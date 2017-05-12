@@ -1,0 +1,124 @@
+<html>
+    <head>
+        <title>Where to get Gtk-Perl documentation</title>
+    </head>
+    <body bgcolor=#e7e7ff>
+    <h1>Some notes on Gtk-Perl documentation</h1>
+
+    Firstly, make sure that you have the latest Gtk-Perl (or at the very least 
+    version 0.6123). Older versions have too many errors and omissions.
+
+    <p>There is documentation and software to download at the
+    <a href="http://www.gtkperl.org/">Gtk-Perl homepage</a>
+    <h2>HTML Tutorial</h2>
+
+    Stephen Wilhelm &lt;swilhelm at theriver.com&gt; has pretty well finished 
+    (10 June 2001) his excellent
+    <a href="http://personal.riverusers.com/~swilhelm/gtkperl-tutorial/">
+        online tutorial</a> 
+    for Gtk-Perl. It follows the Gtk+ Tutorial style 
+    and has some very pretty syntax highlighting for the code examples :)
+    <p>
+    You can download a tarball of the whole site from the tutorial homepage 
+    so that you have a Gtk-Perl tutorial/manual for use when you are off-line.
+    <p>
+    I have learnt a lot from the tutorial and examples and I think that this 
+    is the best way to start with Gtk-Perl. 
+    
+    <h2>Gtk-Perl package documentation</h2>
+    If you need a complete reference of all the Gtk-Perl modules and their
+    methods and data structures
+    the Gtk-Perl maintainers have automated the building of documention for
+    the bindings.
+    and if you build Gtk-Perl yourself, up-to-date docs will be produced then.
+    <ul>
+    <li>
+    Pod versions of the files are in the build/ directory of each module after 
+    you have called 'perl Makefile.PL'. 
+    <br>You can turn them into cross referenced HTML files by calling e.g.:
+    <pre>
+      pod2html perl-gtk-ref.pod > perl-gtk-ref.html
+      pod2html perl-gtk-ds.pod  > perl-gtk-ds.html
+    </pre>
+
+    Online HTML examples of what is produced are 
+    <ul>
+        <li><a href="http://www.gtkperl.org/reference.html">
+            the reference manual of modules and functions and
+            some data structures and types
+            </a> (currently enumerations and flags).
+    </ul>
+    </li>
+    <li>
+    You may be able to learn something from the Gtk-Perl distribution .xs files
+    </li>
+    <li>
+    The file NOTES in Gtk-Perl also gives some programming guidelines and 
+    information about Gtk-Perl naming.
+    </li>
+    </ul>
+
+<h2>Other distribution and source files</h2>
+    <ul>
+    <li>
+        <h3>Gtk documentation</h3>
+        <ul>
+            <li>Since Gtk-Perl mimics the toolkits so regularly, I use the
+            Gtk+ documentation gtk-docs-html-1.1.1 IIRC a tar.gz from 
+            the gtk+ download site. 
+            <li>There is also a tutorial at 
+            <a href="http://www.gtk.org/pub/gtk/tutorial/">www.gtk.org/pub/gtk/tutorial/</a>
+            <li>If you have the gtk+ sources, read the .[ch] files
+            All the source files are clearly named but the main confusion is likely
+            to come from the Gtk-Perl structure which is much more obviously object
+            oriented. For example, gtk_container_add is bound as Gtk::Container->add()
+            and this method is inherited by all containers. So, to add a widget to a
+            TreeItem that inherits as follows
+            <pre>
+             GtkObject
+                 +----GtkWidget
+                       +----GtkContainer
+                             +----GtkBin
+                                   +----GtkItem
+                                         +----GtkTreeItem
+            </pre>
+            you must get a ref $ti_ref to the TreeItem and then call $ti_ref->add()
+            rather than gtk_container_add() as you would in C.
+        </ul>
+    </li>
+    <h3> </h3>
+    <li>
+        <h3>Gnome documentation</h3>
+        <ul>
+            <li>Again, if you have the gnome sources, read the .[ch] files
+            <li>
+            /usr/doc/gnome-libs-devel-1.2.4/devel-docs/ in my gnome-libs-devel
+            rpm package or directory devel-docs/ in the source tree.
+        </ul>
+    </li>
+    </ul>
+    
+<h2>Mailing lists</h2>
+
+    A good source of information about using the Gtk-Perl bindings and Gtk 
+    programming in general is the gtk-perl-list mailing list. You can 
+    <a href="mailto:gtk-perl-list-request@gnome.org?subject=subscribe">
+    subscribe</a>
+    by sending an email to gtk-perl-list-request@redhat.com with a subject of 
+    'subscribe' (without the quotes). Then follow the instructions that will be 
+    emailed to you and confirm the request.
+    <p>
+    The gtk-perl-list grew out of 
+    <a href="mailto:gtk-list-request@gnome.org?subject=subscribe">
+    gtk-list@redhat.com</a> and there is still plenty to learn from that 
+    list too.
+
+    <p>
+    Please don't post long code examples or attachments and definitely no HTML :-) 
+    Also use a meaningful subject line, 'How do I add text to a Gtk::List' 
+    is much better than 'Help, I'm a newbie'
+
+<h2>Glade-Perl</h2>
+    Of course, the <a href="http://www.glade.perl.connectfree.co.uk/index.html">
+    Glade-Perl homepage</a> has the latest documentation and useful links that 
+    I know about.

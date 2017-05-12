@@ -1,0 +1,77 @@
+{
+   "abstract" : "To retrieve ISO 3166:CN standard Chinese provinces",
+   "author" : [
+      "yowcow  C<< <yowcow@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geography-China-Provinces",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Pretty" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Geography::China::Provinces" : {
+         "file" : "lib/Geography/China/Provinces.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yowcow/p5-geography-china-provinces/issues"
+      },
+      "homepage" : "https://github.com/yowcow/p5-geography-china-provinces",
+      "repository" : {
+         "url" : "git://github.com/yowcow/p5-geography-china-provinces.git",
+         "web" : "https://github.com/yowcow/p5-geography-china-provinces"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "yowcow <yowcow@gmail.com>"
+   ]
+}

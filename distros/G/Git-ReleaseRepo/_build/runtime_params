@@ -1,0 +1,4 @@
+do{ my $x = {
+       'install_base' => '/Users/doug/perl5'
+     };
+$x; }

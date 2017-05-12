@@ -1,0 +1,72 @@
+NAME
+    Gearman::Glutch - gearman casual
+
+SYNOPSIS
+        use Gearman::Glutch;
+
+        my $worker = Gearman::Glutch->new(
+            port => 9999,
+            max_workers => 5,
+            max_reqs_per_child => 5,
+            on_spawn_child => sub {
+                warn "Spawned $_[0]";
+            },
+            on_complete => sub {
+                warn "Complete job $$";
+            },
+        );
+        $worker->register_function("echo", sub {
+            my $job = shift;
+            $$.":".$job->arg;
+        });
+        $worker->run();
+
+DESCRIPTION
+    Gearman::Glutch is all in one gearman server management library for
+    casual use. Glutch spawns Gearman::Server and Gearman::Worker
+    automatically.
+
+METHODS
+    my $glutch = Gearman::Glutch->new(%args)
+        Create new instance of Gearman::Glutch. You can pass the following
+        arguments.
+
+        port
+            Port number for gearman server.
+
+        max_workers(Default: 1)
+            number of worker processes
+
+        max_reqs_per_child
+            max. number of requests to be handled before a worker process
+            exits
+
+        on_spawn_child
+            Callback function. This will call on spawned worker process.
+
+        on_complete
+            Callback function. This will call on completed one job.
+
+    $glutch->register_function($name, $code)
+    $glutch->register_function($name, $time, $code)
+            $glutch->register_function("echo", sub {
+                my $job = shift;
+                # $job is instance of Gearman::Job
+                $$.":".$job->arg;
+            });
+
+        Register function to the worker processes.
+
+    $glutch->run()
+        Spawn the child processes and go to main loop.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

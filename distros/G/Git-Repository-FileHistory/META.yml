@@ -1,0 +1,53 @@
+---
+abstract: 'Class representing file on git repository'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Git::Repository: '0'
+  Test::Git: '0'
+  Test::More: '0'
+  Test::Requires::Git: '1.005'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Repository-FileHistory
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Git::Repository::FileHistory:
+    file: lib/Git/Repository/FileHistory.pm
+    version: '0.06'
+  Git::Repository::Plugin::FileHistory:
+    file: lib/Git/Repository/Plugin/FileHistory.pm
+    version: '0.06'
+requires:
+  Git::Repository: '0'
+  Git::Repository::Plugin::Log: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/Git-Repository-FileHistory/issues
+  homepage: https://github.com/Songmu/Git-Repository-FileHistory
+  repository: git://github.com/Songmu/Git-Repository-FileHistory.git
+version: '0.06'
+x_contributors:
+  - 'Matsuki Masayuki <matsuki-masayuki@kayac.com>'
+  - 'Takuya Tsuchida <takuya.tsuchida@gmail.com>'
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'

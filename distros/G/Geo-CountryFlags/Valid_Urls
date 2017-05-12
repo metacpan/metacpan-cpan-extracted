@@ -1,0 +1,6 @@
+
+my $urls = {
+  ISO	=> 'http://www.iso.org/iso/en/prods-services/iso3166ma/02iso-3166-code-lists/list-en1-semic.txt',
+  CIA	=> 'https://www.cia.gov/cia/publications/factbook/docs/flagsoftheworld.html',
+  CIAFLAGS => 'https://www.cia.gov/cia/publications/factbook/flags/',
+};

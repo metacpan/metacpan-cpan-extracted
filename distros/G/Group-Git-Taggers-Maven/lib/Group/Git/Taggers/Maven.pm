@@ -1,0 +1,92 @@
+package Group::Git::Taggers::Maven;
+
+# Created on: 2015-05-17 13:23:25
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use Moo;
+use strict;
+use warnings;
+use namespace::autoclean;
+use version;
+use Carp;
+use English qw/ -no_match_vars /;
+
+extends 'Group::Git::Taggers';
+
+our $VERSION = version->new('0.0.2');
+
+sub match {
+    my ($self, $project) = @_;
+
+    return -f 'pom.xml';
+}
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=head1 NAME
+
+Group::Git::Taggers::Maven - Tags repositories as containing Maven's pom.xml code for Group::Git
+
+=head1 VERSION
+
+This documentation refers to Group::Git::Taggers::Maven version 0.0.2
+
+=head1 SYNOPSIS
+
+   use Group::Git::Taggers::Maven;
+
+   # Brief but working code example(s) here showing the most common usage(s)
+   # This section will be as far as many users bother reading, so make it as
+   # educational and exemplary as possible.
+
+
+=head1 DESCRIPTION
+
+Looks at a repository and determines if it is has a Maven's C<pom.xml> in
+the repository.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 C<match ()>
+
+Returns true if the repository contains a C<pom.xml> file.
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2015 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

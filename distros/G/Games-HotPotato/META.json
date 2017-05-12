@@ -1,0 +1,44 @@
+{
+   "abstract" : "a simple game timer for hot potato or whatever",
+   "author" : [
+      "Andrew Sterling Hanenkamp <hanenkamp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-HotPotato",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::INI::Reader" : 0,
+            "DateTime::Duration" : 0,
+            "Getopt::Long" : 0,
+            "Moose" : 0,
+            "MooseX::Types::DateTime" : 0,
+            "MooseX::Types::Path::Class" : 0,
+            "Path::Class" : 0,
+            "SDL::Mixer" : 0,
+            "SDL::Mixer::Music" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.110020"
+}
+

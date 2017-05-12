@@ -1,0 +1,9 @@
+$Id: README,v 1.1 2004/11/20 11:14:47 joern Exp $
+
+This directory contains example application which use the
+Gtk2::Ex::FormFactory framework.
+
+Change into the examples/ subdirectory and start the programs
+from here. This works, even if you don't have Gtk2::Ex::FormFactory
+actually installed into your Perl system library path.
+

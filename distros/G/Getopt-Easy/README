@@ -1,0 +1,61 @@
+Getopt-Easy version 0.1
+========================
+
+Getopt::Easy is a clear and simple alternative to Getopt::Std
+and Getopt::Long.  It also provides a usage message, an option
+for POD output, and a flexible debugging option.
+
+INSTALLATION
+
+To install this module on Unix and its variants,
+take the Getopt-Easy-0.1.tar.gz file and do
+the usual:
+
+	% gunzip Getopt-Easy-0.1.tar.gz
+	% tar xvf Getopt-Easy-0.1.tar
+	% cd Getopt-Easy-0.1
+	% perl Makefile.PL
+	% make
+	% make test
+
+	And assuming all went well,
+	become super user to do the following:
+	# make install
+
+Since this is a pure Perl module you COULD install it manually.
+Unzip the tar.gz file somehow and then make a Getopt subdirectory
+somewhere on the default search paths (see perl -V and look
+at the bottom for the @INC array).  Then copy
+lib/Getopt/Easy.pm there.
+
+For example, on Win32:
+	
+	Use Winzip to extract the files from the tar.gz file.
+	lib/Getopt/Easy.pm will be among them.
+
+	C:> perl -V
+	...
+	D:\Perl\lib
+	D:\Perl\site\lib
+
+	# make the Getopt directory:
+	C:>md D:\Perl\site\lib\Getopt
+
+	Copy  lib/Getopt/Easy.pm  to  D:\Perl\site\lib\Getopt
+
+	That's all that is needed.
+	Then you can do:
+
+	C:> perldoc Getopt::Easy
+
+	And use the module however you wish.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Jon Bjornstad
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.

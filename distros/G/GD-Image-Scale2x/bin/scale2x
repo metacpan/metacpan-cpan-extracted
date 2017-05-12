@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+=head1 NAME 
+
+scale2x - Scale an image using the Scale2x algorithm
+
+=head1 SYNOPSIS
+
+    % scale2x [-x scale] file.png > file2.png
+
+=head1 DESCRIPTION
+
+This utility allows you to scale an image using the Scale2x algorithm. It takes
+in an image of any format that GD understands and outputs a png. You can
+specify an integer value by which your image should be scaled (default: 2). Example:
+
+    # scale4x
+    % scale2x -x 4 file.png > file4x.png
+
+=cut
+
+use strict;
+use warnings;
+
+use GD;
+use GD::Image::Scale2x;
+use Getopt::Std;
+use Pod::Usage;
+
+our $VERSION = '0.01';
+
+my %options;
+getopts( 'x:', \%options );
+
+my $file = shift;
+
+pod2usage( { verbose => 1 } ) if !defined( $file );
+
+my $image = GD::Image->new( $file );
+my $scale = $options{ x } || 2;
+$scale    = sprintf( 'scale%sx', $scale );
+
+binmode STDOUT;
+
+print $image->$scale->png;

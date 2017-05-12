@@ -1,0 +1,27 @@
+This is Perl module Geo::Coordinates::Converter::iArea.
+
+INSTALLATION
+
+Geo::Coordinates::Converter::iArea installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Geo::Coordinates::Converter::iArea
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Geo::Coordinates::Converter::iArea documentation is available as in POD. So you can do:
+
+    % perldoc Geo::Coordinates::Converter::iArea
+
+to read the documentation online with your favorite pager.
+
+Tokuhiro Matsuno

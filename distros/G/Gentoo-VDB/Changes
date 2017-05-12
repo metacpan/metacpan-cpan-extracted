@@ -1,0 +1,9 @@
+0.001002 - 2016-08-21
+ - Require Path::Tiny 0.048 for "subsumes", thanks NJH Smokers
+ - Unify and expand on testing mechanics for "Valid Gentoo Portage dir"
+
+0.001001 - 2016-08-21
+ - Add extra tests expected to work outside Gentoo targets.
+
+0.001000 - 2016-07-17
+ - Initial Release

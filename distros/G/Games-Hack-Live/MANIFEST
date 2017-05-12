@@ -1,0 +1,11 @@
+Changes
+hack-live
+Makefile.PL
+MANIFEST
+README
+t/Games-Hack-Live.t
+t/test-double.c
+t/test-long.c
+lib/Games/Hack/Live.pm
+GPL-3
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,560 @@
+<html>
+<head>
+<title>Clustered Genezzo Design Document</title>
+</head>
+<body>
+<center><h1>Clustered Genezzo Design Document</h1></center>
+<center><h4>December 20, 2005</h4></center>
+<center><h4>Eric Rollins</h4></center>
+<h2>Introduction</h2>
+Genezzo is a relational database written in Perl currently under development.
+Jeffrey Cohen is the lead developer.  The 
+<a href="http://www.genezzo.com">www.genezzo.com</a>
+web site presents the long-term
+vision for the system, while the current code is hosted on 
+<a href="http://www.cpan.org">CPAN</a> (Comprehensive Perl Archive Network) at
+<a href="http://search.cpan.org/dist/Genezzo/">
+http://search.cpan.org/dist/Genezzo/</a>.
+The Clustered Genezzo code is at
+<a href="http://search.cpan.org/dist/Genezzo-Contrib-Clustered/">
+http://search.cpan.org/dist/Genezzo-Contrib-Clustered/</a>.
+<p>
+Currently Genezzo is a single-process database -- 
+only one process on a single server may access the
+database files at a time.  The current Genezzo codebase also does not
+implement transaction rollback of data already written to disk.  
+The Clustered Genezzo project
+will add support for multi-server multi-process access.  
+The multi-process support
+will be specifically designed to support shared data clusters.
+Transaction rollback support will also be added.  These additions will
+be done via Genezzo's Havok and SysHook extension mechanisms, so
+little modification of the base code will be necessary.
+<p>
+This implementation of Clustered Genezzo will rely heavily on two outside
+components: a Cluster File System and a Distributed Lock Manager.
+Initial choices for these components have been made to enable development.
+It is expected these components will later be replaced, either with other
+outside components or with new components developed as part of the
+Clustered Genezzo project.
+<p>
+The remainder of this document discusses the details of the design and
+proposed implementation of Clustered Genezzo.  Many notes detail alternative
+design decisions and places for further improvement.
+<h2>Shared Data Clusters</h2>
+A shared data cluster consists of multiple independent servers sharing a
+set of common disk drives over a network.  In a production deployment
+the disk sharing will be done over a separate network from the one
+used for general communications between the servers and clients.  
+Until recently this
+separate Storage Area Network (SAN) was assembled using expensive
+Fibre Channel network adapters and switches.  Recently it has become
+possible to assemble a SAN using standard ethernet adapters and switches.
+<p>
+A shared data cluster with a topology like that shown below 
+provides numerous benefits when deploying an
+application like the Genezzo database.   These benefits are in the
+areas of scalability, high availability, and  most
+recently affordability.  Several of these benefits arise because 
+every server can equally access every shared disk.
+The cluster scales in compute power by adding servers, and
+in capacity by adding disks.   The data stored by the
+cluster is highly available because single
+server failures don't prevent access to any of the data, and because the SAN
+disks can easily be set up in a RAID configuration to guard against
+disk failures.
+Finally, clusters built with commodity AMD/Intel processors,
+ATA/SATA hard drives, and ethernet adapters and switches are
+very affordable.  The major drawback to shared data clusters is the
+greater complexity of the operating system(s) and applications required
+to utilize it.  The holy grail at both
+the operating system and database level is the "single system image" &#0150;
+the illusion presented to the higher level applications and the users that
+the cluster is a single monolithic system and the underlying hardware
+complexity can safely be ignored.
+<p>
+<img src="http://eric_rollins.home.mindspring.com/genezzo/cluster.jpg">
+<img src="http://eric_rollins.home.mindspring.com/genezzo/cluster2.jpg">
+<h2>Cluster File System</h2>
+When a disk is directly shared between multiple servers a cluster file system
+is normally needed to arbitrate access to prevent file system corruption.
+Cluster file systems such as Red Hat's
+<a href="http://sources.redhat.com/cluster/gfs/">
+Global File System (GFS)</a>,
+<a href="http://opengfs.sourceforge.net/">OpenGFS</a>, and 
+<a href="http://oss.oracle.com/projects/ocfs/">
+Oracle Cluster File System (OCFS)</a> are available for Linux, but
+none appear ready to run on Debian with a 2.6 kernel.  When running
+on a cluster the Genezzo database system will maintain its own
+buffer cache, manage its own free space and metadata
+storage, and provide its own distributed locking facilities
+(initially using 
+<a href="http://opendlm.sourceforge.net/">OpenDLM</a>).
+Thus it can instead run on Linux raw devices.  Here a whole disk
+partition acts as a single file.  The disk is read and written
+directly, bypassing the kernel's block buffer cache.  This also
+eliminates fsync problems where blocks are cached in the kernel
+instead of written immediately to disk.  The downside is that
+raw devices are much more primitive to maintain than file
+system devices.  Clustered Oracle initially ran on raw devices
+but they later created OCFS to ease the maintenance headaches.
+GFS and/or OCFS may be integrated into the Linux kernel in
+a later release, and Genezzo could run on these file systems.
+<p>
+The configuration of the Genezzo test cluster is discussed at
+<a href="http://eric_rollins.home.mindspring.com/genezzo/cluster.html">
+http://eric_rollins.home.mindspring.com/genezzo/cluster.html</a>.
+<p>
+One major concern with any file system will be the implementation of the 
+<i>fsync</i>
+system call.  When implementing database transactions it is
+important to guarantee data has really been written to disk.  <i>fsync</i>
+is used to force all cached data to disk.  When buffers are passed between
+processes on different machines via the disk 
+another process may read an inconsistent block due
+to a partially completed write.  
+This is very possible when database blocks are larger
+than file system blocks.  We can detect this failure case using a checksum,
+and the block will be reread if a mismatch
+is found.
+<h2>Distributed Lock Manager</h2>
+Cluster File Systems allow processes on multiple machines to simultaneously
+read and write the same file.  Without some form of arbitration a shared
+database file would quickly become corrupted.  A Distributed Lock Manager
+provides locking services to perform this arbitration.  For initial 
+development Clustered Genezzo will utilize 
+<a href="http://opendlm.sourceforge.net/">OpenDLM</a>.  OpenDLM was 
+originally started by IBM, and is apparently currently being used by
+Computer Associates for Ingres on Linux.  
+There are questions about OpenDLMs completeness and
+stability.  Red Hat rejected the IBM DLM and is writing their own
+<a href="http://sources.redhat.com/cluster/dlm/">DLM</a>.  It can
+be used independently of Red Hat GFS, but it isn't clear whether it only
+operates on SAN or shared-disk hardware.
+<p>
+In the past clustered databases (such as Oracle Parallel Server or RAC) 
+have been implemented utilizing one
+database instance per machine, where each instance has its own internal
+lock manager.  With row level locking the lock information has been
+stored directly in the data blocks with the rows.  The DLM has been
+used to implement cache coherence between database instances on different
+machines, not database transaction-level locks.  In our case we will not
+initially be implementing a separate instance-level (intra-machine) lock
+manager.  Instead the DLM will provide all locking services 
+even if only a single machine is running.
+<p>
+Early tests of OpenDLM's scalability have found it to run out of locks
+at around 360,000 locks.  Only 350MB out of 1GB memory had been consumed,
+so the issue was not simple memory exhaustion.  
+Initially
+we will restrict our usage to 100,000 locks.  This would restrict the size
+of an update or select to 400MB, assuming a 4K database page size.  
+We will instead hash the
+lock names into a space of 100,000 locks, 
+trading off 
+the possibility of false lock blocking
+for larger potential update size.  
+<p>
+There may also be issues with the
+performance of OpenDLM.  In testing it took 1.9 seconds to obtain
+10,000 locks, or 5263 locks/second.  In the 100,000 lock limit case
+above it would take 19 seconds to lock the entire database.  This
+is probably acceptable.
+<p>
+While OpenDLM provides many complex locking services, we will initially
+utilize a very simple set.  We will not utilize the async APIs, avoiding
+issues with callback synchronization in Perl.  By utilizing a simple set
+it should be easier to move to a different DLM (or write our own) in the 
+future.
+<h2>Overall Architecture</h2>
+Clustered Genezzo will consist of many identical server processes
+running on multiple server machines.  Each machine will have multiple
+server processes.  Server processes are not multi-threaded, so each one
+will only service one request at a time.  Each server process maintains
+its own private buffer cache.
+Database data files will be stored on SAN attached disks.
+Genezzo server
+processes never communicate directly with one another.  They only interact
+via data stored in the Cluster File System and lock requests using
+the Distributed Lock Manager.
+<p>
+Each Genezzo process is started with a globally unique process id.
+Currently it is allocated by requesting a lock [SVR-processid] in 
+exclusive nowait mode, and incrementing the processid and retrying
+if the processid is already in use (this N^2 technique may need to be
+revisited with a large number of processes).
+All processes share a single undo file, but have distinct
+ranges of blocks preallocated to each process.  
+Only the owning process reads or writes its
+portion of the undo file.  
+<p>
+The undo file lists the current status of each process (CLEAR, COMMITTED,
+ROLLEDBACK, PENDING) with one block per process.  A range of blocks per
+process lists filenumber-blocknumber pairs.  These are the blocks written
+to by the current transaction.  Before the data block is written the
+before image is copied to the tail of its associated data file to a slot
+at filelength + blocknum.
+<p>
+Blocks written by a process but not yet committed contain the process id.
+When a process failure occurs
+block locks will be released.  If a block is read containing another
+process id the state of the failed process is read and the block
+is replaced with the before image if necessary.
+<p>
+Note only before-images of blocks are being generated, 
+and they are only being retained for the duration of the transaction.
+No long-lived redo or log file is generated.  Cluster-wide recovery with
+multiple redo log files is quite complex, and it is believed may 
+customers cannot accept the downtime implied in a restore-backups + 
+mount-offline-logs + roll-logs-forward style recovery.  Instead we will
+rely on the availability of cheap SATA RAID hardware to cover the media failure
+case.  Simple process death or power failure is covered in the undo file
+scheme. 
+<p>
+An online hot-backup facility can be added via a tablespace or cluster-wide
+lock which must be held in SHARED mode to enable writes to the tablespace.
+A backup process would obtain it in EXCLUSIVE mode, locking out all writers
+for the duration of the backup.  
+<p>
+Alternately all transactions could be streamed to a remote log server.  This
+is similar to how many databases accomplish replication.
+<p>
+<h2>Block Structure</h2>
+The basic Clustered Genezzo data block structure is as follows:
+<pre>
+   blockType
+   fileNumber
+   blockNumber
+   currentProcess  (or none)
+   ...metadata...
+   ...row data..
+   checksum
+</pre>
+<p>
+If <i>currentProcess</i> is not <i>none</i> 
+a transaction is in progress against this
+block, and this block has been modified.  
+<i>currentProcess</i> indicates the slot in the undo file
+which contains
+a commit record if the transaction was committed.  In this case 
+<i>currentProcess</i> can safely be set to <i>none</i>.  Otherwise the transaction
+has been rolled back, and the current block needs to be replaced with the
+before image from the tail of the data file.
+<p>
+Note no global System Commit
+Number or Log Sequence Number is maintained.  This eliminates the need
+for this type of global sequence generation algorithm.  
+<h2>Normal Transaction Operation</h2>
+At the beginning of a normal transaction the process's undo file status block
+will be set to clear.
+The buffer cache will not contain any
+valid blocks, and no locks will be held except an EXCLUSIVE lock on the
+undo file [SVR-processId].  Note the buffer cache is only used
+to manage database data blocks.  The undo file is managed separately.
+<p>
+As SQL statements are processed blocks will be requested from the
+buffer cache.  Each request will form a lock name [BLK-fileNumber-blockNumber].
+The process will determine whether this block is already locked by the
+process.  If not, a blocking SHARED mode lock request will be made.
+<pre>
+def blockReadRequest(fileNumber, blockNumber)
+   form lock name [BLK-blockNumber mod 100000]
+
+   if(not lock already held by process)
+      blocking SHARED lock request
+      add lock to hash and list of locks held by process
+   end
+
+   checksumMatch = false
+   retries = 0
+
+   // all block reads follow this checksum-retry logic;
+   // it is only listed here
+   while(not checksumMatch and retries < maxRetryCount)
+      read block from disk
+      compute checksumMatch for block
+   end
+
+   if(retries >= maxRetryCount)
+      raise BlockCorruptionException
+   end
+
+   if(block PID not none (and not current process!))
+      promote block lock to EXCLUSIVE
+      // Safe to read state, since we were able to obtain EX block lock
+      get process state for PID 
+
+      if state == COMMITTED
+         update block to clear PID
+         write updated block to before image tail of file
+         write updated block to file
+      else if state == ROLLEDBACK || state == PENDING
+         replace block with before image from tail of file
+      end
+   end
+
+   proceed with regular read
+end
+</pre>
+
+The Genezzo push-hash implementation automatically detects any attempts to
+write to a block.  The first time a block is written in a transaction
+the SHARED lock must be promoted to EXCLUSIVE and the old contents of the
+block must be written to the undo file.
+<pre>
+def blockWriteRequest(fileNumber, blockNumber)
+   if(block on list of those already written to undo)
+      return
+   end
+
+   form lock name 
+   find lock in hash of locks held by process
+   
+   if(not lock already held by process in EXCLUSIVE mode)
+      blocking EXCLUSIVE lock conversion request
+      update local record of lock state
+   end
+
+   append current (old) contents of block to tail of data file
+   <i>fsync</i> data file
+   add fileno-blockno to process undo block in undo file 
+      (written to two blocks for recoverability).
+   <i>fsync</i> undo file
+
+   current process id will be added to PID in metadata portion of block
+      prior to its being written out to disk
+end
+</pre>
+At this point the block may be updated and safely written out to disk at any 
+time by the buffer cache.  It may LRU in and out of the buffer cache 
+repeatedly, so we do support updates larger than the buffer cache.
+<p>
+At commit time the buffer cache must be written out to disk (same as
+single-process Genezzo).  Then the process status in the undo file is set
+to Committed.
+Each of the updated data blocks now has the currentUndo field set to none.
+Finally the undo file is truncated (set to empty), and the locks are released.
+<pre>
+def commit()
+   write all dirty buffer cache buffers to disk
+   <i>fsync</i> data file(s)
+   write Committed status to process slot in undo file
+   <i>fsync</i> undo file
+
+   // At this point we have now persistently marked the transaction as
+   // COMMITTED.  Prior to this point recovery will roll back the
+   // transaction.  After this point recovery will complete the transaction.
+
+   read undo slots in undo file  sequentially to determine list of updated blocks:
+
+   for each block listed in undo slots
+      read block
+      update block to clear PID
+      write updated block to before image tail of file
+      write updated block to file
+   end
+
+   <i>fsync</i> data file(s)
+   write CLEAR status to process slot in undo file
+   <i>fsync</i> undo file
+   free all data buffers
+   release all locks in lock list
+end
+</pre>
+In the case of a rollback we can use the undo file to back out the changes:
+<pre>
+def rollback()
+   write ROLLEDBACK status to process slot in undo file
+   <i>fsync</i> undo file
+
+   invalidate buffer cache
+
+   for each block listed in undo slots in undo file
+      write block from data file tail to corresponding data file location
+   end
+
+   <i>fsync</i> data file(s)
+   write CLEAR status to process slot in undo file
+   <i>fsync</i> undo file
+   release all locks in lock list
+end
+</pre>
+<h2>Process Recovery</h2>
+Process recovery is performed at startup.  
+<p>
+<pre>
+def recoverProcess()   
+   committed = FALSE
+
+   lookup process status of failed process
+  
+   if COMMITTED status found
+      committed = TRUE
+   end
+
+   for each block listed in undo slots of failed process
+      lock block SHARED 
+
+      if PID in block != current process id
+        continue  // block already recovered by some other process
+
+      promote lock to EXCLUSIVE
+
+      if committed
+         read block
+         update block to clear PID
+         write updated block to before image tail of file
+         write updated block to file
+      else
+         write block from data file tail to corresponding data file location
+      end
+
+      release lock (or wait till end)
+   end
+
+   <i>fsync</i> data file(s)
+   write CLEAR status to process slot of failed process in undo file   
+   <i>fsync</i> undo file
+   return TRUE
+end
+</pre>
+<h2>Deadlock</h2>
+Deadlock is detected by the Distributed Lock Manager OpenDLM.  The DLM chooses
+a victim and returns an error code.  It is the responsibility of the
+caller to release all locks and return an error (exception?) to the
+higher level routine.  All lock requests in Clustered Genezzo must
+be written to handle this condition.
+<h2>Space Management Transactions</h2>
+Blocks used to manage space allocation in tablespaces will have
+high degrees of write contention.  
+Currently Genezzo stores the table directory and free space directory
+for each tablespace in block 0.  This prevents any concurrency between
+reads and writes.  One solution would involve moving distinct functions to
+different blocks and allocating multiple blocks of each type.  The block number
+of the first
+block of each table could be stored directly 
+in the data dictionary, and free extent
+lists could be maintained in multiple blocks at the beginning of the file.  
+Processes hashed by PID would begin their search for a free extent in
+different blocks.  Extents could be linked together to prevent contention
+over used extent maps.
+<p>
+We currently don't have any facility to support separate space management
+transactions.  If a user transaction rolls back for any reason the nested space
+management transaction also rolls back.  Space management transactions
+cannot commit prior to the user transaction commit.
+<h2>Data Dictionary</h2>
+At startup (before Havok routines are loaded) data dictionary tables
+are loaded and cached.  These blocks are not released on commit,
+and aren't visible to the lock manager.  Other machines won't be
+notified of changes.  We may only support distributed transactions
+against the non-system tablespace.  The data dictionary would remain
+in the system tablespace and would be cacheable.  Currently the
+data dictionary is written when a table spills into another file of its
+tablespace, so the data dictionary is not read-only for DML.
+<h2>Performance</h2>
+The current Clustered Genezzo design has many areas of concern with
+respect to performance.  Several are related to the buffer cache
+not being able to perform its usual functions.  In a shared-memory or
+multi-threaded server the buffers are shared between many user requests.
+This minimizes the necessary disk access and maximizes the use of memory.
+In Clustered Genezzo we may wish to support hundreds of users on a single
+server, but this means the available server memory would be 
+divided between all the processes.  An individual server process would
+have a very small buffer cache.  The alternative would be to implement a
+true shared-memory buffer cache, or a set of easily reservable buffers
+from a shared pool for use on large queries.  
+<p>
+The second major buffer cache difficulty is that currently
+the cache must be invalidated on completion of each transaction, since all
+the locks are released.  One alternative is to store the blockRevisionNumber
+in the Lock Value Block (a 32-byte user-defined field) provided by OpenDLM.
+If the value matched the blockRevisionNumber in the buffer cache a read
+could be avoided.  However, writing a new value requires upgrading the lock
+to EXCLUSIVE mode, which would be difficult with blocks under high 
+contention.  The lock would also need to be down-converted to NULL mode
+rather than released, so the DLM will preserve the value.  Finally,
+with hashing of locks the lock name would also need to be written in the
+value field and only one value could be retained in a hash-collision case.
+A second option is to have the server processes retain locks after committing,
+and instead only release locks when an async callback occurs requesting
+the lock.  This would require async callback programming in Perl.
+<p>
+File system performance will be strongly influenced by the implementation of
+the underlying Cluster File System.  If it is built directly on raw devices
+there will not be any other file system buffering, and all reads will
+hit the disk (or disk cache).  Cluster file systems build on top of the
+operating system file system
+have additional levels of buffer cache.
+These levels of cache reduce the need for a large Genezzo buffer cache,
+but introduce a greater likelihood of <i>fsync</i> problems.  
+<p>
+Performance will also be impacted by the lack of serial writes.  
+Traditional enterprise databases have one dedicated disk per database
+server log.  This way each server can perform serial writes.
+They also perform write-ahead in the log and minimize <i>fsyncs</i> of
+the data files.
+We have a single random-accessed undo file shared between all 
+processes on all servers.
+A dedicated undo disk per process would be cost prohibitive.
+<h2>Proposed Server Model</h2>
+We are currently investigating utilizing the 
+<a href="http://httpd.apache.org">Apache Web Server</a> 
+running 
+<a href="http://perl.apache.org">mod_perl</a> as the
+multi-process server for Genezzo.  A simple mod_perl script would
+receive HTTP requests and return XML results.  Here it would be
+acting as a XML-over-HTTP web service.  It would be connectionless from
+the web-service user's point of view, but would hold the database files
+open.  Apache 1.3, and 2.0 in pre-fork MPM mode, creates multiple 
+single-threaded server processes.  Each process handles one request at
+a time.  Each would be a separate process for the purposes of the previous
+design -- each would have its own portion of the undo file with its
+process id.  Apache web servers on multiple machines would all access the
+same Genezzo database files available through the Cluster File System.
+<p>
+A minimal Apache 2.0 process (with mod_perl) consumes 6 MB [need to verify
+with code sharing, etc.].  
+The Genezzo code is small, and the total process size will be primarily
+determined by the size of the buffer cache.  With a 4 MB buffer cache
+the total process would be 10 MB, and a 1 GB server could have say 80
+Apache Genezzo child processes running.  This is small compared to the
+hundreds of user connections supported by commercial databases, but the
+difference is that we are using a stateless web protocol instead of
+persistent connections.  If a user makes small simple requests and
+waits tens of seconds between them then
+a single Apache process can serve dozens of users.  
+<p>
+Note the stateless protocol means user transactions cannot span multiple HTTP
+requests.  Instead some type of server-side stored procedures will be
+required to bundle multiple SQL statements into a single transaction.
+Stored procedures would of course be written in Perl.
+A simple alternative is to create separate mod_perl web pages for each
+procedure.  They could be shared between the Apache servers in the cluster via
+the Cluster File System.  Another alternative is to store the 
+procedure definitions in the database.
+Large bulk loads
+would need to be done using a command-line tool (similar to gendba.pl).
+<h2>Read Consistency Model</h2>
+The preceding design specifies lock modes (Shared for read, Exclusive
+for write) and 
+how long locks will be held (until the completion of the transaction).
+This is an instance of two-phase locking, and implements the "Serializable"
+isolation level.  An alternative is to release share locks at on the 
+completion of each SQL select instead of the completion of the transaction.
+This would implement the "Cursor Stability" isolation level.  In this
+case we would need to extend the SQL grammar with "holdlock" or 
+"for update" when locks should be retained until the completion of the
+transaction.  The "Cursor Stability" isolation level (named for 
+cursors, which we don't support) may not be as necessary given
+the short-transaction model imposed by the proposed Apache server model,
+above.
+<p>
+With the locking model described above we still have the potential for
+"Phantoms".  To prevent phantoms in indexed tables we can acquire additional
+locks on the index pages in positions before or after 
+where phantom rows would be inserted.  Preventing phantoms in non-indexed
+columns is more difficult.
+</body>
+</html>
+

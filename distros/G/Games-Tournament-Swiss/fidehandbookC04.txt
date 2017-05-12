@@ -1,0 +1,312 @@
+Actual Handbook
+
+Handbook | C. General Rules and Recommendations for Tournaments
+| 04. FIDE Swiss Rules | 04.1. Swiss System Based on Rating 
+
+04.1. Swiss System Based on Rating
+
+Approved by the 1992, 1997 and 1998 General Assemblies.
+
+A. Introductory Remarks and Definitions 
+
+B. Pairing Criteria 
+
+C. Pairing Procedures 
+
+D. Transposition and Exchange Procedures 
+
+E. Colour Allocation Rules 
+
+F. Final Remarks 
+
+A. Introductory Remarks and Definitions 
+
+A.1 Rating
+It is advisable to check all ratings supplied by players. If no
+reliable rating is known for a player the arbiters should make an
+estimation of it as accurately as possible before the start of the
+tournament.
+(to convert German Ingo or British BCF use rating = 2840 - 8 x INGO =
+600 + 8 x BCF)
+A.2 Order
+For pairing purposes only, the players are ranked in order of,
+respectively
+ a. score
+ b. rating
+ c. FIDE-title (IGM-WGM-IM-WIM-FM-WFM-no title)
+ d. alphabetically (unless it has been previously stated that this
+    criterion has been replaced by another one)
+
+The order made before the first round (when all scores are obviously
+zero) is used to determine the pairing numbers: the highest one gets
+#1 etc.
+A.3 Score brackets
+Players with equal scores constitute a homogeneous score bracket.
+Players who remain unpaired after the pairing of a score bracket will
+be moved down to the next score bracket, which will therefore be
+heterogeneous. When pairing a heterogeneous score bracket these
+players moved down are always paired first whenever possible, giving
+rise to a remainder score bracket which is always treated as a
+homogeneous one.
+A heterogeneous score bracket of which at least half of the players
+have come from a higher score bracket is also treated as though it was
+homogeneous.
+A.4 Floats
+By pairing a heterogeneous score bracket, players with unequal scores
+will be paired. To ensure that this will not happen to the same
+players again in the next round this is written down on the pairing
+card. The higher ranked player receives a downfloat ( ), the lower one
+an upfloat ( ).
+A.5 Byes
+Should the total number of players be (or become) odd, one player ends
+up unpaired. This player receives a bye: no opponent, no colour, 1
+point. A bye is considered to be a downfloat.
+A.6 Subgroups
+To make the pairing, each score bracket will be divided into two
+subgroups, to be called S1 and S2.
+In a heterogeneous score bracket S1 contains all players moved down
+from a higher score bracket.
+In a homogeneous score bracket S1 contains the higher half (rounding
+downwards) of the number of players in the score bracket.
+The number of players in S1 will be indicated by "p", indicating the
+number of pairings to be made.
+In both cases S2 contains all other players of the score bracket.
+In both S1 and S2 players are ordered according to A2.
+A.7 Colour differences and colour preferences
+The colour difference of a player is the number of games played with
+white minus the number of games played with black by this player.
+After a round the colour preference can be determined for every
+player.
+ a. An absolute colour preference occurs when a player's colour
+    difference is greater that 1 or less than -1, or when a player
+    played with the same colour in the two latest rounds. The
+    preference is white when the colour difference is << 0 or when the
+    last two games were played with black, otherwise black. In this
+    case the (obligatory) colour is already written down on the score
+    card. (This rule is not in effect when pairing players with a
+    score of over 50% in the last round).
+ b. A strong colour preference occurs when a player's colour
+    difference is unequal to zero. The preference is white when the
+    colour difference is < 0, black otherwise.
+ c. A mild colour preference occurs when a player's colour difference
+    is zero, the preference being to alternate the colour with respect
+    to the previous game. In this case the colour difference is
+    written down as +0 or -0 depending on the colour of the previous
+    game (white or black respectively).
+    Before the first round the colour preference of one player (often
+    the highest one) is determined by lot.
+
+A.8 Definition of "x"
+The number of pairings which can be made in a score bracket, either
+homogeneous or heterogeneous, not fulfilling all colour preferences,
+is represented by the symbol x.
+x can be calculated as follows:
+w = number of players having a colour preference white.
+b = number of players having a colour preference black.
+q = number of players in the score bracket divided by 2, rounded
+upwards.
+If b >> w then x = b-q, else x = w-q.
+A.9 Transpositions and exchanges
+ a. In order to make a sound pairing it is often necessary to change
+    the order in S2. The Rules to make such a change, called a
+    transposition, are in D1.
+ b. In a homogeneous score bracket it may be necessary to exchange
+    players from S1 and S2. rules for exchanges are found under D2.
+    After each exchange both S1 and S2 are to be ordered according to
+    A2.
+
+B. Pairing Criteria
+
+    Absolute Criteria
+(These may not be violated. If necessary players will be moved down to
+   a lower score bracket.)
+B.1
+ a. Two players shall not meet more than once.
+ b. A player who has received a point without playing, either through
+    a bye or due to an opponent not appearing in time, shall not
+    receive a bye.
+
+B.2
+ a. No player's colour difference will become >+2 or <-2.
+ b. No player will receive the same colour three times in row.
+
+Relative Criteria
+(These are in descending priority. They should be fulfilled as much as
+possible. To comply with these criteria, transpositions or even
+exchanges may be applied, but no player should be moved down to a
+lower score bracket).
+B.3
+The difference of the scores of two players paired against each other
+should be as small as possible and ideally zero.
+B.4
+As many players as possible receive their colour preference. (Whenever
+x of a score bracket is unequal to zero this rule will have to be
+ignored. x is deducted by one each time a colour preference cannot be
+granted.)
+B.5
+    No player shall receive an identical float in two consecutive rounds.
+B.6
+No player shall have an identical float as two rounds before.
+Note: B2, B5 and B6 do not apply when pairing players with a score of
+over 50% in the last round.
+
+C. Pairing Procedures
+
+     Starting with the highest score bracket apply the following
+procedures to all score brackets until an acceptable pairing is
+obtained. Afterwards the colour allocation rules (E) are used to
+   determine which players will play with white.
+C.1  If the score bracket contains a player for whom no opponent can be
+found within this score bracket without violating B1 or B2 then:
+  * if this player was moved down from a higher score bracket apply
+    C12.
+  * if this score bracket is the lowest one apply C13.
+  * in all other cases: move this player down to the next score
+       bracket.
+C.2  Determine x according to A8.
+C.3  Determine p according to A6.
+C.4  Put the highest players in S1, all other players in S2.
+C.5  Order the players in S1 and S2 according to A2.
+C.6  Pair the highest player of S1 against the highest one of S2, the
+second highest one of S1 against the second highest one of S2, etc.
+If now p pairings are obtained in compliance with B1 and B2 the
+pairing of this score bracket is considered complete.
+  * in case of a homogeneous score bracket: remaining players are
+    moved down to the next score bracket. With this score bracket
+    restart at C1.
+  * in case of a heterogeneous score bracket: only players moved down
+    were paired so far. Start at C2 with the homogeneous remainder
+       group.
+C.7  Apply a new transposition of S2 according to D1 and restart at C6.
+C.8  In case of a homogeneous (remainder) group: apply a new exchange
+   between S1 and S2 according to D2. Restart at C5.
+C.9  Drop criterion B6 and B5 (in this order) for downfloats and
+   restart at C4.
+C.10 In case of a homogeneous remainder group: undo the pairing of the
+lowest moved down player paired and try to find a different opponent
+for this player by restarting at C7.
+  * If no alternative pairing for this player exists then drop
+       criterion B6 first and then B5 for upfloats and restart at C2.
+C.11 As long as x is less than p: increase x by 1. When pairing a
+remainder group undo all pairings of players moved down also. Restart
+at C3.
+C.12 In case of a heterogeneous group: undo the pairing of the
+previous score bracket. If in this previous score bracket a pairing
+can be made whereby another player will be moved down to the current
+one, and this now allows p pairing to be made then this pairing in the
+previous score bracket will be accepted.
+C.13 In case of the lowest score bracket: the pairing of the
+penultimate score bracket is undone. Try to find another pairing in
+the penultimate score bracket which will allow a pairing in the lowest
+score bracket. If in the penultimate score bracket p becomes zero
+(i.e. no pairing can be found which will allow a correct pairing for
+the lowest score bracket) then the two lowest score brackets are
+joined into a new lowest score bracket. Because now another score
+bracket is the penultimate one C13 can be repeated until an acceptable
+pairing is obtained.
+C.14 Decrease p by 1 (and if the original value of x was greater than
+zero decrease x by 1 as well). As long as p is unequal to zero restart
+at C4. If p equals zero the entire score bracket is moved down to the
+   next one. Restart with this score bracket at C1.
+
+D. Transposition and Exchange Procedures
+
+  Example: S1 contains players 1, 2, 3 and 4 (in this sequence); S2
+   contains players 5, 6, 7 and 8 (in this sequence).
+D.1 Transpositions within S2 should start with the lowest players,
+with descending priority:
+ 1. 5-6-8-7;
+ 2. 5-7-6-8;
+ 3. 5-7-8-6;
+ 4. 5-8-6-7;
+ 5. 5-8-7-6;
+ 6. 6-5-7-8;
+ 7. 6-5-8-7, etc.
+
+Hint: put all numbers constructable with the digits 5, 6, 7 and 8 in
+   ascending order.
+D.2 When applying an exchange between S1 and S2 the difference between
+the numbers exchanged should be as small as possible. When differences
+of various options are equal take the one concerning the lowest player
+of S1.
+Exchange one player
+S1   Exchange two players
+S1
+  4 3 2 S2   3+4 2+4 2+3
+5 a c f 5+6 j l o
+6 b e h 5+7 k n q
+7 d g i 6+7 m p r
+
+The above matrices contain the sequence in which exchanges should be
+applied.
+Exchanging one player: a) 4 and 5; b) 4 and 6; c) 3 and 5; etc. until
+i) 2 and 7.
+Exchanging two players: j) 3+4 with 5+6; k) 3+4 with 5+7; l) 2+4 with
+5+6 etc. After each exchange both S1 and S2 should be ordered
+according to A2.
+Remark: if the number of players in a score bracket is odd, S1
+contains one player less than S2. So with 7 players S1 contains
+players 1, 2 and 3, S2 4, 5, 6 and 7. The exchanges needed in that
+case can be found from the above ones by deducting all numbers in S1
+and S2 by 1. The last column of the second matrix has then become
+obsolete.
+
+E. Colour Allocation Rules
+
+    For each pairing apply (with descending priority):
+E.1 Grant both colour preferences.
+E.2 Grant the stronger colour preference.
+E.3 Alternate the colours to the most recent round in which they
+   played with different colours.
+E.4 Grant the colour preference of the higher ranked player.
+E.5 In the first round all even numbered players in S1 will receive a
+   colour different from all odd numbered players in S1.
+
+F. Final Remarks
+
+F.1  After a pairing is complete sort the pairing before making them
+public.
+
+The sorting criteria are (with descending priority)
+  * the score of the higher player of the pairing involved;
+  * the sum of the scores of both players of the pairing involved;
+  * the rank according to A2 of the higher player of the pairing
+       involved.
+F.2  Byes, and pairing not actually played, or lost by one of the
+players due to arriving late or not at all, will not be taken into
+account with respect to colour, Such a pairing is not considered to be
+   illegal in future rounds.
+F.3  A player who after five round has a colour history of BWW-B (i.e.
+no valid game in round 4) will be treated as -BWWB with respect to E3.
+   So WB-WB will count as -WBWB and BWW-B-W as - - BWWBW.
+F.4  Because all players are in one homogeneous score bracket before
+the start of round one and are ordered according to A2 the highest
+player of S1 will play against the highest player of S2 and if the
+   number of players is odd the lowest ranked player will receive a bye.
+F.5  Players who withdraw from the tournament will no longer be paired.
+Players known in advance not to play in a particular round are not
+   paired in that round and score 0.
+F.6  A pairing officially made public shall not be changed unless it
+   violates the absolute pairing criteria (B1 and B2).
+F.7  If either
+  * result was written down incorrectly, or
+  * a game was played with the wrong colours, or
+  * a player's rating has to be corrected, then this will only affect
+    pairing yet to be made.
+
+Whether it will affect a pairing already made public but not yet
+played should be decided by the arbiter.
+
+   Unless the rules of the tournament state otherwise:
+F.8  Players who are absent during a round without notification to the
+   arbiter will be considered to have withdrawn themselves.
+F.9  Adjourned games are considered draws for pairing purposes only.
+F.10 F.10 In order to make the final standings the following criteria
+apply (in descending priority):
+  * the highest number of points scored; should this be equal for
+    several participants prize money should be shared;
+  * where it concerns the first place: the best result in games played
+    against each other;
+  * the highest average rating of the opponents;
+  * the drawing of lots.
+

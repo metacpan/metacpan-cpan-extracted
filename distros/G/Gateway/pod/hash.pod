@@ -1,0 +1,31 @@
+=head2 hash
+
+B<THIS MODULE IS EXPERIMENTAL>.  The interface to this module is pretty
+much guaranteed to change in later versions of News::Gateway.  Don't rely
+on the current interface.
+
+This module provides a generic interface for loading hashes from disk
+files.  It can transparently handle either regular files (which are loaded
+into a memory hash) or Berkeley db files (which are tied to a hash
+directly).  The following method is included:
+
+=over 4
+
+=item hash_open (FILE [, SPLIT])
+
+If C<FILE> ends in F<.db>, then it will be tied directly to a hash.
+Otherwise, it will be opened and its contents read into memory.  C<SPLIT>
+is an anonymous code reference that will be called with each line and is
+expected to return a list consisting of the key and then the value (or
+values, if there are more than one associated with a key).  If C<SPLIT>
+isn't provided, each line minus the trailing newline will be taken as a
+key and the value will always be 1.
+
+If C<SPLIT> returns more than one value for a key, the key will be
+associated with an anonymous array containing all the values.  Otherwise,
+the key will be associated with the value directly.
+
+This method returns a reference to the resulting hash, or undef if the
+file could not be opened.
+
+=back

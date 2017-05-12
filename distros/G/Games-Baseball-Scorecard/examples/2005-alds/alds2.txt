@@ -1,0 +1,304 @@
+#  http://sports.espn.go.com/mlb/gameLog?gameId=251005104&full=1
+# http://sports.espn.go.com/mlb/boxscore?gameId=251005104
+# http://mlb.mlb.com/NASApp/mlb/mlb/ps/y2005/boxscore.jsp?gid=2005_10_05_bosmlb_chamlb_1
+
+scorer	Pudge
+date	2005-10-05, 18:09-20:38
+at	U.S. Cellular Field, Chicago
+att	40,799
+temp	81 clear
+wind	11 R to L
+
+away	Boston Red Sox
+starter	16
+lineup
+	18 8
+	 3 6
+	34 0
+	24 7
+	33 2
+	 7 9
+	11 5
+	19 3
+	10 4
+
+home	Chicago White Sox
+starter	56
+lineup
+	22 7
+	15 4
+	23 9
+	14 3
+	 8 0
+	33 8
+	12 2
+	24 5
+	 5 6
+
+__INIT__
+
+inn T1
+	ab
+		p sf
+		hit 1 l
+		-> 3
+		-> 4
+	ab
+		p bsbb 
+		hit 2 l
+		-> 4
+	ab
+		p bfs
+		k
+	ab
+		hit 1 lc
+		rbi 2
+		to 2 FC5-4
+	ab
+		p s
+		fc
+	ab
+		p s
+		1-3
+
+inn B1
+	ab
+		p bss
+		6-3
+	ab
+		p bs
+		f8
+	ab
+		p sbsbf
+		4-3
+
+inn T2
+	ab
+		p ssfb
+		5-3
+	ab
+		p b
+		f8
+	ab
+		p sbbs
+		4-3
+
+inn B2
+	ab
+		p sb
+		f8
+	ab
+		hit 1 cl
+		to 2 6u
+	ab
+		p sf
+		out DP6-3
+
+inn T3
+	ab
+		p sf
+		hit 1 lc
+		-> 3
+		-> 4
+	ab
+		p bssf
+		f8
+	ab
+		p ssf
+		hit 2 l
+		-> 3
+		-> 4
+	ab
+		p bbb
+		ibb
+		-> 2
+		-> 3
+	ab
+		p sffbbf
+		hit 1 rc
+		rbi
+		to 2 FC3-6
+	ab
+		p f
+		fc
+		rbi
+	ab
+		p sf
+		k
+
+inn B3
+	ab
+		4-3
+	ab
+		p bsf
+		!k
+	ab
+		p bs
+		l5
+
+inn T4
+	ab
+		f8
+	ab
+		p bb
+		f8
+	ab
+		p f b
+		4-3
+		
+inn B4
+	ab
+		p sbbf
+		3-1
+	ab
+		p bbf
+		hit 1 il
+	ab
+		p bsb
+		f8
+	ab
+		p sbsfb
+		f8
+
+inn T5
+	ab
+		p s
+		f8
+	ab
+		p s
+		4-3
+	ab
+		5-3
+
+inn B5
+	ab
+		p b
+		hit 1 rc
+		-> 4
+	ab
+		hit 2 l
+		rbi
+		-> 3
+		-> 4
+	ab
+		p fbf
+		4-3
+	ab
+		p fbbf
+		hit 1 cl
+		rbi
+		-> 3 E4
+		-> U
+	ab
+		p fsffbf
+		reach E4
+		error 4
+		-> U
+	ab
+		p f
+		FO5
+	ab
+		p bs
+		hit U l
+		rbi 2
+	ab
+		p bbss
+		!k
+
+inn T6
+	ab
+		p b
+		hit 1 lc
+	ab
+		p sbbff
+		f9
+	ab
+		p s
+		f9
+	ab
+		p ssbb
+		1-3
+
+inn B6
+	ab
+		p sbsf
+		hit 1 lc
+		to 2 6-4
+	ab
+		p b
+		dp6-4-3
+	ab
+		p bs
+		fo2
+
+inn T7
+	ab
+		5-3
+	ab
+		p sfffb
+		3u
+	ab
+		hit 1 il
+	ab
+		p sb
+		4-3
+
+inn B7
+	ab
+		p bs
+		f8
+	ab
+		p ffb
+		f8
+
+	add_pitcher 58
+	ab
+		p bssf
+		hit 1 lc
+	ab
+		5-3
+
+inn T8
+	add_pitcher 45
+	ab
+		p sbbs
+		f8
+	ab
+		3-1
+	ab
+		p sbfbb
+		bb
+	ab
+		p sfbb
+		4-3
+
+inn B8
+	ab
+		p b
+		l3
+	ab
+		p s
+		hit 1 cl
+	ab
+		f8
+	ab
+		f9
+
+inn T9
+	ab
+		p bs
+		1-3
+	ab
+		p bbs
+		hit 2 lc
+	ab
+		p sbbfb
+		f02
+	ab
+		6-3
+
+win 56
+inn
+loss 16
+
+__GAME__

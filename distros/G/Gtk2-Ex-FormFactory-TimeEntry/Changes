@@ -1,0 +1,8 @@
+Revision history for Perl extension Gtk2::Ex::FormFactory::TimeEntry.
+
+0.02  Tues May 11, 2010
+    - fixed makefile
+	
+0.01  Tues May 11, 2010	
+	- initial release
+

@@ -1,0 +1,10 @@
+Revision history for Perl extension Games::Tournament::Blackjack.
+
+0.01  Thu Feb 24 02:30:25 2005
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -b5.6.1 -B -n Games::Tournament::Blackjack
+
+  - Imported from non-cpan code. Alpha quality.
+  - Manually changed version number to 0.01.
+  - Changed perl req., then back to 5.006
+  

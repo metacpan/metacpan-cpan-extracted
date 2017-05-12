@@ -1,0 +1,8 @@
+examples/simple_menu.pl
+lib/Gtk2/Ex/Simple/Menu.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+perl-Gtk2-Ex-Simple-Menu.spec.in
+t/GtkExSimpleMenu.t

@@ -1,0 +1,28 @@
+Geo-Coordinates-ETRSTM35FIN version 0.01
+========================================
+
+Convert Finnish Coordinate System (ETRS-TM35FIN) from/to WGS84
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+    Math::Trig
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2011 Olli Lammi and Matti Lattu <matti@lattu.biz>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+

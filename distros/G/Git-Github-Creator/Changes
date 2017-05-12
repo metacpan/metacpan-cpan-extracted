@@ -1,0 +1,24 @@
+# Changes for github_creator.pl 
+
+0.17_02 - Mon Nov 26 11:40:41 2012
+	* Use Net::GitHub::V3, which can use OAuth
+
+0.17 - Fri Jan  2 21:54:08 2009
+	* I moved most of the script into a modulino.
+
+0.15 - Tue Dec  9 20:23:49 2008
+	* Changes from Yanick to support Module::Build
+	* Changes from David Golden to be smart about META.yml
+
+0.13 - Mon Oct 27 13:10:22 2008
+	* Fixups to the Makefile. No big whoop.
+
+0.12 - Sat Aug 30 19:23:50 2008
+	* Fixups to lazy loading of modules. Have to get those imports
+	right!
+
+0.11 - Sat Aug 30 18:33:50 2008
+	* My dinky little script to log into Github, create a new repo,
+	and tell me what it is. I then push to it. Whoop-de-doo!
+
+

@@ -1,0 +1,35 @@
+Revision history for Perl extension Games::Hack::Live.
+
+0.6
+  - Ability to work on multiple things in parallel,
+	  eg. money, lifes and strength.
+	- Bugfix - substituted "." by "\C" in regex.
+	- Memory dumps now named in hexadecimal.
+
+0.5
+	- small bugfix for applications with lots of libraries.
+	- Bugfix for killwrites - keep *address at old value.
+	- Stop script if debuggee exits
+
+0.406 Thu Nov 15 10:25:20 CET 2007
+  - substitution for non-word characters in ::Patch names.
+
+0.405 Thu Nov 15 10:05:20 CET 2007
+  - forgot to package hack-live script
+
+0.404 Thu Nov 14 10:25:20 CET 2007
+  - Wrapper for easier running
+
+0.4  Wed Oct 24 06:52:11 CEST 2007
+  - Renamed to correct name
+	- Support for various types in search
+	- integer and floating point searching/patching possible
+	- "find" prints last list
+	- (useless) test added
+	- Optionally asks for description for killed writes
+	- Can attach to a running process
+
+0.3  Tue Sep 18 15:57:37 2007
+	- first published version;
+	- supports finding/killing integer values.
+

@@ -1,0 +1,78 @@
+Revision history for Google-ProtocolBuffers-Dynamic
+
+0.16      2017-03-11 14:30:57 CET
+
+    - Compilation fix for threaded Perl
+
+0.15      2016-12-22 15:31:34 CET
+
+    - Fix protobuf encoder being broken after some encoding errors
+      (and probably other latent bugs)
+
+0.14      2016-12-12 19:10:35 CET
+
+    - Don't produce invalid Perl hashes for incorrectly encoded maps
+
+0.13      2016-12-08 12:00:11 CET
+
+    - Fix bug in decoding of empty strings (patch by Pavel Shaydo)
+
+0.12      2016-12-04 22:03:19 CET
+
+    - Add 'plain' accessor style, for compatibility with
+      Google::ProtocolBuffers (patch by Pavel Shaydo)
+
+0.11      2016-11-09 13:19:42 CET
+
+    - Allow passing options with "--" to Build.PL
+
+0.10      2016-11-07 17:59:12 CET
+
+    - Fix warning when encoding '' as a boolean
+
+0.09      2016-10-01 20:23:03 CEST
+
+    - Decorate warnings happening during encoding with the key being
+      encoded when the warning happens
+    - Perl 5.8 compatibility
+
+0.08      2016-07-03 18:54:19 CEST
+
+    - Fix JSON deserialization
+    - Support maps (both proto2 and proto3, except for map<> syntax
+      which is proto3-only)
+    - Optionally, don't encode fields having a value equal to the
+      default
+
+0.07      2016-05-31 08:50:50 CEST
+
+    - Fix bug with some nested data structures
+
+0.06      2016-05-22 12:27:55 CEST
+
+    - Implement pb_prefix mapping option for the protoc plugin
+
+0.05      2016-05-21 18:51:11 CEST
+
+    - Implement JSON serialization/deserialization
+    - Add check() method, as a way to protect against typos in field names
+    - Add an option to use a single mapping for an entire package hierarchy
+    - Add introspection API to get enum descriptors without going
+      through a message field
+
+0.04      2016-03-25 15:39:16 CET
+
+    - Fixed memory leak in some accessors
+
+0.03      2016-03-19 19:24:38 CET
+
+    - Fix segmentation fault
+    - Added introspection API
+
+0.02      2016-01-31 11:55:11 CET
+
+    - Fix trivial packaging issue
+
+0.01      2016-01-30 16:39:16 CET
+
+    - First public release

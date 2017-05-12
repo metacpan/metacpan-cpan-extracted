@@ -1,0 +1,280 @@
+Overview of changes in Glib::Object::Introspection 0.042
+========================================================
+
+* perli11ndoc: put special classes and records into their own category
+* perli11ndoc: list functions of enums and bitfields
+* perli11ndoc: fix the synopsis formatting for class struct functions
+* perli11ndoc: correctly display array and callback parameters/return
+  values/fields
+* Fix "occuring" typo in POD (Bugzilla #775169)
+
+Overview of changes in Glib::Object::Introspection 0.041
+========================================================
+
+∗ Tweak the test environment to work with newer ExtUtils::MakeMaker
+* Use the stack in favor of heap allocation during marshalling
+* Use custom code to find struct methods in order to avoid a bug
+* Remove an unused internal variable
+* Add support for object class functions
+* Add support for marshalling GParamSpec
+* Add Glib::Object::Introspection::GValueWrapper::get_value
+
+Overview of changes in Glib::Object::Introspection 0.040
+========================================================
+
+* Makefile.PL: Make G:O:I dependent on Glib version >= 1.320
+* Makefile.PL: Module marked as "stable"; no code changes since 0.033
+
+Overview of changes in Glib::Object::Introspection 0.033
+========================================================
+
+* perli11ndoc: Add a path bar to the results display 
+
+Overview of changes in Glib::Object::Introspection 0.032
+========================================================
+
+* Makefile.PL/setup.pl: change library extensions on OS X
+* Docs: include an edited version of Gtk2::api
+* perli11ndoc: hush a warning when run in text mode without args
+* perli11ndoc: display a synopsis for callables
+* perli11ndoc: make Control+k focus the search entry
+* perli11ndoc: make Right/Left expand/collapse rows in the tree view
+* perli11ndoc: make the result text view readonly
+* Croak in setup for unhandled modificaion combinations
+* perli11ndoc: when filtering, show children of matching elements
+
+Overview of changes in Glib::Object::Introspection 0.031
+========================================================
+
+* Add perli11ndoc, an interactive documentation viewer
+* Added perli11ndoc to MANIFEST
+
+Overview of changes in Glib::Object::Introspection 0.030
+========================================================
+
+* Avoid repeating setting up a library as this can lead to issues.
+* Add some missing version guards to the tests
+* Added t/variants.t to MANIFEST
+
+Overview of changes in Glib::Object::Introspection 0.029
+========================================================
+
+* Hook up the generic Glib::Boxed constructor on load, not in setup()
+* Add support for marshalling GVariants.
+* Add support for marshalling GArrays, GPtrArrays and GByteArrays.
+* Support flat arrays when converting from C to Perl.
+
+Overview of changes in Glib::Object::Introspection 0.028
+========================================================
+
+* Harmonize the format of type names in error messages
+* Add a FIXME about a corner case of GInitiallyUnowned handling
+
+Overview of changes in Glib::Object::Introspection 0.027
+========================================================
+
+* Fix compilation problems when NOISY is defined
+* Move the handling of void record fields into the field accessors
+* Rename a few variables for clarity
+
+Overview of changes in Glib::Object::Introspection 0.026
+========================================================
+
+* Fix t/enums.t for older versions of Test::More
+
+Overview of changes in Glib::Object::Introspection 0.025
+========================================================
+
+* Fix many argument conversion bugs on 64bit big-endian architectures.
+* Added 'x_IRC' metadata tag so MetaCPAN displays a link to the IRC channel
+
+Overview of changes in Glib::Object::Introspection 0.024
+========================================================
+
+* Fix a stack handling bug for Perl vfuncs.
+
+Overview of changes in Glib::Object::Introspection 0.023
+========================================================
+
+* Fix return value handling on big-endian architectures.
+
+Overview of changes in Glib::Object::Introspection 0.022
+========================================================
+
+* Reset the 'release_status' flag to 'stable' so CPAN will index the release.
+  This reverts a change made in 61345ca2.  There are no functional changes
+  from release 0.021.
+
+Overview of changes in Glib::Object::Introspection 0.021
+========================================================
+
+* Clarify a statement about typelib files in the docs
+* Mention GI_TYPELIB_PATH in the docs for "search_path"
+* Remove address in GPL notices, refer to LICENSE file
+
+Overview of changes in Glib::Object::Introspection 0.020
+========================================================
+
+* Allow undefined values for boolean arguments (and interpret them as "false").
+* Fix a few internal signed/unsigned integer mismatches.
+
+Overview of changes in Glib::Object::Introspection 0.019
+========================================================
+
+* Fix spelling of two internal functions
+* Fix off-by-one error in internal string comparison
+
+Overview of changes in Glib::Object::Introspection 0.018
+========================================================
+
+* Fix registering unregistered enums.
+* Mark a few tests as known to fail so that they do not abort installation.
+
+Overview of changes in Glib::Object::Introspection 0.017
+========================================================
+
+* Register unregistered enums so that, e.g., GSpawnFlags and VtePtyFlags become
+  usable.
+* Pass on NULL user data in C invocations if appropriate
+
+Overview of changes in Glib::Object::Introspection 0.016
+========================================================
+
+* Add support for unicode character arguments to Perl callbacks.
+* Avoid misusing the macro PL_na, thus preventing issues when
+  Glib::Object::Introspection is used in conjunction with certain XS modules,
+  among them XML::Parser and String::Approx.
+* Fix build on MinGW with dmake.
+
+Overview of changes in Glib::Object::Introspection 0.015
+========================================================
+
+* Add support for array arguments to Perl callbacks.
+* Allow Perl code to return Glib::Error objects.
+* Register error domains.
+* Support conversion to raw structs from unregistered libraries.
+
+Overview of changes in Glib::Object::Introspection 0.014
+========================================================
+
+* Implement generic signal marshalling.
+* Implement a generic constructor for boxed types and install it as
+  Glib::Boxed::new.
+* Generate error messages when functions are passed an incorrect number of
+  parameters.
+* Avoid using vfunc names that coincide with special Perl subs.  This fixes
+  double-frees occurring for subclasses of Gtk3::Widget.
+* Rework the way fallback vfuncs are installed.
+* Correctly marshal out/in-out args when invoking Perl code and fix some other
+  related bugs.  This makes it possible to implement complicated interfaces
+  such as Gtk3::TreeModel.
+* Allow enums and flags to have class functions.
+* Add API to manually convert between SVs and enums.
+* Plug a few memory leaks.
+
+Overview of changes in Glib::Object::Introspection 0.013
+========================================================
+
+* SV -> object: do some type checking
+* Fix building with perl <= 5.14
+* Convert invalid or void GTypes to undef.
+
+Overview of changes in Glib::Object::Introspection 0.012
+========================================================
+
+* Support more struct types when writing fields.
+* Handle disguised structures.
+* Avoid invalid memory access during callback destruction.
+* Use the correct allocator for caller-allocated boxed out-args.
+* Add semi-private API wrapping gperl_register_boxed_synonym.
+
+Overview of changes in Glib::Object::Introspection 0.011
+========================================================
+
+* Improve handling of boxed unions, like GdkEvent.
+* Add support for building the test libs on MSWin32.
+* Properly specify our dependencies.
+
+Overview of changes in Glib::Object::Introspection 0.010
+========================================================
+
+* Correctly place the linker flags when building the test libs.
+* Fix compilation of the test libs against recent gobject-introspection
+* updated README file similar to Cairo (RT#74870)
+* Created %meta_merge which follows v2 of meta-spec
+
+Overview of changes in Glib::Object::Introspection 0.009
+========================================================
+
+* Allow setting boxed fields to undef.
+* Do not pass on an incorrect destroy notify func if there is no
+  callback.
+* Do not crash on inexistent GTypes on perl 5.8.x.
+
+Overview of changes in Glib::Object::Introspection 0.008
+========================================================
+
+* When looking up GTypes, also try by name.
+* Make constants work on perl 5.8.x.
+
+Overview of changes in Glib::Object::Introspection 0.007
+========================================================
+
+* Do not assume filenames are UTF8-encoded; pass the strings on unaltered in
+  both directions, C to Perl and Perl to C.  Before passing a filename on to
+  something which expects UTF8 (like widgets), users now have to ensure that it
+  is UTF8-encoded.  Glib::filename_to_unicode provides one way to do this.
+
+Overview of changes in Glib::Object::Introspection 0.006
+========================================================
+
+* Remove an unneeded argument of an internal function
+* Plug a leak in the wrapper for constants
+* Fix compilation of the test lib on x86-64
+
+Overview of changes in Glib::Object::Introspection 0.005
+========================================================
+
+* Use the overloaded '==' operator directly when comparing flags
+* Make t/enums.t more robust
+* Implement check_gi_version
+* Implement test skipping
+* Update FSF address in license blurbs
+
+Overview of changes in Glib::Object::Introspection 0.004
+========================================================
+
+* Fix building test libraries on Ubuntu 11.10.  They (Ubuntu devs) added
+  --as-needed to the default linker flags, and that breaks building the test
+  libraries for reasons I don't understand at the moment.  So simply add
+  --no-as-needed for now.
+* Properly check for definedness throughout; Use gperl_sv_is_defined instead
+  of a direct comparison against &PL_sv_undef.
+
+Overview of changes in Glib::Object::Introspection 0.003
+========================================================
+
+* Nothing, except for adding the NEWS entries that were forgotten for
+  release 0.002.
+
+Overview of changes in Glib::Object::Introspection 0.002
+========================================================
+
+* Add support for implementing interfaces.
+* Add support for implementing object vfuncs.
+* Add support for callbacks in callbacks.
+* Add support for caller-allocated out arguments.
+* Add support for nested structs.
+* Add support for calling functions on structs.
+* Add support for reading and writing fields of boxed types.
+* Add support for flattening array ref returns.
+* Add support for handling 'sentinel booleans'.
+* Handle skipping arguments and return values.
+* Fix ownership handling for GInitiallyUnowned.
+* Expand the documentation.
+* Fix build and test suite issues.
+
+Overview of changes in Glib::Object::Introspection 0.001
+========================================================
+
+* Initial release.

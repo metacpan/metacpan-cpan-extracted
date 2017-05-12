@@ -1,0 +1,338 @@
+#  http://sports.espn.go.com/mlb/gameLog?gameId=251007102&full=1
+# http://sports.espn.go.com/mlb/boxscore?gameId=251007102
+# http://mlb.mlb.com/NASApp/mlb/mlb/ps/y2005/boxscore.jsp?gid=2005_10_05_bosmlb_chamlb_1
+
+scorer	Pudge
+date	2005-10-07, 4:09
+at	U.S. Cellular Field, Chicago
+att	0
+temp	x y
+wind	x y to z
+
+home	Boston Red Sox
+starter	49
+lineup
+	18 8
+	 3 6
+	34 0
+	24 7
+	 7 9
+	11 5
+	19 3
+	28 2
+	10 4
+
+away	Chicago White Sox
+starter	34
+lineup
+	22 7
+	15 4
+	23 9
+	14 3
+	 8 0
+	33 8
+	12 2
+	24 5
+	 5 6
+
+__INIT__
+
+inn T1
+	ab
+		p ss
+		hp
+		tout 2 CS2-4
+	ab
+		p bfbbf
+		k
+	ab
+		p sf
+		k
+
+inn B1
+	ab
+		p bssbfb
+		bb
+		tout 2 6u 3
+	ab
+		p bsf
+		f5
+	ab
+		p sbbsbf
+		'dp l6u'
+
+inn T2
+	ab
+		p fbs
+		k
+	ab
+		p f
+		hp
+		tout 2 DP5-4
+	ab
+		p ssb
+		dp5-4-3
+
+inn B2
+	ab
+		p sbbb
+		bb
+	ab
+		p sfb
+		k
+	ab
+		p bf
+		l6
+	ab
+		p sbsbbf
+		bb
+		tout 2 5-4
+	ab
+		p sbsbf
+		fc
+
+inn T3
+	ab
+		f9
+	ab
+		p b
+		6-3
+	ab
+		p bb
+		hit 2 lc
+		-> 4
+	ab
+		p bbf
+		hit 2 l
+		rbi
+		-> 4
+	ab
+		hit 1 cl
+		rbi
+		-> 3
+	ab
+		p bs
+		hit 1 rc
+	ab
+		p bss
+		f9
+
+inn B3
+	ab
+		p sb
+		hit 1 lc
+		tout 2 1-6
+	ab
+		p sb
+		dp1-6-3
+	ab
+		5-3
+
+inn T4
+	ab
+		p f
+		f8
+	ab
+		p bff
+		hit 2 lc
+	ab
+		p ssfbb
+		6-3
+	ab
+		p b
+		f8
+		
+inn B4
+	ab
+		p sb
+		hit 4 cl
+	ab
+		p bsb
+		hit 4 r
+	ab
+		p fb
+		f9
+	ab
+		p bsbsff
+		f6
+	ab
+		p bss
+		6-3
+
+inn T5
+	ab
+		f9
+	ab
+		p ss
+		k
+	ab
+		p s
+		1-3
+
+inn B5
+	ab
+		p ssbb
+		5-3
+	ab
+		p sbs
+		f7
+	ab
+		p bbbssff
+		hit 2 r
+	ab
+		p sbbb
+		bb
+	ab
+		f8
+
+inn T6
+	ab
+		p bbsb
+		bb
+		-> 4
+	ab
+		p bs
+		hit 4 r
+		rbi
+	ab
+		3-1
+
+	add_pitcher 53
+	ab
+		hit 1 cl
+		-> 2 SB
+		-> 3
+
+	add_pitcher 36
+	ab
+		p sbbsfbf
+		bb
+		-> 2 SB
+
+	add_pitcher 58
+	ab
+		p fffbbfb
+		fo9
+
+	ab
+		p bbsffb
+		k
+
+inn B6
+	ab
+		p s
+		hit 4 lc
+	ab
+		p bss
+		hit 1 r
+		-> 2
+		-> 3
+	ab
+		p sbsbb
+		bb
+		-> 2
+	ab
+		p bbsb
+		bb
+
+	add_pitcher 26
+	add_player 8 33 2
+	ab
+		p bbs
+		FO3
+	ab
+		p fbfbfbfff
+		F6
+	ab
+		p sbbsbf
+		K
+
+inn T7
+	ab
+		p s
+		6-3
+	ab
+		p bbs
+		6-3
+	ab
+		p sbffffb
+		4-3
+
+inn B7
+	ab
+		p bbss
+		k
+	ab
+		p ss
+		k
+	ab
+		p ssbfb
+		3u
+
+inn T8
+	ab
+		f7
+	ab
+		p ssfbfb
+		5-3
+	ab
+		p sbf
+		k
+
+inn B8
+	ab
+		p b
+		3-1
+	ab
+		f4
+	ab
+		p bsfb
+		hit 1 cl
+		add_player 7 40 PR
+
+	ab
+		p ssbff
+		k
+
+inn T9
+	add_pitcher 50
+	# XXXX should be inn 9!
+	ha add_player 7 15 3
+
+	ab
+		p b
+		hit 2 lc
+		-> 3
+		-> 4
+	ab
+		p b
+		fc 3-4
+	ab
+		p bsb
+		fc
+		rbi
+		-> 2 E1
+		error 1
+		-> 3
+	ab
+		p b
+		4-3
+	ab
+		p ss
+		k
+
+inn B9
+	add_pitcher 45
+	ab
+		p sbs
+		5-3
+	ab
+		p sfb
+		k
+	ab
+		p s
+		4-3
+
+inn
+
+__GAME__

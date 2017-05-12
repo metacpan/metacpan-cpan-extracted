@@ -1,0 +1,494 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR 'Jerome Quelin'
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Games-Risk-ExtraMaps-Countries\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-09-26 15:58+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Games/Risk/Map/France.pm:27
+msgid "France"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:37
+msgid "Bretagne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:38
+msgid "Basse Normandie"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:39
+msgid "Haute Normandie"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:40
+msgid "Picardie"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:41
+msgid "Nord-Pas de Calais"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:42
+msgid "Champagne-Ardenne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:43
+msgid "Lorraine"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:44
+msgid "Alsace"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:45
+msgid "Franche-Comté"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:46
+msgid "Rhône-Alpes"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:47
+msgid "Provence-Alpes-Côte d'Azur"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:48
+msgid "Corse"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:49
+msgid "Languedoc-Roussillon"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:50
+msgid "Midi-Pyrénées"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:51
+msgid "Aquitaine"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:52
+msgid "Poitou-Charente"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:53
+msgid "Pays de la Loire"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:54
+msgid "Centre"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:55
+msgid "Ile de France"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:56
+msgid "Bourgogne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:57
+msgid "Auvergne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:58
+msgid "Limousin"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:66
+msgid "Ain"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:67
+msgid "Aisne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:68
+msgid "Allier"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:69
+msgid "Alpes de Haute Provence"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:70
+msgid "Hautes Alpes"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:71
+msgid "Alpes Maritimes"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:72
+msgid "Ardèche"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:73
+msgid "Ardennes"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:74
+msgid "Ariège"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:75
+msgid "Aube"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:76
+msgid "Aude"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:77
+msgid "Aveyron"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:78
+msgid "Bouches du Rhone"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:79
+msgid "Calvados"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:80
+msgid "Cantal"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:81
+msgid "Charente"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:82
+msgid "Charente Maritime"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:83
+msgid "Cher"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:84
+msgid "Corrèze"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:85
+msgid "Corse du Sud"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:86
+msgid "Côte d'Or"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:87
+msgid "Côtes d'Armor"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:88
+msgid "Creuse"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:89
+msgid "Dordogne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:90
+msgid "Doubs"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:91
+msgid "Drôme"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:92
+msgid "Eure"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:93
+msgid "Eure et Loire"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:94
+msgid "Finistère"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:95
+msgid "Gard"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:96
+msgid "Haute Garonne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:97
+msgid "Gers"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:98
+msgid "Gironde"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:99
+msgid "Hérault"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:100
+msgid "Ille et Vilaine"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:101
+msgid "Indre"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:102
+msgid "Indre et Loire"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:103
+msgid "Isère"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:104
+msgid "Jura"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:105
+msgid "Landes"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:106
+msgid "Loire et Cher"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:107
+msgid "Loire"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:108
+msgid "Haute Loire"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:109
+msgid "Loire Atlantique"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:110
+msgid "Loiret"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:111
+msgid "Lot"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:112
+msgid "Lot et Garonne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:113
+msgid "Lozère"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:114
+msgid "Maine et Loire"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:115
+msgid "Manche"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:116
+msgid "Marne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:117
+msgid "Haute Marne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:118
+msgid "Mayenne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:119
+msgid "Meurthe et Moselle"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:120
+msgid "Meuse"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:121
+msgid "Morbihan"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:122
+msgid "Moselle"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:123
+msgid "Nièvre"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:124
+msgid "Nord"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:125
+msgid "Oise"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:126
+msgid "Orne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:127
+msgid "Pas de Calais"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:128
+msgid "Puy de Dome"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:129
+msgid "Pyrénées Atlantiques"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:130
+msgid "Hautes Pyrénées"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:131
+msgid "Pyrénées Orientales"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:132
+msgid "Bas Rhin"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:133
+msgid "Haut Rhin"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:134
+msgid "Rhône"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:135
+msgid "Haute Saône"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:136
+msgid "Saône et Loire"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:137
+msgid "Sarthe"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:138
+msgid "Savoie"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:139
+msgid "Haute Savoie"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:140
+msgid "Paris"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:141
+msgid "Seine Maritime"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:142
+msgid "Seine et Marne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:143
+msgid "Yvelines"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:144
+msgid "Deux Sèvres"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:145
+msgid "Somme"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:146
+msgid "Tarn"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:147
+msgid "Tarn et Garonne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:148
+msgid "Var"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:149
+msgid "Vaucluse"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:150
+msgid "Vendée"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:151
+msgid "Vienne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:152
+msgid "Haute Vienne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:153
+msgid "Vosges"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:154
+msgid "Yonne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:155
+msgid "Territoire de Belfort"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:156
+msgid "Essonne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:157
+msgid "Hauts de Seine"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:158
+msgid "Seine Saint Denis"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:159
+msgid "Val de Marne"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:160
+msgid "Val d'Oise"
+msgstr ""
+
+#: lib/Games/Risk/Map/France.pm:161
+msgid "Haute Corse"
+msgstr ""

@@ -1,0 +1,33 @@
+# ChangeLog for net-wireless/wavemon
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/wavemon/ChangeLog,v 1.1 2004/06/20 09:09:37 linguist Exp $
+
+  13 Jun 2004; Hanno Boeck <hanno@gentoo.org> +files/wavemon_gcc34_fix.gz,
+  wavemon-0.4.0b.ebuild:
+  Fixes for gcc 3.4.
+
+  27 Apr 2004; Aron Griffis <agriffis@gentoo.org> wavemon-0.4.0b.ebuild:
+  Add inherit eutils
+
+  18 Dec 2003; Peter Johanson <latexer@gentoo.org> metadata.xml,
+  wavemon-0.3.3.ebuild, wavemon-0.4.0b.ebuild:
+  Added metadata.xml and fixed the HOMEPAGE variable
+
+  24 Jul 2003; Hanno Boeck <hanno@gentoo.org> wavemon-0.4.0b.ebuild:
+  Compilation fix for gcc 3.3.
+
+*wavemon-0.4.0b (07 Jan 2003)
+
+  07 Jan 2003; J Robert Ray <jrray@gentoo.org> : Version bump to 0.4.0b.
+  Upstream tarball is named wavemon-current, so manually placed a tarball with
+  the version in the filename onto ibiblio, to avoid future problems and a
+  collision with the 0.3.3 ebuild.  Global CFLAGS are now respected.
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+  31 Oct 2002; Hannes Mehnert <hannes@gentoo.org>:
+  moved to net-wireless
+
+*wavemon-0.3.3 ( 28 May 2002 )
+	28 May 2002  (Ben Lutgens <lamer@gentoo.org>: Wavemon is an ncurses tool
+	for monitoring you wavelan wireless cards

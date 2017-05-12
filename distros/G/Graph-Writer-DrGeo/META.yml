@@ -1,0 +1,14 @@
+name: Graph-Writer-DrGeo
+version: 0.01
+abstract: 1
+author: Kang-min Liu <gugod@gugod.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  Graph::Writer: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.33

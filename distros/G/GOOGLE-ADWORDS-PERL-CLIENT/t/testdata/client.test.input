@@ -1,0 +1,8 @@
+# This file is only for Client class unit tests, do not modify.
+email=user@domain.com
+password=pass
+clientId=client_1+user@domain.com
+userAgent=perl-unit-tests
+developerToken=dev-token
+authToken=auth-token
+alternateUrl=https://adwords.google.com

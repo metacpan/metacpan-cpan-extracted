@@ -1,0 +1,76 @@
+---
+abstract: 'Walk over a sequence of commits in a Git::PurePerl repo'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Archive::Tar: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  FindBin: '0'
+  Package::Stash: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-PurePerl-Walker
+provides:
+  Git::PurePerl::Walker:
+    file: lib/Git/PurePerl/Walker.pm
+    version: '0.004001'
+  Git::PurePerl::Walker::Method::FirstParent:
+    file: lib/Git/PurePerl/Walker/Method/FirstParent.pm
+    version: '0.004001'
+  Git::PurePerl::Walker::Method::FirstParent::FromHEAD:
+    file: lib/Git/PurePerl/Walker/Method/FirstParent/FromHEAD.pm
+    version: '0.004001'
+  Git::PurePerl::Walker::OnCommit::CallBack:
+    file: lib/Git/PurePerl/Walker/OnCommit/CallBack.pm
+    version: '0.004001'
+  Git::PurePerl::Walker::OnCommit::List:
+    file: lib/Git/PurePerl/Walker/OnCommit/List.pm
+    version: '0.004001'
+  Git::PurePerl::Walker::Role::HasRepo:
+    file: lib/Git/PurePerl/Walker/Role/HasRepo.pm
+    version: '0.004001'
+  Git::PurePerl::Walker::Role::Method:
+    file: lib/Git/PurePerl/Walker/Role/Method.pm
+    version: '0.004001'
+  Git::PurePerl::Walker::Role::OnCommit:
+    file: lib/Git/PurePerl/Walker/Role/OnCommit.pm
+    version: '0.004001'
+  Git::PurePerl::Walker::Types:
+    file: lib/Git/PurePerl/Walker/Types.pm
+    version: '0.004001'
+recommends:
+  Moose: '2.000'
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Git::PurePerl: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::Clone: '0'
+  MooseX::Types: '0'
+  MooseX::Types::Moose: '0'
+  Path::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Git-PurePerl-Walker/issues
+  homepage: https://github.com/kentnl/Git-PurePerl-Walker
+  repository: https://github.com/kentnl/Git-PurePerl-Walker.git
+version: '0.004001'

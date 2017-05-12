@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name:               Games-Wumpus
+version:            2009112401
+abstract:           Play Hunt the Wumpus
+author:
+    - Abigail <cpan@abigail.be>
+license:            mit
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+    strict:               0
+    Test::More:           0.88
+    warnings:             0
+build_requires:
+    ExtUtils::MakeMaker:  0
+    strict:               0
+    Test::More:           0.88
+    warnings:             0
+requires:
+    Exporter:             0
+    Hash::Util::FieldHash:  0
+    List::Util:           0
+    perl:                 5.01
+    strict:               0
+    warnings:             0
+resources:
+    repository:  git://github.com/Abigail/Games--Wumpus.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:  []

@@ -1,0 +1,72 @@
+{
+   "abstract" : "Parse GEDCOM dates in French r/German/Gregorian/Hebrew/Julian",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Genealogy-Gedcom-Date",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "Data::Dumper::Concise" : "2.022",
+            "Getopt::Long" : "0",
+            "Log::Handler" : "0.88",
+            "Marpa::R2" : "3",
+            "Moo" : "2.002004",
+            "Pod::Usage" : "0",
+            "Try::Tiny" : "0.24",
+            "Types::Standard" : "1.000005",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302052",
+            "Test::Pod" : "1.51"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Gedcom-Date"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Genealogy-Gedcom-Date.git",
+         "web" : "https://github.com/ronsavage/Genealogy-Gedcom-Date"
+      }
+   },
+   "version" : "2.09",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,10 @@
+cookbook.glade
+cookbook.perl
+cookbookwidget.glade
+lib/Glade2/Widget.pm
+Makefile.PL
+MANIFEST			This list of files
+testwidget.glade
+testwidget.pl
+widget.glade
+META.yml                                 Module meta-data (added by MakeMaker)

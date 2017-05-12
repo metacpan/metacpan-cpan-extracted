@@ -1,0 +1,17 @@
+# ChangeLog for app-portage/abeni
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/abeni/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+*abeni-0.0.9-r1 (19 Jun 2004)
+
+  19 Jun 2004; Rob Cakebread <pythonhead@gentoo.org> +abeni-0.0.9-r1.ebuild:
+  Changed DEPEND on wxPython to 2.4.2.4
+
+  14 Sep 2003; Alastair Tse <liquidx@gentoo.org> abeni-0.0.9.ebuild:
+  slight fix to error msg
+
+*abeni-0.0.9 (02 Sep 2003)
+
+  02 Sep 2003; Alastair Tse <liquidx@gentoo.org> abeni-0.0.9.ebuild:
+  initial ebuild. thanks to Rob Cakebread <robc@myrealbox.com> (#22938)
+

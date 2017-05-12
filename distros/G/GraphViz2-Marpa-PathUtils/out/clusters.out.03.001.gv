@@ -1,0 +1,10 @@
+digraph graph_03
+{
+	edge[color = "blue"]
+	node[shape = "Mdiamond"]
+	A
+	node[shape = "Msquare"]
+	B
+	graph[label = "Class Demo" rankdir = "LR"]
+	A -> B
+}

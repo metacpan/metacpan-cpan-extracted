@@ -1,0 +1,5 @@
+Kruskal.pm
+MANIFEST
+Makefile.PL
+README
+t/00____version.t

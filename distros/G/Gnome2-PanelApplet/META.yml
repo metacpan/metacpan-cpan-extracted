@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Gnome2-PanelApplet
+version:            0.03
+abstract:           Perl interface to GNOME's applet library
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::Depends:    0.20
+    ExtUtils::MakeMaker:  0
+    ExtUtils::PkgConfig:  1.03
+    Glib:                 1.160
+    Gnome2:               1.042
+    Gnome2::GConf:        1.044
+    Gtk2:                 1.040
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    ExtUtils::Depends:    0.20
+    ExtUtils::PkgConfig:  1.03
+    Glib:                 1.160
+    Gnome2:               1.042
+    Gnome2::GConf:        1.044
+    Gtk2:                 1.040
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

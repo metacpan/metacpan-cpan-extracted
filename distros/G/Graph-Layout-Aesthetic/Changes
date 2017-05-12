@@ -1,0 +1,101 @@
+Revision history for Perl extension Graph::Layout::Aesthetic.
+
+TODO:
+	- tests for gloss.pl
+        - Make the forces into subpackages
+	- For gloss_graph maybe allow to get the number of dimensions
+	  from a graph attribute, or from the pos/hold attribute size
+	  if array references or the already existing coordinates if hold is
+	  a string. Not sure if this is a good idea.
+        - Add magic tests (does it work at all ? No unneeded extra accesses ?)
+	- self-locking ? Thread support ?
+	- generalize a way to efficiently put vertex attributes in a topology.
+	- MD5 of files in Include.pm and compare with inline value.
+	  If they differ, protest (author should then increase version and MD5)
+	- add_force should probably also take forces instead of names as
+	  argument.
+	- If C-structures change, derived classes should notice and not load.
+
+0.12  2005-11-30
+	- added a #define packWARN for older perls that don't have it yet.
+
+0.11  2005-07-31
+	- Updated windows gnuplot tests to use the right terminal type
+
+0.10  2005-07-28
+	- Updated for the new interface of Graph 0.50
+
+0.09  2005-07-28
+	- The windows frontent to gnuplot is called "pgnuplot"
+	- The default gnuplot terminaltype on windows is "windows", not "X11"
+	- Don't try to pass a geometry argument to gnuplot on windows.
+	- Start using PERL_NO_GET_CONTEXT, and properly propagate the
+	  interpreter context everywhere.
+	- Replaced :: by - in author email address (easier quoting for mailers)
+	- Replace object access by more paranoid versions.
+	- Updated Sample._xs to reflect current reality.
+	- Added dummy MODULE lines in the .xs files that don't have it (or
+	  really need it). Some versions of xsubpp seem to insist on this.
+	- Minor documentation updates.
+
+0.08  2004-11-08
+        - There were variable declarations inside code.
+        - Predeclare the boot_ calls.
+	- remove aglo_point_iso_frame before anyone thinks that actually works.
+	- Removed some unused variables
+	- Rename the variable "rand" to something else. Some compilers dislike
+	  the conflict with rand().
+	- Call perl rand through the opcode table if the random generator is
+          uninitialized (might need a fake pad if someone uses this from XSUB)
+	- Remove inline, unportable. Use macros instead.
+	- fmin() is unused. min() and max() are very popular macro names and
+	  sometimes cause conflicts. Drop them.
+	- Tests should not depend on fileseparator (\ versus /)
+	- Don't use the OO interface to File::Temp, it's not yet in older
+	  perls.
+	- File::Temp tempfiles are seemingly opened in binmode. Do the tail
+	  in textmode in t/05_GnuPlot.t.
+
+0.07  2004-11-06
+	- Make user_data and _private data into lvalue subs.
+	- Added some get magic.
+	- Simplified the gen_include makerule so hopefully nmake can now
+          handle it.
+
+0.06  2004-10-01
+	- Forgot to document Graph::Layout::Aesthetic::Force::MinEdgeLength.
+        - Forgot to update the NAME entry of the different forces.
+	- Graph::Layout::Aesthetic::Force::Perl gradient was documented wrong.
+	- Other minor docs updates.
+	- Have "layout" as an alias for gloss_graph
+          (not documented/tested yet)
+	- Allow to drop the first argument (class) to gloss_graph/layout so
+	  you can also use it as a function (not documented/tested yet).
+
+0.05  2004-10-01
+	- The gnuplot tests still failed for the solaris cpan tester, but at
+          least it gets close now.
+
+0.04  2004-09-30
+        - Warn in case of a clear_forces during a gradient call.
+	- The gnuplot tests still seem to fail for the solaris cpan tester,
+          but I can't reproduce the problem on my solaris box.
+          Stop using the IPC::Open3 hacks and try hacks involving ``
+
+0.03  2004-09-29
+	- gnuplot test failed if user doesn't have gnuplot.
+        - Fix potential coredump when destroying forces during a gradient call
+          (and added a test for it)
+        - Document that the aglo and topology object are not threadsafe.
+
+0.02  2004-09-29
+	- Changed the default attributes to have a layout_ prefix to be
+	  more compatible with Graph::Layouter
+	- set frame coordinates as attributes on a graph if requested
+	- Mention Graph::Layouter and Graph::Renderer in the docs
+	- Added a $VERSION to a few forgotten modules
+
+0.01  2004-09-29
+        - Lots of programming and testing.
+	- original version; created by h2xs 1.23 with options
+		-A -n Graph::Layout::Aesthetic

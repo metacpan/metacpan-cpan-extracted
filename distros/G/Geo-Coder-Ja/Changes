@@ -1,0 +1,11 @@
+Revision history for Perl Extention Geo::Coder::Ja
+
+0.03 Thu Nov 23 11:07:07 JST 2006
+	missed changing MANIFEST. added eg/geocoderja
+
+0.02 Wed Nov 22 17:51:03 JST 2006
+	- geocode(postcode => $postcode) is supported.
+	- added sample script eg/geocoderja
+
+0.01 Mon Nov 20 01:39:29 JST 2006
+	original version

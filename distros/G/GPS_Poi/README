@@ -1,0 +1,68 @@
+NAME
+    GPS::Poi - Perl extension for 'ov2' file extension of POI (Point of
+    Interrest ) for tomtom GPS
+
+SYNOPSIS
+      use GPS::Poi;
+      my $poi = GPS::Poi->new();
+      my $nb = $poi->parse({file => 'myfile.ov2' });
+      my  @list = $poi->all_as_list();
+      my  $dump = $poi->dump_list();
+      print $dump;
+
+DESCRIPTION
+    GPS::Poi is a Perl module who provides a variety of low- and high-level
+    methods for parsing 'ov2' extention file of POI (Point of Interrest ).
+    'ov2' is Tomtom GPS format . Tomtom is trade mark .
+
+METHODS
+  new [ ({file =>/myfile.ov2}) ]
+      The file paremters is optional
+
+  parse [ ({file =>/myfile.ov2}) ]
+      The file paremters is optional ONLY if it was already supplied with new method.
+      This method return the number of file record or 0 if error.
+
+  all_as_list
+      Return array of each record in the same order of file.
+      Each item is like this : (Label,long,lat,code)   
+
+  dump_list
+      Return a string who can be printable : eg
+
+    000002.394520 Lg - 000048.818100 Lt - Ivry sur Seine - 2 000002.394200
+    Lg - 000048.825190 Lt - Bercy - 2 000002.345520 Lg - 000048.784400 Lt -
+    Hay les Roses - 2
+
+  clear_list
+      Clear the current list.
+ 
+TODO
+    This module can only read ov2 file , I must add write,merge methods. Add
+    implementation of type 3 record
+
+SEE ALSO
+    tomtom.com
+    try ./test.pl demo.ov2 in 'eg' directory
+
+AUTHOR
+    Eric GERMAN, <germanlinux@yahoo.fr>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Eric German
+
+        This package is under the GNU General Public License, Version 2.
+      
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; version 2 dated June, 1991.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        A copy of the GNU General Public License is available in the source tree;
+        if not, write to the Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+<meta name="description" content="x86Guns: Pittsburgh's premium custom rilfe source"/>
+<meta name="keywords" content="Bryce Porter, Bryce, Porter, x86, Guns, x86guns, x86guns.us, ar15, ar-15, custom gun, custom, rifle, custom rifle, custom ar15, gun services, services, service, rifles, pistols, pistol, custom 1911, 1911 pistol, 1911"/> 
+<meta name="author" content="Bryce Porter"/> 
+<link rel="stylesheet" type="text/css" href="/css/default.css" media="screen"/>
+<title>x86Guns :: Internal Exception</title>
+
+<script type="text/javascript" src="/js/quantcast.js"></script>
+
+</head>
+
+<body>
+<div class="container">
+
+	<div class="header">x86Guns :: Internal Exception</div>
+
+	<div class="main_right">
+
+		<div class="padded">
+
+			<h1>Internal Exception</h1>
+			<p>Uh oh, an internal exception error has occured...</p>
+
+		</div>
+
+	</div>
+
+	<div class="subnav">
+
+		<h1>AR-15 Rifles</h1>
+		<ul>
+			<li><a href="/custom/ar15/556nato/">5.56 NATO (.223)</a></li>
+			<li><a href="/custom/ar15/65grendel/">6.5 Grendel</a></li>
+			<li><a href="/custom/ar15/300blk/">.300 Blackout</a></li>
+			<li><a href="/custom/ar15/338specter/">.338 Specter</a></li>
+			<li><a href="/custom/ar15/450bushmaster/">.450 Thumper</a></li>
+			<li><a href="/custom/ar15/458socom/">.458 SOCOM</a></li>
+			<li><a href="/custom/ar15/50beowulf/">.50 Beowulf</a></li>
+		</ul>
+
+		<h1>Bolt-Action Rifles</h1>
+		<ul>
+			<li><a href="/custom/model700/556nato/">Remington 700: 5.56 NATO"</a></li>
+			<li><a href="/custom/model700/300blk/">Remington 700: .300 Blackout</a></li>
+			<li><a href="/custom/model700/762nato/">Remington 700: 7.62 NATO (.308)</a></li>
+			<li><a href="/custom/model700/338lm/">Remington 700: .338 Lapua Magnum</a></li>
+		</ul>
+
+		<h1>Services</h1>
+		<ul>
+			<li><a href="/services/rifle/ar15/cleaning/">AR-15 Rifle Cleaning</a></li>
+			<li><a href="/services/rifle/bolt/cleaning/">Bolt-Action Rifle Cleaning</a></li>
+			<li><a href="/services/pistol/cleaning/">Pistol Cleaning</a></li>
+		</ul>
+
+	</div>
+		
+	<div class="main">
+
+		<div class="padded">
+
+			<h1>Uh oh...</h1>
+			<p class="meta">An internal exception error has occured</p>
+
+			<p>We're sorry, there seems to have been an error in our application. Please contact us and let us know what exactly you were doing when this happened, so that we may resolve it as quickly as possible. Thank you.</p>
+
+		</div>
+
+	</div>
+	
+	<div class="clearer"><span></span></div>
+
+	<div class="footer">
+		
+		<span class="left">&copy; 2012 <a href="/">x86guns.us</a>. Valid <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a> &amp; <a href="http://validator.w3.org/check?uri=referer">XHTML</a></span>
+		
+		<span class="right">Template design by <a href="http://templates.arcsin.se">Arcsin</a></span>
+		
+		<div class="clearer"><span></span></div>
+
+	</div>
+
+</div>
+
+<script type="text/javascript">
+        _qevents.push( { qacct:"p-HuEQFUrWUd2qT"} );
+</script>
+<noscript>
+        <div style="display: none;">
+                <img src="//pixel.quantserve.com/pixel/p-HuEQFUrWUd2qT.gif" height="1" width="1" alt="Quantcast"/>
+        </div>
+</noscript>
+
+</body>
+
+</html>
+

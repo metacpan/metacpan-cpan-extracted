@@ -1,0 +1,34 @@
+Games/Cryptoquote version 1.30
+==============================
+
+This module solves cryptoquote puzzles.  Cryptoquotes
+(sometimes called cryptogram) are typically brief
+famous quotes, enciphered such that every letter stands
+for another letter.  For example, "Xrxb" stands for "Adam".
+
+Note that you'll get some pretty interesting results if
+your cryptoquote puzzle does not yield a unique result,
+or if it uses words that are not in your dictionary.
+
+Thanks to Adam Foxson <afoxson@pobox.com> for making this
+CPANable and numerous other cleanups.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None, baby.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 1999-2002 Bob O'Neill
+All rights reserved.
+
+See COPYING for licence

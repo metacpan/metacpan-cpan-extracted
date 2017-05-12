@@ -1,0 +1,61 @@
+=encoding utf8
+
+
+This is Perl module B<Google::DNS>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Google-DNS"><img src="https://secure.travis-ci.org/bayashi/Google-DNS.png?_t=1462630132"/></a> <a href="https://coveralls.io/r/bayashi/Google-DNS"><img src="https://coveralls.io/repos/bayashi/Google-DNS/badge.png?_t=1462630132&branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Google::DNS installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Google::DNS
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+=head2 Downloading the standalone executable
+
+You can also copy the standalone executable to whatever location you'd like.
+
+    % cd ~/bin
+    % curl -LO http://bit.ly/digle
+    % chmod +x digle
+
+NOTE: edit shebang if you don't have /usr/bin/env
+
+
+=head1 DOCUMENTATION
+
+Google::DNS documentation is available as in POD. So you can do:
+
+    % perldoc Google::DNS
+
+
+=head1 REPOSITORY
+
+Google::DNS is hosted on github
+L<http://github.com/bayashi/Google-DNS>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

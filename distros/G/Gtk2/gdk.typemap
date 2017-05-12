@@ -1,0 +1,43 @@
+#
+# Copyright (C) 2003-2005 by the gtk2-perl team (see the file AUTHORS for the
+# full list)
+# 
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Library General Public License as published by the Free
+# Software Foundation; either version 2.1 of the License, or (at your option)
+# any later version.
+# 
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
+# more details.
+# 
+# You should have received a copy of the GNU Library General Public License
+# along with this library; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+#
+# $Id$
+#
+
+# this is where Gdk hand coded typemap stuff resides
+TYPEMAP
+
+# can be either a pointer or an integer, this handles both cases
+GdkNativeWindow		T_UV
+
+# GdkBitmap doesn't get its own type id, but needs to be treated separately.
+GdkBitmap *		T_GPERL_GENERIC_WRAPPER
+GdkBitmap_ornull *	T_GPERL_GENERIC_WRAPPER
+GdkBitmap_noinc *	T_GPERL_GENERIC_WRAPPER
+
+# one of those magickal opaque pointer types
+GdkAtom 		T_GPERL_GENERIC_WRAPPER
+
+GdkGeometry *		T_GPERL_GENERIC_WRAPPER
+GdkWindowAttr *		T_GPERL_GENERIC_WRAPPER
+
+# can be either an object or NULL to get the default keymap
+GdkKeymap_orclass *	T_GPERL_GENERIC_WRAPPER
+
+# wrapped as a blessed hash
+GdkPixbufFormat *	T_GPERL_GENERIC_WRAPPER

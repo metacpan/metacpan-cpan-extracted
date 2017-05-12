@@ -1,0 +1,10 @@
+Revision history for Perl extension Games::WordFind.
+
+0.02  Sat Mar  7 15:59:16 1998
+	changed to Games::WordFind namespace.
+	added get_html() method.
+	made 'create_puzzle' return refs to 
+		the puzzle, wordlist, and solution arrays.
+
+0.01  Thu Mar  5 1998
+	original module version.

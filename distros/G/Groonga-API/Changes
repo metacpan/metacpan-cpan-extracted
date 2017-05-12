@@ -1,0 +1,11 @@
+Revision history for Groonga-API
+
+0.03 2014/02/23
+  - groonga 4.0.0 introduced new APIs
+    (some of which Groonga::API hasn't supported yet)
+
+0.02 2013/11/30
+  - initial CPAN release
+
+0.01 2013/01/28
+  - initial release

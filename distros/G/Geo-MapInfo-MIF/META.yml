@@ -1,0 +1,31 @@
+---
+abstract: 'Perl extension for handling MapInfo Interchange Format (MIF) files.'
+author:
+  - 'Jeffery Candiloro <jeffery@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0.80
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Geo::MapInfo::MIF
+name: Geo-MapInfo-MIF
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Basename: 2.76
+  File::Slurp: 9999.13
+  Params::Util: 1.00
+  Text::CSV: 1.12
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

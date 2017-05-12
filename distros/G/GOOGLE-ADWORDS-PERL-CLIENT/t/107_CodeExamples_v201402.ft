@@ -1,0 +1,216 @@
+#!/usr/bin/perl
+#
+# Copyright 2013, Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Functional test for all code examples. Make sure the example runs with no
+# exceptions.
+#
+# Author: Josh Radcliff <api.jradcliff@gmail.com>
+
+use strict;
+use lib qw(t/util);
+use lib qw(lib);
+
+use File::Temp qw(tempfile);
+use Test::More (tests => 51);
+use TestClientUtils qw(get_test_client);
+use TestAPIUtils;
+
+# Getting API client for functional tests.
+my $client = get_test_client("v201402");
+if (!$client) {
+  plan skip_all => "Can't create test client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+# Test dependencies
+my $client_email = TestAPIUtils::get_any_child_client_email($client);
+my $campaign = TestAPIUtils::create_campaign($client);
+my $campaign_id = $campaign->get_id()->get_value();
+my $campaign_2 = TestAPIUtils::create_campaign($client);
+my $campaign_2_id = $campaign_2->get_id()->get_value();
+my $ad_group = TestAPIUtils::create_ad_group($client, $campaign_id);
+my $ad_group_id = $ad_group->get_id()->get_value();
+my $text_ad = TestAPIUtils::create_text_ad($client, $ad_group_id);
+my $text_ad_id = $text_ad->get_id()->get_value();
+my $keyword = TestAPIUtils::create_keyword($client, $ad_group_id);
+my $keyword_id = $keyword->get_id()->get_value();
+my $campaign_location_extension =
+    TestAPIUtils::create_campaign_location_extension($client, $campaign_id);
+my $campaign_location_extension_id =
+    $campaign_location_extension->get_adExtension()->get_id()->get_value();
+my $experiment = TestAPIUtils::create_experiment($client, $campaign_id);
+my $experiment_id = $experiment->get_id()->get_value();
+
+# v201402 Code Examples.
+# Account Management examples.
+require qw(examples/v201402/account_management/get_account_changes.pl);
+ok(get_account_changes($client), "Test of get_account_changes example");
+require qw(examples/v201402/account_management/create_account.pl);
+ok(create_account($client), "Test of create_account example");
+require qw(examples/v201402/account_management/get_account_alerts.pl);
+ok(get_account_alerts($client), "Test of get_account_alerts example");
+require qw(examples/v201402/account_management/get_account_hierarchy.pl);
+ok(get_account_hierarchy($client), "Test of get_account_hierarchy example");
+$client = get_test_client("v201402");
+
+# Basic Operations examples but deletes (deletes at end of the tests).
+require qw(examples/v201402/basic_operations/add_campaigns.pl);
+ok(add_campaigns($client), "Test of add_campaigns example");
+require qw(examples/v201402/basic_operations/add_ad_groups.pl);
+ok(add_ad_groups($client, $campaign_id), "Test of add_ad_groups example");
+require qw(examples/v201402/basic_operations/add_text_ads.pl);
+ok(add_text_ads($client, $ad_group_id), "Test of add_text_ads example");
+require qw(examples/v201402/basic_operations/add_keywords.pl);
+ok(add_keywords($client, $ad_group_id), "Test of add_keywords example");
+require qw(examples/v201402/basic_operations/get_campaigns.pl);
+ok(get_campaigns($client), "Test of get_campaigns example");
+require qw(examples/v201402/basic_operations/get_campaigns_with_awql.pl);
+ok(get_campaigns_with_awql($client), "Test of get_campaigns with AWQL example");
+require qw(examples/v201402/basic_operations/get_ad_groups.pl);
+ok(get_ad_groups($client, $campaign_id), "Test of get_ad_groups example");
+require qw(examples/v201402/basic_operations/get_keywords.pl);
+ok(get_keywords($client, $ad_group_id), "Test of get_keywords example");
+require qw(examples/v201402/basic_operations/get_text_ads.pl);
+ok(get_text_ads($client, $ad_group_id), "Test of get_text_ads example");
+require qw(examples/v201402/basic_operations/update_campaign.pl);
+ok(update_campaign($client, $campaign_id), "Test of update_campaign example");
+require qw(examples/v201402/basic_operations/update_ad_group.pl);
+ok(update_ad_group($client, $ad_group_id), "Test of update_ad_group example");
+require qw(examples/v201402/basic_operations/update_keyword.pl);
+ok(update_keyword($client, $ad_group_id, $keyword_id),
+   "Test of update_keyword example");
+require qw(examples/v201402/basic_operations/pause_ad.pl);
+ok(pause_ad($client, $ad_group_id, $text_ad_id), "Test of pause_ad example");
+
+# Advanced Operations examples.
+require qw(examples/v201402/advanced_operations/add_click_to_download_ad.pl);
+ok(add_click_to_download_ad($client, $ad_group_id),
+   "Test of add_click_to_download_ad example");
+require qw(examples/v201402/advanced_operations/add_ad_group_bid_modifier.pl);
+ok(add_ad_group_bid_modifier($client, $ad_group_id),
+   "Test of add_ad_group_bid_modifier example");
+require qw(examples/v201402/advanced_operations/get_ad_group_bid_modifier.pl);
+ok(get_ad_group_bid_modifier($client),
+   "Test of get_ad_group_bid_modifier example");
+
+# Campaign Management examples.
+require qw(examples/v201402/campaign_management/add_keywords_in_bulk.pl);
+ok(add_keywords_in_bulk($client, $ad_group_id),
+   "Test of add_keywords_in_bulk example");
+require qw(examples/v201402/campaign_management/add_location_extension.pl);
+ok(add_location_extension($client, $campaign_id),
+   "Test of add_location_extension example");
+require qw(examples/v201402/campaign_management/get_all_disapproved_ads.pl);
+ok(get_all_disapproved_ads($client, $ad_group_id),
+   "Test of get_all_disapproved_ads example");
+require qw(examples/v201402/campaign_management/get_all_disapproved_ads_with_awql.pl);
+ok(get_all_disapproved_ads_with_awql($client, $ad_group_id),
+   "Test of get_all_disapproved_ads_with_awql example");
+require qw(examples/v201402/campaign_management/promote_experiment.pl);
+ok(promote_experiment($client, $experiment_id),
+   "Test of promote_experiment example");
+require qw(examples/v201402/campaign_management/add_experiment.pl);
+ok(add_experiment($client, $campaign_id, $ad_group_id, $keyword_id),
+   "Test of add_experiment example");
+require qw(examples/v201402/campaign_management/set_ad_parameters.pl);
+ok(set_ad_parameters($client, $ad_group_id, $keyword_id),
+   "Test of set_ad_parameters example");
+require qw(examples/v201402/campaign_management/set_bid_modifier.pl);
+ok(set_bid_modifier($client, $campaign_2_id),
+   "Test of set_bid_modifier example");
+require qw(examples/v201402/campaign_management/validate_text_ad.pl);
+ok(validate_text_ad($client, $ad_group_id), "Test of validate_text_ad example");
+$client = get_test_client("v201402");
+
+# Error Handling examples.
+require qw(examples/v201402/error_handling/handle_partial_failures.pl);
+ok(handle_partial_failures($client, $ad_group_id),
+   "Test of handle_partial_failures example");
+require qw(examples/v201402/error_handling/handle_server_faults.pl);
+ok(handle_server_faults($client), "Test of handle_server_faults example");
+$client = get_test_client("v201402");
+
+# Misc examples.
+require qw(examples/v201402/misc/get_all_images_and_video.pl);
+ok(get_all_images_and_video($client),
+   "Test of get_all_images_and_video example");
+require qw(examples/v201402/misc/upload_image.pl);
+ok(upload_image($client), "Test of upload_image example");
+require qw(examples/v201402/misc/use_hashes.pl);
+ok(use_hashes($client), "Test of use_hashes example");
+require qw(examples/v201402/misc/use_xpath.pl);
+ok(use_xpath($client), "Test of use_xpath example");
+
+# Optimization examples.
+require qw(examples/v201402/optimization/estimate_keyword_traffic.pl);
+ok(estimate_keyword_traffic($client),
+   "Test of estimate_keyword_traffic example");
+require qw(examples/v201402/optimization/get_keyword_bid_simulations.pl);
+ok(get_keyword_bid_simulations($client, $ad_group_id, $keyword_id),
+   "Test of get_keyword_bid_simulations example");
+require qw(examples/v201402/optimization/get_keyword_ideas.pl);
+ok(get_keyword_ideas($client), "Test of get_keyword_ideas example");
+
+# Remarketing examples.
+require qw(examples/v201402/remarketing/add_audience.pl);
+ok(add_audience($client), "Test of add_audience example");
+require qw(examples/v201402/remarketing/add_conversion_tracker.pl);
+ok(add_conversion_tracker($client), "Test of add_conversion_tracker example");
+
+# Reporting examples.
+require qw(examples/v201402/reporting/download_criteria_report.pl);
+my ($fh, $filename) = tempfile();
+ok(download_criteria_report($client, $filename),
+   "Test of download_criteria_report example");
+require qw(examples/v201402/reporting/download_criteria_report_with_awql.pl);
+($fh, $filename) = tempfile();
+ok(download_criteria_report_with_awql($client, $filename),
+   "Test of download_criteria_report_with_awql example");
+require qw(examples/v201402/reporting/get_report_fields.pl);
+ok(get_report_fields($client), "Test of get_report_fields example");
+
+# Targeting examples.
+require qw(examples/v201402/targeting/add_campaign_targeting_criteria.pl);
+ok(add_campaign_targeting_criteria($client, $campaign_id),
+   "Test of add_campaign_targeting_criteria example");
+require qw(examples/v201402/targeting/get_campaign_targeting_criteria.pl);
+ok(get_campaign_targeting_criteria($client, $campaign_id),
+   "Test of get_campaign_targeting_criteria example");
+require qw(examples/v201402/targeting/get_targetable_languages_and_carriers.pl);
+ok(get_targetable_languages_and_carriers($client, $campaign_id),
+   "Test of get_targetable_languages_and_carriers example");
+require qw(examples/v201402/targeting/lookup_location.pl);
+ok(lookup_location($client), "Test of lookup_location example");
+
+# Basic Operations delete examples.
+require qw(examples/v201402/basic_operations/delete_ad.pl);
+ok(delete_ad($client, $ad_group_id, $text_ad_id), "Test of delete_ad example");
+require qw(examples/v201402/basic_operations/delete_keyword.pl);
+ok(delete_keyword($client, $ad_group_id, $keyword_id),
+   "Test of delete_keyword example");
+require qw(examples/v201402/basic_operations/delete_ad_group.pl);
+ok(delete_ad_group($client, $ad_group_id), "Test of delete_ad_group example");
+require qw(examples/v201402/basic_operations/delete_campaign.pl);
+ok(delete_campaign($client, $campaign_id), "Test of delete_campaign example");
+
+# Cleaning up test dependencies.
+TestAPIUtils::delete_campaign_ad_extension($client,
+                                           $campaign_location_extension_id);
+TestAPIUtils::delete_text_ad($client, $text_ad_id);
+TestAPIUtils::delete_keyword($client, $keyword_id);
+TestAPIUtils::delete_ad_group($client, $ad_group_id);
+TestAPIUtils::delete_campaign($client, $campaign_id);

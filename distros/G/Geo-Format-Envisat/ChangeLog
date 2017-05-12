@@ -1,0 +1,17 @@
+
+========== ChangeLog of Geo::Format::Envisat
+
+All modifications where created by Mark Overmeer, unless explicitly
+stated differently.
+
+version 0.03: Thu Dec  1 14:21:21 CET 2011
+	- do not use /bin/pwd in t/99pod.t
+
+version 0.02: Wed Jan 21 13:27:53 CET 2009
+	- Use Geo::Surface for collected footprints.
+	- Require Geo::Point 0.10 for fixes.
+	- collect DSD contents, except for the huge measurement data.
+	- fix silly mistakes in t/10name.t
+
+version 0.01: Wed Dec 31 14:59:32 CET 2008
+	- initial release, probably quite complete

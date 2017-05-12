@@ -1,0 +1,22 @@
+Release history for Generic-Assertions
+
+0.001002 2017-03-03T16:20:07Z 3a245dd
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Generic-Assertions/issues/1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +8 ↑4 -2 (recommends: ↓1, suggests: ↑2)
+ - test: ↓1 (recommends: ↓1)
+
+0.001001 2014-10-30T09:12:56Z 93284f4
+ - Non-Trial release of previous version.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - configure: +1
+ - test: +1
+
+0.001000 2014-10-25T10:32:43Z c2ef458
+ - First version.

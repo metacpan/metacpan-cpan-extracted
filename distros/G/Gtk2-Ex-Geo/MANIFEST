@@ -1,0 +1,27 @@
+LICENCE
+ChangeLog
+Changes
+MANIFEST
+README
+Makefile.PL
+index.dox
+t/00.t
+t/01.t
+t/02.t
+lib/Gtk2/Ex/typemap
+lib/Gtk2/Ex/gtk2-ex-geo.h
+lib/Gtk2/Ex/Geo.pm
+lib/Gtk2/Ex/Geo.xs
+lib/Gtk2/Ex/Geo/Dialogs.glade
+lib/Gtk2/Ex/Geo/Glue.glade
+lib/Gtk2/Ex/Geo/Dialogs.pm.in
+lib/Gtk2/Ex/Geo/Glue.pm.in 
+lib/Gtk2/Ex/Geo/DialogMaster.pm
+lib/Gtk2/Ex/Geo/Layer.pm
+lib/Gtk2/Ex/Geo/Overlay.pm
+lib/Gtk2/Ex/Geo/TreeDumper.pm
+lib/Gtk2/Ex/Geo/Dialogs/Colors.pm
+lib/Gtk2/Ex/Geo/Dialogs/Symbols.pm
+lib/Gtk2/Ex/Geo/Dialogs/Labeling.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

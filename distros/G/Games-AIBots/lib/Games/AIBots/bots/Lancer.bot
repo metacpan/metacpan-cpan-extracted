@@ -1,0 +1,521 @@
+$name   = 'Lancer';
+$author = 'Bestian Tang';
+$team   = 'Solanian Knight';
+
+# require 'Drones.bm';
+
+$a = 0;
+$b = 0;
+
+sub ride {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    call charge if abs($xx) <= 1 or abs($yy) <= 1;
+
+    call trample if &inperim('enemy');
+    enable shield;
+    if (&nearst('enemy') < 3 and $x != $enemy_x and $y != $enemy_y) {
+        move backward;
+        call trample;
+    }
+
+    disable cloak if &nearst('enemy') > 2;
+
+    if ($fuel < 300 or $life < 5 or $ammo < 11) {
+        goto rest;
+    }
+
+    scan front;
+
+    if (&found('wall|mine')) {
+        if (int(rand(2))) {
+            turn left;
+        }
+        else {
+            turn right;
+        }
+        call move;
+        redo;
+    }
+
+    elsif (&found('flag|vault')) {
+        if (&damaged == 0 and &found('flag')) {
+            move backward;
+            fire energy;
+        }
+        call cuthead;
+    }
+    elsif (&found('fence')) {
+        if ($ammo > 20) {
+            disable shield;
+            fire laser;
+            redo;
+        }
+        else {
+            call move;
+            call move if int(rand(2));
+
+            if (int(rand(2))) {
+                turn left;
+            }
+            else {
+                turn right;
+            }
+            call move;
+            redo;
+        }
+    }
+
+    elsif (&found('enemy')) {
+        if ($enemy_h == $h and $ammo >= 10) {
+            disable shield;
+            fire grenade * 2;
+            enable shield;
+            call charge;
+        }
+
+        else {
+            call charge;
+        }
+
+    }
+    else {
+        call march;
+    }
+    call trample;
+    call trample if &inperim('enemy');
+
+    if ($a = ($a + 1) % 2) {
+        turn right;
+        call move;
+
+        if (&bumped('enemy')) {
+            if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+                call trample;
+            }
+            else {
+                disable shield;
+                fire laser * 5;
+                enable shield;
+            }
+        }
+        elsif (&bumped) {
+            move backward;
+        }
+
+        turn left;
+        call move;
+        if (&bumped('enemy')) {
+            if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+                call trample;
+            }
+            else {
+                disable shield;
+                fire laser * 5;
+                enable shield;
+            }
+        }
+        elsif (&bumped) {
+            move backward;
+        }
+    }
+    else {
+        turn left;
+        call move;
+
+        if (&bumped('enemy')) {
+            if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+                call trample;
+            }
+            else {
+                disable shield;
+                fire laser * 5;
+                enable shield;
+            }
+        }
+        if (&bumped) {
+            move backward;
+        }
+
+        turn right;
+        call move;
+        if (&bumped('enemy')) {
+            if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+                call trample;
+            }
+            else {
+                disable shield;
+                fire laser * 5;
+                enable shield;
+            }
+        }
+        elsif (&bumped) {
+            move backward;
+        }
+    }
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+
+    redo;
+}
+
+
+sub charge {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    call turn;
+    call move;
+    return if (&nearst('enemy') >= 6 or abs($xx) > 1 and abs($yy) >1);
+    redo;
+}
+
+sub march {
+    if ($b < 3) {
+        call move;
+        if (&bumped('enemy')) {
+            if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+                $b = 2;
+                call trample;
+            }
+            elsif (&bumped('friend')) {
+                turn left;
+                $b = 0;
+                return;
+            }
+
+            else {
+                $b = 2;
+                disable shield;
+                fire laser * 5;
+                enable shield;
+            }
+
+        }
+        $b++;
+        redo;
+    }
+
+    $b = 0;
+    if (&nearst('enemy') <= 2) {
+        scan perimeter;
+
+        if (&found('enemy')) {
+            call trample;
+        }
+        turn left;
+        redo;
+    }
+
+    return;
+}
+
+sub trample {
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+    $foe = $enemy_l;
+    attempt destruct if (&inperim('enemy') and $life <= int($enemy_l/2));
+    fire energy if &inperim('enemy');
+    if ($enemy_l != $foe - 2) {
+        scan perimeter;
+        if (&found('flag|vault')) {
+            call catch;
+        }
+        elsif (&found('mine') and $life > 4) {
+            fire energy;
+        }
+        elsif (&found('enemy')) {
+            attempt destruct;
+        }
+
+        return;
+    }
+
+    redo;
+}
+
+sub cuthead {
+    $lastammo = $ammo;
+    $lastlife = $life;
+    call move;
+
+    if (&bumped('enemy')) {
+        if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+            call trample;
+        }
+        else {
+            disable shield;
+            fire laser * 5;
+            enable shield;
+        }
+    }
+
+    return if &bumped();
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+    redo;
+}
+
+sub rest {
+    enable shield;
+
+    call snare;
+    turn left;
+    call snare;
+    turn left;
+    call snare;
+    turn left;
+    call snare;
+
+    goto ambush;
+}
+
+sub ambush {
+    enable cloak if (&nearst('enemy') < 3 and $ammo > 10);
+    scan perimeter;
+
+    if (&found('enemy')) {
+        $ol = $enemy_l;
+        call trample;
+    }
+    elsif (&found('flag|vault') and $fuel > 150) {
+        call catch;
+    }
+
+    disable cloak if &nearst('enemy') < 2;
+
+    if ($fuel > 100 and $ammo > 1) {
+        scan front;
+        if (&found('space')) {
+            move forward * 2;
+            enable laymine;
+            move backward;
+            disable laymine;
+            move backward;
+        }
+        elsif (&found('enemy')) {
+            if ($enemy_h + $h != 10 and $enemy_h - $h != 0 and $fuel > 300 and $ammo > 4) {
+                fire grenage * 3;
+                redo;
+            elsif ($fuel > 300 and $ammo > 4) {
+                disable shield;
+                fire grenade 3;
+                redo;
+            }
+            else {
+                turn right;
+                move backward;
+                call pit;
+                redo;
+            }
+        }
+        elsif (&found('flag|vault')) {
+            call hunt;
+            redo;
+        }
+    }
+
+    if ($life < 9) {
+        disable shield;
+        attempt repair * 3;
+        enable shield;
+    }
+    turn right;
+    if ($life > 8 and $fuel > 1000 and $ammo > 5 and &nearst('enemy') > 5) {
+        call move;
+        turn right;
+        call move;
+        turn left;
+        goto ride;
+    }
+
+    redo;
+}
+
+sub snare {
+    scan relative 8;
+    if (&found('enemy')) {
+        call trample;
+    }
+
+    if (&found('space|flag|vault|enemy')) {
+        if (&damaged == 0 and &found('flag')) {
+            move backward;
+            fire energy;
+            call move;
+        }
+        call move;
+        scan relative 8;
+
+        if &found('enemy') {
+            if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+                call trample;
+            }
+            else {
+                disable shield;
+                fire laser * 5;
+                enable shield;
+            }
+        }
+        if (&found('space|flag|vault|enemy')) {
+            if (&damaged == 0 and &found('flag')) {
+                move backward;
+                fire energy;
+                call move;
+            }
+            call move;
+            enable laymine;
+
+            move backward;
+            disable laymine;
+            move backward;
+            return;
+        }
+        elsif (&found('mine|wall|fence')) {
+            move backward;
+            return;
+        }
+    }
+    return;
+}
+
+sub move {
+    move forward;
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') < 3;
+    call trample if &inperim('enemy');
+    if (&bumped('enemy')) {
+        if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+            call trample;
+        }
+        else {
+            disable shield;
+            fire laser * 5;
+            enable shield;
+        }
+    }
+    elsif (&bumped('friend')) {
+        move backward;
+        turn left;
+    }
+
+    return;
+}
+
+sub hunt {
+    if (&damaged == 0 and &found('flag')) {
+        move backward;
+        fire energy;
+        call move;
+    }
+
+    $ox = $x;
+    $oy = $y;
+    call cuthead;
+    $camp = abs($ox - $x) + abs($oy - $y);
+
+    move backward * $camp;
+
+    return;
+}
+
+sub pit {
+    $b ++;
+    scan relative 8;
+    if (&found('enemy')) {
+        disable shield;
+        fire laser * 3;
+        enable shield;
+        redo;
+    }
+    elsif (&found('flag|vault')) {
+        if (&damaged == 0 and &found('flag')) {
+            move backward;
+            fire energy;
+            call move;
+        }
+        call move;
+        move backward;
+        redo;
+    }
+    if ($b == 6) {
+        call move;
+        turn left;
+        $b = 0;
+        return;
+    }
+    redo;
+}
+
+sub catch {
+    $b ++;
+    $lastammo = $ammo;
+    $lastlife = $life;
+    scan relative 8;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move backward;
+            fire energy;
+            call move;
+        }
+        call move;
+    }
+    scan relative 9;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move backward;
+            fire energy;
+            call move;
+        }
+        call move;
+        turn right;
+        call move;
+    }
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+    if ($b > 4) {
+        $b = 0;
+        return;
+    }
+
+    turn right;
+    redo;
+}
+
+sub turn {
+    call trample if &inperim('enemy');
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+    }
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+    return;
+}

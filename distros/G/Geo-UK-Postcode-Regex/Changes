@@ -1,0 +1,73 @@
+Revision history for Geo-UK-Postcode-Regex
+
+0.015  2015-05-29 17:06:29 BST
+
+  [Maintenance]
+   - fixing incorrect version of Test::Exception in cpanfile
+
+0.014  2015-02-11 17:57:31 GMT
+
+  [Bugfix]
+  - extract/extract_pc methods no longer extract valid postcodes out of invalid ones
+  - unanchored postcodes work correctly
+
+0.013  2014-03-31 13:10:16 BST
+
+  [Bugfix]
+  - Correct parsing of partial postcodes when using valid outcodes (now matches 'E14' as 'E14' not 'E1')
+
+0.012  2014-03-12 17:06:25 GMT
+
+  [Important behaviour changes to parse()]
+  - 'incode' now set to undef if sector and unit are missing from a postcode (previously set to empty string)
+  - 'valid_outcode' no longer returned 
+
+  [Maintenance]
+  - Updating POD, correcting SYNOPSIS
+
+0.011  2014-03-12 16:59:16 GMT
+
+  [Important behaviour changes to parse()]
+  - 'incode' now set to undef if sector and unit are missing from a postcode (previously set to empty string)
+  - 'valid_outcode' no longer returned 
+
+  [Maintenance]
+  - Updating POD, correcting SYNOPSIS
+
+0.010  2014-01-28 13:48:32 GMT
+
+  [Features]
+  - Case-insensitive matching, and allow options on validate_pc
+
+  [Maintenance]  
+  - POD - methods grouped
+  - Switched to Dist::Milla
+  - moved tied hash to separate file
+
+0.009     2014-01-22 18:20:34+00:00 Europe/London
+
+  - debugging regexes
+  - added Simple.pm
+  - switched regex building to tied hash
+
+0.008     2014-01-15 16:36:51+00:00 Europe/London
+
+  - fixing parse.t tests
+  - adding extract() method
+
+0.007     2014-01-14 16:26:16+00:00 Europe/London
+
+  - BUGFIX: 'P' missing in possible subdistricts for single character areas ('N1P' only use)
+
+0.006     2013-12-20 12:57:44 Europe/London
+
+  - Tidy and tests
+
+0.005     2013-10-23 12:56:02 Europe/London
+
+  - Bumping version number, conflict with existing version from Geo::UK::Postcode
+
+0.001     2013-10-23 12:20:07 Europe/London
+
+  - Initial release - Separated from Geo::UK::Postcode and simplified dependencies
+

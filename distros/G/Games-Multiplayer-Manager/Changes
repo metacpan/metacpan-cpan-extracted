@@ -1,0 +1,14 @@
+Revision history for Perl extension Games::Multiplayer::Manager.
+
+1.01  Thu Aug  3 13:16:00 2006
+	- Fixed a few bugs with arrays being returned by the module. It used to return "0"
+		when the array would've been empty, causing $array[0] = 0. This has been fixed.
+		empty arrays return empty now.
+	- Revised the module page. The broadcast handler receives "to" and "message" as
+		the hash keys, not "msg".
+	- Fixed the test script; Makefile should install more smoothly now.
+
+1.00  Tue Jan 18 14:42:47 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Games::Multiplayer::Manager
+

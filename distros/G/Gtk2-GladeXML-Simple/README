@@ -1,0 +1,78 @@
+NAME
+   Gtk2::GladeXML::Simple - A clean object-oriented interface to Gtk2::GladeXML
+
+SYNOPSIS
+
+   package MyApp;
+
+   use Gtk2::GladeXML::Simple;
+   use base qw( Gtk2::GladeXML::Simple )
+
+   sub new {
+      my $class = shift;
+      my $self = $class->SUPER::new( $gladefile ); 
+      return $self;
+   }
+
+   ...
+
+   # Signal handlers are methods of your class
+   sub on_button_clicked {
+      my $self = shift;
+      # You have access to your widgets directly
+      # or using $self->get_widget( widget_name )
+      my $button = $self->{button1};
+   }        
+
+DESCRIPTION
+
+   Gtk2::Glade::XML::Simple is a module that provides a clean and easy interface
+   for Gnome/Gtk2 and Glade applications using an object-oriented syntax. You just
+   make Gtk2::GladeXML::Simple your application's base class, have your C<new> call
+   C<SUPER::new>, and the module will do the hard work for you.
+
+   Gtk2::GladeXML::Simple offers:
+
+      * Signal handlers callbacks as methods of your class.
+      
+      * Autoconnection of signal handlers.
+
+      * Autocalling of creation functions for custom widgets.
+
+      * Access to widgets as instance attributes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Gtk2
+  Gtk2::GladeXML
+
+AUTHOR
+   Marco Antonio Manzo <marcoam@perl.org.mx>
+
+   Special thanks in no order to Scott Arrington "muppet" <scott at asofyet dot org> who provided
+   lots of great ideas to improve this module. Sandino "tigrux" Flores <tigrux at ximian dot com>
+   who is the author of SimpleGladeApp which is the main source of this module's core idea.
+   Sean M. Burke <sburke at cpan dot org> and Rocco Caputo <rcaputo at cpan dot org> for constantly
+   helping me with ideas and cleaning my POD.
+
+       
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Marco Antonio Manzo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

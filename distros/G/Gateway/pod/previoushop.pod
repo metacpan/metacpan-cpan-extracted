@@ -1,0 +1,23 @@
+=head2 previoushop
+
+Adds the previous host through which a mail message passed to the Path
+header of the message.  It does this by looking through the raw Received
+headers, finding the first Received header that specifies a host from
+which the message was received, and prepending it to the Path header (or
+creating a new Path header if none already exists).
+
+If no Received headers that contain a "from" clause are found (which may
+be the case for mail originating locally), nothing is done.
+
+The reason for this module is to support news to mail and mail to news
+gateways for the same unmoderated newsgroup.  If the mail to news address
+is subscribed to a mailing list and posts to the newsgroup are sent back
+to the mailing list, a loop will be created unless something is done to
+stop it.  One method of stopping such loops is to alias the hostname of
+the mailing list machine out of the feed to the news to mail gateway in
+the news server and then use this module to put the hostname of the
+mailing list machine in the Path of all articles posted through the mail
+to news gateway.
+
+This module takes no arguments or configuration directives and cannot
+fail.

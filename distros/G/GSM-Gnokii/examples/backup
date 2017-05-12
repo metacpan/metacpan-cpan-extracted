@@ -1,0 +1,44 @@
+#!/pro/bin/perl
+
+use strict;
+use warnings;
+use autodie;
+
+use GSM::Gnokii;
+use JSON;
+
+my $gsm  = GSM::Gnokii->new ({ verbose => 1 })->connect ();
+
+binmode STDOUT, ":encoding(utf-8)";
+
+print to_json ({
+    IMEI	=> $gsm->GetIMEI (),
+    DateTime	=> $gsm->GetDateTime (),
+    Security	=> $gsm->GetSecurity (),
+#   Display	=> $gsm->GetDisplayStatus (),
+#   Profile_1	=> $gsm->GetProfiles (0, 0),
+    Memory	=> $gsm->GetMemoryStatus (),
+    Power	=> $gsm->GetPowerStatus (),
+    PhoneBook	=> { map {( $_ => $gsm->GetPhonebook ($_, 1, 0) )} "ME", "SM" },
+    SpeedDial	=> [ map { $gsm->GetSpeedDial ($_) } 1 .. 9 ],
+    RF		=> $gsm->GetRF (),
+    NetworkInfo	=> $gsm->GetNetworkInfo (),
+    SMSCenters	=> $gsm->GetSMSCenter (1, 9),
+    Alarm	=> $gsm->GetAlarm (),
+    RingtoneList=> $gsm->GetRingtoneList (),
+    Ringtones	=> [ map { $gsm->GetRingtone ($_)  } 0 .. 9 ],
+    SMSStatus	=> $gsm->GetSMSStatus (),
+    SMS_List	=> { map { my $h = $_;
+			   my $m = $h->{memorytype};
+			   $h->{sms_list} = [ map {
+			       $gsm->GetSMS ($m, $_) } 1 .. $h->{count} ];
+			   ( $m => $h );
+			   } @{$gsm->GetSMSFolderList ()} },
+#   CalNotes	=> $gsm->GetCalendarNotes (0, 4),
+#   WAPSettings	=> $gsm->GetWapSettings (2),
+    }, {
+	utf8	=> 1,
+	pretty	=> 1,
+	});
+
+$gsm->disconnect;

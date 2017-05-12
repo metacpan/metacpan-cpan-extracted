@@ -1,0 +1,13 @@
+diff -Nur -x '*.orig' -x '*~' lmc//lib/Gtk2/Ex/ListModelConcat.pm lmc.new//lib/Gtk2/Ex/ListModelConcat.pm
+--- lmc//lib/Gtk2/Ex/ListModelConcat.pm	2010-09-11 18:04:14.000000000 +1000
++++ lmc.new//lib/Gtk2/Ex/ListModelConcat.pm	2010-09-11 18:06:37.000000000 +1000
+@@ -1204,7 +1204,8 @@
+ objects end up before C<append-model> even if they're written the other way
+ around.
+ 
+-See F<examples/builder-append.pl> and F<examples/builder-children.pl> in the
++See F</usr/share/doc/libgtk2-ex-listmodelconcat-perl/examples/builder-append.pl>
++and F</usr/share/doc/libgtk2-ex-listmodelconcat-perl/examples/builder-children.pl> in the
+ ListModelConcat sources for complete sample programs.
+ 
+ =head1 BUGS

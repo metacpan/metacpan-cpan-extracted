@@ -1,0 +1,100 @@
+Games-Quake-Stats version 0.05
+==============================
+
+This module provides simple mechanisms for collecting and displaying game
+statisitics for the Quake, Quake2, Quake2world, and Quake 3 games.   It works by 
+reading the fraglog file created by Quake servers.
+
+You can specify the fraglog file when the object is constructed, the module
+compiles statistics for each player that appears in the log.
+
+The Games::Quake::Stats module can create simple bar charts showing
+the relative statistics of each player, and can generate textual and pre-formed
+HTML output (HTML output shows the graphs created).
+
+
+Example Usage
+=============================
+
+ use strict;
+ use Games::Quake::Stats;
+ 
+ # NOTE: 
+ # 
+ # This example supposes you want to use this module in a CGI setting.
+ #
+ #
+ # If you configure your quake-server to write a fraglog in the directory 
+ # where the quake-server is run, you can create a symbolic link from the
+ # fraglog file to the file: /var/www/cgi-bin/fraglog.log (if that is where this
+ # CGI application will reside).  This code will then read the statistics data
+ # from the *actual* file, while the quake-server deals only with a symbolically
+ # linked file.
+ #
+ my $quake_stats = Stats->new(_frag_log => "/var/www/cgi-bin/fraglog.log",
+			      _stats_graph => "/var/www/html/stats/chart.jpg",
+			      _skill_graph => "/var/www/html/stats/skill.jpg");
+					   
+
+
+ # number of times player 'player1' has been scored against
+ my $player1_fragged = $stats->times_fragged("player1");
+
+
+ # number of times player 'player1' has scored against 'player2'
+ my $player_total = $stats->total_frags("player1", "player2");
+ 
+
+ # total frags player 'player1' has scored
+ my $player_total = $stats->total_frags("player1");
+ 
+
+ # skill level of player 'player1' (total_scored/times_scored_against);
+ my $player_skill = $stats->skill_level("player1");
+
+
+
+
+ # create graphs					   
+ $quake_stats->generate_stats_graph(); # or, generate_stats_graph("/var/www/html/stats/stats.jpg");
+ $quake_stats->generate_skill_graph();
+
+
+ # If you are using this code as a CGI response:
+ print "Content-type: text/html\r\n\r\n";    
+
+ # Usually create graphs before calling this (as this example did above)
+ $quake_stats->generate_html("http://www.youraddress.net/stats/");
+
+ exit (0);
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Games::Quake::Player
+  GD::Graph::hbars;
+  GD::Graph::colour;	
+  
+  
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Matthias Beebe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

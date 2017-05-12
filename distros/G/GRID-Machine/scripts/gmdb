@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+use strict;
+use Getopt::Long;
+
+my $sshcommand    ;
+my $sshconfigfilename ;
+my $netcatcommand ;
+my $netcatoptions ;
+my $machine       ;
+
+my $result = GetOptions (
+  "config=s"         => \$sshconfigfilename,
+  "machine=s"        => \$machine,
+  "help"             => \&help, 
+  "sshcommand=s"     => \$sshcommand,
+  "netcatcommand=s"  => \$netcatcommand,
+  "netcatoptions=s"  => \$netcatoptions,
+); 
+
+$sshconfigfilename = "$ENV{HOME}/.ssh/config" unless defined($sshconfigfilename);
+$machine       = $ENV{GRID_REMOTE_MACHINE} unless defined($machine);
+
+parseSSHConfig();
+
+$sshcommand    = 'ssh'                     unless defined($sshcommand);
+$netcatcommand = 'netcat'                  unless defined($netcatcommand);
+$netcatoptions = '-v -l -p 1234'           unless defined($netcatoptions);
+
+help() unless defined($machine);
+
+my $command = "$sshcommand $machine $netcatcommand $netcatoptions";
+print "Connected to '$machine' via '$sshcommand' using '$netcatcommand' with options '$netcatoptions'\n";
+exec($command);
+
+sub parseSSHConfig {
+
+  local $/ = undef;
+  open(my $con, $sshconfigfilename);
+    my $c = <$con>; 
+  close($con);
+  
+  $c =~ /^\s*(Host.*$machine(?:.|\n)*?)(?:Host\b|\z)/m;
+  my $hostdesc = $1;
+
+  if (defined($hostdesc)) {
+
+    $sshcommand    = $1 if !$sshcommand    and !$hostdesc =~ /^#gm\s+sshcommand\s+'([^'\n]*)'/m;
+
+    $netcatcommand = $1 if !$netcatcommand and $hostdesc =~ /^#gm\s+netcat(?:command)?\s+'([^'\n]*)'/m;
+
+    $netcatoptions = $1 if !$netcatoptions and $hostdesc =~ /^#gm\s+netcatopt(?:ions)?\s+'([^'\n]*)'/m;
+
+    $machine       = $1 if $hostdesc =~ /^\s*HostName\s+([\w.-]+)/m;
+  }
+}
+
+sub help {
+
+  print <<"INFO";
+Usage: $0 [--sshcommand 'ssh'] [--netcatcommand 'netcat'] [--netcatoptions netcatoptions] [--config configfile] [--machine machine]
+
+  By default, machine is given by environment variable \$GRID_REMOTE_MACHINE
+  By default, sshcommand is 'ssh'
+  By default, netcatcommand is 'netcat'
+  By default, netcatoptions is '-v -l -p 1234'
+  By default, configfile is '~/.ssh/config'
+
+Algorithm:
+  The program connects via 'ssh' to machine 'machine'
+  and executes there the 'netcat' command in 'listen' mode
+  using the 'port' specified by the 'netcatoptions'.
+INFO
+  exit(0);
+} 
+

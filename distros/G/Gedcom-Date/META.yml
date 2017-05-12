@@ -1,0 +1,37 @@
+---
+abstract: 'Perl class for interpreting dates in Gedcom files'
+author:
+  - 'Eugene van der Pijll (pijll@gmx.net)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302052'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gedcom-Date
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config: '0'
+  DateTime: '1.36'
+  DateTime::Locale: '1.05'
+  File::Spec: '0'
+  File::Temp: '0'
+  Params::Validate: '0'
+  overload: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Gedcom-Date
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Gedcom-Date.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

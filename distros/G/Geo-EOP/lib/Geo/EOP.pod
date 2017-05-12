@@ -1,0 +1,509 @@
+=encoding utf8
+
+=head1 NAME
+
+Geo::EOP - Earth Observation Products EOP
+
+=head1 INHERITANCE
+
+ Geo::EOP
+   is a Geo::GML
+   is a XML::Compile::Cache
+   is a XML::Compile::Schema
+   is a XML::Compile
+
+=head1 SYNOPSIS
+
+ use Geo::EOP ':eop1.1';
+
+ my $eop = Geo::EOP->new(eop_version => '1.1');
+
+ # see XML::Compile::Cache on how to use readers and writers
+ my $data = $eop->reader("gml:GridCoverage")->($xmlmsg);
+ my $xml  = $eop->writer($sometype)->($doc, $perldata);
+
+ # or without help of the cache, XML::Compile::Schema
+ my $r    = $gml->compile(READER => $sometype);
+ my $data = $r->($xml);
+
+ # read a eop data file.  Autodetects the version used.
+ my ($type, $data) = $eop->from('data.xml');
+ my ($type, $data) = Geo::EOP->from('data.xml');
+ print "Root type:   $type\n";
+ print "EOP version: $data->{version}\n";
+
+ # huge overview on all defined elements
+ $gml->printIndex;
+
+=head1 DESCRIPTION
+
+Provides access to the EOP definitions specified as XML schemas, based
+on GML.  Up to version 1.0, these schemas where named 'HMA' (Heterogeneous
+EO Missions Accessibility), and the development is still part of these
+ESA efforts for standardization.
+
+BE WARNED that HMA1.0 and EOP 1.1/1.2 are only using a B<subset> of GML
+version 3.1.1, due to problems with some software tools.  This limitation
+will probably be removed in 1.3 (or whatever the next version will
+be named).
+
+The first releases of this module will not powerful, but hopefully
+people contribute.  For instance, an example conversion script between
+various versions is very welcome!  It would be nice to help each other.
+I will clean-up the implementation, to make it publishable, but do not
+have the knowledge about needed to implement the converter itself.
+
+Extends L<"DESCRIPTION" in Geo::GML|Geo::GML/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Geo::GML|Geo::GML/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Geo::GML|Geo::GML/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<from>(XMLDATA, OPTIONS)
+
+=item Geo::EOP-E<gt>B<from>(XMLDATA, OPTIONS)
+
+Read a EOP structure from a data source, which can be anything acceptable
+by L<dataToXML()|XML::Compile/"Compilers">: a XML::LibXML::Element, XML as string or ref-string,
+filename, filehandle or known namespace.
+
+Returned is the product (the type of the root node) and the parsed
+data-structure.  The EOP version used for decoding is autodetected,
+unless specified.
+
+See F<examples/read_eop.pl>
+
+example: 
+
+  my ($type, $data) = $eop->from('data.xml');
+  my ($type, $data) = Geo::EOP->from('data.xml');
+
+=item Geo::EOP-E<gt>B<new>(OPTIONS)
+
+ -Option            --Defined in          --Default
+  allow_undeclared    Geo::GML              <true>
+  any_element         XML::Compile::Cache   ATTEMPT
+  block_namespace     XML::Compile::Schema  []
+  eop_version                               <required>
+  hook                XML::Compile::Schema  undef
+  hooks               XML::Compile::Schema  []
+  ignore_unused_tags  XML::Compile::Schema  <false>
+  key_rewrite         XML::Compile::Schema  []
+  opts_readers        XML::Compile::Cache   []
+  opts_rw             XML::Compile::Cache   <some>
+  opts_writers        XML::Compile::Cache   []
+  parser_options      XML::Compile          <many>
+  prefixes            Geo::GML              undef
+  schema_dirs         XML::Compile          undef
+  typemap             XML::Compile::Cache   {}
+  units                                     <none>
+  version             Geo::GML              <required>
+  xsi_type            XML::Compile::Cache   {}
+
+=over 2
+
+=item allow_undeclared => BOOLEAN
+
+=item any_element => CODE|'TAKE_ALL'|'SKIP_ALL'|'ATTEMPT'|'SLOPPY'
+
+=item block_namespace => NAMESPACE|TYPE|HASH|CODE|ARRAY
+
+=item eop_version => VERSION|NAMESPACE
+
+Only used when the object is created directly from this base-class.  It
+determines which EOP syntax is to be used.  Can be a VERSION like "1.1"
+or a NAMESPACE URI like 'NS_EOP_11'.
+
+=item hook => HOOK|ARRAY
+
+=item hooks => ARRAY
+
+=item ignore_unused_tags => BOOLEAN|REGEXP
+
+=item key_rewrite => HASH|CODE|ARRAY
+
+=item opts_readers => HASH|ARRAY-of-PAIRS
+
+=item opts_rw => HASH|ARRAY-of-PAIRS
+
+=item opts_writers => HASH|ARRAY-of-PAIRS
+
+=item parser_options => HASH|ARRAY
+
+=item prefixes => ARRAY|HASH
+
+=item schema_dirs => DIRECTORY|ARRAY-OF-DIRECTORIES
+
+=item typemap => HASH|ARRAY
+
+=item units => HASH
+
+See L</Units>.  Only if you specify your preference in units of measurement,
+some automatic translations will be performed.
+
+=item version => VERSION|NAMESPACE
+
+=item xsi_type => HASH|ARRAY
+
+=back
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in Geo::GML|Geo::GML/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addHook>($hook|LIST|undef)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addHooks>( $hook, [$hook, ...] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addKeyRewrite>($predef|CODE|HASH, ...)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+=item Geo::EOP-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+Inherited, see L<XML::Compile/"Accessors">
+
+=item $obj-E<gt>B<addSchemas>($xml, %options)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addTypemap>(PAIR)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addTypemaps>(PAIRS)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addXsiType>( [HASH|ARRAY|LIST] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<allowUndeclared>( [BOOLEAN] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<anyElement>('ATTEMPT'|'SLOPPY'|'SKIP_ALL'|'TAKE_ALL'|CODE)
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<blockNamespace>($ns|$type|HASH|CODE|ARRAY)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<direction>()
+
+Inherited, see L<Geo::GML/"Accessors">
+
+=item $obj-E<gt>B<eopVersion>()
+
+EOP/HMA version, for instance '1.0'.
+
+=item $obj-E<gt>B<hooks>( [<'READER'|'WRITER'>] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<typemap>( [HASH|ARRAY|PAIRS] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<useSchema>( $schema, [$schema, ...] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<version>()
+
+Inherited, see L<Geo::GML/"Accessors">
+
+=back
+
+=head2 Prefix management
+
+Extends L<"Prefix management" in Geo::GML|Geo::GML/"Prefix management">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addNicePrefix>(BASE, NAMESPACE)
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<addPrefixes>( [PAIRS|ARRAY|HASH] )
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<learnPrefixes>($node)
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<prefix>($prefix)
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<prefixFor>($uri)
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<prefixed>( $type|<$ns,$local> )
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<prefixes>( [$params] )
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=back
+
+=head2 Compilers
+
+Extends L<"Compilers" in Geo::GML|Geo::GML/"Compilers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addCompileOptions>( ['READERS'|'WRITERS'|'RW'], %options )
+
+Inherited, see L<XML::Compile::Cache/"Compilers">
+
+=item $obj-E<gt>B<compile>( <'READER'|'WRITER'>, $type, %options )
+
+Inherited, see L<XML::Compile::Schema/"Compilers">
+
+=item $obj-E<gt>B<compileAll>( ['READERS'|'WRITERS'|'RW', [$ns]] )
+
+Inherited, see L<XML::Compile::Cache/"Compilers">
+
+=item $obj-E<gt>B<compileType>( <'READER'|'WRITER'>, $type, %options )
+
+Inherited, see L<XML::Compile::Schema/"Compilers">
+
+=item $obj-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
+
+=item Geo::EOP-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
+
+Inherited, see L<XML::Compile/"Compilers">
+
+=item $obj-E<gt>B<initParser>(%options)
+
+=item Geo::EOP-E<gt>B<initParser>(%options)
+
+Inherited, see L<XML::Compile/"Compilers">
+
+=item $obj-E<gt>B<reader>($type|$name, %options)
+
+Inherited, see L<XML::Compile::Cache/"Compilers">
+
+=item $obj-E<gt>B<template>('PERL'|'XML', TYPE, OPTIONS)
+
+Inherited, see L<Geo::GML/"Compilers">
+
+=item $obj-E<gt>B<writer>($type|$name)
+
+Inherited, see L<XML::Compile::Cache/"Compilers">
+
+=back
+
+=head2 Helpers
+
+Extends L<"Helpers" in Geo::GML|Geo::GML/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<GPtoGML>(OBJECT, OPTIONS)
+
+Inherited, see L<Geo::GML::GeoPoint/"Helpers">
+
+=back
+
+=head2 Administration
+
+Extends L<"Administration" in Geo::GML|Geo::GML/"Administration">.
+ 
+=over 4
+
+=item $obj-E<gt>B<declare>( <'READER'|'WRITER'|'RW'>, <$type|ARRAY>, %options )
+
+Inherited, see L<XML::Compile::Cache/"Administration">
+
+=item $obj-E<gt>B<doesExtend>($exttype, $basetype)
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<elements>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<findName>($name)
+
+Inherited, see L<XML::Compile::Cache/"Administration">
+
+=item $obj-E<gt>B<findSchemaFile>($filename)
+
+=item Geo::EOP-E<gt>B<findSchemaFile>($filename)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=item $obj-E<gt>B<importDefinitions>($xmldata, %options)
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<knownNamespace>($ns|PAIRS)
+
+=item Geo::EOP-E<gt>B<knownNamespace>($ns|PAIRS)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=item $obj-E<gt>B<namespaces>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<printIndex>( [FILEHANDLE], OPTIONS )
+
+List all the elements which can be produced with the schema.  By default,
+this only shows the elements and excludes the abstract elements from
+the list.  The selected FILEHANDLE is the default to print to.
+
+ -Option       --Defined in         --Default
+  show_declared  XML::Compile::Cache  <true>
+
+=over 2
+
+=item show_declared => BOOLEAN
+
+=back
+
+=item $obj-E<gt>B<types>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<walkTree>($node, CODE)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Geo::GML|Geo::GML/"DETAILS">.
+ 
+=head2 Distribution collection overview
+
+Extends L<"Distribution collection overview" in Geo::GML|Geo::GML/"Distribution collection overview">.
+ 
+=head2 Comparison
+
+Extends L<"Comparison" in Geo::GML|Geo::GML/"Comparison">.
+ 
+=head2 Collecting definitions
+
+Extends L<"Collecting definitions" in Geo::GML|Geo::GML/"Collecting definitions">.
+ 
+=head2 Addressing components
+
+Extends L<"Addressing components" in Geo::GML|Geo::GML/"Addressing components">.
+ 
+=head2 Representing data-structures
+
+Extends L<"Representing data-structures" in Geo::GML|Geo::GML/"Representing data-structures">.
+ 
+=head2 Schema hooks
+
+Extends L<"Schema hooks" in Geo::GML|Geo::GML/"Schema hooks">.
+ 
+=head2 Typemaps
+
+Extends L<"Typemaps" in Geo::GML|Geo::GML/"Typemaps">.
+ 
+=head2 Handling xsi:type
+
+Extends L<"Handling xsi:type" in Geo::GML|Geo::GML/"Handling xsi:type">.
+ 
+=head2 Key rewrite
+
+Extends L<"Key rewrite" in Geo::GML|Geo::GML/"Key rewrite">.
+ 
+=head2 Units
+
+GML is careful about its units, which is nice but verbose.
+Therefore, this module gives you a way to set your preferences.
+The reader will simplify the structure, re-calculating the values
+found into the units of measure you prefer, according to UCUM
+(F<http://aurora.regenstrief.org/ucum>)
+
+  my $eop = Geo::EOP->new(...
+     , units => { distance => 'm'
+                , angle    => 'deg' }
+     );
+
+Available conversions:
+
+=over 4
+
+=item angle 'deg'|'rad'
+
+Will be applied to all AngleType elements
+
+=item distance 'm'
+
+Will be applied to all MeasureType elements
+
+=item percentage '%'|'float'
+
+Will be applied to all elements with a name ending on "Percentage".
+I am not sure about the C<float>... cannot find the uom name.
+
+=back
+
+=head1 DESCRIPTIONS
+
+Extends L<"DESCRIPTIONS" in Geo::GML|Geo::GML/"DESCRIPTIONS">.
+ 
+=head1 SEE ALSO
+
+This module is part of Geo-EOP distribution version 0.50,
+built on July 21, 2015. Website: F<http://perl.overmeer.net/geo/>
+All modules in this suite:
+L</Geo::GML>,
+L</Geo::ISO19139>,
+L</Geo::EOP>,
+L</Geo::Point>,
+L</Geo::Proj4>,
+L</Geo::WKT>, and
+L</Math::Polygon>.
+
+Please post questions or ideas to
+F<https://list.hut.fi/mailman/listinfo/geo-perl|the Geo-Perl mailinglist>
+
+=head1 COPYRIGHTS
+
+=head2 License of the CODE
+
+Copyrights of the perl code and the related documentation by
+2008-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+
+=head2 License of the SCHEMAS
+
+The included schemas are copyrighted by the Open Geospatial Consortium, Inc.
+They are unmodified copied from the files at F<http://schemas.opengis.net>.
+Read OGCs disclaimer and copyright statements on documentation and software
+at F<http://www.opengeospatial.org/ogc/legal>.  The license text is also
+included in this CPAN distribution.
+

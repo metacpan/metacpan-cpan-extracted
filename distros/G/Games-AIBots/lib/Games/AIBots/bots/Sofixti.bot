@@ -1,0 +1,276 @@
+$name   = 'Sofixti';
+$author = 'Bestian Tang';
+$team   = 'Star Controller';
+
+$a = 0;
+$b = 10;
+
+sub charge {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+
+    call turn;
+
+    if (&nearst('enemy') == 3) {
+        scan relative 8;
+
+        if (&found('fence')) {
+            fire laser;
+        }
+        elsif (&found('wall|flag|mine')) {
+            move backward;
+            fire bazooka;
+            disable cloak;
+        }
+    }
+
+    call fire if &nearst('enemy') <= 3 and $ammo >= 10 and $fuel >= 300;
+    call move;
+    call heal if &nearst('enemy') > 4 and abs($xx) > 1 and abs($yy) > 1;
+    redo;
+}
+
+sub turn {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    call bomb if &inperim('enemy');
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+    }
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+    if ($xx * $yy == 0 and &nearst('enemy') >= 5) {
+        turn left;
+        call move;
+        turn right;
+    }
+
+    return;
+}
+
+sub fire {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+
+    if ($xx * $yy == 0 and $ammo >= 10) {
+        fire bazooka;
+    }
+    else {
+        fire grenade 2;
+    }
+
+    call bomb if &inperim('enemy');
+    redo if &nearst('enemy') <= 3 and $ammo >= 8 and $fuel >= 300;
+    call move;
+    scan perimeter;
+
+    if (&found('enemy')) {
+            call bomb if &inperim('enemy');
+        }
+        elsif (&found('flag|vault') and &nearst('enemy') > 3) {
+            call search;
+        }
+        elsif (&found('mine') and $life > 1) {
+            fire energy;
+        }
+        elsif (&found('friend')) {
+            if (int(rand(2))) {
+                move forward;
+            }
+            else {
+                move backward;
+            }
+        }
+    }
+    return;
+}
+
+sub move {
+    call bomb if &inperim('enemy');
+    move backward if &nearst('friend') == 1 and int(rand(2));
+    move forward;
+
+    if (&bumped('enemy')) {
+        call bomb;
+    }
+    elsif (&bumped('fence')) {
+        disable shield;
+        fire laser;
+    }
+    elsif (&bumped()) {
+        if (int(rand(2))) {
+            turn left;
+        }
+        else {
+            turn right;
+        }
+        move forward;
+    }
+
+    if (&nearst('enemy') > 4) {
+        disable cloak;
+        enable shield;
+    }
+    else {
+        disable shield;
+        enable cloak;
+    }
+
+    call bomb if &inperim('enemy');
+    disable cloak if &nearst('enemy') > 4;
+    return;
+}
+
+sub heal {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    disable cloak;
+    if ($b >= 10) {
+        scan perimeter;
+        if (&found('enemy')) {
+            call bomb;
+        }
+        elsif (&found('flag|vault') and &nearst('enemy') > 3) {
+            call search;
+        }
+        elsif (&found('mine') and $life > 1) {
+            fire energy;
+        }
+        elsif (&found('friend')) {
+            if (int(rand(2))) {
+                move forward;
+            }
+            else {
+                move backward;
+            }
+        }
+        $b == 0;
+    }
+
+    if ($life < $max_life) {
+        attempt repair;
+        disable shield;
+    }
+
+    if (abs($xx) <= 1 or abs($yy) <= 1 or $life == $max_life) {
+        $b = 10;
+        return;
+    }
+
+    $b++;
+    redo;
+}
+
+sub bomb {
+    if (&nearst('enemy') == 1) {
+        fire laser;
+        redo if &inperim('enemy');
+    }
+    elsif ($enemy_l <= 4) {
+        fire energy;
+        fire energy if $enemy_l <= 2;
+    }
+    else {
+        attempt destruct;
+    }
+    return;
+}
+
+sub search {
+    $a++;
+    $lastammo = $ammo;
+    $lastlife = $life;
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+
+    call bomb if &inperim('enemy');
+    return if &nearst('enemy') < 3;
+    scan relative 8;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move backward;
+            fire energy;
+            move forward;
+        }
+        move forward;
+    }
+
+    call bomb if &inperim('enemy');
+    return if &nearst('enemy') < 3;
+    scan relative 2;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move forward;
+            fire energy;
+            move backward;
+        }
+        move backward;
+    }
+
+    call bomb if &inperim('enemy');
+    return if &nearst('enemy') < 3;
+    scan relative 9;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move backward;
+            fire energy;
+            move forward;
+        }
+        move forward;
+        turn right;
+        move forward;
+    }
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+
+    call bomb if &inperim('enemy');
+    return if &nearst('enemy') < 3;
+    scan relative 1;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move forward;
+            fire energy;
+            move backward;
+        }
+        move backward;
+        turn right;
+        move backward;
+    }
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+
+    if ($a > 2) {
+        $a = 0;
+        return;
+    }
+    turn right;
+    redo;
+}
+    

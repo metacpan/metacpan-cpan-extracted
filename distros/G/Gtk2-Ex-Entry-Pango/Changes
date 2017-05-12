@@ -1,0 +1,55 @@
+Revision history for Perl extension Gtk2::Ex::Entry::Pango.
+
+0.10 Thu Aug  5 23:04:41 CEST 2010
+	- Version bump in order to make a new CPAN release (the module disappeared from CPAN).
+
+
+0.09 Wed Dec 23 19:53:57 CET 2009
+	- Issue 1 - test failure under locale.
+
+
+0.08 Sun Dec  6 20:30:19 CET 2009
+	- Fix an undef warning when reverting to the default empty text.
+
+
+0.07 Tue May  5 07:45:03 CEST 2009
+	- Bug fix: Old versions of Gtk2 would fail to have a proper $EMPTY_ATTRLIST
+	  Patch by Matthew Braid
+
+
+0.06 Mon May  4 20:01:15 CEST 2009
+	- New release with all the changes from the 0.06_XX releases.
+
+
+0.06_02 Sun May  3 09:16:07 CEST 2009
+	- Fixed the property 'clear-on-focus'.
+
+
+0.06_01 Fri May  1 13:23:07 CEST 2009
+	- Default markup when the entry is empty is not displayed if when focused.
+	- Depending on Gtk2::Pango and on a version of Gtk2 that has Pango support.
+
+
+0.05  Thu Apr 30 09:34:57 CEST 2009
+	- New release with all the changes from the 0.05_XX releases.
+
+
+0.05_01  Sun Feb  8 08:04:30 CET 2009
+	- More unit tests.
+
+
+0.04  Mon Jan  5 20:32:42 CET 2009
+	- Fixed the return value in the unit tests.
+
+
+0.03  Sat Jan  3 17:37:46 CET 2009
+	- Fixed the paste with a middle click when the widget is empty.
+	- Fixed the right click popup menu when the widget is empty.
+
+
+0.02  Fri Jan  2 22:08:00 CET 2009
+	- Can display a default value when the widget is empty.
+
+
+0.01  Fri Jan  2 10:06:06 CET 2009
+	- Initial release.

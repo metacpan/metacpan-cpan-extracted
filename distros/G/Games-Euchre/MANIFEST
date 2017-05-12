@@ -1,0 +1,14 @@
+ChangeLog
+COPYRIGHT
+Makefile.PL
+MANIFEST
+README
+test.pl
+lib/Games/Euchre.pm
+lib/Games/Euchre/Team.pm
+lib/Games/Euchre/Player.pm
+lib/Games/Euchre/Trick.pm
+lib/Games/Euchre/AI.pm
+lib/Games/Euchre/AI/Human.pm
+lib/Games/Euchre/AI/Simple.pm
+scripts/euchre.pl

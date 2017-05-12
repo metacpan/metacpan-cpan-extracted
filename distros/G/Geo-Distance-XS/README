@@ -1,0 +1,30 @@
+Geo-Distance-XS
+===============
+
+This module speeds up Geo::Distance.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Geo::Distance
+    Test::More
+    XSLoader
+
+A C compiler is required to build this module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2014 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

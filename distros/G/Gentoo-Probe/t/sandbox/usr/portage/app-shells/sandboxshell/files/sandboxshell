@@ -1,0 +1,37 @@
+#!/bin/bash
+# Written by vapier@gentoo.org
+# public-domain code ... z0r ...
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/sandboxshell/files/sandboxshell,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+. /sbin/functions.sh
+. /etc/profile
+
+# sanity checks ...
+cd ${PWD} || {
+	eerror "Could not access ${PWD}"
+	exit 1
+}
+
+export LD_PRELOAD=/lib/libsandbox.so
+export SANDBOX_LIB=/lib/libsandbox.so
+export SANDBOX_LOG="/tmp/sandboxme-$(date '+%d.%m.%Y-%H.%M.%S').log"
+export SANDBOX_DEBUG_LOG="${SANDBOX_LOG}.debug"
+export SANDBOX_DENY=""
+export SANDBOX_READ="/"
+export SANDBOX_WRITE="/dev/tty:/dev/pts:/dev/null:/tmp"
+export SANDBOX_PREDICT="${HOME}/.bash_history"
+export SANDBOX_ON="1"
+
+einfo "Loading sandboxed shell"
+einfo " Log File:           ${SANDBOX_LOG}"
+einfo " Debug Log File:     ${SANDBOX_DEBUG_LOG}"
+einfo " sandboxon:          turn sandbox on"
+einfo " sandboxoff:         turn sandbox off"
+einfo " addread <path>:     allow <path> to be read"
+einfo " addwrite <path>:    allow <path> to be written"
+einfo " adddeny <path>:     deny access to <path>"
+einfo " addpredict <path>:  allow fake access to <path>"
+
+export SANDBOX_ACTIVE="armedandready"
+export SANDBOX_WRITE="${SANDBOX_WRITE}:`pwd`:/etc/mtab:/dev/ram5:/root/.ccache"
+exec /bin/bash --init-file /etc/sandboxshell.conf

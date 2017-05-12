@@ -1,0 +1,49 @@
+AudioStream					T_OPAQUE_STRUCT
+BoundingBox					T_OPAQUE_STRUCT
+Camera						T_OPAQUE_STRUCT
+Camera *					T_PTROBJ
+Camera2D					T_OPAQUE_STRUCT
+Color						T_OPAQUE_STRUCT
+Color *						T_PTROBJ
+Image						T_OPAQUE_STRUCT
+Image *						T_PTROBJ
+Light						T_PTROBJ
+Material					T_OPAQUE_STRUCT
+Matrix						T_OPAQUE_STRUCT
+Mesh						T_OPAQUE_STRUCT
+Model						T_OPAQUE_STRUCT
+Music						T_PTROBJ
+Ray						T_OPAQUE_STRUCT
+Rectangle					T_OPAQUE_STRUCT
+RenderTexture2D					T_OPAQUE_STRUCT
+Shader						T_OPAQUE_STRUCT
+Sound						T_OPAQUE_STRUCT
+SpriteFont					T_OPAQUE_STRUCT
+Texture2D					T_OPAQUE_STRUCT
+Texture2D *					T_PTROBJ
+Vector2						T_OPAQUE_STRUCT
+Vector2 *					T_PTROBJ
+Vector3						T_OPAQUE_STRUCT
+Vector3 *					T_PTROBJ
+Wave						T_OPAQUE_STRUCT
+Wave *						T_PTROBJ
+float *						T_PTROBJ
+int *						T_PTROBJ
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));

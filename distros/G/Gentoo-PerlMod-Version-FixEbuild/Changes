@@ -1,0 +1,10 @@
+Release history for Gentoo-PerlMod-Version-FixEbuild
+
+0.1.1     2011-01-14 18:23:41 Pacific/Auckland
+
+        Fixed a syntax error, fixed not shipping the damn script.
+
+0.1.0     2011-01-13 20:00:32 Pacific/Auckland
+
+        First version, released on an unsuspecting world.
+

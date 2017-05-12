@@ -1,0 +1,151 @@
+[% title = view.title %]
+
+<script type="text/javascript">
+    <!--
+		var button_clicked = false;
+		function AntiClicker() {
+			if(button_clicked == true) {
+				return false;
+			}
+			button_clicked = true;
+			return true;
+		}
+// -->
+</script>
+
+<form 	
+	method="[% view.form.method || 'post' %]" 
+	action="[% view.form.action || self.uri %]" 
+	name="[% view.form.name %]"
+>
+
+
+[% view.form.javascript %]
+
+<fieldset>
+	<legend>
+		[% view.form.legend %]
+	</legend>
+	
+	<div style="float: left">
+		<table class="results" 
+			cellspacing="[% view.form.cellspacing || 0 %]"
+			border="0"
+			width="[% view.form.width %]">
+			
+			
+			[% FOREACH field IN view.form.fields %]
+			
+			[% IF field.raw_html %]
+				[% field.raw_html %]
+			[% ELSE %]
+			<tr>
+				<td class="shd" valign="top">
+					[% IF view.form.results.missing.${field.name} %]
+						<div style="color: red">
+					[% END %]
+					
+					[% field.label %]
+					[% IF view.form.results.missing.${field.name} %]
+					    </div>
+                    [% END %]
+					
+				</td>
+				<td class="dta" style="width: [% field.width || '80%' %]" valign="top">
+					[% IF field.type == 'select' %]
+						<select name="[% field.name %]">
+						[% FOR option IN field.options %]
+							<option value="[% option.value %]"
+							 [% IF ( 
+                                option.value == self.params.${field.name}
+							 	|| option.value == field.default_value 
+							 	|| option.value == view.form.row.${field.name} ); 
+							 	"SELECTED"; 
+							 	END 
+							 %]
+							>
+							[% option.label || option.value %]
+							</option> 
+						[% END %]
+						</select>
+					[% ELSIF field.type == 'textarea' %]
+						<textarea name="[% field.name %]" id="[% field.id %]"
+							rows="[% field.rows || '0' %]"
+							cols="[% field.cols || '0' %]"
+						>[% self.params.${field.name} || view.form.row.${field.name}
+|| field.default_value %]</textarea>
+					
+					[% ELSE %]
+						<input type="[% field.type %]" 
+							size="[% field.display_size %]"
+							value="[% self.params.${field.name} || view.form.row.${field.name} || field.default_value %]" 
+							name="[% field.name %]"
+						 />
+						[% IF field.date_select_text %]
+							[% popup = "datepopup('$field.name')" %]
+							<a href="javascript://" onClick="[% popup %]" >
+							[% field.date_select_text %]
+							</a>
+						[% END %]
+					[% END %]
+				</td>
+			</tr>
+			[% END %]			
+			[% END %]
+			
+			<tr>
+				<td colspan="2" class="rshd">
+				<input type="submit" name="submit" value="Search" />
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	[% IF view.form.error_text %]
+	    <div style="float: left; color: red;">
+				[% view.form.error_text %]
+	    </div>
+	[% END %]
+	
+</fieldset>
+</form>
+
+<div class="box">
+    <table id="results">
+        <tr>
+            [% FOREACH heading IN view.data.headings %]
+            
+			<td class="hdr">
+				[% heading %]
+			</td>
+
+            [% END %]
+        </tr>
+
+        [% FOREACH row IN view.data.rows %]
+        <tr>
+            [% FOREACH elem IN row.data %]
+                <td class="dta">[% elem %]</td>
+            [% END %]
+        </tr>
+        [% END %]
+
+        [% IF NOT view.data.rows.0 AND self.method == 'POST' %]
+        [% colspan = view.data.headings.size + view.data.header_options.size %]
+            <tr><td colspan="[% colspan %]">No Data</td></tr>
+        [% END %]
+		
+    </table>
+	[% IF view.data.previous %]
+		<div style="float: left">
+			<a href="[% view.data.previous %]">&lt; Previous</a>
+		</div>
+	[% END %]
+	[% IF view.data.next %] 
+		<div style="float: right">
+			<a href="[% view.data.next %]">Next &gt;</a>
+		</div>
+	[% END %]
+
+</div>
+

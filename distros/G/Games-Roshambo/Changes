@@ -1,0 +1,8 @@
+Revision history for Games::Roshambo
+
+1.00 - Sun Feb 17, 2008
+        First Release
+
+1.01 - Mon Feb 18, 2008
+	o Fixed a stupid error in the tests that prevented make test from working.
+	o Added the description of RPS-101 which had inexplicably been left out of 1.00

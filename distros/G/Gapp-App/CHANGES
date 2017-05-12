@@ -1,0 +1,10 @@
+Changes for Gapp::App
+
+{{$NEXT}}
+- add HasComponent role
+
+0.002     2012-10-05 17:57:13
+- added HasApp roles and HasApp trait
+
+0.01.0 (ALPHA) Aug 16 2012
+- Created Gapp::App::Debug library

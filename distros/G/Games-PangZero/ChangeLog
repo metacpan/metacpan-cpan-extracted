@@ -1,0 +1,479 @@
+
+2012-03-12 19:42 FROGGS
+    * 1.4.1, fix for SDL's Joystick API
+
+2012-02-21 22:27 kthakore, FROGGS
+    * ChangeLog, VERSION, *.p[l/m]: Bumped version to 1.4, making pangzero
+      work with upstream release of SDL. Many fixes.
+      See http://cpansearch.perl.org/src/FROGGS/SDL-2.536/CHANGELOG
+
+2007-07-15 10:12  upi
+
+	* bin/upipang.pl: Proper website launching for Windows.  High level
+	  table is now saved properly.
+
+2007-06-28 09:10  upi
+
+	* ChangeLog, VERSION, bin/upipang.pl: Bumped version to 1.2.
+
+2007-06-28 09:10  upi
+
+	* INSTALL: Basic installation instructions.
+
+2007-06-28 08:56  upi
+
+	* bin/upipang.pl: Some minor tweaks.  Balls smaller than level 3 no
+	  longer have magic in them.  Fixed a bug related to multiple slow
+	  effects.  Slow effect no longer survives in Challenge Mode.
+	  Eliminated some SDL warning messages.  Added TutorialGame (one on
+	  one with a specific kind of ball).
+
+2007-06-28 08:47  upi
+
+	* data/: Balls-Upside128.png, Balls-Upside64.png: Fixed background
+	  green
+
+2007-06-28 08:46  upi
+
+	* data/bonus.png: New bonus graphics
+
+2007-04-03 21:35  upi
+
+	* bin/upipang.pl: Added UpsideDownBall, minor fixes.
+
+2007-04-03 21:33  upi
+
+	* data/: Balls-Upside128.png, Balls-Upside16.png,
+	  Balls-Upside32.png, Balls-Upside64.png, Balls-Upside96.png: Added
+	  UpsideDownBall
+
+2007-01-04 10:38  upi
+
+	* VERSION, bin/upipang.pl: Separate high score tables for Panic and
+	  Challenge modes.  More challenge levels.
+
+2007-01-03 23:31  upi
+
+	* bin/upipang.pl: Show website at exit.
+
+2007-01-03 19:51  upi
+
+	* bin/upipang.pl, data/bonus.png: Added "Matrix effect": slows the
+	  game down for 15 sec.
+
+2007-01-01 09:52  upi
+
+	* ChangeLog, VERSION: Bumped version number to 1.0
+
+2007-01-01 09:50  upi
+
+	* bin/upipang.pl: Quick fix for the Demo before 1.0
+
+2006-12-31 16:32  upi
+
+	* bin/upipang.pl: Added option for weapon durations.
+
+2006-12-31 15:49  upi
+
+	* bin/upipang.pl: Some more fixes for Challenge mode.
+
+2006-12-31 10:54  upi
+
+	* bin/upipang.pl: Fixes for challenge mode.  Better scoreboard
+	  layout for very small screen heights.
+
+2006-12-30 19:45  upi
+
+	* bin/upipang.pl: Improved High Score table.  Menu items now show
+	  tool tips at the bottom of the screen.
+
+2006-12-30 12:33  upi
+
+	* bin/upipang.pl: Player can choose Panic or Challenge game from
+	  the menu.
+
+2006-12-30 10:38  upi
+
+	* bin/upipang.pl: Bugfix for machine gun.
+
+2006-12-30 10:21  upi
+
+	* bin/upipang.pl: Some speed improvements.  Removed the Christmas
+	  decor.
+
+2006-12-23 10:40  upi
+
+	* bin/upipang.pl: Improved ball positioning in challenge mode.
+
+2006-12-20 14:16  upi
+
+	* bin/upipang.pl, data/santa.png: Added flying Santa.
+
+2006-12-20 13:29  upi
+
+	* VERSION, bin/upipang.pl, data/christmas_candle.jpg,
+	  data/christmas_house.jpg, data/christmas_houses.jpg,
+	  data/christmas_tree.jpg, data/christmas_trees.jpg,
+	  data/guyChristmas.png, data/guy_r2.png: Graphics update for 0.19
+
+2006-12-20 10:39  upi
+
+	* bin/upipang.pl, data/glossyfont.png: Number of players moved to
+	  "Player setup" menu.	Several bugfixes (santa pixel bug, credits
+	  bug, 200.000 points bonus life bug) Level display more prominent
+	  in Challenge Game mode.  Error is better reported if the program
+	  dies.
+
+2006-12-16 21:41  upi
+
+	* data/guyChristmas.png: Fix of minor graphics glitch.
+
+2006-12-16 21:23  upi
+
+	* bin/upipang.pl: Minor bugfixes
+
+2006-12-16 14:42  upi
+
+	* bin/upipang.pl: Bugfixing for credits screen.
+
+2006-12-16 09:43  upi
+
+	* ChangeLog, VERSION, bin/upipang.pl, data/fireplace.jpg,
+	  data/xmas-dawn.jpg, data/xmas-night.jpg: Updated version number.
+	  Updated demo.  New Christmas backgrounds.
+
+2006-12-15 23:33  upi
+
+	* bin/upipang.pl, data/bonus.png: XmasBall now drops random weapon
+	  or powerup.  Hexa balls rotation is improved.
+
+2006-12-15 11:11  upi
+
+	* bin/upipang.pl: Slippery floor can be toggled in the menu
+
+2006-12-15 09:55  upi
+
+	* bin/upipang.pl: Added XmasBall.
+
+2006-12-15 09:54  upi
+
+	* data/: Balls-Snow128.png, Balls-Snow16.png, Balls-Snow32.png,
+	  Balls-Snow64.png, Balls-Snow96.png, Balls-XMAS128.png,
+	  border-lighted-theme.png, border-xmas-theme.png: Updated
+	  christmas graphics.
+
+2006-12-15 02:23  upi
+
+	* bin/upipang.pl, data/Balls-Snow128.png, data/Balls-Snow16.png,
+	  data/Balls-Snow32.png, data/Balls-Snow64.png,
+	  data/Balls-Snow96.png, data/Balls-XMAS128.png,
+	  data/border-lighted-theme.png, data/border-xmas-theme.png,
+	  data/guyChristmas.png: Christmas edition graphics.  Challenge
+	  version added.
+
+2006-12-15 01:32  upi
+
+	* ChangeLog, bin/upipang.pl, data/Balls-Fragile128.png,
+	  data/Balls-Fragile16.png, data/Balls-Fragile32.png,
+	  data/Balls-Fragile64.png, data/Balls-Fragile96.png: Minor code
+	  refactoring.	Added FragileBall.
+
+2006-12-04 14:00  upi
+
+	* VERSION, bin/upipang.pl, data/bonus.png, data/border.png:
+	  Improved border for 0.17
+
+2006-12-01 15:06  upi
+
+	* AUTHORS, ChangeLog, VERSION: Update for version 0.16
+
+2006-12-01 15:06  upi
+
+	* bin/upipang.pl: Better handling of music files.
+
+2006-12-01 15:05  upi
+
+	* data/: Hexa-16.png, Hexa-32.png, Hexa-64.png: Background fixes
+	  for Hexas.
+
+2006-12-01 11:16  upi
+
+	* data/: Balls-Bouncy16.png, Balls-Bouncy32.png,
+	  Balls-Bouncy64.png, Balls-Death64.png, Balls-EarthQ16.png,
+	  Balls-EarthQ32.png, Balls-EarthQ64.png, Balls-Red128.png,
+	  Balls-Red16.png, Balls-Red32.png, Balls-Red64.png,
+	  Balls-Red96.png, Balls-Seeker32.png, Balls-Seeker64.png,
+	  Balls-SuperClock64.png, Balls-SuperClock96.png,
+	  Balls-SuperStar64.png, Balls-SuperStar96.png, Balls-Water16.png,
+	  Balls-Water32.png, Balls-Water64.png, Balls-Water96.png,
+	  Hexa-16.png, Hexa-32.png, Hexa-64.png, guy_danigm.png,
+	  guy_pix.png, guy_pux.png, guy_r2.png, guy_sonic.png, l1.jpg,
+	  l2.jpg, l3.jpg, l4.jpg, l5.jpg, l6.jpg, l7.jpg, l8.jpg, l9.jpg:
+	  Data files updated
+
+2006-11-30 19:22  upi
+
+	* bin/upipang.pl: New graphics, hopefully faster, too.	High score
+	  table.
+
+2006-10-08 00:39  upi
+
+	* AUTHORS, ChangeLog, VERSION, bin/upipang.pl: Updated version and
+	  credits for 0.15
+
+2006-10-08 00:26  upi
+
+	* bin/upipang.pl: Added FPS indicator.
+
+2006-10-07 23:47  upi
+
+	* bin/upipang.pl: Players can now select character and color.
+	  AlterPalette now uses display_format (hopefully faster).
+
+2006-10-07 23:43  upi
+
+	* data/ball.png: New and improved ball
+
+2006-10-07 23:18  upi
+
+	* data/: guy_danigm.png, guy_pix.png, guy_pux.png: Added selectable
+	  characters.
+
+2006-10-05 15:07  upi
+
+	* bin/upipang.pl: Fixed for the menu changes.
+
+2006-10-05 13:11  upi
+
+	* bin/upipang.pl: Nifty menu animations.
+
+2006-10-05 08:47  upi
+
+	* bin/upipang.pl: Added "ball mixer" to the menu.
+
+2006-09-06 10:57  upi
+
+	* bin/upipang.pl, data/guy.png: More appealing death effect.
+
+2006-09-06 10:09  upi
+
+	* data/harpoon.png: Added straight harpoon by eblanca76.
+
+2006-09-06 00:38  upi
+
+	* bin/upipang.pl: More forgiving collision detection.
+
+2006-09-05 23:17  upi
+
+	* bin/upipang.pl, data/harpoon.png: New harpoon graphics by
+	  eblanca76 at sourceforge.net
+
+2006-09-05 18:16  upi
+
+	* bin/upipang.pl, data/meltdown.png: Deathball Meltdown at 30+
+	  death balls.
+
+2006-09-05 15:46  upi
+
+	* bin/upipang.pl: DeadGuy uses RotoZoom (funny effect).
+
+2006-09-05 13:45  upi
+
+	* bin/upipang.pl: Fix for previous checkin.
+
+2006-09-05 13:44  upi
+
+	* bin/upipang.pl: Workaround for SDL_perl 1.2.20
+
+2006-09-04 22:21  upi
+
+	* bin/upipang.pl, data/guy.png, data/level.png,
+	  data/level_empty.png: Widescreen mode improvements, better
+	  scoreboard.
+
+2006-08-21 14:10  upi
+
+	* VERSION, ChangeLog: Updated for version 0.13
+
+2006-08-21 14:08  upi
+
+	* bin/upipang.pl: Minor graphics changes, max players set to 6
+
+2006-08-21 14:05  upi
+
+	* data/guy.png: Replaced graphics with free version by "DaniGM"
+	  (panreyes@panreyes.com)
+
+2006-08-14 20:40  upi
+
+	* bin/upipang.pl: Bugfix in background image zooming
+
+2006-08-14 19:01  upi
+
+	* bin/upipang.pl: Widescreen mode.  Some code cleanup.
+
+2006-08-07 11:38  upi
+
+	* bin/upipang.pl: * Fixed SDL_perl 2.x compatibility issue * Added
+	  Rewind capability to RecordGame
+
+2006-08-05 16:21  upi
+
+	* bin/upipang.pl: New Demo (includes SeekerBall).  Fix for SDL_perl
+	  2.x
+
+2006-08-04 20:53  upi
+
+	* ChangeLog, VERSION: Updated for version 0.12
+
+2006-08-04 20:34  upi
+
+	* data/: bonus.png, harpoon.png: Adjusted for new weapons
+
+2006-08-04 20:30  upi
+
+	* bin/upipang.pl: * Joysticks now work in the menu.  * Added
+	  "Credits" screen.  * New ball type: "Seeker" ball.  * Fullscreen
+	  / window can be toggled in the menu * Refactoring: Rolled package
+	  SpawningBall into Ball.  * Refactoring: Removed individual "anim"
+	  attributes and moved them to Game->{anim} * Made sure that the
+	  GamePause is always on top.  * Added Replay capability to normal
+	  games.  * Randomized bonus collection.  * Visual enhancements *
+	  Improved scoreboard layout * Added new difficulty level: "Miki" *
+	  Split off "Options" menu * Controls menu now displays key names
+
+2006-07-28 06:17  upi
+
+	* bin/upipang.pl: * Added new ball type: WaterBall * Added weapons
+	  and weapon drops: MachineGun, PowerWire, HalfCutter * Code
+	  cleanup * Uses Carp module * SuperBall now has its own BallDesc
+	  (no extra parameter uglyness) * BallDesc now contains the package
+	  name of the ball, so Ball::Create is cleaner * Fixed a bug which
+	  caused GamePause to disappear sometimes.  * Player lives
+	  indicator now works for >3 lives.  * Some minor fixes.
+
+2006-07-20 11:52  upi
+
+	* bin/upipang.pl: Earthquake-ball related tweaks
+
+2006-07-20 11:37  upi
+
+	* ChangeLog, VERSION: Updated for 0.11
+
+2006-07-20 11:22  upi
+
+	* bin/upipang.pl: Better joystick support
+
+2006-07-20 10:01  upi
+
+	* bin/upipang.pl, data/gameover.png, data/paused.png: Game Over and
+	  Paused messages
+
+2006-07-20 09:20  upi
+
+	* bin/upipang.pl: New background every 10 levels
+
+2006-07-20 01:14  upi
+
+	* bin/upipang.pl: Color the border red during death sequence
+
+2006-07-20 00:50  upi
+
+	* bin/upipang.pl, data/bonus.png: Added pictograms for Earthquake
+	  Balls and Death Balls
+
+2006-07-20 00:42  upi
+
+	* data/quake.voc: Added Earthquake Balls
+
+2006-07-19 21:59  upi
+
+	* bin/upipang.pl: Added Earthquake Balls
+
+2006-07-19 18:34  upi
+
+	* bin/upipang.pl: The number of death balls spawned is now limited
+	  to 2
+
+2006-07-19 18:20  upi
+
+	* bin/upipang.pl: Added demo / help
+
+2006-07-19 14:09  upi
+
+	* bin/upipang.pl: Can take multiple screanshots with W key
+
+2006-07-18 12:36  upi
+
+	* ChangeLog, VERSION: Updated for 0.10
+
+2006-07-16 14:04  upi
+
+	* bin/upipang.pl: Sound and music can be toggled on/off in main
+	  menu
+
+2006-07-16 12:03  upi
+
+	* bin/upipang.pl: Added difficulty levels.  Split controls menu
+	  from main menu.
+
+2006-07-15 13:34  upi
+
+	* bin/upipang.pl: Renamed package to SpawningBall
+
+2006-07-15 13:06  upi
+
+	* bin/upipang.pl: Factored the menu-related subs into a package
+	  (more OOP!)
+
+2006-07-15 10:06  upi
+
+	* bin/upipang.pl: Esc key now goes back to the menu instead of
+	  quitting during game
+
+2006-07-14 23:16  upi
+
+	* bin/upipang.pl: Added configuration loading and saving
+
+2006-07-13 22:53  upi
+
+	* bin/upipang.pl: Factored apart Game and GameBase packages.
+
+2006-07-12 09:14  upi
+
+	* AUTHORS, COPYING, ChangeLog, NEWS, README, TODO, VERSION: Import
+	  of usual documentation files.
+
+2006-07-12 08:47  upi
+
+	* bin/upipang.pl: Automatically find data directory (good for
+	  autoconf)
+
+2006-07-12 08:14  upi
+
+	* bin/upipang.pl: Main game loop now in the Game package.
+
+2006-07-11 13:31  upi
+
+	* bin/upipang.pl: Factored many global methods and variables into
+	  package Game.
+
+2006-07-10 05:55  upi
+
+	* bin/upipang.pl: Better game balance, respawning players.
+
+2006-06-23 21:47  upi
+
+	* data/: UPiPang.mid, UPiPang.mp3, ball.png, bonus.png, border.png,
+	  brandybun3.png, desert2.png, font2.png, gun.voc, guy.png,
+	  harpoon.png, hexa.png, level.voc, magic.voc, meow.voc, pop.voc,
+	  pop3.voc, shoot.voc, super.voc: Initial import.
+
+2006-06-23 21:36  upi
+
+	* bin/upipang.pl: Initial import
+
+2006-06-23 21:36  upi
+
+	* bin/upipang.pl: Initial revision
+

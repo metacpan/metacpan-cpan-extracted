@@ -1,0 +1,75 @@
+;
+; Ringing Tones text transfer language (RTTTL)
+;
+; Version 1.0 / 29-July-1998
+; - First version by John Mostelo
+; 
+; http://members.tripod.com/~ringtones/note_syntax.txt
+;
+
+<ringing-tones-text-transfer-language> :=
+       <name> <sep> [<defaults>] <sep> <note-command>+
+
+<name> := <char>+    ; maximum name length 10 characters
+
+<sep> := ":"
+
+<defaults> := 
+      <def-note-duration> |
+      <def-note-scale> |
+      <def-beats> 
+
+<def-note-duration> := "d=" <duration>
+
+<def-note-scale> := "o=" <scale> 
+
+<def-beats> := "b=" <beats-per-minute>
+
+<beats-per-minute> := 25,28,...,900   ; decimal value
+
+; If not specified, defaults are
+;
+;  4   = duration
+;  6   = scale   
+;  63  = beats-per-minute
+
+
+<note-command> :=
+      [<duration>] <note> [<scale>] [<special-duration>] <delimiter>
+
+
+<duration> :=
+      "1"  |  ; Full 1/1 note
+      "2"  |  ; 1/2 note
+      "4"  |  ; 1/4 note
+      "8"  |  ; 1/8 note
+      "16" |  ; 1/16 note
+      "32" |  ; 1/32 note
+     
+<note> :=
+      "P"  |  ; pause
+      "C"  |
+      "C#" |
+      "D"  |
+      "D#" |
+      "E"  |
+      "F"  |
+      "F#" |
+      "G"  |
+      "G#" |
+      "A"  |
+      "A#" |
+      "H"         
+
+<scale> :=
+      "5" |   ; Note A is 440Hz
+      "6" |   ; Note A is 880Hz
+      "7" |   ; Note A is 1.76 kHz
+      "8"     ; Note A is 3.52 kHz
+
+<special-duration> :=
+      "."     ; Dotted note
+
+<delimiter> := ","
+
+; End of specification

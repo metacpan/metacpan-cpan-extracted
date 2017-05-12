@@ -1,0 +1,736 @@
+#!/usr/bin/perl -w
+$|++;
+
+# freecell.pl
+#
+# Original implementation by Michael Houghton
+# TUI stuff copied from his TUI implementation
+# Lots of stuff changed, bugs added by Amir Karger
+#
+# based on klondike.pl modified for different solitaire rules
+
+use strict;
+use Games::Cards;
+use Getopt::Std;
+#use Data::Dumper;
+
+use vars qw($opt_g);
+
+getopts('g');
+my $Is_GUI = 0;
+if ($opt_g) {
+    eval "use Tk";
+    die "$@\nGUI is not possible. Fix above error or use text mode.\n\n" if $@;
+
+    # Otherwise, use Tk worked!
+    $Is_GUI = 1;
+    require Tk::Dialog;
+    require Tk::DialogBox;
+    require Tk::ROText;
+    require Games::Cards::Tk;
+}
+
+my $FreeCell; # Games::Cards::Game object
+my %FreeCells; # empty spaces on the game board for putting cards
+my %Foundations; # places to build Ace to King of each suit
+my @Tableau; # columns where cards start
+my $Tableau_Size = 8;
+my $Undo; # Games::Cards::Undo object
+
+my $Error; # current "error" message
+my ($mw, $c); # GUI Main window, Canvas
+
+my $class = $Is_GUI ? "Games::Cards::Tk::Game" : "Games::Cards::Game";
+$FreeCell = $class->new;
+srand();
+
+# Start a new game!
+&New_Game;
+
+# Now play
+if ($Is_GUI) {
+    # This automatically implements a turn-loop
+    &MainLoop;
+
+} else { # TUI
+    while (1) {
+	&print_game;
+
+	# If we got an error on the last turn, print the game status *first*,
+	# then print the error right before the prompt (so that the reader will
+	# see it)
+	if ($Error) { print "$Error\n\n"; $Error = ""; }
+
+	# Ask player what to do
+	print "Command (h for help): ";
+	my $input = <STDIN>; chomp($input); $input =~ s/\s*//g;
+
+	# Do it
+	&do_command ($input);
+    } #end while (loop over turns)
+}
+
+
+######################################################################
+# Create the deck, columns, etc.
+sub setup_game
+{
+    my $class_prefix = $Is_GUI ? "Games::Cards::Tk::" : "Games::Cards::";
+
+    my $class = $class_prefix . "Deck";
+    my $Deck = $class->new($FreeCell, "Deck");
+
+    print "shuffling the deck\n";
+    $Deck->shuffle;
+    
+    # deal the tableau
+    $class = $class_prefix . "Stack";
+    @Tableau = (); # erase Tableau from last game, if any
+    foreach my $i (1..$Tableau_Size)
+    {
+	my $column = $class->new($FreeCell, "Column $i", $i);
+	$Deck->give_cards($column, 6 + $i%2);
+	$column->face_up;
+	push @Tableau, $column;
+    }
+    
+    foreach my $i ("a".."d")
+    {
+	my $column = $class->new($FreeCell, "Cell $i", $i);
+	$FreeCells{$i} = $column;
+    }
+    
+    # Create the empty Foundations
+    foreach (@{$FreeCell->{"suits"}}) {
+	$Foundations{$_} = $class->new($FreeCell, ucfirst($_) . " Pile", lc $_);
+    }
+    
+    $Undo = new Games::Cards::Undo;
+}
+
+######################################################################
+# Subroutine that implements whatever (GUI or TUI) command we gave
+sub do_command {
+    my $input = shift; # whitespace already removed
+    # Big case statement
+    for ($input) {
+
+	# Move card in free cell to a column OR move one 
+	# cards from a column to another column or free cell
+	if (/^([abcd\d])([abcd\d])$/i) {
+	    &move_to_column($1, $2);
+	    $Undo->end_move;
+	    &auto_move; # (calls Undo->end_move inside it)
+
+	# Move a card to (correct) foundation from free cell or from a column
+	} elsif (/^([abcd\d])f$/i) {
+	    &move_to_foundation($1);
+	    $Undo->end_move;
+	    &auto_move;
+
+	# undo
+	} elsif (/^u/i) {
+	    &Undo;
+
+	# redo
+	} elsif (/^r/i) {
+	    &Redo;
+
+	# help
+	} elsif (/^h/i) {
+	    &Help;
+
+	# start a new game (abandon this one)
+	} elsif (/^n/i) {
+	    &New_Game if &New_Game_Prompt;
+
+	# quit game
+	} elsif (/^q/i) {
+	    &Quit;
+
+	} else {
+	    $Error = "ERROR! unknown command. Try again (h for help)"
+	} # end case if
+    } # end switch for
+} # end sub do_command
+
+
+# Move cards around
+sub move_to_column {
+# Move a card from Stack arg0 to column arg1
+# Arg0 can be a column number or "abcd" for a free cell
+#
+# Return 1, or 0 for error
+    my ($from, $to) = @_;
+    my ($donor, $receiver);
+
+    # From which Stack are we taking cards?
+    if ($from =~ /[abcd\d]/) {
+	$donor = $FreeCell->get_cardset_by_nickname($from);
+	unless ($donor) {$Error = "Illegal 'from' column '$from'\n"; return 0;}
+    } else {$Error = "Unknown 'from' column '$from'!\n"; return 0}
+    unless ($donor->size) {$Error = "ERROR! No cards to move!"; return 0;}
+
+    # To which Stack are we transferring cards?
+    if ($to =~ /\d/) {
+	$receiver = $FreeCell->get_cardset_by_nickname($to);
+	unless ($receiver) {$Error = "Illegal 'to' column '$to'\n"; return 0;}
+    } elsif ($to =~ /[abcd]/) {
+	$receiver = $FreeCell->get_cardset_by_nickname($to);
+	if ($receiver->size) {$Error="ERROR! Cell is not empty\n"; return 0;}
+    } else {$Error = "Unknown 'to' column '$to'!\n"; return 0}
+
+    # If we're going column to column, search through the (face-up cards
+    # in the) column for the card that can legally move to the other column,
+    # then transfer that card and all cards below it.
+    # TODO this is currently useless since we can only transfer one card. But
+    # we should steal from Andy Bach's code the ability to transfer multiple
+    # cards at once if you have enough cells. (Then make sure to move
+    # all the cards' images!)
+    #    If we're going from the waste pile to a column, just take the top card
+    # and confirm that it's allowed to transfer
+    my @cards = $donor->top_card;
+
+    my $allowed = 0; # are we allowed to transfer?
+    my $transferred = 0; # number of cards to transfer
+    my $receiver_card = $receiver->top_card;
+    foreach my $card (@cards) {
+	$transferred++;
+	# card must be different color & next lower card
+	# Or a anything can go onto an empty column
+	if ($receiver_card) {
+	    #print "move ", $card->print, " to ", $receiver_card->print, "\n";
+	    $allowed = ($receiver_card->value == $card->value + 1 &&
+			$receiver_card->color ne $card->color);
+	} else {
+	    #print "move ", $card->print, " to blank space\n";
+	    $allowed = 1;
+	}
+
+	last if $allowed;
+    }
+
+    unless ($allowed) { $Error = "ERROR! Illegal move!"; return 0; }
+
+    # Now actually transfer the card(s)
+    $donor->give_cards($receiver, $transferred);
+	
+    return 1;
+} # end sub move_to_column
+
+
+sub move_to_foundation {
+# Move a card from arg0 to the correct foundation for that suit
+# Arg0 can be a column number or abcd for free cell
+#
+# Return 1, or 0 for error
+    my ($from) = @_;
+    my ($donor, $receiver);
+
+    # From which Stack are we taking cards?
+    if ($from =~ /[abcd\d]/) {
+	$donor = $FreeCell->get_cardset_by_nickname($from);
+	unless ($donor) {$Error = "Illegal 'from' column '$from'\n"; return 0;}
+    } else {$Error = "Unknown 'from' column '$from'!\n"; return 0}
+    unless ($donor->size) { $Error = "ERROR! No cards to move!"; return 0; }
+
+    my $donor_card = $donor->top_card;
+	
+    my $allowed = can_move_to_foundation($donor_card);
+
+    unless ($allowed) { $Error = "ERROR! Illegal move!"; return 0; }
+
+    # Now actually transfer the card
+    $receiver = $Foundations{$donor_card->suit("long")};
+    $donor->give_cards($receiver, 1);
+
+    return 1;
+} # end sub move_to_foundation
+
+
+sub can_move_to_foundation
+{
+    my $donor_card = shift;
+    # To which Stack are we transferring cards?
+    my $receiver = $Foundations{$donor_card->suit("long")};
+    die "Unknown suit in sub move_to_foundation!\n" unless $receiver;
+
+    my $allowed = 0; # are we allowed to transfer?
+    my $receiver_card = $receiver->top_card;
+    if ($receiver_card) {
+	$allowed = ($receiver_card->value == $donor_card->value - 1);
+    } else { # empty foundation
+	$allowed = $donor_card->name("long") eq "Ace";
+    }
+    return $allowed;
+}
+
+sub auto_move { 
+    my $from;
+    while (my $from = &auto_move_check()) {
+	    #print "auto_move from = ", Dumper($from);
+	move_to_foundation($from);
+	$Undo->end_move;
+	if ($Is_GUI) {
+	    $c->update;
+	} else {
+	    #print "from = ", Dumper($from);
+	    print "auto-move from $from\n";
+	}
+    }
+
+    # Did auto-moving allow us to win?
+    &check_win;
+}
+
+sub auto_move_check {
+    # get lowest value showing on foundations
+    my $min_show = 13;
+    foreach my $col (values %Foundations)
+    {
+	unless ($col->size) {
+	    $min_show = 1;
+	    next;
+	}
+	my $top_card = $col->top_card->value;
+	$min_show = $top_card if $top_card < $min_show;
+    }
+    $min_show++;
+    # check for cards which can safely be moved to foundation stacks
+    my $ret;
+    foreach my $nickname ("a".."d", 1..$Tableau_Size)
+    {
+	my $col = $FreeCell->get_cardset_by_nickname($nickname);
+	next unless $col->size;
+	next unless $col->top_card->value <= $min_show;
+	next unless can_move_to_foundation($col->top_card);
+	return $ret=$nickname;
+    }
+    return undef;
+} # end sub auto_move_check
+
+sub check_win {
+    my $a;
+    
+    if ((grep 
+	    {$a=$_->top_card and $a->name("long") eq "King"} 
+	    (values %Foundations)
+	) == 4) {
+	if ($Is_GUI) {
+	    # TODO change this to use &New_Game_Prompt
+	    my $button = $mw->Dialog(
+		-text => "You have won! Play another game?",
+		-buttons => ["New game", "Quit"],
+		-default_button => 'New game')->Show;
+	    &Quit(qw/-prompt no/) if $button eq 'Quit';
+
+	    # Otherwise, start a new game
+	    &New_Game;
+	    return;
+	} else {
+	    print "You have won!\n";
+	    if (&New_Game_Prompt) {
+	        &New_Game;
+	    } else {
+	        exit;
+	    }
+	}
+    }
+}
+
+######################################################################
+# Game actions other than moving cards around
+
+# Returns true if you should start a new game
+sub New_Game_Prompt {
+    if ($Is_GUI) {
+	return 1 unless defined $mw; # very first game
+
+	return ($mw->Dialog(-text => "Start new game?",
+		-buttons => [qw/OK Cancel/],
+		-default_button => 'OK')->Show
+		ne 'Cancel');
+    } else {
+	print "Start a new game? (y/n): ";
+	my $a = <STDIN>;
+	return ($a =~ /^\s*y/i);
+    }
+}
+
+sub New_Game
+{
+    &erase_mark if $Is_GUI and defined $mw;
+
+    # Create new deck
+    &setup_game;
+    $Error = $Is_GUI ? "Welcome!" : "Welcome! Type h for help, q to quit";
+
+    if ($Is_GUI) {
+	if (defined $mw) {
+	    # delete all the cards prior to creating a new deck
+	    $c->delete('card'); 
+	} else { # very first game
+	    &init_GUI; # note that this must be called *after* setup_game
+	}
+
+	# Redraw all the cards, put them where they belong...
+	&setup_GUI;
+    }
+}
+
+sub Undo
+{
+    &erase_mark if $Is_GUI;
+    if ($Undo->undo) {
+	# if no error, make sure to erase any existing error message (like
+	# "can't redo any more")
+	$Error = ""; 
+    } else {
+        $Error = "ERROR! Can't undo any more";
+    }
+}
+
+sub Redo
+{ 
+    &erase_mark if $Is_GUI;
+    if ($Undo->redo) {
+	# if no error, make sure to erase any existing error message (like
+	# "can't redo any more")
+	$Error = ""; 
+    } else {
+        $Error = "ERROR! Can't redo any more";
+    }
+}
+
+sub Help {
+my $Usage = <<ENDUSAGE;
+
+- Columns are 1 to 8, plus Foundations and four Free Cells (a to d)
+
+- Try to build piles of Ace through King of each suit in the Foundations.
+
+- You can move the top card from one column to another, or the Foundation,
+  or an empty Free Cell. You can move the card in a Free Cell to the
+  Foundation or to a column.
+
+- You can move a card onto the next highest card of a different color, so,
+  e.g. a red ten can go on a black Jack. You may place any card in an empty
+  column.
+
+- Commands are one or two letters or number (from 1 to 8)
+
+  23 moves a card from column 2 to 3
+  a3 moves a card from freecell a to column 3
+  4f moves a card from column 4 to the appropriate foundation pile
+  
+  u  undo last move
+  r  redo the last move undone
+  
+  q  quit the game
+  n  new game (abandon this one)
+  h  print help
+ENDUSAGE
+
+my $GUI_Usage = <<GUIUSAGE;
+- Of course, you can click on things instead in the GUI version. Click on
+  a card and then the column, free cell, or foundation you want to move the
+  card to. Click on the buttons at the bottom of the window to do things.
+GUIUSAGE
+
+    if ($Is_GUI) {
+
+	my $small_font = "-*-Times-Medium-R-Normal--*-120-*-*-*-*-*-*";
+
+	# Partially copied from tktk
+	# Note that I have no idea if this is a good way to do this,
+	# but it works!
+	my $di = $mw->DialogBox(-title => "Help",
+		-buttons => [qw/OK/],
+		-default_button => 'OK');
+	my $f = $di->add('Frame')->pack();
+	my $text = $f->Scrolled('ROText',
+	    -scrollbars => 'e',
+	    -wrap       => 'word',
+	    -width      => 60,
+	    -height     => 25,
+	    -font       => $small_font,
+	    -setgrid    => 1,
+	)->pack(-expand => 1, -fill => 'both');
+	$text->tagConfigure('title',
+	    -font => '-*-Times-Bold-R-Normal--*-180-*-*-*-*-*-*',
+	);
+	my $instr = "$Usage\n$GUI_Usage";
+	my @lines = split(/(\n{2,})/,$instr);
+	my $concat = 0;
+	# make the paragraphs into one long line
+	$instr = join("",map {s/\n\s*/ /g if /^-/; $_} @lines);
+
+	$text->insert('end', "Free Cell Instructions\n", 'title');
+	$text->insert('end', $instr);
+
+	$di->Show;
+    } else {
+	print $Usage;
+	print "\nType RETURN to continue\n";
+	<STDIN>;
+    }
+} # end sub Help
+
+sub Quit {
+    if ($Is_GUI) {
+	my %args = @_;
+	$args{-prompt} ||= 'yes';
+	return if ($args{-prompt} eq 'no' ||
+	    $mw->Dialog(-text => "Abandon game?",
+		-buttons => [qw/OK Cancel/],
+		-default_button => 'OK')->Show
+		eq 'Cancel');
+	$mw->destroy;
+    } else {
+	print "Are you sure you want to quit? (y/n): ";
+	my $a = <STDIN>;
+	if ($a =~ /^\s*y/i) {
+	    print "Bye!\n";
+	    exit;
+	}
+    }
+}
+
+######################################################################
+# GUI-specific stuff
+sub init_GUI {
+
+    $mw = new MainWindow;
+    $mw->title("Free Cell");
+    {
+	my $f = $mw->Frame(-labelVariable => \$Error,
+	    -labelPack => [qw/-side top -anchor w -fill x -expand 0/],
+	    )->pack(qw/-side bottom -expand 0 -fill x/);
+	$f->Button(-text => 'New Game', -command => sub {&do_command("n")},
+	    )->pack(qw/-side left/);
+	$f->Button(-text => 'Undo', -command => sub {&do_command("u")},
+	    )->pack(qw/-side left/);
+	$f->Button(-text => 'Redo', -command => sub {&do_command("r")},
+	    )->pack(qw/-side left/);
+	$f->Button(-text => 'Help', -command => sub {&do_command("h")},
+	    )->pack(qw/-side left/);
+	$f->Button(-text => 'Quit', -command => sub {&do_command("q")},
+	    )->pack(qw/-side right/);
+    }
+
+    # Create the canvas everything sits on
+    $c = $mw->Scrolled('Canvas', -scrollbars => 'osoe',);
+    $FreeCell->set_canvas($c);
+
+    # Get the card gifs
+    $FreeCell->load_card_images;
+
+    # TODO get rid of constants, use multiples of card size
+    $c->configure(
+	-scrollregion => ['0','0','750','600'],
+	-height => 450,
+	-width => 680,
+    );
+    $c->pack(qw/-side top -expand y -fill both/);
+
+    # Card with bounding rectangle
+    my $Card_Border = 2;
+    my $Card_Rect_X = $FreeCell->card_width + $Card_Border;
+    my $Card_Rect_Y = $FreeCell->card_height + $Card_Border;
+    # Columns 1-8
+    # Add width between cards
+    my $Column_X = $Card_Rect_X + 10;
+    # Y coordinate where Columns start
+    my $Column_Start_Y = $Card_Rect_Y + 22;
+
+    my $Pile_Size_X = $Card_Rect_X + 4;
+    my $Pile_Size_Y = $Card_Rect_Y + 4;
+    my ($x1, $y1, $x2, $y2) = (2,2, $Pile_Size_X-1, $Pile_Size_Y-1);
+    foreach my $col (values %FreeCells) {
+	my $s = $col->name;
+	$c->createRectangle($x1, $y1, $x2, $y2,
+		-outline => 'seagreen', -fill => 'green3', 
+		-tags => ['freecell', "set:$s"],
+		);
+	$x1 += $Pile_Size_X + 4;
+	$x2 += $Pile_Size_X + 4;
+    }
+
+    $x1 += 10; $x2 += 10; # separate the free cells from the foundations
+    foreach my $col (values %Foundations) {
+	my $s = $col->name;
+	$c->createRectangle($x1, $y1, $x2, $y2,
+		-outline => 'seagreen', -fill => 'green3', 
+		-tags => ['foundation', "set:$s"],
+		);
+	$x1 += $Pile_Size_X + 4;
+	$x2 += $Pile_Size_X + 4;
+    }
+
+    # Print tableau
+    my $i = 0;
+    foreach my $col (@Tableau) {
+	my $s = $col->name;
+	my ($x1, $y1) = ($i*$Column_X + 2, $Column_Start_Y); 
+        my ($x2, $y2) = ($i*$Column_X + 2 + $Card_Rect_X, 820);
+	$c->createRectangle($x1, $y1, $x2, $y2,
+	    -outline => 'seagreen',
+	    -fill => 'green3',
+	    -tags => ["column", "set:$s"]);
+	$i++;
+    }
+
+    # All these clickings just lead to calling sub click with correct argument
+    $c->bind('card', '<1>', \&click_pile);
+    $c->bind('column', '<1>', \&click_pile);
+    $c->bind('foundation', '<1>', \&click_pile);
+    $c->bind('freecell', '<1>', \&click_pile);
+
+    foreach my $k (qw(1 2 3 4 5 6 7 8)) {
+	$mw->bind("<Key-$k>", sub {click($k);})
+    }
+    $mw->bind('<Key-a>', sub {click('a');});
+    $mw->bind('<Key-b>', sub {click('b');});
+    $mw->bind('<Key-c>', sub {click('c');});
+    $mw->bind('<Key-d>', sub {click('d');});
+    $mw->bind('<Key-f>', sub {click('spades');});
+    
+    $mw->bind('<Key-KP_Add>', sub {click('spades');});
+    $mw->bind('<Key-F33>', sub {click('1');});
+    $mw->bind('<Key-Down>', sub {click('2');});
+    $mw->bind('<Key-F35>', sub {click('3');});
+    $mw->bind('<Key-Left>', sub {click('4');});
+    $mw->bind('<Key-F31>', sub {click('5');});
+    $mw->bind('<Key-Right>', sub {click('6');});
+    $mw->bind('<Key-F27>', sub {click('7');});
+    $mw->bind('<Key-Up>', sub {click('8');});
+
+    foreach my $k (qw(h n q r u)) {
+	$mw->bind("<Key-$k>", sub {&do_command($k)})
+    }
+}
+
+# Called (after init_GUI) each time a new game is started
+sub setup_GUI {
+    # How many pixels show in covered-up card
+    my $Delta_Y = 30;
+    # Border around cards in the column
+    my $Border_X = 2;
+    my $Border_Y = 2;
+
+    foreach my $col (@Tableau) {
+	$col->attributes({
+	    "delta_y" => $Delta_Y,
+	    "border_y" => $Border_Y,
+	    "border_x" => $Border_X,
+	});
+
+	# Draw all the cards in the column
+	foreach my $card (@{$col->cards}) {
+	    $card->draw;
+	}
+
+	$col->redraw; # Move the cards into the column
+    }
+
+    foreach my $col (values %Foundations, values %FreeCells) {
+	$col->attributes({
+	    "border_y" => $Border_Y,
+	    "border_x" => $Border_X,
+	});
+    }
+}
+
+
+# process a "click" on the specified column/freecell/foundation
+sub click {
+    my $col = shift;
+    $Error = '';
+    my $marked = $FreeCell->get_marked_card;
+    if (defined $marked) { # a card is already selected
+	# which column has the marked card in it?
+	my $set = $marked->owning_cardset;
+	my $old_col = $set->nickname;
+	$marked->unmark;
+	# Just unmark card if we clicked on the same card twice
+	if ($old_col ne $col) { 
+	    if ($col !~ /^[12345678abcd]$/) {
+	        $col = "f"; # move to foundation
+	    }
+	    my $command = "$old_col$col";
+	    &do_command("$command");
+	}
+    } else { # select a card to move
+	if ($col =~ /spades|clubs|hearts|diamonds/) {
+	    $Error = "You may not move a card from the foundation";
+	    return;
+	} else {
+	    my $stack = $FreeCell->get_cardset_by_nickname($col);
+	    unless ($stack) { $Error = "Weird column '$col'."; return; }
+	    my $top = $stack->top_card;
+	    unless ($top) { $Error = "No cards in that column."; return; }
+	    $top->mark;
+	}
+    }
+}
+
+sub click_pile
+{
+    my $set = $FreeCell->get_clicked_cardset;
+    my $col = $set->nickname;
+    &click($col);
+}
+
+sub erase_mark {
+    my $marked = $FreeCell->get_marked_card;
+    $marked->unmark if defined $marked;
+}
+
+######################################################################
+# TUI STUFF!
+#
+sub print_columns {
+# print the columns in rows (2-D display)
+# args are a list of CardSets
+    my @columns = @_;
+    # Print from bottom to top...
+    my $index = (sort {$a <=> $b} (map {$_->size} @columns))[-1] -1;
+    print " ",join("     ",(1..@columns)),"\n";
+    print join("   ",("---") x @columns),"\n";
+    foreach (0 .. $index) {
+	my $to_print = "";
+        foreach my $column (@columns) {
+	    my $a = ${$column->cards}[$_];
+	    my $p = defined $a ? $a->print("short") : "    ";
+	    $to_print .= "$p  ";
+	} # end loop over one row of each column
+	print "$to_print\n";
+    } # end loop over all rows
+    print "\n";
+} # end sub print_columns
+
+sub print_game {
+# print out the current status in solitaire
+    print "\n\n\n", "-" x 50,"\n";
+    print "Foundations:   ";
+    foreach (keys %Foundations) {
+	my $set = $Foundations{$_};
+        my $to_print = $set->size ? 
+	    $set->top_card->print("short") :
+	    "(none)"; 
+	print "$to_print   ";
+    }
+    print "\n\n";
+
+     print "Free Cells:   ";
+    foreach (keys %FreeCells) {
+	my $set = $FreeCells{$_};
+        my $to_print = $set->size ? 
+	    $set->top_card->print("short") :
+	    "(none)"; 
+	print "$to_print   ";
+    }
+    print "\n\n";
+
+   &print_columns(@Tableau);
+} # end sub print_game

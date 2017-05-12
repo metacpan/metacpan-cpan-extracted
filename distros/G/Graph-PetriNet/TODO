@@ -1,0 +1,5 @@
+* rewrite with Graph
+* use Moose roles
+* allow fields used in roles to be customized
+* couple this with Makefile infrastructures
+* reset uses node-wise initialisation

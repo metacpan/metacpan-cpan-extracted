@@ -1,0 +1,14 @@
+Revision history for Perl extension GlbDNS.
+
+0.30
+  Tue May  5 08:38:33 PDT 2009
+      Fix issue with AAAA records for glbdns records that exist but have no AAAA
+      Same for MX
+      Don't give MX records for hostnames that don't have them
+      Move resolver out to it's own class and allow resolvers to hook in
+
+0.29
+  Fri Dec 19 11:59:01 2008
+	- original version; created by h2xs 1.23 with options
+		-X GlbDNS
+

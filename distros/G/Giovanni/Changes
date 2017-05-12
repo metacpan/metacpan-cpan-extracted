@@ -1,0 +1,54 @@
+==================================================
+Changes from 2015-02-04 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.12 at 2016-02-04 23:07:34 +0000
+-----------------------------------------
+
+  Change: 4fe7602f2dd90e2d790876d179c781f6dd568360
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2016-02-05 11:47:06 +0000
+
+    Merge pull request #2 from norbu09/systemd
+
+    hack to add systemd support (fixes #1) 
+
+  Change: de1b23f2397bab9394cd43fd5b115c498510044b
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2016-02-05 11:46:27 +0000
+
+    better README 
+
+  Change: d7adb808c1e1332a964b611bf11874ae20c8f110
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2015-12-17 14:09:13 +0000
+
+    hack to add systemd support (fixes #1) 
+
+  Change: d64af47835d685983e3e3bbbde046338b23c763e
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2015-10-09 17:43:48 +0000
+
+    v1.11 
+
+-----------------------------------------
+version 1.11 at 2015-10-09 04:42:59 +0000
+-----------------------------------------
+
+  Change: a30d7e75bc0d597d1a7ee6622318d813b57f80a1
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2015-10-09 17:42:59 +0000
+
+    load LWP::Protocol::https explicitly so it gets pulled in as a
+    dependency 
+
+  Change: 7dcceaf30b1130286bd4df36e9b72e597a17103c
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-10-31 12:25:24 +0000
+
+    v1.10 
+
+===============================================
+Plus 1 release after 2015-02-04 00:00:00 +0000.
+===============================================

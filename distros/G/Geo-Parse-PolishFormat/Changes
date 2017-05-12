@@ -1,0 +1,7 @@
+Revision history for Perl extension Geo::Parse::PolishFormat.
+
+0.01  Wed Aug  8 15:32:48 2007
+	- original version; 
+	
+0.02  Thu Aug  9 11:15:00 2007
+	- fixed a bug with collection names detection; 

@@ -1,0 +1,48 @@
+Revision history for Games-Nintendo-Mario
+
+0.208     2013-09-04 22:09:08 America/New_York
+          [IMPORTANT]
+        - This may be the last update to Games-Nintendo-Mario!  Although I
+          receive dozens of support requests or letters of appreciation each
+          day about this code, I receive very few patches, including those to
+          bring the library up to date with modern Mario standards such as
+          NSMB2 or NSMBU, let alone NSLU.  Although I am happy to continue
+          supporting this library's dedicated userbase, I cannot do so without
+          hardware for comparison testing.  Donations of a Wii U or 3DS console
+          would certainly lead to new versions, and hopefully to the
+          long-awaited Games::Nintendo::Metroid.
+
+          [LESS IMPORTANT]
+        - update bugtracker and repository
+
+0.205     2012-05-30
+          add New Super Mario Bros. Wii
+
+0.204     2007-12-29
+          fix typo in POD; thanks ZPMORGAN!
+
+0.203     2007-12-27
+          add support for Super Mario Bros.: The Lost Levels
+          change internals for Hearts base class
+
+0.202     2007-05-20
+          fix typo in NSMB docs
+
+0.201     2006-11-13
+          packaging enhancements
+          more diagnostics on weird deaths
+
+0.200     2006-07-30
+          first pass at NSMB
+          bug with flower while in fire state in SMB; broken test!
+
+0.10      2004-09-21 09:40
+          minor cleanup
+          more documenation
+          test revisions
+
+0.02      2003-12-08
+          second release, cleanup of the first
+
+0.01      2003-12-06
+          first release

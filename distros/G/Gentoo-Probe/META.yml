@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Gentoo-Probe
+version:            1.0.6
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Getopt::WonderBra:  1.04
+    Inline::Python:     0.22
+    String::Escape:     0
+    Term::ReadLine:     1.02
+    Text::Number:       0.8
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.46
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

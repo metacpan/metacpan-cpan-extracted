@@ -1,0 +1,33 @@
+---
+name: Graphics-ColorNames-WWW
+version: 1.13
+author:
+  - 'Claus FE<auml>rber <CFAERBER@cpan.org>'
+abstract: WWW color names and equivalent RGB values
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+requires:
+  Graphics::ColorNames: 0.32
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Graphics::ColorNames::CSS:
+    file: lib/Graphics/ColorNames/CSS.pm
+    version: 1.13
+  Graphics::ColorNames::IE:
+    file: lib/Graphics/ColorNames/IE.pm
+    version: 1.13
+  Graphics::ColorNames::SVG:
+    file: lib/Graphics/ColorNames/SVG.pm
+    version: 1.13
+  Graphics::ColorNames::WWW:
+    file: lib/Graphics/ColorNames/WWW.pm
+    version: 1.13
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

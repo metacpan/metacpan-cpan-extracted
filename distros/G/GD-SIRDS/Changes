@@ -1,0 +1,10 @@
+Revision history for Perl extension GD::SIRDS.
+
+0.02  2002-0527-0358 (Sun)
+	-Added GD as a prerequisite to this module.
+	-diddled with the POD a bit.
+
+0.01  Fri May 10 23:06:36 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n GD::SIRDS
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Getopt-Long-Spec,
+version 0.002:
+
+  translate Getopt::Long specs into a hash of attributes, and back again
+
+This software is copyright (c) 2012 by Stephen R. Scaffidi.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

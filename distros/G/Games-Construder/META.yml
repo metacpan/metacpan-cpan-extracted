@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name:               Games-Construder
+version:            0.95
+abstract:           A 3D game written in Perl, which is actually playable!
+author:
+    - Robin Redeker <elmex@ta-sa.org>
+license:            agpl_3
+distribution_type:  module
+configure_requires:
+    Alien::SDL:           0
+    File::ShareDir::Install:  0
+    OpenGL:               0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Alien::SDL:           0
+    AnyEvent:             0
+    common::sense:        0
+    Compress::LZF:        0
+    File::ShareDir::Install:  0
+    File::ShareDir::PAR:  0
+    JSON:                 0
+    Math::Trig:           0
+    Object::Event:        0
+    OpenGL:               0
+    OpenGL::List:         0
+    SDL:                  0
+    Storable:             0
+    Test::More:           0
+resources:
+    bugtracker:
+        mailto:  elmex@ta-sa.org
+        web:     http://ue.o---o.eu/
+    homepage:  http://ue.o---o.eu/
+    repository:
+        type:  git
+        url:   http://git.ta-sa.org/Games-Construder.git
+        web:   http://git.ta-sa.org/git/Games-Construder/
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

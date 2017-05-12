@@ -1,0 +1,70 @@
+Revision history for Perl extension GD::SVG.
+
+0.33  Sun May 10 04:14:12 MDT 2009
+        - Can now embed pixmap information inside an SVG (Lincoln Stein)
+        - Improvements to alpha support (Lincoln Stein)
+        - Ghost methods for more complete mapping to GD (Jason Stajich)
+
+0.31  Thu Aug 14 08:16:37 MDT 2008
+        - removed GD version requirement
+        - fixed _distill_gdSpecial when using non-numeric colors (from srezic)
+        - fixed partically incomplete lines with square caps (jettero)
+        - Correctly handle the case where a rectangle's bottomright and topleft 
+	are flipped. This is arguably a caller bug, but GD handles it.
+
+0.30  Thu Aug  7 14:37:25 EDT 2008
+        - Added grouping features.
+
+0.28  Mon May 22 12:35:55 EDT 2006
+        - fixed result codes that were causing broken tests
+          (thanks to LS)
+
+0.26  Mon Oct 18 11:29:40 CDT 2004
+        - added kludgey support for GD::Image::copy()
+        - added a new example script
+
+0.25  Wed Jan 07 13.48.12 2004
+	- fixed a variable scoping issue that was throwing
+ 	  a warning
+
+0.24  Mon Dec 15 16:04:17 2003
+	- fixed the stringUp and charUp methods so that
+          they are positioned properly
+
+0.23  Wed Dec 3 14:00:02 2003
+	- added kludge for setStyle() and gdStyled()
+	- changed the underlying handling of colors - color methods
+     	  now return integers like GD
+
+0.22  Sun Nov 30 11:33:04 2003
+	- added support for the filledArc exported special styles:
+	  gdArc, gdEdged, gdChord, gdPie, and gdNoFill
+
+0.21  Sat Nov 29 14:54:54 2003
+	- added support for both open and closed arcs
+	- added support for $polygon->bounds();
+	- updated test script
+	- finally squashed the line thickness bug
+
+0.20  Wed Nov 26 08:51:13 2003
+	- fixed a bug in the resetting of line thickness 
+          after using gdBrushed
+
+0.19  Mon Nov 24 10:08:06 2003	
+        - support for GD's setBrush and gdBrushed methods
+	- added optional debug parameter to new()	
+        - added lots of documentation
+
+0.18  Fri Nov 21 20:22:17 2003
+	- small bug fixes relating to typo
+
+0.17  Fri Nov 21 19:21:44 2003
+	- initial CPAN release
+
+0.01  Thu Nov  6 10:14:04 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n GD::SVG
+
+--
+
+April - October 2003 GD::SVG developed as GD2SVG

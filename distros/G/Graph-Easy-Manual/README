@@ -1,0 +1,26 @@
+Graph-Easy-Manual
+=================
+
+This module provides you with a comprehensive HTML manual for Graph::Easy.
+There is no need to install this package, just read the HTML files in
+C<doc/manual/>.
+
+You can also view the manual online at:
+
+	http://bloodgate.com/perl/graph/manual/
+
+Many more examples and documentation, especially on integrating this into
+a Mediawiki installation, can be found at:
+
+	http://bloodgate.com/perl/graph/
+
+Have fun!
+
+AUTHOR
+======
+
+Copyright (C) 2004 - 2008 by Tels http://bloodgate.com/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL version 2 or later.
+

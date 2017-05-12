@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="400mm"
+   width="400mm"
+   id="svg3355"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="many_shapes.svg">
+
+  <metadata
+     id="metadata3372">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3370" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1863"
+     inkscape:window-height="1056"
+     id="namedview3368"
+     showgrid="false"
+     inkscape:zoom="2.3475"
+     inkscape:cx="116.71991"
+     inkscape:cy="200"
+     inkscape:window-x="57"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3355" />
+  <g
+     id="main_group">
+    <circle
+       cx="300"
+       cy="250"
+       r="60"
+       style="fill: none; stroke: #993399"
+       id="circle3358" />
+    <line
+       style="fill: none; stroke: #33ff33"
+       x1="250"
+       x2="350"
+       y1="250"
+       y2="350"
+       id="line3360" />
+    <line
+       style="fill: none; stroke: #33ff33"
+       x1="350"
+       x2="350"
+       y1="350"
+       y2="50"
+       id="line3362" />
+    <line
+       style="fill: none; stroke: #33ff33"
+       x1="350"
+       x2="250"
+       y1="50"
+       y2="250"
+       id="line3364" />
+    <polygon
+       points="210,254 90,254 30,150 90,46 210,46 270,150 "
+       style="fill: none; stroke: #88aa88"
+       id="polygon3366" />
+  </g>
+  <!-- 
+	Generated using the Perl SVG Module V2.64
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+ -->
+  <rect
+     style="opacity:1;fill:none;fill-opacity:1;stroke:#829abf;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="rect3346"
+     width="93"
+     height="55"
+     x="100"
+     y="306"
+     class="glow" />
+    <ellipse
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#829abf;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3452"
+       cx="391.42856"
+       cy="453.79077"
+       rx="165.71428"
+       ry="118.57143" />
+</svg>

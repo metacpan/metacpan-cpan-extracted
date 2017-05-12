@@ -1,0 +1,408 @@
+2004/08/15 22:11 (-0400) muppetman
+
+	* Canvas.pm, NEWS, README: stable bugfix release 1.002
+
+2004/08/15 22:07 (-0400) muppetman
+
+	* t/GnomeCanvas.t, t/GnomeCanvasItem.t, xs/GnomeCanvas.xs,
+	xs/GnomeCanvasItem.xs: fix the unusably broken bindings for
+	Gnome2::Canvas::w2c_affine(), Gnome2::Canvas::Item::i2w_affine(),
+	and Gnome2::Canvas::Item::i2c_affine().  we retain compatibility
+	with the broken signature, and include tests for both broken and
+	fixed.
+
+2004/08/15 22:01 (-0400) muppetman
+
+	* xs/GnomeCanvasUtil.xs: minor doc updates.
+
+2004/08/15 19:37 (-0400) muppetman
+
+	* xs/GnomeCanvasUtil.xs: fixed mysterious failure on darwin of
+	polygon_to_point(); was passing the wrong length value to the C
+	function.  don't know how it worked in the first place.
+
+2004/08/13 22:33 (-0400) muppetman
+
+	* Canvas.pm: don't set dl_load_flags on darwin.
+
+2004/08/13 22:22 (-0400) muppetman
+
+	* xs/GnomeCanvasItem.xs: apidoc fixes
+
+2004/08/13 07:49 (-0400) muppetman
+
+	* xs/GnomeCanvas.xs: force generation of docs for
+	Gnome2::Canvas::Text, which has properties but no methods.
+
+2004/06/06 11:52 (-0400) muppetman
+
+	* Canvas.pm, NEWS, README: stable release 1.001
+
+2004/06/02 15:53 (-0400) muppetman
+
+	* xs/GnomeCanvas.xs: fix the broken example in the synopsis.
+
+2004/05/17 18:15 (+0200) kaffeetisch
+
+	* t/GnomeCanvasPathDef.t: Skip the open_parts and closed_parts
+	tests to pass when working with 2.0.x.
+
+2004/05/06 21:11 (-0400) muppetman
+
+	* xs/GnomeCanvas.xs: unused var
+
+2004/03/29 12:04 (-0500) muppetman
+
+	* Canvas.pm, README, NEWS: stable release 1.0
+
+	* Makefile.PL: require stable Glib and Gtk2.
+
+	* Canvas.pm: add import version checking, so we don't later wish
+	we'd added it now.
+
+2004/03/20 23:27 (-0500) muppetman
+
+	* canvas_demo/canvas-arrowhead.pl, canvas_demo/canvas-curve.pl,
+	canvas_demo/canvas-features.pl, canvas_demo/canvas-fifteen.pl,
+	canvas_demo/canvas-primitives.pl, canvas_demo/canvas-rich-text.pl:
+	use Glib's TRUE and FALSE constants instead of defining our own.
+
+2004/03/18 14:26 (-0500) muppetman
+
+	* Makefile.PL, README: patch from Torsten corrects the EU::PkgConfig
+	version requirements.
+
+2004/03/16 13:58 (-0500) muppetman
+
+	* Canvas.pm, NEWS, README: beta release 0.93
+
+	* Makefile.PL: require ExtUtils::PkgConfig 1.03 and Glib 1.039
+
+2004/03/16 13:58 (-0500) muppetman
+
+	* xs/GnomeCanvas.xs: flesh out the pod for GET_VERSION_INFO.
+
+2004/03/16 01:05 (-0500) muppetman
+
+	* Makefile.PL, xs/GnomeCanvas.xs, gnomecanvasperl.h: modified patch
+	from emmanuele adds GET_VERSION and CHECK_VERSION, and the required
+	Makefile.PL magic to get that information.  Refactor the Makefile.PL
+	code a bit, too.
+
+2004/03/07 00:40 (-0500) muppetman
+
+	* Makefile.PL: check the version of ExtUtils::Depends.
+
+2004/03/07 00:35 (-0500) muppetman
+
+	* Canvas.pm, xs/GnomeCanvas.xs: move pod from Canvas.pm to
+	xs/GnomeCanvas.xs, and beef it up.  use the description text from
+	libgnomecanvas' gtk-doc.  assume the reader doesn't care that this
+	is a binding and just wants to know about the perl object.
+
+2004/02/26 17:37 (-0500) muppetman
+
+	* README: fix the spelling of license; update the sandbox instructions.
+
+2004/02/12 19:00 (-0500) muppetman
+
+	* Canvas.pm, Makefile.PL, README, NEWS: unstable release 0.92
+
+2004/02/10 01:43 (-0500) muppetman
+
+	* xs/GnomeCanvasItem.xs, xs/GnomeCanvasPathDef.xs,
+	xs/GnomeCanvasUtil.xs: pod updates
+
+2004/01/29 19:22 (-0500) rwmcfa1
+
+	* Canvas.pm, README: beta release 0.91
+
+	* NEWS: initial import
+
+	* MANIFEST: NEWS added
+
+2004/01/25 23:13 (-0500) muppetman
+
+	* gnomecanvasperl.h, maps: rearrange the boxed type support for
+	GnomeCanvasPathDef.  it's now defined in the maps file like the rest,
+	and the definition in gnomecanvasperl.h can be easily avoided if/when
+	libgnomecanvas provides the appropriate boxed type support.
+
+	* xs/GnomeCanvasPathDef.xs: change boxed type support to use ref
+	instead of duplicate for copy.  add \$pathdef->copy, with doc that
+	reminds people it's not the same as Glib::Boxed::copy.
+
+2004/01/24 21:44 (-0500) rwmcfa1
+
+	* Makefile.PL: removed runtime_reqs stuff, replaced by the pkg-config 
+	trick
+	
+	* perl-Gnome2-Canvas.spec.in: use pkg-config for Requires version
+
+2004/01/12 22:48 (-0500) muppetman
+
+	* Canvas.pm: updated docs.
+
+	* xs/GnomeCanvas.xs: doc fixes.  re-order some xsubs to have better
+	doc ordering.  hide pixels_per_unit from docs; prefer get_pixels_per
+	unit since there's a set_pixels_per_unit.  adjust ALIASed xsubs to
+	avoid having an extra unused name in the symbol table.
+
+	* xs/GnomeCanvasItem.xs: mangle ALIAS ordering to remove invalid
+	entries from the symbol table.
+
+2004/01/12 18:34 (-0500) muppetman
+
+	* canvas_demo/canvas-curve.pl, canvas_demo/canvas-arrowhead.pl,
+	canvas_demo/canvas-primitives.pl: use operators rather than grep
+	on flags values, and other sundry cleanup.
+
+	* canvas_demo/canvas-fifteen.pl, canvas_demo/canvas.pl:
+	port canvas-fifteen to perl at long last
+
+2004/01/08 23:48 (-0500) muppetman
+
+	* Canvas.pm, README: beta release 0.90
+	
+	* Makefile.PL, README: require Glib-1.020, since we require
+	MakeHelper and lots of doc stuff.
+
+	* Makefile.PL: supply the DATE replacement if using a Glib whose
+	MakeHelper doesn't actually perform that sub.  (it was added after
+	1.020 was released.)
+
+2003/12/29 22:52 (+0100) kaffeetisch
+
+	* t/GnomeCanvasPathDef.t: Don't loop over the return values of
+	split, open_parts and closed_parts but only look at the first
+	returned list element.  This makes the test independent from
+	implementation details.
+
+2003/12/29 16:32 (-0500) rwmcfa1
+
+	* perl-Gnome2-Canvas.spec.in: use the new DATE replacement in 
+	conjunction with VERSION to create the changlog on the fly, which is 
+	better.
+
+2003/12/23 00:00 (-0500) muppetman
+
+	* xs/GnomeCanvas.xs, xs/GnomeCanvasItem.xs: hush warnings about
+	uninitialized and unused parameters.
+
+2003/12/17 10:58 (-0500) muppetman
+
+	* t/GnomeCanvasPathDef.t: patch from kaffee hushes some warnings
+	on FreeBSD.
+
+	* t/GnomeCanvasItem.t: added commentary about how we can't do anything
+	about warnings from get_bounds() on shapes on libgnomecanvas 2.0.x.
+
+2003/12/07 13:47 (+0100) kaffeetisch
+
+	A t/GnomeCanvas.t
+	A t/GnomeCanvasItem.t
+	A t/GnomeCanvasPathDef.t
+	* MANIFEST: Add a test suite.
+
+	* t/GnomeCanvas.t
+	* xs/GnomeCanvasUtil.xs: Implement and test
+	Gnome2::Canvas::point_to_polygon.
+
+2003/12/05 16:04 (-0500) muppetman
+
+	* Canvas.pm, Makefile.PL: can't get ABSTRACT without head name,
+	so put it into the WriteMakefile call.
+
+	* xs/GnomeCanvas.xs, xs/GnomeCanvasUtil.xs: okay, Canvas_methods
+	is *really* gone now.
+
+2003/12/05 15:51 (-0500) muppetman
+
+	* xs/GnomeCanvasPathDef.xs: another update from kaffee -- don't leak
+	the return values of pathdef functions.
+
+	* Makefile.PL, Canvas.pm, xs/GnomeCanvas.xs: some hacks to the pod
+	generation for the Gnome2::Canvas manpage, in an attempt to get rid
+	of the horrible Gnome2::Canvas_methods.  this merges the pod from 
+	the pm file into the pod generated from the xs file; the output is...
+	well, functional.
+
+2003/12/05 00:14 (-0500) muppetman
+
+	stuff from kaffee, who is working on a test suite.
+
+	A xs/GnomeCanvasShape.xs
+	* MANIFEST: added new file for GnomeCanvasShape's functions
+
+	* canvas.typemap: typemap for const GnomeCanvasPathDef*
+
+	* xs/GnomeCanvas.xs: remove =for object Gnome2::Canvas::Shape, it has
+	its own xs file.  fix b0rken call signature for $canvas->get_color,
+	which was requiring a returned parameter.
+
+	* xs/GnomeCanvasItem.xs: use actual typemaps for some enum/flags types
+	instead of plain integers.
+
+	* xs/GnomeCanvasPathDef.xs: implement a bunch of missing pathdef methods.
+
+	* xs/GnomeCanvasRichText.xs: don't leak.
+
+2003/11/13 23:58 (-0500) muppetman
+
+	* Makefile.PL, README, Canvas.pm: bump version to 0.34.
+	require Glib 1.01, but only Gtk2 1.00 -- we only need the docgen
+	stuff from Glib, and nothing new from Gtk2.
+
+2003/11/11 00:36 (-0500) muppetman
+
+	* MANIFEST, debian/*: remove the debian packaging files, since having
+	them in the upstream dist makes it difficult for the maintainers
+
+	* Canvas.pm: add pointer to generated docs
+
+2003/11/06 16:54 (-0500) muppetman
+
+	* xs/GnomeCanvas.xs: accessors for pixels_per_unit
+
+2003/11/06 11:37 (-0500) muppetman
+
+	* xs/GnomeCanvas.xs: route GnomeCanvas's log domains through perl's
+	warn() and croak()
+
+	* xs/GnomeCanvasItem.xs, xs/GnomeCanvasPathDef.xs,
+	xs/GnomeCanvasUtil.xs: remove type on class params so that the doc
+	shows them correctly (and so that the bindings don't waste cycles
+	on unused params)
+
+2003/11/02 14:17 muppetman
+
+	* Makefile.PL: remove the stupid atleast version checks -- Glib and
+	Gtk2 have been corrected.
+
+2003/10/29 02:00 muppetman
+
+	* Canvas.pm: bump version for next devel series.
+
+	* Makefile.PL: use the latest CVS Glib and Gtk2 features -- atleast
+	version checks, MakeHelper, doc generation, etc.
+
+	* xs/GnomeCanvas.xs: doc comments
+
+2003/09/21 20:19 rwmcfa1
+
+	* Makefile.PL: fixed bug in specfile generation
+
+2003/09/21 19:42 muppetman
+
+	* Makefile.PL perl-Gnome2-Canvas.spec.in: there was some disagreement
+	about the actual substitution symbols...
+
+2003/09/21 19:36 muppetman
+
+	* Canvas.pm META.yml Makefile.PL README debian/changelog debian/control:
+	updated for 0.32 release
+
+2003/09/17 10:44 rwmcfa1
+
+	* Makefile.PL: ExtUtils::PkgConfig can now deal with version 
+	requirements using pkg-config's interface, make use of it.
+
+2003/09/16 23:50 rwmcfa1
+
+	* Makefile.PL, perl-*spec.in: somewhat automated versioning system 
+	implemented for depenancy modules
+
+2003/09/15 22:26 rwmcfa1
+
+	* Makefile.PL: spec file dependancies improved
+
+2003/09/06 19:23 rwmcfa1
+
+	* Makefile.PL: dist-rpms build target added
+
+	* perl-Gnome2-Canvas.spec.in: initial import
+
+2003/09/02 21:08 muppetman
+
+	* Canvas.pm, README, META.yml, debian/changelog: prep for 0.30 release.
+	flesh out the pod a bit.
+	* canvas.typemap: use T_GPERL_GENERIC_WRAPPER
+	* Makefile.PL: require Glib 0.97 (because of the new typemap stuff);
+	update the build to do prereqs properly
+	* TODO, MANIFEST: updated 
+	* MANIFEST.SKIP: new
+	* canvas_demo/canvas-primitives.pl, xs/GnomeCanvasPathDef.xs:
+	commentary
+	* xs/GnomeCanvas.xs: consolidate the constructors into one aliased xsub
+
+2003/08/19 21:11 rwmcfa1
+
+	* Makefile.PL: added realclean removal of build dir to postamble 
+	section.
+
+2003/08/18 12:34 muppetman
+
+	* debian/*: patch from james curbo adds debian packaging stuff
+
+2003/07/18 13:00 muppetman
+
+	* Canvas.pm, Makefile.PL, README: bump version information for 0.28
+	release
+
+2003/07/07 23:06 muppetman
+
+	* Makefile.PL: use new args of Gtk2::CodeGen->write_boot to avoid
+	boot problems
+
+2003/07/05 00:42 muppetman
+
+	* xs/GnomeCanvasBpath.xs, canvas_demo/canvas-curve.pl,
+	xs/GnomeCanvas.xs, xs/GnomeCanvasPathDef.xs: hackish workaround
+	for bug in libgnomecanvas
+
+	* Canvas.pm: bump version to 0.26 for release
+
+2003/06/27 17:00 muppetman
+
+	* Makefile.PL, canvas_demo/canvas_arrowhead.pl,
+	canvas_demo/canvas-features.pl:  require latest Gtk2 and Glib,
+	which treat objects as hashes.
+
+	* canvas_demo/canvas-curve.pl: mark known crash.
+
+2003/06/20 12:00 muppetman
+
+	* Canvas.pm Makefile.PL README: bump version info and prepare for
+	0.24 release
+
+	* gnomecanvasperl.h: one-time-include stuff used the wrong name,
+	would prevent inclusion of gnome2perl.h (copy and paste bug - bad
+	muppet, no biscuit)
+
+2003/06/19 17:11 pcg
+
+	* t/01.t: make it actually work.
+
+2003/06/16 13:46 muppetman
+
+	* xs/GnomeCanvasUtil.xs, canvas_demo/canvas-primitives.pl,
+	canvas_demo/canvas-arrowhead.pl: use a GPerlBoxedWrapperClass override
+	to allow GnomeCanvasPoints to be implemented as simple perl array
+	references.
+
+	* Makefile.PL, MANIFEST: make sure we're ready to go out
+
+2003/06/04 23:45 muppetman
+
+	cleanup, making it ready to share with other people
+
+	* canvas_demo/canvas-curve.pl
+
+2003/06/03 13:42 muppetman
+
+	* canvas_demo/canvas-rich-text.pl
+
+2003/06/02 12:00 muppetman
+
+	started from a copy of the Gnome2-Perl module.
+

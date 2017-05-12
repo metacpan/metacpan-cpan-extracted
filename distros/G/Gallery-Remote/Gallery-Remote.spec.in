@@ -1,0 +1,42 @@
+%define archivename Gallery-Remote
+Summary: A module that interacts with the Gallery Remote protocol.
+Name: perl-%{archivename}
+Version: @version@
+Release: @release@
+Copyright: GPL
+Group: Applications/CPAN
+Source0: %{archivename}-%{version}.tar.gz
+Url: http://www.cpan.org
+BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot/
+Requires: perl
+BuildArch: noarch
+
+%description
+This module allows perl scripts to interact with the Gallery remote protocol.
+
+%prep
+%setup -q -n %{archivename}-%{version}
+
+%build
+CFLAGS="$RPM_OPT_FLAGS" perl Makefile.PL
+make
+
+%clean 
+rm -rf $RPM_BUILD_ROOT
+
+%install
+rm -rf $RPM_BUILD_ROOT
+eval `perl '-V:installarchlib'`
+mkdir -p $RPM_BUILD_ROOT/$installarchlib
+make PREFIX=$RPM_BUILD_ROOT/usr install
+find $RPM_BUILD_ROOT/usr -type f -print | sed "s@^$RPM_BUILD_ROOT@@g" | grep -v perllocal.pod > %{archivename}-%{version}-filelist
+
+%files -f %{archivename}-%{version}-filelist
+%defattr(-,root,root)
+
+%changelog
+* Wed Apr  7 2004 Tanner Lovelace <lovelace@wayfarer.org> 0.2
+- Fix protocol comparisons.
+
+* Sat Jan 31 2004 Tanner Lovelace <lovelace@wayfarer.org>
+- Initial spec file.

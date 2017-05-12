@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<minerals>
+          <mineral>
+          <name>Tritanium</name>
+          <price>4.20</price>
+        </mineral><mineral>
+          <name>Pyerite</name>
+          <price>9.69</price>
+        </mineral><mineral>
+          <name>Mexallon</name>
+          <price>38.02</price>
+        </mineral><mineral>
+          <name>Isogen</name>
+          <price>105.65</price>
+        </mineral><mineral>
+          <name>Nocxium</name>
+          <price>606.27</price>
+        </mineral><mineral>
+          <name>Zydrine</name>
+          <price>589.05</price>
+        </mineral><mineral>
+          <name>Megacyte</name>
+          <price>1491.90</price>
+        </mineral><mineral>
+          <name>Morphite</name>
+          <price>5690.81</price>
+        </mineral>
+        </minerals>

@@ -1,0 +1,79 @@
+<script type="text/javascript">
+<!--
+function checkAll() {
+    var field = document.getElementsByTagName( 'input' );
+
+    for ( i = 0; i < field.length; i++ ) {          
+	    field[i].checked = true ;
+	}
+    
+}
+
+function uncheckAll() {
+    var field = document.getElementsByTagName( 'input' );
+
+    for ( i = 0; i < field.length; i++ ) {          
+	    field[i].checked = false ;
+	}
+}
+//  End -->
+</script>
+
+<form method="post" action="[% view.form.action || self.uri %]" 
+	id="[% view.form.name || 'myform' %]">
+
+    <fieldset>
+    	<legend>
+    		[% view.form.legend %]
+    	</legend>
+
+        <dl class="checklist">
+        [% IF view.data.type == 'checkbox' %]
+    	    [%- WHILE ( available = view.data.available.next ) %]
+            [%- id = available.id %]
+            <dd>
+                <input type="checkbox" value="1" name="subscribe:[% id %]" 
+                [%- IF view.data.selected.$id %]
+                    checked="checked"
+                [%- END %] />
+                
+                <span class="label">[% available.foreign_display %]</span>            
+            </dd>
+
+            [%- END %]
+        
+            <dd>
+                <a href="javascript: checkAll();">Check All</a>
+                <a href="javascript: uncheckAll();">Uncheck All</a>
+            </dd>
+
+        [%- ELSE -%]
+            
+            <dd>
+            <select class="multiselect" name="subscribe" size="5" 
+                multiple="yes">
+         	   
+         	    [%- WHILE ( available = view.data.available.next ) %]
+                [%- id = available.id %]
+                    <option 
+                    [%- IF view.data.selected.$id %]
+                        selected="selected"
+                    [%- END %]
+                    value="[% id %]">[% available.foreign_display %]
+                    </option>
+                [%- END %]
+            </select>
+            </dd>
+            
+         [%- END %]
+
+        
+            <dd style="padding-top: 5px;">
+                <input type="submit" name="submit" value="Submit" />
+            	<input type="submit" name="cancel" value="Cancel" />
+            </dd>
+        </dl>
+        
+    </fieldset>
+</form>
+

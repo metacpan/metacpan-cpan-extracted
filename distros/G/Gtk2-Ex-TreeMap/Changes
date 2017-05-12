@@ -1,0 +1,6 @@
+Revision history for Perl extension Gtk2::Ex::TreeMap.
+
+0.01  Wed May 25 21:08:38 2005
+	- original version; created by h2xs 1.23 with options
+		-AX Gtk2::Ex::TreeMap
+

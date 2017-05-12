@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+#
+# ./garivini_workers --gearmand="127.0.0.1:7003" \
+# --dsn="DBI:mysql:job:host=127.0.0.1;database=job" --username="job" \
+# --password="job" --roles="QueueRunner,Injector,Controller"
+#
+
+use strict;
+use warnings;
+
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Getopt::Long;
+
+my %o = (roles => 'QueueRunner');
+
+# TODO: Doesn't support specifying multiple DB's yet. YAML config or whatever?
+GetOptions(\%o,
+    'gearmand=s@',
+    'dsn=s',
+    'username=s',
+    'password=s',
+    'roles=s', # QueueRunner, Injector, Controller
+    );
+
+die "Need dsn" unless $o{dsn};
+die "Need gearman servers" unless $o{gearmand};
+
+my @roles = split(/,/, $o{roles});
+
+my @children = ();
+my $primary_role = shift @roles;
+for my $role (@roles) {
+    my $pid = fork;
+    die "Fork failed: $_" unless defined $pid;
+    if ($pid) {
+        push(@children, $pid);
+    } else {
+        @children = ();
+        run($role);
+        exit;
+    }
+}
+
+$SIG{INT} = $SIG{TERM} = sub { kill INT => @children; exit };
+run($primary_role);
+
+sub run {
+    my $role = shift;
+    my $class = 'Garivini::' . $role;
+    eval "use $class; 1" or die $@;
+    my $worker = $class->new(job_servers => $o{gearmand},
+        dbs => {1 => { id => 1, dsn => $o{dsn}, user => $o{username},
+        pass => $o{password}, }},
+        );
+
+    $worker->work;
+}

@@ -1,0 +1,4 @@
+TODO list for Perl module Gtk2::Ex::DbLinker
+
+- autocommit when moving from one record to another
+

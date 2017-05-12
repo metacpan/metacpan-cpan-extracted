@@ -1,0 +1,2 @@
+%color = #99ff99ff;
+point( %color, 1.0, 0.5, 1.2 );

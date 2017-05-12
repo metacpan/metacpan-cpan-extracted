@@ -1,0 +1,122 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            182
+    BUFR edition:                      3
+
+Section 1:
+    Length of section:                 18
+    BUFR master table:                 0
+    Originating subcentre:             0
+    Originating centre:                98
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           3
+    Data subcategory:                  206
+    Master table version number:       13
+    Local table version number:        1
+    Year of century:                   12
+    Month:                             10
+    Day:                               31
+    Hour:                              0
+    Minute:                            0
+
+Section 3:
+    Length of section:                 32
+    Number of data subsets:            2
+    Observed data:                     1
+    Compressed data:                   1
+    Data descriptors unexpanded:       310020 224000 236000 101000 031001 031031 001031 001032 008023 101000 031001 224255
+
+Subset 1
+
+     1  001007              785  SATELLITE IDENTIFIER [CODE TABLE]
+     2  002019              394  SATELLITE INSTRUMENTS [CODE TABLE]
+     3  001033               98  IDENTIFICATION OF ORIGINATING/GENERATING CENTRE [CODE TABLE]
+     4  002172                1  PRODUCT TYPE FOR RETRIEVED ATMOSPHERIC GASES [CODE TABLE]
+     5  004001             2012  YEAR [YEAR]
+     6  004002               10  MONTH [MONTH]
+     7  004003               31  DAY [DAY]
+     8  004004                0  HOUR [HOUR]
+     9  004005                0  MINUTE [MINUTE]
+    10  004006               24  SECOND [SECOND]
+    11  005001         12.07028  LATITUDE (HIGH ACCURACY) [DEGREE]
+    12  006001       -157.35901  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    13  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
+    14  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    15  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
+    16  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    17  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
+    18  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    19  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
+    20  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    21  007022            52.66  SOLAR ELEVATION [DEGREE]
+    22  005043          missing  FIELD OF VIEW NUMBER [NUMERIC]
+    23  020010               21  CLOUD COVER (TOTAL) [%]
+    24  020016            76300  PRESSURE AT TOP OF CLOUD [PA]
+    25  033003                0  QUALITY INFORMATION [CODE TABLE]
+    26  010040                1  NUMBER OF RETRIEVED LAYERS [NUMERIC]
+    27  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    28  007004               12  PRESSURE [PA]
+    29  007004           101325  PRESSURE [PA]
+    30  015020       0.00530923  INTEGRATED 03 DENSITY [KG/M**2]
+    31  010002          missing  HEIGHT [M]
+        224000                   FIRST ORDER STATISTICS FOLLOW
+        236000                   DEFINE DATA PRESENT BIT MAP
+    32  031001                4  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    33  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
+    34  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
+    35  031031                0  DATA PRESENT INDICATOR [FLAG TABLE]
+    36  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
+    37  001031               98  IDENTIFICATION OF ORIGINATING/GENERATING CENTRE (SEE NOTE 10) [CODE TABLE]
+    38  001032               81  GENERATING APPLICATION [CODE TABLE]
+    39  008023                9  FIRST ORDER STATISTICS [CODE TABLE]
+    40  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    41  015020       0.00053092  INTEGRATED 03 DENSITY [KG/M**2]
+
+Subset 2
+
+     1  001007              785  SATELLITE IDENTIFIER [CODE TABLE]
+     2  002019              394  SATELLITE INSTRUMENTS [CODE TABLE]
+     3  001033               98  IDENTIFICATION OF ORIGINATING/GENERATING CENTRE [CODE TABLE]
+     4  002172                1  PRODUCT TYPE FOR RETRIEVED ATMOSPHERIC GASES [CODE TABLE]
+     5  004001             2012  YEAR [YEAR]
+     6  004002               10  MONTH [MONTH]
+     7  004003               31  DAY [DAY]
+     8  004004                0  HOUR [HOUR]
+     9  004005                0  MINUTE [MINUTE]
+    10  004006               24  SECOND [SECOND]
+    11  005001         12.10918  LATITUDE (HIGH ACCURACY) [DEGREE]
+    12  006001       -157.13652  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    13  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
+    14  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    15  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
+    16  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    17  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
+    18  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    19  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
+    20  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    21  007022            52.47  SOLAR ELEVATION [DEGREE]
+    22  005043          missing  FIELD OF VIEW NUMBER [NUMERIC]
+    23  020010               12  CLOUD COVER (TOTAL) [%]
+    24  020016            76500  PRESSURE AT TOP OF CLOUD [PA]
+    25  033003                3  QUALITY INFORMATION [CODE TABLE]
+    26  010040                1  NUMBER OF RETRIEVED LAYERS [NUMERIC]
+    27  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    28  007004               12  PRESSURE [PA]
+    29  007004           101325  PRESSURE [PA]
+    30  015020       0.00492335  INTEGRATED 03 DENSITY [KG/M**2]
+    31  010002          missing  HEIGHT [M]
+        224000                   FIRST ORDER STATISTICS FOLLOW
+        236000                   DEFINE DATA PRESENT BIT MAP
+    32  031001                4  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    33  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
+    34  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
+    35  031031                0  DATA PRESENT INDICATOR [FLAG TABLE]
+    36  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
+    37  001031               98  IDENTIFICATION OF ORIGINATING/GENERATING CENTRE (SEE NOTE 10) [CODE TABLE]
+    38  001032               81  GENERATING APPLICATION [CODE TABLE]
+    39  008023                9  FIRST ORDER STATISTICS [CODE TABLE]
+    40  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    41  015020       0.00049234  INTEGRATED 03 DENSITY [KG/M**2]

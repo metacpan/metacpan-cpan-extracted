@@ -1,0 +1,33 @@
+---
+abstract: 'Produces charts with GD'
+author:
+  - 'Martien Verbruggen <mgjv@tradingpost.com.au>'
+  - 'Benjamin Warfield <bwarfield@cpan.org>'
+  - 'Ruslan Zakirov <Ruslan.Zakirov@gmail.com>'
+build_requires:
+  Capture::Tiny: '0.30'
+  ExtUtils::MakeMaker: '6.76'
+  FindBin: '0'
+  Test::Exception: '0.40'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.76'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GDGraph
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  GD: '1.18'
+  GD::Text: '0.80'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=GDGraph
+  repository: git://github.com/ruz/GDGraph.git
+version: '1.54'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+
+# Usage:
+#  perl -Mre=debug -e '/^[ab]$/' 2>&1 | perl -Ilib examples/regraph ascii
+
+use strict;
+use lib '../lib';
+use lib 'lib';
+use Graph::Regexp;
+
+my $format = shift || 'as_ascii';
+$format = 'as_' . $format unless $format =~ /^as_/;
+my $debug = shift || undef;
+my $gr = Graph::Regexp->new( debug => $debug );
+
+# slurp mode
+$/ = undef; my $doc = <>;
+
+# remove text preceding the regexp, important if you do:
+# use -Mcharnames=:full, because this compiles other regexps, too:
+$doc =~ s/(.|[\n\r])*Compiling REx.*?[\r\n]//m;
+
+my $graph = $gr->parse(\$doc)->as_graph();
+
+binmode STDOUT, 'utf8' or die ("Cannot set binmode('utf8') on STDOUT: $!");
+print $graph->$format();
+

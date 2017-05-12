@@ -1,0 +1,14 @@
+Revision history for Perl extensions Graph::Layouter and Graph::Renderer.
+
+0.01  Sun Apr  4 00:04:24 2004
+	- First working version; created by h2xs 1.21 with options
+		-A -X -n Graph::Layouter
+
+0.02  Tue Apr  6 17:23:55 2004
+	- use lib updates in provided test and example script
+	- Minor fixes and enhancements
+	- eg/weight.pl example script
+	- Support for bounding Graph::Layouter::Spring execution also by time
+
+0.03  Sat Feb 11 18:35:17 2006
+	- port the package to support the new incompatible versions of Graph.pm

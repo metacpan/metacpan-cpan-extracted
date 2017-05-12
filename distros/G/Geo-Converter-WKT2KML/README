@@ -1,0 +1,37 @@
+Geo-Converter-WKT2KML 
+
+This module provides two functions, wkt2kml and kml2wkt.
+These are convert geometry formats WKT (Well-Known Text) and KML
+each other.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Exporter
+XML::Simple
+Test::Base
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, OHTSUKA Ko-hei
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

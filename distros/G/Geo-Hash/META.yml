@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Geo-Hash
+version:             0.02
+abstract:            Encode / decode geohash.org locations.
+license:             perl
+author:              
+    - Andy Armstrong <andy@hexten.net>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

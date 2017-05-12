@@ -1,0 +1,27 @@
+---
+name: Graph-PetriNet
+version: 0.03
+author:
+  - 'Robert Barta <rho@devc.at>'
+abstract: Perl extension for Petri Nets
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Class::Trait: 0
+  List::MoreUtils: 0
+  Test::Exception: 0
+  Test::Pod::Coverage: 0
+  Time::HiRes: 0
+provides:
+  Graph::PetriNet:
+    file: lib/Graph/PetriNet.pm
+    version: 0.03
+  Graph::PetriNet::PlaceAble:
+    file: lib/Graph/PetriNet/PlaceAble.pm
+  Graph::PetriNet::TransitionAble:
+    file: lib/Graph/PetriNet/TransitionAble.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

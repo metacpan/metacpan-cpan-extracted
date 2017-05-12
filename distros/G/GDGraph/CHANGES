@@ -1,0 +1,482 @@
+1.54 21 Nov 2016
+
+- Disable two Y axes alignment when any y[12]_{min,max}_value is defined
+  RT#62665
+
+1.53 08 Jul 2016
+
+- Fix 'Illegal division by zero' when x_min_value and x_max_value
+  are defined and x_tick_number set to 'auto' RT#73185
+  Thanks to Bob Rogers, https://github.com/ruz/GDGraph/pull/12
+
+1.52 28 Jan 2016
+
+- y1_min_range and y2_min_range instead of min_range_1 and min_range_2,
+  niether were documented before.
+- Update documentation in regards to all *_min_range options available.
+
+1.51 27 Dec 2015
+
+- fix shadows rendering on cumulative bar charts
+  thanks to https://github.com/Tordek
+  see https://github.com/ruz/GDGraph/pull/4
+
+1.50 27 Dec 2015
+
+- run samples as part of test suite to make sure no sample crashes
+  thanks to https://github.com/tynovsky
+- properly define test requirements using newer MakeMaker
+
+1.49 11 Mar 2015
+
+- fix to Z-axis color filling in 3D pie charts (Debian Bug #489184)
+- bump ExtUtils::MakeMaker dependency
+- tiny improvement in the code of the samples
+
+1.48 02 Aug 2013
+
+- no code changes, just release enginering cleanup
+- adjust MANIFEST.SKIP file so MANIFEST can be generated
+  once again
+- ship sample58.pl file, so `make samples` stop failing
+- mention the current and past maintainers in META files
+  as authors
+- use newer CPAN::Meta and ExtUtils::MakeMaker, older
+  versions generated META files without runtime prerequisites
+
+1.47 28 Jun 2013
+
+- experimental hide_overlapping_values option for bar graphs
+
+1.46 26 Jun 2013
+
+- This release is based on old work by Martien that was sitting
+  in his repo
+- x_last_label_skip option
+- new samples and tweaks to old
+
+1.45 21 Jun 2013
+
+- read DISTRIBUTION STATUS in perldoc GD::Graph
+- no code changes since 1.44
+
+25 Apr 2007
+
+- Patched bugs 21610, 20792, 20802, 23755 and 22932
+- Updated POD to clarify current maintenance status, and encourage 
+	bug reporting via RT (and to point out some external help resources)
+- Release 1.44
+
+17 May 2006
+
+- Patched bugs 7307, 2944 (extended the fix to mixed graphs), 4177, and 16863.
+- Fixed a fencepost error in pie.pm that caused an occasional segfault
+	(reported by John Westlund and Hank Leininger)
+- Fixed a bug that broke bar charts with no visible 0-axis 
+	(reported by Steve Foster)
+
+19 Feb 2006
+
+- Patched bugs 2218, 4632 (which had two duplicates), 7881, and 15374
+- Failed to update CHANGES file before releasing 1.4307 to CPAN (oops)
+
+4 Feb 2006
+
+- Patched bugs 16880 and 16791
+
+19 Dec 2005
+
+- Resolved the following bug reports/feature requests from RT:
+	1363, 2944, 3346, 3850, 4104, 4380, 4384, 
+	4469, 5275, 5282, 6751, 6786, 7287, 7819
+- Straightened out $my_graph/$graph confusion in docs
+- Added five new sample scripts
+- Individual module versions now reflect a branch from original CVS
+  versioning, in case things need to be merged at some later date.
+- Uploading to CPAN as 1.4305 under ~BWARFIELD because I can't seem
+  to get in touch with Martien Verbruggen.
+
+1 July 2003
+
+- Fixed yet another division by 0 problem, for two_axes. 
+- Added more tests to axestype.t
+- Cleaned up other test files.
+- Release 1.43
+
+19 June 2003
+
+- Fixed another division by 0 problem, introduced in 1.41
+- Added test t/axestype.pm, which now tests for division by 0 error.
+- Released 1.42
+
+17 June 2003
+
+- Removed file BUGS from distribution. Too much work to keep up to
+  date. Use rt.cpan.org, or email.
+- Fixed skip() calls in tests to work with ancient versions of
+  Test.pm.
+- Made GD::Graph::Data::read() work with file handles under Perl
+  5.005.
+- Released 1.41
+
+16 June 2003
+
+- Fixed when zero axis inclusion is done for bar and are charts.
+- Fixed code to reserve area for hbar charts last y axis label
+
+11 June 2003
+
+- Added no_axes option, changed sample56 to reflect this
+
+30 May 2003
+
+- Added version number for GD::Text PREREQ_PM
+- Allow GD::Graph::Data::read() to read from file handle, instead of
+  file
+- Added tests for data file reading, and test data
+- Release version 1.40
+
+24 Feb 2003
+
+- How come I never noticed this before? Right axis was disappearing
+  when r_margin was zero.
+
+22 Feb 2003
+
+- Added patch by Ben Tilly from RT ticket 203 (manually, and much too
+  late) to fix problems with picking decent values for axes when
+  two_axes set to true. Added sample 57
+
+20 Feb 2003
+
+- Removed cetus font, because of unknown copyright status.
+- Release 1.39 (skip 1.38, internal release)
+
+11 Feb 2003, continued after 1.37 release
+
+- Fixed version numbering
+- Added limited, preliminary get_feature_coordinates support.
+
+11 Feb 2003
+
+- Fixed =head1 in GD/Graph/FAQ.pod
+- release 1.37
+
+10 Feb 2003
+
+- Added some tests, mainly to make the CPAN testers happy :) The best
+  way to test is still to use the samples.
+
+- Preparation for 1.36
+
+Jan 2003
+
+- Made detection of output formats more robust. Newer GDs break on
+  simply testing with UNIVERSAL::can.
+- Added some documentation on error handling.
+
+12 Jun 2002 - 21 Jun 2002
+
+- Fixed various bugs: 
+  - Area charts don't allow undefined variables, die on hotspot code
+  - allow "0.00" to be equal to 0 when determining min and max values
+    for axes
+  - fixed shadows for cumulative bars
+
+- Preparation for release 1.35
+
+9 Jun 2002
+
+- I just realised this file is severely out of date. I'll only keep
+  track of the really big changes here, since I really can't remember
+  what I've fixed and changed sine 1.33, and it's really too much work
+  to go through all CVS comments.
+- Added hbars.pm, and put most of the framework in place to allow the
+  other charts to be plotted rotated as well.
+- preparation of release 1.34
+
+7 Oct 2000
+
+- Addition of undefined data set colour.
+- Addition of bar_width option
+- Preparation of release 1.33
+
+May - Sep 2000
+
+- Various small bug fixes
+
+7 May 2000
+
+- Finalised code for value display
+- prepared for release of 1.32
+
+6 May 2000
+
+- Added FAQ to distribution
+- Fixed bug with calculation of bottom of plotting area (causing axis
+  tick values to be cut off, when no label present)
+- Some 5.004 code retrogression
+
+30 Apr 2000
+
+- Fixed problems with overzealousness of correct_width attribute for
+  mixed charts (report Jimmy Sieben)
+- Fixed problem with zero_axis and zero_axis_only drawing when y values
+  are all on one side of 0 (report Matthew Darwin)
+- Fixed GD::Graph::Data::get_min_max_y and ppoints charts with numerical
+  X axes (thanks Peter)
+- Fixed problem when data sets contain only zeroes (report Joe Pepin)
+- Added experimental support for hotspots
+
+15 Apr 2000
+
+- Added some code (thanks Gary) to deal better with 'numerical' X axes.
+- Prepared version 1.30 for release, mainly to make sure that patches
+  that come in are done against the new code base
+
+27 Feb 2000
+
+- Added cumulate attribute, needs more code changes to fully replace
+  'overwrite == 2'. For now, it will work.
+
+20 Feb 2000
+
+- Added correct_width option
+- Fixed bug in pie. If one of the slices ended up at exactly 90 degrees,
+  or very close to it, The fill would cause GD to core dump. Ugly.
+  Introduced half a degree of relaxation there.
+  There still are troubles with this. I really need to think of another
+  way to do this.
+
+15 - 17 Feb 2000
+
+- Added Error class, removed error checking code from Data
+- Added $VERSION to each module
+- Fixed bug in can_do_ttf. Can now _really_ be called as static or
+  class method.
+
+14 Feb 2000
+
+- Fixed bug in bar width. Removed some roundings, and always add 1
+  to left boundary. Also, adapt r_margin on the fly to make sure bars
+  are always exactly the same width. This changes the look of graphs
+  slightly, but it looks so much better in general.
+- Fixed bug in drawing of vertical x labels with x_tick_number enabled
+- Cleaned up code in setup_coords in axestype.pm a bit
+
+12 Feb 2000
+
+- Removed ReadFile sub from GD::Graph.pm. I never got around to making
+  it part of the interface anyway. replaced by GD::Graph::Data.
+- Rewrote lots, and lots of code. General cleanup. Removal of direct
+  work with data array. Now only works with interface of GD::Graph::Data
+  object (hopefully)
+
+09 Feb 2000
+
+- Added GD::Graph::Data to distribution
+
+27 Jan 2000
+
+- Added patch from Hildebrand, which allows non-drawing of accents on
+  bars with accent_treshold option
+- Fixed rounding problems with overwrite == 2, alert from Hildebrand,
+  also a patch supplied which couldn't be used because of other code
+  changes related to sample17
+- Added sample18, supplied by Hildebrand as illustration of rounding
+  problem.
+- Fixed off-by one error in pick_data_color whenever color pick is based
+  on point instead of data set (cycle_clrs and pie)
+- Added accent_treshold option to area charts
+
+09 Jan 2000
+
+- Rewrote some documentation to reflect new GD::Text behaviour.
+
+08 Jan 2000
+
+- Rewrote set method to only accept documented attributes.
+- Made sure all documented attributes are part of the %Defaults hashes.
+- Changed inheritance slightly, because changing the set method and
+  using access to file scoped variables didn't work very well with
+  multiple inheritance in mixed and linespoints. All file scoped
+  material now is kept in the common ancestor of these, i.e. axestype.
+
+06 Jan 2000
+
+- Added shadow patch from Jeremy Wadsack, changed a few things: Allow
+  negative shadows, move his code out a bit more.
+- Added color cycling patch from Jeremy. Adapted it to new code, and
+  added code to also allow cycling of colour of bar borders.
+- Documentation.
+
+05 Jan 2000
+
+- removed all references to perl version from any code. Leaving it up to
+  users to find out for themselves. They'll just need to read the
+  documentation.
+- Applied patch from Jeremy Wadsack fixing text sticking out of pie
+  slices causing fills to fail.
+- cleanup of code in pie.pm: draw_data, filling front of pie, and
+  _get_pie_front_coords.
+
+03 Jan 2000
+
+- Fixed two_axes and negative values
+- released 1.22
+
+Dec 1999, mgjv
+
+- Development and support back to me, mgjv. GIFgraph and Chart::PNGgraph
+  (hopefully) will both become wrappers around this new set of modules.
+
+- Renamed to GD::Graph
+- Removed direct font handling stuff, and moved font handling to
+  GD::Text::Align objects
+- Removed methods for writing to files directly. it is now up to the
+  user of the module to save the image to a file. GIFgraph and
+  Chart::PNGgraph will still do this
+- plot method now returns a reference to a gd object, no longer the
+  image data. GIFgraph and Chart::PNGgraph still exhibit old beahviour.
+- Added some new options, and split up some others. 
+- Added new methods, mainly to detect the useability level of the
+  current GD.
+- Changed any die and warn statements to croak and carp
+
+Thu October 21 1999 by sbonds@agora.rdrop.com
+- Chart::PNGgraph version 1.13
+- Added primitive support for TrueType fonts
+- Fixed bug where 3d charts with very large slices would not have both
+  parts of the front filled properly.
+
+Thu October 7 1999  by sbonds@agora.rdrop.com
+- Chart::PNGgraph version 1.12
+- Changed namespace to Chart:PNGgraph so that CPAN will index it properly
+- Added "base" tests-- still very incomplete
+- Changed sample 5-2 to have multiple lines since this is what the html
+  file described it as having.
+- Checks the read-only attributes 'pngx' and 'pngy' so these will not get
+  accidently set.  $g->set() returns undef if they are present, but the
+  rest of the attributes will be set.
+
+Tue August 31 1999  by sbonds@agora.rdrop.com
+- Please contact me rather than the original author for problems unless
+  you are convinced that the problems are not a result of the port to PNG
+- Converted GIFgraph-1.10 to PNGgraph-1.10 so it works properly with GD-1.20
+- UNISYS has been increasingly defensive of the LZW patent used in GIF
+  compression, which necessitates these kinds of fixes.  
+
+Tue August 25 1998
+
+- Fixed bug with undef values for first value in lines graphs
+- Changed one or two samples, and samples Makefile dependencies
+
+Tue August 25 1998
+
+- Added bar_spacing option.
+- Fixed a slight drawing 'bug' while doing that.
+- Changed a few of the samples to use bar_spacing
+- Implemented numerical X axis, based on a changed axestype.pm from
+  Scott Prahl <prahl@ece.ogi.edu>. many thanks.
+- Added sample54 to illustrate
+
+Tue August 18 1998
+
+- Added rudimentary mixed type graph
+
+Mon August 17 1998
+
+- Added control over axis label placement through x_label_position and
+  y_label_position.
+- Added possibility to call a coderef to format the y labels. See
+  y_number_format.
+	(Idea: brian d foy <comdog@computerdog.com>)
+- Fixed some bugs (see file BUGS, version 1.04)
+
+Fri August 14 1998
+
+- Uploaded version 1.03 to CPAN
+
+- Finally able to make some fixes
+- Changed defaults for zero_axis and zero_axis_only to 0. Were both 1.
+  Needed to do this, because of all the confusion they cause
+- Test for defined $s->{y_(min|max)_value} 
+	(Honza Pazdziora <adelton@informatics.muni.cz>)
+	(Vegard Vesterheim <vegardv@runit.sintef.no>)
+- Fixed handling of negative values (I hope)
+	(brian d foy <comdog@computerdog.com>)
+- From now on, require 5.004. 5.003 is dead, and should be deprecated
+  now that 5.005 is out.
+- Added 5.005 specific MakeMaker fields to Makefile.PL
+
+Tue May 12 1998
+
+- Cleaned up a bit, finalised version 1.02, because of time
+  contraints, and the need to get these bug fixes out. Didn't succeed.
+
+Mon Jan 19 1998
+
+- Fixed some bugs (see file BUGS, version 1.02)
+- Added option x_all_ticks, to force all x ticks to be printed, even
+  if x_label_skip is set.
+- Added option x_labels_vertical, to print x labels vertical
+	(Thanks to DBelcher <dbelcher@cyberhino.com> for a patch)
+
+Fri Jan  9 1998
+
+- Fixed some bugs (see file BUGS, version 1.01)
+- Added formatting for y labels (option y_label_format)
+
+Tue Dec 23 1997
+
+- Changed PERL=perl5 to PERL=perl in samples/Makefile (D'OH!)
+- Added read_rgb to GIFgraph::colour to allow definition of own colours
+- Added t/colour.t
+- Removed a lot of unnecessary quotes all over the place
+
+Mon Dec 22 1997
+
+- Center graph titles on axes, not on png
+- Added line types
+- Moved initialise() to each module with $self->SUPER inheritance
+- Added check for duplicate GD::Image object initialisation
+- Added binmode() to t/ff.pl to make tests compatible with Win32 
+  platforms (D'OH).
+
+Thu Dec 18 1997
+
+- Allow undef values in data sets, and skip them
+- Added prototyping of functions
+- Legends, finally
+  requests from Petter Reinholdtsen <pere@link.no>
+  				Giorgos Andreadakis <gand@forthnet.gr>
+
+Tue Dec 16 1997
+
+- Added documentation for dclrs and markers options
+- removed line_width and ReadFile from the documentation (unimplemented)
+- Started on port to win32
+- Changed Area to use Polygon and to work with negative numbers
+
+Mon Dec 15 1997
+
+- Added support for negative numbers in lines, points and linespoints 
+  graphs
+- Added new options: zero_axis, and zero_axis_only (code and documentation)
+- Added new options: y_min_value, y1_min_value, y2_min_value
+
+Fri Dec 12 1997
+
+- Changed 0 angle for pies to be at front/bottom, to make calculations a 
+  bit easier
+- Added test scripts for 'make test'
+
+Before Fri Dec 05 1997
+
+- Lots of minor tuning
+- Added x_ticks option 
+  requests from Will Mitayai Keeso Rowe - thelab@nmarcom.com
+			    mparvataneni@quadravision.com (Murali Parvataneni)
+- Added binmode() here and there to accommodate for platforms that need
+  it.
+

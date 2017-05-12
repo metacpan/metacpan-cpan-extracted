@@ -1,0 +1,80 @@
+NEWS of Glade::PerlGenerate (GPG) Gtk-Perl-Glade UI builder and source generator
+--------------------------------------------------------------------
+
+NEW 'FEATURES'
+--------------
+version 0.59 Produces documentation and distribution files
+
+version 0.58 changes for Gtk-Perl-0.7005 and much tidying.
+
+version 0.57 updated to cater for Glade 0.5.11 changes
+
+version 0.53 parses underline accelerators and handles character encodings
+    in Glade and glade2perl files better
+
+version 0.52 has some utilities to help you to produce the gettext strings
+    that need to be translated, just by running the generated subclass.
+    More defaults added so that Glade-0.5.7 files will not fail.
+    
+version 0.51 generates i18n-capable code - except underline accelerators :(
+    It is also i18n capable itself. See the diagnostics in one language, the
+    source code in another and the generated apps will run in any language
+    that you make .mo files for (all from one build run)
+    
+version 0.50 pixmaps are now handled with relative paths. Glade-Perl now
+    can also generate hierarchical widget structures so that you can access 
+    widgets like :
+    $form->{'vbox1'}{'frame2'}{'hbox3'}{entry1'}{'__W'}->get_text;
+    
+version 0.48 has a better make install. It fixes some bugs but the main changes
+    are to the generated code structure. Old apps that use the generated files
+    will work in the same way but the simpler structure means that you can
+    edit the file Project.pm in situ and it will not be overwritten.
+    UI code also connects signal handlers more correctly so that it should
+    work however you call it - even from a perl script (eg package main)
+    
+version 0.45 Has fixes for Gtk-Perl-0.7000 and recent CVS (29 Dec 1999)
+
+version 0.44 Can generate a module that uses libglade to show the UI
+
+version 0.42 implements Gnome::Animator and makes change necessary for
+    Gtk-Perl CVS versions after 19991029. Also fixes some Gnome related 
+    failures (I hope). 
+    You will need the CVS version after 19991107 and Glade 0.5.4 to see all
+    the improvements although older versions should still work.
+
+version 0.41 implements Gnome::Druid stuff and also generates a working
+    subclass with skeleton signal handler subs for you to copy and edit.
+    We can now generate _all_ Glade widgets (and mostly correctly :-)
+    
+version 0.40 is the first CPAN release - hence the new version number format
+
+version 0.3.14 is mainly a bugfix release with more useful values returned
+    in the generated form constructors and some widgets packed properly now.
+    
+version 0.3.13 allows you to have a Gnome::App with some widgets in it! Some
+    bug fixes from CVS versions of 19990922 and 19991001 are implemented and
+    Gtk widget constructors split off from Glade::PerlUI into new module
+    Glade::PerlUIGtk. Gnome enums looked up at run-time.
+
+version 0.3.12 does most Gnome stuff now but you will need the CVS version
+    after 19990922 to get the best from it. I have added a version dependancy
+    checking so that older versions (eg Gtk-Perl 0.6123) will still work but 
+    without the improvements and newer CVS builds can get at the improvements.
+    
+version 0.3.11 handles all widgets/properties that Gtk-Perl 0.6123 can handle
+    as well as styles, although Glade cannot handle styles properly yet.
+    Signals are now connected after the widgets are constructed.
+
+version 0.3.8 does more Gnome widgets, GtkImage, MenuItem label accelerator
+    underlining, signal handlers now get ref to form and first styles (fonts)
+    
+version 0.3.5 (and greater) generates Gnome widgets but many are missing in the
+    generally available Gtk-Perl (0.5121) :-(.
+
+version 0.3.4 produces an OO class for each toplevel window/dialog. Thanks to 
+    Robert Schwebel for many ideas and tests.
+
+version 0.2.0 is the first 'stable' release. Bugfixes only in 0.2.x and
+    development moves to 0.3.x versions.
+

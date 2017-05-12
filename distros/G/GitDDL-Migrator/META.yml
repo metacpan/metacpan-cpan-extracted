@@ -1,0 +1,48 @@
+---
+abstract: 'database migration utility for git managed SQL extended L<GitDDL>'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  DBI: '0'
+  Test::Git: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Test::Requires::Git: '1.005'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GitDDL-Migrator
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  GitDDL::Migrator:
+    file: lib/GitDDL/Migrator.pm
+    version: '0.08'
+requires:
+  GitDDL: '0.03'
+  Mouse: '0'
+  SQL::Translator: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/GitDDL-Migrator/issues
+  homepage: https://github.com/Songmu/GitDDL-Migrator
+  repository: git://github.com/Songmu/GitDDL-Migrator.git
+version: '0.08'
+x_contributors:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'

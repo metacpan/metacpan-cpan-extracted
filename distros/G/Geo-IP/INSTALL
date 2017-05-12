@@ -1,0 +1,23 @@
+To install the GeoIP C library, go to
+  http://www.maxmind.com/app/c
+
+Geo::IP 1.37 requires GeoIP CAPI 1.4.5 or higher
+Note that Geo::IP 1.36 requires GeoIP C 1.4.5 or higher
+
+To install the Perl XS wrapper, run
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+To install the PurePerl code (no C API required), run
+
+  perl Makefile.PL PP=1
+  make
+  make test
+  make install
+
+(If you get a "libGeoIP.so.1: cannot open shared object  No such file or
+directory" error, add /usr/local/lib to /etc/ld.so.conf then run
+/sbin/ldconfig /etc/ld.so.conf     )

@@ -1,0 +1,73 @@
+{
+   "abstract" : "A xs module to give perl global mutex-lock between crons or web-app's workers",
+   "author" : [
+      "itsusony <itsusony@fout.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Global-MutexLock",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LeakTrace" : "0.15",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Global::MutexLock" : {
+         "file" : "lib/Global/MutexLock.pm",
+         "version" : "0.026"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/itsusony/Global-MutexLock/issues"
+      },
+      "homepage" : "https://github.com/itsusony/Global-MutexLock",
+      "repository" : {
+         "url" : "git://github.com/itsusony/Global-MutexLock.git",
+         "web" : "https://github.com/itsusony/Global-MutexLock"
+      }
+   },
+   "version" : "0.026"
+}

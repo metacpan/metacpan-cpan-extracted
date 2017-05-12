@@ -1,0 +1,24 @@
+
+1) With EvaP():
+
+   genpTk -c withevap -o withevap.ptk
+
+genpTk nominally handles evap-compliant programs - it actually
+executes the command "withevap" with a -full_help argument and sucks
+up the resulting stdout data; this data describes the command and it's
+parameters, their types and default values.  genpTk then parses this
+help output and writes the Perl/Tk program "withevap.ptk".
+
+
+2) Without EvaP():
+
+   genpTk -c woevap -p woevap.pdt -m woevap.mm -o woevap.ptk
+
+If you're too lazy to retrofit EvaP() into your clunky old code, and
+are feeling lucky, try creating PDT and MM files to map your code's
+command line parameters to EvaP's syntax.  Here, genpTk privately
+invokes a -full_help Evap() call with the supplied PDT and MM
+structures, captures the help output to a file, and proceeds as above
+by parsing this output and writing "woevap.ptk".
+
+

@@ -1,0 +1,24 @@
+Updated postcodes
+------------------
+It is possible to update the postcodes yourself, but I do not recommend it.
+
+1. Run the command './update_dk -update'. This will take care of everything.
+   The old version of the module (DK.pm) is automatically renamed (with a
+   trailing dot and a large numer).
+
+2. Install the module, after running the tests; './Build test install' or
+   'make test install'.
+
+
+The postcode file can be found on <http://www.postdanmark.dk/iis/postnumre/services.asp>.
+Click on "Download til adressekartotek" (after noting the date below it)
+on the top of the page, and download the file 'postnr.xls'.
+The direct link is <http://www.postdanmark.dk/iis/postnumre/postnr.xls>.
+
+The syntax in the postcode file may change, and this may cause errors in the
+parsing - and errors in the generated perl code. It is possible to check the
+syntax by running the program as './update_dk'.
+
+Note that the tests are hard coded for a few selected postcodes, and can stop
+functioning if there are changes in one of them.  I recommend that you instead
+wait for a new and updated official version of the module. 

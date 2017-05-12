@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Games-Tournament-BlackJack.t
+t/Games-Tournament-BlackJack-Shoe.t
+lib/Games/Tournament/BlackJack.pm
+lib/Games/Tournament/BlackJack/Game.pm
+lib/Games/Tournament/BlackJack/Shoe.pm
+lib/Games/Tournament/BlackJack/Utilities.pm
+lib/Games/Tournament/BlackJack/Player.pm
+lib/Games/Tournament/BlackJack/Player/DealerPlayer.pm
+lib/Games/Tournament/BlackJack/Player/ExamplePlayer1.pm
+lib/Games/Tournament/BlackJack/Player/ExamplePlayer2.pm
+lib/Games/Tournament/BlackJack/Player/HumanPlayer.pm
+discuss/related_modules
+META.yml                                 Module meta-data (added by MakeMaker)

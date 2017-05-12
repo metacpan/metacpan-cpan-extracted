@@ -1,0 +1,136 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use lib '../lib';
+use lib 'lib';
+
+use Carp qw(croak);
+use File::Spec;
+use Getopt::Long;
+use XML::Twig;
+
+# gwybodaeth specific modules
+use Gwybodaeth::Parsers::N3;
+use Gwybodaeth::Read;
+
+sub show_help {
+    return system( "perldoc", "Gwybodaeth" );
+}
+
+my $data;
+my $map;
+my $in_type;
+my $help;
+
+GetOptions(
+    'src|source=s' => \$data,
+    'map=s'        => \$map,
+    'input|in=s'   => \$in_type,
+    'help|h'       => \$help
+);
+
+# Load help dialogue
+if ( defined $help ) {
+    show_help;
+    exit 1;
+}
+
+# Load configuration
+my $root = File::Spec->rootdir();
+my $conf_file = File::Spec->catfile("$root",'etc','gwybodaeth','gwybodaeth.conf');
+-e $conf_file or croak "you need a configuration file $conf_file: $!";
+
+my $twig = XML::Twig->new();
+$twig->parsefile($conf_file);
+
+my @converters = $twig->root->children('converter');
+my %convert    = ();
+
+for my $conv (@converters) {
+    my $name   = $conv->first_child_text('name');
+    my $parser = $conv->first_child_text('parser');
+    my $writer = $conv->first_child_text('writer');
+
+    $convert{$name} = { parser => $parser, writer => $writer };
+}
+
+my $input = Gwybodaeth::Read->new();
+
+my $len;
+if ( -f $data ) {
+    $len = $input->get_file_data($data);
+}
+else {
+    $len = $input->get_url_data($data);
+}
+
+croak "Empty file." if ( $len < 1 );
+
+my $mapping = Gwybodaeth::Read->new();
+
+if ( -f $map ) {
+    $len = $mapping->get_file_data($map);
+}
+else {
+    $len = $mapping->get_url_data($map);
+}
+
+croak "Empty site." if ( $len < 1 );
+
+my @data = @{ $mapping->get_input_data };
+
+my $map_parser = Gwybodaeth::Parsers::N3->new();
+
+my $map_triples = $map_parser->parse(@data);
+
+unless ($map_triples) { croak 'Error while parsing map data'; }
+
+my $parser;
+my $writer;
+my $write_mod;
+my $parse_mod;
+if ( defined( $convert{$in_type} ) ) {
+    $write_mod = $convert{$in_type}->{'writer'};
+    $parse_mod = $convert{$in_type}->{'parser'};
+    eval {
+        ( my $wpkg = $write_mod ) =~ s!::!/!gx;
+        ( my $ppkg = $parse_mod ) =~ s!::!/!gx;
+        require "$wpkg.pm";                        ## no critic
+        require "$ppkg.pm";                        ## no critic
+        import $parse_mod;
+        import $write_mod;
+        1;
+    } or croak "Module loading failed: $!";
+    $parser = $parse_mod->new();
+    $writer = $write_mod->new();
+}
+else {
+    croak "$in_type is not defined in the config file";
+}
+my $parsed_data_ref = $parser->parse( @{ $input->get_input_data } );
+
+unless ($parsed_data_ref) { croak 'Error while parsing source data.'; }
+
+$writer->write_rdf( $map_triples, $parsed_data_ref );
+__END__
+
+=head1 SEE ALSO
+
+L<Gwybodaeth>
+
+=head1 AUTHORS
+
+Iestyn Pryce, <imp25@cam.ac.uk>
+
+=head1 ACKNOWLEDGEMENTS
+
+I'd like to thank the Ensemble project (www.ensemble.ac.uk) for funding me to
+work on this project in the summer of 2009.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 Iestyn Pryce <imp25@cam.ac.uk>
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the BSD license.

@@ -1,0 +1,33 @@
+bin/protoc-perl
+Changes
+lib/Google/ProtocolBuffers.pm
+lib/Google/ProtocolBuffers/Codec.pm
+lib/Google/ProtocolBuffers/CodecIV32.pm
+lib/Google/ProtocolBuffers/CodecIV64.pm
+lib/Google/ProtocolBuffers/CodeGen.pm
+lib/Google/ProtocolBuffers/Compiler.pm
+lib/Google/ProtocolBuffers/Constants.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/01-load.t
+t/02-compiler.t
+t/03-encoder.t
+t/04-decoder.t
+t/05-enums.t
+t/06-accessors.t
+t/07-extensions.t
+t/08-defaults.t
+t/09-codegen-a.t
+t/10-codegen-b.t
+t/11-broken.t
+t/12-unknown.t
+t/13-native64.t
+t/14-oneof.t
+t/bootstrap.pl
+t/extra/enumalias.proto
+t/google/protobuf/unittest.proto
+t/google/protobuf/unittest_import.proto
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

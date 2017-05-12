@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+# This software is Copyright (C) 2015 by Blaise Roth.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+# See <http://dev.perl.org/licenses/> for more information.
+
+use 5.012;
+use Games::2048;
+Games::2048->new->run;

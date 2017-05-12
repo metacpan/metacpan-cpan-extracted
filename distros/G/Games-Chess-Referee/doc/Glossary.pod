@@ -1,0 +1,596 @@
+=pod
+
+
+=head1 NAME
+
+Chess - Glossary
+
+
+=head1 SYNOPSIS
+
+A glossary of chess terms.
+
+
+=head1 DESCRIPTION
+
+
+=head1 GLOSSARY
+
+=over 4
+
+=item active
+
+A piece is active when it is able to participate in guards and attacks.
+
+=item algebraic notation
+
+A board location notation in which the ranks are numbered from 1 (white's home rank) to 8
+(black's home rank), and the files are lettered from `a' (queen's rook's file) to `h'
+(king's rook's file), and spaces are denoted by their file letter followed by their rank
+number.
+
+=item army
+
+Collectively, a player's chessmen.
+
+=item attack
+
+TODO
+
+=item back rank
+
+The rank containing the king's home space.
+
+=item backward
+
+Toward the player's back rank.
+
+See also: forward.
+
+=item battery
+
+Two or more pieces supporting each other on the same line.
+
+=item bishop
+
+A species of chessman. Due to the way it moves, it always remains on the same color space
+as its home.
+
+=item black
+
+One of the two colors of chess spaces, pieces, and players.
+
+See also: color, white.
+
+=item board
+
+The playing surface for the game. Comprised of an 8 by 8  square lattice of equal-sized
+square spaces. The rows are called ranks, and the columns are called files. The spaces
+are alternately black and white as one moves up a file, or across a rank. The space at
+the intersection of the first rank and the first file (conventionally, the lower-left
+space on the board) is black.
+
+=item capture
+
+When a piece is moved to a space occupied by an enemy chessman, the previous occupant is
+captured, and removed from play.
+
+=item castle
+
+A special move involving the king and one of the rooks. Also, an informal alternate name
+for a rook.
+
+See: castle long, castle short, rook.
+
+=item castle long
+
+Castling involving the king's rook.
+
+=item castle short
+
+Castling involving the queen's rook.
+
+=item castling on opposite wings
+
+When one player castles short and the other castles long.
+
+=item centerl
+
+The four central spaces, at the intersection of ranks 4 and 5 and files
+d and e.
+
+=item check
+
+A guard against the opposing king.
+
+See also: checkmate, double check, exposed check.
+
+=item checkmate
+
+Trapping the opposing king. The word `mate' comes from a word meaning `to kill'.
+
+See also: check, trap.
+
+=item chessclock
+
+The special clock used in timed chess games.
+
+=item chessman, chessmen
+
+The name given to the objects that are moved around on the board during a game of Chess.
+
+=item clock
+
+Short for chessclock.
+
+See: chessclock.
+
+=item color
+
+Refers not to the actual color of things, but to the fact that there are two distinct kinds
+of each, and these are given the names `black', and `white'.
+
+See also: black, white.
+
+=item combination
+
+A sequence of forced moves leading to advantage.
+
+=item correspondence chess
+
+Chess played by postal or electronic mail.
+
+=item demolition
+
+Destruction of the pawn structure protecting the hostile king's by way of a sacrifice.
+
+=item descriptive notation
+
+See: English Descriptive Notation.
+
+=item development
+
+Moves that activate chessmen.
+
+=item diagonal
+
+The conceptual equivalent to a rank or file, but rotated 45 degrees. As ranks and files are
+to rooks, diagonals are to bishops. The long diagonals are the two diagonals that connect
+opposite corners of the board.
+
+=item diagonal battery
+
+A battery on a diagonal involving the queen and a bishop.
+
+=item discovered check
+
+TODO
+
+=item double check
+
+The piece that moves ends up guarding the king, but its movement also exposes check by another
+piece as well.
+
+See also: check, exposed check.
+
+=item doubled pawns
+
+Two pawns of the same color on the same file.
+
+=item doubled rooks
+
+A battery of two rooks.
+
+=item draw
+
+See: stalemate
+
+=item I<en passant>
+
+French for `in passing'. A special pawn capture rule.
+
+=item I<en pris>
+
+French for `in take'. When a chessman is threatened.
+
+=item endgame
+
+TODO
+
+=item enemy
+
+See: opponent.
+
+=item English Descriptive Notation
+
+An older notation where the files are referred to by side of the board (queen's or king's) along with
+the type of piece on the home rank at the beginning of the game (rook, knight, bishop). The ranks
+are referred to by the names 1 to 8 as with algebraic notation, but the counting is relative to the
+home rank of the player. So, each space will have two names: one when referred to by black, and another
+when referred to by white.
+
+=item exchange
+
+TODO
+
+=item exposed check
+
+When check is achieved indirectly. Most commonly, the piece that moves ends up in a position
+such that it guards the enemy king. But, if instead, the piece that moves gets out of the way
+so that some other piece guards the king, check has been exposed.
+
+See also: check, double check.
+
+=item I<fianchetto>
+
+When a bishop moves from its home onto one of the long diagonals.
+
+=item flag
+
+The time forfeit indicator on the chessclock.
+
+=item forced mate
+
+A forcing sequence leading up to checkmate.
+
+=item forced move
+
+When there is only one legal move possible. For example, when the king is in check, and
+there is only one way to remedy it. Sometimes also used to refer to a weaker
+situation when there is only one ``good'' move. For example, when the Queen is threatened
+and there is only one way to neutralize the threat.
+
+=item forward
+
+Toward the enemy's back rank.
+
+See also: backward.
+
+=item four-move checkmate
+
+Another name for scholar's mate.
+
+=item gambit
+
+An opening involving a pawn sacrifice.
+
+=item Gruenfeld Defense
+
+TODO
+
+=item Gruenfeld Gambit
+
+A chessman sacrificed by Black in the Gruenfeld Defense.
+
+=item guard
+
+A piece guards an enemy piece when the enemy piece is in a space that could be reached by it in
+the next move, without regard for the possibility that the piece under consideration may in
+reality be pinned in its current location.
+
+Also, a piece can guard a friendly piece so that if the guarded piece is captured, the
+guarding piece can capture back.
+
+See also: pin, threat.
+
+=item half-open line
+
+A line with no friendly pawn that does have an enemy pawn.
+
+=item handicap
+
+TODO.
+
+=item home
+
+The initial space of a piece.
+
+=item invasion square
+
+TODO
+
+=item isolated pawn
+
+A pawn which does not have any neighboring friendly pawns.
+
+=item king
+
+A species of chessman. The only one that may not be captured (because if it is not permitted
+to even be guarded, much less threatened, and as soon as it is not possible to remove such
+a guard or threat--called checkmate--the game is over).
+
+=item kingside
+
+On the half of the board containing the king's home. Files `e' to `h'.
+
+See also: queenside.
+
+=item knight
+
+A species of chessman. The only one that can jump over other pieces.
+
+=item Legall's Mate
+
+A pattern that arises when one side sacrifices the Queen to checkmate with one bishop and
+two knights.
+
+=item line
+
+A rank, file, or diagonal.
+
+=item line segment
+
+A contiguous portion of a line. Maximally, an entire line; minimally a single space.
+
+=item I<luft>
+
+A square left open in front of the king to prevent checkmate on the home
+rank.
+
+=item major pieces
+
+Queens and rooks.
+
+=item man
+
+Short for chessman.
+
+=item mate
+
+From the Persion I<mat> (death).
+
+See: checkmate.
+
+=item material
+
+Another name for chessmen.
+
+=item mating attack
+
+An attack that could leat to checkmate.
+
+=item middlegame
+
+TODO
+
+=item minor pieces
+
+Knights and bishops.
+
+=item move
+
+A white ply followed by a black ply. Sometimes used to refer to a ply itself, when the ply
+is an occupation rather than a capture.
+
+See also: ply, occupy.
+
+=item neutralize
+
+A guard or threat can be neutralized by one of three direct methods: (i) capture the
+offending enemy piece; (ii) interpose another piece; or (iii) move the piece away to
+a safe location. An indirect method is to create a greater threat for the opponent.
+
+=item obstruction
+
+TODO
+
+=item occupy
+
+When a ply results in a chessman ending up in a space that did not already contain an enemy
+chessman, the piece occupies the space.
+
+See also: capture.
+
+=item open file
+
+A file containing no pawns of either color.
+
+=item open line
+
+A line containing no pawns of either color.
+
+=item open rank
+
+A rank containing no pawns of either color.
+
+=item opening
+
+The first moves in the game, where the focus is usually on the development of the
+pieces.
+
+=item opponent
+
+White is the opponent of black and I<vice-versa>.
+
+=item passed pawn
+
+A pawn for which its file is free of enemy pawns and the two neighboring files are free of 
+enemy pawns forward of its rank. No longer can it be blocked or captured by enemy pawns
+(unless another capture brings an enemy pawn onto one of these ranks).
+
+=item pawn
+
+A species of chessman. The pawn is the only chessman that moves and captures in distinct
+ways.
+
+=item pawn duo
+
+Two friendly pawns in the same rank and neighboring files.
+
+=item perpetual check
+
+TODO
+
+=item piece
+
+A chessman that is not a pawn. Sometimes, the word `piece' is used in place of `chessman'.
+Usually context makes it clear which is meant.
+
+=item pin
+
+A chessman is pinned when it is not legal for it to move from its current location. Usually
+this is caused by an enemy piece being placed such that moving the chessman would expose the
+king to a guard by the enemy.
+
+Also used to refer to a weaker case when it is not desirable to lose the more valuable
+piece behind it.
+
+=item play
+
+See ply.
+
+=item ply
+
+One play in a Chess game.
+
+=item promotion
+
+When a pawn reaches the back rank of the opponent, it is promoted to any other piece than
+a pawn or king.
+
+=item queen
+
+A species of chessman.
+
+=item queenside
+
+On the half of the board containing the queen's home. Files `a' to `d'.
+
+See also: kingside.
+
+=item rook
+
+A species of chessman. Can participate in castling with the king.
+
+=item sacrifice
+
+A purposeful loss of a chessman in the interest of gaining some other advantage.
+
+=item safe
+
+A square which is not guarded by the enemy.
+
+=item scholar's mate
+
+Mate in four moves using the queen and bishop. Also called scholar's mate and four-move checkmate.
+One way it could be played is:
+
+    1. e4     e5
+    2. Bc4    h6?
+    3. Qh5    a5??  Could also be 3. Qf3  ...
+    4. Qxf7#
+
+The particular moves of black are not important, just that they don't interfere with white's line
+of play.
+
+=item shepherd's mate
+
+Another name for scholar's mate.
+
+=item Sicilian Defence
+
+An asymetrical answer to White's C<1. e4>. First played in Palermo in the
+1500's.
+
+=item space
+
+A board location that may be empty or contain a single chessman.
+
+=item square
+
+See space.
+
+=item stalemate
+
+When the player to move has no legal move, but is not in check, it is stalemate.
+
+TODO: Other ways: repetition, etc.
+
+=item starting rank
+
+See: home rank
+
+=item tempo
+
+TODO
+
+=item tie
+
+See: stalemate
+
+=item time control
+
+TODO: traditional, sudden-death
+
+=item tournament
+
+TODO
+
+=item trap
+
+A piece is trapped when it is threatened and the threat cannot be neutralized. Also, a series of
+moves by one player leading to an unfavorable position for the opponent.
+
+See also: neutralize.
+
+=item turn
+
+See move.
+
+=item unblocked lines
+
+A line segment containing no chessmen.
+
+
+=item unit
+
+Another name for a chessman.
+
+=item variation
+
+TODO
+
+=item white
+
+One of the two colors of chess spaces, pieces, and players.
+
+See also: color, black.
+
+=item win an exchange
+
+When an enemy rook is captured at the loss of a knight or a bishop.
+
+=item I<zeitnot>
+
+German term for a situation in which a player has little time to consider his plies
+due to time control.
+
+=item I<zugzwang>
+
+From the German `compulsion to move'. A player foregoes immediate capture of compensating
+material for that just lost, and instead creates a larger threat the enemy must respond
+to, eventually achieving material (and perhaps positional) compensation.
+
+Also, when every possible move worsens one's position.
+
+=item I<zwischenzug>
+
+German for an in-between move.
+
+=back
+
+
+=head1 AUTHOR
+
+Gregor N. Purdy (C<gregor@focusresearch.com>).
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 1999-2006 Gregor N. Purdy. All rights reserved.
+
+This program is free software. You may redistribute and/or
+modify it under the same terms as Perl iteself.
+
+=cut
+

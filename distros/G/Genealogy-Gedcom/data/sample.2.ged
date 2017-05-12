@@ -1,0 +1,47 @@
+0 HEAD
+1   SOUR Genealogy::Gedcom
+2     NAME Genealogy::Gedcom::Reader
+2     VERS V 1.00
+2     CORP Ron Savage
+3       ADDR Box 3055
+4         STAE Vic
+4         POST 3163
+4         CTRY Australia
+3       EMAIL ron@savage.net.au
+3       WWW http://savage.net.au
+2     DATA Sample
+3       COPR Copyright 2011, Ron Savage
+1   NOTE
+2     CONT This file is based on test data in Paul Johnson's Gedcom.pm
+2     CONT Gedcom.pm is Copyright 1999-2009, Paul Johnson (paul@pjcj.net)
+2     CONT Version 1.16 - 24th April 2009
+2     CONT
+2     CONT Ron's modules under the Genealogy::Gedcom namespace are free
+2     CONT
+2     CONT The latest versions of these modules are available from
+2     CONT my homepage http://savage.net.au and http://metacpan.org
+1   GEDC
+2     VERS 5.5.1-5
+2     FORM LINEAGE-LINKED
+1   DATE 10 Aug 2011
+1   CHAR ANSEL
+1   SUBM @SUBM1@
+
+0 @SUBM1@ SUBM
+1   NAME A Submitter
+1   NOTE Nota bene
+2     ADDR Box 3055
+3       CONT C.11
+3       ADR1 A.11
+3       ADR2 A.21
+3       ADR3 A.31
+3       CITY Murrumbeena
+3       STAE Vic
+3       POST 3163
+3       CTRY Australia
+2     PHON P.11
+2     EMAIL ron@savage.net.au
+2     FAX F.11
+2     WWW http://savage.net.au
+
+0 TRLR

@@ -1,0 +1,10 @@
+
+Coordinate systems - do this by getting a new window:
+
+	$win2 = $win->rotated_window(30); # degrees?
+
+and then the new window has all the normal primitives.
+
+More devices - e.g. libplot 
+
+Do arrows using native ones in e.g. GnomeCanvas

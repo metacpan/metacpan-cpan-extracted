@@ -1,0 +1,168 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use URI::Escape;
+use AnyEvent::WebSocket::Client;
+use Getopt::Long::Descriptive;
+use Golger;
+
+my $default_config_file;
+if (defined $ENV{LOGGMANN_CONFIG_FILE}) {
+	$default_config_file = $ENV{LOGGMANN_CONFIG_FILE};
+} else {
+	for my $f (glob('~/.loggmann.conf'), '/etc/loggmann.conf') {
+		if (-f $f) {
+			$default_config_file = $f;
+			last
+		}
+	}
+}
+
+my ($opt, $usage) = describe_options(
+	"%c %o [host] [service]",
+	[ 'server|s=s', 'Riemann server to subscribe to' ],
+	[ 'query|q=s', 'Riemann Query (see https://github.com/aphyr/riemann/blob/master/test/riemann/query_test.clj)' ],
+	[ 'host|H=s', 'Host to query (will be ANDed to query)' ],
+	[ 'service|S=s', 'Service to query (will be ANDed to query)' ],
+	[ 'help|h', 'Print help' ],
+	[ 'debug|d', 'Toggle debugging' ],
+	[ 'configfile|c=s', 'Path to configfile', { default => $default_config_file } ],
+	[ 'format|f=s', 'logformat. Defaults to "time host service description"' ],
+	[ 'rawformat|r', 'log raw json data. supersedes --format', { default => 0 } ],
+);
+
+if ($opt -> help) {
+	print $usage -> text;
+	exit 0;
+}
+
+my @query;
+
+if (defined $opt->configfile) {
+	if (-f $opt->configfile) {
+		require Config::Any;
+		my $cfgfile = Config::Any -> load_files (
+			{
+				files => [$opt->configfile],
+				use_ext => 1,
+				filter  => \&merge_config,
+				flatten_to_hash => 1,
+			}
+		);
+		}
+}
+
+my $server;
+sub merge_config {
+	while (my ($k, $v) = each %$_) {
+		if ($k eq "server") {
+			warn "setting `$k=$v` from configfile `".$opt->configfile."`\n" if $opt -> debug;
+			$server = $v;
+		} else {
+			warn "ignored key `$k` from configfile `".$opt->configfile."`\n";
+		}
+	}
+}
+if (defined $opt->server) {
+	$server = $opt->server
+}
+
+if (defined $opt->host) {
+	push @query, 'host = "'.$opt->host.'"';
+}
+if (defined $opt->service) {
+	push @query, 'service = "'.$opt->service.'"';
+}
+if (defined $opt->query) {
+	push @query, $opt->query;
+}
+
+# treat ARGV as (<host>, [service])
+my $na = scalar @ARGV;
+if ($na > 2) {
+	warn "error in arg list";
+	exit 2;
+}
+if ($na > 0) {
+	push @query, 'host = "'.$ARGV[0].'"';
+}
+if ($na == 2) {
+	push @query, 'service = "'.$ARGV[1].'"';
+}
+
+if (scalar @query == 0) {
+	warn "empty query\n";
+	print $usage -> text;
+	exit 3;
+}
+
+my $query = uri_escape(join " and ", @query);
+
+my $connect_info = 'ws://'.$server."/index?subscribe=true&query=${query}";
+warn "Opening `$connect_info`\n" if  $opt->debug;
+
+if ($opt->rawformat) {
+	Golger::connect ($connect_info, sub { print $_[0], "\n" })
+} else {
+	if ($opt->format) {
+		my @format = split (/\s+/, $opt->format) or die "format specification error";
+		Golger::connect ($connect_info, \@format);
+	} else {
+		Golger::connect ($connect_info);
+	}
+}
+
+=head1 NAME
+
+loggmann - riemann log cat from the shell
+
+=head1 DESCRIPTION
+
+This cli tool will subscribe to a riemann websocket and dump events to the console.
+
+=head1 SYNOPSIS
+
+Dump sshd logs from node01:
+
+    loggmann node01 sshd
+
+Dump all events from node01:
+
+    loggmann node01
+
+Full query:
+
+    loggmann -q 'host = "node01" and tagged "syslog"'
+
+Explicit server:
+
+    loggmann -s myriemann:5556 -q 'state != "ok"'
+
+Using server defined in configfile:
+
+    loggmann -c /etc/loggmann.conf ...
+
+Again but using environment variable in b*sh:
+
+    LOGGMANN_CONFIG_FILE=/etc/loggmann.yaml loggmann node01
+
+Using explicit host/service lookup:
+
+    loggmann -H node02 -S httpd
+
+Change default logging format:
+
+    loggmann node03 -f "time host service metric"
+
+Output raw (json):
+
+    loggmann node04 -r
+
+Help:
+
+    loggmann -h
+
+=cut
+

@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Gtk2-WebKit-Mechanize
+version:             0.01
+abstract:            Mechanize like module using WebKit browser
+license:             ~
+author:              
+    - Boris Sukholitko (boriss@gmail.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Gtk2::WebKit:                  
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

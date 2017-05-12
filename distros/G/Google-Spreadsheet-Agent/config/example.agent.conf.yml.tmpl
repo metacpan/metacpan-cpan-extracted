@@ -1,0 +1,36 @@
+---
+# this is where you should store your google userid and password
+# this file should be protected from snooping by others on the network
+# and you should probably create a special google account just for these
+# agents to work with.  The user should have the ability to read
+# spreadsheets and send gmail.
+guser: your_google_userid
+gpass: your_google_password
+
+# this is the name of the google spreadsheet that will be used
+# as the control panel for the agents.  See ../README.txt for details.
+spreadsheet_name: name
+
+# when agents are run without debug mode, the STDOUT and STDERR
+# of each agent is trapped and emailed instead of writing to
+# the actual output.  This is actually emailed using the gmail
+# account of the guser, so no mail support is needed on the host
+# machines.
+reply_email: address_from_whence_error_messages_come@somewhere.domain
+send_to: address_to_send_errors@somewhere.domain
+
+# Each agent will need to find a single entry on the spreadsheet.
+# They will do this by specifying one or more fields in the
+# spreadsheet which will be used to query for entries, and then
+# requiring that specific values be bound to these fields in
+# the instance of the agent.  There should be at least one
+# required key_field, but there can be optional key_fields
+# as well.  Each instance of an agent must bind a specific value
+# to each required query_field. See IGSP::GoogleAgent pod for details.
+key_fields:
+  foo:
+    required: 1
+  bar:
+    required: 1
+  baz:
+    required: 0

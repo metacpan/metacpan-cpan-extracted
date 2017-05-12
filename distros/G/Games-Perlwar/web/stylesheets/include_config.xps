@@ -1,0 +1,4 @@
+<perlwar>
+<!--#include file="configuration.xml" -->
+<%= apply_templates %>
+</perlwar>

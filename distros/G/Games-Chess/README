@@ -1,0 +1,38 @@
+NAME
+    Games::Chess - represent chess positions and games
+
+SYNOPSIS
+        use Games::Chess qw(:constants);
+        my $p = Games::Chess::Position->new;
+        $p->at(0,0,BLACK,ROOK);
+        $p->at(7,7,WHITE,ROOK);
+        print $p->to_text;
+
+DESCRIPTION
+    The `Games::Chess' package provides the class
+    `Games::Chess::Piece' to represent chess pieces, and the class
+    `Games::Chess::Position' to represent a position in a chess
+    game. Objects can be instantiated from data in standard formats
+    and exported to these formats.
+
+EXAMPLE
+    To create a GIF of the opening position:
+
+        use Games::Chess;
+	my $p = Games::Chess::Position->new;
+	open(GIF,">chess.gif") or die $!;
+	print GIF $p->to_GIF;
+	close(GIF);
+
+PREREQUISITES
+    Perl 5.004 or later.
+
+    To create GIFs of chess positions, you need Lincoln Stein's "GD", a
+    Perl interface to Tom Boutell's libgd graphics library.
+
+INSTALLATION
+    perl Makefile.PL && make && make test && make install
+
+AUTHOR
+    Gareth Rees `<garethr@cre.canon.co.uk>'.
+

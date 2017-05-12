@@ -1,0 +1,146 @@
+#!perl -w
+
+# Copyright 2011 Kevin Ryde
+
+# This file is part of Gtk2-Ex-Splash.
+#
+# Gtk2-Ex-Splash is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Gtk2-Ex-Splash is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Gtk2-Ex-Splash.  If not, see <http://www.gnu.org/licenses/>.
+
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long;
+use Glib 1.220; # for SOURCE_REMOVE
+use Gtk2;
+use Gtk2::Ex::Splash;
+
+our $VERSION = 52;
+
+# uncomment this to run the ### lines
+#use Smart::Comments;
+
+
+my $option_time = .75; # seconds
+GetOptions('time=f' => \$option_time,
+           'version' => sub {
+             print "gtk2-ex-splash version $main::VERSION\n";
+             exit 0;
+           },
+           'help|?' => sub {
+             print "gtk2-ex-splash [--options] filename\n";
+             print "   --time=SECONDS      how long to show the splash\n";
+             print "   --display=DPY       X display to use\n";
+             print "   --help              print this help\n";
+             print "   --version           print program version number\n";
+             exit 0;
+           }) or exit 1;
+
+if (! @ARGV) {
+  print STDERR "No filename to splash";
+  exit 1;
+}
+my $filename = $ARGV[0];
+
+Gtk2->init;
+my $splash = Gtk2::Ex::Splash->new (filename => $filename);
+$splash->present;
+Glib::Timeout->add (int($option_time*1000), # in milliseconds
+                    sub {
+                      Gtk2->main_quit;
+                      return Glib::SOURCE_REMOVE();
+                    });
+Gtk2->main;
+exit 0;
+
+__END__
+
+=for stopwords Ryde
+
+=head1 NAME
+
+gtk2-ex-splash -- display a splash window
+
+=head1 SYNOPSIS
+
+ gtk2-ex-splash [--options] filename
+
+=head1 DESCRIPTION
+
+C<gtk2-ex-splash> displays an image file in a splash window.  The window is
+not interactive, and doesn't take the keyboard focus away.
+
+    gtk2-ex-splash /my/pictures/something.png
+
+=head1 OPTIONS
+
+The command line options are
+
+=over 4
+
+=item --time=SECONDS
+
+The time to show the splash.  The default is 0.75 second.
+
+=item --display=DPY
+
+Usual Gtk2 option to set the X display to use.  The default is the
+C<DISPLAY> environment variable.
+
+=item --help
+
+Print some brief help information.
+
+=item --version
+
+Print the program version number and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item C<DISPLAY>
+
+The X display to use.
+
+=back
+
+=head1 SEE ALSO
+
+L<Gtk2::Ex::Splash>
+
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/gtk2-ex-splash/index.html>
+
+=head1 LICENSE
+
+Copyright 2011 Kevin Ryde
+
+Gtk2-Ex-Splash is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+Gtk2-Ex-Splash is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+Gtk2-Ex-Splash.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

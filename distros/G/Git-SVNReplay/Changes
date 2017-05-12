@@ -1,0 +1,31 @@
+1.0214: Fri Oct 02 2009
+   - the -q option was borked, fixed
+
+1.0213: Mon Jul 20 2009
+   - I made the makefile smarter about svn permissions to avoid
+     test problems
+
+1.0211: Sun May  3 17:22:29 EDT 2009
+   - fixed a bunch of bad assumptions in the tests.
+
+1.0210: Mon Apr 27 21:46:06 EDT 2009
+   - fixed vile bugs in the .pm -- they were obviated by changes to T::GF
+
+1.0200: Sat Apr 25 21:34:30 EDT 2009
+   - if no arguments and no dir to cd into, just show the help
+   - replaced all croaks (misleading/meaningless) with meaninful and not
+     misleading edie
+   - fixed a git-repo-assumption, namely, relative path git repos won't be
+     where you'd think once you cd into the svn.co
+   - fixed a bad format bug
+
+
+1.0001: Fri Apr 24 07:31:16 EDT 2009
+   - converting the script to a module (mostly)
+
+1.0: Thu Apr 23 15:46:27 EDT 2009
+   - I had released this before, but it was crap.
+   - There are too many chagnes to list here, see github:
+     http://github.com/jettero/git-svn-replay/ (Also, please ignore previous
+     versions.)
+     

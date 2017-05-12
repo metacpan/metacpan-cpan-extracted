@@ -1,0 +1,73 @@
+=pod
+
+=head1 NAME
+
+Graph-Dependency - Generate dependency graphs for a Perl package.
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+
+=head1 REQUIRES
+
+You need the following:
+
+	Perl			(well, duh!)
+	wget			(to acceess search.cpan.org)
+	Module::CoreList
+	Graph::Easy		(for the graphs)
+	graphviz		(for png output)
+
+=head1 USAGES
+
+	./graph	YAML
+	./graph Graph::Easy html
+	./graph Graph::Easy png svg html
+
+The output will be written to C<out/Foo-Bar/>. The META.yml
+file for each module will be written to C<tmp/>.
+
+=head1 BUGS
+
+=over 10
+
+=item *
+
+The META.yml files are cached, but there is no mechanism to invalidate
+or re-validate them. If you want to refresh the data, delete everything
+in C<tmp/>.
+
+=item *
+
+Modules without a META.yml file will not generate dependencies. Parsing
+of Makefile.PL is not implemented yet.
+
+=item *
+
+Modules that are in the core of I<any> Perl version are marked as "in-core".
+If you have an older Perl, you might still need to install that module
+first to satisfy the dependencies.
+
+=item *
+
+Getting the author name from the package requires a needless trip to
+L<http://search.cpan.org> and might even fail. It would be cool
+(I<*wink*> I<*nudge*>) if search.cpan.org could redirect to the proper
+file when given:
+
+	http://search.cpan.org/src/FOO-BAR/META.yml
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Tels at bloodgate.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL version 2.
+
+

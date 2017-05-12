@@ -1,0 +1,154 @@
+{
+	'type': 'class',
+	'class_name' : 'Gentoo::Perl::Distmap',
+	'attributes' : [
+		{ 
+			'type' : 'instance_attribute',
+			'name' : 'map',
+			'access' : 'rw',
+			'constructor_flag' : 'map',
+			'provides_methods' : [
+				{
+					'type' : 'proxy_method',
+					'name' : 'multi_repository_dists',
+					'as' : 'multi_repository_dists',
+				},
+				{
+					'type' : 'proxy_method',
+					'name' : 'all_mapped_dists',
+					'as' : 'all_mapped_dists',
+				},
+				{
+					'type' : 'proxy_method',
+					'name' : 'mapped_dists',
+					'as' : 'mapped_dists',
+				},
+				{
+					'type' : 'proxy_method',
+					'name' : 'dists_in_repository',
+					'as' : 'dists_in_repository',
+				},
+				{
+					'type' : 'attribute_accessor',
+					'as'   : 'map',
+				}
+			]
+		}
+	],
+	'methods' : [
+		{
+			'type' : 'class_method',
+			'name' : 'load',
+			'signature' : {
+				'type' : 'positional_multi_dispatch',
+				'signatures' :
+				[ 
+					[ 
+						'file' ,
+						{ 'type' : 'filepath' }
+					],
+					[
+						'filehandle',
+						{ 'type' : 'filehandle' },
+					],
+					[
+						'string',
+						{ 'type' : 'string' },
+					]
+				] 
+			},
+		},
+		{
+			'type' : 'instance_method',
+			'name' : 'save',
+			'signature' : { 
+				'type' : 'positional_multi_dispatch',
+				'signatures' : 
+				[
+					[ 'file', { 'type' : 'filepath' } ],
+					[ 'filehandle' , { 'type' : 'filehandle'}],
+					{ 'parameters' : [ 'string' ], 'return' : { 'type' : 'string' } },
+
+				]
+			},
+		},
+		{
+			'type' : 'instance_method',
+			'name' : '_save_string',
+			'intent' : 'private',
+			'signature' : {
+				'type' : 'positional',
+				'parameters' : [ { 'type' : 'string' } ],
+				'return' : [ { 'type' : 'string' } ],
+			},
+		},
+		{
+			'type' : 'instance_method',
+			'name' : '_save_filehandle',
+			'intent' : 'private',
+			'signature' : {
+				'type' : 'positional',
+				'parameters' : [ { 'type' : 'string' }, { 'type' : 'filehandle' } ],
+				'return' : [ { 'type' : 'boolean' } ],
+			},
+		},
+		{
+			'type' : 'instance_method',
+			'name' : '_save_file',
+			'intent' : 'private',
+			'signature' : {
+				'type' : 'positional',
+				'parameters' : [ { 'type' : 'string' } , { 'type' : 'filepath' } ],
+				'return' : [ { 'type' : 'boolean' } ],
+			},
+		},
+		{
+			'type' : 'class_method',
+			'name' : '_load_file',
+			'intent' : 'private',
+			'signature' : {
+				'type' : 'positional',
+				'parameters' : [ { 'type' : '?' }, { 'type' : 'filepath' } ],
+				'return' : [ { 'type' : 'string' } ],
+			},
+		},
+		{
+			'type' : 'class_method',
+			'name' : '_load_filehandle',
+			'intent' : 'private',
+			'signature' : {
+				'type' : 'positional',
+				'parameters' : [ { 'type' : '?' }, { 'type' : 'filehandle' } ],
+				'return' : [ { 'type' : 'string' } ],
+			},
+		},
+		{
+			'type' : 'class_method',
+			'name' : '_load_string',
+			'intent' : 'private',
+			'signature' : {
+				'type' : 'positional',
+				'parameters' : [ { 'type' : '?' }, { 'type' : 'string' } ],
+				'return' : [ { 'type' : 'string' } ],
+			},
+		},
+		{
+			'type' : 'class_method',
+			'name' : 'decoder',
+			'signature' : {
+				'type' : 'positional',
+				'parameters' : [ ],
+				'return' : [ { 'type' : [ 'Object', 'JSON' ] } ],
+			},
+		},
+		{
+			'type' : 'class_method',
+			'name' : 'encoder',
+			'signature' : {
+				'type' : 'positional',
+				'parameters' : [ ],
+				'return' : [ { 'type' : [ 'Object', 'JSON' ] } ],
+			},
+		},
+	]
+}

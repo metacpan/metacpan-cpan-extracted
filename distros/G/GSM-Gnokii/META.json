@@ -1,0 +1,69 @@
+{
+   "name" : "GSM-Gnokii",
+   "generated_by" : "Author",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "prereqs" : {
+      "test" : {
+         "requires" : {
+            "Test::NoWarnings" : "0",
+            "Test::Harness" : "0",
+            "Test::More" : "0.88"
+            },
+         "recommends" : {
+            "Test::More" : "0.98"
+            }
+         },
+      "runtime" : {
+         "recommends" : {
+            "Data::Peek" : "0.39",
+            "perl" : "5.016003"
+            },
+         "requires" : {
+            "JSON" : "0",
+            "DynaLoader" : "0",
+            "Data::Peek" : "0.32",
+            "perl" : "5.008004",
+            "Carp" : "0"
+            }
+         },
+      "build" : {
+         "requires" : {
+            "Config" : "0"
+            }
+         },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+            }
+         }
+      },
+   "version" : "0.09",
+   "provides" : {
+      "GSM::Gnokii" : {
+         "version" : "0.09",
+         "file" : "lib/GSM/Gnokii.pm"
+         }
+      },
+   "abstract" : "Perl API to libgnokii",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+      },
+   "license" : [
+      "perl_5"
+      ],
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "repository" : {
+         "url" : "http://repo.or.cz/r/GSM-Gnokii.git",
+         "web" : "http://repo.or.cz/w/GSM-Gnokii.git",
+         "type" : "git"
+         }
+      },
+   "dynamic_config" : 1
+   }

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    
+    <title>[% view.title %]</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <!-- include a style sheet if you like:
+		<link rel="stylesheet" type="text/css" media="screen"
+			title="Default" href="[% self.doc_rootp %]/css/default.css" />
+    -->
+    
+    [% html_headers %] 
+
+    <style type='text/css'>
+    input { border: 1px solid #777; background: dce2da;}
+    a { color: #333;}
+    a:active { color: #ddd;}
+    a:hover { color: blue;}
+    #user_content { width: 150px; margin: 0 0 10px 0;}
+    #products { width: 150px; margin: 0 0 10px 0;}
+    #product_attribs { width: 150px; margin: 0 0 10px 0;}
+    #users { width: 150px; margin: 0 0 10px 0;}
+    #user_content ul { list-style: none; margin: 0; padding: 0;}
+    #products ul { list-style: none; margin: 0; padding: 0;}
+    #product_attribs ul { list-style: none; margin: 0; padding: 0;}
+    #login_errors ul { padding: 0 0 0 0; }
+    #login_errors { white-space: nowrap; }
+    #users ul { list-style: none; margin: 0; padding: 0;}
+    #site_links { visibility: hidden;}
+    #footer #site_links { visibility: visible;}
+    fieldset { background: #e9e9e9; border: 1px solid #c7c7c7;}
+    legend { padding: 0 10px 0 10px; border: 1px solid #c7c7c7; background: #fff;}
+    #content .box table { padding: 0; margin: 0; background: #eee; width: 100%;}
+    #content .box table td { padding: 0 4px 0 4px; margin: 0; border: 0;}
+    #content .box table tr { background: #b9c5b4;}
+    #content .box table tr + tr { background: #fff;}
+    #content table .rhdr { text-align: right }
+    #content table .rdta { text-align: right }
+    #content table .rshd { text-align: right }
+    #footer { font: normal 12px/20px sans-serif; text-align: center; padding: 10px; margin: 0px auto ; width: 740px;}
+    #float_right { float: right;}
+    #float_left { float: left;}
+    #right { text-align: right;}
+    body { margin: 0; background: #eee; font-family: sans-serif; font-size: 100%;}
+    #header { text-align: right; width: 95%; padding: 0px 0px 0px 0px;}
+    #page { background: #fff; width: 95%; margin: 0 auto; padding: 0px 0px 0px 0px; border: 1px solid #c7c7c7; border-top: 0;}
+    #content { background: #fff; margin: 0px 0px 0px 0px; padding: 10px 10px 10px 10px; font: normal 12px/20px sans-serif; /* border-right: 1px dotted #99d; */}
+    #title_bar { clear: both; border: 1px solid #c7c7c7; background: #b9c5b4; width: 95%; text-align: center; padding: 3px 0 0 0; margin: 0 auto 0 auto; -moz-border-radius-topright: 6px;}
+    #nav { background: #eee; margin: 0px auto 0px auto; padding: 0px; width: 95%;}
+    #nav ul { background: #fff; list-style: none; border: 0; margin: 0 0 0 0 ; padding: 0;}
+    #nav ul li { display: block; float: left; text-align: center; padding: 0; margin: 0; border-left: 1px solid #99d;}
+    #nav ul li + li { border-left: none; display: block; float: left; text-align: center; padding: 0; margin: 0;}
+    #nav ul li a { background: #fff; border-bottom: 1px solid #99d; border-right: 1px solid #99d; border-left: none; padding: 0 8px 0 8px; margin: 0 0 0px 0; color: #9a9a9a; text-decoration: none; display: block; text-align: center; font: normal 12px/20px sans-serif;}
+    #nav ul li a:hover { color: #000; background: #bbe;}
+    #nav a:active { background: #c60; color: #fff;}
+    #nav li strong a { background: #bbf; font-weight: bold; color: #000;}
+    .lowtech { visibility: hidden;}
+    </style>
+
+    </head>
+    
+    <body>
+	
+    <div id="header">
+        <span style="font-size: 10pt;">
+            [% self.fish_config('app_name') %]
+            [% self.app_version %]
+        </span><br />
+
+        <a href="/">Gantry</a><br />
+        <span style="font-size: 10pt;">
+            [% self.gantry_version %]
+        </span>
+	</div>
+    	
+	<!-- START: title bar -->
+	<div id="title_bar">
+        [% title %]
+	</div>
+	<!-- END: title bar -->
+	
+	<!-- START: page -->
+	<div id="page">
+	
+		<!-- START: content -->
+		<div id="content">
+	
+			[% content %]
+			
+			<br class="clear" />
+		</div>
+		<!-- END: content -->
+	
+	</div>
+	<!-- END: page -->
+
+	<!-- START: footer -->
+	<div id="footer">
+		[% USE Date %]
+		<p>Page generated on [% Date.format(Date.now, "%A, %B %d, %Y at %l:%M %p") %]
+		[% IF r.user; "for $r.user"; END; %]
+		<br />
+		</p>
+	</div>
+	<!-- END: footer -->
+	
+    </body>
+</html>

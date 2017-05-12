@@ -1,0 +1,90 @@
+#!/usr/bin/perl -w
+use strict;
+use Gnome2::VFS;
+
+use Test::More;
+use Data::Dumper;
+
+# $Id$
+
+unless (-d "$ENV{ HOME }/.gnome") {
+  plan(skip_all => "You have no ~/.gnome");
+}
+
+unless (Gnome2::VFS -> CHECK_VERSION(2, 8, 0)) {
+  plan(skip_all => "This is new in 2.8");
+}
+
+plan(tests => 16);
+
+Gnome2::VFS -> init();
+
+###############################################################################
+
+my $browse_callback = sub {
+  print Dumper \@_;
+};
+
+my $resolve_callback = sub {
+  print Dumper \@_;
+};
+
+###############################################################################
+
+my ($result, $handle, @services, @domains, $host, $port, $text, $text_raw);
+
+($result, $handle) = Gnome2::VFS::DNSSD -> browse("dns-sd.org",
+                                                  "_http._tcp",
+                                                  $browse_callback);
+
+is($result, "ok");
+isa_ok($handle, "Gnome2::VFS::DNSSD::Browse::Handle");
+is($handle -> stop(), "ok");
+
+($result, $handle) = Gnome2::VFS::DNSSD -> resolve("http",
+                                                   "_http._tcp",
+                                                   "dns-sd.org",
+                                                   1000,
+                                                   $resolve_callback);
+
+is($result, "ok");
+isa_ok($handle, "Gnome2::VFS::DNSSD::Resolve::Handle");
+is($handle -> cancel(), "ok");
+
+($result, @services) = Gnome2::VFS::DNSSD -> browse_sync("dns-sd.org",
+                                                         "_http._tcp",
+                                                         1000);
+
+is($result, "error-generic");
+is(@services, 0);
+
+($result,
+ $host,
+ $port,
+ $text,
+ $text_raw) = Gnome2::VFS::DNSSD -> resolve_sync("http",
+                                                 "_http._tcp",
+                                                 "dns-sd.org",
+                                                 1000);
+
+is($result, "error-generic");
+ok(not defined $host);
+is($port, 0);
+isa_ok($text, "HASH");
+ok(not defined $text_raw);
+
+($result, @domains) = Gnome2::VFS::DNSSD -> list_browse_domains_sync("dns-sd.org",
+                                                                     1000);
+
+is($result, "error-generic");
+is(@domains, 0);
+
+is_deeply([Gnome2::VFS -> get_default_browse_domains()], ["dns-sd.org"]);
+
+###############################################################################
+
+# use Gtk2 -init;
+# Glib::Timeout -> add(1000, sub { Gtk2 -> main_quit(); 0; });
+# Gtk2 -> main();
+
+Gnome2::VFS -> shutdown();

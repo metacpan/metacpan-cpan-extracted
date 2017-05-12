@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Gtk2/Unique.pm
+maps
+unique-perl.h
+xs/UniqueApp.xs
+xs/UniqueBackend.xs
+xs/UniqueMessageData.xs
+xs/Unique.xs
+t/Unique.t
+t/UniqueApp.t
+t/UniqueBackend.t
+t/unit-tests.pl
+examples/sample.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,29 @@
+---
+abstract: 'Calculate geographic distances.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Simple: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GIS-Distance
+recommends:
+  GIS::Distance::Fast: '0.04'
+  Geo::Ellipsoid: '0.902'
+requires:
+  Class::Measure: '0'
+  Math::Complex: '0'
+  Moo: '1.006000'
+  Type::Tiny: '1'
+  namespace::clean: '0'
+  strictures: '1'
+resources:
+  bugtracker: https://github.com/bluefeet/GIS-Distance/issues
+  repository: git://github.com/bluefeet/GIS-Distance.git
+version: '0.09'

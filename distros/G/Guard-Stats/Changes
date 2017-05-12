@@ -1,0 +1,23 @@
+Revision history for Guard-Stats
+
+0.03	Sat Jul 13 2013
+	* API renamed finished() -> done()
+	* DOC more documentation
+	* TST add custom guard class spec and test script
+
+0.0205	Thu Jul 11 2013
+	* Renamed project Guard::Stat => Guard::Stats to avoid misleading stat()
+
+0.0204	Fri Jul 5 2013
+	* Major rewrite, time_stat now available extra module, methods renamed
+
+0.0102	Sun Feb 17 2013
+	* Improved docs
+	* Improved performance
+
+0.01	Sat Jan 26 2013
+	Initial version open-sourced. Features:
+	* guard(), get_stat() - main functionality
+	* get_times() - guard lifetime statistics
+	* on_level() - set up callback for load change
+

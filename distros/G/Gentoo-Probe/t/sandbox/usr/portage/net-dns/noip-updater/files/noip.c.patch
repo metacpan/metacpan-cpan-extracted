@@ -1,0 +1,6 @@
+98,99c98,99
+< #define CONFIG_FILENAME		"/usr/local/lib/no-ip.conf"
+< #define CONFIG_FILENAME_ETC     "/usr/local/etc/no-ip.conf"
+---
+> #define CONFIG_FILENAME		"/usr/lib/no-ip.conf"
+> #define CONFIG_FILENAME_ETC     "/etc/no-ip.conf"

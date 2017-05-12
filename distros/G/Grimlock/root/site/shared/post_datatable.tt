@@ -1,0 +1,563 @@
+[% page.load_scripts_at_top = 1 %]
+	
+<script type="text/javascript">
+YUI().use("datasource-io", "io-form", "datasource-jsonschema", "datatable-datasource", "datatable", "datatype", "model", 'view', 'panel', 'dd-plugin', 'button', function (Y) {
+  // -------------------------
+  //  Define a few DataTable helper methods
+  //    NOTE: These only work with the 3.5.0PR release of DataTable  
+  // -------------------------
+  /**
+	 Method to take an existing TD or TR Node element as input "target" and scan 
+	 the dataset (ModelList) for the underlying data record (a Model).
+	 
+	 @method getRecord
+	 @param target {Node} Either a TR or TD Node
+	 @returns {Model} Data record or false (or -1 if not found)
+	 **/
+  //FIXME: if target is numeric or string, not working yet ... Node only works
+  Y.DataTable.prototype.getRecord = function (target) {
+    var rs = this.get('data')
+    tag = target.get('tagName').toLowerCase();
+
+    var row = (tag === 'td') ? target.ancestor() : (tag === 'tr') ? target : null;
+    if (!row) return false;
+
+    if (Y.Lang.isNumber(row)) // assume row is rowindex
+    return rs.item(row) || false;
+
+    else if (row instanceof Y.Node || Y.Lang.isString(row)) {
+      var crow = (Y.Lang.isString(row)) ? row : row.get('id'); // matches based on DOM id
+      var rec = -1;
+      Y.log(crow);
+      rs.some(function (item) {
+        if (item.get('clientId') === crow) {
+          rec = item;
+          return true;
+        }
+      });
+      return rec;
+    }
+    return false;
+  }
+
+
+  /**
+	 Helper method to return the column's key property associated with the current TD.
+	 Uses DataTable's current method of identifying a class on TD as "yui3-datatable-col-XXX" 
+	 where XXX is the column 'key' (or 'name')
+	 
+	 @method getDTColumnKey
+	 @param tdTarget {Node} The TD cell to return column key to
+	 @returns ckey {String} column key name		  
+	 **/
+  Y.DataTable.prototype.getCellColumnKey = function (tdTarget) {
+    var DT_COL_CLASS = this.getClassName('col');
+    var regex = new RegExp(DT_COL_CLASS + '-(.*)'),
+      // currently creates /yui3-datatable-col-(.*) to grab column key
+      tdclass = tdTarget.get('className').split(" "),
+      ckey = -1;
+    //
+    //  Scan through the TD class(es), checking for a match
+    //	
+    Y.Array.some(tdclass, function (item) {
+      var mitem = item.match(regex);
+      if (mitem && mitem[1]) {
+        ckey = mitem[1].replace(/^\s+|\s+$/g, ""); // trim all spaces
+        return true;
+      }
+    });
+    return ckey || false;
+  }
+
+  /*  https://gist.github.com/1707631  
+  
+	Y.DataTable.prototype.getCellColumnKey = function (node) {
+	    var classRE = new RegExp('\b' + this.getClassName('col') + '-(\W+)'),
+	        name, column;
+	
+	    node = node.ancestor('.' + this.getClassName('cell'), true);
+	
+	    if (node) {
+	        name = (node.get('className').match(classRE) || [])[1];
+	
+	        column = name && this.getColumn(name);
+	    }
+	
+	    return column && column.key;
+	};
+*/
+
+
+  /**
+	 Method to scan the "columns" Array for the target and return the requested column.
+	 The requested "target" can be either of ;
+	 	a column index, 
+	 	or a TD Node, 
+	 	or a column "key", column "name" or "_yuid" (in that order). 
+	 
+	 @method getColumn
+	 @param target {Number | Node | String} Either the column index, the TD node or a column ID
+	 @returns {Object} Column
+	 **/
+  Y.DataTable.prototype.getColumn = function (target) {
+    var cs = this.get('columns'),
+      ckey = null;
+    if (Y.Lang.isNumber(target)) return cs[target]; //return cs.keys[col];
+    else if (Y.Lang.isString(target) || target instanceof Y.Node) { // check for 'key' or then 'name', finally '_yuid'
+      ckey = (target instanceof Y.Node) ? ckey = this.getCellColumnKey(target) : ckey;
+
+      col = (ckey) ? ckey : target;
+
+      // Check if a column "key"
+      var cm = -1;
+      Y.Array.some(cs, function (citem) {
+        if (citem['key'] === col) {
+          cm = citem;
+          return true;
+        }
+      });
+      if (cm !== -1) return cm; // found one, bail !!
+      // If not found, Check if a column "name"
+      Y.Array.some(cs, function (citem) {
+        if (citem.name === col) {
+          cm = citem;
+          return true;
+        }
+      });
+      if (cm !== -1) return cm;
+
+      // If not found, Check if a column "_yui" something
+      Y.Array.some(cs, function (citem) {
+        if (citem._yuid === col) {
+          cm = citem;
+          return true;
+        }
+      });
+      return cm;
+
+    } else return false;
+  }
+
+
+  var fmtPublished = function (o) {
+      var published = o.value;
+      return o.value == 1 ? "yes" : "no";
+    }
+
+  var fmtBlank = function (o) {
+      var fclass = o.column.className || null;
+      if (fclass) o.className += ' ' + fclass;
+      o.value = ' ';
+    }
+
+  var cols = [{
+    key: "entryid",
+    label: 'ID',
+    sortable: true
+  }, {
+    key: "title",
+    label: "Title",
+    sortable: true
+  }, {
+    key: "created_at",
+    label: 'Created At',
+    sortable: true
+  }, {
+    key: "published",
+    label: 'Published',
+    formatter: fmtPublished
+  }, {
+    key: "reply_count",
+    label: 'Replies',
+    sortable: true
+  }, {
+    key: "body",
+    label: "Body Text"
+  }, {
+    name: 'edit',
+    label: '- Edit -',
+    formatter: fmtBlank,
+    className: 'align-center cell-edit'
+  }, {
+    name: 'delete',
+    label: '- Delete -',
+    formatter: fmtBlank,
+    className: 'align-center cell-delete'
+  }
+
+  ];
+
+  var ds = new Y.DataSource.IO({
+    source: "[% c.uri_for_action( source_url, [ c.user.name ] ) %]",
+    ioConfig: {
+      headers: {
+        'Accept': 'application/json'
+      }
+    }
+  }).plug(Y.Plugin.DataSourceJSONSchema, {
+    schema: {
+      resultListLocator: "data_table",
+      resultFields: ["entryid", "title", "created_at", "published", "reply_count", "body"]
+    }
+  });
+
+  var dt = new Y.DataTable({
+    columns: cols,
+    caption: "Entries"
+  }).plug(
+  Y.Plugin.DataTableDataSource, {
+    datasource: ds,
+    initialRequest: ""
+  });
+
+
+  ds.after("response", function () {
+    dt.render("#div_table")
+  });
+
+  var editorPanel = new Y.Panel({
+    srcNode: '#idPanel',
+    width: 425,
+    xy: [750, 170],
+    visible: false,
+    render: true,
+    zIndex: 10,
+    plugins: [Y.Plugin.Drag],
+    buttons: [{
+      value: 'Save',
+      section: Y.WidgetStdMod.FOOTER,
+      action: function (e) {
+        if (e) e.preventDefault();
+        saveFormData();
+        this.hide();
+      }
+    }, {
+      value: 'Cancel',
+      section: Y.WidgetStdMod.FOOTER,
+      action: function (e) {
+        e.preventDefault();
+        this.hide();
+      }
+    }],
+    on: {
+      'render': function () {
+        Y.one("#main").show(); // render the "main" page elements, 
+      }
+    }
+  });
+
+  var editPostCB = function (id, formObject) {
+
+      Y.io('[% update_url %]' + id, {
+        method: 'PUT',
+        form: {
+          id: formObject,
+         },
+        
+        headers: {
+          'Accept': 'application/json'
+        },
+        on: {
+          success: function (id, result) {
+            Y.one("#status").setContent(result)
+            Y.log(result);
+          },
+          failure: function (id, result) {
+            Y.one("#status").setContent(result)
+            Y.log(result);
+          }
+        }
+      });
+    }
+
+  var deletePostCB = function (id) {
+      Y.io('[% delete_url %]' + id, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json'
+        },
+        on: {
+          success: function (id, result) {
+            Y.log(result)
+          },
+          failure: function (id, result) {
+            Y.log(result)
+          }
+
+        }
+      });
+
+    }
+    //-----------------
+    //  Function to save the FORM data, based on current values.
+    //  Define a mapping object to help us figure out how to apply INPUT[name=xxx] to what 
+    //    column of each record.
+    //  Uses the setting of FORM hidden value "frmInsertFlag" to determine if this is a new
+    //   record or if we are saving an existing record.  
+    //  If existing, the record "entryid" is saved in FORM hidden value "frmRecord"
+    //-----------------
+  var saveFormData = function () {
+      form = document.forms[0];
+      rec_id 	= form.frmRecord.value,	// if INSERT, this is disregarded ...
+			newData = {},
+			raw_value  = 0,
+			data_value = 0;
+	//
+	//  Define a mapping between the INPUT 'name' settings and the record "key" names ...
+	//    also, define a parser on a few numeric items
+	//		
+		var record_map = [
+			{ field:'entryid',   ckey:'entryid', parser: parseInt },	
+			{ field:'title',     ckey:'title' },
+			{ field:'published', ckey:'published' },
+      { field:'body',      ckey:'body' },
+		];
+
+
+	//
+	//  Run through the "record_map" FORM variables, inserting data values into "newData"
+	//   that will serve as the data object for DataTable
+	//	
+		Y.Array.each( record_map, function(item){
+			raw_value  = form[item.field].value;
+			data_value = ( item.parser && Y.Lang.isFunction(item.parser) ) ? item.parser.call(this,raw_value)  : raw_value ;
+			newData[ item.ckey ] = data_value;
+		});
+      
+      //
+      //  Now insert the "newData" object into DataTable's data, 
+      //    check frmInsertFlag for whether it is "new" or "updated" data 
+      //
+      if (parseInt(form.frmInsertFlag.value) === 0) dt.modifyRow(form.frmRecord.value, newData, editPostCB(form.title.value, form));
+
+      else dt.addRow(newData);
+
+    }
+
+    // trap an ENTER key on the form, save the data ...
+    editorPanel.get('srcNode').on('key', function () {
+      saveFormData();
+      editorPanel.hide();
+    }, 'enter');
+
+  //
+  //  Define DEFAULT data for a "New" inserted row
+  //
+  var default_data = {
+
+    title: 'New Entry',
+    body: ' ',
+    published: 0,
+    row: 0,
+    insert: 1
+  };
+
+  var default_dialog_xy = [220, 130];
+
+  var showDT_Dialog = function (record, xy, insert_obj) {
+      var thePanel, DialogTMPL, body_html, header_html;
+
+      //
+      //  Grab the dialog internal content from the <script> template
+      //
+      DialogTMPL = Y.one("#dialog-template").getContent();
+      thePanel = editorPanel;
+
+      if (!insert_obj) { // we are EDITING and existing row ...
+        //
+        //  Define the substitution objects to fill in the INPUT default values
+        //
+        var form_data = {
+          entryid: record.get('entryid'),
+          title: record.get('title'),
+          published: (record.get('published') == '1') ? 'checked="1"' : '',
+          body: record.get('body'),
+          row: record.get('clientId'),
+          insert: 0
+        }
+
+        xy[0] += 50; // offset the dialog a tinch, from the Edit TD ...
+        header_html = 'Editing Row No. ' + (dt.get('data').indexOf(record) + 1);
+        body_html = Y.Lang.sub(DialogTMPL, form_data);
+
+      } else { //  we are INSERTING a new row ...
+        insertFlag = true; // used 
+        xy = default_dialog_xy;
+        header_html = 'Inserting NEW Row';
+        body_html = Y.Lang.sub(DialogTMPL, insert_obj);
+
+      }
+
+      //
+      //	Fill the Panel content, position it and display it
+      //	
+      thePanel.set('xy', xy);
+      thePanel.set('headerContent', header_html);
+      thePanel.set('bodyContent', body_html);
+      thePanel.show();
+    }
+
+
+    // Button click handler for the "Insert New Row" button
+    new Y.Button({
+      srcNode: "#btnInsert"
+    }).on("click", function () {
+      editorPanel.hide();
+      showDT_Dialog(0, 0, default_data);
+    });
+
+
+  // -------------------------
+  //  Define a click handler on table cells ...
+  //   Note: use Event Delegation here (instead of just .on() ) because we may be 
+  //         deleting rows which may cause problems with just .on 
+  // -------------------------
+  dt.delegate("click", function (e) {
+
+    var cell = e.currentTarget,
+      // the clicked TD
+      row = cell.ancestor(),
+      // the parent of TD, which is TR
+      rec = this.getRecord(cell),
+      //  Call the helper method above to return the "data" record (a Model)
+      ckey = this.getCellColumnKey(cell),
+      //
+      col = this.getColumn(cell); //
+    var d_ckey = col.key || col.name || 'not set'; // if column key returned is a yui_id, don't display it
+    //   ... that means we are in the "Select", "Edit" or "Delete" columns
+    //
+    //  Update status box
+    //	
+    var StatusTMPL = Y.one("#status-template").getContent(); // this retrieves HTML containing {xxx} tags for substitution 
+    Y.one("#idStatus").setContent(Y.Lang.sub(StatusTMPL, { // ... do the substitution into the template using Y.Lang.sub 
+      rec_id: rec.get('clientId'),
+      rec_index: this.get('data').indexOf(rec),
+      col_key: d_ckey,
+      col_index: Y.Array.indexOf(this.get('columns'), col),
+      //this.get('columns').indexOf(col),
+      raw_data: rec.get(ckey) || 'No Data'
+    }));
+
+    //
+    //  If a column 'action' is available, process it
+    //	
+    switch (col.name || null) {
+    case 'edit':
+      // EDIT CALL GOES HERE
+      showDT_Dialog(rec, cell.getXY());
+      break;
+
+    case 'delete':
+      if (confirm("Are you sure you want to delete this record ?") === true) {
+        // DELETE CALL GOES HERE
+        dt.removeRow(rec.get('clientId'), deletePostCB(rec.get('title')));
+        Y.one("#idStatus").setContent("<br/><b>Row was Deleted!</b>");
+      }
+
+      break;
+    }
+
+  }, "tbody tr td", dt);
+  //  the selector,  internal scope
+
+  // -------------------------
+  //   Click handler on "Select" TH checkbox, toggle the settings of all rows
+  // -------------------------
+  Y.one("#selAll").on("click", function (e) {
+    var selAll = this.get('checked'); // the checked status of the TH checkbox
+    //
+    //  Get a NodeList of each of INPUT with class="myCheckboxFmtr" in the TBODY
+    //	
+    var chks = dt.get('srcNode').all("tbody input.myCheckboxFmtr");
+    chks.each(function (item) {
+      item.set('checked', selAll); // set the individual "checked" to the TH setting
+    });
+  });
+
+
+
+  // -------------------------
+  //  Handle the "Process Selected Rows" BUTTON press,
+  // -------------------------
+  new Y.Button({
+    srcNode: "#btnProcess"
+  }).on("click", function () {
+    //
+    //  Get a NodeList of all nodes on the DT which have the checkboxes I defined, 
+    //    with class="myCheckBoxFmtr" AND that are currently "checked"  
+    //  
+    var chks = this.get("srcNode").all("tbody tr td input.myCheckboxFmtr"); // get all checks
+    // in a perfect world ... i.e. one without IE 8-, we could just do ...	
+    // var chkd = this.get("srcNode").all("tbody tr td input.myCheckboxFmtr:checked");
+    //
+    //  Loop over the NodeList (using it's .each method) and append the employee name to the message.  
+    //	 Note: 'chkd' contains nodes of the INPUT checkboxes, step back twice to get the parent TR node  
+    //	
+    var msg = "The following Employees will be processed;\n\n"; // define the beginning of our message string
+    chks.each(function (item) {
+      if (!item.get('checked')) return;
+      var rec = this.getRecord(item.ancestor().ancestor()); // item is INPUT, first parent is TD, second is TR
+      msg += rec.get('entryid') + ' : ' + rec.get('title') + "\n";
+    }, this);
+
+    alert(msg);
+
+  }, dt);
+
+
+});
+
+
+</script>
+
+
+<script type="text/x-template" id="status-template">	<!-- used in Y.delegate ... tbody tr td     -->
+	<table id="dt_info" width="250">
+		<tr><th width="50%">Record entry :</th><td>{rec_id}</td></tr>
+		<tr><th>Record Index :</th><td>{rec_index}</td></tr>
+		<tr><th>Col Key :</th><td>{col_key}</td></tr>
+		<tr><th>Col Index :</th><td>{col_index}</td></tr>
+		<tr><th>Raw Data :</th><td>{raw_data}</td></tr>
+	</table>    
+</script>
+
+<script type="text/x-template" id="dialog-template">	<!--  used in Function showDT_Dialog   -->
+	<form name="roweditor">
+		<fieldset id="myfieldset">
+			<table>
+				<tr><th>Title :</th><td><input type="text" name="title" value="{title}" /></td></tr>
+				<tr><th>Published :</th><td><input type="checkbox" name="published" {published} /></td></tr>
+        <tr><th>Body : </th><td><textarea name="body" rows=10 cols=45>{body}</textarea></td></tr>
+			</table>
+		</fieldset>
+		<input type="hidden" name="frmRecord" value="{row}" />
+		<input type="hidden" name="frmInsertFlag" value="{insert}" />
+		<input type="hidden" name="entryid" value="{entryid}" />
+	</form>
+</script>
+<div id="main">
+
+<h2>Manage Entries</h2>
+<table>
+		<tr valign="top">
+			<td>
+        <div id="status"></div>
+				<div id="div_table"></div>
+				<br/>&nbsp; &nbsp; <button id="btnInsert">Insert New Row</button>			
+			</td>
+			<td width="300" align="center">
+				TD Click Status:<br/>
+				<div id="idStatus"></div>	
+			</td>
+		</tr>
+	</table>
+<br/>
+<div id="idPanel">
+		<div class="yui3-widget-hd"></div>
+		<div class="yui3-widget-bd"></div>
+	</div>
+
+	<div id="idCalendarBox" style="z-index:12;"></div>
+
+</div>
+

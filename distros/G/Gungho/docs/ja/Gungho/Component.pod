@@ -1,0 +1,28 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component.ja - Gunghoコンポーネント親クラス
+
+=head1 SYNOPSIS
+
+  package MyComponent;
+  use base qw(Gungho::Component);
+
+  # in your conf
+  ---
+  components:
+    - +MyComponent
+    - Authentication::Basic
+
+=head1 DESCRIPTION
+
+Gungho::ComponentはGunghoを拡張するための部品です。プラグインとは違い、
+Gungho::ComponentはGunghoのリクエストサイクル動作を継承により変更します。
+
+新規にComponentを作成する場合はGungho::Componentから継承するモジュールを
+作成し、C<components>項目に指定してください。
+
+=cut
+
+

@@ -1,0 +1,100 @@
+NAME
+    Getopt::Usaginator - Conjure up a usage function for your applications
+
+VERSION
+    version 0.0012
+
+SYNOPSIS
+        use Getopt::Usaginator <<_END_;
+
+            Usage: xyzzy <options>
+    
+            --derp          Derp derp derp         
+            --durp          Durp durp durp
+            -h, --help      This usage
+        
+        _END_
+
+        # The 'usage' subroutine is now installed
+
+        ...
+
+        $options = parse_options( @ARGV ); # Not supplied by Usaginator
+
+        usage if $options{help}; # Print usage and exit with status 0
+
+        if ( ! $options{derp} ) {
+            # Print warning and usage and exit with status -1
+            usage "You should really derp";
+        }
+    
+        if ( $options{durp} ) {
+            # Print warning and usage and exit with status 2
+            usage 2 => "--durp is not ready yet";
+        }
+
+        ...
+
+        usage 3 # Print usage and exit with status 3
+
+DESCRIPTION
+    Getopt::Usaginator is a tool for creating a handy usage subroutine for
+    commandline applications
+
+    It does not do any option parsing, but is best paired with Getopt::Long
+    or any of the other myriad of option parsers
+
+USAGE
+  use Getopt::Usaginator <usage>
+    Install a "usage" subroutine configured with the <usage> text
+
+  $code = Getopt::Usaginator->usaginator( <usage> )
+    Return a subroutine configured with the <usage> text
+
+  ...
+    More advanced usage is possible, peek under the hood for more
+    information
+
+        perldoc -m Getopt::Usaginator
+
+    An example:
+
+        use Getopt::Usaginator
+            # Called with the error
+            error => sub { ... },
+            # Called when usage printing is needed
+            usage => sub { ... },
+            ...
+        ;
+
+An example with Getopt::Long parsing
+        use Getopt::Usaginator ...
+
+        sub run {
+            my $self = shift;
+            my @arguments = @_;
+    
+            usage 0 unless @arguments;
+
+            my ( $help );
+            {     
+                local @ARGV = @arguments;                                  
+                GetOptions(
+                    'help|h|?' => \$help,
+                );
+            }
+
+            usage 0 if $help;
+
+            ...
+        }
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

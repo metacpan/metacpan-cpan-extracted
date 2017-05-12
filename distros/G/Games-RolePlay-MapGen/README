@@ -1,0 +1,19 @@
+vi:tw=75:
+
+AUTHOR'S NOTE 
+
+I was particularly thrilled with Jamis Buck's Dungeon Generator
+(http://www.aarg.net/~minam/dungeon.cgi), but I wanted to design something
+a little more flexible -- particularly, new export and generation plugins.
+
+SYNOPSIS
+
+    use Games::RolePlay::MapGen;
+    use Games::RolePlay::MapGen;
+
+    $map->set_generator("Basic");             # This is actually the default generator,
+    $map->add_generator_plugin("BasicDoors"); # however, you must add the doors.
+    generate $map("map.txt");                 # It'll generate a text map by default.
+
+    $map->set_exporter( "PNG" );              # But a graphical map is probably more useful.
+    export $map("map.png");

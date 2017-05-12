@@ -1,0 +1,11 @@
+diff -ruN sash-3.6.orig/Makefile sash-3.6/Makefile
+--- sash-3.6.orig/Makefile	2002-07-22 01:24:47.000000000 +0200
++++ sash-3.6/Makefile	2003-10-17 14:25:00.306848712 +0200
+@@ -21,7 +21,7 @@
+ 	-DHAVE_BSD_MOUNT=$(HAVE_BSD_MOUNT) \
+ 	-DMOUNT_TYPE=$(MOUNT_TYPE)
+ 
+-LDFLAGS = -static -s
++LDFLAGS = --disable-shared -static -s
+ LIBS = -lz
+

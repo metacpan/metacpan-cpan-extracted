@@ -1,0 +1,27 @@
+Revision history for Graphics-DZI
+
+!! means break of backward compatibility
+
+0.05    Fri Apr 23 14:06:02 CEST 2010
+	- dix: doc, added hint Re: PNG
+	- fix: doc: default for tilesize is 256
+	- add: canvas can now be a stack of images
+	- add: dzi parameter for constructor specifies the tile positions
+	- add: Files version now supports 'generate' method
+
+0.04    Thu Mar 18 20:35:25 CET 2010
+	- fixed the problem of script not being installed automatically
+
+0.03    Thu Mar 18 19:20:25 CET 2010
+	- added sparse image support via overlays
+	- added sparse document images
+	- added Graphics::DZI: overlays option
+	- changed invocation line in deepzoom
+	- changed defaults for tilesizes to 256
+
+0.02	Sun Mar 14 18:13:34 CET 2010
+	- first release
+
+0.01    Tue Mar  9 17:44:54 CET 2010
+	- experimental version
+

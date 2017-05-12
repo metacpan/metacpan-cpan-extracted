@@ -1,0 +1,57 @@
+Gimp-ScriptFu-Client version 1.01 - first public release
+========================================================
+
+Gimp::ScriptFu::Client acts as a source filter in a Scheme
+script that uses Text::Template to preprocess any embedded
+Perl fragments contained between { } brackets before sending
+the resulting Scheme to a Gimp Script-Fu server. Each Perl
+fragment may or may not produce a Scheme fragment.
+
+The Scheme script becomes a standalone client application.
+
+This permits using Perl for getting parameters from the real world
+or for generating complex Scheme expressions, that would be more
+difficult or impossible with plain Scheme.
+
+It also makes it possible to do Perlish things with Gimp if you
+can't do the compiler stuff for Gimp/Gimp::Fu for your OS. All
+recent Gimp versions include the Script-Fu (Scheme) server.
+
+Tested with Gimp 2.13.12 and Gimp 2.13.14, compiled with MinGW
+on Win XP, Perl 5.8.8
+Feb 20, 2007
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+
+   Run Gimp with something like:
+      gimp-x.x -b "(plug-in-script-fu-server 1 10008 \"\")"
+   or start Gimp and start the server from the menu
+   Xtns/Script-Fu/Start Server.
+
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+IO::Socket;
+Getopt::Long;
+Text::Template;
+Filter::Simple;
+
+AUTHOR
+
+Alan Stewart <astewart1@cox.net>
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007 Alan Stewart. All rights reserved.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

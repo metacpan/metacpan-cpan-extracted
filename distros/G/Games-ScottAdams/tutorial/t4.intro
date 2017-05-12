@@ -1,0 +1,14 @@
+This stage introduces automatic actions, which occur without the
+player needing to do anything.  In effect, they happen I<to> him
+rather than being done I<by> him.
+
+It also uses inline documentation in the form of an action comment
+(though why you'd want to do this is beyond me) and specifies the
+start and treasury rooms explicitly.
+
+This stage uses the directives from the previous stage, plus
+C<%occur>,
+C<%comment>,
+C<%start>
+and
+C<%treasury>.

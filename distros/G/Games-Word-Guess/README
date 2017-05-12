@@ -1,0 +1,11 @@
+SYNOPSIS
+
+     % wordguess
+
+SEE ALSO
+
+    wordguess
+
+    Games::GuessWord which is more akin to Hangman but, at the time of this
+    writing, does not come with a readily-playable game.
+

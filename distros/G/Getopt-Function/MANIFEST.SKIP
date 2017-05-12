@@ -1,0 +1,14 @@
+\bRCS\b
+\bCVS\b
+^MANIFEST\.[Bb]
+^Makefile$
+~$
+\.old$
+\.tar.gz$
+\.mikeonly$
+^blib/
+^MakeMaker-\d
+^pm_to_blib$
+^#.*#$
+^.#
+^Getopt-Function-[0-9]+.[0-9][0-9][0-9]

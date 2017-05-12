@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Complete::Cache file => __FILE__ . ".opts";

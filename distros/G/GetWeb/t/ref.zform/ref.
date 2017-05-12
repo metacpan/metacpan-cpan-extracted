@@ -1,0 +1,57 @@
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: the_user
+Subject: Resource Unavailable
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+Could not fetch http://www.zxvba_test_ignore.com/foo?sort=by%20date%20-%20new%20files%20first&hits=25&myarea1=&year=1960&name=&orfile=on&not=&myarea2=%20This%20needs%20to%20expand%0A%20and%20fill%20out%0A%20three%20rows!%20%0A&and=&day=1&month=Oct&search=default&category=MS-Windows%28all%29&cfrom=power
+
+ An Error Occurred
+==================
+
+500 - Can't resolv address for www.zxvba_test_ignore.com
+
+
+...while executing the following command:
+
+GET <url:http://www.zxvba_test_ignore.com/foo?sort=by%20date%20-%20new%20files%20first&hits=25&myarea1=&year=1960&name=&orfile=on&not=&myarea2=%20This%20needs%20to%20expand%0A%20and%20fill%20out%0A%20three%20rows!%20%0A&and=&day=1&month=Oct&search=default&category=MS-Windows%28all%29&cfrom=power> #link
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: the_user
+Subject: Resource Unavailable
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+Could not fetch http://www.zxvba_test_ignore.com/foo2?color1=green&year=1960&name=&orfile=on&not=&color2=green&and=&submit_name=start%20search&month=Jan&search=&cfrom=power&hits=25&sort=by%20date%20-%20new%20files%20first&day=6&day=11
+
+ An Error Occurred
+==================
+
+500 - Can't resolv address for www.zxvba_test_ignore.com
+
+
+...while executing the following command:
+
+GET <url:http://www.zxvba_test_ignore.com/foo2?color1=green&year=1960&name=&orfile=on&not=&color2=green&and=&submit_name=start%20search&month=Jan&search=&cfrom=power&hits=25&sort=by%20date%20-%20new%20files%20first&day=6&day=11> #link
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: the_user
+Subject: Resource Unavailable
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+Could not fetch http://www.zxvba_test_ignore.com/foo3
+
+ An Error Occurred
+==================
+
+500 - Can't resolv address for www.zxvba_test_ignore.com
+
+
+...while executing the following command:
+
+GET <url:http://www.zxvba_test_ignore.com/foo3> #link

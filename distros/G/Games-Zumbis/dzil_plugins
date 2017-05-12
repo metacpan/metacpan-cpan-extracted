@@ -1,0 +1,8 @@
+
+Dist::Zilla::Plugin::CompileTests 
+Dist::Zilla::Plugin::CriticTests
+Dist::Zilla::Plugin::HasVersionTests
+Dist::Zilla::Plugin::KwaliteeTests
+Dist::Zilla::Plugin::MinimumVersionTests
+Dist::Zilla::Plugin::PortabilityTests
+Dist::Zilla::Plugin::UnusedVarsTests

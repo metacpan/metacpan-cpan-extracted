@@ -1,0 +1,44 @@
+1.1 release (1.11):
+
+Major additions:
+
+* Added DEEP command (which is disabled by default)
+
+Minor modifications:
+
+* Assumes binary HTML are Latin-1 accent characters
+* Support for client-side imagemaps
+
+Bug fixes:
+
+* FTP directories were not annotated
+* rget, rsend, rwww, rsource were broken
+* Didn't work with MIME-Tools-3.xx
+* Confusing errmsgs after failed ftp session
+* Could not process image-submit form
+* Could not find form if at start of document
+
+
+1.1b1 (1.10):
+
+Major additions:
+
+* Fill out arbitrary HTML GET and POST forms
+* Basic User-Password authentication
+* AdvCGI module allows simulated forwarding
+
+Minor modifications:
+
+* Abandoned 'cwd' concept (subject line is now only used when following
+  links)
+* More .sigs recognized
+* checked links extracted from msg body, avoiding repeat HTTP req
+* TO command changes 'From' field to original sender
+* Removed 'Received' header hop-count
+
+Bug fixes:
+
+* References were not appended to error messages
+* Mail-spool command was not actually configurable
+* 'HELP' messages to unknown service caused error
+* Splitting occurred at 2 * $splitSize rather than $splitSize

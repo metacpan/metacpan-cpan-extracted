@@ -1,0 +1,265 @@
+<HTML>
+<HEAD>
+<TITLE>Boxplot - Box and Whisker Graph Module for Perl 5.</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+  <!-- beginning of leaf header-->
+
+  <TABLE border=0  cellpadding=0 cellspacing=0 width=100%>
+  <TR>
+    <TD valign=middle width='100%'
+    bgcolor='#cc0066'> <font face='sans-serif' size='+1'
+    color='#ff99cc'>&nbsp;&nbsp;&nbsp;GD::Graph::boxplot - Produces PNG box and whisker graphs</font>
+    </TD>
+  </TR>
+  </TABLE>
+  <p>&nbsp</p>
+  <!-- end of leaf content-->
+  
+
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<LI><A HREF="#methods and functions">METHODS AND FUNCTIONS</A></LI>
+	<LI><A HREF="#options">OPTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#options for all graphs">Options for all graphs</A></LI>
+		<LI><A HREF="#options for graphs with axes">Options for graphs with axes</A></LI>
+		<LI><A HREF="#options specific to boxplot graphs">Options specific to Boxplot graphs</A></LI>
+	</UL>
+
+	<LI><A HREF="#notes">NOTES</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<UL>
+
+		<LI><A HREF="#contact info">Contact info</A></LI>
+		<LI><A HREF="#copyright">Copyright</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Boxplot - Box and Whisker Graph Module for Perl 5.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>use GD::Graph::boxplot;</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><STRONG>boxplot</STRONG> is a <EM>perl5</EM> module that uses GD::Graph, GD, and Statistics::Descriptive
+to create and display PNG output for box and whisker graphs.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>See the samples directory in the distribution.</P>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<P>Fill an array of arrays with the x values and array references to the 
+data sets to be used.  Make sure that every array has the same number 
+of data sets as there are x values, otherwise <EM>GD:Graph</EM> will complain 
+and refuse to compile the graph.  For example:</P>
+<PRE>
+        $one = [210..275];
+        $two = [180, 190, 200, 220, 235, 245];
+        $three = [40, 140..150, 160..180, 250];
+        $four = [100..125, 136..140];
+        $five = [10..50, 100, 180];</PRE>
+<PRE>
+        @data = ( 
+                [&quot;1st&quot;, &quot;2nd&quot;, &quot;3rd&quot;, &quot;4th&quot;, &quot;5th&quot;],
+                [$one, $two, $three, $four, $five ],
+                [ [-25, 1..15], [-45, 25..45, 100], [70, 42..125], [undef], [180..250] ],
+                # as many sets of data sets as you like         
+                );</PRE>
+<P>If you don't have any data for a certain dataset, you can use <STRONG>undef</STRONG> as 
+shown above, and <EM>GD::Graph</EM> will skip that box.</P>
+<P>Create a new <EM>GG::Graph</EM> object by calling the <EM>new</EM> operator on the type
+<EM>boxplot</EM>:</P>
+<PRE>
+        $my_graph = new GD::Graph::boxplot( );</PRE>
+<P>Set the graph options:</P>
+<PRE>
+        $my_graph-&gt;set( 
+                x_label           =&gt; 'X Label',
+                y_label           =&gt; 'Y label',
+                title             =&gt; 'Some simple graph',
+                upper_percent     =&gt; 70,
+                lower_percent     =&gt; 35,
+                step_const        =&gt; 1.8
+                );</PRE>
+<P>Output the graph:</P>
+<PRE>
+    $gd = $my_graph-&gt;plot( \@data );</PRE>
+<PRE>
+    open(IMG, '&gt;box.png') or die $!;
+    binmode IMG;
+    print IMG $gd-&gt;png;</PRE>
+<P>
+<HR>
+<H1><A NAME="methods and functions">METHODS AND FUNCTIONS</A></H1>
+<P>See GD::Graph documentation for methods for all GD::Graph graphs.</P>
+<P>
+<HR>
+<H1><A NAME="options">OPTIONS</A></H1>
+<P>
+<H2><A NAME="options for all graphs">Options for all graphs</A></H2>
+<P>See GD::Graph documentation for options for all graphs.</P>
+<P>
+<H2><A NAME="options for graphs with axes">Options for graphs with axes</A></H2>
+<P>Boxplot has axes, and has all of the options available to the
+other graphs with axes: <EM>bars</EM>, <EM>lines</EM>, <EM>points</EM>, <EM>linespoints</EM>
+and <EM>area</EM>.  See the GD::Graph documentation for all of these options.</P>
+<P>
+<H2><A NAME="options specific to boxplot graphs">Options specific to Boxplot graphs</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_do_stats%2C_upper_percent%2C_lower_percent">do_stats, upper_percent, lower_percent</A></STRONG><BR>
+<DD>
+If <EM>do_stats</EM> is a true value, the program assumes that raw data are used
+for input.  It calculates the statistics for each box's data, and draws the box,
+mean, median, upper and lower whiskers, outliers, and far-out-values 
+accordingly.  The top and bottom of the box are determined by the numbers given
+for upper_percent and lower_percent.  For example, if you wanted to have the box
+contain all the data from the 20% to 80% range, you would use:
+<PRE>
+        $my_graph-&gt;set(
+                lower_percent         =&gt; 20,
+                upper_percent         =&gt; 80
+                );</PRE>
+<P>If <EM>do_stats</EM> is set to 0, the program assumes that the user has already
+calculated the required statistics for every box.  The user must input these
+statistics in place of the raw data:</P>
+<PRE>
+        # data must be in this form:
+        # $data = [mean, lowest, lower-percentile, median, upper-precentile, highest];
+        $one = [27, -35, 14, 29, 39, 52];
+        $two = [41, -140, 29, 45, 62, 125];
+        $three = [100, 30, 88, 95, 115, 155];
+        $four = [80, -100, 60, 100, 110, 195];</PRE>
+<PRE>
+        @data = ( 
+                [&quot;1st&quot;, &quot;2nd&quot;, &quot;3rd&quot;, &quot;4th&quot;],
+                [ $one, $two, $three, $four],
+                # as many sets as you like, all with the required statistical data
+                );
+</PRE>
+<PRE>
+
+        $my_graph = new GD::Graph::boxplot();</PRE>
+<PRE>
+        $my_graph-&gt;set(
+                box_spacing       =&gt; 35,
+                do_stats          =&gt; 0
+                );</PRE>
+<P>Notice that if do_stats is set to 0, upper_percent and lower_percent are not
+used, because the user is able to input the actual value for the 
+lower-percentile and upper-percetile.  Also notice that outliers and 
+far-out-values are not drawn, because the program does not have the data points
+to use.  However, the lowest or highest values can be drawn as outliers or 
+far-out-values if they fall outside of the whiskers.</P>
+<P>Default: do_stats = 1, upper_percent = 75, lower_percent = 25.</P>
+<P></P>
+<DT><STRONG><A NAME="item_box_spacing">box_spacing</A></STRONG><BR>
+<DD>
+Number of pixels to leave open between boxes. This works well in most
+cases, but on some platforms, a value of 1 will be rounded off to 0.
+<P>Default: box_spacing = 10</P>
+<P></P>
+<DT><STRONG><A NAME="item_warnings">warnings</A></STRONG><BR>
+<DD>
+If set to 1, warnings are printed to the standard out when the user sets 
+parameters to questionable values.  For example, if there are not enough
+pixels to draw the boxes properly because there are too many data sets for 
+the given image size, or because the box_spacing is set too high, then a 
+warning is printed so the user is aware of the problem.  If set to 0, all
+warnings are turned off.  This option is for users who do not want anything 
+to be printed to the standard output.
+<P>Default: warnings = 1</P>
+<P></P>
+<DT><STRONG><A NAME="item_step_const">step_const</A></STRONG><BR>
+<DD>
+Sets the step size equal to step_const box-heights, where the box-height is
+the distance from the top of the box to the bottom.  The whiskers are then 
+drawn one step from the top/bottom of the box, or to the largest/smallest data
+value, whichever is closer to the box.  If there are values further than one 
+step from the box, then the whiskers are drawn to one step from the box, and 
+those values further than the whiskers are drawn as either outliers or 
+far-out-values as explained below.  step_cont can be any number greater than 0.
+<P>Default: step_const = 1.5</P>
+<P></P>
+<DT><STRONG><A NAME="item_fov_const">fov_const</A></STRONG><BR>
+<DD>
+Sets the distance that will mark the boundary between outliers 
+and far-out-values.  Outliers will be drawn between the whisker and fov_const
+steps from the whisker.  Far-out-values will be drawn for values that fall
+farther than fov_const steps from the whisker.  fov_const can be any number 
+greater than 0.
+<P>Default: fov_const = 1</P>
+<P></P>
+<DT><STRONG><A NAME="item_box_fill">box_fill</A></STRONG><BR>
+<DD>
+When set to 1, the boxes are filled with the color for that data set.  When set to
+0, only the symbols and the outlines of the boxes will be drawn.
+<P>Default: box_fill = 1</P>
+<P></P>
+<DT><STRONG><A NAME="item_symbolc">symbolc</A></STRONG><BR>
+<DD>
+The color for drawing the symbols and box outlines.
+<P>Default: symbolc = 'dblue'</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="notes">NOTES</A></H1>
+<P>This module was designed to function in the same way as other GIFgraph graph types.
+It has all of the same functionality (except for mixed graphs) as the other graphs.  
+This functionality includes how to set the colors that fill the boxes (same as Bars),
+change the size of the margins between the plot and the edge of the GIF, etc.  Please
+read the GIFgraph documentation for the full set of options avaiable.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Written by:             Nigel Wright.
+Converted by:           George Fitch.</P>
+<P>Design and Funding:     Mark Landry, Client/Server Architects, Inc.</P>
+<P>
+<H2><A NAME="contact info">Contact info</A></H2>
+<P>email: <A HREF="mailto:nwright@hmc.edu">nwright@hmc.edu</A> - Nigel
+       <A HREF="mailto:gaf3@gaf3.com">gaf3@gaf3.com</A> - George</P>
+<P>
+<H2><A NAME="copyright">Copyright</A></H2>
+<P>Copyright (C) 1999 Nigel Wright.
+All rights reserved.  This package is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself.</P>
+
+
+    <!-- beginning of leaf footer-->
+    <p>&nbsp;</p>
+    <TABLE border=0  cellpadding=0 cellspacing=0 width=100%>
+    <TR>
+      <TD valign=middle
+        bgcolor='#cc0066'> <font face='sans-serif' size='+1'
+        color='#ff99cc'>&nbsp;&nbsp;&nbsp;GD::Graph::boxplot - Produces PNG box and whisker graphs</font>
+      </TD>
+    </TR>
+    </TABLE>
+    <!-- end of leaf footer-->
+  
+</BODY>
+
+</HTML>

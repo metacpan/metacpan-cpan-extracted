@@ -1,0 +1,73 @@
+2001-10-01 08:35  dlc
+
+	* t/: 01load.t, 02usage.t, 03golandgoa.t: Initial addition of these
+	tests.
+
+2001-10-01 08:35  dlc
+
+	* lib/Getopt/AutoConf.pm: Updated documentation, including adding
+	pointers to t/ files for examples.  Added several live, working
+	examples, including one on how Getopt::AutoConf and Getopt::Long
+	can coexist (also included is a test illustrating this same code). 
+	Addef '-' as a valid character in the --with-(.*) part of the
+	parsing.
+
+2001-10-01 08:33  dlc
+
+	* README: Updated with `perldoc Getopt::AutoConf` > README
+
+2001-10-01 08:32  dlc
+
+	* Makefile.PL: Removed PREREQ_PM line; it was unneeded.
+
+2001-10-01 08:32  dlc
+
+	* MANIFEST: Removed test.pl, added t/0*.t
+
+2001-09-25 17:06  dlc
+
+	* lib/Getopt/AutoConf.pm: Chaned $VERSION slightly.
+
+2001-09-18 08:40  dlc
+
+	* lib/Getopt/AutoConf.pm: Modified debugging output.  Fixed ome
+	small bugs with enable and with wher ethere was no =... at the end.
+
+2001-09-17 16:31  dlc
+
+	* README, lib/Getopt/AutoConf.pm: Updated README pods.	Converged
+	enable and with code, and converged without and disable code. 
+	Updated documentation.
+
+2001-09-17 10:45  dlc
+
+	* lib/Getopt/AutoConf.pm: Reworked and refactored.
+
+2001-09-14 13:45  dlc
+
+	* AutoConf.pm: Moved to lib/Getopt/AutoConf.pm
+
+2001-09-14 13:41  dlc
+
+	* lib/Getopt/AutoConf.pm: Made directory paths.
+
+2001-09-14 13:40  dlc
+
+	* MANIFEST, Makefile.PL: Changes.
+
+2001-09-05 09:12  dlc
+
+	* AutoConf.pm: Added a lot of functionality to GetOptions.
+
+2001-08-14 21:54  dlc
+
+	* Changes, MANIFEST, Makefile.PL, README, test.pl: Getopt::AutoConf
+
+2001-08-14 21:54  dlc
+
+	* Changes, MANIFEST, Makefile.PL, README, test.pl: Initial revision
+
+2001-07-10 07:53  darren
+
+	* AutoConf.pm: Initial revision
+

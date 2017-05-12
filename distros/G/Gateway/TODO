@@ -1,0 +1,169 @@
+This is a list of things that need to be done to this distribution,
+features which have been requested, bugs that I've noticed and haven't
+fixed yet, and similar such things.  It's not in any particular order, and
+definitely isn't in order of priority or severity or any other such useful
+thing.  Some elementary effort has gone into organizing it by type, but
+even that may not be all that thorough.
+
+Patches, suggestions, comments, and additions based on anything on this
+list are *greatly appreciated* and will result in entries in the THANKS
+file.  Additions to this file are also greatly appreciated.
+
+People requesting things are listed in brackets after the points (mostly
+for my own information for future THANKS entries).
+
+CORE
+
+  * Look at the whole issue of what happens when a module rejects and how
+    to restart the checks.  Many modules are currently not restartable;
+    should that change?  What should be done instead?  Should there be
+    some additional interface that says to run the checks of just module
+    X, or replace the module list with something else?  Thought:  What we
+    have is an array of modules to call plus a pointer to our current
+    location in that array.  Perl has tons of array handling already built
+    in.  Can we just use it?
+  * We need a way of accumulating error messages so that all checks can be
+    ran even if some failed.  Otherwise, the iterative process can get
+    annoying.  [Yusaf Pisan]
+  * If arguments are passed to a module that doesn't take any arguments,
+    currently that generates an autoloader error complaining about the
+    missing _init sub.  AUTOLOAD() should catch that case and so something
+    more interesting with it.
+  * An interface to the %HOOKS hash so that a user can add their own
+    modules and have things work correctly.  Where to put user modules
+    should also be documented.  [Yusaf Pisan]
+  * Look into providing some way for a rewrite module to be run and told
+    to ignore all errors.  This may or may not be useful in all cases.
+  * Contemplate ways of merging or working with Majordomo 2, which has a
+    lot of the same hooks as we do.
+  * Would it be possible to ever support underlying article models other
+    than News::Article?
+  * Can we work out some way for modules to specify that they take or
+    require arguments, so that the core code can do the syntax checking?
+
+BUILD PROCESS
+
+  * Find a better way to figure out what the correct permanent failure
+    code is than hardcoding it and expecting the user to change it on
+    install.
+  * Do we want to build a file of stubs the way AutoLoader usually has?
+    use strict 'methods' may require it in 5.005.  We may also have to
+    have it to do anything sane about missing methods in the AUTOLOAD
+    sub.  Need to look into how one can tell if a sub has been loaded.
+    (Upon further investigation, defined *{$sub}{CODE} appears to do it.)
+  * Put together a real test suite.  We should be able to do this for at
+    least the rewrite modules by reading in an article, applying the
+    modules, and then writing the article back out again and comparing it
+    with the expected output.
+
+DOCUMENTATION
+
+  * Add documentation of the additional fatal AUTOLOAD errors that can
+    occur.
+  * Write some more generic front-ends or otherwise provide documentation
+    or ideally a robomoderator constructor for those people who don't
+    like doing the Perl programming themselves.
+  * Check the documentation for references that are too focused on the
+    mail to news direction of gatewaying.
+  * Migrate the extensive comments currently in the source out into a
+    separate INTERNALS file to decrease the source code comment size?
+    Should we also be doing the same thing for the modules?  How would we
+    handle module-specific internals documentation?  What formatting
+    language should we use for all this stuff?
+  * Write a guide to writing robomoderators that both includes a step by
+    step guide of what people should be thinking about and something about
+    general philosophy, accumulated wisdom, what's a good idea, what
+    isn't, and so forth.  It occurs to me that quite a bit of this isn't
+    News::Gateway-specific and would make a good Usenet FAQ.
+  * Write a guide to writing modules.
+  * Build local queuing and message logging into an example so that people
+    can see how to do it.
+  * Reimplement newsgate using this module.
+  * Combine the listgate documentation with the comments at the beginning
+    of the source and rewrite in POD.
+  * Write documentation on the issues involved in mail to news gatewaying.
+  * Consider including the Stanford local gateways as examples.
+  * Rip the comments out of the beginning of the newsgroups module and put
+    them in a general document about mail to news gatewaying where they
+    belong so that font-lock won't take so long to colorize that file.
+
+REWRITE MODULES
+
+  * Do full PGPMoose including sending posts on to other moderated groups.
+  * Modify the cleanbody module to finish its scan even if it finds invalid
+    characters, and have it return the line number on which it found an
+    invalid character.
+  * Add support to the newsgroups module for automatically figuring out
+    the group name from the address.
+  * Consider keeping a message ID cache and using that to reject
+    duplicates.  This may be much more robust than the current attempt to
+    reject duplicates in the newsgroups module.  [Igor Chudov]
+  * The whitelist module (and perhaps the keywords module) should really
+    allow comments to be added after the address and keyword.
+  * Allow the whitelist and keyword modules to take db files instead of
+    just flat files.
+  * The fact that the keyword module takes an argument rather than a
+    configuration directive specifying the keyword regex violates the
+    standard distinction between arguments and configuration file
+    directives.
+  * The anykeyword module should take the same directive to specify the
+    regex for keywords as the keyword module.
+  * Expand the headers module to be able to do more manipulations of
+    headers and behave properly in cases of existence of multiple headers.
+    It should really provide an interface to all of the header
+    manipulations News::Article supports.
+  * Authenticate posts via checking signatures with PGP against a keyring
+    for known authors.
+  * Work out how to handle multiline header additions.
+  * The keywords module should really allow for some keywords which are
+    usable only in conjuction with other keywords.
+  * The nobinaries module should actually understand multipart posts and
+    delimiters and know where to look for other headers so as not to use
+    the hack body searching it uses right now.
+  * Fix the nobinaries module to take in the various tunable parameters
+    as configuration directives.
+  * cleanbody should only do the ISO 8859-1 check if there's no charset
+    specified or if iso-8859-1 is given as the charset.  Should probably
+    special-case us-ascii too....
+  * The various things that cleanbody does should ideally be deselectable
+    by configuration directives. [Yusaf Pisan]
+  * Add a way to detect the case where followups are set to a different
+    set of groups than the article was posted to and do something about
+    this.  [Yusaf Pisan]
+  * A module to run an MD5 checksum on the message body and cache the last
+    several, to use to suppress duplicate postings.  [Yusaf Pisan]
+  * Modify the header module to take action based on the content of a
+    header.  (Just add support for :/regex/ when the header name is
+    specified for an action and only take action if the regex matches.)
+  * A module to drop all headers in an incoming message *except* for a
+    given list.  [Randal Schwartz]
+  * Do real RFC 822 address parsing in a lot of places (most notably the
+    whitelist module and the newsgroups module, but possibly including the
+    error module).  Can we use Graham's Mail::Internet module?
+  * Modify the various rewrite modules that use disk files to use the new
+    hash module and support configuration directives listing individual
+    items as well.
+  * Detect crossposts to other moderated groups.  [Chris Meadows]
+  * Include a module to detect overquoted text.  [Tom Christiansen]
+  * Remove variable substitution from the headers module and revisit how
+    we're storing information from configuration directives, since I'm
+    fairly sure there are much better ways.
+  * Include all of the new modules Curtis Whalen sent me.  [Curtis Whalen]
+
+UTILITY MODULES
+
+  * Consider having config_parse() do something other than call error() for
+    syntax errors.
+  * The mail_error() message is mail to news specific and has a variety of
+    other problems (may be partially qmail-specific, although not in a
+    harmful way).
+  * Possibly write a regex utility module for the use of keywords and
+    anykeyword (for starters).  newsgroups and mungeids could also use
+    this.  We won't need this when we have Perl support for compiled
+    regexes.
+  * Add the ability to associate a given server with a given group, for
+    use when posting?  [Ernie Longmire <elongmi@basis.com>]
+  * Write a module to do generic handling of hashes, both tied and untied,
+    both read-only and read-write.  This may be something we can eventually
+    spin off into another full module.  May only want to handle the
+    read-only case at first.

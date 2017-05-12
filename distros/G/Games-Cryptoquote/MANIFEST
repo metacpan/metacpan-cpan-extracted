@@ -1,0 +1,9 @@
+CHANGES
+COPYING
+Cryptoquote.pm
+MANIFEST
+Makefile.PL
+README
+bin/cryptoquote-driver.pl
+t/can_solve.t
+t/patterns.txt

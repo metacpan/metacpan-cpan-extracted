@@ -1,0 +1,426 @@
+
+=pod
+
+=head1 Roll20 Dice Specification
+
+=head2 Order of Operations
+
+While the Roll20 dice engine does support basic math and functions such as
+floor() and ceil(), it is first and foremost a dice engine, and so it has its
+own order of operations. This means that putting parentheses inside of your
+dice formula will not always affect the outcome of the roll (for example, you
+can't force a variable to be interpreted before a macro). Here is the general
+order of operations:
+
+The roll is executed: first, dice are rolled for any dice (e.g. "2d6" is
+rolled; including any special dice such as dropped or exploding), then the
+result of that roll is substituted into the formula. Next, floor() and ceil()
+functions are executed. Finally, the entire remaining formula is evaluated,
+including observing proper math order of operations (parentheses first, then
+multiplication/division, then addition/subtraction).
+
+=head2 Types Of Dice
+
+Roll20 supports more than just your standard polyhedrons when rolling dice,
+below are the available die types you can use in your games.
+
+=head3 Basic Roll I<NdX>
+
+Rolls B<N> traditional (almost, you can have any number of sides that you want)
+dice with B<X> sides per die. B<N> must be greater than or equal to 0 and B<X>
+must be greater than or equal to 1.
+
+=head3 Fate/Fudge Roll I<NdF>
+
+Rolls B<N> Fate/Fudge dice. These dice have three sides with values of -1, 0, and 1.
+
+=head3 Computed Dice Roll I<(N+Y)dX>/I<Nd(X+Y)>
+
+Computes the number of dice to roll or the number of sides on the dice based on
+the mathematical expression in the parentheses. Dice computation can be used
+with both Basic and Fate dice.
+
+=head2 Roll Modifiers
+
+Modfiers that can change the behavior or outcome of dice rolls. Each modifier
+states which B<Types Of Dice> it can be applied to in parentheses after the
+modifier name. Rolls can have multiple modifiers applied to a single roll to
+allow for complex dice expressions.
+
+=over 4
+
+=item B<B> - Basic Roll
+
+=item B<F> - Fate/Fudge Roll
+
+=back
+
+Many modifiers compare each die to a target number to decided if the modifier
+action should be applied. We'll call this a B<Compare Point> or B<CP> for
+short in the roll modifiers below. A Compare Point consists of an optional
+compare operation I<E<lt>>,I<=>,I<E<gt>> and a
+target number. If the operation is not specified I<=> is assumed and
+for most modifiers the entire Compare Point can be left off for the default
+behavior.
+
+=over 4
+
+=item *
+
+Example Compare Points
+
+=item *
+
+I<3> - If the roll is equal to 3
+
+=item *
+
+I<E<gt>2> - If the roll is greater than or equal to 2
+
+=item *
+
+I<E<lt>18> - If the roll is less than or equal to 18
+
+=back
+
+=head3 Target Number / Successes (B,F) - I<CP>
+
+Normally when you perform a roll, Roll20 reports back the total value of all
+the dice rolled, plus any modifiers. Some game systems, though, work by rolling
+a set of dice versus a target number, and then adding up the total number of
+successes instead.
+
+=over 4
+
+=item *
+
+I<3d6E<gt>3> - Roll 3 d6's and count one success for each roll of 3 or higher
+
+=item *
+
+I<10d6E<lt>4> - Roll 10 d6's and count one success for each roll of 4 or less
+
+=back
+
+=head3 Failures (B,F) - I<fCP>
+
+Some systems build on success checks by also including failures. Failure checks
+only work when a success check is already being done and each failure subtracts
+one from the total number of successes.
+
+=over 4
+
+=item *
+
+I<3d6E<gt>3f1> - Roll 3 d6's and count one success for each roll of 3 or higher and one failure for each 1
+
+=item *
+
+I<10d6E<lt>4fE<gt>5> - Roll 10 d6's and count one success for each roll of 4 or less and one failure for each roll of 5 or more
+
+=back
+
+=head3 Exploding Dice (B,F) I<!CP>
+
+Exploding dice, also known as &quot;rule of 6&quot; or &quot;rule of 10s&quot;
+depending on your gaming system, rolls an additional die if the maximum is
+rolled. If the additional roll is also the maximum number the additional rolls
+keep on going! The Compare Point can be specified to change the exploding
+trigger.
+
+=over 4
+
+=item *
+
+I<3d6!> - Rolls 3d6 and explodes every time a 6 is rolled
+
+=item *
+
+I<3d6!E<gt>5> - Rolls 3d6 and explodes every time a 5 or 6 is rolled
+
+=back
+
+=head3 Compounding Dice (B,F) I<!!CP>
+
+Shadowrun (and some other systems, such as 7th Sea and L5R) use a special style
+of exploding dice where the the additional rolls for each dice are added
+together as a single &quot;roll&quot;. To do this, just use two exclamation
+marks instead of one. With the compounding exploding rolls a single roll can be
+infinitely high! The Compare Point can be specified to change the exploding
+trigger.
+
+=over 4
+
+=item *
+
+I<5d6!!> - Rolls 5d6 and compound every time a 6 is rolled
+
+=item *
+
+I<5d6!!5> - Rolls 5d6 and compound every time a 5 is rolled, 6's will be
+treated as a normal roll
+
+=back
+
+=head3 Penetrating Dice (B,F) I<!pCP>
+
+HackMaster (and some other systems) use a special style of exploding dice where
+the additional rolls for each dice have 1 subtracted from the roll. To do this,
+add a p after the exclamation mark. A die can penetrate multiple times but the
+modifier is only ever -1 to each additional die.
+
+=over 4
+
+=item *
+
+I<5d6!p> - Rolls 5d6 and explode with a -1 modifier every time a 6 is rolled
+
+=item *
+
+I<5d6!pE<gt>5> - Rolls 5d6 and explode with a -1 modifier every time a 5 or higher is rolled.
+
+=back
+
+=head3 Keep / Drop Dice (B,F) I<khN>/I<klN>/I<dhN>/I<dlN>
+
+Some game systems ask you to roll a large number of dice, and then either drop
+a certain number (B<N>) of the lowest rolls, or keep only a certain number
+(B<N>) of the highest rolls. Roll20 supports this type of roll through the
+I<d> and I<k> commands, respectively. The optional
+I<h>/I<l> parameter can either be I<h> to keep or
+drop the highest B<N> dice or I<l> to keep or drop the lowest
+B<N> dice. If not specified when keeping rolls the high rolls will be kept
+and when dropping rolls the low rolls will be dropped.
+
+=over 4
+
+=item *
+
+I<8d100k4> - Roll 8 d100's and keep the four largest rolls.
+
+=item *
+
+I<8d100kl4> - Roll 8 d100's and keep the four smallest rolls.
+
+=item *
+
+Example Drop Rolls
+
+=item *
+
+I<8d100d4> - Roll 8 d100's and drop the four smallest rolls.
+
+=item *
+
+I<8d100dh4> - Roll 8 d100's and drop the four largest rolls.
+
+=back
+
+=head3 Rerolling Dice (B,F) I<rCP>
+
+Several systems require that certain dice be reroll, for example brutal weapons
+in D&amp;D 4e require any 1s or 2s to be re-rolled and the original die value
+ignored. The reroll modifier can be specified multiple times to allow rerolling
+at multiple Compare Points. By default the dice will continue to reroll until
+the result is inside the defined parameters. Optionally you can set the results
+to only reroll once regardless of the outcome.
+
+=over 4
+
+=item *
+
+Example Rerolls
+
+=item *
+
+I<2d10rE<lt>2> - Roll 2 d10's and reroll any time a 2 or lower is rolled
+
+=item *
+
+I<8d6r> - Roll 8 d6's and reroll any time a 1 is rolled
+
+=item *
+
+I<8d6r2r4r6> - Roll 8 d6's and reroll any time a 2, 4, or 6 is rolled
+
+=item *
+
+I<2d6roE<lt>2> - Roll 2 d6's and reroll anything less than 2 but only once
+
+=back
+
+'''Special Case: Reroll Once (B,F) I<roCP>'''
+
+In some systems (such as D&D 5E) you want to reroll dice below a certain value,
+but you only want to reroll the dice one time each. To do that, just use
+I<ro> instead of I<r>.
+
+=over 4
+
+=item *
+
+Example Reroll Once Rolls
+
+=item *
+
+I<2d10roE<lt>2> - Roll 2 d10's and reroll any time a 2 or lower is rolled, but
+only up to one time per dice.
+
+=back
+
+=head3 Sorting Dice (B,F) I<sa>/I<sd>
+
+You may want to see your results in either ascending or descending order. The
+sorting modifier does just this. The order parameter is optional and specifies
+the order to sort with I<a> for ascending and I<d> for
+descending. Sorting defaults to ascending if order is not specified.
+
+=over 4
+
+=item *
+
+I<8d6s> - Roll 8 d6's and sort the results in ascending order
+
+=item *
+
+I<8d6sd> - Roll 8 d6's and sort the results in descending order
+
+=back
+
+=head3 Order of Operations for Modifiers
+
+Modifiers are applied in the following order:
+
+=over 4
+
+=item Exploding, Compounding, Penetrating, Rerolls
+
+These are applied while the dice are still rolling. imagine that you roll some
+exploding 6d6 on your table and the instant one of them settles as a 6 another
+die is rolled
+
+=item Keep, Drop, Success, Failure, Sorting
+
+These are applied after all of the dice have "settled" and all of the
+result values are known.
+
+=back
+
+=head1 Rounding Rolls and Math Functions
+
+You may want to use rounding in your roll formulas to emulate mechanics such as
+"half a level, rounded down to the nearest level." Roll20 provides several
+functions to accomplish this:
+
+=over 4
+
+=item *
+
+I<floor()> which will always round the number down (e.g. 5.7 becomes 5)
+
+=item *
+
+I<ceil()> which will always round the number up (e.g. 5.1 becomes 6)
+
+=item *
+
+I<round()> which will always round to the nearest whole number (e.g. 4.4
+becomes 4 and 4.5 becomes 5).
+
+=item *
+
+I<abs()> will calculate the absolute value of the roll
+
+=back
+
+You can use these functions almost anywhere in your roll formulas (around a
+single math expression, groups of math expressions, or even the entire roll).
+
+=head2 Grouped Rolls
+
+B<This section is not yet implemented>
+
+Mutliple rolls can be perfomed within a group via curly braces using a comma to
+seperate the sub-roll expressions I<{3d6+3d4+5, 2d8+4}>. Grouped Rolls have
+their own set of Group Modifiers which perform actions across the whole group.
+
+=head2 Grouped Roll Modifiers
+
+Modfiers that can change the behavior or outcome of grouped rolls. Grouped
+Rolls can have multiple modifiers applied to a group roll to allow for complex
+dice expressions.
+
+=head3 Keep / Drop I<khN>/I<klN>/I<dhN>/I<dlN>
+
+To apply a keep or drop modifier across multiple types of dice wrap the roll in
+a group. With a single Sub-Roll in the group the keep/drop operation is applied
+across all rolls. To choose the best or worse roll expression multiple
+sub-groups can be used. In this case the keep/drop operation is applied to the
+final result of each subgroup.
+
+=over 4
+
+=item *
+
+I<{4d6+3d8}k4> - Roll 4 d6's and 3 d8's, out of those 7 dice the highest 4 are kept and summed up.
+
+=item *
+
+I<{4d6+2d8, 3d20+3, 5d10+1}d1> - Roll each of the three sub-roll expressions
+and total them up. Drop the sub-roll expression with the lowest total and sum
+the other two totals as the result.
+
+=back
+
+=head3 Target Number / Successes (B,F) - I<CP>
+
+The same concept as when using on Dice Rolls but with different behavor for a
+group. For a Grouped Roll with a single sub-roll expression the success check
+is done after the remaining math expressions have been totaled into each roll.
+Single sub-roll groups are also useful when doing a success check on a roll
+that has another Compare Point enabled modifer. For a Grouped Roll with a
+multiple sub-roll expression the success check is applied to the esult of each
+sub-roll expression.
+
+=over 4
+
+=item *
+
+I<{3d20+5}E<gt>21> - Roll 3 d20's, for each roll add 5 and then count a success for each result of 21 or more.
+
+=item *
+
+I<{2d6!}E<gt>4> - Roll 2d6 exploding and count a success for each roll of 4 or greater.
+
+=item *
+
+I<{4d6+2d8, 3d20+3, 5d10+1}E<gt>40> - Roll each of the three sub-roll expression and total them up. Count one success for each sub-roll total of 40 or more.
+
+=back
+
+=head3 Failures (B,F) - I<fCP>
+
+Failure checks on groups work just like success checks.
+
+=over 4
+
+=item *
+
+I<{3d20+5}E<gt>21fE<lt>10> - Roll 3 d20's, for each roll add 5 and then count a success for each result of 21 or more and count a failure for each result of 10 or less.
+
+=item *
+
+I<{2d6!}E<gt>4f1> - Roll 2d6 exploding and count a success for each roll of 4 or greater and a failure for each roll of 1.
+
+=item *
+
+I<{4d6+2d8, 3d20+3, 5d10+1}E<gt>40fE<lt>10> - Roll each of the three sub-roll expression and total them up. Count one success for each sub-roll total of 40 or more and one failure for each sub-roll total of 10 or less.
+
+=back
+
+=head1 License
+
+This text was copied from <https://wiki.roll20.net/Dice_Reference>
+and has been slightly modified to match the library it was shipped
+with. The original test and this modified version are licensed under
+<http://creativecommons.org/licenses/by-nc-sa/3.0/>.

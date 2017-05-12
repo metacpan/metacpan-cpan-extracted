@@ -1,0 +1,35 @@
+Goo-Canvas version 0.05
+=======================
+
+Perl bindings to the goocanvas-0.9+. For goocanvas-0.6, please use
+Goo-Canvas version 0.03.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  perl >= 5.8.0
+  Cairo >= 1.00 (perl module and requisite C libraries)
+  Glib >= 1.103 (perl module and requisite C libraries)
+  Gtk2 >= 1.100 (perl module and requisite C libraries)
+  goocanvas-0.9+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Ye Wenbin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

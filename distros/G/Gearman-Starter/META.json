@@ -1,0 +1,96 @@
+{
+   "abstract" : "Gearman workers launcher with register functions",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gearman-Starter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Class::Inspector" : "0",
+            "Filesys::Notify::Simple" : "0",
+            "Gearman::Worker" : "0",
+            "Getopt::Long" : "0",
+            "Hash::Rename" : "0",
+            "Module::Load" : "0",
+            "Parallel::Prefork" : "0",
+            "Parallel::Scoreboard" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Gearman::Client" : "0",
+            "Net::EmptyPort" : "0",
+            "Test::More" : "0.98",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Gearman::Starter" : {
+         "file" : "lib/Gearman/Starter.pm",
+         "version" : "0.03"
+      },
+      "Gearman::Starter::Util" : {
+         "file" : "lib/Gearman/Starter/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/gearman-starter.pl/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/gearman-starter.pl",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/gearman-starter.pl.git",
+         "web" : "https://github.com/tokuhirom/gearman-starter.pl"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "hisaichi5518 <hisaichi5518@gmail.com>",
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

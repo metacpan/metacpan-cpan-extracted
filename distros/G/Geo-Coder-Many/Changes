@@ -1,0 +1,154 @@
+Revision history for Perl module Geo::Coder::Many.
+
+0.47    2017-01-30
+        - FINAL RELEASE: module is now DEPRECATED and no longer maintained
+        - improved POD
+        - remove suppor for Ovi, PlaceFind and Google (but kept Googlev3)
+          all three longer exist
+        - fixes to Geo::Coder::Many::OpenCage, which frankly was probably
+          never working
+
+0.46    2014-06-01
+        - Add support for Geo::Coder::OpenCage
+
+0.45    2013-12-11
+        - Add 'lib' to @INC in Build.PL
+          Thanks Slaven (https://rt.cpan.org/Ticket/Display.html?id=91283)
+
+0.44    2013-12-09
+        - Correctly added repo information to Makefile.PL
+
+0.43    2013-12-09
+        - Added META.json with repository information
+
+0.42    2013-07-18
+        - Updated Changes to conform to CPAN::Changes::Spec
+        - Added a release test with Test::CPAN::Changes
+
+0.41    2013-06-7
+        - Removed smartmatch usage for Perl 5.18
+        - Changed geocoders test input
+
+0.40    2012-11-10
+        - Updated documentation to make it clear that the cache object must
+          work with references
+        - Updated the _test_cache_object() method to check the above is true
+        - Updated mapstraction link
+        - Fixed bug in Build.PL - missing underscore in private method call
+        - Removed Multimap from Build.PL optional dependencies list
+          (Geo::Coder::Many::Multimap was removed in August 2011!)
+
+0.30    2012-10-11
+        - Changed minimum required version of Geo::Coder::Mapquest to 0.05 (it
+          was previously 0.04, which is incompatible with our plugin.)
+        - When calling add_geocoder(), check that the geocoder is compatible with
+          the plugin, based on a minimum version requirement.
+
+0.29    2012-08-15
+        - don't instantiate Geo::Distance object on every call
+        - use 'return;' over 'return undef;'
+
+0.28    2011-10-12
+        - dropping support for Geo::Coder::SimpleGeo
+          seems it is no longer a freely available geocoder
+
+0.27    2011-07-26
+        - Geo::Coder::Many::Response::add_response now
+          appends a space and the version of the geocoder used to the
+          name of the geocoder
+          
+          Example:
+          old - 'place_finder'
+          new - 'place_finder 0.05' 
+
+0.26    2011-07-25
+        - dropping support for Geo::Coder::Many::Yahoo
+          yahoo! no longer supports geocoding. *sigh*
+
+0.25    2011-06-17
+        - more granularity in 
+	  Geo::Coder::Many::Utils::determine_precision_from_bbox
+
+0.24    2011-06-3
+        - fixed bug in Geo::Coder::Many::Utils::determine_precision_from_bbox
+	  whereby identical long/lats wasn't returning a precision
+
+        - Geo::Coder::Many::Placefinder now determines precision
+          based on Geo::Coder::Many::Utils::determine_precision_from_bbox
+          rather than using the supplied accuracy
+
+0.23    2011-03-4
+        - remove print statement added for debugging *sigh*
+
+0.22    2011-03-2
+        - require Geo::Coder::Googlev3 0.07
+        - deal with new Geo::Coder::Googlev3 raw response format
+
+        * A big "danke sehr" goes out to SREZIC for fast turn around
+          on Geo::Coder::Googlev3 changes 
+
+0.21    2011-02-23
+        - support new Geo::Coder::Googlev3 response format
+        - require Geo::Coder::Googlev3 0.06
+        - change to precision scoring in 
+          Geo::Coder::Many::Utils::determine_precision_from_bbox
+
+0.20    2011-02-22
+        - added Geo::Coder::Many::Googlev3
+        - fixed bug in causing division by zero error
+          when creating default (WRR) scheduler without weights
+
+0.19    2011-01-5
+        - added Geo::Coder::Many::Ovi
+        - added link to Dec 2010 London Perl Workshop talk in POD
+        - fixed typo in Geo::Coder::Many::SimpleGeo
+        - require Test::Simple, not Test::More
+
+0.18    2010-12-3
+        - return undef when precision is unknown as per pod,
+          had previously been returning 1 from SimpleGeo and Mapquest
+
+0.17    2010-12-3
+        - added support for SimpleGeo with Geo::Coder::Many::SimpleGeo
+        - made Geo::Coder::Many::get_geocoders() public, fixed pod
+        - hid pod for internal methods. Don't play with internals!
+
+0.16    2010-12-3
+        - added Geo::Coder::Many::Mapquest, though still need to 
+          add precision
+        - pod tweaks
+
+0.15    2010-11-11
+        - Geo::Coder::Many::Google assumed google geocoding api v3
+          when in reality v2 is used. This is now fixed. 
+
+          Have tried to contact author of Geo::Coder::Google about
+          supporting v3
+   
+0.14    2010-11-8
+        - fixed mix up of long and lat in in Geo::Coder::Many::Bing
+          thx to stpra123 for reporting
+        - previously Geo::Coder::Many::Google had been returning precision
+          of 1.0 for all requests (what a wonderful world that would be)
+          Now determines precision based on response
+        - previously Geo::Coder::Many::OSM had been returning precision 
+          of undef for all requests (what a terrible world that would be)
+          Now determines precision based on response
+        - both of the above use 
+          Geo::Coder::Many::Util::determine_precision_from_bbox
+          which use Geo::Distance::XS
+        - new tests
+        - submitted by co-maintainer EDF
+        - corresponds to Lokku internal revision 39083
+
+0.13    2010-08-26
+        - Minor tweaks (internal SVN revision 36990)
+
+0.12     2010-07-30
+        - Fixed test plan
+
+0.11    2010-07-30
+        - Minor tweaks and improvements to documentation
+
+0.1     2010-07-26
+        - Release of Geo::Coder::Many, based on Geo::Coder::Multiple

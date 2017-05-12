@@ -1,0 +1,834 @@
+Wed Apr 15 00:14:20 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * News/Gateway.in: Version 0.42 released.
+
+        * pod/mailtonews.pod: Document compaction of continuation lines in
+        the From header.
+
+        * modules/mailtonews.al: Replace all newlines in the From header
+        with spaces, since INN doesn't support addresses on continuation
+        lines of the From header.
+
+Tue Apr 14 02:01:59 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/newsgroups.pod: Document the new fatal error message.
+
+        * modules/newsgroups.al: Throw a fatal error if no primary
+        newsgroup was specified.
+
+        * examples/raccpost: newsgroups requires an argument, so pull that
+        off the command line or default to rec.arts.comics.creative and
+        modify the handling of -f accordingly.
+
+Mon Apr 13 10:28:07 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/newsgroups.al: Fixed an obvious bug in extraction of
+        newsgroups from To and Cc addresses.
+
+        * pod/headers.pod: Incorrectly said the module couldn't fail.
+
+        * pod/hash.pod: Added a warning that the interface of this module
+        will be changing.
+
+        * modules/mungeids.al: If, after filtering the Newsgroups header
+        through our regexes, we have no groups left, then just exit
+        quietly and don't munge anything.
+
+        * pod/config.pod: Added a large security warning about the dangers
+        of untrusted access to configuration directives and the importance
+        of doing security checking before modules have access to them.
+
+        * pod/master.pod: Cleaned up more of the old refereneces to
+        config_file(), adding in references to config(), and tweaked some
+        of the documentation to reflect that apply() can now take
+        arguments.
+
+        * pod/mungeids.pod: Added documentation of the new configuration
+        directive and the new stripping behavior, cleaned up some of the
+        documentation of how this module behaves with crossposted
+        articles.
+
+        * modules/mungeids.al: Added a configuration directive giving
+        regexes specifying which newsgroups should be used in constructing
+        the munge.  Also tweaked the regex used to match existing munges
+        (we now no longer support newsgroup names not containing a period,
+        but that's a small price to pay to avoid false positives on nearly
+        all news.answers articles) and modified to strip prefixes from the
+        message ID too (since followups will get that stripped anyway, we
+        should do it with the first post).  Fixed a few compiler warnings.
+
+Sun Apr 12 02:12:38 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mail.al: Don't assume that News::FormReply is already
+        loaded, since we no longer load it by default.
+
+        * modules/config.al: Added the necessary support for allowing
+        several modules to register interest in a given configuration
+        directive.  We now pass the parsed directive along to every module
+        that was interested in it.
+
+        * News/Gateway.in: Don't load News::FormReply by default, set the
+        envelope sender to the maintainer by default, allow multiple
+        modules to register interest in the same configuration directive
+        by storing an anonymous array of interested modules for each
+        directive, just call the News::Article constructor directly in
+        read(), reformatted code a bit and reworked some comments.
+
+        * pod/config.pod: Tweaked the wording a bit to reflect the fact
+        that backslashes now work outside of double quotes, and added a
+        note that continuation lines inside double quotes will result in a
+        literal newline being part of the string.
+
+        * modules/config.al: Cleaned up config_parse() to allow embedded
+        newlines in strings, to support backslashes outside of double
+        quotes, and to remove duplicate code.  Also cleaned up
+        config_file() a bit and caused it to pass the embedded newlines
+        from continued lines directly along to the parser (the
+        implications of which are that a continued line inside double
+        quotes results in an embedded newline in the string).
+
+        * pod/mungeids.pod: Document the stripping of things that look
+        like prefixes.
+
+        * modules/mungeids.al: Strip off anything that looks like a
+        mungeids prefix from the message IDs in the References header
+        before adding our prefix, to prevent message threads in multiple
+        mungeid'd groups from acquiring new prefixes in the References
+        message IDs every round of replies.
+
+        * examples/racrmod: Use mail() rather than mail_forward(), cleaned
+        up some formatting.
+
+        * examples/raccpost: Support a -f flag that means to allow
+        crossposts to any groups, use mail() rather than mail_forward().
+
+        * examples/raccmod: Use mail() rather than the now-deprecated
+        mail_forward().
+
+        * Makefile.PL: Version information is now stored in VERSION.pm.
+
+        * makepm.PL: Grab the version number from the second line of
+        VERSION.pm instead of the first line of VERSION (since we're
+        renaming VERSION to VERSION.pm and including package information
+        so that PAUSE will put this module in the right place).
+
+        * pod/headers.pod: Added documentation of the Invalid header
+        failure message.
+
+        * modules/headers.al: Added support for multiple directives
+        affecting the same header (they'll all be applied in order), added
+        a "reject" action that will return an error if the given header is
+        present in the incoming message, fixed ifempty (typo in the name
+        of the directive), special-cased a Subject of (none) due to the
+        way that mailtonews works to be equivalent to an empty subject.
+
+        * pod/mailtonews.pod: Added documentation of the "Empty body"
+        failure message and tweaked the documentation of In-Reply-To
+        lifting.
+
+        * modules/mailtonews.al: Added a check for messages with an empty
+        body, tweaked the regex for matching valid message IDs some more
+        (both where we check the existing Message-ID header and where we
+        look at the In-Reply-To header to see if we want to lift anything
+        up to the References header).
+
+        * pod/newsgroups.pod: Rewrote the documentation of what we do in
+        an attempt to make it clearer and to add some details about the
+        new complexity of how we handle supplied Newsgroups headers.  This
+        isn't nearly as complete as the source code comments, but should
+        provide most of the relevant details.
+
+        * modules/newsgroups.al: *Heavily* reworked the actual message
+        rewriting rules and included a *lot* of comments about what we're
+        doing here, how, and why.  We should now correctly handle quite a
+        few more cases, including addressing the whole issue of what to do
+        when we have an incoming Newsgroups header rather than simply
+        always using it.  The code is much cleaner, and much more heavily
+        commented.  We also rename the Newsgroups header and the
+        Message-ID header when we think we should to reduce the chance of
+        duplicate errors when posting.  Did I mention comments?
+
+Wed Mar 25 03:38:10 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/hash.pod: New file.
+
+        * modules/hash.al: New file.
+
+        * pod/newstomail.pod: New file.
+
+        * modules/newstomail.al: New file.
+
+        * pod/mail.pod: Removed documentation of mail_forward(), added
+        documentation of mail() and expanded the documentation to include
+        the no address and multiple address cases.  Added a note that
+        mail_forward() is deprecated.
+
+        * modules/mail.al: Added mail() with the same functionality as the
+        old mail_forward() except that null address lists actually work
+        now.  Deprecated mail_forward().
+
+Mon Feb 23 16:03:55 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mailtonews.al: Move the In-Reply-To into References even
+        if there is no existing References header.
+        
+Sun Feb 22 16:09:25 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * News/Gateway.in: Version 0.41 released.
+
+        * modules/mailtonews.al: The extraction of message IDs from
+        In-Reply-To was pretty severely broken.  Match our regex against
+        the In-Reply-To header, not against $_, don't anchor it as many
+        mailers surround it with other text, and make sure that a
+        References header exists before we split it.
+
+Fri Feb 20 00:04:35 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mailpath.al: Need to allow space after the Received:
+        part of the header or this will never match.
+
+Thu Feb 19 00:36:12 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mungeids.al: Make the munge in the case of crossposting
+        independent of the order of the groups on the Newsgroups line.
+
+        * examples/listgate.m4: New file.
+
+        * examples/listgate.readme: New file.
+
+        * examples/listgate: Reworked to use the new post_*() methods from
+        News::Gateway and to use the new mungeids module rather than
+        rolling our own, some comment and default tweaks, changed @rnews
+        to an array rather than a scalar to allow safe exec, changed to
+        use config() rather than config_line().
+
+Wed Feb 18 13:50:41 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * makepm.PL: Obtain the version number from VERSION and substitute
+        it into News/Gateway.pm.
+
+        * Makefile.PL: Obtain the version number from VERSION rather than
+        News/Gateway.in.
+
+        * pod/master.pod: Removed the documentation for post(), as this is
+        now in its own module, added a reference to it at the top of the
+        list of methods, and added the diagnostic for attempting to load a
+        Perl module and failing.
+
+        * pod/post.pod: New file.
+
+        * modules/post.al: New file.
+
+        * News/Gateway.in: Removed the post() method, as this is now in an
+        autoloaded module.  Also removed the version number, so that it
+        can be added automatically during the build process.  Starting
+        with this revision, the version number of the News::Gateway
+        package as a whole is not the same as the RCS revision of this
+        file.
+
+        * pod/mungeids.pod: New file.
+
+        * modules/mungeids.al: New file.
+
+Fri Feb 13 22:12:09 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/master.pod: News::Gateway->new, not News::Gateway::new.
+        D'oh.
+
+Mon Jan 19 01:58:38 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/newsgroups.al: Downcase an e-mail address before
+        checking it against a pattern associated with a group, since we
+        already downcased the pattern and since case in addresses is
+        nearly always insignificant.
+
+        * modules/mailpath.al: Updated to handle qmail Received headers
+        with ident responses (including the null response) and the headers
+        qmail generates when host lookup fails.  Also added support for
+        "from hostname [1.2.3.4]", which is generated by a few places
+        despite the fact that it's invalid under RFC 822.
+
+        * pod/master.pod: Added documentation of the new apply() behavior.
+
+        * pod/config.pod: Added documentation of the new config() method.
+
+        * modules/config.al: Added a config() method that can be called
+        directly and which just passes an argument list along to the
+        callbacks, modified config_line() to call it, cleaned up some
+        comments.
+
+        * News/Gateway.in: Modified apply() so that it can take a list of
+        modules to apply, changed mesghooks so that it now contains a list
+        of modules rather than a list of methods to call, and removed $ID
+        from use vars as we no longer use it.
+
+Sun Jan 18 13:57:24 1998  Christopher Davis  <ckd@loiosh.kei.com>
+
+        * examples/listgate: Added the ability to post via IHAVE, added
+        message ID munging, added rnews injection capability, changed
+        various bits of documentation.
+
+Sun Jan 18 04:08:47 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * doc/moderate.pod: New file.
+
+Thu Jan  8 00:21:42 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * examples/listgate: Added a temporary failure exit on posting
+        problems, documented the reasoning behind that decision.
+
+Wed Jan  7 19:53:41 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * examples/listgate: New file.
+
+Tue Jan  6 18:56:52 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mailtonews.al: When pulling message IDs out of
+        In-Reply-To for References, don't require that the message ID be
+        the only thing in In-Reply-To; sometimes it's followed by a space
+        and other text.
+
+Thu Jan  1 06:41:45 1998  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * examples/racrmod: New file.
+
+        * News/Gateway.in: Revision 0.40 released.
+
+        * News/Gateway.in: [Revision 0.40] Took out all of the config file
+        parsing and reading code, as this now belongs in the config
+        module.  (Yay, the core is even smaller!)  Also renamed
+        read_message() to read() and parse_message() to apply(), which
+        should make much more sense down the road.  This should hopefully
+        be the last backwardsly-incompatible major interface change.
+
+        * examples/raccpost: Modified for new News::Gateway calling
+        syntax.
+
+        * examples/raccmod: Modified for new News::Gateway calling syntax,
+        added nobinaries to the list of modules that are applied.
+
+        * modules/cleanbody.al: Added mapping of octal 0205 to --, another
+        one of Microsoft Word's annoyances, and added automatic stripping
+        of literal delete characters.  (Gary's stories keep getting posted
+        containing them....)
+
+Tue Dec 30 08:45:23 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/config.pod: Added another error message from master.pod
+        that's config-specific.
+
+        * pod/master.pod: Removed the config file stuff, which is now spun
+        off into config.pod, and changed the references to those routines
+        to use the new names.  Also renamed read_message() to read() and
+        parse_message() to apply() throughout (hopefully), and moved the
+        error messages that are only generated by the config code out into
+        that documentation.
+
+        * pod/config.pod: Added documentation of the fatal error message
+        from line parsing.  Hopefully eventually we'll phase this out.
+
+        * pod/config.pod: New file.
+        
+        * modules/config.al: New file.
+
+Mon Dec 29 03:24:26 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/headers.al: Added the prepend directive, which prepends
+        the given content to the first occurance of the given header.
+        This is mostly intended for use with Path headers, but may have
+        other applications (Subject comes to mind).
+
+        * pod/headers.pod: Added documentation of the new prepend header
+        rewrite directive, and added documentation of the possible fatal
+        configuration error (which previously wasn't documented).
+
+        * pod/previoushop.pod: New file.
+
+        * modules/previoushop.al: New file.
+
+Fri Dec 26 00:09:09 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * News/Gateway.in: [Revision 0.39] Cleaned up some of the AUTOLOAD
+        handling, explicitly catching now the cases of failure to autoload
+        the mail_error() method and attempting to autoload a non-method so
+        that they don't attempt to call error() again.  Also cleaned up
+        the comments for post(), which still referred to the excised
+        spooling code.
+
+        * pod/bodyheaders.pod: New file.
+
+        * modules/bodyheaders.al: New file.
+
+Thu Dec 25 10:27:57 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/crosspost.pod: New file.
+
+        * modules/crosspost.al: New file.
+
+        * examples/raccmod: Fixed the calling syntax for the constructor.
+
+        * examples/raccpost: Fixed the calling syntax for the constructor,
+        added the additional global variables into use vars.
+
+        * modules/nobinaries.al: Added in the check to ensure the body was
+        at least 40 lines when looking for encoded text, and changed the
+        message for base64 encoding detected by the body scan to use the
+        term base64 rather than the term MIME.
+
+        * pod/nobinaries.pod: New file.
+
+        * modules/nobinaries.al: New file.
+
+        * examples/raccpost: Broken out a bit and commented considerably,
+        the maintainer address and list submission address moved to the
+        top and X'd out just in case.
+
+        * examples/raccmod: Removed the unnecessary require line, since we
+        really don't care about a Perl version here.
+
+        * examples/raccmod: Added lots of documentation and lots more
+        comments, removed the addresses of a few things just in case,
+        fixed the bug where some crossposted articles wouldn't get resent
+        to the mailing list by pulling out the Newsgroups header and
+        actually looking at it rather than relying on ARGV, added
+        eagle-aclnh@windlord.stanford.edu to the list of alt.comics.lnh
+        addresses.
+
+        * News/Gateway.in: [Revision 0.38] Modified to be Gateway.in,
+        changed the default exit code to something compatible with
+        sendmail, removed the hooks in favor of building them in
+        makepm.PL, removed the local spooling code in post() since this is
+        the job of the calling program, cleaned up a few comments.
+
+        * Makefile.PL: Added the POD file to the list of files to install,
+        added News::Article to the module prerequisites list, fixed a bug
+        in how I was specifying which files generated man pages, added the
+        PL file to generate the .pm to the list of things to run and added
+        the POD file and the .pm to the list of things to delete on make
+        realclean.
+
+Tue Dec 23 12:43:17 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * makepod.PL: Modified to use all-caps list files to find sub-PODs
+        to incorporate, since files beginning with . aren't included in
+        the distribution.
+
+        * makepm.PL: New file.
+
+        * modules/moosesign.al: Changed the interface line, since under
+        the new method we no longer require the initial 1 for message
+        rewrites.
+
+        * Makefile.PL: Added instructions for how to build the POD
+        documentation.
+
+        * makepod.PL: New file.
+
+        * pod/master.pod: New file.
+
+        * pod/mail.pod: New file.
+
+Mon Dec 22 01:38:47 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/whitelist.pod: New file.
+
+        * pod/newsgroups.pod: New file.
+
+Sun Dec 21 23:25:20 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/headers.pod: New file.
+
+        * pod/mailtonews.pod: New file.
+
+Sat Dec 20 15:17:30 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/moosesign.pod: New file.
+
+Sun Dec 14 08:46:11 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * pod/mailpath.pod: New file.
+
+        * pod/keywords.pod: New file.
+
+        * pod/cleanbody.pod: New file.
+
+        * pod/anykeyword.pod: New file.
+
+        * modules/anykeyword.al: Allow for Re: at the beginning of the
+        subject as well.
+
+Mon Nov 10 13:29:02 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * examples/raccmod: Added more comments for our envelope sender
+        hack, changed the keywords and whitelist files to point to their
+        new permanent locations.
+        
+Sun Nov  9 10:06:47 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * examples/raccpost: New file.
+
+        * examples/raccmod: Added forwarding of all successful posts to a
+        mailing list as well.
+
+        * News/Gateway.pm: [Revision 0.37] Added hooks for anykeyword and
+        cleanbody, added accessor functions so that one can get at the
+        underlying News::Article object inside the Gateway object.
+
+        * Makefile.PL: We now build the list of modules dynamically by
+        reading the module directory and don't need to play with either
+        special make rules or with external scripts.  Much cleaner.
+        (Didn't need an external script after all.)
+
+        * Makefile.PL: First pass at using an external script to build the
+        list of modules.
+
+        * examples/raccmod: New file.
+
+Fri Oct 24 18:02:44 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/keywords.al: Added the ability to pass in an anonymous
+        sub that does the work of extracting keywords from the subject
+        line.
+
+        * modules/newsgroups.al: Added the ability to fail automatically
+        if we aren't the primary addressee of the mail, so that
+        crossposting can be handled correctly without resulting in
+        multiposting.  Note that this module is complicated and still
+        needs considerably more commenting and documentation.
+
+Mon Oct 20 01:29:50 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mailtonews.al: Pass through Approved headers and only
+        drop headers that the news server would croak on.  This forces
+        robomod scripts to be careful about Approved headers, but it also
+        allows the headers module to be run before the mailtonews module.
+
+Sun Oct 19 12:21:59 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mailtonews.al: INN rejects Relay-Version headers, so
+        drop them.
+
+        * modules/newsgroups.al: Fixed bugs that were preventing multiple
+        patterns from working and that were preventing patterns from
+        working with commented addresses.
+
+Tue Sep 16 10:00:45 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/anykeyword.al: New file.
+
+        * modules/newsgroups.al: Added error checking for invalid regexes
+        and a correct error report.
+
+Mon Sep 15 10:37:22 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * Makefile.PL: Makefiles need literal tabs.
+
+        * Makefile.PL: Moved Gateway.pm into the subdirectory News/.
+
+        * Makefile.PL: Untabified, changed to take the version directly
+        out of Gateway.pm.
+
+        * modules/cleanbody.al: Cleaned up a few comments.
+
+        * modules/newsgroups.al: Fixed a minor but fatal typo.
+
+        * modules/newsgroups.al: Make sure we only initialize our data
+        structures once, call header() correctly to get an array rather
+        than a scalar.
+
+        * Gateway.pm: [Revision 0.36] Cleaned up to use an internal
+        error() method rather which may call mail_error().  Now takes a
+        flag to the constructor which specifies whether or not we are
+        running interactively (and therefore may not want to generate
+        rejection messages for internal errors).  Also cleaned up the
+        interface for the current names of modules.
+
+        * modules/whitelist.al, modules/mail.al, modules/keywords.al,
+        modules/headers.al: Fixed interface, changed to use error() rather
+        than mail_error().
+
+        * modules/newsgroups.al: Completely rewritten from scratch to take
+        a much wider variety of ways of specifying groups, to clean up the
+        handling of them, and to speed things up considerably.  Probably
+        needs to be cleaned up further and commented.
+
+Sun Aug 31 05:04:15 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/cleanbody.al: Added undoing of quoted-printable, checks
+        for invalid characters in the body, and stripping of Ctrl-Ms.
+
+Sat Aug 30 23:29:34 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/whitelist.al: Changed to whitelist from posters,
+        modified to use News::Article, the new rejection method, the new
+        error reporting syntax, and the new interface, cleaned up
+        comments, and generally cleaned up the code.
+
+        * modules/moosesign.al: New file.
+
+        * modules/mailtonews.al: Don't worry about the envelope, since
+        it's passed to the mail program in a safe fashion.  Add a Sender
+        header, drop Received headers because the news server rejects
+        them, and attempt to extract a message ID from the In-Reply-To
+        header if present.  Also added more comments, cleaned things up a
+        bit, and fixed the interface line.
+
+        * modules/mailpath.al: Fixed interface line, changed to use the
+        raw headers instead of the post headers (so that we do the right
+        thing for C News submissions), no longer delete the old Received
+        headers (that's mailtonews.al's job).
+
+        * modules/mailpath.al: Always return success from the munging.
+
+        * modules/mailpath.al: Fixed a few comments (forgot one of the
+        additional cases that we had to handle and actually do).
+
+        * modules/mailpath.al: New file.
+
+        * modules/mail.al: New file.
+
+        * modules/keywords.al: Modified to use News::Article, to use the
+        new mail_error() method to report fatal errors, and modified for
+        the new rejection scheme.  Also generally cleaned up.
+
+        * modules/headers.al: Completely rewritten to use the new
+        News::Article header munging shortcuts that make our job much,
+        much easier.  Added a new "add" directive that just adds a new
+        header (possibly duplicating an existing one).  Also untabified
+        all of the source and fixed to not use lexical variables.
+
+        * modules/newsgroups.al: New file.
+
+        * modules/cleanbody.al: New file.
+
+        * Gateway.pm: [Revision 0.35] *Extensive* modifications.  All of
+        the hard and tedious work is now being done for us by Andrew
+        Gierth's News::Article and associated modules, so we don't have to
+        do it any more.  In particular, all of the posting code has been
+        ripped out, as well as all of the article reading and munging
+        code.  The hook structure has been reworked and rethought a
+        little, and _mesg message mangling hooks are now installed for all
+        modules with defined interfaces.  We use the mail_error() method
+        everywhere to report fatal errors.  We no longer attempt to
+        declare all of our modules in the constructor; instead, the
+        constructor takes the address of the maintainer and the envelope
+        address for auto-replies instead, and we have to call the
+        modules() method to initialize modules.  parse_line() has been
+        fixed up a little to make backslashing more general, and
+        read_config() now supports continuation lines and being passed
+        file handles rather than filenames.  (So one can do read_config
+        (\*DATA), which is useful.)  post() no longer implicitly runs the
+        article munging hooks; instead, a separate method that has to be
+        called directly (parse_message()) does that.
+
+Tue Aug 19 03:55:26 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mailtonews.al: Disallow message IDs with a trailing
+        period.
+
+Mon Aug 18 21:57:40 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * modules/mailtonews.al: Changed to do a variety of standard
+        article munging necessary for turning a mail message into a news
+        post, and untabified.  We no longer take a configuration file
+        directive, just an argument when the module is loaded specifying
+        the default newsgroup for articles.
+
+        * modules/whitelist.al: Tweaked the way we get the address
+        slightly to allow for the cases where there was no comment.
+
+        * Gateway.pm: [Revision 0.34] Cleaned up the RCS version handling,
+        cleaned up the AUTOLOAD routine, documented the operation of the
+        constructor some more, untabified the entire source.  This is a
+        checkpoint version prior to the complete rewrite to use Andrew's
+        News::Article and associated modules.
+
+Fri May 23 10:25:19 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * Makefile.PL: New file.
+
+        * modules/whitelist.al: New file.
+
+        * modules/mailtonews.al: New file.
+
+        * modules/keywords.al: New file.
+
+        * modules/headers.al: New file.
+
+        * Gateway.pm: [Revision 0.33] Rewritten from scratch as a module
+        rather than a script, major core functionality factored out into
+        modules, rewritten for modern Perl and better programming habits,
+        and generally massively improved.
+
+Sat Feb 15 09:26:38 1997  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.32] Completely rewritten using my
+        current Perl programming style and using modules better, fixed a
+        lot of the documentation, cleaned up and made various parts of the
+        code a *lot* shorter, uses a global configuration information hash
+        rather than a bunch of global variables.  Note that this version
+        was part of a rewrite which was later abandoned, so it in and of
+        itself is probably not entirely functional.  This is the last
+        stand-alone script version of gateway before the rewrite as a
+        module.
+
+Sun Jun  2 14:50:33 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.31] Added nntpserver configuration file
+        directive.
+
+        * gateway.in: [Revision 0.30] Added support for sending
+        autoreplies.  So far, you can only list one autoreply per group
+        and wildcards aren't supported yet; all that's likely to
+        eventually change.
+
+Fri May 10 20:55:31 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.29] Added the ability to use wildcards
+        in a group directive.  Crossposting is still done correctly, but
+        $d cannot be used since there is no way of mapping hyphens to
+        periods correctly.
+
+Sun Apr 28 11:45:45 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.28] When pulling the message ID out of
+        the In-Reply-To: header and appending it to References:, we need
+        to make sure there's a space between it and the previous contents
+        of References:.
+
+Sat Apr 27 22:26:45 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.27] Added support for the standard
+        "convert all .s to -s for the gateway address" convention for
+        posting gateways (dumb convention).
+
+        * gateway.in: [Revision 0.26] Added support for reading in valid
+        newsgroups from a file given in a group configuration directive
+        and adding all newsgroups matching a mask.  Changed return of -v
+        to use the current program name and not put v before the version
+        number.  Improved From: line parsing to allow for more weird
+        cases, and improved To: and Cc: parsing to correctly deal with
+        comments and local addresses.  Should now return the correct error
+        code if the news server is throttled.
+
+Mon Apr 22 05:18:49 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.25] Added an empty keyword to the header
+        conf lines to allow specification in the case of an empty header.
+        We also now grab the message id from elm-style In-Reply-To lines
+        and add it to References to make threading work better.
+
+Fri Apr 19 05:21:06 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.24] Changed the posting method so that
+        it writes the post to a temporary file and then pipes that file
+        into inews so that we can capture the output of inews.  Reads the
+        output of inews and returns TEMPFAIL for any error messages
+        related to inability to contact the server (chances are, we'll
+        need to modify this later to deal with throttled servers).  Added
+        a -d flag to get the old posting behavior if wanted.  Wrote a
+        generic &error routine using the error codes from the sendmail
+        source and changed all exit calls to use that routine.  Rewrote
+        the fix_headers routine to make it clearer.
+
+Thu Apr 18 11:24:26 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.23] Support for header rewriting made
+        considerably more generic, special cases for header capitalization
+        added, Sender removed from header drops and X-UIDL added,
+        messageid and organization configuration lines removed since
+        they've been superseded by the new generic header support.
+
+Thu Apr  4 20:42:09 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.22] Better handling of configuration
+        file parsing errors added, better handling of fallback for cases
+        where -s isn't used.
+
+        * gateway.in: [Revision 0.21] path directive for adding
+        directories to the PATH changed to inewspath, new path directive
+        added to set the end of the Path: header on the posted article.
+
+        * gateway.in: [Revision 0.20] Added support for a messageid
+        directive, allowing renaming of Message-ID to X-Message-ID or just
+        dropping the incoming one and creating a new one.
+
+        * gateway.in: [Revision 0.19] Better configuration file parsing
+        (allow space before directives, give error messages for invalid
+        directives including line numbers), allow the organization line to
+        be missing in which case organization is passed, study for header
+        matching removed due to bug in Perl 5.002, $pattern processing
+        modified to allow quoting of metacharacters.
+
+Wed Apr  3 21:51:38 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway.in: [Revision 0.18] Added -f option to change
+        configuration file, added magic emacs marker to make sure we edit
+        gateway.in in Perl mode, rewrote some of the usage explanation.
+
+        * gateway.in: [Revision 0.17] Modified to be gateway.in, so that
+        configuration-time options can be handled with sed in the Makefile
+        (or eventually maybe a configure script).
+
+        * gateway: [Revision 0.16] sender configuration option and header
+        support removed (dumb idea anyway, since inews just does that
+        itself).  Extensive comments added.
+
+Tue Apr  2 23:48:45 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway: [Revision 0.15] Added Control: to the list of ignored
+        headers.  Posting gateways should not be used to post control
+        messages.  Also added Newsgroups.
+
+        * gateway: [Revision 0.14] Added automatic qualification of an
+        unqualified sender line.
+
+        * gateway: [Revision 0.13] Moved organization and pattern into
+        configuration file, support for different patterns added, made
+        sure more matches against configuration file directives were
+        case-insensitive.
+
+        * gateway: [Revision 0.12] Increased configuration file support,
+        adding host, sender, and path entries.  Still need to move pattern
+        and organization off to the config file.  Also made sure matches
+        were being made on a case-insensitive basis.
+
+        * gateway: [Revision 0.11] Added configuration file to list valid
+        newsgroups, fixed bug in recognizing crossposts and exiting
+        correctly.
+
+Mon Apr  1 23:15:24 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway: [Revision 0.10] Added support for standard sendmail
+        error exit codes, removed -c option, changed -s to mean "spam" and
+        analyze the from line by default, changed the way repeated headers
+        are handled, reformatted site options section.
+
+Wed Feb 28 13:33:20 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway: [Revision 0.9] Fixed major, obvious bug in recognition
+        of address@host (name) type From: lines.
+
+Mon Feb 26 07:38:18 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway: [Revision 0.8] Added explicit PATH addition to handle
+        inews in /usr/pubsw/bin.
+
+Fri Feb  2 22:07:53 1996  Russ Allbery  <eagle@windlord.Stanford.EDU>
+
+        * gateway: [Revision 0.7] Handling of additional Cc's fixed.
+
+        * gateway: [Revision 0.6] Continuation line support fixed.
+
+        * gateway: [Revision 0.5] Support for Bcc: posting added.
+
+        * gateway: [Revision 0.4] $sender moved up as one of the site
+        customizable variables (sendmail runs programs as bin??  WTF??).
+
+        * gateway: [Revision 0.3] Pattern for mailing addresses built into
+        the program, bug with detecting unqualified From: addresses fixed.
+
+        * gateway: [Revision 0.2] Bug fixes with slave status, Sender line
+        added.
+
+        * gateway: Initial revision.

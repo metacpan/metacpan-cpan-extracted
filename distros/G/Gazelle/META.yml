@@ -1,0 +1,64 @@
+---
+abstract: 'a Preforked Plack Handler for performance freaks'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  HTTP::Tiny: '0.058'
+  Plack::Test: '0'
+  Plack::Test::Suite: '0'
+  Test::More: '0.98'
+  Test::TCP: '2'
+configure_requires:
+  Devel::CheckCompiler: '0.04'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gazelle
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Gazelle:
+    file: lib/Gazelle.pm
+    version: '0.46'
+  Plack::Handler::Gazelle:
+    file: lib/Plack/Handler/Gazelle.pm
+    version: '0.46'
+requires:
+  Guard: '0'
+  Parallel::Prefork: '0.18'
+  Plack: '1.0037'
+  Server::Starter: '0'
+  Stream::Buffered: '0'
+  Try::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kazeburo/Gazelle/issues
+  homepage: https://github.com/kazeburo/Gazelle
+  repository: git://github.com/kazeburo/Gazelle.git
+version: '0.46'
+x_authority: cpan:KAZEBURO
+x_contributors:
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'bayashi <bayashi@cpan.org>'
+  - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Alex Hunsaker <badalex@gmail.com>'
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+  - 'Shlomi Fish <shlomif@shlomifish.org>'
+  - 'meru_akimbo <merukatoruayu0@gmail.com>'
+  - 'karupanerura <karupa@cpan.org>'
+  - 'Mark Ellis <mark.ellis@cartridgesave.co.uk>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

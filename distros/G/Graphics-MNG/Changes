@@ -1,0 +1,21 @@
+Revision history for Perl extension Graphics::MNG.
+
+0.04  Wed Dec 05 15:10:00 2001
+	- Corrected some typos in the documentation
+   - Corrected date/timestamps in this file
+   - Added utility functions (default callback implementations) to MNG.pm
+   - Cleaned up test cases to use default callback implementations
+
+0.03  Tue Oct 30 20:09:29 2001
+	- Added support for compilation on cygwin platforms
+   - Added backwards-compatible support for libmng v1.0.3 (new I/F function)
+   - Updated documentation and test cases
+   - Fixed case of filenames in .tar.gz distribution
+
+0.02  Fri Oct 26 19:50:10 2001
+	- Updated documentation
+
+0.01  Fri Aug 10 20:09:48 2001
+	- original version; created by h2xs 1.21 with options
+		-Oamx -n Graphics::MNG -F ' -DMNG_FULL_CMS -DMNG_USE_SO -DNON_WINDOWS -I.. ' -M '^[mM][nN][gG]_' libmng.h libmng_types.h libmng_conf.h -llibmng.lib
+

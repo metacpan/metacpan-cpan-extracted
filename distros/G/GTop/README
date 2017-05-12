@@ -1,0 +1,11 @@
+
+	The source files in this distribution are 
+	Copyright (C) 1999, Doug MacEachern, and are licensed for
+	use under the same terms as Perl itself.
+
+this package is a Perl interface to libgtop:
+http://ftp.gnome.org/pub/GNOME/sources/libgtop/
+http://ftp.gnome.org/pub/gnome/sources/libgtop/
+
+see also: Stas Bekman's Apache::VMonitor
+http://www.cpan.org/modules/by-module/Apache/

@@ -1,0 +1,25 @@
+*** noip2.c.orig	Wed Jan 29 07:21:46 2003
+--- noip2.c	Fri Jan 31 12:01:18 2003
+***************
+*** 147,156 ****
+  #define HOST			1
+  #define GROUP			2
+  #ifndef PREFIX
+!   #define PREFIX		"/usr/local"
+  #endif
+! #define CONFIG_FILEPATH		PREFIX"/etc"
+! #define CONFIG_FILENAME		PREFIX"/etc/no-ip2.conf"
+  #define CONFSTRLEN		1024
+  #define MAX_DEVLEN		16
+  #define MAX_INSTANCE		4
+--- 147,156 ----
+  #define HOST			1
+  #define GROUP			2
+  #ifndef PREFIX
+!   #define PREFIX		"/usr"
+  #endif
+! #define CONFIG_FILEPATH		"/etc"
+! #define CONFIG_FILENAME		"/etc/no-ip2.conf"
+  #define CONFSTRLEN		1024
+  #define MAX_DEVLEN		16
+  #define MAX_INSTANCE		4

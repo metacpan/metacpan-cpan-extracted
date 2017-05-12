@@ -1,0 +1,29 @@
+Getopt-Std-WithCheck version 0.04
+=================================
+
+Getopt::Std::WithCheck - Perl extension for process command line arguments with custom check on them
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Getopt::Std
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Daniel Podolsky, <tpaba@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

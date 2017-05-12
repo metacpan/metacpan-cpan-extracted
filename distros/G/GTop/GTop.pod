@@ -1,0 +1,563 @@
+=head1 NAME
+
+GTop - Perl interface to libgtop
+
+=head1 SYNOPSIS
+
+ use GTop ();
+ my $gtop = GTop->new;
+
+=head1 DESCRIPTION
+
+Perl interface to libgtop:
+
+ http://ftp.gnome.org/pub/gnome/sources/libgtop/
+
+=head1 CLASSES
+
+
+=head2 GTop::Cpu
+
+    my $cpu = $gtop->cpu;
+
+=over 4
+
+=item flags
+
+    my $flags = $cpu->flags;
+
+=item total
+
+    my $total = $cpu->total;
+
+=item user
+
+    my $user = $cpu->user;
+
+=item nice
+
+    my $nice = $cpu->nice;
+
+=item sys
+
+    my $sys = $cpu->sys;
+
+=item idle
+
+    my $idle = $cpu->idle;
+
+=item frequency
+
+    my $frequency = $cpu->frequency;
+
+=back
+
+=head2 GTop::Fsusage
+
+    my $fsusage = $gtop->fsusage($disk);
+
+=over 4
+
+=item flags
+
+    my $flags = $fsusage->flags;
+
+=item blocks
+
+    my $blocks = $fsusage->blocks;
+
+=item bfree
+
+    my $bfree = $fsusage->bfree;
+
+=item bavail
+
+    my $bavail = $fsusage->bavail;
+
+=item files
+
+    my $files = $fsusage->files;
+
+=item ffree
+
+    my $ffree = $fsusage->ffree;
+
+=back
+
+=head2 GTop::Loadavg
+
+    my $loadavg = $gtop->loadavg;
+
+=over 4
+
+=item flags
+
+    my $flags = $loadavg->flags;
+
+=item nr_running
+
+    my $nr_running = $loadavg->nr_running;
+
+=item nr_tasks
+
+    my $nr_tasks = $loadavg->nr_tasks;
+
+=item last_pid
+
+    my $last_pid = $loadavg->last_pid;
+
+=back
+
+=head2 GTop::Mem
+
+    my $mem = $gtop->mem;
+
+=over 4
+
+=item flags
+
+    my $flags = $mem->flags;
+
+=item total
+
+    my $total = $mem->total;
+
+=item used
+
+    my $used = $mem->used;
+
+=item free
+
+    my $free = $mem->free;
+
+=item shared
+
+    my $shared = $mem->shared;
+
+=item buffer
+
+    my $buffer = $mem->buffer;
+
+=item cached
+
+    my $cached = $mem->cached;
+
+=item user
+
+    my $user = $mem->user;
+
+=item locked
+
+    my $locked = $mem->locked;
+
+=back
+
+=head2 GTop::Mountlist
+
+    my $mountlist = $gtop->mountlist($all_fs);
+
+=over 4
+
+=item flags
+
+    my $flags = $mountlist->flags;
+
+=item number
+
+    my $number = $mountlist->number;
+
+=item total
+
+    my $total = $mountlist->total;
+
+=item size
+
+    my $size = $mountlist->size;
+
+=back
+
+=head2 GTop::Netload
+
+    my $netload = $gtop->netload($interface);
+
+=over 4
+
+=item flags
+
+    my $flags = $netload->flags;
+
+=item if_flags
+
+    my $if_flags = $netload->if_flags;
+
+=item mtu
+
+    my $mtu = $netload->mtu;
+
+=item subnet
+
+    my $subnet = $netload->subnet;
+
+=item address
+
+    my $address = $netload->address;
+
+=item packets_in
+
+    my $packets_in = $netload->packets_in;
+
+=item packets_out
+
+    my $packets_out = $netload->packets_out;
+
+=item packets_total
+
+    my $packets_total = $netload->packets_total;
+
+=item bytes_in
+
+    my $bytes_in = $netload->bytes_in;
+
+=item bytes_out
+
+    my $bytes_out = $netload->bytes_out;
+
+=item bytes_total
+
+    my $bytes_total = $netload->bytes_total;
+
+=item errors_in
+
+    my $errors_in = $netload->errors_in;
+
+=item errors_out
+
+    my $errors_out = $netload->errors_out;
+
+=item errors_total
+
+    my $errors_total = $netload->errors_total;
+
+=item collisions
+
+    my $collisions = $netload->collisions;
+
+=back
+
+=head2 GTop::ProcArgs
+
+    my $proc_args = $gtop->proc_args($pid);
+
+=over 4
+
+=item flags
+
+    my $flags = $proc_args->flags;
+
+=item size
+
+    my $size = $proc_args->size;
+
+=back
+
+=head2 GTop::ProcMap
+
+    my $proc_map = $gtop->proc_map($pid);
+
+=over 4
+
+=item flags
+
+    my $flags = $proc_map->flags;
+
+=item number
+
+    my $number = $proc_map->number;
+
+=item total
+
+    my $total = $proc_map->total;
+
+=item size
+
+    my $size = $proc_map->size;
+
+=back
+
+=head2 GTop::ProcMem
+
+    my $proc_mem = $gtop->proc_mem($pid);
+
+=over 4
+
+=item flags
+
+    my $flags = $proc_mem->flags;
+
+=item size
+
+    my $size = $proc_mem->size;
+
+=item vsize
+
+    my $vsize = $proc_mem->vsize;
+
+=item resident
+
+    my $resident = $proc_mem->resident;
+
+=item share
+
+    my $share = $proc_mem->share;
+
+=item rss
+
+    my $rss = $proc_mem->rss;
+
+=item rss_rlim
+
+    my $rss_rlim = $proc_mem->rss_rlim;
+
+=back
+
+=head2 GTop::ProcSegment
+
+    my $proc_segment = $gtop->proc_segment($pid);
+
+=over 4
+
+=item flags
+
+    my $flags = $proc_segment->flags;
+
+=item text_rss
+
+    my $text_rss = $proc_segment->text_rss;
+
+=item shlib_rss
+
+    my $shlib_rss = $proc_segment->shlib_rss;
+
+=item data_rss
+
+    my $data_rss = $proc_segment->data_rss;
+
+=item stack_rss
+
+    my $stack_rss = $proc_segment->stack_rss;
+
+=item dirty_size
+
+    my $dirty_size = $proc_segment->dirty_size;
+
+=item start_code
+
+    my $start_code = $proc_segment->start_code;
+
+=item end_code
+
+    my $end_code = $proc_segment->end_code;
+
+=item start_stack
+
+    my $start_stack = $proc_segment->start_stack;
+
+=back
+
+=head2 GTop::ProcState
+
+    my $proc_state = $gtop->proc_state($pid);
+
+=over 4
+
+=item flags
+
+    my $flags = $proc_state->flags;
+
+=back
+
+=head2 GTop::ProcTime
+
+    my $proc_time = $gtop->proc_time($pid);
+
+=over 4
+
+=item flags
+
+    my $flags = $proc_time->flags;
+
+=item start_time
+
+    my $start_time = $proc_time->start_time;
+
+=item rtime
+
+    my $rtime = $proc_time->rtime;
+
+=item utime
+
+    my $utime = $proc_time->utime;
+
+=item stime
+
+    my $stime = $proc_time->stime;
+
+=item cutime
+
+    my $cutime = $proc_time->cutime;
+
+=item cstime
+
+    my $cstime = $proc_time->cstime;
+
+=item timeout
+
+    my $timeout = $proc_time->timeout;
+
+=item it_real_value
+
+    my $it_real_value = $proc_time->it_real_value;
+
+=item frequency
+
+    my $frequency = $proc_time->frequency;
+
+=back
+
+=head2 GTop::ProcUid
+
+    my $proc_uid = $gtop->proc_uid($pid);
+
+=over 4
+
+=item flags
+
+    my $flags = $proc_uid->flags;
+
+=item uid
+
+    my $uid = $proc_uid->uid;
+
+=item euid
+
+    my $euid = $proc_uid->euid;
+
+=item gid
+
+    my $gid = $proc_uid->gid;
+
+=item egid
+
+    my $egid = $proc_uid->egid;
+
+=item pid
+
+    my $pid = $proc_uid->pid;
+
+=item ppid
+
+    my $ppid = $proc_uid->ppid;
+
+=item pgrp
+
+    my $pgrp = $proc_uid->pgrp;
+
+=item session
+
+    my $session = $proc_uid->session;
+
+=item tty
+
+    my $tty = $proc_uid->tty;
+
+=item tpgid
+
+    my $tpgid = $proc_uid->tpgid;
+
+=item priority
+
+    my $priority = $proc_uid->priority;
+
+=item nice
+
+    my $nice = $proc_uid->nice;
+
+=back
+
+=head2 GTop::Proclist
+
+    my $proclist = $gtop->proclist;
+
+=over 4
+
+=item flags
+
+    my $flags = $proclist->flags;
+
+=item number
+
+    my $number = $proclist->number;
+
+=item total
+
+    my $total = $proclist->total;
+
+=item size
+
+    my $size = $proclist->size;
+
+=back
+
+=head2 GTop::Swap
+
+    my $swap = $gtop->swap;
+
+=over 4
+
+=item flags
+
+    my $flags = $swap->flags;
+
+=item total
+
+    my $total = $swap->total;
+
+=item used
+
+    my $used = $swap->used;
+
+=item free
+
+    my $free = $swap->free;
+
+=item pagein
+
+    my $pagein = $swap->pagein;
+
+=item pageout
+
+    my $pageout = $swap->pageout;
+
+=back
+
+=head2 GTop::Uptime
+
+    my $uptime = $gtop->uptime;
+
+=over 4
+
+=item flags
+
+    my $flags = $uptime->flags;
+
+=back
+
+=head1 AUTHOR
+
+Currently maintained by Malcolm J Harwood <mjh@cpan.org>.
+
+Previously maintained by Stas Bekman <stas@stason.org>.
+
+Doug MacEachern wrote the original version.
+
+

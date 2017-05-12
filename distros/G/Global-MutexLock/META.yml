@@ -1,0 +1,37 @@
+---
+abstract: "A xs module to give perl global mutex-lock between crons or web-app's workers"
+author:
+  - 'itsusony <itsusony@fout.jp>'
+build_requires:
+  Test::LeakTrace: '0.15'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Global-MutexLock
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Global::MutexLock:
+    file: lib/Global/MutexLock.pm
+    version: '0.026'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/itsusony/Global-MutexLock/issues
+  homepage: https://github.com/itsusony/Global-MutexLock
+  repository: git://github.com/itsusony/Global-MutexLock.git
+version: '0.026'

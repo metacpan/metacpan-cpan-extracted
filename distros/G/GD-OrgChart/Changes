@@ -1,0 +1,19 @@
+Revision history for Perl extension GD::OrgChart.
+
+0.03  Thu Jan  9 08:57:38 EST 2003
+	- Added WARNINGS to the README.
+	- Changed method image to Image for consistancy.
+
+0.02  Wed Jan  8 17:00:00 EST 2003
+	- Added support for builtin fonts.
+	- Added tests for builtin fonts and inheritance.
+	- Dropped misguided "adorn" callback.
+	- Added some parameters to DrawBox method and BoundBox
+	  method to make them more use for overloading.
+	- Hid private utility functions with a leading underscore.
+
+0.01  Wed Dec 18 21:03:35 2002
+	- original version; created by h2xs 1.21 with options
+		-XA -n GD::OrgChart
+	- imported code separately developed outside the proper
+	  module framework

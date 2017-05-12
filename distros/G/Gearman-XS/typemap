@@ -1,0 +1,41 @@
+# Gearman Perl front end
+# Copyright (C) 2013 Data Differential, http://datadifferential.com/
+# Copyright (C) 2009-2010 Dennis Schoen
+# All rights reserved.
+# 
+# This library is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself, either Perl version 5.8.9 or,
+# at your option, any later version of Perl 5 you may have available.
+
+TYPEMAP
+gearman_xs_client *	T_GCLIENT
+gearman_xs_job *	T_GJOB
+gearman_xs_task *	T_GTASK
+gearman_xs_worker *	T_GWORKER
+gearman_return_t	T_ENUM
+gearman_worker_options_t	T_ENUM
+gearman_client_options_t  T_ENUM
+gearman_verbose_t  T_ENUM
+in_port_t	T_IV
+uint8_t	T_IV
+uint32_t	T_IV
+
+INPUT
+T_GCLIENT
+  $var = XS_STATE(gearman_xs_client*, $arg);
+T_GJOB
+  $var = XS_STATE(gearman_xs_job*, $arg);
+T_GTASK
+  $var = XS_STATE(gearman_xs_task*, $arg);
+T_GWORKER
+  $var = XS_STATE(gearman_xs_worker*, $arg);
+
+OUTPUT
+T_GCLIENT
+  XS_STRUCT2OBJ($arg, CLASS, $var);
+T_GJOB
+  XS_STRUCT2OBJ($arg, CLASS, $var);
+T_GTASK
+  XS_STRUCT2OBJ($arg, CLASS, $var);
+T_GWORKER
+  XS_STRUCT2OBJ($arg, CLASS, $var);

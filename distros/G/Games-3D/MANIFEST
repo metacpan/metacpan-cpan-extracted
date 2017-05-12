@@ -1,0 +1,37 @@
+BUGS
+Build.PL
+CHANGES
+CREDITS
+MANIFEST
+README
+SIGNATURE
+LICENSE
+TODO
+Makefile.PL
+lib/Games/3D.pm			# doc and VERSION
+lib/Games/3D/Link.pm		# link thingies together
+lib/Games/3D/Signal.pm		# signal and state names
+lib/Games/3D/Sensor.pm		# sense changes and trigger on them
+lib/Games/3D/Template.pm	# blueprints for Thingys
+lib/Games/3D/Thingy.pm		# base class, providing id(), name() etc
+lib/Games/3D/World.pm		# entire object system
+t/lib/Games/3D/Thingy/Test.pm	# test receiver
+t/link.t
+t/signal.t
+t/sensor.t
+t/template.t
+t/thingy.t
+t/world.t
+t/data/templates.txt
+t/pod.t
+t/pod_cov.t
+META.yml
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm

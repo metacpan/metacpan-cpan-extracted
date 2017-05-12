@@ -1,0 +1,135 @@
+NAME
+    Graphics::ColorNames - defines RGB values for common color names
+
+REQUIREMENTS
+    `Graphics::ColorNames' should work on Perl 5.6.0. It requires the
+    following non-core (depending on your Perl version) modules:
+
+      Module::Load
+      Module::Loaded
+
+    The following modules are not required for using most features but are
+    recommended:
+
+      Color::Library
+      Tie::Sub
+
+    Installation requires the following testing modules:
+
+      Test::Exception
+      Test::More
+
+    If the `DEVEL_TESTS' environment variable is set, the tests will also
+    use the following modules for running developer tests, if they are
+    installed:
+
+      Test::Pod
+      Test::Pod::Coverage
+      Test::Portability::Files
+
+    The developer tests are for quality-control purposes.
+
+INSTALLATION
+    Installation can be done using the traditional Makefile.PL or the newer
+    Build.PL methods.
+
+    Using Makefile.PL:
+
+      perl Makefile.PL
+      make test
+      make install
+
+    (On Windows platforms you should use `nmake' instead.)
+
+    Using Build.PL (if you have Module::Build installed):
+
+      perl Build.PL
+      perl Build test
+      perl Build install
+
+SYNOPSIS
+      use Graphics::ColorNames 2.10;
+
+      $po = new Graphics::ColorNames(qw( X ));
+
+      $rgb = $po->hex('green');          # returns '00ff00'
+      $rgb = $po->hex('green', '0x');    # returns '0x00ff00'
+      $rgb = $po->hex('green', '#');     # returns '#00ff00'
+
+      $rgb = $po->rgb('green');          # returns '0,255,0'
+      @rgb = $po->rgb('green');          # returns (0, 255, 0)  
+
+      $rgb = $po->green;                 # same as $po->hex('green');
+
+      tie %ph, 'Graphics::ColorNames', (qw( X ));
+
+      $rgb = $ph{green};                 # same as $po->hex('green');
+
+DESCRIPTION
+    This module provides a common interface for obtaining the RGB values of
+    colors by standard names. The intention is to (1) provide a common
+    module that authors can use with other modules to specify colors by
+    name; and (2) free module authors from having to "re-invent the wheel"
+    whenever they decide to give the users the option of specifying a color
+    by name rather than RGB value.
+
+    See the module POD for complete documentation.
+
+REVISION HISTORY
+    Changes since the last release:
+
+    2.11    Thu Jan 10 2008
+            - updated version number for release
+            - minor changes of text format
+            - added fix for problems with Graphics::ColorNames::GrayScale
+    
+    2.10_05 Tue Jan  8 2008
+            * checks if modules already loaded before re-loading them
+              (uses Module::Loaded for this)
+            - requires changed to load for dynamically loaded modules
+            - updated README
+    
+    2.10_04 Sun Jan  6 2008
+            - reverted back to standard object-oriented style
+            - Tie::Sub is only loaded when a subroutine is used for scheme
+    
+    2.10_03 Sat Jan  5 2008
+            - tests use Test::Exception to catch errors
+            - rewrite parts of documentation to emphasize object-oriented
+              interface rather than the tied interface
+            - implemented a proper DESTROY method
+            - misc code cleanup and reorganization
+    
+    2.10_02 Fri Jan  4 2008
+            * added support for Color::Library dictionaries
+            - minor changes to error messages
+            - underscores in color names ignored
+            - auto-loading color names in object-oriented interface, e.g.
+              $obj->black()
+            - stubs for DESTROY and UNTIE methods
+            - 06-obj.t test more flexible
+            - pointless 01-ColourNames test removed
+            - more updates to documentation
+    
+    2.10_01 Thu Dec 20 2007
+            * non-word characters (spaces, punctuation) now ignored in
+              color names
+            * smarter handling of comments in rgb.txt files
+            * significant rewrite to parts of the code, requires Tie::Sub
+            * rewritten how FIRSTKEY and NEXTKEY methods work
+            - better error handling
+            - minor updates to documentation
+            - typos in comments
+            - added better checking for minimum Perl version reqs
+            - added aliaes w/out punctuation in Netscape scheme
+
+    More details can be found in the Changes file.
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+LICENSE
+    Copyright (c) 2001-2008 Robert Rothenberg. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

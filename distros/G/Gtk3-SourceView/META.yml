@@ -1,0 +1,23 @@
+---
+abstract: 'Perl binding for the Gtk3::SourceView widget'
+author:
+  - 'Maximilian Lika <Maximilian-Lika@gmx.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gtk3-SourceView
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Glib::Object::Introspection: '0'
+  Gtk3: '0'
+version: '0.12'

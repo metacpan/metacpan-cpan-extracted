@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use lib 'lib';
+
+my @testfiles;
+if (@ARGV >= 1) {
+    @testfiles = @ARGV;
+} else {
+    opendir (TD, 't');
+    while (my $testfile = readdir(TD)) {
+        push (@testfiles,$testfile);
+    }
+    closedir(TD);
+}
+
+foreach my $testfile (@testfiles) {
+    next unless $testfile =~ /\.t$/;
+    print "[ ".$testfile." ]\n";
+    require ( ("t/".$testfile) );
+}

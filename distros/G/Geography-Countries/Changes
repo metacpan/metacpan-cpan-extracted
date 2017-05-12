@@ -1,0 +1,13 @@
+Version 2009040901
+- Force DATA encoding to be iso-8859-1 (davidhull/RT #38005)
+----
+Version 2009040801
+- Moved to git and github.
+- Modernized distro.
+----
+Revision 1.2  2000/09/05 18:22:01  abigail
+Changed typo in "Federal Republic of Germany" (Dan Allen)
+Changed layout of test.pl
+----
+Revision 1.1  1999/09/15 07:27:22  abigail
+Initial revision

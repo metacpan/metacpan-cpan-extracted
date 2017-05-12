@@ -1,0 +1,6 @@
+Revision history for Perl extension Geo::Cartogram.
+
+0.01  Sun Nov 26 21:35:23 2006
+	- original version; created by h2xs 1.23 with options
+		-X -A -n Geo::Cartogram
+

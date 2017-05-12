@@ -1,0 +1,17 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/snake.pl
+lib/Games/Snake.pm
+lib/Games/Snake/Level.pm
+lib/Games/Snake/Player.pm
+t/00-load.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

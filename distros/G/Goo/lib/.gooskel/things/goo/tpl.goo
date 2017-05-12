@@ -1,0 +1,16 @@
+title = Template 
+description = Generic Template in Goo Markup (GML)
+
+location = things/tpl 
+
+#[M]ake			=	Goo::Thing::gml::Maker.pm
+[E]dit			=	Goo::Editor.pm
+[C]lone			=	Goo::FileThing::Cloner.pm
+[P]rofile		=	Goo::Thing::gml::Profiler.pm
+[D]elete		=	Goo::FileThing::Deleter.pm
+E[X]it			=	Goo::Exiter.pm
+[J]ump			=	Goo::JumpManager.pm
+[B]ack			=	Goo::TrailGoBackOne.pm
+Back [L]inks	=	Goo::BackLinkManager.pm
+Care[O]Meter	=	Goo::CareOMeter.pm
+[Z]one      	=   Goo::Zone.pm

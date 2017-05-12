@@ -1,0 +1,105 @@
+=head1 NAME
+
+GRID::Machine::Message - Primitives for sending and receiving
+
+=head1 DESCRIPTION
+
+
+This class is used by both the local and the remote sides of the
+C<GRID::Machine>. It implements the low level communication 
+layer. It is responsible of marshalling the data.
+
+=head2 The C<read_operation> Method
+
+Syntax:
+
+   my ( $operation, @args ) = $server->read_operation( );
+
+Returns the kind of operation and the data sent by the other
+side of the SSH link.
+
+=head2 The C<send_operation> Method
+
+Examples:
+
+  $server->send_operation("RETURNED", GRID::Machine::Result->new( %arg ));
+
+  $server->send_operation("DIED", GRID::Machine::Result->new( 
+                                    errmsg  => "$server->{host}: $message")
+  );
+
+  $server->send_operation("RETURNED", exists($server->{stored_procedures}{$name}));
+
+
+
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * L<GRID::Machine>
+
+=item * L<GRID::Machine::IOHandle>
+
+=item * L<GRID::Machine::Group>
+
+=item * L<GRID::Machine::Process>
+
+=item * L<GRID::Machine::perlparintro>
+
+
+=item *  L<Net::OpenSSH> 
+
+=item * L<IPC::PerlSSH>
+
+=item * L<IPC::PerlSSH::Async>
+
+=item * Man pages of C<ssh>, C<ssh-key-gen>, C<ssh_config>, C<scp>, 
+C<ssh-agent>, C<ssh-add>, C<sshd>
+
+=item * L<http://www.openssh.com>
+
+=back
+
+
+
+
+=head1 AUTHOR
+
+Casiano Rodriguez Leon E<lt>casiano@ull.esE<gt>
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+Support from Gobierno de Canarias was through GC02210601
+(I<Grupos Consolidados>).
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+I wish to thank Paul Evans for his C<IPC::PerlSSH> module: it was the source
+of inspiration for this module. To 
+Alex White,
+Dmitri Kargapolov, 
+Eric Busto
+and
+Erik Welch 
+for their contributions.
+To the Perl Monks, and the Perl Community for generously sharing their knowledge.
+Finally, thanks to Juana, Coro and  my students at La Laguna.
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2007 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+

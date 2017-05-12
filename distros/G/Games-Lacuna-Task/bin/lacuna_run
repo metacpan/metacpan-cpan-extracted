@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use Games::Lacuna::Task::ActionProto;
+
+Games::Lacuna::Task::ActionProto->new->run;
+
+=encoding utf8
+
+=head1 NAME
+
+lacuna_run - Run a single task in the Lacuna MMPOG
+
+=head1 USAGE
+
+ lacuna_run command [options]
+ lacuna_run help
+ lacuna_run command --help
+
+=head2 GLOBAL OPTIONS
+
+=head3 configdir
+
+Path to the lacuna config directory (will be created if it does not exist)
+
+Default: ~/.lacuna/
+
+=head3 loglevel
+
+Prints all messages equal or above the given level
+
+Default: info
+Accepted: debug,info,notice,warn,error
+
+=head3 debug
+
+Log all messages to debug.log
+
+=head3 -? --usage --help  
+
+Prints usage information

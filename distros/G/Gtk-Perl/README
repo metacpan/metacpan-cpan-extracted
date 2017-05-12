@@ -1,0 +1,94 @@
+
+	The source files in this distribution are 
+	Copyright (C) 1997-2001, Kenneth Albanowski, Paolo Molaro and are 
+	licensed for use under the same terms as Perl itself.
+
+The graphics files, testgtkrc file, */*.defs (originally gtk.defs) file,
+and the origination for test.pl and simple.pl are from the gtk distribution,
+and are under this copyright:
+
+/* GTK - The GIMP Toolkit
+ * Copyright (C) 1995-1997 Peter Mattis, Spencer Kimball and Josh MacDonald
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+The GNU public license is included with Perl, and with this distribution in
+the file "COPYING".
+
+Note that there is a mailing-list foir discussions about
+development of and with Gtk-Perl: gtk-perl-list@gnome.org.
+To subscribe to this list, send "subscribe" in the subject to
+gtk-perl-list-request@gnome.org. Bug reports can be sent directly to the list
+or logged on http://bugzilla.gnome.org/ on product gnome-perl.
+Make sure you include all the relevant info and if possible
+also a small test case that shows the bug and how to reproduce it.
+
+Starting with version 0.7005 the toplevel makefile will try to autodetect
+what sub-modules can be compiled on your system and do that automatically for you
+taking into account the dependencies of the modules.
+
+See the INSTALL file for more details on installing this package.
+
+This setup may require changes in the source code of existing programs, ie
+if you need gdk-imlib support, you need to "use Gtk::Gdk::ImlibImage".
+The same applies if you used gnome features without "use Gnome".
+
+Also, starting with version 0.7000, info about flags and enumeration values are
+retreived directly from gtk+ at runtime instead of relying on our .defs files.
+This makes for faster startup and lower memory usage, but may introduce
+some source incompatibilities: the only one I know of is the values of
+Gtk::PackerOptions (pack-expand becomes expand now).
+
+This module should compile with Gtk+ version 1.2.x, gnome version 1.0.x,
+libglade version 0.11, gdkimlib version 1.9.x, gtkglarea 1.2.x.
+
+Some of the information below may be out of date.
+
+Usage information: this package was designed to work Gtk+ versions 0.99.10
+through 1.2.3, though there is no guarantee it will work with any other
+distributions, or indeed even those ones. To build, fully build and install
+Gtk in your system (and glib too, if necessary), then run 'perl
+Makefile.PL', and 'make test', and then 'make install' if all went well.
+
+You may optionally run Makefile.PL with several different switches to enable
+use of some Gtk widgets and Gdk functions available in those packages. These
+switches are listed when you run Makefile.PL.
+
+Gtk is available at <ftp://ftp.gimp.org/pub/gtk/>.
+
+The code may very well still have leaks, and a few portions are incomplete
+(such as Gdk colormap manipulation) and much of it is untested. No
+documentation currently exists, but this code is designed to mimic the C
+calling sequences as much as is reasonable.
+
+A major file reorganization happened with 0.1.13, hopefully making the
+module easier to work with, and add widgets to, but it may turn out to break
+with older Perl installations. A configuration reorgnization occured after
+0.3, to try and copy with supporting multiple Gtk versions.
+
+If you have been using Gtk-0.1.8, several changes have been made to the API,
+including the change of enumeration and flag values to lowercase (to match
+the constants defined in gtk.defs), and the requirement for Gtk->init() to
+be invoked before any other Gtk functions.
+
+Please bring information regarding bugs and other issues to
+<gtk-list@redhat.com> (before posting, you will need to subscribe to the
+list by sending 'subscribe' to gtk-list-request@redhat.com) or the primary
+author, at <kjahds@kjahds.com>. I cannot guarantee, at the moment, that any
+particular problem will be fixed.
+
+Good Luck,
+Ken

@@ -1,0 +1,62 @@
+Revision history for Git-Repository-Plugin-Blame.
+
+v1.4.0  2017-03-21
+        - Relicensed under Perl 5 terms.
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+
+v1.3.0  2015-05-24
+        - Added 'ignore_whitespace' option to blame(). Thank you, Dominic
+          Sonntag!
+
+v1.2.3  2014-11-24
+        - Fixed POD (GH-6). Thank you, Сергей Романов!
+
+v1.2.2  2014-06-09
+        - Added git v1.5.0 requirement.
+
+v1.2.1  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - General cleanup.
+
+v1.2.0  2013-11-15
+        - Added a new dependency due to a split in Git::Repository.
+
+v1.1.1  2013-08-08
+        - Required Class::Load v0.20 for load_class() to return the class name.
+
+v1.1.0  2013-08-08
+        - Added optional caching mechanism for blame()'s output.
+        - Cleaned up tests and added Coveralls.io support.
+
+v1.0.5  2013-04-07
+        - Added Test::FailWarnings to all tests.
+        - Reported Search CPAN links to MetaCPAN.
+        - Moved to using GitHub's issues instead of RT, updated links.
+        - Moved release tests to xt/, added new release tests.
+        - Added handling of release tests to Build.PL.
+        - Added examples/ and info on how to contribute to this directory.
+        - Fixed prerequisites.
+        - Fixed dates in Changes, to use international format.
+        - Added configuration file to tie into Travis-CI for continuous
+          integration.
+
+v1.0.4  2012-10-03
+        - Relicensed as GPLv3.
+
+v1.0.3  2012-05-24
+        - Updated .perlcriticrc to use only core policies.
+        - Updated bug tracker information in POD.
+        - Added meta information.
+
+v1.0.2  2012-02-04
+        - Updated dependencies to require Git::Repository v1.20, to support
+          changes introduced in v1.0.1.
+
+v1.0.1  2012-02-04
+        - Fixed problem when git blame output was too large and caused the
+          module to hang.
+
+v1.0.0  2012-01-29
+        - First public version.

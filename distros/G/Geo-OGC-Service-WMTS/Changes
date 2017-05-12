@@ -1,0 +1,17 @@
+0.04, Jan 26, 2017
+  * If processor exists, call its process method with dataset, tile and self
+  * Configuration parameter serve_arbitrary_layers to skip checking requested layer names
+  * Require that the BBOX defines specifically a tile, it can't be arbitrary
+  * Fix how row and col are computed in GetMap
+  * Fix a bug where the Plack::Request object provided by Service was overwritten
+  * In test, use GDAL data files from share provided by Geo::GDAL
+
+0.03, Sep 12, 2016
+  * Fix the computation of col and row for GetMap tile requests.
+  * Support Geo::GDAL version 1.x.
+  * Support for processor add-ons.
+
+0.02, Dec 1, 2015
+  * Rename Tile class to Geo::OGC::Service::WMTS::Tile
+
+0.01, Nov 15, 2015

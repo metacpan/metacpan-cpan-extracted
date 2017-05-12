@@ -1,0 +1,43 @@
+
+############################################################################## 
+Games::Irrlicht 
+
+2004-02-28 v0.01 Tels - 153 tests (first version)
+  * first working draft
+  * from SDL::App::FPS:
+    + Games::Irrlicht
+    + Games::Irrlicht::Thingy
+    + Games::Irrlicht::Timer
+    + Games::Irrlicht::EventHandler (not functional)
+    + Games::Irrlicht::Group
+
+2004-02-29 v0.02 Tels - 156 tests
+  * added getPrimitiveCountDrawn(), addCameraSceneNodeFPS()
+  * hide_mouse_cursor()
+  * print out what went wrong in init_engine()
+  * query filesystem, too
+  * fixed the Makefile.PL building, thanx Nick. Ing. Simmons!
+
+2004-03-06 v0.03 Tels - 158 tests
+  * Irrlicht: added FileSystem(), SzeneManager(), GUIEnvironment(),
+    VideoDriver(), IrrlichtDevice()
+  * tests for these
+  * EventReceiver supresses output if disable_logging, used by tests
+  * use  mbstowcs() to convert Perl scalar for wchar* functions
+
+2004-03-14 v0.04 Tels - 163 tests
+  * added a preliminary Makefile.PL.win32
+  * added for device:
+    + getVersion()
+    + isWindowActive()
+  * added for filesystem: 
+    + changeWorkingDirectoryTo()
+    + getWorkingDirectory()
+    + FileExists()
+  * added getOSOperator() and getOperationSystemVersion()
+  * added Games::Irrlicht::Constants so that you get EDT_OPENGL etc.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

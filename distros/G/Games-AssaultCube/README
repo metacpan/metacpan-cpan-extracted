@@ -1,0 +1,66 @@
+NAME
+    Games::AssaultCube - The AssaultCube perl libraries
+
+SYNOPSIS
+            This is just a placeholder, please see the subclasses.
+
+ABSTRACT
+    This module provides the supporting perl libraries around the popular
+    game, AssaultCube.
+
+DESCRIPTION
+    This module provides the supporting perl libraries around the popular
+    game, AssaultCube. Please see the subclasses for specific functionality.
+
+    The AssaultCube website can be found at <http://assault.cubers.net/>
+
+    WARNING: The modules in this distribution have been tested against the
+    latest AssaultCube version: 1.0.2 and use at your own risk if you have
+    an older/newer version :)
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Games::AssaultCube
+
+  Websites
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Games-AssaultCube>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Games-AssaultCube>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-AssaultCube>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Games-AssaultCube>
+
+    *   CPAN Testing Service
+
+        <http://cpants.perl.org/dist/overview/Games-AssaultCube>
+
+  Bugs
+    Please report any bugs or feature requests to "bug-games-assaultcube at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-AssaultCube>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+AUTHOR
+    Apocalypse <apocal@cpan.org>
+
+    Props goes to Getty and the BS clan for the support!
+
+    This project is sponsored by <http://cubestats.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2009 by Apocalypse
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

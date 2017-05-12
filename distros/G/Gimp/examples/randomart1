@@ -1,0 +1,119 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+# Definiere die Konstante "pi mal zwei"
+use constant PIx2 => 8 * atan2 1,1;
+
+podregister {
+   Gimp::Context->push();
+
+   # Erzeuge ein neues Bild
+   my $image = new Gimp::Image($width,$height,RGB);
+   $image->undo_disable;
+
+   # Erzeuge die erste Ebene für das Bild
+   my $layer = $image->layer_new($width,$height,RGB_IMAGE,
+		   "Random Art #1",100,NORMAL_MODE);
+
+   # Füge sie in das Bild ein
+   $image->insert_layer($layer,0,0);
+
+   # Setze die Hintergrundfarben
+   Gimp::Context->set_background('white');
+
+   # ...und lösche die Ebene damit
+   $layer->fill(BACKGROUND_FILL);
+
+   # Jetzt wurde ein neues, leeres Bild erzeugt, und
+   # das Zeichnen kann beginnen.
+
+   # Erzeuge zufällige Polygone, fülle sie mit einem
+   # zufälligen Farbgradienten und verschiebe das Bild
+   # wiederholt.
+   for (1..$num_poly) {
+      my @ecken;
+      for (1..$edges*$revolutions) {
+	 my $r = rand(0.4)+0.1;
+	 push(@ecken, $width/2+sin($_*PIx2/$edges)*$r*$width,
+		      $height/2+cos($_*PIx2/$edges)*$r*$height);
+      }
+
+      # Selektiere die Region
+      Gimp::Context->set_feather($feather);
+      $image->select_polygon(CHANNEL_OP_REPLACE, \@ecken);
+
+      # Wähle zufällig zwei Farben aus
+      Gimp::Context->set_foreground([rand(256)/256.0,rand(256)/256.0,rand(256)/256.0]);
+      Gimp::Context->set_background([rand(256)/256.0,rand(256)/256.0,rand(256)/256.0]);
+
+      # Und erzeuge einen Farbverlauf über das Bild
+      $layer->edit_blend (FG_BG_HSV_MODE,
+		     DIFFERENCE_MODE,
+		     GRADIENT_LINEAR,         # gradient type
+		     100,                     # opacity
+		     0,                       # offset
+		     REPEAT_TRIANGULAR,       # repeat
+		     0,                       # reverse
+		     $super,                  # supersampling
+		     2,
+		     3,
+		     0,                       # no dithering
+		     $width/2,                    # x1
+		     $height/2,                    # y1
+		     rand($width),                # x2
+		     rand($height));               # y2
+
+      # Und dann verschiebe das Bild etwas
+      $layer->offset (1,0,(rand(0.8)+0.1)*$width,(rand(0.8)+0.1)*$height);
+   }
+
+   Gimp::Context->pop();
+
+   $image->selection_none;
+   $image->undo_enable;
+   eval { Gimp::Display->new($image); };
+
+   # Gib das neu erzeugte Bild zurück, damit es angezeigt wird.
+   $image;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+random_art_1 - Create a Random Tile
+
+=head1 SYNOPSIS
+
+<Image>/File/Create/Logos/Random Art #1...
+
+=head1 DESCRIPTION
+
+Create a tileable image by repeatedly drawing colourful polygons
+
+=head1 PARAMETERS
+
+  [PF_INT32,	'width',	'Image width',		300],
+  [PF_INT32,	'height',	'Image height',		300],
+  [PF_SLIDER,	'num_poly',	'Number of polygons',	20, [5,100,1]],
+  [PF_SLIDER,	'edges',	'Number of edges',      10, [3, 30, 1]],
+  [PF_SLIDER,	'revolutions',	'Number of revolutions',1, [1, 3, 1]],
+  [PF_SLIDER,	'feather',	'Feather radius',	30, [1, 100]],
+  [PF_BOOL,	'super',	'Adaptive supersampling', 0],
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+0.4
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

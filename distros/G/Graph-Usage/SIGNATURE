@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.42.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 e7ef3fb1bb7d34e68f8fb3d8b24a5e62439edb88 CHANGES
+SHA1 02154445bc9831e791c35050f1a018ed99030016 LICENSE
+SHA1 9b33398333f00f6f174ea138081dccbbb73975cf MANIFEST
+SHA1 9b8dbf8692647f82706141589857b1d834c061b7 META.yml
+SHA1 90b0b0688641865372df7312d95ed9a2627f20d4 Makefile.PL
+SHA1 4a9b5b19725efcb2b3840fdd9da876bc06dbc9a4 README
+SHA1 58f1b277cb828539f497c40480b9b884282bf596 TODO
+SHA1 2b5b07ebc9d45b6862d507a6fd6d886aee2e8d05 gen_graph
+SHA1 78745166bbda3ea00b0991671c53d85563774bf1 lib/Graph/Usage.pm
+SHA1 79d6cf65f1aa8b22cdc92ffa049f8e0e8282a0ae t/00_basic.t
+SHA1 292b4099d566a2b4e5df9e97f13f380209b74106 t/01_html.t
+SHA1 5e678f56bacc9cd026e839a679d658069cb2e573 t/lib/Graph/Usage/MySubClass.pm
+SHA1 04355f4e8ef11c55f446a6f8f3c47d75c4bba971 t/lib/Test.pm
+SHA1 fcaa06302cc889f872d22da0bbddd6cf8f7d60d5 t/pod.t
+SHA1 7a534d4ca0a7ae8841dcc6399f118ff109c74dc2 t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iQEVAwUBQ9zcuXcLPEOTuEwVAQE3+Af+N5qyE6juoyXS1K+s7aymK2M5imWtRqIj
+ZJuHx2xE4ghgVqeoyYnjZx0Jiech+ETIsLV6UH30FK2wyRafOF0ebTpXbhM4jTR5
+6DbvvlFh8o2d0l33tbQWXXTOztzcW30i5d08EuinxGRCmJ7PIZ224yWH2PVVtq9I
+/JZFsmS726FuFu9AVXfcICnYbW+eUN7LfEkAwK64HAhrPflYANl4/d01SW8zPPEH
+jrqHWdRzh0H0aGNv3p5TJqgAS7wuUmkpvRVYUvZZnPzfZ0hc0yqRzHR3fXjypUyP
+yLZ8RCVtACwIbTahFxz3hr/x4w4VWRoa6lAD0cU2RELoEW4lx53tMw==
+=oe2A
+-----END PGP SIGNATURE-----

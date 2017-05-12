@@ -1,0 +1,301 @@
+use strict;
+use Module::Build;
+use File::Find;
+
+print( '*' x 80, "\n" );
+print( "Gantry Framework\n" );
+print( '*' x 80, "\n" );
+
+my $subclass = Module::Build->subclass(
+    class   => 'My::Builder',
+    code    => &_custom_code(),
+);
+
+# collect web files
+my( %web_dirs, @web_dirs );
+
+find( \&wanted, 'root' );
+
+sub wanted {
+
+    my $dir = $File::Find::dir;
+    $dir =~ s![^/]*/!!;
+
+    next if $dir =~ /\.svn/;
+
+    ++$web_dirs{ $dir };
+}
+
+push( @web_dirs, '/*.*' );
+foreach my $k ( sort { $a cmp $b } keys %web_dirs ) {
+    print "[web dir] $k\n";
+    push( @web_dirs, ( $k . '/*.*' ) );
+}
+    
+my $build = $subclass->new(
+    web_files => \@web_dirs,
+    build_web_directory => 'root',
+    install_web_directories =>  { 
+        'default' => '/home/httpd/html/gantry',
+        'prod'    => '/home/httpd/html/gantry',
+        'dev'     => '/home/httpd/html/gantry',
+        'tim'     => '/home/tkeefer/httpd/html/gantry' 
+    },
+    create_makefile_pl => 'passthrough',
+    license            => 'perl',
+    module_name        => 'Gantry',
+    requires           => {
+        'perl'                      => '5.008000',
+        'CGI::Simple'               => 0,
+        'Date::Calc'                => 0,
+        'Crypt::CBC'                => 0,
+        'Data::FormValidator'       => 0,
+        'Template'                  => '2.0',
+        'URI'                       => 0,
+        'Data::UUID'                => 0,
+        'DBI'                       => 0,
+        'HTML::Prototype'           => 0,
+        'Hash::Merge'               => 0,
+        'File::Copy::Recursive'     => 0,
+        'HTTP::Server::Simple::CGI' => 0,
+        'Config::General'           => '2.31', 
+        'JSON'                      => 0,
+        'Sub::Install'              => 0,
+        'HTML::SuperForm'           => 0,
+        'Template::Plugin::HTML::SuperForm' => 0,
+        'Mail::RFC822::Address'     => 0,
+    },
+    build_requires      => {
+        'Test::More'          => 0,
+        'Test::Exception'     => 0,
+    },
+    create_makefile_pl  => 'passthrough',
+    script_files        => [ glob('bin/*') ],
+    test_files          => [
+        't/*.t',
+        't/engine/*.t',
+        't/plugins/*.t',
+        't/utils/*.t',
+        't/auth/*.t',
+        't/conf/*.t',
+        't/form/*.t',
+        't/template/*.t',
+    ],
+#    'recursive_test_files' => 1,
+);
+
+my $default_template_path = $build->{ properties }
+                                    { install_web_directories }
+                                    { default };
+
+eval {
+    require Gantry::Init;
+    $default_template_path = Gantry::Init->base_root();
+};
+
+my $template_path = $ENV{'GANTRY_TEMPLATE_PATH'};
+if (! $template_path) {
+    print "\n\nGantry comes with a set of default templates that\n"
+        . "need to be written to disk. A typical location for these\n"
+        . "templates is your web server document root.\n\n";
+
+    $template_path = $build->prompt(
+        "Path for Gantry templates",
+        $default_template_path,
+    );
+}
+
+$build->notes( install_web_directory => $template_path );
+
+if ( not -d $template_path ) {
+    my $make_path = $ENV{'GANTRY_TEMPLATE_PATH'} || $build->y_n(
+        "$template_path does not exist, should I make it?",
+        'y'
+    );
+
+    if ( $make_path ) {
+        eval {  
+            File::Path::mkpath( $template_path );
+        };
+        if ( $@ ) {
+            $@ =~ s/ at .+?$//;
+            print "Error: unable to create directory $template_path @_\n";
+            $build->notes( install_web_directory => '__skip__' );
+        }
+    }
+    else {
+        $build->notes( install_web_directory => '__skip__' );
+    }
+}
+
+$build->create_build_script;
+
+sub _custom_code {
+
+    return( q{
+
+    sub ACTION_code {
+        my $self = shift;
+        $self->SUPER::ACTION_code();
+
+        $self->add_build_element( 'web' );
+        
+        $self->process_web_files( 'web' );
+
+    }
+
+    sub ACTION_install {
+        my $self = shift;
+        
+        my $p = $self->{properties};        
+
+        my $install_base = $self->install_destination('lib') 
+            || $p->{install_sets}{site}{lib};
+        
+        my $initf = "$install_base/$p->{dist_name}/Init.pm";
+                
+        $self->SUPER::ACTION_install();
+
+        my $tmpl_dir = $self->notes( 'install_web_directory' );
+            
+        if( $tmpl_dir && $tmpl_dir ne '__skip__' ) {
+
+            # write Init.pm file with install options
+
+            my $init_pkg = << "EO_INIT";
+package Gantry::Init;
+use strict;
+
+sub base_root {
+    return "$tmpl_dir";
+}
+1;
+
+=head1 NAME
+
+Gantry::Init - stores things the user provided to Build.PL during install
+
+=head1 SYNOPSIS
+
+    use Gantry::Init;
+    my \$base_root = Gantry::Init->base_root();
+
+=head1 Methods
+
+=head2 base_root
+
+Returns the local system path to Gantry's default templates.  This usually
+becomes the last item in the Template Toolkit template path.
+
+=head1 AUTHOR
+
+Auto-generated by Build.PL
+
+=cut
+
+EO_INIT
+
+            for my $dst ("blib/lib/Gantry/Init.pm", $initf) {
+                my $orig_mode = (stat $dst)[2];
+                my $rw_mode = 0666;
+                chmod $rw_mode, $dst or die "Can't chmod $rw_mode $dst: $!";
+                open( INIT_FILE, "> $dst" ) or die "$!";
+                print INIT_FILE $init_pkg;
+                close INIT_FILE;
+
+                # restore the perms
+                chmod $orig_mode, $dst or die "Can't chmod $orig_mode $dst: $!";
+            } 
+
+            eval {  
+                # this should have been done during perl Build.PL
+                if ( not -d $tmpl_dir ) {
+                    File::Path::mkpath( $tmpl_dir );
+                }
+            };
+            if ( $@ ) {
+                print "Error: unable to create directory $tmpl_dir\n";
+                $@ =~ s/ at .+?$//;
+                die( "$@\n" );
+            }
+            
+            my $blib_tmpl_dir = File::Spec->catdir(
+                $self->blib, 'web', $p->{build_web_directory} 
+            );  
+            
+            eval {
+                require File::Copy::Recursive;
+                import File::Copy::Recursive 'dircopy';
+
+                $num = dircopy($blib_tmpl_dir, $tmpl_dir) || 0;
+            };
+            if ( $@ ) {
+                print "\nError coping templates:\n";
+                print $@ . "\n";
+            }
+            else {
+                print "\n$num Gantry templates copied to $tmpl_dir\n";
+            }
+        }
+        else {
+            print "SKIPPING WEB CONTENT INSTALL\n";
+        }
+        
+        print "\n";
+
+    } # end ACTION_install
+
+    sub process_web_files {
+        my $self = shift;
+        my $files = $self->find_web_files;
+        return unless @$files;
+        
+        my $tmpl_dir = File::Spec->catdir($self->blib, 'web');
+        File::Path::mkpath( $tmpl_dir );
+        
+        foreach my $file (@$files) {
+            my $result = $self->copy_if_modified($file, $tmpl_dir) 
+                or next;
+            #$self->fix_shebang_line($result);
+        }
+    }
+
+    sub find_web_files {
+        my $self = shift;
+        my $p = $self->{properties};
+        my $b_tmpl_dir = $p->{build_web_directory};
+        $b_tmpl_dir =~ s/\/$//g;
+
+        if (my $files = $p->{web_files}) {
+            if (  UNIVERSAL::isa($files, 'HASH') ) {
+                my @files = [keys %$files];
+                return( \@files );
+            }
+            
+            my @files;
+            foreach my $glob ( @$files ) {
+                $glob = "$b_tmpl_dir/$glob";
+                push( @files, glob( $glob ) );
+            }       
+            return( \@files );
+            return( [ map $self->localize_file_path($_), @files ] );
+            return( \@localized );
+        } 
+    }
+
+    sub web_files {
+        my $self = shift;
+        for ($self->{properties}{web_files}) {
+            $_ = shift if @_;
+            return unless $_;
+            
+            # Always coerce into a hash
+            return $_ if UNIVERSAL::isa($_, 'HASH');
+            return $_ = {$_ => 1} unless ref();
+            return { map {$_,1} @$_ };
+        }
+    }
+    
+    } ); # end return
+
+} # end _custom_code

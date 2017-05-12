@@ -1,0 +1,70 @@
+Revision history for Perl extension GraphViz2::Marpa::PathUtils.
+
+2.00  Fri Nov 28 11:14:00 2014
+	- Switch from Hash::FieldHash to Moo.
+	- Re-write to use GraphViz2::Marpa V 2.03. This involves many changes.
+		One effect is that the original structure and attributes of nodes and edges is now preserved
+		in the output clusters.
+	- Rename *::Utils to *::Demo. It's only used by the author.
+		Rewrite the html generating code, so each cluster test and each fixed length path test has
+		own web page.
+	- Update the docs.
+	- Edit line lengths in docs to be 100 chars, max.
+	- Rename data/*.gv files, and move output *.gv files into out/.
+	- With clusters, output each cluster into its own out/*.gv and html/*.svg file.
+	- Update MANIFEST.
+	- Update the pre-reqs.
+	- Replace Path::Class with File::Spec.
+	- Rename parameters to new().
+	- Add github repo to docs, Build.PL and Makefile.PL.
+	- Move t/pod.t to xt/author/.
+	- TODO: Things which are not yet implemented:
+		o Paths into or out of subgraphs.
+		o allow_cycle logic.
+
+1.05  Wed Jan 29 10:27:00 2014
+	- After calling find_clusters(), sort the result twice: Once for elements within a set and once
+		for the sets, because Marpa::R2 V 2.079_013 returns results in a different order than
+		previous versions.
+
+1.04  Wed Jun 12 08:55:00 2013
+	- Install Graphviz 2.30.1 from AT&T.
+	- Rename CHANGES to Changes as per CPAN::Changes::Spec.
+	- Re-write the code in Build.PL and Makefile.PL which checks for Graphviz (dot) being installed,
+		since the previous code, using a pipe, was failing on some versions of Windows.
+	- Assume Config.pm is installed, and hence remove it from the pre-reqs.
+		This also stops a warning message generated because Config's version # is undef.
+	- Likewise assume File::Spec and File::Temp are installed, and 'recent enough'.
+		This is because the new code uses these 3 modules before specifying the pre-reqs.
+	- Bump the pre-req for Perl from 5.10.0 to 5.14, since we 'use feature qw/unicode_strings/.
+	- Re-write the code in Build.PL and Makefile.PL which checks for Perl being 'recent enough',
+		since the previous code, using a pre-req of "perl => '5.10.0'" generates a warning message
+		when using Makefile.PL (for my current Perl V 5.14.2). Now we analyze $Config{version}.
+	- Re-create the demo files. See scripts/generate.demo.sh.
+
+1.03  Mon May 20 11:38:00 2013
+	- Add another demo, graphs/directed/arrows.gv as data/08.clusters.in.gv, from Graphviz V 2.29.
+	- Remove the special-case label "\N" from data/02.fixed.paths.in.gv. Such an escape sequence
+		causes Graphviz to override the node-renumbering logic in find_fixed_length_paths(), which I
+		need to allow the same node to appear multiple times in the output graph without Graphviz
+		automatically coalescing them into a single node.
+	- Add a new FAQ entry (the first in the list) to discuss this issue.
+	- Remove some other, redundant, node attributes from data/02.fixed.paths.in.gv, to simplify
+		debugging all this.
+
+1.02  Thu Nov  8 12:38:00 2012
+	- No code changes.
+	- For pre-reqs such as strict, warnings, etc, which ship with Perl, set the version # to 0.
+		Reported as RT#80663 by Father Chrysostomos for Tree::DAG_Node.
+	- Remove from TODO things which have been implemented.
+	- Add scripts/code.attributes2html.pl to create html/code.attributes.html.
+	- Add back data/07.clusters.in.gv now Graphviz bug is fixed in V 2.29.20121107.0545.
+
+1.01  Mon Oct 15 14:20:00 2012
+	- Implement find_clusters() which finds mutually-exclusive clusters of nodes.
+	- Rename data/* and html/* demo files.
+	- Re-write scripts/generate.demo.pl to handle new code and file names.
+	- Put the demo generating code into GraphViz2::Marpa::PathUtils::Demo.
+
+1.00  Mon Sep 24 17:35:00 2012
+	- Original version

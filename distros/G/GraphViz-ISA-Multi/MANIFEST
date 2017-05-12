@@ -1,0 +1,13 @@
+Changes
+examples/curses-ui.pl
+examples/cpanp.pl
+lib/GraphViz/ISA/Multi.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_methods.t
+t/003_pod.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

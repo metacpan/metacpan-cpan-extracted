@@ -1,0 +1,4 @@
+name = "Geo-OSM-Imager"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+=pod
+ Translate the header file plot.h to xsub declarations.
+ use with gnu libplot
+=cut
+
+
+while(<>) {
+    next unless /^int|^double|^FILE/;
+    chomp;
+    print "#  $_ \n";
+    ($return_type,$name,$arglist) = 
+	/(\S+)\s+(\w+)\s*___P\s*\(\(([^\)]*)\)\)/;
+    @args = split('\s*,\s*',$arglist);
+    @argtype=();
+    @argname=();
+    foreach $arg (@args) {
+	$arg =~ s/___const\s+//g;
+	$arg =~ s/^s*//; $arg =~ s/\s*$//;
+	($argtype,$argname) = split('\s+',$arg);
+	next unless defined $argtype and defined $argname;
+	push @argtype,$argtype;
+	push @argname,$argname;
+    }
+    print $return_type,"\n";
+    print "$name(";
+#    print "$name\n";
+    for($i=0;$i<@argname;$i++) {
+	$outname = $argname[$i];
+	$outname =~ s/\*//g;
+	print $outname;
+	print "," unless $i == $#argname;
+    }
+    print ")\n";
+    for($i=0;$i<@argname;$i++) {
+	print "      $argtype[$i]  $argname[$i]\n";
+    }
+    print "\n\n";
+}
+
+
+
+
+
+
+
+

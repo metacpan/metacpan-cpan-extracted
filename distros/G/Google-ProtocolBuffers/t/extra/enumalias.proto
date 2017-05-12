@@ -1,0 +1,9 @@
+message EnumAlias {
+  enum Status {
+    option allow_alias = true;
+    UNKNOWN = 0;
+    STARTED = 1;
+    RUNNING = 1;  
+  }
+  required Status status = 1 [default = UNKNOWN];
+}

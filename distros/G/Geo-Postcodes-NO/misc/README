@@ -1,0 +1,25 @@
+Updated postcodes
+------------------
+It is possible to update the postcodes yourself, but I do not recommend it.
+
+1. Run the command './update_no -update'. This will take care of everything.
+   The old version of the module (NO.pm) is automatically renamed (with a
+   trailing dot and a large numer).
+
+2. Install the module, after running the tests; './Build test install' or
+   'make test install'.
+
+The postcode file can be found on <http://epab.posten.no/>. Click on
+"Nedlasting" on the bottom of the page, and download the file 'tilbud5'.
+The direct link is <http://epab.posten.no/Norsk/Nedlasting/_Files/tilbud5>.
+
+The syntax in the postcode file may change, and this may cause errors in the
+parsing - and errors in the generated perl code. It is possible to check the
+syntax by running the program as './update_no'.
+
+An explanation of the syntax on the postcode file  is given in the following
+document: "http://epab.posten.no/Norsk/Nedlasting/_Files/NorLayout.doc".
+
+Note that the tests are hard coded for a few selected postcodes, and can stop
+functioning if there are changes in one of them.  I recommend that you instead
+wait for a new and updated official version of the module. 

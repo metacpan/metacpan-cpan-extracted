@@ -1,0 +1,37 @@
+---
+abstract: "Managing Worker's lifecycle with Slots"
+author:
+  - 'HyeonSeung Kim <sng2nara@hanmail.net>'
+build_requires:
+  AnyEvent::Gearman: 0
+  Exporter: 0
+  Gearman::Client: 0
+  JSON: 0
+  POSIX: 0
+  Storable: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gearman-SlotManager
+requires:
+  Any::Moose: 0
+  AnyEvent: 0
+  AnyEvent::HTTPD: 0
+  Data::Dumper: 0
+  Devel::GlobalDestruction: 0
+  Gearman::Server: 0
+  Gearman::Worker: 0
+  LWP::Simple: 0
+  Log::Log4perl: 0
+  Scalar::Util: 0
+  namespace::autoclean: 0
+resources:
+  homepage: https://github.com/sng2c/Gearman-SlotManager
+  repository: git://github.com/sng2c/Gearman-SlotManager.git
+version: 0.3

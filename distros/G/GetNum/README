@@ -1,0 +1,44 @@
+NAME
+    GetNum - coerce scalars into numbers or return undef
+
+SYNOPSIS
+     use GetNum;
+
+     my $i = get_int('foo'); # returns undef
+     my $i = get_int('123'); # returns 123
+
+DESCRIPTION
+    This module can be used to force scalar to be coerced into numeric types
+    in a situation when the effect of "int()" to turn non-numerics into 0
+    (zero) is not desirable.
+
+    This module is handy when programming a serialization strategy for a
+    Perl object into JSON where datatypes affect the output.
+
+EXPORTED SUBROUTINES
+    All subroutines are exported by default.
+
+    *   iget_int - coerce a scalar into an integer or return undef
+
+    *   is_int - returns true if a scalar is an integer
+
+    *   get_float - coerce a scalar into a float or return undef
+
+    *   is_float - returns true if a scalar is a float
+
+SEE ALSO
+    The discussion on SV (Perl scalar variables) manipulation functions in
+    the documentation for the perlapi:
+    <http://perldoc.perl.org/perlapi.html#SV-Manipulation-Functions>
+
+DEPENDENCIES
+    *   Inline::C
+
+Revision History
+    v1.0.0 - Original package submitted September 2014
+    v1.0.1 - Added POD
+
+Author
+    Aaron Dallas
+    adallas@cpan.org
+

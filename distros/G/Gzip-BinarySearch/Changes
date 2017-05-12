@@ -1,0 +1,5 @@
+0.91 Sun May 22 16:00 2011
+   - Add missing build-time dependency on Test::Exception.
+
+0.9 Sat Apr 9 17:00 2011
+   - Initial release.

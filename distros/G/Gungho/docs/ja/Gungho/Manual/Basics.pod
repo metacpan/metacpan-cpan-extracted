@@ -1,0 +1,114 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Manual::Basics.ja - Gunghoの基本
+
+=head1 Gunghoの由来
+
+GunghoをそもそもPOEで作られたクローラー「Xango」を拡張する際に「こういう構造
+だったらもっと拡張しやすいのに」「こうだったらもっと簡単にクローラーがかけるのに」という願望を満たすために作られました。それまでに培われた
+クロールのノウハウや、フレームワークとしてどの部分は不変でどの部分が
+アプリケーションに応じて変化していかなければならないのかの知識を生かした
+形で実現可能なクローラーフレームワークはなにか、という形がGunghoです。
+
+=head1 Gunghoの構成
+
+GunghoはWebクローラーというものは大きく以下の３つのコンポーネントに分けられる
+物と定義しています。
+
+=over 4
+
+=item Provider
+
+Providerはクローラーに「次になにを取りに行くのか」指定するコンポーネントです。
+Providerがリクエストを出し続ける限り、クローラーはそのURLを取得しつづけます。
+
+=item Handler
+
+Handlerは取得されたURLを処理するコンポーネントです。HTMLのパース等はこの
+コンポーネントから行います。
+
+=item Engine
+
+EngineはPOE等、イベントベースの非同期エンジンを介してHTTP通信を行います。
+現在POEエンジンのみが本番環境に対応できるレベルまで開発が進んでいます。
+
+=back
+
+Gungho内でのデータのもっとも基本的な流れは以上３つのコンポーネントを軸に、
+以下のようになります：
+
+                  リクエスト              取得後
+    ------------             ----------             -----------
+    | Provider | ----------> | Engine | ----------> | Handler |
+    ------------             ----------             -----------
+                                | ^
+                                v |
+                             ----------
+                             |  Web   |
+                             ----------
+
+Gunghoではこれらのコンポーネント同士が直接やりとりをすることを推奨しません。
+このコントロールするためにメディエーターであるGunghoクラスが存在します。
+
+Gunghoクラス（コンテキストとも呼びます）はほぼ全てのメソッドで第１引数として
+関数に渡されます。例えばHandlerのhandle_response() メソッドでは以下のように
+してコンテキストを$cとして受け取っています：
+
+  sub handle_response
+  {
+    my($self, $c, $request, $response) = @_;
+  }
+
+$selfはGungho::Handlerオブジェクト自身で、その後の第１引数として$cが
+渡されているわけです。例えばこのhandle_response内でproviderのpushback_request()
+を使ってproviderに新たなリクエストを渡したいと考える場合、以下のようになります
+
+  sub handle_response
+  {
+    my($self, $c, $request, $response) = @_;
+    $c->pushback_request( Gungho::Request->new(GET => $url) );
+  }
+
+このようにGunghoの中のコンポーネント同士は必ずこのメディエーターを通して
+連絡を取り合います。
+
+=head1 Gunghoの拡張
+
+Gunghoの拡張はPluginとComponentを追加する事によって実現します。
+（注：現在PluginとComponentは混在していますが、これからより以下の定義に
+合うようにリファクタリングをしていく予定です）
+
+=over 4
+
+=item Component
+
+ComponentはGunghoのリクエストサイクルの実行内容そのものを変更するものです。
+RobotRulesやBlockPrivateIP等は実際に取得されるリクエストを変更していしまうので
+この部類に入ります。
+
+=item Plugin
+
+PluginはGunghoのリクエストサイクルとは別の次元でなんらかの機能を追加するため
+に使います。
+
+=back
+
+=head1 Gunghoの設定
+
+GunghoはYAML等の設定ファイルか、同等の内容が記されたハッシュをGungho-E<gt>run
+に渡す事で設定をする事が可能です。
+
+設定項目は深くネスとすることがあるので記述はドキュメント中では I<大項目.中項目.諸項目>のようにドット(.)でつなげて表現します。例えばengine.config.clientなら、
+対応する項目はYAMLでは
+
+  engine:
+    config:
+      client: xxxx
+
+になります。
+
+=cut
+
+

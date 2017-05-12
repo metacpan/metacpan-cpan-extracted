@@ -1,0 +1,50 @@
+SYNOPSIS
+
+     use Getopt::Long::Negate::EN qw(negations_for_option);
+    
+     # the Getopt::Long's default
+     @negs = negations_for_option('foo'); # ('no-foo', 'nofoo')
+    
+     @negs = negations_for_option('with-foo');    # ('without-foo')
+     @negs = negations_for_option('without-foo'); # ('with-foo')
+    
+     @negs = negations_for_option('is-foo');      # ('isnt-foo')
+     @negs = negations_for_option('isnt-foo');    # ('is-foo')
+     @negs = negations_for_option('are-foo');     # ('isnt-foo')
+     @negs = negations_for_option('arent-foo');   # ('arent-foo')
+    
+     @negs = negations_for_option('has-foo');     # ('hasnt-foo')
+     @negs = negations_for_option('hasnt-foo');   # ('has-foo')
+     @negs = negations_for_option('have-foo');    # ('havent-foo')
+     @negs = negations_for_option('havent-foo');  # ('have-foo')
+    
+     @negs = negations_for_option('can-foo');     # ('cant-foo')
+     @negs = negations_for_option('cant-foo');    # ('can-foo')
+    
+     @negs = negations_for_option('enabled-foo'); # ('disabled-foo')
+     @negs = negations_for_option('disabled-foo');# ('enabled-foo')
+     @negs = negations_for_option('enable-foo');  # ('disable-foo')
+     @negs = negations_for_option('disable-foo'); # ('enable-foo')
+    
+     @negs = negations_for_option('allowed-foo');    # ('disallowed-foo')
+     @negs = negations_for_option('disallowed-foo'); # ('allowed-foo')
+     @negs = negations_for_option('allow-foo');      # ('disallow-foo')
+     @negs = negations_for_option('disallow-foo');   # ('allow-foo')
+    
+     @negs = negations_for_option('no-foo');      # ('foo')
+
+DESCRIPTION
+
+    This module aims to provide a nicer negative boolean option names. By
+    default, Getopt::Long provides options --foo as well as --no-foo and
+    --nofoo if you specify boolean option specification foo!. But this
+    produces awkward/incorrect English word like --nowith-foo or
+    --no-is-foo. In those two cases, --without-foo and --isnt-foo are
+    better option names.
+
+FUNCTIONS
+
+    None are exported by default, but they are exportable.
+
+ negations_for_option($str) => list
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension Gnome::StockIcons.
+
+1.4.2  Thu Dec  5 10:38:13 2002
+	- added requirement Gtk in Makefile.PL
+	- test window now automatically disapears after 2 seconds
+1.4.1  Tue Dec  3 15:33:03 2002
+	- original version; created by h2xs 1.21 with options
+		-X Gnome::StockIcons
+

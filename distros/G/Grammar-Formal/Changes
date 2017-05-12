@@ -1,0 +1,8 @@
+Revision history for Perl extension Grammar::Formal.
+
+0.02  January 2014
+  - fixed a bug in making ::Grammar objects parent of ::Rule objects
+	- fixed minor bug in Grammar::Formal::CharClass->from_numbers
+
+0.01  January 2014
+	- original version

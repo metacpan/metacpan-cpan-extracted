@@ -1,0 +1,11 @@
+Revision history for Perl extension Gftracks.
+
+0.01  Fri Mar 18 21:20:00 2005
+	- original version; created by h2xs 1.23 with options
+		-X gftracks
+0.5   Mon Nov 27 18:30:00 2005
+	- first version packaged for CPAN
+0.9.0 Sat Dec 03 21:15:00 2005
+        - No longer writes to a .tracks.sav file
+	- makes a backup file of the original on startup
+	- added POD-documentation

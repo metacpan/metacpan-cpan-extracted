@@ -1,0 +1,29 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::RobotRules::Storage.ja - robots.txtストレージ
+
+=head1 METHODS
+
+=head2 storage
+
+実際のストレージオブジェクトへのリファレンス。
+
+=head2 get_rule
+
+特定のURLのルールセットを取得します。
+
+=head2 put_rule
+
+特定のURLのルールセットを保存します。
+
+=head2 get_pending_robots_txt
+
+特定のrobots.txt取得待ち状態のリクエストのリストを返します。
+
+=head2 push_pending_robots_txt
+
+特定のrobots.txt取得待ち状態のリクエストのリストにリクエストを追加します。
+
+=cut

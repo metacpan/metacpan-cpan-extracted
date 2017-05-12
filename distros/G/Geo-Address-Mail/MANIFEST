@@ -1,0 +1,21 @@
+Changes
+ignore.txt
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Geo/Address/Mail.pm
+lib/Geo/Address/Mail/US.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/lib/Geo/Address/Mail/Standardizer/Mock.pm
+t/lib/MyStandardizer.pm
+t/new_for_country.t
+t/standardize.t
+t/us.t

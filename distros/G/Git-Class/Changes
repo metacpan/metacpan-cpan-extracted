@@ -1,0 +1,59 @@
+Revision history for Git-Class
+
+0.15 2014/08/05
+  - fixed cpanfile
+
+0.14 2014/08/04
+  - no new features
+  - modernized with Moo and Path::Tiny; dropped a few dependencies
+
+0.13 2012/11/29
+  - no new features
+  - set user.name/email locally to avoid fatal errors under smoking environments
+
+0.12 2012/02/19
+  - added no_capture to disable capturing, and disabled capturing
+    when wantarray is not defined.
+
+0.11 2011/11/01
+  - explicitly resolve test dir as /tmp may be a symlink
+
+0.10_01 2011/06/06
+  - provide author info for test commits
+  - added canary tests
+
+0.09 2011/06/02
+  - use Carp::Clan to give a better message source
+  - added git method to Worktree
+  - added a work around not to treat the known messages to stderr
+    by "git push" as errors
+  - use temporary directories while testing
+
+0.08 2011/04/11
+  - added ::Role::Config to support $git->config
+  - now commands always return the output even in the void context
+  - Try::Tiny for testing
+
+0.07 2011/04/10
+  - forgot to add Scope::Guard dependency
+
+0.06 2011/04/10
+  - make sure that commands run under the speicified worktree
+    directory
+
+0.05 2010/04/19
+  - use MRO::Compat explicitly
+
+0.04 2010/02/20
+  - fixed pod nits spotted by FWIE
+
+0.03 2009/07/02
+  - now ::Worktree takes you back to the previous current directory
+    when you demolish an object
+  - refactored ::Worktree test (which actually was just a stub)
+
+0.02 2009/06/19
+  - ::Worktree shouldn't call system chdir (spotted by Mathieu Bivert)  - added some tests for ::Worktree
+
+0.01 2009/06/11
+  - initial release

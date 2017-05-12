@@ -1,0 +1,40 @@
+!gaf-version: 1.0
+!
+! THIS IS A FAKE ASSOCIATION FILE USED FOR TESTING PURPOSES
+!
+! the information below is intended to replicate a real header
+!
+!CVS Version: Revision: 1.155 $
+!GOC Validation Date: 08/08/2009 $
+!Submission Date: 7/29/2009
+!
+! The above "Submission Date" is when the annotation project provided
+! this file to the Gene Ontology Consortium (GOC).  The "GOC Validation
+! Date" indicates when this file was last changed as a result of a GOC
+! validation and filtering process.  The "CVS Version" above is the
+! GOC version of this file.
+!
+! Note: The contents of this file may differ from that submitted to the
+! GOC. The identifiers and syntax of the file have been checked, rows of
+! data not meeting the standards set by the GOC have been removed. This
+! file may also have annotations removed because the annotations for the
+! listed Taxonomy identifier are only allowed in a file provided by
+! another annotation project.  The original submitted file is available from:
+!  http://www.geneontology.org/gene-associations/submission/
+!
+! For information on which taxon are allowed in which files please see:
+!  http://www.geneontology.org/GO.annotation.shtml#script
+!
+!Project_name: FlyBase
+!URL: http://flybase.bio.indiana.edu/
+!Contact Email: s.tweedie@gen.cam.ac.uk
+!Funding: MRC at UK MRC, grant number G0200234 
+!
+!saved-by: Susan Tweedie s.tweedie@gen.cam.ac.uk
+!Data from FlyBase version FB2009_07
+!version: $Revision: 1.154 $
+FB	FBgn0010339	128up		GO:0005525	FB:FBrf0067209|PMID:8121394	IDA		F	upstream of RpIII128	CG8340|GTP-bp|X71866	gene	taxon:7227	20060803	FlyBase
+FB	FBgn0010339	128up		GO:0005525	FB:FBrf0105495	ISS	UniProtKB:P43690	F	upstream of RpIII128	CG8340|GTP-bp|X71866	gene	taxon:7227	20060803	FlyBase
+FB	FBgn0010339	128up		GO:0005525	FB:FBrf0156694	NAS		F	upstream of RpIII128	CG8340|GTP-bp|X71866	gene	taxon:7227	20060803	FlyBase
+FB	FBgn0010339	128up		GO:0005622	FB:FBrf0174215	IEA	InterPro:IPR002917	C	upstream of RpIII128	CG8340|GTP-bp|X71866	gene	taxon:7227	20090124	FlyBase
+FB	FBgn0010339	128up		GO:0005622	FB:FBrf0174215	IC	GO:0005525	C	upstream of RpIII128	CG8340|GTP-bp|X71866	gene	taxon:7227	20090124	FlyBase

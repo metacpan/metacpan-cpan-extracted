@@ -1,0 +1,1556 @@
+#
+#
+# Initial script to parse the output of vtkPrint
+#
+
+my $usage = "
+ $0 module pmfile 
+ 
+ where: 
+	module is the name of the module (e.g. Graphics::VTK::Contrib)
+	   that this xs code will be placed into.
+	pmfile is the name of the Perl pm file to create
+
+Description:
+$0 is a utility program to generate XS code and .pm files from VTK
+header files, processed thru the vtkPrint2 program. 
+
+The vtkPrint2 program is a simple modification of the vtkPrint program
+included and built with the VTK package when it is compiled. 
+It resides in the 'wrap' directory of the VTK directory structure.
+
+This program takes the output of the vtkPrint program as its standard
+input, and outputs XS code to the standard output. A Perl .pm file is 
+also created.
+
+Example:
+ ./vtkPrint2 ../contrib/vtkCubeAxesActor2D.h hints is_concrete \\\\
+    | perl -w parseWrap vtkCubeAxesActor2D.pm 0.1 > XSfile
+";
+
+if( @ARGV != 2){
+	print $usage;
+	exit -1;
+}
+
+
+# Functions to not parse
+my @dontParseFunctions = qw/ None MakeObject IsA /;
+
+my ($module, $pmFile) = @ARGV;
+
+use DataArray;
+
+$/ = undef;
+
+my $stuff = <STDIN>;
+
+# Fix Blank values to say 'None'
+#  e.g. 'Comment:  ' becomes 'Comment: None'
+$stuff =~ s/^(\s*(?:[A-Z][a-z]+\s*)+\:)\s*$/$1 None/mg;
+
+my @pieces = split( /^(\s*(?:[A-Z][a-z]+\s*)+)\:\s+/m, $stuff);
+
+
+# Now go thru the elements at put into a structure:
+
+my ($key,$value);
+
+my $level1Hash = {};
+my $level2Hash;
+
+shift @pieces if( $pieces[0] !~ /\S/); # get rid of first element in pieces if 
+					# all whitespaces
+					
+my %overloadedFuncts; # hash of functions that are overloaded
+
+while( @pieces){
+
+	$key = shift @pieces;
+	$value = shift @pieces;
+	
+	#get rid of any leading newlines in $key
+	$key =~ s/^(\s*\n)+//mg;
+	
+	# Get rid of any trailing whitespace in value
+	$value =~ s/\s+$//s;
+	
+	if( $key =~ /function\s+name/i){
+		if( exists $level1Hash->{functions}{$value} ){
+			#print STDERR "Warning function '$value' already parsed. Changing Name to:";
+			my $newName = $value."_";
+			$overloadedFuncts{$value} = 1;
+			while( exists $level1Hash->{functions}{$newName}){ $newName .= '_'};
+			#print STDERR "'$newName'\n";
+			$value = $newName;
+			$overloadedFuncts{$value} = 1; # Set the unique name in the overloadedFuncs hash as well
+
+		}
+		$level2Hash = $level1Hash->{functions}{$value} = {};
+		next;
+	}
+	
+	# see if we are at level 2
+	if( $key =~ /^\s+/){
+		# Level 2 has indents
+		$key =~ s/^\s+//; # now get rid of leading whitespace
+		$level2Hash->{$key} = $value;
+		next;
+	}
+	
+	# at level 1:
+	$level1Hash->{$key} = $value;
+	
+}
+	
+	
+# Make dataArray out of function info for easier manipulation
+my $functionInfo = new DataArray(name => 'function Info', array => $level1Hash->{functions},
+					dimNames => ['name','attrib']);
+
+my $className = $level1Hash->{'Class Name'};
+
+# Get list of functions we won't be parsing:
+
+push @dontParseFunctions, $className, '~'.$className; # add the official c++ constructor and desctructor
+							# to the functions not parsed
+
+# Add any overloaded contructors:
+push @dontParseFunctions, grep(/^$className\_+$/,  keys %{$level1Hash->{functions}})  ;
+
+my %dontParseFunctions; # Hash for quick lookup
+@dontParseFunctions{@dontParseFunctions} = @dontParseFunctions;
+
+
+# Parse the function Signature:
+#   Get list of functions to parse
+my @functions = grep( !defined($dontParseFunctions{$_}), keys %{$level1Hash->{functions}});
+
+my %functionSig = map {$_ => $level1Hash->{functions}{$_}{'Function Signature'}}  @functions;
+
+my %returnType;
+my %args;
+my $sig;
+my ($retType, $args);
+
+my %skippedFunctions; # Functions/reasons that are skipped, due to one reason or another
+
+foreach my $funct(keys %functionSig){
+	
+	#if( $funct =~ /getnextcell/i){
+	#	$wha = 1;
+	#}
+	
+	$sig = $functionSig{$funct};
+	my $realFunction = $funct;  # real FunctionName doesn't have any '_' at the end to id overloaded
+					# functions ('__' added to the end above)
+	$realFunction =~ s/\_+$//g;
+	
+	$sig =~ s/\=\s*0\s*\;?\s*$/\;/g;  # get rid of any '= 0' and the end of the function signature
+	$sig =~ s/^\s*virtual\s*//g;    # get rid of 'virtual' in the function type
+
+	################# $%^$#$% vtkPrint Band-Aid Section #############
+
+	# Fix bug in vtPrint that parses vtkDataArray ** as vtkDataArray *
+	if( $funct eq 'GetComponentsType'){
+		$sig =~ s/vtkDataArray\s+\*\s*arrays/vtkDataArray \*\* arrays/;
+	};
+
+	# Fix bug in vtPrint that parses char *&  as char &
+	if( $funct eq 'SetArrayName'){
+		$sig =~ s/char\s+\&/char \* \&/;
+	};
+
+	# Fix bug in vtPrint that parses char *&  as char &
+	if( $funct eq 'GetNextCell'){
+		$sig =~ s/vtkIdList\s*\&\s*\b/vtkIdList* \&/;
+	};
+
+
+
+	# Fix bug in vtPrint that parses char *&  as char &
+	if( $funct eq 'SetArrayName'){
+		$sig =~ s/char\s+\&/char \* \&/;
+	};
+
+
+	# Fix bug in vtPrint that parses vtkMapper ** as vtkMapper *
+	if( $funct =~  /^GetLODMapper/){
+		$sig =~ s/vtkMapper\s*\*m/vtkMapper \*\*m/;
+		$sig =~ s/vtkVolumeMapper\s*\*m/vtkVolumeMapper \*\*m/;
+
+	};
+	# Fix bug in vtPrint that parses vtkMapper ** as vtkMapper *
+	if( $funct =~  /^GetLODProperty/){
+		$sig =~ s/vtkProperty\s*\*p/vtkProperty \*\*p/;
+		$sig =~ s/vtkVolumeProperty\s*\*p/vtkVolumeProperty \*\*p/;
+
+	};
+	# Fix bug in vtPrint that parses vtkMapper ** as vtkMapper *
+	if( $funct =~  /^GetLODTexture/){
+		$sig =~ s/vtkTexture\s*\*t/vtkTexture \*\*t/;
+
+	};
+
+
+	# Fix bug in vtPrint that parses char ** as char *
+	if( $className eq 'vtkArrayCalculator' && $funct =~  /^Get\w+?Names/){
+		$sig =~ s/^char\s*\*/char \*\*/;
+
+	};
+
+	# Fix bug in vtPrint that parses char ** as char *
+	if( $className eq 'vtkLODProp3D' && $funct =~  /^GetLODBackfaceProperty/){
+		$sig =~ s/vtkProperty\s*\*\b/vtkProperty \*\*/;
+
+	};
+	
+	# Fix bug in vtPrint that parses vtkMapper ** as vtkMapper *
+	if( $funct =~  /^GetLocatorPoint/){
+		$sig =~ s/^int\s+.+?GetLocatorPoint/int GetLocatorPoint/;
+
+	};
+
+	# Fix bug in vtPrint 
+	if( $funct =~  /^Cull\b/){
+		$sig =~ s/vtkProp\s*\*prop/vtkProp \*\*prop/;
+
+	};
+	# Fix bug in vtPrint gets signature of New wrong
+	if( $funct =~  /^New\b/){
+		unless( $sig =~ /^\s*vtk\w+/){
+			$sig =~ s/\s*.+?(?=vtk\w+)//; # get rid of bogus stuff before real vtk type
+			$functionSig{$funct} = $sig;
+		}
+		if( $sig =~ /^\s*vtkProp3D\s+Prop3D/ ){ #Correct Signature for New in vtkLODProp3D 
+			$sig =~ s/^\s*.+?(?=vtkLODProp)//;
+			$functionSig{$funct} = $sig;
+		}
+	};
+
+	
+	
+	########################################################
+
+	# skip vtkScalarTree GetNextCell, that doesn't have a comment, This
+	#   should be marked as Do Not Use
+	if( $className eq 'vtkScalarTree' && $funct =~ /^GetNextCell_*$/
+		&& $level1Hash->{functions}{$funct}{Comment} =~ /None/i ){
+		$level1Hash->{functions}{$funct}{Comment} = "Do Not Use\n";
+	};
+
+	# Skip vtkVRMLExporter::GetFilePointer, present in the header
+	#  but not in the vtk code
+	if( $className eq 'vtkVRMLExporter' && $funct =~ /^GetFilePointer$/
+		 ){
+		$skippedFunctions{$funct} = "Definition in Header File, but not implemented in source code\n";
+	};
+	
+	# Skip any functions that have 'Do Not Use' in the comment
+	if( $level1Hash->{functions}{$funct}{Comment} =~ /do\s+not\s+use/i ){
+		$skippedFunctions{$funct} = "Method is marked 'Do Not Use' in its descriptions\n";
+		next;
+	}
+
+
+	# Skip any functions that wouldn't be parsed as a TCL function
+	#   (These rules are from the vtk file vtkWrapTcl.c)
+	if( $level1Hash->{functions}{$funct}{Operator} =~ /Yes/i 
+		|| $level1Hash->{functions}{$funct}{'Array Failure'} =~ /Yes/i ){
+		$skippedFunctions{$funct} = "No TCL interface is provided by VTK, so we aren't going to provide one either.\n";
+		next;
+	}
+
+
+	# Skip any functions called 'None' These usually are the result in an
+	#   Error in vtkPrint parsing the header files
+	next if( $funct =~ /^\s*None_*\s*$/ );
+
+	
+	unless(($retType, $args) = $sig =~ /^\s*(\S+.*?[*&]?)\s*$realFunction\s*\((.*?)\)\s*(const)?\s*\;\s*$/  ){
+		
+		# Don't Die on non-public functions, just warn
+		if( $level1Hash->{functions}{$funct}{Public} eq 'Yes'){
+			die("Error Can't Parse Public Function '$funct' sig '$sig'\n");
+		}
+		else{
+			warn("Warning: Can't Parse Non-Public Function '$funct' sig '$sig'\n");
+			next;
+		}
+	}
+	
+
+	# Correct for bug in vtk print that sometimds parses a const char * as char *,
+	#  but the return type number will still be 1303 or 3303
+	if( $retType =~ /^\s*char\b/ && ( $level1Hash->{functions}{$funct}{'Return Type'} eq '1303' ||
+			$level1Hash->{functions}{$funct}{'Return Type'} eq '3303') ){
+		$retType = "const ".$retType;
+	}
+
+	# Correct for bug in vtk print that sometimds parses a object return type like
+	#    vtkObject ** as vtkObject *, ,
+	#  but the return type number will still be 709
+	if( $retType =~ /^\s*vtk\w+\s*\*\s*$/ && 
+		( $level1Hash->{functions}{$funct}{'Return Type'} eq '709'  )){
+		$retType .= "*";
+	}
+
+	# Correct for bug in vtk print that sometimds parses a void return type
+	#  as something else
+	if( $level1Hash->{functions}{$funct}{'Return Type'} == 2 ){
+		$retType = "void";
+	}
+
+	# Correct for bug in vtk print that returns vtkDataObject ** return
+	#  type as 'int AbortExecutevtkDataObject *'
+	if( $retType =~ /^\s*int\s+AbortExecutevtkDataObject\s*\*\s*$/ ){
+		$retType = "vtkDataObject**";
+	}
+
+	# Correct for bug in vtk print that parses return types 'unsigned int'
+	#   in the header files to 'int unsigned'
+	$retType =~ s/int\s+unsigned/unsigned int/;
+
+
+	# Correct for bug in vtk print that parses return types 'unsigned char'
+	#   in the header files to 'char unsigned'
+	$retType =~ s/char\s+unsigned/unsigned char/;
+
+	# Correct for bug in vtk print that parses return types 'unsigned long'
+	#   in the header files to 'long unsigned'
+	$retType =~ s/long\s+unsigned/unsigned long/;
+
+	# Correct for bug in vtk print that parses return types 'unsigned short'
+	#   in the header files to 'short unsigned'
+	$retType =~ s/short\s+unsigned/unsigned short/;
+	
+	# Skip return type 'istreamk Can't Deal with this type yet
+	if( $retType =~ /\bistream/ ){
+		$skippedFunctions{$funct} = "Can't Handle istream return type yet\n";
+		next;
+	}
+	# Skip return type 'HDC Can't Deal with this type yet
+	if( $retType =~ /\bHDC/ ){
+		$skippedFunctions{$funct} = "Can't Handle HDC return type yet\n";
+		next;
+	}
+	# Skip return type 'Widget Can't Deal with this type yet
+	if( $retType =~ /^\s*Widget\b/ ){
+		$skippedFunctions{$funct} = "Can't Handle Widget return type yet\n";
+		next;
+	}
+	# Skip return type 'XtAppContext Can't Deal with this type yet
+	if( $retType =~ /^\s*XtAppContext\b/ ){
+		$skippedFunctions{$funct} = "Can't Handle XtAppContext return type yet\n";
+		next;
+	}
+	# Skip return type '_vtkLink Can't Deal with this type yet
+	if( $retType =~ /\b_vtkLink/ ){
+		$skippedFunctions{$funct} = "Can't Handle _vtkLink_s return type yet\n";
+		next;
+	}
+	# Skip return type '_vtkLink Can't Deal with this type yet
+	if( $retType =~ /\b_vtkCell/ ){
+		$skippedFunctions{$funct} = "Can't Handle _vtkCell_s return type yet\n";
+		next;
+	}
+	# Skip return type 'Visual' Can't Deal with this type yet
+	if( $retType =~ /\bVisual\b/ ){
+		$skippedFunctions{$funct} = "Can't Handle Visual return type yet\n";
+		next;
+	}
+	# Skip return type 'ColorMap' Can't Deal with this type yet
+	if( $retType =~ /\bColormap\b/ ){
+		$skippedFunctions{$funct} = "Can't Handle ColorMap return type yet\n";
+		next;
+	}
+	# Skip return type 'Display' Can't Deal with this type yet
+	if( $retType =~ /\bDisplay\b/ ){
+		$skippedFunctions{$funct} = "Can't Handle Display return type yet\n";
+		next;
+	}
+	# Skip return type 'Window' Can't Deal with this type yet
+	if( $retType =~ /\bWindow\b/ ){
+		$skippedFunctions{$funct} = "Can't Handle Window return type yet\n";
+		next;
+	}
+	# Skip return type 'Window' Can't Deal with this type yet
+	if( $retType =~ /\bGC\b/ ){
+		$skippedFunctions{$funct} = "Can't Handle GC return type yet\n";
+		next;
+	}
+	
+	# Correct for a bug in vtkPrint that sometimes gives the wrong
+	#  return type for 'New'. 'New' should always have the return type of
+	#   the class
+	if( $funct eq 'New'){
+		$retType = "$className*";
+	} 
+	
+	# Reject wierd return types
+	if( $retType =~ /[\*\&]\s*[\*\&]/ || $retType =~ /^XVisual/ ){
+		$skippedFunctions{$funct} = "Can't Handle '$retType' return type yet\n";
+		next;
+	}
+
+	# Reject plain object (i.e. not object pointer return types)
+	#   The vtk tcl bindings can't handle this either
+	if( $retType =~ /^\s*vtk\w+\s*$/){
+		$skippedFunctions{$funct} = "Can't return vtk Object Types that aren't a pointer\n";
+		next;
+	}
+
+
+	# if return types  are one of the following pointer types;
+      	#      float, double, 
+	#      int, short, long, 
+	#      unsigned char, unsigned int, unsigned short, unsigned long, void
+	#   then only handle function we have a hint for the function
+	#     - or - (not implemented yet) return a PDL???
+	if( $retType =~ /^\s*?(static\s+)?float\s*\*\s*$/ ||
+	       $retType =~ /^\s*?(static\s+)?double\s*\*\s*$/ ||
+	       $retType =~ /^\s*?(static\s+)?(unsigned)?\s*int\s*\*\s*$/ ||
+	       $retType =~ /^\s*?(static\s+)?(unsigned)?\s*short\s*\*\s*$/ ||
+	       $retType =~ /^\s*?(static\s+)?(unsigned)?\s*long\s*\*\s*$/ ||
+	       $retType =~ /^\s*?(static\s+)?void\s*\*\s*$/ ||
+	       $retType =~ /^\s*?(const\s+)?(static\s+)?unsigned\s*char\s*\*\s*$/ ){
+	       
+	       unless( $level1Hash->{functions}{$funct}{'Have Hint'} =~ /Yes/i ){
+		       $skippedFunctions{$funct} = "Can't Handle '$retType' return type without a hint\n";
+		       next;
+	       }
+	}
+				
+
+
+	$returnType{$funct} = $retType;
+	
+	my @args = split( ',',$args);
+	
+	# Go Thru each arg and try to parse a type and a name
+	#   Create a name if one is not present
+	my ($type,$name);
+	my $i = 1;
+	
+	#if( $funct =~ /GetEdgeArray/i){  # for debug only
+	#	my $dummy = 1;
+	#}
+	
+	# Get The arg Types and Counts from the hash
+	my @argTypes;
+	my @argCounts;
+	unless( $level1Hash->{functions}{$funct}{'ArgTypes'} =~ /none/i){ # populate the argTypes array
+		@argTypes = split('\s*\,\s*',$level1Hash->{functions}{$funct}{'ArgTypes'});
+	}
+	unless( $level1Hash->{functions}{$funct}{'ArgCounts'} =~ /none/i){ # populate the argCounts array
+		@argCounts = split('\s*\,\s*',$level1Hash->{functions}{$funct}{'ArgCounts'});
+	}
+	
+	$args{$funct} = { name => {1=> undef}, type => {1 => undef}, dims => { 1 => undef}}; # initiaze args for this function
+
+	foreach my $arg(@args){
+		unless(($type, $name) = $arg =~ /^\s*((?:const\s+)?(?:unsigned\s+)?(?:const\s+)?\S+(?:\s*\[\S+?\])?\s*[*&]*)(\S+)?\s*$/  ){
+			# See if its a function pointer arg:
+			if( ($type, $name) = $arg =~ /^\s*((?:unsigned\s+)?(?:const\s+)?\S+(?:\s*\[\S+?\])?\s*[*&]*)\s*\(\s*\*\s*(\w+)\s*\)\s*\(\s*void\s*\*\)\s*$/ ){
+				# Function Args
+				$type = 'func'.$type;
+			}
+			else{
+
+				warn("Warning Can't Parse Arg '$arg' for funct '$funct'\n");
+				$skippedFunctions{$funct} = "Can't Parse Arg '$arg'" if( $level1Hash->{functions}{$funct}{Public} eq 'Yes'); # only keep track of public functions skipped
+				last;
+			}
+			
+		}
+		unless( defined($name)){ # Give the arg a name if not defined in the sig
+			$name = 'arg'.$i;
+		}
+		
+		# If name contains an array specification (like a[4]) convert the type to 
+		# a equivalent pointer type, and same the expected dim sizes in the 'dims' element
+		#   For example 'float a[3][4]' becomes float** a, with dims '3,4'
+		my @dims;
+		if( $name =~ /\s*(\w+)\s*((?:\[\s*\d*\s*\])+)/ ){
+			my $realName = $1;
+			my $dims = $2;
+			$dims =~ s/\]\[/\,/g; # Change ][ to commas
+			$dims =~ s/[\[\]]//g; # Get rid of any extra ][
+			@dims = split '\s*\,\s*', $dims, -1; # Negative limit to pick up trailing empty fields
+			
+			@dims = ('') unless (@dims); # dims should always contain at least one empty fields
+						     # to handle cases like 'argv[]'
+
+			$dims = join(", ",@dims); # make dims have known spacing between commas
+			$name = $realName;
+			$type .= '*' x scalar(@dims); # Add indirection symbol to type
+			$args{$funct}{dims}{$i} = $dims;
+			
+		}  
+		# If name is emtpy (like arg3, etc), and the type contains an array specification
+		#  like float [3], convert the type to an equivalent pointer type like above
+		elsif( $name =~ /^arg\d+$/ &&
+			$type =~ /^\s*((?:unsigned\s+)?(?:const\s+)?\S+)\s*((?:\[\s*\d*\s*\])+)/){
+			my $realType = $1;
+			my $dims = $2;
+			$dims =~ s/\]\[/\,/g; # Change ][ to commas
+			$dims =~ s/[\[\]]//g; # Get rid of any extra ][
+			@dims = split '\s*\,\s*', $dims, -1; # Negative limit to pick up trailing empty fields
+			
+			@dims = ('') unless (@dims); # dims should always contain at least one empty fields
+						     # to handle cases like 'argv[]'
+
+			$dims = join(", ",@dims); # make dims have known spacing between commas
+			$type = $realType.('*' x scalar(@dims)); # Add indirection symbol to type
+			$args{$funct}{dims}{$i} = $dims;
+		}
+			
+		
+		
+		# Fix bug in vtkPrint where int* & arg is sometimes parsed
+		#   as int & arg
+		if( $type =~ /^\s*int\s*\&\s*$/ && $argTypes[$i-1] == 504){
+			$type = 'int * &';
+		}
+		
+		#  if arg is 
+        	#      1)  a pointer (100) (has '*' in the arg signature or is type 106 from the vtkPrint2 output)
+		#                         ('vtkIdType &' types get parsed by vtkPrint2 as 'long &', so the only
+		#                           way to correctly reject these args is to use the vtkPrint2 numeric arg types '106'
+		#			    Using these number is more confusing that the actual arg text in the function signature,
+		#			     but can't be avoided here.)
+		#      2)  and not char *,
+		#      3)  and not a class pointer (109 and 309)
+		#          or is a double class pointer
+     		#	 -- and -
+		#      4) Number of args > 1
+		#     5) or  ArgCounts for this arg is 0
+		#     then skip function
+		# (This logic comes from the VTK file vtkWrapTcl.c)
+		if( ($type =~ /\*/ || $argTypes[$i-1] == 106) && $type !~ /^(const\s+)?char\s*\*\s*$/ &&
+			( $type !~ /^\s*vtk\w+/ || $type =~ /\*\*/) ){
+			unless( $type =~ /^\s*void\s*\*\s*$/ && $args{$funct}{type}{$i-1} =~ /^func/ ){ # void pointer args after function pointer args are OK
+				if( (scalar(@args) > 1) ||
+					$argCounts[$i-1] == 0){
+					$skippedFunctions{$funct} = "Don't know the size of pointer arg number $i\n";
+					last;
+				}
+			}
+		}
+			
+		if( $type =~ /void\s*\*/ &&
+			$args{$funct}{type}{$i-1} =~ /^func/ ){  # Arg types of 'void *', that come after function args are deleted in the perl
+								#  XS interface. The sub ref is passed in its place in the XS code that is generated
+			next;
+		}
+		if( $type =~ /void\s*\*/ &&
+			$args{$funct}{type}{$i-1} !~ /^func/ ){  # Can't handle arg types of 'void *', unless they are right after a function pointer arg
+			$skippedFunctions{$funct} = "Arg types of 'void *' not supported yet";
+			last;
+		}
+		if( $type =~ /\bistream/){  # Can't handle arg types of 'istream'
+			$skippedFunctions{$funct} = "Arg types of 'istream' not supported yet";
+			last;
+		}
+		if( $type =~ /^\s*Widget\b/){  # Can't handle arg types of 'Widget'
+			$skippedFunctions{$funct} = "Arg types of 'Widget' not supported yet";
+			last;
+		}
+		if( $type =~ /^\s*XtAppContext\b/){  # Can't handle arg types of 'XtAppContext'
+			$skippedFunctions{$funct} = "Arg types of 'XtAppContext' not supported yet";
+			last;
+		}
+		if( $type =~ /^\s*Font\b/){  # Can't handle arg types of 'font'
+			$skippedFunctions{$funct} = "Arg types of 'Font' not supported";
+			last;
+		}
+		
+		next if( $type =~ /^\s*void\s*$/); # ignore void-only arg types
+		
+		# Skip other unknown arg types:
+		if( $type =~ /^\s*unsigned/ &&
+			( $type !~ /^\s*unsigned\s+char\s*$/ &&
+			  $type !~ /^\s*unsigned\s+int\s*$/ &&
+			  $type !~ /^\s*unsigned\s+short\s*$/ &&
+			  $type !~ /^\s*unsigned\s+long\s*$/ )){
+			$skippedFunctions{$funct} = "Arg types of '$type' not supported yet";
+			last;
+		}
+		# Reject wierd arg types
+		if( $type =~ /[\*\&]\s*[\*\&]/){
+			$skippedFunctions{$funct} = "Arg types of '$type' not supported yet";
+			next;
+		}
+			  
+			
+		$args{$funct}{type}{$i} = $type;
+		$args{$funct}{name}{$i} = $name;
+		
+		$i++;
+	}
+		
+		
+		
+}
+	
+
+my $argInfo = new DataArray(name => 'arg Info', array => \%args,
+					dimNames => ['Func','attrib','argNo']);
+
+
+
+########################## Generate XS Code ###########################
+my $shortClass = $className; # make classname without the 'vtk' at the front
+$shortClass =~ s/^vtk//;
+
+print "\nMODULE = $module	PACKAGE = Graphics::VTK::$shortClass PREFIX = vtk\n\n";
+print "PROTOTYPES: DISABLE\n\n";
+
+my $listSize;  # Size of the list returned, if any. This is gathered
+		#  from the 'Hint Size' element.
+
+
+##### Special Case include of the vtkObject Print and AddObserver Methods #######
+
+if( $module eq 'Graphics::VTK::Common' && $shortClass eq 'Object'){
+	
+	print <<EOF;
+
+unsigned long
+vtkObject::AddObserver(event, func)
+		char*	event
+		SV*	func
+		CODE:
+    		vtkPerlCommand *cmd = vtkPerlCommand::New();
+		cmd->SetCallback(func);		
+		RETVAL = THIS->AddObserver(event, cmd);
+		cmd->Delete();
+		OUTPUT:
+		RETVAL
+		
+char *
+vtkObject::Print()
+		CODE:
+		ostrstream ostrm;
+		THIS->Print(ostrm);
+		RETVAL = ostrm.str();
+		OUTPUT:
+		RETVAL
+		
+EOF
+}
+# Go Thru each function:
+my @XSFunctions;  # Functions that we wrote an interface for
+my %XSFunctions;  # hash for quick lookup
+foreach my $funct(sort @functions){
+
+
+#	if( $funct =~ /getrange/i){  # for debug only
+#		my $dummy = 1;
+#	}
+	
+	# Skip if we have already done this function (thru the overloaded section, etc) 
+	next if( defined($XSFunctions{$funct}));
+	
+	next unless ($level1Hash->{functions}{$funct}{Public} eq 'Yes'); # only parse public functions
+
+	if( $level1Hash->{functions}{$funct}{'Function Signature'} =~ /ostream/){ # don't parse functions
+									    # that have stream args... not
+									    # supported yet.
+		$skippedFunctions{$funct} = "I/O Streams not Supported yet\n";
+	}
+
+	# Don't Parse functions that have 'internal use' in the commets
+	if( $level1Hash->{functions}{$funct}{'Comment'} =~ /internal\s+use/i){ # don't parse functions
+									    # that have stream args... not
+									    # supported yet.
+		$skippedFunctions{$funct} = "Method is for internal use only\n";
+	}
+	
+	next if( defined( $skippedFunctions{$funct})); # skip function if on list
+
+	print "\n";								    
+
+
+	unless( defined($overloadedFuncts{$funct})){ # non-overloaded Functions:
+
+		next if( $funct =~ /_+$/ ); # skip overloaded functions, they are handled by a separate section
+
+		# Check for a single-Array function/method. Skip if it is
+		if( singleArrayFunction($funct, \%args,1 )){  # constFlag = 1, const single arrays are not skipped
+			
+			$skippedFunctions{$funct} = "Can't handle methods with single array args (like a[3]) yet.\n";
+			next;
+		}
+
+
+
+
+		print "\n";
+		
+		$hintSize = $level1Hash->{functions}{$funct}{'Hint Size'};
+		
+		# Figure out All Arg Names
+		my @argNumbers = ();  # initialize to empty array for functs with
+				      # no args
+		my @argNames = ();
+		my @argElements = ();
+		my @argDims; 
+		my @outputs; # outputs other than the RETVAL
+		my @c_args;  # c_args, if required
+		my $c_args;  # flag = 1 to include c_flags
+		my %argTypes;
+
+		if(defined($args{$funct}{name}{1})){ # Functions with args
+			@argNumbers = sort {$a<=>$b} keys %{$args{$funct}{name}};
+			@argNames = @{$args{$funct}{name}}{@argNumbers};
+			@argDims = @{$args{$funct}{dims}}{@argNumbers};
+			@argTypes{@argNumbers} = map $args{$funct}{type}{$_},@argNumbers;
+			
+			# If arg types is like 'int &', or 'unsigned short &' assume
+			#  it is an i/o arg and add to output
+			# If it is an  vtkObject (like 'vtkIdList &'), then treat
+			#  as an object pointer from perl, but create c_args keyword
+			#  with a dereferences call 
+			#   
+			foreach my $argNumber(@argNumbers){
+				my $argType = $argTypes{$argNumber};
+				if( $argType =~/\&\s*$/){
+					if( $argType =~ /^vtk\w+/){ # vtkObject
+						$argType =~ s/\&\s*$/\*/g; # get rid of & in type and replace with *
+						$c_args = 1;
+						push @c_args,'*'.$args{$funct}{name}{$argNumber};
+						$argTypes{$argNumber} = $argType;
+					}
+					else{ # non vtkObject
+						$argType =~ s/\&\s*$//g; # get rid of & in type and add to output list
+						push @outputs, $args{$funct}{name}{$argNumber};
+						push @c_args, $args{$funct}{name}{$argNumber};
+						$argTypes{$argNumber} = $argType;
+					}
+				}
+				else{
+					push @c_args, $args{$funct}{name}{$argNumber};
+				}
+			} 
+			
+		}
+
+		# vtk... & return types actually return
+		#  a vtk pointer. In these cases, the methods
+		#   will be called like '&(THIS)->method'
+		my $returnTypeNeedsAddress;
+		my $returnType = $returnType{$funct};
+		if ($returnType =~ /^\s*(vtk\w+\b\s*)\&/){
+			$returnTypeNeedsAddress = 1;
+			$returnType = $1." *";
+
+		}
+
+
+		writeXSsig($returnType, $className, $funct, \@argNames, \@argDims);
+
+		writeArgList(\%argTypes, $args{$funct}{name}, $args{$funct}{dims});
+		
+		# Find out if this function hash function pointer args
+		my %argNames;
+		@argNames{@argNumbers} = @argNames;
+		my $funcPointerArgs;
+		foreach my $argNumber(keys %argTypes){
+			if( $argTypes{$argNumber} =~ /^func\w+/){
+				$funcPointerArgs = $argNames{$argNumber};
+			}
+		}
+		my @arg_types = map $argTypes{$_}, @argNumbers;
+		writeXScode($level1Hash,$returnType,$funct,$funct,$returnTypeNeedsAddress,
+			\@c_args,\@outputs, $hintSize,$funcPointerArgs, \@argDims, \@arg_types);
+			
+		push @XSFunctions, $funct; # save the function name that we actually wrote out
+		$XSFunctions{$funct} = 1;  
+
+	}
+	else{  # Overloaded Funtions
+		print "\n";
+		
+		if($funct =~ /invert/i){ # debug only
+			my $wha = 1;
+		}
+		
+		# - Get the list of overloaded functions
+		my @overloadedFuncs = grep /^$funct\_*$/,  sort @functions ;
+		
+		# Get only the public ones
+		@overloadedFuncs = grep $level1Hash->{functions}{$_}{Public} eq 'Yes',  @overloadedFuncs;
+		
+		# Get Only ones that aren't marked skipped
+		@overloadedFuncs = grep !defined($skippedFunctions{$_}),  @overloadedFuncs;
+		
+		
+		# Eliminate Redundant Overloaded Methods
+		#   e.g. method1(float * a[4]) and method1(float, float, float, float) would be
+		#    considered redundant, because they would result in the same XS function being written out
+		eliminateRedundant($funct, \%args, \@overloadedFuncs, \%skippedFunctions);
+
+		# Check for a single-Array function/methods. Skip if it is
+		foreach my $functName(@overloadedFuncs){
+			if( singleArrayFunction($functName,\%args,0)){ # const flag = 0, not handling single array functions in overloaded functions
+				$skippedFunctions{$functName} = "Can't handle methods with single array args (like a[3]) in overloaded methods yet.\n";
+			}
+		}
+		
+		# Find any return types that are non void, if any left are static, use one of those.
+		#   (Overloaded methods that are static methods must be declared as overall static methods,
+		#     Any non-static 
+		my $returnType;
+		my @nonVoidReturnTypes = grep $_ ne 'void', @returnType{@overloadedFuncs};
+		my @staticReturnTypes = grep $_ =~ /^\s*static\s+/, @nonVoidReturnTypes;
+		
+		my $staticMethodFlag;  # flag = shortClass name if one of the methods is static.
+		
+		if( @staticReturnTypes){
+			$returnType = $staticReturnTypes[0];
+			$staticMethodFlag = $shortClass
+		}
+		elsif(@nonVoidReturnTypes) {
+			$returnType = $nonVoidReturnTypes[0];
+		}
+		else{	
+			$returnType = 'void';
+		}
+
+		# Get Only ones that aren't marked skipped
+		@overloadedFuncs = grep !defined($skippedFunctions{$_}),  @overloadedFuncs;			
+
+		
+		# get the functions that are distinct by arg count, and the ones that aren't
+		my ($distinctArgCountFuncs, $NonDistinctArgCountFuncs) =
+			classifyOverloadedFuncs(\@overloadedFuncs, \%args);
+
+		my %caseConditions; # Hash of CASE statements to be used for each overloaded function
+
+		# Take care of the CASE conditions for the distinctArgCount functions
+		foreach (keys %$distinctArgCountFuncs){
+			$caseConditions{$_} = "CASE: items == ".($distinctArgCountFuncs->{$_}+1);
+		}
+		
+		# Now Go thru each set of non-distinct overloaded functions
+		foreach my $argCount(sort keys %$NonDistinctArgCountFuncs){
+		
+			my @NDfuncNames = @{$NonDistinctArgCountFuncs->{$argCount} };
+			# Build Hash of Function Names to Arg Types
+			my %funcTypes;
+			foreach (@NDfuncNames){
+				$funcTypes{$_} = [ @{$args{$_}{type}}{1..$argCount} ];
+			}
+			
+			# find which args (if any) makes the signature unique
+			my $uniqueArgs = findUniqueArgs(\%funcTypes);
+			 
+			# Now build the CASE conditions for these functions, or if no
+			#        unique functions, skip it
+			foreach my $NDfunc(@NDfuncNames){
+				
+				my $uniqueArg = $uniqueArgs->{$NDfunc};
+				
+				# If some unique args defined, and some of them are vtkObjects
+				if( scalar(keys %$uniqueArg) ){
+				
+					my %uniqueTypes = reverse %$uniqueArg; # get mapping of types to Arg Numbers
+					
+					my ($uniqueType) = grep /^vtk\S+/, keys %uniqueTypes;
+					if( $uniqueType){ # Unique Arg is an vtkObject
+						my $vtkUniqueArg = $uniqueTypes{$uniqueType};
+						$uniqueType =~ s/[\*\&]//g; # get rid of any pointer symbols
+						$uniqueType =~ s/^\s*//g; # Get rid of leading/trailing whitespace
+						$uniqueType =~ s/\s*$//g; # Get rid of leading/trailing whitespace
+						my $shortType = $uniqueType; # make type without the leading 'vtk'
+						$shortType =~ s/^vtk//;
+						$caseConditions{$NDfunc} = "CASE: items == ".($argCount+1)." && sv_isobject(ST(".($vtkUniqueArg).")) && sv_derived_from(ST(".($vtkUniqueArg)."),\"Graphics::VTK::$shortType\")";
+					}
+					elsif( ($uniqueType) = grep /^\s*(const\s+)?int\s*/, keys %uniqueTypes ){ # Unique Type is an integer
+						my $UniqueArg = $uniqueTypes{$uniqueType};
+						$caseConditions{$NDfunc} = "CASE: items == ".($argCount+1)." && SvIOK(ST(".($UniqueArg)."))";
+					}						
+					elsif( ($uniqueType) = grep /^\s*(const\s+)?char\s*\*/, keys %uniqueTypes ){ # Unique Type is an string
+						my $UniqueArg = $uniqueTypes{$uniqueType};
+						$caseConditions{$NDfunc} = "CASE: items == ".($argCount+1)." && SvPOK(ST(".($UniqueArg)."))";
+					}						
+					else{
+						# Can't handle this function because nothing was unique
+						$skippedFunctions{$NDfunc} = "Can't Handle Function Signature for this overloaded method\n";
+					}
+					
+				}
+				else{
+					# Can't handle this function because nothing was unique
+					$skippedFunctions{$NDfunc} = "Can't Get Unique Function Signature for this overloaded method\n";
+				}
+			}
+		}
+		
+		$returnType ||= 'void'; # set return type to void if not defined
+			
+		# Make vtk... & return types look like a vtk.... * return type
+		$returnType =~ s/^\s*(vtk\w+\b\s*)\&/$1\*/;
+
+
+
+		# - generate XS code based on the max number of items and non-void return type, or
+		#   void if all return types are void
+		my ($maxDistinctItems, $maxNoDistinctItems);
+		($maxDistinctItems) = sort { $b <=> $a } values %$distinctArgCountFuncs;
+		($maxNonDistinctItems) = sort { $b <=> $a } keys %$NonDistinctArgCountFuncs;
+		$maxDistinctItems ||= -1;    # set default min value
+		$maxNonDistinctItems ||= -1; # set default min value
+		
+		
+		my $maxItems;
+		my $maxFunction;
+		if( $maxDistinctItems > $maxNonDistinctItems){
+			($maxFunction) = grep $distinctArgCountFuncs->{$_} == $maxDistinctItems,  keys %$distinctArgCountFuncs
+		}
+		elsif( $maxDistinctItems == -1 && $maxNonDistinctItems == -1){ # no max found, just use the
+										# first Overloaded func for maxFunction
+			$maxFunction = $overloadedFuncs[0];
+		}
+		else{
+			$maxFunction = $NonDistinctArgCountFuncs->{$maxNonDistinctItems}[0];
+		}
+		
+
+		# Figure out All Arg Names
+		my @argNumbers = ();  # initialize to empty array for functs with
+				      # no args
+		my @argNames = ();
+		my @argElements = ();
+		if(defined($args{$maxFunction}{name}{1})){ # Functions with args
+			@argNumbers = sort {$a<=>$b} keys %{$args{$maxFunction}{name}};
+		}
+		
+		my @SigargNames = map "arg$_ = 0", @argNumbers;
+		my $nonUniqueFuncName = $funct; # Get rid of trailing '_' for signature
+		$nonUniqueFuncName =~ s/_+$//g;
+		writeXSsig($returnType, $className, $nonUniqueFuncName, \@SigargNames);
+
+		# Find the order we are going spit out code for the cases
+		my @sortedFuncs = sort { $caseConditions{$b} cmp $caseConditions{$a} } keys %caseConditions;
+		
+		# Go Thru Each Item numbers
+		foreach my $funcName(@sortedFuncs){
+			my $returnType = $returnType{$funcName}; # return type for this function
+
+			$hintSize = $level1Hash->{functions}{$funcName}{'Hint Size'};
+
+			# vtk... & return types actually return
+			#  a vtk pointer. In these cases, the methods
+			#   will be called like '&(THIS)->method'
+			my $returnTypeNeedsAddress;
+			if ($returnType =~ /^\s*(vtk\w+\b\s*)\&/){
+				$returnTypeNeedsAddress = 1;
+			}
+
+
+			# Number of args in XS includes THIS, so $itemNo
+			#  has to be increased by 1
+			print "\t".$caseConditions{$funcName}."\n";
+			@argElements = ();
+			@argNames = ();
+			my @outputs; # outputs other than the RETVAL
+			my @c_args;  # c_args, if required
+			my $c_args;  # flag = 1 to include c_flags
+			my %argTypes;
+			if(defined($args{$funcName}{name}{1})){ # Functions with args
+				@argNumbers = sort {$a<=>$b} keys %{$args{$funcName}{name}};
+				@argNames = map "arg$_", @argNumbers;
+				@argTypes{@argNumbers} = map $args{$funcName}{type}{$_},@argNumbers;
+
+				# If arg types is like 'int &', or 'unsigned short &' assume
+				#  it is an i/o arg and add to output
+				# If it is an  vtkObject (like 'vtkIdList &'), then treat
+				#  as an object pointer from perl, but create c_args keyword
+				#  with a dereferences call 
+				#   
+				foreach my $argNumber(@argNumbers){
+					my $argType = $argTypes{$argNumber};
+					if( $argType =~/\&\s*$/){
+						if( $argType =~ /^vtk\w+/){ # vtkObject
+							$argType =~ s/\&\s*$/\*/g; # get rid of & in type and replace with *
+							push @c_args,'*'." arg$argNumber";
+							$argTypes{$argNumber} = $argType;
+						}
+						else{ # non vtkObject
+							$argType =~ s/\&\s*$//g; # get rid of & in type and add to output list
+							push @outputs, "arg$argNumber";
+							push @c_args, "arg$argNumber";
+							$argTypes{$argNumber} = $argType;
+						}
+					}
+					else{
+						push @c_args, "arg$argNumber";
+					}
+				} 
+
+				@argElements = map { $argTypes{$_}."\t".
+							 "arg$_"} @argNumbers;
+			}
+			# Now Print Arg Types and names, in the K&R Style
+			my %argNames;
+			@argNames{@argNumbers} = map "arg$_", @argNumbers;
+			
+			writeArgList(\%argTypes, \%argNames);
+
+			# Find out if this function hash function pointer args
+			my $funcPointerArgs;
+			foreach my $argNumber(keys %argTypes){
+				if( $argTypes{$argNumber} =~ /^func\w+/){
+					$funcPointerArgs = $argNames{$argNumber};
+				}
+			}
+		
+			writeXScode($level1Hash,$returnType{$funcName},$funcName,
+				$nonUniqueFuncName,$returnTypeNeedsAddress, \@c_args,\@outputs, $hintSize, $funcPointerArgs,undef, undef, $staticMethodFlag);
+
+			push @XSFunctions, $funcName; # save the function name that we actually wrote out
+			$XSFunctions{$funcName} = 1;
+
+		}
+		print "\tCASE:\n\t\tCODE:\n\t\tcroak(\"Unsupported number of args and/or types supplied to $className\:\:$nonUniqueFuncName\\n\")\;\n\n";
+	}
+			
+	
+}
+
+######################### Generate pm file ##################################
+# Get the base class info:
+my $noBaseClasses = 0;
+my @baseClasses;
+my $baseClassString = $level1Hash->{'Number Of Super Classes'};
+($noBaseClasses, @baseClasses) = split( /\s+/s, $baseClassString);
+
+open(PMFILE, ">$pmFile") or die("Can't open file '$pmFile' for writing\n");
+
+print PMFILE "package Graphics::VTK::$shortClass;
+
+";
+
+# Take care of any base classes
+if( $noBaseClasses){
+foreach (@baseClasses){ s/^vtk//;}# Convert to short class names:
+
+print PMFILE "
+\@Graphics::VTK::$shortClass\::ISA = qw( ".( join(" ",map('Graphics::VTK::'.$_." ", @baseClasses)) ).");\n";  
+}
+
+
+print PMFILE "\n=head1 Graphics::VTK::$shortClass\n\n";
+
+print PMFILE "=over 1\n\n";
+print PMFILE "=item *\n\nInherits from ".join(", ",@baseClasses)."\n\n";
+print PMFILE "=back\n\n";
+
+print PMFILE "B<Functions Supported for this class by the PerlVTK module:>\n";
+print PMFILE "(To find more about their use check the VTK documentation at http://www.kitware.com.)\n\n";
+
+
+foreach my $funct(@XSFunctions){
+	print PMFILE "   ".$functionSig{$funct}."\n";
+	$hintSize = $level1Hash->{functions}{$funct}{'Hint Size'};
+	if( $hintSize){
+		print PMFILE "      (Returns a ".$hintSize."-element Perl list)\n";
+	}
+
+}
+
+
+if( scalar( keys( %skippedFunctions) > 0)){ # Put in skipped section
+	print PMFILE "\n\nB<$className Unsupported Funcs:>\n\nFunctions which are not supported supported for this class by the PerlVTK module.\n\n";
+
+	foreach my $funct(sort keys %skippedFunctions){
+		print PMFILE "   ".$functionSig{$funct}."\n      ".$skippedFunctions{$funct}."\n";
+	}
+}
+
+print PMFILE "\n=cut\n\n";
+
+
+close PMFILE;
+
+
+
+#####################################################################################
+#  Sub to write the XS sub signature
+
+sub writeXSsig{
+
+	my ($retType, $className,$funcName, $args,$dims) = @_;  # return type, className, functionName and array ref of arg names
+	
+	# copy @$args to @args. If any args have dims, then 
+	#   create extra args for them
+	my @args;
+	my $index = 0;
+	foreach my $arg(@$args){
+		if( $dims->[$index]){
+			my @subArgs = map "$arg"."_$_", (0..($dims->[$index]-1));
+			push @args, @subArgs;
+		}
+		else{
+			push @args, $arg;
+		}
+	}
+	
+	# Contructor gets a static type
+	if( $funcName eq 'New'){
+		print "static ";
+	}
+	#else{
+	#	# Only constructors should have static return typ
+	#	$retType =~ s/^\s*static\s+//;
+	#} 
+
+	
+	print $retType."\n";
+
+	print "$className\:\:$funcName\(";
+	print join(", ",@args).")\n";
+
+	
+}
+
+#####################################################################################
+#  Sub to write the args types and names, in the K&R Style
+sub writeArgList{
+
+	my ($argTypes, $argNames, $argDims) = @_;  # hashes of arg types and arg names vs arg numbers (1..whatever)
+	
+	# Make into arrays:
+	my @argNumbers = sort {$a <=> $b} keys %$argTypes;
+	my @argTypes = @$argTypes{@argNumbers};
+	my @argDims =  @$argDims{@argNumbers};
+	my @argNames =  @$argNames{@argNumbers};
+
+	# Convert 'func<something>' arg types to SV* types
+	foreach my $argType(@argTypes){
+		if( $argType =~ /^func\w+/){
+			$argType = 'SV*';
+		}
+	}
+	# Expand any arg names/types that have dims
+	#   e.g. type: double* name: arg1 dims:2
+	#  becomes type: double, double name: arg1_0, arg1_1 
+	my @argTypes2;
+	my @argNames2;
+	my $index = 0;
+	foreach my $argName(@argNames){
+		my $argType = $argTypes[$index];
+		my $argDims = $argDims[$index];
+		if($argDims && $argDims > 1){ # greater than 1 arg dims
+			my @subNames = map "$argName"."_$_", (0..($argDims-1));
+			$argType =~ s/\*\s*$//; # get rid of any pointer in arg type
+			my @subTypes = map $argType, (0..($argDims-1));
+			push @argTypes2, @subTypes;
+			push @argNames2, @subNames;
+		}
+		else{
+			push @argTypes2, $argType;
+			push @argNames2, $argName;
+		}
+		$index++;
+	}
+	
+	my @argElements = map { $argTypes2[$_]."\t".
+						 $argNames2[$_]} (0..$#argNames2);
+	
+	print "\t\t".join("\n\t\t",@argElements)."\n" if(@argElements);
+
+}
+
+#######################################################################################
+# Sub to write the XS function code section
+
+# Inputs:
+# $classInfo:  2D hash of class information parsed from the vtkPrint utility
+# $returntype: Return type for this function
+# $funcName:   Unique Name for this function (i.e. could be something like 'func__' if this
+#                  is an overloaded function
+# $func        Non-unique name for this function (i.e. would be 'func' in the above exaple
+# $returnTypeNeedsAddress:  Flag = 1 if the return type needs to be turned into adress
+# $c_args      List of args to call the c-function with
+# $outputs     List of args that should be be in the output list
+# listSize     size to list to be returned. 0 of undef if no list is
+#              to be returned
+# funcArg      Defined with the arg name if this is a function that has function pointer args (like 'SetExecuteMethod', etc)
+# argDims      dims of any args. used to create an initialization section
+#                 e.g. if an arg2 has dims 2, then an initialization section will
+#                      be created double arg2[] = { arg2_0, arg2_1 };
+# argTypes     types of the args
+#
+# supplyThis  Flag = classname if we need to manually supply the 'THIS' variable in the preinit section of this function
+#              This is needed for an overloaded method that is defined as an overall static method, but has some overloaded
+#              methods that are non-static.
+
+sub writeXScode{
+	
+	my($classInfo, $returnType, $funcName, $funct, $returnTypeNeedsAddress,
+		$c_args, $outputs, $listSize, $funcArg, $arg_dims, $arg_types, $supplyThis) = @_;
+	
+	$arg_dims ||= []; # default value for arg dims
+	$arg_types ||= []; # default value for arg dims
+	
+	my @preInitLines; # any pre-init section lines 
+	
+	# If this function returns a class (and is not the 'New' method, supply the preinit XS section to make the CLASS
+	#  variable equal to the class returned:
+	my $returnClass;
+	if( ($returnClass = $classInfo->{functions}{$funcName}{ReturnClass}) ne 'None' 
+		&& $returnType =~ /^vtk\S+/ && $funct ne 'New'){
+		push @preInitLines, "\t\tchar  CLASS[80] = \"Graphics::VTK\:\:$returnClass\"\;";
+	}
+
+	if( $listSize ){ # We need to return a list:
+		push @preInitLines, "\t\t$returnType retval;";
+	}
+	
+	if( $supplyThis && $returnType !~ /\bstatic\b/){ # this is a non-static method, with a static overall xs return type
+
+		push @preInitLines,  "\t\tvtk$supplyThis *  THIS;";
+	        push @preInitLines,  "\t\tif( sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG) )";
+        	push @preInitLines,  "\t\t\tif (sv_derived_from(ST(0), \"Graphics::VTK::$supplyThis\")) {";
+		push @preInitLines,  "\t\t\t\tTHIS = (vtk$supplyThis *)SvIV((SV*)SvRV( ST(0) ));";
+		push @preInitLines,  "\t\t\t}";
+		push @preInitLines,  "\t\t\telse{";
+		push @preInitLines,  "\t\t\t\tcroak(\"Graphics::VTK::$supplyThis::$funct() -- THIS not of type Graphics::VTK::$supplyThis\");";
+		push @preInitLines,  "\t\t\t}";
+		push @preInitLines,  "\t\telse{";
+		push @preInitLines,  "\t\t\twarn( \"Graphics::VTK::$supplyThis::$funct() -- THIS is not a blessed SV reference\" );";
+		push @preInitLines,  "\t\t\tXSRETURN_UNDEF;";
+		push @preInitLines,  "\t\t};";
+		
+	}
+		
+	if( @preInitLines ){
+		print join("\n", ("\t\tPREINIT:", @preInitLines))."\n";
+	}
+
+	my $retValText = "RETVAL";
+	if( $listSize){  # Returning a list:
+		$retValText = "retval";
+		# We are emulating a 'PPCODE' section with 'CODE' text because
+		#  xsubpp doesn't like multiple CASE's with PPCODEs in them.
+		print "\t\tCODE:\n";
+		print "\t\tSP -= items;\n\t\t";	
+
+	}
+	else{
+		print "\t\tCODE:\n\t\t";
+	}
+	
+	# Check for needing a initialization due to args dims
+	my $indx = 0;
+	foreach my $c_arg(@$c_args){
+		if( $arg_dims->[$indx] && $arg_dims->[$indx] > 1){
+			my $type = $arg_types->[$indx];
+			$type =~ s/\*\s*$//g; # get rid of any pointer '*' for the initialization code
+			print "$type $c_arg\[\] = ";
+			my @subArgs = map $c_arg."_$_", (0..($arg_dims->[$indx]-1));
+			print "{ ".join(", ",@subArgs)."};\n\t\t";
+		}
+		$indx++;
+	}
+	
+	# Check for function pointer arg:
+	if( $funcArg){ # output function arg stuff:
+		print"HV * methodHash;
+		HV * HashEntry;
+		HE * tempHE;
+		HV * tempHV;
+      		/* put a copy of the callback in the executeMethodList hash */
+		methodHash = perl_get_hv(\"Graphics::VTK::Object::executeMethodList\", FALSE);
+    		if (methodHash == (HV*)NULL)
+    		    printf(\"Graphics::VTK::executeMethodList hash doesn't exist???\\n\");
+    		else{
+			tempHE = hv_fetch_ent(methodHash, ST(0), 0,0);
+	    		if( tempHE == (HE*)NULL ) {  /* Entry doesn't exist (i.e. we didn't create it, make an entry for it */
+		    		tempHV = newHV();  /* Create empty hash ref and put in executeMethodList */
+				hv_store_ent(methodHash, ST(0), newRV_inc((SV*) tempHV), 0);
+			}
+		    HashEntry =   (HV *) SvRV(HeVAL(hv_fetch_ent(methodHash, ST(0), 0,0)));
+		    hv_store_ent(HashEntry, newSVpv(\"$funcName\",0), newRV($funcArg), 0);
+		}\n\t\t";
+		unshift @$c_args, 'callperlsub'; # add the call perlsub infront of the c_args
+						
+		
+	}
+	
+	
+	if( $returnType !~  /^\s*(static\s+)?void\s*$/){
+		print "$retValText = ";
+	}
+
+	if( $funct ne 'New' && $returnType !~ /^\s*static/ ){ # use THIS->func unless this is the constructor, or static method
+		if( $returnTypeNeedsAddress){ # return type needs to be turned into adress
+			print '&(THIS)';
+		}
+		else{                        # return type is already what it needs to be
+			print 'THIS';
+		}
+		print "->".$funct."(".join(", ",@$c_args).");\n";
+	}
+	else{
+		print "$className\:\:".$funct."(".join(", ",@$c_args).");\n";
+	}
+
+	# If returning a class, modify the class name to get what is actually being
+	#  This will properly bless the object returned into the correct class.
+	#   For example vtkCullerCollection->GetNextItem returns a vtkCuller object, but
+	#    it could also return a object that is a subclass of vtkCuller, but including
+	#    the following code, we get the real class name of the return class
+	# (+3 added to the pointer to not pick up the leading 'vtk' in the classname
+	if( $returnClass ne 'None' 
+		&& $returnType =~ /^vtk\S+/ && $funct ne 'New'){
+		print "\t\tif(RETVAL != NULL){\n\t\t\tstrcpy(CLASS,\"Graphics::VTK::\")\;\n\t\t\tstrcat(CLASS,RETVAL->GetClassName()+3)\;\n\t\t}\n";
+	}
+		
+
+	#  
+	
+	if( $listSize ){ # Returning a list
+		# Get the base type from the return type (i.e. without the *)
+		my $baseType = $returnType;
+		$baseType =~ s/\*//g;
+		$baseType =~ s/^\s+//g; # get rid of leading/trailing whitespace
+		$baseType =~ s/\s+$//g;
+		
+		# XS macro used to turn the return type 
+		#  into a perl scalar value
+		my $XSmacro;
+		if( $baseType =~ /int/ && $baseType =~ /char/){
+			$XSmacro = 'newSViv';
+		}
+		else{
+			$XSmacro = 'newSVnv';
+		}
+		
+		print "\t\tEXTEND(SP, $listSize);\n";
+		foreach ( ( 0..($listSize-1))){
+			print "\t\tPUSHs(sv_2mortal(".$XSmacro."(retval[".$_."])));\n"
+		}
+		
+		# This stuff is needed because we are emulating a PPCODE section
+		#   using a CODE section, because xsubpp doesn't like multiple CASE's with PPCODEs in them.
+		print "\t\tPUTBACK;\n";
+		print "\t\treturn;\n";
+
+	}
+	elsif( $returnType =~ /^\s*(static\s+)?void$/){
+		print "\t\tXSRETURN_EMPTY;\n";
+	}
+	else{
+		push @$outputs, 'RETVAL';
+
+	}
+	print "\t\tOUTPUT:\n\t\t".join("\n\t\t", @$outputs)."\n" if( @$outputs);
+
+}
+
+#
+#    Sub to take a list of arg types for some functions 
+#     (Assumed to be the same number of args), and find
+#    which arg numbers are unique across all the funcs supplied
+#
+#    Input Data is of the form:
+#      ( FunctionName => [ Arg Types])
+#  $funcTypes = {
+#	'func1'   => [ qw/ int  vtkDude double / ],
+#	'func1_'  => [ qw/ int   double vtkDude / ],
+#	'func1__' => [ qw/ int   vtkDude double / ]
+#	};
+	
+#   Output Data is of the form:
+#  $uniqueArgs = {
+#	'func1' => { }  # nothing unique
+#       'func2' => { 2 => double, 3 => vtkDude }  # args 2 and 3 unique
+#       'func3' => { }  # nothing unique
+sub findUniqueArgs{
+	my $funcTypes = shift;
+	
+	# Get the number of args, and the number of funcs
+	my @funcs =  keys %$funcTypes;
+	my $noArgs = scalar( @{$funcTypes->{$funcs[0]}});
+	my $noFuncs = scalar(@funcs);
+	
+	my $uniqueArgs = {}; # setup output hash
+	foreach (@funcs){ $uniqueArgs->{$_} = {} };
+	
+	# Go thru each arg, and thru each funcs
+	foreach my $argNo(1..$noArgs){
+		
+		# Get all the types for this arg Number
+		my @types = map $funcTypes->{$_}[$argNo-1], @funcs;
+				
+		my %typeCount; # hash of the occurences of the type
+		foreach (@types){
+			$typeCount{$_}++;
+		}
+		
+		# Now mark the unique ones
+		foreach my $func(@funcs){
+			my $type = $funcTypes->{$func}[$argNo-1];
+			if( $typeCount{$type} ==1){ # Unique  Arg
+				$uniqueArgs->{$func}{$argNo} = $type;
+			}
+		}
+		
+	}
+	
+	return $uniqueArgs;
+	
+}
+
+
+##############################################################
+# Function to find out which of the overloaded functions can
+#  be identified by the number of args only, and which can't.
+#
+#  Inputs 
+#     $overloadedFuncs:  Array reof of the overloaded function names
+#     $args:             Args hash
+#
+#  Outputs:
+#	distinctArgCountFuncs # Hash of functs that are unique by arg counts => arg count
+#				#  e.g. (func1 => 3, funct1_ => 4)
+#       nonDistinctArgCountFuncs # Hash ref of functs that are non unique by arg counts
+#				#  e.g. ( 1 => [func1__, funct1____], 2 => [funct1____])
+
+sub classifyOverloadedFuncs{
+
+	my ( $overloadedFuncs, $args) = @_;
+	
+	my @overloadedFuncs = @$overloadedFuncs; # make local array copy, for convienence
+	
+	my %overloadedItems;
+	foreach my $func(@overloadedFuncs){
+		my $types = $args->{$func}{type};
+
+		# number of items for this function is the number of defined values
+		#  for the 'types' item of the $args hash
+		$overloadedItems{$func} = scalar(  grep defined($types->{$_}), keys%$types);
+	}
+
+	# -  Make hash mapping of items => function Name (with underscore)
+	# Find which functions we can identify by # Args Only
+	my %distinctNumberArgs; # Hash of #number Args => No Functions;
+	foreach my $func( @overloadedFuncs){
+		$distinctNumberArgs{$overloadedItems{$func}}++;
+	}
+	# Wrray of which arg Counts are unique
+	my @distinctArgCounts =  grep $distinctNumberArgs{$_} == 1, keys %distinctNumberArgs;
+	my %overloadedItemsReverseLookup = reverse (%overloadedItems);
+	# Which Functions are unique by arg count:
+	my @distinctArgCountFuncs =  map  $overloadedItemsReverseLookup{$_}, @distinctArgCounts;
+
+	my %distinctArgCountFuncs;
+	@distinctArgCountFuncs{@distinctArgCountFuncs} = @distinctArgCounts;
+	
+	# Which functions are not unique by arg count
+	my @nonDistinctArgCounts = grep $distinctNumberArgs{$_} > 1, keys %distinctNumberArgs;
+
+	# Hash of Arg Count => [ func1, func2 ], (function names that can't be ID'ed by arg count
+	my %nonDistinctArgCountFuncs;
+	foreach my $argCount( @nonDistinctArgCounts ){
+		my @funcNames = grep $overloadedItems{$_} == $argCount, @overloadedFuncs;
+		$nonDistinctArgCountFuncs{$argCount} = [@funcNames];
+	}
+	
+	return( \%distinctArgCountFuncs, \%nonDistinctArgCountFuncs);
+	
+}
+
+# Function to Eliminate Redundant Overloaded Methods
+#   e.g. method1(float * a[4]) and method1(float, float, float, float) would be
+#    considered redundant, because they would result in the same XS function being written out
+#
+sub eliminateRedundant{
+
+	my ($funct, $args, $overloadedFuncs, $skippedFunctions) = @_;
+	
+	# Find any int[3] or float[2] functions
+	
+	my %singleArrayFunctions;  # functions with one single array args
+	
+	foreach my $functName(@$overloadedFuncs){
+	
+		if( singleArrayFunction($functName,$args)){
+			my $funcInfo  = $args->{$functName}; # get info for this funct
+	
+			$singleArrayFunctions{$functName} = { type => $funcInfo->{type}{1}, size => $funcInfo->{dims}{1}};
+		}
+		
+	}
+	
+	return unless( keys %singleArrayFunctions); # don't go further if none found
+	
+	# Now look for any equivalant args
+	my %redundantFuncs;
+	foreach my $singleArrayFunc(keys %singleArrayFunctions){
+	
+		my $argType = $singleArrayFunctions{$singleArrayFunc}{type};
+		$argType =~ s/\s*\*\s*$//; # get rid of pointer * in arg type
+		$argType =~ s/^\s*const\s*//; # get of any starting 'const' in arg type
+		my $noArgs =  $singleArrayFunctions{$singleArrayFunc}{size};
+		
+		# Now go thru the functions looking for a equivalent
+		foreach my $funcName(@$overloadedFuncs){
+			my $funcInfo  = $args->{$funcName}; # get info for this funct
+			if( keys( %{$funcInfo->{type}}) == $noArgs ){    # Same number of args as the size
+			
+				my @matchingArgs = grep /$argType\s*$/, values(%{$funcInfo->{type}});
+				
+				if( @matchingArgs == $noArgs){  # function has the same number of args as $noArgs, and has 
+								# all the same type as $argType
+					$redundantFuncs{$singleArrayFunc} = $funcName;
+					$skippedFunctions->{$singleArrayFunc} = "Method is redundant. Same as $funct( ".join(", ", ( map $argType , (1..$noArgs))).")\n";
+				}
+			}
+		}
+		
+	}
+	
+	# 
+	# Filter overloaded functions by the redundant functions we found
+	@$overloadedFuncs = grep !defined($skippedFunctions->{$_}),  @$overloadedFuncs;
+
+								
+		
+}
+
+
+# Function to determine is the supplied function is a single-array function
+#   A single array function is one that containts one argument that is an array, and
+#     not a const array (if constFlag is true)
+#   e.g. method1(float * a[4]) 
+#   Returns 1 if true, 0 if false
+
+sub singleArrayFunction{
+	my ($funct, $args, $constOk) = @_;
+	
+	if( $funct =~ /insideoroutside/i ){
+		my $wha = 1;
+	}
+	# Find any int[3] or float[2] functions
+	my $funcInfo  = $args->{$funct}; # get info for this funct
+	
+	if( $constOk && keys( %{$funcInfo->{type}}) == 1  &&    # Single Arg constFlag = 1
+	     defined( $funcInfo->{type}{1}) && $funcInfo->{type}{1} =~ /^\s*((unsigned\s+char)|(float)|(int)|(double))\s*\*\s*$/ &&  # float * or int * type
+	     defined( $funcInfo->{dims}{1}) && $funcInfo->{dims}{1} =~ /\d*/          # Signature contains arg size info
+	){
+		return 1;
+	}
+	elsif( keys( %{$funcInfo->{type}}) == 1  &&    # Single Arg constFlag = 0
+	     defined( $funcInfo->{type}{1}) && $funcInfo->{type}{1} =~ /^\s*(const\s+)?(unsigned\s+char)|(float)|(int)|(double)\s*\*\s*$/ &&  # float * or int * type
+	     defined( $funcInfo->{dims}{1}) && $funcInfo->{dims}{1} =~ /\d*/          # Signature contains arg size info
+	){
+		return 1;
+	}
+		
+	return 0;
+}

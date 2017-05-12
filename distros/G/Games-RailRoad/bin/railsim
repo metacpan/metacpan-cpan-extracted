@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+# 
+# This file is part of Games-RailRoad
+# 
+# This software is copyright (c) 2008 by Jerome Quelin.
+# 
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# 
+
+use strict;
+use warnings;
+
+# for testing purposes
+use FindBin qw[ $Bin ];
+use lib "$Bin/../lib";
+#/testing
+
+use Getopt::Euclid;
+use Games::RailRoad;
+
+Games::RailRoad->spawn;
+POE::Kernel->run;
+
+exit;
+
+__END__
+
+=head1 NAME
+
+railsim - a railroad simulation
+
+
+=head1 USAGE
+
+    $ railsim
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item --version
+
+=item --usage
+
+=item --help
+
+=item --man
+
+Print the usual program information.
+
+
+=back
+
+
+=head1 AUTHOR
+
+Jerome Quelin, C<< <jquelin at cpan.org> >>
+
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2008 Jerome Quelin, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+

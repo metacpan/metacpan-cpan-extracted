@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Games/WavingHands.pm
+lib/Games/WavingHands/Archive.pm
+lib/Games/WavingHands/Archive/WavingHands.pm
+lib/Games/WavingHands/Engine.pm
+lib/Games/WavingHands/Engine/WavingHands.pm
+lib/Games/WavingHands/Parser.pm
+lib/Games/WavingHands/Parser/WavingHands.pm
+lib/Games/WavingHands/Parser/Grammar/WavingHands.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+Revision history for Gtk2-Ex-Email-AddressVBox
+
+0.0.1	2009-11-10/18:30
+		-Correct the POD so that the example in
+			the synopsis is not work wrapped.
+
+0.0.0	2009-11-09/21:20
+		-Initial release.

@@ -1,0 +1,1208 @@
+
+
+Revision history for Graphics-Framebuffer
+
+1.00    2004
+
+        First version, released privately only, as part of a Perl
+		media player project called "SuperSparky".
+
+4.02    Dec 29, 2013
+
+        Public CPAN release.  This is considerably more advanced
+		than the one distributed as part of the media player.
+
+4.03    March 20, 2014
+
+        Minor changes to the CPAN package
+
+4.05    April 14, 2014
+
+        Documentation updates.  POD section revamped.
+
+4.06    July 19, 2014
+
+        Added better testing
+
+        Added framebuffer emulation mode for test running on systems
+        without a hardware framebuffer.  It draws to a 640x480x32
+        virtual screen in memory.  You can dump this screen to a file.
+        
+4.07    July 23, 2014
+
+        Fixed calculation error in string size allocation for emulation
+        mode.
+
+        Fixed fill 'flood' typo.
+
+        Fixed pixel class documentation.  It was incorrect.
+
+        Added more tests for most used methods.
+
+4.08    July 25, 2014
+
+        Added additional information to the documentation for the new
+        emulation mode.  No actual code changes made.
+
+4.09    November 26, 2014
+
+        Added more FBIOCTL flags to make ready for future hardware
+        accellerated updates.  No promises here, but heck, this
+        entire module was an exercise in "can it be done in Perl?"
+        
+        Also fixed a code comment that was mislabeled.
+
+4.10    May 10, 2015
+
+        Added the ability to customize the framebuffer file path.
+        Thanks Markus Maier.
+        
+        Added aliases to "set_mode"
+
+        Some minor documentation fixes.
+
+4.11    July 03, 2015
+
+        Numerous changes.
+
+        Changed ttf_print box_mode to return everything needed to call itself
+        again.
+
+        Added a 'COLOR_ORDER' setting to the "new" parameters.  1=RGB and 0=BGR.
+        The default is BGR.
+
+        Added more comments to the code
+
+        Added 'reset' as an alias to 'attributes_reset'.  Just for people with
+        different tastes.
+
+        Hardened the code further against undefined values.
+
+        Added more documentation
+
+        Tested on Raspberry PI2, and works great!  Odroid XU3, not so much...
+
+        Circle/ellipse clipping weirdness remains.  I should have that addressed
+        in the next release.
+
+4.12    July 05, 2015
+
+        Minor POD fix
+
+        There was a POD error that caused it to fail testing, although it would
+        have worked fine if installed.
+
+        No new functionality in this release, just that one issue fixed.
+
+4.13    July 06, 2015
+
+        Changed the tests to only test against a memory buffer.
+
+        The tests get screwed up by the Test::Harness' output (which can't be
+        squelched apparently).  So instead of testing on the real framebuffer,
+        I force the tests on a pseudo memory buffer.
+
+        I believe I have fixed the clipping issues, especially the ones with
+        filled ellipses and circles.  It was related to blit_write.
+
+        There are some minor optimizations, although likely not obvious.
+
+4.14    July 07, 2015
+
+        Fixed borked plot test.  Functionality of the module is fine.  The test
+        was broken.
+
+4.15    July 07, 2015
+
+        Optimizations!
+
+        I have optimized the draw_arc routine, and in the process made it
+        properly work with XOR mode as well.  It only draws what it hasn't
+        drawn before.  Which makes it quite faster (although still not a speed
+        demon).
+
+4.16    July 14, 2015
+
+        Bug fixes
+
+        Fill is now fixed.  This sucker still uses stack memory like it's going
+        out of style.  You have been warned.
+
+        Filled polygons now, as long as they aren't overly complicated, and the
+        borders do not cross.  It uses a history buffer when drawing and then
+        uses it to draw a series of horizontal lines to "fill" the polygon. This
+        fill is very fast as a result.
+
+        'line' added for an alternate way of drawing a line.  It's essentially
+        a combination of plot > drawto under the hood.
+
+        Warnings have been completely turned off.  We don't want warnings to
+        mess up your pretty graphics.  Crashable code is in an eval, so who
+        cares?  Generally warnings begin happening when Perl has done a
+        variable garbage collection, and the memory mapping to the framebuffer
+        is borked.  Fortunately, the module now recovers from this and remaps
+        it.
+
+        Clipping is quicker and more robust.
+
+        Documentation has been updated / fixed where appropriate.
+
+4.17    July 14, 2015
+
+        Fixed bugs as a result of some typos.  Sorry about that.
+        This affected the draw_arc and ellipse routines.
+        
+        Made poly arcs draw with lines instead of single pixels.  That fills in
+        the errors left by high granularity.
+        
+        Added the constants 'ARC', 'PIE', and 'POLY_ARC' to make drawing arcs
+        easier to code.
+
+4.18    July 14, 2015
+
+        Added new arc drawing methods.  See the POD docs (man) for details.
+
+4.19    July 16, 2015
+
+        Fixed the POD errors on test.  I could swear I tested that.  Oh well.
+
+4.20    July 16, 2015
+
+        Removed the harmless leftover SCREEN2 code.  Since that variable no
+        longer existed, the code skips by it.
+
+4.21    July 16, 2015
+
+        Ugh, I left "Data::Dumper::Simple" in the previous version.  Build
+        was borking on machines without it.  Sorry folks.
+
+        I try to leave out all debugging code to keep the module as fast as
+        possible, but I missed this one.
+
+4.22    July 21, 2015
+
+        I added a new mode to the framebuffer engine.  Typically the module
+        uses a memory mapped method to draw to the framebuffer.  It's fast,
+        but on some systems, this may be unstable.  In such cases, you have
+        the option of telling the drawing engine to use a file handle mode
+        instead.  File handle mode is a little slower, so use this mode
+        only if necessary.  See the manual for specifics.
+
+4.23    July 21, 2015
+
+        Modified the testing to stop failing too easy.  It's really not
+        catestrophic if a test fails.  Testing kind of interferes with
+        the output anyway.
+
+        Consolided the tests into one single "primitives" test.
+
+        ARM Mali GPUs now work.  I found the problem was the framebuffer
+        driver was returning some bogus data, and was throwing off the
+        calculations for drawing.  Which caused crazy numbers to be
+        sent to the mmap call, and thus fail.  Now an override can be
+        sent when initializing the module to fix this.  Yes, this means
+        that this module now works on the Odroid XU3!
+
+        The scripts in the "examples" directory can be put into MALI mode
+        by simply passing "mali" on the command line.
+
+        I added a boxfill for hardware accelerated cards.  It's automatic
+        when called by box/rbox in the API.  It only works with filled
+        boxes in normal and XOR mode.
+
+        If hardware accelerated filled boxes aren't working, then you
+        can disable them by setting (assume $fb is your object variable)
+        $fb->{'accel_flags'} = 0
+
+        Oh, and blitcopy is hardware accelerated in normal mode only as
+        well, if your video card supports it.
+
+4.24    July 23, 2015
+
+        Vertical Gradents for boxes, ellipses, circles, and polygons
+        added.  See the documentation for details.  See the "examples"
+        directory for... well... examples.
+        
+        Polygon fills fixed.  No more gaps.  Go easy on the complex
+        filled polygons though.  Sometimes you get better results by
+        making a complex filled polygon out of smaller simple ones.
+
+        Updated the examples with up-to-date tests.
+
+        Added "UNMASK_MODE" to the documentation.  Sorry about not having it
+        in there in the first place.  I also added the shortcut method
+        "unmask_mode".
+
+        Added "angle_line" method for drawing lines at specific angles.
+
+5.00    July 31, 2015
+
+        Major version update.
+
+        So many things have been added and optimized, that it warrants a full
+        version number upgrade.
+
+        'replace_color' is VERY fast if clipping is reset (off)
+
+        'pie_arc' has been changed.  It uses the same fill routine that the
+        polygon fill uses.  Thus it draws a lot faster with no more gaps.
+        Granularity is not as important.  The value of 0.01 for granularity
+        should work for most uses (unless you have a 4K screen).
+
+        'fill' Is a lot faster, and uses considerably less memory now.  I
+        knew I'd get it down.
+
+        New 'monochrome' method that takes any image data and makes it
+        greyscale.  Using it with the blit methods should be handy.
+
+        TrueType font rendering is improved.  It has a default font setting,
+        which you can change when you instantiate the framebuffer.  It also
+        takes a new parameter 'wscale' to scale the width of the text.  It
+        takes decimal values between 1 (inclusive) to 0 (exclusive).  1
+        is normal, and smaller values squeeze the text.
+
+        Color conversions are a bit better for 16 bit framebuffers.
+
+        Added 'cubic_bezier' curves!  Yes, you can be a spline master now.
+
+        More friendlier named methods that are aliases to others.
+
+        Due to the extra features, two more prerequisite modules are
+        required.
+        
+        On that note, I removed the need for Switch.pm. It turns out it's
+        flakey and starts to give bizarre errors, not to mention I realized
+        it has a performance penalty. So yes, this module is a little bit
+        faster now as a result.
+
+        Boxes can have rounded corners in frame, filled, and gradient
+        filled modes, if you desire.  Just add the parameter 'radius'
+        to the method call.
+
+        Polygons with rounded corners are not ready.  I am still having
+        trouble with them, but they will be added eventually.
+
+        This new version comes with a splash screen, which can be turned off.
+
+        The scripts in the 'examples' directory have been updated to reflect
+        the new additions.  They should be very helpful in getting you
+        started.
+
+        Please read the manual for info on the new additions.
+
+5.01    August 03, 2015
+
+        Fixed colorspace handling.  Whether your video card is RGB or BGR (or
+        anything else), the module handles it fine.  Also, 32, 24, and 16 bit
+        color modes are fully supported now.  Note, 16 bit is a bit slower due
+        to the need for bit shifting.  So I recommend 32 bit.
+
+        Color replace (replace_color) is now fixed, and quite a bit faster.
+        Super-fast if you do it without clipping (clip_reset).
+
+        More code optimizations have been added for speed.
+
+        cls/screen_clear have been changed a bit to be more effective when
+        clipping is off.  You can also enable/disable the console cursor if
+        you pass 'ON' or 'OFF' to them.
+
+        Splash screen contains info on the video card, and if hardware
+        acceleration is used.  It also indicates which color order RGB are
+        (look at the 'GFB' in the upper left circle, they are colored
+        according your video card's order).
+
+5.02    August 03, 2015
+
+        Discontinued "cubic_bezier' and replaced it with 'bezier'.  It was so
+        young, but this needed to be done.  It will still work, but I don't
+        suggest continuing to use it.  It's now just an alias to 'bezier'.
+
+        New 'bezier' method can create complex multi-point curves and shapes.
+        If a closed shape, it can be filled too.
+
+        Module prerequisites changed.
+
+        Optimized rounded corner box drawing.
+
+5.03    August 05, 2015
+
+        Improved the IOCTL handling.  A lot of work there.  Still can't figure
+        out why Mali and Nouveau are not giving the needed information to
+        properly draw.  The size of the framebuffer is improperly reported by
+        the Mali driver, and the size of a line is improperly reported by the
+        Nouveau driver.  It seems Nouveau requires an additional 192 bytes per
+        line.,, weird.
+
+        So, to compensate for weirdness, I added another option to the 'new'
+        method, LINE_PADDING.  With this one and MALI, I hope I have the quirks
+        covered.
+
+        Optimized the rounded box algorithm for solid fills a bit more.
+
+        Changed the splash screen a bit.
+
+        Changed the examoples scripts to fall in line with the changes.
+
+5.04    August 06, 2015
+
+        Optimized circles and boxes with rounded corners... by a lot.
+
+5.05    August 08, 2015
+
+        Fixed load_image, and added color remapping as well.
+
+5.06    August 08, 2015
+
+        Documentation for 'load_image' was incorrect.  'load_image' returns
+        a structure containing the image for display with 'blit_write'.
+
+5.07    August 08, 2015
+
+        Fixed the 32/24/16 bit conversions for image loading.
+
+5.08    August 08, 2015
+
+        Ugh, I left some debug code in one of the examples scripts.
+
+5.09    August 09, 2015
+
+        Updated the documentation.
+
+        Updates to set_color and related methods
+        
+5.10    August 09, 2015
+
+        Fixed a bug in xoffset calculations.
+
+5.11    August 10, 2015
+
+        Fixed a POD error
+
+5.12    August 11, 2015
+
+        Improved color replace.  It's a lot faster for clipped mode.
+
+        Modified the test scripts to dynamically adjust to the resolution of
+        the device.  This way the tests look fine on all devices, even tiny
+        96x64 OLED devices.
+
+        I was handling hardware acceleration incorrectly, which is why it
+        didn't work (duh).  Right now it's just turned off.  It requires
+        Inline C code, and I am not prepared for that yet.
+
+5.13    August 11, 2015
+
+        More fixes to line drawing and blitting routines.
+
+        Made test scripts completely resolution independent.  They should
+        display sane graphics for even the smallest displays.
+
+5.14    August 12, 2015
+
+        Hardened memory mapping.
+
+        If mmap fails more than twice, it now just switches to file handle mode.
+        Apparently when mmap fails, in some environments, the file handle
+        disappears as well.  Attempts are also made to recover the file handle
+        too.
+
+        Tests now check to see if run in X-Windows.  Naughty naughty those of
+        you not reading the instructions!  I don't like receiving CPAN reporter
+        errors when the error is not reading the instructions (wink wink).
+
+5.15    August 12, 2015
+
+        Added a real test pattern to image tests
+
+5.16    August 13, 2015
+
+        Fixed color mapping for ttf_print
+
+5.17    August 13, 2015
+
+        Removed MALI and LINE_PADDING parameters.
+        
+        Byte aligning helped figure out the driver paramenter structures.
+
+5.18    August 13, 2015
+
+        Moved the images into their own directory
+
+        Modified the scripts to work with the images.
+
+5.19    August 13, 2015
+
+        Replaced some for[each] loops with map for just that slight boost
+        of speed.  Every optimization helps.
+
+5.20    August 14, 2015
+
+        Fixed the color mapping for the TrueType font rendering.  This was
+        most obvious in 16 bit modes.  However, because of the complexities
+        in this process, text rendering for 16 bit modes is slower, as it
+        has to convert the 24 bit output of Imager into a 16 bit image to
+        then blit to the screen.  I will see if there are optimizations I can
+        do for this in the future.  Meanwhile it works.
+
+        Rounded box rendering has been fixed.  It was showing an error in the
+        right side of the boxes mostly.  This is no longer an issue.
+
+        Fixed the splash screen to show something coherrant on very low
+        resolution displays, like adafruit displays for example (96x64x16).
+
+        I have also forced buffer flushes on the screen filehandle.  It was
+        buffering the drawing, which was leaving artifacts and driving me
+        crazy.  Fortunately, this doesn't affect speed, as I don't tell it to
+        flush the buffer until after the entire primitive is drawn.
+
+5.21    August 14, 2015
+
+        Modified clear_screen a bit.
+
+        Made changes to the test and examples scripts.
+
+5.22    August 14, 2015
+
+        I somehow reintroduced some clipping errors I had previously fixed.
+        Well, those are fixed once again.
+
+5.23    August 16, 2015
+
+        I fixed one last clipping bug in horizontal line drawing and the top
+        of the screen.
+
+5.24    August 17, 2015
+
+        Mostly documentation updates.
+
+        'threadtest.pl' was no longer showing what each thread was doing.  It
+        must have been related to the buffering fixes for the graphics.  Doing
+        a flush on STDOUT seems to have fixed it.
+
+5.25    August 18, 2015
+
+        Added assign colorspace ability to emulation mode.  No longer is it
+        just RGB.  You can define it yourself.
+
+5.26    August 19, 2015
+
+        Fixed image load routine.
+
+5.27    August 19, 2015
+
+        Fixed POD errors
+
+5.28    August 20, 2015
+
+        The polygon fill has been completely rewritten.  It has one minor
+        requirement though, that all polygons need to be drawn with their
+        points in a clockwise direction.  Keep that in mind and filled
+        polygons will look great.
+
+5.29    August 20, 2015
+
+        Documentation changes
+
+        Improved a couple of the example scripts
+
+5.30    August 21, 2015
+
+        'image_load' now allows you to define the type of scaling to use, if
+        the image is to be scaled.
+
+        A few minor changes to the example scripts.
+
+5.31    August 25, 2015
+
+        Re-wrote the algorithm that retrieves the framebuffer ioctl structures
+        Different CPU types really throw this off, and attempting to use c2ph
+        shows that c2ph is broken.  Hopefully this algorithm works.
+
+        Included further install documentation, as it seems installing Imager
+        from CPAN can result in a useless Imager if the necessary libraries aren't
+        present ahead of time.
+
+5.32    August 25, 2015
+
+        Fixed some typos
+
+5.33    August 26, 2015
+
+        Improved the IOCTL detection code further.  It just goes to fbset if it
+        gets confused.  (#@$%@# C structures)
+
+        Added further documentation on installation and troubleshooting.
+
+        Added a disagnostics script call "dump.pl" in the "examples" directory.
+        I may ask you to send me the output of this, if you contact me for help.
+
+5.34    August 26, 2015
+
+        Horizontal gradients are now allowed (in addition to the vertical).  See
+        the documentation for details.  Surprisingly, this draws faster on some
+        primitives.  It's not perfect yet though.  Polygon fills seem to have
+        some issues.
+
+5.35    August 28, 2015
+
+        Improved cursor show/hide in clear_screen/cls.
+
+        Added more tests to primitives.pl.  Made slideshow.pl show on all
+        framebuffer devices on the system automatically.
+
+5.36    August 29, 2015
+
+        Changed the Build.PL and Makefile.PL scripts to be more informative
+        and check for 'fbset' as well.
+
+        Removed the test 01-environment.t script.  It was causing far too much
+        trouble with automated CPAN tester bots (I hate getting CPAN Tester
+        failure emails).
+
+        The example script "mmapvsfile.pl" now actually makes a recommendation
+        on which mode to use for your framebuffer device, as some SPI
+        connected TFT devices actually work much faster in file handle mode
+        instead of memory mapped mode (go figure).
+
+5.37    August 31, 2015
+
+        Fixed the 'angle_line' bug.  It just plain wasn't working right.  Now
+        it is.
+
+        Added the 'last_plot' method to return the current X,Y cursor position.
+
+        Added an 'angle_line' call to the "primitives.pl" script.
+
+5.38    September 03, 2015
+
+        Fixed load_image to actually work with center parameter.
+
+        load_image now loads images with multiple frames (animated gifs).
+
+        Added new method "blit_transform", which rotates, scales, flips, and
+        merges blit images.
+
+        Update the "examples" scripts to show off new methods.
+
+5.39    September 03, 2015
+
+        Fixed a time bug on primitives.pl that showed up on slow machines.
+
+5.40    September 03, 2015
+
+        Fixed the Perl 5.22+ hard error in load_image while checking for
+        Imager based errors.  Instead of "defined(@Img)" I changed it to
+        "defined($Img[0])".  Which is functionally equivalent to what I
+        need to check, as the first element needs to be defined anyway.
+        This should make new Perls happy.
+
+5.41    September 05, 2015
+
+        Fixed the animated GIF rendering issue with transparency.  No more
+        ugly black splotches.
+
+        Changed example scripts. Added more images with different
+        characteristics.
+
+5.42    September 14, 2015
+
+        Fixed incorrect color mapping for horizontal gradient fills in 16 bit
+        mode.
+
+        Added a color mapping test for "primitives.pl".
+
+        Changed how images are loaded for very low resolution screens in
+        "primitives.pl".
+
+5.43    September 16, 2015
+
+        Fixed circle bug with XOR draswing mode.
+
+        Fixed MASK and UNMASK drawing modes.  They previously didn't even work.
+
+        Removed some old legacy unused code.
+
+        Overhauled the examples scripts, especially "primitives.pl".
+
+        Gutted the old testing scripts.  They were just for show, and never
+        really were testing anything.  Due to Perl's taint mode, which test
+        uses, it was more trouble than it was worth.  Now, if you see the
+        splash screen, it works and is properly tested, sufficiently for
+        installing.
+
+5.44    September 18, 2015
+
+        Fixed a majorly annoying and long-term clipping bug with blit_write.
+        This was causing corruption and over drawing for horizontal gradients.
+
+5.45    September 18, 2015
+
+        Added "convertalpha" parameter to "load_image".  This finds all
+        occurances of the background color and gives it the alpha value in the
+        global background that is set.  This makes for overlaying via
+        "blit_transform" in "merge" mode much easier, and pretty much replaces
+        MASK and UNMASK mode for blitting (they will stay for compatibility).
+        Note, alpha only works for 32 bit mode.  This parameter does nothing
+        in 24 and 16 bit screen modes.
+
+5.46    September 19. 2015
+
+        I left "use threads" in when it was no longer needed.  I had been
+        experimenting with using threads internally, but neglected to remove
+        those lines when I trashed the idea.
+
+        Also "use Config" was removed as well.  It was used previously in "new"
+
+5.47    September 19, 2015
+
+        Added system variable $obj->{'FONTS'}, which contains all of the fonts
+        found in the system.  It is a hash in the format:
+
+             'facename' => {
+                 'path' => 'path to font',
+                 'font' => 'file name of font'
+             }
+
+        The module now assigns the default font from a list of possible fonts
+        that should be installed, instead of just "FreeSans".  This should
+        alieviate the fonts issue when testing.
+
+        The method "get_font_face" has been fixed, as it wasn't working as
+        documented.
+
+5.48    September 21, 2015
+
+        Fixed rotate to work properly for 16 bit mode.  Imager doesn't do 16
+        bit RGB565, so this rotate has to be coded in Perl for 16 bit mode
+        instead.
+        
+        Added the transform "monochrome" to "blit_transform".  It does the
+        same as the "monochrome" method.  It was placed in "blit_transform"
+        for consistency.
+
+        The example script "primitives.pl" has been better coded to know
+        if it's in 16 mode and leave out tests that don't work in that mode.
+        I have also shrunk down the "MASK" and "UNMASK" graphics sizes to
+        save some time in their rendered output, as they can be SLOOOW,
+        especially on a Raspberry PI.
+
+5.49    September 23, 2015
+
+        Some code optimization and documentation improvements
+
+        Added a new "get_fonts_list" method.  It returns a hash of all of
+        the system fonts.
+
+        Build.PL was broken.  I'm surprised nobody notified me of this.  It
+        is fixed now.
+
+5.50    September 25, 2015
+
+        Added PODs to all examples scripts, and cleaned up excisting POD in
+        the module itself.  TODO has been cnverted to a POD file.
+
+        Redesigned "primitives.pl", but gives the same output.
+
+        Added "blit_transform" -> "merge" examples as alternatives to
+        "MASK" and "UNMASK" drawing modes in "primitives.pl".
+
+        Some speed optimizations were made to the module.  Nothing dramatic,
+        but a help, nevertheless.
+
+        Minor changes to the splash screen.
+
+5.51    September 25, 2015
+
+        Fixed manifying POD weirdness for TODO
+
+5.52    September 27, 2015
+
+        Fixed RGB_to_16 routine.  It was affecting truetype rendering in
+        16 bit mode, mapping the wrong colors.
+
+        Improved the splash screen.  It adjusts to each resolution better.
+
+        Added the YouTube channel to the README and POD manual.
+
+5.53    September 30, 2015
+
+        Made 16 bit monochrome work a bit better.  It's not perfect and
+        yields a violet hue, but it's not as ugly as before.
+
+        "primitives.pl" in the "examples" directory adapts for Raspberry PIs
+        to prevent tests that take too long.
+
+5.54    October 02, 2015
+
+        Added the ability to merge a smaller graphic on top of a larger one
+        in "blit_transform" -> "merge".  It now takes into consideration the
+        X and Y values for the top graphic.
+
+        "examples/primitives.pl" has been updated to better demonstrate
+        MASK, UNMASK modes and the faster alternative "blit_transform" with
+        "merge".
+
+5.55    October 03, 2015
+
+        Renamed a few color conversion methods.  Anything mentioning "RGB",
+        "RGBA", or "16" are now "RGB888", "RGBA8888", and "RGB565"
+        respectively.
+
+        Improved 16 bit conversions.  Monochrome should be fixed for 16 bit
+        now.  I still emphasize that you avoid 16 bit if possible.
+
+        Some documentation additions.  System variables are listed.
+
+5.56    October 05, 2015
+
+        Added antialiased line drawing.  'drawto', 'line', 'angle_line' and
+        'polygon' is affected.  Antialiased drawing is slower, so it is an
+        extra parameter to turn it on or off.
+        
+        Updated 'examples/primitives.pl' to demonstrate antialiased lines.
+
+        Fixed a bug in 'blit_transform' for 'monochrome'.  It just wasn't
+        working, although the method 'monochrome' was.
+
+        Revamped the documentation.  Hopefully I got all the formatting
+        errors and outdated parameters on some methods.
+
+        The method 'ttf_print' now has a 'wscale' parameter for scaling the
+        width of the text.
+
+5.57    January 28, 2016
+
+        The method "screen_dimensions" was incorrectly returning the virtual
+        resolution instead of the actual.
+
+5.58    March 18, 2016
+
+        Added method "which_console".  This method returns the current active
+        console and the console when started.
+
+5.59    March 18, 2016
+
+        Forgot to document the updates
+
+5.60    March 20, 2016
+
+        Added "sys/ioctl.ph" require.  Changed "screen_dump" to allow for JPEG
+        etc.
+
+5.61    March 31, 2016
+
+        Split splash code off to "Graphics::Framebuffer::Splash"
+
+5.62    April 02, 2016
+
+        Fixed the perl rotation code for 16 bit, but also added a switch to use
+        it in other color depths via "perl_only".
+
+5.63    April 11, 2016
+
+        Some speed optimizations.  Nothing major.
+
+        Removed the "sys/ioctl.ph" require.  It just was too flakey.
+
+5.70    April 15, 2016
+
+        Significant upgrade!  Texture fills and hatch fills have been added.
+
+        Documentation updated to reflect the new features.
+
+        Fills for primitives has been optimized further.  It's a bit faster.
+        This has the side effect of also decreasing the TrueType rendering
+        time.
+
+        Polygon fills are fixed, and so are the filled pies.
+
+        "replace_color" has been significantly optimized.  It's faster in
+        memory mapped mode and file handle mode.
+
+        TrueType Font rendering now has the ability to rotate the text on
+        an arbitray angle.  Box calculation isn't perfect.  Trying padding
+        with spaces, should you have issues.
+
+        Example scripts changed to demonstrate new features.
+
+        Imager is preloaded "Imager->preload" for more thread friendly use.
+        It didn't have issues before, but this is safer, and according to
+        its documentation, it should be done.
+
+5.71    April 15, 2016
+
+        Oops, accidentally left a "use Carp" in there.  It's gone now.
+
+5.72    April 15, 2006
+
+        New method "acceleration" added to toggle Imager assistance and get
+        its status.  The unused method "acceleration_disable" has been
+        removed.
+
+        The method "screen_dimensions" now returns more information if called
+        in a scalar context.
+
+        The method "get_font_list" now returns an array reference of hashes
+        matching the face name, if more than one match for the name is found.
+
+        The "blit_transform" method now allows for 16 bit use, but it WILL
+        BE SLOWER.  Why?  GFB has to convert your 16 bit bitmap data into
+        24 bit before it can get Imager to work with it.  It then has to
+        convert it back into 16 bit when Imager is done.  This is not a
+        Road Runner friendly operation, especially with a slow CPU.  Rotate
+        and flip use their own Perl native algorithms.  So they will be
+        speedier for 16 bit (relatively speaking).  If you have the ability,
+        use 32 bit color mode.  Things are so much faster.
+
+        "flood_fill" acceleration x,y clipping offset fixed.  Although there
+        seems to be another issue with this.  You may have to turn off
+        acceleration for this method for the time being, if your system
+        renders it funny.
+
+        Demo image files in the "examples/images" directory optimized for
+        space, so the tarball is smaller.  Also two images missing from
+        the manifest added.
+
+        More speed optimizations.  It seems "foreach my $var (0 .. 100)" is
+        considerably faster than "for (my $var;$var <= 100;$var++)".  Where
+        possible, this change was made, and a noticeable change it was.
+
+5.73    April 24, 2016
+
+        The Perl 'rotate' algorithm in the method 'blit_transform' has been
+        corrected, optimized, and now no longer clips the output.  Rotations
+        that are a multiple of 90 degrees use an optimized routine instead of
+        the standard rotation algorithm.  Note, this routine only is used
+        in 16 bit mode or when 'acceleration(0)' has been set.
+
+        Image loading has been modified to automatically scale images larger
+        than the output device (without clipping set).  This overrides any
+        scaling values larger than the screen resolution.
+
+        Most of the blitting issues with textures fixed.  Especially the
+        mirroring issue with ellipses.
+
+        Drawing mode "alpha" now works properly.
+
+        'center' added to the method 'blit_transform' for easy centering of
+        images.
+
+        Greatly modified and improved the scripts in the 'examples' directory.
+        In 'primitives.pl', most of the images are preloaded into memory.
+        This reduces or eliminates waiting between stages.  Images used for
+        textures, etc. are randomly chosen for most examples.
+
+        New method "play_animation" plays animated GIFs loaded via the
+        'load_image' method.
+
+5.74    April 26, 2016
+
+        Added new methods "active_console" and "wait_for_console" to make
+        semaphore style blocking easier.  This allows you to stop drawing
+        until the proper console becomes active.
+        
+        If the install script detects a threaded Perl, then the module is
+        configured to run a thread that monitors the current active console.
+        This allows for blocking.  Blocking is enabled by default if the
+        Perl is threaded AND the script 'fgconsole' is found.  Otherwise,
+        console blocking is disabled, and all methods related to detecting
+        the current console will always report console 1.
+        
+        NOTE:  The module does NOT require threaded Perl, but uses it, if
+               it's being run from it.
+
+        Corrected a spelling error in test script 'primitives.pl'.
+
+5.75    April 26, 2016
+
+        The test scripts have been rewritten to account for bad CPAN testers.
+        Here's how you find out if tests were successful.  Did you see the GFB
+        splash screen during the testing phase?  Congratulations, it works.
+        If you didn't then makes sure your system meets the requirements for
+        this module, and that is configured correctly.  The tests will
+        almost always report success, but your own eyes are your means of
+        determining success or failure.  If you need help, then you can
+        contact me via my CPAN contact address.  I will be happy to help you.
+
+5.76    April 26, 2016
+
+        Build.PL and Makefile.PL was detecting the wrong versions (it was
+        changed in the previous version in my heated attempt it getting
+        past bogus testing).
+
+5.77    April 27, 2016
+
+        Some improvements to the build scripts.  Version checking was still
+        too stringent.  I have loosened the requirements a bit.
+
+5.78    May 9, 2016
+
+        MAJOR speed updates!
+
+        The module Inline::C has been added to the list of prerequisites.
+        Many of the time consuming methods have been accelerated via simple
+        C language routines.  These C language boosts only function in the
+        MMap mode.  File handle mode only uses Perl and Imager routines.
+        Eventually file handle mode will be obsoleted, but not for a while.
+
+        16 bit to 24/32 bit and 24/32 bit to 16 bit image conversion is
+        accelerated and now no longer an issue for those with 16 bit
+        graphics displays.  All blit_transform methods are full speed.
+        TrueType font printing and image loading is faster as a result as well.
+
+        MASK, UNMASK, and ALPHA drawing modes are now accelerated, and
+        lightning fast, even for Raspberry PIs!
+
+        Acceleration is a work in progress.  Not all methods are accelerated.
+        My priority has been to accelerate the slowest methods and then work
+        to the others.
+
+        Because of the need for the Inline module, you WILL require a
+        compiler and linker to be installed.  Basically the Linux development
+        tools.  When installing the Inline module, its installer will tell you
+        what you need, if you are missing anything.
+
+5.79    June 03, 2016
+
+        Inline has been made optional and not a prerequisite, as I considered
+        there may be systems without compilers.  If Inline::C is available,
+        then the C acceleration routines will be compiled at first runtime.
+
+        Texture flood fill on some systems had issues, ignoring borders.  This
+        should be fixed.
+
+5.80    June 04, 2016
+
+        More detatchment from the Inline requirement (no longer required now,
+        but highly swuggested).  I found some bugs where C code was still
+        called and Perl code was missing (image flip for example).
+
+        Install documentation improved.
+
+5.81    June 15, 2016
+
+        Fixed the auto-detection for Inline-C compiling ability
+
+5.82    June 17, 2016
+
+        Corrected the threaded perl checks.
+
+        Tests reports failures much more clearly,
+
+5.83    June 19, 2016
+
+        Added the "blit_move" method
+
+        Optimized the C routines for even faster speed.  "blit_write" is
+        most affected by this.
+
+        Modified "primitives.pl" sample script to reflect the changes.
+
+5.84    June 22, 2016
+
+        Fixed "ttf_print" font positioning.  Corrected splash generation
+        to compensate.  Centering fixed too.
+        
+        NOTE:  Older code will have to be adjusted
+
+5.85    June 24, 2016
+
+        It seems there are issues with the POSIX module not having the
+        "lround" or "round" method for some installations.  So... I coded
+        the rounding in Perl.  This affects the antialiasing.
+
+        The 'examples/primitives.pl" script has been streamlined a bit.
+
+5.86    July 01, 2016
+
+        Optimized some of the Perl code further.  Arc drawing uses math
+        caching to give an extra speed boost.
+
+        Added a "Diagnostic" mode for loading images.
+
+        Also when loading images, if the module is running in accelerated
+        mode, animated GIF transparency per frame is preserved.  This is to
+        allow you to play it back in "mask mode" as it is intended to play
+        GIFs anyway.
+
+        The "examples" scripts have also been tweaked.
+
+5.87    July 02, 2016
+
+        Fixed the fill issues with all filled primitives.  It was basically
+        anything that called the internal "_polygon_fill" routine that had
+        troubles.
+
+5.88    July 04, 2016
+
+        Fixed a bug in the C code "c_filled_circle" routine causing failure
+        to compile on some systems.
+
+5.89    July 05, 2016
+
+        NOT RELEASED
+
+5.90    July 09, 2016
+
+        There have been numerous issues with 16 bit mode and color mapping.
+        They mainly are a result of Imager not being able to work in a
+        RGB565 color mode.  All operations have had to convert from RGB565
+        to RGB888 and visa versa for each and every Imager operation.  This
+        causes errors and artifacts, among other things.  They compound
+        themselves the more operations done.  So... here's what I did:
+
+        If you have a 16 bit display, you need to use double buffering.  How
+        do you do that you may say?  Well, it's actually quite easy, and does
+        not involve modifying legacy code to any great deal.  You need to
+        have TWO instances of Graphics::Framebuffer instantiated.  One for the
+        "real" actual 16 bit framebuffer, and another in virtual framebuffer
+        mode with 32 bit (or 24) color mode (I think you see where I am going).
+        You do ALL of your drawing, loading, etc on the virtual framebuffer
+        object, and then "flip" it with the real framebuffer object by means of
+        the new "blit_flip" method (examples in the documentation).
+
+        What this does is do a single one-way 32 (or 24) bit to 16 bit
+        conversion then blits it to the 16 bit screen for the entire screen.
+        This is called "double-buffering".  Yes, generally things can be a
+        little slower, but this is a fast compiled C routine, and is pretty
+        darn fast even on a Raspberry PI2.  If you only call "blit_flip" for
+        when a complete screen is drawn and not after each draw operation, then
+        you can speed things up more.
+        
+        The "examples/primitives" script has been modified to exhibit this
+        behavior for 16 bit displays.  I have not modified the threading
+        example, as it's methods really do not need double-buffering.
+
+        You do not have to do double-buffering.  All primitives, etc operate
+        as they did before in 16 bit mode, but if you are working with fonts
+        and images, then I highly recommend it.  Just remember, if you do use
+        double-buffering, then do not draw to the 16 bit screen directly, as
+        "blit_flip" copies from the virtual object, which only has screen
+        data that has been drawn to it.  So do all operations (drawing,
+        loading, blitting, etc) on the virtual display.
+
+5.91    July 16, 2016
+
+        Removed the path info from the CPAN test script, as it was causing
+        unnecessary troubles (causing C compilation to fail).
+        
+        Theoretically, running (even installing) via a SSH session is possible,
+        but I make no guarantees as to its success, as what is allowed is
+        mostly dependent on the SSH server's permissions granted to the
+        user's session etc.  If you log in directly on the console, and
+        everything works, then there is nothing wrong with this module, and
+        your SSH specific troubleshooting will have to be your own.  However,
+        with that said, make sure the user with which you are using SSH belongs
+        to the "video" group and has read/write permissions to the
+        "/dev/fb[0-31]" devices, specifically the fb device you need to operate
+        on.  You also need to make sure that X-Windows is not active on the
+        display, even if the display you are using the module with isn't mapped
+        to X-Windows.
+
+        When installing the module, you can bypass the test portion, if it is
+        giving you troubles.  In all likelihood, the module will work if the
+        installation criteria are met.  This means use:
+
+            force install Graphics::Framebuffer
+
+        if you are installing using CPAN.
+
+5.92    July 18, 2016
+
+        Made some changes to the examples.
+
+5.93    July 21, 2016
+
+        Fixed a bug in GPU identification, and added "Virtual Framebuffer"
+        for emulation mode.
+
+        Added "GPU" internal variable for the name of the detected GPU.
+
+        Modified "examples/primitives.pl" to update the screen using alarm
+        event for 16 bit displays.  It auto-adjusts for slow Raspberry PIs.
+
+5.94    September 20, 2016
+
+        Added "RESET" parameter for initialization.  As part of this, it
+        automatically sets up signal handlers to fix up the screen on
+        CTRL-C exits (and normal exits).  The "RESET" parameter can disable
+        this behavior.
+
+        Improved the "dump.pl" script in the "examples" directory to better
+        diagnose acceleration issues.
+
+        Some improvements to documentation as well.
+
+5.95    September 29, 2016
+
+        Added automatice double buffer creation when "DOUBLE_BUFFER => 1" is
+        passed during object creation.  If this is set to 1, it returns 2
+        framebuffer objects in an array context.  The first is the physical
+        framebuffer and the second is a 32 bit virtual framebuffer.
+
+        Now all you need to do is draw to the virtual framebuffer and use
+        "blit_flip" to send it to the physical framebuffer.  Double buffering
+        is only needed for 16 bit displays.
+
+        Also added the parameter "NO_THREADS" to disable the background thread
+        that keeps "which_console" updated.  Some older Perls or very slow
+        systems may benefit from this.
+
+        THIS RELEASE WAS PULLED
+
+5.96    September 29, 2016
+
+        Fixed the DOUBLE_BUFFER method, which was previously broken (hence why
+        the release was pulled).
+
+        Completely removed threads.  This breaks the "which_console" method.
+        It just returns 1 always now, and other "_console" methods always think
+        it's console 1.  In other words, these methods don't work anymore, but
+        won't break your code.
+
+        Detecting the current console is up to you now.  I suggest "fgconsole".
+
+6.00    October 10, 2016
+
+        Version jump because of major build change.
+
+        Inline::C is now a requirement.  It pre-compiles at module build like
+        an XS module.
+
+        FILE_MODE has been completely removed.
+
+6.01   October 15, 2016
+
+       Fixed some bugs in screen format conversions
+
+       Added "vsync" method for systems with supported drivers that allow for
+       waiting on vertical blank.  Note, Raspberry PIs do not support this,
+       although calling it should not be an issue, as Raspberry PI's driver
+       just make this a dummy call.
+
+       Improved documentation on constants and fixed some examples to use
+       constants instead of the onject variables.
+
+       Added documentation for some screen format conversion methods.
+
+       Changed the splash screen to better demonstrate most capabilities. 
+
+6.02   October 25, 2016
+
+       Added the ability to include the alpha channel in gradients.  This
+       means you can generate varying degrees of alpha as well as color.
+
+       Splash screen modified somewhat to reflect the above.
+
+       Lowered the Inline pre-requisite version requirement to 0.53.
+
+       Caught a few bugs relating to gradients in circle and rounded boxes.
+
+6.03   December 21, 2016
+
+       Added runtime diagnostics to more easily diagnose failures.
+
+       It outputs all errors to STDERR.
+
+       Runtime diagnostics ALWAYS are shown if there are catastrophic
+       failures.

@@ -1,0 +1,63 @@
+GD-3DBarGrapher
+
+3DBarGrapher was written primarily to create "professional looking" 3D bar
+graphs.
+
+It features:
+
+  - customisable colours, fonts and dimensions 
+  - bar or column styles 
+  - gradient fill option for columns and plot area background 
+  - random bar colour feature to easily make multiple graphs on the same
+    page more distinct 
+  - XHTML image map output to enable displaying of values when moving mouse
+    cursor over the bars
+    
+Example usage:
+
+  use GD::3DBarGrapher qw(creategraph);
+        
+  my @data = (
+      ['Apples', 28],
+      ['Pears',  43],
+      ...etc 
+  );
+
+  my %options = (
+      'file' => '/webroot/images/mygraph.jpg',
+  );
+
+  my $imagemap = creategraph(\@data, \%options);
+  
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD 2.0.1 or greater
+
+
+AUTHOR
+
+S.I.Warhurst <swarhurst _AT_ cpan.org>
+
+http://www.creationfactor.net
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 S.I.Warhurst
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See:
+http://www.perl.com/language/misc/Artistic.html

@@ -1,0 +1,36 @@
+---
+abstract: "Solver for Mag Interactive's WordBrain Mobile Game"
+author:
+  - 'Robert Stone <drzigman@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Readonly: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Game-WordBrain
+requires:
+  Cwd: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Storable: '0'
+  overload: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/drzigman/game-wordbrain/issues
+  homepage: http://search.cpan.org/dist/Game-WordBrain
+  repository: git://github.com/drzigman/game-wordbrain.git
+version: 0.2.2

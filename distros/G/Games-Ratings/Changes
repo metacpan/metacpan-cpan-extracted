@@ -1,0 +1,33 @@
+Revision history for Games-Ratings
+
+0.0.1  Wed Feb 13 14:51:49 2008
+       Initial release.
+
+0.0.2  Thu Feb 28 10:22:00 2008
+       added 'use 5.6.1;' to Ratings.pm, DWZ.pm and FIDE.pm
+         (those modules use 'our' which was introduced in Perl 5.6)
+       added method $player->get_points_expected() to FIDE.pm
+         (calculate expected points for given games)
+       added method $player->get_performance() to FIDE.pm
+         (calculate performance for given games)
+
+0.0.3  Fri Feb 29 17:39:00 2008
+       added 'use 5.006;' to Makefile.PL
+         (I still got failed tests from cpan-testers for Perl 5.5)
+       added Games::Ratings::Go::EGF (version 0.0.1)
+         (calculation of go ratings)
+
+0.0.4  Thu Jul 3  15:00:00 2008
+       updated links to FIDE Handbook (FIDE changed their URLs)
+       fixed small bug in Ratings.pm
+         (subroutine get_number_of_games_played had no explicit return scalar)
+	     (it has now ;-)
+
+0.0.5  Sun Apr 18  15:00:00 2010
+       added tests (DWZ and Elo rating calculations from real tournaments)
+       fixed bug in DWZ.pm
+         (at some points it was necessary to use sprintf() in order to have
+         three digits after decimal point)
+       fixed bug in DWZ.pm
+         (at one point it was necessary to use sprintf() in order to have
+         two digits after decimal point)

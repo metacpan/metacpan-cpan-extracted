@@ -1,0 +1,9 @@
+0.002000
+ [Added / runtime requires]
+ - GraphViz2::Abstract::Util::Constants
+
+ [Removed / runtime requires]
+ - constant
+
+0.001001 2013-11-30T09:18:32Z
+

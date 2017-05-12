@@ -1,0 +1,6 @@
+# ChangeLog for app-admin/gentoolkit/portage-statistics
+# Copyright 2002-2003 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/gentoolkit/files/portage-statistics/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+2002-03-22 Karl Trygve Kalleberg <karltk@gentoo.org>
+	* Threw away the coverage scripts, replaced with this.

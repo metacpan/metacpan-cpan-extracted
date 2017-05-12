@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_normalWindow.t
+lib/GD/Window.pm
+META.yml                                 Module meta-data (added by MakeMaker)

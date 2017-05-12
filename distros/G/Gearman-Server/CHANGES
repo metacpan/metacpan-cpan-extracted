@@ -1,0 +1,135 @@
+1.13.002 2016-07-11
+        * pod links to gearmand repaired
+
+1.13.001 2016-07-11
+        * Feature Request: #115368 for Gearman-Server: Allow bind to specific IP address
+        * Fix bug #115458 Distributions contain no tests.
+          Actually only use ok and version tests
+        * Fix bug #89033 typo fixes
+        * Fix bug #107045 [PATCH] fix pod whatis
+        * Fix bug #115350 Uses old port by default (7003) should use 4730
+        * pod usage
+
+1.12 2014-12-14
+
+        * Add HACKING file
+
+        * Fix bug #70728 memory leak when clients disconnect (sleeper list isn't pruned).
+          Fixes CPAN RT 70728 (Marsh Yamazaki)
+
+1.11 2010-01-17
+
+        * Don't get stuck in the wakeup loop. Dummy.
+
+1.10 2009-10-04
+
+        * Read client input more aggressively. Speed improvement.
+
+        * Add text commands 'jobs' and 'clients' which give information allowing you to trace
+          jobs from clients to workers while they are running.
+
+        * Flush buffers to client on EOF (assume half-closed). This makes things like netcat
+          work better as a way to speak text protocol to the gearmand.
+
+        * Add command-line option to adjust a delay before more workers are woken up.
+          This acts as an anti-starvation mechanism in case of lower wake up counts.
+            -Default is .1 seconds, formerly this option was not needed because all workers
+             were woken up at the time of job submission.
+
+        * Add command-line option to adjust number of workers to wake up per job injected.
+            -Default is 3, formerly was -1 (wake up all as fast as possible)
+
+        * Add command-line option to change the number of sockets accepted at once per
+          listener socket.
+            -Default is now 10, formerly used to be 1.
+
+        * Add exceptions passing support to gearman server classes, using new options
+          support.
+
+        * Add options support to server clients, so they can subscribe to newer protocol
+          features.
+
+        * Change listening socket to be a real Danga::Socket subclass, this allows
+          pausing for a period of time when we run into accept errors. This will
+          fix the problem of gearmand spinning 100% cpu in those cases.
+
+        * Make gearmand a little more vocal about socket accept errors.
+
+        * add fast read concept to server reading from client codepath. This drastically
+          improves performance of jobs over 1k in size.
+
+        * fix in-process client and start_worker method calls to use non-blocking
+          sockets like they should.
+
+1.09 2007-05-09
+
+        * make start_worker (for making worker child processes), return
+          the pid in scalar context, or ($pid, $conn) in list context
+
+        * make the text command "status" show functions which have
+          registered workers, even if nothing is pending for that func.
+
+1.08 2007-05-01
+
+        * let start_worker take a coderef for the exec, not just an $exe name
+
+1.07 2007-05-01
+
+        * fix up bug in Gearman::Server:  we set OtherFds, instead of adding with
+          Danga::Socket->AddOtherFds, blowing away other watched fds.
+
+        * Add Gearman::Server->to_inprocess_server that returns a socket connecting to
+          the server object, we can then use this socket with a Gearman::Client::Async
+          object to run clients and servers in the same thread.
+
+        * Add ability for workers to be launched as sub processes of the
+          gearmand, using a duped socketpair for communication.
+
+1.06 2007-04-25
+
+        * split up the monolithic gearmand script (which had classes, but
+          all internally), into separate files per class, and also make
+          a new Gearman::Server class, so Gearman servers can be embedded
+          into other processes.  (running Gearman router inside Perlbal,
+          MogileFS, DJabberd, etc... then having child processes be workers)
+
+1.05
+
+        * add --pidfile=/path/file.pid option and document the command
+          line options (Ask Bjoern Hansen)
+
+1.04 2007-02-20
+
+        * Add maximum jobqueue size feature, with a test.
+
+1.03 2006-09-25
+
+        * "version" text command
+
+        * weakref client connections in listeners list so they go away.
+          still wondering why the jobs holding them lasted so long.
+          or was it a loop?  time will tell.  go gladiator.
+
+1.02  2006-09-20
+
+        * Devel::Gladiator support for tracking elusive memory leak
+
+        * support for "shutdown" and "shutdown graceful" commands,
+          the latter of which immediate stops listens, and exits
+          when convenient
+
+1.01  2006-07-01
+
+        * Artur Bergman backed out some changes seconds before I did
+          the 1.00 release.  this puts them back in.
+
+1.00  2006-07-01
+
+        * the get-it-on-CPAN-finally release.  but forgot this changes
+          entry.
+
+0.30  2006-06-27
+
+        * fix memory leak with sleepers list.  change it from list to hash
+          so there can't be dups, as there were before, when a worker
+          could do multiple functions.

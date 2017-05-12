@@ -1,0 +1,33 @@
+NAME
+    Games::Snake - Snake game
+
+VERSION
+    version 0.000001
+
+DESCRIPTION
+    Games::Snake is a clone of the classic Snake game.
+
+    This game was originally created for The SDL Perl Game Contest!
+
+    See snake.pl for instructions to play the game.
+
+SEE ALSO
+    *   snake.pl
+
+    *   SDL
+
+    *   The SDL Perl Game Contest!
+        <http://onionstand.blogspot.com/2011/02/sdl-perl-game-contest.html>
+
+    *   Snake <http://en.wikipedia.org/wiki/Snake_%28video_game%29>
+
+AUTHOR
+    Jeffrey T. Palmer <jtpalmer@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Jeffrey T. Palmer.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr">
+
+<head>
+<!-- #BeginEditable "Header" -->
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-gb" />
+<meta name="author"			content="Tamura Jones" />
+<meta name="robots" content="index,follow,noarchive" />
+<link rel="icon" href="fav/16.png" type="image/png" />	
+<link rel="stylesheet" type="text/css" href="style2011.css" />
+<link rel="stylesheet" type="text/css" href="gedcom.css" />
+<title>GEDCOM ANSEL Table</title>
+<meta name="keywords"		content="GEDCOM ANSEL Table" />
+<meta name="description"	content="GEDCOM ANSEL Table" />
+<meta name="summary"		content="GEDCOM ANSEL Table" />
+<!-- #EndEditable -->
+</head>
+
+<body>
+
+<div id="masthead">
+<a href="http://www.tamurajones.net/index.xhtml">Modern Software Experience</a>
+</div>
+
+<div id="container">	
+<div id="leftcol">
+<ul>
+<li><a href="http://www.tamurajones.net/index.xhtml">Home</a></li>
+<li><a href="http://www.tamurajones.net/articles.xhtml">Articles</a></li>
+<li><a href="http://www.tamurajones.net/reviews.xhtml">Reviews</a></li>
+<li><a href="http://www.tamurajones.net/news.xhtml">News</a></li>
+<li><a href="http://www.tamurajones.net/standards.xhtml">Standards</a></li>
+<li><a href="http://www.tamurajones.net/web.xhtml">Web</a></li>
+<li><a href="http://www.tamurajones.net/microsoft.xhtml">Microsoft</a></li>
+<li><a href="http://www.tamurajones.net/genealogy.xhtml">Genealogy</a></li>
+<li><a href="http://www.tamurajones.net/resources.xhtml">Resources</a></li>
+<li><a href="http://www.tamurajones.net/Awards.xhtml">Awards</a></li>
+</ul>
+<ul>
+<li><a href="http://www.facebook.com/TamuraJones">facebook</a></li>
+<li><a href="http://twitter.com/TamuraJones">twitter</a></li>
+</ul>
+
+</div>
+<div id="body">
+<!-- #BeginEditable "body" -->
+<h1><span class="isodate">2013-05-14</span>
+<a class="permalink" href="http://www.tamurajones.net/GEDCOMANSELTable.xhtml">GEDCOM ANSEL Table</a></h1>
+
+<h2>GEDCOM 5.5.1</h2>
+
+<h3>Appendix C</h3>
+
+<p>The GEDCOM 5.5.1 specifcation has several appendices.
+The ANSEL character set used by many GEDCOM files is presented in <cite>Appendix C: ANSEL Character Set</cite>.<br />
+Various interesting observations can be made about how this GEDCOM 5.5.1 ANSEL table relates to earlier versions of the GEDCOM specification,
+or the ANSEL standard itself, but the first problem you'll notice when you look up GEDCOM 5.5.1 Appendix C is that the table is not what it should be.
+The FamilySearch GEDCOM specification admits this shortcoming; <q>The graphic characters shown are not always accurate,
+however the name of the diacritic and the decimal equivalent should agree with the ANSEL standard.</q>
+It is true that the names are not messed up, but the examples are damaged too.</p>
+
+<h4>graphic</h4>
+
+<p>The GEDCOM 5.5.1 specification is provided as an Adobe PDF file.
+When you try the view the table in Appendix C using Adobe Reader, many a character that should be there have been replaced by a • (U+2022 Bullet).
+Where it should show a graphic displaying <q>slash D - uppercase</q>, it does not show Đ (U+0110 Latin Capital Letter D with Stroke) but • (U+2022 Bullet).
+Where it should show a graphic displaying <q>cedilla</q>, it does not show &#x25CC;&#x0327; (U+0327 Combining Cedilla) as it should,
+it does not even show ¸(U+00B8 Cedilla), it shows • (U+2022 Bullet) instead.
+The example for the macron should be <q>gājējs</q>, but the table shows <q>g•j•js</q>.</p>
+
+<p>Several browsers include the ability to view PDF files.
+When you view the GEDCOM 5.5.1 PDF using these browsers, you will other characters than a bullet, but not the right characters.</p>
+
+<img class="appbordered floatright" alt="Adobe Reader cannot find font WPMultinationalARoman" src="img/screens/AdobeReaderCannotFindFontWPMultinationalARoman.png" />
+
+<h4>WPMultinationalARoman</h4>
+
+<p>When you open the PDF and scroll to the table, Adobe Reader will you something is wrong.
+It will display a message box with the text  <q>Cannot find or create the font 'WPMultinationalARoman'. 
+Some characters may not display or print correctly.</q>.<br />
+Adobe is not to blame.
+This is entirely FamilySearch's fault.
+FamilySearch could have included the font in the PDF.<br />
+Another possible approach would have been to not rely on some proprietary font, but on images.</p>
+
+<h4>WordPerfect</h4>
+
+<p>The font <em>WP MultinationalA Roman</em> is a WordPerfect font.
+This, and other WordPerfect 9 fonts can be downloaded from the Corel's FTP site as <code>wpfonts.exe</code>.
+That is a self-extracting ZIP file containing TrueType fonts.
+The <code>WPCO01NA.TTF</code> file contains <em>WP MultinationalA Courier</em>,
+The <code>WPHV01NA.TTF</code> file contains <em>WP MultinationalA Helvetica</em>,
+and <code>WPRO01NA.TTF</code> file contains <em>WP MultinationalA Roman</em>.
+The <code>wpfonts_readme.txt</code> file confirms that these font files can be embedded in Adobe PDF files.</p>
+
+<h4>GEDCOM 5.5</h4>
+
+<p>The Adobe PDF for the original GEDCOM 5.5 specification has the same problem.<br />
+However, a later release of the GEDCOM 5.5 specification, that includes a few errata dated 11 December 1995, contains a table that looks fine.
+The GEDCOM 5.5.1 ANSEL tables can be repaired by referencing both the older FamilySearch GEDCOM&nbsp;5.5 specification and the original ANSEL specification.<br />
+The corrected table is presented below.</p>
+
+<h3>GEDCOM 5.5.1 ANSEL tables</h3>
+
+<h4>ANSEL examples</h4>
+
+<p>The ANSEL table in GEDCOM  contains examples.
+These examples were copied from the ANSEL specification, but on more than one occassion, some letters or combining characters were lost.
+These letters and combining characters have been restored.</p>
+
+<h4>spaces for readability</h4>
+
+<p>The name column of the table contains text such as <q>ligature ae—lowercase</q>.<br />
+These are not the ANSEL character names.
+The corresponding ANSEL character names have spaces around the dash now: <q>ligature ae — lowercase</q>.
+These spaces have been restored to enhance readability.</p>
+
+<h4>characters</h4>
+
+<p>The characters in the <em>graphics</em> column are not images, but actual characters.
+These should display correctly unless you are using a browser or system that belongs in the previous millennium.<br />
+These tables aren't images, but real web tables, with their layout controlled through <abbr title="Cascading Style Sheets">CSS</abbr>.<br />
+You can change the size of the font for the page, and the table will resize with it.</p>
+
+<h4>combining characters</h4>
+
+<p>The table below is a further improvement on the GEDCOM 5.5.1 ANSEL table in that it displays the <em>actual</em> combining characters, 
+not some non-combining character that approximates it, in the <em>graphics</em> column.
+For example, the first character shown is U+0300 Combining Grave Accent, not U+0060 Grave Accent.
+To show the combining characters correctly and to clearly show the relative position of the combining character, 
+the table uses &#x25CC; (U+25CC Dotted Circle) as a placeholder character.</p>
+
+<table class="ANSEL" id="AppendixC.1NonSpacingChars" summary="non-spacing ANSEL characters">
+<caption>ANSEL Non-spacing graphic characters</caption>
+
+<thead>
+<tr>
+<th class="Hex">HEX</th>
+<th class="WPCode">wpcode</th>
+<th class="Dec">Dec</th>
+<th class="Graphic">Graphic</th>  
+<th class="FamilySearchName">Name</th>
+<th class="Example">example of use</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>E1</td>
+<td>1,0</td>
+<td>225</td>
+<td>&#x25CC;&#x0300;</td>
+<td>grave accent</td>
+<td>règle</td>
+</tr>
+
+<tr>
+<td>E2</td>
+<td>1,6</td>
+<td>226</td>
+<td>&#x25CC;&#x0301;</td>
+<td>acute accent</td>
+<td>está</td>
+</tr>
+
+<tr>
+<td>E3</td>
+<td>1,3</td>
+<td>227</td>
+<td>&#x25CC;&#x0302;</td>
+<td>circumflex accent</td>
+<td>même</td>
+</tr>
+
+<tr>
+<td>E4</td>
+<td>1,2</td>
+<td>228</td>
+<td>&#x25CC;&#x0303;</td>
+<td>tilde</td>
+<td>niño</td>
+</tr>
+
+<tr>
+<td>E5</td>
+<td>1,8</td>
+<td>229</td>
+<td>&#x25CC;&#x0304;</td>
+<td>macron</td>
+<td>gājējs</td>
+</tr>
+
+<tr>
+<td>E6</td>
+<td>1,22</td>
+<td>230</td>
+<td>&#x25CC;&#x0306;</td>
+<td>breve</td>
+<td>altă</td>
+</tr>
+
+<tr>
+<td>E7</td>
+<td>1,15</td>
+<td>231</td>
+<td>&#x25CC;&#x0307;</td>
+<td>dot above</td>
+<td>żaba</td>
+</tr>
+
+<tr>
+<td>E8</td>
+<td>1,7</td>
+<td>232</td>
+<td>&#x25CC;&#x0308;</td>
+<td>umlaut (diaeresis)</td>
+<td>öppna</td>
+</tr>
+
+<tr>
+<td>E9</td>
+<td>1,19</td>
+<td>233</td>
+<td>&#x25CC;&#x030C;</td>
+<td>hacek</td>
+<td>vždy</td>
+</tr>
+
+<tr>
+<td>EA</td>
+<td>1,14</td>
+<td>234</td>
+<td>&#x25CC;&#x030A;</td>
+<td>circle above (angstrom)</td>
+<td>hår</td>
+</tr>
+
+<tr>
+<td>ED</td>
+<td>1,10</td>
+<td>237</td>
+<td>&#x25CC;&#x0315;</td>
+<td>high comma, off center</td>
+<td>rozdel̕ ovac</td>
+</tr>
+
+<tr>
+<td>EE</td>
+<td>1,16</td>
+<td>238</td>
+<td>&#x25CC;&#x030B;</td>
+<td>double acute accent</td>
+<td>időszaki</td>
+</tr>
+
+<tr>
+<td>F0</td>
+<td>1,17</td>
+<td>240</td>
+<td>&#x25CC;&#x0327;</td>
+<td>cedilla</td>
+<td>ça</td>
+</tr>
+
+<tr>
+<td>F1</td>
+<td>1,18</td>
+<td>241</td>
+<td>&#x25CC;&#x0328;</td>
+<td>right hook, ogonek</td>
+<td>vietą</td>
+</tr>
+
+<tr>
+<td>F6</td>
+<td>2,7</td>
+<td>246</td>
+<td>&#x25CC;&#x0332;</td>
+<td>underscore</td>
+<td>s&#x332;amar</td>
+</tr>
+
+<tr>
+<td>FE</td>
+<td>1,9</td>
+<td>254</td>
+<td>&#x25CC;&#x00313;</td>
+<td>high comma, centered</td>
+<td>ge&#x313;otermika</td>
+</tr>
+
+</tbody>
+</table>
+
+<!-- <span name="link455" /> -->
+
+<table class="ANSEL" id="AppendixC.2SpacingChars" summary="spacing ANSEL characters">
+<caption>ANSEL Spacing graphic characters</caption>
+
+<thead>
+<tr>
+<th class="Hex">C/R</th>
+<th class="WPCode">wpcode</th>
+<th class="Dec">Dec</th>
+<th class="Graphic">Graphic</th>  
+<th class="FamilySearchName">Name</th>
+<th class="Example">example of use</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>A1</td>
+<td>1,152</td>
+<td>161</td>
+<td>Ł</td><!-- &#x0141; -->
+<td>slash L — uppercase</td>
+<td>Łódź</td>
+</tr>
+
+<tr>
+<td>A2</td>
+<td>1,80</td>
+<td>162</td>
+<td>Ø</td><!-- &#x00D8; -->
+<td>slash O — uppercase</td>
+<td>Øst</td>
+</tr>
+
+<tr>
+<td>A3</td>
+<td>1,78</td>
+<td>163</td>
+<td>Đ</td><!-- &#x0110; -->
+<td>slash D — uppercase</td>
+<td>Đuro</td>
+</tr>
+
+<tr>
+<td>A4</td>
+<td>1,88</td>
+<td>164</td>
+<td>Þ</td><!-- &#x00DE; -->
+<td>thorn — uppercase</td>
+<td>Þann</td>
+</tr>
+
+<tr>
+<td>A5</td>
+<td>1,36</td>
+<td>165</td>
+<td>Æ</td><!-- &#x00C6; -->
+<td>ligature AE — uppercase</td>
+<td>Ægir</td>
+</tr>
+
+<tr>
+<td>A6</td>
+<td>1,166</td>
+<td>166</td>
+<td>Œ</td><!-- &#x0152; -->
+<td>ligature OE — uppercase</td>
+<td>Œuvre</td>
+</tr>
+
+<tr>
+<td>A8</td>
+<td>1,1</td>
+<td>168</td>
+<td>·</td><!-- &#x00B7; -->
+<td>middle dot</td>
+<td>novel·la</td>
+</tr>
+
+<tr>
+<td>A9</td>
+<td>5,28</td>
+<td>169</td>
+<td>♭</td><!-- &#x266D; -->
+<td>musical flat</td>
+<td>B&#x266D;</td>
+</tr>
+
+<tr>
+<td>AA</td>
+<td>4,32</td>
+<td>170</td>
+<td>®</td><!-- &#x00AE; -->
+<td>registered trademark</td>
+<td>ABC®</td>
+</tr>
+
+<tr>
+<td>AB</td>
+<td>6,1</td>
+<td>171</td>
+<td>±</td><!-- &#x00B1; -->
+<td>plus or minus</td>
+<td>A±B</td>
+</tr>
+
+<tr>
+<td>AE</td>
+<td>1,11</td>
+<td>174</td>
+<td>&#x25CC;&#x02BE;</td>
+<td>alif</td>
+<td>Un&#x02BE;yusho</td>
+</tr>
+
+<tr>
+<td>B0</td>
+<td>2,11</td>
+<td>176</td>
+<td>&#x25CC;&#x02BF;</td>
+<td>ayn</td>
+<td>fa&#x02BF;il</td>
+</tr>
+
+<tr>
+<td>B1</td>
+<td>1,153</td>
+<td>177</td>
+<td>ł</td><!-- &#x0142; -->
+<td>slash l — lowercase</td>
+<td>rozbił</td>
+</tr>
+
+<tr>
+<td>B2</td>
+<td>1,81</td>
+<td>178</td>
+<td>ø</td><!-- &#x00F8; -->
+<td>slash o — lowercase</td>
+<td>høj</td>
+</tr>
+
+<tr>
+<td>B3</td>
+<td>1,79</td>
+<td>179</td>
+<td>đ</td><!-- &#x0111; -->
+<td>slash d — lowercase</td>
+<td>đavola</td>
+</tr>
+
+<tr>
+<td>B4</td>
+<td>1,89</td>
+<td>180</td>
+<td>þ</td><!-- &#x00FE; -->
+<td>thorn — lowercase</td>
+<td>þann</td>
+</tr>
+
+<tr>
+<td>B5</td>
+<td>1,37</td>
+<td>181</td>
+<td>æ</td><!-- &#x00E6; -->
+<td>ligature ae — lowercase</td>
+<td>skæg</td>
+</tr>
+
+<tr>
+<td>B6</td>
+<td>1,167</td>
+<td>182</td>
+<td>œ</td><!-- &#x0153; -->
+<td>ligature oe — lowercase</td>
+<td>œuvre</td>
+</tr>
+
+<tr>
+<td>B8</td>
+<td>1,24</td>
+<td>184</td>
+<td> ı</td><!-- &#x0131; -->
+<td>dotless i — lowercase</td>
+<td>masalı</td>
+</tr>
+
+<tr>
+<td>B9</td>
+<td>4,11</td>
+<td>185</td>
+<td>£</td><!-- &#x00A3; -->
+<td>British pound</td>
+<td>£5.00</td>
+</tr>
+
+<tr>
+<td>BA</td>
+<td>1,87</td>
+<td>186</td>
+<td>ð</td><!-- &#x00F0; -->
+<td>eth</td>
+<td>verður</td>
+</tr>
+
+<tr>
+<td>C3</td>
+<td>4,23</td>
+<td>195</td>
+<td>©</td><!-- &#x00A9; -->
+<td>copyright mark</td>
+<td>©1993</td>
+</tr>
+
+<tr>
+<td>C5</td>
+<td>4,8</td>
+<td>197</td>
+<td>¿</td><!-- &#x00BF; -->
+<td>inverted question mark</td>
+<td>¿Qué?</td>
+</tr>
+
+<tr>
+<td>C6</td>
+<td>4,7</td>
+<td>198</td>
+<td>¡</td><!-- &#x00A1; -->
+<td>inverted exclamation mark</td>
+<td>¡Esta!</td>
+</tr>
+
+<tr>
+<td>CF</td>
+<td>1,23</td>
+<td>207</td>
+<td>ß</td><!-- &#x00DF; -->
+<td>Ess Zed</td>
+<td>Preußen</td>
+</tr>
+
+</tbody>
+</table>
+
+<h2>updates</h2>
+
+<h3>2013-05-18: LDS ANSEL versus LDS ANSEL</h3>
+<p><cite>LDS ANSEL versus LDS ANSEL</cite> compares the <q>ANSEL</q> tables provided in different GEDCOM versions.</p>
+
+<h3>2014-08-29: GEDCOM specifications</h3>
+<p>FamilySearch has removed the GEDCOM 5.5 and 5.5.1 specifications from their site.
+These and other specifications can now be found on the <cite>FamilySearch GEDCOM Specifications</cite> page.</p>
+
+<h2>links</h2>
+
+<ul>
+<li><a rel="nofollow" href="ftp://ftp.corel.com/pub/WordPerfect/wpwin/9/">Corel WordPerfect 9 FTP</a></li>
+<!--  2014-08-29: FamilySearch has removed the GEDCOM specifications from their site.
+<li><a rel="nofollow" href="https://devnet.familysearch.org/docs/gedcom/ged551.pdf">GEDCOM 5.5.1</a></li>
+-->
+<li><a href="http://www.tamurajones.net/LDSANSELVersusLDSANSEL.xhtml">LDS ANSEL versus LDS ANSEL</a></li>
+<li><a href="http://www.tamurajones.net/FamilySearchGEDCOMSpecifications.xhtml">FamilySearch GEDCOM Specifications</a></li>
+</ul>
+
+<p>&nbsp;</p>
+<!-- #EndEditable -->
+<p class="copyright clear">Copyright © <a class="noicon" href="http://www.tamurajones.net/WhatWhere.xhtml">Tamura Jones</a>. All Rights reserved.</p>
+</div>
+
+</div>
+<div id="footer">
+<ul class="About">
+<li><a href="http://www.tamurajones.net/About.xhtml">About</a></li>
+<li><a href="http://www.tamurajones.net/Copyright.xhtml">Copyright</a></li>
+<li><a href="http://www.tamurajones.net/Contact.xhtml">Contact</a></li>
+<li><a href="http://www.tamurajones.net/FAQ.xhtml">FAQ</a></li>
+<li><a href="http://www.tamurajones.net/LinkButtons.xhtml">Link Buttons</a></li>
+<li><a href="http://www.tamurajones.net/jargon.xhtml">Jones Jargon</a></li>
+<li><a href="http://www.tamurajones.net/GenealogyJargon.xhtml">Genea Jargon</a></li>
+<li><a href="http://www.tamurajones.net/GeneAwards.xhtml">GeneAwards</a></li>
+</ul>
+</div>
+</body>
+</html>

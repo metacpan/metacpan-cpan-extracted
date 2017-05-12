@@ -1,0 +1,57 @@
+0.01 Inital version
+
+0.02  Changes to new weather.com site
+
+0.03 Added support for HTTP/1.1 because Weather.com requires HTTP/1.1 only
+
+0.04 Changed how the current condition was located before of more weather.com changes
+
+0.05 Complete rewrite of parsing code because of more weather.com changes. By the looks of their
+     new tags, one would hope they will not be making more changes in the near future. Timeout
+     code has also been added.
+
+0.06 Added make test and more debugging capabilities.
+
+0.07 Converted to LWP::UserAgent to fix socket problems. Be sure to use a recent libwww-perl so timeout
+     code works correctly.
+
+0.08 Added proxy authentication support.
+
+0.09 Changed end of report marker because of more weather.com changes
+
+1.0  Fixed agent string to contain latest version number. Added heat index to report(). Cleaned up documentation.
+
+1.1  More weather.com changes. Added dependancy on LWP::UserAgent. Added new error code when weather.com is too busy to handle requests.
+
+1.1.1 Suport for celcius, fixes.
+
+1.2 More weather.com changes, added report_raw function. Current as of 2002-12-05 thanks to Kevin L. Papendick
+
+1.2.1 More weather.com changes. Current as of 2003-01-17 thanks to Kevin L. Papendick again :)
+
+1.2.2 Update for cities with negative dew points
+
+1.3 Change request URL -klp
+
+V1.31 - 05/28/03
+Added data_check() function in an effort to detect and catch bad/missing data. -klp
+Removed unnecessary UserAgent cookie jar left behind from V1.3 development -klp
+
+V1.32 - 06/12/03 -klp
+Changed $self->{server} value
+Cleared $self->{ext} value
+
+V1.4 - 08/12/03 -klp
+Bug Fix for City, State request.  Added recursive lookup call against redirect URL.
+Added get_city(), get_state() functions.
+Added set_report_colors() functions.
+Minor reformatting of report() function.
+Added lookup_forecast() and report_forecast() function.
+Removed $self->{ext} variable.
+Additional debugging messages added.
+
+V1.41 - 08/27/03 -klp
+Changed City, State URL extraction due to weather.com change
+Changed $self->{forecast_flag} to $self->{location_code} as it is now needed by
+both the current and forecast weather retrievals
+

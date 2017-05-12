@@ -1,0 +1,29 @@
+Place  No  Opponents     Roles     Float Score
+15-16
+       10  20,1,15,16     BWBW          1.5
+       20  10,15,14,12    WBBW      D   1.5
+17-19
+       12  2,11,19,20     WBWB      dU  1
+       18  8,13,17,14     WBWW      u   1
+       19  9,16,12,13     BWBB      u   1
+20
+       14  4,17,20,18     WBWB          0
+
+Bill Gletsos, Bartolin, Swiss Master 5 were 
+pairing this:
+
+10&18
+19&20
+12&14
+
+Games::Tournament::Swiss had been pairing it this way too.
+
+But Games::Tournament:Swiss version 0.17 and some 
+earlier versions started pairing it:
+
+12&10
+20&18
+19&14
+
+Now it is pairing it as above. I guess that is the correct pairing.
+

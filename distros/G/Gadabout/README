@@ -1,0 +1,17 @@
+Gadabout 1.0002
+=========================
+
+Gadabout is a perl reimplementation based on Vagrant:
+http://vagrant.sourceforge.net/
+
+The entire code was rewritten in perl.  Some verbatim translation and
+some reimplementation from scratch of the parts that were broken.
+
+It has a mod_perl handler for Pie charts, but is remarkably easy to
+use to generate very slick looking graphs.
+
+Ben Martin <bmartin@omniti.com> did the Gadabout and Gadabout::Imlib2 coding.
+Theo Schlossnagle <jesus@omniti.com> did the Gadabout::Pie coding, testing,
+debugging, and packaging for release.
+
+-- jesus@omniti.com

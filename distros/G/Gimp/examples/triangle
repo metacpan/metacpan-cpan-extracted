@@ -1,0 +1,69 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  my ($w, $h, $lista);
+  $w = $image->width();
+  $h = $image->height();
+  if ($type == 0) {
+    $lista= [0, 0, $w, 0, 0, $h, 0, 0];
+  };
+  if ($type == 1) {
+    $lista= [0, 0, 0, $h, $w, $h, 0, 0];
+  };
+  if ($type == 2) {
+    $lista= [0, 0, $w, 0, $w, $h, 0, 0];
+  };
+  if ($type == 3) {
+    $lista= [$w, 0, $w, $h, 0, $h, $w, 0];
+  };
+  $image->select_polygon($mode, $lista);
+};
+exit main;
+__END__
+
+=head1 NAME
+
+triangle - Creates a triangular selection with the diagonal as one of its sides.
+
+=head1 SYNOPSIS
+
+<Image>/Select/Triangle...
+
+=head1 DESCRIPTION
+
+Tick appropriate radio buttons.
+
+=head1 PARAMETERS
+
+  [PF_RADIO, "type", "Select position", 0,
+    [Upper_left => 0, Lower_left => 1, Upper_right => 2, Lower_right => 3]
+  ],
+  [PF_RADIO, "mode", "Selection mode", 2,
+    [Add => 0, Subtract => 1, Replace => 2, Intersect => 3]
+  ]
+
+=head1 RETURN VALUES
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Claes G Lindblad <claesg@algonet.se>
+
+=head1 DATE
+
+990328
+
+=head1 LICENSE
+
+Copyright Claes G. Lindblad.
+Distributed under the terms of the GNU Public License, v2 or higher.
+
+=cut

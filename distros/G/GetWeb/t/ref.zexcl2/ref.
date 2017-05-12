@@ -1,0 +1,369 @@
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: the_user
+CC: getweb-admin@usa.healthnet.org
+Subject: Internal Error
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+An unexpected internal error occurred:
+  SYNTAX_ERROR: key 'buz' selected more than once: 'exclusive 2 eat it' and 'have cake'
+
+Please select only one 'buz' attribute.
+
+____original message follows____
+
+From: the_user
+Content-Type: text/plain; name="form.html"
+Content-Disposition: inline; filename="form.html"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/form.html> SHAREWARE.COM: Power Search Form
+
+ [1][IMAGE]Exclusive. Netscape Navigator survival guide -- free![2]
+
+CNET Online[3]
+
+[IMAGE MAP][4][5]
+
+Menu
+\  NEW ARRIVALS[6]
+\  MOST POPULAR[7]
+\  SELECTIONS[8]
+
+\  SEARCH[9]
+\  \  Quick[10]
+\  \  Simple[11]
+\  \  Power[12]
+
+\  HELP[13]
+\  ABOUT[14]
+\  SUBSCRIBE[15]
+
+CNET services
+\  CNET.COM[16]
+\  NEWS.COM[17]
+\  GAMECENTER.COM[18]
+\  SEARCH.COM[19]
+\  DOWNLOAD.COM[20]
+\  ACTIVEX.COM[21]
+\  MEDIADOME.COM[22]
+
+CNET Marketplace
+\  Sponsors[23]
+\  CNET store[24]
+BUYDIRECT.COM[25]
+
+SHAREWARE.COM: power search
+
+[IMAGE] [IMAGE] [IMAGE]
+
+<GETWEB: FORM A>
+
+Power Search by platform
+The platform of files to search:
+
+     [X] MS-Windows(all)
+  OR [ ] MS-Windows3.x
+  OR [ ] Long Option Which Almost Takes Up A Whole Line
+  OR [ ] Source-Code
+  OR [ ] All-Categories
+
+[____________________]
+[____________________]
+[____________________]
+[____________________]
+
+[_ This needs to expand_]
+[_ and fill out______]
+[_ three rows! ______]
+Search the file's description for: [_default____________]
+and for: [____________________]
+but not for:  <WARNING: INSECURE> [____________________]
+Check to match case in the above: [ ]
+Check to search in filenames too: [X]
+And matches directory/filename: [____________________]
+Show only files created after:
+
+     [ ] Jan
+  OR [X] Oct
+  OR [ ] Nov
+  OR [ ] Dec
+
+     [X] 1
+  OR [ ] 6
+  OR [ ] 11
+  OR [ ] 16
+  OR [ ] 21
+  OR [ ] 26
+
+     [X] 1960
+  OR [ ] 1970
+  OR [ ] 1980
+  OR [ ] 1985
+  OR [ ] 1990
+  OR [ ] 1991
+  OR [ ] 1992
+  OR [ ] 1993
+  OR [ ] 1994
+  OR [ ] 1995
+  OR [ ] 1996
+  OR [ ] 1997
+
+Limit the number of files listed to:
+
+     [ ] 10
+  OR [X] 25
+  OR [ ] 35
+  OR [ ] 50
+
+Sort files:
+
+     [X] by date - new files first
+  OR [ ] by directory/path
+
+[ ] start search: check preceding box, forward entire document to GetWeb
+
+<GETWEB: FORM B>
+
+Power Search by archive
+The archives to search inside:
+(To select more than one archive hold the Control key.) Blue: ([ ])
+Green: ([X]) Blue: ([ ]) Green: ([X])
+
+         [ ] 3com-dos
+  AND/OR [ ] 3com-mac
+  AND/OR [ ] 3com-mswin
+  AND/OR [ ] accolade-dos
+  AND/OR [ ] accolade-win95
+  AND/OR [ ] adobe-systems-any
+  AND/OR [ ] adobe-systems-mac
+  AND/OR [ ] adobe-systems-mswin
+  AND/OR [ ] alt.src
+  AND/OR [ ] ambrosia-mac
+  AND/OR [ ] aminet
+  AND/OR [ ] wordplace-win
+  AND/OR [ ] wpine-mac
+  AND/OR [ ] wpine-win31
+  AND/OR [ ] wpine-win95
+  AND/OR [ ] zipexplorer-mswin95
+
+Search the file's description for: [____________________]
+and for: [____________________]
+but not for: [____________________]
+Check to match case in the above: [ ]
+Check to search in filenames too: [X]
+And matches directory/filename: [____________________]
+Show only files created after:
+
+     [X] Jan
+  OR [ ] Feb
+  OR [ ] Mar
+  OR [ ] Apr
+  OR [ ] May
+  OR [ ] Jun
+  OR [ ] Jul
+  OR [ ] Aug
+  OR [ ] Sep
+  OR [ ] Oct
+  OR [ ] Nov
+  OR [ ] Dec
+
+         [ ] 1
+  AND/OR [X] 6
+  AND/OR [X] 11
+  AND/OR [ ] Long Option Which Almost Takes Up A Whole Line
+  AND/OR [ ] 21
+  AND/OR [ ] 26
+
+     [X] 1960
+  OR [ ] 1970
+  OR [ ] 1980
+  OR [ ] 1985
+  OR [ ] 1990
+  OR [ ] 1996
+  OR [ ] 1997
+
+Limit the number of files listed to:
+
+     [ ] 10
+  OR [X] 25
+  OR [ ] 35
+  OR [ ] 50
+
+Sort files:
+
+     [X] by date - new files first
+  OR [ ] by directory/path
+
+[ ] start search: check preceding box, forward entire document to GetWeb
+
+<GETWEB: FORM C>
+
+[____________________]
+[ ] start search: check preceding box, forward entire document to GetWeb
+
+<GETWEB: FORM D>
+
+[____________________]
+[ ] failed search 1: check preceding box, forward entire document to GetWeb
+
+<GETWEB: FORM E>
+
+([X])exclusive 1 have cake
+([ ])exclusive 1 eat it
+[ ] exclusive 1: check preceding box, forward entire document to GetWeb
+
+<GETWEB: FORM F>
+
+     [X] exclusive 2 have cake
+  OR [X] exclusive 2 eat it
+
+[X] exclusive 2: check preceding box, forward entire document to GetWeb
+
+OTHER SEARCHES
+quick search[26]
+designed for minimum fuss simple search[27]
+an easy way to search
+for software
+
+\  
+Back to the top[28]
+
+Check out our latest sites
+\  Check out
+\  our latest
+\  sites:
+Go to BUYDIRECT.COM[29]
+\  Click here[30] to get
+\  fully-featured, fully supported
+\  software direct from the publisher. Go to DOWNLOAD.COM[31]
+\  Click here[32] to visit
+\  DOWNLOAD.COM, the
+\  Internet's Software Source.
+CNET disclaims any responsibility for software obtained through this
+site. Click here[33] for more legal stuff. Copyright[34] \co 1995-97
+CNET, Inc. All rights reserved.
+
+*** Form section (ignore) ***
+<FORM ACTION="http://www.zxvba_test_ignore.com/foo" METHOD="GET">
+<SELECT NAME="category"><OPTION VALUE="MS-Windows(all)">
+<OPTION VALUE="MS-Windows3.x">
+<OPTION VALUE="Long Option Which Almost Takes Up A Whole Line">
+<OPTION VALUE="Source-Code"><OPTION VALUE="All-Categories"></SELECT>
+<INPUT NAME="cfrom" TYPE="hidden" VALUE="power">
+<TEXTAREA NAME="myarea1" ROWS=4></TEXTAREA>
+<TEXTAREA NAME="myarea2" ROWS=3></TEXTAREA>
+<INPUT NAME="search" TYPE="text">
+<INPUT NAME="and" TYPE="text">
+<INPUT NAME="not" TYPE="password">
+<INPUT NAME="matchCase" TYPE="checkbox">
+<INPUT NAME="orfile" TYPE="checkbox">
+<INPUT NAME="name" TYPE="text">
+<SELECT NAME="month"><OPTION VALUE="Jan"><OPTION VALUE="Oct">
+<OPTION VALUE="Nov"><OPTION VALUE="Dec"></SELECT>
+<SELECT NAME="day"><OPTION VALUE=1><OPTION VALUE=6><OPTION VALUE=11>
+<OPTION VALUE=16><OPTION VALUE=21><OPTION VALUE=26></SELECT>
+<SELECT NAME="year"><OPTION VALUE=1960><OPTION VALUE=1970>
+<OPTION VALUE=1980><OPTION VALUE=1985><OPTION VALUE=1990>
+<OPTION VALUE=1991><OPTION VALUE=1992><OPTION VALUE=1993>
+<OPTION VALUE=1994><OPTION VALUE=1995><OPTION VALUE=1996>
+<OPTION VALUE=1997></SELECT>
+<SELECT NAME="hits"><OPTION VALUE=10><OPTION VALUE=25>
+<OPTION VALUE=35><OPTION VALUE=50></SELECT>
+<SELECT NAME="sort"><OPTION VALUE="by date - new files first">
+<OPTION VALUE="by directory/path"></SELECT>
+<INPUT TYPE="submit" VALUE="start search">
+<INPUT TYPE="reset"></FORM><FORM ACTION="foo2" METHOD="GET">
+<INPUT NAME="color1" TYPE="radio" VALUE="blue">
+<INPUT NAME="color1" TYPE="radio" VALUE="green">
+<INPUT NAME="color2" TYPE="radio" VALUE="blue">
+<INPUT NAME="color2" TYPE="radio" VALUE="green">
+<SELECT MULTIPLE NAME="archive"><OPTION VALUE="3com-dos">
+<OPTION VALUE="3com-mac"><OPTION VALUE="3com-mswin">
+<OPTION VALUE="accolade-dos"><OPTION VALUE="accolade-win95">
+<OPTION VALUE="adobe-systems-any"><OPTION VALUE="adobe-systems-mac">
+<OPTION VALUE="adobe-systems-mswin"><OPTION VALUE="alt.src">
+<OPTION VALUE="ambrosia-mac"><OPTION VALUE="aminet">
+<OPTION VALUE="wordplace-win"><OPTION VALUE="wpine-mac">
+<OPTION VALUE="wpine-win31"><OPTION VALUE="wpine-win95">
+<OPTION VALUE="zipexplorer-mswin95"></SELECT>
+<INPUT NAME="cfrom" TYPE="hidden" VALUE="power">
+<INPUT NAME="search" TYPE="text">
+<INPUT NAME="and" TYPE="text">
+<INPUT NAME="not" TYPE="text">
+<INPUT NAME="matchCase" TYPE="checkbox">
+<INPUT NAME="orfile" TYPE="checkbox">
+<INPUT NAME="name" TYPE="text">
+<SELECT NAME="month"><OPTION VALUE="Jan"><OPTION VALUE="Feb">
+<OPTION VALUE="Mar"><OPTION VALUE="Apr"><OPTION VALUE="May">
+<OPTION VALUE="Jun"><OPTION VALUE="Jul"><OPTION VALUE="Aug">
+<OPTION VALUE="Sep"><OPTION VALUE="Oct"><OPTION VALUE="Nov">
+<OPTION VALUE="Dec"></SELECT>
+<SELECT MULTIPLE NAME="day"><OPTION VALUE=1><OPTION VALUE=6>
+<OPTION VALUE=11>
+<OPTION VALUE="Long Option Which Almost Takes Up A Whole Line">
+<OPTION VALUE=21><OPTION VALUE=26></SELECT>
+<SELECT NAME="year"><OPTION VALUE=1960><OPTION VALUE=1970>
+<OPTION VALUE=1980><OPTION VALUE=1985><OPTION VALUE=1990>
+<OPTION VALUE=1996><OPTION VALUE=1997></SELECT>
+<SELECT NAME="hits"><OPTION VALUE=10><OPTION VALUE=25>
+<OPTION VALUE=35><OPTION VALUE=50></SELECT>
+<SELECT NAME="sort"><OPTION VALUE="by date - new files first">
+<OPTION VALUE="by directory/path"></SELECT>
+<INPUT NAME="submit_name" TYPE="submit" VALUE="start search">
+<INPUT TYPE="reset"></FORM><FORM ACTION="foo3" METHOD="POST">
+<INPUT NAME="foo" TYPE="text">
+<INPUT TYPE="submit" VALUE="start search"></FORM>
+<FORM ACTION="http://www.zxvba_test_ignore.com/foo4" METHOD="NOT_REAL">
+<INPUT NAME="foo" TYPE="text">
+<INPUT TYPE="submit" VALUE="failed search 1"></FORM>
+<FORM ACTION="http://www.zxvba_test_ignore.com/foo5">
+<INPUT NAME="baz" TYPE="radio" VALUE="have cake">
+<INPUT NAME="baz" TYPE="radio" VALUE="eat it">
+<INPUT TYPE="submit" VALUE="exclusive 1"></FORM>
+<FORM ACTION="http://www.zxvba_test_ignore.com/foo6">
+<SELECT NAME="buz"><OPTION VALUE="have cake">
+<OPTION VALUE="exclusive 2 eat it"></SELECT>
+<INPUT TYPE="submit" VALUE="exclusive 2"></FORM>
+
+*** References from this document ***
+[orig] http://www.zxvba_test_ignore.com/
+[1] http://www.zxvba_test_ignore.com/
+[2] http://www.zxvba_test_ignore.com/cgi-bin/redirect.cgi?locati\
+on=http://www.download.com/PC/Ed/Index/0,43,0-g,00.html%3fsw.nav\
+survive%23%23CLink%23DEF%23CNET%23Navsurvive%23%23
+[3] http://www.zxvba_test_ignore.com/Maps/logo.map
+[4] http://www.cnet.com/
+[5] http://www.zxvba_test_ignore.com/SW/FD/Home
+[6] http://www.zxvba_test_ignore.com/code/engine/New
+[7] http://www.zxvba_test_ignore.com/SW/Search/Popular/
+[8] http://www.zxvba_test_ignore.com/SW/Selections/Index/
+[9] http://www.zxvba_test_ignore.com/SW/Search/Index/
+[10] http://www.zxvba_test_ignore.com/SW/Search/Quick/
+[11] http://www.zxvba_test_ignore.com/SW/Search/Simple/
+[12] http://www.zxvba_test_ignore.com/code/engine/Power
+[13] http://www.zxvba_test_ignore.com/SW/Help/Index/
+[14] http://www.zxvba_test_ignore.com/SW/About/Index/
+[15] http://www.zxvba_test_ignore.com/SW/Subscribe/
+[16] http://www.cnet.com/?shareware.navbar
+[17] http://www.news.com/?shareware.navbar
+[18] http://www.gamecenter.com/?shareware.navbar
+[19] http://www.search.com/?shareware.navbar
+[20] http://www.download.com/?shareware.navbar
+[21] http://www.activex.com/?shareware.navbar
+[22] http://www.mediadome.com/?shareware.navbar
+[23] http://www.zxvba_test_ignore.com/SW/About/Advert/
+[24] http://www.store.cnet.com/index5.htm
+[25] http://www.buydirect.com/?shareware.navbar
+[26] http://www.shareware.com/SW/Search/Quick/
+[27] http://www.shareware.com/SW/Search/Simple/
+[28] http://www.zxvba_test_ignore.com/#top
+[29] http://www.buydirect.com/?sw.footer
+[30] http://www.buydirect.com/?sw.footer
+[31] http://www.download.com/?sw.footer
+[32] http://www.download.com/?sw.footer
+[33] http://www.zxvba_test_ignore.com/SW/About/Copyright/0,61,1,\
+00.html
+[34] http://www.zxvba_test_ignore.com/SW/About/Copyright/

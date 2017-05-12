@@ -1,0 +1,24 @@
+---
+abstract: 'Access the Google AJAX Libaries API in Perl'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  File::Temp: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Google-AJAX-Library
+recommends: {}
+requires:
+  Carp::Clan::Share: 0
+  HTML::Declare: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Path::Class: 0
+  URI: 0
+version: 0.022

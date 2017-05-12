@@ -1,0 +1,18 @@
+--- #YAML:1.0
+ name: Gtk2-Net-LDAP-Widgets
+ abstract: LDAP-related widget library for Gtk2
+ version: 2.0.1
+ author:
+   - Aleksander Adamowski <cpan@olo.org.pl>
+ license: perl
+ distribution_type: module
+ requires:
+   perl: 5.005
+ build_requires:
+   Test::More: 0
+   ExtUtils::AutoInstall: 0
+ meta-spec:
+   version: 1.3
+   url: http://module-build.sourceforge.net/META-spec-v1.3.html
+ generated_by: hand
+

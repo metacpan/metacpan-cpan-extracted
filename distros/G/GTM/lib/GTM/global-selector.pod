@@ -1,0 +1,33 @@
+=head1 Global Selector
+
+=head2 Patterns
+
+=over 4
+
+=item B<NAME> selects ^NAME
+
+=item B<-NAME> unselects ^NAME
+
+=item B<NAME-NAME> select all globals that match the range.
+
+=item B<?> matches exact one character
+
+=item B<*> matches zero or more characters
+
+=item B</invert> inverts the selection.
+This is helpful if you want to select many globals except a few.
+Here an example:
+normally you select all globals and deselect a few:
+
+  *
+  -notthis
+  -except
+
+This is confusing because there are so many globals selected.
+With B</invert> this example looks like this:
+
+  notthis
+  except
+  /invert
+
+=back

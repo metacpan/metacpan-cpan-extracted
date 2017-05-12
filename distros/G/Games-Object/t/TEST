@@ -1,0 +1,17 @@
+# Run this through Perl to run all tests.
+
+use strict;
+use Test::Harness;
+
+runtests(
+    './create.t',
+    './attr.t',
+    './inherit.t',
+    './flag.t',
+    './event.t',
+    './process.t',
+    './priority.t',
+    './loadsave.t',
+    './overload.t',
+    './relate.t',
+);

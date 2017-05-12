@@ -1,0 +1,8 @@
+MANIFEST
+lib/Geography/States.pm
+Makefile.PL
+t/000_tests.t
+Changes
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

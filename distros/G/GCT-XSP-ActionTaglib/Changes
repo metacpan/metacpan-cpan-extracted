@@ -1,0 +1,6 @@
+Revision history for Perl extension GCT::XSP::ActionTaglib.
+
+0.01  Mon Jan 13 17:16:03 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n GCT::XSP::ActionTaglib
+

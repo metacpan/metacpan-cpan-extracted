@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/fips55.t
+t/fips-sample.txt
+Fips55.pm
+META.yml                                 Module meta-data (added by MakeMaker)

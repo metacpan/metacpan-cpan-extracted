@@ -1,0 +1,112 @@
+(;GM[1]FF[3]
+SZ[19]KM[0];
+C[owl_attack G16: WIN E14 (attack effective)
+  (639 variations)
+owl_defend G16: WIN E13 (defense effective)
+  (409 variations)]
+AW[ha][hb][cc][hc][ic][gd][id][kd][ld][be][ge][ie][je][cf][df][ff][gf][jf][qf][rf][jg][ng][fh][ih][nj][pm]
+AB[fa][ga][eb][gb][ec][gc][jc][kc][lc][rc][dd][fd][hd][jd][nd][pd][fe][he][ke][re][bf][hf][if][kf][dg][hg][ig][gh][gi][dj][jj][pj][dp][jp][np][pp]
+;B[ef]
+C[A1124 at G16 (variation 426, hash f21b53a6)
+owl_defend G16: 0 (defense failed - genus 0)
+  (213 variations)
+(next variation: 639)]
+;W[eg]
+C[D1140 at G16 (variation 427, hash b619f8c7)
+owl_attack G16: WIN E15 (attack effective)
+  (210 variations)
+(next variation: 637)]
+;B[ee]
+C[A1108 at G16 (variation 497, hash b12e663e)
+owl_defend G16: 0 (defense failed - genus 0)
+  (140 variations)
+(next variation: 637)]
+;W[dh]
+C[D1201 at G16 (variation 545, hash a7efa5b0)
+owl_attack G16: WIN C13 (attack effective)
+  (92 variations)
+(next variation: 637)]
+;B[cg]
+C[save lunch at G16 (variation 546, hash 30342c69)
+owl_defend G16: 0 (defense failed - genus 0)
+  (91 variations)
+(next variation: 637)]
+;W[cj]
+C[D107 at G16 (variation 547, hash 6da41ea2)
+owl_attack G16: WIN B12 (attack effective)
+  (38 variations)
+(next variation: 585)]
+;B[bh]
+C[save lunch at G16 (variation 548, hash e4cebbfd)
+owl_defend G16: 0 (defense failed - genus 0)
+  (37 variations)
+(next variation: 585)]
+;W[fi]
+C[D302 at G16 (variation 570, hash ced9b568)
+owl_attack G16: WIN F10 (attack effective)
+  (15 variations)
+(next variation: 585)]
+;B[fj]
+C[A401 at G16 (variation 571, hash 53a593b7)
+owl_defend G16: 0 (defense failed - genus 0)
+  (14 variations)
+(next variation: 585)]
+;W[ei]
+C[D1003 at G16 (variation 572, hash b3b49508)
+owl_attack G16: WIN E10 (attack effective)
+  (13 variations)
+(next variation: 585)]
+;B[ej]
+C[A1101b at G16 (variation 573, hash eb7201ab)
+owl_defend G16: 0 (defense failed - genus 0)
+  (12 variations)
+(next variation: 585)]
+;W[di]
+C[D1302 at G16 (variation 574, hash e6b80f2)
+owl_attack G16: WIN F13 (attack effective)
+  (11 variations)
+(next variation: 585)]
+;B[fg]
+C[A708 at G16 (variation 575, hash 2d9e7a8c)
+owl_defend G16: 0 (defense failed - genus 0)
+  (10 variations)
+(next variation: 585)]
+;W[bi]
+C[D310b at G16 (variation 576, hash 7e27735d)
+owl_attack G16: WIN C9 (attack effective)
+  (9 variations)
+(next variation: 585)]
+;B[ck]
+C[A401 at G16 (variation 577, hash 69f34628)
+owl_defend G16: 0 (defense failed - genus 0)
+  (8 variations)
+(next variation: 585)]
+;W[bk]
+C[D308 at G16 (variation 578, hash fe98662a)
+owl_attack G16: WIN C12 (attack effective)
+  (7 variations)
+(next variation: 585)]
+;B[ch]
+C[A1002 at G16 (variation 579, hash 5b0096cb)
+owl_defend G16: 0 (defense failed - genus 0)
+  (6 variations)
+(next variation: 585)]
+;W[bl]
+C[D1311 at G16 (variation 580, hash 4494d0fc)
+owl_attack G16: WIN E12 (attack effective)
+  (5 variations)
+(next variation: 585)]
+;B[eh]
+C[A1201 at G16 (variation 581, hash 6198bf9e)
+owl_defend G16: 0 (defense failed - genus 0)
+  (4 variations)
+(next variation: 585)]
+;W[ci]
+C[D1000a at G16 (variation 582, hash d72470e0)
+owl_attack G16: WIN G13 (all original stones captured)
+  (3 variations)
+(next variation: 585)]
+;B[gg]
+C[tactical attack at G16 (variation 584, hash b49bea7c)
+(next variation: 585)]
+)

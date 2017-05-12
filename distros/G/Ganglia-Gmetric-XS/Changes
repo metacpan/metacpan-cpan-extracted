@@ -1,0 +1,36 @@
+Revision history for Ganglia-Gmetric-XS
+
+1.06  2016-09-01
+  * Exclude MYMETA files
+    (rt117395 https://rt.cpan.org/Public/Bug/Display.html?id=117395)
+
+1.05  2016-08-17
+  * Enable to compile with ganglia >= 3.2
+
+1.04  2012-04-03
+  * Fixed semantic bug
+    (rt75468 https://rt.cpan.org/Public/Bug/Display.html?id=75468)
+
+1.03  2010-11-29
+  * added feature to send metadata (group, desc, title).
+    (rt63368 https://rt.cpan.org/Public/Bug/Display.html?id=63368)
+
+1.02  2010-10-26
+  * support ganglia 3.1.
+
+1.01  2009-04-21
+  * fixed some typo.
+    thanks to Carlo Marcelo Arenas Belon.
+
+1.00  2008-06-17
+  * first stable release.
+  * correct mis-usage of gmetric (Ganglia_gmetric). to destory every time.
+    thanks a lot for advice by ganglia team.
+
+0.02  2008-05-26
+  * fixed some memory leak bugs.
+    see README and apply including patch to ganglia.
+
+0.01  2008-05-16
+  * Initial release.
+

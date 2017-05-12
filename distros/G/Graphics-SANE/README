@@ -1,0 +1,31 @@
+Graphics::SANE version 0.02
+===========================
+
+The Sane module provides access to the Sane scanner access library.
+Documentation on the interface is provided in the module.  Type
+'perldoc Graphics::SANE' after installation.  For more information on
+Sane, see the Sane website at http://www.sane-project.org/.
+
+Version 0.01 was named simply 'Sane' and was not distributed.  Version
+0.02 is the first version uploaded to CPAN.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the Sane development libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Thomas Pfau
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

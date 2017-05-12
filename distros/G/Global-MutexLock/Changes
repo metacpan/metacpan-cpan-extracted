@@ -1,0 +1,36 @@
+Revision history for Perl extension Global-MutexLock
+
+0.026 2016-09-28T03:04:53Z
+    - edit minil.toml
+    - add builder for pthread option! -_!
+
+0.025 2016-09-21T01:55:13Z
+    - use Module::Build
+    - add -pthread option
+
+0.024 2016-09-02T03:05:21Z
+
+    - update readme
+
+0.023 2016-09-02T02:59:56Z
+
+    - change license to MIT
+    - update readme
+
+0.022 2016-08-31T10:26:39Z
+
+    - update pod again.
+    - fix example's usage
+
+0.021 2016-08-31T10:21:09Z
+
+    - update pod
+
+0.02 2016-08-30T09:51:42Z
+
+    - udpate readme
+
+0.01 2016-08-30T05:21:19Z
+
+    - original version
+

@@ -1,0 +1,11 @@
+API For Game::Life::NDim
+
+Goals
+* Should be able support multiple life forms
+* Should be able to generate standard rules types
+* Accept rules in the form of closures
+* Should also be able generate boards based on size and/or rand initialiser
+* Should have tools that make creating rule closures simple
+* Boards should be either 2D or 3D (nD?) and should be able to wrap
+
+

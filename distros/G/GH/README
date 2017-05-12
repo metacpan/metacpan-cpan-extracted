@@ -1,0 +1,8 @@
+
+To install in the BDGP/LBL, we want most of the stuff to end up in the
+local tree, but the utility scripts (overlap, etc...) to land in 
+/usr/local/bdgp/bin.
+
+   make
+   make test
+   make INSTALLSCRIPT=/usr/local/bdgp/bin install

@@ -1,0 +1,462 @@
+$name   = 'WWW';
+$author = 'Bestian Tang';
+$team   = 'Townsperson';
+
+
+$a = $b = $c = $d = $ok = 0;
+$go = $move = 1;
+$head = 8;
+$startx = $x;
+$starty = $y;
+
+build: {
+    if ($a == 0) {
+        call starta;
+        $a++;
+    }
+    enable shield;
+    call watch;
+    call xy;
+    call hun;
+    call xy;
+    call att;
+    call xy;
+    call sav;
+    call look;
+    redo;
+}
+
+sub starta {
+#    $map[$_] = 0 for (0..25*40+40);
+    $map[$x + $y * 40] = 'space';
+    return;
+}
+
+sub xy {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if ($h == 8) {
+        $my = -1;
+        $mx = 0;
+    }
+    elsif ($h == 6) {
+        $my = 0;
+        $mx = 1;
+    }
+    elsif ($h == 2) {
+        $my = 1;
+        $mx = 0;
+    }
+    elsif ($h == 4) {
+        $my = 0;
+        $mx = -1;
+    }
+    return;
+}
+
+sub watch {
+    disable cloak unless &inperim('enemy');
+    enable cloak if &inperim('enemy');
+    fire energy if &inperim('enemy');
+    redo if &inperim('enemy');
+    scan perimeter;
+    if (&found('enemy')) {
+        fire energy * 3;
+    }
+    return;
+}
+
+sub hun {
+    call turn;
+    return unless &nearst('enemy') < $go;
+    call hunt;
+    redo;
+}
+
+sub att {
+    call turn;
+    return unless $xx * $yy == 0;
+    call attack;
+    return unless $ok;
+    if ($ok == 1) {
+        if ($enemy_h - $h == 0) {
+            if (&nearst('enemy') <= 4) {
+                disable shield;
+                fire bazooka;
+                enable shield;
+            }
+        }
+        elsif ($enemy_h + $h == 10) {
+            disable shield;
+            fire bazooka;
+            enable shield;
+            $ok = 2;
+            call side;
+            enable shield;
+        }
+        elsif (&nearst('enemy') <= 3) {
+            disable shield;
+            fire grenade 2;
+            enable shield;
+        }
+        else {
+            return;
+        }
+    }
+    else {
+        if ($h == 8) {
+            move backward if $map[$x + ($y + 1) * 40] eq '' or $map[$x + ($y + 1) * 40] eq 'space' or $map[$x + ($y + 1) * 40] eq 'vault';
+        }
+        elsif ($h == 6) {
+            move backward if $map[($x - 1) + $y * 40] eq '' or $map[($x - 1) + $y * 40] eq 'space' or $map[($x - 1) + $y * 40] eq 'vault';
+        }
+        elsif ($h == 4) {
+            move backward if $map[$x + ($y - 1) * 40] eq '' or $map[$x + ($y - 1) * 40] eq 'space' or $map[$x + ($y - 1) * 40] eq 'vault';
+        }
+        elsif ($h == 2) {
+            move backward if $map[($x + 1) + $y * 40] eq '' or $map[($x + 1) + $y * 40] eq 'space' or $map[($x + 1) + $y * 40] eq 'vault';
+        }
+        return;
+    }
+    $ok = 0;
+    call move;
+    redo;
+}
+
+sub sav {
+    call turn;
+    return unless (abs($xx) == 2 or abs($xx) == 1 or abs($yy) == 2 or abs($yy) == 1);
+    call save;
+    call xy;
+    call att if $xx * $yy == 0;
+    return;
+}
+
+sub hunt {
+    move forward;
+    return;
+}
+sub attack {
+    call xy;
+    $d++;
+    if ($h == 8) {
+        return if $d == abs($yy);
+        print $map[$x + ($y - $d) * 40];
+        if ($map[$x + ($y - $d) * 40] eq 'space') {
+            $ok = 1;
+            redo;
+        }
+        elsif ($map[$x + ($y - $d) * 40] eq '') {
+            $ok = 1;
+            return;
+        }
+        elsif ($d == 1 and $map[$x + ($y + 1) * 40] eq 'space') {
+            $ok = 2;
+            return;
+        }
+        else {
+            $ok = 0;
+            return;
+        }
+    }
+    elsif ($h == 6) {
+        return if $d == abs($xx);
+        if ($map[($x + $d) + $y * 40] eq 'space') {
+            $ok = 1;
+            redo;
+        }
+        elsif ($map[($x + $d) + $y * 40] eq '') {
+            $ok = 1;
+            return;
+        }
+        elsif ($d == 1 and $map[($x - 1) + $y * 40] eq 'space') {
+            $ok = 2;
+            return;
+        }
+        else {
+            $ok = 0;
+            return;
+        }
+    }
+    elsif ($h == 2) {
+        return if $d == abs($yy);
+        if ($map[$x + ($y + $d) * 40] eq 'space') {
+            $ok = 1;
+            redo;
+        }
+        elsif ($map[$x + ($y + $d) * 40] eq '') {
+            $ok = 1;
+            return;
+        }
+        elsif ($d == 1 and $map[$x + ($y - 1) * 40] eq 'space') {
+            $ok = 2;
+            return;
+        }
+        else {
+            $ok = 0;
+            return;
+        }
+    }
+    elsif ($h == 4) {
+        return if $d == abs($xx);
+        if ($map[($x - $d) + $y * 40] eq 'space') {
+            $ok = 1;
+            redo;
+        }
+        elsif ($map[($x - $d) + $y * 40] eq '') {
+            $ok = 1;
+            return;
+        }
+        elsif ($d == 1 and $map[($x + 1) + $y * 40] eq 'space') {
+            $ok = 2;
+            return;
+        }
+        else {
+            $ok = 0;
+            return;
+        }
+    }
+}
+
+sub save {
+    call turn;
+    call xy;
+    if ($h == 8) {
+        if ($xx == 1) {
+            turn right;
+            call move;# if $map[($x + 1) + $y * 40] eq '' or $map[($x + 1) + $y * 40] eq 'space';
+            turn left;
+        }
+        elsif ($xx == -1) {
+            turn left;
+            call move;# if $map[($x - 1) + $y * 40] eq '' or $map[($x - 1) + $y * 40] eq 'space';
+            turn right;
+        }
+    }
+    elsif ($h == 6) {
+        if ($yy == 1) {
+            turn right;
+            call move;# if $map[$x + ($y + 1) * 40] eq '' or $map[$x + ($y + 1) * 40] eq 'space';
+            turn left;
+        }
+        elsif ($yy == -1) {
+            turn left;
+            call move;# if $map[$x + ($y - 1) * 40] eq '' or $map[$x + ($y - 1) * 40] eq 'space';
+            turn right;
+        }
+    }
+    elsif ($h == 2) {
+        if ($xx == -1) {
+            turn right;
+            call move;# if $map[($x - 1) + $y * 40] eq '' or $map[($x - 1) + $y * 40] eq 'space';
+            turn left;
+        }
+        elsif ($xx == 1) {
+            turn left;
+            call move;# if $map[($x + 1) + $y * 40] eq '' or $map[($x + 1) + $y * 40] eq 'space';
+            turn right;
+        }
+    }
+    elsif ($h == 6) {
+        if ($yy == -1) {
+            turn right;
+            call move;# if $map[$x + ($y - 1) * 40] eq '' or $map[$x + ($y - 1) * 40] eq 'space';
+            turn left;
+        }
+        elsif ($yy == 1) {
+            turn left;
+            call move;# if $map[$x + ($y + 1) * 40] eq '' or $map[$x + ($y + 1) * 40] eq 'space';
+            turn right;
+        }
+    }
+    call xy;
+    move backward;
+    redo if abs($xx) == 1 or abs($yy) == 1;
+    return;
+}
+
+# 812
+# 7 3
+# 654
+sub look {
+    $starty-- if $head == 8;
+    $startx++ if $head == 6;
+    $starty++ if $head == 2;
+    $startx-- if $head == 4;
+
+    if (abs($startx - $x) <= $go and abs($starty - $y) <= $go) {
+        if ($c == $go * 8) {
+            $starty--;
+            $go++;
+            $c = 0;
+        }
+
+        $c++;
+
+        if ($startx > 0 and $startx < 41 and $starty > 0 and $starty < 26) {
+            scan gps $startx, $starty;
+
+            if (&found('wall|mine|fence|flag|vault')) {
+                $map[$startx + $starty * 40] = $found;
+            }
+            else {
+                $map[$startx + $starty * 40] = 'space';
+            }
+        }
+        else {
+            redo;
+        }
+    }
+    else {
+        if ($head == 8) {
+            $head = 6;
+            $starty++;
+        }
+        elsif ($head == 6) {
+            $head = 2;
+            $startx--;
+        }
+        elsif ($head == 2) {
+            $head = 4;
+            $starty--;
+        }
+        elsif ($head == 4) {
+            $head = 8;
+            $startx++;
+        }
+        redo;
+    }
+    return;
+}
+
+sub move {
+    call watch if &inperim('enemy');
+    move backward if &nearst('friend') == 1 and int(rand(2));
+    move forward;
+
+    if (&bumped('enemy')) {
+        call watch;
+    }
+    elsif (&bumped('fence')) {
+        disable shield;
+        fire laser;
+    }
+    elsif (&bumped()) {
+        if (int(rand(2))) {
+            turn left;
+        }
+        else {
+            turn right;
+        }
+        move forward;
+    }
+
+    if (&nearst('enemy') > 4) {
+        disable cloak;
+        enable shield;
+    }
+    else {
+        disable shield;
+        enable cloak;
+    }
+
+    call watch if &inperim('enemy');
+    disable cloak if &nearst('enemy') > 4;
+    return;
+}
+
+sub turn {
+    disable cloak unless &inperim('enemy');
+    enable cloak if &inperim('enemy');
+    call watch if &inperim('enemy');
+    call xy;
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+    }
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+    return;
+}
+
+sub side {
+    if ($h == 8) {
+        enable shield;
+        turn left;
+        if ($map[$x + ($y + 1) * 40] eq '' or $map[$x + ($y + 1) * 40] eq 'space' or $map[$x + ($y + 1) * 40] eq 'vault') {
+            move backward unless $move == 2;
+            $move = 0;
+        }
+        elsif ($map[$x + ($y - 1) * 40] eq '' or $map[$x + ($y - 1) * 40] eq 'space' or $map[$x + ($y - 1) * 40] eq 'vault') {
+            move forward if $move;
+            $move = 2;
+        }
+    }
+    elsif ($h == 6) {
+        enable shield;
+        turn left;
+        if ($map[($x - 1) + $y * 40] eq '' or $map[($x - 1) + $y * 40] eq 'space' or $map[($x - 1) + $y * 40] eq 'vault') {
+            move backward unless $move == 2;
+            $move = 0;
+        }
+        elsif ($map[($x + 1) + $y * 40] eq '' or $map[($x + 1) + $y * 40] eq 'space' or $map[($x + 1) + $y * 40] eq 'vault') {
+            move forward;
+            $move = 2;
+        }
+    }
+    elsif ($h == 2) {
+        enable shield;
+        turn left;
+        if ($map[$x + ($y - 1) * 40] eq '' or $map[$x + ($y - 1) * 40] eq 'space' or $map[$x + ($y - 1) * 40] eq 'vault') {
+            move backward unless $move == 2;
+            $move = 0;
+        }
+        elsif ($map[$x + ($y + 1) * 40] eq '' or $map[$x + ($y + 1) * 40] eq 'space' or $map[$x + ($y + 1) * 40] eq 'vault') {
+            move forward if $move;
+            $move = 2;
+        }
+    }
+    elsif ($h == 4) {
+        enable shield;
+        turn left;
+        if ($map[($x + 1) + $y * 40] eq '' or $map[($x + 1) + $y * 40] eq 'space' or $map[($x + 1) + $y * 40] eq 'vault') {
+            move backward unless $move == 2;
+            $move = 0;
+        }
+        elsif ($map[($x - 1) + $y * 40] eq '' or $map[($x - 1) + $y * 40] eq 'space' or $map[($x - 1) + $y * 40] eq 'vault') {
+            move forward if $move;
+            $move = 2;
+        }
+    }
+    $ok--;
+    redo if $ok;
+    $ok = 0;
+    $move = 1;
+    return;
+}x

@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Games::Cellulo::Game;
+my $g = Games::Cellulo::Game->new_with_options;
+
+my $_all = sub {
+    return @$_[0];
+};
+
+my $DESTROY = sub {
+    warn 'DESTROY';
+    warn "\n"x100000;
+    exit;
+};
+
+$g->init;
+$g->play;
+
+__END__
+
+=head1 NAME
+
+cellulo - Cellular Automata Visualisation
+
+=head1 SYNOPSIS
+
+    $ cellulo
+
+OR
+
+    $ cellulo --meld
+
+=head1 USAGE
+
+USAGE: cellulo [-h] [long options...]
+
+    --behavior: Int
+
+                1: go straight, avoid only on collision
+                2: meld, on collision switch to new type
+                3: adopt direction of avoid path
+
+    --clump:
+        clump instead of avoid
+
+    --grayscale:
+        no doc for grayscale
+
+    --meld:
+        particles should turn in to each other when stuck
+
+    --num_particles: Int
+        number of onscreen particles
+
+    --ramp:
+        add particles on collision
+
+    --randomize_clump:
+        no doc for randomize_clump
+
+    --sleep_time: String
+        time to sleep between frames
+
+    --usage:
+        show a short help message
+
+    -h --help:
+        show a help message
+
+    --man:
+        show the manual
+
+
+=head1 DESCRIPTION
+
+Cellulo is a visualisation of cellular automata, or at least my interpretation of what that would be.
+
+Basically launch the thing and watch em go ;)
+
+L<https://imgur.com/a/ANHV2>
+
+=head1 AUTHOR
+
+Samuel Kaufman <skaufman@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) Samuel Kaufman.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

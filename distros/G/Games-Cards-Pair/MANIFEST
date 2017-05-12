@@ -1,0 +1,19 @@
+Changes
+lib/Games/Cards/Pair.pm
+lib/Games/Cards/Pair/Card.pm
+lib/Games/Cards/Pair/Params.pm
+script/play-pelmanism
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-Games-Cards-Pair.t
+t/02-Games-Cards-Pair-Card.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

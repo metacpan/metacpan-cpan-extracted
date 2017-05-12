@@ -1,0 +1,74 @@
+                        Readme for Geo::METAR
+
+          Accessing Aviation Weather Information with Perl.
+
+   Copyright (c) 1997-2000, Jeremy D. Zawodny <Jeremy@Zawodny.com>
+   Copyright (c) 2007, Koos van den Hout <koos@kzdoos.xs4all.nl>
+
+
+BACKGROUND
+
+    This is the README file for the Geo::METAR Perl module.
+
+    The Geo::METAR home page is located at:
+
+        http://idefix.net/~koos/perl/Geo-METAR/
+
+    There may be bugs in the code as well as in the documentation. If
+    you find either, I'd appreciate a patch or at least a mail message
+    to let me know what's wrong so that I can add it to the TODO list.
+
+    Geo::METAR as been developed and tested on Linux and Solaris as
+    well as Windows NT. It may well work on other platforms. It is
+    pure Perl. If you install it on another platform, and have trouble
+    I'd like to hear about it. If you develop patches for that
+    platform, I'd REALLY like to hear about it. Send me a note.
+
+REQUIREMENTS
+
+    You will need Perl 5.005 or newer to install and use
+    Geo::METAR. It may work with older versions of Perl, but I make no
+    guarantees.
+
+
+INSTALLATION
+
+    Installing Geo::METAR is an easy process.
+
+      $ perl Makefile.PL
+      $ make
+      $ make test
+      $ make install
+
+
+DOCUMENTATION
+
+    The documentation is built-in to the Geo::METAR module in POD
+    format.  You can use any of the pod2* converters to translate it
+    to a more readable format. The three most common formats are
+    'man', 'html', and 'text'.
+
+    When you ran the 'make install' above, documentation should have
+    been installed on your system such that 'perldoc Geo::METAR' will
+    spit it out.  Of course, you can run your favorite pod converter
+    and generate it in alternative formats.
+
+
+EXAMPLE SCRIPTS
+
+    The following scripts are included in the `examples'
+    directory. They are provided as examples. They should provide an
+    idea of what you can do with this module.
+
+      simple_dump.pl       Process a simple METAR.
+      fetch_temp.pl	       Fetch the temperature and print it out.
+
+    If you develop a good example that would be useful to others, I'd
+    be glad to add it to the distribution.
+
+
+TODO LIST
+
+    If you're wondering what will come next in Geo::METAR, see the
+    TODO file.
+

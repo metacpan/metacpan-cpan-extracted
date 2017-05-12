@@ -1,0 +1,3 @@
+GTK_TYPE_HSV	GtkHSV	GtkObject	Gtk2::HSV
+GTK_TYPE_NUMBER_UP_LAYOUT	GtkNumberUpLayout	GEnum	Gtk2::NumberUpLayout
+GTK_TYPE_TOOL_SHELL	GtkToolShell	GInterface	Gtk2::ToolShell

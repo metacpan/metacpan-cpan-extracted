@@ -1,0 +1,27 @@
+Revision history for GD-3DBarGrapher
+
+0.9.6   14 January 2009
+        Restructured script to solve the problem reported here:
+        https://rt.cpan.org/Public/Bug/Display.html?id=42277 and
+        other formatting errors when creating graph within
+        a loop. Many thanks to "lhrabal" for reporting the bug.
+        
+0.9.5   27 March 2008
+        YAML file fix
+        
+0.9.4   26 March 2008
+        Removed gap behind bars/columns
+        Small change to makefile for EU:MM benefit
+        
+0.9.3   07 October 2007
+        Previous version wasn't gzipped inside tarball!!
+
+0.9.2   08 June 2007
+        Fixed permissions problem in tarball!
+        
+0.9.1   17 May 2007
+        Resolved ommission in makefile.PL
+        
+0.9.0   16 May 2007
+        Initial Release
+

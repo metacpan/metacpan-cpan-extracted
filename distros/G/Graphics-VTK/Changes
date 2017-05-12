@@ -1,0 +1,20 @@
+Summary of Changes to Graphics::VTK
+
+See ChangeLog for detailed changes.
+
+
+
+Release 4.0.001:  2/1/2003
+
+ * Updated to be compatible with VTK 4.0
+ 
+ * Moved old VTK 3.2-converted examples into examples/old_examples
+ 
+ * Converted new VTK 4.0 examples and put in subdirs of examples
+ 	(examples/Annotation, examples/DataManipulation, etc)
+   Many of these examples require the VTK test datasets that are
+   available at the VTK website. (vtk.org)
+   
+Release 3.2.001: 9/1/2002
+
+ * Initial Release, compatible with VTK 3.2 only.

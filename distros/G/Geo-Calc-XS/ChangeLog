@@ -1,0 +1,47 @@
+Revision history for Geo::Calc::XS
+
+0.33 Sat Oct 18 22:50:21 EST 2014
+    - Skipping debug test as it's failing on lots of configurations
+
+0.32 Sat Oct 18 22:50:21 EST 2014
+    - Fixed 05_fuzzy_input.t failing test on older perl versions
+
+0.31 Sat Oct 18 21:55:31 EST 2014
+    - Switched from Test::NoWarnings to Test::FailWarnings
+
+0.30 Sat Oct 18 04:51:18 EST 2014
+    - Tests are skipping now if the modules are not found
+    - Removed TEST_REQUIRES
+    - Added threads test
+
+0.29 Thu Oct  16 00:00:00 EST 2014
+    - Thread-safety implemented
+    - Fix bug #97052: Geo::Calc::XS midpoint_to returns different results in
+    debugger
+    - Add MIN_PERL_VERSION and LICENSE to Makefile.PL
+
+0.28 Wed Oct  15 00:00:00 EST 2014
+    - Change in undocumented behaviour: die on invalid parameters
+    - Die cleanly instead of segfaulting on missing parameters
+    - Improve documentation of actual behaviour
+    - Add test to check for memory leaks
+
+0.27 Tue Oct   7 00:00:00 EST 2014
+    - Fix MANIFEST so that are the needed files are in the tarball
+    - Move test dependencies to TEST_REQUIRES
+    - Resolve memory leaks, thanks to Chris Hughes <chris@lokku.com>
+
+0.26  Sat Aug 16 00:00:00 EST 2014
+    - change default units to match documentation and Geo::Calc
+    - add getters
+    - improve POD
+
+0.25  Tue Mar  6 10:50:21 EST 2012
+    - added Test::Deep to dependencies
+
+0.24  Tue Mar  6 03:41:48 EST 2012
+    - fixed documentation
+    - split benchmarks into separate tests
+
+0.23  Tue Mar  6 02:50:53 EST 2012
+    - first public version

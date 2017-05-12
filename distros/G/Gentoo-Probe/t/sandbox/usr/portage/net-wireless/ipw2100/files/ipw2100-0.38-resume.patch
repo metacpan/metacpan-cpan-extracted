@@ -1,0 +1,22 @@
+diff -u -r1.662 -r1.664
+--- ipw2100_main.c	24 Mar 2004 17:47:34 -0000	1.662
++++ ipw2100_main.c	24 Mar 2004 22:42:51 -0000	1.664
+@@ -5616,10 +5616,18 @@
+ {
+ 	struct net_device *dev = pci_get_drvdata(pdev);
+ 	struct ipw2100_priv *priv = dev->priv;
++	u32 val;
+ 	
+ 	pci_set_power_state(pdev, 0);
+ 	pci_restore_state(pdev, priv->pm_state);
+ 	
++        /* Suspend/Resume resets the PCI configuration space, so we have to
++	 * re-disable the RETRY_TIMEOUT register (0x41) to keep 
++	 * PCI Tx retries from interfering with C3 CPU state */
++	pci_read_config_dword(pdev, 0x40, &val); 
++	if ((val & 0x0000ff00) != 0) 
++		pci_write_config_dword(pdev, 0x40, val & 0xffff00ff);
++
+ 	if (netif_running(dev))
+ 		ipw2100_up(priv);
+ 	

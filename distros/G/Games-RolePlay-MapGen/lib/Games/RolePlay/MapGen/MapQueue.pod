@@ -1,0 +1,391 @@
+
+=head1 NAME
+
+Games::RolePlay::MapGen::MapQueue - An object for storing objects by location, on a map, with visi-calc support
+
+=head1 SYNOPSIS
+
+    use Games::RolePlay::MapGen;
+    use Games::RolePlay::MapGen::MapQueue;
+
+    my $map = new Games::RolePlay::MapGen;
+       $map->generate;
+
+    my $queue = new Games::RolePlay::MapGen::MapQueue( $map );
+       $queue->add( $object1 => (1, 2) );
+       $queue->add( $object2 => (5, 3) );
+       # The objects can be any unique identifier or reference (blessed or unblessed).
+
+       $queue->replace( $object3 => (5, 3) );
+       # remove first if it's already on the map somewhere else
+
+       $queue->remove( $object3 ); # just remove it
+
+    my $distance = $map->distance( $object1, $object2 );
+    # the distance from o1 to o2 or undef if the tile is not visible
+
+    my @all = $queue->all_open_locations;
+    my @los = $queue->locations_in_line_of_sight( @dude_position );
+
+=head1 DETAILS
+
+These docs refer to something called the lhs and the rhs from time to time.
+They are short-hand for left-hand-side and right-hand-side.  Where there is a
+source and a destination, or a beginning and an end, the lhs is the start or
+beginning and the rhs is the end.
+
+This module assumes that all tiles are in the appropriate base units (5ft by 5ft
+tiles for d20 game systems) and doesn't even pretend to check their size.  If
+your game uses 5ft by 5ft tiles, it's up to you to make sure the tiles in the
+map passed to this C<MapQueue> module are actually set up correctly.
+
+Additionally, the distances returned by C<distance()>/C<ldistance()> and given
+to C<locations_in_range_and_line_of_sight> are in tile units, ignoring the size
+in feet (or meters or whatever) of the tiles.  If you want the distance in feet
+(or meters), you'll have to multiply and divide it on your own.
+
+=head2 new
+
+C<new()> takes a single argument, which is required: a MapGen map object
+
+=head2 flush
+
+Most of the MapQueue functions are cached with L<Memoize>, C<flush()> clears the
+caches.
+
+=head2 add
+
+Store an object on the map at a specified location.  This function will raise an
+error if the location doesn't make any sense.  To make sense, the location must
+be within the map boundaries and must be an open tile -- either a corridor or a
+room tile.  It will additionally raise an error if the object is already
+elsewhere on the map.
+
+    my $pistol = bless {}, "Sig P229r";
+    $mq->add($pistol, (2,2) );
+    $mq->add( "boring string", (2,3) );
+
+See C<is_open()> below for a function to check whether a location makes sense.
+
+=head2 remove
+
+Remove an object on the map.  It raises an error if the object isn't on the map
+or if the location doesn't make sense (see C<add()>).
+
+    $mq->remove( $pistol );
+    $mq->remove( "boring string" );
+
+=head2 replace
+
+Exactly like C<add()>, except that it removes the pistol iff it's already on the
+map.
+
+    $mq->replace( $pistol, (5,4) );
+    $mq->replace( $pistol, (5,4) );
+    $mq->replace( blagh => (2,3) );
+
+=head2 location
+
+Locates an object in the queue, returning the (x,y) coordinate.  Raises an error
+if the object isn't on the map.
+
+    my @loc = eval { $mq->add($pistol) }; warn "wasn't there" if $@;
+
+=head2 distance
+
+In scalar context, C<distance()> returns the distance from one object to
+another.  It raises errors if the lhs or rhs objects aren't found in the queue.  
+If there is no line of sight from the lhs to the rhs, the function returns a
+scalar undef (even in list context).
+
+    my $dist = $mq->distance( blagh => $pistol );
+
+If C<distance()> is given a third argument that evaluates to true, distance will
+instead return both the distance and a boolean value indicating whether there's
+a line of sight.  (It returns the distance even if there's no line of sight.)
+
+    my ($dist, $los) = $mq->distance( blagh => $pistol, 1 );
+
+=head2 ldistance
+
+Works rather like C<distance()> but takes locations as arguments instead of
+objects.  It raises errors if either of the locations don't make sense (see
+C<add()>).  If there's no line of sight, C<ldistance()> returns a scalar undef
+(even in list context).
+
+    my $dist = $mq->ldistance( (1,1), (2,2) );
+
+If given a fifth argument, C<ldistance> returns C<$dist> and C<$los> like
+C<distance()>.
+
+    my ($dist, $los) = $mq->ldistance( (1,1), (2,2), 1 );
+
+=head2 line_of_sight
+
+Returns a scalar indicating whether there's a line of sight from the lhs object
+to the rhs object.  C<$los> will be one of C<LOS_NO> or C<LOS_YES>, which are
+exported in to the requiring namespace.  They are usable as booleans, so you
+don't have to use the names, and are single scalars in list context.
+
+The C<$los> values returned from distance are of the same type as the C<$los>
+returned here.
+
+    my $los = $mq->line_of_sight( blagh => $pistol );
+    if( $los == LOS_NO ) { # if( $los ) is fine also
+        # blargh
+    }
+
+The function raises errors if the objects aren't found on the map.
+
+=head2 lline_of_sight
+
+Works just like C<line_of_sight> but takes locations as arguments instead of
+objects.  The function raises an error if the locations don't make any sense.
+
+    my $los = $mq->lline_of_sight( (1,1), (2,2) );
+
+=head2 closure_line_of_sight
+
+Determines if there is a line of sight from an object to a closure (a wall,
+door, or opening of a tile).  Presently there are no functions to return
+door objects from the map, but you can get them from the map yourself.
+
+    my $door = $map->[ $y ][ $x ]{od}{ w }; # west door of ($x,$y);
+
+    $mq->add( $some_player_object );
+    $mq->closure_line_of_sight( $some_player_object, $door );
+
+The function raises errors if the C<$door> isn't a door object (or isn't on the
+map) or if the lhs object isn't on the map.
+
+The decision about whether there's a line of sight includes the idea that the
+line of sight doesn't do much good if you can't see most of the door at an angle
+that allows you to examine it...
+
+That minimum angle is a package global that can be changed but defaults to 9
+degrees.  The global is in radians, but can be set like this:
+
+    $Games::RolePlay::MapGen::MapQueue::CLOS_MIN_ANGLE = deg2rad(9);
+
+(C<deg2rad()> comes from L<Math::Trig>.)
+
+=head2 closure_lline_of_sight
+
+Like C<closure_line_of_sight()>, this tells whether there's a line of sight from
+a tile location to a closure.  It takes I<five> arguments:
+
+    $mq->closure_lline_of_sight( ($x,$y), ($x,$y,$d) );
+
+Like the other "l-I<name>" functions, the lhs and rhs are coordinate pairs, but
+unlike the others this function also takes a direction argument (to name the
+closure).  The fifth argument must be one of 'C<n>', 'C<e>', 'C<s>', or 'C<w>'.
+
+Predictably, it raises errors if the locations don't make sense or the direction
+is incorrect or missing.
+
+=head2 objs
+
+Returns all the object so the map as an array.  Each element in the array is
+just the objects as they were placed on the map.
+
+    my @objs = $mq->objs;
+    my ($pistol) = grep {m/P229r/} @objs;
+
+=head2 objs_with_locations
+
+Like C<objs()>, but also returns the locations.  Each element is an array ref,
+whose first element is the location (as an arrayref) and whose second element is
+an arrayref of objects.
+
+    my @objs      = $mq->objs_with_locations;
+    my ($loc, $a) = $objs[0];
+    my ($x,$y)    = @$loc; # the location
+    my @objs_a    = @$a;   # the objects at the location
+
+=head2 objs_at_location
+
+Like C<objs()>, but only returns objects at a specific location C<($x,$y)>.
+
+    my @objs = $mq->objs_at_location($x,$y);
+
+The function raises errors if the location doesn't make sense.
+
+=head2 objs_in_line_of_sight
+
+Like C<objs()>, but only returns objects with a clear line of sight from C<($x,$y)>.
+
+    my @objs = $mq->objs_in_line_of_sight($x,$y);
+
+The function raises errors if the location doesn't make sense.
+
+=head2 all_open_locations
+
+Returns all the locations on the map.
+
+    my @locs = $mq->all_open_locations;
+    my ($x,$y) = @{ $locs[0] };
+
+It will optionally return the array as an arrayref:
+
+    my $locs = $mq->all_open_locations;
+    my ($x,$y) = @{ $locs->[0] };
+
+=head2 random_open_location
+
+Returns a single random open location from the map.
+
+    my ($x,$y) = $mq->random_open_location;
+
+It will optionally return the location as an array:
+
+    my @xy = $mq->random_open_location;
+
+=head2 locations_in_line_of_sight
+
+Returns all open tile locations to which there is a clear line of sight from the
+C<($x,$y)> location argument.  It raises an error if the location doesn't make
+sense.
+
+    my @locations = $mq->locations_in_line_of_sight($x,$y);
+    for my $l (@locations) {
+        local $" = ",";
+        print "I can see (@$l).\n";
+    }
+
+=head2 locations_in_range_and_line_of_sight
+
+Returns all open tile locations to which there is a clear line of sight from the
+C<($x,$y)> location argument that are also within a certain range.  It raises an
+error if the location doesn't make sense or if the range isn't greater than
+C<0>.
+
+    my @locations = $mq->locations_in_range_and_line_of_sight($x,$y);
+
+=head2 locations_in_path
+
+Takes two locations (four scalars) as arguments.  Raises errors if either
+location doesn't make sense or if there isn't a clear light of sight from the
+lhs to the rhs.
+
+Returns the locations of tiles a player would step through to get from the lhs
+to the rhs.  The path is not necessarily optimal.  C<locations_in_path()> uses a
+straight line heuristic with slight corrections for passing through doors and
+the like.  It should be reasonably close to optimal.
+
+The path is meant to be reasonably compatible with d20 game systems, but may
+differ slightly in certain cases.
+
+    my @locations = $mq->locations_in_path( ($src_x,$src_y), ($dst_x,$dst_y) );
+    for my $l (@locations) {
+        local $" = ",";
+        print "Player through to (@$l) on his way to ($dst_x,$dst_y).\n";
+    }
+
+The path is inclusive, meaning, the locations in the path I<include> the
+starting point and the end point.
+
+=head2 melee_cover
+
+Takes two locations (four scalars) as arguments and raises errors if either
+location doesn't make sense.  If one were to draw a line from each corner of the
+lhs tile to each corner of the rhs tile, this function would return true if and
+only if none of the lines intersects a wall closure and false otherwise.
+
+This is meant to be reasonably compatible with d20 game systems.
+
+It returns either C<LOS_COVER>, when there is over or C<LOS_NO_COVER> when
+there isn't.  C<LOS_COVER> evaluates to true and C<LOS_NO_COVER> does not, so
+you can choose not to use these constants.
+
+    my $melee_cover = $mq->melee_cover( @lhs => @rhs );
+    # if( $melee_cover == LOS_COVER ) would also work
+    if( $melee_cover ) {
+        print "That's a tough shot, really.\n";
+    }
+
+Additionally, C<melee_cover()> automatically returns C<LOS_NO_COVER> if the
+tiles are farther apart than one tile in either direction.  That's really more
+of a reach or ranged attack.
+
+=head2 ranged_cover
+
+Takes two locations (four scalars) as arguments and raises errors if either
+location doesn't make sense.  If all four corners of the rhs tile are visible
+from any one corner in the lhs tile, then there is C<LOS_NO_COVER>.
+
+To correct for various weird artifacts because of smallish openings and long
+distances, when all four corners of the rhs are visible from the lhs, that
+corner must also be able to see a tighter box toward the middle of the tile.  I
+doesn't do any good to be able to see the corners of the rhs if you can't see
+the middle!
+
+Lastly, C<LOS_COVER> is upgraded to C<LOS_DOUBLE_COVER> if there is cover (i.e.,
+there is no corner of lhs that can see all four corners of the rhs) and there is
+also cover when considering a tighter line of sight.
+
+This is meant to be reasonably compatible with d20 game systems, but it differs
+quite a bit because computers are willing to do more work than humans and the
+string you're meant to use is only I<virtual> here.
+
+=head2 is_open
+
+Takes a standard C<($x,$y)> pair as arguments.  Returns a boolean indicating
+whether a location is an open tile (true) or a wall tile (false).  This is
+actually the function you can use to see if a location "makes sense" as first
+described in C<add()>.
+
+=head2 is_door
+
+Takes a semi-standard C<($x,$y,$d)> triplet as arguments (where C<$d> is 'C<n>',
+'C<e>', 'C<s>', or 'C<w>').  Returns a boolean indicating whether a closure is a
+door.  Raises an error if the location doesn't make sense.
+
+=head2 is_door_open
+
+Takes a semi-standard C<($x,$y,$d)> triplet as arguments (where C<$d> is 'C<n>',
+'C<e>', 'C<s>', or 'C<w>').  Returns a boolean indicating whether a door is
+closed.  Raises errors if the location doesn't make sense or there isn't a door
+there.
+
+=head2 open_door
+
+Takes a C<($x,$y,$d)> closure triplet as arguments.  Raises errors if the
+location doesn't make sense, there isn't a door, or the door is already open.
+
+=head2 close_door
+
+Takes a C<($x,$y,$d)> closure triplet as arguments.  Raises errors if the
+location doesn't make sense, there isn't a door, or the door is already closed.
+
+=head2 map_range
+
+Returns either the position of the last column of the map (rather like
+C<$#array>) or an array of all the columns on the map (like C<0 .. $#array>).
+
+=head2 map_domain
+
+Returns either the position of the last row of the map (rather like
+C<$#array>) or an array of all the rows on the map (like C<0 .. $#array>).
+
+=head1 AUTHOR
+
+Paul Miller C<jettero@cpan.org>
+
+I am using this software in my own projects...  If you find bugs, please please
+please let me know.
+
+I normally hang out on #perl on freenode, so you can try to get immediate
+gratification there if you like.  L<irc://irc.freenode.net/perl>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008 Paul Miller -- LGPL [Software::License::LGPL_2_1]
+
+    perl -MSoftware::License::LGPL_2_1 \
+         -e '$l = Software::License::LGPL_2_1->new({
+             holder=>"Paul Miller"});
+             print $l->fulltext' | less
+
+=head1 SEE ALSO
+
+perl(1), L<Games::RolePlay::MapGen>

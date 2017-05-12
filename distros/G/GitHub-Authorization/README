@@ -1,0 +1,233 @@
+NAME
+    GitHub::Authorization - Generate a GitHub OAuth2 non-web authorization
+    token
+
+VERSION
+    This document describes version 0.001 of GitHub::Authorization -
+    released March 16, 2013 as part of GitHub-Authorization.
+
+SYNOPSIS
+        use GitHub::Authorization;
+
+        my $token_info = get_gh_token(
+            user     => 'RsrchBoy',
+            password => '*****',
+            scopes   => ['repo'],
+            note     => 'test!',
+        );
+        my $token      = $token_info->{token};
+
+        # e.g.
+        use Net::GitHub;
+        my $gh = Net::GitHub->new(access_token => $token, ...);
+
+        # ... or ...
+        use Pithub;
+        my $ph = Pithub->new(token => $token, ...);
+
+DESCRIPTION
+    There are a number of good packages on the CPAN to handle working with
+    the GitHub API <http://developer.github.com/v3>, but none that provide a
+    (relatively) lightweight, straight-forward way to generate OAuth2
+    tokens.
+
+    This package implements the procedure described in GitHub Developer's
+    Guide "Non-Web Application Flow"
+    <http://developer.github.com/v3/oauth/#non-web-application-flow> to
+    create authorization tokens; that is, authorization tokens that can be
+    stored, managed, reused and revoked without needing to store (or
+    otherwise acquire) a user password.
+
+  Exports
+    We do not export anything by default; Sub::Exporter::Progressive is used
+    here so you can either use plain-old Exporter or fancy-new Sub::Exporter
+    syntax; whatever you desire or require.
+
+  Technologies
+    This package uses and returns OAuth2 authorization tokens, and uses V3
+    of the GitHub API.
+
+  Legal Scopes
+    The formal list of supported scopes can be found at the GitHub OAuth API
+    reference <http://developer.github.com/v3/oauth/#scopes> (note this list
+    is taken almost verbatim from that page). If a scope appears there but
+    not here, please file an issue against this package (as the author has
+    likely not noticed it yet).
+
+    *   (no scopes given)
+
+        public read-only access (includes public user profile info, public
+        repo info, and gists).
+
+    *   user
+
+        Read/write access to profile info only. Note: this scope includes
+        "user:email" and "user:follow".
+
+    *   user:email
+
+        Read access to a user’s email addresses.
+
+    *   user:follow
+
+        Access to follow or unfollow other users.
+
+    *   public_repo
+
+        Read/write access to public repos and organizations.
+
+    *   repo
+
+        Read/write access to public and private repos and organizations.
+
+    *   repo:status
+
+        Read/write access to public and private repository commit statuses.
+        This scope is only necessary to grant other users or services access
+        to private repository commit statuses without granting access to the
+        code. The "repo" and "public_repo" scopes already include access to
+        commit status for private and public repositories respectively.
+
+    *   delete_repo
+
+        Delete access to adminable repositories.
+
+    *   notifications
+
+        Read access to a user’s notifications. repo is accepted too.
+
+    *   gist
+
+        Write access to gists.
+
+FUNCTIONS
+  get_gh_token(user => Str, password => Str, ...)
+    NOTE: Validate your parameters! We do basic validation, but nothing
+    strenuous.
+
+    We take 2 mandatory parameters (user and password), and can take several
+    more optional ones:
+
+   Parameters
+    *   user (required)
+
+        The user-name or email of the user the authorization is being
+        created against.
+
+    *   password (required)
+
+        The user's password.
+
+    *   scopes
+
+        An ArrayRef of scopes (described "Legal Scopes").
+
+    *   note
+
+        A short note (or reminder) describing what the authorization is for.
+
+    *   note_url
+
+        A link that describes why the authorization has been generated We
+        throw an exception on error or failure, and return the structure
+        describing the new authorization token (and the token itself, as
+        described below) on success.
+
+    *   client_id (required if client_secret is given)
+
+        If requesting an authorization for a specific app, pass its client
+        key here.
+
+    *   client_secret (required if client_id is given)
+
+        If requesting an authorization for a specific app, pass its client
+        secret here.
+
+   On success...
+    A successful return from get_gh_token() will look something like this:
+
+        {
+            app => {
+                name => "test! (API)",
+                url  => "http://developer.github.com/v3/oauth/#oauth-authorizations-api",
+            },
+            created_at => "2012-12-24T14:28:17Z",
+            id         => xxxxxxx, # an integer > 0
+            note       => "test!",
+            note_url   => undef,
+            scopes     => ["public_repo"],
+            token      => "****************************************",
+            updated_at => "2012-12-24T14:28:17Z",
+            url        => "https://api.github.com/authorizations/xxxxxxx",
+        }
+
+    The "token" slot is probably the bit you want.
+
+   On failure/error...
+    On failure, we confess() our sins:
+
+        Failed: 401/Unauthorized / Bad credentials ...
+
+    That is, we "confess" in Carp with the status code, status message, and
+    the message returned from GitHub itself.
+
+  legal_scopes
+    Returns a list of legal scope names. (See get_gh_token() doc for the
+    list)
+
+  is_legal_scope('scope_name')
+    Returns true if the scope name given is a legal scope.
+
+MANAGING AUTHORIZATIONS
+    All of a user's GitHub authorization tokens can be viewed and revoked on
+    their GitHub Applications <https://github.com/settings/applications>
+    account page.
+
+    Users may revoke tokens at any time through GitHub proper.
+
+SSL VALIDATION
+    We instruct our user-agent (HTTP::Tiny in this case) to validate the
+    remote server's certificate, as described in "SSL-SUPPORT" in
+    HTTP::Tiny. (Essentially, using Mozilla::CA).
+
+    While this satisfies the "let's be cautious" alarms in the author's
+    head, this may be too paranoid or not paranoid enough for you. If so,
+    please file an issue or pull request and we'll work something out.
+
+LIMITATIONS
+    This package currently has no capabilities for deleting, altering, or
+    otherwise doing anything with tokens outside of creating them.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   The GitHub OAuth API reference
+        <http://developer.github.com/v3/oauth/#create-a-new-authorization>
+
+    *   Net::GitHub
+
+    *   Pithub
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/github-authorization> and may be cloned from
+    <git://github.com/RsrchBoy/github-authorization.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/github-authorization/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

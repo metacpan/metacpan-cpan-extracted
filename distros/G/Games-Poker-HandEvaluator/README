@@ -1,0 +1,54 @@
+NAME
+    Games::Poker::HandEvaluator - Perl extension for blah blah blah
+
+SYNOPSIS
+       use Games::Poker::HandEvaluator qw(handval evaluate);
+       use Games::Cards;
+       my $Poker = new Games::Cards::Game;
+       my $Deck = new Games::Cards::Deck ($Poker, "Deck");
+       $Deck->shuffle;
+
+       # Deal out the hands
+       my $hand = Games::Cards::Hand->new($Poker, "Hand") ;
+       $Deck->give_cards($hand, 7);
+
+       print $hand->print("short"), "\n";
+       # Hand:  JC   7C   8C   JH   3C   7S   5C  
+
+       print handval(evaluate($hand)), "\n";
+       # Flush (J 8 7 5 3)
+
+    Or just:
+
+       my $hand_a = evaluate("Jc 7c 8c Jh 3c 7s 5c");
+       my $hand_b = evaluate("9d 5d Ks 7h 5s 7s 4c");
+       if ($hand_a > $hand_b) {
+          print handval($hand_a), " beats ", handval($hand_b);
+          # Flush (J 8 7 5 3) beats TwoPair (7 5 K)
+       }
+    
+DESCRIPTION
+    This is an XS wrapper around the "libpoker" library, found at
+    <http://www.pokersource.org/>.
+
+    It provides two functions, which are not exported by default, "evaluate"
+    and "handval". "evaluate" turns a hand, as described either by a
+    "Games::Card::CardSet" object or a simple string, into an integer
+    representing the best poker play for that hand. If the hand cannot be
+    parsed, 0 is returned. This integer value can be compared with other
+    hand evaluations; the higher the integer, the better the hand.
+
+    "handval" turns that value into a short textual description.
+
+SEE ALSO
+    http://www.pokersource.org/
+
+AUTHOR
+    Simon Cozens, <simon@kasei.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Simon Cozens
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

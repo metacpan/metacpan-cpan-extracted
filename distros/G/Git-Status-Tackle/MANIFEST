@@ -1,0 +1,16 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+bin/git-status-tackle
+dist.ini
+lib/Git/Status/Tackle.pm
+lib/Git/Status/Tackle/CompletedFeatureBranches.pm
+lib/Git/Status/Tackle/IndexChanges.pm
+lib/Git/Status/Tackle/Plugin.pm
+lib/Git/Status/Tackle/UnmergedFeatureBranches.pm
+lib/Git/Status/Tackle/UnpushedBranches.pm
+lib/Git/Status/Tackle/UntrackedFiles.pm
+lib/Git/Status/Tackle/WorkingTreeChanges.pm

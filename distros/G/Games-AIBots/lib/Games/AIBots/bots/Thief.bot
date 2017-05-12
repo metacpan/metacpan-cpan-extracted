@@ -1,0 +1,137 @@
+$name   = 'Thief';
+$author = 'Autrijus Tang';
+$team   = 'Dark Ally';
+
+require '[DarkAlly].bm';
+
+main: {
+    enable shield;
+    goto dock;
+}
+
+dock: {
+    $flag = 0;
+    goto dock_x if abs($delta_x = $enemy_x - $x) < 2; # + (&nearst('enemy') <= 5);
+    goto dock_y if abs($delta_y = $enemy_y - $y) < 2; # + (&nearst('enemy') <= 5);
+    goto guard if not &onnode and $snode_x and (abs($enemy_x - $snode_x) >= 2 and abs($enemy_y - $snode_y) >= 2);
+    goto heal;
+}
+
+guard: {
+    scan perimeter;
+    fire energy if &found('mine');
+    if (&found('enemy')) {
+        fire energy;
+        redo;
+    }
+    call search if &found('vault|flag') and &nearst('enemy') > 3;
+
+    if (abs($enemy_x - $snode_x) >= 2 and abs($enemy_y - $snode_y) >= 2) {
+        goto dock if abs($enemy_x - $x) < 2 or abs($enemy_y - $y) < 2;
+        goto go_x if abs($snode_x - $x) > abs($snode_y - $y) - ($h eq '4' or $h eq '6');
+        goto go_y;
+    }
+
+    goto dock;
+}
+
+drain: {
+    if ($enemy_x == $ex and $enemy_y == $ey and $enemy_h == $eh and $enemy_l == $el) {
+        if ($ec >= 50) {
+            goto hunt_x unless $enemy_x == $x;
+            goto hunt_y;
+        }
+        $ec++;
+    }
+    else {
+        $ex = $enemy_x;
+        $ey = $enemy_y;
+        $eh = $enemy_h;
+        $el = $enemy_l;
+        $ec = 0;
+    }
+
+    scan perimeter;
+    call search if &found('vault|flag') and &nearst('enemy') > 3;
+    fire energy if &found('mine');
+    fire energy if &found('enemy');
+    goto dock;
+}
+
+backstab: {
+    $el = $enemy_l;
+    disable shield;
+    fire laser;
+    redo if $enemy_l < $el;
+    fire energy unless &damaged;
+    move forward;
+    move forward;
+    goto drain;
+}
+
+hunt_x: {
+    goto drain unless $enemy_x == $ex and $enemy_y == $ey and $enemy_h == $eh and $enemy_l == $el;
+
+    scan relative 8;
+    fire energy if &found('mine');
+    if (&found('flag') and not &damaged) {
+        move backward;
+        fire energy;
+        move forward;
+    }
+    if (&found('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+    }
+
+    goto dock if &found('enemy');
+    goto dock if &damaged and &onnode;
+    goto hunt_y unless $delta_x = $enemy_x - $x  # - ($enemy_h eq '6' ? 2 : $enemy_h eq '4' ? -2 : 0);;
+
+    $turn = &turnto(($delta_x < 0) ? '4' : '6');
+    turn $turn if $turn;
+    goto backstab if &nearst('enemy') < 3;
+    move forward;
+    if (&bumped) {
+        move backward;
+        goto hunt_y;
+    }
+    redo;
+}
+
+hunt_y: {
+    goto drain unless $enemy_x == $ex and $enemy_y == $ey and $enemy_h == $eh and $enemy_l == $el;
+
+    scan relative 8;
+    fire energy if &found('mine');
+    if (&found('flag') and not &damaged) {
+        move backward;
+        fire energy;
+        move forward;
+    }
+    if (&found('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+    }
+
+    goto dock if &found('enemy');
+    goto dock if &damaged and &onnode;
+    goto hunt_x unless $delta_y = $enemy_y - $y # - ($enemy_h eq '2' ? 2 : $enemy_h eq '8' ? -2 : 0);
+
+    $turn = &turnto(($delta_y < 0) ? '8' : '2');
+    turn $turn if $turn;
+    goto backstab if &nearst('enemy') < 3;
+    move forward;
+    if (&bumped) {
+        move backward;
+        goto hunt_x;
+    }
+    redo;
+}
+
+sub quarterstaff {
+    fire energy if $life > 1;
+    return;
+}

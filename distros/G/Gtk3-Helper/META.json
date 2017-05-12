@@ -1,0 +1,48 @@
+{
+   "abstract" : "Convenience functions for the Gtk3 module",
+   "author" : [
+      "Thierry Vignaud <tvignaud@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk3-Helper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Gtk3" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/potyl/perl-Gtk3-Helper",
+      "repository" : {
+         "url" : "https://github.com/potyl/perl-Gtk3-Helper"
+      },
+      "x_Bucktracker" : "https://github.com/potyl/perl-Gtk3-Helper/issues"
+   },
+   "version" : "0.02"
+}

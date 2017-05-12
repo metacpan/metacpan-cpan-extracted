@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/Geo/Google/PolylineEncoder.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_basic.t
+t/90_benchmark.pl
+t/data/20061228.gpx
+t/data/BritishShoreline.csv
+t/data/MtMitchell.csv
+t/encoding_bugs.t
+t/js_reference/polyline.js
+t/js_reference/test.html
+t/mt_mitchell_csv.t
+t/small_gpx_file.t
+META.json

@@ -1,0 +1,10 @@
+--- farm9crypt.cc.orig	2004-05-13 01:16:03.393590404 +0000
++++ farm9crypt.cc	2004-05-13 01:16:13.903000361 +0000
+@@ -26,6 +26,7 @@
+ //#include <sys/socket.h>		/* basics, SO_ and AF_ defs, sockaddr, ... */
+ #include <unistd.h>
+ #include <stdlib.h>	
++#include <string.h>
+ #else
+ #include <fcntl.h>
+ #include <io.h>

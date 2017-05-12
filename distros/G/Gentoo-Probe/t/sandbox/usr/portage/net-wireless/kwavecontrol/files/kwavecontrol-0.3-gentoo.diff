@@ -1,0 +1,71 @@
+--- kwavecontrol/wcard.cpp	2003-02-06 22:25:46.000000000 +0000
++++ kwavecontrol/wcard.cpp	2003-02-09 18:42:59.000000000 +0000
+@@ -35,7 +35,9 @@
+   device = (char*)malloc(20);
+ 
+   strcpy(device, dev);
+-  
++
++  range = 0L;
++  stats = 0L;
+   stats = (iwstat*)malloc(sizeof(iwstat));
+   range = (iwrange*)malloc(sizeof(iwrange));
+ 
+@@ -74,7 +76,8 @@
+   if(ioctl(ethFD , SIOCGIWSTATS, &wrq) < 0)
+     return -1;
+ 
+-  int q = (int)stats->qual.qual;
++  int q = 0;
++  q = (int)stats->qual.qual;
+   int s = (int)stats->qual.level;
+   int n = (int)stats->qual.noise;
+ 
+@@ -86,9 +89,10 @@
+   int maxS = (int)range->max_qual.level;
+   int maxN = (int)range->max_qual.noise;
+ 
+-  int avgQ = (int)range->avg_qual.qual;
++  int avgQ = 0;
++  avgQ = (int)range->avg_qual.qual;
+   
+-  float zw;
++  float zw=0.0F;
+ 
+   zw = 100*((float)q / (float)maxQ);
+   link   = (int)zw;
+--- kwavecontrol/wwidget.cpp	2003-02-06 22:20:35.000000000 +0000
++++ kwavecontrol/wwidget.cpp	2003-02-09 18:07:34.000000000 +0000
+@@ -194,10 +194,10 @@
+ 	{
+ 		if(card->isWave())
+ 		{
+-	    int numFreq;
+-  	  double freq;
+-    	int numChannel;
+-	    int channel;
++	    int numFreq=0;
++  	  double freq=0;
++    	int numChannel=0;
++	    int channel=0;
+     	if( card->getChannel(numFreq, freq, eh, numChannel, channel) < 0 )
+ 	    {
+   	    frequencyLabel->setValue(i18n ("error"));
+@@ -226,7 +226,7 @@
+ {
+ 	if(card->isWave())
+ 	{
+-		int index;
++		int index=0;
+     card->getBitRate(bitRates, index);
+     bitrateSelection->clear();
+     for( int i=0; i < bitRates->num; i++)
+@@ -235,7 +235,7 @@
+     }
+     bitrateSelection->setCurrentItem(index);
+ 
+-    int sens, sensRange;
++    int sens=0; int sensRange=0;
+     card->getSensitivity(sens, sensRange);
+ 
+     sensitivitySelection->clear();

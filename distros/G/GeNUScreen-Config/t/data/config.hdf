@@ -1,0 +1,764 @@
+config {
+  general {
+    hostname = genuscreen.example.com
+    webenable = 1
+    webunrestricted = 1
+    webusername = admin
+    webuserpasswd = $2a$08$11hWhQBZGaNfvbtgMlt/oevaIKl4hgLLq2UhIeL7tM5lz5kq1YLgW
+    defaultgw = 
+    webcert << EOM
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAvGuLdput1iMOZjKvoBmpsRREJ/WxAir4BfYueTkazDI/dqu8
+YzE2qgW5b6mlm/6Qlq9D0t/am2WUlNBWZ0wOj40tc87j96vZXA6uC20NKDKyrzbv
+NbOx/fTYPklFqbCTy/PR8Rb7bz0MAqv+bLehFo8CaIKI/8DvXM6zjBwzSiCVN1uW
+Byz8RFc8pMDImnHUxPpherxQF5B5t+7acFD2KRT3n2I8K0YBIFPKGc4KQxUJQEP8
+EV5nrRpy/SGqPGsUJbbUpDOlrVHS8JUwvCQ6OZUCxPrTpY2rcBz5eoIXhjR56Brk
+g3sUj0sZLrpciOIFKBO9oJGxX4/WRrKJZdzHFQIDAQABAoIBAHOnQ5SLHFn7bKQ4
+amrINcuW1/r7KSpee50VLhOEhLlgAmpyIZF1LMuR9e/fXuLwj4mejPAMLaAC6v+p
+HdAL9EgS7RpPnMhyeFm0PQqQZmoNLHa2LoB1C0UJnA4nZZYx55Zh07S7WZw/CXc+
+YU4ULNGu+Fhz/2mU4JfD3Juc17KgXa8q0LiFXOUMhk9xDf7QO+oeYTE5iuxUBukc
+B+OZIXmu582Ii8IiLveVsRO252ePymod6FlXvro9bTjhUX9CRrInydf6rPi2uEAW
+Bpn/WFjnmwtk6peGnF6mMPXF46xcJmQcpyXJoAdfgH3wU5ShdSjHZpfUr+En7tMO
+FObxEEECgYEA3z78xKnT9bkDI/6ePCpbJ19L8OP4Dnk/P+68w0wWSX46zkZA5Z1w
+cLHvfesmTTXeMd2vkpqi1DKIFiYsZbGpIzlghk3w1HZ6hgOy9n4hSPQA0MivN7xk
+YmQVnQwCK9Ct2BcNHO66JDcPNU+ZMdCuA/DbxcpKHrKy5DYLdbNFnzECgYEA2BCD
+BC2ZV7tpTgkq22baZn0RGn6URY1YWgzJb7KE6KKttOlnVSZQM7Rbx0ueDUjWEn/y
+b3aeGR7XelWW7vg0gqqIDxGVw7Hh4KOBoC9mfZMkaFbnk0DKacf55cb4rDCHOBq9
+sD+OMCLh0qrOjdF3r53QSQuLI+GJw2r4MPip1SUCgYEApGE8vZJPAB+6sEZLPQHz
+HIqO4FD71axxZiHj2+mqf3Ly2e/g2TGUGWbrcUw0Z6XCdfVF0i0KuDR8/9Ib3sVy
+RP16lWnOaqLSlNska1t0JsOD1jfuzJtrTwdi4sB02M5PM03F2gfuB7yC9j4mDwgZ
+Gc3ABWNuMCxkjKU+yuu12AECgYEAhbCZ0LECS9Wrj9x+Ryl6A6ZpOdKOngaaX4W/
+8jwsnuFhyCoPhRFi2MtFaqhwUFn8E5BViwCDTJnXzFs/O/gaTauE6oX//AmJ8Pxa
+zanmqdas1V7IhUW2uQNCrhmSbsDMOjvZmT+KFGDRCBAmJHwyqVhls3zQCFCadG8w
+yORj+X0CgYB7PFJNPtSMKRe+ZVxds4MpDsqnDuRhTfw6sPQn2jCpYpRWDGIGQR3c
+qHlUVx8hYtSr5lDJX0XTMLMhJ076clSFKq6tWx4G9W6wm8IGXVQNpkJJqJkMBPt3
+LfNYwG6/wH1cw+2Zh9g5bmslmZR8YAgzHE/vi+Dllg1oHvptVnM9yA==
+-----END RSA PRIVATE KEY-----
+-----BEGIN CERTIFICATE-----
+MIIC2jCCAcKgAwIBAgIJAOHH0dO3rS4KMA0GCSqGSIb3DQEBBAUAMCExHzAdBgNV
+BAMTFmdlbnVzY3JlZW4uZXhhbXBsZS5jb20wHhcNMDkwMjIwMTkwMTAwWhcNMjgx
+MTA3MTkwMTAwWjAhMR8wHQYDVQQDExZnZW51c2NyZWVuLmV4YW1wbGUuY29tMIIB
+IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvGuLdput1iMOZjKvoBmpsRRE
+J/WxAir4BfYueTkazDI/dqu8YzE2qgW5b6mlm/6Qlq9D0t/am2WUlNBWZ0wOj40t
+c87j96vZXA6uC20NKDKyrzbvNbOx/fTYPklFqbCTy/PR8Rb7bz0MAqv+bLehFo8C
+aIKI/8DvXM6zjBwzSiCVN1uWByz8RFc8pMDImnHUxPpherxQF5B5t+7acFD2KRT3
+n2I8K0YBIFPKGc4KQxUJQEP8EV5nrRpy/SGqPGsUJbbUpDOlrVHS8JUwvCQ6OZUC
+xPrTpY2rcBz5eoIXhjR56Brkg3sUj0sZLrpciOIFKBO9oJGxX4/WRrKJZdzHFQID
+AQABoxUwEzARBglghkgBhvhCAQEEBAMCBkAwDQYJKoZIhvcNAQEEBQADggEBAEGM
+yH5mZjZODcr3U70BfsDfVvlnsXDS8D8zIcz7/960oxBkTE+ZHfHnil0Hmzw2FEzN
+lncVgUuyedRdvrLG2sxOPS9qvWbkM7V8eM7kQLrQY/NmKrre8UtSUngdXDZeaPqm
+pxzVAsPVyVkwxNak3bPF70FGqhcUCJMxrMhILEE0ICF2HSUZk79iT8j/FIUQ6ZPM
+MBIeYzvGOc9V7r5LX77i1jOc6zn0zOjuztrGZB3gRz35scPRtCHdFL7emjk9uMQA
+ZLyTulqGpAnfYxUNGaJyuM/kigDBhWoaIuoqu3soMid4SmhRZgP6Fvl7k4uC3sTR
+a3+jdlJOc5FbNODUCD4=
+-----END CERTIFICATE-----
+EOM
+  }
+  addresses {
+    0 {
+      interface = 0
+      addr = 192.168.1.55
+      addr {
+        prefixlen = 24
+      }
+    }
+  }
+  pfservice {
+    30 {
+      name = CIFS
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 445
+          }
+        }
+      }
+      desc = Common Internet File System
+    }
+    28 {
+      name = Citrix (ICA)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 1494
+            1 = 2598
+          }
+        }
+      }
+      desc = Citrix Independent Computing Architecture
+    }
+    12 {
+      name = DHCP
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 67
+            1 = 68
+          }
+        }
+      }
+      desc = Dynamic Host Configuration Protocol
+    }
+    9 {
+      name = DNS
+      subtype = tcpudp
+      subtype {
+        tcpudp {
+          dport {
+            0 = 53
+          }
+        }
+      }
+      desc = Domain Name System
+    }
+    31 {
+      name = Email
+      subtype = group
+      subtype {
+        group {
+          services {
+            0 = 2
+            1 = 3
+            2 = 4
+            3 = 5
+          }
+        }
+      }
+      desc = Send and receive emails
+    }
+    55 {
+      name = FTP (proxy)
+      subtype = ftp
+      subtype {
+        ftp {
+          port {
+            0 = 21
+          }
+        }
+      }
+      desc = File transfer protocol (proxy service)
+    }
+    33 {
+      name = GRE
+      subtype = ip
+      subtype {
+        ip {
+          proto = 47
+        }
+      }
+      desc = General Routing Encapsulation
+    }
+    32 {
+      name = HTTP proxy/cache
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 8080
+            1 = 3128
+          }
+        }
+      }
+      desc = HTTP proxy and cache (squid)
+    }
+    13 {
+      name = HTTP(S)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 80
+            1 = 443
+          }
+        }
+      }
+      desc = HTTP, HTTPS
+    }
+    18 {
+      name = Ident (auth)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 113
+          }
+        }
+      }
+      desc = Authentication ident
+    }
+    35 {
+      name = IGMP
+      subtype = ip
+      subtype {
+        ip {
+          proto = 2
+        }
+      }
+      desc = Internet Group Management
+    }
+    5 {
+      name = IMAP(s)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 143
+            1 = 993
+          }
+        }
+      }
+      desc = Internet Message Access,  over SSL
+    }
+    46 {
+      name = IPsec
+      subtype = group
+      subtype {
+        group {
+          services {
+            0 = 24
+            1 = 37
+            2 = 38
+            3 = 39
+          }
+        }
+      }
+      desc = IPsec protocols
+    }
+    38 {
+      name = IPsec AH
+      subtype = ip
+      subtype {
+        ip {
+          proto = 51
+        }
+      }
+      desc = Authentication Header
+    }
+    37 {
+      name = IPsec ESP
+      subtype = ip
+      subtype {
+        ip {
+          proto = 50
+        }
+      }
+      desc = Encap Security Payload
+    }
+    24 {
+      name = IPsec ISAKMP (IKE)
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 500
+          }
+        }
+      }
+      desc = ISAKMP key management
+    }
+    39 {
+      name = IPsec NAT-T
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 4500
+          }
+        }
+      }
+      desc = IPsec NAT-Traversal
+    }
+    14 {
+      name = Kerberos
+      subtype = tcpudp
+      subtype {
+        tcpudp {
+          dport {
+            0 = 88
+          }
+        }
+      }
+      desc = Kerberos authentication
+    }
+    42 {
+      name = L2TP
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 1701
+          }
+        }
+      }
+      desc = Layer 2 Tunneling Protocol
+    }
+    23 {
+      name = LDAP(S)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 389
+            1 = 636
+          }
+        }
+      }
+      desc = Lightweight Directory Access, over SSL
+    }
+    41 {
+      name = LDP (printer)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 515
+          }
+        }
+      }
+      desc = Network print service
+    }
+    45 {
+      name = NetBIOS
+      subtype = group
+      subtype {
+        group {
+          services {
+            0 = 58
+            1 = 59
+            2 = 60
+            3 = 61
+          }
+        }
+      }
+      desc = Network Basic Input Output System
+    }
+    60 {
+      name = NetBIOS DGM
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 138
+          }
+        }
+      }
+      desc = NetBIOS Datagram Service
+    }
+    59 {
+      name = NetBIOS LS
+      subtype = tcpudp
+      subtype {
+        tcpudp {
+          dport {
+            0 = 135
+          }
+        }
+      }
+      desc = NetBIOS Location Service
+    }
+    58 {
+      name = NetBIOS NS
+      subtype = tcpudp
+      subtype {
+        tcpudp {
+          dport {
+            0 = 137
+          }
+        }
+      }
+      desc = NetBIOS Name Service
+    }
+    61 {
+      name = NetBIOS SSN
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 139
+          }
+        }
+      }
+      desc = NetBIOS Session Service
+    }
+    19 {
+      name = NNTP(S)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 119
+            1 = 563
+          }
+        }
+      }
+      desc = USENET News Transfer Protocol, over SSL
+    }
+    27 {
+      name = Notes RPC
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 1352
+          }
+        }
+      }
+      desc = Lotus Notes RPC
+    }
+    20 {
+      name = NTP
+      subtype = tcpudp
+      subtype {
+        tcpudp {
+          dport {
+            0 = 123
+          }
+        }
+      }
+      desc = Network Time Protocol
+    }
+    47 {
+      name = Oracle SQL
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 1525
+            1 = 1521
+          }
+        }
+      }
+      desc = Oracle Database SQL
+    }
+    34 {
+      name = OSPF
+      subtype = ip
+      subtype {
+        ip {
+          proto = 89
+        }
+      }
+      desc = Open Shortest Path First IGP
+    }
+    36 {
+      name = PIM
+      subtype = ip
+      subtype {
+        ip {
+          proto = 103
+        }
+      }
+      desc = Protocol Independent Multicast
+    }
+    48 {
+      name = PING
+      subtype = icmp
+      subtype {
+        icmp {
+          type = 8
+          code = 0
+        }
+      }
+      desc = ICMP echo request (ping)
+    }
+    4 {
+      name = POP3(s)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 110
+            1 = 995
+          }
+        }
+      }
+      desc = Post Office Protocol Version 3
+    }
+    49 {
+      name = PostgreSQL
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 5432
+          }
+        }
+      }
+      desc = PostgreSQL Database
+    }
+    50 {
+      name = PPTP
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 1723
+          }
+        }
+      }
+      desc = Point-to-Point Tunneling Protocol
+    }
+    29 {
+      name = RADIUS
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 1812
+            1 = 1813
+          }
+        }
+      }
+      desc = RADIUS authentication, accounting
+    }
+    40 {
+      name = RDP (remote desktop)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 3389
+          }
+        }
+      }
+      desc = Microsoft Remote Deskto
+    }
+    51 {
+      name = RTSP (TCP)
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 554
+          }
+        }
+      }
+      desc = Real Time Stream Control Protocol
+    }
+    56 {
+      name = SIP (proxy)
+      subtype = sip
+      subtype {
+        sip {
+          port {
+            0 = 5060
+          }
+        }
+      }
+      desc = Session Initiation Protocol (proxy service)
+    }
+    52 {
+      name = SIP (TCP), SIP+SSL
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 5060
+            1 = 5061
+          }
+        }
+      }
+      desc = Session Initiation Protocol
+    }
+    3 {
+      name = SMTP submission
+      subtype = tcp
+      subtype {
+        ip {
+          proto = 103
+        }
+        tcp {
+          dport {
+            1 = 587
+          }
+        }
+      }
+      desc = Message Submission for Mail (RFC 4409)
+    }
+    2 {
+      name = SMTP(S)
+      subtype = tcp
+      subtype {
+        ip {
+          proto = 89
+        }
+        tcp {
+          dport {
+            0 = 25
+            1 = 465
+          }
+        }
+      }
+      desc = Simple Mail Transfer Protocol
+    }
+    22 {
+      name = SNMP, SNMPTRAP
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 161
+            1 = 162
+          }
+        }
+      }
+      desc = Simple Network Management Protocol
+    }
+    26 {
+      name = SOCKS
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 1080
+          }
+        }
+      }
+      desc = SOCKS
+    }
+    0 {
+      name = SSH
+      subtype = tcp
+      subtype {
+        ip {
+          proto = 2
+        }
+        tcp {
+          dport {
+            0 = 22
+          }
+        }
+      }
+      desc = Secure Shell (SSH)
+    }
+    17 {
+      name = SunRPC
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 111
+          }
+        }
+      }
+      desc = SunRPC
+    }
+    25 {
+      name = Syslog
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 514
+          }
+        }
+      }
+      desc = Syslog network protocol
+    }
+    6 {
+      name = TACACS
+      subtype = tcpudp
+      subtype {
+        tcpudp {
+          dport {
+            0 = 49
+          }
+        }
+      }
+      desc = Terminal Access Controller Access Control System
+    }
+    1 {
+      name = TELNET
+      subtype = tcp
+      subtype {
+        ip {
+          proto = 47
+        }
+        tcp {
+          dport {
+            0 = 23
+          }
+        }
+      }
+      desc = Terminal Emulation Protocol
+    }
+    57 {
+      name = Traceroute (UDP)
+      subtype = udp
+      subtype {
+        udp {
+          dport {
+            0 = 33000:34000
+          }
+        }
+      }
+    }
+    54 {
+      name = VNC
+      subtype = tcp
+      subtype {
+        tcp {
+          dport {
+            0 = 5900
+          }
+        }
+      }
+      desc = VNC remote desktop
+    }
+  }
+  interfaces {
+    0 {
+      name = vr0
+      subtype = physical
+    }
+    1 {
+      name = vr1
+      subtype = physical
+    }
+    2 {
+      name = vr2
+      subtype = physical
+    }
+    3 {
+      name = vr3
+      subtype = physical
+    }
+  }
+  version = 7
+  licenses {
+    license = 12345-GS-ABCD-EF67-G8HI-JKLM
+  }
+  ssh {
+    enable = 1
+    hostkey << EOM
+-----BEGIN RSA PRIVATE KEY-----
+MIICWwIBAAKBgQDVf1+20ERaxwCI0hJrzeTXk7LxDtYi6KC5756zczsVP6JLU3Fh
+Tiqd7coUds9SBSgMCYsTFQJSbPE8bGx9Pw8OrX0FgrD+G1u/kHJ1yc9Ily/CMWLb
+nGb9PCRCXJLfyWb5Lkk/t1KCzvBKQUfVVo2yn/6aMy3KrwOGd2Rc3CzOJwIBIwKB
+gDDMqCnJNDIBmbjfjy6VdiKlarrBkAf6qGUDkf0hpxrMt2GsrDN/lLZiPNF6PgQe
+b425Cdh51KUgNyPBAtrMlbnLFR9VgSB+YklMW5xtp8rBnhq0wigAsded1x87j+7C
+il4w/VETweXq10aZNuc93LkkQ/OjeUwqdQRY0Flf42QLAkEA/NDr+9tlWlVehE1s
+Zc+/C6rUbM5iA1vkcrpAx6JkqXhbmdDQTliYSZaO/4QvtOS03qiuae27335pNcE6
+ovvYaQJBANgvsHDAqpgYYF4UPQRBcnxxOO3DCpYBCXbc2PBaxozRQX4kLLKJnKHr
+5mNzcfMDU8Ksod4NYZXFKj0TmzWuIA8CQQCJPjb2b8lOS5m1iR2WWtVsu9Jm87GM
+y3wDxDHLdWnYV0erRXhlC4XezhMc/p2OFcFFrAbpDAbnChvbWkRnGwBzAkBvLnf/
+eQdG5/cLz+TdngBdQYr970dF1KXIGc6nfyRIa54GW783P3UgEuuDmnUd5HQ4O4Zy
+MsR46Q5ojb2JUjxfAkEAukR/JGBJHbYxXt6yO6zsZbLYr8GFyQaC/K+XFUVxCyAm
++/qeAmMNw3/Oxm+FOgfpJpFHShp5cv0hqL+9eyfpZA==
+-----END RSA PRIVATE KEY-----
+EOM
+    port = 
+    addr = 0
+    unrestricted = 1
+    acl {
+      0 = 
+      0 {
+        negate = 
+        prefixlen = 24
+      }
+    }
+  }
+}

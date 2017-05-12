@@ -1,0 +1,29 @@
+---
+abstract: 'simple and fast gzip and gunzip'
+author:
+  - 'Ben Bullock <bkb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gzip-Faster
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/benkasminbullock/gzip-faster/issues
+  repository: git://github.com/benkasminbullock/gzip-faster.git
+version: '0.19'
+x_contributors:
+  - 'Aristotle Pagaltzis <aristotle@cpan.org>'
+  - 'zgrim <zgrim@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

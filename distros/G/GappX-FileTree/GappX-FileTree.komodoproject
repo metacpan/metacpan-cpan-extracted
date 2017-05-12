@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="85b695bb-7287-41d5-af44-4fe643d43efe" kpf_version="5" name="GappX-FileTree.komodoproject">
+<preference-set idref="85b695bb-7287-41d5-af44-4fe643d43efe">
+  <string id="perlDefaultInterpreter"></string>
+  <string relative="path" id="perlExtraPaths">lib</string>
+</preference-set>
+</project>

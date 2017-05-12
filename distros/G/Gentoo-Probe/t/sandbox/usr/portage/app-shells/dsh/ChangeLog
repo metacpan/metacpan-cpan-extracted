@@ -1,0 +1,28 @@
+# ChangeLog for app-shells/dsh
+# Copyright 2002-2003 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/dsh/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+*dsh-0.25.0 (02 Oct 2003)
+
+  02 Oct 2003; Mike Frysinger <vapier@gentoo.org> :
+  Version bump.
+
+*dsh-0.24.0 (13 Aug 2003)
+
+  13 Aug 2003; Mike Frysinger <vapier@gentoo.org> :
+  Version bump #26254.
+
+*dsh-0.23.4-r2 (11 Aug 2003)
+
+  11 Aug 2003; Mike Frysinger <vapier@gentoo.org> :
+  Move configuration dir from /etc/ to /etc/dsh/ #26254
+
+*dsh-0.23.4-r1 (20 Mar 2003)
+
+  20 Mar 2003; Graham Forest <vladimir@gentoo.org> dsh-0.23.4-r1.ebuild:
+  Removed usage of pic USE flag
+
+*dsh-0.23.4 (23 Nov 2002)
+
+  23 Nov 2002; Mike Frysinger <vapier@gentoo.org> :
+  Initial import.  Ebuild submitted by Enrico Morelli <morelli@cerm.unifi.it>.

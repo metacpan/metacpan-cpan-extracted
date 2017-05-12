@@ -1,0 +1,38 @@
+---
+abstract: 'Construct and read/write Git mailmap file.'
+author:
+  - "'Mikko Koivunalho <mikko.koivunalho@iki.fi>'"
+build_requires:
+  Test::Most: '0'
+  perl: '5.010000'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010000'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Mailmap
+provides:
+  Git::Mailmap:
+    file: lib/Git/Mailmap.pm
+    version: '0.004'
+requires:
+  Carp: '0'
+  Carp::Assert: '0'
+  Carp::Assert::More: '0'
+  Hash::Util: '0.06'
+  Log::Any: '0'
+  Params::Validate: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  perl: '5.010000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Mailmap
+  homepage: https://metacpan.org/release/Git-Mailmap
+  repository: https://github.com/mikkoi/git-mailmap.git
+version: '0.004'

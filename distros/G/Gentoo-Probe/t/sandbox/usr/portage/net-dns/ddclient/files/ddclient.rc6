@@ -1,0 +1,30 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/ddclient/files/ddclient.rc6,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+depend() {
+	need net
+}
+
+checkconfig() {
+	if [ ! -e /etc/ddclient/ddclient.conf ] ; then
+		eerror "You need a /etc/ddclient/ddclient.conf file to run ddclient"
+		eerror "There is a sample file in /etc/ddclient/"
+		return 1
+	fi
+
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting DDClient"
+	start-stop-daemon --start --quiet --exec /usr/sbin/ddclient
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping DDClient"
+	start-stop-daemon --stop --quiet --pidfile /var/run/ddclient.pid
+	eend $?
+}

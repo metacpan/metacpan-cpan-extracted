@@ -1,0 +1,105 @@
+
+=head1 NAME
+
+Git::SVNReplay - replay git commits into a throwaway svn repo
+
+=head1 SYNOPSIS
+
+    Git::SVNReplay->new( git_repo =>
+        'git://github.com/jettero/git-svn-replay.git')
+
+        ->setup_git_in_svnco
+            ->run;
+
+=head1 DESCRIPTION
+
+Normally you would just invoke L<git-svn-replay>, although, this module happens
+to contain most of the code for the command.  As a consequence, this pod is
+mainly a list of functions.
+
+=head2 new
+
+All the defaults this function uses are available in
+C<$Git::SVNReplay::DEFAULTS> should you wish to adulterate them.  The options
+the function understands are as follows:
+
+=over
+
+=item C<< db_file => "replay.rdb" >>
+
+The location of the replay database (L<DBM::Deep>).
+
+=item C<< patch_format => '%s [%h]%n%n%b%n%aN <%aE>%n%ai%n%H' >>
+
+The format of the message (C<.msg>) fed to svn during a commit.
+
+=item C<< src_branch => "master" >>
+
+The name of the branch you wish to pull from C<git_repo>.
+
+=item C<< mirror_branch => "mirror" >>
+
+The name of the local branch you wish to use, default is C<mirror> rather than
+C<master>.
+
+=item C<< git_repo => "g.repo" >>
+
+The location of the git repo you wish to pull from.  By default, it assumes
+you're super paranoid and cloned the repo you wish to pull from into a local
+directory: C<g.repo> (probably not necessary).
+
+=item C<< svn_repo => "s.repo" >>
+
+The location of the svn repository.
+
+=item C<< svn_co => "s.co" >>
+
+The location of the checked out copy of the svn repository.
+
+=back
+
+=head2 set
+
+Takes the same arguments as C<new()> and returns itself so you may use this
+function in function chains.
+
+=head2 setup_git_in_svnco
+
+Setup the git repo inside the checked out svn.  If it's already there, do
+nothing.  Returns itself so you may use the function in chains.
+
+=head2 run
+
+Replay all the commits not yet commited to the svn.  Returns itself so you may
+use the function in chains.
+
+=head2 create_svn_repo
+
+Create the svn repo, if necessary.  Returns itself so it may be used in chains.
+
+=head2 add_svn_dir
+
+Adds a directory to the checked out svn, if it's not already there, and returns
+itself for chains.
+
+=head2 quiet
+
+Turn off all L<Term::GentooFunctions> racket.  Returns itself so you may use the
+function in chains.
+
+=head1 REPORTING BUGS
+
+You can report bugs either via rt.cpan.org or via the issue tracking system on
+github.  I'm likely to notice either fairly quickly.
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+=head1 COPYRIGHT
+
+Copyright 2009 Paul Miller -- released under the GPL
+
+=head1 SEE ALSO
+
+perl(1), git(1), svn(1), L<git-svn-replay>, L<DBM::Deep>, L<IPC::System::Simple>

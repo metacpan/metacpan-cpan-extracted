@@ -1,0 +1,104 @@
+
+=head1 NAME
+
+Gungho::Manual::FAQ - Gungho FAQ
+
+=head1 Q. "Why Did You Call It Gungho"?
+
+It rhymes with Xango, which is its predecessor.
+
+=head1 Q. "I don't understand the notation of the config"
+
+To make the notation concise, we use a notation like engine.module = POE.
+Each level is a key in the hash, so the previous example translates to a
+config like
+
+  my $config = {
+    engine => {
+      module => "POE"
+    }
+  }
+
+Or, in YAML:
+
+  engine:
+    module: POE
+
+=head1 Q. "My requests are being served slow. What can I do?"
+
+There are actually a number of things that may affect fetch speed.
+
+=head2 Is Gungho The Right Crawler For Your Data Set?
+
+Gungho uses an asynchronous engine, and with POE::Component::Client::Keepalive
+it reuses the connections to the same host. 
+
+This kind of setup works great if you are accessing a lot of diffferent hosts,
+but could easily jam up if you are accessing, for example, a single host.
+For such datasets, Gungho will be no more effective than a simple script
+repeated calls to LWP::UserAgent-E<gt>get().
+
+=head2 Choosing The Right loop_delay With Gungho::Engine::POE
+
+C<engine.config.loop_delay> specifies the number of seconds to wait between
+each "loop" iteration.
+
+A single loop in Gungho is basically (1) check if we have requests in the
+provider, and (2) attempt to fetch that request. 
+
+Therefore, if you set this loop_delay to something too low, then you would 
+be spending most of the time attempting to fetch a request from the provider 
+instead of spending it fetching the request.
+
+On the other hand if you set this too high, you will have to wait until
+Gungho notices that there are pending requests. 
+
+There's no general "right" value for this configuration parameter, because
+it largely depends on what kind of dataset you're working with. As a general
+rule of thumb, set it to something sane like 5 seconds, and check out your 
+logs to see if that value is an acceptable value.
+
+=head2 Workaround For Jamming Up PoCo::Client::HTTP
+
+When using Gungho::Engine::POE, POE::Component::Client::HTTP is used internally
+to do the actual fetching. Its performance is usually great, but when you
+reach a certain number of requests, it start to jam up and all of the sudden
+your requests will be served very slowly.
+
+This limitation is per-session limit, so Gungho tries to workaround this
+problem by spawning multiple sessions of POE::Component::Client::HTTP.
+
+If you believe this is the cause of the problem, try setting the 
+engine.config.spawn to a higher value (the default is 2)
+
+Do note, however, that excessive enqueueing of requests is going to e a
+problem regardless. You should at least keep a mental note of how many requests
+you're sending to the POE queue, and throttle as necessary.
+
+=head2 Considerations When Using A Proxy With Gungho::Engine::POE
+
+Proxies are great, and could be used in crawler applications, but by default
+it doesn't play nicely with Gungho's POE engine. 
+
+The short version of the remedy is: Set engine.config.keepalive.keep_alive to 0
+
+  engine:
+    module: POE
+    config:
+      keepalive:
+        keep_alive: 0
+
+Now the long explanation. Gungho::Engine::POE, and POE::Component::Client::HTTP
+which is used internally, uses a module called POE::Component::Client::Keepalive
+to manage the connections, and to possibly reuse the already established
+connection. However, when using a proxy, all the requests go through the given
+proxy, so PoCo::Client::Keepalive will try to reuse the connections to all
+of the requests.
+
+This is obviously aproblem, because it will make the entire request set to
+go through the same connection -- and therefore you lose all parallelism.
+
+To workaround this problem, you need to disable PoCo::Component::Keepalive,
+and hence the above configuration.
+
+=cut

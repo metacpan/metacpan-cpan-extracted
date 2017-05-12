@@ -1,0 +1,117 @@
+Revision history for Perl extension Geo::IP::PurePerl.
+1.26 May 22th, 2012
+        Please note that this module is deprecated. Please use Geo::IP instead.
+	Geo::IP::PurePerl has been merged with Geo::IP.
+        Update country names and codes ( Boris Zentner )
+1.25 March 30th, 2010
+        Skip DNS lookups for cpantesters ( Boris Zentner )
+        Add Domain database support ( Boris Zentner )
+1.24  September 22th, 2009
+        Work around mod_perl centos issue ( Boris Zentner )
+        Add ASNum database support ( Boris Zentner )
+        Fix using region rev0 databases ( Boris Zentner )
+        Handle database types similar to the CAPI ( Boris Zentner )
+	Fix 3 letter country code for Romaina ( Boris Zentner )
+1.23 December 15th, 2008
+	Backport changes from Geo::IP. New methods ( Boris Zentner )
+		
+		open_type
+		charset
+		set_charset
+		netmask
+		last_netmask
+		range_by_ip
+
+	Add org_by_addr and isp_by_addr ( Boris Zentner )
+	Fix doc typo the correct methodname is get_city_record_as_hash ( Boris Zentner ) 
+1.22 September 30th, 2008
+	fix geoip-lookup-city.pl example ( Boris Zentner )
+	Update comments about metro_code
+1.21 September 10th, 2008
+	metro_code is a replacement for the depreciated dma_code ( Boris Zentner )
+1.20 August 4th, 2008
+	Add missing country/country code 'Other' ( Boris Zentner )
+
+1.19  March 22nd, 2008
+	Added BL/Saint Barthelemy, MF/Saint Martin (ISO-3166-1 additions)
+        Change default database name for NetWare to sys:/etc/GeoIP/GeoIP.dat
+                 and MSWin32 to c:/GeoIP/GeoIP.dat ( Guenter Knauf )
+	Country, City and Org requests benefit from GEOIP_MEMORY_CACHE and GEOIP_MMAP_CACHE
+	Add GEOIP_MMAP_CACHE support ( Peter Shipley ) 
+	Now works with new format of GeoIP ISP
+	Corrected path to /usr/local/share/GeoIP/GeoIP.dat in geoip-lookup program.
+
+1.18  January 8th 2007
+	Replaced CS/Serbia and Montenegro with RS/Serbia, removed ZR/Zaire, added ME/Montenegro
+	Added AX/Aland Islands, GG/Guernsey, IM/Isle of Man, JE/Jersey (ISO-3166-1 changes)
+	Fixed issue with Memory Cache mode (Frank Mather)
+	Fixed alpha-3 codes ordering, replaced TLS,TKM,TUN,TON with TKM,TUN,TON,TLS
+	TP/East Timor changed to TL/Timor-Leste, reflecting changes in ISO-3166
+	Now works with Perl 5.004 (Sébastien Aperghis-Tramoni, http://rt.cpan.org/Public/Bug/Display.html?id=19237)
+
+1.17  August 9th 2005
+	Replaced Yugoslavia with Serbia and Montenegro
+	Fixed bug when GEOIP_MEMORY is set (http://rt.cpan.org/NoAuth/Bug.html?id=13073)
+
+1.16  May 27th 2005
+	Added support for GeoIP Netspeed
+
+1.15  May 17th 2005
+	Fixed warning messages with GeoIP City lookups (Frank Mather)
+	Fixed geoip-lookup to work with hostnames
+
+1.14  December 24th 2004
+	Added database_info method (Frank Mather)
+	Added example scripts to MANIFEST
+
+1.13  October 3rd 2004
+	Updated test case, removed www.bundesregierung.de
+	Fixed bug when IP Address Not found for GeoIP Domain Names
+		(also applicable for GeoIP Organization and GeoIP ISP)
+
+1.12  June 2nd 2004
+	Added support for GeoIP Region, City, ISP and Organization (Frank Mather)
+	Updated country names
+
+1.11  November 1st 2003
+
+The following changes contributed by Graham Barr
+
+* The "I1" template for unpack is machine dependent. It seems to be 
+that you generate the GeoIP.dat file on a little-endian machine. This 
+causes everything to fail on a big-endian machine. The patch changes 
+unpack to use "V1", which will unpack a little-endian integer and be 
+platform independent.
+
+* The in-memory cache was causing the buffer to be copied several 
+times. The patch causes the data to be read directly into the hash and 
+also avoids copying in _seek_country
+
+* Tests 1_lookup.t and 2_namelookup.t fail if there is no GeoIP.dat 
+file in /usr/local. The patch makes these tests skip if GeoIP.dat 
+cannot be found.
+
+      Changed Taiwan, Province of China to Taiwan
+
+1.10  November 22nd 2002
+      GeoIP Free Database is now updated monthly!
+      Added install file.
+      First upload to CPAN.
+      ! IMPORTANT API CHANGE - now returns undef instead of '--' or
+      'N/A' when country not found.
+      rewrote _seek_country to use loop instead of recursion for faster performance
+
+0.28  September 12th 2002
+      Added Memory Cache mode (Matt Wickline)
+      Added ISO 3166-1 alpha-3 code and country names (Matt Wickline)
+      Added open method, conform new to XS API (Matt Wickline)
+      Added more POD (Matt Wickline)
+
+0.27  September 11th 2002
+      Fixed database location in examples and tests
+      Module throws error if it can't locate database file
+      Removed DB_File dependency
+
+0.26  August 20th 2002
+      First release under the Geo::IP::PurePerl name,
+      repackaged from Geo::IP version 0.07

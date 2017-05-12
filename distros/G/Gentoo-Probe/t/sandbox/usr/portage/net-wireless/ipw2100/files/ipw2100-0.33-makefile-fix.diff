@@ -1,0 +1,69 @@
+diff -aur ipw2100-0.33/Makefile ipw2100-0.33-fixed/Makefile
+--- ipw2100-0.33/Makefile	2004-03-16 16:42:51.000000000 -0500
++++ ipw2100-0.33-fixed/Makefile	2004-03-16 20:54:36.860644056 -0500
+@@ -20,7 +20,7 @@
+ 
+ VERFILE := $(KSRC_OUTPUT)/include/linux/version.h
+ KERNELRELEASE := $(shell if [ -r $(VERFILE) ]; \
+-        then (cat $(VERFILE); echo UTS_RELEASE) | $(CC) -I$(KSRC_OUTPUT) $(CFLAGS) -E - | tail -1 | xargs echo; \
++        then (cat $(VERFILE); echo UTS_RELEASE) | $(CC) -I$(KSRC_OUTPUT) $(CFLAGS) -E - | tail -n 1 | xargs echo; \
+         else uname -r; fi)
+ 
+ MODPATH := $(DESTDIR)/lib/modules/$(KERNELRELEASE)
+@@ -41,12 +41,12 @@
+ 	-cp $(KSRC_OUTPUT)/.tmp_versions/*.mod $(MODVERDIR)
+ ifeq ($(KSRC),$(KSRC_OUTPUT)) # We're not outputting elsewhere
+ 	-cp $(KSRC)/.tmp_versions/*.mod $(MODVERDIR)
+-	make -C $(KSRC) SUBDIRS=$(PWD) MODVERDIR=$(PWD) \
++	make -C $(KSRC) SUBDIRS=$(PWD) MODVERDIR=$(PWD) BUILD_DIR=$(PWD)  \
+ 		modules
+ else # We've got a kernel with seperate output, copy the config, and use O=
+ 	mkdir -p $(TMP)
+ 	cp $(KSRC_OUTPUT)/.config $(TMP)
+-	make -C $(KSRC) SUBDIRS=$(PWD) MODVERDIR=$(PWD) \
++	make -C $(KSRC) SUBDIRS=$(PWD) MODVERDIR=$(PWD) BUILD_DIR=$(PWD) \
+ 		O=$(PWD)/tmp modules
+ endif 
+ 
+@@ -58,10 +58,10 @@
+ else # We're on 2.4, and things are slightly different
+ 
+ modules:
+-	make -C $(KSRC) SUBDIRS=$(PWD) modules
++	make -C $(KSRC) SUBDIRS=$(PWD) BUILD_DIR=$(PWD) modules
+ 
+ install: modules
+-	MODULES=`awk -F+=\  '{ if ($2 != "") print $2 }' Makefile.24`
++	MODULES=`awk -F+=\  '{ if ($2 != "") print $2 }' $(PWD)/Makefile.24`
+ 	mkdir -p $(MODPATH)/kernel/drivers/net/wireless/ipw2100
+ 	cp -f $MODULES $(MODPATH)/kernel/drivers/net/wireless/ipw2100/
+ 	depmod -a
+@@ -70,14 +70,26 @@
+ 
+ else # We're acting as a kernel build makefile
+ 
++# If CONFIG_IPW2100 isn't set, we'll assume the user has never configured
++# their kernel to include this module and set up some defaults.
++
++ifndef CONFIG_IPW2100
++CONFIG_IPW2100=m
++CONFIG_IPW2100_AVERATEC_5100P=m
++CONFIG_DEBUG=y
++endif
++
++ifeq ($(BUILD_DIR),)
++	BUILD_DIR=$(obj)
++endif
+ 
+ ifeq ($(PATCHLEVEL),6) # If on a 2.6 kernel
+ 
+-include Makefile.24
++include $(BUILD_DIR)/Makefile.26
+ 
+ else # We're on a 2.4 kernel
+ 
+-include Makefile.26
++include $(BUILD_DIR)/Makefile.24
+ 
+ endif
+ endif

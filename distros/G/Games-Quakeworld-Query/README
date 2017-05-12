@@ -1,0 +1,16 @@
+Games::Quakeworld::Query 0.33
+
+Hello, and welcome to a work in progress module
+called Games::Quakeworld::Query. This module
+allows you to query easily Quakeworld servers,
+and get their informations, i.e. map, deathmatch mode,
+hostname and player ammount.
+
+Since Perl offers you a great convenience called perlpod,
+to see a better documentation of this module, just
+type perldoc Games::Quakeworld::Query, and you'll se the doc.
+
+I'm a lousy writer so I stop it here and recommend you to
+consult the perlpod docs :-)
+
+Antoine Kalmbach <anzu@mbnet.fi>

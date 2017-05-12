@@ -1,0 +1,25 @@
+=== README for Geo-Format-Landsat version 0.01
+=   Generated on Tue Jan 27 15:46:24 2009 by OODoc 1.06
+
+There are various ways to install this module:
+
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d Geo-Format-Landsat-0.01.tar.gz
+       tar -xf Geo-Format-Landsat-0.01.tar
+       cd Geo-Format-Landsat-0.01
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/Geo-Format-Landsat-0.01/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=Geo-Format-Landsat
+

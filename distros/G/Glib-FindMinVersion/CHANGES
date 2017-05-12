@@ -1,0 +1,66 @@
+==================================================
+Changes from 2016-03-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2017-03-28 08:14:46 +0000
+------------------------------------------
+
+  Change: 07d4534b5519d555763727e77d4c29cdd178addc
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-28 10:14:21 +0000
+
+    Added Perl 5.10.0 as dependency 
+
+  Change: 821bc809bb45bc2dd7d97ee25a7ea08fb8592434
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 14:25:14 +0000
+
+    Now using proper version comparison for sorting too 
+
+------------------------------------------
+version 0.003 at 2017-03-11 13:07:46 +0000
+------------------------------------------
+
+  Change: accc7f0125bfb43c11f2127d6d96fb5f9bb99796
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 14:07:46 +0000
+
+    Now returning a sorted list from for_source
+
+    This way $x = Glib::FindMinVersion::for_source($src) and ($x) =
+    Glib::FindMinVersion::for_source($src)
+
+    compare equal, which is more intuitive 
+
+  Change: 4ae7f1a6f6f6a5e46d1820f8f8ac5fd243661675
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 14:07:22 +0000
+
+    Fixed version compare
+
+    2.6 no longer compares greater than 2.26 
+
+------------------------------------------
+version 0.002 at 2017-03-11 12:22:33 +0000
+------------------------------------------
+
+  Change: c364e5fd358a31808fcf02ce80003bd096751256
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 13:22:33 +0000
+
+    Fixed Synoposis example 
+
+------------------------------------------
+version 0.001 at 2017-03-11 11:39:40 +0000
+------------------------------------------
+
+  Change: 110901722c35143f163024b35720768fa3929a81
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 12:39:40 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

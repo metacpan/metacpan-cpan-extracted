@@ -1,0 +1,9 @@
+example/example.pl
+example/glade/example.glade
+example/glade/example.gladep
+Changes
+MANIFEST
+Makefile.PL
+README
+test.pl
+lib/Gtk2/GladeXML/OO.pm

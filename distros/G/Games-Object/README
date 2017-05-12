@@ -1,0 +1,121 @@
+Games/Object version 0.11
+=========================
+
+IMPORTANT NOTE TO USERS OF VERSIONS 0.05 AND PREVIOUS
+
+The latest version of the module makes some major redesigns to the APIs
+and internal structure. Your code will have to change with 0.10. The redesign
+was extensive enough that I could not preserve backward compatibility. These
+changes are based on concrete feedback from other users either attempting to
+use the module or expressing an interest in it.
+
+The new design should be more stable than the previous and should not undergo
+any further paradigm shifts. The module it still alpha, but hopefully will
+progress to beta by version 0.20.
+
+INTRODUCTION
+
+This module is intended to serve as a base class for game objects. It is
+designed to take much of the burden from the game programmer by providing the
+mechanics for storing and manipulating game data objects.
+
+The functionality of this module can be divided into the following sections:
+
+  Attributes
+
+    This are arbitrary, named data items on an object. Rules for modification
+    of attribute values, including automated update and persistent modifiers,
+    can be set up with ease. For example, you could set up an attribute such
+    that:
+
+    - It stores its value as a decimal, but polling the attribute always rounds
+      to the nearest integer.
+
+    - It is confined to the range of 0 to 100, and attempts to modify it outside
+      that range are truncated to the minimum or maximum automatically.
+
+    - It automatically tends towards the maximum of 100 by 1 each time the
+      object is processed.
+
+    - A user-defined chunk of code is called if the value falls to 0.
+
+    Modifications of attributes can be made to:
+
+    - Persist such that they can be cancelled later and revert the attribute
+      value back to what it was before the modifier was applied.
+
+    - Persist but automatically time out after a given amount of time.
+
+    - Persist but have its initial effect be delayed a certain amount of time.
+
+    - Invoke used-defined chunks of code when changes to attributes applied.
+
+  Flags
+
+    Arbitrary, used-defined flags can be placed on objects. These flags can
+    be made such that user-defined code is invoked when a flag changes value.
+
+  Load/Save
+
+    Object data can be saved to an arbitrary file and then read back in later
+    to produce an exact copy of the object. This essentially provides the bulk
+    of save/load game functionality. You can even set up customized code to
+    execute each time an object loads/saves to read/write additional data.
+
+  Events
+
+    The user can define arbitrary code to execute when modifications are
+    made to objects or their attributes. Some examples of these are mentioned
+    above. Events on attributes share the same inheritance as attribute values,
+    which means you can define a common event trigger on a master object and
+    have lots of other objects inherit from it and use the event as if it were
+    defined on the individual objects.
+
+  Object Management
+
+    As part of the redesign with version 0.10, management of the overall list of
+    objects is now implemented by a separate manager module, allowing you to
+    maintain many independent groups of objects. This also makes it far easier
+    for the user to extend the object management functionality, merely by
+    subclassing the manager class.
+
+
+CHANGES FROM LAST VERSION
+
+This is a patch release only to fix critical bugs in 0.10. See the Changes
+file for details.
+
+
+INSTALLATION
+
+This is packaged as a standard CPAN module, thus you ought to be able to
+install the module with the following steps:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+This module is pure Perl code, thus there is no C code to be compiled.
+
+
+DEPENDENCIES
+
+Perl 5.6.0 or better is required. Perl 5.6.1 is recommended.
+
+You will also need IO::String 1.02 or better (older versions will NOT work),
+available from CPAN.
+
+
+BUG REPORTS
+
+This is an ALPHA release. Please send all bug reports to p.stewart@comcast.net.
+Suggestions at future functionality are also welcome.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002,2003 Peter J. Stewart, all rights reserved.
+
+This module is distributable and modifiable under the
+GPL and the Artistic Licenses.

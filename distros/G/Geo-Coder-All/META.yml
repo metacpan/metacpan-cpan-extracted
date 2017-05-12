@@ -1,0 +1,31 @@
+---
+abstract: Geo::Coder::All
+author:
+  - 'Rohit Deshmukh <raigad1630@gmail.com>'
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Coder-All
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Geo::Coder::Google: 0
+  Locale::Codes::Country: 3.30
+  Module::Runtime: 0
+  Moose: 0
+  namespace::autoclean: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/raigad/geo-coder-all/issues
+  homepage: http://search.cpan.org/~raigad/geo-coder-all/
+  repository: git://github.com/raigad/geo-coder-all.git
+version: 0.06

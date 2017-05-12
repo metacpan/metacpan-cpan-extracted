@@ -1,0 +1,29 @@
+Revision history for Geo-Coder-Mapquest
+
+0.06  Fri Jun 28 14:31:29 UTC 2013
+    - Added option to use the open data platform. (Drew Taylor)
+
+0.05  Wed Mar 30 00:14:37 UTC 2011
+    - Required newer LWP with better HTTPS support.
+    - Enabled response compression by default
+    - Added response method.
+
+0.04  Wed Jun 16 21:07:08 UTC 2010
+    - Added https option.
+    - Added batch method.
+    - Added providedLocation field to the returned locations.
+
+0.03  Wed Dec 2 09:36:30 PST 2009
+    - Updated to reflect Mapquest moved the service out of beta.
+    - Location is no longer limited to only unicode-flagged strings or
+      UTF-8 bytes.
+    - Added support for debug parameter.
+    - Updated example script to use apikey.
+
+0.02  Sat Sep 19 08:52:40 UTC 2009
+    - Added missing example of location data format.
+    - Added file portability author test.
+    - Added authortest Makefile target and added it to the disttest target.
+
+0.01  Tue Sep 15 09:16:12 UTC 2009
+    - Initial distribution.

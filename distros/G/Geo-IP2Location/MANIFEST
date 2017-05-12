@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/0_module.t
+t/1_lookup.t
+t/2_lookupv6.t
+lib/Geo/IP2Location.pm

@@ -1,0 +1,6 @@
+Revision history for Perl extension Games::Hanabi.
+
+0.01  Wed Dec 17 14:48:32 2014
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Games::Hanabi
+

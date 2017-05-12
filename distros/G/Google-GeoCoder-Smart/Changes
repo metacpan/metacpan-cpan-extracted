@@ -1,0 +1,37 @@
+Revision history for Perl extension Google::GeoCoder::Smart.
+
+1.0  Fri Apr 30 18:02:25 2010
+	- original version; created by h2xs 1.23 with options
+		-A -n Google::GeoCoder::Smart
+
+1.1  Tue Jul 27 10:20:30 2010
+	-update for the google v3 maps api
+		-A -n Google::GeoCoder::Smart
+
+1.11 Tue Jul 27 15:27:00 2010
+	-new updates for error detection and alerting
+		-A -n Google::GeoCoder::Smart
+1.12 Wed Sep 1 14:45:00 2010
+	-small fix for some bugs
+		-A -n Google::GeoCoder::Smart
+1.13 Wed Sep 15 19:00:00 2010
+	-fix the prerequisit bug and json support...
+		-A -n Google::GeoCoder::Smart
+1.14 Mon Feb 14 07:50:00 2011
+	-new test.pl script
+		-A -n Google::GeoCoder::Smart
+1.15 Mon Feb 14 12:29:00 2011
+	-remove xml parsing
+		-A -n Google::GeoCoder::Smart
+
+1.16 Wed May 23 17:30:00 2012
+	-fixed header export bug
+		-A -n Google::GeoCoder::Smart
+
+1.17 Wed Nov 5 18:36:00 2014
+	-Google changed the api url
+		-A -n Google::GeoCoder::Smart
+
+1.18 Wed Nov 10 20:48:00 2014
+	-Fixed connection error catching
+		-A -n Google::GeoCoder::Smart

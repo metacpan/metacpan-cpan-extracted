@@ -1,0 +1,7 @@
+Revision history for Perl extension Gtk2::Net::LDAP::Widgets
+
+2.0.1  Sat, 03 May 2008 21:22:31 +0200 cpan@olo.org.pl
+        - metadata change: corrected author's address
+
+2.0.0  Tue, 08 Apr 2008 13:18:12 +0200 cpan@olo.org.pl
+        - initial public release

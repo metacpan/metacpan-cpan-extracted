@@ -1,0 +1,100 @@
+NAME
+    Games::NES::ROM - View information about an NES game from a ROM file
+
+SYNOPSIS
+        use Games::NES::ROM;
+    
+        # Read in the ROM without having to know its format
+        my $rom = Games::NES::ROM->load( 'file.nes' );
+
+        # Specifically read in an iNES file
+        $rom = Games::NES::ROM::INES->new( filename => 'file.nes' );
+
+        # Access the details
+        print 'PRG Banks: ', $rom->prg_count, "\n";
+        print 'CHR Banks: ', $rom->prg_count, "\n";
+        # etc...
+    
+        # View the SHA-1 & CRC checksums
+        print 'SHA1: ', $rom->sha1, "\n";
+        print ' CRC: ', $rom->crc, "\n";
+
+DESCRIPTION
+    This module loads the details of an NES rom file. It is primarily meant
+    to be used a base class for more specific file formats. Those formats
+    include:
+
+    *   Universal NES Image File (UNIF)
+
+    *   iNES
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  load( $filename )
+    Attemps to read the ROM structure into memory using all available file
+    formats until success.
+
+  prg_count( )
+    Returns the number of PRG banks for this ROM.
+
+  chr_count( )
+    Returns the number of CHR banks for this ROM.
+
+  sha1( )
+    Returns the SHA-1 checksum for the PRG and CHR data.
+
+  crc( )
+    Returns the CRC checksum for the PRG and CHR data.
+
+  sprite( $chr_bank, $index )
+    Returns the raw (composite) sprite in the specified CHR bank at the
+    specified array index.
+
+BASE ATTRIBUTES
+    The following base attributes are available for all file formats:
+
+    *   filename - The filename from which data was loaded
+
+    *   id - A string found at the beginning of a file to identify the file
+        format
+
+    *   title - The game's title, if available
+
+    *   prg_banks - An arrayref of PRG bank data
+
+    *   chr_banks - An arrayref of CHR bank data
+
+    *   has_sram - Boolean value to determine if the ROM is battery backed
+
+    *   mapper - A value indicating what memory mapper to use with the ROM
+
+    *   mirroring - A value indicating what time of mirroring is used in the
+        ROM
+
+  NOTES
+    *   mapper - iNES uses integer IDs, UNIF uses string IDs
+
+    *   mirroring - An integer ID, using the UNIF list as a basis
+
+    Each file format will have an extended set of attributes specific to its
+    data structure. Please consult their documentation for more information.
+
+SEE ALSO
+    *   Games::NES::ROM::Format::INES
+
+    *   Games::NES::ROM::Format::UNIF
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007-2013 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

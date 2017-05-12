@@ -1,0 +1,257 @@
+Revision history for Graph::Easy::As_svg:
+
+0.26        2017-04-15
+  * dzil fixes - bump the $VERSION in lib/Graph/Easy/As_svg.pm .
+    + See: https://rt.cpan.org/Ticket/Display.html?id=121124
+    + Thanks to Gintautas Grigelionis .
+
+0.25        2017-04-12
+  * Convert "#!/usr/bin/perl -w" shabangs to "#!/usr/bin/env perl" .
+    + Hopefully to avoid test failures such as:
+    + http://www.cpantesters.org/cpan/report/40dc5da0-18b6-11e7-ba6a-0a894c2cdaca
+
+0.24        2017-04-03
+  * Convert from Module-Install to Dist-Zilla and did some cleanups.
+    + Hopefully fix https://rt.cpan.org/Public/Bug/Display.html?id=120889
+      ( Cannot install without '.' in @INC .)
+    + Now maintained at https://github.com/shlomif/Graph-Easy-As_svg .
+
+2008-05-22 v0.23 Tels 137 tests - Fix, fix, fix, fix the bugs...
+  * require Graph::Easy v0.63 (for correct graph attribute output)
+  * suppress attributes without "-" (like "labelpos" vs. "label-pos")
+  * output the "font-family" style to support the "font" attribute
+  * center graph when the graph label is wider than the graph itself
+  * shift graph by half the border with down and right to prevent the border
+    from getting cut off
+  * don't draw end arrows on undirected edges (with more than one cell)
+  * "rounded" nodes have their corners correctly filled with the background
+    color (f.i. when inside a group) (Thanx Dieter Wunderer!)
+  * quote "&" in links (Thanx Emmanuel Quevillon!)
+  * links on edge labels were missing (Thanx Emmanuel Quevillon!)
+  * tweak width of digits to create more fitting labels (Thanx Emmanuel Quevillon!)
+  * better text for labels (alignment and tweaks) (Thanx Emmanuel Quevillon!)
+
+2008-03-30 v0.22 Tels 127 tests
+  * require Graph::Easy v0.62
+  * remove Build.PL (bundle Module::Install 0.71)
+  * fix class attribute set on primary class, this colors all nodes red:
+      node { class: red; } node.red { color: red; }
+  * amend INSTALL
+  * don't needlessly output polygon points in comments
+  * fix suppression of attributes (included all the added ones)
+  * fix support for point-style/point-shape
+  * anonymous nodes:
+    + fix comment
+    + fix misplacement
+  * fix multi-line labels (Thanx Amanda B. Hickman!)
+    + multi-line graph labels no longer cross into content
+    + render alignments like \r,\l etc. properly
+    + remove escapes (like \l etc.) from title for a better title-tag
+  * better rendering of open/filled stars
+  * a set fontsize on the graph no longer affacts nodes/edges/groups
+  * filled arrows fall back to the edge color (instead of inherit) if
+    the fill attribute is not set
+
+2006-12-17 v0.21 Tels 93 tests
+  * require Graph::Easy v0.50
+  * fixes for the changes attribute system in Graph::Easy v0.50
+  * fix alignment of node labels under align: left, align: right etc.
+  * don't output needless things like 'fill=""' or default text-anchor
+  * handle borderwidths like "20px" and "2em"
+
+2006-09-03 v0.20 Tels 89 tests
+  * require Graph::Easy v0.47
+  * fix invalid output on multi-line aligned labels
+  * fix alignment of labels on loops and vertical edges (text-align takes
+    "start" or "end", not "left" or "right" - duh!)
+  * correct the placement of multi-line node labels, especially when
+    using \r, \l or \c instead of \n
+  * fix warning and missing arrows when using edge { arrow-style: open; }
+  * fix undef warning when using closed arrows
+  * fix problem with dasharrays when using groups
+
+2006-08-13 v0.19 Tels 89 tests - Fix, fix, fix, fix the bugs...
+  * single-line labels were not properly quoted (for "<>&)
+  * add encoding="UTF-8" to XML header to make encoding explicit
+  * require Graph::Easy v0.46
+  * require Image::Info v1.22
+  * add a Build.PL file
+  * add support for color schemes
+  * fix for very wide borders:
+    + make dash:dot ratio 3:1 vs. 2:1
+    + don't include "stroke-linecap: round" for diamon shapes
+    + scale the dasharray according to stroke-width
+  * remove the workaround for Firefox bug with links:
+    + it works now in the latest Firefox, so upgrade!
+    + In the newest Firefox, it spawned a second new window
+
+2006-04-17 v0.18 Tels 87 tests
+  * require Graph::Easy v0.44
+  * require Image::Info v1.20
+  * don't output empty <text...></text> tags
+  * _svg_background() returns SVG code instead of modifying $$svg
+  * don't draw borders on Group::Cells
+  * fix background color for edges and invisible nodes inside groups
+  * fix alignment for labels
+  * size-correction for overly big arrows now also works for vertical edges
+  * close the hole in open arrows on bold/broad/wide edges
+  * edge corners no longer have holes
+  * close the gaps on edges with style double
+  * fix the fontsize (was missing a "px") and also use 16 as the base vs. 14
+    This makes the text independed from the user setting in the browser, and
+    also increases it to be more readable.
+  * always include the fill, to help renderers that can't cope with CSS styles
+  * fix rendering of multiline labels:
+    + lineheight is 18px vs 1em to not have the lines drawn together
+    + no longer contain a spurious empty last <tspan>-pair
+  * reorder output order of elements: first groups, then nodes, then edges
+  * correct the displacement on edge end/start points for wide/broad/bold edges
+  * render selfloops with paths
+  * don't render invisible edges
+  * a set background on edge cells did have a stray border
+  * edge labels have a 80% font-size as default
+  * only add 0.5EM (currently 8 pixels) as padding around the graph (was 14)
+  * add a few characters to make the _text_length() calculation more accurate
+  * a Node::Empty should not be rendered
+  * font is really font-family in CSS section
+  * support point-shaped nodes with point-style: invisible
+
+2006-01-29 v0.17 Tels 73 tests
+  * use Module::Install (and bundle it)
+  * require Graph::Easy v0.40
+  * require Image::Info v1.17 (for nodes with "shape: img")
+  * fix VERSION in packages as to not conflict with the ones from Graph::Easy
+  * add support for:
+    + invisible edges
+    + nodes with "shape: img" (Thanx to Jeff Schiller for pointing out
+      svg:image!)
+  * add an onclick-handler to links to force them to open in the current
+    window/tab - work around bug in FF 1.5 (Thanx Jeff Schiller again!)
+  * put the link around the node shape, not just the text. Makes it easier
+    to hit the link.
+  * nodes with shape: point get a link, too (although the area is tiny)
+
+2006-01-01 v0.16 Tels 72 tests
+  * require Graph::Easy v0.38
+  * use $self->angle() to get the correct shape rotation
+  * forgot to limit precision on some edge-line coordinates
+
+2005-12-18 v0.15 Tels 72 tests
+  * require Graph::Easy v0.36
+  * fix edge crossings with different widths (wide vs. broad etc)
+  * add rendering of edge joints
+
+2005-12-10 v0.14 Tels 72 tests
+  * require Graph::Easy v0.35
+  * quote "&", "<", ">" and '"' in links and titles (Thanx Mutante!)
+  * add "xlink:show" and "xlink:target" on links to open them in
+    a new window (but Firefox ignores this anyway, see mozilla bug #315389)
+
+2005-12-04 v0.13 Tels 72 tests
+  * require Graph::Easy v0.34
+  * handle multi-celled nodes
+  * better support labels on vertical edges
+  * fix unitialized warning in line 298
+  * use strict; in Makefile.PL
+  * support svg_info fields (mainly for wikipedia SVG integration)
+
+2005-11-13 v0.12 Tels 64 tests
+  * require Graph::Easy v0.33
+  * add PREREQ_FATAL to Makefile.PL
+  * support bold-dash, broad and wide edge/border styles
+  * correct node-sizes to accomodate border-width
+  * shorten edge-pieces with labels a bit
+  * implement a crude version of _text_length(), returning the text length
+    in pixels depending on EM and the string content ("WW" vs. "ii"). This
+    stops nodes from being overly broad with lots of padding.
+  * don't generate invalid SVG on labels/node names with "--", "&", "<" or ">"
+  * limit precision on edge-lines and arrows to 2 digits (instead of 4)
+
+2005-11-06 v0.11 Tels 56 tests
+  * limit precision to 2 digits (instead of 4) for coordinates
+  * put common attributes on double-border shapes into a <g> to shorten output
+  * indent output by ' ' instead of '  ' to shorten it a bit
+  * support "rotate" attribute on Nodes
+
+2005-10-30 v0.10 Tels 56 tests
+  * require Graph::Easy v0.31
+  * don't draw background if bg eq ''
+  * add support for attribute "font-size"
+  * add support for attribute "text-style"
+  * calculate the correct size for edge cells with a label
+  * include xmlns:xlink too, to make Firefox 1.5x happy
+  * include version of Graph::Easy::As_svg in output, too
+  * for edge labels: fallback to the color of the edge did not work
+  * triangle-shaped nodes have equal height/width (if possible)
+  * the "autolink" and "link" attributes correctly create links with
+    mouseover titles
+  * nodes with shape "none" result no longer in invalid SVG
+  * only include the actually used defitinons, that shortens the output,
+    especially for small graphs
+  * don't need to output "stroke-width" for including arrow heads, this
+    shortens the output a bit
+  * shorten output by grouping multiple lines of an edge together
+  * text in (invert)-triangle etc nodes is better displaced to fit better
+  * better rendering of multi-line labels on edges
+  * support multi-line labels on nodes (correct hight, multi-line text)
+  * output fontsize is 14 pixels instead of 11 (for bigger graphs in FF 1.5)
+  * close gaps in hor/ver edge pieces with style "double"
+  * examples/as_svg: input utf8 from STDIN, output utf-8 to STDOUT
+  * Nodes with "shape: rounded" are rounded by a fixed amount
+  * edge crossings with different styles and colors are now rendered correctly
+  * output a title for the SVG graph
+  * output "width" and "height" instead of viewbox on <svg> for Firefox 1.5
+  * render the graph label with label-pos bottom or top, incl. optional link
+
+2005-09-23 v0.09 Tels 41 tests
+  * require Graph::Easy v0.30
+  * fix README
+  * fix SVG header (standlone="yes", xmlns for <svg tag)
+
+2005-09-18 v0.08 Tels 40 tests
+  * require Graph::Easy v0.29
+  * 'fill' defaults to white
+  * edge labels use "label-color" and fall back to "color"
+  * improve support for multi-line labels
+  * fix bidirectional edges (render their arrows correctly)
+  * better center the text on triangle|invtriangel shaped nodes
+  * better node sizes for the various shapes
+  * draw graph background, border and label if nec.
+  * double lines on edges are rendered better at the arrow-ends
+  * add support for the following node shapes:
+    + invhouse, octagon, hexagon, septagon, parallelogram, trapezium
+  * draw background for non-rect nodes
+  * correctly draw "border-style: double" on the various node shapes
+  * draw backgrounds for edge cells (for groups and when background is set)
+  * add tests for POD via Test::POD (t/pod.t)
+  * add tests for POD coverage via Test::POD::Coverage (t/pod_cov.t)
+
+2005-09-04 v0.07 Tels 38 tests
+  * require Graph::Easy v0.27
+  * added tests for as_svg_file()
+  * fix rendering of edge cells to be compatible with new Graph::Easy code
+  * arrow lines on non-solid edges are now solid (instead of dashed etc)
+  * render the different arrow styles (closed, open, filled)
+  * render nodes with "shape: point"
+  * produce shorter code by using default attributes/classes better
+  * render node shapes: diamond, house, triangle, invtriangle
+  * render edge style "double-dash"
+  * "fill" is the fill color, "background" the background
+  * better skipping of non-SVG attributes
+
+2005-07-13 v0.06 Tels 31 tests
+  * require Graph::Easy v0.22
+  * As_svg: use Graph::Easy to allow a require w/o Graph::Easy
+
+Seperated Graph::Easy::As_svg from Graph::Easy:
+
+2005-06-25 v0.05 Tels 31 tests
+  * Much more complete: output class attributes, stylesheets etc.
+  * generate SVG 1.1
+  * use "stroke-linecap: round" to generate nicer arrow heads
+  * shorten output by using a few tricks
+  * render node borders in different styles (dotted etc)
+  * render edge lines in different styles (dotted etc)
+
+For older CHANGES, please see the Graph::Easy package.
+

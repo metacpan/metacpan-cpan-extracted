@@ -1,0 +1,9 @@
+r1945,1946,1947:Groupwork::NoFault-totalPercent:
+round_to_2_decimal_places_precision
+
+I have to quote the precision in '100.00' to
+prevent 'prove' (or perl?) removing them and
+failing the test now.                       
+
+I notice that Devel::REPL is also quoting the     
+'100.00', but not the 66.67.

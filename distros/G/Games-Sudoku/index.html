@@ -1,0 +1,209 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Games::Sudoku::Kubedoku - Sudoku Solver for any NxN puzzles</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@midas.slackware.lan" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#version">VERSION</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#functions">FUNCTIONS</a></li>
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#availability">AVAILABILITY</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Games::Sudoku::Kubedoku - Sudoku Solver for any NxN puzzles</p>
+<p>
+</p>
+<hr />
+<h1><a name="version">VERSION</a></h1>
+<p>Version 1.00</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Games::Sudoku::Kubedoku;
+    my $sudoku = Games::Sudoku::Kubedoku-&gt;new('.4...7.35..5...8.7.78.65.9.9..2..3....364.7.9.6..3.2..5.....1...9.7.......235...4');
+    $sudoku-&gt;solve();
+    my $solution = $sudoku-&gt;get_game();
+    print &quot;$solution\n&quot;;
+    $sudoku-&gt;print_board();</pre>
+<p>Or:</p>
+<pre>
+    use Games::Sudoku::Kubedoku;
+    my $sudoku = Games::Sudoku::Kubedoku-&gt;new();
+    $sudoku-&gt;set_game('.4...7.35..5...8.7.78.65.9.9..2..3....364.7.9.6..3.2..5.....1...9.7.......235...4');
+    $sudoku-&gt;solve();
+    my $solution = $sudoku-&gt;get_game();
+    print &quot;$solution\n&quot;;
+    $sudoku-&gt;print_board();</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Kubedoku is a Sudoku Solver. It uses a cube(Kube) to solve the game.
+The rows, columns and values will become the axes (x,y,z).
+The kube has one property, once a value is set in the board, then all the axes (x,y,z) will become empties.
+The software will try to get all the unknown values checking axes with the sum of 1.
+If there is a sum higher than one, then It will execute recursive to get the right solution.
+The code is not the fastest but It is not too complex.
+The solver accept the written games with &quot;.&quot; or &quot;0&quot; for the unknown values.
+The code support Sudokus with 4, 9, 16 or higher size.
+The games with more than 9 values has to use letters.</p>
+<p>
+</p>
+<hr />
+<h1><a name="functions">FUNCTIONS</a></h1>
+<ul>
+<li>
+<p><strong>new()</strong> <em>Create an sudoku solver instance</em></p>
+</li>
+<li>
+<p><strong>set_game($sudoku_string)</strong> <em>Set the sudoku's values (known &amp; unknown)</em></p>
+</li>
+<li>
+<p><strong>get_game()</strong> <em>Return the sudoku's values (known &amp; unknown)</em></p>
+</li>
+<li>
+<p><strong>solve()</strong> <em>Try to get a solution (recursive function)</em></p>
+</li>
+<li>
+<p><strong>print_board()</strong> <em>Print the sudoku board</em></p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<pre>
+    use Games::Sudoku::Kubedoku;
+    my $sudoku = Games::Sudoku::Kubedoku-&gt;new('1.34....432.21.3');
+    print $sudoku-&gt;get_game().&quot;\n&quot;;
+    $sudoku-&gt;print_board();
+    $sudoku-&gt;solve();
+    print $sudoku-&gt;get_game().&quot;\n&quot;;
+    $sudoku-&gt;print_board();</pre>
+<pre>
+    1.34....432.21.3
+    1234341243212143</pre>
+<pre>
+    +--+--+    +--+--+
+    |1.|34|    |12|34|
+    |..|..|    |34|12|
+    +--+--+    +--+--+
+    |43|2.|    |43|21|
+    |21|.3|    |21|43|
+    +--+--+    +--+--+</pre>
+<pre>
+    use Games::Sudoku::Kubedoku;
+    my $sudoku = Games::Sudoku::Kubedoku-&gt;new('.4...7.35..5...8.7.78.65.9.9..2..3....364.7.9.6..3.2..5.....1...9.7.......235...4');
+    print $sudoku-&gt;get_game().&quot;\n&quot;;
+    $sudoku-&gt;print_board();
+    $sudoku-&gt;solve();
+    print $sudoku-&gt;get_game().&quot;\n&quot;;
+    $sudoku-&gt;print_board();</pre>
+<pre>
+    .4...7.35..5...8.7.78.65.9.9..2..3....364.7.9.6..3.2..5.....1...9.7.......235...4
+    149827635625493817378165492954278361283641759761539248537984126496712583812356974</pre>
+<pre>
+    +---+---+---+    +---+---+---+
+    |.4.|..7|.35|    |149|827|635|
+    |..5|...|8.7|    |625|493|817|
+    |.78|.65|.9.|    |378|165|492|
+    +---+---+---+    +---+---+---+
+    |9..|2..|3..|    |954|278|361|
+    |..3|64.|7.9|    |283|641|759|
+    |.6.|.3.|2..|    |761|539|248|
+    +---+---+---+    +---+---+---+
+    |5..|...|1..|    |537|984|126|
+    |.9.|7..|...|    |496|712|583|
+    |..2|35.|..4|    |812|356|974|
+    +---+---+---+    +---+---+---+</pre>
+<pre>
+    use Games::Sudoku::Kubedoku;
+    my $sudoku = Games::Sudoku::Kubedoku-&gt;new('ad4...67..3b.c.....c9a.2.1..........5...g46..2.d....c.319...g.7.....a758..b..e....1...........9..g.d....e6f.c.1537b6.e2.5........e....1.7....5...f.7..c..b9........3e..4fg...6a.g4.8.b7...e3.9..4a....b6.e.f7...25f.......1.3..a.c3...g..a5.4d.b.6.128.3........');
+    print $sudoku-&gt;get_game().&quot;\n&quot;;
+    $sudoku-&gt;print_board();
+    $sudoku-&gt;solve();
+    print $sudoku-&gt;get_game().&quot;\n&quot;;
+    $sudoku-&gt;print_board();</pre>
+<pre>
+    ad4...67..3b.c.....c9a.2.1..........5...g46..2.d....c.319...g.7.....a758..b..e....1...........9..g.d....e6f.c.1537b6.e2.5........e....1.7....5...f.7..c..b9........3e..4fg...6a.g4.8.b7...e3.9..4a....b6.e.f7...25f.......1.3..a.c3...g..a5.4d.b.6.128.3........
+    ad4f8g67253b9ce16bgc9ad2817e534f13795febg46ca28d58e2c4319fdagb76f9c4a75813bd6eg2e215g6fdc8a7b4938gadb349e6f2c71537b61e2c59g4daf8ce2a391g7d86f5b4df5762ca4b918g3eb193ed84fgc526a7g468fb75a2e319dc4a8gd5b63e2f71c925fb4c9ed71g386a9c3e71gf6a584d2b76d128a3bc49ef5g</pre>
+<pre>
+    +----+----+----+----+    +----+----+----+----+
+    |ad4.|..67|..3b|.c..|    |ad4f|8g67|253b|9ce1|
+    |...c|9a.2|.1..|....|    |6bgc|9ad2|817e|534f|
+    |....|5...|g46.|.2.d|    |1379|5feb|g46c|a28d|
+    |....|c.31|9...|g.7.|    |58e2|c431|9fda|gb76|
+    +----+----+----+----+    +----+----+----+----+
+    |....|a758|..b.|.e..|    |f9c4|a758|13bd|6eg2|
+    |..1.|....|....|..9.|    |e215|g6fd|c8a7|b493|
+    |.g.d|....|e6f.|c.15|    |8gad|b349|e6f2|c715|
+    |37b6|.e2.|5...|....|    |37b6|1e2c|59g4|daf8|
+    +----+----+----+----+    +----+----+----+----+
+    |.e..|..1.|7...|.5..|    |ce2a|391g|7d86|f5b4|
+    |.f.7|..c.|.b9.|....|    |df57|62ca|4b91|8g3e|
+    |...3|e..4|fg..|.6a.|    |b193|ed84|fgc5|26a7|
+    |g4.8|.b7.|..e3|.9..|    |g468|fb75|a2e3|19dc|
+    +----+----+----+----+    +----+----+----+----+
+    |4a..|..b6|.e.f|7...|    |4a8g|d5b6|3e2f|71c9|
+    |25f.|....|..1.|3..a|    |25fb|4c9e|d71g|386a|
+    |.c3.|..g.|.a5.|4d.b|    |9c3e|71gf|6a58|4d2b|
+    |.6.1|28.3|....|....|    |76d1|28a3|bc49|ef5g|
+    +----+----+----+----+    +----+----+----+----+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Sebastian Isaac Velasco, <code>&lt;velascosebastian at gmail.com&gt;</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<pre>
+    Copyright 2013, Sebastian Isaac Velasco</pre>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="availability">AVAILABILITY</a></h1>
+<p>The latest version of this library is likely to be available from CPAN as well as:</p>
+<pre>
+    https://github.com/velascosebastian/kubedoku/perl</pre>
+
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+---
+name: Geo-Direction-Name
+version: 0.0.4
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: Transform direction name and degree each other.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Inspector: 0
+  Scalar::Util: 0
+  Test::Base: 0
+  UNIVERSAL::require: 0
+  version: 0
+provides:
+  Geo::Direction::Name:
+    file: lib/Geo/Direction/Name.pm
+    version: 0.0.4
+  Geo::Direction::Name::Locale:
+    file: lib/Geo/Direction/Name/Locale.pm
+    version: 0.0.4
+  Geo::Direction::Name::Locale::en:
+    file: lib/Geo/Direction/Name/Locale/en.pm
+  Geo::Direction::Name::Locale::ja:
+    file: lib/Geo/Direction/Name/Locale/ja.pm
+  Geo::Direction::Name::Locale::ko:
+    file: lib/Geo/Direction/Name/Locale/ko.pm
+  Geo::Direction::Name::Locale::zh_CN:
+    file: lib/Geo/Direction/Name/Locale/zh_CN.pm
+  Geo::Direction::Name::Locale::zh_TW:
+    file: lib/Geo/Direction/Name/Locale/zh_TW.pm
+  Geo::Direction::Name::Spec:
+    file: lib/Geo/Direction/Name/Spec.pm
+    version: 0.0.4
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

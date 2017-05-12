@@ -1,0 +1,20 @@
+Revision history for Grapheme::Ngram
+
+0.006  2015-05-28 23:52:41 CEST
+       - improved tests
+
+0.005  2014-10-09 11:42:26 CEST
+       - improved test coverage
+       - return as is if length shorter width
+
+0.004  2014-08-16 23:38:24 CEST
+       - badges in pod
+
+0.003  2014-08-16 07:44:43 CEST
+       - add travis
+
+0.002  2014-08-04 22:05:17 CEST
+       - quote version
+
+0.001  2014-07-29 22:03:51 CEST
+       - Initial release.

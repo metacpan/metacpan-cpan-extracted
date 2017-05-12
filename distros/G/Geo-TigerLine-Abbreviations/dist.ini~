@@ -1,0 +1,12 @@
+name    = Geo-TigerLine-Abbreviations
+author  = Josh Jore <jjore@cpan.org>
+license = Perl_5
+copyright_holder = Josh Jore
+copyright_year   = 2011
+
+version = 0.03
+
+[@Basic]
+[Prereqs]
+Cache::Cache = 0
+LWP::Simple = 0

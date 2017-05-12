@@ -1,0 +1,78 @@
+{
+   "abstract" : "Wraper arround SVG to graph chart",
+   "author" : [
+      "DULAUNOY Fabrice <fabrice at dulaunoy dot com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graph-ChartSVG",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::Dumper" : "0"
+         },
+         "requires" : {
+            "Data::Serializer" : "0",
+            "Hash::Merge" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "SVG" : "0",
+            "SVG::Parser" : "0",
+            "perl" : "5.005_03"
+         }
+      }
+   },
+   "provides" : {
+      "Graph::ChartSVG" : {
+         "file" : "lib/Graph/ChartSVG.pm",
+         "version" : "2.07"
+      },
+      "Graph::ChartSVG::Border" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      },
+      "Graph::ChartSVG::Data" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      },
+      "Graph::ChartSVG::Frame" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      },
+      "Graph::ChartSVG::Glyph" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      },
+      "Graph::ChartSVG::Grid" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      },
+      "Graph::ChartSVG::Grid_def" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      },
+      "Graph::ChartSVG::Label" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      },
+      "Graph::ChartSVG::Layer" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      },
+      "Graph::ChartSVG::Overlay" : {
+         "file" : "lib/Graph/ChartSVG.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "2.07",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

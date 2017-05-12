@@ -1,0 +1,182 @@
+.content
+{
+line-height: 120%;
+}
+
+.global_toc_heading
+{
+color: teal;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 12pt;
+text-align: center;
+}
+
+.global_toc_text
+{
+color: green;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 16pt;
+text-align: center;
+}
+
+h5
+{
+background: #88A088;
+color: red;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 8pt;
+font-weight: bold;
+text-align: left;
+}
+
+.headline
+{
+color: maroon;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 16pt;
+font-weight: 500;
+text-align: left;
+}
+
+.index
+{
+color: red;
+background-color: yellow;
+}
+
+.introduction
+{
+color: #80c0ff;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 14pt;
+text-align: center;
+white-space: nowrap;
+}
+
+.item_headline
+{
+color: teal;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 12pt;
+font-weight: 500;
+text-align: left;
+}
+
+.item_text
+{
+color: maroon;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 12pt;
+font-weight: 500;
+text-align: left;
+}
+
+.local_h2
+{
+background-color: white;
+color: teal;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 14pt;
+font-weight: 500;
+text-align: left;
+}
+
+.local_text
+{
+background-color: white;
+color: maroon;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 16pt;
+font-weight: 500;
+text-align: left;
+}
+
+.local_toc_heading
+{
+color: teal;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 12pt;
+font-weight: bold;
+text-align: center;
+}
+
+.local_toc_prefix
+{
+color: navy;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 10pt;
+text-align: left;
+}
+
+.local_toc_text
+{
+color: green;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 10pt;
+text-align: left;
+}
+
+.page_heading
+{
+color: blue;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 16pt;
+font-weight: bold;
+text-align: center;
+white-space: nowrap;
+}
+
+.small_gray_text
+{
+color: gray;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 8pt;
+text-align: left;
+}
+
+.small_green_text
+{
+color: green;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 8pt;
+text-align: left;
+}
+
+.small_purple_text
+{
+color: purple;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 8pt;
+text-align: left;
+}
+
+.small_red_text
+{
+color: red;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 8pt;
+text-align: left;
+}
+
+.small_white_text
+{
+color: white;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 8pt;
+text-align: left;
+}
+
+.submit
+{
+background: #80c0ff;
+border-top-width: 1px;
+border-bottom-width: 1px;
+border-left-width: 1px;
+border-right-width: 1px;
+color: navy;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 8pt;
+font-weight: bold;
+width: auto;
+}
+

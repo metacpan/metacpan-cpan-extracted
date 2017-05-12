@@ -1,0 +1,45 @@
+Overview of Changes in 1.002
+============================
+
+* Fix a bug in Gnome2::Canvas::polygon_to_point().  [muppet]
+* Fix unusably broken bindings of Gnome2::Canvas::w2c_affine(),
+  Gnome2::Canvas::Item::i2w_affine(), and Gnome2::Canvas::Item::i2c_affine(),
+  with regression tests.  [muppet]
+* Portability fixes for Mac OS X.  [muppet]
+* Minor documentation enhancements.  [muppet]
+
+Overview of Changes in 1.001
+============================
+
+* Fix the broken example in the documentation synopsis.  [muppet]
+* Skip the open_parts and closed_parts tests to pass when working with
+  libgnomecanvas 2.0.x.  [Torsten]
+* Hush unused variable warning.  [muppet]
+
+Overview of Changes in 1.0
+==========================
+
+* Require stable Glib/Gtk2 1.040
+* Add import version checking.
+* Spit and polish.
+
+Overview of Changes in 0.93
+===========================
+
+* Check that we're using at least ExtUtils::Depends 0.2.
+* Require ExtUtils::PkgConfig 1.03.
+* Add Gnome2::Canvas::GET_VERSION and Gnome2::CHECK_VERSION. [Emmaneule Bassi]
+* Pod improvements.
+
+Overview of Changes in Gnome2::Canvas 0.92
+==========================================
+
+* Updated Glib requirement to 1.035.
+* Made use of Glib 1.035's MakeHelper features for documentation generation.
+
+Overview of Changes in Gnome2::Canvas 0.91
+==========================================
+
+* GnomeCancasPathDef, handling re-worked.
+* apidoc POD updates
+* some new demos added, others updated

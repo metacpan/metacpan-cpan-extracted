@@ -1,0 +1,280 @@
+#!/usr/local/bin/perl
+
+# This is a simple script that allows use of
+# Geo::WebService::Elevation::USGS from the command line.
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Geo::WebService::Elevation::USGS;
+use Pod::Usage;
+use Scalar::Util qw{ looks_like_number };
+
+our $VERSION = '0.106';
+
+BEGIN {
+    eval {
+	require Time::HiRes;
+	Time::HiRes->import( qw{time alarm sleep} );
+    };
+}
+
+# Output is by whatever dumper is available.
+
+my $dumper = eval {
+    require YAML and YAML->can('Dump')} || eval {
+    require Data::Dumper and Data::Dumper->can('Dumper')}
+    or die "Can not load YAML or Data::Dumper";
+
+# If interactive, input is by Term::ReadLine if available, or a simple
+# subroutine otherwise. If not interactive, we just read STDIN.
+
+my $interactive = -t STDIN;
+my $prompt = 'usgs_ele> ';
+my $read = $interactive ?
+    eval {require Term::ReadLine} ? do {
+	my $rl = Term::ReadLine->new('USGS Elevation query');
+	sub {$rl->readline($_[0])}
+    } : sub {print STDERR $_[0]; <STDIN>} : sub {<STDIN>};
+
+# If interactive, print a banner
+
+$interactive and warn <<eod;
+
+Simple Geo::WebService::Elevation::USGS client
+Enter 'help' for help
+
+eod
+
+# We need a Geo::WebService::Elevation::USGS object.
+
+my $ele = Geo::WebService::Elevation::USGS->new();
+
+# While we have input ...
+
+while (defined ($_ = $read->($prompt))) {
+
+    # Normalize the input and bypass it if it is an empty line or a
+    # comment.
+
+    chomp;
+    s/^\s+//;
+    s/\s+$//;
+    $_ or next;
+    substr($_, 0, 1) eq '#' and next;
+
+    # Split the line into a method name and arguments.
+
+    my ($method, @args) = split '\s+', $_;
+    my $rslt;
+    my $start;
+    if ($method eq 'time') {
+	$method = shift @args;
+	$start = time();
+    }
+
+    # Dispatch the command to our own subroutine if there is one, or the
+    # same-named Geo::WebService::Elevation::USGS method otherwise.
+
+    if (my $code = __PACKAGE__->can('cmd_' . $method)) {
+	$rslt = eval {$code->(@args)};
+    } else {
+	$rslt = eval {$ele->$method(@args)};
+    }
+    if ($start) {
+	warn "Elapsed time: ", time() - $start, " seconds\n";
+    }
+
+    # If we flunked, display the error message. Otherwise if we got a
+    # result and it's just our object again, print it. 
+
+    if ($@) {
+	warn $@;
+    } elsif (defined $rslt && !eval
+	{$rslt->isa('Geo::WebService::Elevation::USGS')}) {
+	print $dumper->($rslt);
+    }
+}
+
+# End of input. Print a newline for neatness, and fall off the end of
+# the script.
+
+print "\n";
+
+# The exit command.
+
+sub cmd_exit {
+    print "\n";
+    exit;
+}
+
+# The help command displays very brief help.
+
+sub cmd_help {
+    pod2usage( { -verbose => 2, exitval => 'NOEXIT' } );
+    return;
+}
+
+# The 'new' command wraps the Geo::WebService::Elevation::USGS 'new',
+# nabs the new object, and puts it where we can find it.
+
+sub cmd_new {
+    return $ele = Geo::WebService::Elevation::USGS->new(@_);
+}
+
+# The 'show' command displays the values of the named attributes. If
+# none are given, all are displayed.
+
+sub cmd_show {
+    my @args = @_;
+    unless ( @args ) {
+	my %attr = $ele->attributes();
+	@args = sort keys %attr;
+    }
+    foreach my $name ( @args ) {
+	my $val = _format( $ele->get( $name ) );
+	print "$name\t=> $val\n";
+    }
+    return;
+}
+
+sub _format {
+    my ( $val ) = @_;
+    defined $val
+	or return 'undef';
+    looks_like_number( $val )
+	and return $val;
+    return "'$val'";
+}
+
+# The 'sources' command sets the source attribute to a reference to the
+# array of its arguments (which may be empty).
+
+sub cmd_sources {
+    return $ele->set(source => [@_]);
+}
+
+# The 'throttle' command sets the throttle time, which is the minimum
+# elapsed time between queries.
+
+sub cmd_throttle {
+    @_ and $Geo::WebService::Elevation::USGS::THROTTLE = $_[0];
+    return $Geo::WebService::Elevation::USGS::THROTTLE;
+}
+
+__END__
+
+=head1 TITLE
+
+usgs_ele - Interactive script to access USGS elevation data
+
+=head1 SYNOPSIS
+
+ usgs_ele
+ usgs_ele> help
+ usgs_ele> exit
+
+=head1 OPTIONS
+
+None.
+
+=head1 DETAILS
+
+This is an interactive Perl script to access the USGS elevation data.
+
+Possible commands:
+
+=head2 attributes
+
+This command lists the names and values of all
+Geo::WebService::Elevation::USGS attributes.
+
+=head2 exit
+
+This command terminates this script. End-of-file also works.
+
+=head2 get
+
+ usgs_ele> get units
+
+This command displays the value of the attribute named in the command.
+
+=head2 getAllElevations
+
+ usgs_ele> getAllElevations lat lon
+
+This command displays all available elevation values for the given
+latitude and longitude. The latitude and longitude are in degrees, with
+south latitude and west longitude being negative.
+
+=head2 getElevation
+
+ usgs_ele> getElevation lat lon
+
+This command displays the 'best' elevation value for the given latitude
+and longitude. The latitude and longitude are in degrees, with south
+latitude and west longitude being negative.
+
+=head2 help
+
+This command displays this text.
+
+=head2 new
+
+This command creates a new Geo::WebService::Elevation::USGS object.
+
+=head2 show
+
+ usgs_ele> show
+ usgs_ele> show retry
+
+This command displays the values of the named attributes. If no
+attribute names are given, all are displayed.
+
+=head2 set
+
+ usgs_ele> set units METERS
+
+This command sets the given attribute to the given value. The value is
+not case-sensitive, and bogus values are equivalent to C<'Feet'>.
+
+=head2 sources
+
+ usgs_ele> sources Elev_DC_Washington Elev_DE_SussexCounty
+
+This command sets the C<source> attribute to a reference to an array
+containing its arguments.
+
+=head2 throttle
+
+This command displays (without an argument) or changes (with an
+argument) the value of C<$Geo::WebService::Elevation::USGS::THROTTLE>.
+
+=head2 time
+
+ usgs_ele> time elevation 40 -90
+
+This pseudo-command takes as its arguments a real command, executes it,
+and displays the time elapsed.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008-2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

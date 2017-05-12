@@ -1,0 +1,17 @@
+diff -u -r wavelan-applet-0.5.orig/src/wavelan-applet.c wavelan-applet-0.5/src/wavelan-applet.c
+--- wavelan-applet-0.5.orig/src/wavelan-applet.c	Thu Dec  6 03:29:32 2001
++++ wavelan-applet-0.5/src/wavelan-applet.c	Thu Dec  6 17:41:14 2001
+@@ -570,9 +570,9 @@
+ 	wavelan_applet_set_update_interval (global_applet, 
+ 					    gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (entry)));
+ 
+-	entry = gtk_object_get_data (GTK_OBJECT (pb), "text-smaller");
+-	wavelan_applet_set_text_smaller (global_applet, 
+-					 gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (entry)));
++/* 	entry = gtk_object_get_data (GTK_OBJECT (pb), "text-smaller"); */
++/* 	wavelan_applet_set_text_smaller (global_applet,  */
++/* 					 gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (entry))); */
+ 
+ 	entry = gtk_object_get_data (GTK_OBJECT (pb), "text-aa");
+ 	wavelan_applet_set_text_aa (global_applet, 
+Only in wavelan-applet-0.5/src: wavelan-applet.c~

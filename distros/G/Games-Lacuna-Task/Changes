@@ -1,0 +1,38 @@
+Changes for Game-Lacuna-Task
+
+2.05 Fri, Apr 07, 2012
+    * Fix bugs in ship_update, ship_dispatch and building_upgrade tasks
+    * Check for shot down excavators
+    * Better ship renaming
+    * Dist maintenance
+
+2.04 Fri, Apr 07, 2012
+    * Maintenance release
+
+2.03 Fri, Apr 06, 2012
+    * New resources push action
+    * New upgrade fleet action
+    * New excavator action
+    * Rename some actions
+    * Cache empire info and add action to query this cache
+    * Star cache helper actions
+    * Better API exception handling
+    * Refactor ship helper role
+    * Refactor base classes and how actions are loaded
+    * Refactor storage logic to separate class
+    * Better documentation
+    * Many bugfixes
+
+2.01 Fri, Jan 13, 2012
+    * Incompatible database changes: Distinguish between probed (currently 
+      probed by empire or alliance) and known solar systems (body data 
+      available in cache)
+    * new empire_find action
+    * new star_cache_export action
+    * renamed build_star_cache action to star_cache_build
+    * fix broken mining action
+    * basic locking mechanism
+    * automatically handle database upgrades
+
+2.00 Fri, Jan 13, 2012
+    * First stable version released on CPAN

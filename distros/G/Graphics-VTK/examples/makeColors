@@ -1,0 +1,50 @@
+#
+#  Script to make the VTK::Colors file
+#
+
+
+my $vtkBaseDir = "/home/cerney/vtk/vtk31";
+
+
+
+my $dirName = "$vtkBaseDir/examplesTcl";
+	
+unless( -d $dirName){
+	die "Path '$dirName' doesn't exist\n";
+	next;
+}
+	
+
+my $command = "perl -w tcl2perl ../VTK $dirName/colors.tcl";
+
+
+		
+system( $command ) && die("Error executing Command '$command': $!");
+		
+# Get rid of Use VTK in the colors file
+open(OUTFILE, ">../VTK/Colors.pm") or die("Can't open file ../VTK/Colors.pm\n");
+
+print OUTFILE "# Predined colors for the VTK package
+
+package VTK::Colors;
+
+";
+
+open(INFILE, "../VTK/colors.pl") or die("Can't Open colors.pl\n");
+
+while(<INFILE>){
+
+	next if( /^use VTK/);
+	
+	if( /^\$\w+/){
+		s/^\$/\@/;
+		s/\"(.+?)\"/qw\/$1\//g;
+	}
+	print OUTFILE $_;
+	
+}
+
+close OUTFILE;
+close INFILE;
+
+unlink "../VTK/colors.pl";

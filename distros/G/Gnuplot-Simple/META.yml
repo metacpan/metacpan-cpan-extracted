@@ -1,0 +1,29 @@
+---
+abstract: 'A simple way to control Gnuplot'
+author:
+  - finnperl
+build_requires:
+  Cwd: '0'
+  File::Basename: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gnuplot-Simple
+requires:
+  Carp::Assert: '0'
+  Exporter::Tidy: '0'
+  File::Slurper: '0'
+  File::Temp: '0'
+  Method::Signatures: '0'
+  Text::CSV: '0'
+  Types::Standard: '0'
+  perl: v5.14.0
+  strictures: '2'
+version: '0.013'

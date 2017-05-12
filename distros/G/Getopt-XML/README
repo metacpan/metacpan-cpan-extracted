@@ -1,0 +1,100 @@
+Getopt-XML version 0.53
+============================
+
+This is simply another way to pass in user defined arguments to an application
+using Getop::Long. The module provides a way to pass in user arguments from an
+XML file into Getopt::Long.
+
+In this way, the user can provide input to an application via an XML file. And
+this can be useful if the application is ran at a regular interval. Or it may
+be useful if the input to the application can change between multiple
+executions, but the provided content is consistant over time based on the
+context of the execution.
+
+This input method may be desired for an application which has default values
+for options the author wishes to exist, but the author wants those default
+values to be changed by the user without having to edit the application code.
+
+Or perhaps the application will reside in a multi-user environment, and this
+module would be used to store the input options as part of the user preferences.
+
+And finally, perhaps the options to be passed into the application resides
+somewhere else in XML or another storage format that can be transformed into
+XML as input to an application.
+
+
+EXAMPLE
+
+    use XML::TreePP;
+    use Getopt::Long;
+    use Getopt::XML qw(GetXMLOptions);
+    use Data::Dump qw(dump);
+    #
+    # Set the XML Data
+    my $xmldata=<<"EOF_XMLDATA";
+    <apple>
+        <color>red</color>
+        <type>red delicious</type>
+        <isAvailable/>
+        <cityGrown>Macomb</cityGrown>
+        <cityGrown>Peoria</cityGrown>
+        <cityGrown>Galesburg</cityGrown>
+    </apple>
+    EOF_XMLDATA
+    #
+    # Parse the XML data using XML::TreePP module
+    my $tpp     = XML::TreePP->new();
+    my $tree    = $tpp->parse( $xmldata );
+    #
+    # Read the XML data in as arguments to Getopt::Long
+    my %options;
+    GetXMLOptions (
+            xmldoc   => $tree,
+            xmlpath  => 'apple',
+            Getopt_Long     =>
+            [
+            \%options,
+                    'isAvailable',
+                    'color=s',
+                    'type=s',
+                    'cityGrown=s@'
+            ]
+    );
+    dump(\%options);
+
+This is the output:
+
+    {
+      cityGrown => ["Macomb", "Peoria", "Galesburg"],
+      color => "red",
+      isAvailable => 1,
+      type => "red delicious",
+    }
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Getopt::Long >= 2.37
+  XML::TreePP
+  XML::TreePP::XMLPath
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2008-2009 Center for the Application of Information Technologies.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

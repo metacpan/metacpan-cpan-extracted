@@ -1,0 +1,45 @@
+---
+name: Game-Pexeso
+version: 0.01
+author:
+  - 'Emmanuel Rodriguez <potyl@cpan.org>'
+abstract: Pexeso game in Clutter
+license: perl
+resources:
+  bugtracker: http://github.com/potyl/pexeso/issues
+  homepage: http://github.com/potyl/pexeso
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/potyl/pexeso
+configure_requires:
+  File::Spec::Functions: 0
+requires:
+  AnyEvent::HTTP: 0
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Clutter: 1.000
+  Data::Dumper: 0
+  File::Spec: 0
+  FindBin: 0
+  Getopt::Long: 0
+  Glib: 0
+  Gtk2: 0
+  List::Util: 0
+  Math::Trig: 0
+  Pod::Usage: 0
+  URI: 0
+  XML::LibXML: 0
+  perl: 5.6.1
+build_requires:
+  File::Spec::Functions: 0
+provides:
+  Game::Pexeso:
+    file: lib/Game/Pexeso.pm
+    version: 0.01
+  Game::Pexeso::Card:
+    file: lib/Game/Pexeso/Card.pm
+  Game::Pexeso::Spinner:
+    file: lib/Game/Pexeso/Spinner.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,14 @@
+Revision history for Geo-LocaPoint
+
+0.0.4  Tue Mar 24 2009
+       Add Geo::Formatter::Format::LocaPoint
+
+0.0.3  Sun Aug 31 2008
+       Add some pods, tests, required modules.
+
+0.0.2  Mon Mar  3 23:46:00 2008
+       Internal logic changes.
+
+0.0.1  Sat Jan 26 06:24:18 2008
+       Initial release.
+

@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Geo/Names/Russian.pm
+t/author-critic.t
+t/release-pod-coverage.t
+t/streetname_keystring.t
+t/streetname_split.t

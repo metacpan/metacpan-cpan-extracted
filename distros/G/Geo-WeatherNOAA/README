@@ -1,0 +1,41 @@
+$Id: README,v 1.6 1999/02/17 17:39:02 msolomon Exp $
+
+----------
+IMPORTANT!
+----------
+Version 4 is a complete re-write of code and has NONE of the same
+function calls or returns, so read the docs if you want to use it.
+
+This module enable one to easily get official weather information from
+NOAA, their "Zone Reports" and hourly "state roundups." I wanted to be
+able to get his information quickly and easily for web pages, or the
+command line, etc.
+
+I've also started a List-Serv for this module for those interested.  Look at
+http://fido.seva.net:8090/mailman/listinfo/weathernoaa for info to join
+
+A quick example to get a current weather in Boston, MA is as simple as:
+
+	use Geo::WeatherNOAA;
+	print print_current('BOSTON','MA');
+ 
+Would result with:
+	At 12:00pm EST, Boston, MA was experiencing light rain at 
+	45 F, wind is northeast at 10 mph. 
+
+Requirements:
+-------------
+	perl(1)
+	Text::Wrap
+	Tie::IxHash
+	LWP::UserAgent
+	LWP::Simple
+	LWP (libwww-perl)
+
+
+To install:
+-----------
+	perl Makefile.PL
+	make
+	make install
+

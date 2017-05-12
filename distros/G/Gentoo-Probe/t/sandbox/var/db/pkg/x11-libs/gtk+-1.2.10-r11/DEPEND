@@ -1,0 +1,4 @@
+virtual/x11
+	=dev-libs/glib-1.2*
+	nls? ( sys-devel/gettext
+		dev-util/intltool )  !bootstrap? ( sys-devel/patch ) !bootstrap? ( sys-devel/libtool )

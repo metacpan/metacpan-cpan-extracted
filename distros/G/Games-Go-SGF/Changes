@@ -1,0 +1,54 @@
+Revision history for Perl extension Games::Go::SGF.
+
+0.01  Sun Sep 30 12:54:47 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n Games::Go::SGF
+
+0.02  Fri Nov 24 16:00:04 2006
+	- second version; created by h2xs 1.23 with options
+		-XO -n Games::Go::SGF
+Changes:
+
+1. Report 'bad go sgf' with an explanation if:
+there are certain duplicated property identifiers (tags) 
+within a file (eg SZ),
+there are certain duplicated tags within a node (eg B),
+there is a certain mixture of tags within a node 
+eg ( (B or W) and (AB or AW or AE) )
+
+2. Quietly re-organise tags within a node if it is badly formed.
+eg CR[aa]CR[ab] becomes CR[aa][ab]
+
+3. Added AUTOLOAD functions to SGF::Node and SGF, so property values can be 
+found from the sgf tag. eg. $sgf->RU.
+
+4. Added $sgf->colour to report the move colour
+
+5. Added $sgf->tags, that returns a list of the tags found in a node.
+
+6. Added some validation checks to the values associated with some tags.
+
+0.03  Sat Nov 25 2006
+	- created by h2xs 1.23 with options
+		-XO -n Games::Go::SGF
+Changes:
+
+1. Added $sgf->color as an alias for $sgf->colour
+
+0.05  Tue Nov 28 2006
+	- created by h2xs 1.23 with options
+		-XO -n Games::Go::SGF
+Changes:
+
+1. Tag values can be set
+
+2. savesgf method will save as an sgf file
+
+0.10  Sun Oct 26 2008
+
+Fixed problem with CR[aa]CR[ab] becoming CR[aa][ab]CR[aa][ab]
+
+0.11  Sun Oct 26 2008
+
+If the sgf contains more than one game record, the first game is now parsed,
+and any others ignored, rather than than whole thing not parsing.

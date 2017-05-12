@@ -1,0 +1,38 @@
+GraphViz-DBI-General version 0.1
+=================================
+
+GraphViz::DBI::General is an object-oriented module that provides 
+the capability to automatically graphs of database schemas 
+(i.e. foreign key connections between tables).
+
+This is a subclass of GraphViz::DBI. It is intended to work 
+in the general case, and has been tested with PostgreSQL.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GraphViz
+  GraphViz::DBI
+  DBI
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Joseph Brenner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

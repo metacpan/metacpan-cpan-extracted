@@ -1,0 +1,66 @@
+Content-Type: text/html; name="promed_new.html"
+Content-Disposition: inline; filename="promed_new.html"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed_new.html> ProMED-mail
+X-Mailbot-Note: following link 1, following link 1
+
+<html>
+<html>
+<head>
+<title>ProMED-mail</title>
+</head>
+<IMG  HEIGHT=54 WIDTH=291 SRC="/images/satlogo.jpg">
+<p>
+<p>
+Welcome!
+<p>
+Here is 1k of junk:
+<p>
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foofoo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foofoo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+</body>
+</html>
+
+
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: Original_Sender
+Subject: Resource Unavailable
+X-Mailbot-Note: following link 3
+
+Could not fetch file:./notavalidpath/justtesting/foobarfoobarfoobarfoobarfoobarfoobarfoobar
+
+<HTML>
+<HEAD>
+<TITLE>
+An Error Occurred
+</TITLE>
+</HEAD>
+<BODY>
+<H1>An Error Occurred</h1>
+404 - File `/home/rolf/dev/getweb/t/testRoot/pub/notavalidpath/justtesting/foobarfoobarfoobarfoobarfoobarfoobarfoobar' does not exist
+</BODY>
+</HTML>
+
+
+...while executing the following command:
+
+GET NOMIME SOURCE file://test/promed.html FOLLOW 3

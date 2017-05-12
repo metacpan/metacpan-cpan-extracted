@@ -1,0 +1,17 @@
+[% title = view.title %]
+
+<form method='post' action='[% site.uri %]/yes' name='del_form'>
+<div class="box">
+  <table>
+    <tr>
+      <td class="dta"> <strong>[% view.form.message %]</strong> </td>
+    </tr>
+    <tr>
+      <td class="rshd">
+        <input type="submit" name="submit" value="Continue with Delete" />
+        <input type="submit" name="cancel" value="Cancel" />
+      </td>
+    </tr>
+  </table>
+</div>
+</form>

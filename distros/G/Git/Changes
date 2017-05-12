@@ -1,0 +1,12 @@
+Revision history for CPAN tracker of git's Git.pm
+
+0.40  Sat Oct 11 02:35:10 CDT 2014
+    - Adding Error.pm to prerequisites (should have been there all along, thanks Andreas Koenig https://rt.cpan.org/Public/Bug/Display.html?id=92422 )
+    - Dropping the spurious requirement of 5.14 in Makefile.PL (thanks Gustavo L. de M. Chaves <gnustavo@cpan.org> for pointing that out)
+    - Switching to .40 instead of .04 because of some conflict in another distro
+    - Including the MYMETA files because PAUSE wanted them
+0.03  Sun Jan 12 22:59:13 CST 2014
+    - New temp_is_locked function (see POD or https://raw.github.com/git/git/master/perl/Git.pm)
+0.02  Thu Jun 20 11:02:03 2013
+    - First import from https://raw.github.com/git/git/master/perl/Git.pm
+      for release on CPAN

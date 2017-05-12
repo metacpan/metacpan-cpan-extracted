@@ -1,0 +1,12 @@
+diff -urN zsh-4.1.1.old/Src/mkbltnmlst.sh zsh-4.1.1/Src/mkbltnmlst.sh
+--- zsh-4.1.1.old/Src/mkbltnmlst.sh	2002-10-16 02:59:58.000000000 +0900
++++ zsh-4.1.1/Src/mkbltnmlst.sh	2003-08-27 22:45:49.000000000 +0900
+@@ -54,7 +54,7 @@
+ 	echo "    add_autoparam(\"$param\", \"$x_mod\");"
+     done
+     for mfunc in $automathfuncs; do
+-	echo "    add_automath(\"$mfunc\", \"$x_mod\");"
++	echo "    add_automathfunc(\"$mfunc\", \"$x_mod\");"
+     done
+     echo "  }"
+     for dep in $moddeps; do

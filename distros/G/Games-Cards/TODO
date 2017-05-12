@@ -1,0 +1,23 @@
+Short Term
+----------
+- Pod
+- Drag & Drop for Tk::Cards. (in progress)
+- Bug fixes
+
+Medium Term
+-----------
+- Better GUI
+- More games
+- Multi-deck games?
+- Extra cards in the deck (e.g., joker)
+
+Long Term
+---------
+- Client/Server 
+- multiplayer games (over the network)
+
+Maybe Never
+-----------
+- CGI port
+- Curses port
+- Other card images

@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: Games-PMM
+version: 0.10
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires:
+  Test::Simple: 0.47
+conflicts: {}
+provides:
+  Games::PMM:
+    file: lib/Games/PMM.pm
+    version: 0.10
+  Games::PMM::Actions:
+    file: lib/Games/PMM/Actions.pm
+  Games::PMM::Arena:
+    file: lib/Games/PMM/Arena.pm
+  Games::PMM::Monster:
+    file: lib/Games/PMM/Monster.pm
+  Games::PMM::Monster::Commands:
+    file: lib/Games/PMM/Monster/Commands.pm
+generated_by: Module::Build version 0.20

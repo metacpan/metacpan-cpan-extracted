@@ -1,0 +1,45 @@
+{
+   "abstract" : "Bindings for GStreamer 1.0, the open source multimedia framework",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GStreamer1",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0.9",
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Glib::Object::Introspection" : "0.009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frezik/GStreamer1.git",
+         "web" : "https://github.com/frezik/GStreamer1"
+      }
+   },
+   "version" : "0.003"
+}
+

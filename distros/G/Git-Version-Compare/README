@@ -1,0 +1,30 @@
+NAME
+
+    Git::Version::Compare - Functions to compare Git versions
+
+SYNOPSIS
+
+    use Git::Version::Compare qw( cmp_git );
+
+    # result: 1.2.3 1.7.0.rc0 1.7.4.rc1 1.8.3.4 1.9.3 2.0.0.rc2 2.0.3 2.3.0.rc1
+    my @versions = sort cmp_git qw(
+      1.7.4.rc1 1.9.3 1.7.0.rc0 2.0.0.rc2 1.2.3 1.8.3.4 2.3.0.rc1 2.0.3
+    );
+
+DESCRIPTION
+
+    Git::Version::Compare contains a selection of subroutines that make
+    dealing with Git-related things (like versions) a little bit easier.
+
+    The strings to compare can be version numbers, tags from "git.git" or the
+    output of "git version" or "git describe".
+
+    These routines collect the knowledge about Git versions that was
+    accumulated while developing Git::Repository.
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Philippe Bruhat (BooK).
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,55 @@
+Revision history for Perl module Google::SAML::Response
+
+0.14 2014-08-16T21:31:59Z
+    - This distribution is now Minilla-managed. No code changes
+
+0.13 Sat Aug 31 2013
+    - The string returned by get_google_form no longer contains HTTP headers.
+    - Changed github repository URL.
+    - Minor code cleanup
+
+0.11 Wed Apr 18 2012
+    - Many thanks to Jeremy Smith who reported that Google (sometimes?) doesn't
+      correctly encoded its relay state and who sent a patch to fix the problem.
+
+0.10 Sat Aug 07 2010
+    - Many thanks to Thiago Damasceno who let me know that DSA-Key handling
+      was horribly, horribly broken and then showed me how to do it correctly.
+
+0.09 Fri Nov 06 2009
+    - The synopsis was corrected (the example call to new() didn't provide
+      the parameters as a hash-ref).
+
+0.08 Mon Aug 17 2009
+    - Fixed some serious documentation bugs (thanks to Keith Erekson for 
+      reporting them)
+    - Changed the xmlsec test that now not only checks whether xmlsec1 is
+      installed, but also whether it is also working.
+
+0.07 Fri Dec 19 2008
+    - Repair the broken package 0.06 which wouldn't pass the tests
+
+0.06 Thu Dec 18 2008
+    - Improve the xmlsec test a bit so that we can be sure (can we?)
+      about xmlsec being installed or not.
+    - No source code changes.
+
+0.05 Tue Aug 12 2008
+    - Add even more recipient information and the AudienceRestriction tag
+    - Add support for DSA keys
+
+0.04 Tue Jul 29 2008
+    - Add recipient information to response xml as specified by Google
+      (http://code.google.com/apis/apps/faq.html#recipient). Thanks to
+      Dusty Wilson for the patch!
+
+0.03 Thu Jun 5 2008
+	- Add yet another missing dependency to Makefile.PL: Crypt::OpenSSL::Bignum
+
+0.02 Thu Jun 5 2008
+    - Add missing dependency Google::SAML::Request to Makefile.PL
+
+0.01 Wed Jun 4 2008
+    - initial release
+
+

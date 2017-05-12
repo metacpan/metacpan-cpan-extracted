@@ -1,0 +1,202 @@
+NAME
+    Geo::Google - Perform geographical queries using Google Maps
+
+SYNOPSIS
+      use strict;
+      use Data::Dumper;
+      use Geo::Google;
+
+      #Allen's office
+      my $gonda_addr = '695 Charles E Young Dr S, Westwood, CA 90024';
+      #Stan's Donuts
+      my $stans_addr = '10948 Weyburn Ave, Westwood, CA 90024';
+      #Roscoe's House of Chicken and Waffles
+      my $roscoes_addr = "5006 W Pico Blvd, Los Angeles, CA";
+
+      #Instantiate a new Geo::Google object.
+      my $geo = Geo::Google->new();
+
+      #Create Geo::Google::Location objects.  These contain
+      #latitude/longitude coordinates, along with a few other details
+      #about the locus.
+      my ( $gonda ) = $geo->location( address => $gonda_addr );
+      my ( $stans ) = $geo->location( address => $stans_addr );
+      my ( $roscoes ) = $geo->location( address => $roscoes_addr );
+      print $gonda->latitude, " / ", $gonda->longitude, "\n";
+      print $stans->latitude, " / ", $stans->longitude, "\n";
+      print $roscoes->latitude, " / ", $roscoes->longitude, "\n";
+
+      #Create a Geo::Google::Path object from $gonda to $roscoes
+      #by way of $stans.
+      my ( $donut_path ) = $geo->path($gonda, $stans, $roscoes);
+
+      #A path contains a series of Geo::Google::Segment objects with
+      #text labels representing turn-by-turn driving directions between
+      #two or more locations.
+      my @segments = $donut_path->segments();
+
+      #This is the human-readable directions for the first leg of the
+      #journey.
+      print $segments[0]->text(),"\n";
+
+      #Geo::Google::Segment objects contain a series of
+      #Geo::Google::Location objects -- one for each time the segment
+      #deviates from a straight line to the end of the segment.
+      my @points = $segments[1]->points;
+      print $points[0]->latitude, " / ", $points[0]->longitude, "\n";
+
+      #Now how about some coffee nearby?
+      my @coffee = $geo->near($stans,'coffee');
+      #Too many.  How about some Coffee Bean & Tea Leaf?
+      @coffee = grep { $_->title =~ /Coffee.*?Bean/i } @coffee;
+
+      #Still too many.  Let's find the closest with a little trig and
+      #a Schwartzian transform
+      my ( $coffee ) = map { $_->[1] }
+                       sort { $a->[0] <=> $b->[0] }
+                       map { [ sqrt(
+                                ($_->longitude - $stans->longitude)**2
+                                  +
+                                ($_->latitude - $stans->latitude)**2
+                               ), $_ ] } @coffee;
+
+      # Export a location as XML for part of a Google Earth KML file
+      my $strStansDonutsXML = $stans->toXML();
+ 
+      # Export a location as JSON data to use with Google Maps
+      my $strRoscoesJSON = $roscoes->toJSON();
+
+DESCRIPTION
+    Geo::Google provides access to the map data used by the popular Google
+    Maps web application.
+
+  WHAT IS PROVIDED
+    Conversion of a street address to a 2D Cartesian point
+    (latitude/longitude)
+    Conversion of a pair of points to a multi-segmented path of driving
+    directions between the two points.
+    Querying Google's "Local Search" given a point and one or more query
+    terms.
+
+  WHAT IS NOT PROVIDED
+    Documentation of the Google Maps map data XML format
+    Documentation of the Google Maps web application API
+    Functionality to create your own Google Maps web page.
+
+AUTHOR
+    Allen Day <allenday@ucla.edu>, Michael Trowbridge
+    <michael.a.trowbridge@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2004-2007 Allen Day. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+BUGS / TODO
+    Report documentation and software bugs to the author, or better yet,
+    send a patch. Known bugs/issues:
+
+    Polyline decoding needs to be cleaned up.
+    Lack of documentation.
+        JSON exporting is not exactly identical to the original Google JSON
+        response. Some of the Google Maps-specific data is discarded during
+        parsing, and the perl JSON module does not allow for bare keys while
+        exporting to a JSON string. It should still be functionally
+        interchangeable with a Google JSON reponse.
+
+SEE ALSO
+      http://maps.google.com
+      http://www.google.com/apis/maps/
+      http://libgmail.sourceforge.net/googlemaps.html
+
+CONSTRUCTOR
+  new()
+     Usage    : my $geo = Geo::Google->new();
+     Function : constructs and returns a new Geo::Google object
+     Returns  : a Geo::Google object
+     Args     : n/a
+
+OBJECT METHODS
+  error()
+     Usage    : my $error = $geo->error();
+     Function : Fetch error messages produced by the Google Maps XML server.
+                Errors can be produced for a number of reasons, e.g. inability
+                of the server to resolve a street address to geographical
+                coordinates.
+     Returns  : The most recent error string.  Calling this method clears the
+                last error.
+     Args     : n/a
+
+  location()
+     Usage    : my $loc = $geo->location( address => $address );
+     Function : creates a new Geo::Google::Location object, given a
+                street address.
+     Returns  : a Geo::Google::Location object, or undef on error
+     Args     : an anonymous hash:
+                key       required?   value
+                -------   ---------   -----
+                address   yes         address to search for
+                id        no          unique identifier for the
+                                      location.  useful if producing
+                                      XML.
+                icon      no          image to be used to represent
+                                      point in Google Maps web
+                                      application
+                infoStyle no          unknown.  css-related, perhaps?
+
+  near()
+     Usage    : my @near = $geo->near( $loc, $phrase );
+     Function : searches Google Local for records matching the
+                phrase provided, with the constraint that they are
+                physically nearby the Geo::Google::Location object
+                provided.  search phrase is passed verbatim to Google.
+     Returns  : a list of Geo::Google::Location objects
+     Args     : 1. A Geo::Google::Location object
+                2. A search phrase.
+
+  path()
+     Usage    : my $path = $geo->path( $from, $OptionalWaypoints, $to );
+     Function : get driving directions between two points
+     Returns  : a Geo::Google::Path object
+     Args     : 1. a Geo::Google::Location object (from)
+                2. optional Geo::Google::Location waypoints
+                3. a Geo::Google::Location object (final destination)
+
+INTERNAL FUNCTIONS AND METHODS
+  _decode()
+     Usage    : my @points = _decode($encoded_points);
+     Function : decode a polyline into its composite lat/lon pairs
+     Returns  : an array
+     Args     : a string
+
+  _encode()
+     Usage    : my $encoded_points = _encode(@points);
+     Function : encode lat/lon pairs into a polyline string
+     Returns  : a string
+     Args     : an array
+
+  _html_unescape()
+     Usage    : my $clean = _html_unescape($dirty);
+     Function : does HTML unescape of & > < " special characters
+     Returns  : an unescaped HTML string
+     Args     : an HTML string.
+
+  _obj2location()
+     Usage    : my $loc = _obj2location($obj);
+     Function : converts a perl object generated from a Google Maps 
+                    JSON response to a Geo::Google::Location object
+     Returns  : a Geo::Google::Location object
+     Args     : a member of the $obj->{overlays}->{markers}->[] 
+                    anonymous array that you get when you read google's 
+                    JSON response and parse it using JSON::jsonToObj()
+
+  _JSONrenderSkeleton()
+     Usage    : my $perlvariable = _JSONrenderSkeleton();
+     Function : creates the skeleton of a perl data structure used by 
+                    the Geo::Google::Location and Geo::Google::Path for 
+                    rendering to Google Maps JSON format
+     Returns  : a mildly complex multi-level anonymous hash/array 
+                    perl data structure that corresponds to the Google 
+                    Maps JSON data structure
+     Args     : none
+

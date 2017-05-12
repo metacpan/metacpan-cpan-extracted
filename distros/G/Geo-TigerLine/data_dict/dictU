@@ -1,0 +1,14 @@
+Record Type U - TIGER/Line ID Overpass/Underpass Identification
+
+Field     BV  Fmt  Type Beg End  Len Description
+RT        No   L    A     1    1  1  Record Type
+VERSION   No   L    N     2    5  4  Version Number
+FILE      No   L    N     6   10  5  File Code
+TZID      No   R    N    11   20 10  TIGER Zero-Cell ID, Permanent Zero-Cell Number
+RTSQ      No   R    N    21   21  1  Record Sequence Number
+TLIDOV1   Yes  R    N    22   31 10  TIGER/Line ID, First Overpass 1-Cell Number
+TLIDOV2   Yes  R    N    32   41 10  TIGER/Line ID, Second Overpass 1-Cell Number
+TLIDUN1   Yes  R    N    42   51 10  TIGER/Line ID, First Underpass 1-Cell Number
+TLIDUN2   Yes  R    N    52   61 10  TIGER/Line ID, Second Underpass 1-Cell Number
+FRLONG    No   R    N    62   71 10  TZID Longitude
+FRLAT     No   R    N    72   80  9  TZID Latitude

@@ -1,0 +1,17 @@
+Revision history for Perl extension Guitar::scale.
+
+0.06  add 'Diminish--' scale
+
+0.05  add 'Algerian', 'Diatonic', 'Dominant7th', 'Chromatic', 'Blues++', 'MitsuruMetal' scale
+      I have corrected in alphabetical order ScaleList
+
+0.04  ..none
+
+0.03  add 'Ultralocrian' scale.
+
+0.02  add 'Altered' scale. edited documentation
+
+0.01  Sun Apr 21 20:21:48 2013
+	- original version; created by h2xs 1.23 with options
+		-X -A Guitar::scale
+

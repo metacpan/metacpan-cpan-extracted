@@ -1,0 +1,4 @@
+GTK_TYPE_ACTIVATABLE	GtkActivatable	GInterface	Gtk2::Activatable
+GTK_TYPE_ARROW_PLACEMENT	GtkArrowPlacement	GEnum	Gtk2::ArrowPlacement
+GTK_TYPE_ORIENTABLE  GtkOrientable  GInterface  Gtk2::Orientable
+GTK_TYPE_ENTRY_ICON_POSITION  GtkEntryIconPosition  GEnum  Gtk2::EntryIconPosition

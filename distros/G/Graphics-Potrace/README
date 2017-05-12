@@ -1,0 +1,172 @@
+NAME
+    Graphics::Potrace - bindings to the potrace library
+
+VERSION
+    version 0.76
+
+SYNOPSIS
+       # Step by step
+       use Graphics::Potrace qw< raster >;
+       my $raster = raster('
+       ..........................
+       .......XXXXXXXXXXXXXXX....
+       ..XXXXXXXX.......XXXXXXX..
+       ....XXXXX.........XXXXXX..
+       ......XXXXXXXXXXXXXXX.....
+       ...XXXXXX........XXXXXXX..
+       ...XXXXXX........XXXXXXX..
+       ....XXXXXXXXXXXXXXXXXX....
+       ..........................
+       ');
+       my $vector = $raster->trace();
+       $vector->export(Svg => file => 'example.svg');
+       $vector->export(Svg => file => \my $svg_dump);
+       $vector->export(Svg => fh   => \*STDOUT);
+
+       # There is a simpler way to get a dump in a scalar
+       my $eps_dump = $vector->render('Eps');
+
+       # All in one facility
+       use Graphics::Potrace qw< trace >;
+       trace(
+          raster => '
+          ..........................
+          .......XXXXXXXXXXXXXXX....
+          ..XXXXXXXX.......XXXXXXX..
+          ....XXXXX.........XXXXXX..
+          ......XXXXXXXXXXXXXXX.....
+          ...XXXXXX........XXXXXXX..
+          ...XXXXXX........XXXXXXX..
+          ....XXXXXXXXXXXXXXXXXX....
+          ..........................
+          ',
+          vectorial => [ Svg => file => 'example.svg' ],
+       );
+
+       # There is a whole lot of DWIMmery in both raster() and trace().
+       # Stick to Graphics::Potrace::Raster for finer control
+       use Graphics::Potrace::Raster;
+       my $raster = Graphics::Potrace::Raster->load(
+          Ascii => text => '
+          ..........................
+          .......XXXXXXXXXXXXXXX....
+          ..XXXXXXXX.......XXXXXXX..
+          ....XXXXX.........XXXXXX..
+          ......XXXXXXXXXXXXXXX.....
+          ...XXXXXX........XXXXXXX..
+          ...XXXXXX........XXXXXXX..
+          ....XXXXXXXXXXXXXXXXXX....
+          ..........................
+          ',
+       );
+       # you know what to do with $raster - see above!
+
+DESCRIPTION
+    Potrace (<http://potrace.sourceforge.net/>) is a program (and a library)
+    by Peter Selinger for *Transforming bitmaps into vector graphics*. This
+    distribution aims at binding the library from Perl for your fun and
+    convenience.
+
+INTERFACE
+  raster
+       my $raster = raster(@parameters);
+
+    Generate a Graphics::Potrace::Raster object for further usage.
+
+    If the first parameter you provide is already such an object, it is
+    returned back. This lets you forget about what you actually have, and it
+    might be handy.
+
+    Otherwise, a new Graphics::Potrace::Raster object is created, and
+    "dwim_load" in Graphics::Potrace::Raster is called upon it passing the
+    provided parameters. This applies an heuristic to give you something
+    reasonable, see there for details.
+
+  raster2vectorial
+       my $vector = raster2vectorial($raster, %parameters);
+       my $vector = raster2vectorial($raster, \%parameters);
+
+    Arguments:
+
+    $raster
+        a "Graphics::Potrace::Raster" object, or anything that has a
+        "packed()" method programmed to return the right hash ref.
+
+    %parameters
+    $parameters
+        parameters for tracing. This version of the bindings is aligned with
+        "libpotrace" 1.10 and supports the following parameters:
+
+        *   turdsize
+
+        *   turnpolicy
+
+        *   opticurve
+
+        *   alphamax
+
+        *   opttolerance
+
+        See e.g. <http://potrace.sourceforge.net/potracelib.pdf> for
+        details.
+
+    You should never actually need this function, because you can just as
+    well call:
+
+       my $vector = $raster->trace(%parameters); # or with \%parameters
+
+    unless $raster isn't actually a "Graphics::Potrace::Raster" object and
+    you managed to duck a "packed()" method in it.
+
+  trace
+       my $vector = trace(%parameters);
+       my $vector = trace($parameters);
+
+    This is the most *Do What I Mean* (a.k.a. DWIM) function of the whole
+    distribution. It tries to be as bloated as it can, but to provide you a
+    single interface for your one-off needs.
+
+    The following arguments can be provided either via %parameters or
+    through an input hash ref:
+
+    "raster"
+        the raster to load. This parameter is used to call "raster" above,
+        see there and "dwim_load" in Graphics::Potrace::Raster for in-depth
+        documentation. And yes, if you *already* have a
+        Graphics::Potrace::Raster object you can pass it in.
+
+        This parameter is mandatory.
+
+    "vectorial"
+        a description of what you want to do with the vector, e.g. export it
+        or get a representation. If present, this parameter is expected to
+        be an array reference containing parameters for "export" in
+        Graphics::Potrace::Vectorial, see there for details.
+
+        This parameter is optional.
+
+    *all Potrace parameters supported by "raster2trace"*
+        these parameters will be passed over to "raster2trace", they are all
+        optional.
+
+    Any other parameter will be ignored.
+
+  version
+    This function returns the version of the Potrace library.
+
+SEE ALSO
+    See <http://potrace.sourceforge.net/> for Potrace - it's awesome!
+
+AUTHOR
+    Flavio Poletti <polettix@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011-2015 by Flavio Poletti polettix@cpan.org.
+
+    This module is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+

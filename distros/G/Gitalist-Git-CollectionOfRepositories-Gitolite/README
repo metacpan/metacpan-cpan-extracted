@@ -1,0 +1,31 @@
+NAME
+    Gitalist::Git::CollectionOfRepositories::Gitolite
+
+SYNOPSIS
+     gitalist.conf:
+
+        <Model::CollectionOfRepos>
+            class Gitalist::Git::CollectionOfRepositories::Gitolite
+            # optional, /home/git/.gitolite.rc
+            gitolite_conf /home/git/.gitolite.rc
+            # optional, defaults to /home/git/bin/
+            gitolite_bin_dir /home/git/bin/
+        </Model::CollectionOfRepos>
+
+DESCRIPTION
+    Adds support for gitolite to gitalist
+
+SEE ALSO
+    Gitalist, Gitalist::Git::CollectionOfRepositories,
+    Gitalist::Git::Repository, <https://github.com/broquaint/Gitalist>
+
+AUTHORS
+    Gavin Mogan <halkeye@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Gavin Mogan
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

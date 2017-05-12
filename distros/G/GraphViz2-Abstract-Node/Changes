@@ -1,0 +1,20 @@
+Release history for GraphViz2-Abstract-Node
+
+0.002000 2013-12-01T05:47:00Z
+ - Factor out constants into GV2:A:Util::Constants
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - develop: +2 ↑1 -2
+ - runtime: +1 -1
+
+0.001001 2013-11-30T09:18:32Z
+ - Add URL and showboxes fields.
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - develop: ↑1 -1
+
+0.001000 2013-11-29T17:59:27Z
+ - First version.
+

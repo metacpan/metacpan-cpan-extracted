@@ -1,0 +1,377 @@
+TYPEMAP
+
+GSSAPI::Status					T_OBJ_NU
+
+GSSAPI::Name					PTROBJ_
+GSSAPI::OID					PTROBJ_
+GSSAPI::OID::Set				PTROBJ_
+GSSAPI::Cred					PTROBJ_
+GSSAPI::Context					PTROBJ_
+GSSAPI::Binding					PTROBJ_
+
+GSSAPI::OID_const				PTROBJ_CONST
+GSSAPI::OID::Set_const				PTROBJ_CONST
+
+GSSAPI::Name_out				PTROBJ_OUT
+GSSAPI::Cred_out				PTROBJ_OUT
+GSSAPI::OID_out					PTROBJ_OUT
+GSSAPI::OID::Set_out				PTROBJ_OUT
+GSSAPI::Context_out				PTROBJ_OUT
+GSSAPI::Binding_out				PTROBJ_OUT
+I32_out						T_IV_OUT
+int_out						T_IV_OUT
+gss_cred_usage_t_out				T_IV_OUT
+U32_out						T_U_LONG_OUT
+OM_uint32_out					T_IV_OUT
+
+GSSAPI::Name_optout				PTROBJ_OPTOUT
+GSSAPI::Cred_optout				PTROBJ_OPTOUT
+GSSAPI::OID_optout				PTROBJ_OPTOUT
+GSSAPI::OID::Set_optout				PTROBJ_OPTOUT
+I32_optout					T_IV_OPTOUT
+int_optout					T_IV_OPTOUT
+gss_cred_usage_t_optout				T_IV_OPTOUT
+U32_optout					T_U_LONG_OPTOUT
+OM_uint32_optout				T_IV_OPTOUT
+
+GSSAPI::Name_opt				PTROBJ_OPT
+GSSAPI::OID_opt					PTROBJ_OPT
+GSSAPI::OID::Set_opt				PTROBJ_OPT
+GSSAPI::Cred_opt				PTROBJ_OPT
+GSSAPI::Context_opt				PTROBJ_OPT
+GSSAPI::Binding_opt				PTROBJ_OPT
+
+gss_buffer_desc					T_BUFFER_DESC
+gss_buffer_desc_out				T_BUFFER_DESC_OUT
+gss_buffer_desc_copy				T_BUFFER_DESC_COPY
+gss_buffer_str					T_BUFFER_STR
+gss_buffer_str_out				T_BUFFER_STR_OUT
+gss_oidstr_out                  T_BUFFER_OIDSTR_OUT
+gss_cred_usage_t				T_IV
+gss_qop_t					T_UV
+OM_uint32					T_U_LONG
+
+GSSAPI_obj					PTROBJ_OPT
+
+#
+#	Okay, what at T_OBJ_NU, PTROBJ and PTROBJ_OPT?
+#
+#	T_OBJ_NU is a small object which can be freely copied: it must
+#	not contain pointers and is effectively passwd by value-return
+#
+
+INPUT
+
+T_OBJ_NU
+	if (!SvOK($arg)) {
+	    Zero(&$var, 1, ${type});
+	}
+	else if (sv_derived_from($arg, \"${ntype}\")) {
+	    SV *	tmp = SvRV($arg);
+	    STRLEN	len;
+	    char *	tmpc = SvPV(tmp, len);
+	    if (len != sizeof($var)) {
+		croak(\"$var is not of type ${ntype} (wrong size)\");
+	    }
+	    Copy(tmpc, &$var, 1, ${type});
+	}
+	else {
+	    croak(\"$var is not of type ${ntype}\");
+	}
+
+PTROBJ_
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    SV *tmp = SvRV($arg);
+	    $var = (${type}) SvIV(tmp);
+	    if ($var == NULL) {
+		croak(\"$var has no value\");
+	    }
+	}
+	else {
+	    croak(\"$var is not of type ${ntype}\");
+	}
+
+PTROBJ_CONST
+	"This should not happen"
+
+PTROBJ_OPT
+	if (!SvOK($arg)) {
+	    $var = NULL;
+	}
+	else if (sv_derived_from($arg, \"${ \substr($ntype, 0, -4) }\")) {
+	    SV *tmp = SvRV($arg);
+	    $var = (${type}) SvIV(tmp);
+	}
+	else {
+	    croak(\"$var is not of type ${ \substr($ntype, 0, -4) }\");
+	}
+
+PTROBJ_OUT
+	if (SvREADONLY($arg)) {
+	    croak(\"Modification of a read-only value attempted, $var\");
+	}
+	$var = NULL;
+
+PTROBJ_OPTOUT
+	if (SvREADONLY($arg)) {
+	    $var = NULL;
+	}
+	else {
+	    $var = &${var}_real;
+	    ${var}_real = NULL;
+	}
+
+T_IV_OUT
+	if (SvREADONLY($arg)) {
+	    croak(\"Modification of a read-only value attempted, $var\");
+	}
+	$var = 0;
+
+T_U_LONG_OUT
+	if (SvREADONLY($arg)) {
+	    croak(\"Modification of a read-only value attempted, $var\");
+	}
+	$var = 0;
+
+T_IV_OPTOUT
+	if (SvREADONLY($arg)) {
+	    $var = NULL;
+	} else {
+	    $var = &${var}_real;
+	    ${var}_real = 0;
+	}
+
+T_U_LONG_OPTOUT
+	if (SvREADONLY($arg)) {
+	    $var = NULL;
+	} else {
+	    $var = &${var}_real;
+	    ${var}_real = 0;
+	}
+
+T_BUFFER_DESC
+	$var.value = SvPV($arg, $var.length);
+
+T_BUFFER_DESC_OUT
+	$var.length = 0;
+	$var.value = NULL;
+
+T_BUFFER_DESC_COPY
+	if (!SvOK($arg)) {
+	    $var.length = 0;
+	    $var.value = NULL;
+	} else {
+	    void *p = SvPV($arg, $var.length);
+	    New(0, $var.value, $var.length, char);
+	    Copy(p, $var.value, $var.length, char);
+	}
+
+T_BUFFER_STR
+	$var.value = SvPV($arg, $var.length);
+	if ($var.length) {
+	    if (((char*)$var.value)[$var.length-2] != '\\0' &&
+		((char*)$var.value)[$var.length-1]   == '\\0')
+		$var.length++;
+	} else if (((char*)$var.value)[0] == '\\0') {
+	    $var.length++;
+	}
+
+T_BUFFER_STR_OUT
+	$var.length = 0;
+	$var.value = NULL;
+
+T_BUFFER_OIDSTR_OUT
+    $var.length = 0;
+    $var.value = NULL;
+
+
+
+OUTPUT
+
+T_OBJ_NU
+	sv_setref_pvn($arg, \"${ntype}\", (void*)&$var, sizeof($var));
+
+PTROBJ_
+	{
+	    SV *tmp = SvRV($arg);
+	    if ((IV)(void*)$var != SvIV(tmp)) {
+		sv_setref_iv($arg, \"${ntype}\", (IV)(void*)$var);
+	    }
+	}
+
+PTROBJ_CONST
+	SvREADONLY_on(sv_setref_iv($arg, \"${ \substr($ntype, 0, -6) }\",
+				   (IV)(void*)$var));
+
+PTROBJ_OPT
+	if (!SvOK($arg)) {
+	    sv_setref_iv($arg, \"${ \substr($ntype, 0, -4) }\",
+					(IV)(void*)$var);
+	}
+	else {
+	    SV *tmp = SvRV($arg);
+	    if ((IV)(void*)$var != SvIV(tmp)) {
+		sv_setref_iv($arg, \"${ \substr($ntype, 0, -4) }\",
+					    (IV)(void*)$var);
+	    }
+	}
+
+PTROBJ_OUT
+	sv_setref_iv($arg, \"${ \substr($ntype, 0, -4) }\", (IV)(void*)$var);
+
+PTROBJ_OPTOUT
+	if ($var != NULL) {
+	    sv_setref_iv($arg, \"${ \substr($ntype, 0, -7) }\",
+					(IV)(void*)${var}_real);
+	}
+
+T_IV_OUT
+	sv_setiv_mg($arg, $var);
+
+T_U_LONG_OUT
+	sv_setuv_mg($arg, (UV)$var);
+
+T_IV_OPTOUT
+	if ($var != NULL) {
+	    sv_setiv_mg($arg, ${var}_real);
+	}
+
+T_U_LONG_OPTOUT
+	if ($var != NULL) {
+	    sv_setuv_mg($arg, (UV)${var}_real);
+	}
+
+T_BUFFER_DESC
+	if (SvREADONLY($arg)) {
+	} else if ($var.value != NULL) {
+	    sv_setpvn_mg($arg, $var.value, $var.length);
+	} else {
+	    sv_setsv_mg($arg, &PL_sv_undef);
+	}
+	{
+	    OM_uint32 minor;
+	    gss_release_buffer(&minor, &$var);
+	}
+
+T_BUFFER_DESC_OUT
+	if (SvREADONLY($arg)) {
+	} else if ($var.value != NULL) {
+	    sv_setpvn_mg($arg, $var.value, $var.length);
+	} else {
+	    sv_setsv_mg($arg, &PL_sv_undef);
+	}
+	{
+	    OM_uint32 minor;
+	    gss_release_buffer(&minor, &$var);
+	}
+
+T_BUFFER_DESC_COPY
+	if (SvREADONLY($arg)) {
+	} else if ($var.value != NULL) {
+	    sv_setpvn_mg($arg, $var.value, $var.length);
+	} else {
+	    sv_setsv_mg($arg, &PL_sv_undef);
+	}
+
+T_BUFFER_STR
+	if ($var.value != NULL) {
+	    sv_setpv($arg, $var.value);
+	    SvSETMAGIC($arg);
+	} else {
+	    sv_setsv_mg($arg, &PL_sv_undef);
+	}
+	{
+	    OM_uint32 minor;
+	    gss_release_buffer(&minor, &$var);
+	}
+
+
+T_BUFFER_STR_OUT
+	if ($var.value != NULL) {
+            sv_setpvn($arg, $var.value, $var.length);
+	    SvSETMAGIC($arg);
+	} else {
+	    sv_setsv_mg($arg, &PL_sv_undef);
+	}
+	{
+	    OM_uint32 minor;
+	    gss_release_buffer(&minor, &$var);
+	}
+
+T_BUFFER_OIDSTR_OUT
+    if ($var.value != NULL) {
+            sv_setpv($arg, $var.value );
+        SvSETMAGIC($arg);
+    } else {
+        sv_setsv_mg($arg, &PL_sv_undef);
+    }
+    {
+        OM_uint32 minor;
+        gss_release_buffer(&minor, &$var);
+    }
+
+#
+#	Okay, what do all these different typemaps do?  Anything that
+#	starts with "PTROBJ" deals with references to objects.  The
+#	different versions just allow for different calling conventions.
+#	For example, while the basic PTROBJ typemap requires that a
+#	non-undef value be passed in, the PTROBJ_OPT typemap will
+#	map an undef to the C NULL value (these are all only used with C
+#	pointer types).  The PTROBJ type is similar to the standard
+#	typemap T_PTROBJ, the difference being that on output,
+#	T_PTROBJ will turn the C NULL pointer into a reference to
+#	undef while PTROBJ_OPT will still return a blessed value.
+#
+#
+#			uses	 may	 may	 may	 may	 outputs
+#	name		input	input	input	input	output	  const
+#			value	undef	 NULL	const	 NULL
+#	------------------------------------------------------------------
+#	PTROBJ		  Y	  N	  N	  Y	  Y	    N
+#	PTROBJ_OPT	  Y	  Y	  Y	  Y	  Y	    N
+#	PTROBJ_OUT	  N	  -	  -	  N	  Y	    N
+#	PTROBJ_OPTOUT	  N	  -	  -	  Y	  Y	    N
+#	PTROBJ_CONST	 	 		   	  Y	    Y
+#
+#
+#	PTROBJ is for input parameters that must not turn out to be
+#	NULL pointers once mapped.
+#
+#	PTROBJ_OPT is for input parameters that may turn out to be
+#	NULL pointers once mapped.
+#
+#	PTROBJ_OUT is for required output parameters.  A variable must be
+#	given, but its value is ignored.
+#
+#	PTROBJ_OPTOUT is for optional output parameters.  If a variable
+#	is given, its value is ignored.  See below for more.
+#
+#	PTROBJ_CONST is for output parameters that are actual constants
+#
+#	PTROBJ_OPTOUT deserves special explanation.  It is intended
+#	for optional output paramaters where the actual function
+#	is expecting either the NULL value or a pointer to the
+#	target variable.  A value is thus returned iff NULL was not
+#	passed to the function.  The perl usage is to pass undef
+#	if you don't want the value, and the input routine will map
+#	that to a NULL pointer.  When used, you have to supply a
+#	'real' variable via a PREINIT: block which can be pointed
+#	to by the variable represented by the function parameter.
+#	This 'real' variable is named by appending "_real" to the
+#	name of the parameter and stripping the "_optout" from the
+#	typename.  Of course, since this is in a PREINIT: block and
+#	not a INPUT: block, you have to do the mapping of object
+#	type to real type, ala "GSSAPI::Context" -> "GSSAPI__Context".
+#	So, a usage will run something like:
+#
+#	foo(param)
+#	    PREINIT:
+#		GSSAPI__OID		param_real
+#	    INPUT:
+#		GSSAPI::OID_optout	param
+#	    CODE:
+#		...
+#
+#	Yeah, it's ugly, but it makes the rest of the code look good.
+#
+#

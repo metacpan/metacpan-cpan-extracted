@@ -1,0 +1,3 @@
+* deal with jobservers timing out (going off net) in the middle of
+  workers doing work and submitting a job, status, grabbing a job, etc
+

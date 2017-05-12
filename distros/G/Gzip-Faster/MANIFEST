@@ -1,0 +1,27 @@
+bench/benchmark.pl
+bench/do_nothing
+bench/load_comp_raw_zlib
+bench/load_gzip_faster
+bench/load_io_comp_gzip
+bench/load_io_uncomp_gunzip
+Changes
+clean.pl
+examples/file-name.pl
+examples/inflate.pl
+examples/larry-wall.png
+examples/synopsis.pl
+Faster.xs
+gzip-faster-perl.c
+lib/Gzip/Faster.pm
+lib/Gzip/Faster.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/gzip-faster.t
+t/index.html.gz
+t/png.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,378 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - F.A.Q. - Frequently Asked Questions</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+
+  <a class="menubck" href="index.html" title="Back to the index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+
+  <a class="menuext" href="overview.html" title="How everything fits together">Overview</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+  <a class="menuext" href="hinting.html" title="Generating specific layouts">Hinting</a>
+  <a class="menuext" href="output.html" title="Output formats and their limitations">Output</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+  <a class="menuext" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+  <a class="menucur" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+    <a class="menuind" href="#general" title="Some generic questions and answers">General</a>
+    <a class="menuind" href="#graphviz" title="How does Graph::Easy compare to Graphviz?">Graphviz?</a>
+    <a class="menuind" href="#svg" title="SVG output and problems">SVG?</a>
+    <a class="menuind" href="#windows" title="Windows">Windows?</a>
+    <a class="menuind" href="benchmark.html" title="Benchmarks">Benchmarks</a>
+    <a class="menuind" href="errors.html" title="Error codes and explanations">Errors</a>
+    <a class="menuind" href="glossary.html" title="Glossary of often used terms">Glossary</a>
+  <a class="menuext" href="tutorial.html" title="Tutorial for often used graph types and designs">Tutorial</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h1>
+
+<h2>F.A.Q. - Frequently Asked Questions</h2>
+
+<div class="text">
+
+<p>
+This document tried to answer the most frequently asked questions in relation
+to Graph::Easy, as well as for the MediaWiki integration.
+</p>
+
+</div>
+
+
+<a name="general"></a>
+<h2>General</h2>
+
+<div class="text">
+
+<span class="q">Question:</span>
+
+<p>
+Is there an interactive editor or GUI for Graph::Easy?
+</p>
+
+<span class="a">Answer: <small>[2007-09-1]</small></span>
+
+<p>
+Yes, read its <a href="editor.html">manual page</a> or go straight to
+<a href="http://bloodgate.com/graph-easy/">interactive graph editor</a>.
+</p>
+
+<span class="q">Question:</span>
+
+<p>
+What extension should Graph::Easy files have?
+</p>
+
+<span class="a">Answer: <small>[2006-12-17]</small></span>
+
+<p>
+The <i>native</i> format of Graph::Easy is called "txt", as can be seen on the
+method names (<code>as_txt()</code>) as well as the converter options. And
+since a graph description in Graph::Easy is just this, text, the file
+extension used should be <code><b>.txt</b></code>.
+<br>
+Some people like to invent their own extension for Graph::Easy files, but this
+just is a solution in search for a problem, and actually causes more problems,
+namely:
+</p>
+
+<ul>
+  <li>There aren't enough two- and three-letter combinations available, so
+      name clashes are unavoidable</li>
+  <li>All current modern operating systems know how to handle .txt files, but
+      for an unknown extension no handler is setup/installed</li>
+  <li>Likewise, sending .txt files via email etc. already works</li>
+</ul>
+
+<p>
+Therefore, Graph::Easy textual descriptions should be called what they are:
+<code><b>.txt</b></code>.
+</p>
+
+</div>
+
+<a name="graphviz"></a>
+<h2>Graphviz</h2>
+
+<div class="text">
+
+<span class="q">Question:</span>
+
+<p>
+What are the main differences between <code>Graph::Easy</code> and Graphviz?
+</p>
+
+<span class="a">Answer: <small>[2006-08-20]</small></span>
+
+<p>
+<code>Graph::Easy</code> has:
+</p>
+
+<ul>
+  <li>an easier syntax, that is very human readable/writable and makes thus maintance easier,
+      especially for people unfamiliar with graphviz, HTML or similar languages
+  <li>a grid based layouter, which is suited for flowcharts. For complex graphs it can also
+      use graphviz as backend, giving you the best of both worlds.
+  <li>is easier to install, needs no compiler, just Perl
+  <li>Can output HTML, and ASCII art
+  <li>Sizes, widths, lengths and offsets are all given relative, either to some point
+      of reference or the current font-size. This makes the output resolution independend
+      and freely scalable.
+</ul>
+
+<span class="q">Question:</span>
+
+<p>
+What can Graphviz, that <code>Graph::Easy</code> cannot do?
+</p>
+
+<span class="a">Answer: <small>[2006-08-06]</small></span>
+
+<p>
+Here is a list of things that <code>Graph::Easy</code> has difficulties with, or that are
+not yet implemented:
+</p>
+
+<ul>
+  <li>For complex layouts, the layouter easily breaks down.
+  <li>The layouter only has one overall strategy (unlike graphviz, where dot, neato and circo all implement wildly different strategies)
+  <li>One cannot define a starting point on an edge, edges always start with a plain line.
+  <li>Groups (aka subgraphs) cannot yet be nested.
+  <li>Some shapes and options (node shape egg, edge lines with more than two lines f.i.) are not yet possible
+  <li>There are only 3 different arrow shapes (open, closed and filled triangles)
+  <li>Not as many layout influencing options (margins, paddings and spacings are generally missing)
+  <li>It is not yet possible to specify transparency for colors (especially fill/background).
+</ul>
+
+<span class="q">Question:</span>
+
+<p>
+What can <code>Graph::Easy</code>, that Graphviz cannot do?
+</p>
+
+<span class="a">Answer: <small>[2006-11-18]</small></span>
+
+Apart from the IMHO easier for humans syntax of the input format, here are the key points:
+
+<ul>
+  <li>Full <a href="http://unicode.org/">Unicode</a> support on both input
+      and output (when supported by the output format, all native ones like
+      HTML, SVG and ASCII/Unicode output do). Graphviz has problems
+      when you include "foreign" characters, then you must set the proper
+      font (and hope that it is portable and contains all glyphs your label has)
+  <li>Grid-based layouter
+  <li>Support for HTML, ASCII and boxart drawing (Unicode) output formats
+  <li>You can set text-styles on labels like <span style="text-decoration: underline">underline</span>,
+      <span style="text-decoration: overline">overline</span>, <b>bold</b>, <i>italic</i> etc
+  <li>You can even set these text-styles for parts of a label and mix them, even nest them like
+      so:
+      <span style="text-decoration: underline">underline<b>bold</b> and <i>italic</i></span> (<font color="green">Implemented in v0.43</font>)
+  <li><code>text-wrap: auto</code> automatically wraps labels (<font color="green">Implemented in v0.43</font>)
+  <li>You can set the flow (direction of layout) for the entire graph, and change it
+      on an per-node or even per-edge basis.
+  <li>Graphviz doesn't implement the border or edge style "wave". Edge styles involving double
+      lines are non-obvious to create in Graphviz.
+  <li>Links are build from two parts, a <code>linkbase</code> and a <code>link</code>. Thus you
+      can easily set a common base part and put the rest per node on it. There are even attributes
+      than build links or titles automatically.
+  <li>You can restrict the node length automatically, and make a title automatically show the
+      full node text.
+  <li>Edge arrows can have their arrows filled with a different color
+  <li>Graph::Easy supports an additional color scheme, <code>w3c</code>. This is also the default.  (<font color="green">Color scheme support is implemented in v0.46</font>)
+  <li>Animations are possible (even w/o knowledge of scripting languages) (<font color="red">Will be implemented in v0.60</font>)
+</ul>
+
+<span class="q">Question:</span>
+
+<p>
+Are there other differences between <code>Graph::Easy</code> and Graphviz?
+</p>
+
+<span class="a">Answer: <small>[2006-03-12]</small></span>
+
+<p>
+There are other differences which have mainly to do with the output formats and their
+limitations or advantages. For instance:
+
+<ul>
+  <li>HTML allows text zoom (good for people with bad eyesight, or big monitors), while f.i.
+      raster image formats like PNG only support one fixed size
+  <li>Plain text formats like HTML or SVG allow easy indexing of the contents.
+  <li>SVG files are truly resolution independend.
+  <li>ASCII output lacks many things, but can be read even on a terminal or by
+      a screen reader.
+</ul>
+
+<p>
+Since Graph::Easy's own layouter can only output HTMl, ASCII or SVG, other formats like PNG or PDF 
+must be created by either using the graphviz backend, or by outputting SVG and then converting
+this. In the future SVG support by viewing and printer subsystems will hopefully be so good
+that such "hacks" are no longer required, though. 
+</p>
+
+<span class="q">Question:</span>
+
+<p>
+Is there a speed difference?
+</p>
+
+<span class="a">Answer: <small>[2006-03-12]</small></span>
+
+<p>
+<code>Graph::Easy</code> might be a bit slower for some things, but is faster for others.
+In praxis this only matters for huge graphs. For details, please see the <a href="benchmark.html">benchmark page</a>.
+
+</p>
+
+</div>
+
+<a name="svg"></a>
+<h2>SVG (Scalable Vector Graphic) Problems</h2>
+
+<div class="text">
+<h3>Links open inside the SVG</h3>
+
+<span class="q">Question:</span>
+
+<p class="ind">
+When I click a link in an SVG graph, the new page is opened inside the graph,
+instead of in a new window/tab or even in the same window.
+</p>
+
+<span class="a">Answer:</span>
+
+<p class="ind">
+This is a Firefox 1.5 bug. Firefox will open links in SVGs by default "inline", and
+it even ignores attributes like "xlink:show" and "xlink:target".
+<br>
+The bug is reportedly already
+fixed in the Mozilla codebase, so it should work in the near future in a browser
+on your system.
+<br>
+In the meantime upgrade <a href="http://search.cpan.org/~tels/Graph-Easy-As_svg">Graph::Easy::As_svg</a>,
+as newer versions contain a workaround for this bug. 
+
+<br>
+See also <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=315389">bug #315389</a> in the bugzilla.
+</p>
+
+<h3>Text too big</h3>
+
+<span class="q">Question:</span>
+
+<p class="ind">
+The text on nodes is to small, or to big, and sometimes even crosses the node
+border.
+</p>
+
+<span class="a">Answer:</span>
+
+<p class="ind">
+Please upgrade <a href="
+">Graph::Easy::As_svg</a>, this bug has been fixed in v0.18.
+<br>
+You still might see text that is either too big or too small if you
+use the text-zoom (<code>CTRL</code> plus <code>+</code> or <code>-</code>),
+Firefox will zoom the font/text, but not the rest of the SVG, thus the graphic quickly
+becomes garbled.
+</p>
+
+<h3>Graphic corruptions</h3>
+
+<span class="q">Question:</span>
+
+<p class="ind">
+I see only garbled graphs, f.i. it has black rectangles or
+the labels are not properly centered.
+</p>
+
+<span class="a">Answer:</span>
+
+<p class="ind">
+Make sure you are using the latest version of your browser. Opera 8.5 does only
+support SVG Tiny, which is not enough to properly display the SVG generated
+by Graph::Easy. Likewise, Opera 9.0 only supports SVG Basic, which sadly
+also misses key features like centered text.
+<br>
+Other browsers seem to lack support for CSS-styles inside SVG, and thus will
+render the fillcolor inside nodes wrongly (the default is black, and the
+overriden color from the CSS is ignored by these buggy browsers).
+</p>
+
+</div>
+
+<a name="windows"></a>
+<h2>Windows</h2>
+
+<div class="text">
+
+<h3>Install under Windows</h3>
+
+<span class="q">Question:</span>
+
+<p class="ind">
+Can I install and use Graph::Easy under Windows?
+</p>
+
+<span class="a">Answer:</span>
+
+<p class="ind">
+Yes. You need two things:
+</p>
+
+<ul class="ind">
+  <li>Perl, you can get it from <a href="http://activestate.com/store/activeperl/download">Activestate</a>
+  <li>nmake, see here for how to <a href="http://johnbokma.com/perl/make-for-windows.html">get and install nmake</a>
+</ul>
+
+<p class="ind">
+After installing Perl and nmake, you can install Graph::Easy normally, just replacing "make" with "nmake" in
+the install instructions:
+</p>
+
+<pre class="ind">
+perl Makefile.PL
+nmake
+nmake test
+nmake install
+</pre>
+
+</div>
+
+<h2>Contact and Bugreports</h2>
+
+<div class="text">
+
+<p>
+If you have questions, or found an error on this page, feel free to send me an
+<a href="http://bloodgate.com/mail.html">email</a>
+<small>(<a href="http://bloodgate.com/tels.asc">Gnupg key</a>)</small>.
+<b>Bugreports</b> should go to <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Graph-Easy">rt.cpan.org</a>.
+</p>
+
+</div>
+
+<div class="footer">
+Page created <span class="date">2005-01-11</span> by <a href="http://bloodgate.com/mail.html">Tels</a>.
+Last update: <span class="date">2007-09-02</span>
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>

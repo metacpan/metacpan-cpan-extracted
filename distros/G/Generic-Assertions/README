@@ -1,0 +1,46 @@
+Generic::Assertions
+
+"Generic::Assertions" allows you to create portable containers of
+classes of assertions, and allows keeping severity of assertions from
+their implementation.
+
+Basic implementation entails
+
+*   Defining a list of things to test for
+
+*   Returning a pair of ( OK / NOT_OK , "reason" ) for the tests
+    conclusion
+
+*   [optional] Defining a default handler for various classes of
+    severity ( "should", "must" etc. )
+
+*   [optional] Defining an input transform (eg: always converting the
+    first argument to a path)
+
+*   Invoking the assertion at the callpoint as
+    "$instance->severity_level( test_name => @args_for_test )"
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

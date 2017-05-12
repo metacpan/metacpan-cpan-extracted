@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Gtk2/Ex/Threads/DBI.pm
+lib/Gtk2/Ex/Threads/DBI/Query.pm
+examples/thread-dbi-usage.pl
+t/test.1.t
+t/data

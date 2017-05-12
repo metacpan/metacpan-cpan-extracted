@@ -1,0 +1,7 @@
+# The following issues have been observed with the examples translated from
+#  tcl
+#
+# Date   Date Fixed    Issue
+ 12/1/01    3/15/02    vtk interactor examples don't work
+ 12/1/01    3/15/02    graphics/streamV.pl doesn't work. Not sure why
+ 12/1/01    3/15/02    tk examples don't work

@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Gimp;
+#BEGIN { $Gimp::verbose = 3; }
+use Gimp::Fu;
+use Gimp::Extension;
+
+my $number;
+podregister_temp demo_show => sub { die "$number\n" };
+podregister { $number = $input; Gtk2->main; };
+exit main;
+__END__
+
+=head1 NAME
+
+extension_demo - Demo extension showing persistent data
+
+=head1 SYNOPSIS
+
+<Toolbox>/Filters/Languages/_Perl/_Extension Demo
+
+=head1 DESCRIPTION
+
+Enter a number when it starts, then see that number with the temporary
+procedure.
+
+=head1 PARAMETERS
+
+  [PF_INT8, 'input', 'Input value', 5],
+
+=head1 TEMPORARY PROCEDURES
+
+=head2 demo_show - Show persistent info
+
+Show the number held in the extension.
+
+=head3 SYNOPSIS
+
+<Image>/Filters/Languages/_Perl/_Extension Demo Temp
+
+=head1 AUTHOR
+
+Ed J
+
+=head1 DATE
+
+2014-05-22
+
+=head1 LICENSE
+
+As per Gimp-Perl.

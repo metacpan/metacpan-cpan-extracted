@@ -1,0 +1,19 @@
+Cached.xs
+Changes
+lib/Goto/Cached.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+ppport.h
+README
+t/01_use.t
+t/benchmark.t
+t/dynamic.t
+t/leak.t
+t/lib/Inner.pm
+t/lib/Outer.pm
+t/pod.t
+t/scope.t
+t/static.t
+t/sub.t

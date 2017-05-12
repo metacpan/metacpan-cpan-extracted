@@ -1,0 +1,264 @@
+Revision history for Git-Wrapper
+
+0.047     2016-09-18 15:30:58-07:00 America/Los_Angeles
+
+       Properly track commits in test (Graham Knop)
+
+0.046     2016-09-12 20:13:04-07:00 America/Los_Angeles
+
+        No changes since last development release.
+
+0.045_091 2016-09-10 14:26:13-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+        Properly handle scores in raw log files (Atoomic)
+        Update error message for inability to run 'git config --list'
+
+0.045_090 2016-09-08 21:59:58-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+        Fix tabs being expanded in log output in git 2.9+ (Graham Knop)
+        Misc POD fixes (gregor herrmann/Debian, Philippe Bruhat)
+
+0.045     2015-07-19 09:46:07-07:00 America/Los_Angeles
+
+        And this time let's actually use a non-trial release, dummy...
+
+0.044_92  2015-07-19 09:45:11-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+        No changes since last development release
+
+0.044_91  2015-07-13 18:12:05-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+        Uncoditionally set no_abbrev option to improve raw log parsing [#67] (John Anderson)
+
+0.044_90  2015-05-06 15:08:17-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+        Document 'modifications' method on G::W::Log (John Anderson)
+
+        Parse raw logs correctly (John Anderson)
+
+        Set modifications properly in constructor (John Anderson)
+
+0.044     2015-04-07 21:10:31-07:00 America/Los_Angeles
+
+        No changes from the (borked) v0.043-TRIAL
+
+0.043-effup 2015-03-31 11:54:27-04:00 America/New_York (TRIAL RELEASE)
+
+        Handle SKIP affecting number of commits in test (Gianni Ceccarelli)
+
+0.043     2015-03-28 20:07:33-07:00 America/Los_Angeles
+
+        No changes from 0.042-TRIAL (see also changes for 0.041-TRIAL)
+
+0.042     2015-03-23 21:54:11-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+        Using "--format" with the log method now throws a
+        Git::Wrapper::Exception (B. Estrade)
+
+0.041     2015-03-18 22:14:08-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+        Switch from File::pushd to File::chdir (John Anderson)
+
+0.040     2015-03-13 16:11:14-07:00 America/Los_Angeles
+
+        No changes from 0.039-TRIAL
+
+0.039     2015-02-23 19:27:47-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+        Various POD updates (B. Estrade)
+        Exclude failing test on Mac OS with older Git (#41) (John Anderson)
+        POD and typo fixes (Doug Bell)
+
+0.038     2014-10-29 10:35:40-07:00 America/Los_Angeles
+
+0.037     2014-08-13 12:43:00-05:00 America/Chicago
+
+        Fix 'git config' during install stuff (Graham Knop)
+
+0.036     2014-08-12 23:50:30-05:00 America/Chicago
+
+        Run 'git config' during install (Karen Etheridge)
+
+0.035     2014-07-30 07:25:21-07:00 America/Los_Angeles
+
+        Attempted fix for Win32 test fails
+
+0.034     2014-07-24 18:30:14-07:00 America/Los_Angeles
+
+        Fix typo in minimum version required of File::pushd (Russell
+        Jenkins)
+
+0.033     2014-07-24 14:45:05-07:00 America/Los_Angeles
+
+        require File::pushd 1.05 at a minimum
+
+0.032     2014-04-22 18:29:06-07:00 America/Los_Angeles
+
+        bail out early in Makefile.PL if git not installed, instead of
+        failing tests (Karen Etheridge)
+
+0.031     2014-03-17 08:10:42-07:00 America/Los_Angeles
+
+        Only load IPC::Cmd if needed (Graham Knop)
+        Reduce dependency on Path::Class to test.recommends, fix min version (Kent Fredric)
+        Increment minimum version in eval check to match stated dist.ini version
+        typo fix (dsteinbrunner)
+
+0.030     2013-07-29 09:23:13 America/Los_Angeles
+
+        Add explicit version dep on Path::Class (#40) (John SJ Anderson)
+        Fixes typos. (Olaf Alders)
+
+0.029     2013-05-07 10:21:26 America/Los_Angeles
+
+        Included missed Changes update from last release...
+
+0.028_97  2013-04-23 06:17:12 America/Los_Angeles
+
+        Rework argument passing to deal with stringifying arguments (#29) (John SJ Anderson)
+
+0.028_96  2013-02-24 16:19:15 America/Los_Angeles
+
+	Support specifying the git binary location on new (Todd Rinaldo)
+        Rework argument passing (#29) (John SJ Anderson, Mark Price)
+
+0.028     2012-10-19 06:55:15 America/Los_Angeles
+
+        Fix $git->branch compatibility with git < 1.7.1 by tweaking color calling convention (Vyacheslav Matyukhin)
+
+0.027     2012-09-19 22:32:52 America/New_York
+
+        Disable --no-abbrev-commit when git doesn't support it
+
+0.026     2012-09-17 20:52:45 America/Los_Angeles
+
+        Disable ANSI output for the branch command (John SJ Anderson)
+        Force --no-abbrev-commit in git-log wrapper (Rob Hoelz)
+        Add ABSTRACT for G::W::Statuses (John SJ Anderson)
+        Fix the environment in a more sane way, to resolve issues on 5.8.x (introduced in v0.022) (Karen Etheridge)
+
+0.025     2012-07-18 12:38:05 America/New_York
+
+        Add 'fatal' option for RequiresExternal dzil plugin
+
+0.024     2012-07-18 12:32:17 America/New_York
+
+        make sure no line ending munging is done to get consistent
+        hashing in test (Graham Knop)
+
+
+0.023     2012-06-28 09:22:13 America/New_York
+
+        Skip hash test on git versions before 1.6.1 (Eduardo Ariño de la Rubia)
+
+        Add explicit external dep on 'git' in $PATH; remove test code
+        that bailed when 'git' wasn't in $PATH (JSJA)
+
+        Remove t/pod* in favor of dzil plugin POD coverage/syntax tests (JSJA)
+
+0.022     2012-06-27 17:00:46 America/New_York
+
+        Unset GIT_PAGER_IN_USE env var to stop any ANSI colorization (Karen Etheridge)
+
+0.021     2012-06-27 16:48:42 America/New_York
+        Splitted up classes inside Git::Wrapper to individual package files (Torsten Raudssus)
+        Added the handling of ->log({ raw => 1 }) to get the file modifications (Torsten Raudssus)
+        add -STDIN option for passing content via STDIN (Graham Knop)
+
+0.020     2012-04-28 11:21:55 America/New_York
+
+        dist.ini tweaking:
+	    * Exclude archived releases and dist.ini from dist
+            * Don't ship README; only README.mkdn
+            * Set homepage and bugtracker URLs in META.yml
+
+0.019     2012-04-25 08:14:54 America/New_York
+
+        Skip 'git log --oneline' test on older gits without support for that option
+
+0.018     2012-04-22 15:30:43 America/New_York
+
+        Misc doc clean ups and tweaks (John SJ Anderson)
+        Add ERR and OUT methods to provide direct access to STDERR and STDOUT, respectively
+          (attempt to address RT#71632, John SJ Anderson)
+        Generate proper calls for single letter options that take values (RT#75955, Fitz Elliott)
+        Update documentation to demonstrate how to pass '0' to an option (RT#58787, John SJ Anderson)
+        Make git-wrapper a bit friendlier on old gits (Ricardo Signes)
+
+0.017     2011-09-27 14:35:19 America/New_York
+
+        Remove usage of '//' operator (again) (John SJ Anderson)
+
+0.016     2011-09-05 20:24:49 America/New_York
+
+        Lots of tweaks to tests that will (hopefully) reduce some testing noise (John SJ Anderson)
+        Fix for multi-line commit messages on Win32 (Christian Walde)
+
+0.015     2011-07-16 10:15:15 America/New_York
+
+        Added a fix that allows the 'clone' command to work (John SJ Anderson)
+        Change 'log' indentation stripping behavior (RT#56427, Mark Grimes)
+
+0.014   2010-11-12
+
+        Added empty commit message handling (Robert Bohne)
+        Fixed failed tests on slow smokers. (Robert Bohne)
+        Convert to Dist::Zilla (John SJ Anderson)
+        Add 'is_dirty' helper to Statuses (John SJ Anderson)
+
+0.013   2010-09-06
+
+        Added missing dependency for Test::Deep
+
+0.012   2010-09-05
+
+        Rewrote // operator into pre-5.10 perl
+        Debugging mode (Alexandr Ciornii)
+
+0.011   2010-07-14
+
+        Doc Patch (Gabrielle Roth)
+        Git Status Support (Murray)
+        Remove the Stupid basic.t test (Jonathan Scott Duff)
+
+0.010   2010-06-14
+
+        Win32 Support -- Docs and Tests (Christian Walde)
+
+0.009   2010-06-05
+
+        stop failing tests on git 1.7 or newer (Aristotle Pagaltzis)
+        do not rely on default value of log --pretty (Aristotle Pagaltzis)
+
+0.008   2010-03-17
+
+        fix the tests for git >= 1.7 (Michael Schout)
+
+0.007   2009-08-26
+        fix tests even more firmly (perigrin)
+
+0.006   2009-06-01
+
+        fix tests more firmly
+
+0.005   2009-05-28
+
+        change tests to pass on git 1.6
+
+0.004   2008-06-19
+
+        add links to other git-related things
+        inflate Git::Wrapper::Log objects
+
+0.003   2008-06-05
+
+        improve error handling
+        make documentation clearer
+
+0.002   2008-06-04
+
+        properly depend on git binary
+
+0.001   2008-06-04
+
+        First version, released on an unsuspecting world.

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Geocode addresses with Mapquest",
+   "author" : [
+      "gray <gray@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-Coder-Mapquest",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.82"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "2",
+            "LWP::Protocol::https" : "6.02"
+         },
+         "requires" : {
+            "Encode" : "0",
+            "JSON" : "2",
+            "LWP::UserAgent" : "6.02",
+            "URI" : "1.36",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/gray/geo-coder-mapquest"
+      }
+   },
+   "version" : "0.06"
+}

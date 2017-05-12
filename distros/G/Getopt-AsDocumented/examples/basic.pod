@@ -1,0 +1,107 @@
+
+=head1 Usage
+
+  basic [options] inputfile outputfile
+
+=head1 Options
+
+=over
+
+=item -i, --input-file FILENAME
+
+=for positional
+=for isa File::Fu::File
+
+Input file name.
+
+=item -o, --output-file FILENAME
+
+=for positional
+=for isa File::Fu::File
+
+Output file name.
+
+=item -n, --index N (integer)
+
+=for help frobstration index
+
+Index for frobstration.  This corresponds to the wibble-factor
+
+  correlation of the long-winded explanation endeavor.
+
+=item -c, --config-file FILENAME
+
+Load alternate configuration file.
+
+DEFAULT: 'examples/basic_config.yml'
+
+=item -f, --foo THIS (number)
+
+=for help your favorite $foo value
+
+This sets the value of the foo option.  Your account will be billed
+accordingly.
+
+DEFAULT: 20
+
+=item -b, --bar YAY [--bar ...] (number)
+
+One or more bar-razing values.
+
+=item --something "x, y, z"
+
+A string to pass to something.
+
+=item --what-ever, --footprint SIZE (integer)
+
+Shoe size of footprint.  This can be as large or small as you want, but
+probably shouldn't be negative and should definitely be specified in
+something like inches.
+
+DEFAULT: 7
+
+=item --deal NAME=NUM (integer)
+
+=for help name/value pairs
+
+One or more name/value pairs for dealings.
+
+=item -x, --explode
+
+Self-destruct.
+
+DEFAULT: NO
+
+=item -v, --verbose
+
+Emit extra information. 
+
+=item -q, --quiet, --no-verbose
+
+Emit no extra information.
+
+=item --version
+
+Display version number.
+
+=item -h, --help
+
+=for help show this help message
+
+Show help and options.
+
+=back
+
+=cut
+
+$VERSION = 42.7.9;
+use warnings;
+use strict;
+
+use Getopt::AsDocumented;
+my $o = Getopt::AsDocumented->process(\@ARGV) or exit;
+use YAML;
+warn YAML::Dump($o), "\n";
+
+die "explode!\n" if($o->explode);
+warn "yay!\n" if($o->verbose);

@@ -1,0 +1,20 @@
+Revision history for Geo-OSM-StaticMap
+
+0.4       2014-04-12 21:36:30+02:00 Europe/Vienna
+
+    - Updated zoom level calulation algorithm
+    - Numeric sorting of geo coordinates (Jiří Václavík)
+    - Use shorter side of map for zoom calculation Ivan Ivanov
+
+0.3       2011-02-16 09:52:38 Europe/Vaduz
+
+    - Skip Config, Carp, English and File::Find modules in build_requires
+
+0.2       2011-02-14 10:12:10 Europe/Vaduz
+
+    - Updated tests to take different precision of calculated values for 'center'
+      depending on Perl having uselongdouble defined or not into account.
+
+0.1       2011-02-13 18:48:01 Europe/Vaduz
+
+    - Initial release

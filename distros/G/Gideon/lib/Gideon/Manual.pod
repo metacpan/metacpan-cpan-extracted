@@ -1,0 +1,110 @@
+package Gideon::Manual;
+
+#ABSTRACT: Gideon Manual
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Gideon::Manual - Gideon Manual
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 DESCRIPTION
+
+Gideon is a mapping layer between POMO ( Plain Old Moose Objects ) and your data
+sources such as databases, Non-SQL storage and more. It provides a common
+interface for your persisted objects no matter what the source is so you can
+concentrate on your model ( classes and their relationship ) instead of txeh code
+for accessing the data.
+
+=head1 NAME
+
+Gideon::Manual - What is Gideon, and how do I use it?
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 WHY GIDEON?
+
+There are other projects that attempt to do a similar job but Gideon is different
+in the sense that the interface provided for your classes doesn't depend on the
+data source, folliwing the Data Mapper pattern by Martin Fowler. Gideon also
+tries very hard to cause as less impact as possible on your class design.
+
+=head1 AN EXAMPLE
+
+  package Customer;
+  use Gideon driver => 'DBI';
+
+  has id => ( 
+      is          => 'rw',
+      isa         => 'Num', 
+      traits      => [ 'Gideon::DBI::Column' ],
+      primary_key => 1
+  );
+
+  has name => ( 
+      is          => 'rw',
+      isa         => 'Str', 
+      traits      => [ 'Gideon::DBI::Column' ],
+  );
+
+  __PACKAGE__->meta->store('mydb:customers');
+  __PACKAGE__->meta->make_immutable;
+
+As you can see this is a POMO with an extended meta definition and that's all
+that Gideon needs.
+
+  my $customer = Customer->find_one;
+  $customer->remove;
+
+  my @johns = Customer->find( name => 'john' );
+
+=head1 TABLE OF CONTENTS
+
+=head2 L<Gideon::Manual::Intro>
+
+Introduces Gideon and basic setup
+
+=head2 L<Gideon::Manual::Creating>
+
+How to create records in your datastore
+
+=head2 L<Gideon::Manual::Finding>
+
+How to search records in your datastore
+
+=head2 L<Gideon::Manual::Updating>
+
+How to update records in your datastore
+
+=head2 L<Gideon::Manual::Removing>
+
+How to remove records in your datastore
+
+=head2 L<Gideon::Manual::Plugins>
+
+How to extend Gideon
+
+=head2 L<Gideon::Manual::Drivers>
+
+Supported Data Stores and how to write a new one
+
+=head1 AUTHOR
+
+Mariano Wahlmann, Gines Razanov
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mariano Wahlmann, Gines Razanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

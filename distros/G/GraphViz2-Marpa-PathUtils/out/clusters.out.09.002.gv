@@ -1,0 +1,27 @@
+strict digraph graph_09
+{
+
+	{
+
+	}
+
+	{
+
+	}
+	i[color = "lemonchiffon" style = "filled"]
+	j[color = "yellow" style = "filled"]
+	k[color = "olivedrab" style = "filled"]
+	l[color = "lime" style = "filled"]
+
+	{
+		i
+		j
+	}
+ ->
+	
+	{
+		k
+		l
+	}
+
+}

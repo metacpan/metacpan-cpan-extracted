@@ -1,0 +1,5 @@
+Revision history for Git-Hooks-PerlCritic
+
+0.001001  2014-11-23
+	Read option 'profile' from Git config. 'profile' points to PerlCritic rc file. File path is (should be) relational to repository root.
+	Changes to accommodate PerlCritic.

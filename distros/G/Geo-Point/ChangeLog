@@ -1,0 +1,148 @@
+Revision history for Perl extension Geo::Point
+
+version 0.96: Tue Jan 21 14:34:23 CET 2014
+	Improvements:
+	- more work on docs.
+
+version 0.95: Mon Jan 20 16:54:57 CET 2014
+
+	Fixes:
+	- typos.  rt.cpan.org#82902 [Xavier Guimard]
+	- Geo::Distance integration
+	  rt.cpan.org#92242 [Niko Tyni], http://bugs.debian.org/735744
+
+	Improvements:
+	- change documentation style.
+
+version 0.94: Fri Dec 21 12:19:47 CET 2012
+
+	Fixes:
+
+	- fix ::Surface::bbox()
+
+version 0.93: Wed May 19 23:31:05 CEST 2010
+
+	Fixes:
+
+	- ::Surface::geo_outer() and geo_inner() renamed to ::geoOuter()
+	  and ::geoInner(), to be consequent with naming convensions.
+	  Older names still supported but not documented anymore.
+
+	- Geo::Proj::zoneForUTM() used 'zone' as proj4 option, where
+	  it should be '+zone'. [Michael R. Davis]
+
+	- Geo::Proj:zoneForUTM() miscalculated zones with negative
+	  longitudes. [Michael R. Davis]
+
+version 0.92: Thu Dec 24 12:08:04 CET 2009
+
+	Fixes:
+
+	- synopsis mistakes in Geo::Proj, spotted by
+	  rt.cpan.org#47953 [Don Reid]
+
+version 0.91: Mon May 25 14:31:47 CEST 2009
+
+	Fixes:
+
+	- the Geo::Surface was very seriously broken.
+
+version 0.90: Tue Jan 27 16:45:11 CET 2009
+
+	Fixes:
+
+	- do not use /bin/pwd in t/pod.t
+
+	- detected projection of ::Surface not registered.
+
+version 0.10: Wed Jan 21 10:04:19 CET 2009
+
+	Fixes:
+
+	- projection lost during line creation from geopoints.
+
+	- default projection must be expressed as label, not object.
+
+	- default projection for surface is that of first component.
+
+	- many fixes to Surface initiation.
+
+version 0.09: Fri Jan  2 20:08:35 CET 2009
+
+	Fixes:
+
+	- creation of Geo::Line objects based on Geo::Point objects.
+	  rt.cpan.org#42076 [Jonathan Yu]
+
+	- fix call to bestUTMprojection for 'utm' default nick-name
+
+	- repare UTM zone calculation.
+
+	- repare reprojecting of lines.
+
+	Improvement:
+
+	- croak when object is passed as proj parameter: must be a
+	  Geo::Proj label.
+
+version 0.08: Mon Mar 31 08:58:30 CEST 2008
+
+	- very stupid bugs when 0 was used as lat or long.  Hit by
+	  [Paul Tomblin]
+
+version 0.07: Tue Feb 12 10:00:05 CET 2008
+
+	- use Geo::Distance for Geo::Shape::distance [Mark Lawrence]
+
+	- use Math::Trig for Geo::Shape::distance [Mark Lawrence]
+
+	- added dependency for Math::Trig
+
+	- add '0' before 1 digit minutes and seconds in deg2dm() and
+	  deg2dms()
+
+	- GeoPoint is stable for quite some time, but the man-page
+	  still contained ALPHA and BETA release warnings.
+
+	- added toString() as prefered over string().
+
+version 0.06: Mon Jun 11 16:55:01 CEST 2007
+
+	- added t/pod.t
+
+version 0.05: Fri Mar  9 14:18:25 CET 2007
+
+	- Converted to use oodist, removing mkdist, mkdoc, version.
+
+	- removed superfluous html/index.html
+
+	- email address now geo@, webpage /geo/
+
+	- all error messages should start with lower-case
+
+version 0.04: Thu Nov 30 15:08:19 CET 2006
+
+	- Removed some (harmless) debugging traps
+
+	- Geo::Point::normalize()
+
+version 0.03: Mon Oct  9 20:04:16 CEST 2006
+
+	- Do not keep Geo::Proj4 object within Geo::Shape, so Geo
+	  objects can be used in a database.
+
+	- Newest OODoc produces better man-pages.
+
+version 0.002: Mon Sep 25 16:01:18 CEST 2006
+
+	- fix of Geo::Proj::default projection(): should always return a
+	  nickname, not an object.
+
+	- overloading with enabled fallback, which fixes some test
+	  problems.  by [Chia-liang Kao].
+
+	- overload cmp in Geo::Proj
+
+version 0.001: Mon Dec 12 12:04:21 CET 2005
+
+	Initial release

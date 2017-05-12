@@ -1,0 +1,103 @@
+#!/bin/sh
+
+# MPS2EPS converts MetaPost PostScript (MPS) files to Encapsulated
+# PostScript Files (EPS).
+#
+# Copyright (C) 2003  Jon Edvardsson <joned@ida.liu.se>
+#                     http://www.ida.liu.se/~joned
+#                     Linköpings universitet, Sweden
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+#
+# $Id$
+#
+# Bugs and comments can be reported to Jon Edvardsson <joned@ida.liu.se>.
+
+
+PROG=`basename $0`
+PROGNAME="MPS2EPS";
+REVISION='$Revision$'
+VERSION=`echo $REVISION|awk '{print $2}'`
+COPYRIGHT="Copyright (C) 2003 Jon Edvardsson."
+LICENSE="Released under GNU General Public License."
+
+version() {
+    cat <<EOF
+$PROGNAME version $VERSION
+EOF
+}
+
+help() {
+    cat << EOF
+$PROGNAME $VERSION converts a MetaPost output file (.mps) to a self
+contained EPS file. For best result, the MetaPost output file 
+should not set "prologues".
+
+Usage: $PROG [options] input.mps
+        --dvips options     Sets addition DVIPS options, make sure to quote
+                            arguments properly.
+                            Example: $PROG -dvips "-N -V" file.mps
+    -h, --help              This help message.
+    -v, --version           Displays the version number
+
+Web site: http://www.ida.liu.se/~joned/download/mps2eps
+$COPYRIGHT
+$LICENSE
+EOF
+}
+
+error() {
+    echo $PROG: $1;
+    exit 1;
+}
+
+
+for i
+do
+    case $1 in
+        --dvips) DVIPS_OPTS=$2; shift 2;;
+        -h|--help) help; shift; exit 0;;
+        -v|--version) version; shift; exit 0;;
+        -*) error "Unknown option: $1";;
+        *) break;;
+    esac
+done
+
+if [ $# -ne 1 ]; then
+    help;
+    exit 1;
+fi
+
+MPSFILE=$1
+BASENAME=`basename $MPSFILE .mps`
+TEXBASE=$BASENAME$$
+TEXFILE=$TEXBASE.tex
+EPSFILE=$BASENAME.eps
+
+cat > $TEXFILE <<EOF
+\nopagenumbers
+\input epsf
+\centerline{\epsfbox{$MPSFILE}}
+\end
+EOF
+
+tex $TEXFILE > /dev/null
+dvips $DVIPS_OPTS -E -j -o $EPSFILE $TEXBASE 2> /dev/null
+rm -f $TEXBASE.*
+
+
+
+

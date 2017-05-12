@@ -1,0 +1,48 @@
+GNOME::GNORBA 0.0.2
+===================
+
+The GNOME::GNORBA module sets up cookies appropriately for
+using ORBit in a GNOME environment, and also provides
+an interface to GOAD. (The GNOME Object Activation Directory)
+
+
+Install
+=======
+
+You must have the CORBA::ORBit module installed first.
+It is available from the place you got this module.
+
+Once you have the the ORBit module installed, do:
+
+  perl Makefile.PL
+  make
+
+The package then can be installed by executing the command:
+
+  make install
+
+
+Trying it out
+=============
+
+With a recent version of gmc installed, do:
+
+ perl -Mblib gmc-test
+
+It should briefly pop up a file manager window
+with a few files inside it, then close it again.
+
+There is a gnumeric-test that can be used similarly.
+
+
+License
+=======
+
+This work is Copyright Red Hat, Inc, 1999, and licensed
+under the terms of the GNU Library General Public License (LGPL)
+See the included file LICENSE-LGPL for details.
+
+The contents of the file constsub.c are from the Perl distribution
+and licensed accordingly.
+
+

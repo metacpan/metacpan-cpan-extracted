@@ -1,0 +1,83 @@
+is_deeply is finding a difference which doesn't exist!
+
+is_deeply is reporting:
+
+not ok 25 - 1-0 White,was id 10!
+
+#   Failed test '1-0 White,was id 10!'
+#   at t/29495.t line 318.
+#     Structures begin differing at:
+#          $got->{roles}{4} = 'Black'
+#     $expected->{roles}{4} = 'White'
+
+on this test:
+
+[ $lineup[11],	$m{1}->[0]->contestants->{White},	'1-0 White,was id 10!'],
+
+They are in fact the same structure in memory:
+Games::Tournament::Contestant::Swiss=HASH(0x95ad484)
+
+  DB<4> x $m{1}->[0]->contestants->{White}
+0  Games::Tournament::Contestant::Swiss=HASH(0x95ad484)
+   'firstround' => 1
+   'floater' => 'Up'
+   'floats' => ARRAY(0x95bf1dc)
+      0  'Not'
+      1  'Not'
+      2  'Down'
+      3  'Up'
+   'id' => 12
+   'name' => 'Eleven'
+   'pairingNumber' => 12
+   'preference' => Games::Tournament::Contestant::Swiss::Preference=HASH(0x95ad4e4)
+      'difference' => 0
+      'lastTwo' => ARRAY(0x95c64d4)
+         0  'White'
+         1  'Black'
+      'sign' => 'Black'
+   'rating' => 99
+   'roles' => HASH(0x95bf23c)
+      1 => 'White'
+      2 => 'Black'
+      3 => 'White'
+      4 => 'Black'
+   'score' => 1
+   'scores' => HASH(0x95bf04c)
+      1 => undef
+      2 => undef
+      3 => undef
+      4 => undef
+   'title' => 'Unknown'
+  DB<5> x $lineup[11]
+0  Games::Tournament::Contestant::Swiss=HASH(0x95ad484)
+   'firstround' => 1
+   'floater' => 'Up'
+   'floats' => ARRAY(0x95bf1dc)
+      0  'Not'
+      1  'Not'
+      2  'Down'
+      3  'Up'
+   'id' => 12
+   'name' => 'Eleven'
+   'pairingNumber' => 12
+   'preference' => Games::Tournament::Contestant::Swiss::Preference=HASH(0x95ad4e4)
+      'difference' => 0
+      'lastTwo' => ARRAY(0x95c64d4)
+         0  'White'
+         1  'Black'
+      'sign' => 'Black'
+   'rating' => 99
+   'roles' => HASH(0x95bf23c)
+      1 => 'White'
+      2 => 'Black'
+      3 => 'White'
+      4 => 'Black'
+   'score' => 1
+   'scores' => HASH(0x95bf04c)
+      1 => undef
+      2 => undef
+      3 => undef
+      4 => undef
+   'title' => 'Unknown'
+ 
+

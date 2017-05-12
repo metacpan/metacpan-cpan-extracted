@@ -1,0 +1,308 @@
+#!/usr/bin/perl -w
+
+# Usage:
+
+#  build/gen_manual >attributes.html
+
+use strict;
+use Carp;
+use Time::HiRes qw/time/;
+use File::Spec;
+
+BEGIN
+  {
+  $|++;
+  chdir 'doc' if -d 'doc';
+  use lib 'lib', '../lib';
+  }
+
+my $path = shift || 'manual';
+
+use Graph::Easy 0.62;
+use Graph::Easy::Parser;
+use Graph::Easy::Manual;
+
+my $start = time();
+
+my $tpl = read_file('attributes.tpl');
+
+# make copy of entries to preserve ARRAY refs
+
+my $e = Graph::Easy->_attribute_entries();
+my $entries = {};
+for my $k (keys %$e)
+  {
+  for my $k1 (keys %{$e->{$k}})
+    {
+    $entries->{$k}->{$k1} = [ @{$e->{$k}->{$k1}} ];
+    }
+  }
+
+my $parser = Graph::Easy::Parser->new();
+
+my $example_graph_id = '';
+
+for my $class (qw/node edge graph group/)
+  {
+  my $css = '';
+  my $start_time = time();
+  my $cur_tpl = read_file('att_' . $class . 's.tpl');
+
+  my $txt = '';
+
+  my $idx = "<ul>\n  <li>";
+
+  my $todo = { };
+  for my $entry (keys %{$entries->{all}})
+    {
+    $todo->{$entry} = $entries->{all}->{$entry};
+    }
+  for my $entry (keys %{$entries->{$class}})
+    {
+    $todo->{$entry} = $entries->{$class}->{$entry};
+    }
+  
+  my $file = 'att_' . $class . 's.html';
+  my $last = '';
+  for my $entry (sort keys %$todo)
+    {
+    if ($last ne '' && $last ne substr($entry,0,1))
+      {
+      $idx .= "\n  <li>";
+      }
+    $last = substr($entry,0,1);
+
+    my $e = $todo->{$entry};
+
+    my $des = $e->[0]; 
+    my $short_des = $des; $short_des =~ s/\. .*/\./; $short_des =~ s/"/''/g;
+    $short_des =~ s/[IBCL]<([^>]+)>/$1/g;
+
+    # convert I<>
+    $des =~ s/I<([^>]+)>/<i>$1<\/i>/g;
+    # convert B<>
+    $des =~ s/B<([^>]+)>/<b>$1<\/b>/g;
+    # convert C<>
+    $des =~ s/C<([^>]+)>/<code>$1<\/code>/g;
+
+    # convert L<>
+    $des =~ s/L<([^>]+)>/<a href="#${class}_$1">$1<\/a>/g;
+    $des =~ s/(section about )([^>]*?)( for ref)/my $l = $2; $l =~ tr!A-Za-z0-9!_!c; "$1<a href=\"attributes.html#$l\">$2<\/a>$3";/eg;
+
+    # insert into the index/short overview:
+    $idx .= "<a href='$file#${class}_$entry' title=\"$short_des\">$entry</a>, ";
+    
+    $txt .= "<a name=\"${class}_$entry\">\n<h4>$entry</h4></a>\n\n";
+
+    $txt .= "<div class=\"entry\">\n\n";
+    
+    if (ref($e->[1]) eq 'ARRAY')
+      {
+      # list of words
+      $des .= "\nOne of: <code>" . join ("</code>, <code>", @{$e->[1]}) . "</code>.\n";
+      } 
+
+    $txt .= "<p>\n$des<br>\n";
+    my $default = $e->[2]; $default = '' unless defined $default;
+
+    if (ref($default))
+      {
+      my $d = $default; $default = "<ul>\n";
+      for my $k (sort keys %$d)
+	{
+        next if $k eq 'default';
+	$default .= "  <li><code>$d->{$k}</code> for $k</li>\n";
+	}
+      $default .= "  <li><code>$d->{default}</code> for anything else</li>\n" if exists $d->{default};
+      $default .= "</ul>\n";
+      }
+    else
+      {
+      $default = '<code>' . $default . '</code>';
+      }
+    $txt .= "<b>Defaults to:</b> $default";
+
+    if (defined $e->[5])
+      {
+      $txt .= "<br>\n<b>Example graph:</b>\n</p>\n";
+      my $sample = $e->[5];
+
+      # quote hTML chars
+      $sample =~ s/&/&amp;/g;
+      $sample =~ s/>/&gt;/g;
+      $sample =~ s/</&lt;/g;
+
+      $txt .= '<pre class="graphtext">' . "$sample\n</pre>\n\n" .
+              '<div class="clear"></div>';
+
+      my $graph = $parser->from_text($e->[5]);
+
+      confess ($parser->error(). "\n Input:\n" . $e->[5]) if $parser->error();
+     
+      $graph->id($example_graph_id);
+
+      if (($graph->attribute('output') || 'html') eq 'html')
+        {
+        $css .= $graph->css();
+        $txt .= '<div style="margin-left: 1em;">' . $graph->as_html() . '</div>';
+        }
+      else
+        {
+        $txt .= '<div style="margin-left: 1em;"><pre>' . $graph->output() . '</pre></div>';
+        }
+
+      $txt .= '<div class="clear"></div>';
+      $example_graph_id ||= 0; $example_graph_id++;
+      }
+    else
+      {
+      $txt .= "<br>\n<b>Example value:</b> <code>$e->[3]</code></p>\n";
+      }
+    $txt .= "\n</div>\n\n";
+    }
+
+  $idx =~ s/<li>\z//; $idx .= "\n</ul>\n";
+
+  $cur_tpl =~ s/##$class##/$idx$txt/;
+
+  $cur_tpl =~ s/##css##/$css/;
+  $cur_tpl =~ s/##time##/ scalar localtime(); /eg;
+  $cur_tpl =~ s/##version##/$Graph::Easy::Manual::VERSION/g;
+
+  my $took = sprintf("%0.4fs", time() - $start_time);
+  $cur_tpl =~ s/##took##/$took/g;
+
+  write_file(File::Spec->catfile($path,$file),$cur_tpl);
+
+  # insert the index
+  $tpl =~ s/##$class##/$idx/;
+  }
+
+my $took = sprintf("%0.4fs", time() - $start);
+$tpl =~ s/##took##/$took/g;
+
+$tpl =~ s/##time##/ scalar localtime(); /eg;
+write_file(File::Spec->catfile($path,'attributes.html'),$tpl);
+
+
+#############################################################################
+# insert the list of colors as one table per colorscheme
+
+$start = time();
+$tpl = read_file('att_colors.tpl');
+
+my $schemes = Graph::Easy->color_names();
+my $list = '';
+for my $scheme ('w3c', 'x11')
+  {
+  my $colors = $schemes->{$scheme};
+
+  my $limit = 6; 
+
+  $list .= "<a name='$scheme'><b>$scheme</b> color scheme:</a><br>\n<table class='clr'>\n<tr>\n"; my $o = 0;
+  for my $clr (sort {
+    my $ac = $colors->{$a}; $ac =~ /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/;
+    $ac = hex($1) * hex($1) + hex($2) * hex($2) + hex($3) * hex($3); 
+    my $bc = $colors->{$b}; $bc =~ /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/;
+    $bc = hex($1) * hex($1) + hex($2) * hex($2) + hex($3) * hex($3); 
+    $ac <=> $bc;
+    } keys %$colors)
+    {
+    next if $clr =~ /^(transparent|inherit)\z/;
+    # skip these
+    next if $clr =~ /grey/;
+
+    $list .= _color_entry($clr,$colors->{$clr});
+    if ($o++ > $limit)
+      { 
+      $o = 0;
+      $list .= "</tr><tr>\n";
+      }
+    }
+  $list =~ s/<tr>\n\z//;		# remove last <tr>
+  $list .= "</table>\n";
+  }
+
+# ColorBrewer schemes:
+$list .= "<p><b><a name='colorbrewer' href='http://colorbrewer.org/'>ColorBrewer</a></b> schemes:<p>\n";
+for my $scheme (sort keys %$schemes)
+  {
+  my $colors = $schemes->{$scheme};
+  # do w3c and x11 later
+  next if $scheme =~ /^(w3c|x11)\z/;
+
+  $list .= "<b>$scheme</b> color scheme:<br>\n<table class='clr'>\n<tr>\n";
+  for my $clr (sort { $a <=> $b } keys %$colors)
+    {
+    $list .= _color_entry($clr,$colors->{$clr});
+    }
+  $list =~ s/<tr>\n\z//;		# remove last <tr>
+  $list .= "</table>\n";
+  } # end for all schemes
+
+$tpl =~ s/##colors##/$list/;
+
+$tpl =~ s/##time##/ scalar localtime(); /eg;
+
+$took = sprintf("%0.4fs", time() - $start);
+$tpl =~ s/##took##/$took/g;
+
+write_file(File::Spec->catfile($path,'att_colors.html'),$tpl);
+
+# re-generate the dataflow.png picture
+
+`graph-easy --png ../examples/overview.txt manual/img/dataflow.png`;
+
+#############################################################################
+
+sub _color_entry
+  {
+  # create on color entry
+  my ($name, $color) = @_;
+
+  $color =~ /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/;
+  my $ac = hex($1) * hex($1) + hex($2) * hex($2) + hex($3) * hex($3);
+  my $class = ''; 
+
+  $class = ' class="w"' if $ac < (256*170);
+
+  "<td$class style='background: $color' title='$color'>$name</td>\n";
+  }
+
+sub read_file
+  {
+  my $f = shift;
+
+  open FILE, "$f" or die ("Cannot read '$f': $!");
+  local $/ = undef;
+  my $input = <FILE>;
+  close FILE;
+  $input;
+  }
+
+sub write_file
+  {
+  my ($file,$txt) = @_;
+
+  # create the directory unless it already exists
+  my ($vol,$dir,$f) = File::Spec->splitpath($file);
+  my @dirs = File::Spec->splitdir($dir);
+
+  my $comb = '';
+  $comb = File::Spec->curdir() unless File::Spec->file_name_is_absolute($dirs[0]);
+  foreach my $d (@dirs)
+    {
+    $comb = File::Spec->catdir($comb,$d);
+    if (!-d $comb)
+      {
+      die ("Couldn't create dir $comb: $!") unless mkdir $comb, 0750;
+      }
+    }
+
+  print "Writing $file...\n";
+  open FILE, ">$file" or die ("Cannot write '$file': $!");
+  binmode FILE, ':utf8' or die ("binmode $file, ':utf8' failed: $!");
+  print FILE $txt;
+  close FILE;
+  }
+

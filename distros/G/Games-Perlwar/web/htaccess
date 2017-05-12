@@ -1,0 +1,23 @@
+AxNoCache On
+DirectoryIndex round_current.xml
+
+<FilesMatch "round*">
+   AxAddProcessor application/x-ypathscript ../stylesheets/include_config.xps
+    <AxStyleName "#default">
+        AxAddProcessor application/x-ypathscript ../stylesheets/iteration2html.xps
+    </AxStyleName>
+    <AxStyleName "config">
+        AxAddProcessor application/x-ypathscript ../stylesheets/configuration.xps
+    </AxStyleName>
+    <AxStyleName "upload">
+        AxAddProcessor application/x-ypathscript ../stylesheets/upload.xps
+    </AxStyleName>
+</FilesMatch>
+
+# can't let players peek there, can we?
+<Files "configuration.xml">
+    deny from all
+</Files>
+<FilesMatch "mobil/*">
+    deny from all
+</FilesMatch>

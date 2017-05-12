@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Games-Quake-Stats
+version:             0.05
+abstract:            Perl module for compiling basic Quake game statistics
+license:             ~
+author:              
+    - Matthias Beebe <matthiasbeebe@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    GD::Graph::colour:             0
+    GD::Graph::hbars:              0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

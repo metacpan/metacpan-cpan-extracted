@@ -1,0 +1,125 @@
+# -*- Mode: Perl -*-
+
+gfsmSemiring*             O_OBJECT
+gfsmAutomaton*            O_OBJECT
+gfsmIndexedAutomaton*     O_OBJECT
+#gfsmxlCascade*            O_OBJECT
+gfsmxlCascadePerl*        O_OBJECT
+gfsmxlCascadeLookupPerl*  O_OBJECT
+
+gfsmLabelVector*   T_LABELID_VECTOR
+
+gboolean         T_INT
+
+guint            T_UINT
+gfsmLabelId      T_UINT
+gfsmLabelVal     T_UINT
+gfsmStateId      T_UINT
+
+gfsmSRType       T_UINT
+
+#gfsmWeight       T_FLOAT
+gfsmWeightVal    T_FLOAT
+gfsmWeight       T_GFSM_WEIGHT
+
+gfsmArcCompMask  T_UINT
+
+######################################################################
+# perl->C
+INPUT
+
+#T_std_string
+#  {
+#    char *cstr = SvPV_nolen($arg);
+#    $var.assign(cstr, SvCUR($arg));
+#  }
+
+T_INT
+  {
+      $var = SvIV($arg);
+  }
+
+T_UINT
+  {
+      $var = SvUV($arg);
+  }
+
+T_FLOAT
+  {
+      $var = SvNV($arg);
+  }
+
+T_GFSM_WEIGHT
+  {
+      gfsm_perl_weight_setfloat($var,SvNV($arg));
+  }
+
+T_LABELID_VECTOR
+  {
+      //-------------------------- BEGIN T_LABELID_VECTOR perl->C
+      int _i, _avlen;
+      AV *av=NULL;
+
+      if (SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) )
+	  av = (AV*)SvRV( $arg );
+      else {
+	  warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+	  XSRETURN_UNDEF;
+      }
+
+      _avlen = av_len(av);
+      $var = g_ptr_array_sized_new(_avlen > 0 ? _avlen : 1);
+      for (_i=0; _i <= _avlen; _i++) {
+	  SV **sv = av_fetch(av,_i,0);
+	  if (sv && *sv) {
+	      g_ptr_array_add($var, GUINT_TO_POINTER(SvUV(*sv)));
+	  } else {
+	      g_ptr_array_add($var, GUINT_TO_POINTER((guint)gfsmNoLabel));
+	  }
+      }
+      //-------------------------- END T_LABELID_VECTOR perl->C
+  }
+
+
+######################################################################
+# C->perl
+OUTPUT
+
+#T_std_string
+#  $arg = newSVpvn($var.data(), $var.length());
+
+T_INT
+  {
+      sv_setiv($arg,$var);
+  }
+
+T_UINT
+  {
+      sv_setuv($arg,$var);
+  }
+
+T_FLOAT
+  {
+      sv_setnv($arg,$var);
+  }
+
+T_GFSM_WEIGHT
+  {
+      sv_setnv($arg, gfsm_perl_weight_getfloat($var));
+  }
+
+T_LABELID_VECTOR
+  {
+      //-------------------------- BEGIN T_LABELID_VECTOR C->perl
+      int _i;
+      AV *av = newAV();
+      if ($var) {
+	  for (_i=0; _i < $var->len; _i++) {
+	      av_push(av, newSVuv((UV)GPOINTER_TO_UINT(g_ptr_array_index($var,_i))));
+	  }
+      }
+      sv_2mortal((SV*)av);
+      $arg = newRV((SV*)av);
+      sv_2mortal($arg);
+      //-------------------------- END T_LABELID_VECTOR C->perl
+  }

@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+use 5.12.0;
+use Cwd;
+use Git;
+use Getopt::Long;
+use Git::Release;
+$|++;
+
+my $opt_list;
+my $opt_remote;
+
+GetOption(
+    'l|list' => \$opt_list,
+    'remote=s' => \$opt_remote,
+);
+
+my $re = Git::Release->new;
+
+if( $opt_list ) {
+    $re->branch->hotfix_branches;
+} else {
+    $opt_remote ||= $re->remote->origin;
+    my $prefix = $re->config->hotfix_prefix;
+    my $hotfix = shift;
+    my $from = shift || 'master';
+    my $name = $prefix . '/' . $hotfix;
+
+    say "Creating hotfix branch $name.";
+    my $b = $re->branch->new_branch( $name )->create( from => $from );
+    $b->checkout;
+
+    if( $opt_remote ) {
+        say "Pushing feature branch @{[ $b->name ]} to remote $opt_remote... ";
+        $b->push($opt_remote, upstream => 1);
+    }
+
+    say "Done";
+}
+1;
+__END__
+=pod
+
+To create a hotfix branch from master, for ticket 13033:
+
+    $ git hotfix bug1 master --redmine --issue=13033
+    > hotfix/bug1
+
+To list hotfix branches
+
+    $ git hotfix --list
+
+=cut

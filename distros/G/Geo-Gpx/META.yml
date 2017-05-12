@@ -1,0 +1,28 @@
+---
+name: Geo-Gpx
+version: 0.26
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Create and parse GPX files.
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Gpx
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/Geo--Gpx.git
+requires:
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  HTML::Entities: 0
+  Scalar::Util: 0
+  Test::More: 0
+  Time::Local: 0
+  XML::Descent: 1.01
+  version: 0
+provides:
+  Geo::Gpx:
+    file: lib/Geo/Gpx.pm
+    version: 0.26
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

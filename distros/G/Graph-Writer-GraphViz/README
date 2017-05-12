@@ -1,0 +1,7 @@
+Graph::Writer::GraphViz is an Writer object of Graph, using
+GraphViz module. All GraphViz output format should be supported
+by nature.
+
+Cheers,
+Kang-min Liu <gugod@gugod.org>
+

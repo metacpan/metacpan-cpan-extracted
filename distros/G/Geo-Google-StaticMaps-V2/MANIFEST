@@ -1,0 +1,23 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Geo/Google/StaticMaps/V2.pm
+lib/Geo/Google/StaticMaps/V2/Visible.pm
+lib/Geo/Google/StaticMaps/V2/Path.pm
+lib/Geo/Google/StaticMaps/V2/Markers.pm
+t/001_load.t
+t/002_url.t
+t/003_markers.t
+t/004_paths.t
+t/005_paths_geodesic.t
+t/006_save.t
+t/007_visible.t
+t/008_marker_color.t
+t/009_path_color.t
+t/010_path_fillcolor.t
+scripts/Geo-Google-StaticMaps-V2-flight.pl
+perl-Geo-Google-StaticMaps-V2.spec
+META.yml                                 Module meta-data (added by MakeMaker)

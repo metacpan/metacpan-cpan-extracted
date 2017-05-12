@@ -1,0 +1,24 @@
+Changes
+GSAPI.pm
+GSAPI.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/01.t
+t/02.t
+t/03.t
+t/04.t
+t/05.t
+t/06.t
+t/07.t
+t/08.t
+t/10_constant.t
+t/20_display.t
+typemap
+INSTALL
+fallback/const-c.inc
+fallback/const-xs.inc
+eg/imager.pl
+eg/mozilla.ps
+META.yml                                 Module meta-data (added by MakeMaker)

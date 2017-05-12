@@ -1,0 +1,47 @@
+% layout 'standard';
+% content_for header => begin
+  %= javascript '/assets/html.sortable.0.3.0.min.js'
+  %= javascript '/galileo-edit.js'
+% end
+
+%= javascript begin
+function onSuccess(reply) {
+  content = $(reply.content);
+  id = content.attr('id');
+  $('#'+id).replaceWith(content);
+}
+
+function saveButton() {
+  var data = {
+    name : "main",
+    list : $('#list-active-pages li:not(.nav-header)').map(function(){return $(this).attr('id') }).get(),
+  };
+  sendViaWS("<%= url_for('storemenu')->to_abs %>", data, onSuccess);
+}
+
+$(function() {
+  $( "#list-active-pages, #list-inactive-pages" ).sortable({
+    connectWith: ".connectedSortable",
+    items: "li:not(.nav-header)"
+  });
+});
+% end
+
+<div class="row">
+  <div class="span5">
+    <ul id="list-active-pages" class="nav nav-list connectedSortable well">
+      <li id="header-active" class="nav-header">Active Pages</li>
+      <%= $active %>
+    </ul>
+  </div>
+  <div class="span5">
+    <ul id="list-inactive-pages" class="nav nav-list connectedSortable well">
+      <li id="header-inactive" class="nav-header">Inactive Pages</li>
+      <%= $inactive %>
+    </ul>
+  </div>
+</div>
+<button class="btn" id="save-list" onclick="saveButton()">
+  Save
+</button>
+

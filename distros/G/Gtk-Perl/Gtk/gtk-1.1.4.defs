@@ -1,0 +1,10 @@
+(define-boxed GtkRcStyle
+  gtk_rc_style_ref
+  gtk_rc_style_unref)
+
+
+(define-flags GtkObjectFlags
+  (destroyed GTK_DESTROYED)
+  (floating GTK_FLOATING)
+  (connected GTK_CONNECTED)
+  (constructed GTK_CONSTRUCTED))

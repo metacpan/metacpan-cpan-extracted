@@ -1,0 +1,148 @@
+
+    Sgf2Dg
+
+Smart Go Format (SGF) files are commonly used to store go games in
+electronic form.  Hard copy (paper) records are commonly in diagram
+form.  Sgf2Dg is a perl package to convert from SGF to diagrams.
+
+Sgf2Dg is a complete re-write of the sgf2tex package.  The last
+release of sgf2tex was sgf2tex-3.3.tar.gz.  Sgf2Dg is a super-set
+replacement for sgf2tex and starts with revision 4.000.
+
+One reason for re-writing sgf2tex was to create a more flexible
+converter environment.  The Sgf2Dg package is designed to
+accommodate different target diagram formats.  TeX is still the
+default converter, but the sgf2dg script can handle any converter to
+produce diagrams in any format.  The Sgf2Dg package currently ships
+with these output converters:
+
+    TeX         the default
+    Mp          MetaPost embedded in TeX (encapsulated PostScript)
+    ASCII       simple ASCII art
+    PDF         Portable Document Format
+    Ps          PostScript (much nicer than TkPs)
+    Tk          a perl/Tk NoteBook window
+    TkPs        PostScript derived from the Tk converter
+
+Another reason to re-write sgf2tex was to make this package a
+standard perl module, installable with the usual perl invocation:
+
+    $ perl Makefile.pl
+    $ make
+    $ make test
+    $ make install
+
+If this normal installation fails for any reason, please see the
+file INSTALL, where you will find more detailed instructions for
+installing the Sgf2Dg package and the TeX fonts.  The file
+INSTALL.DOS contains additional instructions specific to DOS and
+Windows systems.  If are installing on a DOS or Windows platform,
+please read both INSTALL and INSTALL.DOS
+
+Note that during 'perl Makefile.PL', the script may not be able to
+determine the proper destinations for some TeX files.  If this
+happens, it will stop and ask for user input (our apologies to
+automatic testers and installers).  If you don't wish to install the
+TeX parts, you may answer with 'q' at this time.
+
+Completing font installation in TeX may require tools that are not included
+in a standard TeX installation.  If displaying your output document fails
+with "font not found" messages, you may need to install some additional TeX
+'utils' package.  Examine the error messages for 'command not found' for
+more clues (mktexpk may be the culprit).
+
+Installation includes a number of manual/perldoc pages.  Invoking:
+
+    $ perldoc sgf2dg
+
+or
+
+    $ man sgf2dg
+
+after installation gives you the complete documentation for the
+sgf2dg script.  sgfsplit also has a perldoc/man page.
+
+In addition, there are pages for all the output converters.  Since
+the converters are stored in the Games::Go hierarchy of your perl
+installation, you can view their perldoc/man pages with:
+
+    $ perldoc Games::Go::Sgf2Dg::Dg2Tk
+
+or
+
+    $ man Games::Go::Sgf2Dg::Dg2PDF
+
+There is also a manual.tex included with this distribution.  If you
+install using the invocation above, it produces a manual.dvi file in
+the distribution directory.  You may view this manual with any DVI
+viewer (kdvi for KDE, xdvi, etc).  manual.tex includes information
+on the fonts as well as sgf2dg and sgfsplit.
+
+
+
+    Go Typesetting Using the Dg2TeX converter
+
+Dg2TeX is the default output converter plugin for sgf2dg.  It
+produces TeX source for the target diagram.  TeX produced by Dg2TeX
+may be used with either plain TeX or LaTeX.  This package includes
+the Metafont sources for a set of fonts, called GOOE, used by the
+Dg2TeX converter to produce TeX source for the diagrams.
+
+The numerals on the Go stones in these fonts are instances of the
+Computer Modern Fonts designed by Donald Knuth and his co-workers as
+part of the TeX system. The file romandg.mf is the same as the file
+romand.mf distributed with TeX, with only trivial modifications to
+allow the fonts generated from it to be pasted onto Go stones. This
+file is of course copyrighted by Donald Knuth. The remaining
+portions of the GOOE system are published under the Gnu Public
+License.  The sgf2dg scripts and associated Dg2* output converters
+are published under the standard perl license.  Although this system
+is thus free software, we would appreciate acknowledgement if it is
+used to publish a book.
+
+Another set of Go fonts was created by Hanna Kolodziejska around
+1990, and revised by Jan van der Steen. Those fonts, together with
+the latex document style file go.sty can be found at CTAN in the
+directory fonts/go, or at the Go ftp sites (such as
+ftp://igs.nuri.net in the Go/printing directory) under the name
+golatex. Jan van der Steen's utiltiy sgf2misc has the capability of
+generating LaTeX or postscript files from SGF. It may be obtained
+from ftp://igs.nuri.net in the Go/prog directory. Our work is
+independent of and different from van der Steen's.
+
+
+                Getting perl and TeX
+
+perl and TeX are both widely available, and will be found already
+installed on many or most UNIX systems. 
+
+If you don't have it, you can get perl from the Comprehensive Perl
+Archive Network (CPAN) at:
+
+    http://cpan.org
+
+You can get TeX in the TeTeX or Web2c distributions from:
+
+    http://www.tug.org/tetex/
+
+or:
+
+    ftp://ftp.tug.org/tex/web2c/
+
+An NTEX distribution (which may be somewhat out of date) may be
+found at:
+
+    http://cyl.cs.cf.ac.uk/software/ntex/
+or:
+
+    ftp://www.langbein.org/ntex/
+
+
+TeX is a trademark of the American Mathematical Society. Metafont is
+a trademark of Addison Wesley Publishing Company.
+
+
+                      Daniel Bump (bump@math.stanford.edu)
+                      Reid Augustin (reid@hellosix.com), 2005
+
+

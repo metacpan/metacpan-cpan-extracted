@@ -1,0 +1,70 @@
+
+				    Gnome2
+				   --------
+
+The Gnome2 module allows a perl developer to use the Gnome libraries.  Find out
+more about Gnome+ at http://www.gnome.org.
+
+The perl bindings follow the C API very closely, and the C reference
+documentation should be considered the canonical source.
+
+To discuss gtk2-perl, ask questions and flame/praise the authors, join
+gtk-perl-list@gnome.org at lists.gnome.org.
+
+Also have a look at the gtk2-perl website and sourceforge project page,
+http://gtk2-perl.sourceforge.net
+
+
+				 Installation
+				--------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+To avoid installing to a system directory, since this is a beta release, you
+can change the installation prefix at Makefile.PL time with
+
+   perl Makefile.PL PREFIX=/some/other/place
+
+This will install the module to the subdirectory lib/perl5 under the given
+prefix.  If this is not already in perl's include path, you'll need to tell
+perl how to get to this library directory so you can use it; there are three
+ways:
+
+  in your environment (the easiest):
+    PERL5LIB=/some/other/place/lib/perl5/site_perl:$PERL5LIB
+
+  on the perl command line:
+    perl -I /some/other/place/lib/perl5/site_perl yourscript
+
+  in the code of your perl script:
+    use lib '/some/other/place/lib/perl5/site_perl';
+
+
+				 Dependencies
+				--------------
+
+This module requires these other modules and libraries:
+
+  perl >= 5.8.0
+  Glib >= 1.04 (perl module and requisite C libraries)
+  Gtk2 >= 1.00 (perl module and requisite C libraries)
+  Gnome2::Canvas >= 1.00 (perl module and requisite C libraries)
+  Gnome2::VFS >= 1.00 (perl module and requisite C libraries)
+  libgnomeui > 2.x (C library) and dependencies
+  libbonoboui > 2.x (C library) and dependencies
+
+To build this module from source, you'll also need:
+
+  ExtUtils::Depends >= 0.20
+  ExtUtils::PkgConfig >= 1.03
+
+				   Copyright
+				  -----------
+
+Copyright (C) 2003-2006 by the gtk2-perl team (see the file AUTHORS)

@@ -1,0 +1,36 @@
+Revision history for Gtk2::SourceView2.
+
+0.10 Sun May 30 23:35:52 CEST 2010
+	Unit tests now work with Test::Simple 0.95_02.
+	Unit test compatible with gtksourceview 2.10.2 (view most be in a parent).
+
+0.09 Tue Apr 27 20:11:56 CEST 2010
+	Fix the license in Makefile.PL.
+
+0.08 Mon Apr 26 22:11:27 CEST 2010
+	License change to GPL2 and Artistic.
+	Remove the dependency to File::Slurp in the example.
+
+0.07 Fri Mar 19 21:12:08 CET 2010
+	Issue 2 - configure requires missing test failure.
+
+0.06 Fri Jan 29 12:56:44 CET 2010
+	Issue 1 - test failure non-English locale (reopen).
+
+0.05 Sat Nov 21 08:56:04 CET 2009
+	Issue 1 - test failure non-English locale.
+
+0.04 Sat Nov 14 19:42:51 CET 2009
+	Fix a warning in the examples when pasting text with the keyboard.
+
+0.03 Sun Nov  8 14:23:48 CET 2009
+	More complete example.
+	Remove a TODO.
+
+0.02 Sat Oct 31 09:22:17 CET 2009
+	Add the bindings for Gtk2::SourceView2::Iter.
+	LanguageManager->guess_language() last argument is optional.
+	Fix a typo in the module's documentation.
+
+0.01 Thu Oct 29 21:33:41 CET 2009
+	First release.

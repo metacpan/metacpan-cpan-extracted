@@ -1,0 +1,34 @@
+---
+abstract: 'Helpers for Glib objects.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Glib-Ex-ObjectBits
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+optional_features:
+  maximum_tests:
+    description: 'Have "make test" do as much as possible.'
+    requires:
+      Test::Weaken: '3.002'
+requires:
+  Devel::GlobalDestruction: '0'
+  Glib: '0'
+  Glib::Object::Subclass: '0'
+  perl: '5.008'
+resources:
+  homepage: http://user42.tuxfamily.org/glib-ex-objectbits/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '16'

@@ -1,0 +1,8 @@
+Revision history for Perl extension GPIB::serialdev.
+
+0.20  Mon May 31 20:00:00 1999
+        - First external release
+
+0.01  Sun Apr 18 17:53:45 1999
+	- original version; created by h2xs 1.18
+

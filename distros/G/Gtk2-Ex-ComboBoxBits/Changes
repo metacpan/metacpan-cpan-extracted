@@ -1,0 +1,54 @@
+Copyright 2010, 2011 Kevin Ryde
+
+This file is part of Gtk2-Ex-ComboBoxBits.
+
+Gtk2-Ex-ComboBoxBits is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-ComboBoxBits is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-ComboBoxBits.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 32, May 2011
+    - ComboBoxBits new get_active_path()
+
+Version 31, May 2011
+    - ComboBox::PixbufType fix for_width,for_height==0 means unrestricted
+
+Version 30, May 2011
+    - use PixbufBits type_supports_size()
+
+Version 29, January 2011
+    - ComboBoxBits new set_active_path()
+
+Version 28, January 2011
+    - new Gtk2::Ex::ToolItem::ComboEnum
+    - jump version number across Gtk2::Ex::ComboBox::PixbufType
+      had $VERSION=27
+
+Version 6, December 2010
+    - new Gtk2::Ex::Menu::EnumRadio
+
+Version 5, November 2010
+    - ComboBoxBits set_active_text() undef do nothing if no model set
+    - ComboBox::Enum new get_active_nick() and set_active_nick()
+
+Version 4, October 2010
+    - new Gtk2::Ex::ComboBox::PixbufType
+
+Version 3, September 2010
+    - tests at least one not depending on DISPLAY
+
+Version 2, September 2010
+    - fix leftover unused List::MoreUtils
+
+Version 1, September 2010
+    - the first version

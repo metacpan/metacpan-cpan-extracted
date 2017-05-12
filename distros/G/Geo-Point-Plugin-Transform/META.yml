@@ -1,0 +1,23 @@
+---
+name: Geo-Point-Plugin-Transform
+version: 0.0.2
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: Add transforming projection method to Geo::Point
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Geo::Point: 0
+  Geo::Proj: 0
+  version: 0
+build_requires:
+  Test::Base: 0
+provides:
+  Geo::Point::Plugin::Transform:
+    file: lib/Geo/Point/Plugin/Transform.pm
+    version: 0.0.2
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

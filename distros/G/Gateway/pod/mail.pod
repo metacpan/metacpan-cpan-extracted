@@ -1,0 +1,68 @@
+=head2 mail
+
+This module separates out various functions related to sending mail into
+their own module so that it can be autoloaded on demand rather than always
+compiled.  The following methods are included:
+
+=over 4
+
+=item mail ([ ADDRESS [, ADDRESS ...]])
+
+The message in its current form will be mailed to C<ADDRESS>, and the
+method will return true on success, false on failure.  If C<ADDRESS> is
+not supplied, the message is mailed to the addresses in the standard mail
+headers (To, Cc, Bcc, and the Resent-* varients depending on your MTA), so
+this method should also be used after news to mail rewrites have taken
+place.
+
+B<NOTE: The old mail_forward() method is DEPRECATED.>
+
+=item mail_bounce (ERROR)
+
+Bounces the message by printing C<ERROR> to stderr and then exiting with
+the permanent failure status code (as defined in the beginning of the
+News::Gateway source).  This should only be used as a last resort,
+particularly for robomoderators, since the bounces will go to the envelope
+sender address which is often not the same as the poster.
+
+=item mail_error (ERROR)
+
+Attempts to send an error message to the sender of the original message,
+cc'd to the maintainer address.  Replies will be set to the maintainer
+address, the subject will be "failure notice," and a Precedence header of
+"junk" will be added, which can be used to avoid loops.
+
+If no From or Reply-To header has been seen, or if sending the mail fails,
+this method will call mail_bounce() with the same error message instead.
+
+The message sent will be:
+
+    Hi.  I'm afraid that I was unable to post your message.  This
+    is a fatal error; I've given up.  A copy of this report is
+    being sent to my maintainer.  The error message I received was:
+
+    ERROR
+
+    --- Below this line is a copy of the message.
+
+followed by the original article headers and the body, with ERROR replaced
+by C<ERROR>.  Note that if C<ERROR> should be word-wrapped in the message,
+this must be done by the caller.
+
+=item mail_filereply (FILENAME [, SOURCES])
+
+Mails a News::FormReply-style message to the author of the incoming
+message.  See L<News::FormReply> for more information.  C<FILENAME> is the
+path to the file to use to construct the reply, and C<SOURCES> for
+News::FormReply variables can optionally be provided.  The following
+variables are exposed to the form message by default:
+
+    @BODY        Message body, possibly munged by previous modules.
+    @HEADERS     Current message headers.
+    @OLDHEADERS  Original message headers.
+    $SUBJECT     Original subject line.
+    $MAINTAINER  Maintainer of this gateway.
+
+Returns true if sending the mail succeeded, false if it failed.
+
+=back

@@ -1,0 +1,216 @@
+==================================================
+Changes from 2015-03-14 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2016-03-13 09:14:40 +0000
+------------------------------------------
+
+  Change: 4729213713bf66ce4198f4cc7d22499aece0e87d
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-13 09:13:47 +0000
+
+    cpant fix from manwar, also some doc cleanup 
+
+  Change: 3cbaa8e79523fe9c992a9df590f98a3af8966862
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-03-13 09:06:13 +0000
+
+    Merge pull request #2 from Manwar/fix-missing-abstract
+
+    CPANTS issue 
+
+  Change: 55500e29426b2cd594ef9ff457e4e921930792ae
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-03-12 21:36:57 +0000
+
+    - Added the missing abstract. - Removed 'use strict; use warnings;'
+    as importing Moo makes it redundant. 
+
+------------------------------------------
+version 0.003 at 2016-03-12 18:45:20 +0000
+------------------------------------------
+
+  Change: 989a5b5176edfdc7ed3431b73377807a98cd8f17
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 18:45:20 +0000
+
+    use Cpanel JSON as its more maintained 
+
+------------------------------------------
+version 0.002 at 2016-02-28 18:14:00 +0000
+------------------------------------------
+
+  Change: a291a9bc12f2139da61d8141734b8d95271fad15
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-02-28 18:14:00 +0000
+
+    version goes after nextversion plugin 
+
+  Change: 59d37025da2c3b25696099258b673e61459cda3c
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-02-28 18:12:17 +0000
+
+    cleanup git plugins 
+
+  Change: c43d733efd031c857f18f21c0e72871cb0bcf1f6
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-02-28 17:58:38 +0000
+
+    try adding upload to cpan to dist ini 
+
+  Change: 5fe1f0f7c0505c0d94c38fa9d59c5c4a91e65cb8
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-02-28 17:50:10 +0000
+
+    escape arrow in pod 
+
+  Change: 6c5681df87f409ba08571331c948f5d54f2f3e00
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-02-28 17:48:31 +0000
+
+    cleanup pod for user consent 
+
+  Change: 5aeb8fd5584ce6c03615a7981d16ad126d5863ba
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-02-28 16:47:15 +0000
+
+    update pod 
+
+------------------------------------------
+version 0.001 at 2016-02-26 15:16:24 +0000
+------------------------------------------
+
+  Change: 44d6ea7a9380903485b1543de4f6dc26fdc7470f
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-26 15:16:24 +0000
+
+    uploadtocpan already available in basic bundle 
+
+  Change: 459d82a7b1b8c135732efb22c515efda913baff8
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-26 15:13:55 +0000
+
+    add recommended bundles for dzil 
+
+  Change: 5075fd69fbb5714c878b1f28574ee19fc606a062
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-26 15:04:16 +0000
+
+    update dist file 
+
+  Change: 2d073a02bd63d46a272849ce7bbb02ac6d8434d0
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-26 14:37:33 +0000
+
+    Merge pull request #1 from ziali088/oauth-client
+
+    First version of client 
+
+  Change: fcd2c5486caed57a030e18be6cb34b88c356ac0a
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-26 09:53:52 +0000
+
+    update dist 
+
+  Change: 942138246ae89246630c9e551839dd2d92ea66da
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-26 09:50:35 +0000
+
+    some refactoring for making requests and mocking all tests 
+
+  Change: 18095f42181954143234ac8a98aac4a8df71abab
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 17:56:08 +0000
+
+    confess the full response, convert decoded_content into perl ref, and
+    mock test the access token method 
+
+  Change: 7df943ba561694ed7fb6c9cbee90c0d528315bda
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 16:35:18 +0000
+
+    update doc 
+
+  Change: 9d381d123141bcee0152390b4e39a240ff5713a0
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 16:33:35 +0000
+
+    doc update 
+
+  Change: efa0ac9ab53d946673983fbfa9e1f98aec4b7948
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 16:30:48 +0000
+
+    lets not do auto refresh, add pod 
+
+  Change: 9579485c2ed85d4d02fbd148d5bcd833c7e9850d
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 14:54:06 +0000
+
+    slight update to synop 
+
+  Change: 15caea73d3c937f8fd7b9675137092e30e538509
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 14:53:08 +0000
+
+    cleaner readme 
+
+  Change: a8548a7b32a4cfbc06a28e4caf1654d86b609c53
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 14:51:42 +0000
+
+    synopsis in readme and starting to think about how to refresh tokens 
+
+  Change: 64d4dd8baabd68cf2f06d60127f585279edf41ed
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 12:54:14 +0000
+
+    some readme 
+
+  Change: 5d011ffc2c2f815acc30fac5f079f519158fb16f
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 12:26:01 +0000
+
+    dont need data guid 
+
+  Change: 467acb63a41b2069f5b2dd423cc61aed3e7f8e26
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 12:25:20 +0000
+
+    include test psgi app to test out workflow of module, start process
+    of exchanging code for token 
+
+  Change: db5110d6df0aa1c5bd61e96d4b66b4badf75337f
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 10:19:14 +0000
+
+    update dist 
+
+  Change: dff43a26d01970d700bad636d123bb42e50ac329
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 10:11:30 +0000
+
+    start with working tests 
+
+  Change: e2d687bce6245600e8d695bc62ee9d7741d98703
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-25 09:54:37 +0000
+
+    rename to oauth2 as G:OAuth namespace already exists 
+
+  Change: 440123dd1c4fcd224672ab1156ec72e36780ed44
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-02-14 09:28:16 +0000
+
+    request user consent 
+
+  Change: 3c73c3109826a7c7f76e996ea33d53ed96e390a8
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-02-13 18:44:40 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

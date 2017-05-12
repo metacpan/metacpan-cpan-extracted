@@ -1,0 +1,114 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1d572bfeefa1b826622da362e4ed79a592c1030e ChangeLog
+SHA1 e1cb4dfc7c6c38a2f4d99b7c201244e8eff24681 GD.xs
+SHA1 a670a0f6bf54244e98000dac01027a0cf9c01ee2 LICENSE
+SHA1 52c88e9f516768523969cd0f352ef44e7c63a006 MANIFEST
+SHA1 2c9e59c832fe8cc31ddf5068e39864a46c14b650 MANIFEST.SKIP
+SHA1 a1c39fb29c86695c033b0ad37eaf9671f21545d3 META.json
+SHA1 0190f19745a5c811a0ea5e8cc8c6f2de6a1db6a4 META.yml
+SHA1 63da3ad869e307278d63ac02fdf873a28684bd1d Makefile.PL
+SHA1 ad9ca326a04f1a01344003aa19a79b9089d490bb README
+SHA1 a4130024c229f17921f4168266a372adc3d50c1f README.QUICKDRAW
+SHA1 66754814e77c9cac2656dbf87688df8a19f68344 bdf_scripts/README
+SHA1 52e86e8d8ed01862508f4ba745e267cec8ccc946 bdf_scripts/bdf2gdfont_pl.PL
+SHA1 7a1e000010ffa47da5b833bdd625fff71c043946 bdf_scripts/bdftogd
+SHA1 a03838f0190c18be02eaa05773ae94cc7a1b4648 bdf_scripts/cvtbdf.pl
+SHA1 92e02d229d6db40a60d43e8d8d93c0cbbbd5c529 const-c.inc
+SHA1 1aa0bf16c21c1e7a9b12c52e263fc5d1c45e72d8 const-xs.inc
+SHA1 e8bce4b6054ca1a61e21a78cab05a4fa2bc4a59e demos/brushes.pl
+SHA1 3ab28c2445db04a53c0ef3e1de2536ba446e7906 demos/copies.pl
+SHA1 5312907b8bb1841ab12b301a1cb271cebba3ba90 demos/draw_colors.pl
+SHA1 26b0d6a63be5962fad04273441b852d14d9464d9 demos/fills.pl
+SHA1 0f3f3fd8738cc2a9aba8c19503c7caf0c3f87a43 demos/font_list.png
+SHA1 cc5a1f736a6fbcef31b39a328b69c65633af929d demos/fonttest
+SHA1 43d60bafe52999200a37ae5e9114fbdd206511d7 demos/gd_example.cgi
+SHA1 55a8028dce35b9834b10a1f7bc9f5f846c6a8795 demos/polyline.pl
+SHA1 c42ef9c321fb7ad9bc24bc21c0a7fbea71837f7d demos/polys.pl
+SHA1 011fc9605c1d58b1215e6015bed5faeb8c555459 demos/shapes.pl
+SHA1 f8a82028ff9be72100fecdc88550a0dad616a5c2 demos/tile.png
+SHA1 09eca663f2a408bf9c3129f332c6c56493670a61 demos/transform.pl
+SHA1 0af9d18d9ff540323a7fb1a2dd55e7e8bb36e08b demos/truetype_test
+SHA1 34b58832de0d82e724f58d910ff7049d30a9a895 demos/ttf.pl
+SHA1 d91a95f545335a2c0b69d324d95d94283ecafbf7 lib/GD.pm
+SHA1 8f3d2799bccc9ad37fbd28ce3321693840ba33bc lib/GD/Group.pm
+SHA1 b55eb75938c985125395fee9c024f2070f0694d2 lib/GD/Image.pm
+SHA1 eb63a3bc5f5f20e314449825c5aaaf7c241cf63d lib/GD/Image_pm.PL
+SHA1 e1d9add14f7e7445f521f1c7a6b7bb13c8c940ed lib/GD/Polygon.pm
+SHA1 a3cd1d6b349b2202172ec46e66f41b9cdb695cc9 lib/GD/Polyline.pm
+SHA1 49e2a672738e156dc2c5691f956991e6599476b2 lib/GD/Simple.pm
+SHA1 1fa5072bb1b044eddc4a3a4ffb7a9db267d0be7d t/GD.t
+SHA1 9e9a794a7c72ecc3d20034746ea756d7ccc58cc7 t/HSV.t
+SHA1 e7a8a36560240d801eb9dc900ef4ba0cee4f3170 t/Polyline.t
+SHA1 e9b05fc79ae66119c6ffbeb7cf851a82a8af3f0b t/test_data/Generic.ttf
+SHA1 5de16754ef5ec122c7a1e3306a16c11195d218cc t/test_data/frog.jpg
+SHA1 c71435c69b13cd19b56b839a0334bf58a3a4152f t/test_data/frog.xpm
+SHA1 edff2bad6104140721ef4e47938c668450eb9a2f t/test_data/images/corrupt.png
+SHA1 5c87ae5d91010beea33b94c12cd2f64318cb6dcf t/test_data/images/t1/1-00.gd
+SHA1 13fcf6c434c412404bd89064dd0ad42592f2038b t/test_data/images/t1/1-00.gd2
+SHA1 332d6d54430c6e78e672612b0a0cbd5cc2dbe0ae t/test_data/images/t1/1-00.gif
+SHA1 2e492d69810db736718f68354458cf2bd638bb1c t/test_data/images/t1/1-00.jpeg
+SHA1 11582bd38a3ea26e5a166e4afaa4e5c4ea85f2b8 t/test_data/images/t1/1-00.png
+SHA1 79a7a49dca7278710598515d080e26f7cf12e0d0 t/test_data/images/t2/2-00.gd
+SHA1 d6f1eb2c14fcaaad4e4aa6f6c9af62797a19a6e2 t/test_data/images/t2/2-00.gd2
+SHA1 ead01cb00d6c5f171844dbfad09d763cb2f4c9a3 t/test_data/images/t2/2-00.gif
+SHA1 05e1772b9ec6e4b3252ea3a4225099d2e0540396 t/test_data/images/t2/2-00.jpeg
+SHA1 c7f6ff2d7933c7f84096a21dae0c116f975e2fce t/test_data/images/t2/2-00.png
+SHA1 28eeb2ac09c60b7959d40b761cf33ce71b434e1c t/test_data/images/t3/3-00.gd
+SHA1 6ebbe178ecebe95d61b1612bfc600f81b8f238be t/test_data/images/t3/3-00.gd2
+SHA1 12bad62842a18691b5631946cbd2eedc35a02561 t/test_data/images/t3/3-00.gif
+SHA1 18bc99a9ea585938a7de42e753c1802a97b5c7b2 t/test_data/images/t3/3-00.jpeg
+SHA1 cd818368377040876e9997f7781098d86ffe58f2 t/test_data/images/t3/3-00.png
+SHA1 3d3bfc53aba0b6ba976128f394e808240458f799 t/test_data/images/t4/4-00.gd
+SHA1 64e99869cfaa3cd76d78336ff75117e1757bbf95 t/test_data/images/t4/4-00.gd2
+SHA1 f6d9d0e63f420f7a2d7029a82efbe4e4b3be6523 t/test_data/images/t4/4-00.gif
+SHA1 8f5ac097ea31269743fba0bab2acc13e9e35a991 t/test_data/images/t4/4-00.jpeg
+SHA1 2b3b0896a6f1e22c2e8f56d899385a4f4c06b089 t/test_data/images/t4/4-00.png
+SHA1 31c63fcd9f74bebabb9aad08e114196371fcf135 t/test_data/images/t5/5-00.gd
+SHA1 8b7a085d0c9d94c8a8f6965787fd8626e48ad775 t/test_data/images/t5/5-00.gd2
+SHA1 cd428b1bc7eb8f93b1129315aeb9aeb3fa01db72 t/test_data/images/t5/5-00.gif
+SHA1 b4448bfa0472a44fc64983deeb775dd4599b0a3a t/test_data/images/t5/5-00.jpeg
+SHA1 5d3dbe5703e7e71597dc9ac7e9a8c257cb3b975b t/test_data/images/t5/5-00.png
+SHA1 b4cc666813ea7476995e73b6ba0b7a0f790daef4 t/test_data/images/t6/6-00.gd
+SHA1 e0a9b2ff9a44234f4d3ce1590a5ac6c505afe2e2 t/test_data/images/t6/6-00.gd2
+SHA1 d1bad53c6f8e5949497e8550e661dcd1f652c8c1 t/test_data/images/t6/6-00.gif
+SHA1 7dd604d83e9938049a4e73f6ebed93c7ad38a60f t/test_data/images/t6/6-00.jpeg
+SHA1 5ae76eeba4682f09dc5f3daabaa89e44d9758960 t/test_data/images/t6/6-00.png
+SHA1 0a9e033829bd8b3d156c87e2039ede27377570d0 t/test_data/images/t7/7-00.gd
+SHA1 29153fdb58db4c7cb5b98bfe0033562e2603e09d t/test_data/images/t7/7-00.gd2
+SHA1 2fd38d1308251d82fb77c8403d7e0ff82be71d7b t/test_data/images/t7/7-00.gif
+SHA1 61038e512beed1acfdb7608716982946e79c5b7a t/test_data/images/t7/7-00.jpeg
+SHA1 161b55a07901e8dcbd5699592dc9d524f80402fa t/test_data/images/t7/7-00.png
+SHA1 e3d849dbe2731ba175e3c35b9e06cf1e5a64d554 t/test_data/images/t7/7-01.gd2
+SHA1 e79b51c344514410f58bc18a66372c2a269fa6da t/test_data/palettemap.png
+SHA1 94b1ff6e1a950524ba251260655f73953e30d335 t/test_data/tile.gd
+SHA1 47cf4c2e969b5f3f9f8f5bdfddff85b3ae6eda23 t/test_data/tile.gd2
+SHA1 e1d2dd1fe9f6502ce44b27a860f208536d96d1c3 t/test_data/tile.gif
+SHA1 81a4b73a2aca1592555b9b3a926aeed1ed395cf7 t/test_data/tile.jpeg
+SHA1 f8a82028ff9be72100fecdc88550a0dad616a5c2 t/test_data/tile.png
+SHA1 32117e631ae6f5fbcf30cc09d2ae609e663df467 t/transp.t
+SHA1 a9d3b7db55ac95e11798c409ba566d3a53a4097b t/z_kwalitee.t
+SHA1 c6bbbe8c1a0fa2803be5a83ffdfea9b65c601a34 t/z_manifest.t
+SHA1 c562193b547edb1824e7466fa9f2133eee1e2109 t/z_pod-spell-mistakes.t
+SHA1 5f435a91dcba00ff9c4f4f434ff80451de71a474 t/z_pod.t
+SHA1 b557ea8c70773b80a9e6118e7f4e0597bb94af74 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWPynGwAKCRCabZJij/3J
+Qhd6AJ9lb30J1480tnMd91apiNJWT54l2QCgkdWkkku9ErAHpZmqWAcD1HcBThQ=
+=We2a
+-----END PGP SIGNATURE-----

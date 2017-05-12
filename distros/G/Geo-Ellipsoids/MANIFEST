@@ -1,0 +1,10 @@
+bin/example-list.pl
+bin/example-simple.pl
+CHANGES
+lib/Geo/Ellipsoids.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/base.t

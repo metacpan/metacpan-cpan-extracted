@@ -1,0 +1,9 @@
+{
+  "resources": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/monsieurp/Gentoo-App-Pram/",
+      "web": "https://github.com/monsieurp/Gentoo-App-Pram/"
+    }
+  }
+}

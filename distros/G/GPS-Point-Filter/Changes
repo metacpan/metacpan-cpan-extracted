@@ -1,0 +1,6 @@
+Revision history for Perl module GPS::Point::Filter
+
+0.01 2008-12-28T21:02Z
+    - original version; created by ExtUtils::ModuleMaker 0.51
+0.02 2009-01-18T06:42Z
+    - Added DateTime to Makefile.PL (Bug RT 42133)

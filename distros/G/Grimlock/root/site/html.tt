@@ -1,0 +1,88 @@
+[%~ 
+
+IF c.debug && debug_init.defined; $debug_init; END;
+
+IF page.header && page.header != 'none';
+    header = PROCESS "header/${page.header}.tt";
+END;
+
+IF page.footer && page.header != 'none';
+    footer = PROCESS "footer/${page.footer}.tt";
+END;
+
+~%]
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="[% page.language %]">
+ <head>
+  <title>[% page.title %]</title>
+  <meta http-equiv="Content-Language" content="[% page.language %]">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+  
+[%
+# Add all javascript refs in page.head.scripts (see page.body.scripts)
+page.head.scripts = page.head.scripts.unique;
+FOREACH script IN page.head.scripts;
+    NEXT UNLESS script;
+    script = script.match('^https?://|/') ?
+                    script :
+                    static("scripts/$script", 1); -%]
+    <script type="text/javascript" src="[% script %]"></script>
+[%
+END;
+
+# Add all stylesheet refs in page.head.stylesheets
+page.head.stylesheets = page.head.stylesheets.unique;
+FOREACH stylesheet IN page.head.stylesheets;
+    NEXT UNLESS stylesheet;
+    stylesheet = stylesheet.match('^https?://|/') ?
+                    stylesheet :
+                    static("css/$stylesheet", 1); -%]
+   <link rel="stylesheet" href="[% stylesheet %]" media="screen">
+[%
+END;
+%]
+<link rel="stylesheet" href="[% static( 'css/screen.css', 1 ) %]" media="screen" />
+ </head>
+ <!--[if !IE]> <-->
+ <body
+    [%~ IF page.body.id %] id="[% page.body.id %]"[% END %]
+    [%~ page.body.classes.size ?
+            ' class="' _ page.body.classes.unique.join(' ') _ '"' : '' %]>
+ <!--><![endif]-->
+ <!--[if IE 5]>
+ <body
+    [%~ IF page.body.id %] id="[% page.body.id %]"[% END =%]
+    class="[% page.body.classes.join(' ') %] IE IE5">
+ <![endif]-->
+ <!--[if IE 6]>
+ <body
+    [%~ IF page.body.id %] id="[% page.body.id %]"[% END =%]
+    class="[% page.body.classes.join(' ') %] IE IE6">
+ <![endif]-->
+ <!--[if IE 7]>
+ <body
+    [%~ IF page.body.id %] id="[% page.body.id %]"[% END =%]
+    class="[% page.body.classes.join(' ') %] IE IE7">
+ <![endif]-->
+  [% IF !load_scripts_at_top_of_page;
+         load_scripts(page.body.scripts);
+      END;
+    %]
+
+    [% # Drop in the header if appropriate
+    header %]
+        [% IF rest.message || message  %]
+ <div id="message"><h2>[% message || rest.message %]</h2></div>
+   [% END %]
+   [% IF rest.error || error %]
+ <div id="error"><h2>[% rest.error || error %]</h2></div>
+   [% END %]
+    <div class="[% page.content_class %]">[% content %]</div>
+    [% footer %]
+    [% UNLESS page.load_scripts_at_top;
+         load_scripts(page.body.scripts);
+      END;
+    %]
+    </body>
+</html>

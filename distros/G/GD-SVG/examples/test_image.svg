@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<svg height="1000" width="800" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">	<text fill="rgb(0,0,0)" font="Helvetica" font-size="15" font-weight="bold" id="1-348-1" x="348" y="14">GD vs GD::SVG
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="2-10-15" x="10" y="26">Setting pixels...
+	</text>
+	<circle cx="250" cy="25" id="3-250-25" r="0.03" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0)" />
+	<circle cx="260" cy="25" id="4-260-25" r="0.03" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0)" />
+	<circle cx="270" cy="25" id="5-270-25" r="0.03" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255)" />
+	<circle cx="280" cy="25" id="6-280-25" r="0.03" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0)" />
+	<circle cx="290" cy="25" id="7-290-25" r="0.03" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0)" />
+	<circle cx="300" cy="25" id="8-300-25" r="0.03" style="fill: rgb(127,127,127); fill-opacity: 1.0; stroke: rgb(127,127,127)" />
+	<circle cx="310" cy="25" id="9-310-25" r="0.03" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212)" />
+	<circle cx="320" cy="25" id="10-320-25" r="0.03" style="fill: rgb(255,165,0); fill-opacity: 1.0; stroke: rgb(255,165,0)" />
+	<circle cx="330" cy="25" id="11-330-25" r="0.03" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0)" />
+	<circle cx="340" cy="25" id="12-340-25" r="0.03" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0)" />
+	<circle cx="350" cy="25" id="13-350-25" r="0.03" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255)" />
+	<circle cx="360" cy="25" id="14-360-25" r="0.03" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0)" />
+	<circle cx="370" cy="25" id="15-370-25" r="0.03" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0)" />
+	<circle cx="380" cy="25" id="16-380-25" r="0.03" style="fill: rgb(127,127,127); fill-opacity: 1.0; stroke: rgb(127,127,127)" />
+	<circle cx="390" cy="25" id="17-390-25" r="0.03" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212)" />
+	<circle cx="400" cy="25" id="18-400-25" r="0.03" style="fill: rgb(255,165,0); fill-opacity: 1.0; stroke: rgb(255,165,0)" />
+	<circle cx="410" cy="25" id="19-410-25" r="0.03" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0)" />
+	<circle cx="420" cy="25" id="20-420-25" r="0.03" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0)" />
+	<circle cx="430" cy="25" id="21-430-25" r="0.03" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255)" />
+	<circle cx="440" cy="25" id="22-440-25" r="0.03" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0)" />
+	<circle cx="450" cy="25" id="23-450-25" r="0.03" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0)" />
+	<circle cx="460" cy="25" id="24-460-25" r="0.03" style="fill: rgb(127,127,127); fill-opacity: 1.0; stroke: rgb(127,127,127)" />
+	<circle cx="470" cy="25" id="25-470-25" r="0.03" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212)" />
+	<circle cx="480" cy="25" id="26-480-25" r="0.03" style="fill: rgb(255,165,0); fill-opacity: 1.0; stroke: rgb(255,165,0)" />
+	<circle cx="490" cy="25" id="27-490-25" r="0.03" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0)" />
+	<circle cx="500" cy="25" id="28-500-25" r="0.03" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0)" />
+	<circle cx="510" cy="25" id="29-510-25" r="0.03" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255)" />
+	<circle cx="520" cy="25" id="30-520-25" r="0.03" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0)" />
+	<circle cx="530" cy="25" id="31-530-25" r="0.03" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0)" />
+	<circle cx="540" cy="25" id="32-540-25" r="0.03" style="fill: rgb(127,127,127); fill-opacity: 1.0; stroke: rgb(127,127,127)" />
+	<circle cx="550" cy="25" id="33-550-25" r="0.03" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212)" />
+	<circle cx="560" cy="25" id="34-560-25" r="0.03" style="fill: rgb(255,165,0); fill-opacity: 1.0; stroke: rgb(255,165,0)" />
+	<circle cx="570" cy="25" id="35-570-25" r="0.03" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0)" />
+	<circle cx="580" cy="25" id="36-580-25" r="0.03" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0)" />
+	<circle cx="590" cy="25" id="37-590-25" r="0.03" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255)" />
+	<circle cx="600" cy="25" id="38-600-25" r="0.03" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0)" />
+	<circle cx="610" cy="25" id="39-610-25" r="0.03" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0)" />
+	<circle cx="620" cy="25" id="40-620-25" r="0.03" style="fill: rgb(127,127,127); fill-opacity: 1.0; stroke: rgb(127,127,127)" />
+	<circle cx="630" cy="25" id="41-630-25" r="0.03" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212)" />
+	<circle cx="640" cy="25" id="42-640-25" r="0.03" style="fill: rgb(255,165,0); fill-opacity: 1.0; stroke: rgb(255,165,0)" />
+	<circle cx="650" cy="25" id="43-650-25" r="0.03" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0)" />
+	<circle cx="660" cy="25" id="44-660-25" r="0.03" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0)" />
+	<circle cx="670" cy="25" id="45-670-25" r="0.03" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255)" />
+	<circle cx="680" cy="25" id="46-680-25" r="0.03" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0)" />
+	<circle cx="690" cy="25" id="47-690-25" r="0.03" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0)" />
+	<circle cx="700" cy="25" id="48-700-25" r="0.03" style="fill: rgb(127,127,127); fill-opacity: 1.0; stroke: rgb(127,127,127)" />
+	<circle cx="710" cy="25" id="49-710-25" r="0.03" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212)" />
+	<circle cx="720" cy="25" id="50-720-25" r="0.03" style="fill: rgb(255,165,0); fill-opacity: 1.0; stroke: rgb(255,165,0)" />
+	<circle cx="730" cy="25" id="51-730-25" r="0.03" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0)" />
+	<circle cx="740" cy="25" id="52-740-25" r="0.03" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0)" />
+	<circle cx="750" cy="25" id="53-750-25" r="0.03" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255)" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="54-10-35" x="10" y="46">Drawing lines...
+	</text>
+	<line id="55-250-35" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212); stroke-opacity: 1.0; stroke-width: 0.5" x1="250" x2="750" y1="35" y2="35" />
+	<line id="56-250-40" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 0.5" x1="250" x2="750" y1="40" y2="40" />
+	<line id="57-250-45" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 0.5" x1="250" x2="750" y1="45" y2="45" />
+	<line id="58-250-50" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" x1="250" x2="750" y1="50" y2="50" />
+	<line id="59-250-55" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" x1="250" x2="750" y1="55" y2="55" />
+	<line id="60-250-65" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" x1="250" x2="750" y1="65" y2="65" />
+	<line id="61-250-60" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 2" x1="250" x2="750" y1="60" y2="60" />
+	<line id="62-250-65" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 2" x1="250" x2="750" y1="65" y2="65" />
+	<line id="63-250-70" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 2" x1="250" x2="750" y1="70" y2="70" />
+	<line id="64-250-75" style="fill: rgb(127,127,127); fill-opacity: 1.0; stroke: rgb(127,127,127); stroke-opacity: 1.0; stroke-width: 4" x1="250" x2="750" y1="75" y2="75" />
+	<line id="65-250-80" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212); stroke-opacity: 1.0; stroke-width: 4" x1="250" x2="750" y1="80" y2="80" />
+	<line id="66-250-85" style="fill: rgb(255,165,0); fill-opacity: 1.0; stroke: rgb(255,165,0); stroke-opacity: 1.0; stroke-width: 4" x1="250" x2="750" y1="85" y2="85" />
+	<line id="67-250-90" style="stroke-dasharray: 4; fill: none; fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" x1="250" x2="750" y1="90" y2="90" />
+	<line id="68-250-96" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 3" x1="250" x2="750" y1="96" y2="96" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="69-10-115" x="10" y="126">Rectangles...
+	</text>
+	<rect height="20" id="70-250-115" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" width="500" x="250" y="115" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="71-10-155" x="10" y="166">Filled rectangles...
+	</text>
+	<rect height="20" id="72-250-155" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" width="500" x="250" y="155" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="73-10-195" x="10" y="206">Filled rectangles (bordered)...
+	</text>
+	<rect height="20" id="74-250-195" style="fill: rgb(127,255,212); fill-opacity: 1.0; stroke: rgb(127,255,212); stroke-opacity: 1.0; stroke-width: 1" width="500" x="250" y="195" />
+	<rect height="20" id="75-250-195" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" width="500" x="250" y="195" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="76-10-235" x="10" y="246">Polygons...
+	</text>
+	<polygon id="77-290-235" points="290,235 300,265 330,275 300,285 290,315 280,285 250,275 280,265 290,235 " style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="78-390-235" points="390,235 400,265 430,275 400,285 390,315 380,285 350,275 380,265 390,235 " style="fill: none; fill-opacity: 0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="79-490-235" points="490,235 500,265 530,275 500,285 490,315 480,285 450,275 480,265 490,235 " style="fill: none; fill-opacity: 0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="80-590-235" points="590,235 600,265 630,275 600,285 590,315 580,285 550,275 580,265 590,235 " style="fill: none; fill-opacity: 0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="81-690-235" points="690,235 700,265 730,275 700,285 690,315 680,285 650,275 680,265 690,235 " style="fill: none; fill-opacity: 0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="82-10-320" x="10" y="331">Filled polygons...
+	</text>
+	<polygon id="83-290-320" points="290,320 300,350 330,360 300,370 290,400 280,370 250,360 280,350 290,320 " style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="84-390-320" points="390,320 400,350 430,360 400,370 390,400 380,370 350,360 380,350 390,320 " style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="85-490-320" points="490,320 500,350 530,360 500,370 490,400 480,370 450,360 480,350 490,320 " style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="86-590-320" points="590,320 600,350 630,360 600,370 590,400 580,370 550,360 580,350 590,320 " style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="87-690-320" points="690,320 700,350 730,360 700,370 690,400 680,370 650,360 680,350 690,320 " style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="88-10-420" x="10" y="431">Filled polygons (bordered and boxed)...
+	</text>
+	<rect height="80" id="89-250-420" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" width="80" x="250" y="420" />
+	<polygon id="90-290-420" points="290,420 300,450 330,460 300,470 290,500 280,470 250,460 280,450 290,420 " style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="91-290-420" points="290,420 300,450 330,460 300,470 290,500 280,470 250,460 280,450 290,420 " style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<rect height="80" id="92-350-420" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" width="80" x="350" y="420" />
+	<polygon id="93-390-420" points="390,420 400,450 430,460 400,470 390,500 380,470 350,460 380,450 390,420 " style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="94-390-420" points="390,420 400,450 430,460 400,470 390,500 380,470 350,460 380,450 390,420 " style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<rect height="80" id="95-450-420" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" width="80" x="450" y="420" />
+	<polygon id="96-490-420" points="490,420 500,450 530,460 500,470 490,500 480,470 450,460 480,450 490,420 " style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="97-490-420" points="490,420 500,450 530,460 500,470 490,500 480,470 450,460 480,450 490,420 " style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<rect height="80" id="98-550-420" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" width="80" x="550" y="420" />
+	<polygon id="99-590-420" points="590,420 600,450 630,460 600,470 590,500 580,470 550,460 580,450 590,420 " style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="100-590-420" points="590,420 600,450 630,460 600,470 590,500 580,470 550,460 580,450 590,420 " style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<rect height="80" id="101-650-420" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" width="80" x="650" y="420" />
+	<polygon id="102-690-420" points="690,420 700,450 730,460 700,470 690,500 680,470 650,460 680,450 690,420 " style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="103-690-420" points="690,420 700,450 730,460 700,470 690,500 680,470 650,460 680,450 690,420 " style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="104-10-520" x="10" y="531">Ellipses...
+	</text>
+	<ellipse cx="290" cy="520" id="105-290-520" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="390" cy="520" id="106-390-520" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="490" cy="520" id="107-490-520" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="590" cy="520" id="108-590-520" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="690" cy="520" id="109-690-520" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="110-10-550" x="10" y="561">Filled ellipses...
+	</text>
+	<ellipse cx="290" cy="550" id="111-290-550" rx="40" ry="12.5" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="390" cy="550" id="112-390-550" rx="40" ry="12.5" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="490" cy="550" id="113-490-550" rx="40" ry="12.5" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="590" cy="550" id="114-590-550" rx="40" ry="12.5" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="690" cy="550" id="115-690-550" rx="40" ry="12.5" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="116-10-580" x="10" y="591">Filled ellipses (bordered, increasing thickness)...
+	</text>
+	<ellipse cx="290" cy="580" id="117-290-580" rx="40" ry="12.5" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="290" cy="580" id="118-290-580" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="390" cy="580" id="119-390-580" rx="40" ry="12.5" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 2" />
+	<ellipse cx="390" cy="580" id="120-390-580" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 2" />
+	<ellipse cx="490" cy="580" id="121-490-580" rx="40" ry="12.5" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 3" />
+	<ellipse cx="490" cy="580" id="122-490-580" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 3" />
+	<ellipse cx="590" cy="580" id="123-590-580" rx="40" ry="12.5" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 4" />
+	<ellipse cx="590" cy="580" id="124-590-580" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 4" />
+	<ellipse cx="690" cy="580" id="125-690-580" rx="40" ry="12.5" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 5" />
+	<ellipse cx="690" cy="580" id="126-690-580" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 5" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="127-10-610" x="10" y="621">Arcs (closed)...
+	</text>
+	<ellipse cx="290" cy="610" id="128-290-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="290" cy="610" id="129-290-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="390" cy="610" id="130-390-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="390" cy="610" id="131-390-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="490" cy="610" id="132-490-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="490" cy="610" id="133-490-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="590" cy="610" id="134-590-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="590" cy="610" id="135-590-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="690" cy="610" id="136-690-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="690" cy="610" id="137-690-610" rx="40" ry="12.5" style="fill: none; fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="138-10-640" x="10" y="651">Arcs on a circle (open)...
+	</text>
+	<path d="M302.5,640 A12.5,12.5 0 0,1 290,652.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M402.5,640 A12.5,12.5 0 0,1 390,652.5" style="fill: none; fill-opacity: 0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M502.5,640 A12.5,12.5 0 0,1 490,652.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M602.5,640 A12.5,12.5 0 0,1 590,652.5" style="fill: none; fill-opacity: 0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M702.5,640 A12.5,12.5 0 0,1 690,652.5" style="fill: none; fill-opacity: 0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="144-10-670" x="10" y="681">Arcs on an ellipse (open)...
+	</text>
+	<path d="M302.5,670 A12.5,40 0 1,1 290,630" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M402.5,670 A12.5,40 0 1,1 390,630" style="fill: none; fill-opacity: 0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M502.5,670 A12.5,40 0 1,1 490,630" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M602.5,670 A12.5,40 0 1,1 590,630" style="fill: none; fill-opacity: 0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M702.5,670 A12.5,40 0 1,1 690,630" style="fill: none; fill-opacity: 0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="150-10-730" x="10" y="741">Filled arcs (closed)...
+	</text>
+	<ellipse cx="290" cy="730" id="151-290-730" rx="40" ry="12.5" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="390" cy="730" id="152-390-730" rx="40" ry="12.5" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="490" cy="730" id="153-490-730" rx="40" ry="12.5" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="590" cy="730" id="154-590-730" rx="40" ry="12.5" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<ellipse cx="690" cy="730" id="155-690-730" rx="40" ry="12.5" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="156-10-760" x="10" y="771">Filled arcs (open)...
+	</text>
+	<path d="M320.625,768.0322265625 A40,12.5 0 0,1 270,770.8154296875" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="158-290-760" points="290,760 320.625,768.0322265625 270,770.8154296875 " style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M420.625,768.0322265625 A40,12.5 0 0,1 370,770.8154296875" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="160-390-760" points="390,760 420.625,768.0322265625 370,770.8154296875 " style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M520.625,768.0322265625 A40,12.5 0 0,1 470,770.8154296875" style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="162-490-760" points="490,760 520.625,768.0322265625 470,770.8154296875 " style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M620.625,768.0322265625 A40,12.5 0 0,1 570,770.8154296875" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="164-590-760" points="590,760 620.625,768.0322265625 570,770.8154296875 " style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<path d="M720.625,768.0322265625 A40,12.5 0 0,1 670,770.8154296875" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="166-690-760" points="690,760 720.625,768.0322265625 670,770.8154296875 " style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="167-10-790" x="10" y="801">Filled arcs (special styles)...
+	</text>
+	<line id="169-290-790" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" x1="290" x2="310" y1="790" y2="800.8154296875" />
+	<line id="170-290-790" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" x1="290" x2="252.421875" y1="790" y2="794.2724609375" />
+	<path d="M310,800.8154296875 A40,12.5 0 0,1 252.421875,794.2724609375" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="8" font-weight="normal" id="172-250-810" x="250" y="816">gdEdged|gdNoFill
+	</text>
+	<path d="M410,800.8154296875 A40,12.5 0 0,1 352.421875,794.2724609375" style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="174-390-790" points="390,790 410,800.8154296875 352.421875,794.2724609375 " style="fill: rgb(255,0,0); fill-opacity: 1.0; stroke: rgb(255,0,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="8" font-weight="normal" id="175-350-810" x="350" y="816">gdArc
+	</text>
+	<polygon id="177-490-790" points="490,790 510,800.8154296875 452.421875,794.2724609375 " style="fill: rgb(0,0,255); fill-opacity: 1.0; stroke: rgb(0,0,255); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="8" font-weight="normal" id="178-450-810" x="450" y="816">gdChord
+	</text>
+	<line id="180-610-800.8154296875" style="fill: rgb(0,255,0); fill-opacity: 1.0; stroke: rgb(0,255,0); stroke-opacity: 1.0; stroke-width: 1" x1="610" x2="552.421875" y1="800.8154296875" y2="794.2724609375" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="8" font-weight="normal" id="181-550-810" x="550" y="816">gdChord|gdNoFill
+	</text>
+	<path d="M710,800.8154296875 A40,12.5 0 0,1 652.421875,794.2724609375" style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<polygon id="183-690-790" points="690,790 710,800.8154296875 652.421875,794.2724609375 " style="fill: rgb(255,255,0); fill-opacity: 1.0; stroke: rgb(255,255,0); stroke-opacity: 1.0; stroke-width: 1" />
+	<line id="185-690-790" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" x1="690" x2="710" y1="790" y2="800.8154296875" />
+	<line id="186-690-790" style="fill: rgb(0,0,0); fill-opacity: 1.0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" x1="690" x2="652.421875" y1="790" y2="794.2724609375" />
+	<path d="M710,800.8154296875 A40,12.5 0 0,1 652.421875,794.2724609375" style="fill: none; fill-opacity: 0; stroke: rgb(0,0,0); stroke-opacity: 1.0; stroke-width: 1" />	<text fill="rgb(0,0,0)" font="Helvetica" font-size="8" font-weight="normal" id="188-630-810" x="630" y="816">gdArc, then gdEdged|gdNoFill
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="189-10-830" x="10" y="841">Fonts
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="8" font-weight="normal" id="190-250-830" x="250" y="836">gdTinyFont
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="8" font-weight="normal" id="191-400-830" x="400" y="836">GD::SVG::Font-&gt;Tiny
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="11" font-weight="normal" id="192-250-850" x="250" y="859">gdSmallFont
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="11" font-weight="normal" id="193-400-850" x="400" y="859">GD::SVG::Font-&gt;Small
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="194-250-870" x="250" y="881">gdMediumBoldFont
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="13" font-weight="bold" id="195-400-870" x="400" y="881">GD::SVG::Font-&gt;MediumBold
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="16" font-weight="normal" id="196-250-890" x="250" y="904">gdLargeFont
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="16" font-weight="normal" id="197-400-890" x="400" y="904">GD::SVG::Font-&gt;Large
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="15" font-weight="bold" id="198-250-910" x="250" y="923">gdGiantFont
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="15" font-weight="bold" id="199-400-910" x="400" y="923">GD::SVG::Font-&gt;Giant
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="15" font-weight="bold" id="200-370-930" transform="translate(385,930) rotate(-90)">gdGiantFont
+	</text>	<text fill="rgb(0,0,0)" font="Helvetica" font-size="15" font-weight="bold" id="201-550-930" transform="translate(565,930) rotate(-90)">GD::SVG::Font-&gt;Giant
+	</text><!-- 
+	Generated using the Perl SVG Module V2.37
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+ -->
+</svg>

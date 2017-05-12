@@ -1,0 +1,614 @@
+
+# functions of the module Graphics::Plotter
+
+int
+Plotter::arc(xc,yc,x0,y0,x1,y1)
+	int xc
+	int yc
+	int x0
+	int y0
+	int x1
+	int y1
+
+int
+Plotter::box(x0,y0,x1,y1)
+	int x0
+	int y0
+	int x1
+	int y1
+
+int
+Plotter::circle(x,y,r)
+	int x
+	int y
+	int r
+
+int
+Plotter::closepl()
+
+int
+Plotter::cont(x,y)
+	int x
+	int y
+
+int
+Plotter::erase()
+
+int
+Plotter::label(s)
+	const char * s;
+
+int
+Plotter::line(x0,y0,x1,y1)
+	int x0
+	int y0
+	int x1
+	int y1
+
+int
+Plotter::linemod(s)
+	const char *s;
+
+int
+Plotter::move(x,y)
+	int x
+	int y
+
+int
+Plotter::openpl()
+
+int
+Plotter::point(x,y)
+	int x
+	int y
+
+int
+Plotter::space(x0,y0,x1,y1)
+	int x0
+	int y0
+	int x1
+	int y1
+
+# additional functions in GNU libplot
+
+# int ?_justify does not work in alabel
+
+int
+Plotter::alabel (x_justify, y_justify, s)
+	char x_justify;
+	char y_justify;
+	const char * s;
+
+int
+Plotter::arcrel (dxc, dyc, dx0, dy0, dx1, dy1)
+	int dxc
+	int dyc
+	int dx0
+	int dy0
+	int dx1
+	int dy1
+
+int
+Plotter::bezier2 (x0, y0, x1, y1, x2, y2)
+	int x0
+	int y0
+	int x1
+	int y1
+	int x2
+	int y2
+
+int
+Plotter::bezier2rel (dx0, dy0, dx1, dy1, dx2, dy2)
+	int dx0
+	int dy0
+	int dx1
+	int dy1
+	int dx2
+	int dy2
+
+int
+Plotter::bezier3 (x0, y0, x1, y1, x2, y2, x3, y3)
+	int x0
+	int y0
+	int x1
+	int y1
+	int x2
+	int y2
+	int x3
+	int y3
+
+int
+Plotter::bezier3rel (dx0, dy0, dx1, dy1, dx2, dy2, dx3, dy3)
+	int dx0
+	int dy0
+	int dx1
+	int dy1
+	int dx2
+	int dy2
+	int dx3
+	int dy3
+
+int
+Plotter::bgcolor (red, green, blue)
+	int red
+	int green
+	int blue
+
+int
+Plotter::bgcolorname (name)
+	const char *	name
+
+int
+Plotter::boxrel (dx0, dy0, dx1, dy1)
+	int dx0
+	int dy0
+	int dx1
+	int dy1
+
+int
+Plotter::capmod (s)
+	const char *	s
+
+int
+Plotter::circlerel (dx, dy, r)
+	int dx
+	int dy
+	int r
+
+int
+Plotter::color (red, green, blue)
+	int red
+	int green
+	int blue
+
+int
+Plotter::colorname (name)
+	const char *	name
+
+int
+Plotter::contrel (x, y)
+	int x
+	int y
+
+int
+Plotter::ellarc (xc, yc, x0, y0, x1, y1)
+	int xc
+	int yc
+	int x0
+	int y0
+	int x1
+	int y1
+
+int
+Plotter::ellarcrel (dxc, dyc, dx0, dy0, dx1, dy1)
+	int dxc
+	int dyc
+	int dx0
+	int dy0
+	int dx1
+	int dy1
+
+int
+Plotter::ellipse (x, y, rx, ry, angle)
+	int x
+	int y
+	int rx
+	int ry
+	int angle
+
+int
+Plotter::ellipserel (dx, dy, rx, ry, angle)
+	int dx
+	int dy
+	int rx
+	int ry
+	int angle
+
+int
+Plotter::endpath ()
+
+int
+Plotter::fillcolor (red, green, blue)
+	int red
+	int green
+	int blue
+
+int
+Plotter::fillcolorname (name)
+	const char *	name
+
+int
+Plotter::fillmod(s)
+	const char *	s
+
+int
+Plotter::filltype (level)
+	int level
+
+int
+Plotter::flushpl ()
+
+int
+Plotter::fontname (s)
+	const char *	s
+
+int
+Plotter::fontsize (size)
+	int size
+
+int
+Plotter::havecap (s)
+	const char *	s
+
+int
+Plotter::joinmod (s)
+	const char *	s
+
+int
+Plotter::labelwidth (s)
+	const char *	s
+
+int
+Plotter::linedash (dashes, offset)
+	SV *		dashes
+	int		offset
+	CODE:
+	int *dims, ndims, i;
+	SV *bar;
+	AV *array;
+
+	if (!(SvROK(dashes) && SvTYPE(SvRV(dashes))==SVt_PVAV))
+		croak("usage: pl_linedash(\\@array,$offset)");
+	array = (AV *) SvRV(dashes);
+	ndims = (int) av_len(array) + 1;
+	dims = (int *) safemalloc(ndims * sizeof(int));
+	if (dims == NULL) croak("Out of memory");
+	for(i=0; i<ndims; ++i) {
+		bar = *(av_fetch( array, i, 0 ));
+		dims[i] = (int) SvIV(bar);
+	}
+	RETVAL=THIS->linedash(ndims,dims,offset);
+	if (dims)
+	    safefree(dims);
+	OUTPUT:
+	RETVAL
+
+int
+Plotter::linerel (dx0, dy0, dx1, dy1)
+	int dx0
+	int dy0
+	int dx1
+	int dy1
+
+int
+Plotter::linewidth (size)
+	int size
+
+int
+Plotter::marker (x, y, type, size)
+	int x
+	int y
+	int type
+	int size
+
+int
+Plotter::markerrel (dx, dy, type, size)
+	int dx
+	int dy
+	int type
+	int size
+
+int
+Plotter::moverel (x, y)
+	int x
+	int y
+
+FILE *
+Plotter::outfile (newstream)
+	FILE	*	newstream
+
+int
+Plotter::pencolor (red, green, blue)
+	int red
+	int green
+	int blue
+
+int
+Plotter::pencolorname (name)
+	const char *	name
+
+int
+Plotter::pointrel (dx, dy)
+	int dx
+	int dy
+
+int
+Plotter::restorestate ()
+
+int
+Plotter::savestate ()
+
+int
+Plotter::space2 (x0, y0, x1, y1, x2, y2)
+	int x0
+	int y0
+	int x1
+	int y1
+	int x2
+	int y2
+
+int
+Plotter::textangle (angle)
+	int angle
+
+# floating point counterparts to the above (all GNU additions)
+
+double
+Plotter::ffontname (s)
+	const char *	s
+
+double
+Plotter::ffontsize (size)
+	double size
+
+double
+Plotter::flabelwidth (s)
+	const char *	s
+
+double
+Plotter::ftextangle (angle)
+	double angle
+
+int
+Plotter::farc (xc, yc, x0, y0, x1, y1)
+	double xc
+	double yc
+	double x0
+	double y0
+	double x1
+	double y1
+
+int
+Plotter::farcrel (dxc, dyc, dx0, dy0, dx1, dy1)
+	double dxc
+	double dyc
+	double dx0
+	double dy0
+	double dx1
+	double dy1
+
+int
+Plotter::fbezier2 (x0, y0, x1, y1, x2, y2)
+	double x0
+	double y0
+	double x1
+	double y1
+	double x2
+	double y2
+
+int
+Plotter::fbezier2rel (dx0, dy0, dx1, dy1, dx2, dy2)
+	double dx0
+	double dy0
+	double dx1
+	double dy1
+	double dx2
+	double dy2
+
+int
+Plotter::fbezier3 (x0, y0, x1, y1, x2, y2, x3, y3)
+	double x0
+	double y0
+	double x1
+	double y1
+	double x2
+	double y2
+	double x3
+	double y3
+
+int
+Plotter::fbezier3rel (dx0, dy0, dx1, dy1, dx2, dy2, dx3, dy3)
+	double dx0
+	double dy0
+	double dx1
+	double dy1
+	double dx2
+	double dy2
+	double dx3
+	double dy3
+
+int
+Plotter::fbox (x0, y0, x1, y1)
+	double x0
+	double y0
+	double x1
+	double y1
+
+int
+Plotter::fboxrel (dx0, dy0, dx1, dy1)
+	double dx0
+	double dy0
+	double dx1
+	double dy1
+
+int
+Plotter::fcircle (x, y, r)
+	double x
+	double y
+	double r
+
+int
+Plotter::fcirclerel (dx, dy, r)
+	double dx
+	double dy
+	double r
+
+int
+Plotter::fcont (x, y)
+	double x
+	double y
+
+int
+Plotter::fcontrel (x, y)
+	double x
+	double y
+
+int
+Plotter::fellarc (xc, yc, x0, y0, x1, y1)
+	double xc
+	double yc
+	double x0
+	double y0
+	double x1
+	double y1
+
+int
+Plotter::fellarcrel (dxc, dyc, dx0, dy0, dx1, dy1)
+	double dxc
+	double dyc
+	double dx0
+	double dy0
+	double dx1
+	double dy1
+
+int
+Plotter::fellipse (x, y, rx, ry, angle)
+	double x
+	double y
+	double rx
+	double ry
+	double angle
+
+int
+Plotter::fellipserel (dx, dy, rx, ry, angle)
+	double dx
+	double dy
+	double rx
+	double ry
+	double angle
+
+int
+Plotter::fline (x0, y0, x1, y1)
+	double x0
+	double y0
+	double x1
+	double y1
+
+int
+Plotter::flinedash (dashes, offset)
+	SV *		dashes
+	double		offset
+	CODE:
+	double *dims;
+	int ndims, i;
+	SV *bar;
+	AV *array;
+
+	if (!(SvROK(dashes) && SvTYPE(SvRV(dashes))==SVt_PVAV))
+		croak("usage: flinedash(\\@array,$offset)");
+	array = (AV *) SvRV(dashes);
+	ndims = (int) av_len(array) + 1;
+	dims = (double *) safemalloc(ndims * sizeof(double));
+	if (dims == NULL) croak("Out of memory");
+	for(i=0; i<ndims; ++i) {
+		bar = *(av_fetch( array, i, 0 ));
+		dims[i] = (double) SvNV(bar);
+	}
+	RETVAL=THIS->flinedash(ndims,dims,offset);
+	if (dims)
+	    safefree(dims);
+	OUTPUT:
+	RETVAL
+
+int
+Plotter::flinerel (dx0, dy0, dx1, dy1)
+	double dx0
+	double dy0
+	double dx1
+	double dy1
+
+int
+Plotter::flinewidth (size)
+	double size
+
+int
+Plotter::fmarker (x, y, type, size)
+	double x
+	double y
+	int type
+	double size
+
+int
+Plotter::fmarkerrel (dx, dy, type, size)
+	double dx
+	double dy
+	int type
+	double size
+
+int
+Plotter::fmove (x, y)
+	double x
+	double y
+
+int
+Plotter::fmoverel (x, y)
+	double x
+	double y
+
+int
+Plotter::fpoint (x, y)
+	double x
+	double y
+
+int
+Plotter::fpointrel (dx, dy)
+	double dx
+	double dy
+
+int
+Plotter::fspace (x0, y0, x1, y1)
+	double x0
+	double y0
+	double x1
+	double y1
+
+int
+Plotter::fspace2 (x0, y0, x1, y1, x2, y2)
+	double x0
+	double y0
+	double x1
+	double y1
+	double x2
+	double y2
+
+
+# floating point operations with no integer counterpart (GNU additions)
+
+int
+Plotter::fconcat (m0, m1, m2, m3, m4, m5)
+	double m0
+	double m1
+	double m2
+	double m3
+	double m4
+	double m5
+
+int
+Plotter::fmiterlimit(limit)
+	double limit
+
+int
+Plotter::frotate (theta)
+	double theta
+
+int
+Plotter::fscale (x, y)
+	double x
+	double y
+
+int
+Plotter::ftranslate (x, y)
+	double x
+	double y
+
+

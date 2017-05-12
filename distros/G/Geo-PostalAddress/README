@@ -1,0 +1,41 @@
+Geo::PostalAddress - Country-specific postal address parsing/formatting
+
+DESCRIPTION
+
+This module converts postal (snail mail) addresses between an
+unstructured country-neutral format (an array of character strings)
+and a country-specific format that's hopefully meaningful by postal
+authorities, courier/delivery services, residents, ... of that
+country for postal address entry. It should handle most countries 
+out of the box with only minor or technical divergences from 
+approved bulk-mailing formats; if needed, country-specific code can 
+be added to make it fully conformant to those formats.
+
+The intended audience for this module is anyone needing to handle
+most addresses in a recognizable country-specific format, without
+going into the full generality and complexity that UPU standards
+would appear to require.
+
+DOCUMENTATION, CONTACT INFORMATION, AND LICENSE
+
+After installation, those are accessible from the POD or man page:
+
+    perldoc Geo::PostalAddress
+
+or
+
+    man Geo::PostalAddress
+
+INSTALLATION
+
+This module requires:
+
+- Locale::Country;
+- Locale::SubCountry;
+
+The usual method applies:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

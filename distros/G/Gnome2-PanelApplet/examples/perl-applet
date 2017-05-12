@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+# -*- coding: utf-8 -*-
+use strict;
+use warnings;
+use utf8;
+
+# Uncomment and modify this if you have the Perl modules in a custom directory
+# and the panel's environment isn't set up so that perl can find them.
+# use lib qw(/opt/perl/share/perl
+#            /opt/perl/lib
+#            /opt/perl/lib/perl
+#            /opt/perl/lib/perl/site_perl);
+
+use Glib qw(:constants);
+use Gnome2::PanelApplet;
+
+Gnome2::Program->init ('A Stupid Applet Written in Perl', '0.01', 'libgnomeui',
+                       sm_connect => FALSE);
+
+Gnome2::PanelApplet::Factory->main ('OAFIID:PerlSampleApplet_Factory',
+                                    'Gnome2::PanelApplet',
+                                    \&fill);
+
+sub fill {
+  my ($applet, $iid, $data) = @_;
+
+  if ($iid ne 'OAFIID:PerlSampleApplet') {
+    return FALSE;
+  }
+
+  my $menu_xml = <<EOX;
+<popup name="button3">
+  <menuitem name="Properties Item"
+            verb="Properties"
+            _label="Properties ..."
+	    pixtype="stock"
+	    pixname="gtk-properties"/>
+  <menuitem name="Help Item"
+	    verb="Help"
+	    _label="Help"
+	    pixtype="stock"
+	    pixname="gtk-help"/>
+  <menuitem name="About Item"
+	    verb="About"
+	    _label="About ..."
+	    pixtype="stock"
+	    pixname="gnome-stock-about"/>
+</popup>
+EOX
+
+  my $cb_mapping = {
+    Properties => [\&properties_callback, 'default!'],
+    Help => \&help_callback,
+    About => \&about_callback,
+  };
+
+  $applet->setup_menu($menu_xml, $cb_mapping, 'default?');
+
+  my $label = Gtk2::Label->new ('Hi, there!');
+  $applet->add ($label);
+  $applet->show_all;
+
+  return TRUE;
+}
+
+sub properties_callback {
+  my $dialog = Gtk2::MessageDialog->new (undef, [],
+                                         'info', 'ok',
+                                         'Properties');
+  $dialog->run;
+  $dialog->destroy;
+}
+
+sub help_callback {
+  my $dialog = Gtk2::MessageDialog->new (undef, [],
+                                         'info', 'ok',
+                                         'Help');
+  $dialog->run;
+  $dialog->destroy;
+}
+
+sub about_callback {
+  my $about = Gnome2::About->new ('Hello, World!', '0.1',
+                                  'A useless, stupid, example of an Applet written in Perl',
+                                  '© 2003 Emmanuele Bassi',
+                                  'Emmanuele Bassi <emmanuele.bassi@iol.it>');
+  $about->show;
+}

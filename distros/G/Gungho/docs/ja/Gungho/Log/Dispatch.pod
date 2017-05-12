@@ -1,0 +1,113 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Log::Dispatch.ja - Gunghoログモジュール
+
+=head1 SYNOPSIS
+
+  # in your Gungho config
+  log:
+    module: Dispatch
+    config:
+      logs:
+        - module: Screen
+          min_level: debug
+          name: stderr
+          stderr: 1
+        - module: File
+          min_level: info
+          filename: /path/tofilename
+          mode: append
+
+  # ... or somewhere in your code ..
+  use Gungho::Log::Dispatch;
+
+  my $log = Gungho::Log::Dispatch->new();
+  $log->setup($c, {
+    logs => [
+      { module    => 'Screen',
+        min_level => 'debug',
+        name      => 'stderr',
+        stderr    => 1
+      },
+      { module    => 'File',
+        min_level => 'info',
+        filename  => '/path/to/filename'
+        mode      => 'append'
+      }
+    ]
+  });
+
+=head1 DESCRIPTION
+
+Gungho用ログモジュールです。Log::Dispatchを使ってフレキシブルなログを可能に
+します。
+
+=head1 CONFIGURATION
+
+C<log.module> 項目にDispatchと指定し、C<log.config>項目に以下のように
+Log::Dispatchの小クラスの設定を記述してください：
+
+  log:
+    module: Dispatch
+    config:
+      logs:
+        - module: File
+          min_level: info
+          filename: /path/to/filename
+          name: logfile
+
+Log::DispatchクラスはC<module>項目で指定された値にLog::Dispatch::という文字列が
+追加されたものが使用されます。C<module>以外の内容は全てそのクラスのコンストラクタ
+に渡されます。
+
+C<log.config.logs>には複数のログ指定が可能です。リストに追加するだけでその分の
+Log::Dispatchオブジェクトが作成されます。
+
+詳しい設定方法はL<Log::Dispatch|Log::Dispatch>を参照してください。
+
+作成したログはGungho内で$c-E<gt>logからアクセス可能です。使用する場合は
+以下のようにするとよいでしょう：
+
+  $c->log->debug("This is a debug message");
+  $c->log->emergency("This is an emergency message");
+
+=head1 METHODS
+
+=head2 setup($c, \%config)
+
+オブジェクトを初期化します。
+
+=head2 debug
+
+=head2 info
+
+=head2 notice 
+
+=head2 warning 
+
+=head2 error 
+
+=head2 critical 
+
+=head2 alert 
+
+=head2 emergency
+
+上記それぞれのログレベルに出力します。
+
+=head1 CAVEATS
+
+もしGunghoをマルチプロセス間で動作させていて、なおかつ同じログファイルを
+指定したいような場合があった場合はLog::Dispatch::File::Lockedは使用しないで
+ください。
+
+File::Lockedはflock() を使ってファイルをロックし続けるので最初にファイルに
+ロックを書けられたプロセスだけが動く結果となります。
+
+=head1 SEE ALSO
+
+L<Log::Dispatch|Log::Dispatch>
+
+=cut

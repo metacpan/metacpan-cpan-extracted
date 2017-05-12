@@ -1,0 +1,81 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  # Remove all existing guides (this is optional)
+  if($remove_old_guides) {
+    my $i=$image->find_next_guide(0);
+    while ($i != 0) {
+      $image->delete_guide($i);
+      $i=$image->find_next_guide(0);
+    }
+  }
+  for (my $i=$xoffset; $i<$image->width; $i+=$xspace) {
+    $image->add_vguide($i) if $i;
+  }
+  for (my $i=$yoffset; $i<$image->height; $i+=$yspace) {
+    $image->add_hguide($i) if $i;
+  }
+  $drawable->update(0, 0, $image->height, $image->width);
+  return;
+};
+exit main;
+__END__
+
+=head1 NAME
+
+guide_grid - Creates a grid of guides
+
+=head1 SYNOPSIS
+
+<Image>/Image/Guides/Guide Grid...
+
+=head1 DESCRIPTION
+
+You specify the X spacing, the Y spacing, and initial offsets.  It creates
+a grid of guides.
+
+=head1 PARAMETERS
+
+ [PF_SPINNER, "xspace", "How far to space grid horizontally", 24, [1,1000,1]],
+ [PF_SPINNER, "yspace", "How far to space grid vertically", 24, [1,1000,1]],
+ [PF_SPINNER, "xoffset", "How much to initially offset it horizontally", 0, [0,1000,1]],
+ [PF_SPINNER, "yoffset", "How much to initially offset it vertically", 0, [0,1000,1]],
+ [PF_TOGGLE, "remove_old_guides", "Remove existing guides?", 0],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 HISTORY
+
+  <sjburges@gimp.org> (original release)
+
+  11/7/99 <brendy@swipnet.se>
+  Added an option to remove existing guides
+  Added progress bar.
+
+  12/7/99 <sjburges@gimp.org>
+  Changed the display code in C and got rid of ugly hack in perl.
+
+  7/15/03 <sjburges@gimp.org>
+  Changed spot that its registered from <Image>/Guides to <Image>/Image/Guides
+  to reduce horizontal clutter on menubar
+
+=head1 AUTHOR
+
+Seth Burgess
+
+=head1 DATE
+
+1999-03-20
+
+=head1 LICENSE
+
+Seth Burgess <sjburges@gimp.org>
+
+Distributed under the same terms as Gimp-Perl.

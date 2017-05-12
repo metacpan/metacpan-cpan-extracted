@@ -1,0 +1,55 @@
+Content-Type: text/plain; name="promed_new.html"
+Content-Disposition: inline; filename="promed_new.html"
+Mime-Version: 1.0
+To: getweb_discard
+Subject: <URL:file:./test/promed_new.html> ProMED-mail
+X-Mailbot-Note: following link 1, following link 1
+From: Original_Sender
+
+ [IMAGE]
+
+Welcome!
+
+Here is 1k of junk:
+
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foofoo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+
+*** References from this document ***
+[orig] file:./test/promed_new.html
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: Original_Sender
+Subject: Resource Unavailable
+X-Mailbot-Note: following link 3
+
+Could not fetch file:./notavalidpath/justtesting/foobarfoobarfoobarfoobarfoobarfoobarfoobar
+
+ An Error Occurred
+==================
+
+404 - File
+`/home/rolf/dev/getweb/t/testRoot/pub/notavalidpath/justtesting/foobarfoobarfoobarfoobarfoobarfoobarfoobar'
+does not exist
+
+
+...while executing the following command:
+
+GET TO getweb_discard file://test/promed.html FOLLOW 3

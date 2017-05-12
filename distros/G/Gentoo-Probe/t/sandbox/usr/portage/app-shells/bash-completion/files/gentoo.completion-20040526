@@ -1,0 +1,601 @@
+# -*- shell-script -*-
+#
+# Gentoo Linux command completion.
+#
+# Copyright 1999-2002 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License, v2 or later
+#
+# Author: Geert Bevin  <gbevin@theleaf.be>
+# Author: Zach Forrest <zach@disinformation.ca>
+#
+
+#
+# rc & rc-status completion command
+#
+_rc()
+{
+	local cur
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+	if [ ${#COMP_WORDS[*]} -le 2 ]; then
+		COMPREPLY=( $( compgen -W "$(for i in /etc/runlevels/*; do echo ${i##*/}; done)" -- $cur ) )
+
+	fi
+	return 0
+}
+complete -F _rc rc
+
+_rcstatus()
+{
+	local cur opts
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+	if [ ${#COMP_WORDS[*]} -le 2 ]; then
+		opts="-a --all -l --list -u --unused"
+		COMPREPLY=( $( compgen -W "${opts} $(for i in /etc/runlevels/*; do echo ${i##*/}; done)" -- $cur ) )
+
+	fi
+	return 0
+}
+complete -F _rcstatus rc-status
+
+#
+# distcc-config completion command
+#
+_distccconfig()
+{
+	local cur curword numwords opts
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+	numwords=${#COMP_WORDS[*]}
+	curword=${COMP_CWORD}
+	if [ ${numwords} -gt 3 ]; then
+		return 0
+	fi
+	if [[ "${cur}" == -* ]] || [ ${curword} -eq 1 ]; then
+		if [ ${numwords} -le 2 ] && [ ${curword} -eq 1 ]; then
+			opts="--get-hosts \
+				--get-verbose \
+				--get-log \
+				--set-hosts \
+				--set-verbose \
+				--set-log \
+				--add-path \
+				--no-path"
+		else
+			opts=""
+		fi
+	else
+		opts=""
+	fi
+	COMPREPLY=($(compgen -W "${opts}" | grep ^$cur))
+	return 0
+}
+complete -F _distccconfig distcc-config
+
+#
+# simple completion for Gentoo style init
+#
+complete -W "start stop restart pause zap ineed needsme iuse usesme broken" \
+	$(for i in /etc/init.d/*; do echo ${i##*/}; done)
+
+#
+# emerge completion command
+#
+_emerge()
+{
+	local cur prev grepcmd sedcmd systemactions setsma setbig portagedir origdir
+	local mode words opts curword numwords pkgdbdir
+
+	origdir="${PWD}"
+	portagedir=/usr/portage
+	pkgdbdir=/var/db/pkg
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	words="${COMP_WORDS[*]}"
+	numwords=${#COMP_WORDS[*]}
+	curword=${COMP_CWORD}
+	mode='ALL'
+
+	# Determine which mode we're running in.
+
+	if [ ${curword} -eq 1 ] && [ ${numwords} -eq 2 ]; then
+		# This is set when we nothing but the command name has been given.
+		mode='ALL'
+	elif [[ " ${words} " == *" --unmerge "* ]]; then
+		mode='UNMERGE'
+	elif [[ " ${words} " == *" --safe "* ]]; then
+		mode='SAFE'
+	elif [[ " ${words} " == *" --search "* ]]; then
+		mode='SEARCH'
+	elif [[ " ${words} " == *" --world "* ]]; then
+		mode='WORLD'
+	elif [[ " ${words} " == *" --help "* ]]; then
+		mode='HELP'
+	elif [[ " ${words} " == *" --clean "* ]]; then
+		mode='CLEAN'
+	elif [[ " ${words} " == *" --pretend "* ]]; then
+		mode='PRETEND'
+	else
+		# All except '--clean'
+		mode='NOCLEAN'
+	fi
+
+	if [[ "${cur}" == -* ]]; then
+
+		# Process Options
+
+		case "${mode}" in
+			"ALL")
+				opts='--clean --help --verbose --debug --fetchonly \
+					--onlydeps --noreplace --usepkg --buildpkg \
+					--autoclean --pretend --unmerge --safe \
+					--search --world'
+				;;
+
+			"UNMERGE")
+				opts='--clean --verbose --debug --pretend \
+					--unmerge --safe'
+				;;
+
+			"SAFE")
+				opts='--unmerge --verbose --debug'
+				;;
+
+			"SEARCH")
+				opts='--verbose --debug'
+				;;
+
+			"WORLD")
+				opts='--verbose --debug --pretend --world'
+				;;
+
+			"HELP")
+				opts=''
+				;;
+
+			"CLEAN")
+				opts='--verbose --debug --clean'
+				;;
+
+			"PRETEND")
+				opts='--verbose --debug --fetchonly --onlydeps \
+					--noreplace --usepkg --buildpkg \
+					--autoclean --pretend --unmerge --safe \
+					--world'
+				;;
+
+			"NOCLEAN")
+				opts='--help --verbose --debug --fetchonly \
+					--onlydeps --noreplace --usepkg --buildpkg \
+					--autoclean --pretend --unmerge --safe \
+					--search --world'
+				;;
+			*)
+				# Same as ALL
+				opts='--clean --help --verbose --debug --fetchonly \
+					--onlydeps --noreplace --usepkg --buildpkg \
+					--autoclean --pretend --unmerge --safe \
+					--search --world'
+				;;
+
+		esac
+		
+		# Generate the reply.
+		COMPREPLY=($(compgen -W "${opts}" | grep ^$cur))
+
+	elif [ "${mode}" == "CLEAN" ]; then
+		# "rsync" is the only option that can follow "--clean"
+		COMPREPLY=($(compgen -W 'rsync'))
+
+	elif [ "${mode}" == "WORLD" ]; then
+		# "update" is the only option that can follow "--world"
+		#COMPREPLY=($(compgen -W 'update'))
+		COMPREPLY=($(compgen -W 'update' | grep ^${cur}))
+
+	elif [ "${mode}" == "HELP" ]; then
+		if [[ ! " ${words} " == *" "@(system|rsync)" "* ]]; then
+			COMPREPLY=($(compgen -W 'rsync system' | grep ^${cur}))
+		else
+			COMPREPLY=''
+		fi
+
+	elif [ "${mode}" == "SEARCH" ]; then
+		# We don't need to interfere here as the search string is a
+		# regular expression. (But wouldn't intelligent, dynamic,
+		# commandline completion of regular expressions be great!)
+		COMPREPLY=''
+
+	elif [ "${mode}" == "UNMERGE" ]; then
+		# Ignore >, >=, <, <=, and = for the purpose of completion.
+		sedcmd="sed -e s:=:: -e s:>:: -e s:<::"
+		cur=$(echo "${cur}" | ${sedcmd})
+
+		# If the current completion (minus conditional characters)
+		# starts with one of the following characters, then complete
+		# on filenames (i.e. an ebuild file) rather than referencing
+		# the package database.
+		if [[ "${cur} " == @('/'|'.'|'~'|'$')* ]]; then
+			# Setting this to nothing with tell bash to use default
+			# completion (i.e. pathname completion).
+			COMPREPLY=''
+		else
+			cd "${pkgdbdir}"
+			grepcmd="grep -E ^$cur.*"
+
+			if [ "${cur}" ]; then
+				if [ $(echo "${cur}" | grep '/') ]; then
+					setbig=$(compgen -G "${cur}*")
+					COMPREPLY=($(echo "${setbig}" | ${grepcmd}))
+				else
+					setsma=$(compgen -S '/' -G "${cur}*")
+					if [ $(echo "${setsma}" | ${grepcmd} | grep '/' | wc -l) = 1 ]; then
+						setbig=$(compgen -G "*/*")
+						COMPREPLY=($(echo "${setbig}" | ${grepcmd}))
+					else
+						COMPREPLY=($(echo "${setsma}" | ${grepcmd}))
+					fi
+				fi
+			else
+				setsma=$(compgen -S '/' -G "${cur}*")
+				COMPREPLY=($(echo "${setsma}"))
+			fi
+
+			cd "${origdir}"
+		fi
+
+	elif [ "${mode}" == "SAFE" ]; then
+		COMPREPLY=($(compgen -W '--unmerge' | grep ^${cur}))
+
+	elif [[ " ${words} " == *" "@(update|system|rsync)" "* ]]; then
+ 		# syncing the portage tree is a lonely job
+ 		# updating should be done by itself (also lonely)
+  		COMPREPLY=''
+
+	elif [[ " ${words} " == *" --usepkg "* ]] && [[ "${cur} " == @('/'|'.'|'~'|'$')* ]]; then
+		# In order to complete on a package file, the name must be
+		# an absolute or realative pathname (even if it is in the
+		# current directory). This allows completion on both package
+		# names in /usr/portage and on arbitrary *.tbz2 packages.
+		#
+		# I'm planning to come up with a more elegant solution, but
+		# that will have to wait for another update. (The only thing
+		# that is really annoying right now is when specifying a
+		# *.tbz2 file in or below the current directory, you have
+		# to prefix the path with "./".)
+		COMPREPLY=''
+
+	else
+		cd "${portagedir}"
+		grepcmd="grep -E ^${cur}.*"
+		sedcmd="sed -e /^[^-]*$/d"
+
+		if [ ${COMP_CWORD} -eq 1 ]; then
+			# If emerge hasn't been given any args yet, include "rsync"
+			# among the system actions. The case where the "--clean" flag
+			# has been specified is handled above.
+			systemactions=$'\n'"system"$'\n'"update"$'\n'"rsync"
+		else
+			# Only allow these actions if no packages have been specified.
+			if [[ ! " ${words} " == *" "*[/]*" "* ]]; then
+				systemactions=$'\n'"system"$'\n'"update"
+			else
+				systemactions=''
+			fi
+		fi
+
+		if [ "${cur}" ]; then
+			if [[ "${cur} " == @('/'|'.'|'~'|'$')* ]]; then
+				COMPREPLY=''
+			elif [ $(echo "${cur}" | grep '/') ]; then
+				setbig=$(compgen -G "${cur}*" | ${sedcmd})"${systemactions}"
+				COMPREPLY=($(echo "${setbig}" | $grepcmd))
+			else
+				setsma=$(compgen -S '/' -G "${cur}*" | ${sedcmd})"${systemactions}"
+				if [ $(echo "${setsma}" | ${grepcmd} | grep '/' | wc -l) = 1 ]; then
+					setbig=$(compgen -G "*/*" | ${sedcmd})"${systemactions}"
+					COMPREPLY=($(echo "${setbig}" | ${grepcmd}))
+				else
+					COMPREPLY=($(echo "${setsma}" | ${grepcmd}))
+				fi
+			fi
+		else
+                        setsma=$(compgen -S '/' -G "${cur}*" | ${sedcmd})"${systemactions}"
+                        COMPREPLY=($(echo "${setsma}"))
+		fi
+
+		cd "${origdir}"
+	fi
+
+	# (Adapted from bash_completion by Ian Macdonald <ian@caliban.org>)
+	# This removes any options from the list of completions that have
+	# already been specified on the command line.
+	COMPREPLY=($(echo "${COMP_WORDS[@]}" | \
+			(while read -d ' ' i; do
+				[ "${i}" == "" ] && continue
+				# flatten array with spaces on either side,
+				# otherwise we cannot grep on word boundaries of
+				# first and last word
+				COMPREPLY=" ${COMPREPLY[@]} "
+				# remove word from list of completions
+				COMPREPLY=(${COMPREPLY/ ${i%% *} / })
+			done
+			echo ${COMPREPLY[@]})))
+		
+	return 0
+}
+complete -o default -F _emerge emerge
+
+#
+# ebuild completion command
+#
+_ebuild()
+{
+	local cur prev
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+	prev=${COMP_WORDS[COMP_CWORD-1]}
+	if [ $COMP_CWORD -eq 1 ]; then
+		#COMPREPLY=( $( compgen -o filenames -X '!*.ebuild' $cur ) )
+		COMPREPLY=($(compgen -o filenames))
+	elif [ $COMP_CWORD -eq 2 ]; then
+		COMPREPLY=( $( compgen -W 'check \
+			clean compile config \
+			depend digest \
+			fetch \
+			help \
+			install \
+			merge \
+			package postinst postrm preinst prerm \
+			qmerge \
+			rcheck remerge rpm \
+			setup \
+			touch \
+			unmerge unpack' $cur ) )
+	fi
+	return 0
+}
+complete -o default -F _ebuild ebuild
+
+#
+# rc-update completion command
+#
+_rcupdate()
+{
+	local cur prev initdir runlvdir origdir
+	origdir=${PWD}
+	initdir=/etc/init.d
+	runlvdir=/etc/runlevels
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+	prev=${COMP_WORDS[COMP_CWORD-1]}
+	if [ $COMP_CWORD -eq 1 ]; then
+		COMPREPLY=( $( compgen -W 'add del' ${cur} ) )
+	elif [ $COMP_CWORD -eq 2 ]; then
+		cd ${initdir}
+		COMPREPLY=( $( compgen -G "${cur}*" ) )
+		cd ${origdir}
+	elif [ $COMP_CWORD -eq 3 ]; then
+		cd ${runlvdir}
+		COMPREPLY=( $( compgen -G "${cur}*" ) )
+		cd ${origdir}
+	fi
+	return 0
+}
+complete -F _rcupdate rc-update
+
+#
+# gcc-config completion command
+#
+_gccconfig()
+{
+	local cur curword numwords opts
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+	numwords=${#COMP_WORDS[*]}
+	curword=${COMP_CWORD}
+	if [ ${numwords} -gt 3 ]; then
+		return 0
+	fi
+	if [[ "${cur}" == -* ]] || [ ${curword} -eq 1 ]; then
+		if [ ${numwords} -le 2 ] && [ ${curword} -eq 1 ]; then
+			opts="--use-old \
+				--use-portage-chost \
+				--get-current-profile \
+				--list-profiles \
+				--print-environ \
+				--get-bin-path \
+				--get-lib-path \
+				--get-stdcxx-incdir"
+		else
+			opts=""
+		fi
+	elif [ ${numwords} -le 3 ] && [ ${curword} -eq 2 ]; then
+		case "${COMP_WORDS[1]}" in
+			"--print-environ"|"--get-bin-path"|"--get-lib-path"|"--get-stdcxx-incdir")
+				opts=$(gcc-config --list-profiles)
+				;;
+			*)
+				opts=""
+				;;
+		esac
+	else
+		opts=""
+	fi
+	COMPREPLY=($(compgen -W "${opts}" | grep ^$cur))
+	return 0
+}
+complete -F _gccconfig gcc-config
+
+_javaconfig()
+{
+	local cur curword numwords opts args arg spec flag sedcmd grepcmd
+	local multiplepkgs pkgs execopts
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+	numwords=${#COMP_WORDS[*]}
+	curword=${COMP_CWORD}
+	opts=""
+	args=""
+	pkgs=""
+	sedcmd="sed -r -e s/\[([^]]+)\].*/\1/"
+	vmsedcmd="sed -r -e s/\[([^]]+)\]/\1/"
+	grepcmd="egrep -o (--set-(system|user)-(classpath|vm)=)"
+	multiplepkgs=""
+	execopts="HtmlConverter JavaPluginControlPanel \
+			  appletviewer awt_robot \
+			  extcheck \
+			  idlj \
+			  j2sdk-config jar jarsigner \
+			  java java-rmi.cgijava_vm javac javadoc javah javap jdb \
+			  keytool kinit klist ktab \
+			  native2ascii \
+			  oldjava oldjavac oldjdb orbd \
+			  policytool \
+			  realpath rmic rmid rmiregistry \
+			  serialver servertool \
+			  tnameserv"
+	if [[ "${cur}" == -* ]] || [ ${curword} -eq 1 ]; then
+		case "${cur}" in
+			"--java")
+				opts="--java --javac --java-version"
+				;;
+			--j@(a@(r|va@(c|-version))|@(dk|re)-home))
+				opts=""
+				;;
+			--list-available-@(packages|vms))
+				opts=""
+				;;
+			--@(exec|set-@(user|system)-@(classpath|vm)))
+				opts="${cur}="
+				;;
+			--set-@(user|system)-@(classpath|vm)=)
+				if [[ "${cur}" == "--set-system-vm=" ]] || [[ "${cur}" == "--set-user-vm=" ]]; then
+					flag="--list-available-vms"
+					args=$(java-config "${flag}" | cut --delimiter=' ' --fields=2 | ${vmsedcmd})
+				else
+					flag="--list-available-packages"
+					args=$(java-config "${flag}" | ${sedcmd})
+				fi
+				#echo "$(java-config ${flag})" >> output
+				#args=$(java-config "${flag}" | ${sedcmd})
+				for arg in ${args}
+				do
+					[ "${opts}" ] && opts="${opts} ${arg}" || opts="${arg}"
+				done
+				COMPREPLY=($(compgen $nospace -W "${opts}"))
+				return 0
+				;;
+			"--exec=")
+				COMPREPLY=($(compgen $nospace -W "${execopts}"))
+				return 0
+				;;
+			*)
+				if [[ "${cur}" == "--set-system-vm="* ]] || [[ "${cur}" == "--set-user-vm="* ]]; then
+					args=$(java-config --list-available-vms | cut --delimiter=' ' --fields=2 | ${vmsedcmd})
+					# spec=$(echo "${cur}" | egrep -o "(--set-(system|user)-(classpath|vm)=)")
+					# spec=$(echo "${cur}" | ${grepcmd})
+					if [[ "${cur}" == "--set-system-vm="* ]]; then
+						spec=${cur##--set-system-vm=}
+					else
+						spec=${cur##--set-user-vm=}
+					fi
+					for arg in ${args}
+					do
+						if [[ "${arg:0:${#spec}}" == "${spec}" ]]; then
+							[ "${opts}" ] && opts="${opts} ${arg}" || opts="${arg}"
+						fi
+					done
+					[[ "${opts}" == "${spec}" ]] && opts=""
+					COMPREPLY=($(compgen -W "${opts}"))
+					return 0
+				elif [[ "${cur}" == "--set-system-classpath="* ]] || [[ "${cur}" == "--set-user-classpath="* ]]; then
+					args=$(java-config --list-available-packages | ${sedcmd})
+					[ $(echo "${cur}" | grep -c ",") -gt 0 ] && multiplepkgs="true"
+					# spec=$(echo "${cur}" | ${grepcmd})
+					if [[ "${cur}" == "--set-system-classpath="* ]]; then
+						spec="${cur##--set-system-classpath=}"
+					else
+						spec="${cur##--set-user-classpath=}"
+					fi
+					if [[ "${multiplepkgs}" ]]; then
+						pkgs="${spec%,*}"
+						spec="${spec##*,}"
+					fi
+					if [[ "${multiplepkgs}" ]]; then
+						for arg in ${args}
+						do
+							if [[ "${spec}" ]]; then
+								if [[ "${arg:0:${#spec}}" == "${spec}" ]] \
+										&& [[ ! $(echo "${cur}" | egrep -o "(=|,)${arg},") ]]; then
+									[ "${opts}" ] && opts="${opts} ${pkgs},${arg}" || opts="${pkgs},${arg}"
+								fi
+							else
+								if [[ ! $(echo "${cur}" | egrep -o "(=|,)${arg},") ]]; then
+									[ "${opts}" ] && opts="${opts} ${pkgs},${arg}" || opts="${pkgs},${arg}"
+								fi
+							fi
+						done
+						[[ "${opts}" == "${pkgs},${spec}" ]] && opts=""
+					else
+						for arg in ${args}
+						do
+							if [[ "${spec}" ]] && [[ "${arg:0:${#spec}}" == "${spec}" ]]; then
+								[ "${opts}" ] && opts="${opts} ${arg}" || opts="${arg}"
+							fi
+						done
+						[[ "${opts}" == "${spec}" ]] && opts=""
+					fi
+					COMPREPLY=($(compgen -W "${opts}"))
+					return 0
+				elif [[ "${cur}" == "--exec="* ]]; then
+					spec=${cur##--exec=}
+					for arg in ${execopts}
+					do
+						if [[ "${arg:0:${#spec}}" == "${spec}" ]]; then
+							[ "${opts}" ] && opts="${opts} ${arg}" || opts="${arg}"
+						fi
+					done
+					[[ "${opts}" == "${spec}" ]] && opts=""
+					COMPREPLY=($(compgen -W "${opts}"))
+					return 0
+				else
+					opts="--javac \
+						--java \
+						--jar \
+						--jdk-home \
+						--jre-home \
+						--java-version \
+						--classpath \
+						--full-classpath \
+						--exec \
+						--list-available-packages \
+						--list-available-vms \
+						--set-system-vm \
+						--set-user-vm \
+						--set-system-classpath \
+						--set-user-classpath \
+						--clean-system-classpath"
+				fi
+				;;
+		esac
+	else
+		opts=""
+	fi
+	COMPREPLY=($(compgen $nospace -W "${opts}" | grep ^${cur}))
+	return 0
+}
+complete $nospace -F _javaconfig java-config
+
+_openglupdate()
+{
+	local cur
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+        if [ ${#COMP_WORDS[*]} -le 2 ]; then
+		COMPREPLY=($(compgen -W "$(for i in /usr/lib/opengl/*; do [ -d "$i" ] && echo ${i##*/}; done)" $cur))
+	fi
+	return 0
+}
+complete -F _openglupdate opengl-update

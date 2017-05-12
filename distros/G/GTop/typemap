@@ -1,0 +1,9 @@
+GTop		T_PTROBJ
+u_int64_t	T_IV
+pid_t		T_IV
+AV *			T_AVREF
+
+OUTPUT
+
+T_AVREF
+	$arg = newRV_noinc((SV*)$var);

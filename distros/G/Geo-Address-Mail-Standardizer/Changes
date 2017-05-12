@@ -1,0 +1,8 @@
+Revision history for Geo-Address-Mail-Standardizer
+
+0.02    April 15, 2010
+    * Add has_standardized_address predicate to Results
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

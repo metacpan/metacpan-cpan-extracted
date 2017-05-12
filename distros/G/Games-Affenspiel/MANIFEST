@@ -1,0 +1,12 @@
+COPYING
+Makefile.PL
+MANIFEST
+README
+perllib/Games/Affenspiel.pm
+perllib/Games/Affenspiel/Board.pm
+bin/affenspiel-random-moves
+bin/affenspiel-random-solve
+bin/affenspiel-solve
+doc/affenspiel-solution-best.txt
+t/use.t
+META.yml                                 Module meta-data (added by MakeMaker)

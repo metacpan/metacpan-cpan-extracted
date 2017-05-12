@@ -1,0 +1,6 @@
+Revision history for Perl extension GD::WKB.
+
+0.01  Fri Sep  1 17:23:17 2006
+	- original version; created by h2xs 1.23 with options
+		-c -f -n GD::WKB --use-new-tests
+

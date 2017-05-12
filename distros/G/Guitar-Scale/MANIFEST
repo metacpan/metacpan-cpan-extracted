@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Guitar-Scale.t
+t/A_Blues.t
+t/B_MelodicMinor.t
+t/E_HeavyMetal.t
+lib/Guitar/Scale.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

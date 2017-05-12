@@ -1,0 +1,16 @@
+---
+name: Geo-Coordinates-Parser
+version: 0.01
+author:
+  - 'Carl Räihä, <carl.raiha at gmail.com>'
+abstract: A coordinate parser class.
+license: perl
+requires:
+  Geo::Coordinates::DecimalDegrees: 0
+build_requires:
+  Test::More: 0
+provides:
+  Geo::Coordinates::Parser:
+    file: lib/Geo/Coordinates/Parser.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

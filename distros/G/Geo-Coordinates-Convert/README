@@ -1,0 +1,34 @@
+Geo/Coordinates/Convert version 0.01
+====================================
+
+Geo::Coordinates::Convert provides you a function converting classical geographics
+coordinates (e.g. 50.25° E, 12.3° S) to Lambert II coordinates (x meters, y meters)
+you can draw easily on a flat map using translation and scaling factors.
+Geo::Coordinates::Convert provides also the reverse function converting Lambert II coordinates
+to classical geographics coordinates.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+CAUTION
+
+I'm not sure these subs works fine for all longitudes (despite the sub
+set_Mean_Longitude), nor other latitudes, especially northern ones or equatorial ones.
+I don't know the place to find the parameters $N, $C, $XS, $YS for other countries than France.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Jean-Pierre Vidal, jeanpierre.vidal@free.fr
+
+This package is free software and is provided "as is"
+without express or implied warranty. It may be used, modified,
+and redistributed under the same terms as Perl itself.
+
+

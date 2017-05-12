@@ -1,0 +1,10 @@
+Revision history for Geo-Hash
+
+0.01 2008-02-29
+    - Initial release.
+
+0.02 2008-02-29
+    - Added precision guessing
+    - Added decode_to_interval
+
+

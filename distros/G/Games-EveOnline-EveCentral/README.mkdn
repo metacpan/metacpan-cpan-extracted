@@ -1,0 +1,153 @@
+# NAME
+
+Games::EveOnline::EveCentral - A Perl library client for the EVE Central API.
+
+# VERSION
+
+version 0.001
+
+# SYNOPSIS
+
+    use Games::EveOnline::EveCentral;
+
+    my $client = Games::EveOnline::EveCentral->new;
+    # ...
+
+# DESCRIPTION
+
+This module provides a client library for the API made available by
+[http://eve-central.com/](http://eve-central.com/).
+
+Full API documentation is available at
+[http://dev.eve-central.com/evec-api/start](http://dev.eve-central.com/evec-api/start).
+
+# METHODS
+
+## new
+
+    use Games::EveOnline::EveCentral;
+
+    my $client = Games::EveOnline::EveCentral->new;
+
+## marketstat
+
+    my $xml = $client->marketstat(
+      Games::EveOnline::EveCentral::Request::MarketStat->new(
+        type_id => 34, # or [34, 35]. Mandatory.
+        hours => 1, # defaults to 24
+        min_q => 10000, # defaults to 1
+        system => 30000142,
+        regions => 10000002, # or [10000002, 10000003],
+      )->request
+    );
+
+## quicklook
+
+    my $xml = $client->quicklook(
+      Games::EveOnline::EveCentral::Request::QuickLook->new(
+        type_id => 34, # Mandatory.
+        hours => 1, # defaults to 360
+        min_q => 10000, # defaults to 1
+        system => 30000142,
+        regions => 10000002, # or [10000002, 10000003],
+      )->request
+    );
+
+## quicklookpath
+
+    my $xml = $client->quicklookpath(
+      Games::EveOnline::EveCentral::Request::QuickLookPath->new(
+        type_id => 34, # Mandatory
+        from_system => 'Jita', # or 30000142, mandatory
+        to_system => 'Amarr', # or 30002187, mandatory
+        hours => 37, # Defaults to 360
+        min_q => 100 # Defaults to 1
+      )->request
+    );
+
+## history
+
+    my $json = $client->history(
+      Games::EveOnline::EveCentral::Request::History->new(
+        type_id => 34, # Mandatory
+        location_type => 'system', # or 'region'.
+        location => 'Jita', # Or 30000142, must be present if location_type is
+        bid => 'buy' # Or 'sell', mandatory
+      )->request
+    );
+
+## evemon
+
+    my $xml = $client->evemon(
+      Games::EveOnline::EveCentral::Request::EVEMon->new->request
+    );
+
+## route
+
+    my $json = $client->route(
+      Games::EveOnline::EveCentral::Request::Route->new(
+        from_system => 'Jita', # Or 30000142, mandatory
+        to_system => 'Amarr', # Or 30002187, mandatory
+      )->request
+    );
+
+# AUTHOR
+
+Pedro Figueiredo, `<me at pedrofigueiredo.org>`
+
+# BUGS
+
+Please report any bugs or feature requests through the web interface at
+[https://github.com/pfig/games-eveonline-evecentral/issues](https://github.com/pfig/games-eveonline-evecentral/issues).  I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Games::EveOnline::EveCentral
+
+You can also look for information at:
+
+- GitHub Issues (report bugs here)
+
+    [https://github.com/pfig/games-eveonline-evecentral/issues](https://github.com/pfig/games-eveonline-evecentral/issues)
+
+- AnnoCPAN: Annotated CPAN documentation
+
+    [http://annocpan.org/dist/Games-EveOnline-EveCentral](http://annocpan.org/dist/Games-EveOnline-EveCentral)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/d/Games-EveOnline-EveCentral](http://cpanratings.perl.org/d/Games-EveOnline-EveCentral)
+
+- CPAN
+
+    [http://metacpan.org/module/Games::EveOnline::EveCentral](http://metacpan.org/module/Games::EveOnline::EveCentral)
+
+# ACKNOWLEDGEMENTS
+
+- The people behind EVE Central.
+
+    [http://eve-central.com/](http://eve-central.com/)
+
+# LICENSE AND COPYRIGHT
+
+Copyright 2013 Pedro Figueiredo.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+# AUTHOR
+
+Pedro Figueiredo <me@pedrofigueiredo.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Pedro Figueiredo.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,25 @@
+Changes
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+examples/spellcheck.pl
+lib/Gerrit/Client.pm
+lib/Gerrit/Client/ForEach.pm
+lib/Gerrit/Client/Test.pm
+t/00-load.t
+t/00-setup-test-gerrit.t
+t/10-gerrit.t
+t/20-gerrit-for-each-patchset.t
+t/50-system-stream-events.t
+t/60-system-for-each-patchset.t
+t/61-system-for-each-patchset-rest.t
+t/99-shutdown-test-gerrit.t
+t/dummy-reviewer
+t/changes.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

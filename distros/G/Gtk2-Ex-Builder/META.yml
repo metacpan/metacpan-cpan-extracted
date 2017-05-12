@@ -1,0 +1,18 @@
+---
+abstract: 'Gtk2::Widget Wrapper and Gtk2 Building DSL'
+author:
+  - 'Hojung Youn <amorette@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gtk2-Ex-Builder
+requires:
+  Class::Accessor: 0.34
+  Sub::Call::Tail: 0.01
+version: 0.003001

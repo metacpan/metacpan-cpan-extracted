@@ -1,0 +1,13 @@
+Revision history for Perl extension Games::Go::AGA::DataObjects
+
+0.152     2016-11-15 13:28:23-08:00 America/Los_Angeles
+    A number of methods are now deprecated.  For example, keeping track of
+    BYE players and calculating player statistics are now handled by the
+    Tournament object instead of the Player.  The deprecation is managed by
+    options to the 'use' directives.  Specifically, in order to actually
+    deprecate the methods (which should result in more robust code), you
+    must add a 'deprecate => <level>' option to the 'use' line.  See
+    perldoc Games::Go::AGA::DataObjects for details.
+
+0.107     2015-01-18 15:55:31-08:00 America/Los_Angeles
+    Original release.

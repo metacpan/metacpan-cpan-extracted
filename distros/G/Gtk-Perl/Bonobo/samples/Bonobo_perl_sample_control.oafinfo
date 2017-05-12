@@ -1,0 +1,20 @@
+<oaf_info>
+
+<oaf_server iid="OAFIID:Bonobo_perlentry_factory" type="exe" location="perl-entry.pl">
+<oaf_attribute name="repo_ids" type="stringv">
+<item value="IDL:GNOME/ObjectFactory:1.0"/>
+</oaf_attribute>
+<oaf_attribute name="name" type="string" value="Perl entry control factory"/>
+<oaf_attribute name="description" type="string" value="Factory for the sample Perl entry control"/>
+</oaf_server>
+
+<oaf_server iid="OAFIID:Bonobo_perlentry" type="factory" location="OAFIID:Bonobo_perlentry_factory">
+<oaf_attribute name="repo_ids" type="stringv">
+<item value="IDL:Bonobo/Unknown:1.0"/>
+<item value="IDL:Bonobo/Control:1.0"/>
+</oaf_attribute>
+<oaf_attribute name="name" type="string" value="Perl entry control"/>
+<oaf_attribute name="description" type="string" value="A sample Bonobo control which displays a entry."/>
+</oaf_server>
+
+</oaf_info>

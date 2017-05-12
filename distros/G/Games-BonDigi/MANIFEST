@@ -1,0 +1,20 @@
+Artistic
+ChangeLog
+Changes
+COPYING
+INSTALL
+lib/Games/BonDigi.pm
+lib/Test/Games/BonDigi.pm
+examples/generate_bondigi.pl
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00basic.t
+t/01load.t
+t/02class.t
+t/90podtest.t
+t/91podcover.t
+t/94metatest.t

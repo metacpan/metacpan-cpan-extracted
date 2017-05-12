@@ -1,0 +1,11 @@
+MANIFEST
+Changes
+Makefile.PL
+README
+test.pl
+XS.c
+XS.pm
+XS.xs
+misc/make_manifest.pl
+html/docs.css
+html/XS.html

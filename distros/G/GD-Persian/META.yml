@@ -1,0 +1,29 @@
+---
+abstract: 'Persian UTF-8 support for GD module'
+author:
+  - 'Milad Rastian <milad@cpan.org>'
+  - 'Milad Rastian <milad@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GD-Persian
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  GD: 0
+resources:
+  bugtracker: https://github.com/slashmili/perl-gd-persian/issues
+  homepage: https://github.com/slashmili/perl-gd-persian
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/slashmili/perl-gd-persian.git
+version: 0.9

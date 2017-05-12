@@ -1,0 +1,13 @@
+Release history for GraphViz2-Abstract-Edge
+
+0.002000 2013-12-01T06:28:23Z
+ - Factor out constants into GraphViz2::Abstract::Util::Constants
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - develop: +2 ↑1 -2
+ - runtime: +1 -1
+
+0.001000 2013-11-30T17:03:21Z
+ - First version.
+

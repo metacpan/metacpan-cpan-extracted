@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         GD-Cairo
+version:      0.01
+version_from: lib/GD/Cairo.pm
+installdirs:  site
+requires:
+    Cairo:                         1.023
+    GD:                            2.35
+    Test::More:                    0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

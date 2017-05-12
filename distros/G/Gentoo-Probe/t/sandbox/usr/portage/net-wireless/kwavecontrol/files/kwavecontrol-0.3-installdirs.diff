@@ -1,0 +1,388 @@
+diff -Nur kwavecontrol/options.cpp kwavecontrol/options.cpp
+--- kwavecontrol/options.cpp      2003-02-06 22:48:29.000000000 +0100
++++ kwavecontrol/options.cpp   2004-04-29 23:41:10.290885944 +0200
+@@ -29,7 +29,7 @@
+   loadOptions();
+
+ //  *kwcDir = KGlobal::dirs()->findResourceDir( "appdata", "kwaveq0.png" );
+-  *kwcDir = "//opt/.kwavecontrol/";
++  *kwcDir = "/usr/share/apps/kwavecontrol/icons/";
+   notString = new QString("<" + i18n ("not a wlan-device") + ">");
+   pollingChanged(polling);
+ }
+diff -Nur kwavecontrol/Makefile.am kwavecontrol/Makefile.am
+--- kwavecontrol/Makefile.am	2004-04-29 22:48:22.053531232 +0200
++++ kwavecontrol/Makefile.am	2004-04-29 22:46:54.795796424 +0200
+@@ -12,60 +12,60 @@
+ install-data-local:
+ 	$(mkinstalldirs) $(kde_appsdir)/Applications/
+ 	$(INSTALL_DATA) $(srcdir)/kwavecontrol.desktop $(kde_appsdir)/Applications/kwavecontrol.desktop
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/close.png //opt/.kwavecontrol/close.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/open.png //opt/.kwavecontrol/open.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq0.png //opt/.kwavecontrol/kwaveq0.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq1.png //opt/.kwavecontrol/kwaveq1.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq2.png //opt/.kwavecontrol/kwaveq2.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq3.png //opt/.kwavecontrol/kwaveq3.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq4.png //opt/.kwavecontrol/kwaveq4.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq5.png //opt/.kwavecontrol/kwaveq5.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq6.png //opt/.kwavecontrol/kwaveq6.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq7.png //opt/.kwavecontrol/kwaveq7.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq8.png //opt/.kwavecontrol/kwaveq8.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveq9.png //opt/.kwavecontrol/kwaveq9.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwaveqx.png //opt/.kwavecontrol/kwaveqx.png
+-	$(mkinstalldirs) $(kde_localedir)/de/LC_MESSAGES/
+-	$(INSTALL_DATA) $(srcdir)/kwavecontrol.mo $(kde_localedir)/de/LC_MESSAGES/kwavecontrol.mo
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/kwc.png //opt/.kwavecontrol/kwc.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/close.png /usr/share/apps/kwavecontrol/icons/close.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/open.png /usr/share/apps/kwavecontrol/icons/open.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq0.png /usr/share/apps/kwavecontrol/icons/kwaveq0.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq1.png /usr/share/apps/kwavecontrol/icons/kwaveq1.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq2.png /usr/share/apps/kwavecontrol/icons/kwaveq2.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq3.png /usr/share/apps/kwavecontrol/icons/kwaveq3.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq4.png /usr/share/apps/kwavecontrol/icons/kwaveq4.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq5.png /usr/share/apps/kwavecontrol/icons/kwaveq5.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq6.png /usr/share/apps/kwavecontrol/icons/kwaveq6.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq7.png /usr/share/apps/kwavecontrol/icons/kwaveq7.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq8.png /usr/share/apps/kwavecontrol/icons/kwaveq8.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveq9.png /usr/share/apps/kwavecontrol/icons/kwaveq9.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwaveqx.png /usr/share/apps/kwavecontrol/icons/kwaveqx.png
++	$(mkinstalldirs) $(kde_locale)/de/LC_MESSAGES/
++	$(INSTALL_DATA) $(srcdir)/kwavecontrol.mo $(kde_locale)/de/LC_MESSAGES/kwavecontrol.mo
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/kwc.png /usr/share/apps/kwavecontrol/icons/kwc.png
+ 	$(mkinstalldirs) $(kde_icondir)/locolor/32x32/apps/
+ 	$(INSTALL_DATA) $(srcdir)/kwavecontrol.png $(kde_icondir)/locolor/32x32/apps/kwavecontrol.png
+-	$(mkinstalldirs) //opt/.kwavecontrol/
+-	$(INSTALL_DATA) $(srcdir)/small.png //opt/.kwavecontrol/small.png
++	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
++	$(INSTALL_DATA) $(srcdir)/small.png /usr/share/apps/kwavecontrol/icons/small.png
+
+ uninstall-local:
+ 	-rm -f $(kde_appsdir)/Applications/kwavecontrol.desktop
+-	-rm -f //opt/.kwavecontrol/close.png
+-	-rm -f //opt/.kwavecontrol/open.png
+-	-rm -f //opt/.kwavecontrol/kwaveq0.png
+-	-rm -f //opt/.kwavecontrol/kwaveq1.png
+-	-rm -f //opt/.kwavecontrol/kwaveq2.png
+-	-rm -f //opt/.kwavecontrol/kwaveq3.png
+-	-rm -f //opt/.kwavecontrol/kwaveq4.png
+-	-rm -f //opt/.kwavecontrol/kwaveq5.png
+-	-rm -f //opt/.kwavecontrol/kwaveq6.png
+-	-rm -f //opt/.kwavecontrol/kwaveq7.png
+-	-rm -f //opt/.kwavecontrol/kwaveq8.png
+-	-rm -f //opt/.kwavecontrol/kwaveq9.png
+-	-rm -f //opt/.kwavecontrol/kwaveqx.png
+-	-rm -f $(kde_localedir)/de/LC_MESSAGES/kwavecontrol.mo
+-	-rm -f //opt/.kwavecontrol/kwc.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/close.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/open.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq0.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq1.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq2.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq3.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq4.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq5.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq6.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq7.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq8.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq9.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveqx.png
++	-rm -f $(kde_locale)/de/LC_MESSAGES/kwavecontrol.mo
++	-rm -f /usr/share/apps/kwavecontrol/icons/kwc.png
+ 	-rm -f $(kde_icondir)/locolor/32x32/apps/kwavecontrol.png
+-	-rm -f //opt/.kwavecontrol/small.png
++	-rm -f /usr/share/apps/kwavecontrol/icons/small.png
+
+ ####### kdevelop will overwrite this part!!! (end)############
+ # These paths are KDE specific. Use them:
+diff -Nur kwavecontrol/Makefile.in kwavecontrol/Makefile.in
+--- kwavecontrol/Makefile.in	2004-04-29 22:48:19.074984040 +0200
++++ kwavecontrol/Makefile.in	2004-04-29 22:46:41.003893112 +0200
+@@ -633,164 +633,164 @@
+ #>- 	$(INSTALL_DATA) $(srcdir)/kwavecontrol.desktop $(kde_appsdir)/Applications/kwavecontrol.desktop
+ #>+ 1
+ 	$(INSTALL_DATA) $(srcdir)/kwavecontrol.desktop $(DESTDIR)$(kde_appsdir)/Applications/kwavecontrol.desktop
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/close.png //opt/.kwavecontrol/close.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/close.png /usr/share/apps/kwavecontrol/icons/close.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/close.png $(DESTDIR)//opt/.kwavecontrol/close.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/close.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/close.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/open.png //opt/.kwavecontrol/open.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/open.png /usr/share/apps/kwavecontrol/icons/open.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/open.png $(DESTDIR)//opt/.kwavecontrol/open.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/open.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/open.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq0.png //opt/.kwavecontrol/kwaveq0.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq0.png /usr/share/apps/kwavecontrol/icons/kwaveq0.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq0.png $(DESTDIR)//opt/.kwavecontrol/kwaveq0.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq0.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq0.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq1.png //opt/.kwavecontrol/kwaveq1.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq1.png /usr/share/apps/kwavecontrol/icons/kwaveq1.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq1.png $(DESTDIR)//opt/.kwavecontrol/kwaveq1.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq1.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq1.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq2.png //opt/.kwavecontrol/kwaveq2.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq2.png /usr/share/apps/kwavecontrol/icons/kwaveq2.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq2.png $(DESTDIR)//opt/.kwavecontrol/kwaveq2.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq2.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq2.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq3.png //opt/.kwavecontrol/kwaveq3.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq3.png /usr/share/apps/kwavecontrol/icons/kwaveq3.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq3.png $(DESTDIR)//opt/.kwavecontrol/kwaveq3.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq3.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq3.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq4.png //opt/.kwavecontrol/kwaveq4.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq4.png /usr/share/apps/kwavecontrol/icons/kwaveq4.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq4.png $(DESTDIR)//opt/.kwavecontrol/kwaveq4.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq4.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq4.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq5.png //opt/.kwavecontrol/kwaveq5.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq5.png /usr/share/apps/kwavecontrol/icons/kwaveq5.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq5.png $(DESTDIR)//opt/.kwavecontrol/kwaveq5.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq5.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq5.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq6.png //opt/.kwavecontrol/kwaveq6.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq6.png /usr/share/apps/kwavecontrol/icons/kwaveq6.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq6.png $(DESTDIR)//opt/.kwavecontrol/kwaveq6.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq6.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq6.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq7.png //opt/.kwavecontrol/kwaveq7.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq7.png /usr/share/apps/kwavecontrol/icons/kwaveq7.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq7.png $(DESTDIR)//opt/.kwavecontrol/kwaveq7.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq7.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq7.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq8.png //opt/.kwavecontrol/kwaveq8.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq8.png /usr/share/apps/kwavecontrol/icons/kwaveq8.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq8.png $(DESTDIR)//opt/.kwavecontrol/kwaveq8.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq8.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq8.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq9.png //opt/.kwavecontrol/kwaveq9.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveq9.png /usr/share/apps/kwavecontrol/icons/kwaveq9.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveq9.png $(DESTDIR)//opt/.kwavecontrol/kwaveq9.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwaveq9.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq9.png
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwaveqx.png //opt/.kwavecontrol/kwaveqx.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwaveqx.png /usr/share/apps/kwavecontrol/icons/kwaveqx.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwaveqx.png $(DESTDIR)//opt/.kwavecontrol/kwaveqx.png
+-#>- 	$(mkinstalldirs) $(kde_localedir)/de/LC_MESSAGES/
++	$(INSTALL_DATA) $(srcdir)/kwaveqx.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveqx.png
++#>- 	$(mkinstalldirs) $(kde_locale)/de/LC_MESSAGES/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)$(kde_localedir)/de/LC_MESSAGES/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwavecontrol.mo $(kde_localedir)/de/LC_MESSAGES/kwavecontrol.mo
++	$(mkinstalldirs) $(DESTDIR)$(kde_locale)/de/LC_MESSAGES/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwavecontrol.mo $(kde_locale)/de/LC_MESSAGES/kwavecontrol.mo
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwavecontrol.mo $(DESTDIR)$(kde_localedir)/de/LC_MESSAGES/kwavecontrol.mo
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++	$(INSTALL_DATA) $(srcdir)/kwavecontrol.mo $(DESTDIR)$(kde_locale)/de/LC_MESSAGES/kwavecontrol.mo
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/kwc.png //opt/.kwavecontrol/kwc.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/kwc.png /usr/share/apps/kwavecontrol/icons/kwc.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/kwc.png $(DESTDIR)//opt/.kwavecontrol/kwc.png
++	$(INSTALL_DATA) $(srcdir)/kwc.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwc.png
+ #>- 	$(mkinstalldirs) $(kde_icondir)/locolor/32x32/apps/
+ #>+ 1
+ 	$(mkinstalldirs) $(DESTDIR)$(kde_icondir)/locolor/32x32/apps/
+ #>- 	$(INSTALL_DATA) $(srcdir)/kwavecontrol.png $(kde_icondir)/locolor/32x32/apps/kwavecontrol.png
+ #>+ 1
+ 	$(INSTALL_DATA) $(srcdir)/kwavecontrol.png $(DESTDIR)$(kde_icondir)/locolor/32x32/apps/kwavecontrol.png
+-#>- 	$(mkinstalldirs) //opt/.kwavecontrol/
++#>- 	$(mkinstalldirs) /usr/share/apps/kwavecontrol/icons/
+ #>+ 1
+-	$(mkinstalldirs) $(DESTDIR)//opt/.kwavecontrol/
+-#>- 	$(INSTALL_DATA) $(srcdir)/small.png //opt/.kwavecontrol/small.png
++	$(mkinstalldirs) $(DESTDIR)/usr/share/apps/kwavecontrol/icons/
++#>- 	$(INSTALL_DATA) $(srcdir)/small.png /usr/share/apps/kwavecontrol/icons/small.png
+ #>+ 1
+-	$(INSTALL_DATA) $(srcdir)/small.png $(DESTDIR)//opt/.kwavecontrol/small.png
++	$(INSTALL_DATA) $(srcdir)/small.png $(DESTDIR)/usr/share/apps/kwavecontrol/icons/small.png
+
+ uninstall-local:
+ #>- 	-rm -f $(kde_appsdir)/Applications/kwavecontrol.desktop
+ #>+ 1
+ 	-rm -f $(DESTDIR)$(kde_appsdir)/Applications/kwavecontrol.desktop
+-#>- 	-rm -f //opt/.kwavecontrol/close.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/close.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/close.png
+-#>- 	-rm -f //opt/.kwavecontrol/open.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/close.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/open.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/open.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq0.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/open.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq0.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq0.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq1.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq0.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq1.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq1.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq2.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq1.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq2.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq2.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq3.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq2.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq3.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq3.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq4.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq3.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq4.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq4.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq5.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq4.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq5.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq5.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq6.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq5.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq6.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq6.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq7.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq6.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq7.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq7.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq8.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq7.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq8.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq8.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveq9.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq8.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveq9.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveq9.png
+-#>- 	-rm -f //opt/.kwavecontrol/kwaveqx.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveq9.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwaveqx.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwaveqx.png
+-#>- 	-rm -f $(kde_localedir)/de/LC_MESSAGES/kwavecontrol.mo
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwaveqx.png
++#>- 	-rm -f $(kde_locale)/de/LC_MESSAGES/kwavecontrol.mo
+ #>+ 1
+-	-rm -f $(DESTDIR)$(kde_localedir)/de/LC_MESSAGES/kwavecontrol.mo
+-#>- 	-rm -f //opt/.kwavecontrol/kwc.png
++	-rm -f $(DESTDIR)$(kde_locale)/de/LC_MESSAGES/kwavecontrol.mo
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/kwc.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/kwc.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/kwc.png
+ #>- 	-rm -f $(kde_icondir)/locolor/32x32/apps/kwavecontrol.png
+ #>+ 1
+ 	-rm -f $(DESTDIR)$(kde_icondir)/locolor/32x32/apps/kwavecontrol.png
+-#>- 	-rm -f //opt/.kwavecontrol/small.png
++#>- 	-rm -f /usr/share/apps/kwavecontrol/icons/small.png
+ #>+ 1
+-	-rm -f $(DESTDIR)//opt/.kwavecontrol/small.png
++	-rm -f $(DESTDIR)/usr/share/apps/kwavecontrol/icons/small.png
+
+ # Uncomment the following two lines if you add a ui.rc file for your application to make use of
+ # KDE?s XML GUI builing

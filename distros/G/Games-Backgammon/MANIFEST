@@ -1,0 +1,14 @@
+Backgammon.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+COPYING
+t/1.t
+t/set_position.t
+t/get_position_id.t
+t/legal_moves.t
+
+positionid.xc
+generate_moves.xc
+format_move.xc

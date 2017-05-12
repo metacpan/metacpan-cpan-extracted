@@ -1,0 +1,71 @@
+	test1:	"(" 'the' "$::first" /te+st/ is ('easy')(s?)
+			{ "[$item[3]|$item[4]|$item[5]|" .
+				join(':', @{$item[6]})   .
+				']' }
+
+	is:	'is' | 'are'
+
+#================================================================#
+
+	test2:	<matchrule:$arg{article}>
+		<matchrule:$arg[3]>[$arg{sound}]
+
+	the:	'the'
+	a:	'a'
+
+	cat:	<reject: $arg[0] ne 'meows'> 'cat'
+			{ "fluffy" }
+	   |    { "not fluffy" }
+
+	dog:	'dog'
+			{ "rover" }
+
+#================================================================#
+
+	test3:	 (defn | typedef | fail)(5..10)
+			{ join ', ', @{$item[1]}; }
+
+	typedef: 'type' id 'is' typename ';'
+			{ $return = "$item[0]=>$item[2]";
+			  $thisparser->Extend("typename: '$item[2]'"); }
+
+	fail:	 { 'baddef' }
+
+	defn:	 'var' id 'holds' typename ';'
+			{ "$item[0]=>$item[2]" }
+
+	id:	 /[a-z]		# LEADING ALPHABETIC
+		  \w*		# FOLLOWED BY ALPHAS, DIGITS, OR UNDERSCORES
+		 /ix		# CASE INSENSITIVE
+
+	typename: 'int'
+
+#================================================================#
+
+	test4:	'a' b /c/
+			{ "$itempos[1]{offset}{from}:$itempos[2]{offset}{from}:$itempos[3]{offset}{from}" }
+
+	b:	"b"
+
+#================================================================#
+
+	test5: ...!name notname | name
+
+	notname: /[a-z]\w*/i { 'notname' }
+
+	name: 'fred' { 'name' }
+
+#================================================================#
+
+	test6: <rulevar: $test6 = 1>
+	test6: 'a' <commit> 'b' <uncommit> 'c' <reject: $test6 && $text>
+			{ 'prod 1' }
+	     | <uncommit>
+			{ 'prod 2' }
+	     | 'a'
+			{ 'prod 3' }
+
+#================================================================#
+
+	test7: 'x' <resync> /y+/
+			{ $return = $item[3] }

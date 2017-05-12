@@ -1,0 +1,25 @@
+# havok version=7.17
+ABSTRACT:     
+AUTHOR:    Jeffrey I Cohen (jcohen@cpan.org)
+DML:    
+  -    
+    check:    
+      -    select * from user_functions where xname = 'Genezzo::Havok::Utils'
+
+    install:    
+      -    i user_functions 1 require Genezzo::Havok::Utils sql_func_alter_ts SYSTEM 2007-07-16T07:35:22 0 HASH alter_ts
+      -    i user_functions 2 require Genezzo::Havok::Utils sql_func_add_user_function SYSTEM 2007-07-16T07:35:22 0 HASH add_user_function
+      -    i user_functions 3 require Genezzo::Havok::Utils sql_func_drop_user_function SYSTEM 2007-07-16T07:35:22 0 HASH drop_user_function
+      -    i user_functions 4 require Genezzo::Havok::Utils sql_func_register_havok_package SYSTEM 2007-07-16T07:35:22 0 HASH register_havok_package
+
+
+
+LICENSE:    gpl
+NAME:    Genezzo::Havok::Utils
+PREREQ_HAVOK:    
+  Genezzo::Havok::UserFunctions:    0.0
+
+TABLEDEFS:    
+
+UPDATED:    2007-07-16T00:39:39
+VERSION:    1.10

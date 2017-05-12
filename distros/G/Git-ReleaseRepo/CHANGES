@@ -1,0 +1,823 @@
+==================================================
+Changes from 2012-09-11 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.006 at 2013-09-11 22:58:19 +0000
+------------------------------------------
+
+  Change: fb0e47234352a80357849d944fa974abc3d2f876
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-09-11 14:54:43 +0000
+
+    fix reference_root code to work on perl 5.12 
+
+  Change: dd0dbe8d46a8c8965b63db0c013d2b3bc28ab21c
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-09-11 14:41:56 +0000
+
+    don't use a remote that we don't have... 
+
+  Change: 316bdcb9f9349e34457dd47d34a457477b624574
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-09-11 14:33:36 +0000
+
+    fix #16: newly-cloned repository reports incorrect status 
+
+  Change: f993abffa8bfba8595639924d75db12f8a502573
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2013-09-09 18:18:21 +0000
+
+    commit a test for #16 
+
+  Change: dd2d16ffccf619a2df769688c145f82f3b89c3b6
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2013-09-09 17:38:54 +0000
+
+    fix the rest of #15: Cannot push refspec any 
+
+  Change: 483161ccb2ea766c5166917940cb5a023445a5d6
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-09-03 17:02:51 +0000
+
+    fix #15: unable to checkout or push release in repo cloned after a
+    release 
+
+  Change: dc8f9cfc03667d07902005d2ab17d8a8feec5eae
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-09-03 14:49:17 +0000
+
+    update version and readme for new author 
+
+  Change: eabc20fc9a19af3b15198ede003783a02fdefa9d
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-09-03 14:37:39 +0000
+
+    add Andrew as an author 
+
+  Change: be977bde58e0f6bc32f0589247703e6049aed1f2
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2013-09-03 11:27:04 +0000
+
+    Merge pull request #14 from adgoudz/andrew
+
+    add reference option for all create and add commands 
+
+  Change: 4ebcb5b720a2242d9ce9fcc050a342c3e14442a8
+  Author: Andrew Goudzwaard <andrew.goudzwaard@baml.com>
+  Date : 2013-08-16 08:55:58 +0000
+
+    add reference option for all create and add commands 
+
+  Change: 04283762a3f416d196a4ab6ecd407c7741a24f36
+  Author: Andrew Goudzwaard <andrew.goudzwaard@baml.com>
+  Date : 2013-08-13 14:04:16 +0000
+
+    allow for absolute target paths in create commands 
+
+------------------------------------------
+version 0.005 at 2013-08-08 19:29:08 +0000
+------------------------------------------
+
+  Change: e917df341411961d22b598acb119751a7ddf1376
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2013-08-08 14:29:08 +0000
+
+    Release v0.005 
+
+  Change: f0d8b215e7cf4aac9d740b458c3671afab44f554
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2013-08-08 14:26:44 +0000
+
+    make code work on perl 5.12. keys() takes a hash, not an expr 
+
+------------------------------------------
+version 0.004 at 2013-07-19 19:02:51 +0000
+------------------------------------------
+
+  Change: 4de20d438dff2d732ece97395e6c0ecd63fd7a05
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-19 15:02:51 +0000
+
+    only show deploy release status in deployed repo 
+
+  Change: 5a3129d4443b5d86cc09a063b8b3b97e1f2a459c
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-19 15:02:43 +0000
+
+    add progress bar to pull 
+
+  Change: f176502c41d9685cadbd3efb5d52c2f2207425c5
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-18 16:39:01 +0000
+
+    release v0.004 
+
+  Change: 873825e9d1bfb88403aa87743f0a0a876072c3f0
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-18 16:38:54 +0000
+
+    add pull tests 
+
+  Change: d1b12ebc322339f6cedcb3693b1ba2e1bddd51f6
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-18 16:34:12 +0000
+
+    integration should be last 
+
+  Change: 1b0412426bbd5119a11a05bbb400eda97d9fdf64
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-18 15:41:47 +0000
+
+    fix pull command to actually work 
+
+  Change: 11ac9538f1dd9509f2b2b5203221f802dc3571f7
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-18 14:24:13 +0000
+
+    add deploy test 
+
+  Change: 3e29ac5468e4da1653b0ed5abe4e35804dfe99bb
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-17 18:17:12 +0000
+
+    add missing prereq 
+
+  Change: b7ae3599b1185885047d86ea284c5516e0bcb389
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-17 18:16:45 +0000
+
+    make status a little faster 
+
+  Change: 1ba1ca8b75a652479b908ab70e9e82517c8fa208
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-17 16:08:35 +0000
+
+    add progress bars to some long tasks 
+
+  Change: 340e043c7d327a8475256f2b17a4a3519954b48e
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-17 13:38:42 +0000
+
+    status must fetch to give accurate statuses 
+
+  Change: ae329787cf7594ee841d26ea38617aa0642a2ab4
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-17 13:12:17 +0000
+
+    deploy needs to know what the origin knows
+
+    luckily, after a clone, show-ref will get the correct remote refs
+
+    not so lucky for the "status" command, later, though 
+
+  Change: 2abf11d1795c67f3885422b822d7cd48bac733ba
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-17 13:01:20 +0000
+
+    The canonical copy of the repo is now local, not origin 
+
+  Change: f66b16e02b1391cd9e866f634891b5887541282f
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-17 13:01:06 +0000
+
+    push "master" and "latest_release_branch" by default 
+
+  Change: e2f9bafb76913d769cf2089ae15c267241ab2eda
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-17 12:24:08 +0000
+
+    fix the clone command and ensure it is fully tested 
+
+  Change: 3da8ab3fac2260598d0ab351ea7143310c9e94b0
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 17:53:14 +0000
+
+    pushing is responsibility of the push command, not the commit command 
+
+  Change: ff137092302865732206cee50380b12dd8a0810b
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 17:52:19 +0000
+
+    file:// lets us push using local file repositories 
+
+  Change: 0dfbbc5bdb441b7011cc4173fcbd5059a93e36ef
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 17:52:02 +0000
+
+    quiet the checkout and deploy commands 
+
+  Change: 1e376839f485a4daad44d047dd1ee3fccc04f4db
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 16:19:13 +0000
+
+    the old update command is now called "pull" 
+
+  Change: c5b06eff1faa473298d5ba8ea3b72645cf019ff8
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 16:14:54 +0000
+
+    update checkout test for new test subs 
+
+  Change: 03cce0102f3da6fde443e36c08201a72a6a8ae01
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 16:12:20 +0000
+
+    split apart "add" to create an "update" command 
+
+  Change: b14f7837d87b350a9d86a2c01eba4a244355cdfa
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 15:54:45 +0000
+
+    test::more adds use strict/warnings for us 
+
+  Change: 282088d5adda7ba506edb6ce8f0308d99454e485
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 15:54:30 +0000
+
+    fix push test and update to new test subs 
+
+  Change: c3b6973c25e2e4ccb5c00053d92ed3ca51c6663c
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 15:48:40 +0000
+
+    all modules should be checked out to the same branch as super-repo 
+
+  Change: ec6b6caa945414557d6144ce9b3cccf3a0d20ade
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-16 15:40:35 +0000
+
+    add should not change which branch we're on 
+
+  Change: 873a74a863295eca2fd513adde436df5c8b9f170
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-15 16:21:42 +0000
+
+    add test for checkout command 
+
+  Change: e53841e51534186f38e96e67f82ac098f9ba741d
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-15 16:12:40 +0000
+
+    add test boilerplate functions 
+
+  Change: ee68a892f076bad8e96c5db0f5d538e8ccc92524
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-15 15:42:29 +0000
+
+    warn users if they're out-of-date 
+
+  Change: ce5f9662cd4623c19fe777ac43f94f9c276b422b
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-15 12:40:39 +0000
+
+    --bugfix is no longer on the add command 
+
+  Change: e1c7117fd70f515f129bed9915f39c748237e05f
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-15 12:38:19 +0000
+
+    fix add for new checkout command 
+
+  Change: ded4b65d1ebf37858b7bab35ddc29bbdbbe79de9
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-12 16:58:36 +0000
+
+    start removing --bugfix from everywhere and add checkout command
+    instead 
+
+  Change: b5ee84e0fe5aacaf2bbae5477f7ffc010796f4f6
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-12 15:03:59 +0000
+
+    change "update" to "pull" 
+
+  Change: 79de4c1df9da36665a6b0c4a1bea799b135b3887
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-12 15:00:52 +0000
+
+    remove reset test for now 
+
+  Change: 35a21a9712f0baeda768df2219b54e3cf20f8d68
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-12 14:49:43 +0000
+
+    add a function to create a module repo for testing 
+
+  Change: e03f143447f6e362c4dfcf2cbdd641f3cee5a6b6
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-12 14:49:34 +0000
+
+    show diagnostics when a command has an error 
+
+  Change: 893375ecfb1ae8678a550b285bbfbe52354066af
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-12 14:48:35 +0000
+
+    add push command 
+
+  Change: b41cfa45964ef1231c65448982106545b3eff61b
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-09 18:09:21 +0000
+
+    add test files for push and reset commands 
+
+  Change: 45a7bc577157474e6f6d3d0664e00ded895604ef
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-09 18:00:35 +0000
+
+    rename "release" command to "commit" 
+
+------------------------------------------
+version 0.003 at 2013-07-06 00:53:08 +0000
+------------------------------------------
+
+  Change: ec98906908b8d3caba6ed30b72623e88e869f1c4
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2013-07-05 19:53:08 +0000
+
+    fix META URLs 
+
+  Change: ad6c1e420879f155f276867191e863a391aa6b86
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2013-07-05 19:37:30 +0000
+
+    fix dist.ini and .gitignore 
+
+  Change: 88f88f1868291057802a43c189b753fe8e0b9af2
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2013-07-05 14:00:07 +0000
+
+    add some diag messages 
+
+------------------------------------------
+version 0.002 at 2013-07-03 16:11:08 +0000
+------------------------------------------
+
+  Change: 7804c53da1449cbc18b10b2a6bdc4f074dfb6e48
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-03 12:11:08 +0000
+
+    add more tests for init.t 
+
+  Change: f184f8933ee3eaf320276b65c7f2843c321118f0
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-03 12:04:43 +0000
+
+    fix test module sending wrong arguments to test_app 
+
+  Change: 157211c1536b92597b37faf4911992fec7ee4610
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-03 12:04:43 +0000
+
+    require a version_prefix when initializing a new release repo 
+
+  Change: 31d255ca198c469855a470ae9805c0bd5abf1094
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-02 17:51:53 +0000
+
+    require a version_prefix when initializing a new release repo 
+
+  Change: 32a6e2e9714e5c5d73ec6353066ce3e5dc18e35b
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-02 17:48:11 +0000
+
+    provide a method to not check errors after running command 
+
+  Change: 8b46305dace6a31c7972b141efc5beee48000a8c
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-02 17:41:53 +0000
+
+    add test library 
+
+  Change: 0ca4910df434c8b1977e1883ba3143e23028cf67
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-07-02 17:27:33 +0000
+
+    move to integration.t, to start doing bugfix tests 
+
+  Change: eec5a0144a6cac412f0289193a77c58b15eb7b83
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 18:25:18 +0000
+
+    update command now works with new architecture 
+
+  Change: c4f46a1316985f084d9f641aef2a633f80a73428
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 18:22:10 +0000
+
+    deploy command now works with new architecture 
+
+  Change: e2092ee7807596272e2a6d3f07bc86c0b630fab4
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 18:03:18 +0000
+
+    "add" and "release" commands now work with new architecture 
+
+  Change: e1b14ef538b91c395e14cd05803680298d26e0af
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 18:02:03 +0000
+
+    status command now works with new architecture 
+
+  Change: 283f3ff71c9bec91ac7af86720af62e43adde1ba
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 17:54:08 +0000
+
+    init command works with new architecture 
+
+  Change: 4ea42d07f049116d5bf443fcc1f2a957f7eccda2
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 17:49:22 +0000
+
+    let the tempdir get deleted by moving cwd back 
+
+  Change: 038e2e530d827f3e55883b36e7483fe96589e68d
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 17:40:03 +0000
+
+    "use" command is not necessary anymore, its function is in init 
+
+  Change: 66d2099bfc9337ad7357dd1e7fd3fb4287f731d7
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 17:31:06 +0000
+
+    start version 0.002 development 
+
+  Change: 43138befd85021511ac2a880504be0fa1996270c
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 17:06:49 +0000
+
+    use the current directory as the git repo, like regular git commands
+
+    this makes it easier to figure out what's going on. no configuration
+    file or "use" command. and it helps with using the repository as a
+    regular repository as well.
+
+    All in all, this is a far better architecture. 
+
+  Change: 489303bd59d1e4d376c579dc9d711547a6eaa192
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-25 17:06:31 +0000
+
+    change the name to allow use as "git release" 
+
+------------------------------------------
+version 0.001 at 2013-06-18 20:59:08 +0000
+------------------------------------------
+
+  Change: 3a28473ea2f03d0a563ab144d0ede7622394b15f
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-18 16:59:08 +0000
+
+    upgrade to Dist::Zilla 
+
+  Change: 091c83f22af9acfeeba282bd3a3d8cf469bebca4
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-03 18:43:23 +0000
+
+    fix --master option to deploy command, and always have a
+    version_prefix 
+
+  Change: a60cc921c488b5b1bd53024327ccbf576045375a
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-03 18:43:14 +0000
+
+    add update command to update a deploy repository 
+
+  Change: c0e69a1d03badbb63848a98f2028f9e483947bb8
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-03 18:22:13 +0000
+
+    add cover_db to gitignore 
+
+  Change: 0dbce98d3c3ec2c88d0ae9042f055e9a3f547cd3
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-03 18:21:10 +0000
+
+    do not automatically checkout during status
+
+    only release repositories should checkout during status, and that is
+    an interesting problem indeed. Perhaps only 'fetch --tags' should be
+    used instead? 
+
+  Change: 13d4bcc0f2d1652a35f5055fd9eba9bc826b306d
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-03 18:20:54 +0000
+
+    show deploy status for deploy directories 
+
+  Change: f91ce86b751f1e2a74921e42fa94c07930d1e3b9
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-06-03 18:19:56 +0000
+
+    show both stdout and stderr from command 
+
+  Change: 22ec1c7a1680d2d1e937797a05b7e356d22204ad
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 19:16:46 +0000
+
+    deploy needs to know version prefix; refactor common parts of
+    clone/deploy 
+
+  Change: ca9d94852c2f4cae100e14ff242d0b93aec7fb15
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 18:24:39 +0000
+
+    add deploy command 
+
+  Change: 40eaee30ee32b89802bd1a4eff6fe68f43c1c7e4
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 18:24:06 +0000
+
+    always check origin for refs if it is available
+
+    This way we don't have to fetch down changes, and potentially merge
+    them, until absolutely necessary. 
+
+  Change: a3269168a39a3090ed18a594934e37b64a3a9846
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 18:22:53 +0000
+
+    use --branch in deploy because --version is reserved by Getopt::Long 
+
+  Change: 4cd9dbfa52709187ee8c0ef750bca2eaf93db031
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 18:22:09 +0000
+
+    deployed repository will have a detached HEAD; not be on a branch 
+
+  Change: 49d100b869daeb659bb8f576f9af648cc7776434
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 18:21:12 +0000
+
+    fix checking for tag when a commit has multiple tags 
+
+  Change: acfedf12d2b0144c0b3f4f928b6af087224e29da
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 18:20:38 +0000
+
+    add stdout when a command fails 
+
+  Change: 69c66918157c8c1545ab989a06f5c6d858b8b786
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 18:18:32 +0000
+
+    add a way to prevent cleanup during testing, to see the state of the
+    test repo 
+
+  Change: 66ace9cceeef38304b14b8390a3545a1a449cb81
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-31 14:33:51 +0000
+
+    move the repository-based subs into a Git::Repository plugin 
+
+  Change: c8981755ba8747ec1f1499d21e4e9af6de17cd40
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-30 18:05:25 +0000
+
+    deploy command must accept the repo URL to clone, and a name for the
+    deployed release 
+
+  Change: 657e3bf6883050f80991f2e850580d57c56e12bb
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-30 18:05:01 +0000
+
+    test subs go at the top, tests at the bottom 
+
+  Change: 7fee4ad68e02156a2d2651f8bf47e6e78b33b45c
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-30 17:45:29 +0000
+
+    add tests for 'deploy' and 'update' commands 
+
+  Change: fc84e34ba8ec1430d8afe2382de378e45f818436
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-30 17:45:05 +0000
+
+    add --repo option to temporarily change what repo name to look at 
+
+  Change: fffe52e6a40adef44b2b1b4587538b610cb8e6bb
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-30 16:43:03 +0000
+
+    refactor tests to remove some common blocks into subs 
+
+  Change: 849fe4fb22eff8445c40aadf49ae7d45c5c4729a
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-24 19:48:28 +0000
+
+    add clone command for existing release repositories 
+
+  Change: 1340cf5e2bcbcbc573c8d8d7530451295f3a9c01
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-24 18:36:20 +0000
+
+    fix warning when doing init with no options 
+
+  Change: 792fcc59414c23c3685cdcbea97be02f55167da5
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-24 18:17:34 +0000
+
+    add docs and fix App::Cmd framework usage 
+
+  Change: 82a85818af6a36e00046222f2766252a8ad9bb63
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-24 18:13:37 +0000
+
+    clone/config is now accomplished by 'use' 
+
+  Change: fb1210a5bb447c36b2b17925c42dd58cd3cb1612
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-24 18:01:05 +0000
+
+    use App::Cmd::Tester::CaptureExternal 
+
+  Change: 661dbf82f1d412fd0bb55e7c84b8a37ce9cda2ce
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-24 15:44:55 +0000
+
+    add a new way to configure release repositories 
+
+  Change: e88c4a1bc5442d864b498bbeb7258a3f4efa08db
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-20 18:47:14 +0000
+
+    second release now works correctly
+
+    * Remove any untracked submodules after a checkout, since git will
+    not do it for us * Sort versions that are missing a third part 
+
+  Change: 7910524380113c6b2f916b02633f6d5fab356584
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-20 18:12:34 +0000
+
+    bugfix releases now work correctly
+
+    I need to make an abstraction around commands that are allowed to die
+    and ones that are not allowed to die 
+
+  Change: 4e6d27888f9b91a8bf730c4a5a0e853f623938f6
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 19:40:12 +0000
+
+    fix the spacing of the status command output 
+
+  Change: 3bc675c79d1406b3d5df61f24a73f0650850525e
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 19:27:03 +0000
+
+    fill in the rest of the tests 
+
+  Change: 3c477268b08cb3e208df6bd63cb9f5b226010d6c
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 19:26:44 +0000
+
+    add option for --bugfix to status, does not actually do anything yet 
+
+  Change: f2dd8a20b8f3a8b70dd7a1b132af71af5e71d6d4
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 19:26:14 +0000
+
+    add methods for finding the release branches 
+
+  Change: 0b673ac0147db34636f24e4f2566273d3e5b84f7
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 19:25:44 +0000
+
+    add notes about what happens during different versions
+
+    these notes will eventually lead to documentation 
+
+  Change: 7369004a047437740b3bead64936ef57a2721428
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 18:29:11 +0000
+
+    add comment for clarification 
+
+  Change: 4996d56107a94a2171ea6ea5c01650117a3eb39d
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 17:39:40 +0000
+
+    initial release now works. everything happens locally
+
+    there is going to need to be a lot of configurability in the
+    command-line and in the future, fixed config file 
+
+  Change: a3b267cf0deed719865ccec3ee53a169e75c6cc7
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 17:38:10 +0000
+
+    add some overview docs about tags, branches, and semantic versioning 
+
+  Change: 4e3714e8b23f2e047587301e1f12411f3ae037b4
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-17 17:37:54 +0000
+
+    actually add the test file this time 
+
+  Change: a06f52b7bf2462b2c4ab3e16fcd7f9dd9f0b30b4
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-16 20:42:59 +0000
+
+    start building tests and fixing problems raised by tests 
+
+  Change: 3065f24c8de58371386b7fd8a3788ab171af10ea
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-07 17:42:16 +0000
+
+    add more things to ignore 
+
+  Change: a51779b86d646efa11b2d56be88a372dfff3eddc
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-02 19:56:11 +0000
+
+    add some test requirements so we can write some tests! 
+
+  Change: a9bc25aa5380b25ca0d973496291ddcd6cdb966c
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-02 19:54:34 +0000
+
+    branch each submodule with the current release version 
+
+  Change: 02e00945d8ed56d93165c56928affd9a61eb3cec
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-02 19:02:38 +0000
+
+    make "status" command also show committed changes since last release 
+
+  Change: f61db77281c64784562442284b65ff6c554623f4
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-01 20:49:03 +0000
+
+    add -a (all) option to "add" 
+
+  Change: 35ed4464e110b8e17dc25fbf55e56cdba9d18223
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-01 19:15:05 +0000
+
+    sort the submodules when doing status, and quiet warnings 
+
+  Change: 16f7f95f6448bd10412c93c82fe6ac1d44c81acc
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-01 18:57:25 +0000
+
+    add command to set work_tree of existing release repo 
+
+  Change: a9a9cbf3c58522494051b2be4e75a2d14e04ce75
+  Author: Doug Bell <doug.bell@baml.com>
+  Date : 2013-05-01 16:44:44 +0000
+
+    this had never worked. wtf 
+
+  Change: 452afd91ac31df4a09009a73c1ef96c6f55b9665
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2012-11-07 22:38:07 +0000
+
+    forgot to add copyright and license 
+
+  Change: 46a087aaf1f874c126bbd2391e6ebd9aa35efe01
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2012-11-07 22:19:53 +0000
+
+    add README for github users 
+
+  Change: facefa4737c301f277523da3a20d024756c25172
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2012-11-07 22:09:14 +0000
+
+    add release command 
+
+  Change: 710be6800173c387696534a6c798abce12d80b50
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2012-11-07 21:36:07 +0000
+
+    add "status" command 
+
+  Change: 7c4d2670765e8f0623841cff62ec500485689e4e
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2012-11-07 20:56:49 +0000
+
+    add "add" command 
+
+  Change: d38146480697748fa617276e1553c008f6e554f6
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2012-11-07 20:38:22 +0000
+
+    add an accessor for the release repository 
+
+  Change: 521bfda693ad8ea25a963beb0ff06f38d4373b96
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2012-11-07 20:37:13 +0000
+
+    config must be created after config_file 
+
+  Change: 31571693b3e889215ff06aff51d61721ba55f5e2
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2012-11-07 19:18:36 +0000
+
+    start with a clone method and a config file 
+
+================
+End of releases.
+================

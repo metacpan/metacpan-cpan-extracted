@@ -1,0 +1,17 @@
+# Getopt::Euclid-generated file. Skip me
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item  -i[nfile]  [=]<file>    
+
+Specify input file
+
+=for Euclid:
+    file.type:    readable
+    file.default: '-'
+
+=back
+
+=cut

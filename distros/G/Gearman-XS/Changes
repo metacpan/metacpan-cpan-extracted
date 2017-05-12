@@ -1,0 +1,86 @@
+0.13 - 2012-04-20
+  * Fix testsuite for compatibility with 1.2
+
+0.12 - 2011-07-18
+ * add add client/worker function remove_servers()
+ * fix test suite failures with latest gearmand versions
+
+0.11 - 2010-08-18
+ * remove build warnings with newer Module::Install versions
+ * replace savesvpv() with custom function to not pass around trailling NULL
+   bytes (also fixes unrelated #619309)
+
+0.10 - 2010-04-09
+ * fix bug #559240 (broken compatibility with non-Gearman::XS clients)
+ * this actually opens bug #525826 again as I currently don't see a way to fix
+   it.
+
+0.9 - 2010-04-06
+ * fix bug #525826 (empty string result)
+
+0.8 - 2010-02-19
+ * fix bug #507781 (Memory leak - GC)
+ * fix non-string input to do* functions
+ * remove Gearman::XS::Server
+ * add worker function function_exists()
+ * add Gearman::XS::strerror
+ * requires libgearman 0.12 or later
+
+0.7 - 2009-11-26
+ * add worker set_log_fn()
+ * new Gearman::XS::Server
+
+0.6 - 2009-10-06
+ * depends on libgearman 0.10 or later
+ * API changes:
+   client/worker set_options() now only gets one parameter
+
+   job functions renamed:
+    status()   -> send_status()
+    data()     -> send_data()
+    fail()     -> send_fail()
+    warning()  -> send_warning()
+    complete() -> send_complete()
+
+   task functions renamed:
+    function() -> function_name()
+    uuid()     -> unique()
+
+ * add client function add_task_status()
+ * add client/worker options(), add_options() and remove_options() functions
+ * add client/worker timeout() and set_timeout() functions
+ * add client/worker wait() function
+ * add worker functions register(), unregister() and unregister_all()
+ * add client clear_fn() function
+ * add task functions is_known() and is_running()
+
+0.5 - 2009-08-26
+ * extend makefile to support custom libgearman locations
+ * fix client hanging if worker functions return undef
+ * use Module::Install as Installer
+ * fix passing of warning payload in do_(high/low) functions
+
+0.4 - 2009-07-16
+ * fix perl compatibility issues
+ * add worker grab_job() function
+ * add job complete() function
+ * add job warning() function and ability to set a client warning callback function
+
+0.3 - 2009-07-14
+ * Fix freeing of job handle on connection error
+ * improve test suite (patch by Johannes Plunien)
+ * rework XS code
+
+0.2 - 2009-06-02
+ * Requires libgearman 0.7
+ * Fix bugs #379586 #380279
+ * Fix memory leak in result handling.
+ * replace malloc/free/strdup with perl safe* equivalents
+ * Fix binary workload and integer/long return values.
+ * Add job fail() function.
+ * Add client/worker add_servers() function.
+ * Add version information to all .pm files.
+ * Add note about callback return values.
+
+0.1 - 2009-05-22
+ * First release.

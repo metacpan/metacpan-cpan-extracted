@@ -1,0 +1,7 @@
+To install:
+	perl Makefile.PL
+	make
+	make test
+
+and then as root, if make test seems OK:
+	make install

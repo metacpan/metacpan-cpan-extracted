@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+use strict;
+use Gnome2;
+
+# $Id$
+
+###############################################################################
+
+SKIP: {
+  our $application;
+  do "t/TestBoilerplate";
+
+  #############################################################################
+
+  Gnome2::URL -> show("http://ftp.freenet.de");
+  Gnome2::URL -> show_with_env("http://ftp.freenet.de", [map { "$_=" . $ENV{ $_ } } (keys(%ENV))]);
+}

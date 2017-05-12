@@ -1,0 +1,13 @@
+Revision history for Perl extension GCCJIT.
+
+0.03  Fri Apr 22 20:18:11 2016
+	- fix undef warning in wrapper
+
+0.02  Mon Mar 14 21:40:26 2016
+	- compatibility patch for older perls
+	- more package metadata
+
+0.01  Wed Sep  9 18:36:45 2015
+	- original version; created by h2xs 1.23 with options
+		-O -x -n GCCJIT gccjit-perlready.h
+

@@ -1,0 +1,161 @@
+#!/usr/bin/perl
+$version = q$Id: listgate,v 0.6 1998/02/23 00:02:09 eagle Exp $;
+#
+# listgate -- Gateway incoming mailing lists to local newsgroups.
+#             Copyright 1998 by Russ Allbery <rra@stanford.edu>
+#              Based on code by Christopher Davis <ckd@loiosh.kei.com>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
+# This program is designed to take incoming mail messages from mailing lists
+# and post them to local newsgroups.  It takes the name of the mailing list
+# on the command line and adds a prefix (see the settings below) to come up
+# with the name of the newsgroup to post to.
+#
+# There are a variety of ways that one could convince your MTA to call this
+# program with the right syntax.  One of which would be to set up this
+# program as a sendmail mailer definition as follows:
+#
+# Mlistgate,	P=/usr/local/bin/listgate, F=DFMlmnS, U=news:news, S=10,
+# 		R=20/40, A=listgate $u
+#
+# and then set up a virtual domain that delivers all mail to that mailer and
+# subscribe addresses in that virtual domain to the mailing lists.  See
+# listgate.readme and listgate.m4 for more information.
+
+# Another way, if you're using qmail, is to (using either ~alias .qmail
+# files, virtual domains, or the qmail-users mapping method) make sure
+# that all incoming mailing list mail is delivered to
+# .qmail-gateway-LIST where LIST is the name of the mailing list and
+# then create .qmail-gateway-default with the content:
+#
+#       |/usr/local/bin/listgate "$EXT2"
+#
+# Please note that it's considered antisocial in the extreme to gateway
+# mailing lists to public newsgroups without the explicit permission of the
+# users and owner of the mailing list.  If you use this program, make sure
+# to gateway the mailing lists into a private hierarchy.  This program will
+# set the distribution of all articles posted to a value of your choice; I
+# recommend using that feature to make sure the articles remain local.
+
+############################################################################
+# Site configuration
+############################################################################
+
+# This is the newsgroup hierarchy into which messages should be posted.  For
+# example, if this is set to "example.mail" and the list name given on the
+# commandline is "list", the article will be posted to local.mail.list.
+$hierarchy = 'example.mail';
+
+# The distribution to be added to all articles posted.  This should be
+# something that will keep the articles on your local server and not
+# redistribute them to the world, even if they end up accidentally posted to
+# the wrong group.
+$distribution = 'example';
+
+# What to put in the Approved header.  It's recommended that you make all
+# local mailing list gateway groups moderated with the submission address
+# pointing to the mailing list submission address so that your users can
+# post to the groups normally.  If that's done, all posted articles have to
+# have an Approved header.  Since having an Approved header does no harm
+# even if the group is unmoderated, and since not having an Approved header
+# when the local group is moderated can create loops, this program always
+# adds one.
+$approved = 'usenet@example.com';
+
+# What to put in the Organization header.  It's probably best to include a
+# contact address, just in case of problems.
+$organization = "Local Mail/News Gateway <$approved>";
+
+# What to put in the Path header.  This is needed if you use rnews or ihave
+# injection.  Something that clearly marks the message as originating from a
+# mail-to-news gateway is recommended.
+$path = 'listgate.example.com!mail-to-news';
+
+# How to inject the articles into the news stream.  There are three options:
+#   rnews - feed the article directly into rnews
+#   ihave - post to a news server using IHAVE
+#   post  - post to a news server using POST
+# Use rnews if the host listgate runs on is the news server; use ihave
+# if the host listgate runs on is in hosts.nntp (or the equivalent); use
+# post if you absolutely must (but not otherwise).
+$inject = 'rnews';
+
+# Full path to your rnews or workalike; include arguments if needed.  This
+# needs to be a list, so if arguments are needed, you should set @rnews to
+# something like ('/bin/rnews', '-S', 'server').
+@rnews = ('/bin/rnews');
+
+
+############################################################################
+# Implementation
+############################################################################
+
+# Set this; we may run with special uid/gid, and we may exec rnews.
+$ENV{'PATH'} = '/bin:/usr/bin';
+
+use News::Gateway qw();
+
+use strict;
+use vars qw($approved $distribution $hierarchy $organization $version
+	    $path $inject @rnews);
+
+# Use this to report fatal error messages.  The exit code should work under
+# both qmail and sendmail, but under qmail it's more technically correct to
+# use 100.
+sub bounce { warn @_, "\n"; exit 64 }
+
+# Figure out what groups we'll be posting to from our command-line
+# arguments.
+my $newsgroups = join (',', map { $hierarchy . '.' . $_ } @ARGV);
+unless ($newsgroups) { bounce 'No newsgroups specified' }
+
+# Create our gateway object, non-interactive, setting the maintainer address
+# to $approved, and load the hooks for our modules.
+my $gateway = News::Gateway->new (0, $approved);
+$gateway->modules ('mailpath',
+                   'headers',
+                   mailtonews => [$newsgroups],
+                   'mungeids');
+
+# Read the configuration information at the end of this script.
+$gateway->config_file (\*DATA);
+
+# Initialize a couple more things from our site configuration.
+$gateway->config ('header', 'organization', 'replace', $organization);
+$gateway->config ('header', 'approved', 'replace', $approved);
+$gateway->config ('header', 'distribution', 'replace', $distribution);
+$gateway->config ('header', 'path', 'replace', $path);
+
+# Read in the message (moved up so we can do the rewrites).
+$gateway->read (\*STDIN);
+
+# Run our rewrites.  If nothing fails, post the message.  Otherwise, drop
+# the message on the floor, since if we're gating mailing list traffic,
+# there really isn't anything reasonable we can do with failed posts.  This
+# is why using rnews if possible is recommended, since it has a fallback
+# mechanism for posting failure.
+my $error = $gateway->apply ();
+unless ($error) {
+  # If any injection fails, we drop the article.
+  if    ($inject eq 'post')  { $error = $gateway->post ()               }
+  elsif ($inject eq 'ihave') { $error = $gateway->post_ihave ()         }
+  elsif ($inject eq 'rnews') { $error = $gateway->post_program (@rnews) }
+  else  { bounce "Unknown injection method $inject" }
+}
+
+__END__
+
+############################################################################
+# Configuration directives
+############################################################################
+
+# These renames could probably be changed to drops if you feel like it
+# and don't need the additional information.  We rename the To and Cc
+# headers just in case because some news servers don't cope well with
+# messages in moderated groups containing To and Cc headers.  We drop
+# the Newsgroups header because it may cause conflicts.
+header cc         rename
+header to         rename
+header newsgroups drop

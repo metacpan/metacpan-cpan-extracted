@@ -1,0 +1,190 @@
+C001  0    1  Shetland Islands (Yell & Unst)    
+C002  0    2  Shetland Islands (North Mainland) 
+C003  0    3  Shetland Islands (Lerwick)        
+C004  0    4  Shetland Islands (South Mainland) 
+C005  0    5  Orkney Islands (North)            
+C006  0    6  Orkney Islands (Kirkwall)         
+C007  0    7  Pentland Firth                    
+C008  0    8  Isle of Lewis (Stornoway)         
+C009  0    9  Cape Wrath                        
+C010  0   10  Tongue                            
+C011  0   11  Thurso                            
+C012  0   12  Isle of Lewis & North Harris      
+C013  0   13  Loch Inver & Loch Assynt          
+C014  0   14  Lairg                             
+C015  0   15  Helmsdale                         
+C016  0   16  Wick                              
+C017  0   17  North Uist                        
+C018  0   18  Harris                            
+C019  0   19  Gairloch                          
+C020  0   20  Ullapool                          
+C021  0   21  Bonar-Bridge                      
+C022  0   22  Dornoch                           
+C023  0   23  South Uist                        
+C024  0   24  North Skye                        
+C025  0   25  Portree                           
+C026  0   26  Lochcarron                        
+C027  0   27  Strathpeffer                      
+C028  0   28  Inverness                         
+C029  0   29  Elgin                             
+C030  0   30  Banff                             
+C031  0   31  Peterhead                         
+C032  0   32  Barra                             
+C033  0   33  Rhum and part of Skye             
+C034  0   34  South Skye & Arisaig              
+C035  0   35  Loch Arkaig                       
+C036  0   36  Fort Augustus                     
+C037  0   37  Kingussie                         
+C038  0   38  Grantown and Cairngorm            
+C039  0   39  Strathdon                         
+C040  0   40  Aberdeen                          
+C041  0   41  Braemar                           
+C042  0   42  Ballater                          
+C043  0   43  Stonehaven                        
+C044  0   44  Coll & Tiree                      
+C045  0   45  Sound of Mull                     
+C046  0   46  Loch Linnhe                       
+C047  0   47  Glen Coe                          
+C048  0   48  Loch Tay                          
+C049  0   49  Blairgowrie                       
+C050  0   50  Forfar                            
+C051  0   51  Iona & Colonsay                   
+C052  0   52  Loch Awe                          
+C053  0   53  Loch Lomond                       
+C054  0   54  Stirling                          
+C055  0   55  Perth & Alloa                     
+C056  0   56  St Andrews and Kirkcaldy          
+C057  0   57  Islay                             
+C058  0   58  Knapdale                          
+C059  0   59  Firth of Clyde                    
+C060  0   60  Glasgow                           
+C061  0   61  Falkirk & Lanark                  
+C062  0   62  Edinburgh                         
+C063  0   63  Dunbar                            
+C064  0   64  Berwick-upon-Tweed                
+C065  0   65  Kintyre                           
+C066  0   66  Island of Arran                   
+C067  0   67  Ayr                               
+C068  0   68  Biggar                            
+C069  0   69  Selkirk                           
+C070  0   70  Jedburgh                          
+C071  0   71  Alnwick                           
+C072  0   72  Girvan                            
+C073  0   73  New Galloway                      
+C074  0   74  Dumfries                          
+C075  0   75  Dumfries & Gretna                 
+C076  0   76  Carlisle                          
+C077  0   77  Hexham                            
+C078  0   78  Newcastle upon Tyne               
+C079  0   79  Stranraer                         
+C080  0   80  Kirkcudbright                     
+C081  0   81  Dalbeattie                        
+C082  0   82  Keswick                           
+C083  0   83  Penrith                           
+C084  0   84  Teesdale                          
+C085  0   85  Durham                            
+C086  0   86  Redcar & Whitby                   
+C087  0   87  Isle of Man                       
+C088  0   88  Barrow in Furness                 
+C089  0   89  Lancaster and Kendal              
+C090  0   90  Wensleydale                       
+C091  0   91  Ripon                             
+C092  0   92  Pickering                         
+C093  0   93  Scarborough                       
+C094  0   94  Preston                           
+C095  0   95  Blackburn & Burnley               
+C096  0   96  Leeds & Bradford                  
+C097  0   97  York                              
+C098  0   98  Market Weighton                   
+C099  0   99  Hull                              
+C100  0  100  Liverpool                         
+C101  0  101  Manchester                        
+C102  0  102  Huddersfield                      
+C103  0  103  Doncaster                         
+C104  0  104  Gainsborough                      
+C105  0  105  Grimsby                           
+C106  0  106  Anglesey                          
+C107  0  107  Snowdon                           
+C108  0  108  Denbigh                           
+C109  0  109  Chester                           
+C110  0  110  Stoke on Trent                    
+C111  0  111  Buxton & Matlock                  
+C112  0  112  Nottingham                        
+C113  0  113  Lincoln & Grantham                
+C114  0  114  Boston & Skegness                 
+C115  0  115  Pwllheli                          
+C116  0  116  Dolgellau                         
+C117  0  117  Bala & Welshpool                  
+C118  0  118  Shrewsbury                        
+C119  0  119  Stafford                          
+C120  0  120  Burton upon Trent                 
+C121  0  121  Derby & Leicester                 
+C122  0  122  Melton Mowbray                    
+C123  0  123  Spalding                          
+C124  0  124  Kings Lynn                        
+C125  0  125  Fakenham                          
+C126  0  126  Norwich                           
+C127  0  127  Aberystwyth                       
+C128  0  128  Montgomery and Llandrindod Wells  
+C129  0  129  Ludlow                            
+C130  0  130  Kidderminster                     
+C131  0  131  Birmingham                        
+C132  0  132  Coventry & Rugby                  
+C133  0  133  Northampton                       
+C134  0  134  Huntingdon & Peterborough         
+C135  0  135  Cambridge & Ely                   
+C136  0  136  Bury St Edmunds                   
+C137  0  137  Lowestoft                         
+C138  0  138  Fishguard                         
+C139  0  139  Cardigan                          
+C140  0  140  Llandovery                        
+C141  0  141  Brecon                            
+C142  0  142  Hereford                          
+C143  0  143  Gloucester & Malvern              
+C144  0  144  Cheltenham & Evesham              
+C145  0  145  Banbury                           
+C146  0  146  Buckingham                        
+C147  0  147  Bedford & Luton                   
+C148  0  148  Saffron Walden                    
+C149  0  149  Colchester                        
+C150  0  150  Ipswich                           
+C151  0  151  Pembroke                          
+C152  0  152  Carmarthen and Tenby              
+C153  0  153  Swansea                           
+C154  0  154  Cardiff                           
+C155  0  155  Bristol & Newport                 
+C156  0  156  Bristol & Stroud                  
+C157  0  157  Swindon                           
+C158  0  158  Oxford & Newbury                  
+C159  0  159  The Chilterns                     
+C160  0  160  London NW                         
+C161  0  161  London NE                         
+C162  0  162  Southend-on-Sea                   
+C163  0  163  Barnstaple                        
+C164  0  164  Minehead                          
+C165  0  165  Weston-super-Mare                 
+C166  0  166  Frome                             
+C167  0  167  Salisbury                         
+C168  0  168  Winchester                        
+C169  0  169  Aldershot                         
+C170  0  170  London SW                         
+C171  0  171  London SE                         
+C172  0  172  Chatham & Maidstone               
+C173  0  173  East Kent                         
+C174  0  174  Bude                              
+C175  0  175  Okehampton                        
+C176  0  176  Exeter                            
+C177  0  177  Taunton & Lyme Regis              
+C178  0  178  Dorchester                        
+C179  0  179  Bournemouth                       
+C180  0  180  The Solent                        
+C181  0  181  Chichester                        
+C182  0  182  Brighton & Worthing               
+C183  0  183  Eastbourne                        
+C184  0  184  Hastings                          
+C185  0  185  Newquay & Padstow                 
+C186  0  186  Bodmin & Launceston               
+C187  0  187  Plymouth                          
+C188  0  188  Torbay                            
+C189  0  189  Lands End                         
+C190  0  190  Truro & Falmouth                  

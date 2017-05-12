@@ -1,0 +1,80 @@
+=encoding utf8
+
+=head1 NAME
+
+Geo::EOP::Util - EOP useful constants
+
+=head1 INHERITANCE
+
+ Geo::EOP::Util
+   is a Exporter
+
+=head1 SYNOPSIS
+
+  use Geo::EOP::Util ':eop11';
+
+=head1 DESCRIPTION
+
+Defines the namespaces used with EOP.
+
+=head1 FUNCTIONS
+
+=head2 Constants
+
+All export tags defined NS_ATM_ESA, NS_SAR_ESA for EOP/HMA.
+
+The constants have names which end with C<_ESA>, because I expect them
+to move to the opengis name-space in the forseeable future.  Those new
+names will not have the shorter constant name.
+
+=head3 :hma10
+
+Exports NS_OHR_ESA and NS_HMA_ESA as well.
+
+=head3 :eop11
+
+Exports NS_OPT_ESA and NS_EOP_ESA as well.
+
+=head3 :eop12beta
+
+Same exports as C<:eop11>
+
+=head3 :eop121
+
+Same exports as C<:eop11>
+
+=head1 SEE ALSO
+
+This module is part of Geo-EOP distribution version 0.50,
+built on July 21, 2015. Website: F<http://perl.overmeer.net/geo/>
+All modules in this suite:
+L</Geo::GML>,
+L</Geo::ISO19139>,
+L</Geo::EOP>,
+L</Geo::Point>,
+L</Geo::Proj4>,
+L</Geo::WKT>, and
+L</Math::Polygon>.
+
+Please post questions or ideas to
+F<https://list.hut.fi/mailman/listinfo/geo-perl|the Geo-Perl mailinglist>
+
+=head1 COPYRIGHTS
+
+=head2 License of the CODE
+
+Copyrights of the perl code and the related documentation by
+2008-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+
+=head2 License of the SCHEMAS
+
+The included schemas are copyrighted by the Open Geospatial Consortium, Inc.
+They are unmodified copied from the files at F<http://schemas.opengis.net>.
+Read OGCs disclaimer and copyright statements on documentation and software
+at F<http://www.opengeospatial.org/ogc/legal>.  The license text is also
+included in this CPAN distribution.
+

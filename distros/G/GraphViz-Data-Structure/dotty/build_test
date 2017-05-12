@@ -1,0 +1,221 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+build_test - build/verify the test data for GraphViz::Data::Structure
+
+=head1 SYNOPSIS
+
+Run C<dotty> and verify that the test is visually correct:
+
+  build_test testname
+
+Build the tests without running C<dotty>:
+
+  build_test --no-dotty testname
+
+=head1 DESCRIPTION
+
+C<GraphViz::Data::Structure> is a bit more difficult to test than some 
+Perl modules. Since "bad" (i.e., visually-unappealing or incorrect) output
+can only be checked visually, we have a bit of a problem turning this into
+text-based tests. 
+
+C<build_tests> gets around this problem by creating a "pre-test" suite for 
+C<GraphViz::Data::Structure>. Each pre-test runs a set of data structures
+through C<GraphViz::Data::Structure>; the output is run through C<dotty> to
+allow the developer to do the visual check. At the same time, a C<.t> file
+is created in the module's C</t> directory; this C<.t> file can check the 
+output of C<GraphViz::Data::Structure> to make sure that the output is 
+consistent.
+
+=head1 DEVELOPMENT USAGE
+
+It is recommended that anyone developing, modifying, or maintaining 
+C<GraphViz::Data::Structure> run C<build_test> as needed after each change to 
+verify that the modifications that were made do indeed draw the correct
+picture. Often it will be found that running just a single test build
+will be sufficient to check the enw code, but you should always run all of
+them before signing off on a change.
+
+If new functionality is added to C<GraphViz::Data::Structure>, new tests
+should be added to the C<data.in> files in this directory to ensure that
+the new features get both a visual check and a test in the test suite.
+
+=head1 WARNINGS
+
+Running all the tests together from one driver program can lead to problems
+with cross-contamination of the old with the new; this is paticularly a 
+problem with globs. This is why the tests are run one by one.
+
+=head1 data.in FILES
+
+The C<data.in> files have the following format:
+
+  (name => 'undef',
+   code => 'GraphViz::Data::Structure->new(undef)->graph->as_canon',
+  )
+  %%
+  (name => 'atom',
+   code => 'GraphViz::Data::Structure->new(1)->graph->as_canon',
+  )
+  %%
+  ...
+
+Each one is a valid hash initializer, with the C<name> and C<code> keys
+required. The name is the name to be associated with the test, and C<code>
+is the actual code to be executed to create and visualize the data structure.
+
+You should name your C<data.in> files in a manner consistent with the other
+tests: ddname.data.in, where "dd" is a two-digit number, and "name" is an
+arbitrary name to be associated with the test(s) in this file.
+
+=head1 USE
+
+When you add or change function in C<GraphViz::Data::Structure>, do the 
+following:
+
+=over 4
+
+=item 1. Create a new C<data.in> file containing the tests you want to run.
+
+=item 2. In this directory, run C<perl build_test testname>.
+
+=item 3. Verify that the output of the test is visually pleasing and accurate.
+
+=item 4. C<cd ..> and run C<make test> to verify that the new test is OK and passes.
+
+=back
+
+=head1 NOTES
+
+Obviously, it would be nice if there was an easy way to get the C<Makefile.PL>
+to handle the running of C<build_tests> appropriately, but there doesn't seem
+to be an easy way to do that.
+
+Always remember: you have to do a C<make> before re-running C<build_tests> 
+when you've changed the module! Otherwise you build tests based on the old
+code instead of the new changes.
+
+=cut
+
+# Ensure we're running with the most current version of the module.
+BEGIN {
+  unshift @INC,'../lib';
+}
+
+use GraphViz::Data::Structure;
+use File::Spec;
+use Getopt::Long;
+
+# When you interpolate arrays, separate the elements with newlines.
+$" = "\n";
+
+
+# If --no-dotty is on the command line, skip running dotty and just save tests.
+GetOptions("no-dotty"=>\$skip_dotty);
+$skip_dotty = 0 unless defined $skip_dotty;
+
+# Get the name of the test to run.
+my $testname = shift;
+
+# Originally, this code ran all of the tests at once. This was both very slow
+# if you just wanted to check one kind of item, and also error-prone; the tests
+# (especially if fiddling with globals is done) can interact and produce output
+# different from what they produce when run individually.
+foreach my $test ($testname) {
+  print "*** $test\n";
+  open TESTDATA, "<$test" or die "Can't open $test: $!\n";
+  $test =~ s/\.data\.in//;
+  # Determine where output will be written.
+  my($volume,$directories,$file) = File::Spec->splitpath($test);
+  my $outfile = File::Spec->catdir(File::Spec->updir,"t","$file.t");
+  open PROGRAM, ">$outfile" or die "Can't open $outfile: $!\n";
+
+  # Run the test, capturing the canonical dot output.
+  # Each test gets a '%%' separator after the first one.
+  my $first_is_out = 0;
+  my $tests_count = 0;
+  my @__data__ = ();
+  while (my $current = get_current()) {
+    %hash = eval $current;
+    print $hash{name},"\n";
+    $hash{'code'} =~ s/%title%/graph=>{label=>"$hash{name}"}/;
+    $hash{'out'} = eval $hash{'code'};
+    print "FAILED: $@\n" if $@;
+    unless ($skip_dotty) {
+      open DOTTY,"|dotty -" or die "Can't talk to dotty: $!";
+      print DOTTY $hash{'out'};
+      close DOTTY;
+    }
+  
+    # reading and eval will strip an extra set of backslashes,
+    # so we put some extras in as appropriate.
+    $hash{'out'}  =~ s/\\/\\\\/g;
+    $hash{'code'} =~ s/\\/\\\\/g;
+    $hash{'out'} = normalize($hash{'out'});
+  
+    # Now save it.
+    push @__data__, "%%" if $first_is_out++;
+    push @__data__, <<EOF;
+(name => '$hash{"name"}',
+ code => '$hash{"code"}',
+ out  => qq($hash{"out"}
+)
+)
+EOF
+  $tests_count++;
+  }
+  chomp @__data__;      # there should only be one newline per
+  print PROGRAM <<EOF;
+#!/usr/bin/perl -w
+
+BEGIN {
+  unshift \@INC,'../lib';
+}
+
+use Test::More tests=>$tests_count;
+use GraphViz::Data::Structure;
+
+while (my \$current = get_current()) {
+  \%hash = eval \$current;
+  my \$result = eval \$hash{'code'};
+  die \$@ if \$@;
+  is (normalize(\$result), normalize(\$hash{'out'}), \$hash{'name'});
+}
+
+sub get_current {
+   my \$code = "";
+   while (<DATA>) {
+   last if /%%/;
+   \$code .= \$_;
+   }
+   \$code;
+}
+
+sub normalize { @_ }
+
+__DATA__
+@__data__
+EOF
+}
+
+# This subroutine reads the test input from __DATA__, one test at a time.
+sub get_current {
+   my $code = "";
+   while (<TESTDATA>) {
+   last if /%%/;
+   $code .= $_;
+   }
+   $code;
+}
+
+# This subroutine cleans out excess whitespace and newlines to allow the 
+# actually-obtained output to be checked agains the projected output.
+# Simpler than a lot of regex-based fiddling, and it works. The sort is
+# necessary to deboggle the output if nodes are not output in strict order.
+sub normalize {
+   my $string = shift;
+   my @strings = split /\\n/, $string;
+   join("\n", sort @strings);
+}

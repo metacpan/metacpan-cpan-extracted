@@ -1,0 +1,23 @@
+
+
+=pod
+
+=head1 NAME
+
+gmt - bioinformatics tools for genomics
+
+
+
+=head1 VERSION
+
+This document describes gmt version 0.05.
+
+=head1 SUB-COMMANDS
+
+ install  [NAME]  install more modules 
+
+
+
+
+=cut
+

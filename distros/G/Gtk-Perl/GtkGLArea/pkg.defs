@@ -1,0 +1,10 @@
+(define-object GtkGLArea (GtkDrawingArea) (cast GTK_GL_AREA))
+
+(define-boxed GdkGLContext
+	gdk_gl_context_ref
+	gdk_gl_context_unref)
+
+(define-boxed GdkGLPixmap
+	gdk_gl_pixmap_ref
+	gdk_gl_pixmap_unref)
+

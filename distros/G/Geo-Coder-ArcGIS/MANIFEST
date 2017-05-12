@@ -1,0 +1,18 @@
+Changes
+ex/custom-useragent.pl
+lib/Geo/Coder/ArcGIS.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_compile.t
+t/01_new.t
+xt/kwalitee.t
+xt/live.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/portability_filenames.t
+xt/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+[Wed Oct 19 09:20:02 2011] [error] [client ::1] Argument "" isn't numeric in subtraction (-) at /var/www/cgi-bin/swiss/root/src/pairtable.tt2 line 3., referer: http://localhost/swiss/tournaments/rounds
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] WARNING: U9916027 and U9931016 have the same name: Eric. Proceeding, but BEWARE there may be problems later, at /var/www/cgi-bin/swiss/script_files/../lib/Swiss/Model/GTS.pm line 431, referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] White role replaced by Bye at /usr/local/share/perl5/Games/Tournament/Contestant/Swiss.pm line 141., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] Player U9931028 game in round 1? at /usr/local/share/perl5/Games/Tournament/Swiss.pm line 495., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] Player U9931105 game in round 2? at /usr/local/share/perl5/Games/Tournament/Swiss.pm line 495., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] Player U9931034 game in round 2? at /usr/local/share/perl5/Games/Tournament/Swiss.pm line 495., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] Player U9931101 game in round 2? at /usr/local/share/perl5/Games/Tournament/Swiss.pm line 495., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] Player U9931028 had Bye in round 1? at /usr/local/share/perl5/Games/Tournament/Swiss.pm line 565., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] Player U9931105 had Bye in round 2? at /usr/local/share/perl5/Games/Tournament/Swiss.pm line 565., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] Player U9931034 had Bye in round 2? at /usr/local/share/perl5/Games/Tournament/Swiss.pm line 565., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:20:08 2011] [error] [client ::1] Player U9931101 had Bye in round 2? at /usr/local/share/perl5/Games/Tournament/Swiss.pm line 565., referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:22:08 2011] [warn] [client ::1] Timeout waiting for output from CGI script /var/www/cgi-bin/swiss/script_files/swiss_cgi.pl, referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:22:08 2011] [error] [client ::1] Script timed out before returning headers: swiss_cgi.pl, referer: http://localhost/swiss/tournaments/absentees
+[Wed Oct 19 09:24:08 2011] [warn] [client ::1] Timeout waiting for output from CGI script /var/www/cgi-bin/swiss/script_files/swiss_cgi.pl, referer: http://localhost/swiss/tournaments/absentees

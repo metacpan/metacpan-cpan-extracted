@@ -1,0 +1,17 @@
+HTTP/1.1 401 Unauthorized
+Connection: close
+Date: Wed, 15 Jun 2016 19:52:41 GMT
+Server: nginx
+Content-Length: 74
+Content-Type: application/json;charset=UTF-8
+Client-Response-Num: 1
+Client-SSL-Cert-Issuer: /C=US/O=GeoTrust Inc./CN=RapidSSL SHA256 CA - G3
+Client-SSL-Cert-Subject: /OU=GT36478046/OU=See www.rapidssl.com/resources/cps (c)15/OU=Domain Control Validated - RapidSSL(R)/CN=*.what3words.com
+Client-SSL-Cipher: ECDHE-RSA-AES128-SHA
+Client-SSL-Socket-Class: IO::Socket::SSL
+Client-Warning: Missing Authenticate header
+
+{
+    "code": 2,
+    "message": "Authentication failed; invalid API key"
+}

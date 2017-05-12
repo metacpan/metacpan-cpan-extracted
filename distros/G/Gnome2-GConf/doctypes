@@ -1,0 +1,5 @@
+GConfValue	value
+GConfEntry	entry
+GConfSchema	schema
+GConfChangeSet	changeset
+GConfEngine	engine

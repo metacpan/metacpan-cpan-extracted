@@ -1,0 +1,264 @@
+FROM FILENAME:
+$VAR1 = {
+  ACQUISITION_DATE => '2006-07-25',
+  ENDING_ROW => 4,
+  SPACECRAFT_ID => 'Landsat5',
+  STARTING_ROW => '024',
+  WRS_PATH => '198'
+};
+FROM CONTENT:
+TYPE=L1_METADATA_FILE
+$VAR1 = {
+  CORRECTIONS_APPLIED => {
+    BANDING => 'N',
+    COHERENT_NOISE => 'N',
+    DROPPED_LINES => 'N',
+    INOPERABLE_DETECTORS => 'N',
+    MEMORY_EFFECT => 'Y',
+    SCAN_CORRELATED_SHIFT => 'Y',
+    STRIPING_BAND1 => 'NONE',
+    STRIPING_BAND2 => 'NONE',
+    STRIPING_BAND3 => 'NONE',
+    STRIPING_BAND4 => 'NONE',
+    STRIPING_BAND5 => 'NONE',
+    STRIPING_BAND6 => 'NONE',
+    STRIPING_BAND7 => 'NONE'
+  },
+  map_projection => bless( {
+    GP_name => 'Universal Transverse Mercator',
+    GP_nick => 'utm31-wgs84',
+    GP_proj4 => bless( do{\(my $o = 137928280)}, 'Geo::Proj4' ),
+    GP_srid => undef
+  }, 'Geo::Proj' ),
+  METADATA_FILE_INFO => {
+    DATEHOUR_CONTACT_PERIOD => '0620610',
+    GROUND_STATION => 'KIS',
+    LANDSAT5_XBAND => '1',
+    landsat_xband => '1',
+    LPS_PROCESSOR_NUMBER => '0',
+    ORIGIN => 'Image courtesy of the U.S. Geological Survey',
+    PRODUCT_CREATION_TIME => '2009-01-24T10:10:55Z',
+    REQUEST_ID => '0800901220025_00001',
+    request_id => {
+      date_iso => '2009-01-22Z',
+      dorran_unit => '1',
+      node => '80',
+      seqnr => '25'
+    },
+    STATION_ID => 'EDC',
+    SUBINTERVAL_NUMBER => '01'
+  },
+  MIN_MAX_PIXEL_VALUE => {
+    QCALMAX_BAND1 => '255.0',
+    QCALMAX_BAND2 => '255.0',
+    QCALMAX_BAND3 => '255.0',
+    QCALMAX_BAND4 => '255.0',
+    QCALMAX_BAND5 => '255.0',
+    QCALMAX_BAND6 => '255.0',
+    QCALMAX_BAND7 => '255.0',
+    QCALMIN_BAND1 => '1.0',
+    QCALMIN_BAND2 => '1.0',
+    QCALMIN_BAND3 => '1.0',
+    QCALMIN_BAND4 => '1.0',
+    QCALMIN_BAND5 => '1.0',
+    QCALMIN_BAND6 => '1.0',
+    QCALMIN_BAND7 => '1.0'
+  },
+  MIN_MAX_RADIANCE => {
+    LMAX_BAND1 => '193.000',
+    LMAX_BAND2 => '365.000',
+    LMAX_BAND3 => '264.000',
+    LMAX_BAND4 => '221.000',
+    LMAX_BAND5 => '30.200',
+    LMAX_BAND6 => '15.303',
+    LMAX_BAND7 => '16.500',
+    LMIN_BAND1 => '-1.520',
+    LMIN_BAND2 => '-2.840',
+    LMIN_BAND3 => '-1.170',
+    LMIN_BAND4 => '-1.510',
+    LMIN_BAND5 => '-0.370',
+    LMIN_BAND6 => '1.238',
+    LMIN_BAND7 => '-0.150'
+  },
+  PRODUCT_METADATA => {
+    ACQUISITION_DATE => '2006-07-25',
+    BAND1_FILE_NAME => 'L5198024_02420060725_B10.TIF',
+    BAND2_FILE_NAME => 'L5198024_02420060725_B20.TIF',
+    BAND3_FILE_NAME => 'L5198024_02420060725_B30.TIF',
+    BAND4_FILE_NAME => 'L5198024_02420060725_B40.TIF',
+    BAND5_FILE_NAME => 'L5198024_02420060725_B50.TIF',
+    BAND6_FILE_NAME => 'L5198024_02420060725_B60.TIF',
+    BAND7_FILE_NAME => 'L5198024_02420060725_B70.TIF',
+    BAND_COMBINATION => '1234567',
+    CPF_FILE_NAME => 'L5CPF20060701_20060930_04',
+    ENDING_ROW => '24',
+    EPHEMERIS_TYPE => 'DEFINITIVE',
+    footprint => bless( {
+      G_proj => 'wgs84',
+      GS_comp => [
+        bless( {
+          MS_inner => [],
+          MS_outer => bless( {
+            G_proj => 'wgs84',
+            GL_bbox => undef,
+            GL_fill => 1,
+            GL_ring => 1,
+            MP_bbox => undef,
+            MP_clockwise => 1,
+            MP_points => [
+              [
+                '3.3875954',
+                '52.6858919'
+              ],
+              [
+                '7.0568599',
+                '52.6170298'
+              ],
+              [
+                '6.8836909',
+                '50.6364651'
+              ],
+              [
+                '3.3709992',
+                '50.7006272'
+              ],
+              $VAR1->{PRODUCT_METADATA}{footprint}{GS_comp}[0]{MS_outer}{MP_points}[0]
+            ]
+          }, 'Geo::Line' )
+        }, 'Math::Polygon::Surface' )
+      ]
+    }, 'Geo::Surface' ),
+    footprint_map => bless( {
+      G_proj => 'utm31-wgs84',
+      GS_comp => [
+        bless( {
+          MS_inner => [],
+          MS_outer => bless( {
+            G_proj => 'utm31-wgs84',
+            GL_bbox => undef,
+            GL_fill => 1,
+            GL_ring => 1,
+            MP_bbox => undef,
+            MP_clockwise => 1,
+            MP_points => [
+              [
+                '526200.000',
+                '5837400.000'
+              ],
+              [
+                '774600.000',
+                '5837400.000'
+              ],
+              [
+                '774600.000',
+                '5616600.000'
+              ],
+              [
+                '526200.000',
+                '5616600.000'
+              ],
+              $VAR1->{PRODUCT_METADATA}{footprint_map}{GS_comp}[0]{MS_outer}{MP_points}[0]
+            ]
+          }, 'Geo::Line' )
+        }, 'Math::Polygon::Surface' )
+      ]
+    }, 'Geo::Surface' ),
+    METADATA_L1_FILE_NAME => 'L5198024_02420060725_MTL.txt',
+    PROCESSING_SOFTWARE => 'LPGS_9.3.0',
+    PRODUCT_LINES_REF => '7361',
+    PRODUCT_LINES_THM => '3681',
+    PRODUCT_LL_CORNER_LAT => '50.7006272',
+    PRODUCT_LL_CORNER_LON => '3.3709992',
+    PRODUCT_LL_CORNER_MAPX => '526200.000',
+    PRODUCT_LL_CORNER_MAPY => '5616600.000',
+    product_ll_map => bless( {
+      G_proj => 'utm31-wgs84',
+      GP_x => '526200.000',
+      GP_y => '5616600.000'
+    }, 'Geo::Point' ),
+    product_ll_wgs84 => bless( {
+      G_proj => 'wgs84',
+      GP_x => '3.3709992',
+      GP_y => '50.7006272'
+    }, 'Geo::Point' ),
+    PRODUCT_LR_CORNER_LAT => '50.6364651',
+    PRODUCT_LR_CORNER_LON => '6.8836909',
+    PRODUCT_LR_CORNER_MAPX => '774600.000',
+    PRODUCT_LR_CORNER_MAPY => '5616600.000',
+    product_lr_map => bless( {
+      G_proj => 'utm31-wgs84',
+      GP_x => '774600.000',
+      GP_y => '5616600.000'
+    }, 'Geo::Point' ),
+    product_lr_wgs84 => bless( {
+      G_proj => 'wgs84',
+      GP_x => '6.8836909',
+      GP_y => '50.6364651'
+    }, 'Geo::Point' ),
+    PRODUCT_SAMPLES_REF => '8281',
+    PRODUCT_SAMPLES_THM => '4141',
+    PRODUCT_TYPE => 'L1G',
+    PRODUCT_UL_CORNER_LAT => '52.6858919',
+    PRODUCT_UL_CORNER_LON => '3.3875954',
+    PRODUCT_UL_CORNER_MAPX => '526200.000',
+    PRODUCT_UL_CORNER_MAPY => '5837400.000',
+    product_ul_map => bless( {
+      G_proj => 'utm31-wgs84',
+      GP_x => '526200.000',
+      GP_y => '5837400.000'
+    }, 'Geo::Point' ),
+    product_ul_wgs84 => bless( {
+      G_proj => 'wgs84',
+      GP_x => '3.3875954',
+      GP_y => '52.6858919'
+    }, 'Geo::Point' ),
+    PRODUCT_UR_CORNER_LAT => '52.6170298',
+    PRODUCT_UR_CORNER_LON => '7.0568599',
+    PRODUCT_UR_CORNER_MAPX => '774600.000',
+    PRODUCT_UR_CORNER_MAPY => '5837400.000',
+    product_ur_map => bless( {
+      G_proj => 'utm31-wgs84',
+      GP_x => '774600.000',
+      GP_y => '5837400.000'
+    }, 'Geo::Point' ),
+    product_ur_wgs84 => bless( {
+      G_proj => 'wgs84',
+      GP_x => '7.0568599',
+      GP_y => '52.6170298'
+    }, 'Geo::Point' ),
+    SENSOR_ID => 'TM',
+    SENSOR_MODE => 'BUMPER',
+    software_system => 'LPGS',
+    software_version => '9.3.0',
+    SPACECRAFT_ID => 'Landsat5',
+    STARTING_ROW => '24',
+    WRS_PATH => '198'
+  },
+  PRODUCT_PARAMETERS => {
+    CORRECTION_METHOD_BIAS => 'IC',
+    CORRECTION_METHOD_GAIN_BAND1 => 'CPF',
+    CORRECTION_METHOD_GAIN_BAND2 => 'CPF',
+    CORRECTION_METHOD_GAIN_BAND3 => 'CPF',
+    CORRECTION_METHOD_GAIN_BAND4 => 'CPF',
+    CORRECTION_METHOD_GAIN_BAND5 => 'CPF',
+    CORRECTION_METHOD_GAIN_BAND6 => 'IC',
+    CORRECTION_METHOD_GAIN_BAND7 => 'CPF',
+    OUTPUT_FORMAT => 'GEOTIFF',
+    SUN_AZIMUTH => '146.8131143',
+    SUN_ELEVATION => '54.3986101'
+  },
+  PROJECTION_PARAMETERS => {
+    GRID_CELL_SIZE_REF => '30.000',
+    GRID_CELL_SIZE_THM => '60.000',
+    MAP_PROJECTION => 'UTM',
+    orientation => 'North Up',
+    ORIENTATION => 'NUP',
+    REFERENCE_DATUM => 'WGS84',
+    REFERENCE_ELLIPSOID => 'WGS84',
+    resampling_option => 'Cubic Convolution',
+    RESAMPLING_OPTION => 'CC'
+  },
+  UTM_PARAMETERS => {
+    ZONE_NUMBER => '31'
+  }
+};

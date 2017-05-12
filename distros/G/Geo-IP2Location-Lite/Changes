@@ -1,0 +1,31 @@
+Revision history for Perl extension Geo::IP2Location::Lite
+
+0.10     2016-12-02
+        - Fix some warnings from uninitialized vars
+
+0.09     2016-09-15
+        - Increase test coverage
+
+0.08     2016-09-01
+        - Bring up to date with recent changes in Geo::IP2Location
+        - Support new BIN file with index to speed up query time
+        - Remove dependency on bigint, improves performance by x25
+          as bigint is not required for IPv4 lookup
+
+0.07     2016-05-17
+        - Transfer repo from G3S to Humanstate
+
+0.06     2015-10-21
+        - Move github repo to G3S org
+
+0.04     2015-09-10
+        - Fix some warnings from uninitialized vars
+
+0.03     2014-12-15
+        - Couple of non-impacting dist quality tweaks
+
+0.02     2014-12-12
+        - Test fix for non english locales
+
+0.01     2014-12-11
+        - First release

@@ -1,0 +1,37 @@
+---
+abstract: 'Perl class for reading a graph from unicode tree text format.'
+author:
+  - 'Michal Spacek <skim@cpan.org>'
+build_requires:
+  Encode: 0
+  ExtUtils::MakeMaker: 6.36
+  File::Object: 0.07
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Graph-Reader-UnicodeTree
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Encode: 0
+  Graph::Reader: 0
+  Readonly: 0
+  perl: 5.6.2
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Graph-Reader-UnicodeTree
+  homepage: https://github.com/tupinek/Graph-Reader-UnicodeTree
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/tupinek/Graph-Reader-UnicodeTree
+version: '0.02'

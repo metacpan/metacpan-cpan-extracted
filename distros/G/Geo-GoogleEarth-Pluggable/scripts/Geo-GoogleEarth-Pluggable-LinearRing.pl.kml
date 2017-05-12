@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+  <Document>
+    <name>My Document</name>
+    <Snippet maxLines="0"/>
+    <Placemark>
+      <name>My LinearRing</name>
+      <Snippet maxLines="0"/>
+      <Polygon>
+        <tessellate>1</tessellate>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>-77.1,38.5,0 -77.2,38.6,0 -77.2,38.7,0 -77.1,38.8,0 -77.1,38.5,0</coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Document>
+</kml>

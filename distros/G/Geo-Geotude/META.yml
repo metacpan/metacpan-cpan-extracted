@@ -1,0 +1,22 @@
+---
+name: Geo-Geotude
+version: 1.0
+author:
+  - 'Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>'
+abstract: foo
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Memoize: 0
+  POSIX: 0
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  Geo::Geotude:
+    file: lib/Geo/Geotude.pm
+    version: 1.0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,17 @@
+Revision history for Perl extension GD::Barcode::Image
+
+1.03  2007-08-26
+        - more doc cleanup
+        - put the --man test in a TODO block. That test works when run
+          in local working directory, but it fails when running as root
+          and installing the same package from CPAN. So, until I figure this
+          out, moving the --man test into a TODO block.
+
+1.02  2007-05-19
+        - first release
+
+1.01  2007-05-17
+        - updated doc, test
+
+1.00  2007-05-01
+        - created

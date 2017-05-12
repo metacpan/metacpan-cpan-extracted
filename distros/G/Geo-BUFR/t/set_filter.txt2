@@ -1,0 +1,273 @@
+
+Message 1  ISXD99 SVVS 200300
+
+Section 0:
+    Length of BUFR message:            164
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           0
+    International data subcategory:    0
+    Local data subcategory:            20
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2016
+    Month:                             2
+    Day:                               20
+    Hour:                              3
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 35
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       301089 001019 002001 301011 301012 301021 007030 025053 302032 302034 007032 013013 302040 302042
+
+Subset 1
+
+     1  004001             2016  YEAR [YEAR]
+     2  004002                2  MONTH [MONTH]
+     3  004003               20  DAY [DAY]
+     4  004004                3  HOUR [HOUR]
+     5  004005                0  MINUTE [MINUTE]
+     6  005001         59.12550  LATITUDE (HIGH ACCURACY) [DEGREE]
+     7  006001          9.50770  LONGITUDE (HIGH ACCURACY) [DEGREE]
+     8  012101           275.05  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+     9  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    10  011002          missing  WIND SPEED [M/S]
+
+Message 3  ISXD99 SVVS 200300
+
+Section 0:
+    Length of BUFR message:            164
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           0
+    International data subcategory:    0
+    Local data subcategory:            20
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2016
+    Month:                             2
+    Day:                               20
+    Hour:                              3
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 35
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       301089 001019 002001 301011 301012 301021 007030 025053 302032 302034 007032 013013 302040 302042
+
+Subset 1
+
+     1  004001             2016  YEAR [YEAR]
+     2  004002                2  MONTH [MONTH]
+     3  004003               20  DAY [DAY]
+     4  004004                3  HOUR [HOUR]
+     5  004005                0  MINUTE [MINUTE]
+     6  005001         58.85100  LATITUDE (HIGH ACCURACY) [DEGREE]
+     7  006001          9.11970  LONGITUDE (HIGH ACCURACY) [DEGREE]
+     8  012101           274.55  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+     9  011001              262  WIND DIRECTION [DEGREE TRUE]
+    10  011002              2.9  WIND SPEED [M/S]
+
+Message 7  ISMD11 OKPR 060600
+
+Section 0:
+    Length of BUFR message:            225
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           0
+    International data subcategory:    2
+    Local data subcategory:            0
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2005
+    Month:                             5
+    Day:                               6
+    Hour:                              6
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 9
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       307080
+
+Subset 1
+
+     1  001001               11  WMO BLOCK NUMBER [NUMERIC]
+     2  001002              520  WMO STATION NUMBER [NUMERIC]
+     3  004001             2005  YEAR [YEAR]
+     4  004002                5  MONTH [MONTH]
+     5  004003                6  DAY [DAY]
+     6  004004                6  HOUR [HOUR]
+     7  004005                0  MINUTE [MINUTE]
+     8  005001         50.00833  LATITUDE (HIGH ACCURACY) [DEGREE]
+     9  006001         14.44806  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    10  010004            97580  PRESSURE [PA]
+    11  012101           280.55  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    12  011001              240  WIND DIRECTION [DEGREE TRUE]
+    13  011002              4.0  WIND SPEED [M/S]
+
+Message 8  IUSA11 ENMI 291800
+
+Section 0:
+    Length of BUFR message:            721
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           2
+    International data subcategory:    4
+    Local data subcategory:            255
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2007
+    Month:                             7
+    Day:                               27
+    Hour:                              20
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 9
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       309052
+
+Subset 1
+
+     1  001001                1  WMO BLOCK NUMBER [NUMERIC]
+     2  001002                1  WMO STATION NUMBER [NUMERIC]
+     3  001011        Jan Mayen  SHIP OR MOBILE LAND STATION IDENTIFIER [CCITTIA5]
+     4  004001             2007  YEAR [YEAR]
+     5  004002                7  MONTH [MONTH]
+     6  004003               27  DAY [DAY]
+     7  004004               19  HOUR [HOUR]
+     8  004005               55  MINUTE [MINUTE]
+     9  005001         70.93970  LATITUDE (HIGH ACCURACY) [DEGREE]
+    10  006001         -8.66790  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    11  012101           278.20  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    12  011001              270  WIND DIRECTION [DEGREE TRUE]
+    13  011002              5.0  WIND SPEED [M/S]
+    14  012101           277.80  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    15  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    16  011002          missing  WIND SPEED [M/S]
+    17  012101           273.60  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    18  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    19  011002          missing  WIND SPEED [M/S]
+    20  012101           273.00  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    21  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    22  011002          missing  WIND SPEED [M/S]
+    23  012101           276.50  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    24  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    25  011002          missing  WIND SPEED [M/S]
+    26  012101           274.10  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    27  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    28  011002          missing  WIND SPEED [M/S]
+    29  012101           270.90  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    30  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    31  011002          missing  WIND SPEED [M/S]
+    32  012101           265.10  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    33  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    34  011002          missing  WIND SPEED [M/S]
+    35  012101           267.30  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    36  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    37  011002          missing  WIND SPEED [M/S]
+    38  012101           266.50  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    39  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    40  011002          missing  WIND SPEED [M/S]
+    41  012101           265.30  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    42  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    43  011002          missing  WIND SPEED [M/S]
+    44  012101           257.20  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    45  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    46  011002          missing  WIND SPEED [M/S]
+    47  012101           256.30  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    48  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    49  011002          missing  WIND SPEED [M/S]
+    50  012101           255.70  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    51  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    52  011002          missing  WIND SPEED [M/S]
+    53  012101           253.50  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    54  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    55  011002          missing  WIND SPEED [M/S]
+    56  012101           253.40  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    57  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    58  011002          missing  WIND SPEED [M/S]
+    59  012101           253.40  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    60  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    61  011002          missing  WIND SPEED [M/S]
+    62  012101           252.80  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    63  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    64  011002          missing  WIND SPEED [M/S]
+    65  012101           250.70  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    66  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    67  011002          missing  WIND SPEED [M/S]
+    68  012101           250.00  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    69  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    70  011002          missing  WIND SPEED [M/S]
+    71  012101           240.60  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    72  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    73  011002          missing  WIND SPEED [M/S]
+    74  012101           240.20  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    75  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    76  011002          missing  WIND SPEED [M/S]
+    77  012101           236.20  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    78  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    79  011002          missing  WIND SPEED [M/S]
+    80  012101           234.70  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    81  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    82  011002          missing  WIND SPEED [M/S]
+    83  012101           233.00  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    84  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    85  011002          missing  WIND SPEED [M/S]
+    86  012101           227.00  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    87  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    88  011002          missing  WIND SPEED [M/S]
+    89  012101           224.10  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    90  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    91  011002          missing  WIND SPEED [M/S]
+    92  012101           219.30  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    93  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    94  011002          missing  WIND SPEED [M/S]
+    95  012101           219.30  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    96  011001          missing  WIND DIRECTION [DEGREE TRUE]
+    97  011002          missing  WIND SPEED [M/S]
+    98  012101           219.50  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    99  011001          missing  WIND DIRECTION [DEGREE TRUE]
+   100  011002          missing  WIND SPEED [M/S]

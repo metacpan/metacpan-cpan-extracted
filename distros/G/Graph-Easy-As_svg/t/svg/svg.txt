@@ -1,0 +1,85 @@
+graph {
+  fill: peru;
+  border: 1px dashed blue;
+  }
+group { fill: peru; }
+
+  [ Bonn ] - > [ Berlin ] { shape: circle; fill: darkslategrey; background: brown; color: white; }
+  [ Bonn ] ==> [ Frankfurt ] { fill: #deadff; }
+  [ Berlin ] ..> [ Cottbus ] { shape: ellipse; }
+  [ Berlin ] -> { color: green; } [ Bonn ] { fill: #ffdead; }
+  [ Cottbus ] = > [ Frankfurt ]
+  [ Berlin ] -> { arrow-style: closed; } [ Ulm ]
+  [ Ulm ] { shape: house; } .-> { color: #a02020; } [ Koblenz]
+  [ Ulm ] ..-> [ Konstanz ] { shape: diamond; fill: peru; border: none; background: yellow; }
+
+  [ Konstanz ] --> { arrow-style: filled; fill: red; } [ Mainz ] { shape: triangle; }
+
+  [ Koblenz ] { shape: invtriangle; }
+
+node.point { shape: point; flow: south; }
+node.doublepoint { border-style: double; shape: point; flow: east; }
+node.double { border: double white; fill: palevioletred; }
+node.doubledash { border: double-dash yellow; fill: crimson; }
+
+( Stars
+  [ A ] { point-style: star; color: red; } ->		# background ignored
+  [ B ] { point-style: circle; fill: dodgerblue; } ->
+  [ C ] { point-style: circle; fill: white; } ->
+  [ D ] { point-style: square; fill: firebrick; flow: west; } ->
+  [ E ] { point-style: diamond; fill: lime; } ->
+  [ F ] { shape: invisible; background: coral; } ->
+  [ G ] { point-style: dot; color: slategrey; } ->	# background ignored
+  [ H ] { point-style: circle; fill: black; } ->
+  [ I ] { point-style: cross; color: darkblue; }	# fill ignored
+) { nodeclass: point; }
+
+(
+ [ Rect ]
+  <--> [ Circle ] { shape: circle; }
+  <--> [ Ellipse ] { shape: ellipse; }
+  <.-> [ House ] { shape: house; }
+  <.> [ InvHouse ] { shape: invhouse; }
+  <= > [ Triangle ] { shape: triangle; }
+  <- > [ InvTriangle ] { shape: invtriangle; flow: south; }
+  <..-> [ Octagon ] { shape: octagon; flow: south; }
+  <..-> [ Diamond ] { shape: diamond; flow: east; }
+  [ Triangle ] <==> [ Hexagon ] { shape: hexagon; }
+  <==> [ Pentagon ] { shape: pentagon; }
+  <==> [ Septagon ] { shape: septagon; }
+  [ Pentagon ] <==> [ Parallelogram ] { shape: parallelogram; }
+  [ Hexagon ] -- [ Trapezium ] { shape: trapezium; }
+  [ Hexagon ] .-.- [ Invtrapezium ] { shape: invtrapezium; }
+) { nodeclass: double; }
+
+[ A ] -> [ AB ]
+
+( Stars2
+  [ AB ] { point-style: circle; fill: dodgerblue; } ->
+  [ AC ] { point-style: circle; fill: white; } ->
+  [ AD ] { point-style: square; fill: firebrick; flow: west; } ->
+  [ AE ] { point-style: diamond; fill: lime; } ->
+  [ AF ] { shape: invisible; background: coral; } ->
+  [ AG ] { point-style: dot; color: slategrey; } ->	# background ignored
+  [ AH ] { point-style: circle; fill: black; } ->
+  [ AI ] { point-style: cross; color: darkblue; }	# fill ignored
+) { nodeclass: doublepoint; }
+
+( Rect2
+ [ DRect ] { origin: Frankfurt; offset: 0,4; }
+  <--> [ DCircle ] { shape: circle; }
+  <.-> [ DHouse ] { shape: house; }
+  <.> [ DInvHouse ] { shape: invhouse; }
+  <= > [ DTriangle ] { shape: triangle; }
+  <- > [ DInvTriangle ] { shape: invtriangle; flow: south; }
+  <..-> [ DOctagon ] { shape: octagon; flow: south; }
+  <..-> [ DDiamond ] { shape: diamond; flow: east; }
+  [ DTriangle ] <==> [ DHexagon ] { shape: hexagon; }
+  <==> [ DPentagon ] { shape: pentagon; }
+  <==> [ DSeptagon ] { shape: septagon; }
+  [ DPentagon ] <==> [ DParallelogram ] { shape: parallelogram; }
+  [ DDiamond ] -- [ DTrapezium ] { shape: trapezium; }
+  [ DHexagon ] .-.- [ DInvtrapezium ] { shape: invtrapezium; }
+) { nodeclass: doubledash; }
+
+

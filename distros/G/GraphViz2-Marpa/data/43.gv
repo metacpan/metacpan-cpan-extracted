@@ -1,0 +1,14 @@
+digraph graph_43
+{
+	node_43_1
+	[
+		color = red
+		fontcolor = green
+		shape = box
+	]
+	node_43_2
+	[
+		fixedsize = true
+		width = 2
+	]
+}

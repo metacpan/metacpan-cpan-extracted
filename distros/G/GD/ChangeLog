@@ -1,0 +1,189 @@
+2.66    * throw proper error on newFrom* with not-existing file
+        * add t/transp.t from RT #40525
+        * Improve RT #54366 multiple gd.h warning
+        * better doc for GD::Simple->arc
+        * fix ANIMGIF with libgd 2.3.0-dev
+2.65    * fix --gdlib_config_path to accept an argument (fperrad)
+2.64    * Update doc for LIBGD_VERSION()
+        * Fix 5.6.2, which does not have float in its typemap
+2.63    * renamed VERSION() to LIBGD_VERSION(), RT #121307.
+          It was treated magically by "use GD 2.18"
+2.62    * fixed wrong <5.14 code generated with ExtUtils::Constants
+          RT #121297. Don't generate const-xs.inc, only when missing.
+        * add -liconv on hpux also (our pkgconfig parser cannot handle it)
+2.61    * add CONFIGURE_REQUIRES META
+        * add --gdlib_config_path
+        * add Image Filters: scatter, pixelate, negate, grayscale, brightness,
+          contrast, color, selectiveBlur, edgeDetectQuick, gaussianBlur, emboss,
+          meanRemoval, smooth, copyGaussianBlurred
+        * add palette methods: createPaletteFromTrueColor,
+          neuQuant (but discouraged), colorMatch.
+        * add interpolation methods: copyScale, copyRotateInterpolated,
+          interpolationMethod.
+        * add double GD::VERSION
+        * add all gd.h constants
+2.60    * add missing methods newFromWBMP, newFromXbm,
+          (RT #68784) and some missing docs
+        * Add --lib_fontconfig_path, --fcgi options
+        * rewrote most of the XS code
+        * cleanup Makefile.PL #20
+2.59    * error on failing libgd calls
+        * fix colorClosestAlpha, colorAllocateAlpha
+        * add missing documentation
+2.58    * fix VERSION_STRING for 2.0.x
+        * honor --lib_gd_path specific gdlib-config
+        * Loosen the comparison tests with GDIMAGETYPE ne gd2
+        * Improve gdlib-config parsing (PR #17), esp. with 2.0.34
+2.57    * fix Jpeg magic number detection RT #26146
+        * fix RGB - HSV roundtrips: RT #120572 by J2N-FORGET
+        * fix -print-search-dirs errors RT #106265
+        * co-maint to rurban
+        * add hv_fetchs, CI smokers
+        * add GD::VERSION_STRING api
+2.56_03 * add alpha method
+        * improve option handling
+        * fix meta data
+2.56_02 * fix feature extraction >= 2.2 [RT #119459]
+2.56_01 * rm Build.PL, fix permissions, fix for missing gdlib-config
+2.56	* Fix Makefile.PL so that it works again.
+2.55	* Great simplification of regression framework ought to fix make test problems.
+	* Replace ExtUtils::MakeMaker script with Module::Build system
+	  (just in time for Module::Build to be deprecated).
+	* Remove archaic qd.pl (for creating QuickDraw picts) from distribution.
+2.54	Patch from yurly@unet.net to fix image corruption in rotate180 when image height is odd.
+2.53	Points to Gabor Szabo's GD::Simple tutorial, and fix link to repository.
+2.52    Fix regression tests to run on Ubuntu 12.04 64bit.
+2.51	Fix misleading warning message about location of gd.h file.
+2.50	Fix gdUseFontConfig so that it can be called as a class method.
+2.49    Add GitHub information to README.
+2.48    Fix compile crash on windows and strawberry (https://rt.cpan.org/Public/Bug/Display.html?id=67990).
+2.47	Fix compilation on older perl's without the Newxz macros.
+2.46    Added a basic "use" test for GD::Simple
+2.45	Clarified the GD license. There is now a formal LICENSE file in the package.
+2.44    GD::Group now installed properly.
+	Quenched compiler warning caused by Newxs() calls.
+2.43    Added "transparent" color to GD::Simple.
+	Fixed Makefile so that GD/Image.pm depends both on GD/Image.pm.PLS and .config.cache
+2.42	Fixed magic number detection to autodetect certain missed jpeg files (thanks to Mike Walker)
+2.41    Added backend support for grouping features in GD::SVG module.
+2.40    ** Do not use - contains a bug **
+2.39	Makefile.PL will refuse to run if the proper version of libgd is unavailable.
+2.38	Fixed bizarre warning about /usr/include/gd.h != /usr/include/gd.h.
+2.37	GD/Image.pm did not bring in croak() properly, meaning that incorrect error messages are printed out when any of the newFromXXX() calls are made.
+2.36	Instructions on using gdAntiAliased with palette images.
+2.35	Some instructions on installation for Windows users.
+	Doesn't push libpng onto @LIBS unless png support is requested.
+	Supports Storable's freeze/thaw via a custom serializer.
+	Remove "scale redefined" message during compilation of Polyline.
+2.34    Added a check for stray gd.h include files from older installations. If any are
+	      found, Makefile.PL will issue a warning.
+	Fixed incorrect documentation of GD::Simple->string() method. The method call
+	      *does* move the pen.
+2.33	Added appropriate #ifdefs to allow to compile under version 5.6.0 (due to lack of
+	      threading macros before 5.8).
+2.32	Added a GD::Simple->HSVtoRGB() method.
+	Documentation fixes from Mark Manning.
+	Added a clear() method to GD::Polygon to remove all vertices.
+2.31	Fixed GD::Simple->transparent to support symbolic color names.
+	Made changes that should render the module thread-safe.
+	Changed newSVpv calls to newSVpvn, in hopes of improving performance.
+	Added a GD::Simple->HSVtoRGB() method.
+	Fixed incorrect freeing of user-provided raw data in newFromGdData() and newFromGd2Data()
+		(this caused segfaults; patch provided by Nigel Sandever)
+2.30	Migrated polyline() support into GD::Simple.
+2.29	Better support for fonts and brushed patterns in GD::Simple
+2.28	Having troubles getting all the modules installed correctly. Should work now.
+2.27	Reworked the way that GD.pm is created at compile time so that CPAN picks up
+	   correct version information. No code changes.
+2.26    CPAN isn't propagating GD, so I'll upload another version
+2.25    Fixed Makefile.PL so that GD::Polyline and GD::Simple are installed (thanks to Guy Albertelli).
+	
+2.24	Fixed gif/anim gif support so that you can't have animated gif support without
+		having gif support.
+	
+2.23	Added patch from Slaven Rezic which makes it possible to call GD constants
+		in an OO way (without generating warnings), and removes #! from the
+		top of autogenerated GD.pm
+	Rewrote tests 11 and 12 - if they continue to randomly fail on various
+		platforms, they will be removed.
+2.22	Changed the way the gd and gd2 round-trip tests are evaluated. This
+		might fix test failures that have been reported on some platforms.
+2.21    Regression tests are now functional for versions of libgd compiled
+	exclusively with PNG, JPEG or GIF support.
+2.20	GD::Image->newFromGdData() and newFromGd2Data() got broken
+		somewhere along the line.  They are now fixed (and
+		have a regression test).
+	Added copyRotated() method.
+2.19	Added a HAVE_FTCIRCLE define to handle versions of libgd that do not 
+		have the gdImageStringFTCircle() function.
+2.18	This version needs libgd 2.0.28 or higher.
+	Fixed documentation bug in synopsis of GD::Simple.
+	Updated Polyline to version 0.20
+2.17	Added animated GIF patches from Jaakko Hyvätti.
+	Added dynamic bitmapped font loading support.
+	Added fontconfig support.
+	Added a simplified API called GD::Simple.
+	Added support for kern control and other libgd-based FT improvements.
+	Fixed a define that caused gif functions to be miscompiled on some platforms.
+	Documentation fixes.
+2.16	Fixed bug in GIF #IFDEFs pointed out by BZAJAC
+	Added #IFDEF for WIN32 provided by Randy Kobes
+2.15	Brought back GIF support (requires libgd 2.0.28 or higher).
+	Takes advantage of gdlib-config support in libgd 2.0.27 or higher.
+2.14	Support for AMD64 libraries.
+2.12	Fixed regression test 10 to succeed when used with
+		libgd 2.0.22
+2.11	More alpha functions from Cory Watson
+2.10	Suppress CAPI warning.
+	Warn about Math::Trig warning
+2.09	VMS documentation patch from Martin Zinser
+	Non-standard library finding path options from Peter Kruty
+2.08	Applied 5.00503 compatibility patch from Mathieu Arnold
+	New check for JPEG magic tag returned by some digital cameras.
+2.07	Now compatible with (and requires!) libgd 2.0.12.
+	Added setThickness() method.
+	Added support for compression level argument to png().
+	Added support for antialiasing drawing using setAntiAliased() and setAntiAliasedDontBled().
+	Added extended options to stringFT().
+	Added filledArc(), ellipse() and filledEllipse() methods.
+	Added command-line options to Makefile.PL provided by David Eisenberg.
+2.06	Added saveAlpha() and alphaBlending() methods.
+2.05	Alpha methods courtesy Georges Arnould.
+2.041	Added a regression test to detect certain versions of freetype.
+2.04	Removed the patch file since Tom has begun adding his own configure file.
+	Changed the context member from free to gd_free to allow for compiling.
+	Fixed the regression tests since the gd-generated images have changed slightly.
+2.03	Skipped so as to remain version number compatible with libgd.
+2.02	Changed Math::Trig version requirement from 0.0 to 1.0 as Perl 5.8
+	no long recognizes this as a valid version number.
+2.01	Added Math::Trig to the prerequisites because GD::Polyline needs it.
+2.00    Folded in support for gd version 2.0 from Dan Palermo
+	Folded in support for splines (GD::Polyline) from Dan Harasty.
+	Removed all GIF support.
+1.43    Added demo of Type1 fonts to truetype demo from Slaven Rezic.
+1.42	Fixed the patch_gd.pl file
+	Version 2.0 is coming.
+1.39	Fixed FreeType test, at least on some platforms.
+	Added patches from Stephen Clouse to allow to build on 5.8.0rc1.
+1.35	Patches to support Philip Warner's GIF-reinstating library
+	maintained at http://www.rime.com.au/gd/
+1.34	Fixed problems that arise when compiling against older versions of
+	libgd that do not have XPM support.
+1.33	Updated patch file for gd 1.8.4
+1.32	Added support for Tru64 UNIX v5.0
+1.29	Fixed a corrupted .xpm file in the regression suite
+		(caused test 9 to fail)
+1.28    Added support for gd 1.8.3
+1.27	Fixed strict refs problem on 5.00503 and earlier
+1.26	Brought up to date with libgd 1.8.1
+1.24-1.25 More tweaks to Makefile.PL.
+1.23    Added a bunch more libraries and includes... might or might not port
+	to other platforms now
+1.22	Fix to Makefile.PL to accomodate linking static libraries.
+	Added newFromGd2Part() method.
+	Supports libgd 1.7.1.
+1.21	Slight fix in regression tests so that test 8 doesn't fail when compiled
+		without TrueType support.
+1.20	Rewritten for libgd 1.6.3
+1.19	Fixed Makefile.PL for better compilation on Windoze machines
+	

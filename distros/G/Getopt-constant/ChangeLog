@@ -1,0 +1,15 @@
+Revision history for Perl extension Getopt::constant
+                                        Time-stamp: "2004-12-29 19:27:18 AST"
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.03 -- just rebundling.  No code changes.
+	
+2001-02-25  Sean M. Burke  sburke@cpan.org
+	
+	* Release 1.02 -- just fixing harmless typos in the docs.
+	
+2001-02-23  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.01 -- first release
+

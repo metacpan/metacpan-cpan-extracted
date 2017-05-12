@@ -1,0 +1,34 @@
+				  Gnome2::VFS
+				 -------------
+
+This module allows you to use the GNOME Virtual File System library
+(libgnomevfs for short) from Perl.
+
+The canonical API documentation can be found at
+
+  http://developer.gnome.org/doc/API/2.0/gnome-vfs-2.0/index.html
+
+Gnome2::VFS also comes with automatically generated API documentation.  To
+access its index, use:
+
+  perldoc Gnome2::VFS::index
+
+				 Installation
+				--------------
+
+To install Gnome2::VFS, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+				 Dependencies
+				--------------
+
+Gnome2::VFS depends on:
+
+  ExtUtils::Depends >= 0.20
+  ExtUtils::PkgConfig >= 1.03
+  Glib >= 1.120
+  libgnomevfs >= 2.0.0

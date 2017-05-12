@@ -1,0 +1,59 @@
+{
+   "abstract" : "declare options as pod documentation",
+   "author" : [
+      "Eric Wilhelm @ <ewilhelm at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Getopt-AsDocumented",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4005",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Base" : "v0.0.3",
+            "Pod::Parser" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Getopt::AsDocumented" : {
+         "file" : "lib/Getopt/AsDocumented.pm",
+         "version" : "v0.0.2"
+      },
+      "Getopt::AsDocumented::PodParser" : {
+         "file" : "lib/Getopt/AsDocumented.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Getopt-AsDocumented"
+      },
+      "homepage" : "http://enobacon.com/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://git.enobacon.com/Getopt-AsDocumented.pm.git"
+      }
+   },
+   "version" : "v0.0.2"
+}

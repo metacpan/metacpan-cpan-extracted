@@ -1,0 +1,21 @@
+Revision history for Perl extension Getopt::Long::DescriptivePod
+
+0.04  Wed Jul 13 19:43:33 2016
+- handle different format in tests
+  if Getopt::Long::Descriptive version >= 0.100
+  so fixed https://rt.cpan.org/Ticket/Display.html?id=116088
+
+0.03  Sun Mar 15 10:12:53 2015
+- handle different format in tests
+  if Getopt::Long::Descriptive version >= 0.099
+  so fixed https://rt.cpan.org/Public/Bug/Display.html?id=102138
+- replace Perl6::Export::Attrs using Sub::Exporter
+- remove Build.PL from distribution
+
+0.02  Sun May  6 07:32:43 2012
+- repaired Makefile.PL
+- added sub trim_lines
+- repaired example
+
+0.01  Sat Jun  4 00:15:00 2011
+- first release

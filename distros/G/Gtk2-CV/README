@@ -1,0 +1,266 @@
+NAME
+    cv - a fast gtk+ image viewer loosely modeled after XV
+
+SYNOPSIS
+       cv [file...]
+
+FEATURES
+    CV is supposed to work similar to the venerable XV image viewer, just
+    faster. Why faster?
+
+    *   optimized directory scanning algorithm
+
+        The directory scanning in CV uses some tricks that - on most modern
+        filesystems - makes it possible to detect filetypes faster than
+        stat()'ing every file. This makes CV suitable for directories with
+        lots of files (10000+).
+
+        This algorithm is quite unprecise - it doesn't make a difference
+        between files, device nodes, symlinks and the like, and filetype
+        detection is done using the file extension only.
+
+        On the positive side, it is usually many orders of magnitude faster
+        than traditional scanning techniques (good for directories with
+        10000 or 100000+ files).
+
+    *   queuing for all time-consuming background tasks
+
+        All tasks, such as unlinking files or generating thumbnails, that
+        can be done in the background will be done so - no waiting required,
+        even when changing directories.
+
+    *   use of asynchronous I/O
+
+        CV tries to use asynchronous I/O whereever it makes sense, for
+        example while scanning directories, waiting for stat data, unlinking
+        files or generating thumbnails. This usually decreases scanning
+        times for large directories a bit (especially on RAID devices and
+        over NFS) and makes CV much more interactive.
+
+    *   fast image loading
+
+        The time span between the user issuing a command and displaying the
+        new image should be as small as possible. CV uses optimized
+        (especially for JPEG) loading functions and sacrifices some quality
+        (e.g no gamma correction, although this might change) to achieve
+        this speed.
+
+    *   fast thumbnail creation
+
+        Thumbnail creation uses both CPU and Disk-I/O. CV interleaves both,
+        so on modern CPUs, thumbnailing is usually limited by I/O speed.
+        Thumbnail creation for JPEGs has been specially optimized and can
+        even take advantage of multiple CPUs.
+
+    *   minimum optical clutter
+
+        CV has no menus or other user interface elements that take up a lot
+        of screen space (or are useful for beginning users). The schnauzer
+        windows can also be somewhat crowded.
+
+        The point of an image viewer is viewing images, not a nice GUI. This
+        is similar to XV's behaviour.
+
+    *   efficient (and hard to learn) user interface
+
+        CV uses key combinations. A lot. If you are an experienced XV user,
+        you will find most of these keys familiar. If not, CV might be hard
+        to use at first, but will be an efficient tool later.
+
+    *   multi-window GUI
+
+        CV doesn't force you to use a specific layout, instead it relies on
+        your window manager, thus enabling you to chose whatever layout that
+        suits you most.
+
+    *   i18n'ed filename handling throughout
+
+        As long as glib can recognize your filename encoding (either UTF-8
+        or locale-specific, depending on the setting of G_BROKEN_FILENAMES)
+        and you have the relevant fonts, CV will display your filenames
+        correctly.
+
+    *   extensible through plug-ins
+
+        I have weird plug-ins that access remote databases to find a
+        directory. This is not likely to be of any use to other people.
+        Likewise, others might have weird requirements I cannot dream of.
+
+    *   filename clustering
+
+        Among the standard plug-ins is a filename clustering plug-in, that
+        (in case of tens of thousands images in one directory) might be able
+        to cluster similar names together.
+
+DESCRIPTION
+  THE IMAGE WINDOW
+    You can use the following keys in the image window:
+
+     q            quit the program
+     <            half the image size
+     >            double the image size
+     ,            shrink the image by 10%
+     .            enlarge the image by 10%
+     n            reset to normal size
+     m            maximize to screensize
+     M            maximize to screensize, respecting image aspect
+     ctrl-m       toggle maxpect-always mode
+     ctrl-sift-m  toggle using current image size as max image size
+     u            uncrop
+     r            set scaling mode to 'nearest' (fastest)
+     s            set scaling mode to 'bilinear' (default)
+     shift-s      set scaling mode to 'hyper' (slowest)
+     t            rotate clockwise 90°
+     T            rotate counterclockwise°
+     a            apply all rotations loslessly to a jpeg file (using exiftran)
+     ctrl-v       open a new visual schnauzer window for the current dir
+     ctrl-c       clone the current image window
+     ctrl-e       run an editor ($CV_EDITOR or "gimp") on the current image
+     ctrl-p       fire up the print dialog
+     escape       cancel a crop action
+
+    And when playing movies, these additional keys are active:
+
+     left         rewind by 10 seconds
+     right        forward by 10 seconds
+     down         rewind by 60 seconds
+     up           forward by 60 seconds
+     pg_up        rewind by 600 seconds
+     pg_down      forward by 600 seconds
+     o            toggle on-screen display
+     p            pause/unpause
+     escape       stop playing
+     9            turn volume down
+     0            turn volume up
+
+    Any other keys will be sent to the default schnauzer window, which can
+    be toggled on and off by right-clicking into the image window.
+
+    Left-clicking into the image window will let you crop the image (usually
+    to zoom into large images that CV scales down).
+
+  THE VISUAL SCHNAUZER
+    Any image-loading action in a schnauzer window acts on the
+    "last-recently-activated" imagewindow, which currently is simply the
+    last image window that received a keypress.
+
+    You can use the following keys in the schnauzer window:
+
+     ctrl-space,
+     space        move to and display next image
+     ctrl-backspace,
+     backspace    move to and display previous image
+     ctrl-return,
+     return       display selected picture, or enter directory
+
+     cursor keys  move selection
+     page-up      move one page up
+     page-down    move one page down
+     home         move to first file
+     end          move to last file
+
+     ctrl-a       select all files
+     ctrl-shift-a select all files currently displayed in the schnauzer window
+     ctrl-d       delete selected files WITHOUT ASKING AGAIN
+     ctrl-g       force generation of thumbnais for the selected files
+     ctrl-s       rescan current direcory or files updates/deletes etc.
+     ctrl-u       update selected (or all) icons if neccessary
+     ctrl--       unselected thumbnailed images
+     ctrl-+       keep only thumbnailed images, deselect others
+
+     ^            go to parent directory (caret).
+
+     0-9,
+     a-z          find the first filename beginning with this letter
+
+    Right-clicking into the schnauzer window displays a pop-up menu with
+    additional actions.
+
+   SELECTION
+    You can select entries in the Schnauzer in a variety of ways:
+
+    Keyboard
+        Moving the cursor with the keyboard will first deselect all files
+        and then select the file you moved to.
+
+    Clicking
+        Clicking on an entry will select the one you clicked and deselect
+        all others.
+
+    Shift-Clicking
+        Shift-clicking will toggle the selection on the entry under the
+        mouse.
+
+    Dragging
+        Dragging will select all entries between the one selected when
+        pushing the button and the one selected when releasing the button.
+        If you move above or below the schnauzer area while drag-selecting,
+        the schnauzer will move up/down one row twice per second. In
+        addition, horizontal mouse movement acts as a kind of invisible
+        horizontal scrollbar.
+
+    Hint: double-click works while click-selecting
+        You can double-click any image while click-selecting to display it
+        without stopping the selection process. This will act as if you
+        normally double-clicked the image to display it, and will toggle the
+        selection twice, resulting in no change.
+
+FILES
+    When starting, CV runs the .cvrc file in your $HOME directory as if it
+    were a perl script. in that, you will mostly load plug-ins.
+
+    Example:
+
+       system "fping -q -t 10 ether"
+         or require "/fs/cv/cvplugin.pl";
+
+    This will load a plug-in, but only if the machine *ether* is reachable
+    (supposedly the plug-in is networked in some way :).
+
+ENVIRONMENT VARIABLES
+    CV_EDITOR
+        The program that gets executed when the user presses "CTRL-e" in the
+        Schnauzer or image window. The default is "gimp".
+
+    CV_AUDIO_PLAYER
+        Program used to play all sorts of audio (wav, aif, mp3, ogg...),
+        default "play". Will be called like "$CV_AUDIO_PLAYER -- <path>".
+
+    CV_PRINT_DESTINATION
+        The default (perl-style) destination to use in the print dialog.
+
+    CV_TRASHCAN
+        When set, must point to a directory where all files that are deleted
+        by the "Delete Physically" (ctrl-d) action are moved to (other
+        deletion actions still delete!). If unset, files that are deleted
+        are really being deleted.
+
+SIGNALS
+    Sending CV a SIGUSR1 signal will cause all image viewers to reload the
+    currently loaded image. This is useful if you use CV as a viewer for
+    changing data - just run it in the background with some path and each
+    time the image changes, send it a SIGUSR1.
+
+SECURITY CONSIDERATIONS
+    CV uses Pixbuf to load non-JPEG images. Pixbuf is not considered safe
+    for this purpose, though (from the gtk-2.2 release notes):
+
+    "While efforts have been made to make gdk-pixbuf robust against invalid
+    images, using gdk-pixbuf to load untrusted data is not recommended, due
+    to the likelyhood that there are additional problems where an invalid
+    image could cause gdk-pixbuf to crash or worse."
+
+BUGS/TODO
+     Lots of functionality is missing.
+
+     Pixbuf doesn't always honor G_BROKEN_FILENAMES, so accessing files with
+     names incompatible with utf-8 might fail.
+
+     rotate on disk
+     lots of ui issues
+     save(?)
+     preferences
+
+AUTHOR
+    Marc Lehmann <cv@plan9.de>.
+

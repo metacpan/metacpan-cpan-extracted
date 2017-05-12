@@ -1,0 +1,20 @@
+Revision history for Perl extension Geo::Hashing.
+
+0.05  Tue Jun 24 2008
+      Remove silly requirement for perl 5.10.0
+
+0.04  Mon Jun 23 2008
+      Fix tests so that they use a fixed percision
+
+0.03  Add SVN tags
+      Mark dependency on LWP::Simple for G:H:S:Peeron
+
+0.02  Documentation updates
+      Fix 30w rule processing (limit by date)
+
+0.01  Wed Jun 18 2008
+	- original version; created by h2xs 1.23 with options
+		-X Geo::Hashing
+
+-- 
+   $Id: Changes 257 2008-06-25 02:02:19Z dan $

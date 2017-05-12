@@ -1,0 +1,31 @@
+Revision history for Games-ArrangeNumber
+
+0.05    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.04    2014-08-12 (SHARYANTO)
+
+        - No functional changes.
+
+        - Tweak formatting.
+
+
+0.03    2014-08-11 (SHARYANTO)
+
+        - No functional changes.
+
+        - [opt] Process all pending keypresses before redrawing.
+
+
+0.02    2014-08-07 (SHARYANTO)
+
+        - Fixes.
+
+
+0.01    2014-08-07 (SHARYANTO)
+
+        - First release.

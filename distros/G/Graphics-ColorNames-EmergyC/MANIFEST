@@ -1,0 +1,8 @@
+Build.PL
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+lib/Graphics/ColorNames/EmergyC.pm
+t/01-EmergyC.t

@@ -1,0 +1,9 @@
+---
+name: 'IO::Async Engine'
+default: 0
+depends:
+    'IO::Async::Buffer': 0
+    'HTTP::Parser': 0
+    'HTTP::Status': 0
+    'IO::Socket::INET': 0
+    'Net::DNS': 0

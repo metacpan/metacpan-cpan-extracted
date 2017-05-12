@@ -1,0 +1,4 @@
+Revision history for Perl extension Geo::SweGrid.
+
+1.0 : 2009-03-24
+ - Initial version converted to object oriented Perl code from the original Javascript code by Arnold Andreasson.

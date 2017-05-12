@@ -1,0 +1,140 @@
+NAME
+    Geo::Dymaxion - Plot latitude/longitude on a Fuller Dymaxion(tm) map
+
+SYNOPSIS
+      use Geo::Dymaxion;
+  
+      # Suppose we have a Fuller projection of the Earth's surface that's
+      # 800 pixels wide and 600 pixels high.
+
+      my $map = Geo::Dymaxion->new( 800, 600 );
+
+      # Find the x and y coordinates in pixels of Philadelphia, PA, USA.
+
+      my ($x, $y) = $map->plot( 40, -75 );
+
+      # Do the same for Sebastopol, CA, USA.
+
+      ($x, $y) = $map->plot( 38.3993, -122.8259 );
+
+DESCRIPTION
+    "Geo::Dymaxion" allows you to draw points on Dymaxion(tm) maps using
+    latitude and longitude data, which turns out to be quite difficult and
+    requires some tricky trigonometry. This module strives to hide away all
+    the ugly math and allow you to concentrate on drawing your map.
+
+    The Dymaxion(tm), or Fuller, projection was invented by R. Buckminster
+    Fuller in 1954, and is "the only flat map of the entire surface of the
+    Earth which reveals our planet as one island in one ocean, without any
+    visually obvious distortion of the relative shapes and sizes of the land
+    areas, and without splitting any continents." See
+    http://www.bfi.org/map.htm for more details.
+
+METHODS
+    new( [WIDTH [, HEIGHT]] )
+        "new" takes two arguments: the length and width of your Dymaxion map
+        in pixels. Be sure when supplying this measure that you have
+        excluded any margins that may exist around the edges of your map
+        image. If no arguments are provided, operations with "Geo::Dymaxion"
+        will return values expressed in fractions of a unit-sized map.
+
+    plot( LATITUDE, LONGITUDE )
+        "plot" takes a floating-point (lat, long) pair, and returns a list
+        consisting of floating-point (x, y) coordinates, scaled to the width
+        and height provided to "new()". Latitudes south of the equator and
+        longitudes west of the prime meridian should be expressed as
+        negative values. These X and Y values can then be plugged into
+        "Imager->setpixel()" or any other drawing module you'd care to use.
+
+FUNCTIONS
+    Geo::Dymaxion::dymax( LATITUDE, LONGITUDE )
+        "dymax()" provides access to the internal routines used by
+        "Geo::Dymaxion". Takes a (lat, long) pair, returns an (x, y) pair,
+        scaled in unit triangle edges, with (0, 0) at the *lower left*
+        corner of the map. For reference, a Fuller projection of the Earth's
+        surface is 5.5 by sqrt(7.75) unit triangle edges in size.
+
+EXAMPLE
+      # This script takes a Dymaxion map and (lat, long) point and
+      # outputs a JPEG of the map with a large red dot over that point.
+      #
+      # For a more elaborate example of the same, see:
+      #    http://iconocla.st/hacks/dymax/
+  
+      use Imager;
+      use Imager::Fill;
+      use Geo::Dymaxion;
+      use strict;
+  
+      my ($lat, $long) = @ARGV;
+      my $map_file = "dymaxion.gif"; # make sure the margins are trimmed!
+
+      my $map = Imager->new;
+      $map->open( file => $map_file );
+  
+      my $dymax = Geo::Dymaxion->new( $map->getwidth, $map->getheight );
+      my ($x, $y) = $dymax->plot( $lat, $long );
+  
+      my $dot  = Imager::Color->new( 255, 0, 0 );
+      my $fill = Imager::Fill->new( solid => $dot );
+      $map->circle( fill => $fill, r => 5, x => $x, y => $y );
+  
+      $map->write( type => "jpeg", fd => fileno(STDOUT) )
+          or die $map->errstr;
+  
+BUGS
+    It would be really cool if this module could convert (x, y) points on a
+    Fuller projection back into (lat, long).
+
+DESIDERATA
+    "Think of it. We are blessed with technology that would be indescribable
+    to our forefathers. We have the wherewithal, the know-it-all to feed
+    everybody, clothe everybody, and give every human on Earth a chance. We
+    know now what we could never have known before-that we now have the
+    option for all humanity to "make it" successfully on this planet in this
+    lifetime. Whether it is to be Utopia or Oblivion will b a touch-and-go
+    relay race right up to the final moment." - R. Buckminster Fuller
+
+    "When I am working on a problem, I never think about beauty. I only
+    think about how to solve the problem. But when I have finished, if the
+    solution is not beautiful, I know it is wrong." - R. Buckminster Fuller
+
+SEE ALSO
+    The word "Dymaxion" and the Fuller projection design are trademarks of
+    the Buckminster Fuller Institute (<http://www.bfi.org>). The BFI can be
+    reached at <info@bfi.org>.
+
+    This module would not exist without the prior work of Robert W. Gray in
+    determining the calculations necessary to plot latitude and longitude on
+    a Fuller map. Gray's notes and original code are available at
+    <http://www.rwgrayprojects.com/rbfnotes/maps/graymap1.html>, which is
+    well worth the read if you're into such things.
+
+    Also, see also Imager, Inline.
+
+AUTHOR
+    Robert W. Gray <rwgray@rwgrayprojects.com> wrote the C code on which
+    this module is based.
+
+    Schuyler D. Erle <schuyler@nocat.net> wrote the Perl API, with a little
+    help from Inline.pm.
+
+COPYRIGHT AND LICENSE
+    The C code that performs the actual conversions is copyright Robert W.
+    Gray <rwgray@rwgrayprojects.com>. His code is distributed under the
+    following terms taken from
+    <http://www.rwgrayprojects.com/rbfnotes/maps/graymap6.html>:
+
+    "Usage Note: My work is copyrighted. You may use my work but you may not
+    include my work, or parts of it, in any for-profit project without my
+    consent."
+
+    This bears reiteration, in case it wasn't clear the first time:
+    According to Gray's license, you must obtain his consent prior to using
+    his code for commercial or for-profit purposes. Please contact him, not
+    me. (But please contact me if you use this module anyway, I'm curious to
+    know what people might want it for.)
+
+    The rest of the module is copyright 2003 by Schuyler D. Erle, and is
+    free software, distributed under the same terms as Perl itself.
+

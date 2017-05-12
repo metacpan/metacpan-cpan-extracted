@@ -1,0 +1,44 @@
+Revision history for Perl extension Geo::StreetAddress::US.
+
+1.04
+
+    Avoid undef warning in some cases. RT#82146
+    Force number to end on non-digit to improve parsing for some edge-cases.
+    Added test case for RT#73397.
+    Workaround a regex bug in perl 5.18.{1,2} RT#91420
+
+1.03
+
+    Added avoid_redundant_street_type class attribute.
+    Removed temporary $Old_Undef_Fields_Behaviour added in 1.00.
+
+1.02
+
+    Add 'cur' as abbreviation for 'curve', Fred Zellinger
+    Move init code into init() function to enable re-init, Fred Zellinger
+
+1.01  May 5 2011 - Tim Bunce
+
+    Fixed lower cased city direction thanks to Al Sary. RT#50476.
+    Fixed space in state name thanks to Nate Blaylock. RT#30109.
+
+    Changed to no longer add undef fields to result hash
+    (you can set a global to enable the old behaviour, for now).
+    Changed minimum perl version from 5.6.1 to 5.8.1.
+    Changed the outdated README, cut down to a minimal description.
+
+    Added support for ZIP+4 without hyphen thanks to Mark Pickett. RT#17445.
+    Added sec_unit_type and sec_unit_num fields thanks to Evan S Kaufman. RT#44735.
+    Added support for more numbered Secondary Unit Designators.
+    Added support for unnumbered Secondary Unit Designators.
+    Added note to docs that future versions may add extra fields.
+    Added parse_informal_address() which handles a wider range of addresses.
+    parse_location() now calls parse_informal_address() if pause_address() fails.
+
+0.99  May 17 2005 - Schuyler Erle
+
+    This version was on CPAN for many years till 1.00 was released.
+
+0.01  May 15 2005
+
+    Original version

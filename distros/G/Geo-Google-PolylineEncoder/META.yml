@@ -1,0 +1,28 @@
+---
+abstract: 'encode lat/lons to Google Maps Polylines'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Steve Purkis <spurkis@cpan.org>'
+build_requires:
+  IO::File: 0.01
+  Module::Build: 0.20
+  Test::More: 0.01
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Google-PolylineEncoder
+provides:
+  Geo::Google::PolylineEncoder:
+    file: lib/Geo/Google/PolylineEncoder.pm
+    version: 0.06
+requires:
+  accessors: 0.02
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

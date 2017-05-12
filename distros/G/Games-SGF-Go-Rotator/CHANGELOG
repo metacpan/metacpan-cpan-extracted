@@ -1,0 +1,9 @@
+1.21    2012-11-27    Games::SGF::Go's internal ordering of elements
+                        changes in perl 5.17, so normalize for testing
+
+1.2     2010-12-09    Bugfix the bugfix
+
+1.1     2010-12-09    Fix bug where only moves were rotated, but not
+                        stuff like AE[aa:ee]
+
+1.0     2010-05-15    Initial release

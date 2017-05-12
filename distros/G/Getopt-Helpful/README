@@ -1,0 +1,19 @@
+Getopt-Helpful
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Getopt::Helpful
+
+

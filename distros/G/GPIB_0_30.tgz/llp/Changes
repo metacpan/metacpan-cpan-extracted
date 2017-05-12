@@ -1,0 +1,8 @@
+Revision history for Perl extension gpib.
+
+0.20  Mon May 31 20:00:00 1999
+        - First external release
+
+0.01  Tue Mar 30 22:15:48 1999
+	- original version; created by h2xs 1.18
+

@@ -1,0 +1,24 @@
+---
+name: Getopt-Mixed-Help
+version: 0.26
+author:
+abstract: 'combine L<C<Getopt::Mixed>> with usage and help'
+license: perl
+requires:
+  Getopt::Long: 0
+  perl: v5.8.9
+recommends:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  Module::Build: 0.340201
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+provides:
+  Getopt::Mixed::Help:
+    file: lib/Getopt/Mixed/Help.pm
+    version: 0.26
+resources:
+  license: http://dev.perl.org/licenses/

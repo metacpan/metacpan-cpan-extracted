@@ -1,0 +1,102 @@
+Revision history for Perl extension Geo::PostalCode.
+
+0.07  05/22/2006
+
+    - Added support for building the DB files from the more recent
+    zip-code data here:
+
+      http://civicspacelabs.org/releases/zipcodes/zipcodes-csv-10-Aug-2004.tgz
+
+    The old data will continue to work. (Sam Tregar)
+
+The following changes contributed by Scott Gifford of HomeSurfUSA.com
+
+  Subclassing
+  * Move database installation code from load.pl into a module, to
+    make subclassing easier.
+  * Modify instructions to discuss proposed "Geo::PostalCode::US"
+    to get US postal codes.
+
+  New Functionality
+  * You can specify constructor arguments "units" or "earth_radius" to
+    change the units that Geo::PostalCode operates in.  By default it
+    supports miles and kilometers, but it can support any unit if you
+    provide the earth's radius in that unit.
+ 
+  Speed Improvements for Very Large Searches
+  * Allow overriding B-Tree cache size with "cachesize" constructor
+    argument.
+  * Very small speedups in query_postal_codes.
+
+  Major Cleanup
+  * All required files for testing included in package, so that a
+    "make test" from CPAN will succeed.
+
+  Minor Cleanup
+  * Better error checking of database tie commands.
+  * Minor syntax fixes to split.
+  * Use name "geo_postalcode_makedb" instead of "load.pl", so it can
+    be installed in a bin directory.
+
+0.06  09/24/2003
+	Scott Gifford contribed the following changes
+  * query_postal_codes contained some errors:
+
+    + It assumed that the space between single degrees of latitude and
+      longitude are the same.  This only holds true at the equator;
+      otherwise the distance between two degrees longitude is:
+
+          cos($lat*PI/180)*LON_MILEAGE_CONSTANT
+
+      This formula is probably well-known, but I got it from:
+
+          http://www.malaysiagis.com/related_technologies/mapping/basics1b.cfm
+
+      This corrected a bug where the cells searched would often miss
+      areas that were a ways away from the site.
+
+    + There were bugs when the search radius crossed the poles, the
+      prime meridian, or the -180/180 longitude line.  All of these
+      are now fixed in various ways (see the code).
+    
+    + postal_code attribute was sometimes not returned correctly for
+      some results.
+
+  * query_postal_codes now searches for ZIP codes whose distances are
+    inside or exactly at the search radius, instead of strictly
+    inside (<= instead of <).
+
+  * The search algorithm has gotten complex, so I re-implemented
+    nearby_postal_codes in terms of query_postal_codes.  Benchmarking
+    shows that this doesn't introduce much of a performance hit, and
+    it makes the code much more maintainable.
+
+  * A bug in test_near when the $cell and $center were on opposite
+    sides of the -180/180 longitude line caused a cell to be missed.
+
+  * Modified load.pl to take an optional parameter with a filename to
+    build from.
+
+  * Corrected 01_basic.t with new results based on modified code.
+
+  * Added regression test 02_polevault for near poles, prime meridian,
+    and 180/-180 latitude line, including test data edgetest.data
+
+0.05  08/19/2002
+	- Fix for load.pl on FreeBSD and Mac OS X (Andrew Brosnan)
+	- more POD fixes
+
+0.04  07/18/2002
+	- POD fixes (Paul Kooros)
+	- Error handling for load.pl (Paul Kooros)
+
+0.03  05/17/2002
+	- Work around for Perl/Berkeley DB bug in load.pl
+	  (Kyle Dawkins)
+	- Improved accurancy of PI
+
+0.02  12/23/2001
+	- Documentation fixes
+
+0.01  10/27/2001
+	- original version; created by h2xs 1.19

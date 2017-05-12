@@ -1,0 +1,35 @@
+---
+abstract: 'a simple git wrapper to capture output'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+  Test::UseAllModules: '0.12'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.06'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Class
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0'
+  Carp::Clan: '0'
+  MRO::Compat: '0'
+  Module::Find: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  Scope::Guard: '0'
+  String::ShellQuote: '0'
+  Try::Tiny: '0'
+  URI::Escape: '0'
+resources:
+  repository: http://github.com/charsbar/git-class
+version: '0.15'

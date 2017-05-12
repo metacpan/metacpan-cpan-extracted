@@ -1,0 +1,12 @@
+Changes
+ColorHistogram.pm
+ColorHistogram.xs
+Graphics-Magick-ColorHistogram.spec
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+t/00-compile.t
+t/01-histogram.t
+t/test.jpg

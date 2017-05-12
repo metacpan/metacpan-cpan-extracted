@@ -1,0 +1,73 @@
+NAME
+    Games::SolarConflict - Spacewar! clone
+
+VERSION
+    version 0.000001
+
+DESCRIPTION
+    Games::SolarConflict is a Spacewar! clone.
+
+    This game was originally created for The SDL Perl Game Contest!
+
+    See solar-conflict.pl for instructions to play the game.
+
+ATTRIBUTION
+    The font and image files contained in this distribution are licensed
+    separately from the code.
+
+    *   UbuntuMono-BI.ttf
+
+        Created by Canonical Ltd. <http://www.canonical.com/> and licensed
+        under the Ubuntu Font License Version 1.0
+        <http://font.ubuntu.com/licence/>, available at
+        <http://font.ubuntu.com/>.
+
+    *   backgound.png
+
+        Based on spacefield_a-000.png created by beren77
+        <http://opengameart.org/user/453> and licensed under the Public
+        Domain, available at
+        <http://opengameart.org/content/space-backdrop>.
+
+    *   explosion.png
+
+        Based on an image from jswars_gfx_cc3.zip created by Jonas Wagner
+        <http://29a.ch/> and licensed under CC-BY-SA 3.0
+        <http://creativecommons.org/licenses/by-sa/3.0/legalcode>, available
+        at
+        <http://opengameart.org/content/asteroid-explosions-rocket-mine-and-
+        laser>.
+
+    *   spaceship1.png and spaceship2.png
+
+        Based on ship360_32.png created by Killy Overdrive
+        <http://www.killyoverdrive.co.cc/> and licensed under CC-BY 3.0
+        <http://creativecommons.org/licenses/by/3.0/legalcode>, available at
+        <http://opengameart.org/content/spaceship-360>.
+
+    *   sun.png
+
+        Based on sun.png created by NASA, Solar Dynamics Observatory
+        <http://sdo.gsfc.nasa.gov/> and licensed under the Public Domain,
+        available at <http://opengameart.org/content/the-sun>.
+
+SEE ALSO
+    *   solar-conflict.pl
+
+    *   SDL
+
+    *   The SDL Perl Game Contest!
+        <http://onionstand.blogspot.com/2011/02/sdl-perl-game-contest.html>
+
+    *   Spacewar! <http://en.wikipedia.org/wiki/Spacewar%21>
+
+AUTHOR
+    Jeffrey T. Palmer <jtpalmer@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Jeffrey T. Palmer.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

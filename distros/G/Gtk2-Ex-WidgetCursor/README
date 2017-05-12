@@ -1,0 +1,30 @@
+Copyright 2007, 2008, 2009 Kevin Ryde
+
+This file is part of Gtk2-Ex-WidgetCursor.
+
+Gtk2-Ex-WidgetCursor is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-WidgetCursor is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-WidgetCursor.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Gtk2::Ex::WidgetCursor helps you manage what mouse pointer cursor is
+used in a widget's window.  You can setup for a base cursor, then
+something special cursor during a drag, and perhaps a "watch" for a
+busy state on top of one or both of those.
+
+A global "busy" mechanism is included, as a convenient way to display
+a wristwatch in all windows while away number crunching.
+
+The only prerequisite is Gtk2-Perl.  The WidgetCursor home page is
+
+    http://user42.tuxfamily.org/gtk2-ex-widgetcursor/index.html

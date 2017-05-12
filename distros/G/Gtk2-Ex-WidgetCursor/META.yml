@@ -1,0 +1,50 @@
+--- #YAML:1.0
+name:               Gtk2-Ex-WidgetCursor
+version:            15
+abstract:           Mouse pointer cursor management for Gtk widgets.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Glib::Ex::SignalIds:  1
+    Glib::Object::Subclass:  0
+    Gtk2:                 0
+    perl:                 5.008
+    Scalar::Util:         1.18
+resources:
+    homepage:  http://user42.tuxfamily.org/gtk2-ex-widgetcursor/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - devel
+        - examples
+        - maybe
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    maximum_devel:
+        description:  Stuff used variously for development.
+        requires:
+            Pod::Simple::HTML:  0
+            warnings::unused:   0
+    maximum_tests:
+        description:  Have "make test" do as much as possible.
+        requires:
+            Parse::CPAN::Meta:   0
+            Test::DistManifest:  0
+            Test::Pod:           1.00
+            Test::Synopsis:      0
+            Test::YAML::Meta:    0.15
+            YAML:                0
+            YAML::Syck:          0
+            YAML::Tiny:          0
+            YAML::XS:            0

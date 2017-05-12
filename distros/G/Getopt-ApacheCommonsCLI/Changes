@@ -1,0 +1,9 @@
+Revision history for Perl extension Getopt::ApacheCommonsCLI.
+
+0.01  Thu Sep 25 20:27:40 2014
+	- original version; created by h2xs 1.23 with options
+		-AXn Getopt::ApacheCommonsCLI
+
+0.02  Sat Oct 11 09:35:00 2014
+        - update Makefile.PL for META info
+

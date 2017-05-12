@@ -1,0 +1,91 @@
+Revision history for Perl extension Geo::ReadGRIB.
+
+0.01  Fri Apr 21 05:45:54 2006
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.6.0 -n Geo::ReadGRIB
+
+0.40  Sat May 27
+
+        - Added a tempfile() method based on File::Tmp to name
+          temp filed so had to change Perl version to "use 5.6.1"
+        - Each method that uses wgrib.exe now uses tempfile() to
+          name temp files and then removes them when done. 
+        - Changed tests to use full path to test GRIB file
+        - POD doc tweaks	 
+
+0.50  June 12
+
+        - New method extractLaLo() extracts forecast data for a given
+          type and time for a range of locations. The locations will be
+          all (lat, long) points in the GRIB file inside the rectangular
+          area defined by (lat1, long1) and (lat2, long2) where lat1
+          >= lat2 and long1 <= long2.  - that is, lat1 is north or lat2
+          and long1 is west of long2 (or the same as...)
+
+0.51  July 10 2006
+
+        - Added END block and signal handlers to clean up temp files on
+          close or interruptions.
+        - Added new method getParam() to return values of selected 
+          parameters useful to users.  
+
+0.98  March 6 2009
+
+        - Added Geo::ReadGRIB::Place and Geo::ReadGRIB::PlaceIterator
+          classes.
+        - extractLaLo() now returns a PlaceIterator object;  
+        - Deprecated getCatalog() and getCatalogVerbose(). Getting the 
+          offset index for each data type and time is now done during 
+          object creation.
+
+0.99  Oct 2009
+
+        - A major bug fix release to support Canadian high res gribs.
+        - Add a check for GDS byte 6 = 0. Croak if a not (yet) supported
+          grid other than lat/long.
+        - Discover scan mode from byte 28. Many changes to support south
+          to north scanning. Will also print advisory messages if it 
+          detects as yet unsupported modes.
+        - Some refactoring and new tests. 
+        - extract() now returns a PlaceIterator object like extractLaLo
+          does.  
+
+1.0   Oct 2009
+
+        - Some documentation changes and minor adjustments. Verification
+          of new GRIB type support justified finally moving to v1.0
+
+1.1   Oct 2009
+
+        - Bug fix release for rt.cpan.org ticket #50820 where new test
+          fails for some values only on 64bit uselongdouble Perl 
+
+1.2   Nov 2009
+
+        - Improved extractLaLo() by reading all rows from (la1, lo1) to
+          (la2, lo2) into a scalar in one read. This will get more data 
+          than needed in many cases, but the temporary increase in memory
+          footprint will typically be less than a megabyte. Speed increases
+          grater that %35 were measured on large extracts. 
+
+1.21  Nov 2009
+
+        - Add tests and doc to improve "kwalitee" (already 104.35%)
+        - Add and improve range testing methods in accord with DRY 
+          principle and to remove range test from lalo2offset which 
+          is called many times when using extractLaLo()
+
+1.3  Jan 2010
+
+        - Bug fix release for rt.cpan.org ticket #53494 where CMC gribs
+          require a different interpretation of PDS octets 19 and 20
+        - Added fix to cover changes made for fix
+
+1.4  March 2010
+
+        - extractLaLo() no longer saves extracted data to the object by
+          default. The new method backflip() turns this behavior back on.
+        - A test was added for backflip()
+        - Changes made to Makefile.PL to support the cc compiler on Solaris
+          and give a helpful message for those with a different compiler 
+          than Perl was built with.

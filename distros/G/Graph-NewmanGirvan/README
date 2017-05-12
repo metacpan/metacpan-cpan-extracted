@@ -1,0 +1,4 @@
+Graph::NewmanGirvan
+===================
+
+See `perldoc lib/Graph/NewmanGirvan.pm.

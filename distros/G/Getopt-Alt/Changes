@@ -1,0 +1,274 @@
+Revision history for Getopt-Alt
+
+0.4.2   2016-12-20
+        Updating for release of version 0.4.2
+        Fixed stopping processing at -- (Ivan Wills)
+        Fix stopping passing of parameters after a -- (Ivan Wills)
+
+0.4.1   2016-10-31
+        Updating for release of version 0.4.1
+        Too many dashes (Ivan Wills)
+        Changed type testing to give better error messages (Ivan Wills)
+        Cleaned up odd spacing (Ivan Wills)
+
+0.4.0   2016-10-16
+        Updating for release of version 0.4.0
+        Added missing documentation (Ivan Wills)
+        Improving auto completion code (Ivan Wills)
+        Removed condition that can never be true (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
+0.3.9   2016-07-03
+        Updating for release of version 0.3.9
+        Removed reference to removed file (Ivan Wills)
+        Removed documentation for removed cmds (Ivan Wills)
+        Removed attribute cmds as it isn't used (Ivan Wills)
+        More edits (Ivan Wills)
+        Setting default files to edit (Ivan Wills)
+
+0.3.8   2016-03-27
+        Updating for release of version 0.3.8
+        Fixed missing documentation (Ivan Wills)
+        Updated config to auto test (Ivan Wills)
+        Added showing help for sub-ommand usage when not sub-command specified (Ivan Wills)
+        More help (Ivan Wills)
+        Added help (Ivan Wills)
+        Adding help_packages attribute to allow sub-commands their own help package (Ivan Wills)
+        Reduced min perl version (Ivan Wills)
+        Merge pull request #1 from Manwar/fix-typo-in-cookbook-pod (Ivan Wills)
+
+0.3.7   2016-02-21
+        Updating for release of version 0.3.7
+        Added new configs (Ivan Wills)
+        Fixing up auto completion (Ivan Wills)
+
+0.3.6   2016-01-31
+        Updating for release of version 0.3.6
+        Switched back to showing plain message (Ivan Wills)
+
+0.3.5   2016-01-30
+        Updating for release of version 0.3.5
+        Updated license (Ivan Wills)
+        Added new dependency (Ivan Wills)
+        Converted to using Throwable::Error (Ivan Wills)
+
+0.3.4   2015-08-23
+        Updating for release of version 0.3.4
+        Removed creation of makefile (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.3.3   2015-06-25
+        Updating for release of version 0.3.3
+        Fixed warning when no argument passed (Ivan Wills)
+
+0.3.2   2015-05-27
+        Updating for release of version 0.3.2
+        Reverting some of the code back (Ivan Wills)
+        Added some diagnostics (Ivan Wills)
+        Trying to get test working again (Ivan Wills)
+        Trying to construct sub command options (Ivan Wills)
+        Removed unneded tag (Ivan Wills)
+        Removed no critic statement that appears to no longer be required (Ivan Wills)
+        Again cleaned up unused logic (Ivan Wills)
+        Cleaned up logic statements (Ivan Wills)
+        Cleaned up some of the logic in the code (Ivan Wills)
+        Removed code that was unreachable (Ivan Wills)
+        Removed unnessesary line (Ivan Wills)
+        Factered out option class building (Ivan Wills)
+        Trying to plan out sub-command stratergy (Ivan Wills)
+
+0.3.1   2015-03-29
+        Updating for release of version 0.3.1
+        Added full number arg definition (Ivan Wills)
+        Partially working default number argument (Ivan Wills)
+        Added missing semi-colons (Ivan Wills)
+        Added spec type for number arguments (Ivan Wills)
+        New spec type to define values that can be passed in as only numbers (defaults to specified argument) (Ivan Wills)
+        Added test for short form listed values (Ivan Wills)
+        Added tests for BASH auto-completeion (Ivan Wills)
+        Added some documentation about newly added type (Ivan Wills)
+        Made values be accepted and processed correctly (Ivan Wills)
+        Starting on getting set values working (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+
+0.3.0   2015-01-27
+        Updating for release of version 0.3.0
+        Upped minimum version as Perl 5.8.8 seems to have issues (Ivan Wills)
+
+0.2.9   2015-01-21
+        Updating for release of version 0.2.9
+        Changed skipping to check if a YAML module is installed (Ivan Wills)
+        Added more stop words (Ivan Wills)
+        Added suggested config file formats (Ivan Wills)
+        Added skipping if YAML isn't installed and the yaml config is picked by Config::Any (Ivan Wills)
+        Working on perlcritic improvements (Ivan Wills)
+
+0.2.8   2015-01-15
+        Updating for release of version 0.2.8
+        Added case for when the warning is an error object as well (Ivan Wills)
+        Trying to get more detailed error messages (Ivan Wills)
+
+0.2.7   2015-01-08
+        Updating for release of version 0.2.7
+        Updated licence (Ivan Wills)
+        Fixed POD (Ivan Wills)
+        Fixed tests to use --version rather than --VERSION (Ivan Wills)
+        Added missing new options documentation (Ivan Wills)
+        Updated helper docs (Ivan Wills)
+        Changed --VERSION to --version to be consistent with standard practice (Ivan Wills)
+        Expanding coverage (Ivan Wills)
+        added new files to manifest (Ivan Wills)
+        Added tests for more for code (Ivan Wills)
+        Reverted changes for new test (Ivan Wills)
+        New test for build arguments (Ivan Wills)
+        Added some comments and confess missing error condition (Ivan Wills)
+        Updating the documentation (Ivan Wills)
+
+0.2.6   2014-12-12
+        Updating for release of version 0.2.6 (Ivan Wills)
+        Attempt to fix windows issue (Ivan Wills)
+
+0.2.5   2014-12-07
+        Updating for release of version 0.2.5 (Ivan Wills)
+        Changed test to better find out why Windows is having troubles (Ivan Wills)
+        Updating for release of version 0.2.4 (Ivan Wills)
+        Renamed attribute to be clearer about its meaning (Ivan Wills)
+        Switched from Path::Class to Path::Tiny (Ivan Wills)
+        Changed documentation to hear doc for clarity (Ivan Wills)
+
+0.2.4   2014-12-07
+        Updating for release of version 0.2.4 (Ivan Wills)
+        Renamed attribute to be clearer about its meaning (Ivan Wills)
+        Switched from Path::Class to Path::Tiny (Ivan Wills)
+        Changed documentation to hear doc for clarity (Ivan Wills)
+
+0.2.3   2014-12-06
+        Updating for release of version 0.2.3 (Ivan Wills)
+        Added the ability to change the prefix of the config name (Ivan Wills)
+
+0.2.2   2014-12-04
+        Updating for release of version 0.2.2 (Ivan Wills)
+        License update (Ivan Wills)
+        Fixed the documentation about help and aliases attributes (Ivan Wills)
+        Added the ability to have sub-command aliases (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+
+0.2.1   2014-11-24
+        Updating for release of version 0.2.1 (Ivan Wills)
+        Changed to get home directory from File::HomeDir (Ivan Wills)
+
+0.2.0   2014-11-23
+        Updating for release of version 0.2.0 (Ivan Wills)
+        Added new test to manifest (Ivan Wills)
+        Reordered files (Ivan Wills)
+        Added more tests for processing options (Ivan Wills)
+        Removed unessesary code to (gets better code coverage) (Ivan Wills)
+        Added more tests for building options (Ivan Wills)
+        Changed build requires to Test::Warnings (Ivan Wills)
+        Cleaned up bang (Ivan Wills)
+        Changed from Test::NoWarnings to Test::Warnings (Ivan Wills)
+        Added better tests for get_options (Ivan Wills)
+
+0.1.5   2014-09-14
+        Updating for release of version 0.1.5 (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Added better diagnostics (Ivan Wills)
+
+0.1.4   2014-08-26
+        Got updated boilerplate test passing (Ivan Wills)
+        Updating for release of version 0.1.4 (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Updated boilerplate test (Ivan Wills)
+        [Bug #98242] Removed unused modules (Ivan Wills)
+        [Bug #98242] Moved to load Pod::Usage later (Ivan Wills)
+        [Bug #98241] Fixed bad file name (Ivan Wills)
+        Converted to POD syntax (Ivan Wills)
+        Moved to pod (Ivan Wills)
+        Start using travis-ci (Ivan Wills)
+        Updating for release of version 0.1.3 (Ivan Wills)
+        Added missing dependency (Ivan Wills)
+
+0.1.3   2014-08-21
+        Updated licence (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/GetOpt-Alt (Ivan Wills)
+        Added ignoring tag files (Ivan Wills)
+        Updated dependency (Ivan Wills)
+        Fixed more Try::Tiny limitations (Ivan Wills)
+        Trying to replace TryCatch with Try::Tiny (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Got Perl::Critic happyer (Ivan Wills)
+        First stab at default config (probably needs more work) (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/GetOpt-Alt (Ivan Wills)
+        Added more changes (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Added files missing from the manifest (Ivan Wills)
+        Updating for release of version 0.1.2 (Ivan Wills)
+
+0.1.2   2013-10-21
+        Updated dependencies (Ivan Wills)
+        Added files missing from the manifest (Ivan Wills)
+        Fixed POD (Ivan Wills)
+        Fixed warning, started saving helper (Ivan Wills)
+        Changed code to use Moose::Exporter (Ivan Wills)
+        Made next/last work as expected (Ivan Wills)
+        Added showing a list of options if the current parameter is an option (Ivan Wills)
+        Fixed warning about exiting eval via next/last (Ivan Wills)
+        Trying to simplify bash function (Ivan Wills)
+        Added some documentation to eg/auto-complete.sh (Ivan Wills)
+        Added a description (Ivan Wills)
+        Added message (Ivan Wills)
+        Converted confesses to Exceptions (Ivan Wills)
+        Changed missing argument value to throw execption (with work around for TryCatch not catching (Ivan Wills)
+        Added option and type fields to explain what went wrong for individual options (Ivan Wills)
+        Fixed error type (Ivan Wills)
+        New example script to show --auto-complete in action (Ivan Wills)
+        Added more recipies (Ivan Wills)
+        Added missing files (Ivan Wills)
+        Fixed missing $ (Ivan Wills)
+        Added --auto-complete-list to list all options for auto completion (Ivan Wills)
+        Started to document sub-commands (Ivan Wills)
+        Added new Coock Book POD (Ivan Wills)
+        Added catching errors if --auto-complete is on and passing them to the auto_complete function (Ivan Wills)
+        Added auto completeion example (Ivan Wills)
+        First implementation for --auto-complete (Ivan Wills)
+        Changed helper arguments to put their values first so that they can be overridden (Ivan Wills)
+
+0.1.1   2013-07-15
+        Cleaned up messages
+        Fixed issues with calling process on the same object several times
+        Fixed gramma
+        Fixed altering self's sub_command by semi deep copy
+        Getting closer to making test pass
+        Fixed issue where help could be a file rather than a package name
+        Changed showing help to show help from the specified module
+        Trying to get more detailed tests for sub-commands
+        WIP on example complex sub command usage
+        Cleaned up the argv attribute which isn't really needed or tested
+        Added checking if want array to make subcommand usage easier so that the sub command can be returned
+        Big change with get_options now only returns the options (common use senario) to get the Getopt::Alt object you have to use new
+
+0.1.0   2013-05-19
+        Got sub command hashes working, added documentation on how that works
+        Updated the tasks
+        Added new test
+        Starting to implement more complex sub commands
+        Rationalised options use ->options is now the class name and opt is the object with the processed options
+        Fixed nullable parameter
+        Basic sub commands working
+
+0.0.3   2013-05-12
+        Added missing pre-requisite from Build.pl
+
+0.0.2   2013-05-09
+        Got the tests passing
+        Fixed failing tests
+        New Dynaming object parent object
+        Fixed issue where no files causes test to execption
+        More work on getting options working
+        Started objectivying
+        Fixed some error handling
+        Turned on bool overloading again
+
+0.0.1   2012-07-21
+        First version, released on an unsuspecting world.
+

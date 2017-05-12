@@ -1,0 +1,339 @@
+dir /usr
+dir /usr/lib
+obj /usr/lib/libgdk-1.2.so.0.9.1 d6f71cd52fded66132686840bf11818e 1082975415
+sym /usr/lib/libgdk-1.2.so.0 -> libgdk-1.2.so.0.9.1 1082975415
+sym /usr/lib/libgdk.so -> libgdk-1.2.so.0.9.1 1082975415
+obj /usr/lib/libgdk.la 2d238220e97c13b921c6760f1e1616bb 1082975415
+obj /usr/lib/libgdk.a 1fdc2f774f34712a1e14d314e8deed6e 1082975415
+obj /usr/lib/libgtk-1.2.so.0.9.1 443b7327b74f7c15245974e97b950f11 1082975415
+sym /usr/lib/libgtk-1.2.so.0 -> libgtk-1.2.so.0.9.1 1082975415
+sym /usr/lib/libgtk.so -> libgtk-1.2.so.0.9.1 1082975415
+obj /usr/lib/libgtk.la ff8929ae3034eaebdebfd282d0bd0a6a 1082975415
+obj /usr/lib/libgtk.a 563c8ec22544e249e4ea65ea0a38b119 1082975415
+dir /usr/lib/pkgconfig
+obj /usr/lib/pkgconfig/gdk.pc 46b33cdd5e6e45f1fdd7eef672bc1312 1082975415
+obj /usr/lib/pkgconfig/gtk+.pc 242ff614b39c7e7234a0e346c93c31c3 1082975415
+dir /usr/bin
+obj /usr/bin/gtk-config 43f6cd0d029ded14b6bf026bc551ba26 1082975415
+dir /usr/include
+dir /usr/include/gtk-1.2
+dir /usr/include/gtk-1.2/gdk
+obj /usr/include/gtk-1.2/gdk/gdk.h 7efc5c0d998f0bf885ad64c882ac79b8 1082975415
+obj /usr/include/gtk-1.2/gdk/gdkcursors.h 6d362a5402853910f5a132ddd7a04559 1082975415
+obj /usr/include/gtk-1.2/gdk/gdkrgb.h ed9ea1747834729904387cfe5d946e48 1082975415
+obj /usr/include/gtk-1.2/gdk/gdki18n.h 3034e7281569a9453ca1553f4ffe58bf 1082975415
+obj /usr/include/gtk-1.2/gdk/gdkkeysyms.h 3f6260583cfad89b4e56895a6461ce25 1082975415
+obj /usr/include/gtk-1.2/gdk/gdkprivate.h b2694b7f982e7685631a8ce20a87c997 1082975415
+obj /usr/include/gtk-1.2/gdk/gdktypes.h 5d783359b6cf3de6c5470f3c8cfd6069 1082975415
+obj /usr/include/gtk-1.2/gdk/gdkx.h 6e4102f60bdb30dac8d0d1e98e2cc884 1082975415
+dir /usr/include/gtk-1.2/gtk
+obj /usr/include/gtk-1.2/gtk/gtk.h 1ebd0ba81df3f3ae62a53c0a4a3abe0a 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkaccelgroup.h 8bd95e0d4d851ed4b9fe96a65d7434fe 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkaccellabel.h d9dd5c87e01eef015506d551427778f2 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkadjustment.h 4491116d69d238aefef7d6c982a79d98 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkalignment.h e3b117424803109c803699b44e14ed59 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkarg.h a0d282ab06c9feea9273baeeb7a016e9 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkarrow.h a298d987e06b33152b770389a9477010 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkaspectframe.h 1a7da56d6afe3674d1713ccab02b8f93 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkbin.h 32f514299a8f99922ef30939f7400a65 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkbindings.h 2d5a177e275006313f69bc983bda2bd4 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkbbox.h 0269e7342da91c3bdf5fd8ca798aff87 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkbox.h 3576d3d554a22001aa4e4f4c1177c6dd 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkbutton.h 578c21f0eead5affff7af7305ef79fde 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkcalendar.h e997d4a073122600fe2b1ab760858515 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkcheckbutton.h 36675397baaa9451b96297f20766ec95 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkcheckmenuitem.h 0928600cda67eac5030afa2ac1b3f6d6 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkclist.h e56d6945f34430b804bfea4777400ca7 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkcolorsel.h f12c8524429ba48f1e6bbb790950e95b 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkcombo.h 3afdbbcdc0dae05f9814a893335cfa5b 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkcompat.h d9512f9a99571218e922c3c9ed69acf9 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkcontainer.h 86cc5cd0ecadde75d61eb595977c0542 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkctree.h 821d375765ae6aa50b318de92788cb5b 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkcurve.h 527a17c79efac6612b0935c77e1801f1 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkdata.h 49d53f914729e7793502507a8a365166 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkdebug.h b7defbc2690a431eb6ff0b9c6db2c03b 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkdialog.h 58295f2b615c0d4ff0d6eb052b337424 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkdnd.h 51e4c2420d45e804a61ccbda21eaa44d 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkdrawingarea.h 11253321ec53c95f3bf62fb71a95aa69 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkeditable.h efde06d6db445b831c2468c48d004c06 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkentry.h 241bb38ca2738410d0a4e27c05f9cebd 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkenums.h cafd36652ed9515fb4373d11018f7eba 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkeventbox.h 42f47b1f8dc342f6bc169fc9fed0f345 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkfilesel.h 7d8eb3ce39c755800e347b07a2bd0120 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkfixed.h 1004bb7bd1f67e1d0e03609c340af2c4 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkfontsel.h da3e4b519f36c2a21c078278f37d41ad 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkframe.h 0843048dca7beb89c90187533781cb03 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkgamma.h 27b276e738cc594c48b1a62d86587adb 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkgc.h 10f7a959dd3513b6e1cc4dc664b39084 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkhandlebox.h 13761bd7d5e34b16c71fa0b14afbdec2 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkhbbox.h c1252a8b9abfd2a1188d59ccdfd7545f 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkhbox.h 9fc239153f0e703f29fbb977bd1902bc 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkhpaned.h 114727b2a30803c9173250b96d3e5b5c 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkhruler.h b65eee12899329650a6c8298f0c16977 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkhscale.h cfecd423325fd2087f6f72efd6a74c52 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkhscrollbar.h 5d0f1b8830d440e427a6dc241ec06c94 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkhseparator.h c03ecc7328683335efc009bc6384fad7 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkimage.h b175f6a84a664c14d8ed04cd1494d9fa 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkinputdialog.h f95d265316af4a52a3cca50917113dd7 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkinvisible.h f6edde4a439e3015bd1f30bf42054ac6 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkitem.h 0ea0413064594c967e43d058ea59ddad 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkitemfactory.h 74b84ea5a71775b1c39e3d6b9d100b06 1082975415
+obj /usr/include/gtk-1.2/gtk/gtklabel.h 38e71c8189f483b337abbc5df59653b7 1082975415
+obj /usr/include/gtk-1.2/gtk/gtklayout.h 634c5d4c07a476d4c2570cc834ed9abd 1082975415
+obj /usr/include/gtk-1.2/gtk/gtklist.h 49bef86a7020d74c10ecb24993e13822 1082975415
+obj /usr/include/gtk-1.2/gtk/gtklistitem.h a0794aaa0dff94d0816bfc976f9d1f5f 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkmain.h c97b5b44334593925574df09ce532f2b 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkmenu.h 575d2728caea07c3f68ca87195487d3c 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkmenubar.h e26c8f745ffbb800bf61f59b8858adb4 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkmenufactory.h 246de0dc4b6369703f9e4ee1da982bec 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkmenuitem.h 547a29e24344b1a805287e6689d14a88 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkmenushell.h 2f3f35276d2022fe96d63514b88f3c45 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkmisc.h 5617e3659dfd703260a9fbd69afaed4d 1082975415
+obj /usr/include/gtk-1.2/gtk/gtknotebook.h 3e1cf358006ff4786d06b8e210fc6f87 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkobject.h d8f009e363e5b6266f04721d649bc6ed 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkoptionmenu.h f0d0bf7a0c7a74d59d27a80e0a6732d6 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkpacker.h bb6bd09af9d69eb37ab126b362b4f931 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkpaned.h e08764872aab71fd11e6b32303f66a67 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkpixmap.h eab622665d8783a7ee75e0f0d9b37954 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkplug.h 654ec3ea6f35fb0c8edde934224c4690 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkpreview.h e430e14815107a45b9096a1514bb97e5 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkprivate.h 22eb05474b667309644c32f7fe85536a 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkprogress.h faee260c079425de27662ea85bcf77b0 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkprogressbar.h b28b3684ec630d255fc8c98699af96d8 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkradiobutton.h f0ea5668f9128932bf0c5fbe73fb2ab4 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkradiomenuitem.h 95fc76f41aba3fa1df83e98b09dfff5e 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkrange.h db01ba3639f5e058d860f2ea6ce9ebfd 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkrc.h ed3d482f3829c58155ca9da72fbad2de 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkruler.h aee7c987875ed80aa2666230884df12a 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkscale.h c63bab0c16a2f6cdff449f4fe7df6622 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkscrollbar.h 7aeca1d92c9aa4e54e292678c45cdf37 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkscrolledwindow.h 087b8c94dbf64a7c8112fecf064e9344 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkselection.h f13d4788b43328f4caa050d48c8f1805 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkseparator.h 68129dee3c5347127c755af33a7f6cc2 1082975415
+obj /usr/include/gtk-1.2/gtk/gtksignal.h 45a82c66b5466db59c55d06c139093a2 1082975415
+obj /usr/include/gtk-1.2/gtk/gtksocket.h 227ccc7e830f6ffe1ca679d73231c98f 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkspinbutton.h be0a858a9d0a1a13311a96decfc45763 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkstyle.h c5dc2fa273dd5a9ffd9e56515a971219 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkstatusbar.h c19e535369b971a58c757ce7edf71dc5 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktable.h 2cf12465dcc5ddb9310b1e5b35b02ce2 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktearoffmenuitem.h 59187d2b775931c89f578e60fe68136e 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktext.h ce542d5360c64d57e1c1077a112e7077 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkthemes.h 57d632fd1cda8b8848050af722ed61ef 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktipsquery.h 4735ba1754e0619ee241fc1ae17be619 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktogglebutton.h ce28972967b2d54a8f11520f3015956d 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktoolbar.h 530613ef39e80278f3a5429a379cc2b5 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktooltips.h 9a7af9f79152b663ec692ff94f600892 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktree.h 805dc0d9222d333373762874eee0721a 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktreeitem.h 9b1615283d091e27b671d91f83ee508e 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktypeutils.h 22cb6ae86d52d7087eb9f22f4f97affe 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkvbbox.h 89829da5e76fbc92357ab3e4bf938fcf 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkvbox.h 5b33c25b9cdf6c3185e04a383d0759e2 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkviewport.h d51be06b35356e847a3b5c33d02d9b6e 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkvpaned.h 6653711e7d4732db899e00e30cc2881e 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkvruler.h a704994ca8c903b756a2ffa050ce57d8 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkvscale.h 3680927cbcfcf5c3df1d99ebdbb3e640 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkvscrollbar.h cd30b20ba6cde42bd2b55f3e4007c9a0 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkvseparator.h 42be50e2d2fe3b108a58b9bb21466107 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkwidget.h de6fcfafced413e3b407da76807604fe 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkwindow.h 1b5fa5b3d95cef7db34cb82b049b5bf1 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkmarshal.h 873754259953ee8d38f2bbcf6058e93c 1082975415
+obj /usr/include/gtk-1.2/gtk/gtktypebuiltins.h 0f045fd35e414833a6183776253a041e 1082975415
+obj /usr/include/gtk-1.2/gtk/gtkfeatures.h 3cbbea3f54299f586c30a95980024e00 1082975415
+dir /usr/share
+dir /usr/share/themes
+dir /usr/share/themes/Default
+dir /usr/share/themes/Default/gtk
+obj /usr/share/themes/Default/gtk/gtkrc 6a571e9d38c43a7c57240c15d3e9d551 1082975415
+dir /usr/share/themes/Gentoo
+dir /usr/share/themes/Gentoo/gtk
+obj /usr/share/themes/Gentoo/gtk/gtkrc 36d00cf3b4035e6cb9873ade9ed1a9ce 1082975415
+dir /usr/share/info
+obj /usr/share/info/gtk.info-1.gz 0318058faf6df7000de3005317a4335b 1082975415
+obj /usr/share/info/gtk.info-2.gz a93c96f48bd3593052de952316b83313 1082975415
+obj /usr/share/info/gtk.info-3.gz 23a02fb4b41f016388fd60f0b3a56425 1082975415
+obj /usr/share/info/gtk.info-5.gz b4f2bb28bb1e9032b367d7bd96558122 1082975415
+obj /usr/share/info/gtk.info-6.gz 65be06c302a0e421c7317a5257727351 1082975415
+obj /usr/share/info/gdk.info.gz b60c46fec45ea06e4734aabcbe55c9b5 1082975415
+obj /usr/share/info/gtk.info.gz 54b6b4ece592cca10413e140f9116894 1082975415
+obj /usr/share/info/gtk.info-4.gz 2431ba19e3f75b9acf72884a2168ad72 1082975415
+dir /usr/share/man
+dir /usr/share/man/man1
+obj /usr/share/man/man1/gtk-config.1.gz af939882530afb34a45dd2840c44ec35 1082975415
+dir /usr/share/aclocal
+obj /usr/share/aclocal/gtk.m4 4bbe0df16259421ab575d1c987dfe16a 1082975415
+dir /usr/share/doc
+dir /usr/share/doc/gtk+-1.2.10-r11
+dir /usr/share/doc/gtk+-1.2.10-r11/docs
+dir /usr/share/doc/gtk+-1.2.10-r11/docs/html
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_table.gif b8b1b1b4965251306a0a89ae425c5340 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_packbox1.gif 428bb005e744f8a70e78faf68ca81531 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_packbox2.gif 7733c9790e48ab8684b198c7b7792e2d 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut.html d74748e5ec2fc6b20df2ed4221949c3c 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-1.html fc6d17b38935631553ada71a60fc9644 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-2.html 4bda2575dd3e63902f9984841ca60c36 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-3.html 636ac2701228141349a145f8600dd8d9 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-4.html a9ea1b370d4f02414f9d6e0b133f2065 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-5.html d91bf21c9c559fecfbb3bc1cc6e358f3 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-6.html 798f483a94d934cd00a5b448ffbc47b0 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-7.html 29d0ced3aa529555f804e62b0740e033 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-8.html 588cec24cc7358baee6f0cf4f76213e1 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-9.html 707d1f1e444caf78829fecdf044e6e53 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-10.html 2b26827afe3d5b29b3b8b55c1c77bbaf 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-11.html 311bc2ba93e1233d5c9d0cdfc86c92bc 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-12.html 1200a308cf583eb940e29921bbeb857d 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-13.html cd3b0c2002d5c0f22ea4cd8e455c9ca6 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-14.html 96804e604e7c3c60008abac6fecf564f 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-15.html d92088ac8434b300d70bc76589564814 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-16.html 1fa6b07f12e428c922f25d7f095fc859 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-17.html bba56dc58b5aea0b304593e04a672221 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-18.html 1d7563e291fa1486c9d2158a7063a90e 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-19.html d82da1a9bde83bc41abfff135230e93d 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-20.html d7391bcc13db9be7eec4230120502be5 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-21.html 75f7f79ac5545c954fbbb7f88b4006fb 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-22.html 86a8cd14cb4ee3bfa0f72a784628a7cd 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-23.html b8c5dbdd6eaf750252acf5687e0b1cae 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-24.html d73de01a839de5d27afd5f8562a0aeb9 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-25.html c7f9b4d60e9e83015cf9b75380babff0 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-26.html de81d524c287c1be523856c2e190cabe 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-27.html 3183c956b6821b95e4dc97fc38a136d3 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-28.html 2e1c6209df9d2502a37d67d2a019a7af 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-29.html ff215ceaeb0ed1af8caaf52f56bd0039 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-30.html 5af50dff7c90f56d33499b80a456ca77 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut-31.html 0f889b2923adfe4dba3c73571db780bc 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-1.html 0dda224d9ed5aab6339ed9c2980b40cb 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-2.html 43e0d0a6333805595c767ebe958dad35 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-3.html 91433e49d2873af9da84f79190eaf51b 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-4.html 11b35fb2ac22c027f44b19bbe85e6e8b 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-5.html 72c8d88bb436461d77a8601a56bad607 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-6.html ed1bbc981ab82cfcbea24cafe91f9cd0 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-7.html e5f3039f9bc92850b7d7306cc99bd4cd 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-8.html 5e25058b49c092d56f6b6ab7ce5a9436 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-9.html b2dcbd6ff2f49819a4a8c9794ef057a9 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-10.html a954c232c0434970096783712b0a9558 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-11.html 7b01b34ee152f709c9b6740a8b26d554 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-12.html f8fa1d17d40ba9bec7b798a675bd5111 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-13.html 47fa7a8d47131ac77a0a8ddcbbfbaad2 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-14.html 79395457259a19599c4543c36316fe9d 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-15.html 8152f42d25dc083b570ad12f6eb4fea2 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-16.html bc6031ede0fa9490513b867c1d83d848 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-17.html 4e2a20c3be44e7d75a86afa3dd60c596 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-18.html 63ed569d69d3b1f7f1df85efd26036c3 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-19.html 231adebab6f84ade7b4ef9c387bf822e 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-20.html cf2a98346de9d45a079e59c90597bdd7 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-21.html 131d2216dffeb6d965357d5c64b639f2 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-22.html 3b9f22031376f278996fae9c1a4a32a0 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-23.html df83369b578e7b3e1cf9c050ee584600 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr-24.html ef84a26a5c2b6c223744f482a643366d 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_fr.html 8eccb2428a7b5bf5475a9ccb9c61f2a8 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it.html b103506a5c34477d367cc8a4fada7d26 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-1.html 867f55706cb7ee557ac846feff901709 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-2.html eb0718d47d5e21c485056abacdda7f5c 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-3.html 41c02c79623cd22d4dde97e073430d6e 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-4.html 9858ef53aafea7cd4bf30d63a5d46cc6 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-5.html 46e7226f336c1012d986e1c8b3098b77 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-6.html b29dacc10ac242070c6c2bea59d5864d 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-7.html 5d5d653869eff0a3d50678b70ab7aa27 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-8.html baecbd989fd2a6c0f84dac0bb39b66dc 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-9.html b69666a647440dddf282f5f709f273b1 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-10.html 920b559e8c506fb3f015661158c6296b 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-11.html ab930b9acd161da157cf62a82e4938e4 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-12.html a95016b722353ea902fae087b88aeccd 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-13.html 78744cc87768b18227f933301a710bbf 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-14.html f782a74860db12beb0b97cace2347535 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-15.html 27587921d58cdf202e6ee065d20906fa 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-16.html 8f6cd49dace2f27e1dcbf9933b43cb2e 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-17.html a8f4e119de34c6f197da09ba84ef64f2 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-18.html 3bc8d5279dad66eaaf7d282556daf4ab 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-19.html be13aa3e7ce0ee9766b06b002c86469f 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-20.html 5b13626d672d995ef212cd128b6b0402 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-21.html 08e44b2d16d3b7a964fb7385b81dad02 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-22.html 5be028290113679cd6e8ce7faf1622a0 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-23.html 7c70dcb8af94cec29ed097491a7c4a5e 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtk_tut_it-24.html 243561e0bd38f7cb51a899a139fd57b7 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtkfaq.html 59a57a8aae3b237f0070a96d70f5b42d 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtkfaq-1.html a7f3a1a325742692a6a386a1029a7fa7 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtkfaq-2.html 55eb6a6046f1e52fe9934e98b3a25526 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtkfaq-3.html 251f48999501360f3a39ba7c74b513c6 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtkfaq-4.html d91cc536ea621956d7b24f1a3fcdd019 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtkfaq-5.html 978b0552e82f51774f244aea1c7e25ad 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtkfaq-6.html 629795ee20fa3c719f5e4f736cb8da5a 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/html/gtkfaq-7.html 158981c37669e32b0fd71e64a6e94dfe 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/Changes-1.2.txt.gz a33ee18cf30fc2ef2beec7087f9a95df 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/debugging.txt.gz 30a2b3976b4d27f443da4979efeedfb5 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/developers.txt.gz 23f9658c02ddf7fe09871bfaa4f87f18 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/generation.txt.gz ea4184a38c01324b2c113c3b4046bba3 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/gtk-config.txt.gz 5625e49c7b0af0b26df6cc060f35309b 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/refcounting.txt.gz 1e11e63354f0499d02772ac687b6c3a1 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/styles.txt.gz b93ed1f92a4b8fdc5de43ca9dc0429ae 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/text_widget.txt.gz 959591979c754e73e5736edcb3fb7d20 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/gtk_tut.txt.gz 165666ff455a52e77c0c58ff7c61b8f8 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/widget_system.txt.gz 064cda9b129342ec76c24be49aac428a 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/gtk_tut_packbox1.gif.gz 06f3388868aff7e93f98116d93778b08 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/gtk_tut_packbox2.gif.gz 960cde02fb2cae93617c8a299e8c3eb0 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/gtk_tut_table.gif.gz 5a8a22f35114f96a773fc8c9009aee58 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/gtk_tut_fr.txt.gz 93f138f80bc4ece153b515eb13f44417 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/gtk_tut_it.txt.gz a265ef42c40153e372cb1ae4262a71de 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/docs/gtkfaq.txt.gz fcfb3dbc45d7b95caaeebecbb3b0ed88 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/AUTHORS.gz 43ae2b3fc2121fdab6bbc69cd2770250 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/COPYING.gz 9b3238811136d5fcfa75bb179d4a8833 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/HACKING.gz feaec54780ab5cf57d3ae9ec3eaa87a9 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/ChangeLog.gz bdc416f31440fae424da964638688b96 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/NEWS.gz fd849086324f35cb89996e8f3435518f 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/ChangeLog.pre-1-0.gz dd12eba8638ac47d103c0c1d3bd328e2 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/README.gz e6cd812c39d9765198dd9f6e0ac72794 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/NEWS.pre-1-0.gz 98e171e78921e7fd75fb402eb07b518c 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/TODO.gz 97845b09dd2ed961d291e29c6acb0268 1082975415
+obj /usr/share/doc/gtk+-1.2.10-r11/README.cvs-commits.gz 8634ae92ce5b8099f3471dab4c085d89 1082975415
+dir /etc
+dir /etc/gtk
+obj /etc/gtk/gtkrc.az 35a22d6744dfcb67a8efba689abdcaf2 1082975415
+obj /etc/gtk/gtkrc.el a92356b895516fe527be5fe6d8afb5c9 1082975415
+obj /etc/gtk/gtkrc.eo 8de6d603dce4b9a34a7edb0ed3ac7bf4 1082975415
+obj /etc/gtk/gtkrc.he 3998d39e89de931de8c1eabe5730e1a0 1082975415
+obj /etc/gtk/gtkrc.hy 34d6d2dea5b5b641eea0856a10e59a6d 1082975415
+obj /etc/gtk/gtkrc.ja 198f6da4b968f6769bcb3a03f1ed775d 1082975415
+obj /etc/gtk/gtkrc.ko 127e10d310e05eef8864c433689bd9f6 1082975415
+obj /etc/gtk/gtkrc.ru 4917134f95a1928ddf2ce24ca5220bf1 1082975415
+obj /etc/gtk/gtkrc.tr f72492bacf98c61a9c39b5c746a68257 1082975415
+obj /etc/gtk/gtkrc.th 6e3b068760d7c9995645330434202ddb 1082975415
+obj /etc/gtk/gtkrc.uk 3c3194a96b9eb3805eb7e572da519fd7 1082975415
+obj /etc/gtk/gtkrc.iso-8859-2 7583eb79e9ff6371d6996e0b9223096c 1082975415
+obj /etc/gtk/gtkrc.iso-8859-5 9f428a9108a19f41a117b6465f0881a0 1082975415
+obj /etc/gtk/gtkrc.iso-8859-13 2003fad80d14cc7fce9456530b7d6767 1082975415
+obj /etc/gtk/gtkrc.iso-8859-14 4c05e4635b9b1d18d1a61e952a0a4d51 1082975415
+obj /etc/gtk/gtkrc.iso-8859-15 b57cfb45b56d2efde1235c785fc2a50a 1082975415
+obj /etc/gtk/gtkrc.zh_CN 7bcb87939636be8ec2a8cbe62cfca38b 1082975415
+obj /etc/gtk/gtkrc.zh_TW.big5 92fe73fdeacaa16b771d39231dff478a 1082975415
+obj /etc/gtk/gtkrc.ka_GE.georgianacademy fde8a8bc49c326956615d5624144da88 1082975415
+obj /etc/gtk/gtkrc.ka_GE.georgianps a2f0cadd343c324ede9455d51c241914 1082975415
+obj /etc/gtk/gtkrc.vi_VN.tcvn c16fbfb0d7fe373edfb5aaa9c99a0298 1082975415
+obj /etc/gtk/gtkrc.vi_VN.viscii c4e741a1a570ce6044cc626769cb1c11 1082975415
+obj /etc/gtk/gtkrc.cp1251 26a466ee49c21d9e4e81fc71de62ef66 1082975415
+obj /etc/gtk/gtkrc.cp1255 5b2b88230cbd20231e109b7ec26c50c0 1082975415
+sym /etc/gtk/gtkrc.cs -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.hr -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.hu -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.pl -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.ro -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.sk -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.sl -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.sq -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.sr -> gtkrc.iso-8859-2 1082975415
+sym /etc/gtk/gtkrc.bg_BG.iso88595 -> gtkrc.iso-8859-5 1082975415
+sym /etc/gtk/gtkrc.mk -> gtkrc.iso-8859-5 1082975415
+sym /etc/gtk/gtkrc.sp -> gtkrc.iso-8859-5 1082975415
+sym /etc/gtk/gtkrc.ru_RU.iso88595 -> gtkrc.iso-8859-5 1082975415
+sym /etc/gtk/gtkrc.he_IL.cp1255 -> gtkrc.cp1255 1082975415
+sym /etc/gtk/gtkrc.he_IL.microsoftcp1255 -> gtkrc.cp1255 1082975415
+sym /etc/gtk/gtkrc.yi -> gtkrc.cp1255 1082975415
+sym /etc/gtk/gtkrc.mi -> gtkrc.iso-8859-13 1082975415
+sym /etc/gtk/gtkrc.lt -> gtkrc.iso-8859-13 1082975415
+sym /etc/gtk/gtkrc.lv -> gtkrc.iso-8859-13 1082975415
+sym /etc/gtk/gtkrc.cy -> gtkrc.iso-8859-14 1082975415
+sym /etc/gtk/gtkrc.ga -> gtkrc.iso-8859-14 1082975415
+sym /etc/gtk/gtkrc.et -> gtkrc.iso-8859-15 1082975415
+sym /etc/gtk/gtkrc.ka -> gtkrc.ka_GE.georgianps 1082975415
+sym /etc/gtk/gtkrc.vi_VN.viscii111 -> gtkrc.vi_VN.viscii 1082975415
+sym /etc/gtk/gtkrc.vi -> gtkrc.vi_VN.tcvn 1082975415
+sym /etc/gtk/gtkrc.be -> gtkrc.cp1251 1082975415
+sym /etc/gtk/gtkrc.bg -> gtkrc.cp1251 1082975415

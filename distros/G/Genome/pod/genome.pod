@@ -1,0 +1,23 @@
+
+
+=pod
+
+=head1 NAME
+
+genome - bioinformatics tools for genomics
+
+
+
+=head1 VERSION
+
+This document describes genome version 0.05.
+
+=head1 SUB-COMMANDS
+
+ install  [NAME]  install more modules 
+
+
+
+
+=cut
+

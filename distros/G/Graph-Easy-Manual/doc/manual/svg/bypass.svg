@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="539" height="119" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Generated at Thu Aug 17 19:51:20 2006 by:
+  Graph::Easy v0.47
+  Graph::Easy::As_svg v0.19
+-->
+
+<title>Untitled graph</title>
+<defs>
+ <!-- open arrow head -->
+ <g id="ah" stroke-linecap="round" stroke-width="1">
+  <line x1="-8" y1="-4" x2="1" y2="0" />
+  <line x1="1" y1="0" x2="-8" y2="4" />
+ </g>
+
+ <!-- class definitions -->
+ <style type="text/css"><![CDATA[
+ .edge {
+  fill: inherit;
+  font-family: monospaced, courier-new, courier, sans-serif;
+  stroke: black;
+ }
+ .node {
+  text-anchor: middle;
+  colorscheme: inherit;
+  fill: white;
+ }
+ .edge {
+  text-anchor: middle;
+  font-size: 13px;
+ }
+ ]]></style>
+</defs>
+
+<!-- graph background with border (mainly for printing) -->
+<rect x="0" y="0" width="547" height="127" fill="white" stroke="none" />
+
+<g class="edge">
+ <!-- from Koblenz to Trier -->
+ <!-- vertical -->
+ <line x1="141" y1="52" x2="141" y2="76" stroke="#000000" stroke-width="1" />
+
+ <!-- north/east corner -->
+ <g stroke="#000000" stroke-width="1">
+  <line x1="141" y1="76" x2="141" y2="94.5" />
+  <line x1="140.5" y1="94" x2="183" y2="94" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="183" y1="94" x2="210.8" y2="94" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" x="211.8" y="94"/>
+</g>
+
+<g class="edge">
+ <!-- from Frankfurt to Dresden -->
+ <!-- horizontal -->
+ <line x1="415.2" y1="26" x2="439.8" y2="26" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" x="440.8" y="26"/>
+</g>
+
+<g class="edge">
+ <!-- from Koblenz to Frankfurt -->
+ <!-- horizontal -->
+ <line x1="186.2" y1="26" x2="215" y2="26" stroke="#000000" stroke-width="1" />
+
+ <!-- horizontal -->
+ <line x1="215" y1="26" x2="281" y2="26" stroke="#000000" stroke-width="1" />
+
+ <!-- horizontal -->
+ <line x1="281" y1="26" x2="308.8" y2="26" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" x="309.8" y="26"/>
+</g>
+
+<g class="edge">
+ <!-- from Trier to Frankfurt -->
+ <!-- horizontal -->
+ <line x1="284.2" y1="94" x2="313" y2="94" stroke="#000000" stroke-width="1" />
+
+ <!-- north/west corner -->
+ <g stroke="#000000" stroke-width="1">
+  <line x1="362.5" y1="76" x2="362.5" y2="94.5" />
+  <line x1="313" y1="94" x2="363" y2="94" />
+ </g>
+
+ <!-- vertical -->
+ <line x1="362.5" y1="48.2" x2="362.5" y2="76" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" transform="translate(362.5 47.2)rotate(-90)"/>
+</g>
+
+<g class="edge">
+ <!-- from Bonn to Koblenz -->
+ <!-- horizontal -->
+ <line x1="70.2" y1="26" x2="94.8" y2="26" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" x="95.8" y="26"/>
+</g>
+
+<g class="node">
+ <!-- Bonn, rect -->
+ <rect fill="white" height="35" stroke="#000000" width="58" x="8.5" y="8.5" />
+ <text x="38" y="32" fill="#000000">Bonn</text>
+</g>
+
+<g class="node">
+ <!-- Koblenz, rect -->
+ <rect fill="white" height="35" stroke="#000000" width="83" x="99.5" y="8.5" />
+ <text x="141" y="32" fill="#000000">Koblenz</text>
+</g>
+
+<g class="node">
+ <!-- Frankfurt, rect -->
+ <rect fill="white" height="35" stroke="#000000" width="98" x="313.5" y="8.5" />
+ <text x="363" y="32" fill="#000000">Frankfurt</text>
+</g>
+
+<g class="node">
+ <!-- Dresden, rect -->
+ <rect fill="white" height="35" stroke="#000000" width="87" x="444.5" y="8.5" />
+ <text x="488" y="32" fill="#000000">Dresden</text>
+</g>
+
+<g class="node">
+ <!-- Trier, rect -->
+ <rect fill="white" height="35" stroke="#000000" width="65" x="215.5" y="76.5" />
+ <text x="248" y="100" fill="#000000">Trier</text>
+</g>
+
+</svg>

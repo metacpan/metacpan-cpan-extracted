@@ -1,0 +1,55 @@
+                    =======================================
+                      Module "Graph::Kruskal" Version 2.0
+                    =======================================
+                       for Perl version 5.000 and higher
+
+     Copyright (c) 1995, 1996, 1997 by Steffen Beyer. All rights reserved.
+     This package is free software; you can redistribute it and/or modify
+     it under the same terms as Perl itself.
+
+
+Prerequisites:
+--------------
+
+Perl version 5.000 or higher.
+
+
+Installation:
+-------------
+
+Simply install this module using the following commands:
+
+                            % perl Makefile.PL
+                            % make
+                            % make test
+                            % make install
+
+
+Documentation:
+--------------
+
+To see the module's documentation, use the command "man Graph::Kruskal"
+thereafter.
+
+
+Version history:
+----------------
+
+Version 1.0 was a simple Perl script contained in the "Set::IntegerFast"
+distribution.
+
+Version 2.0 is the initial release as a module.
+
+
+Author's note:
+--------------
+
+I hope you will find this module beneficial!
+
+Share and enjoy!
+
+Yours,
+--
+    Steffen Beyer <sb@sdm.de> http://www.engelschall.com/u/sb/
+     "There is enough for the need of everyone in this world,
+      but not for the greed of everyone." - Mahatma Gandhi

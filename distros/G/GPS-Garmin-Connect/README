@@ -1,0 +1,48 @@
+GPS-Garmin-Connect
+
+GPS::Garmin::Connect is a simple module which allows you to fetch your
+activities from http://connect.garmin.com
+
+WARNING: It is NOT based on any official API released by Garmin. It 
+simply logs in using the web form and fetches JSON data just like 
+the flash UI does. It might break at any time.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc GPS::Garmin::Connect
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=GPS-Garmin-Connect
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/GPS-Garmin-Connect
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/GPS-Garmin-Connect
+
+    Search CPAN
+        http://search.cpan.org/dist/GPS-Garmin-Connect
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Herbert Poul
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

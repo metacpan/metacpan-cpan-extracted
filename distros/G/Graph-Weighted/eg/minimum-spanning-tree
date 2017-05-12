@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Graph::Weighted;
+
+my $g = Graph::Weighted->new( undirected => 1 );
+$g->populate(
+    {
+        A => { B => 4, F => 2 },
+        B => { C => 6, F => 5 },
+        C => { F => 1 },
+        D => { },
+    },
+);
+
+my @path = $g->MST_Kruskal; # A=B,A=F,C=F
+print 'Kruskal: ', join( '->', @path ), "\n";
+
+@path = $g->MST_Prim; # same
+print 'Prim: ', join( '->', @path ), "\n";

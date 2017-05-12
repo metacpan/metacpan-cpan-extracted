@@ -1,0 +1,6 @@
+Revision history for Perl extension Games::EternalLands::Binary::Float16.
+
+0.01  20120714
+	- original version; created by h2xs 1.23 with options
+		-A -n Games::EternalLands::Binary::Float16
+

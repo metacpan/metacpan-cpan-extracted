@@ -1,0 +1,1074 @@
+? 119804.patch
+? ChangeLog.new
+? accels
+? accepttab
+? adsf
+? asdf
+? beta
+? birnan
+? blah
+? complete.diff
+? crack.patch
+? defer_phase1
+? dizzy2.patch
+? dizzybar.patch
+? draw-as-radio.patch
+? emfle
+? extra.patch
+? frugt
+? gd
+? goback.patch
+? good-install.patch
+? gtk-noexpose-scroll.diff
+? gtkd
+? hasspinner.patch
+? head-unchanged-gtk+-diff
+? hmm
+? hmm.patch
+? huh
+? instrument.patch
+? jazz.patch
+? jazz2.patch
+? mactreeplus.patch
+? mbdraw.patch
+? menu-redraw
+? no-flicker-old.patch
+? nopackend
+? paintstack-3.diff
+? paintstack.diff
+? paintstack2.diff
+? patches
+? phase1
+? profiler.diff
+? profiler.log
+? signalspeedup
+? simple_scroll.patch
+? simplify.patch
+? slet
+? smooth2.patch
+? statu
+? string-bugs.patch
+? td2
+? textdiff
+? textview-cursor-move.patch
+? tool-current.patch
+? tool13
+? tooldiff
+? tooldiff4
+? toolfix
+? whatelse
+? demos/gtk-demo/core.3957
+? gdk/gc-caching.patch
+? gdk/newgccache.patch
+? gdk/paintfix
+? gdk/profiler.c
+? gdk/profiler.h
+? gdk/profiler.log
+? gdk/spam
+? gdk/timing.c
+? gdk/x11/119722.patch
+? gdk/x11/bug117579.patch
+? gdk/x11/gravity.patch
+? gdk/x11/problem
+? gdk/x11/xidfix
+? gdk/x11/xsettings.patch
+? gtk/accels
+? gtk/adjd
+? gtk/adsfasdf
+? gtk/arrows.patch
+? gtk/asdf
+? gtk/asdfasdfasdf
+? gtk/asdfqwer
+? gtk/attempt.diff
+? gtk/bardiff
+? gtk/birnan
+? gtk/bodies
+? gtk/bt
+? gtk/calls
+? gtk/commitcand.patch
+? gtk/core.11617
+? gtk/core.13415
+? gtk/core.16181
+? gtk/core.17238
+? gtk/core.1944
+? gtk/core.19975
+? gtk/core.23401
+? gtk/core.24368
+? gtk/core.26526
+? gtk/core.27892
+? gtk/core.30053
+? gtk/core.30067
+? gtk/core.30080
+? gtk/core.32237
+? gtk/core.4428
+? gtk/core.9619
+? gtk/dizzy.patch
+? gtk/emfle
+? gtk/fixtodo
+? gtk/gtkmenu.ac
+? gtk/gtkmenuitem.ac
+? gtk/gtknotebook.ac
+? gtk/gtkpaned.hack.c
+? gtk/gtkradiobutton.ac
+? gtk/gtkstyle.mac.c
+? gtk/gtkstyle.orig.c
+? gtk/gtktoolbar.125
+? gtk/gtktoolbar.ac
+? gtk/gtktoolbar.c.current
+? gtk/gtktoolbar.c.draft
+? gtk/gtktoolbar.conflict-resolved.c
+? gtk/gtktoolbar.cvs
+? gtk/gtktoolbar.defer.c
+? gtk/gtktoolbar.hacked.c
+? gtk/gtktoolbar.hacked.h
+? gtk/gtktoolbar.smooth.c
+? gtk/gtktoolbar.smooth.h
+? gtk/gtktoolbar.splitalloc.c
+? gtk/gtktooltips.broken.c
+? gtk/gwp
+? gtk/handlefix.patch
+? gtk/highlight
+? gtk/hsdf
+? gtk/huh
+? gtk/huh2
+? gtk/idles
+? gtk/menuimprovements
+? gtk/minw.patch
+? gtk/paned-rtl.diff
+? gtk/profiler.log
+? gtk/qwer
+? gtk/qwer2
+? gtk/sofar
+? gtk/tb
+? gtk/td
+? gtk/testtoolbar.diff
+? gtk/tit
+? gtk/tool.ac
+? gtk/tool.diff
+? gtk/toolchange.patch
+? gtk/tooldiff
+? gtk/toolfix
+? gtk/toolitem.diff
+? gtk/tt
+? tests/accels
+? tests/asdf
+? tests/core.22082
+? tests/core.24504
+? tests/core.7041
+? tests/testtoolbar.hacked.c
+? tests/tt.diff
+Index: gdk/gdkwindow.c
+===================================================================
+RCS file: /cvs/gnome/gtk+/gdk/gdkwindow.c,v
+retrieving revision 1.157
+diff -u -p -u -r1.157 gdkwindow.c
+--- gdk/gdkwindow.c	18 Feb 2004 17:03:46 -0000	1.157
++++ gdk/gdkwindow.c	29 Feb 2004 23:54:21 -0000
+@@ -1963,6 +1963,7 @@ gdk_window_copy_to_image (GdkDrawable   
+ static GSList *update_windows = NULL;
+ static guint update_idle = 0;
+ static gboolean debug_updates = FALSE;
++static gint update_serial = 1;
+ 
+ static void
+ gdk_window_process_updates_internal (GdkWindow *window)
+@@ -1988,6 +1989,8 @@ gdk_window_process_updates_internal (Gdk
+ 	  GdkRegion *window_region;
+           gint width, height;
+ 
++	  ++update_serial;
++
+           if (debug_updates)
+             {
+               /* Make sure we see the red invalid area before redrawing. */
+@@ -2056,6 +2059,7 @@ flush_all_displays (void)
+ void
+ gdk_window_process_all_updates (void)
+ {
++  gboolean retval = FALSE;
+   GSList *old_update_windows = update_windows;
+   GSList *tmp_list = update_windows;
+ 
+@@ -2065,6 +2069,9 @@ gdk_window_process_all_updates (void)
+   update_windows = NULL;
+   update_idle = 0;
+ 
++  if (old_update_windows)
++    retval = TRUE;
++  
+   g_slist_foreach (old_update_windows, (GFunc)g_object_ref, NULL);
+   
+   while (tmp_list)
+@@ -2079,6 +2086,12 @@ gdk_window_process_all_updates (void)
+   flush_all_displays ();
+ }
+ 
++gint
++gdk_window_get_update_serial (void)
++{
++  return update_serial;
++}
++
+ static gboolean
+ gdk_window_update_idle (gpointer data)
+ {
+Index: gdk/gdkwindow.h
+===================================================================
+RCS file: /cvs/gnome/gtk+/gdk/gdkwindow.h,v
+retrieving revision 1.49
+diff -u -p -u -r1.49 gdkwindow.h
+--- gdk/gdkwindow.h	26 Jan 2004 20:20:42 -0000	1.49
++++ gdk/gdkwindow.h	29 Feb 2004 23:54:25 -0000
+@@ -542,6 +542,7 @@ GdkRegion *gdk_window_get_update_area   
+ void       gdk_window_freeze_updates      (GdkWindow    *window);
+ void       gdk_window_thaw_updates        (GdkWindow    *window);
+ 
++gint       gdk_window_get_update_serial   (void);
+ void       gdk_window_process_all_updates (void);
+ void       gdk_window_process_updates     (GdkWindow    *window,
+ 					   gboolean      update_children);
+Index: gtk/gtkadjustment.c
+===================================================================
+RCS file: /cvs/gnome/gtk+/gtk/gtkadjustment.c,v
+retrieving revision 1.29
+diff -u -p -u -r1.29 gtkadjustment.c
+--- gtk/gtkadjustment.c	3 Feb 2004 21:43:10 -0000	1.29
++++ gtk/gtkadjustment.c	29 Feb 2004 23:54:26 -0000
+@@ -27,6 +27,8 @@
+ #include "gtkadjustment.h"
+ #include "gtkintl.h"
+ #include "gtkmarshalers.h"
++#include <math.h>
++
+ 
+ enum
+ {
+@@ -46,9 +48,19 @@ enum {
+ };
+ 
+ 
+-static void gtk_adjustment_class_init (GtkAdjustmentClass *klass);
+-static void gtk_adjustment_init       (GtkAdjustment      *adjustment);
++typedef struct _GtkAdjustmentPrivate GtkAdjustmentPrivate;
++struct _GtkAdjustmentPrivate
++{
++  GTimer *timer;
++  gdouble start_value;
++  gdouble goal_value;
++  guint idle_id;
++};
+ 
++static void                  gtk_adjustment_private_finalize   (GtkAdjustmentPrivate *private);
++static void                  gtk_adjustment_class_init         (GtkAdjustmentClass   *klass);
++static void                  gtk_adjustment_init               (GtkAdjustment        *adjustment);
++static GtkAdjustmentPrivate *gtk_adjustment_get_private        (GtkAdjustment        *adjustment);
+ static void gtk_adjustment_get_property (GObject      *object,
+                                          guint         prop_id,
+                                          GValue       *value,
+@@ -160,7 +172,6 @@ gtk_adjustment_class_init (GtkAdjustment
+ 							0.0, 
+ 							G_PARAM_READWRITE));
+   
+-
+   adjustment_signals[CHANGED] =
+     g_signal_new ("changed",
+ 		  G_OBJECT_CLASS_TYPE (class),
+@@ -190,6 +201,44 @@ gtk_adjustment_init (GtkAdjustment *adju
+   adjustment->page_size = 0.0;
+ }
+ 
++static GtkAdjustmentPrivate *
++gtk_adjustment_get_private (GtkAdjustment *adjustment)
++{
++  GtkAdjustmentPrivate *private;
++  static GQuark private_quark = 0;
++
++  if (!private_quark)
++    private_quark = g_quark_from_static_string ("gtk-adjustment-private");
++
++  private = g_object_get_qdata (G_OBJECT (adjustment), private_quark);
++
++  if (!private)
++    {
++      private = g_new0 (GtkAdjustmentPrivate, 1);
++
++      private->timer = g_timer_new ();
++      private->start_value = 0.0;
++      private->goal_value = 0.0;
++      private->idle_id = 0;
++      
++      g_object_set_qdata_full (G_OBJECT (adjustment), private_quark,
++			       private,
++                               (GDestroyNotify) gtk_adjustment_private_finalize);
++    }
++
++  return private;
++}
++
++static void
++gtk_adjustment_private_finalize (GtkAdjustmentPrivate *private)
++{
++  if (private->idle_id)
++    g_source_remove (private->idle_id);
++
++  g_timer_destroy (private->timer);
++  g_free (private);
++}
++
+ static void
+ gtk_adjustment_get_property (GObject *object, guint prop_id, GValue *value, 
+ 	                     GParamSpec *pspec)
+@@ -334,11 +383,26 @@ gtk_adjustment_changed (GtkAdjustment   
+   g_signal_emit (adjustment, adjustment_signals[CHANGED], 0);
+ }
+ 
++static void
++gtk_adjustment_value_changed_unchecked (GtkAdjustment *adjustment)
++{
++  g_signal_emit (adjustment, adjustment_signals[VALUE_CHANGED], 0);
++}
++
+ void
+ gtk_adjustment_value_changed (GtkAdjustment        *adjustment)
+ {
++  GtkAdjustmentPrivate *priv;
++  
+   g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
+ 
++  priv = gtk_adjustment_get_private (adjustment);
++  if (priv->idle_id)
++    {
++      g_source_remove (priv->idle_id);
++      priv->idle_id = 0;
++    }
++  gtk_adjustment_value_changed_unchecked (adjustment);
+   g_signal_emit (adjustment, adjustment_signals[VALUE_CHANGED], 0);
+   g_object_notify (G_OBJECT (adjustment), "value");
+ }
+@@ -371,3 +435,171 @@ gtk_adjustment_clamp_page (GtkAdjustment
+   if (need_emission)
+     gtk_adjustment_value_changed (adjustment);
+ }
++
++#define UPDATE_TIME 0.1
++
++static gboolean
++adjustment_update_idle (gpointer data)
++{
++  GtkAdjustment *adj = data;
++  GtkAdjustmentPrivate *priv = gtk_adjustment_get_private (adj);
++
++  gdouble new_value;
++  gdouble elapsed = g_timer_elapsed (priv->timer, NULL);
++
++  GDK_THREADS_ENTER();
++  
++  new_value = priv->start_value +
++    (elapsed / UPDATE_TIME) * (priv->goal_value - priv->start_value);
++
++  /* make sure new_value is betweeen start_value and goal_value */
++  if (!((new_value >= priv->start_value && new_value <= priv->goal_value) ||
++	(new_value <= priv->start_value && new_value >= priv->goal_value)))
++    {
++      new_value = priv->goal_value;
++    }
++
++  if (new_value > adj->upper - adj->page_size)
++    new_value = adj->upper - adj->page_size;
++  
++  if (new_value < adj->lower)
++    new_value = adj->lower;
++
++  if (new_value != adj->value)
++    {
++      gint update_serial_before  = gdk_window_get_update_serial();
++      
++      adj->value = new_value;
++
++      gtk_adjustment_value_changed_unchecked (adj);
++
++      /* if anything was drawn during the signal emission, synchronize
++       * with the X server to avoid swamping it with updates
++       */
++      gdk_window_process_all_updates ();
++      if (update_serial_before != gdk_window_get_update_serial())
++	gdk_flush ();
++    }
++  
++  if (adj->value == priv->goal_value ||
++      adj->value == adj->lower ||
++      adj->value == adj->upper - adj->page_size)
++    {
++      priv->idle_id = 0;
++
++      GDK_THREADS_LEAVE();
++      return FALSE;
++    }
++
++  GDK_THREADS_LEAVE();
++  return TRUE;
++}
++
++static void
++gtk_adjustment_change_value (GtkAdjustment *adjustment,
++			     gdouble        delta)
++{
++  GtkAdjustmentPrivate *priv;
++
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++  
++  priv = gtk_adjustment_get_private (adjustment);
++
++  if (delta > -1 && delta < 1)
++    return;
++
++  priv->start_value = adjustment->value;
++  g_timer_reset (priv->timer);
++  
++  if (!priv->idle_id)
++    {
++      priv->idle_id = g_idle_add_full (GDK_PRIORITY_REDRAW + 3, adjustment_update_idle, adjustment, NULL);
++      priv->goal_value = adjustment->value + delta;
++    }
++  else
++    priv->goal_value = priv->goal_value + delta;
++}
++
++void
++gtk_adjustment_step_up (GtkAdjustment *adjustment)
++{
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++  
++  gtk_adjustment_change_value (adjustment, -adjustment->step_increment);
++}
++
++void
++gtk_adjustment_step_down (GtkAdjustment *adjustment)
++{
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++  
++  gtk_adjustment_change_value (adjustment, adjustment->step_increment);
++}
++
++void
++gtk_adjustment_wheel_up (GtkAdjustment *adjustment)
++{
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++
++  gtk_adjustment_change_value (adjustment,
++			       -pow (adjustment->page_size, 2.0/3.0));
++}
++
++void
++gtk_adjustment_wheel_down (GtkAdjustment *adjustment)
++{
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++
++  gtk_adjustment_change_value (adjustment,
++			       pow (adjustment->page_size, 2.0/3.0));
++}
++
++void
++gtk_adjustment_page_up (GtkAdjustment *adjustment)
++{
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++
++  gtk_adjustment_change_value (adjustment, -adjustment->page_increment);
++}
++
++void
++gtk_adjustment_page_down (GtkAdjustment *adjustment)
++{
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++  
++  gtk_adjustment_change_value (adjustment, adjustment->page_increment);
++}
++
++void
++gtk_adjustment_home (GtkAdjustment *adjustment)
++{
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++  
++  gtk_adjustment_goto_value (adjustment, 0.0);
++}
++
++void
++gtk_adjustment_end (GtkAdjustment *adjustment)
++{
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++  
++  gtk_adjustment_goto_value (adjustment, adjustment->upper - adjustment->page_size);
++}
++
++void
++gtk_adjustment_goto_value (GtkAdjustment *adjustment,
++			   gdouble        value)
++{
++  GtkAdjustmentPrivate *priv;
++  
++  g_return_if_fail (GTK_IS_ADJUSTMENT (adjustment));
++
++  priv = gtk_adjustment_get_private (adjustment);
++
++  priv->start_value = adjustment->value;
++  priv->goal_value = value;
++  g_timer_reset (priv->timer);
++
++  if (!priv->idle_id)
++    priv->idle_id = g_idle_add_full (GDK_PRIORITY_REDRAW + 3, adjustment_update_idle, adjustment, NULL);
++}
+Index: gtk/gtkadjustment.h
+===================================================================
+RCS file: /cvs/gnome/gtk+/gtk/gtkadjustment.h,v
+retrieving revision 1.18
+diff -u -p -u -r1.18 gtkadjustment.h
+--- gtk/gtkadjustment.h	9 Oct 2002 22:25:17 -0000	1.18
++++ gtk/gtkadjustment.h	29 Feb 2004 23:54:26 -0000
+@@ -75,21 +75,32 @@ struct _GtkAdjustmentClass
+ };
+ 
+ 
+-GType	   gtk_adjustment_get_type		(void) G_GNUC_CONST;
+-GtkObject* gtk_adjustment_new			(gdouble	  value,
+-						 gdouble	  lower,
+-						 gdouble	  upper,
+-						 gdouble	  step_increment,
+-						 gdouble	  page_increment,
+-						 gdouble	  page_size);
+-void	   gtk_adjustment_changed		(GtkAdjustment	 *adjustment);
+-void	   gtk_adjustment_value_changed		(GtkAdjustment	 *adjustment);
+-void	   gtk_adjustment_clamp_page		(GtkAdjustment	 *adjustment,
+-						 gdouble	  lower,
+-						 gdouble	  upper);
+-gdouble	   gtk_adjustment_get_value		(GtkAdjustment   *adjustment);
+-void	   gtk_adjustment_set_value		(GtkAdjustment	 *adjustment,
+-						 gdouble	  value);
++GType	   gtk_adjustment_get_type	(void) G_GNUC_CONST;
++GtkObject* gtk_adjustment_new           (gdouble        value,
++					 gdouble        lower,
++					 gdouble        upper,
++					 gdouble        step_increment,
++					 gdouble        page_increment,
++					 gdouble        page_size);
++void       gtk_adjustment_changed       (GtkAdjustment *adjustment);
++void       gtk_adjustment_value_changed (GtkAdjustment *adjustment);
++void       gtk_adjustment_clamp_page    (GtkAdjustment *adjustment,
++					 gdouble        lower,
++					 gdouble        upper);
++gdouble    gtk_adjustment_get_value     (GtkAdjustment *adjustment);
++void       gtk_adjustment_set_value     (GtkAdjustment *adjustment,
++					 gdouble        value);
++
++void       gtk_adjustment_goto_value    (GtkAdjustment *adjustment,
++					 gdouble        value);
++void	   gtk_adjustment_home		(GtkAdjustment *adjustment);
++void       gtk_adjustment_end           (GtkAdjustment *adjustment);
++void       gtk_adjustment_step_up       (GtkAdjustment *adjustment);
++void       gtk_adjustment_step_down     (GtkAdjustment *adjustment);
++void       gtk_adjustment_wheel_up      (GtkAdjustment *adjustment);
++void       gtk_adjustment_wheel_down    (GtkAdjustment *adjustment);
++void       gtk_adjustment_page_up       (GtkAdjustment *adjustment);
++void       gtk_adjustment_page_down     (GtkAdjustment *adjustment);
+ 
+ #ifdef __cplusplus
+ }
+Index: gtk/gtkrange.c
+===================================================================
+RCS file: /cvs/gnome/gtk+/gtk/gtkrange.c,v
+retrieving revision 1.96
+diff -u -p -u -r1.96 gtkrange.c
+--- gtk/gtkrange.c	29 Feb 2004 18:21:57 -0000	1.96
++++ gtk/gtkrange.c	29 Feb 2004 23:54:32 -0000
+@@ -27,6 +27,7 @@
+ 
+ #include <stdio.h>
+ #include <math.h>
++#include <string.h>
+ #include "gtkintl.h"
+ #include "gtkmain.h"
+ #include "gtkmarshalers.h"
+@@ -34,8 +35,8 @@
+ #include "gtkintl.h"
+ #include "gtkscrollbar.h"
+ 
+-#define SCROLL_INITIAL_DELAY 250  /* must hold button this long before ... */
+-#define SCROLL_LATER_DELAY   100  /* ... it starts repeating at this rate  */
++#define SCROLL_INITIAL_DELAY 225  /* must hold button this long before ... */
++#define SCROLL_LATER_DELAY   55   /* ... it starts repeating at this rate  */
+ #define UPDATE_DELAY         300  /* Delay for queued update */
+ 
+ enum {
+@@ -701,6 +702,12 @@ should_invert (GtkRange *range)
+     return range->inverted;
+ }
+ 
++static gboolean
++can_be_smooth (GtkRange *range)
++{
++  return (range->round_digits < 0 && range->update_policy == GTK_UPDATE_CONTINUOUS);
++}
++
+ static void
+ gtk_range_finalize (GObject *object)
+ {
+@@ -1366,39 +1373,6 @@ gtk_range_button_release (GtkWidget     
+   return FALSE;
+ }
+ 
+-/**
+- * _gtk_range_get_wheel_delta:
+- * @range: a #GtkRange
+- * @direction: A #GdkScrollDirection
+- * 
+- * Returns a good step value for the mouse wheel.
+- * 
+- * Return value: A good step value for the mouse wheel. 
+- * 
+- * Since: 2.4
+- **/
+-gdouble
+-_gtk_range_get_wheel_delta (GtkRange           *range,
+-			    GdkScrollDirection  direction)
+-{
+-  GtkAdjustment *adj = range->adjustment;
+-  gdouble delta;
+-
+-  if (GTK_IS_SCROLLBAR (range))
+-    delta = pow (adj->page_size, 2.0 / 3.0);
+-  else
+-    delta = adj->step_increment * 2;
+-  
+-  if (direction == GDK_SCROLL_UP ||
+-      direction == GDK_SCROLL_LEFT)
+-    delta = - delta;
+-  
+-  if (range->inverted)
+-    delta = - delta;
+-
+-  return delta;
+-}
+-      
+ static gint
+ gtk_range_scroll_event (GtkWidget      *widget,
+ 			GdkEventScroll *event)
+@@ -1408,19 +1382,59 @@ gtk_range_scroll_event (GtkWidget      *
+   if (GTK_WIDGET_REALIZED (range))
+     {
+       GtkAdjustment *adj = GTK_RANGE (range)->adjustment;
+-      gdouble delta;
++      GdkScrollDirection direction = event->direction;
+ 
+-      delta = _gtk_range_get_wheel_delta (range, event->direction);
+-      gtk_range_internal_set_value (range, adj->value + delta);
++      if (direction == GDK_SCROLL_UP ||
++ 	  direction == GDK_SCROLL_LEFT)
++ 	{
++ 	  direction = GDK_SCROLL_UP;
++ 	}
++      else
++ 	{
++ 	  direction = GDK_SCROLL_DOWN;
++ 	}
+       
+-      /* Policy DELAYED makes sense with scroll events,
+-       * but DISCONTINUOUS doesn't, so we update immediately
+-       * for DISCONTINUOUS
+-       */
+-      if (range->update_policy == GTK_UPDATE_DISCONTINUOUS)
+-        gtk_range_update_value (range);
++      if (should_invert (range))
++ 	{
++ 	  if (direction == GDK_SCROLL_UP)
++ 	    direction = GDK_SCROLL_DOWN;
++ 	  else
++ 	    direction = GDK_SCROLL_UP;
++ 	}
++      
++      if (can_be_smooth (range) && GTK_IS_SCROLLBAR (range))
++ 	{
++ 	  if (direction == GDK_SCROLL_UP)
++ 	    gtk_adjustment_wheel_up (adj);
++ 	  else
++ 	    gtk_adjustment_wheel_down (adj);
++	  
++ 	  range->need_recalc = TRUE;
++ 	  gtk_widget_queue_draw (GTK_WIDGET (range));
++ 	}
++      else
++ 	{
++ 	  gdouble increment;
++
++	  if (GTK_IS_SCROLLBAR (widget))
++	    increment = pow (adj->page_size, 2.0/3.0);
++	  else
++	    increment = 2 * adj->step_increment;
++	  
++ 	  if (direction == GDK_SCROLL_UP)
++ 	    increment *= -1;
++	  
++ 	  gtk_range_internal_set_value (range, adj->value + increment);
++	  
++ 	  /* Policy DELAYED makes sense with scroll events,
++ 	   * but DISCONTINUOUS doesn't, so we update immediately
++	   * for DISCONTINUOUS
++ 	   */
++ 	  if (range->update_policy == GTK_UPDATE_DISCONTINUOUS)
++ 	    gtk_range_update_value (range);
++ 	}
+     }
+-
++  
+   return TRUE;
+ }
+ 
+@@ -1517,14 +1531,22 @@ gtk_range_adjustment_value_changed (GtkA
+ 				    gpointer       data)
+ {
+   GtkRange *range = GTK_RANGE (data);
++  GtkRangeLayout old_layout;
++
++  old_layout = *range->layout;
+ 
+   range->need_recalc = TRUE;
++  gtk_range_calc_layout (range, adjustment->value);
++
++  if (memcmp (&old_layout, range->layout, sizeof (GtkRangeLayout)) != 0)
++    {
++      gtk_widget_queue_draw (GTK_WIDGET (range));
++
++      /* This is so we don't lag the widget being scrolled. */
++      if (GTK_WIDGET_REALIZED (range))
++	gdk_window_process_updates (GTK_WIDGET (range)->window, FALSE);
++    }
+ 
+-  gtk_widget_queue_draw (GTK_WIDGET (range));
+-  /* This is so we don't lag the widget being scrolled. */
+-  if (GTK_WIDGET_REALIZED (range))
+-    gdk_window_process_updates (GTK_WIDGET (range)->window, FALSE);
+-  
+   /* Note that we don't round off to range->round_digits here.
+    * that's because it's really broken to change a value
+    * in response to a change signal on that value; round_digits
+@@ -1550,53 +1572,80 @@ gtk_range_style_set (GtkWidget *widget,
+ static void
+ step_back (GtkRange *range)
+ {
+-  gdouble newval;
+-  
+-  newval = range->adjustment->value - range->adjustment->step_increment;
+-  gtk_range_internal_set_value (range, newval);
+-}
++  GtkAdjustment *adj = range->adjustment;
+ 
+-static void
+-step_forward (GtkRange *range)
+-{
+-  gdouble newval;
++  if (can_be_smooth (range))
++    {
++      gtk_adjustment_step_up (adj);
++      range->need_recalc = TRUE;
++      gtk_widget_queue_draw (GTK_WIDGET (range));
++    }
++  else
++    {
++      gdouble newval;
+ 
+-  newval = range->adjustment->value + range->adjustment->step_increment;
+-  gtk_range_internal_set_value (range, newval);
++      newval = adj->value - adj->step_increment;
++      gtk_range_internal_set_value (range, newval);
++    }
+ }
+ 
+-
+ static void
+-page_back (GtkRange *range)
++step_forward (GtkRange *range)
+ {
+-  gdouble newval;
++  GtkAdjustment *adj = range->adjustment;
++
++  if (can_be_smooth (range))
++    {
++      gtk_adjustment_step_down (adj);
++      range->need_recalc = TRUE;
++      gtk_widget_queue_draw (GTK_WIDGET (range));
++    }
++  else
++    {
++      gdouble newval;
+ 
+-  newval = range->adjustment->value - range->adjustment->page_increment;
+-  gtk_range_internal_set_value (range, newval);
++      newval = adj->value + adj->step_increment;
++      gtk_range_internal_set_value (range, newval);
++    }
+ }
+ 
+ static void
+-page_forward (GtkRange *range)
++page_back (GtkRange *range)
+ {
+-  gdouble newval;
++  GtkAdjustment *adj = range->adjustment;
+ 
+-  newval = range->adjustment->value + range->adjustment->page_increment;
+-  gtk_range_internal_set_value (range, newval);
+-}
++  if (can_be_smooth (range))
++    {
++      gtk_adjustment_page_up (adj);
++      range->need_recalc = TRUE;
++      gtk_widget_queue_draw (GTK_WIDGET (range));
++    }
++  else
++    {
++      gdouble newval;
+ 
+-static void
+-scroll_begin (GtkRange *range)
+-{
+-  gtk_range_internal_set_value (range, range->adjustment->lower);
++      newval = adj->value - adj->page_increment;
++      gtk_range_internal_set_value (range, newval);
++    }
+ }
+ 
+ static void
+-scroll_end (GtkRange *range)
++page_forward (GtkRange *range)
+ {
+-  gdouble newval;
++  GtkAdjustment *adj = range->adjustment;
+ 
+-  newval = range->adjustment->upper - range->adjustment->page_size;
+-  gtk_range_internal_set_value (range, newval);
++  if (can_be_smooth (range))
++    {
++      gtk_adjustment_page_down (adj);
++      range->need_recalc = TRUE;
++      gtk_widget_queue_draw (GTK_WIDGET (range));
++    }
++  else
++    {
++      gdouble newval;
++      newval = adj->value - adj->page_increment;
++      gtk_range_internal_set_value (range, newval);
++    }
+ }
+ 
+ static void
+@@ -1678,11 +1727,27 @@ gtk_range_scroll (GtkRange     *range,
+       break;
+ 
+     case GTK_SCROLL_START:
+-      scroll_begin (range);
++      if (can_be_smooth (range))
++	{
++	  gtk_adjustment_home (range->adjustment);
++	  range->need_recalc = TRUE;
++	  gtk_widget_queue_draw (GTK_WIDGET (range));
++	}
++      else
++	gtk_range_internal_set_value (range,
++				      range->adjustment->lower);
+       break;
+ 
+     case GTK_SCROLL_END:
+-      scroll_end (range);
++      if (can_be_smooth (range))
++	{
++	  gtk_adjustment_end (range->adjustment);
++	  range->need_recalc = TRUE;
++	  gtk_widget_queue_draw (GTK_WIDGET (range));
++	}
++      else
++	gtk_range_internal_set_value (range,
++				      range->adjustment->upper - range->adjustment->page_size);
+       break;
+ 
+     case GTK_SCROLL_JUMP:
+Index: gtk/gtkrange.h
+===================================================================
+RCS file: /cvs/gnome/gtk+/gtk/gtkrange.h,v
+retrieving revision 1.28
+diff -u -p -u -r1.28 gtkrange.h
+--- gtk/gtkrange.h	29 Feb 2004 18:21:57 -0000	1.28
++++ gtk/gtkrange.h	29 Feb 2004 23:54:33 -0000
+@@ -149,9 +149,6 @@ void           gtk_range_set_value      
+                                             gdouble        value);
+ gdouble        gtk_range_get_value         (GtkRange      *range);
+ 
+-gdouble	      _gtk_range_get_wheel_delta   (GtkRange           *range,
+-					    GdkScrollDirection  direction);
+-
+ #ifdef __cplusplus
+ }
+ #endif /* __cplusplus */
+Index: gtk/gtkscrolledwindow.c
+===================================================================
+RCS file: /cvs/gnome/gtk+/gtk/gtkscrolledwindow.c,v
+retrieving revision 1.70
+diff -u -p -u -r1.70 gtkscrolledwindow.c
+--- gtk/gtkscrolledwindow.c	29 Feb 2004 18:21:57 -0000	1.70
++++ gtk/gtkscrolledwindow.c	29 Feb 2004 23:54:37 -0000
+@@ -794,98 +794,65 @@ gtk_scrolled_window_scroll_child (GtkScr
+ 				  GtkScrollType      scroll,
+ 				  gboolean           horizontal)
+ {
+-  GtkAdjustment *adjustment = NULL;
++  GtkAdjustment *hadj = NULL;
++  GtkAdjustment *vadj = NULL;
++
++  if (scrolled_window->hscrollbar)
++    hadj = gtk_range_get_adjustment (GTK_RANGE (scrolled_window->hscrollbar));
++
++  if (scrolled_window->vscrollbar)
++    vadj = gtk_range_get_adjustment (GTK_RANGE (scrolled_window->vscrollbar));
+   
+   switch (scroll)
+     {
+     case GTK_SCROLL_STEP_UP:
+-      scroll = GTK_SCROLL_STEP_BACKWARD;
+-      horizontal = FALSE;
++    case GTK_SCROLL_STEP_BACKWARD:
++      if (vadj)
++	gtk_adjustment_step_up (vadj);
+       break;
+     case GTK_SCROLL_STEP_DOWN:
+-      scroll = GTK_SCROLL_STEP_FORWARD;
+-      horizontal = FALSE;
++    case GTK_SCROLL_STEP_FORWARD:
++      if (vadj)
++	gtk_adjustment_step_down (vadj);
+       break;
+     case GTK_SCROLL_STEP_LEFT:
+-      scroll = GTK_SCROLL_STEP_BACKWARD;
+-      horizontal = TRUE;
++      if (hadj)
++	gtk_adjustment_step_up (hadj);
+       break;
+     case GTK_SCROLL_STEP_RIGHT:
+-      scroll = GTK_SCROLL_STEP_FORWARD;
+-      horizontal = TRUE;
++      if (hadj)
++	gtk_adjustment_step_down (hadj);
+       break;
+     case GTK_SCROLL_PAGE_UP:
+-      scroll = GTK_SCROLL_PAGE_BACKWARD;
+-      horizontal = FALSE;
++    case GTK_SCROLL_PAGE_BACKWARD:
++      if (vadj)
++	gtk_adjustment_page_up (vadj);
+       break;
+     case GTK_SCROLL_PAGE_DOWN:
+-      scroll = GTK_SCROLL_PAGE_FORWARD;
+-      horizontal = FALSE;
++    case GTK_SCROLL_PAGE_FORWARD:
++      if (vadj)
++	gtk_adjustment_page_down (vadj);
+       break;
+     case GTK_SCROLL_PAGE_LEFT:
+-      scroll = GTK_SCROLL_STEP_BACKWARD;
+-      horizontal = TRUE;
++      if (hadj)
++	gtk_adjustment_page_up (hadj);
+       break;
+     case GTK_SCROLL_PAGE_RIGHT:
+-      scroll = GTK_SCROLL_STEP_FORWARD;
+-      horizontal = TRUE;
++      if (hadj)
++	gtk_adjustment_page_down (hadj);
+       break;
+-    case GTK_SCROLL_STEP_BACKWARD:
+-    case GTK_SCROLL_STEP_FORWARD:
+-    case GTK_SCROLL_PAGE_BACKWARD:
+-    case GTK_SCROLL_PAGE_FORWARD:
+     case GTK_SCROLL_START:
++      if (vadj)
++	gtk_adjustment_home (vadj);
++      break;
+     case GTK_SCROLL_END:
++      if (vadj)
++	gtk_adjustment_end (vadj);
+       break;
+     default:
+       g_warning ("Invalid scroll type %d for GtkSpinButton::change-value", scroll);
+       return;
+     }
+-
+-  if (horizontal)
+-    {
+-      if (scrolled_window->hscrollbar)
+-	adjustment = gtk_range_get_adjustment (GTK_RANGE (scrolled_window->hscrollbar));
+-    }
+-  else
+-    {
+-      if (scrolled_window->vscrollbar)
+-	adjustment = gtk_range_get_adjustment (GTK_RANGE (scrolled_window->vscrollbar));
+-    }
+-
+-  if (adjustment)
+-    {
+-      gdouble value = adjustment->value;
+-      
+-      switch (scroll)
+-	{
+-	case GTK_SCROLL_STEP_FORWARD:
+-	  value += adjustment->step_increment;
+-	  break;
+-	case GTK_SCROLL_STEP_BACKWARD:
+-	  value -= adjustment->step_increment;
+-	  break;
+-	case GTK_SCROLL_PAGE_FORWARD:
+-	  value += adjustment->page_increment;
+-	  break;
+-	case GTK_SCROLL_PAGE_BACKWARD:
+-	  value -= adjustment->page_increment;
+-	  break;
+-	case GTK_SCROLL_START:
+-	  value = adjustment->lower;
+-	  break;
+-	case GTK_SCROLL_END:
+-	  value = adjustment->upper;
+-	  break;
+-	default:
+-	  g_assert_not_reached ();
+-	  break;
+-	}
+-
+-      value = CLAMP (value, adjustment->lower, adjustment->upper - adjustment->page_size);
+-      
+-      gtk_adjustment_set_value (adjustment, value);
+-    }
+ }
+ 
+ static void
+@@ -1226,15 +1193,18 @@ gtk_scrolled_window_scroll_event (GtkWid
+ 
+   if (range && GTK_WIDGET_VISIBLE (range))
+     {
+-      GtkAdjustment *adj = GTK_RANGE (range)->adjustment;
+-      gdouble delta, new_value;
+-
+-      delta = _gtk_range_get_wheel_delta (GTK_RANGE (range), event->direction);
+-
+-      new_value = CLAMP (adj->value + delta, adj->lower, adj->upper - adj->page_size);
++      GtkAdjustment *adjustment = GTK_RANGE (range)->adjustment;
++      
++      if (event->direction == GDK_SCROLL_UP ||
++	  event->direction == GDK_SCROLL_LEFT)
++ 	{
++	  gtk_adjustment_wheel_up (adjustment);
++ 	}
++      else
++ 	{
++	  gtk_adjustment_wheel_down (adjustment);
++ 	}
+       
+-      gtk_adjustment_set_value (adj, new_value);
+-
+       return TRUE;
+     }
+ 

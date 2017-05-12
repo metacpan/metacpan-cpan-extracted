@@ -1,0 +1,111 @@
+{
+   "abstract" : "Perl interface to Git repositories",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "git",
+      "wrapper"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Git-Repository",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Git::Version::Compare" : "1.001",
+            "IO::Handle" : "0",
+            "Scalar::Util" : "0",
+            "System::Command" : "1.118",
+            "Test::Builder" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Requires::Git" : "1.005",
+            "blib" : "1.01",
+            "constant" : "0",
+            "lib" : "0",
+            "overload" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-git-repository@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Repository"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/book/Git-Repository.git",
+         "web" : "https://github.com/book/Git-Repository"
+      }
+   },
+   "version" : "1.320",
+   "x_contributors" : [
+      "Samit Badle <Samit.Badle@gmail.com>",
+      "Lisa Hansen <Lisa.Hansen@sas.com>",
+      "Alex Raguero <jhavero@gmail.com>",
+      "Gregor Herrmann <gregoa@cpan.org>",
+      "Petr Šabata <contyk@cpan.org>",
+      "Tim Bunce <timb@cpan.org>",
+      "Aristotle Pagaltzis <aristotle@cpan.org>",
+      "Michael G. Schwern <mschwern@cpan.org>",
+      "Todd Rinaldo <toddr@cpan.org>",
+      "Mark Lawrence <mlawren@cpan.org>",
+      "Dominic Humphries <oneonetwo@cpan.org>",
+      "Christian Walde <mithaldu@cpan.org>",
+      "Yanick Champoux <yanick@cpan.org>",
+      "Thomas Klausner <domm@cpan.org>",
+      "Olivier Mengué <dolmen@cpan.org>",
+      "Nigel Metheringham <nigel.metheringham@dev.intechnology.co.uk>",
+      "Lasse Makholm <lasse.makholm@nokia.com>",
+      "Kazuhiro Shibuya <shibuya@cpan.org>",
+      "Jacques Germishuys <jacquesg@cpan.org>",
+      "Olivier Raginel <babar@cpan.org>",
+      "Anton Berezin <gruber@cpan.org>",
+      "Alessandro Ghedini <alexbio@cpan.org>",
+      "Gustavo Leite de Mendonça Chaves <gnustavo@cpan.org>"
+   ]
+}
+

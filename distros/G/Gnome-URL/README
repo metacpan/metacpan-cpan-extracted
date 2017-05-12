@@ -1,0 +1,54 @@
+Gnome/URL version 0.01
+======================
+
+This module provides a Perl binding for url handling in
+the GNOME (1.x) environment (http://www.gnome.org).  It can handle
+various types of URLs including http, https, ftp, file,
+info, man, ghelp, and possibly others.
+
+The commands used to view different types of URLs are
+determined by the user's gnome configuration (most likely
+stored in ~/.gnome/Gnome).
+
+See http://developer.gnome.org/doc/API/libgnome/gnome-gnome-url.html
+for more information.
+
+
+INSTALLATION
+------------
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+------------
+This module requires these other modules and libraries:
+	gnome-config command (or manually writing part of the Makefile.PL)
+	libgnome
+	libgnomesupport
+
+
+PROBLEMS OR COMMENTS
+--------------------
+If you encounter any problems with installation, please don't
+hesitate to contact me, mark@sporkstorms.org, with the necessary
+details (error messages, libgnome version, perl version, OS, etc).
+Comments, suggestions, questions, requests, etc are more than
+welcome as well. =)
+
+
+COPYRIGHT AND LICENCE
+---------------------
+	Copyright (c) 2001, Mark Stratman.  All Rights Reserved.
+	This module is free software. It may be used, redis-
+	tributed and/or modified under the same terms as Perl
+	itself.
+
+	The GNOME libraries (libgnome) are released under the LGPL
+	(Library General Public License). Visit http://www.gnu.org
+	for more details.
+

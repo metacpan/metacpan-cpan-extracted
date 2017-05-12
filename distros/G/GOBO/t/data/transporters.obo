@@ -1,0 +1,387 @@
+format-version: 1.2
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_pombe "Fission yeast GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+
+[Term]
+id: GO:0003674
+name: molecular_function
+namespace: molecular_function
+alt_id: GO:0005554
+def: "Elemental activities, such as catalysis or binding, describing the actions of a gene product at the molecular level. A given gene product may exhibit one or more molecular functions." [GOC:go_curators]
+comment: Note that, in addition to forming the root of the molecular function ontology, this term is recommended for use for the annotation of gene products whose molecular function is unknown. Note that when this term is used for annotation, it indicates that no information was available about the molecular function of the gene product annotated as of the date the annotation was made; the evidence code ND, no data, is used to indicate this.
+subset: goslim_candida  ! Candida GO slim
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: goslim_yeast  ! Yeast GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "molecular function" EXACT []
+synonym: "molecular function unknown" NARROW []
+
+[Term]
+id: GO:0005215
+name: transporter activity
+namespace: molecular_function
+alt_id: GO:0005478
+def: "Enables the directed movement of substances (such as macromolecules, small molecules, ions) into, out of, within or between cells." [GOC:ai, GOC:df]
+subset: goslim_candida  ! Candida GO slim
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: goslim_yeast  ! Yeast GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "small-molecule carrier or transporter" RELATED []
+xref: Reactome:1391
+is_a: GO:0003674  ! molecular_function
+relationship: part_of GO:0006810 ! transport
+
+[Term]
+id: GO:0005451
+name: monovalent cation:proton antiporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a solute or solutes from one side of a membrane to the other according to the reaction: monovalent cation(out) + H+(in) = monovalent cation(in) + H+(out)." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0015078  ! hydrogen ion transmembrane transporter activity
+is_a: GO:0015299  ! solute:hydrogen antiporter activity
+is_a: GO:0015491  ! cation:cation antiporter activity
+
+[Term]
+id: GO:0006810
+name: transport
+namespace: biological_process
+def: "The directed movement of substances (such as macromolecules, small molecules, ions) into, out of, within or between cells, or within a multicellular organism." [GOC:mah]
+comment: Note that 'electron transport ; GO:0006118' is not a child of transport because electron transport is not a type of directed movement of substances.
+subset: goslim_candida  ! Candida GO slim
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: goslim_yeast  ! Yeast GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "small molecule transport" NARROW []
+synonym: "solute:solute exchange" NARROW []
+is_a: GO:0051234  ! establishment of localization
+
+[Term]
+id: GO:0006811
+name: ion transport
+namespace: biological_process
+def: "The directed movement of charged atoms or small charged molecules into, out of, within or between cells." [GOC:ai]
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_pir  ! PIR GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0006810  ! transport
+
+[Term]
+id: GO:0006812
+name: cation transport
+namespace: biological_process
+alt_id: GO:0006819
+def: "The directed movement of cations, atoms or small molecules with a net positive charge, into, out of, within or between cells." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0006811  ! ion transport
+
+[Term]
+id: GO:0006814
+name: sodium ion transport
+namespace: biological_process
+alt_id: GO:0006834
+def: "The directed movement of sodium ions (Na+) into, out of, within or between cells." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "mitochondrial sodium/calcium ion exchange" NARROW []
+synonym: "sodium transport" EXACT []
+synonym: "sodium/potassium transport" BROAD []
+synonym: "sodium:calcium exchange" NARROW []
+synonym: "sodium:solute transport" NARROW []
+is_a: GO:0015672  ! monovalent inorganic cation transport
+is_a: GO:0030001  ! metal ion transport
+
+[Term]
+id: GO:0008150
+name: biological_process
+namespace: biological_process
+alt_id: GO:0000004
+alt_id: GO:0007582
+def: "Any process specifically pertinent to the functioning of integrated living units: cells, tissues, organs, and organisms. A process is a collection of molecular events with a defined beginning and end." [GOC:go_curators, GOC:isa_complete]
+comment: Note that, in addition to forming the root of the biological process ontology, this term is recommended for use for the annotation of gene products whose biological process is unknown. Note that when this term is used for annotation, it indicates that no information was available about the biological process of the gene product annotated as of the date the annotation was made; the evidence code ND, no data, is used to indicate this.
+subset: goslim_candida  ! Candida GO slim
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: goslim_yeast  ! Yeast GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "biological process" EXACT []
+synonym: "biological process unknown" NARROW []
+synonym: "physiological process" EXACT []
+xref: Wikipedia:Biological_process
+
+[Term]
+id: GO:0008324
+name: cation transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of cation from one side of the membrane to the other." [GOC:df, GOC:mtg_transport, ISBN:0815340729]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "transmembrane cation transporter activity" EXACT []
+is_a: GO:0015075  ! ion transmembrane transporter activity
+
+[Term]
+id: GO:0015075
+name: ion transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of an ion from one side of a membrane to the other." [GOC:def, GOC:df, GOC:mtg_transport, ISBN:0815340729]
+subset: goslim_goa  ! GOA and proteome slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "ion transporter activity" EXACT []
+is_a: GO:0022891  ! substrate-specific transmembrane transporter activity
+
+[Term]
+id: GO:0015077
+name: monovalent inorganic cation transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a inorganic cations with a valency of one from one side of a membrane to the other. Inorganic cations are atoms or small molecules with a positive charge that do not contain carbon in covalent linkage." [GOC:ai, GOC:mtg_transport, ISBN:0815340729]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "univalent inorganic cation transporter" EXACT []
+is_a: GO:0022890  ! inorganic cation transmembrane transporter activity
+
+[Term]
+id: GO:0015078
+name: hydrogen ion transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of hydrogen ions from one side of a membrane to the other." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "proton transporter" EXACT []
+xref: Reactome:1383
+is_a: GO:0015077  ! monovalent inorganic cation transmembrane transporter activity
+
+[Term]
+id: GO:0015079
+name: potassium ion transmembrane transporter activity
+namespace: molecular_function
+alt_id: GO:0022817
+def: "Catalysis of the transfer of potassium ions (K+) from one side of a membrane to the other." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "potassium transporter" EXACT []
+is_a: GO:0015077  ! monovalent inorganic cation transmembrane transporter activity
+is_a: GO:0046873  ! metal ion transmembrane transporter activity
+
+[Term]
+id: GO:0015291
+name: secondary active transmembrane transporter activity
+namespace: molecular_function
+alt_id: GO:0015290
+def: "Catalysis of the transfer of a solute from one side of a membrane to the other, up its concentration gradient. The transporter binds the solute and undergoes a series of conformational changes. Transport works equally well in either direction and is driven by a chemiosmotic source of energy. Chemiosmotic sources of energy include uniport, symport or antiport." [GOC:mtg_transport, ISBN:0198506732, ISBN:0815340729, PMID:10839820]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "active transporter" BROAD []
+synonym: "coupled carrier" EXACT []
+synonym: "electrochemical potential-driven transporter activity" EXACT []
+synonym: "galactose/glucose (methylgalactoside) porter activity" NARROW []
+synonym: "heavy metal ion porter activity" NARROW []
+synonym: "nitrite/nitrate porter activity" NARROW []
+synonym: "porter activity" EXACT []
+synonym: "porters" EXACT []
+synonym: "secondary carrier-type facilitators" EXACT []
+xref: TC:2.A
+is_a: GO:0022804  ! active transmembrane transporter activity
+
+[Term]
+id: GO:0015297
+name: antiporter activity
+namespace: molecular_function
+def: "Enables the active transport of a solute across a membrane by a mechanism whereby two or more species are transported in opposite directions in a tightly coupled process not directly linked to a form of energy other than chemiosmotic energy." [GOC:mtg_transport, ISBN:0815340729, PMID:10839820]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "antiport" RELATED []
+synonym: "countertransporter" EXACT []
+synonym: "dicarboxylate (succinate/fumarate/malate) antiporter activity" NARROW []
+synonym: "exchange transporter" EXACT []
+synonym: "exchanger" BROAD []
+synonym: "porter" BROAD []
+is_a: GO:0015291  ! secondary active transmembrane transporter activity
+
+[Term]
+id: GO:0015298
+name: solute:cation antiporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a solute or solutes from one side of a membrane to the other according to the reaction: solute(out) + cation(in) = solute(in) + cation(out)." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0008324  ! cation transmembrane transporter activity
+is_a: GO:0015300  ! solute:solute antiporter activity
+
+[Term]
+id: GO:0015299
+name: solute:hydrogen antiporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a solute or solutes from one side of a membrane to the other according to the reaction: solute(out) + H+(in) = solute(in) + H+(out)." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "L-arabinose/beta-D-thiogalactopyranoside:hydrogen antiporter activity" NARROW []
+synonym: "solute:proton antiporter" EXACT []
+is_a: GO:0015298  ! solute:cation antiporter activity
+
+[Term]
+id: GO:0015300
+name: solute:solute antiporter activity
+namespace: molecular_function
+def: "Catalysis of the reaction: solute A(out) + solute B(in) = solute A(in) + solute B(out)." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "solute:solute exchange" RELATED []
+is_a: GO:0015297  ! antiporter activity
+
+[Term]
+id: GO:0015385
+name: sodium:hydrogen antiporter activity
+namespace: molecular_function
+alt_id: GO:0015502
+def: "Catalysis of the transfer of a solute or solutes from one side of a membrane to the other according to the reaction: Na+(out) + H+(in) = Na+(in) + H+(out)." [TC:2.A.35.1.1, TC:2.A.36.-.-]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "pH-dependent sodium:hydrogen antiporter activity" NARROW []
+synonym: "pH-dependent sodium:proton antiporter" NARROW []
+synonym: "sodium/hydrogen antiporter" EXACT []
+synonym: "sodium:hydrogen exchange activity" EXACT []
+synonym: "sodium:hydrogen exchanger" EXACT []
+synonym: "sodium:proton antiporter" EXACT []
+is_a: GO:0005451  ! monovalent cation:proton antiporter activity
+
+[Term]
+id: GO:0015386
+name: potassium:hydrogen antiporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a solute or solutes from one side of a membrane to the other according to the reaction: K+(in) + H+(out) = K+(out) + H+(in)." [TC:2.A.37.-.-]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "potassium:proton antiporter" EXACT []
+is_a: GO:0005451  ! monovalent cation:proton antiporter activity
+is_a: GO:0022821  ! potassium ion antiporter activity
+
+[Term]
+id: GO:0015491
+name: cation:cation antiporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a solute or solutes from one side of a membrane to the other according to the reaction: cation A(out) + cation B(in) = cation A(in) + cation B(out)." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0015298  ! solute:cation antiporter activity
+
+[Term]
+id: GO:0015672
+name: monovalent inorganic cation transport
+namespace: biological_process
+def: "The directed movement of inorganic cations with a valency of one into, out of, within or between cells. Inorganic cations are atoms or small molecules with a positive charge which do not contain carbon in covalent linkage." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "univalent inorganic cation transport" EXACT []
+is_a: GO:0006812  ! cation transport
+
+[Term]
+id: GO:0022804
+name: active transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a specific substance or related group of substances from one side of a membrane to the other, up the solute's concentration gradient. The transporter binds the solute and undergoes a series of conformational changes. Transport works equally well in either direction." [GOC:mtg_transport, ISBN:0815340729]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "active carrier activity" EXACT []
+synonym: "carrier activity" EXACT []
+synonym: "permease activity" EXACT []
+synonym: "pump activity" EXACT []
+is_a: GO:0022857  ! transmembrane transporter activity
+
+[Term]
+id: GO:0022821
+name: potassium ion antiporter activity
+namespace: molecular_function
+def: "Catalysis of the active transport of a potassium ion across a membrane by a mechanism whereby two or more species are transported in opposite directions in a tightly coupled process not directly linked to a form of energy other than chemiosmotic energy." [GOC:mtg_transport, ISBN:0815340729]
+is_a: GO:0015079  ! potassium ion transmembrane transporter activity
+is_a: GO:0015297  ! antiporter activity
+
+[Term]
+id: GO:0022857
+name: transmembrane transporter activity
+namespace: molecular_function
+alt_id: GO:0005386
+alt_id: GO:0015646
+def: "Catalysis of the transfer of a substance from one side of a membrane to the other." [GOC:mtg_transport, ISBN:0815340729]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0005215  ! transporter activity
+
+[Term]
+id: GO:0022890
+name: inorganic cation transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of inorganic cations from one side of a membrane to the other. Inorganic cations are atoms or small molecules with a positive charge that do not contain carbon in covalent linkage." [GOC:ai, GOC:mtg_transport, ISBN:0815340729]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0008324  ! cation transmembrane transporter activity
+
+[Term]
+id: GO:0022891
+name: substrate-specific transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a specific substance or group of related substances from one side of a membrane to the other." [GOC:jic, GOC:mtg_transport, ISBN:0815340729]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0022857  ! transmembrane transporter activity
+is_a: GO:0022892  ! substrate-specific transporter activity
+
+[Term]
+id: GO:0022892
+name: substrate-specific transporter activity
+namespace: molecular_function
+def: "Enables the directed movement of a specific substance or group of related substances (such as macromolecules, small molecules, ions) into, out of, within or between cells." [GOC:mtg_transport]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0005215  ! transporter activity
+
+[Term]
+id: GO:0030001
+name: metal ion transport
+namespace: biological_process
+def: "The directed movement of metal ions, any metal ion with an electric charge, into, out of, within or between cells." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "heavy metal ion transport" NARROW []
+is_a: GO:0006812  ! cation transport
+
+[Typedef]
+id: part_of
+name: part_of
+namespace: gene_ontology
+is_transitive: true
+xref: OBO_REL:part_of
+
+[Term]
+id: GO:0046873
+name: metal ion transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of metal ions from one side of a membrane to the other." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "heavy metal ion porter activity" NARROW []
+synonym: "heavy metal ion transporter activity" NARROW []
+synonym: "heavy metal ion:hydrogen symporter activity" NARROW []
+synonym: "heavy metal-exporting ATPase activity" NARROW []
+synonym: "high affinity metal ion uptake transporter activity" NARROW []
+synonym: "low affinity metal ion uptake transporter activity" NARROW []
+is_a: GO:0015075  ! ion transmembrane transporter activity
+
+[Term]
+id: GO:0051179
+name: localization
+namespace: biological_process
+def: "Any process by which a cell, a substance, or a cellular entity, such as a protein complex or organelle, is transported to, and/or maintained in a specific location." [GOC:ai]
+subset: goslim_pir  ! PIR GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "establishment and maintenance of cellular component location" NARROW []
+synonym: "establishment and maintenance of localization" EXACT []
+synonym: "establishment and maintenance of position" EXACT []
+synonym: "establishment and maintenance of substance location" NARROW []
+synonym: "establishment and maintenance of substrate location" NARROW []
+is_a: GO:0008150  ! biological_process
+
+[Term]
+id: GO:0051234
+name: establishment of localization
+namespace: biological_process
+def: "The directed movement of a cell, substance or cellular entity, such as a protein complex or organelle, to a specific location." [GOC:ai]
+subset: goslim_pir  ! PIR GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0008150  ! biological_process
+relationship: part_of GO:0051179 ! localization
+

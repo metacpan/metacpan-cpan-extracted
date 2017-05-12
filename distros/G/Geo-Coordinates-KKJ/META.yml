@@ -1,0 +1,28 @@
+---
+name: Geo-Coordinates-KKJ
+version: 0.01
+author:
+  - 'Josep Roca <quelcom@gmail.com>'
+abstract: 'Convert Finnish Coordinate System (KKJ) from/to WGS84'
+distribution_type: module
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Math::Trig: 0
+build_requires:
+  Test::More: 0.34
+  Test::Exception: 0
+recommends:
+  Test::Pod: 1
+provides:
+  Geo::Coordinates::KKJ
+    file: lib/Geo/Coordinates/KKJ.pm
+    version: 0.01
+generated_by: 'Josep Roca'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+
+

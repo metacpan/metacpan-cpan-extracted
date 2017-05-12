@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         GD-Tab-Ukulele
+version:      0.01
+version_from: lib/GD/Tab/Ukulele.pm
+installdirs:  site
+requires:
+    Class::Accessor::Fast:         0
+    GD:                            2.3
+    List::Util:                    0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

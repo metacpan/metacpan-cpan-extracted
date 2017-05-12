@@ -1,0 +1,50 @@
+=head2 post
+
+Implements all methods related to posting articles.  The following methods
+are included:
+
+=over 4
+
+=item post ([ SERVER ])
+
+Posts the article using the NNTP POST command.  Under most circumstances,
+this is how you want to post an article.  SERVER, if specified, may be
+either the name or IP address of a news server to use for posting or a
+reference to an open Net::NNTP connection to be used.  undef is returned
+on success; the error message is returned on failure.
+
+Before this method is called, the message headers should be rewritten into
+ones appropriate for a news message; this is one of the purposes of the
+modules.
+
+=item post_ihave ([ SERVER ])
+
+Posts the article using the NNTP IHAVE command.  This connects to a news
+server as a transfer server rather than as a client; under most
+circumstances this is not what you want.  Unless you already know what
+IHAVE is, you may not want to use this.  In order to use this posting
+method, the article already has to have all necessary headers to be a
+properly formatted news article, including Path and Message-ID; unlike
+POST, IHAVE will not automatically fill in missing headers.
+
+As above, SERVER if specified may be either the name or IP address of a
+news server to use for posting or a reference to an open Net::NNTP
+connection.  undef is returned on success; the error message is returned
+on failure.
+
+=item post_program (COMMAND [, ARGUMENT ... ])
+
+Posts the article by running a program and passing the article to it on
+stdin.  This can be used to post via inews or rnews if you so wish,
+although using the post() method is recommended under most circumstances.
+The arguments to the command should be a list of strings; this command
+does not fork a shell so shell metacharacters will not be interpreted as
+such.
+
+If the program exits with status 0, success is assumed and this method
+returns undef.  If the program exits with non-zero status or some other
+error occurs, this method returns the output of the program (both stdout
+and stderr) and an error message.  The output and error message will be
+newline-terminated.
+
+=back

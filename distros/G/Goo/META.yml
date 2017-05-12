@@ -1,0 +1,31 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Goo
+version:      0.09
+version_from: lib/Goo.pm
+installdirs:  site
+requires:
+    CGI:                           0
+    Config::Auto:                  0
+    Config::Tiny:                  0
+    DBD::SQLite:                   0
+    Devel::Symdump:                0
+    File::Find:                    0
+    File::Grep:                    0
+    File::NCopy:                   0
+    LWP::ConnCache:                0
+    LWP::UserAgent:                0
+    Perl::Tidy:                    0
+    Pod::Coverage:                 0
+    Term::ANSIColor:               0
+    Term::Complete:                0
+    Term::ProgressBar:             0
+    Term::ReadKey:                 0
+    Test::More:                    0
+    Test::Pod:                     0
+    Test::Pod::Coverage:           0
+    Text::FormatTable:             0
+    Time::HiRes:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Gtk2-GladeXML
+version:             1.007
+abstract:            Create user interfaces directly from Glade XML files.
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    ExtUtils::Depends:             0.300
+    ExtUtils::PkgConfig:           1.000
+    Glib:                          1.020
+    Gtk2:                          1.000
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

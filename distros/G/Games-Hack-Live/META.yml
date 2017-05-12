@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Games-Hack-Live
+version:            0.62
+abstract:           Perl script to ease playing games
+author:
+    - Ph. Marek <pmarek@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Expect:               1.21
+    Games::Hack::Patch::x86_64:  0
+    IPC::Mmap:            0.21
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

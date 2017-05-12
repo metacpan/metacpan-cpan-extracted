@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+# PODNAME: pnm2chr
+# ABSTRACT: converts PNM files to NES sprite data (.chr files)
+
+use Games::NES::SpriteMaker 'image_to_sprite';
+
+
+my $data;
+if (@ARGV) {
+    $data = $ARGV[0];
+}
+else {
+    $data = \(do { local $/; <> });
+}
+
+my $sprite_data = image_to_sprite($data);
+
+if (@ARGV) {
+    (my $outfile = $data) =~ s/\..*$/.chr/;
+    open my $fh, '>', $outfile
+        or die "Couldn't open $outfile for writing: $!";
+    $fh->print($sprite_data);
+    $fh->close;
+}
+else {
+    print $sprite_data;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pnm2chr - converts PNM files to NES sprite data (.chr files)
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  pnm2chr input.pgm # generates input.chr
+  pnm2chr < input.pgm > output.chr
+
+=head1 DESCRIPTION
+
+This is a simple wrapper around L<Games::NES::SpriteMaker> to convert existing
+files from PNM format to CHR-ROM format. If you pass a filename as an argument,
+it will create a new file in the same directory with the same name except
+replacing the extension with C<.chr>, otherwise it will read PNM data from
+stdin and write CHR data to stdout.
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

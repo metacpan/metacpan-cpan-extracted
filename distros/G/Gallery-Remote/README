@@ -1,0 +1,32 @@
+Gallery::Remote v0.01
+
+Gallery is a web based product that lets you manage your photos on a
+web site.
+
+For more information about Gallery visit http://gallery.menalto.com/
+
+Gallery::Remote is a Perl module that provides a Perl Developer
+access to the Gallery Remote protocol as described at
+http://gallery.menalto.com/modules.php?op=modload&name=GalleryDocs&file=index&page=gallery-remote.protocol.php
+
+Tanner Lovelace
+<lovelace-cpan@wayfarer.org>
+
+REQUIREMENTS
+  - LWP::UserAgent        - Handles communication with the Gallery server.
+  - HTTP::Cookies         - Gallery remote authentication requires cookies.
+  - HTTP::Request::Common - Used for POST requests.
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install
+
+STATUS
+
+Initial release.  I'm sure it's riddled wtih bugs.  Please report
+them to lovelace-cpan@wayfarer.org.
+
+2004/02/17
+

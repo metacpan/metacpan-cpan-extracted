@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/">
+  <title>Test Feed</title>
+  <id>tag:example.com,2007:1</id>
+  <updated>2007-01-01T00:00:00Z</updated>
+  <link rel="self" href="http://example.com/feed.atom"/>
+  <openSearch:startIndex>1</openSearch:startIndex>
+  <entry>
+    <title>Test Entry 1</title>
+    <id>tag:example.com,2007:2</id>
+    <updated>2007-02-01T00:00:00Z</updated>
+    <published>2007-02-01T00:00:00Z</published>
+    <link rel="alternate" href="http://example.com/1"/>
+    <link rel="edit" href="http://example.com/edit/1"/>
+    <author>
+      <name>Foo</name>
+      <email>foo@example.com</email>
+    </author>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+        <span>Test 1</span>
+      </div>
+    </content>
+  </entry>
+  <entry>
+    <title>Test Entry 2</title>
+    <id>tag:example.com,2007:3</id>
+    <updated>2007-03-01T00:00:00Z</updated>
+    <published>2007-03-01T00:00:00Z</published>
+    <link rel="alternate" href="http://example.com/2"/>
+    <link rel="edit" href="http://example.com/edit/2"/>
+    <author>
+      <name>Bar</name>
+      <email>bar@example.com</email>
+    </author>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+        <span>Test 2</span>
+      </div>
+    </content>
+  </entry>
+</feed>

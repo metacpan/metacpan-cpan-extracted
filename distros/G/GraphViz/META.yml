@@ -1,0 +1,46 @@
+---
+abstract: "Interface to AT&T's GraphViz. Deprecated. See GraphViz2"
+author:
+  - 'Leon Brocard <acme@astray.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GraphViz
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.01'
+  Config: '0'
+  File::Which: '1.09'
+  Getopt::Long: '2.34'
+  IO::Dir: '1.04'
+  IO::File: '1.1'
+  IPC::Run: '0.6'
+  LWP::Simple: '6'
+  Parse::RecDescent: '1.965001'
+  Pod::Usage: '1.16'
+  Time::HiRes: '1.51'
+  XML::Twig: '3.52'
+  XML::XPath: '1.13'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=GraphViz
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/GraphViz.git
+version: '2.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,54 @@
+Installation Instructions
+
+The instructions are basically as per any Perl module.
+
+
+INSTALLING AUTOMATICALLY
+------------------------
+
+The easiest way to install is via CPAN or CPANPLUS:
+
+CPAN:
+
+    % perl -MCPAN -e shell                    [as root]
+    > install Games::BonDigi
+    > quit
+
+CPANPLUS:
+
+    % cpanp
+    > i Games::BonDigi
+    > q
+
+See your local 'perldoc CPAN' or 'perldoc CPANPLUS' for
+instructions on setting up and configuring CPAN or CPANPLUS.
+
+
+OBTAINING THE MODULE
+--------------------
+
+The latest release version of Games::BonDigi can be downloaded
+from any CPAN site:
+
+    http://www.cpan.org/modules/by-authors/id/C/CO/COSIMO/
+    http://search.cpan.org/dist/Games-BonDigi/
+
+Games::BonDigi is distributed as a gzipped tar archive file:
+
+    Games-BonDigi-<version>.tar.gz
+
+where <version> represents the current version number, e.g. 0.01.
+
+To install the module, unpack the distribution archive to
+create an installation directory.  Something like this:
+
+    tar zxf Games-BonDigi-0.01.tar.gz
+or
+    gunzip Games-BonDigi-0.01.tar.gz
+    tar xf Games-BonDigi-0.01.tar
+
+You can then 'cd' into the directory created,
+
+    cd Games-BonDigi-0.01
+
+

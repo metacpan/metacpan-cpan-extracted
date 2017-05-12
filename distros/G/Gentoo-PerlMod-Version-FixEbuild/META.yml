@@ -1,0 +1,271 @@
+---
+abstract: 'Automatically fix an old-style ebuild to a new style ebuild.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gentoo-PerlMod-Version-FixEbuild
+provides:
+  Gentoo::PerlMod::Version::FixEbuild:
+    file: lib/Gentoo/PerlMod/Version/FixEbuild.pm
+    version: v0.1.1
+requires:
+  Carp: 0
+  File::pushd: 0
+  Gentoo::PerlMod::Version: 0
+  Moose: 0
+  Params::Util: 0
+  Path::Class: 0
+resources:
+  homepage: http://github.com/kentfredric/Gentoo-PerlMod-Version-FixEbuild/tree
+  repository: git://github.com/kentfredric/Gentoo-PerlMod-Version-FixEbuild.git
+version: 0.1.1
+x_BuiltWith:
+  modules:
+    Carp: 1.17
+    Dist::Zilla::PluginBundle::KENTNL: 1.0.1
+    Dist::Zilla::PluginBundle::KENTNL::Lite: 0.01000002
+    File::Temp: 0.22
+    File::pushd: 1.00
+    Gentoo::PerlMod::Version: 0.2.2
+    Module::Build: 0.3607
+    Moose: 1.21
+    Params::Util: 1.03
+    Path::Class: 0.21
+    Test::More: 0.96
+  perl:
+    original: v5.12.3
+    qv: 1
+    version:
+      - 5
+      - 12
+      - 3
+  platform: linux
+  uname: 'Linux 2.6.37-gentoo x86_64 GenuineIntel GNU/Linux'
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@KENTNL/Git::NextVersion'
+      version: 1.103520
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@KENTNL/GatherDir'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@KENTNL/MetaConfig'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@KENTNL/PruneCruft'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@KENTNL/GithubMeta'
+      version: 0.10
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@KENTNL/License'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@KENTNL/PkgVersion'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@KENTNL/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: '@KENTNL/MetaProvides::Package'
+      version: 1.12044908
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@KENTNL/MetaJSON'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@KENTNL/MetaYAML'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: '@KENTNL/ModuleBuild'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: '@KENTNL/ReadmeFromPod'
+      version: 0.14
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@KENTNL/ManifestSkip'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@KENTNL/Manifest'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@KENTNL/AutoPrereqs'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: '@KENTNL/Prereqs/BundleDevelNeeds'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@KENTNL/Prereqs/BundleDevelRecommends'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: suggests
+      name: '@KENTNL/Prereqs/BundleDevelSuggests'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::MetaData::BuiltWith
+      config:
+        Dist::Zilla::Plugin::MetaData::BuiltWith:
+          _stash_key: x_BuiltWith
+          show_uname: 1
+          uname:
+            uname_args:
+              - '-s'
+              - '-o'
+              - '-r'
+              - '-m'
+              - '-i'
+            uname_call: uname
+      name: '@KENTNL/MetaData::BuiltWith'
+      version: 0.01018204
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: '@KENTNL/CompileTests'
+      version: 1.103030
+    -
+      class: Dist::Zilla::Plugin::CriticTests
+      name: '@KENTNL/CriticTests'
+      version: 1.102280
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@KENTNL/MetaTests'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@KENTNL/PodCoverageTests'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@KENTNL/PodSyntaxTests'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: '@KENTNL/ReportVersions::Tiny'
+      version: 1.03
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: '@KENTNL/KwaliteeTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@KENTNL/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@KENTNL/ExtraTests'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@KENTNL/TestRelease'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@KENTNL/ConfirmRelease'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@KENTNL/Git::Check'
+      version: 1.103520
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@KENTNL/NextRelease'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@KENTNL/Git::Tag/tag_master'
+      version: 1.103520
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@KENTNL/Git::Commit'
+      version: 1.103520
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      name: '@KENTNL/Git::CommitBuild'
+      version: 1.103520
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@KENTNL/Git::Tag/tag_release'
+      version: 1.103520
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@KENTNL/UploadToCPAN'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::Twitter
+      name: '@KENTNL/Twitter'
+      version: 0.009
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.200000
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.200000
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.200000

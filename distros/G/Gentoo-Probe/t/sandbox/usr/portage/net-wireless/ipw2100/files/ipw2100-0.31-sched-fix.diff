@@ -1,0 +1,42 @@
+diff -aur ipw2100-0.31-orig/ipw2100.h ipw2100-0.31/ipw2100.h
+--- ipw2100-0.31-orig/ipw2100.h	2004-03-12 14:59:07.000000000 -0500
++++ ipw2100-0.31/ipw2100.h	2004-03-12 16:22:44.368536512 -0500
+@@ -42,6 +42,12 @@
+ #include <linux/wireless.h>
+ #include <linux/version.h>
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0)
++#define work_struct tq_struct
++#define schedule_work schedule_task
++#define INIT_WORK INIT_TQUEUE
++#endif
++
+ struct ipw2100_priv;
+ struct ipw2100_hw_packet;
+ 
+@@ -496,13 +502,9 @@
+ 	struct net_device_stats stats;
+ 	struct iw_statistics wstats;
+ 
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0)
+-	struct tasklet_struct irq_tasklet;
+-#else
+ 	struct work_struct irq_work;
+ 	struct work_struct reset_work;
+ 	struct work_struct tx_work;
+-#endif
+ 
+ 	struct defrag_info *defrag_pool;
+ 	struct list_head defrag_list;
+diff -aur ipw2100-0.31-orig/ipw2100_main.c ipw2100-0.31/ipw2100_main.c
+--- ipw2100-0.31-orig/ipw2100_main.c	2004-03-12 14:59:07.000000000 -0500
++++ ipw2100-0.31/ipw2100_main.c	2004-03-12 16:19:36.485099136 -0500
+@@ -163,8 +163,6 @@
+ 
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0)
+ #include <linux/sched.h>
+-#define work_struct tq_struct
+-#define schedule_work schedule_task
+ #endif
+ 
+ #ifndef IRQ_NONE

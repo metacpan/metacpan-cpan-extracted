@@ -1,0 +1,74 @@
+{
+   "abstract" : "Simple API for querying Gentoo's installed-package database",
+   "author" : [
+      "Kent Fredric <kentnl@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.014",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gentoo-VDB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.014",
+            "CPAN::Meta" : "2.150010"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Path::Tiny" : "0.048",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::TempDir::Tiny" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Needs" : "0"
+         }
+      },
+      "x_examples" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Term::ANSIColor" : "4.00",
+            "Text::Wrap" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Gentoo::VDB" : {
+         "file" : "lib/Gentoo/VDB.pm",
+         "version" : "0.001002"
+      },
+      "Gentoo::VDB::Portage" : {
+         "file" : "lib/Gentoo/VDB/Portage.pm",
+         "version" : "0.001002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kentnl/Gentoo-VDB/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kentnl/Gentoo-VDB",
+         "web" : "https://github.com/kentnl/Gentoo-VDB"
+      }
+   },
+   "version" : "0.001002",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

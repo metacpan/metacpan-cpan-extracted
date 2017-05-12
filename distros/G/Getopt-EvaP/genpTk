@@ -1,0 +1,1318 @@
+#!./perl -w
+#
+# generate_PerlTk_program: create a Perl/Tk 8.x X11 GUI wrapper program for any
+# command line application.  
+#
+# A re-write of generate_tk_program (now called generate_TclTk_program), for
+# Perl/Tk 4.x.
+#
+# SOL, 98/07/26.  LUCC
+#
+# Stephen.O.Lidie@Lehigh.EDU
+#
+# Copyright (C) 1995 - 2013.  Stephen O. Lidie.
+#
+
+use Config;
+use Getopt::EvaP;		# Evaluate Parameters
+use subs qw/exit/;
+use strict qw(subs refs);	# be as pure as possible!
+
+sub evap_PDT_error;
+sub evap_set_value;
+sub exit {print "my exit\n";};
+sub finish;
+sub genPerlTk;
+sub initialize;
+sub initialize_global_variables;
+sub process_command_line_widget;
+
+$genPerlTk_aux_files = "$Config{installsitelib}/Getopt"; # other files
+chop($genPerlTk_date = `date`);	# creation date
+$genPerlTk_version = '2.7';	# version (same as Evaluate Parameters)
+
+sub evap_PDT_error {
+
+    my($msg) = @_;
+
+    print STDERR "$msg";
+    $error++;
+
+} # end evap_PDT_error
+
+sub evap_set_value {
+    
+    #
+    # Store a parameter's value; some parameter types require special type
+    # conversion.
+    #
+    # Handle list syntax (item1, item2, ...) for 'list of' types.
+    #
+    # Lists are a little weird as they may already have default values from the
+    # PDT declaration. The first time a list parameter is specified on the
+    # command line we must first empty the list of its default values.  The
+    # P_INFO list flag thus can be in one of three states: 1 = the list has
+    # possible default values from the PDT, 2 = first time for this command
+    # line parameter so empty the list and THEN push the parameter's value, and
+    # 3 = from now just keep pushing new command line values on the list.
+    #
+    
+    local( $type, $list, $v, *parameter ) = @_;
+    local( $value, @values );
+    local( $pdt_reg_exp2 ) = '^TRUE$|^YES$|^1$';
+    local( $pdt_reg_exp3 ) = '^FALSE$|^NO$|^0$';
+
+    @parameter = () if $list =~ /^2$/; # empty list of default values
+
+    if ( $list && $v =~ /^\(+[^\)]*\)+$/ ) { # check for list
+	    
+        # If a string type then values are already quoted and eval can
+	# handle the situation.  Otherwise just split on whitespace after
+	# removing the comma list separators and the left/right parens.
+
+	if ( $type =~ /^s$/ ) {
+	    @values = eval "$v"; # let Perl do the walking
+        } else {
+	    $v =~ s/(,)//g;
+	    $v =~ s/([()])//g;
+	    @values = split( ' ', $v );
+	}
+    } else {
+	@values = $v;		# a simple scalar	
+    } # ifend initialize list of values
+
+    foreach $value (@values) {
+
+        if ( $type =~ /^b$/ ) {
+            $value =~ tr/a-z/A-Z/;
+	    $value = 'TRUE' if $value =~ /$pdt_reg_exp2/;
+	    $value = 'FALSE' if $value =~ /$pdt_reg_exp3/;
+        } # ifend boolean type
+
+        if ( $list ) {
+	    push( @parameter, $value );
+        } else {
+	    $parameter = $value;
+        }
+
+    } # forend
+	
+} # end evap_set_value
+
+sub finish {
+
+    close( IN );
+    close( OUT );
+
+} # end finish
+
+sub genPerlTk {
+
+    # Process a Parameter Description Table (PDT).  Some lines are command 
+    # line parameter information, one may be trailing file name information; 
+    # all lines are help information for the user.  When all the input has 
+    # been read then create the Perl/Tk X11 GUI wrapper program.
+    
+    while (($line = <IN>)) {
+
+	push @command_help, $line; # save for tk help window
+	$help_index++;		# keep track of Text widget mark position
+
+	&process_command_line_widget if substr( $line, 0, 1 ) eq '-';
+	if ( $line =~ / required by this command/ ) {
+	    push( @P_ENTRY, 'files' ); # update list of entry widgets
+	    push @help_index, "\$help->mark('set', 'mark_${my_command}_end', '${help_index}.0');\n";
+	    $optional_files = ($line =~/ optionally required by this command/);
+	    $enable_file_menu = 1;
+	    print W <<"end_of_trailing_file_list";
+\n# $line
+\$w_trailing_file_list = \$widgets->Frame(qw(-bd 1 -relief flat));
+end_of_trailing_file_list
+	    if ( $optional_files ) {
+		$text = 'File Name(s)' . ' ' x (44 - 12);
+	    } else {
+		$text = 'Required File Name(s)' . ' ' x (44 - 21);
+	    }
+	    print W <<"end_of_trailing_file_list";
+\$w_trailing_file_list_b = \$w_trailing_file_list->Button(
+    -text        => '$text',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+	my(\$help, \$index, \$ce) = \@_;
+	see_view 'end', \$ce, \$help, \$index;
+    }, \$help, '${my_command}_end', \$ce],
+);
+\$w_trailing_file_list_b->pack(-side => 'left');
+\$w_trailing_file_list_e = \$w_trailing_file_list->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \\\$trailing_file_list,
+    -background  => \$genPerlTk_highlight,
+);
+\$w_trailing_file_list_e->pack(-side => 'left');
+\$w_trailing_file_list_e->bind('<KeyPress-Return>' => \\&update_command);
+\$widgets->window('create', 'end', -window => \$w_trailing_file_list);
+end_of_trailing_file_list
+	} # ifend trailing file list
+
+    } # whilend next input line
+
+    close( W );			# close widget file so we can read it later
+
+    # Now generate the Perl/Tk program.
+
+    print OUT <<"end_of_template";
+#!/usr/local/bin/perl5 -w
+#
+#  This Perl/Tk X11 GUI wrapper for program `$my_command' created by version $genPerlTk_version
+#  of generate_PerlTk_program.
+#
+#  $genPerlTk_date
+end_of_template
+    print OUT <<'end_of_template';
+#
+#  Stephen.O.lidie@Lehigh.EDU
+
+require 5.002;
+use English;			# legible Perl special vriable names
+require 'shellwords.pl';	# parse quoted strings
+use strict qw(subs refs);	# be as pure as possible!
+use Tk;				# Tk objects and methods
+use Tk::Dialog;			# Dialog widget
+use Tk::ErrorDialog;		# ErrorDialog widget
+use Tk::FileSelect;		# FileSelect widget
+end_of_template
+    print OUT "require '$genPerlTk_aux_files/DisU.pl';\n";
+    print OUT <<'end_of_template';
+
+$genPerlTk_mw = MainWindow->new;# main window
+
+# Subroutine prototypes (someday).
+
+use subs qw(sub execute_command flash_widget kill_stdout pipe_window
+	    read_stdout reset_doit_button reset_parameters save_window
+	    see_view update_command);
+
+# Subroutines.
+
+sub execute_command {
+
+    # Create a toplevel output window, exec the Unix command and capture 
+    # stdout/stderr.  If no stdout/stderr then don't bother to deiconify
+    # the toplevel, and, if only doing-it-once, exit.
+
+    my($doit, $doit_bg) = @_;
+
+    update_command;
+    $genPerlTk_mw->update;
+
+    my $execute = 1;
+    $execute = ($genPerlTk_stdin_dialog->Show eq 'OK') if 
+        defined $trailing_file_list and $trailing_file_list eq '';
+
+    if (not $execute) {
+	reset_doit_button $doit, $doit_bg;
+	return;
+    }
+
+    # Special case $required parameters.
+
+end_of_template
+    print OUT "    foreach (qw(", join(' ', @P_REQUIRED), ")) {\n";
+    print OUT "        no strict qw(refs);\n";
+    print OUT "        if (\$\$_ eq '\$REQUIRED' or \$\$_ eq '\$required' or \$\$_ eq '') {\n";
+    print OUT "            \$genPerlTk_required_dialog->configure(-text => \"Parameter \\\"\$_\\\" requires a value.\");\n";
+
+    print OUT "            \$genPerlTk_required_dialog->Show;\n";
+    print OUT "            reset_doit_button \$doit, \$doit_bg;\n";
+    print OUT "            return;\n";
+    print OUT "        }\n";
+    print OUT "    }\n";
+    print OUT <<'end_of_template';
+    
+    my($t);
+    if (Exists($genPerlTk_runme)) {
+	$t = $genPerlTk_text;
+	$genPerlTk_runme->deiconify;
+    } else{
+	$genPerlTk_runme = $genPerlTk_mw->Toplevel;
+	my $e = $genPerlTk_runme;
+end_of_template
+    my $my_xcommand = 'x' . $my_command;
+    print OUT <<"end_of_template";
+	\$e->title('$my_xcommand output');
+	\$e->iconname('$my_xcommand');
+end_of_template
+    print OUT <<'end_of_template';
+
+	# Forward declaration of the Text widget.
+
+	$tf = $e->Frame;
+	$t = $tf->Text(qw(-relief raised -bd 2 -setgrid true -font fixed));
+	$genPerlTk_text = $t;
+	$t->pack(qw(-expand yes -fill both));
+        $tf->AddScrollbars($t);
+        $tf->configure(-scrollbars => 'se');
+
+	my $m = $e->Frame(qw(-bd 1 -relief raised));
+	$m->pack(qw(-side top -fill x -expand yes));
+	my $mf = $m->Menubutton(qw(-text File -underline 0 -relief raised));
+	$mf->pack(-side => 'left');
+	my $fs = $genPerlTk_mw->FileSelect;
+	$mf->command(
+            -label   => 'Save as ...',
+            -command => [sub {save_window @_}, $fs, $t],
+        );
+	$mf->command(
+            -label   => 'Pipe to ...',
+            -command => [sub {pipe_window @_}, $t],
+        );
+	$mf->separator;
+	$mf->command(
+            -label   => 'Close',
+            -command => [$e => 'iconify'],
+        );
+
+	$tf->pack;
+
+    } # ifend not Exists
+	
+    # Open the pipe.  The Do It button has been disabled until now to
+    # prevent a race condition.
+    
+    {
+	no strict qw(subs);
+	$genPerlTk_pid = open H, "$genPerlTk_command 2>&1 |";
+	warn $OS_ERROR if not defined $genPerlTk_pid;
+        select H; $OUTPUT_AUTOFLUSH = 1; select STDOUT;
+	$genPerlTk_mw->fileevent(H, 'readable' => [sub {
+            read_stdout @_;
+        }, $t, $doit, $doit_bg]);
+    }
+    $doit->configure(
+        -text    => 'Cancel',
+        -relief  => 'raised',
+        -state   => 'normal',
+        -command => [sub {
+            kill_stdout @_;
+        }, $t, $doit, $doit_bg],
+    );
+    flash_widget $doit, '-background' => $genPerlTk_highlight, $doit_bg, 500;
+    
+} # end execute_command
+
+sub flash_widget {
+
+    # Flash a widget by alternating its foreground and background colors.
+
+    my($w, $option, $val1, $val2, $interval) = @_;
+
+    if ($genPerlTk_fini == 0) {
+	$w->configure($option => $val1);
+	$genPerlTk_mw->after($interval, [\&flash_widget, $w, $option, $val2,
+            $val1, $interval]);
+    }
+
+} # end flash_widget
+
+sub kill_stdout {
+    
+    # A click on the blinking Cancel button resumes normal operations.
+
+    my($t, $doit, $doit_bg) = @_;
+
+    $genPerlTk_fini = 1;
+    {
+	no strict qw(subs);
+	$genPerlTk_mw->fileevent(H, 'readable' => ''); # clear handler
+    }
+    kill 'KILL', $genPerlTk_pid;
+    close H;
+    exit if $genPerlTk_doit_once and ($t->index('end') eq '2.0');
+    $genPerlTk_runme->withdraw if $t->index('end') eq '2.0';
+    reset_doit_button $doit, $doit_bg;
+
+} # end kill_stdout
+
+sub ldifference {		# @d = ldifference(\@l1, \@l2)
+
+    my($l1, $l2) = @_;
+    my %d;
+    @d{@$l2} = (1) x @$l2;
+    return grep(! $d{$_}, @$l1);
+
+} # end ldifference
+
+sub lintersection {		# @i = lintersection(\@l1, \@l2)
+
+    my($l1, $l2) = @_;
+    my %i;
+    @i{@$l1} = (1) x @$l1;
+    return grep($i{$_}, @$l2);
+
+} # end lintersection
+
+sub lsearch {			# $o = lsearch($regexp, @list)
+
+    # Search the list using the supplied regular expression and return it's 
+    # ordinal, or -1 if not found.
+
+    my($regexp, @list) = @_;
+    my($i);
+
+    for ($i=0; $i<=$#list; $i++) {
+        return $i if $list[$i] =~ /$regexp/;
+    }
+    return -1;
+
+} # end lsearch
+
+sub lunion {			# @u = lunion(\@l1, \@l2)
+
+    my($l1, $l2) = @_;
+    my %u;
+    @u{@$l1,  @$l2} = 1;
+    return keys %u;
+
+} # end lunion
+
+sub pipe_window {
+
+    # Create a modal dialog entry toplevel window divided into an upper 
+    # message widget, a middle entry widget and a lower frame with OK and 
+    # Cancel button widgets. Make a local grab, wait for the pipeline string
+    # to be entered, withdraw the window and perform the exec.
+
+    my($w) = @_;
+
+    my($answer) = '';
+    if (Exists($genPerlTk_pipe)) {
+	$genPerlTk_pipe->deiconify;
+    } else {
+        $genPerlTk_pipe = $genPerlTk_mw->Toplevel(-class => 'dialog');
+	$genPerlTk_pipe->title('Pipe');
+	$genPerlTk_pipe->iconname('Pipe');
+	my $f1 = $genPerlTk_pipe->Frame(qw(-bd 1 -relief raised));
+	my $f2 = $genPerlTk_pipe->Frame(qw(-bd 1 -relief raised));
+	my $f3 = $genPerlTk_pipe->Frame(qw(-bd 1 -relief raised));
+	$f1->pack($f2, $f3, qw(-side top -fill both -expand yes));
+
+	my $process_pipe_input =  [sub {
+	    shift if ref($_[0]) eq 'Tk::Entry';
+	    my($answer, $w, $genPerlTk_pipe) = @_;
+	    open(P, "| $$answer") or warn $OS_ERROR;
+	    print P $w->get('1.0', 'end');
+	    close P;
+	    $genPerlTk_pipe->withdraw;
+        }, \$answer, $w, $genPerlTk_pipe];
+
+	my $msg = $f1->Message(
+            -aspect => 400,
+            -text   => 'Enter command pipeline:',
+        );
+	$msg->pack(qw(-side top -expand yes -fill both));
+
+	my $e = $f2->Entry(
+            -relief => 'sunken',
+            -width  => 40,
+            -textvariable => \$answer,
+        );
+	$e->focus;
+	$e->bind('<KeyPress-Return>' => $process_pipe_input);
+	$e->pack(qw(-side top -expand yes -fill both));
+
+	my $ok = $f3->Button(
+            -text    => 'OK',
+            -command => $process_pipe_input,
+	);
+	$ok->pack(qw(-side left -expand yes -fill x));
+
+	my $can = $f3->Button(
+            -text    => 'Cancel',
+            -command => [$genPerlTk_pipe => 'withdraw'],
+        );
+	$can->pack(
+            qw(-side right -expand yes -fill x),
+        );
+    }
+	
+} # end pipe_window
+
+sub read_stdout {
+
+    # Called when input is available for the output window.  Also checks
+    # the global genPerlTk_fini to see if the user has clicked Cancel.
+
+    my($t, $doit, $doit_bg) = @_;
+
+    if ($genPerlTk_fini) {
+	kill_stdout $t, $doit, $doit_bg;
+    } else {
+	if ((not eof H) and ($_ = <H>)) {
+	    $t->insert('end', $_);
+	    $t->yview('end');
+	} else {
+	    $genPerlTk_fini = 1;
+	}
+    }
+	
+} # end read_stdout
+
+sub reset_doit_button {
+
+    # Establish normal Do It button parameters.
+
+    my($doit, $doit_bg) = @_;
+
+    $doit->configure(
+        -text       => 'Do It',
+        -relief     => 'raised',
+        -background => $doit_bg,
+        -state      => 'normal',
+        -command    => [sub {
+	    my($doit, $doit_bg) = @_;
+            $genPerlTk_fini = 0;
+            $doit->configure(
+                -text   => 'Working ...',
+                -relief => 'sunken',
+                -state  => 'disabled'
+            );
+            execute_command $doit, $doit_bg;
+        }, $doit, $doit_bg],
+    );
+
+} # end reset_doit_button
+
+sub reset_parameters {
+
+    # Restore all command line parameter values to their default values.
+
+end_of_template
+    initialize_global_variables 1;
+    print OUT <<'end_of_template';
+
+} # end reset_parameters
+
+sub save_window {
+
+    # Open a file selection window and save text widget $w.
+
+    my($fs, $w) = @_;
+
+end_of_template
+    $my_xcommand = 'x' . $my_command;
+    print OUT "    my \$o = '${my_xcommand}.out';\n";
+print OUT <<'end_of_template';
+    $o = $fs->Show;
+    my $replace = 1;
+    if ($o ne '') {
+	if (-s $o) {
+	    $genPerlTk_replace->configure(
+                -text => "Replace existing $o?",
+            );
+	    my $answer = $genPerlTk_replace->Show;
+	    $replace = $answer eq 'Yes';
+	}
+    }
+    if ($replace == 1) {
+	open(S, ">$o") or warn $OS_ERROR;
+	print S $w->get('1.0', 'end');
+	close S;
+    }
+
+} # end save_window
+
+sub see_view {
+
+    # Position view of the command widget to this command line parameter.
+    # Position help window so help information for this parameter is visible
+    # and highlighted for a few seconds.
+
+    my ($p, $ce, $help, $index) = @_;
+
+    if ($p =~ /^end$/) {
+	    $ce->xview('end');
+    } else {
+        $ce->xview(index($genPerlTk_command, $p) - 10);
+    }
+
+    $help->yview(-pickplace, 'mark_' . $index);
+    $help->tag('configure', 'tag_' . $index, 
+        -background => $genPerlTk_highlight,
+    );
+    $help->after(4000, [$help => 'tag', 'configure', 'tag_' . $index,
+        -background => ($help->configure(-background))[3]],
+    );
+
+} # end see_view
+
+sub update_command {
+
+    # Create the command to execute.
+
+    # BEGIN application specific command line processing.
+    # END   application specific command line processing.
+
+end_of_template
+    print OUT "    \$genPerlTk_command = '$my_command';\n";
+    print OUT <<'end_of_template';
+
+    # Build all non-switch parameters that have been specified.
+
+    my($parameter, @l0, @l1, @udi);
+end_of_template
+    print OUT '    foreach $parameter (qw(';
+    my $parameter;
+    foreach $parameter (@P_PARAMETER) {
+	my($required, $type, $list) = ($P_INFO{$parameter} =~ /(.)(.)(.?)/);
+	print OUT " $parameter" if $type !~ /w/;
+    }
+    print OUT ")) {\n";
+print OUT <<'end_of_template';
+	no strict qw(refs);
+        @l0 = &shellwords($$parameter);
+	next if join(' ', @l0) eq '';
+	@l1 = @${"${parameter}0"};
+        next if $$parameter eq join ' ', @l1;
+        @udi = lunion [ldifference \@l0, \@l1], [lintersection \@l0, \@l1];
+        $genPerlTk_command .=
+            " -$parameter '" . join("' -$parameter '", @udi) . "'";
+    }
+
+    # Build all switch parameters that have been specified.
+
+end_of_template
+    print OUT '    foreach $parameter (qw(';
+    foreach $parameter (@P_SWITCH) {
+        print OUT " $parameter";
+    }
+    print OUT ")) {\n";
+    print OUT <<'end_of_template';
+	no strict qw(refs);
+        next if $$parameter eq "NOT_${parameter}";
+	$genPerlTk_command .= " -${parameter}";
+    }
+
+    $genPerlTk_command .= ' ' . $trailing_file_list if
+        defined $trailing_file_list;
+
+    return $genPerlTk_command;
+
+} # end update_command
+
+sub update_checkbutton_list {
+
+    # Toggle $val in $var.
+
+    my($var, $val) = @_;
+
+    my @l = split ' ', $$var;
+    my $i = lsearch $val, @l;
+    if ($i >= 0) {
+	splice @l, $i, 1;
+    } else {
+	push @l, $val;
+    }
+    $$var = join ' ', @l;
+    update_command;
+
+} # end update_check_button_list
+
+# Signal handlers.
+
+$SIG{PIPE} = 'IGNORE';
+
+# Initialize global Evaluate Parameters variables.
+
+end_of_template
+    initialize_global_variables 0;
+    print OUT <<'end_of_template';
+
+# Initialize global generate_PerlTk_program variables.
+
+end_of_template
+#    print OUT "\$genPerlTk_aux_files = '$genPerlTk_aux_files';\n";
+    print OUT "\$genPerlTk_doit_once = $my_dio;\n";
+    print OUT <<'end_of_template';
+$genPerlTk_required_dialog = $genPerlTk_mw->Dialog(
+    -title   => 'Alert',
+    -text    => 'Parameter "_" required a value.',
+    -bitmap  => 'error',
+    -buttons => [qw(Cancel)],
+    -wraplength => '6i',
+);
+$genPerlTk_stdin_dialog = $genPerlTk_mw->Dialog(
+    -title   => 'Alert',
+    -text    => 'Is standard input really the file you want to process?',
+    -bitmap  => 'warning',
+    -buttons => [qw(Cancel OK)],
+);
+$genPerlTk_fini = 0;
+
+$genPerlTk_highlight = $genPerlTk_mw->optionGet(qw(highlight Highlight));
+if (not defined $genPerlTk_highlight) {
+    if ($genPerlTk_mw->depth > 1) {
+	$genPerlTk_highlight = 'yellow';
+    } else {
+	$genPerlTk_highlight = 'white';
+    }
+}
+$genPerlTk_replace = $genPerlTk_mw->Dialog(
+    -title   => 'Replace?',
+    -buttons => ['Yes', 'No'],				 
+);
+$genPerlTk_undo_all = 'Undo All';
+
+reset_parameters;
+$genPerlTk_command = update_command;
+
+# BEGIN application specific command line processing.
+# END   application specific command line processing.
+
+end_of_template
+    $my_xcommand = 'x' . $my_command;
+    print OUT <<"end_of_template";
+\$genPerlTk_mw->title('$my_xcommand');
+\$genPerlTk_mw->iconname('$my_xcommand');
+end_of_template
+    print OUT <<'end_of_template';
+$genPerlTk_mw->geometry('+400+50');
+
+# File, Edit and Help menubuttons, with the Do It button stuffed in between.
+
+my $mb = $genPerlTk_mw->Frame(-borderwidth => 1, -relief => 'raised');
+$mb->pack(qw(-side top -fill both -expand yes));
+
+my $mbf = $mb->Menubutton(qw(-text File -underline 0 -relief raised));
+my $fs = $genPerlTk_mw->FileSelect;
+$mbf->command(
+    -label     => 'Open ...', 
+    -underline => 0,
+end_of_template
+    my $state = $enable_file_menu ? 'normal' : 'disabled';
+    print OUT "    -state     => '$state',\n";
+    print OUT <<'end_of_template';
+    -command   => [sub {
+	my($fs) = @_;
+	$trailing_file_list = $fs->Show;
+	update_command;
+    }, $fs],
+);
+$mbf->separator;
+$mbf->command(
+    -label     => 'Close',
+    -underline => 0,
+    -command   => [$genPerlTk_mw => 'iconify'],
+);
+$mbf->separator;
+$mbf->command(
+    -label     => 'Quit',
+    -underline => 0,
+    -command   => sub {exit},
+);
+$mbf->pack(-side => 'left');
+
+my $mbe = $mb->Menubutton(qw(-text Edit -underline 0 -relief raised));
+$mbe->command(
+     -label     => $genPerlTk_undo_all,
+     -underline => 0,
+);
+$mbe->pack(-side => 'left');
+
+my $doit = $mb->Button;
+$doit->pack(-side => 'left', -expand => 'yes');
+my $doit_bg = ($doit->configure(-background))[4];
+reset_doit_button($doit, $doit_bg);
+
+my $filler = $mb->Menubutton(-text => '          ', -state => 'disabled');
+$filler->pack(-side => 'left');
+
+my $mbh = $mb->Menubutton(qw(-text Help -underline 0 -relief raised));
+$mbh->pack(-side => 'left');
+
+my $about = $genPerlTk_mw->Dialog(
+    -title  => 'About',
+end_of_template
+    print OUT "    -text   => \"This Perl/Tk X11 GUI wrapper for program `$my_command' created by version $genPerlTk_version of generate_PerlTk_program.\\n\\n$genPerlTk_date\\n\\nStephen.O.Lidie\\\@Lehigh.EDU\",\n";
+    print OUT <<'end_of_template';
+#    -bitmap => "\@${genPerlTk_aux_files}/SOL.xbm",
+     -wraplength => '4i',
+);
+$mbh->command(
+    -label     => 'About', 
+    -underline => 0, 
+    -command   => [$about => 'Show'],
+);
+$mbh->command(
+    -label     => 'Usage', 
+    -underline => 0, 
+end_of_template
+    print OUT "    -command   => [\\&display_usage, '$genPerlTk_version'],\n";
+    print OUT <<'end_of_template';
+);
+
+# Full command help from Evaluate Parameters Message Module.
+
+my $h = $genPerlTk_mw->Frame;
+$h->pack(qw(-fill x -expand 1));
+my $help = $h->Text(
+    qw(-relief raised -bd 1 -setgrid 1 -height 10 -font fixed -width 100),
+);
+$help->pack(qw(-expand yes -fill both));
+$h->AddScrollbars($help);
+$h->configure(-scrollbars => 'e');
+
+# Configure Undo All now that $help has been defined.
+
+$mbe->entryconfigure($genPerlTk_undo_all, -command => [sub {
+        shift->yview('0.0');
+        reset_parameters;
+        update_command;
+    }, $help],
+);
+
+# Scrollable text widget to contain command line parameter widgets.
+
+my $wf = $genPerlTk_mw->Frame;
+$wf->pack(qw(-fill x -expand yes));
+my $widgets = $wf->Text(qw(-relief raised -bd 1 -setgrid true -height 11));
+$widgets->pack(qw(-fill x -expand yes));
+$wf->AddScrollbars($widgets);
+$wf->configure(-scrollbars => 'se');
+
+# Populate help window with Evaluate Parameters -full_help.
+
+foreach (<DATA>) {
+    $help->insert('end', $_);
+}
+$help->configure(-state => 'disabled');
+
+# Establish marks and tags for quickly positioning the help information.
+end_of_template
+{
+    my($i, $last);
+    for($i=0; $i <= $#help_index; $i++) {
+	$_ = $help_index[$i];
+	print OUT "\n";
+	print OUT;
+	s/mark/tag/;
+	s/set/add/;
+	s/mark_/tag_/;
+	($l) = /, '(\d+)\.0'/;
+        $l++;
+        s/, '(\d+)\.0'/, '$l\.0'/;
+	if ($i < $#help_index) {
+	    ($l) = ($help_index[$i+1] =~ /(, '\d+\.0')/);
+	} else {
+	    $l = ", 'end - 2 lines'";
+	}
+	s/\);/$l\);/;
+	print OUT;
+    }
+}
+print OUT <<'end_of_template';
+
+# Forward declaration of the entry widget.
+
+my $c = $genPerlTk_mw->Frame;
+my $ce = $c->Entry(-relief => 'ridge', -textvariable => \$genPerlTk_command);
+
+# Entry widget showing command to execute.
+
+my $spacer = $genPerlTk_mw->Frame(-height => 15);
+$spacer->pack;
+my $l = $genPerlTk_mw->Label(-text => 'Command to Execute');
+$l->pack;
+$c->pack(qw(-fill x -expand yes));
+$ce->pack(qw(-fill x -expand yes));
+$c->AddScrollbars($ce);
+$c->configure(-scrollbars => 's');
+end_of_template
+
+    # Append all the command line widget definitons.
+
+    open( W, "<$widgets" ) || die( "Cannot open widget scracth file: $!" );
+    print OUT <W>;
+    close W;
+
+    # Finally, start the event loop and supply full help information.
+
+    print OUT "\nMainLoop;\n__END__\n";
+    print OUT @command_help;
+
+} # end genPerlTk
+
+sub initialize {
+
+    $PDT =<<'end_of_PDT';
+        command, c: application = $required
+	pdt, p: file = $optional
+	mm, m: file = $optional
+        key_widget_type, kwt: key radiobutton, optionmenu, keyend = radiobutton
+        do_it_once, dio:  boolean = FALSE
+	output, o: file = stdout
+        no_file_list
+end_of_PDT
+
+    $MM = <<'end_of_MM';
+generate_PerlTk_program, genPerlTk
+
+	Generates a Perl/Tk program to create an X11 GUI wrapper
+        around any command line program.  Although primarily
+        designed for programs that actually use EvaP to process
+        arguments, by creating files containing a Parameter
+        Description Table (PDT) and Message Module (MM), many
+        other programs can be wrapped in a graphical interface.
+	
+	Interprets the command's Parameter Description Table and
+        builds the necessary windows and widgets.  The resulting
+        application can capture its standard output in a window; 
+        the output can be saved to a file or directed to a pipeline.
+        Complete help is also provided.
+
+	General capabilities:
+
+	 . Command line parameters are specified via a form packed
+           inside a scrollable Text widget.  Most are Entry widgets,
+           except for parameters of type switch and boolean which
+           are Radiobutton widgets, and type key which can be either
+           Radiobutton widgets or an Optionmenu.
+	
+	 . For 'list of' command line parameters we make these
+	   widget distinctions:  key parameters use Checkbuttons
+	   and other types use Entry widgets with multiple items.
+
+	 . Complete command and parameter help (from the
+	   Evaluate Parameters Message Module) displayed in a
+	   scrollable Text widget.
+
+	 . A scrollable Entry widget dynamically displays the
+	   command to be executed.
+
+	 . After execution the command's standard output is captured
+	   in a separate Toplevel window.  This window can be saved
+	   to file or directed to a command pipeline.
+
+	 . Parameters are labelled with Button widgets rather than
+	   Label widgets so clicking on a command line parameter
+	   Button positions the help window automatically to the
+	   help text for that parameter.  The scrollable Entry
+	   widget is also repositioned to show the specified
+	   parameter.
+
+	 . Important items that should be highlighted for the user
+	   to see are displayed in a configurable background color
+	   using the X11 resource name `name.highlight : color'.       	
+
+	 . An Undo selection to reset all command line parameters to
+	   their original values.
+
+	 . Usage help explaining the characteristics of applications
+	   generated by generate_PerlTk_program, and details of
+	   Evaluate Parameters.
+
+          Examples:
+
+            genPerlTk -c op -o xop
+
+            genPerlTk -c op -p op.pdt -m op.mm > xop
+
+	In the last example note that since the genPerlTk output
+	file defaults to stdout	normal I/O redirection can be
+	used.
+.command
+	Specifies the name of the command.  If this command uses
+        EvaP to handle its command line parameters the -pdt and
+        -mm options must not be specified (this information is
+        already part of the command).
+.pdt
+        Specifies the Parameter Description Table for the command.
+        Only supply this parameter if your command does not use
+        Evaluate Parameters.
+.mm
+        Specifies the Message Module for the command. Only supply
+        this parameter if your command does not use Evaluate
+        Parameters.
+.key_widget_type
+        Specifies what kind of widget represents a parameter of
+        type key, a Radiobutton or Optionmenu.
+.do_it_once
+        If TRUE, exit program after 1 Do It if no stdout/stderr.
+.output
+	Specifies the name of the generate_PerlTk_program output
+        file.
+end_of_MM
+    
+    @PDT = split( /\n/, $PDT );
+    @MM = split( /\n/, $MM );
+    EvaP \@PDT, \@MM;		# Evaluate Parameters
+
+    $my_command = $opt_command;	# save if command has identical parameter
+    $my_kwt = $opt_key_widget_type;
+    $my_dio = $opt_do_it_once;
+    $my_output = $opt_output;
+
+    open( OUT, ">$my_output" ) || die( "Cannot open output file: $!" );
+
+if ($opt_pdt eq '$optional') {
+
+    # Open a pipe to an executable so it can spit out its PDT data.
+
+    open( IN, "$my_command -full_help |" ) || 
+    die( "Cannot execute command: $!" );
+} else {
+    
+    # Call EvaP with the PDT and MM and capture its -full_help output.
+
+    open(PDT, $opt_pdt) or die "Cannot open $opt_pdt: $!";
+    my(@tmp_pdt) = <PDT>;
+    close PDT;
+    open(MM, $opt_mm) or die "Cannot open $opt_mm: $!";
+    my(@tmp_mm) = <MM>;
+    close MM;
+    chomp @tmp_mm;
+    open(main::OLDOUT, ">&STDOUT") or die $!;
+    open(STDOUT, ">$my_command-pdt.out") or die $!;
+    $Getopt::EvaP::evap_embed = 1;
+    my %OPT;
+    @ARGV = (qw/-full_help/);
+    EvaP \@tmp_pdt, \@tmp_mm, \%OPT;
+    close STDOUT;
+    open(STDOUT, ">&OLDOUT");
+    open(IN, "$my_command-pdt.out") or die $!;
+    close OLDOUT;
+}
+
+    $widgets = "/tmp/genPerlTk_widgets";
+    open( W, ">$widgets" ) || die( "Cannot open widget scracth file: $!" );
+
+    $enable_file_menu = 0;	# 1 IFF a toplevel "Select File" menu
+    $error = 0;			# no PDT parsing errors
+    $help_index = -1;		# for recording marks in the help Text widget
+    $my_font = "fixed";
+    $opt_command = "";		# no command
+    $opt_key_widget_type = "";
+    $opt_do_it_once = "";
+    $opt_output = "";
+
+    @P_PARAMETER = ();		# no parameter names
+    %P_INFO = ();		# no encoded parameter information
+    %P_ALIAS = ();		# no aliases
+    @P_REQUIRED = ();		# no required parameters
+    %P_VALID_VALUES = ();	# no keywords
+    %P_ENV = ();		# no default environment variables
+    @P_SWITCH = ();		# no switch type parameters
+    @P_ENTRY = ();		# no entry widgets
+    
+} # end initialize
+
+sub initialize_global_variables {
+
+    my($indent) = @_;
+
+    $tab = $indent ? "    " : "";
+
+    foreach $parameter (@P_PARAMETER) {
+        ($required, $type, $list) = ( $P_INFO{$parameter} =~ /(.)(.)(.?)/ );
+	if ( $list eq '1' ) { # if 'list of'
+	    @values = eval "\@opt_$parameter";
+	    print OUT
+                "${tab}\$${parameter}0 = ['", join("', '", @values), "'];\n"
+                if not $indent;
+	    if ( $type =~ /k/ ) {
+		foreach $value0 (split( ' ', $P_VALID_VALUES{$parameter} )) {
+		    $value = "";
+		    foreach $v (eval "\@opt_$parameter") {
+			if ( $v eq $value0 ) {
+			    $value = $v;
+			    last;
+			}
+		    }
+		    print OUT "${tab}\$${parameter}_${value0} = '${value}';\n"
+                        if $indent;
+		}
+	    }
+	    if ($indent) {
+		print OUT "${tab}\$$parameter = join ' ', \@\$${parameter}0;\n"
+                    if $indent;
+		next;
+	    }
+	} else {
+	    $value = eval "\$opt_$parameter";
+	    if ($type =~ /w/) {
+		print OUT "\$${parameter}0 = '$value';\n" if not $indent;
+		print OUT "${tab}\$$parameter = \$${parameter}0;\n" if $indent;
+	    } else {
+		print OUT "\$${parameter}0 = ['$value'];\n" if not $indent;
+		print OUT "${tab}\$$parameter = join ' ', \@\$${parameter}0;\n"
+                    if $indent;
+	    }
+	} # ifend 'list of'
+    } # forend all command line parameters
+
+    if ($enable_file_menu) {
+	print OUT "\$trailing_file_list0 = [''];\n" if not $indent;
+	print OUT 
+            "${tab}\$trailing_file_list = join ' ', \@\$trailing_file_list0;\n"
+            if $indent;
+    }
+	
+} # end initialize_global_variables
+
+sub process_command_line_widget {
+
+    # Parse the psuedo-PDT line from Evaluate Parameters.
+
+    return if substr( $line, 0, 5 ) eq '-help';
+
+    $option = substr( $line, 1 );
+	
+    ($parameter, $alias, $_) =
+      ($option =~ /^\s*(\S*)\s*,\s*(\S*)\s*:\s*(.*)$/);
+    push @help_index, "\$help->mark('set', 'mark_${my_command}_${parameter}', '${help_index}.0');\n";
+    evap_PDT_error("Error in an Evaluate Parameters 'parameter, alias: " .
+        "type' option specification:  \"$option\".\n")
+	unless defined $parameter && defined $alias && defined $_;
+    evap_PDT_error("Duplicate parameter $parameter:  \"$option\".\n")
+        if defined $P_INFO{$parameter};
+    push @P_PARAMETER, $parameter; # update the ordered list of parameter names
+
+    /(\bswitch\b|\binteger\b|\bstring\b|\breal\b|\bfile\b|\bboolean\b|\bkey\b|\bname\b|\bapplication\b)/; # type/list
+    ($list, $type, $_)=($`, $1, $');
+    evap_PDT_error("Parameter $parameter has an undefined type:  " .
+        "\"$option\".\n") unless defined $type;
+    evap_PDT_error("Expecting 'list of', found:  \"$list\".\n") 
+        if $list ne '' && $list !~ /\s*list\s+of\s+/;
+    $list = '1' if $list;	# list state = 1, possible default PDT values
+    $type = 'w' if $type =~ /^switch$/;
+    $type = substr( $type, 0, 1 );
+
+    ($_, $default_value) = /\s*=\s*/ ? ($`, $') : ('', ''); # get default value
+    if ( $default_value =~ /^([^\(]{1})(\w*)\s*,\s*(.*)/ ) { # if environment variable AND not a list
+	$default_value = $3;
+	$P_ENV{$parameter} = $1 . $2;
+    }
+    $required = ($default_value eq '$required') ? 'R' : 'O';
+    $P_INFO{$parameter} = defined $type ? $required . $type . $list : "";
+    push( @P_REQUIRED, $parameter ) if $required =~ /^R$/; # update the list of $required parameters
+
+    if ( $type =~ /^k$/ ) {
+	$_ =~ s/,/ /g;
+	@keys = split( ' ' );
+	pop( @keys );	# remove 'keyend'
+	$P_VALID_VALUES{$parameter} = join( ' ', @keys );
+    } #ifend keyword type
+	
+    foreach $value (keys %P_ALIAS) {
+	&evap_PDT_error( "Duplicate alias $alias:  \"$option\".\n" ) 
+            if $alias eq $P_ALIAS{$value};
+    }
+    $P_ALIAS{$parameter} = $alias; # remember alias
+	
+    &evap_PDT_error( "Cannot have 'list of switch':  \"$option\".\n" ) 
+        if $P_INFO{$parameter} =~ /^.w\@$/;
+
+    $default_value = "NOT_${parameter}" if $type =~ /w/;
+    $default_value = "" if $type =~ /f/ && $default_value eq '-';	
+    $default_value = "stdout" if $type =~ /f/ && $default_value eq '>-';	
+    $default_value = "" if $default_value eq "\$optional" || $default_value 
+        eq "";
+
+    if ( $default_value ne '' ) {
+	$default_value = $ENV{$P_ENV{$parameter}} if $P_ENV{$parameter} && 
+            $ENV{$P_ENV{$parameter}};
+	&evap_set_value( $type, $list, $default_value, 'opt_'."$parameter" ); # initialize with default value
+    }
+
+    # Line parsed - create the widget based upon the parameter's type.
+
+    $indicator = '(' . $type . ($list ? 'l' : ' ') . ') ';
+    $indicator = '(sw) ' if $indicator eq '(w ) ';	
+
+    if ( $type =~ /i|s|r|f|n|a/ ) { # integer, string, real, file, name and application
+
+	push @P_ENTRY, $parameter; # update list of entry widgets
+	$spaces = ' ' x (39 - length $parameter);
+	print W <<"end_of_param";
+\n# -$option
+my \$w_$parameter = \$widgets->Frame(qw(-bd 1 -relief flat));
+my \$w_${parameter}_b = \$w_$parameter->Button(
+    -text        => '${parameter}${spaces}${indicator}',
+    -borderwidth => 0,
+    -font        => '$my_font',
+    -command     => [sub {
+        my(\$help, \$index, \$ce) = \@_;
+        see_view '-${parameter}', \$ce, \$help, \$index;
+    }, \$help, '${my_command}_${parameter}', \$ce],
+);
+\$w_${parameter}_b->pack(qw(-side left));
+my \$w_${parameter}_e = \$w_$parameter->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \\\$${parameter},
+end_of_param
+        print W "    -background   => \$genPerlTk_highlight,\n" if
+            $default_value eq '$required';
+        print W <<"end_of_param";
+);
+\$w_${parameter}_e->pack(qw(-side left));
+\$w_${parameter}_e->bind('<KeyPress-Return>' => \\&update_command);
+\$widgets->window('create', 'end', -window => \$w_$parameter);
+end_of_param
+
+    } elsif ( $type =~ /b/ ) {	# boolean
+
+	$spaces = ' ' x (39 - length $parameter);
+        print W <<"end_of_param";
+\n# -$option
+\$w_$parameter = \$widgets->Frame(qw(-bd 1 -relief flat));
+\$w_${parameter}_b = \$w_$parameter->Button(
+    -text        => '${parameter}${spaces}${indicator}',
+    -borderwidth => 0,
+    -font        => '$my_font',
+    -command     => [sub {
+        my(\$help, \$index, \$ce) = \@_;
+        see_view '-${parameter}', \$ce, \$help, \$index;
+    }, \$help, '${my_command}_${parameter}', \$ce],
+);
+\$w_${parameter}_b->pack(qw(-side left));
+end_of_param
+	if ( $list ) {
+	    push @P_ENTRY, $parameter; # update list of entry widgets
+            print W <<"end_of_param";
+my \$w_${parameter}_e = \$w_$parameter->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \\\$${parameter},
+end_of_param
+        print W "    -background   => \$genPerlTk_highlight,\n" if
+            $default_value eq '$required';
+        print W <<"end_of_param";
+);
+\$w_${parameter}_e->pack(qw(-side left));
+\$w_${parameter}_e->bind('<KeyPress-Return>' => \\&update_command);
+\$widgets->window('create', 'end', -window => \$w_$parameter);
+end_of_param
+	} else {
+	    print W <<"end_of_param";
+my \$w_${parameter}_yes = \$w_${parameter}->Radiobutton(
+    -text     => 'Yes',
+    -variable => \\\$${parameter},
+    -relief   => 'flat',
+    -value    => 'TRUE',
+    -command  => \\&update_command,
+);
+\$w_${parameter}_yes->pack(-side => 'left');
+my \$w_${parameter}_no = \$w_${parameter}->Radiobutton(
+    -text     => 'No',
+    -variable => \\\$${parameter},
+    -relief   => 'flat',
+    -value    => 'FALSE',
+    -command  => \\&update_command,
+);
+\$w_${parameter}_no->pack(-side => 'left');
+\$widgets->window('create', 'end', -window => \$w_$parameter);
+end_of_param
+        } # ifend 'list of' boolean
+
+    } elsif ( $type =~ /w/ ) {	# switch
+
+	push @P_SWITCH, $parameter; # update ordered list of switch parameters
+	$spaces = ' ' x (39 - length $parameter);
+        print W <<"end_of_param";
+\n# -$option
+\$w_$parameter = \$widgets->Frame(qw(-bd 1 -relief flat));
+\$w_${parameter}_b = \$w_$parameter->Button(
+    -text        => '${parameter}${spaces}${indicator}',
+    -borderwidth => 0,
+    -font        => '$my_font',
+    -command     => [sub {
+        my(\$help, \$index, \$ce) = \@_;
+        see_view '-${parameter}', \$ce, \$help, \$index;
+    }, \$help, '${my_command}_${parameter}', \$ce],
+);
+\$w_${parameter}_b->pack(qw(-side left));
+my \$w_${parameter}_yes = \$w_${parameter}->Radiobutton(
+    -text     => 'Yes',
+    -variable => \\\$${parameter},
+    -relief   => 'flat',
+    -value    => '${parameter}',
+    -command  => \\&update_command,
+);
+\$w_${parameter}_yes->pack(-side => 'left');
+my \$w_${parameter}_no = \$w_${parameter}->Radiobutton(
+    -text     => 'No',
+    -variable => \\\$${parameter},
+    -relief   => 'flat',
+    -value    => 'NOT_${parameter}',
+    -command  => \\&update_command,
+);
+\$w_${parameter}_no->pack(-side => 'left');
+\$widgets->window('create', 'end', -window => \$w_$parameter);
+end_of_param
+
+    } elsif ( $type =~ /k/ ) {	# keyword
+
+	$spaces = ' ' x (39 - length $parameter);
+        print W <<"end_of_param";
+\n# -$option
+\$w_$parameter = \$widgets->Frame(qw(-bd 1 -relief flat));
+\$w_${parameter}_b = \$w_$parameter->Button(
+    -text        => '${parameter}${spaces}${indicator}',
+    -borderwidth => 0,
+    -font        => '$my_font',
+    -command     => [sub {
+        my(\$help, \$index, \$ce) = \@_;
+        see_view '-${parameter}', \$ce, \$help, \$index;
+    }, \$help, '${my_command}_${parameter}', \$ce],
+);
+\$w_${parameter}_b->pack(qw(-side left));
+end_of_param
+        if ($my_kwt eq 'radiobutton' or $list) {
+            foreach $value (split ' ', $P_VALID_VALUES{$parameter}) {
+                if ($list) {
+                    print W <<"end_of_param";
+\$w_${parameter}_${value} = \$w_$parameter->Checkbutton(
+    -text         => '$value',
+    -variable    => \\\$${parameter}_${value},
+    -relief      => 'flat',
+    -onvalue     => '$value',
+    -command     => [\\&update_checkbutton_list, \\\$${parameter}, '$value'],
+);
+end_of_param
+                } else {
+                    print W <<"end_of_param";
+\$w_${parameter}_${value} = \$w_$parameter->Radiobutton(
+    -text     => '$value',
+    -variable => \\\$${parameter},
+    -relief   => 'flat',
+    -value    => '$value',
+    -command  => \\&update_command,
+);
+end_of_param
+                }
+                print W "\$w_${parameter}_${value}->pack(qw(-side left));\n";
+            } # forend all keywords
+        } else { # Optionmenu
+	    print W <<"end_of_param";
+\$w_${parameter}_option = \$w_$parameter->Optionmenu(
+    -textvariable => \\\$${parameter},
+end_of_param
+            print W '    -options => [qw(', $P_VALID_VALUES{$parameter},
+                ")],\n";
+	    print W <<"end_of_param";
+    -command  => \\&update_command,
+    );
+\$w_${parameter}_option->pack(qw(-side left));
+end_of_param
+        } # ifend Radiobutton
+	print W "\$widgets->window('create', 'end', -window => \$w_$parameter);\n";
+
+    } # ifend case type
+
+} # end process_command_line_widget
+
+initialize;
+genPerlTk;
+finish;

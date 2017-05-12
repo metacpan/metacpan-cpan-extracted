@@ -1,0 +1,18 @@
+---
+activity:
+  t:
+    f:
+      -
+         White: 500
+         Black: 400
+      -
+         White: 100
+         Black: 800
+      -
+         White: 300
+         Black: 200
+      -
+         White: 900
+         Black: 700
+bye: 600
+      

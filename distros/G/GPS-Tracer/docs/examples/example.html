@@ -1,0 +1,104 @@
+<html> <head>
+<title></title>
+
+<link rel="stylesheet" href="example.css" type="text/css">
+
+<!-- make this page runable from several servers, with different Google Maps keys -->
+<script language="javascript" type="text/javascript">
+function include (script_url) {
+   document.write ('<' + 'script');
+   document.write (' language="javascript"');
+   document.write (' type="text/javascript"');
+   document.write (' src="' + script_url + '">');
+   document.write ('</' + 'script' + '>');
+}
+
+var hostname = document.location.hostname;
+var key;
+if (hostname == "localhost")
+   key = "ABQIAAAAZhe5F7Vv-1Xq9DDyIlEQXxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSg6J0s1S0DuVD-dFi2DIRpZq2LOg";
+else if (hostname == "search.cpan.org")
+   key = "ABQIAAAAZhe5F7Vv-1Xq9DDyIlEQXxRXkoA0ikWbLTA5zEphjuKmDfOeFhSpvvsPVbZ1_Fl-5vsZ9etg1R85vA";
+else if (hostname == "...")
+   key = "...";
+else if (hostname == "...")
+   key = "...";
+
+include ("http://maps.google.com/maps?file=api&amp;v=2&amp;key=" + key);
+</script>
+
+<script src="tracer.js" type="text/javascript"></script>
+<script src="prototype.js" type="text/javascript"></script>
+<script src="summary.js" type="text/javascript"></script>
+
+</head>
+
+
+<body>
+<h1>How to use outputs of the GPS::Tracer module</h1>
+
+This example page uses real data collected by the <a
+href="http://frozenfive.org">FrozenFive</a> student arctic expedition,
+and shows how to display them in various formats. <p>
+
+<hr/>
+
+<!-- total km -->
+<div id="statistics">
+Total km travelled so far
+<span id="totalkms">0</span>
+</div>
+
+<br /> <!-- clear the float (stylesheet) -->
+
+<!-- select the density -->
+<div id="selection">
+
+<form action="javascript:void%200">
+<label>Density:</label>
+<select name="density" id="density" onChange="changeMap()">
+<option value="oneperday" selected>Maximum one point per day</option>
+<option value="distance">Points separated by more than 500 metres</option>
+<option value="all">All points (no route polyline)</option>
+</select>
+</form>
+
+<div id="progressDisplay">&nbsp;</div>
+</div> <!-- end selection -->
+
+<br /> <!-- clear the float (stylesheet) -->
+
+<!-- map -->
+<div id="maping">
+  <div id="map">Loading...</div>
+  <div>
+    <table border="0"><tr>
+      <td><strong>Number&nbsp;of&nbsp;displayed&nbsp;points:</strong></td>
+      <td><div id="markerCount">unknown</div></td>
+      <td width="100%">&nbsp;</td>
+      <td><strong>Last&nbsp;known&nbsp;point&nbsp;at:</strong></td>
+      <td><div id="lastPoint">unknown</div></td>
+    </tr></table>
+  </div>
+</div>
+
+<div id="daily">
+<!-- the span is here to keep labels aligned -->
+<label>Daily&nbsp;distances</label>
+<img border="0" src="data/output-chart.png"/>
+</div>
+
+<br /> <!-- clear the float (stylesheet) -->
+
+
+<hr>
+<div align=right><font size=-2>
+<address><A HREF="mailto:martin.senger&#64;gmail.com">Martin Senger</A><BR></address>
+<!-- hhmts start -->
+Last modified: Sun Apr 29 17:33:27 2007
+<!-- hhmts end -->
+</font></div>
+
+<!-- this script must be here - at the end of this page!!! -->
+<script type="text/javascript" src="loading.js"></script>
+</body> </html>

@@ -1,0 +1,14 @@
+######################################################################
+Revision history for Perl extension Getopt::Fancy
+
+0.06  2007/03/29
+    (RJP) Change class variables to instance for non John Singleton case
+
+0.03  2007/03/29
+    (RJP) Fix warnings
+
+0.02  2006/05/13
+    (RJP) Minor doc changes
+
+0.01  2006/05/13
+    (RJP) And so it begins

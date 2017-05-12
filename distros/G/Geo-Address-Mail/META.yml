@@ -1,0 +1,30 @@
+---
+abstract: 'A Mailing Address on Earth'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.94'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Address-Mail
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  MooseX::Clone: 0
+  MooseX::Storage: 0
+  MooseX::Types: 0
+  Regexp::Common: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

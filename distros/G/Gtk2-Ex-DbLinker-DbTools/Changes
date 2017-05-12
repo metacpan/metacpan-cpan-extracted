@@ -1,0 +1,66 @@
+Revision history for Perl module Gtk2::Ex::DbLinker
+
+0.01 Tue May 20 15:03:43 2014
+    - original version; created by ExtUtils::ModuleMaker 0.51
+0.02 Added support informations
+0.03 Added example2_dbc with DBIx::Class, and the database ex1_1 database that holds the table 'speaks' without a counter (pk is composed of the 2 fields langid + countryid).
+	Added example_dbi with uses sql commands and DBI 
+	Bug corrected in DbcDataManager (occured when a new reccord is added)
+	Removed 'use of Data::Dumper;'
+0.05 Form::add_combo corrected use of set_text_column
+0.06 Form::add_combo delete existing model 
+     DbcDataManager 
+	new parameters columns => {name =>type} which replace the call to $rs->result_source->columns to supplied the column's names and types
+	+columns => {name => type} the columns supplied are added to those found with  $rs->result_source->columns. 
+	if a primary_keys array ref is supplied the search of the row at a given pos is done with $rs->search, not $rs->find
+0.07 Test failed - updated
+0.08 
+	Datasheet: 	
+		get/set_column_value, 
+		call back function with on_row_select + on_changed ; 
+	DbiDataManager:
+		before_query
+0.09
+	DbiDataManager:
+		auto_incrementing use from the start, in the module, $self->get_primarykeys must be called instead of @{$self->{primary_keys}}
+		$self->{cols} holds field's names without their changing to lower case
+	Form:
+		set_data_manager method to replace the current data manager
+0.091 Datasheet.pm binrary in my disc and missing in the zip in 0.09 
+0.092 DbiDataManager save({pk_name 0 => pk_value}) to update one of the field composing a multi field primarykey.
+0.093 Corrected bugs in Form (dateformater), remove use of Gtk2::Ex::Dialogs in DbiDM, more changes in update in table with 2 primary keys
+0.094 corrected bugs with textview in Form.pm
+0.094 DbcDataManager
+	Fields added with columns or +columns are readonly.
+	$self->set_row_pos($self->{row}->{pos}) in query
+      RbDataManager
+	$self->set_row_pos($self->{row}->{pos}) in query
+0.095 RdbDataManager
+	Fields added with columns or +columns to read data from joined tables
+	These fields are readonly.
+0.096 Bug corrected in Form
+0.097 Form 
+	auto_apply can be defined (defaults to true)
+	add_childform to cascade auto_apply down to child form or datasheet
+	has_changed return true if children forms or datasheets have been changed in the form but not applied to the database
+0.098 Form save return 1 (success) or 0 (failure)
+	DbcDataManager save return 1 (success) or 0 (failure)
+ 	Removed mailing list support (and the list alltogether)
+0.100  Split the distribution: 
+	- Form + Datasheet remains in Gtk2::Ex::DbLinker
+	- xxxDataManager are in this Gtk2::Ex::DbLinker::DbTools distribution (but the package is unchanged)
+	- Wx Form and Datasheet objects are in Wx::Perl::DbLinker
+0.101  Added SqlADataManager which uses SQL::Abstract::More to build the sql statement. 
+       Added a separate Recordset object used by this class to hold pk values and a subset of rows
+0.103  DbiDataManger: 
+	- update and insert_into sql strings are build using the first word (the table's name) of $self->{sql}->{from}
+	- added ro_fields constructor param to exclude fields comming from joined tables in update or insert statement
+0.104  use interface instsead of Class::Interface, changed the way the objects received args, use Carp instead of warn
+0.105  added alias as a new param to RdbDM constructor
+0.106 Created AbForm to hold common methods to Form and Wxform
+0.107 DatasheetHelper to handle apply, common to Wxdatasheet and Datasheet
+0.108 setup_combo and setup_fields in DatasheetHelper
+0.109  Use Class::InsideOut for Gtk2::Ex::DbLinker::Abform to enforce encapsulation and to prevent for manipulating Abform properties directly in children classes
+0.110 DbcDataManager: row_count taken from scalar @{ $self->{data}}, not from resultset->count
+0.111 Corrected pod. ./lib: Log4perl->logconfess, ->logcroak ... instead of confess, croak
+      Improved readme file

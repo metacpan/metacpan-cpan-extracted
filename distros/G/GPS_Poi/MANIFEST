@@ -1,0 +1,9 @@
+Changes
+eg/demo.ov2
+eg/test.pl
+lib/GPS/Poi.pm
+Makefile.PL
+MANIFEST
+README
+t/GPS-Poi.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+Changes
+examples/find_city.pl
+INSTALL.SKIP
+lib/Geo/GeoNames.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/json.t
+t/pod.t
+t/pod_coverage.t
+t/url.t
+t/useragent.t
+t/username.t
+t/xml.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml # Will be created by "make dist"
+META.json # Will be created by "make dist"
+README
+TODO
+lib/Graphics/Colourset.pm
+scripts/colourset
+t/00_dist.t
+t/01_load.t
+t/pod-coverage.t
+t/pod.t

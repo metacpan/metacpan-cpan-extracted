@@ -1,0 +1,25 @@
+Changes
+ex/benchmark.pl
+ex/benchmark2.pl
+lib/Geo/Distance/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/00_load.t
+t/01_new.t
+t/02_new_pp.t
+t/03_methods.t
+t/04_disable_xs.t
+XS.xs
+xt/kwalitee.t
+xt/leaktrace.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/portability_filenames.t
+xt/valgrind.t
+xt/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

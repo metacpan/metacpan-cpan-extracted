@@ -1,0 +1,28 @@
+Geo-Point-Plugin-Transform version 0.0.2
+
+Add taransforming projection method to Geo::Point
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Geo::Point
+Geo::Proj
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, OHTSUKA Ko-hei
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

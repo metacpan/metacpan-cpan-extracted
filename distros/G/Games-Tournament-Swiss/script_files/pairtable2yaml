@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+pairtable2yaml - Create YAML version of pairing table
+
+=cut
+
+use strict;
+use warnings;
+
+use YAML qw/LoadFile DumpFile/;
+
+use IO::All;
+use Parse::RecDescent;
+our $RD_HINT=1;
+use List::MoreUtils qw/firstval/;
+
+my $io = io $ARGV[0];
+my @lines = $io->slurp;
+
+# shift @lines; shift @lines; shift @lines; shift @lines;
+my $table;
+
+for my $line ( @lines )
+{
+    our ($player, $opponents, $roles, $b5float, $b6float, $score, $result);
+    my $format = q{
+		    line: data end | longform end | comment end | <error>
+		    data: player opponents roles floats score
+		    longform: place player opponents roles floats score
+		    place: wholenumber(s /-/)
+		    player: id { $::player = $item[1] }
+		    id: wholenumber
+		    wholenumber: m/^\d+/
+		    Bye: '-'
+		    opponents: opponent(s /,/) { $::opponents = $item[1] }
+		    opponent: id | Bye
+		    roles: role(s) { $::roles = $item[1] }
+		    role: White | Black | Bye
+		    White: 'W'
+		    Black: 'B'
+		    floats: B6andB5 | B5andB6 | B5float | B6float | NotFloat
+		    B6andB5: B6float B5float 
+		    {
+			$::b5float ||= $item{'B5float'};
+			$::b6float ||= $item{'B6float'};
+		    }
+		    B5andB6: B5float B6float
+		    {
+			$::b5float ||= $item{'B5float'};
+			$::b6float ||= $item{'B6float'};
+		    }
+		    B6float: lowercasefloat
+		    {
+			$::b6float ||= $item{'lowercasefloat'};
+		    }
+		    lowercasefloat: 'u' | 'd'
+		    B5float: uppercasefloat
+		    {
+			$::b5float ||= $item{'uppercasefloat'};
+		    }
+		    uppercasefloat: 'U' | 'D'
+		    NotFloat: ''
+		    score: scorenumber { $::score = $item[1] }
+		    scorenumber: m/^\d+(?:\.5)?/
+		    comment: token(s?) {$::result = 'comment'}
+		    token: m/\S+/ 
+		    end: m/^\Z/
+		};
+
+    my $parser = Parse::RecDescent->new($format);
+    defined $parser->line($line) or die "parser died: $?\n";
+    unless ( $result and $result eq 'comment' )
+    {
+	for ( @$opponents )
+	{
+	    $_ = 'Bye' if $_ and $_ eq '-';
+	}
+	$table->{opponents}->{$player} = $opponents;
+	for ( @$roles )
+	{
+	    $_ = 'White' if $_ and $_ eq 'W';
+	    $_ = 'Black' if $_ and $_ eq 'B';
+	    $_ = 'Bye' if $_ and $_ eq '-';
+	}
+	$table->{roles}->{$player} = $roles;
+	for ( $b5float,  $b6float )
+	{
+	    $_ = 'Up' if $_ and $_ =~ m/^U$/i;
+	    $_ = 'Down' if $_ and $_ =~ m/^D$/i;
+	    $_ = undef unless $_;
+	}
+	$table->{floats}->{$player} = [ $b6float, $b5float ];
+	$table->{score}->{$player} = $score;
+    }
+    ($::player, $::opponents, $::roles, $::b5float, $::b6float, $::score, $::result) = undef;
+}
+
+DumpFile 'pairtable.yaml', $table;
+
+__END__
+
+=head1 SYNOPSIS
+
+pairtable2yaml pairingtable.txt
+
+Options:
+
+--help            This help message
+
+--man            A man page
+
+=head1 DESCRIPTION
+
+B<pairtable2yaml> converts a pairing table used to pair the next round of a swiss tournament into a YAML data structure. It expects the pairing table, contained in a text file, to be formatted as a series of columns that represent a) scoregroups that players with equal scores fall into (optional), b) place so far (optional), c) pairing numbers, d) opponents each player has already met (each round's opponent being separated by a comma), e) the initial letters of the roles in the previous rounds (concatenated into one 'word'), f) downfloating/upfloating in the previous round (D/U) and in the round before the previous round (d/u) (an entry being made here only if the player floated), and g) the score of the player so far. 
+
+A typical pairing table looks like this:
+
+                 Round 5 Pairing Groups
+ ---------------------------------------------------------------------
+ No  Opponents  Roles     Float Score
+  1   6,4,2,5   WBWB      uD  3.5  
+  2   7,3,1,4   BWBW      D   3.5  
+  3   8,2,6,7   WBWB      d   2.5  
+  6   1,5,3,9   BWBW          2.5  
+                                  
+In YAML, this becomes, or something the equivalent:
+
+ ---
+ opponents:
+   1 : [6,4,2,5]
+   2 : [7,3,1,4]
+   3 : [8,2,6,7]
+   6 : [1,5,3,9]
+ roles:
+   1 : [White,Black,White,Black]
+   2 : [Black,White,Black,White]
+   3 : [White,Black,White,Black]
+   6 : [Black,White,Black,White]
+ floats:
+   1 : [Up,Down]
+   2 : [~,Down]
+   3 : [Down,~]
+   6 : [~,~]
+ score:
+   1: 3.5
+   2: 3.5
+   3: 2.5
+   6: 2.5
+ ...
+
+This program parses with Parse:RecDescent and is slow, but tries to make no mistakes.
+
+The YAML data structure is dumped in pairtable.yaml in the same directory.
+
+=cut
+
+# vim: set ts=8 sts=4 sw=4 noet:

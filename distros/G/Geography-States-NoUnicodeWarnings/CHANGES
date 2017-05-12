@@ -1,0 +1,22 @@
+0.004 2015-07-27
+	[Documentation]
+		Updated the documentation to clarify that warnings aren't a problem
+		on many systems, and apparently not on modern Perls.
+
+	[Bugfix]
+		Geography::States doesn't warn on all systems. I can't reproduce
+		this easily - it's not just a matter of locales - and it's not
+		important that it used to warn; what's important is that it
+		doesn't now.
+
+0.003 2015-07-20
+	[Bugfix]
+		Geography::States wasn't listed as a prequisite.
+
+0.002 2015-07-20
+	[Bugfix]
+		I can't read the documentation for open properly.
+
+0.001 2015-07-20
+
+	Initial release.

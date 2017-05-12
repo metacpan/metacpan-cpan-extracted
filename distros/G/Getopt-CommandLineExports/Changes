@@ -1,0 +1,9 @@
+Revision history for Getopt-CommandLineExports
+
+0.02    3 May 2012
+        Updated POD for style
+        Removed "use feature qw(say)" to reduce dependencies
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

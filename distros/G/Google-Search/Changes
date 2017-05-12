@@ -1,0 +1,38 @@
+0.028 Wednesday June 20 12:28:36 PDT 2012:
+    - Deprecation notice
+
+0.027 Monday July 05 19:13:13 PDT 2010:
+    - Include "phoneNumbers" "addressLines" with Result::Local (thanks Chris Thompson)
+
+0.026 Tuesday May 18 18:41:04 PDT 20102:
+    - Smarter parameter handling
+    - Include arbritrary parameters passed to constructor (with warning)
+    - Handle 'hl' parameter
+
+0.025 Friday April 30 16:48:46 PDT 2010:
+    - Added ->suggest
+
+0.024 Friday April 16 19:55:50 PDT 2010:
+    - Switch from Moose to Any::Moose
+    - Added patent searching
+    - Added start option
+    - Code refactoring and cleanup
+    - Took out weak_ref (might be bad)
+
+0.023 Friday August 28 18:24:51 PDT 2009:
+    - Fixed Google::Search::Error to be compatible with the latest Moose (rt49082)
+
+0.022 Thursday April 16 01:09:46 PDT 2009:
+    - Added tb* support to the book result class
+
+0.021 Wednesday April 15 10:24:50 PDT 2009:
+    - Fixed bug 45061 (thanks Paolo Tealdi)
+    - Fixed error with passing an ARRAY reference to LWP ->get
+
+0.020 Thursday May 01 11:42:25 PDT 2008:
+    - Documentation tweaks
+     - Fixed issue with $self->v returning as a number instead of string
+     - Added ->make_immutable
+
+0.010 Thursday May 01 02:26:12 PDT 2008:
+     - Initial release

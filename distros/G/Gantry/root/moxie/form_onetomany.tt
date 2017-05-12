@@ -1,0 +1,71 @@
+[%- USE form = HTML.SuperForm( self.params ) %]
+<div class="results-box">
+<table class="results" id="results">
+    <tr class="heading">
+        <td colspan="2" class="hdr">
+            [% view.form.legend %]
+        </td>
+    </tr>
+	[% FOREACH field IN view.form.fields %]
+
+[% onclick_text = BLOCK -%]
+javascript: ajax_action('[% field.cb_action %]', this.checked, 'view_[% field.name %]' );
+[%- END %]
+
+	<tr class="[% 'selected' IF field.checked %]">
+	    <td class="form_selector">
+            [% field_type = field.type %]
+            [%- form.$field_type( 
+                id      => field.id,
+                name    => field.name, 
+                class   => field.class,
+                value   => field.default_value,
+                default => field.checked,
+                size    => field.display_size,
+                onclick => onclick_text,
+                label   => field.label,
+            ) %]
+			
+		</td>
+        <td>
+            <div id="view_[% field.id %]"></div>
+        </td>
+	</tr>
+	[% END %]
+
+</table>
+</div>
+
+[% IF view.form.back %]
+    <br />
+    <input type="button" 
+        name="Back"
+        value="Back"
+        onclick="javascript: location='[% view.form.back %]';" />       
+[% END %]
+
+[% html_headers = BLOCK %]
+<script 
+    type="text/javascript" 
+    src="[% self.web_rootp %]/js/jquery.js">
+</script>
+
+<script type="text/javascript">
+
+function ajax_action ( url, select_value, cb_output ) {
+    
+    var html = $.ajax({
+        url: url + '&val=' + select_value,
+        async: false,
+        success: function(msg){
+            var oNode = document.getElementById( cb_output );
+            if ( oNode ) {
+                oNode.innerHTML = msg;
+            }
+        }
+    }).responseText;
+
+}
+</script>
+
+[% END %]

@@ -1,0 +1,141 @@
+diff -u djbdns-1.05/Makefile /tmp/djbdns-1.05/Makefile
+--- djbdns-1.05/Makefile	2004-02-18 18:45:31.152421552 +0900
++++ /tmp/djbdns-1.05/Makefile	2004-02-18 18:34:58.000000000 +0900
+@@ -1102,7 +1102,7 @@
+ tinydns-data: \
+ load tinydns-data.o cdb.a dns.a alloc.a buffer.a unix.a byte.a
+ 	./load tinydns-data cdb.a dns.a alloc.a buffer.a unix.a \
+-	byte.a 
++	env.a byte.a 
+ 
+ tinydns-data.o: \
+ compile tinydns-data.c uint16.h uint32.h str.h byte.h fmt.h ip4.h \
+diff -u djbdns-1.05/dns.h /tmp/djbdns-1.05/dns.h
+--- djbdns-1.05/dns.h	2004-02-18 18:45:31.158420549 +0900
++++ /tmp/djbdns-1.05/dns.h	2004-02-18 18:35:43.000000000 +0900
+@@ -89,5 +89,6 @@
+ 
+ extern int dns_name6_domain(char *,char *);
+ #define DNS_NAME6_DOMAIN (4*16+10)
++#define DNS_NAME6_ARPA   (4*16+11)
+ 
+ #endif
+diff -u djbdns-1.05/dns_name.c /tmp/djbdns-1.05/dns_name.c
+--- djbdns-1.05/dns_name.c	2004-02-18 18:45:31.163419714 +0900
++++ /tmp/djbdns-1.05/dns_name.c	2004-02-18 18:37:24.000000000 +0900
+@@ -50,11 +50,14 @@
+ 
+ int dns_name6(stralloc *out,char ip[16])
+ {
+-  char name[DNS_NAME6_DOMAIN];
++  char name[DNS_NAME6_ARPA];
+ 
+   if (ip6_isv4mapped(ip))
+     return dns_name4(out,ip+12);
+-  dns_name6_domain(name,ip);
++  if (env_get("IP6_INT"))
++    dns_name6_domain(name,ip);
++  else
++    dns_name6_arpa(name,ip);
+   if (dns_resolve(name,DNS_T_PTR) == -1) return -1;
+   if (dns_name_packet(out,dns_resolve_tx.packet,dns_resolve_tx.packetlen) == -1) return -1;
+   dns_transmit_free(&dns_resolve_tx);
+diff -u djbdns-1.05/dns_nd6.c /tmp/djbdns-1.05/dns_nd6.c
+--- djbdns-1.05/dns_nd6.c	2004-02-18 18:45:31.165419379 +0900
++++ /tmp/djbdns-1.05/dns_nd6.c	2004-02-18 18:38:28.000000000 +0900
+@@ -26,3 +26,17 @@
+   return 4*16+9;
+ }
+ 
++int dns_name6_arpa(char name[DNS_NAME6_ARPA],char ip[16])
++{
++  unsigned int j;
++
++  for (j=0; j<16; j++) {
++    name[j*4]=1;
++    name[j*4+1]=tohex(ip[15-j] & 15);
++    name[j*4+2]=1;
++    name[j*4+3]=tohex((unsigned char)ip[15-j] >> 4);
++  }
++  byte_copy(name + 4*16,10,"\3ip6\4arpa\0");
++  return 4*16+10;
++}
++
+diff -u djbdns-1.05/dnscache.c /tmp/djbdns-1.05/dnscache.c
+--- djbdns-1.05/dnscache.c	2004-02-18 18:45:31.176417541 +0900
++++ /tmp/djbdns-1.05/dnscache.c	2004-02-18 18:40:55.000000000 +0900
+@@ -23,6 +23,7 @@
+ #include "log.h"
+ #include "okclient.h"
+ #include "droproot.h"
++#include "openreadclose.h"
+ 
+ long interface;
+ 
+@@ -414,6 +415,14 @@
+   if (ip6_isv4mapped(myipincoming))
+     noipv6 = 1;
+ #endif
++#if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__)
++  if (ip4_scan(x,myipincoming+12))
++{
++    noipv6 = 1;
++} else {
++    ip6_scan(x,myipincoming); /* set again */
++}
++#endif
+ 
+   udp53 = socket_udp6();
+   if (udp53 == -1)
+diff -u djbdns-1.05/server.c /tmp/djbdns-1.05/server.c
+--- djbdns-1.05/server.c	2004-02-18 18:45:31.221410019 +0900
++++ /tmp/djbdns-1.05/server.c	2004-02-18 18:43:07.000000000 +0900
+@@ -103,6 +103,10 @@
+   while (x[off]) {
+     unsigned int l;
+     char dummy[16];
++#if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__)
++    if (ip4_scan(x,ip+12))
++      noipv6 = 1;
++#endif
+     l=ip6_scan(x+off,dummy);
+     if (!l)
+       strerr_die3x(111,fatal,"unable to parse IP address ",x+off);
+diff -u djbdns-1.05/tinydns-data.c /tmp/djbdns-1.05/tinydns-data.c
+--- djbdns-1.05/tinydns-data.c	2004-02-18 18:45:31.248405506 +0900
++++ /tmp/djbdns-1.05/tinydns-data.c	2004-02-18 18:44:58.000000000 +0900
+@@ -19,6 +19,7 @@
+ #include "stralloc.h"
+ #include "open.h"
+ #include "dns.h"
++#include "env.h"
+ 
+ #define TTL_NS 259200
+ #define TTL_POSITIVE 86400
+@@ -174,6 +175,7 @@
+ static char *d2;
+ char dptr[DNS_NAME4_DOMAIN];
+ char d6ptr[DNS_NAME6_DOMAIN];
++char d6ptr_arpa[DNS_NAME6_ARPA];
+ 
+ char strnum[FMT_ULONG];
+ 
+@@ -356,10 +358,16 @@
+ 	  rr_finish(d1);
+ 
+ 	  if (line.s[0] == '6') {
+-	    dns_name6_domain(d6ptr,ip6);
++	    if (env_get("IP6_INT")) {
++		  dns_name6_domain(d6ptr,ip6);
++	      rr_start(DNS_T_PTR,ttl,ttd,loc);
++	      rr_addname(d1);
++	      rr_finish(d6ptr);
++	    }
++	    dns_name6_arpa(d6ptr_arpa,ip6);
+ 	    rr_start(DNS_T_PTR,ttl,ttd,loc);
+ 	    rr_addname(d1);
+-	    rr_finish(d6ptr);
++	    rr_finish(d6ptr_arpa);
+ 	  }
+ 	}
+ 	break;

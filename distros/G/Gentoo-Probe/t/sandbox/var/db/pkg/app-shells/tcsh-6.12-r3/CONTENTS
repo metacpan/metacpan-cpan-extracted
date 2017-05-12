@@ -1,0 +1,32 @@
+dir /bin
+obj /bin/tcsh 2e7d6a29f2a65bdc091c01c6cb44dce8 1082927065
+sym /bin/csh -> /bin/tcsh 1082927065
+dir /usr
+dir /usr/share
+dir /usr/share/man
+dir /usr/share/man/man1
+obj /usr/share/man/man1/tcsh.1.gz c0593950cac41ad0c8bfbf6983ce1ee6 1082927065
+dir /usr/share/doc
+dir /usr/share/doc/tcsh-6.12-r3
+dir /usr/share/doc/tcsh-6.12-r3/html
+obj /usr/share/doc/tcsh-6.12-r3/html/header.html 8ea1e8efefa6ee26165dcb6d3331d3bd 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/html/index.html efde0272d738cd9d6f62967ce949cd80 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/html/lists.html e6f3361a435604dc76be6a99af583fa2 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/html/top.html efde0272d738cd9d6f62967ce949cd80 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/FAQ.gz 9df16bd0dd80fd48b2cf50420c8a2d02 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/Y2K.gz 8159ac7d1d2d21afabe4f7bca0f91785 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/Fixes.gz 41d7bd0a4b46ff035843735b691d1e92 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/Ported.gz 39070a388f6095659bcb07443227f8bc 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/NewThings.gz 29aa35fb5ff77bf1aa792bf2442bfa37 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/README.gz 197ffe99bca3034d2673cd9cb9b32620 1082927065
+obj /usr/share/doc/tcsh-6.12-r3/WishList.gz afd82f0aae3359d82ffdb714b7f1d69f 1082927065
+dir /etc
+obj /etc/csh.cshrc 299cd79eb3cbc2a3caeac1c3a0309556 1082927065
+obj /etc/csh.login 4869b9da87c79854e2cc97241f125853 1082927065
+dir /etc/skel
+obj /etc/skel/.tcsh.config 6bd69d3c815412ada4579ac8f8cc9c45 1082927065
+dir /etc/profile.d
+obj /etc/profile.d/tcsh-settings e717dd2122d1ae7ab9ee8ebf2c33636a 1082927065
+obj /etc/profile.d/tcsh-aliases 16713fff7d0ccc21e1c32b250cdc44ff 1082927065
+obj /etc/profile.d/tcsh-bindkey 8c5915d05b8b0c2db109c754a2bee20f 1082927065
+obj /etc/profile.d/tcsh-complete d4108a1ef7482d9440e5032e8a8d77b3 1082927065

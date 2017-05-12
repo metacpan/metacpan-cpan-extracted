@@ -1,0 +1,89 @@
+# ChangeLog for net-wireless/hostap
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/hostap/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  14 Jun 2004; Aron Griffis <agriffis@gentoo.org> hostap-0.0.4.ebuild:
+  Fix use invocation
+
+  08 Jun 2004; Michael Sterrett <mr_bones_@gentoo.org> hostap-0.0.1.ebuild,
+  hostap-0.0.2-r1.ebuild, hostap-0.0.2.ebuild, hostap-0.0.3-r1.ebuild,
+  hostap-0.0.3.ebuild:
+  clean older ebuilds
+
+*hostap-0.0.4 (28 Jul 2003)
+
+  28 Jul 2003; Peter Johanson <latexer@gentoo.org> hostap-0.0.4.ebuild:
+  Added 0.0.4. Switched to using local use variables instead of the silly
+  HOSTAP_DRIVER variable. Bad idea on my part. Use "hostap-nopci" or
+  "hostap-noplx" to not build those if you don't want to.
+
+  18 Jun 2003; Patrick Kursawe <phosphan@gentoo.org> :
+  Fixed missing digests (bug 21466)
+
+*hostap-0.0.3-r1 (11 Jun 2003)
+
+  11 Jun 2003; Patrick Kursawe <phosphan@gentoo.org> hostap-0.0.3-r1.ebuild:
+  Fixed(?) bug 21050, finally. Did not install all built drivers.
+
+*hostap-0.0.3 (24 May 2003)
+
+  24 May 2003; Peter Johanson <latexer@gentoo.org> hostap-0.0.3.ebuild:
+  Bump
+
+*hostap-0.0.2-r1 (15 May 2003)
+
+  15 May 2003; Patrick Kursawe <phosphan@gentoo.org> hostap-0.0.2-r1.ebuild:
+  Corrected line in the installation function that installed nothing if no
+  pcmcia was selected and the build was not customized (bug 21050)
+
+*hostap-0.0.2 (13 May 2003)
+
+  13 May 2003; Peter Johanson <latexer@gentoo.org> hostap-0.0.2.ebuild;
+  Bump. bug #20911.
+
+*hostap-0.0.1 (16 Apr 2003)
+
+  16 Apr 2003; Peter Johanson <latexer@gentoo.org> hostap-0.0.1.ebuild,
+  hostap-20021012-r1.ebuild:
+  Version bump to a real release
+
+  24 Mar 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012-r1.ebuild :
+  Use has_version to set PCMCIA_VERSION. using all portage stuff now. should work once and for all.
+
+  4 Mar 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012-r1.ebuild :
+  Use full path to cardmgr and cut, should fix PCMCIA_VERSION once and for all
+
+  2 Mar 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012-r1.ebuild :
+  fix to PCMCIA_VERSION. Combination of double quotes and use of "which" should
+  solve the problem of setting the PCMCIA_VERSION variable.
+
+  1 Mar 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012-r1.ebuild :
+  fix to PCMCIA_VERSION.
+
+  27 Feb 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012-r1.ebuild :
+  Major fixes to work with latest portage. HOSTAP_DRIVERS functionality now works.
+  Fixed PCMCIA_VERSION.
+
+  25 Feb 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012.ebuild
+  hostap-20021012-r1.ebuild:
+  Ebuilds checks for which version of pcmcia-cs is installed now.
+
+  13 Feb 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012.ebuild :
+  Fixed IUSE
+
+*hostap-20021012-r1 (13 Feb 2003)
+
+  07 Apr 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012-r1.ebuild:
+  Much better method of compiling against proper pcmcia-cs version
+
+  13 Feb 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012-r1.ebuild
+  files/digest-hostap-20021012-r1 :
+  Ebuild now can use HOSTAP_DRIVERS to specify which drivers to build.
+
+  08 Feb 2003; Peter Johanson <latexer@gentoo.org> :
+  Moved from sys-apps to net-wireless.
+
+*hostap-20021012 (07 Feb 2003)
+
+  07 Feb 2003; Peter Johanson <latexer@gentoo.org> hostap-20021012 :
+  Initial import. Ebuild by me.

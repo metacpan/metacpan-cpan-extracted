@@ -1,0 +1,13 @@
+skip("You don't appear to have the GNOME session manager running.", TESTS)
+  unless (-d "$ENV{ HOME }/.gconfd" &&
+          -d "$ENV{ HOME }/.gnome2");
+
+skip("Couldn't initialize Gtk2", TESTS)
+  unless (Gtk2 -> init_check());
+
+$application = Gnome2::Program -> init("Test", "0.1");
+
+skip("Couldn't connect to the session manager.", TESTS)
+  unless (Gnome2::Client -> new() -> connected());
+
+1;

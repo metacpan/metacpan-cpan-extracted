@@ -1,0 +1,45 @@
+= GraphViz-DBI-FromSchema =
+
+This is the Cpan distribution of the GraphViz::DBI::FromSchema Perl module.
+
+GraphViz::DBI::FromSchema generates a database diagram, automatically getting
+the foreign key relationships from the database schema.
+
+  use DBI;
+  use GraphViz::DBI::FromSchema;
+
+  my $db = DBI->connect(@dsn_etc);
+
+  my $filename = 'DB_diagram.ps';
+  open my $file, '>', $filename or die "Opening $filename failed: $!\n";
+  print $file GraphViz::DBI::FromSchema->new($db)->graph_tables->as_ps;
+
+== Installation ==
+
+GraphViz::DBI::FromSchema can be installed using the Cpan client:
+
+  cpan -i GraphViz::DBI::FromSchema
+
+or by unzipping this distribution and running Build.PL and then Build:
+
+  perl Build.PL
+  ./Build test
+  ./Build install
+
+or, if you have a make program, by running Makefile.PL then make:
+
+  perl Makefile.PL
+  make test
+  make install
+
+== Copyright & Licence ==
+
+© Copyright 2007-2008 by Pipex Communications UK Ltd
+
+This library is software libre; you may redistribute it and modify it under the
+terms of any of these licences:
+
+* The GNU General Public License, version 2
+* The GNU General Public License, version 3
+* The Artistic License
+* The Artistic License 2.0

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Gtk2-Ex-TreeMap.t
+lib/Gtk2/Ex/TreeMap.pm
+examples/demo-treemap.pl
+META.yml                                 Module meta-data (added by MakeMaker)

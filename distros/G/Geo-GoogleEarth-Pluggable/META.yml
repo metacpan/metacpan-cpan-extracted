@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                Geo-GoogleEarth-Pluggable
+version:             0.15
+abstract:            Generates GoogleEarth Documents
+license:             ~
+author:              
+    - Michael R. Davis (domain=>michaelrdavis,tld=>com,account=>perl)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Archive::Zip:                  0
+    IO::Scalar:                    0
+    Method::Autoload:              0
+    Module::Pluggable:             0
+    Package::New:                  0
+    Scalar::Util:                  0
+    Test::Simple:                  0.44
+    XML::LibXML::LazyBuilder:      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

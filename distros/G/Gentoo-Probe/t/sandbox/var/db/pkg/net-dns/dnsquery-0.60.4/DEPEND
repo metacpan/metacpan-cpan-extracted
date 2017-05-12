@@ -1,0 +1,2 @@
+>=dev-cpp/poslib-1.0.2
+	=x11-libs/gtk+-1.2* 

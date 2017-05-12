@@ -1,0 +1,12 @@
+Changes
+lib/GPS/Point/Cluster.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_cluster.t
+t/003_interlude.t
+t/004_separation.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

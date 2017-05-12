@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Geo-Coder-Ja
+version:             0.03
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Test::More:                    0.32
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Jiro Nishiguchi <jiro@cpan.org>

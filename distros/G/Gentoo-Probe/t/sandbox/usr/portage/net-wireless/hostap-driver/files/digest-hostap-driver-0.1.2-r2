@@ -1,0 +1,6 @@
+MD5 44dbc0a8978fe618eee242b0bd25392c pcmcia-cs-3.2.5.tar.gz 1266494
+MD5 33325ed642b5277a9695d10bd19b3d7a pcmcia-cs-3.2.5-module-init-tools.diff.gz 460
+MD5 ee4f8227cc28f9a29a609f6e9561ef54 pcmcia-cs-3.2.5-SMP-fix.diff.gz 320
+MD5 2b2cba3fdd498b001ea3c27d8b2da31b pcmcia-cs-3.2.5-3.2.6.diff.gz 23034
+MD5 f2feda5eb46c1a2b99ae9db274879afc pcmcia-cs-3.2.5-3.2.7.diff.gz 28244
+MD5 48dc3ddd8a8b1d47002b54f7a8fee7da hostap-driver-0.1.2.tar.gz 168410

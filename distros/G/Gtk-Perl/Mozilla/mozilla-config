@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w
+
+my $prefix = '/usr';
+
+my $libdir = $prefix.'/lib/mozilla';
+my $incdir = $prefix.'/include';
+
+my @libs = qw(gtksuperwin gtkembedmoz jsj gkgfx mozjs nspr4 plc4 plds4 xpcom pthread);
+
+foreach (@ARGV) {
+	if (/^--libs$/) {
+		print " -L$libdir ",join(' ', map {"-l$_"} @libs), " ", `gtk-config --libs`;
+	} elsif (/^--cflags$/) {
+		print " -I$incdir -I$incdir/nspr ", `gtk-config --cflags`;
+	} else {
+		die "Unsupported: $_\n";
+	}
+}

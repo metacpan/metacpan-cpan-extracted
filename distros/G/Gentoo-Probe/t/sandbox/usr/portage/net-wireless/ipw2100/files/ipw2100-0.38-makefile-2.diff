@@ -1,0 +1,11 @@
+--- ipw2100-0.38-orig/Makefile	2004-03-24 20:39:31.000000000 +0100
++++ ipw2100-0.38/Makefile	2004-03-25 00:28:39.000000000 +0100
+@@ -121,7 +121,7 @@
+ all: modules
+ 
+ clean:
+-	rm -f *.mod.c *.mod *.o *.ko
++	rm -f *.mod.c *.mod *.o *.ko .*.cmd
+ 	rm -rf $(PWD)/tmp
+ 
+ ifeq ($(OLDMAKE),)

@@ -1,0 +1,28 @@
+---
+abstract: 'the $1 (mouse) gesture recognizer'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gesture-Simple
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Any::Moose: 0
+  Scalar::Defer: 0
+  perl: 5.8.1
+resources:
+  homepage: http://github.com/sartak/gesture-simple/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/gesture-simple.git
+version: 0.01

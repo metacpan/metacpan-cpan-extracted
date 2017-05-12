@@ -1,0 +1,84 @@
+# havok version=7.18
+ABSTRACT:     
+AUTHOR:    Jeffrey I Cohen (jcohen@cpan.org)
+DML:    
+  -    
+    check:    
+      -    select * from user_functions where xname = 'Genezzo::Havok::SQLScalar'
+
+    install:    
+      -    insert into user_functions values ('6', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_chomp', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('7', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_chop', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('8', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_chr', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('9', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_crypt', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('10', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_index', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('11', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_lc', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('12', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_lcfirst', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('13', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_length', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('14', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_ord', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('15', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_pack', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('16', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_reverse', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('17', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_rindex', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('18', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_sprintf', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('19', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_substr', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('20', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_uc', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('21', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_ucfirst', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('22', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_abs', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('23', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_atan2', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('24', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_cos', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('25', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_exp', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('26', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_hex', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('27', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_int', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('28', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_log10', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('29', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_oct', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('30', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_rand', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('31', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_sin', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('32', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_sqrt', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('33', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_srand', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('34', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_perl_join', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('35', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_concat', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('36', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_greatest', 'SYSTEM', '2007-11-18T08:16:56', '0', 'HASH', NULL, NULL )
+      -    insert into user_functions values ('37', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_initcap', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('38', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_least', 'SYSTEM', '2007-11-18T08:16:56', '0', 'HASH', NULL, NULL )
+      -    insert into user_functions values ('39', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_lower', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('40', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_lpad', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('41', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_ltrim', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('42', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_replace', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('43', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_rpad', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('44', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_rtrim', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('45', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_soundex', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('46', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_translate', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('47', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_upper', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('48', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_cosh', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('49', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_ceil', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('50', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_floor', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('51', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_ln', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('52', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_logn', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('53', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_mod', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('54', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_power', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('55', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_round', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('56', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_sign', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('57', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_sinh', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('58', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_tan', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('59', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_tanh', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('60', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_trunc', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('61', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_ascii', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('62', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_instr', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('63', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_nvl', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('64', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_quurl', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('65', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_quurl2', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    insert into user_functions values ('66', 'require', 'Genezzo::Havok::SQLScalar', 'sql_func_unquurl', 'SYSTEM', '2007-11-18T08:16:56', '0', NULL, NULL, NULL )
+      -    select add_help('Genezzo::Havok::SQLScalar') from dual
+      -    select register_havok_package('modname=Genezzo::Havok::SQLScalar', 'creationdate=2007-11-18T08:16:56', 'version=1.24') from dual
+
+
+
+LICENSE:    gpl
+NAME:    Genezzo::Havok::SQLScalar
+PREREQ_HAVOK:    
+  Genezzo::Havok::UserFunctions:    0.0
+
+TABLEDEFS:    
+
+UPDATED:    2007-11-18T00:20:22
+VERSION:    1.24

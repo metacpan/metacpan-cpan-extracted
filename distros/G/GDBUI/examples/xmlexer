@@ -1,0 +1,811 @@
+#!/usr/bin/perl -w
+
+# xmlexer (xml-rpc/soap exerciser)
+# Scott Bronson
+# 8 Dec 2003
+
+#  TODO: add soap
+#  print the xmlrpc transaction
+#  TODO: what about concatenating strings?
+
+use strict;
+use lib '../lib';
+use lib '.';
+
+use vars qw($VERSION);
+$VERSION = '0.81';
+
+use Term::ExprUI;
+use RPC::Connection;
+use Data::Dumper ();
+
+my %variables;		# keeps variables indexed by name
+my %connections;	# keeps open connections indexed by URL
+
+my $autoload = 1;	# true if we should load methods upon opening.
+my $verbose = 1;	# 0=very quite, 1=normal, 2=loud, 3=unbearable
+
+my $term = new Term::ExprUI(
+	commands => get_builtin_cmds(),
+	history_file => '~/.xmlexer-history',
+	display_summary_in_help => 0,
+	add_var => sub { my $name = shift; $variables{$name} = shift; },
+	get_var => sub { my $name = shift; $variables{$name}; },
+	get_all_vars => sub { [keys %variables] },
+	get_function_cset => \&get_function_cset,
+	call_function => \&call_function,
+	);
+die "Could not get term" unless $term;
+
+# Readline signal handling is really weird.  Signals just pile up until
+# the readline call completes, then they all fire at once.  Huh?
+$SIG{INT} = sub { print "Received interrupt signal\n"; die "Interrupted.\n" };
+
+# parse command-line arguments
+for(@ARGV) {
+	eval { open_connection($_) };
+	print $@ if $@;
+}
+
+for(;;) {
+	eval { $term->run() };
+	if($@ =~ /Interrupted/) {
+		print "Use exit or ^D to quit.\n";
+		next;
+	}
+	last;
+}
+
+exit 0;
+
+
+# Returns a command set listing all currently-defined functions.
+
+sub get_function_cset
+{
+	my $cset = {};
+
+	for(keys(%connections)) {
+		my $cmds = $connections{$_}->get_command_set();
+		if($cmds) {
+			for(keys %$cmds) {
+				$cset->{$_} = $cmds->{$_};
+			}
+		}
+	}
+
+	return $cset;
+}
+
+
+# Pass a function ID and the args; it looks up the URL.
+
+sub call_function
+{
+	my $id = shift;
+
+	for my $url (keys(%connections)) {
+		my $cmds = $connections{$url}->get_command_set();
+		if($cmds && $cmds->{$id}) {
+			return call($connections{$url}, $id, @_);
+		}
+	}
+
+	die "Could not find $id in any open connection!\n";
+}
+
+
+# open the appropriate client lib based on URL/args/whatever.
+
+sub open_connection
+{
+	my $url = shift;
+	
+	$url =~ s/^(["'])(.*)\1$/$2/;	# trim surrounding quotes
+
+	if(exists($connections{$url})) {
+		print "$_ is already open.  You must close it first.\n";
+		return undef;
+	}
+
+	my $conn = new RPC::Connection::RPCXMLClient($url);
+	if($conn) {
+		$url = $conn->get_url(); # maybe it was reformatted
+		$connections{$url} = $conn;
+		load_connection_api($conn) if $autoload;
+	}
+
+	return $conn;
+}
+
+
+sub load_connection_api
+{
+	my $conn = shift;
+	$conn->set_verbosity($verbose);
+	my $cnt = $conn->retrieve_command_set(@_);
+	my $url = $conn->get_url();
+	print "Loaded $cnt functions from $url\n";
+}
+
+
+sub close_connection
+{
+	my $url = shift;
+
+	$url =~ s/^(["'])(.*)\1$/$2/;	# trim surrounding quotes
+
+	unless(exists($connections{$url})) {
+		print "$_ is not an open connection.\n";
+		return undef;
+	}
+
+	print "Deleted $url: $connections{$url}\n" if $verbose > 1;
+	delete $connections{$url};
+}
+
+
+# pass a connection, the name of the function, and its arguments
+# and it will call the function
+
+sub call
+{
+	my $conn = shift;
+	my $func = shift;
+
+	$conn->set_verbosity($verbose);
+	print "Calling " . $conn->get_url() . " -> $func with (" .
+		join(", ", @_) . ")\n" if $verbose > 1;
+
+	my $resp = eval { $conn->call($func, @_); };
+	die "ERROR!\n$@" if $@;
+
+	if($verbose > 2) {
+		print Data::Dumper->Dump([$resp], ['Received']);
+	}
+
+	return $resp;
+}
+
+
+
+# Pass a URL, function ID, and the args, and it will call the function
+
+sub call_by_url
+{
+	my $url = shift;
+
+	$url =~ s/^(["'])(.*)\1$/$2/;	# trim surrounding quotes
+
+	my $conn = $connections{$url};
+	unless($conn) {
+		die "$url is not an open connection.\n";
+	}
+	
+	return call($conn, @_);
+}
+
+
+# adds function names to the possible completions.
+
+sub complete_function_name
+{
+	my $self = shift;
+	my $cmpl = shift;
+
+	my $url = $cmpl->{args}->[0];
+	return [] unless $url;
+
+	$url =~ s/^(["'])(.*)\1$/$2/;	# trim surrounding quotes
+	if(exists $connections{$url}) {
+		my $cset = $connections{$url}->get_command_set();
+		if(defined $cset) {
+			return [keys %$cset];
+		} else {
+			if($cmpl->{twice}) {
+				$self->completemsg("\nNo methods loaded for $url\n");
+			}
+		}
+	}
+
+	return undef;
+}
+
+
+# This is an experiment to see if it's worth trying to pull the
+# command help text from the pod.  Assuming Pod::Text::select so
+# improves so I can get rid of the hack re, it looks successful.
+
+sub pod2doc
+{
+	my $self = shift;
+	my $cmd = shift;
+	my $name = shift;
+
+	require Pod::Text;
+	my $parser = new Pod::Text;
+
+	my($fh, $s);
+	$s = ''; # this appears to be a bug in open: undef'd errors otherwise.
+	open($fh, '>', \$s) or die "pod2doc: could not open output on var: $!\n";
+	$parser->select("COMMANDS");
+	$parser->parse_from_file($0, $fh);
+	close($fh);
+
+	# it sucks that Pod::Text can't select an item inside a header.
+	# so, we'll use a stupid heuristic based on leading spaces
+	# to find the item using a regexp.
+	if($s =~ /\n(\s{2,6}$name.*?\n)(?:\s{2,6}\S|$)/s) {
+		$s = "$1\n";
+	} else {
+		$s = "No POD documentation found for $name.\n";
+	}
+
+	# A cute trick: replace the reference to this subroutine in
+	# the command hash with the returned text.  That way we're
+	# only called once then the result is cached.
+	$cmd->{doc} = $s;
+
+	return $s;
+}
+
+
+# Unfortunately, thanks to subtraction, '-' is a tokenizing
+# character.  This means that numbers and options ('-1', '-d')
+# are now split across 2 tokens ('-', '1').  This routine
+# reassembles them in-place.
+# TODO: this should actually be done by ExprUI.
+
+sub reassemble_command
+{
+	my @out;
+	for (my $i=0; $i < @_; $i++) {
+		if($_[$i] eq '-' && $i < $#_ && $_[$i+1] =~ /^[0-9A-Za-z-]/) {
+			push @out, $_[$i] . $_[$i+1];
+			$i += 1;
+			next;
+		}
+		push @out, $_[$i];
+	}
+	return @out;
+}
+
+
+sub get_builtin_cmds
+{
+	# note that we generate the doc for all the commands from
+	# the pod (see the very end of this routine).
+
+	my $cset = {
+		# enable history completion:
+		"" => { args => sub { shift->complete_history(@_) } },
+
+		"autoload" => {
+			desc => "Switch whether connections load on opening",
+			maxargs => 0,
+			proc => sub {
+				$autoload = !$autoload;
+				print "Autoload methods is ".($autoload?'on':'off')."\n";
+			},
+		},
+
+		"call" => {
+			desc => "Calls a remote procedure manually",
+			args => [
+				# first arg is the URL to call
+				sub { shift->force_to_string(@_,[keys %connections],'"') },
+				# second arg is the function name
+				sub { complete_function_name(@_); },
+				# the rest of the args are passed to the function
+				"(arguments)",
+			],
+			proc => sub {
+				my $resp = call_by_url(@_);
+				if(defined($resp)) {
+					$variables{result} = $resp;
+					print Data::Dumper->Dump([$resp], ['result']);
+				}
+				return $resp;
+			},
+		},
+
+		"clear" => {
+			desc => "clears all methods from a connection.",
+			args => [
+				# first arg is the connection
+				sub { shift->force_to_string(@_,[keys %connections],'"') },
+				# rest of args are function names
+				sub { complete_function_name(@_); },
+			],
+			minargs => 1,
+			proc => sub {
+				my $url = shift;
+				$url =~ s/^(["'])(.*)\1$/$2/;	# trim surrounding quotes
+				if(exists $connections{$url}) {
+					$connections{$url}->set_verbosity($verbose);
+					$connections{$url}->clear_command_set(@_);
+				} else {
+					print "$url is not a valid connection.\n";
+				}
+			}
+		},
+
+		"close" =>	{
+			desc => "Closes a connection",
+			args => sub { shift->force_to_string(@_,[keys %connections],'"') },
+			minargs => 1, maxargs => 1,
+			proc => \&close_connection,
+		},
+
+		"connections" => {
+			desc => "Lists open connections",
+			maxargs => 0,
+			proc => sub { print join("\n", keys %connections), "\n"; }
+		},
+
+		"delete" => {
+			desc => "Deletes variables",
+			args => sub { [keys %variables] },
+			proc => sub {
+				for(@_) {
+					if(exists $variables{$_}) {
+						delete $variables{$_};
+					} else {
+						print "$_ does not exist!\n";
+					}
+				}
+			}
+		},
+
+		"echo" => {
+			desc => "Echoes the command-line arguments",
+			proc => sub { @_=reassemble_command(@_); print join(" ", @_), "\n"; }
+		},
+
+        "exit" => {
+			desc => "Exits from this program",
+			maxargs => 0,
+			meth => sub { shift->exit_requested(1); }
+		},
+
+		"help" => {
+			desc => "Prints helpful information",
+			args => sub { @_=reassemble_command(@_); shift->help_args(undef, @_); },
+			meth => sub { @_=reassemble_command(@_); shift->help_call(undef, @_); }
+		},
+
+		"history" => {
+			desc => "Prints the command history",
+			args => "[-c] (number)",
+			meth => sub { @_=reassemble_command(@_); shift->history_call(@_) },
+		},
+
+		"list" => {
+			desc => "List the methods in a connection",
+			args => sub { shift->force_to_string(@_,[keys %connections],'"') },
+			minargs => 1, maxargs => 1,
+			proc => sub {
+				my $url = shift;
+				$url =~ s/^(["'])(.*)\1$/$2/;	# trim surrounding quotes
+				if(exists $connections{$url}) {
+					my $cmds = $connections{$url}->get_command_set();
+					print join("\n", sort keys(%$cmds)) . "\n";
+				} else {
+					print "$url is not a valid connection.\n";
+				}
+			},
+		},
+
+		"load" => {
+			desc => "Load the API for a connection",
+			args => [
+				sub { shift->force_to_string(@_,[keys %connections],'"') },
+				sub { complete_function_name(@_); },
+			],
+			minargs => 1,
+			proc => sub {
+				my $url = shift;
+				$url =~ s/^(["'])(.*)\1$/$2/;	# trim surrounding quotes
+				if(exists $connections{$url}) {
+					load_connection_api($connections{$url}, @_);
+				} else {
+					print "$url is not a valid connection.\n";
+				}
+			},
+		},
+
+		"open" => {
+			desc => "Opens a new connection",
+			args => "The URL of the connection to open",
+			minargs => 1, maxargs => 1,
+			proc => \&open_connection,
+		},
+
+		"quit" => { syn => "exit" },
+
+		"show" => {
+			desc => "Displays the value of one or more variables",
+			args => sub { [keys %variables] },
+			proc => sub {
+				for(@_) {
+					print Data::Dumper->Dump([$variables{$_}], [$_]);
+				}
+			},
+		},
+
+		"vars" => {
+			desc => "Lists all known variables",
+			maxargs => 0,
+			proc => sub { print("vars: ".join(", ", keys %variables) . "\n"); }
+		},
+
+		"verbose" => {
+			desc => "Tells how loud this program should be.",
+			args => sub { [0, 1, 2, 3] },
+			proc => sub {
+				# if negative, the '-' and the number are separate tokens
+				@_=reassemble_command(@_);
+				if(@_) {
+					die "verbose takes a maximum of 1 argument\n" if @_ > 1;
+					$verbose = $_[0];
+				}
+				print "Verbosity: $verbose\n" if $verbose > 0;
+			},
+		},
+
+		"debug_complete" => {
+			desc => "Tells how loud completion should be.",
+			args => sub { [0, 1, 2, 3] },
+			proc => sub {
+				@_=reassemble_command(@_);
+				if(@_) {
+					die "debug_complete takes a maximum of 1 argument\n" if @_ > 1;
+					$term->{debug_complete} = $_[0];
+				}
+				print "debug_complete: ".$term->{debug_complete}."\n" if $verbose > 0;
+			},
+		},
+	};
+
+	for(keys %$cset) {
+		$cset->{$_}->{doc} = \&pod2doc;
+	}
+
+	return $cset;
+}
+
+
+=head1 NAME
+
+xmlexer - exercises XML-RPC and SOAP servers interactively
+
+=head1 SYNOPSIS
+
+  xmlexer "http://www.oreillynet.com:80/meerkat/xml-rpc/server.php"
+  xmlexer> meerkat.getCategoriesBySubstring('Data')
+  $result = [ {
+	  'id' => '80',
+	  'title' => 'Data'
+    }, ...
+
+Completion works: in the example above,
+you just need to typ m(tab)Ca(tab)B(tab) to
+enter "meerkat.getCategoriesBySubstring".
+
+=head1 DESCRIPTION
+
+xmlexer provides an easy-to-use environment
+to exercise XML-RPC and SOAP applications.  It offers extensive
+command-line completion, history, and even an expression parser
+and symbol table.
+
+=head1 OPTIONS
+
+xmlexer doesn't take any command-line options.  It opens all URLs
+named on the command line.
+
+=head1 COMMANDS
+
+xmlexer supplies a number of commands to open a connection to
+a remote host and navigate its API.  Usually hitting ^C will
+terminate the currently-running command and return you to
+the xmlexer prompt.
+
+=over 4
+
+=item autoload
+
+Toggles the autoload flag (defaults to on).  If autoload is true,
+when a connection is opened, xmlexer attempts to load the entire API.
+However, on a bad server this can be time consuming and error-prone.
+Turning autoload off prevents the API from being loaded.  You can
+still exercise the server using 'call'.  Use the 'load' command to
+load the API after the connection has been opened.
+
+See also: open, load
+
+=item call URL FUNC [ARGS...]
+
+Calls a connection manually.  This is necessary if the remote
+server doesn't publish its API (i.e. provide working system.listMethods,
+system.methodSignature, and system.introspection calls).
+
+  $ xmlexer
+  xmlexer> open "http://time.xmlrpc.com/RPC2"
+  Loaded 0 functions from http://time.xmlrpc.com/RPC2
+  xmlexer> call "http://time.xmlrpc.com/RPC2" currentTime.getCurrentTime
+  $result = '20040128T01:07:27';
+
+See also: load, autoload
+
+=item clear URL [METHODS...]
+
+Clears all knowledge of the API for the connection specified.
+You can also pass the names of the specific methods that you
+would like to clear.  If you don't specify any methods to clear,
+the entire API for this connection will be cleared.
+
+Calling clear with no arguments and then load forces a connection's
+API to be entirely refreshed.
+
+See also: list, load
+
+=item close URL
+
+Closes a connection.  Pass it the URL of the connection you want to close.
+Use "open" to open a connection.
+
+See also: open, connections
+
+=item connections
+
+Lists open connections.  These aren't actually open sockets; it's
+just a data structure that stores API information for a particular
+remote host.
+
+See also: open, close
+
+=item delete VAR...
+
+Removes one or more variables from the symbol table.
+To add variables, use the assignment operator.
+For instance,
+
+  xmlexer> abc=2^8  
+  $abc = 256;
+  xmlexer> delete abc
+  xmlexer> abc
+  abc
+  ^ unknown command or variable!
+
+See also: vars, show
+
+=item echo ARGS...
+
+Simply echoes its command-line arguments.  This is a good way of
+discovering if your input strings are accidentally being tokenized
+(i.e. you forgot to put quotes around a URL).
+
+=item exit
+
+Exits xmlexer immediately.
+
+=item help [CMD]
+
+Lists the commands and functions that you have at your disposal.
+If you supply the name of a command or function, it
+will print more detailed help on that command or function.
+
+  xmlexer> help list
+  list: List the methods in a connection
+
+=item history [-c] [-d] NUM...
+
+Lists the command history (similar to Bash).  It also accepts
+some arguments:
+
+=over 4
+
+=item -c
+
+Clears all history.
+
+=item -d NUM...
+
+Deletes a specific item from history.  You can pass more than
+one number to -d.
+
+=back
+
+You can pass an integer specifying the maximum number of history
+items you to view.  If you don't specify any arguments on the
+command line, every history item will be printed.
+
+xmlexer performs history substitution just like bash:
+!! repeats the last command,
+!$ specifies the last argument,
+!!:s/SEARCH/REPLACE/ runs a substitution on the last command,
+^search^repl performs a quick substitution, etc.
+
+  xmlexer> !12
+  open 'http://localhost:9000'
+
+If you type a bang and then hit tab, you can even complete
+on the strings in history.  Try it and you'll see what I mean.
+Unfortunately, due to a ReadLine bug, if you start completing a
+line from history, when completing on command history, you must
+finish the entire command -- you can't just hit return when the
+string is unique.
+
+=item list CONN
+
+If you pass it the URL of an open connection, the methods
+that the connection supplies will be listed.
+
+See also: load, clear
+
+=item load CONN [methods...]
+
+Loads the API for the specified connection.  You will need this
+call if either the API didn't load completely the first time (keep
+calling load until you get everything), or you called the clear
+command, or autoload is turned off.
+
+You can specify the names of the methods that you would like to
+be loaded.  If you don't specify any methods, load will use
+system.listMethods to determine what methods to load.
+If the server is set up correctly, this will load all methods
+from the server's API.
+
+See also: open, list, clear, autoload
+
+=item open URL
+
+Opens a new connection.  "Open" is a bit of a misnomer -- this call
+does not actually open any sort of persistent socket.  Rather,
+it connects to the remote server and reads as much information
+as it can about the API (unless autoload is off).
+It uses this information to assist
+in command-line completion and expression writing.  To cause
+xmlexer to forget about a connection, call "close".
+
+You need to surround the argument to open in quotes.  Otherwise,
+xmlexer will think that you're doing a lot of syntactically
+invalid division (http://ab/c...).
+
+See also: close, load
+
+=item show VAR...
+
+Shows the value of one or more variables.  Because variables return
+their result when they're named on the command line, there's no real
+need for the show command anymore.
+
+  xmlexer> abc=123
+  $abc = '123';
+  xmlexer> show abc
+  $abc = '123';
+  xmlexer> abc
+  $result = '123';
+
+See also: vars, delete
+ 
+=item vars
+
+Lists all the variables defined in the symbol table.
+
+See also: show, delete
+
+=item verbose NUM
+
+Raises or lowers the amount of text printed by xmlexer.  Set it to -1
+to get xmlexer to print virtually nothing.  Set it to 10 to see the
+nitty gritty details of everything xmlexer is doing.  The default
+verbosity is 1.
+
+  xmlexer> verbose 4
+
+Primarily affects: load, open, call
+
+=item debug_complete NUM
+
+This turns on command-line completion debugging.  If you set this to
+3 or higher, you will see a lot of information about the completion
+process printed every time you stomp on tab.
+
+=head1 EXPRESSIONS
+
+xmlexer actually has two parsers in it: the shell-like one provided
+by Term::GDBUI and its own internal expression parser.  Use shell-like
+expressions when working with xmlexer, and expressions when working
+with remote servers.
+
+  xmlexer> verbose -1            # shell-like, command with args
+  xmlexer> system.identity()
+  $result = 'RPC::XML::Server/1.37';
+
+Because the two types of expressions are totally distinct, you cannot
+mix them.  The following doesn't work, for instance,
+because it is mixing commands and expressions into the same statement.
+
+  xmlexer> verbose 1+3         # WRONG
+
+To call a function, just follow its name with a set of parentheses
+containing optional arguments.  The function will not be called if
+you forget to specify the parens.
+
+If you do not supply a variable to store the result of an expression,
+xmlexer will store the result in the variable named "result".
+
+  xmlexer> 9
+  $result = '9';
+  xmlexer> x=6
+  $x = '6';
+  xmlexer> show result
+  $result = '9';
+
+=head2 Operators
+
+xmlexer can perform some rudimentary arithmetic operations.
+Here is the precedence table of the arithmetic operators, from
+highest to lowest.
+
+  ^         exponentiation    (tightest binding)
+  * /       multiplication, divison
+  + -       addition, subtraction
+  =         assignment        (weakest binding)
+
+You can mix arithmetic and method calls interchangably in the
+same expression.
+
+  xmlexer> 3^3-Test.add(2^3,4)
+  $result = 15;
+
+
+=head1 EXAMPLES
+
+The synopsis at the start of this document exercises the Meerkat API at
+L<http://www.oreillynet.com/pub/a/rss/2000/11/14/meerkat_xmlrpc.html>.
+
+Remember that as long as xmlexer can load the method signatures
+it will autocomplete for you.  Just bounce on tab -- usually you'll
+be pleased by the results.
+
+Sometimes a server won't publish its method signatures.  In this case,
+you need to use xmlexer's L<call> routine manually (see its
+documentation in L<COMMANDS> for an example).
+
+=head1 TROUBLESHOOTING
+
+If anything goes wrong, the first thing you should do is bump up
+the verbosity and try again.  Usually this will give you a good
+idea of just what's going on.
+
+If you get parse errors, hit the up arrow to see how xmlexer is
+tokenizing your expression.  It spaces the tokens its own way
+so you can see, for instance, what happens if you forget to put
+quotes around a URL.
+  
+=head1 BUGS
+
+You can't concatenate strings.  This is just pure laziness until
+someone asks for it.  I suppose I'd overload the + operator as
+I really, really don't want to turn '.' into a tokenchar.
+
+expressions and commands don't get along (see more under
+L<EXPRESSIONS>).  This is because Term::ExprUI is incomplete.
+The best solution to this problem is probably just to ditch
+commands entirely and turn everything into an expression.
+
+^C interrupts are a little odd.  At the command line, they
+don't fire until you hit return.  This appears to be a bug
+with Term::ReadLine::Gnu.  The signals just pile up until the
+readline call returns.  I haven't found any way of fixing it.
+Also, it appears that some libraries disable SIG{INT} while
+they're doing network operations.  If you just hold down ^C,
+eventually they'll notice and return early.
+
+=head1 AUTHOR
+
+Scott Bronson <S<bronson@rinspin.com>>
+

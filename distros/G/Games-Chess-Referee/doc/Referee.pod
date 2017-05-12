@@ -1,0 +1,62 @@
+=pod
+
+=head1 NAME
+
+Games::Chess::Referee - work with chess positions and games, according to the rules of chess.
+
+
+=head1 SYNOPSIS
+
+    use Games::Chess:Referee;
+    new_game();
+    ply('e2e4');
+    ply('e7e5');
+    show_board();
+    move('d2d3', 'd7d6');
+    show_board();
+
+
+=head1 DESCRIPTION
+
+The C<Games::Chess:Referee> module provides a mechanism to interpret (almost) standard algebraic chess notation and to print out the resulting positions. It makes use of the Games::Chess::Position and Games::Chess::Piece classes by Gareth Rees, adding the chess rules and move application functionality.
+
+
+=head1 ERROR HANDLING
+
+Where the code does complain, it uses the carp routine. The ply() and
+move() routines return zero on failure, one on success.
+
+
+=head1 LIMITATIONS
+
+In this very early version, many of the rules of chess are not yet
+implemented. The code is in a state of flux right now, as it is being
+reworked into a class from a simple afternoon proof of concept. See
+the README file and comments in the code for more information.
+
+
+=head1 BUGS
+
+There are no known bugs as of this writing, but it would be reasonable
+to consider the limitations as bugs.
+
+
+=head1 SEE ALSO
+
+L<Games::Chess>
+
+
+=head1 AUTHOR
+
+Gregor N. Purdy (C<gregor@focusresearch.com>)
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 1999-2006 Gregor N. Purdy. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

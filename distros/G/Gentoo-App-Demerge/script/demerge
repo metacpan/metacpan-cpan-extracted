@@ -1,0 +1,1010 @@
+#!/usr/bin/perl
+
+# -----------------------------------------------------------------------------
+#
+# demerge
+#
+# date        : 2008-12-01
+# author      : Christian Hartmann <ian@gentoo.org>
+# version     : 0.047
+# license     : GPL-2
+# description : Revert to previous installation states.
+#
+# header      : $Header: /srv/cvsroot/demerge/demerge,v 1.21 2008/12/01 20:38:29 ian Exp $
+#
+# -----------------------------------------------------------------------------
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# -----------------------------------------------------------------------------
+
+# - modules >
+use warnings;
+use strict;
+use Getopt::Long; Getopt::Long::Configure('bundling');
+use Term::ANSIColor;
+use Term::ReadKey;
+use File::Copy;
+use File::Path;
+use Path::Tiny;
+use Shell::EnvImporter;
+use PortageXS;
+use PortageXS::UI::Spinner;
+use DirHandle;
+
+$|=1;
+
+# - init vars & constants >
+my $VERSION					= '0.048';
+my $NEEDVERSION					= '0.043';
+my $DEBUG					= 0;
+my $comment					= '';
+my $do						= 0;
+my $recordSystemState				= 0;
+my $restoreSystemState				= 0;
+my $restorePrevious				= 0;
+my $wipe					= 0;
+my $wipeOlder					= 0;
+my $noColor					= 0;
+my $postsync					= 0;
+my $pxs						= PortageXS->new();
+my $homedir					= $pxs->getHomedir().'/.demerge';
+my $cmd_homedir					= '';
+my $configfile					= '/etc/demerge.conf';
+my @emergePackages				= ();
+my @unmergePackages				= ();
+my @crossgradePackages				= ();
+my @quickpkgPackages				= ();
+my $time					= 0;
+my %emergeOpts					= ();
+my $terminalWidth				= 80;
+my $missingEbuilds				= 0;
+my %CACHE_getUseSettingsOfInstalledPackage	= ();
+my %CACHE_getUseSettingsOfRecordedPackage	= ();
+my %CACHE_getUseSettingsOfInstalledPackageF	= ();
+my %CACHE_getUseSettingsOfRecordedPackageF	= ();
+my @CACHE_searchInstalledPackage		= ();
+my @CACHE_repos					= ();
+push(@CACHE_repos,$pxs->getPortageMakeParam('PORTDIR'));
+push(@CACHE_repos,split(/ /,$pxs->getPortageMakeParam('PORTDIR_OVERLAY')));
+
+# - init colors >
+my $yellow	= color('bold yellow');
+my $green	= color('green');
+my $lightgreen	= color('bold green');
+my $white	= color('bold white');
+my $cyan	= color('bold cyan');
+my $red		= color('bold red');
+my $blue	= color('bold blue');
+my $reset	= color('reset');
+
+# - Check if colors are allowed (first make.conf then .demergerc then command-line option) >
+if (lc($pxs->getParamFromFile(path('/etc/portage/make.conf')->slurp,'NOCOLOR','lastseen')) eq 'true') {
+	$noColor=1;
+}
+else {
+	$noColor=0;
+}
+if (-e $configfile) {
+	if (lc($pxs->getParamFromFile(path($configfile)->slurp,'nocolor','lastseen')) eq 'true') {
+		$noColor=1;
+	}
+	elsif (lc($pxs->getParamFromFile(path($configfile)->slurp,'nocolor','lastseen')) eq 'false') {
+		$noColor=0;
+	}
+}
+
+# - get options >
+GetOptions(
+	'comment=s'			=> \$comment,
+	'dir=s'				=> \$cmd_homedir,
+	'do'				=> \$do,
+	'record-system-state'		=> \$recordSystemState,
+	'record'			=> \$recordSystemState,
+	'restore-system-state=s'	=> \$restoreSystemState,
+	'restore=s'			=> \$restoreSystemState,
+	'restore-previous'		=> \$restorePrevious,
+	'usepkg|k'			=> \$emergeOpts{'usepkg'},
+	'wipe:1'			=> \$wipe,
+	'wipe-older=s'			=> \$wipeOlder,
+	'nocolor|C'			=> \$noColor,
+	'postsync'			=> \$postsync,
+	'help|h'			=> sub { printHeader(); printUsage(); }
+	) || printUsage();
+
+if ($noColor) {
+	$yellow		= '';
+	$green		= '';
+	$lightgreen	= '';
+	$white		= '';
+	$cyan		= '';
+	$red		= '';
+	$blue		= '';
+	$reset		= '';
+	$pxs->{'COLORS'}{'YELLOW'}	= '';
+	$pxs->{'COLORS'}{'GREEN'}	= '';
+	$pxs->{'COLORS'}{'LIGHTGREEN'}	= '';
+	$pxs->{'COLORS'}{'WHITE'}	= '';
+	$pxs->{'COLORS'}{'CYAN'}	= '';
+	$pxs->{'COLORS'}{'RED'}		= '';
+	$pxs->{'COLORS'}{'BLUE'}	= '';
+	$pxs->{'COLORS'}{'RESET'}	= '';
+}
+
+# - check if user is root >
+if ($< > 0) {
+	printHeader();
+	print $red.' * '.$reset."To use demerge you must have root access. Aborting.\n\n";
+	exit(0);
+}
+else {
+	if ($postsync) {
+		if (-e $configfile) {
+			$homedir=$pxs->getParamFromFile(path($configfile)->slurp,'datadir','lastseen');
+		}
+		postsyncHook();
+		exit(0);
+	}
+	else {
+		# - normal startup >
+		# - Actually do not call GetTerminalSize() when --postsync is called (error reported on efika/ppc by amne)
+		# - Also do not call GetTerminalSize() if TERM is not set (when demerge is called by cron e.g.; reported by pille)
+		if (exists $ENV{'TERM'}) {
+			$terminalWidth = (GetTerminalSize())[0];
+		}
+		printHeader();
+		print $red.' Use this program carefully - otherwise you might run into problems.'.$reset."\n";
+		print $red.' You are root. You are responsible for your actions.'.$reset."\n";
+		print " Bugs and requests go to ian <ian\@gentoo.org>.\n\n";
+		
+		print " Following repositories will be used:\n";
+		my $number=0;
+		foreach (@CACHE_repos) {
+			$number++;
+			print ' ['.$number.'] '.$_."\n";
+		}
+		print "\n";
+	}
+}
+
+# - read configfile (if available) >
+if (-e $configfile) {
+	demergeReadConfig();
+}
+
+# - User defined homedir overrides config settings >
+if ($cmd_homedir) {
+	$homedir=$cmd_homedir;
+}
+
+# - Do some basic checks >
+if (! -d $homedir) {
+	if(mkdir($homedir)) {
+		print $lightgreen.' * '.$reset.'Created '.$homedir."\n";
+	}
+	else {
+		print $red.' * '.$reset.'Could not create '.$homedir.". Aborting.\n\n";
+		exit(0);
+	}
+}
+
+print $lightgreen.' * '.$reset.'Using datadir: '.$homedir."\n\n";
+
+# - dispatcher >
+if (!$recordSystemState && !$restoreSystemState && !$restorePrevious && !$wipe && !$wipeOlder) {
+	my @availableStates=getAvailableStates();
+	
+	if ($#availableStates>-1) {
+		setupCache();
+		
+		# - Process states >
+		print $lightgreen.' * '.$reset."Found previous states:\n\n";
+		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst);
+		foreach (@availableStates) {
+			# - print timestamp && date && comment (if any) >
+			($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime($_);
+			print '   ',$_,' (',($year+1900),'-',sprintf('%02s',($mon+1)),'-',sprintf('%02s',$mday),' ',sprintf('%02s',$hour),':',sprintf('%02s',$min),':',sprintf('%02s',$sec),')';
+			print ' - ',path($homedir, $_.'.comment')->slurp if (-e path($homedir, $_.'.comment'));
+			print "\n";
+			
+			if (!printStateDiff($_,1)) {
+				print "        Skipping - system state has been recorded with an older/incompatible version of demerge.\n";
+			}
+			print "\n";
+		}
+		print $lightgreen.' * '.$reset."To revert to one of the previous system-states run 'demerge --restore timestamp'.\n\n";
+	}
+	else {
+		printUsage();
+	}
+	exit(0);
+}
+
+if ($recordSystemState) {
+	print $lightgreen.' * '.$reset.'Recording current system state..';
+	$time=recordSystemState();
+	print " done\n";
+	print $lightgreen.' * '.$reset."To restore the system-state run 'demerge --restore ".$time."'.\n\n";
+	exit(0);
+}
+
+if ($restoreSystemState || $restorePrevious) {
+	setupCache();
+	
+	if ($restorePrevious) {
+		# - Get latest state >
+		my @availableStates=getAvailableStates();
+		$restoreSystemState=$availableStates[$#availableStates];
+		if (!$restoreSystemState) { $restoreSystemState=0; }
+	}
+	
+	# - Check if given file exists >
+	if (!-e $homedir.'/'.$restoreSystemState.'.systemstate') {
+		$pxs->printColored('RED',"No systemstate file found or unable to open! Aborting.\n\n");
+		exit(0);
+	}
+	
+	if (!printStateDiff($restoreSystemState)) {
+		print $red.' * '.$reset."System state has been recorded with an older/incompatible version of demerge.\n\n";
+		print $yellow.' * '.$reset."Quitting.\n\n";
+		exit(1);
+	}
+	
+	if (!$do) {
+		if ($missingEbuilds) {
+			if ($missingEbuilds==1) {
+				print $red.' * '.$reset.$missingEbuilds." ebuild missing. Due to this demerge will not be able to revert to the given state!\n\n";
+			}
+			else {
+				print $red.' * '.$reset.$missingEbuilds." ebuilds are missing. Due to this demerge will not be able to revert to the given state!\n\n";
+			}
+			exit(1);
+		}
+		if ($pxs->cmdAskUser('Proceed?','y,n') eq 'n') {
+			print "\n";
+			print $yellow.' * '.$reset."Quitting.\n\n";
+			exit(1);
+		}
+	}
+	
+	print "\n";
+	print $lightgreen.' * '.$reset.'Recording current system state..';
+	$comment='State recorded before restoring to '.$restoreSystemState;
+	$time=recordSystemState();
+	print " done\n";
+	
+	if ($#unmergePackages>=0) {
+		if ($emergeOpts{'usepkg'}) {
+			demergeCmdExec('quickpkg ='.join(' =',@unmergePackages));
+		}
+		demergeCmdExec('emerge -C ='.join(' =',@unmergePackages));
+	}
+	if ($#emergePackages>=0) {
+		if ($emergeOpts{'usepkg'}) {
+			$emergeOpts{'usepkg'}='-k';
+		}
+		else {
+			$emergeOpts{'usepkg'}='';
+		}
+		
+		foreach (@emergePackages) {
+			$emergeOpts{'P_USEFLAGS'}=$CACHE_getUseSettingsOfRecordedPackage{$restoreSystemState.'/'.$_};
+			demergeCmdExec("USE='-* ".$emergeOpts{'P_USEFLAGS'}."' emerge ".$emergeOpts{'usepkg'}." =".$_);
+		}
+	}
+	if ($#crossgradePackages>=0) {
+		if ($emergeOpts{'usepkg'}) {
+			$emergeOpts{'usepkg'}='-k';
+		}
+		else {
+			$emergeOpts{'usepkg'}='';
+		}
+		
+		if ($emergeOpts{'usepkg'}) {
+			foreach (@quickpkgPackages) {
+				demergeCmdExec('quickpkg ='.$_);
+			}
+		}
+		
+		foreach (@crossgradePackages) {
+			$emergeOpts{'P_USEFLAGS'}=$CACHE_getUseSettingsOfRecordedPackage{$restoreSystemState.'/'.$_};
+			demergeCmdExec("USE='-* ".$emergeOpts{'P_USEFLAGS'}."' emerge ".$emergeOpts{'usepkg'}." =".$_);
+		}
+	}
+	
+	if (-e $homedir.'/'.$restoreSystemState.'.world') {
+		print $lightgreen.' * '.$reset.'Restoring world file... ';
+		copy($homedir.'/'.$restoreSystemState.'.world','/var/lib/portage/world');
+		print "done\n\n";
+	}
+	
+	print $lightgreen.' * '.$reset."To revert to the previous system-state run 'demerge --restore ".$time."'.\n\n";
+	
+	exit(0);
+}
+
+if ($wipe==1) {
+	# - Cleanup .demerge dir >
+	if (!$do) {
+		if ($pxs->cmdAskUser('Do you really want to remove all recorded system-states?','y,n') eq 'n') {
+			print "\n";
+			print $yellow.' * '.$reset."Quitting.\n\n";
+			exit(1);
+		}
+	}
+	demergeCmdExec('rm -r '.$homedir);
+	mkdir($homedir);
+	print " Done.\n";
+}
+elsif ($wipe>1) {
+	# -Just delete the state given >
+	if (!$do) {
+		if ($pxs->cmdAskUser('Do you really want to remove this state?','y,n') eq 'n') {
+			print "\n";
+			print $yellow.' * '.$reset."Quitting.\n\n";
+			exit(1);
+		}
+	}
+	wipe($wipe);
+	print " Done.\n";
+}
+
+if ($wipeOlder) {
+	my $dh = new DirHandle($homedir);
+	my @availableStates=();
+	if (defined $dh) {
+		while (defined(my $this_file = $dh->read)) {
+			if ($this_file=~m/^([0-9]+)\.systemstate$/i) {
+				my $this_timestamp=$1;
+				if ($wipeOlder>$this_timestamp) {
+					push(@availableStates,$this_timestamp);
+				}
+			}
+		}
+	}
+	
+	if ($#availableStates>-1) {
+		print $lightgreen.' * '.$reset."Previous states selected for removal:\n\n";
+		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst);
+		foreach (sort @availableStates) {
+			($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime($_);
+			print '   ',$_,' (',($year+1900),'-',sprintf('%02s',($mon+1)),'-',sprintf('%02s',$mday),' ',sprintf('%02s',$hour),':',sprintf('%02s',$min),':',sprintf('%02s',$sec),")\n";
+		}
+	}
+	else {
+		$pxs->printColored('YELLOW',"Nothing to wipe. Aborting.\n\n");
+		exit(1);
+	}
+	
+	print "\n";
+	if (!$do) {
+		if($pxs->cmdAskUser('Do you really want to remove these system-states?','y,n') eq 'n') {
+			print "\n";
+			print $yellow.' * '.$reset."Quitting.\n\n";
+			exit(1);
+		}
+	}
+	
+	foreach (@availableStates) {
+		wipe($_);
+	}
+	print " Done.\n";
+}
+
+print "\n";
+exit(0);
+
+# -----------------------------------------------------------------------------
+# subs >
+# -----------------------------------------------------------------------------
+
+sub wipe {
+	my $wipe	= shift;
+	if (-e $homedir.'/'.$wipe.'.systemstate') { demergeCmdExec('rm '.$homedir.'/'.$wipe.'.systemstate'); }
+	if (-e $homedir.'/'.$wipe.'.version') { demergeCmdExec('rm '.$homedir.'/'.$wipe.'.version'); }
+	if (-e $homedir.'/'.$wipe.'.comment') { demergeCmdExec('rm '.$homedir.'/'.$wipe.'.comment'); }
+	if (-e $homedir.'/'.$wipe.'.world') { demergeCmdExec('rm '.$homedir.'/'.$wipe.'.world'); }
+	if (-e $homedir.'/'.$wipe.'.dvdb') { demergeCmdExec('rm '.$homedir.'/'.$wipe.'.dvdb'); }
+	if (-d $homedir.'/'.$wipe) { demergeCmdExec('rm -r '.$homedir.'/'.$wipe); }
+	return 1;
+}
+
+sub demergeReadConfig {
+	print $lightgreen.' * '.$reset.'Using configuration: '.$configfile."\n";
+	$homedir=$pxs->getParamFromFile(path($configfile)->slurp,'datadir','lastseen');
+	if (lc($pxs->getParamFromFile(path($configfile)->slurp,'usepkg','lastseen')) eq 'yes') {
+		$emergeOpts{'usepkg'}='-k';
+		print $lightgreen.' * '.$reset."--usepkg enabled in configuration.\n";
+	}
+}
+
+sub postsyncHook {
+	if(! -d $homedir) {
+		if(mkdir($homedir)) {
+			print $red.'demerge'.$reset.': Created '.$homedir."\n";
+		}
+		else {
+			print $red.'demerge'.$reset.': Could not create '.$homedir.". Aborting.\n";
+			exit(0);
+		}
+	}
+	
+	# - Get latest state >
+	my @availableStates=getAvailableStates();
+	my $lastSystemState=$availableStates[$#availableStates];
+	
+	$comment='Postsync';
+	print $red.'demerge'.$reset.': Recording system state...';
+	$time=recordSystemState();
+	print "\n";
+	print $red.'demerge'.$reset.': Timestamp: '.$time."\n";
+	
+	# - Compare states >
+	if ($lastSystemState) {
+		if (path($homedir,$lastSystemState.'.systemstate')->slurp eq path($homedir, $time.'.systemstate')->slurp) {
+			# - States are identical - wipe newest >
+			print $red.'demerge'.$reset.': State is identical to '.$lastSystemState.'. Wiping '.$time.".\n";
+			wipe($time);
+		}
+	}
+	
+	return 1;
+}
+
+sub recordSystemState {
+	# - record system state and exit >
+	$time = time();
+	my @rpackages=$pxs->searchInstalledPackage('*');
+	
+	open(FH,'>'.$homedir.'/'.$time.'.systemstate') or die('Cannot create systemstate file!');
+	print FH join("\n",@rpackages)."\n";
+	close(FH);
+	print '.';
+	
+	open(FH,'>'.$homedir.'/'.$time.'.version') or die('Cannot create version file!');
+	print FH $VERSION;
+	close(FH);
+	print '.';
+	
+	if ($comment) {
+		open(FH,'>'.$homedir.'/'.$time.'.comment') or die('Cannot create comment file!');
+		print FH $comment;
+		close(FH);
+		print '.';
+	}
+	
+	if (-e '/var/lib/portage/world') { copy('/var/lib/portage/world',$homedir.'/'.$time.'.world'); }
+	print '.';
+	
+	my $thisIUSE='';
+	my $thisUSE='';
+	my @package_IUSE=();
+	my @package_USE=();
+	my $uses='';
+	my $iuses='';
+	my $hasuse='';
+	my @USEs=();
+	
+	open(DVDB,'>'.$homedir.'/'.$time.'.dvdb') or die('Cannot create dvdb file!');
+	foreach (@rpackages) {
+		@package_USE=();
+		@package_IUSE=();
+		@USEs=();
+		if (-e '/var/db/pkg/'.$_.'/USE') {
+			$uses=path('/var/db/pkg', $_, 'USE')->slurp;
+			$uses=~s/\n//g;
+			@package_USE=split(/ /,$uses);
+		}
+		if (-e '/var/db/pkg/'.$_.'/IUSE') {
+			$iuses=path('/var/db/pkg',$_,'IUSE')->slurp;
+			$iuses=~s/\n//g;
+			@package_IUSE=split(/ /,$iuses);
+		}
+		
+		foreach $thisIUSE (@package_IUSE) {
+			next if ($thisIUSE eq '');
+			$hasuse = '-';
+			foreach $thisUSE (@package_USE) {
+				if ($thisIUSE eq $thisUSE) {
+					$hasuse='';
+					last;
+				}
+			}
+			push(@USEs,$hasuse.$thisIUSE);
+		}
+		print DVDB $_,':USE:',join(' ',uniqifyArray(@USEs)),"\n";
+	}
+	close(DVDB);
+	print '.';
+
+	return $time;
+}
+
+sub printHeader {
+	print "\n",$lightgreen,' demerge',$reset,' version ',$VERSION,' ',$blue,'(using PortageXS-',$pxs->{'VERSION'},')',$reset,"\n\n";
+	return 1;
+}
+
+sub printUsage {
+	print " --comment [ comment ]       : Add comment to state for your convenience.\n";
+	print " --do                        : Do not ask user to confirm actions - just do it.\n";
+	print " --dir [ directory ]         : Select directory to store/get demerge data.\n";
+	print " -h, --help                  : Show this help.\n";
+	print " -k, --usepkg                : Pass -k to emerge so that binary packages\n";
+	print "                             : will be used when available. When enabling this\n";
+	print "                             : option demerge will also create binpkgs of\n";
+	print "                             : packages before removing them.\n";
+	print "                             : (Note: Currently --usepkg is not useflag aware. So\n";
+	print "                             : no matter what useflags were set in the system-state\n";
+	print "                             : portage will install the binpkg as is.)\n";
+	print " -C, --nocolor               : Turn off colors.\n";
+	print " --record                    : Records which packages are installed\n";
+	print "                             : on this system.\n";
+	print " --restore [ timestamp ]     : Restores previous recorded system-state of the given\n";
+	print "                             : timestamp.\n";
+	print " --restore-previous          : Restores previous recorded system-state.\n";
+	print " --wipe [ timestamp ]        : Remove all/given system-states.\n";
+	print " --wipe-older [ timestamp ]  : Remove all recorded system-states that are\n";
+	print "                             : older than the given timestamp.\n";
+	print "\n";
+	
+	exit(0);
+}
+
+sub compareCachedUseSettings {
+	my $t=shift;
+	my $t2=shift;
+	if (!$CACHE_getUseSettingsOfInstalledPackageF{$t2}) {
+		$CACHE_getUseSettingsOfInstalledPackage{$t2}=join(' ',uniqifyArray($pxs->getUseSettingsOfInstalledPackage($t2)));
+		$CACHE_getUseSettingsOfInstalledPackageF{$t2}=1;
+	}
+	if (!$CACHE_getUseSettingsOfRecordedPackageF{$t}) {
+		$CACHE_getUseSettingsOfRecordedPackage{$t}=join(' ',uniqifyArray(getUseSettingsOfRecordedPackage($t)));
+		$CACHE_getUseSettingsOfRecordedPackageF{$t}=1;
+	}
+	if ($CACHE_getUseSettingsOfInstalledPackage{$t2} eq $CACHE_getUseSettingsOfRecordedPackage{$t}) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+sub setupCache {
+	# - Set up cache >
+	print $lightgreen,' * ',$reset,"Analyzing current state..  ";
+	@CACHE_searchInstalledPackage=$pxs->searchInstalledPackage('*');
+	my $spinner=PortageXS::UI::Spinner->new();
+	foreach (@CACHE_searchInstalledPackage) {
+		$CACHE_getUseSettingsOfInstalledPackage{$_}=join(' ',uniqifyArray($pxs->getUseSettingsOfInstalledPackage($_)));
+		$CACHE_getUseSettingsOfInstalledPackageF{$_}=1;
+		$spinner->spin();
+	}
+	$spinner->reset();
+	print "done\n\n";
+	return 1;
+}
+
+sub printStateDiff {
+	my $restoreSystemState	= shift;
+	my $indent		= shift;
+	
+	if (getSystemStateVersion($restoreSystemState) >= $NEEDVERSION) {
+		@emergePackages = ();
+		@unmergePackages = ();
+		@crossgradePackages = ();
+		my $this_src='';
+		my $this_dest='';
+		my $has=0;
+		$missingEbuilds=0;
+		
+		# - Check for differences in the two states >
+		my @destState = split(/\n/,path($homedir,$restoreSystemState.'.systemstate')->slurp);
+		foreach $this_src (@CACHE_searchInstalledPackage) {
+			$has=0;
+			foreach $this_dest (@destState) {
+				if ($this_src eq $this_dest) {
+					# - Check for useflag differences >
+					if (compareCachedUseSettings($restoreSystemState.'/'.$this_src,$this_src)) {
+						$has++;
+						last;
+					}
+				}
+			}
+			if (!$has) {
+				push(@unmergePackages,$this_src);
+			}
+		}
+		
+		foreach $this_dest (@destState) {
+			$has=0;
+			foreach $this_src (@CACHE_searchInstalledPackage) {
+				if ($this_src eq $this_dest) {
+					# - Check for useflag differences >
+					if (compareCachedUseSettings($restoreSystemState.'/'.$this_src,$this_src)) {
+						$has++;
+						last;
+					}
+				}
+			}
+			if (!$has) {
+				push(@emergePackages,$this_dest);
+			}
+		}
+		
+		if ($indent) {
+			if ($#emergePackages<0 && $#unmergePackages<0) {
+				print "        No differences found.\n";
+			}
+			else {
+				if ($#unmergePackages>-1) {
+					foreach (@unmergePackages) {
+						print '        -'.$green.$_.$reset;
+						demergeOutputUseflags(9,$_,$pxs->formatUseflags(split(/ /,$CACHE_getUseSettingsOfInstalledPackage{$_})));
+					}
+				}
+				if ($#emergePackages>-1) {
+					foreach (@emergePackages) {
+						print '        +'.$green.$_.$reset;
+						my $ebuildDa=ebuildDa($_);
+						if ($ebuildDa == 0) { $missingEbuilds++; $ebuildDa='MISSING'; }
+						print ' [',$ebuildDa,']';
+						demergeOutputUseflags(9,$_,$pxs->formatUseflags(split(/ /,getUseSettingsOfRecordedPackage($restoreSystemState.'/'.$_))));
+					}
+				}
+			}
+		}
+		else {
+			if ($#emergePackages<0 && $#unmergePackages<0) {
+				$pxs->printColored('YELLOW',"No differences found. Aborting.\n\n");
+				exit(1);
+			}
+			else {
+				if ($#unmergePackages>-1) {
+					print $lightgreen.' * '.$reset."Packages that will be uninstalled:\n";
+					foreach (@unmergePackages) {
+						print '   '.$green.$_.$reset;
+						demergeOutputUseflags(3,$_,$pxs->formatUseflags(uniqifyArray($pxs->getUseSettingsOfInstalledPackage($_))));
+					}
+					print "\n";
+				}
+				if ($#emergePackages>-1) {
+					print $lightgreen.' * '.$reset."Packages that will be installed:\n";
+					foreach (@emergePackages) {
+						print '   '.$green.$_.$reset;
+						my $ebuildDa=ebuildDa($_);
+						if ($ebuildDa == 0) { $missingEbuilds++; $ebuildDa='MISSING'; }
+						print ' [',$ebuildDa,']';
+						demergeOutputUseflags(3,$_,$pxs->formatUseflags(split(/ /,getUseSettingsOfRecordedPackage($restoreSystemState.'/'.$_))));
+					}
+					print "\n";
+				}
+			}
+			
+			# - check for crossgrades >
+			my %tmp_unmergePackages=();
+			my %tmp_emergePackages=();
+			my %tmp_crossgradePackages=();
+			my %tmp_crossgradePackagesEN=();
+			my $e='';
+			my $u='';
+			
+			foreach $u (@unmergePackages) {
+				$tmp_unmergePackages{$u}=1;
+				foreach $e (@emergePackages) {
+					$tmp_emergePackages{$e}=1;
+					if ($pxs->getEbuildName($u) eq $pxs->getEbuildName($e)) {
+						$tmp_unmergePackages{$u}=0;
+						$tmp_emergePackages{$e}=0;
+						$tmp_crossgradePackages{$e}=1;
+						$tmp_crossgradePackagesEN{$pxs->getEbuildName($e)}=1;
+						last;
+					}
+				}
+			}
+			
+			foreach $e (@emergePackages) {
+				$tmp_emergePackages{$e}=1;
+				foreach $u (@unmergePackages) {
+					$tmp_unmergePackages{$u}=1;
+					if ($pxs->getEbuildName($u) eq $pxs->getEbuildName($e)) {
+						$tmp_unmergePackages{$u}=0;
+						$tmp_emergePackages{$e}=0;
+						$tmp_crossgradePackages{$e}=1;
+						$tmp_crossgradePackagesEN{$pxs->getEbuildName($e)}=1;
+						last;
+					}
+				}
+			}
+			
+			@unmergePackages=();
+			@emergePackages=();
+			@crossgradePackages=();
+			foreach (keys %tmp_unmergePackages) {
+				if ($tmp_unmergePackages{$_}) {
+					if (!$tmp_crossgradePackagesEN{$pxs->getEbuildName($_)}) {
+						push(@unmergePackages,$_);
+					}
+				}
+				else {
+					push(@quickpkgPackages,$_);
+				}
+			}
+			foreach (keys %tmp_emergePackages) {
+				if ($tmp_emergePackages{$_} && !$tmp_crossgradePackages{$_}) {
+					if (!$tmp_crossgradePackagesEN{$pxs->getEbuildName($_)}) {
+						push(@emergePackages,$_);
+					}
+				}
+			}
+			foreach (keys %tmp_crossgradePackages) {
+				if ($tmp_crossgradePackages{$_}) {
+					push(@crossgradePackages,$_);
+				}
+			}
+		}
+		
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+# Description:
+# Returns useflag settings of the given recorded package.
+# @useflags = $pxs->getUseSettingsOfRecordedPackage("timestamp/dev-perl/perl-5.8.8-r3");
+sub getUseSettingsOfRecordedPackage {
+	my $package		= shift;
+	my $category		= '';
+	my $time		= 0;
+	my $tmp_filecontents	= '';
+	
+	($time,$category,$package)	= split(/\//,$package);
+	$package=$category.'/'.$package;
+	
+	if (!$CACHE_getUseSettingsOfRecordedPackageF{$time.'/'.$package}) {
+		my @dvdb=split(/\n/,path($homedir,$time.'.dvdb')->slurp);
+		foreach my $this_line (@dvdb) {
+			my @elements=split(/:/,$this_line);
+			$CACHE_getUseSettingsOfRecordedPackageF{$time.'/'.$elements[0]}=1;
+			if (!$elements[2]) {
+				$CACHE_getUseSettingsOfRecordedPackage{$time.'/'.$elements[0]}='';
+			}
+			else {
+				$elements[2]=~s/\n//g;
+				$CACHE_getUseSettingsOfRecordedPackage{$time.'/'.$elements[0]}=$elements[2];
+			}
+		}
+	}
+	
+	return $CACHE_getUseSettingsOfRecordedPackage{$time.'/'.$package};
+}
+
+sub getSystemStateVersion {
+	my $timestamp	= shift;
+	my $version	= 0;
+	
+	if (-e $homedir.'/'.$timestamp.'.version') {
+		open(FH,'<'.$homedir.'/'.$timestamp.'.version') or die('Cannot open version file!');
+		while(<FH>) {
+			$version .= $_;
+		}
+		close(FH);
+	}
+	
+	return $version;
+}
+
+# Description:
+# Returns the given array without duplicates.
+# @array = uniqifyArray(@array);
+sub uniqifyArray {
+	my %seen	= ();
+	return grep { ! $seen{$_} ++ } @_;
+}
+
+# Description:
+# Reformat useflags so that it matches the terminal width.
+sub demergeOutputUseflags {
+	my $offset	= shift;
+	my $thisPackage	= shift;
+	my @useflags	= @_;
+	my $cx		= 0;
+	my $chars	= 0;
+	my $thisUse	= '';
+	my $thisUseClean= '';
+	
+	$offset+=5;
+	
+	if (@useflags) {
+		print ' USE="';
+		$chars=$offset+length($thisPackage);
+		foreach $thisUse (@useflags) {
+			$thisUse.=' ';
+			$thisUseClean=$thisUse;
+			$thisUseClean=~s/[\000-\037]\[(\d|;)+m//g;
+			if ($chars+length($thisUseClean)>=$terminalWidth) {
+				$chars=$offset+length($thisPackage);
+				printf("\n %".$chars.'s',' ');
+			}
+			print $thisUse;
+			$chars+=length($thisUseClean);
+		}
+		print "\b \b\"\n";
+	}
+	else {
+		print " USE=\"\"\n";
+	}
+	return 1;
+}
+
+# Description:
+# Execute given command and quit on error/user termination.
+# demergeCmdExec(@command);
+sub demergeCmdExec {
+	my $cmd		= shift;
+	my $rc		= 0;
+	
+	if (!$DEBUG) {
+		$rc=system($cmd);
+		
+		if ($rc == 0) {
+			return 1;
+		}
+		else {
+			print $yellow.' * '.$reset."Quitting.\n\n";
+			exit(1);
+		}
+	}
+	else {
+		print 'DEBUG: '.$cmd."\n";
+		return 1;
+	}
+}
+
+# Description:
+# Returns an array containing all recorded states.
+# @availableStates=getAvailableStates();
+sub getAvailableStates {
+	my $dh = new DirHandle($homedir);
+	my @availableStates=();
+	if (defined $dh) {
+		while (defined(my $this_file = $dh->read)) {
+			if ($this_file=~m/^([0-9]+)\.systemstate$/i) {
+				push(@availableStates,$1)
+			}
+		}
+	}
+	return sort(@availableStates);
+}
+
+# Description:
+# Check if ebuild is available and return number of repo
+sub ebuildDa {
+	my $ebuild	= shift;
+	my $number	= ($#CACHE_repos)+1;
+	
+	foreach (reverse(@CACHE_repos)) {
+		my $pn=(split(/\//,$pxs->getEbuildName($ebuild)))[1];
+		if ($pn) {
+			if (-e $_.'/'.$pxs->getEbuildName($ebuild).'/'.$pn.'-'.$pxs->getEbuildVersion($ebuild).'.ebuild') {
+				last;
+			}
+			$number--;
+		}
+	}
+	
+	return $number;
+}
+
+# - Here comes the POD >
+
+=head1 NAME
+
+demerge - Revert to previous installation states.
+
+=head1 VERSION
+
+This document refers to version 0.048 of demerge
+
+=head1 SYNOPSIS
+
+demerge [option]...
+
+=head1 DESCRIPTION
+
+Using demerge you can easily record and restore your system state.
+
+=head1 ARGUMENTS
+
+  --comment [ comment ]        Add comment to state for your convenience.
+
+  --do                         Do not ask user to confirm actions - just do it.
+
+  --dir [ directory ]          Select directory to store/get demerge data.
+
+  -h, --help                   Show options.
+
+  -k, --usepkg                 Pass -k to emerge so that binary packages
+                               will be used when available. When enabling this option
+                               demerge will also create binpkgs of packages before
+                               removing them.
+                               (Note: Currently --usepkg is not useflag aware. So no matter what
+                               useflags were set in the system-state portage will install
+                               the binpkg as is.)
+
+  -C, --nocolor                Turn off colors.
+
+  --record                     Records which packages are installed on this system.
+
+  --restore [ timestamp ]      Restores previous recorded system-state of the given timestamp.
+
+  --restore-previous           Restores previous recorded system-state.
+
+  --wipe [ timestamp ]         Remove all/given system-states.
+
+  --wipe-older [ timestamp ]   Remove all recorded system-states that are
+                               older than the given timestamp.
+
+=head1 CONFIGURATION FILE
+
+Rather than calling demerge with the --dir, --usepkg and --nocolor parameter you can
+also use the /etc/demerge.conf configuration file to change the location where demerge stores
+and expects its data.
+
+To make demerge use the directory /var/lib/demerge instead of /root/.demerge:
+
+# echo 'datadir=/var/lib/demerge' >> /etc/demerge.conf
+
+To make demerge use the --usepgk option by default:
+
+# echo 'usepkg=yes' >> /etc/demerge.conf
+
+To disable colors:
+
+# echo 'nocolor=true' >> /etc/demerge.conf
+
+=head1 AUTHOR
+
+Christian Hartmann <ian@gentoo.org>
+
+=head1 CONTRIBUTORS
+
+Many thanks go out to all the people listed below:
+
+Wernfried Haas <amne@gentoo.org>
+
+Tobias Scherbaum <dertobi123@gentoo.org>
+
+Kalin Kozhuharov <me.kalin@gmail.com>
+
+Michael Cummings <mcummings@gentoo.org>
+
+Raul Porcel <armin76@gentoo.org>
+
+pille <pille@struction.de>
+
+=head1 LICENSE
+
+demerge - Revert to previous installation states.
+Copyright (C) 2007  Christian Hartmann
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut

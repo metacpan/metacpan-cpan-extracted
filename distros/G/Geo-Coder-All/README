@@ -1,0 +1,116 @@
+NAME
+Geo::Coder::All - Wrapper to Geocoders 
+SYNOPSIS
+    use Geo::Coder::All;
+    #For google geocoder
+    my $google_geocoder = Geo::Coder::All->new();#geocoder defaults to Geo::Coder::Google::V3
+    #You can also use optional params for google api
+    my $google_geocoder = Geo::Coder::All->new(key=>'GMAP_KEY',client=>'GMAP_CLIENT');
+
+    #For Bing
+    my $bing_geocoder = Geo::Coder::All->new(geocoder=>'Bing',key=>'BING_API_KEY');
+
+    #For Ovi
+    my $ovi_geocoder = Geo::Coder::All->new(geocoder=>'Ovi');
+
+    #For OSM
+    my $osm_geocoder = Geo::Coder::All->new(geocoder=>'OSM');
+
+    #For TomTom
+    my $tomtom_geocoder = Geo::Coder::All->new(geocoder=>'TomTom');
+
+DESCRIPTION
+Geo::Coder::All is wrapper for other geocoder cpan modules such as
+Geo::Coder::Google,Geo::Coder::Bing,Geo::Coder::Ovi,Geo::Coder::OSM and
+Geo::Coder::TomTom. Geo::Coder::All provides common geocode output
+format for all geocoder.
+
+METHODS
+
+geocode
+
+For Google geocoder , we can directly set the different geocoding options when calling geocode and reverse_geocode methods. i.e If you use Geo::Coder::Go    ogle you will have to create new instance every single time you need to change geocoding options 
+
+    $rh_location = $google_geocoder->geocode({location => 'London'});
+    #Following will return London from United Kingdom
+    #With geocoding options
+    #Following will return London from Canada as we used country_code => ca (country_code is ISO 3166-1 )
+    $rh_location = $google_geocoder->geocode({location => 'London',language=>'en',country_code=>'ca',encoding=>'utf8',sensor=>1});
+    #in spanish
+    $rh_location = $google_geocoder->geocode({location => 'London',language=>'es',country_code=>'ca',encoding=>'utf8',sensor=>1});
+    #default encodings is set to 'utf8' you can change to other such as 'latin1'
+    #You can also set DEGUB=>1 to dump raw response from the geocoder api
+
+
+You cal also set GMAP_KEY and GMAP_CLIENT directly from geocode/reverse_geocode method and it will just work
+
+reverse_geocode
+
+For Google reverse_geocoder
+
+    $rh_location = $google_geocoder->reverse_geocode({latlng=>'51.508515,-0.1254872',language=>'en',encoding=>'utf8',sensor=>1})
+    #in spanish
+    $rh_location = $google_geocoder->reverse_geocode({latlng=>'51.508515,-0.1254872',language=>'es',encoding=>'utf8',sensor=>1})
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Geo::Coder::All
+
+Issues
+	https://github.com/raigad/geo-coder-all/issues
+
+	
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 Rohit Deshmukh
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

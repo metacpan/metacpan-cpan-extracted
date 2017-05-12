@@ -1,0 +1,27 @@
+---
+abstract: 'Option parsing, done differently'
+author:
+  - 'Ryan P. Kelly <rpkelly@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Output: 0
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Getopt-Flex
+requires:
+  Carp: 0
+  Clone: 0
+  Hash::Merge: 0
+  Moose: 0
+  Moose::Meta::TypeConstraint: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::StrictConstructor: 0
+version: 1.07

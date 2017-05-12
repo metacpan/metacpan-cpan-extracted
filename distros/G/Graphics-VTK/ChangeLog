@@ -1,0 +1,2767 @@
+2003-02-01 08:06  tag Graphics-VTK-4_0_001
+
+2003-02-01 08:06  cerney
+
+	* Changes: Added changes file, which contains a summary of changes
+	in each of the releases.  
+
+2003-01-26 08:33  jcerney
+
+	* VTK.config.win32, Hybrid/Hybrid.xs: Updates to compile on win32
+	(mingw compiler) 
+
+2003-01-22 21:15  cerney
+
+	* VTK.config, VTK.config.redhat: Removed USE_MESA define. Not used
+	anymore for vtk 4.0 
+
+2003-01-22 21:13  cerney
+
+	* VTK.config.solaris: Updated solaris example config for building
+	with vtk 4.0 
+
+2003-01-14 20:08  cerney
+
+	* IO/IO.xs: Added file should have been added earlier 
+
+2003-01-14 19:44  cerney
+
+	* VTK.config, test.pl: Tweaked so tutorial test scrips would work
+	during make-test.  
+
+2002-11-24 14:54  cerney
+
+	* Makefile.PL, README, test.pl, examples/README,
+	examples/pipeline/financialField.pl: Getting test.pl to run with
+	the vtk4.0 changes 
+
+2002-11-24 13:48  cerney
+
+	* examples/README: Updated Docs 
+
+2002-11-24 13:21  cerney
+
+	* examples/: README, old_examples/README,
+	old_examples/contrib/ClippedCone.pl,
+	old_examples/contrib/InterpolationModes.pl,
+	old_examples/contrib/MassProperties.pl,
+	old_examples/contrib/OBJReader.pl,
+	old_examples/contrib/TestAsynchBuffer.pl,
+	old_examples/contrib/TestAsynchBuffer2.pl,
+	old_examples/contrib/TestChair.pl,
+	old_examples/contrib/TestImageBlockReader.pl,
+	old_examples/contrib/TestImageBlockWriter.pl,
+	old_examples/contrib/TestReslice.pl,
+	old_examples/contrib/TestResliceNoInterp.pl,
+	old_examples/contrib/TestResliceOptimizeOff.pl,
+	old_examples/contrib/TestResliceTricubic.pl,
+	old_examples/contrib/TestResliceWrap.pl,
+	old_examples/contrib/TestWarpReslice.pl,
+	old_examples/contrib/TextureReslice.pl,
+	old_examples/contrib/cellDerivs.pl,
+	old_examples/contrib/cubeAxes.pl, old_examples/contrib/dem.pl,
+	old_examples/contrib/earth.pl, old_examples/contrib/largeImage.pl,
+	old_examples/contrib/projTex.pl,
+	old_examples/contrib/reconstructSurface.pl,
+	old_examples/contrib/squadViewer.pl,
+	old_examples/contrib/subDivideTetra.pl,
+	old_examples/contrib/superquad.pl,
+	old_examples/contrib/thinPlateTransform.pl,
+	old_examples/contrib/video.pl,
+	old_examples/contrib/volProSimple.pl,
+	old_examples/graphics/3DMorph.pl,
+	old_examples/graphics/3dsToRIB.pl,
+	old_examples/graphics/AllWriters.pl,
+	old_examples/graphics/CSpline.pl, old_examples/graphics/CamBlur.pl,
+	old_examples/graphics/Canny.pl,
+	old_examples/graphics/CellDataToPointData.pl,
+	old_examples/graphics/ColorSph.pl, old_examples/graphics/Cone.pl,
+	old_examples/graphics/CustomInteraction.pl,
+	old_examples/graphics/Cylinder.pl,
+	old_examples/graphics/Decimate.pl,
+	old_examples/graphics/DelMesh.pl,
+	old_examples/graphics/Delaunay2D.pl,
+	old_examples/graphics/Delaunay2DAlpha.pl,
+	old_examples/graphics/Delaunay3D.pl, old_examples/graphics/Disk.pl,
+	old_examples/graphics/Hyper.pl, old_examples/graphics/InputStr.pl,
+	old_examples/graphics/InteractorDemo.pl,
+	old_examples/graphics/KSpline.pl, old_examples/graphics/LOx.pl,
+	old_examples/graphics/LOxGrid.pl,
+	old_examples/graphics/LOxGridAA.pl,
+	old_examples/graphics/LoopShrink.pl,
+	old_examples/graphics/MSquares.pl,
+	old_examples/graphics/MotBlur.pl,
+	old_examples/graphics/MultidimensionalSolution.pl,
+	old_examples/graphics/OBBCylinder.pl,
+	old_examples/graphics/OBBTree.pl, old_examples/graphics/OffAxis.pl,
+	old_examples/graphics/Peano.pl,
+	old_examples/graphics/Plot3DScalars.pl,
+	old_examples/graphics/Plot3DVectors.pl,
+	old_examples/graphics/PointLocator.pl,
+	old_examples/graphics/PolyDataMapperAllPoints.pl,
+	old_examples/graphics/PolyDataMapperAllPolygons.pl,
+	old_examples/graphics/PolyDataMapperAllWireframe.pl,
+	old_examples/graphics/RectilinearGridExtents.pl,
+	old_examples/graphics/RectilinearGridGeometry.pl,
+	old_examples/graphics/SelectionLoop.pl,
+	old_examples/graphics/SpatialRep.pl,
+	old_examples/graphics/SpatialRepAll.pl,
+	old_examples/graphics/StructuredGridExtents.pl,
+	old_examples/graphics/StructuredGridGeometry.pl,
+	old_examples/graphics/StructuredPointsExtents.pl,
+	old_examples/graphics/StructuredPointsGeometry.pl,
+	old_examples/graphics/TPlane.pl, old_examples/graphics/TPlane2.pl,
+	old_examples/graphics/TenAxes.pl,
+	old_examples/graphics/TenEllip.pl,
+	old_examples/graphics/TestCell.pl,
+	old_examples/graphics/TestChangeNumContours.pl,
+	old_examples/graphics/TestTubeCap.pl,
+	old_examples/graphics/TkInteractor.pl,
+	old_examples/graphics/TkRenderWidget.pl,
+	old_examples/graphics/VisQuad.pl,
+	old_examples/graphics/VolCutKnee.pl,
+	old_examples/graphics/VolIntermixProtein.pl,
+	old_examples/graphics/VolIsosurface.pl,
+	old_examples/graphics/VolMIP.pl, old_examples/graphics/WarpLens.pl,
+	old_examples/graphics/aniIso.pl,
+	old_examples/graphics/animVectors.pl,
+	old_examples/graphics/annotatePick.pl,
+	old_examples/graphics/appendCellData.pl,
+	old_examples/graphics/appendCells.pl,
+	old_examples/graphics/appendImplicitModel.pl,
+	old_examples/graphics/appendImplicitModelNoBounds.pl,
+	old_examples/graphics/asciiSTL.pl,
+	old_examples/graphics/assembly.pl,
+	old_examples/graphics/assembly2.pl,
+	old_examples/graphics/backdrop.pl,
+	old_examples/graphics/billBoard.pl, old_examples/graphics/blow.pl,
+	old_examples/graphics/bluntF.pl, old_examples/graphics/bluntStr.pl,
+	old_examples/graphics/bottle.pl,
+	old_examples/graphics/byuReader.pl,
+	old_examples/graphics/camera.pl, old_examples/graphics/camera2.pl,
+	old_examples/graphics/capCow.pl,
+	old_examples/graphics/capSphere.pl,
+	old_examples/graphics/cellCenters.pl,
+	old_examples/graphics/cellEdges.pl, old_examples/graphics/cells.pl,
+	old_examples/graphics/clipArt.pl, old_examples/graphics/clipCut.pl,
+	old_examples/graphics/clipPlane.pl,
+	old_examples/graphics/clipSphCyl.pl,
+	old_examples/graphics/clipSphere.pl,
+	old_examples/graphics/clipSphere2.pl,
+	old_examples/graphics/clipSphereWithImage.pl,
+	old_examples/graphics/clipTexPlane.pl,
+	old_examples/graphics/clipVolume.pl,
+	old_examples/graphics/clipVolume2.pl,
+	old_examples/graphics/closedSplines.pl,
+	old_examples/graphics/combColorIso.pl,
+	old_examples/graphics/combIso.pl, old_examples/graphics/combVol.pl,
+	old_examples/graphics/complexV.pl,
+	old_examples/graphics/coneResolution.pl,
+	old_examples/graphics/connPineRoot.pl,
+	old_examples/graphics/constrainedDelaunay.pl,
+	old_examples/graphics/contour2DAll.pl,
+	old_examples/graphics/contour3DAll.pl,
+	old_examples/graphics/contourCells.pl,
+	old_examples/graphics/contourMatrix.pl,
+	old_examples/graphics/contoursToSurface.pl,
+	old_examples/graphics/createBFont.pl,
+	old_examples/graphics/cubeEdges.pl,
+	old_examples/graphics/cubedSphere.pl,
+	old_examples/graphics/cursor3D.pl, old_examples/graphics/cut.pl,
+	old_examples/graphics/cutCells.pl,
+	old_examples/graphics/cutLoop.pl,
+	old_examples/graphics/cutModel.pl,
+	old_examples/graphics/cutPlane.pl, old_examples/graphics/cylMap.pl,
+	old_examples/graphics/datasetConnColorRegions.pl,
+	old_examples/graphics/deciFranFace.pl,
+	old_examples/graphics/deciHawa.pl,
+	old_examples/graphics/deciPineRoot.pl,
+	old_examples/graphics/deleted.pl, old_examples/graphics/dicer.pl,
+	old_examples/graphics/dispPlot.pl,
+	old_examples/graphics/dualfile.pl,
+	old_examples/graphics/edgePoints.pl,
+	old_examples/graphics/eleState.pl, old_examples/graphics/expCos.pl,
+	old_examples/graphics/expCos2.pl,
+	old_examples/graphics/extractD.pl,
+	old_examples/graphics/extractPolyData.pl,
+	old_examples/graphics/extractUGrid.pl,
+	old_examples/graphics/extractVectors.pl,
+	old_examples/graphics/faultLines.pl,
+	old_examples/graphics/fieldAttr.pl,
+	old_examples/graphics/fieldAttr2.pl,
+	old_examples/graphics/fieldToPolyData.pl,
+	old_examples/graphics/fieldToRGrid.pl,
+	old_examples/graphics/fieldToSGrid.pl,
+	old_examples/graphics/fieldToSPoints.pl,
+	old_examples/graphics/fieldToUGrid.pl,
+	old_examples/graphics/fieldfile.pl,
+	old_examples/graphics/financialField.pl,
+	old_examples/graphics/financialField2.pl,
+	old_examples/graphics/flamingo.pl, old_examples/graphics/fohe.pl,
+	old_examples/graphics/franFace.pl,
+	old_examples/graphics/frogSpleen.pl,
+	old_examples/graphics/geomFilter.pl,
+	old_examples/graphics/goblet.pl, old_examples/graphics/hawaii.pl,
+	old_examples/graphics/headSlic.pl, old_examples/graphics/hello.pl,
+	old_examples/graphics/iceCream.pl,
+	old_examples/graphics/imageWarp.pl,
+	old_examples/graphics/implicitCylinder.pl,
+	old_examples/graphics/implicitPlanes.pl,
+	old_examples/graphics/implicitVolume.pl,
+	old_examples/graphics/ironPIso.pl, old_examples/graphics/isoDel.pl,
+	old_examples/graphics/isoIntersect.pl,
+	old_examples/graphics/lineStrip.pl,
+	old_examples/graphics/loopCellColors.pl,
+	old_examples/graphics/loopCellColors2.pl,
+	old_examples/graphics/mace.pl, old_examples/graphics/macePara.pl,
+	old_examples/graphics/marching.pl,
+	old_examples/graphics/matchingSpheres.pl,
+	old_examples/graphics/mcTest.pl, old_examples/graphics/mccases.pl,
+	old_examples/graphics/mccasesui.pl,
+	old_examples/graphics/mcubes.pl,
+	old_examples/graphics/mergeDataObject.pl,
+	old_examples/graphics/mergeFilter.pl,
+	old_examples/graphics/mole.pl, old_examples/graphics/motor.pl,
+	old_examples/graphics/movePlane.pl,
+	old_examples/graphics/multipleIso.pl,
+	old_examples/graphics/multipleIsoThreshold.pl,
+	old_examples/graphics/office.pl,
+	old_examples/graphics/officeStreamPoints.pl,
+	old_examples/graphics/officeTube.pl,
+	old_examples/graphics/otherColorTransferFunction.pl,
+	old_examples/graphics/partialSphere.pl,
+	old_examples/graphics/pickCells.pl,
+	old_examples/graphics/piecewiseFunction.pl,
+	old_examples/graphics/pineRoot.pl, old_examples/graphics/plane.pl,
+	old_examples/graphics/pointToCellData.pl,
+	old_examples/graphics/polyConn.pl,
+	old_examples/graphics/polyConnClosestPoint.pl,
+	old_examples/graphics/polyConnColorRegions.pl,
+	old_examples/graphics/polyEx.pl,
+	old_examples/graphics/polyTexture.pl,
+	old_examples/graphics/polyViewer.pl,
+	old_examples/graphics/probe.pl, old_examples/graphics/probeComb.pl,
+	old_examples/graphics/probeImageData.pl,
+	old_examples/graphics/probeImageData2.pl,
+	old_examples/graphics/progGlyphs.pl,
+	old_examples/graphics/progGlyphsBySource.pl,
+	old_examples/graphics/propAssembly.pl,
+	old_examples/graphics/quadricCut.pl,
+	old_examples/graphics/rainbow.pl,
+	old_examples/graphics/randomCellColors.pl,
+	old_examples/graphics/randomVectors.pl,
+	old_examples/graphics/rectGrid.pl,
+	old_examples/graphics/rectGridMod.pl,
+	old_examples/graphics/recursiveDC.pl,
+	old_examples/graphics/reflect.pl,
+	old_examples/graphics/rendererSource.pl,
+	old_examples/graphics/resampledTexture.pl,
+	old_examples/graphics/reverse.pl,
+	old_examples/graphics/reverseCellNormals.pl,
+	old_examples/graphics/rot.pl, old_examples/graphics/rotations.pl,
+	old_examples/graphics/scalarColors.pl,
+	old_examples/graphics/scalarConn.pl,
+	old_examples/graphics/scalarMapping.pl,
+	old_examples/graphics/schwarz.pl,
+	old_examples/graphics/selectCellsWithPlane.pl,
+	old_examples/graphics/shepards.pl,
+	old_examples/graphics/simpleElevation.pl,
+	old_examples/graphics/skinOrder.pl,
+	old_examples/graphics/smoothCyl.pl,
+	old_examples/graphics/smoothLines.pl,
+	old_examples/graphics/socbal.pl, old_examples/graphics/spToPd.pl,
+	old_examples/graphics/specular.pl, old_examples/graphics/sphere.pl,
+	old_examples/graphics/sphereField.pl,
+	old_examples/graphics/sphereFlake.pl,
+	old_examples/graphics/sphereMap.pl,
+	old_examples/graphics/spikeColor.pl,
+	old_examples/graphics/spikeF.pl,
+	old_examples/graphics/splatFace.pl,
+	old_examples/graphics/spring.pl, old_examples/graphics/stCone.pl,
+	old_examples/graphics/stl.pl, old_examples/graphics/stocks.pl,
+	old_examples/graphics/streamV.pl, old_examples/graphics/strip.pl,
+	old_examples/graphics/stripF.pl,
+	old_examples/graphics/subPixelPositionMin.pl,
+	old_examples/graphics/subdivideCellColors.pl,
+	old_examples/graphics/subdivideCone.pl,
+	old_examples/graphics/subdividePointData.pl,
+	old_examples/graphics/subdivideTetra.pl,
+	old_examples/graphics/subdivideTexture.pl,
+	old_examples/graphics/surfVol.pl,
+	old_examples/graphics/sweptCurve.pl,
+	old_examples/graphics/tcutSph.pl,
+	old_examples/graphics/teapotHulls.pl,
+	old_examples/graphics/testTexThresh.pl,
+	old_examples/graphics/texThresh.pl,
+	old_examples/graphics/texTrans.pl, old_examples/graphics/text.pl,
+	old_examples/graphics/textOrigin.pl,
+	old_examples/graphics/texturedCube.pl,
+	old_examples/graphics/threshold.pl,
+	old_examples/graphics/thrshldV.pl,
+	old_examples/graphics/triangularTCoords.pl,
+	old_examples/graphics/triangularTexture.pl,
+	old_examples/graphics/triangulate.pl,
+	old_examples/graphics/ugFacet.pl, old_examples/graphics/vectext.pl,
+	old_examples/graphics/velProf.pl, old_examples/graphics/vib.pl,
+	old_examples/graphics/viewMCubesFile.pl,
+	old_examples/graphics/volCompareCompositeMethods.pl,
+	old_examples/graphics/volCompositeGrid.pl,
+	old_examples/graphics/volCylinderClipNormals.pl,
+	old_examples/graphics/volExercise.pl,
+	old_examples/graphics/volIsoTexture.pl,
+	old_examples/graphics/volMIPGrid.pl,
+	old_examples/graphics/volMultiLight.pl,
+	old_examples/graphics/volRainbow.pl,
+	old_examples/graphics/volSimple.pl,
+	old_examples/graphics/volSphereNormals.pl,
+	old_examples/graphics/volSubRegionNormals.pl,
+	old_examples/graphics/volTestClipRegions.pl,
+	old_examples/graphics/volTexSimple.pl,
+	old_examples/graphics/voxelModel.pl,
+	old_examples/graphics/vtkLogo.pl, old_examples/graphics/walkCow.pl,
+	old_examples/graphics/walls.pl, old_examples/graphics/warpComb.pl,
+	old_examples/imaging/Attenuation.pl,
+	old_examples/imaging/ButterworthHighPass.pl,
+	old_examples/imaging/Close.pl, old_examples/imaging/ColorPad.pl,
+	old_examples/imaging/ColorWrap.pl,
+	old_examples/imaging/ComponentPad.pl,
+	old_examples/imaging/ContinuousClose2D.pl,
+	old_examples/imaging/Cursor3D.pl, old_examples/imaging/Draw.pl,
+	old_examples/imaging/EnhanceEdges.pl,
+	old_examples/imaging/GaussianSmooth.pl,
+	old_examples/imaging/Gradient2D.pl,
+	old_examples/imaging/HSVColors.pl,
+	old_examples/imaging/HighPassComparison.pl,
+	old_examples/imaging/Histogram.pl,
+	old_examples/imaging/HybridMedianComparison.pl,
+	old_examples/imaging/IdealHighPass.pl,
+	old_examples/imaging/ImageGradient.pl,
+	old_examples/imaging/ImageLens.pl,
+	old_examples/imaging/LaplacianEdgeEnhance.pl,
+	old_examples/imaging/LaplacianSurfaceEnhance.pl,
+	old_examples/imaging/Magnify2D.pl,
+	old_examples/imaging/MandelbrotViewer.pl,
+	old_examples/imaging/ManualClip.pl,
+	old_examples/imaging/MedianComparison.pl,
+	old_examples/imaging/NonMaximumSuppression2D.pl,
+	old_examples/imaging/Pad.pl, old_examples/imaging/ScalarBar.pl,
+	old_examples/imaging/ShotNoiseInclude.pl,
+	old_examples/imaging/ShrinkStream.pl,
+	old_examples/imaging/Skeleton.pl, old_examples/imaging/Spectrum.pl,
+	old_examples/imaging/TestAccumulate.pl,
+	old_examples/imaging/TestAllFlips.pl,
+	old_examples/imaging/TestAllLogic.pl,
+	old_examples/imaging/TestAllMaskBits.pl,
+	old_examples/imaging/TestAllMathematics.pl,
+	old_examples/imaging/TestAllShrinks.pl,
+	old_examples/imaging/TestAllWriters.pl,
+	old_examples/imaging/TestAnisotropicDiffusion2D.pl,
+	old_examples/imaging/TestAnisotropicDiffusion3D.pl,
+	old_examples/imaging/TestAppend.pl,
+	old_examples/imaging/TestAppendComponents.pl,
+	old_examples/imaging/TestBlend.pl,
+	old_examples/imaging/TestButterworthHighPass.pl,
+	old_examples/imaging/TestButterworthLowPass.pl,
+	old_examples/imaging/TestBypass.pl,
+	old_examples/imaging/TestCache.pl,
+	old_examples/imaging/TestCanvasSource2D.pl,
+	old_examples/imaging/TestCast.pl,
+	old_examples/imaging/TestCast2.pl,
+	old_examples/imaging/TestCityBlockDistance.pl,
+	old_examples/imaging/TestClip.pl,
+	old_examples/imaging/TestComposite.pl,
+	old_examples/imaging/TestConstantPad.pl,
+	old_examples/imaging/TestContinuousDilate3D.pl,
+	old_examples/imaging/TestContinuousErode3D.pl,
+	old_examples/imaging/TestCorrelation.pl,
+	old_examples/imaging/TestDifference.pl,
+	old_examples/imaging/TestDilateErode3D.pl,
+	old_examples/imaging/TestDivergence.pl,
+	old_examples/imaging/TestDotProduct.pl,
+	old_examples/imaging/TestEuclideanToPolar.pl,
+	old_examples/imaging/TestExtractComponents.pl,
+	old_examples/imaging/TestFFT.pl, old_examples/imaging/TestFlip.pl,
+	old_examples/imaging/TestFourierCenter.pl,
+	old_examples/imaging/TestGaussianSmooth.pl,
+	old_examples/imaging/TestGaussianSource.pl,
+	old_examples/imaging/TestGradient.pl,
+	old_examples/imaging/TestGradientMagnitude.pl,
+	old_examples/imaging/TestHSVToRGB.pl,
+	old_examples/imaging/TestHybridMedian2D.pl,
+	old_examples/imaging/TestIdealHighPass.pl,
+	old_examples/imaging/TestIdealLowPass.pl,
+	old_examples/imaging/TestInPlaceFilter.pl,
+	old_examples/imaging/TestIslandRemoval2D.pl,
+	old_examples/imaging/TestLaplacian.pl,
+	old_examples/imaging/TestLogarithmicScale.pl,
+	old_examples/imaging/TestLogic.pl,
+	old_examples/imaging/TestLuminance.pl,
+	old_examples/imaging/TestMagnify.pl,
+	old_examples/imaging/TestMagnifyColor.pl,
+	old_examples/imaging/TestMagnitude.pl,
+	old_examples/imaging/TestMapToRGBA.pl,
+	old_examples/imaging/TestMapToRGBABlockStreaming.pl,
+	old_examples/imaging/TestMapToRGBAXSlabStreaming.pl,
+	old_examples/imaging/TestMapToRGBAYSlabStreaming.pl,
+	old_examples/imaging/TestMapToRGBAZSlabStreaming.pl,
+	old_examples/imaging/TestMask.pl,
+	old_examples/imaging/TestMask2.pl,
+	old_examples/imaging/TestMathematics.pl,
+	old_examples/imaging/TestMedian3D.pl,
+	old_examples/imaging/TestMirrorPad.pl,
+	old_examples/imaging/TestNoiseSource.pl,
+	old_examples/imaging/TestNonMaximumSuppression.pl,
+	old_examples/imaging/TestNormalize.pl,
+	old_examples/imaging/TestOpenClose3D.pl,
+	old_examples/imaging/TestPermute.pl,
+	old_examples/imaging/TestPoly.pl,
+	old_examples/imaging/TestQuantizeTo16Colors.pl,
+	old_examples/imaging/TestQuantizeTo64Colors.pl,
+	old_examples/imaging/TestRFFT.pl,
+	old_examples/imaging/TestRGBToHSV.pl,
+	old_examples/imaging/TestRange3D.pl,
+	old_examples/imaging/TestResample.pl,
+	old_examples/imaging/TestSeedConnectivity.pl,
+	old_examples/imaging/TestShiftScale.pl,
+	old_examples/imaging/TestShiftScale2.pl,
+	old_examples/imaging/TestShrink3D.pl,
+	old_examples/imaging/TestSinusoidSource.pl,
+	old_examples/imaging/TestSkeleton2D.pl,
+	old_examples/imaging/TestSobel2D.pl,
+	old_examples/imaging/TestSobel3D.pl,
+	old_examples/imaging/TestTIFFReader.pl,
+	old_examples/imaging/TestText.pl,
+	old_examples/imaging/TestThreshold.pl,
+	old_examples/imaging/TestTkImageWindowWidget.pl,
+	old_examples/imaging/TestTranslateExtent.pl,
+	old_examples/imaging/TestVariance3D.pl,
+	old_examples/imaging/TestViewerApp.pl,
+	old_examples/imaging/TestViewports.pl,
+	old_examples/imaging/TestWrapPad.pl,
+	old_examples/imaging/TestWriter.pl,
+	old_examples/imaging/TestWriterWithMemoryLimit1.pl,
+	old_examples/imaging/TestWriterWithMemoryLimit1000.pl,
+	old_examples/imaging/ThresholdBetween.pl,
+	old_examples/imaging/Timing.pl, old_examples/imaging/TkViewer.pl,
+	old_examples/imaging/TkViewer2.pl,
+	old_examples/imaging/VTKSpectrum.pl,
+	old_examples/imaging/Viewer.pl, old_examples/imaging/ViewerApp.pl,
+	old_examples/imaging/ViewerAppTkImageViewerInteractor.pl,
+	old_examples/imaging/WindowLevelInterface.pl,
+	old_examples/imaging/drawMesh.pl,
+	old_examples/imaging/labeledContours.pl,
+	old_examples/imaging/labeledMesh.pl,
+	old_examples/imaging/multiLineText.pl,
+	old_examples/imaging/plot.pl, old_examples/imaging/skinOrder.pl,
+	old_examples/imaging/vtkHistogramWidget.pl,
+	old_examples/imaging/vtkImageInclude.pl,
+	old_examples/imaging/xyPlot.pl, old_examples/patented/3DMorph.pl,
+	old_examples/patented/ParallelStream.pl,
+	old_examples/patented/ParallelStream2.pl,
+	old_examples/patented/TestGridSynchronizedTemplates3D.pl,
+	old_examples/patented/TestImageMarchingCubes.pl,
+	old_examples/patented/TestMarchingSquares.pl,
+	old_examples/patented/TestSynchronizedTemplates2D.pl,
+	old_examples/patented/TestSynchronizedTemplates3D.pl,
+	old_examples/patented/contour2DAll.pl,
+	old_examples/patented/dcubes.pl, old_examples/patented/deciFran.pl,
+	old_examples/patented/deciFranErrors.pl,
+	old_examples/patented/financialField.pl,
+	old_examples/patented/financialField2.pl,
+	old_examples/patented/genHead.pl,
+	old_examples/patented/genPineRoot.pl,
+	old_examples/patented/headBone.pl,
+	old_examples/patented/iceCream.pl,
+	old_examples/patented/imageMCAll.pl,
+	old_examples/patented/implicitCylinder.pl,
+	old_examples/patented/mcubes.pl, old_examples/patented/nc.pl,
+	old_examples/patented/rectGrid.pl,
+	old_examples/patented/smoothFran.pl,
+	old_examples/patented/splatFace.pl,
+	old_examples/patented/stripF2.pl,
+	old_examples/patented/sweepAuto.pl,
+	old_examples/patented/sweptVtk.pl,
+	old_examples/patented/thrshldV.pl,
+	old_examples/patented/uStripeF.pl: Moved old vtk3.2 examples to
+	their own separate directory.  
+
+2002-11-24 13:01  cerney
+
+	* examples/: README, makeExamples: All examples now work 
+
+2002-11-24 10:29  cerney
+
+	* examples/: makeExamples, tcl2perl,
+	VolumeRendering/SimpleRayCast.pl,
+	VolumeRendering/SimpleTextureMap2D.pl: All VolumeRendering examples
+	now work 
+
+2002-11-24 10:10  cerney
+
+	* examples/: README, makeExamples,
+	VisualizationAlgorithms/ClipCow.pl,
+	VisualizationAlgorithms/ColorIsosurface.pl,
+	VisualizationAlgorithms/CutCombustor.pl,
+	VisualizationAlgorithms/DepthSort.pl,
+	VisualizationAlgorithms/ExtractGeometry.pl,
+	VisualizationAlgorithms/ExtractUGrid.pl,
+	VisualizationAlgorithms/GenerateTextureCoords.pl,
+	VisualizationAlgorithms/SubsampleGrid.pl,
+	VisualizationAlgorithms/VisQuad.pl,
+	VisualizationAlgorithms/deciFran.pl,
+	VisualizationAlgorithms/imageWarp.pl,
+	VisualizationAlgorithms/officeTube.pl,
+	VisualizationAlgorithms/officeTubes.pl,
+	VisualizationAlgorithms/probeComb.pl,
+	VisualizationAlgorithms/smoothFran.pl,
+	VisualizationAlgorithms/spikeF.pl,
+	VisualizationAlgorithms/streamSurface.pl,
+	VisualizationAlgorithms/warpComb.pl: All VisualizationAlgorithms
+	examples now work 
+
+2002-11-24 09:53  cerney
+
+	* examples/: README, makeExamples, tcl2perl,
+	Tutorial/Step1/Cone.pl, Tutorial/Step2/Cone2.pl: All Tutorial
+	examples now work 
+
+2002-11-24 09:40  cerney
+
+	* examples/: Rendering/CSpline.pl, Rendering/RenderLargeImage.pl,
+	Rendering/TPlane.pl, Rendering/rainbow.pl, README, makeExamples,
+	tcl2perl: All Rendering examples now work 
+
+2002-11-24 09:34  cerney
+
+	* examples/Rendering/: CADPart.pl, Cylinder.pl, FilterCADPart.pl,
+	KeyFrame.pm, assembly.pl, keyBottle.pl: Some Rendering examples now
+	work 
+
+2002-11-23 14:21  cerney
+
+	* examples/: README, makeExamples, tcl2perl, Modelling/DelMesh.pl,
+	Modelling/Delaunay3D.pl, Modelling/constrainedDelaunay.pl,
+	Modelling/expCos.pl, Modelling/faultLines.pl, Modelling/hello.pl,
+	Modelling/iceCream.pl, Modelling/reconstructSurface.pl: Modeling
+	examples now work 
+
+2002-11-23 13:58  cerney
+
+	* examples/: README, makeExamples, IO/flamingo.pl, IO/stl.pl: IO
+	examples now work.  
+
+2002-11-23 13:52  cerney
+
+	* examples/: README, makeExamples,
+	ImageProcessing/HistogramWidget.pm: Image Processing examples now
+	work.  
+
+2002-11-23 13:49  cerney
+
+	* examples/ImageProcessing/: Contours2D.pl, Histogram.pl: Image
+	Processing examples mostly work 
+
+2002-11-21 21:29  cerney
+
+	* examples/: README, makeExamples, tcl2perl, GUI/Mace.pl,
+	GUI/MaceTk.pl: GUI examples converted.  
+
+2002-11-20 20:49  cerney
+
+	* examples/DataManipulation/: marching.pl, pointToCellData.pl: 
+	DataManipulation Examples work (some manually converted, see README) 
+
+2002-11-20 20:18  cerney
+
+	* examples/DataManipulation/: Arrays.pl, CreateStrip.pl,
+	FinancialField.pl: More Examples work 
+
+2002-11-17 13:14  cerney
+
+	* examples/: README, makeExamples, tcl2perl,
+	Annotation/TestText.pl, Annotation/annotatePick.pl,
+	Annotation/cubeAxes.pl, Annotation/labeledMesh.pl,
+	Annotation/multiLineText.pl, Annotation/textOrigin.pl,
+	Annotation/xyPlot.pl: vtk40 Annotation Examples now autoconvert and
+	work.  
+
+2002-11-17 10:41  cerney
+
+	* Common/Common.xs, parseVTKdir, parseWrap, examples/tcl2perl: 
+	Modified to add the AddObserver method to vtkObject, and the
+	vtkPerlCommand subclass.  
+
+2002-11-07 21:12  cerney
+
+	* examples/pipeline/financialField.pl: financialField.pl examples
+	now work 
+
+2002-11-05 21:10  cerney
+
+	* makeBindings, parseWrap, Common/Common.pm, Common/Common.xs,
+	Graphics/Graphics.pm, Graphics/Graphics.xs: Tweaked parseWrap to
+	produce more overloaded methods.  
+
+2002-11-05 16:08  cerney
+
+	* VTK.config, VTK.pm, makeBindings, parseWrap, Common/Common.pm,
+	Common/Common.xs, Graphics/Graphics.pm, Graphics/Graphics.xs,
+	Hybrid/Hybrid.pm, Hybrid/Hybrid.xs, IO/IO.pm,
+	Rendering/Rendering.pm, Rendering/Rendering.xs,
+	Tk/vtkImageViewer/vtkImageViewer.pm,
+	Tk/vtkInteractor/vtkInteractor.pm: Most examples now work, except
+	for financialField.  
+
+2002-11-05 13:35  cerney
+
+	* Tk/pTk/mTk/vtkTcl/: vtkTkImageViewerWidget.cxx,
+	vtkTkRenderWidget.cxx, vtkXRenderWindowTclInteractor.cxx,
+	vtkXRenderWindowTclInteractor.h: Tk files updated for changes made
+	in from vtk3.2 to 4.0.  (Possibly updates from 3.1 to 3.2 not
+	incorporated???) 
+
+2002-11-05 12:48  cerney
+
+	* Tk/pTk/mTk/vtkTcl/: vtkTkImageViewerWidget.cxx,
+	vtkTkImageViewerWidget.h, vtkTkImageWindowWidget.cxx,
+	vtkTkImageWindowWidget.h, vtkTkRenderWidget.cxx,
+	vtkTkRenderWidget.h, vtkXRenderWindowTclInteractor.cxx,
+	vtkXRenderWindowTclInteractor.h: Changed from vtk 3.2 to vtk4.0
+	merged, from separate cvs module PerlVTK_tkFiles. (Not tested yet) 
+
+2002-11-04 17:18  cerney
+
+	* VTK.config, VTK.pm, cmakeParse, makeBindings,
+	Rendering/Rendering.pm, Rendering/Rendering.xs,
+	Rendering/typemapRendering: All libs compile. Tk-releated files are
+	not.  Looks like vtkXRenderWindowTCLinteractor.cxx needs to be
+	updated for the changes made in vtk40 
+
+2002-11-04 11:48  cerney
+
+	* VTK.config, VTK.pm, cmakeParse, makeBindings, parseVTKdir,
+	Hybrid/Hybrid.pm, Hybrid/Hybrid.xs, Hybrid/Makefile.PL,
+	Hybrid/typemapHybrid: Hybrid lib now compiles 
+
+2002-11-04 10:30  cerney
+
+	* VTK.pm, cmakeParse, makeBindings, parseWrap, IO/IO.pm,
+	IO/Makefile.PL, IO/typemapIO: IO lib now compiles 
+
+2002-11-04 10:06  cerney
+
+	* VTK.pm, cmakeParse, makeBindings, Patented/Patented.pm,
+	Patented/Patented.xs: Patented lib now compiles 
+
+2002-11-04 10:03  cerney
+
+	* VTK.pm, cmakeParse, makeBindings, parseWrap,
+	Filtering/Filtering.pm, Filtering/Filtering.xs,
+	Filtering/Makefile.PL, Filtering/typemapFiltering: Filtering lib
+	now compiles 
+
+2002-11-03 21:25  cerney
+
+	* VTK.config, VTK.pm, makeBindings, parseVTKdir, parseWrap,
+	Rendering/Makefile.PL, Rendering/Rendering.pm,
+	Rendering/Rendering.xs, Rendering/typemapRendering: New Rendering
+	Lib dir now compiles.  
+
+2002-11-03 09:29  cerney
+
+	* VTK.pm, cmakeParse, makeBindings, parseVTKdir,
+	Imaging/Imaging.pm, Imaging/Imaging.xs, Imaging/typemapImaging: 
+	Imaging directory now compiles 
+
+2002-11-01 19:31  cerney
+
+	* VTK.pm, makeBindings, parseWrap, Common/Common.pm,
+	Graphics/Graphics.pm: Setup a flag in the singleArrayFunction to
+	allow const single arrays args for  non-overloaded functions. In
+	these cases, we can handle them. For cases where  they are in
+	overloaded functions, we still can't.  
+
+2002-10-28 09:08  cerney
+
+	* VTK.pm, makeBindings, parseWrap, Graphics/Graphics.pm,
+	Graphics/Graphics.xs: vtkPrint2 Band-aid section updated so that
+	Graphics.xs no compiles. There appears to be some single-array
+	functions that are being skipped (like vtkOBBTree::InsideOrOutside)
+	that could be handled.  
+
+2002-10-27 20:41  cerney
+
+	* parseWrap, Common/Common.xs: Updated to handle overloaded methods
+	where some methods are static and others are non-static.  
+
+2002-10-22 20:45  cerney
+
+	* parseWrap, Common/Common.pm, Common/Common.xs: Updated to reject
+	arg types 106 (long pointers) directly. This is to reject 'vtkIdType
+	&' args. vtkPrint2 parses these as 'long &' types, so we have to
+	resort to using the arg type numbers to reject functions with these
+	args.  
+
+2002-10-20 15:40  cerney
+
+	* parseWrap, Common/Common.pm, Common/Common.xs: Updated to not
+	parse methods that return void pointers. Updated to parse static
+	methods correctly (i.e. call statically, without the THIS->) 
+
+2002-10-20 10:54  cerney
+
+	* parseVTKdir, Common/Common.pm, Common/Common.xs: Trying to get
+	the Common.c file to compile.  
+
+2002-10-20 10:15  cerney
+
+	* parseWrap: Tweaks to parseWrap to recognize single array return
+	types. 'xsubpp' now parses Common.xs without barfing.  
+
+2002-10-20 09:35  cerney
+
+	* typemap: Fixed typemap 
+
+2002-10-20 09:18  cerney
+
+	* parseWrap, Common/Common.xs: Modified to not use PPCODE sections
+	in xs code. These are now emulated wih CODE sections and some extra
+	XS macros. For some reason, xsubpp did not like PPCODE sections in
+	multiple CASE section in a XS function. This made overridden methods
+	that return a list of values (e.g. vtkDataArray::GetRange)
+	impossible to implement in XS code.  
+
+2002-10-19 10:25  cerney
+
+	* VTK.pm, cmakeParse, makeBindings, parseVTKdir, parseWrap,
+	Common/Common.pm, Common/Common.xs, Common/typemapCommon,
+	Graphics/Graphics.pm, Graphics/Graphics.xs,
+	Graphics/typemapGraphics: Trying to get the newly parsed Common.xs
+	to compile. Added code to parseWrap to reject singleArray functions
+	that now seem to be tcl wraped in vtk 40, but we can't handle yet.  
+
+2002-10-13 20:11  cerney
+
+	* VTK.config, VTK.pm, cmakeParse, makeBindings, parseVTKdir,
+	Graphics/Graphics.pm, Graphics/Graphics.xs,
+	Graphics/typemapGraphics: Initial pass at generation the Graphics
+	diretory for VTK 4.0 
+
+2002-09-28 16:24  cerney
+
+	* test.pl: Corrected typo in calling-out squad viewer.  
+
+2002-09-17 21:16  tag Graphics-VTK-3_2_001
+
+2002-09-17 21:16  cerney
+
+	* README: More doco updates 
+
+2002-09-17 20:19  cerney
+
+	* README: Updated docs` 
+
+2002-09-17 20:17  cerney
+
+	* README: doco fix 
+
+2002-08-04 12:20  cerney
+
+	* examples/examplesTODO: Updated tasks.  
+
+2002-08-03 16:06  cerney
+
+	* VTK/Pipeline.pm: Discovered the vtk pipline doesn't display
+	vtkCubeAxes2D objects in the pipeline. This object doesn't appear to
+	make it to the renderers actors list. (i.e.  $renderCollection =
+	$render->getActors doesn't include the vtkCubeAxes2D object) 
+
+2002-08-02 14:39  cerney
+
+	* README: Added comment about the glibc pthread hangup problem and
+	the LD_PRELOAD workaround 
+
+2002-08-02 14:29  cerney
+
+	* test.pl, VTK/Pipeline.pm, examples/README,
+	examples/pipeline/Cone.pl, examples/pipeline/financialField.pl: 
+	Added pipline browser to the main distribution.  
+
+2002-08-01 20:47  cerney
+
+	* parseWrap, Common/Common.xs: Special cased the vtkObject::Print
+	method into Common.xs. Note that this method's use of ostrstreams
+	can cause pthread deadlocks under glibc/gcc, if perl has not been
+	linked with libpthread. Setting LD_PRELOAD=libpthread.so environment
+	var is a workaround fix for this problem.  
+
+2002-06-27 21:04  cerney
+
+	* Tk/Tk.pm: Removed the use PDL::Lite.  Added some pod docs.  
+
+2002-06-27 19:41  cerney
+
+	* parseWrap, Common/Common.xs, Graphics/Graphics.xs: Changed to
+	check for the executeMethodList not having an element, and creating
+	one if one doesn't exist. This can create a memory leak, where sub
+	refs are not destroyed, if the VTK object wasn't created in perl.
+	(i.e. created by VTK). This should not cause a big problem, because
+	the sub refs are not created often.  
+
+2002-06-07 16:10  cerney
+
+	* parseWrap, Common/Common.pm, Graphics/Graphics.pm,
+	Imaging/Imaging.pm, Patented/Patented.pm: Fixed class names not
+	showing up in the pod docs 
+
+2002-05-25 08:20  cerney
+
+	* examples/: Cube.pl, Mace.pl, MotBlur.pl, contQuad.pl,
+	medical1.pl, stl.pl, vtkLogo.pl: Removed example files that are not
+	used anymore.  
+
+2002-05-21 14:35  cerney
+
+	* Tk/: Makefile.PL, vtkGlue/Makefile.PL,
+	vtkImageViewer/Makefile.PL, vtkImageWindow/Makefile.PL,
+	vtkInteractor/Makefile.PL: Updated Makefile.PL's to pick up the
+	options set at the top-level Makefile.PL more consistently.  
+
+2002-05-19 17:19  cerney
+
+	* README, VTK.config, VTK.config.redhat, VTK.config.solaris,
+	VTK.config.win32: doc and comment updates 
+
+2002-05-10 17:51  cerney
+
+	* MANIFEST: Removed MANIFEST. Not needed with CVS control 
+
+2002-05-10 17:40  cerney
+
+	* parseWrap: Commented-out dataarray references so that other
+	people can run without having the DataArray package.  
+
+2002-05-10 17:37  cerney
+
+	* VTK.config, VTK.config.redhat, VTK.config.solaris,
+	VTK.config.win32, parseWrap, Common/Common.pm,
+	Graphics/Graphics.pm, Imaging/Imaging.pm, Patented/Patented.pm: 
+	Removed unneeded stuff in .pm files 
+
+2002-05-10 15:56  cerney
+
+	* test.pl, examples/README: Removed examples that don't
+	consistently work 
+
+2002-05-10 15:23  A0182636
+
+	* VTK.config.win32: Added config file for win32 
+
+2002-05-10 15:22  A0182636
+
+	* test.pl: Fixed Typo 
+
+2002-05-09 19:53  cerney
+
+	* Makefile.PL, VTK.config, VTK.config.redhat, VTK.config.solaris,
+	makeBindings, parseVTKdir, Graphics/Graphics.pm,
+	Graphics/Graphics.xs, Graphics/typemapGraphics, Imaging/Imaging.pm,
+	Imaging/Imaging.xs, Imaging/typemapImaging: Fixed the
+	PERL_DL_NONLAZY problem during make test for linux. Needs to be
+	tested on win32 and solaris 
+
+2002-05-04 17:41  cerney
+
+	* Makefile.PL, README, VTK.config, VTK.pm, parseVTKdir, parseWrap,
+	Common/Common.pm, Graphics/Graphics.pm, Imaging/Imaging.pm,
+	Patented/Patented.pm, Tk/Makefile.PL, Tk/pTk/Makefile.PL,
+	examples/README: Made version numbers all consistent thruout.  
+
+2002-04-21 20:54  cerney
+
+	* test.pl: Add script to run thru all known good examples 
+
+2002-04-20 17:19  cerney
+
+	* VTK.config.redhat: Changed for vtk3.2 
+
+2002-04-19 13:02  cerney
+
+	* VTK.config.solaris, typemap: Modified to compile on Solaris.  
+
+2002-04-19 07:38  cerney
+
+	* VTK.config.redhat, VTK.config.solaris: Added sample config files.  
+
+2002-04-16 21:07  cerney
+
+	* Tk/pTk/mTk/vtkTcl/: vtkTkImageViewerWidget.cxx,
+	vtkTkImageWindowWidget.cxx: More Mods to widgets to work under
+	Tk800.023 
+
+2002-04-16 20:12  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.cxx,
+	examples/README: Modified to work under linux after mods to compile
+	under win32.  
+
+2002-04-16 20:12  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx: Modified to work under
+	Tk800.023. Reference counting has changed with this Tk release.
+	Tcl_SetObjectResult used to increment the reference count, now it
+	doesn't. Change GetRenderWindow to use act like a cget(-rw) call to
+	avoid this problem.  
+
+2002-04-16 20:09  cerney
+
+	* makeBindings, parseVTKdir, parseWrap: Modified to make bindings
+	that will compile on win32.  
+
+2002-04-08 18:45  A0182636
+
+	* Tk/Tk.pm: Mods so example scripts don't lockup when pressing the
+	'q' button on win32.  
+
+2002-04-04 21:05  A0182636
+
+	* Patented/Patented.xs, Tk/Makefile.PL, Tk/Tk.xs,
+	Tk/pTk/Makefile.PL, Tk/pTk/mTk/vtkTcl/tkWinX.c,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageWindowWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.cxx,
+	Tk/vtkGlue/Makefile.PL, Tk/vtkGlue/vtkGlue.cpp,
+	Tk/vtkImageViewer/Makefile.PL, Tk/vtkImageViewer/vtkImageViewer.xs,
+	Tk/vtkImageWindow/Makefile.PL, Tk/vtkImageWindow/vtkImageWindow.xs,
+	Tk/vtkInteractor/Makefile.PL, Tk/vtkInteractor/vtkInteractor.xs: 
+	Now Compiles on win32 (using mingw32 and a ming32-built vtk) Changes
+	made to compile are untested on Unix.  
+
+2002-03-31 08:49  A0182636
+
+	* typemap: Changes to compile under win32 
+
+2002-03-31 08:20  A0182636
+
+	* Common/Common.pm, Common/Common.xs, Common/typemapCommon,
+	Graphics/Graphics.pm, Graphics/Graphics.xs,
+	Graphics/typemapGraphics, Imaging/Imaging.pm, Imaging/Imaging.xs,
+	Imaging/typemapImaging: Now Compiles on win32 
+
+2002-03-09 21:56  cerney
+
+	* VTK.config, VTK.pm, makeBindings, parseVTKdir, parseWrap,
+	typemap, Common/Common.pm, Common/Common.xs, Graphics/Graphics.pm,
+	Graphics/Graphics.xs, Imaging/Imaging.pm, Imaging/Imaging.xs,
+	Patented/Patented.pm, Patented/Patented.xs: Removed dependencies on
+	PDL. Was not being used anyway, with the transformation of the
+	package to be like the tcl bindings to VTK.  
+
+2002-03-09 09:38  cerney
+
+	* makeBindings, Graphics/Graphics.pm, Graphics/Graphics.xs,
+	Graphics/typemapGraphics, Imaging/Imaging.pm, Imaging/Imaging.xs,
+	Imaging/typemapImaging, Tk/vtkImageWindow/vtkImageWindow.pm: All
+	known good examples now work with the changed namespace to
+	Graphics::VTK 
+
+2002-03-03 18:28  cerney
+
+	* Tk/vtkGlue/vtkGlue.cpp, Tk/vtkImageViewer/vtkImageViewer.pm,
+	Tk/vtkInteractor/vtkInteractor.pm, VTK/Colors.pm: Known good
+	examples in examples/graphics now work. Imaging ones don't 
+
+2002-03-02 07:54  cerney
+
+	* VTK.pm, makeBindings, parseWrap, typemap, Common/Common.pm,
+	Common/Common.xs, Graphics/Graphics.pm, Graphics/Graphics.xs,
+	Imaging/Imaging.pm, Imaging/Imaging.xs, Patented/Patented.pm,
+	Patented/Patented.xs, Tk/Tk.pm, Tk/Tk.xs, Tk/vtkGlue/vtkGlue.cpp: 
+	Started removal of leading 'vtk' from class names. Tk not totally
+	done. Examples not updated yet.  
+
+2002-03-02 07:39  cerney
+
+	* Tk/vTkGlue.cpp: File not needed 
+
+2002-03-01 08:17  cerney
+
+	* Makefile.PL, VTK.pm, makeBindings, parseVTKdir, parseWrap,
+	typemap, Common/Common.pm, Common/Common.xs, Common/Makefile.PL,
+	Graphics/Graphics.pm, Graphics/Graphics.xs, Graphics/Makefile.PL,
+	Imaging/Imaging.pm, Imaging/Imaging.xs, Imaging/Makefile.PL,
+	Patented/Makefile.PL, Patented/Patented.pm, Patented/Patented.xs,
+	Tk/Makefile.PL, Tk/Tk.pm, Tk/Tk.xs, Tk/Tk/vtkInt.pm,
+	Tk/vtkGlue/Makefile.PL, Tk/vtkImageViewer/Makefile.PL,
+	Tk/vtkImageViewer/vtkImageViewer.pm,
+	Tk/vtkImageViewer/vtkImageViewer.xs, Tk/vtkImageWindow/Makefile.PL,
+	Tk/vtkImageWindow/vtkImageWindow.pm,
+	Tk/vtkImageWindow/vtkImageWindow.xs, Tk/vtkInteractor/Makefile.PL,
+	Tk/vtkInteractor/vtkInteractor.pm,
+	Tk/vtkInteractor/vtkInteractor.xs: Changed Namespace from VTK to
+	Graphics::VTK. Examples not updated yet 
+
+2002-02-24 17:55  cerney
+
+	* VTK.config, VTK.pm, makeBindings, Common/Common.pm,
+	Common/Common.xs, Common/typemapCommon, Graphics/Graphics.pm,
+	Graphics/Graphics.xs, Graphics/Makefile.PL,
+	Graphics/typemapGraphics, Imaging/Imaging.pm, Imaging/Imaging.xs,
+	Imaging/Makefile.PL, Imaging/typemapImaging, Patented/Patented.pm,
+	Patented/Patented.xs: Now Compiles with VTK 3.2 
+
+2002-02-24 09:17  tag VTK_31
+
+2002-02-24 09:17  cerney
+
+	* MANIFEST, Makefile.PL, VTK.config, VTK.pm, VTK.xs, makeBindings,
+	parseVTKdir, parseWrap, typemap, Common/Common.pm,
+	Common/Common.xs, Common/Makefile.PL, Common/typemapCommon,
+	Graphics/Graphics.pm, Graphics/Graphics.xs, Graphics/Makefile.PL,
+	Graphics/typemapGraphics, Imaging/Imaging.pm, Imaging/Imaging.xs,
+	Imaging/Makefile.PL, Imaging/typemapImaging, Patented/Makefile.PL,
+	Patented/Patented.pm, Patented/Patented.xs,
+	Patented/typemapPatented, Tk/Makefile.PL, Tk/Tk.pm, Tk/Tk.xs,
+	Tk/myConfig, Tk/vTkGlue.cpp, Tk/Tk/vtkInt.pm, Tk/pTk/Makefile.PL,
+	Tk/pTk/Tcl-pTk, Tk/pTk/chext, Tk/pTk/counts, Tk/pTk/defs,
+	Tk/pTk/fakeld, Tk/pTk/findX, Tk/pTk/findcore, Tk/pTk/findstrings,
+	Tk/pTk/from, Tk/pTk/genexc, Tk/pTk/license.html_lib,
+	Tk/pTk/license.terms, Tk/pTk/makeenglish, Tk/pTk/mkXinfo,
+	Tk/pTk/mkmethods, Tk/pTk/mkneed, Tk/pTk/p4e, Tk/pTk/process_object,
+	Tk/pTk/refs, Tk/pTk/tdiff, Tk/pTk/vtkTkport.h, Tk/pTk/why,
+	Tk/pTk/mTk/README, Tk/pTk/mTk/vtkTcl/pTk.exc,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageWindowWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageWindowWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.h,
+	Tk/pod/Makefile.PL, Tk/vtkGlue/Makefile.PL, Tk/vtkGlue/vtkGlue.cpp,
+	Tk/vtkImageViewer/Makefile.PL, Tk/vtkImageViewer/vtkImageViewer.pm,
+	Tk/vtkImageViewer/vtkImageViewer.xs, Tk/vtkImageWindow/Makefile.PL,
+	Tk/vtkImageWindow/vtkImageWindow.pm,
+	Tk/vtkImageWindow/vtkImageWindow.xs, Tk/vtkInteractor/Makefile.PL,
+	Tk/vtkInteractor/vtkInteractor.pm,
+	Tk/vtkInteractor/vtkInteractor.xs, VTK/Colors.pm,
+	VTK/vtk3DSImporter.pm, VTK/vtkAbstractMapper.pm,
+	VTK/vtkAbstractMapper3D.pm, VTK/vtkActor.pm, VTK/vtkActor2D.pm,
+	VTK/vtkActor2DCollection.pm, VTK/vtkActorCollection.pm,
+	VTK/vtkAppendFilter.pm, VTK/vtkAppendPolyData.pm,
+	VTK/vtkApproximatingSubdivisionFilter.pm, VTK/vtkAssembly.pm,
+	VTK/vtkAssemblyPaths.pm, VTK/vtkAttributeData.pm,
+	VTK/vtkAttributeDataToFieldDataFilter.pm, VTK/vtkAxes.pm,
+	VTK/vtkAxisActor2D.pm, VTK/vtkBMPReader.pm, VTK/vtkBMPWriter.pm,
+	VTK/vtkBYUReader.pm, VTK/vtkBYUWriter.pm, VTK/vtkBitArray.pm,
+	VTK/vtkBooleanTexture.pm, VTK/vtkBrownianPoints.pm,
+	VTK/vtkButterflySubdivisionFilter.pm, VTK/vtkCamera.pm,
+	VTK/vtkCardinalSpline.pm, VTK/vtkCastToConcrete.pm, VTK/vtkCell.pm,
+	VTK/vtkCellArray.pm, VTK/vtkCellCenters.pm, VTK/vtkCellData.pm,
+	VTK/vtkCellDataToPointData.pm, VTK/vtkCellLinks.pm,
+	VTK/vtkCellLocator.pm, VTK/vtkCellPicker.pm, VTK/vtkCellTypes.pm,
+	VTK/vtkCharArray.pm, VTK/vtkCleanPolyData.pm,
+	VTK/vtkClipPolyData.pm, VTK/vtkClipVolume.pm, VTK/vtkCollection.pm,
+	VTK/vtkColorTransferFunction.pm, VTK/vtkCone.pm,
+	VTK/vtkConeSource.pm, VTK/vtkConnectivityFilter.pm,
+	VTK/vtkContourFilter.pm, VTK/vtkContourValues.pm,
+	VTK/vtkCoordinate.pm, VTK/vtkCubeSource.pm,
+	VTK/vtkCullerCollection.pm, VTK/vtkCursor3D.pm, VTK/vtkCutter.pm,
+	VTK/vtkCylinder.pm, VTK/vtkCylinderSource.pm,
+	VTK/vtkDashedStreamLine.pm, VTK/vtkDataArray.pm,
+	VTK/vtkDataObject.pm, VTK/vtkDataObjectReader.pm,
+	VTK/vtkDataObjectSource.pm, VTK/vtkDataObjectToDataSetFilter.pm,
+	VTK/vtkDataObjectWriter.pm, VTK/vtkDataReader.pm,
+	VTK/vtkDataSet.pm, VTK/vtkDataSetAttributes.pm,
+	VTK/vtkDataSetCollection.pm, VTK/vtkDataSetMapper.pm,
+	VTK/vtkDataSetReader.pm, VTK/vtkDataSetSource.pm,
+	VTK/vtkDataSetToDataObjectFilter.pm,
+	VTK/vtkDataSetToDataSetFilter.pm,
+	VTK/vtkDataSetToPolyDataFilter.pm,
+	VTK/vtkDataSetToStructuredGridFilter.pm,
+	VTK/vtkDataSetToStructuredPointsFilter.pm,
+	VTK/vtkDataSetToUnstructuredGridFilter.pm, VTK/vtkDataSetWriter.pm,
+	VTK/vtkDataWriter.pm, VTK/vtkDecimate.pm, VTK/vtkDecimatePro.pm,
+	VTK/vtkDelaunay2D.pm, VTK/vtkDelaunay3D.pm, VTK/vtkDicer.pm,
+	VTK/vtkDirectory.pm, VTK/vtkDiskSource.pm, VTK/vtkDividingCubes.pm,
+	VTK/vtkDoubleArray.pm, VTK/vtkDynamicLoader.pm,
+	VTK/vtkEdgePoints.pm, VTK/vtkEdgeTable.pm,
+	VTK/vtkElevationFilter.pm, VTK/vtkEmptyCell.pm,
+	VTK/vtkEncodedGradientEstimator.pm,
+	VTK/vtkEncodedGradientShader.pm, VTK/vtkExporter.pm,
+	VTK/vtkExtractEdges.pm, VTK/vtkExtractGeometry.pm,
+	VTK/vtkExtractGrid.pm, VTK/vtkExtractPolyDataGeometry.pm,
+	VTK/vtkExtractTensorComponents.pm,
+	VTK/vtkExtractUnstructuredGrid.pm, VTK/vtkExtractVOI.pm,
+	VTK/vtkExtractVectorComponents.pm, VTK/vtkFeatureEdges.pm,
+	VTK/vtkFieldData.pm, VTK/vtkFieldDataToAttributeDataFilter.pm,
+	VTK/vtkFiniteDifferenceGradientEstimator.pm, VTK/vtkFloatArray.pm,
+	VTK/vtkFloatNormals.pm, VTK/vtkFloatPoints.pm,
+	VTK/vtkFloatScalars.pm, VTK/vtkFloatTCoords.pm,
+	VTK/vtkFloatTensors.pm, VTK/vtkFloatVectors.pm, VTK/vtkFollower.pm,
+	VTK/vtkFrustumCoverageCuller.pm, VTK/vtkGaussianSplatter.pm,
+	VTK/vtkGeneralTransform.pm,
+	VTK/vtkGeneralTransformConcatenation.pm,
+	VTK/vtkGeneralTransformInverse.pm, VTK/vtkGenericCell.pm,
+	VTK/vtkGeometryFilter.pm, VTK/vtkGlyph3D.pm,
+	VTK/vtkGraphicsFactory.pm, VTK/vtkGridSynchronizedTemplates3D.pm,
+	VTK/vtkHedgeHog.pm, VTK/vtkHexahedron.pm, VTK/vtkHull.pm,
+	VTK/vtkHyperStreamline.pm, VTK/vtkIVExporter.pm,
+	VTK/vtkIdFilter.pm, VTK/vtkIdList.pm, VTK/vtkImageAccumulate.pm,
+	VTK/vtkImageAnisotropicDiffusion2D.pm,
+	VTK/vtkImageAnisotropicDiffusion3D.pm, VTK/vtkImageAppend.pm,
+	VTK/vtkImageAppendComponents.pm, VTK/vtkImageBlend.pm,
+	VTK/vtkImageButterworthHighPass.pm,
+	VTK/vtkImageButterworthLowPass.pm, VTK/vtkImageCacheFilter.pm,
+	VTK/vtkImageCanvasSource2D.pm, VTK/vtkImageCast.pm,
+	VTK/vtkImageCityBlockDistance.pm, VTK/vtkImageClip.pm,
+	VTK/vtkImageComposite.pm, VTK/vtkImageConnector.pm,
+	VTK/vtkImageConstantPad.pm, VTK/vtkImageContinuousDilate3D.pm,
+	VTK/vtkImageContinuousErode3D.pm, VTK/vtkImageCorrelation.pm,
+	VTK/vtkImageCursor3D.pm, VTK/vtkImageData.pm,
+	VTK/vtkImageDataStreamer.pm, VTK/vtkImageDecomposeFilter.pm,
+	VTK/vtkImageDifference.pm, VTK/vtkImageDilateErode3D.pm,
+	VTK/vtkImageDivergence.pm, VTK/vtkImageDotProduct.pm,
+	VTK/vtkImageEllipsoidSource.pm, VTK/vtkImageEuclideanToPolar.pm,
+	VTK/vtkImageExport.pm, VTK/vtkImageExtractComponents.pm,
+	VTK/vtkImageFFT.pm, VTK/vtkImageFilter.pm, VTK/vtkImageFlip.pm,
+	VTK/vtkImageFourierCenter.pm, VTK/vtkImageFourierFilter.pm,
+	VTK/vtkImageGaussianSmooth.pm, VTK/vtkImageGaussianSource.pm,
+	VTK/vtkImageGradient.pm, VTK/vtkImageGradientMagnitude.pm,
+	VTK/vtkImageHSVToRGB.pm, VTK/vtkImageHybridMedian2D.pm,
+	VTK/vtkImageIdealHighPass.pm, VTK/vtkImageIdealLowPass.pm,
+	VTK/vtkImageImport.pm, VTK/vtkImageInPlaceFilter.pm,
+	VTK/vtkImageIslandRemoval2D.pm, VTK/vtkImageIterateFilter.pm,
+	VTK/vtkImageLaplacian.pm, VTK/vtkImageLogarithmicScale.pm,
+	VTK/vtkImageLogic.pm, VTK/vtkImageLuminance.pm,
+	VTK/vtkImageMagnify.pm, VTK/vtkImageMagnitude.pm,
+	VTK/vtkImageMandelbrotSource.pm, VTK/vtkImageMapToColors.pm,
+	VTK/vtkImageMapToRGBA.pm, VTK/vtkImageMapper.pm,
+	VTK/vtkImageMarchingCubes.pm, VTK/vtkImageMask.pm,
+	VTK/vtkImageMaskBits.pm, VTK/vtkImageMathematics.pm,
+	VTK/vtkImageMedian3D.pm, VTK/vtkImageMirrorPad.pm,
+	VTK/vtkImageMultipleInputFilter.pm, VTK/vtkImageNoiseSource.pm,
+	VTK/vtkImageNonMaximumSuppression.pm, VTK/vtkImageNormalize.pm,
+	VTK/vtkImageOpenClose3D.pm, VTK/vtkImagePadFilter.pm,
+	VTK/vtkImagePermute.pm, VTK/vtkImageQuantizeRGBToIndex.pm,
+	VTK/vtkImageRFFT.pm, VTK/vtkImageRGBToHSV.pm,
+	VTK/vtkImageRange3D.pm, VTK/vtkImageReader.pm,
+	VTK/vtkImageResample.pm, VTK/vtkImageSeedConnectivity.pm,
+	VTK/vtkImageShiftScale.pm, VTK/vtkImageShrink3D.pm,
+	VTK/vtkImageSinusoidSource.pm, VTK/vtkImageSkeleton2D.pm,
+	VTK/vtkImageSobel2D.pm, VTK/vtkImageSobel3D.pm,
+	VTK/vtkImageSource.pm, VTK/vtkImageSpatialFilter.pm,
+	VTK/vtkImageThreshold.pm, VTK/vtkImageToImageFilter.pm,
+	VTK/vtkImageToStructuredPoints.pm, VTK/vtkImageTranslateExtent.pm,
+	VTK/vtkImageTwoInputFilter.pm, VTK/vtkImageVariance3D.pm,
+	VTK/vtkImageViewer.pm, VTK/vtkImageWindow.pm,
+	VTK/vtkImageWrapPad.pm, VTK/vtkImageWriter.pm, VTK/vtkImager.pm,
+	VTK/vtkImagerCollection.pm, VTK/vtkImagingFactory.pm,
+	VTK/vtkImplicitBoolean.pm, VTK/vtkImplicitDataSet.pm,
+	VTK/vtkImplicitFunction.pm, VTK/vtkImplicitFunctionCollection.pm,
+	VTK/vtkImplicitModeller.pm, VTK/vtkImplicitSelectionLoop.pm,
+	VTK/vtkImplicitTextureCoords.pm, VTK/vtkImplicitVolume.pm,
+	VTK/vtkImplicitWindowFunction.pm, VTK/vtkImporter.pm,
+	VTK/vtkIndent.pm, VTK/vtkIntArray.pm, VTK/vtkInteractorStyle.pm,
+	VTK/vtkInteractorStyleTrackball.pm, VTK/vtkInteractorStyleUser.pm,
+	VTK/vtkInterpolateDataSetAttributes.pm,
+	VTK/vtkInterpolatingSubdivisionFilter.pm,
+	VTK/vtkKitwareContourFilter.pm, VTK/vtkKochanekSpline.pm,
+	VTK/vtkLODActor.pm, VTK/vtkLODProp3D.pm,
+	VTK/vtkLabeledDataMapper.pm, VTK/vtkLight.pm,
+	VTK/vtkLightCollection.pm, VTK/vtkLine.pm, VTK/vtkLineSource.pm,
+	VTK/vtkLinearExtrusionFilter.pm, VTK/vtkLinearSubdivisionFilter.pm,
+	VTK/vtkLinkEdgels.pm, VTK/vtkLocator.pm, VTK/vtkLogLookupTable.pm,
+	VTK/vtkLongArray.pm, VTK/vtkLookupTable.pm,
+	VTK/vtkLoopSubdivisionFilter.pm, VTK/vtkMCubesReader.pm,
+	VTK/vtkMCubesWriter.pm, VTK/vtkMapper.pm, VTK/vtkMapper2D.pm,
+	VTK/vtkMapperCollection.pm, VTK/vtkMarchingContourFilter.pm,
+	VTK/vtkMarchingCubes.pm, VTK/vtkMarchingSquares.pm,
+	VTK/vtkMaskPoints.pm, VTK/vtkMaskPolyData.pm, VTK/vtkMath.pm,
+	VTK/vtkMatrix4x4.pm, VTK/vtkMergeDataObjectFilter.pm,
+	VTK/vtkMergeFilter.pm, VTK/vtkMergePoints.pm,
+	VTK/vtkMergePoints2D.pm, VTK/vtkMultiThreader.pm,
+	VTK/vtkMutexLock.pm, VTK/vtkNormals.pm, VTK/vtkOBBDicer.pm,
+	VTK/vtkOBBTree.pm, VTK/vtkOBJExporter.pm, VTK/vtkObject.pm,
+	VTK/vtkObjectFactory.pm, VTK/vtkObjectFactoryCollection.pm,
+	VTK/vtkOpenGLCamera.pm, VTK/vtkOpenGLImageMapper.pm,
+	VTK/vtkOpenGLImageWindow.pm, VTK/vtkOpenGLImager.pm,
+	VTK/vtkOpenGLLight.pm, VTK/vtkOpenGLPolyDataMapper.pm,
+	VTK/vtkOpenGLPolyDataMapper2D.pm,
+	VTK/vtkOpenGLProjectedPolyDataRayBounder.pm,
+	VTK/vtkOpenGLProperty.pm, VTK/vtkOpenGLTexture.pm,
+	VTK/vtkOpenGLVolumeTextureMapper2D.pm, VTK/vtkOutlineFilter.pm,
+	VTK/vtkOutlineSource.pm, VTK/vtkOutputWindow.pm,
+	VTK/vtkPLOT3DReader.pm, VTK/vtkPNMReader.pm, VTK/vtkPNMWriter.pm,
+	VTK/vtkPicker.pm, VTK/vtkPiecewiseFunction.pm, VTK/vtkPixel.pm,
+	VTK/vtkPlane.pm, VTK/vtkPlaneCollection.pm, VTK/vtkPlaneSource.pm,
+	VTK/vtkPlanes.pm, VTK/vtkPointData.pm,
+	VTK/vtkPointDataToCellData.pm, VTK/vtkPointLoad.pm,
+	VTK/vtkPointLocator.pm, VTK/vtkPointLocator2D.pm,
+	VTK/vtkPointPicker.pm, VTK/vtkPointSet.pm,
+	VTK/vtkPointSetSource.pm, VTK/vtkPointSetToPointSetFilter.pm,
+	VTK/vtkPointSource.pm, VTK/vtkPoints.pm, VTK/vtkPolyData.pm,
+	VTK/vtkPolyDataCollection.pm, VTK/vtkPolyDataConnectivityFilter.pm,
+	VTK/vtkPolyDataMapper.pm, VTK/vtkPolyDataMapper2D.pm,
+	VTK/vtkPolyDataNormals.pm, VTK/vtkPolyDataReader.pm,
+	VTK/vtkPolyDataSource.pm, VTK/vtkPolyDataToPolyDataFilter.pm,
+	VTK/vtkPolyDataWriter.pm, VTK/vtkPolyLine.pm, VTK/vtkPolyVertex.pm,
+	VTK/vtkPolygon.pm, VTK/vtkPostScriptWriter.pm,
+	VTK/vtkPriorityQueue.pm, VTK/vtkProbeFilter.pm,
+	VTK/vtkProcessObject.pm, VTK/vtkProcessStatistics.pm,
+	VTK/vtkProgrammableAttributeDataFilter.pm,
+	VTK/vtkProgrammableDataObjectSource.pm,
+	VTK/vtkProgrammableFilter.pm, VTK/vtkProgrammableGlyphFilter.pm,
+	VTK/vtkProgrammableSource.pm,
+	VTK/vtkProjectedPolyDataRayBounder.pm, VTK/vtkProp.pm,
+	VTK/vtkProp3D.pm, VTK/vtkPropAssembly.pm, VTK/vtkPropCollection.pm,
+	VTK/vtkPropPicker.pm, VTK/vtkProperty.pm, VTK/vtkProperty2D.pm,
+	VTK/vtkPyramid.pm, VTK/vtkQuad.pm, VTK/vtkQuadric.pm,
+	VTK/vtkRayBounder.pm, VTK/vtkRayCaster.pm,
+	VTK/vtkRectilinearGrid.pm, VTK/vtkRectilinearGridGeometryFilter.pm,
+	VTK/vtkRectilinearGridReader.pm, VTK/vtkRectilinearGridSource.pm,
+	VTK/vtkRectilinearGridToPolyDataFilter.pm,
+	VTK/vtkRectilinearGridWriter.pm, VTK/vtkRecursiveDividingCubes.pm,
+	VTK/vtkRecursiveSphereDirectionEncoder.pm,
+	VTK/vtkReferenceCount.pm, VTK/vtkRenderWindow.pm,
+	VTK/vtkRenderWindowCollection.pm, VTK/vtkRenderWindowInteractor.pm,
+	VTK/vtkRenderer.pm, VTK/vtkRendererCollection.pm,
+	VTK/vtkRendererSource.pm, VTK/vtkReverseSense.pm,
+	VTK/vtkRibbonFilter.pm, VTK/vtkRotationalExtrusionFilter.pm,
+	VTK/vtkSLCReader.pm, VTK/vtkSTLReader.pm, VTK/vtkSTLWriter.pm,
+	VTK/vtkSampleFunction.pm, VTK/vtkScalarBarActor.pm,
+	VTK/vtkScalarTree.pm, VTK/vtkScalars.pm, VTK/vtkScalarsToColors.pm,
+	VTK/vtkScaledTextActor.pm, VTK/vtkSelectPolyData.pm,
+	VTK/vtkSelectVisiblePoints.pm, VTK/vtkShepardMethod.pm,
+	VTK/vtkShortArray.pm, VTK/vtkShrinkFilter.pm,
+	VTK/vtkShrinkPolyData.pm, VTK/vtkSimpleElevationFilter.pm,
+	VTK/vtkSliceCubes.pm, VTK/vtkSmoothPolyDataFilter.pm,
+	VTK/vtkSource.pm, VTK/vtkSpatialRepresentationFilter.pm,
+	VTK/vtkSphere.pm, VTK/vtkSphereSource.pm, VTK/vtkSpline.pm,
+	VTK/vtkStack.pm, VTK/vtkStreamLine.pm, VTK/vtkStreamPoints.pm,
+	VTK/vtkStreamer.pm, VTK/vtkStripper.pm, VTK/vtkStructuredData.pm,
+	VTK/vtkStructuredGridGeometryFilter.pm,
+	VTK/vtkStructuredGridOutlineFilter.pm,
+	VTK/vtkStructuredGridReader.pm, VTK/vtkStructuredGridSource.pm,
+	VTK/vtkStructuredGridToPolyDataFilter.pm,
+	VTK/vtkStructuredGridToStructuredGridFilter.pm,
+	VTK/vtkStructuredGridWriter.pm, VTK/vtkStructuredPoints.pm,
+	VTK/vtkStructuredPointsCollection.pm,
+	VTK/vtkStructuredPointsGeometryFilter.pm,
+	VTK/vtkStructuredPointsReader.pm, VTK/vtkStructuredPointsSource.pm,
+	VTK/vtkStructuredPointsToPolyDataFilter.pm,
+	VTK/vtkStructuredPointsToStructuredPointsFilter.pm,
+	VTK/vtkStructuredPointsToUnstructuredGridFilter.pm,
+	VTK/vtkStructuredPointsWriter.pm, VTK/vtkSubPixelPositionEdgels.pm,
+	VTK/vtkSweptSurface.pm, VTK/vtkSynchronizedTemplates2D.pm,
+	VTK/vtkSynchronizedTemplates3D.pm, VTK/vtkTCoords.pm,
+	VTK/vtkTIFFReader.pm, VTK/vtkTIFFWriter.pm, VTK/vtkTensor.pm,
+	VTK/vtkTensorGlyph.pm, VTK/vtkTensors.pm, VTK/vtkTetra.pm,
+	VTK/vtkTextMapper.pm, VTK/vtkTextSource.pm, VTK/vtkTexture.pm,
+	VTK/vtkTextureMapToCylinder.pm, VTK/vtkTextureMapToPlane.pm,
+	VTK/vtkTextureMapToSphere.pm, VTK/vtkTexturedSphereSource.pm,
+	VTK/vtkThreshold.pm, VTK/vtkThresholdPoints.pm,
+	VTK/vtkThresholdTextureCoords.pm, VTK/vtkTimeStamp.pm,
+	VTK/vtkTimerLog.pm, VTK/vtkTransform.pm,
+	VTK/vtkTransformCollection.pm, VTK/vtkTransformFilter.pm,
+	VTK/vtkTransformPolyDataFilter.pm,
+	VTK/vtkTransformTextureCoords.pm, VTK/vtkTriangle.pm,
+	VTK/vtkTriangleFilter.pm, VTK/vtkTriangleStrip.pm,
+	VTK/vtkTriangularTCoords.pm, VTK/vtkTriangularTexture.pm,
+	VTK/vtkTubeFilter.pm, VTK/vtkUGFacetReader.pm,
+	VTK/vtkUnsignedCharArray.pm, VTK/vtkUnsignedIntArray.pm,
+	VTK/vtkUnsignedLongArray.pm, VTK/vtkUnsignedShortArray.pm,
+	VTK/vtkUnstructuredGridReader.pm, VTK/vtkUnstructuredGridSource.pm,
+	VTK/vtkUnstructuredGridToUnstructuredGridFilter.pm,
+	VTK/vtkUnstructuredGridWriter.pm, VTK/vtkVRMLExporter.pm,
+	VTK/vtkVectorDot.pm, VTK/vtkVectorNorm.pm, VTK/vtkVectorText.pm,
+	VTK/vtkVectors.pm, VTK/vtkVertex.pm, VTK/vtkViewRays.pm,
+	VTK/vtkViewport.pm, VTK/vtkVoidArray.pm, VTK/vtkVolume.pm,
+	VTK/vtkVolume16Reader.pm, VTK/vtkVolumeCollection.pm,
+	VTK/vtkVolumeMapper.pm, VTK/vtkVolumeProperty.pm,
+	VTK/vtkVolumeRayCastCompositeFunction.pm,
+	VTK/vtkVolumeRayCastFunction.pm,
+	VTK/vtkVolumeRayCastIsosurfaceFunction.pm,
+	VTK/vtkVolumeRayCastMIPFunction.pm, VTK/vtkVolumeRayCastMapper.pm,
+	VTK/vtkVolumeReader.pm, VTK/vtkVolumeTextureMapper.pm,
+	VTK/vtkVolumeTextureMapper2D.pm, VTK/vtkVoxel.pm,
+	VTK/vtkVoxelContoursToSurfaceFilter.pm, VTK/vtkVoxelModeller.pm,
+	VTK/vtkWarpLens.pm, VTK/vtkWarpScalar.pm, VTK/vtkWarpTo.pm,
+	VTK/vtkWarpVector.pm, VTK/vtkWedge.pm, VTK/vtkWindow.pm,
+	VTK/vtkWindowLevelLookupTable.pm, VTK/vtkWindowToImageFilter.pm,
+	VTK/vtkWindowedSincPolyDataFilter.pm, VTK/vtkWorldPointPicker.pm,
+	VTK/vtkWriter.pm, VTK/vtkXImageMapper.pm, VTK/vtkXImageWindow.pm,
+	VTK/vtkXPolyDataMapper2D.pm, VTK/vtkXRenderWindow.pm,
+	VTK/vtkXRenderWindowInteractor.pm,
+	VTK/vtkXRenderWindowTclInteractor.pm, VTK/vtkXYPlotActor.pm,
+	examples/ColorSph.pl, examples/Mace.pl, examples/MotBlur.pl,
+	examples/README, examples/examplesTODO, examples/makeColors,
+	examples/makeExamples, examples/medical1.pl, examples/stl.pl,
+	examples/tcl2perl: Merged Contrib Branch with main branch 
+
+2002-02-21 16:32  cerney
+
+	* examples/README: More Scripts work 
+
+2002-02-16 21:32  cerney
+
+	* examples/: README, makeExamples, tcl2perl: patented directory now
+	converts.  
+
+2002-02-16 17:59  cerney
+
+	* examples/: README, makeExamples, tcl2perl: Contrib directory now
+	translates.  
+
+2002-02-11 20:31  cerney
+
+	* examples/README: Added contrib examples 
+
+2002-02-10 21:44  cerney
+
+	* VTK.config, makeBindings, parseWrap, typemap, Common/Common.pm,
+	Common/Common.xs, Graphics/Graphics.pm, Graphics/Graphics.xs,
+	Graphics/typemapGraphics, Imaging/Imaging.pm, Imaging/Imaging.xs,
+	Imaging/typemapImaging, Patented/Patented.pm, Patented/Patented.xs,
+	examples/README: Modified XS code to get the actual class name if
+	returning a class. Previously was blessing the return class into the
+	namespace defined by the function signature, when the actual class 
+	returned could be a subclass.  
+
+2002-02-09 21:05  cerney
+
+	* Tk/Makefile.PL: Modified to pick the CFLAGS from the parent
+	directory 
+
+2002-02-08 16:17  cerney
+
+	* examples/: README, makeExamples, tcl2perl: Updated tcl2perl to
+	properly handle the vtkInteractor widget.  
+
+2002-02-03 20:18  cerney
+
+	* examples/tcl2perl: Changes due to tweaks in tcl2perl: Hex Numbers
+	now ok. While loops recognized.  
+
+2002-02-03 11:48  cerney
+
+	* examples/: README, makeExamples, tcl2perl: Modified to
+	autogenerate TestTkImageWindowWidget.pl 
+
+2002-02-02 21:33  cerney
+
+	* Tk/: Tk/vtkInt.pm, vtkImageViewer/vtkImageViewer.pm,
+	vtkImageWindow/vtkImageWindow.pm, vtkInteractor/vtkInteractor.pm: 
+	1) Added code to suppiy imagewindow or imageviewer args ('-iw',
+	'-iv') to the widget upon creation.  
+	2) Added MW->update to vtkInt.pm to help InputStr.pl get a
+	kick-start. Not sure why this is needed for this example script,
+	because the other standard ones, like ColorSph.pl doesn't need it.  
+
+2002-02-02 21:33  cerney
+
+	* Tk/vtkImageWindow/vtkImageWindow.pm: file vtkImageWindow.pm was
+	initially added on branch contrib.  
+
+2002-02-02 21:33  cerney
+
+	* Tk/vtkImageViewer/vtkImageViewer.pm: file vtkImageViewer.pm was
+	initially added on branch contrib.  
+
+2002-02-02 18:10  cerney
+
+	* Tk/pod/Makefile.PL: file Makefile.PL was initially added on
+	branch contrib.  
+
+2002-02-02 18:10  cerney
+
+	* Tk/pod/Makefile.PL: Added File. Should have been added earlier.  
+
+2002-02-02 17:30  cerney
+
+	* Patented/typemapPatented: file typemapPatented was initially
+	added on branch contrib.  
+
+2002-02-02 17:30  cerney
+
+	* Imaging/typemapImaging: file typemapImaging was initially added
+	on branch contrib.  
+
+2002-02-02 17:30  cerney
+
+	* Graphics/typemapGraphics: file typemapGraphics was initially
+	added on branch contrib.  
+
+2002-02-02 17:30  cerney
+
+	* Common/typemapCommon, Graphics/typemapGraphics,
+	Imaging/typemapImaging, Patented/typemapPatented: Added typemaps.
+	Should have been added before 
+
+2002-02-02 17:30  cerney
+
+	* Common/typemapCommon: file typemapCommon was initially added on
+	branch contrib.  
+
+2002-02-01 12:00  cerney
+
+	* examples/tcl2perl: Update to process image tcl files 
+
+2002-01-31 09:57  cerney
+
+	* Patented/Patented.pm: file Patented.pm was initially added on
+	branch contrib.  
+
+2002-01-31 09:57  cerney
+
+	* Imaging/Imaging.pm: file Imaging.pm was initially added on branch
+	contrib.  
+
+2002-01-31 09:57  cerney
+
+	* Graphics/Graphics.pm: file Graphics.pm was initially added on
+	branch contrib.  
+
+2002-01-31 09:57  cerney
+
+	* Common/Common.pm: file Common.pm was initially added on branch
+	contrib.  
+
+2002-01-31 09:57  cerney
+
+	* VTK.config, parseWrap, Common/Common.pm, Common/Common.xs,
+	Graphics/Graphics.pm, Graphics/Graphics.xs, Imaging/Imaging.pm,
+	Imaging/Imaging.xs, Patented/Patented.pm, Patented/Patented.xs: 
+	Updated parseWrap to not generate redundant methods. Example
+	method1(float[3]) and method1(float,float,float); method1(float[3])
+	would be eliminated.  
+
+2002-01-27 17:51  cerney
+
+	* parseWrap, Common/Common.xs, Graphics/Graphics.xs,
+	Imaging/Imaging.xs, Patented/Patented.xs: Updated XS code
+	generation to die if can't find a match for overloaded functions
+	from supplied args.  
+
+2002-01-26 21:39  cerney
+
+	* Tk/Makefile.PL: Turned debug mode off.  
+
+2002-01-26 21:37  cerney
+
+	* Tk/vtkImageWindow/Makefile.PL: file Makefile.PL was initially
+	added on branch contrib.  
+
+2002-01-26 21:37  cerney
+
+	* Tk/vtkImageWindow/vtkImageWindow.xs: file vtkImageWindow.xs was
+	initially added on branch contrib.  
+
+2002-01-26 21:37  cerney
+
+	* VTK.config, Tk/Makefile.PL, Tk/pTk/Makefile.PL,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageWindowWidget.cxx,
+	Tk/vtkGlue/vtkGlue.cpp, Tk/vtkImageWindow/Makefile.PL,
+	Tk/vtkImageWindow/vtkImageWindow.xs: vtkImageWindow now works.
+	(Script TestTkImageWindowWidget). Script had to be changed because
+	of issues with changing the image window after the widget is
+	created. vtkImageViewer probably has the same problem.  
+
+2002-01-25 21:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.cxx: fixed minor error
+	not picked up before 
+
+2002-01-23 10:04  cerney
+
+	* Tk/pTk/: Makefile.PL, mTk/vtkTcl/vtkTkImageWindowWidget.cxx,
+	mTk/vtkTcl/vtkTkImageWindowWidget.h: TkImageWindowWidget Compiles
+	OK.  
+
+2002-01-21 16:21  cerney
+
+	* VTK.config, parseWrap, Common/Common.xs: Updated to include some
+	class's New methods, which were not getting included before, because
+	of a bug in the the vtkPrint parsing.  
+
+2002-01-20 20:46  cerney
+
+	* parseWrap, Common/Common.xs: Updated parsewrap to get the New
+	function for vtkCellTypes 
+
+2002-01-13 17:55  cerney
+
+	* Tk/Makefile.PL, Tk/Tk.xs, Tk/pTk/Makefile.PL,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.h, Tk/vtkGlue/Makefile.PL,
+	Tk/vtkImageViewer/Makefile.PL, Tk/vtkInteractor/vtkInteractor.pm,
+	examples/README, examples/tcl2perl: vtkImageViewer now works with
+	vtkInteractor.  
+
+2002-01-11 07:36  cerney
+
+	* Tk/vtkInteractor/vtkInteractor.xs: file vtkInteractor.xs was
+	initially added on branch contrib.  
+
+2002-01-11 07:36  cerney
+
+	* Tk/vtkImageViewer/vtkImageViewer.xs: file vtkImageViewer.xs was
+	initially added on branch contrib.  
+
+2002-01-11 07:36  cerney
+
+	* Tk/: vtkGlue/Makefile.PL, vtkImageViewer/Makefile.PL,
+	vtkInteractor/Makefile.PL: file Makefile.PL was initially added on
+	branch contrib.  
+
+2002-01-11 07:36  cerney
+
+	* Tk/: vtkGlue/Makefile.PL, vtkImageViewer/Makefile.PL,
+	vtkImageViewer/vtkImageViewer.xs, vtkInteractor/Makefile.PL,
+	vtkInteractor/vtkInteractor.xs: Separating out the individual
+	widgets into separate directories (like original perl/tk package)
+	now works.  
+
+2002-01-09 10:56  cerney
+
+	* examples/README: file README was initially added on branch
+	contrib.  
+
+2002-01-09 10:56  cerney
+
+	* examples/: README, tcl2perl: Modified to handle the vtk
+	Get/Set/New Widget/obj calls 
+
+2002-01-08 15:44  cerney
+
+	* Tk/pTk/: Makefile.PL, mTk/vtkTcl/vtkTkImageViewerWidget.cxx,
+	mTk/vtkTcl/vtkTkImageViewerWidget.h: TkImageViewer.cxx compiles 
+
+2002-01-07 11:29  cerney
+
+	* examples/tcl2perl: Completed updated for new VTK::Tk
+	Capabilities.  
+
+2002-01-06 15:16  cerney
+
+	* Tk/Tk/vtkInt.pm: file vtkInt.pm was initially added on branch
+	contrib.  
+
+2002-01-06 15:16  cerney
+
+	* Tk/Tk/vtkInt.pm: [no log message] 
+
+2002-01-06 08:36  cerney
+
+	* examples/tcl2perl: Updated to use VTK::Tk capabilities.  
+
+2002-01-05 10:59  cerney
+
+	* Tk/vtkInteractor/vtkInteractor.pm: Rubber Zoom now works 
+
+2002-01-04 16:08  cerney
+
+	* Tk/: vTkGlue.cpp, pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx,
+	vtkGlue/vtkGlue.cpp, vtkInteractor/vtkInteractor.pm: vtkInteractor
+	mostly works. Still problem with rubberband? 
+
+2002-01-04 15:44  cerney
+
+	* examples/tcl2perl: Modified to properly handle expression like
+	'expr $a + ($b - $c)'. Previously would translate to '$a + $b - $c.  
+
+2002-01-01 17:17  cerney
+
+	* Tk/: Tk.xs, myConfig, vTkGlue.cpp, pTk/Makefile.PL,
+	pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx,
+	pTk/mTk/vtkTcl/vtkTkRenderWidget.h, vtkGlue/vtkGlue.cpp,
+	vtkInteractor/vtkInteractor.pm: TkRenderWidget example now works 
+
+2001-12-26 19:03  cerney
+
+	* parseWrap, typemap, Tk/Makefile.PL, Tk/Tk.xs, Tk/pTk/vtkTkport.h,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.cxx,
+	Tk/vtkInteractor/vtkInteractor.pm: Added vtkTkRenderWidget.cxx to
+	Tk files that are compiled. Now compiles OK.  
+
+2001-12-26 19:03  cerney
+
+	* Tk/vtkInteractor/vtkInteractor.pm: file vtkInteractor.pm was
+	initially added on branch contrib.  
+
+2001-12-26 19:03  cerney
+
+	* Tk/pTk/vtkTkport.h: file vtkTkport.h was initially added on
+	branch contrib.  
+
+2001-12-23 09:09  cerney
+
+	* Tk/: vTkGlue.cpp, vtkGlue/vtkGlue.cpp: file vTkGlue.cpp was
+	initially added on branch contrib.  
+
+2001-12-23 09:09  cerney
+
+	* Tk/: Makefile.PL, Tk.pm, vTkGlue.cpp, pTk/Makefile.PL,
+	pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx,
+	pTk/mTk/vtkTcl/vtkTkRenderWidget.h, vtkGlue/vtkGlue.cpp: 
+	vtkTkRenderWidget now compiles.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/README: file README was initially added on branch
+	contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/chext: file chext was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mkXinfo: file mkXinfo was initially added on branch
+	contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx: file
+	vtkTkRenderWidget.cxx was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/pTk.exc: file pTk.exc was initially added on
+	branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/license.html_lib: file license.html_lib was initially
+	added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/process_object: file process_object was initially added on
+	branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/why: file why was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkTkImageWindowWidget.h: file
+	vtkTkImageWindowWidget.h was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.h: file
+	vtkXRenderWindowTclInteractor.h was initially added on branch
+	contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/tdiff: file tdiff was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/defs: file defs was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/makeenglish: file makeenglish was initially added on
+	branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/Tcl-pTk: file Tcl-pTk was initially added on branch
+	contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/findstrings: file findstrings was initially added on
+	branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/genexc: file genexc was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.h: file vtkTkRenderWidget.h
+	was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkTkImageWindowWidget.cxx: file
+	vtkTkImageWindowWidget.cxx was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/refs: file refs was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/findcore: file findcore was initially added on branch
+	contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/findX: file findX was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.cxx: file
+	vtkXRenderWindowTclInteractor.cxx was initially added on branch
+	contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/from: file from was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/counts: file counts was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/fakeld: file fakeld was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/license.terms: file license.terms was initially added on
+	branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.cxx: file
+	vtkTkImageViewerWidget.cxx was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/p4e: file p4e was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mkneed: file mkneed was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.h: file
+	vtkTkImageViewerWidget.h was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/pTk/mkmethods: file mkmethods was initially added on branch
+	contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/: Makefile.PL, pTk/Makefile.PL: file Makefile.PL was initially
+	added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/Tk.xs: file Tk.xs was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/Tk.pm: file Tk.pm was initially added on branch contrib.  
+
+2001-12-16 14:14  cerney
+
+	* Makefile.PL, parseWrap, Common/Common.xs, Graphics/Graphics.xs,
+	Tk/Makefile.PL, Tk/Tk.pm, Tk/Tk.xs, Tk/myConfig,
+	Tk/pTk/Makefile.PL, Tk/pTk/Tcl-pTk, Tk/pTk/chext, Tk/pTk/counts,
+	Tk/pTk/defs, Tk/pTk/fakeld, Tk/pTk/findX, Tk/pTk/findcore,
+	Tk/pTk/findstrings, Tk/pTk/from, Tk/pTk/genexc,
+	Tk/pTk/license.html_lib, Tk/pTk/license.terms, Tk/pTk/makeenglish,
+	Tk/pTk/mkXinfo, Tk/pTk/mkmethods, Tk/pTk/mkneed, Tk/pTk/p4e,
+	Tk/pTk/process_object, Tk/pTk/refs, Tk/pTk/tdiff, Tk/pTk/why,
+	Tk/pTk/mTk/README, Tk/pTk/mTk/vtkTcl/pTk.exc,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageViewerWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageWindowWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkImageWindowWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkTkRenderWidget.h,
+	Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.cxx,
+	Tk/pTk/mTk/vtkTcl/vtkXRenderWindowTclInteractor.h: Initial Sucess
+	at getting the vtkXRenderWindowTcl to work.  
+
+2001-12-16 14:14  cerney
+
+	* Tk/myConfig: file myConfig was initially added on branch contrib.  
+
+2001-12-09 11:56  cerney
+
+	* examples/tcl2perl: Added packforget support 
+
+2001-12-07 12:10  cerney
+
+	* VTK.pm, makeBindings, parseVTKdir, parseWrap, Common/Common.xs,
+	Graphics/Graphics.xs, Imaging/Imaging.xs, Patented/Patented.xs,
+	examples/tcl2perl: Completed update to handle function pointer args 
+
+2001-12-07 10:02  cerney
+
+	* Common/Common.xs, Graphics/Graphics.xs, Imaging/Imaging.xs,
+	Patented/Patented.xs: Baseline before adding function pointer arg
+	support to parseWrap 
+
+2001-12-07 07:20  cerney
+
+	* VTK/Colors.pm: file Colors.pm was initially added on branch
+	contrib.  
+
+2001-12-07 07:20  cerney
+
+	* Graphics/Graphics.xs: file Graphics.xs was initially added on
+	branch contrib.  
+
+2001-12-07 07:20  cerney
+
+	* Imaging/Imaging.xs: file Imaging.xs was initially added on branch
+	contrib.  
+
+2001-12-07 07:20  cerney
+
+	* VTK.pm, makeBindings, parseVTKdir, Common/Common.xs,
+	Graphics/Graphics.xs, Imaging/Imaging.xs, Patented/Patented.xs,
+	VTK/Colors.pm: Startup of update to handle function pointer args 
+
+2001-12-07 07:20  cerney
+
+	* Common/Common.xs: file Common.xs was initially added on branch
+	contrib.  
+
+2001-12-07 07:20  cerney
+
+	* Patented/Patented.xs: file Patented.xs was initially added on
+	branch contrib.  
+
+2001-12-06 09:49  cerney
+
+	* examples/tcl2perl: Modified to handle multiple init and loop
+	actions in for loops 
+
+2001-12-01 21:11  cerney
+
+	* examples/: examplesTODO, makeExamples: Entire graphics dir now
+	converts,  but not necessarily runs correctly (but many do) 
+
+2001-12-01 21:11  cerney
+
+	* examples/examplesTODO: file examplesTODO was initially added on
+	branch contrib.  
+
+2001-12-01 17:38  cerney
+
+	* examples/: makeExamples, tcl2perl: More Stuff works 
+
+2001-11-30 21:12  cerney
+
+	* examples/: makeExamples, tcl2perl: Fixed to better parse for
+	statments, allow null actions 
+
+2001-11-30 20:19  cerney
+
+	* examples/: makeExamples, tcl2perl: More stuff works 
+
+2001-11-29 21:14  cerney
+
+	* examples/tcl2perl: More Stuff Works 
+
+2001-11-29 20:10  cerney
+
+	* examples/tcl2perl: More Files work 
+
+2001-11-29 18:18  cerney
+
+	* examples/: makeExamples, tcl2perl: More Files work 
+
+2001-11-29 15:30  cerney
+
+	* examples/: makeExamples, tcl2perl: updated to handle negation in
+	expressions 
+
+2001-11-29 14:25  cerney
+
+	* examples/tcl2perl: Changed associated with 'info command' on
+	non-vtk objects 
+
+2001-11-29 12:59  cerney
+
+	* examples/: makeExamples, tcl2perl: More Files Work 
+
+2001-11-29 11:20  cerney
+
+	* examples/: ColorSph.pl, tcl2perl: More Files Work 
+
+2001-11-29 10:11  cerney
+
+	* examples/tcl2perl: More Tweaks 
+
+2001-11-29 06:42  cerney
+
+	* examples/makeExamples: Modified to run all the files at once, to
+	avoid startup time of tcl2perl 
+
+2001-11-29 06:41  cerney
+
+	* examples/tcl2perl: Split out the definition of tcl args to
+	tcl_args, from the expression-based 'primary'.  
+
+2001-11-27 20:16  cerney
+
+	* examples/tcl2perl: Added pre/post processing to handle some
+	special cases in some scripts 
+
+2001-11-26 20:05  cerney
+
+	* examples/tcl2perl: Added foreach support. Added array support.
+	Setup additional pre/post processing 
+
+2001-11-25 20:17  cerney
+
+	* examples/tcl2perl: Tweaked the setting of the my and global
+	variables hashes.  
+
+2001-11-25 17:46  cerney
+
+	* examples/tcl2perl: Rearranged the order of parsing to keep lvar
+	from being called (and eventually failed) so often. This causes the
+	myVariables hash to get filled up with non-variables. Played with
+	the 'defer' actions to help with this, but did not work as expected.  
+
+2001-11-25 16:40  cerney
+
+	* examples/tcl2perl: Modified to handle create commands. Now gets
+	thru all of Decimate.tcl 
+
+2001-11-25 15:10  cerney
+
+	* examples/tcl2perl: Modified to handle uary '!' operator.  
+
+2001-11-25 14:57  cerney
+
+	* examples/tcl2perl: Modified to handle the winfo command.  
+
+2001-11-25 14:25  cerney
+
+	* examples/tcl2perl: Mod to handle the format command 
+
+2001-11-25 13:54  cerney
+
+	* examples/tcl2perl: Mod to handle the tcl scan command 
+
+2001-11-25 09:24  cerney
+
+	* examples/tcl2perl: Modified to handle bind commands.  
+
+2001-11-24 17:13  cerney
+
+	* examples/tcl2perl: Handle -image widget options as a variable
+	instead of a name, in the perltk style.  
+
+2001-11-24 17:08  cerney
+
+	* examples/tcl2perl: Added initial support for tk image create
+	commands.  
+
+2001-11-24 11:30  cerney
+
+	* examples/tcl2perl: Modified to handle tcl wm commands better 
+
+2001-11-24 09:34  cerney
+
+	* examples/tcl2perl: Modified to handle functions in expressions 
+
+2001-11-23 21:51  cerney
+
+	* examples/tcl2perl: Modified to handle just a single proc argument 
+
+2001-11-23 19:12  cerney
+
+	* examples/tcl2perl: Fixed so widgets would handle -command options
+	correctly.  
+
+2001-11-23 19:05  cerney
+
+	* examples/tcl2perl: Fixed to correctly interprete tk options like
+	'3.0i' 
+
+2001-11-23 14:57  cerney
+
+	* examples/tcl2perl: Added support for the tk entryconfigure
+	method.  Made translation of 'if' statements more robust.  
+
+2001-11-22 22:17  cerney
+
+	* examples/tcl2perl: Updated to handle string match commands, and
+	info commands commands 
+
+2001-11-22 10:08  cerney
+
+	* examples/tcl2perl: Full support for if statements (elseif and
+	else) added. 'puts' translated to 'print'.  
+
+2001-11-21 17:29  cerney
+
+	* examples/tcl2perl: Got embedded curly-braces working for
+	tranlating to MD perl arrays.  
+
+2001-11-18 13:38  cerney
+
+	* examples/tcl2perl: Fixed so the tk -variable option changes
+	variables to a variable reference 
+
+2001-11-18 12:27  cerney
+
+	* examples/tcl2perl: Tweaks to handle callbacks correctly 
+
+2001-11-17 19:56  cerney
+
+	* examples/tcl2perl: Got Menus working 
+
+2001-11-17 08:48  cerney
+
+	* examples/tcl2perl: Updated to handle multiple pack widgets 
+
+2001-11-14 21:35  cerney
+
+	* examples/tcl2perl: Tk 'add' commands now work 
+
+2001-11-13 19:59  cerney
+
+	* examples/tcl2perl: Added tcl_pack 
+
+2001-11-12 21:59  cerney
+
+	* examples/tcl2perl: Starting to get widgets to work 
+
+2001-11-11 16:46  cerney
+
+	* examples/tcl2perl: CSpline now translates ok 
+
+2001-11-10 20:00  cerney
+
+	* examples/tcl2perl: Added tcl_info rule 
+
+2001-11-09 21:33  cerney
+
+	* examples/tcl2perl: 3DMorph Now converts ok.  
+
+2001-11-09 16:24  cerney
+
+	* examples/tcl2perl: Major change to use Parse::RecDescent to parse
+	the TCL file.  
+
+2001-10-20 08:01  cerney
+
+	* examples/tcl2perl: Yes Still trying to get gui to translate 
+
+2001-10-14 20:49  cerney
+
+	* examples/tcl2perl: Still trying to get big tk app to translate 
+
+2001-10-13 18:21  cerney
+
+	* examples/tcl2perl: Initial cut at getting to parse a full-blown
+	vtk gui script.  
+
+2001-10-12 08:11  cerney
+
+	* examples/tcl2perl: file tcl2perl was initially added on branch
+	contrib.  
+
+2001-10-12 08:11  cerney
+
+	* examples/makeExamples: file makeExamples was initially added on
+	branch contrib.  
+
+2001-10-12 08:10  cerney
+
+	* examples/: makeColors, makeExamples, tcl2perl: Added files
+	associated with auto-generating the examples from the tcl examples
+	provided by vtk.  
+
+2001-10-12 08:10  cerney
+
+	* examples/makeColors: file makeColors was initially added on
+	branch contrib.  
+
+2001-10-12 08:06  cerney
+
+	* typemap: Modified typemap to better pick up the class name. Using
+	the subtype variable causes problems for classes that end in
+	'Array'.  
+
+2001-10-11 21:38  cerney
+
+	* Graphics/Makefile.PL: file Makefile.PL was initially added on
+	branch contrib.  
+
+2001-10-11 21:38  cerney
+
+	* Graphics/Makefile.PL: Makefile should have been added earlier 
+
+2001-10-06 20:22  cerney
+
+	* parseWrap, examples/Mace.pl, examples/MotBlur.pl,
+	examples/medical1.pl, examples/stl.pl: More Examples Work 
+
+2001-10-05 22:06  cerney
+
+	* parseWrap, typemap, examples/ColorSph.pl: Color Sphere example
+	now works 
+
+2001-09-29 11:03  cerney
+
+	* MANIFEST, VTK.pm, makeBindings, parseWrap, examples/ColorSph.pl: 
+	Everything compiles, but the example ColorSp doesn't work 
+
+2001-09-28 16:00  cerney
+
+	* parseWrap: Everything now compiles 
+
+2001-09-28 15:47  cerney
+
+	* VTK.xs: Got rid of VTK.xs. This is now handled by the separate
+	files Graphics.xs, Common.xs, etc 
+
+2001-09-28 14:56  cerney
+
+	* parseWrap: Contrib, Common, Graphics now compile 
+
+2001-09-23 20:20  cerney
+
+	* parseWrap: Added function to write xs code that is common between
+	the overloaded and non-overloaded functions.  
+
+2001-09-23 19:41  cerney
+
+	* parseWrap: Created subs to writing the XS function sig and arg
+	lists/types 
+
+2001-09-22 21:45  cerney
+
+	* parseWrap: Modified to properly handle 'vtkObject &' type return
+	types for overloaded functions only. Non-overloaded function support
+	will probably have to be added later, but doesn't appear to be
+	needed now.  
+
+2001-09-22 21:21  cerney
+
+	* parseWrap: Modified the overloaded functions section to handle
+	'&' type args, like 'int &'.  
+
+2001-09-19 21:03  cerney
+
+	* parseWrap: Mod to adjust for args supplied by reference (non
+	overloaded objs only) 
+
+2001-09-16 21:06  cerney
+
+	* parseVTKdir, parseWrap: Started to get the common.xs to compile.  
+
+2001-09-15 15:40  cerney
+
+	* parseWrap: Updated to use vtkPrint2 program.  Started using
+	parsing rules for the functions gathered from vtkWrapTcl.c 
+
+2001-09-09 21:17  cerney
+
+	* VTK.pm, parseWrap, typemap: Changes to compile the 'common' code
+	generated by parseWrap 
+
+2001-09-08 10:18  cerney
+
+	* Common/Makefile.PL, Imaging/Makefile.PL, Patented/Makefile.PL: 
+	file Makefile.PL was initially added on branch contrib.  
+
+2001-09-08 10:18  cerney
+
+	* Common/Makefile.PL, Imaging/Makefile.PL, Patented/Makefile.PL: 
+	Added dirs and makefile for the individual VTK package types
+	(Common, Graphics, etc) 
+
+2001-09-08 09:53  cerney
+
+	* makeBindings, parseVTKdir: Modified to parse thru all VTK source
+	dirs 
+
+2001-09-04 16:30  cerney
+
+	* makeBindings, parseVTKdir, parseWrap: Updated the parsing
+	routines to handle more strange cases.  
+
+2001-09-04 13:35  cerney
+
+	* makeBindings: file makeBindings was initially added on branch
+	contrib.  
+
+2001-09-04 13:35  cerney
+
+	* makeBindings, parseWrap, examples/stl.pl: Got Contrib Working
+	under solaris 
+
+2001-09-03 21:06  cerney
+
+	* parseVTKdir: Modified to accept arguments to be called from
+	another script 
+
+2001-09-02 20:42  cerney
+
+	* examples/stl.pl: Added example that uses the contrib axes object.  
+
+2001-09-02 20:42  cerney
+
+	* examples/stl.pl: file stl.pl was initially added on branch
+	contrib.  
+
+2001-09-02 12:28  cerney
+
+	* parseWrap: file parseWrap was initially added on branch contrib.  
+
+2001-09-02 12:28  cerney
+
+	* parseVTKdir: file parseVTKdir was initially added on branch
+	contrib.  
+
+2001-09-02 12:28  cerney
+
+	* Makefile.PL, VTK.config, parseVTKdir, parseWrap: Got contrib
+	branch to compile.  
+
+2001-09-01 21:33  cerney
+
+	* VTK/vtkObject.pm, examples/ColorSph.pl, examples/Mace.pl,
+	examples/MotBlur.pl, examples/contQuad.pl, examples/medical1.pl,
+	examples/vtkLogo.pl: Changed for VTK auto deletion 
+
+2001-08-07 16:42  cerney
+
+	* Makefile.PL, typemap, vtkPerl.h: Modified to compile under
+	solaris 
+
+2001-07-26 09:55  tag baseline-1
+
+2001-07-26 09:55  cerney
+
+	* COPYING, MANIFEST, Makefile.PL, README, VTK.config, VTK.pm,
+	VTK.xs, typemap, vtkPerl.h, VTK/vtk3DSImporter.pm,
+	VTK/vtkAbstractMapper.pm, VTK/vtkAbstractMapper3D.pm,
+	VTK/vtkActor.pm, VTK/vtkActor2D.pm, VTK/vtkActor2DCollection.pm,
+	VTK/vtkActorCollection.pm, VTK/vtkAppendFilter.pm,
+	VTK/vtkAppendPolyData.pm, VTK/vtkApproximatingSubdivisionFilter.pm,
+	VTK/vtkAssembly.pm, VTK/vtkAssemblyPaths.pm,
+	VTK/vtkAttributeData.pm, VTK/vtkAttributeDataToFieldDataFilter.pm,
+	VTK/vtkAxes.pm, VTK/vtkBYUReader.pm, VTK/vtkBYUWriter.pm,
+	VTK/vtkBitArray.pm, VTK/vtkBooleanTexture.pm,
+	VTK/vtkBrownianPoints.pm, VTK/vtkButterflySubdivisionFilter.pm,
+	VTK/vtkCamera.pm, VTK/vtkCardinalSpline.pm,
+	VTK/vtkCastToConcrete.pm, VTK/vtkCell.pm, VTK/vtkCellArray.pm,
+	VTK/vtkCellCenters.pm, VTK/vtkCellData.pm,
+	VTK/vtkCellDataToPointData.pm, VTK/vtkCellLinks.pm,
+	VTK/vtkCellLocator.pm, VTK/vtkCellPicker.pm, VTK/vtkCellTypes.pm,
+	VTK/vtkCharArray.pm, VTK/vtkCleanPolyData.pm,
+	VTK/vtkClipPolyData.pm, VTK/vtkClipVolume.pm, VTK/vtkCollection.pm,
+	VTK/vtkColorTransferFunction.pm, VTK/vtkCone.pm,
+	VTK/vtkConeSource.pm, VTK/vtkConnectivityFilter.pm,
+	VTK/vtkContourFilter.pm, VTK/vtkContourValues.pm,
+	VTK/vtkCoordinate.pm, VTK/vtkCubeSource.pm,
+	VTK/vtkCullerCollection.pm, VTK/vtkCursor3D.pm, VTK/vtkCutter.pm,
+	VTK/vtkCylinder.pm, VTK/vtkCylinderSource.pm,
+	VTK/vtkDashedStreamLine.pm, VTK/vtkDataArray.pm,
+	VTK/vtkDataObject.pm, VTK/vtkDataObjectReader.pm,
+	VTK/vtkDataObjectSource.pm, VTK/vtkDataObjectToDataSetFilter.pm,
+	VTK/vtkDataObjectWriter.pm, VTK/vtkDataReader.pm,
+	VTK/vtkDataSet.pm, VTK/vtkDataSetAttributes.pm,
+	VTK/vtkDataSetCollection.pm, VTK/vtkDataSetMapper.pm,
+	VTK/vtkDataSetReader.pm, VTK/vtkDataSetSource.pm,
+	VTK/vtkDataSetToDataObjectFilter.pm,
+	VTK/vtkDataSetToDataSetFilter.pm,
+	VTK/vtkDataSetToPolyDataFilter.pm,
+	VTK/vtkDataSetToStructuredGridFilter.pm,
+	VTK/vtkDataSetToStructuredPointsFilter.pm,
+	VTK/vtkDataSetToUnstructuredGridFilter.pm, VTK/vtkDataSetWriter.pm,
+	VTK/vtkDataWriter.pm, VTK/vtkDecimatePro.pm, VTK/vtkDelaunay2D.pm,
+	VTK/vtkDelaunay3D.pm, VTK/vtkDicer.pm, VTK/vtkDirectory.pm,
+	VTK/vtkDiskSource.pm, VTK/vtkDoubleArray.pm,
+	VTK/vtkDynamicLoader.pm, VTK/vtkEdgePoints.pm, VTK/vtkEdgeTable.pm,
+	VTK/vtkElevationFilter.pm, VTK/vtkEmptyCell.pm,
+	VTK/vtkEncodedGradientEstimator.pm, VTK/vtkFieldData.pm,
+	VTK/vtkFloatArray.pm, VTK/vtkFloatNormals.pm,
+	VTK/vtkFloatPoints.pm, VTK/vtkFloatScalars.pm,
+	VTK/vtkFloatTCoords.pm, VTK/vtkFloatTensors.pm,
+	VTK/vtkFloatVectors.pm, VTK/vtkGeneralTransform.pm,
+	VTK/vtkGeneralTransformConcatenation.pm,
+	VTK/vtkGeneralTransformInverse.pm, VTK/vtkGenericCell.pm,
+	VTK/vtkHexahedron.pm, VTK/vtkIdList.pm, VTK/vtkImageData.pm,
+	VTK/vtkImageSource.pm, VTK/vtkImageToStructuredPoints.pm,
+	VTK/vtkImplicitFunction.pm, VTK/vtkImplicitFunctionCollection.pm,
+	VTK/vtkIndent.pm, VTK/vtkIntArray.pm, VTK/vtkLine.pm,
+	VTK/vtkLocator.pm, VTK/vtkLogLookupTable.pm, VTK/vtkLongArray.pm,
+	VTK/vtkLookupTable.pm, VTK/vtkMapper2D.pm, VTK/vtkMath.pm,
+	VTK/vtkMatrix4x4.pm, VTK/vtkMergePoints2D.pm,
+	VTK/vtkMultiThreader.pm, VTK/vtkMutexLock.pm, VTK/vtkNormals.pm,
+	VTK/vtkObject.pm, VTK/vtkObjectFactory.pm,
+	VTK/vtkObjectFactoryCollection.pm, VTK/vtkOutputWindow.pm,
+	VTK/vtkPixel.pm, VTK/vtkPlane.pm, VTK/vtkPlaneCollection.pm,
+	VTK/vtkPointData.pm, VTK/vtkPointLocator.pm,
+	VTK/vtkPointLocator2D.pm, VTK/vtkPointSet.pm, VTK/vtkPoints.pm,
+	VTK/vtkPolyData.pm, VTK/vtkPolyLine.pm, VTK/vtkPolyVertex.pm,
+	VTK/vtkPolygon.pm, VTK/vtkPriorityQueue.pm,
+	VTK/vtkProcessObject.pm, VTK/vtkProcessStatistics.pm,
+	VTK/vtkProp.pm, VTK/vtkPropAssembly.pm, VTK/vtkPropCollection.pm,
+	VTK/vtkProperty2D.pm, VTK/vtkPyramid.pm, VTK/vtkQuad.pm,
+	VTK/vtkRectilinearGrid.pm, VTK/vtkReferenceCount.pm,
+	VTK/vtkScalars.pm, VTK/vtkScalarsToColors.pm, VTK/vtkShortArray.pm,
+	VTK/vtkSource.pm, VTK/vtkStack.pm, VTK/vtkStructuredData.pm,
+	VTK/vtkStructuredPoints.pm, VTK/vtkTCoords.pm, VTK/vtkTensor.pm,
+	VTK/vtkTensors.pm, VTK/vtkTetra.pm, VTK/vtkTimeStamp.pm,
+	VTK/vtkTimerLog.pm, VTK/vtkTransform.pm,
+	VTK/vtkTransformCollection.pm, VTK/vtkTriangle.pm,
+	VTK/vtkTriangleStrip.pm, VTK/vtkUnsignedCharArray.pm,
+	VTK/vtkUnsignedIntArray.pm, VTK/vtkUnsignedLongArray.pm,
+	VTK/vtkUnsignedShortArray.pm, VTK/vtkVectors.pm, VTK/vtkVertex.pm,
+	VTK/vtkViewport.pm, VTK/vtkVoidArray.pm, VTK/vtkVoxel.pm,
+	VTK/vtkWedge.pm, VTK/vtkWindow.pm,
+	VTK/vtkWindowLevelLookupTable.pm, VTK/vtkWindowToImageFilter.pm,
+	VTK/vtkEncodedGradientShader.pm, VTK/vtkExporter.pm,
+	VTK/vtkExtractEdges.pm, VTK/vtkExtractGeometry.pm,
+	VTK/vtkExtractGrid.pm, VTK/vtkExtractPolyDataGeometry.pm,
+	VTK/vtkExtractTensorComponents.pm,
+	VTK/vtkExtractUnstructuredGrid.pm, VTK/vtkExtractVOI.pm,
+	VTK/vtkExtractVectorComponents.pm, VTK/vtkFeatureEdges.pm,
+	VTK/vtkFieldDataToAttributeDataFilter.pm,
+	VTK/vtkFiniteDifferenceGradientEstimator.pm, VTK/vtkFollower.pm,
+	VTK/vtkFrustumCoverageCuller.pm, VTK/vtkGaussianSplatter.pm,
+	VTK/vtkGeometryFilter.pm, VTK/vtkGlyph3D.pm,
+	VTK/vtkGraphicsFactory.pm, VTK/vtkHedgeHog.pm, VTK/vtkHull.pm,
+	VTK/vtkHyperStreamline.pm, VTK/vtkIVExporter.pm,
+	VTK/vtkIdFilter.pm, VTK/vtkImplicitBoolean.pm,
+	VTK/vtkImplicitDataSet.pm, VTK/vtkImplicitModeller.pm,
+	VTK/vtkImplicitSelectionLoop.pm, VTK/vtkImplicitTextureCoords.pm,
+	VTK/vtkImplicitVolume.pm, VTK/vtkImplicitWindowFunction.pm,
+	VTK/vtkImporter.pm, VTK/vtkInteractorStyle.pm,
+	VTK/vtkInteractorStyleTrackball.pm, VTK/vtkInteractorStyleUser.pm,
+	VTK/vtkInterpolateDataSetAttributes.pm,
+	VTK/vtkInterpolatingSubdivisionFilter.pm, VTK/vtkKochanekSpline.pm,
+	VTK/vtkLODActor.pm, VTK/vtkLODProp3D.pm, VTK/vtkLight.pm,
+	VTK/vtkLightCollection.pm, VTK/vtkLineSource.pm,
+	VTK/vtkLinearExtrusionFilter.pm, VTK/vtkLinearSubdivisionFilter.pm,
+	VTK/vtkLinkEdgels.pm, VTK/vtkLoopSubdivisionFilter.pm,
+	VTK/vtkMCubesReader.pm, VTK/vtkMCubesWriter.pm, VTK/vtkMapper.pm,
+	VTK/vtkMapperCollection.pm, VTK/vtkMaskPoints.pm,
+	VTK/vtkMaskPolyData.pm, VTK/vtkMergeDataObjectFilter.pm,
+	VTK/vtkMergeFilter.pm, VTK/vtkMergePoints.pm, VTK/vtkOBBDicer.pm,
+	VTK/vtkOBBTree.pm, VTK/vtkOBJExporter.pm, VTK/vtkOpenGLCamera.pm,
+	VTK/vtkOpenGLLight.pm, VTK/vtkOpenGLPolyDataMapper.pm,
+	VTK/vtkOpenGLProjectedPolyDataRayBounder.pm,
+	VTK/vtkOpenGLProperty.pm, VTK/vtkOpenGLTexture.pm,
+	VTK/vtkOpenGLVolumeTextureMapper2D.pm, VTK/vtkOutlineFilter.pm,
+	VTK/vtkOutlineSource.pm, VTK/vtkPLOT3DReader.pm, VTK/vtkPicker.pm,
+	VTK/vtkPiecewiseFunction.pm, VTK/vtkPlaneSource.pm,
+	VTK/vtkPlanes.pm, VTK/vtkPointDataToCellData.pm,
+	VTK/vtkPointLoad.pm, VTK/vtkPointPicker.pm,
+	VTK/vtkPointSetSource.pm, VTK/vtkPointSetToPointSetFilter.pm,
+	VTK/vtkPointSource.pm, VTK/vtkPolyDataCollection.pm,
+	VTK/vtkPolyDataConnectivityFilter.pm, VTK/vtkPolyDataMapper.pm,
+	VTK/vtkPolyDataNormals.pm, VTK/vtkPolyDataReader.pm,
+	VTK/vtkPolyDataSource.pm, VTK/vtkPolyDataToPolyDataFilter.pm,
+	VTK/vtkPolyDataWriter.pm, VTK/vtkProbeFilter.pm,
+	VTK/vtkProgrammableAttributeDataFilter.pm,
+	VTK/vtkProgrammableDataObjectSource.pm,
+	VTK/vtkProgrammableFilter.pm, VTK/vtkProgrammableGlyphFilter.pm,
+	VTK/vtkProgrammableSource.pm,
+	VTK/vtkProjectedPolyDataRayBounder.pm, VTK/vtkProp3D.pm,
+	VTK/vtkPropPicker.pm, VTK/vtkProperty.pm, VTK/vtkQuadric.pm,
+	VTK/vtkRayBounder.pm, VTK/vtkRayCaster.pm,
+	VTK/vtkRectilinearGridGeometryFilter.pm,
+	VTK/vtkRectilinearGridReader.pm, VTK/vtkRectilinearGridSource.pm,
+	VTK/vtkRectilinearGridToPolyDataFilter.pm,
+	VTK/vtkRectilinearGridWriter.pm, VTK/vtkRecursiveDividingCubes.pm,
+	VTK/vtkRecursiveSphereDirectionEncoder.pm, VTK/vtkRenderWindow.pm,
+	VTK/vtkRenderWindowCollection.pm, VTK/vtkRenderWindowInteractor.pm,
+	VTK/vtkRenderer.pm, VTK/vtkRendererCollection.pm,
+	VTK/vtkRendererSource.pm, VTK/vtkReverseSense.pm,
+	VTK/vtkRibbonFilter.pm, VTK/vtkRotationalExtrusionFilter.pm,
+	VTK/vtkSLCReader.pm, VTK/vtkSTLReader.pm, VTK/vtkSTLWriter.pm,
+	VTK/vtkSampleFunction.pm, VTK/vtkScalarTree.pm,
+	VTK/vtkSelectPolyData.pm, VTK/vtkSelectVisiblePoints.pm,
+	VTK/vtkShepardMethod.pm, VTK/vtkShrinkFilter.pm,
+	VTK/vtkShrinkPolyData.pm, VTK/vtkSimpleElevationFilter.pm,
+	VTK/vtkSmoothPolyDataFilter.pm,
+	VTK/vtkSpatialRepresentationFilter.pm, VTK/vtkSphere.pm,
+	VTK/vtkSphereSource.pm, VTK/vtkSpline.pm, VTK/vtkStreamLine.pm,
+	VTK/vtkStreamPoints.pm, VTK/vtkStreamer.pm, VTK/vtkStripper.pm,
+	VTK/vtkStructuredGridGeometryFilter.pm,
+	VTK/vtkStructuredGridOutlineFilter.pm,
+	VTK/vtkStructuredGridReader.pm, VTK/vtkStructuredGridSource.pm,
+	VTK/vtkStructuredGridToPolyDataFilter.pm,
+	VTK/vtkStructuredGridToStructuredGridFilter.pm,
+	VTK/vtkStructuredGridWriter.pm,
+	VTK/vtkStructuredPointsCollection.pm,
+	VTK/vtkStructuredPointsGeometryFilter.pm,
+	VTK/vtkStructuredPointsReader.pm, VTK/vtkStructuredPointsSource.pm,
+	VTK/vtkStructuredPointsToPolyDataFilter.pm,
+	VTK/vtkStructuredPointsToStructuredPointsFilter.pm,
+	VTK/vtkStructuredPointsToUnstructuredGridFilter.pm,
+	VTK/vtkStructuredPointsWriter.pm, VTK/vtkSubPixelPositionEdgels.pm,
+	VTK/vtkTensorGlyph.pm, VTK/vtkTextSource.pm, VTK/vtkTexture.pm,
+	VTK/vtkTextureMapToCylinder.pm, VTK/vtkTextureMapToPlane.pm,
+	VTK/vtkTextureMapToSphere.pm, VTK/vtkTexturedSphereSource.pm,
+	VTK/vtkThreshold.pm, VTK/vtkThresholdPoints.pm,
+	VTK/vtkThresholdTextureCoords.pm, VTK/vtkTransformFilter.pm,
+	VTK/vtkTransformPolyDataFilter.pm,
+	VTK/vtkTransformTextureCoords.pm, VTK/vtkTriangleFilter.pm,
+	VTK/vtkTriangularTCoords.pm, VTK/vtkTriangularTexture.pm,
+	VTK/vtkTubeFilter.pm, VTK/vtkAxisActor2D.pm, VTK/vtkBMPReader.pm,
+	VTK/vtkBMPWriter.pm, VTK/vtkDecimate.pm, VTK/vtkDividingCubes.pm,
+	VTK/vtkGridSynchronizedTemplates3D.pm, VTK/vtkImageAccumulate.pm,
+	VTK/vtkImageAnisotropicDiffusion2D.pm,
+	VTK/vtkImageAnisotropicDiffusion3D.pm, VTK/vtkImageAppend.pm,
+	VTK/vtkImageAppendComponents.pm, VTK/vtkImageBlend.pm,
+	VTK/vtkImageButterworthHighPass.pm,
+	VTK/vtkImageButterworthLowPass.pm, VTK/vtkImageCacheFilter.pm,
+	VTK/vtkImageCanvasSource2D.pm, VTK/vtkImageCast.pm,
+	VTK/vtkImageCityBlockDistance.pm, VTK/vtkImageClip.pm,
+	VTK/vtkImageComposite.pm, VTK/vtkImageConnector.pm,
+	VTK/vtkImageConstantPad.pm, VTK/vtkImageContinuousDilate3D.pm,
+	VTK/vtkImageContinuousErode3D.pm, VTK/vtkImageCorrelation.pm,
+	VTK/vtkImageCursor3D.pm, VTK/vtkImageDataStreamer.pm,
+	VTK/vtkImageDecomposeFilter.pm, VTK/vtkImageDifference.pm,
+	VTK/vtkImageDilateErode3D.pm, VTK/vtkImageDivergence.pm,
+	VTK/vtkImageDotProduct.pm, VTK/vtkImageEllipsoidSource.pm,
+	VTK/vtkImageEuclideanToPolar.pm, VTK/vtkImageExport.pm,
+	VTK/vtkImageExtractComponents.pm, VTK/vtkImageFFT.pm,
+	VTK/vtkImageFilter.pm, VTK/vtkImageFlip.pm,
+	VTK/vtkImageFourierCenter.pm, VTK/vtkImageFourierFilter.pm,
+	VTK/vtkImageGaussianSmooth.pm, VTK/vtkImageGaussianSource.pm,
+	VTK/vtkImageGradient.pm, VTK/vtkImageGradientMagnitude.pm,
+	VTK/vtkImageHSVToRGB.pm, VTK/vtkImageHybridMedian2D.pm,
+	VTK/vtkImageIdealHighPass.pm, VTK/vtkImageIdealLowPass.pm,
+	VTK/vtkImageImport.pm, VTK/vtkImageInPlaceFilter.pm,
+	VTK/vtkImageIslandRemoval2D.pm, VTK/vtkImageIterateFilter.pm,
+	VTK/vtkImageLaplacian.pm, VTK/vtkImageLogarithmicScale.pm,
+	VTK/vtkImageLogic.pm, VTK/vtkImageLuminance.pm,
+	VTK/vtkImageMagnify.pm, VTK/vtkImageMagnitude.pm,
+	VTK/vtkImageMandelbrotSource.pm, VTK/vtkImageMapToColors.pm,
+	VTK/vtkImageMapToRGBA.pm, VTK/vtkImageMapper.pm,
+	VTK/vtkImageMarchingCubes.pm, VTK/vtkImageMask.pm,
+	VTK/vtkImageMaskBits.pm, VTK/vtkImageMathematics.pm,
+	VTK/vtkImageMedian3D.pm, VTK/vtkImageMirrorPad.pm,
+	VTK/vtkImageMultipleInputFilter.pm, VTK/vtkImageNoiseSource.pm,
+	VTK/vtkImageNonMaximumSuppression.pm, VTK/vtkImageNormalize.pm,
+	VTK/vtkImageOpenClose3D.pm, VTK/vtkImagePadFilter.pm,
+	VTK/vtkImagePermute.pm, VTK/vtkImageQuantizeRGBToIndex.pm,
+	VTK/vtkImageRFFT.pm, VTK/vtkImageRGBToHSV.pm,
+	VTK/vtkImageRange3D.pm, VTK/vtkImageReader.pm,
+	VTK/vtkImageResample.pm, VTK/vtkImageSeedConnectivity.pm,
+	VTK/vtkImageShiftScale.pm, VTK/vtkImageShrink3D.pm,
+	VTK/vtkImageSinusoidSource.pm, VTK/vtkImageSkeleton2D.pm,
+	VTK/vtkImageSobel2D.pm, VTK/vtkImageSobel3D.pm,
+	VTK/vtkImageSpatialFilter.pm, VTK/vtkImageThreshold.pm,
+	VTK/vtkImageToImageFilter.pm, VTK/vtkImageTranslateExtent.pm,
+	VTK/vtkImageTwoInputFilter.pm, VTK/vtkImageVariance3D.pm,
+	VTK/vtkImageViewer.pm, VTK/vtkImageWindow.pm,
+	VTK/vtkImageWrapPad.pm, VTK/vtkImageWriter.pm, VTK/vtkImager.pm,
+	VTK/vtkImagerCollection.pm, VTK/vtkImagingFactory.pm,
+	VTK/vtkKitwareContourFilter.pm, VTK/vtkLabeledDataMapper.pm,
+	VTK/vtkMarchingContourFilter.pm, VTK/vtkMarchingCubes.pm,
+	VTK/vtkMarchingSquares.pm, VTK/vtkOpenGLImageMapper.pm,
+	VTK/vtkOpenGLImageWindow.pm, VTK/vtkOpenGLImager.pm,
+	VTK/vtkOpenGLPolyDataMapper2D.pm, VTK/vtkPNMReader.pm,
+	VTK/vtkPNMWriter.pm, VTK/vtkPolyDataMapper2D.pm,
+	VTK/vtkPostScriptWriter.pm, VTK/vtkScalarBarActor.pm,
+	VTK/vtkScaledTextActor.pm, VTK/vtkSliceCubes.pm,
+	VTK/vtkSweptSurface.pm, VTK/vtkSynchronizedTemplates2D.pm,
+	VTK/vtkSynchronizedTemplates3D.pm, VTK/vtkTIFFReader.pm,
+	VTK/vtkTIFFWriter.pm, VTK/vtkTextMapper.pm,
+	VTK/vtkUGFacetReader.pm, VTK/vtkUnstructuredGridReader.pm,
+	VTK/vtkUnstructuredGridSource.pm,
+	VTK/vtkUnstructuredGridToUnstructuredGridFilter.pm,
+	VTK/vtkUnstructuredGridWriter.pm, VTK/vtkVRMLExporter.pm,
+	VTK/vtkVectorDot.pm, VTK/vtkVectorNorm.pm, VTK/vtkVectorText.pm,
+	VTK/vtkViewRays.pm, VTK/vtkVolume.pm, VTK/vtkVolume16Reader.pm,
+	VTK/vtkVolumeCollection.pm, VTK/vtkVolumeMapper.pm,
+	VTK/vtkVolumeProperty.pm, VTK/vtkVolumeRayCastCompositeFunction.pm,
+	VTK/vtkVolumeRayCastFunction.pm,
+	VTK/vtkVolumeRayCastIsosurfaceFunction.pm,
+	VTK/vtkVolumeRayCastMIPFunction.pm, VTK/vtkVolumeRayCastMapper.pm,
+	VTK/vtkVolumeReader.pm, VTK/vtkVolumeTextureMapper.pm,
+	VTK/vtkVolumeTextureMapper2D.pm,
+	VTK/vtkVoxelContoursToSurfaceFilter.pm, VTK/vtkVoxelModeller.pm,
+	VTK/vtkWarpLens.pm, VTK/vtkWarpScalar.pm, VTK/vtkWarpTo.pm,
+	VTK/vtkWarpVector.pm, VTK/vtkWindowedSincPolyDataFilter.pm,
+	VTK/vtkWorldPointPicker.pm, VTK/vtkWriter.pm,
+	VTK/vtkXImageMapper.pm, VTK/vtkXImageWindow.pm,
+	VTK/vtkXPolyDataMapper2D.pm, VTK/vtkXRenderWindow.pm,
+	VTK/vtkXRenderWindowInteractor.pm,
+	VTK/vtkXRenderWindowTclInteractor.pm, VTK/vtkXYPlotActor.pm,
+	examples/ColorSph.pl, examples/Cube.pl, examples/Mace.pl,
+	examples/MotBlur.pl, examples/contQuad.pl, examples/medical1.pl,
+	examples/vtkLogo.pl: Initial revision 
+
+2001-07-26 09:55  cerney
+
+	* COPYING, MANIFEST, Makefile.PL, README, VTK.config, VTK.pm,
+	VTK.xs, typemap, vtkPerl.h, VTK/vtk3DSImporter.pm,
+	VTK/vtkAbstractMapper.pm, VTK/vtkAbstractMapper3D.pm,
+	VTK/vtkActor.pm, VTK/vtkActor2D.pm, VTK/vtkActor2DCollection.pm,
+	VTK/vtkActorCollection.pm, VTK/vtkAppendFilter.pm,
+	VTK/vtkAppendPolyData.pm, VTK/vtkApproximatingSubdivisionFilter.pm,
+	VTK/vtkAssembly.pm, VTK/vtkAssemblyPaths.pm,
+	VTK/vtkAttributeData.pm, VTK/vtkAttributeDataToFieldDataFilter.pm,
+	VTK/vtkAxes.pm, VTK/vtkBYUReader.pm, VTK/vtkBYUWriter.pm,
+	VTK/vtkBitArray.pm, VTK/vtkBooleanTexture.pm,
+	VTK/vtkBrownianPoints.pm, VTK/vtkButterflySubdivisionFilter.pm,
+	VTK/vtkCamera.pm, VTK/vtkCardinalSpline.pm,
+	VTK/vtkCastToConcrete.pm, VTK/vtkCell.pm, VTK/vtkCellArray.pm,
+	VTK/vtkCellCenters.pm, VTK/vtkCellData.pm,
+	VTK/vtkCellDataToPointData.pm, VTK/vtkCellLinks.pm,
+	VTK/vtkCellLocator.pm, VTK/vtkCellPicker.pm, VTK/vtkCellTypes.pm,
+	VTK/vtkCharArray.pm, VTK/vtkCleanPolyData.pm,
+	VTK/vtkClipPolyData.pm, VTK/vtkClipVolume.pm, VTK/vtkCollection.pm,
+	VTK/vtkColorTransferFunction.pm, VTK/vtkCone.pm,
+	VTK/vtkConeSource.pm, VTK/vtkConnectivityFilter.pm,
+	VTK/vtkContourFilter.pm, VTK/vtkContourValues.pm,
+	VTK/vtkCoordinate.pm, VTK/vtkCubeSource.pm,
+	VTK/vtkCullerCollection.pm, VTK/vtkCursor3D.pm, VTK/vtkCutter.pm,
+	VTK/vtkCylinder.pm, VTK/vtkCylinderSource.pm,
+	VTK/vtkDashedStreamLine.pm, VTK/vtkDataArray.pm,
+	VTK/vtkDataObject.pm, VTK/vtkDataObjectReader.pm,
+	VTK/vtkDataObjectSource.pm, VTK/vtkDataObjectToDataSetFilter.pm,
+	VTK/vtkDataObjectWriter.pm, VTK/vtkDataReader.pm,
+	VTK/vtkDataSet.pm, VTK/vtkDataSetAttributes.pm,
+	VTK/vtkDataSetCollection.pm, VTK/vtkDataSetMapper.pm,
+	VTK/vtkDataSetReader.pm, VTK/vtkDataSetSource.pm,
+	VTK/vtkDataSetToDataObjectFilter.pm,
+	VTK/vtkDataSetToDataSetFilter.pm,
+	VTK/vtkDataSetToPolyDataFilter.pm,
+	VTK/vtkDataSetToStructuredGridFilter.pm,
+	VTK/vtkDataSetToStructuredPointsFilter.pm,
+	VTK/vtkDataSetToUnstructuredGridFilter.pm, VTK/vtkDataSetWriter.pm,
+	VTK/vtkDataWriter.pm, VTK/vtkDecimatePro.pm, VTK/vtkDelaunay2D.pm,
+	VTK/vtkDelaunay3D.pm, VTK/vtkDicer.pm, VTK/vtkDirectory.pm,
+	VTK/vtkDiskSource.pm, VTK/vtkDoubleArray.pm,
+	VTK/vtkDynamicLoader.pm, VTK/vtkEdgePoints.pm, VTK/vtkEdgeTable.pm,
+	VTK/vtkElevationFilter.pm, VTK/vtkEmptyCell.pm,
+	VTK/vtkEncodedGradientEstimator.pm, VTK/vtkFieldData.pm,
+	VTK/vtkFloatArray.pm, VTK/vtkFloatNormals.pm,
+	VTK/vtkFloatPoints.pm, VTK/vtkFloatScalars.pm,
+	VTK/vtkFloatTCoords.pm, VTK/vtkFloatTensors.pm,
+	VTK/vtkFloatVectors.pm, VTK/vtkGeneralTransform.pm,
+	VTK/vtkGeneralTransformConcatenation.pm,
+	VTK/vtkGeneralTransformInverse.pm, VTK/vtkGenericCell.pm,
+	VTK/vtkHexahedron.pm, VTK/vtkIdList.pm, VTK/vtkImageData.pm,
+	VTK/vtkImageSource.pm, VTK/vtkImageToStructuredPoints.pm,
+	VTK/vtkImplicitFunction.pm, VTK/vtkImplicitFunctionCollection.pm,
+	VTK/vtkIndent.pm, VTK/vtkIntArray.pm, VTK/vtkLine.pm,
+	VTK/vtkLocator.pm, VTK/vtkLogLookupTable.pm, VTK/vtkLongArray.pm,
+	VTK/vtkLookupTable.pm, VTK/vtkMapper2D.pm, VTK/vtkMath.pm,
+	VTK/vtkMatrix4x4.pm, VTK/vtkMergePoints2D.pm,
+	VTK/vtkMultiThreader.pm, VTK/vtkMutexLock.pm, VTK/vtkNormals.pm,
+	VTK/vtkObject.pm, VTK/vtkObjectFactory.pm,
+	VTK/vtkObjectFactoryCollection.pm, VTK/vtkOutputWindow.pm,
+	VTK/vtkPixel.pm, VTK/vtkPlane.pm, VTK/vtkPlaneCollection.pm,
+	VTK/vtkPointData.pm, VTK/vtkPointLocator.pm,
+	VTK/vtkPointLocator2D.pm, VTK/vtkPointSet.pm, VTK/vtkPoints.pm,
+	VTK/vtkPolyData.pm, VTK/vtkPolyLine.pm, VTK/vtkPolyVertex.pm,
+	VTK/vtkPolygon.pm, VTK/vtkPriorityQueue.pm,
+	VTK/vtkProcessObject.pm, VTK/vtkProcessStatistics.pm,
+	VTK/vtkProp.pm, VTK/vtkPropAssembly.pm, VTK/vtkPropCollection.pm,
+	VTK/vtkProperty2D.pm, VTK/vtkPyramid.pm, VTK/vtkQuad.pm,
+	VTK/vtkRectilinearGrid.pm, VTK/vtkReferenceCount.pm,
+	VTK/vtkScalars.pm, VTK/vtkScalarsToColors.pm, VTK/vtkShortArray.pm,
+	VTK/vtkSource.pm, VTK/vtkStack.pm, VTK/vtkStructuredData.pm,
+	VTK/vtkStructuredPoints.pm, VTK/vtkTCoords.pm, VTK/vtkTensor.pm,
+	VTK/vtkTensors.pm, VTK/vtkTetra.pm, VTK/vtkTimeStamp.pm,
+	VTK/vtkTimerLog.pm, VTK/vtkTransform.pm,
+	VTK/vtkTransformCollection.pm, VTK/vtkTriangle.pm,
+	VTK/vtkTriangleStrip.pm, VTK/vtkUnsignedCharArray.pm,
+	VTK/vtkUnsignedIntArray.pm, VTK/vtkUnsignedLongArray.pm,
+	VTK/vtkUnsignedShortArray.pm, VTK/vtkVectors.pm, VTK/vtkVertex.pm,
+	VTK/vtkViewport.pm, VTK/vtkVoidArray.pm, VTK/vtkVoxel.pm,
+	VTK/vtkWedge.pm, VTK/vtkWindow.pm,
+	VTK/vtkWindowLevelLookupTable.pm, VTK/vtkWindowToImageFilter.pm,
+	VTK/vtkEncodedGradientShader.pm, VTK/vtkExporter.pm,
+	VTK/vtkExtractEdges.pm, VTK/vtkExtractGeometry.pm,
+	VTK/vtkExtractGrid.pm, VTK/vtkExtractPolyDataGeometry.pm,
+	VTK/vtkExtractTensorComponents.pm,
+	VTK/vtkExtractUnstructuredGrid.pm, VTK/vtkExtractVOI.pm,
+	VTK/vtkExtractVectorComponents.pm, VTK/vtkFeatureEdges.pm,
+	VTK/vtkFieldDataToAttributeDataFilter.pm,
+	VTK/vtkFiniteDifferenceGradientEstimator.pm, VTK/vtkFollower.pm,
+	VTK/vtkFrustumCoverageCuller.pm, VTK/vtkGaussianSplatter.pm,
+	VTK/vtkGeometryFilter.pm, VTK/vtkGlyph3D.pm,
+	VTK/vtkGraphicsFactory.pm, VTK/vtkHedgeHog.pm, VTK/vtkHull.pm,
+	VTK/vtkHyperStreamline.pm, VTK/vtkIVExporter.pm,
+	VTK/vtkIdFilter.pm, VTK/vtkImplicitBoolean.pm,
+	VTK/vtkImplicitDataSet.pm, VTK/vtkImplicitModeller.pm,
+	VTK/vtkImplicitSelectionLoop.pm, VTK/vtkImplicitTextureCoords.pm,
+	VTK/vtkImplicitVolume.pm, VTK/vtkImplicitWindowFunction.pm,
+	VTK/vtkImporter.pm, VTK/vtkInteractorStyle.pm,
+	VTK/vtkInteractorStyleTrackball.pm, VTK/vtkInteractorStyleUser.pm,
+	VTK/vtkInterpolateDataSetAttributes.pm,
+	VTK/vtkInterpolatingSubdivisionFilter.pm, VTK/vtkKochanekSpline.pm,
+	VTK/vtkLODActor.pm, VTK/vtkLODProp3D.pm, VTK/vtkLight.pm,
+	VTK/vtkLightCollection.pm, VTK/vtkLineSource.pm,
+	VTK/vtkLinearExtrusionFilter.pm, VTK/vtkLinearSubdivisionFilter.pm,
+	VTK/vtkLinkEdgels.pm, VTK/vtkLoopSubdivisionFilter.pm,
+	VTK/vtkMCubesReader.pm, VTK/vtkMCubesWriter.pm, VTK/vtkMapper.pm,
+	VTK/vtkMapperCollection.pm, VTK/vtkMaskPoints.pm,
+	VTK/vtkMaskPolyData.pm, VTK/vtkMergeDataObjectFilter.pm,
+	VTK/vtkMergeFilter.pm, VTK/vtkMergePoints.pm, VTK/vtkOBBDicer.pm,
+	VTK/vtkOBBTree.pm, VTK/vtkOBJExporter.pm, VTK/vtkOpenGLCamera.pm,
+	VTK/vtkOpenGLLight.pm, VTK/vtkOpenGLPolyDataMapper.pm,
+	VTK/vtkOpenGLProjectedPolyDataRayBounder.pm,
+	VTK/vtkOpenGLProperty.pm, VTK/vtkOpenGLTexture.pm,
+	VTK/vtkOpenGLVolumeTextureMapper2D.pm, VTK/vtkOutlineFilter.pm,
+	VTK/vtkOutlineSource.pm, VTK/vtkPLOT3DReader.pm, VTK/vtkPicker.pm,
+	VTK/vtkPiecewiseFunction.pm, VTK/vtkPlaneSource.pm,
+	VTK/vtkPlanes.pm, VTK/vtkPointDataToCellData.pm,
+	VTK/vtkPointLoad.pm, VTK/vtkPointPicker.pm,
+	VTK/vtkPointSetSource.pm, VTK/vtkPointSetToPointSetFilter.pm,
+	VTK/vtkPointSource.pm, VTK/vtkPolyDataCollection.pm,
+	VTK/vtkPolyDataConnectivityFilter.pm, VTK/vtkPolyDataMapper.pm,
+	VTK/vtkPolyDataNormals.pm, VTK/vtkPolyDataReader.pm,
+	VTK/vtkPolyDataSource.pm, VTK/vtkPolyDataToPolyDataFilter.pm,
+	VTK/vtkPolyDataWriter.pm, VTK/vtkProbeFilter.pm,
+	VTK/vtkProgrammableAttributeDataFilter.pm,
+	VTK/vtkProgrammableDataObjectSource.pm,
+	VTK/vtkProgrammableFilter.pm, VTK/vtkProgrammableGlyphFilter.pm,
+	VTK/vtkProgrammableSource.pm,
+	VTK/vtkProjectedPolyDataRayBounder.pm, VTK/vtkProp3D.pm,
+	VTK/vtkPropPicker.pm, VTK/vtkProperty.pm, VTK/vtkQuadric.pm,
+	VTK/vtkRayBounder.pm, VTK/vtkRayCaster.pm,
+	VTK/vtkRectilinearGridGeometryFilter.pm,
+	VTK/vtkRectilinearGridReader.pm, VTK/vtkRectilinearGridSource.pm,
+	VTK/vtkRectilinearGridToPolyDataFilter.pm,
+	VTK/vtkRectilinearGridWriter.pm, VTK/vtkRecursiveDividingCubes.pm,
+	VTK/vtkRecursiveSphereDirectionEncoder.pm, VTK/vtkRenderWindow.pm,
+	VTK/vtkRenderWindowCollection.pm, VTK/vtkRenderWindowInteractor.pm,
+	VTK/vtkRenderer.pm, VTK/vtkRendererCollection.pm,
+	VTK/vtkRendererSource.pm, VTK/vtkReverseSense.pm,
+	VTK/vtkRibbonFilter.pm, VTK/vtkRotationalExtrusionFilter.pm,
+	VTK/vtkSLCReader.pm, VTK/vtkSTLReader.pm, VTK/vtkSTLWriter.pm,
+	VTK/vtkSampleFunction.pm, VTK/vtkScalarTree.pm,
+	VTK/vtkSelectPolyData.pm, VTK/vtkSelectVisiblePoints.pm,
+	VTK/vtkShepardMethod.pm, VTK/vtkShrinkFilter.pm,
+	VTK/vtkShrinkPolyData.pm, VTK/vtkSimpleElevationFilter.pm,
+	VTK/vtkSmoothPolyDataFilter.pm,
+	VTK/vtkSpatialRepresentationFilter.pm, VTK/vtkSphere.pm,
+	VTK/vtkSphereSource.pm, VTK/vtkSpline.pm, VTK/vtkStreamLine.pm,
+	VTK/vtkStreamPoints.pm, VTK/vtkStreamer.pm, VTK/vtkStripper.pm,
+	VTK/vtkStructuredGridGeometryFilter.pm,
+	VTK/vtkStructuredGridOutlineFilter.pm,
+	VTK/vtkStructuredGridReader.pm, VTK/vtkStructuredGridSource.pm,
+	VTK/vtkStructuredGridToPolyDataFilter.pm,
+	VTK/vtkStructuredGridToStructuredGridFilter.pm,
+	VTK/vtkStructuredGridWriter.pm,
+	VTK/vtkStructuredPointsCollection.pm,
+	VTK/vtkStructuredPointsGeometryFilter.pm,
+	VTK/vtkStructuredPointsReader.pm, VTK/vtkStructuredPointsSource.pm,
+	VTK/vtkStructuredPointsToPolyDataFilter.pm,
+	VTK/vtkStructuredPointsToStructuredPointsFilter.pm,
+	VTK/vtkStructuredPointsToUnstructuredGridFilter.pm,
+	VTK/vtkStructuredPointsWriter.pm, VTK/vtkSubPixelPositionEdgels.pm,
+	VTK/vtkTensorGlyph.pm, VTK/vtkTextSource.pm, VTK/vtkTexture.pm,
+	VTK/vtkTextureMapToCylinder.pm, VTK/vtkTextureMapToPlane.pm,
+	VTK/vtkTextureMapToSphere.pm, VTK/vtkTexturedSphereSource.pm,
+	VTK/vtkThreshold.pm, VTK/vtkThresholdPoints.pm,
+	VTK/vtkThresholdTextureCoords.pm, VTK/vtkTransformFilter.pm,
+	VTK/vtkTransformPolyDataFilter.pm,
+	VTK/vtkTransformTextureCoords.pm, VTK/vtkTriangleFilter.pm,
+	VTK/vtkTriangularTCoords.pm, VTK/vtkTriangularTexture.pm,
+	VTK/vtkTubeFilter.pm, VTK/vtkAxisActor2D.pm, VTK/vtkBMPReader.pm,
+	VTK/vtkBMPWriter.pm, VTK/vtkDecimate.pm, VTK/vtkDividingCubes.pm,
+	VTK/vtkGridSynchronizedTemplates3D.pm, VTK/vtkImageAccumulate.pm,
+	VTK/vtkImageAnisotropicDiffusion2D.pm,
+	VTK/vtkImageAnisotropicDiffusion3D.pm, VTK/vtkImageAppend.pm,
+	VTK/vtkImageAppendComponents.pm, VTK/vtkImageBlend.pm,
+	VTK/vtkImageButterworthHighPass.pm,
+	VTK/vtkImageButterworthLowPass.pm, VTK/vtkImageCacheFilter.pm,
+	VTK/vtkImageCanvasSource2D.pm, VTK/vtkImageCast.pm,
+	VTK/vtkImageCityBlockDistance.pm, VTK/vtkImageClip.pm,
+	VTK/vtkImageComposite.pm, VTK/vtkImageConnector.pm,
+	VTK/vtkImageConstantPad.pm, VTK/vtkImageContinuousDilate3D.pm,
+	VTK/vtkImageContinuousErode3D.pm, VTK/vtkImageCorrelation.pm,
+	VTK/vtkImageCursor3D.pm, VTK/vtkImageDataStreamer.pm,
+	VTK/vtkImageDecomposeFilter.pm, VTK/vtkImageDifference.pm,
+	VTK/vtkImageDilateErode3D.pm, VTK/vtkImageDivergence.pm,
+	VTK/vtkImageDotProduct.pm, VTK/vtkImageEllipsoidSource.pm,
+	VTK/vtkImageEuclideanToPolar.pm, VTK/vtkImageExport.pm,
+	VTK/vtkImageExtractComponents.pm, VTK/vtkImageFFT.pm,
+	VTK/vtkImageFilter.pm, VTK/vtkImageFlip.pm,
+	VTK/vtkImageFourierCenter.pm, VTK/vtkImageFourierFilter.pm,
+	VTK/vtkImageGaussianSmooth.pm, VTK/vtkImageGaussianSource.pm,
+	VTK/vtkImageGradient.pm, VTK/vtkImageGradientMagnitude.pm,
+	VTK/vtkImageHSVToRGB.pm, VTK/vtkImageHybridMedian2D.pm,
+	VTK/vtkImageIdealHighPass.pm, VTK/vtkImageIdealLowPass.pm,
+	VTK/vtkImageImport.pm, VTK/vtkImageInPlaceFilter.pm,
+	VTK/vtkImageIslandRemoval2D.pm, VTK/vtkImageIterateFilter.pm,
+	VTK/vtkImageLaplacian.pm, VTK/vtkImageLogarithmicScale.pm,
+	VTK/vtkImageLogic.pm, VTK/vtkImageLuminance.pm,
+	VTK/vtkImageMagnify.pm, VTK/vtkImageMagnitude.pm,
+	VTK/vtkImageMandelbrotSource.pm, VTK/vtkImageMapToColors.pm,
+	VTK/vtkImageMapToRGBA.pm, VTK/vtkImageMapper.pm,
+	VTK/vtkImageMarchingCubes.pm, VTK/vtkImageMask.pm,
+	VTK/vtkImageMaskBits.pm, VTK/vtkImageMathematics.pm,
+	VTK/vtkImageMedian3D.pm, VTK/vtkImageMirrorPad.pm,
+	VTK/vtkImageMultipleInputFilter.pm, VTK/vtkImageNoiseSource.pm,
+	VTK/vtkImageNonMaximumSuppression.pm, VTK/vtkImageNormalize.pm,
+	VTK/vtkImageOpenClose3D.pm, VTK/vtkImagePadFilter.pm,
+	VTK/vtkImagePermute.pm, VTK/vtkImageQuantizeRGBToIndex.pm,
+	VTK/vtkImageRFFT.pm, VTK/vtkImageRGBToHSV.pm,
+	VTK/vtkImageRange3D.pm, VTK/vtkImageReader.pm,
+	VTK/vtkImageResample.pm, VTK/vtkImageSeedConnectivity.pm,
+	VTK/vtkImageShiftScale.pm, VTK/vtkImageShrink3D.pm,
+	VTK/vtkImageSinusoidSource.pm, VTK/vtkImageSkeleton2D.pm,
+	VTK/vtkImageSobel2D.pm, VTK/vtkImageSobel3D.pm,
+	VTK/vtkImageSpatialFilter.pm, VTK/vtkImageThreshold.pm,
+	VTK/vtkImageToImageFilter.pm, VTK/vtkImageTranslateExtent.pm,
+	VTK/vtkImageTwoInputFilter.pm, VTK/vtkImageVariance3D.pm,
+	VTK/vtkImageViewer.pm, VTK/vtkImageWindow.pm,
+	VTK/vtkImageWrapPad.pm, VTK/vtkImageWriter.pm, VTK/vtkImager.pm,
+	VTK/vtkImagerCollection.pm, VTK/vtkImagingFactory.pm,
+	VTK/vtkKitwareContourFilter.pm, VTK/vtkLabeledDataMapper.pm,
+	VTK/vtkMarchingContourFilter.pm, VTK/vtkMarchingCubes.pm,
+	VTK/vtkMarchingSquares.pm, VTK/vtkOpenGLImageMapper.pm,
+	VTK/vtkOpenGLImageWindow.pm, VTK/vtkOpenGLImager.pm,
+	VTK/vtkOpenGLPolyDataMapper2D.pm, VTK/vtkPNMReader.pm,
+	VTK/vtkPNMWriter.pm, VTK/vtkPolyDataMapper2D.pm,
+	VTK/vtkPostScriptWriter.pm, VTK/vtkScalarBarActor.pm,
+	VTK/vtkScaledTextActor.pm, VTK/vtkSliceCubes.pm,
+	VTK/vtkSweptSurface.pm, VTK/vtkSynchronizedTemplates2D.pm,
+	VTK/vtkSynchronizedTemplates3D.pm, VTK/vtkTIFFReader.pm,
+	VTK/vtkTIFFWriter.pm, VTK/vtkTextMapper.pm,
+	VTK/vtkUGFacetReader.pm, VTK/vtkUnstructuredGridReader.pm,
+	VTK/vtkUnstructuredGridSource.pm,
+	VTK/vtkUnstructuredGridToUnstructuredGridFilter.pm,
+	VTK/vtkUnstructuredGridWriter.pm, VTK/vtkVRMLExporter.pm,
+	VTK/vtkVectorDot.pm, VTK/vtkVectorNorm.pm, VTK/vtkVectorText.pm,
+	VTK/vtkViewRays.pm, VTK/vtkVolume.pm, VTK/vtkVolume16Reader.pm,
+	VTK/vtkVolumeCollection.pm, VTK/vtkVolumeMapper.pm,
+	VTK/vtkVolumeProperty.pm, VTK/vtkVolumeRayCastCompositeFunction.pm,
+	VTK/vtkVolumeRayCastFunction.pm,
+	VTK/vtkVolumeRayCastIsosurfaceFunction.pm,
+	VTK/vtkVolumeRayCastMIPFunction.pm, VTK/vtkVolumeRayCastMapper.pm,
+	VTK/vtkVolumeReader.pm, VTK/vtkVolumeTextureMapper.pm,
+	VTK/vtkVolumeTextureMapper2D.pm,
+	VTK/vtkVoxelContoursToSurfaceFilter.pm, VTK/vtkVoxelModeller.pm,
+	VTK/vtkWarpLens.pm, VTK/vtkWarpScalar.pm, VTK/vtkWarpTo.pm,
+	VTK/vtkWarpVector.pm, VTK/vtkWindowedSincPolyDataFilter.pm,
+	VTK/vtkWorldPointPicker.pm, VTK/vtkWriter.pm,
+	VTK/vtkXImageMapper.pm, VTK/vtkXImageWindow.pm,
+	VTK/vtkXPolyDataMapper2D.pm, VTK/vtkXRenderWindow.pm,
+	VTK/vtkXRenderWindowInteractor.pm,
+	VTK/vtkXRenderWindowTclInteractor.pm, VTK/vtkXYPlotActor.pm,
+	examples/ColorSph.pl, examples/Cube.pl, examples/Mace.pl,
+	examples/MotBlur.pl, examples/contQuad.pl, examples/medical1.pl,
+	examples/vtkLogo.pl: Imported using TkCVS 
+

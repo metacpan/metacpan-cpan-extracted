@@ -1,0 +1,13 @@
+0.022 Friday May 28 17:09:48 PDT 2010:
+    - Keep non-author tests from accessing Internet
+
+0.021 Wednesday May 26 18:32:49 PDT 2010:
+    - Fixed minor issue with testing with Test-Simple-0.95_02 (rt57876) (Slaven)
+    - Converted to dzpl
+
+0.020 Friday June 06 18:13:30 PDT 2008:
+    - Forget the description in the title
+    - Minor dox tweaking
+
+0.010 Friday June 06 16:45:07 PDT 2008:
+    - Initial release

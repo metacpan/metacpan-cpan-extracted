@@ -1,0 +1,13 @@
+
+This module was intended to be a flexible and pluggable arch for
+parsing SGF and producing images and xml and things.  In reality
+it's a bit of a mess.  It may work for certain things and I have
+it deployed in quite a few places, but it's probably not the best
+choice if you can find something else that works.
+
+As far as I know, I'm the only person left in the whole wide
+world that's using this -- the other project originators have
+moved on to ruby -- if you use this, and happen to read this,
+definitely let me know.
+
+-Paul (jettero@cpan.org)

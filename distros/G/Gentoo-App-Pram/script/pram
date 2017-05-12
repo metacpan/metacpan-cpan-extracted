@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Gentoo::App::Pram;
+
+Gentoo::App::Pram->new_with_opts->run();
+
+__END__
+
+=head1 NAME
+
+pram - Standalone script for the Gentoo::App::Pram module.
+
+=head1 DESCRIPTION
+
+pram is the frontend script for the Gentoo::App::Pram module.
+
+=head1 SYNOPSIS
+
+pram <Pull Request #>
+
+ --repository|r <repository> Set repository to fetch PR from.
+ --editor|e     <editor>     Set editor to visualise patch in.
+ --signoff|-s                Pass --signoff option to git am.
+ --help|h                    Display help.
+ --man|m                     Display a man page.
+
+=head1 EXAMPLE
+
+ # This command will fetch PR 123 from the GitHub repository 'gentoo/gentoo'
+ # and display it in emacs.
+ $ pram --editor emacs --repository gentoo/gentoo 123
+
+=head1 VERSION
+
+version 0.004
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Patrice Clement.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 AUTHOR
+
+Patrice Clement <monsieurp@gentoo.org>, Kent Fredric <kentnl@gentoo.org>.
+
+=cut

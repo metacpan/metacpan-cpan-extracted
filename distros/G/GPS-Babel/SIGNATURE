@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6868cd7bfd52fb5457755f94434160a771bc6328 Build.PL
+SHA1 61bd8e2239f91567a98150e835430afac84de303 Changes
+SHA1 8816e3c698e7defbd34589d9f82bf4c878783466 MANIFEST
+SHA1 62e1752474d06917856307549abb24419db8e4d3 META.yml
+SHA1 592467607270a734675c21402b59e075af98e42e Makefile.PL
+SHA1 4aa2b42e4b2181f743922287a1b56f0bd6f374ee README
+SHA1 8c97bbeb63b586ee9c722313c2ad7858e32ff52c inc/MyBuilder.pm
+SHA1 ae9752b91f2629d5ed88ac28509a843bc6fa3d0b lib/GPS/Babel.pm
+SHA1 b08fd6f02c5e958e75c425d815f607502658c7e9 t/00.load.t
+SHA1 b57403b1c67f4b5cbd2f861d8a437dfe96201729 t/10.basic.t
+SHA1 cfc765c6d612228749a2c278874155c5fa8b25b6 t/20.execute.t
+SHA1 cdd69390b6546de3e2d05665a28128f061fe3298 t/30.live.t
+SHA1 48b7a43b0bcf2027a6dd8db9967b21d86cd84845 t/fake-babel.pl
+SHA1 7d627617fa7b5036e7587bfc40b3f3fa2a77ed0f t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Darwin)
+
+iEYEARECAAYFAkogKv8ACgkQwoknRJZQnCELVACfZO8NGHdRfu2IXu9HUIgVPBir
+v5kAn2WImkBXnu55kIzcm53gRBaKIe9K
+=zsPG
+-----END PGP SIGNATURE-----

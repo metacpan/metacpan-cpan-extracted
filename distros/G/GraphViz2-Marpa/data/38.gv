@@ -1,0 +1,9 @@
+digraph graph_38
+{
+	node_38_1
+	[
+		color = red
+		fontcolor = green
+		label = <<table border='0'><tr><td>html-style label with 2 <br align='center' /> &lt;br /&gt;s in the middle <br align='center' /> and without a table border.</td></tr></table>>
+	]
+}

@@ -1,0 +1,31 @@
+archives/Games-Sudoku-Component-0.01.tar.gz
+Changes
+lib/Games/Sudoku/Component.pm
+lib/Games/Sudoku/Component/Base.pm
+lib/Games/Sudoku/Component/Controller.pm
+lib/Games/Sudoku/Component/Controller/History.pm
+lib/Games/Sudoku/Component/Controller/Loader.pm
+lib/Games/Sudoku/Component/Controller/Status.pm
+lib/Games/Sudoku/Component/Result.pm
+lib/Games/Sudoku/Component/Table.pm
+lib/Games/Sudoku/Component/Table/Cell.pm
+lib/Games/Sudoku/Component/Table/Item.pm
+lib/Games/Sudoku/Component/Table/Permission.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/02_pod.t
+t/02_podcoverage.t
+t/05_result.t
+t/06_item.t
+t/10_permission.t
+t/10_permission_internal.t
+t/30_cell.t
+t/40_table.t
+t/50_status.t
+t/60_history.t
+t/70_controller.t
+t/80_component.t
+t/90_loader.t
+META.yml                                 Module meta-data (added by MakeMaker)

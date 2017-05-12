@@ -1,0 +1,78 @@
+Revision history for Perl extension Geo::Shapelib.
+
+0.01  Thu Aug 24 13:48:52 2000
+	- original version; created by h2xs 1.20 with options
+		-n Shape shapelib-1.2.8/shapefil
+0.02  Fri Aug 25 14:29:26 EEST 2000
+	- save implemented
+0.03  released Sep 13. 2001
+	- changes from Quinn Hart <qjhart@ucdavis.edu>, see README.Debian
+	- included the debian files into MANIFEST
+0.04  released Mar 4 2003
+	- changes from Leif Pedersen <pedersen@meridian-enviro.com>
+0.05  released Oct 20 2003
+	- as Geo::Shapelib in CPAN
+	- removed the debian files, sorry
+0.06  released Oct 22 2003
+	- included Shapelib-1.2.10 tree into the distro
+0.07  released Jan 14 2004
+	- change suggested by Stephen Woodbridge <woodbri@swoodbridge.com>
+	  ("it would be nice to be able to define the size of the the DBF fields")
+	- changes to shputils.c (#include <stdlib.h>,int findunit(char *unit);)
+0.08  released May 14 2004
+	- notes on installation in Windows from daniel.babault@mbda.fr
+0.09  released May 27 2004
+	- DBFWrite.. bugs fixed (thanks Joaquin Ferrero)
+0.10  released August 20 2004
+	- ForceStrings and other options for the new method (thanks Massimiliano )
+	- save bails out if shape is empty
+0.11  released November 15 2004
+	- ShapeID, NParts, NVertices optional (they are set in save method)
+	- Removed the DB method
+0.12  released January 8 2005
+	- bug fix: $self->{Options} gets set in all cases
+	- Fieldwidths in dbf files are used
+	- rewrote if($self->{Options}{UnhashFields}) in new method
+	- set_sizes method
+	- failure of DBFWriteAttribute gets correctly tested
+	- many bug fixes in dump method
+	- brush up of the man page
+	- new parameters for the constructor
+	- SHPType optional
+	- test.pl rewritten
+0.13 released Feb 8 2005
+	- changes to Shapelib.xs to make it compile with gcc 2.96 (as
+          suggested by Greg Machala)
+0.14 released Apr 11 2005
+	- use Tree:R, optionally build a R-tree of the shapes
+	- new methods: clear_selections, select_vertices, move_selected_vertices
+	- use $shapefile instead of $shape in the docs, $shapefile is
+          the whole object, $shape is either and individual shape or an index
+          to an individual shape
+0.15 released Apr 11 2005
+	- fixed small bugs in 0.14
+0.16 released Apr 21 2005
+	- select_vertices more options (all, one shape, vertices)
+	- Rtree handling in move_selected_vertices
+0.17 released May 26 2005
+	- LoadRecords to control whether load records into Perl vars or not
+	- fixed a bug which made open, save fail
+0.18 released June 11 2005
+	- fixed bugs pointed out by Ethan Alpert:
+	- in xs: in _CreateObject parts and vertices were not read correctly always, wrote tests for these
+	- edited pod, Parts, CombineVertices
+	- new method set_bounds
+0.19 released Jan 15 2006
+	- new constructor options: Like, Load
+	- get_record_hashref
+	- create, add, close
+	- lengths
+0.20 released Jan 15 2006
+	- some bugfixes related to NShapes
+0.21 released Sep 15 2015
+        - remove shapelib from the distribution
+        - add quadtree support
+0.22 released Jan 26 2017
+     - fix error https://rt.cpan.org/Public/Bug/Display.html?id=119994
+     - do not run file size comparison tests
+     

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Wraper arround GD to graph chart",
+   "author" : [
+      "DULAUNOY Fabrice <fabrice at dulaunoy dot com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graph-Chart",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::Dumper" : 0,
+            "Data::Serializer" : 0,
+            "Image::Info" : 0
+         },
+         "requires" : {
+            "Clone" : 0,
+            "Compress::Zlib" : 0,
+            "GD" : 0,
+            "GD::Polyline" : 0,
+            "perl" : "5.005_03"
+         }
+      }
+   },
+   "provides" : {
+      "Graph::Chart" : {
+         "file" : "lib/Graph/Chart.pm",
+         "version" : "0.65"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
+      ]
+   },
+   "version" : "0.65"
+}

@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Games::Affenspiel::Board;
+use Getopt::Long;
+
+my $board_num = undef;
+
+sub show_help {
+	my $text = qq{
+		Affenspiel Game Random Moves.
+		Usage: $0 [OPTIONS]
+		Options:
+			-h --help          show this help and exit
+			-b --board N       different initial board configuration
+			-T --dumb-term     do not position terminal cursor
+			-C --dumb-chars    do not use fancy drawing characters
+	};
+	$text =~ s/^\n//; $text =~ s/\t$//; $text =~ s/^\t\t//mg;
+	print $text;
+	exit 0;
+}
+
+sub wrong_usage {
+	die "Try '$0 --help' for more information.\n";
+}
+
+GetOptions(
+	"h|help"         => \&show_help,
+	"b|board=i"      => \$board_num,
+	"T|dumb-term!"   => \$ENV{DUMB_TERM},
+	"C|dumb-chars!"  => \$ENV{DUMB_CHARS},
+) || wrong_usage();
+
+$| = 1;
+
+my $board = Games::Affenspiel::Board->new($board_num);
+print "\e[1;1H\e[J" unless $ENV{DUMB_TERM};
+$board->show;
+
+for (1 .. 5000) {
+	sleep(1);
+	my ($bar, $gap_position, $direction) = $board->choose_random_move;
+	printf "%4d | bar%s %s -> %s | %s |\n",
+		$_, $bar, $direction,
+		$board->stringify_position($gap_position), $board->hash;
+	print "\e[1;1H" unless $ENV{DUMB_TERM};
+	$board->show;
+}

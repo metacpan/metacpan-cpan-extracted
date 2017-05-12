@@ -1,0 +1,32 @@
+Revision history for Perl module Git::Reduce::Tests
+
+0.01 Sat Aug  2 20:55:45 2014
+    - Original version; created by ExtUtils::ModuleMaker 0.52
+
+0.02 Sun Aug  3 18:58:38 EDT 2014
+    - Improved documentation.
+
+0.03 Mon Aug  4 18:47:32 EDT 2014
+    - Corrected error in name of executable in multiple locations
+
+0.04 Mon Aug  4 20:02:55 EDT 2014
+    - Make usable by perl-5.6 forward.
+
+0.05 Tue Aug  5 21:18:19 EDT 2014
+    - Presuming presence of git, move 2 test files from xt/git to t.
+
+0.06 Tue Aug  5 21:42:44 EDT 2014
+    - 0.05 fails when running tests while installing via cpanm.
+    - Move two files back from t/ to xt/git/.
+
+0.07 Thu Aug  7 21:32:01 EDT 2014
+    - Introduce '--suffix' option.
+
+0.08 Thu Aug  7 22:17:38 EDT 2014
+    - Eliminate one unreachable branch.
+
+0.09 Fri Aug 15 21:15:49 EDT 2014
+    - Make sure certain variables are initialized.
+
+0.10 Mon Mar  9 21:23:17 EDT 2015
+    - Add metadata to Makefile.PL.

@@ -1,0 +1,935 @@
+==================================================
+Changes from 2014-10-26 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 2.6 at 2016-10-25 23:40:11 +0000
+----------------------------------------
+
+  Change: 56146fb19c1e052d16e9c2deb7ce838b41394c9b
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-24 16:38:05 +0000
+
+    New config to profile command and allow cancellation.
+
+    Added changing review.config for the config. Added changing README
+    for the config. Allow aborting of the command after editing and
+    cleanup properly. 
+
+  Change: 5804d27332815bb1c2363e78c6c99cfab5b535e7
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-24 13:37:15 +0000
+
+    Added a new config command.
+
+    The config command allows editing the global config files and the
+    templates and tracks them in the audit. 
+
+  Change: e421816a98b8810a79b79b5124c44fefd8f880d9
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-21 15:41:08 +0000
+
+    Added a bunch of enhancements to the init command.
+
+    - Removed globals. - Added validation of command line arguments and
+    options. - Improved documentation. 
+
+  Change: 0b8cd3aa5e90280f231d243ecfefb6b35c9e58dc
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-21 15:17:57 +0000
+
+    Performance improvement for the show command.
+
+    In a large repository, processing all commits can take significantly
+    longer than processing just the commit required. This change allows a
+    couple of requests to be processed individually before the bulk
+    computation kicks off. 
+
+  Change: f8ab37795659a8e79c4d41ce1ec62821f0c77c06
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-21 14:14:18 +0000
+
+    Added a bunch of enhancements to the Notify module.
+
+    - Deferred initialising globals until really required. - Updated
+    overdue template to show profiles which have been excluded. - Updated
+    overdue template to show age of each commit and how it has been
+    computed. - Updated overdue template to show the state of the overdue
+    commits, particularly useful if it is in locked state. 
+
+  Change: 2cedf4f54b51d7af6ce31cfc8f45352a0484f3df
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-19 18:07:35 +0000
+
+    Fixing an issue with picking up commits for review where one profile
+    has the same name as the begining of another profile.
+
+    As an example consider you have two profiles: team_awesome and
+    team_awesome_and_smart When reviewing commits for team_awesome, the
+    commits from team_awesome_and_smart also get picked. 
+
+  Change: 22822cfc6f5301b83294df9113265dc1cb2713bb
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-19 17:45:59 +0000
+
+    Added a bunch of enhancements to the mailhandler command.
+
+    - Added userid as an alias for username - Added global.auto-approve
+    option in mailhandler config to control if replying with a FIX in the
+    email would approve the comment. - Added dry-run option to allow
+    testing of mail server configuration. - Added gathering metric
+    information for analysis. - Allow ssl option to be set in mailhandler
+    config - Delayed parsing config files until really necessary. - Added
+    validation of command line arguments and options. - Improved
+    documentation. 
+
+  Change: 8b07a3ffa6dd5e3d9a0a301f577fc4f2dabd3217
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-18 16:52:18 +0000
+
+    Added a bunch of enhancements to the select command.
+
+    - Refresh the audit repository before selecting as the selection
+    criterion may have changed. - Added --message / -m option for
+    specifying the reason message for consistency with git. - Added
+    support for multiple --message / -m options to add paragraphs similar
+    to how git handles its message option. - Allow user to abort action
+    leaving the reason / message empty. - Added gathering metric
+    information for analysis. - Changed behaviour of --number option to
+    select all commits by default and also treat 0 and negative numbers
+    as all commits. - Deprecated --all and give warning as it is used in
+    other commands to ignore profile. - Removed globals. - Added
+    validation of command line arguments and options. - Improved
+    documentation. 
+
+  Change: 4562dd659f34cb7cb09e5cb18f3b603e667f9ce6
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-13 16:14:43 +0000
+
+    Added a bunch of enhancements to the profile command.
+
+    - Added --message / -m option for specifying the reason message for
+    consistency with git. - Added support for multiple --message / -m
+    options to add paragraphs similar to how git handles its message
+    option. - Allow user to abort action leaving the reason / message
+    empty. - Fixed: Adding an empty ("") profile would be allowed and
+    lead to unexpected results. - Show list by default. - Removed
+    globals. - Added validation of command line arguments and options. -
+    Improved documentation. 
+
+  Change: 21374c8e9bf2fa13062aae35d66be115a24e5541
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-13 15:36:38 +0000
+
+    Added a bunch of enhancements to the info command.
+
+    - Show selection criterion for selected profile. - Added --files
+    option to also show the actual files that match the selection
+    criterion. - Added --history option to show history of changes to
+    selection criterion config file. Useful when auditing. - Reset the
+    audit repository by default to get the latest audit information. -
+    Added --no-refresh option to skip the reseting the audit repository
+    to audit at a historic point in time. - Added validation of command
+    line arguments. - Improved documentation. 
+
+  Change: 180e75b2b7d096e02b06029f661c0afe8dc2c6d3
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-12 18:27:31 +0000
+
+    Added a bunch of enhancements to the pick command.
+
+    - Added review as an alias, review seems to the first verb that comes
+    to mind when new users try to review code. - Added validation of
+    command line arguments. - Reduced globals. - Added feature to view
+    information about the purpose and guidelines for the audit to be
+    shown while reviewing using a README file. - Added helpful messages
+    to guide new users in the right direction if stuck. - Allow option to
+    cancel at every menu so user can gracefully exit without leaving the
+    commit in a locked state. - Allow customisation of all approval
+    descriptions via configuration. - Allow customisation of all concern
+    reasons via configuration. - Added --unlock option to allow all or
+    matching commits locked by the user to be unlocked without having to
+    resort to interactive mode. - Improved documentation. 
+
+  Change: 47384ec62e676c52f8cff3484ec77f604a26692b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-10-11 17:28:42 +0000
+
+    Docs updated with 2.5 release. 
+
+  Change: 59c82e6f77b1b9bc1d6c6278b76bda3210e32378
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-11 18:30:20 +0000
+
+    Added a bunch of enhancements to the fixed command.
+
+    - Added approve as an alias as sometimes an explaination is enough to
+    clear a concern and does not require a fix. - Added validation of
+    command line arguments. - Removed globals. - Added helpful messages
+    to guide new users in the right direction if stuck. - Improved
+    documentation. 
+
+----------------------------------------
+version 2.5 at 2016-10-11 17:15:49 +0000
+----------------------------------------
+
+  Change: 4bc6b8bb808b97ea94bbf6e0ebd5157e744fd0a9
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-10 16:08:22 +0000
+
+    Added a bunch of enhancements to the report command.
+
+    - Added support for single letter -s and -u options for --since and
+    --until to be consistent with other commands. - Added validation of
+    command line arguments and options. - Extracted date manipulations
+    for getting the start of a month. - Added tests. - Improved
+    documentation. 
+
+  Change: d41a85f701db2d478ec3ca46a39e3f5c7401c7a6
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-07 18:45:04 +0000
+
+    Added a bunch of enhancements to the show command.
+
+    - Support multiple commit hashes on command line to avoid repository
+    resets and speed things up. - Changed logic to use --notes and
+    --no-notes instead of --verbose and turned it on by default. - Also
+    show who has currently locked a commit, if it is still locked. -
+    Improved documentation. 
+
+  Change: 2c22796690340eb06c0e1a74ddca2417b395b38f
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-07 17:33:23 +0000
+
+    Added a bunch of enhancements to the overdue command.
+
+    - Added validation of command line arguments. - Provide age for each
+    commit for better reporting. - Provide the type of age used for
+    overdue calculations for better reporting. - Improved documentation. 
+
+  Change: 20655d40d77df7f5250f1d5e7bebab53478d58ea
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-07 15:02:24 +0000
+
+    Added a bunch of enhancements to the move command.
+
+    - Added validation of command line arguments. - Added --message / -m
+    option for specifying the reason message for consistency with git. -
+    Added support for multiple --message / -m options to add paragraphs
+    similar to how git handles its message option. - Allow skipping move
+    by leaving the reason message empty. - Improved documentation. 
+
+  Change: 79590e96e356a76628d3cf516427648bea18decc
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-06 19:49:56 +0000
+
+    Added a bunch of enhancements to the list command.
+
+    - Added validation of command line arguments. - Show a header for the
+    listed commits. - Added support for multiple --state options and each
+    can take one or a CSV of more states. - Added validation of state and
+    refusal of invalid states. - Show available states in the options. -
+    Improved documentation. 
+
+  Change: e4a96ea27595893e6f696b5668518f85ab6defc0
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-06 18:05:06 +0000
+
+    Added a bunch of enhancements to the comment command.
+
+    - Improved validation of command line arguments. - Removed global
+    variables to avoid loading and running code until really required. -
+    Added --message / -m option to allow adding a comment using command
+    line. - Added multiple --message / -m options to add paragraphs
+    similar to how git handles its message option. - Allow skipping
+    comments by leaving the comment message empty. - Improved
+    documentation. 
+
+  Change: bbd05c216a90fad09960778c26b128060d10d7cc
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-10-04 18:58:22 +0000
+
+    Added diff command to diff the files selected by selection criterion
+    changes 
+
+  Change: 2172e05616791382d8706b7b5286ea564d58a4b0
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-09-01 09:46:29 +0000
+
+    Configure TravisCI 
+
+  Change: f83af5439e33a591e193800b0af5432d0856e54b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-08-31 19:19:51 +0000
+
+    Documentation Upgraded to 2.4 
+
+----------------------------------------
+version 2.4 at 2016-08-31 19:17:58 +0000
+----------------------------------------
+
+  Change: 0855db97b1526bee705bd55de4cb86ab9f70cfb4
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-08-24 15:17:35 +0000
+
+    Git::Code::Review includes an excellent tutorial that would make it
+    easy for new users to understand this tool. Adding a tutorial command
+    to show the bundled tutorial makes it easier for users to discover
+    and use this tutorial. 
+
+  Change: 4f0868304df6c6a2497d470b41a3f9fadc6ed61a
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-08-24 15:08:46 +0000
+
+    Adding a comment to a commit with comments shows a selection list of
+    the commit and well as the comments. Trying to comment on another
+    comment errors out with an "unknown commit object" error. This fix
+    restricts the selection list to commits and thereby eliminates such
+    errors. 
+
+  Change: 505ff9bef7bb6b143675a69d67ef1c61443bba9f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-07-12 00:31:53 +0000
+
+    Version 2.3 Released. 
+
+----------------------------------------
+version 2.3 at 2016-07-12 00:19:22 +0000
+----------------------------------------
+
+  Change: 0a237170faf9ed03ffb932683bf54495bca21dec
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2016-07-11 23:06:51 +0000
+
+    An epoch created for GMT works better when converted as GMT and
+    should fix the tests failing in some timezones. 
+
+  Change: 7cf8c6656bc4089c7a4d8e1977afbca7a5c55b3e
+  Author: Tigin Kaptanoglu <tigin.kaptanoglu@booking.com>
+  Date : 2016-04-13 10:56:47 +0000
+
+    Fixing a couple of 'uninitialized value' warnings in the report
+    command: Use of uninitialized value $config{"priority"} in string eq
+    at
+    /usr/local/booking-perl/5.18.2/site/lib/Git/Code/Review/Notify/Email.
+    pm line 42. Use of uninitialized value $config{"priority"} in string
+    eq at
+    /usr/local/booking-perl/5.18.2/site/lib/Git/Code/Review/Notify/Email.
+    pm line 50. Use of uninitialized value in sprintf at
+    /usr/local/booking-perl/5.18.2/site/lib/Git/Code/Review/Command/repor
+    t.pm line 239. 
+
+----------------------------------------
+version 2.2 at 2016-02-21 08:01:12 +0000
+----------------------------------------
+
+  Change: 2680b9dca8ad5a09d2a4b1dc989059f739a04294
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-21 00:01:12 +0000
+
+    Documentation updates. 
+
+  Change: 7e3daf7d03f243b5c1fca0dfdef94114c8f78395
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 23:59:37 +0000
+
+    Disabled tests that are failing and touched up Pod 
+
+  Change: fdc3f5720c5ed1b277dc9183b01fdf085dde0d8d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 22:53:12 +0000
+
+    Customize the POD Support Section. 
+
+  Change: 6360bd16b672e0983a4ca2d9fcef4c34bacbe812
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 22:31:55 +0000
+
+    Dist::Zilla / Pod::Weaver config fixup. 
+
+  Change: c6408d67a7f807323ae6292ff8b1e5ea49143cb0
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2015-10-08 17:11:32 +0000
+
+    Optimise away many calls to getcwd
+
+    In a reasonably large audit repository, we can end up calling
+    getcwd() thousands of times, and this function may well be forking
+    and exec-ing /bin/pwd. This is slow, and we never chdir anyway, so
+    use the global variable initialised at startup instead. 
+
+  Change: dc8116954fa98f2ab723096e0df4e59aefc7099f
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2015-09-09 17:23:12 +0000
+
+    Fixed DST bug in age calculations. Extracted age calculation into
+    Git::Code::Review::Utilities::Date module. Added support for
+    excluding weekend days in age calculations. Added support to exclude
+    special days like holidays, parties, hackathons and other days from
+    age calculations. Added --weekdays and --workdays to overdue to
+    influence age calculations, where --weekdays excludes weekends and
+    --workdays excludes weekends as well as special days specified in
+    .code-review/special-days.txt. Report now reflects which type of age
+    calculations were used. Ignored .DS_Store and also added tests and
+    documentation. 
+
+  Change: eff0c4381f2cf7f56255feb2c759dea40b843214
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2015-09-07 21:30:14 +0000
+
+    New feature to ignore profiles in overdue reporting when
+    ignore.overdue=1 in notification.config for the profile 
+
+  Change: 5c504be6dc17d4344f12a94a3aab8a911cdbee21
+  Author: Samit Badle <Samit.Badle@gmail.com>
+  Date : 2015-08-24 17:52:38 +0000
+
+    Fixed DST bug in age calculations. Extracted age calculation into
+    Git::Code::Review::Utilities::Date module. Added support for
+    excluding weekend days in age calculations. Added support to exclude
+    special days like holidays, parties, hackathons and other days from
+    age calculations. Added --weekdays and --workdays to overdue to
+    influence age calculations, where --weekdays excludes weekends and
+    --workdays excludes weekends as well as special days specified in
+    .code-review/special-days.txt. Report now reflects which type of age
+    calculations were used. Ignored .DS_Store and also added tests and
+    documentation. 
+
+  Change: a78d0969c8af6ea9b491f73ccc1844572ad316f2
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2015-02-21 21:13:18 +0000
+
+    fix typo 
+
+  Change: 8b964e97389a293972b742025a7a58cd1e824209
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2015-02-20 09:40:06 +0000
+
+    Generate diff files with the --find-renames option
+
+    It's tedious to review commits where a file has just been moved, with
+    only a few lines changed. --find-renames generates a much more
+    concise output. 
+
+----------------------------------------
+version 2.1 at 2015-02-17 13:32:38 +0000
+----------------------------------------
+
+  Change: 891a7ea6c9c1dc02494e149713c6fbf094a83a42
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-02-17 14:32:38 +0000
+
+    Fix bug in the regex matching ISO dates to handle new and old
+    versions of the commits in the repository. 
+
+  Change: f0730a603ebb33f3bbdab51a773c2186956c452c
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-02-17 13:21:54 +0000
+
+    Fix warnings in finding commit date 
+
+----------------------------------------
+version 2.0 at 2015-02-17 12:01:09 +0000
+----------------------------------------
+
+  Change: 2cbaa12a91ea353ec3480f31971de57908a932e6
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-02-17 12:57:46 +0000
+
+    list now show author and selected dates for all commits and uses the
+    select_date attribute for all date range operations. overdue command
+    is now explicit about which commits are overdue and what date they
+    were selected to remove ambiguity. 
+
+  Change: 463bf405b355ba0b4ff7214f30d82f863ab28748
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2015-02-09 10:59:26 +0000
+
+    Use the commit date instead of the author date
+
+    But keep looking for Date: in the patch files for backwards
+    compatibility 
+
+----------------------------------------
+version 1.9 at 2015-02-03 16:23:31 +0000
+----------------------------------------
+
+  Change: 80a1553fbf95bca3530c61a6e79582cfcb2ebcc9
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-02-03 17:23:31 +0000
+
+    Make debugging statement for month determination correct. 
+
+  Change: 44352814dfe9d7062d26758598cd7b63daebcbf8
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-02-03 16:54:35 +0000
+
+    Wasn't handling year wrapping correctly. Partly due to my own stupid
+    use of an arrays, so I better variable naming and bug squashed. 
+
+----------------------------------------
+version 1.8 at 2015-02-02 13:07:43 +0000
+----------------------------------------
+
+  Change: 50f6015851bf4e88c36fa851726bc385889a6084
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2015-02-02 08:42:25 +0000
+
+    More liberal mail parsing for FIX-ing SHA1s 
+
+----------------------------------------
+version 1.7 at 2015-01-15 11:53:35 +0000
+----------------------------------------
+
+  Change: 1e0289e384f10fc94c2cd9f7a0711be791f59c94
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-01-15 12:53:35 +0000
+
+    Fix dumb date math mistake around year boundaries. 
+
+----------------------------------------
+version 1.6 at 2014-12-16 15:21:52 +0000
+----------------------------------------
+
+  Change: 0e068e546fb39ab71e654b9b90979a916b1bac3b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-12-16 16:21:52 +0000
+
+    Cache commit info for the run of the script. Remove caller()
+    functions as that information is less useful than expected. 
+
+  Change: d8992c95e60e044cae0aa7008f9ad3e035049e58
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-12-16 16:20:04 +0000
+
+    Add --critical to overdue to toggle mail headers for importance and
+    priority. Update the rest of the notifications to take advantage of
+    this new flag. 
+
+  Change: 7537df7f3a44da84a13501ee596fc1c2590454a9
+  Author: Dennis Kaarsemaker <dennis@kaarsemaker.net>
+  Date : 2014-12-16 11:17:33 +0000
+
+    Fix 'hostanme' typo 
+
+  Change: adc62afe6e37a89a8fb4c5c6579fa6ebe9be5f0b
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2014-12-16 10:16:19 +0000
+
+    Better error handling for the profile command 
+
+----------------------------------------
+version 1.5 at 2014-12-15 12:45:36 +0000
+----------------------------------------
+
+  Change: 5242bf1e904138bb7128661c612f3d61b90ff55b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-12-15 13:45:36 +0000
+
+    Use caching for speed bump in selection date processing. Bugfix in
+    Git::Code::Review::Notify 
+
+----------------------------------------
+version 1.4 at 2014-12-12 14:58:51 +0000
+----------------------------------------
+
+  Change: cdc8ed55e6255d7006660fcdeff427d8bacb0083
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-12-12 15:56:45 +0000
+
+    Make --notify a global option for things that load
+    Git::Code::Review::Notify.
+
+    Added notify_enabled() to pick and select commands as they should
+    always send notifications.
+
+    Overdue command now includes the email addresses of the folks slated
+    for the selection in the profiles. 
+
+  Change: a2942651a1a0299d076c095bb58eb6f767c37501
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-12-10 18:18:33 +0000
+
+    Changes to the overdue command so it shows only commits where the
+    date selected is beyond the age. This handles merges of topic
+    branches a bit better. 
+
+  Change: ddab4f3dcd28519a9c2b54f03e60b6af499599f2
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2014-12-08 12:21:56 +0000
+
+    Fix a few typos in messages and in documentation 
+
+----------------------------------------
+version 1.3 at 2014-11-25 16:02:59 +0000
+----------------------------------------
+
+  Change: 1b7cef2f0707e22dfd5cb5e0016ee5d043a62386
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-11-25 17:02:59 +0000
+
+    Version bump for 1.3 
+
+  Change: d8b89d2d7095e7b08a76f85cb8f5bf822b6d5e65
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-25 16:56:09 +0000
+
+    Enhancements to the mailhandler
+
+    * Stricter checking for details
+
+    * Notify folks when their email fails to parse
+
+    * Notify reviewers when a comment is made via email
+
+    Cleanup Notify to remove information we cannot rely on. Alias 'fixed'
+    to 'approve' for clarity 
+
+----------------------------------------
+version 1.2 at 2014-11-20 21:47:41 +0000
+----------------------------------------
+
+  Change: e768e2b188ea05ad3e5238bd1e99533e64222c11
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-11-20 22:47:41 +0000
+
+    Version tagged for 1.2 release. 
+
+  Change: 1034aabb26a66f2719d03cff516560e799767d8c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-11-20 22:44:52 +0000
+
+    Fix bug with die-ing too soon. 
+
+  Change: 0d6b3815ca301753ba620d6382a7265ec05ab80a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-20 22:37:37 +0000
+
+    Added new function to allow polling IMAP mailboxee for replies to the
+    concerns commands. 
+
+  Change: f81763e662e6ef3d1a9055d3c42b5206ff73fa00
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-20 22:37:15 +0000
+
+    Set the notification name in the meta data. 
+
+  Change: 93b9d71a94b8a6bcf9986bb403da605889a31dbc
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-20 22:35:15 +0000
+
+    Bug squashing in 'show' and the change_state function. 
+
+  Change: f735fa22f154d7dc23d922bfdfe58660fcd06ba8
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-20 21:46:15 +0000
+
+    Removing the cleanup tool as it was a temporary thing. 
+
+  Change: 36f3846d8b5e26d5d150b3c64cdc4ba1b1a725f0
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-20 21:40:29 +0000
+
+    Improve the output of the overdue command. 
+
+  Change: d72210a1d687618956fb78e6c45fce03b5da55dc
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-20 21:08:13 +0000
+
+    Fix bug where comments cause patches to throw exceptions. 
+
+  Change: 72cd4156095f75ff3473f13f4e90826eb544b43f
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-20 13:58:16 +0000
+
+    Cleanup noisy debug output so that we only get useful information 
+
+  Change: 7c407729f5fe36c33842150b46c1f7232254f4cd
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-20 13:56:52 +0000
+
+    Make use of the --notify in the overdue command by setting
+    environment variables to disable the email and jira reporting. 
+
+  Change: ffacb52e739e147084cd977de0d9c25bdf3d535a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-19 17:43:02 +0000
+
+    Overdue report will now include commits in concerns. 
+
+  Change: a479de515d4718902c18a709424e357361ef5cb8
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-17 16:24:19 +0000
+
+    Minor fixes + list
+
+    - use data option for commit listings to file + select
+
+    - Do not select merge commits + show
+
+    - reset the source repo before trying to display the commit +
+    gcr_view_commit refreshes the source repo 
+
+----------------------------------------
+version 1.1 at 2014-11-06 12:04:29 +0000
+----------------------------------------
+
+  Change: 96b651aab2f37d995302db92c5487bc4edc90f5d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-06 13:04:29 +0000
+
+    Added 'cleanup' command which will correct path oddities by pre 1.1
+    releases of the tool. 
+
+  Change: c640697530057c730b985fab06b0b954ff642e41
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-06 13:01:16 +0000
+
+    Handle strange paths by ensuring that the profile actually exists. 
+
+  Change: 6aca40f543f0c997d65f13bf7ead50e1ed10bee1
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-06 13:01:16 +0000
+
+    Added context to gcr_commit_message to make hunting bugs easier. 
+
+  Change: f6251ddda4687e7f2d293abe516135a921dc0fca
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-11-05 13:16:32 +0000
+
+    Fix missing prequisites 
+
+  Change: 623d782641cb62b85e6ebd44d2dc5d625db53d2e
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2014-11-03 23:46:39 +0000
+
+    Some template nits
+
+    Prefix the user-supplied comment details line by "Details:", which
+    should be less confusing about the actual origin of the comments.
+    Also reduce the width of a large line (once a full SHA1 is expanded
+    in it). 
+
+----------------------------------------
+version 1.0 at 2014-11-03 09:46:42 +0000
+----------------------------------------
+
+  Change: 5ef6a2a1172ae008dedcd40c8857ee19bb531405
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-11-03 10:46:42 +0000
+
+    POD Updates for version 1.0 
+
+  Change: d0f3e3215532b1a6a5ddb6aac9677542a895fb35
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2014-10-31 14:14:24 +0000
+
+    Write back the configuration we just read into the %CFG hash
+
+    This was not done, so in this module only the configuration value of
+    'editor' was ever set. Notably, the 'user' configuration setting was
+    ignored. 
+
+  Change: 5939716c8f437a0b8ac0fa3f312cb4507c039c36
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2014-10-31 13:56:10 +0000
+
+    POD syntax fixes
+
+    This should allow to regenerate Tutorial.mkdn without the disgracious
+    section "POD ERRORS" at the end. 
+
+  Change: bc116c5f91d69d58dcf6efd402ef44f76e76ee56
+  Author: Rafael Garcia-Suarez <rgs@consttype.org>
+  Date : 2014-10-29 17:17:39 +0000
+
+    Fix several places that make use of profiles
+
+    because gcr_profiles() returns a list of profiles, not a hash 
+
+----------------------------------------
+version 0.9 at 2014-10-29 17:48:46 +0000
+----------------------------------------
+
+  Change: 0a87043a50a17f526c90c58b71e73f1a5e11aba3
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-29 18:48:46 +0000
+
+    Added overdue commands and templates. 
+
+  Change: 220f11c577d261766bc113ed413730de191a814f
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-27 14:15:18 +0000
+
+    Fixed a few "uninitialized strings" warnings with $ENV{EDITOR} and in
+    list. Major overhaul of the submodule handling to not break things
+    horribly. 
+
+  Change: 35e1af06f62947cfbdc965074dea5c8ab0f17e47
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-14 14:48:52 +0000
+
+    Touch up the JIRA Templates to be date aware. Move to one update per
+    day, allow comments and files in tickets to be updated. Fix some
+    logic in the report action to make the daily report action more
+    fluid. Include details on audited commits in the selection.csv. 
+
+  Change: 5b7b64590f2ed0de423e0bac09dcfac232b6144d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-14 14:48:36 +0000
+
+    Make use of gcr_audit_files in the utilities module. 
+
+  Change: 2fad3b20b1b1b0bb75c1e9ac979c9cc59b72ed10
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-06 18:34:00 +0000
+
+    Report command now includes a list of the commits that were added for
+    the previous month. Better handling of dates so the report makes a
+    lot more sense. 
+
+  Change: 110e271119decce79b9609e8d5031adfa8ceb73f
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-06 18:34:00 +0000
+
+    New command to show the summary of a particular commit. 
+
+  Change: 9b20a991398fd0006b858bb6c5146ac7a20f3b4a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-06 14:32:40 +0000
+
+    Fix YAML Bugs in the template generation 
+
+  Change: a1b6151a139c97e77315bd763382ae6009ccfdd8
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-04 22:22:32 +0000
+
+    Fix bugs in the logic for the display of the history. 
+
+  Change: c7da033f8db7da5696b60af43e1bb1a8a606a570
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-04 17:36:26 +0000
+
+    Use the full history log file to create the 'history.log' attachment
+    in JIRA so auditors have access to all data in the interface. 
+
+  Change: aade3cb662841096df4919f4a5d1fdaaa2689733
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-04 17:35:56 +0000
+
+    Report is restructured to be simpler and more in line with what
+    compliance officers may want. 
+
+  Change: 2ed117f391f679c84369aa075071fb414047a352
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-04 17:34:31 +0000
+
+    Use the gcr_config() function in gcr_commit_message to lookup whether
+    to record review time. This now defaults to false and users must opt
+    in by setting code-review.record_time in their ~/.gitconfig 
+
+  Change: f4615ff4366b3adcc144d092b93e6f5b69257bf7
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-04 17:32:08 +0000
+
+    Saner gcr_config() function for easier additions of tooling. 
+
+  Change: 19c6dc33e9c255a77693cfbff5d76f60270c5044
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-10-04 17:31:29 +0000
+
+    Skip commits without a profile in the list command. 
+
+  Change: 627f851224265e5c50095f6bd23154e4eb447318
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-30 16:58:10 +0000
+
+    Added JIRA Notification Plugin. Added the report command which works
+    wonderfully with the JIRA Notification Plugin. 
+
+  Change: 451ce688db8eaacccbad155750c52744b248e9b7
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-30 16:41:26 +0000
+
+    Change email notification plugin to take advantage of the new STDOUT
+    module. 
+
+  Change: d581cfcfcb78e4054be1470e693f42acfde96762
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-30 16:40:57 +0000
+
+    Profile aware report mechanism for tracking and reporting by profile. 
+
+  Change: 154c2c8373dbb9c5cf1039463d1b5d9fd25216ac
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-30 16:39:13 +0000
+
+    Get the list of files modified in the audit commit. This is useful
+    for counting the number of files a 'select' adds to the repository. 
+
+  Change: 8f90494e43c8649134bd2d2a3b6be9b0e4120861
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-30 16:37:42 +0000
+
+    Added STDOUT Notify plugin for simple message displays. 
+
+  Change: c8bff125afcb68238c0b3cacd19945a515305223
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-29 17:40:18 +0000
+
+    Fixed templates to be readable in email and JIRA-ble. Added Logic to
+    cram data into JIRA. 
+
+  Change: f82939e7305f0be16145be48acd13f1f4a2b032c
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-29 13:33:50 +0000
+
+    Starting the connection bits for JIRA 
+
+  Change: 5af15e749c330b55d09b6a61872bdbede3fb1ce5
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-24 17:58:21 +0000
+
+    Report template is complete with all necessary information coming
+    from the audit log.
+
+    Added utility function to Git::Code::Review::Utilties to facilitate
+    the data collection for reporting.
+
+    JIRA Formatting of the report mail needs to be verfified. 
+
+  Change: 12cc163815100abf1bf832c05803b278a71f61b6
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-18 16:35:50 +0000
+
+    Initial check-in for JIRA Reporting Toolset 
+
+  Change: ff46908fcd043965cae9a14d398702ec37045f9d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-18 16:34:29 +0000
+
+    Fix bug in the display of status information. 
+
+  Change: feaa7493007a5b13414a732d45fb8273b9a820bc
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-08 21:55:39 +0000
+
+    Remove some debugging output as it's too noisy. 
+
+  Change: d236aa83f1a42af3d6f1f13bcd8d95df44163d8e
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-08 21:54:14 +0000
+
+    Enable Git::Repository::Plugin::Log Tweak the logging details for the
+    YAML 
+
+  Change: b91d1b5f39c05a84961b09b730febb28f2182e70
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-08-18 16:01:31 +0000
+
+    Fix bug in default profile file syntax due to YAML reference
+    ambiguity. 
+
+================================================
+Plus 9 releases after 2014-10-26 00:00:00 +0000.
+================================================

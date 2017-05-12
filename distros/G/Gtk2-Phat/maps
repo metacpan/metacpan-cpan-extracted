@@ -1,0 +1,7 @@
+PHAT_TYPE_SLIDER_BUTTON	PhatSliderButton	GObject	Gtk2::Phat::SliderButton
+PHAT_TYPE_FAN_SLIDER	PhatFanSlider	GObject	Gtk2::Phat::FanSlider
+PHAT_TYPE_HFAN_SLIDER	PhatHFanSlider	GObject	Gtk2::Phat::HFanSlider
+PHAT_TYPE_VFAN_SLIDER	PhatVFanSlider	GObject Gtk2::Phat::VFanSlider
+PHAT_TYPE_KEYBOARD		PhatKeyboard	GObject	Gtk2::Phat::Keyboard
+PHAT_TYPE_HKEYBOARD		PhatHKeyboard	GObject	Gtk2::Phat::HKeyboard
+PHAT_TYPE_VKEYBOARD		PhatVKeyboard	GObject	Gtk2::Phat::VKeyboard

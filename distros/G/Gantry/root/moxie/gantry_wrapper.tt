@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <title>[% view.data.title %]</title>
+    
+    <style type="text/css">
+        [% INCLUDE 'css/gantry_site.css' %]
+        [% INCLUDE 'css/gantry_layout.css' %]
+        [% INCLUDE 'css/gantry_forms.css' %]
+        [% INCLUDE 'css/gantry_datepicker.css' %]
+    </style>
+    <script type="text/javascript">
+        [% INCLUDE 'js/jquery.js' %]
+    </script>
+    <script type="text/javascript">
+        [% INCLUDE 'js/datePicker.js' %]
+    </script>
+    <script type="text/javascript">
+        [% INCLUDE 'js/gantry.js' %]
+    </script>
+    
+    <script type="text/javascript">
+        $(document).ready(init);
+        function init() {
+            // $.datePicker.setDateFormat('mdy','/');
+            // $('input#shipped').datePicker();
+    
+            // add stripe to admin forms and tables
+            $('dl.checklist dd:odd').addClass('alt');
+            $('tr.results-row:odd').addClass('alt');
+            $('.form-data:odd').addClass('alt');
+        }
+    </script>
+    
+</head>
+
+<body class="template1 overview">
+
+<div id="page">
+    <div id="header">
+        <span style="font-size: 10pt;">
+            [% self.fish_config('app_name') %]
+        </span><br />
+        
+        <a href="/">Gantry</a><br />
+        <span style="font-size: 10pt; position: relative; top: -16px; left: -15px">
+            [% self.gantry_version %]
+        </span>
+	</div>
+	
+	<div id="body">
+      
+    [% content %]
+
+	</div>
+	
+	<div id="footer">
+	  <p>Copyright &copy; 2007 Me</p>
+	</div>
+
+</div>
+ 
+</body></html>

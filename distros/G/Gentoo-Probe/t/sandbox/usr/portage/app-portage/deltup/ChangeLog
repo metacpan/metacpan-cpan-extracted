@@ -1,0 +1,53 @@
+# ChangeLog for app-portage/deltup
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/deltup/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  21 Feb 2004; Brian Harring <ferringb@gentoo.org> deltup-0.4.0.ebuild, 
+  deltup-0.3.7: Added warning about deltup's imminent demise, and url for glep9
+
+  23 Jan 2004; Brian Harring <ferringb@gentoo.org> deltup-0.3.7.ebuild,
+  deltup-0.4.0.ebuild, metadata.xml:
+  adjusting keywording to just ~x86, ~ppc, and ~sparc. deltup is dependant on
+  xdelta to function, and xdelta is keyworded only for those arches
+
+  23 Jan 2004; Brian Harring <ferringb@gentoo.org> metadata.xml:
+  assuming maintainership of deltup. Currently deltup is slated for removal due
+  to development being stopped upstream.
+
+*deltup-0.4.0 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> deltup-0.3.4.ebuild,
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> deltup-0.3.4.ebuild,
+  deltup-0.3.5.ebuild, deltup-0.3.6.1.ebuild, deltup-0.3.7.ebuild,
+  deltup-0.4.0.ebuild:
+  moved from sys-apps to app-portage
+
+*deltup-0.4.0 (24 Jul 2003)
+
+  24 Jul 2003; Martin Holzer <mholzer@gentoo.org> deltup-0.4.0.ebuild:
+  Version bumped.
+
+*deltup-0.3.7 (27 Jun 2003)
+
+  27 Jun 2003; Donnie Berkholz <spyderous@gentoo.org> deltup-0.3.7.ebuild:
+  Bump.
+
+*deltup-0.3.6.1 (17 Jun 2003)
+
+  17 Jun 2003; Seemant Kulleen <seemant@gentoo.org> deltup-0.3.6.1.ebuild:
+  version bump -- now, an unofficial mirror exists to house dtu's. so make your
+  make.conf have this:
+  FETCHCOMMAND="efetch ${URI} ${DISTDIR} ftp://sunsite.dk/projects/deltup/patchfiles"
+
+*deltup-0.3.5 (13 Jun 2003)
+
+  13 Jun 2003; Seemant Kulleen <seemant@gentoo.org> deltup-0.3.5.ebuild:
+  version bump, thanks to john
+
+*deltup-0.3.4 (08 Jun 2003)
+
+  08 Jun 2003; Seemant Kulleen <seemant@gentoo.org> deltup-0.3.4.ebuild:
+  new package for a patch system for distfiles. Essentially an implementation of
+  deltas for upgrading. Package was written (and ebuild submitted) by: John
+  Joseph Whitney <jjw@linuxmail.org> in bug #18354
+

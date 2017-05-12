@@ -1,0 +1,2 @@
+BUFR.pm ERROR: Section 5 is not '7777' but the 4 characters (in hex): 0x16 0x00 0x00 0x62 at ./bufrread.pl line 143
+In message 1 contained in bulletin with ahl IUSA11 TEST 291800

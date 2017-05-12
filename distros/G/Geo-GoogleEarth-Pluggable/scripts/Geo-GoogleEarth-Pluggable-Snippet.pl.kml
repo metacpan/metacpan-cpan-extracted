@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+  <Document>
+    <name>My Document Name</name>
+    <Snippet maxLines="1">My Document Snippet</Snippet>
+    <Folder>
+      <name>My Folder Name</name>
+      <Snippet maxLines="1">My Folder Snippet</Snippet>
+      <Placemark>
+        <name>White House</name>
+        <Snippet maxLines="2">1600 Pennsylvania Avenue NW
+Washington, DC 20500</Snippet>
+        <Point>
+          <coordinates>-77.03655,38.89767,0</coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

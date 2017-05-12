@@ -1,0 +1,53 @@
+# ----------------------------------------------------------------------------
+# README
+# Geography::USStates
+# Version 0.12
+# Dion Almaer (dion@almaer.com)
+# Wed May 26 02:15:53 1999
+# ----------------------------------------------------------------------------
+# CHANGES: 0.10 was missing New Jersey!
+#          0.11 didn't handle US dependant areas
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# ABOUT
+# ----------------------------------------------------------------------------
+Geography::USStates holds US State name and abbreviation information
+that you can get through a few simple functions.
+
+It also holds information on the US Dependant areas (like Virgin Islands etc),
+and lumps the District of Columbia in that
+
+NOTE: perldoc Geography::USStates to find out more!
+      see 't/main.t' to see sample functions being used!
+
+# ----------------------------------------------------------------------------
+# COMPATIBILITY
+# ----------------------------------------------------------------------------
+This module is pure Perl. It should work with any Perl5
+
+# ----------------------------------------------------------------------------
+# INSTALL
+# ----------------------------------------------------------------------------
+To build and test this distribution, type:
+
+  perl Makefile.PL
+  make test
+
+If the tests pass, install it:
+
+  make install
+
+# ----------------------------------------------------------------------------
+# PROBLEMS/BUG REPORTS
+# ----------------------------------------------------------------------------
+Please send any reports of problems or bugs to dion@almaer.com.
+
+# ----------------------------------------------------------------------------
+# CREDITS AND LICENSES
+# ----------------------------------------------------------------------------
+This package is copyright © 1998 by Dion Almer (dion@almaer.com) and may be
+distributed under terms of the Artistic License used to cover Perl itself.
+See the file Artistic in the distribution of Perl 5.002 or later for details
+of copy and distribution terms.
+# ----------------------------------------------------------------------------

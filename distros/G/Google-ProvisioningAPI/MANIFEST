@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Google-ProvisioningAPI.t
+lib/Google/ProvisioningAPI.pm
+META.yml                                 Module meta-data (added by MakeMaker)

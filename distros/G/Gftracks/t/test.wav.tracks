@@ -1,0 +1,36 @@
+# GramoFile Tracks File
+#
+# This file contains information on track starts/ends. It is automatically
+# generated and will be overwritten completely by subsequent track-
+# splitting actions on the same audio file.
+
+# Blank lines and lines starting with `#' are ignored.
+
+[Tracks]
+# These values are not used (yet), but are included for reference /
+# regeneration purposes.
+Blocklen=4410
+Global_silence_factor=150
+Local_silence_factor=5
+Min_silence_blocks=5
+Min_track_blocks=50
+Extra_blocks_start=3
+Extra_blocks_end=6
+
+# Below are start/end times of tracks. These are used to create separate
+# soundfiles during signal processing. You may modify the computed values
+# if you disagree... The block-numbers are those used in the .med file.
+
+Number_of_tracks=3
+
+# Track 1 - blocks 0 to 1915 - length: 0:03:11.600
+Track01start=0:00:05.000
+Track01end=0:03:11.600
+
+# Track 2 - blocks 1948 to 2696 - length: 0:01:14.900
+Track02start=0:03:14.800
+Track02end=0:04:29.700
+
+# Track 3 - blocks 2734 to 4607 - length: 0:03:07.400
+Track03start=0:04:33.400
+Track03end=0:07:40.800

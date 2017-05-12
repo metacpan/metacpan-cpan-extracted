@@ -1,0 +1,31 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/posadis/files/posadis-init,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+depend() {
+	need net
+	provide dns
+}
+
+checkconfig() {
+	if [ ! -e /etc/posadisrc ] ; then
+		eerror "You need an /etc/posadisrc to run Posadis"
+		eerror "For more help, do man posadisrc."
+		return 1
+	fi
+	return 0
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting Posadis"
+	start-stop-daemon --quiet --start -p /var/posadis/pidfile --exec /usr/bin/posadis -- -p /var/posadis/pidfile -f
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping Posadis"
+	start-stop-daemon --quiet --stop --name posadis -p /var/posadis/pidfile --exec /usr/bin/posadis
+	eend $?
+}

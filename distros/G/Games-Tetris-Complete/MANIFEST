@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Games/Tetris/Complete.pm
+lib/Games/Tetris/Complete/Shape.pm
+t/00-load.t
+t/boilerplate.t
+t/shape.t
+META.yml                                 Module meta-data (added by MakeMaker)

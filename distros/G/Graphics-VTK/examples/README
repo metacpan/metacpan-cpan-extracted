@@ -1,0 +1,94 @@
+The scripts in the subdirectores here 
+are converted from the tcl examples that come with the stock VTK package.
+There were auto-converted (for the most part) using a tcl2perl script
+in this directory. 
+
+Converted TCL Examples that are known to work:
+
+Annotation:
+
+	annotatePick.pl
+	cubeAxes.pl
+	labeledMesh.pl
+	multiLineText.pl
+	TestText.pl
+	textOrigin.pl
+	xyPlot.pl
+
+DataManipulation:
+
+	Arrays.pl
+	CreateStrip.pl
+	FinancialField.pl*
+	marching.pl*
+
+GUI:
+
+	Mace.pl
+	MaceTk.pl*
+
+ImageProcessing:
+
+	Contours2D.pl
+	Histogram.pl *
+	
+IO:
+	flamingo.pl
+	stl.pl
+
+Modeling:
+	constrainedDelaunay.pl
+	Delaunay3D.pl
+	DelMesh.pl
+	expCos.pl
+	faultLines.pl
+	hello.pl
+	iceCream.pl
+	reconstructSurface.pl*
+	
+Rendering:
+	assembly.pl
+	CADPart.pl
+	CSpline.pl
+	Cylinder.pl
+	FilterCADPart.pl
+	keyBottle.pl*
+	rainbow.pl
+	RenderLargeImage.pl
+	TPlane.tcl
+
+Tutorial/Step1:
+	Cone.pl
+	
+Tutorial/Step2:
+	Cone2.pl
+	
+VisualizationAlgorithms:
+	ClipCow.pl
+	ColorIsosurface.pl
+	CutCombustor.pl
+	deciFran.pl
+	DepthSort.pl
+	ExtractGeometry.pl
+	ExtractUGrid.pl
+	GenerateTextureCoords.pl
+	imageWarp.pl
+	officeTube.pl
+	officeTubes.pl
+	probeComb.pl
+	smoothFran.pl
+	spikeF.pl
+	streamSurface.pl
+	SubsampleGrid.pl
+	VisQuad.pl
+	warpComb.pl
+	
+VolumeRendering:
+	SimpleRayCast.pl
+	
+		
+*Manually Updated (i.e. not totally
+ autoconverted using tcl2perl)
+	
+
+

@@ -1,0 +1,117 @@
+#############################################################################
+##
+## Gentoo system tcsh scripts
+##
+## $Id: tcsh-bindkey,v 1.1 2004/06/20 09:09:35 linguist Exp $
+##
+## Based on the TCSHRC package (http://tcshrc.sourceforge.net)
+##
+## .tcshrc.bindkey		2Sep2001, Simos Xenitellis (simos@hellug.gr)
+##
+## 2003-01-13  --  Alain Penders (alain@gentoo.org)
+##     Renamed to /etc/profile.d/tcsh-bindkey
+##     Made unnecessary KEY definitions optional.
+##
+
+#  One can use the "bindkey" facility to redefine the meaning of 
+#  keys on the keyboard. Now you can eventually use those F*** keys.
+#
+
+# INSERT : toggles overwrite or insert mode.
+bindkey    ^[[2~  overwrite-mode 
+
+# DELETE : delete char at cursor position.
+bindkey    ^[[3~  delete-char
+
+# HOME : go to the beginning of the line.
+bindkey    ^[[1~  beginning-of-line
+
+# END : go to the end of the line.
+bindkey    ^[[4~  end-of-line
+
+# PAGE UP : search in history backwards for line beginning as current.
+bindkey    ^[[5~   history-search-backward
+
+# PAGE DOWN : search in history forwards for line beginning as current.
+bindkey    ^[[6~   history-search-forward
+
+
+
+if ( $?TCSH_FKEYS ) then
+
+# ESC-left-arrow : go to beginning of left word.        
+# The second version is used to fix a strange bug where the binding
+# stops working after some usage. Did not manage to recreate.
+bindkey    ^[^[[D vi-word-back
+bindkey	   OD vi-word-back
+
+# ESC-right-arrow : go to beginning of right word.
+# The second version is used to fix a strange bug where the binding
+# stops working after some usage. Did not manage to recreate.
+bindkey    ^[^[[C vi-word-fwd
+bindkey	   OC vi-word-fwd
+
+# F1 : help on command currently typed(if 'ls passwd', help on 'ls').
+# first: while in console mode, second: while in X
+bindkey    ^[[[A   run-help
+bindkey    OP    run-help
+
+# F2 : set the mark command to cursor position.
+# first: while in console mode, second: while in X
+bindkey  ^[[[B    set-mark-command 
+bindkey  OQ     set-mark-command 
+
+# F3 : move cursor to the marked position.
+# first: while in console mode, second: while in X
+bindkey   ^[[[C   exchange-point-and-mark 
+bindkey   OR    exchange-point-and-mark 
+
+# F4 : --empty--
+# first: while in console mode, second: while in X
+bindkey   ^[[[D   undefined-key
+bindkey   OS   undefined-key
+
+# F5 : check line for spelling and make changes.
+# first: while in console mode, second: while in X
+bindkey    ^[[[E   spell-line
+bindkey    [15~   spell-line
+
+# F6 : check current word for spelling and make changes.
+# same in both console and X modes
+bindkey    ^[[17~  spell-word
+
+# F7 : insert last item of previous command.
+bindkey    ^[[18~  insert-last-word
+
+# F8 : search in history backwards for line beginning as current.
+bindkey   ^[[19~  history-search-backward
+
+# F9 : clear screen.
+# You may be in the middle of a command when you use this.
+# Does not affect what you are writing at the moment.
+bindkey    ^[[20~  clear-screen
+
+# F10 : do an 'ls -l'.    (\16 is Ctrl-U on Linux(and Sun?))
+bindkey -s ^[[21~  "\16ls -l\n"
+
+# F11 : display load average and current process status.
+bindkey    ^[[23~  "/usr/bin/uptime ; ps"
+
+# F12 : do a ala-csh completion.
+bindkey    ^[[24~  complete-word-raw
+
+#######################################
+# Advanced settings
+
+# Thanks to Carlos Duarte <cgd@teleweb.pt>
+# Eazy edit of path, type Ctrl-X p
+bindkey -s '^Xp'        '. `echo $path`^X*)^A^Dset path = ( '
+
+# Ctrl-X *   Expand glob. example: ls *<^X*>  will expand the line
+# default behaviour
+
+# Ctrl-X $   Expand variables. example: $TERM<^X$> with give  vt100
+# default behaviour
+
+endif
+

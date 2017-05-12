@@ -1,0 +1,18 @@
+use vars qw($SKIP);
+BEGIN {
+   if(! eval "require Test::More;1") { # Test::More was first released with perl 5.007003
+      require Test; # Test was first released with perl 5.005
+      Test->import;
+      $SKIP = 1;
+   } else {
+      Test::More->import;
+   }
+}
+
+if ($SKIP) {
+   plan tests => 1;
+   skip("Test::More does not exist. Skipping...", sub{1});
+   exit;
+}
+
+1;

@@ -1,0 +1,19 @@
+# ChangeLog for net-wireless/gtkskan
+# Copyright 2002-2003 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/gtkskan/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+  31 Oct 2002; Hannes Mehnert <hannes@gentoo.org>:
+  moved to net-wireless
+
+*gtkskan-0.2 ( 10 Feb 2002 )
+
+  07 Jul 2002; phoen][x <phoenix@gentoo.org> gtkskan-0.2.ebuild :
+  Added KEYWORDS, LICENSE, SLOT.
+
+  10 Feb 2002; Karl Trygve Kalleberg <karltk@gentoo.org> ChangeLog files/digest-gtkskan-0.2 gtkskan-0.2.ebuild :  
+  A 802.11 network tool. It can detect networks and services using the
+  wireless extensions for Linux and reading/writing raw 802.11 frames. 
+
+  Initial support is for the wavelan/orinoco card.

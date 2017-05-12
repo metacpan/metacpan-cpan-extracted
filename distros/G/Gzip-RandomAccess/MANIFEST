@@ -1,0 +1,18 @@
+Changes
+libzran/libzran.c
+libzran/libzran.h
+libzran/Makefile.PL
+Makefile.PL
+MANIFEST			This list of files
+lib/Gzip/RandomAccess.pm
+RandomAccess.xs
+README
+t/01index_handling.t
+t/02extract.t
+t/03ctor_errors.t
+t/fixtures/seq.gz
+t/pod.t
+t/pod_coverage.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

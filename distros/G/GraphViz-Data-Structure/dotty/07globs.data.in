@@ -1,0 +1,27 @@
+(name => 'file glob',
+ code => 'my $a = *STDOUT; 
+          GraphViz::Data::Structure->new($a,%title%)->graph->as_canon',
+)
+%%
+(name => 'empty glob ref',
+ code => 'my $a = \*FOO; 
+          GraphViz::Data::Structure->new($a,%title%)->graph->as_canon',
+)
+%%
+(name => 'file glob ref',
+ code => 'my $a = \*STDOUT; 
+          GraphViz::Data::Structure->new($a,%title%)->graph->as_canon',
+)
+%%
+(name => 'multi glob ref',
+ code => 'my ($a,$b,@c,%d); 
+          $a=\*Foo::Bar; 
+          *Foo::Bar=\&normalize; 
+          *Foo::Bar=\$b; 
+          $b="test string"; 
+          *Foo::Bar = \@c; 
+          @c=qw(foo bar baz); 
+          *Foo::Bar = \%d; 
+          %d = (This=>That,The=>Other);  
+          GraphViz::Data::Structure->new(\$a,%title%)->graph->as_canon',
+)

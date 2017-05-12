@@ -1,0 +1,24 @@
+Revision history for Geography-China-Provinces
+
+0.06 2014-09-23T10:21:13Z
+    Migrated to Minilla v2.1.1
+
+0.05 2014-02-18T01:07:43Z
+    Fixed 'zn' to 'zh'
+
+0.04    Sun Oct 21 2012
+    Migrated to Module::Install 1.06
+    Fixed typo: 特別行政區 -> 特別行政区
+    Updated email
+
+0.03    Sat Jan 07 2012
+    Moved some tests from t/ to xt/
+
+0.02    Fri Jan 06 2012
+    Changed method name
+        retrieve_by_category -> category
+    Fixed POD
+
+0.01    Fri Dec 23 16:00:59 2011
+    Initial release.
+

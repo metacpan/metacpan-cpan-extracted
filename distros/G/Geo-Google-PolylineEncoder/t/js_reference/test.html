@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>Interactive Polyline Encoder Utility - Google Maps API - Google Code</title>
+		<link href="http://code.google.com/css/codesite.pack.04102009.css" type="text/css" rel="stylesheet" />
+		<script src="http://code.google.com/js/codesite_head.pack.04102009.js" type="text/javascript"></script>
+		<link rel="search" type="application/opensearchdescription+xml" title="Google Code" href="/osd.xml" />
+		<link href="http://code.google.com/apis/maps/documentation/local_extensions.css" rel="stylesheet" type="text/css" />
+
+<style type="text/css">
+
+    span.new {
+      vertical-align: super;
+      color: #cc0000;
+      font-size: 70%;
+    }
+
+    .encodeBox {
+      width: 550px;
+      height: 40px;
+      font-size: 14px;
+      font-family: Courier;
+    }
+
+    .inputField {
+      width: 160px;
+    }
+
+    #pointList {
+      width: 300px;
+      font-size: 12px;
+    }
+
+    #map_canvas {
+      width: 350px;
+      height: 300px;
+      border: 1px solid gray;
+      margin-top:6px;
+    }
+
+    #txtAddress {
+      width: 14em;
+    }
+
+    </style>
+<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSosDVG8KKPE1-m51RBrvYughuyMxQ-i1QfUnH94QxWIa6N4U6MouMmBA"></script>
+<script src="./polyline.js" type="text/javascript"></script>
+  </head>
+
+  <body onload="createMap()" onunload="GUnload()" class="gc-documentation">
+
+    <div id="gb">
+		</div>
+
+		<div class="gbh" style="left: 0pt;"></div>
+		<div class="gbh" style="right: 0pt;"></div>
+
+		<div id="gc-container">
+			<a id="top"></a>
+			<div id="skipto">
+  
+  
+			</div>
+
+			<div id="codesiteContent">
+      
+				<a name="gc-pagecontent-anchor"></a>   
+				<div class="g-unit" id="gc-pagecontent">
+					<h1 class="page_title">Interactive Polyline Encoder Utility</h1>
+					<br />
+					<table>
+						<tr valign="top">
+							<td>
+								<form method="post" action="javascript:void(0)" onsubmit="centerMap()">
+									Center map at: <input type="text" id="txtAddress"/>
+									<input type="submit" value="Search"/>
+								</form>
+								<div id="map_canvas"></div>
+							</td>
+							<td style="padding-left:20px">
+								<table>
+									<tr>
+										<td align="right">Latitude:</td>
+										<td><input id="txtLatitude" type="text" class="inputField"/></td>
+									</tr>
+									<tr>
+										<td align="right">Longitude:</td>
+										<td><input id="txtLongitude" type="text" class="inputField"/></td>
+									</tr>
+									<tr>
+										<td align="right">Min zoom level:</td>
+										<td><input id="txtLevel" type="text" size=3 value="3"/> <input type="button" value="Add Point" onclick="addPoint()"/></td>
+									</tr>
+									<tr>
+										<td colspan=2 align="right">
+										</td>
+									</tr>
+								</table>
+
+								<br />
+								<b>Point list</b><br />
+								<select id="pointList" size="14" onchange="highlight(this.selectedIndex)"
+												ondblclick="jumpToPoint()"></select>
+								<br/>
+								<input type="button" value="Delete Selected Point" onclick="deletePoint()"/>
+								<input type="button" value="Delete All Points" onclick="deleteAllPoints()"/>
+
+							</td>
+							<td style="padding-left:20px">
+								<b>Input Points List</b><br/>
+								<textarea id="txtPointsList" rows="24" cols="30"></textarea><br/>
+								<input type="button" value="Add Points" onclick="addPointsList()"/>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+
+								<br />
+								<table>
+									<tr>
+										<td>Encoded Polyline:</td>
+										<td>
+											<textarea id="encodedPolyline" class="encodeBox">
+											</textarea>
+										</td>
+									</tr>
+
+									<tr>
+										<td>Encoded Levels:</td>
+										<td>
+											<textarea id="encodedLevels" class="encodeBox">
+											</textarea>
+										</td>
+									</tr>
+									<tr>
+										<td colspan=2 align="right">
+											<input type="button" value="Decode Polyline and Levels" onclick="decode()"/>
+										</td>
+									</tr>
+								</table>
+
+							</td>
+						</tr>
+					</table>
+
+        <!-- end body text -->
+
+   
+				</div><!-- end gc-pagecontent -->
+			</div><!-- end gooey wrapper -->
+
+    </div> <!-- end codesite content -->
+
+
+		<div id="gc-footer" dir="ltr">
+		</div><!-- end gc-footer -->
+
+</div><!-- end gc-container -->
+
+
+
+
+
+<script type="text/javascript">
+var _gaq = _gaq || [];
+
+(function() {
+  var ga = document.createElement('script');
+
+  ga.type = 'text/javascript';
+  ga.async = true;
+  ga.src = 'http://www.google-analytics.com/ga.js';
+  (document.getElementsByTagName('head')[0] ||
+   document.getElementsByTagName('body')[0]).appendChild(ga);
+ })();
+</script>
+
+
+
+
+  </body>
+</html>

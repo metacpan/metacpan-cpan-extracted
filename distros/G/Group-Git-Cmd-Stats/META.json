@@ -1,0 +1,61 @@
+{
+   "abstract" : "Group-Git tools to show statistics accross many repositories",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Group-Git-Cmd-Stats",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::chdir" : "0",
+            "Getopt::Alt" : "v0.3.1",
+            "List::Util" : "1.41",
+            "Moose::Role" : "2.1",
+            "Path::Tiny" : "0.06",
+            "YAML::Syck" : "1.29",
+            "perl" : "5.010",
+            "version" : "0.9902"
+         }
+      }
+   },
+   "provides" : {
+      "Group::Git::Cmd::Stats" : {
+         "file" : "lib/Group/Git/Cmd/Stats.pm",
+         "version" : "v0.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Group::Git::Cmd::Stats"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/Group-Git-Cmd-Stats.git"
+      }
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

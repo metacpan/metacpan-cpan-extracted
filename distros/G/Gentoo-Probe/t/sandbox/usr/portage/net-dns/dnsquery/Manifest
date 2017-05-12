@@ -1,0 +1,6 @@
+MD5 3fd56e7f967120c8625269711e9ef8cb ChangeLog 744
+MD5 8cc7c660447622ea8d4ae7ee2980a766 metadata.xml 520
+MD5 2885bd2ed92e4f78198b0e43fe516827 dnsquery-0.60.2.ebuild 663
+MD5 1182021e918392c411b5cc3327de5d07 dnsquery-0.60.4.ebuild 669
+MD5 728edb8542d52ea9d5a48a051db6e426 files/digest-dnsquery-0.60.4 66
+MD5 3d9dec90c596214e19de6ecfc63aff23 files/digest-dnsquery-0.60.2 66

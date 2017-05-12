@@ -1,0 +1,16 @@
+DESCRIPTION
+    This tool simply replays a git repo into an svn repo for the
+    purpose of using svn natively in Trac. It has the side effect
+    of helping to import more than one project into Trac --
+    something it did not yet support at the time of this writing.
+
+    The svn repo that this tool creates and uses is assumed to be
+    a throwaway and is not meant for people to pull from or push
+    to. It will most likely get dropped and recreated from
+    scratch more than once (from bugs in this app or other
+    problems). This means that the revision numbers will be
+    almost useless and patches may not align quite right.
+
+    This tool is really *only* useful for viewing commits in
+    Trac. It probably has no other purpose.
+

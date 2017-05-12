@@ -1,0 +1,154 @@
+#!/usr/bin/perl
+
+#
+# Use modules
+use LWP::Simple;
+use File::stat;
+use Getopt::Long;
+use GSM::SMS::NBS;
+
+
+#
+# No output buffering
+$|++;
+
+#
+# Get arguments
+my $ARG_TRANSPORTCFG;
+my $ARG_VERBOSE;
+my $ARG_CACHEFILE;
+my $ARG_ACL;
+GetOptions(
+	"config:s"		=> \$ARG_TRANSPORTCFG,	
+	"verbose"		=> \$ARG_VERBOSE,
+	"cachefile=s"	=> \$ARG_CACHEFILE,
+	"acl=s"			=> \$ARG_ACL
+			);
+
+unless ( $ARG_CACHEFILE && $ARG_ACL ) {
+print <<EOT;
+Usage: $0 --cachefile=<file to keep cache> --acl=<comma seperated msisdn regexs> [--verbose] [--config=<file with transport config>] 
+
+    config           File that contains the transport configuration.
+    
+    cachefile        File to keep latest headlines. Slashdot asks only to hit
+                     the server 1 time in an hour, so we obey.
+    
+    acl              Comma seperated list of regular expression of msisdn
+                     to allow the service.
+                     e.g.:
+                     --acl=".*"                   : allow everybody 
+                     --acl="^\+32475,^\+32478"    : allow these prefixes
+                     --acl="^\+32475000000"       : allow this number
+    
+    verbose          Print out info.
+
+    To access /. through a proxy ( bash ):
+    export http_proxy=http://proxy:port
+   
+
+EOT
+exit(1);
+}
+
+
+#
+# Configuration
+my $CFG_TIMEOUT = 60*60;		# 60 minutes, as asked by slashdot ...
+my @CFG_ACL = split /,/, $ARG_ACL;
+
+
+#
+# Let's go
+verb( join( " ", split( //, "SLASHDOT HEADLINES") ) . "\n\n" );
+
+#
+# Start server
+
+my $nbs = GSM::SMS::NBS->new( $ARG_TRANSPORTCFG );
+
+die "Sorry ... could not activate NBS stack ($!) ... check transport logfiles\n"
+	unless $nbs;
+
+my $message;
+my $timestamp;
+my $transportname;
+my $port;
+
+while (1) {
+		verb( "waiting for message ..." );
+		# blocking receive
+		$nbs->receive(	\$msisdn, 
+			\$message, 
+			\$timestamp, 
+			\$transportname, 
+			\$port, 
+			1 );	
+	
+	verb(<<EOT
+
+received a message:
+msisdn:        $msisdn
+timestamp:     $timestamp
+transport:     $transportname
+port:          $port
+--------------------------------------------------------------------------
+$message
+--------------------------------------------------------------------------
+EOT
+);
+	# only text messages
+	unless ( $port ) {
+		# acl check
+		if ( grep { $msisdn =~ /$_/ } @CFG_ACL ) {
+			verb( "acl pass\n" );
+			# check for code word
+			if (  $message =~ /^sld/i ) {  
+	
+				$stats = stat($ARG_CACHEFILE);
+
+				unless ($stats && (time - $stats->mtime) < $CFG_TIMEOUT) {
+					verb( "Getting new SLASHDOT headlines\n" );
+					getstore('http://www.slashdot.org/slashdot.xml', $ARG_CACHEFILE); 
+				}
+
+				open XML,$ARG_CACHEFILE or die("Cannot open $ARG_CACHEFILE for read: $!");
+				my $data = join "", <XML>;
+				close XML;
+				my $msg="";
+				my @msg;
+				while ($data =~ m#<title>(.*?)<\/title>#gsi) {
+					my $line = "*".$1."\n";
+					if (length($msg.$line)>160 || $msg eq "") {
+						if ($msg ne "") {
+							push @msg, $msg;
+						}
+						$msg="SLASHDOT #pa/#fr\n\n";
+					}
+					$msg.=$line;
+				}
+				push @msg, $msg;
+
+				my $from = sprintf("%02d",$#msg+1);
+				for($i=0;$i<=$#msg;$i++) {
+					my $page = sprintf("%02d",$i+1);
+					$msg[$i]=~s/#pa/$page/;
+					$msg[$i]=~s/#fr/$from/;
+					verb( "=" x 75 . "\n" );
+					verb( $msg[$i] );
+					verb( "." x 75 . "\n\n");
+					unless ($nbs->sendSMSTextMessage( $msisdn, $msg[$i] )) {
+						verb("!ERROR SENDING! *check logfile*\n");
+					}
+				}
+			}
+		}	
+	}
+}
+exit(0);
+
+#
+# Verbose function
+sub verb {
+	print shift if $ARG_VERBOSE;
+}

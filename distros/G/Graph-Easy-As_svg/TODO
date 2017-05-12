@@ -1,0 +1,39 @@
+Todo for Graph-Easy-As_svg
+==========================
+
+Output bugs:
+
+* a graph border of double is rendered as single
+* Anon groups should not have a border
+* Borders on nodes/graph are placed on the path center. Instead they should
+  be inside the shape, aka moved BORDER-WIDTH/2 to the inside.
+* Rotated nodes:
+  + Node texts are moved wrongly on rotated nodes (their new
+    center should rotate along with the shape)
+  + do not increase the graph size, so corners might get cut off
+  + the label text is not rotated with the rest of the shape
+* implement border- and edge-style: wave
+* _text_length() could be more accurate
+* edges with style "double" have wrong corner pieces
+* wide and broad self-loops are too small and the line must be moved
+* support different edge starting point styles ala:
+
+  ----->  |----->  o----->  +----->  *----->  >>----->
+
+Shorter output:
+
+* instead of rendering individual edge cells, we should create
+  one path, this would allow better rendering of non-solid
+  edges, like dashed or dotted ones
+* put the stroke-width and stroke on the <g class="edge"> instead on
+  each <line>
+* merge all group cells together to create a minimum number of rectangles
+  to render
+* font-family and font-size are output needless even when they are the
+  default values
+
+Browser-specific woes:
+
+* Firefox 1.5 gets tspan with 'x="..." dy="1em"' wrong
+* Firefox 1.5 seems to ignore text-decoration on <text>
+* Batik 1.5.1 has problems with 'font-size="12px"' on <text>

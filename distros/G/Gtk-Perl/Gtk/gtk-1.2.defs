@@ -1,0 +1,405 @@
+
+(define-flags GtkSpinButtonUpdatePolicy
+  (always GTK_UPDATE_ALWAYS)
+  (if-valid GTK_UPDATE_IF_VALID))
+
+(define-object GtkProgressBar (GtkProgress)
+	)
+
+(define-object GtkProgress (GtkWidget)
+	)
+
+; this is wrong in the header (derived from GtkBin)
+(define-object GtkInvisible (GtkWidget)
+	)
+
+(define-enum GdkExtensionMode
+   (none GDK_EXTENSION_EVENTS_NONE)
+   (all GDK_EXTENSION_EVENTS_ALL)
+   (cursor GDK_EXTENSION_EVENTS_CURSOR))
+
+; gtk+ 1.1 
+
+(define-enum GtkCTreePos
+  (before GTK_CTREE_POS_BEFORE)
+  (as-child GTK_CTREE_POS_AS_CHILD)
+  (after GTK_CTREE_POS_AFTER))
+
+(define-enum GtkCTreeLineStyle
+  (solid GTK_CTREE_LINES_SOLID)
+  (dotted GTK_CTREE_LINES_DOTTED)
+  (tabbed GTK_CTREE_LINES_TABBED)
+  (none GTK_CTREE_LINES_NONE))
+
+(define-enum GtkCTreeExpansionType
+  (expand GTK_CTREE_EXPANSION_EXPAND)
+  (expand-recursive GTK_CTREE_EXPANSION_EXPAND_RECURSIVE)
+  (collapse GTK_CTREE_EXPANSION_COLLAPSE)
+  (collapse-recursive GTK_CTREE_EXPANSION_COLLAPSE_RECURSIVE)
+  (toggle GTK_CTREE_EXPANSION_TOGGLE)
+  (toggle-recursive GTK_CTREE_EXPANSION_TOGGLE_RECURSIVE))
+
+(define-flags GtkDebugFlag
+  (objects GTK_DEBUG_OBJECTS)
+  (misc GTK_DEBUG_MISC)
+  (signals GTK_DEBUG_SIGNALS))
+
+(define-flags GtkAccelFlags
+  (visible GTK_ACCEL_VISIBLE)
+  (signal-visible GTK_ACCEL_SIGNAL_VISIBLE)
+  (locked GTK_ACCEL_LOCKED)
+  (mask GTK_ACCEL_MASK))
+
+(define-enum GtkMatchType
+  (all GTK_MATCH_ALL)
+  (all-tail GTK_MATCH_ALL_TAIL)
+  (head GTK_MATCH_HEAD)
+  (tail GTK_MATCH_TAIL)
+  (exact GTK_MATCH_EXACT)
+  (last GTK_MATCH_LAST))
+
+(define-enum GtkPathPriorityType
+  (lowest GTK_PATH_PRIO_LOWEST)
+  (gtk GTK_PATH_PRIO_GTK)
+  (application GTK_PATH_PRIO_APPLICATION)
+  (rc GTK_PATH_PRIO_RC)
+  (highest GTK_PATH_PRIO_HIGHEST)
+  (mask GTK_PATH_PRIO_MASK))
+
+(define-enum GtkPathType
+  (widget GTK_PATH_WIDGET)
+  (widget-class GTK_PATH_WIDGET_CLASS)
+  (class GTK_PATH_CLASS))
+
+(define-enum GtkReliefStyle
+  (normal GTK_RELIEF_NORMAL)
+  (half GTK_RELIEF_HALF)
+  (none GTK_RELIEF_NONE))
+
+(define-enum GtkResizeMode
+  (parent GTK_RESIZE_PARENT)
+  (queue GTK_RESIZE_QUEUE)
+  (immediate GTK_RESIZE_IMMEDIATE))
+
+(define-flags GtkSignalRunType
+  (first GTK_RUN_FIRST)
+  (last GTK_RUN_LAST)
+  (both GTK_RUN_BOTH)
+  ;;(mask GTK_RUN_MASK)
+  (no-recurse GTK_RUN_NO_RECURSE)
+  (action GTK_RUN_ACTION))
+
+(define-enum GtkScrollType
+  (none GTK_SCROLL_NONE)
+  (step-backward GTK_SCROLL_STEP_BACKWARD)
+  (step-forward GTK_SCROLL_STEP_FORWARD)
+  (page-backward GTK_SCROLL_PAGE_BACKWARD)
+  (page-forward GTK_SCROLL_PAGE_FORWARD)
+  (jump GTK_SCROLL_JUMP))
+
+(define-enum GtkTroughType
+  (none GTK_TROUGH_NONE)
+  (start GTK_TROUGH_START)
+  (end GTK_TROUGH_END)
+  (jump GTK_TROUGH_JUMP))
+
+(define-enum GtkVisibility
+  (none GTK_VISIBILITY_NONE)
+  (partial GTK_VISIBILITY_PARTIAL)
+  (full GTK_VISIBILITY_FULL))
+
+(define-enum GtkFontMetricType
+  (pixels-metric GTK_FONT_METRIC_PIXELS)
+  (points-metric GTK_FONT_METRIC_POINTS))
+
+(define-flags GtkObjectFlags
+  (destroyed GTK_DESTROYED)
+  (floating GTK_FLOATING)
+  (connected GTK_CONNECTED)
+;  (reserved-2 GTK_RESERVED_2)
+;  (object-flag-last GTK_OBJECT_FLAG_LAST)
+  )
+
+;;;;;;;;;;; random stuff
+
+(define-boxed GtkAccelGroup
+ gtk_accel_group_ref
+ gtk_accel_group_unref)
+
+(define-object GtkAccelLabel (GtkLabel))
+(define-object GtkCTree (GtkCList))
+(define-object GtkFontSelection (GtkNotebook))
+(define-object GtkFontSelectionDialog (GtkWindow))
+(define-object GtkItemFactory (GtkObject))
+
+(define-object GtkProgress (GtkWidget))
+(define-object GtkProgressBar (GtkProgress))
+
+(define-object GtkTearoffMenuItem (GtkMenuItem))
+
+(define-enum GtkProgressBarStyle
+  (continuous GTK_PROGRESS_CONTINUOUS)
+  (discrete GTK_PROGRESS_DISCRETE))
+
+(define-enum GtkProgressBarOrientation
+  (left-to-right GTK_PROGRESS_LEFT_TO_RIGHT)
+  (right-to-left GTK_PROGRESS_RIGHT_TO_LEFT)
+  (bottom-to-top GTK_PROGRESS_BOTTOM_TO_TOP)
+  (top-to-bottom GTK_PROGRESS_TOP_TO_BOTTOM))
+
+(define-boxed GtkCTreeNode
+  "(void)"
+  "(void)")
+
+(define-boxed GtkCTreeRow
+  "(void)"
+  "(void)")
+
+(export-enum GtkWindowType)
+(export-enum GtkCellType)
+(export-flags GtkDebugFlag)
+(export-flags GtkAccelFlags)
+;(export-enum GtkArrowType)
+(export-flags GtkAttachOptions)
+(export-enum GtkButtonBoxStyle)
+(export-enum GtkCurveType)
+(export-enum GtkDirectionType)
+(export-enum GtkJustification)
+(export-enum GtkMatchType)
+(export-enum GtkMenuFactoryType)
+(export-enum GtkMetricType)
+(export-enum GtkOrientation)
+(export-enum GtkPackType)
+(export-enum GtkPathPriorityType)
+(export-enum GtkPathType)
+(export-enum GtkPolicyType)
+(export-enum GtkPositionType)
+(export-enum GtkPreviewType)
+(export-enum GtkReliefStyle)
+(export-enum GtkResizeMode)
+(export-flags GtkSignalRunType)
+
+; gtk+ 1.2
+
+(define-enum GtkSortType
+  ( ascending GTK_SORT_ASCENDING)
+  ( descending GTK_SORT_DESCENDING))
+
+; this was also in some earlier version, but play safe for now...
+(define-enum GdkFunction
+  (copy GDK_COPY)
+  (invert GDK_INVERT)
+  (xor GDK_XOR)
+  (clear GDK_CLEAR)
+  (and GDK_AND)
+  (and-reverse GDK_AND_REVERSE)
+  (and-invert GDK_AND_INVERT)
+  (noop GDK_NOOP)
+  (or GDK_OR)
+  (equiv GDK_EQUIV)
+  (or-reverse GDK_OR_REVERSE)
+  (copy-invert GDK_COPY_INVERT)
+  (or-invert GDK_OR_INVERT)
+  (nand GDK_NAND)
+  (set GDK_SET)
+)
+
+(define-object GtkCalendar (GtkWidget))
+
+(define-flags GtkCalendarDisplayOptions
+  (show-heading GTK_CALENDAR_SHOW_HEADING)
+  (show-day-names GTK_CALENDAR_SHOW_DAY_NAMES)
+  (no-month-change GTK_CALENDAR_NO_MONTH_CHANGE)
+  (show-weeks-numbers GTK_CALENDAR_SHOW_WEEK_NUMBERS)
+  (week-start-monday GTK_CALENDAR_WEEK_START_MONDAY))
+
+(export-enum GtkSortType)
+(export-enum GtkCTreePos)
+(export-enum GtkCTreeLineStyle)
+(export-enum GtkCTreeExpansionType)
+
+(define-flags GdkWindowHints
+  (pos GDK_HINT_POS)
+  (min-size GDK_HINT_MIN_SIZE)
+  (max-size GDK_HINT_MAX_SIZE)
+  (base-size GDK_HINT_BASE_SIZE)
+  (aspect GDK_HINT_ASPECT)
+  (resize-inc GDK_HINT_RESIZE_INC))
+
+(define-flags GtkArgFlags
+  (readable GTK_ARG_READABLE)
+  (writable GTK_ARG_WRITABLE)
+  (construct GTK_ARG_CONSTRUCT)
+  (construct-only GTK_ARG_CONSTRUCT_ONLY)
+  (child-arg GTK_ARG_CHILD_ARG))
+
+; previously in Gnome
+(define-object GtkSocket (GtkContainer))
+(define-object GtkPlug (GtkWindow))
+(define-object GtkLayout (GtkContainer))
+
+; drag & drop stuff
+
+(define-flags GtkDestDefaults
+  (motion GTK_DEST_DEFAULT_MOTION)
+  (highlight GTK_DEST_DEFAULT_HIGHLIGHT)
+  (drop GTK_DEST_DEFAULT_DROP)
+  (all GTK_DEST_DEFAULT_ALL))
+
+(define-flags GtkTargetFlags
+  (same-app GTK_TARGET_SAME_APP)
+  (same-widget GTK_TARGET_SAME_WIDGET))
+
+(define-flags GdkDragAction
+  (default GDK_ACTION_DEFAULT)
+  (copy GDK_ACTION_COPY)
+  (move GDK_ACTION_MOVE)
+  (link GDK_ACTION_LINK)
+  (private GDK_ACTION_PRIVATE)
+  (ask GDK_ACTION_ASK))
+
+(define-enum GdkDragProtocol
+  (motif GDK_DRAG_PROTO_MOTIF)
+  (xdnd GDK_DRAG_PROTO_XDND)
+  (rootwin GDK_DRAG_PROTO_ROOTWIN)
+  (none GDK_DRAG_PROTO_NONE))
+
+(define-boxed GdkDragContext
+  gdk_drag_context_ref
+  gdk_drag_context_unref)
+
+(define-boxed GtkTargetList
+  gtk_target_list_ref
+  gtk_target_list_unref)
+
+(define-enum GtkCornerType
+  (top-left GTK_CORNER_TOP_LEFT)
+  (bottom-left GTK_CORNER_BOTTOM_LEFT)
+  (top-right GTK_CORNER_TOP_RIGHT)
+  (bottom-right GTK_CORNER_BOTTOM_RIGHT))
+
+(define-flags GtkFontType
+  (bitmap GTK_FONT_BITMAP)
+  (scalable GTK_FONT_SCALABLE)
+  (scalable-bitmap GTK_FONT_SCALABLE_BITMAP)
+  (all GTK_FONT_ALL))
+
+(define-enum GtkFontFilterType
+  (base GTK_FONT_FILTER_BASE)
+  (user GTK_FONT_FILTER_USER))
+
+(define-enum GtkCListDragPos
+  (none GTK_CLIST_DRAG_NONE)
+  (before GTK_CLIST_DRAG_BEFORE)
+  (into GTK_CLIST_DRAG_INTO)
+  (after GTK_CLIST_DRAG_AFTER))
+
+(define-flags GtkButtonAction
+  (ignored GTK_BUTTON_IGNORED)
+  (selects GTK_BUTTON_SELECTS)
+  (drags GTK_BUTTON_DRAGS)
+  (expands GTK_BUTTON_EXPANDS))
+
+(define-enum GtkCTreeExpanderStyle
+  (none GTK_CTREE_EXPANDER_NONE)
+  (square GTK_CTREE_EXPANDER_SQUARE)
+  (triangle GTK_CTREE_EXPANDER_TRIANGLE)
+  (circular GTK_CTREE_EXPANDER_CIRCULAR))
+
+(define-flags GtkRcFlags
+  (fg GTK_RC_FG)
+  (bg GTK_RC_BG)
+  (text GTK_RC_TEXT)
+  (base GTK_RC_BASE))
+
+(export-enum GdkAxisUse)
+(export-enum GdkByteOrder)
+(export-enum GdkCapStyle)
+(export-enum GdkCursorType)
+(export-enum GdkDragProtocol)
+(export-enum GdkEventType)
+(export-enum GdkExtensionMode)
+(export-enum GdkFill)
+(export-enum GdkFillRule)
+(export-enum GdkFunction)
+(export-enum GdkImageType)
+(export-enum GdkInputMode)
+(export-enum GdkInputSource)
+(export-enum GdkJoinStyle)
+(export-enum GdkLineStyle)
+(export-enum GdkNotifyType)
+(export-enum GdkOverlapType)
+(export-enum GdkPropMode)
+(export-enum GdkPropertyState)
+(export-enum GdkRgbDither)
+(export-enum GdkSelection)
+(export-enum GdkStatus)
+(export-enum GdkSubwindowMode)
+(export-enum GdkVisualType)
+(export-enum GdkWindowClass)
+(export-enum GdkWindowType)
+(export-enum GtkAnchorType)
+(export-enum GtkArrowType)
+(export-enum GtkCListDragPos)
+(export-enum GtkCTreeExpanderStyle)
+(export-enum GtkCornerType)
+(export-enum GtkFontFilterType)
+(export-enum GtkFontMetricType)
+(export-enum GtkFundamentalType)
+(export-enum GtkProgressBarOrientation)
+(export-enum GtkProgressBarStyle)
+(export-enum GtkScrollType)
+(export-enum GtkSelectionMode)
+(export-enum GtkShadowType)
+(export-enum GtkSideType)
+(export-enum GtkStateType)
+(export-enum GtkSubmenuDirection)
+(export-enum GtkSubmenuPlacement)
+(export-enum GtkToolbarChildType)
+(export-enum GtkToolbarSpaceStyle)
+(export-enum GtkToolbarStyle)
+(export-enum GtkTreeViewMode)
+(export-enum GtkTroughType)
+(export-enum GtkUpdateType)
+(export-enum GtkVisibility)
+(export-enum GtkWindowPosition)
+(export-flags GdkDragAction)
+(export-flags GdkEventMask)
+(export-flags GdkGCValuesMask)
+(export-flags GdkInputCondition)
+(export-flags GdkModifierType)
+(export-flags GdkWMDecoration)
+(export-flags GdkWMFunction)
+(export-flags GdkWindowAttributesType)
+(export-flags GdkWindowHints)
+(export-flags GtkArgFlags)
+(export-flags GtkButtonAction)
+(export-flags GtkCalendarDisplayOptions)
+(export-flags GtkDestDefaults)
+(export-flags GtkFontType)
+(export-flags GtkObjectFlags)
+(export-flags GtkPackerOptions)
+(export-flags GtkSpinButtonUpdatePolicy)
+(export-flags GtkTargetFlags)
+(export-flags GtkRcFlags)
+(export-struct GdkColor)
+(export-struct GdkEvent)
+(export-boxed GdkFont)
+(export-boxed GdkWindow)
+(export-boxed GdkDragContext)
+(export-boxed GdkVisual)
+(export-boxed GdkColormap)
+
+(define-enum GdkVisibilityState
+  (unobscured GDK_VISIBILITY_UNOBSCURED)
+  (partial GDK_VISIBILITY_PARTIAL)
+  (fully-obscured GDK_VISIBILITY_FULLY_OBSCURED))
+
+(define-enum GdkCrossingMode
+  (normal GDK_CROSSING_NORMAL)
+  (grab GDK_CROSSING_GRAB)
+  (ungrab GDK_CROSSING_UNGRAB))
+  
+(export-enum GdkVisibilityState)
+(export-enum GdkCrossingMode)
+

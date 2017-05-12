@@ -1,0 +1,19 @@
+---
+abstract: Find a random path between two graph vertices
+author:
+  - 'Bjoern Hoehrmann <bjoern@hoehrmann.de>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Graph-RandomPath
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/hoehrmann/Graph-RandomPath.git
+version: 0.01

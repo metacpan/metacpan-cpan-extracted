@@ -1,0 +1,53 @@
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/Group-Git-Taggers-Node?branch=master"><img src="https://travis-ci.org/ivanwills/Group-Git-Taggers-Node.png?branch=master" alt="Group-Git-Taggers-Node"></a>
+<a href="https://coveralls.io/r/ivanwills/Group-Git-Taggers-Node?branch=master"><img src="https://coveralls.io/repos/ivanwills/Group-Git-Taggers-Node/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=head1 Group::Git::Taggers::Node
+
+Package that helps L<Group::Git> tag repositories containing Node files by
+looking to see if they contain a I<package.json> in the root of the repository.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Group::Git::Taggers::Node
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Group-Git-Taggers-Node
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Group-Git-Taggers-Node
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Group-Git-Taggers-Node
+
+    Search CPAN
+        http://search.cpan.org/dist/Group-Git-Taggers-Node/
+
+    Source Code
+        git://github.com/ivanwills/Group-Git-Taggers-Node.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

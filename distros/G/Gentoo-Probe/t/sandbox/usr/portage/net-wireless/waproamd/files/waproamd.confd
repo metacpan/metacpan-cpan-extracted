@@ -1,0 +1,14 @@
+# Configuration file for waproamd
+# Peter Johanson <latexer@gentoo.org>
+
+# INTERFACES="auto" if you'd like the devices to be determined automagically
+INTERFACES="wlan0"
+
+# Additional parameters for waproamd.
+# (Run "waproamd -h" for further information.)
+ARGS="-wM"
+
+# Additional parameters for waproamd for the specified interface.  Note
+# that $ARGS is ignored, when a variable like this is set for an
+# interface
+#ARGS_wlan0="-wM"

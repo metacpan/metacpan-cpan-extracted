@@ -1,0 +1,100 @@
+commit ab1468569454e19d27548dda3afe8f0916b214f2
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Sun Jun 10 13:13:24 2012 +0200
+
+    Added test for polylines
+
+commit 6d1a3b1c7a215b8a6a9e705c5b3fbcc35806160a
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Sun Jun 10 13:01:56 2012 +0200
+
+    remove debugging code
+
+commit e0b18f8ba696267d051bc4ab29f88a9eefee399c
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Fri Jun 8 19:51:15 2012 +0200
+
+    Merged changes from C. Crum
+
+commit afe68ae8bdd6fcb6b91e108d52a8de040508a283
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Wed Feb 22 19:03:18 2012 +0100
+
+    Increased cache page size for client unit test because tests failing on some platforms
+
+commit 8f544b07bb8df585a625411d4ee67b1b02bc15a8
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Mon Feb 20 11:47:20 2012 +0100
+
+    Made sample response more complex
+    Implemented character limit for path
+    Test caching
+    Use MooseX::WithCache for caching
+
+commit aade9eb8771e7e843330333408c7394e3dd8ea38
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Sun Feb 19 11:46:20 2012 +0100
+
+    Wrote git log to Changes
+
+commit bff67e7649a240a04a8f71fafc4699372a9e758c
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Sun Feb 19 10:34:19 2012 +0100
+
+    Cleaned up Types (use enum where appropriate)
+    Added respons.json to MANIFEST
+
+commit 26d85658450d76839a94ec13e63b6e4c4109bbd9
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Sat Feb 18 11:01:15 2012 +0100
+
+    Added missing PREREQ_PM packages
+
+commit 64e03e301b9b4a2487fd4460b8d7094239b55228
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Fri Feb 17 11:16:52 2012 +0100
+
+    Completed client unit test
+
+commit 1be5d6bcaa2a634d97c5a3402e919b0e4e42bacb
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Thu Feb 16 18:55:45 2012 +0100
+
+    Debugging errors in Types
+
+commit 2ef70a4d1eb18b61cfb292cea69e1003b38c8dc1
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Thu Feb 16 16:30:39 2012 +0100
+
+    Made Types package
+
+commit 7616ae9a527a21e6077c435e16b57d8051ecdd2a
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Thu Feb 2 11:45:33 2012 +0100
+
+    Removed YAML dependancy
+
+commit 3f52b1d1e666606d98edeea1ddd8975b391d34be
+Author: Tim Heaney <oylenshpeegul@gmail.com>
+Date:   Wed Feb 1 20:40:20 2012 -0500
+
+    $ perldoc Google::Directions
+    No documentation found for "Google::Directions".
+
+commit eb4cb59abe3ad54ed940dbd84ef875a9d33d99a5
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Wed Feb 1 19:01:44 2012 +0100
+
+    Completed documentation
+
+commit 791964ffabe0974b709285f348cf2db67d22af1e
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Wed Feb 1 18:02:53 2012 +0100
+
+    Got conversion of json to objects working
+
+commit c5f02eeeba9353254380bdc483be3eec4b0595e2
+Author: Robin Clarke <robin@robinclarke.net>
+Date:   Fri Jan 27 18:29:59 2012 +0100
+
+    First

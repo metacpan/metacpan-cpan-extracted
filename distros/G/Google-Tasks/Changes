@@ -1,0 +1,19 @@
+Revision history for Google-Tasks
+
+1.05      2016-02-22 09:10:41-08:00 America/Los_Angeles
+        - Patch to support Google's new two-page web sign-in process
+
+1.04      2015-01-28 20:34:06-08:00 America/Los_Angeles
+        - Moving up the CI badges in the README.md
+
+1.03      2015-01-28 20:20:42-08:00 America/Los_Angeles
+        - Switching from using cpanfile to Makefile.PL for better TravisCI-ing-ness.
+
+1.02      2015-01-28 20:04:06-08:00 America/Los_Angeles
+        - Pre and post-build handling of cpanfile so TravisCI et al will work.
+
+1.01      2015-01-28 14:29:49-08:00 America/Los_Angeles
+        - Implementing use of Dist::Zilla.
+
+1.00      Tue Jan  6 10:33:25 PST 2015
+        - First version, released on an unsuspecting world.

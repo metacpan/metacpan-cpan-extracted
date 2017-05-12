@@ -1,0 +1,82 @@
+Revision history for Guardian::OpenPlatform::API
+
+0.09  2017-01-01 MANWAR
+      - Added key 'provides' to the Makefile.PL script.
+
+0.08  2016-04-22 MANWAR
+      - Updated Build.PL script with regard to downgrading to Moo.
+
+0.07  2016-04-20 MANWAR
+      - Downgraded to use Moo.
+      - Added standard load test script (t/00-load.t).
+      - Removed '+x' attributes from some of the test scripts.
+
+0.06  2016-04-12 MANWAR
+      * Updated endpoint for API.
+      * Updated param name for api key i.e. 'api-key'.
+      * Tidied up pod document.
+      * Updated github repository details.
+      * Removed '+x' attrbutes from Build.PL, MANIFEST and README.
+      * Tidied up Changes file.
+
+0.05  2009-03-13 Dave Cross <dave@dave.org.uk>
+      * lib/Guardian/OpenPlatform/API.pm: Bumped version number.
+      * commit 79779eeb4721c4d62830d2a74259b236051096af
+      * Build.PL: Removed unnecessary dist_version setting.
+      * commit 264a373ea36fa1386fe20e449d2a96bcb0bc3b30
+      * lib/Guardian/OpenPlatform/API.pm: Added item method.
+      * commit fef44d0db61ccdab153301eebfa79d910f0faa78
+
+0.04  2009-03-12 Dave Cross <dave@dave.org.uk>
+      * t/01-basic.t: Added more tests.
+      * commit 1c1c96cad654d9328d6d15a8d67523b69ea04fa7
+      * lib/Guardian/OpenPlatform/API.pm: Remove repeated text.
+      * commit d4376c928172bd1b252c3b862a85a57ddc38e6a2
+      * Build.PL, lib/Guardian/OpenPlatform/API.pm: Fixed RT email
+        address. Bumped version numbers.
+      * commit 56eda331480e87936368ee1e76ad6470d723e6ea
+
+0.03  2009-03-12 Dave Cross <dave@dave.org.uk>
+      * Changes: Removed Changes file from version control.
+      * commit 63914421e6349087c9afd3bfcd83dafef489c634
+      * Build.PL, Changes: Bumped _other_ version number.
+      * commit 7c710633c12b55f448f39517887fc8d2e8307e3b
+      * lib/Guardian/OpenPlatform/API.pm: Bumped version number.
+      * commit ef3d0e6101ebf3d1c6da95f408a00ccc28e8ae9b
+      * lib/Guardian/OpenPlatform/API.pm, t/01-basic.t: Added support
+        for the 'tags' call.
+      * commit 272475a4d129867be8571ced80ef8076e944f199
+      * lib/Guardian/OpenPlatform/API.pm: Oops. Forgot to bump version
+        number.
+      * commit 0fac879bf3462b35ddc4656ee3babbd2e2fcd756
+      * Changes, MANIFEST, lib/Guardian/OpenPlatform/API.pm: Changed
+        MANIFEST to add new test files. Changes to pass pod tests.
+      * commit 449be1a4ad593128f88bc451d216e0b663de59f1
+
+0.02  2009-03-12 Dave Cross <dave@dave.org.uk>
+      * Build.PL: Bump version number.
+      * commit e323586ec82beb042c37fe2364948ad65638227c
+      * t/02-pod.t, t/03-pod_coverage.t: Added pod tests
+      * commit 246399657a05603dcd65c03a82c805cf3c7dbfce
+      * lib/Guardian/OpenPlatform/API.pm: Use strict and warnings
+        (for Kwalitee)
+      * commit 39428541eabbfcb4aaf4216e9c29810078775742
+      * lib/Guardian/OpenPlatform/API.pm: Refactored to allow support
+        of other query methods.
+      * commit cd58cc30f3d6cf155d5d2e5a3836e2f7f747e7f6
+      * Build.PL: Require Perl 5.8.1 (as that's what Moose needs).
+      * commit c047deef90d2452469bf45e83cd60607f5f0977c
+
+0.01  2009-03-11 Dave Cross <dave@dave.org.uk>
+      * Build.PL, MANIFEST, README: Various admin tweaks.
+      * commit 5cf8de343430ccadac45d380d76181bb4460ca15
+      * lib/Guardian/OpenPlatform/API.pm, t/00-load.t, t/01-basic.t:
+        More tests and basic code to pass them. Now actually does
+        something useful.
+      * commit b6b2473c9ac8e855c32bb9c8c3ef7634624e8849
+      * lib/Guardian/OpenPlatform/API.pm, t/00-load.t: Tests for basic
+        object construction, together with code that passes them.
+      * commit 129112e018407c6ca079900fe4cf121f98f5d01c
+      * Build.PL, Changes, MANIFEST, README,
+        lib/Guardian/OpenPlatform/API.pm, t/00-load.t: Initial commit.
+      * commit 078bc1afee74ee5cda1a190fe7de5a13adc960b3

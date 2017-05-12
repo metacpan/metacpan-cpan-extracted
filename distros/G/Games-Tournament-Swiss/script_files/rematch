@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use YAML qw/LoadFile DumpFile/;
+
+use Games::Tournament::Swiss::Config;
+
+my $swiss = Games::Tournament::Swiss::Config->new;
+
+my $league = LoadFile "../league.yaml";
+my $roles = $league->{roles} || [$swiss->roles];
+my $scores = $league->{scores} ||
+	{ win => 1, loss => 0, draw => 0.5, absent => 0, bye => 1 };
+my $firstRound = $league->{firstround} || $swiss->firstround;
+my $algorithm = $league->{algorithm} || 'Games::Tournament::Swiss::Procedure::FIDE';
+
+my $firstround = $swiss->frisk($firstRound);
+$scores = $swiss->frisk($scores);
+$roles = $swiss->frisk($roles);
+$algorithm = $swiss->frisk($algorithm);
+
+$Games::Tournament::Swiss::Config::firstround = $firstround;
+%Games::Tournament::Swiss::Config::scores = %$scores;
+@Games::Tournament::Swiss::Config::roles = @$roles;
+$Games::Tournament::Swiss::Config::algorithm = $algorithm;
+
+require Games::Tournament::Swiss;
+require Games::Tournament::Contestant::Swiss;
+require Games::Tournament::Card;
+
+use File::Spec;
+use File::Basename;
+my $round = basename( File::Spec->rel2abs( '.' ) );
+die "round $round directory name not a round number" unless $round =~ m/^\d+$/;
+my $n = 0;
+
+my $players;
+if ( -e "./player.yaml" ) { $players = LoadFile qq{./player.yaml}; }
+else { die "No player.yaml file. Are you sure you paired players already?"; }
+
+my $tourney;
+if ( -e "./tourney.yaml" ) { $tourney = LoadFile "./tourney.yaml"; }
+else { die "No tourney.yaml file. Are you sure you paired players already?"; }
+
+my $matches;
+if ( -e "./matches.yaml" ) { $matches = LoadFile qq{./matches.yaml}; }
+else { die "No matches.yaml file. Are you sure you paired players already?"; }
+
+my $schedule;
+my @rematches;
+if ( -e "./round.yaml" )
+{
+	$schedule = LoadFile "./round.yaml";
+	my $reschedule = $schedule->{group};
+	for my $groupId ( keys %$reschedule )
+	{
+		my $group = $reschedule->{$groupId};
+		my (%contestants, %result);
+		for my $role ( keys %$group )
+		{
+			my $name = $group->{$role};
+			my $contestant = $tourney->named($name);
+			# die "No contestant $name" unless $contestant and
+			# $contestant->isa('Games::Tournament::Contestant');
+			$contestants{$role} = $contestant;
+			$result{$role} = undef;
+		}
+		my $rematch = Games::Tournament::Card->new(
+			round => $round,
+			contestants => \%contestants,
+			result => undef );
+		push @rematches, $rematch;
+	}
+}
+else { die "No round.yaml file. Are you sure you paired players already?"; }
+
+my $notice = "# Round $round rematched by rematch on " . localtime() . " by rematch. " . $schedule->{Warning};
+$schedule->{Warning} = $notice;
+DumpFile 'matches.yaml.bak', $matches;
+DumpFile 'matches.yaml', \@rematches;
+DumpFile 'round.yaml', $schedule;
+
+__END__
+
+=head1 NAME
+
+rematch - Edit pairings after the fact
+
+=head1 SYNOPSIS
+
+markCards
+
+--help            This help message
+
+--man            A man page
+
+=head1 DESCRIPTION
+
+B<rematch> rewrites cards pairing players with the new pairings in ./round.yaml, the file in which the matches produced by pair were reported to the user.This is sometimes necessary if there is a failure in the program to produce the correct pairing, or there is other need to proceed with games not specified by the swiss algorithm. The new Games::Tournament::Card matches are serialized back into ./matches.yaml. The cards originally in ./matches.yaml are preserved in matches.yaml.bak.
+
+The configuration file, ../league.yaml, holds the value of $scores, and $round is the directory name in which the command is run and where matches.yaml and player.yaml, a file of serialized player objects, exist. (The name must be a round number.)
+
+=cut
+
+# vim: set ts=8 sts=4 sw=4 noet:

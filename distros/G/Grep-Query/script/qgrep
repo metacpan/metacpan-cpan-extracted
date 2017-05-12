@@ -1,0 +1,15 @@
+#! perl
+
+use strict;
+use warnings;
+
+use Grep::Query;
+
+my $q = shift(@ARGV);
+die("Usage: $0 <query> [file1 file2 ...]\n") unless $q;
+
+my $gq = Grep::Query->new($q);
+while (<>)
+{
+	print if $gq->qgrep($_);
+}

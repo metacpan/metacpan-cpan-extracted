@@ -1,0 +1,46 @@
+=head2 whitelist
+
+Checks to make sure that the incoming message is from a poster in a file
+of valid posters.  The most common use of this module is in conjunction
+with human moderation; all messages from pre-approved posters are sent
+straight through via the robomoderator and the rest are relayed to a human
+moderator for hand checking.
+
+This module takes one configuration directive:
+
+=over 4
+
+=item whitelist FILE
+
+C<FILE> is a list of poster addresses, one per line.  Only the address
+should be included in this file, not the name or other comments.  Files
+ending in C<.db> are reserved for future implementations (eventually,
+these will automatically be recognized as Berkeley db files for handling
+large lists of posters).
+
+=back
+
+There is one possible failure message:
+
+=over 4
+
+=item Unknown poster %s
+
+The message is from a poster address which isn't in the whitelist of known
+addresses.
+
+=back
+
+In addition, during parsing of the configuration directives, one fatal
+error, which would be passed to error(), is possible:
+
+=over 4
+
+=item Can't open whitelist file %s: %s
+
+An error occurred while trying to open a file given as a C<FILE> argument
+to a configuration directive.
+
+=back
+
+This module takes no arguments.

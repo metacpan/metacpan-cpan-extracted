@@ -1,0 +1,53 @@
+=head1 NAME
+
+Gungho::Manual::TODO - TODO Items
+
+=head1 TODO
+
+Things marked TODO. Your contributions are welcome. Please check out 
+
+  http://gungho-crawler.googlecode.com/svn/trunk
+
+and get the latest source code.
+
+=head2 Fix method names, structure
+
+This is a long term TODO. We want to make the internal structure a bit more
+concise, meaningful.
+
+Method renamings are bound to happen before we call it 1.00.
+
+=head2 Tightly integrate with MQ
+
+Message queue integration seems just natural. 
+
+=head2 Fix stacked throttling
+
+Currently when multiple throttler components are specified, all of them are
+tried until one fails. This in theory works, but it becomes a problem if you
+for example throttle by number of requests first, and then by domain, and you
+reach the max number of amounts you throttle by domain before number of requests.
+
+For example, suppose you have plenty of room for the first throttler.
+Gungho will first invoke try_push() on the first throttler, which increments
+the number of requests that have been processed.
+
+After this, the second throttler invokes its try_push() which fails. At this
+point the request gets throttled, but there's no way to undo the try_push() 
+for the first throttler.
+
+This means that the overall capacity may be well within your throttling limits,
+but Gungho may not actually go fetch your requests. 
+
+At this point I have no particularly elegant solution to this
+
+=head2 Add a throttled Provider
+
+Excessive requessts to fetch pages tend to slow down the engine. We have
+the Throttler component to throttle the requests, but that still doesn't
+stop the Provider from overwhelming, for example, POE's internal queue. 
+
+To this end, Providers should also have the ability to throttle incoming
+requests to start with.
+
+=cut

@@ -1,0 +1,41 @@
+---
+name: Geo-Formatter
+version: 0.0.1
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: Encode / decode latitude & longitude in degree to / from other format
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Inspector: 0
+  Exporter: 0
+  Test::Base: 0
+  UNIVERSAL::require: 0
+  version: 0
+provides:
+  Geo::Formatter:
+    file: lib/Geo/Formatter.pm
+    version: 0.0.1
+  Geo::Formatter::CalcurateDMS:
+    file: lib/Geo/Formatter/CalcurateDMS.pm
+    version: 0.0.1
+  Geo::Formatter::Format::DMS:
+    file: lib/Geo/Formatter/Format/DMS.pm
+    version: 0.0.1
+  Geo::Formatter::Format::Degree:
+    file: lib/Geo/Formatter/Format/Degree.pm
+    version: 0.0.1
+  Geo::Formatter::FormatBase:
+    file: lib/Geo/Formatter/FormatBase.pm
+    version: 0.0.1
+  Geo::Formatter::FormatBase::Double:
+    file: lib/Geo/Formatter/FormatBase/Double.pm
+    version: 0.0.1
+  Geo::Formatter::FormatBase::Single:
+    file: lib/Geo/Formatter/FormatBase/Single.pm
+    version: 0.0.1
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

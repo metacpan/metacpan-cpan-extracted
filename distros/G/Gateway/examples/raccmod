@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+$version = q$Id: raccmod,v 0.8 1998/04/12 12:06:09 eagle Exp $;
+#
+# raccmod -- Robomoderator script for rec.arts.comics.creative.
+#            Copyright 1997, 1998 by Russ Allbery <rra@stanford.edu>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
+# This program is provided as an example of the use of News::Gateway, but is
+# also the actual front-end robomoderator used for rec.arts.comics.creative,
+# with only minor modifications to hide confidential information.  All
+# incoming messages are fed directly to this script, which either posts them
+# automatically or forwards them to the hand moderation address.
+#
+# This is part of two programs, both using News::Gateway, which are used in
+# moderating rec.arts.comics.creative.  The other is raccpost, the script
+# that hand-approved articles are piped through for posting.  It performs
+# significantly fewer checks (for obvious reasons).
+#
+# This script also gets submissions for alt.comics.lnh, possibly
+# crossposted, possibly not.  (alt.comics.lnh isn't moderated, but it has a
+# mail to news gateway implemented via this robomoderation script.)
+# Crossposting and multiple executions of the script therefore have to be
+# dealt with correctly.
+#
+# All messages successfully posted to rec.arts.comics.creative are also sent
+# to a mailing list, and that's also done here.
+
+############################################################################
+# Configuration
+############################################################################
+
+# The address to which any bounces or rejection messages should be cc'd.
+$maintainer = 'XXX';
+
+# The address to which posts that fail any check should be relayed.
+$moderator = 'XXX';
+
+# The mailing list address, to which all successful posts should be sent.
+$list = 'XXX';
+
+
+############################################################################
+# Implementation
+############################################################################
+
+use News::Gateway qw();
+
+use strict;
+use vars qw($list $maintainer $moderator $version);
+
+# Create our gateway object, non-interactive, setting the maintainer
+# address, and then load in the hooks for the modules that we're going to
+# need.  Note that the default group for the purposes of mailtonews is
+# pretty much irrelevant, since newsgroups always adds a Newsgroups header.
+# newsgroups looks at either $ARGV[0] or falls back to RACC, since posts to
+# alt.comics.lnh get $ARGV[0] set to that.
+my $gateway = News::Gateway->new (0, $maintainer);
+$gateway->modules ('mailpath', 
+                   newsgroups => [$ARGV[0] || 'rec.arts.comics.creative'],
+                   mailtonews => ['rec.arts.comics.creative'],
+                   'headers',
+                   'keywords',
+                   'whitelist',
+                   'nobinaries',
+                   'cleanbody');
+
+# Read our configuration information from the end of this script.  This is a
+# handy way to feed News::Gateway configuration information if you have a
+# fairly simple script and don't want to bother with multiple files.
+$gateway->config_file (\*DATA);
+
+# Since we're using qmail, create a source for the message data that will
+# automatically add the envelope From header.  We could use preline, but
+# this way we don't have an extra fork.  This is needed for qmail systems
+# since qmail doesn't automatically add an envelope From line; sendmail
+# systems can eliminate this part in favor of giving read_message() STDIN
+# directly.
+my $sentenvelope;
+my $source = sub {
+    unless ($sentenvelope) {
+        $sentenvelope = 1;
+        return "From $ENV{SENDER} " . scalar localtime() . "\n";
+    }
+    scalar <STDIN>;
+};
+
+# Read in the message, and then run our various checks against it.  If none
+# of the checks failed, post the message.
+$gateway->read ($source);
+my $error = $gateway->apply ();
+unless ($error) { $error = $gateway->post () }
+
+# If we got some sort of error message, we need to resend the post to the
+# moderation address.  We also need to add a header saying why the post was
+# rejected.  Otherwise, we succeded in posting the message and want to
+# resend it to the group mailing list.  Note that we just silently exit if
+# given the "Not primary instance" message; that means the message was
+# crossposted via e-mail and another instance of us is doing the posting.
+# We have to use the News::Article methods for adding a header and use the
+# accessor function to get the actual News::Article object.
+if ($error) {
+    exit if ($error eq 'newsgroups: Not primary instance');
+    my $article = $gateway->get_article ();
+    $article->add_headers ('x-rejected-for' => $error);
+    $gateway->mail ($moderator)
+        or $gateway->error ('Unable to resend to moderator');
+} else {
+    # Only resend to the mailing list if we actually posted to RACC.
+    my $article = $gateway->get_article ();
+    my @groups = split (',', $article->header ('newsgroups'));
+    exit unless (grep { $_ eq 'rec.arts.comics.creative' } @groups);
+
+    # Add a To header, since otherwise the article looks weird on the list.
+    $article->add_headers (to => 'racc@eyrie.org');
+    
+    # We need to drop the Approved header, or majordomo gets confused.
+    $article->drop_headers ('approved');
+
+    # Forward the article to the list.
+    $gateway->mail ($list);
+    # Silently ignore errors since there isn't much we can do about them.
+}
+__END__
+
+############################################################################
+# Configuration directives
+############################################################################
+
+header approved       replace racc-request@eyrie.org
+header cc             drop
+header date           rename
+header delivered-to   drop
+header path           drop
+header to             drop
+header x-previous-hop drop
+keywords /home/eagle/usenet/racc/keywords
+whitelist /home/eagle/usenet/racc/posters
+group rec.arts.comics.creative /^rec-arts-comics-creative\@/
+group rec.arts.comics.creative rec.arts.comics.creative@eyrie.org
+group rec.arts.comics.creative racc@eyrie.org
+group rec.arts.comics.creative eagle-racc@windlord.stanford.edu
+group alt.comics.lnh alt.comics.lnh@eyrie.org
+group alt.comics.lnh aclnh@eyrie.org
+group alt.comics.lnh eagle-aclnh@windlord.stanford.edu

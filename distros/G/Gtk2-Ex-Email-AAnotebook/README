@@ -1,0 +1,43 @@
+Gtk2-Ex-Email-AAnotebook
+
+Builds a Gtk2::Notebook object to help with email address
+and attachment handling.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Gtk2::Ex::Email::AAnotebook
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Gtk2-Ex-Email-AAnotebook
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Gtk2-Ex-Email-AAnotebook
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Gtk2-Ex-Email-AAnotebook
+
+    Search CPAN
+        http://search.cpan.org/dist/Gtk2-Ex-Email-AAnotebook/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

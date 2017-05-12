@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Games-Hanabi.t
+lib/Games/Hanabi.pm
+bin/hanabi_ai.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

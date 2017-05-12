@@ -1,0 +1,23 @@
+Changes
+ARTISTIC
+GPL
+INSTALL
+Makefile.PL
+MANIFEST
+README
+documentation.html
+ColorPicker.pm
+test.pl
+examples/colorbar.html
+examples/demo.html
+examples/demo2.html
+images/cleardot.gif
+images/darkb.jpg
+images/darkb409.jpg
+images/grey.jpg
+images/liteb.jpg
+images/liteb409.jpg
+images/updown.gif
+scripts/p_gen.cgi
+scripts/p_gen2.cgi
+META.yml                                 Module meta-data (added by MakeMaker)

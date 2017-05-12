@@ -1,0 +1,257 @@
+#!/usr/bin/env perl
+
+use POSIX;
+use locale;
+#use Data::Dumper;
+use Getopt::Long;
+use Locale::TextDomain 'net.suteren.POI.ttn2device';
+use Pod::Usage;
+use Config::General;
+use File::Basename;
+use File::Copy;
+use Geo::Ov2;
+
+our $VERSION = '0.09';
+
+=head1 NAME
+
+{progname} - recategorizes POIs by config, writes poi.dat and add area structurre to ov2 files.
+
+=head1 SYNOPSIS
+
+{progname} [--configfile=filename|-c filename] [sourceDir [destDir]]
+
+{progname} --help|-h
+
+
+=head1 DESCRIPTION
+
+{progname} can merge ov2 files from srcDir into destDir and write poi.dat against definition in config file.
+configfile has to be in "./", "./etc/", "../etc/", "/etc/", "/etc/POI/", "/etc/POIs/", "/etc/local/POI/" or "/usr/local/etc/POI/" and has to be named "catgroup.conf", "catgroup.cfg", "catgroup_rc" or "catgroup".
+Or it can by directly specified on command line.
+
+=head2 Syntax of config file
+
+	<_DEFAULT_>
+		srcDir=/home/public/POI/data
+		destDir=/home/public/POI/todevice
+	</_DEFAULT_>
+
+	<category Parkoviste_pujcovny.ov2>
+		id=9930
+		filename=Rent Car Parking.ov2
+	</category>
+
+	<category GeoCaching.ov2>
+		filename=CZ-Geocaching-multi.ov2
+		filename=CZ-Geocaching-mystery.ov2
+		filename=CZ-Geocaching-traditional.ov2
+		filename=CZ-Geocaching-virtual.ov2
+		filename=CZ-Geocaching-webcam.ov2
+		icon=/somepath/somefile.bmp
+	</category>
+
+
+
+=head1 OPTIONS
+
+=over
+
+=item --help|-h
+
+Display this help message.
+
+=item --quiet|-q
+
+Suppress output messages. If used more than once, output will be more quiet.
+
+=item --verbose|-v
+
+Display extra runtime informations.
+
+=item --configfile=path_and_filename|-a path_and_filename
+
+Using of specified config file.
+
+=back
+
+config: {configfile}
+
+=head1 SEE ALSO
+
+L<Pod::Usage>, L<pod2usage(1)>, L<Geo::Ov2>
+
+=head1 BUGS
+
+=head1 TODO
+
+Do some checking for correct syntax and feedback to user.
+
+=over
+
+=item
+Translation of help message is dependent on pod2usage implementation. If help message is not displayed in expected language, you can check net.suteren.POI.ttn2device for corresponding message
+
+=back
+
+=cut
+
+
+my $helptext;
+
+sub printhelp {
+	pipe Reader, Writer;
+	pod2usage( -exitval => NOEXIT, -output => \*Writer );
+	close Writer;
+	$message = "";
+	while ( <Reader> ) {
+		$message .=  __$_;
+	}
+	close Reader;
+	open X, ">x.hlp";
+	print X $message;
+	close X;
+	print __x($message, progname => basename( $0 ), configfile => $configfile );
+}
+
+my $help;
+my $verbose;
+my $quiet;
+my @quiet;
+my $extraquiet;
+$configfile;
+$bufflen = 64*8*1024;
+@configfiles = ( "catgroup.conf", "catgroup.cfg", "catgroup_rc", "catgroup" );
+@configdirs = ( "./", "./etc/", "../etc/", "/etc/", "/etc/POI/", "/etc/POIs/", "/etc/local/POI/", "/usr/local/etc/POI/" );
+
+outer:
+foreach $i ( @configdirs ) {
+	foreach $j ( @configfiles ) {
+		if ( -f "$i$j" && -r "$i$j" ) {
+			$configfile = "$i$j";
+			last outer;
+		}
+	}
+}
+
+
+unless ( GetOptions ( "help" => \$help, "configfile=s" => \$configfile, verbose => \$verbose, quiet => \@quiet ) ) {
+	&printhelp();
+	die __"Bad options.";
+}
+
+$quiet = 1 if @quiet > 0;
+$extraquiet = 1 if @quiet > 1;
+
+printf STDERR  "config: %s\n", $configfile if $verbose;
+
+if ( $help ) {
+	&printhelp();
+	exit 0;
+}
+
+my $srcDir = shift;
+my $destDir = shift;
+
+$conf = new Config::General( -ConfigFile => $configfile, -InterPolateVars => 1);
+my %conf = $conf->getall();
+$srcDir = $conf{_DEFAULT_}{srcDir} unless $srcDir;
+$destDir = $conf{_DEFAULT_}{destDir} unless $destDir;
+
+$srcDir = "$srcDir/" if substr ( $srcDir, length ( $srcDir ) - 1 ) ne "/";
+$destDir = "$destDir/" if substr ( $destDir, length ( $destDir ) - 1 ) ne "/";
+
+my %conf_categories = %{$conf{category}};
+
+my %poidat;
+my @sources;
+
+foreach $category ( keys %conf_categories ){
+	printf N__"cat: %s\n", $category unless $quiet;
+	my %category = %{$conf_categories{$category}};
+	my $id = $conf_categories{$category}{id};
+	chomp $category;
+	chomp $id;
+	$poidat{$id}=$category if $id;
+	my $fdto = "$destDir/$category";
+	my $ov2to = new Geo::Ov2->new( ">$fdto" );
+	my @files = @{$conf_categories{$category}{filename}};
+	@files = ( $conf_categories{$category}{filename} ) unless @files;
+	my $ts=0;
+	my @pois;
+	foreach my $file (@files) {
+		chomp $file;
+		my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat("$srcDir/$file");
+		$ts = $mtime if $mtime > $ts;
+		my $fdfrom = "$srcDir/$file";
+		my $ov2from = Geo::Ov2->new( "<$fdfrom" );
+		my $poisfrom = $ov2from->poireadall();
+		my @poisfrom = @$poisfrom;
+		push @sources, $file;
+		push @pois, @poisfrom;
+		$ov2from->close();
+		printf N__"src: %s (%d)\n", $file, $#poisfrom unless $quiet;
+	}
+	printf STDERR __n("written: %d record\n", "written: %d records\n"), $#pois if $verbose;
+	$ov2to->poiwriteall( @pois );
+	$ov2to->close();
+	utime $ts, $ts, "$destDir/$category";
+
+	my $iconfile = $conf_categories{$category}{icon};
+	$catname = fileparse( $category, ".ov2" );
+	$iconfile = "$srcDir/$catname.bmp" unless $iconfile;
+	my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat("$iconfile");
+	copy("$iconfile","$destDir/$catname.bmp");
+	utime $atime, $mtime, "$destDir/$catname.bmp";
+}
+
+my $ts=0;
+
+my @catids = keys %poidat;
+my @offsets;
+my $headermask = "V" . ( "V" x ( $#catids + 1 ) ) . ( "V" x ( $#catids+2) );
+my $header = pack $headermask, ($#catids + 1, @catids, @catids, 0 ) ;
+my $bytecounter= length ( $headermask ) * 4;
+open POIDAT, ">$destDir/poi.dat";
+
+print POIDAT $header;
+
+foreach my $id (@catids) {
+	my $filename=$poidat{$id};
+	printf N__"dat: %s=%s\n", $id, $poidat{$id} unless $quiet;
+	my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat("$destDir/$filename");
+	$ts = $mtime if $mtime > $ts;
+	open FROMCAT, "<$destDir/$filename";
+	push @offsets, $bytecounter;
+	while ( my $bytescount = read FROMCAT, my $buff, $size ) {
+		print POIDAT $buff;
+		$bcount = $bytescount;
+		$blen = length $buff;
+	}
+	close FROMCAT;
+	unlink "$destDir/$filename";
+	$bytecounter += $size;
+}
+
+push @offsets, $bytecounter - 1;
+$header = pack $headermask, ($#catids + 1, @catids, @offsets );
+seek POIDAT, 0, 0;
+print POIDAT $header;
+close POIDAT;
+utime $ts, $ts, "$destDir/poi.dat";
+
+unless ( $extraquiet ) {
+	opendir SOURCEDIR, "$srcDir";
+	while ( my $filename = readdir SOURCEDIR ) {
+		next unless -f "$srcDir/$filename" and $filename =~ /\.ov2$/;
+		if ( grep { $_ eq $filename } @sources ) {
+			@sources = grep { $_ ne $filename } @sources ;
+		} else {
+			printf N__"new: %s\n", $filename;
+		}
+	}
+	foreach my $flename ( @sources ) {
+		printf N__"old: %s\n", $filename;
+	}
+
+}

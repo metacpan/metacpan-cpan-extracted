@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.63.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 05c4b31cc74e5c4348edef90aa48e2dafd52c30d Changes
+SHA1 ecb416fc28a430a272b6a2b94e56c40a71b15176 MANIFEST
+SHA1 e6e7c2904ea5d300c0ddf70fc5a80f5005229aa9 MANIFEST.SKIP
+SHA1 9b1a262d2060168158df0aae4c6bd6282c0df785 META.yml
+SHA1 952c78ae0bd173526c606c3589f7a42e7747ef8e Makefile.PL
+SHA1 38210ac339d52849a53e2782e4ea27b185e34cb9 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 7851ba1a54d46712f74b24e6cefeaaf297b7ba0f debian/control
+SHA1 5609b45a2416e86b8c690b5e48fc75956e5cb528 debian/copyright
+SHA1 c247b07dc432a2a7bb52bf24132ecdfb560b6fe8 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 9e0feb6017b8a8962dccbee4138a56cdc857d8c3 debian/watch
+SHA1 c41a4273101adf22054ca17c00fcf213a0d14419 devel/TiedChildProperties.pm
+SHA1 bfcc6179f52eb0548479dbfaaf153cc7d228295f devel/array-base.t
+SHA1 48b1ff8db6c13fa06da34981d93d9089ddccdc50 devel/child-properties.pl
+SHA1 e7c2d8c5f5e31d8f8f702b971c42cde38f727907 devel/splice.pl
+SHA1 8a31b46002beba533826b97616c348524ecdc434 devel/stamp.pl
+SHA1 9cccbecb36a0c7c08377d256f732c57db939f654 devel/tied-simple-list.pl
+SHA1 3cf3345a9177dbe362dfc8fbf192272f4a611ca8 inc/MyMakeMakerExtras.pm
+SHA1 692a1ddc2ca6b98cac7b48ea40bc1ac1509e8ed9 inc/my_pod2html
+SHA1 bd3da8d21535a50244070774811d5f0e91888994 lib/Gtk2/Ex/TiedListColumn.pm
+SHA1 69ddb86f9a9f923ddce2dcc16f6bc2fc89458f68 lib/Gtk2/Ex/TiedMenuChildren.pm
+SHA1 c1c1386bf40a5adea927d0e5647d0086ca12c727 lib/Gtk2/Ex/TiedTreePath.pm
+SHA1 5e5680b471811244fe93571efc23e7b6089cac3b t/MyTestHelpers.pm
+SHA1 ee34bd14f39082e9816be33f4674b6143d866ef2 t/TiedListColumn-weaken.t
+SHA1 35fb88b4ba1aedb8aeac880dee3a6a1f320fad7e t/TiedListColumn.t
+SHA1 cecf530883a481587961538ea5dc7e484c94bc80 t/TiedMenuChildren.t
+SHA1 3931f9ff44c6229790e207a8507728c06315b713 t/TiedTreePath-weaken.t
+SHA1 15a5a645b03b4703f3ebb76afb6716716cb56dba t/TiedTreePath.t
+SHA1 9127f78a0dfa04976acbb979dd7862ef59a74c58 xt/0-META-read.t
+SHA1 37abd43b41068804ea4bb099fdd89af21be82926 xt/0-Test-DistManifest.t
+SHA1 8f93fb4c8f0424a4442cc93c9a2e86342ef55281 xt/0-Test-Pod.t
+SHA1 1de8f07883f6bf1a2ef79f2cb8adf1deb3f61cee xt/0-Test-Synopsis.t
+SHA1 fb517c2fae5ddac559318bf6a224949115ea3129 xt/0-Test-YAML-Meta.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFMmVLtLFMCIV9q3ToRArzpAJ9xq5XaP0WqdwTusclH+uc9x+PQoACeJWiN
+XBD+BbvHe44ELQibIvCg2K4=
+=kdzw
+-----END PGP SIGNATURE-----

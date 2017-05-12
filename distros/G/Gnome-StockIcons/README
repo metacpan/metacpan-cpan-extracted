@@ -1,0 +1,30 @@
+Gnome/StockIcons version 1.4.2
+==============================
+
+These are XPM pixmaps of stock Gnome icons
+Converted from PNG's in gnome-libs-1.4.1.2.90/libgnomeui/pixmaps 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The module does not strictly speaking require Gtk, but it's not much use without. You need Gtk for make test.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Wim Vanderbauwhede. All rights reserved.                 
+This program is free software; you can redistribute it and/or modify it     
+under the same terms as Perl itself.                                        
+
+These are XPM pixmaps of stock Gnome icons
+Converted from PNG's in gnome-libs-1.4.1.2.90/libgnomeui/pixmaps 
+Copyright for the artwork (C) Tigert Labs (tigert.gimp.org)
+License for the artwork: GPL
+

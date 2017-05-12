@@ -1,0 +1,58 @@
+/* body - the whole website */
+body {
+  font-family: Verdana, Arial, Helvetica, sans-serif; } 
+h1 { text-align: center; }
+
+/* total km */
+#statistics {
+border-top:5px solid #9AB7CF;
+border-bottom:5px solid #9AB7CF;
+background:#8FAFC9 none repeat scroll 0%;
+display:inline;
+float: left;
+margin:0pt;
+padding:0pt;
+padding-left: 1em;
+width:500px;
+}
+#statistics span {
+  font-size: 1.5em;
+  font-weight: bold;
+  padding-left: 2em;
+}
+
+/* density */
+#selection label {
+  display: block; width: 5em; float: left; text-align: right; padding: .2em .2em; 
+  background-color: #ccc; font-weight: bold; }
+#selection select {
+  display: block; width: auto; float: left; margin: .2em; }
+
+/* loading... */
+#progressDisplay {  
+  color: red; 
+  font-weight: bold;
+  margin-left: 4em; }
+
+/* map */
+#maping { 
+  display: block; float: left; width: 500px; }
+#maping div table { 
+  font-size: .8em; }
+#map { 
+  border: 1px solid lightblue; width: 500px; height: 500px; }
+/* daily distances */
+#daily { display: block; width: auto; float: left; margin-left: 2em; }
+#daily label { display: block; font-size: 1.2em; }
+
+/* map-description */
+#map-description { 
+  width: 600px; }
+#map-description div.label {
+  display: block; width: 5em; float: left; padding: .2em .2em; 
+  font-size: .8em; font-weight: bold; }
+
+br {   /* clear floating */
+  clear: left; }
+
+

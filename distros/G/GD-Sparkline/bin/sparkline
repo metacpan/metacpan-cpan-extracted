@@ -1,0 +1,27 @@
+#!/usr/bin/perl -T
+#########
+# Author:        rmp
+# Maintainer:    $Author: rmp $
+# Created:       2008-12-01
+# Last Modified: $Date$
+# Id:            $Id$
+# $HeadURL$
+#
+use strict;
+use warnings;
+use GD::Sparkline;
+use CGI;
+use Carp;
+use English qw(-no_match_vars);
+
+our $VERSION = do { my ($r) = q$Revision: 0.01 $ =~ /(\d+)/smx; $r; };
+
+my $cgi = CGI->new();
+my $cfg = { map { $_ => $cgi->param($_) || q[] } GD::Sparkline->fields() };
+my $gd  = GD::Sparkline->new($cfg);
+
+if(!$cgi->param('suppress')) {
+  print "Content-type:image/png\n\n" or croak $ERRNO;
+}
+
+print $gd->draw() or croak $ERRNO;

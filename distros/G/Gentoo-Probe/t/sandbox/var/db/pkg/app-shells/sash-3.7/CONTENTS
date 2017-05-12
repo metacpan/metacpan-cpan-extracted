@@ -1,0 +1,10 @@
+dir /bin
+obj /bin/sash f0a38783ef34008ca7071b05af0b7641 1087301844
+dir /usr
+dir /usr/share
+dir /usr/share/man
+dir /usr/share/man/man1
+obj /usr/share/man/man1/sash.1.gz fa401504d0865c8bcbd4dfea9eb2b37e 1087301844
+dir /usr/share/doc
+dir /usr/share/doc/sash-3.7
+obj /usr/share/doc/sash-3.7/README.gz 0245f0a5d050ae49d7b9f5a129ccd865 1087301844

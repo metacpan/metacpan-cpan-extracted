@@ -1,0 +1,12 @@
+PDT frog_prog, frop
+  number, n: integer = 123
+  verbose, v: switch
+  command, c: string = D_SAMPLE_COMMAND, "ps -el"
+  scale_factor, sf: real = 1.2340896e-1
+  millisecond_update_interval, mui: integer = $required
+  ignore_output_file_column_one, iofco: boolean = TRUE
+  output, o: file = stdout
+  queue, q: key plotter, postscript, text, printer, keyend = printer
+  destination, d: application = `hostname`
+  tty, t: list of name = ("/dev/console", "/dev/tty0", "/dev/tty1")
+PDTEND required_file_list

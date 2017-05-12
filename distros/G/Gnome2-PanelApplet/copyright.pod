@@ -1,0 +1,4 @@
+Copyright (C) 2003, 2007 by the gtk2-perl team.
+
+This software is licensed under the LGPL.  See L<Gnome2::PanelApplet> for a
+full notice.

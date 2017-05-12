@@ -1,0 +1,314 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR 'Jerome Quelin'
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Games-Risk-ExtraMaps-Imaginary\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-10-03 16:46+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Games/Risk/Map/Lotr.pm:27
+msgid "Lord of the Rings"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:37
+msgid "Gondor"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:38
+msgid "Mirkwood"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:39
+msgid "Rohan"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:40
+msgid "Rhovanion"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:41
+msgid "Arnor"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:42
+msgid "Eriador"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:43
+msgid "Rhun"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:44
+msgid "Haradwaith"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:45
+msgid "Mordor"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:53
+msgid "Forodwaith"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:54
+msgid "Eastern Angmar"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:55
+msgid "Borderlands"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:56
+msgid "Angmar"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:57
+msgid "North Downs"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:58
+msgid "Fornost"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:59
+msgid "Buckland"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:60
+msgid "Old Forest"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:61
+msgid "South Downs"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:62
+msgid "Weather Hills"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:63
+msgid "Rhudaur"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:64
+msgid "Carrock"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:65
+msgid "North Mirkwood"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:66
+msgid "Eastern Mirkwood"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:67
+msgid "Anduin Valley"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:68
+msgid "South Mirkwood"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:69
+msgid "Eregion"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:70
+msgid "Minhiriath"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:71
+msgid "Dunland"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:72
+msgid "Enedwaith"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:73
+msgid "West Rohan"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:74
+msgid "Fangorn"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:75
+msgid "Gap of Rohan"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:76
+msgid "Rhun Hills"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:77
+msgid "Brown Lands"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:78
+msgid "Emyn Muil"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:79
+msgid "The Wold"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:80
+msgid "Lorien"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:81
+msgid "Gladden Fields"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:82
+msgid "Moria"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:83
+msgid "Dead Marshes"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:84
+msgid "Druwaith Iaur"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:85
+msgid "Andras"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:86
+msgid "Anfalas"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:87
+msgid "Vale of Erech"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:88
+msgid "Lamedon"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:89
+msgid "Belfalas"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:90
+msgid "Lebennin"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:91
+msgid "Minis Tirith"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:92
+msgid "Ithilien"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:93
+msgid "South Ithilien"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:94
+msgid "Forlindon"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:95
+msgid "Lune Valley"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:96
+msgid "Mithlond"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:97
+msgid "Harlindon"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:98
+msgid "Tower Hills"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:99
+msgid "The Shire"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:100
+msgid "Evendim Hills"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:101
+msgid "North Rhun"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:102
+msgid "Withered Heath"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:103
+msgid "Esgaroth"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:104
+msgid "South Rhun"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:105
+msgid "Harandor"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:106
+msgid "Umbar"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:107
+msgid "Deep Harad"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:108
+msgid "Harad"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:109
+msgid "Near Harad"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:110
+msgid "Khand"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:111
+msgid "Udun Value"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:112
+msgid "Mount Doom"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:113
+msgid "Barad Dur"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:114
+msgid "Minas Morgul"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:115
+msgid "Gorgoroth"
+msgstr ""
+
+#: lib/Games/Risk/Map/Lotr.pm:116
+msgid "Nurn"
+msgstr ""

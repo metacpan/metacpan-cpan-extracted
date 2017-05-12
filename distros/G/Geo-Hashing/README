@@ -1,0 +1,85 @@
+Geo-Hashing version 0.01
+========================
+
+NAME
+    Geo::Hashing - Perl library to calculate Geohashing points
+
+SYNOPSIS
+      use Geo::Hashing;
+      my $g = new Geo::Hashing(lat => 37, lon => -122, date => "2008-05-24");
+      printf "Today's location is at %.6f, %.6f.\n", $g->lat, $g->lon;
+
+DESCRIPTION
+    This module allows calculating the locaiton of Geohashes as described in
+    http://wiki.xkcd.com/geohashing/Main_Page.
+
+METHODS
+  new
+    Create a new Geo::Hashing object.
+
+  lat
+    Set or get the points latitude. When settings, only the integer portion
+    is considered. Set to undef to just get the offset.
+
+  lon
+    Set or get the points longitude. When settings, only the integer portion
+    is considered. Set to undef to just get the offset.
+
+  date
+    Set or get the date used for the calculation. Note that this is the
+    actual date of the meetup in question, even when the 30w rule is in
+    effect.
+
+  djia
+    Set or get the Dow Jones Industrial Average used for the calculation. If
+    not set, it will be automatically retrieved depending on the value of
+    $self->source.
+
+  source
+    Set the source of the DJIA opening data. Will load
+    Geo::Hashing::Source::Name and call get_djia($date). See
+    Geo::Hashing::Source::Random for a sample.
+
+  use_30w_rule
+    Set or get the 30w flag. Will be set automatically if lon is set and is
+    greater than -30.
+
+  debug
+    Enable or disable diagnostic logging
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Digest::MD5
+  LWP::Simple (if using the default Geo::Hashing::Source::Peeron)
+
+SEE ALSO
+    Original comic: http://www.xkcd.com/426/
+
+    Wiki: http://wiki.xkcd.com/geohashing/Main_Page
+
+    IRC: irc://irc.xkcd.com/geohashing
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Dan Boger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+-- 
+   $Id: README 255 2008-06-21 03:48:46Z dan $

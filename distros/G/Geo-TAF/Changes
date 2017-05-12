@@ -1,0 +1,18 @@
+Revision history for Perl extension Geo::TAF.
+
+1.01  Fri Jan 31 15:08:17 2003
+	- original version; created by h2xs 1.22 with options
+		--skip-exporter --skip-autoloader -Xb 5.5.0 -n Geo::TAF
+
+1.02  Mon Feb  3 01:28:00 2003
+	- fixed some uninitialised data errors in TAF.pm
+	- included example scgi_weather.pl
+
+1.03  Mon Feb  3 17:00:00 2003
+	- swapped BKN with SCT
+	- added dayend function in Geo::TAF::EN
+	- detail changes to example/scgi_weather.pl
+	- added some tests
+
+1.04  Mon Feb  3 17:40:00 2003
+	- fix typo in scgi_weather.pl

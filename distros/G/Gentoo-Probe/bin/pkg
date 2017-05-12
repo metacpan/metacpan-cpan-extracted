@@ -1,0 +1,4 @@
+#!/usr/bin/perl -w
+$|++;
+use Gentoo::Probe::Pkg;
+Gentoo::Probe::Pkg->new(@ARGV)->run();

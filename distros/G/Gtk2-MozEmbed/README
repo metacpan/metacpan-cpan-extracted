@@ -1,0 +1,38 @@
+
+				Gtk2::MozEmbed
+			       ----------------
+
+This module allows you to use the Mozilla embedding widget from Perl.
+
+Gtk2::MozEmbed comes with automatically generated API documentation.  Its index
+can be accessed with:
+
+  perldoc Gtk2::MozEmbed::index
+
+				 Installation
+				--------------
+
+To install Gtk2::MozEmbed, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+				 Dependencies
+				--------------
+
+Gtk2::MozEmbed depends on:
+
+  ExtUtils::Depends
+  ExtUtils::PkgConfig
+  Glib >= 1.060
+  Gtk2 >= 1.081
+  a gtkmozembed provider:
+    mozilla-gtkmozembed >= 1.7 or
+    firefox-gtkmozembed >= 1.0 or
+    mozilla-firefox-gtkmozembed >= 1.0 or
+    xulrunner-gtkmozembed >= 1.8
+
+If you have Mozilla::DOM >= 0.01 installed, optional support for it will be
+enabled.

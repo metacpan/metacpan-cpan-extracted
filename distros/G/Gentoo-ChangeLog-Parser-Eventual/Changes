@@ -1,0 +1,62 @@
+Release history for Gentoo-ChangeLog-Parser-Eventual
+
+0.1.2 2013-04-06T05:35:40Z
+ - Maintenance release for Module::Build 0.4004
+
+ [Dependencies::Added / develop requires]
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta
+ - Test::Pod 1.41
+ - Test::Pod::Coverage 1.08
+ - version 0.9901
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Dependencies::Changed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803 → v1.3.0
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.2.0 → v1.7.2
+
+ [Dependencies::Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+ [Documentation]
+ - update copyright year
+ - add README.mkdn
+
+ [Meta]
+ - bugtracker to github issues
+
+ [Packaging]
+ - utilise test_requires in Build.PL
+
+0.1.1 2012-01-04T02:44:09Z
+ - Maintenance Release.
+
+ [Dependencies::Added]
+ - requires : perl 5.10.0
+ - requires : strict
+ - requires : warnings
+
+ [Dependencies::Removed]
+ - build_requires : English
+
+ [Internals]
+ - Namespaces now declare AUTHORITY
+ - VERSION declarations moved out of BEGIN
+
+ [Packaging]
+ - Changes file reformatted to CPAN::Changes standard.
+ - Copyright dates, formatting, and address updated.
+ - Author/Release tests moved to xt/
+ - Repository urls moved to https://
+ - x_authority declared in metadata
+
+0.1.0 2011-02-14T23:24:53Z
+ - First version, released on an unsuspecting world.
+

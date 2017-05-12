@@ -1,0 +1,23 @@
+Revision history for System-Sub.
+
+0.163320     2016-11-27    DOLMEN (Olivier Mengué)
+	Workaround for perl 5.8.9 bug (RT#118898, GH#5). Thanks BooK for
+	the reporting, and Graham Knop for the fix!
+
+0.163130     2016-11-08    DOLMEN (Olivier Mengué)
+	Require System::Sub 0.162800 (RT#118114). Thanks BooK!
+
+0.162920     2016-10-18    DOLMEN (Olivier Mengué)
+	Fix tests on MSWin32 platform (GH #4, Paul Durden). Thanks!
+	Repository moved to github.com/dolmen-perl5/Git-Sub
+
+0.161810     2016-06-30    DOLMEN (Olivier Mengué)
+	Remove the 'git' namespace from CPAN indexing to avoid conflict
+	with 'Git'.
+	
+0.130270     2013-01-27    DOLMEN (Olivier Mengué)
+	Added 'Changes' file.
+	Added tests created by BOOK. Thanks!
+
+0.130170     2013-01-18    DOLMEN (Olivier Mengué)
+	Initial release.

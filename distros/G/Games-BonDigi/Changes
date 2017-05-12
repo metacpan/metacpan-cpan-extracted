@@ -1,0 +1,8 @@
+# Changes log for Games::BonDigi
+
+0.02    13 January 2008
+        - Fixed an incredible bug on infinite sequence generation
+        - Fixed POD coverage
+
+0.01    12 January 2008
+        - Initial crazy release.

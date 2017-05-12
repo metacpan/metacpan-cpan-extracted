@@ -1,0 +1,38 @@
+Revision history for Geo-Parse-OSM
+
+0.01    July 29 2010
+        Initial release - simple continuous regexp parsing
+
+0.10    July 30 2010
+        Basic OO interface
+        File seek
+
+0.20    August 02 2010
+        Compressed file support
+
+0.22    August 03 2010
+        to_xml
+
+0.221   August 03 2010
+        some fixes
+
+0.30    August 05 2010
+        added ::Multipass class
+        some fixes
+
+0.35    August 09 2010
+        store packed coordinates (less memory)
+        latlon() method
+        generate 'outer' for closed ways
+        some fixes
+
+0.40    August 11 2010
+        added ::Singlepass class
+        changed processing order in ::Multipass
+        list as 'only' parameter
+        some fixes
+        
+0.42    Feb 19 2011
+        some regexp and code refactoring
+        function object_to_xml instead of class method
+        added parse_file.t

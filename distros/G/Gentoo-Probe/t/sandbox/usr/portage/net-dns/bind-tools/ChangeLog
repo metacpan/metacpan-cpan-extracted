@@ -1,0 +1,105 @@
+# ChangeLog for net-dns/bind-tools
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/bind-tools/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  08 Jun 2004; Stephen P. Becker <geoman@gentoo.org>
+  bind-tools-9.2.3-r1.ebuild:
+  Added gnuconfig tweak for mips.
+
+  05 Jun 2004; Bryan Østergaard <kloeri@gentoo.org>
+  bind-tools-9.2.3-r1.ebuild:
+  Stable on alpha.
+
+  01 Jun 2004; Tom Gall <tgall@gentoo.org> bind-tools-9.2.3-r1.ebuild:
+  stable on ppc64, bug #52706
+
+  15 May 2004; Joshua Kinard <kumba@gentoo.org> bind-tools-9.2.3-r1.ebuild:
+  Marked stable on mips.
+
+  27 Apr 2004; Aron Griffis <agriffis@gentoo.org> bind-tools-9.2.3.ebuild:
+  Add flag-o-matic for bug 49179
+
+  26 Apr 2004; Michael McCabe <randy@gentoo.org> bind-tools-9.2.3-r1.ebuild:
+  added s390 keywords
+
+  11 Apr 2004; Jason Wever <weeve@gentoo.org> bind-tools-9.2.3-r1.ebuild:
+  Stable on sparc.
+
+  11 Mar 2004; Lars Weiler <pylon@gentoo.org> bind-tools-9.2.3-r1.ebuild:
+  stable on ppc
+
+*bind-tools-9.2.3-r1 (02 Feb 2004)
+
+  02 Feb 2004; Stewart Honsberger <blkdeath@gentoo.org>
+  bind-tools-9.2.3-r1.ebuild:
+  Revert to old build method until dynamic linked libs co-exists with BIND
+
+  30 Jan 2004; <tuxus@gentoo.org> bind-tools-9.2.2.ebuild:
+  Added mips to KEYWORDS.
+
+  26 Nov 2003; Stewart Honsberger <blkdeath@gentoo.org>
+  bind-tools-9.2.2.ebuild, bind-tools-9.2.3.ebuild:
+  Marked 9.2.2 stable on PPC
+  Marked 9.2.3 unstable on all arches; critical library conflicts.
+
+  24 Nov 2003; Aron Griffis <agriffis@gentoo.org> bind-tools-9.2.3.ebuild:
+  Disable on alpha until bug 34265 is resolved
+
+  18 Nov 2003; Stewart <stewart@gentoo.org> bind-tools-9.2.3.ebuild:
+  -fPIC flag for 64-bit architectures (Bug #33336)
+
+*bind-tools-9.2.3 (17 Nov 2003)
+
+  17 Nov 2003; Stewart Honsberger <blkdeath@gentoo.org>
+  bind-tools-9.2.3.ebuild:
+  Version bump.
+  Dynamic linking of utilities (Bug #14261)
+
+*bind-tools-9.2.2 (04 Mar 2002)
+
+  16 Apr 2003; Guy Martin <gmsoft@gentoo.org> bind-tools-9.2.2.ebuild :
+  Marked stable for hppa.
+
+  06 Apr 2003; Zach Welch <zwelch@gentoo.org> bind-tools-9.2.2.ebuild:
+  add arm keyword
+
+  30 Mar 2003; Christian Birchinger <joker@gentoo.org>
+  bind-tools-9.2.2.ebuild:
+  Added sparc stable keyword
+
+  09 Mar 2003; Aron Griffis <agriffis@gentoo.org> bind-tools-9.2.2.ebuild:
+  Marked stable on alpha and x86 during package upgrade phase.
+
+  04 Mar 2003; Brandon Low <lostlogic@gentoo.org> bind-tools-9.2.2.ebuild:
+  make->emake -j1
+
+  04 Mar 2003; Brandon Low <lostlogic@gentoo.org> bind-tools-9.2.2.ebuild:
+  Version bump, marked unstable.  Cleaned up unneeded ebuilds.
+
+*bind-tools-9.2.2_rc1 (16 Aug 2002)
+
+  27 Feb 2003; Guy Martin <gmsoft@gentoo.org> bind-tools-9.2.2_rc1.ebuild :
+  Added hppa to keywords.
+
+  16 Aug 2002; Seemant Kulleen <seemant@gentoo.org>
+  bind-tools-9.2.2_rc1.ebuild :
+
+  Security fix version bump: http://www.kb.cert.org/vuls/id/803539
+  Thanks to: kevin@aptbasilicata.it (Maurizio Disimino) in bug #6578
+
+*bind-tools-9.2.1 (27 Jun 2002)
+
+  27 Jun 2002; Seemant Kulleen <seemant@gentoo.org> bind-tools-9.2.1.ebuild
+  files/digest-bind-tools-9.2.1 :
+
+  Version bump by: markus-krainer@chello.at (Markus Krainer) in bug #3249
+
+*bind-tools-9.1.3-r1 (1 Feb 2002)
+
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

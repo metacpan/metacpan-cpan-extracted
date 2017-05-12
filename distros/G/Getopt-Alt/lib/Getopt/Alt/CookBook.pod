@@ -1,0 +1,175 @@
+=head1 NAME
+
+Getopt::Alt::CookBook - Example usages of Getopt::Alt;
+
+=head1 VERSION
+
+This documentation refers to Getopt::Alt version 0.4.2.
+
+=head1 EXAMPLES
+
+=head2 Simple
+
+=head3 Comparison with L<Getopt::Long>
+
+Simple example comparing L<Getopt::Long>'s C<GetOptions> to L<Getopt::Alt>'s
+C<get_options>
+
+GetOptions:
+
+    use Getopt::Long;
+    use Pod::Usage;
+
+    my %option;
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'dir|d=s',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # use options found in %options
+
+get_options:
+
+    use Getopt::Alt qw/get_options/;
+
+    my ($options) = get_options(
+        { helper => 1 },
+        [ 'dir|d=s' ],
+    );
+
+    # use options found in %$options
+
+The helper parameter gives adds the verbose, man, help and VERSION options to
+your options and will if --VERSION specified output the version of the calling
+module, if --man or --help is used will run pod2usage on the calling script.
+This all reduces the amount of boiler plate code needed in your scripts (of
+cause this means you should also write POD for your script).
+
+=head2 Sub-Commands
+
+L<Getopt::Alt> has three sub command modes:
+
+=over 4
+
+=item *
+
+simple
+
+=item *
+
+HASH
+
+=item *
+
+Module
+
+=back
+
+=head3 Simple
+
+Just stops processing at first non-option parameter (assumed to be the sub command).
+Any further processing of sub-commands must be made manually (eg having what ever
+processes the sub-command doing further processing).
+
+    use Getopt::Alt qw/get_options/;
+
+    my ($options, $cmd) = get_options(
+        { helper => 1, sub_command => 1 },
+        [ 'dir|d=s' ],
+    );
+
+    # on the command line
+    $ command --dir=/some/where sub --not-processed
+
+    # will result in $option->{dir} eq /some/where and $cmd eq 'sub' and
+    # @ARGV having ['--not-processed']
+
+=head3 HASH
+
+A hash is passed with the keys representing the sub commands and the values are
+the sub-commands parameters.
+
+    use Getopt::Alt qw/get_options/;
+
+    my ($options, $cmd) = get_options(
+        {
+            helper => 1,
+            sub_command => {
+                sub => [
+                    'to be implemented'
+                ],
+            },
+        }
+        [ 'dir|d=s' ],
+    );
+
+=head3 Module
+
+The final form for sub-commands is that they should be picked up by other modules
+
+=head2 Auto Completion
+
+    use Getopt::Alt qw/get_options/;
+
+    my ($options, $cmd) = get_options(
+        { helper => 1, auto_complete => \&my_auto },
+        [ 'dir|d=s' ],
+    );
+
+
+The C<auto_complete> parameter takes a code reference with is called when the
+script is with the C<--auto-complete> parameter (supplied by helper => 1).
+L<Getopt::Alt> will try to complete any unfinished options but not their
+values that is left to for C<$self-E<gt>E<lt>sub_commandE<gt>> to process.
+
+Eg C<~/.bashrc> function for auto completion of "command"
+
+    _command() {
+        local cur prev opts
+        COMPREPLY=()
+        cur="${COMP_WORDS[COMP_CWORD]}"
+        prev="${COMP_WORDS[COMP_CWORD-1]}"
+        # get list of command line options
+        opts=$(command --auto-complete --auto-complete-list)
+
+        if [[ ${cur} == -* && ${COMP_CWORD} -eq 1 ]]; then
+            COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+        else
+            local sonames=$(command --auto-complete ${COMP_WORDS[@]})
+            COMPREPLY=($(compgen -W "${sonames}" -- ${cur}))
+        fi
+    }
+    complete -F _command command
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

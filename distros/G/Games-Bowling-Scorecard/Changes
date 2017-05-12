@@ -1,0 +1,30 @@
+Changelog for Games-Bowling-Scorecard
+
+0.105     2013-09-24 20:56:26 America/New_York
+          replace a busted-on-Win32 test file
+
+0.104     2013-08-24 08:19:51 America/New_York
+          repackage!  now using recent Dist::Zilla and github
+
+0.103     2008-06-02
+          experiment in dist packaging: this dist not built by EUMM, MI, or MB
+
+0.102     2008-05-27
+          experiment in dist packaging: no MANIFEST included
+
+0.101     2007-02-22
+          add README (for kwalitee)
+
+0.100     2007-01-22
+          add roll_ok checks
+          improve test coverage
+          fix a number of AsText bugs for tenth frame
+          improve tests for AsText
+
+0.011     2007-01-21
+          fix version code/doc mismatches
+          add score_through method
+          add AsText to produce ASCII scorecards
+
+0.001     2007-01-21
+          first release!

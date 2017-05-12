@@ -1,0 +1,45 @@
+=head2 bodyheaders
+
+Extracts headers from the beginning of a message body and lifts them up
+into the message headers.  This is to assist posters whose software makes
+it difficult for them to edit the headers of their posts or mail.
+
+This module looks for recognized headers at the beginning of the article
+body.  As long as it's seen only blank lines (possibly containing
+whitespace) and recognized headers, it adds all of those headers to the
+main message headers.  As soon as it finds a line that isn't a recognized
+header, it stops, and if it found any headers it removes everything up to
+the first non-header line from the body.
+
+This module takes one configuration directive:
+
+=over 4
+
+=item bodyheaders HEADER [HEADER ...]
+
+A list of headers to look for in the beginning of the body.  The headers
+are not case sensitive, and any amount of whitespace (including none) is
+allowed after the colon.
+
+=back
+
+For example, with the directive:
+
+    bodyheaders x-no-archive
+
+and a message beginning with:
+
+    x-no-archive:yes
+
+    Comment: hello
+
+an X-No-Archive header with content "yes" will be added to the message
+headers and the first line of the message body after this module runs will
+be the line starting with "Comment:".  Had "comment" also been listed in
+the configuration directive, that header would have been lifted into the
+article headers as well and this module would have continued looking.
+
+Whitespace on the line before the header is not allowed, and such a line
+would not be recognized as a header to be lifted to the message headers.
+
+This module takes no arguments and cannot fail.

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Geo-Cloudmade.t
+t/walking-route.t
+lib/Geo/Cloudmade.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+Ignore environment variables in setuid or setgid programs.
+--- hesiod-3.0.2/hesiod.c	Wed Oct  3 14:53:37 2001
++++ hesiod-3.0.2/hesiod.c	Wed Oct  3 14:55:02 2001
+@@ -52,6 +52,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
+ #include <ctype.h>
+ #include "hesiod.h"
+ #include "hesiod_p.h"
+@@ -79,13 +80,13 @@
+   if (ctx)
+     {
+       *context = ctx;
+-      configname = getenv("HESIOD_CONFIG");
++      configname = ((getuid() == geteuid()) && (getgid() == getegid())) ? getenv("HESIOD_CONFIG") : NULL;
+       if (!configname)
+ 	configname = SYSCONFDIR "/hesiod.conf";
+       if (read_config_file(ctx, configname) >= 0)
+ 	{
+ 	  /* The default rhs can be overridden by an environment variable. */
+-	  p = getenv("HES_DOMAIN");
++	  p = ((getuid() == geteuid()) && (getgid() == getegid())) ? getenv("HES_DOMAIN") : NULL;
+ 	  if (p)
+ 	    {
+ 	      if (ctx->rhs)

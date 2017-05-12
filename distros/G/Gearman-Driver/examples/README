@@ -1,0 +1,16 @@
+These examples require http://search.cpan.org/dist/Imager/
+as well as running gearmand on the default port 4730
+
+You can test the non-Gearman::Driver scripts this way:
+
+gearmand -d
+convert.pl &
+gearman -f convert_to_jpeg < cpan.png > cpan.jpg
+gearman -f convert_to_gif < cpan.png > cpan.gif
+
+To test the Gearman::Driver one do:
+
+gearmand -d
+gearman_driver.pl --namespaces GDExamples &
+gearman -f GDExamples::Convert::convert_to_jpeg < cpan.png > cpan.jpg
+gearman -f GDExamples::Convert::convert_to_gif < cpan.png > cpan.gif

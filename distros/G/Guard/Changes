@@ -1,0 +1,44 @@
+Revision history for Perl extension Guard
+
+1.023 Thu Nov 20 19:12:58 CET 2014
+	- work around backwards compatibility breakage in perl 5.22
+          (removal of PL_sv_objcount).
+
+1.022 Sat Jul  2 02:38:21 CEST 2011
+	- document how () after the function name overrides the
+          prototype.
+        - improve documentation, fix the examples.
+
+1.021 Sun Jul 19 07:43:17 CEST 2009
+	- try to provide compatibility to pre-5.8.8.
+
+1.02 Sat Apr 11 06:42:06 CEST 2009
+	- set NODEBUG on scope_guard, to work around -d:-modules
+          causing scope_guard to be called in the wrong context.
+
+1.01 Wed Jan 14 00:30:18 CET 2009
+	- guard_free didn't return a value.
+
+1.0  Fri Dec 26 14:03:28 CET 2008
+	- un-support windows process emulation (it didn't
+          work anyways).
+        - discuss similar modules.
+        - tweaked documentation slightly.
+
+0.5  Sat Dec 13 22:46:46 CET 2008
+	- vastly improve documentation,
+          clarify local/scope_guard ordering
+          and give niftier examples.
+        - always bless guard objects and convert
+          Guard::cancel to a method, at an 8% runtime
+          cost.
+        - temporarily disable $SIG{__DIE__} when executing
+          guard blocks.
+        - fix testsuite.
+
+0.1  Sat Dec 13 18:49:30 CET 2008
+	- first release.
+
+0.01 Sat Dec 13 14:57:44 CET 2008
+	- cloned form Convert-Scalar.
+

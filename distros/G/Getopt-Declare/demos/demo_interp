@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Declare;
+
+use vars qw{ $name $result $n };
+
+my $interpolator = Getopt::Declare->new(<<'EOCMDS',[-BUILD]);
+	[cluster:none]
+	[repeatable]
+	[pvtype: NOTDELIM /(?:%T.)+/ ]
+	[pvtype: WS   /\s+/ ]
+
+	\{{ <cmd:NOTDELIM> }}[<ws:WS>]	
+			{ $self->{result} .= eval "no strict; $cmd"||'';
+			  $self->{result} .= $ws if $ws; }
+
+	<str>[<ws:WS>]	
+			{ $self->{result} .= $str;
+			  $self->{result} .= $ws if $ws; }
+EOCMDS
+
+sub interpolate($)
+{
+	$interpolator->{result} = '';
+	$interpolator->parse($_[0]);
+	return $interpolator->{result};
+}
+
+
+$result = 22;
+$name = "Sam";
+$n = 50;
+sub average
+{
+	my ($sum, $count) = (0,0);
+	foreach ( @_ ) { $sum += $_; $count++; }
+	return $count ? $sum/$count : 0;
+}
+
+print interpolate('The person {{$name}} scored {{$result}}'), "\n";
+print interpolate('The pass mark was {{$result * 2}}'), "\n";
+print interpolate('The average of the first {{2*$n}} numbers is {{average 1..2*$n}}'), "\n";

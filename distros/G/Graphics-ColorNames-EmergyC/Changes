@@ -1,0 +1,11 @@
+Change log for Graphics::ColorNames::EmergyC:
+
+1.01   21 Dec 2007
+       - cleaned up newlines
+       - removed restriction on minimum Perl version (left it up to
+         Graphics::ColorNames)
+       - minor changes to documentation
+       - fixed wrong requirement
+
+1.00   17 Dec 2007
+       - first release

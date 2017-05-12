@@ -1,0 +1,9 @@
+digraph graph_30
+{
+	node_30_1
+	[
+		color = red
+		fontcolor = green
+		label = <<table><tr><td>html-style label</td></tr></table>>
+	]
+}

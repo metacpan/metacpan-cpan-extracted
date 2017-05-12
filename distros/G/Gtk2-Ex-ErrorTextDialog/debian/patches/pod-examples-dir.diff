@@ -1,0 +1,12 @@
+diff -Nur -x '*.orig' -x '*~' errtext/lib/Gtk2/Ex/ErrorTextDialog.pm errtext.new/lib/Gtk2/Ex/ErrorTextDialog.pm
+--- errtext/lib/Gtk2/Ex/ErrorTextDialog.pm	2009-12-18 16:59:20.000000000 +1100
++++ errtext.new/lib/Gtk2/Ex/ErrorTextDialog.pm	2009-12-18 17:02:23.000000000 +1100
+@@ -643,7 +643,7 @@
+     }
+     class "Gtk2__Ex__ErrorTextDialog" binding:application "my_error_keys"
+ 
+-See F<examples/keybindings.pl> in the sources for a complete program doing
++See F</usr/share/doc/libgtk2-ex-errortextdialog-perl/examples/keybindings.pl> for a complete program doing
+ this.
+ 
+ =head1 PROPERTIES

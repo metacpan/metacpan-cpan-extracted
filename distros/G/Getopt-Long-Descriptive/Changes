@@ -1,0 +1,146 @@
+Revision history for Getopt-Long-Descriptive
+
+0.100     2016-07-11 22:21:26-04:00 America/New_York
+        - show off "shortcircuit" in synopsis (thanks, Zhenyi Zhou)
+        - Fix rendering of complex types ('i@' → 'INT...', etc)
+          (thanks, Arthur Axel fREW Schmidt)
+
+0.099     2015-01-23 21:11:09-05:00 America/New_York
+        - options that take arguments now indicate the argument's type and
+          whether it can be given multiply (thanks, Niels Thykier)
+
+0.098     2014-11-16 14:35:34-05:00 America/New_York
+        - when showing defaults, show false ones, too
+
+0.097     2014-03-05 21:57:32-05:00 America/New_York
+        - explicitly make the default behavior case-sensitive
+        - add show_defaults option (thanks, Thomas Neumann)
+
+0.096     2013-10-04 08:03:12 America/New_York
+        - update version of Test::Warnings required
+          (thanks, Alexandr Ciornii!)
+
+0.095     2013-09-26 20:32:55 America/New_York
+        - add the "shortcircuit" option option (thanks, Diab Jerius!)
+
+0.094     2013-09-05 09:35:26 America/New_York
+        - update documentation to note that failed validation is fatal (thanks,
+          SMYLERS)
+        - show off "required" in the SYNOPSIS (thanks, OALDERS)
+
+0.093     2012-11-01 15:55:35 America/New_York
+        - bogus %-codes in usage description are now noticed and fatal
+
+0.092     2012-07-31 22:51:09 America/New_York
+        - make "hidden" options usable on their own (thanks, Roman Hubacek!)
+
+0.091     2012-02-22 18:15:08 America/New_York
+        - don't die quite so violently when a Params::Validate constraint fails
+          (initial patch by harleypig@github; final blame to RJBS)
+
+0.090     2011-04-21 20:43:07 America/New_York
+        - bump prereq on Params::Validate to deal with recent buggy versions
+
+0.089     2011-01-13
+        - bump version to deal with busted PAUSE indexing
+
+0.088     2011-01-12
+        - fix infinite loop when long option documentation strings couldn't wrap
+          (HDP)
+
+0.087     2010-11-30
+        - long option documentation strings are now line-wrapped and aligned
+          correctly (Dave Rolsky)
+
+0.086     2010-09-19
+        - fix minimum required version of Sub::Exporter
+        - minor tweak to avoid warnings when run with -w
+
+0.085     2010-03-13
+        - rewrite much of the documentation
+
+0.084     2010-02-14
+        - prevent auto-enabling of auto_help (Thanks, DOUGDUDE)
+
+0.083     2009-12-12
+        - create an Opts module to store the opts object code
+        - add _specified_opts method and _specified method for Opts
+
+0.082     2009-12-03
+        - require Getopt::Long 2.33 for proper --no-foo handling
+
+0.081     2009-11-27
+        - \%opt will not contain entries for opts that were not given
+          (this reverts 0.079 and 0.080's new behavior of undef entries)
+
+0.080     2009-11-27
+        - fix option naming to ignore "+" used to mark cumulative options
+        - fix direct calls to Getopt::Long::Descriptive::describe_options
+
+0.079     2009-11-26 Happy Thanksgiving!
+        - improve the "opt as object" facility to have all opts as methods
+
+0.078     2009-08-21
+        - refactoring to allow subclassing of Getopt::Long::Descriptive
+
+0.077     2009-08-21
+        - allow 'f' as an option name; had mistakenly required 2 characters
+
+0.076     2009-08-20
+        - bundle the accidentally omitted Usage.pm file
+        - the $opt returned by described_options is now an object with accessors
+
+0.075     2009-08-19
+        - significant refactoring, especially to GLD::Usage, which is now a more
+          traditional (non-hash-based) object (RJBS)
+
+0.074     2008-05-11
+
+        - fix RT#35678 (thanks RJBS)
+
+0.073     2008-04-04
+
+        - packaging fix
+
+0.072     2008-04-03
+
+        - remove duplicate option name in test
+
+0.071     2008-04-03
+
+        - fix RT#34153 (bcbailey++)
+
+0.070     2008-01-29
+
+        - fix RT#32481 (nothingmuch++)
+
+0.06      2006-08-20
+
+        - Required options should not give an unhelpful
+          Params::Validate error message when they're missing.
+
+        - Add %c to 'format' for command name.
+
+        - Use [] for spacers in option list.
+
+0.05      2006-01-25
+
+        - Support negatable ('foo!') options from Getopt::Long.
+
+0.04      2005-11-28
+
+        - Include IO::Scalar prereq in Makefile.PL
+
+0.03      2005-11-15
+
+        - Add 'one_of' and 'hidden'.
+
+0.02      2005-11-10
+
+        - Bugfix: Getopt::Long type specifiers were sneaking
+          into option names
+
+0.01      2005-11-10
+
+        - First version, released on an unsuspecting world.
+

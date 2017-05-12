@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                GSAPI
+version:             0.5
+abstract:            Perl extension for accessing GNU Ghostscript
+license:             ~
+author:              
+    - Stefan Traby <stefan@hello-penguin.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

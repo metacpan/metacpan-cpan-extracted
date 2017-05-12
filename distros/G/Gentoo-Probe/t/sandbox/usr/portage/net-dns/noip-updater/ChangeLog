@@ -1,0 +1,56 @@
+# ChangeLog for net-dns/noip-updater
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/noip-updater/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+*noip-updater-2.1.1-r1 (09 Jun 2004)
+
+  09 Jun 2004; Seemant Kulleen <seemant@gentoo.org> -noip-updater-1.6.ebuild,
+  -noip-updater-2.0.12.ebuild, +noip-updater-2.1.1-r1.ebuild,
+  -noip-updater-2.1.1.ebuild:
+  part of the problem with the new version is that the sourcefile uses PREFIX so
+  it wants to put config files in /usr/etc of all things. Since this was in
+  stable, I'm moving this revision bump with a sed statement to remove the
+  nonsense in the sourcefile to stable x86. Closes bug #53374 by Joshua Banks
+  <l0f33t@yahoo.com>
+
+  06 Jun 2004; Daniel Black <dragonheart@gentoo.org>
+  noip-updater-2.0.15.ebuild, noip-updater-2.1.1.ebuild:
+  x86 keyword
+
+  05 Jun 2004; Bryan Østergaard <kloeri@gentoo.org> noip-updater-2.1.1.ebuild:
+  Stable on alpha.
+
+*noip-updater-2.1.1 (18 Apr 2004)
+
+  18 Apr 2004; Daniel Black <dragonheart@gentoo.org> metadata.xml,
+  noip-updater-2.1.1.ebuild, files/noip-2.1.1.patch:
+  Version bump - thanks to Paulo Fidalgo <kanniball@zmail.pt> in bug #43153
+
+*noip-updater-2.0.15 (30 Dec 2003)
+
+  30 Dec 2003; Seemant Kulleen <seemant@gentoo.org>
+  noip-updater-2.0.12.ebuild, noip-updater-2.0.15.ebuild,
+  files/noip-2.0.15.patch:
+  version bump, thanks to: Shaun Cloherty <s.cloherty@gsbme.unsw.edu.au> in bug
+  #36324
+
+  03 Aug 2003; Seemant Kulleen <seemant@gentoo.org>
+  noip-updater-2.0.12.ebuild, files/noip2.start:
+  dns dependency in initscript changed to use dns instead of need dns. Thanks to
+  Davi Arnaut <davi@hotpop.com> (dv in #gentoo/freenode)
+
+*noip-updater-2.0.12 (15 Jun 2003)
+
+  15 Jun 2003; Jared Hudson <jhhudso@gentoo.org> : Incremented to latest
+  version and set older version as stable (x86). Credit goes to Low Zhen Lin
+  <lowzl@hotmail.com> for providing the updated ebuild.
+	
+*noip-updater-1.6 (15 Dec 2002)
+
+  15 Dec 2002; Seemant Kulleen <seemant@gentoo.org> noip-updater-1.6.ebuild
+  ChangeLog files/noip.c.patch files/noip.start
+  files/digest-noip-updater-1.6 :
+
+  New package -- client to upgrade your noip.com DNS entry.  Provided by: 
+  Low Zhen Lin <lowzl@hotmail.com> in bug #9745
+

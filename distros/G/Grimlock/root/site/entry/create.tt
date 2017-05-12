@@ -1,0 +1,50 @@
+[% page.load_scripts_at_top = 1 %]
+
+<h2>Create an entry</h2>
+<div id="draft_save"></div>
+<form method="POST" action="[% c.uri_for_action('/entry/create') %]">
+<div id="form-entry-title">Title: <input type="text" name="title" /></div>
+<div id="form-entry-body">
+<textarea name="body" rows=15 cols=45></textarea>
+</div>
+<div id="form-entry-publish">Publish? <input type="checkbox" name="published" /></div>
+<div id="form-entry-submit"><input type="submit" value="Save entry" /></div>
+
+<script type="text/javascript">
+YUI().use("node", "dump", "datasource-function", "datasource-polling", "datasource", function(Y) {
+  var saveDraft = function() {
+    
+    Y.io('/draft', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      data: {
+        title: document.forms[0].title.value,
+        body: document.forms[0].body.value
+      },
+      on: {
+        success: function(id, response){
+                    Y.one("#draft_save").setContent("Draft saved at " + new Date);
+                },
+                failure: function(id, response){
+                    Y.one("#draft_save")
+                     .setContent("Could not retrieve data: " + e.error.message);
+                }
+      }
+    });
+  },
+  id,  
+  myDataSource = new Y.DataSource.Function({source:saveDraft}),
+        request = {
+            callback: {
+                           }
+        };
+  Y.on("click", function (e) {
+    if ( document.forms[0].title.value != "" ) {
+        id = myDataSource.setInterval(10000, request); // Starts polling
+    }
+  }, '#form-entry-title');
+      //  myDataSource.clearInterval(id); // Ends polling
+});
+
+</script>
+

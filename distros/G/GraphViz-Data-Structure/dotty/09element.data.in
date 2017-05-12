@@ -1,0 +1,28 @@
+(name => 'array ref to self',
+ code => '@a= (1,\@a,3);
+          GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name => 'scalar ref to array element',
+ code => '@a=(1,2,3); 
+          $a=\$a[2];
+          GraphViz::Data::Structure->new($a,%title%)->graph->as_canon',
+)
+%%
+(name => 'hash ref to self',
+ code => '%refhash=(Self=>\%refhash);
+          GraphViz::Data::Structure->new(\%refhash,%title%)->graph->as_canon',
+ )
+%%
+(name => 'scalar ref to hash element',
+ code => '%refhash=(One=>1,Two=>2);
+          $a=\$refhash{One};
+          GraphViz::Data::Structure->new($a,%title%)->graph->as_canon',
+)
+%%
+(name => 'complex case',
+ code => '@a=(1,2); 
+          $a[0]=\@a; 
+          $a[1]=\$a[0]; 
+          GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+ )

@@ -1,0 +1,41 @@
+
+<!ELEMENT MapGen (option*, tile_group*, map)>
+<!ELEMENT option EMPTY>
+<!ELEMENT tile_group (rectangle*)>
+<!ELEMENT rectangle EMPTY>
+<!ELEMENT closure EMPTY>
+<!ELEMENT map (row*)>
+<!ELEMENT row (tile*)>
+<!ELEMENT tile (contents?|closure*)>
+<!ELEMENT contents (item*)>
+
+<!ATTLIST row ypos CDATA #REQUIRED>
+<!ATTLIST tile xpos CDATA #REQUIRED>
+<!ATTLIST tile type CDATA #REQUIRED>
+<!ATTLIST tile_group name CDATA #REQUIRED>
+<!ATTLIST tile_group type CDATA #REQUIRED>
+<!ATTLIST rectangle loc CDATA #REQUIRED>
+<!ATTLIST rectangle size CDATA #REQUIRED>
+
+<!ATTLIST option name   CDATA #REQUIRED>
+<!ATTLIST option value  CDATA #REQUIRED>
+
+<!ATTLIST closure dir            (north|east|south|west)   #REQUIRED>
+<!ATTLIST closure type           (room|corridor|wall|door) #REQUIRED>
+<!ATTLIST closure locked         (yes|no) #IMPLIED>
+<!ATTLIST closure open           (yes|no) #IMPLIED>
+<!ATTLIST closure stuck          (yes|no) #IMPLIED>
+<!ATTLIST closure secret         (yes|no) #IMPLIED>
+<!ATTLIST closure major_open_dir (north|east|south|west) #IMPLIED>
+<!ATTLIST closure minor_open_dir (north|east|south|west) #IMPLIED>
+
+<!ELEMENT item (attr*)>
+<!ELEMENT attr EMPTY>
+
+<!ATTLIST item name   CDATA #REQUIRED>
+<!ATTLIST item unique CDATA #IMPLIED>
+<!ATTLIST item qty    CDATA #IMPLIED>
+<!ATTLIST item id     CDATA #IMPLIED>
+
+<!ATTLIST attr name  CDATA #REQUIRED>
+<!ATTLIST attr value CDATA #REQUIRED>

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/gplvotesigndocclient.t
+lib/GPLVote/SignDoc/Client.pm

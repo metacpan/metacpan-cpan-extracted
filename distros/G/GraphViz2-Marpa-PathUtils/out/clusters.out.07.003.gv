@@ -1,0 +1,15 @@
+digraph graph_07
+{
+	graph[rankdir = "LR"]
+	node[shape = "oval"]
+	edge[color = "slateblue"]
+	node[style = "filled"]
+	D[color = "lawngreen"]
+	E[color = "coral"]
+	G[color = "crimson"]
+	F[color = "turquoise"]
+	D -> F[arrowhead = "none" label = "" samehead = "1"]
+	E -> F[arrowhead = "none" label = "" samehead = "1"]
+	F -> G[arrowhead = "invempty" label = "" sametail = "1"]
+
+}

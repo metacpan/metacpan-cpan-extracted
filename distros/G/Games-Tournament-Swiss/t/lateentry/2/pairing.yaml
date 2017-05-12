@@ -1,0 +1,315 @@
+--- !!perl/hash:Games::Tournament::Swiss::Procedure
+badpair: ~
+brackets:
+  0: &1 !!perl/hash:Games::Tournament::Swiss::Bracket
+    badpair: 0
+    biggroupx: 0
+    floatCheck: None
+    lastS2ids:
+      - 4
+      - 3
+      - 2
+    members:
+      - &2 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: Down
+        floats:
+          - ~
+          - Not
+        id: 103
+        name: Carl
+        oldId: 103
+        pairingNumber: 5
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 1
+          lastTwo:
+            - White
+          sign: White
+        rating: 1960
+        roles:
+          - White
+        score: 1
+        scores:
+          1: ~
+        title: Mr.
+      - &3 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: Up
+        floats:
+          - ~
+          - Not
+        id: 102
+        name: Bert
+        oldId: 102
+        pairingNumber: 3
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 1
+          lastTwo:
+            - Black
+          sign: Black
+        rating: 1980
+        roles:
+          - Black
+        score: 0
+        scores:
+          1: ~
+        title: Mr.
+    number: 2
+    pprime: 1
+    remainder: &4 !!perl/hash:Games::Tournament::Swiss::Bracket
+      floatCheck: None
+      lastS2ids:
+        - 4
+      members:
+        - &5 !!perl/hash:Games::Tournament::Contestant::Swiss
+          firstround: 1
+          floater: ''
+          floats:
+            - ~
+            - Not
+          id: 201
+          name: Ally
+          oldId: 201
+          pairingNumber: 2
+          preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+            difference: 1
+            lastTwo:
+              - Black
+            sign: Black
+          rating: 1990
+          roles:
+            - Black
+          score: 0
+          scores:
+            1: ~
+          title: Ms.
+        - &6 !!perl/hash:Games::Tournament::Contestant::Swiss
+          firstround: 2
+          floats: []
+          id: 202
+          name: Bertha
+          oldId: 202
+          pairingNumber: 4
+          preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+            difference: 0
+            sign: ''
+          rating: 1970
+          scores: ~
+          title: Ms.
+      number: 2's Remainder Group
+      pprime: 1
+      remainderof: *1
+      s1:
+        - *5
+      s2:
+        - *6
+      score: 0
+      x: 0
+      xprime: 0
+    s1:
+      - *2
+    s2:
+      - *3
+      - *5
+      - *6
+    score: 0
+    x: 0
+    xdeduction: 0
+    xprime: 0
+  0Remainder: *4
+  1: !!perl/hash:Games::Tournament::Swiss::Bracket
+    badpair: 0
+    floatCheck: None
+    lastS2ids:
+      - 6
+      - 5
+    members:
+      - &7 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: ''
+        floats:
+          - ~
+          - Not
+        id: 101
+        name: Al
+        oldId: 101
+        pairingNumber: 1
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 1
+          lastTwo:
+            - White
+          sign: White
+        rating: 2000
+        roles:
+          - White
+        score: 1
+        scores:
+          1: ~
+        title: Mr.
+      - &8 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: ''
+        floats:
+          - ~
+          - Down
+        id: 104
+        name: Don
+        oldId: 104
+        pairingNumber: 6
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          sign: ''
+        rating: 1940
+        roles:
+          - Bye
+        score: 1
+        scores:
+          1: Bye
+        title: Mr.
+    number: 1
+    pprime: 1
+    s1:
+      - *7
+    s2:
+      - *8
+      - *2
+    score: 1
+    x: 0
+    xprime: 0
+byes:
+  104: 1
+colorClashes: ~
+log:
+  C1:
+    strings:
+      - "\tB1,2 test: OK, no unpairables\n"
+      - "\tB1,2 test: OK, no unpairables\n"
+    tailpos: 1
+  C2:
+    strings:
+      - "\tx=0\n"
+      - "\tx=0\n"
+      - "\tx=0\n"
+    tailpos: 2
+  C3:
+    strings:
+      - "\tp=1. Homogeneous.\n"
+      - "\tp=1. Heterogeneous.\n"
+      - "\tp=1. Homogeneous.\n"
+    tailpos: 2
+  C4:
+    strings:
+      - "\tS1: 1 & S2: 5 6\n"
+      - "\tS1: 5 & S2: 2 3 4\n"
+      - "\tS1: 2 & S2: 4\n"
+    tailpos: 2
+  C5:
+    strings:
+      - "\tordered: 1\n\t       & 5 6\n"
+      - "\tordered: 5\n\t       & 2 3 4\n"
+      - "\tordered: 2\n\t       & 4\n"
+    tailpos: 2
+  C6OTHERS:
+    strings:
+      - "\tFloating remaining 5 Down. [1] 1 6 & [2] 2 3 4 5\n"
+      - |2
+        	Remaindering 2 4.
+            [2] 5 3 & [2's Remainder Group] 2 4
+    tailpos: 1
+  C6PAIRS:
+    strings:
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB56: OK.\n"
+      - "\t1-Bracket (1) tables 1 paired. OK\n"
+      - "\tE1 6&1 \n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB56: OK.\n"
+      - "\t0-Bracket (2) tables 1 paired. OK\n"
+      - "\tE1 3&5 \n"
+      - "\tB56: OK.\n"
+      - "\t0Remainder-Bracket (2's Remainder Group) tables 1 paired. OK\n"
+      - "\tE1 2&4 \n"
+    tailpos: 10
+  C7:
+    strings:
+      - "\t         6 5\n"
+      - "\t         3 2 4\n"
+    tailpos: 1
+  NEXT:
+    strings:
+      - "\t1-Bracket [1]: 1 5 6\n"
+      - "\t0-Bracket [2]: 2 3 4 5\n"
+    tailpos: 1
+  START:
+    strings:
+      - "\tRound 2:  1 5 6 (1), 2 3 4 (0), \n"
+    tailpos: 0
+logged:
+  ASSIGNPAIRINGNUMBERS: 1
+  C1: 1
+  C10: 1
+  C11: 1
+  C12: 1
+  C13: 1
+  C14: 1
+  C2: 1
+  C3: 1
+  C4: 1
+  C5: 1
+  C6OTHERS: 1
+  C6PAIRS: 1
+  C7: 1
+  C8: 1
+  C9: 1
+  MATCHPLAYERS: 1
+  NEXT: 1
+  PREV: 1
+  START: 1
+matches:
+  0:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *2
+        White: *3
+      floats:
+        Black: Down
+        White: Up
+      result: ~
+      round: 2
+  0Remainder:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *6
+        White: *5
+      floats:
+        Black: ~
+        White: ''
+      result: ~
+      round: 2
+  1:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *7
+        White: *8
+      floats:
+        Black: ''
+        White: ''
+      result: ~
+      round: 2
+nonpaired:
+  - *5
+  - *6
+previousBracket: []
+round: 2
+thisBracket: 0Remainder
+whoPlayedWho:
+  101:
+    102: 1
+  102:
+    101: 1
+  103:
+    201: 1
+  104: {}
+  201:
+    103: 1
+  202: {}

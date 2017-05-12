@@ -1,0 +1,71 @@
+---
+abstract: 'A simple modern CMS built on Mojolicious'
+author:
+  - 'Joel Berger'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Galileo
+no_index:
+  file:
+    - README.pod
+provides:
+  Galileo:
+    file: lib/Galileo.pm
+    version: '0.042'
+  Galileo::Admin:
+    file: lib/Galileo/Admin.pm
+  Galileo::Command::dump:
+    file: lib/Galileo/Command/dump.pm
+  Galileo::Command::setup:
+    file: lib/Galileo/Command/setup.pm
+  Galileo::DB::Deploy:
+    file: lib/Galileo/DB/Deploy.pm
+  Galileo::DB::Schema:
+    file: lib/Galileo/DB/Schema.pm
+    version: '2'
+  Galileo::DB::Schema::Result::Menu:
+    file: lib/Galileo/DB/Schema/Result/Menu.pm
+  Galileo::DB::Schema::Result::Page:
+    file: lib/Galileo/DB/Schema/Result/Page.pm
+  Galileo::DB::Schema::Result::User:
+    file: lib/Galileo/DB/Schema/Result/User.pm
+  Galileo::File:
+    file: lib/Galileo/File.pm
+  Galileo::Menu:
+    file: lib/Galileo/Menu.pm
+  Galileo::Page:
+    file: lib/Galileo/Page.pm
+  Galileo::Plugin::Deploy:
+    file: lib/Galileo/Plugin/Deploy.pm
+  Galileo::Plugin::Modal:
+    file: lib/Galileo/Plugin/Modal.pm
+  Galileo::User:
+    file: lib/Galileo/User.pm
+requires:
+  Crypt::Eksblowfish::Bcrypt: '0'
+  DBD::SQLite: '0'
+  DBIx::Class: '0'
+  DBIx::Class::Candy: '0'
+  DBIx::Class::DeploymentHandler: '0'
+  DBIx::Class::EncodedColumn: '0'
+  File::Copy::Recursive: '0'
+  File::Next: '0'
+  File::ShareDir: '1.00'
+  Mojolicious: '7.15'
+  Mojolicious::Plugin::Humane: '0.07'
+  Mojolicious::Plugin::Memorize: '0'
+  SQL::Translator: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: http://github.com/jberger/Galileo/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Galileo
+version: '0.042'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

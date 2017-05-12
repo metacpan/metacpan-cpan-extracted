@@ -1,0 +1,6 @@
+<p><a href="http://search.cpan.org/search?query=[%-
+ view.data.base_module %]::[% view.data.module_name %]&mode=all">
+Search CPAN</a><p>
+
+[% view.data.html %]
+

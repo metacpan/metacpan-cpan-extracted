@@ -1,0 +1,68 @@
+2007/05/15 00:01 (+0200) borup
+
+	* eggtrayicon.[ch]: merge changes from svn head
+
+2006/05/14 21:04 (+0200) borup
+
+	* eggtrayicon.[ch]: merge changes from svn head
+	* eggtrayicon.[ch]: apply patch from:
+	http://bugzilla.gnome.org/show_bug.cgi?id=150726
+
+2005/03/03 21:54 (-0400) muppetman
+
+	* eggtrayicon.c: apply patch from
+	http://bugzilla.gnome.org/show_bug.cgi?id=123570
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+	* perl-Gtk2-TrayIcon.spec.in: new scheme that addresses x86_64 problems
+	found by Carl Nygard
+
+2004/02/26 17:41 (-0500) muppetman
+
+	* Makefile.PL: remove no-op
+
+2004/01/24 21:44 (-0500) rwmcfa1
+
+	* Makefile.PL: removed runtime_reqs stuff, replaced by the pkg-config 
+	trick. use Glib::MakeHelper.
+	
+	* perl-Gtk2-TrayIcon.spec.in: use pkg-config for Requires version
+
+2003/12/29 16:32 (-0500) rwmcfa1
+
+	* perl-Gtk2-TrayIcon.spec.in: use the new DATE replacement in 
+	conjunction with VERSION to create the changlog on the fly, which is 
+	better.
+
+2003-10-27 19:19 muppetman
+
+	* TrayIcon.xs, eggtrayicon.c, eggtrayicon.h: long overdue, 
+	my old patch to allow this stuff to work with 2.0.x.
+
+2003-10-21 23:25  rwmcfa1
+
+	
+
+2003-10-03 23:00  borup
+
+	* ChangeLog, README, TrayIcon.pm: Added dull but needed stuff:
+	ChangeLog and README
+
+2003-09-29 03:08  rwmcfa1
+
+	* .cvsignore: initial import
+
+2003-09-26 11:28  borup
+
+	* Makefile.PL: Glib::PkgConfig changed name...
+
+2003-09-26 08:08  borup
+
+	* MANIFEST, MANIFEST.SKIP, META.yml, Makefile.PL, TODO,
+	TrayIcon.pm, TrayIcon.xs, config.h, eggtrayicon.c, eggtrayicon.h,
+	maps, trayicon.h, examples/simple.pl, t/load.t: Initial commit of
+	Gtk2::TrayIcon.
+

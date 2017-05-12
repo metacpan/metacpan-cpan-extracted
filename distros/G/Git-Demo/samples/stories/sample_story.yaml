@@ -1,0 +1,88 @@
+---
+characters:
+- name: Bob
+- name: Mary
+- name: Jane
+- name: Peter
+- name: origin
+  git_args:
+  - --bare
+events:
+
+# Make all the characters use the origin as a remote and pull from origin
+- type: git
+  characters: ALL_NOT origin
+  action: remote
+  args:
+  - add
+  - origin
+  - -t
+  - master
+  - ../origin
+
+# now Bob adds a line to first_file.txt, checks it in, and pushes it back to origin
+- type: file
+  characters: Bob
+  action: append
+  args:
+  - first_file.txt
+  - Some text [% NAME %] [% DATE %]
+- type: git
+  characters: Bob
+  action: add
+  args:
+  - -A
+- type: git
+  characters: Bob
+  action: commit
+  args:
+  - -m
+  - My checkin
+- type: git
+  characters: Bob
+  action: push
+  args:
+  - origin
+  - master
+
+# And all update from the origin again
+- type: git
+  characters: ALL_NOT origin
+  action: pull
+  args:
+  - origin
+  - master
+
+# now Jane adds a line to first_file.txt, checks it in, and pushes it back to origin
+- type: file
+  characters: Jane
+  action: append
+  args:
+  - first_file.txt
+  - Some text [% NAME %] [% DATE %]
+- type: git
+  characters: Jane
+  action: add
+  args:
+  - -A
+- type: git
+  characters: Jane
+  action: commit
+  args:
+  - -m
+  - My checkin
+- type: git
+  characters: Jane
+  action: push
+  args:
+  - origin
+  - master
+
+
+# And all update from the origin again
+- type: git
+  characters: ALL_NOT origin
+  action: pull
+  args:
+  - origin
+  - master

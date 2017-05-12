@@ -1,0 +1,16 @@
+Changes file for GraphViz::Traverse
+
+0.02 Sun Apr 30, 2006
+    - Moved the Filesystem.pm attribute code out of the way.
+    - Began documenting how to subclass and override.
+
+0.01 Sat Apr 29, 2006
+    - Thanks Brad!
+    - Made t relatively sane.
+    - Documented packages.
+    - Moved Filesystem.pm from eg/ to GraphViz/Traverse/.
+
+0.00_2 Sun March 5, 2006
+    - Got my autoloading straight at the pre E-Tech'06 Hack-a-thon.
+0.00_1 Sun Feb 5, 2006
+    - Created by Module::Husbandry.

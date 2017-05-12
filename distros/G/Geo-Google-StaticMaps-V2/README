@@ -1,0 +1,13 @@
+Install for RPM-based systems
+
+  $ rpmbuild -ta XXX.tar.gz
+  # rpm -Uhv XXX.rpm
+
+Or old school
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  # make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

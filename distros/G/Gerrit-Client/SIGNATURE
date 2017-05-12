@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 90c908d955966739bdfabac71d9af1f2725e9395 Changes
+SHA1 7c7d178d9ce31b21a4869940a881b043b086f007 LICENSE
+SHA1 3337d7410839aba51c8d6d9d1fc1616b5b1aa975 MANIFEST
+SHA1 a6493e0c7a418eed24453ebc6be81887a9ded1fc MANIFEST.SKIP
+SHA1 e094f7b5791c95d7ffb94658782d3778a9d8a5f6 META.json
+SHA1 d78bce2acb2587e9692c66779b52a569abc179a9 META.yml
+SHA1 c2f9cb1cf1273ff6eba901dcc62b50de8886cd99 Makefile.PL
+SHA1 e22f1beb7a38acf9502bce395d82578a6e58ff1a README
+SHA1 8aa1790cd2e95badc530c72c1888b104e9ab291e examples/spellcheck.pl
+SHA1 da3077d700c8fd7c356b584142b938be6a956258 lib/Gerrit/Client.pm
+SHA1 c6657572faa4e908af4c4db0c360ef44684efe76 lib/Gerrit/Client/ForEach.pm
+SHA1 1b151596e8c253bfb176d20d47cc2f17585978e6 lib/Gerrit/Client/Test.pm
+SHA1 35bdfcb972b5d84baecfcc59c5e57d4c55a15177 t/00-load.t
+SHA1 39218d51ab9b2665d201f4ec2f315c2f8a9548d9 t/00-setup-test-gerrit.t
+SHA1 d36dabfb8ca84b498f9adcf5ec8647a904f72a62 t/10-gerrit.t
+SHA1 945b8013e291c5a45904e2f07b680528b2056864 t/20-gerrit-for-each-patchset.t
+SHA1 c0c8a1efb880ce17d7e7cfb8f37fa8ec619b9143 t/50-system-stream-events.t
+SHA1 a69bf64b9a892f258053fd22d529dd27dc40d3a3 t/60-system-for-each-patchset.t
+SHA1 f8d72f2a7d7986d8fbbcbf349e4c1d60ee087630 t/61-system-for-each-patchset-rest.t
+SHA1 0c7cddd480f1f370cbbb2f1ffeb440a0e105ba9b t/99-shutdown-test-gerrit.t
+SHA1 e66a8fae16a1ebf2a993af51a38312bb77d61da0 t/changes.t
+SHA1 929a63a76babf316c8ba567c6ab1eae9b32cac5d t/dummy-reviewer
+SHA1 3914b6ae52885aae445bd6a9f602434577c9042d t/manifest.t
+SHA1 e68774abed6a9090b1fd450402a93fb7066c20b9 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iQEcBAEBAgAGBQJTmEGVAAoJEG3YuWOtEXoumYYIAJcJjHMo2v+IQq5Ctb5Q1ABU
+4bxiuA0JlQZWyXcBCFrJiYU51hoJLJGkECdOtm+PM2PgsNdipRoyPkIaO6ZIAGYR
+WItDWJaGCeOfYAHpc+ifAGpDyOp06+Qbxem0xQT6NAtJbD5O13yAR+2ZjqowPWnS
+bip086Vu4CVy8FtjeMbZLEaSHMsx0tcI8uWqCe/NM981htwa86/ON8KEVCEdvFrM
++n+ynhVu58pM79myCA3z1DSKCkInQme4ZbPUD0VaKMb0fEiJ44uETe3Oge769t13
+DB1MDj1nsXs7D+088j09WbDJd2szJKDcFR9trS7aDY0Ba7gpHAVMtvQIh3LrafA=
+=MzL/
+-----END PGP SIGNATURE-----

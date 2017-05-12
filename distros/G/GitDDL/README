@@ -1,0 +1,106 @@
+NAME
+    GitDDL - database migration utility for git managed sql
+
+SYNOPSIS
+        my $gd = GitDDL->new(
+            work_tree => '/path/to/project', # git working directory
+            ddl_file  => 'sql/schema_ddl.sql',
+            dsn       => ['dbi:mysql:my_project', 'root', ''],
+        );
+    
+        # checking whether the database version matchs ddl_file version or not.
+        $gd->check_version;
+    
+        # getting database version
+        my $db_version = $gd->database_version;
+    
+        # getting ddl version
+        my $ddl_version = $gd->ddl_version;
+    
+        # upgrade database
+        $gd->upgrade_database;
+    
+        # deploy ddl
+        $gd->deploy;
+
+DESCRIPTION
+    This is database migration helper module for users who manage database
+    schema version by single .sql file in git repository.
+
+    By using this module, you can deploy .sql to database, check sql version
+    between database and .sql file, make diff between them, and apply alter
+    table to database.
+
+METHODS
+  GitDDL->new(%options)
+        my $gd = GitDDL->new(
+            work_tree => '/path/to/project', # git working directory
+            ddl_file  => 'sql/schema_ddl.sql',
+            dsn       => ['dbi:mysql:my_project', 'root', ''],
+        );
+
+    Create GitDDL object. Available options are:
+
+    *   work_tree => 'Str' (Required)
+
+        Git working tree path includes target ddl file.
+
+    *   ddl_file => 'Str' (Required)
+
+        ddl file (.sql file) path in repository.
+
+        If ddl file located at /repos/project/sql/schema.sql and work_tree
+        root is /repos/project, then this option should be sql/schema.sql
+
+    *   dsn => 'ArrayRef' (Required)
+
+        DSN parameter that pass to DBI module.
+
+    *   version_table => 'Str' (optional)
+
+        database table name that contains its git commit version. (default:
+        git_ddl_version)
+
+    *   sql_filter => 'CodeRef' (optional)
+
+        CodeRef for filtering sql content. It is invoked only in "diff()"
+        method. (default: do nothing)
+
+  check_version()
+        $gd->check_version();
+
+    Compare versions latest ddl sql and database, and return true when both
+    version is same.
+
+    Otherwise return false, which means database is not latest. To upgrade
+    database to latest, see upgrade_database method described below.
+
+  database_version()
+    Return git commit hash indicates database's schema.
+
+  ddl_version()
+    Return git commit hash indicates ddl file.
+
+  deploy()
+    Just deploy ddl_file schema to database. This method is designed for
+    initial database setup. But database should be created previously.
+
+  diff()
+    Show sql differences between ddl file and database. This method is
+    useful for dry-run checking before upgrade_database.
+
+  upgrade_database()
+    Upgrade database schema to latest ddl schema.
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2012 Daisuke Murase. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

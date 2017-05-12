@@ -1,0 +1,2 @@
+virtual/x11
+	=dev-libs/glib-1.2* 

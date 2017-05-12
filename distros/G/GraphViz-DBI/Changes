@@ -1,0 +1,9 @@
+Revision history for Perl extension GraphViz::DBI.
+
+0.01  Mon Mar  5 21:11:04 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n GraphViz::DBI
+
+0.02  Sat Mar 29 17:40:05 2003
+        - Updates by Aaron Trevena
+

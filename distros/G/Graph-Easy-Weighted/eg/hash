@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Graph::Easy::Weighted;
+
+my $attr = 'rand';
+
+my $gw = Graph::Easy::Weighted->new();
+
+$gw->populate(
+    {
+        W => { attributes => { title => 'w' }, X => rand, Z => rand },
+        X => { attributes => { title => 'x' }, W => rand, Y => rand },
+        Y => { attributes => { title => 'y' }, W => rand, Y => rand },
+        Z => { attributes => { title => 'z' }, W => rand, X => rand },
+    },
+    $attr,
+    '%0.2f'
+);
+
+$gw->dump();
+
+print $gw->as_ascii();

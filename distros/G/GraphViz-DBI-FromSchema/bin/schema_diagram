@@ -1,0 +1,252 @@
+#!perl
+
+=head1 NAME
+
+schema_diagram - Create a diagram of a database's tables
+
+=head1 SYNOPSIS
+
+B<schema_diagram> [B<--user> I<username>] [B<--password> I<password>]
+    [B<--format> I<format>] [B<--output> I<filename>]
+    [B<--tile>] [B<--scale> I<factor>] [B<--paper> I<paper_size>]
+    I<DBI_data_source>
+
+=head1 DESCRIPTION
+
+Produces a diagram of the specified database, showing all the tables, listing
+their fields, and indicating foreign key links between tables.
+
+The output can be various formats, including PostScript, png, SVG, and
+GraphViz's dot. If the B<poster(1)> command is available then PostScript output
+can be tiled on to multiple sheets.
+
+=head2 Examples
+
+Generate a PostScript diagram of the Postgres database C<wedding>, saving it to
+the file I<wedding.ps>:
+
+  schema_diagram DBI:Pg:dbname=wedding
+
+Same, but tile it over multiple sheets:
+
+  schema_diagram --tile DBI:Pg:dbname=wedding
+
+Generate a png image of the MySQL database C<intranet>, connecting as the user
+C<wiki>, and saving it to the file C<intranet.png>:
+
+  schema_diagram --format png --user wiki DBI:mysql:intranet
+
+Same, but save to the file C<DB_schema.png>:
+
+  schema_diagram --output DB_schema.png --user wiki DBI:mysql:intranet
+
+=head2 Specifying the Database
+
+Specify the database with I<DBI_data_source>, a string in the format used by
+the Perl L<DBI> module, such as in the above examples.
+
+If non-default authentication is required, specify them with these options:
+
+=over
+
+=item B<--user> I<username>
+
+The username to the database as.
+
+=item B<--password> I<password>
+
+The password to use when connecting to the database.
+
+=back
+
+=head2 Specifying the Output
+
+These options can be used to specify the output format and filename. By default
+PostScript output is generated and the filename based on the database's name.
+
+=over
+
+=item B<--format> I<format>
+
+The output format. Valid values include C<png>, C<svg>, C<fig>, C<plain>, and
+any format which the L<GraphViz> module can create with an C<add_*> method. The
+format C<dot> can be used to specify GraphViz's dot format, suitable for
+passing to C<dot(1)>.
+
+=item B<--output> I<filename>
+
+The name of the file to save the diagram in. If the filename has an extension
+which matches the desired format then there is no need to also pass the
+C<--format> option; schema_diagram will work out the format from the filename.
+
+=back
+
+=head2 Tiling
+
+These options use the C<poster(1)> command to split the diagram over multiple
+sheets, with cutmarks suitable for printing and assembling into a large poster.
+There is no tiling by default.
+
+=over
+
+=item B<--tile>
+
+Tile the diagram. This will use the system's default paper size, and a scale
+factor of 0.4.
+
+=item B<--scale> I<factor>
+
+Scale the diagram by the specified factor.
+
+Specifying C<--scale> implies C<--tile>.
+
+=item B<--paper> I<paper_size>
+
+Tile on to sheets of the specified paper size.
+
+Specifying C<--paper> implies C<--tile>.
+
+=back
+
+=head2 Tweaking the Included Tables
+
+If you wish to tweak a diagram, perhaps to remove some irrelevant tables or
+specify a I<de facto> foreign key link which isn't encoded in the database, use
+C<--format dot>. Then edit the created file with a text editor (the format is
+quite intutive to make basic changes), and use the C<dot> command to generate
+the diagram.
+
+=head1 SEE ALSO
+
+L<DBI>, L<GraphViz>, L<GraphViz::DBI::FromSchema>, L<poster>
+
+=head1 CREDITS
+
+Written by Smylers, for Webfusion L<http://www.webfusion.com/>
+
+Contact me on <Smylers@cpan.org> or L<http://twitter.com/Smylers2>
+
+=head1 COPYRIGHT & LICENCE
+
+Copyright 2011 Webfusion Ltd
+
+This library is software libre; you may redistribute it and modify it under the
+terms of any of these licences:
+
+=over
+
+=item *
+
+The GNU General Public License, version 2
+
+=item *
+
+The GNU General Public License, version 3
+
+=item *
+
+L<The Artistic License|perlartistic>
+
+=item *
+
+The Artistic License 2.0
+
+=back
+
+=cut
+
+
+use warnings;
+use strict;
+
+use DBI;
+use GraphViz::DBI::FromSchema;
+use Getopt::Long qw<GetOptions>;
+use File::Temp qw<tempfile>;
+
+my ($user, $password, $filename, $format, $tile, $scale, $paper);
+GetOptions
+    'user=s' => \$user,
+    'password=s' => \$password,
+    'output=s' => \$filename,
+    'format=s' => \$format,
+    'tile' => \$tile,
+    'scale' => \$scale,
+    'paper=s' => \$paper,
+    or die "$0: Invalid usage\n";
+
+my $db_spec = shift or die "$0: No database specified\n";
+die "$0: Too many arguments: @ARGV\n" if @ARGV;
+
+my $db = DBI->connect($db_spec, $user, $password)
+    or die "$0: Failed to connect to database $db_spec\n";
+
+if (!defined $format)
+{
+  if (defined $filename && $filename =~ /\.(\w+)$/)
+  {
+    $format = $1;
+  }
+  else
+  {
+    $format = 'ps';
+  }
+}
+$format = lc $format;
+
+if (!defined $filename)
+{
+  local $_ = $db_spec;
+  s/^dbi:\w+://i;
+  s/;.*//;
+  s/.*=//;
+  /(\w+)/ or die "$0: Failed to generate default filename from '$db_spec'\n";
+  $filename = "$1.$format";
+}
+
+my ($file, $temp_filename);
+
+$tile = 1 if $paper || $scale;
+if ($tile)
+{
+  die "$0: Tiling requires the ps format, but $format specified"
+      if $format ne 'ps';
+
+  ($file, $temp_filename)
+      = tempfile 'schema_XXXX', SUFFIX => '.ps', TMPDIR => 1, UNLINK => 1
+      or die "$0: Creating temporary file failed.\n";
+}
+
+else
+{
+  open $file, '>', $filename or die "$0: Opening $filename failed: $!\n";
+}
+
+binmode $file;
+
+$format = 'debug' if $format eq 'dot';
+
+my $graph = GraphViz::DBI::FromSchema->new($db)->graph_tables;
+my $method = "as_$format";
+my $output = eval
+{
+  $graph->$method;
+};
+if ($@)
+{
+  die "$0: '$format' is not a recognized GraphViz format.\n"
+      if $@ =~ /^Method $method not defined!/;
+  die $@;
+}
+
+print $file $output;
+
+if ($tile)
+{
+  $scale //= 0.4;
+  my @cmd = ('poster', -s => $scale, -o => $filename);
+  push @cmd, -m => $paper if defined $paper;
+  push @cmd, $temp_filename;
+  my $error = system @cmd;
+  die "$0: @cmd returned status $error.\n" if $error;
+}

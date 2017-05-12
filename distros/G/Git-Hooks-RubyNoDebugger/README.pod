@@ -1,0 +1,36 @@
+=pod
+
+=head1 NAME
+
+Git::Hooks::RubyNoDebugger - Git::Hooks plugin that checks for calls to a Ruby debugger
+
+=head1 DESCRIPTION
+
+C<Git::Hooks::RubyNoDebugger> adds a pre-commit hook that looks for the invocation of a debugger.
+If one is detected the commit will be aborted.
+
+=head2 Setup
+
+C<git config --add githooks.plugin RubyNoDebugger>
+
+=head2 File Extensions
+
+Files with the following extensions are checked: erb, haml, hbs, handlebars, rake, rb, ru, rhtml, slim, thor
+
+=head2 Debugger Calls
+
+The following debugger calls are checked: C<binding.pry>, C<byebug>, C<debug>, C<debugger>.
+
+=head1 AUTHOR
+
+Skye Shaw (sshaw [AT] gmail.com)
+
+=head1 SEE ALSO
+
+L<Git::Hooks>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015 Skye Shaw.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

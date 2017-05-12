@@ -1,0 +1,56 @@
+{
+   "abstract" : "simple interface to Google Protocol Buffers",
+   "author" : [
+      "Igor Gariev <gariev@hotmail.com>, the CISRT Gadgets Foundation <csirtgadgets.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-ProtocolBuffers",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Config" : "0",
+            "Math::BigInt" : "0",
+            "Parse::RecDescent" : "1.94",
+            "Test::More" : "0.52",
+            "constant" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/csirtgadgets/google-protocolbuffers-perl/issues"
+      },
+      "homepage" : "https://github.com/csirtgadgets/google-protocolbuffers-perl",
+      "repository" : {
+         "url" : "https://github.com/csirtgadgets/google-protocolbuffers-perl.git"
+      }
+   },
+   "version" : "0.12"
+}

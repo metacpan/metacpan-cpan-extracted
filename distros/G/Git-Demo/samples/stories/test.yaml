@@ -1,0 +1,105 @@
+---
+characters:
+- name: Bob
+- name: Mary
+- name: Jane
+- name: Peter
+- name: origin
+  git_args:
+  - --bare
+events:
+
+- type: print
+  action: screen
+  characters: ALL_NOT origin
+  args:
+  - Yippee - go-go-Git!
+
+- type: git
+  action: remote
+  characters: ALL_NOT origin
+  args:
+  - add
+  - origin
+  - ../origin
+
+
+# Bob gets a config file and adds it
+- type: print
+  action: screen
+  characters: Bob
+  args:
+  - I'm going to add a config file!
+- type: file
+  action: copy_from_abs
+  characters: Bob
+  args:
+  - /home/rcl/.git-demo/config.yaml
+  - config.yaml
+- type: git
+  action: add
+  characters: Bob
+  args:
+  - -A
+- type: git
+  action: commit
+  characters: Bob
+  args:
+  - -a
+  - -m
+  - "Added config"
+- type: git
+  action: push
+  characters: Bob
+  args:
+  - origin
+  - master
+
+
+# Everyone pulls Bobs changes
+- type: git
+  action: pull
+  characters: ALL_NOT Bob origin
+  args:
+  - origin
+  - master
+
+
+
+# Bob and Jane both add a key to the config file - this will make a conflict!
+- type: file
+  action: append
+  characters: Bob Jane
+  args:
+  - config.yaml
+  - "[% NAME %]_key: [% NAME %] rulez"
+
+
+# Bob and Jane both add/commit
+- type: git
+  action: add
+  characters: Bob Jane
+  args:
+  - -A
+- type: git
+  action: commit
+  characters: Bob Jane
+  args:
+  - -a
+  - -m
+  - "Added my key to the config"
+- type: git
+  action: push
+  characters: Bob Jane
+  args:
+  - origin
+  - master
+
+
+# Everyone pulls the changes
+- type: git
+  action: pull
+  characters: ALL_NOT origin
+  args:
+  - origin
+  - master

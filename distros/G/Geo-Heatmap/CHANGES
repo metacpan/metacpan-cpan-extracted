@@ -1,0 +1,8 @@
+Revision history for Perl module Geo::Heatmap
+
+0.15 2013-12-05
+
+   * Moved from Image::Magick to Imager
+   * migrated HTML example to Google Map API V3
+
+

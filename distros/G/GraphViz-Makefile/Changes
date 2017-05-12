@@ -1,0 +1,28 @@
+Revision history for Perl extension Graphviz::Makefile.
+
+1.17
+	- stable release with changes in 1.16_50
+
+1.16_50
+	- no functional changes, just Pod and Makefile.PL/META
+	  improvements
+
+1.16
+	- no functional change, just a test improvement
+
+1.15
+	- new option reversed (suggested by Robert Sander)
+
+1.14
+	- fixed a problem with targets with variables
+	- better tests
+
+1.12
+	- tkgvizmakefile: new option -tkcanvastype
+
+1.11
+	- now with POD
+
+0.01  Mon Mar 18 14:52:56 2002
+	- original version; created by h2xs 1.19
+

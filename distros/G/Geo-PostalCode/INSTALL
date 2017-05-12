@@ -1,0 +1,25 @@
+To install, run
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+This module comes with no postal code data.  You should
+download and install your own data.  For example, to download and
+install a database of US postal codes (from 2004), you could run:
+
+ lwp-download http://civicspacelabs.org/releases/zipcodes/zipcodes-csv-10-Aug-2004.tgz
+ tar zxf zipcodes-csv-10-Aug-2004.tgz
+ ./bin/geo_postalcode_makedb ./zipcodes-csv-10-Aug-2004/zipcode.csv /your/db/path
+
+Then create objects using this database with:
+
+  my $gp = Geo::PostalCode->new(db_dir => '/your/db/path');
+
+The older data-file (from 1999) still works with the module, in case you want to use it.
+
+ ### depreciated, don't run unless you want old data
+ ### lwp-download http://tjmather.com/Geo-PostalCode_19991101.txt.gz
+ ### gunzip Geo-PostalCode_19991101.txt.gz
+ ### geo_postalcode_makedb Geo-PostalCode_19991101.txt /your/db/path

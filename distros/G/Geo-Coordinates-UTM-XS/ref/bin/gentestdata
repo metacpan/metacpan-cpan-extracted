@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Geo::Coordinates::UTM;
+
+my @en = ellipsoid_names();
+
+my $n = $ARGV[0];
+
+print "# ellipsoid|latitude|longitude|zone|easting|northing\n";
+
+for (1..$n) {
+    my $e = $en[int(rand(@en))];
+    my $lat = 84 - rand(84+80);
+    my $lon = 180.0 - rand(360.0);
+    my ($z, $x, $y) = latlon_to_utm($e, $lat, $lon);
+
+    print join('|', $e, $lat, $lon, $z, $x, $y), "\n";
+
+}

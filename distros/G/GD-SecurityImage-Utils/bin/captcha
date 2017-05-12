@@ -1,0 +1,167 @@
+#!/usr/bin/perl
+use strict;
+use lib './lib';
+use base 'LEOCHARRE::CLI';
+use GD::SecurityImage::Utils;
+use Cwd;
+
+
+
+
+
+my $o = gopts('m:f:e:o:');
+
+$o->{m} ||= 20;
+$o->{e} ||= 'png';
+
+-f $o->{f} or die("need -f abs path to font argument");
+
+$o->{o} or die('missing -o directory to output to');
+my $out_dir = $o->{o};
+-d $out_dir or die("dir $out_dir does not exist.");
+
+
+
+
+my $abs_captcha_table_file = "$out_dir/captcha_table.txt";
+
+my $abs_font = $o->{f}; #cwd().'/t/luxisr.ttf';
+unlink $abs_captcha_table_file;
+
+
+
+# 1) CREATE A LIST OF IMAGES TO CREATE
+my $max = $o->{m}; # how many?
+my @abs_captchas;
+while( $max-- ){
+   push @abs_captchas, "$out_dir/captcha_$max.$$o{e}";
+}
+
+
+# 2) GENERATE IMAGES AND SAVE CODES
+# save codes in a text file for lookup
+
+open( CAPTCHA_TABLE_FILE, '>>',$abs_captcha_table_file) or die($!);
+
+# for each in the list, make a image, and record the right code
+for my $_abs_out ( @abs_captchas ){
+      my $abs_out = Cwd::abs_path($_abs_out);
+      unlink $abs_out; # just in case
+
+      # create the captcha image and find out what the code is
+      my $correct_code = write_captcha($abs_out,{font=>$abs_font});
+   
+      # save it in the file for later lookups
+      print CAPTCHA_TABLE_FILE "$correct_code=$abs_out\n";
+
+      -f $abs_out or die("could not write to $abs_out?");
+   
+}
+
+close CAPTCHA_TABLE_FILE;
+
+
+debug("done");
+
+exit;
+
+
+=pod
+
+=head1 NAME
+
+captcha - make captcha images on disk
+
+=head1 OPTION FLAGS
+
+   -d debug
+   -h help
+
+=head1 PARAMETERS
+
+   -m num images to make, default is 20, optional
+   -o directory to output to, required
+   -f abs path to ttf font file, required
+   -e extension, default is png
+   
+=head1 EXAMPLE USAGE
+
+   captcha -f /usr/share/font/luxisr.ttf -o /tmp/captchas/ -e jpg -m 10
+
+   captcha -f /usr/share/font/luxisr.ttf -o /tmp/captchas/
+
+=head1 DESCRIPTION
+
+This will create captcha images and record in a captcha_table.txt file what the codes are.
+
+With this command:
+
+   captcha -f /usr/share/fonts/bitstream-vera/VeraMono.ttf -o /tmp/captchas/
+
+This is the output:
+	
+	/tmp/captchas/captcha_6.png
+	/tmp/captchas/captcha_11.png
+	/tmp/captchas/captcha_8.jpg
+	/tmp/captchas/captcha_16.png
+	/tmp/captchas/captcha_5.png
+	/tmp/captchas/captcha_18.png
+	/tmp/captchas/captcha_5.jpg
+	/tmp/captchas/captcha_3.png
+	/tmp/captchas/captcha_8.png
+	/tmp/captchas/captcha_1.png
+	/tmp/captchas/captcha_12.png
+	/tmp/captchas/captcha_9.png
+	/tmp/captchas/captcha_17.png
+	/tmp/captchas/captcha_table.txt
+	/tmp/captchas/captcha_2.jpg
+	/tmp/captchas/captcha_0.jpg
+	/tmp/captchas/captcha_4.jpg
+	/tmp/captchas/captcha_15.png
+	/tmp/captchas/captcha_4.png
+	/tmp/captchas/captcha_1.jpg
+	/tmp/captchas/captcha_7.jpg
+	/tmp/captchas/captcha_0.png
+	/tmp/captchas/captcha_2.png
+	/tmp/captchas/captcha_7.png
+	/tmp/captchas/captcha_9.jpg
+	/tmp/captchas/captcha_3.jpg
+	/tmp/captchas/captcha_6.jpg
+	/tmp/captchas/captcha_13.png
+	/tmp/captchas/captcha_19.png
+	/tmp/captchas/captcha_10.png
+	/tmp/captchas/captcha_14.png
+	
+And captcha_table.txt holds:
+	
+	0473=/tmp/captchas/captcha_19.png
+	5804=/tmp/captchas/captcha_18.png
+	5126=/tmp/captchas/captcha_17.png
+	7173=/tmp/captchas/captcha_16.png
+	8561=/tmp/captchas/captcha_15.png
+	1820=/tmp/captchas/captcha_14.png
+	7368=/tmp/captchas/captcha_13.png
+	9136=/tmp/captchas/captcha_12.png
+	6313=/tmp/captchas/captcha_11.png
+	1334=/tmp/captchas/captcha_10.png
+	0832=/tmp/captchas/captcha_9.png
+	7874=/tmp/captchas/captcha_8.png
+	9138=/tmp/captchas/captcha_7.png
+	3928=/tmp/captchas/captcha_6.png
+	4586=/tmp/captchas/captcha_5.png
+	8448=/tmp/captchas/captcha_4.png
+	6232=/tmp/captchas/captcha_3.png
+	8588=/tmp/captchas/captcha_2.png
+	9503=/tmp/captchas/captcha_1.png
+	7440=/tmp/captchas/captcha_0.png
+
+
+=head1 SEE ALSO
+
+GD::SecurityImage::Utils
+
+=head1 AUTHOR
+
+Leo Charre
+
+   

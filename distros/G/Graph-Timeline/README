@@ -1,0 +1,75 @@
+Graph::Timeline - Manipulate and display timelines
+
+This is release V1.5 of Graph::Timeline. The class 
+is used to show timelines.
+
+Look in the examples directory for a program showing how to use the
+module and some sample data. The first type of chart is the traditional
+sort you see in history books showing the lives of famous people against
+the timeline of world events.
+
+The second type lists events down the page, starting with the eariest.
+This will form a sort of diagonal. Used less for historical data and more
+for charting processes.
+
+You can also generate an imagemap for this image
+
+INSTALLATION
+
+ % perl Makefile.PL
+ % make
+ % make test
+ % sudo make install
+
+TEST FAILURES
+
+The tests are there to make sure that I have broken nothing when I
+fiddle with the code and will teach you very little about how to use
+the code. 
+
+TO DO
+
+* Look at getting 1971/05-1971/09 for sometime between May 1971 and September
+  1971 accepted for 'start' and 'end' dates for intervals and points.
+* Documentation
+
+BUGS
+
+None so far
+
+REQUIREMENTS
+
+* Developed under 5.6.1 but should work on anything 5+.
+* Written completely in Perl. XS is not required.
+* Requires Date::Calc, GD, GD::Text
+
+AUTHOR
+
+Peter Hickman <peterhi@ntlworld.com>
+
+Copyright (c) 2003, Peter Hickman. All rights reserved.
+
+This module is free software. It may be used, redistributed and/or 
+modified under the same terms as Perl itself.
+
+CHANGES IN THIS RELEASE
+
+V1.0:
+      - First release to CPAN
+
+V1.1:
+      - Handles the years in the window correctly
+	  - Draws points
+
+V1.2:
+      - Minor fix to the POD
+
+V1.3:
+	  - New DiagonalGD chart type
+
+V1.4:
+      - New map method for DiagonalGD allow the user to create an
+      imagemap.
+
+V1.5:
+      - Now allowing - as a date seperator

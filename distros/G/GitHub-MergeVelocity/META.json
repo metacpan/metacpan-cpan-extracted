@@ -1,0 +1,95 @@
+{
+   "abstract" : "Determine how quickly your pull request might get merged",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GitHub-MergeVelocity",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Code::TidyAll" : "0.24",
+            "Test::Code::TidyAll" : "0.24",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CHI" : "0",
+            "LWP::ConsoleLogger" : "0.000013",
+            "WWW::Mechanize::Cached" : "1.46"
+         },
+         "requires" : {
+            "CLDR::Number::Format::Percent" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "File::HomeDir" : "0",
+            "Math::Round" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "1.007000",
+            "MooX::HandlesVia" : "0",
+            "MooX::Options" : "0",
+            "MooX::StrictConstructor" : "0",
+            "Path::Tiny" : "0",
+            "Pithub::PullRequests" : "0",
+            "Text::SimpleTable::AutoWidth" : "0.09",
+            "Type::Library" : "0",
+            "Type::Utils" : "0",
+            "Types::Standard" : "0",
+            "URI" : "0",
+            "WWW::Mechanize::GZip" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::RequiresInternet" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/github-mergevelocity/issues"
+      },
+      "homepage" : "https://github.com/oalders/github-mergevelocity",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/github-mergevelocity.git",
+         "web" : "https://github.com/oalders/github-mergevelocity"
+      }
+   },
+   "version" : "0.000007",
+   "x_contributors" : [
+      "Olaf Alders <olaf@wundersolutions.com>"
+   ]
+}
+

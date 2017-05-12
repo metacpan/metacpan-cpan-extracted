@@ -1,0 +1,59 @@
+README for Worms
+
+				Worms
+
+!!!! THIS IS AN ALPHA RELEASE !!!!
+
+
+PREREQUISITES
+
+This suite requires Perl 5.  It requires pTk for the Tk interface.
+
+
+INSTALLATION
+
+You install Worms, as you would install any Perl module
+distribution, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Worms in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+See the pods in Games::Worms, Games::Worms::Base,
+Games::Worms::Beeler, Games::Worms::Random, Games::Worms::Random2,
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Worms should be sent to me at sburke@netadventure.net
+
+
+AVAILABILITY
+
+The latest version of Worms is available from the Comprehensive
+Perl Archive Network (CPAN).  Visit <http://www.perl.com/CPAN/> to
+find a CPAN site near you.
+
+
+COPYRIGHT
+
+Copyright 1999 - 2006, Sean M. Burke <sburke@cpan.org>, all rights
+reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+
+AUTHOR
+
+Current maintainer Avi Finkel <avi@finkel.org>;
+Original author Sean M. Burke <sburke@cpan.org>

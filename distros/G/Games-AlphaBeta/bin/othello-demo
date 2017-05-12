@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Games::AlphaBeta;
+use Games::AlphaBeta::Reversi;
+
+my $p = Games::AlphaBeta::Reversi->new;
+my $g = Games::AlphaBeta->new($p);
+
+while ($p = $g->abmove) {
+   print $p->as_string, "\n";
+}
+
+__DATA__
+
+=head1 NAME
+
+othello-demo - a self-playing Othello game
+
+=head1 SYNOPSIS
+
+  othello-demo
+
+=head1 DESCRIPTION
+
+This is an example of how simple a self-playing Othello (aka
+Reversi) program can be created using L<Games::AlphaBeta> and
+L<Games::AlphaBeta::Reversi>.
+
+=head1 AUTHOR
+
+Stig Brautaset <stig@brautaset.org>
+
+=cut

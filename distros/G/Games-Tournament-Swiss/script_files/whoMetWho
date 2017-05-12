@@ -1,0 +1,39 @@
+#!usr/bin/perl
+
+use lib lib;
+
+use Games::Tournament::Contestant::Swiss -base;
+use Games::Tournament::Swiss -base;
+
+use YAML qw/LoadFile DumpFile/;
+
+my @roundsFiles = glob " ../?/b?.yaml ";
+my @rounds = map {
+	LoadFile $_;
+} @roundsFiles;
+
+my $class = LoadFile "../class.yaml";
+my $members = $class->{member};
+my %names = map { $_->{id} => $_->{name} } @$members;
+my %ids = map { $_->{name} => $_->{id} } @$members;
+my $met;
+
+map
+{
+	my $round = $_;
+	map
+	{
+		my $group = $round->{group}->{$_};
+		map
+		{
+			my $id1 = $ids{$_};
+			map
+			{
+				my $id2 = $ids{$_};
+				$met->{$id1}->{$id2}++;
+			} @$group;
+		} @$group;
+	} keys %{$round->{group}};
+} @rounds;
+
+DumpFile "../met.yaml", $met;

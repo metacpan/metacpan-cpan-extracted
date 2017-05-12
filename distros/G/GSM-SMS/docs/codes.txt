@@ -1,0 +1,267 @@
+Country;Operator/Network;Country code;Network code;prefixes 
+Albania;Albanian Mobile Comms;276;01 
+Algeria;Albanian Mobile Comms;603;01 
+Andorra;S.T.A. MobilAnd;213;03 
+Armenia;ArmenTel;283;01 
+Australia;Telstra Mobile Comms;505;01 
+Australia;Cable + Wireless Optus;505;02 
+Australia;Vodafone;505;03 
+Austria;MobilKom Austria A1;232;01 
+Austria;max.mobil.Telekoms Service;232;03 
+Austria;Connect Austria One;232;05 
+Azerbaijan;Azercell Telekom B.M.;400;01 
+Azerbaijan;J.V.Bakcell GSM 2000;400;02 
+Bahrain;Batelco;426;01 
+Bangladesh;Grameen Phone;470;01 
+Bangladesh;Sheba Telecom;470;19 
+Belgium;Belgacom Mobile Proximus;206;01 
+Belgium;KPN Orange;206;20 
+Belgium;Mobistar;206;10 
+Bosnia Herzegovina;Cronet;218;01 
+Bosnia Herzegovina;PTT Bosnia;218;19 
+Bosnia Herzegovina;PE PTT BIH;218;90 
+Botswana;Mascom Wireless;652;01 
+Brunei Darussalam;Jabatan Telekom;528;01 
+Brunei Darussalam;DST Communications;528;11 
+Bulgaria;MobilTel AD;284;01 
+Cambodia;CamGSM;456;01 
+Cambodia;Cambodia Samart Comms;456;02 
+Cameroon;PTT Cameroon Cellnet;624;01 
+Canada;Microcell Connexions Inc;302;37 
+Cape Verde;Cabo Verde Telecom;625;01 
+Chile;Entel Telefonia Movil;730;01 
+Chile;Entel PCS Telecom.;730;10 
+China;China Telecom GSM;460;00 
+China;China Unicom GSM;460;01 
+China;Liaoning PPTA;460;02 
+Cote d'Ivoire;Comstar Cellular Network;612;01 
+Cote d'Ivoire;Telecel;612;02 
+Cote d'Ivoire;S.I.M Ivoiris;612;03 
+Cote d'Ivoire;Loteny Telecom Telecel;612;05 
+Croatia;Croatian Telecoms Cronet;219;01 
+Croatia;Vipnet;219;10 
+Cyprus;Cyprus Telecoms Authority;280;01 
+Czech Republic;RadioMobil;230;01 
+Czech Republic;EuroTel Praha;230;02 
+Czech Republic;SPT Telecom;230;03 
+Denmark;Tele-Danmark Mobil;238;01 
+Denmark;Sonofon;238;02 
+Denmark;Telia Denmark;238;20 
+Denmark;Mobilix;238;30 
+Egypt;MobiNil;602;01 
+Egypt;Misrfone Telecom. Click;602;02 
+Estonia;Estonian Mobile Telephone;248;01 
+Estonia;Radiolinja Eesti;248;02 
+Estonia;Q GSM;248;03 
+Ethiopia;Ethiopian Telecoms Auth.;636;01 
+Fiji;Vodafone Fiji;542;01 
+Finland;Telia Finland;244;03 
+Finland;Radiolinja;244;05 
+Finland;Alands Mobiltelefon;244;05 
+Finland;Finnet Group;244;09 
+Finland;Sonera Corporation;244;91 
+France;France Telecom Itineris;208;01 
+France;SFR;208;10 
+France;Bouygues Telecom;208;20 
+French Polynesia;Tikiphone;547;20 
+French West Indies;France Caraibe Ameris;340;01 
+Georgia;Geocell Limited;282;01 
+Georgia;Magti GSM;282;02 
+Germany;D1 DeTe Mobil;262;01 
+Germany;D2 Mannesmann Mobilfunk;262;02 
+Germany;E-Plus Mobilfunk;262;03 
+Germany;Viag Interkom;262;07 
+Ghana;ScanCom;620;01 
+Gibraltar;Gibraltar Telecoms Gibtel;266;01 
+Greece;Cosmote;202;01 
+Greece;Panafon;202;05 
+Greece;Telestet;202;10 
+Greenland;Tele Greenland;290;01 
+Guinea;Sotelgui Lagui;611;02 
+Hong Kong;Hong Kong Telecom CSL;454;00 
+Hong Kong;Hutchison Telecom;454;04 
+Hong Kong;SmarTone Mobile Comms;454;06 
+Hong Kong;New World PCS;454;10 
+Hong Kong;Peoples Telephone;454;12 
+Hong Kong;Mandarin Com. Sunday;454;16 
+Hong Kong;Pacific Link;454;18 
+Hong Kong;P Plus Comm;454;22 
+Hungary;Pannon GSM;216;01 
+Hungary;Westel 900 GSM Mobile;216;30 
+Iceland;Iceland Telecom Siminn;274;01 
+Iceland;TAL hf;274;02 
+India;TATA Cellular;404;07 
+India;Bharti Cellular Telecom Airtel;404;10 
+India;Sterling Cellular Essar;404;11 
+India;Escotel Mobile Comms;404;12 
+India;Modi Telstra Modicom;404;14 
+India;Aircel Digilink Essar Cellph.;404;15 
+India;Hutchison Max Touch;404;20 
+India;BPL Mobile;404;21 
+India;BPL USWest Cellular;404;27 
+India;Usha Martin Tel. Command;404;30 
+India;Mobilenet;404;31 
+India;SkyCell Communications;404;40 
+India;RPG MAA;404;41 
+India;Srinivas Cellcom;404;42 
+Indonesia;PT. Satelindo;510;01 
+Indonesia;Telkomsel;510;10 
+Indonesia;PT. Excelcomindo Excelcom;510;11 
+Iran;TCI;432;11 
+Iraq;Iraq Telecom;418;01 
+Ireland;Eircell;272;01 
+Ireland;Esat Digifone;272;02 
+Ireland;Meteor;272;03 
+Israel;Partner Communications;425;01 
+Italy;Telecom Italia Mobile TIM;222;01 
+Italy;Omnitel Pronto;222;10 
+Italy;Wind Telecomunicazioni;222;88 
+Jordan;J.M.T.S Fastlink;416;01 
+Kuwait;Mobile Telecoms MTCNet;419;02 
+Kyrgyz Republic;Bitel;437;01 
+Lao;Lao Shinawatra Telecom;457;01 
+Latvia;Latvian Mobile Tel.;247;01 
+Latvia;BALTCOM GSM;247;02 
+Lebanon;FTML Cellis;415;01 
+Lebanon;LibanCell;415;03 
+Lesotho;Vodacom;651;01 
+Liberia;Omega Communications;618;01 
+Lithuania;Omnitel;246;01 
+Lithuania;UAB Bite GSM;246;02 
+Luxembourg;P+T LUXGSM;270;01 
+Luxembourg;Millicom Tango GSM;270;77 
+Macau;C.T.M. TELEMOVEL+;455;01 
+Macedonia;Macedonian Tel. MobiMak;294;01 
+Madagascar;Madacom;646;01 
+Madagascar;SMM Antaris;646;02 
+Madagascar;Sacel;646;03 
+Malawi;Telekom Network Callpoint;650;01 
+Malaysia;My BSB;502;02 
+Malaysia;Binariang;502;03 
+Malaysia;Binariang Comms. Maxis;502;12 
+Malaysia;Telekom Cellular TM Touch;502;13 
+Malaysia;DiGi Telecommunications;502;16 
+Malaysia;Time Wireless Adam;502;17 
+Malaysia;Celcom;502;19 
+Malta;Vodafone;278;01 
+Mauritius;Cellplus Mobile Comms;617;01 
+Moldova;Voxtel;259;01 
+Morocco;Itissalat Al-Maghrib IAM;604;01 
+Mozambique;Telecom de Mocambique;634;01 
+Namibia;MTC;649;01 
+Netherlands;Libertel;204;04 
+Netherlands;KPN Telecom;204;08 
+Netherlands;Telfort;204;12 
+Netherlands;Ben;204;16 
+Netherlands;Dutchtone;204;20 
+New Caledonia;OPT Mobilis;546;01 
+New Zealand;Vodafone;530;01 
+New Zealand;Telecom NZ;530;03 
+New Zealand;Telstra;530;04 
+Norway;Telenor Mobil;242;01 
+Norway;NetCom GSM;242;02 
+Oman;General Telecoms;422;02 
+Pakistan;Mobilink;410;01 
+Papua New Guinea;Pacific Mobile Comms;310;01 
+Philippines;Isla Comms;515;01 
+Philippines;Globe Telecom;515;02 
+Philippines;Smart Communications;515;03 
+Poland;Polkomtel PLUS GSM;260;01 
+Poland;ERA GSM;260;02 
+Poland;IDEA Centertel;260;03 
+Portugal;Telecel Communicacoes;268;01 
+Portugal;Optimus Telecom.;268;03 
+Portugal;Telecom Moveis Nac. TMN;268;06 
+Qatar;Q-Tel QATARNET;427;01 
+Reunion;Societe Reunionnaise SRR;647;10 
+Romania;MobiFon CONNEX GSM;226;01 
+Romania;Mobil Rom DIALOG;226;10 
+Russia;MTS Moscow;250;01 
+Russia;North-West GSM;250;02 
+Russia;Siberian Cellular;250;05 
+Russia;Zao Smarts;250;07 
+Russia;Don Telecom;250;10 
+Russia;New Telephone Company;250;12 
+Russia;Far-Eastern Cellular;250;12 
+Russia;Kuban GSM;250;13 
+Russia;Uratel;250;39 
+Russia;North Caucasian GSM;250;44 
+Russia;KB Impuls BeeLine;250;99 
+Rwanda;Rwandacell;635;10 
+Saudi Arabia;Ministry of PTT Al Jawal;420;01 
+Saudi Arabia;Electronics App' Est. EAE;420;07 
+Senegal;Sonatel ALIZE;608;01 
+Seychelles;Seychelles Cellular Services;633;01 
+Seychelles;Telecom AIRTEL;633;10 
+Singapore;Singapore Tel. GSM 900;525;01 
+Singapore;Singapore Tel. GSM 1800;525;02 
+Singapore;MobileOne Asia;525;03 
+Slovak Republic;Globtel GSM;231;01 
+Slovak Republic;EuroTel GSM;231;02 
+Slovenia;Si.mobil;293;40 
+Slovenia;Mobitel;293;41 
+South Africa;Vodacom;655;01 
+South Africa;MTN;655;10 
+Spain;Airtel Movil;214;01 
+Spain;Retevision Movil;214;03 
+Spain;Telefonica Moviles Movistar;214;07 
+Sri Lanka;MTN Networks Dialog GSM;413;02 
+Sudan;Mobile Telephone Company;634;01 
+Sweden;Telia Mobitel;240;01 
+Sweden;Comviq GSM;240;07 
+Sweden;Europolitan;240;08 
+Switzerland;Swisscom NATEL;228;01 
+Switzerland;diAx Mobile;228;02 
+Switzerland;Orange;228;03 
+Syria;Syrian Telecom Est. MOBILE;417;09 
+Taiwan;Far EasTone Telecoms;466;01 
+Taiwan;TUNTEX Telecom;466;06 
+Taiwan;KG Telecom;466;88 
+Taiwan;Chunghwa Telecom;466;92 
+Taiwan;Mobitai Communications;466;93 
+Taiwan;Pacific Cellular TWNGSM;466;97 
+Taiwan;TransAsia Telecoms;466;99 
+Tanzania;Tritel;640;01 
+Thailand;Advanced Info Service AIS;520;01 
+Thailand;WCS IQ;520;10 
+Thailand;Total Access Worldphone;520;18 
+Thailand;Digital Phone HELLO;520;23 
+Togo;Togo Telecom TOGO CELL;615;01 
+Tunisia;Tunisie Telecom Tunicell;605;02 
+Turkey;Turk Telekom Turkcell;286;01 
+Turkey;TELSIM Mobil Telekom.;286;02 
+U.S.A.;APC Sprint Spectrum;310;02 
+U.S.A.;Wireless 2000 Telephone;310;11 
+U.S.A.;BellSouth Mobility DCS;310;15 
+U.S.A.;Omnipoint Communications;310;16 
+U.S.A.;Pacific Bell Wireless;310;17 
+U.S.A.;Western Wireless Voicestream;310;26 
+U.S.A.;Powertel;310;27 
+U.S.A.;Aerial Communications;310;31 
+U.S.A.;Iowa Wireless Services;310;77 
+Uganda;Celtel Cellular;641;01 
+Uganda;MTN Uganda;641;10 
+Ukraine;Ukrainian Mobile Comms;255;01 
+Ukraine;Ukrainian Radio Systems;255;02 
+Ukraine;Kyivstar GSM;255;03 
+Ukraine;Golden Telecom;255;05 
+United Arab Emirates;UAE ETISALAT-G1;424;01 
+United Arab Emirates;UAE ETISALAT-G2;424;02 
+United Kingdom;Cellnet;234;10 
+United Kingdom;Vodafone;234;15 
+United Kingdom;One 2 One;234;30 
+United Kingdom;Orange;234;33 
+United Kingdom;Jersey Telecom GSM;234;50 
+United Kingdom;Guernsey Telecoms GSM;234;55 
+United Kingdom;Manx Telecom Pronto GSM;234;58 
+Uzbekistan;Buztel;434;01 
+Uzbekistan;Daewoo Unitel;434;04 
+Uzbekistan;Coscom;434;05 
+Venezuela;Infonet;734;01 
+Vietnam;MTSC;452;01 
+Vietnam;DGPT;452;02 
+Yugoslavia;MOBTEL;220;01 
+Yugoslavia;ProMonte GSM;220;02 
+Zambia;Zamcell;645;01 
+Zimbabwe;NET*ONE;648;01 
+Zimbabwe;Telecel;648;03 

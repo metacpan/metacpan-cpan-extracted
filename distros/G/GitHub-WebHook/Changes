@@ -1,0 +1,9 @@
+# Change file for GitHub::WebHook
+
+0.11  2015-04-14 09:59:14 CEST
+    - support commands as string in GitHub::WebHook::Run
+    - don't depend on Plack::App::GitHub::WebHook
+    - modify log levels and logger interface 
+
+0.10  2015-04-13 14:55:04 CEST
+    - initial release

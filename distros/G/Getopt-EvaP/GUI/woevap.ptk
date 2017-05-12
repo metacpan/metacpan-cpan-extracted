@@ -1,0 +1,1037 @@
+#!/usr/local/bin/perl5 -w
+#
+#  This Perl/Tk X11 GUI wrapper for program `woevap' created by version 2.3.5
+#  of generate_PerlTk_program.
+#
+#  Wed Jul 29 20:28:35 EDT 1998
+#
+#  Stephen.O.lidie@Lehigh.EDU
+
+require 5.002;
+use English;			# legible Perl special vriable names
+require 'shellwords.pl';	# parse quoted strings
+use strict qw(subs refs);	# be as pure as possible!
+use Tk;				# Tk objects and methods
+use Tk::Dialog;			# Dialog widget
+use Tk::ErrorDialog;		# ErrorDialog widget
+use Tk::FileSelect;		# FileSelect widget
+require '/usr/lib/perl5/site_perl/5.005/Getopt/DisU.pl';
+
+$genPerlTk_mw = MainWindow->new;# main window
+
+# Subroutine prototypes (someday).
+
+use subs qw(sub execute_command flash_widget kill_stdout pipe_window
+	    read_stdout reset_doit_button reset_parameters save_window
+	    see_view update_command);
+
+# Subroutines.
+
+sub execute_command {
+
+    # Create a toplevel output window, exec the Unix command and capture 
+    # stdout/stderr.  If no stdout/stderr then don't bother to deiconify
+    # the toplevel, and, if only doing-it-once, exit.
+
+    my($doit, $doit_bg) = @_;
+
+    update_command;
+    $genPerlTk_mw->update;
+
+    my $execute = 1;
+    $execute = ($genPerlTk_stdin_dialog->Show eq 'OK') if 
+        defined $trailing_file_list and $trailing_file_list eq '';
+
+    if (not $execute) {
+	reset_doit_button $doit, $doit_bg;
+	return;
+    }
+
+    # Special case $required parameters.
+
+    foreach (qw(millisecond_update_interval)) {
+        no strict qw(refs);
+        if ($$_ eq '$REQUIRED' or $$_ eq '$required' or $$_ eq '') {
+            $genPerlTk_required_dialog->configure(-text => "Parameter \"$_\" requires a value.");
+            $genPerlTk_required_dialog->Show;
+            reset_doit_button $doit, $doit_bg;
+            return;
+        }
+    }
+    
+    my($t);
+    if (Exists($genPerlTk_runme)) {
+	$t = $genPerlTk_text;
+	$genPerlTk_runme->deiconify;
+    } else{
+	$genPerlTk_runme = $genPerlTk_mw->Toplevel;
+	my $e = $genPerlTk_runme;
+	$e->title('xwoevap output');
+	$e->iconname('xwoevap');
+
+	# Forward declaration of the Text widget.
+
+	$tf = $e->Frame;
+	$t = $tf->Text(qw(-relief raised -bd 2 -setgrid true -font fixed));
+	$genPerlTk_text = $t;
+	$t->pack(qw(-expand yes -fill both));
+        $tf->AddScrollbars($t);
+        $tf->configure(-scrollbars => 'se');
+
+	my $m = $e->Frame(qw(-bd 1 -relief raised));
+	$m->pack(qw(-side top -fill x -expand yes));
+	my $mf = $m->Menubutton(qw(-text File -underline 0 -relief raised));
+	$mf->pack(-side => 'left');
+	my $fs = $genPerlTk_mw->FileSelect;
+	$mf->command(
+            -label   => 'Save as ...',
+            -command => [sub {save_window @_}, $fs, $t],
+        );
+	$mf->command(
+            -label   => 'Pipe to ...',
+            -command => [sub {pipe_window @_}, $t],
+        );
+	$mf->separator;
+	$mf->command(
+            -label   => 'Close',
+            -command => [$e => 'iconify'],
+        );
+
+	$tf->pack;
+
+    } # ifend not Exists
+	
+    # Open the pipe.  The Do It button has been disabled until now to
+    # prevent a race condition.
+    
+    {
+	no strict qw(subs);
+	$genPerlTk_pid = open H, "$genPerlTk_command 2>&1 |";
+	warn $OS_ERROR if not defined $genPerlTk_pid;
+        select H; $OUTPUT_AUTOFLUSH = 1; select STDOUT;
+	$genPerlTk_mw->fileevent(H, 'readable' => [sub {
+            read_stdout @_;
+        }, $t, $doit, $doit_bg]);
+    }
+    $doit->configure(
+        -text    => 'Cancel',
+        -relief  => 'raised',
+        -state   => 'normal',
+        -command => [sub {
+            kill_stdout @_;
+        }, $t, $doit, $doit_bg],
+    );
+    flash_widget $doit, '-background' => $genPerlTk_highlight, $doit_bg, 500;
+    
+} # end execute_command
+
+sub flash_widget {
+
+    # Flash a widget by alternating its foreground and background colors.
+
+    my($w, $option, $val1, $val2, $interval) = @_;
+
+    if ($genPerlTk_fini == 0) {
+	$w->configure($option => $val1);
+	$genPerlTk_mw->after($interval, [\&flash_widget, $w, $option, $val2,
+            $val1, $interval]);
+    }
+
+} # end flash_widget
+
+sub kill_stdout {
+    
+    # A click on the blinking Cancel button resumes normal operations.
+
+    my($t, $doit, $doit_bg) = @_;
+
+    $genPerlTk_fini = 1;
+    {
+	no strict qw(subs);
+	$genPerlTk_mw->fileevent(H, 'readable' => ''); # clear handler
+    }
+    kill 'KILL', $genPerlTk_pid;
+    close H;
+    exit if $genPerlTk_doit_once and ($t->index('end') eq '2.0');
+    $genPerlTk_runme->withdraw if $t->index('end') eq '2.0';
+    reset_doit_button $doit, $doit_bg;
+
+} # end kill_stdout
+
+sub ldifference {		# @d = ldifference(\@l1, \@l2)
+
+    my($l1, $l2) = @_;
+    my %d;
+    @d{@$l2} = (1) x @$l2;
+    return grep(! $d{$_}, @$l1);
+
+} # end ldifference
+
+sub lintersection {		# @i = lintersection(\@l1, \@l2)
+
+    my($l1, $l2) = @_;
+    my %i;
+    @i{@$l1} = (1) x @$l1;
+    return grep($i{$_}, @$l2);
+
+} # end lintersection
+
+sub lsearch {			# $o = lsearch($regexp, @list)
+
+    # Search the list using the supplied regular expression and return it's 
+    # ordinal, or -1 if not found.
+
+    my($regexp, @list) = @_;
+    my($i);
+
+    for ($i=0; $i<=$#list; $i++) {
+        return $i if $list[$i] =~ /$regexp/;
+    }
+    return -1;
+
+} # end lsearch
+
+sub lunion {			# @u = lunion(\@l1, \@l2)
+
+    my($l1, $l2) = @_;
+    my %u;
+    @u{@$l1,  @$l2} = 1;
+    return keys %u;
+
+} # end lunion
+
+sub pipe_window {
+
+    # Create a modal dialog entry toplevel window divided into an upper 
+    # message widget, a middle entry widget and a lower frame with OK and 
+    # Cancel button widgets. Make a local grab, wait for the pipeline string
+    # to be entered, withdraw the window and perform the exec.
+
+    my($w) = @_;
+
+    my($answer) = '';
+    if (Exists($genPerlTk_pipe)) {
+	$genPerlTk_pipe->deiconify;
+    } else {
+        $genPerlTk_pipe = $genPerlTk_mw->Toplevel(-class => 'dialog');
+	$genPerlTk_pipe->title('Pipe');
+	$genPerlTk_pipe->iconname('Pipe');
+	my $f1 = $genPerlTk_pipe->Frame(qw(-bd 1 -relief raised));
+	my $f2 = $genPerlTk_pipe->Frame(qw(-bd 1 -relief raised));
+	my $f3 = $genPerlTk_pipe->Frame(qw(-bd 1 -relief raised));
+	$f1->pack($f2, $f3, qw(-side top -fill both -expand yes));
+
+	my $process_pipe_input =  [sub {
+	    shift if ref($_[0]) eq 'Tk::Entry';
+	    my($answer, $w, $genPerlTk_pipe) = @_;
+	    open(P, "| $$answer") or warn $OS_ERROR;
+	    print P $w->get('1.0', 'end');
+	    close P;
+	    $genPerlTk_pipe->withdraw;
+        }, \$answer, $w, $genPerlTk_pipe];
+
+	my $msg = $f1->Message(
+            -aspect => 400,
+            -text   => 'Enter command pipeline:',
+        );
+	$msg->pack(qw(-side top -expand yes -fill both));
+
+	my $e = $f2->Entry(
+            -relief => 'sunken',
+            -width  => 40,
+            -textvariable => \$answer,
+        );
+	$e->focus;
+	$e->bind('<KeyPress-Return>' => $process_pipe_input);
+	$e->pack(qw(-side top -expand yes -fill both));
+
+	my $ok = $f3->Button(
+            -text    => 'OK',
+            -command => $process_pipe_input,
+	);
+	$ok->pack(qw(-side left -expand yes -fill x));
+
+	my $can = $f3->Button(
+            -text    => 'Cancel',
+            -command => [$genPerlTk_pipe => 'withdraw'],
+        );
+	$can->pack(
+            qw(-side right -expand yes -fill x),
+        );
+    }
+	
+} # end pipe_window
+
+sub read_stdout {
+
+    # Called when input is available for the output window.  Also checks
+    # the global genPerlTk_fini to see if the user has clicked Cancel.
+
+    my($t, $doit, $doit_bg) = @_;
+
+    if ($genPerlTk_fini) {
+	kill_stdout $t, $doit, $doit_bg;
+    } else {
+	if ((not eof H) and ($_ = <H>)) {
+	    $t->insert('end', $_);
+	    $t->yview('end');
+	} else {
+	    $genPerlTk_fini = 1;
+	}
+    }
+	
+} # end read_stdout
+
+sub reset_doit_button {
+
+    # Establish normal Do It button parameters.
+
+    my($doit, $doit_bg) = @_;
+
+    $doit->configure(
+        -text       => 'Do It',
+        -relief     => 'raised',
+        -background => $doit_bg,
+        -state      => 'normal',
+        -command    => [sub {
+	    my($doit, $doit_bg) = @_;
+            $genPerlTk_fini = 0;
+            $doit->configure(
+                -text   => 'Working ...',
+                -relief => 'sunken',
+                -state  => 'disabled'
+            );
+            execute_command $doit, $doit_bg;
+        }, $doit, $doit_bg],
+    );
+
+} # end reset_doit_button
+
+sub reset_parameters {
+
+    # Restore all command line parameter values to their default values.
+
+    $number = join ' ', @$number0;
+    $verbose = $verbose0;
+    $command = join ' ', @$command0;
+    $scale_factor = join ' ', @$scale_factor0;
+    $millisecond_update_interval = join ' ', @$millisecond_update_interval0;
+    $ignore_output_file_column_one = join ' ', @$ignore_output_file_column_one0;
+    $output = join ' ', @$output0;
+    $queue = join ' ', @$queue0;
+    $destination = join ' ', @$destination0;
+    $tty = join ' ', @$tty0;
+    $trailing_file_list = join ' ', @$trailing_file_list0;
+
+} # end reset_parameters
+
+sub save_window {
+
+    # Open a file selection window and save text widget $w.
+
+    my($fs, $w) = @_;
+
+    my $o = 'xwoevap.out';
+    $o = $fs->Show;
+    my $replace = 1;
+    if ($o ne '') {
+	if (-s $o) {
+	    $genPerlTk_replace->configure(
+                -text => "Replace existing $o?",
+            );
+	    my $answer = $genPerlTk_replace->Show;
+	    $replace = $answer eq 'Yes';
+	}
+    }
+    if ($replace == 1) {
+	open(S, ">$o") or warn $OS_ERROR;
+	print S $w->get('1.0', 'end');
+	close S;
+    }
+
+} # end save_window
+
+sub see_view {
+
+    # Position view of the command widget to this command line parameter.
+    # Position help window so help information for this parameter is visible
+    # and highlighted for a few seconds.
+
+    my ($p, $ce, $help, $index) = @_;
+
+    if ($p =~ /^end$/) {
+	    $ce->xview('end');
+    } else {
+        $ce->xview(index($genPerlTk_command, $p) - 10);
+    }
+
+    $help->yview(-pickplace, 'mark_' . $index);
+    $help->tag('configure', 'tag_' . $index, 
+        -background => $genPerlTk_highlight,
+    );
+    $help->after(4000, [$help => 'tag', 'configure', 'tag_' . $index,
+        -background => ($help->configure(-background))[3]],
+    );
+
+} # end see_view
+
+sub update_command {
+
+    # Create the command to execute.
+
+    # BEGIN application specific command line processing.
+    # END   application specific command line processing.
+
+    $genPerlTk_command = 'woevap';
+
+    # Build all non-switch parameters that have been specified.
+
+    my($parameter, @l0, @l1, @udi);
+    foreach $parameter (qw( number command scale_factor millisecond_update_interval ignore_output_file_column_one output queue destination tty)) {
+	no strict qw(refs);
+        @l0 = &shellwords($$parameter);
+	next if join(' ', @l0) eq '';
+	@l1 = @${"${parameter}0"};
+        next if $$parameter eq join ' ', @l1;
+        @udi = lunion [ldifference \@l0, \@l1], [lintersection \@l0, \@l1];
+        $genPerlTk_command .=
+            " -$parameter '" . join("' -$parameter '", @udi) . "'";
+    }
+
+    # Build all switch parameters that have been specified.
+
+    foreach $parameter (qw( verbose)) {
+	no strict qw(refs);
+        next if $$parameter eq "NOT_${parameter}";
+	$genPerlTk_command .= " -${parameter}";
+    }
+
+    $genPerlTk_command .= ' ' . $trailing_file_list if
+        defined $trailing_file_list;
+
+    return $genPerlTk_command;
+
+} # end update_command
+
+sub update_checkbutton_list {
+
+    # Toggle $val in $var.
+
+    my($var, $val) = @_;
+
+    my @l = split ' ', $$var;
+    my $i = lsearch $val, @l;
+    if ($i >= 0) {
+	splice @l, $i, 1;
+    } else {
+	push @l, $val;
+    }
+    $$var = join ' ', @l;
+    update_command;
+
+} # end update_check_button_list
+
+# Signal handlers.
+
+$SIG{PIPE} = 'IGNORE';
+
+# Initialize global Evaluate Parameters variables.
+
+$number0 = ['123'];
+$verbose0 = 'NOT_verbose';
+$command0 = ['"ps -el"'];
+$scale_factor0 = ['1.2340896e-1'];
+$millisecond_update_interval0 = ['$required'];
+$ignore_output_file_column_one0 = ['TRUE'];
+$output0 = ['stdout'];
+$queue0 = ['printer'];
+$destination0 = ['`hostname`'];
+$tty0 = ['/dev/console', '/dev/tty0', '/dev/tty1'];
+$trailing_file_list0 = [''];
+
+# Initialize global generate_PerlTk_program variables.
+
+$genPerlTk_doit_once = 0;
+$genPerlTk_required_dialog = $genPerlTk_mw->Dialog(
+    -title   => 'Alert',
+    -text    => 'Parameter "_" required a value.',
+    -bitmap  => 'error',
+    -buttons => [qw(Cancel)],
+    -wraplength => '6i',
+);
+$genPerlTk_stdin_dialog = $genPerlTk_mw->Dialog(
+    -title   => 'Alert',
+    -text    => 'Is standard input really the file you want to process?',
+    -bitmap  => 'warning',
+    -buttons => [qw(Cancel OK)],
+);
+$genPerlTk_fini = 0;
+
+$genPerlTk_highlight = $genPerlTk_mw->optionGet(qw(highlight Highlight));
+if (not defined $genPerlTk_highlight) {
+    if ($genPerlTk_mw->depth > 1) {
+	$genPerlTk_highlight = 'yellow';
+    } else {
+	$genPerlTk_highlight = 'white';
+    }
+}
+$genPerlTk_replace = $genPerlTk_mw->Dialog(
+    -title   => 'Replace?',
+    -buttons => ['Yes', 'No'],				 
+);
+$genPerlTk_undo_all = 'Undo All';
+
+reset_parameters;
+$genPerlTk_command = update_command;
+
+# BEGIN application specific command line processing.
+# END   application specific command line processing.
+
+$genPerlTk_mw->title('xwoevap');
+$genPerlTk_mw->iconname('xwoevap');
+$genPerlTk_mw->geometry('+400+50');
+
+# File, Edit and Help menubuttons, with the Do It button stuffed in between.
+
+my $mb = $genPerlTk_mw->Frame(-borderwidth => 1, -relief => 'raised');
+$mb->pack(qw(-side top -fill both -expand yes));
+
+my $mbf = $mb->Menubutton(qw(-text File -underline 0 -relief raised));
+my $fs = $genPerlTk_mw->FileSelect;
+$mbf->command(
+    -label     => 'Open ...', 
+    -underline => 0,
+    -state     => 'normal',
+    -command   => [sub {
+	my($fs) = @_;
+	$trailing_file_list = $fs->Show;
+	update_command;
+    }, $fs],
+);
+$mbf->separator;
+$mbf->command(
+    -label     => 'Close',
+    -underline => 0,
+    -command   => [$genPerlTk_mw => 'iconify'],
+);
+$mbf->separator;
+$mbf->command(
+    -label     => 'Quit',
+    -underline => 0,
+    -command   => sub {exit},
+);
+$mbf->pack(-side => 'left');
+
+my $mbe = $mb->Menubutton(qw(-text Edit -underline 0 -relief raised));
+$mbe->command(
+     -label     => $genPerlTk_undo_all,
+     -underline => 0,
+);
+$mbe->pack(-side => 'left');
+
+my $doit = $mb->Button;
+$doit->pack(-side => 'left', -expand => 'yes');
+my $doit_bg = ($doit->configure(-background))[4];
+reset_doit_button($doit, $doit_bg);
+
+my $filler = $mb->Menubutton(-text => '          ', -state => 'disabled');
+$filler->pack(-side => 'left');
+
+my $mbh = $mb->Menubutton(qw(-text Help -underline 0 -relief raised));
+$mbh->pack(-side => 'left');
+
+my $about = $genPerlTk_mw->Dialog(
+    -title  => 'About',
+    -text   => "This Perl/Tk X11 GUI wrapper for program `woevap' created by version 2.3.5 of generate_PerlTk_program.\n\nWed Jul 29 20:28:35 EDT 1998\n\nStephen.O.Lidie\@Lehigh.EDU",
+#    -bitmap => "\@${genPerlTk_aux_files}/SOL.xbm",
+     -wraplength => '4i',
+);
+$mbh->command(
+    -label     => 'About', 
+    -underline => 0, 
+    -command   => [$about => 'Show'],
+);
+$mbh->command(
+    -label     => 'Usage', 
+    -underline => 0, 
+    -command   => [\&display_usage, '2.3.5'],
+);
+
+# Full command help from Evaluate Parameters Message Module.
+
+my $h = $genPerlTk_mw->Frame;
+$h->pack(qw(-fill x -expand 1));
+my $help = $h->Text(
+    qw(-relief raised -bd 1 -setgrid 1 -height 10 -font fixed -width 100),
+);
+$help->pack(qw(-expand yes -fill both));
+$h->AddScrollbars($help);
+$h->configure(-scrollbars => 'e');
+
+# Configure Undo All now that $help has been defined.
+
+$mbe->entryconfigure($genPerlTk_undo_all, -command => [sub {
+        shift->yview('0.0');
+        reset_parameters;
+        update_command;
+    }, $help],
+);
+
+# Scrollable text widget to contain command line parameter widgets.
+
+my $wf = $genPerlTk_mw->Frame;
+$wf->pack(qw(-fill x -expand yes));
+my $widgets = $wf->Text(qw(-relief raised -bd 1 -setgrid true -height 11));
+$widgets->pack(qw(-fill x -expand yes));
+$wf->AddScrollbars($widgets);
+$wf->configure(-scrollbars => 'se');
+
+# Populate help window with Evaluate Parameters -full_help.
+
+foreach (<DATA>) {
+    $help->insert('end', $_);
+}
+$help->configure(-state => 'disabled');
+
+# Establish marks and tags for quickly positioning the help information.
+
+$help->mark('set', 'mark_woevap_number', '29.0');
+$help->tag('add', 'tag_woevap_number', '30.0', '33.0');
+
+$help->mark('set', 'mark_woevap_verbose', '33.0');
+$help->tag('add', 'tag_woevap_verbose', '34.0', '39.0');
+
+$help->mark('set', 'mark_woevap_command', '39.0');
+$help->tag('add', 'tag_woevap_command', '40.0', '49.0');
+
+$help->mark('set', 'mark_woevap_scale_factor', '49.0');
+$help->tag('add', 'tag_woevap_scale_factor', '50.0', '54.0');
+
+$help->mark('set', 'mark_woevap_millisecond_update_interval', '54.0');
+$help->tag('add', 'tag_woevap_millisecond_update_interval', '55.0', '63.0');
+
+$help->mark('set', 'mark_woevap_ignore_output_file_column_one', '63.0');
+$help->tag('add', 'tag_woevap_ignore_output_file_column_one', '64.0', '69.0');
+
+$help->mark('set', 'mark_woevap_output', '69.0');
+$help->tag('add', 'tag_woevap_output', '70.0', '76.0');
+
+$help->mark('set', 'mark_woevap_queue', '76.0');
+$help->tag('add', 'tag_woevap_queue', '77.0', '81.0');
+
+$help->mark('set', 'mark_woevap_destination', '81.0');
+$help->tag('add', 'tag_woevap_destination', '82.0', '90.0');
+
+$help->mark('set', 'mark_woevap_tty', '90.0');
+$help->tag('add', 'tag_woevap_tty', '91.0', '100.0');
+
+$help->mark('set', 'mark_woevap_end', '100.0');
+$help->tag('add', 'tag_woevap_end', '101.0', 'end - 2 lines');
+
+# Forward declaration of the entry widget.
+
+my $c = $genPerlTk_mw->Frame;
+my $ce = $c->Entry(-relief => 'ridge', -textvariable => \$genPerlTk_command);
+
+# Entry widget showing command to execute.
+
+my $spacer = $genPerlTk_mw->Frame(-height => 15);
+$spacer->pack;
+my $l = $genPerlTk_mw->Label(-text => 'Command to Execute');
+$l->pack;
+$c->pack(qw(-fill x -expand yes));
+$ce->pack(qw(-fill x -expand yes));
+$c->AddScrollbars($ce);
+$c->configure(-scrollbars => 's');
+
+# -number, n: integer = 123
+
+my $w_number = $widgets->Frame(qw(-bd 1 -relief flat));
+my $w_number_b = $w_number->Button(
+    -text        => 'number                                 (i ) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-number', $ce, $help, $index;
+    }, $help, 'woevap_number', $ce],
+);
+$w_number_b->pack(qw(-side left));
+my $w_number_e = $w_number->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \$number,
+);
+$w_number_e->pack(qw(-side left));
+$w_number_e->bind('<KeyPress-Return>' => \&update_command);
+$widgets->window('create', 'end', -window => $w_number);
+
+# -verbose, v: switch
+
+$w_verbose = $widgets->Frame(qw(-bd 1 -relief flat));
+$w_verbose_b = $w_verbose->Button(
+    -text        => 'verbose                                (sw) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-verbose', $ce, $help, $index;
+    }, $help, 'woevap_verbose', $ce],
+);
+$w_verbose_b->pack(qw(-side left));
+my $w_verbose_yes = $w_verbose->Radiobutton(
+    -text     => 'Yes',
+    -variable => \$verbose,
+    -relief   => 'flat',
+    -value    => 'verbose',
+    -command  => \&update_command,
+);
+$w_verbose_yes->pack(-side => 'left');
+my $w_verbose_no = $w_verbose->Radiobutton(
+    -text     => 'No',
+    -variable => \$verbose,
+    -relief   => 'flat',
+    -value    => 'NOT_verbose',
+    -command  => \&update_command,
+);
+$w_verbose_no->pack(-side => 'left');
+$widgets->window('create', 'end', -window => $w_verbose);
+
+# -command, c: string = D_SAMPLE_COMMAND, "ps -el"
+
+my $w_command = $widgets->Frame(qw(-bd 1 -relief flat));
+my $w_command_b = $w_command->Button(
+    -text        => 'command                                (s ) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-command', $ce, $help, $index;
+    }, $help, 'woevap_command', $ce],
+);
+$w_command_b->pack(qw(-side left));
+my $w_command_e = $w_command->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \$command,
+);
+$w_command_e->pack(qw(-side left));
+$w_command_e->bind('<KeyPress-Return>' => \&update_command);
+$widgets->window('create', 'end', -window => $w_command);
+
+# -scale_factor, sf: real = 1.2340896e-1
+
+my $w_scale_factor = $widgets->Frame(qw(-bd 1 -relief flat));
+my $w_scale_factor_b = $w_scale_factor->Button(
+    -text        => 'scale_factor                           (r ) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-scale_factor', $ce, $help, $index;
+    }, $help, 'woevap_scale_factor', $ce],
+);
+$w_scale_factor_b->pack(qw(-side left));
+my $w_scale_factor_e = $w_scale_factor->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \$scale_factor,
+);
+$w_scale_factor_e->pack(qw(-side left));
+$w_scale_factor_e->bind('<KeyPress-Return>' => \&update_command);
+$widgets->window('create', 'end', -window => $w_scale_factor);
+
+# -millisecond_update_interval, mui: integer = $required
+
+my $w_millisecond_update_interval = $widgets->Frame(qw(-bd 1 -relief flat));
+my $w_millisecond_update_interval_b = $w_millisecond_update_interval->Button(
+    -text        => 'millisecond_update_interval            (i ) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-millisecond_update_interval', $ce, $help, $index;
+    }, $help, 'woevap_millisecond_update_interval', $ce],
+);
+$w_millisecond_update_interval_b->pack(qw(-side left));
+my $w_millisecond_update_interval_e = $w_millisecond_update_interval->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \$millisecond_update_interval,
+    -background   => $genPerlTk_highlight,
+);
+$w_millisecond_update_interval_e->pack(qw(-side left));
+$w_millisecond_update_interval_e->bind('<KeyPress-Return>' => \&update_command);
+$widgets->window('create', 'end', -window => $w_millisecond_update_interval);
+
+# -ignore_output_file_column_one, iofco: boolean = TRUE
+
+$w_ignore_output_file_column_one = $widgets->Frame(qw(-bd 1 -relief flat));
+$w_ignore_output_file_column_one_b = $w_ignore_output_file_column_one->Button(
+    -text        => 'ignore_output_file_column_one          (b ) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-ignore_output_file_column_one', $ce, $help, $index;
+    }, $help, 'woevap_ignore_output_file_column_one', $ce],
+);
+$w_ignore_output_file_column_one_b->pack(qw(-side left));
+my $w_ignore_output_file_column_one_yes = $w_ignore_output_file_column_one->Radiobutton(
+    -text     => 'Yes',
+    -variable => \$ignore_output_file_column_one,
+    -relief   => 'flat',
+    -value    => 'TRUE',
+    -command  => \&update_command,
+);
+$w_ignore_output_file_column_one_yes->pack(-side => 'left');
+my $w_ignore_output_file_column_one_no = $w_ignore_output_file_column_one->Radiobutton(
+    -text     => 'No',
+    -variable => \$ignore_output_file_column_one,
+    -relief   => 'flat',
+    -value    => 'FALSE',
+    -command  => \&update_command,
+);
+$w_ignore_output_file_column_one_no->pack(-side => 'left');
+$widgets->window('create', 'end', -window => $w_ignore_output_file_column_one);
+
+# -output, o: file = stdout
+
+my $w_output = $widgets->Frame(qw(-bd 1 -relief flat));
+my $w_output_b = $w_output->Button(
+    -text        => 'output                                 (f ) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-output', $ce, $help, $index;
+    }, $help, 'woevap_output', $ce],
+);
+$w_output_b->pack(qw(-side left));
+my $w_output_e = $w_output->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \$output,
+);
+$w_output_e->pack(qw(-side left));
+$w_output_e->bind('<KeyPress-Return>' => \&update_command);
+$widgets->window('create', 'end', -window => $w_output);
+
+# -queue, q: key plotter, postscript, text, printer, keyend = printer
+
+$w_queue = $widgets->Frame(qw(-bd 1 -relief flat));
+$w_queue_b = $w_queue->Button(
+    -text        => 'queue                                  (k ) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-queue', $ce, $help, $index;
+    }, $help, 'woevap_queue', $ce],
+);
+$w_queue_b->pack(qw(-side left));
+$w_queue_plotter = $w_queue->Radiobutton(
+    -text     => 'plotter',
+    -variable => \$queue,
+    -relief   => 'flat',
+    -value    => 'plotter',
+    -command  => \&update_command,
+);
+$w_queue_plotter->pack(qw(-side left));
+$w_queue_postscript = $w_queue->Radiobutton(
+    -text     => 'postscript',
+    -variable => \$queue,
+    -relief   => 'flat',
+    -value    => 'postscript',
+    -command  => \&update_command,
+);
+$w_queue_postscript->pack(qw(-side left));
+$w_queue_text = $w_queue->Radiobutton(
+    -text     => 'text',
+    -variable => \$queue,
+    -relief   => 'flat',
+    -value    => 'text',
+    -command  => \&update_command,
+);
+$w_queue_text->pack(qw(-side left));
+$w_queue_printer = $w_queue->Radiobutton(
+    -text     => 'printer',
+    -variable => \$queue,
+    -relief   => 'flat',
+    -value    => 'printer',
+    -command  => \&update_command,
+);
+$w_queue_printer->pack(qw(-side left));
+$widgets->window('create', 'end', -window => $w_queue);
+
+# -destination, d: application = `hostname`
+
+my $w_destination = $widgets->Frame(qw(-bd 1 -relief flat));
+my $w_destination_b = $w_destination->Button(
+    -text        => 'destination                            (a ) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-destination', $ce, $help, $index;
+    }, $help, 'woevap_destination', $ce],
+);
+$w_destination_b->pack(qw(-side left));
+my $w_destination_e = $w_destination->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \$destination,
+);
+$w_destination_e->pack(qw(-side left));
+$w_destination_e->bind('<KeyPress-Return>' => \&update_command);
+$widgets->window('create', 'end', -window => $w_destination);
+
+# -tty, t: list of name = (/dev/console, /dev/tty0, /dev/tty1)
+
+my $w_tty = $widgets->Frame(qw(-bd 1 -relief flat));
+my $w_tty_b = $w_tty->Button(
+    -text        => 'tty                                    (nl) ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+        my($help, $index, $ce) = @_;
+        see_view '-tty', $ce, $help, $index;
+    }, $help, 'woevap_tty', $ce],
+);
+$w_tty_b->pack(qw(-side left));
+my $w_tty_e = $w_tty->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \$tty,
+);
+$w_tty_e->pack(qw(-side left));
+$w_tty_e->bind('<KeyPress-Return>' => \&update_command);
+$widgets->window('create', 'end', -window => $w_tty);
+
+# file(s) required by this command
+
+$w_trailing_file_list = $widgets->Frame(qw(-bd 1 -relief flat));
+$w_trailing_file_list_b = $w_trailing_file_list->Button(
+    -text        => 'Required File Name(s)                       ',
+    -borderwidth => 0,
+    -font        => 'fixed',
+    -command     => [sub {
+	my($help, $index, $ce) = @_;
+	see_view 'end', $ce, $help, $index;
+    }, $help, 'woevap_end', $ce],
+);
+$w_trailing_file_list_b->pack(-side => 'left');
+$w_trailing_file_list_e = $w_trailing_file_list->Entry(
+    -relief       => 'sunken',
+    -width        => 40,
+    -textvariable => \$trailing_file_list,
+    -background  => $genPerlTk_highlight,
+);
+$w_trailing_file_list_e->pack(-side => 'left');
+$w_trailing_file_list_e->bind('<KeyPress-Return>' => \&update_command);
+$widgets->window('create', 'end', -window => $w_trailing_file_list);
+
+MainLoop;
+__END__
+Command Source:  ../genpTk
+
+
+
+frog_program, frop
+
+	Hi there.
+
+	A sample program demonstrating typical Evaluate Parameters
+	usage.
+
+	Examples:
+
+	  sample
+	  sample -usage_help
+	  sample -h
+	  sample -full_help
+          sample -mui 1234
+
+Parameters:
+
+-help, h, usage_help, full_help: Display Command Information
+
+	Display information about this command, which includes
+	a command description with examples, plus a synopsis of
+	the command line parameters.  If you specify -full_help
+	rather than -help complete parameter help is displayed
+	if it's available.
+
+-number, n: integer = 123
+
+	An integer.
+
+-verbose, v: switch
+
+        A 'switch' type parameter emulates a typical standalone
+        switch. If the switch is specified Evaluate Parameters
+        returns a '1'.
+
+-command, c: string = D_SAMPLE_COMMAND, "ps -el"
+
+        A 'string' type parameter is just a list of characters,
+        which must be quoted if it contains whitespace. 
+        NOTE:  for this parameter you can also create and
+        initialize the environment variable D_SAMPLE_COMMAND to
+        override the standard default value for this command
+        line parameter.  All types except 'switch' may have a
+        default environment variable for easy user customization.
+
+-scale_factor, sf: real = 1.2340896e-1
+
+        A 'real' type parameter must be a real number that may
+        contain a leading sign, a decimal point and an exponent.
+
+-millisecond_update_interval, mui: integer = $required
+
+        An 'integer' type parameter must consist of all digits
+        with an optional leading sign.  NOTE: this parameter's
+        default value is '$required', meaning that
+        Evaluate Parameters ensures that this parameter is
+        specified and given a valid value.  All types except
+        'switch' may have a default value of '$required'.
+
+-ignore_output_file_column_one, iofco: boolean = TRUE
+
+        A 'boolean' type parameter may be TRUE/YES/ON/1 or
+        FALSE/NO/OFF/0, either upper or lower case.  If TRUE,
+        Evaluate Parameters returns a value of '1', else '0'.
+
+-output, o: file = stdout
+
+        A 'file' type parameter expects a filename.  For Unix
+        $HOME and ~ are expanded.  For evap/Perl 'stdin' and
+	'stdout' are converted to '-' and '>-' so they can be
+	used in a Perl 'open' function.
+
+-queue, q: key plotter, postscript, text, printer, keyend = printer
+
+        A 'key' type parameter enumerates valid values.  Only the
+        specified keywords can be entered on the command line.
+
+-destination, d: application = `hostname`
+
+	An 'application' type parameter is not type-checked in
+	any - the treatment of this type of parameter is
+	application specific.  NOTE:  this parameter' default
+	value is enclosed in grave accents (or "backticks").
+	Evaluate Parameters executes the command and uses it's
+	standard output as the default value for the parameter.
+
+-tty, t: list of name = (/dev/console, /dev/tty0, /dev/tty1)
+
+	A 'name' type parameter is similar to a string except
+	that embedded white-space is not allowed.  NOTE: this
+	parameter is also a LIST, meaning that it can be
+	specified multiple times and that each value is pushed
+        onto a Perl LIST variable.  In general you should quote
+        all list elements.  All types except 'switch' may be
+	'list of'.
+
+file(s) required by this command
+

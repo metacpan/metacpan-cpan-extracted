@@ -1,0 +1,105 @@
+#!/usr/bin/perl -w
+
+#BEGIN { $Gimp::verbose = 1; }
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  $drawable->become('Gimp::Layer');
+  return if $image->selection_is_empty == 0;
+  $image->undo_group_start;
+  Gimp::Context->push();
+  #get the drawable dimensions
+  my $xsize = $drawable->width;
+  my $ysize = $drawable->height;
+
+  Gimp::Context->set_background([128,128,128]);
+
+  # Create a grayscale workspace image for displacement map
+  my $dm = Gimp::Image->new($xsize, $ysize, 1);
+  # It needs to have 2 layers
+  my $dmlayer = Gimp::Layer->new($dm, $xsize, $ysize, GRAY_IMAGE, "newlayer",
+    100, NORMAL_MODE);
+  $dm->insert_layer($dmlayer, 0, 0);
+
+  # Create the layers, one-by-one
+  my $i = 1;
+  my $xdist = ($arithmode) ?
+    $i * $distance / $nsteps * -cos($angle * 3.14159 / 180) :
+    $distance ** ($i/$nsteps) * -cos($angle * 3.14159 / 180);
+  my $ydist = ($arithmode) ?
+    $i * $distance / $nsteps * sin($angle * 3.14159 / 180) :
+    $distance ** ($i/$nsteps) * sin($angle * 3.14159 / 180);
+  $dmlayer->edit_clear;
+  $dmlayer->noisify(0, 255, 255, 255, 0);
+  $dmlayer->levels(0, 0, 255, 1.0, 128, 255);
+  $drawable = $drawable->copy(0);
+  $image->insert_layer($drawable, 0, -1);
+  $drawable->displace($xdist, $ydist, 1, 1, $dmlayer, $dmlayer, 1);
+  $image->lower_item($drawable) if $inmode == 1;
+  for ( $i = 2; $i <= $nsteps; $i++ ) {
+    $xdist = ($arithmode) ?
+      $i * $distance / $nsteps * -cos($angle * 3.14159 / 180) :
+      $distance ** ($i/$nsteps) * -cos($angle * 3.14159 / 180);
+    $ydist = ($arithmode) ?
+      $i * $distance / $nsteps * sin($angle * 3.14159 / 180) :
+      $distance ** ($i/$nsteps) * sin($angle * 3.14159 / 180);
+    $dmlayer->edit_clear;
+    $dmlayer->noisify(0, 255, 255, 255, 0);
+    $dmlayer->levels(0, 0, 255, 1.0, 128, 255);
+    $drawable = $drawable->copy(0);
+    $image->insert_layer($drawable, 0, -1);
+    $drawable->displace($xdist, $ydist, 1, 1, $dmlayer, $dmlayer, 1);
+    $image->lower_item($drawable) if $inmode == 1;
+  }
+
+#  gimp_image_remove_layer($dm, $dmlayer);
+#  gimp_image_delete ($dm);
+  Gimp::Context->pop;
+  $image->undo_group_end;
+  ();
+};
+
+exit main;
+
+__END__
+
+=head1 NAME
+
+blowinout - Blow selected layer in/out
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Animation/BlowInOut...
+
+=head1 DESCRIPTION
+
+Generates an animation thats blows the selected layer in or out.
+
+=head1 PARAMETERS
+
+ [PF_INT32, "angle", "Wind Angle, 0 is left", 120],
+ [PF_INT32, "nsteps", "Number of Steps/Layers", 5],
+ [PF_VALUE, "distance", "How far to blow",30],
+ [PF_RADIO, "inmode", "Blow direction", 0, [In => 1, Out => 0]],
+ [PF_RADIO, "arithmode", "Kind of series", 1, [Arithmetic => 1, Geometric => 0]]
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+John Pitney <john@pitney.org>
+
+=head1 DATE
+
+1999-03-15
+
+=head1 LICENSE
+
+Copyright John Pitney.
+
+Released under the same terms as Gimp-Perl.

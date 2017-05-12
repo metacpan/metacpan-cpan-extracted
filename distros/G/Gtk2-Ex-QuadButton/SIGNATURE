@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 633645c3e32e49d36c4306e5aaee06f86cabc802 Changes
+SHA1 779031b7d75651a806d9d8ad2f6fd13cf5abeea0 MANIFEST
+SHA1 d6f9595a0ae02220d6781c9460782ae32c0d4aaf MANIFEST.SKIP
+SHA1 f2e40ac314edec93137bb441d2789de67bfbad37 META.yml
+SHA1 b7c7d922c1d28dd499715cc69639c4f2251403a6 Makefile.PL
+SHA1 c0d278db3cb005e3baf9ce94c343fd69f3283500 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 e1fdd9e7a14396cd21e71ee81abbac32241616c7 debian/control
+SHA1 d37ac755829fb6cff032dd2cde7e85f99bda1bb8 debian/copyright
+SHA1 18dc36e456bfe5777679aecdf00584d325351765 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 c716b948637c0a8660e7d5fa18ad6cebaffa590d debian/watch
+SHA1 bc322fa79984aac1b578063a91aff8bf4afc9677 devel/QuadScroll.pm
+SHA1 20caa96424603efe5146241aeecfcf9283cf1f47 devel/QuadScroll/ArrowButton.pm
+SHA1 bd4ea38fb42a7358c5887084a6056af8f775035b devel/ScrollButtons.pm
+SHA1 d87738621f41b3c231ef2b3c744ae95440b3e0cf devel/builder.pl
+SHA1 8a78d761896078e710520c5babebc98b8b07bbd3 devel/dirbutton.pl
+SHA1 8a9b1cec59c445a0112a1c87f570b30e7d394cfb devel/run.pl
+SHA1 47088e3927fbf08778fcb4ffdcaeff66336793d1 devel/screenshot.pl
+SHA1 986b8de1d00e2ea860a5f2fdc7be446fec5ef58a devel/toolbar.pl
+SHA1 4af5287f51c19998d1c6255703393773960f86b3 examples/quadbutton.pl
+SHA1 7aa92b5074cf12916763acbfc1c440575679a07e inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 5c99015d24d0fe03bc72a005f61572ae1c71a3ca lib/Gtk2/Ex/QuadButton.pm
+SHA1 67def2e5f8539baa4b99f2d1a20da75834cf2b67 lib/Gtk2/Ex/QuadButton/Scroll.pm
+SHA1 4dc04c5401c223a0beedf001b5d8fb71afbdabfd t/MyTestHelpers.pm
+SHA1 dcab77c39412f7374a4b2ed544edff9cb947b39f t/QuadButton-Scroll-buildable.t
+SHA1 458b5b3f16e630b7cc5e0a5052fd9dbd89466024 t/QuadButton-Scroll-load.t
+SHA1 a4b219c03e120b2d96161ed90fd8ffdc6db27c9d t/QuadButton-Scroll-weaken.t
+SHA1 ddab55fad7d5ce30681c258be6a3f1ccc2fd11ff t/QuadButton-Scroll.t
+SHA1 68fadf91adb4a871edd7713ff5a97256fef627b8 t/QuadButton-buildable.t
+SHA1 855af8f88cf86336b79394f243c39d28e79befe0 t/QuadButton-load.t
+SHA1 f04af1a5dfd4457f801da7d242795fdd2f419c57 t/QuadButton-weaken.t
+SHA1 614817a899579041ef23fddd34c83cd95421468b t/QuadButton.t
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 219395eb91b03829e6f14db4ebd57d88ea972e61 xt/0-Test-ConsistentVersion.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
+SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
+SHA1 439687ac1489fcb62c3cf200fedf9ebf210e7bf7 xt/0-no-debug-left-on.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFN1a+9LFMCIV9q3ToRAtzoAJ4i8L132LWqI3OKwMNSavYL6uO4aACeNK6G
+immHOnvg9iL2M3e7wsv1OsY=
+=uLUL
+-----END PGP SIGNATURE-----

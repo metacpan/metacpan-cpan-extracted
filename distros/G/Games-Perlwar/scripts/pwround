@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+=pod
+
+	usage: pwround $game_dir
+
+=cut
+
+use strict;
+use warnings;
+
+use Games::Perlwar;
+
+sub usage {
+    return "usage: $0 <game_directory>\n"
+}
+
+die usage() unless @ARGV == 1;
+
+my $game_directory = shift @ARGV;
+
+unless( -d $game_directory ) {
+    warn "can't access directory '$game_directory': $!\n";
+    die usage();
+}
+
+my $pw = new Games::Perlwar( $game_directory );
+
+$pw->load;
+$pw->play_round;
+$pw->save;

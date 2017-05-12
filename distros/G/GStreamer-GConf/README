@@ -1,0 +1,26 @@
+
+			       GStreamer::GConf
+			      ------------------
+
+GStreamer::GConf provides access to the GConf interaction facilities of the
+GStreamer library.
+
+				 Installation
+				--------------
+
+To install GStreamer, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+				 Dependencies
+				--------------
+
+GStreamer::GConf depends on any release of the 0.8 series of the GStreamer
+GConf library and on the following Perl modules:
+
+  ExtUtils::Depends
+  ExtUtils::PkgConfig
+  GStreamer >= 0.02

@@ -1,0 +1,20 @@
+TODO file for Games::Bingo::Print
+
+$Id: TODO 1835 2007-03-17 17:36:20Z jonasbn $
+
+- Center single digit numbers (if doable)
+
+- Add generation of master plate (all numbers) on paper for the referee?
+  (see output example from Games::Bingo bingo.pl)
+
+---
+
+- Get Games::Bingo to work with PDFLib-lite. The open source version of
+  PDFLib which seem to be the free part of the future PDFLib.
+  
+Tested with release 0.03 and PDFLib-lite 7.0.1 and it works see INSTALL
+
+- Make support for other paperformats than A4?
+
+Added papersize argument to constructor
+

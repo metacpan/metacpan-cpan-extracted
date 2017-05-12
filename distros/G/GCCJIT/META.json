@@ -1,0 +1,52 @@
+{
+   "abstract" : "Perl bindings for GCCJIT library",
+   "author" : [
+      "Vickenty Fesunov <cpan-gccjit@setattr.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GCCJIT",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FFI::Raw" : "0.30",
+            "Test::Fatal" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vickenty/gccjit-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vickenty/gccjit-perl",
+         "web" : "https://github.com/vickenty/gccjit-perl"
+      }
+   },
+   "version" : "0.03"
+}

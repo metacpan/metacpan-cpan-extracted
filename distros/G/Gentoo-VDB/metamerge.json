@@ -1,0 +1,41 @@
+{
+  "prereqs": {
+    "runtime": {
+      "requires": {
+        "Path::Tiny":                         "0.048",
+        "perl":                               "5.006"
+      }
+    },
+    "test": {
+      "requires": {
+        "Test::More":       "0.88",
+        "Test::Needs":      "0"
+      },
+      "recommends": {
+        "Test::TempDir::Tiny": "0"
+      }
+    },
+    "develop": {
+      "requires": {
+        "CPAN::Meta" : "2.150010"
+      }
+    },
+    "x_examples": {
+      "requires": {
+        "Data::Dump": "0",
+        "Term::ANSIColor": "4.00",
+        "Text::Wrap": "0"
+      }
+    }
+  },
+  "resources": {
+    "bugtracker": {
+      "web":  "https://github.com/kentnl/Gentoo-VDB/issues"
+    },
+    "repository": {
+      "type": "git",
+      "url":  "https://github.com/kentnl/Gentoo-VDB",
+      "web":  "https://github.com/kentnl/Gentoo-VDB"
+    }
+  }
+}

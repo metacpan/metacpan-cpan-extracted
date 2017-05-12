@@ -1,0 +1,50 @@
+
+It is great to see you would want to improve Game::Risk.
+
+** Prerequisites
+
+Here's what you need (among other prereqs):
+    - Tk
+    - POE
+    - Dist::Zilla
+    - Dist::Zilla::PluginBundle::JQUELIN
+
+
+** Getting started
+
+Once those prereqs installed, one can do:
+    $ dzil test                         # to run the tests
+    $ dzil run ./bin/prisk              # to run the game from local checkout
+    $ dzil run bash                     # to examine what built dist will look like
+
+This takes quite some time, but you will be sure to run against what
+would be released to CPAN. For quicker iterations, you can run directly:
+    $ ./bin/prisk
+
+Note however that some windows will fail (such as the about box,
+and maybe others): indeed, they would need some information added
+by dist-zilla.
+
+
+** Code layout:
+
+Each window has its own module in:
+    lib/Games/Risk/GUI/
+
+but it is moving slowly in lib/Games/Risk/Tk once they are sanitized.
+
+
+** I18n layout
+
+The file holding the strings is here:
+    share/locale/Games-Risk-messages.pot
+
+It can be updated at anytime by using:
+    $ dzil pot
+
+Translation files are in:
+    share/locale/<language code>/LC_MESSAGES/Games-Risk.po
+
+So for example the French translation is in:
+    share/locale/fr/LC_MESSAGES/Games-Risk.po
+

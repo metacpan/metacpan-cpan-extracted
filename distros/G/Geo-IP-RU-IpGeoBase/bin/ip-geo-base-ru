@@ -1,0 +1,211 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use utf8;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %db = (
+    dsn   => '',
+    user  => '',
+    pass  => '',
+    table => 'ip_geo_base_ru',
+);
+my %url = (
+    main        => 'http://ipgeobase.ru/files/db/Main/geo_files.tar.gz'
+);
+my %opt = (
+    help        => 0,
+    create      => 0,
+    verbose     => 0,
+);
+
+GetOptions(
+    'h|help!'              => \$opt{'help'},
+    'v|verbose!'           => \$opt{'verbose'},
+    'd|dsn=s'              => \$db{'dsn'},
+    'u|user=s'             => \$db{'user'},
+    'p|password=s'         => \$db{'pass'},
+    't|table=s'            => \$db{'table'},
+    'source=s'             => \$url{'main'},
+    'create!'              => \$opt{'create'},
+);
+
+if ( !$db{'dsn'} || $opt{'help'} ) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(
+        -message => "",
+        -exitval => $opt{'help'}? 0 : 1,
+        -verbose => 99,
+        -sections => $opt{'help'}? 'NAME|USAGE|DESCRIPTION|OPTIONS' : 'NAME|USAGE',
+    );
+}
+
+=head1 NAME
+
+ip-geo-base-ru - retrieve DBs from ipgeobase.ru and import them into DB
+
+=head1 USAGE
+
+    ip-geo-base-ru -h
+    ip-geo-base-ru --dsn 'dbi:SQLite:/path/to/my.db' --create
+    ip-geo-base-ru --dsn 'dbi:SQLite:/path/to/my.db'
+
+    ip-geo-base-ru [-d,--dsn <dsn>]
+        [-u,--user <db user>] [-p,--password <db password>]
+        [-t,--table <db table>] [--create]
+        [--source <URL>]
+        [--coordinates-source]
+
+=head1 DESCRIPTION
+
+Script fetches information about IP blocks and locations from
+http://ipgeobase.ru and imports data into a database table.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * -h, --help - show help and exit
+
+=item * -d, --dsn - the only mandatory option - data base connection
+string. Syntax described in L</DBI>, example 'dbi:mysql:mydb'.
+
+=item * -u, --user, -p, --password - credentials that should be
+used to connect to the DB. Default values are empty.
+
+=item * -t, --table - name of the table in the database where data
+should be stored, default value is 'ip_geo_base_ru'.
+
+=item * --create - use this to create table in the DB for the first
+time.
+
+=item * --source - URL of the file on the site, default is
+F<http://ipgeobase.ru/files/db/Main/geo_files.tar.gz>.
+
+=back
+
+=cut
+
+binmode STDOUT, ":utf8";
+
+require File::Spec;
+
+require Geo::IP::RU::IpGeoBase;
+my $api = Geo::IP::RU::IpGeoBase->new(
+    db => \%db,
+);
+if ( $opt{'create'} ) {
+    print "Going to create a table\n" if $opt{'verbose'};
+    $api->create_table;
+}
+
+update_ip_geo_base();
+
+sub update_ip_geo_base{
+
+    my ($blocks_file, $cities_file) = fetch();
+
+    my %city_info;
+    $api->process_file(
+        $cities_file,
+        fields   => [qw(city_id city region federal_district latitude longitude)],
+        callback => sub {
+            my $rec = shift;
+            $city_info{ delete $rec->{'city_id'} } = $rec;
+        },
+    );
+
+    my $table = $api->db_info->{'quoted_table'};
+    $api->dbh->do("UPDATE $table SET in_update = 1");
+    $api->process_file(
+        $blocks_file,
+        fields   => [qw(istart iend block country_code city_id)],
+        callback => sub {
+            my $rec = shift;
+            my $city = $city_info{ $rec->{'city_id'} }
+                or return;
+
+            delete @{$rec}{'country_code', 'city_id'};
+            update( { %$city, %$rec } );
+        },
+    );
+    $api->dbh->do("DELETE FROM $table WHERE in_update = 1");
+}
+
+sub update {
+    my $rec = shift;
+    $rec->{'in_update'} = 0;
+    if ( $opt{'create'} ) {
+        print "Inserting block $rec->{start} - $rec->{end} ($rec->{city}, $rec->{longitude})\n" if $opt{'verbose'};
+        return $api->insert_record( %$rec );
+    }
+    elsif ( $api->fetch_record( $rec->{'istart'}, $rec->{'iend'} ) ) {
+        print "Updating block $rec->{start} - $rec->{end}  ($rec->{city}, $rec->{longitude})\n" if $opt{'verbose'};
+        return $api->update_record( %$rec );
+    }
+    else {
+        print "Inserting block $rec->{start} - $rec->{end} ($rec->{city}, $rec->{longitude})\n" if $opt{'verbose'};
+        return $api->insert_record( %$rec );
+    }
+}
+
+sub fetch {
+    my @files = extract( fetch_file( $url{'main'} ) );
+    unless ( grep $_ eq 'cidr_optim.txt', @files ) {
+        die "Couldn't find cidr_optim.txt";
+    }
+    unless ( grep $_ eq 'cities.txt', @files ) {
+        die "Couldn't find cities.txt";
+    }
+    my $optim = File::Spec->catfile( tmp_dir(), 'cidr_optim.txt' );
+    my $cities = File::Spec->catfile( tmp_dir(), 'cities.txt' );
+
+    return ($optim, $cities);
+}
+
+sub extract {
+    my $file = shift;
+
+    print "Going to extract archive '$file'\n" if $opt{'verbose'};
+
+    require Archive::Extract;
+    my $ae = Archive::Extract->new( archive => $file );
+    return $file unless $ae;
+    $ae->extract( to => tmp_dir() ) or die $ae->error;
+
+    print "Done\n" if $opt{'verbose'};
+
+    return @{ $ae->files };
+}
+
+sub fetch_file {
+    my $url = shift;
+
+    my ($file) = ($url =~ m{/([^/]+)$});
+    die "couldn't figure file name from $url" unless $file;
+
+    my $path = File::Spec->catfile( tmp_dir(), $file );
+
+    print "Going to fetch '$url'\n" if $opt{'verbose'};
+    require LWP::Simple;
+    my $status = LWP::Simple::getstore($url, $path);
+    die "Couldn't get '$url': $status"
+        unless $status == 200;
+
+    print "Fetched to '$path'\n" if $opt{'verbose'};
+    return $path;
+}
+
+my $tmp_dir;
+sub tmp_dir {
+    return $tmp_dir if $tmp_dir;
+
+    require File::Temp;
+    $tmp_dir = File::Temp->newdir( CLEANUP => 1 );
+    print "Temporary directory is '$tmp_dir'\n" if $opt{'verbose'};
+
+    return $tmp_dir;
+}

@@ -1,0 +1,1 @@
+[% IF syntax_css %]<link rel="stylesheet" type="text/css" href="[% syntax_css %]"/>[% END %]

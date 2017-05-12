@@ -1,0 +1,4 @@
+Copyright (C) 2003-2005, 2010  Torsten Schoenfeld
+
+This software is licensed under the LGPL.  See L<Gnome2::Rsvg> for a full
+notice.

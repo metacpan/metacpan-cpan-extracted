@@ -1,0 +1,110 @@
+<html>
+
+<head>
+
+<title>GenPerl Home</title>
+
+</head>
+
+<body text="#000000" bgcolor="#FFFFFF" link="seagreen" alink="lightseagreen" vlink="firebrick">
+
+<table border="0" width="100%" cellspacing="20" align="center">
+ <tr>
+  <td colspan="3" align="center">
+     <font face="Arial, Helvetica, sans-serif" color="seagreen" size="7">GenPerl</font>
+  </td>
+ </tr>
+ <tr>
+  <td colspan="3">
+
+<p> GenPerl is a software development toolkit designed to facilitate the
+development of Perl scripts and applications in the area of genetic analysis.
+This includes a detailed genetic analysis object model implemented as a
+collection of OO Perl classes, and a series modules that implement an API for
+interacting with objects of these classes.  The API includes functionality for
+managing the persistence of objects in a relational database.
+
+<p> GenPerl does not include ready to use programs with friendly graphical
+user interfaces (GUIs).  Instead, GenPerl provides reusable Perl modules that
+facilitate the development of applications for the storage, manipulation and
+analysis of genetic data.  GenPerl enables the development applications which
+can process and analyze large quantities of data in customized ways that are
+typically difficult or impossible with large GUI-based systems.
+
+<p> A <a href="/cgi-bin/gpa.cgi"><b>CGI client application</b></a> has been
+built using GenPerl, which demonstrates some of the functionality in GenPerl.
+Examples of code using GenPerl can be found in the <a
+href="/GenPerl/gptutorial.html"><b>GenPerl Tutorial</b></a> document.
+
+<p>
+GenPerl should be considered <b><i>alpha software</i></b>.
+
+</td>
+ </tr>
+ <tr>
+  <TD bgcolor="lightseagreen" width="250" height="30"><font size="5" color="white">&nbsp; Classes/Objects</font></TD>
+  <TD bgcolor="lightseagreen" width="250" height="20"><font size="5" color="white">&nbsp; API</font></TD>
+  <TD bgcolor="lightseagreen" width="250" height="20"><font size="5" color="white">&nbsp; Database</font></TD>
+ </tr>
+ <tr>
+  <td valign="top" width="250">
+The GenPerl object model is implemented as a series of Perl classes.  GenPerl objects are instances of these classes.
+
+<p><a href="/GenPerl/Object.html">Genetics::Object</a> is the superclass for all GenPerl objects.
+<p> The objects with which one interacts directly are:
+ <ul>
+  <li><a href="/GenPerl/Cluster.html">Cluster</a> representing groupings of objects, by reference.
+  <li><a href="/GenPerl/DNASample.html">DNASample</a> representing laboratory samples of DNA.
+  <li> <a href="/GenPerl/FrequencySource.html">FrequencySource</a> representing observed allele and/or haplotype frequencies.
+  <li> <a href="/GenPerl/Genotype.html">Genotype</a> representing the observed allele(s) an individual has at a polymorphic locus.
+  <li> <a href="/GenPerl/Haplotype.html">Haplotype</a> representing a specific combination of alleles known or predicted to be segregating together.
+  <li> <a href="/GenPerl/HtMarkerCollection.html">HtMarkerCollection</a> representing a set of Markers/SNPs from which Haplotypes can be constructed.
+  <li> <a href="/GenPerl/Kindred.html">Kindred</a> representing groups of Subjects related genetically or by mariage.
+  <li> <a href="/GenPerl/Map.html">Map</a> representing an ordered set of chromosomal loci.
+  <li> <a href="/GenPerl/Marker.html">Marker</a> representing polymorphic genetic loci.
+  <li> <a href="/GenPerl/Phenotype.html">Phenotype</a> representing the observable properties - genetic and/orenvironmental - of an individual.
+  <li> <a href="/GenPerl/SNP.html">SNP</a> representing single nucleotide polymorphisms.
+  <li> <a href="/GenPerl/StudyVariable.html">StudyVariable</a> representing definitions of physical traits, affection status, environmental exposure, drug treatments, etc.
+  <li> <a href="/GenPerl/Subject.html">Subject</a> representing the individuals being studied.
+  <li> <a href="/GenPerl/TissueSample.html">TissueSample</a> representing laboratory tissue samples.
+ </ul>
+  </td>
+  <td valign="top" width="250">
+The GenPerl API functionality is separated into the following packages.
+
+<p>The <a href="/GenPerl/API.html">Genetics::API</a> package contains general API methods that don't fit anywhere else right now.
+
+<p>The Genetics::API::DB packages contain methods for managing the persistance of GenPerl objects in a relational database.  These packages essentially constitute the middleware layer between client scripts and data in a GenPerl schema.
+ <ul>
+  <li><a href="/GenPerl/Insert.html">Insert</a>  This package contains the methods for saving new objects (i.e. objects that have not been previously saved to the database).
+  <li><a href="/GenPerl/Read.html">Read</a>  This package contains the methods for reading objects. This involves extracting the neccessary data from the database and instantiating Genperl objects.
+  <li> <a href="/GenPerl/Update.html">Update</a>  This package contains the methods for updating objects that have previously been saved in the MySQL database.
+  <li> <a href="/GenPerl/Delete.html">Delete</a>  This package contains the methods for deleting objects.
+    <li> <a href="/GenPerl/Query.html">Query</a>  This package contains methods for more sophisticated querying.
+ </ul>
+
+<p> The <a href="/GenPerl/Analysis.html">Genetics::API::Analysis</a> package contains methods related to the analysis of genetic data.  This includes statistical tests, formatting of analysis files, etc.
+ <ul>
+   <li> The <a href="/GenPerl/Linkage.html">Genetics::API::Analysis::Linkage</a> package contains methods relating to genetic linkage analyses.  Generally speaking, this means reading and writing linkage format pedigree and locus files, and/or running programs such as genehunter, etc.
+ </ul>
+  </td>
+
+ <td valign="top" width="250">
+<p>In order to manage the persistance of GenPerl objects, the GenPerl API requires a relational database instance in which to store the data.  Right now, the only supported databse is <a href="http://www.mysql.com/">MySQL</a>.  I chose MySQL mainly because it's free, fast, and relatively simple to administrate.  All database interaction in the API is implemented using DBI, and thus the API could, in theory, easily support the use of any RDBMS for which a DBD module exists.
+
+<p>The <a href="/GenPerl/createGenPerlSchema.sql">DDL in this script</a> can be used to create an appropriate schema in MySQL.
+
+  </td>
+ </tr>
+</table>
+
+
+<hr>
+<address>Steve Mathias <a href="mailto:mathias@genomica.com"> &lt;mathias@genomica.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Tue Nov 27 17:11:43 2001
+<!-- hhmts end -->
+
+</body>
+
+</html>

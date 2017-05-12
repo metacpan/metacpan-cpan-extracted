@@ -1,0 +1,97 @@
+<HTML>
+<HEAD>
+<TITLE>Online Help: FORMS</TITLE>
+</HEAD>
+<BODY>
+<H1>How can I fill out HTML forms?</H1>
+
+<p>Pages containing HTML forms have &lt;GETWEB: FORM A&gt; at the
+beginning of each form.  To fill out the form, forward the message
+containing the form back to the server, filling out any inputs
+surrounded by braces: []
+
+For example, if you send a command to get <A
+HREF="http://www.healthnet.org/programs/promed.html"> the ProMED page</A>,
+part of the document will look like this:
+
+<hr><PRE>
+&lt;GETWEB: FORM A&gt;
+
+Search the entire archive: ProMED-mail
+
+String to search for: [______________________________]
+[ ] Submit: check preceding box and forward to GetWeb
+[ ]Case sensitive     [ ]Partial match
+
+Return only files modified within the last [_____] days.
+Maximum number of files returned:
+
+      [ ] 10
+   OR [X] 50
+   OR [ ] 100
+   OR [ ] 1000
+</PRE><hr>
+
+<p>To search for 'ebola' and 'zaire' within the last 200 days,
+returning the top 10 matching files, you would fill out the form as
+follows:
+
+<hr><PRE>
+&lt;GETWEB: FORM A&gt;
+
+Search the entire archive: ProMED-mail
+
+String to search for: [__________ebola zaire____________________]
+[X ] Submit: check preceding box and forward to GetWeb
+[ ]Case sensitive     [X ]Partial match
+
+Return only files modified within the last [_\200____] days.
+Maximum number of files returned:
+
+      [X ] 10
+   OR [] 50
+   OR [ ] 100
+   OR [ ] 1000
+</PRE><hr>
+
+Note the '\' before the 200.  When filling out a form input, you must
+'escape' the following characters by preceding them with a backslash
+(\):
+
+<ul>
+<li> Number: write 3 as \3, you can write 50 as \50 or \5\0
+<li> Braces: write [ as \[, and ] as \]
+<li> Underscores: write _ as \_
+<li> Backslashes themselves: write a literal \ as \\
+</ul>
+
+<p>Remember to 'X' the box where it says to 'check preceding box', or the
+form will not be processed.
+
+<p>Finally, make sure to fill out at most one box in each radio button
+group or menu.  Radio buttons look like this:
+
+<pre>
+Choose ([X]) Blue or ([ ]) Green, but not both!
+</pre>
+
+Menus look like this:
+
+<pre>
+Choose:
+
+     [X] Red
+  OR [ ] Black
+
+but not both!
+</pre>
+
+Yahoo offers a <A
+HREF=http://www.yahoo.com/text/Business_and_Economy/Companies/Internet_Services/Search_and_Navigation/>short
+list</A> of the best search engines; Excite offers <A
+HREF=http://www.excite.com/Reviews/Computing/World_Wide_Web/Searching_The_Web/Search_Engines/>a more
+comprehensive list</A> of search engines.
+
+<p><A HREF=HELP.html>Back to the main help page</A>
+</BODY>
+</HTML>

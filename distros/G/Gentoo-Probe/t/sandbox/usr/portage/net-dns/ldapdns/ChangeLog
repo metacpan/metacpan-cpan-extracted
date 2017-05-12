@@ -1,0 +1,22 @@
+# ChangeLog for net-dns/ldapdns
+# Copyright 2000-2003 Gentoo Technologies, Inc.; Distributed under the  GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/ldapdns/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+*ldapdns-2.05 (11 Nov 2003)
+
+  11 Nov 2003; <jhhudso@gentoo.org> : Version bump.
+	
+  12 Jun 2003; <msterret@gentoo.org> ldapdns-2.03.ebuild, ldapdns-2.04.ebuild:
+  add Header
+
+*ldapdns-2.04 (01 Jun 2003)
+
+  01 Jun 2003; Carl Perry <edolnx@gentoo.org>, ldapdns-2.04.ebuild :
+  New version that fixes some bugs.  Unmasked as it's working fine on 
+  x86.
+
+*ldapdns-2.03 (17 Mar 2003)
+
+  17 Mar 2003; Carl Perry <edolnx@gentoo.org>, ldapdns-2.03.ebuild :
+  Initial import.  Ebuild submitted by Mark Farver  <mfarver@mindbent.org>.
+

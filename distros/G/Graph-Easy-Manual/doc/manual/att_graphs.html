@@ -1,0 +1,3027 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - Manual - Attributes for graphs</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link rel="Start" href="index.html">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+ <style type="text/css">
+   <!-- 
+    h4 { margin-bottom: 0em; padding-left: 1em; }
+    table.graph50 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph50 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph50 .group,table.graph50 .group_anon {
+  text-align: left;
+  border-style: none;
+  border-width: 1px;
+  background: #a0d0ff;
+  font-size: 0.8em;
+  padding: 0.2em;
+}
+table.graph50 .group_anon {
+  border-style: none;
+}
+table.graph50 .node,table.graph50 .node_anon {
+  text-align: left;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph50 .node_anon {
+  border-style: none;
+}
+table.graph50 td[class|="group"] { padding: 0.2em; }
+table.graph50 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph50 span.l { float: left; }
+table.graph50 span.r { float: right; }
+table.graph50 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph50 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph50 .lh, table.graph50 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph50 .sv, table.graph50 .sh, table.graph50 .shl, table.graph50 .sa, table.graph50 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph50 .sv, table.graph50 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph50 .shl { left: 0.3em; }
+table.graph50 .sv { left: -0.5em; top: -0.4em; }
+table.graph50 .su { left: -0.5em; top: 0.4em; }
+table.graph50 .sa { left: -0.3em; top: 0; }
+table.graph50 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph50 .gi { border: none;}
+table.graph50 .gr { border-right-style: dashed;}
+table.graph50 .gl { border-left-style: dashed;}
+table.graph50 .gt { border-top-style: dashed;}
+table.graph50 .gb { border-bottom-style: dashed;}
+table.graph50 .ga { border-style: dashed;}
+table.graph51 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph51 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph51 .group_anon {
+  border-style: none;
+}
+table.graph51 .node,table.graph51 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph51 .node_anon {
+  border-style: none;
+}
+table.graph51 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph51 span.l { float: left; }
+table.graph51 span.r { float: right; }
+table.graph51 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph51 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph51 .lh, table.graph51 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph51 .sv, table.graph51 .sh, table.graph51 .shl, table.graph51 .sa, table.graph51 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph51 .sv, table.graph51 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph51 .shl { left: 0.3em; }
+table.graph51 .sv { left: -0.5em; top: -0.4em; }
+table.graph51 .su { left: -0.5em; top: 0.4em; }
+table.graph51 .sa { left: -0.3em; top: 0; }
+table.graph51 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph52 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph52 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph52 .group_anon {
+  border-style: none;
+}
+table.graph52 .node,table.graph52 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph52 .node_anon {
+  border-style: none;
+}
+table.graph52 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph52 span.l { float: left; }
+table.graph52 span.r { float: right; }
+table.graph52 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph52 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph52 .lh, table.graph52 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph52 .sv, table.graph52 .sh, table.graph52 .shl, table.graph52 .sa, table.graph52 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph52 .sv, table.graph52 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph52 .shl { left: 0.3em; }
+table.graph52 .sv { left: -0.5em; top: -0.4em; }
+table.graph52 .su { left: -0.5em; top: 0.4em; }
+table.graph52 .sa { left: -0.3em; top: 0; }
+table.graph52 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph52 span.c { position: relative; top: 1.5em; }
+table.graph52 div.c { -moz-border-radius: 100%; border-radius: 100%; }
+table.graph52 div.r { -moz-border-radius: 1em; border-radius: 1em; }
+table.graph53 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph53 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph53 .group_anon {
+  border-style: none;
+}
+table.graph53 .node,table.graph53 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph53 .node_anon {
+  border-style: none;
+}
+table.graph53 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph53 span.l { float: left; }
+table.graph53 span.r { float: right; }
+table.graph53 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph53 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph53 .lh, table.graph53 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph53 .sv, table.graph53 .sh, table.graph53 .shl, table.graph53 .sa, table.graph53 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph53 .sv, table.graph53 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph53 .shl { left: 0.3em; }
+table.graph53 .sv { left: -0.5em; top: -0.4em; }
+table.graph53 .su { left: -0.5em; top: 0.4em; }
+table.graph53 .sa { left: -0.3em; top: 0; }
+table.graph53 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph54 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph54 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph54 .group_anon {
+  border-style: none;
+}
+table.graph54 .node,table.graph54 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: bold;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph54 .node_anon {
+  border-style: none;
+}
+table.graph54 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph54 span.l { float: left; }
+table.graph54 span.r { float: right; }
+table.graph54 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph54 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph54 .lh, table.graph54 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph54 .sv, table.graph54 .sh, table.graph54 .shl, table.graph54 .sa, table.graph54 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph54 .sv, table.graph54 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph54 .shl { left: 0.3em; }
+table.graph54 .sv { left: -0.5em; top: -0.4em; }
+table.graph54 .su { left: -0.5em; top: 0.4em; }
+table.graph54 .sa { left: -0.3em; top: 0; }
+table.graph54 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph55 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph55 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph55 .group_anon {
+  border-style: none;
+}
+table.graph55 .node,table.graph55 .node_anon {
+  text-align: center;
+  border-style: dotted;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph55 .node_anon {
+  border-style: none;
+}
+table.graph55 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph55 span.l { float: left; }
+table.graph55 span.r { float: right; }
+table.graph55 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph55 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph55 .lh, table.graph55 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph55 .sv, table.graph55 .sh, table.graph55 .shl, table.graph55 .sa, table.graph55 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph55 .sv, table.graph55 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph55 .shl { left: 0.3em; }
+table.graph55 .sv { left: -0.5em; top: -0.4em; }
+table.graph55 .su { left: -0.5em; top: 0.4em; }
+table.graph55 .sa { left: -0.3em; top: 0; }
+table.graph55 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph56 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph56 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph56 .group_anon {
+  border-style: none;
+}
+table.graph56 .node,table.graph56 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph56 .node_anon {
+  border-style: none;
+}
+table.graph56 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph56 span.l { float: left; }
+table.graph56 span.r { float: right; }
+table.graph56 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph56 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph56 .lh, table.graph56 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph56 .sv, table.graph56 .sh, table.graph56 .shl, table.graph56 .sa, table.graph56 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph56 .sv, table.graph56 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph56 .shl { left: 0.3em; }
+table.graph56 .sv { left: -0.5em; top: -0.4em; }
+table.graph56 .su { left: -0.5em; top: 0.4em; }
+table.graph56 .sa { left: -0.3em; top: 0; }
+table.graph56 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph57 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph57 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph57 .group_anon {
+  border-style: none;
+}
+table.graph57 .node,table.graph57 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph57 .node_anon {
+  border-style: none;
+}
+table.graph57 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph57 span.l { float: left; }
+table.graph57 span.r { float: right; }
+table.graph57 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph57 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph57 .lh, table.graph57 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph57 .sv, table.graph57 .sh, table.graph57 .shl, table.graph57 .sa, table.graph57 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph57 .sv, table.graph57 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph57 .shl { left: 0.3em; }
+table.graph57 .sv { left: -0.5em; top: -0.4em; }
+table.graph57 .su { left: -0.5em; top: 0.4em; }
+table.graph57 .sa { left: -0.3em; top: 0; }
+table.graph57 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph58 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph58 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph58 .group_anon {
+  border-style: none;
+}
+table.graph58 .node,table.graph58 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph58 .node_anon {
+  border-style: none;
+}
+table.graph58 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph58 span.l { float: left; }
+table.graph58 span.r { float: right; }
+table.graph58 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph58 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph58 .lh, table.graph58 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph58 .sv, table.graph58 .sh, table.graph58 .shl, table.graph58 .sa, table.graph58 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph58 .sv, table.graph58 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph58 .shl { left: 0.3em; }
+table.graph58 .sv { left: -0.5em; top: -0.4em; }
+table.graph58 .su { left: -0.5em; top: 0.4em; }
+table.graph58 .sa { left: -0.3em; top: 0; }
+table.graph58 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph59 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph59 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph59 .group_anon {
+  border-style: none;
+}
+table.graph59 .node,table.graph59 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph59 .node_anon {
+  border-style: none;
+}
+table.graph59 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph59 span.l { float: left; }
+table.graph59 span.r { float: right; }
+table.graph59 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph59 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph59 .lh, table.graph59 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph59 .sv, table.graph59 .sh, table.graph59 .shl, table.graph59 .sa, table.graph59 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph59 .sv, table.graph59 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph59 .shl { left: 0.3em; }
+table.graph59 .sv { left: -0.5em; top: -0.4em; }
+table.graph59 .su { left: -0.5em; top: 0.4em; }
+table.graph59 .sa { left: -0.3em; top: 0; }
+table.graph59 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph59 span.c { position: relative; top: 1.5em; }
+table.graph59 div.c { -moz-border-radius: 100%; border-radius: 100%; }
+table.graph59 div.r { -moz-border-radius: 1em; border-radius: 1em; }
+table.graph60 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph60 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph60 .group_anon {
+  border-style: none;
+}
+table.graph60 .node,table.graph60 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph60 .node_anon {
+  border-style: none;
+}
+table.graph60 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph60 span.l { float: left; }
+table.graph60 span.r { float: right; }
+table.graph60 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph60 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph60 .lh, table.graph60 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph60 .sv, table.graph60 .sh, table.graph60 .shl, table.graph60 .sa, table.graph60 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph60 .sv, table.graph60 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph60 .shl { left: 0.3em; }
+table.graph60 .sv { left: -0.5em; top: -0.4em; }
+table.graph60 .su { left: -0.5em; top: 0.4em; }
+table.graph60 .sa { left: -0.3em; top: 0; }
+table.graph60 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph61 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph61 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph61 .group,table.graph61 .group_anon {
+  text-align: left;
+  border-style: none;
+  border-width: 1px;
+  background: #a0d0ff;
+  font-size: 0.8em;
+  padding: 0.2em;
+}
+table.graph61 .group_anon {
+  border-style: none;
+}
+table.graph61 .node,table.graph61 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph61 .node_anon {
+  border-style: none;
+}
+table.graph61 td[class|="group"] { padding: 0.2em; }
+table.graph61 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph61 span.l { float: left; }
+table.graph61 span.r { float: right; }
+table.graph61 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph61 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph61 .lh, table.graph61 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph61 .sv, table.graph61 .sh, table.graph61 .shl, table.graph61 .sa, table.graph61 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph61 .sv, table.graph61 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph61 .shl { left: 0.3em; }
+table.graph61 .sv { left: -0.5em; top: -0.4em; }
+table.graph61 .su { left: -0.5em; top: 0.4em; }
+table.graph61 .sa { left: -0.3em; top: 0; }
+table.graph61 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph61 .gi { border: none;}
+table.graph61 .gr { border-right-style: dashed;}
+table.graph61 .gl { border-left-style: dashed;}
+table.graph61 .gt { border-top-style: dashed;}
+table.graph61 .gb { border-bottom-style: dashed;}
+table.graph61 .ga { border-style: dashed;}
+table.graph62 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph62 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph62 .group,table.graph62 .group_anon {
+  text-align: left;
+  border-style: none;
+  border-width: 1px;
+  background: #a0d0ff;
+  font-size: 0.8em;
+  padding: 0.2em;
+}
+table.graph62 .group_anon {
+  border-style: none;
+}
+table.graph62 .node,table.graph62 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph62 .node_anon {
+  border-style: none;
+}
+table.graph62 td[class|="group"] { padding: 0.2em; }
+table.graph62 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph62 span.l { float: left; }
+table.graph62 span.r { float: right; }
+table.graph62 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph62 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph62 .lh, table.graph62 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph62 .sv, table.graph62 .sh, table.graph62 .shl, table.graph62 .sa, table.graph62 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph62 .sv, table.graph62 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph62 .shl { left: 0.3em; }
+table.graph62 .sv { left: -0.5em; top: -0.4em; }
+table.graph62 .su { left: -0.5em; top: 0.4em; }
+table.graph62 .sa { left: -0.3em; top: 0; }
+table.graph62 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph62 .gi { border: none;}
+table.graph62 .gr { border-right-style: dashed;}
+table.graph62 .gl { border-left-style: dashed;}
+table.graph62 .gt { border-top-style: dashed;}
+table.graph62 .gb { border-bottom-style: dashed;}
+table.graph62 .ga { border-style: dashed;}
+table.graph63 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph63 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph63 .group_anon {
+  border-style: none;
+}
+table.graph63 .node,table.graph63 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph63 .node_anon {
+  border-style: none;
+}
+table.graph63 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph63 span.l { float: left; }
+table.graph63 span.r { float: right; }
+table.graph63 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph63 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph63 .lh, table.graph63 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph63 .sv, table.graph63 .sh, table.graph63 .shl, table.graph63 .sa, table.graph63 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph63 .sv, table.graph63 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph63 .shl { left: 0.3em; }
+table.graph63 .sv { left: -0.5em; top: -0.4em; }
+table.graph63 .su { left: -0.5em; top: 0.4em; }
+table.graph63 .sa { left: -0.3em; top: 0; }
+table.graph63 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph64 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph64 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph64 .group_anon {
+  border-style: none;
+}
+table.graph64 .node,table.graph64 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph64 .node_anon {
+  border-style: none;
+}
+table.graph64 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph64 span.l { float: left; }
+table.graph64 span.r { float: right; }
+table.graph64 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph64 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph64 .lh, table.graph64 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph64 .sv, table.graph64 .sh, table.graph64 .shl, table.graph64 .sa, table.graph64 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph64 .sv, table.graph64 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph64 .shl { left: 0.3em; }
+table.graph64 .sv { left: -0.5em; top: -0.4em; }
+table.graph64 .su { left: -0.5em; top: 0.4em; }
+table.graph64 .sa { left: -0.3em; top: 0; }
+table.graph64 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph65 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph65 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph65 .group_anon {
+  border-style: none;
+}
+table.graph65 .node,table.graph65 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph65 .node_anon {
+  border-style: none;
+}
+table.graph65 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph65 span.l { float: left; }
+table.graph65 span.r { float: right; }
+table.graph65 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph65 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph65 .lh, table.graph65 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph65 .sv, table.graph65 .sh, table.graph65 .shl, table.graph65 .sa, table.graph65 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph65 .sv, table.graph65 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph65 .shl { left: 0.3em; }
+table.graph65 .sv { left: -0.5em; top: -0.4em; }
+table.graph65 .su { left: -0.5em; top: 0.4em; }
+table.graph65 .sa { left: -0.3em; top: 0; }
+table.graph65 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph66 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph66 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph66 .group_anon {
+  border-style: none;
+}
+table.graph66 .node,table.graph66 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  font-size: 1.1em;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph66 .node_anon {
+  border-style: none;
+}
+table.graph66 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph66 span.l { float: left; }
+table.graph66 span.r { float: right; }
+table.graph66 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph66 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph66 .lh, table.graph66 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph66 .sv, table.graph66 .sh, table.graph66 .shl, table.graph66 .sa, table.graph66 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph66 .sv, table.graph66 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph66 .shl { left: 0.3em; }
+table.graph66 .sv { left: -0.5em; top: -0.4em; }
+table.graph66 .su { left: -0.5em; top: 0.4em; }
+table.graph66 .sa { left: -0.3em; top: 0; }
+table.graph66 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph68 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph68 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph68 .group_anon {
+  border-style: none;
+}
+table.graph68 .node,table.graph68 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph68 .node_anon {
+  border-style: none;
+}
+table.graph68 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph68 span.l { float: left; }
+table.graph68 span.r { float: right; }
+table.graph68 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph68 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph68 .lh, table.graph68 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph68 .sv, table.graph68 .sh, table.graph68 .shl, table.graph68 .sa, table.graph68 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph68 .sv, table.graph68 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph68 .shl { left: 0.3em; }
+table.graph68 .sv { left: -0.5em; top: -0.4em; }
+table.graph68 .su { left: -0.5em; top: 0.4em; }
+table.graph68 .sa { left: -0.3em; top: 0; }
+table.graph68 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph69 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph69 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph69 .group_anon {
+  border-style: none;
+}
+table.graph69 .node,table.graph69 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffd080;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph69 .node_anon {
+  border-style: none;
+}
+table.graph69 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph69 span.l { float: left; }
+table.graph69 span.r { float: right; }
+table.graph69 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph69 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph69 .lh, table.graph69 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph69 .sv, table.graph69 .sh, table.graph69 .shl, table.graph69 .sa, table.graph69 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph69 .sv, table.graph69 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph69 .shl { left: 0.3em; }
+table.graph69 .sv { left: -0.5em; top: -0.4em; }
+table.graph69 .su { left: -0.5em; top: 0.4em; }
+table.graph69 .sa { left: -0.3em; top: 0; }
+table.graph69 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph70 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph70 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph70 .group,table.graph70 .group_anon {
+  text-align: left;
+  border-style: none;
+  border-width: 1px;
+  background: #a0d0ff;
+  font-size: 0.8em;
+  padding: 0.2em;
+}
+table.graph70 .group_anon {
+  border-style: none;
+}
+table.graph70 .node,table.graph70 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  white-space: normal;
+}
+table.graph70 .node_anon {
+  border-style: none;
+}
+table.graph70 td[class|="group"] { padding: 0.2em; }
+table.graph70 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph70 span.l { float: left; }
+table.graph70 span.r { float: right; }
+table.graph70 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph70 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph70 .lh, table.graph70 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph70 .sv, table.graph70 .sh, table.graph70 .shl, table.graph70 .sa, table.graph70 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph70 .sv, table.graph70 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph70 .shl { left: 0.3em; }
+table.graph70 .sv { left: -0.5em; top: -0.4em; }
+table.graph70 .su { left: -0.5em; top: 0.4em; }
+table.graph70 .sa { left: -0.3em; top: 0; }
+table.graph70 .eb { max-height: 0; line-height: 0; height: 0; }
+table.graph70 .gi { border: none;}
+table.graph70 .gr { border-right-style: dashed;}
+table.graph70 .gl { border-left-style: dashed;}
+table.graph70 .gt { border-top-style: dashed;}
+table.graph70 .gb { border-bottom-style: dashed;}
+table.graph70 .ga { border-style: dashed;}
+table.graph71 .edge {
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  vertical-align: bottom;
+}
+table.graph71 {
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+  type: undirected;
+}
+table.graph71 .group_anon {
+  border-style: none;
+}
+table.graph71 .node,table.graph71 .node_anon {
+  text-align: center;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1px;
+  background: #ffffff;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph71 .node_anon {
+  border-style: none;
+}
+table.graph71 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph71 span.l { float: left; }
+table.graph71 span.r { float: right; }
+table.graph71 .va {
+  vertical-align: middle;
+  line-height: 1em;
+  width: 0.4em;
+  }
+table.graph71 .el {
+  width: 0.1em;
+  max-width: 0.1em;
+  min-width: 0.1em;
+  }
+table.graph71 .lh, table.graph71 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph71 .sv, table.graph71 .sh, table.graph71 .shl, table.graph71 .sa, table.graph71 .su {
+  max-height: 1em;
+  line-height: 1em;
+  position: relative;
+  top: 0.55em;
+  left: -0.3em;
+  overflow: visible;
+  }
+table.graph71 .sv, table.graph71 .su {
+  max-height: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph71 .shl { left: 0.3em; }
+table.graph71 .sv { left: -0.5em; top: -0.4em; }
+table.graph71 .su { left: -0.5em; top: 0.4em; }
+table.graph71 .sa { left: -0.3em; top: 0; }
+table.graph71 .eb { max-height: 0; line-height: 0; height: 0; }
+
+   -->
+ </style>
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+
+  <a class="menubck" href="index.html" title="Back to the manual index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+  <a class="menuext" href="overview.html" title="How everything fits together">Overview</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+  <a class="menuext" href="hinting.html" title="Generating specific layouts">Hinting</a>
+  <a class="menuext" href="output.html" title="Output formats and their limitations">Output</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+    <a class="menucur" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+    <a class="menucin" href="#Graphs" title="Graph attributes">Graphs</a>
+    <a class="menuind" href="att_nodes.html" title="Node attributes">Nodes</a>
+    <a class="menuind" href="att_edges.html" title="Edge attributes">Edges</a>
+    <a class="menuind" href="att_groups.html" title="Group attributes">Groups</a>
+
+    <a class="menuind" href="attributes.html#class_names" title="Classes and their names">Classes</a>
+    <a class="menuind" href="attributes.html#labels__titles__names_and_links" title="Labels, titles, names and links">Labels</a>
+    <a class="menuind" href="attributes.html#links" title="Links and URLs">Links</a>
+    <a class="menuind" href="attributes.html#color_names_and_values" title="Color names and values">Colors</a>
+  <a class="menuext" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+  <a class="menuext" href="tutorial.html" title="Tutorial for often used graph types and designs">Tutorial</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h1>
+
+<h2>Attributes</h2>
+
+<div class="text">
+
+<p>
+If you haven't done so, please read the <a href="overview.html">Overview</a> first.
+</p>
+
+<p>
+This chapter describes all the possible attributes for graphs.
+<br>
+This page was generated automatically from the definitions in <code>Graph::Easy::Attributes</code>.
+</p>
+
+<a name="Graphs">
+<h3>Graphs</h3>
+</a>
+
+<ul>
+  <li><a href='att_graphs.html#graph_align' title="The alignment of the label text.">align</a>, <a href='att_graphs.html#graph_autolabel' title="Will restrict the label text to N characters.">autolabel</a>, <a href='att_graphs.html#graph_autolink' title="If set to something else than 'none', will use the appropriate attribute to automatically generate the link, unless link is already set.">autolink</a>, <a href='att_graphs.html#graph_autotitle' title="If set to something else than 'none', will use the appropriate attribute to automatically generate the title, unless title is already set.">autotitle</a>, 
+  <li><a href='att_graphs.html#graph_background' title="The background color, e.g.">background</a>, <a href='att_graphs.html#graph_border' title="The border.">border</a>, <a href='att_graphs.html#graph_bordercolor' title="The color of the border.">bordercolor</a>, <a href='att_graphs.html#graph_borderstyle' title="The style of the border.">borderstyle</a>, <a href='att_graphs.html#graph_borderwidth' title="The width of the border.">borderwidth</a>, 
+  <li><a href='att_graphs.html#graph_class' title="The subclass of the object.">class</a>, <a href='att_graphs.html#graph_color' title="The foreground/text/label color.">color</a>, <a href='att_graphs.html#graph_colorscheme' title="The colorscheme to use for all color values.">colorscheme</a>, <a href='att_graphs.html#graph_comment' title="A free-form text field containing a comment on this object.">comment</a>, 
+  <li><a href='att_graphs.html#graph_fill' title="The fill color, e.g.">fill</a>, <a href='att_graphs.html#graph_flow' title="The general direction in which edges will leave nodes first.">flow</a>, <a href='att_graphs.html#graph_font' title="A prioritized list of lower-case, unquoted values, separated by a comma.">font</a>, <a href='att_graphs.html#graph_fontsize' title="The size of the label text, best expressed in em (1.0em, 0.5em etc) or percent (100%, 50% etc)">fontsize</a>, <a href='att_graphs.html#graph_format' title="The formatting language of the label.">format</a>, 
+  <li><a href='att_graphs.html#graph_gid' title="A unique ID for the graph.">gid</a>, 
+  <li><a href='att_graphs.html#graph_id' title="A unique identifier for this object, consisting only of letters, digits, or underscores.">id</a>, 
+  <li><a href='att_graphs.html#graph_label' title="The text displayed as label.">label</a>, <a href='att_graphs.html#graph_labelpos' title="The position of the graph label.">labelpos</a>, <a href='att_graphs.html#graph_link' title="The link part, appended onto linkbase.">link</a>, <a href='att_graphs.html#graph_linkbase' title="The base URL prepended to all generated links.">linkbase</a>, 
+  <li><a href='att_graphs.html#graph_output' title="The desired output format.">output</a>, 
+  <li><a href='att_graphs.html#graph_root' title="The name of the root node, given as hint to the layouter to start the layout there.">root</a>, 
+  <li><a href='att_graphs.html#graph_textstyle' title="The style of the label text.">textstyle</a>, <a href='att_graphs.html#graph_textwrap' title="The default none makes the label text appear exactly as it was written, with <a href='syntax.html'>manual line breaks</a> applied.">textwrap</a>, <a href='att_graphs.html#graph_title' title="The text displayed as mouse-over for nodes/edges, or as the title for the graph.">title</a>, <a href='att_graphs.html#graph_type' title="The type of the graph, either undirected or directed.">type</a>, 
+</ul>
+<a name="graph_align">
+<h4>align</h4></a>
+
+<div class="entry">
+
+<p>
+The alignment of the label text.
+One of: <code>center</code>, <code>left</code>, <code>right</code>.
+<br>
+<b>Defaults to:</b> <ul>
+  <li><code>left</code> for edge</li>
+  <li><code>left</code> for group</li>
+  <li><code>center</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { align: left; label: My Graph; }
+node {align: left;}
+ ( Nodes:
+ [ Right\nAligned ] { align: right; } -- label\n text --&gt;
+ { align: left; }
+ [ Left\naligned ] )
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph50" cellpadding=0 cellspacing=0>
+<tr>
+  <td colspan=28 style="text-align: left">My Graph</td>
+</tr>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gt gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>Nodes:</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt gr'>&nbsp;</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr></tr>
+
+<!-- row 0 line 3 -->
+<tr></tr>
+
+<!-- row 1 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='node' style="text-align: right">Right<br>Aligned</td>
+ <td colspan=4 rowspan=4 class='group'>&nbsp;</td>
+<td rowspan=4 class="group edge el" style=" background: #a0d0ff;"></td>
+ <td colspan=2 rowspan=2 class="group edge lh" style=" background: #a0d0ff;border-bottom: solid 2px #000000; background: #a0d0ff;">label<br>text</td>
+ <td rowspan=2 class="group edge eb" style=" color: #000000; background: #a0d0ff;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='group'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='node'>Left<br>aligned</td>
+ <td colspan=4 rowspan=4 class='group gr'>&nbsp;</td>
+</tr>
+
+<!-- row 1 line 1 -->
+<tr></tr>
+
+<!-- row 1 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="group edge eb" style=" background: #a0d0ff;">&nbsp;</td>
+ <td rowspan=2 class="group edge eb" style=" background: #a0d0ff;"></td>
+</tr>
+
+<!-- row 1 line 3 -->
+<tr></tr>
+
+<!-- row 2 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gb gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gr gb'>&nbsp;</td>
+</tr>
+
+<!-- row 2 line 1 -->
+<tr></tr>
+
+<!-- row 2 line 2 -->
+<tr></tr>
+
+<!-- row 2 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_autolabel">
+<h4>autolabel</h4></a>
+
+<div class="entry">
+
+<p>
+Will restrict the <a href="#graph_label">label</a> text to N characters. N must be greater than 10. See the section about <a href="attributes.html#labels__titles__names_and_links">labels, titles, names and links</a> for reference.<br>
+<b>Defaults to:</b> <ul>
+  <li><code></code> for graph</li>
+  <li><code>inherit</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { autolabel: 20; autotitle: name; }
+
+[ Bonn ]
+ -- Acme Travels Incorporated --&gt;
+  [ Frankfurt (Main) / Flughafen ]
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph51" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node' title='Bonn'>Bonn</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;" title="Acme Travels Incorporated">Acme Tr ... porated</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' title='Frankfurt (Main) / Flughafen'>Frankfu ... ughafen</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_autolink">
+<h4>autolink</h4></a>
+
+<div class="entry">
+
+<p>
+If set to something else than 'none', will use the appropriate attribute to automatically generate the <a href="#graph_link">link</a>, unless <a href="#graph_link">link</a> is already set. See the section about <a href="attributes.html#labels__titles__names_and_links">labels, titles, names and links</a> for reference.
+One of: <code>label</code>, <code>title</code>, <code>name</code>, <code>none</code>, <code>inherit</code>.
+<br>
+<b>Defaults to:</b> <ul>
+  <li><code>none</code> for graph</li>
+  <li><code>inherit</code> for anything else</li>
+</ul>
+<br>
+<b>Example value:</b> <code>title</code></p>
+
+</div>
+
+<a name="graph_autotitle">
+<h4>autotitle</h4></a>
+
+<div class="entry">
+
+<p>
+If set to something else than 'none', will use the appropriate attribute to automatically generate the <a href="#graph_title">title</a>, unless <a href="#graph_title">title</a> is already set. See the section about <a href="attributes.html#labels__titles__names_and_links">labels, titles, names and links</a> for reference.
+One of: <code>label</code>, <code>name</code>, <code>none</code>, <code>link</code>, <code>inherit</code>.
+<br>
+<b>Defaults to:</b> <ul>
+  <li><code>none</code> for graph</li>
+  <li><code>inherit</code> for anything else</li>
+</ul>
+<br>
+<b>Example value:</b> <code>label</code></p>
+
+</div>
+
+<a name="graph_background">
+<h4>background</h4></a>
+
+<div class="entry">
+
+<p>
+The background color, e.g. the color <b>outside</b> the shape. Do not confuse with <a href="#graph_fill">fill</a>. If set to inherit, the object will inherit the <a href="#graph_fill">fill</a> color (<b>not</b> the background color!) of the parent e.g. the enclosing group or graph. See the section about <a href="attributes.html#color_names_and_values">color names and values</a> for reference.<br>
+<b>Defaults to:</b> <code>inherit</code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">[ Crimson ] { shape: circle; background: crimson; }
+ -- Aqua Marine --&gt; { background: #7fffd4; }
+ [ Misty Rose ]
+  { background: white; fill: rgb(255,228,221); shape: ellipse; }
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph52" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node' style="border: none;background: #dc143c"><div class='c' style='background:#ffffff;border:solid 1px #000000;width: 9em; height: 9em'><span class='c' style="top: 4em">Crimson</span></div></td>
+<td rowspan=4 class="edge el" style=" background: #7fffd4;"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style=" background: #7fffd4;border-bottom: solid 2px #000000; background: #7fffd4;">Aqua Marine</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000; background: #7fffd4;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: none;background: #ffffff"><div class='c' style='background:#ffe4dd;border:solid 1px #000000;width: 12em; height: 3em'><span class='c' style="top: 1em">Misty Rose</span></div></td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb" style=" background: #7fffd4;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" background: #7fffd4;"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_border">
+<h4>border</h4></a>
+
+<div class="entry">
+
+<p>
+The border. Can be any combination of <a href="#graph_borderstyle">borderstyle</a>, <a href="#graph_bordercolor">bordercolor</a> and <a href="#graph_borderwidth">borderwidth</a>.<br>
+<b>Defaults to:</b> <ul>
+  <li><code>dashed 1px #000000</code> for group</li>
+  <li><code>none</code> for group.anon</li>
+  <li><code>solid 1px #000000</code> for node</li>
+  <li><code>none</code> for node.anon</li>
+  <li><code>none</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">[ Normal ]
+ --&gt; [ Bold ]      { border: bold; }
+ --&gt; [ Broad ]     { border: broad; }
+ --&gt; [ Wide ]      { border: wide; }
+ --&gt; [ Bold-Dash ] { border: bold-dash; }
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph53" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>Normal</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: solid 4px #000000">Bold</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: solid 0.5em #000000">Broad</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: solid 1em #000000">Wide</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: dashed 4px #000000">Bold-Dash</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_bordercolor">
+<h4>bordercolor</h4></a>
+
+<div class="entry">
+
+<p>
+The color of the <a href="#graph_border">border</a>. See the section about <a href="attributes.html#color_names_and_values">color names and values</a> for reference.<br>
+<b>Defaults to:</b> <ul>
+  <li><code>#000000</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">node { border: black bold; }
+[ Black ]
+ --&gt; [ Red ]      { bordercolor: red; }
+ --&gt; [ Green ]    { bordercolor: green; }
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph54" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node' style="border: solid 4px #000000">Black</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: solid 4px #ff0000">Red</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: solid 4px #008000">Green</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_borderstyle">
+<h4>borderstyle</h4></a>
+
+<div class="entry">
+
+<p>
+The style of the <a href="#graph_border">border</a>. The special styles "bold", "broad", "wide", "double-dash" and "bold-dash" will set and override the <a href="#graph_borderwidth">borderwidth</a>.
+One of: <code>none</code>, <code>solid</code>, <code>dotted</code>, <code>dashed</code>, <code>dot-dash</code>, <code>dot-dot-dash</code>, <code>double</code>, <code>wave</code>, <code>bold</code>, <code>bold-dash</code>, <code>broad</code>, <code>double-dash</code>, <code>wide</code>.
+<br>
+<b>Defaults to:</b> <ul>
+  <li><code>dashed</code> for group</li>
+  <li><code>none</code> for group.anon</li>
+  <li><code>solid</code> for node</li>
+  <li><code>none</code> for node.anon</li>
+  <li><code>none</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">node { border: dotted; }
+[ Dotted ]
+ --&gt; [ Dashed ]      { borderstyle: dashed; }
+ --&gt; [ broad ]    { borderstyle: broad; }
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph55" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node' style="border: dotted 1px #000000">Dotted</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: dashed 1px #000000">Dashed</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="border: solid 0.5em #000000">broad</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_borderwidth">
+<h4>borderwidth</h4></a>
+
+<div class="entry">
+
+<p>
+The width of the <a href="#graph_border">border</a>. Certain <a href="#graph_border">border</a>-styles will override the width.<br>
+<b>Defaults to:</b> <code>1</code><br>
+<b>Example value:</b> <code>2px</code></p>
+
+</div>
+
+<a name="graph_class">
+<h4>class</h4></a>
+
+<div class="entry">
+
+<p>
+The subclass of the object. See the section about <a href="attributes.html#class_names">class names</a> for reference.<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example value:</b> <code>mynodeclass</code></p>
+
+</div>
+
+<a name="graph_color">
+<h4>color</h4></a>
+
+<div class="entry">
+
+<p>
+The foreground/text/label color. See the section about <a href="attributes.html#color_names_and_values">color names and values</a> for reference.<br>
+<b>Defaults to:</b> <code>black</code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">[ Lime ] { color: limegreen; }
+ -- label --&gt; { color: blue; labelcolor: red; }
+ [ Dark Orange ] { color: rgb(255,50%,0.01); }
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph56" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node' style="color: #32cd32">Lime</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #0000ff;color: #ff0000;">label</td>
+ <td rowspan=2 class="edge eb" style=" color: #0000ff;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>Dark Orange</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_colorscheme">
+<h4>colorscheme</h4></a>
+
+<div class="entry">
+
+<p>
+The colorscheme to use for all color values. See the section about <a href="attributes.html#color_names_and_values">color names and values</a> for reference and a list of possible values.<br>
+<b>Defaults to:</b> <ul>
+  <li><code>w3c</code> for graph</li>
+  <li><code>inherit</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { colorscheme: accent8; } [ 1 ] { fill: 1; }
+ -&gt; 
+ [ 3 ] { fill: 3; }
+ -&gt; 
+ [ 4 ] { fill: 4; }
+ -&gt; 
+ [ 5 ] { fill: 5; }
+ -&gt; 
+ [ 6 ] { fill: 6; }
+ -&gt; 
+ [ 7 ] { fill: 7; }
+ -&gt; 
+ [ 8 ] { fill: 8; }
+
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph57" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node' style="background: #7fc97f">1</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #fdc086">3</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #ffff99">4</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #386cb0">5</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #f0027f">6</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #bf5b17">7</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #666666">8</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_comment">
+<h4>comment</h4></a>
+
+<div class="entry">
+
+<p>
+A free-form text field containing a comment on this object. This will be embedded into output formats if possible, e.g. in HTML, SVG and Graphviz, but not ASCII or Boxart.<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { comment: German capitals; }
+ [ Bonn ] --&gt; [ Berlin ]
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+<!-- German capitals -->
+
+<table class="graph58" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>Bonn</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>Berlin</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_fill">
+<h4>fill</h4></a>
+
+<div class="entry">
+
+<p>
+The fill color, e.g. the color inside the shape. For the graph, this is the background color for the label. For edges, defines the color inside the arrow shape. See also <a href="#graph_background">background</a>. See the section about <a href="attributes.html#color_names_and_values">color names and values</a> for reference.<br>
+<b>Defaults to:</b> <ul>
+  <li><code>inherit</code> for edge</li>
+  <li><code>inherit</code> for graph</li>
+  <li><code>#a0d0ff</code> for group</li>
+  <li><code>white</code> for group.anon</li>
+  <li><code>inherit</code> for node.anon</li>
+  <li><code>white</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">[ Crimson ]
+  {
+  shape: circle;
+  background: yellow;
+  fill: red;
+  border: 3px solid blue;
+  }
+-- Aqua Marine --&gt;
+  {
+  arrowstyle: filled;
+  fill: red;
+  }
+[ Two ]
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph59" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node' style="border: none;background: #ffff00"><div class='c' style='background:#ff0000;border:solid 3px #0000ff;width: 9em; height: 9em'><span class='c' style="top: 4em">Crimson</span></div></td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">Aqua Marine</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">▶</span></td>
+ <td colspan=4 rowspan=4 class='node'>Two</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_flow">
+<h4>flow</h4></a>
+
+<div class="entry">
+
+<p>
+The general direction in which edges will leave nodes first. On edges, influeces where the target node is place. Please see the section about <a href='hinting.html#flow'>flow control</a> for reference.<br>
+<b>Defaults to:</b> <ul>
+  <li><code>east</code> for graph</li>
+  <li><code>inherit</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { flow: up; }
+ [ Enschede ] { flow: left; } -&gt; [ Bielefeld ] -&gt; [ Wolfsburg ]
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph60" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>Enschede</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr></tr>
+
+<!-- row 0 line 3 -->
+<tr></tr>
+
+<!-- row 1 line 0 -->
+<tr>
+<td colspan=4 class="edge eb"></td>
+</tr>
+
+<!-- row 1 line 1 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge el">&nbsp;</td>
+ <td colspan=2 rowspan=2 class="edge lv" style="border-left: solid 2px #000000;">&nbsp;</td>
+</tr>
+
+<!-- row 1 line 2 -->
+<tr></tr>
+
+<!-- row 1 line 3 -->
+<tr>
+ <td colspan=2 class="edge eb" style=" color: #000000;">&nbsp;</td>
+ <td colspan=2 class="edge eb" style=" color: #000000;"><span class="sv">∨</span></td>
+</tr>
+
+<!-- row 2 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>Bielefeld</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>Wolfsburg</td>
+</tr>
+
+<!-- row 2 line 1 -->
+<tr></tr>
+
+<!-- row 2 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 2 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_font">
+<h4>font</h4></a>
+
+<div class="entry">
+
+<p>
+A prioritized list of lower-case, unquoted values, separated by a comma. Values are either font family names (like "times", "arial" etc) or generic family names (like "serif", "cursive", "monospace"), the first recognized value will be used. Always offer a generic name as the last possibility.<br>
+<b>Defaults to:</b> <ul>
+  <li><code>sans-serif</code> for edge</li>
+  <li><code>serif</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { font: vinque, georgia, utopia, serif; label: Sample; }
+
+ ( Nodes:
+ [ Webdings ] { font: Dingbats, webdings; }
+ -- FlatLine --&gt;
+ { font: flatline; }
+  [ Normal ] )
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph61" cellpadding=0 cellspacing=0>
+<tr>
+  <td colspan=28 style="font-family: vinque, georgia, utopia, serif; text-align: center">Sample</td>
+</tr>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gt gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>Nodes:</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt gr'>&nbsp;</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr></tr>
+
+<!-- row 0 line 3 -->
+<tr></tr>
+
+<!-- row 1 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='node' style="font-family: Dingbats, webdings">Webdings</td>
+ <td colspan=4 rowspan=4 class='group'>&nbsp;</td>
+<td rowspan=4 class="group edge el" style=" background: #a0d0ff;"></td>
+ <td colspan=2 rowspan=2 class="group edge lh" style=" background: #a0d0ff;border-bottom: solid 2px #000000;font-family: flatline; background: #a0d0ff;">FlatLine</td>
+ <td rowspan=2 class="group edge eb" style=" color: #000000; background: #a0d0ff;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='group'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='node'>Normal</td>
+ <td colspan=4 rowspan=4 class='group gr'>&nbsp;</td>
+</tr>
+
+<!-- row 1 line 1 -->
+<tr></tr>
+
+<!-- row 1 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="group edge eb" style=" background: #a0d0ff;">&nbsp;</td>
+ <td rowspan=2 class="group edge eb" style=" background: #a0d0ff;"></td>
+</tr>
+
+<!-- row 1 line 3 -->
+<tr></tr>
+
+<!-- row 2 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gb gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gr gb'>&nbsp;</td>
+</tr>
+
+<!-- row 2 line 1 -->
+<tr></tr>
+
+<!-- row 2 line 2 -->
+<tr></tr>
+
+<!-- row 2 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_fontsize">
+<h4>fontsize</h4></a>
+
+<div class="entry">
+
+<p>
+The size of the label text, best expressed in <i>em</i> (1.0em, 0.5em etc) or percent (100%, 50% etc)<br>
+<b>Defaults to:</b> <ul>
+  <li><code>1em</code> for graph</li>
+  <li><code>1em</code> for node</li>
+  <li><code>0.8em</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { fontsize: 200%; label: Sample; }
+
+ ( Nodes:
+ [ Big ] { fontsize: 1.5em; color: white; fill: darkred; }
+  -- Small --&gt;
+ { fontsize: 0.2em; }
+  [ Normal ] )
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph62" cellpadding=0 cellspacing=0>
+<tr>
+  <td colspan=28 style="font-size: 200%; text-align: center">Sample</td>
+</tr>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gt gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>Nodes:</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt gr'>&nbsp;</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr></tr>
+
+<!-- row 0 line 3 -->
+<tr></tr>
+
+<!-- row 1 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='node' style="background: #8b0000; color: #ffffff; font-size: 1.5em">Big</td>
+ <td colspan=4 rowspan=4 class='group'>&nbsp;</td>
+<td rowspan=4 class="group edge el" style=" background: #a0d0ff;"></td>
+ <td colspan=2 rowspan=2 class="group edge lh" style=" background: #a0d0ff;border-bottom: solid 2px #000000;font-size: 0.2em; background: #a0d0ff;">Small</td>
+ <td rowspan=2 class="group edge eb" style=" color: #000000; background: #a0d0ff;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='group'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='node'>Normal</td>
+ <td colspan=4 rowspan=4 class='group gr'>&nbsp;</td>
+</tr>
+
+<!-- row 1 line 1 -->
+<tr></tr>
+
+<!-- row 1 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="group edge eb" style=" background: #a0d0ff;">&nbsp;</td>
+ <td rowspan=2 class="group edge eb" style=" background: #a0d0ff;"></td>
+</tr>
+
+<!-- row 1 line 3 -->
+<tr></tr>
+
+<!-- row 2 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gb gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gr gb'>&nbsp;</td>
+</tr>
+
+<!-- row 2 line 1 -->
+<tr></tr>
+
+<!-- row 2 line 2 -->
+<tr></tr>
+
+<!-- row 2 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_format">
+<h4>format</h4></a>
+
+<div class="entry">
+
+<p>
+The formatting language of the label. The default, <code>none</code> means nothing special will be done. When set to <code>pod</code>, formatting codes like <code>B&lt;bold&gt;</code> will change the formatting of the label. See the section about <a href="attributes.html#label_text_formatting">label text formatting</a> for reference.
+One of: <code>none</code>, <code>pod</code>.
+<br>
+<b>Defaults to:</b> <code>none</code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph {
+  format: pod;
+  label: I am B&lt;bold&gt; and I&lt;italic&gt;;
+  }
+node { format: pod; }
+edge { format: pod; }
+
+[ U&lt;B&lt;bold and underlined&gt;&gt; ]
+--&gt; { label: "S&lt;Fähre&gt;"; }
+ [ O&lt;Konstanz&gt; ]
+
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph63" cellpadding=0 cellspacing=0>
+<tr>
+  <td colspan=12 style="text-align: center">I am <b>bold</b> and <i>italic</i></td>
+</tr>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>U<<b>bold and underlined</b>></td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;"><span style="text-decoration: line-through">Fähre</span></td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'><span style="text-decoration: overline">Konstanz</span></td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_gid">
+<h4>gid</h4></a>
+
+<div class="entry">
+
+<p>
+A unique ID for the graph. Usefull if you want to include two graphs into one HTML page.<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example value:</b> <code>123</code></p>
+
+</div>
+
+<a name="graph_id">
+<h4>id</h4></a>
+
+<div class="entry">
+
+<p>
+A unique identifier for this object, consisting only of letters, digits, or underscores.<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">[ Bonn ] --&gt; { id: 123; } [ Berlin ]
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph64" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>Bonn</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>Berlin</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_label">
+<h4>label</h4></a>
+
+<div class="entry">
+
+<p>
+The text displayed as label. If not set, equals the name (for nodes) or no label (for edges, groups and the graph itself).<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example value:</b> <code>My label</code></p>
+
+</div>
+
+<a name="graph_labelpos">
+<h4>labelpos</h4></a>
+
+<div class="entry">
+
+<p>
+The position of the graph label.
+One of: <code>top</code>, <code>bottom</code>.
+<br>
+<b>Defaults to:</b> <code>top</code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { labelpos: bottom; label: My Graph; }
+
+ [ Buxtehude ] -&gt; [ Fuchsberg ]
+
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph65" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>Buxtehude</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>Fuchsberg</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+<tr></tr>
+
+<tr>
+  <td colspan=12 style="text-align: center">My Graph</td>
+</tr>
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_link">
+<h4>link</h4></a>
+
+<div class="entry">
+
+<p>
+The link part, appended onto <a href="#graph_linkbase">linkbase</a>. See the section about <a href="attributes.html#links">links</a> for reference.<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">node {
+  autolink: name;
+  textstyle: none;
+  fontsize: 1.1em;
+  }
+graph {
+  linkbase: http://de.wikipedia.org/wiki/;
+  }
+edge {
+  textstyle: overline;
+  }
+
+[] --&gt; [ Friedrichshafen ]
+ -- Schiff --&gt; { autolink: label; color: orange; title: Vrooom!; }
+[ Immenstaad ] { color: green; } --&gt; [ Hagnau ]
+
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph66" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node_anon'></td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'><a href='http://de.wikipedia.org/wiki/Friedrichshafen' style="text-decoration: none">Friedrichshafen</a></td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #ffa500;" title="Vrooom!"><a href='http://de.wikipedia.org/wiki/Schiff' style='color: #ffa500; text-decoration: overline;'>Schiff</a></td>
+ <td rowspan=2 class="edge eb" style=" color: #ffa500;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'><a href='http://de.wikipedia.org/wiki/Immenstaad' style="color: #008000; text-decoration: none">Immenstaad</a></td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'><a href='http://de.wikipedia.org/wiki/Hagnau' style="text-decoration: none">Hagnau</a></td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_linkbase">
+<h4>linkbase</h4></a>
+
+<div class="entry">
+
+<p>
+The base URL prepended to all generated links. See the section about <a href="attributes.html#links">links</a> for reference.<br>
+<b>Defaults to:</b> <ul>
+  <li><code>/wiki/index.php/</code> for graph</li>
+  <li><code>inherit</code> for anything else</li>
+</ul>
+<br>
+<b>Example value:</b> <code>http://en.wikipedia.org/wiki/</code></p>
+
+</div>
+
+<a name="graph_output">
+<h4>output</h4></a>
+
+<div class="entry">
+
+<p>
+The desired output format. Only used when calling Graph::Easy::output(), or by mediawiki-graph.
+One of: <code>ascii</code>, <code>html</code>, <code>svg</code>, <code>graphviz</code>, <code>boxart</code>, <code>debug</code>.
+<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { output: debug; }
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;"><pre># Using Graph::Easy v0.63
+# Using Graph::Easy::As_svg v0.22
+# Running Perl v5.008008 under linux
+
+# Input normalized as_txt:
+
+graph { output: debug; }
+
+</pre></div><div class="clear"></div>
+</div>
+
+<a name="graph_root">
+<h4>root</h4></a>
+
+<div class="entry">
+
+<p>
+The name of the root node, given as hint to the layouter to start the layout there. When not set, the layouter will pick a node at semi-random.<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { root: B; }
+ # B will be at the left-most place
+ [ A ] --&gt; [ B ] --&gt; [ C ] --&gt; [ D ] --&gt; [ A ]
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph68" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=2 rowspan=2 class="edge eb"></td>
+ <td colspan=2 rowspan=2 class="edge eb" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td colspan=20 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td colspan=2 rowspan=2 class="edge eb" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td colspan=2 rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+ <td colspan=2 class="edge eb"></td>
+ <td colspan=2 class="edge eb" style="border-left: solid 2px #000000;">&nbsp;</td>
+<td colspan=20 rowspan=2 class="edge eb">&nbsp;</td>
+ <td colspan=2 class="edge eb"></td>
+ <td colspan=2 class="edge eb" style="border-left: solid 2px #000000;">&nbsp;</td>
+</tr>
+
+<!-- row 0 line 3 -->
+<tr>
+ <td colspan=2 class="edge eb" style=" color: #000000;">&nbsp;</td>
+ <td colspan=2 class="edge eb" style=" color: #000000;"><span class="sv">∨</span></td>
+
+ <td colspan=4 class="edge eb"></td>
+</tr>
+
+<!-- row 1 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>A</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>B</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>C</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>D</td>
+</tr>
+
+<!-- row 1 line 1 -->
+<tr></tr>
+
+<!-- row 1 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 1 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_textstyle">
+<h4>textstyle</h4></a>
+
+<div class="entry">
+
+<p>
+The style of the label text. Either 'none', or any combination (separated with spaces) of 'underline', 'overline', 'bold', 'italic', 'line-through'. 'none' disables underlines on links.<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph {
+  fontsize: 150%;
+  label: Verbindung;
+  textstyle: bold italic;
+  }
+node {
+  textstyle: underline bold;
+  fill: #ffd080;
+  }
+edge {
+  textstyle: italic bold overline;
+  }
+
+[ Meersburg ] { fontsize: 2em; }
+ -- Fähre --&gt; { fontsize: 1.2em; color: red; }
+ [ Konstanz ]
+
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph69" cellpadding=0 cellspacing=0>
+<tr>
+  <td colspan=12 style="font-style: italic; font-weight: bold; font-size: 150%; text-align: center">Verbindung</td>
+</tr>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node' style="font-weight: bold; text-decoration: underline; font-size: 2em">Meersburg</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #ff0000;color: #ff0000; font-style: italic; font-weight: bold; text-decoration: overline; font-size: 1.2em;">Fähre</td>
+ <td rowspan=2 class="edge eb" style=" color: #ff0000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node' style="font-weight: bold; text-decoration: underline">Konstanz</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_textwrap">
+<h4>textwrap</h4></a>
+
+<div class="entry">
+
+<p>
+The default <code>none</code> makes the label text appear exactly as it was written, with <a href='syntax.html'>manual line breaks</a> applied. When set to a positive number, the label text will be wrapped after this number of characters. When set to <code>auto</code>, the label text will be wrapped to make the node size as small as possible, depending on output format this may even be dynamic. When not <code>none</code>, manual line breaks and alignments on them are ignored.<br>
+<b>Defaults to:</b> <ul>
+  <li><code>none</code> for graph</li>
+  <li><code>inherit</code> for anything else</li>
+</ul>
+<br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">node { textwrap: auto; }
+ ( Nodes:
+ [ Frankfurt (Oder) liegt an der
+   ostdeutschen Grenze und an der Oder ] --&gt;
+ [ Städte innerhalb der
+   Ost-Westfahlen Region mit sehr langen Namen] )
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph70" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gt gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>Nodes:</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gt gr'>&nbsp;</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr></tr>
+
+<!-- row 0 line 3 -->
+<tr></tr>
+
+<!-- row 1 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='node'>Frankfurt (Oder) liegt an der ostdeutschen Grenze und an der Oder</td>
+ <td colspan=4 rowspan=4 class='group'>&nbsp;</td>
+<td rowspan=4 class="group edge el" style=" background: #a0d0ff;"></td>
+ <td colspan=2 rowspan=2 class="group edge lh" style=" background: #a0d0ff;border-bottom: solid 2px #000000; background: #a0d0ff;">&nbsp;</td>
+ <td rowspan=2 class="group edge eb" style=" color: #000000; background: #a0d0ff;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='group'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='node'>Städte innerhalb der Ost-Westfahlen Region mit sehr langen Namen</td>
+ <td colspan=4 rowspan=4 class='group gr'>&nbsp;</td>
+</tr>
+
+<!-- row 1 line 1 -->
+<tr></tr>
+
+<!-- row 1 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="group edge eb" style=" background: #a0d0ff;">&nbsp;</td>
+ <td rowspan=2 class="group edge eb" style=" background: #a0d0ff;"></td>
+</tr>
+
+<!-- row 1 line 3 -->
+<tr></tr>
+
+<!-- row 2 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='group gb gl'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gb'>&nbsp;</td>
+ <td colspan=4 rowspan=4 class='group gr gb'>&nbsp;</td>
+</tr>
+
+<!-- row 2 line 1 -->
+<tr></tr>
+
+<!-- row 2 line 2 -->
+<tr></tr>
+
+<!-- row 2 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+<a name="graph_title">
+<h4>title</h4></a>
+
+<div class="entry">
+
+<p>
+The text displayed as mouse-over for nodes/edges, or as the title for the graph. If empty, no title will be generated unless <a href="#graph_autotitle">autotitle</a> is set.<br>
+<b>Defaults to:</b> <code></code><br>
+<b>Example value:</b> <code>My title</code></p>
+
+</div>
+
+<a name="graph_type">
+<h4>type</h4></a>
+
+<div class="entry">
+
+<p>
+The type of the graph, either undirected or directed.
+One of: <code>directed</code>, <code>undirected</code>.
+<br>
+<b>Defaults to:</b> <code>directed</code><br>
+<b>Example graph:</b>
+</p>
+<pre class="graphtext">graph { type: undirected; }
+ [ A ] --&gt; [ B ]
+</pre>
+
+<div class="clear"></div><div style="margin-left: 1em;">
+
+<table class="graph71" cellpadding=0 cellspacing=0>
+<!-- row 0 line 0 -->
+<tr>
+ <td colspan=4 rowspan=4 class='node'>A</td>
+<td rowspan=4 class="edge el"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #000000;">&nbsp;</td>
+ <td rowspan=2 class="edge eb" style=" color: #000000;"><span class="sh">></span></td>
+ <td colspan=4 rowspan=4 class='node'>B</td>
+</tr>
+
+<!-- row 0 line 1 -->
+<tr></tr>
+
+<!-- row 0 line 2 -->
+<tr>
+<td colspan=2 rowspan=2 class="edge eb">&nbsp;</td>
+ <td rowspan=2 class="edge eb"></td>
+</tr>
+
+<!-- row 0 line 3 -->
+</table>
+</div><div class="clear"></div>
+</div>
+
+
+
+</div>
+
+<div class="footer">
+Page created automatically at <span class="date">Thu May 22 20:38:56 2008</span> in 0.5156s. Contact: <a href="http://bloodgate.com/mail.html">Tels</a>.
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>

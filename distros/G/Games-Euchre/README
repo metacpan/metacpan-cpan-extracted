@@ -1,0 +1,41 @@
+Games::Euchre
+
+This provides the framework for a game of Euchre.  Any combination of
+the four players can be human or computer players (although more than
+one human player can be awkward).  A simple interface is available to
+alternative computer players to be created.  The supplied human player
+interface isn't bad, but the supplied computer player is DUMB!!  
+
+Others are encouraged to create new Games::Euchre::AI::* players,
+either human interfaces or computer players, and submit to CPAN.  If
+so, you will likely want to copy and edit euchre.pl.  If so, please
+send me any recommended changes so I can incorporate them in future
+versions.
+
+This game is made possible by Games::Cards by Amir Karger.
+
+You may simply run scripts/euchre.pl directly out of this directory,
+or you may install via the usual:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+  (The euchre.pl file will be installed in your $perlbin directory)
+
+This software is released under the GNU Public License v2.  See
+"COPYING".
+
+Chris Dolan, chrisdolan@sourceforge.net
+
+--- TO DO ---
+
+* Write more robot players
+* Randomize initial player number and initial dealer number
+* Let user choose human vs. robot players in Euchre.pl
+* Change (or allow changes to) player names -- something other than
+  "Player n"
+* Option to play more than one game
+* Record game results in stats file?
+* Option for current dealer to redeal after everyone passes, instead
+  of handing the deal to the next player.

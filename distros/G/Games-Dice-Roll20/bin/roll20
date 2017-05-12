@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Games::Dice::Roll20;
+
+my $dice = Games::Dice::Roll20->new();
+
+my $expr = shift;
+
+if ( !$expr ) {
+    die "Usage: $0 DICE\n";
+}
+
+my $result = $dice->roll($expr);
+
+if ($result) {
+    print $dice->roll($expr) . "\n";
+}
+else {
+    die "Can't parse expression <$expr>.\n";
+}
+
+exit 0;

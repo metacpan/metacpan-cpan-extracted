@@ -1,0 +1,216 @@
+
+ I'll be using this file for a list of bugs, goals, and my general
+ intentions for Perl/Gtk+. I'd appreciate it if folks would keep an eye on
+ the sections and at least strip out the bug listings when/if they get
+ fixed.
+ 
+	 - Kenneth Albanowski
+
+Revision notes:
+
+New with release 0.7005.
+
+* GnomePrint support added.
+* Experimental Bonobo support added.
+* Experimental Mozilla support added.
+* No longer required to call the init method on most of the submodules.
+* Updated support for GtkHTML (added a Gtk::HTML::Simple package that handles
+  all the http connections for you using LWP).
+* Added a perl variable change event source for the gtk mainloop.
+* Simpler support for building your own submodules.
+* The toplevel Makefile will compile all the submodules for you (if you have
+  the requires libraries installed).
+* Moved the Applet code to its own submodule.
+* Documentation updates (including a brand-new Gtk::cookbook!).
+* Many fixes, cleanups and other small enhancements here and there.
+
+Old stuff follows...
+
+	As of public release 0.7000, the submodules in Perl/Gtk need to be
+	built separately as outlined in the INSTALL file. This may change
+	in a future point release if there is demand for compiling all the 
+	modules at once.
+
+	As of public release 0.5000, Perl/Gtk+ now contains both the Gtk and
+	Gnome sections (in 0.4 they were split apart), and a build mechanism
+	capable of building everything that the user desires. The files have
+	been moved around substantially, and Makefile.PL severely tweaked to
+	support this.  (This may turn out to be unportable -- I'll find out.)
+	For the moment, Perl/Gnome will be a permanent part of the Perl/Gtk+
+	module.
+
+	Release 0.5000 has been tested with Gtk+ 0.99.10 through 1.1.something,
+	and should work properly with all of them. I'm sure I've left some newer
+	functions out, of course. (Please be careful when adding or modifying
+	code, to try and avoid breaking the support for older versions.) I've
+	compiled it up through 1.1.9 successfully, and it ran file up until
+	1.1.8, where it started freezing up.
+	
+	The directory rearrangement has moved all buildable packages into
+	separate subdirectories of the main (Gtk, GdkImlib, Gnome, etc.), with
+	.xs and sample files being stored in $package/xs and $package/samples
+	directories, respectively.
+	
+	Makefile.PL looks automatically for */pkg*.pl and presents the user with
+	a list of package names to choose from. There is currently no
+	auto-detection. Gnome is turned off by default, along with everything
+	else.
+	
+	"make test" now runs a master test program that lets you easily launch
+	any sample file from any of the packages (as long as it contains a
+	TITLE: comment.)
+	
+	
+	Getting back to the Gtk/Gnome split and recombination, this involves an
+	experimental design to allow Perl/Gtk+ "submodules" (specifically, the
+	bindings for a particular Gtk+ widget set) to be compiled independantly,
+	allowing them to be distributed and maintained separately. This
+	mechanism was used in Gtk 0.4 and the separate Gnome 0.3000 module, but
+	the results didn't seem favourable, and I'm still unsure of the
+	stability of the mechanism. For the time being, I want to roll both Gtk
+	and Gnome back into a single distribution.
+	
+	Note that this itself was always a goal (that is, putting any of those
+	separate modules together and building them all at once), and the
+	mechanisms involved are still in place (tools/genext.pl and the
+	Perl*DeclareFunc/Var macros), and will be quite easy to revive if it
+	seems worth the effort.
+
+Programming guidelines:	
+
+	xsubpp requires all named types to be mentioned in the typemap file,
+	even for functions that are #ifdef'd out. That's why separate files are
+	needed to fully support some of the different Gtk+ versions of widgets, and why
+	#ifdef "mysteriously" fails to work sometimes.
+	
+	As much as possible avoid building direct interfaces to GLib objects
+	(especially GNodes). Perl already has support for all of the data types
+	needed, and I don't want to try to tie GLib into Perl along with
+	everything else.
+	
+	Most parameters (and return values) are cross-checked at run-time to
+	make sure they are of the proper time, and are not NULL/undefined. If a
+	NULL/undefined parameter or return value is desirable, please append
+	_OrNULL to the type.
+
+BUGS:
+
+	Resize of swatch inside ColorSelectButton is delayed (at least with
+	gtk+ 1.2.2).
+
+	Selection handling (and/or atoms?) is out to lunch, dinner, breakfest,
+	etc.
+
+	Pixmap changing of notebook tabs in test.pl is broken. (Seems to be fixed.)
+  
+	Memory management of Gtk objects (things related to GtkObject) is fairly
+	solid, but management of other types (structures, abstract pointers,
+	etc.) is still clumsy.
+	
+	Version configuration is based heavily on a hex/BCD scheme (1.2.3 ==
+	0x010203). If any version component of Gtk+ ever has more then three
+	digits, this will break, messily. Any other suggestions?
+	
+	widget.pl doesn't work with all versions, as the "string" Gtk type
+	has changed names.
+	
+	The Gtk packer sample is completely out of it.
+	
+	RC support slacks off after 1.1.5.
+	
+	"BASIC" and the other gtk widget flags seem to be at complete a lost,
+	for the moment.
+	
+	There are a lot of #ifdefs that just chop things out that probably
+	ought to provide decent alternatives.
+	
+	There's a very serious problem affecting GtkColorSelectButton, and every
+	else in general, specifically the need to manually invoke init on Gtk
+	before doing anything. Unfortunately this rather kills GCSB, which
+	registers its type when used -- before Gtk has been initialized. It's
+	rather hard to come up with an auto-init solution for this because you
+	can only init one thing (gnome, gtk, or gdk), and if its gnome, you may
+	need parameters. Ugh.
+	
+	The CAST mechanism in the .def format isn't very regular across types,
+	and it almost certainly oughtn't to be there, or at least should be
+	modified so that a language independant technique could be used. (Or
+	language _specific_, so that Perl, Scheme, whatever, can each have their
+	own overrides.)
+	
+	GtkXmHTML is only hanging on via a thread, due to the casting mechanism
+	being a bit more complex then I had remembered.
+	
+	Each package (Gtk, XmHTML, Gnome, etc.) currently partakes of the same
+	wodge of include files, which really isn't good, since it could lead to
+	namespace problems, and also slows everything down parsing stuff like
+	the GNOME includes. gendefs/genext should work separately on each
+	package, so that they can refer to each other if they have to, but
+	aren't required to. (This is a good steps towards module separation, of
+	course.) All modules still link with the same libraries, of course,
+	since they are all linked together.
+		
+Goals:
+
+	Switch signal handling over to _interp calls.
+
+	GtkGC from 0.99.
+	
+	Auto-detect available packages (use Configure from Term::ReadKey).
+
+	Revisit the GtkObject garbage collection system, make sure there aren't
+	any leaks, that cycles unwind themselves, and that cleanup is relatively
+	timely.
+	
+	There are currently three types of memory thingy: boxed, struct, and
+	GtkObject. GtkObject's are the most advanced, and are complexly bound
+	into the Perl typesystem, with a cache of Perl objects serving as
+	proxies for the C GtkObject pointers, along with garbage collected
+	reference counting.
+		boxed thingies are one step down. They have a separate cache, but
+	there is less reference counting so thingies tend to drop out of the
+	cache, leading to the possibility of the same C pointer showing up as
+	different Perl objects over time. "boxed" refers to the fact that these
+	objects have ref/unref functions, making then reference counted.
+	    struct thingies don't work at all the same, and are more sort of
+	pass-by-value then pass-by-reference, or at least that is the tack I've
+	taken. Usually these are copied directly into Perl data types intstead
+	of being referred to through a proxy.
+	
+	Problems abound: many "boxed" thingies have stubbed out ref/unref
+	functions, or have copy/delete functions (which is _not_ the same
+	thing). It's a miracle some of this stuff works at all. "struct"'s don't
+	fair much better -- there's little consistent use of them, the
+	interfaces tend to be different, and they often aren't used at all,
+	in favour of a little special purpose code.
+	
+	All of these types need to be reviewed, both towards fixing up
+	Perl/Gtk+, and towards changing C/Gtk+ to solve some of these issues at
+	the source.
+	
+
+On the naming of widgets:
+
+  GTK widget abc_def_ghi becomes Perl widget Gtk::Abc::DefGhi
+  
+  GTK widget gtk_def_ghi becomes Perl widget Gtk::DefGhi
+  
+  GDK widget gdk_def_ghi becomes Perl widget Gtk::Gdk::DefGhi
+  
+  GNOME widget gnome_foo_bar becomes Perl widget Gnome::FooBar
+  
+  GNOME widget gtk_gnome_foo_bar becomes Perl widget Gtk::Gnome::FooBar
+  
+  
+  XS code may refer to PerlGtk objects, along with these variants:
+  
+     Gtk::FooBar_Sink = sink the object before returning it
+                        (this doesn't hurt anything because Perl
+                         grabs a reference when it first sees
+                         the object, which makes the sink
+                         superfluous)
+     Gtk::Widget_Up = upcast the object to its real object type
+     Gtk::Widget_Sink_Up = Both
+     Gtk::Widget_OrNULL = accept undef as a null ptr
+     
+     

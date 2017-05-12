@@ -1,0 +1,51 @@
+#! /usr/bin/perl -w
+
+use strict;
+
+use Geo::Postcodes::DK 0.30;
+
+################################################################################
+#                                                                              #
+#                                 basic_dk                                     #
+#                                 --------                                     #
+#              Arne Sommer - perl@bbop.org - 9. September 2006                 #
+#                                                                              #
+################################################################################
+
+unless (@ARGV)
+{
+  print "Usage: basic_dk <one or more danish postcodes>\n";
+  exit;
+}
+
+foreach my $postcode (@ARGV)  # One or more postcodes
+{
+  if (Geo::Postcodes::DK::valid($postcode))
+  {
+    my $P = Geo::Postcodes::DK->new($postcode);
+
+    foreach my $field (Geo::Postcodes::DK::get_fields())
+      # Iterate over the fields supported by a danish postcode object.
+    {
+      printf("%-10s\t%s\n", ucfirst($field), $P->$field() || ""),
+        # Print the field name, and the result of the method call.
+    }
+
+    printf("%-10s\t%s\n\n", "Type_english", 
+      Geo::Postcodes::type2verbose($P->type()));
+        # The english description for the type.
+  }
+  else # Not valid.
+  {
+    if (Geo::Postcodes::DK::legal($postcode))
+    {
+      print "Postcode '$postcode' not in use.\n\n";
+    }
+    else
+    {
+      print "Illegal postcode '$postcode'.\n\n";
+    }
+  }
+}
+
+

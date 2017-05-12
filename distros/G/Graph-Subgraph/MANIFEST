@@ -1,0 +1,19 @@
+Changes
+lib/Graph/Subgraph.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/10-subgraph.t
+t/11-complete.t
+t/12-empty.t
+t/13-error.t
+t/14-plain-list.t
+t/15-deprecate.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

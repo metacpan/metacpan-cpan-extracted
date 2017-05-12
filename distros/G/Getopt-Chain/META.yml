@@ -1,0 +1,25 @@
+---
+abstract: 'Command-line processing like svn and git'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Getopt-Chain
+requires:
+  Carp::Clan::Share: 0
+  Getopt::Long: 2.37
+  Hash::Param: 0
+  Moose: 0
+  MooseX::AttributeHelpers: 0
+  MooseX::MakeImmutable: 0.02
+  Path::Dispatcher: 0
+  Path::Dispatcher::Declarative: 0
+version: 0.017

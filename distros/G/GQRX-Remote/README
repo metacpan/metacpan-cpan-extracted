@@ -1,0 +1,39 @@
+GQRX-Remote version 1.0.1
+=========================
+
+This module provides a Perl interface for the Gqrx remote control
+protocol.
+
+For more details on this module and its usage, please see the
+README.md file including with the distribution and POD documentation.
+
+Development of this module is done on GitHub:
+
+https://github.com/DougHaber/gqrx-remote
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The tests will create and use a mock server, unless port 7356 is use,
+in which case it will assume a real Gqrx instance is running, and test
+against that.  The default location for a server can overriden by
+passing the environment variables GQRX_REMOTE_TEST_HOST and
+GQRX_REMOTE_TEST_PORT to the tests.
+
+DEPENDENCIES
+
+There are no dependencies beyond Perl core modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Douglas Haber
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,7 @@
+Revision history for Perl module Graph::Undirected::Components
+
+0.30 28 Mar 2012
+  - first release to CPAN.
+
+0.31 24 Apr 2012
+  - add File::Path 2.08 to Makefile.PL.

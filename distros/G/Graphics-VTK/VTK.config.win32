@@ -1,0 +1,18 @@
+#
+#
+#
+# Sample Perl VTK Config file for Win32
+#   Copy this file to VTK.config and modify for your installation
+#    (Tested on Windows with mingw compiler)
+
+%vtkConfigMacro = (
+    'CC' => 'g++',
+    'LIBS' => ['-L/UDIR/mingw1.1/lib -L/UDIR/mingw1.1/lib/gcc-lib/mingw32/2.95.3-6 -L/UDIR/VTK/output/lib -lvtkCommon -lvtkFiltering -lvtkGraphics -lvtkImaging -lvtkPatented -lvtkRendering -lvtkHybrid -lvtkIO -lglut32 -lglu32 -lopengl32 -lm -lstdc++'],
+
+# INC should contain the paths to your VTK include files
+#   Note: Extra hybrid and Rendering path included here, because the standard VTK 4.0
+#     fails to put vtkVRML.h and vtk3DS.h with the rest of the include when 
+#      installing.
+#    Also, vtkXRenderwindow.h is missing from the Rendering directory
+    'INC' => '-I/UDIR/VTK/output/include -I/UDIR/VTK/Hybrid -I/UDIR/VTK/Rendering'
+);

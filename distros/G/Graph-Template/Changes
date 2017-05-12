@@ -1,0 +1,16 @@
+Revision history for Perl module Graph::Template
+
+0.05 Thu Apr 08 07:30:00 2004
+        - Fixed bug regarding empty arrays as loop variables
+
+0.04 Wed Mar 17 16:00:00 2004
+        - Fixed bug introduced in 0.03 (Loops were not case-insensitive)
+
+0.03 Wed Mar 17 16:00:00 2004
+        - Parameters are now case-insensitive
+
+0.02 Fri Jan 30 16:00:00 2004
+        - Added entity including capability
+
+0.01 Fri Nov 21 14:43:17 2003
+        - original version; created by ExtUtils::ModuleMaker 0.32

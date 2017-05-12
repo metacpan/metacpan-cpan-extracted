@@ -1,0 +1,360 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Gimp;
+use Gimp::Fu;
+
+sub process;
+sub scraper(&);
+
+sub filesize_str {
+  my $size = $_[0];
+  ($size > 1099511627776)
+   ? sprintf ( "%.2f TiB", $size/1099511627776 )
+   : ( $size > 1073741824 )
+   ? sprintf ( "%.2f GiB", $size/1073741824 )
+   : ( $size > 1048576 )
+   ? sprintf ( "%.2f MiB", $size/1048576 )
+   : ( $size > 1024 )
+   ? sprintf ( "%.2f KiB", $size/1024 )
+   : ("$size byte" . ( $size == 1 ? "" : "s" ))
+}
+
+sub scraper_init {
+  my ($sldata) = @_;
+  # TODO: die unless $sl
+  my $h = {
+    list => scraper {
+      process '#block-system-main div.node > h2', 'content[]' => scraper {
+        process '>a[href]', link => '@href', title => sub { $_->as_trimmed_text }
+      }
+    },
+
+    pager => scraper {
+      process '#block-system-main li.pager-next a[href]', link => '@href'
+    },
+
+    node => scraper {
+      process 'div.node-scriptfu', 'classes' => sub {
+        my $c = $_->attr('class');
+        $c ? +{ map { ($_=>1) } split ' ', $c } : ()
+      },
+         node => scraper {
+           process 'span.submitted', 'submit-date' => sub {
+             (my $x = ($_->content)[0][0]) =~ s/\s*\x{2014}\s*$//;
+             $x
+           };
+           process 'span.submitted > span.username', 'author' => 'TEXT';
+           process '.field-name-body .field-items > .field-item',
+           body => 'TEXT';
+           process '.field-name-upload span.file > a[href]',
+           'files[]' => scraper {
+             process 'a[href]', name => '@title',
+             link => sub { "". $_->attr('href') },
+             desc => 'TEXT',
+             size => sub {
+               $_->attr('type')
+                && $_->attr('type') =~ /length=(\d+)/
+                && $1
+             };
+           };
+           process '.field-type-taxonomy-term-reference',
+           'taxonomy[]' => scraper {
+             process '.field-label', name => sub {
+               (my $x = lc ($_->as_text)) =~ s/\W+/-/g;
+               $x =~ s/-+$//;
+               $x
+             };
+             process '.field-item > a[href]', 'values[]' => 'TEXT';
+           }
+        }
+   },
+    sl => $sldata,
+    pos => 0,
+    q_uri => [],
+    plugins => [],
+  };
+  return unless $h->{loop} = IO::Async::Loop::Glib->new;
+  return unless $h->{ua} = Net::Async::HTTP->new(stall_timeout => 30);
+  $h->{loop}->add($h->{ua});
+
+  $h->{ua}->do_request(
+    uri => URI->new("http://registry.gimp.org/taxonomy/term/20"),
+    on_response => sub {
+      my ($rsp) = @_;
+      die "found no plugins in registry!" # maybe don't die?
+       unless my $r_stubs = $h->{list}->scrape($rsp);
+      get_plugin ($h, $_) for @{ $r_stubs->{content} };
+      if (my $r_page = $h->{pager}->scrape($rsp)) {
+        get_page ($h, $r_page->{link});
+      }
+    },
+    on_fail => sub { die "couldn't contact registry! ", $_[0] });
+  return $h;
+}
+
+sub get_plugin {
+  my ($h, $p) = @_;
+  $h->{ua}->do_request (
+    uri => $p->{link},
+    on_response => sub {
+      my ($rsp) = @_;
+      return unless my $r_node = $h->{node}->scrape ($rsp);
+      return unless $r_node->{node};
+      my %node = (%$p, %{ $r_node->{node} });
+      if ($node{taxonomy}) {
+        my $tx = {};
+        for my $t ( @{ $node{taxonomy} }) {
+          $tx->{$t->{name}} = +{ map { ($_=>1) } @{ $t->{values} }};
+        }
+        $node{taxonomy} = $tx;
+        @{ $node{files} }
+        = grep $_->{link} =~ /\.scm$/, @{ $node{files} };
+      }
+      if (filter_plugin (\%node)) {
+        push @{$h->{sl}}, $node{title};
+        push @{$h->{plugins}}, [$node{body}, $node{files}];
+      }
+    });
+}
+
+sub get_page {
+  my ($h, $uri) = @_;
+  $h->{ua}->do_request (
+    uri => $uri,
+    on_response => sub {
+      my ($rsp) = @_;
+      return unless my $r_stubs = $h->{list}->scrape($rsp);
+      get_plugin ($h, $_) for @{ $r_stubs->{content} };
+      if (my $r_page = $h->{pager}->scrape($rsp)) {
+        get_page ($h, $r_page->{link});
+      }
+    });
+}
+
+sub filter_plugin {
+  ref ($_[0]) eq 'HASH'
+   and $_[0]{files}
+  and @{ $_[0]{files} }
+  and $_[0]{taxonomy}{'gimp-version'}
+  and ($_[0]{taxonomy}{'gimp-version'}{2.7}
+       || $_[0]{taxonomy}{'gimp-version'}{2.8})
+  and $_[0]
+}
+
+sub do_file {
+  my ($h, $uri, $dir, $u2lf, $cb, $fcb) = @_;
+  my $file;
+  return unless $uri = URI->new($uri);
+
+  if ($u2lf && ($file = $u2lf->{$uri}) && -r $file && -s $file) {
+    $cb->($file, $dir);
+    return $dir;
+  } else {
+    $dir = undef if $dir && !-w $dir;
+    if ($dir ||= File::Temp->newdir()) {
+      $u2lf->{$uri} = $file = "$dir/".($uri->path_segments)[-1];
+      $h->{ua}->do_request (
+        uri => $uri,
+        on_response => sub {
+          my ($rsp) = @_;
+          my $txt = $rsp->content;
+          if (open my $fh, '>', $file) {
+            print $fh $txt;
+            close $fh;
+            $cb->($file, $dir, $txt);
+          } else {
+            warn "couldn't write to $file: $!";
+          }
+        },
+        $fcb ? (on_fail => $fcb): ());
+      return $dir;
+    } else {
+      warn "couldn't make temp dir: $!";
+    }
+  }
+  ()
+}
+
+podregister {
+  require Alien::Gimp;
+  require Gtk2::SimpleList;
+  require File::Temp;
+  require URI;
+  require LWP::Simple;
+  require IO::All;         IO::All->import;
+  require Web::Scraper;    Web::Scraper->import;
+  require IO::Async::Loop::Glib; IO::Async::Loop::Glib->import;
+  require Net::Async::HTTP;
+
+  Gimp::gtk_init;
+
+  my $list = Gtk2::SimpleList->new('Script' => 'text');
+
+  die "Failed to initialize!"
+   unless my $s_hash = scraper_init ($list->{data});
+
+
+  my $d = Gtk2::Dialog->new("Browse/Install Plugins", undef,
+                            [qw(modal destroy-with-parent)],
+                            'Done' => 'close');
+  $d->set_default_response('close');
+  my $ca = $d->get_content_area;
+
+  my $box1 = Gtk2::VBox->new (FALSE, 2);
+  my $box2 = Gtk2::VBox->new (FALSE, 2);
+  my $box3 = Gtk2::VBox->new (FALSE, 2);
+
+  my $tbl = Gtk2::Table->new(1,2);
+  my $s = Gtk2::ScrolledWindow->new(undef,undef);
+  $s->set_policy ('automatic', 'automatic');
+  $s->set_size_request (300, 500);
+
+  my $t = Gtk2::ScrolledWindow->new(undef,undef);
+  $t->set_policy ('automatic', 'automatic');
+  $t->set_size_request (300, 500);
+
+  my $tv = Gtk2::TextView->new;
+  $tv->set_editable(FALSE);
+  my $b = $tv->get_buffer;
+
+  $tbl->set_border_width(6);
+  $tbl->set_col_spacings(6);
+  my $l2;
+  my $status = Gtk2::Label->new('');
+
+  $list->signal_connect (
+    cursor_changed => sub {
+      my ($i) = $_[0]->get_selected_indices();
+      $tv->set_cursor_visible(FALSE);
+      $tv->set_wrap_mode('word');
+      $b->set_text($s_hash->{plugins}[$i][0]);
+      my $rows = @{$s_hash->{plugins}[$i][1]};
+
+      $l2->destroy() if $l2;
+      $l2 = Gtk2::Table->new($rows+1,3);
+      $l2->attach_defaults(Gtk2::Label->new('Files'), 0, 3, 0, 1);
+      $box2->pack_start($l2,FALSE,TRUE,0);
+      my $r = 1;
+
+      for my $f (@{$s_hash->{plugins}[$i][1]}) {
+        $l2->attach_defaults(
+          Gtk2::Label->new(($f->{name} || $f->{desc} || $f->{link})
+          . " (".filesize_str($f->{size}).")"),
+          0, 1, $r, $r+1);
+
+        $l2->attach(
+          my $vbtn = Gtk2::Button->new("View"), 1, 2, $r, $r+1,
+          'shrink','fill', 2, 2);
+        $l2->attach(
+          my $ibtn = Gtk2::Button->new ("Install"), 2, 3, $r, $r+1,
+          'shrink','fill', 2, 2);
+        ++$r;
+
+        my ($dir, %url2localfiles);
+
+        $vbtn->signal_connect(
+          clicked => sub {
+            $status->set_text('fetching: '.$f->{link});
+            $status->set_text("couldn't fetch $f->{link}")
+             unless $dir = do_file (
+               $s_hash, $f->{link}, $dir, \%url2localfiles,
+               sub {
+                 my ($file, $dir, $txt) = @_;
+                 if ($txt ||= io($file)->all) {
+                   $tv->set_cursor_visible(TRUE);
+                   $tv->set_wrap_mode('none');
+                   $b->set_text($txt);
+                 }
+                 $status->set_text('');
+               });
+          });
+
+        $ibtn->signal_connect(
+          clicked => sub {
+            $status->set_text('fetching: '.$f->{link});
+            $status->set_text("couldn't install $f->{link}")
+             unless $dir = do_file (
+               $s_hash, $f->{link}, $dir, \%url2localfiles,
+               sub {
+                 my ($file, $dir) = @_;
+                 $status->set_text('installing: '.$f->{name}||$f->{desc});
+		 my $tool = Alien::Gimp->gimptool;
+                 die ("couldn't $tool ",
+                      "--install-script $file: $!")
+                 unless system ($tool,
+                                 '--install-script', $file) == 0;
+                 $status->set_text('installed, refreshing');
+                 Gimp->script_fu_refresh();
+                 $status->set_text("installed ". $f->{name}||$f->{desc});
+                 ()
+               });
+          });
+      }
+      $l2->show_all();
+      $box2->show();
+    });
+
+  $ca->add($box1);
+  $ca->add($box3);
+  $box1->pack_start($tbl,TRUE,TRUE,0);
+  $box1->pack_start($status,FALSE,FALSE,0);
+  $tbl->attach_defaults($s, 0, 1, 0, 1);
+  $tbl->attach_defaults($box2, 1, 2, 0, 1);
+  $box2->pack_start($t,TRUE,TRUE,0);
+  $s->add($list);
+  $t->add($tv);
+
+  $d->show_all();
+  $box2->hide();
+  $box3->hide();
+
+  my $rsp = $d->run;
+  $d->destroy;
+
+  ()
+};
+
+exit main;
+
+__END__
+
+=head1 NAME
+
+registry_viewer - Browse the gimp plugin registry
+
+=head1 SYNOPSIS
+
+<Toolbox>/Filters/Languages/Browse Pl_ug-in Registry
+
+=head1 DESCRIPTION
+
+Browse scripts from http://registry.gimp.org.
+
+Currently only shows scriptfu scripts compatible with Gimp 2.8.
+
+Requires Web::Scraper.
+
+=head1 AUTHOR
+
+Rain <rain AT terminaldefect DOT com>
+
+=head1 DATE
+
+2014-05-19
+
+=head1 LICENSE
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.

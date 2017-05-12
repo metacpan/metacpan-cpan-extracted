@@ -1,0 +1,5 @@
+(name=>'verify circular links (dot cannot render)',
+ code=>'my @a; 
+        @a=(\@a,\\@a,\\\@a); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)

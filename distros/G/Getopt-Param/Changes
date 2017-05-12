@@ -1,0 +1,23 @@
+Revision history for Getopt-Param
+
+0.0.5  Wed Jun 25 23:44:17 2008
+    - Do not auto vivify option in object
+    
+0.0.4  Tue Jun 24 22:50:04 2008
+    - Added 'no_args_help' key
+    - Added 'known_only' key
+    - Added 'required' key
+    - Added the 'actions' key
+    - Added help()
+    - Added support for '--' to as a terminator of arguments
+    - move TODO comment to TODO PPD
+
+0.0.3  Sat Sep 29 16:38:29 2007
+		Made perlcritic test optional as per http://rt.cpan.org/Ticket/Display.html?id=29554#txn-364766
+
+0.0.2  Fri Apr  6 04:23:09 2007
+       - Maketext fixup
+       - Add 'Test::Perl::Critic' to dependency list
+
+0.0.1  Fri Feb 23 17:27:59 2007
+       Initial release.

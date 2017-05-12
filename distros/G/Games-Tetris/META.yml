@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Games-Tetris
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  String::ShellQuote: 0
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Games::Tetris:
+    file: lib/Games/Tetris.pm
+    version: 0.01
+  Games::Tetris::Shape:
+    file: lib/Games/Tetris/Shape.pm
+generated_by: Module::Build version 0.20

@@ -1,0 +1,41 @@
+[% title = view.title %]
+<style type="text/css">
+#login_page { width:  600px; }
+#login { float:  left;}
+#login ul { list-style: none }
+#login input { border: 1px solid #c7c7c7; }
+#login fieldset legend { padding: 3px }
+#login fieldset { width:  150px; border: 1px solid #c7c7c7; padding: 10px 0px 15px 15px;}
+#login_page #login_text { float:  left; width:  300px; }
+</style>
+
+<div id="login_page">
+    <div id="login">
+        <fieldset>
+            <legend>Login</legend>
+    
+            [% IF site.stash.controller.data.errors > 0 %]
+            <div id="login_errors">
+                
+            <ul>          
+            [% FOREACH err IN site.stash.controller.data.errors %]
+                <li>[% err %]</li>
+            [% END %]
+            </ul>
+            
+            </div>     
+            [% END %]
+    
+            [% site.stash.controller.data.login_form %]
+            
+            </fieldset> 
+    </div>
+
+    [% IF view.data.page %]
+    <div id="login_text">
+        <h2>Access Denied</h2>
+        <p>[% view.data.page.replace( ':', '/' ) %]</p>
+    </div>
+    [% END %]
+    <br style="clear:both" />
+</div>

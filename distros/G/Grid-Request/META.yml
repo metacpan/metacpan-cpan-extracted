@@ -1,0 +1,24 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Grid-Request
+version:      0.5
+version_from: VERSION
+installdirs:  site
+requires:
+    Carp:                          0
+    Config::IniFiles:              2.19
+    Exception::Class:              1.23
+    File::Path:                    1.0403
+    File::Temp:                    0.12
+    File::Which:                   0
+    FindBin:                       0
+    IO::Scalar:                    2.104
+    Log::Log4perl:                 1.08
+    Schedule::DRMAAc:              0
+    Sys::Hostname:                 1.1
+    Test::MockObject:              0
+    Test::More:                    0.46
+    XML::Writer:                   0.4
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,20 @@
+Revision history for Perl extension GSAPI.
+
+0.5 Tue Nov 18 16:42:28 MET 2008
+       - added gsapi_set_display_callback support (Philip Gwyn)
+       - documentation fixes (Philip Gwyn)
+       - various fixes (Philip Gwyn)
+
+0.4 Wed May  4 09:25:41 MEST 2005
+       - added INSTALL
+
+0.3 Mon Dec 15 23:12:02 2003
+       - fix for non iso-c-99 ms-c compiler
+
+0.2 Mon Oct 27 00:01:08 2003
+       - minor fixes
+       
+0.1  Sun Oct 26 10:20:51 2003
+	- original version; created by h2xs 1.22 with options
+		-v0.1 -n GSAPI
+

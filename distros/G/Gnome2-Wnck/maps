@@ -1,0 +1,18 @@
+WNCK_TYPE_PAGER				WnckPager			GtkObject	Gnome2::Wnck::Pager
+WNCK_TYPE_TASKLIST			WnckTasklist			GtkObject	Gnome2::Wnck::Tasklist
+
+WNCK_TYPE_APPLICATION			WnckApplication			GObject		Gnome2::Wnck::Application
+WNCK_TYPE_CLASS_GROUP			WnckClassGroup			GObject		Gnome2::Wnck::ClassGroup
+WNCK_TYPE_SCREEN			WnckScreen			GObject		Gnome2::Wnck::Screen
+WNCK_TYPE_WINDOW			WnckWindow			GObject		Gnome2::Wnck::Window
+WNCK_TYPE_WORKSPACE			WnckWorkspace			GObject		Gnome2::Wnck::Workspace
+
+WNCK_TYPE_MOTION_DIRECTION		WnckMotionDirection		GEnum		Gnome2::Wnck::MotionDirection
+WNCK_TYPE_PAGER_DISPLAY_MODE		WnckPagerDisplayMode		GEnum		Gnome2::Wnck::PagerDisplayMode
+WNCK_TYPE_TASKLIST_GROUPING_TYPE	WnckTasklistGroupingType	GEnum		Gnome2::Wnck::TasklistGroupingType
+WNCK_TYPE_WINDOW_GRAVITY		WnckWindowGravity		GEnum		Gnome2::Wnck::WindowGravity
+WNCK_TYPE_WINDOW_TYPE			WnckWindowType			GEnum		Gnome2::Wnck::WindowType
+
+WNCK_TYPE_WINDOW_ACTIONS		WnckWindowActions		GFlags		Gnome2::Wnck::WindowActions
+WNCK_TYPE_WINDOW_MOVE_RESIZE_MASK	WnckWindowMoveResizeMask	GFlags		Gnome2::Wnck::WindowMoveResizeMask
+WNCK_TYPE_WINDOW_STATE			WnckWindowState			GFlags		Gnome2::Wnck::WindowState

@@ -1,0 +1,27 @@
+0.07
+    - My new version of git won't allow config files with underscores in them;
+      so we now use a - instead.
+
+0.06
+    - Support ssl and lowercase in the config file; make output indicate use of https
+    - Add necessary git config to *pull* from the remote you just made
+
+0.05
+    - Add --lowercase
+    - project name cleanups
+
+0.04
+    - Remove superflous deps
+    - add --ssl flag
+    - add --description, --homepage
+
+0.03
+    - PAUSE doesn't index without 'package ...;', a redundant declaration was
+      added
+
+0.02
+    - use git config instead of a yaml file
+    - use github auth token instead of password
+
+0.01
+    - Initial release

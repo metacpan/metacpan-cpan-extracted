@@ -1,0 +1,10 @@
+These people contributed or helped the Graph-Layderer development:
+
+<hossman_cpan@fucit.org>
+	Suggestions, initial testing
+
+Paul Mutton <paul@jibble.org>
+	Inspiration, original Graph::Layouter::Spring algorithm
+
+Petr Baudis <pasky@ucw.cz>
+	Initial coding, maintainer

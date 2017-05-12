@@ -1,0 +1,33 @@
+AUTHORS
+ChangeLog
+examples/source-view.pl
+gtksourceviewperl.h
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+maps
+META.yml			Module meta-data (added by MakeMaker)
+NEWS
+README
+SourceView.pm
+t/GtkSourceBuffer.t
+t/GtkSourceLanguage.t
+t/GtkSourceLanguagesManager.t
+t/GtkSourceMarker.t
+t/GtkSourcePrintJob.t
+t/GtkSourceStyleScheme.t
+t/GtkSourceTag.t
+t/GtkSourceTagStyle.t
+t/GtkSourceTagTable.t
+t/GtkSourceView.t
+TODO
+xs/GtkSourceBuffer.xs
+xs/GtkSourceLanguage.xs
+xs/GtkSourceLanguagesManager.xs
+xs/GtkSourceMarker.xs
+xs/GtkSourcePrintJob.xs
+xs/GtkSourceStyleScheme.xs
+xs/GtkSourceTag.xs
+xs/GtkSourceTagStyle.xs
+xs/GtkSourceTagTable.xs
+xs/GtkSourceView.xs

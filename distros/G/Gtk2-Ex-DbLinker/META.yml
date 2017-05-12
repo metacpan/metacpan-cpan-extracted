@@ -1,0 +1,33 @@
+---
+abstract: 'Gui building part with Gtk2 of DbLinker'
+author:
+  - 'FranE<ccedil>ois Rappaz (rappazf@gmail.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gtk2-Ex-DbLinker
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::InsideOut: '1.13'
+  DBD::SQLite: '1.46'
+  Data::Dumper: '2.154'
+  DateTime::Format::Strptime: '1.5'
+  Gtk2: '1.24'
+  Gtk2::Ex::DbLinker::DbTools: '0.11'
+  Log::Log4perl: '1.41'
+  Scalar::Util: '1.45'
+  Test::More: '1'
+resources:
+  repository: https://sourceforge.net/projects/gtk2-ex-dblinker/
+version: '0.111'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

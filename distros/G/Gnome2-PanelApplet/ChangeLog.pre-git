@@ -1,0 +1,149 @@
+=== ChangeLog discontinued ===
+
+	With the move to git, we stop maintaining a separate ChangeLog and
+	rely on proper commit messages instead.
+
+2007-09-28	kaffetisch
+
+	* lib/Gnome2/PanelApplet.pm
+	* NEWS
+	* README: Release 0.02.
+
+2007-09-28	kaffeetisch
+
+	* MANIFEST
+	* Makefile.PL
+	* README
+	* libpanelapplet-perl.h
+	* lib/Gnome2/PanelApplet.pm
+	* t/test-applet
+	* xs/PanelAppletGConf.xs: Wrap the gconf helper API.
+
+	* Makefile.PL
+	* README: Require Glib 1.160.
+
+2007-08-14	kaffeetisch
+
+	* Makefile.PL: Require Glib >= 1.153, not 1.053.  Doh.  (Reported
+	by Thierry Vignaud).
+
+2007-08-13	kaffeetisch
+
+	* MANIFEST
+	* NEWS: Release 0.01.
+
+2007-08-13	kaffeetisch
+
+	* MANIFEST: Add t/GNOME_PerlAppletTest.server and t/test-applet.
+
+	* Makefile.PL
+	* README: Require Glib >= 1.053 and Gnome2 >= 1.042 for new
+	features.
+
+	* examples/perl-applet
+	* lib/Gnome2/PanelApplet.pm
+	* t/test-applet: Use sm_connect => FALSE in the examples and
+	tests.
+
+2007-07-31	kaffeetisch
+
+	* lib/Gnome2/PanelApplet.pm
+	* PanelApplet.xs: Add documentation.
+
+	* Makefile.PL: Add a reminder to bump the required Glib version.
+
+2007-07-30	kaffeetisch
+
+	* libpanelapplet-perl.h
+	* maps
+	* xs/PanelApplet.xs: Wrap the rest of the panel API.
+	panel_applet_gconf_* is still missing.
+
+	* t/GNOME_PerlAppletTest.server
+	* t/test-applet: Add interactive test.
+
+	* examples/perl-applet: Tell emacs that this is UTF-8.
+
+	* t/00.PanelApplet.t: Add shebang line.
+
+2007-07-29	kaffeetisch
+
+	The return of Gnome2::PanelApplet.
+
+	* .cvsignore
+	* AUTHOR
+	* LICENSE
+	* MANIFEST
+	* README
+	* WARNING
+	* t/00.PanelApplet.t
+	* xs/.cvsignore
+	* xs/Panel2.xs: Do some janitorial work.
+
+	* MANIFEST
+	* PanelApplet.pm
+	* libpanelapplet-perl.h
+	* lib/Gnome2/PanelApplet.pm
+	* panelappletperl.h: Rename and shuffle around some stuff.
+
+	* MANIFEST
+	* Makefile.PL
+	* copyright.pod: Require Gnome2.  Use some of the modern stuff.
+
+	* maps
+	* xs/PanelApplet.xs: Represent PanelApplet as Gnome2::PanelApplet,
+	not Gnome2::PanelApplet::Applet.
+
+	* xs/PanelApplet.xs: Bind panel_applet_factory_main as
+	Gnome2::PanelApplet::Factory::main.  Don't provide
+	Gnome2::PanelApplet::bonobo_factory and instead have the user call
+	Gnome2::Program::init.  Wrap BonoboUIVerb* lists as a simple hash
+	reference mapping names to code references.
+
+	* examples/README
+	* examples/GNOME_PerlAppletSample.server
+	* examples/perl-applet: Update the example, add some instructions.
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+2004/03/14 23:58 (+0100) ebassi
+
+	* xs/Panel2.xs,
+	  t/00.PanelApplet.t: Adapt to the new version information
+	implementation policy.
+
+2004/02/26 17:37 (-0500) muppetman
+
+	* README: fix the spelling of license; update the sandbox instructions.
+
+2004/02/06 09:42 (+0100) ebassi
+
+	* examples/GNOME_PerlAppletSample.server: remove absolute path
+
+	* t/00.PanelApplet.t: fix the module's name (patch by Torsten
+	Schoenfeld)
+
+2004/01/30 21:27 (+0100) ebassi
+
+	* Makefile.PL: print the warning.
+
+	* Initial release: still pre-alpha code; the module compiles fine, but
+	when called, the test applet dies with no apparent reason.
+
+	A AUTHOR
+	A ChangeLog
+	A examples/GNOME_PerlAppletSample.server
+	A examples/perl-applet
+	A Makefile.PL
+	A MANIFEST
+	A MANIFEST.SKIP
+	A maps
+	A PanelApplet.pm
+	A panelappletperl.h
+	A README
+	A t/00.PanelApplet.t
+	A WARNING
+	A xs/Panel2.xs
+	A xs/PanelApplet.xs

@@ -1,0 +1,229 @@
+=head1 NAME
+
+Geo::Postcodes::Ajax - A Tutorial in how to set up an Ajax service for the
+Geo::Postcodes::* modules.
+
+=head1 INTRODUCTION
+
+This document uses the fictious country I<Utopia> (with country code 'U2'),
+and the rest of this document will refer to the non-existent module
+C<Geo::Postcodes::U2>.
+
+The files described in this tutorial are available in the I<eg/> directory of
+the distribution.
+
+=head1 THE HTML FILE
+
+Only the relevant parts of the html code in the file I<index.html> is shown
+here:
+
+ 01 <script type="text/javascript" src="postcodecheck.js"></script>
+
+Put this line somehere in the beginning of the file, so that the ajax code is
+available for the code.
+
+ 02 <form name='one' onSubmit="return false;">
+
+The form does not need a name for the ajax code to work, but it does not
+hurt. The 'onSubmit'-code prevents the form from beeing submitted, as we would
+like to keep the html page - and let the ajax-code do changes in-line.
+
+ 03   Address:  <input name="address" value="Something or other"><br>
+
+This is not used by the example, but is there to make it more real.
+
+ 04   Postcode: <input id="postcode_u2"
+
+We have dropped naming this and the following element, as there are no program to
+receive the submitted form. Do give them a name-attribute if the form is meant
+for submission (and use the same name as the ID).
+
+It does not matter what id we give these elements, byt they must be unique for
+the html document. (The naming structure used in this example makes it easy to
+add forms for several languages in the same html document.)
+
+ 05           onBlur='get_location("location_u2", "u2", "postcode_u2");'
+
+When the postcode field looses the focus, the location is computed
+automatically by this call. The first argument is the ID of the location
+field, which is showing the updated location information. The second argument
+is the name of the country module, as used to build up the name of the
+cgi-program that the ajax-code calls; in this case 'location_u2.cgi'. The
+third argument is the ID of the postcode field, where the ajax-code gets hold
+of the postcode.
+
+ 06           onFocus='clear_it("location_u2");'
+
+The location field is cleared whenever the poscode field gets the focus, as a
+visual hint that we are changing it - and the shown location would not be
+correct anyway.
+
+ 07           maxlength=4 size=4><br>
+
+Utoipian postcodes are no longer than four characters, so we prevent the user
+from typing in longer strings.
+
+ 08   Location:  <span id="location_u2" style="color:red;"></span>
+
+The style is just to make the location stand out.
+
+ 09 </form>
+
+
+=head1 THE JAVASCRIPT FILE
+
+The file I<postcodecheck.js>:
+
+ 01 function clear_it (dest)
+ 02 {
+ 03   document.getElementById(dest).innerHTML = "";
+ 04 }
+
+ This function is used to clear the location field for us, when the postcode
+ field gets the docus.
+
+ 05 function get_location (dest, country, code)
+
+The 'dest' variable is the ID of the location field, where the postal location
+is written (and is the destination of the call). The 'country' variable is the
+name of the country class the postcode belongings to. The 'code' varaiable is
+the ID of the postcode field, where the postcode is taken from.
+
+ 06 {
+
+ 07   var postcode = document.getElementById(code).value;
+
+Get the postcode.
+
+ 08   var httpreq  = getHTTPObject();
+
+Ajax magic. This procedure is included in this file, but ius not shown here
+as it is exactly as in the ajax documentation. (See the file
+I<eg/postcodecheck.js> in the distribution of the core module for the code.)
+
+ 09   var url      = "location_" + country + ".cgi?postcode=" + postcode;
+
+Build up the url of the cgi program to call. This ensures that we can have
+programs for different countries, as it would not be a good idea to mix them
+all togetehr into one huge program.
+
+ 10   httpreq.open("GET", url, true);
+
+This will execute the cgi program.
+
+ 11   httpreq.onreadystatechange = function ()
+ 12   {
+ 13     if (httpreq.readyState == 4)
+ 14     {
+ 15       document.getElementById(dest).innerHTML = httpreq.responseText;
+
+Put the returned text from the cgi call into the location element.
+
+ 16     }
+ 17     return true;
+ 18   }
+ 19   httpreq.send(null);
+ 20 }
+
+=head1 THE CGI FILE
+
+The file I<location_u2.cgi>:
+
+ 01 #! /usr/bin/perl
+ 02 use strict;
+ 03 use Geo::Postcodes::U2 0.30;
+ 04 use HTML::Entities ();
+ 05 use CGI ();
+
+ 06 print CGI::header(), CGI::start_html('-');
+
+ 07 if (CGI::param())
+ 08 {
+ 09   my $postcode = CGI::param('postcode');
+
+Check that the program was given the '?postcode=xxxx' argument.
+
+ 10   if (!Geo::Postcodes::U2::legal($postcode))
+ 11   {
+ 12     print "<em>Illegal postcode</em>";
+ 13   }
+ 14   elsif (!Geo::Postcodes::U2::valid($postcode))
+ 15   {
+ 16     print "<em>Postcode not in use</em>";
+ 17   }
+
+Give an error message that is as helpful as possible.
+
+ 18   else
+ 19   {
+ 20     print HTML::Entities::encode(Geo::Postcodes::U2::location_of($postcode));
+ 21   }
+
+If the postcode is valid, we return the location. The I<encode> call transforms any
+8-bit (non us-ascii) characters (as the danish and norwegian 'æ', 'ø' and 'å')
+to html character codes, as they would otherwise get scrambled (as we chose to
+send the location string in hmtl instead of xml).
+
+ 22 }
+
+ 23 print CGI::end_html(), "\n";
+
+=head1 USAGE
+
+=over
+
+=item 1
+
+Copy the three files I<index.html>, I<location_u2.cgi> and I<postcodecheck.js>
+(available in the I<eg/> directory of the distribution) to a directory on a
+web server, and make sure that execution of cgi-scrips are allowed there.
+
+=item 2
+
+Choose a country module to use (as 'U2' is fictious),
+e.g. I<Geo::Postcodes::NO>. Install this module, if not already done. Rename
+the file I<location_u2.cgi> to <location_no.cgi>.
+
+=item 3
+
+Swap all occurences of the string 'u2' in the two files I<index.html> and
+I<location_u2.cgi> with 'no'.
+
+=item 4
+
+Open the index file in a web browser.
+
+=back
+
+=head1 THINGS TO DO
+
+There are several things that can be done to this ajax example:
+
+=over
+
+=item 1
+
+Use the CPAN module I<CGI::Ajax> instead of my javascript code. This
+will probably also fix the compatibility problem with Internet Explorer.
+
+=item 2
+
+Speed it up considerably by setting it up as a mod_perl handler.
+
+=back
+
+=head1 SEE ALSO
+
+The tutorial I<perldoc Geo::Postcodes::Tutorial> or
+I<man Geo::Postcodes::Tutorial>, and the documentation for the individual
+country modules; e.g. I<perldoc Geo::Postcodes::NO> or
+I<man Geo::Postcodes::NO>.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Arne Sommer - perl@bbop.org
+
+This library is free software; you can redistribute them and/or modify
+it under the same terms as Perl itself.
+
+=cut

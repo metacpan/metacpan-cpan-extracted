@@ -1,0 +1,1069 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - Manual - Hinting aka generating specific layouts</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link rel="Start" href="index.html">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+  <a class="menubck" href="index.html" title="Back to the manual index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+
+  <a class="menuext" href="overview.html" title="How everything fits together">Overview</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+  <a class="menucur" href="hinting.html" title="Generating specific layouts">Hinting</a>
+    <a class="menuind" href="#flow" title="Set the flow direction of the graph">Flow</a>
+    <a class="menuind" href="#ports" title="Specify edge end/start ports">Ports</a>
+    <a class="menuind" href="#joints" title="Edge joining, splicing and connecting">Joints</a>
+    <a class="menuind" href="#size" title="Adjust node sizes">Node size</a>
+    <a class="menuind" href="#groups" title="Group nodes together">Grouping</a>
+    <a class="menuind" href="#minlen" title="Enforce minimum edge lengths and distances">Minlen</a>
+    <a class="menuind" href="#autosplit" title="Create rows/columns of node cells">Autosplit</a>
+    <a class="menuind" href="#relatives" title="Place nodes relative to each other">Relatives</a>
+  <a class="menuext" href="output.html" title="Output formats and their limitations">Output</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+  <a class="menuext" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+  <a class="menuext" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+  <a class="menuext" href="tutorial.html" title="Tutorial for often used graph types and designs">Tutorial</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h1>
+
+<h2>Hinting - or how to create specific graph layouts</h2>
+
+<div class="text">
+
+<p>
+If you haven't done so, please read the <a href="overview.html">Overview</a> first,
+followed by the chapter about the <a href="layouter.html">Layouter details</a>.
+</p>
+
+<p>
+This chapter gives an overview over all the different hints you can
+give the layouter on how to layout the graph. For specific, visual
+examples, please see the <a href="tutorial.html">tutorial chapters</a>.
+</p>
+
+<h3>Introduction</h3>
+
+<p>
+Graph::Easy's layouter is responsible for converting a (internal) graph representation into
+a specific layout. Here are two example layouts, automatically produced from the same
+input graph:
+</p>
+
+<img src="img/example1.png" alt="Example layout of simple graph" style="float: left">
+<pre class="graph">
++---+     +---+     +---+
+| A | --> | C | --> | D |
++---+     +---+     +---+
+            |
+            |
+            v
+          +---+
+          | E |
+          +---+
+</pre>
+
+<div class="clear"></div>
+
+<h3>Influencing the Layout</h3>
+
+<p>
+Although the placement of nodes, edges and labels is completely automated, 
+you can influence the created layout by giving the layouter hints like
+the following:
+</p>
+
+<ul>
+  <li><a href="#flow">adjusting the flow direction</a>
+  <li><a href="#size">setting node sizes</a>
+  <li><a href="#groups">grouping nodes together</a>
+  <li><a href="#autosplit">Creating rows/columns of nodes</a>
+  <li><a href="#relatives">Placing nodes relativ to each other</a>
+  <li><a href="#minlen">Enforcing edge lengths and minimum distances</a>
+  <li><a href="#clusters">placing nodes relativ to each other</a>
+  <li><a href="#edges">specify edge starting/ending ports</a>
+</ul>
+
+<p>
+Some of the hints will be used only as <i>hints</i> by the layouter, e.g. it
+might ignore them to produce a complete layout. Other hints like
+relative node placements are taken as strict "must do", and these might
+create dilemmas for the layouter. So use them only when absolutely neccessary.
+</p>
+
+<a name="flow">
+<h3>Flow Control</h3>
+</a>
+
+<p>
+You can use the attribute <a href="att_graphs.html#graph_flow">flow</a>
+to let the graph flow in another general direction:
+</p>
+
+<h4>Flow-dependend and Flow-independend Directions</h4>
+
+<p>
+Flow can be specified either
+<b>absolut</b> (giving absolut directions like <code>south</code> or <code>west</code>),
+or <b>relative</b> (directions <code>left</code>, <code>front</code> etc that
+are relative to the local flow at that node).
+</p>
+
+<h4>Controlling the Overall Graph Flow</h4>
+
+<pre class="graphtext">
+graph { flow: south; }
+
+[ Hamm ] -> [ Essen ] -> [ Olpe ]
+</pre>
+
+<pre class="graph">
++-------+
+| Hamm  |
++-------+
+  |
+  |
+  v
++-------+
+| Essen |
++-------+
+  |
+  |
+  v
++-------+
+| Olpe  |
++-------+
+</pre>
+
+<pre class="graphtext clear">
+graph { flow: west; }
+
+[ Hamm ] -> [ Essen ] -> [ Olpe ]
+</pre>
+
+<pre class="graph">
++------+     +-------+     +------+
+| Olpe | <-- | Essen | <-- | Hamm |
++------+     +-------+     +------+
+</pre>
+
+<p class="clear">
+All four flow directions (north, south, west, east) are supported, even when
+generating <code>graphviz</code> code (<i>dot</i> does not easily support
+upwards and leftwards flow directions without some trickery).
+</p>
+
+<h4>Controlling the Flow per Node</h4>
+
+<p>
+You can also change the flow on a per-node basis.
+<br>
+In the next example the node <b>Siegen</b> has a flow towards <code>west</code> (because this is
+the general flow of the graph). The default flow for all its outgoing edges is
+then modified to be <code>left</code>, which amounts to <code>south</code>,
+since looking westwards and turning left 90 degress will make you looking
+southwards:
+</p>
+
+</p>
+
+<pre class="graphtext">
+graph { flow: west; }
+
+[ Duisburg ] -> [ Siegen ] { flow: south; }
+ -> [ Adenau ]
+</pre>
+
+<pre class="graph">
++--------+     +----------+
+| Siegen | <-- | Duisburg |
++--------+     +----------+
+  |
+  |
+  v
++--------+
+| Adenau |
++--------+
+</pre>
+
+<div class="clear"></div>
+
+<h4>Controlling the Flow per Edge</h4>
+
+<p>
+You can also set the flow direction for each edge on its own.
+We modify the example above by adding another node. Instead
+of relying on the out-going flow from <b>Siegen</b>, we
+give this edge its own flow, namely <code>up</code>. (<code>right</code>
+would have worked, too. In fact, relative flow is always better,
+we will see below why.)
+</p>
+
+<pre class="graphtext">
+graph { flow: west; }
+
+[ Duisburg ] -> [ Siegen ] { flow: left; }
+ -> [ Adenau ]
+[ Siegen ] -> { flow: up; } [ Monschau ]
+</pre>
+
+<img src="img/flow.png" alt="Flow directions (partially supported by dot)" title="Flow directions (partially supported by dot)" class="float">
+
+<pre class="graph">
++----------+
+| Monschau |
++----------+
+  ^
+  |
+  |
++----------+     +----------+
+|  Siegen  | <-- | Duisburg |
++----------+     +----------+
+  |
+  |
+  v
++----------+
+|  Adenau  |
++----------+
+</pre>
+
+<div class="clear"></div>
+
+<a name="ports">
+<h3>Edge start/end ports</h3>
+</a>
+
+<p>
+Before we continue with the differences between relative and absolute flow,
+let's just have a look at <code>port numbers</code> and <code>sides</code>:
+</p>
+
+<pre>
+..................................................
+:      :<span class="port">       </span>:<span class="port">       </span>:       :     :     :     :
+: 0,0  :<span class="port">north,0</span>:<span class="port">north,1</span>: 3,0   : 4,0 : 5,0 : 6,0 :
+:      :<span class="port">left,0 </span>:<span class="port">left,1 </span>:       :     :     :     :
+:      :<span class="port">       </span>:<span class="port">       </span>:       :     :     :     :
+..................................................
+:<span class="port">      </span>:<span class="node">+-------------+</span>:<span class="port">       </span>:     :     :     :
+:<span class="port">west,0</span>:<span class="node">|             |</span>:<span class="port">east,0 </span>: 4,1 : 5,1 : 6,1 :
+:<span class="port">back,1</span>:<span class="node">|             |</span>:<span class="port">front,0</span>:     :     :     :
+:<span class="port">      </span>:<span class="node">|             |</span>:<span class="port">       </span>:     :     :     :
+........<span class="node">|    Node     |</span>...........................
+:<span class="port">      </span>:<span class="node">|             |</span>:<span class="port">       </span>:     :     :     :
+:<span class="port">west,1</span>:<span class="node">|             |</span>:<span class="port">east,1 </span>: 4,2 : 5,2 : 6,2 :
+:<span class="port">back,1</span>:<span class="node">|             |</span>:<span class="port">front,1</span>:     :     :     :
+:<span class="port">      </span>:<span class="node">+-------------+</span>:<span class="port">       </span>:     :     :     :
+.................................................
+:      :<span class="port">       </span>:<span class="port">       </span>:       :     :     :     :
+: 0,3  :<span class="port">south,0</span>:<span class="port">south,1</span>: 3,3   : 4,3 : 5,3 : 6,3 :
+:      :<span class="port">right,0</span>:<span class="port">right,1</span>:       :     :     :     :
+:      :<span class="port">       </span>:<span class="port">       </span>:       :     :     :     :
+.................................................
+</pre>
+
+<p>
+Each side of a node can be named. The reason that there are two names
+(<code>north</code> and <code>left</code>)
+has to do with graph/node flow. The south side of the node is always
+the same side, no matter what the flow at the node is. The <code>right</code>
+side is always perpendicular to the <code>front</code> side - and the
+front side always points in the direction of the flow.
+Here is an example that should make this clear:
+</p>
+
+<pre class="graphtext">
+[ C ] -> { start: south; } [ S ] { origin: C; offset: 0,2; }
+[ C ] -> { start: north; } [ N ] { origin: C; offset: 0,-2; }
+[ C ] -> { start: east; }  [ E ] { origin: C; offset: 2,0; }
+[ C ] -> { start: west; }  [ W ] { origin: C; offset: -2,0; }
+</pre>
+
+<pre class="graph">
+          +---+
+          | N |
+          +---+
+            ^
+            |
+            |
++---+     +---+     +---+
+| W | <-- | C | --> | E |
++---+     +---+     +---+
+            |
+            |
+            v
+          +---+
+          | S |
+          +---+
+</pre>
+
+<div class="clear"></div>
+
+<pre class="graphtext">
+[ C ] -> { start: right; } [ R ] { origin: C; offset: 0,2; }
+[ C ] -> { start: left; }  [ L ] { origin: C; offset: 0,-2; }
+[ C ] -> { start: front; } [ F ] { origin: C; offset: 2,0; }
+[ C ] -> { start: back; }  [ B ] { origin: C; offset: -2,0; }
+</pre>
+
+<pre class="graph">
+          +---+
+          | L |
+          +---+
+            ^
+            |
+            |
++---+     +---+     +---+
+| B | <-- | C | --> | F |
++---+     +---+     +---+
+            |
+            |
+            v
+          +---+
+          | R |
+          +---+
+</pre>
+
+<div class="clear"></div>
+
+<p>
+Both graphs look the same, so there does not seem much point in using
+<code>right</code> or <code>south</code>. However changing the flow of the
+graph will show a difference:
+</p>
+
+<pre class="graphtext">
+graph { <em>flow: down;</em> }
+
+[ C ] -> { <em>start: south;</em> } [ S ] { origin: C; offset: 0,2; }
+[ C ] -> { <em>start: north;</em> } [ N ] { origin: C; offset: 0,-2; }
+[ C ] -> { <em>start: east;</em> }  [ E ] { origin: C; offset: 2,0; }
+[ C ] -> { <em>start: west;</em> }  [ W ] { origin: C; offset: -2,0; }
+</pre>
+
+<pre class="graph">
+          +---+
+          | N |
+          +---+
+            ^
+            |
+            |
++---+     +---+     +---+
+| W | <-- | C | --> | E |
++---+     +---+     +---+
+            |
+            |
+            v
+          +---+
+          | S |
+          +---+
+</pre>
+
+<div class="clear"></div>
+
+<pre class="graphtext">
+graph { <em>flow: down;</em> }
+
+[ C ] -> { <em>start: right;</em> } [ R ] { origin: C; offset: 0,2; }
+[ C ] -> { <em>start: left;</em> }  [ L ] { origin: C; offset: 0,-2; }
+[ C ] -> { <em>start: front;</em> } [ F ] { origin: C; offset: 2,0; }
+[ C ] -> { <em>start: back;</em> }  [ B ] { origin: C; offset: -2,0; }
+</pre>
+
+<pre class="graph">
+          +---+
+          | L | <+
+          +---+  |
+                 |
+  +---------+    |
+  v         |    |
++---+     +---+  |  +---+
+| B |  +- | C | -+  | F |
++---+  |  +---+     +---+
+       |    |         ^
+       |    +---------+
+       |
+       |  +---+
+       +> | R |
+          +---+
+</pre>
+
+<img src="img/ports.png" alt="Relative starting side of edges" title="Relative starting side of edges" class="float">
+
+<div class="clear"></div>
+
+<p>
+You can see that the first graph did not change at all.
+<br>
+The second one looks different, though. Since the node offsets are fixed
+(they do not change with the flow, as this is not possible yet), all the nodes
+are still placed at the same position.
+But the starting ports moved (rotated) with the flow direction!
+</p>
+
+<p>
+Summary: To make graphs flow-invariant, use south etc, to make it possible
+to rotate graphs, use <code>left</code>, <code>right</code>, <code>front</code>
+or <code>back</code>.
+</p>
+
+<p>
+Here is one more example:
+</p>
+
+<pre class="graphtext">
+graph { flow: east; }
+
+[1 - turn back]
+ --> {flow: <em>back</em> } [2 - turn left]
+ --> {flow: <em>left</em> } [3 - turn left]
+ --> {flow: <em>left</em> } [4 - turn right] 
+ --> {flow: <em>right</em> } [5 - turn right] 
+ --> {flow: <em>right</em> } [6 - finished]
+</pre>
+
+<pre class="graph">
++---------------+     +----------------+
+| 2 - turn left | <-- | 1 - turn back  |
++---------------+     +----------------+
+  |
+  |
+  v
++---------------+     +----------------+
+| 3 - turn left | --> | 4 - turn right |
++---------------+     +----------------+
+                        |
+                        |
+                        v
++---------------+     +----------------+
+| 6 - finished  | <-- | 5 - turn right |
++---------------+     +----------------+
+</pre>
+
+<div class="clear"></div>
+
+<h4>Port numbers</h4>
+
+<p>
+By setting the start/end port to one side, you instruct the layouter
+to place the edge on one arbitrary port on that side:
+</p>
+
+<pre class="graphtext">
+[ Left ] -> { start: left; end: left; } [ Right ]
+</pre>
+
+<img src="img/sides.png" alt="Edge start/end side" title="Edge start/end side" class="float">
+
+<pre class="graph">
+  +------------+
+  |            v
++------+     +-------+
+| Left |     | Right |
++------+     +-------+
+</pre>
+
+<p class="clear"></p>
+
+<a name="joints">
+<h3>Joins (Edge Splicing and Splitting</h3>
+</a>
+
+<p>
+Whenever two (or more) edges share <b>one common start port</b> (not just one side, like
+<code>south</code>), they will split up somewhere along their path.<br>
+Likewise, when two or more edges share <b>one common end port</b>, the
+edges will joint up somewhere on their way to the target node:
+</p>
+
+<pre class="graphtext">
+ [ Potsdam ], [ Mannheim ]
+   --> { <em>end: back,0;</em> }
+ [ Weimar ]
+   --> { <em>start: front,0;</em> } [ Finsterwalde ], [ Aachen ]
+</pre>
+
+<div class="clear"></div>
+
+<img src="img/joints.png" alt="Edge joints" title="Example of edge joints" class="float">
+
+<pre class="graph">
++----------+           +--------+          +--------------+
+| Mannheim | ------+-> | Weimar | -+-----> | Finsterwalde |
++----------+       |   +--------+  |       +--------------+
+                   |               |
+                   |               |
+                   |               |
++----------+       |               |       +--------------+
+| Potsdam  | ------+               +-----> |    Aachen    |
++----------+                               +--------------+
+</pre>
+
+<p class="clear">
+This works even in combination with edge labels:
+</p>
+
+<pre class="graphtext">
+[ Jena ] 
+ <em>-- train --&gt;</em> { <em>start: front, 0;</em> } 
+  [ Augsburg ], [ Ulm ]
+[ Jena ] <em>-- car --&gt;</em> { start: front, 0; } [ Plauen ]
+</pre>
+
+<div class="clear"></div>
+
+<img src="img/joint_labels.png" alt="Edge joints" title="Edge joints with labels" class="float">
+
+<pre class="graph">
++------+           train    +----------+
+| Jena | ------+----------> |   Ulm    |
++------+       |            +----------+
+               |   train    +----------+
+               +----------> | Augsburg |
+               |            +----------+
+               |    car     +----------+
+               +----------> |  Plauen  |
+                            +----------+
+</pre>
+
+<div class="clear"></div>
+
+<a name="size">
+<h3>Node sizes (multi-celled nodes)</h3>
+</a>
+
+<p>
+You can specify the size of a node in rows and columns by using either the
+<code>rows</code>, <code>columns</code> or <code>size</code> attribute:
+</p>
+
+<pre class="graphtext">
+[ A ] { size: 2,2; }
+-> [ B ] { rows: 2; }
+-> [ C ] { columns: 3; }
+</pre>
+
+<div class="clear"></div>
+
+<p>
+Here is an example that demonstrates this:
+</p>
+
+<pre class="graphtext">
+[ A ] { size: 2,2; }
+-> [ B ] { rows: 2; }
+-> [ C ] { columns: 3; }
+
+[ A ] -> [ B ]
+ -> [ C ]
+ -> [ D ]
+
+[ D ] -> [ C ]
+[ B ] -> [ C ]
+
+[ A ] -> [ F ]
+[ A ] -> [ G ]
+</pre>
+
+<pre class="graph">
+
+                      +---------+    +---------+
+                      |         v    v         |
++---+     +---+     +---+     +--------+     +---+
+| G | <-- |   | --> |   | --> |   C    | --> | D |
++---+     | A |     | B |     +--------+     +---+
+          |   |     |   |       ^
+          |   | --> |   | ------+
+          +---+     +---+
+            |
+            |
+            v
+          +---+
+          | F |
+          +---+
+</pre>
+
+<div class="clear"></div>
+
+<p>
+Even when you do not specify a size, the layouter will grow nodes
+automatically to satisfy the constraints of the layout, for
+instance when more than four edges start/end at a particular
+node. Likewise, when specifying edge ports (see <a href="#ports">above</a>),
+these constraints will grow the node if necessary.
+<br>
+As an example, if you specifiy that there are 5 edges starting/ending
+at the south side of the node, than the node will be made
+at least 5 cells wide.
+</p>
+
+<div class="clear"></div>
+
+<a name="groups">
+<h3>Groups</h3>
+</a>
+
+<p>
+Nodes can be grouped together by using braces, thus creating a subgraph
+(or cluster). A group gives the layouter the hint that these
+nodes are related and should be laid out closely together:
+</p>
+
+<pre class="graphtxt">
+( German Cities
+  [ Berlin ] -> [ Potsdam ]
+) {
+  border-style: dashed;
+  }
+</pre>
+
+<img src="img/grouping.png" alt="Grouping/Clustering/subgraphs" title="Grouping/Clustering/subgraphs" class="float">
+
+<pre class="graph">
+...................................
+: German Cities:                  :
+:                                 :
+: +-------------+     +---------+ :
+: |   Berlin    | --> | Potsdam | :
+: +-------------+     +---------+ :
+:                                 :
+:.................................:
+</pre>
+
+<p class="clear">
+The grouping feature is especially powerfull in combination with the
+<code>nodeclass</code> attribute:
+</p>
+
+<pre>
+node.cities { color: blue; }
+
+( German Cities
+  [ Berlin ] -> [ Potsdam ]
+) { 
+  border-style: dashed;
+  nodeclass: cities;
+  }
+</pre>
+
+<p>
+In this example, all nodes in the group will automatically be put into the
+class <code>node.cities</code>.
+</p>
+
+<p>
+You can also defined edges that run from one group to another,
+or from a node to a group, or from a group to a node:
+</p>
+
+<pre>
+[ From Node to Group ] -->
+
+( German cities:
+  [ Berlin ] -> [ Potsdam ]
+) 
+
+  -- group to group -->
+
+( German rivers:
+  [ Rhein ] -> [ Elbe ]
+)
+
+--> [ From Group to Node ]
+</pre>
+
+<a name="minlen">
+<h3>Relative placement (via minlen)</h3>
+</a>
+
+<p>
+Sometimes you want to enforce a minimum distance between different nodes.
+To achive this, you can set the <a href="att_edges.html#minlen">minlen</a>
+attribute on an edge.
+If necessary, you can also set the edge to <code>invisible</code>
+to hide it from view:
+</p>
+
+<pre class="graphtxt">
+[ Aachen ] --> [ Bonn ] --> [ Coburg ]
+[ Aue ] --> { minlen: 3; } [ Cuxhaven ]
+</pre>
+
+<img src="img/minlen.png" alt="minlen attribute" title="minlen attribute" class="float">
+
+<pre class="graph">
++--------+     +------+     +----------+
+| Aachen | --> | Bonn | --> |  Coburg  |
++--------+     +------+     +----------+
++--------+                  +----------+
+|  Aue   | ---------------> | Cuxhaven |
++--------+                  +----------+
+</pre>
+
+<p class="clear">
+The advantage of setting a minlen on an edge is that the distance
+is enforced in the direction of the flow, e.g. with an relative flow
+the distance becomes rotation-invariant. If one would use a
+relative placement via <code>offset</code>, the two nodes would
+be always placed with the same offset from each other, no matter
+what the flow of the graph is.
+</p>
+
+</a>
+<a name="autosplit">
+<h3>Relative placement (via auto-split)</h3>
+</a>
+
+<p>
+You can cluster nodes together by placing them relatively to each other.
+<br>
+Perhaps the easiest way to achive the placement is to use the
+<i>auto-split</i> feature:
+</p>
+
+<ul>
+  <li>a <code>|</code> (vertical bar) in the node name will split the node
+      into two parts, and place them next to each other, horizontally
+  </li>
+  <li>likewise, <code>||</code> (two vertical bars) in the node name will split the node
+      into two parts, but place the second part at the start of a new row
+  </li>
+  <li>If a part between two <code>|</code> consists of exactly one space, an
+      invisible cell will be generated, e.g. one without borders and background
+  </li>
+  <li>If a part between two <code>|</code> consists of more than one space, an empty
+      cell (e.g. with borders and background) will be generated
+  </li>
+  <li>Trailing empty parts will be treated just like when they apeared in the
+      middle, e.g. both <code>[ |...</code> and <code>[|..-</code> create an
+      invisible leading part, while <code>[  |...</code> (two spaces) creates
+      an empty, but visible leading part. Likewise for trailing parts.
+  </li>
+</ul>
+
+<p>
+Here is a few examples to make this clear:
+</p>
+
+<pre class="graphtext">
+[ A | B | C ]
+</pre>
+
+<pre class="graph">
++---+---+---+
+| A | B | C |
++---+---+---+
+</pre>
+
+
+<pre class="graphtext">
+[ A | B || C ]
+</pre>
+
+<pre class="graph">
++---+---+
+| A | B |
++---+---+
+| C |
++---+
+</pre>
+
+<div class="clear"></div>
+
+<pre class="graphtext">
+[ A | B ||
+  C | D | E ||
+  F ]
+</pre>
+
+<pre class="graph">
++---+---+
+| A | B |
++---+---+---+
+| C | D | E |
++---+---+---+
+| F |
++---+
+</pre>
+
+<p class="clear">
+And now an example showing empty trailing and leading parts:
+</p>
+
+<pre class="graphtext">
+[  | C |  ]
+[ | D |  ]
+[  | E | ]
+[ | F | ]
+[|G|]
+[  |H| |]
+
+[ C.2 ] -> [ A1 ]
+[ D.2 ] -> [ A2 ]
+[ E.2 ] -> [ A3 ]
+[ F.2 ] -> [ A4 ]
+[ G.2 ] -> [ A5 ]
+[ H.3 ] -> [ A6 ]
+</pre>
+
+<pre class="graph">
+    +--+---+--+     +----+
+    |  | C |  | --> | A1 |
+    +--+---+--+     +----+
+       |---+--+     +----+
+       | D |  | --> | A2 |
+        ---+--+     +----+
+    +--+---+        +----+
+    |  | E |    --> | A3 |
+    +--+---+        +----+
+       |---+        +----+
+       | F |    --> | A4 |
+        ---+        +----+
+       |---+        +----+
+       | G |    --> | A5 |
+        ---+        +----+
++--+---+            +----+
+|  | H |        --> | A6 |
++--+---+            +----+
+</pre>
+
+<div class="clear"></div>
+
+<p>
+Please see the section about <a href="syntax.html#attributes" title="Attributes">attributes</a>
+on how to put individual attributes on each autosplit node.
+</p>
+
+<p>
+To reference an autosplit node, you need to know its basename and the number of
+the part that was split up. The basename can be set via an attribute. If not specified,
+it will be automatically created by concatenating all the parts together, without
+spaces or linebreaks. If the basename already exists, an incrementing number
+is appended (including a leading "-"), starting with "1":
+</p>
+
+<pre class="graphtext">
+[ A | B | C ]		# basename is: ABC
+[ A | B | C ]		# basename is: ABC-1
+</pre>
+
+<div class="clear"></div>
+
+<p>
+In this example, the basename for the first autosplit node is "ABC", the second one
+get's as basename "ABC-1".
+</p>
+
+<pre class="graphtext">
+[ A | B | C ]		# basename: ABC
+[ A | B | C ]		# basename: ABC-1
+[ C | D | E ]		# basename: CDE
+[ C | D | E ]		# basename: CDE-2
+</pre>
+
+<div class="clear"></div>
+
+<p>
+Note that the number is unique and increasing for the entire graph, thus
+creating "CDE" and "CDE-2", and <b>not</b> "CDE-1" in the second example.
+
+<p>
+The parts are referenced by their number, with a leading ".". Here is an example
+referencing the second part of the autosplit node:
+</p>
+
+<pre class="graphtext">
+[ A | B | C ]
+[ 1 ] -> [ ABC.2 ]
+</pre>
+
+<pre class="graph">
+         +---+
+         | 1 |
+         +---+
+           |
+           |
+           v
++---+---+----+
+| A | B |  C |
++---+---+----+
+</pre>
+
+<div class="clear"></div>
+
+<p>
+Here is a more complex example, using the basename attribute:
+</p>
+
+<pre class="graphtext">
+[ A|B|C ] { basename: A } [ 1 ] -> [ A.2 ]
+[ A|B|C ] [ 2 ] -> [ ABC-1.2 ]
+</pre>
+
+<div class="clear"></div>
+
+<p>
+This will be rendered like so:
+</p>
+
+<pre class="graph">
+         +---+
+         | 2 |
+         +---+
+           |
+           |
+           v
++---+---+----+
+| A | B |  C |
++---+---+----+
+         +---+
+         | 1 |
+         +---+
+           |
+           |
+           v
++---+---+----+
+| A | B |  C |
++---+---+----+
+</pre>
+
+<div class="clear"></div>
+
+<a name="relatives">
+<h3>Relative Node Placement (with offsets)</h3>
+</a>
+
+<p>
+Another way is to specify an <code>origin</code> and <code>offset</code>
+for a node, placing it relatively to another node:
+</p>
+
+<pre class="graphtext">
+[ Left ] -> [ Right ] { origin: Left; offset: 2,1; }
+</pre>
+
+<pre class="graph">
++------+
+| Left |
++------+
+  |
+  |              +-------+
+  +------------> | Right |
+                 +-------+
+</pre>
+
+<div class="clear"></div>
+
+<p>
+The offset should not be <code>0,0</code>. Also, be carefull to node place nodes
+inside each other, especially when using multicelled nodes as explained above.
+</p>
+
+<p>
+The offset is calculated from the left/right or top/bottom side of the node,
+so for a multicelled node that is 3 cells wide, an offset of 2 would still
+place the next node two cells from the right side (instead inside the
+first node):
+</p>
+
+<pre class="graphtext">
+[ A ] { size: 3,2; }
+
+[ A ] -> [ B ] { origin: A; offset: 2,0; }
+[ A ] -> [ C ] { origin: A; offset: 1,1; }
+</pre>
+
+<pre class="graph">
++---+     +---+
+|   | --> | B |
+| A |     +---+
+|   |
+|   |--+
++---+  v
+     +---+
+     | C |
+     +---+
+</pre>
+
+<div class="clear"></div>
+
+<p>
+You can set an <code>origin</code> for each node, even if this node has an
+origin itself.  The only exception is that you may not create loops like in
+the following:
+</p>
+
+<pre class="graphtext">
+[ A ] { origin: B; offset: 1,1; }
+[ B ] { origin: A; offset: 1,1; }       # invalid!
+
+[ C ] { origin: E; offset: 1,1; }
+[ D ] { origin: C; offset: 1,1; }
+[ E ] { origin: C; offset: 1,1; }       # invalid!
+</pre>
+
+<div class="clear"></div>
+
+<p>
+And here is an example, using a chain of origins:
+</p>
+
+<pre class="graphtext">
+[ A ] { origin: B; offset: 2,1; }
+
+-> [ B ] { origin: C; offset: 1,1; }
+-> [ C ] { origin: D; offset: 1,1; }
+-> [ D ]
+-> [ E ]
+</pre>
+
+<pre class="graph">
++---+     +---+
+| D | --> | E |
++---+     +---+
+  ^  +---+
+  +--| C |
+     +---+
+       ^  +---+
+       +--| B |
+          +---+
+            ^       +---+
+            +------ | A |
+                    +---+
+</pre>
+
+<div class="clear"></div>
+
+
+</div><div class="text next">
+
+Please continue with the chapter about the <a href="a-star.html">A* algorithm</a> for
+details on pathfinding.
+
+</div>
+
+<div class="footer">
+Page created <span class="date">2005-08-19</span> by <a href="http://bloodgate.com/mail.html">Tels</a>.
+Last update: <span class="date">2006-11-21</span>
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>

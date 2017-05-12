@@ -1,0 +1,44 @@
+Ganglia-Gmetric-XS
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it get an idea of the modules uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+To build XS module, We need some libraries and header files which bundled
+ganglia tarball. so firstly we configure and make ganglia source. Don't
+forget to specify "-fPIC" with CFLAGS.
+
+    cd WORKDIR
+    wget http://dl.sourceforge.net/sourceforge/ganglia/ganglia-3.1.X.tar.gz
+    tar zxf ganglia-3.1.X.tar.gz
+    cd ganglia-3.1.X
+    ./configure CFLAGS="-fPIC" && make
+
+next, run perl Makefile.PL specifying gaglia build directory by --ganglia-dir
+option or environment variable $GANGLIA_DIR.
+
+    perl Makefile.PL --ganglia-dir=WORKDIR/ganglia-3.1.X
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 HIROSE Masaaki
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

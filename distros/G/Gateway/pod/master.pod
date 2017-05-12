@@ -1,0 +1,260 @@
+=head1 NAME
+
+News::Gateway - Tools for gatewaying messages between news and mail.
+
+=head1 SYNOPSIS
+
+    use News::Gateway;
+    my $gateway = News::Gateway->new (1, 'user@example.com');
+    $gateway->modules ('headers', mailtonews => ['misc.test']);
+    $gateway->config_file ('/path/to/config/file');
+    $gateway->read (\*STDIN);
+    my $error = $gateway->apply ();
+    if ($error) { $gateway->error ($error) }
+    $error = $gateway->post ();
+    if ($error) { $gateway->error ($error) }
+
+=head1 DESCRIPTION
+
+This module is a collection of tools to allow gatewaying of mail messages
+into newsgroups or vice versa.  It's written to be extremely modular and
+extendable, so that any modification or check of incoming messages can be
+dropped in.  It's intended to be usable for both a straight gateway or a
+robomoderator, or even as the front end and supporting tool set for human
+moderation.
+
+The module is intended to take input from three different sources:  an
+incoming message, a set of modules that contain checks or modifications to
+be performed to that message, and a configuration file that affects the
+behavior of the modules.  Each module can list one or more configuration
+directives that it takes, and then when those directives are encountered
+in the configuration file, they're parsed and and handed off to the
+module.  Then, after the message has been read in, its headers and body
+are given to each module in turn, so that they can perform whatever tests
+and make whatever modifications they were designed to do.
+
+A message is represented internally as a News::Article object that each
+module has access to, allowing the headers or body to be read and
+manipulated.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new (INTERACTIVE [, MAINTAINER [, SENDER]])
+
+This builds a new News::Gateway object.  C<INTERACTIVE> is a true/false
+flag specifying whether the program is running interactively.  If true,
+the C<error()> method will call C<die> in the event of an error;
+otherwise, it will attempt to send mail to the maintainer and the sender
+of the message.  C<MAINTAINER> is the e-mail address of the maintainer of
+the gateway, defaulting to the user the program is running as if not
+supplied.  C<SENDER> is the envelope sender which should be used for all
+mail sent through News::Gateway, defaulting to C<MAINTAINER> if not
+supplied.
+
+=back
+
+=head1 METHODS
+
+First, the standard methods in the order in which they are normally
+called.  Some of these methods, like C<modules()>, are normally called
+only once, while others, like C<read()>, may be called multiple times for
+multiple incoming messages.  You'll almost certainly also want to read
+about the C<config()>, C<config_file()>, and C<post()> directives below in
+L<"UTILITY MODULES">.
+
+=over 4
+
+=item modules (MODULE [ => ARGUMENTS ] [, ...])
+
+Sets the list of modules that should be applied to each incoming message.
+The list of modules is cumulative; in other words, C<modules()> can be
+called multiple times to add more modules to the list of ones which will
+be applied.  This method both adds each supplied module name to the list
+of modules that will be run if C<apply()> is called with no arguments and
+sets up callbacks so that any configuration directives that C<MODULE> is
+interested in will be passed along to it when configuration directives are
+processed.
+
+Some modules may take arguments; if so, they can be passed in as an
+anonymous array associated with the module.  For example:
+
+    $gateway->modules (mailtonews => ['misc.test']);
+
+adds C<mailtonews> to the list of modules and passes in C<misc.test> as an
+argument to it.
+
+Modules will be run in the order they are given to C<modules()>.
+
+C<modules()> should always be called before any call to C<apply()>,
+C<config()>, or C<config_file()> that those modules are supposed to
+affect.
+
+=item read (SOURCE [, MAXSIZE [, MAXHEAD]])
+
+Reads in a new message from the supplied source, which can be a file name,
+a file handle, or even an anonymous sub which will be called repeatedly
+for each line of the message until it returns undef.  C<MAXSIZE>, if
+given, specifies the maximum size in bytes of the article body, and
+C<MAXHEAD>, if given, specifies the maximum size in bytes of the article
+headers.  C<MAXSIZE> defaults to 256KB and C<MAXHEAD> defaults to 8KB.
+
+This method returns the total number of bytes read if successful, or undef
+in the case of an error.
+
+This method constructs a new News::Article object and calls its method, so
+it will always support essentially the same arguments as the corresponding
+News::Article C<read()> method.
+
+=item apply (MODULES)
+
+This method hands the message off to each module given (if no modules are
+given, the message is given to each module registered by C<modules()> in
+the order in which they were given to C<modules()>) and lets them do
+whatever they wish with the article.  If a module returns undef, it's
+presumed to be successful and the message is given to the next module.  If
+a module returns a string, it's considered to be a failure message and
+C<apply()> stops.
+
+If all modules succeed, C<apply()> returns undef or the empty list.  If a
+module fails, C<apply()> returns a list consisting of the module which
+failed and the message it failed with in a list context; or a string
+consisting of the name of the module, a colon, a space, and the message it
+failed with in a scalar context.
+
+The calling script should then look at the failure message and take the
+appropriate action.
+
+=back
+
+The following additional methods are also supplied, some of which are
+mostly intended for internal use.
+
+=over 4
+
+=item error (ERROR)
+
+Handles a fatal error.  If the C<INTERACTIVE> flag passed to C<new()> was
+true, this method just calls C<die> with the error message.  Otherwise, it
+calls C<mail_error()> (part of the standard C<mail> module), which
+attempts to mail the maintainer and the sender of the message.  If that
+fails, for whatever reason, News::Gateway calls C<exit> with the right
+status code for a mail bounce.
+
+This method should be used B<only> for fatal, unrecoverable errors,
+particularly when C<INTERACTIVE> isn't true, since it could bounce mail or
+notify the wrong person of problems.  It's a last resort that goes to
+great lengths to try to keep the message from being lost.
+
+=item get_article ()
+
+An accessor method that returns the underlying News::Article object.
+
+=item set_article (ARTICLE)
+
+Takes a News::Article object and makes that the underlying message in that
+instance of News::Gateway, discarding the old one if any.
+
+=back
+
+=head1 REWRITE MODULES
+
+The following modules to perform checks or rewrites of messages are part
+of the standard distribution.  To use them with a News::Gateway object,
+pass them (along with anonymous arrays for their options, if any) to the
+C<modules()> method.
+
+@@ rewrite: This section is automatically generated from pod/*.pod
+
+=head1 UTILITY MODULES
+
+The following modules are also part of the standard distribution.  Rather
+than rewrite or check messages, they provide additional methods that can
+be used by programs, other modules, even or the News::Gateway core code.
+Methods supplied by utility modules can be called like any other
+News::Gateway method.
+
+@@ utility: This section is automatically generated from pod/*.pod
+
+=head1 DIAGNOSTICS
+
+In addition to the failure messages generated by modules (listed above),
+the following messages may be generated by the News::Gateway core code and
+would be passed to the C<error()> method.
+
+=over 4
+
+=item Autoload of %s failed: %s
+
+A method was called that doesn't exist in the core code and was unable to
+be loaded from a module.  Chances are you made a typo when referring to a
+News::Gateway method.
+
+=item Cannot open file %s: %s
+
+News::Gateway attempted to open a file (probably the configuration file)
+and failed for the given reason.
+
+=item Unable to load %s: %s
+
+One of the modules (either rewrite or utility) you used requires an
+external Perl module and was unable to load it.
+
+=item Unknown module %s
+
+You told C<modules()> to load a module that has no hooks registered.
+News::Gateway has to know about every module that it can use; you can't
+just copy in a new module with the others and have it work.  Instead, put
+the module in the F<modules> directory before the build process.
+
+=back
+
+=head1 BUGS
+
+Many.  This is an B<alpha> release, with all that's implied by that in
+terms of bugs, interface instability, and other such concerns.  Use at
+your own risk, but if you encounter a bug please let me know.  Patches in
+particular are gratefully accepted.
+
+=head1 NOTES
+
+If you are interested in being notified of new releases, helping with
+development, developing, testing, or using new modules, or even just
+getting tips on how to use this module, there is a mailing list available.
+To subscribe, send mail to majordomo@eyrie.org with:
+
+    subscribe gateway-users
+
+in the body.
+
+New patches and modules are always welcome, whether from people on the
+list or not, and can be mailed to the address listed below.
+
+=head1 SEE ALSO
+
+L<News::Article>
+
+=head1 AUTHOR
+
+Russ Allbery E<lt>rra@stanford.eduE<gt>.
+
+=head1 HISTORY
+
+News::Gateway started as a simple mail to news Perl script, written right
+after the cs.utexas.edu mail to news gateway closed and just a quick hack
+for the use of people who had previously used that gateway to post to
+rec.arts.comics.creative and alt.comics.lnh.  Over time, it became a
+general mail to news gateway with a fairly broad set of features.
+
+Eventually, it became obvious that it really B<should> have been a module
+rather than a script, and it also became clear that it could be used as
+the core of a robomoderator.  Since there was no real general-purpose
+robomoderation software around that was nearly as flexible as I thought a
+package B<should> be, I decided to be ambitious and try to solve the
+general problem.
+
+Then I took a complete detour to rewrite the entire thing again to use
+Andrew Gierth's News::Article class, which is what I should have been
+doing from the beginning.  And now, finally, it's getting closer to what
+I'd envisioned.

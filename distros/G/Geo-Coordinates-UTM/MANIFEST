@@ -1,0 +1,9 @@
+Changes
+UTM.pm
+Makefile.PL
+MANIFEST
+README
+t/01_basic_settings.t
+t/02_points.t
+t/03_mgrs.t
+META.yml                                 Module meta-data (added by MakeMaker)

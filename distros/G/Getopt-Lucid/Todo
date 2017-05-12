@@ -1,0 +1,45 @@
+TODO list for Perl module Getopt::Lucid
+
+#--------------------------------------------------------------------------#
+# Bugs
+#--------------------------------------------------------------------------#
+
+- repeated parameters should be OK -- later should override.  Could add 
+  a "unique" modifier for original behavior
+
+#--------------------------------------------------------------------------#
+# Features to add
+#--------------------------------------------------------------------------#
+
+- new option types:  
+  - Version( $string ) -- defaults to "--version" and preempts exceptions
+    - prints $VERSION of script
+  - Help( $string ) -- defaults to "--help|-h|-?" and preempts exceptions
+    - prints any usage information defined in spec?
+    - optional coderef to handle help (given rest of command line as args)
+- create spec modifier with coderef to denote a potential command
+    - dispatch to command immediately when seen & pass the rest of the 
+      array for further processing -- maybe gets back modified command line
+      if it comes back at all
+    - commands() function to give list of command seen on command line (?)
+    - dispatch() function to call, in order, the list of commands (?)
+- Usage information in spec and printed by a separate function
+    - optional name for params usage("msg", "FILE") --> --input=FILE
+    - usage("msg", "LABEL", "VALUE") --> --keypair LABEL=VALUE
+- For keypair validation, pass *both* key and value to a validation 
+  subroutine (allowing custom validation by key)
+- Callbacks (?)
+- option to allow unrecognized dash-prefixed options without exception
+- "cuddle" parameters -- e.g. "-Ilib" is "-I lib"
+
+#--------------------------------------------------------------------------#
+# Bugfixes/technical/other
+#--------------------------------------------------------------------------#
+
+- test how negation is handled under $STRICT
+- write cookbook
+- refactor ugly code (module and tests)
+- Allow keypairs to escape an equals sign for use in keys(?) -- e.g.
+  "define is\==value" giving "is=" => "value" (Does anyone really need
+  this?)
+

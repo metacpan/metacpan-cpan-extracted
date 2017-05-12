@@ -1,0 +1,10 @@
+Changes
+Geocoding.pm
+Geocoding/Result.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-lookup.t
+t/02-fail.t
+META.yml                                 Module meta-data (added by MakeMaker)

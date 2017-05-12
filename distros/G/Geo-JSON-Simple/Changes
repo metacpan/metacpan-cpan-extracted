@@ -1,0 +1,23 @@
+==================================================
+Changes from 1740-03-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2013-12-22 02:35:52 +0000
+------------------------------------------
+
+  Change: 1cd52f7386b6944a974cc29d9a4b7206156e50c1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-22 03:35:20 +0000
+
+    Base implementation and tests, ready for first release 
+
+  Change: 9e8f266bce3521ce7b2163b0d11a00480a6cd9c6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-21 23:37:14 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

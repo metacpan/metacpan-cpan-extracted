@@ -1,0 +1,14 @@
+Revision history for Git-Mailmap
+
+0.004     2015-05-26 01:22:53+03:00 Europe/Helsinki Changed aliases: one email, one name -> one email, many names. Added to test.
+          Fixed minor bugs.
+
+0.003     2015-04-19 12:54:14+03:00 Europe/Helsinki
+          Added method to_string to SYNOPSIS.
+          Removed __END__ from module end.
+          Method from_string now always returns the object, not just when called as creator method.
+          Enabled release test Test::Synopsis again.
+
+0.002     2015-04-11 22:48:26+03:00 Europe/Helsinki
+
+0.001     2015-03-30 01:02:04+03:00 Europe/Helsinki   Initial version.

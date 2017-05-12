@@ -1,0 +1,44 @@
+{
+   "abstract" : "GenOO framework extension to read SAM files created by the BWA aligner",
+   "author" : [
+      "Emmanouil \"Manolis\" Maragkakis <mns.marag@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GenOOx-Data-File-SAMbwa",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GenOO::Data::File::SAM::Record" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose::Role" : "0",
+            "Test::Class::Moose" : "0",
+            "Test::Class::Moose::Load" : "0",
+            "Test::Class::Moose::Role::AutoUse" : "0",
+            "Test::Class::Moose::Runner" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.0.4"
+}
+

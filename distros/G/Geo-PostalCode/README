@@ -1,0 +1,17 @@
+Geo::Postalcode is a module for calculating the distance between two postal
+codes.  It can find the postal codes within a specified distance of another
+postal code.  It can lookup the city, state, longitude and latitude by
+postal code.
+
+To access the data, it uses Berkeley DB, which is fast and portable
+(most Linux/Unix servers have it pre-installed.)
+
+To install, see the INSTALL file.
+
+This class is designed to be easy to subclass.  For example,
+Geo::PostalCode::US could contain all US Zipcodes.
+
+Copyright (c) 2006, MaxMind.com, tjmather@maxmind.com
+
+All rights reserved.  This package is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

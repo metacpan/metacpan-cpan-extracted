@@ -1,0 +1,68 @@
+Revision history for Perl extension Graphics::ColorPicker
+
+0.17  Sun Jun  3 12:20:40 PDT 2012
+	add missing <head> to right picker frame
+
+0.16  Fri May  4 15:59:20 PDT 2012
+
+0.15  Wed Mar 28 21:48:28 PDT 2012
+	fix html typo
+
+0.14  Sun Mar 25 14:14:39 PDT 2012
+	add demo2.html link to documentation
+
+0.13  Sun Mar 25 13:04:06 PDT 2012
+	add call back hook for color "update" function to
+	allow frame embedded use of Color Picker
+
+0.12  Wed May 18 15:13:24 PDT 2011
+	change javascript eval(stuff) to parseInt(....)
+
+	Thanks to spoon.reloaded@gmail.com for the code improvement
+
+0.11  Tue Sep 30 14:39:07 PDT 2008
+	add link in documentation to operational demo
+	add current year to dynamic copyright statement
+
+0.10  Mon Aug 26 15:22:31 PDT 2002
+	add "!important" to style font settings
+
+0.09  Sat Aug 17 12:08:47 PDT 2002
+	Update README file and pod docs.
+	Restore "show" frame background = white
+	removed for "Opera" development.
+	Add version number to pop window.
+
+0.08  Sat Aug 17 11:59:19 PDT 2002
+	add function "no_picker" to allow selection of pop up
+	windows with 24 million or web safe colors only
+
+0.07  Thu Aug 15 09:58:41 PDT 2002
+	Change "demo.html" javascript to accomodate
+	certain buggy?? versions of Mozilla 1.0
+	Trap 'Opera' which does not work due to poor javascript
+	implimentation
+
+0.06  Wed Aug 14 13:12:09 PDT 2002
+	added null test.pl
+	missing path to "images" directory added for up-down arrows
+
+0.05  Tue Aug 13 18:40:35 PDT 2002
+	rename module ColorPicker
+
+0.04  Mon Aug 12 20:56:17 PDT 2002
+	Add univeral XY resolution using MOUSEDOWN
+	Revise rev 0.03 to use universal XY for GECKO
+	Add styles for uniform font rendering in most browsers
+
+0.03  Thu Aug  8 17:50:22 PDT 2002
+	add GECKO to the dumb browser list with MSIE
+
+0.02  Wed Jun  5 11:52:42 PDT 2002
+	change window names "picker,data,sample,digits"
+	to "_picker,_data,_sample,_digits"
+
+	correct reference to 'opener' in doSubmit()
+
+0.01  Mon Jun  3 14:16:30 PDT 2002
+	initial release

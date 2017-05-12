@@ -1,0 +1,20 @@
+$Id$
+
+
+give a better name to the entry point for gtk-demo
+make gtk-demo not show the 2.2 stuff when running on 2.0
+should example programs be installed?
+there are plenty of unbound apis, either because of lack of interest or
+	lack of need -- these should be audited.
+
+no typemap (and therefore no bindings) for
+	GdkRgbCmap
+	GScanner <- i'd consider this to be internal
+	PangoEngineShape
+	PangoCoverage
+	PangoLayoutLine
+
+what about decorated window stuff?
+
+foreach callbacks (and possibly other types) need some doc on the callback
+api/params.

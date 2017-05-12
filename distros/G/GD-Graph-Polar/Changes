@@ -1,0 +1,67 @@
+Changes for package GD-Graph-Polar
+
+0.17 2012-05-16
+  - Lazy load all of the stuff in the initialize method
+
+0.16 2011-03-27
+  - Added Todo
+  - Added perl-GD-Graph-Polar.spec to distribution
+  - Added Tests for kwalitee, changes, pods to svn not dist
+  - Moved scripts from bin to scripts folder
+  - Renamed CHANGES to Changes to pass tests
+  - Updated format of Changes to pass tests
+  - Dropped MANIFEST.SKIP as I no longer use make manifest
+  - Dropped META.yml as CPAN now auto generates it
+
+0.15-2 2010-06-10
+  - Updated tests
+  - Dropped use vars
+
+0.15 2006-03-14
+  - Documentation
+
+0.14 2006-03-13
+  - Documentation
+
+0.13 2006-02-25
+  - Fixed calls using named colors to the color method failing
+
+0.12 2006-02-25
+  - Graphics::ColorNames is optional e.g. black=>[0,0,0] or black=>"black"
+
+0.11 2006-02-17
+  - Modification to account for rbg.txt file is not in a standard location
+
+0.10 2006-02-01
+  - Parameters ticks and border can now be 0
+
+0.09 2006-01-25
+  - Corrected Error in _scale method
+  - Corrected Error in _imgxy_xy method
+  - Corrected Error in addGeoString method
+
+0.08 2006-01-24
+  - Added Geo equivalent functions
+
+0.07 2006-01-24
+  - Added color, font, and addString methods
+  - Added example-text.pl
+
+0.06 2006-01-16
+  - Documentation
+
+0.05 2006-01-13
+  - Added addGeoLine methods
+
+0.04 2006-01-13
+  - Added addArc methods
+
+0.03 2006-01-04
+  - Documentation
+
+0.02 2006-12-22
+  - Renamed image method to draw
+  - Added addLine method
+
+0.01 2006-12-20
+  - Original version

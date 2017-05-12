@@ -1,0 +1,21 @@
+
+Revision history for Perl extension Games::Go::AGA::TDListDB
+
+0.048     2016-11-15 14:14:34-08:00 America/Los_Angeles
+    provide print_cb and my_print methods for debug messages.  need this
+        when, e.g: this module is inside a web-app and messages need to go
+        to a log file.
+
+    Handle TDListN.txt properly even if it doesn't have line-breaks.
+
+    Skip tests if SQLite.pm not installed.
+
+    Add README file.
+
+    Add verbose flag.
+
+    Fix how undefined joiners are set to default.
+
+0.026     2015-01-18 15:53:13-08:00 America/Los_Angeles
+    Original release
+

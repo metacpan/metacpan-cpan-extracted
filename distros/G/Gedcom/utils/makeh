@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+# Copyright 2001-2013, Paul Johnson (paul@pjcj.net)
+
+# This software is free.  It is licensed under the same terms as Perl itself.
+
+# The latest version of this software should be available from my homepage:
+# http://www.pjcj.net
+
+use strict;
+use warnings;
+
+my $Command = {
+    set_version => sub {
+        my ($command, $version, $date, @files) = @_;
+        local ($^I, @ARGV) = (".bak", @files);
+        while (<>) {
+            s/(^\s*(?:our\s+)?\$VERSION = ")\d+\.\d+(";)/$1$version$2/;
+            s/(Version )\d+\.\d+( - ).*/$1$version$2$date/;
+            s/(^\s*use Gedcom(?:::\w+)*\s+)\d+\.\d+;/$1$version;/;
+            print;
+        }
+    },
+    make_readme => sub {
+        my ($command) = @_;
+        local @ARGV;
+        while (<>) {
+            print if (/NAME/        ... /^[A-Z ]+$/) =~ /^\d+$/;
+            print if (/DESCRIPTION/ ... /^[A-Z ]+$/) =~ /^\d+$/;
+        }
+    },
+};
+
+sub main {
+    my ($command) = @ARGV;
+    die "No such command: $command" unless $Command->{$command};
+    $Command->{$command}->(@ARGV)
+}
+
+main

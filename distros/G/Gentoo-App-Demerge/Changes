@@ -1,0 +1,108 @@
+Changelog
+---------
+
+0.048 2016-05-22
+ - First version on CPAN with minimal changes.
+ - "make.conf" directory moved to /etc/portage
+ - Fix reliance on deprecated Path API in PortageXS
+
+0.047 2008-12-01
+ - Make use of PortageXS 0.02.09 and fix some silly warnings
+
+0.046 2008-02-21
+ - Fix tab-replacement bug while parsing config-files
+
+0.045 2007-11-20
+ - Check if needed ebuilds are available. Show which ebuild will be used by portage when merging the package.
+
+0.044 2007-05-20
+ - Do not record states in postsync when state is identical to the latest recorded state.
+ - Require dev-perl/PortageXS-0.02.06
+
+0.043 2007-04-18
+ - Force recording virtuals (workaround to fix a bug in <dev-perl/PortageXS-0.02.05)
+ - Removed pre-0.040 converter
+ - Some cosmetic changes
+
+0.042
+ - New option --comment which allows users to leave comments on each state.
+ - Autocomment on states being recorded before restoring a state.
+ - Autocomment on states being recorded in postsync hook.
+ - Option --wipe can now also be used to just delete a single state.
+
+0.041
+ - Tell user what we are doing when analyzing the current state
+ - Do not call GetTerminalSize() if TERM is not set in environment (e.g. when demerge is called by cron; reported by pille <pille@struction.de>)
+
+0.040
+ - Speedups/Caching (in memory)
+ - New storage format (uses less disk space; melts down ~13MB to 60kb per state)
+ - Converter which converts old states (version >=0.027) to the new format
+ - Overall performance: up to 5 times faster than 0.035
+ - Do not call GetTerminalSize() from Term::ReadKey when --postsync is called.
+  (Problems occured while testing on ppc/efika. Reported by Wernfried Haas <amne@gentoo.org>)
+ - Moved configfile to /etc/demerge.conf (converter takes care about moving your configfile to the new location)
+
+0.035
+ - Fix problem with invisible timestamps in terminals like xterm. (Reported by Raúl Porcel <armin76@gentoo.org>)
+
+0.034
+ - New options:
+  --do                Do not ask user to confirm actions - just do it.
+  --restore-previous  Restores previous recorded system-state.
+ - Fix color for warnings.
+
+0.033
+ - This release introduces no new features but kills one little bug. Consider this a service release. (PortageXS-0.02.04->PortageXS-0.02.05 transition.)
+ - Also clean up USE/IUSE duplicates in outputs.
+ - Use getEbuildName() and formatUseflags() from PortageXS-0.02.05 (see PortageXS changelog for further information)
+ - Made NOCOLOR work with PortageXS-0.02.05
+
+0.032
+ - Fixed typo in help.
+ - Work around for portage bug that made useflags appear multiple times in USE/IUSE.
+ - Prettified output. Hope you all like it.
+ - Added new option: -C, --nocolor: Turn off colors
+ - Check for NOCOLOR variable and apply setting from make.conf. (See `man make.conf`)
+  Rule: 'cmd-line option' overrides '.demergerc' overrides 'make.conf'
+ - demerge now also records and restores the world file.
+ - Handle user termination correctly when executing external programs.
+ - Added a note about binpkgs and useflags.
+
+0.031
+ - Fixed error that some packages weren't emerged in a demerge --restore process (broken in 0.030).
+ - New option --dir which can be used to change the datadir demerge uses. Furthermore this can also be
+  done using the new .demergerc. See `man demerge` for further information.
+ - -k, --usepkg now creates binpkgs of the packages before unmerging them.
+ - Fixed changelog.
+
+0.030
+ - emerge/unmerge packages in an even more sane way (could cause breakage in earlier versions)
+
+0.029
+ - Fixed some typos.
+ - emerge/unmerge packages in a more sane way without breaking the system when dealing with packages
+  like portage itself.
+
+0.028
+ - Prettified/simplified output.
+ - Added new option: --wipe-older: Remove all recorded system-states that are older than the given timestamp.
+ - Internal var NEEDVERSION stores minimal needed version for system-states. Older ones are incompatible and cannot
+  be restored any more.
+ - Check for homedir in postsync hook.
+ - Improved --record performance by factor 10.
+ - Added manpage.
+
+0.027
+ - Fixed perl warning when no option was passed to demerge
+ - Check if useflags have been changed
+ - Record used version of demerge in systemstates (to prevent/detect compatibility issues)
+
+0.026
+ - Record useflags too and use them on a per-package base when restoring
+ - Fixed help
+
+0.025
+ - Added short-options --restore for --restore-system-state and --record for --record-system-state
+ - Added new option: -k, --usepkg: Pass -k to emerge so that binary packages will be used when available.
+ - Added new option: --postsync-hook (only to be used in postsync hook; wrapper for --record with less output)

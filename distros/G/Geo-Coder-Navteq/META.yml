@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Geo-Coder-Navteq
+version:            0.03
+abstract:           Geocode addresses with the Navteq MapTP AJAX API
+author:
+    - gray <gray@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::More:  0.82
+requires:
+    Encode:          0
+    LWP::UserAgent:  0
+    URI:             1.36
+    XML::Simple:     0
+resources:
+    repository:  http://github.com/gray/geo-coder-navteq
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

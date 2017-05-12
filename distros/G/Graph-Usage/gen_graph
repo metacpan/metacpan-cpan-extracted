@@ -1,0 +1,230 @@
+#!/usr/bin/perl -w
+
+use lib 'lib';
+use Graph::Usage;
+use strict;
+use Time::HiRes qw/time/;
+use Getopt::Long;
+
+use vars qw/$VERSION/;
+
+$VERSION = $Graph::Usage::VERSION;
+
+print "Graph::Usage v$VERSION (c) by Tels bloodgate.com 2005.\n\n";
+
+# mapping format to method (all) and file extension (except for graphviz)
+my $ext = {
+  html => 'html',
+  graphviz => 'graphviz',
+  svg => 'svg',
+  dot => 'dot',
+  ascii => 'txt',
+  };
+
+# where the user options are stored (plus defaults for them)
+my $opt = {
+  format => 'graphviz',
+  output_file => 'usage',
+  extension => 'png',
+  inc => '',
+  color => 1,
+  nocolor => 0,
+  verbose => 0,
+  help => 0,
+  recurse => '',
+  versions => 0,
+  debug => 0,
+  generator => 'dot',
+  flow => 'south',
+  dotted => 0,          	# dotted edges for "require"?
+  skip => '',           	# which packages to skip
+  use => 'Graph::Usage',	# our brain
+  };
+
+if (!get_options())
+  {
+  print "\n";
+  require Pod::Usage; Pod::Usage::pod2usage(2);
+  }
+
+if (!exists $ext->{$opt->{format}})
+  {
+  require Carp; Carp::croak ("Unknown output format $opt->{format}");
+  }
+
+eval "require $opt->{use}";
+
+if ($@)
+  {
+  require Carp;
+  Carp::confess($@);
+  }
+
+my $brain = $opt->{use}->new( opt => $opt);
+my $brain_version = eval '$' . $opt->{use}. '::VERSION || 0;';
+print "Using $opt->{use} v$brain_version for processing data...\n";
+
+print "Gathering data and generating graph...";
+my $graph = $brain->generate_graph($opt);
+print "done.\n";
+$brain->statistic();
+print "Generating output...";
+$brain->output_file();
+
+print "done.\n";
+print "All done. Have a nice day.\n";
+
+1;
+
+#############################################################################
+
+sub get_options
+  {
+  # hash with options for GetOptions
+  my %options = (
+    'color=i' => \$opt->{color},
+    'debug' => \$opt->{debug},
+    'format=s' => \$opt->{format},
+    'generator=s' => \$opt->{generator},
+    'help' => \$opt->{help},
+    'inc=s' => \$opt->{inc},
+    'nocolor!' => \$opt->{nocolor},
+    'output=s' => \$opt->{output_file},
+    'recurse=s' => \$opt->{recurse},
+    'verbose+' => \$opt->{verbose},
+    'version' => \$opt->{version},
+    'versions!' => \$opt->{versions},
+    'flow=s' => \$opt->{flow},
+    'extension=s' => \$opt->{extension},
+    'skip=s' => \$opt->{skip},
+    'use=s' => \$opt->{use},
+    );
+  return if @ARGV == 0;			# no options?
+
+  my $rc = GetOptions( %options );
+
+  return if @ARGV > 0 || $opt->{help};	# something left over or help request?
+  exit if $opt->{version};		# print only version
+
+  $opt->{color} = 0 if $opt->{nocolor};
+  delete $opt->{nocolor};
+
+  # if output is ascii, disable coloring of edges
+  if ($opt->{format} eq 'ascii')
+    {
+    $opt->{dotted} = 1; 
+    $opt->{color} = 0;
+    }
+
+  # build a regexp from skip:
+  $opt->{skip} = '^\z' if $opt->{skip} eq '';
+  $opt->{skip} = qr/$opt->{skip}/;
+
+  $rc;
+  }
+
+__END__
+
+=pod
+
+=head1 NAME
+
+perl_graph_usage - generate graph with usage patterns from Perl packages
+
+=head1 SYNOPSIS
+
+	./gen_graph --inc=lib/ --format=graphviz --output=usage_graph
+	./gen_graph --nocolor --inc=lib --format=ascii
+	./gen_graph --recurse=Graph::Easy
+	./gen_graph --recurse=Graph::Easy --format=graphviz --ext=svg
+	./gen_graph --recurse=var --format=graphviz --ext=jpg
+	./gen_graph --recurse=Math::BigInt --skip='^[a-z]+\z'
+	./gen_graph --use=Graph::Usage::MySubClass --recurse=Math::BigInt
+
+Options:
+
+	--color=X		0: uncolored output
+				1: default, colorize nodes on how much packages they use
+				2: colorize nodes on how much packages use them
+	--nocolor		Sets color to 0 (like --color=0, no color at all)
+
+	--inc=path[,path2,..]	Path to source tree or a single file
+				if not specified, @INC from Perl will be used
+	--recurse=p[,p2,..]	recursively track all packages from package "p"
+	--skip=regexp		Skip packages that match the given regexp. Example:
+				  -skip='^[a-z]+\z'		skip all pragmas
+				  -skip='^Math::BigInt\z'	skip only Math::BigInt
+				  -skip='^Math'			skip all Math packages
+
+	--output		Base-name of the output file, default "usage".
+	--format		The output format, default "graphviz", valid are:
+				  ascii (via Graph::Easy)
+				  html (via Graph::Easy)
+				  svg (via Graph:Easy)
+				  dot (via Graph:Easy)
+				  graphviz (see --generator below)
+	--generator		Feed the graphviz output to this program, default "dot".
+				It must be installed and in your path.
+	--extension		Extension of the output file. For "graphviz" it will
+				change the format of the output to produce the appr.
+				file type.  For all other formats it will merely set
+				the filename extension. It defaults to:
+				  Format	Extension
+				  ascii		txt
+				  html		html
+				  svg		svg
+				  dot		dot
+				  graphviz	png
+	--flow			The output flows into this direction. Default "south".
+				Possible are:
+				  north
+				  west
+				  east
+				  south
+	--versions		include package version number in graph nodes.
+
+	--debug			print some timing and statistics info.
+
+Help and version:
+
+	--help			print this help and exit
+	--version		print version and exit
+
+
+=head1 DESCRIPTION
+
+This script traces the usage of Perl packages by other Perl packages from
+C<use> and C<require> statements and plots the result as a graph.
+
+Due to the nature of the parsing it might miss a few connections, or even
+generate wrong positives. However, the goal is to provide a map of what
+packages your module/package I<really> uses. This can be quite different
+from what the dependency-tree in Makefile.PL states.
+
+=head1 TODO
+
+=head2 Output formats
+
+Formats rendered via Graph::Easy (HTML, ASCII and SVG) have a few limitations
+and only work good for small to medium sized graphs.
+
+The output format C<graphviz> is rendered via C<dot> or other programs and can
+have arbitrary large graphs.
+
+However, for entire source trees like the complete Perl source, the output becomes
+unlegible and cramped even when using C<dot>.
+
+I hope I can improve this in time.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL version 2.
+See the LICENSE file for information.
+
+=head1 AUTHOR
+
+(c) 2005 by Tels bloodgate.com.
+
+=cut
+

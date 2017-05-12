@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Games-Hack-Patch-i686
+version:             0.52
+abstract:            How to patch code sequences on i686
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Ph. Marek <pmarek@cpan.org>

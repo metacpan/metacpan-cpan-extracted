@@ -1,0 +1,54 @@
+NAME
+    Geo::IP::RU::IpGeoBase - look up location by IP address in Russia
+
+DESCRIPTION
+    This module allows you to look up location in DB provided by
+    http://ipgeobase.ru service. Access to the DB is free. Contains
+    information about city, region, federal district and coordinates.
+
+    DB provided as plain text files and is not very suitable for look ups
+    without loading all data into memory. Instead it's been decided to
+    import data into a database. Use command line utility to create and
+    update back-end DB.
+
+    At this moment DB can be created in SQLite, mysql and Pg. If you create
+    table manually then probably module will just work. It's very easy to
+    add support for more back-end DBs. Patches are welcome.
+
+METHODS
+  new
+    Returns a new object. Takes a hash with options, mostly description of
+    the back-end:
+
+        Geo::IP::RU::IpGeoBase->new( db => {
+            dbh => $dbh, table => 'my_table',
+        } );
+        # or
+        Geo::IP::RU::IpGeoBase->new( db => {
+            dsn => 'dbi:mysql:mydb',
+            user => 'root', pass => 'secret',
+            table => 'my_table',
+        } );
+
+    *   dbh - connected DBI handle, or you can use dsn.
+
+    *   dsn, user, pass - DSN like described in DBI, for example
+        'dbi:SQLite:my.db', user name and his password.
+
+    *   table - name of the table with data, default is 'ip_geo_base_ru'.
+
+  find_by_ip
+    Takes an IP in 'xxx.xxx.xxx.xxx' format and returns information about
+    blocks that contains this IP. Yep, blocks, not a block. In theory DB may
+    contain intersecting blocks.
+
+    Each record is a hash reference with the fields matching table columns:
+    istart, iend, start, end, city, region, federal_district, latitude and
+    longitude.
+
+AUTHOR
+    Ruslan Zakirov >Ruslan.Zakirov@gmail.com<
+
+LICENSE
+    Under the same terms as perl itself.
+

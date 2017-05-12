@@ -1,0 +1,161 @@
+---
+genre: business
+cars:
+ jigsaw:
+  1:
+    identifier: cars 1
+    problem   : At the Penske-Wynn showroom in Las Vegas, people didn't want to buy the cars. they just wanted to look at them. The problem was that there were lots of these people. Many Americans who aren't rich go to Las Vegas because they dream about winning lots of money. These people like to look at expensive cars.
+    good idea : Penske-Wynn started charging a 10 dollar entrance fee. People who said they weren't going to buy a Ferrari or Maserati, and who just wanted to look at the cars had to pay this 10 dollars. Children with their parents didn't have to pay. Ferrari clothes were also sold.
+    results   : About one-fifth of the visitors said they were thinking of buying a car, so didn't have to pay. But there were so many visitors, the showroom was getting almost 100,000 dollars a month in admission fees. In addition, it was selling 20-30 cars a month.
+    conclusion: The experiment was very successful. But other car showrooms may not be able to copy Penske-Wynn's solution. Other showrooms are not in Las Vegas. They do not have many visitors, and are not showing expensive cars to people who dream of being rich. 
+    quiz     :
+      - question: The problem was that too many people wanted to look at the cars.
+        options:
+          - True
+          - False
+        answer  : True
+      - question: People go to Las Vegas to spend lots of money, not win lots of money.
+        answer  : False
+      - question: People had to pay a 10-dollar entrance fee, only if they said they didn't want to buy a car.
+        answer  : True
+      - question: Children had to pay a five-dollar entrance fee.
+        answer  : False
+      - question: Most of the visitors didn't pay. They said they wanted to buy a car.
+        answer  : False
+      - question: The showroom was making almost 100,000 dollars a month.
+        answer  : True
+      - question: Other car showrooms may not be able to copy Penske-Wynn's solution.
+        answer  : True
+      - question: Most car showrooms are not showing expensive cars and they do not have many visitors.
+        answer  : True
+  2:
+    identifier: cars 2
+    problem   : The Penske-Wynn showroom is in Las Vegas in a famous hotel. The people who stay at the hotel want to win lots of money at Las Vegas and become rich. Now they are not rich. They cannot buy the cars in the showroom. But they want to look at them. The problem was that there were so many people just looking at the cars.
+    good idea : Penske-Wynn charged an entrance fee of 10 dollars (350 NT). It also started selling Ferrari products in a Ferrari Store. This was the first Ferrari Store in the US. A Ferrari T-shirt costs 50 dollars (1800 NT). A Ferrari skateboard costs 170 dollars (6000 NT)
+    results   : The showroom is very, very popular. It makes almost 100,000 dollars a month. The Ferrari store is also successful. But it is less successful than the showroom. People think the prices are expensive. But many people still buy the products.
+    conclusion: The experiment with the showroom and the Ferrari Store was successful. There are no other showrooms with an entrance fee. But there are now 3 or 4 more Ferrari Stores in other cities in America. They sell clothes, shoes, toys and car accessories.
+    quiz      :
+      - question: Most people at Las Vegas are very rich, and have the money to buy Ferrari cars.
+        answer  : False
+      - question: Most people do not want to look at the expensive cars, because they don't have enough money to buy them.
+        answer  : False
+      - question: The products in the Ferrari Store are cheap.
+        answer  : False
+      - question: You can buy T-shirts and skateboards at the Ferrari Store.
+        answer  : True
+      - question: The car showroom is successful.
+        answer  : True
+      - question: The Ferrari Store is successful.
+        answer  : True
+      - question: There are other Ferrari Stores in America.
+        answer  : True
+      - question: There are other car showrooms with an entrance fee.
+        answer  : False
+citrus:
+ jigsaw:
+  1:
+    identifier: citrus 1
+    problem   : Farmers in Punjab grow rice, but they don't make very much money. The Punjab government wants to help them make more money. Pepsi wants citrus fruit to make fruit drinks. The three decided to work together to grow citrus fruit.
+    good idea : The farmers let the government grow citrus fruit on their land for 4 years, and the government gives the farmers some money each year. After 4 years, half of the money from sale of the fruit goes to the farmers, and half to the government.
+    results   : Pepsi is already making drinks from the fruit produced by the trees planted by the government. Pepsi said it will continue to increase the amount of citrus fruit it buys. It also said it wants to export drinks made from the fruit to other countries.
+    conclusion: Everyone is very happy. The farmers are happy with the money. Pepsi is happy with its source of citrus fruit. The government is happy with growing and collecting the fruit. It appears that the area will become one of the biggest citrus growing areas in the world.
+    wholelot: |+
+      Farmers in Punjab grow rice, but they don't make very much money. The Punjab government wants to help them make more money. Pepsi wants citrus fruit to make fruit drinks. The three decided to work together to grow citrus fruit. 
+      The idea is for the farmers to let the government grow citrus fruit on their land for four years, and the government gives the farmers some money each year. After four years, half of the money from sale of the fruit goes to the farmers, and half to the government.
+      Pepsi is already making drinks from the fruit produced by the trees planted by the government. The government is taking 50 percent and giving farmers the rest. Pepsi said it will continue to increase the amount of citrus fruit it buys. It also said it wants to export drinks made from the fruit to other countries.
+      The farmers are happy with the money. Pepsi is happy with its source of citrus fruit. The government is happy the area is being developed. The Punjab area may become the world's biggest citrus producer. But other areas may not be able to copy this solution. The area is more suited to growing citrus than other areas.
+      
+    quiz :
+      - question: Farmers are giving their land up to the government for 4 years.
+        answer  : True
+      - question: Pepsi wants citrus fruit from farmers.
+        answer  : True
+      - question: Farmers are growing citrus on government land.
+        answer  : False
+      - question: The government is giving farmers some money each year and growing trees for them.
+        answer  : True
+      - question: After 4 years, all of the money from sale of the fruit goes to the government
+        answer  : False
+      - question: Pepsi is making drinks from fruit produced by government-planted trees.
+        answer  : True
+      - question: Farmers are not happy about the government taking their land.
+        answer  : False
+      - question: The government is not happy about growing citrus fruit for the farmers.
+        answer  : False
+  2:
+    identifier: citrus 2
+    problem   : Farmers in Punjab grow rice, but they don't make very much money. The Punjab government wants to help them make more money. Pepsi wants citrus fruit to make fruit drinks. The three decided to work together to grow citrus fruit.
+    good idea : The farmers give their land to the government for 12 years and the government gives them some money each year for the first 4 years. After the first 4 years, half the money from the sale of the fruit goes to the farmers and half to the government.
+    results   : Pepsi is already making drinks from the fruit produced by the trees planted by the government. Pepsi said it will continue to increase the amount of citrus fruit it buys. It also said it wants to export drinks made from the fruit to other countries.
+    conclusion: Everyone is very happy. The farmers are happy with the money. Pepsi is happy with its source of citrus fruit. The government is happy with growing and collecting the fruit. It appears that the area will become one of the biggest citrus growing areas in the world.
+    quiz      :
+      - question: Farmers are giving their land up to the government for 12 years.
+        answer  : True
+      - question: Pepsi wants citrus fruit from farmers.
+        answer  : True
+      - question: The government is growing citrus on farmers' land.
+        answer  : True
+      - question: Farmers are giving the government money each year to grow trees for them.
+        answer  : False
+      - question: After 4 years, all of the money from sale of the fruit goes to farmers.
+        answer  : False
+      - question: Pepsi is making drinks from fruit produced by government-planted trees.
+        answer  : True
+      - question: Farmers are not happy about the government taking their land.
+        answer  : False
+      - question: The government is happy about growing citrus fruit for Pepsi.
+        answer  : True
+internet:
+ jigsaw:
+  1:
+    identifier: internet 1
+    wholelot   : |+
+      He thought he could make money on the Internet by selling advertising space on his website. Some friends and some of his family gave him some money for the first few advertisements. He used the money to promote the site. Although his idea looks very simple and easy, he had to work very hard to advertise the site.
+      He contacted lots of television and newspaper companies about his idea, and people were very interested in listening to him talk. He hired a person to contact TV and newspaper companies in the US for him. He went to the US for one week and appeared on television there.
+      All the space on his site was sold and he made one million dollars. A few advertisers on the site were well-known, like Yahoo. But most of the advertisers are not well-known and their services are not good. For example, dating services, Internet gambling and free download sites.
+      The website was criticized because the services of the advertisers on it were not good. Some people could not understand why advertisers were attracted by the website. Others said that he made too much money too quickly. He said that he needed the money to go to college, but one million dollars was too much.
+    problem   : He thought he could make money on the Internet by selling advertising space on his website. Some friends and some of his family gave him some money for the first few advertisements. He used the money to promote the site. Although his idea looks very simple and easy, he had to work very hard to advertise the site.
+    good idea : He contacted lots of television and newspaper companies about his idea, and people were very interested in listening to him talk. He hired a person to contact TV and newspaper companies in the US for him. He went to the US for one week and appeared on television there.
+    results   : All the space on his site was sold and he made one million dollars. A few advertisers on the site were well-known, like Yahoo. But most of the advertisers are not well-known and their services are not good. For example, dating services, Internet gambling and free download sites.
+    conclusion: The website was criticized because the services of the advertisers on it were not good. Some people could not understand why advertisers were attracted by the website. Others said that he made too much money too quickly. He said that he needed the money to go to college, but one million dollars was too much.
+    quiz      :
+      - question: His idea was to sell advertising space on his website.
+        answer  : True
+      - question: The first few spaces were bought by Yahoo and well-known advertisers.
+        answer  : False
+      - question: He had to do very little work to advertise his website.
+        answer  : False
+      - question: He went to the US and appeared on television there.
+        answer  : True
+      - question: All of the space on the website was sold.
+        answer  : True
+      - question: Most of the advertisers were well known.
+        answer  : False
+      - question: Some people couldn't understand why advertisers wanted space on the site.
+        answer  : True
+      - question: All critics thought the site was very good and the services were very useful.
+        answer  : False
+  2:
+    identifier: internet 2
+    problem   : The website was not his first website. But he did not earn a lot of money from the other sites. The simple but attractive idea was to sell advertising space on a single page. But after he got a little money, he needed to promote the site so that people would know about it and find it interesting.
+    good idea : Many people were interested in the idea when they heard about it. But he also worked hard to promote the site. He hired two or three people to upload the image files and maintain the database. He also went to the US to promote the site.
+    results   : Finally he sold all the space on the page and made one million dollars. He continues to keep the site up. He said he would maintain it until 2010. But it is not as popular as it was 2-3 years ago. Advertisers have found better ways to advertise their sites.
+    conclusion: He said he learned a lot about Internet marketing from the website. He said even he was surprised by the success of his idea. Since then, he has been trying out some new ideas on the Internet. But none of the new ideas have been as popular as the million dollar home page.
+    quiz      :
+      - question: MillionDollarHomePage was his first website.
+        answer  : False
+      - question: He didn't have to work hard to promote the site.
+        answer  : False
+      - question: No-one was interested in the idea when they first heard about it.
+        answer  : False
+      - question: He had some people working for him to maintain the website.
+        answer  : True
+      - question: The website is no longer up.
+        answer  : False
+      - question: Advertisers have found other ways to promote their sites.
+        answer  : True
+      - question: He said he wasn't sure that the idea would be as successful as it was.
+        answer  : True
+      - question: He has continued to develop new ideas on the Internet.
+        answer  : True
+

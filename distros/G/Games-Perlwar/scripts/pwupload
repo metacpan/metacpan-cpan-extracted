@@ -1,0 +1,64 @@
+#!/usr/bin/perl 
+
+use strict;
+use warnings;
+
+use LWP;
+
+@ARGV <= 2 or die "usage: $0 player:password\@server agent\n";
+
+my $url = shift @ARGV;
+
+my( $player, $password, $server ) = $url =~ m#(?:http://)?(.*?):(.*?)@(.*)#
+    or die "url not correctly formatted, should be player:password\@server\n";
+
+$url = 'http://'.$server.'/upload.epl';
+
+my $browser = LWP::UserAgent->new;
+
+undef $/;
+if ( @ARGV ) {
+    open STDIN, '<', shift @ARGV or die "can't open file: $!\n";
+}
+my $agent = <STDIN>;
+
+# TODO spot when upload fails because of authorisation
+
+# TODO file:// scheme
+
+my @params = ( player => 'yanick', 
+               password => 'y',
+               agent => $agent );
+
+my $answer = $browser->post( $url, [
+                player => $player,
+                password => $password,
+                agent => $agent,
+             ] );
+
+if ( $answer->is_success ) {
+    print "agent uploaded\n";
+    exit;
+}
+else {
+    print "agent upload failed: ", $answer->status_line, "\n"; 
+}
+
+__END__
+
+=head1 NAME
+
+pwupload - upload a perlwar agent
+
+=head1 SYNOPSIS
+
+B<pwupload> I<url> [ I<file> ]
+
+=head1 DESCRIPTION
+
+Uploads the agent contained in I<file> to the game located
+at I<url>. The url must be of the form 
+C<http://>I<player>C<:>I<password>C<@>I<server/path>. E.g.: 
+C< http://yanick:foo@www.perlwar.com/game234 >.
+
+If I<file> is not provided, the agent is read from C<STDIN>.

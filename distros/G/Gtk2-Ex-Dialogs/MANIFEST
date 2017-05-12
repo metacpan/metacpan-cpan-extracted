@@ -1,0 +1,16 @@
+Changes
+COPYRIGHT
+examples/demo.pl
+Makefile.PL
+MANIFEST
+README
+TODO
+t/Gtk2-Ex-Dialogs.t
+lib/Gtk2/Ex/Dialogs.pm
+lib/Gtk2/Ex/Dialogs/ChooseFile.pm
+lib/Gtk2/Ex/Dialogs/ChoosePreviewFile.pm
+lib/Gtk2/Ex/Dialogs/ChooseDirectory.pm
+lib/Gtk2/Ex/Dialogs/ErrorMsg.pm
+lib/Gtk2/Ex/Dialogs/Message.pm
+lib/Gtk2/Ex/Dialogs/Question.pm
+META.yml

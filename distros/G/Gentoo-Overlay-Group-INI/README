@@ -1,0 +1,105 @@
+NAME
+    Gentoo::Overlay::Group::INI - Load a list of overlays defined in a
+    configuration file.
+
+VERSION
+    version 0.2.2
+
+SYNOPSIS
+    Generates a "Gentoo::Overlay::Group" object using a configuration file
+    from your environment.
+
+      require Gentoo::Overlay::Group::INI;
+      my $group = Gentoo::Overlay::Group::INI->load();
+
+    Currently, the following paths are checked:
+
+      ~/.config/Perl/Gentoo-Overlay-Group-INI/config.ini #  'my_dist_config' dir
+      ~/.config/Perl/Gentoo-Overlay-Group-INI/Gentoo-Overlay-Group-INI.ini
+      ~/.local/share/Perl/dist/Gentoo-Overlay-Group-INI/config.ini  # 'my_dist_data' dir
+      ~/.local/share/Perl/dist/Gentoo-Overlay-Group-INI/Gentoo-Overlay-Group-INI.ini
+      /etc/Gentoo-Overlay-Group-INI/config.ini
+      /etc/Gentoo-Overlay-Group-INI/Gentoo-Overlay-Group-INI.ini
+
+    If you have set "GENTOO_OVERLAY_GROUP_INI_PATH", it will be split by ":"
+    and each part scanned:
+
+      $ENV{GENTOO_OVERLAY_GROUP_INI_PATH} = "/a:/b"
+
+      /a/config.ini
+      /a/Gentoo-Overlay-Group-INI.ini
+      /b/config.ini
+      /b/Gentoo-Overlay-Group-INI.ini
+
+    If any of the path parts start with "~/" , those parts will be expanded
+    to your "Home" directory.
+
+    Format of the INI files is as follows:
+
+      [Overlays]
+      directory = /usr/portage
+      directory = /usr/local/portage
+
+CLASS METHODS
+  load
+    Returns a working Overlay::Group object.
+
+      my $group = Gentoo::Overlay::Group::INI->load();
+
+  load_named
+    Return an inflated arbitrary section:
+
+      # A "self-named" overlay section
+      my $section = Gentoo::Overlay::Group::INI->load_named('Overlay');
+      # A 'custom named overlay section, ie:
+      # [ Overlay / foo ]
+      my $section = Gentoo::Overlay::Group::INI->load_named('foo');
+
+  load_all_does
+    Return all sections in a config file that "do" the given role.
+
+      my ( @sections ) = Gentoo::Overlay::Group::INI->load_all_does('Some::Role');
+
+  load_all_isa
+    Return all sections in a config file that inherit the given class.
+
+      my ( @sections ) = Gentoo::Overlay::Group::INI->load_all_isa('Gentoo::Overlay::Group::Section::Overlay');
+
+PACKAGE VARIABLES
+  $CFG_PATHS
+    An array ref of Path::Tiny objects to scan for config files.
+
+PRIVATE FUNCTIONS
+  _cf_paths
+    Fetch $CFG_PATHS, and initialize $CFG_PATHS if it isn't initialized.
+
+      my $path_list = _cf_paths();
+
+  _init_cf_paths
+    Return the hard-coded array ref of paths to use, or parses
+    $ENV{GENTOO_OVERLAY_GROUP_INI_PATH}.
+
+      my $path_list = _init_cf_paths();
+
+  _enumerate_file_list
+    Returns a list of file paths to check, in the order they should be
+    checked.
+
+      my @list = _enumerate_file_list();
+
+  _first_config_file
+    Returns the path to the first file that exists.
+
+      my $first = _first_config_file();
+
+PRIVATE METHODS
+  _parse
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

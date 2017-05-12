@@ -1,0 +1,665 @@
+=pod
+
+=head1 NAME
+
+Geo::Coordinates::OSGB::Background - Background and extended description 
+
+=head1 VERSION
+
+2.16
+
+=head1 DESCRIPTION
+
+These notes are part of Geo::Coordinates::OSGB, a Perl implementation of
+latitude and longitude co-ordinate conversion for England, Wales, and
+Scotland based on formulae and data published by the Ordnance Survey of
+Great Britain.
+
+These modules will convert accurately between an OSGB national grid
+reference and coordinates given in latitude and longitude using the
+WGS84 model.  This means that you can take latitude and longitude
+readings from your GPS receiver, (or read them from Wikipedia, or Google
+Earth, or your car's sat-nav), and use this module to convert them to an
+accurate British National grid reference for use with one of the
+Ordnance Survey's paper maps.  And I<vice versa>, of course.
+
+These notes explain some of the background and implementation details
+that might help you get the most out of them.
+
+The algorithms and theory for these conversion routines are all from I<A
+Guide to Coordinate Systems in Great Britain> published by the OSGB,
+April 1999 (Revised Dec 2010) and available at
+http://www.ordnancesurvey.co.uk/.  You may also like to read some of the
+other introductory material there.  Should you be hoping to adapt this
+code to your own custom Mercator projection, you will find the paper
+called I<Surveying with the National GPS Network>, especially useful.
+
+=head2 Upgrading from V2.09 or earlier
+
+These modules suffered a major overhaul in V2.10 which changed the
+semantics and interface.  The motivation for the change was to simplify
+the interface, to make WGS84 the default model for latitude and
+longitude, and to speed up conversions.  This section explains what you
+might have to change to get your old code to work with V2.10 and above.
+
+=over 4
+
+=item * 
+
+The module structure changed from V2.09 to V2.10 so it would probably be
+a good idea to clean up any old installation you have and re-install a
+new version so that none of the old files hangs about.  The simplest way 
+to do this is to use the C<cpanm> application.
+
+=item *
+
+C<OSGB.pm> no longer exports an C<:all> tag.  This means you must
+explicitly name all the functions that you want to use.  Fortunately
+there are rather fewer functions now.
+
+=item * 
+
+The parsing and formatting routines have been split into a separate
+module, so before V2.10 you could do this:
+
+   use Geo::Coordinates::OSGB ':all'; # Don't do this any more
+
+now you need to do this:
+
+   use Geo::Coordinates::OSGB       qw(grid_to_ll ll_to_grid);
+   use Geo::Coordinates::OSGB::Grid qw(parse_grid format_grid);
+
+=item *
+
+The old C<OSTN02.pm> module has been removed.  The data and the
+functions it provided are now integrated into C<OSGB.pm>.  The 
+old C<OSGB36_to_ETRS89> and C<ETRS89_to_OSGB36> functions are
+now built into C<ll_to_grid> and C<grid_to_ll>; the OSTN02 data 
+is used automatically when needed.
+
+=item * 
+
+The main conversion routines now assume the WGS84 model for lat/lon
+coordinates.  If you still want to work with the OSGB36 model for
+lat/lon, then you need to add the C<< { shape => 'OSGB36' } >> option
+when converting.  In other words if you did this before:
+
+   my ($e, $n) = ll_to_grid(52.5, -2);
+
+then to get exactly the same results, you now need to do this
+
+   my ($e, $n) = ll_to_grid(52.5, -2, { shape => 'OSGB36' } );
+
+On the other hand, if you are working with the WGS84 model, then before
+V2.10 you had to do this:
+
+   # Old and exact
+   my ($e, $n) = ETRS89_to_OSGB36(ll_to_grid(52.5, -2));  
+
+or this: 
+
+   # Old and approximate
+   my ($e, $n) = ll_to_grid(shift_ll_from_WGS84(52.5, -2));  
+
+now you can just do:
+
+   my ($e, $n) = ll_to_grid(52.5, -2); 
+
+This means that the most likely use case is the default.  In other words
+you can take lat/lon from your GPS and get correct grid references by
+default 
+
+=item *
+
+The functions C<shift_ll_into_WGS84> and C<shift_ll_from_WGS84> are 
+no longer provided.  They were not very accurate, and they were
+confusing.  C<ll_to_grid> and C<grid_to_ll> now do the necessary
+adjustments for you automatically.
+
+=item *
+
+The functions to parse and format grid references are moved to
+C<OSGB/Grid.pm>.  They have also been radically simplified, so that
+there are now only two functions: C<parse_grid> and C<format_grid>.
+The old names like C<parse_GPS_grid> and C<format_grid_trad> are
+retained with their former meanings, but they are just synonyms
+for the two core functions.
+
+=item *
+
+The functions to parse and format lat/lon are removed.  They 
+were not really a core function of this module.  There are other modules
+on CPAN to deal with latitude and longitude.  I also give an example of
+how to format decimal degrees as degrees, minutes, and seconds in
+C<examples/bng_to_ll.pl>.
+
+
+=back
+
+=head2 Coordinates and ellipsoid models
+
+This section explains the fundamental problems of mapping a spherical
+earth onto a flat piece of paper (or computer screen).  A basic
+understanding of this material will help you use these routines more
+effectively.  It will also provide you with a good store of ammunition
+if you ever get into an argument with someone from the Flat Earth
+Society.
+
+It is a direct consequence of Newton's law of universal gravitation (and
+in particular the bit that states that the gravitational attraction
+between two objects varies inversely as the square of the distance
+between them) that all planets are roughly spherical.  (If they were any
+other shape gravity would tend to pull them into a sphere).  On the
+other hand, most useful surfaces for displaying large scale maps (such
+as pieces of paper or screens) are flat.  There is therefore a
+fundamental problem in making any maps of the earth that its curved
+surface being mapped must be distorted at least slightly in order to get
+it to fit onto the flat map.
+
+This module sets out to solve the corresponding problem of converting
+latitude and longitude coordinates (designed for a spherical surface) to
+and from a rectangular grid (for a flat surface).  A spherical
+projection is a fairly simple but tedious bit of trigonometry, but the
+problem is complicated by the fact that the earth is not quite a sphere.
+Because our planet spins about a vertical axis, it tends to bulge out
+slightly in the middle, so it is more of an oblate spheroid (or
+ellipsoid) than a sphere.  This makes the arithmetic even more tedious,
+but the real problem is that the earth is not a regular ellipsoid
+either, but an irregular lump that closely resembles an ellipsoid and
+which is constantly (if slowly) being rearranged by plate tectonics.  So
+the best we can do is to pick an imaginary regular ellipsoid that
+provides a good fit for the region of the earth that we are interested
+in mapping.
+
+An ellipsoid model is defined by a series of numbers:  the major and
+minor semi-axes of the solid, and a ratio between them called the
+flattening. There are three ellipsoid models that are relevant to the UK:
+
+=over 4
+
+=item OSGB36
+
+The OSGB36 ellipsoid is a revision of work begun by George Airy the
+Astronomer Royal in 1830, when the OS first undertook to make a series
+of maps that covered the entire country.  It provides a good fit for
+most of the British Isles. 
+
+=item EDM50
+
+The European standard ellipsoid is a compromise to get a good fit for
+most of Western Europe. 
+
+=item WGS84
+
+As part of the development of the GPS network by the American military
+in the 1980s a new world-wide ellipsoid was defined. This fits most
+populated regions of the world reasonably well.
+
+=back
+
+The latitude and longitude marked on OS maps are in the OSGB36 model.
+The latitude and longitude you read from your GPS device, or from
+Wikipedia, or Google Earth are in the WGS84 model.  So the point with
+latitude 51.4778 and longitude 0 in the OSGB36 model is on the prime
+meridian line in the courtyard of the Royal Observatory in Greenwich,
+but the point with the same coordinates in the WGS84 model is about 120
+metres away to the south-east, in the park.
+
+In these modules the shape used for the projection of latitude and
+longitude onto the grid is WGS84 unless you specifically set it to use
+OSGB36. 
+
+=head2 The British National Grid and OSTN02
+
+A Mercator grid projection like the British National Grid is defined by
+the five parameters defined as constants at the top of the module.
+
+=over 4
+
+=item *
+
+True point of origin Latitude and Longitude = 49N, 2W
+
+=item * 
+
+False origin easting and northing = 400000, -100000
+
+=item * 
+
+Convergence factor = 0.9996012717
+
+=back 
+
+One consequence of the True Point of Origin of the British Grid being
+set to 49N, 2W is that all the vertical grid lines are parallel
+to the 2W meridian; you can see this on the appropriate OS maps (for
+example Landranger sheet 184), or on the PDF picture supplied with this
+package in the C<examples> folder.  The effect of moving the False Point
+of Origin to the far south west is to make all grid references positive.
+
+Strictly speaking, grid references are given as whole numbers of metres
+from this point, with the easting always given before the northing.  For
+everyday use however, the OSGB suggest that grid references need only to
+be given within the local 100km square as this makes the numbers
+smaller.  For this purpose they divide Britain into a series of 100km
+squares identified in pair of letters:  TQ, SU, ND, etc.  The grid of
+the big squares actually used is something like this:
+
+                                HP 
+                                HU 
+                             HY 
+                    NA NB NC ND 
+                    NF NG NH NJ NK
+                    NL NM NN NO NP 
+                       NR NS NT NU 
+                       NW NX NY NZ OV
+                          SC SD SE TA 
+                          SH SJ SK TF TG 
+                       SM SN SO SP TL TM 
+                       SR SS ST SU TQ TR 
+                    SV SW SX SY SZ TV
+
+SW covers most of Cornwall, TQ London, HU the Shetlands, and there's one
+tiny corner of a beach in Yorkshire that is in OV.  Note that it has the
+neat feature that N and S are directly above each other, so that most Sx
+squares are in the south and most Nx squares are in the north.  The
+system logically extends far out in all directions; so square XA lies
+south of SV and ME to the west of NA and so on.  But it becomes less
+useful the further you go from the central meridian of 2W.
+
+Within each of the large squares, we only need five digit coordinates
+--- from (0,0) to (99999,99999) --- to refer to a given square metre.
+However general use rarely demands such  precision, so the OSGB
+recommendation  is to use units of 100m (hectometres) so that we only
+need three digits for each easting and northing --- 000,000 to 999,999.
+If we combine the easting and northing we get the familiar traditional
+six figure grid reference.  Each of these grid references is repeated in
+each of the large 100km squares but for local use with a particular map,
+this does not usually matter.  Where it does matter, the OS suggest that
+the six figure reference is prefixed with the identifier of the large
+grid square to give a `full national grid reference', such as TQ330800.
+This system is described in the notes in the corner of every Landranger
+1:50,000 scale map.
+
+This system was originally devised for use on top of the OSGB36 model of
+latitude and longitude, so the prime meridian used and the coordinates
+of the true point of origin are all defined in that system.  However as
+part of standardizing on an international GPS system, the OS have
+redefined the grid as a rubber sheet transformation from WGS84. 
+
+There is no intrinsic merit to using one model or another, but there's
+an obvious need to be consistent about which one you choose, and with
+the growing ubiquity of GPS systems, it makes sense to standardize on
+WGS84.  It is perhaps possible that future editions of OS maps will show
+WGS84 latitude and longitude along the edges instead of OSGB36.
+
+The differences between the models are only important if you are working
+at a fairly small scale.  The average differences on the ground vary
+from about -67 metres to + 124 meters depending on where you are in the
+country.
+
+    Square                 Easting difference           Northing difference
+    --------------------   -------------------------    ------------------
+                 HP                        109                          66        
+              HT HU                    100 106                      59  62        
+        HW HX HY                73  83  93                  51  48  47            
+     NA NB NC ND            61  65  81  89              40  39  38  40            
+     NF NG NH NJ NK         57  68  79  92  99          30  29  28  26  26        
+     NL NM NN NO            56  66  79  91              18  17  15  15            
+        NR NS NT NU             66  77  92 100               3   2   1   0        
+        NW NX NY NZ             70  77  92 103              -9  -8 -10 -13        
+           SC SD SE TA              77  93 104 112             -19 -22 -23 -24    
+           SH SJ SK TF TG           79  91 103 114 124         -35 -34 -35 -38 -40
+        SM SN SO SP TL TM       72  80  90 101 113 122     -49 -47 -46 -46 -46 -47
+           SS ST SU TQ TR           80  90 101 113 121         -57 -56 -57 -57 -59
+        SW SX SY SZ TV          71  79  90 100 113         -67 -64 -62 -62 -62    
+         
+
+The chart above shows the mean difference in each grid square.  A
+positive easting difference means the WGS84 Lat/Lon is to the east of
+OSGB36; a positive northing difference means it is to the north of
+OSGB36.  
+
+The transformation from WGS84 to OSGB36 is called OSTN02 and consists of
+a large data set that defines a three dimensional shift for each square
+kilometre of the country.  To get from WGS84 latitude and longitude to
+the grid, you project from the WGS84 ellipsoid to a pseudo-grid and then
+look up the relevant shifts from OSTN02 and adjust the easting and
+northing accordingly to get coordinates in the OSGB grid.  Going the
+other way is slightly more complicated as you have to use an iterative
+approach to find the latitude and longitude that would give you your
+grid coordinates.
+
+It is also possible to use a three-dimensional shift and rotation called
+a Helmert transformation to get an approximate conversion.  This
+approach is used automatically by these modules for locations that are
+undefined in OSTN02, and, if you want to, you can explicitly use it
+anywhere in the UK by using the C<grid_to_ll_helmert> and
+C<ll_to_grid_helmert> routines.
+
+Modern GPS receivers can all display coordinates in the OS grid system.
+You just need to set the display units to be `British National Grid' or
+whatever similar name is used on your unit.  Most units display the
+coordinates as two groups of five digits and a grid square identifier.
+The units are metres within the grid square.  However you should note
+that your consumer GPS unit will B<not> have a copy of the whole of
+OSTN02 in it.  To show you an OSGB grid reference, your GPS will be
+using either a Helmert transformation, or an even more approximate
+Molodenksy transformation to translate from the WGS84 coordinates it is
+getting from the satellites.
+
+Note that the OSGB (and therefore this module) does not cover the whole
+of the British Isles, nor even the whole of the UK, in particular it
+covers neither the Channel Islands nor Northern Ireland.  The coverage
+that is included is essentially the same as the coverage provided by the
+OSGB "Landranger" 1:50000 series maps.  The coverage of the OSTN02 data
+set is slightly smaller, as the OS do not define the model for any
+points more than about 2km off shore.
+
+=head2 Implementation of OSTN02
+
+The OSTN02 is the definitive transformation from WGS84 coordinates to
+the British National Grid.  It is published as a large text file giving
+a set of corrections for each square kilometre of the country.  The OS
+also publish an algorithm to use it which is described on their website.
+Essentially you take WGS84 latitude and longitude coordinates and
+project them into an (easting, northing) pair of coordinates for the
+flat surface of your grid. You then look up the corrections for the four
+corners of the relevant kilometre square and interpolate the exact
+corrections needed for your spot in the square.  Adding these exact
+corrections gives you an (easting, northing) pair in the British grid.
+
+The distributed data also includes a vertical height correction as part
+of the OSGM02 geoid module, but this is not used in this module, so it
+is omitted from the table of data in order to save space.  
+
+The table of data supplied by the Orndance Survey contains 876951 rows with
+entries for each km intersection between (0,0) and (700000, 1250000).  However
+567472 of these entries refer to places that are more than 10 km away from the
+British mainland (either in the sea or in Eire), and these are set to zero
+indicating that OSTN02 is not defined at these places.  In order to save more
+space, these are omitted from the beginning and end of each row in the data as
+stored in my implementation. The last 21 rows (north of Shetland) are all
+zeroes, so these are omitted as well.
+
+My implementation of the OSTN02 data is included in the C<OSGB.pm> module after
+the C<__DATA__> line, and is read using the magic C<< <DATA> >> file handle.
+In tests this proved to be the fastest way to load all that data, by a long
+way. 
+
+There are 1229 rows of data, and each row contains up to 701 pairs of shift
+data encoded as pairs of integers representing the shift in mm.  Leading and
+trailing zeros are omitted, and the number of leading zeros omitted is stored
+in the first three characters of each row.  The integer pairs are all coded in
+a home-grown version of base32 using the character set 
+C<< 0123456789:;<=>?@ABDEFGHIJKLMNO >>.  This allows integers up to 32767 to be
+stored in three bytes of printable ASCII.  It would (obviously) be possible to
+compress the data more by storing them as binary integers but I need them to be
+printable ASCII so that they can be stored inside C<OSGB.pm>.  Decoding them is
+very slightly slower than decoding hex strings, but using 3 bytes integer
+instead of 4 reduces the memory and loading time by 25%.
+
+Earlier versions of the module had the data in a hash, but this was much
+too slow to load.  Later versions stored keys with the data and use a
+binary search to find the right data, but the current method with no
+keys requires less space and runs much faster.
+
+The C<build> directory includes a script called C<pack_ostn_data> which creates
+the 1229 rows of data in the correct form from the C<OSTN02_OSGM02_GB.txt> file
+which is available from the Ordnance Survey.
+
+=head2 Accuracy, uncertainty, and speed
+
+This section explores the limits of accuracy and precision you can
+expect from this software.  Almost certainly, it provides more accuracy
+than you need.  
+
+=head3 Accuracy of readings from GPS devices
+
+In particular if you are converting readings taken from your own
+handheld GPS device, the readings themselves will not be very accurate.
+To convince yourself of this, try taking your GPS on the same walk on
+different days and comparing the track: you will see that the tracks do
+not coincide.  If you have two units take them both and compare the
+tracks:  you will see that they do not coincide.
+
+The accuracy of the readings you get will be affected by cloud cover,
+tree cover, the exact positions of the satellites relative to you (which
+are constantly changing as the earth rotates), how close you are to
+sources of interference, like buildings or electricity installations,
+not to mention the ambient temperature and the state of your
+rechargeable batteries. 
+
+To get really accurate readings you have to invest in some serious
+professional or military grade surveying equipment.
+
+=head3 How big is 0.000001 of a degree?
+
+In the British Isles the distance along a meridian between two points
+that are one degree of latitude apart is about 110 km or just under 70
+miles. This is the distance as the crow flies from, say, Swindon to
+Walsall.  So a tenth of a degree is about 11 km or 7 miles, a hundredth
+is just over 1km, 0.001 is about 110m, 0.0001 about 11m and 0.00001 just
+over 1 m.  If you think in minutes, and seconds, then one minute is
+about 1840 m (and it's no coincidence that this happens to be
+approximately the same as 1 nautical mile).  One second is a bit over
+30m, 0.1 seconds is about 3 m, and 0.0001 second is about 3mm.
+
+         Degrees              Minutes             Seconds  * LATITUDE *           
+               1 = 110 km         1 = 1.8 km        1 = 30 m  
+             0.1 =  11 km       0.1 = 180 m       0.1 =  3 m   
+            0.01 = 1.1 km      0.01 =  18 m      0.01 = 30 cm 
+           0.001 = 110 m      0.001 =   2 m     0.001 =  3 cm  
+          0.0001 =  11 m     0.0001 = 20 cm    0.0001 =  3 mm  
+         0.00001 = 1.1 m    0.00001 =  2 cm         
+        0.000001 = 11 cm   0.000001 =  2 mm         
+       0.0000001 =  1 cm               
+
+Degrees of latitude get very slightly longer as you go further north but
+not by much.  In contrast degrees of longitude, which represent the same
+length on the ground as latitude at the equator, get significantly
+smaller in northern latitudes.  In southern England one degree of
+longitude represents about 70 km or 44 miles, in northern Scotland it's
+less than 60 km or about 35 miles.  Scaling everything down means that
+the fifth decimal place of a degree of longitude represents about
+60-70cm on the ground.
+
+       Degrees                Minutes            Seconds * LONGITUDE * 
+             1 = 60-70 km         1 = 1.0-1.2 km      1 = 17-20 m 
+           0.1 = 6-7 km         0.1 = 100-120 m     0.1 = 2 m     
+          0.01 = 600-700 m     0.01 = 10-12 m      0.01 = 20 cm   
+         0.001 = 60-70 m      0.001 = 1 m         0.001 = 2 cm    
+        0.0001 = 6-7 m       0.0001 = 10 cm      0.0001 = 2 mm      
+       0.00001 = 60-70 cm   0.00001 = 1 cm             
+
+=head3 How accurate are the conversions?
+
+The OS supply test data with OSTN02 that comes from various fixed
+stations around the country and that form part of the definition of the
+transformation.  If you look in the test file C<06osdata.t> you can see
+how it is used for testing these modules.
+
+In all cases translating from the WGS84 coordinates to the national grid
+is accurate to the millimetre, so these modules are at least as accurate
+as the OSGB software that produced the test data.
+
+Translating from the given grid coordinates to WGS84 latitude and
+longitude coordinates is very slightly less accurate, but in all of
+England, Wales, Scotland and the Isle of Man this software produces
+WGS84 lat/lon coordinates from the given grid references that are within
+a few mm of the OSGB data.  
+
+I have also run extensive `round trip' testing by generating random grid
+references, converting them to WGS84 latitude and longitude and then
+converting them back to grid easting and northing.  In all places
+between 6W and 2E (the whole of the UK mainland, plus Orkney and
+Shetland) the round trip error is less than 1 mm.  This is the design
+point of the OS formulae.  So far so good.  However, west of 6W (that is
+in the Scilly Isles and the Hebrides), the round trip error creeps up
+slowly as you go further west;  the furthest west you can go on the OS
+grid is St Kilda (at about 8.57W) and here the round trip error is about
+4 mm. As far as I can tell, this is just a limitation of the OS formulae
+as designed in 2001 when OSTN02 was published. 
+
+Outside the area covered by OSTN02, this module uses the small Helmert
+transformation recommended by the OS.  The OS state that, with the
+parameters they provide, this transformation will be accurate up to
+about +/-5 metres, in the vicinity of the British Isles.  
+
+You can also use this transformation within the OSTN02 polygon by
+calling the C<grid_to_ll_helmert> and C<ll_to_grid_helmert> routines.
+If you compare the output from these routines to the output from the
+more accurate routines that use OSTN02 you will find that the
+differences are between about -3.6 metres and +5.1 metres depending on
+where you are in the country.  In the South East both easting and
+northing are underestimated, in northern Scotland they tend to be
+overestimated.
+
+=head3 How fast are the conversions?
+
+If you can live with a 5 m level of uncertainty, then you will find that
+the Helmert routines are a bit faster at translating from grid to
+latitude and longitude.  A typical bench mark run on my development
+machine (an old Mac Mini server) using the Apple-supplied Perl 5.16
+gave:
+
+    Subroutine          calls per sec  ms per call 
+    ----------------------------------------------
+    ll_to_grid                  41677        0.024 
+    ll_to_grid_helmert          42145        0.024 
+    grid_to_ll                  18131        0.055 
+    grid_to_ll_helmert          35793        0.028 
+
+None of the routines is really slow, since even C<grid_to_ll> averages
+under 60 microseconds per call, but C<grid_to_ll_helmert> runs about
+twice as fast as C<grid_to_ll>.  Using a locally compiled version of
+Perl 5.22, I see a small improvement on the Helmert routines, but the
+OSTN02 routines are about the same.  `Your mileage may vary', of course.
+
+The routines have been tested with various versions of Perl, including
+recent versions with the C<uselongdouble> option enabled.  On my system,
+long doubles slow everything down by about 10%, and make no difference
+to the round trip precision of the routines. Since the formulae were
+specifically designed for ordinary double precision arithmetic, Perl's
+default arithmetic is more than adequate.  
+
+=head2 Maps 
+
+Since Version 2.09 these modules have included a set of map sheet
+definitions so that you can find which paper maps your coordinates are
+on.
+
+See L<Geo::Coordinates::OSGB::Maps> for details of the series included.
+The first three series are OS maps:
+
+  A - OS Landranger maps at 1:50000 scale; 
+  B - OS Explorer maps at 1:25000; 
+  C - the old OS One-Inch maps at 1:63360.  
+
+Landranger sheet 47 appears in the list of keys as C<A:47>, Explorer
+sheet 161 as C<B:161>, and so on.  As of 2015, the Explorer series of
+incorporates the Outdoor Leisure maps, so (for example) the two sheets
+that make up the map `Outdoor Leisure 1' appear as C<B:OL1E> and
+C<B:OL1W>.
+
+Thanks to the marketing department at the OS and their ongoing
+re-branding exercise several Explorer sheets have been promoted to
+Outdoor Leisure status.  So (for example) Explorer sheet 364 has
+recently become `Explorer sheet Outdoor Leisure 39'.  Maps like this are
+listed with a combined name, thus: C<B:395/OL54>.
+
+Many of the Explorer sheets are printed on both sides.  In these cases
+each side is treated as a separate sheet and distinguished with
+suffixes.  The pair of suffixes used for a map will either be N and S,
+or E and W.  So for example there is no Explorer sheet C<B:271>, but you
+will find sheets C<B:271N> and C<B:271S>.  The suffixes are determined
+automatically from the layout of the sides, so in a very few cases it
+might not match what is printed on the sheet but it should still be
+obvious which side is which.  Where the map has a combined name the
+suffix only appears at the end. For example: C<B:386/OL49E> and
+C<B:386/OL49W>.
+
+Several sheets also have insets, for islands, like Lundy or The Scilly
+Isles, or for promontories like Selsey Bill or Spurn Head.  Like the
+sides, these insets are also treated as additional sheets (albeit rather
+smaller).  They are named with an alphabetic suffix so Spurn Head is on
+an inset on Explorer sheet 292 and this is labelled C<B:292.a>.  Where
+there is more than one inset on a sheet, they are sorted in descending
+order of size and labelled C<.a>, C<.b> etc.  On some sheets the insets
+overlap the area of the main sheet, but they are still treated as
+separate map sheets.  
+
+Some maps have marginal extensions to include local features - these are
+simply included in the definition of the main sheets.  There are,
+therefore, many sheets that are not regular rectangles.  Nevertheless,
+the module is able to work out when a point is covered by one of these
+extensions.
+
+In the examples folder there is an extended example showing how to work
+with the map data as supplied through the C<Maps.pm> interface.
+
+The source files for the map data are in the C<maps> directory.  The script that
+builds C<Maps.pm> from the source files is C<build/make_maps_code>.
+
+It's probably fair to say that everything about the maps is still (2016)
+experimental and may change in the future.
+
+For each series there are (currently) two files
+
+=over 4
+
+=item *
+
+C<catalogue> which defines: 
+an index number for each map (unique to this project);
+the sheet number for the map - not necessarily an integer;
+the sheet title as a UTF8 string;
+the current ISBN number for maps that have them.
+
+=item *
+
+C<polygons> which has:
+index numbers that match the corresponding C<catalogue>;
+sheet numbers that match the corresponding C<catalogue>;
+a flag - an integer to show the status of the entry (no formal meaning);
+followed by a MULTIPOLYGON in WKT format.
+
+=back
+
+There is one line in each of the files for each map in the series.  The data
+format for the sheet polygons is Well Known Text (as defined in Wikipedia).
+The set of polygons for each map is defined as a MULTIPOLYGON; a list of
+POLYGONS.  There are no holes in any of the polygons.  A missing polygon list
+is recorded as "EMPTY" (this is part of WKT).
+
+The units are metres from the false point of origin (which is some miles west
+of the Scilly Isles).  So the south west corner of Landranger sheet 204, which has
+traditional grid reference SW 720 140 is defined in this data as "172000
+14000".  This is essentially what "parse_grid" returns. No leading zeros
+needed.
+
+The polygon starts at the south west corner of the sheet and is recorded
+anticlockwise.  WKT insists that the first pair is repeated at the end to close
+the polygon. So a simple 40km square Landranger sheet with no insets or
+extensions, such as Sheet 152, whose SW corner is at SP 530 300 is recorded as
+
+    (((453000 230000, 493000 230000, 493000 270000, 453000 270000, 453000 230000)))
+
+If the sheet boundary is more complicated than a square, the polygon consists of a coordinate
+pair for each corner.  Extensions - where the coloured printing spills
+over the neat edge - are included as part of the main polygon in the appropriate place,
+always moving anticlockwise.  Extensions don't have to be rectilinear but they
+are made up of straight lines.  Extensions consisting of administrative boundaries
+and labels are ignored.  If in doubt, use common sense.  
+
+If an inset is drawn on the map sheet with its own grid margin then it is recorded
+as a separate polygon following the WKT format, even if it overlaps the main sheet.
+
+On OS Landranger maps,  the first (and last) pair should always be the SW
+corner, if an extension affects the SW corner, start and end with the regular
+corner pair even if they are technically redundant.  This allows me to find the
+SW corners currently defined for the Landranger maps easily.  In other series,
+start somewhere near the SW and go anticlockwise.
+
+=cut
+

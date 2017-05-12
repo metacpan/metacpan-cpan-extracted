@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+TODO
+examples/jumble_create.pl
+examples/jumble_solve.pl
+examples/jumble_word.pl
+examples/crossword_solve.pl
+lib/Games/Jumble.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

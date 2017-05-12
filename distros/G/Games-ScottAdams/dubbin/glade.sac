@@ -1,0 +1,6 @@
+%room glade
+glade
+%exit w clearing
+%exit n outcrop
+%exit s forest2
+

@@ -1,0 +1,23 @@
+strict digraph graph_09
+{
+	a[color = "red" style = "filled"]
+	b[color = "green" style = "filled"]
+	a -> b
+	{
+
+	}
+
+	{
+
+	}
+
+	{
+
+	}
+ ->
+	
+	{
+
+	}
+
+}

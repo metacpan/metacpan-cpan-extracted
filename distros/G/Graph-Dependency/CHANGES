@@ -1,0 +1,11 @@
+Revision history for Graph::Dependency.
+
+2006-01-28 v0.02 Tels 2 tests
+  * more robust grep for modules in search.cpan.results
+    (if Foo-Bar is part of Foo-Baz, find Foo-Baz and it's author)
+  * protect against random data in module names
+  * use "as_html_file" and not "as_html"
+
+2006-01-27 v0.01 Tels 2 tests
+  * first release
+

@@ -1,0 +1,48 @@
+Revision history for Perl extension Google::ProtocolBuffers
+
+0.12    2016-09-29
+    - various makefile cleanups: https://github.com/csirtgadgets/google-protocolbuffers-perl/pull/22
+
+0.11    2014-
+    - bugfixes
+        - bugfix to getExtension code, returns keylist when no arg is passed through
+
+0.11    2013-12-29
+    - bugfixes
+        - doc fix for -p option
+
+0.10    2013-11-20
+    - bugfixes:
+        - use perl 5.8, constants break on 5.6
+    
+    - features:
+        - created protoc-perl
+
+0.09    2013-11-07
+    - bugfixes:
+        - parser (floating point literals, FloatLit in Compiler.pm)
+        - parser fix for fp in CodeGen.pm
+     
+    - features:
+        - decoding of packed repeated fields
+        - package_name for code generator
+        - allow for package line generation in generated module
+        - accept multiple include_dir as an arrayref
+        - accept 'no_timestamp' argument to parse
+
+0.08    Thu Oct 23 21:45:03 MSD 2008
+    - Fixed encoding/decoding of float types on big-endian machines
+    - Fixed default strings values with characters > 127
+    - Added dependencies on Perl v5.6.0 (for 'our'), 
+        'constant' v1.06 (for multiple constants declaration) and
+        'Test::More' v0.52 (for correct require_ok() in tests) 
+
+0.06    Wed Oct 22 00:12:58     2008
+    - Typos in documentation were fixed, public CPAN release
+
+0.05_01 Tue Oct 21 01:06:17 2008
+    - first (alpha) release for CPAN
+
+0.01    Wed Oct  8 22:15:12 2008
+    - original version; created by h2xs 1.23 with options
+        -X Google::ProtoBuf

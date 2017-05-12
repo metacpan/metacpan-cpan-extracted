@@ -1,0 +1,81 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Gimp;
+use Gimp::Fu;
+
+podregister {
+  # no input parameters line - source filter inserts. See Gimp::Fu docs.
+  $Gimp::verbose = 1; # remove this to stop debugging output
+  Gimp::Context->push; # store current settings, so present ones preserved
+  my $img = Gimp::Image->new($width, $height, RGB);
+  $img->undo_group_start; # so all actions can be undone in one step
+  # the __ before the string will translate it if available
+  my $l = Gimp::Layer->new($img, $width, $height, RGB, __"Background", 100, NORMAL_MODE);
+  $l->insert_layer(0, 0); # required!
+  # now a few syntax examples
+  Gimp::Context->set_foreground($text_colour) unless $ignore_cols;
+  Gimp::Context->set_background($bg_colour) unless $ignore_cols;
+  fill $l BACKGROUND_FILL;
+  my $text_layer = $img->text_fontname(-1, 10, 10, $text, 5, 1, 10, PIXELS, $font);
+  Gimp::Context->set_foreground("green");
+  $img->undo_group_end; # close the undo group
+  Gimp::Context->pop; # restore original context
+  eval { Gimp::Display->new($img); };
+  $img; # return image, as Gimp::Fu added that to our output parameters
+        # because no-image-input
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+example_script - Gimp::Fu example, mostly non-functional
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Languages/_Perl/_Test/Dialog
+
+=head1 DESCRIPTION
+
+Just a starting point to derive new scripts. Always remember to put a
+descriptive help message here!
+
+=head1 PARAMETERS
+
+  # one of each type of parameter here
+  # argument type, variable name, short description, default, extra arguments
+  [PF_SLIDER	, "width"	, "Image width"		, 360, [300, 500]],
+  [PF_SPINNER	, "height"	, "Image height"	, 100, [100, 200]],
+  [PF_STRING	, "text"	, "Message"		, "example text"],
+  [PF_TEXT	, "longtext"	, "Longer text"		, "more example text"],
+  [PF_FILE	, "file"	, "File"		, "/tmp"],
+  [PF_INT8	, "int8"	, "8-bit int"		, 10],
+  [PF_INT32	, "bordersize"	, "Border size"		, 10],
+  [PF_FLOAT	, "borderwidth"	, "Border width"	, 1/5],
+  [PF_FONT	, "font"	, "Font"],
+  [PF_COLOUR	, "text_colour"	, "Text colour", [10,10,10]],
+  [PF_COLOUR	, "bg_colour"	, "Background colour"	, [0xff,0x80,0]],
+  [PF_TOGGLE	, "ignore_cols" , "Ignore colours"	, 0],
+  [PF_IMAGE	, "extra_image"	, "Additional picture to ignore"],
+  [PF_DRAWABLE	, "extra_draw"	, "Something to ignore as well"	],
+  [PF_RADIO	, "type"	, "Effect type"		, 0, [small => 0, large => 1]],
+  [PF_BRUSH	, "a_brush"	, "An unused brush"],
+  [PF_PATTERN	, "a_pattern"	, "An unused pattern"],
+  [PF_GRADIENT	, "a_gradients"	, "An unused gradients"],
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+2000-03-21
+
+=head1 LICENSE
+
+(c) 1998,1999,2000 Marc Lehmann
+
+Distributed under the same terms as Gimp-Perl.

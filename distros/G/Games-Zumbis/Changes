@@ -1,0 +1,27 @@
+Revision history for Games-Zumbis.
+
+0.05      2011-06-20 02:27:47 America/Sao_Paulo
+
+ - L10N support. Messages now in en-us and pt-br (garu)
+ - new windows icon (froggs)
+ - player can quit during the gameover scren (garu)
+ - minor internal refactoring (garu)
+ - oops, forgot to bump SDL minimal version (garu)
+
+0.04      2010-10-09 03:04:05 America/Sao_Paulo
+
+ - faster game pace, and moar zombies! (garu)
+
+0.03      2010-10-09 02:50:46 America/Sao_Paulo
+
+ - updated to latest API changes of the new SDL Perl (kthakore)
+ - full screen is now optional (kthakore, garu)
+ - 'f' key toggles fullscreen during the game (garu)
+ - basic usage with --help option (garu)
+
+0.02      2010-08-02 22:39:19 America/Sao_Paulo
+ - updated to latest API changes of the new SDL Perl
+
+0.01      2010-07-27 15:33:16 America/Sao_Paulo
+
+ - initial release.

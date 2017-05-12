@@ -1,0 +1,26 @@
+Gtk2/Net/LDAP/Widgets version 2.0.1
+==================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Gtk2
+  Net::LDAP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005,2008 Aleksander Adamowski
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

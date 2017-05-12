@@ -1,0 +1,38 @@
+---
+abstract: 'A module can alloc 512MB Sysv IPC shared memory for perl'
+author:
+  - 'itsusony <itsusony@fout.jp>'
+build_requires:
+  Test::LeakTrace: '0.15'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Global-IPC-StaticVariable
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Global::IPC::StaticVariable:
+    file: lib/Global/IPC/StaticVariable.pm
+    version: '0.015'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/itsusony/Global-IPC-StaticVariable/issues
+  homepage: https://github.com/itsusony/Global-IPC-StaticVariable
+  repository: git://github.com/itsusony/Global-IPC-StaticVariable.git
+version: '0.015'
+x_authority: cpan:ITSUSONY

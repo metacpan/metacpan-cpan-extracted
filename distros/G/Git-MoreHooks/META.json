@@ -1,0 +1,102 @@
+{
+   "abstract" : "More plugins (Git hooks) for package Git::Hooks.",
+   "author" : [
+      "'Mikko Koivunalho <mikko.koivunalho@iki.fi>'"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Git-MoreHooks",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
+         },
+         "suggests" : {
+            "Dist::Zilla::app::Command::podpreview" : "0.004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Const::Fast" : "0",
+            "Data::Dumper" : "0",
+            "Git::Hooks" : "0",
+            "Git::Mailmap" : "0",
+            "Jenkins::API" : "0",
+            "Log::Any" : "0",
+            "Params::Validate" : "0",
+            "Path::Tiny" : "0",
+            "Template" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Git::MoreHooks" : {
+         "file" : "lib/Git/MoreHooks.pm",
+         "version" : "0.005"
+      },
+      "Git::MoreHooks::CheckCommitAuthorFromMailmap" : {
+         "file" : "lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm",
+         "version" : "0.005"
+      },
+      "Git::MoreHooks::CheckCommitBase" : {
+         "file" : "lib/Git/MoreHooks/CheckCommitBase.pm",
+         "version" : "0.005"
+      },
+      "Git::MoreHooks::CheckIndent" : {
+         "file" : "lib/Git/MoreHooks/CheckIndent.pm",
+         "version" : "0.005"
+      },
+      "Git::MoreHooks::TriggerJenkins" : {
+         "file" : "lib/Git/MoreHooks/TriggerJenkins.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Git-MoreHooks@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-MoreHooks"
+      },
+      "homepage" : "https://metacpan.org/release/Git-MoreHooks",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mikkoi/git-morehooks.git"
+      }
+   },
+   "version" : "0.005"
+}
+

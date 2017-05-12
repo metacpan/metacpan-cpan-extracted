@@ -1,0 +1,11 @@
+Revision history for Perl extension gpib.
+0.30  Tue Jan  1 17:10:28 PST 2002
+        - Changed module name to GPIB (from gpib).
+        - LLP infertave isn't built by default anymore.
+
+0.20  Mon May 31 20:00:00 1999
+        - First external release
+
+0.01  Thu Apr 15 21:33:16 1999
+	- original version; created by h2xs 1.18
+

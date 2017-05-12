@@ -1,0 +1,54 @@
+Copyright 2008, 2010, 2015, 2016 Kevin Ryde
+
+This file is part of Gtk2-Ex-ListModelConcat.
+
+Gtk2-Ex-ListModelConcat is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-ListModelConcat is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-ListModelConcat.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 11, December 2015
+    - recommend Perl-Gtk2 1.2497 avoid EXTEND() trouble on Perl 5.24
+
+Version 10, September 2010
+    - tests fix overload test more
+
+Version 9, September 2010
+    - tests skip overload check somehow not working in perl 5.8
+
+Version 8, September 2010
+    - new buildable interface
+    - new append-model property
+
+Version 7, April 2010
+    - use refaddr() just in case a model overloads numizing
+
+Version 6, April 2010
+    - use Gtk2::Ex::TreeModel::ImplBits
+
+Version 5, February 2010
+    - new home page
+
+Version 4, December 2008
+    - new iter conversion functions
+    - fix for remove() when a child model appears more than once
+
+Version 3, December 2008
+    - fix for iter stamp on LP64 systems
+    - allow for Gtk pre-2.6 in the tests
+
+Version 2, November 2008
+    - delegate drag and drop to submodels instead of attempting row copy
+
+Version 1, July 2008
+    - the first version

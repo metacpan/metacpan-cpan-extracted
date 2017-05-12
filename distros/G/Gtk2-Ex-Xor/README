@@ -1,0 +1,33 @@
+Copyright 2008, 2009 Kevin Ryde
+
+This file is part of Gtk2-Ex-Xor.
+
+Gtk2-Ex-Xor is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+Gtk2-Ex-Xor is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-Xor.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+This is a couple widget add-ons,
+
+* Gtk2::Ex::CrossHair -- horizontal and vertical lines as a visual guide
+
+* Gtk2::Ex::Lasso -- user selection of a rectangular area
+
+The common feature, and the reason for the dist name is that they draw
+with an XOR on top of the ordinary contents of the their target
+widget(s).
+
+The prerequisites are Gtk2-Perl and my Glib-Ex-ObjectBits stuff.
+The Gtk2-Ex-Xor home page is
+
+    http://user42.tuxfamily.org/gtk2-ex-xor/index.html

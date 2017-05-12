@@ -1,0 +1,48 @@
+Revision history for Perl extension of Libplot library from Plotutils dist.
+
+1.0.2
+      Fri May 26  8:00:00 2006
+    - workaround for do_open perl/C++ macro name clash
+    - updated to plottutils version 2.5 (libplotter_*_handler changed
+      to pl_libplotter_*_handler)
+
+1.0.1
+      Thu Apr 01 12:24:00 1999
+	- changed module name from Plotter to Graphics::Plotter
+	  now you should use Graphics::Plotter::<type> instead
+	  of <type>Plotter
+	- changed test files and documentation accordingly
+1.0
+      Sun Mar 28 10:13:00 1999
+	- first public release of version 1.0
+      Thu Mar 25 17:33:00 1999
+	- changed for C++ plotter library
+	  * the name of the module is changed from Libplot to Plotter
+	  * now selectpl and deletepl are not usable anymore
+	  * you can use multiple plotters in the same time more easily
+	  * README file changed
+	  * new functions: warning_handler, error_handler
+	  * pl_ prefixes discarded
+
+0.9.1 Mon Mar 22 12:23:00 1999
+	- changed for plotutils-2.2
+	   * pl_ prefixes added
+	   * new functions: pl_[f]bezier(2|3)[rel], pl_fmiterlimit,
+		pl_[f]linedash, pl_fillmod
+	- new examples - rosette.pl, rotateAgif.pl, rotateeyegif.pl
+
+0.9   Mon Mar 15 15:50:00 1999
+	- bug fixes; first public release
+	- updated Libplot.pm pod subparts
+	- updated test files
+	- piechart.pl in examples/ added
+
+0.1   Nov 12 12:25:00 1998
+	- changed for plotutils-2.1.6
+
+0.02  Mon Jun  8 13:38:00 1998
+	- libplot functions for plotutils-2.1.5 are included
+
+0.01  Fri Jun  5 13:08:40 1998
+	- original version; created by h2xs 1.18
+	  (only constants are included into Plot.xs)

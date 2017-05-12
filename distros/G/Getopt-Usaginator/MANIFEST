@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Getopt/Usaginator.pm
+t/01-basic.t
+t/assets/t0
+t/assets/t1
+t/assets/t2

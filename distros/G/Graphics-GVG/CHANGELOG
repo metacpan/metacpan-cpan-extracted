@@ -1,0 +1,28 @@
+Revision history for perl module Graphics::GVG
+
+0.7 2017-05-08
+
+- Add meta vars
+
+0.6 2017-02-07
+
+- Fix documentation of poly function
+
+0.5 2017-02-03
+
+- Fix double parse problem
+
+0.4 2016-12-25
+
+- Can output the AST as a GVG document
+
+0.3 2016-12-23
+
+- Fix polygon offset
+- Add point command
+- Correct parsing of effect blocks
+- OpenGLRenderer spun off into its own module
+
+0.1 2016-11-28
+
+- Initial version

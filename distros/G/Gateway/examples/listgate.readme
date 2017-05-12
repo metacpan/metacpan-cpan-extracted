@@ -1,0 +1,50 @@
+How to use listgate with sendmail 8
+===================================
+Christopher Davis <ckd@loiosh.kei.com>
+
+$Revision: 1.1 $, $Date: 1998/02/19 08:37:20 $
+
+It is actually quite easy to set up sendmail 8 to work with listgate for
+arbitrary mailing lists, assuming you're using sendmail's m4 system for
+your configuration file building instead of editing cf files by hand.  (If
+you are editing cf files by hand, you shouldn't need this file.)
+
+1. Put listgate.m4 in the cf/mailer directory of sendmail's source tree.
+
+2. Add any necessary define()s to your .mc file to override the
+   following defaults:
+
+   LISTGATE_MAILER_PATH   [/usr/local/bin/listgate]
+   LISTGATE_MAILER_USER   [news:news]
+
+   You should not need to override LISTGATE_MAILER_FLAGS.
+
+3. After the define()s (if any), add the following line:
+
+   MAILER(listgate)
+
+4. If you do not already have it in your .mc file, add the line:
+
+   FEATURE(mailertable)
+
+   Depending on the database formats available in your sendmail binary,
+   you may need to include an argument.  See cf/README in the sendmail
+   distribution.
+
+5. Create your .cf file in the usual manner.
+
+6. Add an entry to mailertable (see "USING MAILERTABLES" in cf/README in
+   the sendmail distribution for details) such as:
+
+   listgate.example.com    listgate:newshost.example.com
+
+7. Add one or more MX records for "listgate.example.com" to the DNS.
+   The lowest-preference MX should be the host running listgate.
+
+8. Create newsgroups for the mailing lists you want to gateway, as well
+   as a "postmaster" newsgroup; the latter is useful for testing, and is
+   necessary to comply with RFC 822.
+
+9. Subscribe "listname@listgate.example.com" to a mailing list to have
+   its mail posted to "example.mail.listname".  Mail for groups which
+   don't exist will be silently dropped.

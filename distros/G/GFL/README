@@ -1,0 +1,60 @@
+Description
+-----------
+This archive contains two Perl modules :
+
+GFL - a low-level SWIG wrapper for P-e Gougelet's cross platform
+Graphic File Library.
+
+GFL::Image - a full-fledged object oriented interface to the above.
+
+GFL's main strength is it's ability to read more than 300 image formats and
+to write around 50. It also contains a large set of filters and
+image manipulation tools.
+It is free for non-commercial use.
+
+Prerequisite
+------------
+The GFL Library (v 1.30) must be installed on your system before you try to compile
+this module.
+Fetch it first at www.xnview.org
+(http://perso.wanadoo.fr/pierre.g/xnview/endownload.html for the download section)
+
+GFL is available for the following systems :
+
+Linux x86
+Irix N32
+Solaris sparc
+BeOS x86
+Windows
+MacOS X
+
+Install (Un*x)
+-------------------
+
+perl Makefile.PL
+make
+make install
+
+Install with PPD (Win32/ActivePerl)
+-----------------------------------
+
+http://www.phoenix-library.org/germain/GFL.ppd
+
+
+A little test
+-------------
+
+perl test
+
+Documentation
+-------------
+
+perldoc GFL::Image
+
+or open gfl-image.html in your favorite browser
+
+
+
+Enjoy,
+
+G.Garand - germain@ebooksfrance.com

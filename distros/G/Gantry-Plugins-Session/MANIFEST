@@ -1,0 +1,11 @@
+Changes
+Build.PL
+MANIFEST
+README
+META.yml
+t/01_load.t
+t/02_basic.t
+t/99_pod.t
+root/session.tt
+lib/Gantry/Plugins/Session.pm
+Makefile.PL

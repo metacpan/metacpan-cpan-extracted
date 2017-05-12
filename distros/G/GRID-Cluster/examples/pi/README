@@ -1,0 +1,10 @@
+In the different directories, there are several configuration files with
+the extension ".pm". To execute the examples, these files must be
+modified to include the machines where the user has remote access.
+
+An example of configuration file is presented in the following lines:
+
+my %debug = (host1 => 0, host2 => 0, host3 => 0, host4 => 0);       # Debug mode for each machine: 0 | 1
+my %max_num_np = (host1 => 2, host2 => 1, host3 => 3, host4 => 1);  # Maximum number of processes for each machine
+
+return (debug => \%debug, max_num_np => \%max_num_np);

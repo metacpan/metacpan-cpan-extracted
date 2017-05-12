@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Gtk2-Ex-Geo-Graph
+version:            0.01
+abstract:           Geospatial graphs for Gtk2::Ex::Geo
+author:
+    - Ari Jolma <ari.jolma @ tkk.fi>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Gtk2::Ex::Geo:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

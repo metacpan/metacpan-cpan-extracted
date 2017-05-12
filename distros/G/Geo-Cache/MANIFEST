@@ -1,0 +1,10 @@
+MANIFEST
+LICENSE
+README
+VERSION
+lib/Geo/Cache.pm
+t/001_load.t
+t/002_waypoint.t
+t/sample.gpx
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

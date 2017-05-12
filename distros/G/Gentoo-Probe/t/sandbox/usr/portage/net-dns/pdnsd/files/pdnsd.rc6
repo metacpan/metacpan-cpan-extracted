@@ -1,0 +1,31 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/pdnsd/files/pdnsd.rc6,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+depend() {
+	need net
+	provide dns
+}
+
+checkconfig() {
+	if [ ! -e /etc/pdnsd/pdnsd.conf ] ; then
+		eerror "You need an /etc/pdnsd/pdnsd.conf file first."
+		eerror "There is a sample in /etc/pdnsd/pdnsd.conf.sample"
+		return 1
+	fi
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting pdnsd"
+	start-stop-daemon --start --quiet --exec /usr/sbin/pdnsd \
+		-- -s -t -d -p /var/run/pdnsd.pid ${PDNSDCONFIG}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping pdnsd"
+	start-stop-daemon --stop --quiet --pidfile /var/run/pdnsd.pid
+	eend $?
+}

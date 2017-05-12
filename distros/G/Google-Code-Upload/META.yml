@@ -1,0 +1,47 @@
+---
+abstract: 'upload files to a Google Code project (deprecated)'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-Code-Upload
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  Getopt::Long: '0'
+  HTTP::Request::Common: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Term::ReadKey: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/fayland/google-code-upload/issues
+  homepage: http://search.cpan.org/dist/Google-Code-Upload/
+  repository: git://github.com/fayland/google-code-upload.git
+version: '0.08'
+x_deprecated: 1

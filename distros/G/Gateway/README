@@ -1,0 +1,187 @@
+                        News::Gateway version 0.42
+           (Robomoderation and mail to news gatewaying toolkit)
+
+  Copyright 1997, 1998 by Russ Allbery <rra@stanford.edu>.  This program
+  is free software; you may redistribute it and/or modify it under the
+  same terms as Perl itself.
+
+  Individual modules and examples may be written by other authors; if so,
+  they will have their own copyright information at the beginning of the
+  code.
+
+
+INTRODUCTION
+
+  Welcome to my attempt to do robomoderation, moderation support, mail to
+  news gatewaying, and news to mail gatewaying right.
+
+  Essentially, robomoderators, moderation support programs, and mail to
+  news gateways are all the same thing.  They take an incoming message,
+  from either an MTA or from a user filtering program like procmail, or
+  perhaps even directly from a user's MUA, perform a variety of rewrites
+  required to turn an RFC 822 message into an RFC 1036 message, possibly
+  perform a variety of checks and additional rewrites suited to the
+  particular application, and then hand the message off to a news server.
+  News to mail gateways just do exactly the same thing in reverse.
+
+  From extremely simple procmail hacks through Rich Salz's newsgate
+  program to the variety of robomoderators and moderation support packages
+  written (most notably, Igor Chudov's STUMP), a variety of people have
+  tackled different aspects of this problem, but nearly every effort was
+  aimed at a particular view or hard-coded various assumptions, and as a
+  result the wheel has been reinvented a ridiculous number of times.
+
+  This is an attempt to generalize out the framework, so that people don't
+  have to keep writing the same code to read e-mail messages, post
+  messages, send e-mail messages, and do the common rewrites, and instead
+  can concentrate on the *interesting* parts, namely the checks and
+  rewrites they need for their specific application.  News::Gateway is
+  *not* a robomoderator or gateway in and of itself.  Rather, it's a
+  toolkit for *building* robomoderators and gateways that attempts to take
+  care of all of the nitpicking details for you and drastically decrease
+  the amount of code you have to write.  And if your problem happens to
+  coincide with one of the supplied example programs, you may not have to
+  write any code at all.
+
+  It furthermore sets up a consistent interface for those additional
+  checks and rewrites, so once they're done they can be generalized and
+  included in the News::Gateway distribution and someone else who is
+  trying to solve the same problem can just use (or work with) the
+  existing code.  This concept of News::Gateway as a library of reusable
+  modules is inherent in its design.
+
+
+REQUIREMENTS
+
+  News::Gateway being a Perl module, it obviously requires Perl.  With
+  great restraint, I've kept myself from requiring Perl 5.004.  But
+  version 5.003 is probably required; earlier versions have some fairly
+  severe bugs.  I highly recommend you upgrade to 5.004 if at all possible
+  since there are very significant bug fixes over 5.003.
+
+  News::Gateway also requires Andrew Gierth's excellent News::Article
+  module (and in fact can be viewed largely as a wrapper around that
+  module).  It may require Net::NNTP depending on what you're doing, and
+  News::Article also requires Net::NNTP and PGP::Sign, both of which are
+  on CPAN.  All required modules are available from CPAN.  News::Article
+  is also at <URL:http://www.erlenstar.demon.co.uk/perl/index.html>, and
+  both the latest version of this module and PGP::Sign can be obtained
+  from <URL:ftp://ftp.eyrie.org/pub/software/modules/>.
+
+
+OVERVIEW
+
+  I view the process of constructing a robomoderator or mail to news
+  gateway as having fundamentally three levels.  First, there's the basic
+  framework that reads in the incoming message, reads any implementation-
+  specific information, runs a variety of checks and rewrites, and posts
+  the result.  Next, there is the implementation of the checks and
+  rewrites.  Finally, there's the code that specifies what checks and
+  rewrites to apply in any given case, provides implementation-specific
+  (or even invocation-specific) arguments to them, and takes fallback
+  actions based on the outcome.
+
+  This package implements the first level, and provides a framework for
+  collecting implementations of the second level (along with providing a
+  bunch of standard second-level modules).  So far, the only third-level
+  support provided is a few examples.
+
+  News::Gateway takes its information on what to do to incoming articles
+  from three basic sources.  First, one tells it what what modules to
+  apply to incoming articles.  Some modules take no additional information
+  and just do one simple thing the same way to every message.  Second, for
+  those modules that do require additional information, News::Gateway can
+  read and parse a configuration file and pass directives along to
+  individual modules, or you can give it configuration directives
+  directly.  Each module registers an interface that tells the
+  News::Gateway core code which directives it's interested in.  Third,
+  there are some pieces of information modules need to know which may be
+  invocation-specific.  For example, for a mail to news gateway, the same
+  script and configuration file may be usable for every newsgroup being
+  gatewayed, but each particular invocation of the program will want to
+  tell the mailtonews module what default newsgroup to use.  To allow for
+  passing that information in, News::Gateway can take module arguments
+  when told what modules to apply, and will pass those arguments along to
+  the modules.
+
+  For complete information on using News::Gateway, including documentation
+  of all available modules, follow the below installation instructions to
+  the point of typing make and then read News/Gateway.pod (which is
+  generated from all of the documentation in the pod directory).  The
+  documentation is in POD format and can therefore either be read straight
+  or (preferably) by running perldoc on the POD file.
+
+  Some additional documentation is also available in the doc directory.
+
+
+INSTALLATION
+
+  If you want to install News::Gateway in the system site_perl directory
+  and have the privileges necessary to do so, follow the standard
+  installation procedure for Perl modules, which is to type the following
+  commands:
+
+          perl Makefile.PL
+          make
+          make install
+
+  (There is no test suite for this module yet, but it's high on the list
+  of things to be added in the future.)  You will probably have to do the
+  last step as root.
+
+  If you would instead like to install News::Gateway in your own account,
+  you can use the standard Perl module facility for doing so.  Just
+  specify a LIB value to Makefile.PL when you run it.  For example, if you
+  want to put all of your personal Perl modules in ~/perl, instead of the
+  first command given above, type:
+
+        perl Makefile.PL LIB=~/perl
+
+  and then continue as normal.  (The man pages may not be installed if you
+  use this method, but the POD documentation will be and you can run
+  perldoc on it directly.)
+
+  You can do exactly the same to install News::Article, PGP::Sign, and
+  other required modules in your home directory, and in fact this method
+  should work with nearly any Perl module.
+
+  To use modules installed in this fashion, you'll need to put the line:
+
+        use lib "$ENV{HOME}/perl";
+
+  at the beginning of your Perl scripts (replace $ENV{HOME} with the
+  actual path to your home directory if you wish).
+
+
+SUPPORT
+
+  THIS IS AN ALPHA RELEASE.  Translated, that means many features are
+  missing or not fully implemented, and there are known bugs which have
+  not yet been fixed.  When using this release, please realize that the
+  interface may still be unstable and that there are some outstanding
+  problems.  I welcome any bug reports or requests for new features; any
+  bug reports that lead to solving a problem or feature suggestions that
+  are included in later versions will result in having your name featured
+  prominently in the THANKS file.
+
+  See the TODO file for a list of known bugs and outstanding feature
+  requests.
+
+  If you are interested in being notified of new releases, helping with
+  development, developing, testing, or using new modules, or even just
+  getting tips on how to use this module, there is a mailing list
+  available.  To subscribe, send mail to majordomo@eyrie.org with:
+
+        subscribe gateway-users
+
+  in the body.  New patches and modules are always welcome, whether from
+  people on the list or not, and can be mailed to the address listed
+  below.
+
+  See the THANKS file for credits.
+
+  The latest version of this module will always be available from
+  <URL:ftp://ftp.eyrie.org/pub/software/modules/>.
+
+                                                Russ Allbery
+                                                rra@stanford.edu

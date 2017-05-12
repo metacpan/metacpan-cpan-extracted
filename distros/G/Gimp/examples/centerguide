@@ -1,0 +1,57 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  my $w = $image->width;
+  my $h = $image->height;
+  $image->undo_group_start;
+  $image->add_hguide($center == 1 ? int(($h / 2.6179) + 0.5) : int($h/2 + 0.5));
+  $image->add_vguide(int($w/2 + 0.5));
+  $drawable->update(0, 0, $w, $h);
+  $image->undo_group_end;
+};
+exit main;
+__END__
+
+=head1 NAME
+
+center_guide - Creates h- & v-guides at the center of the image.
+
+=head1 SYNOPSIS
+
+<Image>/Image/Guides/Center Guide...
+
+=head1 DESCRIPTION
+
+Physical center = width/2 and height/2; Optical center = the Golden Mean.
+
+=head1 PARAMETERS
+
+  [PF_RADIO, "center", "Which center", 0, [Physical => 0, Optical => 1] ]
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 HISTORY
+
+ 7/15/03 <sjburges@gimp.org>
+ Changed spot that its registered from <Image>/Guides to <Image>/Image/Guides
+ to reduce horizontal clutter on menubar
+
+=head1 AUTHOR
+
+Claes G Lindblad <claesg@algonet.se>
+
+=head1 DATE
+
+990323
+
+=head1 LICENSE
+
+Copyright Claes G Lindblad.
+Distributed under the terms of the GNU Public License.

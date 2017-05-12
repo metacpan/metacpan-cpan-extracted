@@ -1,0 +1,84 @@
+{
+   "abstract" : "Google BigQuery Client Library for Perl",
+   "author" : [
+      "Shoji Kai <sho2kai@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-BigQuery",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Crypt::OpenSSL::PKCS12" : "0",
+            "Crypt::OpenSSL::RSA" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "JSON::WebToken" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Google::BigQuery" : {
+         "file" : "lib/Google/BigQuery.pm",
+         "version" : "1.02"
+      },
+      "Google::BigQuery::V2" : {
+         "file" : "lib/Google/BigQuery/V2.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shojikai/Google-BigQuery/issues"
+      },
+      "homepage" : "https://github.com/shojikai/Google-BigQuery",
+      "repository" : {
+         "url" : "git://github.com/shojikai/Google-BigQuery.git",
+         "web" : "https://github.com/shojikai/Google-BigQuery"
+      }
+   },
+   "version" : "1.02"
+}

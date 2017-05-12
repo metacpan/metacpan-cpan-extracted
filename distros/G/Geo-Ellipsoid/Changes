@@ -1,0 +1,60 @@
+Revision history for Perl module Geo::Ellipsoid
+
+0.01 Mon Oct 24 17:18:31 2005
+    - original version; created by ExtUtils::ModuleMaker 0.43
+
+0.9 Fri Oct 28 2005
+    - first version uploaded to PAUSE
+
+0.901 Mon Oct 31 2005
+    1. Add Test::Number::Delta to prerequisites in Makefile.PL.
+    2. Include correct README file.
+    3. Correct version number in Ellipsoid.pm POD.
+
+0.902 Fri Nov 4 2005
+    1. Change WGS84 flattening value to 298.257223563.
+    2. Add set_defaults package method (and tests).
+    3. Add 'IAU76' to POD section on DEFINED ELLIPSOIDS
+    4. Croak on invalid ellipsoid or units.
+    5. Don't change defaults except by set_defaults.
+    6. Use package $DEBUG instead of instance $self->{debug} for debug.
+    7. Don't test bearing angle between points when the same.
+
+0.903 Sat Aug 19 2006
+    1. Change test for zero flattening to use delta_within instead of delta_ok
+
+0.904 Tue Aug 22 2006
+    1. Eliminate tests using points too far away.
+    2. Use delta_ok with relative test instead of delta_within for large
+       ranges.
+
+1.0 Fri Mar 21 2008
+    1. Normalized calculated angle result from _inverse to be
+       less than 360.00 using _normalize_input subroutine.
+    2. Fixed POD error (extraneous =over)
+    3. Add 'use 5.006_00;' statement to abort Perls earlier than 5.6.0
+       because of 'our' statements.
+    4. Fix tests expecting 360 degrees for angles; change to 0.
+
+1.1 Sun Jun 30 2008
+    1. Added set_longitude_symmetric, set_bearing_symmetric, and
+       set_distance_unit methods
+    2. Corrected example of at method in documentation
+    3. Ensured no test too close to range boundaries (0,360 or -180,180)
+    4. Removed non-POD method headers as redundant.
+    5. Added tests for different distance units and symmetrical output
+       ranges.
+
+1.2 Fri Jul 4 2008
+    1. Correct bearing tests in 09-bearing.t
+
+1.13 Wed Sep 07 2016
+    1. Use OO syntax to make subclassing possible.
+    2. Add test file t/11-subclass.t
+    3. Update require version of Test::More to 0.47.
+    4. Minor POD changes.
+    5. Clean up whitespace.
+
+1.14 Sun Sep 18 2016
+    1. Avoid "use parent" in t/11-subclass.t since "parent" was not supported
+       before 5.8.9.

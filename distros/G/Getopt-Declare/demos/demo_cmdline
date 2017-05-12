@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Declare;
+
+use vars qw($VERSION);
+$VERSION = "1.00b";
+
+my $config;
+
+$config = Getopt::Declare->new( <<'EOCONFIG', [-CONFIG]);
+	[strict]
+	min = <n>	Minimum value [required]
+	max = <n>	Maximum value
+
+EOCONFIG
+
+print "min: ", $config->{min}{'<n>'}, "\n" if $config->{min};
+print "max: ", $config->{max}{'<n>'}, "\n" if $config->{max};
+
+
+my $specs = qq{
+This is $0 version $VERSION
+
+General options:
+
+	-e <f:i>..<t:i>	Set expansion factor to specified range
+		[requires: <file>]
+		{ print "k = [\$f..\$t]\n"; }
+
+	-e [<k:n>...]	Set expansion factor to <k> (or 2 by default)
+		[required]
+		{ \@k = (2) unless \@k; print "k = [", join(', ', \@k), "]\n"; }
+
+	-b <blen:i>	Use byte length of <blen> 
+		[excludes: -a +c]
+		{ print "byte len: \$blen\n"; }
+
+	<file>...	Process files [required] [implies: -a]
+		{ print "files: \@file\n"; }
+
+	-a [<N:n>]	Process all data [except item <N>]
+		{ print "proc all"; print " except \$N" if \$N; print "\n"; }
+
+	-fab	The fabulous option (is always required :-)
+		[required]
+		{ defer { print "fabulous!\n" } }
+
+File creation options:
+
+	+c <file>	Create file [mutex: +c -a]
+		{ print "create: \$file\n"; }
+
+	+d <file>	Duplicate file [implies: -a and -b 8]
+                        This is a second line
+		{ print "dup (+d) \$file\n"; }
+
+	--dup <file>	[ditto] (long form)
+
+	-how <N:i>	Set height to <N>       [repeatable]
+
+Garbling options:
+
+	-g [<seed:i>]	Garble output with optional seed [requires: +c]
+		{ print "garbling with \$seed\n"; }
+
+	-i	Case insensitive garbling [required]
+		{ print "insensitive\n"; }
+	-s	Case sensitive garbling 
+	-w	WaReZ m0De 6aRBL1N6 
+
+        [mutex: -i -s -w]
+};
+
+my $args = Getopt::Declare->new($specs);
+
+print "Unused:\n" if @ARGV;
+foreach ( @ARGV )
+{
+        print "\t[$_]\n";
+}
+
+#$args->debug();
+#$args->usage();
+__END__

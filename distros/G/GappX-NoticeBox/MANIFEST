@@ -1,0 +1,14 @@
+CHANGES
+GappX-NoticeBox.komodoproject
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/notice_box.pl
+lib/GappX/Moose/Meta/Attribute/Trait/GappNoticeBox.pm
+lib/GappX/Notice.pm
+lib/GappX/NoticeBox.pm
+t/01_notice.t
+t/02_moose_traits.t

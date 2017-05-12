@@ -1,0 +1,96 @@
+##############################################################################
+##
+## Gentoo's csh.cshrc
+##
+## Based on the TCSH package (http://tcshrc.sourceforge.net)
+##
+## .tcshrc.alias	2Sep2001, Simos Xenitellis (simos@hellug.gr)
+##
+## 2003-01-13  --  Alain Penders (alain@gentoo.org)
+##     Renamed to /etc/tcsh/aliases, basic cleanup work, added features that
+##     can be enabled/disabled from /etc/conf.d/tcsh and ~/.tcshconf.
+##
+
+set noglob
+
+##
+## Secure versions of cp, mv, and rm.  Only used when TCSH_SHELL_SAFETY is set.
+##
+if ( $?TCSH_SHELL_SAFETY ) then
+    alias rm 	'rm -i'
+    alias cp 	'cp -i'
+    alias mv 	'mv -i'
+endif
+
+##
+## Aliases for CPM/MSDOS-like behaviour.  (Only if TCSH_SHELL_DOS is set.)
+##
+if ( $?TCSH_SHELL_DOS ) then
+    alias del   	'rm -i'
+    alias cls   	'clear'
+    # "-p" lets you create a path structure with one command, ex. mkdir -p /a/b/c
+    alias md    	'mkdir -p'
+    alias rd    	'rmdir'
+    alias dir       'ls --format=vertical'
+endif
+
+##
+## Colors for ls, etc.
+##
+if ( -x /bin/dircolors ) then
+    if ( -r $HOME/.dir_colors ) then
+        eval `dircolors -c $HOME/.dir_colors`
+    else if ( -r /etc/DIR_COLORS ) then
+        eval `dircolors -c /etc/DIR_COLORS`
+    endif
+endif
+alias d         'ls --color'
+alias ls        'ls --color=auto'
+alias l         'ls --color -aF'
+alias ll        'ls --color -alF'
+
+##
+## Alias vi to vim when appropriate.
+##
+if ( ( -e `where vim`) && ( ! -e `where vi`) ) then
+    alias vi 'vim'
+endif
+
+##
+## Some fancy aliases to make changing directory easier.
+## Only available when TCSH_SHELL_CDALIAS is set.
+##
+if ( $?TCSH_SHELL_CDALIAS ) then
+    # Shows current directory
+    alias . 	'pwd'
+    # Goes back one directory
+    alias .. 	'cd ..'
+    alias ../	'cd ../'
+    # Goes to previous directory
+    alias -		'cd -'
+    # Goes to the root directory
+    alias /		'cd /'
+endif
+
+##
+## Standard aliases - for typos
+##
+## These are the most common typos made by users, even experienced ones.
+##
+alias maek  'make'
+alias alais 'alias'
+alias csl   'clear'
+alias sl    'ls --color'
+
+##
+## Aliases specific to TCSH
+##
+## What is the help command? Type "ls" and hit F1. Will show a help line.
+## From version tcshrc-1.x we use the man page facility as the help source.
+## Once you read the help, press "q" to quit and you can continue editing the
+## line.
+##
+#alias helpcommand whatis
+alias helpcommand man
+
+unset noglob

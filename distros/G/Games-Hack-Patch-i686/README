@@ -1,0 +1,23 @@
+Games-Hack-Patch-i686 version 0.1
+=================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module is not useable alone; it is used by Games::Hack::Live, and 
+will sometime possibly be used by Games::Hack::Offline.
+
+
+COPYRIGHT AND LICENCE
+
+(C) 2007 by Ph. Marek <pmarek@cpan.org>; licensed under the GPLv3.
+
+

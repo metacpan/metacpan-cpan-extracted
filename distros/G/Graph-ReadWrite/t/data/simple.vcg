@@ -1,0 +1,15 @@
+graph: {
+  node: { title: "a"  }
+  node: { title: "b"  }
+  node: { title: "c"  }
+  node: { title: "d"  }
+  node: { title: "e"  }
+
+  edge: { sourcename: "a" targetname: "b"  }
+  edge: { sourcename: "a" targetname: "c"  }
+  edge: { sourcename: "b" targetname: "c"  }
+  edge: { sourcename: "b" targetname: "d"  }
+  edge: { sourcename: "c" targetname: "d"  }
+  edge: { sourcename: "c" targetname: "e"  }
+  edge: { sourcename: "e" targetname: "e"  }
+}

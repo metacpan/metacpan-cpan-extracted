@@ -1,0 +1,30 @@
+NAME
+    GD::Barcode::Image - Create Image::Magick object for a barcode
+
+    barcodegen - Command-line utility to create barcode image files
+
+DESCRIPTION
+    GD::Barcode::Image extends GD::Barcode and allows creation of
+    barcode images in Image::Magick format. Command-line script
+    barcodegen is also provided to create outputs in any format that
+    Image::Magick supports such as PDF, EPS, GIF, etc.
+
+    After installation, use perldoc to see detailed documentation:
+        perldoc GD::Barcode::Image
+        perldoc barcodegen
+        
+DEPENDS ON
+    This module requires these modules:
+                GD::Barcode
+                GD
+                Image::Magick
+
+INSTALLATION
+    The module can be installed using the standard Perl procedure:
+
+        perl Makefile.PL
+        make
+        make test
+        make install    # You may need to be root
+        make clean      # or make realclean
+

@@ -1,0 +1,20 @@
+---
+abstract: "The totally cool way to open repository page, sometime it's hard to remember and open via browser manually."
+author:
+  - 'Pattarawat Chormai <pat.chormai@gmail.com>'
+build_requires:
+  Test::Mock::Cmd: 0.6
+  Test::More: 1.001002
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Git-Open
+requires:
+  Moose: 0
+  MooseX::Getopt::Usage: 0
+version: 0.1.9

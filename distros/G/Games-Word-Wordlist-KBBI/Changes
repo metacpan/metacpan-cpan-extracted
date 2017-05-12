@@ -1,0 +1,19 @@
+Revision history for Games-Word-Wordlist-KBBI
+
+0.03    2016-01-13 (PERLANCAR)
+
+	- [Bugfix] Bump prereq version WordList::ID::KBBI -> 0.03 (requires
+	  all_words() from WordList 0.1.1) [CT].
+
+
+0.02    2016-01-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- To avoid duplication of efforts, now source the word list from
+	  WordList::ID::KBBI.
+
+
+0.01    2014-08-07 (SHARYANTO)
+
+        - First release.

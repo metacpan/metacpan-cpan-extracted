@@ -1,0 +1,25 @@
+README file for Glade-Perl example project 
+
+After you have installed Glade-Perl
+
+To Build the supplied example
+
+call (from the same directory as this README file)
+
+    glade2perl Bus.glade
+	
+This should do the same as make test did 
+
+-------------------------------------------------------------------------
+
+To run the code that you have generated, 
+
+call (again from the same directory as this README file)
+
+    perl -e 'use Generated::Bus; BusFrame->run'
+OR  perl -e 'use Generated::SubBus; SubBusFrame->run'
+
+Read the message on the UI for instructions.
+
+-------------------------------------------------------------------------
+

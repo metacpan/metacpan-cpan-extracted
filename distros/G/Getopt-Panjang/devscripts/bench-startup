@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use Benchmark::Command;
+
+Benchmark::Command::run(0, {
+    'perl'             => [$^X, "-I$Bin/../lib", "-e1"],
+
+    'load_gl'          => [$^X, "-MGetopt::Long", "-e1"],
+    'load_gl_evenless' => [$^X, "-I$Bin/../lib", "-MGetopt::Long::EvenLess", "-e1"],
+    'load_gl_less'     => [$^X, "-I$Bin/../lib", "-MGetopt::Long::Less", "-e1"],
+    'load_gp'          => [$^X, "-I$Bin/../lib", "-MGetopt::Panjang", "-e1"],
+
+    'run_gl'           => [$^X, "-MGetopt::Long", "-e", "GetOptions()"],
+    'run_gl_evenless'  => [$^X, "-I$Bin/../lib", "-MGetopt::Long::EvenLess", "-e", "GetOptions()"],
+    'run_gl_less'      => [$^X, "-I$Bin/../lib", "-MGetopt::Long::Less", "-e", "GetOptions()"],
+    'run_gp'           => [$^X, "-I$Bin/../lib", "-MGetopt::Panjang=get_options", "-e", "get_options()"],
+});

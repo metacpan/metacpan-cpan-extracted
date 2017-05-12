@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Games-Maze-FirstPerson
+version:             0.03
+abstract:            First person viewpoint of Games::Maze
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Games::Maze:                   1.02
+    Sub::Uplevel:                  0.09
+    Test::Exception:               0.21
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Curtis "Ovid" Poe <moc.oohay@eop_divo_sitruc>

@@ -1,0 +1,79 @@
+#
+# Perl-GPIB configuration file
+#
+# name      Symbolic name for device
+#
+# Board     Board index
+# PAD       Primary GPIB address
+# SAD       Secondary GPIB address
+# TMO       Timeout, This is either a number that corresponds to
+#           one of the defines in ugpib.h or one of the following
+#           text strings:
+#
+#               TNONE T10us T30us T100us T300us T1ms  T3ms
+#               T10ms T30ms T100ms T300ms T1s   T3s   T10s
+#               T30s  T100s T300s T1000s
+#            
+# EOT       EOI mode
+#           Set to one sends EOI signal at the end of GPIB write
+#           operations. Set to zero disables sending EOI
+#           at end of write.
+#
+# EOS       EOS character and modes.  The low byte is the EOS
+#           character (both read and write). Three bits in the
+#           high byte set some modes as follows:
+#               0x0400  Terminate read when EOS is detected
+#               0x0800  Set EOI with EOS on write function
+#               0x1000  Compare 8-bits of EOS (both read and write)
+#
+#           All parameters can be either decimal or hex numbers
+#           beginning with 0x.
+# 
+# GPIB::ni devices look like this
+#
+# name                      Board   PAD     SAD     TMO     EOT     EOS
+# K2002     GPIB::ni        0       0x10    0       T1s     1       0
+#
+K2002       GPIB::ni        0       0x10    0       T1s     1       0
+HP59306A    GPIB::ni        0       0x11    0       T10ms   1       0
+TDS754A     GPIB::ni        0       2       0       T1s     1       0
+HP53132A    GPIB::ni        0       3       0       T1s     1       0
+HPE3631A    GPIB::ni        0       5       0       T1s     1       0
+HP33120A    GPIB::ni        0       10      0       T1s     1       0
+HP3585A     GPIB::ni        0       11      0       T1s     1       0
+
+#
+# The Linux Lab Project likes to keep track of its own device information
+# in /etc/gpib.conf (not this file, /etc/pgpib.conf).  As a result, when
+# using LLP all of the particulars of the device are kept in the LLP
+# file and this file only contains a degenerate entry. The LLP name field
+# is the name LLP like to call the device.  This is probably the same name
+# Perl would like to call the device...
+#
+# GPIB::llp deivces look like this
+#
+# name      interface       LLP name
+K2002       GPIB::llp       K2002
+
+#
+# GPIB::hpserial devices look like this
+#
+# Flag has the following bits:
+#       0x0001      Use RTS/CTS flow control sending to device
+#
+# name      driver              port        speed   TMO     EOS     FLAG
+# HP33120A  GPIB::hpserial      /dev/cua1   9600    T3s     0x0a    0x0001
+#
+HP33120AS   GPIB::hpserial      /dev/cua1   9600    T3s     0x0a    0x0001
+HPE3631AS   GPIB::hpserial      /dev/cua1   9600    T3s     0x0a    0x0001
+
+#
+# Remote connections
+# name        driver        machine          user   password  device
+#
+HP33120A      GPIB::rmt     sparky.mock.com  jeff   fiddlefoo HP33120A 
+HP3585A       GPIB::rmt     sparky.mock.com  jeff   fiddlefoo HP3585A
+HPE3631A      GPIB::rmt     sparky.mock.com  jeff   fiddlefoo HPE3631AS
+HP59306A      GPIB::rmt     sparky.mock.com  jeff   fiddlefoo HP59306A
+K2002         GPIB::rmt     sparky.mock.com  jeff   fiddlefoo K2002
+

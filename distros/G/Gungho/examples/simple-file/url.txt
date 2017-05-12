@@ -1,0 +1,4 @@
+# GET perl from perl.org
+http://www.perl.org
+# And search stuff from CPAN
+http://search.cpan.org # Yey!

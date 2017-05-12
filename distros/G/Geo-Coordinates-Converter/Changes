@@ -1,0 +1,53 @@
+Revision history for Geo-Coordinates-Converter
+
+0.13    2012-10-04T11:33:49+09:00
+        - supported for ISO6709 format
+        - wrote Point#height document
+
+0.12    2012-09-12T14:42:59+09:00
+        - add milliseconds format
+        - more strict check for degree format detect
+        - fixed utf8 flagged number's bug
+
+0.11    2012-06-22T15:15:34+09:00
+        - fixed Makefile.PL Bug (RT #73468)
+
+0.10    2011-02-08T12:34:23+09:00
+        - add method Geo::Coordinates::Converter::Point->converter
+        - add document in Geo::Coordinates::Converter::Point->datum
+
+0.09    2011-01-04T11:52:46+09:00
+        - add back compatibility Class::Accessor methods
+
+0.08    2011-01-02T12:10:29+09:00
+        - remove 'use Readonly' in Geo::Coordinates::Converter::Datum
+
+0.07    2011-01-01T04:26:11+09:00
+	- s/use parent 'Class::Accessor::Fast'/use Class::Accessor::Lite/
+	- s/use Readonly/use constant/
+	- s/use UNIVERSAL::require/use Module::Load/
+
+0.06    2010-12-28T17:27:05+09:00
+	- s/use base/use parent/
+        - modern layout.
+
+0.05    2010-09-08T02:58:06+09:00
+        - added test_requires 'YAML' for Test::Base (tokuhirom)
+        - depended perl 5.8.1 (tokuhirom)
+        - fixed authors test fials (yappo)
+        - fixed method name typo s/normaraiz/normalize/g (tokuhirom)
+
+0.04    2008-01-16T15:52:22+09:00
+        - fixed dms format (example case +N1.1.1.111) is dosent work bug 
+        - add inc directory in distfiles
+
+0.03    2006-12-21T18:15:14+09:00
+        - Added to Geo::Coordinates::Converter::Point the input options for latitude and longitude
+
+0.02    2006-11-07T17:07:24+09:00
+        - Added to add_default_formats method
+        - Fixed to Geo::Coordinates::Converter::Point test dosen't work
+        - Changed to processing to initialize Geo::Coordinates::Converter::Point
+
+0.01    2006-11-06T22:27:24+09:00
+        - First version, released on an unsuspecting world.

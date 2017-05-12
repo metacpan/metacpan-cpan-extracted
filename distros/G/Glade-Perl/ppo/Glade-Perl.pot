@@ -1,0 +1,947 @@
+#:SOME DESCRIPTIVE TITLE.
+#:Copyright (C) YEAR Free Software Foundation, Inc.
+#:FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#:, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version:  PACKAGE VERSION\n"
+"POT-Creation-Date: 2000-03-01 19:17+0000\n"
+"PO-Revision-Date:  YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator:  FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team:  LANGUAGE <LL@li.org>\n"
+"MIME-Version:  1.0\n"
+"Content-Type: text/plain; charset=Latin1\n"
+"Content-Transfer-Encoding:  ENCODING\n"
+"Date: 1991-02-07 13:01:00+0100\n"
+"From: Pablo Saratxaga <srtxg@chanae.alphanet.ch>\n"
+
+#: Generic replacement
+msgid "%s"
+msgstr "%s"
+
+# PerlGenerate.pm:48 PerlGenerate.pm:50 PerlGenerate.pm:51
+msgid "version"
+msgstr ""
+
+#: PerlGenerate.pm:49
+msgid "Written by"
+msgstr ""
+
+#: PerlGenerate.pm:52
+msgid "run from file"
+msgstr ""
+
+#: PerlGenerate.pm:54
+msgid "About"
+msgstr ""
+
+#: PerlGenerate.pm:101 PerlGenerate.pm:132 PerlGenerate.pm:170
+msgid "%s- Use()ing Gnome in %s"
+msgstr ""
+
+#: PerlGenerate.pm:160
+msgid "while trying to eval"
+msgstr ""
+
+#: PerlGenerate.pm:162
+msgid "FAILED with Eval error"
+msgstr ""
+
+#: PerlGenerate.pm:165
+msgid "%s- Use()ing existing module '%s' in %s"
+msgstr ""
+
+#: PerlGenerate.pm:174
+msgid ""
+"%s- You need either to build the Gtk-Perl Gnome module or "
+"uncheck the Glade 'Enable Gnome Support' project option"
+msgstr ""
+
+#: PerlGenerate.pm:178
+msgid ""
+"%s- Continuing without Gnome for now although "
+"the generate run will fail if there are any Gnome widgets"
+"specified in your project"
+msgstr ""
+
+#: PerlGenerate.pm:206
+msgid "%s- Source code will be generated for locale <%s>"
+msgstr ""
+
+#: PerlGenerate.pm:214
+msgid "%s  Generating libglade type code"
+msgstr ""
+
+#: PerlGenerate.pm:218
+msgid "%s- One way to run the generated source from dir '%s/':\n"
+msgstr ""
+
+#: PerlGenerate.pm:223
+msgid "%s- Generating UI construction code"
+msgstr ""
+
+#: PerlGenerate.pm:226
+msgid "%s- Generating signal handler code"
+msgstr ""
+
+#: PerlGenerate.pm:229
+msgid "%s- Generating OO subclass code"
+msgstr ""
+
+#: PerlGenerate.pm:232
+msgid "%s- Some of the ways to run the generated source"
+msgstr ""
+
+#: PerlGenerate.pm:234
+msgid "%s  Change directory to '%s' and then enter one of :"
+msgstr ""
+
+#: PerlGenerate.pm:259
+msgid "%s  CONSISTENCY CHECKS"
+msgstr ""
+
+#: PerlGenerate.pm:260
+msgid "%s- %s unused widget properties"
+msgstr ""
+
+#: PerlGenerate.pm:261
+msgid "%s- %s widgets were ignored (one or more of '%s')"
+msgstr ""
+
+#: PerlGenerate.pm:263
+msgid "%s- %s unpacked widgets"
+msgstr ""
+
+#: PerlGenerate.pm:267
+msgid ""
+"%s  UI MESSAGES - showing missing_handler calls that you triggered, "
+"don't worry, %s will generate dynamic stubs for them all"
+msgstr ""
+
+#: PerlGenerate.pm:275
+msgid "%s  GENERATION RUN COMPLETED by %s (version %s) at %s"
+msgstr ""
+
+#: PerlGenerate.pm:308
+msgid "error Unused widget property for %s %s {'%s'}{'%s'} => '%s' seen by %s"
+msgstr ""
+
+#: PerlGenerate.pm:329
+msgid ""
+"error Unpacked widget '%s' has not been packed "
+"(nor correctly added to the UI file) from %s"
+msgstr ""
+
+#: PerlGenerate.pm:350
+msgid ""
+"error Widget '%s' emits a signal '%s' that "
+"does not have a handler specified - in %s"
+msgstr ""
+
+#: PerlGenerate.pm:217 
+msgid ""
+"%s- One way to run the generated source from dir"
+" '%s/':\n%sperl -e 'use %s%s; %s->run'"
+msgstr ""
+"%s- One way to run the generated source from dir '%s/':\n%sperl -e 'use %s%s; %s->run'"
+
+#: PerlProject.pm:269 
+msgid "%s- %s reported version %s but user overrode with version %s"
+msgstr ""
+
+#: PerlProject.pm:138
+msgid "%s is not an object\n"
+msgstr ""
+
+#: PerlProject.pm:139
+msgid "We were called from "
+msgstr ""
+
+#: PerlProject.pm:154
+msgid "Can't access method `%s' in class %s\n"
+msgstr ""
+
+#: PerlProject.pm:211 PerlProject.pm:229
+msgid "contains"
+msgstr ""
+
+#: PerlProject.pm:217 PerlProject.pm:236
+msgid "is a reference to a"
+msgstr ""
+
+#: PerlProject.pm:249
+msgid "Unknown reference type"
+msgstr ""
+
+#: PerlProject.pm:269 PerlProject.pm:283 PerlProject.pm:297 PerlProject.pm:303
+msgid "%s- %s reported version %s"
+msgstr ""
+
+#: PerlProject.pm:270 PerlProject.pm:298
+msgid " but user overrode with version %s"
+msgstr ""
+
+#: PerlProject.pm:289 PerlProject.pm:310
+msgid "You need to upgrade your"
+msgstr ""
+
+#: PerlProject.pm:350
+msgid "Options to save"
+msgstr ""
+
+#: PerlProject.pm:356
+msgid "User options"
+msgstr ""
+
+#: PerlProject.pm:361
+msgid "%s- NOT saving option '%s' (no value)"
+msgstr ""
+
+#: PerlProject.pm:367
+msgid "%s- NOT saving option '%s' (eq user_option)"
+msgstr ""
+
+#: PerlProject.pm:377
+msgid "%s- Saving project options in file '%s'"
+msgstr ""
+
+#: PerlProject.pm:383 PerlProject.pm:460 PerlProject.pm:591
+msgid "error %s - can't open file '%s' for output"
+msgstr ""
+
+#: PerlProject.pm:387 PerlProject.pm:595
+msgid "error %s - can't close file '%s'"
+msgstr ""
+
+#: PerlProject.pm:436
+msgid ""
+"Much as I like an easy life, please alter options "
+"to, at least, show_UI or write_source\n"
+"    Run abandoned"
+msgstr ""
+
+#: PerlProject.pm:464
+msgid "error %s - can't redirect STDERR to file '%s'"
+msgstr ""
+
+#: PerlProject.pm:471
+msgid ""
+"%s  DIAGNOSTICS (locale <%s> verbosity %s) "
+"started by %s (version %s) at %s"
+msgstr ""
+
+#: PerlProject.pm:476
+msgid "Options used for Generate run"
+msgstr ""
+
+#: PerlProject.pm:490
+msgid "Input Proto project"
+msgstr ""
+
+#: PerlProject.pm:509
+msgid "%s- %s Space(s), minus(es) or dot(s) "
+msgstr ""
+
+#: PerlProject.pm:510
+msgid "removed from project name - it is now '%s'"
+msgstr ""
+
+#: PerlProject.pm:528
+msgid "%s- Creating source_directory '%s' in %s"
+msgstr ""
+
+#: PerlProject.pm:540
+msgid "%s- Creating pixmaps_directory '%s' in %s"
+msgstr ""
+
+#: PerlProject.pm:588
+msgid "%s- Writing our own logo to '%s' in %s"
+msgstr ""
+
+#: PerlRun.pm:107
+msgid "is not an object so we cannot"
+msgstr ""
+
+#: PerlRun.pm:108; PerlRun.pm:132
+msgid "We were called from"
+msgstr ""
+
+#: PerlRun.pm:125
+msgid "AUTOLOADED by"
+msgstr ""
+
+#: PerlRun.pm:131
+msgid "Can't access method"
+msgstr ""
+
+#: PerlRun.pm:131
+msgid "in class"
+msgstr ""
+
+#: PerlRun.pm:191
+msgid "is not a catalog file"
+msgstr ""
+
+#: PerlRun.pm:346
+msgid "error Pixmap file '%s' does not exist in %s\n"
+msgstr ""
+
+#: PerlRun.pm:364
+msgid ""
+"error Couldn't get_toplevel_window to construct pixmap from '%s' in %s\n"
+msgstr ""
+
+#: PerlRun.pm:378
+msgid "no filename for"
+msgstr ""
+
+#: PerlRun.pm:381
+msgid "Can't open file name"
+msgstr ""
+
+#: PerlRun.pm:495 
+msgid "Quit"
+msgstr ""
+
+#: PerlRun.pm:495 
+msgid "Close"
+msgstr ""
+
+#: PerlRun.pm:495 
+msgid "*Quit Program*Quit PerlGenerate*Quit UI Build*Close Form*"
+msgstr ""
+
+#: PerlRun.pm:534
+msgid "error ImlibImage file '%s' does not exist in %s\n"
+msgstr ""
+
+#: PerlRun.pm:557
+msgid " - %s - called with args ('%s')"
+msgstr ""
+
+#: PerlRun.pm:559
+msgid ""
+"%s has been called because\n"
+"a signal (%s) was caused by widget (%s).\n"
+"When Perl::Generate writes the Perl source to a file \n"
+"an AUTOLOADed signal handler sub called '%s'\n"
+"will be specified in the ProjectSIGS class file. You can write a sub with\n"
+"the same name in another module and it will automatically be called "
+"instead.\n"
+msgstr ""
+
+#: PerlRun.pm:567
+msgid "Missing handler"
+msgstr ""
+
+#: PerlRun.pm:567
+msgid "called"
+msgstr ""
+
+#: PerlRun.pm:585
+msgid "Dismiss"
+msgstr ""
+
+#: PerlRun.pm:585
+msgid "Quit Program"
+msgstr ""
+
+#===============================================
+#: PerlSource.pm:476 
+msgid "A reference form containing \n"
+"all possible Gtk and Gnome widgets"
+msgstr ""
+
+#: PerlSource.pm:354 
+msgid "Create a"
+msgstr ""
+
+#:PerlSource.pm:292 
+msgid "UI%s'%s'"
+msgstr ""
+
+#:PerlSource.pm:476 
+msgid "No description"
+msgstr ""
+
+#:PerlSource.pm:301 
+msgid "THIS FILE WILL BE OVERWRITTEN BY THE NEXT RUN OF"
+msgstr ""
+
+#:PerlSource.pm:476 
+msgid "To construct the window object and show it call"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "This sub will create the UI window"
+msgstr ""
+
+#:PerlSource.pm:196 
+msgid "Run from class %s in file %s"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "new_value"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "These are the data fields that you can set/get using the dynamic"
+msgstr ""
+
+#:PerlSource.pm:615  PerlSource.pm:476 
+msgid "Tell interpreter who we are inheriting from"
+msgstr ""
+
+#:PerlSource.pm:301 
+msgid "DO NOT EDIT THIS FILE, ANY CHANGES THAT YOU MAKE WILL BE LOST WHEN"
+msgstr ""
+
+#:PerlSource.pm:753 
+msgid "You can cut and paste the skeleton signal handler subs from this file"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "sets the value of FORMS"
+msgstr ""
+
+#:PerlSource.pm:476 
+msgid "Documentation"
+msgstr ""
+
+#:PerlSource.pm:409 
+msgid "REPLACE the line below with the actions to be taken when"
+msgstr ""
+
+#:PerlSource.pm:753 
+msgid "This is the (re)generated signal handler class"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "Existing signal handler modules"
+msgstr ""
+
+#:PerlSource.pm:476 
+msgid "we_want_to_subclass_this_class"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "This shows dynamic signal handler stub message_box - see hash stubs above"
+msgstr ""
+
+#:PerlSource.pm:193 
+msgid "These are strings that had no gettext translation in '%s'"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "calls provided by AUTOLOAD (and their initial values)."
+msgstr ""
+
+#:PerlSource.pm:739 
+msgid "Below are the signal handlers for"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "in any module specified in 'use_modules'."
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "strip fully-qualified portion"
+msgstr ""
+
+#:PerlSource.pm:322 
+msgid "This perl source file was automatically generated by"
+msgstr ""
+
+#:PerlSource.pm:753 
+msgid "into the relevant classes in your application or its subclasses"
+msgstr ""
+
+#:PerlSource.pm:457 
+msgid "Return the constructed UI"
+msgstr ""
+
+#:PerlSource.pm:816 
+msgid "Below are the default signal handlers for"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "This allows dynamic data methods - see hash fields above"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "gets the current value of FORMS"
+msgstr ""
+
+#:PerlSource.pm:409 
+msgid "Get ref to hash of all widgets on our form"
+msgstr ""
+
+#:PerlSource.pm:322 
+msgid "from Glade file"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "These are signal handlers that will cause a message_box to be"
+msgstr ""
+
+#:PerlSource.pm:322 
+msgid "Author"
+msgstr ""
+
+#:PerlSource.pm:322 
+msgid "This is the"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "Get a unique toplevel widget structure"
+msgstr ""
+
+#:PerlSource.pm:476 
+msgid "Inherit the AUTOLOAD dynamic methods from"
+msgstr ""
+
+#:PerlSource.pm:197 
+msgid "This is the header and needs to be extended"
+msgstr ""
+
+#:PerlSource.pm:194 
+msgid "Automatically generated by %s"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "displayed by AUTOLOAD if there is not already a sub of that name"
+msgstr ""
+
+#:PerlSource.pm:615 
+msgid "Run-time utilities and vars"
+msgstr ""
+
+#:PerlSource.pm:476 
+msgid "Unfortunately, the author has not yet written any documentation :-("
+msgstr ""
+
+#:PerlSource.pm:322  PerlSource.pm:195 
+msgid "Date"
+msgstr ""
+
+#:PerlSource.pm:476 
+msgid "OR use the shorthand for the above calls"
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "Insert your subclass user data key/value pairs "
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "Call our super-class constructor to get an object and reconsecrate it"
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "Below are (overloaded) default signal handlers for"
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "our inherited super-constructor (or overload)"
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "Uncomment the line below to enable gettext checking"
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "Below are the overloaded class constructors"
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "Insert any extra data access methods that you want to add to"
+msgstr ""
+
+#:PerlSource.pm:297 
+msgid "You can safely edit this file, any changes that you make will be preserved"
+msgstr ""
+
+#:PerlSource.pm:297 
+msgid "and this file will not be overwritten by the next run of"
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "Add our own data access methods to the inherited constructor"
+msgstr ""
+
+#:PerlSource.pm:772 
+msgid "This is the basis of an application with signal handlers"
+msgstr ""
+
+#:PerlSource.pm:871 
+msgid "Below are (overloaded) signal handlers for"
+msgstr ""
+
+#:PerlSource.pm:887 
+msgid "This is an example of a subclass of the generated application"
+msgstr ""
+
+#:PerlSource.pm:922 
+msgid "Allow indirect constructor so that we can call eg. "
+msgstr ""
+
+#===============================================
+#: PerlSource.pm:151
+msgid "%s- Closing output file in %s"
+msgstr ""
+
+#: PerlSource.pm:155
+msgid "%s- Already writing to %s in %s"
+msgstr ""
+
+#: PerlSource.pm:161
+msgid ""
+"%s- Using default output files "
+"in Glade <project><source_directory> in %s"
+msgstr ""
+
+#: PerlSource.pm:170 PerlSource.pm:176 PerlSource.pm:182 PerlSource.pm:477
+#: PerlSource.pm:656 PerlSource.pm:992
+msgid "%s- Writing %s source to %s - in %s"
+msgstr ""
+
+#: PerlSource.pm:174 PerlSource.pm:180 PerlSource.pm:186 PerlSource.pm:475
+#: PerlSource.pm:654 PerlSource.pm:704 PerlSource.pm:790 PerlSource.pm:955
+#: PerlSource.pm:987
+msgid "error %s - can't open file '%s' for output"
+msgstr ""
+
+#: PerlSource.pm:214
+msgid "while trying to eval"
+msgstr ""
+
+#: PerlSource.pm:215
+msgid "FAILED with Eval error"
+msgstr ""
+
+#: PerlSource.pm:382
+msgid "End of sub"
+msgstr ""
+
+#: PerlSource.pm:485 PerlSource.pm:668 PerlSource.pm:807 PerlSource.pm:963
+msgid "%s- Writing %s for class %s"
+msgstr ""
+
+#: PerlSource.pm:505
+msgid "This is the (re)generated UI construction class."
+msgstr ""
+
+#: PerlSource.pm:530
+msgid "You can use the line below to load a test .mo file before it is"
+msgstr ""
+
+#: PerlSource.pm:531
+msgid "installed in the normal place"
+msgstr ""
+
+#: PerlSource.pm:540 PerlSource.pm:747 PerlSource.pm:859 PerlSource.pm:1020
+msgid "We need the Gnome bindings as well"
+msgstr ""
+
+#: PerlSource.pm:663
+msgid "%s- Automatically generated SUBS are '%s' by %s"
+msgstr ""
+
+#: PerlSource.pm:707 PerlSource.pm:794 PerlSource.pm:990
+msgid "%s- Creating %s file %s"
+msgstr ""
+
+#: PerlSource.pm:709 PerlSource.pm:796
+msgid "%s- Writing %s to %s - in %s"
+msgstr ""
+
+#: PerlSource.pm:959
+msgid "%s- Automatically generated %s are '%s' by %s"
+msgstr ""
+
+#: PerlSource.pm:997
+msgid "This is the basis of a LIBGLADE application with signal handlers"
+msgstr ""
+
+#:PerlSource.pm:1098 
+msgid "Below are the class constructors"
+msgstr ""
+
+#:PerlSource.pm:1098 
+msgid "Call Gtk::GladeXML to get an object and reconsecrate it"
+msgstr ""
+
+#:PerlSource.pm:1098 
+msgid "Allow indirect constructor so that we can call eg."
+msgstr ""
+
+#: PerlUI.pm:219
+msgid ""
+"warn  Gtk-Perl dated %s cannot do '%s' (properly)"
+" and neither can the CVS version !!!"
+msgstr ""
+
+#: PerlUI.pm:225
+msgid ""
+"warn  Gtk-Perl dated %s cannot do '%s' (properly)"
+" we need CVS module 'gnome-perl' after %s"
+msgstr ""
+
+#: PerlUI.pm:232
+msgid ""
+"warn  Gtk-Perl version %s cannot do '%s' (properly)"
+" we need CPAN version %s or CVS module 'gnome-perl' after %s"
+msgstr ""
+
+#: PerlUI.pm:252
+msgid ""
+"warn  gnome_libs version %s cannot do '%s' (properly)"
+" and neither can the CVS version !!!"
+msgstr ""
+
+#: PerlUI.pm:258 PerlUI.pm:266
+msgid ""
+"warn  gnome_libs version %s cannot do '%s' (properly)"
+" we need CVS module 'gnome-libs' after %s"
+msgstr ""
+
+#: PerlUI.pm:267
+msgid ""
+"warn  gnome_libs version %s cannot do '%s' (properly)"
+" we need version %s"
+msgstr ""
+
+#: PerlUI.pm:291
+msgid ""
+"error No value in supplied %s and NO default was supplied in "
+msgstr ""
+
+#: PerlUI.pm:293
+msgid "%s called from %s line %s"
+msgstr ""
+
+#: PerlUI.pm:328
+msgid "warn  Unable to lookup '%s' using default of '%s'"
+msgstr ""
+
+#: PerlUI.pm:333
+msgid "error Unable to lookup '%s' and no default"
+msgstr ""
+
+#: PerlUI.pm:374
+msgid "Top level application"
+msgstr ""
+
+#: PerlUI.pm:379
+msgid "You have supplied a proto without a name to %s"
+msgstr ""
+
+#: PerlUI.pm:414
+msgid "Construct a"
+msgstr ""
+
+#: PerlUI.pm:422
+msgid "while trying to eval"
+msgstr ""
+
+#: PerlUI.pm:423
+msgid "FAILED with Eval error"
+msgstr ""
+
+#: PerlUI.pm:451
+msgid "error"
+msgstr ""
+
+#: PerlUI.pm:451
+msgid ""
+"I don't have a constructor called '%s'"
+"- I guess that it isn't written yet :-)\n"
+msgstr ""
+
+#: PerlUI.pm:484
+msgid "warn  %s widget ignored in %s"
+msgstr ""
+
+#: PerlUI.pm:487
+msgid "error %s widget ignored in %s"
+msgstr ""
+
+#: PerlUI.pm:521
+msgid "error Object '%s' not recognised "
+msgstr ""
+
+#: PerlUI.pm:522
+msgid "or processed for %s '%s' by %s"
+msgstr ""
+
+#: PerlUI.pm:542
+msgid "Connect all signals now that widgets are constructed"
+msgstr ""
+
+#: PerlUI.pm:578
+msgid ""
+"\n"
+"error %s - There is already a widget called "
+msgstr ""
+
+#: PerlUI.pm:579
+msgid "'%s' constructed and packed - I will not overwrite it !"
+msgstr ""
+
+#: PerlUI.pm:584
+msgid ""
+"%s- Constructing a toplevel component "
+"(window/dialog) '%s'"
+msgstr ""
+
+#: PerlUI.pm:610
+msgid ""
+"\n"
+"error %s - Unable to find a widget called '%s' - "
+msgstr ""
+
+#: PerlUI.pm:611
+msgid "I can not pack widget '%s' into a non-existant widget!"
+msgstr ""
+
+#: PerlUI.pm:642 PerlUI.pm:657
+msgid "error I don't know what to do with %s element %s"
+msgstr ""
+
+#: PerlUI.pm:702
+msgid ""
+"warn  There is no widget on the notebook page linked to "
+"notebook tab '%s' - a Placeholder label was used instead"
+msgstr ""
+
+#: PerlUI.pm:706
+msgid ""
+"This is a message generated by %s\n"
+"\n"
+"No widget was specified for the page linked to\n"
+"notebook tab \"%s\"\n"
+"\n"
+"You should probably use Glade to create one"
+msgstr ""
+
+#: PerlUI.pm:827 PerlUI.pm:1324
+msgid ""
+"warn  Toolbar '%s' is expecting "
+"a tooltip but you have not set one for %s '%s'"
+msgstr ""
+
+#: PerlUI.pm:869
+msgid "error Don't know how to pack %s %s (type '%s') - what should I do?"
+msgstr ""
+
+#: PerlUI.pm:987
+msgid "error Could not set tooltip for unnamed %s"
+msgstr ""
+
+#: PerlUI.pm:991
+msgid "warn  No tooltip specified for widget '%s'"
+msgstr ""
+
+#: PerlUI.pm:1133
+msgid ""
+"warn  Toplevel window uposition has been set but breaks "
+"the window manager's placement policy, and is almost "
+"certainly a bad idea. (Havoc Pennington)"
+msgstr ""
+
+#: PerlUI.pm:1199
+msgid ""
+"error Widget '%s' can't emit signal "
+"'%s' as requested - what's wrong?"
+msgstr ""
+
+#: PerlUI.pm:1226
+msgid "%s- We have a style element '%s' which is '%s'"
+msgstr ""
+
+#: PerlUI.pm:1358
+msgid ""
+"error You have specified a Gnome stock pixmap but this "
+"is not a Gnome project - stock pixmap omitted"
+msgstr ""
+
+#: PerlUI.pm:1431
+msgid ""
+"error We have a label ('%s') to set but the child of"
+" %s isn't a label (actually it's a %s)"
+msgstr ""
+
+#: PerlUI.pm:1437
+msgid ""
+"error We have a label ('%s') to "
+"set but %s doesn't have a ->child() accessor"
+msgstr ""
+
+#: PerlUI.pm:1445
+msgid "error Don't know how to get a ref to %s (type '%s')"
+msgstr ""
+
+#: PerlUI.pm:1524
+msgid ""
+"warn  Missing signal handler '%s' "
+"connected to widget '%s' needs to be written"
+msgstr ""
+
+#: PerlUIExtra.pm:160
+msgid ""
+"warn  You have specified a signal"
+"'%s' (handler '%s') for Gnome::Dialog button '%s' "
+"but Gtk-Perl cannot add it and it has been ignored"
+msgstr ""
+
+#: PerlUIExtra.pm:181
+msgid "Copyright"
+msgstr ""
+
+#: PerlUIExtra.pm:747
+msgid ""
+"warn  No pixmap file specified for GtkPixmap "
+"'%s' so we are using the project logo instead"
+msgstr ""
+
+#: PerlUIExtra.pm:841
+msgid ""
+"warn  Your clock will start at 00:00 until "
+"you upgrade your gnome-libs"
+msgstr ""
+
+#: PerlUIExtra.pm:948
+msgid "warn  underline accelerator removed from '%s' in %s"
+msgstr ""
+
+#: PerlUIGtk.pm:380 PerlUIGtk.pm:414
+msgid "%s- Setting column %s to width %s in %s"
+msgstr ""
+
+#: PerlUIGtk.pm:446
+msgid ""
+"warn  We are generating code to construct a "
+"Gtk::ColorSelectionDialog but if you have set the OK button's "
+"label the app will crash when you show the dialog"
+msgstr ""
+
+#: PerlUIGtk.pm:471
+msgid "warn  Widget '%s' does not have any items specified in %s"
+msgstr ""
+
+#: PerlUIGtk.pm:1152
+msgid ""
+"warn  No pixmap file specified for GtkPixmap "
+"'%s' so we are using the project logo instead"
+msgstr ""
+
+#: PerlUIGtk.pm:1163
+msgid ""
+"\n"
+"error %s failed to create pixmap from file '%s'"
+msgstr ""
+
+#: PerlXML.pm:75
+msgid "error Number is too large for Unicode [%s] in %s "
+msgstr ""
+

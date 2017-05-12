@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+#
+# This file is part of Games-Pandemic
+#
+# This software is Copyright (c) 2009 by Jerome Quelin.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 2, June 1991
+#
+
+use 5.010;
+use strict;
+use warnings;
+
+package pandemic;
+{
+  $pandemic::VERSION = '1.120510';
+}
+# ABSTRACT: pandemic board game in perl
+
+use FindBin qw{ $Bin };
+use lib "$Bin/../lib";
+
+use Games::Pandemic;
+
+Games::Pandemic->new;
+Games::Pandemic->run;
+exit;
+
+
+
+=pod
+
+=head1 NAME
+
+pandemic - pandemic board game in perl
+
+=head1 VERSION
+
+version 1.120510
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2009 by Jerome Quelin.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut
+
+
+__END__

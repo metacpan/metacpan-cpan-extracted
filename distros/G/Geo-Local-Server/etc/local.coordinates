@@ -1,0 +1,7 @@
+[main]
+version=1
+
+[wgs84]
+latitude=38.780276
+longitude=-77.386706
+hae=63

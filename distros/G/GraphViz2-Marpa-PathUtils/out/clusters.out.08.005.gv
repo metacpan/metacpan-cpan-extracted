@@ -1,0 +1,19 @@
+digraph graph_08
+{
+	graph[rankdir = "LR" nodesep = "0"]
+	node[shape = "point" label = ""]
+	edge[fontsize = "10"]
+	_diamond -> diamond[arrowhead = "diamond" label = "diamond"]
+	diamond -> diamonddiamond[arrowhead = "diamonddiamond" label = "diamonddiamond"]
+	_diamond -> ldiamond[arrowhead = "ldiamond" label = "ldiamond"]
+	ldiamond -> ldiamondldiamond[arrowhead = "ldiamondldiamond" label = "ldiamondldiamond"]
+	_diamond -> rdiamond[arrowhead = "rdiamond" label = "rdiamond"]
+	rdiamond -> rdiamondrdiamond[arrowhead = "rdiamondrdiamond" label = "rdiamondrdiamond"]
+	_diamond -> oldiamond[arrowhead = "oldiamond" label = "oldiamond"]
+	oldiamond -> oldiamondoldiamond[arrowhead = "oldiamondoldiamond" label = "oldiamondoldiamond"]
+	_diamond -> ordiamond[arrowhead = "ordiamond" label = "ordiamond"]
+	ordiamond -> ordiamondordiamond[arrowhead = "ordiamondordiamond" label = "ordiamondordiamond"]
+	_diamond -> odiamond[arrowhead = "odiamond" label = "odiamond"]
+	odiamond -> odiamondodiamond[arrowhead = "odiamondodiamond" label = "odiamondodiamond"]
+
+}

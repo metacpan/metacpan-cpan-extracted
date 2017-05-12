@@ -1,0 +1,64 @@
+Revision history for Perl extension Getopt::CallingName.
+
+1.18  - Require perl version in another way...
+
+1.17  - Third time lucky?
+
+1.16  - More test fixes
+
+1.15  - Fixed test so it works on non unix OS path styles
+
+1.14  - No longer sign dist
+      - Document requirement for perl 5.6 or above in Build.PL as well as .pm file
+
+1.13  - POD Updates
+
+1.12  - Pass -no_match_vars to English to avoid performance penalty of unused
+        match variables
+      - Change from ExtUtils:MakeMaker to Module::Build
+
+1.11  - Added Test::Distrbution test and removed my 'manual' pod test.
+
+1.10  - WARNING: Backwardly incompatible change: prefix parameter renamed to
+        name_prefix
+      - Added method_prefix and method_suffix options.
+
+1.01  - Changed $VERSION declaration from a "number" to a "string" to ensure
+        make dist produces a tarball with all three digits and that CPAN pages
+        show version number as full x.yy
+
+1.00  - Final tidying up for 1.00 CPAN release.
+      - Moved docs that were only in the README to module's pod. Now generate
+        the README from pod2text
+      - Removed Test::Pod and File::Find::Rule from Makefile.PL dependencies
+        list
+
+0.94  - Added a v-string to indicate that currently this module is expected to
+        only work with perl 5.6 and higher
+
+0.93  - Removed h2xs rubbish from README and added a description
+
+0.92  - Test::Pod and File::Find::Rule are now optional
+
+0.91  - Updated README with pre-requisites.
+
+0.90  - Updated documentation, prepared for 2nd cpan release
+
+0.60  - Test reorganisation
+
+0.50  - Added non-existant name checking
+
+0.40  - Added call_name argument passing
+
+0.30  - Added return value tests for call_name
+
+0.20  - Implemented call_name
+
+0.10  - Added tests for _get_name and implemented the method
+      - Renamed delegate method to call_name to fit in with 
+        suggested name for this module
+
+0.01  Sun Jun  8 16:00:28 2003
+	- original version; created by h2xs 1.22 with options
+		-X Getopt::CallingName
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Graph::PetriNet.
+
+0.03  Tue May 19 16:34:54 CEST 2009
+      - doc fixes
+      - added retrieveal for places and transitions
+
+0.02  Sun May 17 10:19:57 CEST 2009
+      - doc fixes
+      - scaled down Perl requ to 5.8
+
+0.01  Sat May 16 15:29:52 CEST 2009
+      - initial release onto CPAN
+

@@ -1,0 +1,8 @@
+# Comment before graph.
+
+digraph graph_59_04
+{
+	A -> B
+}
+
+# Comment after graph.

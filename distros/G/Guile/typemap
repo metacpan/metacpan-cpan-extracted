@@ -1,0 +1,17 @@
+TYPEMAP
+SCM     T_SCM
+SCM *   T_PTR
+
+INPUT
+T_SCM
+       if (sv_derived_from($arg, \"Guile::SCM\")) {
+         IV tmp = SvIV((SV*)SvRV($arg));
+         $var = INT2PTR($type,tmp);
+       } else {
+         $var = newSCMsv($arg, NULL);
+       }
+
+OUTPUT
+T_SCM
+        scm_gc_protect_object($var);
+        sv_setref_pv($arg, \"Guile::SCM\", (void*)$var);

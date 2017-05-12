@@ -1,0 +1,53 @@
+Note: bugs relating to GraphViz::Data::Structure are divided into 
+GraphViz::Data::Structure bugs (which I can and will fix as they
+are found) and dot bugs (which I currently am not planning to fix;
+dot is a large and peculiar program, with little to no internal 
+documentation. My C programming expertise, what there is of it,
+is committed to Perl.)
+--------------------------------------------------------------------
+Currently-known dot bugs (you'll have to work around these, or
+endure them):
+ - hashes and arrays with more than 2 elements often have a 
+   "drop-shadow" extra 1-pixel-wide cell on the right-hand side.
+   This is a dot bug. The "shadow" is annoying, but the graph is 
+   otherwise OK.
+
+ - self-edges sometimes generate valid dot files which dot cannot 
+   process, resulting in an empty output file. This is a dot bug.
+   Since most Perl data structures do not point directly to themselves,
+   this isn't a big prblem.
+
+-------------------------------------------------------------------
+GraphViz::Data::Structure bugs (FIXED):
+
+version 0.10, seventh public release
+ - added code to patch the problem in GraphViz that was causing all of
+   out complex record types to fail miserably
+
+version 0.09, sixth public release
+ - found and fixed a number of bugs while testing obscure features
+ - many new tests
+ - array-context calls now return proper results
+
+version 0.08, fifth public release
+ - fixed long-standing bug that caused all scalar refs to be interpreted
+   wrongly on 5.8.0 and up
+
+version 0.07, fourth public release
+- found bug in sharing scalar data between new() and add() calls
+- prettified array elements pointing to scalars (linkthru as per
+  hash elements)
+
+version 0.06, third public release
+- minor changes to tests and documentation
+
+version 0.05, second public release
+ - 02types.t used localtime to generate a static test string. Changed
+   to a really static string.
+
+Version 0.04, first public release
+
+ - "empty" cells have to be filled with a non-blank character, or
+   dot draws them as zero-width cells (dot bug)
+ - references to array and hash elements are not detected; they look
+   like plain of scalar references

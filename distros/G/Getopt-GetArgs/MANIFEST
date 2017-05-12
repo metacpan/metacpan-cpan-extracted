@@ -1,0 +1,12 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+lib/Getopt/GetArgs.pm
+t/100_load.t
+t/110_postioned.t
+t/120_default.t
+t/130_mix_d_p.t
+t/140_named.t
+t/150_mix_d_p_n.t
+t/160_nocase.t

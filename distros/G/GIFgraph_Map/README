@@ -1,0 +1,41 @@
+This package extends GIFgraph. It's allow generates HTML map text 
+for following graph objects GIFgraph::pie, GIFgraph::bars,
+GIFgraph::point and GIFgraph::linespoints
+
+In this version done following CHANGES:
+- Added GIFgraph bar_spacing option handling.
+- Fixed bug with opening new navigator window. See BUGS.
+- Fixed bug with formating info and legend strings. 
+- Fixed bug with showing information in status line.
+- Modifing constructor. Now it has following syntax:
+  new GIFgraph::Map($gr_object, [key1 => value1, key2 => value2, ...]);
+  and you can seting options in constructor immediately.
+
+
+To install, first install GIFgraph module (it available on CPAN).
+Then cd to the directory that contains this README file 
+and type the following:
+
+    perl Makefile.PL
+
+If you wish to install this bundle somewhere other than the default
+location then type something like:
+
+    perl Makefile.PL PREFIX=/home/me/perl
+
+Then to build run make
+
+    make
+
+If you have write access to the install directory (or the one
+specified by PREFIX) then you can now type:
+
+    make install
+
+Presuming that the install target is in your PERL5LIB path then you
+are now ready to use GIFgraph::Map. Enjoy!
+
+Copyright (c) 1999 Roman Kosenko <ra@amk.al.lg.ua>
+All righs reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,14 @@
+Geo::Coordinates::RD-NAP
+========================
+
+This module converts geographical coordinates from and to the Dutch
+RD-NAP (Rijksdriehoekmeting/NAP) system.
+
+INSTALLATION
+
+To install this module type the following:
+
+perl Build.PL
+./Build
+./Build test
+./Build install

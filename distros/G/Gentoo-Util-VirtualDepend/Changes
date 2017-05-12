@@ -1,0 +1,178 @@
+Release history for Gentoo-Util-VirtualDepend
+
+0.003023 2017-03-19T05:21:07Z 4385424
+ - Remove special casing for Gtk2
+
+0.003022 2017-03-06T13:07:00Z c56b6cd
+ [Bugfix]
+ - Update tests for -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003021, see misc/*.deps* for details
+ - develop: ↑1 (suggests: ↑2)
+ - test: ↓1
+
+0.003021 2017-01-27T12:24:51Z 597553e
+ - Update metadata map
+
+0.003020 2016-12-10T18:49:40Z 5e1d1aa
+ - Remove special casing for ExtUtils::PkgConfig
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003019, see misc/*.deps* for details
+ - develop: +1
+
+0.003019 2016-09-12T17:55:27Z e94b404
+ - Remove special casing for Data::Buffer
+ - Remove DBIx::SearchBuilder special case
+ - Remove Digest::BubbleBabble special case
+ - Remove Digest::MD2 special case
+
+0.003018 2016-08-27T13:51:07Z 3fe5211
+ - Remove Cache::Mmap special case.
+ - When more than one module reports to index a given package, prefer the one that matches the module name.
+ - Add Pod-Perldoc to virtuals list due to being impled in dev-lang/perl, even though the virtual does not itself
+   exist.
+
+ [Utils / vdep_check]
+ - now uses Corelist directly for differencing instead of shelling out. This is much faster as
+   Gentoo::Util::VirtualDepend loads Corelist anyway for its override checks.
+ - now reports both changed and unchanged dists
+ - now reports inconsistently versioned dists and inconsistently changed dists
+
+ [Utils / vdep_report]
+ - new utility, dumps an entire Perl's corelist grouped by Gentoo classification.
+
+0.003017 2016-08-03T18:26:16Z eaa81e5
+ - Remove special casing for: Regexp::Common
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003016, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+0.003016 2016-07-26T09:47:48Z 87d9e6b
+ - Remove special casing for: Class::Loader, Convert::ASCII::Armour, Convert::PEM
+
+0.003015 2016-04-30T21:41:26Z 7badff5
+ - Remove special casing for: Text::Template, Text::Wrapper, Tie::EncryptedHash, YAML
+
+0.003014 2016-04-25T14:45:19Z aca0ad3
+ - Remove Virtual rules for dual-life things that we don't have virtuals for yet. This means they will fall back to the
+   corelist resolution strategy when seen. They will be re-added at such time as they are actually needed.
+
+0.003013 2016-04-18T18:47:46Z af611c6
+ - Remove Wx and DateManip special casing
+ - Remove Tk, MogileFS-Server and Ogg-Vorbis-Header special casing
+ - Update mappings
+ - Remove Math-Pari special casing.
+ - Remove PerlTidy special casing.
+ - Remove Set-Scalar special casing.
+ - Remove String-CRC32 special casing.
+ - Remove Time::Period special casing.
+
+0.003012 2016-03-10T07:51:02Z 8020cc9
+ - Update mappings.
+ - Remove special casing for Crypt-* family
+ - Remove special casing for Net-*
+
+0.003011 2016-03-01T13:43:31Z 0a3ca04
+ - Remove special casing for CGI-SpeedyCGI and Locale-Maketext-Fuzzy
+
+0.003010 2016-02-27T23:03:24Z fe322c7
+ - Upgrade Minimum Assumed Supported Perl to 5.18.2 (history/f1379d9)
+ - Upgrade Maximum Assumed Supported Perl to 5.22.1 (master/6a01824)
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003007, see misc/*.deps* for details
+ - runtime: ↑1
+
+0.003007 2016-02-27T21:02:56Z fad2c0e
+ [Mappings]
+ - Update to latest versions
+ - Remove special casing for Image-Info and Image-Size
+
+0.003006 2016-01-09T19:29:01Z e64429c
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003005, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+ [Mappings]
+ - Remove special casings for Module-Info and txt2html
+
+0.003005 2015-10-08T07:27:21Z 855094f
+ [Metadata]
+ - Sync static data from metacpan queries
+
+0.003004 2015-09-13T04:43:40Z d357b13
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003003, see misc/*.deps* for details
+ - develop: +2 ↑1 (suggests: ↑1)
+
+ [Mappings]
+ - Remove special casings for Text-AutoFormat and Text-Reform
+
+0.003003 2015-08-04T09:57:15Z 759505d
+ [Mappings]
+ - Remove special casings for Gtk2Fu: Has gone to CPAN nirvana.
+ - Actually remove special casing for Inline-Files
+
+0.003002 2015-07-18T18:50:45Z ff0171b
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003001, see misc/*.deps* for details
+ - develop: +3 -1 (suggests: ↑1)
+
+ [Mappings]
+ - Remove special casing for Locale-MakeText-Lexicon
+
+0.003001 2015-06-21T20:54:50Z ac103ec
+ [Mappings]
+ - Drop CGI and Module-Build special cases
+
+0.003000 2015-06-02T18:43:52Z 57a37f6
+ [Features]
+ - Added get_known(gentoo_packages|dists|modules) functions.
+ - Added resolver map showing source data used to aggregate data.
+
+0.002005 2015-05-12T10:10:10Z b8ed3de
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002004, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+ [Mappings]
+ - Drop specialcasing for Class-ReturnValue
+
+0.002004 2015-05-01T17:33:29Z 7ecae13
+ [Mappings]
+ - Drop need for specialcasing for ExtUtils-Depends
+ - Add entry for CGI::HTML::Functions -> CGI
+
+0.002003 2015-04-19T03:42:39Z 3ec3162
+ [Mappings]
+ - Dropping need for specialcasings for CGI-Simple
+ - Adding new Encode::XS modules.
+
+0.002002 2015-04-06T21:02:20Z 5e81d82
+ [Mappings]
+ - Dropping need for specialcasings for Log-Dispatch
+
+0.002001 2015-04-02T01:50:43Z 79ff0fe
+ [Mappings]
+ - Dropped need for specialcasing Config-General
+
+0.002000 2015-04-01T16:52:44Z 8de5a28
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - configure: +1 (recommends: +1 ↑1)
+ - develop: +6 ↑2 -2 (recommends: +1, suggests: ↑2)
+ - runtime: +2 ↓1 -1 (recommends: +2)
+ - test: +1 (recommends: ↑1 ↓1)
+
+ [Features]
+ - Add a package->contents mapping ( mostly for consistency checking )
+ - add a module_is_perl function that checks corelist
+
+ [Mappings]
+ - Synced mappings to current CPAN/tree status
+
+0.001000 2014-10-10T17:53:57Z 9a68f55
+ - First version.

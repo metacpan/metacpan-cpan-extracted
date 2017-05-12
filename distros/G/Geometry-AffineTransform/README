@@ -1,0 +1,13 @@
+Geometry::AffineTransform instances represent 2D affine transformations
+that map 2D coordinates to other 2D coordinates. See the POD documentation
+for details. The references in the SEE ALSO section provide background information
+about affine transformations.
+
+The module includes an RPM .spec file to build installation packages for RPM
+based Linux distributions. You should be able to build the RPM directly from
+the tar.gz distribution archive file with this command:
+
+    rpmbuild -ta Geometry-AffineTransform-x.y.tar.gz
+
+Thanks to Kevin Ryde for the invert() implementation.
+

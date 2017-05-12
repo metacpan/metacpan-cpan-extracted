@@ -1,0 +1,11 @@
+Overview of changes since 0.900
+===============================
+
+* Implemented accessor methods for Gtk2::SourceView::TagStyle. [ebassi]
+* Stable release.
+
+Overview of changes since 0.40
+===============================
+
+* Initial release.
+* Added NEWS.

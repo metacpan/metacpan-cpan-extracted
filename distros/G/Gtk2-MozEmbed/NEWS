@@ -1,0 +1,52 @@
+Overview of changes in Gtk2::MozEmbed 0.09
+==========================================
+
+* Make the xulrunner SDK detection work more robust.  [Remi Collet]
+* Fix a test failure.
+
+Overview of changes in Gtk2::MozEmbed 0.08
+==========================================
+
+* Make building and running against xulrunner-1.9 work.  [Boris Sukholitko]
+
+Overview of changes in Gtk2::MozEmbed 0.07
+==========================================
+
+* Prefer xulrunner-gtkmozembed as the GtkMozEmbed provider.
+
+Overview of changes in Gtk2::MozEmbed 0.06
+==========================================
+
+* Wrap gtk_moz_embed_push_startup and gtk_moz_embed_pop_startup.
+* Add support for compiling against XULRunner.  [Tom Killian]
+
+Overview of changes in Gtk2::MozEmbed 0.05
+==========================================
+
+* Improve and correct the pkg-config interaction.
+  [Scott Lanning, José AUGUSTE-ETIENNE]
+
+Overview of changes in Gtk2::MozEmbed 0.04
+==========================================
+
+* Add optional support for Scott Lanning's shiny new Mozilla::DOM module:
+  - Use a C++ compiler;
+  - Provide signal marshallers for the dom_key_* and dom_mouse_* signals;
+  - Wrap gtk_moz_embed_get_nsIWebBrowser.
+
+Overview of changes in Gtk2::MozEmbed 0.03
+==========================================
+
+* "Fix" test failure.
+* Correct a bunch of typos.
+
+Overview of changes in Gtk2::MozEmbed 0.02
+==========================================
+
+* Add lots of documentation.
+
+Overview of changes in Gtk2::MozEmbed 0.01
+==========================================
+
+* Implement a custom marshaller for the new_window signal to make it usable.
+* Use LD_RUN_PATH to make sure we work (nearly, hopefully) everywhere.

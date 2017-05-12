@@ -1,0 +1,62 @@
+0.83   Fri Jun 20 16:44:29 2014
+        - add --time-zone opttion to change time_zone
+        - add --version option
+
+0.82   Fri Jun 20 1:02:08 2014
+        - support vertical line (hirose31)
+        - api timestamp support (sonots)
+        - renew ui of edit|add_complex
+        - add Dockerfile
+
+0.81   Thu Feb 20 16:18:14 2014
+        - add --disable-subtract (sonots)
+
+0.80   Tue Dec 24 13:09:44 2013
+        - [bugfix] remove *_s.rrd (kazeburo)
+        - [bugfix] mysql: text column defalut value error (oranie)
+        - [feature] add step option to xport (anoworl)
+        - [upgrade] upgrade to bootstrap 3 (kazeburo)
+        - [feature] store status of collapse (kazeburo, dayflower)
+
+0.72   Thu Nov 14 13:51:28 2013
+        - fix js install issue (Thank you sharl)
+
+0.71   Wed Nov 13 11:01:41 2013
+        - update Web UI, update bootstrap and make collapsible  (Thank you dayfolwer)
+        - add --mount option (Thank you soh335)
+        - fix typos (Thank you karahiyo and sharl)
+
+
+0.70    Wed Aug 14 10:06:34 2013
+        - support float number
+        - support rrdcached for improve performance
+          (Thank you sonots)
+
+0.62    Fri Jun 28 11:37:55 2013
+        - add more json api(Thanks sonots)
+        - escape uri (Thanks sonots and shibayu36)
+        - add web-max-workers command line option (Thanks niku4i)
+
+0.60    Thu Apr 4 17:07:53 2013
+        - added section delete button (Thanks takus)
+        - added access_log option (Thanks kentaro)
+        - fixed mysql schema (Thanks oranie)
+        - fixed docs (Thanks sugyan)
+        - display service_name/section_name in <title>
+
+0.50    Tue Feb 26 14:12:42 2013
+        - added optional descriotion parameter to POST API
+
+0.40    Mon Feb 25 15:22:25 2013
+        - supports cpanfile
+
+0.39    Sat Feb 2 23:09:06 2013
+        - fixed spelling (thanks syohex)
+        - added Test::Requires 'RRDs'
+
+0.38    Thu Jan 31 13:22:42 2013
+        - fixed broken HTML
+
+0.37    Thu Jan 31 11:47:31 2013
+        - cpanize version
+

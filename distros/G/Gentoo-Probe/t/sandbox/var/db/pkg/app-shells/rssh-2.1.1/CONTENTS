@@ -1,0 +1,22 @@
+dir /usr
+dir /usr/bin
+obj /usr/bin/rssh befc6067f5d4496aff66164df1397b1d 1087573051
+dir /usr/lib
+dir /usr/lib/misc
+obj /usr/lib/misc/rssh_chroot_helper a69e6ec1c5e4219ee7de0f366ee88b30 1087573051
+dir /usr/share
+dir /usr/share/man
+dir /usr/share/man/man1
+obj /usr/share/man/man1/rssh.1.gz 47bab152c0a37fbd3534fd69edb73649 1087573051
+dir /usr/share/man/man5
+obj /usr/share/man/man5/rssh.conf.5.gz 4f72b79fb50cc3ceef4684dc4af2db73 1087573051
+dir /usr/share/doc
+dir /usr/share/doc/rssh-2.1.1
+obj /usr/share/doc/rssh-2.1.1/AUTHORS.gz 41d4a2eee8253ce3b659d523294b98e2 1087573051
+obj /usr/share/doc/rssh-2.1.1/CHROOT.gz d79fad2e69cd4deec41dd8d0476792b7 1087573051
+obj /usr/share/doc/rssh-2.1.1/ChangeLog.gz 395fdc41ecc00270786eec9138d54bea 1087573051
+obj /usr/share/doc/rssh-2.1.1/INSTALL.gz dea1ba5c613101f49391576cbd1963d9 1087573051
+obj /usr/share/doc/rssh-2.1.1/README.gz 7de14171d40a1eaed784d39809a398fc 1087573051
+obj /usr/share/doc/rssh-2.1.1/TODO.gz 4cfcdc71844e8346cac9bccf7f4b7970 1087573051
+dir /etc
+obj /etc/rssh.conf 39f00467c0a0489304c18ac432be2249 1087573051

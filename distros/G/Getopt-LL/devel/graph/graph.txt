@@ -1,0 +1,69 @@
+graph { flow: down; }
+node { fill: #ffe0e0; }
+node.core { fill: #e0ffe0; }
+node.testsuite { fill: #caa1ca; }
+
+[ Getopt-LL ]               { label: Getopt-LL\n (Getopt-LL);               }
+[ Class-Dot ]               { class: core; label: Class-Dot\n (Class-Dot);               }
+[ Getopt-LL-DLList ]        { label: Getopt-LL-DLList\n (Getopt-LL);        }
+[ Getopt-LL-DLList-Node ]   { label: Getopt-LL-DLList-Node\n (Getopt-LL);   }
+[ Getopt-LL-DLList-Short ]  { label: Getopt-LL-DLList-Short\n (Getopt-LL);  }
+[ Getopt-LL-SimpleExporter ] { class: core; }
+[ Getopt-LL-Simple ]        { label: Getopt-LL-Simple\n (Getopt-LL);        }
+
+[ t/gnu.t ]             { class: testsuite; }
+[ t/non-gnu.t ]             { class: testsuite; }
+[ t/aliases.t ]             { class: testsuite; }
+[ t/simple.t ]             { class: testsuite; }
+[ t/missing.t ]             { class: testsuite; }
+[ t/cat.t ]             { class: testsuite; }
+[ t/dllist.t ]             { class: testsuite; }
+[ t/dllist-node.t ]             { class: testsuite; }
+[ t/nonexisting_rule_type.t ]             { class: testsuite; }
+[ t/opt_.t ]             { class: testsuite; }
+[ t/peek.t ]             { class: testsuite; }
+[ t/properties.t ]             { class: testsuite; }
+[ t/regex.t ]             { class: testsuite; }
+[ t/required.t ]             { class: testsuite; }
+[ t/rules.t ]             { class: testsuite; }
+[ t/short-simple-w-options.t ]             { class: testsuite; }
+[ t/short-simple-wo-rules.t ]             { class: testsuite; }
+[ t/short-simple.t ]             { class: testsuite; }
+[ t/short.t ]             { class: testsuite; }
+[ t/simpleExporter.t ]             { class: testsuite; }
+[ t/slurp.t ]             { class: testsuite; }
+[ t/type-check.t ]             { class: testsuite; }
+[ t/help.t ]             { class: testsuite; }
+
+[ Getopt-LL ]               ==> { start: front,0; } [ Class-Dot ]
+[ Getopt-LL ]               --> { start: front,0; } [ Getopt-LL-DLList ]
+[ Getopt-LL-DLList ]        ==> { start: front,0; } [ Class-Dot ]
+[ Getopt-LL-DLList ]        --> { start: front,0; } [ Getopt-LL-DLList-Node ]
+[ Getopt-LL-DLList-Node ]   ==> { start: front,0; } [ Class-Dot ]
+[ Getopt-LL-DLList-Short ]  --> { start: front,0; } [ Getopt-LL ]
+[ Getopt-LL ]               ==> { start: front,0; } [ Getopt-LL-SimpleExporter ]
+[ Getopt-LL-Simple ]        --> { start: front,0; } [ Getopt-LL ]
+
+[ t/gnu.t     ]             --> [ Getopt-LL ]
+[ t/non-gnu.t ]             --> [ Getopt-LL ]
+[ t/aliases.t ]             --> [ Getopt-LL ]
+[ t/simple.t  ]             --> [ Getopt-LL ]
+[ t/missing.t  ]             --> [ Getopt-LL ]
+[ t/cat.t  ]             --> [ Class-Dot ]
+[ t/dllist.t  ]             --> [ Getopt-LL-DLList ]
+[ t/dllist-node.t  ]             --> [ Getopt-LL-DLList-Node ]
+[ t/nonexisting_rule_type.t  ]             --> [ Getopt-LL ]
+[ t/opt_.t  ]             --> [ Getopt-LL ]
+[ t/peek.t  ]             --> [ Getopt-LL ]
+[ t/properties.t  ]             --> [ Class-Dot ]
+[ t/regex.t  ]             --> [ Getopt-LL ]
+[ t/required.t  ]             --> [ Getopt-LL ]
+[ t/rules.t  ]             --> [ Getopt-LL ]
+[ t/short-simple-w-options.t  ]             --> [ Getopt-LL-Simple ]
+[ t/short-simple-wo-rules.t  ]             --> [ Getopt-LL-Simple ]
+[ t/short-simple.t  ]             --> [ Getopt-LL-Simple ]
+[ t/short.t  ]             --> [ Getopt-LL-Short ]
+[ t/simpleExporter.t  ]             --> [ Getopt-LL-SimpleExporter ]
+[ t/slurp.t  ]             --> [ Getopt-LL ]
+[ t/type-check.t  ]             --> [ Getopt-LL ]
+[ t/help.t  ]             --> [ Getopt-LL ]

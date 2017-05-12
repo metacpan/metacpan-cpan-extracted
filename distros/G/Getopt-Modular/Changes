@@ -1,0 +1,71 @@
+Revision history for Getopt-Modular
+
+0.13    2014-03-07
+        + Allow valid_values to take a sub to defer the list creation
+
+0.12    2014-01-06
+        ! Missing proper check for subtypes	
+
+0.11    2013-05-25
+        ! missing 'valid' field for valid_value exceptions
+        ! Valid values in help expected array ref instead of array, fixed.
+        + Add optional hash-ref parameter to parseArgs to return all the
+          arguments, whether set or by default or whatever.  Not recommended
+          for new code, but may make using this in apps that already use
+          Getopt::Long easier as a shim for conversion.
+
+0.10    2012-10-30
+        + Remove extra spaces at the end of getHelpWrap that Text:Table
+          puts in, in case one line is too long for the screen, no need for
+          all lines to be too long for the screen.
+        + getHelpWrap also now wraps current/valid values if the default/valid
+          values are too wide for the screen with its leading text.
+
+0.09    2012-09-19
+        + Add "hidden" flag for parameters that should be accepted but
+          not displayed in getHelp/getHelpWrap
+
+0.08    2012-07-24
+        + Add exception types.  Theoretically good for translatability
+          (but you get to handle translations and catching everything).
+        + Add valid_values option
+        + getHelpWrap will use Text::WrapI18N if available, otherwise use
+          Text::Wrap (core).
+        + Allow callbacks for "current value" and "valid value" strings in
+          getHelp and getHelpWrap
+
+0.07    June 3, 2011
+        * Fix some doc typos, add more explanation on how defaults are dynamic
+        * Reorder revision history: new stuff at top.
+        + Added import options: -namespace, -getOpt
+
+0.06    October 28, 2010
+        ! Remove the rest of the dependency on Contextual::Return since it
+          no longer seems to work on perl 5.8.8
+
+0.05    September 1, 2010
+        ! Gotta run all tests prior to shipping.  Fixed an erroneous test.
+
+0.04    August 31, 2010
+        ! Fixed some tests: kwalitee didn't eval right, help didn't skip right.
+        + Added some tests to improve test coverage
+        ! Removed some (not all) dependency on Contextual::Return where it
+          didn't seem to want to work properly.
+        - Removed dependency on Smart::Comments since they're only used for
+          debugging, not runtime.
+
+0.03    July 24, 2008
+        ! Removed some boilerplate
+        * Defaults for boolean now show up in English rather than
+          perl-bool (undef vs 1) in the help
+        + Settable boolean text
+        + Added getHelpWrap for Text::Wrapped help.
+
+0.02    July 23, 2008
+        ! Fixed missing pre-req
+        + Added Changes 
+
+0.01    July 22, 2008
+        + Core functionality released
+
+

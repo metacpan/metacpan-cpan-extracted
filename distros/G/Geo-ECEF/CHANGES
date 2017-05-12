@@ -1,0 +1,29 @@
+1.10 2010-01-02
+  * Win32 Platforms cannot figure out that Geo::ECEF is not geo::ecef.
+0.10 2007-10-07
+  * removed the "use 5.008;" line in Makefile.PL
+0.09 2007-10-07
+  * Absolutely nothing.  It's a perl testing thing.
+0.08 2007-04-01
+  * Added ecef wantarray
+  * Made geodetic-directic the default geodetic method.
+  * Removed geodetic-iterative method tests due to test issues on certain platforms.
+0.07 2007-02-07
+  * Added geodedtic-directic methodo
+  * Use e2 function from Geo::Ellipsoid
+0.06 2006-12-08
+  * Removed geo::ecef.old from package
+  * modified ellipsoid method
+0.05 2006-12-08
+  * Changed some test to "near" tests to fix reported bugs
+0.04 2006-12-05 - Michael R. Davis MRDVT (mrdvt92)
+  * Bugs in test script perl.cpan.testers (384276) & (384276)
+  * Added geodetic method
+0.03 2006-12-05 - Michael R. Davis MRDVT (mrdvt92)
+  * Renamed to Geo::ECEF
+  * Converted to OO perl
+  * Dependant on Geo::Ellipsoids, Geo::Functions
+1.0.0 2005-02-11 - Morten Sickel <Morten.Sickel@nrpa.no>
+  * Release created, renamed to geo::ecef
+0.01 2004-10-01 - Morten Sickel <Morten.Sickel@nrpa.no>
+  * Original version; created by h2xs 1.23 with options -AXn ecef

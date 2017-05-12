@@ -1,0 +1,23 @@
+# 0       - 0.2  # extreme 1   (A1 - A4)
+# 0.20001 - 0.4  # extreme 2   (B1 - B4)
+# 0.4     - 0.6  # border      (E1 - E4)
+# 0.6     - 0.8  # transition  (D1 - D4)
+# 0.80001 - 1.0  # extreme 3   (C1 - C4)
+
+src_dst 0 0
+   fill_noise 3 3 0.4
+   hist_equalize 512 0 1
+
+   map_range 0 1 0.40001 1
+
+src_dst 0 1
+   fill_noise 3 3 0.4 1
+   hist_equalize 512 0 1
+
+   map_range 0.2 0.8 0 0
+   map_range 0.8 1 0.20001 0.4
+   dst_range 0 0
+   src_blend 1
+   fill
+
+   #show_region_sectors

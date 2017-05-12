@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/GeNUScreen/Config.pm
+lib/GeNUScreen/Config/Diff.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+scripts/genuscreen-config.pl
+t/00.load.t
+t/data/config.hdf
+t/data/example.cfg
+t/genuscreen-config.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/script-genuscreen-config.t

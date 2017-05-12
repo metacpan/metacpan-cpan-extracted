@@ -1,0 +1,318 @@
+<HTML>
+<HEAD>
+<TITLE>Insert.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#inheritance">Inheritance</A></LI>
+	<LI><A HREF="#public methods">Public Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#insertcluster">insertCluster</A></LI>
+		<LI><A HREF="#insertsubject">insertSubject</A></LI>
+		<LI><A HREF="#insertkindred">insertKindred</A></LI>
+		<LI><A HREF="#setsubjectsubjectreferences">setSubjectSubjectReferences</A></LI>
+		<LI><A HREF="#setsubjectkindredreferences">setSubjectKindredReferences</A></LI>
+		<LI><A HREF="#setkindredsubjectreferences">setKindredSubjectReferences</A></LI>
+		<LI><A HREF="#insertmarker">insertMarker</A></LI>
+		<LI><A HREF="#insertsnp">insertSNP</A></LI>
+		<LI><A HREF="#insertgenotype">insertGenotype</A></LI>
+		<LI><A HREF="#insertstudyvariable">insertStudyVariable</A></LI>
+		<LI><A HREF="#insertphenotype">insertPhenotype</A></LI>
+		<LI><A HREF="#insertfrequencysource">insertFrequencySource</A></LI>
+		<LI><A HREF="#inserthtmarkercollection">insertHtMarkerCollection</A></LI>
+		<LI><A HREF="#inserthaplotype">insertHaplotype</A></LI>
+		<LI><A HREF="#insertdnasample">insertDNASample</A></LI>
+		<LI><A HREF="#inserttissuesample">insertTissueSample</A></LI>
+		<LI><A HREF="#insertmap">insertMap</A></LI>
+	</UL>
+
+	<LI><A HREF="#private methods">Private methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#_insertobjectdata">_insertObjectData</A></LI>
+		<LI><A HREF="#_insertassayattrs">_insertAssayAttrs</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::API::DB::Insert</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Genetics::API ;</PRE>
+<PRE>
+  $api = new Genetics::API(DSN =&gt; {driver =&gt; &quot;mysql&quot;,
+                                   host =&gt; $Host,
+                                   database =&gt; $Database},
+                           user =&gt; $UserName,
+                           password =&gt; $Password) ;</PRE>
+<PRE>
+  $snp = new Genetics::SNP( %init ) ;</PRE>
+<PRE>
+  $id = $api-&gt;insertSNP($snp) ;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Genetics::API::DB packages provide an interface for the manipulation of
+Genperl objects in a relational database.  This package contains the methods
+for saving new objects (i.e. objects that have not been previously saved to
+the database).  To update objects that have already been saved in the
+database, see Genetics::API::DB::Update.  A better name for this package would
+probably be Genetics::API::DB::Insert.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+ strict             Just to be anal
+ vars               Global variables
+ Carp               Error reporting</PRE>
+<P>
+<HR>
+<H1><A NAME="inheritance">Inheritance</A></H1>
+<PRE>
+ Exporter           Make methods available to importing packages</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public Methods</A></H1>
+<P>
+<H2><A NAME="insertcluster">insertCluster</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::Cluster object to the database.
+  Argument  : A Genetics::Object::Cluster object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  : Objects must be inserted before Clusters or this method will not be 
+              able to set references to the Objects in a Cluster.</PRE>
+<P>
+<H2><A NAME="insertsubject">insertSubject</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::Subject object to the database.
+  Argument  : A Genetics::Object::Subject object.
+  Returns   : The id of the inserted object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="insertkindred">insertKindred</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::Kindred object to the database.
+  Argument  : A Genetics::Object::Kindred object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  : Subjects must be inserted before Kindreds or this method will not be 
+              able to set references to the Subjects in a Kindred.</PRE>
+<P>
+<H2><A NAME="setsubjectsubjectreferences">setSubjectSubjectReferences</A></H2>
+<PRE>
+  Function  : Sets mother/father references between Subjects based on the 
+              'Mother ImportID' and 'Father ImportID' Keywords associated 
+              with the Subjects.
+  Argument  : An array reference to a list of Subject IDs.
+  Returns   : N/A
+  Scope     : Public
+  Comments  : The fields that are updated by this method are:
+                   Subject.motherID
+                   Subject.fatherID</PRE>
+<P>
+<H2><A NAME="setsubjectkindredreferences">setSubjectKindredReferences</A></H2>
+<PRE>
+  Function  : Sets references between Subjects and Kindreds based on the 
+              'Kindred ImportID' Keywords associated with the Subjects.
+  Argument  : An array reference to a list of Subject IDs.
+  Returns   : N/A
+  Scope     : Public
+  Comments  : A Subject can get its Kindred reference in two possible ways:
+              from Subject-&gt;field('Kindred') or
+              from Kindred-&gt;field('Subjects').  This method sets references 
+              based on the former.  To set references based on the latter, 
+              use setKindredSubjectReferences.</PRE>
+<PRE>
+              The fields that are updated by this method are:
+                   Subject.kindredID
+                   KindredSubject.kindredID
+                   KindredSubject.SubjectID</PRE>
+<P>
+<H2><A NAME="setkindredsubjectreferences">setKindredSubjectReferences</A></H2>
+<PRE>
+  Function  : Sets references between Subjects and Kindreds based on the 
+              'Subjects ImportID' Keywords associated with the Kindreds.
+  Argument  : An array reference to a list of Kindred IDs.
+  Returns   : N/A
+  Scope     : Public
+  Comments  : A Subject can get its Kindred reference in two possible ways:
+              from Subject-&gt;field('Kindred') or
+              from Kindred-&gt;field('Subjects').  This method sets references 
+              based on the latter.  To set references based on the former, use 
+              setSubjectKindredReferences.</PRE>
+<PRE>
+              The fields that are updated by this method are:
+                   Subject.kindredID
+                   KindredSubject.kindredID
+                   KindredSubject.SubjectID</PRE>
+<P>
+<H2><A NAME="insertmarker">insertMarker</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::Marker object to the database.
+  Argument  : A Genetics::Object::Marker object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="insertsnp">insertSNP</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::SNP object to the database.
+  Argument  : A Genetics::Object::SNP object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="insertgenotype">insertGenotype</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::Genotype object to the database.
+  Argument  : A Genetics::Object::Genotype object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="insertstudyvariable">insertStudyVariable</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::StudyVariable object to the database.
+  Argument  : A Genetics::Object::StudyVariable object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="insertphenotype">insertPhenotype</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::Phenotype object to the database.
+  Argument  : A Genetics::Object::Phenotype object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="insertfrequencysource">insertFrequencySource</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::FrequencySource object to the database.
+  Argument  : A Genetics::Object::FrequencySource object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="inserthtmarkercollection">insertHtMarkerCollection</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::HtMarkerCollection object to the database.
+  Argument  : A Genetics::Object::HtMarkerCollection object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="inserthaplotype">insertHaplotype</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::Haplotype object to the database.
+  Argument  : A Genetics::Object::Haplotype object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="insertdnasample">insertDNASample</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::DNASample object to the database.
+  Argument  : A Genetics::Object::DNASample object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="inserttissuesample">insertTissueSample</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::TissueSample object to the database.
+  Argument  : A Genetics::Object::TissueSample object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="insertmap">insertMap</A></H2>
+<PRE>
+  Function  : Insert (create) a Genetics::Object::Map object to the database.
+  Argument  : A Genetics::Object::Map object.
+  Returns   : The id of the inserted object.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<HR>
+<H1><A NAME="private methods">Private methods</A></H1>
+<P>
+<H2><A NAME="_insertobjectdata">_insertObjectData</A></H2>
+<PRE>
+  Function  : Insert data common to all Genetics::Object objects to the database.
+  Argument  : A GNOM-API object and a Genetics::Object object.
+  Returns   : The Object.id of the row inserted into the Object table.
+  Scope     : Private
+  Called by : The various insertObjectSubClass methods.</PRE>
+<P>
+<H2><A NAME="_insertassayattrs">_insertAssayAttrs</A></H2>
+<PRE>
+  Function  : Insert AssayAttributes associated with a Genotype, AlleleCall or 
+              Phenotype.
+  Arguments : Array reference to the list of AssayAttributes, scalar 
+              containing the type of object with which the AssayAttributes 
+              are associated, and another scalar containing the id of that 
+              object.
+  Returns   : N/A
+  Scope     : Private
+  Called by : 
+  Comments  :</PRE>
+
+</BODY>
+
+</HTML>

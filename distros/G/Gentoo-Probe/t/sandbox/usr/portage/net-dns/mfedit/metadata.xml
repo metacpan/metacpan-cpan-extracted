@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>no-herd</herd>
+<maintainer>
+  <email>matsuu@gentoo.org</email>
+</maintainer>
+<longdescription>The Posadis Master File Editor is a graphical editor of DNS master files, the files used by many DNS servers (including Posadis and BIND) to store DNS zone data in. Using this editor, you can graphically maintain your zone data. The editor also features a syntax check which helps you avoid common mistakes.</longdescription>
+</pkgmetadata>

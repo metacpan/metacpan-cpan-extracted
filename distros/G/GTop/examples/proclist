@@ -1,0 +1,21 @@
+#!perl
+
+use strict;
+use ExtUtils::testlib;
+use GTop ();
+
+my $gtop = GTop->new(@ARGV);
+
+my($proclist, $entries) = $gtop->proclist;
+my $number = $proclist->number;
+print "$number processes\n";
+
+for my $pid (@$entries) {
+    my $state = $gtop->proc_state($pid);
+    my($args, $argv) = $gtop->proc_args($pid);
+    printf "PID  %5d: '%s', %s, %d, %d [@$argv]\n",
+		$pid,
+		$state->cmd, $state->state,
+		$state->uid,
+		$state->gid;
+}

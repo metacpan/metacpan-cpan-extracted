@@ -1,0 +1,20 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/dns2go/files/dns2go.rc6,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+depend() {
+	need net
+}
+
+start() {
+	ebegin "Starting DNS2GO"
+	/usr/bin/dns2go
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping DNS2GO"
+	/usr/bin/dns2go -k
+	eend $?
+}

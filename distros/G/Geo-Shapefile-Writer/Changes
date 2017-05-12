@@ -1,0 +1,22 @@
+Revision history for Geo-Shapefile-Writer
+
+0.006   November 12, 2014
+        avoid perl 5.21 sprintf warning (thanks Shawn Laffan)
+
+0.006   July 30, 2014
+        experimental features removed (thanks Shawn Laffan)
+
+0.004   December 29, 2012
+        tests
+
+0.0031  September 19 2012
+        Documentation improved
+
+0.003   August 02 2012
+        File header fix
+        Documentation improved
+
+0.002   April 26 2012
+        Initial cpan release.
+        Implemented writing for points, polygons and polylines.
+

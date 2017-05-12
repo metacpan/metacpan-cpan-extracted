@@ -1,0 +1,13 @@
+# Makefile snippet that holds all package-dependent information.
+
+# Add more languages here, separated with spaces
+LINGUAS = cs cs_CZ czech
+
+# Textdomain for our package.
+TEXTDOMAIN = net.suteren.POI.ttn2device
+
+# Initial copyright holder added to pot and po files.
+COPYRIGHT_HOLDER = Petr Vraník <hpa AT suteren.net>
+
+# Mail address for bug reports
+MSGID_BUGS_ADDRESS = Petr Vraník <hpa AT suteren.net>

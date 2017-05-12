@@ -1,0 +1,27 @@
+Revision history for Perl extension Geography::Countries::LatLong.
+
+1.0   2007-12-19 11:23
+	- New, more accurate data
+	- More pseduo-aliases 
+	- Augmented erogenous "Northern Island" in old data 
+	  with correct "Northern Ireland"
+
+0.922 Sun August 27 21:55:00 2006
+	- updated countries list
+
+0.921 Mon July 31 19:26 2006
+	- updated makefile.pl
+	
+0.92  Sun Jun 18 17:00:00 2006
+	- updated POD
+	- added &supports and @$latlong
+	- removed _pairs and made latlong check wantarray
+	
+0.91  Wed Mar 08 11:34:00 2006
+	- updated POD
+	- added &supports
+	
+0.01  Fri Feb 21 20:09:01 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Geography::Countries::LatLong
+

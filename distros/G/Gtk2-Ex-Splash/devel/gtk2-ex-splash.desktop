@@ -1,0 +1,53 @@
+# Copyright 2011 Kevin Ryde
+
+# This file is part of Gtk2-Ex-Splash.
+#
+# Gtk2-Ex-Splash is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Gtk2-Ex-Splash is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Gtk2-Ex-Splash.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# doesn't do anything except from the command line, so don't think a
+# desktop menu entry is any good
+
+
+# # gtk2-ex-splash.desktop, not installed by Makefile.PL yet.
+# # May need desktop-file-utils 0.15-2 for its automatic trigger on
+# # .desktop files
+# install/libgtk2-ex-splash-perl::
+# 	mkdir -p debian/gtk2-ex-splash/usr/share/applications
+# 	cp -a gtk2-ex-splash.desktop \
+# 	      debian/gtk2-ex-splash/usr/share/applications
+
+
+#
+# Crib notes:
+#
+# Possible categories are at
+#     http://standards.freedesktop.org/menu-spec/latest/apa.html
+#
+
+[Desktop Entry]
+Type=Application
+Version=1.0
+Encoding=UTF-8
+Name=Gtk2-Ex-Splash
+GenericName=Splash Screen Display
+Comment=Popup a temporary splash screen window
+Exec=gtk2-ex-splash
+Terminal=false
+Categories=Utility;Viewer;GTK;
+#
+# "Gtk2-ex-splash" here comes from the executable filename.
+# GtkWindow gets it from gdk_progclass(), which is setup by gdk_init()
+# from g_get_prgname() with an upper case first letter.
+StartupWMClass=Gtk2-ex-splash

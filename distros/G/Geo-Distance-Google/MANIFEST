@@ -1,0 +1,11 @@
+.gitignore
+Changes
+lib/Geo/Distance/Google.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_compile.t
+t/01_live.t
+t/pod.t
+t/pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

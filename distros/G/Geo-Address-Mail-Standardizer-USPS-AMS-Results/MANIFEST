@@ -1,0 +1,8 @@
+Changes
+lib/Geo/Address/Mail/Standardizer/USPS/AMS/Results.pm
+Makefile.PL
+MANIFEST
+README
+t/01pod.t
+t/02use.t
+META.yml                                 Module meta-data (added by MakeMaker)

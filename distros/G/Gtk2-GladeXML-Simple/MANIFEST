@@ -1,0 +1,18 @@
+bin/gpsketcher
+Changes
+examples/mozembed/mozembed.glade
+examples/mozembed/mozembed.gladep
+examples/mozembed/MozEmbed.pl
+examples/sample/sample.glade
+examples/sample/sample.gladep
+examples/sample/Sample.pl
+examples/yahoo/yahoo.glade
+examples/yahoo/yahoo.gladep
+examples/yahoo/YahooApp.pl
+lib/Gtk2/GladeXML/Simple.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/1.t
+META.yml                                 Module meta-data (added by MakeMaker)

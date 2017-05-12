@@ -1,0 +1,150 @@
+0.018		2016-03-01	T. R. Wyant
+  Deprecate 3rd value in set( brick => ... );
+    This has been documented as deprecated for some time. This update
+    documents a deprecation schedule, and includes machinery to display
+    deprecation warnings.
+
+  Move clipboard functionality to module Clipboard. This module is
+    optional; without it copy() and paste() throw exceptions.
+
+  Add Makefile targets authortest, testcover.
+
+0.017		2016-01-05	T. R. Wyant
+  Add GitHub repository to metadata.
+
+0.016		2015-11-11	T. R. Wyant
+  Remove {Build,Makefile}.PL question about sudokug installation.  Also
+    remove OS-specific code to build the executable if it is in fact
+    being built.
+
+0.015		2014-11-16	T. R. Wyant
+   As of 2015-07-01, Makefile.PL and Build.PL will no longer prompt the
+     user about installing sudokug, but default to installing it. The -n
+     option will still suppress the installation. Also, the OS-specific
+     functionality in these files will be removed.
+
+0.014		2013-12-03	T. R. Wyant
+   No code changes - just test tweaks.
+
+0.013		2012-01-04	T. R. Wyant
+   Remove unwanted cruft from Changes file, and bring it into compliance
+      with Test::CPAN::Changes. Add xt/author/changes.t to be sure it
+      stays that way.
+
+0.012		2011-12-20	T. R. Wyant
+   Update copy of Gnu GPL in LICENSES/Copying to have current FSF
+      address.
+
+0.011		2011-11-10	T. R. Wyant
+   'use 5.006002', since that is the oldest Perl I can build.
+
+   Eliminate calls to UNIVERSAL::can as a function.
+
+   Load optional module Win32::Clipboard by file name, mostly so code
+      analyzers do not see it as an undeclared dependency.
+
+   Require Test::More for testing.
+
+   Add tests for POD and Perl::Critic, and for file presence and
+      executability.
+
+   Author testing is now by the authortest target, which requires
+      building via Build.PL. Author testing is no longer supported when
+      building via Makefile.PL.
+
+   Moved the modification log from the module POD to the Changes file.
+
+   Revise copyright and license statement.
+
+0.010		2008-09-14	T. R. Wyant
+   Fixed Build.PL to heed -y and -n options.
+
+0.009		2008-07-21	T. R. Wyant
+   'use 5.006', for 'our' at the very least.
+
+   Update 'SEE ALSO'
+
+   add =head1 LICENSE to POD.
+
+0.008		2008-05-09	T. R. Wyant
+   Tweak docs.
+
+   Support unused cells.
+
+   Add drop_set() method to undo add_set().
+
+   Add 'null' attribute to generate a puzzle with no topology.
+
+   Add 'quincunx' attribute to generate a quincunx (a.k.a.
+     'Samurai Sudoku')
+
+0.007		2006-09-30	T. R. Wyant
+   Corrected example in topology attribute documentation,
+     and other documentation tweaks.
+
+   Moved General.pm to lib/Games/Sudoku.
+
+   Added Build.PL
+
+   In bin/sudokug, added the 'webcmd' pseudo-attribute and fixed the
+     'source' command.
+
+0.006		2006-07-03	T. R. Wyant
+   Fixed problem with 'set corresponding'. Thanks
+       to David Jelinek of Central Michigan University
+       for diagnosing the problem and finding a
+       solution.
+
+   Corrected spelling.
+
+   Eliminated Scalar::Util::looks_like_number, since
+       apparently ActivePerl does not have it.
+
+   Add copy() method and autocopy attribute, for getting
+       generated puzzles onto the clipboard.
+
+   Add paste() method, for loading puzzles from the
+       clipboard.
+
+   Add unload() method.
+
+   In bin/sudokug, allowed input to be redirected or piped in, and added
+       -filter option.
+
+0.005		2005-12-20	T. R. Wyant
+   Added generate() method and generation_limit
+       attribute.
+
+   Added rows attribute. This changes the default
+       output for 'multi-faced' puzzles.
+
+0.004		2005-12-16	T. R. Wyant
+   Added Dion cube (via 'set cube number').
+
+0.003		2005-12-13	T. R. Wyant
+   Added 'set corresponding' and 'set max_tuple'.
+
+   Added cubic sudoku (via 'set cube').
+
+   Fixed horrendous inefficiency in backtrack logic.
+
+0.002		2005-12-11	T. R. Wyant
+   Format solution nicely for multi-character symbols.
+
+   Fixed error in values eliminated by a hidden tuple.
+
+   Recoded 'set sudokug' in terms of 'set brick', thus
+     fixing an error in generating the small squares.
+
+   Added method add_set(), and recoded 'set sudokux' in
+     terms of this and 'set sudokug', thus fixing the
+     same error that 'set sudoku' had.
+
+   Put spaces in the result of scalar constraints_used.
+
+   Spiffed up the POD.
+
+0.001		2005-12-09	T. R. Wyant
+   Initial release to CPAN.
+
+# ex: set textwidth=72 :

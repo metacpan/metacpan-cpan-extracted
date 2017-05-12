@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Gantry-Plugins-Uaf
+version: 0.03
+author:
+  - Kevin L. Esteb <kesteb@wsipc.org>
+abstract: Plugin for an authorizaton and authentication framework
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

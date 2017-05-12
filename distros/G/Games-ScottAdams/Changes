@@ -1,0 +1,64 @@
+Revision history for Perl extension Games::ScottAdams.
+
+0.04  Sat Nov  4 11:32:08 GMT 2006
+	- Add bin/sad, the Scott Adams decompiler.
+	- Fix an important bug: messages above #50 were compiled into
+	  slots one lower than they should have been, yielding very
+	  confusing gameplay.  (I discovered this while playing a
+	  version of _Adventureland_ decompiled with "sad" and then
+	  recompiled with "sac".  Sample diagloue: KILL DRAGON / It
+	  doesn't seem to bother him at all.  TIMBER!)
+	- Correct the sac URL in the _Crystal of Chaos_ welcome
+	  message.
+	- Minor documentation improvements.
+
+0.03  Thu Nov  2 00:30:45 GMT 2006
+	- Revised directory layout to match that produced by h2xs
+	  version 1.23 with flags:
+		-X --name=Games::ScottAdams --compat-version=5.8.0 --omit-constant --skip-exporter --skip-ppport
+	- Fix occasional bug in %nalias: the first of the equivalent
+	  nouns to appear in the vocabulary list is now always the one
+	  that is used as the %getdrop, so that it is recognised by
+	  scottfree.
+	- Finish Games::ScottAdams::Manual
+	- Remove extraneous warning emitted when %AT places an object
+	  that already had a location.
+	- The compiler is not now so fussy about leading whitespace.
+	  In general, all indentation is now ignored except when it's
+	  part of a location description.
+	- Move the sac executable down into new bin directory.
+	- Use ".sao" (Scott Adams Object) instead of the uninformative
+	  ".dat" throughout as the suffix for compiled files.
+	- Tweaks in crystal.sac
+	- Fix crystal/Makefile to use installed components.
+
+0.02  Mon Jun  7 12:49:50 2004
+	- First release.
+
+0.01  Tue Apr 17 13:42:46 2001
+	- original version; created by h2xs 1.19
+
+--
+
+### Still to do
+	- Update the web-page.
+	- Make the decompiler.
+	- Allow room/item descriptions on %whatever line.
+	- Naming and reusing of messages.
+	- Handle multi-line messages.
+	- Add meta-conditions such as "dark" that are implemented in
+	  terms of primitive flags.
+	- Mechanism for setting and testing flags by name.
+	  (flag 15 always indicates if light has run out.)
+	- Register current line-numbers with rooms, actions, etc. so
+	  that compile-phase errors can be reported better.
+	- Add discussion of %ident, %version, %wordlen, %maxload,
+	  %lighttime and %include, and flags, counters and location
+	  stores, to the tutorial.
+	- Test all the action conditions and results.
+	- Write decompiler; regression-test against compiler.
+	- Figure out the MakeMaker magic to have
+	  lib/Games/ScottAdams/Tuturial.pod automatically built.
+
+It's possible to write perfectly good games (e.g. to clone Scott
+Adams's own _Adventureland_) without any of these refinements.

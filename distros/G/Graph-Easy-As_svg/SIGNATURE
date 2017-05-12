@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 32e3c086eb0ff3dfb1cabffdec5c1d84a7611b1a CHANGES
+SHA1 a43df772ac178d64884214866bdce1ce95cc9795 INSTALL
+SHA1 02154445bc9831e791c35050f1a018ed99030016 LICENSE
+SHA1 4b99695b0c16bd93cc6b0814cc880c1c9c9f3c3c MANIFEST
+SHA1 2182d84c7f11a82660b3dcc69511350de4489fc0 MANIFEST.SKIP
+SHA1 f2202fc62eb008680fd2f3f1563e72b35744c821 META.yml
+SHA1 0c02c928b779f9620f28730247963594fe32930d Makefile.PL
+SHA1 bb5aa2b2a4e3d5c02ce3191be09397d8f5a0dec6 README
+SHA1 88fec724d5b1b010d8346b4b6bd05abc0d9f191f TODO
+SHA1 d7be1e7d1b9469989eb93adfb133e47619065dff examples/as_ascii
+SHA1 5dd2df50e3eda30a2abc542f4369d21264434885 examples/as_boxart
+SHA1 63ab4a7efeadde26d0de6f7c9dbd181121ea04e8 examples/as_graphviz
+SHA1 cec99efdf4dc8746782509b1531eea791afe30a2 examples/as_html
+SHA1 d1dae0dca3e8602a37697497f75c56650ca08ec5 examples/as_svg
+SHA1 5e48c6cc058fe4b73fadde3e7ae8570770f38cdc examples/as_txt
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 d8f6d2df4e75cb9e6e77a8377457f0ececd00e31 inc/Module/Install.pm
+SHA1 af0833ed8863138d63c446ab756b868d9ec1a8da inc/Module/Install/AutoInstall.pm
+SHA1 03590cde5c3de0d0d8a84d2b96917ed1a2cf9a30 inc/Module/Install/Base.pm
+SHA1 8ef3c70e905be7d1007b446f21d4eb3ff6ae24cb inc/Module/Install/Can.pm
+SHA1 79054604a1cd4e99443b05cbb62832568a204a33 inc/Module/Install/Fetch.pm
+SHA1 160e1fc7baca4f31c50fe498df10280c9a218ada inc/Module/Install/Include.pm
+SHA1 dfa433f2f41d990946f1b3d68a29299539f2dea6 inc/Module/Install/Makefile.pm
+SHA1 72cab336b6be5716aae0a1cb6d9add6c98a7a1f5 inc/Module/Install/Metadata.pm
+SHA1 35a62725a7eade0fa617ef2ba4cf2f4d4a69a3fe inc/Module/Install/Win32.pm
+SHA1 19dcc6d1e9f02c56d3f6d184642f4cd68aa371e6 inc/Module/Install/WriteAll.pm
+SHA1 633213aaac3fc9ed63b5fa7e6ab793ebf77b4c86 lib/Graph/Easy/As_svg.pm
+SHA1 0dce90945da99b01c024d5d483c0a1f9a4d54c20 t/group.t
+SHA1 ee5c692533559b46d18c832a3d5b9bd2b07633b8 t/output.t
+SHA1 3c376f8a1abcc6c6b4b6df93927a6e9c097fdac2 t/pod.t
+SHA1 5abda62f24a81f74a68ba8afca79dc898f771b19 t/pod_cov.t
+SHA1 a59505548ef2a59c38cf46ac574af090c3bbfd6d t/svg.t
+SHA1 105eb97147f35f83e3e8441f2c0450fc242709ac t/svg/svg.txt
+SHA1 76378e84609186dcf16a510c444b0822a0e06b31 t/text.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iQEVAwUBSDW+S3cLPEOTuEwVAQIqqwf+Mf+WP3D1jQRK2hqjqlat8tNY014gOCj5
+T8SUfUxZvpDeGqc5c4hr6Vb8+BCPVyG70L5SPFd6dCZgbL/rzVFH2FsbYty6m+/k
+QXRBwq/YurjNvtamofpcCQpVPKq4jUYGg/4ngrymt/pCI9yF1LI3gWsPhSNMlyGG
+CE9/8DhSc+iZr3dy1OZ+LZ8OrRWUcPIPk55V4pHyxKf9Wg2W0XNPwGQ0qLmdqCfv
+HyeAvU5gjrlfhPr67nOrgENy7QZdflX3jodEzJiAuamMPdZWU9i4Q8hURak1Q03p
+HMGfjsuSbsq+SNgIpxTAVAQ0ljKTrdzCw+GUwnsCYuTfbMBbqKqfbw==
+=ONj5
+-----END PGP SIGNATURE-----

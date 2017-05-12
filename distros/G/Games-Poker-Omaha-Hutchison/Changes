@@ -1,0 +1,21 @@
+Revision history 
+
+1.04 Tue Sep  6 19:40:30 UTC 2005
+	- Add hand discussed at
+    www.internettexasholdem.com/phpbb2/sat-aug-13-2005-743-pm-vp180454.html
+  - Reference alternate scoring chart at
+    http://erh.homestead.com/omaha.html
+
+1.03 Thu Apr 1 2004
+	- Cope with 'hidden' 3 straight masquerading as overwide 4-straight (A K Q 6)
+
+1.02 Thu Apr 1 2004
+	- Split out StraightScorer 
+
+1.01 Wed Mar 31 2004
+	- Major refactorings
+
+1.00 Wed Mar 31 2004
+	- Original version
+
+

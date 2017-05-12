@@ -1,0 +1,209 @@
+Games-Hack version 0.6
+======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the module
+
+	Expect
+
+which in turn requires
+
+	IO::Pty.
+
+
+COPYRIGHT AND LICENCE
+
+(C) 2007,2012 by Ph. Marek <pmarek@cpan.org>; licensed under the GPLv3.
+
+
+
+EXAMPLE - using keepvalueat
+
+
+As an example I'll be taking "craft"; debian version 3.5-12, a "Warcraft 2-like 
+multi-player real-time strategy game".
+
+Start it with
+	$ hack-live craft
+
+The script outputs a prompt "--->", and starts "craft".
+
+Choose some settings, and start the game.
+You'll be starting with money=1000, wood=1000.
+
+Build a town-hall, and send the other worker to dig somewhere; you'll have 
+995 money left.
+
+Enter a search command into the script 
+	---> find 995
+
+and it will give you
+	Searching for e3030000
+  found at 0xa7690870 (0xa6dfd000 + 0x893870): e3030000e6030000
+	found at 0xa76908d4 (0xa6dfd000 + 0x8938d4): e3030000e6030000
+
+	Most wanted:
+		0xA7690870(1)  0xA76908D4(1)  0x00000000(0)  0x00000000(0)  0x00000000(0)  0x00000000(0)
+
+As you'll see, craft uses two memory location to know how much money you 
+have. Now we'll get us some; enter
+
+	---> keepvalueat 0xA7690870 20000 "money"
+	---> keepvalueat 0xA76908D4 20000 "money2"
+
+
+Now we want to have more wood, too.
+
+Clear the search cache:
+	---> cleanup
+	---> find 198
+
+	Searching for c6000000
+		found at 0x08b40258 (0x080f6000 + 0xa4a258): c6000000b9000000
+	  found at 0x08b576a0 (0x080f6000 + 0xa616a0): c6000000b9000000
+		found at 0x08b5c8d4 (0x080f6000 + 0xa668d4): c600000002000200
+		found at 0x08b5f698 (0x080f6000 + 0xa69698): c6000000b9000000
+		found at 0x08b639c8 (0x080f6000 + 0xa6d9c8): c6000000b9000000
+		...
+		found at 0xa7690874 (0xa6dfd000 + 0x893874): c60000005554b81e
+		found at 0xa76908d8 (0xa6dfd000 + 0x8938d8): c6000000202185eb
+		found at 0xa76f6ddc (0xa6dfd000 + 0x8f9ddc): c6000000c7000000
+		found at 0xa7b9aa50 (0xa6dfd000 + 0xd9da50): c600000019000000
+		found at 0xa7dcd5ec (0xa7dcc000 + 0x15ec): c600000001000000
+		found at 0xa7fde3f0 (0xa7fde000 + 0x3f0): c600000000410e08
+
+	Most wanted:
+		0x08C27114(1)  0x08C266FE(1)  0xA7B9AA50(1)  
+		0x08C2710C(1)  0xA76F6DDC(1)  0xA76908D8(1)
+
+As you can see, the wood is not so easy.
+So you send a worker harvesting wood, as when he has delivered:
+	---> find 298
+	Searching for 2a010000
+		found at 0x08b5ee94 (0x080f6000 + 0xa68e94): 2a01000003000200
+		found at 0x08b5ef4c (0x080f6000 + 0xa68f4c): 2a01000003000200
+		found at 0x08b5eff4 (0x080f6000 + 0xa68ff4): 2a01000003000200
+		found at 0xa7690874 (0xa6dfd000 + 0x893874): 2a010000c88b16d9
+		found at 0xa76908d8 (0xa6dfd000 + 0x8938d8): 2a010000a65a0e2d
+		found at 0xa76f6f6c (0xa6dfd000 + 0x8f9f6c): 2a0100002b010000
+
+	Most wanted:
+		0xA76908D8(2)  0xA7690874(2)  0x08C27114(1)  0x08C266FE(1)  
+		0x08B5EE94(1)  0xA7B9AA50(1)
+
+So now only two locations are left, and we set them:
+
+	---> keepvalueat 0xA76908D8 20000 "wood"
+	---> keepvalueat 0xA7690874 20000 "wood2"
+
+
+Finished!
+
+Now you can play your game, and when you stop the script with CTRL-D you 
+will get the finished output.
+
+Please note that craft won't be stopped - but as the debugger quits, too, 
+the money and wood will no longer be kept at their values!
+
+	# keeping "money" (0xA7690870) at 0x4e20 (20000):
+					set *(int*)0xA7690870=20000
+					watch *(int*)0xA7690870
+					commands
+					silent
+					set *(int*)0xA7690870=20000
+					c
+					end
+
+	# keeping "money2" (0xA76908D4) at 0x4e20 (20000):
+					set *(int*)0xA76908D4=20000
+					watch *(int*)0xA76908D4
+					commands
+					silent
+					set *(int*)0xA76908D4=20000
+					c
+					end
+
+	# keeping "wood" (0xA76908D8) at 0x4e20 (20000):
+					set *(int*)0xA76908D8=20000
+					watch *(int*)0xA76908D8
+					commands
+					silent
+					set *(int*)0xA76908D8=20000
+					c
+					end
+
+	# keeping "wood2" (0xA7690874) at 0x4e20 (20000):
+					set *(int*)0xA7690874=20000
+					watch *(int*)0xA7690874
+					commands
+					silent
+					set *(int*)0xA7690874=20000
+					c
+					end
+
+These are the commands that GDB needs to keep the money and wood at the 
+wanted 20000.
+
+
+EXAMPLE - using killwrites
+
+You start the game and find the memory locations and before; but instead of 
+the keepvalueat commands you enter the killwrites commands:
+
+	---> find 995
+
+	Searching for e3030000
+		found at 0xa767f870 (0xa6dec000 + 0x893870): e3030000e6030000
+		found at 0xa767f8d4 (0xa6dec000 + 0x8938d4): e3030000e6030000
+
+	Most wanted:
+		0xA767F8D4(1)  0xA767F870(1)  0x00000000(0)  0x00000000(0)  0x00000000(0)  0x00000000(0)
+	---> killwrites 0xA767F8D4 "money1"
+	---> killwrites 0xA767F870 "money2"
+
+	---> cleanup
+	---> find 998
+	Searching for e6030000
+		found at 0xa767f874 (0xa6dec000 + 0x893874): e6030000a93108ac
+		found at 0xa767f8d8 (0xa6dec000 + 0x8938d8): e6030000a93108ac
+
+	Most wanted:
+		0xA767F874(1)  0xA767F8D8(1)  0x00000000(0)  0x00000000(0)  0x00000000(0)  0x00000000(0)
+	---> killwrites 0xA767F874 "wood1"
+	---> killwrites 0xA767F8D8 "wood2"
+
+
+And you're finished again. Please note that this will keep *changes* from 
+happening - so you might not be able to acquire more wood or money, because 
+the writes get killed ...
+In this case it might be better to set a new value *before* killing all 
+writes - to avoid having not enough money to buy things.
+This you can do with
+	---> set *(int*)0xA767F8D4=20000
+	---> set *(int*)0xA767F870=20000
+	---> set *(int*)0xA767F874=20000
+	---> set *(int*)0xA767F8D8=20000
+
+
+After quitting the script you'll get again the fruits of your labor:
+
+	# stopped at 0x8082df2 for "wood1" (at 0xa767f874); killing command "mov %eax,0x9c86c(%edx)" via
+		set *(short*)(0x8082dec)=0x04eb
+
+	# stopped at 0x80be6cf for "wood2" (at 0xa767f8d8); killing command "mov %edx,0x9c8d0(%eax)" via
+		set *(short*)(0x80be6c9)=0x04eb
+
+	...
+
+These are the commands to patch your (running) craft binary.
+

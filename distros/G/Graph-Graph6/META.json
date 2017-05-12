@@ -1,0 +1,76 @@
+{
+   "abstract" : "Read and write graph6 and sparse6.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graph-Graph6",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ],
+      "package" : [
+         "Graph::Easy"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "IO::String" : "0",
+            "List::Util" : "0",
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "Graph::Easy::Parser" : "0",
+            "Graph::Reader" : "0",
+            "Graph::Writer" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Graph" : "0",
+            "Graph::Easy" : "0",
+            "Graph::Easy::Parser" : "0",
+            "Graph::Reader" : "0",
+            "Graph::Writer" : "0",
+            "GraphViz2" : "0",
+            "Moo" : "0"
+         },
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/graph-graph6/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "6",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

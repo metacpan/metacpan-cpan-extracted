@@ -1,0 +1,19 @@
+GD::Map::Mercator TO DO
+
+- add convenience functions:
+	- fill($lat, $long, $color): fill region containing $lat, $long with $color
+	- north_america($width, $height) return N. America map of specified dimensions
+	- south_america($width, $height) return S. America map of specified dimensions
+	- europe($width, $height) ditto Europe
+	- asia($width, $height) ditto Asia
+	- africa($width, $height) ditto Africa
+	- (whence Australia/New Zealand ?)
+	- usa($width, $height) ditto USA
+	- maybe other countries
+
+- fix for asia data (-riv, -cil is all f'ed up)
+
+- finish keep => { set => list } support
+
+- fiddle w/ smoothing borders for visualization purposes
+	- return image map of relevant parts

@@ -1,0 +1,358 @@
+#!/usr/bin/perl
+
+use strict;
+use Fcntl qw(:flock);
+
+my $flockingfile;
+
+BEGIN {
+    $global::lkf = "/tmp/.sgfimgmkr.lock.$$".int rand 500;
+
+    open $flockingfile, ">$global::lkf" or die "lockfile trouble ($!)";
+    flock $flockingfile, LOCK_EX        or die "lockfile trouble ($!)";
+}
+
+END {
+    flock $flockingfile, LOCK_UN or die "lockfile trouble ($!)";
+    close $flockingfile          or die "lockfile trouble ($!)";
+
+    unlink $global::lkf;
+}
+
+use strict;
+use Data::Dumper; $Data::Dumper::Indent = 1;
+use Games::Go::SGF2misc;
+use Getopt::Std;
+
+my $sgf = new Games::Go::SGF2misc;
+
+getopts("pqi:b:P:Kj1c:");
+
+our ($opt_q, $opt_i, $opt_b, $opt_p, $opt_P, $opt_K, $opt_j, $opt_1, $opt_c); 
+    # -b location: location of the board htmls
+    # -i location: location of the image graphics
+    # -c location: location of the stylesheet (href format)
+    # -q quiet
+    # -p preprocess pilotGOne files...
+    # -P dump povray position commands
+    # -K include the kgc style sheet
+    # -j extended js data structure instead of ajax
+
+$opt_i = "./g" unless $opt_i;
+$opt_b = "./"  unless $opt_b;
+
+for my $file (@ARGV) {
+    my $dir = $file;
+       $dir =~ s/\.sgf$//;
+
+    my ($sdir, $sfile) = ($dir, $file);
+
+    $sdir  =~ s/.*\///g;
+    $sfile =~ s/.*\///g;
+
+    unless( -d $dir ) {
+        if( $opt_p and -s $file < 1024*1024 ) {
+            open IN, $file or die "couldn't open file for preprocess: $!";
+            my $entire_file = <IN>;
+
+            my $processed   = "";
+               $processed  .= "$1\n" while $entire_file =~ m/(\(.+\))/g;
+
+            close IN;
+
+            open OUT, ">$file.pp" or die "coudln't open preprocess file: $!";
+            print OUT $processed;
+            close OUT;
+        } else {
+            die "couldn't find $file\n" unless -f $file;
+        }
+
+        $sgf->parse(-f "$file.pp" ? "$file.pp" : $file); 
+
+        my $nl = $sgf->nodelist; use Data::Dumper; $Data::Dumper::Indent = $Data::Dumper::Sortkeys = 1; 
+        my @kz = keys %$nl;
+
+        die "we only process 1-game SGFs this one is (" . int(@kz) . ")" unless @kz eq "1";
+
+        $nl = $nl->{$kz[0]};
+
+        unless( $opt_P ) {
+            mkdir $dir       or die "couldn't make dir: $!";
+            chmod 0755, $dir or die "coudln't chmod dir: $!";
+        }
+
+        my $fn = $sdir; $fn =~ s/[^\d\w]//g; $fn .= $$ . time;
+        my $max_i_evar = 0;
+        my $max_node_e = "1.1-root"; # start with this in case there's only one node... it happens
+
+        for my $j (0 .. $#{ $nl }) {
+            my $v = $nl->[$j];
+
+            my $max_i = $#{ $v };
+               $max_i -- while not defined $v->[$max_i]  and $max_i > -1;
+
+            if( $max_i > $max_i_evar ) {
+                $max_i_evar = $max_i;
+                $max_node_e = $v->[$max_i];
+            }
+        }
+
+        my $max_j = $#{ $nl };
+           $max_j -- while not defined $nl->[$max_j]  and $max_j > -1;
+
+        my $min_j = 0;
+           $min_j ++ while not defined $nl->[$min_j] and $min_j < $max_j;
+
+        my @letters = qw(a b c d e f g h i j k l m n o p q r s t u v w x y z aa ab ac ad ae af ag ah ai aj ak al am an ao ap);
+        for my $j ($min_j .. $max_j) {
+            my $v = $nl->[$j];
+
+            my $max_i = $#{ $v };
+               $max_i -- while not defined $v->[$max_i]  and $max_i > -1;
+
+            my $min_i = 0;
+               $min_i ++ while not defined $v->[$min_i] and $min_i < $max_i;
+
+            for my $i ($min_i .. $max_i) {
+                my $n = $v->[$i];
+
+                my ($next, $last, $minn, $maxn);
+                $next = $v->[$i+1] if $i+1 <= $max_i;
+                $last = $v->[$i-1] if $i-1 >= $min_i;
+                $minn = $v->[$min_i];
+                $maxn = $v->[$max_i];
+
+                my %alts = ();
+                for my $lj ($min_j .. $max_j) {
+                    if( $lj != $j ) {
+                        my ($ln, $lp, $lc);
+                           $ln = $nl->[$lj]->[$i+1] if $i+1 <= $#{ $nl->[$lj] };
+                           $lp = $nl->[$lj]->[$i-1] if $i-1 >= 0;
+                           $lc = $nl->[$lj]->[$i];
+
+                       $alts{$lj}{n} = $ln if $ln;
+                       $alts{$lj}{p} = $lp if $lp;
+                       $alts{$lj}{c} = $lc if $lc;
+                    }
+                }
+
+                if( $opt_j ) {
+                    our %altmap;
+                    $altmap{$n} = { "next" => $next, "last" => $last, "minn" => $minn, "maxn" => $maxn, alts => \%alts };
+                }
+
+                if( $opt_P ) {  # -P only outputs the one file
+                } elsif( not $opt_1 and not $opt_j or $i == $max_i ) { # -j skips this part (except for the one node)
+                    my $o  = "$dir/$n.html";                           # -1 only draws the last node (no controls)
+
+                    print "$n\n" unless $opt_q;
+
+                    open OUT, ">$o" or die "couldn't open output file ($o): $!";
+                    my ($before, $after) = split /\Q<!--MATCHME-->\E/, $sgf->as_html($n, $opt_i, ($opt_j ? $fn : ()) );
+                    print OUT "<p>$before\n\n";
+
+                    if( not $opt_1 and $max_node_e ne "1.1-root" ) {
+                        print OUT "\n<span id='sgfcontrols'>\n";
+                        print OUT "<p> 
+                        <input type='submit' onClick='SN$fn(\"1.1-root\");' value='root'>
+                        <input type='submit' onClick='SN$fn(\"$max_node_e\");' value='max node'>
+                        \n";
+                        print OUT "<p><table><tr><td>$letters[$j]:</td>";
+
+                        if( $i == $min_i ) {
+                            print OUT "<td><input type='submit' value='\&lt;\&lt;'></td>\n";
+                        } else {
+                            print OUT "<td><input type='submit' onClick='SN$fn(\"$minn\");' value='\&lt;\&lt;'></td>\n";
+                        }
+
+                        if( $last ) {
+                            print OUT "<td><input type='submit' onClick='SN$fn(\"$last\");' value='\&lt;'></td>\n";
+                        } else {
+                            print OUT "<td><input type='submit' value='\&lt;'></td>\n";
+                        }
+
+                        print OUT "<td><input type='submit' value='\&#149;'></td>\n";
+
+                        if( $next ) {
+                            print OUT "<td><input type='submit' onClick='SN$fn(\"$next\");' value='\&gt;'></td>\n";
+                        } else {
+                            print OUT "<td><input type='submit' value='\&gt;'></td>\n";
+                        }
+
+                        if( $i == $max_i ) {
+                            print OUT "<td><input type='submit' value='\&gt;\&gt;'></td>\n";
+                        } else {
+                            print OUT "<td><input type='submit' onClick='SN$fn(\"$maxn\");' value='\&gt;\&gt;'></td>\n";
+                        }
+
+                        for my $lj (keys %alts) {
+                            print OUT "<tr><td>", $letters[$lj], ":</td><td>\&nbsp;</td>";
+
+                            if( my $last = $alts{$lj}{p} ) {
+                                print OUT "<td><input type='submit' onClick='SN$fn(\"$last\");' value='\&lt;'></td>\n";
+                            } else {
+                                print OUT "<td><input type='submit' value='\&lt;'></td>\n";
+                            }
+
+                            if( my $current = $alts{$lj}{c} ) {
+                                print OUT "<td><input type='submit' onClick='SN$fn(\"$current\");' value='\&#149;'></td>\n";
+                            } else {
+                                print OUT "<td><input type='submit' value='\&#149;'></td>\n";
+                            }
+
+                            if( my $next = $alts{$lj}{n} ) {
+                                print OUT "<td><input type='submit' onClick='SN$fn(\"$next\");' value='\&gt;'></td>\n";
+                            } else {
+                                print OUT "<td><input type='submit' value='\&gt;'></td>\n";
+                            }
+
+                            print OUT "<td>\&nbsp;</td></tr>";
+                        }
+
+                        print OUT "</tr></table>";
+                        print OUT "\n</span>\n";
+                    }
+
+                    print OUT $after;
+                    close OUT;
+
+                    chmod 0644, $o or die "couldn't chmod output file ($o): $!";
+                }
+            }
+        }
+
+        if( $opt_P ) {
+            my $pov_file = $sfile;
+               $pov_file =~ s/\.sgf/.pov/g;
+
+            open OUT, ">$pov_file" or die "couldn't open $pov_file: $!";
+
+            open IN, "$ENV{HOME}/code/povray/goban2/main.pov" or die "couldn't open povsource $ENV{HOME}/code/povray/goban2/main.pov: $!";
+            while(<IN>) {
+                last if m/PRACTICAL END/;
+                print OUT $_;
+            }
+            close IN;
+
+            print OUT "\n\n// $sfile ($max_node_e)\n";
+
+                my $node  = $sgf->as_perl( $max_node_e, 1 ) or croak $sgf->errstr;
+                my $board = $node->{board};
+
+                my $x = 0;
+                for my $i (0..$#{ $board }) {
+                    for my $j (0..$#{ $board->[$i] }) {
+                        my $c = $board->[$i][$j];
+
+                        if( {B=>1, W=>1}->{$c} ) {
+                            printf OUT '%-8s ', "$c(" . ($j+1) . ", " . (19-$i) . ")";
+
+                            if( not ((++$x)%7) ) {
+                                print OUT "\n";
+                            }
+                        }
+                    }
+                }
+
+            close OUT;
+
+        } else {
+            # use max_node_e
+            open OUT, ">$dir.html"           or die "couldn't open rooter: $!";
+            open IN, "$dir/$max_node_e.html" or die "couldn't open parenter(\$max_node_e = $max_node_e): $!";
+
+            if( $opt_j ) {  # the new and improved node changer
+                our %altmap; # this is created above in the node parser
+                print OUT "<script>\n";
+                print OUT "var DA$fn = {\n";
+
+                for my $n (sort keys %altmap) {
+                    if( defined $altmap{$n}{alts} and keys %{$altmap{$n}{alts}} ) {
+                        die "unhandled die muthafucka!!!";
+                    }
+
+                    # '1.1-50' => {
+                    #   'alts' => {},
+                    #   'last' => '1.1-49',
+                    #   'maxn' => '1.1-55',
+                    #   'minn' => '1.1-root',
+                    #   'next' => '1.1-51'
+                    # },
+
+                    printf OUT "\%10s: { next: \%s, last: \%s, minn: \%s, maxn: \%s, node: \%s },\n", 
+                        "'$n'", 
+                        (map {defined $_ ? "'$_'" : "undefined" } @{$altmap{$n}}{qw(next last minn maxn)}),
+                        $sgf->as_js($n),
+                    ;
+                }
+
+                print OUT "};\n";
+
+                print OUT qqfunction SN$fn(newnode) {
+                    var row = DA$fn\[newnode];
+                    var n   = row.node;
+
+                    for (var i in n.board) {
+                        for(var j in n.board[i]) {
+                            var e = document.getElementById("$fn." + i + "." + j );
+
+                            var new = e.src.replace(/[a-z]+\.gif/, n.board[i][j] + ".gif");
+                            if( new != e.src ) 
+                                e.src = new;
+                        }
+                    }
+                };
+
+                print OUT "</script>\n";
+
+            }  # end of the new node changer
+            
+            else { # the regular node changer
+
+                print OUT qq|<script>
+if (typeof XMLHttpRequest == 'undefined') {
+    XMLHttpRequest = function () {
+        var msxmls = ['MSXML3', 'MSXML2', 'Microsoft']
+        for (var i=0; i < msxmls.length; i++) {
+            try {
+                return new ActiveXObject(msxmls[i]+'.XMLHTTP')
+            } catch (e) { }
+        }
+        throw new Error("No XML component installed!")
+    }
+}
+
+function SN$fn(newnode) {
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.open("GET", "$opt_b$sdir/" + newnode + ".html", true);
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4) {
+            document.getElementById("$fn").innerHTML = xmlhttp.responseText;
+        }
+    }
+    xmlhttp.send(null);
+}
+</script>
+| unless $opt_1;
+
+            } # end regular non -j node changer
+
+            print OUT qq(<link rel="stylesheet" type="text/css" href="$opt_c">) if $opt_K;
+            print OUT "<span class='sgf' id='$fn'>\n";
+            while(<IN>) {
+                print OUT $_;
+            }
+            print OUT "</span>\n";
+            close IN;
+            close OUT;
+
+            chmod 0644, "$dir.html" or die "couldn't chmod new html: $!";
+
+            if( $opt_1 ) {
+                unlink "$dir/$max_node_e.html" or die "couldn't unlink something: $!";
+                rmdir  $dir or die "couldn't rmdir something: $!";
+            }
+        }
+    }
+}

@@ -1,0 +1,45 @@
+
+== Revision history for Perl extension Geo::WKT
+
+version 0.95: Wed Jan 14 16:42:33 CET 2015
+
+	Fixes:
+	- parse_wkt linesting [Frank Maas]
+
+	Improvements:
+	- typo use of parse_wkt_linestring
+	  rt.cpan.org#86075 [ttatsumi]
+	- replace use of $& (use slows-down all regexes)
+	- change documentation style
+	- clean-up the code a bit
+	- some examples in the SYNOPSOS
+	- bump version to 0.95, to indicate "close to complete"
+	- remove dependency to Test::Pod, moving t/99pod.t into xt/
+
+version 0.04: Sun Nov 18 21:04:47 CET 2012
+
+	Fixes:
+
+	- fix missing semi-colon in parse_wkt_linestring.
+	  rt.cpan.org#81257 [Andrew Benson]
+
+version 0.03: Mon May 25 14:30:49 CEST 2009
+
+	Fixes:
+	- do not use bin/pwd in t/pod.t
+	- repair used versions report
+	- parse_wkt_linestring was missing.  Contributed by [Mike Kay]
+
+version 0.02: Tue Feb 12 10:08:04 CET 2008
+
+	- renamed from DBD::mysql::WKT into Geo::WKT, and published on CPAN.
+	- added tests for most translations.
+
+version 0.01: Wed Nov 15 12:41:19 CET 2006
+
+	- Converted to use oodist (removed mkdist, mkdoc, MANIFEST.extra)
+
+version 0.00: 2004 (not released)
+
+	- Initial version
+

@@ -1,0 +1,10 @@
+Revision history for Perl module GSM::ARFCN
+
+0.04 2009-01-25T05:57Z
+  - Changed bw property to cs since it was technicaly incorrect.
+0.03 2009-01-25T00:02Z
+  - Change unknown channel to return band=>"" instead of die.
+0.02 2009-01-24T23:36Z
+  - Added test for bpi=>GSM-1800
+0.01 2009-01-24T23:16Z
+    - original version

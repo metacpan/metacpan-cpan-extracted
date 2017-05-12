@@ -1,0 +1,16 @@
+bin/example-getsatellitelist.pl
+bin/example-plot.pl
+bin/example-plot.png
+bin/example-snapshot.pl
+bin/example-snapshot.png
+bin/satellite-get-tle-by-name.pl
+bin/satellite-get-tle.pl
+CHANGES
+doc/gps.tle
+lib/GPS/SpaceTrack.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/base.t

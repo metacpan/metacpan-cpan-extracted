@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/play.pl
+lib/Games/Mastermind/Solver.pm
+lib/Games/Mastermind/Solver/BruteForce.pm
+MANIFEST
+MANIFEST.SKIP
+t/001_load.t
+t/002_internal.t
+t/003_public.t
+t/zzy_pod_coverage.t
+t/zzz_pod.t
+META.yml
+Makefile.PL

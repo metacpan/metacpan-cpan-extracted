@@ -1,0 +1,96 @@
+
+Message 1  IUSA11 TEST 291800
+
+Section 0:
+    Length of BUFR message:            721
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           2
+    International data subcategory:    4
+    Local data subcategory:            255
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2007
+    Month:                             7
+    Day:                               27
+    Hour:                              20
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 9
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       309052
+
+Message 2  ISMD11 OKPR 060600
+
+Section 0:
+    Length of BUFR message:            225
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           0
+    International data subcategory:    2
+    Local data subcategory:            0
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2005
+    Month:                             5
+    Day:                               6
+    Hour:                              6
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 9
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       307080
+
+Message 3  IUSA11 ENMI 291800
+
+Section 0:
+    Length of BUFR message:            721
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           2
+    International data subcategory:    4
+    Local data subcategory:            255
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2007
+    Month:                             7
+    Day:                               27
+    Hour:                              20
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 9
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       309052

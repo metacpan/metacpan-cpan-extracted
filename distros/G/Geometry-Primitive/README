@@ -1,0 +1,50 @@
+Geometry::Primitive - Primitive Geometry Entities
+
+Geometry::Primitive is a device and library agnostic system for representing
+geometric entities such as points, lines and shapes.  It provides simple
+objects and many convenience methods you would expect from a simple geometry
+library.
+
+    use Geometry::Primitive::Point;
+
+    my $foo = Geometry::Primitive::Point->new(x => 1, y => 3);
+    ...
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Geometry::Primitive
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geometry-Primitive
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Geometry-Primitive
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Geometry-Primitive
+
+    Search CPAN
+        http://search.cpan.org/dist/Geometry-Primitive
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Cory Watson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

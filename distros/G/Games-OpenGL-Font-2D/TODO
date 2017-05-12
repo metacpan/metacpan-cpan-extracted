@@ -1,0 +1,12 @@
+
+############################################################################## 
+Games::OpenGL::Font::2D
+
+* support for TrueType Fonts?
+* support for stencil, e.g. the back is 100% transparent, everything else is
+  5% transparent, for crisp and clear texts.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

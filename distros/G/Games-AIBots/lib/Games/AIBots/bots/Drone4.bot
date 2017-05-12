@@ -1,0 +1,13 @@
+$name   = 'Drone4';
+$author = 'Autrijus Tang';
+$team   = 'Free Drones';
+
+enable shield;
+
+sub main {
+    scan perimeter;
+    if (&found('enemy')) {
+        attempt destruct;
+    }
+    redo;
+}

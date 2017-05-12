@@ -1,0 +1,16 @@
+LICENSE
+build-deb
+Changes
+COPYRIGHT
+Makefile.PL
+MANIFEST
+AppIndicator.xs
+ppport.h
+README
+typemap
+gperl.h
+t/Gtk2-AppIndicator.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Gtk2/AppIndicator.pm
+META.yml                                 Module meta-data (added by MakeMaker)

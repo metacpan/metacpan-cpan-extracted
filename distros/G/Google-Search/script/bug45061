@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Google::Search;
+
+use XXX;
+
+my $key = 'ABQIAAAAtDqLrYRkXZ61bOjIaaXZyxQRY_BHZpnLMrZfJ9KcaAuQJCJzjxRJoUJ6qIwpBfxHzBbzHItQ1J7i0w';
+my $referrer = 'http://www.my.site';
+my $search = Google::Search->Books( q => '9529950845', key=>$key, referrer=>$referrer );
+
+my $results = $search->all;
+my $first =  $search->first;
+warn $first->get( 'tbUrl' );
+warn join " ", map { $first->$_ } qw/tbUrl tbWidth tbHeight/;

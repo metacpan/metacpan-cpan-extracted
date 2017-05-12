@@ -1,0 +1,20 @@
+[% BLOCK entry_body %]
+<h2>[% entry.title %]</h2>
+<div id="body">[% entry.body %]</div>
+<div class="info-block">
+posted by <a href="[% c.uri_for_action('/user/browse', [ entry.author.name ] ) %]">[% entry.author.name %]</a>
+on [% entry.created_at %]
+<a href="[% c.uri_for_action('/entry/reply', [ entry.display_title ]) %]">comments ([% entry.reply_count %])</a>
+[% IF entry.parent %]
+(in reply to <a href="[% c.uri_for_action('/entry/browse', [ entry.parent.display_title ] ) %]">[% entry.parent.title %]</a>)
+</div>
+[% END %]
+<div id="replies">
+<ul>
+[% FOR reply IN entry.children %]
+  <li>[% PROCESS entry_body entry=reply %]</li>
+[% END %]
+</ul>
+</div>
+[% END %]
+[% PROCESS entry_body %]

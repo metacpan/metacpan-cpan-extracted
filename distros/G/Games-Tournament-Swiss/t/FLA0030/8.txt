@@ -1,0 +1,72 @@
+Scores on web, in pairingtable are different.
+
+		Round 8 Pairing Groups
+-------------------------------------------------------------------------
+Place  No  Opponents     Roles     Float Score
+1-2
+      13  25,12,26,-,21,16,24  BWB-WWB     31
+      25  13,8,9,12,18,17,6    WBBWWBB     31
+3
+      18  6,2,14,23,25,12,7    BWBWBWB     30
+4-9
+      1   14,16,6,4,12,8,15    BWBWBWB     29
+      12  24,13,10,25,1,18,4   WBWBWBW     29
+      14  1,15,18,7,4,11,21    WBWBWBB     29
+      16  3,1,17,20,24,13,23   WBWBWBB     29
+      21  9,22,20,2,13,24,14   WBWWBBW     29
+      24  12,4,23,19,16,21,13  BWBWBWW     29
+10-16
+      2   15,18,7,21,20,4,11   WBWBWBW     28
+      4   17,24,8,1,14,2,12    WBWBBWB     28
+      5   26,10,3,9,7,22,19    WWBWBWB     28
+      8   20,25,4,15,17,1,10   WWBBWBW     28
+      11  23,19,-,17,-,14,2    BW-B-WB     28
+      15  2,14,19,8,6,23,1     BWBWBWW     28
+      23  11,7,24,18,10,15,16  WBWBWBW     28
+17
+      6   18,17,1,10,15,20,25  WBWBWBW     27
+18-19
+      7   19,23,2,14,5,10,18   BWBWWBW     26
+      17  4,6,16,11,8,25,3     BWBWBWB     26
+20
+      10  22,5,12,6,23,7,8     WBBWBWB     25
+21-22
+      3   16,-,5,22,9,19,17    B-WBWBW     24
+      19  7,11,15,24,-,3,5     WBWB-WW     24
+23
+      20  8,26,21,16,2,6,-     BWBWBW-     23
+24
+      9   21,-,25,5,3,26,-     B-WBBW- D   22
+25
+      22  10,21,-,3,-,5,26     BW-W-BB     20
+26
+      26  5,20,13,-,-,9,22     BBW--BW     19
+
+Number Name	Rating	1	2	3	4	5	6	7	Score
+1 Donna	92	B,7,D	W,6,W	B,3,W	W,20,W	B,5,D	W,4,W	W,2,D	32
+2 Joe	75	B,14,D	W,7,W	B,25,D	B,Bye,B	W,4,D	W,5,W	B,1,D	31
+3 Edison	71	W,10,W	B,16,W	W,1,L	B,15,L	W,12,W	B,18,W	W,5,D	30
+4 Bruce	81	W,24,W	B,26,D	W,21,D	W,8,W	B,2,D	B,1,L	W,9,D	29
+5 Anita	74	W,23,D	B,11,D	W,22,W	B,21,W	W,1,D	B,2,L	B,3,D	29
+6 Maggie	76	W,22,D	B,1,L	W,13,D	B,11,W	B,9,D	W,8,D	B,7,D	28
+7 Eva	82	W,1,D	B,2,L	W,12,L	B,14,W	W,11,D	B,15,W	W,6,D	28
+8 Sophie	80	W,18,D	B,15,D	W,16,W	B,4,L	W,21,D	B,6,D	W,10,D	28
+9 Andy	84	W,11,D	B,18,D	W,15,L	B,16,W	W,6,D	B,10,D	B,4,D	28
+10 Amy	61	B,3,L	W,20,L	B,Bye,B	B,22,D	B,Bye,B	W,9,D	B,8,D	28
+11 Emily1	82	B,9,D	W,5,D	B,17,D	W,6,L	B,7,D	W,13,D	B,18,W	28
+12 Abby	81	W,26,L	B,19,D	B,7,W	W,17,D	B,3,L	W,16,D	B,13,D	27
+13 Elly	80	W,21,L	W,14,L	B,6,D	B,18,D	W,22,W	B,11,D	W,12,D	27
+14 Carol	73	W,2,D	B,13,W	B,24,W	W,7,L	W,15,D	B,22,W	B,17,W	27
+15 Stella	76	B,17,D	W,8,D	B,9,W	W,3,W	B,14,D	W,7,L	B,16,D	26
+16 Emily2	75	B,20,W	W,3,L	B,8,L	W,9,L	W,19,D	B,12,D	W,15,D	26
+17 Nina	78	W,15,D	B,22,D	W,11,D	B,12,D	W,18,L	B,21,D	W,14,L	26
+18 Ivy	74	B,8,D	W,9,D	B,20,L	W,13,D	B,17,W	W,3,L	W,11,L	26
+19 Candy	77	,,	W,12,D	B,23,L	W,24,W	B,16,D	W,26,W	B,20,D	25
+20 Kumiko	76	W,16,L	B,10,W	W,18,W	B,1,L	,,	W,23,W	W,19,D	25
+21 Nancy	72	B,13,W	W,25,D	B,4,D	W,5,L	B,8,D	W,17,D	,,	24
+22 Hank	75	B,6,D	W,17,D	B,5,L	W,10,D	B,13,L	W,14,L	B,23,L	24
+23 Molly	72	B,5,D	,,	W,19,W	B,26,D	W,24,L	B,20,L	W,22,W	24
+24 Jessica	65	B,4,L	,,	W,14,L	B,19,L	B,23,W	W,25,L	B,Bye,B	22
+25 Lu-Ping	46	B,Bye,B	B,21,D	W,2,D	,,	,,	B,24,W	W,26,D	22
+26 Linda	56	B,12,W	W,4,D	,,	W,23,D	,,	B,19,L	B,25,D	20
+ 

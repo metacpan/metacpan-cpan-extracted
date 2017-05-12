@@ -1,0 +1,12 @@
+#!/bin/bash -x
+
+dzil clean
+dzil build || exit 1
+cd Growl-Tiny-* || exit 1
+perl Makefile.PL || exit 1
+
+# Devel::Cover
+RELEASE_TESTING=1 cover -test | tee ../devel-cover.txt
+
+# Perl::Metrics::Simple
+countperl lib/ | tee ../perl-metrics-simple.txt

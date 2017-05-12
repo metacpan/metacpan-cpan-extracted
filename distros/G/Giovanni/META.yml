@@ -1,0 +1,38 @@
+---
+abstract: 'a Perl based deployment system'
+author:
+  - 'Lenz Gschwendtner <mail@norbu09.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Giovanni
+requires:
+  Config::GitLike: 0
+  Cwd: 0
+  Data::Dumper: 0
+  Expect: 0
+  Getopt::Long: 0
+  Git::Repository: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Mouse: 0
+  Mouse::Role: 0
+  Mouse::Util: 0
+  Net::OpenSSH: 0
+  Pod::Usage: 0
+  Sys::Hostname: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/norbu09/Giovanni/issues
+  homepage: https://github.com/norbu09/Giovanni/wiki
+  repository: git://github.com/norbu09/Giovanni.git
+version: 1.12

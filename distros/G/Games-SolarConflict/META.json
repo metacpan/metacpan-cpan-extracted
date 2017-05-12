@@ -1,0 +1,69 @@
+{
+   "abstract" : "Spacewar! clone",
+   "author" : [
+      "Jeffrey T. Palmer <jtpalmer@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-SolarConflict",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "File::ShareDir::Install" : "0.03"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "FindBin" : "0",
+            "Math::Trig" : "0",
+            "Mouse" : "0",
+            "Mouse::Role" : "0",
+            "Path::Class" : "0",
+            "SDL" : "2.532",
+            "SDL::Color" : "0",
+            "SDL::Event" : "0",
+            "SDL::Events" : "0",
+            "SDL::GFX::Primitives" : "0",
+            "SDL::Rect" : "0",
+            "SDLx::App" : "0",
+            "SDLx::Controller::Interface" : "0",
+            "SDLx::Controller::State" : "0",
+            "SDLx::Sprite" : "0",
+            "SDLx::Sprite::Animated" : "0",
+            "SDLx::Surface" : "0",
+            "SDLx::Text" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jtpalmer/Games-SolarConflict/issues"
+      },
+      "homepage" : "https://github.com/jtpalmer/Games-SolarConflict",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jtpalmer/Games-SolarConflict.git",
+         "web" : "https://github.com/jtpalmer/Games-SolarConflict"
+      }
+   },
+   "version" : "0.000001"
+}
+

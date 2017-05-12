@@ -1,0 +1,22 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+bin/mk_helpful
+lib/Getopt/Helpful.pm
+t/config_check/configs/base.conf
+t/config_check/configs/config.conf
+t/config_check/configs/global.conf.source
+t/config_check/configs/myconfig.conf
+t/config_check/standard.pl
+t/help_args-run.pl
+t/noconf_standard-run.pl
+t/00-load.t
+t/01-pod-coverage.t
+t/02-pod.t
+t/help_args.t
+t/noconf_standard.t
+t/verbose-debug.t
+t/lexical.t
+t/stupid_args.t

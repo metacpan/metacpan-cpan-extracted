@@ -1,0 +1,12 @@
+0.002000
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::MinimumPerl
+ - Dist::Zilla::Plugin::RunExtraTests
+
+ [Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.005000 → 2.006001
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::MinimumPerl
+ - Dist::Zilla::Plugin::CheckExtraTests
+

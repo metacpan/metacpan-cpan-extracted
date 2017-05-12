@@ -1,0 +1,48 @@
+---
+abstract: 'A parser for git fast-export streams'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Requires::Git: '0'
+  Test::Script: '1.05'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-FastExport
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '0'
+  Git::Repository: '0'
+  List::Util: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-FastExport
+  repository: http://github.com/book/Git-FastExport.git
+version: '0.107'
+x_contributors:
+  - 'Yves Orton <yves@cpan.org>'
+  - 'Aristotle Pagaltzis <aristotle@cpan.org>'
+  - 'Roger Gammans <rgammans@gammascience.co.uk>'
+  - 'Oliver Paukstadt <pstadt@cpan.org>'
+  - 'Jean-Baptiste Mestelan <mestelan@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

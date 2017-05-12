@@ -1,0 +1,255 @@
+=head1 Name
+
+Gantry::Docs::DBConn - how database connection info flows through Gantry
+
+=head1 Intro
+
+One of the problems with separating models from the rest of any application
+is how to inform the model of the database connection information.  This
+document explains how that information makes its way to the model.
+
+This document does not apply to DBIx::Class, which has a cleaner way
+of moving this information from conf to code.  See
+Gantry::Plugins::DBIxClassConn for how Gantry works with dbic.
+
+=head1 Environments (a.k.a. Engines)
+
+Gantry supports plugable engines.  Currently there are engines for CGI
+and mod_perl versions 1.3, and 2.0.  Further, many gantry apps have
+scripts which also want to use the models.  There is now a comprehensive
+solution for all of these.
+
+=head2 Scripts
+
+The simplest environment is the script.  A script has essentially three
+choices for where to obtain connection information: (1) hard
+coded in the script, (2) taken from the command line, (3) taken from
+a config file (which could be an apache conf).
+
+Where the information comes from matters not to the gantry.  Once you know
+where your information will come from, you have two options for passing it
+to the model.
+
+If the information is known at compile time (i.e. it is hard coded), you
+may simply say:
+
+    use Gantry::Utils::DBConnHelper::Script {
+        dbconn => 'dbi:Pg:dbname=some_db;host=127.0.0.1',
+        dbuser => 'someone',
+        dbpass => 'super_secret',
+    };
+
+Note that the dbconn key must have the full dsn needed by the DBI's connect
+method.  This is true for all environments.
+
+If you must calculate the information do the above in two steps:
+
+    use Gantry::Utils::DBConnHelper::Script;
+
+    # pull in your information from command line or conf file
+
+    Gantry::Utils::DBConnHelper::Script->set_db_conn_info(
+        {
+            dbconn => $dsn,
+            dbuser => $dbuser,
+            dbpass => $dbpass,
+        }
+    );
+
+Note that in both cases you should pass a hash reference.
+
+If you need to access models which inherit from Gantry::Utils::AuthCDBI
+(or one of its authentications cousins), you need to also call
+set_auth_db_conn_info on Gantry::Utils::DBConnHelper::Script.
+That call is the same as the one for set_db_conn_info, except that
+the hash keys are auth_dbconn, auth_dbuser, and auth_dbpass.
+
+=head2 mod_perl
+
+Gantry is ready to help you with connection information.  The normal approach
+is to use PerlSetVars in your httpd.conf:
+
+    <Location />
+        PerlSetVar dbconn dbi:Pg:dbname=some_db;host=127.0.0.1
+        PerlSetVar dbuser someone
+        PerlSetVar dbpass super_secret
+
+        PerlSetVar auth_dbconn dbi:Pg:dbname=auth_db;host=127.0.0.1
+        PerlSetVar auth_dbuser auth_user
+        PerlSetVar auth_dbpass double_super_secret
+    </Location>
+
+=head2 CGI
+
+Note that gantry does user authentication, but only in the mod_perl
+environment at present.  Even so, some of your models may inherit
+from an auth utils module.  In that case, you need to provide the auth
+values below.
+
+Gantry also helps CGI scripts.  Simply include the dbconn, dbuser, and
+dbpass keys (and their auth counterparts, if needed) in the config section
+of the hash you pass to Gantry::Engine::CGI->new:
+
+    my $cgi = Gantry::Engine::CGI->new( {
+        locations => {
+            '/' => 'App::Base',
+            # ...
+        },
+        config => {
+            # ...
+            dbconn => 'dbi:Pg:dbname=some_db;host=127.0.0.1',
+            dbuser => 'someone',
+            dbpass => 'super_secret',
+        }
+
+=head1 Internals
+
+So, how does the data flow?  Of course, it depends slightly on the environment.
+Each has its own source of data and therefore its own scheme.  But they all
+conform to a single API described here.
+
+Let's start at the other end.  When any gantry model wants to use a database,
+it calls db_Main.  That method is responsible for returning a working dbh.
+Here is the db_Main from Gantry::Utils::CDBI (the others look strikingly
+similar):
+
+    sub db_Main {
+        my $dbh;
+
+        my $helper = Gantry::Utils::DBConnHelper->get_subclass();
+
+        $dbh       = $helper->get_dbh();
+
+        if ( not $dbh ) {
+            my $conn_info = $helper->get_conn_info();
+
+            $db_options->{AutoCommit} = 0;
+
+            $dbh = DBI->connect_cached(
+                    $conn_info->{ 'dbconn' },
+                    $conn_info->{ 'dbuser' },
+                    $conn_info->{ 'dbpass' },
+                    $db_options
+                    );
+            $helper->set_dbh( $dbh );
+        }
+
+        return $dbh;
+
+    } # end db_Main
+
+So, there is a base class Gantry::Utils::DBConnHelper which can return
+the subclass which assists the current model.  That subclass responds
+to get_dbh with a cached handle if one is available (or undef if not).
+If the handle is true, it is returned directly.  Otherwise, the if
+block asks the helper for the connection info as a hash reference.
+Then it uses that to connect to the database.  Finally, it gives the
+helper subclass the newly minted connection handle for caching.
+
+This completely separates the concerns of the modules.  The model knows
+how to connect to a database, but relies completely on the helper to
+know what database connection info to supply AND for caching of connections,
+enabling each environment to cache in the most resonable way.
+
+=head2 Gantry::Util::DBConnHelper
+
+The base class for all helpers is Gantry::Util::DBConnHelper.  It is mostly
+a documentation module.  It does have an import method so scripts with
+hard coded connection info can save a statement.  Further, it has two class
+accessors: get_subclass and set_subclass.  The former is called by the
+model, so it will know which class is actually providing the connection
+info for and caching of handles.  The later is called by the subclasses
+of Gantry::Util::DBConnHelper.
+
+=head2 Subclasses of Gantry::Util::DBConnHelper
+
+The easiest way to understand the subclasses of the connection helper is to
+see an example.  The simplest example is the script helper.  I'll show
+just the regular connection routines (since auth works the same with
+'auth_' in front of 'db' in all variable names and hash keys).
+
+    package Gantry::Utils::DBConnHelper::Script;
+    use strict; use warnings;
+
+    use base 'Gantry::Utils::DBConnHelper';
+
+    Gantry::Utils::DBConnHelper->set_subclass(
+        'Gantry::Utils::DBConnHelper::Script'
+    );
+
+    my $dbh;
+    my $conn_info;
+
+    sub get_dbh {
+        return $dbh;
+    }
+
+    sub set_dbh {
+        my $class = shift;
+        $dbh      = shift;
+    }
+
+    sub get_conn_info {
+        return $conn_info;
+    }
+
+    sub set_conn_info {
+        my $class  = shift;
+        $conn_info = shift;
+    }
+
+    1;
+
+At the top of the script we see that the module's full name is
+Gantry::Utils::DBConnHelper::Script and that it inherits from
+Gantry::Utils::DBConnHelper.
+
+The first thing it should do is register with the base class.  There
+can only be one connection helper in a given environment, so
+it calls the class method set_subclass with its own name.  Now the
+base module will tell db_Main that this is the subclass with the info
+and cache.
+
+The remainder of the script implements the simplest possible scheme
+for storing connection information and cached database handles.
+
+Remember that scripts call set_conn_info directly (Gantry::Engine::CGI
+does this in its constructor) or supply the info in a hash reference
+parameter to use.  The other methods are called by db_Main as needed.
+
+The other helpers work similarly with two differences.  Obviously,
+they use different caching schemes (mod_perl helpers use pnotes).
+But, set_conn_info is also handled differently.  Here's where they
+are:
+
+    engine type   where set_conn_info is called
+    -----------------------------------------------------------
+    scripts       manually before database work begins
+    CGI           Gantry::Engine::CGI->new
+    mod_perl      not called, params are fished from dir_config
+                  on every request
+
+So, the Gantry::Utils::DBConnHelper subclasses for mod_perl engines
+fish their connection information directly from the set vars in
+their get_conn_info methods.
+
+=head1 Auth Differences
+
+If you use any model class which inherits from a module with Auth in
+the name, you need to supply the auth_* parameters in PerlSetVars (for
+mod_perl), as config hash keys (for CGI), or in a call to set_auth_conn_info
+(for self standing scripts).
+
+=head1 Author
+
+Phil Crow <philcrow2000@yahoo.com
+
+=head1 Copyright and License
+
+Copyright (c) 2006, Phil Crow.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -1,0 +1,488 @@
+Changes
+=======
+
+All changes by Daisuke Maki unless otherwise noted.
+
+0.09008 Mon Jul 28 2008 [418]
+  [Component::Throttle]
+  - Replace Data::Throttler with Data::Valve
+
+0.09007 Tue Jan 29 2008 [rev 409]
+  [General]
+  - Properly install gungho script
+  - Update tutorial
+
+  [RobotRules::DB_File]
+  - Be more paranoid
+
+0.09006 Thu Jan 17 2008 [rev 403]
+  - Check pending request before decrementing the count
+
+0.09006_01 Thu Dec 13 2007 [rev 399]
+  [General]
+  - Utilize the new META.yml stuff for search.cpan.org
+
+  [Engine::POE]
+  - Fix how 'spawn' was being handled. Patch by Kazuho Oku
+  - Fix t/03_live/perl-proxy.t. Patch by Kazuho Oku
+
+  [Throttle::Provider]
+  - Added a new Throttle::Provider component, which can throttle the
+    number of calls to the provider's dispatch_requests() method.
+
+0.09005 Mon Dec 03 2007 [rev 391]
+  [General]
+  - Add site-crawler example
+  - Update docs/ja/Gungho.pod
+
+0.09005_04 Sat Dec 01 2007 [rev 387]
+  [General]
+  - Add encoding to Japanese docs
+
+  [Request]
+  - Fix cloning multiple notes on the request. Patch by Jeff Kim
+
+  [RobotRules]
+  - Fix handling rules noted by '*'. Patch by Jeff Kim
+
+  [Plugin::Apoptosis]
+  - Fix calling methods
+
+0.09005_03 Thu Nov 29 2007 [rev 371]
+  [General]
+  - Implement a $c->shutdown, and Engnie/Provider/Handler->stop that will
+    stop the entire system
+  - Ahem, *do* index the Japanese documentation (but change the names)
+
+  [Provider::Inline]
+  * Backwards Incompatible Change *
+    - Provider::Inline will no longer dispatch your requests merely by
+      placing them in $p->requests. You need to call send_request() yourself
+
+  [RobotRules]
+  - Deprecate usage of "module: RobotoRules::Storage::XXXX". Now you don't
+    have to type that much. Just say "module: XXXX". This will break your
+    old code! Beware!
+
+  [Apoptosis]
+  - Call shutdown() instead of setting is_running
+
+  [Tests]
+  - Fix a few failing tests
+
+0.09005_02 Tue Nov 27 2007 [rev 348]
+  [General]
+  - Tweak deps
+  - Don't index Japanese documentation
+  - Fix 02_config.t to check for contents rather than entire structure.
+    Seems like some YAML versions reads in the '---' in the beginning of the
+    YAML document
+  - Add Gungho::Base::mk_virtual_methods()
+  - Fix a bunch of typos in Japanese docs
+
+  [RobotRules::Storage]
+  - Explicitly state methods that should be virtual methods.
+
+0.09005_01 Mon Nov 26 2007 [rev 328]
+  [General]
+  - Migrate hooks to Event::Notify. This breaks the input parameter list.
+    Now you receive the event name as the first argument
+  - Add a TODO.pod
+
+  [Engine::POE]
+  - Implement a shutdown state.
+  - Make it callable from stop()
+
+  [Engine]
+  - Refactor handle_response to Engine.pm
+
+  [Throttle]
+  - Changed send_request() to return 1 on success, 0 otherwise.
+
+  [RobotRules]
+  - DB_File storage now dies if the call to tie() fails
+
+  [Log::Dispatch]
+  - Clarify in document that log config should be specified with "config"
+    key.
+  - Backport changes from ja docs
+
+
+0.09004 Mon Nov 12 2007 [rev 276]
+  [General]
+  - Fix bug in detecting provider/handler
+
+0.09003 Mon Nov 12 2007 [rev 276]
+  [General]
+  - Refactor Gungho::Inline into Gungho::Provider::Inline and 
+    Gungho::Handler::Inline.
+  - Add support for coderefs in provider/handler config parameters
+  - Release 0.09003
+
+0.09003_04 Sun Nov 11 2007 [rev 271]
+  [General]
+  - Add $c->pushback_request. Don't use $c->provider->pushback_request anymore!
+  - Add Gungho::Util
+  - Add Gungho::Manual::FAQ
+
+0.09003_03 Fri Nov 09 2007 [rev 258]
+  [POE]
+  - Note: Changes for POE engine contained in this release are relatively
+    critical. If you were having problems before, you probably should check
+    this release out.
+  - Be smarter how dispatch() gets called. Now we do a more effective
+    invocation of the dispatch state so that we don't waste cycles just
+    trying to dispatch requests.
+  - Allow "0" setting in keepalive.keep_alive. This is a very important
+    parameter if you're using Gungho through a proxy. If you enable this
+    while under a proxy, PoCo::Client::Keepalive will think that you should
+    be using the cached connection to the proxy and so Gungho will lose all
+    parallism.
+  - Allow setting the number of PoCo::Client::HTTP to be spawned via
+    client.spawn parameter. This is required if you're dealing with 
+    relatively large amounts of URLs at once. Otherwise, PoCo::Client::HTTP
+    will tend to jam up after a while.
+
+0.09003_02 Thu Nov 08 2007 [rev 258]
+  [Throttle]
+  - Fix Throttling to delegate throttling decisions. This allows you to
+    stack throttlers.
+  - Update prerequisite for Data::Throttler::Memcached
+
+0.09003_01 Thu Nov 08 2007 [rev 254]
+  [General]
+  - Upload blunder. I meant to upload this as 0.09002_01, but I forgot to
+    rename the file. I don't wish for 0.09002 to be a general release, so
+    heres' 0.09003_01 with no code changes.
+
+0.09002_01 Thu Nov 08 2007 [rev 253]
+  [General]
+  - DNS will not be resolved by Gungho if you do one of the following:
+    * specify dns => { disable => 1 } in your config
+    * specify client => { proxy => ... } in your config (POE engine only)
+    * specify HTTP_PROXY in the environment (POE engine only)
+
+  [Tests]
+  - Add more tests
+
+0.09001 Fri Nov 02 2007 [rev 248]
+  [General]
+  - No code changes
+  - Update to Module::Install 0.68
+
+0.09000 Tue Oct 30 2007 [rev 247]
+  [General]
+  - We shall call this the beta release.
+  - Redo main doc
+  - Change defaults for Engine feature
+  - Fix calls where $engine->_http_error() was happening to $c->_http_error()
+
+  [RobotRules]
+  - Fix spurfulous exception
+
+0.09000_03 Tue Oct 30 2007 [rev 240]
+  [General]
+  - Add a new dispatch.dispatch_requests hook
+  - Add a new engine.end_loop hook
+  - Add prepare_response() to make sure response objects are Gungho::Response
+
+  [Plugins]
+  - Change when the apoptosis check runs.
+  - Add Statistics Plugin. It's still not really useful.
+
+  [RobotsMETA]
+  - Only parse Robots META if the request is a success
+  - Don't call $res->uri.
+
+0.09000_02 Mon Oct 29 2007 [rev 225]
+  [General]
+  - Fix POD errors
+  - Fix dependency errors
+  - Fix Gungho::Log::Simple 
+
+  [Plugins]
+  - Add Gungho::Plugin::Apoptosis
+
+0.09000_01 Thu Oct 25 2007 [rev 217]
+  [General]
+  * Backwards Incompatible Change *
+  - Gungho inheritance has been reimplemented. Components are now called
+    before Gungho::Component::Core, so things work a bit more like normal
+    inheritance.
+  - Gungho now uses Class::C3::Componentised and does Gungho->load_components()
+  - Previously, Gungho->setup was the only thing required to setup the
+    framework, but from now both Gungho->bootstrap and Gungho->setup needs
+    to be called
+  - Private IP blocking has been factored out to Component::BlockPrivateIP.
+    You no longer specify block_private_ip_address setting, but instead
+    you load BlockPrivateIP in the component list. See the documentation
+    for BlockPrivateIP POD
+  - Refactor Gungho::Base and separate out Gungho:Base::Class
+
+  [Engine]
+  - Change Gungho::Engine::POE's default loop_delay to 1
+
+  [Scraper]
+  - Add new Scraper component, which allows you to use Web::Scraper from
+    within Gungho
+
+  [Log]
+  - Fix calling syntax for Gungho::Log::*::setup
+
+  [Tests]
+  - A few bogus tests have been fixed
+  - POD coverage now ignores RequestTimer
+
+0.08016 Sun Oct 21 2007 [rev 206]
+  [Tests]
+  - Be more paranoid about testing.
+    Much thanks to David Cantrell for his automated testing.
+
+0.08015 Sat Oct 20 2007 [rev 200]
+  [Plugins]
+  - Deprecate Plugin::RequestTimer
+  - Update RequestLog log format.
+
+  [POE Engine]
+  - Set default timeout to be 60
+
+0.08014 Thu Oct 18 2007 [rev 194]
+  [General]
+  - Makefile.PL now tries harder to silece CPAN::Reporter warnings.
+  - Update module dependencies.
+  - Remove modules that have optional dependencies from t/01_load.t
+  - Use Gungho::Request instead of HTTP::Request
+
+  [Tests]
+  - Add more component tests.
+
+  [Cache]
+  - Fix docs
+
+  [RobotRules]
+  - Fix RobotRules::Storage::Cache so that Cache modules with different
+    API (i.e. delete vs remove) now work
+
+0.08013 Sun Oct 14 2007 [rev 182]
+  [RobotRules]
+  - Add expiration configuration parameters so that ttl for each robot rules
+    can be configured
+  - Add get_pending_robots_txt() and push_pending_robots_txt(). Pending
+    requests are now controled in the Storage::* classes
+  - Fix calling API for Storage::Cache, so that it also works for Cache::Memcached::Managed
+  - Fix a problem where RobotRules::Cache (which is distributed) couldn't
+    figure out that a robots.txt request has been dispatched.
+
+0.08012 Sun Oct 14 2007 [rev 175]
+  [Log]
+  - *Backwards Incompatible Change*
+    - Gungho::Log has been totally redesigned the following methods are
+      now deprecated. Calling $c->debug(...) and such still work, but
+      log setup has been completely changed.
+      is_debug() and friends still exist, but they have been deprecated,
+      and always return false.
+    - engine.send_request hook has been moved to *right* before the 
+      request is sent
+  - Introduce Gungho::Log::Dispatch. Gungho::Log has now been re-implemented
+    as Gugho::Log::Simple.
+  - Introduce Gungho::Plugin::RequestLog
+
+0.08011 Wed Oct 10 2007 [rev 166]
+  [RobotRules]
+  - Fix problems with RobotRules::Storage::* not properly accepting
+    configuration parameters.
+  - RobotRules::Storage::* now accept a $c in the first argument
+
+0.08010 Wed Oct 10 2007 [rev 158]
+  - Accept Data::Throttler::Memcached as the throttling engine as well.
+
+0.08009 Mon Oct 01 2007 [rev 157]
+  - New Cache component! Now you can cache anything, anywhere in your app.
+
+0.08008 Mon Oct 01 2007 [rev 155]
+  [General]
+  - Make sure that the URI object is one that has the host() method at
+    various places
+  - Make block_private_ip_address() to accept an URI object.
+
+  [Tests]
+  - Disable localhost tests, as there are environments where this doesn't
+    work.
+
+0.08007 Sat Sep 29 2007 [rev 149]
+  [RobotRules]
+  - Fix how parameters are passed
+  - Fixed a problem where Gungho would go in an infinite loop, if robots.txt 
+    didn't exist. 
+
+0.08006 Fri Sep 28 2007 [rev 145]
+  [General]
+  - Fix double-setting the host header. Reported by Keiichi Okabe
+  - Fix Gungho::Request->clone to actually clone the contents of notes()
+  - Attempt to use DNS lookup result from previous request, if the
+    request has been cloned.
+
+0.08005 Mon Sep 03 2007 [rev 142]
+  [General]
+  - Add docs
+  - Fix dependencies
+  - Properly receive user_agent from config
+
+  [POE Engine]
+  - Make sure that client: agent: is respected. However, this is an exception
+    in the POE engine. If you are using only one user agent, you should be
+    using user_agent. Reported by Keiichi Okabe
+
+  [Tests]
+  - Added t/03_live/twitter.t, but twitter is currently responding with
+    urls like balancer://twitter_cluster/statuses/update.json, so it will
+    most likely fail anyway.
+
+0.08004 Wed Jul 25 2007 [rev 130]
+  [General]
+  - Previously block_private_address was blocking all addreses.
+    Fixed (Kazuho Oku)
+  - Previously private addresses were only checked after a DNS resolution.
+    Now given an address that contains IP addresses to begin with are
+    also checked (Kazuho Oku)
+  - Local addresses other than loopback (127.0.0.1) are also checked.
+
+  [POE Engine]
+  - Parameters can now be passed to PoCo::Client::DNS (Kazuho Oku)
+
+  [Build]
+  - Retooled the tests.
+  - Fixed requires list.
+
+0.08003 Mon May 28 2007 
+  - *Backwards Incomptible Change*
+    - 127.0.0.1 is now considered a private IP address, when 
+      block_private_ip_address is in use (Kazuho Oku).
+  - 192.160.*.* was being considered a private IP address instead of
+    192.168.*.* (Kazuho Oku).
+  - The handler wasn't properly called when DNS lookups failed (Kazuho Oku)
+  - Fix t/03_live/perl.t to reflect recent API changes.
+
+0.08002 Tue May 15 2007 [rev 111]
+  - Some remaining pieces of code that were assuming Gungho to be an
+    object failed to execute at Class::Accessor::Fast. Spotted by
+    Keiichi Okabe.
+  - Make sure to force robots.txt request to be query-less and fragment-less
+
+0.08001 Tue May 15 2007 [rev 108]
+  - No code change
+  - Doc blunder
+  - Hide HTTP::Response from PAUSE
+
+0.08 Tue May 15 2007 [rev 107]
+  - *API Incompatiblity*
+    - Gungho::Inline->run()'s parameter list changed so that it can accept
+      a config file name (or a hashref, like Gungho->run), and a second
+      hashref that contains the code references.
+    - Parameter ordering for Gungho::Inline's provider and handler has been
+      changed so that it resembles that of regular providers and handlers
+    - The old behavior for both of the above changes are still preserved
+      if you specify the GUNGHO_INLINE_OLD_PARAMETER_LIST environment
+      variable, or if you specify sub Gungho::Inline::OLD_PARAMETER_LIST { 1 }
+  - Implement blocking of private DNS names from lookups. By default
+    this is disabled. To enable, set block_private_ip_address
+  - So that method names for POE events are clearly marked as such,
+    all methods that are mapped to POE events in Engine::POE are now
+    prefixed with _poe_* (including private methods)
+  - Change the way components are invoked. Components are now invoked via
+    maybe::next::method() chain, and if a component should want to stop
+    processing somewhere in the chain, it should raise an exception
+  - Add Gunghoe::Component::RobotRules
+  - GUNGHO_DEBUG environment variable is now respeced
+  - Don't throttle (again) a request if it has gone through DNS-resolution 
+    path internally.
+
+0.07 Tue May 08 2007 [rev 90]
+  - Add asynchronous DNS lookups for POE, IO::Async, Danga::Socket engines
+  - Add dependency on Danga::Socket::Callback, if we're using Danga::Socket engine
+
+0.06 Tue May 08 2007 [rev 85]
+  - Add a new engine based on IO::Async
+  - Add a simple FileWriter handler
+  - Fix documentation and remove ->new()
+  - Fix documentation and add contributors
+  - Tweak the user-agent
+  - Add optional deps for Class::C3::XS
+
+0.05 Sun May 06 2007 [rev 71]
+  - *API Incompatiblity*
+    - Gungho->new has been deprecated in favor of a simple call to ->run()
+    - Gungho::Inline->new has been deprecated
+  - Fix SKIP_DECODED_CONTENT handling by properly specifying a package.
+    POE workaround should now work.
+  - Gungho::Engine::POE will set FollowRedirect to 1 by default.
+
+0.04 Tue Apr 17 2007 [rev 61]
+  - Add Gungho::Inline - thanks to Kazuho Oku
+  - Add way to control logging behavior
+  - Allow comments in files for Provider::Simple
+  - Work around POE trying to decode contents for us.
+
+0.03 Thu Apr 12 2007 [rev 51]
+  - Add simple examples at examples directory
+  - Add Danga::Socket engine -- this is a pretty crude implementation
+  - Add documentation.
+  - Fix G::Request's ID generation
+  - Change pushback_request()'s signature to include a $c
+
+0.02_05 Wed Apr 11 2007 [rev. 41]
+  - Provider::Simple wasn't exactly prepared for the new code path.
+    Fixed, and tested with Plagger
+
+0.02_04 Wed Apr 11 2007
+  - Throttle::Domain was actually checking for URL, not domains.
+
+0.02_03 Wed Apr 11 2007
+  - Packaging blunder. Add dep files for Throttle components
+
+0.02_02 Wed Apr 11 2007
+  - Add a gungho script
+  - Add throttling. You can now throttle your requests by domain or
+    simply by the number of requests in a specific amount of time.
+    Providers are now expected to handle "pushback" of requests when
+    a request has been throttled.
+  - Internal change: Code path to send requests has changed from
+    Gungho.pm doing the control to Provider doing the control
+
+0.02_01 Tue Apr 10 2007
+  - Add experimental component system
+    >>> NOTE <<< This is still subject to change *widely*
+  - Add Gungho->has_feature(X)
+  - Add WWW Authentication component -- now you can authenticate
+    your requests via Basic authentication
+  - Fix Gungho::Request->clone()
+  - Gungho::Provider::Simple respects the is_running() flag
+
+0.02 Mon Apr 09 2007
+  - Fix stupid bug in Gungho::Request
+  - Change the call syntax for G::Component->new(\%config) to 
+    G::Component->(config => \%config, %other_args)
+  - send_request() takes the context object as well
+  - Implement plugins
+  - Add G::Plugin::RequestTimer
+  - Add deps features in Makefile.PL 
+
+0.01 Sat 07 Apr 2007
+  - handle_response() now take $request and $response all over
+  - Add send_request() in Gungho.pm, Gungho/Engine/POE.pm
+  - Add notes() in Gungho/Request.pm. Cloning is properly handled
+
+0.01_04 Sat 07 Apr 2007
+  - Enable keepalive
+
+0.01_03 Fri 06 Apr 2007
+  - Fix embarassing documentation whoopla. As stated, no,
+    I'm not ashamed of stealing good code. 
+
+0.01_02 Fri 06 Apr 2007
+  - Add a new provider and small set of changes so that we can
+    use this in Plagger
+  - Use Class::Inspector to check if a module has been loaded
+
+0.01_01 Fri 06 Apr 2007 "It's right after YAPC" release
+  - Alpha release.

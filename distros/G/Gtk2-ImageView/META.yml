@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Gtk2-ImageView
+version:             0.05
+abstract:            Perl bindings for the GtkImageView widget
+license:             lgpl
+author:              
+    - Jeffrey Ratcliffe
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    ExtUtils::Depends:             0.2
+    ExtUtils::PkgConfig:           1.03
+    Glib:                          1.140
+    Gtk2:                          1.140
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
+
+configure_requires:
+   ExtUtils::Depends: 0.2
+   Glib: 1.140
+   Gtk2: 1.140
+   ExtUtils::PkgConfig: 1.03

@@ -1,0 +1,17 @@
+Changes
+ColorObject.pm
+Makefile.PL
+MANIFEST
+README
+t/01load.t
+t/02rgb.t
+t/03rgbhex.t
+t/03xyz.t
+t/04lab.t
+t/05colorbars.t
+t/06rgbbars.t
+examples/convert-color.pl
+examples/calculate-xyz-matrices.pl
+examples/draw-lab-colorspace.pl
+examples/chrom-adaptation-test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

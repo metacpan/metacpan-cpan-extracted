@@ -1,0 +1,35 @@
+NAME
+    Gentoo::PerlMod::Version::FixEbuild - Automatically fix an old-style
+    ebuild to a new style ebuild.
+
+VERSION
+    version 0.1.1
+
+SYNOPSIS
+    This module is severely incomplete and only 'Just Works'.
+
+    see the accompanying script for usage.
+
+    This is currently my poorest quality module on CPAN, and this is just a
+    release to get this horrible beast off my machine.
+
+    The code is horrible, and far too complex for this and needs a serious
+    overhaul. (yes, already, too much featureitis )
+
+METHODS
+  fix_file
+        $instance->fix_file( @file_list )
+        $instance->fix_file( $file );
+        $instance->fix_file( \%config_overrides , @file_list );
+
+    Fixes the given files.
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

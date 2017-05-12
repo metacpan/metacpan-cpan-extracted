@@ -1,0 +1,19 @@
+Revision history for Games-Dice-Loaded
+
+0.002     2013-01-12 14:56:48 Europe/London
+
+0.001     2012-01-11 19:17:28 Europe/London
+
+	- Some tests to see that we do actually produce the desired distribution
+
+	- Added Test::Probability, a module for performing these tests
+
+	- More use of statistical language in the docs
+
+	- die() rather than croak()ing on internal consistency errors.
+
+0.001_01  2012-01-10 23:34:43 Europe/London
+
+	- Implementation of the algorithm.
+
+	- Some simple sanity checks.

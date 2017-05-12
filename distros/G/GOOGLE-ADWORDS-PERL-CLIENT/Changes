@@ -1,0 +1,222 @@
+2.15.0
+- Removed support for v201306.
+
+2.14.0
+- Added examples and support for v201402.
+
+2.13.0
+- Removed support for v201302.
+
+2.12.0
+- Added examples and support for v201309.
+- Removed examples and support for v201209.
+- Bug fixes to issues #58, #61.
+
+2.11.0
+- Added examples and support for v201306.
+- Added package Google::Ads::AdWords::Reports for reporting classes.
+- Removed units count from the Client, units are not longer used.
+
+2.10.0
+- Added support and examples for AdGroupBidModifierService.
+- Created a new migration examples folder and moved set_campaign_enhanced.pl
+  into it.
+- Added an example for upgrading legacy sitelinks.
+
+2.9.0
+- Removed support for OAuth1.0a.
+- Added support for OAuth2 Service Accounts.
+- Removed support for sunset v201206 version.
+- Bug fixes to issues #56, #57, #58.
+
+2.8.1
+- Bug fixes to issues #54 and #55.
+
+2.8.0
+- Added examples and support for v201302.
+
+2.7.6
+- Added examples for supporting enhanced campaigns through forward compatibility
+  maps.
+
+2.7.5
+- Removed re-definitions of SOAP::WSDL packages. Implemented a cleaner solution
+  based on inheritance. No more need to import the Client module before any
+  other SOAP::WSDL object.
+- Removed unneeded dependency on the CHI module.
+
+2.7.4
+- Removed support of versions v201109 and v201109_1.
+- Bug fixes to issues #50 and #51.
+
+2.7.3
+- Added support for v201209 and code examples.
+- Added support to new reports download error format.
+
+2.7.2
+- Fixes to issues #46 and #49.
+- Changes to the handle_two_factor_authorization_error.pl code example, to
+  adopt the latest authorization logic.
+
+2.7.1
+- Bumped default version to v201206.
+- Fixes to issues #43 and #45.
+
+2.7.0
+- Added support for v201206.
+- Added support for OAuth2 and complete revamp of the authorization logic.
+
+2.6.1
+- Changes to the library user-agent.
+- Enabled gzip compression, please refer to the README for more details.
+- Added support to ActivePerl v5.14 32bit version in Windows environments.
+- Addressing feature request #42.
+
+2.6.0
+- Added support, examples, and tests for v201109_1.
+
+2.5.6
+- Removed support to BulkOpportunityService, due to its sunset.
+- Added API request accounting capabilities (request, operations and units
+  count and logging). See README for more details.
+- Added checks to ensure the Google::Ads:AdWords::Client is loaded before any
+  other library modules. Contribution by Curtis "Ovid" Poe <ovid@cpan.org>.
+- Improved code examples to handle multiple entities per request and show the
+  use of optional fields.
+- Added example to show how to retrieve statistics from services. See
+  examples/v201109/reporting/get_campaign_stats.pl
+
+2.5.5
+- Added functional tests for most used API services and code examples.
+- Added support for captcha challenges.
+- Added handle_captcha_challenge.pl example to demonstrate how to
+  programmatically deal with captchas.
+- Removed support of deprecated versions in preparation for upcoming sunset,
+  refer to http://googleadsdeveloper.blogspot.com/2012/01/55-days-until-adwords-api-deprecation.html
+
+2.5.4
+- Fixed issue 39.
+
+2.5.3
+- v201109 code examples re-organization. No library changes.
+
+2.5.2
+- Adding support and example for CreateAccountService.
+- Fixes to get_account_hierarchy.pl example to correctly handle Sandbox
+  response.
+- Fix and test to issue #37.
+
+2.5.1
+- Added required developerToken header to reports download.
+- Bug fixes on handling report download statuses.
+- Fixes to OAuth logic to better handle misconfigurations.
+- Better documentation on OAuth example.
+
+2.5.0
+- Added support and examples for v201109.
+- Added support and example for downloading ad hoc reports.
+- Deprecated support for clientEmail in v201109.
+
+2.4.6
+- Fixed issue 28.
+- Fixed an issue with a broken image used for image ads examples.
+
+2.4.5
+- Added OAuth support.
+- Added full XPath support, so now XPath queries can be executed over on
+  SOAP returned object.
+
+2.4.4
+- Fixed issues 25, 26 & 27.
+- Fix an issue with incorrect mapping of SOAP faults.
+
+2.4.3
+- Fixed issue 24.
+- Added support to cross-client reports.
+- Added add_mcc_report_definition.pl and download_mcc_report.pl code examples.
+
+2.4.2
+- Fixed issues 22 and 23.
+- CHANGED the logic on logging initialization, when relying on default
+  logging configuration, logs are now created under the user home folder and
+  not spuriously on every directory where scripts are executed.
+- Added missing auto-generated files for ConversionTrackerService and
+  BulkOpportunity service, please discontinue using version 2.4.1 if planning
+  to use either of those services.
+
+2.4.1
+- Added support to BulkOpportunityService and code examples.
+- Added support to ConversionTrackerService and code examples.
+- Modified add_user_list.pl code example to demonstrate how to also retrieve
+  the associated conversion tracker code snippet.
+
+2.4.0
+- Added support to v201101 release.
+- Added code examples for v201101 release.
+- Added to support to complex SOAP exceptions; SOAP exceptions containing
+  objects are correctly mapped and returned as Perl objects.
+- Added support to XPath searches on the top returned SOAP Object, see
+  get_all_campaign_budgets.pl example.
+
+2.3.0
+- Added support to hashes for sending and receiving data to the API.
+- Added add_campaign_using_hashes.pl and get_active_campaigns_using_hashes.pl
+  code examples for v201008.
+- Added support for handlePartialFailures header.
+- Added handle_partial_failures.pl code example for v201008.
+- Added support for the returnMoneyInMicros header in ReportUtils.
+
+2.2.0
+- Added support for v201008 additional services (AlertService,
+  CustomerSyncService, UserListService), with examples.
+- Added examples on how to query and remove BulkMutateJobs.
+- Bug fixes on unit tests (http://goo.gl/USi1, http://goo.gl/HLrQ)
+
+2.1.0
+- Added support for v201008, with examples.
+- Added ability to reuse authToken without first creating new one.
+- Updated ReportUtils error regex.
+- Added ability to turn off auth token cache and added a method to manually
+  force auth token generation.
+- Added support to partial failures.
+- Added the ability to change the auth server.
+- Added ErrorUtils classes to handle ApiError objects.
+- Bug fixes to SOAP:WSDL module to more intelligently manage xsi:type.
+- Added more robust unit test for core classes.
+
+2.0.0
+- Added support to all services in v201003.
+- Added a better logging infrastructure adding support for to Log4perl module.
+- Added more examples.
+- Removed dependencies on experimental version of the SOAP::WSDL module.
+  Instead the module can be installed directly from CPAN and no need to manual
+  patch is required.
+  IMPORTANT: Due to this change now specific generated API objects, and not
+  generic type-maps/hashes are returned on API calls, so access to
+  object attributes need to be done via get_/set_{attribute} methods. Refer to
+  examples on how to handle these objects.
+- Methods to retrieve units and operations information (get_total_unit_count,
+  get_last_unit_count, get_total_operation_count, get_last_operation_count,
+  get_last_response_time, get_last_request_id, get_last_soap_request,
+  get_last_soap_response) have been temporally removed from the Client object.
+  Support to those will be added in a future release.
+
+1.3.0
+- Added support for the 'cm' services in v200909.
+
+1.2.1
+- Added support for the applicationToken header.
+- Updated example code to show API unit usage information.
+
+1.2.0
+- Removed support for v200902.
+- Added support for v200906, both in the Sandbox and Production environments.
+- Modified sample code to use v200906.
+- AuthToken.pm now uses URI::Escape for encoding its parameters.
+
+1.1.0
+- Support for updates to v200902 Sandbox WSDLs.
+
+1.0.0
+- Initial release of the Google::AdWords::Client AdWords API client library.
+- Support is limited to the AdWords API v200902.

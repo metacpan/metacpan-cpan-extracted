@@ -1,0 +1,11 @@
+Revision history for Perl extension GPS::Magellan.
+
+0.06  Tue May 20 20:40:00 2003
+    - Code cleanups
+    - GPS::Magellan::command() is now a public function to send
+      arbitrary commands to the device
+    - POD for GPS::Magellan
+
+0.05  Mon Apr 21 22:24:03 2003
+	- Initial release
+

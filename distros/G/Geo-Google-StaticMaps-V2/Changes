@@ -1,0 +1,50 @@
+Revision history for Perl module Geo::Google::StaticMaps::V2
+
+TODO
+  - Path encode uses URI escape which escapes too many characters
+
+0.12 2016-01-18
+  - Updated Path->encode capibilty to support colors
+ 
+0.11 2016-01-16
+  - Added Path->encode property to encode path in Google's Encoded Polyline Algorithm Format
+
+0.10 2013-07-08
+  - Updated save method to set binmode on file handle to support Windows platforms
+
+0.09 2013-06-16
+  - Updated packages to support Perl < 5.10
+
+0.08_2 2013-06-13
+  - Updated Documentation
+
+0.08 2013-06-13
+  - Updated path->color, path->fillcolor, and marker->color methods
+    - Added color format support [$r,$g,$b],
+    - Added color format support {r=>$r,g=>$g,b=>$b}
+    - Added path color alpha support "10%" or 0-255
+    - Added tests
+
+0.07 2013-06-13
+  - Updated map->save method to set format (localized!) based on file extension unless defined
+  - Added map->visible method and refactored the Path and Markers packages
+
+0.06 2013-06-13
+  - Updated documentation
+
+0.05 2013-06-12
+  - Added Google Maps API Signature capability
+
+0.04 2013-06-10
+  - Fixed Makefile.PL requires
+  - Added RPM spec file
+  - Added t/006_save.t
+
+0.03 2013-06-09
+  - Path method and object are now fully operational
+
+0.02 2013-06-09
+  - Marker method and object are now fully operational
+
+0.01 2013-06-09
+  - original version; created by ExtUtils::ModuleMaker 0.51

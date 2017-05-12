@@ -1,0 +1,5 @@
+TODO list for Graphics-Colourset
+================================
+1. Convert to use Dist::Zilla
+2. refine the 'is_ugly' function
+

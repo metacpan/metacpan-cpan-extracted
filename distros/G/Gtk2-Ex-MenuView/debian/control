@@ -1,0 +1,32 @@
+# Copyright 2008, 2010 Kevin Ryde
+
+# This file is part of Gtk2-Ex-MenuView.
+#
+# Gtk2-Ex-MenuView is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Gtk2-Ex-MenuView is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Gtk2-Ex-MenuView.  If not, see <http://www.gnu.org/licenses/>.
+
+Source: libgtk2-ex-menuview-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.1
+Homepage: http://user42.tuxfamily.org/gtk2-ex-menuview/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libgtk2-ex-menuview-perl
+Architecture: all
+Depends: perl (>= 5.8.0), libglib-perl, libglib-ex-objectbits-perl (>= 9), libgtk2-perl (>= 1:1.200), ${perl:Depends}, ${misc:Depends}
+Description: Menu of items from a TreeModel
+ Gtk2::Ex::MenuView presents rows of a TreeModel as menu items,
+ updating with changes in the model.

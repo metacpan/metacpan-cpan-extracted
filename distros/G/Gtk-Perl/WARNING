@@ -1,0 +1,15 @@
+
+ End Users: Nothing to see here, it's not a very important warning if you
+ just want to build Perl/Gtk+. Please see README for more useful
+ information.
+
+ Developers: Please be very careful about 'make clean' if you are modifying
+ this module. The cleaning process has been "adjusted" to properly clean up
+ all the assorted junk that accumulates when this module is built, but there
+ is a slight chance it is overzealous, and might remove a .c file that you
+ intended to keep. If this happens (or you can prove that it can't), please
+ tell me or fix Makefile.PL so that it doesn't do it again.
+ 
+Thanks (and sorry for the inconvenience),
+Kenneth Albanowski
+ 

@@ -1,0 +1,11 @@
+Release history for Gentoo-Dependency-AST
+
+0.001001 2013-10-23T12:38:02Z
+
+ [00 Trivial]
+ - Add MetaPOD annotations and graphs.
+ - Change travis.ci test system
+
+0.001000 2013-10-20T17:56:56Z
+ - First version.
+

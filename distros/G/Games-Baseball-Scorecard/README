@@ -1,0 +1,37 @@
+This is Games::Baseball::Scorecard, for generating baseball scorecards,
+and optionally filling out the lineups and even scoring a complete game.
+
+
+You must have mpost, mptopdf, and pdftex installed to fully use this module.
+
+I don't really know much about Metapost or TeX, so don't ask me.  However, I can
+say that I installed TeX on Mac OS X (10.3 Server and 10.4) using the i-Installer.
+
+    http://www.rna.nl/ii.html
+
+I just installed the basic TeX install.  All seems happy.
+
+
+See example.plx and example.pdf for ... examples.
+
+
+This archive can always be obtained from:
+
+    http://sf.net/projects/pudge/
+    http://www.cpan.org/authors/id/CNANDOR/
+
+The project homepage is:
+
+    http://projects.pudge.net/
+
+Please let me know how well it does(n't) work, and any changes you'd 
+like to see.   Thanks to all of the people who have sent me feedback
+and ideas.
+
+Copyright (c) 2005 Chris Nandor.  Licensed under the terms of the GNU General
+Public License, Version 2 available from http://www.gnu.org/copyleft/gpl.html.
+
+Front end to mpost_scorecard Copyright (c) 2005 Christopher Swingley,
+also licensed under the GPL.
+
+    http://www.frontier.iarc.uaf.edu/~cswingle/baseball/scorecards.php

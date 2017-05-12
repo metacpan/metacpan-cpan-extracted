@@ -1,0 +1,81 @@
+NAME
+    Geo::Coder::Google - Google Maps Geocoding API
+
+SYNOPSIS
+      use Geo::Coder::Google;
+
+      my $geocoder = Geo::Coder::Google->new(apikey => 'Your API Key');
+      my $location = $geocoder->geocode( location => 'Hollywood and Highland, Los Angeles, CA' );
+
+DESCRIPTION
+    Geo::Coder::Google provides a geocoding functionality using Google Maps
+    API.
+
+METHODS
+    new
+          $geocoder = Geo::Coder::Google->new(apikey => 'Your API Key');
+          $geocoder = Geo::Coder::Google->new(apikey => 'Your API Key', host => 'maps.google.co.jp');
+
+        Creates a new geocoding object. You should pass a valid Google Maps
+        API Key as "apikey" parameter.
+
+        When you'd like to query Japanese address, you might want to set
+        *host* parameter, which should point to *maps.google.co.jp*. I think
+        this also applies to other countries like UK (maps.google.co.uk),
+        but so far I only tested with *.com* and *.co.jp*.
+
+    geocode
+          $location = $geocoder->geocode(location => $location);
+          @location = $geocoder->geocode(location => $location);
+
+        Queries *$location* to Google Maps geocoding API and returns hash
+        refernece returned back from API server. When you cann the method in
+        an array context, it returns all the candidates got back, while it
+        returns the 1st one in a scalar context.
+
+        When you'd like to pass non-ascii string as a location, you should
+        pass it as either UTF-8 bytes or Unicode flagged string.
+
+        Returned data structure is as follows:
+
+          {
+            'AddressDetails' => {
+              'Country' => {
+                'AdministrativeArea' => {
+                  'SubAdministrativeArea' => {
+                    'SubAdministrativeAreaName' => 'San Francisco',
+                    'Locality' => {
+                      'PostalCode' => {
+                        'PostalCodeNumber' => '94107'
+                      },
+                      'LocalityName' => 'San Francisco',
+                      'Thoroughfare' => {
+                        'ThoroughfareName' => '548 4th St'
+                      }
+                    }
+                  },
+                  'AdministrativeAreaName' => 'CA'
+                },
+                'CountryNameCode' => 'US'
+              }
+            },
+            'address' => '548 4th St, San Francisco, CA 94107, USA',
+            'Point' => {
+              'coordinates' => [
+                '-122.397323',
+                '37.778993',
+                0
+              ]
+            }
+          }
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Geo::Coder::Yahoo,
+    <http://www.google.com/apis/maps/documentation/#Geocoding_Examples>
+

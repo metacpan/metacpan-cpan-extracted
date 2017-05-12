@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Graph/Centrality/Pagerank.pm
+scripts/examples_Graph_Centrality_Pagerank.pl
+t/001_test.t
+META.yml                                 Module meta-data (added by MakeMaker)

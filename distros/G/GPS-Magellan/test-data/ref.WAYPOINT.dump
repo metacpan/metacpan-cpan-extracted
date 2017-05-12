@@ -1,0 +1,222 @@
+$VAR1 = [
+          bless( {
+                   'icon' => 'a',
+                   'longitude' => '5220.484',
+                   'name' => 'EEMSSTRA',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00454.569',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000016'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'a',
+                   'longitude' => '5220.509',
+                   'name' => 'WPT001',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00454.571',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000019'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'a',
+                   'longitude' => '5220.879',
+                   'name' => 'WPT002',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00454.287',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000000'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'b',
+                   'longitude' => '5220.594',
+                   'name' => 'VIJFHOEK',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00500.759',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000006'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'b',
+                   'longitude' => '5220.188',
+                   'name' => 'GEHEIMEW',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00457.550',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000006'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'b',
+                   'longitude' => '5221.340',
+                   'name' => 'CACHE 1',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00452.158',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000006'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'c',
+                   'longitude' => '5221.635',
+                   'name' => 'FILMMUS',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00452.499',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000000'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'q',
+                   'longitude' => '5222.122',
+                   'name' => 'SHOP1',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00453.289',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000018'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'a',
+                   'longitude' => '5218.791',
+                   'name' => 'IKEA',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00456.851',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000018'
+                 }, 'GPS::Magellan::Coord' ),
+          bless( {
+                   'icon' => 'a',
+                   'longitude' => '5217.779',
+                   'name' => 'IKEA KOC',
+                   'description' => '',
+                   'fields' => [
+                                 'longitude',
+                                 'lnsign',
+                                 'latitude',
+                                 'ltsign',
+                                 'altitude',
+                                 'unknown',
+                                 'name',
+                                 'description',
+                                 'icon'
+                               ],
+                   'latitude' => '00458.101',
+                   'unknown' => 'M',
+                   'lnsign' => 'N',
+                   'ltsign' => 'E',
+                   'altitude' => '0000001'
+                 }, 'GPS::Magellan::Coord' )
+        ];

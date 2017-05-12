@@ -1,0 +1,16 @@
+/*
+ * style.css -- HTML style-sheet for Games::ScottAdams documentation
+ * $Id: style.css,v 1.3 2006/11/01 17:46:15 mike Exp $
+ */
+body { color: #000040; background: white }
+h1 { color: #ffffa0; background: #800000; margin-top: 20px;
+	padding: 5px 10px; border: 1px transparent }
+h2,h3,h4,h5,h6 { color: #600000 }
+.warning { color: #ff0000; background: #ffff80 }
+hr { border: 0 }
+pre {
+	background: #ffffc0;
+	border: 2px solid grey;
+	padding: 1em 0em;
+	margin: 1em 3em;
+}

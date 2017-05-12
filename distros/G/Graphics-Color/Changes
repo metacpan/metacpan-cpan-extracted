@@ -1,0 +1,103 @@
+Revision history for Graphics-Color
+
+0.28  March 27, 2010
+  - Rely on newer MooseX::Aliases (DSADINOFF, RT #70193)
+  - POD update
+
+0.27    December 27th, 2009
+  - Add MooseX::Storage
+  - POD updates
+
+0.26
+  - Add blurb to RGB explaining that 0 is "none" and 1 is "all" and that
+    alpha => 1 is opaque.
+
+0.25
+  - Fix warnings due to typos in tests (thanks SidBurn)
+
+0.24
+  - Use MooseX::Aliases for more powerful aliasing
+  - Use MooseX::Types for better types
+
+0.23
+  - Fix swapped G and B values in from_hex_string
+
+0.22
+  - Add from_hex_string to RGB
+
+0.21
+  - Remove auto_install
+  - Remove Storage, since I'm not using it
+  - Add ability for as_hex_string to prepend a string
+  - Add RGB->as_css_hex
+
+0.20
+  - Update some deps
+
+0.19
+  - Don't add '#' to hex strings
+  - always print six digit hex strings
+
+0.18
+  - POD Fixes
+
+0.17
+  - RGB instantiation using Color::Library
+  - Add HSV
+  - Add RGB to HSL and HSV conversion
+  - Add HSV to RGB conversion
+
+0.16
+  - Move pod tests to t/author
+
+0.15
+  - Remove Moose Coverage dep
+
+0.14
+  - Forgot MooseX::Storage dependency
+
+0.13
+  - MooseX::Storage support
+  - Fix POD links to Wikipedia
+
+0.12
+  - POD updates
+
+0.11
+  - Fix bug in RGB equal_to
+
+0.10
+  - Return 0 if arg to equal_to is undefined.
+
+0.09
+  - Add equal_to and not_equal_to to all color spaces.
+
+0.08
+  - Add derive method to all colors, allows cloning of a color while changing
+    one of more of it's attributes.
+  - POD
+
+0.07
+  - Add some POD to appease testers.
+
+0.06
+  - Add make_immutable
+  - Put versions on Moose & MooseX::Clone
+
+0.05
+  - Name types with Graphics::Color:: prefix
+
+0.04
+  - Add MI version because Yuval yelled at me
+  - More POD fixes
+0.03
+  - Fix YUV's POD referring to YIQ
+  - Add POD for aliased methods
+  - Fix description
+
+0.02    
+  - Add MooseX::Clone for clone() support in all colors
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

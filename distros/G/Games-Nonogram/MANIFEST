@@ -1,0 +1,24 @@
+Changes
+lib/Games/Nonogram.pm
+lib/Games/Nonogram/Base.pm
+lib/Games/Nonogram/Block.pm
+lib/Games/Nonogram/BruteForce.pm
+lib/Games/Nonogram/Clue.pm
+lib/Games/Nonogram/CommandLine.pm
+lib/Games/Nonogram/Grid.pm
+lib/Games/Nonogram/Line.pm
+lib/Games/Nonogram/Loader/File.pm
+lib/Games/Nonogram/Shell.pm
+Makefile.PL
+MANIFEST			This list of files
+nonogram
+README
+t/00_load.t
+t/99_pod.t
+t/99_podcoverage.t
+t/clue.t
+t/clue_candidates.t
+t/clue_cant_have.t
+t/clue_update.t
+t/line.t
+META.yml                                 Module meta-data (added by MakeMaker)

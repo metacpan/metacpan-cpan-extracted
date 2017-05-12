@@ -1,0 +1,49 @@
+Games::Checkers is a set of Perl classes implementing the Checkers game
+play. Several national rule variants are supported. A basic AI heuristics is
+implemented using the Minimax algorithm. Replay of previously recorded games
+is supported too.
+
+This package is intended to provide complete infrastructure for interactive
+and automatic playing and manipulating of Checkers games. Some features are
+not implemented yet.
+
+See doc/rules to read about the Checkers game rules.
+Alternatively see Games::Checkers man page after installing this package.
+You can run perl scripts in bin/ directory without installing anything.
+
+Currently supported board sizes:
+
+	* 8x8
+	* 10x10 (not yet, but will be soon hopefully)
+
+Currently supported variants:
+
+	* Russian Checkers (AI and game replay)
+	* British Checkers (game replay)
+	* Italian Checkers (game replay, set $ENV{ITALIAN_BOARD_NOTATION})
+
+Currently supported game file formats:
+
+	* .pdn files (trying to detect a lot of broken notations too)
+	* .pdn.gz|xz|bz2 files (automatically uncompressed on the fly)
+
+Currently installed scripts:
+
+	* pcheckers-auto-play
+	* pcheckers-replay-games
+
+In the future one script pcheckers may be installed that will include:
+
+	* automatic AI game play (current script pcheckers-auto-play)
+	* recorded game replay (current script pcheckers-replay-games)
+	* interactive game play of 1 or 2 human players
+
+If SDL perl modules are installed, then the SDL support is automatically
+detected and activated that replaces the default terminal IO. 
+
+See also files INSTALL and TODO, and directory data/.
+
+Author:
+	Mikhael Goikhman <migo@freeshell.org>
+Web site:
+	http://migo.sixbit.org/software/pcheckers/

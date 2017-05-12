@@ -1,0 +1,50 @@
+---
+abstract: 'Github hooks receiving server'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Github-Hooks-Receiver
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Github::Hooks::Receiver:
+    file: lib/Github/Hooks/Receiver.pm
+    version: '0.04'
+  Github::Hooks::Receiver::Declare:
+    file: lib/Github/Hooks/Receiver/Declare.pm
+  Github::Hooks::Receiver::Event:
+    file: lib/Github/Hooks/Receiver/Event.pm
+requires:
+  Class::Accessor::Lite: '0'
+  JSON: '0'
+  Plack::Middleware::HubSignature: '0.02'
+  Plack::Request: '0'
+  Plack::Runner: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/Github-Hooks-Receiver/issues
+  homepage: https://github.com/Songmu/Github-Hooks-Receiver
+  repository: git://github.com/Songmu/Github-Hooks-Receiver.git
+version: '0.04'
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'

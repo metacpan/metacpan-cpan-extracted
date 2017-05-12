@@ -1,0 +1,35 @@
+This is Perl module Growl::NotifySend.
+
+INSTALLATION
+
+Install cpanm (App::cpanminus) and then run the following command to install
+Growl::NotifySend:
+
+    $ cpanm Growl::NotifySend
+
+If you get an archive of this distribution, unpack it and build it
+as per the usual:
+
+    $ tar xzf Growl-NotifySend-$version.tar.gz
+    $ cd Growl-NotifySend-$version
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+Growl::NotifySend documentation is available as in POD. So you can do:
+
+    $ perldoc Growl::NotifySend
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2011, Fuji, Goro (gfx). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,71 @@
+#!/bin/bash
+DISTS="natty oneiric precise quantal"
+
+find . -name "*~" -exec rm {} \;
+
+TEST=3
+echo "argument: $1"
+if [ "$1" = "test" ]; then
+  TEST=1
+else 
+  if [ "$1" != "ppa" ]; then
+    echo "usage: ./build-dep <test|ppa> <subversion (defaults to 1)>"
+    exit 1
+  else 
+    TEST=0
+  fi
+fi
+
+if [ "$2" = "" ]; then
+  SUBVERSION=1
+else 
+  SUBVERSION=$2
+fi 
+
+echo "Making source package"
+BUILDDEPS=libgtk2.0-dev,libappindicator-dev,libgtk2-perl
+PPA=ppa:0k-hans-f8/ppa
+
+rm *.tar.gz
+make clean
+perl Makefile.PL
+make dist
+
+for DIST in $DISTS
+do
+  echo "building $DIST, SUBVERSION=$SUBVERSION"
+  rm -rf /tmp/appind
+  mkdir /tmp/appind
+  #tar -C /tmp/appind -x -z -f $NAME.tar.gz
+  cd /tmp/appind
+  export DEB_BUILD_OPTIONS="nocheck"
+  export DEBFULLNAME="Hans Oesterholt (Lives in the Netherlands)"
+  export EMAIL="debian@oesterholt.net"
+  DEB_BUILD_OPTIONS=nocheck dh-make-perl --dist="precise" --email="debian@oesterholt.net" --cpan Gtk2::AppIndicator
+  NAME=`ls -d Gtk2-AppIndicator* | sed -e 's/.tar.gz//'`
+  VERSION=`echo $NAME | sed -e 's/Gtk2[-]AppIndicator[-]//'`
+  mv /tmp/appind/libgtk2-appindicator-perl_$VERSION.orig.tar.gz /tmp/appind/libgtk2-appindicator-perl_$VERSION.$DIST.orig.tar.gz
+  
+  DIR=/tmp/appind/$NAME
+  
+  cat $DIR/debian/changelog | sed -e "s/$VERSION-1/$VERSION.$DIST-$SUBVERSION/" | sed -e s/unstable/$DIST/ >$DIR/debian/changelog.ff
+  mv $DIR/debian/changelog.ff $DIR/debian/changelog
+  cat $DIR/debian/control | sed -e "s/^[ ]perl/ $BUILDDEPS/" >$DIR/debian/control.ff
+  mv $DIR/debian/control.ff $DIR/debian/control
+  cat $DIR/debian/rules | sed -e "s/dh/DEB_BUILD_OPTIONS=nocheck dh/" >$DIR/debian/rules.ff
+  mv $DIR/debian/rules.ff $DIR/debian/rules
+
+  cd $DIR
+  DEB_BUILD_OPTIONS=nocheck debuild -S
+
+  if [ $TEST = 0 ]; then
+    (cd /tmp/appind/;dput $PPA *.changes)
+  else 
+    (cd /tmp/appind/;sudo pbuilder build *.dsc)
+  fi
+done
+
+
+
+
+

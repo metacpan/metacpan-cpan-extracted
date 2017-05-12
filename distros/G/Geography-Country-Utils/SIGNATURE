@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 56c4a97c0cbf135d074e69719f879d116cf5b8ce Changes
+SHA1 f2630f53726ee8b49d883cf120b30360faa488df MANIFEST
+SHA1 cecac6f0569cb0f39f3e09f5b951001f7009df20 META.yml
+SHA1 a2465e207d433cb1548e631cac14975290569a78 Makefile.PL
+SHA1 40c4c0acf4d25ae2f986776f3403a37d2dcc1130 README
+SHA1 4ca7aba11da65df05c96a707f53ec90beb841703 lib/Geography/Country/Dial.pm
+SHA1 429ccc8594ec1990d5179d63e33312e69f0387a4 lib/Geography/Country/FIPS.pm
+SHA1 5787a5dc3b91e85e1115f16e11d4f65c2686e8f5 lib/Geography/Country/FIPS/Capitals.pm
+SHA1 6c7fd6fb7d505d8d6f5827a000dffc45108fecd6 lib/Geography/Country/TZ.pm
+SHA1 5923f72a9528cc6449897a04a3c8729cd1698fe9 lib/Geography/Country/TZ/Zone.pm
+SHA1 cb758861d2b22ba5fbdb3da49ef7811be183e1b2 lib/Geography/Country/Utils.pm
+SHA1 49db303eee39cddead5648518522541ea3126299 t/0fips.t
+SHA1 5646aa92581289dc9a906b3543c88bcaebca6f34 t/1capital.t
+SHA1 384107f5caf279a7c23e7433c635c4f8c59e4859 t/2dial.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (FreeBSD)
+
+iD8DBQFC+3rDtLPdNzw1AaARAiugAJ9GlLPrblaalt1q00Oqki76kvikIwCeLY9+
+5dFxndW7WW0V2n1BL192DgQ=
+=Syv2
+-----END PGP SIGNATURE-----

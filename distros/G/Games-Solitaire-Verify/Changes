@@ -1,0 +1,185 @@
+Revision history for Games-Solitaire-Verify
+
+0.1701  2016-02-28
+        - Fix the tests (and the code) of method ->print could not be found in
+        IO::Handle/IO::File on older perls.
+            - Reported in some CPAN Testers reports.
+
+0.1700  2016-02-26
+        - Convert file input to slurping+splitting.
+            - This provides a significant (3m05s instead of over 4m)
+            speed boost.
+        - Some other optimisations.
+        - Add Games::Solitaire::Verify::Column->append_cards for faster
+        appending.
+        - Add Games::Solitaire::Verify::Column->popN for popping multiple
+        cards from the top.
+        - Add Games::Solitaire::Verify::Card->get_ranks_strings().
+
+0.1601  2015-12-30
+        - Fix compatibility with older perls (down to 5.8.9).
+            - Several CPAN Tester reports were received.
+            - The problem was the /r flag to s///.
+
+0.1600  2015-12-29
+        - Alter output to exclude trailing whitespace.
+        - Alter input to automatically remove trailing whitespace.
+            - These changes are for an upcoming compilation flag in Freecell
+            Solver of removing trailing whitespace from output.
+
+0.1500  2015-12-21
+        - Remove dependency on MooX::late (and Moo)
+        - Some optimizations and cleanups.
+        - Removed order prefixes from t/*.t files.
+
+0.1400  2014-11-08
+        - Convert to Dist-Zilla
+        - Add lib/Games/Solitaire/Verify/App/CmdLine/From_Patsolve.pm and
+        convert-patsolve-to-fc-solve-solution
+        - Add lib/Games/Solitaire/Verify/Solution/ExpandMultiCardMoves/Lax.pm
+
+0.1300  2014-05-16
+        - Some optimizations after noticing that validating the solutions
+        of the whole Microsoft Freecell 32K was time consuming.
+        - Add examples/benchmark.pl which can be used to benchmark (requires
+        the fc-solve distribution in the path).
+
+0.1203  2014-01-30
+        - Add LICENSE (as well as COPYING) for CPANTS Kwalitee.
+        - Minimum version of perl is 5.8.0 (CPANTS Kwalitee).
+
+0.1202  2013-10-19
+        - Update the contact information (it contains an old E-mail.).
+
+0.1201  2013-06-28
+        - Add $VERSION to some .pm files that missed it.
+            - The PAUSE indexer warned about that.
+        - Convert from 'use base' to 'use parent'.
+
+0.1200  2013-06-28
+        - Add support for flipped cards to ::Card .
+        - Add lib/Games/Solitaire/Verify/KlondikeTalon.pm .
+        - Add script/play-and-verify-klondike - it is a work-in-progress
+        script used to play the solutions provided by
+        https://github.com/ShootMe/KlondikeSolver (also see my fork of it
+        at https://github.com/shlomif/KlondikeSolver ), verify them and
+        display them in a more user-friendly manner.
+        - Add t/cpan-changes.t
+
+0.1103  2013-01-17
+        - Update Build.PL (configure_requires + repository link).
+
+0.1102  2012-09-10
+        - Add lib/Games/Solitaire/Verify/App/CmdLine/Expand.pm to the
+        distribution.
+            - This caused script/expand-solitaire-multi-card-moves to
+            fail.
+
+0.1101  2012-09-07
+        - Add strict, warnings and autodie to requires/build_requires.
+            - See for example: http://www.cpantesters.org/cpan/report/52b7a6ba-f548-11e1-bdcc-373e3b6b8117
+
+0.1100  2012-08-31
+        - Add lib/Games/Solitaire/Verify/Solution/ExpandMultiCardMoves.pm
+        for processing a solution and expanding multi-card (= column) moves
+        into single-card moves, which are easier to validate by human players.
+            - Now tested using t/08-expand-solution.t
+            - Added script/expand-solitaire-multi-card-moves .
+
+0.1001  2012-08-23
+        - Add the color_for_suit method to ::Card .
+        - Remove trailing space with t/style-trailing-space.t as a test.
+
+0.1000  2011-11-08
+        - Add the script/tag-release.pl to tag a release in Subversion.
+        - Add script/bump-version-number.pl .
+        - lib/Games/Solitaire/Verify/Card.pm :
+            - Add the id() slot.
+            - Add the data() slot.
+        - lib/Games/Solitaire/Verify/State.pm :
+            - Add the add_column method.
+            - Add the set_foundations() method.
+            - Add the set_freecells() method.
+        - lib/Games/Solitaire/Verify/State.pm :
+            - Fix cloning of states with a "custom" variant and with
+            variant_params.
+
+0.0901  2011-06-02
+        - Now importing Dumper from Data::Dumper properly.
+
+0.09    2010-07-10
+        - Converted from Class-Accessor to Class-XSAccessor (with a function
+        emulating mk_accessors for convenience.).
+            - This made the test suite run faster.
+        - Add the script/verify-solitaire-solution and
+        lib/Games/Solitaire/Verify/App/CmdLine.pm .
+
+0.08    2009-07-04
+        - Removed the "all rights reserved" language. I was told it is
+        incompatible with the MIT/X11 License.
+        - Added the COPYING file.
+
+0.07    2009-06-22
+        - Added some meta-data (repository, homepage, mailing list and
+        keywords) to META.yml.
+        - Implemented many missing exceptions.
+            - Added tests for some of them.
+
+0.06    2009-05-30
+        - Now the module can verify Simple Simon moves and solutions.
+            - The support has many loose ends including many non-existent
+            exceptions, but it should still yield a true verdict
+            if-and-only-if the solution is correct.
+
+0.05    2009-01-24
+        - Made sure that when unlimited sequence move takes place, it isn't
+        affected by kings_only, etc. I.e: it always allows to move an
+        arbitrary number of cards when it is specified.
+            - Bug discovered based on this post by larrysan:
+            - http://tech.groups.yahoo.com/group/fc-solve-discuss/message/856
+
+0.04    2008-08-07
+        - Now verify_and_perform_move in Games::Solitaire::Verify::State
+        is returning objects of exception classes, instead of stringified
+        errors, to facilitate knowing exactly why the move is invalid.
+        - Refactored Games::Solitaire::Verify::State:
+            - Extracted methods from verify_and_perform_move
+            - Converted to a ->can() dispatch table.
+
+0.03    2008-07-25
+        - Added support for more variants of Solitaire, using the
+        Freecell Solver-style parameterization:
+            - num_freecells
+            - num_columns
+            - num_decks
+            - sequence_move
+            - seq_build_by
+            - empty_stacks_filled_by
+        - Added more support modules:
+            - lib/Games/Solitaire/Verify/VariantParams.pm
+            - lib/Games/Solitaire/Verify/VariantsMap.pm
+
+0.02    2008-07-10
+        - Added another test for a wrong solution.
+        - Extracted two classes from Games::Solitaire::Verify::State :
+            - lib/Games/Solitaire/Verify/Foundations.pm
+            - lib/Games/Solitaire/Verify/Freecells.pm
+        - Added List::Util to the "requires" - it was missing.
+
+0.0102  2008-07-10
+        - Fixed the script with the absolute path on Makefile.PL
+        - Moved bin to script because it's written in pure-Perl.
+
+0.0101  2008-07-09
+        - Fixed various bugs:
+            - incompatible output between what we had and Freecell Solver
+            (trailing whitespace etc.)
+            - Added a test assertion for verifying that a wrong solution is
+              wrong. (which uncovered the bugs.)
+            - Fixed the solution verification logic.
+
+0.01    2008-07-05
+        - First version.
+        - Can only do Freecell for now, but there's a lot of modularity
+        and extensibility infrastrucutre in place.
+        - 193 Test Assertions.

@@ -1,0 +1,202 @@
+#!/usr/bin/perl -w
+
+use File::Path;
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+#$Gimp::verbose = 1;
+
+sub get_guides {
+  my $image = shift;
+  my %orientation2guidepos2guide;
+  for (my $i = 0; $i = $image->find_next_guide($i); ) {
+    $orientation2guidepos2guide{
+      $image->get_guide_orientation($i)
+    }->{
+      sprintf "%5d", $image->get_guide_position($i)
+    } = $i;
+  }
+  \%orientation2guidepos2guide;
+}
+
+# Generates an ordered list of all existing (x) guides.
+sub get_orientguides {
+  my ($orientation2guidepos2guide, $orient) = @_;
+  my $gp2g = $orientation2guidepos2guide->{$orient};
+  map { $gp2g->{$_} } sort keys %$gp2g;
+}
+
+# Duplicate, crop and save the image fragment.
+sub dosel {
+  my ($image, $savepath, $imgpath, $imgbasename, $extension, $l,$r,$t,$b, $i,$j) = @_;
+#    $filename =~ m/^(.*)\.[^\.]*$/ ;
+  my $imgname = "$imgbasename-$i-$j.$extension";
+  my $tmpimage = $image->duplicate;
+  # print "Cropping from $l to $r, $t to $b\n";
+  $tmpimage->crop($r-$l, $b-$t, $l, $t);
+  # Make sure that gif and jpg are of proper type before proceeding.
+  # I could move this outside the dosel for performance improvement,
+  # but then it would end up changing the user's image, which may
+  # not be desired/expected.
+  $tmpimage->image_convert_indexed(0,0,255,0,0,"NULL")
+    if $extension eq "gif" and !($tmpimage->get_layers)[0]->is_indexed;
+  $tmpimage->image_convert_rgb
+    if $extension eq "jpg" and !($tmpimage->get_layers)[0]->is_rgb;
+  $tmpimage->Gimp::Fu::save_image("$savepath$imgpath$imgname","$savepath$imgpath$imgname");
+  $tmpimage->delete;
+  return "$imgpath$imgname"; # what I want printed in html
+}
+
+# HTML Table Generation Functions
+sub html_table_start {
+  my ($fn,$cellpadding,$cellspacing,$border,$capitalize_tags) = @_;
+  my $str = $capitalize_tags ?
+"<TABLE CELLSPACING=$cellspacing CELLPADDING=$cellpadding BORDER=$border>\n" :
+"<table cellspacing=$cellspacing cellpadding=$cellpadding border=$border>\n" ;
+  print $fn $str;
+}
+
+sub html_table_row_start {
+  my ($fn, $capitalize_tags) = @_;
+  my $str = $capitalize_tags ? "\t<TR>\n" : "\t<tr>\n";
+  print $fn $str;
+}
+
+sub html_table_entry {
+  my ($fn, $imgname, $width, $height, $capitalize_tags) = @_;
+  my $str = $capitalize_tags ?
+"\t\t<TD><IMG ALT=\" \" SRC=\"$imgname\" WIDTH=\"$width\" HEIGHT=\"$height\"></TD>\n" :
+"\t\t<td><img alt=\" \" src=\"$imgname\" width=\"$width\" height=\"$height\"></td>\n";
+  print $fn $str;
+}
+
+sub html_table_row_end {
+  my ($fn, $capitalize_tags) = @_;
+  my $str = $capitalize_tags ? "\t</TR>\n" : "\t</tr>\n";
+  print $fn $str;
+}
+
+sub html_table_end {
+  my ($fn, $capitalize_tags) = @_;
+  my $str = $capitalize_tags ? "</TABLE>\n":"</table>\n";
+  print $fn $str;
+}
+
+podregister {
+  my $o2gp2g = get_guides($image);
+  my @vert = get_orientguides($o2gp2g, &Gimp::ORIENTATION_VERTICAL);
+  my @horz = get_orientguides($o2gp2g, &Gimp::ORIENTATION_HORIZONTAL);
+  die __"Abort: no horizontal or vertical guides found.\n" unless @vert + @horz;
+  Gimp->progress_init("Perl-o-Tine");
+  my $progress_increment = 1/( (scalar(@horz)+1) * (scalar(@vert)+1) );
+  my $progress = 0.0;
+  # (Debugging info for the guide functions)
+  # print @vert, " LEN = ", scalar(@vert), "\n";
+  # print @horz, " LEN = ", scalar(@horz), "\n";
+  # foreach $guide (@vert) {
+  #   print $image->get_guide_position($guide), "\n";
+  # }
+  # Correctly format paths and filenames
+  map { $_ .= "/" unless m/\/$/; } ($savepath, $imgpath);
+  $imgpath = "" unless $separate;
+  mkpath($savepath . $imgpath);
+  open FILE, ">$savepath$htmlname" or die "Couldn't open $savepath$htmlname: $!\n";
+  my $top=0;
+  html_table_start(\*FILE,0,$cellspacing,0,$capitalize_tags);
+  for (my $i=0; $i<=scalar(@horz); $i++) {
+    my $bot = ($i>$#horz) ? $image->height : $image->get_guide_position($horz[$i]);
+    html_table_row_start(\*FILE, $capitalize_tags);
+    my $left=0;
+    for (my $j=0; $j<=scalar(@vert); $j++) {
+      my $right = ($j>$#vert) ? $image->width : $image->get_guide_position($vert[$j]);
+      # protect against 0 width/height guide selections
+      if ($left!=$right && $top!=$bot) {
+        # perform cropping, table entry
+        my $imgname = dosel($image, $savepath, $imgpath, $imgbasename, $extension, $left, $right, $top, $bot, $i, $j);
+        html_table_entry(\*FILE, $imgname, $right-$left, $bot-$top, $capitalize_tags);
+      }
+      $left = $right + $cellspacing;
+      $progress += $progress_increment;
+      Gimp->progress_update ($progress);
+    }
+    html_table_row_end(\*FILE, $capitalize_tags);
+    $top = $bot + $cellspacing;
+  }
+  html_table_end(\*FILE, $capitalize_tags);
+  return;
+};
+exit main;
+__END__
+
+=head1 NAME
+
+perlotine - Guillotine implemented in perl, with html output
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Web/Perl-o-tine...
+
+=head1 DESCRIPTION
+
+Add guides to an image.  Then run this.  It will cut along the guides,
+and give you the html to reassemble the resulting images.
+
+=head1 PARAMETERS
+
+  [PF_FILE, "savepath", "The path to export the HTML to",$ENV{HOME}],
+  [PF_STRING, "htmlname", "Filename to export","perlotine.html"],
+  [PF_STRING, "imgbasename", "What to call the images","perlotine"],
+  [PF_RADIO,  "extension", "The format of the images: (gif, jpg, png)", "gif", [gif => "gif", jpg => "jpg", png => "png"]],
+  [PF_TOGGLE, "separate", "Use a separate directory for images",0],
+  [PF_STRING, "imgpath", "The path to export the images to, relative to the Save Path", "images/"],
+  [PF_TOGGLE, "capitalize_tags", "Capitalize HTML tags", 0],
+  [PF_SPINNER, "cellspacing", "Add space between the table elements", 0, [0,15,1]],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 HISTORY
+
+  <sjburges@gimp.org>
+  This is tigert's request.  I suppose it'll be useful to those that do
+  this sort of thing.  Personally I'll probably only run it to test and
+  put up a demo image.
+
+  Since updated a couple times by others, and intgrated by me:
+
+  Bruce Miller                              (fixed to accomdate 1.1.x changes)
+  Brendon and Wendy Humphrey <brendy@swipnet.se> (progress bar, nice comments)
+
+  Tuomas Kuosmanen <tigert@gimp.org>
+  Fixed some things to make this work with cvs gimp. Fixed calls to
+  gimp_get_guide_orientation() (guide types that changed from
+  GUIDE_VERTICAL to VERTICAL and horizontal, respectively.  Should
+  work now). Also convert to indexed parameters changed, fixed them too.
+
+  <sjburges@gimp.org>
+  Added changes to make progess bar work for images with only horizontal
+  or vertical guides.  This was fixed at one time, I forget who did that.
+  Somehow it got broke again ;(
+
+  Added File::Path; for making the directory if it doesn't already exist.
+
+  12/13/03: fixed tigert's fix to use ORIENTATION_VERTICAL rather
+	    than VERTICAL
+
+  If you have more additions, etc please don't hesitate to send them in!
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+1999-03-19
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

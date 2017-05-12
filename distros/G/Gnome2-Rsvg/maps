@@ -1,0 +1,1 @@
+RSVG_TYPE_ERROR		RsvgError	GEnum	Gnome2::Rsvg::Error

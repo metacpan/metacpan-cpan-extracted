@@ -1,0 +1,52 @@
+{
+   "abstract" : "Spicey git-log with a hint of gravatars, nutmeg and cinnamon",
+   "author" : [
+      "Colin Kennedy <moshen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Git-Glog",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Zlib" : 0,
+            "Digest::MD5" : 0,
+            "Getopt::Long" : 0,
+            "Image::Term256Color" : "0.03",
+            "LWP::UserAgent" : 0,
+            "Pod::Usage" : 0,
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Git::Glog" : {
+         "file" : "lib/Git/Glog.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

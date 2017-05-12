@@ -1,0 +1,564 @@
+This file documents the revision history for Perl extension Gantry
+
+3.64 Wed Jan 13 09:30:55 PST 2010
+    - fix session plugin test, reported by Andreas Koenig via RT
+     
+3.63 Wed Dec 05 12:46:00 CDT 2009
+    - Fixed perl version in Build.PL to work with newer Module::Build.
+      Thanks to Matt We...lol... sorry... almost made it through without
+      laughing.
+
+3.62 Wed Dec 02 10:36:00 CDT 2009
+    - Added plugin to handle shibboleth authentication.
+
+3.61 Thu Oct 15 14:13:00 CDT 2009
+    - Added an Engine method that returns whether the current request is being
+      served by an SSL-enabled host.
+
+3.60 Wed Oct 14 17:03:00 CDT 2009
+    - Added ability to test cache set methods. This is useful for cases where
+      you need to ensure that cache sets/gets are working correctly. For
+      example, Cache::Memcached does not return any errors if it cannot
+      connect to the specified memcached server(s).
+    - Added aditional parameter, expires, to the cache_set method in the
+      Gantry::Plugins::Cache::Memcached module. Because the underlying
+      memcached module supports setting individual expire times for items
+      in the case, you can now specificy them. If a expire time is not set
+      for the item, then the global cache_expires value is used (this
+      maintains backwards-compatibility).
+
+3.59 Fri July 10 17:45:00 CDT 2009
+    - Added gantry_secret to serve as a default secret key so you don't have
+      to specify different keys for the authcookie, session, cookie check etc.
+    - Modify ap_req / apache_request so that it never recreates the
+      Apache::Request object. libapreq2 does not like it when you do that
+      and specify a max post size. It will throw a conflicting information
+      error.
+    - Removed code that was setting a test cookie. The code has been replaced
+      by a cookie check plugin.
+    - Preserve all parameters when redirecting during login so that the original
+      request can be fulfilled after login. Also encrypt url during redirect
+      to conceal any posted values you don't want appearing in the url.
+    - Added methods to url encode / decode a specified value.
+    - Modify plugin handling. Plugin method can now be imported into the symbol
+      table of the application using the specified plugin namespace. This allows
+      you to use otherwise incompatible plugins within the same server.
+    - Allow import lists to be added to plugins so that the list of symbols
+      imported can be controlled.
+    - Removed sort of plugin callbacks. It was sorting sub references which basically
+      equated to completely random ordering.
+    - Added PRE_ACTION and POST_ACTION states where plugin callbacks can be
+      registered.
+    - Remove unneeded apreq parse call during file uploads.
+    - Update form templates to decode unsafe html characters before sending them
+      through HTML::SuperForm as it takes care of encoding the unsafe characters.
+
+3.58 Thurs July 02 16:33:00 CDT 2009
+    - Fix AuthCookie.pm so that if get_auth_schema hasn't been imported then
+      it falls back to using get_schema.
+
+3.57 Weds July 01 15:33:00 CDT 2009
+    - Call find_redirect after calling form_add/form_edit. This allows the
+      results of form methods to influence the final redirect location if
+      needed.
+
+3.56 Thurs June 25 16:09:00 CDT 2009
+    - Removed Gantry::Plugins::Session since its being maintained
+      externally now.
+    - Also removed session.tt template.
+
+3.55 Tues June 22 15:24:00 CDT 2009
+    - Update AuthCookie to first check for matching user/pass then if
+      that fails check for the user name by itself. This is needed
+      so that encrypted passwords can be used.
+    - Add reload_config option to Gantry::Conf to force config file to
+      reload. Add reload_config option in 02flat.t test to fix test
+      failures do to config file not reloading.
+    - Modified Gantry::Conf to be able to parse its config file on import.
+      Also modified MP20/MP13 db connection helpers to use cached Gantry::Conf.
+      This fixes a performance issue where the entire gantry config could be
+      reloaded up to 6 times per request.
+    - Fixed get_auth_conn_info so that if gantry conf is being used
+      but the auth db info is in the apache conf everything
+      still works.
+    - Fixed bug in Build.pm where files without an extension would not
+      be installed and where directories containing a . would cause
+      the build to die.
+    - Trim leading / trailing whitespace from incoming parameters by default.
+    - Added sfbb/form.tt template.
+    - Modified CRUD.pm plugin to allow a default template to be specified in
+      the config. The config option is default_form_template.
+    - Fixed form.tt so that you can specify your own parameters
+      in an onchange event.
+    - Skip querying of foreign tables unless a foreign key is actually used on
+      the form. This gives a huge speed increase when dealing with foreign
+      tables with many rows.
+
+3.54 Sun Mar 22 11:48:54 PDT 2009
+    - build CPAN dist
+    - All request parameter values will be filtered by default from now on.
+      This is done to prevent XSS vulnerabilities.
+      The filtering is pretty simple, as it is just translating angle brackets,
+      < and >, and quotes, " and ', into their named-entity equivalents &lt;\
+      and &gt;. If for some an application requires that all request parameter
+      values be unfiltered (which is not safe, and opens the application up to
+      XSS vulnerabilities), then they can specify a config option named
+      'unfiltered_params'. This value can be set to either '1' or 'on'.  Also,
+      if access to a request parameter is needed unfiltered, then the
+      uf_params() method may be used.
+    - Explicitly close auth database handle in Authorization and Authentication
+      handlers on failure so that connections aren't left hanging around when
+      Apache::DBI isn't being used.
+    - Explicitly close database handles in Gantry cleanup() method so that
+      connections aren't left hanging around when Apache::DBI isn't being used.
+    - Change use of DBI->connect_cached() in Gantry::Utils::ModelHelper to
+      DBI->connect() to prevent "idle in transaction" cases when Apache::DBI
+      isn't being used and auto commit is turned off. What ends up happening is
+      when a rollback or commit isn't explicitly issued, the transaction is
+      left open on the database server in a "idle in transaction" state, even
+      though the request has finished being processed.
+    - Enhance results.tt
+    - Add no_options configuration item to suppress header and row options.
+    - Add options for adding a pre header row.
+    - Allow more customizing via classes.
+    - Add ability to specifiy a plugin directory.
+    - Documentation cleanup.
+    - Allow a custom template to be specified for CRUD delete action.
+    - Allow foreign_display_rows to be constrained.
+    - Don't read all rows into memory before processing.
+    - Fix bug in is_date. check_date is not a class method.
+    - Fix a bug with cgi engine. Post params were not being included as part of
+      the cgi object because $self->get_post_body() gets the post body from the
+      cgi object, which hadn't been created yet.
+    - Fixed a bug with form.tt where input_value wasn't being reset.
+    - Changed form.tt to not output a value attribute when the field has no value.
+    - Changed FormMunger to throw an error when an invalid form field is
+      specified. This prevents the form from getting corrupted.
+    - Add option to allow form validation errors to be grouped together by the
+      field. This allows for more versbose error reporting.
+    - Skip form validation for non post requests. The results were being
+      discarded anyways.
+    - Add *.* to list of web_dirs so that files in the top level directory are
+      also installed.
+    - Fix bug in MP13.pm where adding headers would overwrite the previous header
+      instead of appending.
+    - update mod_perl2 test -- skip tests if Apache2::Request does not exist
+    - Updated the documentation, add an external exception handler. Works
+      correctly with the standalone server.
+    - Added some experimental code to throw exceptions and catching them in
+      a state machine. This would allow redirects and such to become exceptions,
+      which could then be handled locally or within the handler.
+
+3.53 Sun Jul  6 11:50:58 PDT 2008
+    - modify Gantry::Server and Gantry::Engine::CGI to work with the
+      new state machines.
+    - add Gantry::State::Simple state machine 
+    - replace unchecked evals around plugin callback execution (so that errors
+      aren't thrown away) with a conditional to see if the arrayref is even
+      defined.
+    - moved engine_init() and post_engine_init plugin callback execution out
+      of init() and into handler() above the init() call so that $r or CGI
+      is available to any pre_init callback methods, and so that any errors
+      that occur within those callbacks are caught correctly with
+      cast_custom_error().
+
+3.52
+    - add relocate_permanently() to support 301 redirects (Stas Bekman)
+    - patch Gantry.pm - add a simple sort to the plugin calls
+    - add patches for Cache plugins
+    - add Gantry::Utils::CRON
+    - add setter/getter for Gantry::Utils::Crypt errors
+    - explicitly call the MP20 engine import for the Auth modules
+    - add handle_request_test_post for testing
+
+3.51 Tue Aug 28 11:42:48 CDT 2007
+    - fix bug in Gantry::Server::handle_request_test 
+    - fix some warning bugs in form.tt
+    - modify AuthCookie plugin to support testing with a logged in user
+    - add test method to gantry
+    - add multiselect option to Gantry::Utils::Threeway 
+    - add serialize_params base method.
+    
+3.50 Tue Jun 19 14:04:10 CDT 2007
+    - fixes to Gantry::Plugins::Session (Kevin Esteb)
+    - add cache_purge option to Caching pluings (Kevin Esteb)
+    - fix Gantry::Utils::DBIxClass util. Calling mk_classdata instead of 
+      mk_classaccessor.
+    - pass orm rom to AutoCRUD callbacks to text_descr.
+      can used to produce a better description on the edit or delete page. 
+    - add ability to override the file name when using the write_file method
+      in Gantry::Utils::CRUDHelp
+    - AuthCookie bug, fix root page login redirection
+    - modify AuthCookie login failure error message
+    - fix post_max in the CGI engine
+    - add Gantry::Utils::Captcha
+    - add Gantry::Utils::Crypt
+    
+3.49 Mon Apr 30 16:45:07 CDT 2007
+    - add datetime_now db-agnostic wrapper to Gantry::Utils::DBIxClass
+    - add post_body parsing to Plugins::SOAP::Doc
+    - modify Gantry handler to work with the PageCache plugin
+    - add Gantry::Plugins::PageCache
+    - modify cache plugins
+    - tie Gantry::Conf into Gantry cache. Specifying a cache plugin will
+      enable caching for Gantry::Conf
+    - add engine_cycle method to the Gantry object. 
+    - add javascript helper for YUI popup calendaring
+    - factor out login, logout routines in AuthCookie. AuthCookie now 
+      provides login/logout methods that can be called at anytime from 
+      anywhere in the app. (think registration form)
+    - add add row level error messages to moxie form.tt
+    - modify Gantry handler to store action
+    - add js_root and js_rootp
+	- add search cpan link to pod/doc viewing module
+    - patch uninitialized warning in CGI engine 
+    - replaced dojo with jquery javascript libraries for the Gantry samples. 
+    - patch Gantry::Utils::DBConnHelper::MP20, the server starting test
+      does not exist in mod_perl 2. Test was useless.
+    - fixed file upload bug, the full extension for .tar.gz 
+      was not being matched 
+    - modified mod_perl2 test
+    - fix link in doc
+    - add patch from Stas for fix the permissions problem with Init.pm
+    - fix gantry base_root bug -- base_root is now add just before template
+      object creation.
+    - add JSON to the requires list, JSON is not integrated into the
+      CRUD do main method. 
+    - added row level permissions by logged in user
+    - added consume_post_body and get_post_body to engines, plugins can use
+      this to preempt normal form parsing of the post body
+    - changed soap plugins to use consume_post_body and get_post_body,
+      making them engine agnostic
+
+3.48 Wed Feb 21 13:52:00 CST 2007
+    - add Gantry::Utils::Threeway
+    - add save and add another to CRUD and AutoCRUD.  To get it from bigtop
+      set 'save_and_add_another' to a true value in your form methods
+      'extra_keys'.
+    - fix crud so that if the form field is display then don't validate
+    - add hints to form.tt
+    - Revised tutorial to reflect current preferred practices.  This
+      involved switching to DBIx::Class and discussing tentmaker.
+    - Modify MP13 and MP20 engine to handle multiple entries for form
+      parameters. Form parameters that contain multiple values will be 
+      joined with nulls ( "\0" ). This is exactly how CGI.pm behaves.
+    - changed sample_wrapper stylesheet example to use doc_rootp so it
+      can work with stand alone server.
+    - Added FormMunger util to massage form fields needed by form.tt.
+    - Added no_cancel flag to form.tt, set it if you don't want the
+      Cancel button.  In bigtop, set this as one of your form methods
+      'extra_keys'.
+    - Added onchange to form.tt.  Give it the name of a javascript function
+      to trigger when a select list changes (type must be select).  You
+      can set this in bigtop with the new html_form_onchange statement.
+
+3.47 Mon Jan 22 09:11:06 CST 2007
+    - Added Gantry::Plugins::Session
+    - Added Ganty SOAP Support
+    - AuthCookie will not redirect to a full url if the 'url' param is passed.
+      i.e. <input type="hidden" name="url" value="http://www.here.com/" />
+    - added test for AjaxFORM
+    - Added auth_cookie_name and auth_cookie_domain as optional conf based
+      accessors for AuthCookie plugin.
+    - Added log_error method to CGI engine, so all engines have it.
+    - Added AJAX form plugin.
+    - Added Session plugin with pluggable caching storage mechanism.
+      (thanks to Kevin Esteb for all the plugins in this release except SOAP)
+    - Added SOAP plugin (mod_perl 2 only).
+    - Changed how plugin namespaces work.  Use the new -PluginNamespace
+      wherever you use -Engine, follow that with the plugins you want.
+
+3.46 Wed Dec 20 12:18:43 CST 2006
+    - Fixed uninitialized warnings in the TT template engine.
+    - Fixed CRUD plugin's validator callback use in edit.
+    - Added Gantry::Build to simplify Build.PLs that need to install
+      web content.
+    - Added Gantry::Plugins::AjaxCRUD, thanks to Kevin Esteb for
+      submitting it.
+    
+3.45 Mon Dec 11 10:10:13 CST 2006
+    - Arranged documenation
+    - Fixed namespace issue with Gantry::Plugins::AuthCookie
+   
+3.44 Tue Dec  5 09:42:01 CST 2006
+    - Added Gantry::Utils::FormErrors to manifest.
+   
+3.43 Tue Dec  5 09:09:00 CST 2006
+    - moved uri, location, path_info, method above the init callback
+    - Param cleaning for CRUD and AutoCRUD no longer makes 0 ints null.
+      But it does make blank ints null.
+    - DBIx::Class autocrud helper now uses transactions so you don't need
+      to set AutoCommit => 1 to use it.
+    - added Gantry::Plugins::AuthCookie ( cookie based auth ). Supports
+      DBIx::Class user models and Apache htpasswd files.
+    - added Template::Plugin::GantryAuthCookie for decrypting auth cookies
+      from Apache::Templates.
+    - added plugin functionality to various phases of the request. Currently
+      you can register the plugin and its callback at the init, pre_init, 
+      post_init, pre_process and post_process phase. 
+      See Gantry::Plugins::AuthCookie for an example.
+    - Gantry::Plugins::CRUD has a new callback: validator in case you
+      don't want or can't use Data::FormValidator.
+
+3.42 Thu Oct 19 10:05:57 CDT 2006
+    - Added Samples.
+    - Missing and Invalid fields on form.tt now have their labels in the
+      error message instead of their names.
+    - Gantry.pm's set_auth_model now requires the model for you.
+    - CRUD add, edit, and delete methods now allow their invokers to set
+      $self->stash->view->title to override default window and table titles.
+    - Added support for generic errors on form.tt (not just missing or
+      invalid).
+    - Added field type 'display' to form.tt for fields which should be
+      displayed, but not in an input element.
+    - Added content key to form.tt's fields hashes.  This helps when you have
+      a Question #. Text label for input elements, but don't want all that
+      text reported in errors.
+    - Added file upload.
+
+3.41 Wed Oct  4 14:58:22 CDT 2006
+    - Corrected response header handling in CGI engine.
+    - Corrected Gantry::Conf so it won't be tested if it can't be used.
+    - Added main.tt to the MANIFEST.  Bigtop uses it for defaul pages.
+    - Tried again to make prompts visible during CPAN shell install.
+
+3.40 Fri Sep 22 08:14:15 CDT 2006
+    - Restored and expanded warning avoidance from Gantry.pm accessors.
+      If you ask for a path, you no longer get undef.  At least you get ''.
+
+3.39 Thu Sep 21 14:20:17 CDT 2006
+    - switched plugin, engine loading from string eval to require
+    - added cookie support to the cgi engine.
+    - bug fix to default form.tt - form didn't always select the correct
+      default/previous value in the select lists.
+    - improved Gantry::Conf so gantry.d includes work and instances
+      can conf directly in the gantry.conf or gantry.d instance block.
+    - added Net::Server support to stand alone server (it's slow)
+    - suppressed some annoying undefined value warnings.
+
+3.38 Wed Aug 16 16:26:03 CDT 2006
+    - Gantry supports DBIx::Class
+    - added tests for auth handlers and models using SQLite
+    - added style to auth pages
+    - add extra testing features to the standalone server.
+
+3.36 Thu Aug 10 09:25:12 CDT 2006
+    - Took another crack at DBIx::Class
+
+3.35 Never installed
+    - Corrected DBIx::Class interactions
+
+3.34 Tue Aug  8 13:27:57 CDT 2006
+    - Added a default Gantry::Init for use during testing.
+
+3.33 Tue Aug  8 10:39:14 CDT 2006
+    - Modify Build.PL to write the Gantry::Init file during the install.
+      This module contains the install options that can be referenced later.
+    - Added action (cancel or submit) and user action (add, edit, or delete)
+      to the end of the parameter list for the redirect callback in CRUD.
+    - Added create method to Gantry::Utils::DBIxClass, calling it (instead
+      of the one provided by DBIx::Class::ResultSet) returns a row with a
+      valid id, even when the id is generated by a sequence within postgres.
+
+3.32 Mon Jul 17 13:49:33 CDT 2006
+	- added Perlbal client ip fix
+    - Removed ident from essential column list for auth_users table.
+      This makes the model classes compatible with prior auth schemes which
+      did not have that column.
+    - Changed the Apache basic auth scheme slightly to accomodate apps which
+      rely on the Class::DBI.  Users now append either Regular or CDBI
+      to all module names used for auth (except Access which never
+      used auth databases).
+    - Added stringify, and an overload to call it, for the DBIxClass Util
+      module.  Without it, form.tt can't show selected items foreign keys
+      point to.
+
+3.31 Jun  2 14:46:36 CDT 2006 
+	- Doc updates to Gantry.pm, Tutorial and FAQ
+    - Added support for DBIx::Class.  (AutoCRUD still only works for ORMs
+      with Class::DBI's API.)
+    - Converted Gantry::Control::C::* auth modules to use Gantry native models.
+    - Cleaned up (that is reduced) the prerequist list in Build.PL.
+    - Cleaned up Web Directory questions during ./Build install.
+    - Corrected problem with Gantry::Conf parameter fishing in the CGI engine.
+
+3.30 Wed May 10 13:01:44 CDT 2006
+    - Corrected bug in CGI engine which made the constructor demand a valid
+      hash as an argment.  Now an empty one is supplied by default, making
+      it work as the QuickStart doc says it should.  Thanks to Краси Беров
+      for pointing this out.
+
+3.29
+    - Restored access to dircopy from File::Copy::Recursive to
+      custom install code.
+
+3.27-8 Tue Apr 18 15:29:15 CDT 2006 - Tue Apr 18 15:45:32 CDT 2006
+    - Made failure due to absence of File::Copy::Recursive gentler.
+
+3.26 Mon Apr 17 14:25:48 CDT 2006
+	- Updates to custom error page
+
+3.25 Fri Apr  7 12:53:20 CDT 2006
+	- Added Test
+
+3.24 Thu Apr  6 15:12:12 CDT 2006
+	- Rearranged/Added more tests
+	
+3.23 Thu Apr  6 08:44:44 CDT 2006
+	- Fixes to the db connection methods
+	
+3.22 Thu Mar 30 12:41:36 CST 200
+	- Added test method to the Gantry server to be used for
+	  to run a test on a Gantry application
+	
+3.21 Wed Mar 29 12:41:36 CST 200
+	- Updates to documentation
+3.20
+	- Added a stand alone web server, Gantry::Server
+	- Updates to documentation.
+3.19
+	- Modified Build.PL. Now copies all files in the root folder.
+    - Updated the Gantry::Conf api so you can get location level
+      config.
+    - Corrected the mechanism for using Gantry::Conf so mulitple
+      instances in the same server can really have different conf.
+
+3.18
+ 	- Documentation updates
+3.17
+	- tied Gantry::Conf to the framework
+    - added initial Gantry::Conf code and stubs for the future 
+    - Updated constraint handling in AutoCRUD and CRUD to use the
+      current Data::FormValidator constraint_methods key.
+    - Updated Gantry::Conf to use ConfigureVia Method insteadn of
+      ConfigureViaMethod which allows for multiple ConfigureVia statements
+      in the same instance block and easier dispatching.
+
+3.16
+	- added PODViewer 
+    - CGI Engine fix, casting error to wrong method
+	- fixed prompt problem when installing within CPAN shell
+
+3.15 Thu Feb 16 09:22:03 CST 2006
+	- add paging.ttc ( paging for the results.tt )
+    - added cgi parameter parsing code
+	- Added lots of Docs modules
+    - Refactored handler and init so that all conf fishing and other
+      engine specific code is actually in the engines not Gantry.pm
+
+3.14 Wed Feb  1 08:09:54 CST 2006
+	- modified engines
+	- added CGI::Simple object to all
+	- improved cgi error messages
+    - restored connection info scheme having found the bug (mod_perl
+      helpers were still caching the conn_info data, so everyone was
+      going to the first database hit)
+    - renamed Gantry::Utils::ModelHelper to Gantry::Utils::DBConnHelper
+      to better reflect what it helps with (renamed all it subclasses too)
+    - added Gantry::Utils::Model as a Class::DBI replacement
+    - added Gantry::Utils::ModelHelper to provide db_Main and other
+      useful methods as mixins to Gantry::Utils::Model::* modules.
+    Note that no production app uses Gantry::Utils::Model yet.
+    - removed accessors in Gantry.pm for dbconn, dbuser, and dbpass
+
+3.13 Fri Jan 20 13:27:21 CST 2006
+    - Added script auth connection handling to db_Main in AuthCDBI util.
+    - Added doc stubs in modules.
+
+3.12 Thu Jan 19 10:44:31 CST 2006
+    - Added retreive_all_for_main_listing to Gantry::Utils::AuthCDBI
+      which we needed to do since we separated Malcolm's auth models
+      from the regular ones.
+
+3.09 - 3.11
+	- AuthCDBI, CBDI testing
+
+3.08
+  	- Add Access auth module ( Gantry::Control::C::Access )
+      provides IP authentication for mod_perl.
+	- updates to pod
+	- updates to Template Default
+    - Changed connection info scheme for regular and cgi scripts
+      in Gantry::Utils::CDBI.  This required moving connection info
+      fishing from init_cgi in Gantry.pm to Gantry::Engine::CGI->new
+    - Expanded the connection info scheme change to all engine types
+      by introducting Gantry::Utils::ModelHelper as a (mostly) abstract
+      base class from which a new module for each engine inherits
+    - Expanded connection info scheme to the auth db connecitons.
+      CGI may not be working correctly under the new scheme.
+
+3.07 Mon Dec 26 12:19:05 CST 2005
+ 	- Add CGI Engine. ( Gantry::Engine::CGI );
+	  Gantry apps can now run under CGI (including Fast-CGI)
+
+3.06 Tue Dec 20 12:47:47 CST 2005
+    - Revised Build.PL so that it complains more quietly if
+      File::Recursive::Copy is not installed.
+    - Revised use test section for mod_perl 1.9x so it checks for
+      Apache::Request before trying to use the engine, yielding a cleaner
+      error message.
+	- Change auth front-end modules to use $self->location for redirect_to_main
+	  instead of $self->apps_rootp . '/blah'
+	  
+3.05 Thu Dec 15 12:08:42 CST 2005
+	- template toolkit object is now unique per location block.
+	- converted front-end auth modules to use Gantry CRUD
+	- added editor_init.ttc ( default tinymce editor componet )
+	- modified form.tt to handle the editor_init.ttc componet
+
+3.04 Fri Dec  9 17:04:05 CST 2005
+    - Corrected template error which gave very small widths to text input
+      fields by default (hint: TT uses size as a pseudo-method)
+
+3.03 Fri Dec  9 14:04:05 CST 2005
+    - Minor template revisions
+
+3.02 Wed Dec  7 16:07:36 CST 2005
+    - Removed required asterisks from checkbox fields
+
+3.01 Tue Dec  6 13:31:16 CST 2005
+    - Improved various templates (made form tables wider by default)
+    - Added optional javascript based html editor to form.tt
+
+3.0  Thu Dec  1 13:49:28 CST 2005
+    - Corrected templates so their html is more standards compliant.
+    - Increased version to indicate that we are using this third generation
+      of our framework in production for multiple apps.
+
+0.26 Wed Nov 16 16:30:39 CST 2005
+    - Changed Gantry::user_row to return nothing when it can't find a user.
+
+0.25 Wed Nov 16 11:46:53 CST 2005
+    - Added Gantry::Plugins::CRUD for more control.
+    - Corrected relocate so you have more control of where it takes you
+      from successful AutoCRUD actions.
+    - Corrected error which had boolean select lists always showing
+      their default values instead of showing those only when the
+      database didn't have a value.
+
+0.24 Thu Nov  3 11:21:28 CST 2005
+	- Fixed Gantry::Utils::CDBI module to work with mp1 and 2.
+	- Modified Build.PL
+
+0.23 Mon Oct 24 15:46:09 CDT 2005
+	- Add a Class::DBI base module to Gantry.
+	  fixes the problem regarging the clashing database handles.
+	- added the log_error method
+	
+0.22 Mon Oct 17 20:12:30 EDT 2005
+	- Switch accessors to methods calls.
+	
+0.21 Wed Aug 24 11:00:41 CDT 2005
+	- Name change to Gantry
+
+0.20 	Mon Aug  8 11:30:08 CDT 2005
+	- Added Gantry::Conrol to framework (Authen, Authz, PageBased)
+	- Added generic templates for mvc processing
+
+0.18	Sat Jun 11 21:08:58 CDT 2005
+	- Add plugin ablility to frame work
+	- Added compatability for mod_perl 1, 1.99, 2.0
+	- Add Template::Toolkit support
+
+0.17 	Sat Jun 11 21:08:58 CDT 2005
+	- Branched from KrKit version 0.16 ( www.krkit.org )

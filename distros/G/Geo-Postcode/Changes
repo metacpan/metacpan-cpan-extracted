@@ -1,0 +1,24 @@
+Revision history for Perl extension Geo::Postcode.
+
+0.17 Thu 13 Jan 2011 20:09:27 GMT
+    - Improve definedness checks [RT: #16956]
+    - Refactor tests a little
+    - Change @nicely as per [RT #24382]
+
+0.16 Wed 12 Jan 2011
+    - Fix for tests/Makefile.PL (mstevens)
+
+0.13  20 October 04
+    - uses latitude and longitude rather than lat and long internally: 
+      'long' can't be a column name in mysql.
+
+0.12  2 September 04
+    - fixed CPAN installation where requirements not met: database file
+      now built at proper time thanks to own make target.
+
+0.11  2 September 04
+    - Database file now built during installation to ensure compatibility.
+
+0.1   31 August 04
+    - First release. What can possibly go wrong?
+

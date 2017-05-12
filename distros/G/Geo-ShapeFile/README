@@ -1,0 +1,39 @@
+Geo/ShapeFile
+=============
+
+Geo::ShapeFile is a perl library for reading ESRI shape files (such as
+those produced by the ESRI ArcGIS application).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or you can use cpanm if it is installed for your perl (see https://metacpan.org/pod/App::cpanminus if not).
+This will get you the latest released version, not the one on the github repo.  
+
+   cpanm Geo::ShapeFile
+
+
+REPORTING BUGS
+
+Please report any bugs or problems to:
+https://github.com/shawnlaffan/Geo-ShapeFile/issues
+
+EXAMPLES
+
+Some example scripts (hopefully documented) can be found in the eg/ directory.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2000-2013 Jason Kohles
+Copyright (C) 2014      Shawn Laffan
+
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

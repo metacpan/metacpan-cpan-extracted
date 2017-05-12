@@ -1,0 +1,42 @@
+NAME
+
+    Gtk2::Ex::DbLinker::DbTools - Databases access part of DbLinker
+
+VERSION
+
+    version 0.111
+
+INSTALLATION
+
+    To install Gtk2::Ex::DbLinker::DbTools, cd to the directory that
+    contains this file and type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    On windows use nmake or dmake instead of make.
+
+    To install this module into a specific directory, do: perl Makefile.PL
+    PREFIX=/name/of/the/directory ...the rest is the same...
+
+    Please also read the perlmodinstall man page, if available.
+
+    Install Gtk2::Ex::DbLinker or Wx::Perl::DbLinker to build your
+    application interface with Gtk2 or Wx. Install one of *
+    Rose::DB::Object * SQL::Abstract::More * DBIx::Class to use one of
+    these orm to access your data.
+
+DEPENDENCIES
+
+            Test::More      1
+            Carp    1.17
+            Try::Tiny       0.22
+            Data::Dumper    2.154
+            interface       0.03
+            Scalar::Util    1.45
+            DBI     1.631
+            Class::InsideOut        1.13
+            Log::Log4perl   1.41
+

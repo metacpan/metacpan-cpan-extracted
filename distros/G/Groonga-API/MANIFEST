@@ -1,0 +1,43 @@
+API.h
+API.xs
+Changes
+lib/Groonga/API.pm
+lib/Groonga/API/Test.pm
+lib/Ploonga.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/00_load.t
+t/01_env.t
+t/10_basic.t
+t/99_pod.t
+t/api/00_globals.t
+t/api/01_context.t
+t/api/02_context_properties.t
+t/api/03_bulk.t
+t/api/05_db.t
+t/api/06_type.t
+t/api/07_logger.t
+t/api/08_query_logger.t
+t/api/09_plugin_register.t
+t/api/10_table_create.t
+t/api/20_column_create.t
+t/api/25_obj_info.t
+t/api/26_string.t
+t/api/30_load.t
+t/api/40_table.t
+t/api/41_table_cursor.t
+t/api/42_table_setoperation.t
+t/api/43_table_difference.t
+t/api/44_table_select.t
+t/api/45_table_sort.t
+t/api/46_table_index_cursor.t
+t/api/50_hash.t
+t/api/51_array.t
+t/api/52_dat.t
+t/api/53_pat.t
+t/api/60_geo.t
+t/api/90_send.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

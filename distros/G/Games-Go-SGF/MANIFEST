@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Games/Go/SGF.pm
+t/Games-Go-SGF.t
+META.yml                                 Module meta-data (added by MakeMaker)

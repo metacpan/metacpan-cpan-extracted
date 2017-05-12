@@ -1,0 +1,6 @@
+MD5 1372bdc30a39c8278967b5343ad706c8 files/1.3-libnet-1.0.patch 2089
+MD5 d24dab72ae2f6047eb9e19858c7e1060 files/digest-dnshijacker-1.3-r1 66
+MD5 d24dab72ae2f6047eb9e19858c7e1060 files/digest-dnshijacker-1.3 66
+MD5 382913bd47ce51a7dc05f3d9eb3ba1b2 dnshijacker-1.3.ebuild 1035
+MD5 844b9d025ec1072a68cf1c64a7cdbeb2 ChangeLog 773
+MD5 ae2a09f004f34ff0feedd8a076e9a616 dnshijacker-1.3-r1.ebuild 846

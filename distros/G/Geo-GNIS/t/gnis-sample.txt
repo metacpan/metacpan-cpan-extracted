@@ -1,0 +1,20 @@
+      580 AZ Alhambra                                                                                             ppl       Maricopa        332954N 1120801W Fowler                     1122
+      581 AZ Ali Chuk                                                                                             ppl       Pima            314854N 1123322W Menagers Lake              1732
+      538 AZ Ajo                                                                                                  ppl       Pima            322218N 1125136W Ajo South                  1760     3705
+      542 AZ Ak Chin                                                                                              ppl       Pinal           330158N 1120421W Maricopa                   1187          BGN 1941
+      511 AZ Agua Fria                                                                                            ppl       Maricopa        333620N 1121850W El Mirage                  1120
+      516 AZ Aguila                                                                                               ppl       Maricopa        335634N 1131024W Aguila                     2163
+      479 AZ Adamana                                                                                              ppl       Apache          345836N 1094918W Adamana                    5305
+      492 AZ Adobe                                                                                                ppl       Maricopa        334121N 1120719W Union Hills                1393
+      605 AZ Allenville                                                                                           ppl       Maricopa        332107N 1123509W Buckeye                     833
+      652 AZ Anegam                                                                                               ppl       Pima            322222N 1120149W Santa Rosa                 1762
+      728 AZ Apache Flats                                                                                         ppl       Cochise         313329N 1102143W Fort Huachuca              4935
+      765 AZ Arizola                                                                                              ppl       Pinal           325104N 1114249W Casa Grande Mountains      1436
+      770 AZ Arizona City                                                                                         ppl       Pinal           324521N 1114013W Casa Grande Mountains      1508     4385
+      788 AZ Arlington                                                                                            ppl       Maricopa        331932N 1124548W Arlington                   803
+      887 AZ Audley                                                                                               ppl       Yavapai         352406N 1130218W Audley                     5209
+      895 AZ Avondale                                                                                             ppl       Maricopa        332608N 1122056W Tolleson                    972    35883
+      929 AZ Bacavi                                                                                               ppl       Navajo          355525N 1103924W Hotevilla                  6296          BGN 1988
+      949 AZ Bagdad                                                                                               ppl       Yavapai         343452N 1131214W Bagdad                     3409     1578
+      971 AZ Bakerville                                                                                           ppl       Cochise         312522N 1095312W Bisbee                     5085
+     1006 AZ Bapchule                                                                                             ppl       Pinal           330811N 1115221W Gila Butte                 1197

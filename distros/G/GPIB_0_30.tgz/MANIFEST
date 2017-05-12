@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+GPIB.pm
+test.pl
+README
+pgpib.conf.sample

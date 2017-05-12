@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Games-Dice-Probability
+version:      0.02
+version_from: lib/Games/Dice/Probability.pm
+installdirs:  site
+requires:
+    Math::Symbolic::AuxFunctions:  0
+    Parse::RecDescent:             0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.28

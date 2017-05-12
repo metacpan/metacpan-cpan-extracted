@@ -1,0 +1,62 @@
+0.25 Sat Aug 16 15:34:45 PDT 2014
+ - Remove 'use 5.x.x' from code
+
+0.24 Sat Aug 16 11:11:13 PDT 2014
+ - Meta 0.0.2
+
+0.23 Sat Aug 16 03:42:01 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.22 Fri Aug 15 15:51:59 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.21 Sun Aug  3 22:55:10 PDT 2014
+ - Remove (c) from Copyright
+ - Finish doc to Swim
+
+0.20 Sat Aug  2 11:20:35 PDT 2014
+ - Fix Copyright years.
+
+0.19 Wed Jul 30 15:44:42 PDT 2014
+ - Switch IRC to
+
+0.18 Sat Jul 26 12:28:18 PDT 2014
+ - Switch to Zilla::Dist
+
+0.17 Mon Sep  5 09:44:44 BST 2011
+ - Add XXX_skip for XXX proxying.
+ - Released from Liz++ and Wendy++'s guest bedroom.
+
+0.16 Fri Aug 19 20:50:09 EEST 2011
+ - Add manifest_skip and readme_from to Makefile.PL
+ - Add $Module::Install::Gloom::VERSION
+ - Switch to Module::Package
+
+0.15 Thu Sep  9 18:08:33 PDT 2010
+ - Only use_gloom for M::I admin
+
+0.14 Tue Aug 31 18:27:32 PDT 2010
+ - t/install.t fails without module install
+
+0.12 Fri Aug 27 19:39:26 PDT 2010
+ - Refactored to be more sane.
+ - Gloom derived modules no longer guess their package name.
+ - Added Module::Install tests like in Mousse.
+
+0.11 Sat Aug 14 21:12:33 PDT 2010
+ - Better package name resolver.
+ - Tweaked the docs to be better.
+
+0.10 Sat Aug 14 16:46:57 PDT 2010
+ - No longer need to subclass or 'do Gloom' to create a base module.
+ - Add Module::Install::Gloom support!
+ - Write the complete documentation.
+
+0.02 Tue Aug  3 17:12:58 PDT 2010
+ - Turn on strict and warnings automatically.
+ - Write more doc.
+
+0.01 Tue Aug  3 02:11:51 PDT 2010
+ - Initial version.
+

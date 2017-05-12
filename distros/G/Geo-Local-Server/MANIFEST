@@ -1,0 +1,20 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Geo/Local/Server.pm
+t/001_load.t
+t/002_env.t
+t/003_file.t
+etc/local.coordinates
+etc/profile.d-local.coordinates.sh
+scripts/is_daytime
+scripts/is_nighttime
+scripts/sunset_time
+scripts/sunrise_time
+scripts/local.coordinates
+perl-Geo-Local-Server.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

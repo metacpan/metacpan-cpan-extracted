@@ -1,0 +1,78 @@
+Revision history for Perl extension Getopt::Simple.
+
+1.52  Sun Feb 21 12:55:13 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.51  Wed Feb 10 14:02:06 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.50  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.49  Sat Mar 22 11:31:00 2008
+    - Patch from JJARVINEN for RT#33299 so that an option value of zero overrides the default
+
+1.48  Sun Nov 07 14:30:00 2004
+	- Add sub pad() to simplify printing of fixed width fields.
+		Original patch: Ricardo Signes.
+		Since this is the only change, there is no need to upgrade
+
+1.47  Tue Jul 20 20:43:00 2004
+	- Change Makefile.PL to coexist with Module::Build
+	- Document parameters properly
+	- Test against Getopt::Long V 2.34
+	- Add t/pod.t to test all PODs
+
+1.46  Sun Mar 23 11:29:00 2003
+	- No source code changes in this version
+	- Patch to stop shipping blib/ directory in Unix distros, because the
+		PAUSE indexer takes this directory to indicate a binary distro,
+		which means it does not index the module, and this in turn means
+		the module is not listed in the CPAN daily update list, etc.
+
+1.45  Sun May 12 13:12:11 2002
+	- Clean up licence and email stuff in all modules, scripts and other docs.
+		Upgrading is not necessary
+
+1.44  4-Oct-99
+--------------
+o Change my email address
+o Make a *.zip compatible with PPM
+
+1.43 26-May-99
+--------------
+o Ensure POD survives buggy pod2man
+o Ship Readme.txt, output by pod2text
+
+1.42 15-Apr-99
+--------------
+o Add stuff required to generate valid PPM files to Makefile.PL
+o Test using makePPD.bat and patchPPD.pl
+o See http://savage.net.au/Perl.html for these 2
+
+1.41 30-May-99
+--------------
+o Recreated by h2xs 1.18
+
+1.40 10-Nov-98
+--------------
+o Change width of help report. Restructure tests.
+
+1.30 11-Dec-97
+--------------
+o Change 'Help' to 'verbose'. Make all hash keys lowercase.
+
+1.20 3-Dec-97
+-------------
+o Add 'Help' on a per-switch basis.
+
+1.10 13-Oct-97
+--------------
+o Add arrays of switches (eg '=s@').
+
+1.00 19-Aug-97
+--------------
+o Initial version.
+

@@ -1,0 +1,37 @@
+---
+abstract: 'Perl extension for geospatial web services'
+author:
+  - 'Ari Jolma <ari.jolma at gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  XML::SemanticDiff: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-OGC-Service
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Clone: '0'
+  Encode: '0'
+  JSON: '0'
+  Modern::Perl: '0'
+  Plack::Builder: '0'
+  Plack::Request: '0'
+  XML::LibXML: '0'
+  XML::LibXML::PrettyPrint: '0'
+  perl: '5.010000'
+resources:
+  repository: https://github.com/ajolma/Geo-OGC-Service
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

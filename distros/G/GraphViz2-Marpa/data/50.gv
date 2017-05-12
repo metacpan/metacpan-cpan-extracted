@@ -1,0 +1,5 @@
+digraph graph_50
+{
+# A node whose name is 0. Can we cope?
+	0
+}

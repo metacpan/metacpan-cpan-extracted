@@ -1,0 +1,31 @@
+---
+abstract: 'Named subroutine arguments, with optional type checking'
+author:
+  - 'The original code (written before September 15, 2004) was written by '
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Getargs::Long
+name: Getargs-Long
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Log::Agent: '0.105'
+  perl: '5.005'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Getargs-Long
+  homepage: https://github.com/coppit/getargs-long/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/coppit/getargs-long.git
+version: '1.1007'

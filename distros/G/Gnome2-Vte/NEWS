@@ -1,0 +1,57 @@
+Overview of changes in Gnome2::Vte 0.11 [2013-10-21]
+=====================================================
+
+* RT#89113 - Use v2 of CPAN::Meta::Spec in Makefile.PL; this adds the "nice
+  bits" to MetaCPAN (git clone URL, project homepage URL, etc.)
+
+Overview of changes in Gnome2::Vte 0.10
+=======================================
+
+* Avoid a segfault in the tests.
+
+Overview of changes in Gnome2::Vte 0.09
+=======================================
+
+* Fix a bug in Gnome2::Vte::match_check that resulted in spurious "Modification
+  of a read-only value attempted" errors.
+
+Overview of changes in Gnome2::Vte 0.08
+=======================================
+
+* Fix a bug that could cause crashes when trying to access the "back" and
+  "fore" members of char attributes.
+* Allow undef as a parameter where appropriate.
+
+Overview of changes in Gnome2::Vte 0.07
+=======================================
+
+* New API: Gnome2::Vte::Terminal::set_opacity.
+* Make sure that return values which contain UTF-8 have the UTF-8 flag set.
+
+Overview of changes in Gnome2::Vte 0.06
+=======================================
+
+* Add new API:
+  - Gnome2::Vte::Terminal::feed_child_binary
+  - Gnome2::Vte::Terminal::set_pty
+
+Overview of changes in Gnome2::Vte 0.05
+=======================================
+
+* Fix a small test issue.
+
+Overview of changes in Gnome2::Vte 0.04
+=======================================
+
+* Replace the old and broken synopsis [muppet]
+* Bind and test get_text_include_trailing_spaces and get_default_emulation
+* Test match_check, get_status_line, get_icon_title, and get_window_title.
+
+Overview of changes in Gnome2::Vte 0.03
+=======================================
+
+* Various small fixes to the build environment and the test suite.
+* Newly wrapped methods: Gnome2::Vte::Terminal::set_font_full,
+set_font_from_string_full, set_color_cursor, set_color_highlight,
+set_background_tint_color, set_scroll_background, match_set_cursor, and
+match_set_cursor_type.

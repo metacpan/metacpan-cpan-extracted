@@ -1,0 +1,81 @@
+=== version history of Geo::GML
+
+All change mades by Mark Overmeer, unless explicitly assigned to
+someone else.
+
+version 0.16: Sun Jan  5 18:57:06 CET 2014
+
+	Fixes:
+	- fixed regression-test to match newer versions of XML::Compile
+
+	Improvements:
+	- use ::Cache::addPrefixes()
+
+version 0.15: Thu Mar 19 09:18:12 CET 2009
+
+	Improvements:
+	- implement from().  Added examples/read_gml.pl
+
+version 0.14: Tue Feb  3 13:09:59 CET 2009
+
+	Fixes:
+
+	- do not use /bin/pwd in t/pod.t
+
+	- fix version report in t/01use.t
+
+	- check minimal version of option Geo::Point in Makefile.PL
+
+version 0.13: Wed Jan 21 12:03:29 CET 2009
+
+	Changes:
+
+	- key_rewrite will be PREFIXED always.
+
+	Fixes:
+
+	- documentation production fixes.
+
+version 0.12: Wed Jan 21 11:18:00 CET 2009
+
+	Fixes:
+
+	- version 3.2.1 needs smil spec of 3.1.1
+
+	- require XML::Compile 1.00 for xlink fixes.
+
+	Changes:
+
+	- extend from XML::Compile::Cache, instead of having it as
+	  helper object.
+
+	Improvements:
+
+	- share man-page tail with other Geo::* modules.
+
+	- doc hint about use of template()
+
+	- direct availability of Geo::Proj object for all shapes via
+	  new proj4() method.
+
+	- allow other GML versions to be registered (used by Geo::EOP)
+
+version 0.11: Thu Jun 12 09:31:12 CEST 2008
+
+	Changes:
+
+	- removed all the ::2_0_0 (and so on) extensions, merging the
+	  specifics into Geo::GML itseld.  This simplifies the
+	  implementation a lot.
+
+	Improvements:
+
+	- added t/pod.t for pod tests.
+
+	- fixed the copyright statement in the manual-pages.
+
+	- reference to new module Geo::ISO19139
+
+version 0.10: Mon Jun  9 14:04:35 CEST 2008
+
+	- initial release

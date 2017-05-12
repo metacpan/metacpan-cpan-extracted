@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+###########################################
+# play - Blackjack against Las Vegas Dealer
+# Mike Schilli, 2003 (m@perlmeister.com)
+###########################################
+use warnings; use strict;
+
+use Games::Blackjack;
+use Term::ANSIColor qw(:constants);
+use Term::ReadKey;
+
+$| = 1; my $total = 0;
+
+my $shoe = Games::Blackjack::Shoe->new(
+                           nof_decks => 4);
+{
+  if($shoe->remaining() < 52) {
+    print "Shuffling ...\n";
+    $shoe->reshuffle();
+  }
+
+  my $player = Games::Blackjack::Hand->new(
+             shoe => $shoe);
+  my $dealer = Games::Blackjack::Hand->new(
+             shoe => $shoe);
+
+  $dealer->draw();
+  P(RED, "D", $dealer);
+  $dealer->draw();
+
+  $player->draw();
+  $player->draw();
+
+  while(!$player->busted()) {
+    P(BLUE, "P", $player);
+    print "([H]it/[S]tand/[Q]uit) ";
+    ReadMode 4;
+    my $move = ReadKey(0);
+    ReadMode 0;
+    print "\r";
+    last if $move =~ /^s/i;
+    exit 0 if $move =~ /^q/i;
+    $player->draw();
+  }
+
+  P(BLUE, "P", $player);
+
+  while(!$dealer->busted() and 
+        $dealer->count("soft") < 17) {
+    P(RED, "D", $dealer);
+    $dealer->draw();
+  }
+
+  P(RED,  "D", $dealer);
+
+  $total += $player->score($dealer);
+
+  print "Score: ", 
+        $player->score($dealer), 
+        ", Total: ", $total, "\n\n";
+
+  redo;
+}
+
+sub P { # Print status in color
+    print(BOLD, $_[0], "$_[1]", "[",
+    $_[2]->count_as_string(), "]",
+    RESET, ": ", $_[2]->as_string(), "\n")
+}

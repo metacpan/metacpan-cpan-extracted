@@ -1,0 +1,39 @@
+Games-RoundRobin-Tournament version 0.02
+
+Round-Robin Tournament Schedule Pairings
+
+This module implements an algorithm that allows the setting up of round robin
+tournaments, a form of competition where all members play in all the rounds and
+every member meets every other member once and only once over the course of the
+tournament.
+
+This is a completely perl module. There is a dependency on Module::Build.
+
+This is version 0.02, the second version uploaded to CPAN.
+
+INSTALLATION
+
+The installation depended on Module::Build, rather than ExtUtils::MakeMaker.
+Now you can try the Makefile.PL, if you don't want to install
+Module::Build.
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+or  perl Makefile.PL
+    make
+    make test
+    make install
+
+Perhaps instead of make, you will use nmake or dmake.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Dr Bean
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,268 @@
+#!/usr/bin/perl -w
+#
+# barcodegen - a program for making barcodes in various image formats
+#
+# GD::Barcode::Image is the package that contains barcodegen
+#
+# uses GD::Barcode, supports following types of barcodes:
+# Code39    COOP2of5      EAN13    EAN8      IATA2of5    Industrial2of5
+# ITF       Matrix2of5    NW7      QRcode    UPCA        UPCE
+# Barcode info: http://www.makebarcode.com/specs/speclist.html
+# For output images, uses Image::Magick - so output can be any format
+# that Image::Magick supports. This requires the GD module also.
+# -----------------------------------------------------------------------
+# Created: May 2007
+# Copyright (C) 2007 Avinash Chopde <avinash@aczoom.com>  www.aczoom.com
+# -----------------------------------------------------------------------
+# License
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+# See http://www.perl.com/perl/misc/Artistic.html.
+# -----------------------------------------------------------------------
+
+use warnings;
+use strict;
+
+use Getopt::Long 2.33;  # > 2.32 for --version flag
+use Pod::Usage;
+use GD::Barcode::Image;
+use Image::Magick;
+use Carp;
+
+our $VERSION = 1.03;
+
+# ---------------------------------------
+my $man        = 0;
+my $help       = 0;
+my $verbose    = 0;
+my $type       = 'Code39';   # barcode type (Code39, EAM13, UPCA etc)
+my $format     = 'PNG';      # output type (PNG, JPEG, EPS, PDF, etc)
+my $filename   = '';         # output file name
+my $notext     = undef;      # if set, create barcode only, with no text label
+my $height     = 36;         # default height in pixels for non-QRCode
+my $qrsize     = undef;      # Module Size for QRCode
+my $qrecc      = undef;      # only for QRCode: Error Correction Capability
+my $qrversion  = undef;      # only for QRCode: Version
+my $border     = '10x7';     # border SIZE, or WIDTHxHEIGHT, example: 20 or 20x3
+
+GetOptions(
+    'type=s'      => \$type,        # barcode type - code39, etc
+    'format=s'    => \$format,      # output format: png, jpeg, eps, pdf, etc
+    'notext'      => \$notext,      # create barcode only, with no text label
+    'height=i'    => \$height,      # image height in pixels
+    'qrsize=i'    => \$qrsize,      # QRcode - Module Size
+    'qrecc=s'     => \$qrecc,       # QRcode only - Error Correction Capability
+    'qrversion=i' => \$qrversion,   # QRcode only - Version
+    'border=s'    => \$border,      # border SIZE or WIDTHxHEIGHT
+    'write=s'     => \$filename,    # output file name
+    'verbose|v'   => \$verbose,     # include info/warnings in output, to STDERR
+    'help|h|?'    => \$help,
+    'man'         => \$man,         # perldoc man page output
+) or pod2usage(2);
+
+pod2usage(1)
+  if $help;
+pod2usage( -verbose => 2 )
+  if $man;
+
+# ---------------------------------------
+# check arguments - border must be two numbers
+my ( $bwidth, $bheight ) = split( /x/, $border, 2 );
+if ($bwidth) {
+    $bheight = $bwidth unless ($bheight);
+    pod2usage("** Error: --border arguments ($border) invalid")
+      if ( $bwidth !~ /^(([+]?\d+)|([+]?(\d+\.\d+|\d+\.|\.\d+)))$/
+        || $bheight !~ /^(([+]?\d+)|([+]?(\d+\.\d+|\d+\.|\.\d+)))$/ );
+    # accept numbers: 10   +11   12.  .13   14.15
+
+    $border = $bwidth . 'x' . $bheight;
+}
+
+# barcode text must be provided
+my $text = $ARGV[0];    # barcode text
+
+# if 0 or more than 1 arguments were given, is error.
+pod2usage("** Error: No barcode text provided.")
+  if ( @ARGV == 0 || !$text );
+pod2usage("** Error: More than one barcode text string provided.")
+  if ( @ARGV > 1 );
+
+# only QRcode uses these arguments
+if ($type =~ /QRcode/) {
+    if (defined($notext)) {
+        carp "Warning: ignoring notext parameter (for QRcode),";
+    }
+    $notext = undef;
+    $height = undef;
+} else {
+    if (defined($qrecc) || defined($qrversion)) {
+        carp "Warning: ignoring ecc or version parameters (not QRcode),";
+        $qrecc = undef;
+        $qrversion = undef;
+    }
+    $qrsize = undef;
+}
+
+# ---------------------------------------
+# informational messages
+if ( $verbose > 0 ) {
+    print STDERR "  Creating barcode for string \"$text\"\n";
+    print STDERR "  Type: $type\n";
+    print STDERR "  Height: $height pixels\n" if ($height);
+    print STDERR "  Border: $border\n" if ($border);
+    print STDERR "  No Text will be printed on image.\n"      if ($notext);
+    print STDERR "  QRcode Module Size: $qrsize\n" if ($qrsize);
+    print STDERR "  QRcode Error Correction Capability: $qrecc\n" if ($qrecc);
+    print STDERR "  QRcode Version: $qrversion\n" if ($qrversion);
+    print STDERR "  Output image format: $format\n";
+    print STDERR "  Output file name: \"$filename\"\n" if ($filename);
+}
+
+# ---------------------------------------
+# using GD::Barcode and GD, create PNG image of Barcode, with no border
+
+my %rhPrm = (   # Used for QRcode type only
+    Ecc        => $qrecc,
+    Version    => $qrversion,
+    ModuleSize => $qrsize,
+);
+
+my $gdbcim = GD::Barcode::Image->new( $type, $text, \%rhPrm );
+croak "** Error: Barcode $type failed for $text: ${GD::Barcode::errStr}," 
+  unless ($gdbcim);
+
+my $image = $gdbcim->plot_imagick( NoText => $notext, Height => $height );
+croak "** Error: Barcode imaging failed: ${GD::Barcode::errStr}," 
+  unless ($image);
+
+# using Image::Magick, add optional border, and convert to required format
+my $errStr;
+$errStr = $image->Set( bordercolor => 'white' );
+carp "Warning: \$image->Set bordercolor failed: $errStr," 
+  if ("$errStr");
+
+if ($border) {
+    $errStr = $image->Border( geometry => $border );
+    carp "Warning: \$image->Border failed: $errStr," 
+      if ("$errStr");
+}
+
+# if required, redirect to output file
+if ($filename) {
+    open( STDOUT, '>', $filename )
+      or croak "** Error: Can't redirect to output ($filename): $!,";
+}
+binmode(STDOUT);
+
+my $blob = $image->ImageToBlob( magick => $format );
+croak "** Error: Could not write image in format ($format): $errStr" 
+  if ("$errStr");
+print $blob;
+# $image->Write(file => \*STDOUT, magick => $format); # don't use!
+# file => \*STDOUT ... leaves program hanging - reading from STDIN, does
+# not exit cleanly. $format:- works correctly, on machine tested.
+# $image->Write($format . ':-'); # works...
+# $blob = $image->ImageToBlob(magick=>$format); print $blob; # another way...
+
+close(STDOUT);
+
+# -----------------------------------------------------------------------
+
+__END__
+
+=head1 NAME
+
+barcodegen - create barcode images
+
+=head1 SYNOPSIS
+
+barcodegen [options] TEXT
+
+   TEXT              Generate Barcode for this text
+
+ Options:
+
+   --type TYPE       Barcode type - Symbology
+                     (default: Code39)
+
+   --format=TYPE     Output format: png, jpeg, eps, pdf, gif, ... 
+                     (default: PNG)
+
+   --height=VALUE    Height in pixels of barcode (for non-QRcode type)
+                     (default: 36)
+   --notext          Create image with no text label (for non-QRcode type)
+
+   --qrecc=[LMQH]    QRcode only - Error Correction Capability
+   --qrversion=VALUE QRcode only - Version (1..40), size of image
+   --qrsize=VALUE    QRcode only - Size of One Module
+
+   --border=SIZE     White border of SIZE created around barcode
+   --border=WIDTH[xHEIGHT]   White border WIDTHxHEIGHT in pixels created
+                     (default: 10x7)
+
+   --write=FILENAME  Output file name. By default image is output to STDOUT
+
+   --help | -h | -?  Brief help message
+   --man             Full documentation
+   --verbose | -v    Informational and warning messages printed, to STDERR
+
+=head1 DESCRIPTION
+
+B<barcodegen> will create a barcode image from the given text, a single
+string is expected as the argument. The barcode image is printed to
+STDOUT, or written to a file.
+All barcodes supported by the GD::Barcode Perl module can be handled, for
+example: 
+Code39    COOP2of5      EAN13    EAN8      IATA2of5    Industrial2of5
+ITF       Matrix2of5    NW7      QRcode    UPCA        UPCE.
+The default barcode type is Code39, and its character set includes
+the digits 0-9, the letters A-Z (upper case only), and the following
+symbols: space, minus (-), plus (+), period (.), dollar sign ($), slash
+(/), and percent (%).
+
+The barcode can be output in any format supported by the Image::Magick
+perl module. The most common formats include: PNG, JPEG, GIF, EPS, PDF. 
+
+Pixel dimensions are used to specify the height and optional border.
+Resolution of 72 pixels/inch may be assumed when needed - such as in the
+PostScript output formats.
+
+=head1 EXAMPLES
+
+=over 8
+
+=item B<barcodegen ABC123DEF>
+
+Will output a PNG image to STDOUT, representing the barcode, with a text
+label. Default height of 36 pixels, and default border of 10x7.
+
+=item B<barcodegen "ABC%123%" --format EPS --height 144 --border 10x7>
+
+Will output a Encapsulated PostScript file to STDOUT, with height of
+144 pixels, the barcode text label, a border of 10 pixels on
+left and right sides, and a border of 7 pixels at the top and bottom.
+
+=item B<barcodegen 01234567890 --type UPCA --verbose>
+
+Will output a PNG image to STDOUT, representing the UPC-A barcode for
+01234567890, with a text label that includes the checksum (which is 5 for
+this barcode). Informational messages will also be printed to STDERR.
+
+=back
+
+=head1 PREREQUISITES
+
+This script requires the following modules:
+C<GD::Barcode>,
+C<GD>,
+C<Image::Magick>.
+
+=head1 OSNAMES
+
+any
+
+=head1 SCRIPT CATEGORIES
+
+Image/Utility
+
+=cut

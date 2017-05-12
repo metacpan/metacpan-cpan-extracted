@@ -1,0 +1,113 @@
+
+GPS::Magellan version 0.5
+=========================
+
+The feature list is rather short:
+
+  * Downloads waypoint and tracklog data from Magellan 
+    receivers via serial port
+
+  * Dump coordinates on stdout or into a file.  At this moment the 
+    GpsDrive way.txt file format is implemented, and there is a 
+    flexible framework so adding new formats/parsers shouldn't be 
+    too hard.
+
+
+STORY
+
+    This module first came into existence as a set of hacks against 
+    Brian J. Hennings' gpsutil[1] program, which was working with my
+    Magellan receiver (thanks for that, Brian).  But I wanted a 
+    Perl interface and GPS::Garmin (although Magellan support is 
+    mentioned in the docs) it couldn't talk to my Magellan.
+
+    In the first iteration the C code was just passing back output
+    to Perl, which then re-parsed it (I needed to convert the data convert 
+    into different file formats)... 
+
+    Eventually, I rewrote some of Brian's code (the higher level 
+    protocol and message-parsing routines) as a Perl module, which 
+    then I glued to some parts of his code using perl XS.  Essentially, 
+    the C code takes care of the serial port and NMEA checksums.  
+    Perl routines do their job on clean CSV data.
+
+
+STATUS
+
+    This project is far from being mature, it's ALPHA code (although it 
+    *does* contain a quite extensive test suite that covers most of 
+    the functionality).  
+
+    Originally, I was looking for a similar project in a more matured state 
+    but couldn't find one.  But I'd still be up for it, so please mail me
+    if you work on such code!  
+
+    I'm also looking into the possibilities of sharing code or joining 
+    other module trees (beneath GPS:: for instance, but anywhere it 
+    makes sense).  Having a common interface with other device-specific
+    GPS communication modules (GPS::Garmin the only one I know of,
+    there may be others...) would also be a nice thing.
+
+
+PLANNED FEATURES
+
+    There are going to be implemented Real Soon Now as I want to draw maps
+    during my trip to the US in June!
+
+  * A command line tool (look in the examples/ directory for an 
+    almost finished one, it takes care of the core business with 
+    a little obvious tweaking involved ;-) (TRACKLOG/WAYPOINT)
+
+  * Uploading waypoints to the receiver
+
+  * Even write documentation!
+
+[1]
+  http://www.cs.uakron.edu/~hennings/gpsutil/
+
+
+INSTALLATION
+
+    To install this module type the following:
+
+       tar xzvf GPS_Magellan-0.5.tar.gz
+
+       # First build the C library
+
+       cd GPS_Magellan-0.5/gpslib
+
+       make
+
+       cd ..
+
+       # Standard Perl installation from here on
+
+       perl Makefile.PL
+       make
+       make test   # TEST_VERBOSE=1
+       make install
+
+BUGS
+
+    Send bugs to <peter@login-fo.net>.
+
+DEPENDENCIES
+
+    A few modules that should be among the standard Perl libs.
+
+DISCLAIMER
+
+    All standard disclaimers apply; this code is provided "AS IS".
+    If it erases your three years' worth of tracklog database, all you 
+    can do is sit back, open a beer and relax.  Please let me know, 
+    however, about serious bugs like sleeping with your wife or stealing
+    your bike.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Peter Banik <peter@login-fo.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

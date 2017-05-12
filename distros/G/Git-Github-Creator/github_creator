@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+# vim:set noet ts=2 sw=2:
+use strict;
+use warnings;
+
+use vars qw($VERSION);
+
+$VERSION = '0.17';
+
+use Git::Github::Creator;
+
+Git::Github::Creator->run( @ARGV );
+
+=head1 NAME
+
+github_creator - Create a Github repository from your local repository
+
+=head1 SYNOPSIS
+
+	# edit ~/.github_creator.ini
+
+	# Inside a git repo
+	% github_creator --name my-project --desc "an awesome thing"
+
+	# for a Perl distro, figure it out through META.yml
+	% github_creator
+	
+=head1 DESCRIPTION
+
+This is a short script you can run from within an existing git
+repository to create a remote repo on Github using a previously
+created account. This does not create Github accounts (and that
+violates the terms of service).
+
+If the C<--name> and C<--desc> switches are not given, it will try
+to find them in META.yml. If the script doesn't find a META.yml, it
+tries to run `make metafile` (or `Build distmeta`) to create one.
+
+From META.yml it gets the module name and abstract, which it uses for
+the Github project name and description. It uses the CPAN Search page
+as the homepage (e.g. http://search.cpan.org/dist/Foo-Bar).
+
+Once it creates the remote repo, it adds a git remote named "origin"
+(unless you change that in the config), then pushes master to it.
+
+If Github sends back the right page, the script ends by printing the
+private git URL.
+
+=head1 CONFIGURATION
+
+The configuration file is an INI file named F<.github_creator.ini>
+which the script looks for in the current directory or your home
+directory (using the first one it finds).
+
+Example:
+
+	[github]
+	login_page="https://github.com/login"
+	account=joe@example.com
+	password=foobar
+	remote_name=github
+	debug=1
+
+=head2 Section [github]
+
+=over 4
+
+  
+=item login_page (default = https://github.com/login)
+
+This shouldn't change, but what the hell. It's the only URL
+you need to know.
+
+=item account (default = GITHUB_USER environment var)
+
+Your account name, which is probably your email address.
+
+=item password (default = GITHUB_PASS environment var)
+
+=item remote_name (default = origin)
+
+I like to use "github" though.
+
+=item debug (default = 0)
+
+Do everything but don't actually create the Githun repo.
+
+=back
+
+=cut
+
+=head1 ISSUES
+
+The Github webserver seems to not return the right page every so
+often, so things might go wrong. Try again a couple times.
+
+Sometimes there is a delay in the availability of your new repo. This
+script sleeps a couple of seconds then tries to verify that the new repo
+is there. If it can't see it, look at Github first to see if it showed up.
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a Github project:
+
+	git://github.com/briandfoy/github_creator.git
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+David Golden and Ricardo SIGNES contributed to the code.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008-2009, brian d foy, All Rights Reserved.
+
+You may redistribute this under the same terms as Perl itself.
+
+=cut
+
+

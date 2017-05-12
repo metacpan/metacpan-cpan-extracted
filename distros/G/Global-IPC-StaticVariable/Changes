@@ -1,0 +1,25 @@
+Revision history for Perl extension Global-IPC-StaticVariable
+
+0.015 2016-09-28T03:23:59Z
+    - add benchmark/var_update.t
+    - add benchmark/var_read.t
+
+0.014 2016-09-28T03:08:09Z
+    - use Module::Build
+    - add -pthread option
+
+0.013 2016-09-02T08:18:33Z
+    - add deps of 'Test::LeakTrace'
+
+0.012 2016-09-02T03:10:57Z
+    - update pod
+    - change license to MIT
+
+0.011 2016-09-02T03:09:33Z
+
+    - add usage
+
+0.01 2016-09-02T02:30:31Z
+
+    - original version
+

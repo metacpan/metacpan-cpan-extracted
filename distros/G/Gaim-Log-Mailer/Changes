@@ -1,0 +1,8 @@
+######################################################################
+Revision history for Perl extension Gaim::Log::Mailer
+
+0.02  2008/03/04
+    (ms) added exclude_words
+
+0.01  2008/02/10
+    (ms) Where it all began.

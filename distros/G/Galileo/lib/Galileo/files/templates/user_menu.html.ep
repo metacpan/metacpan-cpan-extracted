@@ -1,0 +1,79 @@
+% if (my $user = session 'username') {
+<div class="well" style="padding: 8px 0;">
+  <ul class="nav nav-list" id="user-menu">
+    <li class="nav-header">Hello <%== $user %></li>
+    % if ( is_author($user) && current_route 'show_page' ) {
+      <li><a href="#" onclick="add_page()">Add New Page</a></li>
+      <li><a href="<%= url_for 'edit_page', name => stash('name') %>">Edit This Page</a></li>
+    % }
+    <li><a href="/admin/menu">Edit Nav Menu</a></li>
+    <li><a href="/logout">Log Out</a></li>
+    % if ( is_admin $user ) {
+      <li class="nav-header">Administration</li>
+      <li><a href="#" onclick="add_user()">Add New User</a></li>
+      <li><a href="/admin/users">All Users</a></li>
+      <li><a href="/admin/pages">All Pages</a></li>
+    % }
+  </ul>
+</div>
+
+  %= modal 'page-modal' => begin
+    Create a page with link
+    <div class="input-prepend">
+      <span class="add-on">/page/</span>
+      <input type="text" id="new-page-link" placeholder="new page link">
+    </div>
+  % end
+
+  %= modal 'user-modal' => begin
+    Create a new user with username
+    <div class="input-prepend">
+      <span class="add-on">username:</span>
+      <input type="text" id="new-username" placeholder="new username">
+    </div>
+  % end
+
+  %= javascript begin
+    function show_modal(selector, callback) {
+      var modal = $(selector);
+      var button = modal.find('.btn-primary');
+
+      button.on( 'click', callback );
+      modal.on( 'hide', function() { button.off('click') });
+
+      modal.modal();
+    }
+
+    function add_page () {
+      show_modal( '#page-modal', function () {
+        var link = $('#new-page-link').val();
+        if (link.length > 0) {
+          window.location.href = '/edit/' + link;
+        } else {
+          humane.log('New link name cannot be empty');
+        }
+      });
+    }
+
+    function add_user () {
+      show_modal( '#user-modal', function () {
+        var username = $('#new-username').val();
+        if (username.length > 0) {
+          window.location.href = '/admin/user/' + username;
+        } else {
+          humane.log('New user name cannot be empty');
+        }
+      });
+    }
+
+  % end
+
+% } else {
+<form class="well" method="post" action="/login" id="login">
+  <input type="hidden" name="from" value="<%= $c->tx->req->url %>">
+  <input type="text" class="input-small" placeholder="Username" name="username">
+  <input type="password" class="input-small" placeholder="Password" name="password">
+  <input type="submit" class="btn" value="Sign In">
+</form>
+% }
+

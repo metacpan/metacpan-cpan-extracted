@@ -1,0 +1,4 @@
+
+(define-boxed GtkAcceleratorTable
+  gtk_accelerator_table_ref
+  gtk_accelerator_table_unref)

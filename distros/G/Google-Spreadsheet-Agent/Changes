@@ -1,0 +1,11 @@
+Revision history for Google-Spreadsheet-Agent
+
+0.01    10/28/2009
+        First version, released on an unsuspecting world.
+
+0.02 12/2010
+     Second version, slight modifications to the Google::Spreadsheet::Agent module.  
+     Added Google::Spreadsheet::Agent::Runner
+     Both use the same underlying Google::Spreadsheet::Agent::DB object to store their
+     access to the Google Spreadsheet.
+

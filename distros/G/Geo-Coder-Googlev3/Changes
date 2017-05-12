@@ -1,0 +1,72 @@
+Revision history for Perl extension Geo::Coder::Googlev3.
+
+0.15
+	- fixed test for changed results (Brandenburger Tor vs Pariser Platz)
+
+0.14
+	- documentation fix [github.com pull request #2]
+	- fixed test for changed results (Oeschelbronner Weg vs. Path)
+
+0.13
+	- stable release with all changes in 0.12_50..0.12_51
+
+0.12_51
+	- all test cases (also the first one) are run using
+	  safe_geocode
+
+0.12_50
+	- sensor is settable [rt.cpan.org #78520]
+	- specified POD encoding [rt.cpan.org #89213]
+
+0.12
+	- fixed test for changed results (Toledo, ES moved)
+
+0.11
+	- stable release with all changes in 0.10_50..0.10_52
+
+0.10_52
+	- implemented bounds parameter and accessor
+
+0.10_51
+	- again just test fixes, protecting against
+	  OVER_QUERY_LIMIT in tests
+
+0.10_50
+	- various test fixes for changed Google output, and
+	  protect from floating point inaccuracy
+
+0.10
+	- accessors for region and language (provided by abh)
+
+0.09
+	- default LWP::UserAgent object sets env_proxy
+	  [rt.cpan.org #66480] and sets timeout to 15s
+	- tests are skipped if there's no network connection
+	  [rt.cpan.org #65873]
+
+0.08
+	- fixed test for changed results [rt.cpan.org #68437]
+
+0.07
+	- ZERO_RESULTS is not anymore an error, but is returned as an
+	  empty result
+	- raw option
+
+0.06
+	- more diagnostics if an API call failed (status!=OK)
+
+0.05
+	- geocode method now returns multiple results in list context
+
+0.04
+	- just another test fix
+
+0.03
+	- fixed test to accommodate changed results from Google
+
+0.02
+	- more Pod
+	- more tests (region-specific)
+
+0.01
+	- first working version

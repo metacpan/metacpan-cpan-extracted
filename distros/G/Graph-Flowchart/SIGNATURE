@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e1f9643c934494110b4cff8d8975c6f2d79152c8 CHANGES
+SHA1 02154445bc9831e791c35050f1a018ed99030016 LICENSE
+SHA1 15c200790e3e23573943c42e9a44dceff65cbc86 MANIFEST
+SHA1 529b962adf4f4e8e41d483ffde3065784b442ba6 META.yml
+SHA1 28cb66fdb2befd540b3d7ccc64ca784188202b4d Makefile.PL
+SHA1 4beffa6eaef01aad60a1a69b7e9397ca5daac638 README
+SHA1 4c0410cccf848edf94f16d431eefb94d4c7d9c0b examples/test.pl
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 7e2cfa1b9efe0d502ee57717649c90ba4bd28ba9 inc/Module/Install.pm
+SHA1 182a0df45b65151afdc2be0b7246a2d02d0f0567 inc/Module/Install/AutoInstall.pm
+SHA1 6e1392d80a0f239eecd5664f7f21f922cedb9329 inc/Module/Install/Base.pm
+SHA1 f69417fe831d9cc22a78f00a617afadceade4d81 inc/Module/Install/Can.pm
+SHA1 c61d02895330310048bf388881b5e2e064031561 inc/Module/Install/Fetch.pm
+SHA1 4933b00c3a646da8d223c6957f94552bbd62f8c6 inc/Module/Install/Include.pm
+SHA1 54fcbed19232ec959bb17cfb4410599afc7f0779 inc/Module/Install/Makefile.pm
+SHA1 7d3be9b158e37b2b2c22084740099955623b1d56 inc/Module/Install/Metadata.pm
+SHA1 0a8b66180229ba2f9deaea1fedd0aacf7a7ace6b inc/Module/Install/Win32.pm
+SHA1 d3352eb33fe43a5f3ead513f645224fe34d73bc9 inc/Module/Install/WriteAll.pm
+SHA1 5adef0d59ef43abbd43d7d59b7abbcac3f21af1c lib/Graph/Flowchart.pm
+SHA1 3e05446e93d5e69201fddca56374c0fe2e068213 lib/Graph/Flowchart/Node.pm
+SHA1 e24284ea41bdde9997afb4d61710d0d4aa4f2d3e t/graphpm.t
+SHA1 1b9770cd52c39ce7b2d3545b3781493ee7054930 t/nodepm.t
+SHA1 feffb9911ac4562ae10a33c944bb2dc076554743 t/pod.t
+SHA1 65469cad96d416de68da8b514d456f0c567632a9 t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iQEVAwUBR2POnXcLPEOTuEwVAQKKkQf/SXrCSwp8GsOXvPb+nLQFxFme4qZge+UO
+BysfBNe3F6wBr44EpLD89dAlIdf250bhvOXqEo4blJVe/xZb1LdX9ulDxG5MJok/
+OsJ/FzF3IIcjMaWrKLjQJbqD+XGKdBulE2nCW4YecWRkuczAPqMHB73I87nb/eYI
+H3J41kvc1X46IzWh6qkWJHHIEBoElR8qhyWkf7v49VGAlpYfs3wiCFTh9ywL6jgK
+QPERP2WPRmb/r2IvgU8GHdIK31yiZ0TCQBPJtdKuPZ1qLsjTNAPIX8rtNYTbu7xy
+PhmaPcWcRlrqf5OSqI0WVJC3HnPqIBD9DAHfxQjOttGkNH5KBC0mOg==
+=g9al
+-----END PGP SIGNATURE-----

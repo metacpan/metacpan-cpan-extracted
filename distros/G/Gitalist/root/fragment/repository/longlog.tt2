@@ -1,0 +1,1 @@
+[% INCLUDE 'fragment/repository/shortlog.tt2' longlogformat = 1 %]

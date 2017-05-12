@@ -1,0 +1,20 @@
+#
+# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/GnomeCanvas/TODO,v 1.2 2003/09/05 01:11:38 muppetman Exp $
+#
+
+these are brand-new, very quickly made bindings, so there are still 
+some bugs.  the ones i know about are:
+
+- zooming the canvases in canvas_demo by holding the arrows in the
+  spinbuttons sometimes results in a segfault.  not at all sure why.
+
+- the non-english text in canvas_demo/canvas-rich-text.pl is apparently
+  very much not right.
+
+undone:
+
+- test suite!!!
+- the path def and bpath stuff needs serious testing
+- there is no typemap for ArtBpath, so several things are missing from 
+  GnomeCanvasPathDef.xs
+- ditto for ArtSVP and GnomeCanvasUtil.xs

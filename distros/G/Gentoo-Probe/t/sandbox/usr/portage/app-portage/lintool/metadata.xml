@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>tools-portage</herd>
+<maintainer>
+  <email>karltk@gentoo.org</email>
+  <name>Karl Trygve Kalleberg</name>
+  <description>Release manager, patch manager</description>
+</maintainer>
+
+ <longdescription> Lintool is a "lint" utility for the Gentoo Linux
+distribution. It is a tool that tests ebuilds, changelogs and package
+digests for well-formedness. It's intended to aid Gentoo Linux
+developers avoid most common mistakes when packaging software for
+Gentoo. </longdescription>
+
+</pkgmetadata>

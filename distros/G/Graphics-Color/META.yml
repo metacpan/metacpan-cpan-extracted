@@ -1,0 +1,33 @@
+---
+abstract: 'Device and library agnostic color spaces.'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::Number::Delta: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Graphics-Color
+requires:
+  Color::Library: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Aliases: 0.10
+  MooseX::Clone: 0
+  MooseX::Storage::Deferred: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+resources:
+  bugtracker: https://github.com/gphat/graphics-color/issues
+  homepage: https://github.com/gphat/graphics-color
+  repository: https://github.com/gphat/graphics-color.git
+version: 0.31

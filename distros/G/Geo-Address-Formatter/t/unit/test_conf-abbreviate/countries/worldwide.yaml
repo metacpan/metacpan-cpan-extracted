@@ -1,0 +1,32 @@
+default:
+    address_template: |
+        {{one}}, {{two}}
+        {{three}}
+
+# postcode after state
+generic4: &generic4 |
+        {{{attention}}}
+        {{{house}}}
+        {{{house_number}}} {{{road}}}
+        {{#first}} {{{city}}} || {{{town}}} || {{{state_district}}} || {{{village}}} {{/first}}, {{#first}} {{{state_code}}} || {{{state}}} {{/first}} {{{postcode}}}
+        {{{country}}}
+
+generic15: &generic15 |
+        {{{attention}}}
+        {{{house}}}
+        {{{road}}}, {{{house_number}}}
+        {{{postcode}}} {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{state}}} || {{{county}}} {{/first}}
+        {{{country}}}
+
+ES:
+    address_template: *generic15
+
+CA: 
+    address_template: *generic4
+
+US: 
+    address_template: *generic4 
+    postformat_replace:
+        - ["\nUS$","\nUnited States of America"]
+        - ["\nUnited States$","\nUnited States of America"]
+

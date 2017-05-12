@@ -1,0 +1,38 @@
+README for Games::Bingo::Print
+
+$Id: README 1835 2007-03-17 17:36:20Z jonasbn $
+
+ABOUT
+
+The Games::Bingo README files holds all the interesting information
+such as rules on playing etc. Games::Bingo is required by
+Games::Bingo::Print and should therefor be available on your system if
+you install this distribution correctly. If not check it out on CPAN.
+
+http://www.cpan.org/
+
+REQUIREMENTS
+
+This is a list of modules required by Games::Bingo::Print
+
+- POSIX
+- Test::Harness
+- Test::More
+- Data::Dumper
+- PDFLib 0.12
+- Games::Bingo 0.05
+- Getopt::Long
+
+INSTALLATION
+
+Please see the INSTALL
+
+BUGS
+
+If you experience any bugs please report them using:
+
+http://rt.cpan.org or bug-Games-Bingo-Print@rt.cpan.org
+
+Thanks,
+
+jonasbn <jonasbn@cpan.dk>, Copenhagen 30th. July 2003

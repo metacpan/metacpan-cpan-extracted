@@ -1,0 +1,49 @@
+# Hash comment
+
+strict digraph graph_53
+{
+	label   = "Complex\rSyntax\lTest"
+	rankdir = TB
+
+	A [shape = oval]
+
+	node [shape = house]
+	edge [color = purple]
+
+	{
+		rank = same
+		B
+		C
+		node [shape = oval]
+		D
+		ordering = out
+		A -> B
+		C -> D
+	}
+
+	node [color = green style = filled]
+	E
+	F
+	E -> F [label = "e->f", dir = both, arrowhead = dot, arrowtail = odot]
+
+	subgraph cluster_outer
+	{
+		G -> H
+		node [shape = hexagon]
+		node [color = red]
+		label = Outer
+		subgraph cluster_inner
+		{
+			node [shape = triangle]
+			edge [color = blue]
+			I [color = pink shape = square]
+			I -> J
+			label = Inner
+		}
+	}
+	graph [rankdir = TB]
+	node  [color   = orange]
+	K
+	L
+	K -> L [label = "k->l"]
+}

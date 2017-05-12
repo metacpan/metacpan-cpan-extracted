@@ -1,0 +1,21 @@
+# ChangeLog for net-wireless/libbtctl
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/libbtctl/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  12 Feb 2004; Ciaran McCreesh <ciaranm@gentoo.org> libbtctl-0.3.ebuild:
+  Adding ~sparc (works with some kernels, see bug #39710)
+
+  30 Jan 2004; Peter Johanson <latexer@gentoo.org> libbtctl-0.3.ebuild,
+  metadata.xml:
+  Fix for wireless->mobile herd change, and header dates
+
+  22 Sep 2003; Seemant Kulleen <seemant@gentoo.org> libbtctl-0.3.ebuild:
+  DEPEND should be pkgconfig not pkg-config. Thanks to: Nils Spengler
+  <nils.spengler@gmx.de> in bug #29325
+
+*libbtctl-0.3 (19 Sep 2003)
+
+  19 Sep 2003; Alastair Tse <liquidx@gentoo.org> libbtctl-0.3.ebuild,
+  metadata.xml:
+  initial commit. thanks to johnm@gentoo.org (#24302)
+

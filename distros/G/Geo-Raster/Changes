@@ -1,0 +1,122 @@
+Revision history for Perl extension Geo::RasterAlgebra, formerly (Grid).
+
+0.01  Sun Nov 14 02:10:07 1999
+	- original version; created by h2xs 1.18
+      Wed Dec 21 18:20    1999
+	- published on http://www.water.hut.fi/pub/Grid and announced
+          in comp.infosystems.gis and comp.lang.perl.modules
+0.02  Wed Jan 26 10:12:05 EET 2000
+        - started the new version
+      Wed Feb 16 14:20:27 EET 2000
+       	- corrected a bug in subwatersheds
+	- logical operations
+        - mathematical operations
+          this breaks
+		$gd->log10();
+          which was introduced in 0.01, either use
+         	&Grid::gdlog10($gd->{GRID});
+          or 
+		$gd = $gd->log10();
+	- neighbors
+	- colored_map
+	- if ... then construct for grids as a subroutine
+	- print(nonzeros=>1) prints now lines of i,j,x (also alias dump())
+	- restore method can be used to restore from data files
+	  created by dump
+	- lots of work in watershed.*
+	- new constructor $b = new Grid (like=>$a);
+	- methods min and max return the min and max of the grid if
+ 	  called without parameter (with parameter returns a grid)
+      Mon Mar 13 09:13:59 EET 2000
+	- published on http://www.water.hut.fi/pub/Grid and announced
+          in comp.infosystems.gis and comp.lang.perl.modules
+0.03  Mon Mar 13 10:02:40 EET 2000
+	- started the development of version 0.03
+      Tue Mar 14 09:42:05 EET 2000
+	- fixed the cellmove bug in watershed.c
+	- published
+0.04  Tue Mar 14 09:42:05 EET 2000
+	- started the development of version 0.04
+	- border() methods :: there may be a bug in recursive method?
+	- fixcrossings-method for flow direction grids
+	- changes after reading Object Oriented Perl by Conway: 
+	- use constant *_GRID
+	- operator overloading, including built-in functions and
+          taking care of reversed order
+	- in_place versions of many methods, if no result is required,
+          the method is in_place
+	- math functions: $a->sin(); is in_place $a = $a->sin();
+          creates a temporary copy
+	- attributes M and N are now stored also in the self-hash
+	- movecell, ups
+	- changes, additions and bugfixes to watershed.c
+	- published Tue Apr 11 09:46:18 EEST 2000
+0.05 Tue Apr 11 09:46:18 EEST 2000
+	- added attribute name
+	- added database handle and database methods
+	- published May 23 15:08
+0.06 Tue May 23 15:24:30 EEST 2000
+	- work on colortable, it is getting useful now
+	- filled circles and a gis method based on that: bufferzone
+	- a (bad) interpolation method, nearest neighbor
+	- method 'function' which fills the grid using an
+          arbitrary function of x an y --- Perl at its best!
+	- work on the database interface
+	- vector data, loading from database and simple visualization
+	- Voronoi diagram and Delaunay triangulation using an
+	  external program, see the Readme file .. these are stored
+	  as vector data in the database... but Voronoi diagram only
+	  as linesegments instead of polygons :-(
+	- many bugfixes, hopefully the map algebra stuff is now
+	  pretty much ok
+	- published Jun 20
+0.07 Mon Jun 26 15:50:44 EEST 2000
+	- added the licese files
+0.08 Thu Jun 29 17:14:56 EEST 2000
+	- distances and directions
+	- fixed a couple of bugs
+0.09 Wed Jan 10 15:56:22 EET 2001
+	- scaling of axes is now optional in plot/view/draw_on
+	- code cleanups
+        - nodata value in grids
+	- zonal functions, cross product of integer grids
+	- more or less complete rewrite of the hydrological functions (catchment.*)
+	- new default file format hdr/bil
+	- Grid: contents of a real grid
+	- united demo.pl into test.pl
+	- shell.pl: output(), plot() [uses gnuplot]
+0.10 released Mon Oct 15 11:20:03 EEST 2001
+	- applytempl: default new_value =  1
+	- applytempl: return value (if requested) is a new grid and not the count anymore
+	- new and save have named parameters "filename"
+	- name attribute is set to the filename given to new or save
+	- import and export initiated if a recognized extension is detected in the filename
+	- export (later import?) uses colortable if exporting to ppm
+	- exporting to (later importing from?) other graphics formats via external programs
+	- code review: nodata, math, 
+	- added mask support
+0.11 released Mon Oct 15 15:07:17 EEST 2001
+	- fixed a fabs bug which screwed up aspect calculations among other things
+0.12 never released
+	- Timeseries and DBI::Tools separated
+0.20 released Nov 22 2004
+	- changed name to Geo::Raster and upload to CPAN
+	- grid C code is now libral in sourceforge
+	- removed vector code, e.g., voronoi diagram
+0.21 released
+	- better detection of libral location
+	- test functions have_netpbm and have_pgplot
+0.3 released Mar 16 2005
+	- lots of tests and bug fixes
+0.31 relesed Apr 23 2005
+	- improving the 0.3
+0.40 released Oct 2005
+	- removed support for PGPLOT, databases, colortable, PPM, ...
+	- added support for GDAL, Gtk2, ...
+0.41 release Mar 6 2006
+0.42 release Mar 6 2006
+0.50 release Oct 30 2006
+0.61 release Jul 1 2007
+	- use with libral 0.61
+	- split into several files
+	- moved all GUI code into Gtk2::Ex::Geo::Raster

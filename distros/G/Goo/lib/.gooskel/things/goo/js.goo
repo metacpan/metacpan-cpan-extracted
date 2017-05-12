@@ -1,0 +1,16 @@
+title			=	Javascript Script
+description		=	This Thing handles standalone Javascript files
+
+[E]dit			=	Goo::TabAwareEditor.pm
+[P]rofile		=	Goo::Thing::js::JavascriptProfiler.pm
+[D]elete		=	Goo::FileDeleter.pm
+E[X]it			= 	Goo::Exiter.pm
+[J]ump			=	Goo::JumpManager.pm
+[C]lone			=	Goo::FileThing::Cloner.pm
+[S]hell			=	Goo::ShellCommander.pm
+Back [L]inks	= 	Goo::BackLinkManager.pm
+[Z]one      	=   Goo::Zone.pm
+Care[O]Meter	=	Goo::CareOMeter.pm
+
+location		= /home/goo/web
+

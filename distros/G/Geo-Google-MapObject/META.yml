@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               Geo-Google-MapObject
+version:            0.06
+abstract:           Code to help with managing the server side of the Google Maps API
+author:
+    - Nicholas Bamber <nicholas@periapt.co.uk>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTML::Entities:       0
+    HTML::Template::Pluggable:  0
+    JSON:                 0
+    Math::Trig:           1.2
+    Scalar::Util:         0
+    Test::Deep:           0
+    Test::JSON:           0
+    Test::More:           0
+resources:
+    repository:  http://github.com/periapt/geo-google-mapobject
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

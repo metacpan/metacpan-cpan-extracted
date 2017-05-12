@@ -1,0 +1,185 @@
+=pod
+
+
+=head1 NAME
+
+Chess - People
+
+
+=head1 SYNOPSIS
+
+A list of historical figures in chess.
+
+
+=head1 DESCRIPTION
+
+
+=head1 PEOPLE
+
+=over 4
+
+=item Alekhine, Alexander
+
+Succeeded Capablanca as the champion in 1927 (the 4th). His combinations and sacrifices
+were greatly admired. Died in 1946 while still the champion. World War II
+prevented him from defending his title. One of the original five grandmasters named by
+Czar Nicholas.
+
+=item Anderssen, Adolf
+
+=item Botvinnik, Mikhail ``Iron Mike''
+
+Became world champion in 1948, succeeding Alekhine. He held the title for 15 years, but
+with two interruptions.
+
+=item Capablanca, Jose' Rau'l ``The Chess Machine''
+
+A talented Cuban player, who achieved master status at the age of 14. He succeeded
+Lasker as champion in 1921. He was known for his technique of achieving a slight
+positional advantage, forcing a massive exchange of pieces, and finally 
+outmaneuvering his opponent in the endgame.
+
+=item Chigorin
+
+The first world-class Russion chess player.
+Considered to be the founder of the ``Russian School of Chess''.
+
+=item Euwe, Max
+
+A Dutch mathematics professor, an excellent strategist, and author of books on
+chess. Gained the championship title from Alekhine in 1935, but lost it again
+to him in 1937 in a devastating 4 to 10 return match loss.
+
+=item Fischer, Robert James (``Bobby'')
+
+This American won the 1972 championship, crushing Taimanov and Larson both by 6-0.
+Retired from chess after winning the championship, returning in the 1990's for
+a single match against Spassky. The first U.S. born world champion, and the youngest
+grandmaster up to that time.
+
+Born 1943-03-08.
+
+=item Gruenfeld
+
+The man for whom the Gruenfeld Defense and Gruenfeld Gambit are named.
+
+=item Karpov, Anatoly
+
+After Fischer refused to defend his title in 1975, Karpov became the champion.
+
+=item Kasparov, Garry
+
+Won the title in 1985 by 5-3 against Karpov. Formed the Professional Chess
+Association (PCA).
+
+=item Lasker, Emanuel
+
+Won the first official world championship in 1894 at the age of 25 (in a match
+against Steinitz). He remained world champion for 27 years.
+
+=item Legall
+
+The man for whom Legall's Mate is named.
+
+=item Lo'pez, Ruy
+
+A Spanish clergyman who studied chess intensively, writing books about it.
+He invented the opening strategy that has become known as the Spanish Opening.
+
+=item Marshall
+
+Former U.S. champion. Coined the term swindle for a desperate trap that saves or
+wins the game.
+
+=item Morphy, Paul
+
+Known for his elegant combinations, this American from New Orleans became 
+the first unofficial world champion of chess in 1857. Retired from chess without
+being defeated.
+
+=item Pandolfini
+
+Prolific author of chess books. National master. A main character in the book and
+movie ``Searching for Bobby Fischer''.
+
+=item Petrosian, Tigran
+
+Beat Botvinnik in 1963 to win the title.
+
+=item Philidor
+
+Known for the phrase ``The pawns are the soul of chess.''
+
+=item Polgar, Zsusza
+
+One of a family of female chess players, she won the Women's World Championship.
+
+=item Purdy, Cecil John Seddon (C.J.S.)
+
+Born in 1906, he was four time Champion of Australia, an International Master,
+and the first World Correspondence Chess Champion. He edited chess journals.
+He died in 1979.
+
+=item Reinfeld
+
+National Master and author of many chess books.
+
+=item Reti
+
+A founder of the ``hypermodern'' school. Gave Capablaca his only tournament loss in
+10 years.
+
+=item Short, Nigel
+
+The Englishman Kasparov beat to obtain the PCA title.
+
+=item Smyslov, Vasily
+
+Defeated Botvinnik in 1957, winning the title, but lost it again to him in 1958.
+
+=item Spassky, Boris
+
+Succeeded Petrosian as champion in 1969.
+
+=item Staunton
+
+Never won the title, but proclaimed himself world champion. Refused to play Morphy.
+
+=item Steinitz, Wilhelm
+
+Replaced Morphy as the unofficial world champion in 1866 by beating Adolf Anderssen in a match.
+Known for his artful defenses and strategic attacks on enemy weaknesses. Also known
+for some of his unusual moves, such as bringing his king to the center of the board
+early in the game.
+
+=item Tal, Mikhail
+
+Obtained the title in 1960 from Botvinnik. Lost it back to him one year later in the
+return match.
+
+=item Timman
+
+Dutch grandmaster who challenged Karpove for teh FIDE world championship when Kasparov
+and Short formed the PCA.
+
+=item Waitzkin
+
+A young International Master. The main character of the book and movie ``Searching for Bobby Fischer''.
+
+=back
+
+
+=head1 AUTHOR
+
+Gregor N. Purdy (C<gregor@focusresearch.com>).
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 1999-2006 Gregor N. Purdy. All rights reserved.
+
+This program is free software. You may redistribute and/or
+modify it under the same terms as Perl iteself.
+
+=cut
+

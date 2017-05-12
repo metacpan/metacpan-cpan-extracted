@@ -1,0 +1,4 @@
+Serial#,Sequence#,EventTag,Battery,Event_Time,Satellite_Time,Guardian_Time,Longitude,Latitude,Altitude,Speed,Heading,HDOP,Fix_Type,Digital_Prev,Digital_Curr,Analog_1,Scalar_1,Analog_2,Scalar_2,Analog_3,Scalar_3,User_Data_Len,User_Data_Hex,User_Data_ASCII,Translator
+"0306F00016","n/a","n/a","Good",unknown            ,2007-04-21 12:48:37,2007-04-21 12:48:27,16.78029,76.66666,,,,,,"0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0",0.0000000,0.0000000,0.0000000,0.0000000,0.0000000,0.0000000,0,"","","Tracer9.xml"
+"0306F00016","n/a","n/a","Good",unknown            ,2007-04-21 12:36:15,2007-04-21 12:36:05,16.78040,76.66668,,,,,,"0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0",0.0000000,0.0000000,0.0000000,0.0000000,0.0000000,0.0000000,0,"","","Tracer9.xml"
+"0306F00016","n/a","n/a","Good",unknown            ,2007-04-21 12:06:20,2007-04-21 12:06:11,16.78067,76.66664,,,,,,"0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0",0.0000000,0.0000000,0.0000000,0.0000000,0.0000000,0.0000000,0,"","","Tracer9.xml"

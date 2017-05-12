@@ -1,0 +1,70 @@
+0.10    2017-01-11 (PERLANCAR)
+
+	- [Bugfix] Fixes (pass_through should keep unknown/ambiguous short
+	  options, ambiguous long options should be kept).
+
+
+0.09    2017-01-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix grammar.
+
+
+0.08    2017-01-11 (PERLANCAR)
+
+	- Add configuration: pass_through.
+
+	- Remove experimental label.
+
+
+0.07    2016-12-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Getopt::Long::More.
+
+
+0.06    2016-12-02 (PERLANCAR)
+
+	- Allow empty value '--name='.
+
+
+0.05    2016-10-29 (PERLANCAR)
+
+        - No functional changes.
+
+        - Comment-out usage of 'strict' or 'use 5.010001' for reduced startup
+          overhead.
+
+        - [doc] Mention LOC count against Getopt::Long.
+
+
+0.04    2015-06-19 (PERLANCAR)
+
+        - The changes for this release are made to support
+          Perinci::CmdLine::Inline.
+
+        - Allow foo=i and foo=f in addition to foo=s.
+
+        - Allow desttype (foo=s@) and ignore it because it doesn't matter for
+          our case.
+
+
+0.03    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Wording.
+
+
+0.02    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dzil] Use DZP:IfBuilt.
+
+
+0.01    2015-06-16 (PERLANCAR)
+
+        - First release.

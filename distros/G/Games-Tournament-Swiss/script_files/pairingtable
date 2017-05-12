@@ -1,0 +1,244 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+pairingtable - Show player scoregroups for next round of swiss tournament
+
+=cut
+
+use strict;
+use warnings;
+
+use YAML qw/LoadFile DumpFile/;
+use List::Util qw/reduce first max/;
+use Scalar::Util qw/looks_like_number/;
+use List::MoreUtils qw/any all/;
+use IO::Handle;
+
+use Games::Tournament::Swiss::Config;
+
+my $swiss = Games::Tournament::Swiss::Config->new;
+
+my $league = LoadFile "./league.yaml";
+my $roles = $league->{roles} || [qw/White Black/];
+my $scores = $league->{scores} ||
+	{ win => 1, loss => 0, draw => 0.5, forfeit => 0, bye => 1 };
+my $firstround = $league->{firstround} || 1;
+my $algorithm = $league->{algorithm} || 'Games::Tournament::Swiss::Procedure::FIDE';
+my $abbrev = $league->{abbreviation} ||
+    { W => 'White', B => 'Black', 1 => 'Win', 0 => 'Loss',
+	0.5 => 'Draw', '=' => 'Draw'  };
+
+$swiss->frisk($scores, $roles, $firstround, $algorithm, $abbrev);
+
+$Games::Tournament::Swiss::Config::firstround = $firstround;
+%Games::Tournament::Swiss::Config::scores = %$scores;
+@Games::Tournament::Swiss::Config::roles = @$roles;
+$Games::Tournament::Swiss::Config::algorithm = $algorithm;
+
+require Games::Tournament::Swiss;
+require Games::Tournament::Contestant::Swiss;
+require Games::Tournament::Card;
+
+my ($tourney, $lineup, $games, @rounds);
+
+my $nextRound = $ARGV[0];
+my ($previous, $round);
+if ( $nextRound and $nextRound =~ /^\d+$/ ) {
+    @rounds = ($Games::Tournament::Swiss::Config::firstround .. $nextRound-1);
+    $previous = $nextRound-1;
+    $round = $previous;
+}
+elsif ( $nextRound ) { die "Round \"$nextRound\" not a round number"; }
+else {
+    for my $number ( glob ('./comp/*') ) {
+	push @rounds, $1 if -d $number and $number =~ m/\/(\d+)$/
+		and -e "$number/scores.yaml";
+    }
+    @rounds = sort { $a <=> $b } @rounds;
+    $previous = $rounds[-1];
+    $nextRound = $previous + 1;
+    $round = $previous;
+}
+
+my $members = $league->{member};
+my $absentees = $league->{absent};
+my $out = $league->{out};
+for my $member ( @$members, @$absentees ) {
+    push @$lineup, Games::Tournament::Contestant::Swiss->new( %$member )
+	unless any { $member eq $_ } @$lineup;
+}
+
+$tourney = Games::Tournament::Swiss->new( entrants => $lineup,
+	round => $Games::Tournament::Swiss::Config::firstround);
+
+$lineup = $tourney->entrants;
+
+$tourney->idNameCheck;
+
+$tourney->assignPairingNumbers;
+
+my $table;
+for my $round ( @rounds )
+{
+    next unless -d "./comp/$round/";
+    $tourney->round($round);
+    my $schedule = LoadFile "./comp/$round/round.yaml";
+    my $allresults = LoadFile( "./comp/$round/scores.yaml" );
+    my ($results, %playerGames);
+    if (all {ref eq 'HASH' and all {not ref} values %$_} values %$allresults) {
+	for my $table ( keys %$allresults ) {
+	    my $card = $allresults->{$table};
+	    my @players = keys %$card;
+	    for my $player ( @players ) {
+		my $personalresult = $card->{$player};
+		if ( defined $scores->{lc $personalresult} ) {
+		    $results->{$player} = $personalresult;
+		}
+		elsif ( $abbrev->{$personalresult} ) {
+		    $results->{$player} = $abbrev->{$personalresult};
+		}
+		elsif ( looks_like_number( $personalresult ) ) {
+		    my $other = reduce { $a == $b? $a: $b } values %$card;
+		    if ( looks_like_number( $other ) ) {
+			$results->{$player} =
+			    ( $personalresult > $other )?
+				"Win": ( $personalresult < $other )?
+				    "Loss": "Draw";
+		    }
+		    else { die
+	    "Partner to $player on table $table in round $round got $other?";
+		    }
+		}
+		else {
+		    die
+	"Player $player on table $table in round $round got $personalresult?";
+		}
+	    }
+	}
+    }
+    elsif ( all { not ref } values %$allresults ) {
+	for my $player ( keys %$allresults ) {
+	    my $personalresult = $allresults->{$player};
+	    if ( defined $scores->{lc $personalresult} ) {
+		$results->{$player} = $personalresult;
+	    }
+	    elsif ( $abbrev->{$personalresult} ) {
+		$results->{$player} = $abbrev->{$personalresult};
+	    }
+	    else {
+		die "Player $player in round $round got $personalresult?";
+	    }
+	}
+    }
+    else { die "Unknown format or invalid/incomplete results in round $round" }
+    my @games;
+
+    my $groups = $schedule->{group};
+    my $maxn = max keys %$groups;
+    $groups->{++$maxn} = { Bye => $schedule->{bye} } if $schedule->{bye};
+    for my $n ( keys %$groups ) {
+	my $group = $groups->{$n};
+	my (%group, @players);
+	for my $role ( keys %$group ) {
+	    my $id = $group->{$role};
+	    my $player = $tourney->ided( $id );
+die "Player $id, $role at table $n in round $round is not in tournament" unless
+		    $player;
+	    my $name = $player->name;
+	    push @players, $player;
+	    $group{contestants}->{$role} = $player;
+	    my $result = $results->{ $id };
+	    $result ||= $results->{ $name };
+	    $result = "Bye" if $role eq 'Bye';
+	    die "$id got $result in round $round"
+	      unless defined $result;
+	    $group{result}->{$role} = $result;
+	    $group{round} = $round;
+	}
+	my $game = Games::Tournament::Card->new( %group );
+	push @games, $game;
+	$playerGames{$_} = $game for map { $_->id } @players;
+    }
+    $tourney->collectCards( @games );
+    for my $player (@$lineup) {
+	my $id = $player->id;
+	$table->{$id}->{id} = $id;
+	my $game = $playerGames{$id};
+	if ( defined $game ) {
+	    my $opponent = $player->myOpponent($game)
+	      || Games::Tournament::Contestant::Swiss->new( name => "Bye", pairingNumber => "-" );
+	    $table->{$id}->{opponents} .= $opponent->pairingNumber . ",";
+	    my $role = $game->myRole($player);
+	    if ( $role eq 'Bye' ) { $role = '-'; }
+	    else                  { $role =~ s/^(.).*$/$1/; }
+	    $table->{$id}->{roles} .= $role;
+	}
+	else {
+	    $table->{$id}->{opponents} .= "-,";
+	    $table->{$id}->{roles} .= "-";
+	}
+    }
+
+}
+
+my %brackets = $tourney->formBrackets;
+my $playerN = 0;
+
+print "
+		Round $nextRound Pairing Groups
+-------------------------------------------------------------------------
+Place  No  Opponents     Roles     Float Score
+";
+for my $index ( reverse sort { $a <=> $b } keys %brackets )
+{
+	$playerN++;
+	my $place = $playerN;
+	my @members = @{$brackets{$index}->members};
+	$place .= '-' . ($playerN+$#members) if $#members;
+	$playerN += $#members;
+	print "$place\n";
+	foreach my $member ( @members )
+	{
+		my $id = $member->id;
+		my $no = $member->pairingNumber;
+		chop $table->{$id}->{opponents};
+		my $floats = $member->floats;
+		my $float = '';
+		$float = 'd' if $floats->[-2] and $floats->[-2] eq 'Down';
+		$float = 'u' if $floats->[-2] and $floats->[-2] eq 'Up';
+		$float .= 'D' if $floats->[-1] and $floats->[-1] eq 'Down';
+		$float .= 'U' if $floats->[-1] and $floats->[-1] eq 'Up';
+		my $score = defined $member->score? $member->score: '-';
+
+	# no warnings;
+	format STDOUT =
+@<<<< @<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<< @<< @<<<
+" ", $no,  $table->{$id}->{opponents}, $table->{$id}->{roles}, $float, $score
+.
+	write;
+	# use warnings;
+	}
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+pairingtable [n]
+
+Options:
+
+--help            This help message
+
+--man            A man page
+
+=head1 DESCRIPTION
+
+B<pairingtable> shows the scoregroups that players with equal scores fall into, allowing calculation of who will play who in the next round. Included is place so far, opponents each player has already met, the roles in the previous rounds, downfloating (and upfloating) in the previous round (D) and in the round before the previous round (d).
+
+Run it in the directory league.yaml is in and pass a round number, it will show pairgroups for that round. If no number is passed, the next round is the round following the highest existing one in the 'comp' directory. Run it in a round directory, it will show pairgroups for the round after that round.
+
+=cut
+
+# vim: set ts=8 sts=4 sw=4 noet:

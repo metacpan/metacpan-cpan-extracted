@@ -1,0 +1,122 @@
+Revision history for Perl module Geo::GeoNames
+
+1.12 - 2017-04-16
+	* Update the docs for GitHub Issues:
+	+ call things methods (https://github.com/briandfoy/geo-geonames/issues/13)
+	+ use GitHub as the issue tracker (https://github.com/briandfoy/geo-geonames/issues/12)
+
+1.11 - 2016-08-17
+    * Nicolas Mendoza
+	* Fix POD syntax error
+
+1.10 - 2016-08-16
+    * Nicolas Mendoza
+	* Add support for hierarchy API
+	* Happy CPAN-day!
+
+1.09 - 2016-03-11
+    * Nicolas Mendoza
+	* Some CPAN-testers get other kind of error messages from Geonames
+
+1.08 - 2016-03-10
+	* Nicolas Mendoza
+	* None
+
+1.07 - 2016-03-10
+	* Nicolas Mendoza
+	* Try to solve issue with JSON + a custom LWP::UserAgent
+
+1.06 - 2015-12-07
+	* Nicolas Mendoza
+	* alternateName and other multi-element xml values were simply trimmed so 
+	that only one element survived.
+	This change should return them as an arrayref, but still return a single
+	entry as a hashref.
+
+1.05 - 2015-11-26
+	* Nicolas Mendoza
+	* Fix JSON parsing when using a custom non-Mojo::UserAgent-derived client
+
+1.04 - 2015-11-24
+	* Nicolas Mendoza
+	* Added support for custom User-Agent (GH #10)
+
+1.03 - 2015-11-04
+	* Nicolas Mendoza
+	* Added documentation for new parameters and get function
+
+1.02 - 2015-11-03
+	* Nicolas Mendoza
+	* Added function get
+	* Sort parameters in URLs to end up with consistent URL (GH #8)
+	* Add missing allowed search parameters (GH #4)
+
+1.01_01 - 2013-10-08
+	* Handle the test case where the tester is not connected
+	to the internet.
+
+1.01 - 2013-10-02
+	* Fix MYMETA problem (RT #89157)
+	* Patch for multi-value params (RT #48712)
+	* Patch for new API address (RT #62358)
+
+0.09 - 2012-07-17
+	* Handle bad username cases. Require something that's not
+	empty and catch errors from the server when the username
+	is unknown.
+	* Make the API address overrideable through default_url()
+
+0.08 - 2012-07-14
+	* Make the live tests optional. You need to set GEONAMES_USER
+	to run the tests.
+
+0.07 - 2012-07-13
+	* brian d foy
+	* Update for change to api.geonames.org that requires
+	a user account
+
+0.06  2008-03-25
+	* Per Henrik Johansen
+	* Added JSON support
+	* Added function cities
+	* Added function country_info
+	* Added function earthquakes
+	* Added function find_nearby_weather
+	* Fixed arguments in functions search
+	* Fixed arguments to the functions country_code,
+	  find_nearby_placeName, wikipedia_search
+
+0.05  2007-07-05 
+	* Per Henrik Johansen
+	* Added function find_nearby_wikipedia
+	* Added function find_nearby_wikipedia_by_postalcode
+	* Added function wikipedia_search
+	* Added function wikipedia_bounding_box
+	* Added function country_info
+	* Some refactoring
+
+0.04  2007-07-03
+	* Per Henrik Johansen
+	* Added function find_nearest_address
+	* Added function find_nearest_intersection
+	* Added function find_nearby_streets
+
+0.03  2006-12-04
+	* Per Henrik Johansen
+	* Use AUTOLOADER to find method names (they all looked the same)
+	* Use PREREQ_PM in Makefile.PL. Added the versions on my system, since
+	  these are the only I know work for sure.
+
+0.02  2006-11-30
+	* Per Henrik Johansen
+	* Added function find_nearby_postalcodes
+	* Added function find_nearby_placename
+	* Added function postalcode_country_info
+	* Refactored the code so it is easier to add new searches
+	* Fixed bug in geocode()
+	* edited perldoc
+
+0.01 - 2006-11-27
+	* Per Henrik Johansen
+	* original version; created by h2xs 1.23 with options -AXc -n Geo::GeoNames
+

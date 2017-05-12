@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package test.sub1.sub2;
+
+message Foo {
+        optional int32 foo = 1;
+}

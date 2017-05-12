@@ -1,0 +1,21 @@
+This is the Debian GNU/Linux version of the Graphics::Libplot Perl module.
+
+From the README:
+
+    libplot-perl is copyrighted by John Lapeyre
+    <lapeyre@physics.arizona.edu>
+
+    This program may be distributed only under the terms of the Gnu
+    General Public License or the perl Artistic License.
+
+The full text of the GPL is available on Debian systems in
+/usr/share/common-licenses/GPL
+
+The full text of the Artistic Licence is available on Debian systems in
+/usr/share/common-licenses/Artistic.
+
+This package has been through multiple maintainers (for a list see
+/usr/share/doc/libplot-perl/changelog.Debian.gz).
+
+Current Debian specific changes are copyright (c) 1999-2002,
+Stephen Zander <gibreel@debian.org>

@@ -1,0 +1,127 @@
+<html>
+<head><TITLE></TITLE></head>
+<style>
+	BODY { background-color: black; color: lightgreen; font-family: sans-serif;}
+</style>
+<body>
+<%
+    my %args = AxKit::Apache::request->args;
+    use Cwd;
+    my $dir = (split '/' => getcwd )[-1];
+%>
+
+<%  if ( $args{agent} ) { 
+        process_agent( \%args );    
+    } 
+    else {
+        print_form();
+    }
+%>
+
+<p>
+return to <a href="round_current.xml">main page</a>
+</p>
+</body>
+</html>
+
+
+<%- sub print_form { 
+%>
+<form action="." method="get">
+    <input type="hidden" name="style" value="upload" />
+    <table>
+        <TR><TD>player:</TD><TD><INPUT type="text" name="player"></TD>
+        <TD>password:</TD><TD><INPUT type="password" name="password"></TD>
+        <td><INPUT type="submit" value="upload"></td></TR>
+        <TR><TD valign='top'>agent:</TD>
+            <TD colspan="4">
+            <textarea name="agent" cols="80" rows="40"></textarea></TD></TR>
+    </table>
+</form>
+<%  }
+-%>
+
+<%  sub process_agent {
+        my %args = %{$_[0]}; 
+
+        my $auth;
+        if ( findvalue( '//players/@list' ) eq 'adhoc' ) {
+            $auth = authenticate_adhoc( %args );
+        }
+        else {
+            $auth = authenticate_predefined( %args );
+        }
+
+        return unless $auth;
+
+        my $existed;
+
+        $existed = 1 if -e "mobil/$args{player}";
+
+        my $fagent;
+        open $fagent, '>', "mobil/$args{player}" 
+                or die $!;
+
+        print $fagent $args{agent};
+        close $fagent;
+
+        if ( -e "mobil/$args{player}" ) {
+            %><p>agent uploaded</p><%
+        
+            if ( $existed ) {
+                %><p>An agent was already present and has been removed.</p><%
+            }
+        }
+        else {
+            %><p>Agent couldn't be uploaded, 
+            looks like there is a problem. 
+            Please contact the Architect.</p>
+            <%
+        }
+    } 
+%>
+<%  sub authenticate_predefined {
+       my %args = @_;
+
+       my ( $player ) = findnodes(  "//players/player[\@name = '$args{player}']"
+                        ."[\@password = '$args{password}']"   );
+
+        unless ( $player ) {
+            %><p>player not recognized or password not valid</p><%
+            return 0;
+        }
+
+        return 1;
+    }
+
+    sub authenticate_adhoc {
+       my %args = @_;
+       my( $community_file ) = findvalue( '//players/@community' );
+
+       unless( $community_file and -e $community_file ) {
+        %>  <p>Error: communauty file not found. Please
+            contact the Architect.</p><%
+            return 0;
+       }
+
+       my $comm = eval { XML::LibXML->new->parse_file( $community_file ) };
+
+       if ( $@ ) {
+            %><p>Error: communauty file not properly formatted. Please
+            contact the Architect.</p><%
+            return 0;
+       }
+
+       my ( $player ) = $comm->findnodes(  
+                         "//players/player[\@name = '$args{player}']"
+                        ."[\@password = '$args{password}']"           );
+
+        unless ( $player ) {
+            %><p>player not recognized or password not valid</p><%
+            return 0;
+        }
+        
+        return 1;
+    }
+%>
+

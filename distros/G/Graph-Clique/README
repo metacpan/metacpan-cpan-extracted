@@ -1,0 +1,42 @@
+Graph/Clique version 0.01
+=========================
+Graph::Clique module 
+
+This module extends Greg Bacon's implementation on clique reduction with regular expression.
+Originally can be found at: L<http://home.hiwaay.net/~gbacon/perl/clique.html>
+
+The function take clique size (k) and vertices (list of lists) and return all the vertices
+that form the clique. 
+
+K-clique problem is known to be NP-complete, so it is advisable to limit the number
+of edges according to your predefined threshold, rather than exhaustively searching them.
+
+Using Graph::Clique
+===================
+
+my @cliques = getcliques($k,\@edges);
+# @edges is list of list of the edges and $k is the clique size.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 Edward Wijaya
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

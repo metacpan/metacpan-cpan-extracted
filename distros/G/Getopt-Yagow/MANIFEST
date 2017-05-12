@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+README
+Yagow.pm
+t/simple1.t
+t/simple2.t
+t/simple3.t
+t/simple4.t

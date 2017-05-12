@@ -1,0 +1,110 @@
+Content-Type: text/plain; name="promed_new.html"
+Content-Disposition: inline; filename="promed_new.html"
+Mime-Version: 1.0
+To: GetWeb Miser <getweb-miser-test@usa.healthnet.org>
+Subject: <URL:file:./test/promed_new.html> ProMED-mail
+X-Mailbot-Note: ignoring reply-to field
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+ [IMAGE]
+
+Welcome!
+
+Here is 1k of junk:
+
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foofoo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+
+*** References from this document ***
+[orig] file:./test/promed_new.html
+Content-Type: text/plain; name="promed.html"
+Content-Disposition: inline; filename="promed.html"
+Mime-Version: 1.0
+To: GetWeb Miser <getweb-miser-test@usa.healthnet.org>
+Subject: <URL:file:./test/promed.html> ProMED-mail
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+ [IMAGE]
+
+Here we are! Also visit promed_new.html [1]
+
+Here is a binary character: \O^
+
+Too bad we can't read news[2] yet.
+
+Here is a really long URL[3]
+
+
+*** References from this document ***
+[orig] file:./promed.html
+[1] file:/test/promed_new.html
+[2] news:comp.mail.sendmail (not implemented)
+[3] file://notavalidpath/justtesting/foobarfoobarfoobarfoobarfoo\
+barfoobarfoobar
+Content-Type: text/plain; name="promed_old.html"
+Content-Disposition: inline; filename="promed_old.html"
+Mime-Version: 1.0
+To: GetWeb Miser <getweb-miser-test@usa.healthnet.org>
+Subject: <URL:file:./test/promed_old.html> ProMED-mail
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+ [IMAGE]
+
+The address of this page has changed, please update your bookmarks.
+
+promed.html [1]
+
+
+*** References from this document ***
+[orig] file:./test/promed_old.html
+[1] file:/test/promed.html
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: GetWeb Miser <getweb-miser-test@usa.healthnet.org>
+CC: getweb-admin@usa.healthnet.org
+Subject: Access Denied
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+An attempted operation was not allowed:
+   members of group miser may not redirect message to getweb_test_other
+
+____original message follows____
+
+Received: from neptune.healthnet.org (rolf@neptune.healthnet.org [198.115.132.11]) by satellife.healthnet.org (8.6.12/8.6.12) with ESMTP id LAA07026 for <rolf@satellife.healthnet.org>; Mon, 2 Dec 1996 11:42:03 -0500
+Received: (from rolf@localhost) by neptune.healthnet.org (8.6.12/8.6.9) id QAA00777; Mon, 2 Dec 1996 16:42:25 GMT
+Date: Mon, 2 Dec 1996 16:42:25 GMT
+Message-Id: <199612021642.QAA00777@neptune.healthnet.org>
+From: GetWeb Miser <getweb-miser-test@usa.healthnet.org>
+To: getweb(a)usa.healthnet.org
+Subject: mail test
+Reply-To: GetWeb Miser <getweb-miser-test@usa.healthnet.org>
+
+GET file://test/promed_new.html
+
+GET file://test/promed.html
+
+GET file://test/promed_old.html
+
+GET TO getweb_test_other NOMIME SOURCE file://test/promed.html
+

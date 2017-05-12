@@ -1,0 +1,17 @@
+Changes for GappX::Dialogs
+
+{{$NEXT}}
+- question dialog displaying correct icon
+
+0.004     2012-10-04 18:17:07
+
+0.003     2012-10-02 16:36:39
+
+0.002     2012-10-02 16:31:03
+Documentation change
+
+0.001     2012-10-02 15:28:44
+- Using Dist::Zilla
+
+0.01
+- Initial Release

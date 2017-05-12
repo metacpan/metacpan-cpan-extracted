@@ -1,0 +1,29 @@
+GNOME_VFS_MIME_MONITOR_TYPE				GnomeVFSMIMEMonitor			GObject	Gnome2::VFS::Mime::Monitor
+
+GNOME_VFS_TYPE_VFS_DIRECTORY_VISIT_OPTIONS		GnomeVFSDirectoryVisitOptions		GFlags	Gnome2::VFS::DirectoryVisitOptions
+GNOME_VFS_TYPE_VFS_FILE_FLAGS				GnomeVFSFileFlags			GFlags	Gnome2::VFS::FileFlags
+GNOME_VFS_TYPE_VFS_FILE_INFO_FIELDS			GnomeVFSFileInfoFields			GFlags	Gnome2::VFS::FileInfoFields
+GNOME_VFS_TYPE_VFS_FILE_INFO_OPTIONS			GnomeVFSFileInfoOptions			GFlags	Gnome2::VFS::FileInfoOptions
+GNOME_VFS_TYPE_VFS_FILE_PERMISSIONS			GnomeVFSFilePermissions			GFlags	Gnome2::VFS::FilePermissions
+GNOME_VFS_TYPE_VFS_MAKE_URI_DIRS			GnomeVFSMakeURIDirs			GFlags	Gnome2::VFS::MakeURIDirs
+GNOME_VFS_TYPE_VFS_OPEN_MODE				GnomeVFSOpenMode			GFlags	Gnome2::VFS::OpenMode
+GNOME_VFS_TYPE_VFS_SET_FILE_INFO_MASK			GnomeVFSSetFileInfoMask			GFlags	Gnome2::VFS::SetFileInfoMask
+GNOME_VFS_TYPE_VFS_URI_HIDE_OPTIONS			GnomeVFSURIHideOptions			GFlags	Gnome2::VFS::URI::HideOptions
+GNOME_VFS_TYPE_VFS_XFER_OPTIONS				GnomeVFSXferOptions			GFlags	Gnome2::VFS::XferOptions
+
+GNOME_VFS_TYPE_VFS_FILE_TYPE				GnomeVFSFileType			GEnum	Gnome2::VFS::FileType
+GNOME_VFS_TYPE_VFS_FIND_DIRECTORY_KIND			GnomeVFSFindDirectoryKind		GEnum	Gnome2::VFS::FindDirectoryKind
+GNOME_VFS_TYPE_VFS_MIME_ACTION_TYPE			GnomeVFSMimeActionType			GEnum	Gnome2::VFS::MimeActionType
+GNOME_VFS_TYPE_VFS_MIME_APPLICATION_ARGUMENT_TYPE	GnomeVFSMimeApplicationArgumentType	GEnum	Gnome2::VFS::MimeApplicationArgumentType
+GNOME_VFS_TYPE_VFS_MONITOR_EVENT_TYPE			GnomeVFSMonitorEventType		GEnum	Gnome2::VFS::MonitorEventType
+GNOME_VFS_TYPE_VFS_MONITOR_TYPE				GnomeVFSMonitorType			GEnum	Gnome2::VFS::MonitorType
+GNOME_VFS_TYPE_VFS_RESULT				GnomeVFSResult				GEnum	Gnome2::VFS::Result
+GNOME_VFS_TYPE_VFS_SEEK_POSITION			GnomeVFSSeekPosition			GEnum	Gnome2::VFS::SeekPosition
+GNOME_VFS_TYPE_VFS_XFER_ERROR_ACTION			GnomeVFSXferErrorAction			GEnum	Gnome2::VFS::XferErrorAction
+GNOME_VFS_TYPE_VFS_XFER_ERROR_MODE			GnomeVFSXferErrorMode			GEnum	Gnome2::VFS::XferErrorMode
+GNOME_VFS_TYPE_VFS_XFER_OVERWRITE_ACTION		GnomeVFSXferOverwriteAction		GEnum	Gnome2::VFS::XferOverwriteAction
+GNOME_VFS_TYPE_VFS_XFER_OVERWRITE_MODE			GnomeVFSXferOverwriteMode		GEnum	Gnome2::VFS::XferOverwriteMode
+GNOME_VFS_TYPE_VFS_XFER_PHASE				GnomeVFSXferPhase			GEnum	Gnome2::VFS::XferPhase
+GNOME_VFS_TYPE_VFS_XFER_PROGRESS_STATUS			GnomeVFSXferProgressStatus		GEnum	Gnome2::VFS::XferProgressStatus
+
+GNOME_VFS_TYPE_VFS_URI					GnomeVFSURI				GBoxed	Gnome2::VFS::URI

@@ -1,0 +1,11 @@
+\.tar\.gz$
+\.old$
+\.bak$
+^blib/
+/CVS/
+^CVS/
+^MANIFEST.bak$
+^Makefile$
+^Makefile.old$
+^pm_to_blib
+^Gentoo-Probe-*

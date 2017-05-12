@@ -1,0 +1,41 @@
+# Copyright 2015, 2016 Kevin Ryde
+
+# This file is part of Graph-Graph6.
+
+# Graph-Graph6 is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Graph-Graph6 is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Graph-Graph6.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the prereqs.test.recommends from META.yml
+# for more tests.  It would exercise more code but aren't necessary to
+# build.  libgraphviz2-perl not presently in Debian.
+
+Source: libgraph-graph6-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.8
+Homepage: http://user42.tuxfamily.org/graph-graph6/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libgraph-graph6-perl
+Architecture: all
+Depends: perl (>= 5.006), libscalar-list-utils-perl | perl (>= 5.8), libio-string-perl, ${perl:Depends}, ${misc:Depends}
+Suggests: libgraph-perl, libgraph-easy-perl, libgraphviz2-perl, libmoo-perl
+Description: Read and write graph6 and sparse6 file formats
+ These file formats represent undirected graphs (the graph theory type
+ of graph with vertices and edges).
+ .
+ The formats can be read and written natively and there are tie-ins
+ for Graph.pm, Graph::Easy, and GraphViz2.pm graph objects.

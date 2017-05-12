@@ -1,0 +1,97 @@
+0 HEAD
+1   SOUR Genealogy::Gedcom
+2     NAME Genealogy::Gedcom::Reader
+2     VERS V 1.00
+2     CORP Ron Savage
+3       ADDR Box 3055
+4         STAE Vic
+4         POST 3163
+4         CTRY Australia
+3       EMAIL ron@savage.net.au
+3       WWW http://savage.net.au
+2     DATA Sample
+3       COPR Copyright 2011, Ron Savage
+1   NOTE
+2     CONT This file is based on test data in Paul Johnson's Gedcom.pm
+2     CONT Gedcom.pm is Copyright 1999-2009, Paul Johnson (paul@pjcj.net)
+2     CONT Version 1.16 - 24th April 2009
+2     CONT
+2     CONT Ron's modules under the Genealogy::Gedcom namespace are free
+2     CONT
+2     CONT The latest versions of these modules are available from
+2     CONT my homepage http://savage.net.au and http://metacpan.org
+1   GEDC
+2     VERS 5.5.1-5
+2     FORM LINEAGE-LINKED
+1   DATE 10 Aug 2011
+1   CHAR ANSEL
+1   SUBM @SUBM1@
+
+0 @SOU1@ SOUR
+1   DATA
+2     EVEN FACT
+3       DATE FROM 21 Jun 1950 TO 21 Jun 2011
+
+0 @SUBM1@ SUBM
+1   NAME A Submitter
+1   NOTE Nota bene
+2     ADDR Box 3055
+3       CONT C.11
+3       ADR1 A.11
+3       ADR2 A.21
+3       ADR3 A.3.
+3       CITY Murrumbeena
+3       STAE Vic
+3       POST 3163
+3       CTRY Australia
+2     PHON P.11
+2     EMAIL ron@savage.net.au
+2     FAX F.11
+2     WWW http://savage.net.au
+
+0 @I1@ INDI
+1   NAME Fred /Bloggs/
+1   BIRT
+2     DATE 20 Dec 1775
+2     DATE 21 Dec 1775
+1   BIRT
+2     DATE 22 Dec 1775
+1   SEX M
+1   FAMS F1
+
+0 @F1@ FAM
+1   HUSB @I1@
+1   WIFE @I3@
+
+0 @I2@ INDI
+1   NAME John /Smith/
+1   CHR
+2     DATE 15 Jul 1954
+2     DATE 25 Jul 1954
+1   SEX F
+
+0 @I3@ INDI
+1   NAME Jane /Bloggs/
+1   FAMC F1
+
+0 @I4@ INDI
+1   NAME Joe /Bloggs/
+1   BIRT
+2     DATE 3 Feb 1802
+1   SEX M
+1   FAMC F1
+
+0 @I5@ INDI
+1   NAME Susan /Bloggs/
+1   CHR
+2     DATE 11 May 1778
+1   SEX F
+1   FAMS F1
+
+0 @N1@ NOTE
+1   CONT This is a note.
+1   CONT Please take notice.
+1   CONC There's more.  O
+1   CONC k, that's it.
+
+0 TRLR

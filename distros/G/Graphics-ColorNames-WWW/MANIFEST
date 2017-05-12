@@ -1,0 +1,23 @@
+README
+Changes
+MANIFEST
+Build.PL
+Makefile.PL
+lib/Graphics/ColorNames/CSS.pm
+lib/Graphics/ColorNames/IE.pm
+lib/Graphics/ColorNames/SVG.pm
+lib/Graphics/ColorNames/WWW.pm
+t/10pod.t
+t/11pod_cover.t
+t/CSS.t
+t/IExplore.t
+t/SVG.t
+t/WWW.t
+t/WWW_CSS.t
+t/WWW_HTML.t
+t/WWW_IExplore.t
+t/WWW_Mozilla.t
+t/WWW_SVG.t
+LICENSE
+META.yml
+SIGNATURE    Added here by Module::Build

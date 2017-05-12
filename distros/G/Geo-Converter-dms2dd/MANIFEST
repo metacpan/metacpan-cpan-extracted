@@ -1,0 +1,21 @@
+Changes
+lib/Geo/Converter/dms2dd.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/Geo-Converter-dms2dd.t
+xt/.perlcritic-history
+xt/01-has_versions.t
+xt/02-versions_all_same.t
+xt/03-has_pod.t
+xt/03-test_pod.t
+xt/04-pod-coverage.t
+xt/05-manifest.t
+xt/06-critic.t
+xt/07-notabs.t
+xt/09-use_strict.t
+xt/10-changes_format.t
+xt/bench.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

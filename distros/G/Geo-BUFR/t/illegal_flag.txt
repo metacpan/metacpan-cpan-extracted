@@ -1,0 +1,1 @@
+Illegal value (3): bit 18 is set indicating missing value, but then value should be 262143

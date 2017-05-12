@@ -1,0 +1,19 @@
+digraph graph_08
+{
+	graph[rankdir = "LR" nodesep = "0"]
+	node[shape = "point" label = ""]
+	edge[fontsize = "10"]
+	_box -> box[arrowhead = "box" label = "box"]
+	box -> boxbox[arrowhead = "boxbox" label = "boxbox"]
+	_box -> lbox[arrowhead = "lbox" label = "lbox"]
+	lbox -> lboxlbox[arrowhead = "lboxlbox" label = "lboxlbox"]
+	_box -> rbox[arrowhead = "rbox" label = "rbox"]
+	rbox -> rboxrbox[arrowhead = "rboxrbox" label = "rboxrbox"]
+	_box -> olbox[arrowhead = "olbox" label = "olbox"]
+	olbox -> olboxolbox[arrowhead = "olboxolbox" label = "olboxolbox"]
+	_box -> orbox[arrowhead = "orbox" label = "orbox"]
+	orbox -> orboxorbox[arrowhead = "orboxorbox" label = "orboxorbox"]
+	_box -> obox[arrowhead = "obox" label = "obox"]
+	obox -> oboxobox[arrowhead = "oboxobox" label = "oboxobox"]
+
+}

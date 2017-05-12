@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Gtk2/Ex/TreeMaker.pm
+lib/Gtk2/Ex/TreeMaker/FlatInterface.pm
+t/treemaker_test_1.t
+t/treemaker_test_2.t
+t/treemaker_test_3.t
+t/treemaker_test_4.t
+t/treemaker_test_5.t
+examples/treemaker_demo.pl

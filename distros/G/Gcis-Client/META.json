@@ -1,0 +1,45 @@
+{
+   "abstract" : "Client for GCIS Structured Data Server",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gcis-Client",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::XS" : "0",
+            "Mojo::UserAgent" : "0",
+            "Path::Class" : "0",
+            "Time::HiRes" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Gcis::Client" : {
+         "file" : "lib/Gcis/Client.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.12"
+}

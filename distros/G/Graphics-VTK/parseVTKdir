@@ -1,0 +1,420 @@
+#
+#
+#  Script to parse an entire VTK directory (like common, contrib, etc)
+#
+#
+
+my $usage = "
+ $0 VTKdirName dirName vtkBaseDir object1, object2, ...
+ 
+ where: 
+ 	VTKdirName is the name of the VTK directory we are reading
+		files from
+	dirName is the directory we will be writting files to
+	vtkBaseDir is the base directory where the VTK source is
+		located.
+	object1, object2, .... are the vtk objects/files that will
+		be parsed
+
+Description:
+$0 is a utility program to parse thru an entire VTK directory and
+generate generate XS code and .pm files from VTK header files.
+
+
+Example:
+$0 contrib Contrib /home/cerney/vtk/vtk31 vtkCubeAxesActor vtkDEMReader
+";
+
+if( @ARGV < 3){
+	print $usage;
+	exit -1;
+}
+
+
+#my $VTKdirName = "contrib"; # VTK director we are reading files from
+#my $dirName = "Contrib";    # Directory we will be putting files to 
+#my $vtkBaseDir = "/home/cerney/vtk/vtk31";
+
+my @objects;
+
+($VTKdirName, $dirName, $vtkBaseDir, @objects) = @ARGV;
+
+# Make objects into hash of types
+my %objectTypes;
+my $currentType;
+foreach my $element(@objects){
+	if( $element =~ /^-\w+/){
+		$currentType = $element;
+		$objectTypes{$currentType} = [];
+		next;
+	}
+	
+	push @{$objectTypes{$currentType}}, $element;
+}
+
+
+# Consolidate openGL objects between the win32 and opengl categories
+#  This keeps them from showing up twice in the xs file.
+if( defined($objectTypes{-win32} && $objectTypes{-oglr})){
+	my %openGLobjects;
+	foreach my $openGLobject( @{$objectTypes{'-oglr'}}, @{$objectTypes{'-win32'}}){
+		next unless( $openGLobject =~ /opengl/i && $openGLobject !~ /win32/i
+				&& $openGLobject !~ /xopengltextmapper/i
+				&& $openGLobject !~ /openglrenderwindow/i
+				&& $openGLobject !~ /openglimagewindow/i );
+		
+		$openGLobjects{$openGLobject} = 1;
+	}
+	
+	my (@newopengl, @newwin32, @newconcrete);
+	@newwin32 = grep !defined( $openGLobjects{$_}), @{$objectTypes{'-win32'}}; # left-over objects
+	@newopengl = grep defined( $openGLobjects{$_}), @{$objectTypes{'-oglr'}}; # left-over objects
+	@{$objectTypes{'-win32'}} = @newwin32;
+	@{$objectTypes{'-oglr'}} = @newopengl;
+	
+}
+
+
+my $xsoutput = "./$dirName/$dirName.xs"; # XS output file
+
+my $pmoutputDir = "./temp";  # Temporary place to put the pm files generated
+my $pmversion = "4.0.001"; # version number to put in the .pm file
+my $module = "Graphics::VTK::$dirName";
+
+# Clear the temp directory
+print "Clearing temp directory '$pmoutputDir'\n";
+opendir(TEMPDIR, $pmoutputDir) || die "can't opendir $pmoutputDir: $!";
+my @files = grep { $_ !~ /^\./ && -f "$pmoutputDir/$_" } readdir(TEMPDIR);
+closedir TEMPDIR;
+
+@files = map "$pmoutputDir/$_", @files;
+
+unlink @files;
+
+# Go thru each object Type:
+my $specificDir = "$vtkBaseDir/$VTKdirName";
+my $mainHeader = "vtk".ucfirst($VTKdirName).".h"; # the main header in the dir. This is not processed
+my %rawXSoutput; # hash of xs output for each object type
+foreach my $objectType(sort keys %objectTypes){
+
+	my $rawXSoutput = ''; # xs output Text. Code only , no 
+
+	@objects = sort @{$objectTypes{$objectType}}; # get the objects for the current type
+	next unless (@objects);
+	# Get all headers in the dir
+	my @headers = map $_.".h", @objects; # headerFiles for all objects
+
+	# Filter headers to include only ones that are present
+	my @headersPresent;
+	foreach my $headerFile( @headers){
+
+		unless( -f "$vtkBaseDir/$VTKdirName/$headerFile"){
+			warn("   Warning: Header file '$headerFile' not found, skipping\n");
+			next;
+		}
+		push @headersPresent, $headerFile;
+	}
+	@headers = @headersPresent;
+	
+	# Go thru Each Header and create the XS code and the pm file
+
+	my $vtkPrint = "$vtkBaseDir/Wrapping/vtkPrint2"; # full path to vtkPrint
+
+	foreach my $headerFile( @headers){
+
+		print STDERR "Processing '$headerFile'\n";
+
+		my $pmFile = $headerFile; # create pm file name
+		$pmFile =~ s/h$/pm/g;
+
+		my $command = "$vtkPrint $vtkBaseDir/$VTKdirName/$headerFile $vtkBaseDir/Wrapping/hints is_concrete  2> /dev/null | perl -w parseWrap $module $pmoutputDir/$pmFile"; 
+
+		$tempOutput = `$command`;
+
+		die( "Error Executing command '$command'\n$^E\n") if( $?);
+
+		# No Error add output to main variable
+		$rawXSoutput .= $tempOutput;
+
+
+	}
+	$rawXSoutput{$objectType} = $rawXSoutput;
+}
+
+# Now Write output the XS file:
+print  "Writing xs file '$xsoutput'\n";
+
+open( XSFILE, ">$xsoutput") or die("Can't Open Output File '$xsoutput'\n");
+
+print XSFILE q!#include "EXTERN.h"
+
+/* avoid some nasty defines on win32 that cause c++ compilation to fail */
+#ifdef WIN32
+#define WIN32IOP_H
+#endif
+
+#include "perl.h"
+#include "XSUB.h"
+
+/* 'THIS' gets redefined to 'void' in 
+the standard mingw include 'basetyps.h', which causes problems with
+the 'THIS' that appears in XS code. */
+#ifdef __MINGW32__
+#undef THIS
+#endif
+
+#include "vtkPerl.h"
+!;
+
+
+foreach my $objectType(sort keys %objectTypes){ # go thru the different object types
+
+	@objects = sort @{$objectTypes{$objectType}}; # get the objects for the current type
+	next unless (@objects);
+
+	my @headerFiles = map "$_.h", @objects;
+	
+	# Filter headers to include only ones that are present
+	@headerFiles = grep -f "$vtkBaseDir/$VTKdirName/$_", @headerFiles;
+
+	# Put in ifefs for win32 and unix cases
+	if( $objectType eq '-win32'){
+		print XSFILE "#ifdef WIN32\n";
+	}
+	elsif( $objectType eq '-unix_concrete' ){
+		print XSFILE "#ifndef WIN32\n";
+	}
+	elsif( 	$objectType eq '-mesa' ){
+		print XSFILE "#ifdef USE_MESA\n";
+	}
+	elsif( 	$objectType eq '-oglr' ){
+		print XSFILE "#ifndef USE_MESA\n";
+	}
+
+	# print the actual header files	
+	foreach my $headerFile( @headerFiles){
+		print XSFILE "#include \"$headerFile\"\n";
+	}
+	
+	# put in the endifs
+	if( $objectType eq '-win32' || 
+	    $objectType eq '-unix_concrete' ||
+	    $objectType eq '-mesa' || $objectType eq '-oglr'){
+		print XSFILE "#endif\n";
+	}
+	
+}
+	
+# Put in special case includes
+if($VTKdirName =~ /graphics/i){
+	print XSFILE '#include "vtkPropAssembly.h"'."\n";
+}
+elsif( $VTKdirName =~ /Hybrid/i ){
+	print XSFILE '#include "vtkRectilinearGrid.h"
+#include "vtkStructuredGrid.h"
+#include "vtkDataObjectCollection.h"
+#include "vtkDataSetCollection.h"
+#include "vtkGlyphSource2D.h"
+';
+}
+elsif( $VTKdirName =~ /imaging/i ){
+	print XSFILE '#include "vtkWindow.h"
+';
+}	
+elsif( $VTKdirName =~ /rendering/i ){
+	print XSFILE '#include "vtkPropAssembly.h"
+';
+}	
+
+# Put in vtkPerCommand Subclass for the Common.xs file
+if($VTKdirName =~ /common/i){
+	print XSFILE '#include "vtkCommand.h"'."\n";
+	print XSFILE q!
+/*=========================================================================
+
+   Subclass of vtkCommand for the perl interface
+   
+ =========================================================================*/
+
+ class vtkPerlCommand : public vtkCommand
+{
+public:
+  static vtkPerlCommand *New() { return new vtkPerlCommand; };
+
+  void SetCallback(SV* codeRef);
+  
+  void Execute(vtkObject *, unsigned long, void *);
+
+  SV* code;
+  
+protected:
+  vtkPerlCommand();
+  ~vtkPerlCommand(); 
+};
+
+vtkPerlCommand::vtkPerlCommand()
+{ 
+  this->code = NULL; 
+}
+
+vtkPerlCommand::~vtkPerlCommand() 
+{ 
+  if(this->code) { SvREFCNT_dec(this->code); } // We are done with this SV
+}
+
+void vtkPerlCommand::SetCallback(SV* codeRef)
+{
+	this->code = codeRef;
+	SvREFCNT_inc(this->code); // Increment its reference count while we are using it
+	
+
+}
+  
+  
+// Execute the perl callback
+void vtkPerlCommand::Execute(vtkObject *, unsigned long, void *)
+{
+
+  int count;
+  dSP;
+  PUSHMARK(SP) ;
+  /*printf("callperlsub called'%s'\n",SvPV_nolen(code)); */
+  count = perl_call_sv(this->code, G_DISCARD|G_NOARGS ) ;
+}	
+!;	
+}
+
+
+print XSFILE <<EOF;
+/* Routine to call a perl code ref, used by all the Set...Method methods
+   like SetExecuteMethod.
+*/
+
+void
+callperlsub(void * codeRef){
+	SV* code = (SV*) codeRef;
+	int count;
+	dSP;
+	PUSHMARK(SP) ;
+	/*printf("callperlsub called'%s'\\n",SvPV_nolen(code)); */
+	count = perl_call_sv(code, G_DISCARD|G_NOARGS ) ;
+
+}
+EOF
+
+# Print the raw XS code
+foreach my $objectType(sort keys %rawXSoutput){ # go thru the different object types
+
+	my $rawXSoutput = $rawXSoutput{$objectType}; # get the XScode for the current type
+	next unless ($rawXSoutput);
+	
+	# Put in ifefs for win32 and unix cases
+	if( $objectType eq '-win32'){
+		print XSFILE "\n#ifdef WIN32\n";
+	}
+	elsif( $objectType eq '-unix_concrete' ){
+		print XSFILE "\n#ifndef WIN32\n";
+	}
+	elsif( 	$objectType eq '-mesa' ){
+		print XSFILE "\n#ifdef USE_MESA\n";
+	}
+	elsif( 	$objectType eq '-oglr' ){
+		print XSFILE "\n#ifndef USE_MESA\n";
+	}
+
+
+	print XSFILE $rawXSoutput;
+		
+	# put in the endifs
+	if( $objectType eq '-win32' || 
+	    $objectType eq '-unix_concrete' ||
+	    $objectType eq '-mesa' || $objectType eq '-oglr'){
+		print XSFILE "\n#endif\n";
+	}
+	
+}
+
+# Print the trailing stuff (Currently nothing
+print XSFILE '
+
+';
+
+close XSFILE;
+
+# Write out typemap for this XS file
+my $typemap = "typemap".ucfirst($VTKdirName);
+print  "Writing typemap file '$typemap'\n";
+
+open(TYPEMAP, ">$dirName/$typemap") or die( "Can't open File '$dirName/$typemap'\n");
+
+print TYPEMAP "TYPEMAP\n";
+@objects = map @{$objectTypes{$_}}, keys %objectTypes;
+
+foreach my $object(sort @objects){
+	print TYPEMAP $object."*\t\t\tO_OBJECT\n";
+}
+
+close TYPEMAP;
+
+
+############### Consolidate pm files into one file #############
+
+# Clear the temp directory
+print "Consolidating pm files...\n";
+
+open (PMFILE, ">$dirName/$dirName.pm") or die("Can't open output file '$dirName/$dirName.pm'\n");
+
+# Write the header stuff 
+print PMFILE "
+package Graphics::VTK::$dirName;
+use 5.004;
+use strict;
+use Carp;
+
+use vars qw/ \$VERSION \@ISA/;
+
+require DynaLoader;
+
+\$VERSION = '$pmversion';
+
+\@ISA = qw/ DynaLoader /;
+
+bootstrap Graphics::VTK::$dirName \$VERSION;
+
+
+\=head1 NAME
+
+VTK$dirName  - A Perl interface to VTK$dirName library
+
+\=head1 SYNOPSIS
+
+C<use Graphics::VTK;>
+C<use Graphics::VTK::$dirName;>
+
+\=head1 DESCRIPTION
+
+Graphics::VTK::$dirName is an interface to the $dirName libaray of the C++ visualization toolkit VTK..
+
+\=head1 AUTHOR
+
+Original PerlVTK Package: Roberto De Leo <rdl\@math.umd.edu>
+
+Additional Refinements: John Cerney <j-cerney1\@raytheon.com>
+
+=cut
+
+";
+
+close PMFILE;
+
+opendir(TEMPDIR, $pmoutputDir) || die "can't opendir $pmoutputDir: $!";
+@files = grep { $_ !~ /^\./ && -f "$pmoutputDir/$_" } readdir(TEMPDIR);
+closedir TEMPDIR;
+
+@files = map "$pmoutputDir/$_", @files;
+
+system("cat ".join(" ", @files).">>$dirName/$dirName.pm");
+system("echo '1;' >> $dirName/$dirName.pm ");
+
+
+print "Completed\n";

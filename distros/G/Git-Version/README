@@ -1,0 +1,34 @@
+NAME
+
+    Git::Version - Git version objects
+
+SYNOPSIS
+
+    use Git::Version;
+
+    my $v = Git::Version->new( `git --version` );
+    print "You've got an old git" if $v lt '1.6.5';
+
+DESCRIPTION
+
+    "Git::Version" offers specialized version objects that can compare strings
+    corresponding to a Git version number.
+
+    The actual comparison is handled by Git::Version::Compare, so the strings
+    can be version numbers, tags from "git.git" or the output of "git version"
+    or "git describe".
+
+SEE ALSO
+
+    Git::Version::Compare.
+
+AUTHOR
+
+    Philippe Bruhat (BooK) <book@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2016 Philippe Bruhat (BooK), all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

@@ -1,0 +1,209 @@
+#!/usr/bin/env perl
+# TODO: RCL 2011-09-09 Intro header
+#
+use strict;
+use warnings;
+use YAML qw/LoadFile DumpFile Dump/;
+use Getopt::Long;
+use File::Spec::Functions qw/catfile/;
+use Google::Fusion;
+use Term::ReadLine;
+use File::HomeDir;
+use Carp;
+use Try::Tiny;
+use Text::Table;
+use Encode;
+
+my %params;
+GetOptions( \%params,
+    'client_id=s',
+    'client_secret=s',
+    'access_code=s',
+    'refresh_token=s',
+    'access_token=s',
+    'config=s',
+    'interactive',
+    );
+
+# Default params
+%params = (
+    token_store  => catfile( File::HomeDir->my_home(), '.fusion.auth' ),
+    interactive => 1,
+    %params );
+
+# Clean out any undefined values
+%params = map{ $_ => $params{$_} }
+    grep{ $params{$_} }
+    keys %params;
+
+# See if there's a config file in the users home, or a config file defined
+my $conf_file = $params{config} || catfile( File::HomeDir->my_home() , '.fusion' );
+delete( $params{config} );
+if( -f $conf_file ){
+    my $file_params = LoadFile( $conf_file );
+    %params = (
+        %{ $file_params },
+        %params,
+        );
+}
+
+# Initialise the Fusion object and force the auth_client to be built to see
+# if enough parameters were given (it's lazy by default)
+my $fusion = undef;
+try{
+    $fusion = Google::Fusion->new( %params );
+    $fusion->auth_client();
+}catch{
+    print $_;
+    # TODO: RCL 2011-09-09 Make poddoc
+    print "Help to come here...\n";
+    exit;
+};
+
+# Set up the terminal readline controller
+my $term = Term::ReadLine->new('Fusion');
+my $prompt = "fusion> ";
+my $OUT = $term->OUT || \*STDOUT;
+binmode $OUT, ':utf8';
+my $command = '';
+
+# Now loop handling the commands
+COMMAND:
+while ( defined ( $command = $term->readline( $prompt ) ) ) {
+    warn $@ if $@;
+    if( $command =~ m/^\s*$/ ){
+        next COMMAND;
+    }
+    $term->addhistory($command); 
+    if( $command =~ m/^\.(.*)$/ or $command =~ m/^(help)$/i ){
+        my $rtn = local_command( $1 );
+        if( not $rtn ){
+            last COMMAND;
+        }
+
+    }else{
+        my $result = $fusion->query( $command );
+        my @rows = @{ $result->rows };
+
+        # Print the result
+        print_result( $OUT, $result );
+        
+    }
+}
+# If exit was with [ctrl]-d, then there will be no last command, so add a newline.
+printf "%sExiting fusion.\n", ( $command ? '' : "\n" );
+exit( 0 );
+
+# Accepts a filehandle and a reference to an array of array references
+sub print_result {
+    my $fh = shift;
+    my $result = shift;
+
+    my $output = '';
+    
+    # A Text::Table separator
+    my $sep = { 
+        is_sep => 1,
+        title  => ' | ',
+        body   => ' | ',
+    };
+
+    # Prepare the columns with separators
+    my @columns = ( '', @{ $result->columns } );
+    @columns = map { $_, $sep } @columns;
+    pop( @columns );
+    
+    # Set up the table
+    my $tb = Text::Table->new( @columns );
+    
+    # Add an index to each row, and add the data to the table
+    my @rows = @{ $result->rows };
+    foreach my $idx( 0 .. $#rows ){
+        $tb->add( $idx + 1, @{ $rows[$idx] } );
+    }
+    my $rule  = $tb->rule( '-', '+' );
+   
+    # Add the table headers
+    if( $result->has_headers ){
+        $output .= $tb->title;
+        $output .= $tb->rule( '=', '+' );
+    }
+
+    # Output the actual table
+    my @lines = $tb->body;
+    foreach( 0 .. $#lines ){
+        # Because we add an index to the rows, the first column will always have exactly 
+        # either the index, or nothing in it.  Add a rule before.
+        if( $_ > 0 and $lines[$_] !~ m/^\s+\|/ ){
+            $output .= $rule;
+        }
+        $output .= $lines[$_];
+    }
+    $output .= $rule;
+    
+    # Somehow the Text::Table breaks the encoding again... :-/
+    $output = encode( 'utf8', $output );
+    
+    if( $result->error ){
+        $output .= sprintf "Error: %s\n", $result->error;
+    }
+
+    # Add some information about the time taken
+    $output .= sprintf "%s line%s in %0.4fs (auth: %0.4fs)\n",
+        $result->num_rows,
+        ( $result->num_rows != 1 ? 's' : '' ),
+        $result->total_time,
+        $result->auth_time;
+    print $output;
+}
+
+# Handle local commands (stuff which is not sent to the Fusion server
+sub local_command {
+    my $command = shift;
+    if( $command =~ m/^(exit|quit)$/i ){
+        return 0;
+    }elsif( $command =~ m/^help$/i ){
+        print_local_help();
+    }elsif( $command =~ m/^source (.+)$/ ){
+        foreach my $result( @{ local_source( $1 ) } ){
+            printf "Success: %s\n", $result->query;
+        }
+    }elsif( $command =~ m/^refresh_token$/i ){
+        $fusion->get_fresh_access_token();
+    }else{
+        print "I don't know how to do that...\n";
+    }
+    return 1;
+}
+
+# The user called the local help command... give them some help baby!
+sub print_local_help {
+    my %commands = (
+        help            => 'show the internal commands',
+        quit            => 'exit the application',
+        source          => 'read in a source file',
+        refresh_token   => 'refresh access token',
+        'exit'          => 'exit the application',
+        );
+    # All local commands start with a '.'
+    foreach( sort keys %commands ){
+        printf ".%-14s %s\n", $_, $commands{$_};
+    }
+}
+
+sub local_source {
+    my $source_file = shift;
+    printf "Reading source file: %s\n", $source_file;
+    open( my $fh, '<', $source_file ) or die( $! );
+    my @lines;
+    while( my $line = readline( $fh ) ){
+        chomp( $line );
+        push( @lines, $line );
+    }
+    close $fh;
+    my @results;
+    foreach( @lines ){
+        push( @results, $fusion->query( $_ ) );
+    }
+    return \@results;
+}

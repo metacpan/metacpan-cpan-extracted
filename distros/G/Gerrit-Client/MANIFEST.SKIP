@@ -1,0 +1,9 @@
+^\.git
+^t/gerrit
+.*~$
+^MYMETA\..*
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+

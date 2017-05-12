@@ -1,0 +1,100 @@
+Revision history for Perl extension Grips::Cmd.
+
+0.01
+
+    - Rudimentäre und wenig systematisierte Funktionalität
+
+0.80
+
+    - Dokumentation hinzugefügt
+
+    - Methodenschnittstellen vereinheitlicht
+
+    - alle Methoden mit Parameter grips_object_name versehen, der den Namen
+    des grips-open-Objekts bezeichnet, auf dem der Scriptrequest ausgeführt
+    wird
+
+    - Parameter request_id vorhanden, aber deprecated
+
+    - Fehler mit Session-ID korrigiert
+
+    - hochzählende Transaction-ID hinzugefügt
+
+    - auch login()-Methode liefert jetzt Response-Objekt zurück
+
+    - Bei getDocs() kommen jetzt auch die '$'-Felder (DBKEY, COPYRIGHT
+    etc.), allerdings ohne '$' davor
+
+0.81
+
+    - Dokumentation erweitert
+
+    - 3. Parameter (erwarteten Status) zu checkGripsResponse() hinzugefügt
+
+1.00
+
+    - Perl-Datenstrukturen werden jetzt automatisch in beliebiger Tiefe in
+    gsc-requests umgesetzt. Damit sollte theoretisch jeder grips-Request,
+    der sich an die gsc-eigenen Regeln hält, funktionieren.
+
+    - Alle Funktionen ausser login() und logout() geben jetzt eine Warnung
+    aus, wenn sie ohne den Parameter "grips_object_name" aufgerufen werden.
+
+    - Damit man nicht so viel tippen muss, kann statt des Parameternamens
+    "grips_object_name" jetzt auch "_" eingegeben werden.
+
+1.01
+
+    - Fehler bei getCost() und analogen response-Strukturen beseitigt, wo
+    Reponsezeile die Struktur key(n)=value (im Ggs. zu keyA(n).keyB=value)
+    hat
+
+    - Open kann jetzt auch 'rd_from' und 'rd_to'
+
+    - Search kann jetzt auch 'query.mode'
+
+1.02
+
+    - Abwärtskompatibilität bei search() hergestellt: Request versteht jetzt
+    auch wieder skalaren Parameter "query", der query.string enthält.
+
+1.03
+
+    - Funktion connectionIsAlive() hinzugefügt. Liefert 1, wenn noch eine
+    Verbindung zum Socket-CBI-Dämon besteht, sonst 0.
+
+1.04
+
+    - Problem beim Parsen der Response von GetFields() behoben, wenn
+    Periodengruppen zurückkommen. Gelöst über Funktion _cleanRetVal()
+
+    - Fehler beim Parsen von #1 in Response von GetFields() behoben
+
+1.05
+
+    - Fehler beim Parsen von Periodengruppen namens "P-Group" behoben
+
+1.06
+
+    - Konstruktor stirbt nicht mehr, wenn kein Socket da, sondern
+      warnt und liefert undef
+
+1.07
+
+    - Nur Quelltextlayoutverschönerungen
+
+1.08
+
+    - Parse::RecDescent auskomentiert, ist ja eigentlich nicht noetig
+
+1.09
+
+    - new response syntax implementiert
+
+1.10
+
+    - Fix package declaration
+    
+1.11
+
+    - Fix Makefile.PL

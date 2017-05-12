@@ -1,0 +1,37 @@
+Revision history for Perl extension Geo::Calc
+
+version 0.12: Thu Mar  1 12:30:22 EEST 2011
+	- fixed bug to work on perl 5.8.x
+
+version 0.11: Mon Jun 27 18:23:46 EEST 2011
+	- fixed boundry_box bug
+	- fixed initial and final bearing bugs
+	- added distance units ( defaults to meters )
+	- fixed number handeling bug (in precision functions)
+	- now returns numbers not strings
+	- added more tests
+	- code cleaning
+
+version 0.04: Mon Feb 14 07:41:45 EST 2011
+
+	- fixed the boundry_box bug ( used the default 45 deg always )
+	- cleaned up the POD
+	- added distance_at and tests for it
+	- changed destination_point to destination_point_hs
+	- added destination_point using Vincenty inverse formula for ellipsoids
+	- new destination_point uses meters insted of km
+	- changed boundry_box to meters
+
+version 0.03: Wed Feb  9 06:31:18 EST 2011
+
+	- speed impriovements
+	- changed from sub to method using MooseX::Method::Signatures
+
+version 0.02: Tue Feb  8 11:31:35 EST 2011
+
+	- updated the documenation (POD)
+	- fixed the META.yml
+
+version 0.01: Mon Feb  7 08:32:17 EST 2011
+
+	Initial release

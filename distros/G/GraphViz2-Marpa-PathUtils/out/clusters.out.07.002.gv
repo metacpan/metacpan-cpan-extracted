@@ -1,0 +1,22 @@
+digraph graph_07
+{
+	graph[rankdir = "LR"]
+	node[shape = "oval"]
+	edge[color = "slateblue"]
+	node[style = "filled"]
+	H[color = "aquamarine"]
+	L[color = "plum"]
+	M[color = "pink"]
+	O[color = "red"]
+	I[color = "bisque"]
+	K[color = "gold"]
+	J
+	I -> J[arrowhead = "none" label = "" samehead = "1"]
+	H -> J[arrowhead = "none" label = "" samehead = "1"]
+	J -> L[label = "" sametail = "1"]
+	J -> K[label = "" sametail = "1"]
+	L -> M[arrowhead = "odot"]
+	M -> N[arrowhead = "diamond"]
+	N -> O[arrowhead = "odot"]
+
+}

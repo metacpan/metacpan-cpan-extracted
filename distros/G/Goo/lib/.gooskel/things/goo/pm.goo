@@ -1,0 +1,32 @@
+title			=	Perl Module
+description		=	Handle Perl5 + Perl6 modules
+
+# Action Handlers specific to Perl5
+[E]dit			=	Goo::Thing::pm::Editor.pm
+[P]rofile		=	Goo::Thing::pm::Profiler.pm
+[R]un			=	Goo::Thing::pm::Runner.pm
+Comp[I]le		=	Goo::Thing::pm::Compiler.pm
+[D]elete		=	Goo::FileThing::Deleter.pm
+
+# these action handlers can come out in a later release
+# not for version 0.1
+#[M]ake			=	Goo::Thing::pm::Maker.pm
+#[A]dd			=	Goo::Thing::pm::Adder.pm
+#[G]o Live		=	Goo::Thing::pm::GoLiveCommand.pm
+#[T]est			= 	Goo::Thing::pm::TestRunner.pm
+#Mo[V]e			= 	Goo::Thing::pm::MethodMover.pm
+
+# generic Action Handlers
+E[X]it			= 	Goo::Exiter.pm
+[J]ump			=	Goo::JumpManager.pm
+[C]lone			=	Goo::FileThing::Cloner.pm
+[S]hell			=	Goo::ShellCommander.pm
+[Z]one			= 	Goo::Zone.pm
+Back [L]inks	= 	Goo::BackLinkManager.pm
+Care[O]Meter 	=  	Goo::CareOMeter.pm
+#[B]ack			=	Goo::TrailGoBackOne.pm
+
+# need to add all module locations here ...
+location		=	~
+location		= 	/usr/lib/perl6/site_perl
+location		= 	/usr/lib/perl5/site_perl

@@ -1,0 +1,25 @@
+Revision history for Gtk2-Ex-DateRange
+
+0.01    Sep 29, 2005
+        First version, released on an unsuspecting world.
+
+0.02    Sep 29, 2005
+	Fixed issue with clear button in popup
+	Added a few real tests
+
+0.03    Sep 29, 2005
+	Fixed the examples.
+	Bug fix - joinercombo should be insensitive on clear
+	
+0.04    Sep 29, 2005
+	Bug fixes. More tests
+	
+0.05    Sep 29, 2005
+	Added to_sql_condition()
+	More tests	
+	
+0.06    Oct 18, 2005
+	Changed the wrap_width to make the UI look better
+	
+0.07    Oct 18, 2005
+    Bug fixes. combo dropdown won't close the window anymore.

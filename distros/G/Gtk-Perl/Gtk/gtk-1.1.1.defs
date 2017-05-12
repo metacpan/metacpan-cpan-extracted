@@ -1,0 +1,65 @@
+(define-boxed GtkCTreeNode
+  "(void)"
+  "(void)")
+
+(define-enum GtkCTreePos
+  (before GTK_CTREE_POS_BEFORE)
+  (as-child GTK_CTREE_POS_AS_CHILD)
+  (after GTK_CTREE_POS_AFTER))
+
+(define-enum GtkCTreeLineStyle
+  (solid GTK_CTREE_LINES_SOLID)
+  (dotted GTK_CTREE_LINES_DOTTED)
+  (tabbed GTK_CTREE_LINES_TABBED)
+  (none GTK_CTREE_LINES_NONE))
+
+(define-enum GtkCTreeExpansionType
+  (expand GTK_CTREE_EXPANSION_EXPAND)
+  (expand-recursive GTK_CTREE_EXPANSION_EXPAND_RECURSIVE)
+  (collapse GTK_CTREE_EXPANSION_COLLAPSE)
+  (collapse-recursive GTK_CTREE_EXPANSION_COLLAPSE_RECURSIVE)
+  (toggle GTK_CTREE_EXPANSION_TOGGLE)
+  (toggle-recursive GTK_CTREE_EXPANSION_TOGGLE_RECURSIVE))
+
+(define-object GtkCTree (GtkCList))
+
+(define-boxed GtkCTreeRow
+  "(void)"
+  "(void)")
+
+(define-object GtkPacker (GtkContainer))
+
+(define-enum GtkAnchorType
+	(center GTK_ANCHOR_CENTER)
+	(north GTK_ANCHOR_N)
+	(ne GTK_ANCHOR_NE)
+	(east GTK_ANCHOR_E)
+	(se GTK_ANCHOR_SE)
+	(south GTK_ANCHOR_S)
+	(sw GTK_ANCHOR_SW)
+	(west GTK_ANCHOR_W)
+	(nw GTK_ANCHOR_NW))
+
+(define-enum GtkSideType
+	(top GTK_SIDE_TOP)
+	(bottom GTK_SIDE_BOTTOM)
+	(left GTK_SIDE_LEFT)
+	(right GTK_SIDE_RIGHT))
+
+(define-flags GtkPackerOptions
+	(pack-expand GTK_PACK_EXPAND)
+	(fill-x GTK_FILL_X)
+	(fill-y GTK_FILL_Y))
+
+(define-boxed GtkPackerChild
+	"(void)"
+	"(void)")
+
+(define-enum GdkRgbDither
+	(none GDK_RGB_DITHER_NONE)
+	(normal GDK_RGB_DITHER_NORMAL)
+	(max GDK_RGB_DITHER_MAX))
+
+(define-boxed GdkRgbCmap
+	"(void)"
+	"(void)")

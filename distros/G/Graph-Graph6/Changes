@@ -1,0 +1,38 @@
+Copyright 2015, 2016 Kevin Ryde
+
+This file is part of Graph-Graph6.
+
+Graph-Graph6 is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+Graph-Graph6 is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Graph-Graph6.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 6, August 2016
+    - Graph::Writer::Sparse6, Graph::Easy::As_graph6,
+      Graph::Easy::As_sparse6 document header option
+
+Version 5, October 2015
+    - new GraphViz2::Parse::Graph6
+
+Version 4, August 2015
+    - Graph::Graph6 read_graph() propagate taint of input
+
+Version 3, May 2015
+    - fixes for writing named file
+
+Version 2, May 2015
+    - Graph::Graph6 read_graph() delete previous edge_aref contents
+    - Graph::Easy as_graph6() fix for undirected graphs
+
+Version 1, May 2015
+    - the first version

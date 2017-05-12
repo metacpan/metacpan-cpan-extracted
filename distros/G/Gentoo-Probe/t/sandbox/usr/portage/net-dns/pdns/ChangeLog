@@ -1,0 +1,45 @@
+# ChangeLog for net-dns/pdns
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/pdns/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  26 Apr 2004; Aron Griffis <agriffis@gentoo.org> pdns-2.9.12.ebuild,
+  pdns-2.9.8.ebuild:
+  Add die following econf for bug 48950
+
+*pdns-2.9.16 (10 Mar 2004)
+
+  10 Mar 2004; Jared Hudson <jhhudso@gentoo.org> pdns-2.9.16.ebuild:
+  Added pdns-2.9.16 thanks to bug #43240
+
+  10 Mar 2004; Jared Hudson <jhhudso@gentoo.org> pdns-2.9.12-r1.ebuild,
+  pdns-2.9.15.ebuild:
+  Marking as stable
+
+*pdns-2.9.15 (19 Jan 2004)
+
+  19 Jan 2004; Jared Hudson <jhhudso@gentoo.org> : Version bump.
+	
+  17 Jan 2004; Michael Sterrett <mr_bones_@gentoo.org> pdns-2.9.12-r1.ebuild:
+  dev-libs/libpq++ -> dev-cpp/libpqpp
+
+  03 Jan 2004; <plasmaroo@gentoo.org> pdns-2.9.12-r1.ebuild:
+  Added LDAP support flag. Thanks to Lars Kneschke - closes bug 
+  #36881.
+
+*pdns-2.9.12-r1 (14 Dec 2003)
+
+  14 Dec 2003; Jared Hudson <jhhudso@gentoo.org> : Postgresql support added
+  via use variable thanks to Rafal Rzepecki <divide@poczta.onet.pl>
+	
+*pdns-2.9.12 (30 Oct 2003)
+
+  30 Oct 2003; Jared Hudson <jhhudso@gentoo.org> : Version bump.
+	
+  06 Aug 2003; Jared Hudson <jhhudso@gentoo.org> : Fixed bug where pdns would
+  not build with USE=-mysql, if mysql was not installed. Thanks to
+  mi-g2bug@imarko.dhs.org (Bug id #23506) for the fix.
+	
+*pdns-2.9.8 (04 Jun 2003)
+
+  04 Jun 2003; Jared Hudson <jhhudso@gentoo.org> : Initial import.
+

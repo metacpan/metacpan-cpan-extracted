@@ -1,0 +1,109 @@
+{
+          'cached_until' => '2008-05-27 02:22:03',
+          '266' => {
+                   'skills' => {
+                                 '3363' => {
+                                           'primary_attribute' => 'memory',
+                                           'bonuses' => {
+                                                          'corporationMemberBonus' => '10'
+                                                        },
+                                           'name' => 'Corporation Management',
+                                           'required_skills' => {},
+                                           'rank' => '1',
+                                           'description' => 'Basic corporation operation. +10 corporation members allowed per level.',
+                                           'secondary_attribute' => 'charisma'
+                                         },
+                                 '12241' => {
+                                            'primary_attribute' => 'memory',
+                                            'bonuses' => {
+                                                           'corporationMemberBonus' => '1000'
+                                                         },
+                                            'name' => 'Sovereignty',
+                                            'required_skills' => {
+                                                                   '3732' => '5'
+                                                                 },
+                                            'rank' => '8',
+                                            'description' => 'Advanced corporation operation. +1000 corporation members allowed per level.',
+                                            'secondary_attribute' => 'charisma'
+                                          },
+                                 '3732' => {
+                                           'primary_attribute' => 'memory',
+                                           'bonuses' => {
+                                                          'corporationMemberBonus' => '200'
+                                                        },
+                                           'name' => 'Empire Control',
+                                           'required_skills' => {
+                                                                  '3731' => '5'
+                                                                },
+                                           'rank' => '5',
+                                           'description' => 'Advanced corporation operation. +200 corporation members allowed per level.',
+                                           'secondary_attribute' => 'charisma'
+                                         },
+                                 '3369' => {
+                                           'primary_attribute' => 'memory',
+                                           'bonuses' => {},
+                                           'name' => 'CFO Training',
+                                           'required_skills' => {
+                                                                  '3363' => '2',
+                                                                  '3444' => '3'
+                                                                },
+                                           'rank' => '3',
+                                           'description' => 'Skill at managing corp finances. 5% discount on all fees at non-hostile NPC station if acting as CFO of a corp. ',
+                                           'secondary_attribute' => 'charisma'
+                                         },
+                                 '3368' => {
+                                           'primary_attribute' => 'memory',
+                                           'bonuses' => {
+                                                          'nonRaceCorporationMembersBonus' => '20'
+                                                        },
+                                           'name' => 'Ethnic Relations',
+                                           'required_skills' => {
+                                                                  '3363' => '2',
+                                                                  '3355' => '3'
+                                                                },
+                                           'rank' => '2',
+                                           'description' => 'Skill at operating multiracial corporations. Extra 20% corporation members of other race than CEO allowed per skill level.  Percentage is based on CEO\'s corporation management skills, not the number of people in the corporation.',
+                                           'secondary_attribute' => 'charisma'
+                                         },
+                                 '3731' => {
+                                           'primary_attribute' => 'memory',
+                                           'bonuses' => {
+                                                          'corporationMemberBonus' => '50'
+                                                        },
+                                           'name' => 'Megacorp Management',
+                                           'required_skills' => {
+                                                                  '3363' => '5'
+                                                                },
+                                           'rank' => '3',
+                                           'description' => 'Advanced corporation operation. +50 members per level.',
+                                           'secondary_attribute' => 'charisma'
+                                         },
+                                 '3373' => {
+                                           'primary_attribute' => 'memory',
+                                           'bonuses' => {
+                                                          'posStructureControlAmount' => '0',
+                                                          'canNotBeTrainedOnTrial' => '1'
+                                                        },
+                                           'name' => 'Starbase Defense Management',
+                                           'required_skills' => {
+                                                                  '11584' => '5'
+                                                                },
+                                           'rank' => '7',
+                                           'description' => 'Skill at using starbase weapon systems. Allows control of one array per level. Arrays must be placed outside of the forcefield to be controlled.',
+                                           'secondary_attribute' => 'charisma'
+                                         },
+                                 '11584' => {
+                                            'primary_attribute' => 'memory',
+                                            'bonuses' => {
+                                                           'canNotBeTrainedOnTrial' => '1'
+                                                         },
+                                            'name' => 'Anchoring',
+                                            'required_skills' => {},
+                                            'rank' => '3',
+                                            'description' => 'Skill at Anchoring Deployables. Can not be trained on Trial Accounts.',
+                                            'secondary_attribute' => 'charisma'
+                                          }
+                               },
+                   'name' => 'Corporation Management'
+                 }
+        };

@@ -1,0 +1,13 @@
+README
+Changes
+MANIFEST
+COPYING
+Makefile.PL
+Guard.pm
+Guard.xs
+t/00_load.t
+t/01_scoped.t
+t/02_guard.t
+t/03_die.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

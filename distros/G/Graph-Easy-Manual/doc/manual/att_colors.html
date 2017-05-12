@@ -1,0 +1,3657 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - Manual - Attributes - Color schemes and names</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link rel="Start" href="index.html">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+ <style type="text/css">
+   <!-- 
+    h4 { margin-bottom: 0em; padding-left: 1em; }
+    td, td.w { padding-left: 0.4em; padding-right: 0.4em; width: 3em; text-align: center; font-size: 80%; }
+    td.w { color: white; }
+   -->
+ </style>
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+  <a class="menubck" href="index.html" title="Back to the manual index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+
+  <a class="menuext" href="overview.html" title="How everything fits together">Overview</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+  <a class="menuext" href="hinting.html" title="Generating specific layouts">Hinting</a>
+  <a class="menuext" href="output.html" title="Output formats and their limitations">Output</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+  <a class="menuext" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+    <a class="menuind" href="att_graphs.html" title="Graph attributes">Graphs</a>
+    <a class="menuind" href="att_nodes.html" title="Node attributes">Nodes</a>
+    <a class="menuind" href="att_edges.html" title="Edge attributes">Edges</a>
+    <a class="menuind" href="att_groups.html" title="Group attributes">Groups</a>
+
+    <a class="menuind" href="attributes.html#class_names" title="Classes and their names">Classes</a>
+    <a class="menuind" href="attributes.html#labels__titles__names_and_links" title="Labels, titles, names and links">Labels</a>
+    <a class="menuind" href="attributes.html#links" title="Links and URLs">Links</a>
+    <a class="menuind" href="attributes.html#node_ranks" title="Node Ranks">Ranks</a>
+    <a class="menucin" href="#color_names_and_values" title="Color names and values">Colors</a>
+  <a class="menuext" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+  <a class="menuext" href="tutorial.html" title="Tutorial for often used graph types and designs">Tutorial</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h1>
+
+<h2>Color Schemes and Names</h2>
+
+<div class="text">
+
+<p>
+For all colors you can use one of the following notations:
+</p>
+
+<ul>
+  <li>Hex: <code>#ff0080</code> (#rrggbb)
+  <li>Hex: <code>#f08</code> (#rgb)
+  <li>RGB: <code>rgb(255,0,128)</code> (0 .. 255, 0 .. 255, 0 .. 255)
+  <li>HSV: <code>hsv(0.5, 0, 1.0)</code> (0 .. 1.0, 0 .. 1.0, 0 .. 1.0)
+  <li>HSL: <code>hsl(300, 0.5, 0.5)</code> (0 .. 359.9999, 0 .. 1.0, 0 .. 1.0)
+  <li>Name or index: <code>red</code> or <code>1</code> (see below for colorscheme info)
+  <li>Special: <code>inherit</code>, <code>transparent</code> (color will be inherited from containing object)
+</ul>
+
+<p>
+Note that mixing the different ways to express the RGB, HSL or HSV channels
+via absolute value, percentage value or a partial value from 0..1.0 is possible,
+and whitespaces are allowed, so <code>rgb(0, 50%,0.5)</code>
+is a valid color.
+<br>
+All color values (except #RGB) take an optional alpha value.
+<br>
+Any color that has <code>grey</code> in it's name will also be accepted with the alternative
+spelling of <code>gray</code>.
+<p>
+
+<p>
+The following list shows all the color schemes recognized by <code>Graph::Easy</code>,
+as well as the colors they contain and their corrosponding hex value.
+<br>
+Note that the <code>w3c</code> scheme is exactly the same as
+the <a href="http://www.w3.org/TR/SVG/types.html#ColorKeywords">one published</a> by
+<a href="">W3C</a>. So do not blame me for silly things
+like <font style="color: white; background: darkseagreen">darkseagreen</font>
+being lighter than <font style="color: white; background: seagreen">seagreen</font> ...
+</p>
+
+<h3>Supported color schemes:</h3>
+
+<ul>
+  <li><a href="#w3c">w3c</a></li>
+  <li><a href="#x11">x11</a></li>
+  <li><a href="#colorbrewer">Color Brewer</a></li>
+</ul>
+
+<a name='w3c'><b>w3c</b> color scheme:</a><br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #000000' title='#000000'>black</td>
+<td class="w" style='background: #006400' title='#006400'>darkgreen</td>
+<td class="w" style='background: #191970' title='#191970'>midnightblue</td>
+<td class="w" style='background: #2f4f4f' title='#2f4f4f'>darkslategray</td>
+<td class="w" style='background: #800000' title='#800000'>maroon</td>
+<td class="w" style='background: #008000' title='#008000'>green</td>
+<td class="w" style='background: #000080' title='#000080'>navy</td>
+<td class="w" style='background: #00008b' title='#00008b'>darkblue</td>
+</tr><tr>
+<td class="w" style='background: #8b0000' title='#8b0000'>darkred</td>
+<td class="w" style='background: #556b2f' title='#556b2f'>darkolivegreen</td>
+<td class="w" style='background: #228b22' title='#228b22'>forestgreen</td>
+<td class="w" style='background: #4b0082' title='#4b0082'>indigo</td>
+<td class="w" style='background: #8b4513' title='#8b4513'>saddlebrown</td>
+<td class="w" style='background: #483d8b' title='#483d8b'>darkslateblue</td>
+<td class="w" style='background: #2e8b57' title='#2e8b57'>seagreen</td>
+<td class="w" style='background: #a52a2a' title='#a52a2a'>brown</td>
+</tr><tr>
+<td class="w" style='background: #800080' title='#800080'>purple</td>
+<td class="w" style='background: #008080' title='#008080'>teal</td>
+<td class="w" style='background: #808000' title='#808000'>olive</td>
+<td class="w" style='background: #6b8e23' title='#6b8e23'>olivedrab</td>
+<td class="w" style='background: #696969' title='#696969'>dimgray</td>
+<td class="w" style='background: #b22222' title='#b22222'>firebrick</td>
+<td class="w" style='background: #a0522d' title='#a0522d'>sienna</td>
+<td class="w" style='background: #008b8b' title='#008b8b'>darkcyan</td>
+</tr><tr>
+<td class="w" style='background: #8b008b' title='#8b008b'>darkmagenta</td>
+<td class="w" style='background: #0000cd' title='#0000cd'>mediumblue</td>
+<td style='background: #32cd32' title='#32cd32'>limegreen</td>
+<td style='background: #3cb371' title='#3cb371'>mediumseagreen</td>
+<td style='background: #808080' title='#808080'>gray</td>
+<td style='background: #708090' title='#708090'>slategray</td>
+<td style='background: #b8860b' title='#b8860b'>darkgoldenrod</td>
+<td style='background: #dc143c' title='#dc143c'>crimson</td>
+</tr><tr>
+<td style='background: #4682b4' title='#4682b4'>steelblue</td>
+<td style='background: #d2691e' title='#d2691e'>chocolate</td>
+<td style='background: #778899' title='#778899'>lightslategray</td>
+<td style='background: #c71585' title='#c71585'>mediumvioletred</td>
+<td style='background: #cd5c5c' title='#cd5c5c'>indianred</td>
+<td style='background: #5f9ea0' title='#5f9ea0'>cadetblue</td>
+<td style='background: #6a5acd' title='#6a5acd'>slateblue</td>
+<td style='background: #20b2aa' title='#20b2aa'>lightseagreen</td>
+</tr><tr>
+<td style='background: #cd853f' title='#cd853f'>peru</td>
+<td style='background: #ff0000' title='#ff0000'>red</td>
+<td style='background: #00ff00' title='#00ff00'>lime</td>
+<td style='background: #0000ff' title='#0000ff'>blue</td>
+<td style='background: #4169e1' title='#4169e1'>royalblue</td>
+<td style='background: #9400d3' title='#9400d3'>darkviolet</td>
+<td style='background: #9932cc' title='#9932cc'>darkorchid</td>
+<td style='background: #9acd32' title='#9acd32'>yellowgreen</td>
+</tr><tr>
+<td style='background: #ff4500' title='#ff4500'>orangered</td>
+<td style='background: #8a2be2' title='#8a2be2'>blueviolet</td>
+<td style='background: #daa520' title='#daa520'>goldenrod</td>
+<td style='background: #bc8f8f' title='#bc8f8f'>rosybrown</td>
+<td style='background: #8fbc8f' title='#8fbc8f'>darkseagreen</td>
+<td style='background: #7cfc00' title='#7cfc00'>lawngreen</td>
+<td style='background: #ff6347' title='#ff6347'>tomato</td>
+<td style='background: #bdb76b' title='#bdb76b'>darkkhaki</td>
+</tr><tr>
+<td style='background: #00ff7f' title='#00ff7f'>springgreen</td>
+<td style='background: #7fff00' title='#7fff00'>chartreuse</td>
+<td style='background: #66cdaa' title='#66cdaa'>mediumaquamarine</td>
+<td style='background: #9370db' title='#9370db'>mediumpurple</td>
+<td style='background: #db7093' title='#db7093'>palevioletred</td>
+<td style='background: #7b68ee' title='#7b68ee'>mediumslateblue</td>
+<td style='background: #ff8c00' title='#ff8c00'>darkorange</td>
+<td style='background: #a9a9a9' title='#a9a9a9'>darkgray</td>
+</tr><tr>
+<td style='background: #00ced1' title='#00ced1'>darkturquoise</td>
+<td style='background: #00fa9a' title='#00fa9a'>mediumspringgreen</td>
+<td style='background: #ba55d3' title='#ba55d3'>mediumorchid</td>
+<td style='background: #1e90ff' title='#1e90ff'>dodgerblue</td>
+<td style='background: #ff1493' title='#ff1493'>deeppink</td>
+<td style='background: #48d1cc' title='#48d1cc'>mediumturquoise</td>
+<td style='background: #e9967a' title='#e9967a'>darksalmon</td>
+<td style='background: #fa8072' title='#fa8072'>salmon</td>
+</tr><tr>
+<td style='background: #ffa500' title='#ffa500'>orange</td>
+<td style='background: #f4a460' title='#f4a460'>sandybrown</td>
+<td style='background: #d2b48c' title='#d2b48c'>tan</td>
+<td style='background: #40e0d0' title='#40e0d0'>turquoise</td>
+<td style='background: #90ee90' title='#90ee90'>lightgreen</td>
+<td style='background: #deb887' title='#deb887'>burlywood</td>
+<td style='background: #00bfff' title='#00bfff'>deepskyblue</td>
+<td style='background: #ffa07a' title='#ffa07a'>lightsalmon</td>
+</tr><tr>
+<td style='background: #da70d6' title='#da70d6'>orchid</td>
+<td style='background: #b0c4de' title='#b0c4de'>lightsteelblue</td>
+<td style='background: #ff7f50' title='#ff7f50'>coral</td>
+<td style='background: #6495ed' title='#6495ed'>cornflowerblue</td>
+<td style='background: #f08080' title='#f08080'>lightcoral</td>
+<td style='background: #adff2f' title='#adff2f'>greenyellow</td>
+<td style='background: #ff69b4' title='#ff69b4'>hotpink</td>
+<td style='background: #98fb98' title='#98fb98'>palegreen</td>
+</tr><tr>
+<td style='background: #c0c0c0' title='#c0c0c0'>silver</td>
+<td style='background: #ffd700' title='#ffd700'>gold</td>
+<td style='background: #87ceeb' title='#87ceeb'>skyblue</td>
+<td style='background: #87cefa' title='#87cefa'>lightskyblue</td>
+<td style='background: #dda0dd' title='#dda0dd'>plum</td>
+<td style='background: #7fffd4' title='#7fffd4'>aquamarine</td>
+<td style='background: #add8e6' title='#add8e6'>lightblue</td>
+<td style='background: #d8bfd8' title='#d8bfd8'>thistle</td>
+</tr><tr>
+<td style='background: #00ffff' title='#00ffff'>cyan</td>
+<td style='background: #00ffff' title='#00ffff'>aqua</td>
+<td style='background: #ff00ff' title='#ff00ff'>fuchsia</td>
+<td style='background: #ffff00' title='#ffff00'>yellow</td>
+<td style='background: #ff00ff' title='#ff00ff'>magenta</td>
+<td style='background: #f0e68c' title='#f0e68c'>khaki</td>
+<td style='background: #ee82ee' title='#ee82ee'>violet</td>
+<td style='background: #d3d3d3' title='#d3d3d3'>lightgray</td>
+</tr><tr>
+<td style='background: #b0e0e6' title='#b0e0e6'>powderblue</td>
+<td style='background: #ffb6c1' title='#ffb6c1'>lightpink</td>
+<td style='background: #eee8aa' title='#eee8aa'>palegoldenrod</td>
+<td style='background: #f5deb3' title='#f5deb3'>wheat</td>
+<td style='background: #ffc0cb' title='#ffc0cb'>pink</td>
+<td style='background: #afeeee' title='#afeeee'>paleturquoise</td>
+<td style='background: #ffdead' title='#ffdead'>navajowhite</td>
+<td style='background: #dcdcdc' title='#dcdcdc'>gainsboro</td>
+</tr><tr>
+<td style='background: #ffdab9' title='#ffdab9'>peachpuff</td>
+<td style='background: #ffe4b5' title='#ffe4b5'>moccasin</td>
+<td style='background: #ffe4c4' title='#ffe4c4'>bisque</td>
+<td style='background: #ffebcd' title='#ffebcd'>blanchedalmond</td>
+<td style='background: #faebd7' title='#faebd7'>antiquewhite</td>
+<td style='background: #ffefd5' title='#ffefd5'>papayawhip</td>
+<td style='background: #ffe4e1' title='#ffe4e1'>mistyrose</td>
+<td style='background: #e6e6fa' title='#e6e6fa'>lavender</td>
+</tr><tr>
+<td style='background: #f5f5dc' title='#f5f5dc'>beige</td>
+<td style='background: #fafad2' title='#fafad2'>lightgoldenrodyellow</td>
+<td style='background: #fffacd' title='#fffacd'>lemonchiffon</td>
+<td style='background: #faf0e6' title='#faf0e6'>linen</td>
+<td style='background: #fff8dc' title='#fff8dc'>cornsilk</td>
+<td style='background: #fdf5e6' title='#fdf5e6'>oldlace</td>
+<td style='background: #f5f5f5' title='#f5f5f5'>whitesmoke</td>
+<td style='background: #f0fff0' title='#f0fff0'>honeydew</td>
+</tr><tr>
+<td style='background: #e0ffff' title='#e0ffff'>lightcyan</td>
+<td style='background: #ffffe0' title='#ffffe0'>lightyellow</td>
+<td style='background: #fff5ee' title='#fff5ee'>seashell</td>
+<td style='background: #fff0f5' title='#fff0f5'>lavenderblush</td>
+<td style='background: #f0f8ff' title='#f0f8ff'>aliceblue</td>
+<td style='background: #fffaf0' title='#fffaf0'>floralwhite</td>
+<td style='background: #f5fffa' title='#f5fffa'>mintcream</td>
+<td style='background: #f0ffff' title='#f0ffff'>azure</td>
+</tr><tr>
+<td style='background: #fffff0' title='#fffff0'>ivory</td>
+<td style='background: #f8f8ff' title='#f8f8ff'>ghostwhite</td>
+<td style='background: #fffafa' title='#fffafa'>snow</td>
+<td style='background: #ffffff' title='#ffffff'>white</td>
+</table>
+<a name='x11'><b>x11</b> color scheme:</a><br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #000000' title='#000000'>gray0</td>
+<td class="w" style='background: #000000' title='#000000'>black</td>
+<td class="w" style='background: #030303' title='#030303'>gray1</td>
+<td class="w" style='background: #050505' title='#050505'>gray2</td>
+<td class="w" style='background: #080808' title='#080808'>gray3</td>
+<td class="w" style='background: #0a0a0a' title='#0a0a0a'>gray4</td>
+<td class="w" style='background: #0d0d0d' title='#0d0d0d'>gray5</td>
+<td class="w" style='background: #0f0f0f' title='#0f0f0f'>gray6</td>
+</tr><tr>
+<td class="w" style='background: #121212' title='#121212'>gray7</td>
+<td class="w" style='background: #141414' title='#141414'>gray8</td>
+<td class="w" style='background: #171717' title='#171717'>gray9</td>
+<td class="w" style='background: #1a1a1a' title='#1a1a1a'>gray10</td>
+<td class="w" style='background: #1c1c1c' title='#1c1c1c'>gray11</td>
+<td class="w" style='background: #1f1f1f' title='#1f1f1f'>gray12</td>
+<td class="w" style='background: #212121' title='#212121'>gray13</td>
+<td class="w" style='background: #242424' title='#242424'>gray14</td>
+</tr><tr>
+<td class="w" style='background: #262626' title='#262626'>gray15</td>
+<td class="w" style='background: #292929' title='#292929'>gray16</td>
+<td class="w" style='background: #2b2b2b' title='#2b2b2b'>gray17</td>
+<td class="w" style='background: #2e2e2e' title='#2e2e2e'>gray18</td>
+<td class="w" style='background: #303030' title='#303030'>gray19</td>
+<td class="w" style='background: #333333' title='#333333'>gray20</td>
+<td class="w" style='background: #363636' title='#363636'>gray21</td>
+<td class="w" style='background: #383838' title='#383838'>gray22</td>
+</tr><tr>
+<td class="w" style='background: #006400' title='#006400'>darkgreen</td>
+<td class="w" style='background: #3b3b3b' title='#3b3b3b'>gray23</td>
+<td class="w" style='background: #3d3d3d' title='#3d3d3d'>gray24</td>
+<td class="w" style='background: #404040' title='#404040'>gray25</td>
+<td class="w" style='background: #424242' title='#424242'>gray26</td>
+<td class="w" style='background: #191970' title='#191970'>midnightblue</td>
+<td class="w" style='background: #454545' title='#454545'>gray27</td>
+<td class="w" style='background: #2f4f4f' title='#2f4f4f'>darkslategray</td>
+</tr><tr>
+<td class="w" style='background: #474747' title='#474747'>gray28</td>
+<td class="w" style='background: #000080' title='#000080'>navy</td>
+<td class="w" style='background: #000080' title='#000080'>navyblue</td>
+<td class="w" style='background: #4a4a4a' title='#4a4a4a'>gray29</td>
+<td class="w" style='background: #4d4d4d' title='#4d4d4d'>gray30</td>
+<td class="w" style='background: #4f4f4f' title='#4f4f4f'>gray31</td>
+<td class="w" style='background: #008b00' title='#008b00'>green4</td>
+<td class="w" style='background: #8b0000' title='#8b0000'>red4</td>
+</tr><tr>
+<td class="w" style='background: #00008b' title='#00008b'>blue4</td>
+<td class="w" style='background: #525252' title='#525252'>gray32</td>
+<td class="w" style='background: #8b1a1a' title='#8b1a1a'>firebrick4</td>
+<td class="w" style='background: #8b2500' title='#8b2500'>orangered4</td>
+<td class="w" style='background: #556b2f' title='#556b2f'>darkolivegreen</td>
+<td class="w" style='background: #545454' title='#545454'>gray33</td>
+<td class="w" style='background: #228b22' title='#228b22'>forestgreen</td>
+<td class="w" style='background: #8b2323' title='#8b2323'>brown4</td>
+</tr><tr>
+<td class="w" style='background: #4b0082' title='#4b0082'>indigo</td>
+<td class="w" style='background: #575757' title='#575757'>gray34</td>
+<td class="w" style='background: #8b3626' title='#8b3626'>tomato4</td>
+<td class="w" style='background: #595959' title='#595959'>gray35</td>
+<td class="w" style='background: #008b45' title='#008b45'>springgreen4</td>
+<td class="w" style='background: #8b4500' title='#8b4500'>darkorange4</td>
+<td class="w" style='background: #458b00' title='#458b00'>chartreuse4</td>
+<td class="w" style='background: #8b4513' title='#8b4513'>chocolate4</td>
+</tr><tr>
+<td class="w" style='background: #8b4513' title='#8b4513'>saddlebrown</td>
+<td class="w" style='background: #27408b' title='#27408b'>royalblue4</td>
+<td class="w" style='background: #8b3e2f' title='#8b3e2f'>coral4</td>
+<td class="w" style='background: #5c5c5c' title='#5c5c5c'>gray36</td>
+<td class="w" style='background: #104e8b' title='#104e8b'>dodgerblue4</td>
+<td class="w" style='background: #8b4726' title='#8b4726'>sienna4</td>
+<td class="w" style='background: #8b0a50' title='#8b0a50'>deeppink4</td>
+<td class="w" style='background: #8b3a3a' title='#8b3a3a'>indianred4</td>
+</tr><tr>
+<td class="w" style='background: #5e5e5e' title='#5e5e5e'>gray37</td>
+<td class="w" style='background: #8b2252' title='#8b2252'>violetred4</td>
+<td class="w" style='background: #551a8b' title='#551a8b'>purple4</td>
+<td class="w" style='background: #8b5a00' title='#8b5a00'>orange4</td>
+<td class="w" style='background: #473c8b' title='#473c8b'>slateblue4</td>
+<td class="w" style='background: #483d8b' title='#483d8b'>darkslateblue</td>
+<td class="w" style='background: #616161' title='#616161'>gray38</td>
+<td class="w" style='background: #8b4c39' title='#8b4c39'>salmon4</td>
+</tr><tr>
+<td class="w" style='background: #2e8b57' title='#2e8b57'>seagreen4</td>
+<td class="w" style='background: #2e8b57' title='#2e8b57'>seagreen</td>
+<td class="w" style='background: #8b5a2b' title='#8b5a2b'>tan4</td>
+<td class="w" style='background: #636363' title='#636363'>gray39</td>
+<td class="w" style='background: #8b6508' title='#8b6508'>darkgoldenrod4</td>
+<td class="w" style='background: #8b1c62' title='#8b1c62'>maroon4</td>
+<td class="w" style='background: #00688b' title='#00688b'>deepskyblue4</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+</tr><tr>
+<td class="w" style='background: #8b6914' title='#8b6914'>goldenrod4</td>
+<td class="w" style='background: #a52a2a' title='#a52a2a'>brown</td>
+<td class="w" style='background: #666666' title='#666666'>gray40</td>
+<td class="w" style='background: #8b5742' title='#8b5742'>lightsalmon4</td>
+<td class="w" style='background: #68228b' title='#68228b'>darkorchid4</td>
+<td class="w" style='background: #698b22' title='#698b22'>olivedrab4</td>
+<td class="w" style='background: #36648b' title='#36648b'>steelblue4</td>
+<td class="w" style='background: #8b3a62' title='#8b3a62'>hotpink4</td>
+</tr><tr>
+<td class="w" style='background: #6b8e23' title='#6b8e23'>olivedrab</td>
+<td class="w" style='background: #8b7500' title='#8b7500'>gold4</td>
+<td class="w" style='background: #8b475d' title='#8b475d'>palevioletred4</td>
+<td class="w" style='background: #5d478b' title='#5d478b'>mediumpurple4</td>
+<td class="w" style='background: #696969' title='#696969'>gray41</td>
+<td class="w" style='background: #696969' title='#696969'>dimgray</td>
+<td class="w" style='background: #548b54' title='#548b54'>palegreen4</td>
+<td class="w" style='background: #b22222' title='#b22222'>firebrick</td>
+</tr><tr>
+<td class="w" style='background: #6b6b6b' title='#6b6b6b'>gray42</td>
+<td class="w" style='background: #a0522d' title='#a0522d'>sienna</td>
+<td class="w" style='background: #6e8b3d' title='#6e8b3d'>darkolivegreen4</td>
+<td class="w" style='background: #6e6e6e' title='#6e6e6e'>gray43</td>
+<td class="w" style='background: #7a378b' title='#7a378b'>mediumorchid4</td>
+<td class="w" style='background: #00868b' title='#00868b'>turquoise4</td>
+<td class="w" style='background: #4a708b' title='#4a708b'>skyblue4</td>
+<td class="w" style='background: #458b74' title='#458b74'>aquamarine4</td>
+</tr><tr>
+<td class="w" style='background: #707070' title='#707070'>gray44</td>
+<td class="w" style='background: #8b5f65' title='#8b5f65'>lightpink4</td>
+<td class="w" style='background: #008b8b' title='#008b8b'>cyan4</td>
+<td class="w" style='background: #8b008b' title='#8b008b'>magenta4</td>
+<td class="w" style='background: #8b8b00' title='#8b8b00'>yellow4</td>
+<td class="w" style='background: #6a3d9a' title='#6a3d9a'>10</td>
+<td class="w" style='background: #737373' title='#737373'>gray45</td>
+<td class="w" style='background: #8b7355' title='#8b7355'>burlywood4</td>
+</tr><tr>
+<td class="w" style='background: #8b636c' title='#8b636c'>pink4</td>
+<td class="w" style='background: #b15928' title='#b15928'>12</td>
+<td class="w" style='background: #757575' title='#757575'>gray46</td>
+<td class="w" style='background: #698b69' title='#698b69'>darkseagreen4</td>
+<td class="w" style='background: #8b6969' title='#8b6969'>rosybrown4</td>
+<td class="w" style='background: #8b814c' title='#8b814c'>lightgoldenrod4</td>
+<td class="w" style='background: #00cd00' title='#00cd00'>green3</td>
+<td class="w" style='background: #cd0000' title='#cd0000'>red3</td>
+</tr><tr>
+<td class="w" style='background: #0000cd' title='#0000cd'>mediumblue</td>
+<td class="w" style='background: #0000cd' title='#0000cd'>blue3</td>
+<td class="w" style='background: #b03060' title='#b03060'>maroon</td>
+<td class="w" style='background: #8b795e' title='#8b795e'>navajowhite4</td>
+<td class="w" style='background: #8b4789' title='#8b4789'>orchid4</td>
+<td class="w" style='background: #787878' title='#787878'>gray47</td>
+<td class="w" style='background: #8b864e' title='#8b864e'>khaki4</td>
+<td style='background: #607b8b' title='#607b8b'>lightskyblue4</td>
+</tr><tr>
+<td style='background: #8b7765' title='#8b7765'>peachpuff4</td>
+<td style='background: #53868b' title='#53868b'>cadetblue4</td>
+<td style='background: #7a7a7a' title='#7a7a7a'>gray48</td>
+<td style='background: #cd2626' title='#cd2626'>firebrick3</td>
+<td style='background: #cd3700' title='#cd3700'>orangered3</td>
+<td style='background: #528b8b' title='#528b8b'>darkslategray4</td>
+<td style='background: #8b7e66' title='#8b7e66'>wheat4</td>
+<td style='background: #6c7b8b' title='#6c7b8b'>slategray4</td>
+</tr><tr>
+<td style='background: #8b7d6b' title='#8b7d6b'>bisque4</td>
+<td style='background: #6e7b8b' title='#6e7b8b'>lightsteelblue4</td>
+<td style='background: #7d7d7d' title='#7d7d7d'>gray49</td>
+<td style='background: #32cd32' title='#32cd32'>limegreen</td>
+<td style='background: #cd3333' title='#cd3333'>brown3</td>
+<td style='background: #68838b' title='#68838b'>lightblue4</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #7f7f7f' title='#7f7f7f'>gray50</td>
+</tr><tr>
+<td style='background: #3cb371' title='#3cb371'>mediumseagreen</td>
+<td style='background: #8b668b' title='#8b668b'>plum4</td>
+<td style='background: #668b8b' title='#668b8b'>paleturquoise4</td>
+<td style='background: #708090' title='#708090'>slategray</td>
+<td style='background: #8b7d7b' title='#8b7d7b'>mistyrose4</td>
+<td style='background: #8b8970' title='#8b8970'>lemonchiffon4</td>
+<td style='background: #828282' title='#828282'>gray51</td>
+<td style='background: #8b8378' title='#8b8378'>antiquewhite4</td>
+</tr><tr>
+<td style='background: #cd4f39' title='#cd4f39'>tomato3</td>
+<td style='background: #b8860b' title='#b8860b'>darkgoldenrod</td>
+<td style='background: #8b8878' title='#8b8878'>cornsilk4</td>
+<td style='background: #dc143c' title='#dc143c'>crimson</td>
+<td style='background: #cd6600' title='#cd6600'>darkorange3</td>
+<td style='background: #66cd00' title='#66cd00'>chartreuse3</td>
+<td style='background: #00cd66' title='#00cd66'>springgreen3</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+</tr><tr>
+<td style='background: #858585' title='#858585'>gray52</td>
+<td style='background: #cd661d' title='#cd661d'>chocolate3</td>
+<td style='background: #8b8b7a' title='#8b8b7a'>lightyellow4</td>
+<td style='background: #7a8b8b' title='#7a8b8b'>lightcyan4</td>
+<td style='background: #838b83' title='#838b83'>honeydew4</td>
+<td style='background: #8b7b8b' title='#8b7b8b'>thistle4</td>
+<td style='background: #8b8682' title='#8b8682'>seashell4</td>
+<td style='background: #4682b4' title='#4682b4'>steelblue</td>
+</tr><tr>
+<td style='background: #3a5fcd' title='#3a5fcd'>royalblue3</td>
+<td style='background: #8b8386' title='#8b8386'>lavenderblush4</td>
+<td style='background: #878787' title='#878787'>gray53</td>
+<td style='background: #cd5b45' title='#cd5b45'>coral3</td>
+<td style='background: #838b8b' title='#838b8b'>azure4</td>
+<td style='background: #8b8b83' title='#8b8b83'>ivory4</td>
+<td style='background: #d2691e' title='#d2691e'>chocolate</td>
+<td style='background: #1874cd' title='#1874cd'>dodgerblue3</td>
+</tr><tr>
+<td style='background: #778899' title='#778899'>lightslategray</td>
+<td style='background: #cd6839' title='#cd6839'>sienna3</td>
+<td style='background: #cd1076' title='#cd1076'>deeppink3</td>
+<td style='background: #cd5555' title='#cd5555'>indianred3</td>
+<td style='background: #0000ee' title='#0000ee'>blue2</td>
+<td style='background: #00ee00' title='#00ee00'>green2</td>
+<td style='background: #ee0000' title='#ee0000'>red2</td>
+<td style='background: #8b8989' title='#8b8989'>snow4</td>
+</tr><tr>
+<td style='background: #8a8a8a' title='#8a8a8a'>gray54</td>
+<td style='background: #c71585' title='#c71585'>mediumvioletred</td>
+<td style='background: #8c8c8c' title='#8c8c8c'>gray55</td>
+<td style='background: #cd3278' title='#cd3278'>violetred3</td>
+<td style='background: #cd5c5c' title='#cd5c5c'>indianred</td>
+<td style='background: #7d26cd' title='#7d26cd'>purple3</td>
+<td style='background: #5f9ea0' title='#5f9ea0'>cadetblue</td>
+<td style='background: #cd8500' title='#cd8500'>orange3</td>
+</tr><tr>
+<td style='background: #ee2c2c' title='#ee2c2c'>firebrick2</td>
+<td style='background: #ee4000' title='#ee4000'>orangered2</td>
+<td style='background: #6959cd' title='#6959cd'>slateblue3</td>
+<td style='background: #8f8f8f' title='#8f8f8f'>gray56</td>
+<td style='background: #6a5acd' title='#6a5acd'>slateblue</td>
+<td style='background: #20b2aa' title='#20b2aa'>lightseagreen</td>
+<td style='background: #cd7054' title='#cd7054'>salmon3</td>
+<td style='background: #43cd80' title='#43cd80'>seagreen3</td>
+</tr><tr>
+<td style='background: #919191' title='#919191'>gray57</td>
+<td style='background: #ee3b3b' title='#ee3b3b'>brown2</td>
+<td style='background: #cd853f' title='#cd853f'>peru</td>
+<td style='background: #cd853f' title='#cd853f'>tan3</td>
+<td style='background: #cd950c' title='#cd950c'>darkgoldenrod3</td>
+<td style='background: #cd2990' title='#cd2990'>maroon3</td>
+<td style='background: #d02090' title='#d02090'>violetred</td>
+<td style='background: #0000ff' title='#0000ff'>blue1</td>
+</tr><tr>
+<td style='background: #00ff00' title='#00ff00'>green</td>
+<td style='background: #ff0000' title='#ff0000'>red1</td>
+<td style='background: #ff0000' title='#ff0000'>red</td>
+<td style='background: #00ff00' title='#00ff00'>green1</td>
+<td style='background: #0000ff' title='#0000ff'>blue</td>
+<td style='background: #949494' title='#949494'>gray58</td>
+<td style='background: #009acd' title='#009acd'>deepskyblue3</td>
+<td style='background: #4169e1' title='#4169e1'>royalblue</td>
+</tr><tr>
+<td style='background: #9400d3' title='#9400d3'>darkviolet</td>
+<td style='background: #cd9b1d' title='#cd9b1d'>goldenrod3</td>
+<td style='background: #969696' title='#969696'>gray59</td>
+<td style='background: #9932cc' title='#9932cc'>darkorchid</td>
+<td style='background: #9a32cd' title='#9a32cd'>darkorchid3</td>
+<td style='background: #9acd32' title='#9acd32'>olivedrab3</td>
+<td style='background: #9acd32' title='#9acd32'>yellowgreen</td>
+<td style='background: #cd8162' title='#cd8162'>lightsalmon3</td>
+</tr><tr>
+<td style='background: #ee5c42' title='#ee5c42'>tomato2</td>
+<td style='background: #ff3030' title='#ff3030'>firebrick1</td>
+<td style='background: #ff4500' title='#ff4500'>orangered</td>
+<td style='background: #ff4500' title='#ff4500'>orangered1</td>
+<td style='background: #4f94cd' title='#4f94cd'>steelblue3</td>
+<td style='background: #999999' title='#999999'>gray60</td>
+<td style='background: #76ee00' title='#76ee00'>chartreuse2</td>
+<td style='background: #00ee76' title='#00ee76'>springgreen2</td>
+</tr><tr>
+<td style='background: #ee7600' title='#ee7600'>darkorange2</td>
+<td style='background: #cd6889' title='#cd6889'>palevioletred3</td>
+<td style='background: #8968cd' title='#8968cd'>mediumpurple3</td>
+<td style='background: #ee7621' title='#ee7621'>chocolate2</td>
+<td style='background: #8a2be2' title='#8a2be2'>blueviolet</td>
+<td style='background: #cd6090' title='#cd6090'>hotpink3</td>
+<td style='background: #7ccd7c' title='#7ccd7c'>palegreen3</td>
+<td style='background: #9c9c9c' title='#9c9c9c'>gray61</td>
+</tr><tr>
+<td style='background: #ff4040' title='#ff4040'>brown1</td>
+<td style='background: #9e9e9e' title='#9e9e9e'>gray62</td>
+<td style='background: #1c86ee' title='#1c86ee'>dodgerblue2</td>
+<td style='background: #ee7942' title='#ee7942'>sienna2</td>
+<td style='background: #ee1289' title='#ee1289'>deeppink2</td>
+<td style='background: #daa520' title='#daa520'>goldenrod</td>
+<td style='background: #bc8f8f' title='#bc8f8f'>rosybrown</td>
+<td style='background: #ee6363' title='#ee6363'>indianred2</td>
+</tr><tr>
+<td style='background: #a2cd5a' title='#a2cd5a'>darkolivegreen3</td>
+<td style='background: #a1a1a1' title='#a1a1a1'>gray63</td>
+<td style='background: #912cee' title='#912cee'>purple2</td>
+<td style='background: #ee3a8c' title='#ee3a8c'>violetred2</td>
+<td style='background: #a3a3a3' title='#a3a3a3'>gray64</td>
+<td style='background: #ff6347' title='#ff6347'>tomato1</td>
+<td style='background: #ff6347' title='#ff6347'>tomato</td>
+<td style='background: #ee9a00' title='#ee9a00'>orange2</td>
+</tr><tr>
+<td style='background: #bdb76b' title='#bdb76b'>darkkhaki</td>
+<td style='background: #00c5cd' title='#00c5cd'>turquoise3</td>
+<td style='background: #b452cd' title='#b452cd'>mediumorchid3</td>
+<td style='background: #ff7f00' title='#ff7f00'>darkorange1</td>
+<td style='background: #ff7f00' title='#ff7f00'>8</td>
+<td style='background: #00ff7f' title='#00ff7f'>springgreen</td>
+<td style='background: #7fff00' title='#7fff00'>chartreuse1</td>
+<td style='background: #00ff7f' title='#00ff7f'>springgreen1</td>
+</tr><tr>
+<td style='background: #66cdaa' title='#66cdaa'>mediumaquamarine</td>
+<td style='background: #66cdaa' title='#66cdaa'>aquamarine3</td>
+<td style='background: #9370db' title='#9370db'>mediumpurple</td>
+<td style='background: #7a67ee' title='#7a67ee'>slateblue2</td>
+<td style='background: #ff7f24' title='#ff7f24'>chocolate1</td>
+<td style='background: #7b68ee' title='#7b68ee'>mediumslateblue</td>
+<td style='background: #a6a6a6' title='#a6a6a6'>gray65</td>
+<td style='background: #ee8262' title='#ee8262'>salmon2</td>
+</tr><tr>
+<td style='background: #cd8c95' title='#cd8c95'>lightpink3</td>
+<td style='background: #00cdcd' title='#00cdcd'>cyan3</td>
+<td style='background: #cd00cd' title='#cd00cd'>magenta3</td>
+<td style='background: #cdcd00' title='#cdcd00'>yellow3</td>
+<td style='background: #4876ff' title='#4876ff'>royalblue1</td>
+<td style='background: #cdad00' title='#cdad00'>gold3</td>
+<td style='background: #436eee' title='#436eee'>royalblue2</td>
+<td style='background: #ee6a50' title='#ee6a50'>coral2</td>
+</tr><tr>
+<td style='background: #8fbc8f' title='#8fbc8f'>darkseagreen</td>
+<td style='background: #7cfc00' title='#7cfc00'>lawngreen</td>
+<td style='background: #7fff00' title='#7fff00'>chartreuse</td>
+<td style='background: #6ca6cd' title='#6ca6cd'>skyblue3</td>
+<td style='background: #db7093' title='#db7093'>palevioletred</td>
+<td style='background: #a020f0' title='#a020f0'>purple</td>
+<td style='background: #ff8c00' title='#ff8c00'>darkorange</td>
+<td style='background: #4eee94' title='#4eee94'>seagreen2</td>
+</tr><tr>
+<td style='background: #a8a8a8' title='#a8a8a8'>gray66</td>
+<td style='background: #ff7256' title='#ff7256'>coral1</td>
+<td style='background: #ee9a49' title='#ee9a49'>tan2</td>
+<td style='background: #00ced1' title='#00ced1'>darkturquoise</td>
+<td style='background: #00fa9a' title='#00fa9a'>mediumspringgreen</td>
+<td style='background: #ba55d3' title='#ba55d3'>mediumorchid</td>
+<td style='background: #cdaa7d' title='#cdaa7d'>burlywood3</td>
+<td style='background: #1e90ff' title='#1e90ff'>dodgerblue</td>
+</tr><tr>
+<td style='background: #1e90ff' title='#1e90ff'>dodgerblue1</td>
+<td style='background: #eead0e' title='#eead0e'>darkgoldenrod2</td>
+<td style='background: #ee30a7' title='#ee30a7'>maroon2</td>
+<td style='background: #ff8247' title='#ff8247'>sienna1</td>
+<td style='background: #ff1493' title='#ff1493'>deeppink1</td>
+<td style='background: #ff1493' title='#ff1493'>deeppink</td>
+<td style='background: #ff6a6a' title='#ff6a6a'>indianred1</td>
+<td style='background: #ff7f50' title='#ff7f50'>coral</td>
+</tr><tr>
+<td style='background: #ababab' title='#ababab'>gray67</td>
+<td style='background: #cd919e' title='#cd919e'>pink3</td>
+<td style='background: #00b2ee' title='#00b2ee'>deepskyblue2</td>
+<td style='background: #6495ed' title='#6495ed'>cornflowerblue</td>
+<td style='background: #adadad' title='#adadad'>gray68</td>
+<td style='background: #cd9b9b' title='#cd9b9b'>rosybrown3</td>
+<td style='background: #9bcd9b' title='#9bcd9b'>darkseagreen3</td>
+<td style='background: #eeb422' title='#eeb422'>goldenrod2</td>
+</tr><tr>
+<td style='background: #f08080' title='#f08080'>lightcoral</td>
+<td style='background: #48d1cc' title='#48d1cc'>mediumturquoise</td>
+<td style='background: #cdbe70' title='#cdbe70'>lightgoldenrod3</td>
+<td style='background: #9b30ff' title='#9b30ff'>purple1</td>
+<td style='background: #ff3e96' title='#ff3e96'>violetred1</td>
+<td style='background: #e9967a' title='#e9967a'>darksalmon</td>
+<td style='background: #b23aee' title='#b23aee'>darkorchid2</td>
+<td style='background: #ee9572' title='#ee9572'>lightsalmon2</td>
+</tr><tr>
+<td style='background: #fa8072' title='#fa8072'>salmon</td>
+<td style='background: #b3ee3a' title='#b3ee3a'>olivedrab2</td>
+<td style='background: #ffa500' title='#ffa500'>orange</td>
+<td style='background: #ffa500' title='#ffa500'>orange1</td>
+<td style='background: #b0b0b0' title='#b0b0b0'>gray69</td>
+<td style='background: #cdb38b' title='#cdb38b'>navajowhite3</td>
+<td style='background: #cd69c9' title='#cd69c9'>orchid3</td>
+<td style='background: #cdc673' title='#cdc673'>khaki3</td>
+</tr><tr>
+<td style='background: #836fff' title='#836fff'>slateblue1</td>
+<td style='background: #5cacee' title='#5cacee'>steelblue2</td>
+<td style='background: #cdaf95' title='#cdaf95'>peachpuff3</td>
+<td style='background: #8470ff' title='#8470ff'>lightslateblue</td>
+<td style='background: #8db6cd' title='#8db6cd'>lightskyblue3</td>
+<td style='background: #f4a460' title='#f4a460'>sandybrown</td>
+<td style='background: #ff8c69' title='#ff8c69'>salmon1</td>
+<td style='background: #7ac5cd' title='#7ac5cd'>cadetblue3</td>
+</tr><tr>
+<td style='background: #ee6aa7' title='#ee6aa7'>hotpink2</td>
+<td style='background: #d2b48c' title='#d2b48c'>tan</td>
+<td style='background: #b3b3b3' title='#b3b3b3'>gray70</td>
+<td style='background: #ee799f' title='#ee799f'>palevioletred2</td>
+<td style='background: #9f79ee' title='#9f79ee'>mediumpurple2</td>
+<td style='background: #eec900' title='#eec900'>gold2</td>
+<td style='background: #adff2f' title='#adff2f'>greenyellow</td>
+<td style='background: #54ff9f' title='#54ff9f'>seagreen1</td>
+</tr><tr>
+<td style='background: #40e0d0' title='#40e0d0'>turquoise</td>
+<td style='background: #90ee90' title='#90ee90'>palegreen2</td>
+<td style='background: #b5b5b5' title='#b5b5b5'>gray71</td>
+<td style='background: #ffa54f' title='#ffa54f'>tan1</td>
+<td style='background: #79cdcd' title='#79cdcd'>darkslategray3</td>
+<td style='background: #cdba96' title='#cdba96'>wheat3</td>
+<td style='background: #ffb90f' title='#ffb90f'>darkgoldenrod1</td>
+<td style='background: #ff34b3' title='#ff34b3'>maroon1</td>
+</tr><tr>
+<td style='background: #9fb6cd' title='#9fb6cd'>slategray3</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td style='background: #cdb79e' title='#cdb79e'>bisque3</td>
+<td style='background: #a2b5cd' title='#a2b5cd'>lightsteelblue3</td>
+<td style='background: #deb887' title='#deb887'>burlywood</td>
+<td style='background: #00bfff' title='#00bfff'>deepskyblue1</td>
+<td style='background: #00bfff' title='#00bfff'>deepskyblue</td>
+<td style='background: #b8b8b8' title='#b8b8b8'>gray72</td>
+</tr><tr>
+<td style='background: #9ac0cd' title='#9ac0cd'>lightblue3</td>
+<td style='background: #bcee68' title='#bcee68'>darkolivegreen2</td>
+<td style='background: #ffc125' title='#ffc125'>goldenrod1</td>
+<td style='background: #bababa' title='#bababa'>gray73</td>
+<td style='background: #bf3eff' title='#bf3eff'>darkorchid1</td>
+<td style='background: #ffa07a' title='#ffa07a'>lightsalmon1</td>
+<td style='background: #ffa07a' title='#ffa07a'>lightsalmon</td>
+<td style='background: #c0ff3e' title='#c0ff3e'>olivedrab1</td>
+</tr><tr>
+<td style='background: #da70d6' title='#da70d6'>orchid</td>
+<td style='background: #96cdcd' title='#96cdcd'>paleturquoise3</td>
+<td style='background: #cd96cd' title='#cd96cd'>plum3</td>
+<td style='background: #bdbdbd' title='#bdbdbd'>gray74</td>
+<td style='background: #cdb7b5' title='#cdb7b5'>mistyrose3</td>
+<td style='background: #ff69b4' title='#ff69b4'>hotpink</td>
+<td style='background: #63b8ff' title='#63b8ff'>steelblue1</td>
+<td style='background: #00e5ee' title='#00e5ee'>turquoise2</td>
+</tr><tr>
+<td style='background: #98fb98' title='#98fb98'>palegreen</td>
+<td style='background: #d15fee' title='#d15fee'>mediumorchid2</td>
+<td style='background: #7ec0ee' title='#7ec0ee'>skyblue2</td>
+<td style='background: #bfbfbf' title='#bfbfbf'>gray75</td>
+<td style='background: #ff6eb4' title='#ff6eb4'>hotpink1</td>
+<td style='background: #cdc9a5' title='#cdc9a5'>lemonchiffon3</td>
+<td style='background: #76eec6' title='#76eec6'>aquamarine2</td>
+<td style='background: #cdc0b0' title='#cdc0b0'>antiquewhite3</td>
+</tr><tr>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+<td style='background: #c0c0c0' title='#c0c0c0'>gray</td>
+<td style='background: #ff82ab' title='#ff82ab'>palevioletred1</td>
+<td style='background: #ab82ff' title='#ab82ff'>mediumpurple1</td>
+<td style='background: #ffd700' title='#ffd700'>gold1</td>
+<td style='background: #ffd700' title='#ffd700'>gold</td>
+<td style='background: #9aff9a' title='#9aff9a'>palegreen1</td>
+<td style='background: #fdbf6f' title='#fdbf6f'>7</td>
+</tr><tr>
+<td style='background: #eea2ad' title='#eea2ad'>lightpink2</td>
+<td style='background: #c2c2c2' title='#c2c2c2'>gray76</td>
+<td style='background: #eeee00' title='#eeee00'>yellow2</td>
+<td style='background: #00eeee' title='#00eeee'>cyan2</td>
+<td style='background: #ee00ee' title='#ee00ee'>magenta2</td>
+<td style='background: #cdc8b1' title='#cdc8b1'>cornsilk3</td>
+<td style='background: #c4c4c4' title='#c4c4c4'>gray77</td>
+<td style='background: #87ceeb' title='#87ceeb'>skyblue</td>
+</tr><tr>
+<td style='background: #cdcdb4' title='#cdcdb4'>lightyellow3</td>
+<td style='background: #b4cdcd' title='#b4cdcd'>lightcyan3</td>
+<td style='background: #eec591' title='#eec591'>burlywood2</td>
+<td style='background: #c1cdc1' title='#c1cdc1'>honeydew3</td>
+<td style='background: #cdb5cd' title='#cdb5cd'>thistle3</td>
+<td style='background: #cdc5bf' title='#cdc5bf'>seashell3</td>
+<td style='background: #cdc1c5' title='#cdc1c5'>lavenderblush3</td>
+<td style='background: #cab2d6' title='#cab2d6'>9</td>
+</tr><tr>
+<td style='background: #caff70' title='#caff70'>darkolivegreen1</td>
+<td style='background: #b0c4de' title='#b0c4de'>lightsteelblue</td>
+<td style='background: #c7c7c7' title='#c7c7c7'>gray78</td>
+<td style='background: #eea9b8' title='#eea9b8'>pink2</td>
+<td style='background: #c9c9c9' title='#c9c9c9'>gray79</td>
+<td style='background: #c1cdcd' title='#c1cdcd'>azure3</td>
+<td style='background: #cdcdc1' title='#cdcdc1'>ivory3</td>
+<td style='background: #b4eeb4' title='#b4eeb4'>darkseagreen2</td>
+</tr><tr>
+<td style='background: #eeb4b4' title='#eeb4b4'>rosybrown2</td>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #eedc82' title='#eedc82'>lightgoldenrod2</td>
+<td style='background: #eedd82' title='#eedd82'>lightgoldenrod</td>
+<td style='background: #cdc9c9' title='#cdc9c9'>snow3</td>
+<td style='background: #87cefa' title='#87cefa'>lightskyblue</td>
+<td style='background: #dda0dd' title='#dda0dd'>plum</td>
+<td style='background: #cccccc' title='#cccccc'>gray80</td>
+</tr><tr>
+<td style='background: #00f5ff' title='#00f5ff'>turquoise1</td>
+<td style='background: #eecfa1' title='#eecfa1'>navajowhite2</td>
+<td style='background: #e066ff' title='#e066ff'>mediumorchid1</td>
+<td style='background: #87ceff' title='#87ceff'>skyblue1</td>
+<td style='background: #ee7ae9' title='#ee7ae9'>orchid2</td>
+<td style='background: #7fffd4' title='#7fffd4'>aquamarine</td>
+<td style='background: #7fffd4' title='#7fffd4'>aquamarine1</td>
+<td style='background: #eee685' title='#eee685'>khaki2</td>
+</tr><tr>
+<td style='background: #eecbad' title='#eecbad'>peachpuff2</td>
+<td style='background: #a4d3ee' title='#a4d3ee'>lightskyblue2</td>
+<td style='background: #cfcfcf' title='#cfcfcf'>gray81</td>
+<td style='background: #8ee5ee' title='#8ee5ee'>cadetblue2</td>
+<td style='background: #add8e6' title='#add8e6'>lightblue</td>
+<td style='background: #ffaeb9' title='#ffaeb9'>lightpink1</td>
+<td style='background: #d8bfd8' title='#d8bfd8'>thistle</td>
+<td style='background: #ff00ff' title='#ff00ff'>magenta1</td>
+</tr><tr>
+<td style='background: #ff00ff' title='#ff00ff'>magenta</td>
+<td style='background: #00ffff' title='#00ffff'>cyan1</td>
+<td style='background: #ffff00' title='#ffff00'>yellow</td>
+<td style='background: #ffff00' title='#ffff00'>yellow1</td>
+<td style='background: #00ffff' title='#00ffff'>cyan</td>
+<td style='background: #f0e68c' title='#f0e68c'>khaki</td>
+<td style='background: #ee82ee' title='#ee82ee'>violet</td>
+<td style='background: #d1d1d1' title='#d1d1d1'>gray82</td>
+</tr><tr>
+<td style='background: #8deeee' title='#8deeee'>darkslategray2</td>
+<td style='background: #d3d3d3' title='#d3d3d3'>lightgray</td>
+<td style='background: #ffd39b' title='#ffd39b'>burlywood1</td>
+<td style='background: #eed8ae' title='#eed8ae'>wheat2</td>
+<td style='background: #b0e0e6' title='#b0e0e6'>powderblue</td>
+<td style='background: #d4d4d4' title='#d4d4d4'>gray83</td>
+<td style='background: #b9d3ee' title='#b9d3ee'>slategray2</td>
+<td style='background: #ffb6c1' title='#ffb6c1'>lightpink</td>
+</tr><tr>
+<td style='background: #eed5b7' title='#eed5b7'>bisque2</td>
+<td style='background: #bcd2ee' title='#bcd2ee'>lightsteelblue2</td>
+<td style='background: #ffb5c5' title='#ffb5c5'>pink1</td>
+<td style='background: #d6d6d6' title='#d6d6d6'>gray84</td>
+<td style='background: #b2dfee' title='#b2dfee'>lightblue2</td>
+<td style='background: #eee8aa' title='#eee8aa'>palegoldenrod</td>
+<td style='background: #c1ffc1' title='#c1ffc1'>darkseagreen1</td>
+<td style='background: #ffc1c1' title='#ffc1c1'>rosybrown1</td>
+</tr><tr>
+<td style='background: #ffec8b' title='#ffec8b'>lightgoldenrod1</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>gray85</td>
+<td style='background: #f5deb3' title='#f5deb3'>wheat</td>
+<td style='background: #ffc0cb' title='#ffc0cb'>pink</td>
+<td style='background: #eeaeee' title='#eeaeee'>plum2</td>
+<td style='background: #aeeeee' title='#aeeeee'>paleturquoise2</td>
+<td style='background: #dbdbdb' title='#dbdbdb'>gray86</td>
+<td style='background: #afeeee' title='#afeeee'>paleturquoise</td>
+</tr><tr>
+<td style='background: #ffdead' title='#ffdead'>navajowhite</td>
+<td style='background: #ffdead' title='#ffdead'>navajowhite1</td>
+<td style='background: #ff83fa' title='#ff83fa'>orchid1</td>
+<td style='background: #dcdcdc' title='#dcdcdc'>gainsboro</td>
+<td style='background: #fff68f' title='#fff68f'>khaki1</td>
+<td style='background: #eed5d2' title='#eed5d2'>mistyrose2</td>
+<td style='background: #ffdab9' title='#ffdab9'>peachpuff</td>
+<td style='background: #ffdab9' title='#ffdab9'>peachpuff1</td>
+</tr><tr>
+<td style='background: #b0e2ff' title='#b0e2ff'>lightskyblue1</td>
+<td style='background: #eee9bf' title='#eee9bf'>lemonchiffon2</td>
+<td style='background: #dedede' title='#dedede'>gray87</td>
+<td style='background: #eedfcc' title='#eedfcc'>antiquewhite2</td>
+<td style='background: #98f5ff' title='#98f5ff'>cadetblue1</td>
+<td style='background: #ffe4b5' title='#ffe4b5'>moccasin</td>
+<td style='background: #e0e0e0' title='#e0e0e0'>gray88</td>
+<td style='background: #eee8cd' title='#eee8cd'>cornsilk2</td>
+</tr><tr>
+<td style='background: #97ffff' title='#97ffff'>darkslategray1</td>
+<td style='background: #ffe7ba' title='#ffe7ba'>wheat1</td>
+<td style='background: #ffff99' title='#ffff99'>11</td>
+<td style='background: #e3e3e3' title='#e3e3e3'>gray89</td>
+<td style='background: #c6e2ff' title='#c6e2ff'>slategray1</td>
+<td style='background: #ffe4c4' title='#ffe4c4'>bisque1</td>
+<td style='background: #ffe4c4' title='#ffe4c4'>bisque</td>
+<td style='background: #cae1ff' title='#cae1ff'>lightsteelblue1</td>
+</tr><tr>
+<td style='background: #d1eeee' title='#d1eeee'>lightcyan2</td>
+<td style='background: #eeeed1' title='#eeeed1'>lightyellow2</td>
+<td style='background: #e0eee0' title='#e0eee0'>honeydew2</td>
+<td style='background: #e5e5e5' title='#e5e5e5'>gray90</td>
+<td style='background: #eed2ee' title='#eed2ee'>thistle2</td>
+<td style='background: #eee5de' title='#eee5de'>seashell2</td>
+<td style='background: #bfefff' title='#bfefff'>lightblue1</td>
+<td style='background: #eee0e5' title='#eee0e5'>lavenderblush2</td>
+</tr><tr>
+<td style='background: #e8e8e8' title='#e8e8e8'>gray91</td>
+<td style='background: #ffebcd' title='#ffebcd'>blanchedalmond</td>
+<td style='background: #e0eeee' title='#e0eeee'>azure2</td>
+<td style='background: #eeeee0' title='#eeeee0'>ivory2</td>
+<td style='background: #faebd7' title='#faebd7'>antiquewhite</td>
+<td style='background: #ffbbff' title='#ffbbff'>plum1</td>
+<td style='background: #bbffff' title='#bbffff'>paleturquoise1</td>
+<td style='background: #eee9e9' title='#eee9e9'>snow2</td>
+</tr><tr>
+<td style='background: #ebebeb' title='#ebebeb'>gray92</td>
+<td style='background: #ffefd5' title='#ffefd5'>papayawhip</td>
+<td style='background: #ffe4e1' title='#ffe4e1'>mistyrose</td>
+<td style='background: #ffe4e1' title='#ffe4e1'>mistyrose1</td>
+<td style='background: #e6e6fa' title='#e6e6fa'>lavender</td>
+<td style='background: #f5f5dc' title='#f5f5dc'>beige</td>
+<td style='background: #ededed' title='#ededed'>gray93</td>
+<td style='background: #fafad2' title='#fafad2'>lightgoldenrodyellow</td>
+</tr><tr>
+<td style='background: #fffacd' title='#fffacd'>lemonchiffon</td>
+<td style='background: #fffacd' title='#fffacd'>lemonchiffon1</td>
+<td style='background: #ffefdb' title='#ffefdb'>antiquewhite1</td>
+<td style='background: #f0f0f0' title='#f0f0f0'>gray94</td>
+<td style='background: #faf0e6' title='#faf0e6'>linen</td>
+<td style='background: #fff8dc' title='#fff8dc'>cornsilk1</td>
+<td style='background: #fff8dc' title='#fff8dc'>cornsilk</td>
+<td style='background: #f2f2f2' title='#f2f2f2'>gray95</td>
+</tr><tr>
+<td style='background: #fdf5e6' title='#fdf5e6'>oldlace</td>
+<td style='background: #f5f5f5' title='#f5f5f5'>gray96</td>
+<td style='background: #f5f5f5' title='#f5f5f5'>whitesmoke</td>
+<td style='background: #f0fff0' title='#f0fff0'>honeydew</td>
+<td style='background: #f0fff0' title='#f0fff0'>honeydew1</td>
+<td style='background: #e0ffff' title='#e0ffff'>lightcyan1</td>
+<td style='background: #e0ffff' title='#e0ffff'>lightcyan</td>
+<td style='background: #ffffe0' title='#ffffe0'>lightyellow</td>
+</tr><tr>
+<td style='background: #ffffe0' title='#ffffe0'>lightyellow1</td>
+<td style='background: #ffe1ff' title='#ffe1ff'>thistle1</td>
+<td style='background: #fff5ee' title='#fff5ee'>seashell1</td>
+<td style='background: #fff5ee' title='#fff5ee'>seashell</td>
+<td style='background: #fff0f5' title='#fff0f5'>lavenderblush1</td>
+<td style='background: #fff0f5' title='#fff0f5'>lavenderblush</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>gray97</td>
+<td style='background: #f0f8ff' title='#f0f8ff'>aliceblue</td>
+</tr><tr>
+<td style='background: #fffaf0' title='#fffaf0'>floralwhite</td>
+<td style='background: #fafafa' title='#fafafa'>gray98</td>
+<td style='background: #f5fffa' title='#f5fffa'>mintcream</td>
+<td style='background: #f0ffff' title='#f0ffff'>azure</td>
+<td style='background: #fffff0' title='#fffff0'>ivory</td>
+<td style='background: #f0ffff' title='#f0ffff'>azure1</td>
+<td style='background: #fffff0' title='#fffff0'>ivory1</td>
+<td style='background: #f8f8ff' title='#f8f8ff'>ghostwhite</td>
+</tr><tr>
+<td style='background: #fffafa' title='#fffafa'>snow1</td>
+<td style='background: #fffafa' title='#fffafa'>snow</td>
+<td style='background: #fcfcfc' title='#fcfcfc'>gray99</td>
+<td style='background: #ffffff' title='#ffffff'>white</td>
+<td style='background: #ffffff' title='#ffffff'>gray100</td>
+</table>
+<p><b><a name='colorbrewer' href='http://colorbrewer.org/'>ColorBrewer</a></b> schemes:<p>
+<b>accent3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #7fc97f' title='#7fc97f'>1</td>
+<td style='background: #beaed4' title='#beaed4'>2</td>
+<td style='background: #fdc086' title='#fdc086'>3</td>
+</table>
+<b>accent4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #7fc97f' title='#7fc97f'>1</td>
+<td style='background: #beaed4' title='#beaed4'>2</td>
+<td style='background: #fdc086' title='#fdc086'>3</td>
+<td style='background: #ffff99' title='#ffff99'>4</td>
+</table>
+<b>accent5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #7fc97f' title='#7fc97f'>1</td>
+<td style='background: #beaed4' title='#beaed4'>2</td>
+<td style='background: #fdc086' title='#fdc086'>3</td>
+<td style='background: #ffff99' title='#ffff99'>4</td>
+<td style='background: #386cb0' title='#386cb0'>5</td>
+</table>
+<b>accent6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #7fc97f' title='#7fc97f'>1</td>
+<td style='background: #beaed4' title='#beaed4'>2</td>
+<td style='background: #fdc086' title='#fdc086'>3</td>
+<td style='background: #ffff99' title='#ffff99'>4</td>
+<td style='background: #386cb0' title='#386cb0'>5</td>
+<td style='background: #f0027f' title='#f0027f'>6</td>
+</table>
+<b>accent7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #7fc97f' title='#7fc97f'>1</td>
+<td style='background: #beaed4' title='#beaed4'>2</td>
+<td style='background: #fdc086' title='#fdc086'>3</td>
+<td style='background: #ffff99' title='#ffff99'>4</td>
+<td style='background: #386cb0' title='#386cb0'>5</td>
+<td style='background: #f0027f' title='#f0027f'>6</td>
+<td style='background: #bf5b17' title='#bf5b17'>7</td>
+</table>
+<b>accent8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #7fc97f' title='#7fc97f'>1</td>
+<td style='background: #beaed4' title='#beaed4'>2</td>
+<td style='background: #fdc086' title='#fdc086'>3</td>
+<td style='background: #ffff99' title='#ffff99'>4</td>
+<td style='background: #386cb0' title='#386cb0'>5</td>
+<td style='background: #f0027f' title='#f0027f'>6</td>
+<td style='background: #bf5b17' title='#bf5b17'>7</td>
+<td class="w" style='background: #666666' title='#666666'>8</td>
+</table>
+<b>blues3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #deebf7' title='#deebf7'>1</td>
+<td style='background: #9ecae1' title='#9ecae1'>2</td>
+<td style='background: #3182bd' title='#3182bd'>3</td>
+</table>
+<b>blues4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #eff3ff' title='#eff3ff'>1</td>
+<td style='background: #bdd7e7' title='#bdd7e7'>2</td>
+<td style='background: #6baed6' title='#6baed6'>3</td>
+<td style='background: #2171b5' title='#2171b5'>4</td>
+</table>
+<b>blues5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #eff3ff' title='#eff3ff'>1</td>
+<td style='background: #bdd7e7' title='#bdd7e7'>2</td>
+<td style='background: #6baed6' title='#6baed6'>3</td>
+<td style='background: #3182bd' title='#3182bd'>4</td>
+<td class="w" style='background: #08519c' title='#08519c'>5</td>
+</table>
+<b>blues6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #eff3ff' title='#eff3ff'>1</td>
+<td style='background: #c6dbef' title='#c6dbef'>2</td>
+<td style='background: #9ecae1' title='#9ecae1'>3</td>
+<td style='background: #6baed6' title='#6baed6'>4</td>
+<td style='background: #3182bd' title='#3182bd'>5</td>
+<td class="w" style='background: #08519c' title='#08519c'>6</td>
+</table>
+<b>blues7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #eff3ff' title='#eff3ff'>1</td>
+<td style='background: #c6dbef' title='#c6dbef'>2</td>
+<td style='background: #9ecae1' title='#9ecae1'>3</td>
+<td style='background: #6baed6' title='#6baed6'>4</td>
+<td style='background: #4292c6' title='#4292c6'>5</td>
+<td style='background: #2171b5' title='#2171b5'>6</td>
+<td class="w" style='background: #084594' title='#084594'>7</td>
+</table>
+<b>blues8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fbff' title='#f7fbff'>1</td>
+<td style='background: #deebf7' title='#deebf7'>2</td>
+<td style='background: #c6dbef' title='#c6dbef'>3</td>
+<td style='background: #9ecae1' title='#9ecae1'>4</td>
+<td style='background: #6baed6' title='#6baed6'>5</td>
+<td style='background: #4292c6' title='#4292c6'>6</td>
+<td style='background: #2171b5' title='#2171b5'>7</td>
+<td class="w" style='background: #084594' title='#084594'>8</td>
+</table>
+<b>blues9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fbff' title='#f7fbff'>1</td>
+<td style='background: #deebf7' title='#deebf7'>2</td>
+<td style='background: #c6dbef' title='#c6dbef'>3</td>
+<td style='background: #9ecae1' title='#9ecae1'>4</td>
+<td style='background: #6baed6' title='#6baed6'>5</td>
+<td style='background: #4292c6' title='#4292c6'>6</td>
+<td style='background: #2171b5' title='#2171b5'>7</td>
+<td class="w" style='background: #08519c' title='#08519c'>8</td>
+<td class="w" style='background: #08306b' title='#08306b'>9</td>
+</table>
+<b>brbg10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #543005' title='#543005'>1</td>
+<td class="w" style='background: #8c510a' title='#8c510a'>2</td>
+<td style='background: #bf812d' title='#bf812d'>3</td>
+<td style='background: #dfc27d' title='#dfc27d'>4</td>
+<td style='background: #f6e8c3' title='#f6e8c3'>5</td>
+<td style='background: #c7eae5' title='#c7eae5'>6</td>
+<td style='background: #80cdc1' title='#80cdc1'>7</td>
+<td style='background: #35978f' title='#35978f'>8</td>
+<td class="w" style='background: #01665e' title='#01665e'>9</td>
+<td class="w" style='background: #003c30' title='#003c30'>10</td>
+</table>
+<b>brbg11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #543005' title='#543005'>1</td>
+<td class="w" style='background: #8c510a' title='#8c510a'>2</td>
+<td style='background: #bf812d' title='#bf812d'>3</td>
+<td style='background: #dfc27d' title='#dfc27d'>4</td>
+<td style='background: #f6e8c3' title='#f6e8c3'>5</td>
+<td style='background: #f5f5f5' title='#f5f5f5'>6</td>
+<td style='background: #c7eae5' title='#c7eae5'>7</td>
+<td style='background: #80cdc1' title='#80cdc1'>8</td>
+<td style='background: #35978f' title='#35978f'>9</td>
+<td class="w" style='background: #01665e' title='#01665e'>10</td>
+<td class="w" style='background: #003c30' title='#003c30'>11</td>
+</table>
+<b>brbg3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d8b365' title='#d8b365'>1</td>
+<td style='background: #f5f5f5' title='#f5f5f5'>2</td>
+<td style='background: #5ab4ac' title='#5ab4ac'>3</td>
+</table>
+<b>brbg4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #a6611a' title='#a6611a'>1</td>
+<td style='background: #dfc27d' title='#dfc27d'>2</td>
+<td style='background: #80cdc1' title='#80cdc1'>3</td>
+<td class="w" style='background: #018571' title='#018571'>4</td>
+</table>
+<b>brbg5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #a6611a' title='#a6611a'>1</td>
+<td style='background: #dfc27d' title='#dfc27d'>2</td>
+<td style='background: #f5f5f5' title='#f5f5f5'>3</td>
+<td style='background: #80cdc1' title='#80cdc1'>4</td>
+<td class="w" style='background: #018571' title='#018571'>5</td>
+</table>
+<b>brbg6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #8c510a' title='#8c510a'>1</td>
+<td style='background: #d8b365' title='#d8b365'>2</td>
+<td style='background: #f6e8c3' title='#f6e8c3'>3</td>
+<td style='background: #c7eae5' title='#c7eae5'>4</td>
+<td style='background: #5ab4ac' title='#5ab4ac'>5</td>
+<td class="w" style='background: #01665e' title='#01665e'>6</td>
+</table>
+<b>brbg7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #8c510a' title='#8c510a'>1</td>
+<td style='background: #d8b365' title='#d8b365'>2</td>
+<td style='background: #f6e8c3' title='#f6e8c3'>3</td>
+<td style='background: #f5f5f5' title='#f5f5f5'>4</td>
+<td style='background: #c7eae5' title='#c7eae5'>5</td>
+<td style='background: #5ab4ac' title='#5ab4ac'>6</td>
+<td class="w" style='background: #01665e' title='#01665e'>7</td>
+</table>
+<b>brbg8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #8c510a' title='#8c510a'>1</td>
+<td style='background: #bf812d' title='#bf812d'>2</td>
+<td style='background: #dfc27d' title='#dfc27d'>3</td>
+<td style='background: #f6e8c3' title='#f6e8c3'>4</td>
+<td style='background: #c7eae5' title='#c7eae5'>5</td>
+<td style='background: #80cdc1' title='#80cdc1'>6</td>
+<td style='background: #35978f' title='#35978f'>7</td>
+<td class="w" style='background: #01665e' title='#01665e'>8</td>
+</table>
+<b>brbg9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #8c510a' title='#8c510a'>1</td>
+<td style='background: #bf812d' title='#bf812d'>2</td>
+<td style='background: #dfc27d' title='#dfc27d'>3</td>
+<td style='background: #f6e8c3' title='#f6e8c3'>4</td>
+<td style='background: #f5f5f5' title='#f5f5f5'>5</td>
+<td style='background: #c7eae5' title='#c7eae5'>6</td>
+<td style='background: #80cdc1' title='#80cdc1'>7</td>
+<td style='background: #35978f' title='#35978f'>8</td>
+<td class="w" style='background: #01665e' title='#01665e'>9</td>
+</table>
+<b>bugn3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e5f5f9' title='#e5f5f9'>1</td>
+<td style='background: #99d8c9' title='#99d8c9'>2</td>
+<td class="w" style='background: #2ca25f' title='#2ca25f'>3</td>
+</table>
+<b>bugn4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8fb' title='#edf8fb'>1</td>
+<td style='background: #b2e2e2' title='#b2e2e2'>2</td>
+<td style='background: #66c2a4' title='#66c2a4'>3</td>
+<td class="w" style='background: #238b45' title='#238b45'>4</td>
+</table>
+<b>bugn5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8fb' title='#edf8fb'>1</td>
+<td style='background: #b2e2e2' title='#b2e2e2'>2</td>
+<td style='background: #66c2a4' title='#66c2a4'>3</td>
+<td class="w" style='background: #2ca25f' title='#2ca25f'>4</td>
+<td class="w" style='background: #006d2c' title='#006d2c'>5</td>
+</table>
+<b>bugn6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8fb' title='#edf8fb'>1</td>
+<td style='background: #ccece6' title='#ccece6'>2</td>
+<td style='background: #99d8c9' title='#99d8c9'>3</td>
+<td style='background: #66c2a4' title='#66c2a4'>4</td>
+<td class="w" style='background: #2ca25f' title='#2ca25f'>5</td>
+<td class="w" style='background: #006d2c' title='#006d2c'>6</td>
+</table>
+<b>bugn7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8fb' title='#edf8fb'>1</td>
+<td style='background: #ccece6' title='#ccece6'>2</td>
+<td style='background: #99d8c9' title='#99d8c9'>3</td>
+<td style='background: #66c2a4' title='#66c2a4'>4</td>
+<td style='background: #41ae76' title='#41ae76'>5</td>
+<td class="w" style='background: #238b45' title='#238b45'>6</td>
+<td class="w" style='background: #005824' title='#005824'>7</td>
+</table>
+<b>bugn8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcfd' title='#f7fcfd'>1</td>
+<td style='background: #e5f5f9' title='#e5f5f9'>2</td>
+<td style='background: #ccece6' title='#ccece6'>3</td>
+<td style='background: #99d8c9' title='#99d8c9'>4</td>
+<td style='background: #66c2a4' title='#66c2a4'>5</td>
+<td style='background: #41ae76' title='#41ae76'>6</td>
+<td class="w" style='background: #238b45' title='#238b45'>7</td>
+<td class="w" style='background: #005824' title='#005824'>8</td>
+</table>
+<b>bugn9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcfd' title='#f7fcfd'>1</td>
+<td style='background: #e5f5f9' title='#e5f5f9'>2</td>
+<td style='background: #ccece6' title='#ccece6'>3</td>
+<td style='background: #99d8c9' title='#99d8c9'>4</td>
+<td style='background: #66c2a4' title='#66c2a4'>5</td>
+<td style='background: #41ae76' title='#41ae76'>6</td>
+<td class="w" style='background: #238b45' title='#238b45'>7</td>
+<td class="w" style='background: #006d2c' title='#006d2c'>8</td>
+<td class="w" style='background: #00441b' title='#00441b'>9</td>
+</table>
+<b>bupu3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e0ecf4' title='#e0ecf4'>1</td>
+<td style='background: #9ebcda' title='#9ebcda'>2</td>
+<td style='background: #8856a7' title='#8856a7'>3</td>
+</table>
+<b>bupu4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8fb' title='#edf8fb'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #8c96c6' title='#8c96c6'>3</td>
+<td style='background: #88419d' title='#88419d'>4</td>
+</table>
+<b>bupu5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8fb' title='#edf8fb'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #8c96c6' title='#8c96c6'>3</td>
+<td style='background: #8856a7' title='#8856a7'>4</td>
+<td class="w" style='background: #810f7c' title='#810f7c'>5</td>
+</table>
+<b>bupu6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8fb' title='#edf8fb'>1</td>
+<td style='background: #bfd3e6' title='#bfd3e6'>2</td>
+<td style='background: #9ebcda' title='#9ebcda'>3</td>
+<td style='background: #8c96c6' title='#8c96c6'>4</td>
+<td style='background: #8856a7' title='#8856a7'>5</td>
+<td class="w" style='background: #810f7c' title='#810f7c'>6</td>
+</table>
+<b>bupu7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8fb' title='#edf8fb'>1</td>
+<td style='background: #bfd3e6' title='#bfd3e6'>2</td>
+<td style='background: #9ebcda' title='#9ebcda'>3</td>
+<td style='background: #8c96c6' title='#8c96c6'>4</td>
+<td style='background: #8c6bb1' title='#8c6bb1'>5</td>
+<td style='background: #88419d' title='#88419d'>6</td>
+<td class="w" style='background: #6e016b' title='#6e016b'>7</td>
+</table>
+<b>bupu8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcfd' title='#f7fcfd'>1</td>
+<td style='background: #e0ecf4' title='#e0ecf4'>2</td>
+<td style='background: #bfd3e6' title='#bfd3e6'>3</td>
+<td style='background: #9ebcda' title='#9ebcda'>4</td>
+<td style='background: #8c96c6' title='#8c96c6'>5</td>
+<td style='background: #8c6bb1' title='#8c6bb1'>6</td>
+<td style='background: #88419d' title='#88419d'>7</td>
+<td class="w" style='background: #6e016b' title='#6e016b'>8</td>
+</table>
+<b>bupu9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcfd' title='#f7fcfd'>1</td>
+<td style='background: #e0ecf4' title='#e0ecf4'>2</td>
+<td style='background: #bfd3e6' title='#bfd3e6'>3</td>
+<td style='background: #9ebcda' title='#9ebcda'>4</td>
+<td style='background: #8c96c6' title='#8c96c6'>5</td>
+<td style='background: #8c6bb1' title='#8c6bb1'>6</td>
+<td style='background: #88419d' title='#88419d'>7</td>
+<td class="w" style='background: #810f7c' title='#810f7c'>8</td>
+<td class="w" style='background: #4d004b' title='#4d004b'>9</td>
+</table>
+<b>dark23</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #1b9e77' title='#1b9e77'>1</td>
+<td style='background: #d95f02' title='#d95f02'>2</td>
+<td style='background: #7570b3' title='#7570b3'>3</td>
+</table>
+<b>dark24</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #1b9e77' title='#1b9e77'>1</td>
+<td style='background: #d95f02' title='#d95f02'>2</td>
+<td style='background: #7570b3' title='#7570b3'>3</td>
+<td style='background: #e7298a' title='#e7298a'>4</td>
+</table>
+<b>dark25</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #1b9e77' title='#1b9e77'>1</td>
+<td style='background: #d95f02' title='#d95f02'>2</td>
+<td style='background: #7570b3' title='#7570b3'>3</td>
+<td style='background: #e7298a' title='#e7298a'>4</td>
+<td class="w" style='background: #66a61e' title='#66a61e'>5</td>
+</table>
+<b>dark26</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #1b9e77' title='#1b9e77'>1</td>
+<td style='background: #d95f02' title='#d95f02'>2</td>
+<td style='background: #7570b3' title='#7570b3'>3</td>
+<td style='background: #e7298a' title='#e7298a'>4</td>
+<td class="w" style='background: #66a61e' title='#66a61e'>5</td>
+<td style='background: #e6ab02' title='#e6ab02'>6</td>
+</table>
+<b>dark27</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #1b9e77' title='#1b9e77'>1</td>
+<td style='background: #d95f02' title='#d95f02'>2</td>
+<td style='background: #7570b3' title='#7570b3'>3</td>
+<td style='background: #e7298a' title='#e7298a'>4</td>
+<td class="w" style='background: #66a61e' title='#66a61e'>5</td>
+<td style='background: #e6ab02' title='#e6ab02'>6</td>
+<td class="w" style='background: #a6761d' title='#a6761d'>7</td>
+</table>
+<b>dark28</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #1b9e77' title='#1b9e77'>1</td>
+<td style='background: #d95f02' title='#d95f02'>2</td>
+<td style='background: #7570b3' title='#7570b3'>3</td>
+<td style='background: #e7298a' title='#e7298a'>4</td>
+<td class="w" style='background: #66a61e' title='#66a61e'>5</td>
+<td style='background: #e6ab02' title='#e6ab02'>6</td>
+<td class="w" style='background: #a6761d' title='#a6761d'>7</td>
+<td class="w" style='background: #666666' title='#666666'>8</td>
+</table>
+<b>gnbu3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e0f3db' title='#e0f3db'>1</td>
+<td style='background: #a8ddb5' title='#a8ddb5'>2</td>
+<td style='background: #43a2ca' title='#43a2ca'>3</td>
+</table>
+<b>gnbu4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f0f9e8' title='#f0f9e8'>1</td>
+<td style='background: #bae4bc' title='#bae4bc'>2</td>
+<td style='background: #7bccc4' title='#7bccc4'>3</td>
+<td style='background: #2b8cbe' title='#2b8cbe'>4</td>
+</table>
+<b>gnbu5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f0f9e8' title='#f0f9e8'>1</td>
+<td style='background: #bae4bc' title='#bae4bc'>2</td>
+<td style='background: #7bccc4' title='#7bccc4'>3</td>
+<td style='background: #43a2ca' title='#43a2ca'>4</td>
+<td class="w" style='background: #0868ac' title='#0868ac'>5</td>
+</table>
+<b>gnbu6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f0f9e8' title='#f0f9e8'>1</td>
+<td style='background: #ccebc5' title='#ccebc5'>2</td>
+<td style='background: #a8ddb5' title='#a8ddb5'>3</td>
+<td style='background: #7bccc4' title='#7bccc4'>4</td>
+<td style='background: #43a2ca' title='#43a2ca'>5</td>
+<td class="w" style='background: #0868ac' title='#0868ac'>6</td>
+</table>
+<b>gnbu7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f0f9e8' title='#f0f9e8'>1</td>
+<td style='background: #ccebc5' title='#ccebc5'>2</td>
+<td style='background: #a8ddb5' title='#a8ddb5'>3</td>
+<td style='background: #7bccc4' title='#7bccc4'>4</td>
+<td style='background: #4eb3d3' title='#4eb3d3'>5</td>
+<td style='background: #2b8cbe' title='#2b8cbe'>6</td>
+<td class="w" style='background: #08589e' title='#08589e'>7</td>
+</table>
+<b>gnbu8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcf0' title='#f7fcf0'>1</td>
+<td style='background: #e0f3db' title='#e0f3db'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+<td style='background: #a8ddb5' title='#a8ddb5'>4</td>
+<td style='background: #7bccc4' title='#7bccc4'>5</td>
+<td style='background: #4eb3d3' title='#4eb3d3'>6</td>
+<td style='background: #2b8cbe' title='#2b8cbe'>7</td>
+<td class="w" style='background: #08589e' title='#08589e'>8</td>
+</table>
+<b>gnbu9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcf0' title='#f7fcf0'>1</td>
+<td style='background: #e0f3db' title='#e0f3db'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+<td style='background: #a8ddb5' title='#a8ddb5'>4</td>
+<td style='background: #7bccc4' title='#7bccc4'>5</td>
+<td style='background: #4eb3d3' title='#4eb3d3'>6</td>
+<td style='background: #2b8cbe' title='#2b8cbe'>7</td>
+<td class="w" style='background: #0868ac' title='#0868ac'>8</td>
+<td class="w" style='background: #084081' title='#084081'>9</td>
+</table>
+<b>greens3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e5f5e0' title='#e5f5e0'>1</td>
+<td style='background: #a1d99b' title='#a1d99b'>2</td>
+<td class="w" style='background: #31a354' title='#31a354'>3</td>
+</table>
+<b>greens4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8e9' title='#edf8e9'>1</td>
+<td style='background: #bae4b3' title='#bae4b3'>2</td>
+<td style='background: #74c476' title='#74c476'>3</td>
+<td class="w" style='background: #238b45' title='#238b45'>4</td>
+</table>
+<b>greens5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8e9' title='#edf8e9'>1</td>
+<td style='background: #bae4b3' title='#bae4b3'>2</td>
+<td style='background: #74c476' title='#74c476'>3</td>
+<td class="w" style='background: #31a354' title='#31a354'>4</td>
+<td class="w" style='background: #006d2c' title='#006d2c'>5</td>
+</table>
+<b>greens6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8e9' title='#edf8e9'>1</td>
+<td style='background: #c7e9c0' title='#c7e9c0'>2</td>
+<td style='background: #a1d99b' title='#a1d99b'>3</td>
+<td style='background: #74c476' title='#74c476'>4</td>
+<td class="w" style='background: #31a354' title='#31a354'>5</td>
+<td class="w" style='background: #006d2c' title='#006d2c'>6</td>
+</table>
+<b>greens7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8e9' title='#edf8e9'>1</td>
+<td style='background: #c7e9c0' title='#c7e9c0'>2</td>
+<td style='background: #a1d99b' title='#a1d99b'>3</td>
+<td style='background: #74c476' title='#74c476'>4</td>
+<td class="w" style='background: #41ab5d' title='#41ab5d'>5</td>
+<td class="w" style='background: #238b45' title='#238b45'>6</td>
+<td class="w" style='background: #005a32' title='#005a32'>7</td>
+</table>
+<b>greens8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcf5' title='#f7fcf5'>1</td>
+<td style='background: #e5f5e0' title='#e5f5e0'>2</td>
+<td style='background: #c7e9c0' title='#c7e9c0'>3</td>
+<td style='background: #a1d99b' title='#a1d99b'>4</td>
+<td style='background: #74c476' title='#74c476'>5</td>
+<td class="w" style='background: #41ab5d' title='#41ab5d'>6</td>
+<td class="w" style='background: #238b45' title='#238b45'>7</td>
+<td class="w" style='background: #005a32' title='#005a32'>8</td>
+</table>
+<b>greens9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcf5' title='#f7fcf5'>1</td>
+<td style='background: #e5f5e0' title='#e5f5e0'>2</td>
+<td style='background: #c7e9c0' title='#c7e9c0'>3</td>
+<td style='background: #a1d99b' title='#a1d99b'>4</td>
+<td style='background: #74c476' title='#74c476'>5</td>
+<td class="w" style='background: #41ab5d' title='#41ab5d'>6</td>
+<td class="w" style='background: #238b45' title='#238b45'>7</td>
+<td class="w" style='background: #006d2c' title='#006d2c'>8</td>
+<td class="w" style='background: #00441b' title='#00441b'>9</td>
+</table>
+<b>greys3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f0f0f0' title='#f0f0f0'>1</td>
+<td style='background: #bdbdbd' title='#bdbdbd'>2</td>
+<td class="w" style='background: #636363' title='#636363'>3</td>
+</table>
+<b>greys4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7f7f7' title='#f7f7f7'>1</td>
+<td style='background: #cccccc' title='#cccccc'>2</td>
+<td style='background: #969696' title='#969696'>3</td>
+<td class="w" style='background: #525252' title='#525252'>4</td>
+</table>
+<b>greys5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7f7f7' title='#f7f7f7'>1</td>
+<td style='background: #cccccc' title='#cccccc'>2</td>
+<td style='background: #969696' title='#969696'>3</td>
+<td class="w" style='background: #636363' title='#636363'>4</td>
+<td class="w" style='background: #252525' title='#252525'>5</td>
+</table>
+<b>greys6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7f7f7' title='#f7f7f7'>1</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>2</td>
+<td style='background: #bdbdbd' title='#bdbdbd'>3</td>
+<td style='background: #969696' title='#969696'>4</td>
+<td class="w" style='background: #636363' title='#636363'>5</td>
+<td class="w" style='background: #252525' title='#252525'>6</td>
+</table>
+<b>greys7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7f7f7' title='#f7f7f7'>1</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>2</td>
+<td style='background: #bdbdbd' title='#bdbdbd'>3</td>
+<td style='background: #969696' title='#969696'>4</td>
+<td class="w" style='background: #737373' title='#737373'>5</td>
+<td class="w" style='background: #525252' title='#525252'>6</td>
+<td class="w" style='background: #252525' title='#252525'>7</td>
+</table>
+<b>greys8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffff' title='#ffffff'>1</td>
+<td style='background: #f0f0f0' title='#f0f0f0'>2</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>3</td>
+<td style='background: #bdbdbd' title='#bdbdbd'>4</td>
+<td style='background: #969696' title='#969696'>5</td>
+<td class="w" style='background: #737373' title='#737373'>6</td>
+<td class="w" style='background: #525252' title='#525252'>7</td>
+<td class="w" style='background: #252525' title='#252525'>8</td>
+</table>
+<b>greys9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffff' title='#ffffff'>1</td>
+<td style='background: #f0f0f0' title='#f0f0f0'>2</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>3</td>
+<td style='background: #bdbdbd' title='#bdbdbd'>4</td>
+<td style='background: #969696' title='#969696'>5</td>
+<td class="w" style='background: #737373' title='#737373'>6</td>
+<td class="w" style='background: #525252' title='#525252'>7</td>
+<td class="w" style='background: #252525' title='#252525'>8</td>
+<td class="w" style='background: #000000' title='#000000'>9</td>
+</table>
+<b>oranges3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fee6ce' title='#fee6ce'>1</td>
+<td style='background: #fdae6b' title='#fdae6b'>2</td>
+<td style='background: #e6550d' title='#e6550d'>3</td>
+</table>
+<b>oranges4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #feedde' title='#feedde'>1</td>
+<td style='background: #fdbe85' title='#fdbe85'>2</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>3</td>
+<td style='background: #d94701' title='#d94701'>4</td>
+</table>
+<b>oranges5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #feedde' title='#feedde'>1</td>
+<td style='background: #fdbe85' title='#fdbe85'>2</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>3</td>
+<td style='background: #e6550d' title='#e6550d'>4</td>
+<td class="w" style='background: #a63603' title='#a63603'>5</td>
+</table>
+<b>oranges6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #feedde' title='#feedde'>1</td>
+<td style='background: #fdd0a2' title='#fdd0a2'>2</td>
+<td style='background: #fdae6b' title='#fdae6b'>3</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>4</td>
+<td style='background: #e6550d' title='#e6550d'>5</td>
+<td class="w" style='background: #a63603' title='#a63603'>6</td>
+</table>
+<b>oranges7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #feedde' title='#feedde'>1</td>
+<td style='background: #fdd0a2' title='#fdd0a2'>2</td>
+<td style='background: #fdae6b' title='#fdae6b'>3</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>4</td>
+<td style='background: #f16913' title='#f16913'>5</td>
+<td style='background: #d94801' title='#d94801'>6</td>
+<td class="w" style='background: #8c2d04' title='#8c2d04'>7</td>
+</table>
+<b>oranges8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff5eb' title='#fff5eb'>1</td>
+<td style='background: #fee6ce' title='#fee6ce'>2</td>
+<td style='background: #fdd0a2' title='#fdd0a2'>3</td>
+<td style='background: #fdae6b' title='#fdae6b'>4</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>5</td>
+<td style='background: #f16913' title='#f16913'>6</td>
+<td style='background: #d94801' title='#d94801'>7</td>
+<td class="w" style='background: #8c2d04' title='#8c2d04'>8</td>
+</table>
+<b>oranges9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff5eb' title='#fff5eb'>1</td>
+<td style='background: #fee6ce' title='#fee6ce'>2</td>
+<td style='background: #fdd0a2' title='#fdd0a2'>3</td>
+<td style='background: #fdae6b' title='#fdae6b'>4</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>5</td>
+<td style='background: #f16913' title='#f16913'>6</td>
+<td style='background: #d94801' title='#d94801'>7</td>
+<td class="w" style='background: #a63603' title='#a63603'>8</td>
+<td class="w" style='background: #7f2704' title='#7f2704'>9</td>
+</table>
+<b>orrd3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fee8c8' title='#fee8c8'>1</td>
+<td style='background: #fdbb84' title='#fdbb84'>2</td>
+<td style='background: #e34a33' title='#e34a33'>3</td>
+</table>
+<b>orrd4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fef0d9' title='#fef0d9'>1</td>
+<td style='background: #fdcc8a' title='#fdcc8a'>2</td>
+<td style='background: #fc8d59' title='#fc8d59'>3</td>
+<td style='background: #d7301f' title='#d7301f'>4</td>
+</table>
+<b>orrd5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fef0d9' title='#fef0d9'>1</td>
+<td style='background: #fdcc8a' title='#fdcc8a'>2</td>
+<td style='background: #fc8d59' title='#fc8d59'>3</td>
+<td style='background: #e34a33' title='#e34a33'>4</td>
+<td class="w" style='background: #b30000' title='#b30000'>5</td>
+</table>
+<b>orrd6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fef0d9' title='#fef0d9'>1</td>
+<td style='background: #fdd49e' title='#fdd49e'>2</td>
+<td style='background: #fdbb84' title='#fdbb84'>3</td>
+<td style='background: #fc8d59' title='#fc8d59'>4</td>
+<td style='background: #e34a33' title='#e34a33'>5</td>
+<td class="w" style='background: #b30000' title='#b30000'>6</td>
+</table>
+<b>orrd7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fef0d9' title='#fef0d9'>1</td>
+<td style='background: #fdd49e' title='#fdd49e'>2</td>
+<td style='background: #fdbb84' title='#fdbb84'>3</td>
+<td style='background: #fc8d59' title='#fc8d59'>4</td>
+<td style='background: #ef6548' title='#ef6548'>5</td>
+<td style='background: #d7301f' title='#d7301f'>6</td>
+<td class="w" style='background: #990000' title='#990000'>7</td>
+</table>
+<b>orrd8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7ec' title='#fff7ec'>1</td>
+<td style='background: #fee8c8' title='#fee8c8'>2</td>
+<td style='background: #fdd49e' title='#fdd49e'>3</td>
+<td style='background: #fdbb84' title='#fdbb84'>4</td>
+<td style='background: #fc8d59' title='#fc8d59'>5</td>
+<td style='background: #ef6548' title='#ef6548'>6</td>
+<td style='background: #d7301f' title='#d7301f'>7</td>
+<td class="w" style='background: #990000' title='#990000'>8</td>
+</table>
+<b>orrd9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7ec' title='#fff7ec'>1</td>
+<td style='background: #fee8c8' title='#fee8c8'>2</td>
+<td style='background: #fdd49e' title='#fdd49e'>3</td>
+<td style='background: #fdbb84' title='#fdbb84'>4</td>
+<td style='background: #fc8d59' title='#fc8d59'>5</td>
+<td style='background: #ef6548' title='#ef6548'>6</td>
+<td style='background: #d7301f' title='#d7301f'>7</td>
+<td class="w" style='background: #b30000' title='#b30000'>8</td>
+<td class="w" style='background: #7f0000' title='#7f0000'>9</td>
+</table>
+<b>paired10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+<td style='background: #fdbf6f' title='#fdbf6f'>7</td>
+<td style='background: #ff7f00' title='#ff7f00'>8</td>
+<td style='background: #cab2d6' title='#cab2d6'>9</td>
+<td class="w" style='background: #6a3d9a' title='#6a3d9a'>10</td>
+</table>
+<b>paired11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+<td style='background: #fdbf6f' title='#fdbf6f'>7</td>
+<td style='background: #ff7f00' title='#ff7f00'>8</td>
+<td style='background: #cab2d6' title='#cab2d6'>9</td>
+<td class="w" style='background: #6a3d9a' title='#6a3d9a'>10</td>
+<td style='background: #ffff99' title='#ffff99'>11</td>
+</table>
+<b>paired12</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+<td style='background: #fdbf6f' title='#fdbf6f'>7</td>
+<td style='background: #ff7f00' title='#ff7f00'>8</td>
+<td style='background: #cab2d6' title='#cab2d6'>9</td>
+<td class="w" style='background: #6a3d9a' title='#6a3d9a'>10</td>
+<td style='background: #ffff99' title='#ffff99'>11</td>
+<td class="w" style='background: #b15928' title='#b15928'>12</td>
+</table>
+<b>paired3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+</table>
+<b>paired4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+</table>
+<b>paired5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+</table>
+<b>paired6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+</table>
+<b>paired7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+<td style='background: #fdbf6f' title='#fdbf6f'>7</td>
+</table>
+<b>paired8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+<td style='background: #fdbf6f' title='#fdbf6f'>7</td>
+<td style='background: #ff7f00' title='#ff7f00'>8</td>
+</table>
+<b>paired9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #a6cee3' title='#a6cee3'>1</td>
+<td style='background: #1f78b4' title='#1f78b4'>2</td>
+<td style='background: #b2df8a' title='#b2df8a'>3</td>
+<td class="w" style='background: #33a02c' title='#33a02c'>4</td>
+<td style='background: #fb9a99' title='#fb9a99'>5</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+<td style='background: #fdbf6f' title='#fdbf6f'>7</td>
+<td style='background: #ff7f00' title='#ff7f00'>8</td>
+<td style='background: #cab2d6' title='#cab2d6'>9</td>
+</table>
+<b>pastel13</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fbb4ae' title='#fbb4ae'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+</table>
+<b>pastel14</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fbb4ae' title='#fbb4ae'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+<td style='background: #decbe4' title='#decbe4'>4</td>
+</table>
+<b>pastel15</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fbb4ae' title='#fbb4ae'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+<td style='background: #decbe4' title='#decbe4'>4</td>
+<td style='background: #fed9a6' title='#fed9a6'>5</td>
+</table>
+<b>pastel16</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fbb4ae' title='#fbb4ae'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+<td style='background: #decbe4' title='#decbe4'>4</td>
+<td style='background: #fed9a6' title='#fed9a6'>5</td>
+<td style='background: #ffffcc' title='#ffffcc'>6</td>
+</table>
+<b>pastel17</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fbb4ae' title='#fbb4ae'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+<td style='background: #decbe4' title='#decbe4'>4</td>
+<td style='background: #fed9a6' title='#fed9a6'>5</td>
+<td style='background: #ffffcc' title='#ffffcc'>6</td>
+<td style='background: #e5d8bd' title='#e5d8bd'>7</td>
+</table>
+<b>pastel18</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fbb4ae' title='#fbb4ae'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+<td style='background: #decbe4' title='#decbe4'>4</td>
+<td style='background: #fed9a6' title='#fed9a6'>5</td>
+<td style='background: #ffffcc' title='#ffffcc'>6</td>
+<td style='background: #e5d8bd' title='#e5d8bd'>7</td>
+<td style='background: #fddaec' title='#fddaec'>8</td>
+</table>
+<b>pastel19</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fbb4ae' title='#fbb4ae'>1</td>
+<td style='background: #b3cde3' title='#b3cde3'>2</td>
+<td style='background: #ccebc5' title='#ccebc5'>3</td>
+<td style='background: #decbe4' title='#decbe4'>4</td>
+<td style='background: #fed9a6' title='#fed9a6'>5</td>
+<td style='background: #ffffcc' title='#ffffcc'>6</td>
+<td style='background: #e5d8bd' title='#e5d8bd'>7</td>
+<td style='background: #fddaec' title='#fddaec'>8</td>
+<td style='background: #f2f2f2' title='#f2f2f2'>9</td>
+</table>
+<b>pastel23</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #b3e2cd' title='#b3e2cd'>1</td>
+<td style='background: #fdcdac' title='#fdcdac'>2</td>
+<td style='background: #cbd5e8' title='#cbd5e8'>3</td>
+</table>
+<b>pastel24</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #b3e2cd' title='#b3e2cd'>1</td>
+<td style='background: #fdcdac' title='#fdcdac'>2</td>
+<td style='background: #cbd5e8' title='#cbd5e8'>3</td>
+<td style='background: #f4cae4' title='#f4cae4'>4</td>
+</table>
+<b>pastel25</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #b3e2cd' title='#b3e2cd'>1</td>
+<td style='background: #fdcdac' title='#fdcdac'>2</td>
+<td style='background: #cbd5e8' title='#cbd5e8'>3</td>
+<td style='background: #f4cae4' title='#f4cae4'>4</td>
+<td style='background: #e6f5c9' title='#e6f5c9'>5</td>
+</table>
+<b>pastel26</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #b3e2cd' title='#b3e2cd'>1</td>
+<td style='background: #fdcdac' title='#fdcdac'>2</td>
+<td style='background: #cbd5e8' title='#cbd5e8'>3</td>
+<td style='background: #f4cae4' title='#f4cae4'>4</td>
+<td style='background: #e6f5c9' title='#e6f5c9'>5</td>
+<td style='background: #fff2ae' title='#fff2ae'>6</td>
+</table>
+<b>pastel27</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #b3e2cd' title='#b3e2cd'>1</td>
+<td style='background: #fdcdac' title='#fdcdac'>2</td>
+<td style='background: #cbd5e8' title='#cbd5e8'>3</td>
+<td style='background: #f4cae4' title='#f4cae4'>4</td>
+<td style='background: #e6f5c9' title='#e6f5c9'>5</td>
+<td style='background: #fff2ae' title='#fff2ae'>6</td>
+<td style='background: #f1e2cc' title='#f1e2cc'>7</td>
+</table>
+<b>pastel28</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #b3e2cd' title='#b3e2cd'>1</td>
+<td style='background: #fdcdac' title='#fdcdac'>2</td>
+<td style='background: #cbd5e8' title='#cbd5e8'>3</td>
+<td style='background: #f4cae4' title='#f4cae4'>4</td>
+<td style='background: #e6f5c9' title='#e6f5c9'>5</td>
+<td style='background: #fff2ae' title='#fff2ae'>6</td>
+<td style='background: #f1e2cc' title='#f1e2cc'>7</td>
+<td style='background: #cccccc' title='#cccccc'>8</td>
+</table>
+<b>piyg10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #8e0152' title='#8e0152'>1</td>
+<td style='background: #c51b7d' title='#c51b7d'>2</td>
+<td style='background: #de77ae' title='#de77ae'>3</td>
+<td style='background: #f1b6da' title='#f1b6da'>4</td>
+<td style='background: #fde0ef' title='#fde0ef'>5</td>
+<td style='background: #e6f5d0' title='#e6f5d0'>6</td>
+<td style='background: #b8e186' title='#b8e186'>7</td>
+<td style='background: #7fbc41' title='#7fbc41'>8</td>
+<td class="w" style='background: #4d9221' title='#4d9221'>9</td>
+<td class="w" style='background: #276419' title='#276419'>10</td>
+</table>
+<b>piyg11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #8e0152' title='#8e0152'>1</td>
+<td style='background: #c51b7d' title='#c51b7d'>2</td>
+<td style='background: #de77ae' title='#de77ae'>3</td>
+<td style='background: #f1b6da' title='#f1b6da'>4</td>
+<td style='background: #fde0ef' title='#fde0ef'>5</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>6</td>
+<td style='background: #e6f5d0' title='#e6f5d0'>7</td>
+<td style='background: #b8e186' title='#b8e186'>8</td>
+<td style='background: #7fbc41' title='#7fbc41'>9</td>
+<td class="w" style='background: #4d9221' title='#4d9221'>10</td>
+<td class="w" style='background: #276419' title='#276419'>11</td>
+</table>
+<b>piyg3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e9a3c9' title='#e9a3c9'>1</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>2</td>
+<td style='background: #a1d76a' title='#a1d76a'>3</td>
+</table>
+<b>piyg4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d01c8b' title='#d01c8b'>1</td>
+<td style='background: #f1b6da' title='#f1b6da'>2</td>
+<td style='background: #b8e186' title='#b8e186'>3</td>
+<td class="w" style='background: #4dac26' title='#4dac26'>4</td>
+</table>
+<b>piyg5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d01c8b' title='#d01c8b'>1</td>
+<td style='background: #f1b6da' title='#f1b6da'>2</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>3</td>
+<td style='background: #b8e186' title='#b8e186'>4</td>
+<td class="w" style='background: #4dac26' title='#4dac26'>5</td>
+</table>
+<b>piyg6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #c51b7d' title='#c51b7d'>1</td>
+<td style='background: #e9a3c9' title='#e9a3c9'>2</td>
+<td style='background: #fde0ef' title='#fde0ef'>3</td>
+<td style='background: #e6f5d0' title='#e6f5d0'>4</td>
+<td style='background: #a1d76a' title='#a1d76a'>5</td>
+<td class="w" style='background: #4d9221' title='#4d9221'>6</td>
+</table>
+<b>piyg7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #c51b7d' title='#c51b7d'>1</td>
+<td style='background: #e9a3c9' title='#e9a3c9'>2</td>
+<td style='background: #fde0ef' title='#fde0ef'>3</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>4</td>
+<td style='background: #e6f5d0' title='#e6f5d0'>5</td>
+<td style='background: #a1d76a' title='#a1d76a'>6</td>
+<td class="w" style='background: #4d9221' title='#4d9221'>7</td>
+</table>
+<b>piyg8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #c51b7d' title='#c51b7d'>1</td>
+<td style='background: #de77ae' title='#de77ae'>2</td>
+<td style='background: #f1b6da' title='#f1b6da'>3</td>
+<td style='background: #fde0ef' title='#fde0ef'>4</td>
+<td style='background: #e6f5d0' title='#e6f5d0'>5</td>
+<td style='background: #b8e186' title='#b8e186'>6</td>
+<td style='background: #7fbc41' title='#7fbc41'>7</td>
+<td class="w" style='background: #4d9221' title='#4d9221'>8</td>
+</table>
+<b>piyg9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #c51b7d' title='#c51b7d'>1</td>
+<td style='background: #de77ae' title='#de77ae'>2</td>
+<td style='background: #f1b6da' title='#f1b6da'>3</td>
+<td style='background: #fde0ef' title='#fde0ef'>4</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>5</td>
+<td style='background: #e6f5d0' title='#e6f5d0'>6</td>
+<td style='background: #b8e186' title='#b8e186'>7</td>
+<td style='background: #7fbc41' title='#7fbc41'>8</td>
+<td class="w" style='background: #4d9221' title='#4d9221'>9</td>
+</table>
+<b>prgn10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #40004b' title='#40004b'>1</td>
+<td class="w" style='background: #762a83' title='#762a83'>2</td>
+<td style='background: #9970ab' title='#9970ab'>3</td>
+<td style='background: #c2a5cf' title='#c2a5cf'>4</td>
+<td style='background: #e7d4e8' title='#e7d4e8'>5</td>
+<td style='background: #d9f0d3' title='#d9f0d3'>6</td>
+<td style='background: #a6dba0' title='#a6dba0'>7</td>
+<td style='background: #5aae61' title='#5aae61'>8</td>
+<td class="w" style='background: #1b7837' title='#1b7837'>9</td>
+<td class="w" style='background: #00441b' title='#00441b'>10</td>
+</table>
+<b>prgn11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #40004b' title='#40004b'>1</td>
+<td class="w" style='background: #762a83' title='#762a83'>2</td>
+<td style='background: #9970ab' title='#9970ab'>3</td>
+<td style='background: #c2a5cf' title='#c2a5cf'>4</td>
+<td style='background: #e7d4e8' title='#e7d4e8'>5</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>6</td>
+<td style='background: #d9f0d3' title='#d9f0d3'>7</td>
+<td style='background: #a6dba0' title='#a6dba0'>8</td>
+<td style='background: #5aae61' title='#5aae61'>9</td>
+<td class="w" style='background: #1b7837' title='#1b7837'>10</td>
+<td class="w" style='background: #00441b' title='#00441b'>11</td>
+</table>
+<b>prgn3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #af8dc3' title='#af8dc3'>1</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>2</td>
+<td style='background: #7fbf7b' title='#7fbf7b'>3</td>
+</table>
+<b>prgn4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #7b3294' title='#7b3294'>1</td>
+<td style='background: #c2a5cf' title='#c2a5cf'>2</td>
+<td style='background: #a6dba0' title='#a6dba0'>3</td>
+<td class="w" style='background: #008837' title='#008837'>4</td>
+</table>
+<b>prgn5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #7b3294' title='#7b3294'>1</td>
+<td style='background: #c2a5cf' title='#c2a5cf'>2</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>3</td>
+<td style='background: #a6dba0' title='#a6dba0'>4</td>
+<td class="w" style='background: #008837' title='#008837'>5</td>
+</table>
+<b>prgn6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #762a83' title='#762a83'>1</td>
+<td style='background: #af8dc3' title='#af8dc3'>2</td>
+<td style='background: #e7d4e8' title='#e7d4e8'>3</td>
+<td style='background: #d9f0d3' title='#d9f0d3'>4</td>
+<td style='background: #7fbf7b' title='#7fbf7b'>5</td>
+<td class="w" style='background: #1b7837' title='#1b7837'>6</td>
+</table>
+<b>prgn7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #762a83' title='#762a83'>1</td>
+<td style='background: #af8dc3' title='#af8dc3'>2</td>
+<td style='background: #e7d4e8' title='#e7d4e8'>3</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>4</td>
+<td style='background: #d9f0d3' title='#d9f0d3'>5</td>
+<td style='background: #7fbf7b' title='#7fbf7b'>6</td>
+<td class="w" style='background: #1b7837' title='#1b7837'>7</td>
+</table>
+<b>prgn8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #762a83' title='#762a83'>1</td>
+<td style='background: #9970ab' title='#9970ab'>2</td>
+<td style='background: #c2a5cf' title='#c2a5cf'>3</td>
+<td style='background: #e7d4e8' title='#e7d4e8'>4</td>
+<td style='background: #d9f0d3' title='#d9f0d3'>5</td>
+<td style='background: #a6dba0' title='#a6dba0'>6</td>
+<td style='background: #5aae61' title='#5aae61'>7</td>
+<td class="w" style='background: #1b7837' title='#1b7837'>8</td>
+</table>
+<b>prgn9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #762a83' title='#762a83'>1</td>
+<td style='background: #9970ab' title='#9970ab'>2</td>
+<td style='background: #c2a5cf' title='#c2a5cf'>3</td>
+<td style='background: #e7d4e8' title='#e7d4e8'>4</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>5</td>
+<td style='background: #d9f0d3' title='#d9f0d3'>6</td>
+<td style='background: #a6dba0' title='#a6dba0'>7</td>
+<td style='background: #5aae61' title='#5aae61'>8</td>
+<td class="w" style='background: #1b7837' title='#1b7837'>9</td>
+</table>
+<b>pubu3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ece7f2' title='#ece7f2'>1</td>
+<td style='background: #a6bddb' title='#a6bddb'>2</td>
+<td style='background: #2b8cbe' title='#2b8cbe'>3</td>
+</table>
+<b>pubu4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1eef6' title='#f1eef6'>1</td>
+<td style='background: #bdc9e1' title='#bdc9e1'>2</td>
+<td style='background: #74a9cf' title='#74a9cf'>3</td>
+<td style='background: #0570b0' title='#0570b0'>4</td>
+</table>
+<b>pubu5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1eef6' title='#f1eef6'>1</td>
+<td style='background: #bdc9e1' title='#bdc9e1'>2</td>
+<td style='background: #74a9cf' title='#74a9cf'>3</td>
+<td style='background: #2b8cbe' title='#2b8cbe'>4</td>
+<td class="w" style='background: #045a8d' title='#045a8d'>5</td>
+</table>
+<b>pubu6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1eef6' title='#f1eef6'>1</td>
+<td style='background: #d0d1e6' title='#d0d1e6'>2</td>
+<td style='background: #a6bddb' title='#a6bddb'>3</td>
+<td style='background: #74a9cf' title='#74a9cf'>4</td>
+<td style='background: #2b8cbe' title='#2b8cbe'>5</td>
+<td class="w" style='background: #045a8d' title='#045a8d'>6</td>
+</table>
+<b>pubu7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1eef6' title='#f1eef6'>1</td>
+<td style='background: #d0d1e6' title='#d0d1e6'>2</td>
+<td style='background: #a6bddb' title='#a6bddb'>3</td>
+<td style='background: #74a9cf' title='#74a9cf'>4</td>
+<td style='background: #3690c0' title='#3690c0'>5</td>
+<td style='background: #0570b0' title='#0570b0'>6</td>
+<td class="w" style='background: #034e7b' title='#034e7b'>7</td>
+</table>
+<b>pubu8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7fb' title='#fff7fb'>1</td>
+<td style='background: #ece7f2' title='#ece7f2'>2</td>
+<td style='background: #d0d1e6' title='#d0d1e6'>3</td>
+<td style='background: #a6bddb' title='#a6bddb'>4</td>
+<td style='background: #74a9cf' title='#74a9cf'>5</td>
+<td style='background: #3690c0' title='#3690c0'>6</td>
+<td style='background: #0570b0' title='#0570b0'>7</td>
+<td class="w" style='background: #034e7b' title='#034e7b'>8</td>
+</table>
+<b>pubu9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7fb' title='#fff7fb'>1</td>
+<td style='background: #ece7f2' title='#ece7f2'>2</td>
+<td style='background: #d0d1e6' title='#d0d1e6'>3</td>
+<td style='background: #a6bddb' title='#a6bddb'>4</td>
+<td style='background: #74a9cf' title='#74a9cf'>5</td>
+<td style='background: #3690c0' title='#3690c0'>6</td>
+<td style='background: #0570b0' title='#0570b0'>7</td>
+<td class="w" style='background: #045a8d' title='#045a8d'>8</td>
+<td class="w" style='background: #023858' title='#023858'>9</td>
+</table>
+<b>pubugn3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ece2f0' title='#ece2f0'>1</td>
+<td style='background: #a6bddb' title='#a6bddb'>2</td>
+<td style='background: #1c9099' title='#1c9099'>3</td>
+</table>
+<b>pubugn4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f6eff7' title='#f6eff7'>1</td>
+<td style='background: #bdc9e1' title='#bdc9e1'>2</td>
+<td style='background: #67a9cf' title='#67a9cf'>3</td>
+<td class="w" style='background: #02818a' title='#02818a'>4</td>
+</table>
+<b>pubugn5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f6eff7' title='#f6eff7'>1</td>
+<td style='background: #bdc9e1' title='#bdc9e1'>2</td>
+<td style='background: #67a9cf' title='#67a9cf'>3</td>
+<td style='background: #1c9099' title='#1c9099'>4</td>
+<td class="w" style='background: #016c59' title='#016c59'>5</td>
+</table>
+<b>pubugn6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f6eff7' title='#f6eff7'>1</td>
+<td style='background: #d0d1e6' title='#d0d1e6'>2</td>
+<td style='background: #a6bddb' title='#a6bddb'>3</td>
+<td style='background: #67a9cf' title='#67a9cf'>4</td>
+<td style='background: #1c9099' title='#1c9099'>5</td>
+<td class="w" style='background: #016c59' title='#016c59'>6</td>
+</table>
+<b>pubugn7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f6eff7' title='#f6eff7'>1</td>
+<td style='background: #d0d1e6' title='#d0d1e6'>2</td>
+<td style='background: #a6bddb' title='#a6bddb'>3</td>
+<td style='background: #67a9cf' title='#67a9cf'>4</td>
+<td style='background: #3690c0' title='#3690c0'>5</td>
+<td class="w" style='background: #02818a' title='#02818a'>6</td>
+<td class="w" style='background: #016450' title='#016450'>7</td>
+</table>
+<b>pubugn8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7fb' title='#fff7fb'>1</td>
+<td style='background: #ece2f0' title='#ece2f0'>2</td>
+<td style='background: #d0d1e6' title='#d0d1e6'>3</td>
+<td style='background: #a6bddb' title='#a6bddb'>4</td>
+<td style='background: #67a9cf' title='#67a9cf'>5</td>
+<td style='background: #3690c0' title='#3690c0'>6</td>
+<td class="w" style='background: #02818a' title='#02818a'>7</td>
+<td class="w" style='background: #016450' title='#016450'>8</td>
+</table>
+<b>pubugn9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7fb' title='#fff7fb'>1</td>
+<td style='background: #ece2f0' title='#ece2f0'>2</td>
+<td style='background: #d0d1e6' title='#d0d1e6'>3</td>
+<td style='background: #a6bddb' title='#a6bddb'>4</td>
+<td style='background: #67a9cf' title='#67a9cf'>5</td>
+<td style='background: #3690c0' title='#3690c0'>6</td>
+<td class="w" style='background: #02818a' title='#02818a'>7</td>
+<td class="w" style='background: #016c59' title='#016c59'>8</td>
+<td class="w" style='background: #014636' title='#014636'>9</td>
+</table>
+<b>puor10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #7f3b08' title='#7f3b08'>1</td>
+<td class="w" style='background: #b35806' title='#b35806'>2</td>
+<td style='background: #e08214' title='#e08214'>3</td>
+<td style='background: #fdb863' title='#fdb863'>4</td>
+<td style='background: #fee0b6' title='#fee0b6'>5</td>
+<td style='background: #d8daeb' title='#d8daeb'>6</td>
+<td style='background: #b2abd2' title='#b2abd2'>7</td>
+<td style='background: #8073ac' title='#8073ac'>8</td>
+<td class="w" style='background: #542788' title='#542788'>9</td>
+<td class="w" style='background: #2d004b' title='#2d004b'>10</td>
+</table>
+<b>puor11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #7f3b08' title='#7f3b08'>1</td>
+<td class="w" style='background: #b35806' title='#b35806'>2</td>
+<td style='background: #e08214' title='#e08214'>3</td>
+<td style='background: #fdb863' title='#fdb863'>4</td>
+<td style='background: #fee0b6' title='#fee0b6'>5</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>6</td>
+<td style='background: #d8daeb' title='#d8daeb'>7</td>
+<td style='background: #b2abd2' title='#b2abd2'>8</td>
+<td style='background: #8073ac' title='#8073ac'>9</td>
+<td class="w" style='background: #542788' title='#542788'>10</td>
+<td class="w" style='background: #2d004b' title='#2d004b'>11</td>
+</table>
+<b>puor3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1a340' title='#f1a340'>1</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>2</td>
+<td style='background: #998ec3' title='#998ec3'>3</td>
+</table>
+<b>puor4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e66101' title='#e66101'>1</td>
+<td style='background: #fdb863' title='#fdb863'>2</td>
+<td style='background: #b2abd2' title='#b2abd2'>3</td>
+<td class="w" style='background: #5e3c99' title='#5e3c99'>4</td>
+</table>
+<b>puor5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e66101' title='#e66101'>1</td>
+<td style='background: #fdb863' title='#fdb863'>2</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>3</td>
+<td style='background: #b2abd2' title='#b2abd2'>4</td>
+<td class="w" style='background: #5e3c99' title='#5e3c99'>5</td>
+</table>
+<b>puor6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b35806' title='#b35806'>1</td>
+<td style='background: #f1a340' title='#f1a340'>2</td>
+<td style='background: #fee0b6' title='#fee0b6'>3</td>
+<td style='background: #d8daeb' title='#d8daeb'>4</td>
+<td style='background: #998ec3' title='#998ec3'>5</td>
+<td class="w" style='background: #542788' title='#542788'>6</td>
+</table>
+<b>puor7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b35806' title='#b35806'>1</td>
+<td style='background: #f1a340' title='#f1a340'>2</td>
+<td style='background: #fee0b6' title='#fee0b6'>3</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>4</td>
+<td style='background: #d8daeb' title='#d8daeb'>5</td>
+<td style='background: #998ec3' title='#998ec3'>6</td>
+<td class="w" style='background: #542788' title='#542788'>7</td>
+</table>
+<b>puor8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b35806' title='#b35806'>1</td>
+<td style='background: #e08214' title='#e08214'>2</td>
+<td style='background: #fdb863' title='#fdb863'>3</td>
+<td style='background: #fee0b6' title='#fee0b6'>4</td>
+<td style='background: #d8daeb' title='#d8daeb'>5</td>
+<td style='background: #b2abd2' title='#b2abd2'>6</td>
+<td style='background: #8073ac' title='#8073ac'>7</td>
+<td class="w" style='background: #542788' title='#542788'>8</td>
+</table>
+<b>puor9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b35806' title='#b35806'>1</td>
+<td style='background: #e08214' title='#e08214'>2</td>
+<td style='background: #fdb863' title='#fdb863'>3</td>
+<td style='background: #fee0b6' title='#fee0b6'>4</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>5</td>
+<td style='background: #d8daeb' title='#d8daeb'>6</td>
+<td style='background: #b2abd2' title='#b2abd2'>7</td>
+<td style='background: #8073ac' title='#8073ac'>8</td>
+<td class="w" style='background: #542788' title='#542788'>9</td>
+</table>
+<b>purd3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e7e1ef' title='#e7e1ef'>1</td>
+<td style='background: #c994c7' title='#c994c7'>2</td>
+<td style='background: #dd1c77' title='#dd1c77'>3</td>
+</table>
+<b>purd4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1eef6' title='#f1eef6'>1</td>
+<td style='background: #d7b5d8' title='#d7b5d8'>2</td>
+<td style='background: #df65b0' title='#df65b0'>3</td>
+<td style='background: #ce1256' title='#ce1256'>4</td>
+</table>
+<b>purd5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1eef6' title='#f1eef6'>1</td>
+<td style='background: #d7b5d8' title='#d7b5d8'>2</td>
+<td style='background: #df65b0' title='#df65b0'>3</td>
+<td style='background: #dd1c77' title='#dd1c77'>4</td>
+<td class="w" style='background: #980043' title='#980043'>5</td>
+</table>
+<b>purd6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1eef6' title='#f1eef6'>1</td>
+<td style='background: #d4b9da' title='#d4b9da'>2</td>
+<td style='background: #c994c7' title='#c994c7'>3</td>
+<td style='background: #df65b0' title='#df65b0'>4</td>
+<td style='background: #dd1c77' title='#dd1c77'>5</td>
+<td class="w" style='background: #980043' title='#980043'>6</td>
+</table>
+<b>purd7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f1eef6' title='#f1eef6'>1</td>
+<td style='background: #d4b9da' title='#d4b9da'>2</td>
+<td style='background: #c994c7' title='#c994c7'>3</td>
+<td style='background: #df65b0' title='#df65b0'>4</td>
+<td style='background: #e7298a' title='#e7298a'>5</td>
+<td style='background: #ce1256' title='#ce1256'>6</td>
+<td class="w" style='background: #91003f' title='#91003f'>7</td>
+</table>
+<b>purd8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7f4f9' title='#f7f4f9'>1</td>
+<td style='background: #e7e1ef' title='#e7e1ef'>2</td>
+<td style='background: #d4b9da' title='#d4b9da'>3</td>
+<td style='background: #c994c7' title='#c994c7'>4</td>
+<td style='background: #df65b0' title='#df65b0'>5</td>
+<td style='background: #e7298a' title='#e7298a'>6</td>
+<td style='background: #ce1256' title='#ce1256'>7</td>
+<td class="w" style='background: #91003f' title='#91003f'>8</td>
+</table>
+<b>purd9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7f4f9' title='#f7f4f9'>1</td>
+<td style='background: #e7e1ef' title='#e7e1ef'>2</td>
+<td style='background: #d4b9da' title='#d4b9da'>3</td>
+<td style='background: #c994c7' title='#c994c7'>4</td>
+<td style='background: #df65b0' title='#df65b0'>5</td>
+<td style='background: #e7298a' title='#e7298a'>6</td>
+<td style='background: #ce1256' title='#ce1256'>7</td>
+<td class="w" style='background: #980043' title='#980043'>8</td>
+<td class="w" style='background: #67001f' title='#67001f'>9</td>
+</table>
+<b>purples3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #efedf5' title='#efedf5'>1</td>
+<td style='background: #bcbddc' title='#bcbddc'>2</td>
+<td style='background: #756bb1' title='#756bb1'>3</td>
+</table>
+<b>purples4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f2f0f7' title='#f2f0f7'>1</td>
+<td style='background: #cbc9e2' title='#cbc9e2'>2</td>
+<td style='background: #9e9ac8' title='#9e9ac8'>3</td>
+<td style='background: #6a51a3' title='#6a51a3'>4</td>
+</table>
+<b>purples5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f2f0f7' title='#f2f0f7'>1</td>
+<td style='background: #cbc9e2' title='#cbc9e2'>2</td>
+<td style='background: #9e9ac8' title='#9e9ac8'>3</td>
+<td style='background: #756bb1' title='#756bb1'>4</td>
+<td class="w" style='background: #54278f' title='#54278f'>5</td>
+</table>
+<b>purples6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f2f0f7' title='#f2f0f7'>1</td>
+<td style='background: #dadaeb' title='#dadaeb'>2</td>
+<td style='background: #bcbddc' title='#bcbddc'>3</td>
+<td style='background: #9e9ac8' title='#9e9ac8'>4</td>
+<td style='background: #756bb1' title='#756bb1'>5</td>
+<td class="w" style='background: #54278f' title='#54278f'>6</td>
+</table>
+<b>purples7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f2f0f7' title='#f2f0f7'>1</td>
+<td style='background: #dadaeb' title='#dadaeb'>2</td>
+<td style='background: #bcbddc' title='#bcbddc'>3</td>
+<td style='background: #9e9ac8' title='#9e9ac8'>4</td>
+<td style='background: #807dba' title='#807dba'>5</td>
+<td style='background: #6a51a3' title='#6a51a3'>6</td>
+<td class="w" style='background: #4a1486' title='#4a1486'>7</td>
+</table>
+<b>purples8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fcfbfd' title='#fcfbfd'>1</td>
+<td style='background: #efedf5' title='#efedf5'>2</td>
+<td style='background: #dadaeb' title='#dadaeb'>3</td>
+<td style='background: #bcbddc' title='#bcbddc'>4</td>
+<td style='background: #9e9ac8' title='#9e9ac8'>5</td>
+<td style='background: #807dba' title='#807dba'>6</td>
+<td style='background: #6a51a3' title='#6a51a3'>7</td>
+<td class="w" style='background: #4a1486' title='#4a1486'>8</td>
+</table>
+<b>purples9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fcfbfd' title='#fcfbfd'>1</td>
+<td style='background: #efedf5' title='#efedf5'>2</td>
+<td style='background: #dadaeb' title='#dadaeb'>3</td>
+<td style='background: #bcbddc' title='#bcbddc'>4</td>
+<td style='background: #9e9ac8' title='#9e9ac8'>5</td>
+<td style='background: #807dba' title='#807dba'>6</td>
+<td style='background: #6a51a3' title='#6a51a3'>7</td>
+<td class="w" style='background: #54278f' title='#54278f'>8</td>
+<td class="w" style='background: #3f007d' title='#3f007d'>9</td>
+</table>
+<b>rdbu10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #67001f' title='#67001f'>1</td>
+<td class="w" style='background: #b2182b' title='#b2182b'>2</td>
+<td style='background: #d6604d' title='#d6604d'>3</td>
+<td style='background: #f4a582' title='#f4a582'>4</td>
+<td style='background: #fddbc7' title='#fddbc7'>5</td>
+<td style='background: #d1e5f0' title='#d1e5f0'>6</td>
+<td style='background: #92c5de' title='#92c5de'>7</td>
+<td style='background: #4393c3' title='#4393c3'>8</td>
+<td class="w" style='background: #2166ac' title='#2166ac'>9</td>
+<td class="w" style='background: #053061' title='#053061'>10</td>
+</table>
+<b>rdbu11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #67001f' title='#67001f'>1</td>
+<td class="w" style='background: #b2182b' title='#b2182b'>2</td>
+<td style='background: #d6604d' title='#d6604d'>3</td>
+<td style='background: #f4a582' title='#f4a582'>4</td>
+<td style='background: #fddbc7' title='#fddbc7'>5</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>6</td>
+<td style='background: #d1e5f0' title='#d1e5f0'>7</td>
+<td style='background: #92c5de' title='#92c5de'>8</td>
+<td style='background: #4393c3' title='#4393c3'>9</td>
+<td class="w" style='background: #2166ac' title='#2166ac'>10</td>
+<td class="w" style='background: #053061' title='#053061'>11</td>
+</table>
+<b>rdbu3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ef8a62' title='#ef8a62'>1</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>2</td>
+<td style='background: #67a9cf' title='#67a9cf'>3</td>
+</table>
+<b>rdbu4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #ca0020' title='#ca0020'>1</td>
+<td style='background: #f4a582' title='#f4a582'>2</td>
+<td style='background: #92c5de' title='#92c5de'>3</td>
+<td style='background: #0571b0' title='#0571b0'>4</td>
+</table>
+<b>rdbu5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #ca0020' title='#ca0020'>1</td>
+<td style='background: #f4a582' title='#f4a582'>2</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>3</td>
+<td style='background: #92c5de' title='#92c5de'>4</td>
+<td style='background: #0571b0' title='#0571b0'>5</td>
+</table>
+<b>rdbu6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b2182b' title='#b2182b'>1</td>
+<td style='background: #ef8a62' title='#ef8a62'>2</td>
+<td style='background: #fddbc7' title='#fddbc7'>3</td>
+<td style='background: #d1e5f0' title='#d1e5f0'>4</td>
+<td style='background: #67a9cf' title='#67a9cf'>5</td>
+<td class="w" style='background: #2166ac' title='#2166ac'>6</td>
+</table>
+<b>rdbu7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b2182b' title='#b2182b'>1</td>
+<td style='background: #ef8a62' title='#ef8a62'>2</td>
+<td style='background: #fddbc7' title='#fddbc7'>3</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>4</td>
+<td style='background: #d1e5f0' title='#d1e5f0'>5</td>
+<td style='background: #67a9cf' title='#67a9cf'>6</td>
+<td class="w" style='background: #2166ac' title='#2166ac'>7</td>
+</table>
+<b>rdbu8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b2182b' title='#b2182b'>1</td>
+<td style='background: #d6604d' title='#d6604d'>2</td>
+<td style='background: #f4a582' title='#f4a582'>3</td>
+<td style='background: #fddbc7' title='#fddbc7'>4</td>
+<td style='background: #d1e5f0' title='#d1e5f0'>5</td>
+<td style='background: #92c5de' title='#92c5de'>6</td>
+<td style='background: #4393c3' title='#4393c3'>7</td>
+<td class="w" style='background: #2166ac' title='#2166ac'>8</td>
+</table>
+<b>rdbu9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b2182b' title='#b2182b'>1</td>
+<td style='background: #d6604d' title='#d6604d'>2</td>
+<td style='background: #f4a582' title='#f4a582'>3</td>
+<td style='background: #fddbc7' title='#fddbc7'>4</td>
+<td style='background: #f7f7f7' title='#f7f7f7'>5</td>
+<td style='background: #d1e5f0' title='#d1e5f0'>6</td>
+<td style='background: #92c5de' title='#92c5de'>7</td>
+<td style='background: #4393c3' title='#4393c3'>8</td>
+<td class="w" style='background: #2166ac' title='#2166ac'>9</td>
+</table>
+<b>rdgy10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #67001f' title='#67001f'>1</td>
+<td class="w" style='background: #b2182b' title='#b2182b'>2</td>
+<td style='background: #d6604d' title='#d6604d'>3</td>
+<td style='background: #f4a582' title='#f4a582'>4</td>
+<td style='background: #fddbc7' title='#fddbc7'>5</td>
+<td style='background: #e0e0e0' title='#e0e0e0'>6</td>
+<td style='background: #bababa' title='#bababa'>7</td>
+<td style='background: #878787' title='#878787'>8</td>
+<td class="w" style='background: #4d4d4d' title='#4d4d4d'>9</td>
+<td class="w" style='background: #1a1a1a' title='#1a1a1a'>10</td>
+</table>
+<b>rdgy11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #67001f' title='#67001f'>1</td>
+<td class="w" style='background: #b2182b' title='#b2182b'>2</td>
+<td style='background: #d6604d' title='#d6604d'>3</td>
+<td style='background: #f4a582' title='#f4a582'>4</td>
+<td style='background: #fddbc7' title='#fddbc7'>5</td>
+<td style='background: #ffffff' title='#ffffff'>6</td>
+<td style='background: #e0e0e0' title='#e0e0e0'>7</td>
+<td style='background: #bababa' title='#bababa'>8</td>
+<td style='background: #878787' title='#878787'>9</td>
+<td class="w" style='background: #4d4d4d' title='#4d4d4d'>10</td>
+<td class="w" style='background: #1a1a1a' title='#1a1a1a'>11</td>
+</table>
+<b>rdgy3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ef8a62' title='#ef8a62'>1</td>
+<td style='background: #ffffff' title='#ffffff'>2</td>
+<td style='background: #999999' title='#999999'>3</td>
+</table>
+<b>rdgy4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #ca0020' title='#ca0020'>1</td>
+<td style='background: #f4a582' title='#f4a582'>2</td>
+<td style='background: #bababa' title='#bababa'>3</td>
+<td class="w" style='background: #404040' title='#404040'>4</td>
+</table>
+<b>rdgy5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #ca0020' title='#ca0020'>1</td>
+<td style='background: #f4a582' title='#f4a582'>2</td>
+<td style='background: #ffffff' title='#ffffff'>3</td>
+<td style='background: #bababa' title='#bababa'>4</td>
+<td class="w" style='background: #404040' title='#404040'>5</td>
+</table>
+<b>rdgy6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b2182b' title='#b2182b'>1</td>
+<td style='background: #ef8a62' title='#ef8a62'>2</td>
+<td style='background: #fddbc7' title='#fddbc7'>3</td>
+<td style='background: #e0e0e0' title='#e0e0e0'>4</td>
+<td style='background: #999999' title='#999999'>5</td>
+<td class="w" style='background: #4d4d4d' title='#4d4d4d'>6</td>
+</table>
+<b>rdgy7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b2182b' title='#b2182b'>1</td>
+<td style='background: #ef8a62' title='#ef8a62'>2</td>
+<td style='background: #fddbc7' title='#fddbc7'>3</td>
+<td style='background: #ffffff' title='#ffffff'>4</td>
+<td style='background: #e0e0e0' title='#e0e0e0'>5</td>
+<td style='background: #999999' title='#999999'>6</td>
+<td class="w" style='background: #4d4d4d' title='#4d4d4d'>7</td>
+</table>
+<b>rdgy8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b2182b' title='#b2182b'>1</td>
+<td style='background: #d6604d' title='#d6604d'>2</td>
+<td style='background: #f4a582' title='#f4a582'>3</td>
+<td style='background: #fddbc7' title='#fddbc7'>4</td>
+<td style='background: #e0e0e0' title='#e0e0e0'>5</td>
+<td style='background: #bababa' title='#bababa'>6</td>
+<td style='background: #878787' title='#878787'>7</td>
+<td class="w" style='background: #4d4d4d' title='#4d4d4d'>8</td>
+</table>
+<b>rdgy9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #b2182b' title='#b2182b'>1</td>
+<td style='background: #d6604d' title='#d6604d'>2</td>
+<td style='background: #f4a582' title='#f4a582'>3</td>
+<td style='background: #fddbc7' title='#fddbc7'>4</td>
+<td style='background: #ffffff' title='#ffffff'>5</td>
+<td style='background: #e0e0e0' title='#e0e0e0'>6</td>
+<td style='background: #bababa' title='#bababa'>7</td>
+<td style='background: #878787' title='#878787'>8</td>
+<td class="w" style='background: #4d4d4d' title='#4d4d4d'>9</td>
+</table>
+<b>rdpu3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fde0dd' title='#fde0dd'>1</td>
+<td style='background: #fa9fb5' title='#fa9fb5'>2</td>
+<td style='background: #c51b8a' title='#c51b8a'>3</td>
+</table>
+<b>rdpu4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #feebe2' title='#feebe2'>1</td>
+<td style='background: #fbb4b9' title='#fbb4b9'>2</td>
+<td style='background: #f768a1' title='#f768a1'>3</td>
+<td style='background: #ae017e' title='#ae017e'>4</td>
+</table>
+<b>rdpu5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #feebe2' title='#feebe2'>1</td>
+<td style='background: #fbb4b9' title='#fbb4b9'>2</td>
+<td style='background: #f768a1' title='#f768a1'>3</td>
+<td style='background: #c51b8a' title='#c51b8a'>4</td>
+<td class="w" style='background: #7a0177' title='#7a0177'>5</td>
+</table>
+<b>rdpu6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #feebe2' title='#feebe2'>1</td>
+<td style='background: #fcc5c0' title='#fcc5c0'>2</td>
+<td style='background: #fa9fb5' title='#fa9fb5'>3</td>
+<td style='background: #f768a1' title='#f768a1'>4</td>
+<td style='background: #c51b8a' title='#c51b8a'>5</td>
+<td class="w" style='background: #7a0177' title='#7a0177'>6</td>
+</table>
+<b>rdpu7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #feebe2' title='#feebe2'>1</td>
+<td style='background: #fcc5c0' title='#fcc5c0'>2</td>
+<td style='background: #fa9fb5' title='#fa9fb5'>3</td>
+<td style='background: #f768a1' title='#f768a1'>4</td>
+<td style='background: #dd3497' title='#dd3497'>5</td>
+<td style='background: #ae017e' title='#ae017e'>6</td>
+<td class="w" style='background: #7a0177' title='#7a0177'>7</td>
+</table>
+<b>rdpu8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7f3' title='#fff7f3'>1</td>
+<td style='background: #fde0dd' title='#fde0dd'>2</td>
+<td style='background: #fcc5c0' title='#fcc5c0'>3</td>
+<td style='background: #fa9fb5' title='#fa9fb5'>4</td>
+<td style='background: #f768a1' title='#f768a1'>5</td>
+<td style='background: #dd3497' title='#dd3497'>6</td>
+<td style='background: #ae017e' title='#ae017e'>7</td>
+<td class="w" style='background: #7a0177' title='#7a0177'>8</td>
+</table>
+<b>rdpu9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7f3' title='#fff7f3'>1</td>
+<td style='background: #fde0dd' title='#fde0dd'>2</td>
+<td style='background: #fcc5c0' title='#fcc5c0'>3</td>
+<td style='background: #fa9fb5' title='#fa9fb5'>4</td>
+<td style='background: #f768a1' title='#f768a1'>5</td>
+<td style='background: #dd3497' title='#dd3497'>6</td>
+<td style='background: #ae017e' title='#ae017e'>7</td>
+<td class="w" style='background: #7a0177' title='#7a0177'>8</td>
+<td class="w" style='background: #49006a' title='#49006a'>9</td>
+</table>
+<b>rdylbu10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #a50026' title='#a50026'>1</td>
+<td style='background: #d73027' title='#d73027'>2</td>
+<td style='background: #f46d43' title='#f46d43'>3</td>
+<td style='background: #fdae61' title='#fdae61'>4</td>
+<td style='background: #fee090' title='#fee090'>5</td>
+<td style='background: #e0f3f8' title='#e0f3f8'>6</td>
+<td style='background: #abd9e9' title='#abd9e9'>7</td>
+<td style='background: #74add1' title='#74add1'>8</td>
+<td style='background: #4575b4' title='#4575b4'>9</td>
+<td class="w" style='background: #313695' title='#313695'>10</td>
+</table>
+<b>rdylbu11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #a50026' title='#a50026'>1</td>
+<td style='background: #d73027' title='#d73027'>2</td>
+<td style='background: #f46d43' title='#f46d43'>3</td>
+<td style='background: #fdae61' title='#fdae61'>4</td>
+<td style='background: #fee090' title='#fee090'>5</td>
+<td style='background: #ffffbf' title='#ffffbf'>6</td>
+<td style='background: #e0f3f8' title='#e0f3f8'>7</td>
+<td style='background: #abd9e9' title='#abd9e9'>8</td>
+<td style='background: #74add1' title='#74add1'>9</td>
+<td style='background: #4575b4' title='#4575b4'>10</td>
+<td class="w" style='background: #313695' title='#313695'>11</td>
+</table>
+<b>rdylbu3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fc8d59' title='#fc8d59'>1</td>
+<td style='background: #ffffbf' title='#ffffbf'>2</td>
+<td style='background: #91bfdb' title='#91bfdb'>3</td>
+</table>
+<b>rdylbu4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d7191c' title='#d7191c'>1</td>
+<td style='background: #fdae61' title='#fdae61'>2</td>
+<td style='background: #abd9e9' title='#abd9e9'>3</td>
+<td style='background: #2c7bb6' title='#2c7bb6'>4</td>
+</table>
+<b>rdylbu5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d7191c' title='#d7191c'>1</td>
+<td style='background: #fdae61' title='#fdae61'>2</td>
+<td style='background: #ffffbf' title='#ffffbf'>3</td>
+<td style='background: #abd9e9' title='#abd9e9'>4</td>
+<td style='background: #2c7bb6' title='#2c7bb6'>5</td>
+</table>
+<b>rdylbu6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d73027' title='#d73027'>1</td>
+<td style='background: #fc8d59' title='#fc8d59'>2</td>
+<td style='background: #fee090' title='#fee090'>3</td>
+<td style='background: #e0f3f8' title='#e0f3f8'>4</td>
+<td style='background: #91bfdb' title='#91bfdb'>5</td>
+<td style='background: #4575b4' title='#4575b4'>6</td>
+</table>
+<b>rdylbu7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d73027' title='#d73027'>1</td>
+<td style='background: #fc8d59' title='#fc8d59'>2</td>
+<td style='background: #fee090' title='#fee090'>3</td>
+<td style='background: #ffffbf' title='#ffffbf'>4</td>
+<td style='background: #e0f3f8' title='#e0f3f8'>5</td>
+<td style='background: #91bfdb' title='#91bfdb'>6</td>
+<td style='background: #4575b4' title='#4575b4'>7</td>
+</table>
+<b>rdylbu8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d73027' title='#d73027'>1</td>
+<td style='background: #f46d43' title='#f46d43'>2</td>
+<td style='background: #fdae61' title='#fdae61'>3</td>
+<td style='background: #fee090' title='#fee090'>4</td>
+<td style='background: #e0f3f8' title='#e0f3f8'>5</td>
+<td style='background: #abd9e9' title='#abd9e9'>6</td>
+<td style='background: #74add1' title='#74add1'>7</td>
+<td style='background: #4575b4' title='#4575b4'>8</td>
+</table>
+<b>rdylbu9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d73027' title='#d73027'>1</td>
+<td style='background: #f46d43' title='#f46d43'>2</td>
+<td style='background: #fdae61' title='#fdae61'>3</td>
+<td style='background: #fee090' title='#fee090'>4</td>
+<td style='background: #ffffbf' title='#ffffbf'>5</td>
+<td style='background: #e0f3f8' title='#e0f3f8'>6</td>
+<td style='background: #abd9e9' title='#abd9e9'>7</td>
+<td style='background: #74add1' title='#74add1'>8</td>
+<td style='background: #4575b4' title='#4575b4'>9</td>
+</table>
+<b>rdylgn10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #a50026' title='#a50026'>1</td>
+<td style='background: #d73027' title='#d73027'>2</td>
+<td style='background: #f46d43' title='#f46d43'>3</td>
+<td style='background: #fdae61' title='#fdae61'>4</td>
+<td style='background: #fee08b' title='#fee08b'>5</td>
+<td style='background: #d9ef8b' title='#d9ef8b'>6</td>
+<td style='background: #a6d96a' title='#a6d96a'>7</td>
+<td style='background: #66bd63' title='#66bd63'>8</td>
+<td class="w" style='background: #1a9850' title='#1a9850'>9</td>
+<td class="w" style='background: #006837' title='#006837'>10</td>
+</table>
+<b>rdylgn11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #a50026' title='#a50026'>1</td>
+<td style='background: #d73027' title='#d73027'>2</td>
+<td style='background: #f46d43' title='#f46d43'>3</td>
+<td style='background: #fdae61' title='#fdae61'>4</td>
+<td style='background: #fee08b' title='#fee08b'>5</td>
+<td style='background: #ffffbf' title='#ffffbf'>6</td>
+<td style='background: #d9ef8b' title='#d9ef8b'>7</td>
+<td style='background: #a6d96a' title='#a6d96a'>8</td>
+<td style='background: #66bd63' title='#66bd63'>9</td>
+<td class="w" style='background: #1a9850' title='#1a9850'>10</td>
+<td class="w" style='background: #006837' title='#006837'>11</td>
+</table>
+<b>rdylgn3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fc8d59' title='#fc8d59'>1</td>
+<td style='background: #ffffbf' title='#ffffbf'>2</td>
+<td style='background: #91cf60' title='#91cf60'>3</td>
+</table>
+<b>rdylgn4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d7191c' title='#d7191c'>1</td>
+<td style='background: #fdae61' title='#fdae61'>2</td>
+<td style='background: #a6d96a' title='#a6d96a'>3</td>
+<td class="w" style='background: #1a9641' title='#1a9641'>4</td>
+</table>
+<b>rdylgn5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d7191c' title='#d7191c'>1</td>
+<td style='background: #fdae61' title='#fdae61'>2</td>
+<td style='background: #ffffbf' title='#ffffbf'>3</td>
+<td style='background: #a6d96a' title='#a6d96a'>4</td>
+<td class="w" style='background: #1a9641' title='#1a9641'>5</td>
+</table>
+<b>rdylgn6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d73027' title='#d73027'>1</td>
+<td style='background: #fc8d59' title='#fc8d59'>2</td>
+<td style='background: #fee08b' title='#fee08b'>3</td>
+<td style='background: #d9ef8b' title='#d9ef8b'>4</td>
+<td style='background: #91cf60' title='#91cf60'>5</td>
+<td class="w" style='background: #1a9850' title='#1a9850'>6</td>
+</table>
+<b>rdylgn7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d73027' title='#d73027'>1</td>
+<td style='background: #fc8d59' title='#fc8d59'>2</td>
+<td style='background: #fee08b' title='#fee08b'>3</td>
+<td style='background: #ffffbf' title='#ffffbf'>4</td>
+<td style='background: #d9ef8b' title='#d9ef8b'>5</td>
+<td style='background: #91cf60' title='#91cf60'>6</td>
+<td class="w" style='background: #1a9850' title='#1a9850'>7</td>
+</table>
+<b>rdylgn8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d73027' title='#d73027'>1</td>
+<td style='background: #f46d43' title='#f46d43'>2</td>
+<td style='background: #fdae61' title='#fdae61'>3</td>
+<td style='background: #fee08b' title='#fee08b'>4</td>
+<td style='background: #d9ef8b' title='#d9ef8b'>5</td>
+<td style='background: #a6d96a' title='#a6d96a'>6</td>
+<td style='background: #66bd63' title='#66bd63'>7</td>
+<td class="w" style='background: #1a9850' title='#1a9850'>8</td>
+</table>
+<b>rdylgn9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d73027' title='#d73027'>1</td>
+<td style='background: #f46d43' title='#f46d43'>2</td>
+<td style='background: #fdae61' title='#fdae61'>3</td>
+<td style='background: #fee08b' title='#fee08b'>4</td>
+<td style='background: #ffffbf' title='#ffffbf'>5</td>
+<td style='background: #d9ef8b' title='#d9ef8b'>6</td>
+<td style='background: #a6d96a' title='#a6d96a'>7</td>
+<td style='background: #66bd63' title='#66bd63'>8</td>
+<td class="w" style='background: #1a9850' title='#1a9850'>9</td>
+</table>
+<b>reds3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fee0d2' title='#fee0d2'>1</td>
+<td style='background: #fc9272' title='#fc9272'>2</td>
+<td style='background: #de2d26' title='#de2d26'>3</td>
+</table>
+<b>reds4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fee5d9' title='#fee5d9'>1</td>
+<td style='background: #fcae91' title='#fcae91'>2</td>
+<td style='background: #fb6a4a' title='#fb6a4a'>3</td>
+<td class="w" style='background: #cb181d' title='#cb181d'>4</td>
+</table>
+<b>reds5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fee5d9' title='#fee5d9'>1</td>
+<td style='background: #fcae91' title='#fcae91'>2</td>
+<td style='background: #fb6a4a' title='#fb6a4a'>3</td>
+<td style='background: #de2d26' title='#de2d26'>4</td>
+<td class="w" style='background: #a50f15' title='#a50f15'>5</td>
+</table>
+<b>reds6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fee5d9' title='#fee5d9'>1</td>
+<td style='background: #fcbba1' title='#fcbba1'>2</td>
+<td style='background: #fc9272' title='#fc9272'>3</td>
+<td style='background: #fb6a4a' title='#fb6a4a'>4</td>
+<td style='background: #de2d26' title='#de2d26'>5</td>
+<td class="w" style='background: #a50f15' title='#a50f15'>6</td>
+</table>
+<b>reds7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fee5d9' title='#fee5d9'>1</td>
+<td style='background: #fcbba1' title='#fcbba1'>2</td>
+<td style='background: #fc9272' title='#fc9272'>3</td>
+<td style='background: #fb6a4a' title='#fb6a4a'>4</td>
+<td style='background: #ef3b2c' title='#ef3b2c'>5</td>
+<td class="w" style='background: #cb181d' title='#cb181d'>6</td>
+<td class="w" style='background: #99000d' title='#99000d'>7</td>
+</table>
+<b>reds8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff5f0' title='#fff5f0'>1</td>
+<td style='background: #fee0d2' title='#fee0d2'>2</td>
+<td style='background: #fcbba1' title='#fcbba1'>3</td>
+<td style='background: #fc9272' title='#fc9272'>4</td>
+<td style='background: #fb6a4a' title='#fb6a4a'>5</td>
+<td style='background: #ef3b2c' title='#ef3b2c'>6</td>
+<td class="w" style='background: #cb181d' title='#cb181d'>7</td>
+<td class="w" style='background: #99000d' title='#99000d'>8</td>
+</table>
+<b>reds9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff5f0' title='#fff5f0'>1</td>
+<td style='background: #fee0d2' title='#fee0d2'>2</td>
+<td style='background: #fcbba1' title='#fcbba1'>3</td>
+<td style='background: #fc9272' title='#fc9272'>4</td>
+<td style='background: #fb6a4a' title='#fb6a4a'>5</td>
+<td style='background: #ef3b2c' title='#ef3b2c'>6</td>
+<td class="w" style='background: #cb181d' title='#cb181d'>7</td>
+<td class="w" style='background: #a50f15' title='#a50f15'>8</td>
+<td class="w" style='background: #67000d' title='#67000d'>9</td>
+</table>
+<b>set13</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e41a1c' title='#e41a1c'>1</td>
+<td style='background: #377eb8' title='#377eb8'>2</td>
+<td class="w" style='background: #4daf4a' title='#4daf4a'>3</td>
+</table>
+<b>set14</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e41a1c' title='#e41a1c'>1</td>
+<td style='background: #377eb8' title='#377eb8'>2</td>
+<td class="w" style='background: #4daf4a' title='#4daf4a'>3</td>
+<td style='background: #984ea3' title='#984ea3'>4</td>
+</table>
+<b>set15</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e41a1c' title='#e41a1c'>1</td>
+<td style='background: #377eb8' title='#377eb8'>2</td>
+<td class="w" style='background: #4daf4a' title='#4daf4a'>3</td>
+<td style='background: #984ea3' title='#984ea3'>4</td>
+<td style='background: #ff7f00' title='#ff7f00'>5</td>
+</table>
+<b>set16</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e41a1c' title='#e41a1c'>1</td>
+<td style='background: #377eb8' title='#377eb8'>2</td>
+<td class="w" style='background: #4daf4a' title='#4daf4a'>3</td>
+<td style='background: #984ea3' title='#984ea3'>4</td>
+<td style='background: #ff7f00' title='#ff7f00'>5</td>
+<td style='background: #ffff33' title='#ffff33'>6</td>
+</table>
+<b>set17</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e41a1c' title='#e41a1c'>1</td>
+<td style='background: #377eb8' title='#377eb8'>2</td>
+<td class="w" style='background: #4daf4a' title='#4daf4a'>3</td>
+<td style='background: #984ea3' title='#984ea3'>4</td>
+<td style='background: #ff7f00' title='#ff7f00'>5</td>
+<td style='background: #ffff33' title='#ffff33'>6</td>
+<td class="w" style='background: #a65628' title='#a65628'>7</td>
+</table>
+<b>set18</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e41a1c' title='#e41a1c'>1</td>
+<td style='background: #377eb8' title='#377eb8'>2</td>
+<td class="w" style='background: #4daf4a' title='#4daf4a'>3</td>
+<td style='background: #984ea3' title='#984ea3'>4</td>
+<td style='background: #ff7f00' title='#ff7f00'>5</td>
+<td style='background: #ffff33' title='#ffff33'>6</td>
+<td class="w" style='background: #a65628' title='#a65628'>7</td>
+<td style='background: #f781bf' title='#f781bf'>8</td>
+</table>
+<b>set19</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #e41a1c' title='#e41a1c'>1</td>
+<td style='background: #377eb8' title='#377eb8'>2</td>
+<td class="w" style='background: #4daf4a' title='#4daf4a'>3</td>
+<td style='background: #984ea3' title='#984ea3'>4</td>
+<td style='background: #ff7f00' title='#ff7f00'>5</td>
+<td style='background: #ffff33' title='#ffff33'>6</td>
+<td class="w" style='background: #a65628' title='#a65628'>7</td>
+<td style='background: #f781bf' title='#f781bf'>8</td>
+<td style='background: #999999' title='#999999'>9</td>
+</table>
+<b>set23</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #66c2a5' title='#66c2a5'>1</td>
+<td style='background: #fc8d62' title='#fc8d62'>2</td>
+<td style='background: #8da0cb' title='#8da0cb'>3</td>
+</table>
+<b>set24</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #66c2a5' title='#66c2a5'>1</td>
+<td style='background: #fc8d62' title='#fc8d62'>2</td>
+<td style='background: #8da0cb' title='#8da0cb'>3</td>
+<td style='background: #e78ac3' title='#e78ac3'>4</td>
+</table>
+<b>set25</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #66c2a5' title='#66c2a5'>1</td>
+<td style='background: #fc8d62' title='#fc8d62'>2</td>
+<td style='background: #8da0cb' title='#8da0cb'>3</td>
+<td style='background: #e78ac3' title='#e78ac3'>4</td>
+<td style='background: #a6d854' title='#a6d854'>5</td>
+</table>
+<b>set26</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #66c2a5' title='#66c2a5'>1</td>
+<td style='background: #fc8d62' title='#fc8d62'>2</td>
+<td style='background: #8da0cb' title='#8da0cb'>3</td>
+<td style='background: #e78ac3' title='#e78ac3'>4</td>
+<td style='background: #a6d854' title='#a6d854'>5</td>
+<td style='background: #ffd92f' title='#ffd92f'>6</td>
+</table>
+<b>set27</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #66c2a5' title='#66c2a5'>1</td>
+<td style='background: #fc8d62' title='#fc8d62'>2</td>
+<td style='background: #8da0cb' title='#8da0cb'>3</td>
+<td style='background: #e78ac3' title='#e78ac3'>4</td>
+<td style='background: #a6d854' title='#a6d854'>5</td>
+<td style='background: #ffd92f' title='#ffd92f'>6</td>
+<td style='background: #e5c494' title='#e5c494'>7</td>
+</table>
+<b>set28</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #66c2a5' title='#66c2a5'>1</td>
+<td style='background: #fc8d62' title='#fc8d62'>2</td>
+<td style='background: #8da0cb' title='#8da0cb'>3</td>
+<td style='background: #e78ac3' title='#e78ac3'>4</td>
+<td style='background: #a6d854' title='#a6d854'>5</td>
+<td style='background: #ffd92f' title='#ffd92f'>6</td>
+<td style='background: #e5c494' title='#e5c494'>7</td>
+<td style='background: #b3b3b3' title='#b3b3b3'>8</td>
+</table>
+<b>set310</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+<td style='background: #80b1d3' title='#80b1d3'>5</td>
+<td style='background: #fdb462' title='#fdb462'>6</td>
+<td style='background: #b3de69' title='#b3de69'>7</td>
+<td style='background: #fccde5' title='#fccde5'>8</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>9</td>
+<td style='background: #bc80bd' title='#bc80bd'>10</td>
+</table>
+<b>set311</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+<td style='background: #80b1d3' title='#80b1d3'>5</td>
+<td style='background: #fdb462' title='#fdb462'>6</td>
+<td style='background: #b3de69' title='#b3de69'>7</td>
+<td style='background: #fccde5' title='#fccde5'>8</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>9</td>
+<td style='background: #bc80bd' title='#bc80bd'>10</td>
+<td style='background: #ccebc5' title='#ccebc5'>11</td>
+</table>
+<b>set312</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+<td style='background: #80b1d3' title='#80b1d3'>5</td>
+<td style='background: #fdb462' title='#fdb462'>6</td>
+<td style='background: #b3de69' title='#b3de69'>7</td>
+<td style='background: #fccde5' title='#fccde5'>8</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>9</td>
+<td style='background: #bc80bd' title='#bc80bd'>10</td>
+<td style='background: #ccebc5' title='#ccebc5'>11</td>
+<td style='background: #ffed6f' title='#ffed6f'>12</td>
+</table>
+<b>set33</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+</table>
+<b>set34</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+</table>
+<b>set35</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+<td style='background: #80b1d3' title='#80b1d3'>5</td>
+</table>
+<b>set36</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+<td style='background: #80b1d3' title='#80b1d3'>5</td>
+<td style='background: #fdb462' title='#fdb462'>6</td>
+</table>
+<b>set37</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+<td style='background: #80b1d3' title='#80b1d3'>5</td>
+<td style='background: #fdb462' title='#fdb462'>6</td>
+<td style='background: #b3de69' title='#b3de69'>7</td>
+</table>
+<b>set38</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+<td style='background: #80b1d3' title='#80b1d3'>5</td>
+<td style='background: #fdb462' title='#fdb462'>6</td>
+<td style='background: #b3de69' title='#b3de69'>7</td>
+<td style='background: #fccde5' title='#fccde5'>8</td>
+</table>
+<b>set39</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #8dd3c7' title='#8dd3c7'>1</td>
+<td style='background: #ffffb3' title='#ffffb3'>2</td>
+<td style='background: #bebada' title='#bebada'>3</td>
+<td style='background: #fb8072' title='#fb8072'>4</td>
+<td style='background: #80b1d3' title='#80b1d3'>5</td>
+<td style='background: #fdb462' title='#fdb462'>6</td>
+<td style='background: #b3de69' title='#b3de69'>7</td>
+<td style='background: #fccde5' title='#fccde5'>8</td>
+<td style='background: #d9d9d9' title='#d9d9d9'>9</td>
+</table>
+<b>spectral10</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #9e0142' title='#9e0142'>1</td>
+<td style='background: #d53e4f' title='#d53e4f'>2</td>
+<td style='background: #f46d43' title='#f46d43'>3</td>
+<td style='background: #fdae61' title='#fdae61'>4</td>
+<td style='background: #fee08b' title='#fee08b'>5</td>
+<td style='background: #e6f598' title='#e6f598'>6</td>
+<td style='background: #abdda4' title='#abdda4'>7</td>
+<td style='background: #66c2a5' title='#66c2a5'>8</td>
+<td style='background: #3288bd' title='#3288bd'>9</td>
+<td class="w" style='background: #5e4fa2' title='#5e4fa2'>10</td>
+</table>
+<b>spectral11</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td class="w" style='background: #9e0142' title='#9e0142'>1</td>
+<td style='background: #d53e4f' title='#d53e4f'>2</td>
+<td style='background: #f46d43' title='#f46d43'>3</td>
+<td style='background: #fdae61' title='#fdae61'>4</td>
+<td style='background: #fee08b' title='#fee08b'>5</td>
+<td style='background: #ffffbf' title='#ffffbf'>6</td>
+<td style='background: #e6f598' title='#e6f598'>7</td>
+<td style='background: #abdda4' title='#abdda4'>8</td>
+<td style='background: #66c2a5' title='#66c2a5'>9</td>
+<td style='background: #3288bd' title='#3288bd'>10</td>
+<td class="w" style='background: #5e4fa2' title='#5e4fa2'>11</td>
+</table>
+<b>spectral3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fc8d59' title='#fc8d59'>1</td>
+<td style='background: #ffffbf' title='#ffffbf'>2</td>
+<td style='background: #99d594' title='#99d594'>3</td>
+</table>
+<b>spectral4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d7191c' title='#d7191c'>1</td>
+<td style='background: #fdae61' title='#fdae61'>2</td>
+<td style='background: #abdda4' title='#abdda4'>3</td>
+<td style='background: #2b83ba' title='#2b83ba'>4</td>
+</table>
+<b>spectral5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d7191c' title='#d7191c'>1</td>
+<td style='background: #fdae61' title='#fdae61'>2</td>
+<td style='background: #ffffbf' title='#ffffbf'>3</td>
+<td style='background: #abdda4' title='#abdda4'>4</td>
+<td style='background: #2b83ba' title='#2b83ba'>5</td>
+</table>
+<b>spectral6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d53e4f' title='#d53e4f'>1</td>
+<td style='background: #fc8d59' title='#fc8d59'>2</td>
+<td style='background: #fee08b' title='#fee08b'>3</td>
+<td style='background: #e6f598' title='#e6f598'>4</td>
+<td style='background: #99d594' title='#99d594'>5</td>
+<td style='background: #3288bd' title='#3288bd'>6</td>
+</table>
+<b>spectral7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d53e4f' title='#d53e4f'>1</td>
+<td style='background: #fc8d59' title='#fc8d59'>2</td>
+<td style='background: #fee08b' title='#fee08b'>3</td>
+<td style='background: #ffffbf' title='#ffffbf'>4</td>
+<td style='background: #e6f598' title='#e6f598'>5</td>
+<td style='background: #99d594' title='#99d594'>6</td>
+<td style='background: #3288bd' title='#3288bd'>7</td>
+</table>
+<b>spectral8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d53e4f' title='#d53e4f'>1</td>
+<td style='background: #f46d43' title='#f46d43'>2</td>
+<td style='background: #fdae61' title='#fdae61'>3</td>
+<td style='background: #fee08b' title='#fee08b'>4</td>
+<td style='background: #e6f598' title='#e6f598'>5</td>
+<td style='background: #abdda4' title='#abdda4'>6</td>
+<td style='background: #66c2a5' title='#66c2a5'>7</td>
+<td style='background: #3288bd' title='#3288bd'>8</td>
+</table>
+<b>spectral9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #d53e4f' title='#d53e4f'>1</td>
+<td style='background: #f46d43' title='#f46d43'>2</td>
+<td style='background: #fdae61' title='#fdae61'>3</td>
+<td style='background: #fee08b' title='#fee08b'>4</td>
+<td style='background: #ffffbf' title='#ffffbf'>5</td>
+<td style='background: #e6f598' title='#e6f598'>6</td>
+<td style='background: #abdda4' title='#abdda4'>7</td>
+<td style='background: #66c2a5' title='#66c2a5'>8</td>
+<td style='background: #3288bd' title='#3288bd'>9</td>
+</table>
+<b>ylgn3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #f7fcb9' title='#f7fcb9'>1</td>
+<td style='background: #addd8e' title='#addd8e'>2</td>
+<td class="w" style='background: #31a354' title='#31a354'>3</td>
+</table>
+<b>ylgn4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #c2e699' title='#c2e699'>2</td>
+<td style='background: #78c679' title='#78c679'>3</td>
+<td class="w" style='background: #238443' title='#238443'>4</td>
+</table>
+<b>ylgn5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #c2e699' title='#c2e699'>2</td>
+<td style='background: #78c679' title='#78c679'>3</td>
+<td class="w" style='background: #31a354' title='#31a354'>4</td>
+<td class="w" style='background: #006837' title='#006837'>5</td>
+</table>
+<b>ylgn6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #d9f0a3' title='#d9f0a3'>2</td>
+<td style='background: #addd8e' title='#addd8e'>3</td>
+<td style='background: #78c679' title='#78c679'>4</td>
+<td class="w" style='background: #31a354' title='#31a354'>5</td>
+<td class="w" style='background: #006837' title='#006837'>6</td>
+</table>
+<b>ylgn7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #d9f0a3' title='#d9f0a3'>2</td>
+<td style='background: #addd8e' title='#addd8e'>3</td>
+<td style='background: #78c679' title='#78c679'>4</td>
+<td class="w" style='background: #41ab5d' title='#41ab5d'>5</td>
+<td class="w" style='background: #238443' title='#238443'>6</td>
+<td class="w" style='background: #005a32' title='#005a32'>7</td>
+</table>
+<b>ylgn8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffe5' title='#ffffe5'>1</td>
+<td style='background: #f7fcb9' title='#f7fcb9'>2</td>
+<td style='background: #d9f0a3' title='#d9f0a3'>3</td>
+<td style='background: #addd8e' title='#addd8e'>4</td>
+<td style='background: #78c679' title='#78c679'>5</td>
+<td class="w" style='background: #41ab5d' title='#41ab5d'>6</td>
+<td class="w" style='background: #238443' title='#238443'>7</td>
+<td class="w" style='background: #005a32' title='#005a32'>8</td>
+</table>
+<b>ylgn9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffe5' title='#ffffe5'>1</td>
+<td style='background: #f7fcb9' title='#f7fcb9'>2</td>
+<td style='background: #d9f0a3' title='#d9f0a3'>3</td>
+<td style='background: #addd8e' title='#addd8e'>4</td>
+<td style='background: #78c679' title='#78c679'>5</td>
+<td class="w" style='background: #41ab5d' title='#41ab5d'>6</td>
+<td class="w" style='background: #238443' title='#238443'>7</td>
+<td class="w" style='background: #006837' title='#006837'>8</td>
+<td class="w" style='background: #004529' title='#004529'>9</td>
+</table>
+<b>ylgnbu3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #edf8b1' title='#edf8b1'>1</td>
+<td style='background: #7fcdbb' title='#7fcdbb'>2</td>
+<td style='background: #2c7fb8' title='#2c7fb8'>3</td>
+</table>
+<b>ylgnbu4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #a1dab4' title='#a1dab4'>2</td>
+<td style='background: #41b6c4' title='#41b6c4'>3</td>
+<td class="w" style='background: #225ea8' title='#225ea8'>4</td>
+</table>
+<b>ylgnbu5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #a1dab4' title='#a1dab4'>2</td>
+<td style='background: #41b6c4' title='#41b6c4'>3</td>
+<td style='background: #2c7fb8' title='#2c7fb8'>4</td>
+<td class="w" style='background: #253494' title='#253494'>5</td>
+</table>
+<b>ylgnbu6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #c7e9b4' title='#c7e9b4'>2</td>
+<td style='background: #7fcdbb' title='#7fcdbb'>3</td>
+<td style='background: #41b6c4' title='#41b6c4'>4</td>
+<td style='background: #2c7fb8' title='#2c7fb8'>5</td>
+<td class="w" style='background: #253494' title='#253494'>6</td>
+</table>
+<b>ylgnbu7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #c7e9b4' title='#c7e9b4'>2</td>
+<td style='background: #7fcdbb' title='#7fcdbb'>3</td>
+<td style='background: #41b6c4' title='#41b6c4'>4</td>
+<td style='background: #1d91c0' title='#1d91c0'>5</td>
+<td class="w" style='background: #225ea8' title='#225ea8'>6</td>
+<td class="w" style='background: #0c2c84' title='#0c2c84'>7</td>
+</table>
+<b>ylgnbu8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffd9' title='#ffffd9'>1</td>
+<td style='background: #edf8b1' title='#edf8b1'>2</td>
+<td style='background: #c7e9b4' title='#c7e9b4'>3</td>
+<td style='background: #7fcdbb' title='#7fcdbb'>4</td>
+<td style='background: #41b6c4' title='#41b6c4'>5</td>
+<td style='background: #1d91c0' title='#1d91c0'>6</td>
+<td class="w" style='background: #225ea8' title='#225ea8'>7</td>
+<td class="w" style='background: #0c2c84' title='#0c2c84'>8</td>
+</table>
+<b>ylgnbu9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffd9' title='#ffffd9'>1</td>
+<td style='background: #edf8b1' title='#edf8b1'>2</td>
+<td style='background: #c7e9b4' title='#c7e9b4'>3</td>
+<td style='background: #7fcdbb' title='#7fcdbb'>4</td>
+<td style='background: #41b6c4' title='#41b6c4'>5</td>
+<td style='background: #1d91c0' title='#1d91c0'>6</td>
+<td class="w" style='background: #225ea8' title='#225ea8'>7</td>
+<td class="w" style='background: #253494' title='#253494'>8</td>
+<td class="w" style='background: #081d58' title='#081d58'>9</td>
+</table>
+<b>ylorbr3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #fff7bc' title='#fff7bc'>1</td>
+<td style='background: #fec44f' title='#fec44f'>2</td>
+<td style='background: #d95f0e' title='#d95f0e'>3</td>
+</table>
+<b>ylorbr4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffd4' title='#ffffd4'>1</td>
+<td style='background: #fed98e' title='#fed98e'>2</td>
+<td style='background: #fe9929' title='#fe9929'>3</td>
+<td style='background: #cc4c02' title='#cc4c02'>4</td>
+</table>
+<b>ylorbr5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffd4' title='#ffffd4'>1</td>
+<td style='background: #fed98e' title='#fed98e'>2</td>
+<td style='background: #fe9929' title='#fe9929'>3</td>
+<td style='background: #d95f0e' title='#d95f0e'>4</td>
+<td class="w" style='background: #993404' title='#993404'>5</td>
+</table>
+<b>ylorbr6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffd4' title='#ffffd4'>1</td>
+<td style='background: #fee391' title='#fee391'>2</td>
+<td style='background: #fec44f' title='#fec44f'>3</td>
+<td style='background: #fe9929' title='#fe9929'>4</td>
+<td style='background: #d95f0e' title='#d95f0e'>5</td>
+<td class="w" style='background: #993404' title='#993404'>6</td>
+</table>
+<b>ylorbr7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffd4' title='#ffffd4'>1</td>
+<td style='background: #fee391' title='#fee391'>2</td>
+<td style='background: #fec44f' title='#fec44f'>3</td>
+<td style='background: #fe9929' title='#fe9929'>4</td>
+<td style='background: #ec7014' title='#ec7014'>5</td>
+<td style='background: #cc4c02' title='#cc4c02'>6</td>
+<td class="w" style='background: #8c2d04' title='#8c2d04'>7</td>
+</table>
+<b>ylorbr8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffe5' title='#ffffe5'>1</td>
+<td style='background: #fff7bc' title='#fff7bc'>2</td>
+<td style='background: #fee391' title='#fee391'>3</td>
+<td style='background: #fec44f' title='#fec44f'>4</td>
+<td style='background: #fe9929' title='#fe9929'>5</td>
+<td style='background: #ec7014' title='#ec7014'>6</td>
+<td style='background: #cc4c02' title='#cc4c02'>7</td>
+<td class="w" style='background: #8c2d04' title='#8c2d04'>8</td>
+</table>
+<b>ylorbr9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffe5' title='#ffffe5'>1</td>
+<td style='background: #fff7bc' title='#fff7bc'>2</td>
+<td style='background: #fee391' title='#fee391'>3</td>
+<td style='background: #fec44f' title='#fec44f'>4</td>
+<td style='background: #fe9929' title='#fe9929'>5</td>
+<td style='background: #ec7014' title='#ec7014'>6</td>
+<td style='background: #cc4c02' title='#cc4c02'>7</td>
+<td class="w" style='background: #993404' title='#993404'>8</td>
+<td class="w" style='background: #662506' title='#662506'>9</td>
+</table>
+<b>ylorrd3</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffeda0' title='#ffeda0'>1</td>
+<td style='background: #feb24c' title='#feb24c'>2</td>
+<td style='background: #f03b20' title='#f03b20'>3</td>
+</table>
+<b>ylorrd4</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffb2' title='#ffffb2'>1</td>
+<td style='background: #fecc5c' title='#fecc5c'>2</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>3</td>
+<td style='background: #e31a1c' title='#e31a1c'>4</td>
+</table>
+<b>ylorrd5</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffb2' title='#ffffb2'>1</td>
+<td style='background: #fecc5c' title='#fecc5c'>2</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>3</td>
+<td style='background: #f03b20' title='#f03b20'>4</td>
+<td class="w" style='background: #bd0026' title='#bd0026'>5</td>
+</table>
+<b>ylorrd6</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffb2' title='#ffffb2'>1</td>
+<td style='background: #fed976' title='#fed976'>2</td>
+<td style='background: #feb24c' title='#feb24c'>3</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>4</td>
+<td style='background: #f03b20' title='#f03b20'>5</td>
+<td class="w" style='background: #bd0026' title='#bd0026'>6</td>
+</table>
+<b>ylorrd7</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffb2' title='#ffffb2'>1</td>
+<td style='background: #fed976' title='#fed976'>2</td>
+<td style='background: #feb24c' title='#feb24c'>3</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>4</td>
+<td style='background: #fc4e2a' title='#fc4e2a'>5</td>
+<td style='background: #e31a1c' title='#e31a1c'>6</td>
+<td class="w" style='background: #b10026' title='#b10026'>7</td>
+</table>
+<b>ylorrd8</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #ffeda0' title='#ffeda0'>2</td>
+<td style='background: #fed976' title='#fed976'>3</td>
+<td style='background: #feb24c' title='#feb24c'>4</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>5</td>
+<td style='background: #fc4e2a' title='#fc4e2a'>6</td>
+<td style='background: #e31a1c' title='#e31a1c'>7</td>
+<td class="w" style='background: #b10026' title='#b10026'>8</td>
+</table>
+<b>ylorrd9</b> color scheme:<br>
+<table class='clr'>
+<tr>
+<td style='background: #ffffcc' title='#ffffcc'>1</td>
+<td style='background: #ffeda0' title='#ffeda0'>2</td>
+<td style='background: #fed976' title='#fed976'>3</td>
+<td style='background: #feb24c' title='#feb24c'>4</td>
+<td style='background: #fd8d3c' title='#fd8d3c'>5</td>
+<td style='background: #fc4e2a' title='#fc4e2a'>6</td>
+<td style='background: #e31a1c' title='#e31a1c'>7</td>
+<td class="w" style='background: #bd0026' title='#bd0026'>8</td>
+<td class="w" style='background: #800026' title='#800026'>9</td>
+</table>
+
+
+</div>
+
+<div class="footer">
+Page created automatically at <span class="date">Thu May 22 20:38:56 2008</span> in 0.1922s.
+Contact: <a href="http://bloodgate.com/mail.html">Tels</a>.
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>

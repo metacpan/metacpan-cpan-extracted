@@ -1,0 +1,14 @@
+title		=	General Configuration File
+description	=	Simple configuration file
+[E]dit		=	Goo::TabAwareEditor.pm
+[P]rofile	=	Goo::Thing::conf::ConfigProfiler.pm
+[B]ack		=	Goo::TrailGoBackOne.pm
+[D]elete	=	Goo::FileThing::Deleter.pm
+[C]lone		=	Goo::FileThing::Cloner.pm
+E[X]it		=	Goo::Exiter.pm
+[Z]one      =   Goo::Zone.pm
+
+
+location	= 	/etc/httpd/conf		
+
+

@@ -1,0 +1,15 @@
+Revision history for Games-Go-SGF-Grove
+
+1.01 Tue Jul 29 11:55:12 CEST 2008
+        - fixed a bug with empty simpletext/text properties.
+
+1.0  Mon Jul 28 10:48:56 CEST 2008
+	- write out illegal SGF if the structure tells us to, as the SGF
+          spec requires the ability to write illegal SGF files.
+        - fixed compressed move/stone lists, the rectangle was computed short
+          by one row/col.
+
+0.01 Mon Jul 21 21:25:16 CEST 2008
+        - initial version, created with the horrible Module::Starter,
+          originally taken from kgsueme.
+

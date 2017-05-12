@@ -1,0 +1,4 @@
+TODO list for Perl module GD::Graph::histogram
+
+- Add the ability to draw multiple histogram on the same graph to detect shifts
+- Display a normal curve on the histogram

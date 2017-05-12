@@ -1,0 +1,11 @@
+Changes
+examples/basic.pl
+lib/Getopt/Whatever.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/argv_tests.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:                Gaim-Log-Mailer
+version:             0.02
+abstract:            Have your Gaim/Pidgin logs mailed to you
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Data::Throttler:               0
+    File::Temp:                    0
+    Gaim::Log::Finder:             0
+    Gaim::Log::Parser:             0.1
+    Log::Log4perl:                 1
+    Mail::DWIM:                    0
+    Pod::Usage:                    0
+    Text::TermExtract:             0
+    URI:                           0
+    URI::Find:                     0
+    URI::URL:                      0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <cpan@perlmeister.com>

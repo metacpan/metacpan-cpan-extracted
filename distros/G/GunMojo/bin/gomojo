@@ -1,0 +1,7 @@
+#!/bin/sh
+
+su - gunner -c 'screen -dmS -X plackup /opt/gunner/gun-mojo/script/GunMojo -D -l 127.0.0.1:65533 -E deployment --access-log /opt/gunner/gun-mojo/logs/plackup-access.log'
+su - gunner -c 'screen -dmS -X plackup /opt/gunner/gun-mojo/script/GunMojo -D -l 127.0.0.1:65534 -E development -R /opt/gunner/gun-mojo/lib,/opt/gunner/gun-mojo/script,/opt/gunner/gun-mojo/templates --access-log /opt/gunner/gun-mojo/logs/plackup-access.log'
+
+exit
+

@@ -1,0 +1,59 @@
+TODO:
+    - Test with '--' (huh?)
+    - Implement 'defer' sugar/backing
+
+0.017 Monday December 19 11:54:40 PST 2011:
+    - Update to be compatible with latest Path::Dispatcher
+    - Use Dist::Zilla
+
+0.016 Friday June 05 09:36:58 PDT 2009:
+    - Removed Test::Trap dependency
+
+0.015 Thursday June 04 19:33:25 PDT 2009:
+    - Made remainder warning optional on debug (via GOC_TRACE=1)
+
+0.014 Wednesday June 03 17:38:25 PDT 2009:
+    - Fixed some documentation
+    - Discard unknown, option-like arguments, instead of croaking
+
+0.013_1 Monday June 01 23:14:32 PDT 2009:
+    - Allow configuring of the context class
+    - Added Declare::under functionality
+    - Re-implemented the declarator to use a builder replay
+    
+0.013 Saturday May 16 00:40:06 PDT 2009:
+    - Took erroring XXX out of .t
+
+0.012 Friday May 15 19:45:34 PDT 2009:
+    - More saner path handling (* globbing at end)
+
+0.011 Thursday May 14 20:22:44 PDT 2009:
+    - Hash::Param dependency in Makefile.PL
+
+0.010 Tuesday May 12 14:32:10 PDT 2009:
+    - Big change: legacy-ized v005, using Path::Dispatcher to do the fun stuff
+    - Can use ::Declare to do nice stuff
+
+0.005 Thursday September 04 10:58:08 PDT 2008:
+    - Properly pass through remaining arguments
+
+0.004 Saturday August 16 20:02:09 PDT 2008:
+    - Using Test::Trap for exit error code checking
+
+0.003 Saturday August 16 15:07:24 PDT 2008: 
+    - Minor documentation fix
+
+0.002 Saturday August 16 2008:
+    - Inclusion of abort functionality
+    - Better documentation coverage
+    - Integrated Hash::Param
+    - First non-development release
+    
+0.001_3 Saturday August 09 10:09:44 PDT 2008:
+    - Update to work with the latest Moose (reader ... instead of is ...)
+
+0.001_2 Friday August 08 16:09:53 PDT 2008:
+    - Added SOURCE information
+
+0.001_1 Friday August 08 2008:
+    - Initial release

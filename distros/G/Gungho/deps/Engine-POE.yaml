@@ -1,0 +1,9 @@
+---
+name: 'POE Engine'
+default: 1
+depends:
+    'POE': 0.9999
+    'POE::Component::Client::DNS': 0
+    'POE::Component::Client::Keepalive': 0
+    'POE::Component::Client::HTTP': 0.81
+

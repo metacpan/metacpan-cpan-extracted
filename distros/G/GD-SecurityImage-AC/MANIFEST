@@ -1,0 +1,16 @@
+examples/example-captcha.cgi
+lib/GD/SecurityImage/AC.pm
+lib/GD/SecurityImage/AC.pod
+t/1-pod.t
+t/2-pod-coverage.t
+t/3-simple.t
+t/4-taint.t
+t/skip.test
+Artistic_License.txt
+Changes
+Makefile.PL
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+README
+META.yml

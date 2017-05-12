@@ -1,0 +1,81 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Manuall::Install.ja - インストール
+
+=head1 SYNOPSIS
+
+  cpan> install Gungho
+
+=head1 DESCRIPTION
+
+Gunghoのインストール方法を説明します。
+
+=head1 推奨環境
+
+=over 4
+
+=item perl
+
+perl 5.8以降を推奨します。5.6系でのテストは行っておりません。
+
+=item OS
+
+FreeBSD, Mac OSX, Fedora ES4でのテストを行っております。Windowsでは依存関係で
+ある一部のモジュールが動作しない可能性があります。
+
+=back
+
+=head1 CPANからのインストール
+
+もっとも簡単な方法はCPANシェルからのインストールとなります。
+
+perl をインストール済みのマシンでインターネットに接続されているか確認した上、
+
+  shell> cpan
+
+か
+
+  shell> perl -eshell -MCPAN
+
+でCPANシェルを起動させてください。CPANシェルで"install Gungho"とタイプすれば
+自動的にインストールが始まります。
+
+  cpan> install Gungho
+
+=head1 ソースからのインストール
+
+最新ソースはCPANにアップロードされています。
+
+  http://search.cpan.org/dist/Gungho
+
+もしくはGoogle Codeのsubversionレポジトリから入手できます
+
+  http://gungho-crawler.googlecode.com/svn/trunk/Gungho
+
+ソースコードを展開した後、
+
+  shell> perl Makefile.PL
+  shell> make
+  shell> make test
+  shell> make install 
+
+と打ってインストールしてください。
+
+=head1 依存関係
+
+Gunghoは様々なモジュール類を使って構成されているため、CPANにアップされている
+モジュールへの依存関係が多数あります。これらのモジュールはGunghoのインストール中
+に必要かどうかの確認が画面に表示されます。例えばPOEエンジンを使うのであれば
+POE関連のモジュールをインストールするかという質問には"y"で答えてください。
+
+  出力例：
+  [POE Engine]
+  - POE::Component::Client::Keepalive ...missing
+  - POE::Component::Client::DNS       ...missing
+  - POE::Component::Client::HTTP      ...missing
+  - POE                               ...missing
+  ==> Auto-install the 1 optional module(s) from CPAN? [y] 
+
+=cut

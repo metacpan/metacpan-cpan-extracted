@@ -1,0 +1,5 @@
+>=sys-apps/portage-2.0.50
+	>=dev-lang/python-2.0
+	>=dev-util/dialog-0.7
+	>=dev-lang/perl-5.6
+	>=sys-apps/grep-2.5-r1 

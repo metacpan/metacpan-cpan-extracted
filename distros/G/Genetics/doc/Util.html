@@ -1,0 +1,113 @@
+<HTML>
+<HEAD>
+<TITLE>Util.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<UL>
+
+		<LI><A HREF="#now">now</A></LI>
+		<LI><A HREF="#browse">browse</A></LI>
+		<LI><A HREF="#structure2str">structure2Str</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+  SLM::Lib</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  Not really appropriate.  See individual functions.</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+  A collection of GenPerl utility functions.</PRE>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<H2><A NAME="now">now</A></H2>
+<PRE>
+ Function  : Generate a text representation of the current date/time
+ Arguments : Hash
+ Returns   : Scalar text string
+ Example   : print LOG now(format =&gt; 'fancy')
+ Scope     : Public
+ Comments  : Formats: raw       : comma-delimited output from localtime(time)
+                      simple    : &quot;1965-11-14 12:45:44&quot;
+                      dayonly   : &quot;14 November 1965&quot;
+                      fancy     : &quot;Friday November 14, 1965 12:45:44&quot;
+                      mysqldate : &quot;1965-11-14&quot;</PRE>
+<P>
+<H2><A NAME="browse">browse</A></H2>
+<PRE>
+ Function  : A simple de-referencing browser for perl data structures
+ Arguments : Scalar
+ Returns   : N/A
+ Example   : browse()
+ Scope     : Public
+ Comments  : See also structure2Str()</PRE>
+<P>
+<H2><A NAME="structure2str">structure2Str</A></H2>
+<PRE>
+ Function  : Convert a pointer to a complex perl data structure into a string 
+             for printing.
+ Arguments : Scalar
+ Returns   : N/A
+ Example   : browse()
+ Scope     : Private Class Method
+ Comments  : Recurses if nested pointers exist in the data structure.</PRE>
+
+</BODY>
+
+</HTML>

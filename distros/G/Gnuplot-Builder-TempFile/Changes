@@ -1,0 +1,17 @@
+Revision history for Gnuplot-Builder-TempFile
+
+0.03    2014-08-17
+        - No changes to the code.
+        [PACKAGING]
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.02    2014-03-09
+        - No changes to the code.
+        [DOCUMENTATION]
+        - Makes clear that it discards output from the real gnuplot process.
+          This is a major downside of using TempFile wrapper. You cannot
+          diagnose your script if something is wrong with it.
+
+0.01    2014-03-02
+        First version, released on an unsuspecting world.
+

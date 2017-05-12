@@ -1,0 +1,17 @@
+Revision history for Perl extension GD::SecurityImage::AC.
+
+1.11 Sun May 02 07:29:00 2008
+        => Seperated POD into .pod file
+        => Fixed taint compatibility and added documentation note on it
+        => Fixed locking
+        => Removed pointless AUTOLOAD (and consequent DESTROY) subs
+        => Replaced use of 'base' module with direct setting of @Authen::Captcha::ISA 
+        => Added build test for taint compatibility
+        => Benjamin Franz took over as maintainer
+
+1.10 Sun Feb 19 23:33:56 2006
+	=> First release after separation from GD::SecurityImage 
+	   distribution.
+	=> Fixed a bug in setting attributes in new() and AUTOLOAD().
+	=> (Hopefully) fixed a bug related to unlink()ing images.
+	   Reported by GribUser.

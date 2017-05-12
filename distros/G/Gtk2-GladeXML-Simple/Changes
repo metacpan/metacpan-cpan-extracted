@@ -1,0 +1,30 @@
+Revision history for Perl extension Gtk2::GladeXML::Simple.
+
+0.032 Sat Jul 23 01:16:49 CDT 2005
+      - Added gpsketcher V0.4
+
+0.031 Thu Jul 21 02:03:12 2005
+      - gpsketcher is now installed with the module, under perl's binary directory
+      - Added _peek() to gpsketcher, this methods examines the last value in the stack.
+      - Examples updated to the latest module API
+      - Added _get_widgets() private method
+      - fixed get_wigets() method
+      - gpsketcher version 0.3, fixes some creation functions issues when generating code
+
+0.03  Mon Jul 18 10:35:40 CDT 2005
+      - More POD fixes
+      - Added get_widgets() method
+      - run() method is now part of the module
+      - Added gpsketcher, a simple glade-perl code sketcher
+
+0.022 Wed Jun 22 12:48:12 CDT 2005
+      - Fixed POD errors and added some comments to the code.
+
+0.02  Mon Jun 20 02:20:24 CDT 2005
+      - Replaced signal_autoconnect_from_package with a custom autoconnect helper method and
+        g_signal_connect()/g_signal_connect_after() from glib's API.
+      - No longer use for AUTOLOAD.
+
+0.01  Mon Jun 13 01:32:12 CDT 2005
+      Gtk2::Glade::XML was born.
+

@@ -1,0 +1,84 @@
+# Below is stub documentation for your module. You'd better edit it!
+
+=head1 NAME
+
+Gfsm::Semiring - object-oriented interface to libgfsm semiring structures.
+
+=head1 SYNOPSIS
+
+ use Gfsm;
+
+ ##------------------------------------------------------------
+ ## Constructors, etc.
+ $sr  = Gfsm::Semiring->new();
+ $sr2 = $sr->copy();
+
+ ##------------------------------------------------------------
+ ## Properties
+ $typ = $sr->type(); ##-- numeric type
+ $nam = $sr->name(); ##-- symbolic name of type
+ 
+ $zero = $sr->zero();
+ $one  = $sr->one();
+
+ ##------------------------------------------------------------
+ ## Predicates & Comparison
+ $bool = $sr->equal($w1,$w2);
+ $bool = $sr->less($w1,$w2);
+ $val  = $sr->compare($w1,$w2);
+
+ ##------------------------------------------------------------
+ ## Semiring Operations
+ $w = $sr->plus($w1,$w2);
+ $w = $sr->times($w1,$w2);
+
+ ##--------------------------------------------------------------
+ ## Utilities
+ $w = Gfsm::gfsm_log_add($w1,$w2);  ##-- stable log-addition
+
+=head1 DESCRIPTION
+
+Gfsm::Semiring provides an object-oriented interface to the semiring
+types built into the libgfsm library.
+
+=cut
+
+########################################################################
+## FOOTER
+########################################################################
+
+=pod
+
+=head1 BUGS AND LIMITATIONS
+
+=over 4
+
+=item
+
+No support for user-defined semirings.
+
+=item
+
+No support for direct reference from perl of semirings embedded
+in (gfsmAutomaton*)s.
+
+=back
+
+=head1 SEE ALSO
+
+Gfsm(3perl),
+gfsmutils(1).
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by Bryan Jurish
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

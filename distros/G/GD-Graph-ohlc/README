@@ -1,0 +1,21 @@
+
+I sent ohlc.pm to Benjamin Warfield (cpan/~bwarfield) as a patch
+about a year ago.  He later told me that he gets millions of
+patches, some that work, some that don't and that he doesn't
+really have time to apply them all.  This is understandable.  He
+also told me that making sure GD::Graph is stable on all 16,000
+platforms is his number one goal.  Admirable.
+
+He then pointed out that I didn't really need to wait on him... I
+could just release a sub-module.  I don't know why that didn't
+occur to me in the first place.  Doi.
+
+Anyway, what is an OHLC graph?  Let the example speak for itself:
+
+    https://voltar.org/PerlModules/ohlc_example.png
+
+    (This is a mixed.pm graph.  The lines with ticks are the
+    ohlc chart.  The ticks show the opening and closing
+    prices of MSFT.  The line itself shows the high and
+    low for the period.)
+

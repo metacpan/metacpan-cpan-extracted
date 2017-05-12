@@ -1,0 +1,10 @@
+lib/Games/Chess.pm
+lib/Games/Chess.pod
+lib/Games/Chess/PGN.pod
+MANIFEST
+Makefile.PL
+README
+t/01chess.t
+t/02piece.t
+t/03position.t
+t/04gifs.t

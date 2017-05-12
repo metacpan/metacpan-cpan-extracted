@@ -1,0 +1,78 @@
+(name => 'coderef (anon)',
+ code => '$a02 = sub { shift}; 
+          GraphViz::Data::Structure->new($a02,%title%)->graph->as_canon',
+)
+%%
+(name => 'coderef (named)',
+ code => '$a02 = \&get_current; 
+          GraphViz::Data::Structure->new($a02,%title%)->graph->as_canon',
+)
+%%
+(name => 'undef',
+ code => 'GraphViz::Data::Structure->new(undef,%title%)->graph->as_canon',
+)
+%%
+(name => 'atom',
+ code => 'GraphViz::Data::Structure->new(1,%title%)->graph->as_canon',
+)
+%%
+(name => 'scalar',
+ code => '$a02 = 1; 
+          GraphViz::Data::Structure->new($a02,%title%)->graph->as_canon',
+)
+%%
+(name => 'undef ref',
+ code => '$a02 = undef; 
+          GraphViz::Data::Structure->new(\$a02,%title%)->graph->as_canon',
+)
+%%
+(name => 'glob',
+ code => '$a02 = *Foo; 
+          GraphViz::Data::Structure->new(\$a02,%title%)->graph->as_canon',
+)
+%%
+(name => 'regexp-textual',
+ code => '$a02 = qr/foo/; 
+          GraphViz::Data::Structure->new($a02,%title%)->graph->as_canon',
+)
+%%
+(name => 'regexp-flagged',
+ code => '$a02 = qr/foo/mixs; 
+          GraphViz::Data::Structure->new($a02,%title%)->graph->as_canon',
+)
+%%
+(name => 'empty array',
+ code => 'GraphViz::Data::Structure->new([],%title%)->graph->as_canon',
+)
+%%
+(name => 'empty hash',
+ code => 'GraphViz::Data::Structure->new({},%title%)->graph->as_canon',
+)
+%%
+(name => 'one-element array',
+ code => 'GraphViz::Data::Structure->new([1],%title%)->graph->as_canon',
+)
+%%
+(name => 'three-element array, horizontal',
+ code => 'GraphViz::Data::Structure->new(["sample","something longer",1],%title%)->graph->as_canon',
+)
+%%
+(name => 'three-element array, vertical',
+ code => 'GraphViz::Data::Structure->new(["sample","something longer",1],Orientation=>"vertical",%title%)->graph->as_canon',
+)
+%%
+(name => 'one-element hash, horizontal',
+ code => 'GraphViz::Data::Structure->new({"first"=>"one"},%title%)->graph->as_canon',
+)
+%%
+(name => 'one-element hash, vertical',
+ code => 'GraphViz::Data::Structure->new({"first"=>"one"},Orientation=>"vertical",%title%)->graph->as_canon',
+)
+%%
+(name => 'three-element hash, horizontal',
+ code => 'GraphViz::Data::Structure->new({Alpha=>"sample",Beta=>"a longer string",Gamma=>1},%title%)->graph->as_canon',
+)
+%%
+(name => 'three-element hash, vertical',
+ code => 'GraphViz::Data::Structure->new({Alpha=>"sample",Beta=>"a longer string",Gamma=>1},Orientation=>"vertical",%title%)->graph->as_canon',
+)

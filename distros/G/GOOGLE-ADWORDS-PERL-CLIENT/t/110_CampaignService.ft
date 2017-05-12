@@ -1,0 +1,202 @@
+#!/usr/bin/perl
+#
+# Copyright 2011, Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Functional test for the CampaignService.
+#
+# Author: David Torres <api.davidtorres@gmail.com>
+
+use strict;
+use lib qw(t/util);
+
+use Test::More (tests => 26);
+use TestClientUtils qw(get_test_client);
+use TestAPIUtils qw(get_api_package);
+use Data::Uniqid qw(uniqid);
+
+# Getting API client for functional tests.
+my $client = get_test_client();
+if (!$client) {
+  plan skip_all => "Can't create test client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+# Test can use CampaignService related classes.
+use_ok(get_api_package($client, "Budget"));
+use_ok(get_api_package($client, "BudgetOperation"));
+use_ok(get_api_package($client, "Campaign"));
+use_ok(get_api_package($client, "CampaignOperation"));
+use_ok(get_api_package($client, "CampaignReturnValue"));
+use_ok(get_api_package($client, "Predicate"));
+use_ok(get_api_package($client, "Selector"));
+use_ok(get_api_package($client, "Money"));
+use_ok(get_api_package($client, "KeywordMatchSetting"));
+
+# Create a budget, which can be shared by multiple campaigns.
+my $ budget = get_api_package($client, "Budget")->new({
+  # Required attributes.
+  name => "Test budget #" . uniqid(),
+  amount => get_api_package($client, "Money")->new({
+    microAmount => 5000000
+  }),
+  deliveryMethod => "STANDARD",
+  period => "DAILY"
+});
+
+my $budget_operation = get_api_package($client, "BudgetOperation")->new({
+  operator => "ADD",
+  operand => $budget
+});
+
+# Add budget.
+my $budgetId = $client->BudgetService()->mutate({
+  operations => ($budget_operation)
+})->get_value()->get_budgetId()->get_value();
+
+# Test create campaigns.
+my $campaign_name_1 = "Test Campaign 1 - " . uniqid();
+my $campaign1 = get_api_package($client, "Campaign")->new({
+  name => $campaign_name_1,
+  biddingStrategyConfiguration =>
+      get_api_package($client, "BiddingStrategyConfiguration")->new({
+        biddingStrategyType => "MANUAL_CPC"
+      }),
+  budget => get_api_package($client, "Budget")->new({
+    budgetId => $budgetId
+  }),
+  settings => [
+    get_api_package($client, "KeywordMatchSetting")->new({
+      optIn => 0
+    })],
+  advertisingChannelType => "SEARCH"
+});
+
+my $campaign_name_2 = "Test Campaign 2 - " . uniqid();
+my $campaign2 = get_api_package($client, "Campaign")->new({
+  name => $campaign_name_2,
+  biddingStrategyConfiguration =>
+      get_api_package($client, "BiddingStrategyConfiguration")->new({
+        biddingStrategyType => "MANUAL_CPC"
+      }),
+  budget => get_api_package($client, "Budget")->new({
+    budgetId => $budgetId
+  }),
+  settings => [
+    get_api_package($client, "KeywordMatchSetting")->new({
+      optIn => 0
+    })],
+  advertisingChannelType => "SEARCH"
+});
+
+my $operations = [
+  get_api_package($client, "CampaignOperation")->new({
+    operand => $campaign1,
+    operator => "ADD"
+  }),
+  get_api_package($client, "CampaignOperation")->new({
+    operand => $campaign2,
+    operator => "ADD"
+  })
+];
+
+my $result = $client->CampaignService()->mutate({
+  operations => $operations
+});
+
+isa_ok($result, get_api_package($client, "CampaignReturnValue"));
+my $campaign1_id = $result->get_value()->[0]->get_id();
+my $campaign2_id = $result->get_value()->[1]->get_id();
+ok($campaign1_id, "Campaign 1 id is set");
+ok($campaign2_id, "Campaign 2 id is set");
+
+is($result->get_value()->[0]->get_name(), $campaign_name_1,
+   "Campaign 1 name is correct");
+is($result->get_value()->[1]->get_name(), $campaign_name_2,
+   "Campaign 2 name is correct");
+
+# Test get campaign by id.
+my $predicate = get_api_package($client, "Predicate")->new({
+  field => "Id",
+  operator => "IN",
+  values => [$campaign1_id->get_value(), $campaign2_id->get_value()]
+});
+
+my $selector = get_api_package($client, "Selector")->new({
+  fields => ["Id", "Name"],
+  predicates => [$predicate]
+});
+
+my $page = $client->CampaignService()->get({
+  serviceSelector => $selector
+});
+
+is(scalar(@{$page->get_entries()}), 2, "Size of returned campaigns ok");
+my @temp_campaign_arr =
+    grep($_->get_id() eq $campaign1_id, @{$page->get_entries()});
+is(scalar(@temp_campaign_arr), 1, "Id 1 contained in result");
+$campaign1 = $temp_campaign_arr[0];
+@temp_campaign_arr =
+    grep($_->get_id() eq $campaign2_id, @{$page->get_entries()});
+is(scalar(@temp_campaign_arr), 1, "Id 2 contained in result");
+$campaign2 = $temp_campaign_arr[0];
+is($campaign1->get_name(), $campaign_name_1, "Name 1 contained in result");
+is($campaign2->get_name(), $campaign_name_2, "Name 2 contained in result");
+
+# Test update campaign
+my $new_name = "Test Campaign modified name - " . uniqid();
+my $campaign_to_update = get_api_package($client, "Campaign")->new({
+  id => $campaign1_id,
+  name => $new_name
+});
+
+$result = $client->CampaignService()->mutate({
+  operations => [get_api_package($client, "CampaignOperation")->new({
+    operand => $campaign_to_update,
+    operator => "SET"
+  })]
+});
+
+isa_ok($result, get_api_package($client, "CampaignReturnValue"));
+is(scalar(@{$result->get_value()}), 1, "Updated campaign list size is correct");
+is($result->get_value()->[0]->get_id(), $campaign1_id,
+   "Updated campaign id is correct");
+is($result->get_value()->[0]->get_name, $new_name,
+   "Updated campaign name is correct");
+
+# Test delete campaign
+my $campaign_to_delete1 = get_api_package($client, "Campaign")->new({
+  id => $campaign1_id,
+  status => "DELETED"
+});
+my $campaign_to_delete2 = get_api_package($client, "Campaign")->new({
+  id => $campaign2_id,
+  status => "DELETED"
+});
+
+$result = $client->CampaignService()->mutate({
+  operations => [get_api_package($client, "CampaignOperation")->new({
+    operand => $campaign_to_delete1,
+    operator => "SET"
+  }),get_api_package($client, "CampaignOperation")->new({
+    operand => $campaign_to_delete2,
+    operator => "SET"
+  })]
+});
+
+isa_ok($result, get_api_package($client, "CampaignReturnValue"));
+is(scalar(@{$result->get_value()}), 2, "Deleted campaign list size is correct");
+is(scalar(grep($_->get_status() eq "DELETED", @{$result->get_value()})), 2,
+   "Deleted Campaigns status is correct");

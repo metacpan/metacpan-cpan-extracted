@@ -1,0 +1,5 @@
+---
+name: 'Request Timer Plugin'
+default: 0
+depends:
+    'Time::HiRes': 0

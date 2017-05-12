@@ -1,0 +1,12 @@
+Revision history for Perl module Google::SAML::Request
+
+0.05 2014-08-16T21:29:30Z
+    - This distribution is now Minilla-managed. No code changes
+
+0.02 Thu Jun 5
+	- Added missing dependency URI::Escape to Makefile.PL
+
+0.01 Wed Jun 4
+    - initial release
+
+

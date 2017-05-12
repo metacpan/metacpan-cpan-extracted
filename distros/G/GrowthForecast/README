@@ -1,0 +1,130 @@
+NAME
+    growthforecast.pl - Lightning Fast Graphing/Visualization
+
+SYNOPSIS
+      % growthforecast.pl --data-dir=/path/to/dir
+
+DESCRIPTION
+    GrowthForecast is graphing/visualization web tool built on RRDtool
+
+INSTALL
+    Install dependencies
+        To install growthforecast, these libraries are needed.
+
+        *   glib
+
+        *   xml2
+
+        *   pango
+
+        *   cairo
+
+          (CentOS) $ sudo yum groupinstall "Development Tools"
+                   $ sudo yum install pkgconfig glib2-devel gettext libxml2-devel pango-devel cairo-devel
+  
+          (Ubuntu) $ sudo apt-get build-dep rrdtool
+
+    Install GrowthForecast
+          $ cpanm GrowthForecast
+
+        It's recommended to using perlbrew
+
+OPTIONS
+    --data-dir
+        A directory to store rrddata and metadata
+
+    --port
+        TCP port listen on. Default is 5125
+
+    --host
+        IP address to listen on
+
+    --socket
+        File path to UNIX domain socket to bind. If enabled unix domain
+        socket, GrowthForecast does not bind any TCP port
+
+    --front-proxy
+        IP addresses or CIDR of reverse proxy
+
+    --allow-from
+        IP addresses or CIDR to allow access from. Default is empty (allow
+        access from any remote ip address)
+
+    --disable-1min-metrics
+        don't generate 1min rrddata and graph Default is "1" (enabled)
+
+    --disable-subtract
+        Disable gmode `subtract`. Default is "1" (enabled)
+
+    --enable-float-number
+        Store numbers of graph data as float rather than integer. Default is
+        "0" (disabled)
+
+    --with-mysql
+        DB connection setting to store metadata. format like
+        dbi:mysql:[dbname];hostname=[hostnaem] Default is no mysql setting.
+        GrowthForecast save metadata to SQLite
+
+    --web-max-workers
+        Number of web server processes. Default is 4
+
+    --rrdcached
+        rrdcached address. format is like either of
+
+           unix:</path/to/unix.sock>
+           /<path/to/unix.sock>
+           <hostname-or-ip>
+           [<hostname-or-ip>]:<port>
+           <hostname-or-ipv4>:<port>
+
+        See the manual of rrdcached for more details. Default does not use
+        rrdcached.
+
+    --mount
+        Provide GrowthForecast with specify url path. Default is empty (
+        provide GrowthForecast on root path )
+
+    --time-zone
+        Set the system time zone for GrowthForecast. Default is system
+        timezone.
+
+    -v --version
+        Display version
+
+    -h --help
+        Display help
+
+MYSQL Setting
+    GrowthForecast uses SQLite as metadata by default. And also supports
+    MySQL
+
+    GrowthForecast needs these MySQL privileges.
+
+    *   CREATE
+
+    *   ALTER
+
+    *   DELETE
+
+    *   INSERT
+
+    *   UPDATE
+
+    *   SELECT
+
+    Sample GRANT statement
+
+      mysql> GRANT statement sample> GRANT  CREATE, ALTER, DELETE, INSERT, UPDATE, SELECT \\
+               ON growthforecast.* TO 'www'\@'localhost' IDENTIFIED BY foobar;
+
+    Give USERNAME and PASSWORD to GrowthForecast by environment value
+
+      $ MYSQL_USER=www MYSQL_PASSWORD=foobar growthforecast.pl \\
+          --data-dir /home/user/growthforecast \\
+          -with-mysql dbi:mysql:growthforecast;hostname=localhost
+
+    AUTHOR Masahiro Nagano <kazeburo {at} gmail.com>
+
+    LICENSE This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

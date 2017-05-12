@@ -1,0 +1,17 @@
+title			=	Goo Configuration
+description		=	Meta details about Goo configuration files
+
+# relative directory where .goo configuration files are located
+location		=	things/goo
+
+[M]ake			=	Goo::Thing::goo::Maker.pm
+[P]rofile		=	Goo::Thing::conf::ConfigProfiler.pm
+[J]ump			=	Goo::JumpManager.pm
+[C]lone			=	Goo::FileThing::Cloner.pm
+[D]elete		=	Goo::FileThing::Deleter.pm
+[E]dit			=	Goo::Editor.pm
+[S]hell			=	Goo::ShellCommander.pm
+[Z]one      	=   Goo::Zone.pm
+Care[O]Meter 	= 	Goo::CareOMeter.pm
+Back [L]inks 	= 	Goo::BackLinkManager.pm
+E[X]it			=	Goo::Exiter.pm

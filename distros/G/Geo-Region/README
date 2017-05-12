@@ -1,0 +1,145 @@
+NAME
+
+    Geo::Region - Geographical regions and groupings using UN M.49 and CLDR
+    data
+
+VERSION
+
+    This document describes Geo::Region v0.07, built with Unicode CLDR v27.
+
+SYNOPSIS
+
+        use Geo::Region;
+        use Geo::Region::Constant qw( :all );
+    
+        $amer = Geo::Region->new( AMERICAS );
+        $emea = Geo::Region->new([ EUROPE, WESTERN_ASIA, AFRICA ]);
+        $apac = Geo::Region->new([ ASIA, OCEANIA ], exclude => WESTERN_ASIA );
+    
+        if ( $amer->contains($country) ) {
+            # country is in the Americas (US, MX, BR, etc.)
+        }
+        elsif ( $emea->contains($country) ) {
+            # country is in Europe, the Middle East, and Africa (FR, SA, ZW, etc.)
+        }
+        elsif ( $apac->contains($country) ) {
+            # country is in Asia-Pacific (JP, TH, AU, etc.)
+        }
+
+DESCRIPTION
+
+    This class is used to create geographical regions and groupings of
+    subregions and countries. Default regional groupings are provided using
+    the Unicode CLDR v27 Territory Containment
+    <http://unicode.org/cldr/charts/27/supplemental/territory_containment_u
+    n_m_49.html> data, which is an extension of the United Nations UN M.49
+    (Rev.3) <http://unstats.un.org/unsd/methods/m49/m49regin.htm> standard.
+
+ Regions
+
+    Regions and subregions are represented with UN M.49 region codes, such
+    as 419 for Latin America and 035 for Southeast Asia. Either the
+    official format using a three-digit 0-padded string like '035' or an
+    integer like 35 may be used with this class. Note when using the
+    0-padded format that it must be quoted as a string so as not to be
+    treated as on octal literal. The CLDR also adds two additional
+    two-letter region codes which are supported: EU for the European Union
+    and QO for Outlying Oceania. These region codes are all available as
+    constants in Geo::Region::Constant.
+
+ Countries
+
+    Countries and territories are represented with ISO 3166-1 alpha-2
+    country codes, such as JP for Japan and AQ for Antarctica, and are case
+    insensitive. Unlike with region codes, the three-digit forms of country
+    codes are not currently supported, nor are three-letter codes. The
+    deprecated code UK for the United Kingdom is supported as an alias of
+    the official code GB.
+
+ Constructor
+
+    The new class method is used to construct a Geo::Region object along
+    with the include argument and optional exclude argument.
+
+    include
+
+      Accepts either a single region code or an array reference of region
+      or country codes to be included in the resulting custom region. When
+      passed to the new constructor as the first or only argument, the
+      value may be given without the include key.
+
+          # countries in the European Union (EU)
+          Geo::Region->new( include => EUROPEAN_UNION )
+          Geo::Region->new( EUROPEAN_UNION )
+      
+          # countries in Asia (142) plus Russia (RU)
+          Geo::Region->new( include => [ ASIA, RUSSIA ])
+          Geo::Region->new([ ASIA, RUSSIA ])
+
+    exclude
+
+      Accepts values in the same format as include. This can be used to
+      exclude countries or subregions from a region.
+
+          # countries in Europe (150) which are not in the European Union (EU)
+          Geo::Region->new( include => EUROPE, exclude => EUROPEAN_UNION )
+          Geo::Region->new( EUROPE, exclude => EUROPEAN_UNION )
+
+ Methods
+
+    contains
+
+      Given a country or region code, determines if the region represented
+      by the Geo::Region instance contains it.
+
+          if ( $region->contains($country) ) {
+
+    is_within
+
+      Given a region code, determines if all the countries and regions
+      represented by the Geo::Region instance are within it.
+
+          if ( $subregion->is_within($region) ) {
+
+    countries
+
+      Returns a list of country codes of the countries within the region
+      represented by the Geo::Region instance.
+
+          for ( $region->countries ) {
+
+SEE ALSO
+
+      * Geo::Region::Constant — Constants for UN M.49 and CLDR region codes
+
+      * Unicode CLDR: UN M.49 Territory Containment
+      <http://unicode.org/cldr/charts/27/supplemental/territory_containment
+      _un_m_49.html>
+
+      * United Nations: UN M.49 Standard Country, Area, & Region Codes
+      <http://unstats.un.org/unsd/methods/m49/m49regin.htm>
+
+      * Locale::CLDR: Territory Containment
+
+      * Geo::Region <https://github.com/patch/geo-region-pm6> for Perl 6
+
+AUTHOR
+
+    Nick Patch <patch@cpan.org>
+
+    This project is brought to you by Perl CLDR
+    <http://perl-cldr.github.io/> and Shutterstock
+    <http://www.shutterstock.com/>. Additional open source projects from
+    Shutterstock can be found at code.shutterstock.com
+    <http://code.shutterstock.com/>.
+
+COPYRIGHT AND LICENSE
+
+    © 2014–2015 Shutterstock, Inc.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Unicode is a registered trademark of Unicode, Inc., in the United
+    States and other countries.
+

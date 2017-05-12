@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Games-Hack-Patch-i686.t
+lib/Games/Hack/Patch/i686.pm
+GPL-3
+META.yml                                 Module meta-data (added by MakeMaker)

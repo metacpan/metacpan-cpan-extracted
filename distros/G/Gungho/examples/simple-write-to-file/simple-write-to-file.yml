@@ -1,0 +1,13 @@
+---
+debug: 1
+provider:
+    module: Simple
+    config:
+        url:
+            - "http://search.cpan.org"
+            - "http://www.perl.org"
+handler:
+    module: FileWriter::Simple
+    config:
+        dir: examples/simple-write-to-file
+

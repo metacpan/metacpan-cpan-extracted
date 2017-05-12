@@ -1,0 +1,28 @@
+---
+abstract: 'graph data structures and algorithms, just faster.'
+author:
+  - 'Lars Stoltenow <penma.cpan@penma.de>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Graph-Fast
+provides:
+  Graph::Fast:
+    file: lib/Graph/Fast.pm
+    version: 0.02
+  Graph::Fast::GraphPM:
+    file: lib/Graph/Fast/GraphPM.pm
+  Graph::Fast_LPQ::GraphPM:
+    file: lib/Graph/Fast/GraphPM.pm
+recommends:
+  List::PriorityQueue: 0
+requires:
+  Hash::PriorityQueue: 0
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,297 @@
+$name   = 'Pikeman';
+$author = 'Bestian Tang';
+$team   = 'Solanian Knight';
+
+$a = $b = $go = 0;
+
+sub ambush {
+    disable shield if &nearst('enemy') < 5 and $fuel >= 500;
+    enable shield if &nearst('enemy') > 4;
+    call turn;
+    call strike;
+    call pike;
+    if (&nearst('enemy') >= 5) {
+        scan front;
+        if (&found('enemy')) {
+            call strike;
+        }
+        elsif (&found('friend')) {
+            turn right;
+            call move;
+            turn left;
+        }
+        elsif (&found('flag|vault') and &nearst('enemy') > 8) {
+            if ($life == $max_life and &found('flag')) {
+                move backward;
+                fire energy;
+            }
+            call cuthead;
+        }
+        elsif (&found('fence') and $ammo > 10) {
+            disable shield;
+            fire laser;
+            enable shield;
+        }
+    }
+
+    if ($b == 5) {
+        if ($fuel >= 500 and $ammo >= 5 and &nearst('enemy') > 3 or &nearst('friend') <= 4) {
+            call move;
+        }
+        elsif ($fuel >= 500 or $life <= $max_life - 2) {
+            call moveb;
+        }
+
+    $b = 0;
+    }
+
+    $b ++;
+    redo;
+
+}
+
+sub pike {
+    if (&nearst('enemy') > 8 and $life < $max_life) {
+        disable shield;
+        attempt repair * 3;
+        enable shield;
+    }
+
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+    $foe = $enemy_l;
+    attempt destruct if (&inperim('enemy') and $life <= int($enemy_l/2));
+    fire energy if (&inperim('enemy') and $life > 1);
+    if ($enemy_l != $foe - 2) {
+        enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+        disable cloak if &nearst('enemy') > 2;
+        scan perimeter;
+        if (&found('enemy')) {
+            enable cloak;
+            fire energy * 2;
+            redo;
+        }
+        elsif (&found('flag|vault') and &nearst('enemy') > 4) {
+            call catch;
+        }
+        elsif (&found('mine') and $life > 1) {
+            fire energy;
+        }
+        elsif (&found('friend')) {
+            if (int(rand(2))) {
+                call move;
+            }
+            else {
+                call moveb;
+            }
+        }
+        return;
+    }
+
+    redo;
+}
+
+sub turn {
+    call pike if &inperim('enemy');
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+    }
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+    return;
+}
+
+sub strike {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if &inperim('enemy') {
+        call pike;
+        return;
+    }
+
+    elsif (&nearst('enemy') <= 3 and $ammo >= 5 and $fuel >= 300) {
+        disable shield;
+        fire grenade 2;
+        call move;
+        call pike if &nearst('enemy') > 6;
+        call move;
+        call pike if &nearst('enemy') > 6;
+    }
+
+    elsif (($enemy_x == $x or $enemy_y == $y) and $enemy_h + $h == 10) {
+        if (&nearst('enemy') <= 5 and $ammo >= 5 and $fuel >= 300) {
+            disable shield;
+            fire grenade 5;
+        }
+        elsif (&nearst('enemy') <= 5 and $ammo >= 2) {
+            enable laymine;
+            move backward;
+            disable laymine;
+            move backward;
+        }
+        turn right;
+        call move;
+        goto ambush;
+        }
+    }
+    elsif (($enemy_x == $x or $enemy_y == $y) and $enemy_h - $h == 0 and &nearst('enemy') <= 5 and $ammo >= 5 and $fuel >= 300) {
+        disable shield;
+        if ($ammo >= 15) {
+            fire bazooka;
+        }
+        else {
+            fire grenade;
+        }
+    }
+    if ((abs($xx) <= 1 or abs($yy) <= 1) and &nearst('enemy') <= 3) {
+        call charge;
+    }
+
+    return;
+}
+
+sub cuthead {
+    $lastammo = $ammo;
+    $lastlife = $life;
+    call move;
+
+    if (&bumped('enemy')) {
+        if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+            call pike;
+        }
+        else {
+            disable shield;
+            fire laser * 5;
+            enable shield;
+        }
+    }
+
+    return if &bumped();
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+    return if &nearst('enemy') < 8;
+    redo;
+}
+
+sub catch {
+    $a ++;
+    $lastammo = $ammo;
+    $lastlife = $life;
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+
+    call pike if &inperim('enemy');
+    scan relative 8;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            call moveb;
+            fire energy;
+            call move;
+        }
+        call move;
+    }
+    call pike if &inperim('enemy');
+    return if &nearst('enemy') < 8;
+    scan relative 9;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            call moveb;
+            fire energy;
+            call move;
+        }
+        call move;
+        turn right;
+        call move;
+    }
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+    return if &nearst('enemy') < 8;
+    if ($a > 4) {
+        $a = 0;
+        return;
+    }
+
+    turn right;
+    redo;
+}
+
+sub move {
+    call pike if &inperim('enemy');
+    enable cloak if &nearst('enemy') < 4 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 3;
+    move forward;
+    if (&bumped('enemy')) {
+        if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+            call pike;
+        }
+        else {
+            disable shield;
+            fire laser * 5;
+            enable shield;
+        }
+    }
+    call pike if &inperim('enemy');
+    elsif (&bumped()) {
+        turn right;
+        call moveb;
+    }
+
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+    return;
+}
+
+sub moveb {
+    move backward;
+    call pike if &inperim('enemy');
+    enable cloak if &nearst('enemy') < 4 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 3;
+    if (&bumped('enemy')) {
+        call pike;
+    }
+
+    elsif (&bumped()) {
+        turn right;
+        call move;
+    }
+
+    return;
+}
+
+sub charge {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    call turn;
+    call move;
+    return if (&nearst('enemy') >= 6 or abs($xx) > 1 and abs($yy) >1);
+    redo;
+}

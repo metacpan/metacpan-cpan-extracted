@@ -1,0 +1,29 @@
+GD/Chart version 0.04
+=====================
+
+No documentation at present, see examples/ for some help. POD documentation
+real soon now...
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+You need libgd installed, you will be prompted by the makefile as to how
+it was built.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Richard D. Palmer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+(See gdchart/README for its license details)
+

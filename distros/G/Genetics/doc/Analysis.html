@@ -1,0 +1,186 @@
+<HTML>
+<HEAD>
+<TITLE>Analysis.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#inheritance">Inheritance</A></LI>
+	<LI><A HREF="#public methods">Public Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#chisquareassoctest">chiSquareAssocTest</A></LI>
+		<LI><A HREF="#graphallelefreqs">graphAlleleFreqs</A></LI>
+		<LI><A HREF="#calculatehet">calculateHet</A></LI>
+		<LI><A HREF="#calculatesnphw">calculateSnpHW</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::API::Analysis</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  # The following code will produce a graph of allele frequencies in two 
+  # different Subject Clusters</PRE>
+<PRE>
+  $affCluster = $api-&gt;getObject({TYPE =&gt; &quot;Cluster&quot;, NAME =&gt; &quot;HT Affecteds&quot;}) ;
+  $unaffCluster = $api-&gt;getObject({TYPE =&gt; &quot;Cluster&quot;, NAME =&gt; &quot;Normals&quot;}) ;</PRE>
+<PRE>
+  $marker = $api-&gt;getObject({TYPE =&gt; &quot;Marker&quot;, NAME =&gt; &quot;agtT174M&quot;}) ;</PRE>
+<PRE>
+  $api-&gt;graphAlleleFreqs(
+                         MARKER =&gt; $marker, 
+                         FREQSOURCES =&gt; [ $affCluster, $unaffCluster ],
+                         ALLELETYPE =&gt; &quot;Nucleotide&quot;
+                        ) ;</PRE>
+<PRE>
+  # The following code will perform a chi-square test on this same data</PRE>
+<PRE>
+  $api-&gt;chiSquareAssocTest(
+                           MARKER =&gt; $marker, 
+                           SC1 =&gt; $affCluster,
+                           SC2 =&gt; $unaffCluster,
+                           ALLELETYPE =&gt; &quot;Nucleotide&quot;, 
+                          ) ;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This package contains methods for the analysis of data contained in GenPerl
+objects.  Also see Genetics::API::Analysis::Linkage for methods relating to
+genetic linkage analyses.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+ strict             Just to be anal
+ vars               Global variables
+ Carp               Error reporting
+ GD::Graph::bars    Graphing allele frequencies
+ GD::Graph::colour  Graphing allele frequencies
+ GD::Graph::Data    Graphing allele frequencies</PRE>
+<P>
+<HR>
+<H1><A NAME="inheritance">Inheritance</A></H1>
+<PRE>
+ Exporter           Make methods available to importing packages</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public Methods</A></H1>
+<P>sub test {
+  <CODE>my($self)</CODE> = @_ ;
+  my($sth, $aoaRef) ;
+  my $dbh = $self-&gt;{dbh} ;</P>
+<PRE>
+  $sth = $dbh-&gt;prepare( &quot;select alleleCallID from AlleleCall 
+                   where gtID = 4009 
+                   and alleleID = 26&quot; ) ;
+  $sth-&gt;execute() ;
+  $aoaRef = $sth-&gt;fetchall_arrayref() ;
+  print scalar(@$aoaRef), &quot;\n&quot; ;</PRE>
+<PRE>
+  return(1) ;
+}</PRE>
+<P>
+<H2><A NAME="chisquareassoctest">chiSquareAssocTest</A></H2>
+<PRE>
+  Function  : Perform a simple chi-square association test.
+  Arguments : A Marker object, a string containing an allele type and two 
+              Subject Cluster objects.
+  Returns   : N/A
+  Scope     : Public
+  Called by : 
+  Comments  :</PRE>
+<P>
+<H2><A NAME="graphallelefreqs">graphAlleleFreqs</A></H2>
+<PRE>
+  Function  : Graph the allele frequencies for a Marker in a group of Subjects.
+  Arguments : A hash of parameters as follows
+              MARKER =&gt; The Marker object whose allele frequencies are to be graphed.
+                        Required, for obvious reasons.
+              FREQSOURCES =&gt; Array pointer to a list of Cluster (Kindred or Subject) 
+                             and/or FrequencySource objects.
+                             The source(s) for allele frequencies.
+                             Required, for obvious reasons.
+              ALLELETYPE =&gt; The type of alleles whose frequencies are to be graphed.
+                            Optional, the default value is &quot;Code&quot;.
+  Returns   : N/A
+  Scope     : Public
+  Comments  : Calls xv to display the graphic.</PRE>
+<P>
+<H2><A NAME="calculatehet">calculateHet</A></H2>
+<PRE>
+ Function  : Calculate the heterozygosity for a Marker or SNP.
+ Arguments : A Marker object, a string containing an allele type, and one of 
+              the following defining the Subject group:
+                - a Subject Cluster object 
+                - an array reference to a list of Subject objects
+                - a Kindred Cluster object 
+                - an array reference to a list of Kindred objects
+ Returns   : A scalar float
+ Scope     : Public
+ Comments  : Arguments are passed directly to API::DB::Query::getAlleleFreqs()</PRE>
+<P>
+<H2><A NAME="calculatesnphw">calculateSnpHW</A></H2>
+<PRE>
+ Function  : 
+ Arguments : 
+ Returns   : 
+ Example   : calculateHW()
+ Scope     : 
+ Comments  :</PRE>
+
+</BODY>
+
+</HTML>

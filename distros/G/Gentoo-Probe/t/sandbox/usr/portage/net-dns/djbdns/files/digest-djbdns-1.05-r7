@@ -1,0 +1,4 @@
+MD5 3147c5cd56832aa3b41955c7a51cbeb2 djbdns-1.05.tar.gz 85648
+MD5 ac799440bacc9d283e1c228f84cf99d4 djbdns-1.04-fwdzone.patch 6479
+MD5 4c8558be4c763b039de9211368c01b06 round-robin.patch 3239
+MD5 d2bf744c23f982d9ea13cb57f9d4f5af djbdns-1.05-ipv6-gentoo.diff.bz2 18848

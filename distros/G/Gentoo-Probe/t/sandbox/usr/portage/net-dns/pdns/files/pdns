@@ -1,0 +1,20 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/pdns/files/pdns,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+depend() {
+	need net
+}
+
+start() {
+	ebegin "Starting PowerDNS"
+	start-stop-daemon --start --quiet --exec /usr/bin/env -- /usr/sbin/pdns_server --daemon --guardian=yes
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping PowerDNS"
+	start-stop-daemon --stop --quiet --pidfile=/var/run/pdns.pid
+	eend $?
+}

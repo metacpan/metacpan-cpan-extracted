@@ -1,0 +1,11 @@
+Revision history for Perl extension Geo::GeoNames::Record.
+
+0.09 Thu Feb 18 2010
+	- Save admins data in user's home dir.
+
+0.08 Wed Feb 10 2010
+        - First public version.
+
+0.01  Sun Jan 24 20:40:45 2010
+	- original version; created by h2xs 1.23 with options
+		-XAc -b 5.8.7 -n Geo::GeoNames::Record

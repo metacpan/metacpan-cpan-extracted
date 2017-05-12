@@ -1,0 +1,106 @@
+Change log
+0.19  Fri Jan 25 19:24:15 PST 2013
+    - Updated META.yml
+0.18  Wed Mar  9 21:35:23 PST 2011
+	- Updated graphviz package version check
+
+0.17  Thu Sep 13 11:37:06 PDT 2007
+	- Fix bug that wouldn't allow install with sub-versioned (e.g.,
+          2.14.03) versions of graphviz; fix from Roy Fulbright 
+          (rfulbrig@hotmail.com)
+
+0.16  Wed Jul 11 13:45:26 PDT 2007
+	- fix bug that would not allow install with versions of 
+	  graphviz > 2.9: patch from David Romano (unobe@cpan.org)
+
+0.15  Mon Nov 28 12:20:03 2005
+	- Allow <> in labels
+        - Fix problem that sometimes led to array object having no label
+
+0.14  Mon Sep 26 12:40:51 2005
+	- added pod tests to MANIFEST so they would get distributed (oops)
+	- added TODO in basic.t (dot bug fixed in some versions of dot)
+        - changed make_all.pl to just use 'perl' instead of a full path;
+	  this makes sure that the Perls used to build agree.
+        - Added graphviz version test for non-broken version of dot in
+	  Makefile.PL
+	- Added test for dot being installed at all in Makefile.PL
+
+0.13  Fri Sep  9 11:51:24 PDT 2005 
+	- switch to new changelog format
+	- added pod tests
+	- fixed pod errors
+
+0.12  2004/09/27/22:50:12
+	- updated changelog!
+
+0.11  2004/09/27 21:23:20
+	- removed patch; GraphViz 2.01 includes it
+
+0.10  2004/09/24 16:22:57
+	- Added add_node and BEGIN block to patch broken GraphViz release
+
+0.09  2004/09/21 18:58:59
+	- add() now understands array context
+	- dummy node names are properly generated
+	- undef warning from debug statement; removed altogether
+	- fixed clobbering of to_port when recursing
+	- cleaned up ellipses in dot_escape
+	- make sure we take the right part of the string when trimming it in dot_escape
+	- release candidate 0.09
+
+revision 1.23
+0.08  2004/08/13 18:30:12
+	- replace warn with debug() for testing
+	- Change scalar ref check to be either SCALAR or REF (5.8 support)
+	- added debug() internal sub
+	- reverting to old algorithm; dumpvar not precise enough :(
+
+revision 1.20
+0.10  2004/08/11 21:46:31
+	- started adding comments about change to dumpvar.pl-based version
+	- fixed regexp display so it looks normal.
+
+0.07 (date not recorded)
+	- add code to link through arrays as well as hashes
+	- fix address caching for scalars so shared scalars between new() and
+	  add() calls are actually shared
+
+0.06  2002/04/15 14:45:04;  author: joe;  state: Exp;  lines 0
+	- fix 02types.data.in to not use localtime to generate test data 
+
+0.05  2002/01/23 23:28:57;  author: joe;  state: Exp;  lines: +7 -8
+	- final minor pod fixes
+
+0.04  2002/01/18 22:33:33
+	- version to 0.04
+	- added font coloring to color support
+	- fixed bad colors in base palettes
+	- added and clarified docs
+	- fixed up color processing a little
+	- first actually-released version
+
+0.03  2002/01/18 22:02:30
+	- new version 0.03
+	- remove use vars
+	- Debug doc
+	- color support
+	- was_null()
+	- '.' in empty boxes to prevent collapse of boxes
+	- doc of dot bugs
+
+0.02  2002/01/15 20:32:02
+	- version to 0.02
+	- passing of "not-understood" to GraphViz
+	- Remove Freeform, since it didn't work
+	- added address cache for (future) array/hash detection
+	- fixed add to call new if no object existed
+	- eliminated common - less clear with it than not
+	- cleaned up whitespace all over
+	- added more comments
+	- added element address cacheing
+	- added address()
+	- misc doc cleanup
+
+0.01  2001/12/26 23:09:55
+	- first working version to pass tests (0.01)

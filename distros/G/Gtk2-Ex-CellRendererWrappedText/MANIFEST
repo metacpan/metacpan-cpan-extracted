@@ -1,0 +1,12 @@
+Changes
+Gtk2-Ex-CellRendererWrappedText.komodoproject
+Gtk2-Ex-CellRendererWrappedText.kpf
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+example/wrapped_text_example.pl
+lib/Gtk2/Ex/CellRendererWrappedText.pm
+t/01_cellrenderer_wrapped_text.t

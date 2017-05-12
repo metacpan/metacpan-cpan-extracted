@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+#BEGIN { $Gimp::verbose = 1; }
+
+podregister { die "I DIED\n" };
+
+exit main;
+__END__
+
+=head1 NAME
+
+test_exception - Exercise gimp-perl filter testing exceptions
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Languages/_Perl/_Test/Exception
+
+=head1 DESCRIPTION
+
+exercise gimp-perl filter testing exceptions
+
+=head1 AUTHOR
+
+boilerplate id
+
+=head1 DATE
+
+20140310
+
+=head1 LICENSE
+
+boilerplate id

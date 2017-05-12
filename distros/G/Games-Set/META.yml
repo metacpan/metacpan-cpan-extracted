@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: Games-Set
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  Algorithm::ChooseSubsets: 0
+  Algorithm::GenerateSequence: 0
+  Class::Accessor::Fast: 0
+  List::Util: 0
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Games::Set:
+    file: lib/Games/Set.pm
+    version: 0.01
+  Games::Set::Card:
+    file: lib/Games/Set/Card.pm
+generated_by: Module::Build version 0.20

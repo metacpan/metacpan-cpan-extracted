@@ -1,0 +1,21 @@
+# -*- Mode: Text -*-
+# gengetopt specification for 'test'
+package "test1"
+version	"0.01"
+purpose	"Test for moogengetopt.perl."
+#details "Some details about the program."
+#author "Bryan Jurish <examples/config.h>"
+
+# Arguments
+#argument "ARG1" "The first non-option argument"
+
+# Options
+#group "Basic Options"
+option	"functme"	u	"A funct option"		 no
+option	"flagme"	f	"A flag option"			 flag	on
+#option	-		x	"A shortform-only option called 'x'" no
+
+#group "Options With Arguments"
+option	"stringme"	s "A stringy option" string default="my default string value" no
+
+option	"verbose" v "Specify verbosity level (type=short)" int default="1" yes

@@ -1,0 +1,26 @@
+Revision history for Perl extension GD::Image::Scale2x
+
+0.07  Wed Nov 18 2009
+    - fix "unreferenced scalar" bug (RT #39971)
+    - tidy up scale tests
+    - repackaged with a new version of Module::Install
+
+0.06  Tue Jun 17 2008
+    - repackaged
+
+0.05  Mon May 14 2007
+    - clean up setpixel() loop
+
+0.04  Mon May 14 2007
+    - extract out scale2s algorithm
+
+0.03  Mon Feb 26 2007
+    - repackaged -- no functional changes
+
+0.02  Tue Mar 22 2005
+    - fixed scale3x algorithm
+    - fixed bin/scale2x
+
+0.01  Tue Mar 22 10:12:44 2005
+    - original version
+

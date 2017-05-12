@@ -1,0 +1,13 @@
+CHANGES
+DungeonMaker_wrap.cxx
+INSTALL
+lib/Games/DungeonMaker.pm
+lib/Games/DungeonMaker.pod
+Makefile.PL
+Makefile.PL.static
+MANIFEST			This list of files
+META.yml
+README
+swig/DungeonMaker.i
+t/01_DungeonMaker.t
+t/design

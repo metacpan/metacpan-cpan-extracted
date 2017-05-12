@@ -1,0 +1,50 @@
+Revision history for Getopt-Long-Less
+
+0.08    2016-12-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Getopt::Long::More.
+
+
+0.07    2015-12-02 (PERLANCAR)
+
+        - Allow setting empty option value '--name=' (gnu_compat).
+
+
+0.06    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix POD formatting.
+
+
+0.05    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dzil] Use DZP:IfBuilt.
+
+
+0.04    2015-06-16 (PERLANCAR)
+
+	- [Bugfix] Allow .1 for float.
+
+
+0.03    2015-06-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix Abstract.
+
+
+0.02    2015-06-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Note about lack of support of arrays.
+
+
+0.01    2015-06-16 (PERLANCAR)
+
+        - First release.

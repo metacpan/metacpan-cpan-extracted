@@ -1,0 +1,80 @@
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: Original_Sender
+Subject: Resource Unavailable
+
+Could not fetch file:./test/this-is_unavailable.html
+
+ An Error Occurred
+==================
+
+404 - File
+`/home/rolf/dev/getweb/t/testRoot/pub/test/this-is_unavailable.html'
+does not exist
+
+
+...while executing the following command:
+
+GET TO getweb_discard file://test/this-is_unavailable.html
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: Original_Sender
+Subject: Resource Unavailable
+
+Could not fetch 
+
+ An Error Occurred
+==================
+
+501 - Protocol scheme 'garbage_proto' is not supported
+
+
+...while executing the following command:
+
+GET garbage_proto:foo
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: Original_Sender
+CC: getweb-admin@usa.healthnet.org
+Subject: Syntax Error
+
+A syntax error occurred:
+
+   not a valid URL or command: GET_MISPELLED
+
+Some or all commands were not executed.
+
+Tips:
+
+* Put commands in the body of the message, not the Subject line.
+
+* Make sure your signature begins with '--'
+
+Still having trouble?
+
+* Try surrounding your body with 'begin' and 'end'
+
+* Place a blank line between each command
+
+* If command takes up two lines, place a '\' after the first line
+
+For proper usage, send a message containing these three lines:
+
+begin
+
+HELP
+
+end
+
+____original message follows____
+
+From: Original_Sender
+Subject: 
+Reply-To: terminal
+
+GET TO getweb_discard file://test/this-is_unavailable.html GET garbage_proto:foo
+
+GET_MISPELLED TO getweb_discard file://test/promed_new.html

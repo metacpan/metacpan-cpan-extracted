@@ -1,0 +1,28 @@
+---
+abstract: 'A module to access GnuCash SQLite files'
+author:
+  - 'Hoe Kit CHEW <hoekit at gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Number::Delta: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GnuCash-SQLite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  DateTime: '1.12'
+  Path::Tiny: '0.055'
+  UUID::Tiny: '1.04'
+version: '0.06'

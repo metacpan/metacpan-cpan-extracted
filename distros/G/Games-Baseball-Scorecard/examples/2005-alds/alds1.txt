@@ -1,0 +1,349 @@
+#  http://sports.espn.go.com/mlb/gameLog?gameId=251004104&full=1
+# http://sports.espn.go.com/mlb/boxscore?gameId=251004104
+# http://mlb.mlb.com/NASApp/mlb/mlb/ps/y2005/boxscore.jsp?gid=2005_10_04_bosmlb_chamlb_1
+
+scorer	Pudge
+date	2005-10-04, 15:09-18:05
+at	U.S. Cellular Field, Chicago
+att	40,717
+temp	85 p.cloud
+wind	14 R to L
+
+away	Boston Red Sox
+starter	30
+lineup
+	18 8
+	 3 6
+	34 0
+	24 7
+	 7 9
+	33 2
+	15 3
+	11 5
+	10 4
+
+home	Chicago White Sox
+starter	52
+lineup
+	22 7
+	15 4
+	23 9
+	14 3
+	 8 0
+	33 8
+	12 2
+	24 5
+	 5 6
+
+__INIT__
+
+inn T1
+	ab
+		p b
+		L3
+	ab
+		p b s b 
+		hit 2 r
+	ab
+		p b b s b s
+		K
+	ab
+		5-3
+
+inn B1
+	ab
+		p b s
+		hp
+		-> 2 SAC
+		-> 3 SB
+		-> 4
+	ab
+		SAC2-3
+	ab
+		p s b f
+		hp
+		tout 2 FC5-4
+	ab
+		p s b b f
+		reach FC
+		rbi
+		-> 2
+		-> 4
+	ab
+		p b s
+		hit 1 rc
+		-> 3
+		-> 4
+	ab
+		p b b s b s
+		hit 1 lc
+		rbi
+		-> 4
+	ab
+		p f
+		hit 4 lc
+		rbi 2
+	ab
+		p b b s b
+		FO2
+
+inn T2
+	ab
+		p b
+		hit 1 cl
+	ab
+		p s f b
+		!K
+	ab
+		p f b s b
+		!K
+	ab
+		p s b b f b
+		4-3
+
+inn B2
+	ab
+		4-3
+	ab
+		p s
+		hit 1 lc
+		tout 2 CS2-4
+	ab
+		p b s f f b b f
+		F8
+
+inn T3
+	ab
+		p b s
+		hit 2 l
+		-> 3
+	ab
+		p s s f
+		!K
+	ab
+		p f
+		F9
+	ab
+		p f
+		hit 1 il
+		tout 2 FC5-4
+	ab
+		reach FC
+
+inn B3
+	ab
+		p b b s f f
+		F7
+	ab
+		p s b b
+		hit 4 lc
+	ab
+		1-3
+		atbase 'Clement hit' 2
+	ab
+		p f s b b
+		F7
+
+inn T4
+	ab
+		p s b
+		hit 1 rc
+		-> 2
+		-> 3 E5
+		-> 4 WP
+	ab
+		hit 1 il
+		-> 2 E5
+		error 5
+		-> 3 WP
+		-> 4
+	ab
+		p s s b f
+		wp
+		hit 2 r
+		rbi
+		tout 3 FC4-5
+	ab
+		p b s
+		reach FC
+		tout 2 FC6-4
+	ab
+		p b s f
+		reach FC
+	ab
+		p s s
+		K
+		
+inn B4
+	ab
+		p b
+		hit 2 r
+		-> 4
+	ab
+		p s s
+		F7
+	ab
+		p s f
+		hit 4 lc
+		rbi
+
+	add_pitcher 53
+	ab
+		p s b f
+		1-3
+	ab
+		p b b s f
+		!K
+
+inn T5
+	ab
+		p b s b f
+		4-3
+	ab
+		p b s b s f f b
+		F8
+	ab
+		p b s
+		6-3
+
+inn B5
+	ab
+		6-3
+	ab
+		p s f f f b b
+		1-3
+
+	add_pitcher 54
+	ab
+		p s b
+		F-2
+
+inn T6
+	ab
+		F7
+	ab
+		p b s
+		F4
+	ab
+		p s
+		5-3
+inn B6
+	ab
+		p b b s f f b
+		bb
+		-> 2
+		-> 4
+	ab
+		hp
+		-> 2
+		-> 4
+	ab
+		p b f s b
+		F4
+	ab
+		p s f b b
+		hit 1 lc
+		rbi
+		-> 4
+	ab
+		p s b
+		hit 4 r
+		rbi 2
+	ab
+		F4
+	ab
+		p b s b s
+		6-3
+
+inn T7
+	ab
+		p b f s b
+		K
+	ab
+		6-3
+	ab
+		p s b
+		4-3
+
+inn B7
+	ab
+		p b
+		1-3
+	ab
+		p b f s b
+		F4
+	ab
+		p s s b
+		4-3
+
+inn T8
+	ab
+		p b s
+		L9
+	ab
+		p b
+		hit 2 lc
+		-> 3
+	ab
+		p f s
+		6-3
+
+	add_pitcher 46
+	ab
+		p s f b
+		F7
+
+add_player 1 23 6
+add_player 2 25 8
+inn B8
+	add_pitcher 61
+	ab
+		p b s
+		hit 4 r
+	ab
+		p b b s b f
+		bb
+		-> 2
+		-> 4
+	ab
+		p b b s s
+		K
+	ab
+		p s b b f b f
+		bb
+		-> 2
+
+	add_player 2 1 PH/4 8/9
+	ab
+		p s s b
+		hit 1 rc
+		rbi
+
+	add_player 3 7 PH/8 8/9
+	ab
+		F8
+	add_player 4 27 PH/3 8/9
+	ab
+		F4
+
+inn T9
+	add_pitcher 18
+	ab
+		p s
+		F9
+
+	add_player 7 19 PH
+	ab
+		p f b b
+		hit 2 lc
+	ab
+		p b
+		F4
+	ab
+		F7
+
+win 52
+inn
+loss 30
+
+__GAME__

@@ -1,0 +1,6 @@
+.git
+.gitignore
+.shipit
+blib
+inc
+t/gen-test-data.pl

@@ -1,0 +1,47 @@
+
+The Gtk2-Perl Team - contact us at gtk-perl-list@gnome.org
+==========================================================
+muppet                   scott at asofyet dot org
+Ross McFarland           rwmcfa1 at neces dot com
+Torsten Schoenfeld       kaffeetisch at web dot de
+Marc Lehmann             pcg at goof dot com
+Goran Thyni              goran at kirra dot net
+Joern Reder              joern at zyn dot de
+Chas Owens               alas at wilma dot widomaker dot com
+Guillaume Cottenceau     gc at mandrakesoft dot com
+Kevin Ryde               user42 zip com au
+Emmanuel Rodriguez       emmanuel rodriguez gmail com
+Chris Sincock            csincock gmail com
+Quentin Sculo            squentin free fr
+
+Contributors - the people who sent us patches
+=============================================
+René Seindal             rene at seindal dot dk
+Tom Hargreaves           hex at freezone dot co dot uk
+Thierry Vignaud          tvignaud at mandrakesoft dot com
+James Curbo              hannibal at adtrw dot org
+Dr. Michael Langner      langner at fiz-chemie dot de
+Anuradha Ratnaweera      Aratnaweera at virtusa dot com
+Bjarne Steinsbø          bosteins at broadpark dot no
+Roderich Schupp          Roderich dot Schupp at partner dot bmw dot de
+Nathan Kurz              nate at verse dot com
+Cory Omand               Cory.Omand at sun dot com
+Jason Stirling           jasons at postoffice dot utas dot edu dot au
+Albert Chin              china at thewrittenword dot com
+Zach Bean                zb at forty2 dot com
+Aristotle Pagaltzis      pagaltzis at gmx dot de
+LoneFox                  lonefox at welho dot com
+Marc 'HE' Brockschmidt   marc at marcbrockschmidt dot de
+Daniel Kasak             dkasak at nusconsulting dot com dot au
+Grant McLean             grant at mclean dot net dot nz
+Philipp Rumpf            prumpf at gmail dot com
+
+several important bits of gtk2-perl were heavily inspired by pygtk, gtk-perl,
+and a good read-through of the gtk+ source code, so credit goes to those guys
+as well -- thanks!
+
+
+
+Copyright (C) 2003-2006 by the gtk2-perl team.
+
+gtk2-perl is covered by the LGPL -- see the file LICENSE for details.

@@ -1,0 +1,32 @@
+GD-Graph-splined version 0.01
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD             version 2.18, which contains Polyline
+  GD::Polyline   version 0.2, if you're interested
+  GD::Graph      version 1.35, seems to be the last area graph bug fixes
+  
+
+COPYRIGHT AND LICENCE
+
+Lee Goddard added to Martien Verbruggen's GD::Graph::area module the
+ability to use Daniel J Harasty's GD::Polyline module.
+
+Thus, Copyright (c) 1995-2000 Martien Verbruggen with parts copyright
+(c) 2006 Lee Goddard (lgoddard -at- cpan -dot- org).
+
+This software is made available under the same terms as GD::Graph.
+
+

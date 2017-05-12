@@ -1,0 +1,60 @@
+Revision history for Game-Life-NDim
+
+0.0.4   2015-09-09
+        Updating for release of version 0.0.4
+        Removed creation of makefile (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.0.3   2015-06-09
+        Updating for release of version 0.0.3
+        Set Test::More minimum version (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        removed travis testing perl 5.8 (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+
+0.0.2   2015-01-13
+        Updating for release of version 0.0.2
+        Updated License (Ivan Wills)
+        Fixed typos (Ivan Wills)
+        Cleaned up boilerplate text (Ivan Wills)
+        Updated boilerplate test (Ivan Wills)
+        group-git tag (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Game-Life-NDim (Ivan Wills)
+        Added better error checking (Ivan Wills)
+        Added missing documentation and error checking (Ivan Wills)
+        Start using travis-ci (Ivan Wills)
+        Updating for first release (Ivan Wills)
+        Added missing dependency (Ivan Wills)
+
+0.0.1   2014-07-23
+        Completed rename (Ivan Wills)
+        Fixed version (Ivan Wills)
+        Licence file (Ivan Wills)
+        Added more skip files (Ivan Wills)
+        Fixed changed names (Ivan Wills)
+        Removed build files (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Renamed everything (Ivan Wills)
+        Cleaned docs (Ivan Wills)
+        Cleaned up manifests (Ivan Wills)
+        Fixed tests (Ivan Wills)
+        Tabs -> spaces (Ivan Wills)
+        White space clean, some documentation (Ivan Wills)
+        Updated (Ivan Wills)
+        Added configure_requires section (Ivan Wills)
+        More ignore sorting (Ivan Wills)
+        Cleaned Build.PL (Ivan Wills)
+        Updated to my current standards (Ivan Wills)
+        mostly working now (Ivan Wills)
+        Added the ability to print out in ~3D (Ivan Wills)
+        Much improved example (Ivan Wills)
+        Mostly working now only default rule generation to fix (Ivan Wills)
+        more test fixes (Ivan Wills)
+        More changes to pass the tests (Ivan Wills)
+        Got package files up to date (Ivan Wills)
+        More fixes for Dim (Ivan Wills)
+        Started on the surround method (Ivan Wills)
+        Board now working (Ivan Wills)
+        Added extra base modules, self documentation (Ivan Wills)
+        initial commit (Ivan Wills)
+

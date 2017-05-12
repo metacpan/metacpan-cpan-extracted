@@ -1,0 +1,23 @@
+Changelog.ini
+Changes
+lib/Gedcom/Date.pm
+lib/Gedcom/Date/Approximated.pm
+lib/Gedcom/Date/Interpreted.pm
+lib/Gedcom/Date/Period.pm
+lib/Gedcom/Date/Phrase.pm
+lib/Gedcom/Date/Range.pm
+lib/Gedcom/Date/Simple.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/check_ged
+t/002_parse.t
+t/003_convert.t
+t/100_compare.t
+t/101_output.t
+t/200_add.t
+t/201_clone.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

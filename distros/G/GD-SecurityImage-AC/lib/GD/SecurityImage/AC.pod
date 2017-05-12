@@ -1,0 +1,196 @@
+
+=head1 NAME
+
+GD::SecurityImage::AC - A drop-in replacement for Authen::Captcha.
+
+=head1 SYNOPSIS
+
+  use GD::SecurityImage::AC;
+
+  # create a new object
+  my $captcha = Authen::Captcha->new();
+
+  # set the data_folder. contains flatfile db to maintain state
+  $captcha->data_folder('/some/folder');
+
+  # set directory to hold publicly accessable images
+  $captcha->output_folder('/some/http/folder');
+
+  # Alternatively, any of the methods to set variables may also be
+  # used directly in the constructor
+
+  my $captcha = Authen::Captcha->new(
+    data_folder   => '/some/folder',
+    output_folder => '/some/http/folder',
+    );
+
+  # create a captcha. Image filename is "$md5sum.png"
+  my $md5sum = $captcha->generate_code($number_of_characters);
+
+  # check for a valid submitted captcha
+  #   $code is the submitted letter combination guess from the user
+  #   $md5sum is the submitted md5sum from the user (that we gave them)
+  my $results = $captcha->check_code($code,$md5sum);
+  # $results will be one of:
+  #          1 : Passed
+  #          0 : Code not checked (file error)
+  #         -1 : Failed: code expired
+  #         -2 : Failed: invalid code (not in database)
+  #         -3 : Failed: invalid code (code does not match crypt)
+  ##############
+
+=head1 DESCRIPTION
+
+This module is a drop-in GD::SecurityImage replacement for Authen::Captcha. 
+Module is mostly compatible with Authen::Captcha. You can just replace
+
+   use Authen::Captcha;
+
+line in your programs with
+
+   use GD::SecurityImage::AC;
+
+to enable GD::SecurityImage interface. Alternatively, you can use
+
+   use GD::SecurityImage backend => 'AC';
+
+Regular GD::SecurityImage interface is supported with an extra method: 
+C<gdsi>. Also see the C<CAVEATS> section for incompatibilities.
+
+This module uses: C<GD::SecurityImage>, C<Digest::MD5>, C<File::Spec> and 
+C<Fcntl> modules.
+
+If you are writing a captcha handler from scratch, this module is 
+B<not recommended>. You must use C<GD::SecurityImage> directly. This 
+module can be used for older Authen::Captcha applications only. And 
+features are (and will be) limited with Authen::Captcha capabilities.
+
+B<Do not use this module if you have any doubt>.
+
+=head1 METHODS
+
+See L<Authen::Captcha> for the methods and usage.
+
+=head2 gdsi
+
+This method is used to set L<GD::SecurityImage> parameters. Three
+methods are supported: C<new>, C<create> and C<particle>. Parameter
+types and names are identical to GD::SecurityImage parameters:
+
+   $captcha->gdsi(new      => {name => value},
+                  create   => [param1, param2, ...],
+                  particle => [param1, param2]);
+
+C<new> is a hashref while the other two are arrayrefs. 
+See L<GD::SecurityImage> for information about these parameters.
+
+C<gdsi> method must be called just after creating the object:
+
+   my $captcha = Authen::Captcha->new;
+   $captcha->gdsi(
+      new => {
+               width    => 350,
+               height   => 100,
+               lines    => 10,
+               font     => "/absolute/path/to/your.ttf",
+               scramble => 1,
+               ptsize   => 24,
+      },
+      create   => [ttf => 'box', '#80C0F0', '#0F644B'],
+      particle => [115, 250],
+   );
+
+If you don't use this method, the captcha image will be generated with
+default options.
+
+C<gdsi> returns the object itself. So, you can create your object like this:
+
+   my $captcha = Authen::Captcha->new( ... )->gdsi( ... );
+
+=head1 CAVEATS
+
+=over 4
+
+=item *
+
+width and height parameters are *not* character's width and height,
+but they define the image dimensions. 
+
+=item *
+
+No outside images. Captchas are generated with the GD::SecurityImage
+interface, not with third party "letter" graphics (but you can use true 
+type fonts, see C<gdsi> method). As a side effect, captcha size is not 
+(actually "can not be") determined automatically. so, you have to specify 
+a width and height value at the beginning.
+
+=item *
+
+Setting C<images_folder> has no effect.
+
+=item *
+
+No background images. Backgrounds are drawn with GD::SecurityImage styles.
+
+=item *
+
+You have to specify a TTF font, if you want to use another font (other than GD
+built-in C<GD::Font-E<gt>Giant>).
+
+=item *
+
+Setting C<debug> has no effect. You can still set C<debug>, but it is not used 
+inside this module.
+
+=item *
+
+The code is compatible with taint, but only so long as your C<data_folder> and
+C<output_folder> paths are not tainted. This is deliberate. If your C<data_folder>
+or C<output_folder> paths are tainted, you are probably doing something wrong and
+definitely doing something that bears close examination.
+
+=back
+
+=head1 CHANGES
+
+1.11 2008.05.02 - Maintenance taken over by Benjamin Franz. 
+                  Taint compatibility fixed and documented.
+                  Locking fixed.
+                  Example of CGI usage added (see examples/ folder).
+                  Artistic License file added.
+                  POD split into .pod file.
+                  Removed pointless AUTOLOAD subs.
+                  Add build test for taint.
+                  Removed use of 'base' module.
+
+1.10 2006.02.19
+        => First release after separation from GD::SecurityImage
+           distribution.
+        => Fixed a bug in setting attributes in new() and AUTOLOAD().
+        => (Hopefully) fixed a bug related to unlink()ing images.
+           Reported by GribUser.
+
+=head1 SEE ALSO
+
+L<GD::SecurityImage>, L<Authen::Captcha>.
+
+=head1 AUTHOR
+
+Burak Gürsoy, E<lt>burakE<64>cpan.orgE<gt>, Benjamin Franz E<lt>snowhareE<64>cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2005-2006 Burak Gürsoy, 2007 Benjamin Franz. All rights reserved.
+
+Some portions of this module adapted from L<Authen::Captcha>. 
+L<Authen::Captcha> Copyright 2003 by First Productions, Inc. & Seth Jackson.
+
+=head1 LICENSE
+
+This library is provided "AS IS" without warranty of any kind.
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself, either Perl version 5.8.7 or, 
+at your option, any later version of Perl 5 you may have available.
+
+=cut

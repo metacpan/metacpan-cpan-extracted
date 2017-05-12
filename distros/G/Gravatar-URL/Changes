@@ -1,0 +1,86 @@
+1.07  Wed Aug 10 17:47:19 PDT 2016
+    Bug Fixes
+    * Require an updated version of Net::DNS to avoid
+      "resolver->dnssec(1) without Net::DNS::SEC installed"
+      (Schwern) [github #4]
+
+    Test Fixes
+    * Fix our fake random number generator to avoid cross platform issues.
+      [rt.cpan.org 71064] [github #7] (Lisa Hare)
+
+    Distribution
+    * Kwalitee fixups (BooK) (Lisa Hare)
+    * Added a LICENSE file (Lisa Hare)
+    * Now using Travis CI for Unix testing (Schwern)
+    * Now using AppVeyor for Windows testing (Schwern)
+
+1.06  Tue Mar 27 12:55:30 BST 2012
+    Bug fixes
+    * Fixed some undef warnings during sanitization.
+
+    Test fixes
+    * Adapt to changes in Carp 1.25 [rt.cpan.org 75523]
+
+1.05  Wed Jul  6 22:40:06 NZST 2011
+    Security fix
+    * Sanitize DNS results in Libravatar::URL
+
+1.04  Tue Mar 29 17:47:34 NZDT 2011
+    New features
+    * Added OpenID support in Libravatar::URL
+
+1.03  Sat Mar 12 18:17:03 NZDT 2011
+    New Features
+    * Added Libravatar::URL for federated avatar hosting with a Gravatar
+      fallback. (http://www.libravatar.org)
+    * Add new optional 'https' parameter to deliver avatars over HTTPS.
+
+    New Docs
+    * Updated the defaults with the new "retro" and mystery man values.
+    * Document the https base URL now available.
+
+    New Co-Maintainer (Francois Marier)
+
+
+1.02  Thu Apr  1 15:36:52 PDT 2010
+    New Features
+    * Added Unicornify::URL for generated unicorn avatars, OMG!!!
+      http://unicornify.appspot.com/whats-this
+
+    Incompatible Changes
+    * short_keys is now the default, as per Gravatar protocol documentation
+
+    Protocol Updates
+    * Document that Gravatar has a new default option, 404.
+
+
+1.01  Thu Apr  9 13:11:32 PDT 2009
+    Protocol Updates
+    (The Gravatar protocol changed, so we're changing with it)
+    * Gravatar expanded the max size to 512.
+      [rt.cpan.org 41244] (CHISEL)
+    * Base URL changed to http://www.gravatar.com/avatar/
+    * Ratings are now lower cased.  Upper cased ratings still
+      accepted, but will be lower cased.
+    * Using new http://base/id?key=value style.
+    * The border key has been removed from the protocol,
+      so its use throws a deprecation warning.
+
+    New Features
+    * The short_keys flag uses short keys in the URL
+      ("s" instead of "size", for example).
+
+
+1.00  Sun Apr 27 14:12:24 PDT 2008
+    Bug Fixes
+    * Gravatar IDs are insensitive to the case of the email address.
+
+    Doc Fixes
+    * Clarified how relative default URLs will be handled
+
+    Dist Fixes
+    * Added a configure_requires on Module::Build and a requires on perl 5.6.
+
+
+0.01  Sat Sep  8 00:59:04 PDT 2007
+First release, stealing liberally from Template::Plugin::Gravatar

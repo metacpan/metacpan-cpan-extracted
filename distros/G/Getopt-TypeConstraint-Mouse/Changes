@@ -1,0 +1,22 @@
+Revision history for Perl extension Getopt-TypeConstraint-Mouse
+
+0.05 2013-11-16T13:14:06Z
+
+    - add alias of documentation option
+
+0.04 2013-11-16T11:26:27Z
+
+    - change module packag
+
+0.03 2013-11-09T16:30:09Z
+
+    - fix pod
+
+0.02 2013-11-09T15:49:59Z
+
+    - add pointer to documentation
+
+0.01 2013-11-09T15:06:12Z
+
+    - original version
+

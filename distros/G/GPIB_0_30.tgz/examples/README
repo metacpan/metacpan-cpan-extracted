@@ -1,0 +1,12 @@
+#
+# A few GPIB examples to get you going
+#
+#
+# fg.pl     A Tk function generator app for HP33120A
+# ps.pl     A Tk power supply control app for HPE3631A
+# relay.pl  A Tk relay control app for HP59306A
+# sa.pl     A Tk+GD app for HP3585A spectrum analyser
+# cgi-sa.pl A CGI+GD CGI script for displaying HP3585A on a web page
+#
+#
+#

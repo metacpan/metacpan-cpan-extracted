@@ -1,0 +1,6 @@
+Revision history for Perl extension GD::Graph::splined.
+
+0.01  Wed Aug  2 13:34:46 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n GD::Graph::splined
+

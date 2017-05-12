@@ -1,0 +1,7 @@
+Revision history for Geo-Coder-Mappy
+
+0.02  Wed Mar 30 00:01:22 UTC 2011
+    - Required newer LWP with better HTTPS support.
+
+0.01  Tue Mar 22 22:58:43 UTC 2011
+    - Initial distribution.

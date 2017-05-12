@@ -1,0 +1,116 @@
+=head1 NAME
+
+Geo::Format::Envisat - parse Envisat Metadata format
+
+=head1 INHERITANCE
+
+ Geo::Format::Envisat
+   is a Exporter
+
+=head1 SYNOPSIS
+
+ use Geo::Format::Envisat;
+
+ # base info solely on filename (fast!)
+ my $mph  = envisat_mph_from_name $filename;
+
+ # collect all meta-data from inside the file
+ my $meta = envisat_meta_from_file $filename;
+
+ use Data::Dumper;
+ print Dumper $meta;   # see the returned structure
+
+ # see examples/ directory!!
+
+=head1 DESCRIPTION
+
+Simply transform the meta-data which leads Envisat and ERS imagery
+into Perl HASHes for easy access.  All keys which are upper-case
+follow the official document.  Lower-cased fields are added for each
+of the official names, which are preprocessed to simplify further
+processing, like translation of time fields to OS time values and an
+iso representation.  The lower-cased key names will also have blanks
+stripped from the end and abbreviated codes extended for readability.
+
+The formats are described in various documents available from
+F<http://earth.esa.int/pub/ESA_DOC/ENVISAT/>
+
+Used are C<Vol05_Structures_3d_20071122.pdf> (Main Product Header
+description version 2007-11-22) and C<Vol08_Asar_4B_20071025.pdf>
+(ASAR file format specifics version 2007-10-25).
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<envisat_meta_from_file>(FILENAME, OPTIONS)
+
+Read all meta-data from the file specified by its FILENAME.  The file
+can be in compressed form, although you may need to install some
+additional C<IO::Uncompress> modules.
+
+ -Option          --Default
+  take_dsd_content  <false>
+
+=over 2
+
+=item take_dsd_content => BOOLEAN
+
+Collect the content from all non-measurement DSD records.  These are
+binary fields.
+
+=back
+
+example: envisat_meta_from_file
+
+ my $meta = envisat_meta_from_file $fn;
+ my $mph = $meta->{mph};  # Main Product Header
+ my $sph = $meta->{sph};  # Specific Product Header
+ my $mds = $meta->{dsd}{MSD1};  # data-set description
+
+=item B<envisat_mph_from_name>(FILENAME|STRING)
+
+Pass the product FILENAME as STRING, and it will get decomposed into
+some records which are also in the Main Product Header meta-data records.
+This permits some easy searching in directories without the need to open
+the (sometimes compressed, always large) files.
+
+Compression extensions at the end of the STRING will be ignored.  The
+name will be upper-cased before processing.  Undef is returned when
+there is no match.  Some information can be added if the STRING actually
+refers to an existing FILENAME.  Therefore, you may pass a filename
+which contains directory components.
+
+example: envisat_mph_from_name
+
+ my $fn  = 'ASA_IMG_1PNDPA20080903_100725_000000152071_00423_34044_1202.N1';
+ my $mph = envisat_mph_from_name $fn;
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Geo-Format-Envisat distribution version 0.03,
+built on December 01, 2011. Website: F<http://perl.overmeer.net/geo/>
+All modules in this suite:
+L</Geo::Point>,
+L</Geo::Proj4>,
+L</Geo::WKT>,
+L</Math::Polygon>,
+L</Geo::GML>,
+L</Geo::ISO19139>,
+L</Geo::EOP>,
+L</Geo::Format::Envisat>, and
+L</Geo::Format::Landsat>.
+
+Please post questions or ideas to the mailinglist at
+F<http://geo-perl@list.hut.fi>
+
+=head1 LICENSE
+
+Copyrights 2008-2011 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

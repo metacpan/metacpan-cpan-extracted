@@ -1,0 +1,4 @@
+# this test apparently isn't smart enough to tell the difference between
+# object attribute access and real hash-refs.  Why it's allowed out in
+# public is a mystery...
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]

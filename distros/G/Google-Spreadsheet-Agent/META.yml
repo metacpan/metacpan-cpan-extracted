@@ -1,0 +1,33 @@
+---
+abstract: 'A Distributed Agent System using Google Spreadsheets'
+author:
+  - 'Darin London <darin.london@duke.edu>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Google-Spreadsheet-Agent
+provides:
+  Google::Spreadsheet::Agent:
+    file: lib/Google/Spreadsheet/Agent.pm
+    version: 0.02
+  Google::Spreadsheet::Agent::DB:
+    file: lib/Google/Spreadsheet/Agent/DB.pm
+    version: 0.02
+  Google::Spreadsheet::Agent::Runner:
+    file: lib/Google/Spreadsheet/Agent/Runner.pm
+    version: 0.02
+requires:
+  IO::CaptureOutput: '>= 1.1101'
+  Moose: '>= 0.92'
+  Net::Google::Spreadsheets: '>= 0.14'
+  Net::SMTP::TLS: '>= 0.12'
+  YAML::Any: '>= 0.67'
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

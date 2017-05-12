@@ -1,0 +1,51 @@
+{
+   "abstract" : "create sets of colours.",
+   "author" : [
+      "Kathryn Andersen"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graphics-Colourset",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::ArgvFile" : "1.09",
+            "Getopt::Long" : "2.34",
+            "Graphics::ColorObject" : "0",
+            "Pod::Usage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Graphics::Colourset" : {
+         "file" : "lib/Graphics/Colourset.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/rubykat/Graphics-Colourset",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rubykat/Graphics-Colourset.git"
+      }
+   },
+   "version" : "0.02"
+}

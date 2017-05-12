@@ -1,0 +1,12 @@
+Revision history for Games-Solitaire-BlackHole-Solver
+
+0.0.3   2016-02-13
+        - Convert to Dist-Zilla.
+
+0.0.2   2014-01-30
+        - Add the LICENSE file (CPANTS Kwalitee).
+        - Add t/cpan-changes.t and t/style-trailing-space.t .
+        - Minimum version of perl is now 5.8.x (CPANTS Kwalitee).
+
+0.0.1   2010-01-11
+        First version, with rudimentary features but is working.

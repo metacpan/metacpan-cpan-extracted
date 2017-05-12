@@ -1,0 +1,10 @@
+Revision history for Perl module GPS::Point::Cluster
+
+0.05 2008-12-29
+    - Testing requires GSP::Point
+0.04 2008-12-26
+    - CPAN Verison
+0.03 2008-12-19
+0.02 2008-12-19
+0.01 2008-10-18T04:47:06Z
+    - original version

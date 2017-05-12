@@ -1,0 +1,5 @@
+- a new function to allow connections via HTTP.
+- SSL support.
+- XSLT support (result morphing).
+- XQL subquery support.
+

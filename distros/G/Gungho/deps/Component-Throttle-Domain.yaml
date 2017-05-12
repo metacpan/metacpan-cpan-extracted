@@ -1,0 +1,5 @@
+---
+name: 'Throttling By Domain'
+default: 1
+depends:
+    'Data::Valve': 0.00007

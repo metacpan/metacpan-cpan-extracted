@@ -1,0 +1,6 @@
+#!perl
+use strict;
+use warnings;
+
+use Games::Nonogram;
+Games::Nonogram->bootstrap;

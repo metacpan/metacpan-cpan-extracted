@@ -1,0 +1,7 @@
+Revision history for Games-FEAR-Log
+
+0.01    Wed Jan 10 23:41:37 2007
+        Initial version, (briefly) tested support for MySQL and PostgreSQL
+
+0.02    Fri Sep 21 20:25:05 2007
+        Fixed permission issue with distro (had to artifically increment version)

@@ -1,0 +1,39 @@
+---
+abstract: 'Encrypt/decrypt sensitive files before commit and save on public repos'
+author:
+  - 'Hernan Lopes (hernanlopes@gmail.com)'
+build_requires:
+  Crypt::Blowfish: '0'
+  Crypt::CBC: '0'
+  Digest::SHA1: '0'
+  ExtUtils::MakeMaker: '0'
+  IO::All: '0'
+  JSON::XS: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  Proc::ProcessTable: '0'
+  Test::Simple: '0.44'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Crypt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::Blowfish: '0'
+  Crypt::CBC: '0'
+  Digest::SHA1: '0'
+  IO::All: '0'
+  JSON::XS: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  Proc::ProcessTable: '0'
+  Test::Simple: '0.44'
+resources:
+  repository: https://github.com/hernan604/Git-Crypt.git
+version: 0.05

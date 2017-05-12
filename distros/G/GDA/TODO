@@ -1,0 +1,23 @@
+TODO
+GNU Data Access (GDA)
+Perl Module Library
+
+$Revision: 1.1.1.1 $
+
+Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+
+-------------------------------------------------------------------------------
+
+
+2001-07-09
+
+  * Address the TODO items in the code
+
+  * Figure out why t/04log.t's call to GDA::Log::message isn't showing up in
+    ~/.gconf/apps/gda/Log/libgda-perl-test-04/*/%gconf.xml
+
+  * Write a more comprehensive set of tests
+
+  * Figure out how to get Inline::MakeMaker to work
+
+

@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Gtk2/Ex/DBITableFilter.pm
+lib/Gtk2/Ex/DBITableFilter/BrowserBar.pm
+lib/Gtk2/Ex/DBITableFilter/FilterWidget.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+examples/filtered-table.pl
+examples/filtered-table-sqlite.pl

@@ -1,0 +1,12 @@
+Revision history for Getopt-Whatever
+
+0.01 - Sat Jun  2 13:40:45 2007
+	initial release
+
+0.01 - Sat Jun  2 13:39:25 2007
+	Initial release of Getopt::Whatever
+
+0.01    2007-06-02
+    The initial release of Getopt::Whatever.  This version supports
+    long options only.
+

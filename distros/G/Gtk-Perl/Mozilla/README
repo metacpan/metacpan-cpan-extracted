@@ -1,0 +1,19 @@
+
+If you get a connection refused message when using the http
+protocol or a blank page with ftp, it may be due to the fact
+that loading a shared object (the mozilla componet) from a
+non threaded program (perl) is not well supported (at least in
+current GNU/Linux systems).
+So you have three options:
+1) Compile the Gtk and Mozilla Perl modules with a threaded Perl
+2) Intercept http and ftp URIs and feed the mozilla widget with
+the data yourself (using LWP, for example)
+3) Use the LD_PRELOAD trick below
+
+Set the env variable LD_PRELOAD to the current pthread implementation
+and then start the perl script as usual:
+$ LD_PRELOAD=libpthread.so.0 perl sample/test.pl
+
+Since this is a hack its not known if it will work in the future
+or on your system anyway. YMMV.
+

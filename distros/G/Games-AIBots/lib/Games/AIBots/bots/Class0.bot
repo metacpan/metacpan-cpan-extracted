@@ -1,0 +1,5 @@
+$name   = 'Class0';        # 機器人名稱
+$author = 'Autrijus Tang'; # 作者
+
+# 一開始就自爆
+attempt destruct;

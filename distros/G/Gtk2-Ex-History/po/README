@@ -1,0 +1,36 @@
+Copyright 2009, 2010 Kevin Ryde
+
+This file is part of Gtk2-Ex-History.
+
+Gtk2-Ex-History is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+Gtk2-Ex-History is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-History.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+
+This is only a place-holder for possible future translations of the
+few messages in the History.
+
+Currently there's nothing translated, and the messages probably aren't
+settled enough to want to put work into translation.
+
+"charset=UTF-8" should be used in all the .po files because that's
+what History.pm asks for, becoming Perl wide-char strings
+internally.  A charset other than utf-8 still works, it just means
+gettext must convert at runtime.  The .pot file is all ASCII.
+
+header.pot is the start part of Gtk2-Ex-History.pot, put there
+by the generate rules in the Makefile (per inc/MyMakeMakerGettext.pm).
+gettext 0.17 doesn't doesn't preserve comments in a .pot header very
+well.

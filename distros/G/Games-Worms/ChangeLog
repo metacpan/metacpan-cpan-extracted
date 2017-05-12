@@ -1,0 +1,32 @@
+Revision history for Perl suite Games::Worms
+
+1999-02-15  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.41:  Public alpha release
+
+1999-03-03  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.60:  public alpha release 2
+	renamed to Games::Worms
+	Tek4010 and PS (PostScript) output modes now
+
+1999-03-03  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.61:  public alpha release 3
+	Wrote some preliminary docs
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.62:  Just rebundling; no code changes.
+
+2006-03-01  Avi Finkel  avi@finkel.org
+
+	* Release 0.63:  Modifcations for authorship changes
+
+2006-07-07  Avi Finkel  avi@finkel.org
+
+	* Release 0.64:  Fixing up some tests
+
+2007-08-21  Avi Finkel  avi@finkel.org
+
+	* Release 0.65:  Cleaning up makefile / dependencies

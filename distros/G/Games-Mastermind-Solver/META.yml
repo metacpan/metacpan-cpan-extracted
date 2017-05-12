@@ -1,0 +1,24 @@
+---
+name: Games-Mastermind-Solver
+version: 0.02
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+abstract: a Master Mind puzzle solver
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor: 0.27
+  Games::Mastermind: 0.01
+  Test::More: 0.48
+provides:
+  Games::Mastermind::Solver:
+    file: lib/Games/Mastermind/Solver.pm
+    version: 0.02
+  Games::Mastermind::Solver::BruteForce:
+    file: lib/Games/Mastermind/Solver/BruteForce.pm
+    version: 0.02
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

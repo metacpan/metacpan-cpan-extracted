@@ -1,0 +1,20 @@
+NAME
+    GTM - A gui frontend for the GT.M database
+
+SYNOPSIS
+       gtm
+
+    run the gtm frontend
+
+FILES
+       ~/.gtmrc
+
+    preferences (you can source it).
+
+SEE ALSO
+    GTM::Run
+
+AUTHOR
+       Stefan Traby <stefan@hello-penguin.com>
+       http://oesiman.de/gt.m/
+

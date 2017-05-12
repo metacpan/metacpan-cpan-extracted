@@ -1,0 +1,55 @@
+#!/usr/local/bin/perl
+# $Id$
+# $Source$
+# $Author$
+# $HeadURL$
+# $Revision$
+# $Date$
+use strict;
+use warnings;
+use version;
+use 5.006_001;
+
+use FindBin     qw($Bin);
+use YAML::Syck;
+use File::Spec;
+use Getopt::LL qw(getoptions);
+
+our $VERSION = 1.0;
+
+my $options  = getoptions(undef, { style => 'GNU' });
+my $updir    = File::Spec->updir();
+my $distmeta = File::Spec->catfile($Bin, $updir, 'META.yml');
+my $META     = LoadFile($distmeta);
+
+my $version  = $META->{version};
+
+
+if ($options->{'-n'}) {
+    my $v = version->new($version);
+    $version = $v->numify;
+}
+
+if ($options->{'-i'}) {
+    my $v = version->new($version);
+    my @digits = split m/\./, $v->stringify;
+    $digits[-1]++;
+    $v    = version->new( join q{.}, @digits );
+    $version = $v->stringify;
+}
+    
+    
+if ($options->{'-Q'}) {
+    $version = quotemeta $version;
+}
+
+print $version, "\n";
+
+__END__
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+# End:
+# vim: expandtab tabstop=4 shiftwidth=4 shiftround

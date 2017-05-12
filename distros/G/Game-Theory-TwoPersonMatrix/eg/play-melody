@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Game::Theory::TwoPersonMatrix;
+use MIDI::Simple;
+
+# Set the number of moves
+my $n = shift || 32;
+
+# A Prisoner's Dilemma
+my $g = Game::Theory::TwoPersonMatrix->new(
+    # Payoff table for the row player
+    payoff1 => [ [3, 0],   # 1
+                 [6, 1] ], # 2
+    # Payoff table for the column player (opponent)
+    #             1  2
+    payoff2 => [ [3, 6],
+                 [0, 1] ],
+);
+
+# Initial strategies
+my %strategy = (
+    1 => cooperate(),
+#    2 => cooperate(),
+#    1 => defect(),
+#    2 => defect(),
+#    1 => random(),
+    2 => random(),
+);
+
+my $melody = [];
+
+my @moves;  # Used by strategies
+
+for ( 1 .. $n )
+{
+    # Each player makes a move
+    my ($play) = $g->play(%strategy);
+#use Data::Dumper::Concise;warn Dumper$play;
+
+    # Update the melody with the payoff
+    my ($p) = values %$play;
+    push @$melody, $p;
+
+    # The strategies are encoded in the key
+    push @moves, (keys %$play)[0];
+
+    # Set next strategies
+    %strategy = (
+        1 => tit_for_tat(\@moves)->{1},
+#        1 => tit_for_two_tats(\@moves)->{1},
+        2 => random(),
+#        2 => defect()
+    );
+}
+
+process_midi($melody);
+
+sub random { return { 1 => 0.5, 2 => 0.5 } }
+
+sub cooperate { return { 1 => 1, 2 => 0 } }
+
+sub defect { return { 1 => 0, 2 => 1 } }
+
+sub tit_for_tat {
+    my $moves = shift;
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+    return {
+        1 => {
+            1 => ( $strat2 == 1 ? 1 : 0 ),
+            2 => ( $strat2 == 2 ? 1 : 0 ),
+        },
+        2 => {
+            1 => ( $strat1 == 1 ? 1 : 0 ),
+            2 => ( $strat1 == 2 ? 1 : 0 ),
+        },
+    }
+}
+
+sub tit_for_two_tats {
+    my $moves = shift;
+
+    return tit_for_tat() if @$moves == 1;
+
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+    my ( $strat3, $strat4 ) = split /,/, $moves->[-2];
+    # Defect if the opponent has defected twice in a row
+    # Otherwise use tit_for_tat
+    return {
+        1 => {
+            1 => ( $strat2 == 2 && $strat4 == 2 ? 0 : ( $strat2 == 1 ? 1 : 0 ) ),
+            2 => ( $strat2 == 2 && $strat4 == 2 ? 1 : ( $strat2 == 2 ? 1 : 0 ) ),
+        },
+        2 => {
+            1 => ( $strat1 == 2 && $strat3 == 2 ? 0 : ( $strat1 == 1 ? 1 : 0 ) ),
+            2 => ( $strat1 == 2 && $strat3 == 2 ? 1 : ( $strat1 == 2 ? 1 : 0 ) ),
+        },
+    }
+}
+
+sub set_score {
+    my %conf = (
+        tempo     => 600_000,
+        volume    => 100,
+        velocity  => 96,
+        signature => 4,
+        unit      => 'en',
+        channel   => 1,
+        patch     => 1,
+        octave    => 4,
+        kit       => 9,
+        pad       => 38,
+    );
+
+    my $score = MIDI::Simple->new_score();
+
+    $score->Volume($conf{volume});
+    $score->set_tempo($conf{tempo});
+
+    # Lead-in
+    $score->Channel($conf{kit});
+    $score->n($conf{unit}, $conf{pad}) for 1 .. $conf{signature};
+
+    $score->patch_change($conf{channel}, $conf{patch});
+    $score->Channel($conf{channel});
+    $score->Octave($conf{octave});
+
+    # For future use:
+    $score->Cookies(unit => $conf{unit});
+    $score->Cookies(velocity => $conf{velocity});
+
+    return $score;
+}
+
+sub int2name {
+    # Convert integer pitch notation into MIDI note names
+    my %name;
+
+    my @notes = qw( C Cs D Ds E F G Gs A As B );
+
+    my $int = -@notes;
+
+    for my $octave ( 3, 4, 5 ) {
+        for my $note (@notes) {
+            $name{$int} = $note . $octave;
+#warn "N:$int $name{$int} = $note . $octave\n";
+            $int++;
+        }
+    }
+    return %name;
+}
+
+sub process_midi {
+    my $notes = shift;
+
+    my $score = set_score();
+    my %name  = int2name();
+
+    for my $pair ( @$notes ) {
+        $score->n( 'en', $name{ $pair->[0] } );
+        $score->n( 'en', $name{ $pair->[1] } );
+    }
+
+    $score->write_score("$0.mid");
+}

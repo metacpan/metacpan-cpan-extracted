@@ -1,0 +1,18 @@
+digraph graph_59_05
+{
+	edge [penwidth = 3]
+
+	node [shape = square]
+
+	# Comment within graph.
+
+	A -> B [arrowhead = odot]
+
+	# Comment within graph.
+
+	C -> D
+
+	# Comment within graph.
+
+	label = "Test BNF re comment handling"
+}

@@ -1,0 +1,10 @@
+Geo-HelmertTransform
+
+Perform Helmert transforms (linear transformations between coordinate datums).
+These are used (for instance) to transform geographical coordinates between the
+WGS84 datum used in GPS, and the Airy 1830 datum used in British Ordnance
+Survey mapping.
+
+See the documentation for Geo::HelmertTransform for more information.
+
+$Id: README,v 1.1 2006-11-03 14:29:52 chris Exp $

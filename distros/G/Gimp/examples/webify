@@ -1,0 +1,74 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  $thresh /= 255;
+  $image = $image->duplicate if $new;
+  $image->undo_group_start;
+  $drawable = $image->flatten;
+  if ($alpha) {
+    $drawable->add_alpha;
+    Gimp::Context->set_sample_threshold($thresh);
+    $image->select_color(CHANNEL_OP_REPLACE,$drawable,$bg);
+    $drawable->edit_cut if $image->selection_bounds;
+  }
+  $drawable->autocrop if $autocrop;
+  $image->convert_indexed (2, 0, $colours, 0, 0, '') if $colours;
+  $image->undo_group_end;
+  if ($new) {
+    $image->clean_all;
+    eval { Gimp::Display->new($image) };
+  }
+  return $image
+};
+exit main;
+__END__
+
+=head1 NAME
+
+webify - Make an image suitable for the web
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Web/Webify...
+
+=head1 DESCRIPTION
+
+Flattens an image, makes the background transparent, converts it to
+indexed and then crops it to the right size. Useful to save small &
+transparent gifs from a higher-quality source.
+
+=head1 PARAMETERS
+
+  [PF_BOOL, "new", "Create a new image", 1],
+  [PF_BOOL, "alpha", "Make transparent", 1],
+  [PF_COLOUR, "bg", "Background colour to use for transparency", "white"],
+  [PF_SLIDER, "thresh", "Threshold to use for background detection", 100, [0, 255, 1]],
+  [PF_INT32, "colours", "How many colours to use (0 = don't convert to indexed)", 32],
+  [PF_BOOL, "autocrop", "Autocrop at end", 1],
+
+=head1 RETURN VALUES
+
+  [PF_IMAGE, 'image', 'Output image']
+
+=head1 IMAGE TYPES
+
+RGB*, GRAY*
+
+=head1 AUTHOR
+
+Marc Lehmann
+
+=head1 DATE
+
+1.0
+
+=head1 LICENSE
+
+Marc Lehmann
+
+Distributed under the same terms as Gimp-Perl.

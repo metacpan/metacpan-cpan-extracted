@@ -1,0 +1,42 @@
+Graphics::Primitive::Driver::CairoPango
+
+Cairo/Pango backend for Graphics::Primitive
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Graphics::Primitive::Driver::CairoPango
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Graphics-Primitive-Driver-CairoPango
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Graphics-Primitive-Driver-CairoPango
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Graphics-Primitive-Driver-CairoPango
+
+    Search CPAN
+        http://search.cpan.org/dist/Graphics-Primitive-Driver-CairoPango
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Cory G Watson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

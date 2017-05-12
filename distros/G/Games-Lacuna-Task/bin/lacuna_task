@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use Games::Lacuna::Task::TaskRunner;
+
+my $task = Games::Lacuna::TaskRunner->new_with_options();
+$task->run;
+
+=encoding utf8
+
+=head1 NAME
+
+lacuna_task - Run multiple tasks in the Lacuna MMPOG
+
+=head1 USAGE
+
+ lacuna_task --task task1 --task name2 ... [options]
+ lacuna_task --help
+
+=head2 OPTIONS
+
+=head3 task
+
+Specify which tasks to run. If not specified all available tasks will be 
+executed.
+
+Multiple
+
+=head3 exclude
+
+Excludes the selected tasks. Only valid if task option has not been set.
+
+Multiple
+
+=head3 configdir
+
+Path to the lacuna config directory (will be created if it does not exist)
+
+Default: ~/.lacuna/
+
+=head3 loglevel
+
+Prints all messages equal or above the given level
+
+Default: info
+Accepted: debug,info,notice,warn,error
+
+=head3 debug
+
+Log all messages to debug.log
+
+=head3 -? --usage --help  
+
+Prints usage information

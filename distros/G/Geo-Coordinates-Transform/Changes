@@ -1,0 +1,7 @@
+Revision history for Perl extension Geo::Coordinates::Transform.
+
+0.1  Thu Apr  1 17:36:51 2010
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Geo::Coordinates::Transform
+		
+

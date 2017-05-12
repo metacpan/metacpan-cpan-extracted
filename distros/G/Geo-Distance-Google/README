@@ -1,0 +1,195 @@
+NAME
+    Geo::Distance::Google - Google Maps Distance API
+
+SYNOPSIS
+      use Geo::Distance::Google;
+
+      my $geo = Geo::Distance::Google->new; 
+
+      my $distance = $geo->distance(
+        # sears tower... wacker tower whatever
+        origins      => '233 S. Wacker Drive Chicago, Illinois 60606',
+        destinations => '1600 Amphitheatre Parkway, Mountain View, CA'
+      );
+
+      printf "The distance between: %s and %s is %s\n",
+         $distance->[0]->{origin_address},
+         $distance->[0]->{destinations}->[0]->{address},
+         $distance->[0]->{destinations}->[0]->{distance}->{text};
+
+DESCRIPTION
+    Geo::Distance::Google provides a distance and duration functionality
+    using Google Maps API.
+
+METHODS
+  new
+    Create new geo distance object.
+
+      $geo = Geo::Distance::Google->new( https => 1 );
+      $geo = Geo::Distance::Google->new( language => 'ru' );
+      $geo = Geo::Distance::Google->new( gl => 'ca' );
+
+   Parameters (all are optional)
+    *   ua - LWP::UserAgent object or compatiable
+
+    *   host - url of api host
+
+    *   language - Google's response will be in this language (when possible
+        by google)
+
+    *   region - region for usage
+
+    *   sensor - true (1) when pulling data from GPS sensor
+
+    *   mode - mode of transport (default: driving)
+
+    *   avoid - restrictions applied to directions (supports 'tolls' or
+        'highways')
+
+    *   https - set to true will make requests with https
+
+    *   debug - true will output internal debugging info
+
+    You can optionally use your Maps Premier Client ID, by passing your
+    client code as the "client" parameter and your private key as the "key"
+    parameter. The URL signing for Premier Client IDs requires the
+    *Digest::HMAC_SHA1* and *MIME::Base64* modules. To test your client, set
+    the environment variables GMAP_CLIENT and GMAP_KEY before running
+    02_v3_live.t
+
+      GMAP_CLIENT=your_id GMAP_KEY='your_key' make test
+
+  distance
+      $distance = $geo->distance( 
+        origins      => '233 S. Wacker Drive Chicago, Illinois 60606',
+        destinations => '1600 Amphitheatre Parkway, Mountain View, CA'
+      )
+
+      # multiple origins
+      $distance = $geo->distance( 
+        origins      => [ 
+          'One MetLife Stadium Drive, East Rutherford, New Jersey 07073, United States',
+          '602 Jamestown Avenue, San Francisco, California 94124'
+        ],
+        destinations => '1265 Lombardi Avenue, Green Bay, Wisconsin 54304'
+      );
+
+      # lat and lng
+      $distance => $geo->distance( 
+        origins      => '34.101063,-118.3385319',
+        destinations => '34.1613743,118.1676149'
+      );
+
+    Queries *$geo* to Google Maps distance API and returns list reference
+    that contains each origin to destination mapping.
+
+    Data returned from second example above looks like:
+
+      [
+        {
+          'origin_address' => 'MetLife Stadium, 102 Stadium Rd, East Rutherford, NJ 07073, USA',
+          'destinations' => [
+            {
+              'distance' => {
+                 'value' => 1587392,
+                  'text' => '1,587 km'
+               },
+               'status'   => 'OK',
+               'duration' => {
+                 'value' => 60332,
+                 'text'  => '16 hours 46 mins'
+               },
+               'address' => '1265 Lombardi Ave, Green Bay, WI 54304, USA'
+             }
+           ]
+         },
+         {
+           'origin_address' => '602 Jamestown Ave, San Francisco, CA 94124, USA',
+           'destinations' => [
+             {
+               'distance' => {
+                 'value' => 3615562,
+                 'text'  => '3,616 km'
+               },
+               'status' => 'OK',
+               'duration' => {
+                 'value' => 127697,
+                 'text'  => '1 day 11 hours'
+               },
+               'address' => '1265 Lombardi Ave, Green Bay, WI 54304, USA'
+             }
+           ]
+         }
+      ]
+
+    When you'd like to pass non-ascii string as a location, you should pass
+    it as either UTF-8 bytes or Unicode flagged string.
+
+  ua
+    Accessor method to get and set UserAgent object used internally. You can
+    call *env_proxy* for example, to get the proxy information from
+    environment variables:
+
+      $coder->ua->env_proxy;
+
+    You can also set your own User-Agent object:
+
+      $coder->ua( LWPx::ParanoidAgent->new );
+
+ACKNOWLEDGEMENTS
+    I borrowed much of this inital code from "Geo::Coder::Google", it sped
+    up much of my work and was a great help. Thanks.
+
+AUTHOR
+    Lee Carmichael, "<lcarmich at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-geo-distance-google
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Distance-Google>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Geo::Distance::Google
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Distance-Google>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Geo-Distance-Google>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Geo-Distance-Google>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Geo-Distance-Google/>
+
+TODO
+    *   Add support to distance method for explicit latitude and longtitude
+        parameters (support by hand encoding as 'lat|lng'
+
+    *   Add tests for method based changes to attributes avoid, mode and
+        units
+
+    *   Add tests for API keys
+
+    *   Add tests for imperial units
+
+SEE ALSO
+    Geo::Distance, Geo::Coder::Google
+
+    List of supported languages:
+    <http://spreadsheets.google.com/pub?key=p9pdwsai2hDMsLkXsoM05KQ&gid=1>
+
+    API Docs:
+    <http://code.google.com/apis/maps/documentation/distancematrix/>,
+

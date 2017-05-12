@@ -1,0 +1,42 @@
+Revision history for Perl extension Games::Dissociate
+
+1998-11-09  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.12 -- first release version.
+
+2000-05-13  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.13 -- just noting my new email address
+
+2001-03-08  Sean M. Burke  sburke@cpan.org
+	
+	* Release 0.14 -- fixing an annoying but harmless warning that
+	showed up under -w
+	Also moved the POD to after the source.
+	Added disclaimer to the license.
+	Added reference to perlmodinstall to the README
+	Made dissociate_filter die with usage instructions
+	 if there are inadmissible switches used.
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.15 -- just rebundling.  No code changes.
+
+2006-03-01  Avi Finkel  avi@finkel.org
+
+	* Release 0.16 -- Update to change authorship information
+
+2006-06-21  Avi Finkel  avi@finkel.org
+
+	* Release 0.17 -- Small testing changes and some documentation reorg
+
+2006-07-07  Avi Finkel  avi@finkel.org
+
+	* Release 0.18 -- Fixing the MANIFEST
+
+2010-10-03  Avi Finkel  avi@finkel.org
+
+	* Release 1.0 -- Fixing the bug described in rt.cpan.org bug #32690
+	I seem to have neglected to write a change log entry for 0.19.  Oops
+	I'm going to a 1.0 release here because I think a module which hasn't
+	changed dramatically in 9 years can be considered "mature".

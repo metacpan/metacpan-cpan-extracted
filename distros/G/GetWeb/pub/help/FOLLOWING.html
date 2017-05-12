@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>Online Help: FOLLOWING</TITLE>
+</HEAD>
+<BODY>
+<H1>How can I follow chains of linked documents with a single command?</H1>
+
+<p>If you know what link you're going to follow from an intermediate
+document, you do not need to download the intermediate document.  You
+can instead save time and bandwidth by using the FOLLOW command.
+
+<p>Suppose http://www.healthnet.org/programs/ looks like this:
+
+<hr>
+<PRE>Some important conferences carried by SatelLife include:
+
+     * ProMED: Program for Monitoring Emerging Diseases[1]
+     * ProCAARE: Program for Collaboration Against AIDS[2]
+     * E-Drug: Essential Drugs[3]
+
+** References from this document **
+[1] http://www.healthnet.org/programs/promed.html
+[2] http://www.healthnet.org/programs/procaare.html
+[3] http://www.healthnet.org/programs/edrug.html
+</PRE>
+<hr>
+
+<p>If you send a message to the GetWeb server with the text:
+
+<p><code>GET http://www.healthnet.org/programs/ FOLLOW 2</code>
+
+<p>The server will send you the description of ProCAARE.
+
+<p>You can chain together multiple FOLLOW directives.  If you already
+know you're going to want the fifth document linked to the ProCAARE
+page, send a message like this:
+
+<p><code>GET http://www.healthnet.org/programs/ FOLLOW 2 FOLLOW 5</code>
+
+<p>This would reduce the total turnaround time, since you would get
+the desired final document in one e-mail round trip rather than in
+three.
+
+<p><A HREF=HELP.html>Back to the main help page</A>
+</BODY>
+</HTML>

@@ -1,0 +1,4 @@
+
+$ORIGIN not.qualified
+
+600 IN SOA not.qualified. dnsmaster.example.local. 2009012507 1200 120 1209600 60

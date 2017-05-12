@@ -1,0 +1,8 @@
+Add some tests.. 
+
+Think about the interface, in particular
+
+	how to deal with negative options like --no-delete
+
+	what do we think of forcibly putting some variables like
+	$::value in the main package.

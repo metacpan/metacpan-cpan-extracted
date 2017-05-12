@@ -1,0 +1,50 @@
+Revision history for Games-Word-Guess
+
+0.08    2016-01-12 (PERLANCAR)
+
+	- Skip WordList::Test::* by default.
+
+
+0.07    2016-01-08 (PERLANCAR)
+
+	- Switch from Games::Word::Wordlist::* to WordList::*.
+
+
+0.06    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.05    2014-08-08 (SHARYANTO)
+
+        - Rename dist from Games-WordGuess to Games-Word-Guess, because the
+          former is already reserved on PAUSE.
+
+        - Change wordlist: SGB with Enable because SGB only contains 5-letter
+          words.
+
+
+0.04    2014-08-07 (SHARYANTO)
+
+        - Minor tweak (don't pick Indonesian KBBI wordlist unless locale is
+          Indonesian).
+
+
+0.03    2014-08-07 (SHARYANTO)
+
+        - Minor fixes.
+
+
+0.02    2014-08-07 (SHARYANTO)
+
+        - Formatting.
+
+        - Pull a couple of wordlist modules (Games::Word::Wordlist::{KBBI,SGB})
+          as dependencies.
+
+
+0.01    2014-08-07 (SHARYANTO)
+
+        - First release.

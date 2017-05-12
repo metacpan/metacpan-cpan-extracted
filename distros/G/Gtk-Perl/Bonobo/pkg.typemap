@@ -1,0 +1,4 @@
+TYPEMAP
+
+Bonobo::UINode	T_SimpleVal
+

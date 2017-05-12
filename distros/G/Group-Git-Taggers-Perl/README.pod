@@ -1,0 +1,49 @@
+=head1 Group::Git::Taggers::Perl
+
+This package is a tagger from L<Group::Git> it will tag any repository that
+looks like a Perl repository (ie has a Perl Makefile.PL, Build.PL or dist.ini
+file).
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Group::Git::Taggers::Perl
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Group-Git-Taggers-Perl
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Group-Git-Taggers-Perl
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Group-Git-Taggers-Perl
+
+    Search CPAN
+        http://search.cpan.org/dist/Group-Git-Taggers-Perl/
+
+    Source Code
+        git://github.com/ivanwills/Group-Git-Taggers-Perl.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

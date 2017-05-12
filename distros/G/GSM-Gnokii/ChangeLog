@@ -1,0 +1,66 @@
+0.09	- 2012-09-16, H.Merijn Brand
+    * POD change to satisfy modern pod-checkers
+    * This module will be handed over to the libgnokii development team
+    * Upped copyright to 2013
+
+0.08	- 2012-04-04, H.Merijn Brand
+    * gn_data has no member named progress_indication anymore
+    * upped copyright to 2012
+    * Add ping
+    * Fixed YAML metadata
+    * Tested against libgnokii-7.0.0 (still works with 6.1.0)
+
+0.07	- 2011-09-07, H.Merijn Brand
+    * NAME / DISTNAME in Makefile.PL
+
+0.06	- 2011-09-07, H.Merijn Brand
+    * Add [Clear] and [Cancel] to AddressBook  maint window
+    * Spellchecking
+    * More cross-checks for META data
+
+0.05	- 2011-03-25, H.Merijn Brand
+    * Fixed WriteWAPSetting, ActivateWapSetting, WriteWapBookmark,
+      and DeleteWapBookmark
+    * Enable descending depth to dirtree ()
+    * Implemented GetDir ()
+    * Fix buffer overflow (coding error)
+    * Add Tk GUI to examples/dirtree (and a module for it)
+    * Implemented GetFile ()
+    * Add Safe, Show, and Preview functionality to examples/dirtree GUI
+    * Add PhoneBook add/update functionality to examples/kgnokii-sms
+    * Use libgnokii functions for memory types
+
+0.04	- 2011-02-10, H.Merijn Brand
+    * More info in GetDirTree
+    * SendSMS now works as expected
+    * Fixed WriteCalendarNote and CreateSMSFolder
+    * Implemented WritePhonebookEntry, DeleteSMSFolder, and DeleteSMS
+    * Basic range checks
+    * Lots of code cleanup
+
+0.03	- 2011-02-02, H.Merijn Brand
+    * Make it into a more complete and robust distribution
+    * More documentation
+    * Support connect ({ verbose => 1 });
+    * Finalized/Fixed a lot more Get methods from GSMD::Gnokii
+    * Implemented GetDirTree ()
+    * working examples in examples
+      + kgnokii - send SMS. Can be use both from command line
+                  and with Tk GUI
+      + backup  - safe the basic phone settings in JSON
+      + dirtree - show the complete file tree on phone
+
+0.02	- 2011-01-24, H.Merijn Brand
+    * Ongoing work-in-progress in converting all GSMD::Gnokii
+      functionality. Also extending existing code, adding new
+      methods and reformatting all code to mach my style  for
+      easier reading and for better maintainability.
+
+      This first phase is about all Get*** methods
+    * First check-in in git
+
+0.01	- 2011-01-21, H.Merijn Brand
+    * Start analizing GSMD::Gnokii and finding why connection
+      is failing.
+/bin/sh: -c: line 1: unexpected EOF while looking for matching `''
+/bin/sh: -c: line 3: syntax error: unexpected end of file

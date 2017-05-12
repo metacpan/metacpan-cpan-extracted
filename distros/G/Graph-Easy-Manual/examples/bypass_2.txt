@@ -1,0 +1,5 @@
+
+[ Bonn ] --> [ Koblenz ] --> [ Frankfurt ] --> [ Dresden ]
+
+[ Koblenz ] --> [ Trier ] { origin: Koblenz; offset: 2, 2; } 
+  --> [ Frankfurt ]

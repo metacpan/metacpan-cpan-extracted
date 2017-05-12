@@ -1,0 +1,9 @@
+\.svn
+blib
+.*~
+^Makefile$
+\.bs$
+\.c$
+\.o$
+MANIFEST.bak
+\.tar\.gz$

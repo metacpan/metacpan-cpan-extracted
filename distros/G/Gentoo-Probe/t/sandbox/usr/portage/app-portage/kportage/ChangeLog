@@ -1,0 +1,77 @@
+# ChangeLog for app-portage/kportage
+# Copyright 2002-2003 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/kportage/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  03 Jan 2004; Caleb Tennis <caleb@gentoo.org> kportage-0.6.1.ebuild:
+  Remove need-qt, add qt dependency directly to ebuild
+
+*kportage-0.6.1 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> kportage-0.6.1.ebuild:
+  moved from app-admin to app-portage
+
+  14 Jun 2003; Alastair Tse <liquidx@gentoo.org> kportage-0.6.1.ebuild:
+  fixing dep to python-2.2.2, don't peg with ~
+
+*kportage-0.6.1 (08 Feb 2003)
+
+  04 Apr 2003; Jason Wever <weeve@gentoo.org> kportage-0.6.1.ebuild:
+  Changed ~sparc keyword to sparc.
+
+  23 Mar 2003; Lars Weiler <pylon@gentoo.org> kportage-0.6.1.ebuild:
+  Set ppc in KEYWORDS
+
+  08 Feb 2003; Hannes Mehnert <hannes@gentoo.org> kportage-0.6.1.ebuild:
+  version bump
+
+*kportage-0.6 (15 Dec 2002)
+
+  15 Dec 2002; Hannes Mehnert <hannes@gentoo.org> kportage-0.6.ebuild:
+  version bump
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*kportage-0.5.1-r1 (11 Nov 2002)
+
+  11 Nov 2002; Hannes Mehnert <hannes@gentoo.org> kportage-0.5.1-r1.ebuild:
+  fixed broken make.conf parsing
+
+*kportage-0.5.1 (03 Nov 2002)
+
+  03 Nov 2002; Hannes Mehnert <hannes@gentoo.org> kportage-0.5.1.ebuild:
+  version bump
+
+*kportage-0.5 (31 Aug 2002)
+
+  31 Aug 2002; Hannes Mehnert <hannes@gentoo.org> ChangeLog  :
+
+  New upstream version, renamed kportagemaster to kportage
+
+*kportagemaster-0.4.2 (08 Aug 2002)
+
+  08 Aug 2002; Dan Armak <danarmak@gentoo.org> ChangeLog  :
+
+  New upstream version. Also add missing dep on kdebase. Closes #5116.
+
+  17 Jun 2002; Dan Armak <danarmak@gentoo.org> ChangeLog  :
+
+  Add dep on kde-base/kdebase - kportagemaster needs kdesu. Close bug #3758
+  (again).
+
+*kportagemaster-0.3 (02 Jul 2002)
+
+  02 Jul 2002; Ryan phillips <rphillips@gentoo.org> kportagemaster-0.3.ebuild :
+
+  New version
+  
+*kportagemaster-0.2 (15 Jun 2002)
+
+  15 Jun 2002; Dan Armak <danarmak@gentoo.org> ChangeLog  :
+
+  New upstream version, close #3758.
+
+*kportagemaster-0.1 (12 Jun 2002)
+
+  12 Jun 2002; Dan Armak <danarmak@gentoo.org> changelog:
+  
+  Initial ebuld. Submission #3664.

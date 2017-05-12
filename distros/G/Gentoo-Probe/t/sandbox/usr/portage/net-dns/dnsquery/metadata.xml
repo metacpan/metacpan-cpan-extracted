@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>no-herd</herd>
+<maintainer>
+  <email>matsuu@gentoo.org</email>
+</maintainer>
+<longdescription>The DNS Query tool is a program you can use to query Domain Name Servers for information. It can, at your choice, display the answer it receives as a raw DNS message or in a more human-readable format. This makes it a very useful tool for debugging DNS problems.</longdescription>
+</pkgmetadata>

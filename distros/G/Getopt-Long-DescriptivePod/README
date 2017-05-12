@@ -1,0 +1,38 @@
+Getopt::Long::DescriptivePod version 0.04
+=========================================
+
+Getopt::Long::Descriptive is a excellent way
+to write parameters and usage at the same time.
+
+This module allows to write Pod at the same time too.
+The idea is to write the usage in the Pod of the current script
+during development or test.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    English
+    Params::Validate
+    Sub::Exporter
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2011 - 2016,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

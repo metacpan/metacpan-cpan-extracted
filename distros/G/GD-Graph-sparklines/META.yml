@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: GD-Graph-sparklines
+version: 0.2
+author:
+  - |-
+    Copyright (c) 2004, Rob Partington E<lt>perl-ggs@frottage.orgE<gt>
+abstract: ~
+license: perl
+requires:
+  GD::Graph: 0
+  Test::More: 0
+provides:
+  GD::Graph::sparklines:
+    file: lib/GD/Graph/sparklines.pm
+    version: 0.2
+generated_by: Module::Build version 0.25

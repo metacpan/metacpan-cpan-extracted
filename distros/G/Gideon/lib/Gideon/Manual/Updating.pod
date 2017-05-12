@@ -1,0 +1,77 @@
+package Gideon::Manual::Updating;
+
+#ABSTRACT: Updating objects
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Gideon::Manual::Updating - Updating objects
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 DESCRIPTION
+
+Gideon can update a single object or a group objects depending on how it is
+invoked, B<please make sure you read and understand the documentation> as missues
+of this method can cause data corruption
+
+=head2 C<update( %changes )> as a Class method
+
+When C<update> is invoked for a Gideon class it updates all records in a data
+store with C<%changes>.
+
+    # Update all objects in the data store
+    People->update( status => 'active' );
+
+=head2 C<update( %changes )> as an Instance method
+
+When C<update> is invoked for a Gideon class instance it updates that particular
+record and not the rest of the records
+
+    # Update one object
+    People->find_one( id => 1 )->update( id => 2 );
+
+=head2 Updating object with C<save>
+
+Additionally you can use the C<save> method to update a particular object.
+
+    my $person = People->find_one( id => 1 );
+    
+    # Update only the name
+    $person->update( name => 'John Doe' );
+    # Query: UPDATE ... SET name = 'John Doe' WHERE id = 1
+
+    # Update names
+    $person->name('John Doe');
+    $person->save;
+    # Query: UPDATE ... SET id = 1, name = 'John Doe', ... WHERE id = 1
+
+The difference between C<save> and C<update> is that C<update> gives you a fine
+grained control on which fields to update. C<save> sends the entire record as a
+whole to the data store.
+
+=head1 NAME
+
+Updating objects with Gideon
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 AUTHOR
+
+Mariano Wahlmann, Gines Razanov
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mariano Wahlmann, Gines Razanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

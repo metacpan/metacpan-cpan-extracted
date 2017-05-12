@@ -1,0 +1,4 @@
+severity = 4
+
+[-Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict]
+[-Perl::Critic::Policy::TestingAndDebugging::RequireUseWarnings]

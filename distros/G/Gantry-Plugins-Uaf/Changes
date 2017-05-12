@@ -1,0 +1,9 @@
+Revision history for Perl extension Gantry::Plugins::Uaf.
+
+0.01  Mon Jan 28 12:40:57 2008
+	- original version; created by h2xs 1.23 with options
+		-Axc -n Gantry::Plugins::Uaf
+
+0.02  28-Jul-2008 K.Esteb
+      Changed form Makefile.PL to Build.PL
+      

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Interface to genealogy GEDCOM files",
+   "author" : [
+      "Paul Johnson (paul@pjcj.net)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gedcom",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Date::Manip" : "0",
+            "Parse::RecDescent" : "0",
+            "Roman" : "0"
+         },
+         "requires" : {
+            "Text::Soundex" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pjcj/Gedcom.pm/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/pjcj/Gedcom.pm",
+         "web" : "http://github.com/pjcj/Gedcom.pm"
+      },
+      "x_mailing_list" : "http://lists.perl.org/list/perl-gedcom.html"
+   },
+   "version" : "1.20"
+}

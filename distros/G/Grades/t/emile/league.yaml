@@ -1,0 +1,52 @@
+---
+id: emile
+approach: GroupworkNoFault
+league: Rousseau Cram School
+field: Prestentialism
+hw: homework
+compcomp: comp
+groupwork: classwork
+classMax: 3
+jigsaw: exams
+exams: exams
+examMax: 15
+hwMax: 2
+member:
+  - id: S09413
+    name: Sophie
+    rating: 500
+    password: so
+  - id: 34113
+    name: Emile
+    rating: 1500
+    password: em
+  - id: 1
+    name: Rousseau
+    rating: 3500
+    password: ro
+  - id: 222
+    name: Therese
+    rating: 1500
+    password: th
+out:
+  - id: 223
+    name: therese
+    rating: 1500
+    password: th
+absent:
+  - None
+series:
+  - first
+  - second
+  - third
+  - fourth
+session:
+  1: 2
+  2: 5
+  3: 10
+  4: 14
+weights:
+  classwork: 20
+  homework : 20
+  exams    : 60
+conversations:

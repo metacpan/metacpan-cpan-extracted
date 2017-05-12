@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+use lib 'lib';
+use GitInsight;
+use GitInsight::Util qw(info error warning prob);
+use Data::Dumper;
+use Getopt::Long;
+my ( $no_day_stats, $username, $left_cutoff, $cutoff_offset, $accuracy,
+    $output );
+
+GetOptions(
+    "username=s"      => \$username,        # string
+    "nodaystats"      => \$no_day_stats,    # flag
+    "left_cutoff=s"   => \$left_cutoff,
+    "cutoff_offset=s" => \$cutoff_offset,
+    "accuracy"        => \$accuracy,
+    "output=s"          => \$output
+) or die("Error in command line arguments\n");
+
+die("At least you must enter a github username") if !$username;
+$output ||= $username;
+my $Insight = GitInsight->new(
+    no_day_stats  => $no_day_stats,
+    left_cutoff   => $left_cutoff,
+    cutoff_offset => $cutoff_offset,
+    file_output   => $output,
+    accuracy      => $accuracy,
+    verbose       => 1,
+);
+$Insight->contrib_calendar($username);
+$Insight->process;
+

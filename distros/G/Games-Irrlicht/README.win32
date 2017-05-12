@@ -1,0 +1,76 @@
+
+=head1 Games::Irrlicht
+
+=head1 INTRODUCTION
+
+I have no windows experiences whatsoever, so if you have problems (or even
+know how to work around them), please email me! 
+
+Tels http://bloodgate.com/mail.html
+
+=head1 DEPENDENCIES
+
+You need the following things to install and use this Perl package:
+
+=over 2
+
+=item The Irrlicht Engine
+
+Get the Irrlicht engine from L<http://irrlicht.sf.net>.
+
+=item Perl
+
+Get a pre-compiled version from ActiveState
+L<http://www.activestate.com/> or download the source code from
+L<http://www.perl.org> and compile it yourself.
+
+=item Compiler and a make utility
+
+I have no experiences with this one. You probably should have nmake or
+dmake.
+
+=back
+
+=head1 INSTALLATION
+
+=over 2
+
+=item Unpack
+
+Unpack the package with Winzip or similiar.
+
+=item Build the makefile
+
+Go to a console and change to the path where you
+unpacked the package, then type:
+
+	perl Makefile.PL.win32
+
+=item Compile it
+
+	nmake
+
+(Or use dmake)
+
+=item Tun the testsuite:
+
+	nmake test
+
+If there are any test failures, please notify me. Thank you!
+
+=item install
+
+If all tests pass, install:
+
+	nmake install
+
+(You might need Administrator rights for this).
+
+=back
+
+Go to the example/ directory and run the example applications for fun. Enjoy!
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

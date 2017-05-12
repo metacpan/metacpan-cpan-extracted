@@ -1,0 +1,34 @@
+---
+abstract: 'module to manage version tags in git'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires:
+  File::Find: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-TagVersion
+requires:
+  File::Slurp: '0'
+  Git::Wrapper: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::App::Cmd: '0'
+  MooseX::App::Cmd::Command: '0'
+  MooseX::Getopt: '0'
+  Template: '0'
+  Time::Piece: '0'
+  overload: '0'
+  perl: v5.8.5
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-TagVersion
+  repository: https://github.com/benningm/Git-TagVersion
+version: '1.01'

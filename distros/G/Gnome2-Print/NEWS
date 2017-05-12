@@ -1,0 +1,17 @@
+Overview of changes since 0.94
+==============================
+
+* Wrapped Gnome2::Print::Config::set. [Emmanuele]
+* Gnome2::Print::Paper is now a blessed reference. [Emmanuele]
+
+Overview of changes since 0.93
+==============================
+
+* Fixed Gnome2::Print::Paper.  [Emmanuele and Torsten]
+
+Overview of changes since 0.92
+==============================
+
+* Build system updates.  [Emmanuele]
+* Implemented Gnome2::Print::Paper.  [Emmanuele]
+* Started NEWS.

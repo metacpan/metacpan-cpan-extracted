@@ -1,0 +1,59 @@
+NAME
+    Gtk2::Ex::Spinner -- integer entry using SpinButtons
+
+SYNOPSIS
+     use Gtk2::Ex::Spinner;
+     my $is = Gtk2::Ex::Spinner->new (value => 5);
+
+WIDGET HIERARCHY
+    "Gtk2::Ex::Spinner" is (currently) a subclass of "Gtk2::HBox", though
+    it's probably not a good idea to rely on that.
+
+        Gtk2::Widget
+          Gtk2::Container
+            Gtk2::Box
+              Gtk2::HBox
+                Gtk2::Ex::Spinner
+
+DESCRIPTION
+    "Gtk2::Ex::Spinner" is based on a great Gtk2::Ex::DateSpinner, so in
+    most cases documentation is the same. License is (of course) the same
+    too :-).
+
+    "Gtk2::Ex::Spinner" displays and changes a integer using one
+    "Gtk2::SpinButton" fields. The value is shown as below:
+
+            +------+   
+            |   99 |^  
+            +------+v
+
+    There's lots ways to enter/display an integer. This style is good for
+    clicking to a nearby value, but also allows a value to be typed in if a
+    long way away.
+
+FUNCTIONS
+    "$ds = Gtk2::Ex::Spinner->new (key=>value,...)"
+        Create and return a new Spinner widget. Optional key/value pairs set
+        initial properties per "Glib::Object->new". Eg.
+
+            my $s = Gtk2::Ex::Spinner->new (value => 99);
+
+SEE ALSO
+    Gtk2::Ex::DateSpinner Gtk2::Ex::DateSpinner::CellRenderer, Date::Calc,
+    Gtk2::Calendar, Gtk2::SpinButton, Gtk2::Ex::CalendarButton,
+    Gtk2::Ex::DateRange
+
+LICENSE
+    Gtk2-Ex-Spinner is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3, or (at your option) any
+    later version.
+
+    Gtk2-Ex-Spinner is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with Gtk2-Ex-Spinner. If not, see <http://www.gnu.org/licenses/>.
+

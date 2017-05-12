@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>net-dialup</herd>
+<maintainer>
+  <email>dragonheart@gentoo.org</email>
+  <name>Daniel Black</name>
+  <description>I'm maintaining this one package for net-dialup</description>
+</maintainer>
+  <longdescription>Proxy DNS server designed to server dialup workstations/networks</longdescription>
+</pkgmetadata>

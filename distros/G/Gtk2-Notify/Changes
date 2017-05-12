@@ -1,0 +1,25 @@
+Revision history for Gtk2-Notify
+
+0.05    Wed, 12 Nov 2008 07:47:10 +0100
+        * Port build system to Module::Install.
+
+0.04    Thu, 04 Oct 2007 14:26:02 +0200
+        * Let set_hint() stringify it's argument when it doesn't know
+          what to do with it.
+        * Don't compile things with -Werror.
+        * Be more portable by using ppport.h.
+        * Several minor, not user-visible improvements.
+
+0.03    Thu, 31 May 2007 13:48:03 +0200
+        * Bind status icon functions.
+        * Various improvements.
+
+0.02    Mon, 28 Aug 2006 13:07:56 +0200
+        * Make the last three arguments to ->new optional.
+        * Make the last two arguments to ->update optional.
+        * Make the userdata in add_action optional.
+        * Also initialize Gtk2 when called with -init.
+        * Port the pynotify examples.
+
+0.01    Sun, 27 Aug 2006 17:52:24 +0200
+        * First version, released on an unsuspecting world.

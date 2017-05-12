@@ -1,0 +1,5 @@
+[Alien::SDL] Testing header(s): iconv.h
+[Alien::SDL] Testing header(s): math.h
+[Alien::SDL] Testing header(s): SDL.h
+[Alien::SDL] Testing header(s): SDL_mixer.h
+Too early to specify a build action '-n'.  Do 'Build -n' instead.

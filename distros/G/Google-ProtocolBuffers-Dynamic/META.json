@@ -1,0 +1,62 @@
+{
+   "abstract" : "fast and complete protocol buffer implementation",
+   "author" : [
+      "Mattia Barbon <mattia@barbon.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-ProtocolBuffers-Dynamic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::ParseXS" : "2.30",
+            "ExtUtils::Typemaps::Default" : "1.05",
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::ProtoBuf" : "0.01",
+            "Alien::uPB" : "0.06",
+            "Module::Build" : "0.28",
+            "Module::Build::WithXSpp" : "0.14"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "autodie" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/mbarbon/google-protobuf-dynamic",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mbarbon/google-protobuf-dynamic.git",
+         "web" : "https://github.com/mbarbon/google-protobuf-dynamic"
+      }
+   },
+   "version" : "0.16",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0104"
+}
+

@@ -1,0 +1,92 @@
+#!/usr/bin/perl -w
+#
+# This is a supporting file for module GPS::Tracer.
+#
+# More documenttaion in the 'docs' directory, or
+# by calling:
+#    perldoc GPS/Tracer.pm
+#
+# $Id: fetch_and_create,v 1.1 2007/04/29 02:00:42 senger Exp $
+# ----------------------------------------------------------------------------------
+
+# ----------------------------------------
+# Command-line options, help, version
+# ----------------------------------------
+use Getopt::Std;
+use vars qw/ $opt_h $opt_u $opt_p $opt_b $opt_e $opt_m $opt_d $opt_n $opt_i $opt_f /;
+$Getopt::Std::STANDARD_HELP_VERSION = 'true';
+getopts ('hu:p:b:e:m:d:n:i:f:');
+
+sub VERSION_MESSAGE() {
+    print STDOUT "Using GPS::Tracer version $GPS::Tracer::VERSION\n";
+    print STDOUT "(Build: $GPS::Tracer::Revision)\n";
+    exit (0);
+}
+
+sub HELP_MESSAGE() {
+    print STDOUT <<'END_OF_USAGE';
+Usage:
+    -u <user>
+    -p <password>
+    -b <from-date>
+    -e <to-date>
+    -m <min-distance>
+    -d <result-dir>
+    -n <result-basename>
+    -i <input-data-file>
+    -f <input-data-format>
+
+  Options:
+    -h ... help
+END_OF_USAGE
+    exit (0);
+}
+
+HELP_MESSAGE() if $opt_h;
+
+# -----------------------------------------------------------
+
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
+
+use strict;
+use warnings;
+use GPS::Tracer;
+
+# ---------------------------------------------
+# Parameters from the command-line, or defaults
+# ---------------------------------------------
+my @my_params = (
+     result_dir       => $opt_d || 'data',
+     result_basename  => $opt_n || 'output',
+     login_url        => 'http://64.26.145.26/sentinel/main.asp',
+     data_url         => 'http://64.26.145.26/sentinel/messagesDownload.asp',
+     );
+push (@my_params, min_distance => $opt_m) if defined $opt_m;
+push (@my_params, input_data   => $opt_i) if $opt_i;
+push (@my_params, input_format => $opt_f) if $opt_f;
+push (@my_params, user         => $opt_u) if $opt_u;
+push (@my_params, passwd       => $opt_p) if $opt_p;
+push (@my_params, from_date    => $opt_b) if $opt_b;
+push (@my_params, to_date      => $opt_e) if $opt_e;
+
+# ----------------------------------------
+# Main program
+# ----------------------------------------
+my $tracer = new GPS::Tracer (@my_params);
+
+#my $data = $tracer->get_data;
+#print "Created file: ", $tracer->convert2xml ($data), "\n";
+#print "Created file: ", $tracer->summary2csv ($data), "\n";
+#print "Created file: ", $tracer->summary2xml ($data), "\n";
+#print "Created file: ", $tracer->summary2graph ($data), "\n";
+#print "Created file: ", $tracer->oneperday2xml ($data), "\n";
+#print "Created file: ", $tracer->min_distance2xml ($data), "\n";
+#print "Created file: ", $tracer->convert2oziwpt ($data), "\n";
+
+my @files = $tracer->create_all;
+map { print "Created file: ", $_, "\n" } @files;
+
+#my $rh_sum = $tracer->get_summary ($data);
+#require Data::Dumper;
+#print Data::Dumper->Dump ( [$data], ['DATA']);

@@ -1,0 +1,6 @@
+MD5 1ca51c9361283c02e43eb9da338e55f7 files/digest-kdebluetooth-20040416 78
+MD5 26ae7efb8dd189dad66629afa7d192a2 files/digest-kdebluetooth-20040308 74
+MD5 a3b02c48482b3c9b5a8b52ac39fb38b5 ChangeLog 1052
+MD5 96a4184e1e3325923219a5f96a5511a5 metadata.xml 163
+MD5 29aa6212bbb3438ab11ede124a36fd39 kdebluetooth-20040416.ebuild 1019
+MD5 9e6ac608c34c6ceda6b178cccfd4d4c4 kdebluetooth-20040308.ebuild 1042

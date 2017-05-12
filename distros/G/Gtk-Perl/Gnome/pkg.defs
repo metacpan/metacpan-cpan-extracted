@@ -1,0 +1,305 @@
+
+; You may want to disregard the following remark...
+;
+; These non-Gtk widgets will default to the Gtk::Gnome::* namespace. This
+; can be altered by adding a perl argument, like this:
+;
+;    (define-object GnomeAbout (GtkWindow) (perl Gnome::About))
+;
+
+(define-object GnomeAbout (GnomeDialog))
+(define-object GnomeApp (GtkWindow))
+(define-object GnomeClient (GtkObject))
+(define-object GnomeEntry (GtkCombo))
+(define-object GnomeFontSelector (GtkDialog))
+(define-object GnomePixmap (GtkWidget))
+(define-object GnomeScores (GnomeDialog))
+; this changed in gnome-libs sometime
+;(define-object GnomeMessageBox (GtkWindow) (cast GNOME_MESSAGE_BOX))
+(define-object GnomeMessageBox (GnomeDialog) (cast GNOME_MESSAGE_BOX))
+(define-object GtkClock (GtkLabel))
+(define-object GtkTed (GtkTable))
+
+; moved to Gtk
+;(define-object GtkSocket (GtkContainer))
+;(define-object GtkPlug (GtkWindow))
+
+(define-object GnomeCanvas (GtkLayout))
+(define-object GnomeCanvasItem (GtkObject))
+(define-object GnomeCanvasGroup (GnomeCanvasItem))
+(define-object GnomeCanvasText (GnomeCanvasItem))
+(define-object GnomeCanvasImage (GnomeCanvasItem))
+(define-object GnomeCanvasLine (GnomeCanvasItem))
+(define-object GnomeCanvasPolygon (GnomeCanvasItem))
+(define-object GnomeCanvasRE (GnomeCanvasItem))
+(define-object GnomeCanvasRect (GnomeCanvasRE))
+(define-object GnomeCanvasEllipse (GnomeCanvasRE))
+(define-object GnomeCanvasWidget (GnomeCanvasItem))
+
+;; post 0.13 widgets
+(define-object GnomeDialog (GtkWindow))
+(define-object GnomeDateEdit (GtkHBox))
+(define-object GnomeCalculator (GtkVBox))
+(define-object GnomeFileEntry (GtkHBox))
+(define-object GnomeIconList (GnomeCanvas))
+(define-object GnomeLamp (GnomePixmap))
+(define-object GnomeLess (GtkVBox))
+(define-object GnomePropertyBox (GnomeDialog))
+(define-object GnomeRootWin (GtkWindow) (cast GNOME_ROOTWIN))
+
+; moved to Gtk
+; (define-object GtkLayout (GtkContainer))
+
+;; 0.30 widgets
+
+(define-object GnomeAppBar (GtkHBox) (cast GNOME_APPBAR))
+(define-object GnomeColorPicker (GtkButton))
+(define-object GnomeDEntryEdit (GtkObject))
+(define-object GtkDial (GtkWidget))
+(define-object GnomeNumberEntry (GtkHBox))
+
+;; other stuff in gnome-libs 1.0
+(define-object GnomeFontPicker (GtkButton))
+(define-object GnomeHRef (GtkButton))
+(define-object GnomeIconEntry (GtkVBox))
+(define-object GnomePixmapEntry (GtkVBox))
+(define-object GnomePaperSelector (GtkVBox))
+(define-object GnomeDock (GtkContainer))
+(define-object GnomeDockBand (GtkContainer))
+(define-object GnomeDockItem (GtkBin))
+(define-object GnomeDockLayout (GtkObject))
+(define-object GnomeAnimator (GtkWidget))
+(define-object GtkPixmapMenuItem (GtkMenuItem))
+(define-object GnomeIconSelection (GtkVBox))
+
+(define-object GnomeStock (GnomePixmap))
+(define-object GnomeSpell (GtkVBox))
+(define-object GnomeMDI (GtkObject))
+(define-object GnomeMDIChild (GtkObject) (cast GNOME_MDI_CHILD))
+(define-object GnomeMDIGenericChild (GnomeMDIChild) (cast GNOME_MDI_GENERIC_CHILD))
+
+
+(define-enum GnomeDockPlacement
+	(top GNOME_DOCK_TOP)
+	(right GNOME_DOCK_RIGHT)
+	(bottom GNOME_DOCK_BOTTOM)
+	(left GNOME_DOCK_LEFT)
+	(floating GNOME_DOCK_FLOATING))
+
+(define-flags GnomeDockItemBehavior
+	(normal GNOME_DOCK_ITEM_BEH_NORMAL)
+	(exclusive GNOME_DOCK_ITEM_BEH_EXCLUSIVE)
+	(never-float GNOME_DOCK_ITEM_BEH_NEVER_FLOATING)
+	(never-vertical GNOME_DOCK_ITEM_BEH_NEVER_VERTICAL)
+	(never-horizontal GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL)
+	(locked GNOME_DOCK_ITEM_BEH_LOCKED))
+
+(define-enum GnomeAnimatorStatus
+	(stopped GNOME_ANIMATOR_STATUS_STOPPED)
+	(running GNOME_ANIMATOR_STATUS_RUNNING))
+
+(define-enum GnomeAnimatorLoopType
+	(none GNOME_ANIMATOR_LOOP_NONE)
+	(restart GNOME_ANIMATOR_LOOP_RESTART)
+	(ping-pong GNOME_ANIMATOR_LOOP_PING_PONG))
+
+(define-enum GnomeFontPickerMode
+	(pixmap GNOME_FONT_PICKER_MODE_PIXMAP)
+	(font-info GNOME_FONT_PICKER_MODE_FONT_INFO)
+	(user-widget GNOME_FONT_PICKER_MODE_USER_WIDGET)
+	(unknown GNOME_FONT_PICKER_MODE_UNKNOWN))
+
+
+(comment "Old stuff"
+
+;(define-enum GnomeAppWidgetPositionType ; Can say "Gnome::AppWidgetPositionType" here 
+;	; to override default of "Gtk::Gnome::AppWidgetPositionType"
+;	(top GNOME_APP_POS_TOP)
+;	(bottom GNOME_APP_POS_BOTTOM)
+;	(left GNOME_APP_POS_LEFT)
+;	(right GNOME_APP_POS_RIGHT)
+;	(floating GNOME_APP_POS_FLOATING))
+
+(define-enum GnomeInteractStyle
+	(none GNOME_INTERACT_NONE)
+	(errors GNOME_INTERACT_ERRORS)
+	(any GNOME_INTERACT_ANY))
+
+(define-enum GnomeDialogType
+	(error GNOME_DIALOG_ERROR)
+	(normal GNOME_DIALOG_NORMAL))
+
+(define-enum GnomeRestartStyle
+	(if-running GNOME_RESTART_IF_RUNNING)
+	(anyway GNOME_RESTART_ANYWAY)
+	(immediately GNOME_RESTART_IMMEDIATELY)
+	(never GNOME_RESTART_NEVER))
+
+(define-enum GnomeSaveStyle
+	(global GNOME_SAVE_GLOBAL)
+	(local GNOME_SAVE_LOCAL)
+	(both GNOME_SAVE_BOTH))
+
+(define-enum GnomeClientState
+	(idle GNOME_CLIENT_IDLE)
+	(saving-phase-1 GNOME_CLIENT_SAVING_PHASE_1)
+	(waiting-for-phase-2 GNOME_CLIENT_WAITING_FOR_PHASE_2)
+	(saving-phase-2 GNOME_CLIENT_SAVING_PHASE_2)
+	(frozen GNOME_CLIENT_FROZEN)
+	(disconnected GNOME_CLIENT_DISCONNECTED))
+
+(define-enum GtkClockType
+	(increasing GTK_CLOCK_INCREASING)
+	(decreasing GTK_CLOCK_DECREASING)
+	(realtime GTK_CLOCK_REALTIME))
+
+) ; end comment "Old stuff"
+
+;; generated by makeenums.pl  ; -*- scheme -*-
+
+
+; enumerations from "./gnome-app-helper.h"
+
+(define-enum GnomeUIInfoType
+   (endofinfo GNOME_APP_UI_ENDOFINFO)
+   (item GNOME_APP_UI_ITEM)
+   (toggleitem GNOME_APP_UI_TOGGLEITEM)
+   (radioitems GNOME_APP_UI_RADIOITEMS)
+   (subtree GNOME_APP_UI_SUBTREE)
+   (separator GNOME_APP_UI_SEPARATOR)
+   (help GNOME_APP_UI_HELP)
+   (builder-data GNOME_APP_UI_BUILDER_DATA)
+   (item-configurable GNOME_APP_UI_ITEM_CONFIGURABLE)
+   (subtree-stock GNOME_APP_UI_SUBTREE_STOCK))
+
+(define-enum GnomeUIPixmapType
+   (none GNOME_APP_PIXMAP_NONE)
+   (stock GNOME_APP_PIXMAP_STOCK)
+   (data GNOME_APP_PIXMAP_DATA)
+   (filename GNOME_APP_PIXMAP_FILENAME))
+
+; enumerations from "./gnome-app.h"
+
+;(define-enum GnomeAppWidgetPositionType
+;   (top GNOME_APP_POS_TOP)
+;   (bottom GNOME_APP_POS_BOTTOM)
+;   (left GNOME_APP_POS_LEFT)
+;   (right GNOME_APP_POS_RIGHT)
+;   (floating GNOME_APP_POS_FLOATING))
+
+; enumerations from "./gnome-calculator.h"
+
+(define-enum GnomeCalculatorMode
+   (deg GNOME_CALCULATOR_DEG)
+   (rad GNOME_CALCULATOR_RAD)
+   (grad GNOME_CALCULATOR_GRAD))
+
+; enumerations from "./gnome-client.h"
+
+(define-enum GnomeInteractStyle
+   (none GNOME_INTERACT_NONE)
+   (errors GNOME_INTERACT_ERRORS)
+   (any GNOME_INTERACT_ANY))
+
+(define-enum GnomeDialogType
+   (error GNOME_DIALOG_ERROR)
+   (normal GNOME_DIALOG_NORMAL))
+
+(define-enum GnomeSaveStyle
+   (global GNOME_SAVE_GLOBAL)
+   (local GNOME_SAVE_LOCAL)
+   (both GNOME_SAVE_BOTH))
+
+(define-enum GnomeRestartStyle
+   (if-running GNOME_RESTART_IF_RUNNING)
+   (anyway GNOME_RESTART_ANYWAY)
+   (immediately GNOME_RESTART_IMMEDIATELY)
+   (never GNOME_RESTART_NEVER))
+
+; enumerations from "./gnome-icon-list.h"
+
+(define-enum GnomeIconListMode
+   (icons GNOME_ICON_LIST_ICONS)
+   (text-below GNOME_ICON_LIST_TEXT_BELOW)
+   (text-right GNOME_ICON_LIST_TEXT_RIGHT))
+
+; enumerations from "./gnome-mdi.h"
+
+(define-enum GnomeMDIMode
+   (notebook GNOME_MDI_NOTEBOOK)
+   (toplevel GNOME_MDI_TOPLEVEL)
+   (modal GNOME_MDI_MODAL)
+   (default-mode GNOME_MDI_DEFAULT_MODE))
+
+; enumerations from "./gnome-properties.h"
+
+; (define-enum GnomePropertyRequest
+;    (read GNOME_PROPERTY_READ)
+;    (write GNOME_PROPERTY_WRITE)
+;    (apply GNOME_PROPERTY_APPLY)
+;    (setup GNOME_PROPERTY_SETUP))
+
+; enumerations from "./gnome-stock.h"
+
+(define-enum GnomeStockPixmapType
+   (none GNOME_STOCK_PIXMAP_TYPE_NONE)
+   (data GNOME_STOCK_PIXMAP_TYPE_DATA)
+   (file GNOME_STOCK_PIXMAP_TYPE_FILE)
+   (path GNOME_STOCK_PIXMAP_TYPE_PATH)
+   (widget GNOME_STOCK_PIXMAP_TYPE_WIDGET)
+   (imlib GNOME_STOCK_PIXMAP_TYPE_IMLIB)
+   (imlib-scaled GNOME_STOCK_PIXMAP_TYPE_IMLIB_SCALED)
+   (gpixmap GNOME_STOCK_PIXMAP_TYPE_GPIXMAP))
+
+; enumerations from "./gnome-types.h"
+
+(define-enum GnomePreferencesType
+   (never GNOME_PREFERENCES_NEVER)
+   (user GNOME_PREFERENCES_USER)
+   (always GNOME_PREFERENCES_ALWAYS))
+
+; enumerations from "./gtk-clock.h"
+
+(define-enum GtkClockType
+   (increasing GTK_CLOCK_INCREASING)
+   (decreasing GTK_CLOCK_DECREASING)
+   (realtime GTK_CLOCK_REALTIME))
+
+; enumerations from "./gtkcalendar.h"
+
+; now in Gtk
+
+;(define-enum GtkCalendarDisplayOptions
+;   (show-heading GTK_CALENDAR_SHOW_HEADING)
+;   (show-day-names GTK_CALENDAR_SHOW_DAY_NAMES)
+;   (no-month-change GTK_CALENDAR_NO_MONTH_CHANGE))
+
+; (define-enum GtkCalendarFont
+;    (heading GTK_CALENDAR_FONT_HEADING)
+;    (day-name GTK_CALENDAR_FONT_DAY_NAME)
+;    (day GTK_CALENDAR_FONT_DAY))
+
+; (define-enum GtkCalendarColor
+;    (heading GTK_CALENDAR_COLOR_HEADING)
+;    (day-name GTK_CALENDAR_COLOR_DAY_NAME)
+;    (prev-month GTK_CALENDAR_COLOR_PREV_MONTH)
+;    (next-month GTK_CALENDAR_COLOR_NEXT_MONTH)
+;    (normal-day GTK_CALENDAR_COLOR_NORMAL_DAY))
+
+(export-enum GnomeAnimatorStatus)
+(export-enum GnomeAnimatorLoopType)
+;(export-enum GnomeUIInfoType)
+;(export-enum GnomeUIPixmapType)
+(export-enum GnomeCalculatorMode)
+(export-enum GnomeInteractStyle)
+(export-enum GnomeDialogType)
+(export-enum GnomeSaveStyle)
+(export-enum GnomeRestartStyle)
+;(export-enum GnomeClientState)
+(export-enum GnomeDockPlacement)
+(export-flags GnomeDockItemBehavior)
+(export-enum GnomeFontPickerMode)
+(export-enum GnomeIconListMode)
+;(export-enum GnomeMDIMode)
+(export-enum GnomeStockPixmapType)
+(export-enum GnomePreferencesType)

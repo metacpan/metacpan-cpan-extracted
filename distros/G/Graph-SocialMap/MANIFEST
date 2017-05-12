@@ -1,0 +1,22 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Graph/SocialMap.pm
+lib/Graph/SocialMap.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/1.simple.t
+t/2.sub.t
+t/3.graph.t
+t/3.graph.type3.t
+t/4.graph-png.t
+t/5.issue_network.t
+t/6.affiliation_network.t
+t/graph.png

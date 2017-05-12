@@ -1,0 +1,214 @@
+{
+   "abstract" : "FIDE Swiss Same-Rank Contestant Pairing",
+   "author" : [
+      "Dr Bean <drbean, followed by the at mark (@), cpan, then a dot, and finally, org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Games-Tournament-Swiss",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::All" : "0",
+            "Parse::RecDescent" : "0",
+            "Test::Base" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "FileHandle" : "0",
+            "Getopt::Long" : "0",
+            "IO::All" : "0",
+            "IO::Handle" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Parse::RecDescent" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "YAML" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "orz" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Base" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.openfoundry.org/of/projects/swiss",
+      "repository" : {
+         "type" : "svn",
+         "url" : "http://svn.openfoundry.org/swiss/",
+         "web" : "http://svn.openfoundry.org/swiss/"
+      }
+   },
+   "version" : "0.21",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.020003"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [],
+                  "exclude_match" : [],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 0,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               }
+            },
+            "name" : "GatherDir",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "MetaYAML",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "ManifestSkip",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "PkgVersion",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ExecDir",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "License",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "AutoPrereqs",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "build",
+                  "type" : "requires"
+               }
+            },
+            "name" : "BuildRequires",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "ConfirmRelease",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "UploadToCPAN",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "MetaConfig",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "MetaJSON",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "5.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "5.043"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "5.043"
+      }
+   }
+}
+

@@ -1,0 +1,21 @@
+COPYRIGHT
+doc/Glossary.pod
+doc/People.pod
+doc/Referee.pod
+doc/Rules.pod
+images/pawn_b.png
+images/space_b.png
+lib/Games/Chess/Piece/General.pm
+lib/Games/Chess/Piece/Pawn.pm
+lib/Games/Chess/Referee.pm
+lib/Games/Chess/Rules.pm
+Makefile.old
+Makefile.PL
+MANIFEST
+README
+README.html
+script/mkbd
+script/tryme
+Shapes.txt
+t/referee.t
+META.yml                                 Module meta-data (added by MakeMaker)

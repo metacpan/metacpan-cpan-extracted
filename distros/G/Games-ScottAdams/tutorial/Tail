@@ -1,0 +1,32 @@
+=head1 SEE ALSO
+
+The reference manual,
+C<Games::ScottAdams::Manual>.
+
+=head1 BUGS
+
+Bugs in the tutorial, that is, not bugs in the program ...
+
+The following directives are not yet discussed:
+C<%ident>,
+C<%version>,
+C<%wordlen>,
+C<%maxload>,
+C<%lighttime>
+and
+C<%include>.
+
+There is not yet any discussion of flags, counters and location
+stores.
+
+Some discussion of what makes a good game design may be appropriate.
+
+=head1 AUTHOR
+
+Mike Taylor E<lt>mike@miketaylor.org.ukE<gt>
+
+First version Thursday 29th November 2001.
+
+=cut
+
+1;

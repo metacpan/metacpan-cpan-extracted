@@ -1,0 +1,391 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+# PODNAME: smt
+# ABSTRACT: command line interface to Games::SMTNocturne::Demons
+
+use Getopt::Long;
+use List::Util 1.27 'max', 'sum0';
+
+use Games::SMTNocturne::Demons;
+
+
+sub _demon          { Games::SMTNocturne::Demons::demon(@_) }
+sub _demons_of_type { Games::SMTNocturne::Demons::demons_of_type(@_) }
+sub _all_demons     { Games::SMTNocturne::Demons::all_demons(@_) }
+sub _fuse           { Games::SMTNocturne::Demons::fuse(@_) }
+sub _fusions_for    { Games::SMTNocturne::Demons::fusions_for(@_) }
+
+my $command = shift @ARGV;
+
+my ($max_level, $deathstones, $kagutsuchi, $bosses);
+GetOptions(
+    "max_level=i"   => \$max_level,
+    "deathstones=i" => \$deathstones,
+    "kagutsuchi=i"  => \$kagutsuchi,
+    "boss=s@"       => \$bosses,
+) or die "couldn't parse options";
+$bosses = [ split(/,/, join(',', @$bosses)) ]
+    if $bosses;
+
+my $options = {
+    max_level  => $max_level,
+    deathstone => $deathstones,
+    kagutsuchi => $kagutsuchi,
+    bosses     => $bosses,
+};
+
+if ($command !~ /^_/ && defined &$command) {
+    { no strict 'refs'; &{ $command }(@ARGV) }
+}
+else {
+    die "unknown command $command";
+}
+
+sub demon {
+    my ($demon) = @_;
+    print _demon($demon), "\n";
+}
+
+sub demons_of_type {
+    my ($type) = @_;
+    print join("\n", _demons_of_type($type)), "\n";
+}
+
+sub all_demons {
+    print join("\n", _all_demons), "\n";
+}
+
+sub fuse {
+    my ($demon1, $demon2, $sacrifice) = @_;
+    print _fuse($demon1, $demon2, { sacrifice => $sacrifice, %$options }), "\n";
+}
+
+sub fusions_for {
+    my ($demon) = @_;
+    print join("\n", _fusions_for($demon, $options)), "\n";
+}
+
+sub min_level_for {
+    my ($demon) = @_;
+
+    my @fusions = _fusions_for($demon, $options);
+    my $min_level = 99;
+    my @min_level_fusions;
+    for my $fusion (@fusions) {
+        my $max_level = max(map { $_->level } $fusion->all_demons);
+        if ($max_level < $min_level) {
+            @min_level_fusions = ($fusion);
+            $min_level = $max_level;
+        }
+        elsif ($max_level == $min_level) {
+            push @min_level_fusions, $fusion;
+        }
+    }
+    print "Level $min_level:\n";
+    print join("\n", @min_level_fusions), "\n";
+}
+
+sub party_fusion {
+    my @demons = @_;
+
+    my $seen = _party_fusion_recursive_fuse(
+        {
+            map { $_ => _demon($_) } @demons
+        },
+        {
+            map { $_ => _demon($_) } @demons
+        },
+        $deathstones,
+        map { _demon($_) } @demons
+    );
+    my @found =
+        sort { $a->level <=> $b->level }
+            map { _demon($_) }
+                keys %$seen;
+    for my $demon (@found) {
+        my $path = $seen->{$demon->name};
+        if (ref($path) eq 'ARRAY') {
+            print "$demon:\n";
+            my ($fusion, $current) = @$path;
+            print "  $_\n" for _linearize_tree($current, $fusion);
+        }
+        else {
+            print "$demon\n";
+        }
+    }
+}
+my $SEEN = {};
+sub _party_fusion_recursive_fuse {
+    my ($seen, $current, $deathstones, @demons) = @_;
+
+    return $seen if $SEEN->{join(';', @demons, ($deathstones || ''))}++;
+
+    if (@demons > 1) {
+        for my $demon1 (@demons) {
+            for my $demon2 (grep { $_ ne $demon1 } @demons) {
+                if ($deathstones) {
+                    for my $phase (0..8) {
+                        _check_fusion(
+                            $seen, $current, \@demons,
+                            $demon1, $demon2, undef,
+                            $deathstones, $phase
+                        );
+                    }
+                }
+                else {
+                    _check_fusion($seen, $current, \@demons, $demon1, $demon2);
+                }
+                for my $demon3 (grep { $_ ne $demon1 && $_ ne $demon2 } @demons) {
+                    _check_fusion(
+                        $seen, $current, \@demons, $demon1, $demon2, $demon3
+                    );
+                }
+            }
+        }
+    }
+
+    return $seen;
+}
+sub _check_fusion {
+    my ($seen, $current, $party, $demon1, $demon2, $sacrifice, $deathstones, $phase) = @_;
+
+    my $fused = _fuse(
+        $demon1, $demon2,
+        {
+            %$options,
+            sacrifice => $sacrifice,
+            deathstone => $deathstones,
+            kagutsuchi => $phase,
+        },
+    );
+    return unless $fused;
+    return if defined $max_level && $fused->level > $max_level;
+
+    my $new_current = { %$current };
+
+    my $new_fusion = Games::SMTNocturne::Demons::Fusion->new(
+        $options,
+        $demon1, $demon2,
+        ($sacrifice
+            ? ($sacrifice)
+            : ()),
+        ($fused->type eq 'Fiend'
+            ? ('<deathstone>', [$phase])
+            : ()),
+    );
+    if (my $old_fusion = $new_current->{$fused->name}) {
+        my $old_max_level = _max_level($new_current, $old_fusion);
+        my $new_max_level = _max_level($new_current, $new_fusion);
+        if ($new_max_level < $old_max_level) {
+            $new_current->{$fused->name} = $new_fusion;
+        }
+        else {
+            my $old_demon_count = _demon_count($new_current, $old_fusion);
+            my $new_demon_count = _demon_count($new_current, $new_fusion);
+            if ($new_demon_count < $old_demon_count) {
+                $new_current->{$fused->name} = $new_fusion;
+            }
+        }
+    }
+    else {
+        $new_current->{$fused->name} = $new_fusion;
+    }
+    if (my $old = $seen->{$fused->name}) {
+        my ($old_fusion, $old_current) = ref($old) eq 'ARRAY'
+            ? @$old : ($old, undef);
+        my $old_max_level = _max_level($old_current, $old_fusion);
+        my $new_max_level = _max_level($new_current, $new_fusion);
+        if ($new_max_level < $old_max_level) {
+            $seen->{$fused->name} = [ $new_fusion, $new_current ];
+        }
+        else {
+            my $old_demon_count = _demon_count($old_current, $old_fusion);
+            my $new_demon_count = _demon_count($new_current, $new_fusion);
+            if ($new_demon_count < $old_demon_count) {
+                $seen->{$fused->name} = [ $new_fusion, $new_current ];
+            }
+        }
+    }
+    else {
+        $seen->{$fused->name} = [ $new_fusion, $new_current ];
+    }
+
+    my @new_party = (
+        $fused,
+        grep {
+            $_ ne $demon1 && $_ ne $demon2 && (!$sacrifice || $_ ne $sacrifice)
+        } @$party
+    );
+    _party_fusion_recursive_fuse(
+        $seen, $new_current,
+        ($fused->type eq 'Fiend' ? $deathstones - 1 : $deathstones),
+        @new_party
+    );
+}
+sub _max_level {
+    my ($seen, $fusion) = @_;
+
+    return 0 if $fusion->isa('Games::SMTNocturne::Demons::Demon');
+    return 1 + max(
+        map { _max_level($seen, $seen->{$_->name}) } $fusion->all_demons
+    );
+}
+sub _demon_count {
+    my ($seen, $fusion) = @_;
+
+    return 1 if $fusion->isa('Games::SMTNocturne::Demons::Demon');
+    my @demons = $fusion->all_demons;
+    return @demons + sum0(
+        map { _demon_count($seen, $seen->{$_->name}) } @demons
+    );
+}
+sub _linearize_tree {
+    my ($seen, $fusion) = @_;
+
+    return if $fusion->isa('Games::SMTNocturne::Demons::Demon');
+    return (
+        (map { _linearize_tree($seen, $seen->{$_->name}) } $fusion->all_demons),
+        $fusion,
+    );
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+smt - command line interface to Games::SMTNocturne::Demons
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  smt <command> [args...]
+
+  Possible commands:
+
+    demon <name>
+
+    demons_of_type <type>
+
+    all_demons
+
+    fuse [--boss <boss1>[,<boss2>...] [--deathstones <n>]
+         [--kagutsuchi <phase>] <demon1> <demon2>
+
+    fusions_for [--boss <boss1>[,<boss2>...] [--max_level <n>] <demon>
+
+    min_level_for [--boss <boss1>[,<boss2>...] [--max_level <n>] <demon>
+
+    party_fusion [--boss <boss1>[,<boss2>...] [--max_level <n>]
+                 [--deathstones <n>] <demon1> [<demon2> ...]
+
+=head1 DESCRIPTION
+
+This program exposes the functionality from L<Games::SMTNocturne::Demons> on
+the command line, as well as adding some useful functionality on top of it.
+
+=head1 COMMANDS
+
+=head2 demon
+
+  $ smt demon Pixie
+  <Fairy Pixie (2)>
+
+Displays the type, name, and base level for the given demon.
+
+=head2 demons_of_type
+
+  $ smt demons_of_type Wilder
+  <Wilder Zhen (6)>
+  <Wilder Bicorn (15)>
+  <Wilder Raiju (25)>
+  <Wilder Nue (31)>
+  <Wilder Mothman (43)>
+  <Wilder Hresvelgr (75)>
+
+Displays the type, name, and base level for all demons of a given type.
+
+=head2 all_demons
+
+  $ smt all_demons
+  <Foul Will o' Wisp (1)>
+  <Fairy Pixie (2)>
+  <Jirae Kodama (3)>
+  <Haunt Preta (4)>
+  <Brute Shikigami (4)>
+  <Jirae Hua Po (5)>
+  <Foul Slime (6)>
+  <Wilder Zhen (6)>
+  <Femme Datsue-Ba (7)>
+  <Element Erthys (7)>
+  [...]
+
+Displays the type, name, and base level for all demons.
+
+=head2 fuse
+
+  $ smt fuse Zhen Lilim
+  <Beast Inugami (13)>
+
+Displays the demon that would result from fusing C<demon1> with C<demon2>.
+
+=head2 fusions_for
+
+  $ smt fusions_for 'Jack Frost'
+  Fuse <Brute Shikigami (4)> with <Wilder Zhen (6)> resulting in <Fairy Jack Frost (7)>
+  Fuse <Jirae Kodama (3)> with <Brute Shikigami (4)> resulting in <Fairy Jack Frost (7)>
+  Fuse <Jirae Hua Po (5)> with <Brute Shikigami (4)> resulting in <Fairy Jack Frost (7)>
+  Fuse <Mitama Ara Mitama (25)> with <Fairy Jack Frost (7)> resulting in <Fairy Jack Frost (7)>
+  [...]
+
+Displays all possible ways to create C<demon> via fusion.
+
+=head2 min_level_for
+
+  $ smt min_level_for 'Jack Frost'
+  Level 4:
+  Fuse <Jirae Kodama (3)> with <Brute Shikigami (4)> resulting in <Fairy Jack Frost (7)>
+
+Calculates the "easiest" way to fuse a given demon, where "easiest" is defined
+as requiring the lowest leveled demons possible.
+
+=head2 party_fusion
+
+  $ smt party_fusion Pixie 'Hua Po' Zhen
+  <Fairy Pixie (2)>
+  <Jirae Hua Po (5)>
+  <Wilder Zhen (6)>
+  <Yoma Apsaras (8)>:
+    Fuse <Jirae Hua Po (5)> with <Fairy Pixie (2)> resulting in <Yoma Apsaras (8)>
+  <Beast Inugami (13)>:
+    Fuse <Jirae Hua Po (5)> with <Fairy Pixie (2)> resulting in <Yoma Apsaras (8)>
+    Fuse <Yoma Apsaras (8)> with <Wilder Zhen (6)> resulting in <Beast Inugami (13)>
+  <Night Fomor (18)>:
+    Fuse <Jirae Hua Po (5)> with <Wilder Zhen (6)> resulting in <Brute Momunofu (20)>
+    Fuse <Brute Momunofu (20)> with <Fairy Pixie (2)> resulting in <Night Fomor (18)>
+  <Brute Momunofu (20)>:
+    Fuse <Jirae Hua Po (5)> with <Wilder Zhen (6)> resulting in <Brute Momunofu (20)>
+
+Calculates all possible demons that can be fused from the given party, as well
+as an example path to take in order to create that demon.
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

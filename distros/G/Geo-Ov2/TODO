@@ -1,0 +1,10 @@
+    1) Implement reading and writing poi.dat
+        It means operating in two modes. In mode of ov2 behavior stays the
+        same as now. In poi.dat mode it will return hash of arrays on read
+        and expect hash of arrays on write. The top level hash will contain
+        categories and in each category there will be array of POIs, as
+        returned nowadays.
+
+    2) Make Czech translations of README and INSTALL.
+    3) Implement seekability on POI basis.
+    4) Implement other IO::File methods on POI basis.

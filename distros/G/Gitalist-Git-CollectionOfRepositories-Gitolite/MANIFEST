@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Gitalist/Git/CollectionOfRepositories/Gitolite.pm
+lib/Gitalist/Git/CollectionOfRepositories/Gitolite/Collection.pm
+lib/Gitalist/Git/CollectionOfRepositories/Gitolite/Impl.pm
+xt/release/cpan-changes.t
+xt/release/distmeta.t
+xt/release/meta-json.t
+xt/release/pod-syntax.t
+xt/release/portability.t

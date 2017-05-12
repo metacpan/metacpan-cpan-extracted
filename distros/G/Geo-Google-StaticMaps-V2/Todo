@@ -1,0 +1,7 @@
+TODO list for Perl module Geo::Google::StaticMaps::V2
+
+- Update stringify method to support more object types like GPS::Point->newMulti
+
+Not in the plans as of now
+  - Support Encoded Polylines path->enc
+  - Support map->style

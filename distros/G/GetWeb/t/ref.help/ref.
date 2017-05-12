@@ -1,0 +1,196 @@
+Content-Type: text/plain; name=".index.html"
+Content-Disposition: inline; filename=".index.html"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./help/.index.html> Online Help
+
+ How to access GetWeb
+=====================
+
+Please note access to this server is logged; we cannot guarantee that
+your requests will remain private.
+
+To request a document from the World Wide Web, send a message to
+getweb@usa.healthnet.org with the body containing one or more
+requests like:
+
+GET url
+
+Where url is the URL of the document you request. If the message
+contains more than one request, separate each request with a blank
+line.
+
+Here is a message which would fetch the HealthNet home page:
+
+GET http://www.healthnet.org
+
+After receiving the above message, the GetWeb server would format the
+HealthNet home page as human-readable plain-text and send it to you.
+
+A hotlist[1] of URLs which we consider especially interesting is
+available.
+
+Each hypertext link is represented by a number in brackets. Suppose
+you get a message like this from a GetWeb server:
+
+--------------------------------------------------------------------
+
+Some important conferences carried by SatelLife include:
+
+     * ProMED: Program for Monitoring Emerging Diseases[1]
+     * ProCAARE: Program for Collaboration Against AIDS[2]
+     * E-Drug: Essential Drugs[3]
+
+** References from this document **
+[1] http://www.healthnet.org/programs/promed.html
+[2] http://www.healthnet.org/programs/procaare.html
+[3] http://www.healthnet.org/programs/edrug.html
+
+--------------------------------------------------------------------
+
+To get more information about ProCAARE, you would look up link 2 at
+the bottom of the message to find out the URL is
+http://www.healthnet.org/programs/procaare.html. You would then send
+a message to the GetWeb server:
+
+GET http://www.healthnet.org/programs/procaare.html
+
+If your mailer program insists puts extra, unwanted text at the
+beginning or end of your message, then you can enclose your commands
+in a begin/end block. You can also comment out lines with '#', so
+that in the following message only the 'GET http://www.healthnet.org'
+line will be processed:
+
+
+Hello getweb@usa.healthnet.org!
+This preamble will not be processed by the MailBot...
+
+begin
+
+GET http://www.healthnet.org
+
+# ...neither will this comment
+
+end
+...and neither will this signature:
+--
+B. Russell, ontological consultant, phone: (617) 555-1652
+"The worse the logic, the more interesting the conclusions"
+
+
+Follow the links below for more help.
+
+How can I:
+
+  * fill out HTML Forms?[2]
+  * search the Web?[3]
+  * break a long command between multiple lines?[4]
+  * follow chains of linked documents with a single command?[5]
+  * request raw HTML source rather than formatted text?[6]
+  * configure how documents are delivered?[7]
+  * use Agora (w3mail) commands?[8]
+  * send username and password to the Web server?[9]
+  * decode binary files?[10]
+
+How quotas limit server load[11]
+
+Accessing ProMED archives[12]
+
+Other GetWeb-type servers[13]
+
+About the GetWeb MailBot server software[14]
+
+Also see the GetWeb home page.[15]
+
+Send bugs or suggestions for improvement to
+getweb-admin@usa.healthnet.org.
+
+*** References from this document ***
+[orig] file:./help/.index.html
+[1] file:/help/HOTLIST.html
+[2] file:/help/FORMS.html
+[3] file:/help/SEARCHING.html
+[4] file:/help/BREAK.html
+[5] file:/help/FOLLOWING.html
+[6] file:/help/FORMAT.html
+[7] file:/help/DELIVER.html
+[8] file:/help/AGORA.html
+[9] file:/help/AUTH.html
+[10] file:/help/MIME.html
+[11] file:/help/QUOTA.html
+[12] file:/help/PROMED.html
+[13] file:/help/SERVERS.html
+[14] file:/help/INFO.html
+[15] http://www.healthnet.org/dist/getweb/
+Content-Type: text/plain; name="INFO.html"
+Content-Disposition: inline; filename="INFO.html"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./help/INFO.html> Online Help: INFO
+
+ About the GetWeb MailBot server software
+=========================================
+
+GetWeb was developed by SatelLife.[1] SatelLife is an international
+not-for-profit organization employing satellite, telephone and radio
+networking technology to serve the health communication and
+information needs of countries in the developing world.
+
+Please address any suggestions to the author, Rolf Nelson.[2]
+
+Funding was provided by the American Physiological Society[3],
+Management Sciences for Health[4], NEC[5], and the National Science
+Foundation[6].
+
+SatelLife wishes to thank CERN, the European Laboratory for Particle
+Physics[7], for its role in the development of methods of offline Web
+access, especially for developing the Agora (W3mail) Server software.
+
+Special thanks also to the author of Agora, Arthur Secret[8]; and to
+Hugh Sasse[9] and Guido Hansen[10], who have used their prior
+experience running w3mail servers to provide invaluable input to the
+development process.
+
+The GetWeb MailBot server program is copyright (c) 1996 SatelLife.
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl.[11]
+There is no warranty for the service nor the software.
+
+Back to the main help page[12]
+
+*** References from this document ***
+[orig] file:./help/INFO.html
+[1] http://www.healthnet.org/
+[2] mailto:rolf@usa.healthnet.org
+[3] file://www.uth.tmc.edu/apstracts/
+[4] http://www.msh.org/
+[5] http://www.nec.co.jp/index_e.html
+[6] http://www.nsf.gov/
+[7] http://www.cern.ch/
+[8] mailto:secret@w3.org
+[9] mailto:hgs@dmu.ac.uk
+[10] mailto:Guido.Hansen@gmd.de
+[11] http://www.perl.com/perl/doc/misc/license/README.perl5
+[12] file:/help/HELP.html
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: Original_Sender
+CC: getweb-admin@usa.healthnet.org
+Subject: Internal Error
+
+An unexpected internal error occurred:
+  illegal help command: HELP WHOOPS.
+  Legal help commands are: HELP, HELP AGORA, HELP APS, HELP AUTH, HELP BREAK, HELP DELIVER, HELP FOLLOWING, HELP FORMAT, HELP FORMS, HELP HOTLIST, HELP INFO, HELP MIME, HELP PROMED, HELP QUOTA, HELP SEARCHING, HELP SERVERS
+
+____original message follows____
+
+From: Original_Sender
+Subject: 
+Reply-To: terminal
+
+HELP
+
+HELP INFO
+
+HELP WHOOPS

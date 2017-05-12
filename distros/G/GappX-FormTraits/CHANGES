@@ -1,0 +1,21 @@
+Changes for GappX-FormTraits
+
+{{$NEXT}}
+- fix zip code entry
+
+0.204     2012-10-05 17:59:31
+
+0.203     2012-10-04 18:21:34
+-fix zip
+
+0.202     2012-10-04 14:34:40
+- bug fix: reference gobject instead of gtk_widget
+
+0.201     2012-10-03 12:22:38
+- fixed tests ( work with Gapp .40.x )
+
+0.200     2012-10-03 12:16:47
+- using Dist::Zilla
+
+0.01 GappX-FormTraits
+- original version

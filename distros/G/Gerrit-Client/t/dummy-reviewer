@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Gerrit::Client;
+use Gerrit::Client::Test;
+use FindBin;
+
+sub changed_files {
+  my $out = qx(git diff-tree HEAD --name-only -r -z);
+  my (@files) = split(/\x00/, $out);
+  shift @files;
+  return @files;
+}
+
+sub changed_lines {
+  my ($file) = @_;
+  my (@lines) = qx(git blame -t -b HEAD^..HEAD -- "$file");
+  my @out = ();
+  foreach my $line (@lines) {
+    next unless $line =~ /^[a-f0-9]+\s+\(.*?\s+(\d+)\) (.+)$/;
+    push @out, [$1, $2];
+  }
+  return @out;
+}
+
+sub rand_comment {
+  my (@comments) = (
+    'This is no good.',
+    'Looks pretty bad',
+    'Typo.',
+    "I don't like this"
+  );
+
+  my $idx = int(rand(10));
+  return $comments[$idx];
+}
+
+sub do_review {
+  my ($change, $ps) = @_;
+  my (@changed_files) = changed_files();
+
+  my %comments;
+
+  foreach my $file (@changed_files) {
+    my @filecomments;
+    my (@lines) = changed_lines($file);
+    foreach my $data (@lines) {
+      my ($lineno, $linecontent) = @{$data};
+      my $comment = rand_comment();
+      if ($comment) {
+        push @filecomments, {line => $lineno, message => $comment};
+      }
+    }
+    if (@filecomments) {
+      $comments{$file} = \@filecomments; 
+    }
+  }
+
+  my $out = {};
+  if (%comments) {
+    $out->{message} = "Some problems were found. Please see comments inline.";
+    $out->{comments} = \%comments;
+  }
+
+  return $out;
+}
+
+sub run {
+  my $gerrit = Gerrit::Client::Test->ensure_gerrit_installed(
+    dir => "$FindBin::Bin/gerrit",
+  );
+  die unless $gerrit;
+
+  local @Gerrit::Client::SSH = ( $gerrit->git_ssh_wrapper() );
+  local @Gerrit::Client::GIT = ( $gerrit->git_wrapper() );
+
+  my $guard = Gerrit::Client::for_each_patchset(
+    ssh_url => $gerrit->giturl_base(),
+    http_url => $gerrit->http_url(),
+    http_auth_cb => Gerrit::Client::http_digest_auth('perl-gerrit-client-test', 'JN+EDyCDgCbf'),
+    workdir => "$FindBin::Bin/dummy-workdir",
+    review => 1,
+    on_patchset => \&do_review,
+  );
+
+  my $str = join(' ', @Gerrit::Client::GIT);
+  print "Running.\nUse this git command to push changes from another console:\n$str\n";
+  AE::cv()->recv();
+}
+
+run() unless caller;
+1;

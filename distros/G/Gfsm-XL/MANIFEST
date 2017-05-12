@@ -1,0 +1,26 @@
+MANIFEST			This list of files
+MANIFEST.SKIP			Files to skip
+Makefile.PL
+Changes
+README.rpod
+README.txt
+
+GfsmXLPerl.c
+GfsmXLPerl.h
+ppport.h
+
+typemap
+perlobject.map
+
+Cascade.xs
+Lookup.xs
+XL.xs
+
+XL.pm
+XL/Cascade.pm
+XL/Cascade/Lookup.pm
+
+t/01_ini.t
+t/common.plt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

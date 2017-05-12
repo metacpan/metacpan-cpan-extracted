@@ -1,0 +1,14 @@
+Revision history for Perl extension Geo::Address::Mail::Standardizer::USPS::AMS::Results.
+
+0.05  Wed Dec 29 15:03:04 2010
+	- Add footnote support using Message::Stack
+
+0.04  Thu Oct 14 09:42:10 2010
+    - Fixed more dependency issues
+
+0.03  Tue Oct 12 07:21:19 2010
+	- clean up some build issues and flesh out some POD
+
+0.02  Thu Oct 07 13:52:33 2010
+	- split off from Geo::Address::Mail::Standardizer::USPS::AMS
+

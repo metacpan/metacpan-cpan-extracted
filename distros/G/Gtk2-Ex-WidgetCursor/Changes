@@ -1,0 +1,65 @@
+Copyright 2008, 2009, 2010 Kevin Ryde
+
+This file is part of Gtk2-Ex-WidgetCursor.
+
+Gtk2-Ex-WidgetCursor is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+Gtk2-Ex-WidgetCursor is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-WidgetCursor.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 15, November 2010
+    - fix signal warnings for target widget destroyed when unrealized
+
+Version 14, November 2010
+    - an actual Glib::Object so can make from Gtk2::Builder
+    - cleanup realize handler on destroy (harmless but unsightly)
+
+Version 13, September 2010
+    - fix some realize-during-busy commented out for debugging
+
+Version 12, September 2010
+    - test manifest only as an author test
+
+Version 11, August 2010
+    - tests allow for perl 5.8.3 overload.pm on widget somehow not working
+
+Version 10, June 2010
+    - use refaddr() just in case a widget overloads numizing
+
+Version 9, December 2009
+    - use 'blank-cursor' when available
+
+Version 8, March 2009
+    - restore cursor in Gtk2::SpinButton of Gtk 2.14
+
+Version 7, December 2008
+    - workaround for emission hook before any widgets with gtk2-perl 1.160
+
+Version 6, August 2008
+    - restore cursor on Gtk2::SpinButton, improve Gtk2::TextView
+
+Version 5, July 2008
+    - fix weakening so garbage collection actually works
+
+Version 4, June 2008
+    - fix for unrealized Gtk2::Entry
+
+Version 3, June 2008
+    - let test suite cope with single-display gdk backends, as
+      reported by Jamie Lahowetz
+
+Version 2, May 2008
+    - use GtkButton private subwindow
+    - notice new toplevels during busy
+
+Version 1, April 2008
+    - the first version

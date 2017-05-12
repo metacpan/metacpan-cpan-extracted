@@ -1,0 +1,11 @@
+1.10
+
+First CPAN-packaged version.
+
+1.13
+
+Correct sign errors (thanks Jain Harishkumar)
+
+1.14
+
+Fix tests for double longs (thanks Dominic Hargreaves)

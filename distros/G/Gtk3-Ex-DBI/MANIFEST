@@ -1,0 +1,11 @@
+Changes
+COPYRIGHT
+lib/Gtk3/Ex/DBI.pm
+lib/Gtk3/Ex/DBI/Form.pm
+lib/Gtk3/Ex/DBI/Datasheet.pm
+Makefile.PL
+MANIFEST
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)
+readme.txt
+META.json                                Module JSON meta-data (added by MakeMaker)

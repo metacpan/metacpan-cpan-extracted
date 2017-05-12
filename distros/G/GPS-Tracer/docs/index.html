@@ -1,0 +1,203 @@
+<html> <head>
+<title>GPS::Tracer</title>
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<h1>Displaying geographic routes</h1>
+
+There are many software tools allowing to display trip routes from
+data collected by various GPS and tracer devices. This document
+describes one of them. <p>
+
+It consists of a Perl module <tt>GPS::Tracer</tt> that does collect
+and re-format routing data, and from examples of several JavaScript
+functions that display collected data using Google Maps. <p>
+
+The tool was developed primarily to read data from the customer web
+site provided by <a href="http://www.guardianmobility.com">Guardian
+Mobility</a> for their product "Tracer" (data are published there
+after they are collected from the Globastar satellites). However, it
+was made flexible enough that it can also read data from a simple CSV
+format ("comma-separated values") instead from their secured web
+site. <p>
+
+The original motivation for creating the tool was the Arctic student
+expedition <a href="http://frozenfive.org">FrozenFive</a> (2007) where
+you can see their original route, created by the very same tool. <p>
+
+<h3>Architecture</h3>
+
+One scenario is to use module <tt>GPS::Tracer</tt> in a periodically
+and automatically repeated script (on UNIX machine called a
+<em>cronjob</em>) and let the web pages read data from output files
+anytime they are accessed from web browsers. As shown on this figure:
+
+<img src="images/architecture.png" borer=0/>
+<br clear="left"/>
+<p>
+
+<h3>Perl module</h3>
+
+The <tt>GPS::Tracer</tt> module has its <a href="Tracer.html">own
+documentation</a>. It describes the formats off all related files, and
+it shows what module methods may be used in your Perl scripts. This
+distribution also includes a command-line script
+<tt>fetch_and_create.pl</tt> that can be directly used in your
+regular <em>cronjobs</em>. <p>
+
+<h3>JavaScript</h3>
+
+The included JavaScript files are examples how to use outputs from the
+<tt>GPS::Tracer</tt> module to create or enhanced web pages. They are
+quite self-explanatory, containing many comments. Still, below a few
+less immediately visible points is made. They can be found and
+followed in the directory <tt>examples</tt>, in the page <a
+href="examples/example.html">examples/example.html</a>, and in the
+JavaScript files in the same directory. (The page probably reported
+errors - unless you are displaying it using a URL that starts with
+<em>http://localhost/...</em> - see the first comment below). <p>
+
+
+<dl>
+
+  <dt> Google Map needs your own key <p>
+       
+  <dd> In order to display a Google Map in your web page, you need to
+sign up for a Google Maps API key <a
+href="http://www.google.com/apis/maps/signup.html">here</a>. Once you
+have it, put it directly into your page, in its <em>head</em>
+section. You may have more than one Google key if you want to show the
+same page from various web servers. For example:
+
+<pre class="smallercode">
+&lt;!-- make this page runable from several servers, with different Google Maps keys --&gt;
+&lt;script language="javascript" type="text/javascript"&gt;
+function include (script_url) {
+   document.write ('&lt;' + 'script');
+   document.write (' language="javascript"');
+   document.write (' type="text/javascript"');
+   document.write (' src="' + script_url + '"&gt;');
+   document.write ('&lt;/' + 'script' + '&gt;');
+}
+
+var hostname = document.location.hostname;
+var key;
+if (hostname == "localhost")
+   key = "ABQIAAAAZhe5F7Vv-1Xq9DDyIlEQXxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSg6J0s1S0DuVD-dFi2DIRpZq2LOg";
+else if (hostname == "...")
+   key = "...";
+else if (hostname == "...")
+   key = "...";
+else if (hostname == "...")
+   key = "...";
+
+include ("http://maps.google.com/maps?file=api&amp;v=2&amp;key=" + key);
+&lt;/script&gt;
+</pre>       
+
+  <dt> Loading function <p>
+       
+  <dd> We want to do some actions (such as prepare a Google Map) when
+a web page loads. There are two ways to do it. One is to call it
+directly in the <em>body</em> HTML tag, and one is to overwrite the
+<tt>window.onload</tt> function at the end of the page body. The
+latter case allows more flexibility (also it allows displaying a text,
+for example <em>Loading...</em>, during the loading time). The example
+uses the latter one, and the loading is in the file <a
+href="examples/loading.js">examples/loading.js</a>. <p>
+
+  <dt> Displaying Google Maps <p>
+       
+  <dd> It is done by functions in the file <a
+href="examples/tracer.js">examples/tracer.js</a>. Of course, these
+function need to get data produced by the Perl module
+<tt>GPS::Tracer</tt>. The JavaScript is hopefully
+self-explanatory. Just one comment: it has a hard-coded location of
+the map. However, it could be done better, by reading the first marker
+first and use its location as the map centre. <p>
+
+  <dt> Displaying summary <p>
+       
+  <dd> It is done by functions in the file <a
+href="examples/summary.js">examples/summary.js</a>. It just displays
+"so far travelled" kilometres as read from the
+<tt>examples/data/output-summary.xml</tt> file. As it is done, it
+<em>uses a machine gun to kill a mosquito</em>. It needs to read just
+one attribute from a very short XML file and it uses the full-flown
+tool <tt>examples/prototype.js</tt> to do it. One solution is to use
+the same functionality from the Google Maps API (even though this has
+nothing to do with any map). <p>
+       
+  <dt> HTML elements names <p>
+       
+  <dd> Last but not least, be aware that the example JavaScript files
+rely on some names of HTML elements in your web page. If you use
+different names, you need also to change the names in the scripts. The
+used names are <tt>errormsg</tt>, <tt>totalkms</tt> (used in
+<tt>summary.js</tt> file), and <tt>map</tt>, <tt>progressDisplay</tt>,
+<tt>markerCount</tt>, <tt>lastPoint</tt>, <tt>density</tt> (used in
+<tt>tracer.js</tt> file).
+
+</dl> <p>
+
+<h3>Sewing together Perl module and JavaScript</h3>
+
+If the <tt>GPS::Tracer</tt> produces output file on the same machine
+as the web pages are served from, there is no need to sewing them
+together. However, if not, your <em>cronjob</em> needs also to send
+created output files to another machine. It can be done by many ways,
+one example is to use ftp by a Perl script like this:
+
+<pre class="smallercode">
+#!/usr/bin/perl -w
+#
+use strict;
+use warnings;
+use Net::FTP;
+
+# --- Configuration section ---
+my $server =     'YOUR_FTP_HOSTNAME';
+my $user =       'YOUR_USER_NAME_FOR_THE_FTP_SERVER';
+my $password =   '...AND_YOUR PASSWORD';
+my $local_dir =  'data';
+my $remote_dir = 'whatever/data';
+# --- end of configuration ---
+
+my @files = ('output-all.xml', 'output-distance.xml', 'output-oneperday.xml',
+	     'output-summary.xml', 'output.csv', 'output-ozi.wpt',
+	     'output-chart.png');
+
+chdir $local_dir or die "Cannot cd to '$local_dir': $!\n";
+
+my $ftp = Net::FTP->new ($server)
+    or die "Cannot connect to $server: $@";
+$ftp->login ($user, $password)
+    or die "Cannot login: ", $ftp->message;
+$ftp->pasv()
+    or die "Cannot set passive mode: ", $ftp->message;
+$ftp->binary()
+    or die "Cannot set binary: ", $ftp->message;
+$ftp->cwd ($remote_dir)
+    or die "Cannot cd to '$remote_dir': ", $ftp->message;
+foreach my $file (@files) {
+    $ftp->put ($file)
+	or die "Cannot upload '$file': ", $ftp->message;
+}
+$ftp->quit;
+</pre>
+
+<h3>Comments and bug reports welcome</h3>
+
+Please send them to the email below. I will try to answer your
+questions, or even try to apply your suggestions. <p>
+
+
+<hr>
+<div align=right><font size=-2>
+<address><A HREF="mailto:martin.senger&#64;gmail.com">Martin Senger</A><BR></address>
+<!-- hhmts start -->
+Last modified: Sat Apr 28 16:11:21 2007
+<!-- hhmts end -->
+</font></div>
+</body> </html>

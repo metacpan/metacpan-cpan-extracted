@@ -1,0 +1,10 @@
+ENVIRONMENT
+
+ GETOPT_LONG_SUBCOMMAND_DUMP => bool
+
+    Will be set to 1 when executing the script to be dumped.
+
+SEE ALSO
+
+    Getopt::Long::Dump
+

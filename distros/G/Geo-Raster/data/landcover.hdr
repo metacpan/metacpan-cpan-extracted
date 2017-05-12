@@ -1,0 +1,14 @@
+BYTEORDER      I
+LAYOUT       BIL
+NROWS         123
+NCOLS         132
+NBANDS        1
+NBITS         16
+BANDROWBYTES         264
+TOTALROWBYTES        264
+BANDGAPBYTES         0
+NODATA        -9999
+ULXMAP        3390000
+ULYMAP        6785975
+XDIM          25
+YDIM          25

@@ -1,0 +1,56 @@
+{
+   "abstract" : "turn WGS84 coordinates into three word addresses and vice-versa using what3words.com HTTPS API",
+   "author" : [
+      "mtmail <mtmail-cpan@gmx.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-What3Words",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "JSON" : "2",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Net::Ping" : "0",
+            "Net::Ping::External" : "0",
+            "Test::Exception" : "0",
+            "Test::LWP::Recorder" : "0",
+            "Test::More" : "0.88",
+            "Test::Warn" : "0",
+            "URI" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::What3Words" : {
+         "file" : "lib/Geo/What3Words.pm",
+         "version" : "v2.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/opencagedata/perl-Geo-What3Words.git",
+         "web" : "https://github.com/opencagedata/perl-Geo-What3Words"
+      }
+   },
+   "version" : "2.0.1"
+}
+

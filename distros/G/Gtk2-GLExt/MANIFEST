@@ -1,0 +1,31 @@
+AUTHORS
+ChangeLog
+GLExt.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+NEWS
+README
+examples/button.pl
+examples/example.pl.opengl
+examples/example.pl.pdl
+examples/example.pl.sdl
+gtkglextperl.h
+maps
+perl-Gtk2-GLExt.spec.in
+t/00.GtkGl.t
+t/01.GtkGdkGlConfig.t
+t/02.GtkGlWidget.t
+xs/GdkGLConfig.xs
+xs/GdkGLContext.xs
+xs/GdkGLDrawable.xs
+xs/GdkGLFont.xs
+xs/GdkGLInit.xs
+xs/GdkGLPixmap.xs
+xs/GdkGLQuery.xs
+xs/GdkGLShapes.xs
+xs/GdkGLWindow.xs
+xs/GtkGL.xs
+xs/GtkGLInit.xs
+xs/GtkGLWidget.xs
+META.yml                                 Module meta-data (added by MakeMaker)

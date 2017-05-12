@@ -1,0 +1,39 @@
+Sgf2mpost is a tool for producing encapsulated postscript files
+from Smart Go Format files. The program creates a text file
+which can be run through metapost to produce the postscript
+file. Most diagrams found in any typical Go book can be
+produced by this method.
+
+Sgf2mpost is a part of the Sgf2Dg distribution. See
+the Sgf2Dg manual for details.
+
+You may need to edit Makefile, making MPOST the path to metapost.
+
+To create sgf2mpost, just run 'make sgf2mpost'.
+
+sgf2mpost -h reports the following help string:
+
+-i <input file>
+-o <output file>
+-s <start move>       first NUMBERED move number or board location
+-e <end move>         last move number or board location displayed
+-n <num>              first numbered stone gets this numeral
+-l <left column>      limit portion of board printed
+-r <right column>
+-t <top row>
+-b <bottom row>
+-L <location>:<label> (e.g. -L a:K3) mark the location with this label
+-T <location>         mark this stone with a triangle
+-S <scale factor>     scaling factor (default 1.0
+-F <font name>        (e.g. "cmr8") TeX font for numbers
+-I <font name>        (e.g. "cmti8") TeX font for letters
+-B <font name>        TeX font for numbers > 99
+-h                    print this message
+-d                    print debugging traces
+-v                    print version
+
+The Sgf2Dg manual contains examples to show the program's capabilities.
+
+
+
+

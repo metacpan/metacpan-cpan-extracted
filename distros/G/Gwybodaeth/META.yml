@@ -1,0 +1,59 @@
+---
+name: Gwybodaeth
+version: 0.02
+author:
+  - 'Iestyn Pryce, <imp25@cam.ac.uk>'
+abstract: Scripts and classes for RDF-izing data
+license: bsd
+resources:
+  license: http://www.opensource.org/licenses/bsd-license.php
+configure_requires:
+  Module::Build: '>=0.26'
+requires:
+  CGI: 0
+  CGI::Carp: 0
+  Carp: 0
+  LWP: 0
+  Text::CSV: '>=1.10'
+  Tie::InsertOrderHash: 0
+  XML::Twig: '>=3.32'
+  perl: '>= 5.8.0'
+build_requires:
+  Module::Build: '>=0.26'
+  Test::Exception: 0
+  Test::More: 0
+  Test::Output: 0
+provides:
+  Gwybodaeth:
+    file: lib/Gwybodaeth.pm
+    version: 0.02
+  Gwybodaeth::Escape:
+    file: lib/Gwybodaeth/Escape.pm
+  Gwybodaeth::NamespaceManager:
+    file: lib/Gwybodaeth/NamespaceManager.pm
+  Gwybodaeth::Parsers::CSV:
+    file: lib/Gwybodaeth/Parsers/CSV.pm
+  Gwybodaeth::Parsers::GeoNamesXML:
+    file: lib/Gwybodaeth/Parsers/GeoNamesXML.pm
+  Gwybodaeth::Parsers::N3:
+    file: lib/Gwybodaeth/Parsers/N3.pm
+  Gwybodaeth::Parsers::XML:
+    file: lib/Gwybodaeth/Parsers/XML.pm
+  Gwybodaeth::Read:
+    file: lib/Gwybodaeth/Read.pm
+  Gwybodaeth::Tokenize:
+    file: lib/Gwybodaeth/Tokenize.pm
+  Gwybodaeth::Triples:
+    file: lib/Gwybodaeth/Triples.pm
+  Gwybodaeth::Write:
+    file: lib/Gwybodaeth/Write.pm
+  Gwybodaeth::Write::WriteFromCSV:
+    file: lib/Gwybodaeth/Write/WriteFromCSV.pm
+  Gwybodaeth::Write::WriteFromUsgsXML:
+    file: lib/Gwybodaeth/Write/WriteFromUsgsXML.pm
+  Gwybodaeth::Write::WriteFromXML:
+    file: lib/Gwybodaeth/Write/WriteFromXML.pm
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

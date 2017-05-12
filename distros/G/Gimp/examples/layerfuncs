@@ -1,0 +1,48 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  $drawable->become('Gimp::Layer');
+  $drawable->set_offsets(
+    ($image->width - $drawable->width )/2,
+    ($image->height - $drawable->height)/2
+  );
+  return;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+center_layer - Center Layer
+
+=head1 SYNOPSIS
+
+<Image>/Layer/Center Layer
+
+=head1 DESCRIPTION
+
+Centers the current layer on the image
+
+=head1 PARAMETERS
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+1.0
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

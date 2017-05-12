@@ -1,0 +1,36 @@
+Games-Dukedom version v0.1_1
+=========================
+
+This is an implementation of the classic big-iron game "Dukedom". It is the
+aim of this package to provide a display-agnostic adaptation that should
+be suitable for use by CGI scripts, Tk and other displays other than the
+simple command line script included with this package.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Moo
+MooX::StrictConstructor
+MooX::ClassAttribute
+MooX::Struct
+Throwable
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Jim Bacon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.008008
+or, at your option, any later version of Perl 5 you may have available.

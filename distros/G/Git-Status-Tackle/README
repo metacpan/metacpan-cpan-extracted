@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Git-Status-Tackle,
+version 0.01:
+
+  a pluggable "git status"-replacement toolbox
+
+This software is copyright (c) 2012 by Shawn M Moore <code@sartak.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

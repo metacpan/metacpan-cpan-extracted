@@ -1,0 +1,16 @@
+
+* running "make test" hangs in t/myirrlicht.t, while perl t/myirrlicht.t works
+  (huh?) (this is some problem with the nanosleep)
+* resizable is not supported?
+* fullscreen does not seem to work
+* screenshots not yet possible
+* the entire EventHandler code needs revamping due to SDL_KEYDOWN vs. whatever
+  Irrlicht uses
+* The framerate wait-delay stuff (nanosleep) does not work like it should
+* some enums/constants might be missing
+* windows make untested (does probably not work)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

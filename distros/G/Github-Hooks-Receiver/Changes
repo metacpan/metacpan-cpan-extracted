@@ -1,0 +1,14 @@
+Revision history for Perl extension Github-Hooks-Receiver
+
+0.04 2015-03-23T13:07:51Z
+    - depends on Plack::Middleware::HubSignature 0.02 and fix some tests
+
+0.03 2014-12-05T15:14:17Z
+    - depend on Plack::Middleware::HubSignature for validating Hub-Signature header
+
+0.02 2014-09-22T14:07:05Z
+    - application/json mimetype support (shogo82148++)
+    - X-Hub-Signature header support (shogo82148++)
+
+0.01 2014-04-16T14:36:21Z
+    - original version

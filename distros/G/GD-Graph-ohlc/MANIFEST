@@ -1,0 +1,19 @@
+.perlcriticrc
+Changes
+MANIFEST
+Makefile.PL
+README
+candlesticks.pm
+candlesticks.pod
+candlesticks_example.png
+contrib/mixed_candle.pl
+contrib/test_candlesticks_pod_example
+contrib/test_ohlc_pod_example
+ohlc.pm
+ohlc.pod
+ohlc_example.png
+t/01_load.t
+t/critic.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

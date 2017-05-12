@@ -1,0 +1,313 @@
+#!/usr/bin/perl
+#
+# Copyright 2011, Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Functional tests for the AdGroupAdService.
+#
+# Author: David Torres <api.davidtorres@gmail.com>
+
+use strict;
+use lib qw(t/util);
+
+use Test::More (tests => 70);
+use TestClientUtils qw(get_test_client);
+use TestAPIUtils qw(get_api_package create_campaign delete_campaign
+                    create_ad_group delete_ad_group get_test_image);
+
+# Getting API client for functional tests.
+my $client = get_test_client();
+if (!$client) {
+  plan skip_all => "Can't create test client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+use Google::Ads::Common::MediaUtils;
+
+# Test can use AdGroupAdService related classes.
+use_ok(get_api_package($client, "AdGroupAd"));
+use_ok(get_api_package($client, "AdGroupAdOperation"));
+use_ok(get_api_package($client, "AdGroupAdPage"));
+use_ok(get_api_package($client, "AdGroupAdReturnValue"));
+use_ok(get_api_package($client, "ExemptionRequest"));
+use_ok(get_api_package($client, "ImageAd"));
+use_ok(get_api_package($client, "MobileImageAd"));
+use_ok(get_api_package($client, "PolicyViolationKey"));
+use_ok(get_api_package($client, "Selector"));
+use_ok(get_api_package($client, "TextAd"));
+
+# API dependencies for this test.
+my $campaign = create_campaign($client);
+my $ad_group = create_ad_group($client, $campaign->get_id());
+
+# Test create TextAd.
+my $text_ad = get_api_package($client, "TextAd")->new({
+  headline => "Luxury Cruise to Mars",
+  description1 => "Visit the Red Planet in style.",
+  description2 => "Low-gravity fun for everyone!",
+  displayUrl => "www.example.com",
+  url => "http://www.example.com"
+});
+my $ad_group_ad = get_api_package($client, "AdGroupAd")->new({
+  adGroupId => $ad_group->get_id(),
+  ad => $text_ad
+});
+my $result = $client->AdGroupAdService()->mutate({
+  operations => [get_api_package($client, "AdGroupAdOperation")->new({
+    operator => "ADD",
+    operand => $ad_group_ad
+  })]
+});
+ok($result, "Result from adding TextAd is valid");
+isa_ok($result, get_api_package($client, "AdGroupAdReturnValue"));
+ok($result->get_value()->[0], "Result contains the added AdGroupAd");
+ok($result->get_value()->[0]->get_ad(), "Added AdGroupAd contains TextAd");
+isa_ok($result->get_value()->[0]->get_ad(), get_api_package($client, "TextAd"));
+is($result->get_value()->[0]->get_ad()->get_headline(),
+   $text_ad->get_headline(), "Added TextAd headline matches original");
+is($result->get_value()->[0]->get_ad()->get_description1(),
+   $text_ad->get_description1(), "Added TextAd description1 matches original");
+is($result->get_value()->[0]->get_ad()->get_description2(),
+   $text_ad->get_description2(), "Added TextAd description2 matches original");
+is($result->get_value()->[0]->get_ad()->get_displayUrl(),
+   $text_ad->get_displayUrl(), "Added TextAd displayUrl matches original");
+is($result->get_value()->[0]->get_ad()->get_url(),
+   $text_ad->get_url(), "Added TextAd url matches original");
+$text_ad = $result->get_value()->[0]->get_ad();
+
+# Test create TextAd with exemption request.
+my $text_ad_with_exemption =
+    get_api_package($client, "TextAd")->new({
+      headline => "Luxury Cruise to Mars",
+      description1 => "Visit the Red Planet in style.",
+      description2 => "Low-gravity fun for everyone!",
+      displayUrl => "www.example.com",
+      url => "http://www.example.com"
+    });
+$ad_group_ad = get_api_package($client, "AdGroupAd")->new({
+  adGroupId => $ad_group->get_id(),
+  ad => $text_ad_with_exemption
+});
+my $exemption_requests =
+    [get_api_package($client, "ExemptionRequest")->new({
+      key => get_api_package($client, "PolicyViolationKey")->new({
+        policyName => "nonstandard_punctuation",
+        violatingText => "everyone!"
+      })
+    })];
+$result = $client->AdGroupAdService()->mutate({
+  operations => [get_api_package($client, "AdGroupAdOperation")->new({
+    operator => "ADD",
+    operand => $ad_group_ad,
+    exemptionRequests => $exemption_requests
+  })]
+});
+ok($result, "Result from adding TextAd with policy exemptions is valid");
+isa_ok($result, get_api_package($client, "AdGroupAdReturnValue"));
+ok($result->get_value()->[0], "Result contains the added AdGroupAd");
+ok($result->get_value()->[0]->get_ad(), "Added AdGroupAd contains an Ad");
+isa_ok($result->get_value()->[0]->get_ad(), get_api_package($client, "TextAd"));
+is($result->get_value()->[0]->get_ad()->get_headline(),
+   $text_ad_with_exemption->get_headline(),
+   "Added TextAd headline matches original");
+is($result->get_value()->[0]->get_ad()->get_description1(),
+   $text_ad_with_exemption->get_description1(),
+   "Added TextAd description1 matches original");
+is($result->get_value()->[0]->get_ad()->get_description2(),
+   $text_ad_with_exemption->get_description2(),
+   "Added TextAd description2 matches original");
+is($result->get_value()->[0]->get_ad()->get_displayUrl(),
+   $text_ad_with_exemption->get_displayUrl(),
+   "Added TextAd displayUrl matches original");
+is($result->get_value()->[0]->get_ad()->get_url(),
+   $text_ad_with_exemption->get_url(),
+   "Added TextAd url matches original");
+$text_ad_with_exemption = $result->get_value()->[0]->get_ad();
+
+# Test create ImageAd.
+my $image_ad = get_api_package($client, "ImageAd")->new({
+  name => "My Image Ad",
+  displayUrl => "www.example.com",
+  url => "http://www.example.com",
+  image => get_api_package($client, "Image")->new({
+    data => get_test_image()
+  })
+});
+$ad_group_ad = get_api_package($client, "AdGroupAd")->new({
+  adGroupId => $ad_group->get_id(),
+  ad => $image_ad
+});
+$result = $client->AdGroupAdService()->mutate({
+  operations => [get_api_package($client, "AdGroupAdOperation")->new({
+    operator => "ADD",
+    operand => $ad_group_ad
+  })]
+});
+ok($result, "Result from adding ImageAd is valid");
+isa_ok($result, get_api_package($client, "AdGroupAdReturnValue"));
+ok($result->get_value()->[0], "Result contains the added AdGroupAd");
+ok($result->get_value()->[0]->get_ad(), "AdGroupAd contains the added Ad");
+isa_ok($result->get_value()->[0]->get_ad(),
+       get_api_package($client, "ImageAd"));
+is($result->get_value()->[0]->get_ad()->get_name(),
+   $image_ad->get_name(), "Added ImageAd name matches original");
+is($result->get_value()->[0]->get_ad()->get_displayUrl(),
+   $image_ad->get_displayUrl(), "Added ImageAd displayUrl matches original");
+is($result->get_value()->[0]->get_ad()->get_url(),
+   $image_ad->get_url(), "Added ImageAd url matches original");
+$image_ad = $result->get_value()->[0]->get_ad();
+
+# Test create MobileImageAd.
+my $mobile_image_ad = get_api_package($client, "MobileImageAd")->new({
+  displayUrl => "www.example.com",
+  url => "http://www.example.com",
+  markupLanguages => ["HTML", "XHTML"],
+  mobileCarriers => ["ALLCARRIERS"],
+  image => get_api_package($client, "Image")->new({
+    data => Google::Ads::Common::MediaUtils::get_base64_data_from_url(
+        "http://adwords.google.com/select/images/samples/mobile300-50.gif")
+  })
+});
+$ad_group_ad = get_api_package($client, "AdGroupAd")->new({
+  adGroupId => $ad_group->get_id(),
+  ad => $mobile_image_ad
+});
+$result = $client->AdGroupAdService()->mutate({
+  operations => [get_api_package($client, "AdGroupAdOperation")->new({
+    operator => "ADD",
+    operand => $ad_group_ad
+  })]
+});
+ok($result, "Result from adding MobileImageAd is valid");
+isa_ok($result, get_api_package($client, "AdGroupAdReturnValue"));
+ok($result->get_value()->[0], "Result contains the added AdGroupAd");
+ok($result->get_value()->[0]->get_ad(), "AdGroupAd contains the added Ad");
+isa_ok($result->get_value()->[0]->get_ad(),
+       get_api_package($client, "MobileImageAd"));
+is($result->get_value()->[0]->get_ad()->get_displayUrl(),
+   $mobile_image_ad->get_displayUrl(),
+   "Added MobileImageAd displayUrl matches original");
+is($result->get_value()->[0]->get_ad()->get_url(),
+   $mobile_image_ad->get_url(), "Added MobileImageAd url matches original");
+$mobile_image_ad = $result->get_value()->[0]->get_ad();
+
+# Test get Ads from Campaign.
+$result = $client->AdGroupAdService()->get({
+  serviceSelector => get_api_package($client, "Selector")->new({
+    fields => ["Id"],
+    predicates => [
+      get_api_package($client, "Predicate")->new({
+        field => "CampaignId",
+        operator => "IN",
+        values => [$campaign->get_id()->get_value()]
+      })
+    ]
+  })
+});
+ok($result, "Result from getting Ads from Campaign is valid");
+isa_ok($result, get_api_package($client, "AdGroupAdPage"));
+ok($result->get_entries(), "Entries from result is valid");
+is(grep($_->get_ad(), @{$result->get_entries()}),
+   scalar(@{$result->get_entries()}), "All entries contain Ads");
+
+# Test get Ad by id.
+$result = $client->AdGroupAdService()->get({
+  serviceSelector => get_api_package($client, "Selector")->new({
+    fields => ["Id"],
+    predicates => [
+      get_api_package($client, "Predicate")->new({
+        field => "Id",
+        operator => "IN",
+        values => [$text_ad->get_id()->get_value()]
+      }),
+      get_api_package($client, "Predicate")->new({
+        field => "AdGroupId",
+        operator => "IN",
+        values => [$ad_group->get_id()->get_value()]
+      })
+    ]
+  })
+});
+ok($result, "Result from getting Ads from Campaign is valid");
+isa_ok($result, get_api_package($client, "AdGroupAdPage"));
+ok($result->get_entries(), "Entries from result is valid");
+is(scalar(@{$result->get_entries()}), 1,
+   "Entries array contains the right amount of results");
+isa_ok($result->get_entries()->[0]->get_ad(),
+       get_api_package($client, "TextAd"));
+is($result->get_entries()->[0]->get_ad()->get_headline(),
+   $text_ad->get_headline(), "Retrieved TextAd headline matches correctly");
+is($result->get_entries()->[0]->get_ad()->get_description1(),
+   $text_ad->get_description1(),
+   "Retrieved TextAd description1 matches correctly");
+is($result->get_entries()->[0]->get_ad()->get_description2(),
+   $text_ad->get_description2(),
+   "Retrieved TextAd description2 matches correctly");
+is($result->get_entries()->[0]->get_ad()->get_displayUrl(),
+   $text_ad->get_displayUrl(), "Retrieved TextAd displayUrl matches correctly");
+is($result->get_entries()->[0]->get_ad()->get_url(),
+   $text_ad->get_url(), "Retrieved TextAd url matches correctly");
+
+# Test update AdGroupAd status.
+$ad_group_ad = get_api_package($client, "AdGroupAd")->new({
+  adGroupId => $ad_group->get_id(),
+  ad => get_api_package($client, "Ad")->new({
+    id => $text_ad->get_id()
+  }),
+  status => "PAUSED"
+});
+$result = $client->AdGroupAdService()->mutate({
+  operations => [get_api_package($client, "AdGroupAdOperation")->new({
+    operator => "SET",
+    operand => $ad_group_ad
+  })]
+});
+ok($result, "Result from update Ad is valid");
+isa_ok($result, get_api_package($client, "AdGroupAdReturnValue"));
+ok($result->get_value()->[0], "First result is correct");
+ok($result->get_value()->[0]->get_ad(), "Ad within first result is set");
+isa_ok($result->get_value()->[0]->get_ad(),
+       get_api_package($client, "TextAd"));
+is($result->get_value()->[0]->get_status(), "PAUSED",
+   "Updated Ad status is correct");
+
+# Test delete Ads.
+my @operations = ();
+foreach my $ad ($text_ad, $text_ad_with_exemption, $image_ad,
+                $mobile_image_ad) {
+  push(@operations, get_api_package($client, "AdGroupAdOperation")->new({
+    operand => get_api_package($client, "AdGroupAd")->new({
+      adGroupId => $ad_group->get_id(),
+      ad => get_api_package($client, "Ad")->new({
+        id => $ad->get_id()
+      })
+    }),
+    operator => "REMOVE"
+  }));
+}
+$result = $client->AdGroupAdService()->mutate({
+  operations => \@operations
+});
+ok($result, "Results from deleting Ads is correct");
+ok($result->get_value(), "Value array within result is correct");
+isa_ok($result, get_api_package($client, "AdGroupAdReturnValue"));
+is(scalar(@{$result->get_value()}), 4,
+   "Deleted Ads returned array size is correct");
+is(scalar(grep($_->get_status() eq "DISABLED", @{$result->get_value()})), 4,
+   "Deleted Ads status are correct");
+
+# Cleaning up test dependencies.
+delete_ad_group($client, $ad_group->get_id());
+delete_campaign($client, $campaign->get_id());

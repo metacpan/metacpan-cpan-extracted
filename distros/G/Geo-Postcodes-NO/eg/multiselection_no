@@ -1,0 +1,60 @@
+#! /usr/bin/perl -w
+
+use strict;
+
+use Geo::Postcodes::NO 0.30;
+
+################################################################################
+#                                                                              #
+#                             multiselection_no                                #
+#                             -----------------                                #
+#              Arne Sommer - perl@bbop.org - 9. September 2006                 #
+#                                                                              #
+################################################################################
+
+my ($status, @lines) = Geo::Postcodes::NO::verify_selectionlist(@ARGV);
+  # @lines is diagnostic output if the check failed.
+  # @lines is a fixed argument list if the check succeeded.
+  #  e.g. ('and', 'not') -> ('and not').
+
+if ($status == 0)
+{
+  print "Usage: \n",
+        " * multiselection_no [all|none]\n",
+        " * multiselection_no [" , 
+        join("|", Geo::Postcodes::get_initial_selectionmodes()),
+        "]? <field> <string> [[",
+        join("|", Geo::Postcodes::get_selectionmodes()),
+        "]? [<field> <string>]]*\n\n";
+
+  print "Legal fields: ", join(", ", Geo::Postcodes::NO::get_fields()), "\n\n";
+
+  print "Diagnostic output:\n";
+
+  foreach (@lines)
+  {
+    print " * $_\n";
+  }
+
+  exit;
+}
+
+my @fields = Geo::Postcodes::NO::get_fields();
+  # Get all the fields supported by this class.
+
+foreach my $m (@fields)
+{
+  printf("%-14s", ucfirst($m)); # Print headers for each column
+}
+print "\n";
+
+foreach my $P (Geo::Postcodes::NO->selection(@lines)) # Iterate over objects
+{
+  foreach my $m (@fields)     # Iterate over the fields for each object
+  {
+    printf("%-14s", $P->$m() || ""); # Print the column data, catching 'undef'
+  }
+  print "\n";
+}
+print "\n";
+

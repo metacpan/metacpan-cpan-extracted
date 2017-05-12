@@ -1,0 +1,54 @@
+{
+   "abstract" : "General XML-JSON converter based on Google Data APIs",
+   "author" : [
+      "Takeru INOUE <takeru.inoue _ gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-Data-JSON",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Slurp" : 0,
+            "JSON::Any" : 0,
+            "List::MoreUtils" : 0,
+            "Perl6::Export::Attrs" : 0,
+            "UNIVERSAL::require" : 0,
+            "XML::Atom" : 0,
+            "XML::Simple" : 0,
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Google::Data::JSON" : {
+         "file" : "lib/Google/Data/JSON.pm",
+         "version" : "v0.1.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.1.10"
+}

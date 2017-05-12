@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 054eb0ab0937e9bfe0526f314aafd77c1ab3f6a2 Changes
+SHA1 fc0deb6b7a7e74bfeab1a3d10131007a00d4c519 INSTALL
+SHA1 2861d879d1589f82c5f32628a64630a4ee82b183 LICENSE
+SHA1 5073b35ec060aacdfabed8432e6493d31d56bb7e MANIFEST
+SHA1 baa080f1a52d77056d82d388a6d9a4dd839b5abe MANIFEST.SKIP
+SHA1 e4001dd0fc2d40743642e14a16e5abd730e65a86 META.json
+SHA1 78b248f3d28993ebb2311662232956a1ff6a895f META.yml
+SHA1 c16ca307d8162ecabe4de832aa95264075395fef Makefile.PL
+SHA1 a5eb4669994ebe81ef342edfd17f492f7da80f20 README
+SHA1 db4bf5036c43eb8ee35365228a54150745aa3f20 lib/Geo/OSM/StaticMap.pm
+SHA1 e0c3da074c470a887a8da91621b009d4ec3365ad t/00-compile.t
+SHA1 473906254ecd96009795d4b7fbc82fac48c03ecd t/000-report-versions.t
+SHA1 eb26814d126e94ff90bd2761f54672ef0a91e79b t/01-Geo-OSM-StaticMap.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 fddf7f2ff20be97e530614131527af30a1c35966 t/perlcriticrc
+SHA1 6b823fd75631d47297112da5f145e1767a6fad0d t/release-check-changes.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 d165f8ec069354540640243399f536af695046dd t/release-distmeta.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 0068bf52fc88b39cc6509199f19a77890edb9bb0 t/release-has-version.t
+SHA1 961a1e2c92d836c8cad2d34b784cbc75345dec63 t/release-kwalitee.t
+SHA1 5fa9158742288fe940285852b432f4be95593322 t/release-no-tabs.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 bf4fdda27bd4e8ec177c38cca43083317494cba8 t/release-portability.t
+SHA1 e647f89568819f60f56e2c7202e10b21acb77652 t/release-synopsis.t
+SHA1 d7221447937ab93002a123801def7be09748c106 t/release-unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlNJlcIACgkQeM3QI14qZoiGJgCgzK/RWUBJyHUTYBZi/ygNZgkY
+ZQ0AoJwOt+/RfPvxERCt8OqhL1D/RZ2w
+=K/9h
+-----END PGP SIGNATURE-----

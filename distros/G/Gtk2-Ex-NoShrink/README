@@ -1,0 +1,35 @@
+Copyright 2007, 2008, 2009 Kevin Ryde
+
+This file is part of Gtk2-Ex-NoShrink.
+
+Gtk2-Ex-NoShrink is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-NoShrink is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-NoShrink.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+Gtk2::Ex::NoShrink is a simple container widget imposing a "no shrink"
+policy on the size requested by its child.  If the child asks to
+become smaller then that request is ignored, rather the child's
+largest-ever request is used.
+
+The actual size the NoShrink gets, and in turn gives its child,
+depends on the further higher widget parents.  For forms or tables
+where size requests provoke a re-layout the NoShrink can stop
+pointlessly small wobbles, or if the child's desired size is
+data-dependent but too hard to calculate in advance then it can let
+the child reach a peak and then maintain that.
+
+The only prerequisite is Gtk2-Perl itself.  The NoShrink home page is
+
+    http://user42.tuxfamily.org/gtk-ex-noshrink/index.html

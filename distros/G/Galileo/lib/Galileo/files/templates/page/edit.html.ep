@@ -1,0 +1,47 @@
+% require Mojo::JSON;
+% layout 'standard';
+% my $sanitize = stash('sanitize') // 1 ? 'true' : 'false';
+% content_for header => begin
+  %= stylesheet '/assets/pagedown/pagedown.css'
+  %= javascript '/assets/pagedown/Markdown.Converter.js'
+  %= javascript '/assets/pagedown/Markdown.Sanitizer.js'
+  %= javascript '/assets/pagedown/Markdown.Editor.js'
+  %= javascript '/assets/pagedown-extra/Markdown.Extra.js'
+  %= javascript '/galileo-edit.js'
+% end
+
+%= javascript begin
+
+var editor;
+
+function saveButton() {
+  var title = $("#page-title").val();
+  editor.save( title );
+}
+
+var extraOptions = <%== Mojo::JSON::to_json stash('pagedown_extra_options') || {} %>;
+
+$(function () {
+  editor = new Editor("<%= $name =%>", "<%= url_for('storepage')->to_abs =%>", <%= $sanitize =%>, extraOptions);
+});
+
+% end
+
+<div class="wmd-panel">
+  <div class="well form-inline">
+    <label class="nav-header">Page Title</label>
+    <input
+      type="text"
+      id="page-title"
+      placeholder="Page Title"
+      value="<%= $title_value %>"
+    >
+    <button class="btn" id="save-md" onclick="saveButton()">
+      Save Page
+    </button>
+  </div>
+  <div id="wmd-button-bar"></div>
+  <textarea class="wmd-input" id="wmd-input"><%= $input %></textarea>
+  <div id="wmd-preview" class="page-contents"></div>
+</div>
+

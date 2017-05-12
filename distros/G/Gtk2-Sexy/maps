@@ -1,0 +1,6 @@
+SEXY_TYPE_URL_LABEL	SexyUrlLabel	GObject	Gtk2::Sexy::UrlLabel
+SEXY_TYPE_SPELL_ENTRY	SexySpellEntry	GObject	Gtk2::Sexy::SpellEntry
+SEXY_TYPE_ICON_ENTRY	SexyIconEntry	GObject	Gtk2::Sexy::IconEntry
+SEXY_TYPE_TOOLTIP	SexyTooltip	GObject	Gtk2::Sexy::Tooltip
+SEXY_TYPE_TREE_VIEW	SexyTreeView	GObject	Gtk2::Sexy::TreeView
+SEXY_TYPE_ICON_ENTRY_POSITION	SexyIconEntryPosition	GEnum	Gtk2::Sexy::IconEntry::Position

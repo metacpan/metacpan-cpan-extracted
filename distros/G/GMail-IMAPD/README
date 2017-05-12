@@ -1,0 +1,131 @@
+GMail::IMAPD(3)       User Contributed Perl Documentation      GMail::IMAPD(3)
+
+
+
+NNAAMMEE
+       GMail::IMAPD - An IMAP4 gateway to Google's webmail service
+
+SSYYNNOOPPSSIISS
+           # Start an IMAP-to-Gmail daemon on port 1143
+
+           use GMail::IMAPD;
+
+           my $daemon=GMail::IMAPD->new(LocalPort=>1143,
+                                        LogFile=>'gmail_imapd.log',
+                                        Debug=>1);
+           $daemon->run();
+
+           # Or if you prefer to use your own server socket,
+           # you can do something like:
+
+           my $i2g=GMail::IMAPD->new(LogFile=>'imapd.log');
+
+           for(;;){
+             my $s=someserver();
+             $i2g->procimap($s);
+           }
+
+DDEESSCCRRIIPPTTIIOONN
+       This module allows users to access their Gmail account with an IMAP
+       client by running a server which accepts IMAP connections.
+
+MMEETTHHOODDSS
+       new ( [ARGS] )
+           Creates a new object.  Accepts arguments in key => value form.
+           Valid arguments are:
+
+                   LocalAddr       Local host bind address
+                   LocalPort       Local bind port
+                   Detach          Boolean to run in background.  Default = 1
+                   LogFile         Path to log file
+                   Debug           1 = extra information, 2 = raw socket data
+
+       procimap ( $socket_handle )
+           Directly pass a handle to the module to process IMAP commands.
+
+NNOOTTEESS
+       The IMAP and Gmail models differ. How GMail::IMAPD translates these
+       differences is mostly intuitive.  For instance, folders translate to
+       labels.  You can even have subfolders which translate to label names
+       such as 'Work/NewProject'.  Some translations that aren't as intuitive
+       are shown in the table below:
+
+         - Copy message to folder -> Add label to message
+         - Move message from Inbox to folder -> Add label to message and archive
+         - Move message from folder to Inbox -> Remove label and unarchive
+         - Delete message in Inbox -> Archive message
+         - Delete message in folder -> Remove message label
+         - Delete message in Trash -> Permanently delete message
+
+       Messages from other IMAP accounts can be appended to the Gmail Inbox,
+       and Inbox only.  The module achieves this by emailing the message to
+       the Gmail account.  Therefore, the append procedure may be slow and the
+       message will initially be marked unread.
+
+       GMail::IMAPD is not fully IMAP4 compliant and has just enough function-
+       ality to get by. It has been tested with Firefox, Outlook, Outlook
+       Express, and mail2web.com.
+
+CCAAVVEEAATTSS
+       The IMAP client is automatically subscribed to all folders/labels.
+       Unsubscribe has no effect.  This is to eliminate any need for persis-
+       tent server side data at the moment.
+
+       Once a message has been moved to Trash, it cannot be un-Trashed with
+       the IMAP client.  This functionality might be missing in the Mail::Web-
+       mail::Gmail module or I'm not sure how to do it with the module.
+
+       Access to large folders is slow.  To fetch simple header information
+       requested by most IMAP clients (FLAGS, INTERNALDATE, etc) requires
+       GMail::IMAPD to download the entire message.  Persistent message
+       caching will help and is on the todo list.
+
+       To work, GMail::IMAPD currently bundles and uses patched versions of
+       UserAgent and Mail::Webmail::Gmail.  One line of UserAgent was changed
+       to forward cookies to Gmail.  And, only a patched version of Mail::Web-
+       mail::Gmail from the author's website works with the current version of
+       Gmail.  Future versions of GMail::IMAPD will remove these patched mod-
+       ules when the actual modules are updated.  For more information on this
+       topic, see http://code.mincus.com/?p=2.
+
+BBUUGGSS
+       If a message is replied-to via the gmail web interface, and the reply
+       is discarded, the message becomes unavaible to interfaces such as
+       Mail::Webmail::Gmail.  I believe this is a Google bug.
+
+PPRREERREEQQUUIISSIITTEESS
+       LWP
+
+       Crypt::SSLeay
+
+TTOODDOO
+       - Better error handling
+
+       - Persistently cached messages, perhaps with DBI
+
+       - IMAPS support
+
+       - A contacts folder, perhaps containing messages with xml and vcf
+       attachments
+
+       - Copy from other IMAP accounts to any Gmail folder
+
+       - Interface with Mail::Webmail::Yahoo ?
+
+CCRREEDDIITTSS
+       I'd like to thank Allen Holman (mincus) for the Mail::Webmail::Gmail
+       module.  His module greatly accelerated the development of
+       GMail::IMAPD.
+
+AAUUTTHHOORR
+       Kurt Schellpeper  <krs - gmail - com>
+
+CCOOPPYYRRIIGGHHTT
+       Copyright 2005 Kurt Schellpeper. All rights reserved.
+
+       This library is a free software. You can redistribute it and/or modify
+       it under the same terms as Perl itself.
+
+
+
+perl v5.8.6                       2005-11-18                   GMail::IMAPD(3)

@@ -1,0 +1,50 @@
+digraph Architecture {
+   rankdir=TB;
+   node [shape="box"];
+   edge [arrowhead="open"];
+
+   {rank=same; Guardian UserData;}
+
+   subgraph clusterOutputs {
+      label="Output files"
+      style="filled";
+      color="lightgrey";
+
+      oSummary    [label="summary.xml"   color="cadetblue2" style="filled"];
+      oAll        [label="all.xml"       color="cadetblue2" style="filled"];
+      oDistance   [label="distance.xml"  color="cadetblue2" style="filled"];
+      oOneperday  [label="oneperday.xml" color="cadetblue2" style="filled"];
+      oChart      [label="chart.png"     color="cadetblue2" style="filled"];
+      oCSV        [label="daily.csv"     color="cadetblue2" style="filled"];
+      oOzi        [label="ozi.wpt"       color="cadetblue2" style="filled"];
+   }
+
+   subgraph clusterWebPage {
+      label="Web Page(s)"
+      style="filled";
+      color="lightgrey";
+
+      wpText    [label="text"];
+      wpMap     [label="Google Map"];
+      wpImage   [label="image"];
+   }
+
+
+   Guardian    [label="Guardian Mobility\nTracer data"];
+   UserData    [label="User-defined\nCSV data"];
+   Tracer      [label="Perl module\nGPS::Tracer" color="orange" style="filled"];
+   jsSummary   [label="JavaScript\nsummary.js"   color="orange" style="filled"];
+   jsTracer    [label="JavaScript\ntracer.js"    color="orange" style="filled"];
+   download    [label="for download"];
+
+   Guardian -> Tracer;
+   UserData -> Tracer;
+   Tracer -> oSummary -> jsSummary -> wpText;
+   Tracer -> oAll -> jsTracer;
+   Tracer -> oDistance -> jsTracer;
+   Tracer -> oOneperday -> jsTracer;
+   Tracer -> oChart -> wpImage;
+   Tracer -> oCSV -> download;
+   Tracer -> oOzi -> download;
+   jsTracer -> wpMap;
+}

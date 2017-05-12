@@ -1,0 +1,55 @@
+Revision history for Perl extension Goto::Cached
+
+0.22  Sat Aug 28 22:45:17 2010
+    - bump minimum perl version to 5.8.8
+    - only run benchmark for CPAN Testers reports
+    - fix bareword in t/benchmark.t
+
+0.21  Sat Aug 28 19:20:06 2010
+    - improve synopsis
+    - use a more realistic benchmark
+
+0.20  Sat Aug 28 17:17:33 2010
+    - remove various archaisms
+    - add leak.t
+    - add (optional) benchmark.t
+
+0.10  Mon Jun 23 22:16:30 2008
+    - s/Devel::Hints::Lexical/Devel::Pragma/
+
+0.09  Tue Jun 17 21:49:46 2008
+    - rm %^H scoping workaround: use Devel::Hints::Lexical
+
+0.08  Sun Jun 15 15:48:35 2008
+    - remove unused code
+    - fix for perl >= 5.11
+
+0.07  Fri Sep 2 14:05:39 2005
+    - fix threaded Perl pessimization
+    - optimize static goto
+
+0.06  Sat May 21 15:07:41 2005
+    - fix segfault
+    - move END handler to XS
+
+0.05  Sat Apr 23 17:54:52 2005
+    - misc fixes
+    - speed up goto $label
+    - more tests
+
+0.04  Wed Apr 20 05:24:56 2005
+    - split into goto_cached_static and goto_cached_dynamic
+    - weed out op_dump at compile-time
+    - workaround for %^H scoping bug
+    - optimize goto LABEL by storing the target in op_next
+
+0.03  Sat Apr 16 13:43:00 2005
+    - MRU cache for goto LABEL
+
+0.02  Wed Apr 13 00:50:20 2005
+    - compatibility/portability fixes + isolate ptr table from perl's implementation
+    - doc tweaklets
+    - fix optimization in Makefile.PL
+
+0.01  Tue Apr 12 02:03:49 2005
+    - original version; created by h2xs 1.23 with options -n Goto::Cached

@@ -1,0 +1,8 @@
+^Gtk2-Sexy-
+^\.
+^blib\b
+^build\b
+^Makefile$
+^MANIFEST.bak$
+^pm_to_blib$
+\.(?:bs|c|o|old)$

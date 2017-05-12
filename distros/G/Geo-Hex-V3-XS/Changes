@@ -1,0 +1,46 @@
+Revision history for Perl extension Geo-Hex-V3-XS
+
+0.11 2015-10-01T02:46:46Z
+
+   - Fixed overflow on 32bit environment.
+
+0.10 2015-09-03T06:43:16Z
+
+   - Fixed x/y/level constructor.
+
+0.09 2015-09-03T00:48:30Z
+
+   - Added x/y/level constructor
+
+0.08 2015-08-15T09:25:49Z
+
+   - Upgrade c-geohex3 to 1.40. (improvement of accuracy)
+
+0.07 2015-06-22T23:45:38Z
+
+   - Fixed compile option.
+
+0.06 2015-06-06T01:08:43Z
+
+   - Fixed #1 test expected value for `-Duselongdouble` perl.
+
+0.05 2015-06-03T03:43:00Z
+
+   - Fixed dependency.
+
+0.04 2015-06-03T03:16:10Z
+
+   - No run geohex-3 testing on build phase.
+
+0.03 2015-06-03T03:00:12Z
+
+   - Provides `geohex_hexsize` function.
+
+0.02 2015-05-31T02:07:10Z
+
+    - Fixed license to MIT.
+
+0.01 2015-05-31T01:54:34Z
+
+    - original version
+

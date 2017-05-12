@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+  <Document>
+    <name>My Document</name>
+    <Snippet maxLines="0"/>
+    <Placemark>
+      <name>My LineString</name>
+      <Snippet maxLines="0"/>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>-77.1,38.1,0 -77.2,38.2,0 -77.2,38.3,0 -77.1,38.4,0</coordinates>
+      </LineString>
+    </Placemark>
+  </Document>
+</kml>

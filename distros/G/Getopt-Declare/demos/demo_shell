@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Declare;
+
+my $shell_cmds = <<'EOCMDS';
+Commands: [repeatable]
+
+	echo [-n] <words:/.*/>	ECHO WITHOUT NEWLINE 
+			{ print $words; print "\n" unless $_PUNCT_{'-n'}; }
+
+	[pvtype: chwho /u?g?a?/]
+	[pvtype: chwhat /r?w?x?/]
+
+	chmod [-R] <who:chwho>=<what:chwhat> <files>...	
+				CHANGE FILE PERMISSIONS 
+			{ foreach (@files) { print "chmod $who=$what $_\n"; } }
+
+	help			SHOW THIS SUMMARY 
+			{ $self->usage() }
+
+	exit			EXIT SHELL 
+			{ exit }
+
+	<error:/.*/>	 
+			{ print "Unknown command: $error\n";
+			  print "(Try the 'help' command?)\n"; }
+EOCMDS
+
+my $shell = Getopt::Declare->new($shell_cmds,[-BUILD]);
+
+my $count = 1;
+sub prompt { print "$count> "; $count++; return <STDIN> }
+
+print "Welcome to an interactive shell!\n";
+$shell->parse(\&prompt);

@@ -1,0 +1,1463 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR 'Jerome Quelin'
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Games-Risk\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-09-26 15:43+0200\n"
+"PO-Revision-Date: 2011-09-26 15:44+0100\n"
+"Last-Translator: Jérôme Quelin <jquelin@gmail.com>\n"
+"Language-Team: Jérôme Quelin <jquelin@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:27
+msgid "Roman Empire Map"
+msgstr "Empire romain"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:37
+msgid "Africa"
+msgstr "Afrique"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:38
+msgid "Asia"
+msgstr "Asie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:39
+msgid "Gallia"
+msgstr "Gaulle"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:40
+msgid "Hispania"
+msgstr "Hispanie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:41
+msgid "Illyrium"
+msgstr "Illyrie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:42
+msgid "Italia"
+msgstr "Italie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:50
+msgid "Aegyptus"
+msgstr "Egypte"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:51
+msgid "Africa proconsularis"
+msgstr "Afrique proconsulaire"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:52
+msgid "Cyrenaica"
+msgstr "Cyrénaïque"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:53
+msgid "Numidia inf."
+msgstr "Numidie inférieure"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:54
+msgid "Numidia sup."
+msgstr "Numidia supérieure"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:55
+msgid "Arabia"
+msgstr "Arabie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:56
+msgid "Bithynia"
+msgstr "Bithynie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:57
+msgid "Cappadocia"
+msgstr "Cappadoce"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:58
+msgid "Cilicia"
+msgstr "Cilicie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:59
+msgid "Galatia"
+msgstr "Galatie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:60
+msgid "Lycia"
+msgstr "Lycie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:61
+msgid "Palestina"
+msgstr "Palestine"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:62
+msgid "Phrygia"
+msgstr "Phrygie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:63
+msgid "Pontus"
+msgstr "Pontus"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:64
+msgid "Syria"
+msgstr "Syrie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:65
+msgid "Aquitania"
+msgstr "Aquitaine"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:66
+msgid "Belgica"
+msgstr "Belgique"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:67
+msgid "Britannia"
+msgstr "Bretagne"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:68
+msgid "Germania inf."
+msgstr "Germanie inférieure"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:69
+msgid "Germania sup."
+msgstr "Germanie supérieure"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:70
+msgid "Lugdunensis"
+msgstr "Lugdunum"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:71
+msgid "Narbonensis"
+msgstr "Narbonne"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:72
+msgid "Baetica"
+msgstr "Baetique"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:73
+msgid "Baleares"
+msgstr "Baléares"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:74
+msgid "Gallaecia et Asturia"
+msgstr "Gallicie et Asturies"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:75
+msgid "Lusitania"
+msgstr "Lusitanie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:76
+msgid "Mauretania"
+msgstr "Mauritanie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:77
+msgid "Terraconensis"
+msgstr "Terraconensis"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:78
+msgid "Achaia"
+msgstr "Achaïe"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:79
+msgid "Dacia"
+msgstr "Dacie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:80
+msgid "Dalmatia"
+msgstr "Dalmatie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:81
+msgid "Epirus"
+msgstr "Epyre"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:82
+msgid "Macedonia"
+msgstr "Macédoine"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:83
+msgid "Moesia inf."
+msgstr "Mésie inférieure"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:84
+msgid "Moesia sup."
+msgstr "Mésie supérieure"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:85
+msgid "Pannonia"
+msgstr "Pannonie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:86
+msgid "Thracia"
+msgstr "Thrace"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:87
+msgid "Corsica"
+msgstr "Corse"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:88
+msgid "Gallia Cisalpinia"
+msgstr "Gaulle Cisalpine"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:89
+msgid "Noricum"
+msgstr "Norique"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:90
+msgid "Raetia"
+msgstr "Rhétie"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:91
+msgid "Roma"
+msgstr "Rome"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:92
+msgid "Sardinia"
+msgstr "Sardaigne"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:93
+msgid "Sicilia"
+msgstr "Sicile"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:160
+msgid "Conquer the dioceses of Asia and Italia."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:161
+msgid "Conquer the dioceses of Gallia and Hispania and a third diocese of your choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:162
+msgid "Conquer the dioceses of Illyrium and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:163
+msgid "Conquer the dioceses of Illyrium and Hispania and a third diocese of your choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:164
+msgid "Conquer the dioceses of Gallia and Asia."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:165
+msgid "Conquer the dioceses of Italia and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:166
+msgid "Occupy 14 provinces of your choice and occupy each with at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:167
+msgid "Occupy 18 provinces of your choice and occupy each with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:168
+msgid "Occupy 24 provinces of your choice and occupy each with at least 1 army."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:169
+msgid "Destroy all of Player1's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 14 provinces with at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:170
+msgid "Destroy all of Player2's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 14 provinces with at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:171
+msgid "Destroy all of Player3's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 14 provinces with at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:172
+msgid "Destroy all of Player4's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 14 provinces with at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:173
+msgid "Destroy all of Player5's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 14 provinces with at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:174
+msgid "Destroy all of Player6's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 14 provinces with at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:175
+msgid "Destroy all of Player1's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 18 provinces with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:176
+msgid "Destroy all of Player2's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 18 provinces with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:177
+msgid "Destroy all of Player3's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 18 provinces with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:178
+msgid "Destroy all of Player4's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 18 provinces with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:179
+msgid "Destroy all of Player5's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 18 provinces with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:180
+msgid "Destroy all of Player6's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 18 provinces with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:181
+msgid "Destroy all of Player1's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:182
+msgid "Destroy all of Player2's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:183
+msgid "Destroy all of Player3's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:184
+msgid "Destroy all of Player4's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:185
+msgid "Destroy all of Player5's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:186
+msgid "Destroy all of Player6's troops. If they are yours or they have already been destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#~ msgid "Human"
+#~ msgstr "Humain"
+
+#~ msgid "Computer, easy"
+#~ msgstr "Ordinateur, facile"
+
+#~ msgid "Computer, hard"
+#~ msgstr "Ordinateur, difficile"
+
+#~ msgid "Game over"
+#~ msgstr "Partie terminée"
+
+#~ msgid "%s won!"
+#~ msgstr "%s a gagné!"
+
+#~ msgid "Close"
+#~ msgstr "Fermer"
+
+#~ msgid ""
+#~ "Congratulations, you won!\n"
+#~ "Maybe the artificial intelligences were not that hard?"
+#~ msgstr ""
+#~ "Félicitations, vous avez gagné!\n"
+#~ "Peut-être que les intelligences artificielles n'étaient pas assez "
+#~ "difficiles ?"
+
+#~ msgid ""
+#~ "Unfortunately, you lost...\n"
+#~ "Try harder next time!"
+#~ msgstr ""
+#~ "Malheureusement, vous avez perdu...\n"
+#~ "Vous pouvez ré-essayer !"
+
+#~ msgid "Attacking from ..."
+#~ msgstr "Attaquer à partir de ..."
+
+#~ msgid "Attacking %s from %s"
+#~ msgstr "Attaquer %s depuis %s"
+
+#~ msgid "Moving armies from..."
+#~ msgstr "Déplacer des armées depuis ..."
+
+#~ msgid "%s armies left to place"
+#~ msgstr "%s armées restantes"
+
+#~ msgid "human"
+#~ msgstr "humain"
+
+#~ msgid "computer - %s"
+#~ msgstr "Ordinateur - %s"
+
+#~ msgid "Player %s has lost"
+#~ msgstr "Le joueur %s a perdu"
+
+#~ msgid "Attacking ... from %s"
+#~ msgstr "Attaquer ... depuis %s"
+
+#~ msgid "Moving armies from ..."
+#~ msgstr "Déplacer des armées depuis ..."
+
+#~ msgid "Moving armies from %s to ..."
+#~ msgstr "Déplacer des armées de %s vers ..."
+
+#~ msgid "Moving armies from %s to %s"
+#~ msgstr "Déplacer des armées de %s vers %s"
+
+#~ msgid "Game state: "
+#~ msgstr "Etape du jeu :"
+
+#~ msgid "place armies"
+#~ msgstr "placer des armées"
+
+#~ msgid "undo all"
+#~ msgstr "recommencer"
+
+#~ msgid "ready for attack"
+#~ msgstr "prêt à attaquer"
+
+#~ msgid "attack"
+#~ msgstr "attaquer"
+
+#~ msgid "attack again"
+#~ msgstr "ré-attaquer"
+
+#~ msgid "consolidate"
+#~ msgstr "consolider"
+
+#~ msgid "move armies"
+#~ msgstr "déplacer des armées"
+
+#~ msgid "turn finished"
+#~ msgstr "tour terminé"
+
+#~ msgid "~New game"
+#~ msgstr "~Nouvelle partie"
+
+#~ msgid "~Close game"
+#~ msgstr "~Fermer"
+
+#~ msgid "~Quit"
+#~ msgstr "~Quitter"
+
+#~ msgid "~Game"
+#~ msgstr "~Jeu"
+
+#~ msgid "~Cards"
+#~ msgstr "~Cartes"
+
+#~ msgid "C~ontinents"
+#~ msgstr "C~ontinents"
+
+#~ msgid "~View"
+#~ msgstr "~Vue"
+
+#~ msgid "~Undo all"
+#~ msgstr "Reco~mmencer"
+
+#~ msgid "~Attack"
+#~ msgstr "~Attaquer"
+
+#~ msgid "~Re-attack"
+#~ msgstr "~Ré-attaquer"
+
+#~ msgid "~Consolidate"
+#~ msgstr "~Consolider"
+
+#~ msgid "~Finish turn"
+#~ msgstr "~Terminer le tour"
+
+#~ msgid "~Actions"
+#~ msgstr "~Actions"
+
+#~ msgid "~Help"
+#~ msgstr "Aid~e"
+
+#~ msgid "~About"
+#~ msgstr "~A propos"
+
+#~ msgid "Players"
+#~ msgstr "Joueurs"
+
+#~ msgid "Dice arena"
+#~ msgstr "Piste de dés"
+
+#~ msgid "Auto-reattack"
+#~ msgstr "Ré-attaque automatique"
+
+#~ msgid ""
+#~ "Automatically re-do last attack if attacker still has more than 3 armies"
+#~ msgstr "Automatiquement ré-attaquer si l'attaquant a plus de 3 armées"
+
+#~ msgid "New game"
+#~ msgstr "Nouvelle partie"
+
+#~ msgid "Close game"
+#~ msgstr "Fermer"
+
+#~ msgid "Quit"
+#~ msgstr "Quitter"
+
+#~ msgid "about"
+#~ msgstr "à propos"
+
+#~ msgid "Created by Jerome Quelin"
+#~ msgstr "Créé par Jérôme Quelin"
+
+#~ msgid "Copyright (c) 2008 Jerome Quelin, all rights reserved"
+#~ msgstr "Copyright (c) 2008 Jérôme Quelin, tous droits réservés"
+
+#~ msgid ""
+#~ "prisk is free software; you can redistribute it and/or modify it under "
+#~ "the terms of the GPLv3."
+#~ msgstr ""
+#~ "prisk est un logiciel libre ; vous pouvez le redistribuer et/ou le "
+#~ "modifier selon les termes de la GLPv3."
+
+#~ msgid "help"
+#~ msgstr "aide"
+
+#~ msgid "How to play?"
+#~ msgstr "Comment jouer ?"
+
+#~ msgid "continents"
+#~ msgstr "continents"
+
+#~ msgid "Continents information"
+#~ msgstr "Information sur les continents"
+
+#~ msgid "continent"
+#~ msgstr "continent"
+
+#~ msgid "bonus"
+#~ msgstr "bonus"
+
+#~ msgid "# countries"
+#~ msgstr "nb pays"
+
+#~ msgid "cards"
+#~ msgstr "cartes"
+
+#~ msgid "Cards available"
+#~ msgstr "Cartes disponibles"
+
+#~ msgid "Exchange"
+#~ msgstr "Echanger"
+
+#~ msgid "Select 3 cards"
+#~ msgstr "Choisir 3 cartes"
+
+#~ msgid "Risk 2210 A.D."
+#~ msgstr "Risk 2210 A.D."
+
+#~ msgid "North America"
+#~ msgstr "Amérique du Nord"
+
+#~ msgid "South America"
+#~ msgstr "Amérique du Sud"
+
+#~ msgid "Europe"
+#~ msgstr "Europe"
+
+#~ msgid "Australia"
+#~ msgstr "Australie"
+
+#~ msgid "US Pacific"
+#~ msgstr "Pacifique US"
+
+#~ msgid "Asia Pacific"
+#~ msgstr "Pacifique asiatique"
+
+#~ msgid "North Atlantic"
+#~ msgstr "Atlantique du Nord"
+
+#~ msgid "South Atlantic"
+#~ msgstr "Atlantique du Sud"
+
+#~ msgid "Indian"
+#~ msgstr "Indien"
+
+#~ msgid "Northwestern Oil Emirate"
+#~ msgstr "Emirats Pétrolifères du Nord-Ouest"
+
+#~ msgid "Nunavut"
+#~ msgstr "Nunavut"
+
+#~ msgid "Exiled States of America"
+#~ msgstr "Etats Exilés d'Amérique"
+
+#~ msgid "Alberta"
+#~ msgstr "Alberta"
+
+#~ msgid "Canada"
+#~ msgstr "Canada"
+
+#~ msgid "République du Québec"
+#~ msgstr "République du Québec"
+
+#~ msgid "Continental Biospheres"
+#~ msgstr "Biosphères continentales"
+
+#~ msgid "American Republic"
+#~ msgstr "République Américaine"
+
+#~ msgid "Mexico"
+#~ msgstr "Mexique"
+
+#~ msgid "Nuevo Timoto"
+#~ msgstr "Nuevo Timoto"
+
+#~ msgid "Andean Nations"
+#~ msgstr "Nations Andéennes"
+
+#~ msgid "Amazon Desert"
+#~ msgstr "Désert de l'Amazone"
+
+#~ msgid "Argentina"
+#~ msgstr "Argentine"
+
+#~ msgid "Iceland GRC"
+#~ msgstr "CRG d'Islande"
+
+#~ msgid "Jotenheim"
+#~ msgstr "Jotenheim"
+
+#~ msgid "Ukrayina"
+#~ msgstr "Ukrayne"
+
+#~ msgid "New Avalon"
+#~ msgstr "Nouvelle Avalon"
+
+#~ msgid "Warsaw Republic"
+#~ msgstr "République de Varsovie"
+
+#~ msgid "Andorra"
+#~ msgstr "Andorre"
+
+#~ msgid "Imperial Balkania"
+#~ msgstr "Balkans Impériales"
+
+#~ msgid "Saharan Empire"
+#~ msgstr "Empire Saharien"
+
+#~ msgid "Egypt"
+#~ msgstr "Egypte"
+
+#~ msgid "Zaire Military Zone"
+#~ msgstr "Zone Militaire du Zaïre"
+
+#~ msgid "Ministry of Djibouti"
+#~ msgstr "Ministère de Djibouti"
+
+#~ msgid "Lesotho"
+#~ msgstr "Lésotho"
+
+#~ msgid "Madagascar"
+#~ msgstr "Madagascar"
+
+#~ msgid "Siberia"
+#~ msgstr "Sibérie"
+
+#~ msgid "Enclave of the Bear"
+#~ msgstr "Enclave de l'Ours"
+
+#~ msgid "Hong Kong"
+#~ msgstr "Hong Kong"
+
+#~ msgid "Afghanistan"
+#~ msgstr "Afghanistan"
+
+#~ msgid "Middle East"
+#~ msgstr "Moyen Orient"
+
+#~ msgid "United Indiastan"
+#~ msgstr "Indiastan Unifié"
+
+#~ msgid "Angkhor Wat"
+#~ msgstr "Angkor Wat"
+
+#~ msgid "Sakha"
+#~ msgstr "Sakha"
+
+#~ msgid "Alden"
+#~ msgstr "Alden"
+
+#~ msgid "Khan Industrial State"
+#~ msgstr "Etat Industriel du Khan"
+
+#~ msgid "Japan"
+#~ msgstr "Japon"
+
+#~ msgid "Pevek"
+#~ msgstr "Pevek"
+
+#~ msgid "Java Cartel"
+#~ msgstr "Cartel de Java"
+
+#~ msgid "New Guinea"
+#~ msgstr "Nouvelle Guinée"
+
+#~ msgid "Aboriginal League"
+#~ msgstr "Ligue Aborigène"
+
+#~ msgid "Australian Testing Ground"
+#~ msgstr "Terrain d'Essai Australien"
+
+#~ msgid "Sung Tzu"
+#~ msgstr "Sung Tzu"
+
+#~ msgid "Neo Tokyo"
+#~ msgstr "Neo Tokyo"
+
+#~ msgid "Poseidon"
+#~ msgstr "Poséidon"
+
+#~ msgid "Hawaiian Preserve"
+#~ msgstr "Réserve Hawaiienne"
+
+#~ msgid "New Atlantis"
+#~ msgstr "Nouvelle Atlantis"
+
+#~ msgid "Western Ireland"
+#~ msgstr "Irlande occidentale"
+
+#~ msgid "New York"
+#~ msgstr "New York"
+
+#~ msgid "Nova Brasilia"
+#~ msgstr "Nova Brasilia"
+
+#~ msgid "Neo Paulo"
+#~ msgstr "Neo Paulo"
+
+#~ msgid "The Ivory Reef"
+#~ msgstr "Le Récif d'Ivoire"
+
+#~ msgid "South Ceylon"
+#~ msgstr "Ceylan Sud"
+
+#~ msgid "Microcorp"
+#~ msgstr "Microcorp"
+
+#~ msgid "Akara"
+#~ msgstr "Akara"
+
+#~ msgid "France"
+#~ msgstr "France"
+
+#~ msgid "Bretagne"
+#~ msgstr "Bretagne"
+
+#~ msgid "Basse Normandie"
+#~ msgstr "Basse Normandie"
+
+#~ msgid "Haute Normandie"
+#~ msgstr "Haute Normandie"
+
+#~ msgid "Picardie"
+#~ msgstr "Picardie"
+
+#~ msgid "Nord-Pas de Calais"
+#~ msgstr "Nord-Pas de Calais"
+
+#~ msgid "Champagne-Ardenne"
+#~ msgstr "Champagne-Ardenne"
+
+#~ msgid "Lorraine"
+#~ msgstr "Lorraine"
+
+#~ msgid "Alsace"
+#~ msgstr "Alsace"
+
+#~ msgid "Franche-Comté"
+#~ msgstr "Franche-Comté"
+
+#~ msgid "Rhône-Alpes"
+#~ msgstr "Rhône-Alpes"
+
+#~ msgid "Provence-Alpes-Côte d'Azur"
+#~ msgstr "Provence-Alpes-Côte d'Azur"
+
+#~ msgid "Corse"
+#~ msgstr "Corse"
+
+#~ msgid "Languedoc-Roussillon"
+#~ msgstr "Languedoc-Roussillon"
+
+#~ msgid "Midi-Pyrénées"
+#~ msgstr "Midi-Pyrénées"
+
+#~ msgid "Aquitaine"
+#~ msgstr "Aquitaine"
+
+#~ msgid "Poitou-Charente"
+#~ msgstr "Poitou-Charente"
+
+#~ msgid "Pays de la Loire"
+#~ msgstr "Pays de la Loire"
+
+#~ msgid "Centre"
+#~ msgstr "oCentre"
+
+#~ msgid "Ile de France"
+#~ msgstr "Ile de France"
+
+#~ msgid "Bourgogne"
+#~ msgstr "Bourgogne"
+
+#~ msgid "Auvergne"
+#~ msgstr "Auvergne"
+
+#~ msgid "Limousin"
+#~ msgstr "Limousin"
+
+#~ msgid "Ain"
+#~ msgstr "Ain"
+
+#~ msgid "Aisne"
+#~ msgstr "Aisne"
+
+#~ msgid "Allier"
+#~ msgstr "Allier"
+
+#~ msgid "Alpes de Haute Provence"
+#~ msgstr "Alpes de Haute Provence"
+
+#~ msgid "Hautes Alpes"
+#~ msgstr "Hautes Alpes"
+
+#~ msgid "Alpes Maritimes"
+#~ msgstr "Alpes Maritimes"
+
+#~ msgid "Ardèche"
+#~ msgstr "Ardèche"
+
+#~ msgid "Ardennes"
+#~ msgstr "Ardennes"
+
+#~ msgid "Ariège"
+#~ msgstr "Ariège"
+
+#~ msgid "Aube"
+#~ msgstr "Aube"
+
+#~ msgid "Aude"
+#~ msgstr "Aude"
+
+#~ msgid "Aveyron"
+#~ msgstr "Aveyron"
+
+#~ msgid "Bouches du Rhone"
+#~ msgstr "Bouches du Rhone"
+
+#~ msgid "Calvados"
+#~ msgstr "Calvados"
+
+#~ msgid "Cantal"
+#~ msgstr "Cantal"
+
+#~ msgid "Charente"
+#~ msgstr "Charente"
+
+#~ msgid "Charente Maritime"
+#~ msgstr "Charente Maritime"
+
+#~ msgid "Cher"
+#~ msgstr "Cher"
+
+#~ msgid "Corrèze"
+#~ msgstr "Corrèze"
+
+#~ msgid "Corse du Sud"
+#~ msgstr "Corse du Sud"
+
+#~ msgid "Cote d'Or"
+#~ msgstr "Cote d'Or"
+
+#~ msgid "Cotes d'Armor"
+#~ msgstr "Cotes d'Armor"
+
+#~ msgid "Creuse"
+#~ msgstr "Creuse"
+
+#~ msgid "Dordogne"
+#~ msgstr "Dordogne"
+
+#~ msgid "Doubs"
+#~ msgstr "Doubs"
+
+#~ msgid "Drôme"
+#~ msgstr "Drôme"
+
+#~ msgid "Eure"
+#~ msgstr "Eure"
+
+#~ msgid "Eure et Loire"
+#~ msgstr "Eure et Loire"
+
+#~ msgid "Finistère"
+#~ msgstr "Finistère"
+
+#~ msgid "Gard"
+#~ msgstr "Gard"
+
+#~ msgid "Haute Garonne"
+#~ msgstr "Haute Garonne"
+
+#~ msgid "Gers"
+#~ msgstr "Gers"
+
+#~ msgid "Gironde"
+#~ msgstr "Gironde"
+
+#~ msgid "Hérault"
+#~ msgstr "Hérault"
+
+#~ msgid "Ille et Vilaine"
+#~ msgstr "Ille et Vilaine"
+
+#~ msgid "Indre"
+#~ msgstr "Indre"
+
+#~ msgid "Indre et Loire"
+#~ msgstr "Indre et Loire"
+
+#~ msgid "Isère"
+#~ msgstr "Isère"
+
+#~ msgid "Jura"
+#~ msgstr "Jura"
+
+#~ msgid "Landes"
+#~ msgstr "Landes"
+
+#~ msgid "Loire et Cher"
+#~ msgstr "Loire et Cher"
+
+#~ msgid "Loire"
+#~ msgstr "Loire"
+
+#~ msgid "Haute Loire"
+#~ msgstr "Haute Loire"
+
+#~ msgid "Loire Atlantique"
+#~ msgstr "Loire Atlantique"
+
+#~ msgid "Loiret"
+#~ msgstr "Loiret"
+
+#~ msgid "Lot"
+#~ msgstr "Lot"
+
+#~ msgid "Lot et Garonne"
+#~ msgstr "Lot et Garonne"
+
+#~ msgid "Lozère"
+#~ msgstr "Lozère"
+
+#~ msgid "Maine et Loire"
+#~ msgstr "Maine et Loire"
+
+#~ msgid "Manche"
+#~ msgstr "Manche"
+
+#~ msgid "Marne"
+#~ msgstr "Marne"
+
+#~ msgid "Haute Marne"
+#~ msgstr "Haute Marne"
+
+#~ msgid "Mayenne"
+#~ msgstr "Mayenne"
+
+#~ msgid "Meurthe et Moselle"
+#~ msgstr "Meurthe et Moselle"
+
+#~ msgid "Meuse"
+#~ msgstr "Meuse"
+
+#~ msgid "Morbihan"
+#~ msgstr "Morbihan"
+
+#~ msgid "Moselle"
+#~ msgstr "Moselle"
+
+#~ msgid "Nièvre"
+#~ msgstr "Nièvre"
+
+#~ msgid "Nord"
+#~ msgstr "Nord"
+
+#~ msgid "Oise"
+#~ msgstr "Oise"
+
+#~ msgid "Orne"
+#~ msgstr "Orne"
+
+#~ msgid "Pas de Calais"
+#~ msgstr "Pas de Calais"
+
+#~ msgid "Puy de Dome"
+#~ msgstr "Puy de Dome"
+
+#~ msgid "Pyrénées Atlantiques"
+#~ msgstr "Pyrénées Atlantiques"
+
+#~ msgid "Hautes Pyrénées"
+#~ msgstr "Hautes Pyrénées"
+
+#~ msgid "Pyrénées Orientales"
+#~ msgstr "Pyrénées Orientales"
+
+#~ msgid "Bas Rhin"
+#~ msgstr "Bas Rhin"
+
+#~ msgid "Haut Rhin"
+#~ msgstr "Haut Rhin"
+
+#~ msgid "Rhône"
+#~ msgstr "Rhône"
+
+#~ msgid "Haute Saône"
+#~ msgstr "Haute Saône"
+
+#~ msgid "Saône et Loire"
+#~ msgstr "Saône et Loire"
+
+#~ msgid "Sarthe"
+#~ msgstr "Sarthe"
+
+#~ msgid "Savoie"
+#~ msgstr "Savoie"
+
+#~ msgid "Haute Savoie"
+#~ msgstr "Haute Savoie"
+
+#~ msgid "Paris"
+#~ msgstr "Paris"
+
+#~ msgid "Seine Maritime"
+#~ msgstr "Seine Maritime"
+
+#~ msgid "Seine et Marne"
+#~ msgstr "Seine et Marne"
+
+#~ msgid "Yvelines"
+#~ msgstr "Yvelines"
+
+#~ msgid "Deux Sèvres"
+#~ msgstr "Deux Sèvres"
+
+#~ msgid "Somme"
+#~ msgstr "Somme"
+
+#~ msgid "Tarn"
+#~ msgstr "Tarn"
+
+#~ msgid "Tarn et Garonne"
+#~ msgstr "Tarn et Garonne"
+
+#~ msgid "Var"
+#~ msgstr "Var"
+
+#~ msgid "Vaucluse"
+#~ msgstr "Vaucluse"
+
+#~ msgid "Vendée"
+#~ msgstr "Vendée"
+
+#~ msgid "Vienne"
+#~ msgstr "Vienne"
+
+#~ msgid "Haute Vienne"
+#~ msgstr "Haute Vienne"
+
+#~ msgid "Vosges"
+#~ msgstr "Vosges"
+
+#~ msgid "Yonne"
+#~ msgstr "Yonne"
+
+#~ msgid "Territoire de Belfort"
+#~ msgstr "Territoire de Belfort"
+
+#~ msgid "Essonne"
+#~ msgstr "Essonne"
+
+#~ msgid "Hauts de Seine"
+#~ msgstr "Hauts de Seine"
+
+#~ msgid "Seine Saint Denis"
+#~ msgstr "Seine Saint Denis"
+
+#~ msgid "Val de Marne"
+#~ msgstr "Val de Marne"
+
+#~ msgid "Val d Oise"
+#~ msgstr "Val d Oise"
+
+#~ msgid "Haute Corse"
+#~ msgstr "Haute Corse"
+
+#~ msgid "Risk GodStorm"
+#~ msgstr "Risk GodStorm"
+
+#~ msgid "Germania"
+#~ msgstr "Germanie"
+
+#~ msgid "Atlantis"
+#~ msgstr "Atlantide"
+
+#~ msgid "Asia Minor"
+#~ msgstr "Asie Mineure"
+
+#~ msgid "Europa"
+#~ msgstr "Europe"
+
+#~ msgid "Hyrkania"
+#~ msgstr "Hyrkanie"
+
+#~ msgid "Liguria"
+#~ msgstr "Ligurie"
+
+#~ msgid "Apulia"
+#~ msgstr "Apulie"
+
+#~ msgid "Graecia"
+#~ msgstr "Grèce"
+
+#~ msgid "Minoa"
+#~ msgstr "Minoa"
+
+#~ msgid "Ionia"
+#~ msgstr "Ionie"
+
+#~ msgid "Anatolia"
+#~ msgstr "Anatolie"
+
+#~ msgid "Hibernia"
+#~ msgstr "Hibernie"
+
+#~ msgid "Caledonia"
+#~ msgstr "Calédonie"
+
+#~ msgid "Anglia"
+#~ msgstr "Anglia"
+
+#~ msgid "Thule"
+#~ msgstr "Thule"
+
+#~ msgid "Varangia"
+#~ msgstr "Varègues"
+
+#~ msgid "Galicia"
+#~ msgstr "Galicie"
+
+#~ msgid "Alemannia"
+#~ msgstr "Alemannia"
+
+#~ msgid "Gaul"
+#~ msgstr "Gaulle"
+
+#~ msgid "Iberia"
+#~ msgstr "Ibérie"
+
+#~ msgid "Atlas"
+#~ msgstr "Atlas"
+
+#~ msgid "Carthage"
+#~ msgstr "Carthage"
+
+#~ msgid "Gaitulia"
+#~ msgstr "Gaitulie"
+
+#~ msgid "Nubia"
+#~ msgstr "Nubie"
+
+#~ msgid "Kush"
+#~ msgstr "Kush"
+
+#~ msgid "Parthia"
+#~ msgstr "Parthie"
+
+#~ msgid "Sumer"
+#~ msgstr "Sumer"
+
+#~ msgid "Assyria"
+#~ msgstr "Assyrie"
+
+#~ msgid "Phoenicia"
+#~ msgstr "Phoenicie"
+
+#~ msgid "Babylon"
+#~ msgstr "Babylonne"
+
+#~ msgid "Sheba"
+#~ msgstr "Sheba"
+
+#~ msgid "Hesperide"
+#~ msgstr "Hespérides"
+
+#~ msgid "Tritonis"
+#~ msgstr "Tritonis"
+
+#~ msgid "Poseidonis"
+#~ msgstr "Poséidonis"
+
+#~ msgid "Oricalcos"
+#~ msgstr "Oricalcos"
+
+#~ msgid "Rus"
+#~ msgstr "Rus"
+
+#~ msgid "Scythia"
+#~ msgstr "Scythie"
+
+#~ msgid "Cimmeria"
+#~ msgstr "Cimmérie"
+
+#~ msgid "Sarmathia"
+#~ msgstr "Sarmathia"
+
+#~ msgid "Risk"
+#~ msgstr "Risk"
+
+#~ msgid "Alaska"
+#~ msgstr "Alaska"
+
+#~ msgid "North West Territory"
+#~ msgstr "Territoires du Nord-Ouest"
+
+#~ msgid "Western United States"
+#~ msgstr "Etats de l'Ouest"
+
+#~ msgid "Central America"
+#~ msgstr "Amérique Centrale"
+
+#~ msgid "Greenland"
+#~ msgstr "Groënland"
+
+#~ msgid "Ontario"
+#~ msgstr "Ontario"
+
+#~ msgid "Quebec"
+#~ msgstr "Québec"
+
+#~ msgid "Eastern United States"
+#~ msgstr "Etats de l'Est"
+
+#~ msgid "Venezuela"
+#~ msgstr "Vénézuéla"
+
+#~ msgid "Peru"
+#~ msgstr "Pérou"
+
+#~ msgid "Brazil"
+#~ msgstr "Brésil"
+
+#~ msgid "Iceland"
+#~ msgstr "Islande"
+
+#~ msgid "Scandinavia"
+#~ msgstr "Scandinavie"
+
+#~ msgid "Ukraine"
+#~ msgstr "Ukraine"
+
+#~ msgid "Great Britain"
+#~ msgstr "Grande Bretagne"
+
+#~ msgid "Northern Europe"
+#~ msgstr "Europe du Nord"
+
+#~ msgid "Western Europe"
+#~ msgstr "Europe occidentale"
+
+#~ msgid "Southern Europe"
+#~ msgstr "Europe du Sud"
+
+#~ msgid "North Africa"
+#~ msgstr "Afrique du Nord"
+
+#~ msgid "Congo"
+#~ msgstr "Congo"
+
+#~ msgid "East Africa"
+#~ msgstr "Afrique de l'Est"
+
+#~ msgid "South Africa"
+#~ msgstr "Afrique du Sud"
+
+#~ msgid "Ural"
+#~ msgstr "Oural"
+
+#~ msgid "China"
+#~ msgstr "Chine"
+
+#~ msgid "India"
+#~ msgstr "Inde"
+
+#~ msgid "Siam"
+#~ msgstr "Siam"
+
+#~ msgid "Yakutsk"
+#~ msgstr "Yakoutie"
+
+#~ msgid "Irkutsk"
+#~ msgstr "Irkoutsk"
+
+#~ msgid "Mongolia"
+#~ msgstr "Mongolie"
+
+#~ msgid "Kamchatka"
+#~ msgstr "Kamchatka"
+
+#~ msgid "Indonesia"
+#~ msgstr "Indonésie"
+
+#~ msgid "Western Australia"
+#~ msgstr "Australie occidentale"
+
+#~ msgid "Eastern Australia"
+#~ msgstr "Australie orientale"
+
+#~ msgid "Country invasion"
+#~ msgstr "Invasion de pays"
+
+#~ msgid "A country has been conquered!"
+#~ msgstr "Un pays a été conquis !"
+
+#~ msgid "You have conquered %s while attacking from %s."
+#~ msgstr "Vous avez conquis %s en attaquant de %s."
+
+#~ msgid "Moving armies"
+#~ msgstr "Déplacer des armées"
+
+#~ msgid "Consolidate your positions"
+#~ msgstr "Consolidez vos positions"
+
+#~ msgid "Moving armies from %s to %s."
+#~ msgstr "Déplacer des armées de %s vers %s."
+
+#~ msgid "Armies to move"
+#~ msgstr "Armées à déplacer"
+
+#~ msgid "Move armies"
+#~ msgstr "Déplacer des armées"
+
+#~ msgid "Napoleon Bonaparte"
+#~ msgstr "Napoléon Bonaparte"
+
+#~ msgid "Staline"
+#~ msgstr "Staline"
+
+#~ msgid "Alexander the Great"
+#~ msgstr "Alexandre le Grand"
+
+#~ msgid "Julius Caesar"
+#~ msgstr "Jules César"
+
+#~ msgid "Attila"
+#~ msgstr "Attila"
+
+#~ msgid "Genghis Kahn"
+#~ msgstr "Genghis Kahn"
+
+#~ msgid "Charlemagne"
+#~ msgstr "Charlemagne"
+
+#~ msgid "Saladin"
+#~ msgstr "Saladin"
+
+#~ msgid "Otto von Bismarck"
+#~ msgstr "Otto von Bismarck"
+
+#~ msgid "Ramses II"
+#~ msgstr "Ramses II"
+
+#~ msgid "Two players cannot have the same color."
+#~ msgstr "La même couleur ne peut pas être utilisée par deux joueurs."
+
+#~ msgid "Two players cannot have the same name."
+#~ msgstr "Le même nom ne peut pas être utilisé par deux joueurs."
+
+#~ msgid "Cannot have more than one human player."
+#~ msgstr "Partie avec plus d'un joueur humain non supportée."
+
+#~ msgid "Game without any human player not (yet) supported."
+#~ msgstr "Partie sans joueur humain non (encore) supportée."
+
+#~ msgid "A player cannot have an empty name."
+#~ msgstr "Tout joueur doit avoir un nom."
+
+#~ msgid "Game should have at least 2 players."
+#~ msgstr "Il doit y avoir au moins 2 joueurs."
+
+#~ msgid "new game"
+#~ msgstr "nouvelle partie"
+
+#~ msgid "Map"
+#~ msgstr "Carte"
+
+#~ msgid "New player..."
+#~ msgstr "Joueur supplémentaire..."
+
+#~ msgid "Start game"
+#~ msgstr "Nouvelle partie"
+
+#~ msgid "easy"
+#~ msgstr "facile"
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "        This artificial intelligence follows a blitzkrieg strategy. It\n"
+#~ "        will piles up new armies in one country, and then follow a\n"
+#~ "        random path from this attack base.\n"
+#~ "\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+#~ "        Cette intelligence artificielle suit une stratégie de "
+#~ "blitzkrieg.\n"
+#~ "        Elle empile ses renforts dans un pays, et lance une attaque\n"
+#~ "        continue à partir de ce point de départ, tant qu'elle le peut.\n"
+#~ "\n"
+#~ "    "
+
+#~ msgid "hard"
+#~ msgstr "difficile"
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "        This artificial intelligence is optimized to conquer the world.\n"
+#~ "        It checks what countries are most valuable for it, optimizes\n"
+#~ "        attacks and moves for continent bonus and blocking other\n"
+#~ "        players.\n"
+#~ "\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+#~ "        Cette intelligence artificielle est conçue pour conquérir le\n"
+#~ "        monde. Elle optimise attaques et déplacements pour obtenir\n"
+#~ "        et préserver les bonus de continent, ainsi que bloquer les\n"
+#~ "        autres joueurs.\n"
+#~ "\n"
+#~ "    "
+
+#~ msgid "very easy"
+#~ msgstr "très facile"
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "        This artificial intelligence does nothing: it just piles up new "
+#~ "armies\n"
+#~ "        randomly, and never ever attacks nor move armies.\n"
+#~ "\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+#~ "        Cette intelligence artificielle ne fait rien: elle empile "
+#~ "simplement les\n"
+#~ "        renforts de manière aléatoire, et n'attaque ni ne bouge jamais "
+#~ "d'armées.\n"
+#~ "\n"
+#~ "    "

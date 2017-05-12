@@ -1,0 +1,5 @@
+Revision history for Git-Version
+
+1.000 Sun Feb 21 2016
+    - Git::Version provides overloaded strings that compare properly as
+      Git version numbers (using Git::Version::Compare)

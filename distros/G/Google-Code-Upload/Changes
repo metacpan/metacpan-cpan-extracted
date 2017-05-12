@@ -1,0 +1,33 @@
+Revision history for Google-Code-Upload
+
+0.08      2015-03-12
+  - Mark as deprecated: http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html
+
+0.07      2012-08-06
+  - POD update
+  - Include Term::ReadKey as a dependency
+
+0.06      2012-06-14
+  - Re-released with the right version number
+
+0.006     2012-06-14
+  - New maintainer: Mike Doherty <doherty@cpan.org>
+  - Enable OO-style usage
+  - Permit setting a description for the upload
+  - Throw an exception when upload fails
+
+0.05    2010-02-05
+  - fix binmode issue (RT 54202)
+
+0.04    2009-02-07
+  - bug fix in googlecode_upload.pl
+
+0.03    2009-02-07
+  - cleanup the code
+  - add labels prompt in googlecode_upload.pl
+
+0.02	2009-01-12
+  - ReadMode('noecho'); for password in googlecode_upload.pl
+
+0.01    2009-01-12
+  - First version, released on an unsuspecting world.

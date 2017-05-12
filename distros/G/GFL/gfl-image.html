@@ -1,0 +1,489 @@
+<HTML>
+<HEAD>
+<TITLE>GFL::Image - An OO interface to P-e Gougelet's Graphic File Library</TITLE>
+<LINK REL="stylesheet" HREF="pod.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:flepied@debris.mandrakesoft.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<UL>
+
+		<LI><A HREF="#gfl::image>new">GFL::Image-&gt;new</A></LI>
+		<LI><A HREF="#$o>set(attrib => value, ...)">$o-&gt;set(attrib =&gt; value, ...)</A></LI>
+		<LI><A HREF="#$o>get( attrib, ... )">$o-&gt;get( attrib, ... )</A></LI>
+		<LI><A HREF="#$o>load( filename [, imageindex])">$o-&gt;load( filename [, ImageIndex])</A></LI>
+		<LI><A HREF="#$o>loadpreview( filename, width, height [, imageindex])">$o-&gt;loadpreview( filename, width, height [, ImageIndex])</A></LI>
+		<LI><A HREF="#$o>save( filename )">$o-&gt;save( filename )</A></LI>
+		<LI><A HREF="#$o>resize( width, height [, 'quick'])">$o-&gt;resize( Width, Height [, 'quick'])</A></LI>
+		<LI><A HREF="#$o>flip( 'vertical' or 'horizontal' )">$o-&gt;flip( 'vertical' or 'horizontal' )</A></LI>
+		<LI><A HREF="#$o>negate">$o-&gt;negate</A></LI>
+		<LI><A HREF="#$o>crop(x, y, width, height)">$o-&gt;crop(x, y, width, height)</A></LI>
+		<LI><A HREF="#$o>contrast(100...100)">$o-&gt;<CODE>contrast(-100...100)</CODE></A></LI>
+		<LI><A HREF="#$o>gamma(0.01 <> 5.0)">$o-&gt;gamma(0.01 &lt;-&gt; 5.0)</A></LI>
+		<LI><A HREF="#$o>rotate( angle )">$o-&gt;rotate( Angle )</A></LI>
+		<LI><A HREF="#$o>soften( percent )">$o-&gt;soften( percent )</A></LI>
+		<LI><A HREF="#$o>blur( percent )">$o-&gt;blur( percent )</A></LI>
+		<LI><A HREF="#$o>sharpen( percent )">$o-&gt;sharpen( percent )</A></LI>
+		<LI><A HREF="#$o>filter(filter_type => filter_size, ...)">$o-&gt;filter(filter_type =&gt; filter_size, ...)</A></LI>
+		<LI><A HREF="#$o>changedepth( new_depth )">$o-&gt;ChangeDepth( new_depth )</A></LI>
+		<LI><A HREF="#$o>lasterror">$o-&gt;LastError</A></LI>
+	</UL>
+
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#gfl::image>getfileinformations(filename[,format]) or getfileinformations(filename[,format])">GFL::Image-&gt;<CODE>GetFileInformations(filename[,format])</CODE> or <CODE>getfileinformations(filename[,format])</CODE></A></LI>
+		<LI><A HREF="#gfl::image>enablelzw">GFL::Image-&gt;enableLZW</A></LI>
+		<LI><A HREF="#gfl::image>dumpallformats or dumpallformats()">GFL::Image-&gt;DumpAllFormats or <CODE>dumpallformats()</CODE></A></LI>
+	</UL>
+
+	<LI><A HREF="#error handling">ERROR HANDLING</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>GFL::Image - An OO interface to P-e Gougelet's Graphic File Library</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use GFL::Image;</PRE>
+<PRE>
+  my $im = GFL::Image-&gt; new;</PRE>
+<PRE>
+  $im -&gt; load(&quot;test.png&quot;);
+  $im -&gt; set( output =&gt; &quot;jpeg&quot;,
+              undolevel    =&gt; 5
+            );
+  $im -&gt; resize (320, 200);
+  $im -&gt; filter( maximum =&gt; 3,
+                 mediancross =&gt; 7
+                 );
+  $im -&gt; undo;
+  $im -&gt; save(&quot;test.jpg&quot;);</PRE>
+<PRE>
+  undef ($im);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides an Object Oriented interface to Pierre-E. Gougelet's Graphic File Library.</P>
+<P>GFL provides a comprehensive set of image processing tools and can access
+more than 300 image formats.</P>
+<P>GFL is free for non-commercial use, you can grab the latest version at <A HREF="http://www.xnview.org.">http://www.xnview.org.</A>
+People wanting to use it in a commercial application must ask authorization to the author.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<UL>
+<LI>
+Nearly all methods croak their <EM>usage</EM> when called with improper or missing arguments.
+<P></P>
+<LI>
+All methods and attributes are <STRONG>case insensitive</STRONG>. You may say either
+<PRE>
+        $a -&gt; set( 'output' =&gt; 'bmp')</PRE>
+<P>or</P>
+<PRE>
+        $a -&gt; Set( Output =&gt; 'bmp')</PRE>
+<P>or even</P>
+<PRE>
+        $a -&gt; SeT(OUtPuT =&gt; 'bmp')</PRE>
+<P>If the idea of loosing 3 seconds per 100000 method calls makes you sick,
+use all <EM>lowercase</EM> for <STRONG>method</STRONG> names to avoid Autoloading overhead. (timed on a Duron 850Mhz)</P>
+<P></P></UL>
+<P>
+<H2><A NAME="gfl::image>new">GFL::Image-&gt;new</A></H2>
+<P>Create a new object.
+Assigning attributes via <CODE>new</CODE> is <EM>deprecated</EM>.</P>
+<P>
+<H2><A NAME="$o>set(attrib => value, ...)">$o-&gt;set(attrib =&gt; value, ...)</A></H2>
+<P>Set single or multiple attributes.
+Valid attributes are :</P>
+<DL>
+<DT><STRONG><A NAME="item_UndoLevel">UndoLevel</A></STRONG><BR>
+<DD>
+Define the number of possible undos.
+<P>If <CODE>undolevel</CODE> changes and happens to be lower than the current number of undos,
+older undos are cleared accordingly (in FIFO order).</P>
+<P></P>
+<DT><STRONG><A NAME="item_Verbose">Verbose</A></STRONG><BR>
+<DD>
+Set the verbosity level on STDERR:
+<PRE>
+        False - no STDERR report
+        1 - report normal operations + errors (anonymously)
+        2 - normal operations + errors, with object identifier
+        3 - the above plus various internal/cleaning operations</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2D_ATTRIBUTES_CHANGING_IMAGE_EXPORTATION_BEHAV">-- ATTRIBUTES CHANGING IMAGE EXPORTATION BEHAVIOR : --</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Output">Output</A></STRONG><BR>
+<DD>
+The format you want the image to be saved as.
+Writable formats are:
+<PRE>
+        'alias'  : Alias Image File
+        'arcib'  : ArcInfo Binary
+        'bmp'    : Windows Bitmap
+        'cin'    : Kodak Cineon
+        'degas'  : Degas &amp; Degas Elite
+        'dkb'    : DKB Ray-Tracer
+        'gif'    : CompuServe GIF
+        'gpat'   : Gimp Pattern
+        'grob'   : HP-48/49 GROB
+        'hru'    : HRU
+        'ico'    : Windows Icon
+        'iff'    : Amiga IFF
+        'jif'    : Jeff's Image Format
+        'jpeg'   : JPEG / JFIF
+        'miff'   : Image Magick file
+        'mtv'    : MTV Ray-Tracer
+        'palm'   : Palm Pilot
+        'pbm'    : Portable Bitmap
+        'pcl'    : Page Control Language
+        'pcx'    : Zsoft Publisher's Paintbrush
+        'pgm'    : Portable Greyscale
+        'png'    : Portable Network Graphics
+        'pnm'    : Portable Image
+        'ppm'    : Portable Pixmap
+        'psion3' : Psion Serie 3 Bitmap
+        'psion5' : Psion Serie 5 Bitmap
+        'qrt'    : Qrt Ray-Tracer
+        'rad'    : Radiance
+        'raw'    : Raw
+        'ray'    : Rayshade
+        'rla'    : Wavefront Raster file
+        'sgi'    : Silicon Graphics RGB
+        'soft'   : Softimage
+        'tga'    : Truevision Targa
+        'ti'     : TI Bitmap
+        'tiff'   : TIFF Revision 6
+        'uyvy'   : YUV 16Bits
+        'uyvyi'  : YUV 16Bits Interleaved
+        'vista'  : Vista
+        'vivid'  : Vivid Ray-Tracer
+        'wbmp'   : Wireless Bitmap (level 0)
+        'wrl'    : VRML2
+        'xbm'    : X11 Bitmap
+        'xpm'    : X11 Pixmap</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Dither">Dither</A></STRONG><BR>
+<DD>
+Boolean.
+<P></P>
+<DT><STRONG><A NAME="item_BinaryDither">BinaryDither</A></STRONG><BR>
+<DD>
+Preferred dithering method for black &amp; white pictures.
+<P>One of: <STRONG>floyd</STRONG>, <STRONG>pattern</STRONG>, <STRONG>halftone45</STRONG>, <STRONG>halftone90</STRONG></P>
+<P>Defaults to <CODE>floyd</CODE>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Quality">Quality</A></STRONG><BR>
+<DD>
+Defines picture quality (vs. size) for <CODE>jpeg</CODE>, <CODE>wic</CODE> , <CODE>fpx</CODE> formats.
+<P>0 &lt; <CODE>value</CODE> &gt; 100 (best quality)</P>
+<P></P>
+<DT><STRONG><A NAME="item_CompressionLevel">CompressionLevel</A></STRONG><BR>
+<DD>
+Defines compression level for <CODE>png</CODE> format.
+<P>0 &lt; <CODE>value</CODE> &gt; 6 (best compression)</P>
+<P></P>
+<DT><STRONG><A NAME="item_Interlaced">Interlaced</A></STRONG><BR>
+<DD>
+Boolean. For <CODE>gif</CODE> format.
+<P></P>
+<DT><STRONG><A NAME="item_Progressive">Progressive</A></STRONG><BR>
+<DD>
+Boolean. For <CODE>jpeg</CODE> format.
+<P></P>
+<DT><STRONG><A NAME="item_ReplaceExtension">ReplaceExtension</A></STRONG><BR>
+<DD>
+Boolean.
+If set to <CODE>True</CODE>, a correct extension is added to the <CODE>filename</CODE> when saving,
+or it's extension is replaced if incorrect.
+<P></P>
+<DT><STRONG><A NAME="item_ChannelOrder">ChannelOrder</A></STRONG><BR>
+<DD>
+Defines how to store channels in file.
+<P>One of: <STRONG>interleaved</STRONG>, <STRONG>sequential</STRONG>, <STRONG>separate</STRONG>
+Defaults to: <CODE>interleaved</CODE></P>
+<P></P>
+<DT><STRONG><A NAME="item_Compression">Compression</A></STRONG><BR>
+<DD>
+Defines a desired compression method.
+<P>One of:</P>
+<P><STRONG>none</STRONG>, <STRONG>rle</STRONG>, <STRONG>lzw</STRONG>, <STRONG>jpeg</STRONG>, <STRONG>zip</STRONG>, <STRONG>sgi_rle</STRONG>, <STRONG>ccitt_rle</STRONG>, <STRONG>ccitt_fax3</STRONG>, <STRONG>ccitt_fax3_2d</STRONG>, <STRONG>ccitt_fax4</STRONG>, <STRONG>wavelet</STRONG> or <STRONG>lzw_predictor</STRONG></P>
+<P># FIXME : This option does not seem to have any effect ...
+I'll ask more informations to the GFL library's author.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2D_ATTRIBUTES_CHANGING_IMAGE_IMPORTATION_BEHAV">-- ATTRIBUTES CHANGING IMAGE IMPORTATION BEHAVIOR : --</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Input">Input</A></STRONG><BR>
+<DD>
+The input format. Defaults to 'auto', where GFL tries to guess the format.
+<P>Input formats are too numerous to be listed here.
+Just say <CODE>dumpallformats()</CODE> for a comprehensive list.</P>
+<P></P>
+<DT><STRONG><A NAME="item_LinePadding">LinePadding</A></STRONG><BR>
+<DD>
+An integer.
+<P>1 (<EM>default</EM>), 2, 4, ...</P>
+<P></P></DL>
+<P>
+<H2><A NAME="$o>get( attrib, ... )">$o-&gt;get( attrib, ... )</A></H2>
+<P>Get single or multiple attributes.</P>
+<P>Valid (case insensitive) attributes are all Set-able attributes plus :</P>
+<DL>
+<DT><STRONG><A NAME="item_FileInformations">FileInformations</A></STRONG><BR>
+<DD>
+Brings you a hash reference containing various informations about the current loaded file
+(<STRONG>as it is on the disk, not as it is in memory !</STRONG> - this does not reflect any manipulations you have applied)
+<P>e.g:</P>
+<PRE>
+ $infos = $a-&gt;get(FileInformations) || die $a-&gt;lasterror;
+ foreach (keys %$infos)
+ {
+ print &quot;$_ =&gt; $infos-&gt;{$_}\n&quot; if $infos-&gt;{$_};
+ }</PRE>
+<P>sample output:</P>
+<PRE>
+        Origin =&gt; 16
+        Description =&gt; Sgi RGB
+        Width =&gt; 182
+        CompressionDescription =&gt; Sgi Rle
+        BitsPerPlane =&gt; 8
+        FileSize =&gt; 98145
+        NumberOfPlanes =&gt; 3
+        FormatName =&gt; sgi
+        NumberOfImages =&gt; 1
+        FormatIndex =&gt; 4
+        Height =&gt; 170
+        BytesPerPlane =&gt; 182
+        Compression =&gt; 5</PRE>
+<UL>
+<LI>
+remember this is an hash <STRONG>reference</STRONG>, so you must access every member like this:
+<P>$infos-&gt;{'Width'}</P>
+<P></P>
+<LI>
+FileInformations attribute change only when you open a new file.
+<P></P>
+<LI>
+To retrieve informations about a file <EM>before</EM> loading it, see
+function <CODE>GetFileInformations()</CODE>
+<P></P>
+<LI>
+For informations about the current state of the image <STRONG>in memory</STRONG>,
+see <A HREF="#item_BitmapInformations"><CODE>BitmapInformations</CODE></A> attribute.
+<P></P></UL>
+<DT><STRONG><A NAME="item_BitmapInformations">BitmapInformations</A></STRONG><BR>
+<DD>
+Brings you a hash <EM>reference</EM> containing various informations about the current working Bitmap.
+<P>Sample Hash:</P>
+<PRE>
+        Xdpi =&gt; 68
+        BytesPerLine =&gt; 546
+        Width =&gt; 182
+        BitsPerComponent =&gt; 8
+        Ydpi =&gt; 68
+        Data =&gt; GFL_UINT8Ptr=SCALAR(0x81834ec)
+        Height =&gt; 170
+        BytesPerPixel =&gt; 3
+        TransparentIndex =&gt; -1
+        Type =&gt; 16</PRE>
+<P>remember this is an hash <STRONG>reference</STRONG>, so you must access every member like this:</P>
+<P>$infos-&gt;{'Width'}</P>
+<P></P>
+<DT><STRONG><A NAME="item_NumberOfColours_%2F_NumberOfColors">NumberOfColours / NumberOfColors</A></STRONG><BR>
+<DD>
+Return the number of unique colors in the working bitmap.
+<P></P>
+<DT><STRONG><A NAME="item_Width">Width</A></STRONG><BR>
+<DD>
+Width in pixels of the current working bitmap
+<P></P>
+<DT><STRONG><A NAME="item_Height">Height</A></STRONG><BR>
+<DD>
+Height in pixels of the current working bitmap
+<P></P></DL>
+<P>
+<H2><A NAME="$o>load( filename [, imageindex])">$o-&gt;load( filename [, ImageIndex])</A></H2>
+<P>Open the given file.</P>
+<UL>
+<LI>
+- If <CODE>input</CODE> attribute is set to 'auto' (the default), GFL will attempt to guess the format.
+<P></P>
+<LI>
+- <CODE>ImageIndex</CODE> indicates which image should be loaded in the case of a multi-image or animated file. It is <EM>zero-based</EM>.
+<P></P></UL>
+<P>
+<H2><A NAME="$o>loadpreview( filename, width, height [, imageindex])">$o-&gt;loadpreview( filename, width, height [, ImageIndex])</A></H2>
+<P>Open a custom size preview for the given file.</P>
+<P>The preview becomes the current working bitmap.</P>
+<UL>
+<LI>
+- If <CODE>input</CODE> is set to 'auto' (the default), GFL will attempt to guess the format.
+<P></P>
+<LI>
+- <CODE>width</CODE> and <CODE>height</CODE> will be rounded to the nearest integer value if fractionals.
+<P></P>
+<LI>
+- <CODE>ImageIndex</CODE> indicates which image should be loaded in the case of a multi-image or animated file. It is <EM>zero-based</EM>.
+<P></P></UL>
+<P>e.g:</P>
+<PRE>
+        $i = getfileinformations('foo.png') or die;
+        $a = GFL::Image-&gt;new;
+        $a -&gt; loadpreview('foo.png', $i-&gt;{'Width'}/3, $i-&gt;{'Height'}/3);</PRE>
+<P>
+<H2><A NAME="$o>save( filename )">$o-&gt;save( filename )</A></H2>
+<P>Save the current Bitmap using attribute <A HREF="#item_Output"><CODE>Output</CODE></A> as format.</P>
+<P>Be aware that there is no checking to see if current <A HREF="#item_Output"><CODE>Output</CODE></A> format support the actual color depth.</P>
+<P>If the GFL library reports `` Can't save this bitmap in this format !'', see <CODE>ChangeDepth()</CODE> method.</P>
+<P>
+<H2><A NAME="$o>resize( width, height [, 'quick'])">$o-&gt;resize( Width, Height [, 'quick'])</A></H2>
+<P>Rescale the image to the given Width/Height values.</P>
+<UL>
+<LI>
+If the keyword 'Quick' is given as third argument, resize method is set to quick ;
+otherwise, Bilinear method applies.
+<P></P>
+<LI>
+If <A HREF="#item_Width"><CODE>Width</CODE></A> and <A HREF="#item_Height"><CODE>Height</CODE></A> are fractionals, they are rounded to the nearest integer.
+<P></P></UL>
+<P>
+<H2><A NAME="$o>flip( 'vertical' or 'horizontal' )">$o-&gt;flip( 'vertical' or 'horizontal' )</A></H2>
+<P>Flip image on the given axis.</P>
+<P>
+<H2><A NAME="$o>negate">$o-&gt;negate</A></H2>
+<P>Negate current image</P>
+<P>
+<H2><A NAME="$o>crop(x, y, width, height)">$o-&gt;crop(x, y, width, height)</A></H2>
+<P>Crop image starting at (x,y) coordinates from current <CODE>Origin</CODE></P>
+<P>
+<H2><A NAME="$o>contrast(100...100)">$o-&gt;<CODE>contrast(-100...100)</CODE></A></H2>
+<P>
+<H2><A NAME="$o>gamma(0.01 <> 5.0)">$o-&gt;gamma(0.01 &lt;-&gt; 5.0)</A></H2>
+<P>
+<H2><A NAME="$o>rotate( angle )">$o-&gt;rotate( Angle )</A></H2>
+<P>Apply a rotation of ``Angle'' degrees.</P>
+<P>
+<H2><A NAME="$o>soften( percent )">$o-&gt;soften( percent )</A></H2>
+<P>
+<H2><A NAME="$o>blur( percent )">$o-&gt;blur( percent )</A></H2>
+<P>
+<H2><A NAME="$o>sharpen( percent )">$o-&gt;sharpen( percent )</A></H2>
+<P>
+<H2><A NAME="$o>filter(filter_type => filter_size, ...)">$o-&gt;filter(filter_type =&gt; filter_size, ...)</A></H2>
+<P>Apply the given filters.</P>
+<P>Where filter_type is one of:
+<CODE>average</CODE>, <CODE>gaussianblur</CODE>, <CODE>maximum</CODE>, <CODE>minimum</CODE>, <CODE>medianbox</CODE>, <CODE>mediancross</CODE></P>
+<P>And filter_size is one of:
+<CODE>3</CODE>, <CODE>5</CODE>, <CODE>7</CODE>, <CODE>9</CODE>, <CODE>11</CODE>, <CODE>13</CODE></P>
+<P>Multiple filters are applied following arguments order.</P>
+<P>
+<H2><A NAME="$o>changedepth( new_depth )">$o-&gt;ChangeDepth( new_depth )</A></H2>
+<P>Change the color depth of current working bitmap.</P>
+<P>new_depth is one of:</P>
+<PRE>
+        binary, 4g, 8g, 16g, 32g, 64g, 128g, 216g,
+        256g, 8, 16, 32, 64, 128, 216, 256 ,truecolors</PRE>
+<P>Values containing a ``g'' like ``32g'' mean greyscale.</P>
+<P>If the <CODE>dither</CODE> attribute is set (boolean), then image is dithered with Adaptative algorithm.</P>
+<P>If, additionaly, wanted colordepth is 'binary', then dither will read the <CODE>binarydither</CODE>
+attribute and use the corresponding algorithm.</P>
+<P>
+<H2><A NAME="$o>lasterror">$o-&gt;LastError</A></H2>
+<P>Retrieve the last error message.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>Those functions aren't really methods : they do not process the object when called from it.
+Thus, they don't have error handling as defined in ERROR HANDLING section.
+However, if <CODE>getfileinformations(filename)</CODE> is called as a method on an object, you may retrieve
+an eventual error via <CODE>$obj-&gt;lasterror</CODE>;</P>
+<P><CODE>getfileinformations()</CODE> and <CODE>dumpallformats()</CODE> are also exported (in lowercase) in your namespace,
+so you can use them from scratch.</P>
+<P>
+<H2><A NAME="gfl::image>getfileinformations(filename[,format]) or getfileinformations(filename[,format])">GFL::Image-&gt;<CODE>GetFileInformations(filename[,format])</CODE> or <CODE>getfileinformations(filename[,format])</CODE></A></H2>
+<P>Returns a hash reference containing detailed informations about a given file, or <STRONG>false</STRONG> on error.
+If <CODE>format</CODE> is not defined, GFL tries to autodetect it.</P>
+<P>See also <A HREF="#item_FileInformations"><CODE>FileInformations</CODE></A> attribute.</P>
+<P>
+<H2><A NAME="gfl::image>enablelzw">GFL::Image-&gt;enableLZW</A></H2>
+<P>If you've got a patent from UNISIS, you may enable LZW compression (this is class wide).
+This compression algorithm is used by GIF &amp; TIFF formats.</P>
+<P>Always the same sad story...</P>
+<P>
+<H2><A NAME="gfl::image>dumpallformats or dumpallformats()">GFL::Image-&gt;DumpAllFormats or <CODE>dumpallformats()</CODE></A></H2>
+<P>Issue the complete list of supported formats with description and Read/Write flag.</P>
+<P>
+<HR>
+<H1><A NAME="error handling">ERROR HANDLING</A></H1>
+<P>Well, TIMTOWTDI...</P>
+<P>To begin with, all methods except <STRONG>get()</STRONG> bring back a status report which is different
+in LIST and SCALAR context.</P>
+<UL>
+<LI>
+Error reporting in LIST context
+<P>Here, you are testing for <EM>error</EM>. You get a list with two values :</P>
+<P>- first value is <STRONG>true</STRONG> if the function <STRONG>failed</STRONG>, false otherwise.</P>
+<P>- second value is either an error string or the string <CODE>'OK'</CODE></P>
+<P>e.g:</P>
+<PRE>
+        @error = $a -&gt; rotate(100);
+        if ($error[0])
+        {
+                print STDERR $error[1];
+        }</PRE>
+<P></P>
+<LI>
+Error reporting in SCALAR context
+<P>Here, you are testing for <EM>Success</EM>.
+You get <STRONG>true</STRONG> if the method <STRONG>succeeded</STRONG>, false otherwise.</P>
+<P>e.g:</P>
+<PRE>
+        $a-&gt; rotate(100) &amp;&amp; $success++;</PRE>
+<P></P>
+<LI>
+error reporting via <STRONG>LastError</STRONG> attribute
+<P>In either SCALAR or LIST context, the <STRONG>LastError</STRONG> attribute is always updated with
+false or an error message after a method call.</P>
+<P>As using <CODE>get()</CODE> would also affect <CODE>lasterror</CODE>, you must retrieve it via the special accessor <CODE>-&gt;lasterror</CODE>.</P>
+<P>Thus, you can say:</P>
+<PRE>
+        $b = $a -&gt; get('dither');
+        $errormsg = $a -&gt;lasterror and print &quot;couldn't get dither value : $errormsg\n&quot;;</PRE>
+<P></P>
+<LI>
+error reporting on STDERR
+<P>See the <A HREF="#item_Verbose">Verbose</A> attribute if you want reports on STDERR.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>copyright 2001
+Germain Garand (<A HREF="mailto:germain@ebooksfrance.com">germain@ebooksfrance.com</A>)</P>
+<P>This wrapper is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>GD(3), Image::Magick(3)</P>
+
+</BODY>
+
+</HTML>

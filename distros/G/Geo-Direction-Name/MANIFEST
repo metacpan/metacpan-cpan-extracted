@@ -1,0 +1,26 @@
+Build.PL
+Changes
+lib/Geo/Direction/Name.pm
+lib/Geo/Direction/Name/Locale.pm
+lib/Geo/Direction/Name/Locale/en.pm
+lib/Geo/Direction/Name/Locale/ja.pm
+lib/Geo/Direction/Name/Locale/ko.pm
+lib/Geo/Direction/Name/Locale/zh_CN.pm
+lib/Geo/Direction/Name/Locale/zh_TW.pm
+lib/Geo/Direction/Name/Spec.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/01-1.en_string.t
+t/01-2.ja_string.t
+t/01-3.ko_string.t
+t/01-4.zh_CN_string.t
+t/01-5.zh_TW_string.t
+t/02-1.en_dir.t
+t/02-2.ja_dir.t
+t/02-3.ko_dir.t
+t/02-4.zh_CN_dir.t
+t/02-5.zh_TW_dir.t
+t/03.error.t

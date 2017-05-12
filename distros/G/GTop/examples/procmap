@@ -1,0 +1,64 @@
+#!perl
+
+#port of libgtop-x.xx/examples/mountlist.c
+
+use strict;
+use ExtUtils::testlib;
+use GTop ();
+
+my $gtop = GTop->new;
+
+my $pid = shift || $$;
+
+printf STDERR "Getting memory maps for pid %d.\n\n", $pid;
+
+my($procmap, $maps) = $gtop->proc_map($pid);
+my $number = $procmap->number;
+
+for (my $i = 0; $i < $number; $i++) {
+    my $filename = $maps->filename($i) || "-";
+    my $perm = $maps->perm_string($i);
+    my $device = $maps->device($i);;
+    my $device_minor = ($device & 255);
+    my $device_major = (($device >> 8) & 255);
+    my $ptr_size = length pack("p", 0);
+    if ($filename) {
+	my $format;
+	if ($ptr_size == 8) {
+	    $format = "%016lx-%016lx %016lx - " .
+		      "%02x:%02x %08lu - %4s - %s\n";
+	}
+	else {
+	    $format = "%08lx-%08lx %08lx - " .
+		      "%02x:%02x %08lu - %4s - %s\n";
+	}
+	printf STDERR $format,
+	    $maps->start($i),
+	    $maps->end($i),
+	    $maps->offset($i),
+	    $device_major, $device_minor,
+	    $maps->inode($i),
+	    $perm, $filename;
+
+    } 
+    else {
+	my $format;
+
+	if ($ptr_size == 8) {
+	    $format = "%016lx-%016lx %016lx - " .
+		      "%02x:%02x %08lu - %4s\n";
+	}
+	else {
+	    $format = "%08lx-%08lx %08lx - " .
+		      "%02x:%02x %08lu - %4s\n";
+
+	    printf STDERR $format,
+		$maps->start($i),
+		$maps->end($i),
+		$maps->offset($i),
+		$device_major, $device_minor,
+		$maps->inode($i),
+		$perm;
+	}
+    }	
+}

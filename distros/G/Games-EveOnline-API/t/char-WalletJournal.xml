@@ -1,0 +1,19 @@
+<?xml version='1.0'?>
+<eveapi version="2">
+  <currentTime>2014-07-09 13:07:40</currentTime>
+  <result>
+    <rowset name="transactions" key="refID" columns="date,refID,refTypeID,ownerName1,ownerID1,ownerName2,ownerID2,argName1,argID1,amount,balance,reason,taxReceiverID,taxAmount,owner1TypeID,owner2TypeID">
+      <row date="2014-07-08 19:06:42" refID="9729087917" refTypeID="42" ownerName1="Milolika Muvila" ownerID1="94701913" ownerName2="" ownerID2="0" argName1="" argID1="0" amount="-31990.00" balance="35775313.19" reason="" taxReceiverID="" taxAmount="" owner1TypeID="2" owner2TypeID="1375" />
+      <row date="2014-07-08 19:04:19" refID="9729076356" refTypeID="10" ownerName1="Milolika Muvila" ownerID1="94701913" ownerName2="Chips Merkaba" ownerID2="90922771" argName1="" argID1="0" amount="-750000000.00" balance="35807303.19" reason="" taxReceiverID="" taxAmount="" owner1TypeID="1375" owner2TypeID="1383" />
+      <row date="2014-07-08 19:03:16" refID="9729072102" refTypeID="54" ownerName1="Milolika Muvila" ownerID1="94701913" ownerName2="Secure Commerce Commission" ownerID2="1000132" argName1="" argID1="0" amount="-452.25" balance="785807303.19" reason="" taxReceiverID="" taxAmount="" owner1TypeID="1375" owner2TypeID="2" />
+      <row date="2014-07-08 19:03:16" refID="9729072101" refTypeID="2" ownerName1="Shauna Allier" ownerID1="94484917" ownerName2="Milolika Muvila" ownerID2="94701913" argName1="3513456737" argID1="0" amount="30150.00" balance="785807755.44" reason="" taxReceiverID="" taxAmount="" owner1TypeID="1378" owner2TypeID="1375" />
+      <row date="2014-07-08 19:03:04" refID="9729071394" refTypeID="42" ownerName1="Milolika Muvila" ownerID1="94701913" ownerName2="" ownerID2="0" argName1="" argID1="0" amount="-28369982.50" balance="785777605.44" reason="" taxReceiverID="" taxAmount="" owner1TypeID="2" owner2TypeID="1375" />
+      <row date="2014-07-08 19:02:53" refID="9729070530" refTypeID="54" ownerName1="Milolika Muvila" ownerID1="94701913" ownerName2="Secure Commerce Commission" ownerID2="1000132" argName1="" argID1="0" amount="-12223500.00" balance="814147587.94" reason="" taxReceiverID="" taxAmount="" owner1TypeID="1375" owner2TypeID="2" />
+      <row date="2014-07-08 19:02:53" refID="9729070529" refTypeID="2" ownerName1="Cyno Chain" ownerID1="93496706" ownerName2="Milolika Muvila" ownerID2="94701913" argName1="3513456219" argID1="0" amount="814900000.00" balance="826371087.94" reason="" taxReceiverID="" taxAmount="" owner1TypeID="1376" owner2TypeID="1375" />
+      <row date="2014-07-08 19:01:17" refID="9729064231" refTypeID="46" ownerName1="Milolika Muvila" ownerID1="94701913" ownerName2="Caldari Navy" ownerID2="1000035" argName1="EVE System" argID1="1" amount="-8149000.00" balance="11471087.94" reason="" taxReceiverID="" taxAmount="" owner1TypeID="1375" owner2TypeID="2" />
+      <row date="2014-07-08 18:21:31" refID="9728889552" refTypeID="54" ownerName1="Milolika Muvila" ownerID1="94701913" ownerName2="Secure Commerce Commission" ownerID2="1000132" argName1="" argID1="0" amount="-7.37" balance="19620087.94" reason="" taxReceiverID="" taxAmount="" owner1TypeID="1375" owner2TypeID="2" />
+      <row date="2014-07-08 18:21:31" refID="9728889551" refTypeID="2" ownerName1="soro2" ownerID1="1295351495" ownerName2="Milolika Muvila" ownerID2="94701913" argName1="3513403955" argID1="0" amount="491.40" balance="19620095.31" reason="" taxReceiverID="" taxAmount="" owner1TypeID="1375" owner2TypeID="1375" />
+    </rowset>
+  </result>
+  <cachedUntil>2014-07-09 13:33:27</cachedUntil>
+</eveapi>

@@ -1,0 +1,52 @@
+body { background: #FFFFFF;
+       color: #000000;
+       font-family: Arial, Helvetica, sans-serif;
+       font-weight: normal;
+       margin-top: 110px;
+       margin-right: 1em;
+       margin-bottom: 1em;
+       margin-left: 1em;
+       background-image: url("logo.jpg");
+       background-position: center top;
+       background-repeat: no-repeat;
+     }
+
+.address { font-size: 5pt; margin-right:1em }
+
+h1 { border: solid; 
+     text-align:center;
+     background-color:#afeeee;
+     color: navy;
+   }
+h2 { border: ridge;
+     padding: 5px;
+     background-color:#afeeee;
+     color: navy;
+   }
+h3 { border: groove;
+     padding: 5px;
+     background-color:#afeeee;
+     color: navy;
+   }
+pre.script {
+     padding-left: 5px;
+     background-color: white;
+     color: navy;
+   }
+pre.code {
+     border: ridge;
+     padding: 5px;
+     margin-left: 5em;
+     margin-right: 5em;
+     background-color:#FFFF99;
+     color: navy;
+   }
+pre.smallercode {
+     border: ridge;
+     padding: 5px;
+     margin-left: 5em;
+     margin-right: 5em;
+     background-color:#FFFF99;
+     color: navy;
+     font-size: 8pt;
+   }

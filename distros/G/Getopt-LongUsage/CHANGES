@@ -1,0 +1,16 @@
+Revision history for Perl module Getopt::LongUsage.
+
+0.12	2014-07-07 reg
+	- added documentation that describes the format of the output from
+          ParseGetoptLongConfig(), taken from Getopt::Long source
+        - Throw warning and return undef, if Getopt_Long argument is not
+          provided to the GetLongUsage() method.
+        - Fix bug in GetLongUsage that gave an internal error on run time when
+          an option defined in "descriptions" was not also defined as an option
+          in "Getopt_Long". Now carps a message that the option is not defined.
+
+0.11	2013-05-30 reg
+	- fixed a bug that caused an error when no descriptions were given.
+
+0.10	2010-04-26 reg
+	- original version

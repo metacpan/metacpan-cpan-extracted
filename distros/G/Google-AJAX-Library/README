@@ -1,0 +1,156 @@
+NAME
+    Google::AJAX::Library - Access the Google AJAX Libaries API in Perl
+
+VERSION
+    version 0.022
+
+SYNOPSIS
+        use Google::AJAX::Library;
+
+        my $library = Google::AJAX::Library->jquery;
+
+        $library->uri
+        # http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
+
+        $library->html
+        # <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
+
+    You can also fetch or write-out the library content:
+
+        my $library = Google::AJAX::Library->new(name => "mootools", version => "1.8.1");
+
+        my $content = $library->fetch;
+
+        # Into a scalar:
+        my $content;
+        $library->fetch(\$content)
+
+        # To a filehandle:
+        $library->write(\*STDOUT)
+
+        # To a file:
+        $library->write("/path/to/library.js")
+
+        # Check if a library exists at http://ajax.googleapis.com
+        # This will just do a HEAD request
+        $library->exists
+
+DESCRIPTION
+    Google::AJAX::Library is a module for accessing the Google AJAX Libaries
+    API via Perl
+
+    You can find out more about the API here:
+    http://code.google.com/apis/ajaxlibs/
+
+METHODS
+  Google::AJAX::Library->jquery([ <version>, <extra> ])
+  Google::AJAX::Library->jQuery([ <version>, <extra> ])
+    Returns a jQuery library object of the given version
+
+    If no version is given or the given version is 0, then the latest
+    version (1) will be used
+
+    You can pass through "uncompressed = 1" to get the non-compacted .js
+
+    For example:
+
+        my $library = Google::AJAX::Library->jQuery(1.2, uncompressed => 1)
+
+  Google::AJAX::Library->prototype([ <version> ])
+    Returns a prototype library object of the given version
+
+    If no version is given or the given version is 0, then the latest
+    version (1) will be used
+
+    A compressed .js is not offered at this time
+
+  Google::AJAX::Library->scriptaculous([ <version> ])
+    Returns a script.aculo.us library object of the given version
+
+    If no version is given or the given version is 0, then the latest
+    version (1) will be used
+
+    A compressed .js is not offered at this time
+
+  Google::AJAX::Library->mootools([ <version>, <extra> ])
+  Google::AJAX::Library->MooTools([ <version>, <extra> ])
+    Returns a MooTools library object of the given version
+
+    If no version is given or the given version is 0, then the latest
+    version (1) will be used
+
+    You can pass through "uncompressed = 1" to get the non-compacted .js
+
+  Google::AJAX::Library->dojo([ <version>, <extra> ])
+    Returns a Dojo library object of the given version
+
+    If no version is given or the given version is 0, then the latest
+    version (1) will be used
+
+    You can pass through "uncompressed = 1" to get the non-compacted .js
+
+  $library->uri
+    Returns the URI for $library
+
+  $library->version
+    Returns the version of $library
+
+  $library->name
+    Returns the name of $library (e.g. jquery, scriptaculous, etc.)
+
+  $library->file
+    Returns the filename of $library (e.g. jquery.min.js, dojo/dojo.xd.js,
+    etc.)
+
+  $library->html
+    Returns a properly formatted HTML <script></script> entry for $library
+
+  $library->exists
+    Returns 1 if the $library (at the URI, including the specified version)
+    exists at http://ajax.googleapis.com/
+
+    Returns 0 otherwise
+
+    This method uses a HEAD request to do the checking
+
+  $library->request
+    Returns the HTTP::Response of the GET request for $library
+
+  $library->fetch([ <to> ])
+    Attempts to GET $library
+
+    Returns the HTTP::Response decoded content If <to> is not given
+
+    If <to> is a SCALAR reference then the content will be put into <to>
+
+    This method is synonymous/interchangeable with "write"
+
+  $library->write( <to> )
+    Attempts to GET $library
+
+    If <to> is a GLOB reference then the content will be printed to <to>
+
+    If <to> is a filename (or Path::Class::File object) then the content
+    will be printed to the filename specified
+
+    This method will croak if $library couldn't be gotten from Google (e.g.
+    404)
+
+    This method is synonymous/interchangeable with "fetch"
+
+SEE ALSO
+    <http://code.google.com/apis/ajaxlibs/>
+
+    JS::jQuery::Loader
+
+    JS::YUI::Loader
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

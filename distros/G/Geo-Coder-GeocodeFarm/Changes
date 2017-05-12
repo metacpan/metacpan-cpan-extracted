@@ -1,0 +1,40 @@
+0.0402  2015-03-27      Piotr Roszatycki <dexter@cpan.org>
+
+* Bugfix for `reverse_geocode` method.
+* Bugfix for example scripts.
+
+0.0401  2015-03-27      Piotr Roszatycki <dexter@cpan.org>
+
+* Requires URI package.
+
+0.0400  2015-03-26      Piotr Roszatycki <dexter@cpan.org>
+
+* New API v3
+* Supports `HTTP::Tiny` user agent by default.
+* Supports `addr` argument for `geocode` method.
+* Supports `lon` argument for `reverse_geocode` method.
+
+0.0300  2013-08-27      Piotr Roszatycki <dexter@cpan.org>
+
+* Argument raise_failure (default: true) causes that geocode and
+  reverse_geocode methods throw error if status is not SUCCESS.
+* Slash (/) is replaced with dash (-) in location string.
+* Latitude and longitude arguments are not rounded to 5 decimal places
+  anymore.
+* Document query counts and other account information to the API response.
+
+0.0200  2013-08-06      Piotr Roszatycki <dexter@cpan.org>
+
+* New API based on JSON is supported.
+* New method for reverse geocoding.
+
+
+0.0101  2013-07-15      Piotr Roszatycki <dexter@cpan.org>
+
+* Changed URL to http://www.geocodefarm.com/geo.php
+
+
+0.0100  2013-07-09      Piotr Roszatycki <dexter@cpan.org>
+
+* First CPAN release.
+

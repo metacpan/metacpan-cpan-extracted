@@ -1,0 +1,37 @@
+
+;; Re-parent from GtkContainer to GtkBin
+(define-object GtkButton (GtkBin))
+
+(define-flags GtkSpinButtonUpdatePolicy
+  (always GTK_UPDATE_ALWAYS)
+  (if-valid GTK_UPDATE_IF_VALID)
+  (snap-to-ticks GTK_UPDATE_SNAP_TO_TICKS))
+
+(define-object GtkProgressBar (GtkWidget)
+  (fields
+   (float percentage)))
+
+(define-enum GdkEventType
+  (nothing GDK_NOTHING)
+  (delete GDK_DELETE)
+  (destroy GDK_DESTROY)
+  (expose GDK_EXPOSE)
+  (motion-notify GDK_MOTION_NOTIFY)
+  (button-press GDK_BUTTON_PRESS)
+  (2button-press GDK_2BUTTON_PRESS)
+  (3button-press GDK_3BUTTON_PRESS)
+  (button-release GDK_BUTTON_RELEASE)
+  (key-press GDK_KEY_PRESS)
+  (key-release GDK_KEY_RELEASE)
+  (enter-notify GDK_ENTER_NOTIFY)
+  (leave-notify GDK_LEAVE_NOTIFY)
+  (focus-change GDK_FOCUS_CHANGE)
+  (configure GDK_CONFIGURE)
+  (map GDK_MAP)
+  (unmap GDK_UNMAP)
+  (property-notify GDK_PROPERTY_NOTIFY)
+  (selection-clear GDK_SELECTION_CLEAR)
+  (selection-request GDK_SELECTION_REQUEST)
+  (selection-notify GDK_SELECTION_NOTIFY)
+  (other-event GDK_OTHER_EVENT))
+

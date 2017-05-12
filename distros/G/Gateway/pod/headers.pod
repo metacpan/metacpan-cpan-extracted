@@ -1,0 +1,88 @@
+=head2 headers
+
+This module implements some general header rewriting functions, including
+adding, dropping, and renaming headers and replacing header contents.  It
+takes one configuration directive:
+
+=over 4
+
+=item header HEADER FUNCTION [ CONTENT ]
+
+Specify an action on the header C<HEADER>.  C<FUNCTION> can be any of the
+following:  drop deletes a header, rename renames the original header to
+X-Original-HEADER retaining the same value, ifempty adds a header with
+content C<CONTENT> if and only if the message doesn't already contain a
+header C<HEADER>, replace replaces all existing C<HEADER> headers with one
+containing C<CONTENT>, prepend adds C<CONTENT> to the beginning of the
+first header C<HEADER> or creates a new header C<HEADER> with content
+C<CONTENT> if none already exists, and reject returns an error if
+C<HEADER> is present in the incoming message.
+
+C<CONTENT> can contain various special variables:  C<$n> will be replaced
+with the name of the running program, C<$v> will be replaced with the
+version of News::Gateway, and C<$i> will be replaced with a unique
+identifier formed from the current time and the process ID.  C<$$> will be
+replaced with C<$>, so to put a literal dollar sign in a header, you
+should use C<$$>.
+
+=back
+
+For example, suppose you have a configuration file with the following
+directives:
+
+    header organization add     SNAP
+    header message-id   rename
+    header sender       drop
+    header comment      replace $n $v
+    header subject      ifempty no subject (thread id $i)
+
+and suppose you have an incoming message with the headers:
+
+    Organization: Restaurant Reviews
+    Message-ID: <123142@bar.org>
+    Sender: foo@bar.org
+    Comment: Hello
+    Comment: Hello again
+
+After the headers module runs, the message will have a header of:
+
+    Organization: Restaurant Reviews
+    Organization: SNAP
+    X-Original-Message-ID: <123142@bar.org>
+    Comment: PROGRAM VERSION
+    Subject: no subject (thread id ID)
+
+where C<PROGRAM> is the name of the running program (ie, C<$0>),
+C<VERSION> is the version of News::Gateway, and C<ID> is a unique
+identifier as described above.
+
+This module may fail and call error() with the following message while
+reading the configuration directives:
+
+=over 4
+
+=item Unknown header rewrite action %s
+
+A rewrite action was specified that isn't among those that are supported.
+This probably indicates a typo.
+
+=back
+
+This module may fail in one way:
+
+=over 4
+
+=item Invalid header %s
+
+A header that was associated with a reject action in a configuration
+directive was present in the incoming message.  Note that the header will
+be given in all lowercase.
+
+=back
+
+As a side note, if you're constructing a robomoderator for a newsgroup,
+dropping or renaming the Path header in incoming messages is highly
+recommended.  It turns out that some news servers will add a Path header
+with their hostname B<before> remailing the message to a moderator, and if
+you keep that Path header when you post, the article will never propagate
+back to the site of the original poster.

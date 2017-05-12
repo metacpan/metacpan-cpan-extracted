@@ -1,0 +1,18 @@
+diff -Naur ipw2100-0.38-orig/Makefile ipw2100-0.38/Makefile
+--- ipw2100-0.38-orig/Makefile	2004-03-24 20:39:31.000000000 +0100
++++ ipw2100-0.38/Makefile	2004-03-25 00:04:51.000000000 +0100
+@@ -130,10 +130,14 @@
+ MODVERDIR=$(TMP)/.tmp_versions
+ 
+ modules:
++ifdef ($(KSRC_OUTPUT)/.tmp_versions)
+ 	mkdir -p $(MODVERDIR)
+ 	-cp $(KSRC_OUTPUT)/.tmp_versions/*.mod $(MODVERDIR)
++endif
+ ifeq ($(KSRC),$(KSRC_OUTPUT)) # We're not outputting elsewhere
++ifdef ($(KSRC)/.tmp_versions)
+ 	-cp $(KSRC)/.tmp_versions/*.mod $(MODVERDIR)
++endif
+ 	make -C $(KSRC) SUBDIRS=$(PWD) MODVERDIR=$(PWD) modules
+ else # We've got a kernel with seperate output, copy the config, and use O=
+ 	mkdir -p $(TMP)

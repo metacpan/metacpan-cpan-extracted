@@ -1,0 +1,330 @@
+[%-
+    # This form template is used by Sunflower Broadband and is subject
+    # to changes that may not be backwards compatible. Use at your own risk.
+    
+    # This template supports all the field properties in the default form.tt
+    # template and additionally supports the following properties.
+    
+    # fieldset - If fields have a fieldset property specified the template
+    #            will group the fields together into a fieldset.
+-%]
+
+[%- USE form = HTML.SuperForm( self.params ) %]
+
+[%- form.start_form(
+    action => ( view.form.action || self.uri ),
+    enctype => view.form.enctype,
+    class   => ( view.form.class || 'form-box' ),
+    method  => ( view.data.method || 'post' )
+) %]
+
+[%- IF view.form.show_error_summary %]
+    [% PROCESS error_summary %]
+[%- END %]
+
+[%# check for older style crud form %]
+[%- IF view.form.fields %]
+
+    <div class="form-box [% view.form.class %]">
+        [% UNLESS view.form.nohead %]<h4 class="heading">[% view.title %]</h4>[% END %]
+
+        [%-
+            fieldsets = [];
+            cfsgroup.legend = 'gantry-default';
+            cfsgroup.fields = [];
+
+            FOREACH field_data IN view.form.fields;
+                IF field_data.fieldset && ! field_data.fieldset.match(cfsgroup.legend);
+                    IF cfsgroup.fields.size;
+                        fieldsets.push(cfsgroup);
+                        cfsgroup = {};
+                        cfsgroup.fields = [];
+                    ELSE;
+                        cfsgroup = {};
+                        cfsgroup.fields = [];
+                    END;
+
+                    cfsgroup.legend = field_data.fieldset;
+                    cfsgroup.fields.push(field_data);
+                ELSE;
+                    cfsgroup.fields.push(field_data);
+                END;
+            END;
+
+            fieldsets.push(cfsgroup);
+        -%]
+
+        [%- FOREACH fieldset IN fieldsets %]
+            <fieldset class="[% fieldset.legend | replace('\s+', '-') | replace("'", '') | lower %]">
+                [% UNLESS fieldset.legend.match('gantry-default') %]
+                    <legend>[% fieldset.legend %]</legend>
+                [% END %]
+                [% FOREACH field_data IN fieldset.fields; %]
+                    [%- PROCESS field
+                        dta    = field_data
+                        row    = view.form.row
+                        layout = 'default' %]
+                        <br id="[% field_data.name _ '_br' %]" style="clear: both" />
+                [% END %]
+            </fieldset>
+        [%- END %]
+    </div>
+[%- ELSE %]
+    [%- WHILE ( row = view.form.row.next ) %]
+        <div class="form-box [% view.form.class %]">
+            <h5 class="heading">[% view.form.legend %]</h5>
+            [%- FOREACH field_data IN view.form.fields %]
+                [%- PROCESS field
+                    dta    = field_data
+                    row    = row
+                    layout = 'default' %]
+
+            [%- END %]
+        </div>
+    [%- END %]
+
+[%- END %]
+
+<div class="form-box [% view.form.class %] actions">
+[%- UNLESS view.form.no_submit %]
+    [% form.submit(
+        id      => 'submit',
+        name    => 'submit',
+        default => ( view.form.submit_button_label || 'Submit' ),
+        label   => ( view.form.submit_button_label || 'Submit' )
+    ) -%]
+[%- END %]
+
+[%- IF view.form.submit_and_add_another %]
+    [%- form.submit(
+        name => 'submit_add_another',
+        default => ( view.form.submit_and_add_another_label
+            || 'Submit &amp; Add Another' ),
+        label => ( view.form.submit_and_add_another_label
+            || 'Submit &amp; Add Another' )
+    ) %]
+[%- END %]
+[%- UNLESS view.form.no_cancel %]
+    [%- form.submit(
+        id => 'cancel',
+        name => 'cancel',
+        default => ( view.form.cancel_button_label || 'Cancel' )
+        label => ( view.form.cancel_button_label || 'Cancel' )
+    ) -%]
+[%- END %]
+</div>
+
+[% form.end_form %]
+
+[% BLOCK field %]
+    [%- type = dta.type %]
+    [%- name = dta.name %]
+    [%- missing = view.form.results.missing( "$name" ) %]
+    [%- required = dta.optional ? 0 : 1 %]
+    [%- required_mark = required ? ' *' : '' %]
+
+    [%- IF type == 'file' %]
+        <label id="[% dta.name _ '_label' %]" class="[% required ? 'required' : '' %]"
+            for="[% dta.name %]">[% dta.label _ required_mark %]</label>
+        <input type="file" name="[% dta.name %]" />
+
+        [%- PROCESS row_status
+            invalid = view.form.results.invalid( "$name" ).join( ',' )
+            missing = view.form.results.missing( "$name" )
+            hint    = dta.hint
+            name    = dta.name
+        %]
+
+    [%- ELSIF type == 'display' %]
+        <label id="[% dta.name _ '_label' %]">[% dta.label %]</label>
+        [%- name_display = name _ '_display' %]
+        [%- self.unescape_html(row.$name_display) || self.unescape_html(row.$name) || self.unescape_html(dta.default_value) %]
+
+        [%- PROCESS row_status
+            invalid = view.form.results.invalid( "$name" ).join( ',' )
+            missing = view.form.results.missing( "$name" )
+            hint    = dta.hint
+            name    = dta.name
+        %]
+
+    [%- ELSIF type == 'textarea' %]
+        <label id="[% dta.name _ '_label' %]" class="[% required ? 'required' : '' %]"
+            for="[% dta.name %]">[% dta.label _ required_mark %]</label>
+
+        [%- form.$type(
+            id => dta.name,
+            name => name,
+            default => (self.unescape_html(self.params.$name) || self.unescape_html(row.$name) || self.unescape_html(dta.default_value)),
+            class => dta.class,
+            rows => dta.rows,
+            cols => dta.cols
+        )
+        %]
+
+        [%- PROCESS row_status
+            invalid = view.form.results.invalid( "$name" ).join( ',' )
+            missing = view.form.results.missing( "$name" )
+            hint    = dta.hint
+            name    = dta.name
+        %]
+
+    [%- ELSIF type == 'hidden' %]
+
+        [%- form.$type(
+            id => dta.name,
+            name => dta.name,
+            class => dta.class,
+            default => (self.unescape_html(self.params.$name) || self.unescape_html(row.$name) || self.unescape_html(dta.default_value)),
+            size => dta.display_size,
+        )
+        %]
+
+    [%- ELSIF type == 'select' || type == 'multiple_select' %]
+        [%- values = []; labels = {}; %]
+
+        [%- FOREACH i IN dta.options %]
+            [%- key = i.value %]
+
+            [%-  values.push( self.unescape_html(i.value) );
+                labels.$key = self.unescape_html(i.label);
+            %]
+        [%- END %]
+
+
+        <label id="[% dta.name _ '_label' %]" class="[% required ? 'required' : '' %]"
+            for="[% dta.name %]">[% dta.label _ required_mark %]</label>
+
+        [% param_values = self.params.$name.split('\0') %]
+
+        [% val = '' %]
+        [% IF param_values.count %]
+            [% val = param_values %]
+        [% ELSIF row.$name.defined %]
+            [% val = row.$name  %]
+        [% ELSE %]
+            [% val = dta.default_value %]
+        [% END %]
+
+        [%- form.select(
+            id => dta.name,
+            name => name,
+            class => dta.class,
+            default => val,
+            size => dta.display_size,
+            values => values,
+            labels => labels,
+            multiple => ( type == 'multiple_select' ? 1 : 0 )
+            onchange => dta.onchange,
+        )
+        %]
+
+        [%- PROCESS row_status
+            invalid = view.form.results.invalid( "$name" ).join( ',' )
+            missing = view.form.results.missing( "$name" )
+            hint    = dta.hint
+            name    = dta.name
+        %]
+
+    [%- ELSIF type == 'html' %]
+        <label id="[% dta.name _ '_label' %]">[% dta.label %]</label>
+        [%- dta.html %]
+    [%- ELSE %]
+        <label id="[% dta.name _ '_label' %]" class="[% required ? 'required' : '' %]"
+         for="[% dta.name %]">[% dta.label _ required_mark %]</label>
+
+         [% val = '' %]
+         [% IF $self.params.$name.defined %]
+             [% val = self.unescape_html($self.params.$name) %]
+         [% ELSIF row.$name.defined %]
+             [% val = self.unescape_html(row.$name) %]
+         [% ELSE %]
+             [% val = self.unescape_html(dta.default_value) %]
+         [% END %]
+
+        [%- form.$type(
+            id => dta.name,
+            name => dta.name,
+            class => dta.class,
+            default => val,
+            size => dta.display_size,
+        )
+        %]
+
+        [%- PROCESS row_status
+            invalid = view.form.results.invalid( "$name" ).join( ',' )
+            missing = view.form.results.missing( "$name" )
+            hint    = dta.hint
+            name    = dta.name
+        %]
+    [%- END %]
+
+[%- END %]
+
+[% BLOCK row_status %]
+
+    <span id="[% name _ '_hint' %]" class="hint">[% hint %]</span>
+
+    [% IF invalid %]
+        <span class="invalid">invalid</span>
+    [% END %]
+
+    [%- IF missing %]
+        <span class="missing">required</span>
+    [% END %]
+
+[% END %]
+
+[% BLOCK error_summary %]
+    [% IF view.form.results.msgs.group_by_field %]
+        [% IF view.form.results.has_invalid || view.form.results.has_missing %]
+            <p class="missing" style="color: red">
+                [%
+                    CALL view.form.results.msgs(
+                        {
+                            invalid_separator   => ', ',
+                            format              => '%s',
+                        }
+                    );
+                    msgs = view.form.results.msgs;
+
+                    FOREACH field IN view.form.fields;
+                        field_labels.${field.name} = field.label;
+                    END;
+                %]
+                [% FOREACH field IN view.form.fields %]
+                    [% IF view.form.results.invalid(field.name) || view.form.results.missing(field.name) %]
+                        <b>[% field.label %]:</b> [% msgs.${field.name} %]
+                        <br />
+                    [% END %]
+                [% END %]
+         	</p>
+    	[% END %]
+    [% ELSE %]
+        [% IF view.form.results.missing %]
+            <p class="missing" style="color: red">
+                <b>Missing:</b>
+                [% missing_names = [] %]
+                [% FOREACH field IN view.form.fields %]
+                    [% IF view.form.results.missing( "${field.name}" ) %]
+                    [% missing_names.push( field.label ) %]
+                    [% END %]
+                [% END %]
+                [% missing_names.join( ', ' ) %]
+            </p>
+        [% END %]
+
+        [% IF view.form.results.invalid %]
+            <p class="invalid" style="color: red">
+                <b>Invalid:</b>
+                [% invalid_names = [] %]
+                [% FOREACH field IN view.form.fields %]
+                    [% IF view.form.results.invalid( "${field.name}" ) %]
+                    [% invalid_names.push( field.label ) %]
+                    [% END %]
+                [% END %]
+                [% invalid_names.join( ', ' ) %]
+         	</p>
+        [% END %]
+    [% END %]
+
+[% END %]

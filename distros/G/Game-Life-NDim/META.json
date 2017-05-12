@@ -1,0 +1,68 @@
+{
+   "abstract" : "Infrastructure for playing Conway's game of life with support for multiple cell types and 2D or 3D boards.",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Game-Life-NDim",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Params::Coerce" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "Game::Life::NDim" : {
+         "file" : "lib/Game/Life/NDim.pm",
+         "version" : "v0.0.4"
+      },
+      "Game::Life::NDim::Board" : {
+         "file" : "lib/Game/Life/NDim/Board.pm",
+         "version" : "v0.0.4"
+      },
+      "Game::Life::NDim::Dim" : {
+         "file" : "lib/Game/Life/NDim/Dim.pm",
+         "version" : "v0.0.4"
+      },
+      "Game::Life::NDim::Life" : {
+         "file" : "lib/Game/Life/NDim/Life.pm",
+         "version" : "v0.0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Life-NDim"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ivanwills/Game-Life-NDim"
+      }
+   },
+   "version" : "v0.0.4"
+}

@@ -1,0 +1,21 @@
+---
+abstract: 'Calculates the maximum Google Maps zoom which fits the minimum bounding rectangle of Google Map points.'
+author:
+  - 'Michael Portnoy <mport@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-GoogleMaps-FitBoundsZoomer
+requires:
+  Carp: 0
+  List::Util: 0
+version: 1.03

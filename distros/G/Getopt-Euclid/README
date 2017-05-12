@@ -1,0 +1,1333 @@
+NAME
+    Getopt::Euclid - Executable Uniform Command-Line Interface Descriptions
+
+VERSION
+    This document describes Getopt::Euclid version 0.4.5
+
+SYNOPSIS
+        use Getopt::Euclid;
+
+        if ($ARGV{-i}) {
+            print "Interactive mode...\n";
+        }
+
+        for my $x (0..$ARGV{-size}{h}-1) {
+            for my $y (0..$ARGV{-size}{w}-1) {
+                do_something_with($x, $y);
+            }
+        }
+
+        __END__
+
+        =head1 NAME
+
+        yourprog - Your program here
+
+        =head1 VERSION
+
+        This documentation refers to yourprog version 1.9.4
+
+        =head1 USAGE
+
+            yourprog [options]  -s[ize]=<h>x<w>  -o[ut][file] <file>
+
+        =head1 REQUIRED ARGUMENTS
+
+        =over
+
+        =item  -s[ize]=<h>x<w>    
+
+        Specify size of simulation
+
+        =for Euclid:
+            h.type:    int > 0
+            h.default: 24
+            w.type:    int >= 10
+            w.default: 80
+
+        =item  -o[ut][file] <file>    
+
+        Specify output file
+
+        =for Euclid:
+            file.type:    writable
+            file.default: '-'
+
+        =back
+
+        =head1 OPTIONS
+
+        =over
+
+        =item  -i
+
+        Specify interactive simulation
+
+        =item  -l[[en][gth]] <l>
+
+        Length of simulation. The default is l.default
+
+        =for Euclid:
+            l.type:    int > 0
+            l.default: 99
+
+        =item --debug [<log_level>]
+
+        Set the log level. Default is log_level.default but if you provide --debug,
+        then it is log_level.opt_default.
+
+        =for Euclid:
+            log_level.type:        int
+            log_level.default:     0
+            log_level.opt_default: 1
+
+        =item --version
+
+        =item --usage
+
+        =item --help
+
+        =item --man
+
+        Print the usual program information
+
+        =back
+
+        Remainder of documentation starts here...
+
+        =head1 AUTHOR
+
+        Damian Conway (DCONWAY@CPAN.org)
+
+        =head1 BUGS
+
+        There are undoubtedly serious bugs lurking somewhere in this code.
+        Bug reports and other feedback are most welcome.
+
+        =head1 COPYRIGHT
+
+        Copyright (c) 2005, Damian Conway. All Rights Reserved.
+        This module is free software. It may be used, redistributed
+        and/or modified under the terms of the Perl Artistic License
+        (see http://www.perl.com/perl/misc/Artistic.html)
+
+DESCRIPTION
+    Getopt::Euclid uses your program's own POD documentation to create a
+    powerful command-line argument parser. This ensures that your program's
+    documented interface and its actual interface always agree.
+
+    The created command-line argument parser includes many features such as
+    argument type checking, required arguments, exclusive arguments,
+    optional arguments with default values, automatic usage message, ...
+
+    To use the module, simply write the following at the top of your
+    program:
+
+        use Getopt::Euclid;
+
+    This will cause Getopt::Euclid to be require'd and its import method
+    will be called. It is important that the import method be allowed to
+    run, so do not invoke Getopt::Euclid in the following manner:
+
+        # Will not work
+        use Getopt::Euclid ();
+
+    When the module is loaded within a regular Perl program, it will:
+
+    1.  locate any POD in the same *.pl file or its associated *.pod file.
+
+    2.  extract information from that POD, most especially from the "=head1
+        REQUIRED ARGUMENTS" and "=head1 OPTIONS" sections,
+
+    3.  build a parser that parses the arguments and options the POD
+        specifies,
+
+    4.  remove the command-line arguments from @ARGV and parse them, and
+
+    5.  put the results in the global %ARGV variable (or into specifically
+        named optional variables, if you request that -- see "Exporting
+        option variables").
+
+    As a special case, if the module is loaded within some other module
+    (i.e. from within a ".pm" file), it still locates and extracts POD
+    information, but instead of parsing @ARGV immediately, it caches that
+    information and installs an "import()" subroutine in the caller module.
+    This new "import()" acts just like Getopt::Euclid's own import, except
+    that it adds the POD from the caller module to the POD of the callee.
+
+    All of which just means you can put some or all of your CLI
+    specification in a module, rather than in the application's source file.
+    See "Module interface" for more details.
+
+INTERFACE
+  Program interface
+    You write:
+
+        use Getopt::Euclid;
+
+    and your command-line is parsed automagically.
+
+  Module interface
+    import()
+        You write:
+
+            use Getopt::Euclid;
+
+        and your module will then act just like Getopt::Euclid (i.e. you can
+        use your module *instead* of Getopt::Euclid>, except that your
+        module's POD will also be prepended to the POD of any module that
+        loads yours. In other words, you can use Getopt::Euclid in a module
+        to create a standard set of CLI arguments, which can then be added
+        to any application simply by loading your module.
+
+        To accomplish this trick Getopt::Euclid installs an "import()"
+        subroutine in your module. If your module already has an "import()"
+        subroutine defined, terrible things happen. So do not do that.
+
+        You may also short-circuit the import method within your calling
+        program to have the POD from several modules included for argument
+        parsing.
+
+            use Module1::Getopt (); # No argument parsing
+            use Module2::Getopt (); # No argument parsing
+            use Getopt::Euclid;     # Arguments parsed
+
+    process_args()
+        Alternatively, to parse arguments from a source different from
+        @ARGV, use the "process_args()" subroutine.
+
+            use Getopt::Euclid qw(:defer);
+            my @args = ( '-in', 'file.txt', '-out', 'results.txt' );
+            Getopt::Euclid->process_args(\@args);
+
+        If you want to use the :minimal or :vars mode in this type of
+        scenario, you can pass extra options to "process_args()":
+
+            use Getopt::Euclid qw(:defer);
+            my @args = ( '-in', 'file.txt', '-out', 'results.txt' );
+            Getopt::Euclid->process_args(\@args, {-minimal => 1, -vars => 'prefix_'});
+
+        This is particularly when you plan on processing POD manually.
+
+    process_pods()
+        Similarly, to parse argument specifications from a source different
+        than the current script (and its dependencies), use the
+        "process_pods()" subroutine.
+
+            use Getopt::Euclid ();
+            my @pods = ( 'script.pl', 'Module.pm' );
+            $Getopt::Euclid::MAN = Getopt::Euclid->process_pods(\@pods, {-strict => 1});
+            my @args = ( '-in', 'file.txt', '-out', 'results.txt' );
+            Getopt::Euclid->process_args(\@args);
+
+        By default, this method will look for .pod files associated with the
+        given .pl and .pm files and use these .pod files preferentially when
+        available. Set -strict to 1 to only use the given files.
+
+  POD interface
+    This is where all the action is. POD markup can be placed in a .pod file
+    that has the same prefix as the corresponding Perl file. Alternatively,
+    POD can be inserted anywhere in the Perl code, but is typically added
+    either after an __END__ statement (like in the SYNOPSIS), or
+    interspersed in the code:
+
+        use Getopt::Euclid;
+
+        =head1 NAME
+
+        yourprog - Your program here
+
+        =head1 REQUIRED ARGUMENTS
+
+        =over
+
+        =item  -s[ize]=<h>x<w>    
+
+        Specify size of simulation
+
+        =for Euclid:
+            h.type:    int > 0
+            h.default: 24
+            w.type:    int >= 10
+            w.default: 80
+
+        =back
+
+        =head1 OPTIONS
+
+        =over
+
+        =item  -i
+
+        Specify interactive simulation
+
+        =back
+
+        =cut
+
+        # Getopt::Euclid has parsed commandline parameters and stored them in %ARGV
+
+        if ($ARGV{-i}) {
+            print "Interactive mode...\n";
+        }
+
+        for my $x (0..$ARGV{-size}{h}-1) {
+            for my $y (0..$ARGV{-size}{w}-1) {
+                do_something_with($x, $y);
+            }
+        }
+
+    When Getopt::Euclid is loaded in a non-".pm" file, it searches that file
+    for the following POD documentation:
+
+    =head1 NAME
+        Getopt::Euclid ignores the name specified here. In fact, if you use
+        the standard "--help", "--usage", "--man", "--podfile", or
+        "--version" arguments (see "Standard arguments"), the module
+        replaces the name specified in this POD section with the actual name
+        by which the program was invoked (i.e. with $0).
+
+    =head1 USAGE
+        Getopt::Euclid ignores the usage line specified here. If you use the
+        standard "--help", "--usage", "--man" or "--podfile" arguments, the
+        module replaces the usage line specified in this POD section with a
+        usage line that reflects the actual interface that the module has
+        constructed.
+
+    =head1 VERSION
+        Getopt::Euclid extracts the current version number from this POD
+        section. To do that it simply takes the first substring that matches
+        *<digit>*.*<digit>* or *<digit>*_*<digit>*. It also accepts one or
+        more additional trailing .*<digit>* or _*<digit>*, allowing for
+        multi-level and "alpha" version numbers such as:
+
+            =head1 VERSION
+    
+            This is version 1.2.3
+
+        or:
+
+            =head1 VERSION
+    
+            This is alpha release 1.2_34
+
+        You may also specify the version number in your code. However, in
+        order for Getopt::Euclid to properly read it, it must be in a
+        "BEGIN" block:
+
+            BEGIN { use version; our $VERSION = qv('1.2.3') }
+            use Getopt::Euclid;
+
+        Euclid stores the version as $Getopt::Euclid::SCRIPT_VERSION.
+
+    =head1 REQUIRED ARGUMENTS
+        Getopt::Euclid uses the specifications in this POD section to build
+        a parser for command-line arguments. That parser requires that every
+        one of the specified arguments is present in any command-line
+        invocation. See "Specifying arguments" for details of the
+        specification syntax.
+
+        The actual headings that Getopt::Euclid can recognize here are:
+
+            =head1 [STANDARD|STD|PROGRAM|SCRIPT|CLI|COMMAND[-| ]LINE] [REQUIRED|MANDATORY] [PARAM|PARAMETER|ARG|ARGUMENT][S]
+
+        Caveat: Do not put additional subheadings (=headX) inside the
+        REQUIRED ARGUMENTS section.
+
+    =head1 OPTIONS
+        Getopt::Euclid uses the specifications in this POD section to build
+        a parser for command-line arguments. That parser does not require
+        that any of the specified arguments is actually present in a
+        command-line invocation. Again, see "Specifying arguments" for
+        details of the specification syntax.
+
+        Typically a program will specify both "REQUIRED ARGUMENTS" and
+        "OPTIONS", but there is no requirement that it supply both, or
+        either.
+
+        The actual headings that Getopt::Euclid recognizes here are:
+
+            =head1 [STANDARD|STD|PROGRAM|SCRIPT|CLI|COMMAND[-| ]LINE] OPTION[AL|S] [PARAM|PARAMETER|ARG|ARGUMENT][S]
+
+        Caveat: Do not put additional subheadings (=headX) inside the
+        REQUIRED ARGUMENTS section.
+
+    =head1 COPYRIGHT
+        Getopt::Euclid prints this section whenever the standard "--version"
+        option is specified on the command-line.
+
+        The actual heading that Getopt::Euclid recognizes here is any
+        heading containing any of the words "COPYRIGHT", "LICENCE", or
+        "LICENSE".
+
+  Specifying arguments
+    Each required or optional argument is specified in the POD in the
+    following format:
+
+        =item ARGUMENT_STRUCTURE
+
+        ARGUMENT_DESCRIPTION
+
+        =for Euclid:
+            ARGUMENT_OPTIONS
+            PLACEHOLDER_CONSTRAINTS
+
+   Argument structure
+    *   Each argument is specified as an "=item".
+
+    *   Any part(s) of the specification that appear in square brackets are
+        treated as optional.
+
+    *   Any parts that appear in angle brackets are placeholders for actual
+        values that must be specified on the command-line.
+
+    *   Any placeholder that is immediately followed by "..." may be
+        repeated as many times as desired.
+
+    *   Any whitespace in the structure specifies that any amount of
+        whitespace (including none) is allowed at the same position on the
+        command-line.
+
+    *   A vertical bar indicates the start of an alternative variant of the
+        argument.
+
+    For example, the argument specification:
+
+        =item -i[n] [=] <file> | --from <file>
+
+    indicates that any of the following may appear on the command-line:
+
+        -idata.txt    -i data.txt    -i=data.txt    -i = data.txt
+                                     
+        -indata.txt   -in data.txt   -in=data.txt   -in = data.txt
+
+        --from data.text
+
+    as well as any other combination of whitespacing.
+
+    Any of the above variations would cause all three of:
+
+        $ARGV{'-i'}
+        $ARGV{'-in'}
+        $ARGV{'--from'}
+
+    to be set to the string 'data.txt'.
+
+    You could allow the optional "=" to also be an optional colon by
+    specifying:
+
+        =item -i[n] [=|:] <file>
+
+    Optional components may also be nested, so you could write:
+
+        =item -i[n[put]] [=] <file>
+
+    which would allow "-i", "-in", and "-input" as synonyms for this
+    argument and would set all three of $ARGV{'-i'}, $ARGV{'-in'}, and
+    $ARGV{'-input'} to the supplied file name.
+
+    The point of setting every possible variant within %ARGV is that this
+    allows you to use a single key (say $ARGV{'-input'}, regardless of how
+    the argument is actually specified on the command-line.
+
+  Repeatable arguments
+    Normally Getopt::Euclid only accepts each specified argument once, the
+    first time it appears in @ARGV. However, you can specify that an
+    argument may appear more than once, using the "repeatable" option:
+
+        =item file=<filename>
+
+        =for Euclid:
+            repeatable
+
+    When an argument is marked repeatable the corresponding entry of %ARGV
+    will not contain a single value, but rather an array reference. If the
+    argument also has "Multiple placeholders", then the corresponding entry
+    in %ARGV will be an array reference with each array entry being a hash
+    reference.
+
+  Boolean arguments
+    If an argument has no placeholders it is treated as a boolean switch and
+    its entry in %ARGV will be true if the argument appeared in @ARGV.
+
+    For a boolean argument, you can also specify variations that are
+    *false*, if they appear. For example, a common idiom is:
+
+        =item --print
+
+        Print results
+
+        =item --noprint
+
+        Do not print results
+
+    These two arguments are effectively the same argument, just with
+    opposite boolean values. However, as specified above, only one of
+    $ARGV{'--print'} and $ARGV{'--noprint'} will be set.
+
+    As an alternative you can specify a single argument that accepts either
+    value and sets both appropriately:
+
+        =item --[no]print
+
+        [Do not] print results
+
+        =for Euclid:
+            false: --noprint
+
+    With this specification, if "--print" appears in @ARGV, then
+    $ARGV{'--print'} will be true and $ARGV{'--noprint'} will be false. On
+    the other hand, if "--noprint" appears in @ARGV, then $ARGV{'--print'}
+    will be false and $ARGV{'--noprint'} will be true.
+
+    The specified false values can follow any convention you wish:
+
+        =item [+|-]print
+
+        =for Euclid:
+            false: -print
+
+    or:
+
+        =item -report[_no[t]]
+
+        =for Euclid:
+            false: -report_no[t]
+
+    et cetera.
+
+  Multiple placeholders
+    An argument can have two or more placeholders:
+
+        =item -size <h> <w>
+
+    The corresponding command line argument would then have to provide two
+    values:
+
+        -size 24 80
+
+    Multiple placeholders can optionally be separated by literal characters
+    (which must then appear on the command-line). For example:
+
+        =item -size <h>x<w>
+
+    would then require a command-line of the form:
+
+        -size 24x80
+
+    If an argument has two or more placeholders, the corresponding entry in
+    %ARGV becomes a hash reference, with each of the placeholder names as
+    one key. That is, the above command-line would set both
+    $ARGV{'-size'}{'h'} and $ARGV{'-size'}{'w'}.
+
+  Optional placeholders
+    Placeholders can be specified as optional as well:
+
+        =item -size <h> [<w>]
+
+    This specification then allows either:
+
+        -size 24
+
+    or:
+
+        -size 24 80
+
+    on the command-line. If the second placeholder value is not provided,
+    the corresponding $ARGV{'-size'}{'w'} entry is set to "undef". See also
+    "Placeholder defaults".
+
+  Unflagged placeholders
+    If an argument consists of a single placeholder with no "flag" marking
+    it:
+
+        =item <filename>
+
+    then the corresponding entry in %ARG will have a key the same as the
+    placeholder (including the surrounding angle brackets):
+
+        if ($ARGV{'<filename>'} eq '-') {
+            $fh = \*STDIN;
+        }
+
+    The same is true for any more-complicated arguments that begin with a
+    placeholder:
+
+        =item <h> [x <w>]
+
+    The only difference in the more-complex cases is that, if the argument
+    has any additional placeholders, the entire entry in %ARGV becomes a
+    hash:
+
+        my $total_size
+            = $ARGV{'<h>'}{'h'} * $ARGV{'<h>'}{'w'}
+
+    Note that, as in earlier multi-placeholder examples, the individual
+    second- level placeholder keys *do not* retain their angle-brackets.
+
+  Repeated placeholders
+    Any placeholder that is immediately followed by "...", like so:
+
+        =item -lib <file>...
+
+        =for Euclid:
+            file.type: readable
+
+    will match at least once, but as many times as possible before
+    encountering the next argument on the command-line. This allows to
+    specify multiple values for an argument, for example:
+
+        -lib file1.txt file2.txt
+
+    An unconstrained repeated unflagged placeholder (see "Placeholder
+    constraints" and "Unflagged placeholders") will consume the rest of the
+    command-line, and so should be specified last in the POD
+
+        =item -n <name>
+
+        =item <offset>...
+
+        =for Euclid:
+            offset.type: 0+int
+
+    and on the command-line:
+
+        -n foobar 1 5 0 23
+
+    If a placeholder is repeated, the corresponding entry in %ARGV will then
+    be an array reference, with each individual placeholder match in a
+    separate element. For example:
+
+        for my $lib (@{ $ARGV{'-lib'} }) {
+            add_lib($lib);
+        }
+
+        warn "First offset is: $ARGV{'<offsets>'}[0]";
+        my $first_offset = shift @{ $ARGV{'<offsets>'} };
+
+  Placeholder constraints
+    You can specify that the value provided for a particular placeholder
+    must satisfy a particular set of restrictions by using a "=for Euclid"
+    block. For example:
+
+        =item -size <h>x<w>
+
+        =for Euclid:
+            h.type: integer
+            w.type: integer
+
+    specifies that both the "<h>" and "<w>" must be given integers. You can
+    also specify an operator expression after the type name:
+
+        =for Euclid:
+            h.type: integer > 0
+            w.type: number <= 100
+
+    specifies that "<h>" has to be given an integer that is greater than
+    zero, and that "<w>" has to be given a number (not necessarily an
+    integer) that is no more than 100.
+
+    These type constraints have two alternative syntaxes:
+
+        PLACEHOLDER.type: TYPE BINARY_OPERATOR EXPRESSION
+
+    as shown above, and the more general:
+
+        PLACEHOLDER.type: TYPE [, EXPRESSION_INVOLVING(PLACEHOLDER)]
+
+    Using the second syntax, you could write the previous constraints as:
+
+        =for Euclid:
+            h.type: integer, h > 0
+            w.type: number,  w <= 100
+
+    In other words, the first syntax is just sugar for the most common case
+    of the second syntax. The expression can be as complex as you wish and
+    can refer to the placeholder as many times as necessary:
+
+        =for Euclid:
+            h.type: integer, h > 0 && h < 100
+            w.type: number,  Math::is_prime(w) || w % 2 == 0
+
+    Note that the expressions are evaluated in the "package main" namespace,
+    so it is important to qualify any subroutines that are not in that
+    namespace. Furthermore, any subroutines used must be defined (or loaded
+    from a module) *before* the "use Getopt::Euclid" statement.
+
+    You can also use constraints that involve variables. You must use the
+    :defer mode and the variables must be globally accessible:
+
+        use Getopt::Euclid qw(:defer);
+        our $MIN_VAL = 100;
+        Getopt::Euclid->process_args(\@ARGV);
+
+        __END__
+
+        =head1 OPTIONS
+
+        =over
+
+        =item --magnitude <magnitude>
+
+        =for Euclid
+           magnitude.type: number, magnitude > $MIN_VAL
+
+        =back
+
+  Standard placeholder types
+    Getopt::Euclid recognizes the following standard placeholder types:
+
+        Name            Placeholder value...        Synonyms
+        ============    ====================        ================
+
+        integer         ...must be an integer       int    i
+
+        +integer        ...must be a positive       +int   +i
+                        integer
+                        (same as: integer > 0)
+
+        0+integer       ...must be a positive       0+int  0+i
+                        integer or zero
+                        (same as: integer >= 0)
+
+        number          ...must be an number        num    n
+
+        +number         ...must be a positive       +num   +n
+                        number
+                        (same as: number > 0)
+
+        0+number        ...must be a positive       0+num  0+n
+                        number or zero
+                        (same as: number >= 0)
+
+        string          ...may be any string        str    s
+                        (default type)
+
+        readable        ...must be the name         input  in
+                        of a readable file
+
+        writeable       ...must be the name         writable output out
+                        of a writeable file
+                        (or of a non-existent
+                        file in a writeable
+                        directory)
+                    
+        /<regex>/       ...must be a string
+                        matching the specified
+                        pattern
+
+    Since regular expressions are supported, you can easily match many more
+    type of strings for placeholders by using the regular expressions
+    available in Regexp::Common. If you do that, you may want to also use
+    custom placeholder error messages (see "Placeholder type errors") since
+    the messages would otherwise not be very informative to users.
+
+        use Regexp::Common qw /zip/;
+        use Getopt::Euclid;
+
+        ...
+
+        =item -p <postcode>
+
+        Enter your postcode here
+
+        =for Euclid:
+            postcode.type:  /$RE{zip}{France}/
+            postcode.type.error: <postcode> must be a valid ZIP code
+
+  Placeholder type errors
+    If a command-line argument's placeholder value does not satisify the
+    specified type, an error message is automatically generated. However,
+    you can provide your own message instead, using the ".type.error"
+    specifier:
+
+        =for Euclid:
+            h.type:        integer, h > 0 && h < 100
+            h.type.error:  <h> must be between 0 and 100 (not h)
+
+            w.type:        number,  Math::is_prime(w) || w % 2 == 0
+            w.type.error:  Cannot use w for <w> (must be an even prime number)
+
+    Whenever an explicit error message is provided, any occurrence within
+    the message of the placeholder's unbracketed name is replaced by the
+    placeholder's value (just as in the type test itself).
+
+  Placeholder defaults
+    You can also specify a default value for any placeholders that are not
+    given values on the command-line (either because their argument is not
+    provided at all, or because the placeholder is optional within the
+    argument). For example:
+
+        =item -size <h>[x<w>]
+
+        Set the size of the simulation
+
+        =for Euclid:
+            h.default: 24
+            w.default: 80
+
+    This ensures that if no "<w>" value is supplied:
+
+        -size 20
+
+    then $ARGV{'-size'}{'w'} is set to 80. Likewise, of the "-size" argument
+    is omitted entirely, both $ARGV{'-size'}{'h'} and $ARGV{'-size'}{'w'}
+    are set to their respective default values
+
+    However, Getopt::Euclid also supports a second type of default, optional
+    defaults, that apply only to flagged, optional placeholders.
+
+    For example:
+
+        =item --debug [<log_level>]
+
+        Set the log level
+
+        =for Euclid:
+            log_level.type:        int
+            log_level.default:     0
+            log_level.opt_default: 1
+
+    This ensures that if the option "--debug" is not specified, then
+    $ARGV{'--debug'} is set to 0, the regular default. But if no
+    "<log_level>" value is supplied:
+
+        --debug
+
+    then $ARGV{'--debug'} is set to 1, the optional default.
+
+    The default value can be any valid Perl compile-time expression:
+
+        =item -pi=<pi value>
+
+        =for Euclid:
+            pi value.default: atan2(0,-1)
+
+    You can refer to an argument default or optional default value in its
+    POD entry as shown below:
+
+        =item -size <h>[x<w>]
+
+        Set the size of the simulation [default: h.default x w.default]
+
+        =for Euclid:
+            h.default: 24
+            w.default: 80
+
+        =item --debug <level>
+   
+        Set the debug level. The default is level.default if you supply --debug but
+        omit a <level> value.
+
+        =for Euclid:
+            level.opt_default: 3
+
+    Just like for "Placeholder constraints", you can also use variables to
+    define default values. You must use the :defer mode and the variables
+    must be globally accessible:
+
+        use Getopt::Euclid qw(:defer);
+        Getopt::Euclid->process_args(\@ARGV);
+
+        __END__
+
+        =head1 OPTIONS
+
+        =over
+
+        =item --home <home>
+
+        Your project home. When omitted, this defaults to the location stored in
+        the HOME environment variable.
+
+        =for Euclid
+           home.default: $ENV{'HOME'}
+
+        =back
+
+  Exclusive placeholders
+    Some arguments can be mutually exclusive. In this case, it is possible
+    to specify that a placeholder excludes a list of other placeholders, for
+    example:
+
+        =item -height <h>
+
+        Set the desired height
+
+        =item -width <w>
+
+        Set the desired width
+
+        =item -volume <v>
+
+        Set the desired volume
+
+        =for Euclid:
+            v.excludes: h, w
+            v.excludes.error: Either set the volume or the height and weight
+
+    Specifying both placeholders at the same time on the command-line will
+    generate an error. Note that the error message can be customized, as
+    illustrated above.
+
+    When using exclusive arguments that have default values, the default
+    value of the placeholder with the .excludes statement has precedence
+    over any other placeholders.
+
+  Argument cuddling
+    Getopt::Euclid allows any "flag" argument to be "cuddled". A flag
+    argument consists of a single non- alphanumeric character, followed by a
+    single alpha-numeric character:
+
+        =item -v
+
+        =item -x
+
+        =item +1
+
+        =item =z
+
+    Cuddling means that two or more such arguments can be concatenated after
+    a single common non-alphanumeric. For example:
+
+        -vx
+
+    Note, however, that only flags with the same leading non-alphanumeric
+    can be cuddled together. Getopt::Euclid would not allow:
+
+        -vxz
+
+    This is because cuddling is recognized by progressively removing the
+    second character of the cuddle. In other words:
+
+        -vxz
+
+    becomes:
+
+        -v -xz
+
+    which becomes:
+
+        -v -x z
+
+    which will fail, unless a "z" argument has also been specified.
+
+    On the other hand, if the argument:
+
+        =item -e <cmd>
+
+    had been specified, the module *would* accept:
+
+        -vxe'print time'
+
+    as a cuddled version of:
+
+        -v -x -e'print time'
+
+  Exporting option variables
+    By default, the module only stores arguments into the global %ARGV hash.
+    You can request that options are exported as variables into the calling
+    package using the special ':vars' specifier:
+
+        use Getopt::Euclid qw( :vars );
+
+    That is, if your program accepts the following arguments:
+
+        -v
+        --mode <modename>
+        <infile>
+        <outfile>
+        --auto-fudge <factor>      (repeatable)
+        --also <a>...
+        --size <w>x<h>
+        --multiply <num1>x<num2>   (repeatable)
+
+    Then these variables will be exported
+
+        $ARGV_v
+        $ARGV_mode
+        $ARGV_infile
+        $ARGV_outfile
+        @ARGV_auto_fudge
+        @ARGV_also
+        %ARGV_size          # With entries $ARGV_size{w} and $ARGV_size{h}
+        @ARGV_multiply      # With entries that are hashref similar to \%ARGV_size
+
+    For options that have multiple variants, only the longest variant is
+    exported.
+
+    The type of variable exported (scalar, hash, or array) is determined by
+    the type of the corresponding value in %ARGV. Command-line flags and
+    arguments that take single values will produce scalars, arguments that
+    take multiple values will produce hashes, and repeatable arguments will
+    produce arrays.
+
+    If you do not like the default prefix of "ARGV_", you can specify your
+    own, such as "opt_", like this:
+
+        use Getopt::Euclid qw( :vars<opt_> );
+
+    The major advantage of using exported variables is that any misspelling
+    of argument variables in your code will be caught at compile-time by
+    "use strict".
+
+  Standard arguments
+    Getopt::Euclid automatically provides four standard arguments to any
+    program that uses the module. The behaviours of these arguments are
+    "hard- wired" and cannot be changed, not even by defining your own
+    arguments of the same name.
+
+    The standard arguments are:
+
+    --usage usage()
+        The --usage argument causes the program to print a short usage
+        summary and exit. The "Getopt::Euclid-"usage()> subroutine provides
+        access to the string of this message.
+
+    --help help()
+        The --help argument causes the program to take a longer usage
+        summary (with a full list of required and optional arguments)
+        provided in POD format by "help()", convert it to plaintext, display
+        it and exit. The message is paged using IO::Pager::Page (or
+        IO::Page) if possible.
+
+    --man man()
+        The --man argument causes the program to take the POD documentation
+        for the program, provided by "man()", convert it to plaintext,
+        display it and exit. The message is paged using IO::Pager::Page (or
+        IO::Page) if possible.
+
+    --podfile podfile()
+        The --podfile argument is provided for authors. It causes the
+        program to take the POD manual from "man()", write it in a .pod file
+        with the same base name as the program, display the name of the
+        output file and exit. These actions can also be executed by calling
+        the "podfile()" subroutine.This argument is not really a standard
+        argument, but it is useful if the program's POD is to be passed to a
+        POD converter because, among other things, any default value
+        specified is interpolated and replaced by its value in the .pod
+        file, contrary to in the program's .pl file.
+
+        If you want to automate the creation of a POD file during the build
+        process, you can edit you Makefile.PL or Build.PL file and add these
+        lines:
+
+           my @args = ($^X, '-Ilib', '/path/to/script', '--podfile');
+           system(@args) == 0 or die "System call to '@args' failed:\n$?\n";
+
+        If you use Module::Install to bundle your script, you might be
+        interested in using Module::Install::PodFromEuclid to include the
+        --podfile step into the installation process.
+
+    --version version()
+        The --version argument causes the program to print the version
+        number of the program (as specified in the "=head1 VERSION" section
+        of the POD) and any copyright information (as specified in the
+        "=head1 COPYRIGHT" POD section) and then exit. The
+        "Getopt::Euclid-"version()> subroutine provides access to the string
+        of this message.
+
+  Minimalist keys
+    By default, the keys of %ARGV will match the program's interface
+    exactly. That is, if your program accepts the following arguments:
+
+        -v
+        --mode <modename>
+        <infile>
+        <outfile>
+        --auto-fudge
+
+    Then the keys that appear in %ARGV will be:
+
+        '-v'
+        '--mode'
+        '<infile>'
+        '<outfile>'
+        '--auto-fudge'
+
+    In some cases, however, it may be preferable to have Getopt::Euclid set
+    up those hash keys without "decorations". That is, to have the keys of
+    %ARGV be simply:
+
+        'v'
+        'mode'
+        'infile'
+        'outfile'
+        'auto_fudge'
+
+    You can arrange this by loading the module with the special
+    ':minimal_keys' specifier:
+
+        use Getopt::Euclid qw( :minimal_keys );
+
+    Note that, in rare cases, using this mode may cause you to lose data
+    (for example, if the interface specifies both a "--step" and a "<step>"
+    option). The module throws an exception if this happens.
+
+  Deferring argument parsing
+    In some instances, you may want to avoid the parsing of arguments to
+    take place as soon as your program is executed and Getopt::Euclid is
+    loaded. For example, you may need to examine @ARGV before it is
+    processed (and emptied) by Getopt::Euclid. Or you may intend to pass
+    your own arguments manually only using "process_args()".
+
+    To defer the parsing of arguments, use the specifier ':defer':
+
+        use Getopt::Euclid qw( :defer );
+        # Do something...
+        Getopt::Euclid->process_args(\@ARGV);
+
+DIAGNOSTICS
+  Compile-time diagnostics
+    The following diagnostics are mainly caused by problems in the POD
+    specification of the command-line interface:
+
+    Getopt::Euclid was unable to access POD
+        Something is horribly wrong. Getopt::Euclid was unable to read your
+        program to extract the POD from it. Check your program's
+        permissions, though it is a mystery how *perl* was able to run the
+        program in the first place, if it is not readable.
+
+    .pm file cannot define an explicit import() when using Getopt::Euclid
+        You tried to define an "import()" subroutine in a module that was
+        also using Getopt::Euclid. Since the whole point of using
+        Getopt::Euclid in a module is to have it build an "import()" for
+        you, supplying your own "import()" as well defeats the purpose.
+
+    Unknown specification: %s
+        You specified something in a "=for Euclid" section that
+        Getopt::Euclid did not understand. This is often caused by typos, or
+        by reversing a *placeholder*.*type* or *placeholder*.*default*
+        specification (that is, writing *type*.*placeholder* or
+        *default*.*placeholder* instead).
+
+    Unknown type (%s) in specification: %s
+    Unknown .type constraint: %s
+        Both these errors mean that you specified a type constraint that
+        Getopt::Euclid did not recognize. This may have been a typo:
+
+            =for Euclid
+                count.type: inetger
+
+        or else the module simply does not know about the type you
+        specified:
+
+            =for Euclid
+                count.type: complex
+
+        See "Standard placeholder types" for a list of types that
+        Getopt::Euclid *does* recognize.
+
+    Invalid .type constraint: %s
+        You specified a type constraint that is not valid Perl. For example:
+
+            =for Euclid
+                max.type: integer not equals 0
+
+        instead of:
+
+            =for Euclid
+                max.type: integer != 0
+
+    Invalid .default value: %s
+        You specified a default value that is not valid Perl. For example:
+
+            =for Euclid
+                curse.default: *$@!&
+
+        instead of:
+
+            =for Euclid
+                curse.default: '*$@!&'
+
+    Invalid .opt_default value: %s
+        Same as previous diagnostic, but for optional defaults.
+
+    Invalid reference to field %s.default in argument description: %s
+        You referred to a default value in the description of an argument,
+        but there is no such default. It may be a typo, or you may be
+        referring to the default value for a different argument, e.g.:
+
+            =item -a <age>
+
+            An optional age. Default: years.default
+
+            =for Euclid
+                age.default: 21
+
+        instead of:
+
+            =item -a <age>
+
+            An optional age. Default: age.default
+
+            =for Euclid
+                age.default: 21
+
+    Invalid reference to field %s.opt_default in argument description: %s
+        Same as previous diagnostic, but for optional defaults.
+
+    Invalid .opt_default constraint: Placeholder <%s> must be optional
+        You specified an optional default but the placeholder that it
+        affects is not an optional placeholder. For example:
+
+            =item  -l[[en][gth]] <l>
+
+            =for Euclid:
+                l.opt_default: 123
+
+        instead of:
+
+            =item  -l[[en][gth]] [<l>]
+
+            =for Euclid:
+                l.opt_default: 123
+
+    Invalid .opt_default constraint: Parameter %s must have a flag
+        You specified an optional default but the parameter that it affects
+        is unflagged. For example:
+
+            =item  <length>
+
+            =for Euclid:
+                l.opt_default: 123
+
+        instead of:
+
+            =item  -l [<length>]
+
+            =for Euclid:
+                l.opt_default: 123
+
+    Invalid .excludes value for variable %s: <%s> does not exist
+        You specified to exclude a variable that was not seen in the POD.
+        Make sure that this is not a typo.
+
+    Invalid constraint: %s (No <%s> placeholder in argument: %s)
+        You attempted to define a ".type" constraint for a placeholder that
+        did not exist. Typically this is the result of the misspelling of a
+        placeholder name:
+
+            =item -foo <bar>
+
+            =for Euclid:
+                baz.type: integer
+
+        or a "=for Euclid:" that has drifted away from its argument:
+
+            =item -foo <bar>
+
+            =item -verbose
+
+            =for Euclid:
+                bar.type: integer
+
+    Getopt::Euclid loaded a second time
+        You tried to load the module twice in the same program.
+        Getopt::Euclid does not work that way. Load it only once.
+
+    Unknown mode ('%s')
+        The only argument that a "use Getopt::Euclid" command accepts is
+        ':minimal_keys' (see "Minimalist keys"). You specified something
+        else instead (or possibly forgot to put a semicolon after "use
+        Getopt::Euclid").
+
+    Internal error: minimalist mode caused arguments '%s' and '%s' to clash
+        Minimalist mode removes certain characters from the keys hat are
+        returned in %ARGV. This can mean that two command-line options (such
+        as "--step" and "<step>") map to the same key (i.e. 'step'). This in
+        turn means that one of the two options has overwritten the other
+        within the %ARGV hash. The program developer should either turn off
+        ':minimal_keys' mode within the program, or else change the name of
+        one of the options so that the two no longer clash.
+
+  Run-time diagnostics
+    The following diagnostics are caused by problems in parsing the
+    command-line
+
+    Missing required argument(s): %s
+        At least one argument specified in the "REQUIRED ARGUMENTS" POD
+        section was not present on the command-line.
+
+    Invalid %s argument. %s must be %s but the supplied value (%s) is not.
+        Getopt::Euclid recognized the argument you were trying to specify on
+        the command-line, but the value you gave to one of that argument's
+        placeholders was of the wrong type.
+
+    Unknown argument: %s
+        Getopt::Euclid did not recognize an argument you were trying to
+        specify on the command-line. This is often caused by command-line
+        typos or an incomplete interface specification.
+
+CONFIGURATION AND ENVIRONMENT
+    Getopt::Euclid requires no configuration files or environment variables.
+
+DEPENDENCIES
+    *   version
+
+    *   Pod::Select
+
+    *   Pod::PlainText
+
+    *   File::Basename
+
+    *   File::Spec::Functions
+
+    *   List::Util
+
+    *   Text::Balanced
+
+    *   IO::Pager::Page (recommended)
+
+INCOMPATIBILITIES
+    Getopt::Euclid may not work properly with POD in Perl files that have
+    been converted into an executable with PerlApp or similar software. A
+    possible workaround may be to move the POD to a __DATA__ section or a
+    separate .pod file.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-getopt-euclid@rt.cpan.org", or through the web interface at
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Euclid>.
+
+    Getopt::Euclid has a development repository on Sourceforge.net at
+    <http://sourceforge.net/scm/?type=git&group_id=259291> in which the code
+    is managed by Git. Feel free to clone this repository and push patches!
+    To get started: git clone
+    <git://getopt-euclid.git.sourceforge.net/gitroot/getopt-euclid/getopt-eu
+    clid>) git branch 0.2.x origin/0.2.x git checkout 0.2.x
+
+AUTHOR
+    Damian Conway "<DCONWAY@cpan.org>"
+
+    Florent Angly "<florent.angly@gmail.com>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2005, Damian Conway "<DCONWAY@cpan.org>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

@@ -1,0 +1,43 @@
+=head2 keywords
+
+This module checks the Subject header of a message and ensures that it
+starts (modulo an initial Re:) with a valid keyword.  By default, the
+following keyword formats are supported:
+
+    KEYWORD:
+    KEYWORD/KEYWORD:
+    [KEYWORD]
+    [KEYWORD/KEYWORD]
+    [KEYWORD][KEYWORD]
+
+If multiple keywords are given, they all have to be valid.  Keywords are
+checked against a list given in a file and are case-insensitive.
+
+This module takes one optional argument, a reference to a sub which, if
+given a subject line, returns a list of all the keywords present.  This
+can be used to override the default patterns listed above.
+
+There is one required configuration file directive:
+
+=over 4
+
+=item keywords FILENAME
+
+Specifies the file from which the list of valid keywords will be read.
+The file should list all valid keywords, one per line.
+
+=back
+
+Two failure messages are possible:
+
+=over 4
+
+=item No keywords found
+
+There were no keywords in the subject header of the message.
+
+=item Invalid keyword '%s'
+
+A keyword was found that wasn't in the list of valid keywords.
+
+=back

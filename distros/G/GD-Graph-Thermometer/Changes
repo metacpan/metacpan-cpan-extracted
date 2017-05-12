@@ -1,0 +1,27 @@
+Revision history for GD-Graph-Thermometer
+
+0.05   Fri Jan 12 23:30:09 2007
+       added GD::Text::Align to PREREQ in Makefile.PL
+       commented out Perl::Critic from same hash
+       wrapped tests in t/perlcritic.t in condition 
+	  to skip tests unsupported by dependencies
+       edited Build.PL to define prerequisites
+
+0.04   Thu Jan 11 03:50:09 2007
+       noted prerequisites in Makefile.PL
+       to resolve failed tests identified by CPAN Testers
+
+0.03   Thu Jan 11 02:20:09 2007
+       added ability to generate graph 
+       with transparent background.
+
+0.02   Thu Jan 4 00:41:05 2007
+       changes style of version numbers
+       added code to render result image directly 
+	to STDOUT, in addition to legacy behavior 
+	of write it to the filesystem.
+       added ability to choose file type for result image
+
+0.0.1  Wed Jan  3 01:22:10 2007
+       Initial release.
+

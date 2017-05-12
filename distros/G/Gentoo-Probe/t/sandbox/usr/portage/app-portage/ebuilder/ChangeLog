@@ -1,0 +1,58 @@
+# ChangeLog for app-portage/ebuilder
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/ebuilder/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  07 Apr 2004; Marius Mauch <genone@gentoo.org> ebuilder-0.4-r1.ebuild:
+  changing SRC_URI as the old one is unaccessable now
+
+*ebuilder-0.4-r1 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> ebuilder-0.4-r1.ebuild:
+  moved from dev-util to app-portage
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*ebuilder-0.4-r1 (06 May 2002)
+
+  20 Aug 2002; Mark Guertin <gerk@gentoo.org> :
+  Added ppc to keywords
+
+  05 June 2002; George Shapovalov <george@gentoo.org> files/digest-ebuilder-0.4-r1 :
+
+  Looks like either archive was changed or digest file got "corrupted" (see #3208).
+  Updated digest file.
+  
+  
+  06 May 2002; Zach Forrest <zach@disinformation.ca> ebuilder, experted.ebuild, beginner.ebuild :
+
+  Thanks to Karl T for the great feedback and suggestions. (I'll get to
+  the rest of them in the next version.)
+
+  Fixed -h|--help options (i.e. they now display the help).
+
+  Added a man page.
+
+  Added support for the LICENSE variable in ebuilds; a menu is displayed.
+
+  Can now add pkg_setup and pkg_config skeleton methods.
+
+  Fixed the Python src_install method so that the --prefix is now /usr.
+  This was mentioned on the developers mailing list by Jon Nelson
+  <jnelson@jamponi.net>.
+
+  A revision number can now be added to the package name.
+
+  Changed the fourth line in the ebuilds to "$Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/ebuilder/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $".
+
+
+*ebuilder-0.3 (04 May 2002)
+
+  04 May 2002; Karl Trygve Kalleberg <karltk@gentoo.org> ebuilder-0.3.ebuild files/digest-ebuilder-0.3 :
+
+  New upstream version.
+
+*ebuilder-0.2 (25 Apr 2002)
+
+  25 Apr 2002; Grant Goodyear <g2boojum@gentoo.org> ebuilder-0.2.ebuild files/digest-ebuilder-0.2 :
+  
+  Initial import.

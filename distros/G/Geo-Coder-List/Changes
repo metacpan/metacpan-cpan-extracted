@@ -1,0 +1,18 @@
+Revision history for Geo-Coder-List
+
+0.05	Thu Feb  2 09:28:09 EST 2017
+	Fix tests
+
+0.04	Sat Jan 28 20:58:02 EST 2017
+	Fixed Bing tests
+
+0.03	Sat 28 Jan 07:52:23 EST 2017
+	Some places now on the map, so change tests for failure
+	Remember locations to increase speed
+
+0.02	28 Dec 2016
+	If a search dies, use the next encoder
+	Build needs L:P:https
+
+0.01	Thu 22 Dec 11:57:45 EST 2016
+        First draft

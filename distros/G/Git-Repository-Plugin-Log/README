@@ -1,0 +1,36 @@
+Git-Repository-Plugin-Log
+
+Git::Repository::Plugin::Log adds a log() method to Git::Repository,
+which will return Git::Repository::Log objects representing the commit
+information provided by `git log`.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Git::Repository::Plugin::Log
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Repository-Plugin-Log
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Git-Repository-Plugin-Log
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Git-Repository-Plugin-Log
+
+    Search CPAN
+        http://search.cpan.org/dist/Git-Repository-Plugin-Log
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2016 Philippe Bruhat (BooK)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

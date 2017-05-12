@@ -1,0 +1,61 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Request.ja - Gunghoリクエストオブジェクト
+
+=head1 SYNOPSIS
+
+  use Gungho::Request;
+  my $r = Gungho::Request->new(GET => "http://example.com");
+  $r->notes(foo => 2);
+  my $foo = $r->notes('foo');
+
+  my $id     = $r->id;
+  my $cloned = $r->clone;
+  my $string = $r->format();
+
+=head1 DESCRIPTION
+
+Gungho::RequestはHTTP::Requestの小クラスです。基本実装はHTTP::Requestから
+変更はありませんが、いくつかの機能が追加されています。
+
+=head1 METHODS
+
+=head2 new()
+
+新規インスタンスを作成します。
+
+=head2 id()
+
+このリクエスト固有IDを返します。
+
+=head2 clone()
+
+このリクエストのクローンを作成します。クローンはnotes()の中身もクローンされて
+返されます。
+
+=head2 notes($key[, $value])
+
+HTTP::Requestが提供するもの以外のメタデータ／付随データを格納します。
+
+=head2 original_uri
+
+リクエストのURIのクローンを返します。URIのホスト名はGunghoがDNS解決を行う場合
+はIPアドレスに変換されている可能性がありますが、このメソッドを使うと必ず
+最初に指定されていたホスト名を使用して返されます。
+
+=head2 requires_name_lookup
+
+リクエストURIのホスト名がDNS解決を行う必要がある場合は正を返します。
+
+=head2 format
+
+HTTPリクエスト内容を文字列として返します。実装はGungho::Request::httpに
+格納されています。
+
+=head2 SEE ALSO
+
+L<Gungho::Request::http|Gungho::Request::http>
+
+=cut

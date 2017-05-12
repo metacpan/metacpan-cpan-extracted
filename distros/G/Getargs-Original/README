@@ -1,0 +1,101 @@
+NAME
+    Getargs::Original - remember the original arguments a program was
+    invoked with
+
+SYNOPSIS
+    In your main program:
+
+     use Getargs::Original;
+
+    Later on somewhere else
+
+     require Getargs::Original;
+     exec @{ Getargs::Original->args };
+
+DESCRIPTION
+    Common behaviour for a daemon is to re-exec itself upon receipt of a
+    signal (typically SIGHUP). It is also common to use modules like
+    Getopt::Long to parse command line arguments when the program first
+    starts. To achieve both of these tasks one must store the original
+    contents of $0 and @ARGV, as argument processing usually removes
+    elements from @ARGV.
+
+    Getargs::Original simplifies this task by storing the contents of $0 and
+    @ARGV when it is first used in a program. Later on when the original
+    arguments are required, a singleton instance of Getargs::Original can be
+    used to retrieve the arguments.
+
+    Getargs::Original is not meant to be instantiated as an object. All of
+    the methods are called as class methods.
+
+RESOLVING THE PATH OF $0
+    In normal operation, the path of $0 is made absolute using
+    "File::Spec->rel2abs()". Sometimes it is desireable for the canonical
+    name of the program run to be rooted in a particular directory.
+
+    Take for example a scenario where the canonical path to programs is
+    /opt/foo/bin/ but /opt/foo/ is a symlink to another filesystem which can
+    differ from machine to machine. When the full path to $0 is resolved,
+    the path will be the true filesystem and not /opt/foo/.
+
+    This distinction may not matter to most, but if system monitoring tools
+    are looking for a program to be running with a specific path then things
+    will break. /opt/foo/bin/mumble.pl is not the same as /.d1/bin/mumble.pl
+    after all.
+
+    To address this, Getargs::Original provides a way to specify the base
+    directory used for resolution of $0. By passing a directory to the
+    base_dir method the resolved path to $0 will be calculated relative to
+    that directory.
+
+METHODS
+  argv()
+    Returns the original value of $0 and @ARGV as a list reference in scalar
+    context and a list in array context.
+
+    If the base_dir() method has been called then the first element of the
+    list returned will be a relative path rooted in the directory that
+    base_dir() was called with. If base_dir() has not been called then the
+    first element of the list will be the absolute path to $0.
+
+    Resolution of $0 is performed the first time that the argv() method (or
+    the shortcuts described below) are called. As such if relative
+    resolution is desired then the base_dir() method must be called prior to
+    the first use of argv(), program() or args().
+
+  program()
+    Returns the original value of $0. A shortcut to saying
+
+     $originalargs->argv->[0];
+
+  args()
+    Returns the original value of @ARGV. A shortcut to saying
+
+     my $numargs = $originalargs->_argv_count;
+     $originalargs->argv->[1..$numargs]
+
+    As with argv() arguments are returned as a list or list reference
+    depending on calling context.
+
+  base_dir()
+    Sets or gets the base directory used for resolution of $0. See
+    "RESOLVING THE PATH OF $0" above for more detail. Returns the previous
+    base directory.
+
+  resolved()
+    Sets or gets the flag indicating whether $0 has been resolved. Returns
+    the previous state of the flag.
+
+    Using this method as a set accessor should only be required if the
+    argv() method or one of it's shortcuts was inadvertently called prior to
+    the base_dir() method being called.
+
+AUTHOR
+    James FitzGibbon, <jfitz@CPAN.org>
+
+COPYRIGHT
+    Copyright (c) 2003 James FitzGibbon. All Rights Reserved.
+
+    This module is free software; you may use it under the same terms as
+    Perl itself.
+

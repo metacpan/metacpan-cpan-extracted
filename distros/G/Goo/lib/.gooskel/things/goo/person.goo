@@ -1,0 +1,29 @@
+###############################################################################
+#
+# /home/goo/src/things/goo/person.goo - goo config file
+#
+###############################################################################
+
+# what is this Thing?
+title			=	A Person
+table			= 	person
+description		=	The Goo needs to know about People too
+
+# actions and the programs that handle them
+# Em[A]il      =   Goo::Thing::person::Emailer
+
+[J]ump       =   Goo::JumpManager.pm
+[P]rofile    =   Goo::DatabaseThing::Profiler.pm    
+[D]elete     =   Goo::DatabaseThing::Deleter.pm
+E[X]it       =   Goo::Exiter.pm  
+Care[O]Meter =   Goo::CareOMeter.pm   
+[S]hell      =   Goo::ShellCommander.pm     
+[A]dd        =   Goo::Thing::person::Maker.pm 
+[Z]one       =   Goo::Zone.pm              
+[E]dit       =   Goo::TableEditor.pm       
+[M]ake       =   Goo::DatabaseThing::Maker.pm 
+Back [L]ink  =   Goo::BackLinkManager.pm   
+
+# display order
+column_display_order = title description email	
+

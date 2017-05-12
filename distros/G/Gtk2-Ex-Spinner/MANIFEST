@@ -1,0 +1,12 @@
+Changes
+README
+t/03_Spinner.t
+t/00_EntryWithCancel.t
+t/01_PopupForEntry.t
+t/02_CellRenderer.t
+Makefile.PL
+MANIFEST
+lib/Gtk2/Ex/Spinner.pm
+lib/Gtk2/Ex/Spinner/EntryWithCancel.pm
+lib/Gtk2/Ex/Spinner/CellRenderer.pm
+lib/Gtk2/Ex/Spinner/PopupForEntry.pm

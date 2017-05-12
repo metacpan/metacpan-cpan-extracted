@@ -1,0 +1,5 @@
+---
+name: 'Private IP Blocking'
+default: 1
+depends:
+    'Regexp::Common': 0

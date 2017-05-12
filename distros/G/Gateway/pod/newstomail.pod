@@ -1,0 +1,45 @@
+=head2 newstomail
+
+Rewrites a news article into a mail message, using a set of newsgroup to
+e-mail address mappings to determine which addresses to mail the resulting
+message to.
+
+This module does the following:  Checks to make sure there's a Newsgroups
+header; drops Bcc and Resent-Bcc headers in the message; renames To, Cc,
+Apparently-To, Resent-To, Resent-Cc, Return-Path, and Sender headers (if
+present) to the same name prefixed by X-Original- since they may be
+misinterpreted by e-mail software, and sets a new To header consisting of
+the e-mail addresses corresponding to all the groups in the Newsgroups
+header that have defined mappings.  Duplicate addresses are stripped out.
+
+This module takes one configuration file directive:
+
+=over 4
+
+=item newstomail FILENAME
+
+Specifies the file from which the list of newsgroup to address mappings
+should be read, in the form newsgroup, whitespace, address.  If the
+filename ends in .db, then the file will be assumed to be a Berkeley
+database instead, with newsgroups as the keys and addresses as the values.
+
+=back
+
+Two failure messages are possible:
+
+=over 4
+
+=item Missing required Newsgroups header
+
+The incoming message doesn't have a Newsgroups header.  This module only
+handles posts and needs the Newsgroups header to determine what addresses
+to which to send the message.
+
+=item No newsgroup with a mapping
+
+None of the newsgroups in the Newsgroups header had a mapping to an e-mail
+address, so there's nowhere to send the message.
+
+=back
+
+This module takes no arguments.

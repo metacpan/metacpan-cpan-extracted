@@ -1,0 +1,32 @@
+MANIFEST
+Build.PL
+Makefile.PL
+Changes
+README
+scripts/pwcreate
+scripts/pwround
+scripts/pwupload
+scripts/perlwar
+t/01general.t
+t/99signature.t
+t/configuration.xml
+t/round_current.xml
+t/pod.t
+lib/Games/Perlwar.pm
+lib/Games/Perlwar/Rules.pod
+lib/Games/Perlwar/Array.pm
+lib/Games/Perlwar/Cell.pm
+lib/Games/Perlwar/Shell.pm
+lib/Games/Perlwar/AgentEval.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+web/htaccess
+web/line.png
+web/logo.png
+web/perlwar.css
+web/perlwar.ico
+web/perlwar.js
+web/stylesheets/configuration.xps
+web/stylesheets/include_config.xps
+web/stylesheets/iteration2html.xps
+web/stylesheets/upload.xps
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,65 @@
+								  Example
+						  SMART MESSAGING SERVER
+
+INTRODUCTION
+
+Today I see in every popular (TV) magazine, advertisements for ringing tones 
+and logo downloads. You have to call a telephone number (0900-principle) and 
+then by acting upon a voice menu you can download a certain ringing tone or 
+graphic. Because the GSM::SMS package does not implements a voice box we will 
+use an SMS message to 'order' a ringing tone or groupgraphic. 
+
+Anyway, if you are interested in implementing a DTMF phone service, 
+you can look at the Modem::VBox module.
+
+Of course, this is just intented as a demo for the GSM::SMS package. As such, 
+the implementation can be a bit crude. But it should be functional anyway...
+
+To receive a message, you have to send a SMS message that contains which 
+ringing tone or graphic you want to receive. Such command messages consist of 
+a 6 number string. The first 2 numbers indicate the type of resource you want 
+to receive; 10 for a group graphic 20 for a ringing tone. The next 4 digits 
+tell the server which file you actually want to receive. 
+
+The program maps the first 2 numbers to a directory, inside this directory we 
+find files with a filename like:
+
+nnnn.rtttl
+or
+nnnn.gif
+
+Just as you thought, thse 'nnnn' are the 4 last digits in the incoming command 
+message.
+
+The program picks up the file and sends it back to the commands message 
+originating address.
+
+USAGE
+
+./sms --config=<config file> [--transportconfig=<config file>]
+
+CONFIG FILE FORMAT
+
+The following directives can be used in the config file.
+
+access=^\+32475,^\+32478
+	comma seperated access list. The incoming phone number must match
+	one of these regular expressions to be allowed access.
+
+rtttldir=./media/rtttl
+	directory where to find ringing tones.
+
+rtttlprefix=20
+	prefix to use in the 6 digit number to map a command to a ringing tone.
+
+groupgraphicdir=./media/groupgraphics
+	directory where to find group graphics
+
+groupgraphicprefix=10
+	prefix to use in the 6 digit number to map a command to a group graphic.
+
+log=./log.txt
+	log directory to keep various logfiles (debug, output and error)
+
+loglevel=99
+	level of log verbosity. 

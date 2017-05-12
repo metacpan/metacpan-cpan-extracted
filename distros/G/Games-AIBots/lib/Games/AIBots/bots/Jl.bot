@@ -1,0 +1,41 @@
+$name   = 'JL';
+$author = 'JJJLLL';
+
+require 'drones.bm';
+
+sub main {
+    enable shield;
+    scan front;
+    move forward * int(rand(5)) + 1;
+
+    if (&found('enemy')){
+    move backward if &nearst('enemy') <= 2;
+    disable shield;
+    fire bazooka;
+    enable shield;
+    turn right;
+    move backward;
+    turn left;
+    }
+    elsif (&found('wall|mine|friend')) {
+        turn right;
+        }
+    else {
+        turn right;
+        }
+        redo;
+    }
+    elsif (&found('vault|flag')) {
+        if (&damaged == 0 and &found('flag')) {
+            move backward;
+            fire energy;
+        }
+        call fetch;
+    }
+    else {
+        turn left;
+    }
+    redo;
+}
+
+}

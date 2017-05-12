@@ -1,0 +1,23 @@
+Games::AlphaBeta - 0.4.7
+
+* Build/install using straight Module::Build. [#49365]
+* Fix bug in Othello demo. [#49367]
+* Add .gitignore and MANIFEST.SKIP
+
+Games::AlphaBeta - 0.4.6:
+
+* bumped version number because Module::Build's dist_name &
+  dist_version is broken :(
+* added Games::Sequential::Position to MANIFEST
+* added test for bin/othello-demo (and thus for
+  Games::AlphaBeta::Reversi)
+
+Games::Sequential & Games::AlphaBeta - 0.4.2:
+
+* bumped version numbers
+* improve documentation a bit
+* move othello.pl from examples to be installed program and renamed to othello-demo
+* merged dists for convenience
+* fix "use base" lines
+* use M::B::Kwalitee for building
+

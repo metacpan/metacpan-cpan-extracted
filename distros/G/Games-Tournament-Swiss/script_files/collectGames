@@ -1,0 +1,56 @@
+#!usr/bin/perl
+
+use lib lib;
+
+use Games::Tournament::Contestant::Swiss -base;
+use Games::Tournament::Swiss -base;
+use Games::Tournament::Card -base;
+
+use YAML qw/LoadFile DumpFile/;
+
+my @roundsFiles = glob " ../?/b?.yaml ";
+my @rounds = map { LoadFile $_; } @roundsFiles;
+my @resultFiles = glob " ../hw/gb?.yaml ";
+my @result = map { LoadFile $_; } @resultFiles;
+
+my $class = LoadFile "../class.yaml";
+my @members = @{$class->{member}};
+my @ids = map { $_->{name} => $_->{id} } @members;
+my %players = map { $_->{name} => Games::Tournament::Contestant->new(
+					name => $_->{name}, id => $_->{id}) }
+							@members;
+
+my %result;
+map
+	{
+		my $i = $_;
+		my $round = $result[$i];
+		my %roundresult = map { $_ => $round->{$i}->{$_}; } @ids;
+		$result{$i} = \%roundresult;
+	} 1..$#result+1;
+
+my @games;
+map
+{
+	my $round = $_;
+	map
+	{
+		my $group = $round->{group}->{$_};
+		my @player;
+		@player[0..2] = @players{ @$group[0..2] };
+		@tester = reverse @player;
+		my @testerId = map { $_->id } @tester;
+		my $i = $round->{round};
+		push @games, Games::Tournament::Card->new( round => $i,
+			contestants => { tester1 => $tester[0],
+					tester2 => $tester[1],
+					tester3 => $tester[2] },
+			result => { tester1 => $result{$i}{$testerId[0]},
+					tester2 => $result{$i}{$testerId[1]},
+					tester3 => $result{$i}{$testerId[2]}
+					} );
+	} keys %{$round->{group}};
+} @rounds;
+
+my @players =
+DumpFile "../games.yaml", \@games;

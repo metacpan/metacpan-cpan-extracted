@@ -1,0 +1,44 @@
+Geo-Cloudmade version 0.9
+==========================
+
+This module is a wrapper for access to Cloudmade's geo service.
+Cloudmade stoped providing free service since 1st of May 2014.
+Only 'enterprise' customers may use there services.
+
+For now the following features were implemented:
+ - geocoding and geosearching
+ - routing
+ - obtaining tiles 
+
+You can find some examples of usage by command 'perldoc Geo::Cloudmade' after installation of the module.
+
+If you have CloudMade's API Key please assing it to CLOUDMADE_API_KEY environment variable before testing.
+Internet connection is required for testing.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   CLOUDMADE_API_KEY="Your-API-KEY" make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  JSON
+  LWP
+  URI
+  Math
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Dmytro Gorbunov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

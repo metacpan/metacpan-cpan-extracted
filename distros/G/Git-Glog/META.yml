@@ -1,0 +1,30 @@
+---
+abstract: 'Spicey git-log with a hint of gravatars, nutmeg and cinnamon'
+author:
+  - 'Colin Kennedy <moshen@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Git-Glog
+provides:
+  Git::Glog:
+    file: lib/Git/Glog.pm
+    version: 0.01
+requires:
+  Compress::Zlib: 0
+  Digest::MD5: 0
+  Getopt::Long: 0
+  Image::Term256Color: 0.03
+  LWP::UserAgent: 0
+  Pod::Usage: 0
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

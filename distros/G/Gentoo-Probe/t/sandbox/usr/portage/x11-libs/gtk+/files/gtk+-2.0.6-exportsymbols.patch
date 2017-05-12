@@ -1,0 +1,12 @@
+--- gtk+-2.0.6/configure.in.exportsymbols	Thu Aug  8 16:46:41 2002
++++ gtk+-2.0.6/configure.in	Thu Aug  8 16:47:12 2002
+@@ -273,7 +273,8 @@
+ if test "$os_win32" != yes; then
+     # libtool option to control which symbols are exported
+     # right now, symbols starting with _ are not exported
+-    LIBTOOL_EXPORT_OPTIONS='-export-symbols-regex "^[[^_]].*"'
++    # Disabled until -export-symbols-regex works (RH patch)
++    LIBTOOL_EXPORT_OPTIONS=
+ else
+     # We currently use .def files on Windows (for gdk-pixbuf, gdk and gtk)
+     LIBTOOL_EXPORT_OPTIONS=

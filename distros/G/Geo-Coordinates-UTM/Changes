@@ -1,0 +1,37 @@
+Revision history for Perl extension Geo::Coordinates::UTM.
+
+0.01  Wed Sep 27 12:37:38 2000
+	- original version; created by h2xs 1.19
+        - All functions translated from original C code
+
+0.02  Thu May 1 10:07:59 2003
+        - Fixed error in utm_to_latlon translation if coords
+           within S. Hemisphere 
+
+0.03  Mon Jan 26 11:05:22 2004
+        - Fixed "Unrecognized escape \Q passed through" error 
+
+0.04  Tue Mar 23 18:41:13 2004
+	- Added ellipsoid_info
+	- Added ellipsoid_name
+	- Code tidy up
+0.05  Fri Oct 15 14:40:35 2004
+        - Minor bug fix for Latitude >72 degrees North
+0.06  Tue Feb 27 16:55:05 2007
+        - Addition of MGRS conversion
+0.07  Wed Dec 05 16:18:22 2007
+	- Addition of new ellipsoids
+	- Refinement of MGRS calculations
+	- Addition of latlon_to_utm_force_zone 
+0.08  Thu Dec 06 17:15:03 2007
+	- Refinement of MGRS calculations
+0.09  Mon May 17 16:30:32 2010
+	- Patched mgrs_to_utm to handle short MGRS strings
+0.10 Mon Mar 25 19:05:12 2013
+	- fixed error in Everest Pakistan ellipsoid axis
+	- Added Arc 1950 ellipsoid
+	- patched MGRS calculations for S. Hemisphere
+	- Added MGRS tests
+0.11 Tue May 21 13:26:14 2013
+	- Added NAD27 and NAD83 ellipsoids
+	

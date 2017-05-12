@@ -1,0 +1,61 @@
+SYNOPSIS
+
+     use Git::Validate;
+    
+     my $validator = Git::Validate->new;
+     my $errors = $validator->validate_commit('HEAD');
+    
+     die "$errors\n" if $errors;
+
+    Or if you want to be all classy and modern:
+
+     for $e (@{$errors->errors}) {
+        warn $e->line . " longer than " . $e->max_length . " characters!\n"
+          if $e->isa('Git::Validate::Error::LongLine')
+     }
+
+DESCRIPTION
+
+    While many users apparently don't know it, there are actual correct
+    ways to write a git commit message. For a good summary of why, read
+    this blog post
+    <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>.
+
+    This module does its best to automatically check commit messages
+    against The Rules. The current automatic checks are:
+
+      * First line should be 50 or fewer characters
+
+      * Second line should be blank
+
+      * Third and following lines should be less than 72 characters
+
+METHODS
+
+ validate_commit
+
+     my $errors = $validator->validate_commit('HEAD');
+
+    returns "ERRORS" for a given commit
+
+ validate_message
+
+     my $errors = $validator->validate_message($commit_message);
+
+    returns "ERRORS" for a given message
+
+ERRORS
+
+    The object containing errors conveniently stringifies and boolifies. If
+    you need more information, please please please don't try to parse the
+    returned strings. Instead, note that the errors returned are a set of
+    objects. These are the objects you can check for:
+
+      * Git::Validate::Error::LongLine
+
+      * Git::Validate::Error::MissingBreak
+
+    The objects can be accessed with the errors method, which returns an
+    arrayref. The objects have line and line_number methods. The ::LongLine
+    objects have a max_length method as well.
+

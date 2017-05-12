@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2014-08-24 19:18:48</currentTime>
+  <result>
+    <corporationID>1043735888</corporationID>
+    <corporationName>Zaporozhye Sich</corporationName>
+    <ticker>ZPR</ticker>
+    <ceoID>423270919</ceoID>
+    <ceoName>Krasotulya</ceoName>
+    <stationID>60004861</stationID>
+    <stationName>Lasleinur V - Moon 11 - Republic Fleet Assembly Plant</stationName>
+    <description>Research and develop</description>
+    <url>http://</url>
+    <allianceID>0</allianceID>
+    <factionID>0</factionID>
+    <taxRate>5</taxRate>
+    <memberCount>43</memberCount>
+    <shares>1000</shares>
+    <logo>
+      <graphicID>0</graphicID>
+      <shape1>437</shape1>
+      <shape2>480</shape2>
+      <shape3>415</shape3>
+      <color1>677</color1>
+      <color2>676</color2>
+      <color3>674</color3>
+    </logo>
+  </result>
+  <cachedUntil>2014-08-24 22:18:02</cachedUntil>
+</eveapi>

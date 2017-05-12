@@ -1,0 +1,268 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Pod::Usage;
+use File::Spec;
+use File::Path qw( remove_tree );
+use File::Temp qw( tempdir );
+use Cwd qw( cwd );
+use Getopt::Long;
+use Git::Repository;
+use Git::Version::Compare qw( cmp_git );
+use System::Command 1.117;    # loop_on
+
+# command-line options
+my %option = (
+    source      => '/opt/src/git',
+    destination => '/opt/git',
+    limit       => 0,
+    verbose     => 0,
+    rc          => 1,
+);
+GetOptions(
+    \%option,  'source=s', 'destination=s', 'verbose+', 'quiet',
+    'since=s', 'until=s',  'limit=i',
+    'list',    'missing',  'installed',     'rc!',
+    'fetch',   'test',
+    'help',    'manual',
+) or pod2usage( -verbose => 0 );
+
+# simple help/manual
+pod2usage( -verbose => 1 ) if $option{help};
+pod2usage( -verbose => 2 ) if $option{manual};
+
+# verbosity options
+my %run_opt;
+$option{quiet}   = 1     if $option{test};
+$option{verbose} = 0     if $option{quiet};
+$run_opt{stderr} = undef if !$option{verbose};
+$run_opt{stdout} = sub { print shift } if $option{verbose} > 1;
+
+# git.git
+my $r = Git::Repository->new( work_tree => $option{source} );
+
+# fetch recent commits
+$r->run( 'fetch' ) if $option{fetch};
+
+# map version numbers to tags
+my %tag_for = map { ( my $v = substr $_, 1 ) =~ y/-/./; ( $v => $_ ) }
+  grep /^v[^0]/ && !/^v1\.0rc/,    # skip anything before 1.0
+  $r->run( tag => '-l', 'v*' );
+
+# select the versions to build and install
+my @versions = sort cmp_git @ARGV ? @ARGV : keys %tag_for;
+
+# replace aliases with the canonical name
+{
+    my %alias = (
+        '1.0.1'   => '1.0.0a',
+        '1.0.2'   => '1.0.0a',
+    );
+    my %seen;
+    @versions = grep !$seen{$_}++, map $alias{$_} || $_, @versions;
+}
+
+@versions = grep !/rc/, @versions if !$option{rc};
+
+@versions = grep !is_installed($_), @versions if $option{missing};
+@versions = grep is_installed($_),  @versions if $option{installed};
+
+@versions = grep cmp_git( $option{since}, $_ ) <= 0, @versions if $option{since};
+@versions = grep cmp_git( $_, $option{until} ) <= 0, @versions if $option{until};
+
+@versions = $option{limit} > 0
+  ? @versions[ -$option{limit} .. -1 ]       # <limit> most recent
+  : @versions[ 0 .. -$option{limit} - 1 ]    # <limit> most ancient
+  if $option{limit};
+
+
+# pick up invalid versions
+my @nope = grep !exists $tag_for{$_}, @versions;
+die "Can't compile non-existent versions: @nope\n" if @nope;
+
+# just list the selected versions
+print map "$_\n", @versions and exit if $option{list};
+
+# test outputs TAP
+if ( $option{test} ) {
+    require Test::More;
+    import Test::More;
+    plan( tests => scalar @versions );
+    $option{destination} = tempdir( CLEANUP => 1 );
+}
+
+# build install select versions
+chdir $option{source} or die "Can't chdir to $option{source}: $!";
+for my $version (@versions) {
+
+    # skip if that git already exists (and runs)
+    if ( is_installed($version) ) {
+        print "*** GIT $version ALREADY INSTALLED ***\n" if !$option{quiet};
+        next;
+    }
+    else {
+        print "*** GIT $version ***\n" if !$option{quiet};
+        $r->run( checkout => '-f', '-q', $tag_for{$version} );
+        $r->run( clean => '-xqdf' );
+
+        # Fix various issues in the Git sources
+
+        # Fix GIT-VERSION-GEN to use `git describe` instead of `git-describe`
+        if (
+            cmp_git( $version, '1.3.3' ) <= 0
+            && cmp_git( '1.1.0', $version ) <= 0
+            && do { no warnings; `git-describe`; $? != 0 }
+          )
+        {
+            local ( $^I, @ARGV ) = ( '', 'GIT-VERSION-GEN' );
+            s/git-describe/git describe/, print while <>;
+        }
+
+        # fix GIT_VERSION in the Makefile
+        if ( cmp_git( $version, '1.0.9' ) == 0 ) {
+            local ( $^I, @ARGV ) = ( '', 'Makefile' );
+            s/^GIT_VERSION = .*/GIT_VERSION = $version/, print while <>;
+        }
+
+        # add missing #include <sys/resource.h>
+        elsif (   cmp_git( $version, '1.7.5.rc0' ) <= 0
+            && cmp_git( '1.7.4.2', $version ) <= 0 )
+        {
+            $r->run( 'cherry-pick', '-n',
+                'ebae9ff95de2d0b36b061c7db833df4f7e01a41d' );
+
+            # force the expected version number
+            my $version_file = File::Spec->catfile( $r->work_tree, 'version' );
+            open my $fh, '>', $version_file
+              or die "Can't open $version_file: $!";
+            print $fh "$version\n";
+        }
+
+        # settings
+        my $prefix = File::Spec->catdir( $option{destination}, $version );
+        my @make = ( make => "prefix=$prefix" );
+
+        # clean up environment (possibly set by local::lib)
+        local $ENV{PERL_MB_OPT};
+        local $ENV{PERL_MM_OPT};
+
+        # build
+        run_cmd( @make => '-j3' );
+
+        # install
+        run_cmd( @make => 'install' );
+
+        # test the installation and remove all
+        if ( $option{test} ) {
+            ok( is_installed($version), "$version installed successfully" );
+            remove_tree( $prefix );
+        }
+    }
+}
+
+sub run_cmd {
+    print "* @_\n" if !$option{quiet};
+    System::Command->loop_on( command => \@_, %run_opt ) or die "FAIL: @_\n";
+}
+
+sub is_installed {
+    my ($version) = @_;
+    my $git =
+      File::Spec->catfile( $option{destination}, $version, 'bin', 'git' );
+    return eval { Git::Repository->version_eq( $version, { git => $git } ) };
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+build-git - Build and install any Git
+
+=head1 SYNOPSIS
+
+    # clone git.git
+
+    # build and install Git 1.7.2
+    $ build-git 1.7.2
+
+    # build and install all versions between 1.6.5 and 2.1.0
+    $ build-git --since 1.6.5 --until 2.1.0
+
+    # build and install all versions of Git (since 1.0.0)
+    $ build-git
+
+    # build and install the 5 most recent versions of the selection
+    $ build-git --limit 5 ...
+
+    # build and install the 5 most ancient versions of the selection
+    $ build-git --limit -5 ...
+
+    # fetch the latest commit and install the latest git
+    $ build-git --fetch --limit 1
+
+=head1 OPTIONS AND ARGUMENTS
+
+=head2 Options
+
+ --source <directory>         The location of the git.git clone checkout
+
+ --destination <directory>    The location of the Git collection
+
+ --fetch                      Start by doing a `git fetch`
+
+ --list                       List the selected versions and exit
+
+ --test                       Compile, install, test and uninstall
+                              the selected versions. Outputs TAP.
+                              (Implies --quiet and force --destination to
+                              a temporary directory.)
+
+ --since <version>            Select versions greater or equal to <version>
+
+ --until <version>            Select versions less or equal to <version>
+
+ --missing                    Select only non-installed versions
+
+ --installed                  Select only installed versions
+                              (incompatible with the --missing option)
+
+ --limit <count>              Limit the number of versions in the selection
+                              (if <count> is positive, keep the most recent
+                              ones, if <count> is negative, keep the oldest)
+
+ --verbose                    Used once, shows the STDERR of the commands
+                              run to compile and install Git.
+                              Used twice, also shows the STDOUT.
+
+ --quiet                      Silence all output, including the progress status
+
+=head2 Arguments
+
+If no argument is given, all versions are selected.
+
+=head1 DESCRIPTION
+
+B<build-git> is a small utility to build and install any version of Git.
+
+It automatically applies some necessary patches that are needed to compile
+Git on recent systems.
+
+It is used to test the L<Git::Repository> module against all versions
+of Git.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2016 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

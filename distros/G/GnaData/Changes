@@ -1,0 +1,6 @@
+Revision history for Perl extension GnaData.
+
+0.01  Sun Feb 17 12:40:35 2002
+	- original version; created by h2xs 1.21 with options
+		-X GnaData
+

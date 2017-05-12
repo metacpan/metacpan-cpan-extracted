@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+
+<head>
+  <title>Geo::Postcodes::XX - Sample AJAX Application</title>
+</head>
+
+<body>
+
+<script type="text/javascript" src="postcodecheck.js"></script>
+
+<h3'>Utopian postcodes</h3>
+
+<form name='one' onSubmit="return false;">
+  <table>
+    <tr><td style="background-color:#AAC;">Address: </td>
+        <td><input name="address" value="Something or other"></td>
+    </tr>
+
+    <tr><td style="background-color:#AAC;">Postcode: </td>
+        <td><input id="postcode_u2"
+             onBlur='get_location("location_u2", "u2", "postcode_u2");'
+             onFocus='clear_it("location_u2");'
+             maxlength=4 size=4></td>
+    </tr>
+
+    <tr><td style="background-color:#AAC;">Location: </td>
+        <td><span id="location_u2" style="color:red;"></span></td>
+    </tr>
+  </table>
+</form>
+
+</body>
+</html>
+
+
+
+

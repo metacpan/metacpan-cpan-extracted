@@ -1,0 +1,18 @@
+Revision history for Perl extension Geo::PostalAddress.
+
+0.01  Sun Mar 27 22:20:22 2005
+	- original version; created by h2xs 1.19
+
+0.02  Fri Apr 22 08:16:28 2005
+	- first alpha release
+
+0.03  Thu Apr 28 09:49:09 2005
+	- second alpha release
+	* added dependencies in Makefile.PL
+	* Workaround Locale::Subcountry namespace pollution
+	* Tinkered with synopsis
+
+0.04  Sat Apr 30 08:01:00 2005
+	- third alpha release
+	* added t/* to MANIFEST
+	* reminded myself that "make distcheck" exists for a reason

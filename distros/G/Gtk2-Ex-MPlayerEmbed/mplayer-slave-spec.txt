@@ -1,0 +1,282 @@
+SLAVE MODE PROTOCOL
+-------------------
+
+The -slave option switches on slave mode, in which MPlayer works as a backend
+for other programs. Instead of intercepting keyboard events, MPlayer will read
+commands separated by a newline (\n) from stdin.
+
+To try slave mode out by hand, run
+
+  mplayer -slave -quiet <movie>
+
+and type slave commands into the console window.
+
+Most slave mode commands are equivalent to command line options, though not
+necessarily under the same name. Detailed descriptions can be found in the
+man page.
+
+All commands can be prefixed with "pausing ", causing MPlayer to pause as soon
+as possible after processing the command. Please note that this can be before
+the command is fully executed.
+
+Available commands ('mplayer -input cmdlist' will print a list):
+
+
+seek <value> [<type>]
+    Seek to some place in the movie.
+        0 is a relative seek of +/- <value> seconds (default).
+        1 is a seek to <value> % in the movie.
+        2 is a seek to an absolute position of <value> seconds.
+
+speed_set <value>
+    Set the speed to <value>.
+
+speed_incr <value>
+    Add <value> to the current playback speed.
+
+speed_mult <value>
+    Multiply the current speed by <value>.
+
+edl_mark
+    Write the current position into the EDL file.
+
+audio_delay <value>
+    Adjust the audio delay by <value> seconds.
+
+quit [<value>]
+    Quit MPlayer. The optional integer value is used as the return code
+    for the mplayer process (default: 0).
+
+pause
+    Pause/unpause the playback.
+
+frame_step
+    Play one frame, then pause again.
+
+grab_frames
+    Currently unimplemented.
+
+pt_step <value> [<force>]
+    Go to the next/previous entry in the playtree. The sign of <value> tells
+    the direction.  If no entry is available in the given direction it will do
+    nothing unless force is non-zero.
+
+pt_up_step <value> [<force>]
+    Similar to pt_step but jumps to the next/previous entry in the parent list.
+    Useful to break out of the inner loop in the playtree.
+
+alt_src_step <value> (ASX playlist only)
+    When more than one source is available it selects the next/previous one.
+
+sub_delay <value> [<abs>]
+    Adjust the subtitle delay by +/- <value> seconds or set it to <value>
+    seconds when <abs> is nonzero.
+
+sub_step <value>
+    Step forward in the subtitle list by <value> steps or backwards if <value>
+    is negative.
+
+sub_load <subtitle_file>
+    Loads subtitles from <subtitle_file>.
+
+sub_remove [<value>]
+    If the <value> argument is present and non-negative, removes the subtitle
+    file with index <value>. If the argument is omitted or negative, removes
+    all subtitle files.
+
+osd [<level>]
+    Toggle OSD mode or set it to level when <level> >= 0.
+
+osd_show_text <string>
+    Show <string> on the OSD.
+
+volume <value>
+    Increase/decrease volume.
+
+use_master
+    Switch volume control between master and PCM.
+
+mute
+    Mute/unmute sound output.
+
+switch_audio [<value>] (MPEG and Matroska only)
+    Switch to the audio track with the id <value>. Cycle through the
+    available tracks if <value> is omitted or negative.
+
+[contrast|gamma|brightness|hue|saturation] <-100 - 100> [<abs>]
+    Set/adjust video parameters.
+
+frame_drop [<value>]
+    Toggle/set frame dropping mode.
+
+sub_pos <value>
+    Adjust subtitle position.
+
+sub_alignment <value>
+    Set subtitle alignment.
+
+sub_visibility
+    Toggle subtitle visibility.
+
+get_sub_visibility
+    Print out subtitle visibility (1 == on, 0 == off).
+
+sub_select [<value>]
+    Display subtitle with index <value>. Turn subtitle display off if
+    <value> is -1 or greater than the highest available subtitle index.
+    Cycle through the available subtitles if <value> is omitted or less
+    than -1. Supported subtitle sources are -sub options on the command
+    line, VOBsubs, DVD subtitles, and Ogg and Matroska text streams.
+
+sub_log
+    Logs the current or last displayed subtitle together with filename
+    and time information to ~/.mplayer/subtitle_log. Intended purpose
+    is to allow convenient marking of bogus subtitles which need to be
+    fixed while watching the movie.
+
+vobsub_lang
+    This is a stub linked to sub_select for backwards compatibility.
+
+get_percent_pos
+    Print out the current position in the file, as integer percentage [0-100).
+
+get_time_pos
+    Print out the current position in the file in seconds, as float.
+
+get_time_length
+    Print out the length of the current file in seconds.
+
+vo_fullscreen
+    Switch to fullscreen mode.
+
+get_vo_fullscreen
+    Print out fullscreen status (1 == fullscreened, 0 == windowed).
+
+vo_ontop
+    Toggle stay-on-top.
+
+vo_rootwin
+    Toggle playback on the root window.
+
+switch_vsync [<value>]
+    Toggle vsync (1 == on, 0 == off). If no value is provided,
+    vsync status is inverted.
+
+switch_ratio [<value>]
+    Change aspect ratio at runtime. Value is the new aspect ratio expressed
+    as a float (e.g. 1.77778 for 16/9).
+    There might be problems with some video filters.
+
+panscan <-1.0 - 1.0> | <0.0 - 1.0> <absolute>
+    Increase or decrease the pan-and-scan range by <value>, 1.0 is the maximum.
+    Negative values decrease the pan-and-scan range.
+    If <absolute> is != 0, then the pan-and scan range is interpreted as an
+    absolute range.
+
+loadfile <file|url>
+    Load the given file/URL.
+
+loadlist <file>
+    Load the given playlist file.
+
+change_rectangle <val1> <val2>
+    Change the position of the rectangle filter rectangle.
+        <val1>
+            Must be one of the following:
+                0 = width
+                1 = height
+                2 = x position
+                3 = y position
+        <val2>
+            If <val1> is 0 or 1:
+                Integer amount to add/subtract from the width/height.
+                Positive values add to width/height and negative values
+                subtract from it.
+            If <val1> is 2 or 3:
+                Relative integer amount by which to move the upper left
+                rectangle corner. Positive values move the rectangle
+                right/down and negative values move the rectangle left/up.
+
+dvdnav <button>
+    Press the given dvdnav button.
+        1 up
+        2 down
+        3 left
+        4 right
+        5 menu
+        6 select
+
+dvdnav_event <value>
+    Send <value> as DVDNAV event. DVDNAV support in MPlayer is disabled.
+
+tv_step_channel <channel>
+    Select next/previous TV channel.
+
+tv_step_norm
+    Change TV norm.
+
+tv_step_chanlist
+    Change channel list.
+
+tv_set_channel <channel>
+    Set the current TV channel.
+
+tv_last_channel
+    Set the current TV channel to the last one.
+
+tv_set_freq <frequency in MHz>
+    Set the TV tuner frequency.
+
+tv_set_norm <norm>
+    Set the TV tuner norm (PAL, SECAM, NTSC, ...).
+
+tv_set_brightness <-100 - 100>
+    Set TV tuner brightness.
+
+tv_set_contrast <-100 -100>
+    Set TV tuner contrast.
+
+tv_set_hue <-100 - 100>
+    Set TV tuner hue.
+
+tv_set_saturation <-100 - 100>
+    Set TV tuner saturation.
+
+gui_[loadfile|loadsubtitle|about|play|stop|playlist|preferences|skinbrowser]
+    GUI actions
+
+forced_subs_only
+    Display forced subtitles only.
+
+dvb_set_channel <channel_number> <card_number>
+    Set DVB channel.
+
+screenshot
+    Take a screenshot. Currently not implemented in any video output driver.
+
+menu <command>
+    Execute an OSD menu command.
+        up     Move cursor up.
+        down   Move cursor down.
+        ok     Accept selection.
+        cancel Cancel selection.
+        hide   Hide the OSD menu.
+
+set_menu <menu_name>
+    Display the menu named <menu_name>.
+
+The following commands are really only useful for OSD menu console mode:
+
+help
+    Displays help text, currently empty.
+
+exit
+    Exits from OSD menu console. Unlike 'quit', does not quit MPlayer.
+
+hide
+    Hides the OSD menu console. Clicking a menu command unhides it. Other
+    keybindings act as usual.
+
+run <value>
+    Run <value> as shell command. In OSD menu console mode stdout and stdin
+    are through the video output driver.

@@ -1,0 +1,15 @@
+myprogram
+myprogram --frog ribbitx
+myprogram --frog ribbit 
+myprogram --type people --instance larry 
+myprogram x y
+myprogram lib/Getopt/
+myprogram --myfile d1/ 
+myprogram --myfile d1/ --no-go
+myprogram --myfile d1/ --no-fast --go --no-go 
+myprogram --myfile d1/ --no-fast --go
+myprogram --go 
+myprogram --go --no-go --myfile d1/ 
+myprogram --go --no-go --myfile d1/ "foo bar"
+myprogram --go --no-go --myfile d1/ lib/
+

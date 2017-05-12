@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2008-05-26 05:41:57</currentTime>
+  <result>
+    <rowset name="solarSystems" key="solarSystemID" columns="solarSystemID,allianceID,constellationSovereignty,sovereigntyLevel,factionID,solarSystemName">
+      <row solarSystemID="30023410" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500002" solarSystemName="Embod" />
+      <row solarSystemID="30023489" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500003" solarSystemName="Fora" />
+      <row solarSystemID="30024971" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500004" solarSystemName="Hecarrin" />
+      <row solarSystemID="30025042" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500003" solarSystemName="Annad" />
+      <row solarSystemID="30025305" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500004" solarSystemName="Channace" />
+      <row solarSystemID="30030141" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500001" solarSystemName="Uitra" />
+      <row solarSystemID="30031392" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500001" solarSystemName="Komo" />
+      <row solarSystemID="30031407" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500001" solarSystemName="Hitanishio" />
+      <row solarSystemID="30031672" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500003" solarSystemName="Safilbab" />
+      <row solarSystemID="30032505" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500002" solarSystemName="Todeko" />
+      <row solarSystemID="30032547" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500002" solarSystemName="Larkugei" />
+      <row solarSystemID="30032715" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500004" solarSystemName="Olelon" />
+      <row solarSystemID="30033410" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500002" solarSystemName="Erego" />
+      <row solarSystemID="30033489" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500003" solarSystemName="Hanan" />
+      <row solarSystemID="30034971" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500004" solarSystemName="Henebene" />
+      <row solarSystemID="30035042" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500003" solarSystemName="Chaktaren" />
+      <row solarSystemID="30035305" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500004" solarSystemName="Clacille" />
+      <row solarSystemID="30040141" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500001" solarSystemName="Urhinichi" />
+      <row solarSystemID="30041392" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500001" solarSystemName="Laah" />
+      <row solarSystemID="30041407" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500001" solarSystemName="Ichinumi" />
+      <row solarSystemID="30041672" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500003" solarSystemName="Seitam" />
+      <row solarSystemID="30042505" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500002" solarSystemName="Usteli" />
+      <row solarSystemID="30042547" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500002" solarSystemName="Loguttur" />
+      <row solarSystemID="30042715" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500004" solarSystemName="Trossere" />
+      <row solarSystemID="30043410" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500002" solarSystemName="Fildar" />
+      <row solarSystemID="30043489" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500003" solarSystemName="Horir" />
+      <row solarSystemID="30044971" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500004" solarSystemName="Mesokel" />
+      <row solarSystemID="30045042" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500003" solarSystemName="Conoban" />
+      <row solarSystemID="30045305" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500004" solarSystemName="Clellinon" />
+      <row solarSystemID="30001597" allianceID="574100976" constellationSovereignty="0" sovereigntyLevel="3" factionID="0" solarSystemName="M-NP5O" />
+      <row solarSystemID="30001598" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="2-NF2Z" />
+      <row solarSystemID="30001599" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="0Z-VHC" />
+      <row solarSystemID="30001600" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="9-BUSQ" />
+      <row solarSystemID="30001601" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="LQB-TC" />
+      <row solarSystemID="30001602" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="II-1B3" />
+      <row solarSystemID="30001603" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="6-HFD6" />
+      <row solarSystemID="30001604" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="P3UD-M" />
+      <row solarSystemID="30001605" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="LCN-0V" />
+      <row solarSystemID="30001606" allianceID="0" constellationSovereignty="0" sovereigntyLevel="0" factionID="500005" solarSystemName="FX-XMW" />
+    </rowset>
+    <dataTime>2008-05-26 05:22:01</dataTime>
+  </result>
+  <cachedUntil>2008-05-26 11:41:57</cachedUntil>
+</eveapi>

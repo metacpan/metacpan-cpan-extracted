@@ -1,0 +1,16 @@
+title			=	Goo Mark up Language (GML)
+filename		=	gml.goo
+suffix			=	gml
+location		= 	things/gml
+description		=	XML-ish file format for marking up other Things: .email, .frm, .tpl etc
+
+[M]ake			=	Goo::GMLMaker
+[E]dit			=	Goo::Editor
+[C]lone			=	Goo::Cloner
+[P]rofile		=	Goo::TemplateProfiler
+[D]elete		=	Goo::FileDeleter
+E[X]it			=	Goo::Exiter
+[J]ump			=	Goo::JumpManager
+[B]ack			=	Goo::TrailGoBackOne
+Back [L]inks	=	Goo::BackLinkManager
+[Z]one      	=   Goo::Zone

@@ -1,0 +1,152 @@
+NAME
+    Graph::Reader::TGF - Perl class for reading a graph from TGF format.
+
+SYNOPSIS
+     use Graph::Reader::TGF;
+     my $obj = Graph::Reader::TGF->new;
+     my $graph = $obj->read_graph($tgf_file);
+
+METHODS
+    "new()"
+             Constructor.
+             This doesn't take any arguments.
+             Returns Graph::Reader::TGF object.
+
+    "read_graph($tgf_file)"
+             Read a graph from the specified file.
+             The argument can either be a filename, or a filehandle for a previously opened file.
+             Returns Graph object.
+
+TGF FILE FORMAT
+     TGF = Trivial Graph Format
+     TGF file format is described on L<English Wikipedia - Trivial Graph Format|https://en.wikipedia.org/wiki/Trivial_Graph_Format>
+     Example:
+     1 First node
+     2 Second node
+     #
+     1 2 Edge between the two
+
+ERRORS
+     new():
+             Parameter 'edge_callback' isn't reference to code.
+             Parameter 'vertex_callback' isn't reference to code.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Graph::Reader::TGF;
+     use IO::Barf qw(barf);
+     use File::Temp qw(tempfile);
+
+     # Example data.
+     my $data = <<'END';
+     1 First node
+     2 Second node
+     #
+     1 2 Edge between the two
+     END
+
+     # Temporary file.
+     my (undef, $tempfile) = tempfile();
+
+     # Save data to temp file.
+     barf($tempfile, $data);
+
+     # Reader object.
+     my $obj = Graph::Reader::TGF->new;
+
+     # Get graph from file.
+     my $g = $obj->read_graph($tempfile);
+
+     # Print to output.
+     print $g."\n";
+
+     # Clean temporary file.
+     unlink $tempfile;
+
+     # Output:
+     # 1-2
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Graph::Reader::TGF;
+     use IO::Barf qw(barf);
+     use File::Temp qw(tempfile);
+
+     # Example data.
+     my $data = <<'END';
+     1 Node #1
+     2 Node #2
+     3 Node #3
+     4 Node #4
+     5 Node #5
+     6 Node #6
+     7 Node #7
+     8 Node #8
+     9 Node #9
+     10 Node #10
+     #
+     1 2
+     1 3
+     1 5
+     1 6
+     1 10
+     3 4
+     6 7
+     6 8
+     6 9
+     END
+
+     # Temporary file.
+     my (undef, $tempfile) = tempfile();
+
+     # Save data to temp file.
+     barf($tempfile, $data);
+
+     # Reader object.
+     my $obj = Graph::Reader::TGF->new;
+
+     # Get graph from file.
+     my $g = $obj->read_graph($tempfile);
+
+     # Print to output.
+     print $g."\n";
+
+     # Clean temporary file.
+     unlink $tempfile;
+
+     # Output:
+     # 1-10,1-2,1-3,1-5,1-6,3-4,6-7,6-8,6-9
+
+DEPENDENCIES
+    Encode, Error::Pure, Graph::Reader.
+
+SEE ALSO
+    Graph::Reader
+        base class for Graph file format readers
+
+    Task::Graph::Reader
+        Install the Graph::Reader modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Graph-Reader-TGF>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2014-2015
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

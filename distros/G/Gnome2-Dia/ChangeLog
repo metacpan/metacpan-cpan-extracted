@@ -1,0 +1,94 @@
+2005/02/24	kaffeetisch
+
+	* Dia.pm, META.yml, NEWS: Version 0.04.
+
+2005/02/24	kaffeetisch
+
+	* t/DiaCanvasElement.t: Remove stuff that tested if setting the
+	handles property worked since it isn't writable anymore.
+
+2005/02/20	kaffeetisch
+
+	* xs/DiaCanvasGroup.xs: Update prototype of
+	dia_canvas_group_foreach.
+
+2005/01/27 20:12 (+0100) kaffeetisch
+
+	* README: Fix typo.
+
+2004/11/10 19:52 (+0100) kaffeetisch
+
+	* Dia.pm, META.yml, NEWS: Version 0.03.
+
+2004/11/10 19:40 (+0100) kaffeetisch
+
+	* t/DiaShape.t: Reenable this as the upstream problems seem to
+	have been fixed.
+
+	* xs/DiaCanvas.xs: Remove the in_undo accessor.
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+2004/10/15 18:11 (+0200) kaffeetisch
+
+	* t/DiaCanvas.t: Work around the recent deprecation of the undo
+	stuff by using 0 in the [sg]et_undo_stack_depth test.
+
+	* xs/DiaPlacementTool.xs: Alter the version check to actually do
+	the right thing on all versions of diacanvas2.
+
+2004/09/16 14:36 (+0200) kaffeetisch
+
+	* Dia.pm, MANIFEST, META.yml: Version 0.02.
+
+2004/09/26 14:04 (+0200) kaffeetisch
+
+	* t/DiaCanvasGroupable.t: Test the newly added interface stuff.
+
+	* t/DiaShape.t: Remove all references to the visibility stuff.
+
+	* xs/DiaCanvasItem.xs: Allow undef in set_child_of.
+
+2004/09/25 21:00 (+0200) kaffeetisch
+
+	* xs/DiaCanvasGroupable.xs: Add support for implementing this
+	interface in Perl.
+
+	* t/DiaCanvasItem.t, xs/DiaCanvasItem.xs: Bind and test
+	dia_canvas_item_set_child_of despite private mark as it is
+	necessary and actually *is* part of the public API.
+
+	* xs/DiaCanvasItem.xs: First steps towards subclassibility:
+	Implement support for overriding the UPDATE vfunc.
+
+	* t/DiaPlacementTool.t, xs/DiaPlacementTool.xs: Enable
+	dia_placement_tool_new, but use version checks to determine if
+	dia_placement_tool_newv is available.
+
+	* examples/editor.pl: Add an example that shows off some of the
+	more advanced stuff like subclassing and interfaces.
+
+2004/09/14 19:41 (+0200) kaffeetisch
+
+	* .cvsignore, ChangeLog, Dia.pm, LICENSE, MANIFEST, MANIFEST.SKIP,
+	META.yml, Makefile.PL, README, copyright.pod, diacanvas.doctypes,
+	diacanvas.typemap, diacanvas2perl.h, maps, t/Dia.t, t/DiaCanvas.t,
+	t/DiaCanvasBox.t, t/DiaCanvasEditable.t, t/DiaCanvasElement.t,
+	t/DiaCanvasGroup.t, t/DiaCanvasGroupable.t, t/DiaCanvasItem.t,
+	t/DiaCanvasView.t, t/DiaConstraint.t, t/DiaDefaultTool.t,
+	t/DiaExport.t, t/DiaHandle.t, t/DiaHandleLayer.t,
+	t/DiaHandleTool.t, t/DiaItemTool.t, t/DiaPlacementTool.t,
+	t/DiaSelectionTool.t, t/DiaShape.t, t/DiaSolver.t,
+	t/DiaStackTool.t, t/DiaTool.t, t/DiaVariable.t, xs/.cvsignore,
+	xs/Dia.xs, xs/DiaCanvas.xs, xs/DiaCanvasBox.xs,
+	xs/DiaCanvasEditable.xs, xs/DiaCanvasElement.xs,
+	xs/DiaCanvasGroup.xs, xs/DiaCanvasGroupable.xs,
+	xs/DiaCanvasItem.xs, xs/DiaCanvasView.xs, xs/DiaConstraint.xs,
+	xs/DiaDefaultTool.xs, xs/DiaEvent.xs, xs/DiaExport.xs,
+	xs/DiaGeometry.xs, xs/DiaHandle.xs, xs/DiaHandleLayer.xs,
+	xs/DiaHandleTool.xs, xs/DiaItemTool.xs, xs/DiaPlacementTool.xs,
+	xs/DiaSelectionTool.xs, xs/DiaShape.xs, xs/DiaSolver.xs,
+	xs/DiaStackTool.xs, xs/DiaTool.xs, xs/DiaVariable.xs: Initial
+	import.

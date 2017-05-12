@@ -1,0 +1,8 @@
+<table align="center" border = "<: $border :>" summary = "PathUtils">
+: for $row -> $item {
+<tr>
+		: include "basic.column.tx" { column => $item };
+</tr>
+: }
+</table>
+

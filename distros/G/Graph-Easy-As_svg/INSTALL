@@ -1,0 +1,103 @@
+
+=head1 INSTALL
+
+To install this module do the following:
+
+=head2 LINUX, UNIX etc.
+
+Untar the package:
+
+	tar -xzf Graph-Easy-As_svg-0.13.tar.gz
+
+(Replace 0.13 with the actual version you got)
+
+Change into the directory:
+
+	chdir Graph-Easy-As_svg-0.13/
+
+Then you need to check the signature on the package to verify that
+it is untampered and intact. To do this you have to:
+
+=over 2
+
+=item *
+
+Install the Perl module Module::Signature from http://search.cpan.org
+
+=item *
+
+Get my key from http://bloodgate.com/tels.asc, import it into
+GnuPG with:
+
+        gpg --import tels.asc
+
+You may also let the C<cpansign> utility fetch it automatically
+from a keyserver, if that works for you.
+
+=item *
+
+Type on a console:
+
+        cpansign --verify
+
+inside the unpacked directory.
+
+=back
+
+If the last step says "good signature" or "SIGNATURE VERIFIED OK",
+everything is all right.
+
+Note that if C<cpansign> let GnuPG download my key from a keyserver, it
+might put a C<tels.asc> file in the package directory, and then afterward
+complain that "tels.asc" is not in the MANIFEST:
+
+ Not in MANIFEST: tels.asc
+ ==> MISMATCHED content between MANIFEST and distribution files! <==
+
+You can safely ignore this warning.
+
+B<NOTE:> Please notify me immidiately if the signature
+does not verify. In that case do B<NOT> install this software, your system
+might get compromised!
+
+When the package verified okay, then proceed:
+
+        perl Makefile.PL
+
+If you get warnings about missing or outdated modules, then
+upgrade/install these first. Then run the testsuite:
+
+        make test
+
+If all tests pass, install the package:
+
+        sudo make install
+
+=head2 WINDOWS
+
+When the package verified okay (see above), then proceed:
+
+You need the "nmake" utility from Microsoft:
+
+	http://johnbokma.com/perl/make-for-windows.html
+
+=head3 nmake
+
+Then you can build the Makefile and finally run the tests and
+install this package:
+
+        perl Makefile.PL
+        nmake test
+
+If all tests pass, install the package:
+
+        nmake install
+
+AUTHOR
+======
+
+Copyright (C) 2004 - 2008 by Tels http://bloodgate.com/perl/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL version 2.
+

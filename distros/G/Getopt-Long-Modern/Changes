@@ -1,0 +1,16 @@
+1.000     2017-04-26 22:00:07 EDT
+  - Breaking change: no_auto_abbrev is no longer included in the default option
+    set, in order to better match how options are handled by modern unix tools.
+  - Ignore :config import parameter if specified accidentally
+
+0.004     2015-09-16 20:28:17 EDT
+  - Switch installer to ExtUtils::MakeMaker
+
+0.003     2015-09-16 18:47:06 EDT
+  - Bump required version of Getopt::Long to 2.37 for important bugfixes
+
+0.002     2015-09-07 02:51:02 EDT
+  - Use export_to_level instead of $Exporter::ExportLevel
+
+0.001     2015-09-06 19:26:39 EDT
+  - First release

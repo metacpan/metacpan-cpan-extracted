@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Gantry/Plugins/CookieCheck.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+root/cc.tt
+t/01_load.t
+t/99_pod.t

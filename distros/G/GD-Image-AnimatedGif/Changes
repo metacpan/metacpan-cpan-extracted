@@ -1,0 +1,19 @@
+Revision history for Perl extension GD::Image::AnimatedGif.
+
+0.05  Fri Aug 26 18:35:00 2005    
+        - fixed issue with VERSION() that conflicted with UNIVERSAL's VERSION functionality
+
+0.04  Sun Mar 20 21:13:15 2005
+        - fixed up Makefile to have GD as a prereq
+
+0.03  Mon Jan 24 19:10:50 2005
+        - removed Makefile.PL perl version restriction
+
+0.02  Mon Jan 17 19:14:30 2005
+        - added VERSION() which I left out accidentally before
+        - POD error correction (thanks Mike Castle ;p)
+        - Added "Secret Decoder Ring" example info to POD
+
+0.01  Mon Jan  3 19:35:42 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n GD::Image::AnimatedGif

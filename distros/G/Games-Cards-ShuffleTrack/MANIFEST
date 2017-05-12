@@ -1,0 +1,35 @@
+Changes
+lib/Games/Cards/ShuffleTrack.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+examples/games/poker.pl
+examples/magic/key_card.pl
+examples/magic/key_card2.pl
+examples/shuffling/faro-in.pl
+examples/shuffling/faro-out.pl
+examples/shuffling/random_riffle_shuffles.pl
+t/00-load.t
+t/01-basic.t
+t/02-count.t
+t/03-faro.t
+t/04-riffle-shuffle.t
+t/05-cut.t
+t/06-find.t
+t/07-overhand-shuffle.t
+t/08-hindu-shuffle.t
+t/09-handling-cards.t
+t/10-running-cuts.t
+t/12-dealing-cards.t
+t/13-peeking-cards.t
+t/14-taking-cards.t
+t/15-inserting-cards.t
+t/16-dribble.t
+t/17-bury.t
+t/18-original.t
+t/19-remove.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

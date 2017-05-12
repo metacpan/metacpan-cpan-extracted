@@ -1,0 +1,17 @@
+* write more tests
+* rework log messages
+* make MaxIdleTime configurable per job as new attribute
+* use Module::Refresh or something to auto-reload changed workers
+
+* implement some shared stash with different backends (e.g. memcached) to have
+  shared data across multiple worker childs (running on multiple servers). Some
+  smart locking is necessary! Not sure yet if this is a smart idea at all.
+  e.g.:
+  package My::Worker;
+  use base qw(Gearman::Driver::Worker);
+  use Moose;
+  sub do_something : Job : MinChilds(2) : MaxChilds(15) {
+    my ( $self, $job, $workload ) = @_;
+    $self->stash->set( foo => 'bar' );
+    $self->stash->get('foo');
+  }

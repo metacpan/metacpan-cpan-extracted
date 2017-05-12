@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+######
+# Make a query to a GeoNames SQLite database
+# Xiangrui Meng <mengxr@stanford.edu>
+####
+
+use strict;
+use warnings;
+
+use File::Basename;
+
+use Geo::GeoNames::Record;
+use Geo::GeoNames::DB::SQLite;
+
+unless( @ARGV == 2 )
+{	
+  print STDERR "usage: " . basename(__FILE__) . " q database" . "\n";
+  exit; 
+}   
+
+my ($q, $sqlite_file) = @ARGV;
+
+my $dbh = Geo::GeoNames::DB::SQLite->connect( $sqlite_file );
+
+my @records = $dbh->query($q);
+
+$dbh->disconnect();
+
+if( @records )
+{
+  print join( "\n", @records ) . "\n";
+}
+else
+{
+  print STDERR "Cannot find $q.\n";
+}
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="http://www.miieditor.com/xml/mii.xsl" ?>
+<!DOCTYPE mii-collection SYSTEM "http://www.miieditor.com/xml/mii.dtd" >
+<mii-collection>
+  <mii value="1c2c30553093307e30553093000000000000000000004a0700000148c241434149445e00310024655c490680b63870d2008a008a2504004e0069006e00740065006e0064006f00000000">
+    <name maxChars="10">さんまさん</name>
+    <creator maxChars="10">Nintendo</creator>
+    <data name="id" value="00-00-01-48" format="hexadecimal" min="00-00-00-00" max="FF-FF-FF-FF"/>
+    <data name="wii" value="41-43-41" format="hexadecimal" min="00-00-00" max="FF-FF-FF"/>
+    <data name="beardType" value="0" format="integer" min="0" max="3"/>
+    <data name="birthDate" value="1" format="integer" min="0" max="31"/>
+    <data name="birthMonth" value="7" format="integer" min="0" max="12"/>
+    <data name="eyeColor" value="0" format="integer" min="0" max="5"/>
+    <data name="eyeRotation" value="2" format="integer" min="0" max="7"/>
+    <data name="eyeSize" value="3" format="integer" min="0" max="7"/>
+    <data name="eyeType" value="18" format="integer" min="0" max="47"/>
+    <data name="eyeX" value="4" format="integer" min="0" max="12"/>
+    <data name="eyeY" value="9" format="integer" min="0" max="18"/>
+    <data name="eyebrowColor" value="1" format="integer" min="0" max="7"/>
+    <data name="eyebrowRotation" value="4" format="integer" min="0" max="11"/>
+    <data name="eyebrowSize" value="2" format="integer" min="0" max="8"/>
+    <data name="eyebrowType" value="0" format="integer" min="0" max="23"/>
+    <data name="eyebrowX" value="5" format="integer" min="0" max="12"/>
+    <data name="eyebrowY" value="12" format="integer" min="0" max="15"/>
+    <data name="facialFeaturesType" value="5" format="integer" min="0" max="15"/>
+    <data name="facialHairColor" value="0" format="integer" min="0" max="7"/>
+    <data name="favoriteColor" value="6" format="integer" min="0" max="11"/>
+    <data name="gender" value="0" format="integer" min="0" max="1"/>
+    <data name="glassesColor" value="0" format="integer" min="0" max="5"/>
+    <data name="glassesSize" value="4" format="integer" min="0" max="7"/>
+    <data name="glassesType" value="0" format="integer" min="0" max="8"/>
+    <data name="glassesY" value="10" format="integer" min="0" max="20"/>
+    <data name="hairColor" value="0" format="integer" min="0" max="7"/>
+    <data name="hairPart" value="0" format="integer" min="0" max="1"/>
+    <data name="hairType" value="13" format="integer" min="0" max="71"/>
+    <data name="headType" value="2" format="integer" min="0" max="7"/>
+    <data name="height" value="74" format="integer" min="0" max="127"/>
+    <data name="mingles" value="0" format="integer" min="0" max="1"/>
+    <data name="moleSize" value="4" format="integer" min="0" max="15"/>
+    <data name="moleType" value="0" format="integer" min="0" max="1"/>
+    <data name="moleX" value="2" format="integer" min="0" max="16"/>
+    <data name="moleY" value="10" format="integer" min="0" max="30"/>
+    <data name="mouthColor" value="0" format="integer" min="0" max="2"/>
+    <data name="mouthSize" value="6" format="integer" min="0" max="8"/>
+    <data name="mouthType" value="22" format="integer" min="0" max="23"/>
+    <data name="mouthY" value="0" format="integer" min="0" max="18"/>
+    <data name="mustacheSize" value="4" format="integer" min="0" max="8"/>
+    <data name="mustacheType" value="0" format="integer" min="0" max="3"/>
+    <data name="mustacheY" value="6" format="integer" min="0" max="16"/>
+    <data name="noseSize" value="6" format="integer" min="0" max="8"/>
+    <data name="noseType" value="11" format="integer" min="0" max="11"/>
+    <data name="noseY" value="15" format="integer" min="0" max="18"/>
+    <data name="skinColor" value="2" format="integer" min="0" max="5"/>
+    <data name="weight" value="7" format="integer" min="0" max="127"/>
+  </mii>
+</mii-collection>

@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+errors.err
+examples/tohtml.pl
+lib/Games/Terrain/DiamondSquare.pm
+t/basic.t

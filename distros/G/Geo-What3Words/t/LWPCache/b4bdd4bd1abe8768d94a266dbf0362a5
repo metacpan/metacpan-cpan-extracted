@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Connection: close
+Date: Wed, 15 Jun 2016 19:52:43 GMT
+Server: nginx
+Content-Length: 478
+Content-Type: application/json;charset=UTF-8
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Allow-Headers: X-Api-Key
+Access-Control-Allow-Methods: GET
+Access-Control-Allow-Origin: *
+Client-Response-Num: 1
+Client-SSL-Cert-Issuer: /C=US/O=GeoTrust Inc./CN=RapidSSL SHA256 CA - G3
+Client-SSL-Cert-Subject: /OU=GT36478046/OU=See www.rapidssl.com/resources/cps (c)15/OU=Domain Control Validated - RapidSSL(R)/CN=*.what3words.com
+Client-SSL-Cipher: ECDHE-RSA-AES128-SHA
+Client-SSL-Socket-Class: IO::Socket::SSL
+
+{"crs":{"type":"link","properties":{"href":"http:\/\/spatialreference.org\/ref\/epsg\/4326\/ogcwkt\/","type":"ogcwkt"}},"words":"prom.cape.pump","bounds":{"southwest":{"lng":"-0.195426","lat":"51.484449"},"northeast":{"lng":"-0.195383","lat":"51.484476"}},"geometry":{"lng":"-0.195405","lat":"51.484463"},"language":"en","map":"http:\/\/w3w.co\/prom.cape.pump","status":{"status":200,"reason":"OK"},"thanks":"Thanks from all of us at index.home.raft for using a what3words API"}

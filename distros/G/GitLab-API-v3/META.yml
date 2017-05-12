@@ -1,0 +1,40 @@
+---
+abstract: 'A complete GitLab API v3 client.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Log::Any::Adapter::TAP: v0.2.0
+  Test::More: '0'
+  Test::Simple: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GitLab-API-v3
+requires:
+  Const::Fast: '0'
+  Data::Serializer: '0'
+  Getopt::Long: '0'
+  Log::Any: '0.11'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::Screen: '0'
+  Moo: '1.006'
+  Pod::Usage: '0'
+  Role::REST::Client: '0.18'
+  Try::Tiny: '0'
+  Type::Tiny: '1'
+  URI::Escape: '0'
+  YAML: '0'
+  namespace::clean: '0'
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/bluefeet/GitLab-API-v3/issues
+  homepage: https://github.com/bluefeet/GitLab-API-v3
+  repository: https://github.com/bluefeet/GitLab-API-v3.git
+version: '1.00'

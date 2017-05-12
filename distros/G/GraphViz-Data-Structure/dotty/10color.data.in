@@ -1,0 +1,73 @@
+(name => 'multi glob ref, default colors',
+ code => 'my ($a,$b,@c,%d); 
+          $a=\*Foo::Bar; 
+          *Foo::Bar=\&normalize; 
+          *Foo::Bar=\$b; $b="test string"; 
+          *Foo::Bar = \@c; @c=qw(foo bar baz); 
+          *Foo::Bar = \%d; %d = (This=>That,The=>Other);  
+          my $z = GraphViz::Data::Structure->new(\$a,%title%)->graph->as_canon',
+)
+%%
+(name => 'multi glob ref, pastel colors',
+ code => 'my ($a,$b,@c,%d); 
+          $a=\*Foo::Bar; 
+          *Foo::Bar=\&normalize; 
+          *Foo::Bar=\$b; 
+          $b="test string"; 
+          *Foo::Bar = \@c; 
+          @c=qw(foo bar baz); 
+          *Foo::Bar = \%d; 
+          %d = (This=>That,The=>Other);  
+          my $z = GraphViz::Data::Structure->new(\$a,%title%,Colors=>Pastel)->graph->as_canon',
+)
+%%
+(name => 'multi glob ref, bright colors',
+ code => 'my ($a,$b,@c,%d); 
+          $a=\*Foo::Bar; 
+          *Foo::Bar=\&normalize; 
+          *Foo::Bar=\$b; $b="test string"; 
+          *Foo::Bar = \@c; 
+          @c=qw(foo bar baz); 
+          *Foo::Bar = \%d; 
+          %d = (This=>That,The=>Other);  
+          my $z = GraphViz::Data::Structure->new(\$a,%title%,Colors=>Bright,"fontcolor"=>"white","fontname"=>"Helvetica")->graph->as_canon',
+)
+%%
+(name => 'multi glob ref, custom colors',
+ code => 'my ($a,$b,@c,%d); 
+          $a=\*Foo::Bar; 
+          *Foo::Bar=\&normalize; 
+          *Foo::Bar=\$b; 
+          $b="test string"; 
+          *Foo::Bar = \@c; 
+          @c=qw(foo bar baz); 
+          *Foo::Bar = \%d; 
+          %d = (This=>That,The=>Other);  
+          my $z = GraphViz::Data::Structure->new(\$a,Colors=>{Scalar=>"indianred1", Array=>"burlywood2", Hash=>"seagreen1", Glob=>"moccasin"},%title%)->graph->as_canon',
+)
+%%
+(name => 'multi glob ref, default colors with overrides',
+ code => 'my ($a,$b,@c,%d); 
+          $a=\*Foo::Bar; 
+          *Foo::Bar=\&normalize; 
+          *Foo::Bar=\$b; 
+          $b="test string"; 
+          *Foo::Bar = \@c; 
+          @c=qw(foo bar baz); 
+          *Foo::Bar = \%d; 
+          %d = (This=>That,The=>Other);  
+          my $z = GraphViz::Data::Structure->new(\$a,Colors=>{Hash=>"red"},%title%)->graph->as_canon',
+)
+%%
+(name => 'multi glob ref, create a palette',
+ code => 'my ($a,$b,@c,%d); 
+          $a=\*Foo::Bar; 
+          *Foo::Bar=\&normalize; 
+          *Foo::Bar=\$b; 
+          $b="test string"; 
+          *Foo::Bar = \@c; 
+          @c=qw(foo bar baz); 
+          *Foo::Bar = \%d; 
+          %d = (This=>That,The=>Other); 
+          my $z = GraphViz::Data::Structure->new(\$a,Colors=>"pink",%title%)->graph->as_canon',
+)

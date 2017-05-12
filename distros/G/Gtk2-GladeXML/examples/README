@@ -1,0 +1,32 @@
+=======================
+GTK2::GladeXML Examples
+=======================
+
+
+
+fileman.pl
+----------
+
+A simple, but mostly-functional file-manager example.
+    * Shows how to connect a Glade treeview widget to a Simple-list 
+    object
+    * Shows basic use of Gtk-timers
+    * Shows basic rendering of icons, and how to use in Simple-lists
+
+hello-world.pl
+--------------
+
+The defacto hello-world sample
+    * Shows how to use a label with marked-up text
+    * Shows how to embedd a glade-xml file right in a perl-script
+
+progress.pl
+----------
+
+A progress-bar demo
+    * Shows how to use progress bars and slider widgets
+
+scribble.pl
+-----------
+
+The Gtk / Gtk-Perl scribble demo ported to GladeXML

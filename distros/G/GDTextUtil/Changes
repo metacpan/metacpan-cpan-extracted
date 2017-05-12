@@ -1,0 +1,74 @@
+Revision history for Perl extension GDTextUtil.
+
+Thu Jun 19 2003
+
+- Fixed check for TTF font support. The libgd error message changed
+  between 1.8 and 2.0
+- Release patched version
+
+Thu Feb 20 2003
+
+- Removed cetus.ttf from distribution because of copyright uncertainties
+- Fixed font search, slightly
+
+Thu Jun 15 2002
+
+- Fixed GD::Text, use Cwd. For some reason, this was only a problem
+  under Perls before 5.6.0.
+
+Sat Jan 19 2002
+
+- Added demo/GDWrap.ref.png
+- Changed demo/GDWrap.pl
+- Fixes so that set_font always uses absolute path for TTF. This to
+  circumvent some bug/misfeature in the freetype 2.0.x library.
+- Fixed up tests, to include approximate checking of bounds, instead of
+  requiring absolute match.
+
+Sun Oct 22 2000
+
+- Fixed draw(0,0) problem in GD::Text::Wrap
+
+Mon Sep 18 2000
+
+- Added paragraph and newline preservation
+
+Sun Apr 30 2000
+
+- Corrected GD::Wrap::AUTOLOAD not to call DESTROY in the wrong package
+  (5.6.0 introduced this problem)
+- Changed Makefile.PL for 5.6.0
+
+Tue Feb 29 2000
+
+- Modified for/foreach constructs to workin 5.004_04
+- Quoted many hash keys to make 5.004_04 happy
+
+Sun Jan  9 2000
+
+- Added append of '.ttf' when searching for TTF font files.
+
+Sun Jan  9 2000
+
+- Added font path tests.
+- Allow first argument to set_font to be an array reference to various
+  font names that may or may not be present.
+- GD::Text::Wrap now uses autoloader to delegate methods to
+  GD::Text::Align
+
+Release of 0.65
+
+Sat Jan  8 2000
+
+- Added font path.
+- Changed test string to include all printable characters between 0x00
+  and 0xff. Was only using 0x21 to 0x7e before, but some capitals with
+  umlauts are outside of the ASCII range.
+
+Before Jan 01 2000
+- Original module
+- Release of 0.61
+
+0.01  Sat Dec  4 15:21:17 1999
+- original version; created by h2xs 1.19
+

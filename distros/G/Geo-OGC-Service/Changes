@@ -1,0 +1,40 @@
+0.11, Jan 26, 2017
+  * New/enhanced semantics in constructor arguments:
+  *   'processor' is an object, which is forwarded to the service object
+  *   'config_maker' is an object, which, if exists, is used to create the config for the service object
+  * Send Content-Type = 0 and CORS as a reply to an OPTIONS request
+  * Improve the element method of XMLWriter class
+
+0.10, May 24, 2016
+  * Fix several decode/encode bugs.
+  * Fix CORS headers.
+  * Separate Parameter method from Operation in Geo::OGC::Service::Common.
+
+0.09, Dec 14, 2015
+  * Decode attribute values and content into UTF-8 unless they already are in XML responses
+  * Support simple references to top level keys in configuration files
+  * Add CORS method in Geo::OGC::Service::Common to get CORS headers 
+  * XMLWriter constructors take now header instead of just content-type
+
+0.08, Nov 12, 2015
+  * Add Geo::OGC::Service::Common class as a root class for services
+  * Config file is now read and prepared in boot time
+
+0.07, Nov 7, 2015
+  * Allow more complex config variables/files to support multiple services
+
+0.06, Nov 7, 2015(?)
+
+0.05, Nov 5, 2015
+  * This is now a subclass of Plack::Component: have methods to_mount and call
+
+0.04, Oct 30, 2015
+  * This is now a mountable Plack::Builder app
+
+0.03, Oct 28, 2015(?)
+  * Add full env to the service object
+
+0.02, Oct 24, 2015(?)
+  * Added XMLWriter classes
+
+0.01, Oct 21, 2015(?)

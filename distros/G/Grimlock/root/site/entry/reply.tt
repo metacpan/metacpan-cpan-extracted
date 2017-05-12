@@ -1,0 +1,7 @@
+[% INCLUDE 'entry/browse.tt' %]
+<p>Reply to [% entry.title %]</p>
+<form method="POST" action="[% c.uri_for_action('/entry/reply', [ entry.display_title ]) %]">
+<div id="form-entry-body">
+<textarea name="body" rows=15 cols=45></textarea>
+</div>
+<div id="form-entry-submit"><input type="submit" value="Save entry" /></div>

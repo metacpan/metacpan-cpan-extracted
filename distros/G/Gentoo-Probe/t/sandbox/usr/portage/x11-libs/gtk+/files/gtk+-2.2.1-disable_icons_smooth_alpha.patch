@@ -1,0 +1,51 @@
+diff -ru gtk+-2.2.1/gtk/gtkstyle.c gtk+-2.2.1.patch/gtk/gtkstyle.c
+--- gtk+-2.2.1/gtk/gtkstyle.c	2003-01-31 05:42:34.000000000 +0100
++++ gtk+-2.2.1.patch/gtk/gtkstyle.c	2003-02-07 19:16:04.000000000 +0100
+@@ -1988,6 +1988,36 @@
+     }
+ }
+ 
++static void 
++set_pixbuf_alpha (GdkPixbuf *src)
++{
++  int width, wb;
++  int height;
++  int rowstride;
++  gboolean has_alpha;
++  guchar *pixels, *p;
++  int i, j;
++
++  width = gdk_pixbuf_get_width (src);
++  height = gdk_pixbuf_get_height (src);
++  rowstride = gdk_pixbuf_get_rowstride (src);
++  has_alpha = gdk_pixbuf_get_has_alpha (src);
++
++  if (has_alpha == FALSE)
++    return;
++
++  pixels = gdk_pixbuf_get_pixels (src);
++
++  wb = width << 2;
++  for (i = 0; i < height; i ++)
++    {
++      p = pixels + (i * rowstride);
++    
++      for (j = 0; j < wb; j += 4)
++        p[j + 3] = p[j + 3] >> 1;
++    }
++}
++
+ static GdkPixbuf *
+ gtk_default_render_icon (GtkStyle            *style,
+                          const GtkIconSource *source,
+@@ -2054,8 +2084,8 @@
+           stated = gdk_pixbuf_copy (scaled);      
+           
+           gdk_pixbuf_saturate_and_pixelate (scaled, stated,
+-                                            0.8, TRUE);
+-          
++                                            0.0, FALSE);
++          set_pixbuf_alpha (stated);
+           g_object_unref (scaled);
+         }
+       else if (state == GTK_STATE_PRELIGHT)

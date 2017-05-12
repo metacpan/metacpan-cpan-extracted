@@ -1,0 +1,89 @@
+Content-Type: text/plain; name="promed_new.html"
+Content-Disposition: inline; filename="promed_new.html"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed_new.html> ProMED-mail
+
+ [IMAGE]
+
+Welcome!
+
+Here is 1k of junk:
+
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foofoo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+
+*** References from this document ***
+[orig] file:./test/promed_new.html
+Content-Type: text/plain; name="promed_new.html"
+Content-Disposition: inline; filename="promed_new.html"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed_new.html> ProMED-mail
+
+ [IMAGE]
+
+Welcome!
+
+Here is 1k of junk:
+
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foofoo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+
+*** References from this document ***
+[orig] file:./test/promed_new.html
+Content-Type: text/plain; name="promed.html"
+Content-Disposition: inline; filename="promed.html"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed.html> ProMED-mail
+
+ [IMAGE]
+
+Here we are! Also visit promed_new.html [1]
+
+Here is a binary character: \O^
+
+Too bad we can't read news[2] yet.
+
+Here is a really long URL[3]
+
+
+*** References from this document ***
+[orig] file:./promed.html
+[1] file:/test/promed_new.html
+[2] news:comp.mail.sendmail (not implemented)
+[3] file://notavalidpath/justtesting/foobarfoobarfoobarfoobarfoo\
+barfoobarfoobar

@@ -1,0 +1,751 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use Carp;
+use Geo::Raster qw(:types :logics);
+#use Timeseries;
+use Term::ReadLine;
+use Math::MatrixReal;
+#use XML::Parser;
+
+$_plot_file = '.grid-tmp';
+$_input = '';
+
+=pod
+
+=head1 NAME
+
+rash - raster shell - a Perl shell for raster algebra
+
+=head1 SYNOPSIS
+
+    rash.pl <options>
+
+=head1 DESCRIPTION
+
+rash is an extension of the basic Perl shell:
+
+    while (<>) {
+	eval;
+	print $@;
+    }
+
+=head1 BASIC FUNCTIONALITY
+
+rash uses Geo::Raster, thus rasters and PGPLOT graphics can be used
+readily. rash adds command line editing and history with
+Term::ReadLine. Database connectivity is added using the functionality
+provided by Raster module. rash can open a pipe to gnuplot for
+plotting data.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=item B<-a>
+
+Same as specifying both B<--db-connection> and B<--gnuplot>. Tries to
+open a database connection into Raster module and a pipe to gnuplot.
+
+=item B<--db-connection>
+
+Tries to open a database connection into Raster module. The default
+hostname ('' by Raster.pm) can be overridden with option B<-h>
+I<hostname> or argument B<--hostname=>I<hostname>. The default
+database (the name of the current directory by Raster.pm) can be
+overridden with argument B<--database=>I<database>. The default
+username with which to connect (the effective userid by Raster.pm) can
+be overridden with argument B<--username=>I<username>.
+
+=item B<--gnuplot>
+
+Tries to open (an unbuffered) pipe GNUPLOT to gnuplot.
+
+Options can be set from the rash command line with command
+C<options(..list of options and arguments...)>
+
+=cut
+
+sub options {
+    close(GNUPLOT) if $_options{gnuplot};
+    db_close() if $_options{db_connection};
+    %_options = ();
+    my $i = 0;
+    while ($i <= $#_) {
+	$_ = $_[$i];
+	if (/^--database=(\w+)/) {
+	    $_options{database} = $1;
+	} elsif (/^--username=(\w+)/) {
+	    $_options{username} = $1;
+	} elsif (/^--debug/) {
+	    $_options{debug} = 1;
+	} elsif (/^--host\w*=(\w+)/) {
+	    $_options{hostname} = $1;
+	} elsif (/^-h$/) {
+	    $i++;
+	    $_options{hostname} = $_[$i];
+	} elsif (/^--db-connection$/) {
+	    $_options{db_connection} = 1;
+	} elsif (/^--gnuplot$/) {
+	    $_options{gnuplot} = 1;
+	} elsif (/^-a$/) {
+	    $_options{db_connection} = 1;
+	    $_options{gnuplot} = 1;
+	} else {
+	    carp "unknown argument: $_\n";
+	}
+	$i++;
+    }
+    if ($_options{gnuplot}) {
+	open GNUPLOT, "| gnuplot" or carp "can't open gnuplot: $!\n";
+	select(GNUPLOT); $| = 1;
+	select(STDOUT);
+    }
+    db_connect(\%_options,{PrintError=>1}) if $_options{db_connection};
+}
+
+=pod
+
+=head1 COMMANDS
+
+=head2 output
+
+Command C<output(filename)> directs all output to file F<filename>.
+If filename is not given, directs all output to STDOUT.
+
+=cut
+
+sub output {
+    my($fn,%o) = @_;
+    if ($fn and exists $o{gnuplot_add}) {
+	open OUTPUT,">>$fn" or croak("can't open $fn: $!\n");
+	print OUTPUT "\n\n";
+	select OUTPUT;
+    } elsif ($fn) {
+	open OUTPUT, ">$fn" or croak "can't open $fn: $!\n";
+	select OUTPUT;
+    } else {
+	close(OUTPUT);
+	select STDOUT;
+    }
+}
+
+=pod
+
+=head2 p
+
+Command C<p> is the standard perl print except when the first
+parameter is a reference to a hash or to an array.  If the first
+parameter is a hash reference, C<p> sorts the hash numerically and
+prints it using two columns (separated by single space) or several
+columns if the values are references to arrays. If the first parameter
+is a hash reference, C<p> prints the array elements, each on its own
+row. If the element is a reference to an array, it is expanded.
+
+=cut
+
+sub p {
+    my($this,%o) = @_;
+    output($o{file}) if $o{file};
+    if (ref($this) eq 'HASH') {
+	foreach (sort {$a<=>$b} keys %{$this}) {
+	    my $v = $$this{$_};
+	    if (ref($v) eq 'ARRAY') {
+	      print "$_ @{$v}\n";
+	    } else {
+	      print "$_ $v\n";
+	    }
+	}
+    } elsif (ref($this) eq 'ARRAY') {
+	foreach (@{$this}) {
+	    if (ref($_) eq 'ARRAY') {
+	      print "@{$_}\n";
+	    } else {
+	      print "$_\n";
+	    }
+	}
+    } else {
+      print @_,"\n";
+    }
+    output() if $o{file};
+}
+
+=pod
+
+=head2 plot
+
+Command C<plot(argument,options)> plots the argument using
+gnuplot. The argument should be either a reference to a hash (the
+returned value of raster method C<contents>, C<histogram>, or some such)
+or a string. The options should be a hash, i.e, a list of key, value
+-pairs written using the format: key1=>value1, key1=>value1, ...
+
+For example:
+
+C<< plot($raster->contents,title=>'cell count of raster',with=>'impulses'); >>
+
+A hash argument is printed to a temporary file (F<.raster-tmp>)
+and the command line
+
+C<plot I<xrange> ".raster-tmp" I<title> with I<with>>
+
+I<range> = '' or [I<keymin-1>:I<keymax+1>] if with equals 'impulses'
+
+I<title> = 'notitle' or 'title B<title>' if B<title> is given in the command line as an option title=>'B<title>'
+
+I<with> = 'lines' or what is given as an option with=>'B<with>'
+
+is piped to gnuplot.
+
+A string argument is piped to gnuplot as a part of the command line
+
+C<plot I<xrange> I<yrange> argument I<title>>
+
+xrange, yrange, and title are empty strings or those given as options.
+If argument is a readable file, it is surrounded by double quotation marks.
+
+Gnuplot can be instructed to plot into a png-file using option file=>1.
+
+=cut
+
+sub gnuplot {
+    my $line = shift;
+    $line = '' unless $line;
+    print "$line\n" if $_options{debug};
+    print GNUPLOT "$line\n";
+}
+
+sub plot {
+    my($this,%o) = @_;
+    if ($o{file}) {
+	gnuplot("set terminal png");
+	gnuplot("set output \"$o{file}.png\"");
+    }
+    $o{with} = 'lines' unless $o{with};
+    my $xrange = $o{xrange} ? $o{xrange} : '';
+    my $yrange = $o{yrange} ? $o{yrange} : '';
+    $o{title} = '' unless $o{title};
+    my $using = $o{using} ? 'using ' . $o{using} : 'using 1:2';
+    my $other = $o{other} ? ', ' . $o{other} : '';
+
+    gnuplot("set xdata");
+    gnuplot("set format x");
+
+    # the plottable may be a HASH ref, ARRAY ref, Timeseries, or an array of those
+    # support only array of Timeseries for now
+
+    my $plottable = 'datafile';
+    my @datasets = ($this);
+    my @title;
+    my @with;
+    if (ref($this)) {
+	if (ref($this) eq 'ARRAY') {
+	    @datasets = @{$this};
+	    if (ref($this->[0]) eq 'Timeseries') { # list of timeseries
+		$plottable = 'timeseries';
+	    } else { # list of arrays
+		$plottable = 'array';
+	    }
+	    for my $set (0..$#datasets) {
+		$title[$set] = ref($o{title}) ? $o{title}->{$set} : $o{title};
+		$with[$set] = ref($o{with}) ? $o{with}->{$set} : $o{with};
+	    }
+	} elsif (ref($this) eq 'HASH') {
+	    $plottable = 'hash';
+	    my $set = 0;
+	    $with[$set] = ref($o{with}) ? $o{with}->{$set} : $o{with};
+	    $title[$set] = ref($o{title}) ? $o{title}->{$set} : $o{title};
+	    foreach my $name (sort keys %{$this}) {
+		if (ref($this->{$name}) eq 'Timeseries') { # hash of timeseries
+		    $plottable = 'timeseries';
+		    $datasets[$set] = $this->{$name};
+		    if ($o{title}) {
+			$title[$set] = ref($o{title}) ? $o{title}->{$set} : $o{title};
+		    } else {
+			$title[$set] = $name;
+		    }
+		    $with[$set] = ref($o{with}) ? $o{with}->{$set} : $o{with};
+		    $set++;
+		}
+	    }
+	} elsif (ref($this) eq 'Timeseries') {
+	    $plottable = 'timeseries';
+	} else {
+	    croak "don't know how to plot a " . ref($this) . "\n";
+	}
+    }
+
+    my @what; # = for each dataset: <function> | {"<datafile>" {datafile-modifiers}} 
+    my @index;
+    my @using;
+    if ($plottable eq 'array' or $plottable eq 'hash') {
+	my($minx,$maxx);
+	my $r = 0;
+	for my $set (0..$#datasets) {
+	    unless (ref($datasets[$set])) {
+		$what[$set] = $datasets[$set];
+		$index[$set] = '';
+		$using[$set] = '';
+		next;
+	    }
+	    output($_plot_file, $set ? (gnuplot_add=>1) : (0=>0));
+	    p $datasets[$set];
+	    output;
+	    $what[$set] = "\"$_plot_file\"";
+	    $index[$set] = "index $set";
+	    $using[$set] = $using;
+	    if ($with[$set] eq 'impulses') {
+		$r = 1;
+		if (ref($datasets[$set]) eq 'HASH') {
+		    foreach (keys %{$this}) {
+			$minx = $_ if !defined($minx) or $_ < $minx;
+			$maxx = $_ if !defined($maxx) or $_ > $maxx;
+		    }
+		} else {
+		    foreach (@{$datasets[$set]}) {
+			$minx = $$_[0] if !defined($minx) or $$_[0] < $minx;
+			$maxx = $$_[0] if !defined($maxx) or $$_[0] > $maxx;
+		    }
+		}
+		$minx--;
+		$maxx++;
+	    }
+	}
+	$xrange = "[$minx:$maxx]" if $r;
+    } elsif ($plottable eq 'timeseries') {
+	for my $set (0..$#datasets) {
+	    $with[$set] = ref($o{with}) ? $o{with}->{$set} : $o{with};
+	    if ($o{scaled}) {
+		$datasets[$set]->scale->save($_plot_file, $set ? (gnuplot_add=>1) : (0=>0));
+	    } else {
+		$datasets[$set]->save($_plot_file, $set ? (gnuplot_add=>1) : (0=>0));
+	    }
+	    $what[$set] = "\"$_plot_file\"";
+	    $index[$set] = "index $set";
+	    $using[$set] = $using;
+	}
+	gnuplot("set xdata time");
+	gnuplot("set timefmt \"%Y%m%d\"");
+	gnuplot("set format x \"%d.%m\\n%y\"");
+    } else {
+	$title[0] = $o{title} ? $o{title} : '';
+	$with[0] = $o{with} ? $o{with} : 'points';
+	$index[0] = 'index 0';
+	$using[0] = $using;
+	if (-r $this) {
+	    $what[0] = "\"$this\"";
+	} else {
+	    $what[0] = $this;
+	    $using[0] = '';
+	}
+    }
+
+    if ($#datasets == 0) {
+	gnuplot("plot $xrange$yrange $what[0] $using[0] title \"$title[0]\" with $with[0]" . $other);
+    } else {
+#	unless (@names) {
+#	    @names = $_input =~ /\$[a-zA-Z]\w*/g;
+#	    unless (@names) {
+#		@names = (0..$#datasets);
+#	    }
+#	}
+	$title[0] = '' unless $title[0];
+	my $plot = "plot $xrange$yrange $what[0] $index[0] $using[0] title \"$title[0]\" with $with[0]";
+	for my $set (1..$#datasets) {
+	    $title[$set] = '' unless $title[$set];
+	    $plot .= ", $what[$set] $index[$set] $using[$set] title \"$title[$set]\" with $with[$set]";
+	}
+	gnuplot($plot . $other);
+    }
+
+    gnuplot("set xdata") if $plottable eq 'timeseries';
+    if ($o{file}) {
+	gnuplot("set terminal x11");
+	gnuplot("set output");
+    }
+}
+
+sub fit {
+    my($data,$fct) = @_;
+    my @params = $fct =~ /\b[a-zA-Z]\w*\b/g;
+    my %params = map {$_=>1} @params;
+    @params = ();
+    foreach (keys %params) {
+	push @params,$_ unless /^[xyz]/;
+    } 
+    my $params = join(',',@params);
+    print "using params: $params\n";
+    gnuplot("f(x) = $fct");
+    gnuplot("FIT_LIMIT = 1e-6");
+    output($_plot_file);
+    p($data);
+    output();
+    gnuplot("fit f(x) '$_plot_file' via $params");
+}
+
+=pod
+
+=head2 slurp
+
+Command C<slurp(filename,options)> reads the contents of a file into a
+hash (or an array, if option array=>1 is given). It is assumed that
+the file contains data in two (for hash) or more columns (for a
+array). In the case of an array the array values are references to
+arrays which each hold the values of one row of data.
+
+=cut
+
+sub slurp {
+    my($file,%o) = @_;
+    if (!open S,$file) {
+	print("$file: $!\n");
+	return;
+    }
+    my $ret;
+    if ($o{array}) {
+	$ret = [];
+    } else {
+	$ret = {};
+    }
+    while (<S>) {
+	chomp;
+	s/^\s+//;
+	s/\s+$//;
+	next if /^#/;
+	next if $_ eq '';
+	last if $_ eq '__END__';
+	my(@l) = split /[\s,]+/;
+	if ($o{array}) {
+	    my $l = [@l];
+	    $ret->[$#$ret+1] = $l;
+	} else {
+	    $ret->{$l[0]} = $l[1];
+	}
+    }
+    close S;
+    return $ret;
+}
+
+sub nh {
+    my($gd,$i0,$j0,$k) = @_;
+    $k = 1 if !$k;
+    my($i,$j);
+    for $i ($i0-$k..$i0+$k) {
+	for $j ($j0-$k..$j0+$k) {
+	    print $gd->get($i,$j),' ';
+	}
+	print("\n");
+    }
+}
+
+=pod
+
+=head1 vars
+
+Command C<vars> lists all variables, and if they are references, the
+type of data which they refer to.
+
+=cut
+
+sub vars {
+    my @scalars;
+    my @arrays;
+    my @hashes;
+    foreach (sort keys %main::) {
+	next if /^_/;
+#	next if /^[A-Z]/;
+	next if /^$/;
+	next if /^scalars$/;
+	next if /^[^a-z]/;
+	next if /::/;
+	local *sym = $main::{$_};
+	my $scalar = ref($sym);
+	$scalar = 'scalar' unless $scalar;
+	push @scalars, "$scalar \$$_ is defined\n" if defined($sym);
+	push @arrays, "array \@$_ is defined\n" if defined(@sym);
+	push @hashes, "hash \%$_ is defined\n" if defined(%sym);
+    }
+    foreach (@scalars) {
+	print;
+    }
+    foreach (@arrays) {
+	print;
+    }
+    foreach (@hashes) {
+	print;
+    }
+}
+
+=pod
+
+=head1 SIGINT
+
+rash installs a SIGINT handler which may used to cancel lengthy raster
+operations.
+
+=cut
+
+sub cntrlc {
+    my($sig) = @_;
+    &Raster::gdsigint(1);
+}
+
+=pod
+
+=head1 HELP
+
+Commands C<?> and C<help> run C<perldoc rash> thus showing this
+manual page.
+
+Command C<? Raster> and C<help Raster> run C<man Raster> thus showing the
+manual page of the Raster module.
+
+=head1 EXECUTING SYSTEM COMMANDS
+
+A command line which begins with '!' is interpreted as a system
+command.
+
+=cut
+
+sub a2xy {
+    my $a = shift;
+    my @xy;
+    my $i = 0;
+    foreach (@{$a}) {
+	push @xy,[$i,$_];
+	$i++;
+    }
+    return [@xy];
+}
+
+options(@ARGV);
+$SIG{INT} = 'cntrlc';
+$_term = new Term::ReadLine 'rash';
+my $_hfile = "$ENV{HOME}/.rash_history";
+$_term->ReadHistory($_hfile);
+while ( defined ($_ = $_term->readline('>')) ) {
+    chomp;
+    $_input = $_;
+    if (/^\?$/ or /^help$/i) {
+	system "perldoc $0";
+    } elsif (/^\? Raster$/ or /^help Raster$/i) {
+	system "man Raster";
+    } elsif (/^\!(.*)/) {
+	system $1;
+    } else {
+	eval;
+	print $@;
+    }
+#    $_term->addhistory($_input) if $_input =~ /\S/;
+}
+$_term->WriteHistory($_hfile);
+db_close() if $_options{db_connection};
+if ($_options{gnuplot}) {
+    close(GNUPLOT);
+    unlink $_plot_file;
+}
+print "\n";
+
+
+##### cellular automatons a'la new kind of science
+
+sub ca {
+    my $g = shift;
+    my $rule = shift;
+    unless (ref($rule)) {
+	my @rule = ();
+	my $e = 128;
+	for (0..7) {
+	    if ($rule >= $e) {
+		$rule[$_] = 1;
+		$rule -= $e;
+	    }
+	    $e /= 2;
+	}
+	@{$rule} = @rule;
+    }
+    my ($M,$N) = $g->size;
+    $g *= 0;
+    $g->set(0,int($N/2),1);
+    for my $i (1..$M-1) {
+	my $l = $g->get($i-1,0);
+	my $m = $g->get($i-1,1);
+	for my $j (1..$N-2) {
+	    my $r = $g->get($i-1,$j+1);
+	    $g->set($i,$j,1) if $rule->[0] and $l and $m and $r;
+	    $g->set($i,$j,1) if $rule->[1] and $l and $m and !$r;
+	    $g->set($i,$j,1) if $rule->[2] and $l and !$m and $r;
+	    $g->set($i,$j,1) if $rule->[3] and $l and !$m and !$r;
+	    $g->set($i,$j,1) if $rule->[4] and !$l and $m and $r;
+	    $g->set($i,$j,1) if $rule->[5] and !$l and $m and !$r;
+	    $g->set($i,$j,1) if $rule->[6] and !$l and !$m and $r;
+	    $g->set($i,$j,1) if $rule->[7] and !$l and !$m and !$r;
+	    $l = $m;
+	    $m = $r;	    
+	}
+    }
+}
+
+
+############### STATISTICAL ANALYSIS TOOLPACK
+
+##### helper functions 
+
+sub size { # this is a row-based size
+    my $A = shift;
+    if (ref($A) eq 'Math::MatrixReal') {
+	my ($m,$n) = $A->dim;
+	return ($m,$n);
+    } elsif (ref($A) eq 'ARRAY') {
+	my $m = $#$A + 1;
+	my $n;
+	for (@{$A}) {
+	    last unless ref($_) eq 'ARRAY';
+	    $n = $#$_ + 1 if !$n or $#$_ + 1 > $n;
+	}
+#	print "size is $m x $n (row-based)\n";
+	return ($m,$n);
+    }
+#    print "is not a matrix\n";
+}
+
+sub transpose {
+    my $A = shift;
+    my $AT;
+    if (ref($A) eq 'Math::MatrixReal') {
+	my ($r,$c) = $A->dim;
+	$AT = new Math::MatrixReal $c,$r;
+	$AT->transpose($A);
+    } else {
+	for $i (0..$#$A) {
+	    for $j (0..$#{$A->[$i]}) {
+		$AT->[$j]->[$i] = $A->[$i]->[$j];
+	    }
+	}
+    }
+    return $AT;
+}
+
+sub inverse {
+    my $A = shift;
+    my $LR_matrix = $A->decompose_LR();
+    my $Ainv = $LR_matrix->invert_LR();
+    return $Ainv;
+}
+
+##### correlations, input is [[column1],[column2]] columns are sample vectors
+##### you may get X like this for example:
+
+# $d = sql("select parno,thetki,arvo from data where stun=21 order by thetki");
+# $t = Timeseries::hash($d);
+# @t=();foreach (keys %{$t}) {push @t,$t->{$_}}
+# Timeseries::intersection(@t);
+# @X=();foreach (sort keys %{$t}) {push @X,$t->{$_}->value_array}
+
+#### if X is from Timeseries::xy, transpose it first
+
+sub correlations {
+    my($X) = @_;
+
+    my @one = @{$$X[0]};
+    foreach (@one) {$_=1}
+    unshift @{$X},[@one];
+
+    $X = new_from_cols Math::MatrixReal $X;
+    my($n,$k) = $X->dim;
+    $k--;
+
+    my $XT = transpose($X);
+    my $A = $XT * $X;
+
+    my $R;
+    for my $i (1..$k) {
+	my $Sii = $A->element($i+1,$i+1) - $A->element($i+1,1)**2/$n;
+	for my $j (1..$k) {
+	    my $Sij = $A->element($i+1,$j+1) - 
+		$A->element($i+1,1)*$A->element($j+1,1)/$n;
+	    my $Sjj = $A->element($j+1,$j+1) - $A->element($j+1,1)**2/$n;
+	    $R->[$i-1]->[$j-1] = $Sij/sqrt($Sii*$Sjj);
+	}
+    }
+    return $R;
+}
+
+##### multiple linear regression, input is similar as above, 
+##### X contains sample vectors of independent variables
+##### y contains the sample vector of dependent variable
+
+# test: Walpole, Myers 9.3
+
+sub test_linreg {
+    @X = ([1.74,6.32,6.22,10.52,1.19,1.22,4.10,6.32,4.08,4.15,10.15,1.72,1.70],
+	  [5.30,5.42,8.41,4.63,11.60,5.85,6.62,8.72,4.42,7.60,4.83,3.12,5.30],
+	  [10.80,9.40,7.20,8.50,9.40,9.90,8.00,9.10,8.70,9.20,9.40,7.60,8.20]);
+    @y = (25.5,31.2,25.9,38.4,18.4,26.7,26.4,25.9,32.0,25.2,39.7,35.7,26.5);
+    $r = linreg(\@X,\@y);
+    p($r);
+}
+
+
+sub linreg {
+    my($X,$y) = @_;
+
+    my @X = @{$X};
+    my @one = @{$X[0]};
+    foreach (@one) {$_=1}
+    unshift @X,[@one];
+
+    $X = new_from_cols Math::MatrixReal [@X];
+    $y = new_from_cols Math::MatrixReal [$y];
+    my($n,$k) = $X->dim;
+    $k--;
+
+    my $XT = transpose($X);
+    my $A = $XT * $X;
+    my $g = $XT * $y;
+    my $Ainv = inverse($A);
+    croak "no solution\n" unless $Ainv;
+    my $b = $Ainv * $g;
+
+    my @b;
+    for my $i (1..$k+1) {
+	$b[$i-1] = $b->element($i,1);
+    }
+
+    my $temp = $g->element(1,1)**2/$n;
+
+    my $SST = (transpose($y) * $y)->element(1,1) - $temp;
+    my $SSR = (transpose($b) * $g)->element(1,1) - $temp;
+    my $SSE = $SST - $SSR;
+    my $R2 = $SSR/$SST;
+
+    my $dof = $n-$k-1;
+    my $s2 = $SSE/$dof;
+
+    my $f = $SSR/$k/$s2;
+
+    my @m;
+    for my $i (1..$#b) {
+	push @m,"b$i*x$i";
+    }
+    my $m = join(' + ',@m);
+
+#    print "model: y = b0 + $m\n";
+#    print "n = $n, k = $k, dof = $dof\n";
+#    print "SST = $SST\n";
+#    print "SSR = $SSR\n";
+#    print "SSE = $SSE\n";
+#    print "R^2 = $R2\n";
+#    print "f = $f\n";
+
+    my @v;
+    my @t;
+    for my $i (0..$#b) {
+	$v[$i] = $s2 * $Ainv->element($i+1,$i+1);
+	$t[$i] = $b[$i] / sqrt($v[$i]);
+#	print "b$i = $b[$i], s2 = $v[$i], t = $t[$i]\n";
+    }
+    return [[@b],[@v],[@t],[$SST,$SSR,$SSE,$R2,$f],[$n,$k,$dof]];
+}
+
+

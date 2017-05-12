@@ -1,0 +1,85 @@
+#!/usr/bin/perl -w
+
+BEGIN { $Gimp::verbose = 1; }
+use Gimp;
+use strict;
+use warnings;
+
+my $OTHER_EVENTLOOP = 0;
+
+Gimp::register_callback extension_gp_test => sub {
+  # do some relevant initialisation here
+  Gimp->install_temp_proc(
+    "perl_fu_temp_demo", "Demo Gimp-Perl temp proc",
+    "Demo a Gimp-Perl extension's temp proc",
+    "Ed J", "Ed J", "2014-04-11",
+    "<Toolbox>/Xtns/Perl/Test/Temp Proc demo", undef,
+    &Gimp::TEMPORARY,
+    [
+      # must take this parameter first, can take others
+      [ &Gimp::PDB_INT32, 'run_mode', 'Run-mode', 0 ],
+    ],
+    [],
+  );
+  Gimp->extension_ack;
+  if ($OTHER_EVENTLOOP) {
+    Gimp->extension_enable;
+    # enter e.g. Gtk event loop
+  } else {
+    while (1) {
+      Gimp->extension_process(0);
+    }
+  }
+};
+
+Gimp::register_callback perl_fu_temp_demo => sub {
+  my ($run_mode) = @_;
+  # here could bring up UI if $run_mode == RUN_INTERACTIVE
+};
+
+Gimp::on_query {
+   Gimp->install_procedure(
+      "extension_gp_test", "Demo Gimp-Perl extension",
+      "Demo a Gimp-Perl extension",
+      "Ed J", "Ed J", "2014-04-11",
+      undef, undef,
+      &Gimp::EXTENSION,
+      [],
+      [],
+   );
+};
+
+exit Gimp::main;
+__END__
+
+=head1 NAME
+
+extension_gp_test - Demo Gimp::Extension
+
+=head1 SYNOPSIS
+
+<None>
+
+=head1 DESCRIPTION
+
+Example extension that does not use L<Gimp::Extension>.
+
+=head1 PARAMETERS
+
+ # none
+
+=head1 RETURN VALUES
+
+ # none
+
+=head1 AUTHOR
+
+Ed J
+
+=head1 DATE
+
+2014-05-03
+
+=head1 LICENSE
+
+Same terms as Gimp-Perl.

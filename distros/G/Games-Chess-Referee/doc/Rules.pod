@@ -1,0 +1,721 @@
+=pod
+
+
+=head1 NAME
+
+Chess - Rules
+
+
+=head1 SYNOPSIS
+
+The rules of chess, including a glossary of terms.
+
+
+=head1 DESCRIPTION
+
+This document describes the rules of chess, along with associated terminology that is used
+in the description and implementation of the Games::Chess::Referee Perl module.
+
+
+=head1 EQUIPMENT
+
+The equipment of chess consists of a B<board>, two B<players>, and a set of B<chessmen>.
+
+
+=head2 The Board
+
+The board consists of a square lattice of equally sized square B<spaces>, with no gaps in between
+the spaces. Sometimes the spaces are called B<squares>.
+
+The figure below shows a common way to display the board in a text-only situation. The dots on
+the interior represent the spaces.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . . . . . . | 8
+    7 | . . . . . . . . | 7
+    6 | . . . . . . . . | 6
+    5 | . . . . . . . . | 5
+    4 | . . . . . . . . | 4
+    3 | . . . . . . . . | 3
+    2 | . . . . . . . . | 2
+    1 | . . . . . . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+The spaces on the board are of two different kinds. Regardless of the actual distinguishing
+characteristics involved, one kind is said to be of the color `B<white>', and the other is `B<black>'.
+These names are used to correspond to the names given to the players (see below).
+
+The rows are called B<ranks>, and the columns are called B<files>.
+
+In B<algebraic notation>, the ranks are given numbers from 1 to 8 and the files
+and are given letters from `a' to `h'. The board is conventionally drawn as above, with
+the number 1 below the number 8 and the letter `a' to the left of the letter `h'.
+Each space has a name formed by naming its file letter, followed by its
+rank number. So, the four corners of the board are named: a1, a8, h1, and h8.
+
+In B<traditional notation>, the ranks are divided into two groups, the B<queen's side> is
+the left half of the figure above, and the B<king's side> is the right half. The ranks
+are numbered as in algebraic notation, and the files are named, from left to right in the
+figure above, queen's rook, queen's knight, queen's bishop, queen, king, king's bishop,
+king's knight, and king's rook.
+
+The lower-left space (a1, or queen's rook 1) is black, and neighboring spaces along ranks and along files
+alternate between white and black, so that no two spaces sharing an edge are of the same
+color. Another way to remember this is the mnemonic ``light on right'', which has an equivalent effect.
+
+
+=head2 The Players
+
+Chess is played by two B<players>. One player is designated color `white', and the other is designated
+`black'. White's chessmen are designated by upper-case letters, while black's are designated by
+lower-case letters.
+
+
+=head2 The Chessmen
+
+Each player has a collection of objects corresponding to its color, as follows:
+
+=over 4
+
+=item *
+
+Eight B<pawns>, designated by the letter `p'.
+
+=item *
+
+Two B<rooks>, designated by the letter `r'.
+
+=item *
+
+Two B<knights>, designated by the letter `n'.
+
+=item *
+
+Two B<bishops>, designated by the letter `b'.
+
+=item *
+
+One B<queen>, designated by the letter `q'.
+
+=item *
+
+One B<king>, designated by the letter `k'.
+
+=back
+
+
+
+=head1 PLAY
+
+This section describes the play of the game.
+
+
+=head2 The Object
+
+The object of Chess is to trap the opponent's king.
+
+
+=head2 The Setup
+
+
+The initial board setup is as follows:
+
+        a b c d e f g h
+      +-----------------+
+    8 | r n b q k b n r | 8
+    7 | p p p p p p p p | 7
+    6 | . . . . . . . . | 6
+    5 | . . . . . . . . | 5
+    4 | . . . . . . . . | 4
+    3 | . . . . . . . . | 3
+    2 | P P P P P P P P | 2
+    1 | R N B Q K B N R | 1
+      +-----------------+
+        a b c d e f g h
+
+An easy way to remember how to set up the kings and queens correctly is to place the queen
+on the space of its same color, then place the king next to it.
+
+One player is be designated `white' and the other `black'. White always plays first, so
+it is customary to switch colors each game when the same players will play multiple games. 
+Choosing the player to be white for the first game is either by mutual agreement, or
+random choice. One way is for one player to fetch a pawn of each color, mixing them up
+so that one is in each hand and then allow the opponent to choose one hand.
+
+
+=head2 The Procedure
+
+Gameplay proceeds by the players alternately executing plies. A B<ply> is the taking by 
+a player of a legal action. A white ply followed by a black ply in response is called a 
+B<move> (equivalent to a turn in other games). A ply consists of B<moving> a piece to a new
+space according to the movement style of the piece, or B<capturing> an enemy piece, or
+one of a number of special moves.
+
+
+=head1 MOVES AND CAPTURES
+
+The chess pieces capture in the same ways they move. But, pawns move and capture in
+distinct ways. In no case may two pieces occupy the same space. When one player's
+piece lands on a square containing one of the opponent's pieces, the opponent's
+piece is B<captured> and removed from the board. It is illegal to land a piece on
+a square already occupied by a piece of one's own color.
+
+
+=head2 Pawns
+
+A pawn may move one square towards the opponent's side of the board, as long as the
+destination space is not occupied. If the pawn has not moved previously, and so is
+on its home square at the beginning of the turn, the player may choose to move it
+forward two squares, provided that both of the squares in question are unoccupied.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . . . . . . | 8
+    7 | . . . . . . . . | 7
+    6 | . . . . . . . . | 6
+    5 | . . . . . . . . | 5
+    4 | . . . . . # . . | 4
+    3 | . . . . . # . . | 3
+    2 | . . . . . P . . | 2
+    1 | . . . . . . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+A pawn may capture an enemy piece by moving diagonally forward so that the result is
+as if it had moved one square forward, turned left or right, and moved one space. For
+this to be legal, the destination space must contain an enemy piece. It does not matter
+if the space just forward of its initial position is occupied or not.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . . . . . . | 8
+    7 | . . . . . . . . | 7
+    6 | . . . . . . . . | 6
+    5 | . . . # . # . . | 5
+    4 | . . . . P . . . | 4
+    3 | . . . . . . . . | 3
+    2 | . . . . . . . . | 2
+    1 | . . . . . . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+If the player has a pawn on the rank two away from the opponnent's original pawn rank
+(rank 5 for white, rank 4 for black), a special rule may apply. If the ply just prior
+to this one consisted of the opponent moving one of its pawns from the home rank forward
+two squares in such a way that it would have been vulnerable to a diagonal capture had
+it moved only one square, then on this very next ply, the player may capture the enemy
+pawn by making the diagonal move onto the empty space, as if the enemy pawn had been
+captured ``in passing'' (officially, B<I<en passant>>).
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . . . . . . | 8
+    7 | . . . . . . . . | 7
+    6 | . . . . # . . . | 6
+    5 | . . . . p P . . | 5
+    4 | . . . . . . . . | 4
+    3 | . . . . . . . . | 3
+    2 | . . . . . . . . | 2
+    1 | . . . . . . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+If a pawn lands on the opponent's home rank, it is B<promoted>. The player may choose
+any piece other than a pawn or a king to replace the pawn. The player need not have
+previously lost the piece to a capture, so it is possible to have a board position
+with more than one queen or more than two of some other piece type.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . . P . . . | 8
+    7 | . . . . . . . . | 7
+    6 | . . . . . . . . | 6
+    5 | . . . . . . . . | 5
+    4 | . . . . . . . . | 4
+    3 | . . . . . . . . | 3
+    2 | . . . . . . . . | 2
+    1 | . . . . . . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+
+=head2 Rooks
+
+Rooks move in straight lines along ranks and along files. Each rook move consists of
+a move in a single direction of one or more spaces. A rook may not pass through an
+occupied to space to get to its destination.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . # . . . . . | 8
+    7 | . . # . . . . . | 7
+    6 | . . # . . . . . | 6
+    5 | # # R # # # # # | 5
+    4 | . . # . . . . . | 4
+    3 | . . # . . . . . | 3
+    2 | . . # . . . . . | 2
+    1 | . . # . . . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+
+=head2 Knights
+
+Knights move by hopping over spaces, so there is no need for the spaces between it
+starting and ending positions to be empty. They are the only pieces with this
+capability. A knight moves by jumping in an `L' shape. First, choose a directioon:
+left, right, forward, or backward. Count two squares in this direction, then
+count one square in either of the perpendicular directions. This is the destination
+space. The destination space will always be of opposite color to the starting space.
+
+For the knight marked `N' in the figure below, the eight possible destination
+spaces are marked with `#'.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . . . . . . | 8
+    7 | . . . . . . . . | 7
+    6 | . . # . # . . . | 6
+    5 | . # . . . # . . | 5
+    4 | . . . N . . . . | 4
+    3 | . # . . . # . . | 3
+    2 | . . # . # . . . | 2
+    1 | . . . . . . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+
+=head2 Bishops
+
+Bishops move in diagonal paths, so that they always remain on spaces of the same color as
+their starting space. Choose to move forward or backward, and choose a number of spaces.
+Move the same number of spaces also either left or right.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . . . . . # | 8
+    7 | # . . . . . # . | 7
+    6 | . # . . . # . . | 6
+    5 | . . # . # . . . | 5
+    4 | . . . B . . . . | 4
+    3 | . . # . # . . . | 3
+    2 | . # . . . # . . | 2
+    1 | # . . . . . # . | 1
+      +-----------------+
+        a b c d e f g h
+
+
+=head2 The Queen
+
+The queen moves and captures like a combination of a rook and a bishop. Each ply, the
+queen may be moved either like a rook or like a bishop.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . # . . . # | 8
+    7 | # . . # . . # . | 7
+    6 | . # . # . # . . | 6
+    5 | . . # # # . . . | 5
+    4 | # # # Q # # # # | 4
+    3 | . . # # # . . . | 3
+    2 | . # . # . # . . | 2
+    1 | # . . # . . # . | 1
+      +-----------------+
+        a b c d e f g h
+
+
+=head2 The King
+
+The king moves like the queen, except that it can only move one space at a time.
+
+        a b c d e f g h
+      +-----------------+
+    8 | . . . . . . . . | 8
+    7 | . . . . . . . . | 7
+    6 | . . . . . . . . | 6
+    5 | . . # # # . . . | 5
+    4 | . . # K # . . . | 4
+    3 | . . # # # . . . | 3
+    2 | . . . . . . . . | 2
+    1 | . . . . . . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+There are two special moves available to the king, called B<castling>. If the king has not
+moved from its home space, and one of the rooks has not moved from its home square, castling
+on that side may be possible. Provided that the spaces between the king and the rook in
+question are empty, and that none of the spaces, including the king's and the rook's current
+locations, are guarded by enemy pieces, th king is permitted to move I<two> spaces in the
+direction of the rook, and the rook `simultaneously' (in the same ply) takes up the space
+between the king's old and new locations (`hopping' over the king).
+
+The figure below shows the setup before and after B<castling short>, or B<castling kingside>.
+
+        a b c d e f g h             a b c d e f g h    
+      +-----------------+         +-----------------+  
+    8 | . . . . . . . . | 8     8 | . . . . . . . . | 8
+    7 | . . . . . . . . | 7     7 | . . . . . . . . | 7
+    6 | . . . . . . . . | 6     6 | . . . . . . . . | 6
+    5 | . . . . . . . . | 5     5 | . . . . . . . . | 5
+    4 | . . . . . . . . | 4     4 | . . . . . . . . | 4
+    3 | . . . . . . . . | 3     3 | . . . . . . . . | 3
+    2 | . . . . . . . . | 2     2 | . . . . . . . . | 2
+    1 | . . . . K . . R | 1     1 | . . . . . R K . | 1
+      +-----------------+         +-----------------+  
+        a b c d e f g h             a b c d e f g h    
+
+The figure below shows the setup before and after B<castling long>, or B<castling queenside>.
+
+        a b c d e f g h             a b c d e f g h    
+      +-----------------+         +-----------------+  
+    8 | . . . . . . . . | 8     8 | . . . . . . . . | 8
+    7 | . . . . . . . . | 7     7 | . . . . . . . . | 7
+    6 | . . . . . . . . | 6     6 | . . . . . . . . | 6
+    5 | . . . . . . . . | 5     5 | . . . . . . . . | 5
+    4 | . . . . . . . . | 4     4 | . . . . . . . . | 4
+    3 | . . . . . . . . | 3     3 | . . . . . . . . | 3
+    2 | . . . . . . . . | 2     2 | . . . . . . . . | 2
+    1 | R . . . K . . . | 1     1 | . . K R . . . . | 1
+      +-----------------+         +-----------------+  
+        a b c d e f g h             a b c d e f g h    
+
+
+=head2 Global Considerations
+
+Chess is an idealization of a battle. Each of the pieces has distinct capabilities that
+must be accounted for in formulating strategies and tactics. When examining a board position
+and selecting a move, it is important to pay attention to the guards and threats present before
+and resulting from the move. A piece guards a square if the piece could capture an enemy piece
+on that square on the next ply, not accounting for the fact that the enemy piece may not be able
+to actually execute the capture due to constraints on its own king's disposition.
+
+It is illegal to execute a ply that leaves the king on a guarded square. A player that manages
+to execute a legal ply that causes the opposing king to be on a guarded square has put the
+other player in  `check'.
+
+For example, in this board position:
+
+        a b c d e f g h
+      +-----------------+
+    8 | k . . Q . . . R | 8
+    7 | . . . . . . . . | 7
+    6 | . . . . . . . . | 6
+    5 | . . . . . . . . | 5
+    4 | . . . . . . . . | 4
+    3 | . . . . . . . . | 3
+    2 | . . . . . . . . | 2
+    1 | B . . . K . . . | 1
+      +-----------------+
+        a b c d e f g h
+
+the move 1. Ke1-d1 is not legal, despite the fact that the response 1. ... Qd8xd1 is not
+credible in the sense that the queen is pinned at d8 by the white rook on h8. It is sufficient
+that the queen is guarding the square d1 for it to be illegal for the king to move there.
+
+There are three ways to get one's king out of check:
+
+=over 4
+
+=item 1.
+
+Capture the piece that guards the king's space. If it happens that there is more than
+one such piece (called double check), this option is not available.
+
+=item 2.
+
+Interpose a piece. If the opponent's piece is on a neighboring square, this option is
+not available.
+
+=item 3.
+
+Move the king to an empty unguarded square.
+
+=back
+
+Since it is not permitted to have one's king on a guarded square,
+the other player must respond by securing its king on its next ply, regardless of any other
+opportunites there may be on the board. If there are no legal plies available that accomplish
+this, the player has lost, and the situation is called `checkmate'. If a player is not in check,
+but still has no legal plies, then it is `stalemate', which is the Chess term for a tie game.
+
+The king may never be exposed to the gaze of another piece. So, each potential move must
+be screened first to make sure that after it is executed, no enemy piece guards the king's
+square. Even if it would be illegal for the other piece to move away from its present
+location on the next ply (meaning that although the piece guards the square, it does not
+threaten it)
+
+
+=head2 Move Notation
+
+Each move is given its own line of text. First, the move number, then white's ply, then
+black's response. A ply is denoted by a piece type, followed by a starting square name,
+an action type, an ending square name, and a qualifier. The piece types are: C<P> for
+pawn (usually omitted by convention), C<R> for rook, C<N> for knight, C<B> for bishop,
+C<Q> for queen, and C<K> for king. Square names follow algebraic notation, actions are
+occupy (C<->) and capture (C<x>). The primary qualifiers are: C<+> for check, C<#> for
+checkmate, C<!> for good move, C<?> for bad move, and C<??> for blunder. In practice
+some of these elements can be omitted without ambiguity, and often are.
+
+The game below is an example of scholar's mate.
+
+    1. e4     e5
+    2. Bc4    h6?
+    3. Qh5    ...    Qf3 would also serve.
+    3. ...    a5??
+    4. Qxf7#
+
+Note how move 3 has been split into two lines, and in each case the elided ply is replaced
+with ellipses. This is a common form when providing commentary on the progress of a game.
+
+
+=head1 IMPLEMENTATION
+
+This file describes a notation for describing the possibilities and effects of plies in chess-
+like games.
+
+The king may not move into check, where check is not defined as the ability of the enemy piece
+to execute a capture (since this would involve checking to see that it was legal to vacate the
+space it was on, which would introduce recursion), but on the ability of the enemy piece to
+`see' the king.
+
+
+=head2 Piece Predicates
+
+These predicates refer to the ply piece by default:
+
+=over 4
+
+=item C<white>
+
+The piece under consideration is white.
+
+=item C<black>
+
+The piece under consideration is black.
+
+=item C<home>
+
+The piece is in its home position and has not moved prior.
+
+=back
+
+
+=head2 Space Predicates
+
+These predicates refer to the `to' square by default:
+
+=over 4
+
+=item C<empty>
+
+The resulting space is not occupied.
+
+=item C<open>
+
+The spaces between the starting and resulting square are empty.
+
+=item C<clear>
+
+The intervening spaces are open and not guarded, and the starting and ending spaces
+are not guarded. This is used in the description of castling.
+
+=item C<enemy>
+
+The space is occupied by an enemy piece.
+
+=item C<friend>
+
+The space is occupied by a friendly piece.
+
+=item C<pawn>
+
+The space contains a pawn.
+
+=item C<guarded>
+
+The square is guarded by an enemy piece.
+
+=back
+
+
+=head2 Other predicates
+
+=over 4
+
+=item C<last_from>
+
+True if the square given is the `from' from the last ply.
+
+=item C<last_to>
+
+True if the square given is the `to' from the last ply.
+
+=item C<last>
+
+True if the first square is the `from' and the second square is the `to' of the last ply.
+
+=back
+
+
+=head2 Relative Spaces
+
+=over 4
+
+=item C<left>
+
+The space immediately to the left, delta of  [-1,  0].
+
+=item C<right>
+
+The space immediately to the right, delta of [+1,  0].
+
+=item C<kings_rook>
+
+The rook home position on the king's side.
+
+=item C<queens_rook>
+
+The rook home position on the queen's side.
+
+=back
+
+
+=head2 Vectors
+
+vectors may be added, subtracted, and multiplied by a constant.
+
+=over 4
+
+=item C<ahead>
+
+The space immediately `ahead', meaning away from the home row of the color.
+
+=item C<king>
+
+Towards the king one square.
+
+=item C<queen>
+
+Towards the queen one square.
+
+=back
+ 
+
+=head2 Compound predicates
+
+=over 4
+
+=item C<white_passant>
+
+C<
+(enemy(left) and pawn(left) and last(left + [0, 2], left))
+or
+(enemy(right) and pawn(right) and last(right + [0, 2], right))
+>
+
+=item C<black_passant>
+
+C<
+(enemy(left) and pawn(left) and last(left - [0, 2], left))
+or
+(enemy(right) and pawn(right) and last(right - [0, 2], right))
+>
+
+=item C<passant>
+
+C<
+(white and white_passant) or (black and black_passant)
+>
+
+=back
+
+The default action is for the piece to move to the destination and the enemy piece at that
+location to be removed. For specialty moves, these can be overridden.
+
+It is assumed that any moves generated by these rules that produce off-board result
+positions are rejected.
+
+
+=head2 Actions
+
+=over 4
+
+=item C<mutate>
+
+After the move, mutat to the designated piece (used for pawn promotion in standard chess).
+
+=back
+
+
+=head2 Formalized Plies
+
+Pawns:
+
+    [ahead]         if empty;
+    [ahead * 2]     if empty and clear and home;
+    [ahead + left]  if enemy or passant;
+    [ahead + right] if enemy or passant.
+
+Rooks:
+
+    [0, ?]   if clear and not friend;
+    [?, 0]   if clear and not friend.
+
+Knights:
+
+    [+1, +2] if not friend;
+    [+1, -2] if not friend;
+    [-1, +2] if not friend;
+    [-1, -2] if not friend;
+    [+2, +1] if not friend;
+    [+2, -1] if not friend;
+    [-2, +1] if not friend;
+    [-2, -1] if not friend.
+
+Bishops:
+
+    [?,  ?]  if clear and not friend;
+    [?, -?]  if clear and not friend.
+
+Queens:
+
+    [0, ?]   if clear and not friend;
+    [?, 0]   if clear and not friend.
+    [?, ?]   if clear and not friend;
+    [?, -?]  if clear and not friend.
+
+Kings:
+
+    [-1, -1] if not friend and not threat;
+    [-1,  0] if not friend and not threat;
+    [-1, +1] if not friend and not threat;
+    [ 0, -1] if not friend and not threat;
+    [ 0, +1] if not friend and not threat;
+    [+1, -1] if not friend and not threat;
+    [+1,  0] if not friend and not threat;
+    [+1, +1] if not friend and not threat;
+    [king * 2]  if home and home[kings_rook] and clear[king, kings_rook];
+    [queen * 3] if home and home[queens_rook] and clear[king, queens_rook];
+
+
+We still need notations for the rook movements during castling.
+
+Globally: C<not threat[king]>;
+
+
+=head1 AUTHOR
+
+Gregor N. Purdy (C<gregor@focusresearch.com>).
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 1999-2006 Gregor N. Purdy. All rights reserved.
+
+This program is free software. You may redistribute and/or
+modify it under the same terms as Perl iteself.
+
+=cut
+

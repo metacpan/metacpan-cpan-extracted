@@ -1,0 +1,13 @@
+0.01 - 	First release
+
+0.02 - 	Cleaned up some code. Added POD docs
+
+0.03 - 	Added exception-dates.
+
+0.04 - 	Completed the menus for all choices.
+	Added some coloring to get user attention while building the model.
+	
+0.05 -	Left aligned all the labels.
+	Now you can drag from the preview and drop into the exceptions list.	
+
+0.06 - Moved a lot of code into Gtk2::Ex::CalendarButton

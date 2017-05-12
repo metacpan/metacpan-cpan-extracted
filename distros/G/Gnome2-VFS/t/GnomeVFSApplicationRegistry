@@ -1,0 +1,55 @@
+#!/usr/bin/perl -w
+use strict;
+use Gnome2::VFS;
+
+use Test::More;
+
+# $Id$
+
+plan -d "$ENV{ HOME }/.gnome" ?
+  (tests => 12) :
+  (skip_all => "You have no ~/.gnome");
+
+Gnome2::VFS -> init();
+Gnome2::VFS::ApplicationRegistry -> reload();
+
+###############################################################################
+
+ok(Gnome2::VFS::ApplicationRegistry -> get_applications());
+
+my $application = Gnome2::VFS::ApplicationRegistry -> new("gnome-terminal");
+isa_ok($application, "Gnome2::VFS::Application");
+
+ok($application -> exists());
+ok($application -> get_keys());
+is($application -> peek_value("name"), "Terminal");
+is_deeply([$application -> get_bool_value("can_open_multiple_files")], [0, 1]);
+
+$application -> set_value("name", "Terminal Bla");
+$application -> set_bool_value("can_open_multiple_files", 0);
+$application -> unset_key("name");
+
+ok($application -> get_mime_types());
+ok($application -> supports_mime_type(($application -> get_mime_types())[0]));
+
+$application -> add_mime_type("text/plain");
+$application -> remove_mime_type("text/plain");
+
+$application -> clear_mime_types();
+
+ok(not $application -> supports_uri_scheme("http"));
+
+my $mime_application = $application -> get_mime_application();
+isa_ok($mime_application, "Gnome2::VFS::Mime::Application");
+ok(not $mime_application -> is_user_owned());
+$mime_application -> save();
+
+$application -> remove_application();
+
+###############################################################################
+
+Gnome2::VFS::ApplicationRegistry -> reload();
+is(Gnome2::VFS::ApplicationRegistry -> sync(), "ok");
+
+Gnome2::VFS::ApplicationRegistry -> shutdown();
+Gnome2::VFS -> shutdown();

@@ -1,0 +1,310 @@
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="828.5" height="628" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Generated at Sun Apr  9 18:34:53 2006 by:
+  Graph::Easy v0.44
+  Graph::Easy::As_svg v0.18
+-->
+
+<title>Untitled graph</title>
+<defs>
+ <!-- open arrow head -->
+ <g id="ah" stroke-linecap="round" stroke-width="1">
+  <line x1="-8" y1="-4" x2="1" y2="0" />
+  <line x1="1" y1="0" x2="-8" y2="4" />
+ </g>
+ <!-- filled arrow head -->
+ <g id="ahf" stroke-linecap="round" stroke-width="1">
+  <polygon points="-8,-4, 1,0, -8,4"/>
+ </g>
+ <!-- open arrow head for bold edges -->
+ <g id="ahb" stroke-linecap="round" stroke-width="1">
+  <line x1="-8" y1="-4" x2="1" y2="0" />
+  <line x1="1" y1="0" x2="-8" y2="4" />
+  <polygon points="1,0, -4,-2, -4,2" />
+ </g>
+
+ <!-- class definitions -->
+ <style type="text/css"><![CDATA[
+ .edge {
+  fill: inherit;
+  font: monospaced, courier-new, courier, sans-serif;
+  minlen: 3;
+  stroke: black;
+  style: bold;
+ }
+ .node {
+  text-anchor: middle;
+  fill: white;
+ }
+ .text {
+  text-anchor: middle;
+  font-size: 17px;
+ }
+ ]]></style>
+</defs>
+
+<g class="edge" stroke-width="17">
+ <!-- edge from A to B -->
+ <!-- horizontal -->
+ <line x1="270.5" y1="318.75" x2="330" y2="318.75" stroke="black" />
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(262 318.75)rotate(180)scale(5)"/>
+
+ <!-- horizontal -->
+ <line x1="330" y1="318.75" x2="381" y2="318.75" stroke="black" />
+
+ <!-- horizontal -->
+ <line x1="381" y1="318.75" x2="440.5" y2="318.75" stroke="black" />
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(449 318.75)scale(5)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from A to B -->
+ <!-- south/east corner -->
+ <g stroke="black" stroke-width="17">
+  <line x1="219.5" y1="221" x2="219.5" y2="280.5" />
+  <line x1="211" y1="229.5" x2="245" y2="229.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="245" y1="229.5" x2="466" y2="229.5" stroke="black" stroke-width="17" />
+
+ <!-- south/west corner -->
+ <g stroke="black" stroke-width="17">
+  <line x1="512.75" y1="221" x2="512.75" y2="260.1" />
+  <line x1="466" y1="229.5" x2="521.25" y2="229.5" />
+ </g>
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(512.75 273.13)rotate(90)scale(5)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from A to B -->
+ <!-- north/east corner -->
+ <g stroke="black" stroke-width="1">
+  <line x1="218.5" y1="362.05" x2="218.5" y2="404.25" />
+  <line x1="220.5" y1="362.05" x2="220.5" y2="404.25" />
+  <line x1="219" y1="402.75" x2="245" y2="402.75" />
+  <line x1="219" y1="404.75" x2="245" y2="404.75" />
+ </g>
+ <use stroke="black" xlink:href="#ah" transform="translate(219.5 359.55)rotate(-90)"/>
+
+ <!-- horizontal -->
+ <g stroke="black" stroke-width="1">
+  <line x1="245" y1="402.75" x2="466" y2="402.75" />
+  <line x1="245" y1="404.75" x2="466" y2="404.75" />
+ </g>
+
+ <!-- north/west corner -->
+ <g stroke="black" stroke-width="1">
+  <line x1="511.75" y1="362.05" x2="511.75" y2="404.25" />
+  <line x1="513.75" y1="362.05" x2="513.75" y2="404.25" />
+  <line x1="466" y1="402.75" x2="513.25" y2="402.75" />
+  <line x1="466" y1="404.75" x2="513.25" y2="404.75" />
+ </g>
+ <use stroke="black" xlink:href="#ah" transform="translate(512.75 359.55)rotate(-90)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from A to B -->
+ <!-- vertical -->
+ <line x1="168.5" y1="170" x2="168.5" y2="274.1" stroke="black" stroke-width="3" />
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(168.5 277.1)rotate(90)"/>
+
+ <!-- south/east corner -->
+ <g stroke="black" stroke-width="3">
+  <line x1="168.5" y1="143" x2="168.5" y2="170" />
+  <line x1="167" y1="144.5" x2="194" y2="144.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="194" y1="144.5" x2="559.5" y2="144.5" stroke="black" stroke-width="3" />
+
+ <!-- south/west corner -->
+ <g stroke="black" stroke-width="3">
+  <line x1="585" y1="143" x2="585" y2="170" />
+  <line x1="559.5" y1="144.5" x2="586.5" y2="144.5" />
+ </g>
+
+ <!-- vertical -->
+ <line x1="585" y1="170" x2="585" y2="274.1" stroke="black" stroke-width="3" />
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(585 277.1)rotate(90)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from A to B -->
+ <!-- vertical -->
+ <g stroke="black" stroke-width="1">
+  <line x1="167.5" y1="358.5" x2="167.5" y2="459" />
+  <line x1="169.5" y1="358.5" x2="169.5" y2="459" />
+ </g>
+
+ <!-- north/east corner -->
+ <g stroke="black" stroke-width="1">
+  <line x1="167.5" y1="459" x2="167.5" y2="485" />
+  <line x1="169.5" y1="459" x2="169.5" y2="485" />
+  <line x1="168" y1="483.5" x2="194" y2="483.5" />
+  <line x1="168" y1="485.5" x2="194" y2="485.5" />
+ </g>
+
+ <!-- horizontal -->
+ <g stroke="black" stroke-width="1">
+  <line x1="194" y1="483.5" x2="559.5" y2="483.5" />
+  <line x1="194" y1="485.5" x2="559.5" y2="485.5" />
+ </g>
+
+ <!-- north/west corner -->
+ <g stroke="black" stroke-width="1">
+  <line x1="584" y1="459" x2="584" y2="485" />
+  <line x1="586" y1="459" x2="586" y2="485" />
+  <line x1="559.5" y1="483.5" x2="585.5" y2="483.5" />
+  <line x1="559.5" y1="485.5" x2="585.5" y2="485.5" />
+ </g>
+
+ <!-- vertical -->
+ <g stroke="black" stroke-width="1">
+  <line x1="584" y1="362.05" x2="584" y2="459" />
+  <line x1="586" y1="362.05" x2="586" y2="459" />
+ </g>
+ <use stroke="black" xlink:href="#ah" transform="translate(585 359.55)rotate(-90)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from A to B -->
+ <!-- vertical -->
+ <line x1="117.5" y1="170" x2="117.5" y2="268.6" stroke="black" stroke-width="8.5" />
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(117.5 274.72)rotate(90)scale(3)"/>
+
+ <!-- vertical -->
+ <line x1="117.5" y1="119" x2="117.5" y2="170" stroke="black" stroke-width="8.5" />
+
+ <!-- south/east corner -->
+ <g stroke="black" stroke-width="8.5">
+  <line x1="117.5" y1="89.25" x2="117.5" y2="119" />
+  <line x1="113.25" y1="93.5" x2="143" y2="93.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="143" y1="93.5" x2="610.5" y2="93.5" stroke="black" stroke-width="8.5" />
+
+ <!-- south/west corner -->
+ <g stroke="black" stroke-width="8.5">
+  <line x1="653" y1="89.25" x2="653" y2="119" />
+  <line x1="610.5" y1="93.5" x2="657.25" y2="93.5" />
+ </g>
+
+ <!-- vertical -->
+ <line x1="653" y1="119" x2="653" y2="170" stroke="black" stroke-width="8.5" />
+
+ <!-- vertical -->
+ <line x1="653" y1="170" x2="653" y2="268.6" stroke="black" stroke-width="8.5" />
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(653 274.72)rotate(90)scale(3)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from A to B -->
+ <!-- vertical -->
+ <line x1="117.5" y1="357" x2="117.5" y2="459" stroke="black" stroke-width="8.5" />
+
+ <!-- vertical -->
+ <line x1="117.5" y1="459" x2="117.5" y2="510" stroke="black" stroke-width="8.5" />
+
+ <!-- north/east corner -->
+ <g stroke="black" stroke-width="8.5">
+  <line x1="117.5" y1="510" x2="117.5" y2="539.75" />
+  <line x1="113.25" y1="535.5" x2="143" y2="535.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="143" y1="535.5" x2="610.5" y2="535.5" stroke="black" stroke-width="8.5" />
+
+ <!-- north/west corner -->
+ <g stroke="black" stroke-width="8.5">
+  <line x1="653" y1="510" x2="653" y2="539.75" />
+  <line x1="610.5" y1="535.5" x2="657.25" y2="535.5" />
+ </g>
+
+ <!-- vertical -->
+ <line x1="653" y1="459" x2="653" y2="510" stroke="black" stroke-width="8.5" />
+
+ <!-- vertical -->
+ <line x1="653" y1="368.05" x2="653" y2="459" stroke="black" stroke-width="8.5" />
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(653 361.76)rotate(-90)scale(3)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from A to B -->
+ <!-- vertical -->
+ <line x1="66.5" y1="170" x2="66.5" y2="268.6" stroke="black" stroke-width="8.5" />
+ <use fill="#ff0000" stroke="black" xlink:href="#ahf" transform="translate(66.5 274.72)rotate(90)scale(3)"/>
+
+ <!-- vertical -->
+ <line x1="66.5" y1="68" x2="66.5" y2="170" stroke="black" stroke-width="8.5" />
+
+ <!-- south/east corner -->
+ <g stroke="black" stroke-width="8.5">
+  <line x1="66.5" y1="38.25" x2="66.5" y2="68" />
+  <line x1="62.25" y1="42.5" x2="92" y2="42.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="92" y1="42.5" x2="695.5" y2="42.5" stroke="black" stroke-width="8.5" />
+
+ <!-- south/west corner -->
+ <g stroke="black" stroke-width="8.5">
+  <line x1="738" y1="38.25" x2="738" y2="68" />
+  <line x1="695.5" y1="42.5" x2="742.25" y2="42.5" />
+ </g>
+
+ <!-- vertical -->
+ <line x1="738" y1="68" x2="738" y2="170" stroke="black" stroke-width="8.5" />
+
+ <!-- vertical -->
+ <line x1="738" y1="170" x2="738" y2="268.6" stroke="black" stroke-width="8.5" />
+ <use fill="#ff0000" stroke="black" xlink:href="#ahf" transform="translate(738 274.72)rotate(90)scale(3)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from A to B -->
+ <!-- vertical -->
+ <line x1="66.5" y1="357" x2="66.5" y2="459" stroke="black" stroke-width="3" />
+
+ <!-- vertical -->
+ <line x1="66.5" y1="459" x2="66.5" y2="561" stroke="black" stroke-width="3" />
+
+ <!-- north/east corner -->
+ <g stroke="black" stroke-width="3">
+  <line x1="66.5" y1="561" x2="66.5" y2="588" />
+  <line x1="65" y1="586.5" x2="92" y2="586.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="92" y1="586.5" x2="695.5" y2="586.5" stroke="black" stroke-width="3" />
+
+ <!-- north/west corner -->
+ <g stroke="black" stroke-width="3">
+  <line x1="738" y1="561" x2="738" y2="588" />
+  <line x1="695.5" y1="586.5" x2="739.5" y2="586.5" />
+ </g>
+
+ <!-- vertical -->
+ <line x1="738" y1="459" x2="738" y2="561" stroke="black" stroke-width="3" />
+
+ <!-- vertical -->
+ <line x1="738" y1="362.55" x2="738" y2="459" stroke="black" stroke-width="3" />
+ <use fill="black" stroke="black" xlink:href="#ahb" transform="translate(738 359.55)rotate(-90)"/>
+</g>
+
+<g class="node">
+ <!-- A, rect -->
+ <rect fill="white" height="58.5" stroke="black" width="227" x="17.5" y="289.5" />
+ <text class="text" x="131" y="325" fill="black">A</text>
+</g>
+
+<g class="node">
+ <!-- B, rect -->
+ <rect fill="white" height="58.5" stroke="black" width="345.5" x="466.5" y="289.5" />
+ <text class="text" x="640" y="325" fill="black">B</text>
+</g>
+
+</svg>

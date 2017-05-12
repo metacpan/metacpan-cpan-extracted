@@ -1,0 +1,12 @@
+Revision history for Graphics-GnuplotIF-Shortcut
+
+0.03   Mon 2 Feb 15:59:34 2009
+       Annoyed by false positives from CPAN Testers, the pod-coverage test is skipped for automated smoke testers
+
+0.02   Mon Jan 26 11:14:24 2009
+       Require Test::Pod::Coverage version 1.08 to make cpan-testers happy.
+Older versions did not noticed documentation of inherited methods.
+
+0.01   Thu Jun 12 16:27:19 2008
+       Initial release.
+

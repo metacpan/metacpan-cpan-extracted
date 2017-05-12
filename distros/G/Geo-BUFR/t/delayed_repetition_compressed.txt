@@ -1,0 +1,54 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            64
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           0
+    International data subcategory:    0
+    Local data subcategory:            0
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2011
+    Month:                             3
+    Day:                               1
+    Hour:                              0
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 17
+    Number of data subsets:            2
+    Observed data:                     1
+    Compressed data:                   1
+    Data descriptors unexpanded:       102000 031011 030001 030002 001001
+
+Subset 1
+
+     1  031011                3  DELAYED DESCRIPTOR AND DATA REPETITION FACTOR [NUMERIC]
+     2  030001                2  PIXEL VALUE (4 BITS) [NUMERIC]
+     3  030002                9  PIXEL VALUE (8 BITS) [NUMERIC]
+     4  030001                2  PIXEL VALUE (4 BITS) [NUMERIC]
+     5  030002                9  PIXEL VALUE (8 BITS) [NUMERIC]
+     6  030001                2  PIXEL VALUE (4 BITS) [NUMERIC]
+     7  030002                9  PIXEL VALUE (8 BITS) [NUMERIC]
+     8  001001                7  WMO BLOCK NUMBER [NUMERIC]
+
+Subset 2
+
+     1  031011                3  DELAYED DESCRIPTOR AND DATA REPETITION FACTOR [NUMERIC]
+     2  030001                5  PIXEL VALUE (4 BITS) [NUMERIC]
+     3  030002                8  PIXEL VALUE (8 BITS) [NUMERIC]
+     4  030001                5  PIXEL VALUE (4 BITS) [NUMERIC]
+     5  030002                8  PIXEL VALUE (8 BITS) [NUMERIC]
+     6  030001                5  PIXEL VALUE (4 BITS) [NUMERIC]
+     7  030002                8  PIXEL VALUE (8 BITS) [NUMERIC]
+     8  001001               13  WMO BLOCK NUMBER [NUMERIC]

@@ -1,0 +1,145 @@
+Overview of changes in GStreamer 0.20
+=====================================
+
+* GStreamer.pm: Announce/link to new GStreamer1 module
+* README: Add note for and link to new GStreamer1 module
+* copyright.pod: updated copyright year
+* perl-GStreamer.doap: update project short description
+
+Overview of changes in GStreamer 0.19
+=====================================
+
+* Avoid misusing the macro PL_na, thus preventing potential issues when
+  GStreamer is used in conjunction with certain XS modules, among them
+  XML::Parser and String::Approx.
+
+Overview of changes in GStreamer 0.18
+=====================================
+
+* Add GStreamer::Buffer::data_ptr() to access the buffer's data without copying
+  it. (RT#82826)
+∗ Make a few tests more robust
+* Created %meta_merge which follows v2 of CPAN Meta Spec
+  - %meta_merge is used for generating metadata via
+    ExtUtils::MakeMaker/CPAN::Meta
+
+Overview of changes in GStreamer 0.17
+=====================================
+
+* Make GStreamer::Buffer not leak all data.
+∗ Change FSF address in license notices (RT#72664/74533)
+
+Overview of changes in GStreamer 0.16
+=====================================
+
+[The actual 0.16 release did not contain these notes due to an
+ oversight.]
+
+* Make the read-metadata.pl example more robust.
+* Fix many test failures.
+
+Overview of changes in GStreamer 0.15
+=====================================
+
+* Wrap gst_pad_is_blocking, gst_pad_peer_query, gst_pad_iterate_internal_links,
+  and gst_pad_iterate_internal_links_default.
+* Don't assume ownership of GstIndexEntry objects returned by the various
+  GstIndex methods.
+* Throw an exception if unknown GstFormat values are encountered.
+* Convert NULL GstIterator objects to undef.
+* Fix a few test failures.
+
+Overview of changes in GStreamer 0.14
+=====================================
+
+* Fix a few test failures.
+* Hush compiler warnigns.
+
+Overview of changes in GStreamer 0.13
+=====================================
+
+* Make the return value of GStreamer::Element::add_pad,
+  GStreamer::Element::remove_pad, and GStreamer::Element::set_locked_state
+  meaningful.
+* Fix a few test and build issues.
+
+Overview of changes in GStreamer 0.12
+=====================================
+
+* Add support for GST_TYPE_FOURCC, GST_TYPE_DOUBLE_RANGE, GST_TYPE_ARRAY,
+  GST_TYPE_FRACTION, and GST_TYPE_FRACTION_RANGE.
+
+Overview of changes in GStreamer 0.11
+=====================================
+
+* Fix build and test suite issues.
+
+Overview of changes in GStreamer 0.10
+=====================================
+
+* Alter GStreamer::Structure::from_string to return only one value.
+* Add support for latency, async-start, and async-done messages.
+* Add GStreamer::Message::timestamp() and src().
+* Fix test failures.
+
+Overview of changes in GStreamer 0.09
+=====================================
+
+* Fix a portability issue.  [Jeremy Messenger]
+* Fix a few test suite issues.
+
+Overview of changes in GStreamer 0.08
+=====================================
+
+* Fix a few more test suite issues.
+
+Overview of changes in GStreamer 0.07
+=====================================
+
+* Make GStreamer::Clock::wait_async work correctly.
+* Fix some test suite issues.
+
+Overview of changes in GStreamer 0.06
+=====================================
+
+* Fix an obscure GStreamer::Query bug.
+* Add handlers for GstDate.  They convert to and from seconds since epoch.
+* Require Glib 1.114 for the type-to-package mapping changes.  This greatly
+  improves support for interfaces like GStreamer::TagSetter.
+
+Overview of changes in GStreamer 0.05
+=====================================
+
+* Port to GStreamer 0.10.0.
+  - Wrap and test most of the new API.
+  - Remove old stuff.
+* Use Glib's 64-bit integer converters.
+* Rename the various GStreamer::Caps and GStreamer::Event constructors from
+  new_thing to GStreamer::Caps::Thing::new and GStreamer::Event::Thing::new
+  respectively.
+
+Overview of changes in GStreamer 0.04
+=====================================
+
+* Get rid of the Gtk2 dependency by using Glib 1.100's Glib::CodeGen.
+
+Overview of changes in GStreamer 0.03
+=====================================
+
+* Implement overloaded operators for GStreamer::Caps: +, -, &, |, <=, >=, ==
+  and "".
+* Fix a few test failures.
+
+Overview of changes in GStreamer 0.02
+=====================================
+
+* Fix handling of 64bit integers all over the place.
+* Fix the processing of GStreamer::Element::seek's seek-type argument.
+* Fix the "location" property to not mangle filenames.
+* Add support for tag reading and writing.
+* Add plugin and library loading support.
+
+Overview of changes in GStreamer 0.01
+=====================================
+
+* Initial release.

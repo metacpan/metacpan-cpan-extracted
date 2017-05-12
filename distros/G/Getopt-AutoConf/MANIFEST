@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Getopt/AutoConf.pm
+t/01load.t
+t/02usage.t
+t/03golandgoa.t

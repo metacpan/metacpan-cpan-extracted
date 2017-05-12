@@ -1,0 +1,39 @@
+--- #YAML:1.0
+name:               Gtk2-Ex-DateSpinner
+version:            9
+abstract:           Date entry widget using spin buttons.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Date::Calc:           5.0
+    Glib::Ex::ObjectBits:  12
+    Glib::Ex::SignalIds:  1
+    Glib::Object::Subclass:  0
+    Gtk2:                 0
+    Gtk2::Ex::WidgetBits:  0
+    Locale::Messages:     1.16
+    perl:                 5.008
+resources:
+    homepage:  http://user42.tuxfamily.org/gtk2-ex-datespinner/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - devel
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    maximum_tests:
+        description:  Have "make test" do as much as possible.
+        requires:
+            Test::Weaken:        3
+            Test::Weaken::Gtk2:  0

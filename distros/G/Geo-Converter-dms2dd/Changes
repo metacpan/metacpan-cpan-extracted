@@ -1,0 +1,25 @@
+Revision history for Perl extension Geo::Converter::dms2dd.
+
+0.05 2017-01-09
+    - Fix hemisphere handling when full word is given
+    - Correct some incorrect test expectations
+
+0.04 2015-03-16
+    - Move repo to github since Google Code is closing down.
+    - Add github details to Makefile.PL
+
+0.03 2014-05-12
+    -  Set minimum perl version to 5.10.
+    -  Minor refactoring of contents.
+    -  Slight augmentation of error messages (more now include the coord)
+
+0.02  2010-06-19
+    - Change tests to use is_between()
+    - Modify the POD, add details about hemisphere determination
+
+0.01  2010-05-29
+    - original version; created by h2xs 1.23 with options
+        -X Geo::Converter::dms2dd
+    - module contents shifted across from biodiverse project
+    - tests added
+    

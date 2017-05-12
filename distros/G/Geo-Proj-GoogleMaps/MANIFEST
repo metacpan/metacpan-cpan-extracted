@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Geo/Proj/GoogleMaps.ja.pod
+lib/Geo/Proj/GoogleMaps.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/01.transform.t

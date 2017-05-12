@@ -1,0 +1,14 @@
+~$
+\.bak$
+blib
+\.bs$
+build
+CVS
+\.cvsignore$
+Makefile$
+Makefile\.old$
+\.o$
+\.spec$
+\.sw.$
+\.tar\.gz$
+TrayIcon.c

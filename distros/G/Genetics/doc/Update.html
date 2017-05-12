@@ -1,0 +1,374 @@
+<HTML>
+<HEAD>
+<TITLE>Update.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#inheritance">Inheritance</A></LI>
+	<LI><A HREF="#public methods">Public Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#updatecluster">updateCluster</A></LI>
+		<LI><A HREF="#updatesubject">updateSubject</A></LI>
+		<LI><A HREF="#updatekindred">updateKindred</A></LI>
+		<LI><A HREF="#updatemarker">updateMarker</A></LI>
+		<LI><A HREF="#updatesnp">updateSNP</A></LI>
+		<LI><A HREF="#updategenotype">updateGenotype</A></LI>
+		<LI><A HREF="#updatestudyvariable">updateStudyVariable</A></LI>
+		<LI><A HREF="#updatephenotype">updatePhenotype</A></LI>
+		<LI><A HREF="#updatefrequencysource">updateFrequencySource</A></LI>
+		<LI><A HREF="#updatehtmarkercollection">updateHtMarkerCollection</A></LI>
+		<LI><A HREF="#updatehaplotype">updateHaplotype</A></LI>
+		<LI><A HREF="#updatednasample">updateDNASample</A></LI>
+		<LI><A HREF="#updatetissuesample">updateTissueSample</A></LI>
+		<LI><A HREF="#updatemap">updateMap</A></LI>
+	</UL>
+
+	<LI><A HREF="#private methods">Private methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#_updateobjassocdata">_updateObjAssocData</A></LI>
+		<LI><A HREF="#_updatesubjectkindredrefs">_updateSubjectKindredRefs</A></LI>
+		<LI><A HREF="#_updatekindredsubjectrefs">_updateKindredSubjectRefs</A></LI>
+		<LI><A HREF="#_updateassayattrs">_updateAssayAttrs</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::API::DB::Update</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Genetics::API ;</PRE>
+<PRE>
+  $api = new Genetics::API(DSN =&gt; {driver =&gt; &quot;mysql&quot;,
+                                   host =&gt; $Host,
+                                   database =&gt; $Database},
+                           user =&gt; $UserName,
+                           password =&gt; $Password) ;</PRE>
+<PRE>
+  $subject = $api-&gt;getSubject(3) ;
+  $subject-&gt;name(&quot;Elvis&quot;) ;
+  $api-&gt;updateSubject($subject) ;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Genetics::API::DB packages provide an interface for the manipulation of
+Genperl objects in a relational database.  This package contains the methods
+for updating objects that have previously been saved to the database.  To save
+new objects, see Genetics::API::DB::Create.</P>
+<P>The following describes the update behavior implemented by the methods in 
+this package:
+  - The data in each object field will completely replace the data in the 
+    database for that field.
+  - Data for fields not present in an object will not be affected.
+  - In order to delete data for a particular field, the value of that field 
+    should be set to ``DELETE''.
+  - In order to add to existing data for a particular field, use an appropriate 
+    method in Genetics::API or handle it manually.</P>
+<P>Examples:</P>
+<PRE>
+  To completely replace a SNPs set of Alleles:
+     @alleles = ( {name =&gt; &quot;A&quot;, type =&gt; &quot;Nucleotide&quot;},
+                   name =&gt; &quot;C&quot;, type =&gt; &quot;Nucleotide&quot;} ) ;
+     $snp = $api-&gt;getSNP(11) ;
+     $snp-&gt;Alleles(\@alleles) ;
+     $api-&gt;updateSNP($snp) ;</PRE>
+<PRE>
+  To add an Allele to a SNP:
+     $snp = $api-&gt;getSNP(11) ;
+     $alleleListptr = $snp-&gt;Alleles ;
+     push( @$alleleListptr, {name =&gt; &quot;A&quot;, type =&gt; &quot;Nucleotide&quot;} ) ;
+     $snp-&gt;Alleles($alleleListptr) ;
+     $api-&gt;updateSNP($snp) ;</PRE>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+ strict             Just to be anal
+ vars               Global variables
+ Carp               Error reporting</PRE>
+<P>
+<HR>
+<H1><A NAME="inheritance">Inheritance</A></H1>
+<PRE>
+ Exporter           Make methods available to importing packages</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public Methods</A></H1>
+<P>
+<H2><A NAME="updatecluster">updateCluster</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::Cluster object in the database.
+  Argument  : The Genetics::Object::Cluster object to be updated.
+  Returns   : 1 on success, undef otherwise. 
+  Scope     : Public
+  Comments  : Cluster.clusterType cannot be modified, so this method does 
+              not touch the Cluster table.</PRE>
+<P>
+<H2><A NAME="updatesubject">updateSubject</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::Subject object in the database.
+  Argument  : The Genetics::Object::Subject object to be updated.
+  Returns   : 1 on success, undef otherwise. 
+  Scope     : Public
+  Comments  : If Subject.kindredID is modified, the approprate updates are also 
+              made to KindredSubject.  In other words, the reciprocal 
+              relationships Kindred-&gt;Subjects and Subject-&gt;Kindred are kept in 
+              synch.</PRE>
+<P>
+<H2><A NAME="updatekindred">updateKindred</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::Kindred object in the database.
+  Argument  : The Genetics::Object::Kindred object to be updated.
+  Returns   : 1 on success, undef otherwise. 
+  Scope     : Public
+  Comments  : If the set of Subjects contained in a Kindred is modified, 
+              the approprate updates are also made to the Subject.kindredID 
+              field of each of the Subjects.  In other words, the reciprocal 
+              relationships Kindred-&gt;Subjects and Subject-&gt;Kindred are kept 
+              in synch.  This only applies to primary Kindreds, of course.</PRE>
+<P>
+<H2><A NAME="updatemarker">updateMarker</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::Marker object in the database.
+  Argument  : The Genetics::Object::Marker object to be updated.
+  Returns   : 1 on success, undef otherwise. 
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="updatesnp">updateSNP</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::SNP object in the database.
+  Argument  : The Genetics::Object::SNP object to be updated.
+  Returns   : 1 on success, undef otherwise. 
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="updategenotype">updateGenotype</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::Genotype object in the database.
+  Argument  : The Genetics::Object::Genotype object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="updatestudyvariable">updateStudyVariable</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::StudyVariable object in the database.
+  Argument  : The Genetics::Object::StudyVariable object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  : StudyVariable.format cannot be modified.</PRE>
+<P>
+<H2><A NAME="updatephenotype">updatePhenotype</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::Phenotype object in the database.
+  Argument  : The Genetics::Object::Phenotype object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  : 
+</PRE>
+<PRE>
+
+=cut</PRE>
+<P>sub updatePhenotype {
+  my($self, $pt) = @_ ;
+  my($id, $actualType, $sth, $active, $date, $svFormat, $valueFieldName, $aaListPtr) ;
+  my $dbh = $self-&gt;{dbh} ;
+</P>
+<PRE>
+
+  $DEBUG and carp &quot; -&gt;[updatePhenotype] $pt&quot; ;</PRE>
+<PRE>
+  $id = $pt-&gt;field(&quot;id&quot;) ;
+  ( $actualType ) = $dbh-&gt;selectrow_array(&quot;select objType from Object 
+                                           where id = $id&quot;) ;
+  if ( $actualType ne &quot;Phenotype&quot;) {
+    carp &quot; -&gt;[updatePhenotype] Object with ID = $id is not a Phenotype!&quot; ;
+    return(undef) ;
+  }
+  # Object
+  $self-&gt;_updateObjAssocData($pt) ;
+  # Phenotype
+  if ( defined($active = $pt-&gt;field(&quot;isActive&quot;)) ) {
+    $sth = $dbh-&gt;prepare( &quot;update Phenotype 
+                           set isActive = ? 
+                           where ptID = ?&quot; ) ;
+    $sth-&gt;execute($active, $id) ;
+    $sth-&gt;finish() ;
+  }
+  if ( defined($date = $pt-&gt;field(&quot;dateCollected&quot;)) ) {
+    $sth = $dbh-&gt;prepare( &quot;update Phenotype 
+                           set dateCollected = ? 
+                           where ptID = ?&quot; ) ;
+    if ($date eq &quot;DELETE&quot;) {
+      $sth-&gt;execute(undef, $id) ;
+    } else {
+      $sth-&gt;execute($date, $id) ;
+    }
+    $sth-&gt;finish() ;
+  }
+  ( $svFormat ) = $dbh-&gt;selectrow_array( &quot;select format from StudyVariable, Phenotype 
+                                          where ptID = $id 
+                                          and Phenotype.svID = StudyVariable.studyVariableID&quot; ) ;
+  $valueFieldName = lc($svFormat) . &quot;Value&quot; ;
+  $sth = $dbh-&gt;prepare( &quot;update Phenotype 
+                         set $valueFieldName = ? 
+                         where ptID = ?&quot; ) ;
+  $sth-&gt;execute($pt-&gt;field(&quot;value&quot;), $id) ;
+  $sth-&gt;finish() ;
+  # Phenotype AssayAttributes
+  if ( defined ($aaListPtr = $pt-&gt;field(&quot;AssayAttrs&quot;)) ) {
+    $self-&gt;_updateAssayAttrs($aaListPtr, &quot;Phenotype&quot;, $id) ;
+  }
+</PRE>
+<PRE>
+
+  $DEBUG and carp &quot; -&gt;[updatePhenotype] End.&quot; ;</PRE>
+<PRE>
+  return(1) ;
+}</PRE>
+<P>
+<H2><A NAME="updatefrequencysource">updateFrequencySource</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::FrequencySource object in the database.
+  Argument  : The Genetics::Object::FrequencySource object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="updatehtmarkercollection">updateHtMarkerCollection</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::HtMarkerCollection object in the database.
+  Argument  : The Genetics::Object::HtMarkerCollection object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="updatehaplotype">updateHaplotype</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::Haplotype object in the database.
+  Argument  : The Genetics::Object::Haplotype object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="updatednasample">updateDNASample</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::DNASample object in the database.
+  Argument  : The Genetics::Object::DNASample object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="updatetissuesample">updateTissueSample</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::TissueSample object in the database.
+  Argument  : The Genetics::Object::TissueSample object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="updatemap">updateMap</A></H2>
+<PRE>
+  Function  : Update a Genetics::Object::Map object in the database.
+  Argument  : The Genetics::Object::Map object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public</PRE>
+<P>
+<HR>
+<H1><A NAME="private methods">Private methods</A></H1>
+<P>
+<H2><A NAME="_updateobjassocdata">_updateObjAssocData</A></H2>
+<PRE>
+  Function  : Update data in, and associated with, the Object table/object.
+  Argument  : The Genetics::Object object to be updated.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Private
+  Called by : The various updateObjectSubClass methods.
+  Comments  : The following Object fields cannot be modified: id, objType, 
+              dateModified.</PRE>
+<P>
+<H2><A NAME="_updatesubjectkindredrefs">_updateSubjectKindredRefs</A></H2>
+<PRE>
+  Function  : Updates references between Subjects and Kindreds.
+  Argument  : A Subject ID and a Kindred ID (can be undef).
+  Returns   : N/A
+  Scope     : Private
+  Called By : updateSubject() when Subject.kindredID is modified.
+  Comments  : This method updates the KindredSubject table based on 
+              a change to a Subject.kindredID field.</PRE>
+<P>
+<H2><A NAME="_updatekindredsubjectrefs">_updateKindredSubjectRefs</A></H2>
+<PRE>
+  Function  : Updates references between Kindreds and Subjects.
+  Argument  : A Kindred ID and an array reference to a list of Subject IDs.
+  Returns   : N/A
+  Scope     : Private
+  Called By : updateSubject() and updateKindred().
+  Comments  : This method updates the KindredSubject table based on a changes 
+              made to a Kindred-&gt;Subjects field.
+              This method also updates the Subject.kindredID field of each of 
+              the relevant Subjects.</PRE>
+<P>
+<H2><A NAME="_updateassayattrs">_updateAssayAttrs</A></H2>
+<PRE>
+  Function  : Update AssayAttributes associated with a Genotype, AlleleCall 
+              or Phenotype.
+  Arguments : Array reference to the list of AssayAttributes, scalar 
+              containing the type of object with which the AssayAttributes 
+              are associated, and another scalar containing the id of that 
+              object.
+  Returns   : N/A
+  Scope     : Private
+  Called by : updateGenotype(), updatePhenotype().
+  Comments  :</PRE>
+
+</BODY>
+
+</HTML>

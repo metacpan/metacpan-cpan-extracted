@@ -1,0 +1,203 @@
+#!/usr/bin/perl  
+
+# 
+# PGPIB server for remote connections.
+#
+# This is a Unix specific program.  It uses fork() to service
+# client connections, /usr/bin/logger to record syslog information.
+#
+# This program runs as a daemon.  It listens for connections on
+# port 90 and forks a process to service new connections.
+#
+
+use strict;
+use MD5;
+use GPIB;
+use IO::Socket;
+use Storable qw(nstore_fd retrieve_fd);
+use POSIX qw(setsid);
+use vars qw(    $port $listen $sock $child $phost $pport
+                $logger $g @resp $method $rt @params
+                $VERSION $ID $debug $md5 $hash %methods
+                $c_version $c_user $c_password
+                $user $password $passwordcheck $passwordfile
+                $rndfile $rnd);
+
+$debug = 0;                     # Set to run as single thread with STDOUT
+$passwordcheck = 1;             # Unset for no authentication, dangerous!
+$port = 90;                     # Port to listen
+$listen = 20;
+$logger = "/usr/bin/logger";
+$rndfile = "/dev/urandom";
+$passwordfile = "/etc/pgpibusers";
+$VERSION = "0.30";
+$ID = "GPIBProxy";
+
+# As a 'security' measure, the server will only attempt to call
+# following methods.
+%methods = (
+    ibrda => 1,     ibwrta => 1,    ibcmda => 1,    ibfind => 1,
+    ibnotify => 1,  ibask => 1,     ibbna => 1,     ibcac => 1,
+    ibclr => 1,     ibcmd => 1,     ibcmda => 1,    ibconfig => 1,
+    ibdev => 1,     ibdma => 1,     ibeos => 1,     ibeot => 1,
+    ibfind => 1,    ibgts => 1,     ibist => 1,     iblines => 1,
+    ibln => 1,      ibloc => 1,     ibnotify => 1,  ibonl => 1,
+    ibpad => 1,     ibpct => 1,     ibppc => 1,     ibrd => 1,
+    ibrda => 1,     ibrdf => 1,     ibrpp => 1,     ibrsc => 1,
+    ibrsp => 1,     ibrsv => 1,     ibsad => 1,     ibsic => 1,
+    ibsre => 1,     ibstop => 1,    ibtmo => 1,     ibtrg=> 1,
+    ibwait => 1,    ibwrt => 1,     ibwrta => 1,    ibwrtf => 1
+);
+
+sub syslog {
+    my $msg = shift;
+    system("$logger -t PGPIB \"$msg\"");
+    print "$msg\n" if $debug;
+}
+    
+sub getrand {
+    my $rnd;
+
+    if (-r $rndfile) {
+        open FD, "<$rndfile";
+        read FD, $rnd, 8 or die("Cannot read from $rndfile for random numbers");
+        close FD;
+    } else {
+        syslog "Warning: Using horrible source for random numbers...";
+        srand(time);
+        for(my $i = 0; $i<8; $i++) {
+            vec($rnd, $i, 32) = ((int(rand(1 << 25))) >> 1) & 0xffffff;
+        }
+    }
+    return unpack('H16', $rnd);
+}
+
+# Very unpleasant looking thing to catch exit of child processes
+# Otherwise they zombie
+sub finish {
+    wait;
+    $SIG{CHLD} = \&finish;
+}
+$SIG{CHLD} = \&finish;
+
+# Stuff to become a proper daemon
+getrand() if $passwordcheck;
+print "Starting PGPIB server\n" unless $debug;
+print "Debug mode: Forground single process server\n" if $debug;
+exit if !$debug && fork;
+setsid() unless $debug;
+umask(0);
+chdir('/usr/tmp');
+exit if !$debug && fork;
+
+# Get a socket for listening for connections
+$sock = IO::Socket::INET->new( LocalPort    => $port,
+    Proto        => 'tcp',     Listen       => $listen,
+    Reuse        => 1);
+
+syslog "Starting PGPIB server";
+if (!$sock) {
+    syslog "Cannot create socket on port $port, ";
+    syslog "    ... maybe another server is running";
+    print  "Cannot create socket on port $port, \n" unless $debug;
+    print  "    ... maybe another server is running\n" unless $debug;
+    exit(1);
+}
+syslog "Be careful! No security checking" unless $passwordcheck;
+print  "Be careful! No security checking" unless $debug || $passwordcheck;
+
+close STDIN unless $debug;
+close STDOUT unless $debug;
+close STDERR unless $debug;
+$0 = "PGPIB Listening on port $port";
+
+while ($child = $sock->accept()) {
+    $phost = $child->peerhost;
+    $pport = $child->peerport;
+
+    next if !$debug && fork;
+
+    # Forked child process...
+    # First send announcement with a random number
+    # Not using Storable until after authentication, I don't suspect
+    # that there's anything wrong with Storable, just trying to be
+    # as simple as possible until client is authenticated
+
+    $rnd = getrand();
+    $child->print("$ID $VERSION $rnd\n");
+    
+    ($a = $child->getline) =~ s/[\r\n]//g;
+    ($c_version, $c_user, $c_password) = split / /, $a;
+    goto BAIL unless $c_version;
+
+    # Maybe something more sophisticated later
+    if (int($c_version) != int($VERSION)) {
+        syslog "Client: $c_version, Server: $VERSION version mismatch";
+        $child->print("NO Client=$c_version, Server=$VERSION version mismatch");
+        goto BAIL;
+    }
+
+    if ($passwordcheck) {
+        if (!open(FD, "<$passwordfile")) {
+            syslog("Cannot open password file $passwordfile.");
+            $child->print("NO Authentication failed for $c_user\n");
+            goto BAIL;
+        }
+        while (<FD>) {
+            s/[\r\n]//g;
+            ($user, $password) = split;
+            last if ($user eq $c_user);
+        }
+        close FD;
+        $md5 = new MD5;
+        $md5->reset;
+        $md5->add($password, $rnd);
+        $hash = $md5->hexdigest;
+        if ($user ne $c_user || $hash ne $c_password) {
+            syslog "Authentication failure for user $c_user";
+            $child->print("NO Authentication failed for $c_user\n");
+            goto BAIL;
+        }
+    }
+    $child->print("OKAY\n");
+
+    eval { $a = retrieve_fd($child); };
+    goto BAIL if $@;
+    @params = @$a;    
+    syslog "Connect $phost:$pport user $user (@params)";
+    $0 = "PGPIB Connection to $phost:$pport $user (@params)";
+    
+    # Execute new() method on local machine
+    eval { $g = GPIB->new(@params); };
+    if ($@) {
+        @resp = ("NO", $@);
+        eval { nstore_fd(\@resp, $child); $child->flush; };
+    } else {
+        @resp = ("OK");
+        eval { nstore_fd(\@resp, $child); $child->flush; };
+        goto BAIL if $@;
+
+        # After authentication and successfully calling new(),
+        # this is the main loop for receiving commands from the
+        # client, executing them and returning a response.
+        while (1) {
+            eval { $a = retrieve_fd($child); };
+            last if ($@); 
+            $method = shift @$a;
+            if (!$methods{$method}) {
+                syslog("Attempt to call illegal method: $method");
+                goto BAIL;
+            }
+            eval { $rt = $g->$method(@$a); };
+            last if ($@); 
+            @resp = ($rt, $g->ibsta, $g->iberr, $g->ibcnt);
+            eval { nstore_fd(\@resp, $child); $child->flush; };
+            # last if $@ || $method eq "close";
+        }
+    }
+
+BAIL:
+    $child->close;
+    syslog "Closed  $phost:$pport user $user (@params)";
+    exit 0 unless $debug;
+}

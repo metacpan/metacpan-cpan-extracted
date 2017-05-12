@@ -1,0 +1,13 @@
+digraph graph_08
+{
+	graph[rankdir = "LR" nodesep = "0"]
+	node[shape = "point" label = ""]
+	edge[fontsize = "10"]
+	_vee -> vee[arrowhead = "vee" label = "vee"]
+	vee -> veevee[arrowhead = "veevee" label = "veevee"]
+	_vee -> lvee[arrowhead = "lvee" label = "lvee"]
+	lvee -> lveelvee[arrowhead = "lveelvee" label = "lveelvee"]
+	_vee -> rvee[arrowhead = "rvee" label = "rvee"]
+	rvee -> rveervee[arrowhead = "rveervee" label = "rveervee"]
+
+}

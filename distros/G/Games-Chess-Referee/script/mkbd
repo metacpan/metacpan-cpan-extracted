@@ -1,0 +1,130 @@
+#!/usr/bin/perl -w
+#
+# mkbd - A Perl program to generate HTML for a chess board.
+#
+# NOTE: Uses the non-standard Netscape <blink> tag to represent the
+# selected cell (in addition to the standard bgcolor= attribute to
+# the standard <td> tag).
+#
+# History:
+#
+#     1999-06-04: GNP: Genesis.
+#
+# Contributors:
+#
+#     GNP: Gregor N. Purdy
+#
+# Copyright (C) 1999-2006 Gregor N. Purdy. All rights reserved.
+#
+
+use strict;
+
+
+#
+# The board for testing:
+#
+
+my $board = [
+	[ qw(r n b q k b n r) ],
+	[ qw(p p p p p p p p) ],
+	[ qw(. . . . . . . .) ],
+	[ qw(. . . . . . . .) ],
+	[ qw(. . . . . . . .) ],
+	[ qw(. . . . . . . .) ],
+	[ qw(P P P P P P P P) ],
+	[ qw(R N B Q K B N R) ]
+];
+
+
+#
+# board_to_html()
+#
+
+sub board_to_html ($$$)
+{
+	my ($board, $sel_col, $sel_row) = @_;
+
+	my @row_labels = qw(8 7 6 5 4 3 2 1);
+	my @col_labels = qw(a b c d e f g h);
+
+	my @colors = qw(black white);
+	my @sel_colors = qw(gray silver);
+
+	print "<table cellspacing='0' cellpadding='0' border='0'>\n";
+
+	print "<tr align='center'><th height='20' width='20'></th>";
+	foreach(@col_labels) { print "<th width='20'>$_</th>"; }
+	print "<th width='20'></th></tr>\n";
+
+	my $row_num = 0;
+	my $col_num = 0;
+
+	foreach my $row (@$board) {
+		print "<tr align='center'>";
+		print "<th height='20'>$row_labels[$row_num]</th>";
+
+		$col_num = 0;
+
+		foreach my $cell (@$row) {
+			my $idx = ($col_num + $row_num) % 2;
+
+			die "No index" unless defined($idx);
+			die "Index too small" unless $idx >= 0;
+			die "Index too large" unless $idx <= 1;
+
+			my $bg = $colors[$idx];	
+			my $fg = $colors[1 - $idx];	
+
+			die "No backgound" unless defined($bg);
+			die "No foreground" unless defined($fg);
+			die "No contents" unless defined($cell);
+
+			if (($row_num == $sel_row) and ($col_num == $sel_col)) {
+				$cell = "<blink>$cell</blink>"; # NOTE: Non-standard Netscape tag
+				$bg = $sel_colors[$idx];
+			}
+			print "<td bgcolor='$bg'><font color='$fg'>$cell</font></td>";
+
+			$col_num++;
+		}
+
+		print "<th>$row_labels[$row_num]</th>";
+		print "</tr>\n";
+
+		$row_num++;
+	}
+
+	print "<tr align='center'><th height='20'></th>";
+	foreach(@col_labels) { print "<th>$_</th>"; }
+	print "<th></th></tr>\n";
+
+	print "</table>\n";
+}
+
+
+#
+# MAIN PROGRAM:
+#
+
+print q{
+<html>
+<head><title>Chess Board</title></head>
+<body>
+<p>This is an example of a chess board:</p>
+<hr>
+};
+
+board_to_html($board, 3, 6);
+
+print q{
+<hr>
+<p>How do you like it?</p>
+</body>
+</html>
+};
+
+
+#
+# End of file.
+#
+

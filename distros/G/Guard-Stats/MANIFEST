@@ -1,0 +1,23 @@
+Changes
+ignore.txt
+lib/Guard/Stats.pm
+lib/Guard/Stats/Instance.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/10-stat-guard.t
+xt/boilerplate.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+example/under_twiggy.psgi
+example/performance.pl
+example/command_line.pl
+t/11-time-stat.t
+t/12-twice.t
+TODO
+example/check_my_guard_class.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

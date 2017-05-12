@@ -1,0 +1,207 @@
+NAME
+    Geo::Google::PolylineEncoder - encode lat/lons to Google Maps Polylines
+
+SYNOPSIS
+      use Geo::Google::PolylineEncoder;
+
+      my $points = [
+                    # can also take points as [lat, lon]
+                    { lat => 38.5, lon => -120.2 },
+                    { lat => 40.7, lon => -120.95 },
+                    { lat => 43.252, lon => -126.453 },
+                   ];
+      my $encoder = Geo::Google::PolylineEncoder->new;
+      my $eline   = $encoder->encode( $points );
+      print $eline->{num_levels};  # 18
+      print $eline->{zoom_factor}; # 2
+      print $eline->{points};      # _p~iF~ps|U_ulLnnqC_mqNvxq`@
+      print $eline->{levels};      # POP
+
+      # in Javascript, assuming eline was encoded as JSON:
+      # ... load GMap2 ...
+      var opts = {
+        points: eline.points,
+        levels: eline.levels,
+        numLevels: eline.num_levels,
+        zoomFactor: eline.zoom_factor,
+      };
+      var line = GPolyline.fromEncoded( opts );
+
+DESCRIPTION
+    This module encodes a list of lat/lon points representing a polyline
+    into a format for use with Google Maps. This format is described here:
+
+    http://code.google.com/apis/maps/documentation/polylinealgorithm.html
+
+    The module is a port of Mark McClure's `PolylineEncoder.js' with some
+    tweaks. The original can be found here:
+
+    http://facstaff.unca.edu/mcmcclur/GoogleMaps/EncodePolyline/
+
+CONSTRUCTOR & ACCESSORS
+    new( [%args] )
+        Create a new encoder. Arguments are optional and correspond to the
+        accessor with the same name: the num_levels, zoom_factor,
+        visible_threshold, and force_endpoints entries elsewhere in this
+        document, etc...
+
+        Note: there's nothing stopping you from setting these properties
+        each time you encode a polyline.
+
+    num_levels
+        How many different levels of magnification the polyline has.
+        Default: 18.
+
+    zoom_factor
+        The change in magnification between those levels (see num_levels).
+        Default: 2.
+
+    visible_threshold
+        Indicates the length of a barely visible object at the highest zoom
+        level. Default: 0.00001. err.. units.
+
+    force_endpoints
+        Indicates whether or not the endpoints should be visible at all zoom
+        levels. force_endpoints is. Probably should stay true regardless.
+        Default: 1=true.
+
+    escape_encoded_points
+        Indicates whether or not the encoded points should have escape
+        characters escaped, eg:
+
+          $points =~ s/\\/\\\\/g;
+
+        This is useful if you'll be evalling the resulting strings, or
+        copying them into a static document.
+
+        Warning: don't turn this on if you'll be passing the encoded points
+        straight on to your application, or you'll get unexpected results
+        (ie: lines that start out right, but end up horribly wrong). It may
+        even crash your browser.
+
+        Default: 0=false.
+
+    lons_first
+        Specifies the order in which coordinates passed as arrayrefs to
+        encode should be interpreted:
+
+          # false: lat, lon
+          $encoder->encode([
+             [ 38.5, -120.2 ],
+             [ 40.7, -120.95 ],
+          ]);
+
+          # true: lon, lat
+          $encoder->encode([
+             [ -120.2, 38.5 ],
+             [ -120.95, 40.7 ],
+          ]);
+
+        Default: 0 = lat,lon
+
+        (Yes, the default feels wrong to the mathematician in me, but that's
+        how Google Maps do it, so for sake of consistency...)
+
+METHODS
+    encode( \@points );
+        Encode the points into a string for use with Google Maps
+        `GPolyline.fromEncoded' using a variant of the Douglas-Peucker
+        algorithm to set levels, and the Polyline encoding algorithm defined
+        by Google.
+
+        Expects a reference to a `@points' array:
+
+          [
+           { lat => 38.5, lon => -120.2 },
+           { lat => 40.7, lon => -120.95 },
+           { lat => 43.252, lon => -126.453 },
+          ];
+
+        The individual points can also be given as arrayrefs:
+
+          [
+           [ 38.5, -120.2 ],
+           [ 40.7, -120.95 ],
+           [ 43.252, -126.453 ],
+          ];
+
+        *Note:* I tried to avoid this initially, because there's no standard
+        for which should come first: *lat*s or *lon*s. But I agree, it's
+        more convenient in some cases so I've given you enough rope to hang
+        yourself... Of course you can easily unhang yourself: the order for
+        arrayrefs defaults to `lat, lon', but you can change that by setting
+        lons_first.
+
+        Returns a hashref containing:
+
+          {
+           points => 'encoded points string',
+           levels => 'encoded levels string',
+           num_levels => int($num_levels),
+           zoom_factor => int($zoom_factor),
+          };
+
+        You can then use the JSON modules (or XML, or whatever) to pass the
+        encoded values to your Javascript application for use there.
+
+    decode_points( $encoded_polyline );
+        Given an encoded polyline, returns the points:
+
+          [
+           { lat => 38.5, lon => -120.2 },
+           { lat => 40.7, lon => -120.95 },
+           { lat => 43.252, lon => -126.453 },
+          ];
+
+        Note that these will likely be slightly different from the original
+        points due to rounding errors during both encode & decoding.
+
+    decode_levels( $encoded_levels );
+        Given encoded levels, returns the levels:
+
+          [ 17, 16, 17 ]
+
+WHY DO MY LINES LOOK FUNNY?
+    Do your lines all go through the north pole? Maybe you have your *lon*s
+    & *lat*s mixed up... If so and you're using point arrays, you can set
+    lons_first.
+
+    Do your points not show up at particular zoom levels? That's not a bug,
+    it's a feature! Try playing with visible_threshold.
+
+    Do your encoded lines cause your browser to crash? Sounds like a bug -
+    file it!
+
+BUGS
+    https://rt.cpan.org/Dist/Display.html?Queue=Geo-Google-PolylineEncoder
+
+TODO
+    More optimization: encoding big files is *slow*. Maybe XS implementation
+    if there's enough demand for it?
+
+AUTHORS
+    Robert Rothenberg <rrwo@cpan.org>
+
+    Steve Purkis <spurkis@cpan.org>
+
+    Ported from Mark McClure's `PolylineEncoder.js' which can be found here:
+    http://facstaff.unca.edu/mcmcclur/GoogleMaps/EncodePolyline/PolylineEnco
+    derClass.html
+
+    Some encoding ideas borrowed from Geo::Google.
+
+    Bringing distance calcs in-line was Joel Rosenberg's idea:
+    http://facstaff.unca.edu/mcmcclur/GoogleMaps/EncodePolyline/gmap_polylin
+    e_encoder.rb.txt
+
+COPYRIGHT
+    Copyright (c) 2008-2010 Steve Purkis. Released under the same terms as
+    Perl itself.
+
+SEE ALSO
+    http://code.google.com/apis/maps/documentation/polylinealgorithm.html,
+    http://facstaff.unca.edu/mcmcclur/GoogleMaps/EncodePolyline/PolylineEnco
+    derClass.html (JavaScript implementation),
+    http://www.usnaviguide.com/google-encode.htm (similar implementation in
+    perl), Geo::Google, JSON::Any
+

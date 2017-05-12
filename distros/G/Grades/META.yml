@@ -1,0 +1,46 @@
+---
+abstract: 'A collocation of homework, classwork and exams'
+author:
+  - 'Dr Bean <drbean at (a) cpan dot (.) org>'
+build_requires:
+  FindBin: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Grades
+requires:
+  Carp: 0
+  Cwd: 0
+  Encode: 0
+  File::Basename: 0
+  Getopt::Long: 0
+  IO::All: 0
+  Lingua::Han::PinYin: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Moose: 0
+  Moose::Autobox: 0
+  MooseX::Declare: 0
+  MooseX::Getopt: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  POSIX: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  Text::Template: 0
+  Try::Tiny: 0
+  YAML: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: http://search.cpan.org/dist/Grades/
+  repository: http://svn.openfoundry.org/ttb/beans
+version: 0.16

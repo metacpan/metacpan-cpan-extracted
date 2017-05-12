@@ -1,0 +1,63 @@
+Revision history for Perl module Graph::ModularDecomposition.
+
+0.01  20040511 not released
+	original version; created by h2xs 1.21 with options
+		-A -X -n Graph::ModularDecomposition
+
+0.05  20040519 not released
+	changed hierarchy (split out GraphMisc, Bitvector/Bitvector2)
+	made GraphMisc optional in tests
+	updated documentation
+
+0.07  20040520 not released
+	more thorough documentation
+	more OO style methods
+	moved to_bitvector2 routines here, conditional include untested
+	starting to review Devel::Cover output
+	added new and TransitiveClosure_Floyd_Warshall since these both
+		need to construct ModularDecomposition objects
+
+0.08  20040524 not released
+	fixed problem with Graph::Directed::directed re-blessing, to Jarkko
+	now no need for stubs, inheritance works fine (yayy!)
+	cleaned up tests, separated out tests needing other modules
+	all tests pass, readying for release
+
+0.09  20040527
+	added back conditional stubs in case broken Graph is installed
+	filed bug report for Graph at CPAN
+	updated docs with suggested patch
+	tested with both original and modified Graph::Base.pm
+	added new() method for '$object->new' style invocation
+	added pairstring_to_graph(), partition_to_string()
+	conditional include of Bitvector2 conversion routine tested ok
+	test and code tweaks to increase Devel::Cover coverage
+
+0.10  20041018
+	removed workarounds for broken Graph inheritance behaviour
+	modified tests for compatibility with Graph-TNG
+
+0.11  20041031
+	debug output in tests into eval with STDERR > /dev/null
+	to_bitvector2 now uses vertices, not vertices_unsorted
+	modified 11.t and 15.t to work with Graph-TNG
+
+0.12  20051028
+	fixed 12.t sometimes failing due to nondeterministic ordering
+	added canonical_form() to try to keep vertex lists ordered
+	small documentation fixes
+	added pod.t pod-coverage.t META.yml
+
+0.13  20051211
+	VSEP/WSEP and QSEP/PSEP so now allows multicharacter node labels
+	changed factor() to take this change into account
+	small documentation fix
+
+0.14  20170329
+	tests should now work with hash randomization
+	updated documentation and now point to McConnell/de Montgolfier
+
+0.15  20170405
+	fixed POD nit https://rt.cpan.org/Public/Bug/Display.html?id=51710
+	corrected email address
+

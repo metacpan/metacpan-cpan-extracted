@@ -1,0 +1,18 @@
+
+* Build:
+  Support Module::Build as an alternative to ExtUtils::MakeMaker.
+
+* Feature:
+  Allow on the fly rescaling of tiles.  E.g. a tile for zoom level n
+  will be zoomed by 200% (using Image::Magick or Graphics::Magick or
+  something alike), cut into four, and stored as four tiles of zoom
+  level n+1.
+
+  Problem: Image::Magick or Graphics::Magick is quite a heavy
+  prerequisite given that Geo::OSM::Tiles is also used on handheld
+  devices.  Consider to make this feature configurable at build time.
+
+
+# Local Variables:
+# mode: text
+# End:

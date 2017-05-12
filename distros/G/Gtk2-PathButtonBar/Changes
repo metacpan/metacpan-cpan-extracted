@@ -1,0 +1,17 @@
+Revision history for Gtk2-PathButtonBar
+
+0.1.2	2009-10-13/14:00
+		-More button cleanup.
+		-No longer executes any thing more than once.
+
+0.1.1	2009-10-13/13:00
+		-Correct it not setting the path properly.
+
+0.1.0	2009-10-12/18:00
+		-Add the method setPath.
+		-Misc POD cleanups.
+		-Makefile.PL now properly requires Gtk2.
+
+0.0.0 	2008-10-28/17:00
+        Initial release.
+

@@ -1,0 +1,149 @@
+Games-Tournament-Swiss
+
+Version 0.15
+
+The complexity of the C11 code slowed this release down. C12 code wasn't touched, so I'm sure bugs remain. Cross your fingers that your tournament does not exercise the C12 code!
+
+This is a major revision. In addition, we have a nicer interface to writing pairing tests. Look at three.t in the t/ directory.
+
+Warning!
+
+This is ALPHA-level software. Although it attempts to implement the FIDE Swiss Rules, it may not pair players correctly. It may take over your computer, and force you to reboot. It may DELETE files. It may DESTROY your computer. Use at your own risk.
+
+NOTICE: More tests are needed. If you have an interesting pairing table that is difficult to pair, please report it as a bug at http://search.cpan.org/~drbean/Games-Tournament-Swiss/, ideally in the same format as t/three.t. Bring it on! Try to break Games::Tournament::Swiss and report your results!
+
+I recommend looking at the scripts. If you want some more help, look at the 
+tests. Again, scripts are still likely to break, but the purpose of that is to get you to write your own scripts. (ha-ha) Look at the scripts and the tests.
+
+This program is run from a shell. You need to work from a command line and type commands. It also depends on perl to run. If you don't know anything about perl, you will have to learn something about installing it and running scripts, before you can use this software.
+
+For perl on Windows, try the free download of ActiveState's distribution at http://www.activestate.com/store/activeperl, or the experimental Strawberry Perl http://win32.perl.org/wiki/index.php?title=Strawberry_Perl
+
+On other platforms, find it from your regular source for new packages.
+
+INSTALLATION
+
+This software doesn't install itself. To install this module, run the following commands:
+
+    perl Build.PL		or		perl Makefile.PL
+    ./Build					make
+    ./Build test				make install
+    ./Build install
+
+make may be nmake or dmake on Windows. The tests will take a few minutes.
+
+The distribution is made up of modules and scripts. The modules provide functionality that you can use to write your own tournament software. The scripts are an example of a swiss pairing program.
+
+SCRIPTS
+
+The scripts in script_files/ need to be installed somewhere so that they can be run in the directory in which pairing of each round is done.
+
+DIRECTORY LAYOUT
+
+The scripts assume that there is a directory in which a configuration file, called league.yaml, with data about the players exists. The rounds are paired in subdirectories, named 1,2,3,.. below this directory. Files named:
+
+brackets.yaml  pairing.yaml  round.yaml
+matches.yaml   player.yaml   tourney.yaml
+
+are left in these subdirectories after pairing.
+
+Scores are in another subdirectory called scores. They are of the form 1.yaml, 2.yaml,.. You need to create these files, if you use 'pairstately'.
+
+You can create a pairing table with 'pairingtable,' convert it into YAML form with 'pairtable2yaml' and run 'pair.'
+
+DATA FILES
+
+Do not use tabs in these YAML files. The level of indentation is significant. Follow the examples closely. The first, league.yaml has lines of the form:
+
+member:
+  - id: 1
+    name: Laver, Rod
+    rating: 2810
+    title: Grandmaster
+  - id: 2
+    name: Sampras, Pete
+    rating: 2800
+    title: Unknown
+  - id: 3
+    name: McEnroe, John
+    rating: 2780
+    title: Unknown
+
+If you are using your own scoring scheme, and colors (called, roles), see the example below. You can add your own data to the member records. A pairing number is generated for the players, so don't add a pairing number.
+
+Late entries in a round after the first get their own "late" records, of the same form as the member records.
+
+TODO Configuration of your own scoring scheme looks like it is broken.
+
+The score files: 1.yaml, etc, are of the form:
+
+'Laver, Rod': Loss
+'Sampras, Pete': Win
+'McEnroe, John': Bye
+
+First number is the name of the player. (Every name will have to be unique.) The second is the result for that player.
+
+Alternatively,
+1:
+  - 'Laver, Rod': 0
+  - 'Sampras, Pete': 1
+2: 
+  - 'McEnroe, John': -
+
+A template file is generated in the rounds subdirectory.
+
+A sample scoring scheme, abbreviations and roles in league.yaml could be:
+
+scores:
+  win: 1
+  loss: 0.5
+  draw: 0.75
+  absent: 0
+  bye: 1
+abbreviation:
+  W: White
+  1: Win
+  '=': Draw
+roles:
+  - White
+  - Black
+
+For the form of the pairing table and its YAML equivalent, see the documentation for 'pairtable2yaml.'
+
+GENERATING PAIRINGS
+
+Starting with an empty main directory, create league.yaml, and an empty subdirectory for the first round. Run the script, 'pair' in the empty round subdirectory. A log of the pairing is printed and 'round.yaml' in the directory contains the matches. After the games in the round are complete, in the scores subdirectory, enter the scores for the players in the file, '1.yaml', or whatever the round is. You can use the file called 1.yaml, or whatever in the round subdirectory as a template and afterward move it to the scores subdirectory. Then you can run 'crosstable 1' or 'pairingtable 1' in the original directory above the subdirectory, to get current standings. Convert your pairing table into YAML form with 'pairtable2yaml' and copy it into a subdirectory for the next round, and continue as before.
+
+WEB INTERFACE
+
+Check out the web app that you can front this library with in the web subdirectory of the repository.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Games::Tournament::Swiss
+
+You can also look for information at:
+
+    Search CPAN, for documentation and source:
+        http://search.cpan.org/dist/Games-Tournament-Swiss
+
+    CPAN Request Tracker (Report Bugs here):
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-Tournament-Swiss
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Games-Tournament-Swiss
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Games-Tournament-Swiss
+
+    Repository:
+        http://www.openfoundry.org/of/projects/swiss
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Dr Bean
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

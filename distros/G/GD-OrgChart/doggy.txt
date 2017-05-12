@@ -1,0 +1,2 @@
+The truetype font file "doggy.ttf"  was downloaded from:
+	http://www.coolarchive.com/fonts.cfm

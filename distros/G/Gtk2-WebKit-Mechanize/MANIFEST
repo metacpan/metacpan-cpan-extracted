@@ -1,0 +1,9 @@
+MANIFEST
+README
+LICENSE
+Makefile.PL
+lib/Gtk2/WebKit/Mechanize.pm
+t/001_load.t
+t/test.html
+t/010_js.t
+META.yml                                 Module meta-data (added by MakeMaker)

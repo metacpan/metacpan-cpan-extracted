@@ -1,0 +1,51 @@
+Gtk2-Ex-Utils version 0.09
+==========================
+
+This package contains useful classes for Gnome2/Gtk2 Perl GUI design.
+The following modules are contained herein:
+
+ Gtk2::Ex::Constants - Useful constants for working with Gnome2/Gtk2 Perl.
+ Gtk2::Ex::Utils - Extra Gtk2 Utilities for working with Gnome2/Gtk2 in Perl.
+
+For more information, please read the POD from the appropriate
+module.
+
+This README file should be updated with more detail sometime in the relatively
+near future.
+
+INSTALLATION
+
+To install this module type the following:
+
+perl Makefile.PL
+make
+make test         # optional step
+make install      # most likely requires su/sudo
+
+DEPENDENCIES
+
+This package requires Gtk2-Perl available from:
+
+ http://gtk2-perl.sourceforge.net
+
+COPYRIGHT AND LICENCE
+
+Gtk2::Ex::Utils - Useful utilities for Gnome2/Gtk2 Perl GUI design.
+Copyright (C) 2005  Open Door Software Inc. <ods@opendoorsoftware.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+
+

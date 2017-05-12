@@ -1,0 +1,171 @@
+#!/usr/bin/perl
+
+# Last Edit: 2016 Jan 01, 13:38:39
+# $Id: /swiss/trunk/script_files/pair 1285 2007-08-20T09:52:35.271041Z greg  $
+
+=head1 NAME
+
+crosstable - The results of players against their opponents
+
+=cut
+
+use strict;
+use warnings;
+
+use YAML qw/LoadFile DumpFile/;
+
+use Games::Tournament::Swiss::Config;
+
+my $swiss = Games::Tournament::Swiss::Config->new;
+
+my $league = LoadFile "./league.yaml";
+die 'round.yaml already exists' if -e 'round.yaml';
+my $roles = $league->{roles} || [qw/Black White/];
+my $scores = $league->{scores} ||
+	{ win => 1, loss => 0, draw => 0.5, absent => 0, bye => 1 };
+my $firstround = $league->{firstround} || 1;
+my $algorithm = $league->{algorithm} || 'Games::Tournament::Swiss::Procedure::FIDE';
+my $abbrev = $league->{abbreviation} ||
+    { W => 'White', B => 'Black', 1 => 'Win', 0 => 'Loss',
+	0.5 => 'Draw', '=' => 'Draw'  };
+
+$swiss->frisk($scores, $roles, $firstround, $algorithm, $abbrev);
+
+$Games::Tournament::Swiss::Config::firstround = $firstround;
+%Games::Tournament::Swiss::Config::scores = %$scores;
+@Games::Tournament::Swiss::Config::roles = @$roles;
+$Games::Tournament::Swiss::Config::algorithm = $algorithm;
+
+require Games::Tournament::Swiss;
+require Games::Tournament::Contestant::Swiss;
+require Games::Tournament::Card;
+
+my $tourney;
+my $table;
+my $players;
+my $games;
+
+## Make it possible to pass round number as an argument to this script.
+## If no argument is given then number of current round is computed 
+## by looking what's the last score file.
+
+my @rounds;
+if (($ARGV[0]) and ($ARGV[0] =~ /^\d+$/)) {
+    @rounds = (1..$ARGV[0]);
+} else {
+    for my $number ( glob ('./*') ) {
+	push @rounds, $1 if -d $number and $number =~ m/\/(\d+)$/ 
+	    and -e "./scores/$number.yaml";
+    }
+}
+
+my $timethrough;
+for my $round ( @rounds )
+{
+    next unless glob("./$round/*");
+    $tourney = LoadFile "./$round/tourney.yaml";
+    $players = LoadFile qq{./$round/player.yaml};
+    $games   = LoadFile "./$round/matches.yaml";
+    if ( $tourney->unmarkedCards(@$games) ) {
+        my $results = LoadFile("./scores/$round.yaml");
+        for my $game (@$games) {
+            my (%score, %result);
+            my $total;
+            my @contestants = map { $_->id } values %{ $game->{contestants} };
+            for my $role ( @$roles, 'Bye' ) {
+                my $player = $game->contestants->{$role};
+                next
+                  unless $player
+                  and $player->isa('Games::Tournament::Contestant');
+                my $result = $results->{ $player->name };
+                warn "$player->{name} got $result in round $round?"
+                       unless defined $result;
+                $result{$role} = $result;
+                $score{$role} =
+                    $role =~ m/Bye/i ? $scores->{bye}
+                  : $result =~ m/Win/i ? $scores->{win}
+                  : $result =~ m/Draw/i ? $scores->{draw}
+                  : $result =~ m/Loss/i ? $scores->{loss}
+                  : $result =~ m/Absent/i ? $scores->{absent}
+                  : "Error";
+		die "Error: $player->{name} $player->{id}'s result in round $round is $result?" if $score{$role} eq 'Error';
+		$total += $score{$role};
+            }
+	    warn "total scores in round $round with players @contestants = $total?"
+	    unless $total == $scores->{win} + $scores->{loss} or 
+	    $total == 2 * $scores->{draw} or
+	    $total == $scores->{draw} + $scores->{absent} or
+	    $total == 2 * $scores->{absent};
+            $game->result( \%result );
+        }
+    }
+    $tourney->collectCards(@$games);
+    for my $player (@$players) {
+        my $id = $player->id;
+        $table->{$id}->{id} = $id;
+        my $game     = $player->findCard(@$games);
+        my $opponent = $player->myOpponent($game)
+          || Games::Tournament::Contestant->new( name => "Bye", id => "0" );
+        my $result = $game->myResult($player);
+        if ( $result eq 'Bye' ) { $result = 'W'; }
+        else { $result =~ s/^(.).*$/$1/; }
+
+        # my $results = $table->{$id}->{results} or die
+        # "Player ${id}'s $table->{$id}->{results} result in round $round?";
+        my @results = $round == 1 ? () : @{ $table->{$id}->{results} };
+        push @results, $opponent->id . ":" . $result;
+
+        # $results .= $opponent->id . ":" . $result . ' ';
+        $table->{$id}->{results} = \@results;
+    }
+    $timethrough++;
+}
+
+my $playerN = 0;
+my $allRoundPlayers = $tourney->entrants;
+my @rankedplayers = $tourney->rank(@$allRoundPlayers);
+
+local $" = "     ";
+print "
+		Round @{[$#rounds+1]} Crosstable
+-------------------------------------------------------------------------
+Rank No  Name       Rating Total @rounds
+";
+local $" = " ";
+
+for my $player ( @rankedplayers )
+{
+	my $id = $player->id;
+	my $place = ++$playerN;
+	my $results = $table->{$id}->{results};
+	# my $allRoundPlayer = $tourney->ided($id);
+	# my $score = $allRoundPlayer->score;
+	my @results = ($player->id, $player->name, $player->rating, $player->score) or die "$player->{id}'s results?";
+	no warnings;
+	format STDOUT =
+@<< @<< @<<<<<<<<<<< @<<<< @<<< @<<<< @<<<< @<<<< @<<<< @<<<< @<<<< @<<<< @<<<<
+$place, $player->id, $player->name, $player->rating, $player->score, @$results
+.
+	write;
+	use warnings;
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+crosstable $n
+
+--help            This help message
+
+--man            A man page
+
+=head1 DESCRIPTION
+
+B<crosstable> tallies the results of a tournament, recording the role, the opponent and the result for each player over each of the rounds.
+
+Run it in the directory league.yaml is in and pass a round number, it will show results up to that round. If no number is passed, results up to the highest existing round in the directory are shown. Run it in a round directory, it will show pairgroups for the round after that round.
+
+=cut
+
+# vim: set ts=8 sts=4 sw=4 noet:

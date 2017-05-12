@@ -1,0 +1,8 @@
+digraph mainmap
+{
+	/* Note: URL must be in caps and quotes must be doubles. */
+
+	URL = "http://savage.net.au/maps/demo.2.1.html";
+	source [URL = "http://savage.net.au/maps/demo.2.2.html"];
+	source -> destination [URL = "/maps/demo.2.3.html"];
+}

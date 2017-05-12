@@ -1,0 +1,40 @@
+
+
+=pod
+
+=head1 NAME
+
+gmt example-2 - WRITE A ONE-LINE DESCRIPTION HERE
+
+=head1 SYNOPSIS
+
+gmt example-2 IN OUT
+
+gmt example2 IN OUT
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item IN
+
+(undocumented)
+
+=item OUT
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  This is a dummy command.  Copy, paste and modify the module! 
+  CHANGE THIS BLOCK OF TEXT IN THE MODULE TO CHANGE THE HELP OUTPUT.
+
+
+
+=cut
+

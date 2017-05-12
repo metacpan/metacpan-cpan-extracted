@@ -1,0 +1,16 @@
+~$
+\.bak$
+blib
+\.bs$
+build
+\.c$
+\.git
+\.gitignore$
+gtk2perl.h.gch$
+Makefile$
+Makefile\.old$
+MYMETA\..*
+\.o$
+\.spec$
+\.sw.$
+\.tar\.gz$

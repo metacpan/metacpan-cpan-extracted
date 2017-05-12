@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+#
+# This file is part of Games-Risk
+#
+# This software is Copyright (c) 2008 by Jerome Quelin.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+use 5.010;
+use strict;
+use warnings;
+
+package prisk;
+# ABSTRACT: classical Risk game written in perl
+$prisk::VERSION = '4.000';
+# terse error messages
+$ENV{MOOSE_ERROR_STYLE} = "croak";
+
+use Find::Lib "../lib";
+use lib "lib";
+
+use Games::Risk::App;
+Games::Risk::App->run;
+exit;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+prisk - classical Risk game written in perl
+
+=head1 VERSION
+
+version 4.000
+
+=head1 SYNOPSIS
+
+    $ prisk
+    $ prisk help
+    $ prisk play
+
+=head1 DESCRIPTION
+
+Risk is a strategic turn-based board game. Players control armies, with
+which they attempt to capture territories from other players. The goal
+of the game is to control all the territories (C<conquer the world>)
+through the elimination of the other players. Using area movement, Risk
+ignores realistic limitations, such as the vast size of the world, and
+the logistics of long campaigns.
+
+This distribution implements a graphical interface for this game.
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008 by Jerome Quelin.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

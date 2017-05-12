@@ -1,0 +1,15 @@
+Revision history for Group-Git-Taggers-Maven
+
+0.0.2   2015-08-29
+        Updating for release of version 0.0.2
+        Removed creation of makefile (Ivan Wills)
+        Updated the changes (Ivan Wills)
+
+0.0.1   2015-06-28
+        Updated manifest (Ivan Wills)
+        Added stop words (Ivan Wills)
+        Updated tests (Ivan Wills)
+        Added dependencies (Ivan Wills)
+        Implemented Maven check (Ivan Wills)
+        Indicating future plans (Ivan Wills)
+        Initial commit (Ivan Wills)

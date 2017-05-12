@@ -1,0 +1,60 @@
+=encoding UTF-8
+
+=head1 NAME 
+
+Gungho::Component::Cache.ja - キャッシュ機能を組み込む
+
+=head1 SYNOPSIS
+
+  components:
+    - Cache
+  cache:
+    default_backend: small_things
+    backends:
+      large_things:
+        class: '+Cache::Memcached::Managed',
+        data: '127.0.0.1:11211'
+      small_things:
+        class: '+Cache::Memcached::Managed',
+        data: '127.0.0.1:11212'
+
+=head1 DESCRIPTION
+
+このコンポーネントを組み込む事によってキャッシュをクローラーの中で
+使用できるようになります。複数のバックエンドを指定することもできます。
+
+設定するにはC<backends>にキャッシュの名前と設定を指定します
+
+  cache:
+    backends:
+      cache_name:
+        class: '+Cache::Memcached::Managed'
+        data: '127.0.0.1:11211'
+
+一旦設定できたら、C<cache()>メソッドでアクセスできます。
+
+  my $cache = $c->cache('cache_name');
+
+これでC<cache_name>という名前で設定されたキャッシュオブジェクトを返します。
+C<cache()>メソッドに引数を与えない場合はC<default_backend>で指定された
+キャッシュが返されます。
+
+=head1 METHODS
+
+=head2 setup
+
+キャッシュを初期化します。
+
+=head2 setup_cache_backends
+
+=head2 cache($name)
+
+C<$name>で指定されたキャッシュオブジェクトを返します。
+
+C<$name>を指定しない場合はC<default_backend>設定項目で指定されたキャッシュが
+返されます。
+
+C<$name>を指定しないで、なおかつC<default_backend>が設定されていない場合は
+例外を投げます。
+
+=cut

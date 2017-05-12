@@ -1,0 +1,39 @@
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+
+# This file is part of Gtk2-Ex-ListModelConcat.
+#
+# Gtk2-Ex-ListModelConcat is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Gtk2-Ex-ListModelConcat is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Gtk2-Ex-ListModelConcat.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libgtk2-ex-listmodelconcat-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.6
+Homepage: http://user42.tuxfamily.org/gtk2-ex-listmodelconcat/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libgtk2-ex-listmodelconcat-perl
+Architecture: all
+Depends: perl (>= 5.8), libgtk2-perl (>= 1:1.201), libgtk2-ex-widgetbits-perl (>= 17), libglib-perl, libglib-ex-objectbits-perl, ${perl:Depends}, ${misc:Depends}
+Description: Concatenate list model objects in Gtk2-Perl
+ Gtk2::Ex::ListModelConcat presents the contents of multiple list type
+ Gtk2::TreeModel objects as a single concatenated model.  Changes in
+ the sub-models are reported up, and changes can be applied down
+ through the Concat model if the sub-models are editable.

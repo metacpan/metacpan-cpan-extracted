@@ -1,0 +1,4 @@
+name = "Geography-BrazilianStates"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

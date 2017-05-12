@@ -1,0 +1,87 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  Gimp::Context->push();
+  my $xsize = $drawable->width;
+  my $ysize = $drawable->height;
+  my $out = Gimp::Image->new($xsize,$ysize,0);
+  Gimp::Context->set_background([128,128,128]);
+  my $windlayer = $out->layer_new($xsize,$ysize,RGB_IMAGE,"Windlayer",100,NORMAL_MODE);
+  $windlayer->fill(0);
+  $out->insert_layer($windlayer,0,0);
+  my $windlayercopy = $windlayer->copy(1);
+  $out->insert_layer($windlayercopy,0,0);
+  $windlayercopy->noisify(0,$density/255, $density/255, $density/255, 1);
+  $windlayercopy->mblur(
+    0, 15, $angle, $windlayercopy->width/2, $windlayercopy->height/2
+  );
+  $windlayercopy->set_mode(10); # Lighten Only
+  $out->merge_visible_layers(0);
+
+# many thanks to Dov for this suggestion as a workaround to the
+# gimp_image_merge_visible_layers bug
+  my $newlay = $out->get_active_layer;
+  my $xmult = cos(3.14159*$angle/180);
+  my $ymult = sin(3.14159*$angle/180);
+  $drawable->displace(
+    -$distance*$xmult, $distance*$ymult, 1, 1, $newlay, $newlay, $wrap
+  );
+  $drawable->offset(1,0,$distance*$xmult,-$distance*$ymult);
+  $out->delete;
+  Gimp::Context->pop();
+  ();
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+windify - Add wind to an image
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Distorts/Windify...
+
+=head1 DESCRIPTION
+
+Blow your image all over!
+
+=head1 PARAMETERS
+
+ [PF_INT32, "angle", "Wind Angle in degrees, 0 is right, increases anticlockwise", 120],
+ [PF_INT32, "density", "How Much Is Blown",80],
+ [PF_VALUE, "distance", "How Far It's Blown",30],
+ [PF_TOGGLE, "wrap", "Smear on Edges (or Wrap)",1]
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 HISTORY
+
+ sent to me by Seth Burgess <sjburges@gimp.org>
+ small changes my Marc Lehmann <pcg@goof.com>
+ 2014/03/17 ported to GIMP 2.8.10 by Ed J:
+   - I think the fill with the foreground colour should be background
+     since that's the colour expressly set, but didn't touch
+   - adjusted the maths so inputs are in degrees
+
+ There's corruption on the edges of this in smear mode.  Yuck.
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+1998-09-14
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

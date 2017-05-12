@@ -1,0 +1,250 @@
+The changes are logged onto the SVN, which is at
+http://trac.osgeo.org/geoinformatica/
+
+Moved to svn.osgeo.org
+
+Date: 23:45:18, 21. elokuuta 2008
+overlay's parameters can be set at glue's constructor
+
+Date: 23:44:01, 21. elokuuta 2008
+default single color can be set from outside
+
+Date: 22:37:18, 21. elokuuta 2008
+layer treeview tooltips and "v" instead of "?"
+
+Date: 13:14:45, 21. elokuuta 2008
+default single color is black now
+
+Date: 13:10:58, 21. elokuuta 2008
+default bg color is now white
+
+Date: 21:13:50, 19. elokuuta 2008
+assume patched ExtUtils::Depends::find_extra_libs
+
+Date: 14:18:39, 12. elokuuta 2008
+better way to check the GTK version
+
+Date: 14:14:00, 12. elokuuta 2008
+add a test for gtk version before use of tooltips for treeview
+
+Date: 10:14:17, 9. elokuuta 2008
+moved simple and its helper subs to gui.pl in Geoinformatica
+
+Date: 18:59:44, 8. elokuuta 2008
+add a parameter to initialize current folder
+
+Date: 18:59:05, 8. elokuuta 2008
+use Win32::TieRegistry for windows and initialize glue->{folder} to users document directory
+
+Date: 0:01:30, 7. elokuuta 2008
+tooltips for the layer tree view
+
+Date: 0:00:24, 7. elokuuta 2008
+rename log to output
+
+Date: 19:50:43, 19. toukokuuta 2008
+do not use Geo:: modules
+
+Date: 19:47:58, 19. toukokuuta 2008
+in dialog code get* methods return '' instead of undef if no selection
+
+Date: 15:37:06, 30. huhtikuuta 2008
+print to a log window in the simple app
+
+Date: 13:37:10, 15. huhtikuuta 2008
+documentation, formatting, removed extra MIN and MAX subs
+
+Date: 12:05:18, 13. huhtikuuta 2008
+New method point2surface, which is better for Cairo since it does not round to integer coords. Shorter aliases for event_pixel2point (pixel2point) and point2pixmap_pixel (point2pixel).
+
+Date: 21:08:28, 8. huhtikuuta 2008
+in button_press_event fire new_selection only if select, ctrl not down, and not polygon or path; when selecting or measuring a polygon, draw first a line and then a polygon
+
+Date: 15:43:50, 6. huhtikuuta 2008
+improve documentation
+
+Date: 9:45:01, 12. maaliskuuta 2008
+try to make more cpan tester friendly
+
+Date: 9:56:45, 11. maaliskuuta 2008
+writemakefile edits
+
+Date: 9:50:47, 11. maaliskuuta 2008
+0.58 and PREREQ_PM
+
+Date: 19:53:45, 10. maaliskuuta 2008
+New Layer method upgrade for converting substance classes to respective layer classes. register_class to check and record upgrade methods and use them in add_layer. Geo::simple method takes classes instead of registrations as a named parameter.
+
+Date: 21:58:34, 9. maaliskuuta 2008
+fix mapping between M,N width,height in pixbufs
+
+Date: 21:46:26, 9. maaliskuuta 2008
+gtk2-ex-geo.h, gtk2_ex_geo_pixbuf and its methods
+
+Date: 20:04:35, 9. maaliskuuta 2008
+removing traces of libral, Raster, and Vector
+
+Date: 20:19:27, 8. maaliskuuta 2008
+renaming Gtk2::Ex::Geo::Vector as Geo::Vector::Layer and Gtk2::Ex::Geo::Raster as Geo::Raster::Layer
+
+Date: 23:12:22, 6. maaliskuuta 2008
+added progressbar window for future use
+
+Date: 23:11:55, 6. maaliskuuta 2008
+renamed attribute that Glue adds to Layers to _tree_index
+
+Date: 23:36:29, 14. helmikuuta 2008
+removed dialog destroy since new GladeXML does not have destroy
+
+Date: 20:22:52, 1. joulukuuta 2007
+Method layer. add_layer returns the added layer.
+
+Date: 15:52:25, 1. joulukuuta 2007
+a new Geo::Vector is added as a layer
+
+Date: 16:51:48, 10. marraskuuta 2007
+multiple selection in tree view, new method: layers
+
+Date: 16:50:53, 10. marraskuuta 2007
+two layers, correct layer class
+
+Date: 1:29:07, 9. marraskuuta 2007
+maintain zoom_stack instead of previous_zoom and do it correctly, i.e., store offset and pixel size
+
+Date: 12:45:38, 3. marraskuuta 2007
+new signal update-layers gives the users a last chance to change the layers before they are rendered, the signal new-selection is emitted also if the selection is deleted
+
+Date: 11:43:04, 29. lokakuuta 2007
+map-updated signal (is not emitted if render to file), viewport in bootstrap
+
+Date: 9:24:29, 29. lokakuuta 2007
+control_down was not properly unset in key_release_event(?)
+
+Date: 17:33:24, 28. lokakuuta 2007
+no more features-selected signal, test in zoom_to whether to emit zoomed-in or extent-changed, in zoom emit either zoomed-in or extent-changed, in pan emit extent-changed
+
+Date: 16:46:48, 28. lokakuuta 2007
+no extent-widened signal, emit extent-changed if scrolled
+
+Date: 20:38:37, 7. lokakuuta 2007
+add a scrollbar to the layer list
+
+Date: 18:53:49, 16. syyskuuta 2007
+Rewrite of the end of close
+
+Date: 15:13:28, 21. elokuuta 2007
+added extent-changed signal
+
+Date: 10:41:05, 16. elokuuta 2007
+typemap was missing
+
+Date: 13:00:37, 6. elokuuta 2007
+explicitly destroy dialogs from all layers in close
+
+Date: 10:38:05, 3. elokuuta 2007
+in treedumper avoid recursion loops; fix border color bug in layer
+
+Date: 17:24:44, 1. elokuuta 2007
+handle the case where ctrl is down and selection is null
+
+Date: 10:59:43, 1. elokuuta 2007
+update features dialog in concert with selection
+
+Date: 22:57:54, 31. heinäkuuta 2007
+reselect = send signal new_selection
+
+Date: 16:43:36, 31. heinäkuuta 2007
+do not maintain selected layer in overlay; new signal new_selection (preferred over features_selected)
+
+Date: 22:01:28, 20. heinäkuuta 2007
+use Gtk2::Gdk::Color->new and not new Gtk2::Gdk::Color
+
+Date: 19:52:08, 19. heinäkuuta 2007
+delete rubberband attribute in button_release_event if measure path, prevents erasing the path in motion_notify (maybe this is not fixing in the right place)
+
+Date: 19:50:24, 19. heinäkuuta 2007
+fixed a typo in Layer.defaults; initialize COLOR_TABLE attribute in color_table method if setting from GDAL color_table; use Gtk2::Gdk::Color->new and not new Gtk2::Gdk::Color
+
+Date: 14:29:35, 17. heinäkuuta 2007
+version 0.54
+
+Date: 14:09:56, 17. heinäkuuta 2007
+area returns negative if cw
+
+Date: 20:14:44, 16. heinäkuuta 2007
+envelope is a ring
+
+Date: 21:49:04, 15. heinäkuuta 2007
+update_image in delete_rubberband but not in add_to_selection; in rubberband_value use Geo::OGC methods
+
+Date: 19:20:52, 14. heinäkuuta 2007
+rubberband_mode and rubberband_geometry; call update image after reselect; new image menu item "select containing"
+
+Date: 19:18:51, 14. heinäkuuta 2007
+selected_features gets or sets (doesn't add); after unselect all call update_image
+
+Date: 19:17:33, 14. heinäkuuta 2007
+divide overlay's rubberbanding into rubberband_mode and rubberband_geometry; remove backup pixmap; new methods: add_to_selection, reset_image and reset_pixmap; be more careful with creating selection
+
+Date: 19:13:38, 14. heinäkuuta 2007
+divide overlay's rubberbanding into rubberband_mode and rubberband_geometry
+
+Date: 0:15:26, 14. heinäkuuta 2007
+code to allow user create geometry collections
+
+Date: 19:56:18, 12. heinäkuuta 2007
+now uses Geo::OGC::Geometry 
+
+Date: 19:55:21, 12. heinäkuuta 2007
+new methods in Layer: features_selected (also an attribute), selected_features, and features
+
+Date: 20:51:29, 11. heinäkuuta 2007
+new methods: get_world, get_viewport, get_viewport_of_selection; cleanups
+
+Date: 20:50:32, 11. heinäkuuta 2007
+new methods: label_placements, value_range, bootstrap_dialog, dialog_visible; removed has_field (use schema); cleanups
+
+Date: 17:25:57, 11. heinäkuuta 2007
+use IPC::Gnuplot only if it is available
+
+Date: 15:45:06, 10. heinäkuuta 2007
+croak unless pixmap in create_backup_pixmap
+
+Date: 15:44:24, 10. heinäkuuta 2007
+require open_features_dialog, hue_dir is either -1 or 1
+
+Date: 15:42:24, 10. heinäkuuta 2007
+new method: run_command, dox,  in add_layer do not overwrite name
+
+Date: 15:40:33, 10. heinäkuuta 2007
+test with Gtk2::TestHelper
+
+Date: 1:39:57, 10. heinäkuuta 2007
+show toolbar button, change cursor when popup menu on layer list
+
+Date: 1:38:35, 10. heinäkuuta 2007
+test registering commands
+
+Date: 23:37:45, 9. heinäkuuta 2007
+simple named params for register_function 
+
+Date: 23:08:33, 9. heinäkuuta 2007
+simpler overlay menu
+
+Date: 23:07:11, 9. heinäkuuta 2007
+new methods: inspect_data, schema
+
+Date: 23:04:15, 9. heinäkuuta 2007
+simpler overlay menu
+
+Date: 23:02:09, 9. heinäkuuta 2007
+test layer class
+
+Date: 18:07:02, 9. heinäkuuta 2007
+removed draw_on and event_handler code mostly (should use signals)
+
+Date: 17:16:03, 9. heinäkuuta 2007
+moved p and plot to IPC::Gnuplot
+
+Date: 17:09:39, 9. heinäkuuta 2007
+setting title must be outside bootstrap

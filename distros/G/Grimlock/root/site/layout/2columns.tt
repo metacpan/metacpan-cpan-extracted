@@ -1,0 +1,45 @@
+[%
+DEFAULT left_column_template  = 'left_column';
+DEFAULT left_column_class     = 'main_column';
+
+DEFAULT right_column_template = 'right_column';
+DEFAULT right_column_class    = 'support_column';
+
+DEFAULT content_column = 'left';
+
+DEFAULT column_wrapper_class  = page.content_class;
+column_wrapper_class = '' IF column_wrapper_class == 'none';
+~%]
+<div class="[% page.content_class %]">
+IF content_column == 'left' %]
+    <div class="left [% left_column_class %]">[% content %]</div>
+    <div class="right [% right_column_class %]">
+    [%~
+    TRY;
+        PROCESS $right_column_template;
+    CATCH file;
+        '<p>Error rendering right column</p>';
+        IF c.debug;
+            '<p>' _ file.info _ '</p>';
+        END;
+    END;
+    ~%]
+    </div>
+[%
+ELSE;
+~%]
+    <div class="left [% left_column_class %]">
+    [%~
+    TRY;
+        PROCESS $left_column_template;
+    CATCH file;
+        '<p>Error rendering left column</p>';
+        IF c.debug;
+            '<p>' _ file.info _ '</p>';
+        END;
+    END ~%]
+    </div>
+    <div class="right [% right_column_class %]">[% content %]</div>
+[%
+END
+%]

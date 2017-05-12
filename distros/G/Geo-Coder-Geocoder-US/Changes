@@ -1,0 +1,47 @@
+0.007		2016-11-22	T. R. Wyant
+  Update deprecation schedule.
+    It was my intent to take a step every six months, but somehow I
+    overlooked the need to do this.
+
+    Add xt/author/minimum_perl.t
+
+0.006_01	2016-06-29	T. R. Wyant
+  Add deprecation notice to documentation and metadata. No functional
+    changes.
+
+  Add Makefile targets authortest, testcover
+
+0.006		2016-01-10	T. R. Wyant
+  Add pending retraction notice: The web site that this module in a
+    front-end to, http://geocoder.us/, disappeared in late 2015. Without
+    the web site, this module does nothing. If the web site or a
+    reasonable facsimile does not reappear by mid-2016, this module WILL
+    BE RETRACTED.
+
+  Add GitHub repository to metadata.
+
+0.005		2014-12-12	T. R. Wyant
+  No changes since 0.004_01.
+
+0.004_01	2014-12-03	T. R. Wyant
+  Tweak author tests.
+
+0.004		2013-07-28	T. R. Wyant
+  Recode delay loop in terms of while(), rather than a single-iteration
+    loop with 'last' and 'redo'.
+  Build URLs using the URI class rather than by hand.
+  Get rid of unused variables.
+
+0.003		2012-01-06	T. R. Wyant
+  Bring Changes file into compliance with Test::CPAN::Changes. Add
+    author test xt/author/changes.t to make sure it stays that way.
+
+0.002		2011-11-26	T. R. Wyant
+  Fix syntax error in Makefile.PL.
+  Correct address in LICENSES/Copying (GNU GPL 1.0).
+
+0.001		2011-11-19	T. R. Wyant
+  Initial production release to CPAN. No changes since 0.000_01.
+
+0.000_01	2011-11-05	T. R. Wyant
+  Initial release to CPAN.

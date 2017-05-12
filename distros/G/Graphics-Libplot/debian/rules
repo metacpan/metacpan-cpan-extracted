@@ -1,0 +1,61 @@
+#! /usr/bin/make -f
+# -*-makefile-*-
+# debian/rules file for libplot-perl
+
+export DH_COMPAT=4
+
+PERL	?= /usr/bin/perl
+
+package	:= $(firstword $(shell dh_listpackages))
+prefix	:= $(PWD)/debian/$(package)/usr
+
+version	:= $(shell dpkg-parsechangelog | \
+			sed -ne 's/^Version: *\([0-9]\+:\)*//p')
+
+tag:
+	cvs tag -c -F $(subst .,_,debian_version_$(version))
+ifeq ($(findstring -,$(version)),)
+	cvs tag -c -F $(subst .,_,upstream_version_$(version))
+endif
+
+build:	build-stamp
+build-stamp:
+	dh_testdir
+	$(PERL) Makefile.PL INSTALLDIRS=vendor PERL=$(PERL)
+	$(MAKE) LD_RUN_PATH=
+	touch $@
+
+clean:	checkroot
+	rm -f build-stamp
+	-$(MAKE) distclean
+	dh_clean
+
+binary-indep:	checkroot build
+
+binary-arch:	checkroot build
+	dh_clean
+	dh_installdirs
+
+	$(MAKE) pure_install PREFIX=$(prefix)
+	-rmdir -p $(prefix)/share/perl5
+	dh_installdocs README
+	dh_installexamples examples/*
+	dh_installchangelogs Changes
+
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_perl
+	dh_shlibdeps
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary:	binary-indep binary-arch
+
+checkroot:
+	dh_testdir
+	dh_testroot
+
+.PHONY:	binary binary-arch binary-indep clean checkroot build

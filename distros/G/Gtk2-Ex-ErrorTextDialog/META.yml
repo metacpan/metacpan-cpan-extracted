@@ -1,0 +1,44 @@
+--- #YAML:1.0
+name:               Gtk2-Ex-ErrorTextDialog
+version:            11
+abstract:           Dialog showing error messages in a TextView.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Devel::GlobalDestruction:  0
+    Glib:                 0
+    Glib::Ex::ObjectBits:  12
+    Glib::Ex::SignalIds:  0
+    Glib::Object::Subclass:  0
+    Gtk2:                 0
+    Gtk2::Ex::Units:      14
+    Locale::Messages:     0
+    Locale::TextDomain:   1.16
+    perl:                 5.008001
+resources:
+    homepage:  http://user42.tuxfamily.org/gtk2-ex-errortextdialog/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - devel
+        - xt
+        - devel
+        - examples
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    maximum_tests:
+        description:  Have "make test" do as much as possible.
+        requires:
+            Devel::FindRef:  0
+            Test::Weaken:    3

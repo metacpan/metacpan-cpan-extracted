@@ -1,0 +1,23 @@
+Build.PL
+Changes
+examples/sgf_break.pl
+examples/sgfFilter.pl
+lib/Games/SGF.pm
+lib/Games/SGF/Go.pm
+lib/Games/SGF/Util.pm
+license
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+readme
+t/00-load.t
+t/addon.t
+t/edit.t
+t/go-game.t
+t/inherit.t
+t/pod-coverage.t
+t/pod.t
+t/sgf_prop.t
+t/sgf_test.pl
+t/text.t
+t/util.t

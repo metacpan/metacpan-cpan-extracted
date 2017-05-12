@@ -1,0 +1,82 @@
+=head1 NAME
+
+Geo::Format::Landsat::MTL - read landsat meta data from MTL file
+
+=head1 INHERITANCE
+
+ Geo::Format::Landsat::MTL
+   is a Exporter
+
+=head1 SYNOPSIS
+
+ my ($type, $data) = landsat_mtl_from_file $filename;
+
+ # study the result.
+ use Data::Dumper;
+ warn Dumper $data;
+
+ print $data->{METADATA_FILE_INFO}{ORIGIN}, "\n";
+
+ my $data = landsat_meta_from_filename $filename;
+ print $data->{WRS_PATH};
+
+=head1 DESCRIPTION
+
+Process the content of a MTL file, as specified by document
+C<level1_dfcb_rev5_401.pdf>.
+See also F<http://landsathandbook.gsfc.nasa.gov/handbook/handbook_toc.html>
+
+=head1 FUNCTIONS
+
+B<landsat_meta_from_filename>(FILENAME)
+
+=over 4
+
+Returns information from the filename, like the PRODUCT_METADATA
+structured from the MTL record, but without opening the file.
+
+=back
+
+B<landsat_mtl_from_file>(FILE)
+
+=over 4
+
+Read one Vgroup record from the FILE, specified by name or filehandle.
+
+Returned is a pair: the name of the record (for instance, C<L1_METADATA_FILE>)
+and the destructed content.  Each nested group is represented by a nested
+HASH.
+
+The HASHes contain keys in capitals, which are exactly the fields as
+found in the meta-data file.  Additionally, a number of lower-cased
+keys are added (the lower cased versions of some upper-cased names)
+with smart processed information.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Geo-Format-Landsat distribution version 0.03,
+built on January 29, 2009. Website: F<http://perl.overmeer.net/geo/>
+All modules in this suite:
+L</Geo::Point>,
+L</Geo::Proj4>,
+L</Geo::WKT>,
+L</Math::Polygon>,
+L</Geo::GML>,
+L</Geo::ISO19139>,
+L</Geo::EOP>,
+L</Geo::Format::Envisat>, and
+L</Geo::Format::Landsat>.
+
+Please post questions or ideas to the mailinglist at
+F<http://geo-perl@list.hut.fi>
+
+=head1 LICENSE
+
+Copyrights 2009 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

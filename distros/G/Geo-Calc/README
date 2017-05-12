@@ -1,0 +1,11 @@
+
+Geo::Calc
+===========
+
+Geo::Calc tries to help anyone who needs computaion for geo coordinats
+
+The module is heavily resting on Math::Trig.
+Thanks to Chris Veness ( http://www.movable-type.co.uk/scripts/latlong.html )
+
+Improvements and additions please to
+       Sorin Pop, <asp@cpan.org>

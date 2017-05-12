@@ -1,0 +1,26 @@
+
+Trader.pl is a simple Trade Bot.
+
+Harvester.pl harvests lilacs in VOTD and sells them
+to the flower shop
+
+Hunter.pl kills animals that are defined in the canHunt
+hash and picks up there meat. It also finds bread in bags
+and eats it when needed. It may
+
+Huntel.pl and Harvester.pl MUST NOT be run on the real
+server - it will result in you being banned. If you wish
+to experiment with this bot do so on the test server only
+
+Do not run moer than one bot using the same 'knowledge.yaml' file,
+it is quite likely to corrupt the file
+
+If the bot seg faults(1), increase the process stack size with
+
+  ulimit -s 32768
+
+before running the bot
+
+(1) and if anybody knows of an efficient way to flood fill
+    an area where the boundaries are defined by height-maps
+    let me know ;-)

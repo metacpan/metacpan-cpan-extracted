@@ -1,0 +1,6 @@
+Revision history for Perl extension Geo::Fips55.
+
+0.01  Sat Apr  3 10:59:21 2004
+	- original version; created by h2xs 1.23 with options
+		-AXn Geo::Fips55
+

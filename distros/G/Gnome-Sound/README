@@ -1,0 +1,51 @@
+Gnome/Sound version 0.02
+========================
+
+This module is a Perl interface to gnome-sound, which provides sound
+playing routines for GNOME applications (http://www.gnome.org).
+These routines make use of the esd sound daemon.
+
+
+INSTALLATION
+------------
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+------------
+This module requires these other modules and libraries:
+	gnome-config command (or manually writing part of the Makefile.PL)
+	libgnome
+	libgnomesupport
+	libesd
+	libglib
+	Gnome Perl module from the gtk-perl package (http://www.gtkperl.org/)
+		(This module isn't directly needed, but programs using Gnome::Sound
+		 will need it).
+
+
+PROBLEMS OR COMMENTS
+--------------------
+If you encounter any problems with installation, please don't
+hesitate to contact me, mark@sporkstorms.org, with the necessary
+details (error messages, libgnome version, perl version, OS, etc).
+Comments, suggestions, questions, requests, etc are more than
+welcome as well. =)
+
+
+COPYRIGHT AND LICENCE
+---------------------
+	Copyright (c) 2001, Mark Stratman.  All Rights Reserved.
+	This module is free software. It may be used, redis-
+	tributed and/or modified under the same terms as Perl
+	itself.
+
+	The GNOME libraries (libgnome) are released under the LGPL
+	(Library General Public License). Visit http://www.gnu.org
+	for more details.
+

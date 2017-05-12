@@ -1,0 +1,4 @@
+--- #YAML:1.0
+option: global.conf-option
+var: global.conf-var
+

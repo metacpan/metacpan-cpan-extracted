@@ -1,0 +1,6 @@
+Revision history for Perl extension Geo::Coordinates::VandH::XS.
+
+0.01  Fri Oct 15 17:09:25 2004
+    - original version; created by h2xs 1.21 with options
+        -A Geo::Coordinates::VandH::XS
+

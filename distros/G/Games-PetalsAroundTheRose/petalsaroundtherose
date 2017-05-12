@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+=head1 NAME
+
+petalsaroundtherose - Petals around the rose game
+
+=head1 SYNOPSIS
+
+  petalsaroundtherose
+
+=head1 DESCRIPTION
+
+This is a game I found at L<http://crux.baker.edu/cdavis09/roses.html>.
+
+=cut
+
+use Games::PetalsAroundTheRose;
+
+while (1) {
+  # roll the dice
+  my @dice = Games::PetalsAroundTheRose::_five_dice();
+  # print the dice
+  print Games::PetalsAroundTheRose::_display(@dice);
+  # ask the question
+  print "\nHow many petals are there around the rose? ";
+  # exit if ^D is pressed
+  eof() && do {print "\n"; exit};
+  # read the answer
+  chomp (my $try = <>);
+  # get the real answer
+  my $result = Games::PetalsAroundTheRose::_total(@dice);
+  # print Correct or Wrong
+  print $try eq $result ? "Correct" : "Wrong";
+  # print the number of petals
+  print "! There are $result petals around the rose.\n\n";
+}
+
+=head1 SEE ALSO
+
+Games::PetalsAroundTheRose
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog@cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-games-petalsaroundtherose@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
+be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 Jose Castro, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

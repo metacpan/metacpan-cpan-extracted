@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+podregister {
+  my($W,$H) = ($image->width, $image->height);
+  Gimp::Context->push;
+  Gimp::Context->set_feather($feather);
+  Gimp::Context->set_feather_radius($radius, $radius);
+  my $i = $image->find_next_guide(0);
+  while ($i) {
+    my ($x,$y,$w,$h);
+    $x = $image->get_guide_position($i);
+    if ($image->get_guide_orientation($i) == ORIENTATION_HORIZONTAL) {
+      ($x,$y,$w,$h) = (0,$x-($w//0),$W,1);
+    } else {
+      ($x,$y,$w,$h) = ($x,0,1,$H);
+    }
+    $image->select_rectangle($operation,$x,$y,$w,$h);
+    $operation = CHANNEL_OP_ADD if $operation == CHANNEL_OP_REPLACE;
+    $i = $image->find_next_guide($i);
+  }
+  Gimp::Context->pop;
+  ();
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+guide_to_selection - Puts a selection mask around the guides
+
+=head1 SYNOPSIS
+
+<Image>/Image/Guides/To Selection...
+
+=head1 DESCRIPTION
+
+Selects the area under the guides (1px wide)
+
+=head1 PARAMETERS
+
+  [PF_RADIO, "operation", "The selection operation", CHANNEL_OP_REPLACE,
+	     [ADD => CHANNEL_OP_ADD, SUB => CHANNEL_OP_SUBTRACT, REPLACE => CHANNEL_OP_REPLACE]],
+  [PF_TOGGLE, "feather", "Feather the selection?", 0],
+  [PF_SPINNER, "radius","Radius for feather operation", 1, [0, 1000, 1e0]],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 HISTORY
+
+ 7/15/03 <sjburges@gimp.org>
+ Changed spot that its registered from <Image>/Guides to <Image>/Image/Guides
+ to reduce horizontal clutter on menubar
+
+=head1 AUTHOR
+
+Marc Lehmann
+
+=head1 DATE
+
+1999-08-01
+
+=head1 LICENSE
+
+Marc Lehmann <pcg@goof.com>
+
+Distributed under the same terms as Gimp-Perl.

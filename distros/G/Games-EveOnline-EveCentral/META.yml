@@ -1,0 +1,44 @@
+---
+abstract: 'A Perl library client for the EVE Central API.'
+author:
+  - 'Pedro Figueiredo <me@pedrofigueiredo.org>'
+build_requires:
+  Encode: 0
+  Error: 0
+  Exporter: 0
+  File::Find: 0
+  File::Temp: 0
+  HTTP::Response: 0
+  Test::Exception: 0
+  Test::Mock::Class: 0.0303
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Games-EveOnline-EveCentral
+requires:
+  HTTP::Headers: 6.05
+  HTTP::Request: 6.0
+  JSON: 2.90
+  LWP::UserAgent::Determined: 1.06
+  Moo: 1.003001
+  MooX::StrictConstructor: 0.006
+  MooX::Types::MooseLike: 0.25
+  MooX::Types::MooseLike::Base: 0
+  Readonly: 1.03
+  Sub::Quote: 1.003001
+  Try::Tiny: 0.18
+  URI::Escape: 3.31
+  XML::LibXML: 2.0108
+  perl: 5.012
+resources:
+  bugtracker: https://github.com/pfig/games-eveonline-evecentral/issues
+  repository: https://github.com/pfig/games-eveonline-evecentral
+version: 0.001

@@ -1,0 +1,23 @@
+Revision history for Google::Plus
+
+0.004   2011-10-11
+        Refactoring release
+        Perldoc and dist.ini minor fixes
+        Use an HTTP/HTTPS proxy when available
+        Support requesting partial responses
+
+0.003   2011-09-26
+        Add tests and fixes
+        Remove Person (be refactored later)
+        Add getting person's activities
+        Add getting a specific activity
+        Improve documentation
+
+0.002   2011-09-18
+        Add some docs to Google::Plus::Person
+        Put in *alpha* software warning
+
+0.001   2011-09-18
+        Initial release
+        Can retrieve profile info into Google::Plus::Person
+

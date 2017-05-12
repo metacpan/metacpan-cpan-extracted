@@ -1,0 +1,20 @@
+ChangeLog.pre-git
+copyright.pod
+doctypes
+examples/render-to-cairo.pl
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+maps
+NEWS
+perl-Gnome2-Rsvg.doap
+perl-Gnome2-Rsvg.spec.in
+README
+Rsvg.pm
+rsvg.typemap
+rsvg2perl.h
+t/Rsvg.t
+t/window.svg
+xs/Rsvg.xs
+META.yml                                 Module meta-data (added by MakeMaker)

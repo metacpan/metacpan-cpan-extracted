@@ -1,0 +1,25 @@
+strict digraph graph_09
+{
+
+	{
+
+	}
+	f[color = "coral" style = "filled"]
+	g[color = "salmon" style = "filled"]
+	h[color = "mistyrose" style = "filled"]
+
+	{
+		f
+		g
+	}
+ -> h
+	{
+
+	}
+ ->
+	
+	{
+
+	}
+
+}

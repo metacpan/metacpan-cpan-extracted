@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use sigtrap handler => sub { exit; }, qw(INT);
+
+die "Usage: $0 board_num=0 num_moves=1000 limit=0"
+	if ($ARGV[0] || "") =~ /^-h|--help$/;
+
+$_ = 1;
+my $board_num = shift || 0;
+my $num_moves = shift || 1000;
+
+my $test_filename = "affenspiel-solution-test.txt";
+my $best_filename = "affenspiel-solution-best.txt";
+
+-f $test_filename and `tail -1 $best_filename` =~ /Solved in (\d+) moves/
+	and print "Found solution in $best_filename\n" and $num_moves = $1;
+
+print "Current best result is $num_moves moves, trying to improve it\n\n";
+
+while (1) {
+	my $limit_level = @ARGV ? $num_moves - 1 : 0;
+	my $limit_label = $limit_level ? " (limit: $limit_level moves)" : "";
+	print "Solving board #$board_num randomly$limit_label ... ";
+	system("bin/affenspiel-solve -b $board_num -p -1 -m $limit_level >$test_filename 2>&1");
+
+	my $line = `tail -1 $test_filename`;
+	die "\n" unless $line =~ /^\w/;
+
+	if ($line =~ /Solved in (\d+) moves/ && $1 < $num_moves) {
+		$num_moves = $1;
+		$line =~ s/\n/ (record)\n/;
+		rename($test_filename, $best_filename);
+	}
+	print $line;
+}

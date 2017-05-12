@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+
+#BEGIN { $Gimp::verbose = 1; }
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  my $has_noselection;
+  $drawable->is_layer || die "A layer is required for this plugin";
+  $yoffset %= $yspacing;
+  $xoffset %= $xspacing;
+  $image->undo_group_start;
+# Get/save current selection info
+  if (!($image->selection_bounds)[0]) {
+    $image->selection_all;
+    $has_noselection=1;
+  }
+  my $selchannel = $image->selection_save;
+# Generate selection mask of dots on entire image
+  $image->selection_none;
+  for (my $x=$xoffset-$xspacing; $x<$image->width+$size+$xspacing; $x+=$xspacing) {
+    for (
+      my $y=$yoffset-$yspacing; $y<$image->height+$size+$yspacing; $y+=$yspacing
+    ) {
+      $image->select_ellipse(CHANNEL_OP_ADD,$x-0.5*$size,$y-0.5*$size,
+      $size,$size);
+    }
+  }
+# Set opacity of dots via selection mask
+  Gimp::Context->push;
+  my $opc = Gimp::Channel->new($image,$image->width,$image->height,"OPC", 50, [0,0,0]);
+  $image->insert_channel($opc,0,0);
+  Gimp::Context->set_foreground([($opacity/100.0)x3]);
+  $opc->fill(FOREGROUND_FILL);
+  $image->select_item(CHANNEL_OP_INTERSECT, $opc);
+# And mask off with original selection
+  $image->select_item(CHANNEL_OP_INTERSECT, $selchannel);
+# Make the dots
+  Gimp::Context->set_foreground($dotcolor);
+  $drawable->edit_fill(FOREGROUND_FILL);
+# Cleanup to state before plugin was called
+  if ($has_noselection) {
+    $image->selection_none;
+  } else {
+    $image->select_item(CHANNEL_OP_REPLACE, $selchannel);
+  }
+  $image->remove_channel($selchannel);
+  $image->remove_channel($opc);
+  Gimp::Context->pop;
+  $image->undo_group_end;
+  $drawable->set_active_layer;
+  return;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+dots - Create evenly spaced dots on a layer, within a selection
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Render/Pattern/Dots...
+
+=head1 DESCRIPTION
+
+Create evenly spaced dots of the given colour on a layer, within a
+selection (or on whole layer if no selection).
+
+=head1 PARAMETERS
+
+  [PF_SPINNER, "size", "Diameter of dots", 4, [1,255,1]],
+  [PF_COLOR, "dotcolor", "Color of the dots", [0,0,255]],
+  [PF_SLIDER, "opacity", "Opacity of dots", 100, [0,100,1]],
+  [PF_SPINNER, "xspacing", "Spacing of dots in X dimension", 16, [1,255,1]],
+  [PF_SPINNER, "yspacing", "Spacing of dots in Y dimension", 16, [1,255,1]],
+  [PF_SPINNER, "xoffset", "Offset of dots in X dimension", 0, [0,255,1]],
+  [PF_SPINNER, "yoffset", "Offset of dots in y dimension", 0, [0,255,1]],
+
+=head1 IMAGE TYPES
+
+RGB*, GRAY*
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+2003-09-20
+
+=head1 LICENSE
+
+Copyright Seth Burgess.
+Distributed under the same terms as Gimp-Perl.

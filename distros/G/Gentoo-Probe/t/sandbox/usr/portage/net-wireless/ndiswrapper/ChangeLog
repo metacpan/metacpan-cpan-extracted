@@ -1,0 +1,31 @@
+# ChangeLog for net-wireless/ndiswrapper
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/ndiswrapper/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+*ndiswrapper-0.6-r1 (29 Mar 2004)
+
+  29 Mar 2004; Peter Johanson <latexer@gentoo.org> ndiswrapper-0.6-r1.ebuild,
+  files/ndiswrapper-0.6-modules.d:
+  Bump, includes fixes from bug #45331 for module loading stuff. Thanks to
+  Juergen Nagel <juergen@nagel.homeip.net> for the changes.
+
+*ndiswrapper-0.6 (24 Mar 2004)
+*ndiswrapper-0.5 (24 Mar 2004)
+
+  24 Mar 2004; Peter Johanson <latexer@gentoo.org> ndiswrapper-0.4.ebuild,
+  ndiswrapper-0.5.ebuild, ndiswrapper-0.6.ebuild:
+  Bump, and add checks to make sure a sufficently new kernel is found.
+
+*ndiswrapper-0.3 (06 Mar 2004)
+
+  06 Mar 2004; Peter Johanson <latexer@gentoo.org> ndiswrapper-0.3.ebuild:
+  Adding version 0.3 for older kernels as 0.4 won't work with them.
+
+*ndiswrapper-0.4 (28 Feb 2004)
+
+  28 Feb 2004; Peter Johanson <latexer@gentoo.org> metadata.xml,
+  ndiswrapper-0.4.ebuild, files/ndiswrapper.modules.d:
+  Initial commit. Roughly based on ebuild from #38017, with large cleanups by
+  me. Includes pkg_config() function for helping generate the needed
+  /etc/modules.d/ndiswrapper file.
+

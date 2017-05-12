@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Gtk2-Ex-ICal-Recur
+version:      0.06
+version_from: lib/Gtk2/Ex/ICal/Recur.pm
+installdirs:  site
+requires:
+    Data::Dumper:                  0
+    DateTime::Event::ICal:         0
+    Glib:                          0
+    Gtk2:                          0
+    Gtk2::Ex::CalendarButton:      0
+    Gtk2::Ex::ICal::Recur::Selection: 0
+    Gtk2::Ex::Simple::List:        0
+    Gtk2::Ex::Simple::Menu:        0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

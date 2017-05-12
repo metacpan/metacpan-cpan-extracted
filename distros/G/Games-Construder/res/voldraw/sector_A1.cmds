@@ -1,0 +1,15 @@
+src_dst 0 0
+   fill_noise 3 2 0.5
+   map_range 0 1 0.05 0.5
+
+src_dst 0 1
+   src_blend 0
+   mode set
+   menger_sponge 2
+
+   dst_range 0.05 0.5
+   src_blend 1
+   fill
+   dst_range 0 1
+
+   #show_range_sector_type A1 3

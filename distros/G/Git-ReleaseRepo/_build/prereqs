@@ -1,0 +1,19 @@
+do{ my $x = {
+       'build_requires' => {},
+       'test_requires' => {
+                            'File::Temp' => 0,
+                            'Test::Most' => 0,
+                            'File::Spec::Functions' => 0,
+                            'File::Slurp' => 0
+                          },
+       'conflicts' => {},
+       'requires' => {
+                       'Git::Repository' => '1.26',
+                       'YAML::Tiny' => '1.51',
+                       'File::HomeDir' => 0,
+                       'App::Cmd' => '0.318',
+                       'File::Path' => 0
+                     },
+       'recommends' => {}
+     };
+$x; }

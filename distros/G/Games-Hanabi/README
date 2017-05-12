@@ -1,0 +1,40 @@
+Games-Hanabi version 0.01
+=========================
+
+Hanabi is a card game in which players take turns playing cards
+in 5 suits, sequentially from 1 to 5.  The catch is that players
+can only see each others' hands, and not their own.
+They must give hints to each in order to succceed.
+
+This distribution implements the rules for the game (no variations).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  List::Util
+  Clone
+  Data::Dumper
+  Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2014 by Jeff Till
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

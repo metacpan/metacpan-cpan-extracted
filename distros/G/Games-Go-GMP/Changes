@@ -1,0 +1,6 @@
+Revision history for Perl extension Games::Go::GMP.
+
+0.01  Wed Oct 10 15:54:52 2001
+	- original version; created by h2xs 1.21 with options
+		-d -x -F-I. -n Games::Go::GMP gmp
+

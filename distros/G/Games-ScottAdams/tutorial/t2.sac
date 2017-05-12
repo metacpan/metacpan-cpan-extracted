@@ -1,0 +1,19 @@
+%room chamber
+square chamber
+%exit e dungeon
+
+%item sign
+Sign says: leave treasure here, then say SCORE
+
+%room dungeon
+gloomy dungeon
+%exit w chamber
+%exit s cell
+
+%room cell
+dungeon cell
+%exit n dungeon
+
+%item coin
+*Gold coin*
+%getdrop coin

@@ -1,0 +1,221 @@
+#! perl
+
+use strict;
+use Games::Mines::Play;
+use Getopt::Long;
+
+=head1 NAME
+
+pmines - mine finder game.
+
+=head1 SYNOPSIS
+
+B<pmines> [B<--small>|B<--medium>|B<--large>] [B<--width>] [B<--height>] [B<--mines>] . . .
+
+=head1 DESCRIPTION
+
+Plays a text version the a mine finding game.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 8
+
+=item B<--small>|B<--medium>|B<--large>
+
+Starts with a small, medium or large field. The small field is 8x8 
+with 10 mines, the medium field is 16x16 with 40 mines, and the 
+large field is 16x30 with 99 mines.
+
+=item B<--width> B<--height> B<--mines>
+
+Set the width, height or number of mines used in this game. 
+Not that this can be combined with the B<--small>|B<--medium>|B<--large>
+to adjust only one component of the field.
+
+=item B<--color>
+
+Use ANSI color field. Will be quietly ignored on systems that don't 
+have the Term::ANSIColor module.
+
+=back
+
+=head1 PLAYING
+
+When you start the game you are presented with a blank square and and a prompt. You play the game by entering a command at he prompt:
+
+=over 8
+
+=item I<row> I<col>
+
+Step on the square located at I<row> I<col>.
+
+=item B<f> I<row> I<col>
+
+Place a flag at I<row> I<col>.
+
+=item u I<row> I<col>
+
+Remove a flag at I<row> I<col>.
+
+=item s I<game>
+
+Save game as game number I<game>
+
+=item l I<game>
+
+load game numerb I<game>
+
+=item q
+
+Quit the game and show the solution.
+
+=back
+
+=cut
+
+my($save_file) = "./pmines.sav";
+
+my(%opt);
+GetOptions( \%opt,
+	    'small','medium','large',
+	    'width=i','height=i','mines=i',
+	    'color');
+
+my (@defs) = Games::Mines::Play->default(%opt);
+
+my $game = Games::Mines::Play->new(@defs);
+
+if($opt{'color'}) {
+    $game->set_ANSI_Color;
+}
+
+my(@input);
+{
+    my($loaded)=0;
+    $game->print_out("field");
+    $game->print_status_line;
+    
+    print "Command: ";
+    my $line=<STDIN>;
+    $line =~s/\s*$//;
+    $line =~s/^\s*//;
+    redo unless($line);
+    (@input) = split(/\W+/,$line);
+    
+    redo if(@input >3);
+
+    my($cmd)='';
+    if($input[0] =~/\D/) {
+	$cmd = shift @input;
+    }
+    if( $cmd eq 'q') {
+	$game->fill_mines(); # need to show them something
+	last;
+    }
+    elsif($cmd eq 's') {
+        warn "Can't save a game that hasn't started\n";
+	redo;
+    }
+    elsif($cmd eq 'l') {
+	my($number) = 1;
+	if(@input && $input[0] =~/\d+/ ) {
+	    $number = $input[0];
+	}
+	$game->load_game($save_file,$number);
+	$loaded=1;
+    }
+    if($cmd eq 'f') {
+	redo unless(  @input == 2 && $input[0] =~/\d+/ && $input[1] =~/\d+/ );
+	$game->flag(@input);
+	redo;
+    }
+    
+    unless($loaded) {
+	redo unless(  @input == 2 && $input[0] =~/\d+/ && $input[1] =~/\d+/ );
+	$game->fill_mines([@input]);
+	$game->step(@input);
+    }
+    
+    while( $game->running ) {
+	
+	$game->print_out("field");
+	$game->print_status_line;
+
+	print "Command: ";
+	$line=<STDIN>;
+	$line =~s/\s*$//;
+	$line =~s/^\s*//;
+	redo unless($line);
+
+	(@input) = split(/\W+/,$line);
+	
+	redo if(@input >3);
+	
+	my($cmd)='';
+	if($input[0] =~/\D/) {
+	    $cmd = shift @input;
+	}
+	if( $cmd eq 'q') {
+	    last;
+	}
+	elsif($cmd eq 's') {
+	    my($number) = 1;
+	    if(@input && $input[0] =~/\d+/ ) {
+		$game->save_game($save_file,$input[0]);
+	    }
+	    else {
+		$game->save_game($save_file);
+	    }
+	    last;
+	}
+	elsif($cmd eq 'l') {
+	    my($number) = 1;
+	    if(@input && $input[0] =~/\d+/ ) {
+		$number = $input[0];
+	    }
+	    $game->load_game($save_file,$number);
+	    redo;
+	}
+	redo unless(   @input == 2 && $input[0] =~/\d+/ && $input[1] =~/\d+/);
+	if($cmd eq 'f') {
+	    $game->flag(@input);
+	}
+	elsif($cmd eq 'u') {
+	    $game->unflag(@input);
+	}
+	else {
+	    $game->step(@input);
+	}
+    }
+    
+}
+$game->print_out("check");
+$game->print_status_line;
+
+
+=head1 FILES
+
+pmines.sav - file that games are saved into.
+
+=head1 SEE ALSO
+
+Games::Mines and Games::Mines::Play for more details.
+
+=head1 AUTHOR
+
+Martyn W. Peck <mwp@mwpnet.com>
+
+=head1 BUGS
+
+None known. But if you find any, let me know.
+
+=head1 COPYRIGHT
+
+Copyright 2003, Martyn Peck. All Rights Reserves.
+
+This program is free software. You may copy or redistribute 
+it under the same terms as Perl itself.
+
+=cut
+
+1;

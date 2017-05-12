@@ -1,0 +1,9 @@
+o tests
+  o missing Usage
+  o various =for cases
+
+o =for getopt_handler Some::Module
+  # loads that module and sets the handler
+  needs:  parser rework?
+
+unless($handler->can("VERSION")) { eval("require $handler"); die $@ if $@; }

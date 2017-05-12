@@ -1,0 +1,31 @@
+# ChangeLog for app-portage/splat
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/splat/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  05 May 2004; Bryan Østergaard <kloeri@gentoo.org> splat-0.07.ebuild:
+  Stable on alpha.
+
+  03 May 2004; Bryan Østergaard <kloeri@gentoo.org> splat-0.07.ebuild:
+  Added ~alpha to keywords.
+
+*splat-0.07 (14 Dec 2003)
+
+  14 Dec 2003; Marius Mauch <genone@gentoo.org> splat-0.06.ebuild,
+  splat-0.07.ebuild:
+  version bump
+
+  19 Oct 2003; Martin Holzer <mholzer@gentoo.org> splat-0.06.ebuild:
+  Adding DEPEND="dev-lang/perl" Closes #31475.
+
+*splat-0.06 (15 Aug 2003)
+
+  01 Oct 2003; Marius Mauch <genone@gentoo.org> splat-0.06.ebuild:
+  added ~ppc as per bug 30040, marked stable on x86
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> splat-0.06.ebuild:
+  moved from app-admin to app-portage
+
+*splat-0.06 (17 Jul 2003)
+
+  17 Jul 2003; Mike Frysinger <vapier@gentoo.org> :
+  Initial import.  Ebuild submitted by Shaun Guth <l8nite@l8nite.net> #23036.

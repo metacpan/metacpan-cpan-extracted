@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Games::Hack::Live;
+
+Run();

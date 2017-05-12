@@ -1,0 +1,5 @@
+xs/GtkCellRendererSpinner.xs
+xs/GtkOffscreenWindow.xs
+xs/GtkSpinner.xs
+xs/GtkToolItemGroup.xs
+xs/GtkToolPalette.xs

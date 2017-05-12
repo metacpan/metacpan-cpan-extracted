@@ -1,0 +1,25 @@
+#!/usr/bin/perl -Iblib/lib
+
+use IPC::System::Simple qw(systemx);
+
+BEGIN {
+    my @mtime = map {(stat $_)[9]} qw(Makefile Makefile.PL);
+    systemx(qw(perl Makefile.PL)) if $mtime[0] != $mtime[1];
+    systemx(qw(make -f Makefile));
+}
+
+use File::Slurp qw(slurp write_file);
+my $pod = slurp("candlesticks.pod");
+   $pod =~ s/^.*=head1 EXAMPLE\n//s;
+   $pod =~ s/\n=head1.*//s;
+   $pod =~ s/^\S.*//mg;
+
+$pod =~ s/^.*20[0-9][0-9].*#$//mg if "@ARGV" =~ m/--small/;
+
+use lib 'blib/lib';
+eval $pod;
+write_file("/tmp/candlesticks.pl"=>$pod);
+die "while evaluating EXAMPLE from pod: $@" if $@;
+
+systemx(qw(eog /tmp/candlesticks_example.png));
+exit 0;

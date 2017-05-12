@@ -1,0 +1,34 @@
+GetRc - A Module for reading configuration files
+
+This perl library provides reading, writing and updating configuration files
+which is outside your Perl script.
+
+The current version of GetRc.pm is available at
+
+  http://rodney.alert.sk/perl/
+
+Usage:
+
+  use GetRc;
+
+  my $file = GetRc->new ("file_name");
+  $file->ifs('\s*:\s*');
+  my $result_get = $file->getrc(\%input);
+
+  my $newfile = GetRc->new ("new_file_name");
+  $newfile->ofs(' = ');
+  my $result_wri = $newfile->writerc(\%input);
+
+  my $updatefile = GetRc->new ("update_file_name");
+  $updatefile->ifs('\s*:\s*');
+  $updatefile->ofs(' = ');
+  my $result_upd = $updatefile->updaterc(\%input);
+
+Copyright 1997-2000 Jan 'Kozo' Vajda <Jan.Vajda@alert.sk>.  All rights
+reserved.  It may be used and modified freely, but I do request that this
+copyright notice remain attached to the file.  You may modify this module as
+you wish, but if you redistribute a modified version, please attach a note
+listing the modifications you have made.
+
+Address bug reports and comments to:
+Jan.Vajda@alert.sk

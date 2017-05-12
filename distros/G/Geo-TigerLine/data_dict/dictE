@@ -1,0 +1,19 @@
+Record Type E - Polygon Geographic Entity Codes: Economic Census
+
+Field     BV  Fmt  Type Beg End Len Description
+RT        No   L    A    1    1  1  Record Type
+VERSION   No   L    N    2    5  4  Version Number
+FILE      No   L    N    6   10  5  File Code
+CENID     No   L    A   11   15  5  Census File Identification Code
+POLYID    No   R    N   16   25 10  Polygon Identification Code
+STATEEC   No   L    N   26   27  2  FIPS State Code, 2002 Economic Census
+COUNTYEC  No   L    N   28   30  3  FIPS County Code, 2002 Economic Census
+RS-E1     Yes  L    N   31   35  5  Reserved Space E1
+RS-E2     Yes  L    N   36   40  5  Reserved Space E2
+PLACEEC   Yes  L    N   41   45  5  FIPS Economic Census PlaceCode, 2002 Economic Census
+RS-E3     Yes  L    N   46   50  5  Reserved Space E3
+RS-E4     Yes  L    N   51   54  4  Reserved Space E4
+RS-E5     Yes  L    A   55   55  1  Reserved Space E5
+COMMREGEC Yes  L    N   56   56  1  Commercial Region Code, 2002 Economic Census
+RS-E6     Yes  L    A   57   73 17  Reserved Space E6
+

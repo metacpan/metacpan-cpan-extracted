@@ -1,0 +1,8 @@
+Revision history for perl module Gtk2::Ex::CellRendererWrappedText
+
+0.2       2012-10-03 14:08:34
+- using Dist::Zilla
+- updated documentation
+
+0.01
+- first release

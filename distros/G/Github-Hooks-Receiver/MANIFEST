@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/SampleReceiver.pm
+lib/Github/Hooks/Receiver.pm
+lib/Github/Hooks/Receiver/Declare.pm
+lib/Github/Hooks/Receiver/Event.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/02_declare.t
+t/03_signature.t
+META.yml
+MANIFEST

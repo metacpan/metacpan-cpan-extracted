@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                GD-Graph-Polar
+version:             0.17
+abstract:            Make polar graph using GD package
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    GD:                            0
+    Geo::Constants:                0.04
+    Geo::Functions:                0.03
+    List::Util:                    0
+    Package::New:                  0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

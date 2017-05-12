@@ -1,0 +1,54 @@
+Games::FEAR::Log
+
+This module allows the parsing of a F.E.A.R. multiplayer server log into a
+manageable database format, and provides an easy to use object-oriented
+interface to access that information.  This information could then be used
+to create a CGI scoreboard application, such as the one included in the
+/examples directory.
+
+The underlying system uses a SQL relational database to store and retrieve
+game information.  Initially, this implimentation is built to use a MySQL or
+PostgreSQL database, but I can add support for other database systems if
+there is a demand.
+
+Ideally, there could be two different 'pieces' to an application using this
+module, an administrative interface to import new log entries into the
+database, and a public interface to display and/or cross-reference already
+imported information.
+
+If performance is not a concern, however, it could be a one-piece
+application where new entries are checked for and added every time the
+interface is viewed.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+TESTING
+
+There is an optional connectivity test run during 'make test' that creates
+a table and reads/writes it.  If you have an active supported database and
+would like to run this test, set the following environment variables:
+
+    DBI_DSN    DSN as used by the DBI module
+    DBI_USER   Username (must have permissions to create and write to a table)
+    DBI_PASS   Password for the given username
+
+If these environment variables are already defined on your system and you
+do NOT want to run the connectivity test, simply set the DBI_DSN variable
+to an empty string.  On a *nix system, this can be done just for the
+current command:
+
+    DBI_DSN='' make test
+
+COPYRIGHT
+
+Copyright (C) 2007 Evan Kaufman, <evank at cpan.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

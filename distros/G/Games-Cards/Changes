@@ -1,0 +1,50 @@
+Significant changes for Perl extension Games::Cards.
+
+1.45	2000/07/13 21:49:49
+	- war.pl output is now prettier, if still useless
+	- include freecell.tk in distribution
+	- klondike.pl has become klondike.tk
+	! New Games::Cards::Tk module allows you to write GUI card games!
+	- Rearranged directory structure to help installation
+
+1.38 	2000/03/19 21:04:48
+	- Bug: When you tried to do an illegal move, GC::Undo::end_move would
+	  push an empty move onto the Undo list causing bugs.
+	- Bug in klondike.pl's "finish" command
+
+1.36 	2000/01/24  (Millenium version :)
+	- Bug in test.pl (thanks cpan-testers!)
+
+1.35 	1999/11/10
+	- Added minimal test in test.pl
+	- Added GC::CardSet::clone and GC::Card::clone. This allows "restart"
+	  in card games
+	- Andy Bach and Michael Houghton both sent me implementations of the 
+	  solitaire game "Freecell" within a couple days of each other.
+	  Michael's version includes a Tk GUI implementation as well!
+	  I'm going to try to include these games in the next release.
+
+1.34 	1999/10/28
+	- Fix Makefile.PL, etc.: make install wasn't installing Games::Cards!
+	- Make Undo stuff a bit more OO, allow calling undo during a turn
+	- Fix a couple bugs in undoing turning a card up/down
+
+1.33 	1999/08/25
+	- Major overhaul of Undo and methods to add/remove/move cards
+	- Hand class (for a player's hand)
+	- Sorting by suit, value, or both
+	- plays gin -- but only on one console :(
+
+ 1.20	1999/08/12
+ 	! alpha release version (announced on cpl.modules, added to CPAN)
+
+ 1.16	1999/08/09
+ 	- plays klondike
+	- undo
+
+ 1.5	1999/08/01
+	- plays war
+
+ 1.1	1999/08/01 18:35:18
+	- original version
+

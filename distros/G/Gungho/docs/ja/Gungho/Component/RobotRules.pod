@@ -1,0 +1,87 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::RobotRules.ja - robots.txtの処理を行う
+
+=head1 SYNOPSIS
+
+  # 組み込み
+  components:
+    - RobotRules
+
+  # RobotRules設定
+  robot_rules:
+    storage:
+      module: DB_File
+      config:
+        filename: /path/to/storage.db
+
+=head1 DESCRIPTION
+
+Gungho::Component::RobotRulesはクローラーを書く以上必ず実装しなければならない
+robots.txtの処理を行うコンポーネントです。このコンポーネントを使用することに
+より、全てのリクエストに対しrobots.txtを適切に適応し、許可無くページを
+クロールすることを避けられます。
+
+Gungho::Component::RobotRulesが組み込まれると、Gunghoに取得要求のあった全ての
+HTTPリクエストに対し、まずRobotRulesストレージから現在処理中のURLに対応する
+Ruleオブジェクトを取得します。存在しない場合は新規に取得を開始し、その
+リクエストは待機リストに送られます（Providerには戻されません）。その後robots.txt
+を取得した後ルールを作成した時点で（もちろんrobots.txtが存在しない場合は
+空ルールが作られます）その待機リストから該当のリクエストが再度robots.txtに
+記されていたルールにのっとって取得可能かチェックされます。
+
+=head1 METHODS
+
+=head2 setup
+
+RobotRulesコンポーネントを初期化します。
+
+=head2 setup_robot_rules_parser
+
+robots.txtをパースするパーサーオブジェクトを初期化します
+
+=head2 setup_robot_rules_storage
+
+ルールを格納するストレージを初期化します。
+ストレージはrobot_rules.storage.moduleにモジュール名を指定する事で
+好きなストレージを指定する事ができます。
+
+=head2 handle_response
+
+Gunghoのhandle_responseをオーバーライドし、それがRobotRules.pmから出された
+リクエストだった場合は適切な処理を行います。
+
+=head2 send_request
+
+Gunghoのsend_requestをオーバーライドし、そのリクエストが取得可能かどうか
+確認します。
+
+=head2 allowed($request)
+
+リクエストが取得可能かどうか確認します。
+戻り値が1の場合は取得可能、0の場合は取得負荷です。
+戻り値が-1だった場合はrobots.txtが存在しないため、取得を行います。
+戻り値が-2だった場合は既にrobots.txtは取得中です。
+
+=head2 dispatch_pending_robots_txt
+
+robots.txtの取得待ちのリクエストをProviderにpushback_request()経由で
+で渡します。
+
+=head2 push_pending_robots_txt
+
+robots.txt取得待ちリクエストのリストにリクエストを追加します。
+
+=head2 parse_robot_rules
+
+robots.txtをパースし、結果をストレージに格納します。
+
+=head1 SEE ALSO
+
+L<WWW::RobotRules::Parser|WWW::RobotRules::Parser>
+L<Gungho::Component::RobotRules::Storage::DB_File|Gungho::Component::RobotRules::Storage::DB_File>
+L<Gungho::Component::RobotRules::Storage::Cache|Gungho::Component::RobotRules::Storage::Cache>
+
+=cut

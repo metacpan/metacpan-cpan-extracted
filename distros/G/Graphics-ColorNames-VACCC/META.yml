@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Graphics-ColorNames-VACCC
+version: 1.02
+author:
+  - Robert Rothenberg <rrwo at cpan.org>
+abstract: |-
+  VisiBone Anglo-Centric Color Codes for Graphics::ColorNames
+license: perl
+requires:
+  Graphics::ColorNames: 1.01
+  perl: 5.6.0
+build_requires:
+  Test: 0
+provides:
+  Graphics::ColorNames::VACCC:
+    file: lib/Graphics/ColorNames/VACCC.pm
+    version: 1.02
+generated_by: Module::Build version 0.25_02

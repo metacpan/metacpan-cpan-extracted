@@ -1,0 +1,53 @@
+Git-CPAN-Hook
+
+Git::CPAN::Hook adds Git awareness to the CPAN.pm module installer.
+Once the hooks are installed in CPAN.pm's configuration, each and every
+module installation will result in a commit being done in the installation
+directory/repository.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Git::CPAN::Hook
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-CPAN-Hook
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Git-CPAN-Hook
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Git-CPAN-Hook
+
+    Search CPAN
+        http://search.cpan.org/dist/Git-CPAN-Hook
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Philippe Bruhat (BooK)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

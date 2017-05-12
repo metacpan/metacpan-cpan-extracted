@@ -1,0 +1,15 @@
+=head2 anykeyword
+
+This module requires that every incoming message have at least one keyword
+on the subject line.  For the purposes of this check, a keyword is defined
+as anything that matches:
+
+    /^(?:Re:\s+)?\[\S+\]/
+
+(in other words, something without spaces enclosed in square brackets at
+the beginning of the subject line modulo any Re:).  If no keyword is found
+in the incoming message, this module returns the message:
+
+    No keyword found
+
+This module takes no arguments or configuration directives.

@@ -1,0 +1,48 @@
+---
+abstract: "Create or parse Google's SAML requests"
+author:
+  - 'Manni Heumann (saml at lxxi dot org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-SAML-Request
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Google::SAML::Request:
+    file: lib/Google/SAML/Request.pm
+    version: '0.05'
+requires:
+  CGI: '0'
+  Carp: '0'
+  Compress::Zlib: '0'
+  Date::Format: '0'
+  MIME::Base64: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  URI::Escape: '0'
+  XML::Simple: '0'
+resources:
+  bugtracker: https://github.com//mannih/Google-SAML-Request/issues
+  homepage: https://github.com//mannih/Google-SAML-Request
+  repository: git://github.com//mannih/Google-SAML-Request.git
+version: '0.05'
+x_contributors:
+  - 'manni <manni@5c52eb61-1380-4012-85c8-26fb47f1eac4>'
+  - 'Manni Heumann <heumann@strato-rz.de>'
+  - 'Manni Heumann <github@lxxi.org>'

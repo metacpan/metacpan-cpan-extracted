@@ -1,0 +1,9 @@
+digraph graph_36
+{
+// C++-style comment.
+	node_36_1
+	[
+		color = red
+		fontcolor = green
+	];
+}

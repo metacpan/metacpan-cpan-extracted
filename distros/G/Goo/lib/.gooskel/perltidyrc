@@ -1,0 +1,115 @@
+###############################################################################
+# Nigel Hamilton
+#
+# Copyright Nigel Hamilton 2005
+# All Rights Reserved
+#
+# Author:       Nigel Hamilton, Dr Sven Baum
+# Filename:     perltidyrc
+# Description:  perltidyrc : configuration file for the Perl beautification tool
+#				These options are based on Damian Conway's advice in 
+#				"Perl Best Practices".
+#
+# Date          Change
+# -----------------------------------------------------------------------------
+# 27/03/2004    Auto generated file
+#
+###############################################################################
+#
+# conway options
+#
+--maximum-line-length=98
+--indent-columns=4
+# -nt								# no tabs
+--continuation-indentation=4
+#--standard-output
+--standard-error-output
+--line-up-parentheses
+--vertical-tightness=1
+--closing-token-indentation=1
+--paren-tightness=2
+--brace-tightness=1
+--square-bracket-tightness=1
+--block-brace-tightness=1
+--nospace-for-semicolon
+--nooutdent-long-lines
+--want-break-after="% + - * x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x= . << >> -> && ||"
+--cuddled-else
+--opening-brace-always-on-right
+--blanks-before-comments
+--maximum-consecutive-blank-lines=2
+--blanks-before-subs
+--noswallow-optional-blank-lines
+#--want-break-before=" "
+#--want-break-before=" "
+--comma-arrow-breakpoints=1
+--break-at-old-logical-breakpoints
+--break-at-old-keyword-breakpoints
+--break-at-old-trinary-breakpoints
+--nowant-left-space="/ ++ --"
+--nowant-right-space="/ ++ --"
+	
+
+# i/o control
+#--backup-and-modify-in-place
+#--backup-file-extension=~
+
+# basic formatting options
+#--maximum-line-length=77
+#--indent-columns=4
+#--entab-leading-whitespace=8
+
+# code indentation control
+#--continuation-indentation=4
+#--indent-closing-paren
+#--nooutdent-long-comments
+#--nooutdent-long-quotes
+#--nooutdent-long-lines
+#--line-up-parentheses
+#--closing-token-indentation=2
+
+# whitespace control
+#--paren-tightness=2
+#--square-bracket-tightness=2
+#--brace-tightness=2
+#--block-brace-tightness=0
+#--nospace-terminal-semicolon
+#--nospace-for-semicolon
+#--want-left-space="= .= =~ !~ :"
+#--want-right-space="= .= =~ !~ ? :"
+#--nowant-left-space="++ -- ?"
+#--nowant-right-space="++ --"
+#--trim-qw
+
+# semicolon controls
+#--noadd-semicolons
+#--nodelete-semicolons
+
+# comment controls
+#--indent-spaced-block-comments
+#--minimum-space-to-comment=2
+#--hanging-side-comments
+#--noclosing-side-comments
+
+# line break control
+##--nocuddled-else
+#--cuddled-else
+###--opening-brace-on-new-line
+#--opening-brace-always-on-right
+###--opening-sub-brace-on-new-line
+#--vertical-tightness=1
+#--vertical-tightness-closing=0
+#--block-brace-vertical-tightness=0
+#--want-break-after="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x= . << >> -> && ||"
+#--want-break-before=" "
+#--comma-arrow-breakpoints=1
+#--break-at-old-logical-breakpoints
+#--break-at-old-keyword-breakpoints
+#--break-at-old-trinary-breakpoints
+#--blanks-before-comments
+#--blanks-before-subs # also -packages -BEGINS, unless preceded by comment
+#--maximum-consecutive-blank-lines=2
+#--noswallow-optional-blank-lines
+
+
+

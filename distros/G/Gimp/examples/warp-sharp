@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+#$Gimp::verbose = 3;
+
+podregister {
+  $drawable->become('Gimp::Layer');
+  my $width=$drawable->width;
+  my $height=$drawable->height;
+  my $type=($drawable->type);
+  $image->undo_group_start;
+  my $edge_layer = $drawable->copy(FALSE);
+  my $x_displace_layer=
+    $image->layer_new($width, $height, $type, "Displace X", 100, 0);
+  my $y_displace_layer=
+    $image->layer_new($width, $height, $type, "Displace Y", 100, 0);
+  my @selection_info=$image->selection_bounds;
+  my $has_selection=$selection_info[0];
+  my $old_selection;
+  my $bump_xoff = 0;
+  my $bump_yoff = 0;
+  my $version=1;
+  if ($has_selection) {
+      $old_selection=$image->selection_save;
+      $image->selection_grow($blur_strength + $bump_depth + $displace_amount);
+      $bump_xoff=$selection_info[1];
+      $bump_yoff=$selection_info[2];
+  }
+  $x_displace_layer->fill(1 + $version);
+  $y_displace_layer->fill(1 + $version);
+  $image->insert_layer($edge_layer,0,-1);
+  $image->insert_layer($x_displace_layer,0,-1);
+  $image->insert_layer($y_displace_layer,0,-1);
+# added another parameter in edge detect plugin... I'm assuming it was
+# previously differential?
+# TODO: add warp type enums
+  $image->edge($edge_layer,$edge_strength,1,4);
+  $image->gauss_iir($edge_layer, $blur_strength, 1, 1) if $blur_strength >= 1;
+  $image->bump_map($x_displace_layer,$edge_layer, 0, 30,
+		   $bump_depth, $bump_xoff, $bump_yoff, 0,0,0,0,0);
+  $image->bump_map($y_displace_layer,$edge_layer, 270, 30,
+		   $bump_depth, $bump_xoff, $bump_yoff, 0,0,0,0,0);
+  if ($has_selection) {
+    $image->select_item(CHANNEL_OP_REPLACE, $old_selection);
+    $old_selection->remove_channel;
+  }
+  $image->displace($drawable, $displace_amount, $displace_amount, 1, 1, $x_displace_layer, $y_displace_layer, 1);
+  $image->remove_layer($edge_layer);
+  $image->remove_layer($x_displace_layer);
+  $image->remove_layer($y_displace_layer);
+  $image->undo_group_end;
+  return;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+warp_sharp - Sharpen the current drawable
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Enhance/Warp Sharp...
+
+=head1 DESCRIPTION
+
+Sharpen the current drawable by squeezing unsharp edges. Algorithm
+described by Joern Loviscach in c't 22/1999, p 236.
+
+=head1 PARAMETERS
+
+ [PF_SLIDER, "edge_strength", "Edge detection", 7, [1, 10, 0.1]],
+ [PF_SLIDER, "blur_strength", "Blur radius", 3, [0, 10, 0.1]],
+ [PF_SLIDER, "bump_depth", "Bump depth", 2, [1, 10, 1]],
+ [PF_SLIDER, "displace_amount", "Displace Intensity", 2.5, [0.1, 10, 0.1]]
+
+=head1 IMAGE TYPES
+
+RGB*, GRAY*
+
+=head1 AUTHOR
+
+Simon Budig <simon@gimp.org>, Peter Daum <gator@cs.tu-berlin.de>
+
+=head1 DATE
+
+2000-05-11
+
+=head1 LICENSE
+
+Copyright Simon Budig, Peter Daum. (original scheme by Simon Budig).
+
+Distributed under the terms of the GNU Publice License, v2 or higher.

@@ -1,0 +1,37 @@
+=pod
+
+README for Getopt::Gen
+
+=head1 ABSTRACT
+
+Perl module for extended gengetopt-like parsing and
+C source generation.
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item * Parse::Yapp
+
+=item * Parse::Lex
+
+=item * Text::Template
+
+=back
+
+=head1 DESCRIPTION
+
+Getopt::Gen is a perl module which generates C code for command-line
+utilities.  It accepts a superset of the command-line parser specifications
+used by gengetopt(1).
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+gengetopt(1),
+Parse::Yapp(3pm),
+Parse::Lex(3pm),
+perl(1).

@@ -1,0 +1,47 @@
+Revision history for Graph::Convert:
+
+2007-11-19 v0.09 Tels 151 tests (no code changes)
+  * update the requirements (Graph v0.84 and Graph::Easy v0.60)
+  * make Makefile.PL 5.005 proof *sigh*
+  * make t/pod_cov.t 5.10.x proof *sigh*
+
+2007-08-12 v0.08 Tels 149 tests
+  * add as_undirected_graph()
+  * fix as_multiedged_graph() to work with undirected inputs
+  * further fixes to the workaround of the Graph bug with undirected graphs
+  * add a few details to the doc
+  * require Graph::Easy v0.57
+
+2007-07-22 v0.07 Tels 140 tests
+  * support for undirected graphs
+  * require Graph::Easy v0.56
+
+2007-07-01 v0.06 Tels 132 tests
+  * add parameter "undirected => 1" to as_graph() (Thanx to Daniel Bößwetter!)
+    (and workaround Graph bug with add_edge_attributes *sigh*)
+
+2007-06-11 v0.05 Tels 110 tests
+  * require Graph::Easy v0.55
+  * groups are now preserved (Thanx Donuvi Tanoga for the reminder!)
+  
+2006-11-03 v0.04 Tels 63 tests
+  * add: as_multiedged_graph()
+  * as_graph() creates a simple or multiedged graph depending on input
+  * as_graph_easy() can handle simple input graphs now, too
+  * fix as_graph_easy(): graphs with multiedges had them added multiple times
+
+2006-10-29 v0.03 Tels 24 tests
+  * some fixes for Graph::Easy v0.49
+  * class/graph attributes are now carried over 
+
+2006-10-17 v0.02 Tels 14 tests (unreleased)
+  * add SEE ALSO section to POD
+  * require Graph::Easy v0.49
+  * recommend Graph::Easy::As_svg v0.21
+  * the conversion now carries attributes over
+
+2006-09-28 v0.01 Tels 14 tests
+  * first release
+  * require Graph v0.80
+  * require Graph::Easy v0.48
+

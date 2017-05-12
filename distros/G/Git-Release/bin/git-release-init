@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+use 5.12.0;
+use Git::Release;
+$|++;
+my $m = Git::Release->new;
+
+say "Installing hooks...";
+$m->install_hooks;
+
+say "Done";

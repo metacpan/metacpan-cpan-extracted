@@ -1,0 +1,19 @@
+---
+name: Geo-Postcodes-NO
+version: 0.31
+author:
+abstract: Norwegian postcodes with associated information
+license: perl
+requires:
+  Geo::Postcodes: 0.31
+  perl: 5.6.1
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Geo::Postcodes::NO:
+    file: lib/Geo/Postcodes/NO.pm
+    version: 0.31
+resources:
+  license: http://dev.perl.org/licenses/

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Geo/StreetAddress/FR.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01.basic.t
+t/02.common_address.t
+t/03.complex_address.t
+t/kwalitee.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

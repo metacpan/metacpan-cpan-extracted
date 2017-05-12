@@ -1,0 +1,69 @@
+NAME
+    Git::XS - Perl XS binding to libgit2
+
+SYNOPSIS
+        use Git::XS;
+
+        my $git = Git::XS->new(
+            repo => "path/to/git/repo",
+        );
+
+        $git->init;
+    
+        print $git->status;
+
+        $git->add('file.name');
+
+        $git->commit(-m => 'It works');
+
+        $git->fetch;
+
+        $git->push('--all');
+
+DESCRIPTION
+    This module is a Perl binding to libgit2. It attempts to make a clean OO
+    API for dealing with git repositories from Perl. It should be very fast.
+
+STATUS
+    WARNING: This module is still in the "proof of concept" phase. Come back
+    later.
+
+    So far new() and init() are working. Kind of.
+
+    Find me online if you have good ideas for this module.
+
+INSTALLATION
+    You can install this module like any other CPAN module, but you will
+    need 2 programs in your PATH:
+
+        git - to clone the libgit2 repository from GitHub
+        cmake - to build libgit2
+
+    In the future, this module might use your system's copy of libgit2.
+
+METHODS
+    Git::XS->new(repo => $repo)
+        Create a new Git::XS object for dealing with a git repository.
+
+    $git->init([-bare])
+        Initialize a repo if it doesn't exist. You can pass '-bare' to
+        create a bare repo.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2011. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 64:
+        You forgot a '=back' before '=head1'
+

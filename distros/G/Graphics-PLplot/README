@@ -1,0 +1,76 @@
+Graphics::PLplot
+================
+
+This module provides a wrapper around the C PLplot graphics library.
+The PLplot library can be obtained from http://www.plplot.org.
+
+This module should not be confused with the PDL::Graphics::PLplot
+module written by Doug Hunt and distributed as part of PDL. If you 
+have large data arrays to plot you should be using the PDL version.
+
+If you have small data arrays and/or do not want a dependency on
+PDL, this module is for you.
+
+This software is currently in Alpha state since only a subset of the PLplot
+functions are currently supported. More will be added as I need them.
+
+
+Requirements
+------------
+
+C PLplot bindings from http://www.plplot.org. A C compiler is required
+to build this module.
+
+Tested with PLplot v5.3.0 on Linux and Mac OS X
+Should work with Perl >= v5.005
+
+Building
+--------
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The tests include Perl versions of some of the C example code
+distributed with PLplot itself.
+
+Author
+------
+
+This module was written by Tim Jenness  <tjenness@cpan.org>
+of the Joint Astronomy Centre.
+
+Copyright (C) 2004 Tim Jenness. All Rights Reserved. 
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+ 
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ 
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+
+TODO
+----
+
+  + Last few remaining functions
+  + Add explicit documentation for perl-isms
+
+Changes
+-------
+
+ v0.01 - initial test release to CPAN
+
+ v0.02 - Add many new [easy] functions. Rename to Graphics::PLplot
+
+ v0.03 - + All the easy functions (scalar and 1D array functions) added.
+         + Also added (inefficient) support for plimag and plsurf3d
+         + 14 of the 20 PLplot examples now included
+

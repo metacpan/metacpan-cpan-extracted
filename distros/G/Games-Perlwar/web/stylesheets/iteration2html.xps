@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%
+
+$t->{title}{showtag} = 0;
+$t->set( 'log' => {
+    pre => '<div name="log" class="log">',
+    post => "</div>\n",
+} );
+$t->set( 'entry' => {
+    pre => '<div class="entry">',
+    post => '</div>',
+} );
+
+%>
+<html>
+<head>
+<title>
+    perlwar - <%~ /perlwar/configuration/title %>
+</title>
+
+<link REL="icon" HREF="/perlwar/perlwar.ico" />
+<link REL="SHORTCUT ICON" HREF="/perlwar/perlwar.ico" />
+<link rel="stylesheet" type="text/css" href="/perlwar/perlwar.css" />
+<script type="text/javascript" src="/perlwar/perlwar.js" > </script>
+
+</head>
+<body>
+
+<div style="background: url(/perlwar/line.png);" >
+<h1>
+    <%= apply_templates( '/perlwar/configuration/title' ) %>
+</h1>
+<img src="/perlwar/logo.png" alt="PerlWar" style="display: inline" />  
+</div>
+
+<div class="rightSide">
+
+<div class="summary">
+<div align="center">
+    <% my $iteration = findvalue( '/perlwar/iteration/@nbr' ) || 0 %>
+    iteration <%= $iteration  %>
+</div>
+<br/>
+<%
+	my %players = ( '' => { color => 'lightgrey' } );
+
+    if ( $iteration > 0 ) {
+        for( findnodes( '/perlwar/iteration/summary/player' ) ) {
+            my $name = $_->findvalue('@name');
+            $players{ $name  } = { color => $_->getAttribute( 'color' ) };
+            $players{ $name }{status} = $_->getAttribute( 'status' );
+            $players{ $name }{score} = $_->getAttribute( 'agents' );
+        }   
+    }
+    else {
+        if ( findvalue( '/perlwar/configuration/players/@list' ) 
+                eq 'predefined' ) {
+            for( findnodes( '/perlwar/configuration/players/player' ) ) {
+                my $name = $_->findvalue('@name');
+                $players{ $name  } = { color => $_->getAttribute( 'color' ) };
+                $players{ $name }{status} = 'OK';
+                $players{ $names }{score} = 0;
+            }   
+        }
+        else {
+            my( $file ) = findvalue( 
+                '/perlwar/configuration/players/@community' );
+            @player_nodes = grep { -e 'mobil/'.$_->findvalue( '@name' ) }
+                                 XML::LibXML->new
+                                            ->parse_file( $file )
+                                            ->findnodes( '//player' );   
+            for( @player_nodes ) {
+                my $name = $_->findvalue('@name');
+                $players{ $name  } = { color => $_->getAttribute( 'color' ) };
+                $players{ $name }{status} = 'OK';
+                $players{ $names }{score} = 0;
+            }   
+        }
+    }
+
+sub get_players {
+    
+}
+
+
+%>
+
+<!-- TODO: add submission time information -->
+<%
+	
+	my %subm;
+	for( grep $_, keys %players )
+	{
+		my $t = -M "mobil/$_" or next;
+		$subm{ $_ } = $^T - $t*24*60*60;	
+	}
+	my @order = sort { $subm{$a} <=> $subm{$b} } keys %subm;
+	for( 1..@order )
+	{
+		my $x = $order[$_-1];
+		$subm{$x} = "<sub><a title='".localtime($subm{$x})."'>$_</a></sub>";
+	}
+%>
+<% for( sort { $players{$b}{score} <=> $players{$a}{score} } keys %players ) { 
+	next unless $_;  %> <!--  remove the blank player    -->
+	<div style="color: <%= $players{$_}{color} %>"
+        <%=    $players{$_}{status} eq 'EOT' ? 'class="deadPlayer"' 
+             : $players{$_}{status} eq 'w1nn3r' ? 'class="w1nn3r"'
+             : '' -%>
+	>
+	<%= $_ %> <%= $subm{$_} %> <span class="score"><%= $players{$_}{score} || "0" %></span>
+	</div>
+<% } %>
+
+</div>
+
+<div class="gameLinks">
+<a href="./?style=config">war configuration</a>
+<br/><br/>
+<% 
+    use Cwd;
+    my $dir = (split '/' => getcwd )[-1];
+%>
+<a href=".?style=upload">u/l agent</a>
+<br/><br/>
+<a href=".?passthru=1">raw xml</a>
+
+<br/><br/>
+
+<form name='history_form' onSubmit="resolve_iteration();return true;"
+    action='.' >
+<b>log</b><br/>
+<div style="margin-left: 10px">
+
+iteration <SELECT name="history_select">
+<%
+    opendir my $dir, '.' or die;
+    my @rounds = sort grep /^round_\d+\.xml$/, readdir $dir;
+    closedir $dir;
+%>
+<% 
+    for my $r ( @rounds ) {
+        $r =~ /0*(\d+)/; 
+%>
+        <option value='<%= $r %>'><%= $1 %></option> 
+<%  } 
+%>
+</SELECT>&nbsp;
+
+<input type="submit" value="access" />
+
+<br />
+<br />
+
+<input type="button" value="rwd" 
+    onClick="document.forms[0].elements[0].selectedIndex = 
+    <%-= $iteration - 1 %> ;resolve_iteration();submit()">
+&nbsp;
+<input type="button" value="fwd" 
+    onClick="document.forms[0].elements[0].selectedIndex = 
+    <%-= $iteration + 1 %> ;resolve_iteration();submit()"> <br/>
+</div>
+</form>
+<br/>
+<br/>
+<a href="http://babyl.dyndns.org/perlwar">what is perlwar?</a>
+
+
+</div>
+
+</div>
+
+<div class="leftSide">
+<div class="theArray" style="clear: both;">
+<% 
+
+my $fill = length findvalue( '/perlwar/configuration/theArraySize/text()' );
+
+for( 0..findvalue( '/perlwar/configuration/theArraySize/text()' ) -1 ) { %>
+<div name='slot' 
+	class="slot" 
+	style='background-color: 
+            <%-= $players{ findvalue(
+    "/perlwar/iteration/theArray/agent[\@position = $_]/\@owner" ) }{color} 
+    || 'lightgrey' %>'  
+	onclick="showSlot(<%= $_ %>)">
+<% 
+    my $owner = findvalue( "/perlwar/round/theArray/slot[\@id = $_]/owner/text()" );
+    my $facade = findvalue( "/perlwar/round/theArray/slot[\@id = $_]/facade/text()" );
+    $facade_color = $players{ $facade }{ color };
+    $has_facade = $facade and $facade ne $owner;
+%>    
+    <%# $owner.":".$facade.":".$has_facade.":".$facade_color %>
+    <%= "<span style='background-color: $facade_color'>" x !!$has_facade  %>
+    <%=  sprintf "%0${fill}d", $_ %>
+    <%= '</span>' x !!$has_facade  %>
+    
+</div>
+<% } %>
+
+</div>
+<div style="clear: both;height:10px"></div>
+<input type="submit" value="show log" onclick="showLog()" />
+<div class="console">
+
+<%= apply_templates( '/perlwar/iteration/log' ) %>
+<% 
+    $t->set( 'agent' => {
+        testcode => \&tc_slot,
+    } ); 
+
+    sub tc_slot {
+        my( $n, $t ) = @_;
+        my $id = $n->findvalue( '@position' );
+        my $code = $n->findvalue( 'text()' );
+        $t->set({ 
+            pre => "<div class='slotCode' name='slotCode' id='code_$id'>$code</div>\n" });
+        return DO_SELF_ONLY;
+    }
+
+%>
+
+<%  
+    for my $i ( 0..findvalue( '//gameLength/text()' )-1 ) {
+        my( $agent ) = findnodes(  "//theArray/agent[\@position = $i ]" );
+
+        my $code = $agent ? $agent->findvalue( 'text()' ) 
+                          : '<i>empty cell</i>';
+%>
+    <div class='slotCode' name='slotCode' id='code_<%= $i %>'><%= $code %></div>
+<% 
+    } 
+%>
+
+</div>
+
+</div>
+
+<!-- to force the browser to adjust the height of the window -->
+<script type="text/javascript"> showLog(); </script>
+</body>
+</html>

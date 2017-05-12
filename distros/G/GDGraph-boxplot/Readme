@@ -1,0 +1,60 @@
+This is GD::Graph::boxplot 1.00, a package to generate PNG box and whisker plots,
+using Lincoln Stein's GD.pm and Martien Verbruggen's GD::Graph.pm
+
+INSTALLATION
+
+needed to install:
+
+  perl 5.004
+  GD > 1.18
+  GD::Graph >= 1.30
+  Statistics::Descriptive >= 2.4
+
+to install:
+
+  WIN32 (GD-Graph-boxplot-1.00.zip)
+
+    Extract zip file into a directory and type
+
+    ppm install GD-Graph-boxplot.ppd
+
+  UN*X (GD-Graph-boxplot-1.00.tar.gz)
+
+    Extract bundle into a directory and type
+
+    perl Makefile.PL
+    make
+    make install
+    
+to see some samples:
+
+    perl test.pl
+
+That should generate a set of pngs.
+
+DOCUMENTATION
+
+The documentation available is contained in GD/Graph/boxplot.pm, as pod.
+
+AUTHOR
+
+Nigel Wright
+nwright@hmc.edu
+
+CONVERTOR :)
+
+George Fitch (converted it from GIFgraph to GD::Graph)
+gaf3@gaf3.com
+
+THANKS
+
+Mark Landry, Client/Server Architects, Inc.
+brian d foy
+
+COPYRIGHT
+
+Copyright (c) 1999 Nigel Wright. All rights reserved.
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

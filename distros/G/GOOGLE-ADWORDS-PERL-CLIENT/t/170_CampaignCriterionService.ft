@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+#
+# Copyright 2011, Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Functional tests for the CampaignCriterionService.
+#
+# Author: David Torres <api.davidtorres@gmail.com>
+
+use strict;
+use lib qw(t/util);
+
+use Test::More (tests => 29);
+use TestClientUtils qw(get_test_client);
+use TestAPIUtils qw(get_api_package create_campaign delete_campaign
+                    get_location_for_address);
+
+# Getting API client for functional tests.
+my $client = get_test_client();
+if (!$client) {
+  plan skip_all => "Can't create test client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+# Test can use CampaignCriterionService related classes.
+use_ok(get_api_package($client, "CampaignCriterionOperation"));
+use_ok(get_api_package($client, "CampaignCriterionReturnValue"));
+use_ok(get_api_package($client, "CampaignCriterionPage"));
+use_ok(get_api_package($client, "Keyword"));
+use_ok(get_api_package($client, "NegativeCampaignCriterion"));
+use_ok(get_api_package($client, "Selector"));
+
+# API dependencies for this test.
+my $campaign = create_campaign($client);
+
+# Test add a campaign negative criterion.
+my $keyword =
+    get_api_package($client, "Keyword")->new({
+      matchType => "BROAD",
+      text => "jupiter cruise"
+    });
+my $negative_campaign_criterion =
+    get_api_package($client, "NegativeCampaignCriterion")->new({
+      campaignId => $campaign->get_id()->get_value(),
+      criterion => $keyword
+    });
+my $result = $client->CampaignCriterionService()->mutate({
+  operations => [get_api_package($client, "CampaignCriterionOperation")->new({
+    operator => "ADD",
+    operand => $negative_campaign_criterion
+  })]
+});
+ok($result, "Result from adding NegativeCampaignCriterion is valid");
+isa_ok($result, get_api_package($client, "CampaignCriterionReturnValue"));
+ok($result->get_value(), "Result value is valid");
+is(scalar(@{$result->get_value()}), 1, "Results array size is correct");
+ok($result->get_value()->[0], "Returned NegativeCampaignCriterion is valid");
+isa_ok($result->get_value()->[0],
+       get_api_package($client, "NegativeCampaignCriterion"));
+ok($result->get_value()->[0]->get_criterion(), "Returned Keyword is valid");
+isa_ok($result->get_value()->[0]->get_criterion(),
+       get_api_package($client, "Keyword"),
+       "Results contain Keyword");
+$keyword = $result->get_value()->[0]->get_criterion();
+
+# Test get all campaign negative criteria.
+$result = $client->CampaignCriterionService()->get({
+  serviceSelector => get_api_package($client, "Selector")->new({
+    fields => ["CampaignId", "Id"],
+    predicates => [
+      get_api_package($client, "Predicate")->new({
+        field => "CampaignId",
+        operator => "IN",
+        values => [$campaign->get_id()->get_value()]
+      }),
+      get_api_package($client, "Predicate")->new({
+        field => "CriteriaType",
+        operator => "IN",
+        values => ["KEYWORD"]
+      })
+    ]
+  })
+});
+ok($result, "Result from getting negative campaign criteria is valid");
+isa_ok($result, get_api_package($client, "CampaignCriterionPage"));
+ok($result->get_entries(), "Result entries is valid");
+is(scalar(@{$result->get_entries()}), 1, "Result entries length is correct");
+isa_ok($result->get_entries()->[0],
+       get_api_package($client, "NegativeCampaignCriterion"));
+is($result->get_entries()->[0]->get_campaignId(), $campaign->get_id(),
+   "Campaign id of negative campaign criterion is correct");
+ok($result->get_entries()->[0]->get_criterion(), "Keyword is set");
+is($result->get_entries()->[0]->get_criterion()->get_id(), $keyword->get_id(),
+   "Keyword id is correct");
+
+# Test remove campaign negative criterion.
+my $campaign_negative_criterion_to_remove =
+    get_api_package($client, "CampaignCriterion")->new({
+      campaignId => $campaign->get_id(),
+      criterion => get_api_package($client, "Criterion")->new({
+        id => $keyword->get_id()
+      })
+    });
+$result = $client->CampaignCriterionService()->mutate({
+  operations => [get_api_package($client, "CampaignCriterionOperation")->new({
+    operator => "REMOVE",
+    operand => $campaign_negative_criterion_to_remove
+  })]
+});
+ok($result, "Result from removing campaign negative criterion is valid");
+isa_ok($result, get_api_package($client, "CampaignCriterionReturnValue"));
+is(scalar(@{$result->get_value()}), 1, "Result value length is correct");
+isa_ok($result->get_value()->[0],
+       get_api_package($client, "CampaignCriterion"));
+is($result->get_value()->[0]->get_campaignId(), $campaign->get_id(),
+   "Campaign id of negative campaign criterion is correct");
+ok($result->get_value()->[0]->get_criterion(), "Keyword is set");
+is($result->get_value()->[0]->get_criterion()->get_id(),
+   $keyword->get_id(),
+   "Keyword id is correct");
+
+# Cleaning up test dependencies.
+delete_campaign($client, $campaign->get_id());

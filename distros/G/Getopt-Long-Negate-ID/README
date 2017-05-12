@@ -1,0 +1,40 @@
+SYNOPSIS
+
+     use Getopt::Long::Negate::ID qw(negations_for_option);
+    
+     @negs = negations_for_option('foo');       # ('tak-foo')
+     @negs = negations_for_option('tak-foo');   # ('foo')
+     @negs = negations_for_option('tidak-foo'); # ('foo')
+     @negs = negations_for_option('bukan-foo'); # ('foo')
+    
+     @negs = negations_for_option('dengan-foo'); # ('tanpa-foo')
+     @negs = negations_for_option('tanpa-foo');  # ('dengan-foo')
+    
+     @negs = negations_for_option('adalah-foo');  # ('bukan-foo')
+     @negs = negations_for_option('ialah-foo');   # ('bukan-foo')
+    
+     @negs = negations_for_option('matikan-foo');  # ('hidupkan-foo')
+     @negs = negations_for_option('padamkan-foo'); # ('hidupkan-foo')
+     @negs = negations_for_option('hidupkan-foo'); # ('matikan-foo')
+     @negs = negations_for_option('nyalakan-foo'); # ('matikan-foo')
+    
+     @negs = negations_for_option('izinkan-foo');     # ('larang-foo')
+     @negs = negations_for_option('ijinkan-foo');     # ('larang-foo')
+     @negs = negations_for_option('bolehkan-foo');    # ('larang-foo')
+     @negs = negations_for_option('perbolehkan-foo'); # ('larang-foo')
+     @negs = negations_for_option('larang-foo');      # ('izinkan-foo')
+
+DESCRIPTION
+
+    This is the Indonesian equivalent for Getopt::Long::Negate::EN.
+
+FUNCTIONS
+
+    None are exported by default, but they are exportable.
+
+ negations_for_option($str) => list
+
+SEE ALSO
+
+    Getopt::Long::Negate::EN
+

@@ -1,0 +1,21 @@
+ChangeLog
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Games/Alak.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_about_verbose.t
+t/01_old_junk.t
+t/02_pod.t
+t/03_pod_cover.t

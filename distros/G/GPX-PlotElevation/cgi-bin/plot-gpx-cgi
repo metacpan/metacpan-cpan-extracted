@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+# 
+# Copyright: Markus Benning <me@w3r3wolf.de>
+# License: GNU GPL, http://www.gnu.org/licenses/gpl.html
+
+use strict;
+use warnings;
+
+use CGI;
+use IO::File;
+use File::Temp;
+use GPX::PlotElevation;
+use Data::Dumper;
+
+my $q = CGI->new();
+my $tmpfile = File::Temp->new(
+	TEMPLATE => 'plot-gpx-cgi-XXXXXX',
+	SUFFIX => '.png',
+);
+my $tmpfh;
+my $width = 40;
+my $height = 10;
+my $upload = $q->upload('gpxfile');
+my $gpx = '';
+my $buf;
+
+if (!$upload && $q->cgi_error) {
+	print $q->header(-status=>$q->cgi_error);
+	exit 0;
+}
+
+while(<$upload>) { $gpx .= $_; }
+
+print $q->header(-type => 'image/png');
+
+my $plot = GPX::PlotElevation->new(
+	'gpx' => $gpx,
+	'output' => $tmpfile->filename,
+	'width' => $width,
+	'height' => $height,
+);
+$plot->calc();
+$plot->plot();
+
+# output file to stdout
+$tmpfh = IO::File->new();
+$tmpfh->open("<".$tmpfile->filename);
+while($tmpfh->read($buf, 1024)) {
+	print($buf);
+}
+$tmpfh->close();
+

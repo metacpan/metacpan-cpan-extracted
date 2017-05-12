@@ -1,0 +1,41 @@
+
+
+=pod
+
+=head1 NAME
+
+gmt install - install more modules
+
+=head1 SYNOPSIS
+
+gmt install [NAME]
+
+ genome install music
+ genome music ...
+
+ genome install annotate
+ genome annotate ...
+
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item NAME  I<Text>
+
+tool name
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Install new geomics software.
+  
+  When run with no parameters, the available tools will be listed by name.
+
+
+
+=cut
+

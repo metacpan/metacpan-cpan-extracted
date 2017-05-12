@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Gtk2-SourceView
+version:      1.000
+version_from: SourceView.pm
+installdirs:  site
+requires:
+    ExtUtils::Depends:             0.2
+    ExtUtils::PkgConfig:           1.0
+    Glib:                          1.100
+    Gnome2::Print:                 0.60
+    Gtk2:                          1.100
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

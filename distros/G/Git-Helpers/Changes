@@ -1,0 +1,35 @@
+Revision history for Git-Helpers
+
+0.000010  2017-04-27 13:55:03-04:00 America/Toronto
+    - Adds cpan-repo script
+
+0.000009  2017-01-12 16:28:17-05:00 America/Toronto
+    - Fixes copy/paste typ on travis-open docs.
+
+0.000008  2016-09-12 18:26:01-04:00 America/Toronto
+    - Fix broken test.
+
+0.000007  2016-09-09 17:33:58-04:00 America/Toronto
+    - Adds current_branch_name() function
+    - Adds gh-open -b arg, which opens the URL for your current branch (Kevin
+      Phair)
+
+0.000006  2016-08-12 00:02:57-04:00 America/Toronto
+    - Adds URI::git to deps.
+    - skip remote_url() tests if Git version less than 2.7
+
+0.000005  2016-07-27 22:40:25-04:00 America/Toronto
+    - Adds a remote_url() helper.
+    - Adds a travis_url() helper.
+
+0.000004  2016-04-11 21:57:50-04:00 America/Toronto
+    - Replace has_git by test_requires_git (Philippe Bruhat (BooK))
+
+0.000003  2015-04-20 04:35:06+02:00 Europe/Berlin
+    - Fixes use of Test::Git
+
+0.000002  2015-04-19 09:29:34+02:00 Europe/Berlin
+    - Requires the (currently) latest version of Test::Git
+
+0.000001  2015-04-18 15:00:31+02:00 Europe/Berlin
+    - Initial release.

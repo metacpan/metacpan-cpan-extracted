@@ -1,0 +1,70 @@
+NAME
+
+    Glib::FindMinVersion - Find minimum version of GLib needed to compile C
+    source
+
+SYNOPSIS
+
+        use Glib::FindMinVersion;
+    
+        print Glib::FindMinVersion::with('g_get_num_processors'); # 2.36
+        print scalar Glib::FindMinVersion::for_file('source.c'); # 2.18
+        my %symbols = Glib::FindMinVersion::for_file('source.c' => 2.10);
+        # (
+        #   2.18 => [qw[g_set_error_literal]],
+        #   2.12 => [qw[g_ascii_strtoll g_base64_decode]],
+        # )
+        
+
+IMPLEMENTATION
+
+    Symbol use is detected quite crudely with / \s* (?<symbol>\w+) \s* \(
+    /x. Symbols introduced prior to 2.0 are labelled as 2.0.
+
+METHODS AND ARGUMENTS
+
+    with(@symbols)
+
+      Returns minimum GLib version which exports all @symbols.
+
+    for_source($source [, $version])
+
+      Here, [] denotes an optional argument. In list context, returns a
+      listing of all found glib symbols grouped by version. If $version is
+      given, the list is limited to symbols newer than $version. $version
+      is a string of the form /2\.\d\d?/.
+
+      In scalar context, returns the maximum version in the list, which is
+      the minimum version required to use all the symbols.
+
+    for_file($filename [, $version])
+
+      Helper function that reads in $filename and passes it to for_source.
+
+NAMING
+
+    Official casing is GLib, but there's a Glib module already on CPAN, so
+    this follows suit. This and the Glib module are unrelated though.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Glib-FindMinVersion
+
+SEE ALSO
+
+    GLib Reference Manual <https://developer.gnome.org/glib/stable/>
+
+    This module was inspired by Wireshark's tools/checkAPIs.pl
+    <https://github.com/wireshark/wireshark/blob/master/tools/checkAPIs.pl>.
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

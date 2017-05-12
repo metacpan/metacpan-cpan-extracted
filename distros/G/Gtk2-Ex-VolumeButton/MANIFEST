@@ -1,0 +1,8 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+README
+examples/volume-button.pl
+t/Gtk2-Ex-VolumeButton.t
+lib/Gtk2/Ex/VolumeButton.pm

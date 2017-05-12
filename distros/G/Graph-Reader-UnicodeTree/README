@@ -1,0 +1,100 @@
+NAME
+    Graph::Reader::UnicodeTree - Perl class for reading a graph from unicode
+    tree text format.
+
+SYNOPSIS
+     use Graph::Reader::UnicodeTree;
+     my $obj = Graph::Reader::UnicodeTree->new;
+     my $graph = $obj->read_graph($unicode_tree_file);
+
+METHODS
+    "new()"
+             Constructor.
+             This doesn't take any arguments.
+             Returns Graph::Reader::UnicodeTree object.
+
+    "read_graph($unicode_tree_file)"
+             Read a graph from the specified file.
+             The argument can either be a filename, or a filehandle for a previously opened file.
+             Returns Graph object.
+
+UNICODE TREE FILE FORMAT
+     Vertices are simple text.
+     Edges are '─┬─' or '───' in main line and ' ├─' or ' └─' in other lines.
+     Example:
+     1─┬─2
+       ├─3───4
+       ├─5
+       ├─6─┬─7
+       │   ├─8
+       │   └─9
+       └─10
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Encode qw(decode_utf8 encode_utf8);
+     use Graph::Reader::UnicodeTree;
+     use IO::Barf qw(barf);
+     use File::Temp qw(tempfile);
+
+     # Example data.
+     my $data = decode_utf8(<<'END');
+     1─┬─2
+       ├─3───4
+       ├─5
+       ├─6─┬─7
+       │   ├─8
+       │   └─9
+       └─10
+     END
+
+     # Temporary file.
+     my (undef, $tempfile) = tempfile();
+
+     # Save data to temp file.
+     barf($tempfile, encode_utf8($data));
+
+     # Reader object.
+     my $obj = Graph::Reader::UnicodeTree->new;
+
+     # Get graph from file.
+     my $g = $obj->read_graph($tempfile);
+
+     # Clean temporary file.
+     unlink $tempfile;
+
+     # Print to output.
+     print $g."\n";
+
+     # Output:
+     # 1-10,1-2,1-3,1-5,1-6,3-4,6-7,6-8,6-9
+
+DEPENDENCIES
+    Encode, Graph::Reader, Readonly.
+
+SEE ALSO
+    Graph::Reader
+        base class for Graph file format readers
+
+    Task::Graph::Reader
+        Install the Graph::Reader modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Graph-Reader-UnicodeTree>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2013-2015
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

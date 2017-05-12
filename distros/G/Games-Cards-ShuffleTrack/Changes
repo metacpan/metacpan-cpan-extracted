@@ -1,0 +1,29 @@
+Revision history for Games-Cards-ShuffleTrack
+
+0.05    2016-04-28
+		Implemented is_original
+		We can now $deck->remove_all( 'Joker' )
+		Minor bug fixes and improvements
+
+0.04	2016-03-21
+		We can now $deck->run( 3, 5, 2 )
+		We can now $deck->deal( $pile )
+		We can now $deck->dribble( $pile )
+		We can now $deck->count( 'A' ) and $deck->count( 'C', 'S' )
+		Improved the documentation
+
+0.03    2016-03-08
+        Added a few more methods
+		Fixed the tests regarding Test::Warn's presence
+
+0.02    2016-03-05
+		Added other initial orders
+		Different kinds of shuffles (overhand, hindu, running cards)
+		Different kinds of cuts
+		Methods for handling cards (peeks, removing and adding cards, etc.)
+		Added examples
+		Added tests
+		Improved documentation
+
+0.01    2016-02-29
+        First version, released on an unsuspecting world.

@@ -1,0 +1,23 @@
+Revision history for Grid::Request
+
+0.5   - Fixed minor perldoc glitch with log4perl-conf documentation.
+
+0.4   - Added configurable block size for MM jobs with the block_size()
+        method.
+      - Added unit test for the block size method
+      - Added new Grid::Request::Test to remove hard coded project value
+        for test execution.
+
+0.3   - Fixed a problem with the grid_request_worker in which it could iterate
+        past the smallest iterable argument if larger iterable arguments were
+        passed in. Now a check is done to determine the smallest and truncate
+        the remaining arguments if they are larger...
+
+0.2   - Fixed problem with hardcoded drm value in grid_request_worker. Using
+        Grid::Request::HTC to get the value.
+      - Fixed problem with regualar PARAM interpretation in grid_request_worker
+      - Updated package in perldoc to Grid::Request::HTC
+      - Version released at 2009-05-29
+
+0.1   - Initial release.
+      - Version released at 2009-05-28

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/00-load.t
+t/01-position.t
+lib/Games/Chess/Position/Unicode.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

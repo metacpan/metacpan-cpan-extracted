@@ -1,0 +1,21 @@
+Revision history for Perl module Geo::Coordinates::RD-NAP
+
+0.11  2007-07-31
+    - Documentation fixes (thanks to Paul van den Berg)
+
+0.10  2007-06-20
+    *** BACKWARDS INCOMPATABILITY ***
+    - RD coords are now in meters, instead of kilometers, as this is the
+      usual format in geodata files from the Dutch topographical service
+      and Statistics Netherlands
+
+0.03  2006-08-13
+    - added deg, dms functions
+
+0.02  2006-03-09
+    - added to_rd function
+
+    - added Test::Perl::Critic test (optional)
+
+0.01  2006-01-24
+    - original version

@@ -1,0 +1,34 @@
+Geo/TAF version 1.01
+====================
+
+Geo::TAF decodes aviation METAR and TAF weather forecast code 
+strings into English or, if you sub-class, some other language.
+
+METAR (Routine Aviation weather Report) and TAF (Terminal Area
+weather Report) are ascii strings containing codes describing
+the weather at airports and weather bureaus around the world.
+
+This module attempts to decode these reports into a form of 
+English that is hopefully more understandable than the reports
+themselves. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Dirk Koopman G1TLH
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

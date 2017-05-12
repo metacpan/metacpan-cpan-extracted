@@ -1,0 +1,18 @@
+
+                Github::Score
+
+DESCRIPTION
+
+Perl access to the http://github-high-scores.heroku.com/ information via the github v2 api.
+
+DOCUMENTATION
+
+The documentation is in Score.pm in POD format.
+
+INSTALLATION
+
+To install see the INSTALL file in this distribution.
+
+LICENSE & COPYRIGHT
+
+See the LICENCE file in this distribution.

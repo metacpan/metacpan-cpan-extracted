@@ -1,0 +1,43 @@
+Copyright 2010, 2011 Kevin Ryde
+
+This file is part of Gtk2-Ex-History.
+
+Gtk2-Ex-History is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-History is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-History.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 8, November 2011
+    - tests fix MenuToolButton weakening maybe
+
+Version 7, November 2010
+    - tests fix should be an is() not an ok()
+
+Version 6, November 2010
+    - use ConnectProperties for button sensitivities
+
+Version 5, September 2010
+    - tests fix non-string test name
+
+Version 4, September 2010
+    - fix Dialog stray 5.010 should be 5.008
+
+Version 3, September 2010
+    - new MenuToolButton
+    - fix Menu new_popup() to return new object per docs
+
+Version 2, August 2010
+    - use WidgetEvents for action toolbar button release
+
+Version 1, August 2010
+    - the first version.

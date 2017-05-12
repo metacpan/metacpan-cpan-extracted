@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                GPS-Point
+version:             0.20
+abstract:            Provides an object interface for a GPS point.
+license:             bsd
+author:              
+    - Michael R. Davis (account=>perl,tld=>com,domain=>michaelrdavis)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Scalar::Util:                  1.02
+    Test::Number::Delta:           0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

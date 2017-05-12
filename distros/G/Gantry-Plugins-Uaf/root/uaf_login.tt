@@ -1,0 +1,21 @@
+[% title = view.title %]
+<form method="post" action="/login" name="login">
+  <div id="login" class="login">
+    <fieldset>
+      <legend>Please Login</legend>
+      <div class="username">
+        <label for="username">Username:</label>
+        <input type="text" name="username" size="32" value="demo" id="username">
+      </div>
+      <div class="password">
+        <label for="password">Password:</label>
+        <input type="password" name="password" size="32" value="demo" id="password">
+      </div>
+      <div class="message">
+        <p>Enter your username and password to log in.</p>
+      </div>
+      <label for="submit"</label>
+      <input type="submit" value="OK">
+    </fieldset>
+  </div>
+</form>

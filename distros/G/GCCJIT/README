@@ -1,0 +1,27 @@
+GCCJIT version 0.02
+===================
+
+Perl bindings for GCC JIT library (libgccjit).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+GCC 5.1.0.
+Perl of decently recent version.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Vickenty Fesunov.
+
+The library is distributed under the terms of the GNU General Public License
+version 3 or later. See the LICENSE file for details.

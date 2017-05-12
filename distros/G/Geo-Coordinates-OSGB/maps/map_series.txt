@@ -1,0 +1,11 @@
+# Toby Thurston -- 14 Nov 2015
+#
+# This file defines the map series definition files and control parms
+# for make_maps_code that builds British_Maps
+#
+# id  file-name  max_sides  max_inset_area  max_sheet_area  Name   
+A  os-landranger            1  300  1650  LR   'OS Landranger'
+B  os-explorer              2  100   700  Exp  'OS Explorer'
+C  os-one-inch              1  220  1835  1in  'OS One-Inch 7th series'
+H  harvey-british-mountain  2  300  2000  BMM  'Harvey British Mountain Maps'
+J  harvey-superwalker       2  200   800  HSW  'Harvey Superwalker'

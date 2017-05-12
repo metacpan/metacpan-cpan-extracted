@@ -1,0 +1,21 @@
+^MYMETA.yml$
+^.git
+^debian/
+^ubuntu-lucid/
+^alt/
+^dist-maint/
+^MANIFEST.bak$
+^_build/
+^Build$
+\.tar\.gz$
+^blib
+^genome-bindoc
+^gmt-bindoc
+^cmd-bindoc
+^i
+^.modulebuildrc
+^gmt-web
+rebuild-debian-install
+galaxy.xml
+^MYMETA\.json$
+t/Music.t # floating point causes this to fail on other machines

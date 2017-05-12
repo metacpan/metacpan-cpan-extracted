@@ -1,0 +1,8 @@
+Expecting real reference, found "not-a-float" for parameter -scale_factor.
+Expecting integer reference, found "1bc" for parameter -millisecond_update_interval.
+Expecting boolean reference, found "2" for parameter -ignore_output_file_column_one.
+"no-queue" is not a valid value for the parameter -queue.
+Invalid parameter: -unknown.
+Value required for parameter -command.
+Parameter millisecond_update_interval is required but was omitted.
+Type test.pl -h for command line parameter information.

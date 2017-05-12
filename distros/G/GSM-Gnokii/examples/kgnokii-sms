@@ -1,0 +1,390 @@
+#!/pro/bin/perl
+
+use strict;
+use warnings;
+use autodie;
+
+sub usage
+{
+    my $err = shift and select STDERR;
+    print "usage: $0 [ --verbose=# ] [ --to=recipient ] [ --msg=message ]\n";
+    exit $err;
+    } # usage
+
+use Getopt::Long qw(:config bundling nopermute);
+my $opt_v = 1;
+my $msg   = "";
+my $to    = "";
+GetOptions (
+    "help|?"		=> sub { usage (0); },
+
+    "m|msg|message=s"	=> \$msg,
+    "t|to|recipient=s"	=> \$to,
+    "v|verbose:2"	=> \$opt_v,
+    ) or usage (1);
+
+my %font = (
+    text  => "{DejaVu Sans Mono} 8",
+    small => "{DejaVu Sans Mono} 6",
+    label => "{DajaVu Sans} 8",
+    entry => "{DejaVu Sans Mono} 8",
+    );
+
+use Data::Peek;
+use GSM::Gnokii;
+use List::Util qw( max );
+use Tk;
+use Tk::BrowseEntry;
+use Tk::ProgressBar;
+
+$opt_v and print STDERR "Connecting ...\n";
+my $gsm = GSM::Gnokii->new ({ verbose => $opt_v })->connect;
+$opt_v and print STDERR "Read phonebook ...\n";
+my @pb;
+get_pb ();
+
+my ($t_number, $t_name, $t_entry, $t_idx, $status) =
+    ("number", "name", "", -1, "");
+
+if ($msg =~ m/\S/ && @pb == 1) {
+    $opt_v and print STDERR "Sending message ...\n";
+    $t_name = $pb[0]{name};
+    my $err = send_msg ($pb[0]{number}, $msg);
+    print "$status\n";
+    exit $err;
+    }
+
+$opt_v and print STDERR "Starting GUI ...\n";
+
+my $mw = MainWindow->new;
+
+my $f_sig = $mw->Frame->pack (-side =>"top", -anchor => "nw", -fill => "both", -expand => 1);
+my $f_tgt = $mw->Frame->pack (-side =>"top", -anchor => "nw", -fill => "both", -expand => 1);
+my $f_msg = $mw->Frame->pack (-side =>"top", -anchor => "nw", -fill => "both", -expand => 1);
+my $f_btn = $mw->Frame->pack (-side =>"top", -anchor => "nw", -fill => "both", -expand => 1);
+
+{   my $strgth = 0;
+    my $power  = 0;
+
+    $f_sig->ProgressBar (
+	-colors		=> [ 0 => "red", 40 => "yellow", 70 => "green" ],
+	-borderwidth	=>   0,
+	-width		=>  10,
+	-length		=> 220,
+	-variable	=> \$strgth,
+	-blocks		=>  20,
+	-anchor		=> "w",
+	-from		=>   0,
+	-to		=> 100,
+	)->pack (-side => "left",  -anchor => "w", -fill => "none", -expand => 0);
+    $f_sig->Label (
+	-text		=> "GSM::Gnokii-@{[$gsm->version]} - libgnokii-@{[$gsm->{libgnokii_version}]}",
+	-font		=> $font{small},
+	-foreground	=> "Gray40",
+	)->pack (-side => "left",  -anchor => "c", -fill => "both", -expand => 1);
+    $f_sig->ProgressBar (
+	-colors		=> [ 0 => "red", 20 => "yellow", 45 => "green" ],
+	-borderwidth	=>   0,
+	-width		=>  10,
+	-length		=> 220,
+	-variable	=> \$power,
+	-blocks		=>  20,
+	-anchor		=> "e",
+	-from		=>   0,
+	-to		=>  60,
+	)->pack (-side => "right", -anchor => "e", -fill => "none", -expand => 0);
+
+    sub get_levels
+    {
+	$opt_v and print STDERR "Get signal strength ...\n";
+	my $ns  = $gsm->GetRF ();
+	$strgth = $ns->{level};
+	$opt_v and print STDERR "Get power status ...\n";
+	my $ps  = $gsm->GetPowerStatus ();
+	$power  = $ps->{level};
+	$f_sig->after (30_000, \&get_levels);
+	} # get_levels
+
+    get_levels ();
+    }
+
+@pb == 1 and ($t_idx, $t_number, $t_name, $t_entry) = (0, @{$pb[0]}{qw( number name summ )});
+$f_tgt->Label (
+    -text		=> "To",
+    -font		=> $font{text},
+    )->pack (-side => "left", -anchor => "w", -fill => "both", -expand => 1);
+$f_tgt->Entry (
+    -width		=> 13,
+    -textvariable	=> \$t_number,
+    -font		=> $font{text},
+    )->pack (-side => "left", -anchor => "w", -fill => "both", -expand => 1);
+$f_tgt->Entry (
+    -width		=> 13,
+    -textvariable	=> \$t_name,
+    -font		=> $font{text},
+    )->pack (-side => "left", -anchor => "w", -fill => "both", -expand => 1);
+my $be = $f_tgt->BrowseEntry (
+    -width		=> 40,
+    -borderwidt		=> 2,
+    -highlightthickness => 0,
+    -autolistwidth	=> 1,
+    -variable		=> \$t_entry,
+    -browse2cmd		=> sub {
+	$t_idx = $_[1];
+	($t_number, $t_name) = @{$pb[$t_idx]}{qw( number name )};
+	printf STDERR "%3d: %-13s %-20.20s = %s\n", $t_idx, $t_number, $t_name, $t_entry;
+	},
+    -relief		=> "sunken",
+    -font		=> $font{text},
+    )->pack (-side => "left", -anchor => "e", -fill => "both", -expand => 1);
+$f_tgt->Button (
+    -text		=> "+",
+    -font		=> $font{text},
+    -command		=> \&add_contact,
+    )->pack (-side => "left", -anchor => "e", -fill => "both", -expand => 0);
+
+$be->insert ("end", $_) for map { $_->{summ} } @pb;
+
+my $t = $f_msg->Text (
+    -width		=> 80,
+    -height		=>  2,
+    -wrap		=> "word",
+    -font		=> $font{text},
+    )->pack (-side => "left",  -anchor => "w", -fill => "both", -expand => 1);
+$t->insert ("end", $msg);
+
+$f_btn->Button (
+    -text		=> "Cancel",
+    -command		=> sub { exit; },
+    )->pack (-side => "left",  -anchor => "w", -fill => "none", -expand => 0);
+my $l_stat = $f_btn->Label (
+    -textvariable	=> \$status,
+    -font		=> $font{text},
+    -width		=> 40,
+    )->pack (-side => "left",  -anchor => "c", -fill => "both", -expand => 1);
+$f_btn->Button (
+    -text		=> " Send ",
+    -command		=> sub { send_msg ($t_number, $t->get ("0.0", "end")) },
+    )->pack (-side => "right", -anchor => "e", -fill => "none", -expand => 0);
+
+sub status
+{
+    $status = shift;
+    if ($l_stat) {
+	$l_stat->configure (-foreground => shift);
+	$mw->update;
+	}
+    else {
+	$opt_v and print STDERR "$status\n";
+	}
+    } # status
+
+sub get_pb
+{
+    @pb =
+	sort { $a->{name} cmp $b->{name} }
+	grep { $to ? "@{[values %$_]}" =~ m/$to/i : 1 }
+	map  {
+	    my $idx  = $_->{location};
+	    my $name = $_->{name};
+	    my $nick = $_->{nickname} || $name;
+	    if (my $p = $_->{person}) {
+		$p->{family_name} && $p->{given_name} and
+		    $name = join " " => $p->{given_name}, $p->{family_name};
+		}
+	    my $number = $_->{tel_cell} || $_->{number};
+	    {	idx	=> $idx,
+		number	=> $number,
+		name	=> $name,
+		nick	=> $nick,
+		summ	=> "",
+		entry	=> $_,
+		};
+	    #[ $idx, $number, $name, "", $_ ];
+	    } @{$gsm->GetPhonebook ("ME", 1, 0) || []};
+    {   my $maxlen = max map { length $_->{name} } @pb;
+	$_->{summ} = sprintf "%3d: %-*s %s", $_->{idx}, $maxlen, $_->{name}, $_->{number} for @pb;
+	}
+    } # get_pb
+
+sub send_msg
+{
+    my ($dest, $message) = @_;
+    $message =~ s/\s+$//;
+    $message =~ s/^\s+//;
+    $opt_v and print STDERR "To:  $dest ($t_name)\nMsg: $message\n";
+    unless ($dest =~ m/^\+?[0-9]+$/ and $message =~ m/^\S/) {
+	status "Both number and message needed", "Red";
+	return;
+	}
+    my $b8 = ($message =~ m/^[ -~]+$/) ? 0 : 1;
+
+    status "Sending ...", "Black";
+    my $err = $gsm->SendSMS ({
+	destination	=> $dest,
+	message		=> $message,
+#	smscindex	=> 1,
+#	smscnumber	=> "+31653131313",
+#	report		=> 1,
+#	eightbit	=> $b8,
+#	class		=> undef,
+#	validity	=> 173,	# 1 week
+	});
+    if (defined $err and $err == 0) {
+	status "Message sent", "#00a000";
+	}
+    else {
+	status (($gsm->{ERROR} || "ERROR: ".DPeek $err), "#d00000");
+	}
+    $err;
+    } # send_msg
+
+sub clear_hash
+{
+    my $h = shift;
+    foreach my $k (keys %$h) {
+	if (ref $h->{$k} eq "HASH") {
+	    clear_hash ($h->{$k});
+	    }
+	else {	# ignore other refs, they should not occur
+	    $h->{$k} = "";
+	    }
+	}
+    } # clear_hash
+
+sub add_contact
+{
+    my $c = {
+	memorytype      => "ME",
+	location        => 0,
+	number          => "+31612345678",
+	name            => "Miranda GSM",
+	caller_group    => 0,                   # Family
+	person          => {                    # Doesn't work
+	    family_name => "Vries, de",
+	    given_name  => "Miranda",
+	    },
+	address         => {                    # Doesn't work
+	    street      => "Dorpstraat 3",
+	    city        => "Madurodam",
+	    postal      => "1234 AB",
+	    },
+	birthday        => "2001-02-03",        # TODO
+	date            => "2011-02-03",        # TODO
+	ext_group       => 3,                   # TODO
+	e_mail          => "miranda\@hotmail.com",
+	home_address    => "Kerkstraat 3",      # Doesn't work
+	nickname        => "Mirrie",
+	note            => "Notitie",
+#	tel_none        => "+31600000000",      # FAIL
+#	tel_common      => "+31600000001",      # FAIL
+	tel_home        => "+31612345678",
+	tel_cell        => "+31612345678",
+	tel_fax         => "+31612345678",
+	tel_work        => "+31612345678",
+#	tel_general     => "+31600000010",      # FAIL
+	company         => "Vrienden & co.",
+	url             => "http://maak.nieuwe.vrienden.nl",
+	};
+    if ($t_idx >= 0) {
+	DDumper { idx => $t_idx, pb => $pb[$t_idx] };
+	$c = { %{$pb[$t_idx]{entry}} };	# Make a copy
+	}
+    my $cw = $mw->Toplevel;
+    my $ef = $cw->Frame->pack (qw( -side top    -fill both -expand 1 ));
+    my $bf = $cw->Frame->pack (qw( -side bottom -fill x    -expand 0 ));
+    my $eg = $ef->Frame->grid (qw( -sticky nw ));
+    $eg->gridRowconfigure    (0, -weight => 1); # allow expansion in both ...
+    $eg->gridColumnconfigure (0, -weight => 1); # ... X and Y dimensions
+    my @ga = (-borderwidth => 0, -highlightthickness => 0);
+    my @la = (@ga, -font => $font{label}, -foreground => "Green4", -anchor => "w");
+    my @ea = (@ga, -font => $font{entry}, -background => "White");
+    my @gg = (-sticky => "news");
+    for (   [  0,  0, "Location",	\$c->{location},		],
+	    [  0,  2, "Memory",		\$c->{memorytype},		],
+
+	    [  1,  2, "Number",		\$c->{number},			],
+	    [  2,  2, "Cell",		\$c->{tel_cell},		],
+	    [  3,  2, "Home",		\$c->{tel_home},		],
+	    [  4,  2, "Work",		\$c->{tel_work},		],
+	    [  5,  2, "Fax",		\$c->{tel_fax},			],
+
+	    [  1,  0, "Name",		\$c->{name},			],
+	    [  2,  0, " Family",	\$c->{person}{family_name},	],
+	    [  3,  0, " Given",		\$c->{person}{given_name},	],
+	    [  4,  0, " Nick",		\$c->{nickname},		],
+	    [  5,  0, "Adress",		\$c->{home_address},		],
+	    [  6,  0, " Street",	\$c->{address}{street},		],
+	    [  7,  0, " City",		\$c->{address}{city},		],
+	    [  8,  0, " Postal",	\$c->{address}{postal},		],
+
+	    [  6,  2, "Company",	\$c->{company},			],
+	    [  7,  2, "Birth",		\$c->{birthday},		],
+	    [  8,  2, "Date",		\$c->{date},			],
+
+	    [ 10,  0, "URL",		\$c->{url},			],
+	    [ 10,  2, "e-mail",		\$c->{e_mail},			],
+	    [ 11,  0, "Note",		\$c->{note}, 3			],
+	    ) {
+	my ($row, $col, $label, $field, $cs) = (@$_, 1);
+	$eg->Label (-text         => $label, @la)->grid (-row => $row, -column => $col,     @gg);
+	$eg->Entry (-textvariable => $field, @ea)->grid (-row => $row, -column => $col + 1, -columnspan => $cs, @gg);
+	}
+
+    $bf->Button (
+	-text		=> "Save",
+	-command	=> sub {
+	    my $cuh;
+	    $cuh = sub {
+		my $h = shift;
+		my $n = 0;
+		foreach my $k (keys %$h) {
+		    unless (defined $h->{$k}) {
+			delete $h->{$k};
+			next;
+			}
+
+		    $n++;
+		    if (ref $h->{$k}) {
+			unless ($cuh->($h->{$k})) {
+			    delete $h->{$k};
+			    $n--;
+			    }
+			next;
+			}
+
+		    $h->{$k} =~ s/\s+$//;
+		    $h->{$k} =~ s/^\s+//;
+		    unless (length $h->{$k}) {
+			delete $h->{$k};
+			$n--;
+			}
+		    }
+		return $n;
+		}; # cuh
+	    $cuh->($c);
+	    DDumper { Writing => $c };
+
+	    my $err = $gsm->WritePhonebookEntry ($c);
+	    if (defined $err and $err == 0) {
+		status "Phonebook updated", "#00a000";
+		get_pb ();
+		$be->delete (0, "end");
+		$be->insert ("end", $_) for map { $_->{summ} } @pb;
+		}
+	    else {
+		status (($gsm->{ERROR} || "ERROR: ".DPeek $err), "#d00000");
+		}
+	    },
+	)->pack (qw( -side left -expand 0 -fill both -anchor w ));
+    $bf->Button (
+	-text		=> "Clear",
+	-command	=> sub { clear_hash ($c) },
+	)->pack (qw( -side left -expand 0 -fill both -anchor w ));
+    $bf->Button (
+	-text		=> "Cancel",
+	-command	=> sub { $cw->destroy; },
+	)->pack (qw( -side left -expand 0 -fill both -anchor w ));
+    } # add_contact
+
+MainLoop;

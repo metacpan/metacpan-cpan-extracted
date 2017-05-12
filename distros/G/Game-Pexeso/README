@@ -1,0 +1,16 @@
+PEXESO
+======
+
+This program consists of the pexeso game. A fun game that we all have played as
+kids and that never gets old. It's a nice educational game that helps train the
+memory capacities.
+
+The game is written entirely in Perl using the Clutter API. What's interesting
+about this version is that it has a very nice Perl twist. I will let you
+discover which one by playing the game for your self.
+
+The purpose of this program is two server two educational purposes at once.
+First of all it's meant to serve as a show case on how to build a nice
+interactive application with Clutter without hanging the event loop. Secondly
+it provides a new educational game for all of us to enjoy.
+

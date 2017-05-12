@@ -1,0 +1,62 @@
+digraph graph_18
+{
+	label = "dot - graphviz version 2.38.0 (20140413.2041), with local patches from Emden"
+
+	node [style = filled]
+
+	# Subgraph 1.
+
+	subgraph cluster_18_1
+	{
+		label = ""
+
+		node [fillcolor = red]
+
+		node_18_2
+		node_18_3
+	}
+
+	->
+
+	subgraph
+	{
+		node [fillcolor = green]
+
+		node_18_4
+		node_18_5
+	}
+
+	->
+
+	cluster_18_6
+
+	[
+		arrowhead = "empty",
+		arrowtail = "halfopen"
+		color     = green
+		dir       = "both",
+	]
+
+	# The above is just a node, because without the literal 'subgraph',
+	# it does not represent the name of the following subgraph.
+
+	# Subgraph 3.
+
+	{
+		node_18_7 [fillcolor = blue]
+		node_18_8 [fillcolor = blue]
+	}
+
+	->
+
+	{
+		node_18_9 [fillcolor = yellow]
+	}
+
+	[
+		arrowhead = "halfopen",
+		arrowtail = "empty"
+		color     = blue
+		dir       = "both",
+	]
+}

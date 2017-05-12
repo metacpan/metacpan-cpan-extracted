@@ -1,0 +1,67 @@
+{
+   "abstract" : "Query directions from the google maps directions API",
+   "author" : [
+      "Robin Clarke <perl@robinclarke.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-Directions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::GooglePolylineEncoding" : "0",
+            "Cache::FastMmap" : "0",
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "Encode" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Aliases" : "0",
+            "MooseX::Params::Validate" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::WithCache" : "0",
+            "Test::Mock::LWP::Dispatch" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "URL::Encode" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robin13/Google-Directions/issues"
+      },
+      "homepage" : "https://github.com/robin13/Google-Directions",
+      "repository" : {
+         "url" : "https://github.com/robin13/Google-Directions"
+      }
+   },
+   "version" : "0.09"
+}

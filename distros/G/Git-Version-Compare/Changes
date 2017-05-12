@@ -1,0 +1,25 @@
+Revision history for Git-Version-Compare
+
+1.004 2016-05-24 BOOK
+    - Remove a dependency on namespace::clean
+    - Update the cache using the normalized version string
+    - Ignore minor versions of special builds (msysgit, windows, etc.)
+    - Ensure the tests do not throw any warning
+    - Add a few more version numbers to the tests
+
+1.003 2016-05-03 BOOK
+    - Added support for version strings with comments (thanks to PINE)
+
+1.002 2016-04-27 BOOK
+    - Increased the test coverage (from ~400 to ~11000 unit tests)
+
+1.001 2016-02-20 BOOK
+    - Changed the internal format used for comparisons to fix an issue
+      with version numbers like v1.5.3.7-1198-g467f42c
+    - looks_like_git returns a boolean if the string looks like a git version
+    - _normalize now dies if the version does not look like a git version
+
+1.000 2016-02-19 BOOK
+    - Git::Version::Compare takes the knowledge about Git version numbers
+      that was accumulated while working on Git::Repository and offers
+      it in a module that does not depend on Git::Repository

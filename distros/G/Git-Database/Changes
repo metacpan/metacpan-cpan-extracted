@@ -1,0 +1,45 @@
+Revision history for Git-Database
+
+0.009 2017-03-29 BOOK
+    - Ensure the test suite skips backends that do not match the minimum
+      version requirements (RT #120760, reported by SREZIC)
+
+0.008 2017-03-25 BOOK
+    - New backend: Git::Raw::Repository (with help from SROMANOV and JACQUESG)
+    - Make get_object_attributes accept any valid attributes combination
+      (i.e. not just content)
+    - Ensure the test suite works as expected when @INC does not contain '.'
+
+0.007 2017-01-29 BOOK
+    - Adapt get_object_attributes to `git cat-file` output after format change
+      (RT #119915, reported by SREZIC)
+
+0.006 2016-11-16 BOOK
+    - Fix the Git::Wrapper backend's all_digests() method for older Git versions
+      (RT #118732, reported by SREZIC)
+    - Documentation updates
+
+0.005 2016-11-13 BOOK
+    - New backend: Git::Wrapper (with help from SROMANOV)
+
+0.004 2016-10-29 BOOK
+    - New backend: Git
+
+0.003 2016-10-20 BOOK
+    - New backend: Git::PurePerl
+    - New backend: Cogit
+    - New backend method: create_object
+    - Fleshed out Git::Database::Tutorial a little
+
+0.002 2016-10-13 BOOK
+    - New backend: Git::Sub (with help from DOLMEN)
+    - Drop List::Util uniq from the tests (depends on a too recent version)
+    - Catch error messages from git and forward them as warnings
+    - Provide an implementation of all_digests() for older gits
+
+0.001 2016-09-27 BOOK
+    - Git::Database provides an OO interface to the Git object database
+      (similar to Git::PurePerl, but with a choice of backends for interacting
+      with the Git repositories)
+    - This is still in alpha, and everything is subject to change
+    - The only supported backend for now is Git::Repository

@@ -1,0 +1,15 @@
+Changes
+eg/gitmeta-update
+eg/myrepos.gmf
+lib/GitMeta.pm
+lib/GitMeta/Github.pm
+lib/GitMeta/GMF.pm
+lib/GitMeta/SshDir.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001Basic.t
+t/002Live.t
+t/003RepoDirs.t
+META.yml                                 Module meta-data (added by MakeMaker)

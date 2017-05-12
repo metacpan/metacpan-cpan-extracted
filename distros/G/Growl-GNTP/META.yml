@@ -1,0 +1,48 @@
+---
+abstract: 'Perl implementation of GNTP Protocol (Client Part)'
+author:
+  - 'Yasuhiro Matsumoto <mattn.jp@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Growl-GNTP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Growl::GNTP:
+    file: lib/Growl/GNTP.pm
+    version: 0.21
+requires:
+  Crypt::CBC: 2.29
+  Data::UUID: 0.149
+  Digest::MD5: 2.36
+  Digest::SHA: 5.45
+  Filter::Util::Call: 0
+resources:
+  bugtracker: https://github.com/mattn/p5-Growl-GNTP/issues
+  homepage: https://github.com/mattn/p5-Growl-GNTP
+  repository: git://github.com/mattn/p5-Growl-GNTP.git
+version: 0.21
+x_contributors:
+  - 'unknown <Administrator@.(none)>'
+  - 'Yuki Ibe <yibe@yibe.org>'
+  - 'mattn <mattn@poo.(none)>'
+  - 'Marc Thielemann <marc.thielemann@biama.de>'
+  - 'sugyan <sugi1982@gmail.com>'
+  - 'Henrik Brix Andersen <henrik@brixandersen.dk>'
+  - 'John Morrissey <jwm@horde.net>'
+  - 'Kent Fredric <kentfredric@gmail.com>'

@@ -1,0 +1,16 @@
+--- noip2.c.orig	2004-04-18 09:07:29.113079040 +0930
++++ noip2.c	2004-04-18 09:07:49.704948600 +0930
+@@ -191,10 +191,10 @@
+ #define HOST			1
+ #define GROUP			2
+ #ifndef PREFIX
+-  #define PREFIX		"/usr/local"
++  #define PREFIX		"/usr/"
+ #endif
+-#define CONFIG_FILEPATH		PREFIX"/etc"
+-#define CONFIG_FILENAME		PREFIX"/etc/no-ip2.conf"
++#define CONFIG_FILEPATH		"/etc"
++#define CONFIG_FILENAME		"/etc/no-ip2.conf"
+ #define CONFSTRLEN		1024
+ #define MAX_DEVLEN		16
+ #define MAX_INSTANCE		4

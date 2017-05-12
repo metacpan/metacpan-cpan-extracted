@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+$version = q$Id: raccpost,v 0.6 1998/04/14 09:01:57 eagle Exp $;
+#
+# raccpost -- Posting script for rec.arts.comics.creative.
+#             Copyright 1997, 1998 by Russ Allbery <rra@stanford.edu>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
+# This program is provided as an example of the use of News::Gateway, but is
+# also the actual posting script used for rec.arts.comics.creative, with
+# only minor modifications to hide confidential information.  This is
+# basically just a stripped down version of raccmod, so if you're curious
+# about what's happening and the documentation here isn't sufficient, see
+# that example.
+
+############################################################################
+# Configuration
+############################################################################
+
+# The address to which any bounces or rejection messages should be cc'd.
+$maintainer = 'XXX';
+
+# The mailing list address, to which all successful posts should be sent.
+$list = 'XXX';
+
+
+############################################################################
+# Implementation
+############################################################################
+
+use News::Gateway qw();
+
+use strict;
+use vars qw($list $maintainer $version);
+
+# Pull a -f flag off the command line if one is supplied.
+my $force = shift if ($ARGV[0] eq '-f');
+
+# Create our News::Gateway object, setting it interactive, and initialize
+# the modules we're going to use.  Note that all posts which reach this
+# point have gone through raccmod and already have a Newsgroups header.
+my $gateway = News::Gateway->new (1, $maintainer);
+$gateway->modules (newsgroups => [$ARGV[0] || 'rec.arts.comics.creative'],
+                   'headers',
+                   mailtonews => ['rec.arts.comics.creative'],
+                   'cleanbody');
+
+# Read in our configuration details from the end of this script.
+$gateway->config_file (\*DATA);
+
+# If we were given a command-line argument of -f, that means to allow
+# crossposts to any groups.
+$gateway->config ('group', '/./') if $force;
+
+# Read the message in and try to post it.  If we get any errors from the
+# rewrites, just send them through the normal error handling (which will
+# cause a message to be sent to stderr).
+$gateway->read (\*STDIN);
+my $error = $gateway->apply ();
+if ($error) { $gateway->error ($error) }
+$error = $gateway->post ();
+
+# If posting failed, report that error.  Otherwise, we need to resend the
+# article to the mailing list as well.
+if ($error) {
+    $gateway->error ("$error");
+} else {
+    exit if $ARGV[0];
+    my $article = $gateway->get_article ();
+    $article->add_headers (to => 'racc@eyrie.org');
+    $article->drop_headers ('approved');
+    $gateway->mail ($list);
+}    
+
+__END__
+
+############################################################################
+# Configuration directives
+############################################################################
+    
+header approved       replace eagle@eyrie.org
+header cc             drop
+header date           drop
+header delivered-to   drop
+header path           drop
+header return-path    drop
+header sender         drop
+header to             drop
+header x-from-line    drop
+header x-rejected-for drop
+group rec.arts.comics.creative /^rec-arts-comics-creative\@/
+group rec.arts.comics.creative rec.arts.comics.creative@eyrie.org
+group rec.arts.comics.creative racc@eyrie.org
+group rec.arts.comics.creative eagle-racc@windlord.stanford.edu
+group alt.comics.lnh alt.comics.lnh@eyrie.org
+group alt.comics.lnh aclnh@eyrie.org
+group alt.comics.lnh eagle-aclnh@windlord.stanford.edu

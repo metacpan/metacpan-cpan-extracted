@@ -1,0 +1,73 @@
+NAME
+    Gentoo::Perl::Distmap - A reader/writer for the
+    "metadata/perl/distmap.json" file.
+
+VERSION
+    version 0.2.0
+
+SYNOPSIS
+            my $dm  = Gentoo::Perl::Distmap->load(  file => '../path/to/distmap.json' );
+            $dm->save( file => '/tmp/foo.x' );
+
+            for my $dist ( sort $dm->dists_in_repository('gentoo') ) {
+                    /* see the upstream distnames visible in gentoo */
+            }
+            for my $dist ( sort $dm->dists_in_repository('perl-experimental') ) {
+                    /* see the upstream distnames visible in perl-experimental */
+            }
+            for my $dist ( sort $dm->multi_repository_dists ) {
+                    /* see the dists that exist in more than one repository */
+            }
+    -       for my $dist ( sort $dm->mapped_dists ) {
+                    /* see the dists that have at least one version in the dataset */
+                    /* note: dists with empty version sets should be deemed a bug  */
+            }
+
+    Interface for creating/augmenting/comparing ".json" files still to be
+    defined, basic functionality only at this time.
+
+ATTRIBUTES
+  map
+METHODS
+  save
+            $instance->save( file => $filepath );
+            $instance->save( filehandle => $fh );
+            my $string = $instance->save( string => );
+
+CLASS METHODS
+  load
+            my $instance = G:P:Distmap->load( file => $filepath );
+            my $instance = G:P:Distmap->load( filehandle => $fh );
+            my $instance = G:P:Distmap->load( string => $str );
+
+  decoder
+            $decoder = G:P:Distmap->decoder();
+
+  encoder
+            $encoder = G:P:Distmap->encoder();
+
+ATTRIBUTE METHODS
+  map -> map
+  multi_repository_dists -> map
+  all_mapped_dists -> map
+  mapped_dists -> map
+  dists_in_repository -> map
+  add_version -> map
+PRIVATE METHODS
+  _save_string
+  _save_filehandle
+  _save_file
+PRIVATE CLASS METHODS
+  _load_file
+  _load_filehandle
+  _load_string
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

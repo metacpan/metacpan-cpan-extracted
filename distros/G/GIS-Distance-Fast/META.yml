@@ -1,0 +1,29 @@
+---
+abstract: 'C implementation of GIS::Distance formulas.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Simple: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GIS-Distance-Fast
+requires:
+  Class::Measure: '0'
+  GIS::Distance: '0.09'
+  Moo: '1'
+  namespace::clean: '0'
+  strictures: '1'
+resources:
+  bugtracker: https://github.com/bluefeet/GIS-Distance-Fast/issues
+  repository: git://github.com/bluefeet/GIS-Distance-Fast.git
+version: '0.08'

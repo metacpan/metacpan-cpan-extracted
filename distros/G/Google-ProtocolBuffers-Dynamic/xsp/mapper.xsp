@@ -1,0 +1,414 @@
+%module{Google::ProtocolBuffers::Dynamic};
+%package{Google::ProtocolBuffers::Dynamic::Mapper};
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include "mapper.h"
+
+%{
+
+void
+handle_warning(SV *text)
+  INIT:
+    gpd::WarnContext *cxt = (gpd::WarnContext *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    cxt->warn_with_context(aTHX_ text);
+
+SV*
+new(SV *klass, SV *ref = NULL)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    RETVAL = mapper->make_object(ref);
+  OUTPUT: RETVAL
+
+SV*
+new_and_check(SV *klass, SV *ref = NULL)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    if (!mapper->check(ref))
+        croak("Check failed: %s", mapper->last_error_message());
+
+    RETVAL = mapper->make_object(ref);
+  OUTPUT: RETVAL
+
+SV*
+message_descriptor(SV *klass)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    RETVAL = mapper->message_descriptor();
+  OUTPUT: RETVAL
+
+SV*
+enum_descriptor(SV *klass)
+  INIT:
+    gpd::EnumMapper *mapper = (gpd::EnumMapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    RETVAL = mapper->enum_descriptor();
+  OUTPUT: RETVAL
+
+SV*
+decode(SV *klass, SV *scalar)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+    STRLEN bufsize;
+    const char *buffer = SvPV(scalar, bufsize);
+  CODE:
+    RETVAL = mapper->decode(buffer, bufsize);
+
+    if (!RETVAL) {
+        sv_2mortal(RETVAL);
+        croak("Deserialization failed: %s", mapper->last_error_message());
+    }
+  OUTPUT: RETVAL
+
+SV*
+decode_json(SV *klass, SV *scalar)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+    STRLEN bufsize;
+    const char *buffer = SvPV(scalar, bufsize);
+  CODE:
+    RETVAL = mapper->decode_json(buffer, bufsize);
+
+    if (!RETVAL) {
+        sv_2mortal(RETVAL);
+        croak("Deserialization failed: %s", mapper->last_error_message());
+    }
+  OUTPUT: RETVAL
+
+SV*
+encode(SV *klass_or_object, SV *ref = NULL)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    if (ref == NULL) {
+        if (sv_isobject(klass_or_object))
+            ref = klass_or_object;
+        else
+            croak("Usage: $object->encode or $class->encode($hash)");
+    }
+
+    RETVAL = mapper->encode(ref);
+
+    if (!RETVAL) {
+        sv_2mortal(RETVAL);
+        croak("Serialization failed: %s", mapper->last_error_message());
+    }
+  OUTPUT: RETVAL
+
+SV*
+encode_json(SV *klass_or_object, SV *ref = NULL)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    if (ref == NULL) {
+        if (sv_isobject(klass_or_object))
+            ref = klass_or_object;
+        else
+            croak("Usage: $object->encode or $class->encode($hash)");
+    }
+
+    RETVAL = mapper->encode_json(ref);
+
+    if (!RETVAL) {
+        sv_2mortal(RETVAL);
+        croak("Serialization failed: %s", mapper->last_error_message());
+    }
+  OUTPUT: RETVAL
+
+void
+check(SV *klass_or_object, SV *ref = NULL)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    if (ref == NULL) {
+        if (sv_isobject(klass_or_object))
+            ref = klass_or_object;
+        else
+            croak("Usage: $object->check or $class->check($hash)");
+    }
+
+    if (mapper->check(ref))
+        croak("Check failed: %s", mapper->last_error_message());
+
+SV *
+has_field(HV *self)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    bool has_it = field->has_field(self);
+
+    RETVAL = has_it ? &PL_sv_yes : &PL_sv_no;
+  OUTPUT: RETVAL
+
+SV *
+has_extension_field(HV *self, SV *extension)
+  INIT:
+    gpd::MapperField *field = gpd::MapperField::find_extension(aTHX_ cv, extension);
+  CODE:
+    bool has_it = field->has_field(self);
+
+    RETVAL = has_it ? &PL_sv_yes : &PL_sv_no;
+  OUTPUT: RETVAL
+
+void
+clear_field(HV *self)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    field->clear_field(self);
+
+void
+clear_extension_field(HV *self, SV *extension)
+  INIT:
+    gpd::MapperField *field = gpd::MapperField::find_extension(aTHX_ cv, extension);
+  CODE:
+    field->clear_field(self);
+
+void
+get_scalar(HV *self)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    PUSHs(field->get_scalar(self, TARG));
+
+void
+get_extension_scalar(HV *self, SV *extension)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = gpd::MapperField::find_scalar_extension(aTHX_ cv, extension);
+  PPCODE:
+    PUSHs(field->get_scalar(self, TARG));
+
+void
+set_scalar(HV *self, SV *value)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    field->set_scalar(self, value);
+
+void
+set_extension_scalar(HV *self, SV *extension, SV *value)
+  INIT:
+    gpd::MapperField *field = gpd::MapperField::find_scalar_extension(aTHX_ cv, extension);
+  CODE:
+    field->set_scalar(self, value);
+
+void
+get_or_set_scalar(HV *self, SV *value = NULL)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    if (!value)
+        PUSHs(field->get_scalar(self, TARG));
+    else
+        field->set_scalar(self, value);
+
+void
+get_or_set_extension_scalar(HV *self, SV *extension, SV *value = NULL)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = gpd::MapperField::find_scalar_extension(aTHX_ cv, extension);
+  PPCODE:
+    if (!value)
+        PUSHs(field->get_scalar(self, TARG));
+    else
+        field->set_scalar(self, value);
+
+void
+get_list_item(HV *self, IV index)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    PUSHs(field->get_item(self, index, TARG));
+
+void
+get_extension_item(HV *self, SV *extension, IV index)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = gpd::MapperField::find_repeated_extension(aTHX_ cv, extension);
+  PPCODE:
+    PUSHs(field->get_item(self, index, TARG));
+
+void
+set_list_item(HV *self, IV index, SV *value)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    field->set_item(self, index, value);
+
+void
+set_extension_item(HV *self, SV *extension, IV index, SV *value)
+  INIT:
+    gpd::MapperField *field = gpd::MapperField::find_repeated_extension(aTHX_ cv, extension);
+  CODE:
+    field->set_item(self, index, value);
+
+void
+get_or_set_list_item(HV *self, IV index, SV *value = NULL)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    if (!value)
+        PUSHs(field->get_item(self, index, TARG));
+    else
+        field->set_item(self, index, value);
+
+void
+get_or_set_extension_item(HV *self, SV *extension, IV index, SV *value = NULL)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = gpd::MapperField::find_scalar_extension(aTHX_ cv, extension);
+  PPCODE:
+    if (!value)
+        PUSHs(field->get_item(self, index, TARG));
+    else
+        field->set_item(self, index, value);
+
+void
+add_item(HV *self, SV *value)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    field->add_item(self, value);
+
+void
+add_extension_item(HV *self, SV *extension, SV *value)
+  INIT:
+    gpd::MapperField *field = gpd::MapperField::find_repeated_extension(aTHX_ cv, extension);
+  CODE:
+    field->add_item(self, value);
+
+IV
+list_size(HV *self)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    RETVAL = field->list_size(self);
+  OUTPUT: RETVAL
+
+IV
+extension_list_size(HV *self, SV *extension)
+  INIT:
+    gpd::MapperField *field = gpd::MapperField::find_repeated_extension(aTHX_ cv, extension);
+  CODE:
+    RETVAL = field->list_size(self);
+  OUTPUT: RETVAL
+
+void
+get_list(HV *self)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    PUSHs(field->get_list(self));
+
+void
+get_extension_list(HV *self, SV *extension)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = gpd::MapperField::find_repeated_extension(aTHX_ cv, extension);
+  PPCODE:
+    PUSHs(field->get_list(self));
+
+void
+set_list(HV *self, SV *ref)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    field->set_list(self, ref);
+
+void
+set_extension_list(HV *self, SV *extension, SV *ref)
+  INIT:
+    gpd::MapperField *field = gpd::MapperField::find_repeated_extension(aTHX_ cv, extension);
+  CODE:
+    field->set_list(self, ref);
+
+void
+get_or_set_list(HV *self, SV *ref = NULL)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    if (!ref)
+        PUSHs(field->get_list(self));
+    else
+        field->set_list(self, ref);
+
+void
+get_or_set_extension_list(HV *self, SV *extension, SV *ref = NULL)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = gpd::MapperField::find_scalar_extension(aTHX_ cv, extension);
+  PPCODE:
+    if (!ref)
+        PUSHs(field->get_list(self));
+    else
+        field->set_list(self, ref);
+
+void
+get_map_item(HV *self, SV *key)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    PUSHs(field->get_item(self, key, TARG));
+
+void
+set_map_item(HV *self, SV *key, SV *value)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    field->set_item(self, key, value);
+
+void
+get_or_set_map_item(HV *self, SV *key, SV *value = NULL)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    if (!value)
+        PUSHs(field->get_item(self, key, TARG));
+    else
+        field->set_item(self, key, value);
+
+void
+get_map(HV *self)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    PUSHs(field->get_map(self));
+
+void
+set_map(HV *self, SV *ref)
+  INIT:
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    field->set_map(self, ref);
+
+void
+get_or_set_map(HV *self, SV *ref = NULL)
+  INIT:
+    dXSTARG;
+    gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
+  PPCODE:
+    if (!ref)
+        PUSHs(field->get_map(self));
+    else
+        field->set_map(self, ref);
+
+BOOT:
+    gpd::WarnContext::setup(aTHX);
+
+%}

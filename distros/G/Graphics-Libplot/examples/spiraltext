@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+use Graphics::Libplot ':ALL';
+
+# type of plotting device
+$device = 'X';
+if (@ARGV) {
+    $device = $ARGV[0];	
+#    die "Uknown device: $ARGV[0]" unless $ARGV[0] =~ /^ps|X|fig$/;
+}
+
+$SIZE=100.0;
+$EXPAND = 2.2;
+$M_PI= 3.14159265358979;
+#       /* set a Plotter parameter */
+       pl_parampl("PAGESIZE", "letter");
+#       /* create a Postscript Plotter that writes to standard output */
+       pl_parampl ("BITMAPSIZE", "500x500");
+       if (($handle = pl_newpl ($device, stdin, stdout, stderr)) < 0)
+         {
+           die "Couldn't create Plotter";
+         }
+       pl_selectpl ($handle);    #        /* select the Plotter for use */
+     
+       if (pl_openpl () < 0)      #      /* open Plotter */
+         {
+           die "Couldn't open Plotter";
+         }
+       pl_fspace (-($SIZE), -($SIZE), $SIZE, $SIZE); #/* specify user coor system */
+       pl_pencolorname ("blue");       # /* pen color will be blue */
+       pl_fillcolorname ("white");
+       pl_filltype (1);               #  /* ellipses will be filled with white */
+#       fontname ("NewCenturySchlbk-Roman");#  /* choose a Postscript font */
+#       fontname ("utopia-medium-r-normal");#  /* choose a Postscript font */
+       pl_fontname ("HersheySerif");#  /* choose a Postscript font */
+{
+       my $i;     
+       for ($i = 80; $i > 1; $i--)   #   /* loop through angles */
+         {
+           $theta = 0.5 * $i; # /* theta is in radians */
+           $radius = $SIZE / ($theta**(0.35));  #/* this yields a spiral */
+           pl_fmove($radius * cos($theta), $radius * sin($theta));
+           draw_boxed_string("GNU libplot!", 0.04 * $radius,(180.0*$theta / $M_PI) - 90.0);
+         }
+ }    
+       if (pl_closepl () < 0)       #    /* close Plotter */
+         {
+	     die "Couldn't close Plotter";
+         }
+       pl_selectpl (0);
+       if (pl_deletepl ($handle) < 0) #   /* delete Plotter we used */
+         {
+           die "Couldn't delete Plotter";
+         }
+
+sub draw_boxed_string
+{
+    my ($s,$size,$angle) = @_;
+    my ($true_size,$width);
+    pl_ftextangle($angle);             #/* text inclination angle (degrees) */
+    $true_size = pl_ffontsize($size);  #/* choose font size */
+    $width = pl_flabelwidth($s);       #/* compute width of text string */
+    pl_fellipserel (0.0, 0.0, $EXPAND * 0.5 * $width, $EXPAND * 0.5 * $true_size, $angle);
+    pl_alabel (ord 'c', ord 'c', $s);  #/* draw centered text string */
+}
+
+1; #OK

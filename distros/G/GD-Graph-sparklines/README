@@ -1,0 +1,65 @@
+SYNOPSIS
+      use GD::Graph::sparklines;
+
+      my $graph = GD::Graph::sparklines->new(100, 30);
+      my $gd = $graph->plot( [[0,1,2,3], [16, 40, 35, 20]] );
+      print $gd->png();
+
+DESCRIPTION
+    GD::Graph::sparklines is a Perl module for creating sparklines using the
+    GD::Graph infrastructure -- if you want a sparkline of your data, you
+    can just replace
+
+      use GD::Graph::lines;
+
+    with
+
+      use GD::Graph::sparklines;
+
+    and it will "just work", assuming you've not used any esoteric options.
+
+    GD::Graph::sparklines was originally a simple wrapper around
+    GD::Graph::lines but it turned out very difficult to get the graph
+    sizing correct without subclassing and overriding methods.
+
+    (It's also very difficult to get ploticus to draw sparklines.)
+
+OPTIONS
+    GD::Graph::sparklines adds a few options to the GD::Graph set.
+
+  y_min_clip, y_max_clip
+    If set, clips the graph to those values (overriding any minimum or
+    maximum values in the data sets).
+
+  y_band_min, y_band_max
+    If set, plots a background "range" band between the two values.
+
+  no_blob
+    If set, doesn't draw the little red indicator blob on the last value.
+
+BUGS
+    Undoubtedly lots. In particular, the full power of GD::Graph isn't
+    implemented and will probably go terribly wrong if attempted.
+
+    There's no way of setting the colour of the background band or avoiding
+    the light grey as first colour. This should probably be an option,
+    traditional, which sets the grey colours, draws the blob, etc.
+
+    The graphs are generally ugly -- I tend to render them at 4x and use "|
+    convert -scale 25%" to generate the final smoothed output. (GD's
+    copyResampled method doesn't seem to work very well otherwise there'd be
+    a resample option for generating anti-aliased graphs.)
+
+CREDITS
+    Edward Tufte for his chapter about sparklines in "Beautiful Evidence"
+    Martien Verbruggen for GD::Graph
+
+AUTHOR
+    Copyright (c) 2004, Rob Partington <perl-ggs@frottage.org>
+
+SEE ALSO
+    <http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0001Eb&topic
+    _id=1>
+    <http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0001OR&topic
+    _id=1>
+

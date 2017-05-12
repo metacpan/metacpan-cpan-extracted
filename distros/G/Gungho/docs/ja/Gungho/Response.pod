@@ -1,0 +1,30 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Response.ja - Gunghoレスポンス オブジェクト
+
+=head1 DESCRIPTION
+
+Gungho::ResponseはHTTP::Responseの小クラスです。
+
+=head1 METHODS
+
+=head2 new
+
+新規インスタンスを作成します。
+
+=head2 clone
+
+このリクエストのクローンを作成します。クローンはnotes()の中身もクローンされて
+返されます。
+
+=head2 notes
+
+HTTP::Requestが提供するもの以外のメタデータ／付随データを格納します。
+
+=head1 SEE ALSO
+
+L<Gungho::Request|Gungho::Request>
+
+=cut

@@ -1,0 +1,124 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  my @layers = $image->get_layers;
+  my $n = @layers or die "At least one layer is required\n";
+  my ($i, $I, $p, $P, $d); # declare here so seen by eval below
+  my $func = eval "sub{\nno strict;\n#line 0 \"expression\"\n$expr\n}";
+  die "Syntax error in expression '$expr': $@\n" if $@;
+  # now apply the expr
+  eval { $image->undo_group_start };
+  # 5.004 has problems with overlaying functions
+  Gimp->progress_init("Applying Expression...",-1);
+  for $i (0..$n-1) {
+    $I = $n-$i-1;
+    $p = @layers > 1 ? $i/$#layers : 0;
+    $P = 1-$p;
+    $d = $layers[$i];
+    eval { &$func };
+    die "Evaluation error in frame $i: $@\n" if $@;
+    Gimp->progress_update(($i+1)/$n);
+  }
+  eval { $image->undo_group_end };
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+layer_apply - Apply a perl expression to every layer of the image
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Generic/Apply Perl Expression...
+
+=head1 DESCRIPTION
+
+Runs a perl expression for each layer of an image. The perl expression
+can use the following variables:
+
+=over 4
+
+=item $image
+
+The image.
+
+=item $d ("drawable")
+
+The current drawable (currently always a layer).
+
+=item $i, $I ("index")
+
+The index of the current layer. C<$i> counts from 0 to $n-1, i.e. from top
+to the bottom of the stack with layer #0 being the top of the stack.
+
+C<$I> counts "backwards", i.e. from $n-1 to 0, so layer 0 is at the
+bottom.
+
+=item $p, $P ("percent")
+
+Similar to $i, but counts from 0 to 1 (inclusive). $p is equivalent to
+C<$i/($n-1)> and $P is equivalent to C<$I/($n-1)>.
+
+=item $n ("number of frames")
+
+The number of layers in the image.
+
+=item $d2 ("drawable")
+
+The drawable2 argument, entirely optional and can be used for anything you
+like.
+
+=back
+
+=head2 EXAMPLES
+
+The following expression will gradually fade out an animation.
+
+ $d->brightness_contrast ($P * 127, 0);
+
+This little script can be used to merge two animations, $d2 should
+point to another animation with the same number of frames (only the
+image is of concern). It does it by copying each frame of the other
+animation onto the corresponding frame in the current animation and using
+DARKEN_MODE to combine the frames. You might want to use other modes or
+maybe C<$f->set_opacity(50)> for your animation.
+
+ $i2=$d2->get_image;
+ $l2=($i2->get_layers)[$i];
+
+ $i2->selection_all;
+ $l2->edit_copy;
+ $f=$d->edit_paste(0);
+ $f->set_mode(DARKEN_ONLY_MODE);
+ $f->anchor;
+
+=head1 PARAMETERS
+
+ [PF_TEXT, "expr", "Perl expression to run for each layer",
+	  '$d->gauss_rle($P*100+1,1,1)'],
+ [PF_DRAWABLE, "d2", "Optional extra drawable if your code needs it"],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+19990708
+
+=head1 LICENSE
+
+Marc Lehmann <pcg@goof.com>
+
+Distributed under the same terms as Gimp-Perl.

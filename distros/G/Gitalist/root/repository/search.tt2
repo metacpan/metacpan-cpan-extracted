@@ -1,0 +1,43 @@
+[% BLOCK shortlog_table_headfoot %]
+[% SET cell = type == 'head' ? 'th' : 'td' %]
+<tr>
+	<[% cell %]>ID (sha1)</[% cell %]>
+	<[% cell %]>Last change</[% cell %]>
+	<[% cell %]>Message</[% cell %]>
+	<[% cell %]>By</[% cell %]>
+	<[% cell %]>Actions</[% cell %]>
+</tr>
+[% END %]
+
+[% IF results.size == 0 %]
+<div class="copy">
+No results found for <q>[% c.req.param('text') | html %]</q>.
+</div>
+[% ELSE %]
+
+<table class='listing'>
+<thead>[% PROCESS shortlog_table_headfoot type = 'head' %]</thead>
+<tbody>
+[% FOREACH result IN results %]
+ <tr [% "class='invert'" IF loop.count % 2 %]>
+	<td class='sha1' title='[% result.sha1 %]'>[% INCLUDE 'inc/chroma_hash.tt2' sha1 = result.sha1.substr(0, 7) %]</td>
+	<td class='time-since' title='[% result.authored_time %]'>[% time_since(result.authored_time) %]</td>
+	<td class='commit-message'>[%
+     # XXX This is fragile at best.
+     html_comment = result.comment | html;
+     html_comment.replace(
+       c.req.param('text'), '<span class="match">' _ c.req.param('text') _ '</span>'
+     );
+   %]</td>
+	<td class='author'>[% INCLUDE 'inc/gravatar.tt2' email = result.author.email %][% result.author.name | html %]</td>
+	<td class='action-list'>
+ 		<a href="[% c.uri_for_action("/ref/commit", [Repository.name, result.sha1]) %]" title="Commit details" class="button commit">commit</a>
+ 		<a href="[% c.uri_for_action("/ref/diff_fancy", [Repository.name, result.sha1]) %]" title="Commit difference" class="button diff">commitdiff</a>
+ 		<a href="[% c.uri_for_action("/ref/tree", [Repository.name, result.sha1]) %]" title="Tree" class="button tree">tree</a>
+	</td>
+</tr>
+[% END %]
+</tbody>
+</table>
+
+[% END %]

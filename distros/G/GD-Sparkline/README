@@ -1,0 +1,11 @@
+GD::Sparkline - one of many ways to make basic graphs
+
+Usage on the command line (with 'display' command from imagemagick):
+
+ perl -T -Ilib bin/sparkline suppress=1 p=0000009y4salbwyhz7wXXXXX0009990000 | display
+
+ perl -T -Ilib bin/sparkline s=10,10,10,10,20,50,70,10,100,200,40,50 suppress=1 | display
+
+Usage as CGI / Apache::Registry, place bin/sparkline in your cgi-bin or cgi-perl folder
+
+ /cgi-bin/sparkline?p=0000009y4salbwyhz7wXXXXX0009990000

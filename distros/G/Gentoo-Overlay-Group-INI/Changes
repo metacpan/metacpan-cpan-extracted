@@ -1,0 +1,67 @@
+Release history for Gentoo-Overlay-Group-INI
+
+0.2.2 2013-03-13T08:34:37Z
+ [!Noteable Changes]
+ - Use Path::Tiny
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Dependencies::Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+ [Dependencies::New / develop requires]
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta
+ - Test::Pod
+ - Test::Pod::Coverage
+ - version
+
+ [Dependencies::New / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.3.0 → v1.7.0
+
+ [Dependencies::New / runtime requires]
+ - Path::Tiny
+
+ [Dependencies::Removed / runtime requires]
+ - Path::Class::Dir
+
+ [Dependencies::Removed / test requires]
+ - Path::Class
+
+ [Documentation]
+ - Update Copyright to 2013
+ - Add README.mkdn
+
+ [Meta]
+ - bugtracker to github issues
+
+0.2.1 2012-06-22T07:29:54Z
+ [Bug Fixes]
+ - Exceptions needs qw( :all ) to export the exception() util.
+ - File::HomeDir paths changed because XDG systems are weird.
+
+ [Tests]
+ - A File::Tempdir is now configured and assigned to $ENV{HOME} internally
+   for testing as tests will create those paths.
+
+0.2.0 2012-06-22T06:15:18Z
+ [Dependencies::Runtime]
+ - new : String::RewritePrefix
+
+ [Features]
+ - added INI->load_named( $name, $config );
+ - added INI->load_all_isa( $isa, $config );
+ - added INI->load_all_does( $role, $config );
+ - added Overlays->overlay_group();
+
+ [Internals]
+ - moved section <-> group transformer into section code.
+ - broke internals of ->load into ->_parse
+
+0.1.0 2012-06-21T21:05:59Z
+ - First version.
+

@@ -1,0 +1,177 @@
+#!perl
+
+our $DATE = '2016-01-12'; # DATE
+our $VERSION = '0.08'; # VERSION
+
+use Games::Word::Guess;
+use Getopt::Long qw(:config bundling auto_version auto_help);
+
+my %opts = (
+    min_len => undef,
+    max_len => undef,
+    max_guesses => undef,
+    word_list => undef,
+    num_words => undef,
+);
+GetOptions(
+    'min-len|a=i'     => \$opts{min_len},
+    'max-len|b=i'     => \$opts{max_len},
+    'max-guesses|g=i' => \$opts{max_guesses},
+    'word-list|l=s'   => \$opts{word_list},
+    'num-words|w=i'   => \$opts{num_words},
+);
+
+my $game = Games::Word::Guess->new(%opts);
+$game->run;
+
+# ABSTRACT: Word guess game
+# PODNAME: wordguess
+
+
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+wordguess - Word guess game
+
+=head1 VERSION
+
+This document describes version 0.08 of wordguess (from Perl distribution Games-Word-Guess), released on 2016-01-12.
+
+=head1 SYNOPSIS
+
+Run game:
+
+ % wordguess ; # defaults: word length 5, 5 guesses/word, 10 words, wordlist Enable
+
+Customize some options (wordlist is Games::Word::Wordlist::* module):
+
+ % wordguess --min-len 5 --max-len 6 --num-words 5 --word-list KBBI
+
+Other options:
+
+ % wordguess --help
+ % wordguess --version
+
+An example game session:
+
+ % wordguess -w3
+
+ Word 1/3:
+ o  _  _  _  _  Your guess (1/5)? ovale
+ o  _  _  _  _  Sorry, not a word! Your guess (1/5)? odors
+ o  _  _  r  _  Your guess (2/5)? overt
+ o  _  e  r  _  Your guess (3/5)? owers
+ o  _  e  r  _  Sorry, not a word! Your guess (3/5)? o
+ o  _  e  r  _  Sorry, not a word! Your guess (3/5)? our
+ o  _  e  r  _  Sorry, not a 5-letter word! Your guess (3/5)?
+ o  _  e  r  _  Sorry, not a word! Your guess (3/5)? otero
+ o  _  e  r  _  Sorry, not a word! Your guess (3/5)? overt
+ o  _  e  r  _  Your guess (4/5)? overt
+ o  _  e  r  _  Your last guess? overt
+ o  _  e  r  _  Chances used up. The correct word is: opera
+
+ Word 2/3:
+ g  _  _  _  _  Your guess (1/5)? grand
+ g  r  _  _  _  Your guess (2/5)? greet
+ g  r  _  _  _  Your guess (3/5)? groom
+ g  r  _  _  _  Your guess (4/5)? grips
+ g  r  _  _  s  Your last guess? grubs
+ Correct (20 points)!
+
+ Word 3/3:
+ d  _  _  _  _  Your guess (1/5)? drives
+ d  _  _  _  _  Sorry, not a 5-letter word! Your guess (1/5)? drive
+ d  _  _  _  e* Your guess (2/5)? deers
+ d  _  _  _  _  Sorry, not a word! Your guess (2/5)? dears
+ d  _  _  _  _  Sorry, not a word! Your guess (2/5)? delve
+ d  e* _  _  _  Your guess (3/5)? dream
+ d  _  e* _  _  Your guess (4/5)? dared
+ d  _  _  e  _  Your last guess? dunes
+ d  _  _  e  s  Chances used up. The correct word is: dotes
+
+ Number of words guessed correctly: 1/3
+ Final score: 20
+
+=head1 DESCRIPTION
+
+B<wordguess> is a word-guessing game, a variation on "Hangman". Like in Hangman,
+you must guess a word in a certain number of allowed guesses. Unlike in Hangman,
+you guess word-by-word, not letter-by-letter. The first letter is always
+revealed beforehand so you can have a better idea of the word. Also, unlike in
+Hangman, if there is a letter in the your guess word that exists in the answer
+word but at the wrong position, the game will not tell you the correct position
+but instead will display the letter in the guessed position with an accompanied
+C<*> mark. This way, you know that the letter exists but at a different
+position.
+
+B<Scoring>. For each correctly guessed word, you get a score. The score depends
+on word length and number of guesses. For example, if you guess a 5-letter word
+correctly on the first guess, you get 100. On the second guess, 80. And so on.
+
+=head1 OPTIONS
+
+=head2 --min-len=i, -a (default: 5)
+
+Minimum word length.
+
+=head2 --max-len=i, -b (default: 5)
+
+Maximum word length.
+
+=head2 --max-guesses=i, -g
+
+Maximum number of guesses per word. The default is the word length (so if you
+have a 6-character word, the default is 6).
+
+=head2 --word-list=s, -l
+
+Select wordlist. Wordlists are searched in C<Games::Word::Wordlist::*> modules.
+Two default wordlist are used: KBBI (if running under Indonesian locale), or
+Enable.
+
+Only words containing the lowercase latin letter a-z are used.
+
+=head2 --num-words=i, -w (default: 10)
+
+Number of words per game.
+
+=head1 HISTORY
+
+First created as a Perl script on 2010-04-04. First packaged as a CPAN module on
+2014-08-07.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Games-Word-Guess>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Games-Word-Guess>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Word-Guess>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

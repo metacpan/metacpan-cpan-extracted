@@ -1,0 +1,10 @@
+Gzip::RandomAccess lets you randomly access a gzip file as if it
+were an ordinary file. See the module's POD for more info.
+
+INSTALLATION
+
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ # make install
+

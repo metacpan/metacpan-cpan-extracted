@@ -1,0 +1,5 @@
+name = "Global-MutexLock"
+# badges = ["travis"]
+module_maker="ModuleBuild"
+[build]
+build_class="builder::GMBuilder"

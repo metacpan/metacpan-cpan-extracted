@@ -1,0 +1,77 @@
+table.graph .edge {
+  background: inherit;
+  border-style: none;
+  color: black;
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+}
+table.graph {
+  text-align: center;
+  background: inherit;
+  color: black;
+  empty-cells: show;
+  margin: 0.5em;
+  margin-left: 2em;
+  margin-bottom: 1em;
+  padding: 0.5em;
+}
+table.graph .node {
+  text-align: center;
+  color: black;
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+  background: white;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph td {
+  padding: 2px;
+  background: inherit;
+  color: black;
+  white-space: nowrap;
+  }
+table.graph span.l { float: left; }
+table.graph span.r { float: right; }
+table.graph .va {
+  vertical-align: middle;
+  line-height: 1.5em;
+  width: 0.4em;
+  }
+table.graph .ve { width: 0em; }
+table.graph .el {
+  width: 1em;
+  max-width: 1em;
+  min-width: 1em;
+  }
+table.graph .lh, table.graph .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph .v, table.graph .hat, table.graph .sv {
+  text-align: left;
+  height: 0.5em;
+  line-height: 0.6em;
+  }
+table.graph .sv {
+  position: relative;
+  left: -0.5em;
+  overflow: visible;
+  }
+table.graph .sh {
+  position: relative;
+  top: 0.8em;
+  vertical-align: bottom;
+  overflow: visible;
+  }
+table.graph .hat {
+  padding-top: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph .eb {
+  max-height: 0.4em;
+  line-height: 0.4em;
+  }

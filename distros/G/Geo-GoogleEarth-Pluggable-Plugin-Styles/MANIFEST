@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Geo/GoogleEarth/Pluggable/Plugin/Styles.pm
+t/001_load.t
+scripts/Geo-GoogleEarth-Pluggable-Plugin-Styles-Example.pl
+scripts/Geo-GoogleEarth-Pluggable-Plugin-Styles-Example.pl.kml
+perl-Geo-GoogleEarth-Pluggable-Plugin-Styles.spec
+META.yml                                 Module meta-data (added by MakeMaker)

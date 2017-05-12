@@ -1,0 +1,18 @@
+Revision history for Geo-Coder-TomTom
+
+0.04  Sun Jan  4 19:26:05 UTC 2015
+    - Use the new official API; an API key is now required.
+
+0.03  Thu Dec  9 02:02:20 UTC 2010
+    - Fixed the case where only a single result was returned. The JSON
+      structure in the response was changed at some point to be an object if
+      a single result is returned and an array if multiple results are
+      returned.
+    - Updated default apikey.
+
+0.02  Tue Jul 20 23:37:13 UTC 2010
+    - Properly formatted the hashref in the Pod.
+    - Corrected "See Also" link to TomTom's site.
+
+0.01  Sun Jun 27 03:35:42 UTC 2010
+    - Initial distribution.

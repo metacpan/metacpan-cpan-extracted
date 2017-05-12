@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/000-load.t
+lib/GTM.pm
+lib/GTM/Run.pm
+lib/GTM/global-selector.pod
+bin/gtm
+COPYING
+COPYING.GNU
+COPYING.Artistic
+images/ampel-red.png
+images/ampel-green.png
+images/ampel-off.png
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,243 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho.ja - 高性能Webクローラーフレームワーク
+
+=head1 SYNOPSIS
+
+  use Gungho;
+  Gungho->run($config);
+
+=head1 DESCRIPTION
+
+Gunghoは高性能Webクローラーフレームワークです。高速なHTTP処理を行いつつ、
+機能拡張をしやすいようフレキシブルな構造を目指して開発されています。
+
+現在Gunghoはβ版です。機能的／仕様的にも比較的安定しつつありますが、まだ
+内部的なAPI等は大幅な変更が加わる可能性がありますのでご注意ください。
+
+Gunghoをインストールすると自動的に以下の機能が使えるようになります：
+
+=over 4
+
+=item イベント型非同期エンジン
+
+GunghoはPOE、Danga::Socket、IO::Async等をベースにした非同期エンジンを使い
+クロールを行います。あなたのニーズにあったエンジンを選んでください。
+
+=item 非同期DNS解決
+
+HTTP通信が非同期で行われるならもちろんDNS通信も非同期で行えます。
+GunghoはDNS解決をしている間もブロックせずに他の処理を進められます。
+
+=item 自動robots.txt処理
+
+全てのクローラーはrobots.txtを正しく処理し、禁止されているURLにはアクセス
+しないようにするべきです。Gunghoはこのrobots.txt処理という比較的面倒な
+処理を自動的に行います。memcachedとともに使用すれば分散環境でも使用可能です。
+
+=item メタタグ内のロボットディレクティブ処理
+
+ロボットディレクティブはHTMLのMETAタグ内に埋め込まれたロボット用の制御構文
+です。Gunghoではこのディレクティブを自動的にパースし、ユーザーが扱えるように
+します。
+
+=item スロットリング
+
+クロール対象となっているサイトに過度の負荷をかけてサイトを落としては元も子も
+ありません。スロットリングモジュールを使う事によってGunghoではリクエスト数を
+絞り込む事が可能です。
+
+=item 内部向けIP禁止
+
+クロールしているサイトのDNSの設定が間違っていたり、意図的にそのようなURLを
+埋め込んであった場合リクエストが自分の内部ネットワークのIPアドレスに向いてしまい
+DoSを引き起こす可能性があります。Gunghoはこのセキュリティリスクを自動的に監視します。
+
+=item キャッシュ
+
+Catalystキャッシュのようなキャッシュを使いたい場合はCacheコンポーネントを
+使用するだけでプログラム内からキャッシュを扱えるようになります。
+
+=item Web::Scraperサポート
+
+Web::ScraperをGungho内から簡単に扱えるようにしています
+(この機能は現在まだ安定稼働していません）
+
+=item リクエストログ
+
+RequestLogプラグインを使用することによって自動的に取得されていくURLを
+記録して行く事ができます。
+
+=back
+
+=head1 歴史
+
+最初はまずRSSフィードを読み込むスクリプトが数個存在しました。しかしクロールする
+サイトが増える度に同じような処理を行う必要があり、同様にメンテナンスも難しく
+なってきました。この時点でクローラーのフレームワーク化が構想としてうかびあがり
+ました。
+
+その後Xangoというフレームワークを開発し、イベント型クローラーの骨組みを作り
+あげることができました。ただしこのフレームワークはPOEというイベントフレーム
+ワークを使用することにこだわってしまったため、拡張性の低いフレームワークと
+なってしまいました。
+
+そして2007になって過去の教訓やCatalyst, Plagger, DBIx::Class等の事例を経て
+新たに手に入れた知識を素に開発されたのがGunghoです。Gunghoはイベント型
+クローラーの基本構造を崩さず、拡張性に主眼を置いた設計を目指しています。
+
+Gunghoは現在日米数社のプロジェクトで採用されており、一日に数百万件の
+ページを取得するコンポーネントとして活躍しています。
+
+=head1 使用する際に注意する点
+
+Gunghoは膨大な量のHTTP接続をすることを念頭に設計されています。Providerと
+Handlerの実装によってはDoS攻撃のような量のリクエストをサーバーに送信する事も
+容易です。
+
+上記の理由から*必ず*発行するリクエスト数に注意してクローラーを動かして
+ください。Gungho::Component::ThrottleによるスロットリングyGungho::Component::RobotRules
+によるアクセス制御は必ず組み込むようにすると良いでしょう。
+
+また、User Agent名は必ず開発されているクローラーの適切なものに変更するよう
+お願いします。
+
+=head1 構成
+
+Gunghoは主に３つのコンポーネントで構成されています。Engineは全てのリクエスト
+サイクルを統括し、サーバーへの接続、リクエストの送信等を行います。
+Providerは取得すべきURLを指定し、Gungho::RequestをEngineに投げます。
+HandlerはEngineが取得したレスポンスを処理します。
+
+
+=head1 Gunghoの間違った使い方
+
+Gunghoは膨大な数のURLを恒常的に取得するために設計されています。もし
+GunghoをひとつのURL、もしくはひとつのホストに対して扱うのであれば注意を
+要します。
+
+上記のような環境でGunghoを動かす場合は十分なパフォーマンスが出せない可能性が
+高く、LWP::UserAgentのようなモジュールを使用したほうがパフォーマンスを出せる
+場合もあります。
+
+もちろんLWP::UserAgentには存在しないGunghoの機能を使用するためにGunghoを
+使うのもよいかも知れませんが、チューニングが必要であることを認識しておいて
+ください
+
+=head1 GLOBAL CONFIGURATION OPTIONS
+
+=over 4
+
+=item debug
+
+   ---
+   debug: 1
+
+デバッグフラグを有効にするとログの出力が全てデバッグレベルまでの出力と
+なります。その他コンポーネント毎にデバッグ状態の挙動に変更するものもあります。
+
+=back
+
+=head1 COMPONENTS
+
+Gunghoの機能拡張を行うにはComponentを作成します。
+ComponentはGunghoを走らせる段階で指定します：
+
+  Gungho->run({
+    components => [
+      'Throttle::Simple'
+    ],
+    throttle => {
+      max_interval => ...,
+    }
+  });
+
+Componentを指定することによってGungho内部のクラス構造が書き換えられ、
+継承による機能拡張が行われます。
+
+各コンポーネントの詳細についてはそれぞれのドキュメントを参照してください
+
+=over 4
+
+=item Gungho::Component::Authentication::Basic
+
+=item Gungho::Component::BlockPrivateIP
+
+=item Gungho::Component::Cache
+
+=item Gungho::Component::RobotRules
+
+=item Gungho::Component::RobotsMETA
+
+=item Gungho::Component::Scraper
+
+=item Gungho::Component::Throttle::Domain
+
+=item Gungho::Component::Throttle::Simple
+
+=back
+
+=head1 Gunghoのインライン化
+
+それほど複雑でないクローラーを実装する場合はGungho::ProviderやGungho::Handlerを
+わざわざ継承する必要はありません。単純にproviderとhandlerに関数を指定してください
+
+  Gungho->run({
+    provider => sub { ... },
+    handler  => sub { ... }
+  });
+
+=head1 プラグイン
+
+GunghoプラグインはGunghoの継承ツリーに影響を及ぼさずに機能拡張を行います。
+ただし、プラグインはイベント発生時のコールバックにより実装されているので、
+呼び出し可能なタイミングが前もって決まっています。
+
+詳細についてはプラグインのドキュメントを参照してください。
+
+=over 4
+
+=item Gungho::Plugin::RequestLog
+
+=item Gungho::Plugin::Statistics
+
+=back
+
+=head1 METHODS
+
+=head2 component_base_class
+
+Used for Class::C3::Componentised
+
+=head1 CODE
+
+コードはGoogle Codeで管理されています。レポジトリは以下URLに保管されています
+
+  http://gungho-crawler.googlecode.com/svn/trunk
+
+=head1 AUTHOR
+
+Copyright (c) 2007 Daisuke Maki E<lt>daisuke@endeworks.jpE<gt>
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item Jeff Kim
+
+=item Kazuho Oku
+
+=item Keiichi Okabe
+
+=back
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

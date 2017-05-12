@@ -1,0 +1,42 @@
+=head1 NAME
+
+Changes - public release history for Data::Dumper
+
+=head1 DESCRIPTION
+
+Revision history for Geo::GoogleMaps::OffsetCenter
+
+=over 8
+
+=item 0.04
+
+Added a precision-limit to latitude/longitude result
+
+Added some basic test code
+
+Removed references to the old method of calculating the offset. In future,
+occlusions can be handled by calling the main function with modified
+parameters.
+
+Some documentation cleanup
+
+=item 0.03
+
+Documentation fixup
+
+=item 0.02
+
+Rename function from offset_google_maps_center to offset_center_by_occlusion
+
+Add new function offset_centery_by_pixel
+
+POD fixups in accordance with dzil
+
+=item 0.01
+
+Initial Release
+
+=back
+
+=cut
+

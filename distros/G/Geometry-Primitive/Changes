@@ -1,0 +1,99 @@
+Revision history for Geometry-Primitive
+
+0.24    February 16, 2014
+  - Apply encoding patch from Debian
+
+0.22    January 9th, 2009
+  - Default Dimension width and height to 0
+
+0.21    January 9th, 2009
+  - Add Dimension
+  - De-moosify Graphics::Primitive and stop extending it everywhere, since
+    it's useless.
+
+0.20    December 27th, 2009
+  - Use MooseX::Storage::Deferred
+
+0.19    November 12th, 2009
+  - Add JSON::Any dep
+
+0.18    October 3rd, 2009
+  - POD overhaul
+  - Removal of MooseX::AttributeHelpers, using native Moose feature now
+  - Bump Moose dependency
+
+0.17
+  - Fix bug in POD
+  - Fix Geometry::Primitive not being immutable
+
+0.16
+  - Dep bumps
+
+0.15
+  - Updated readme
+
+0.14
+  - POD updates
+
+0.13
+  - Move pod tests to t/author
+
+0.12
+  - Add Ellipse
+  - Circle is no longer a child of Arc
+  - Fix some POD
+  - Remove .DS_Store from MANIFEST
+
+0.11
+  - Stop depending on Moose coverage
+
+0.10
+  - POD updates (thanks CPAN testers!)
+  - Circle: set defaults in radians, not degrees
+  - Add MooseX::Storage for serialization
+
+0.09
+  - Convenience coercions for Point from ArrayRef
+
+0.08
+  - Add Bézier curve
+  - POD fix (thanks Brian Cassidy)
+
+0.07
+  - Add scale method to Shape role and implementations
+  - Fix line slope calculation
+  - Line: add is_perpendicular and is_parallel
+  - Arc: don't check angles in get_point_at_angle, allow for negative arcs
+  - Util: Remove in favor of Math::Trig
+  - Polygon: Implement area
+
+0.06
+  - Shape: removed get_points in favor of point_start/point_end
+  - Arc: Add length and get_point_at_angle
+  - Line: rename point_start/point_end to start/end
+  - Line: added contains_point, length and y_intercept
+  - Polygon: rename get_point_at to get_point
+  - Point: add string overload
+  - Circle: Add area and circumference
+  - Make some attributes required
+  - More MX::Clone lovin'
+  - Add to_string and "" overload to Line
+
+0.05
+  - Add MooseX::Clone for Point (for now)
+  - Add make_immutable to er'thang
+
+0.04
+  - Add Circle
+  - Move 'origin' attribute from Rectangle to Shape and make it !required
+
+0.03
+  - Add MI version because Yuval yelled at me
+  - Add degrees_to_radians and radians_to_degrees to Util
+  
+0.02    2008-07-09
+  - Package fixes, no changes
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

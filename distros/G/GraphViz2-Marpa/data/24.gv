@@ -1,0 +1,11 @@
+digraph graph_24
+{
+	node_24_1
+	[
+		color = red
+	]
+	node_24_2
+	[
+		color = green
+	]
+}

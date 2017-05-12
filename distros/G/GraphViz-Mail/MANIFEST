@@ -1,0 +1,7 @@
+Build.PL
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+Readme
+lib/GraphViz/Mail.pm
+t/mail.t

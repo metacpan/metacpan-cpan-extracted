@@ -1,0 +1,14 @@
+CHANGES
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/plot-gpx
+cgi-bin/plot-gpx-cgi
+dist.ini
+lib/GPX/PlotElevation.pm
+t/author-critic.t
+t/release-pod-syntax.t
+t/use.t

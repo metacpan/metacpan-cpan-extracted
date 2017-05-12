@@ -1,0 +1,11 @@
+Conversation with to_user at 2005-10-29 23:02:19 on from_user (proto)
+(23:02:23) from_user: quack
+(23:03:08) from_user: back
+(23:04:07) from_user: a
+i
+j
+(06:45:05) to_user: reply
+(06:45:05) chat_user: reply
+(06:45:06) to_user: line with : embedded
+(06:45:06) to_user: This is a really long line, so long that it will need to be formatted by the
+formatter in the as_string() function.

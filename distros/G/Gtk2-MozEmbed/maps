@@ -1,0 +1,5 @@
+GTK_TYPE_MOZ_EMBED			GtkMozEmbed			GtkObject	Gtk2::MozEmbed
+# GTK_TYPE_MOZ_EMBED_SINGLE		GtkMozEmbedSingle		GtkObject	Gtk2::MozEmbedSingle
+
+GTK_TYPE_MOZ_EMBED_RELOAD_FLAGS		GtkMozEmbedReloadFlags		GFlags		Gtk2::MozEmbed::Reload
+GTK_TYPE_MOZ_EMBED_CHROME_FLAGS		GtkMozEmbedChromeFlags		GFlags		Gtk2::MozEmbed::Chrome

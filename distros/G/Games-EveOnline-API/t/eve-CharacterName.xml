@@ -1,0 +1,11 @@
+<?xml version='1.0'?>
+<eveapi version="2">
+  <currentTime>2014-07-10 20:59:55</currentTime>
+  <result>
+    <rowset name="characters" key="characterID" columns="name,characterID">
+      <row name="Chips Merkaba" characterID="90922771" />
+      <row name="Milolika Muvila" characterID="94701913" />
+    </rowset>
+  </result>
+  <cachedUntil>2014-08-10 20:59:55</cachedUntil>
+</eveapi>

@@ -1,0 +1,9 @@
+Revision history for Geo-Point-Plugin-Transform
+
+0.0.2  Mon Feb 04 23:41:00 2008
+       Add Japanese pod
+       Add Test::Base to build_requires
+
+0.0.1  Mon Jan 28 02:56:55 2008
+       Initial release.
+

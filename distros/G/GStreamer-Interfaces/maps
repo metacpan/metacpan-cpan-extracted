@@ -1,0 +1,2 @@
+GST_TYPE_PROPERTY_PROBE		GstPropertyProbe	GInterface	GStreamer::PropertyProbe
+GST_TYPE_X_OVERLAY		GstXOverlay		GInterface	GStreamer::XOverlay

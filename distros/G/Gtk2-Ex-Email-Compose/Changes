@@ -1,0 +1,10 @@
+Revision history for Gtk2-Ex-Email-Compose
+
+0.1.0	2009-11-13/6:30
+		-Include the body and subject methods that
+			were accidentally skipped in the initial release.
+		-Correct head error for the title arg key for the
+			window method.
+
+0.0.0	2009-11-11/19:00
+		-Initial release.

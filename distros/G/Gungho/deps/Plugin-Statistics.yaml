@@ -1,0 +1,9 @@
+---
+name: 'Statistics Plugin'
+default: 0
+depends:
+    'XML::LibXML': 0
+    'DBI': 0
+    'File::Temp': 0
+    'Path::Class::Dir': 0
+    'Sys::Hostname': 0

@@ -1,0 +1,33 @@
+				 Gnome2::Wnck
+				--------------
+
+This module allows you to use the Window Navigator Construction Kit library
+(libwnck for short) from Perl.
+
+The index of the automatically generated API documentation can be accessed
+with:
+
+  perldoc Gnome2::Wnck::index
+
+				 Installation
+				--------------
+
+To install Gnome2::Wnck run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+				 Dependencies
+				--------------
+
+Gnome2::Wnck depends on:
+
+  ExtUtils::Depends >= 0.20
+  ExtUtils::PkgConfig >= 1.03
+  Glib >= 1.180
+  Gtk2 >= 1.00
+  libwnck >= 2.20.0
+
+If you need support for libwnck < 2.20.0, use Gnome2::Wnck 0.14.

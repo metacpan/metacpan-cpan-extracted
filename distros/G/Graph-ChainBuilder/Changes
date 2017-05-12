@@ -1,0 +1,14 @@
+Revision history for Graph-ChainBuilder
+
+v0.0.2 2009-01-05
+
+  * dependency declaration nit
+
+v0.0.1 2009-01-04
+
+  * first public release
+
+See the source code repository for more detail.
+  http://scratchcomputing.com/svn/Graph-ChainBuilder/trunk
+
+vim:ts=2:sw=2:et:sta

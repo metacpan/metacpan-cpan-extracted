@@ -1,0 +1,31 @@
+Revision history for Perl extension Gearman::Spawner
+1.11  Tue Aug  9 15:56:31 PDT 2011
+    - Fix unique support in sync/danga clients
+1.10  Fri Aug  5 11:12:58 PDT 2011
+    - Add unique support to sync client
+    - Add known failure for background task in async client
+1.09  Wed Jul 13 13:56:02 PDT 2011
+    - Add unique support for background tasks
+1.08  Mon May 23 16:15:13 PDT 2011
+    - Pass 'unique' option through
+1.07  Mon May 23 16:15:13 PDT 2011
+    - Pass 'unique' option through
+1.06 Tue May 17 23:37:50 PDT 2011
+    - AnyEvent client: Make sure timeout doesn't fire after other callback has fired
+1.05 Tue May 17 19:58:27 PDT 2011
+    - Make client APIs similar and based on named-parameters
+    - Document client interfaces
+    - Move lists of common client tests to ClientTest lib
+    - Test respawning behavior on die/exit/kill
+    - Add timeout to AnyEvent client
+    - Add tests for client timeout
+1.04 Mon May 16 17:16:57 PDT 2011
+    - Promote Server module to installation
+1.03 Mon May 16 16:41:47 PDT 2011
+    - Make client libs optional
+1.02 Sun May 15 21:33:52 PDT 2011
+    - Bind test server to localhost
+1.01 Sun May 15 14:58:48 PDT 2011
+    - Add verbosity for failed test port selection
+1.00 Fri May 13 16:17:22 PDT 2011
+    - Initial revision

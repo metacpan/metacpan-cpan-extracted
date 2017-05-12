@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+WordFind.pm
+examples/simple.pl
+examples/wordfind.pl
+test.pl

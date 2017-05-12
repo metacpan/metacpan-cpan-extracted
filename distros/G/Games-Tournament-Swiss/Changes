@@ -1,0 +1,123 @@
+---
+version: 0.19
+date: Tue 29 Dec 10:38:54 CST 2015
+revision: about 1353
+changes:
+  - fixed t/pairingtable.t, t/pod-coverage.t
+
+---
+version: 0.16
+date: 二  6月 30 13:40:45 CST 2009
+revision: about 1700
+changes:
+  - rt 47450 E5 A7c S2 bug: players were being assigned preferences
+  - t/initializePreferences.t regression test
+
+---
+version: 0.15
+date: Nov 28, 2007
+revision: about 1645
+changes:
+  - Preference update tweaking, tests
+  - Config provides defaults overrideable in BEGIN block
+  - breadth-first C11 searching with X inheritance by remainder groups
+  - more attractive pairing test writer interface
+
+---
+version: 0.12
+date: Oct 27, 2007
+revision: about 1536
+changes:
+  - greater understanding of proactive float checking in C6
+  - large C11, C12 changes
+  - prepareCards method makes Cards from hashes
+  - loggedProcedures, log, tailLog for mix-&-match messaging
+
+---
+version: 0.11
+date: Oct 13, 2007
+revision: about 1480
+changes:
+  - rewrite of C10 code
+  - new indexing method
+  - table ordering in round.yaml bartolin #29953
+
+---
+version: 0.10
+date: Oct 11, 2007
+revision: about 1470
+changes:
+  - hashification of bracket, match orders, with a thisBracket index
+  - BYE procedure gets own state
+  - bad floating over-engineering checked
+  - transposition restart after C12,13 refloating
+  - test of c6pairs: bartolin #29682
+
+---
+version: 0.09
+date: Sep 30, 2007
+revision: about 1431
+changes:
+  - refactor of C6 float testing
+  - D1,2 transposition, exchange tests
+  - pairing table consistency checks
+  - pairingtable parsing: bartolin #29485
+  - unit test of C10 code: bartolin #29495
+
+---
+version: 0.08
+date: Sep 16, 2007
+revision: about 1374
+changes:
+  - reorder S2 before C8 swapping: bartolin #29258
+  - C1 tests of B1, B2 incompatibility were not cooperating.
+  - separate remainder group pairing recording: #29073
+  - round number passing/guessing in cross/pairingtable scripts: bartolin #29125
+  - pairstately supports abbreviation, scores grouped by table: bartolin #28834
+  - test that pair, pairstately, pairingtable, pairtable2yaml work
+
+---
+version: 0.07
+date: Sep 4, 2007
+revision: about 1334
+changes:
+  - refactored FIDE.pm to test pairings in C6PAIRS for all p possibilities, rather than just first pprime ones.
+  - reworked C13, C14 to handle http://www.chesschat.org/showthread.php?t=6619, with cc6619 test.
+
+---
+version: 0.06
+date: Sep 1, 2007
+revision: about 1316
+changes:
+  - pairtable2yaml parses pairing table, emits YAML
+  - pair uses YAML pairing table instead of score files, YAML serialization files.
+  - Fixed bug #29023, test with t/foura.t 
+
+---
+version: 0.05
+date: August 2007
+revision: about 1300
+changes:
+  - Make crosstable, pairingtable also use letter scores: #28834
+  - Copying evacuees by reference meant when they exited group they were gone from the copy as well: #28797.
+  - Scripts take game results from file with lines of form 'Capablanca, Jose Raul': Win
+  - provide traditional Makefile.PL also
+
+---
+version: 0.04
+date: April 2007
+changes:
+  - Pair script wants letter scores, not numbers.
+  - Test FIDE.pm pairs correctly in 4-entrant tournament.
+
+---
+version: 0.03
+date: February 2007
+changes:
+  - First version released on CPAN.
+
+---
+version: 0.02
+date: January 2007
+changes:
+  - First version, worked up after talking with Bill Gletsos on www.chesschat.org

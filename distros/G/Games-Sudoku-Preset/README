@@ -1,0 +1,63 @@
+CONTENTS
+--------
+Purpose
+Description
+    Validation
+    Editing
+Installation
+Dependencies
+Restrictions
+
+PURPOSE
+-------
+This document informs about Games::Sudoku::Preset version 0.01.
+
+DESCRIPTION
+-----------
+Games::Sudoku::Preset is a graphical tool to enter, edit and validate
+the preset values of a classical 9x9 Sudoku puzzle. It has 3 start
+methods for these purposes:
+
+    use Games::Sudoku::Preset;
+
+    # Enter the preset values for a new Sudoku puzzle
+    my $puzzle = Games::Sudoku::Preset->enter();
+
+    # Edit an existing Sudoku puzzle
+    my $puzzle = Games::Sudoku::Preset->edit($game);
+
+    # Validate an existing Sudoku puzzle
+    my $puzzle = Games::Sudoku::Preset->validate($game);
+
+Validation
+----------
+Validation means that the current preset values are checked
+whether they violate the well known basic rules for a
+Sudoku puzzle (e. g. have twice the same digit in a row).
+When an error is found, the affected cells are marked in red
+on the displayed Sudoku board.
+
+Validation occurs when a Sudoku puzzle is passed to a start
+method. The current puzzle on the graphical board is validated
+again when the user presses the "Done" button to return the
+puzzle to the caller. The module doesn't return if an error
+is found. The user may store an unvalidated puzzle for later
+continuation by using the "Save & Cancel" button.
+
+Editing
+-------
+Editing of the values on the graphical Sudoku board may be 
+done intuitively and comfortably via the mouse or via the keyboard.
+
+INSTALLATION
+------------
+See the separate file INSTALL for instructions.
+
+DEPENDENCIES
+------------
+Games::Sudoku::Preset needs Perl/Tk.
+
+RESTRICTIONS
+------------
+Games::Sudoku::Preset supports classical 9x9 Sudoku puzzles only.
+

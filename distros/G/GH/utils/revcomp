@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use Getopt::Long;
+
+my($s1Filename);
+my($s1, $s1Name);
+my($name);
+my($rev);
+
+GetOptions('s1=s' => \$s1Filename,
+	   'name=s' => \$name);
+
+die &usage() if (not defined $s1Filename);
+
+($s1Name, $s1) = getFastaSeq($s1Filename);
+die "Could not read $s1Filename\n" if (not defined ($s1));
+
+$rev = revcomp($s1);
+
+if (!defined($name)) {
+  $name = "$s1Name (revcomp)";
+}
+printFasta($name, $rev);
+
+exit(0);
+
+################################################################
+# end of main                                                  #
+################################################################
+
+sub usage {
+  my($usage);
+
+  $usage .= $0;
+  $usage .= " -s1 seq1filename\n";
+  return($usage);
+}
+
+sub getFastaSeq {
+  my($filename) = @_;
+  my($SEQFILE);
+  my($name);
+  my($seq);
+  my($oldseparator);
+
+  open $SEQFILE, $filename || return undef;
+  $name = <$SEQFILE>;
+  chomp $name;
+  $name =~ s/^> *//;
+  if (length($name) > 35) {
+    $name = substr($name, 0, 32);
+    $name .= "...";
+  }
+
+  $oldseparator = $/;
+  $/ = undef;
+  $seq = <$SEQFILE>;
+  $/ = $oldseparator;
+
+  $seq =~ s/\n//g;
+
+  close $SEQFILE;
+  return($name, $seq);
+}
+
+sub revcomp {
+  my($seq) = @_;
+  my($rc);
+
+  $rc = $seq;
+  $rc =~ tr/acgtrymkswhbvdnxACGTRYMKSWHBVDNX/tgcayrkmswdvbhnxTGCAYRKMSWDVBHNX/;
+  $rc = reverse scalar($rc);
+  return($rc);
+}
+
+sub printFasta {
+  my($name, $seq) = @_;
+
+  print ">$name\n";
+  $seq =~ s/(.{50})/$1\n/g;
+  chomp $seq;			# avoid extra cr's.
+  print "$seq\n";
+}

@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9ebe9daa8eacd5348c12fdf9f760c0776e1f9a2e BUGS
+SHA1 38dd40d4fe9a8a408648f2f2c1a2a3ac76bbac72 Build.PL
+SHA1 3e4b3002396258429548b88ebc5b03dfed0a6750 CHANGES
+SHA1 09acf5a0408dd9e92d430acdda09b8fc85a58cc9 CREDITS
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 f4cbb902311ad99c06deea7fad9c3bd4021672c0 MANIFEST
+SHA1 7f78f821c23ee8a77dbccb116b0c7f7f72461318 META.yml
+SHA1 adf23d76cb7defe742418470b282608aa84eee6a Makefile.PL
+SHA1 8b4dba16455688954b810956f9d6d8d15b67a209 README
+SHA1 ae1bf33fdca9099da9408f6b408c7acdce30570e TODO
+SHA1 9b2f9d83bcf77860f53a0c07c90a4a59ad9f5df1 inc/Module/Install.pm
+SHA1 abe32855d75ab13747cf65765af9947b7a8c3057 inc/Module/Install/Base.pm
+SHA1 da9dfbb8ae4a8a8bac0ab9cd7ef7dc89e4cb5dbe inc/Module/Install/Build.pm
+SHA1 95b81d1e91bd634467bf633571eff4420e9c04eb inc/Module/Install/Can.pm
+SHA1 1fe98c63cf9d7271c8cb4183ba230f152df69e26 inc/Module/Install/Fetch.pm
+SHA1 2249171a2b72cd73ff2c0a06597d29f86e5df456 inc/Module/Install/Makefile.pm
+SHA1 381bb98ea3877bba49ae85e7a7ea130645fd3dbf inc/Module/Install/Metadata.pm
+SHA1 0c2118868ef82ac517eb6d9c3bd93e6eb9bbf83e inc/Module/Install/Win32.pm
+SHA1 e827d6d43771032fa3df35c0ad5e5698d0e54cda inc/Module/Install/WriteAll.pm
+SHA1 2dc07e753242a58b727c8b9619c7728a4f7af88f lib/Games/3D.pm
+SHA1 7a25bd5f8afb34f71430b164db7db9fddf5e0c97 lib/Games/3D/Link.pm
+SHA1 3349face229e1157d31b0bf3bce14ecd74fc7443 lib/Games/3D/Sensor.pm
+SHA1 8ed74bef97754608271a38009e9d230cf20bdd83 lib/Games/3D/Signal.pm
+SHA1 dd19a35b6179e077404d0fc0412e7bd2bd1c586c lib/Games/3D/Template.pm
+SHA1 4230ab9707a7f594dbdb218a1f33335a437e5da4 lib/Games/3D/Thingy.pm
+SHA1 444ff72e3060a24e4f957fd2f77df17b4c7c1f1b lib/Games/3D/World.pm
+SHA1 228408ec11d71f6a807eff7a3acb354147c09fb2 t/data/templates.txt
+SHA1 89ac5f86cd7d2800e4db2c3224bb3efa1997ff4f t/lib/Games/3D/Thingy/Test.pm
+SHA1 a7fca8d1d53aa4a0c957155dcc5402b45f096fa4 t/link.t
+SHA1 a8d4a863f28925b66a3928419a9c1fc0445353d3 t/pod.t
+SHA1 f36bcc0d2fd8cdae72d4d9621a39a8ed30f07076 t/pod_cov.t
+SHA1 6492352783495b20580782402e9c0cdf6a9797ff t/sensor.t
+SHA1 4cc756dff8290898752b02449c6070e73388e900 t/signal.t
+SHA1 80f3918f4737cd338a688eea5e745a3f97354f87 t/template.t
+SHA1 d3a35055476b520ea8f8f3759ff0b3afa678ddf2 t/thingy.t
+SHA1 1fecfdb8a9c70224722266ae836521c6cb865ee1 t/world.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iQEVAwUBRUtdyHcLPEOTuEwVAQLx6wf+MOdsQPp1qGBPIn8I7Uwr39oeuprdtzjT
++v1roSltw81B3El2Pdlza5aSnAi7jCJ8MUqSM7G/2HWQHToyLd99K9Awgf2GyL8d
+CnfvsanpNPg2g//fDRxeool7CVI2O0dWylkT8YMW35qaKnBkUtBZCoN37eed4XoL
+csg7/17YF8RSAeGH1txr5on/+/HhSnJR9nylmcIIuEqN2zAhhHo7HsMkYlX+4mpf
+KBWrfaD14KxMkP5Fk6i8ZFns7ulJFdzl5QFSF2yLI3NuTfcbb5YBBU7mpzkgNT8Y
+Yjp+WPLVSL0iCMrkMyFgmkr2lnIWOpzhIJPCB4Eygxq/Bi5Vb01IiQ==
+=3oK+
+-----END PGP SIGNATURE-----

@@ -1,0 +1,2079 @@
+#!/usr/local/bin/perl -w
+
+# This is a tcl -> perl converted heavily modified from  Nick Ing-Simmons Tk Package
+#   The original was found in the Tk800.022 distribuion. Thanks Nick!
+
+
+use Tk::Pretty;
+use Carp;
+
+use Parse::RecDescent; # used for parsing the tcl text
+use Data::Dumper;
+
+use File::Basename;
+
+#use GraphViz::Parse::RecDescent; # For Debugging
+
+################### global ################
+%Parse::RecDescent::vtkObjects = ();  # hash of vtk object variable names defined
+%Parse::RecDescent::vtkObjects = ();  # appears twice to avoid warning message
+
+%Parse::RecDescent::Objects = ();  # hash of any object variable names defined
+%Parse::RecDescent::Objects = ();  # appears twice to avoid warning message
+
+%Parse::RecDescent::Procs = ();  # hash of any procs defined 
+%Parse::RecDescent::Procs = ();  # appears twice to avoid warning message
+
+%Parse::RecDescent::MyVariables= (); # appears twice to avoid warning message
+%Parse::RecDescent::MyVariables= (); # hash of any local variables used in the current context
+					# ( Will be translated to 'my' variables )
+
+%Parse::RecDescent::GlobalVariables= (); # appears twice to avoid warning message
+%Parse::RecDescent::GlobalVariables= (); # hash of any global variables used in the current context
+
+%Parse::RecDescent::MenuPaths= (); # appears twice to avoid warning message
+%Parse::RecDescent::MenuPaths= (); # Mapping of -menu paths used in menubutton commands to the
+				   #  pathname of the menubutton. This is used to translate
+				   #  the tcl way of adding menubutton commands using the 'menu'
+				   #   command to the perltk way of $menubutton->command(... syntax
+
+###########################################
+
+#################### Parse::RecDescent Grammer #################
+my $parse = Parse::RecDescent->new(<<'EndGrammar');
+
+	main:  statements  /\s*\Z/ { $item[1] }
+#	main:  statements  /\s*\Z/ { {$item[1]}}
+	    | <error>
+
+        statements: <skip:'[ \t]*'> <leftop: statement /[\;\n]+/ statement> 
+	    | <error>
+#        statements:  statement(s) 
+	
+	statement: tcl_set 
+	    | tcl_comment
+	    | tcl_expr
+	    | tcl_for
+	    | tcl_foreach
+	    | tcl_incr
+	    | tcl_if
+	    | tcl_while
+	    | tcl_eval
+	    | tcl_catch
+	    | tcl_info
+	    | tcl_proc
+	    | tcl_global
+	    | tcl_puts
+	    | tcl_lindex
+	    | tcl_string
+	    | tcl_switch
+	    | tcl_wm
+	    | tcl_grid
+	    | tcl_packforget
+	    | tcl_packpropagate
+	    | tcl_pack
+	    | tcl_tkmenu
+	    | tcl_imageCreate
+	    | tcl_bind
+	    | tcl_update
+	    | tcl_winfo
+	    | tcl_widget
+	    | tcl_GetWidgetVarValue
+	    | tcl_SetWidgetVarValue
+	    | tcl_NewWidgetObj
+	    | tcl_scan
+	    | tcl_format
+	    | tcl_append
+	    | tcl_vtkConstructor
+	    | tcl_vtkCallback
+	    | tcl_vtkAddObserver
+	    | tcl_tkadd
+	    | tcl_tkentryconfig
+	    | tcl_return
+	    | tcl_tagbind
+	    | tcl_exec
+	    | tcl_method
+	    | tcl_call
+	    | <error>
+
+	######## Tcl Commands ###########
+	tcl_set: /set(?=\s+)/ lvar tcl_arg { my $op = "=";
+				   my $retVal = [ '=', $item[2],$item[3] ]
+
+				   }
+				   
+	tcl_comment: /\#.*?$/m
+				   
+	tcl_expr: 'expr' expr {  $item[2]   }
+	
+	tcl_incr: 'incr' lvar expr(?) { # If increment is not there, assume 1
+					#print "item 3 is a ".ref($item[3])."\n";
+					my $increment = $item[3][0] || 1;
+	                                my $retVal = [ '+=', $item[2],$increment ] }
+
+	tcl_info: 'info' tcl_arg(s) 
+		{ 	# Info gets parsed as a perl 'can' if it an info command
+			# on a vtk object, else it gets parsed as an exists
+			my $args = $item[2];	
+			my $retVal;
+			if( scalar(@$args) == 2 && 
+				$args->[0] eq 'command'){
+				if( $args->[1] =~ /^vtk/){
+				 		# info command vtkObject, treat as vtkObject->can('new');
+					$retVal = ['->',"Graphics::VTK::".$args->[1],'can','new'];
+				}
+				else{ # non VTK object treat as 'defined'
+					my $var = $args->[1];
+					$var = '$'.$var unless( $var =~ /^\$/);
+					$retVal = [ 'defined', $var];
+				}
+			}
+			elsif( scalar(@$args) == 2 && 
+				$args->[0] eq 'commands' ){ # commands arg, treat as defined
+				my $variable = $args->[1];
+				unless( $variable =~ /^\$/){ # Add '$' to front if not there already
+					$variable = '$'.$variable;
+				}
+				$retVal = [ 'defined', $args->[1]];
+			}
+			else{ # Treat as exists
+				$retVal = [ 'exists', @$args];
+			}
+			$retVal;
+		}
+				
+
+
+	tcl_for:  'for' block  '{' expr '}' block  block 
+			{ forProc( @item); }
+			
+	tcl_foreach:  'foreach' lvar tcl_arg  block 
+			{ [ @item[1,2,3,4]]; }
+
+	tcl_while:  'while' '{' expr '}' block 
+		{
+			['while',$item[3], $item[5]];
+		}
+
+
+	tcl_if:  'if' tcl_ifexpr block tcl_ifelseif(s?) tcl_ifelse(?)
+		{	
+			my( $ifexpr, $ifblock, $elseif, $else) = @item[2,3,4,5];
+			
+			my $retVal = ['if',$ifexpr,$ifblock];
+			
+			if( @$elseif){ # Add any elseif blocks
+				# Flatten elseif array
+				my @elseArray;
+				foreach my $element(@$elseif){
+					push @elseArray, @$element;
+				}
+				push @$retVal, @elseArray;
+			}
+			if( @$else){ # Add an else block, if present
+				push @$retVal, @$else;
+			}
+			
+			$retVal;
+		}
+	
+	# tcl if expression (Can be a single rvar or a bracketed expression)
+	tcl_ifexpr: '{' expr '}' { $item[2] }
+	 	    |  rvar { $item[1] } 
+			
+	# elseif components
+	tcl_ifelseif: <skip:'\s*'> 'elseif' '{' expr '}' block
+			{ [ $item[4], $item[6] ] }
+
+	# else component
+	tcl_ifelse: <skip:'\s*'> 'else'  block
+			{ [ @{$item[3]} ] }
+	
+	# tcl switch statment, map to if and elsif
+	tcl_switch: <skip:'\s*'> 'switch' tcl_arg '{' switch_case(s) '}' 
+		{ switchProc(@item[3,5])}
+	
+	# individual switch cases:
+	switch_case: tcl_arg block tcl_comment(s?) { [ $item[1],$item[2]] }
+	
+			
+	tcl_eval: 'eval' statement
+	tcl_catch: 'catch' '{' statements '}' { [ 'eval', $item[3] ]}
+	
+	# Tcl puts 
+	tcl_puts: 'puts' expr(s)
+			{ [ 'print', @{$item[2]} ] }
+	
+	# Tcl 'lindex' command
+	tcl_lindex: 'lindex' tcl_arg tcl_arg
+		{ [@item[1,2,3]];}
+
+	# Tcl 'string' command
+	tcl_string: 'string' tcl_arg tcl_arg(s)
+		{ tcl_stringProc( @item);}
+	
+	# tk wm statement
+	tcl_wm:  'wm' /\w+/ lvar tcl_arg(s?)
+		{
+			my ( $rule, $wm, $method, $window, $args) = @item;
+			
+			#my $retval = [ '->', [ '->', $window, 'MainWindow'],$method,@$args];
+			my $retval = [ '->', $window,$method,@$args];
+			$retval;
+		}
+
+	# tk grid statement
+	tcl_grid:  /grid(?=\s)/ rvar tcl_arg(s?)
+		{
+			my ( $rule, $grid, $window, $args) = @item;
+			
+			my $retval = [ '->', $window,'grid',@$args];
+			$retval;
+		}
+
+	# tk pack  forget statement, mapped to $widget->packForage
+	tcl_packforget: /pack(?![A-Za-z0-9.])/ 'forget' lvar
+		{ [ '->', $item[3], 'packForget']}
+
+	# tk pack  propagate statement, mapped to $widget->packPropagate
+	tcl_packpropagate: /pack(?![A-Za-z0-9.])/ 'propagate' tcl_arg tcl_arg(s?)
+		{ [ '->', $item[3], 'packPropagate', @{$item[4]} ] }
+		
+	# tk pack statement
+	tcl_pack: 'pack' tcl_arg(s)
+		{
+			my ( $rule, $pack, $args) = @item;
+			my ($optionNo) = grep {$args->[$_] =~ /^-\w+/}  (0.. $#$args); # get the index where the options start (starts with -)
+			#my $optionNo;
+			my (@paths, @options);
+			if( $optionNo){
+				@paths = @$args[0..($optionNo-1)];
+				@options = @$args[$optionNo..$#$args];
+			}
+			else{
+				@paths = @options;
+			}
+			
+			# Convert paths starting with '.' to be off the main window
+			foreach (@paths){
+				next unless /^[.]/;
+				$_ = [ '->{}', '$MW', $_];
+			}
+			my $retVal;
+			if( @paths == 1){ # Single pack statement
+				$retVal = [ '->', $paths[0], 'pack', @options ];
+			}
+			else{ #multiple Packs
+				my @retVal = ( 'foreach', '$_', ['()',@paths], [[ '->', '$_', 'pack', @options ]]);	
+				$retVal = \@retVal;
+			}
+			
+			$retVal;
+		}
+	# tk menus get ignored 
+	tcl_tkmenu: /menu\s+.*?$/m  { "# ".$item[1]; }
+
+	# tcl tk image command (currently only image create supported)
+	tcl_imageCreate: 'image' 'create' tkoption(s?)
+		{ imageCreateProc( @item); }
+
+	# tcl tk widgets (except for menus)
+	tcl_widget: widget plainBareword tkoption(s?)
+		{ widgetProc( @item); }
+
+
+	# process the vtk GetWidgetVariableValue statement
+	#   tcl statement 'GetWidgetVariableValue $widget var' gets translated
+	#     to $widget->{var}
+        tcl_GetWidgetVarValue: 'GetWidgetVariableValue' tcl_arg tcl_arg
+		{ [ '->{}', $item[2], $item[3] ] }
+
+	# process the vtk SetWidgetVariableValue statement
+	#   tcl statement 'SetWidgetVariableValue $widget Rendering 1' gets translated
+	#     to $widget->{Rendering} = 1
+        tcl_SetWidgetVarValue: 'SetWidgetVariableValue' tcl_arg tcl_arg tcl_arg
+		{ [ '=', ['->{}', $item[2], $item[3]], $item[4] ] }
+
+	# process the vtk NewWidgetObject statement
+	#   tcl statement 'NewWidgetObject $widget vtkTextMapper Mapper1' gets translated
+	#     to $widget->{Mapper1} = vtkTextMapper->new;
+        tcl_NewWidgetObj: 'NewWidgetObject' tcl_arg tcl_arg tcl_arg
+		{ [ '=', ['->{}', $item[2], $item[4]], [ '->', "Graphics::VTK::".$item[3], 'new'] ] }
+
+
+	# tcl tk winfo command. Mapped to $widget->command
+	tcl_winfo: 'winfo' plainBareword lvar
+		{ ['->',$item[3],$item[2]] }
+
+	# tcl tk bind command
+	tcl_bind: 'bind' object /\<[^>]+\>/ block
+		{ bindProc( @item); }
+
+	# tcl tk tag bind command
+	tcl_tagbind: object 'tag' 'bind' tcl_arg /\<[^>]+\>/ block
+		{ tagbindProc( @item); }
+			
+	# tcl tk update command					
+	tcl_update: 'update' { [ '->','$MW','update']}
+
+	# tcl 'scan' command. This is usually used in tcl to split a string list to
+	#   some variables, so that is how we map it here. i.e. 'scan command format var1 var2
+	#  gets mapped to ($var1,$var2) = command;
+	tcl_scan: 'scan' '[' statement ']' tcl_arg lvar(s)
+		{ scanProc( @item); }
+	
+	# tcl format command. Mapped to sprintf
+	tcl_format: 'format' formatString tcl_arg(s)
+		{ my ($rule, $format, $formatString, $args) = @item;
+		  my $retVal = [ 'sprintf', $formatString,@$args];
+		  $retVal;
+		 }
+
+	# tcl append command.
+	tcl_append: /append(?![A-Za-z0-9.])/ lvar tcl_arg(s)
+		{ my ($rule, $append, $lvar, $args) = @item;
+		  my $retVal;
+		  if( @$args == 1){
+		  	$retVal = [ '=', $lvar, ['.',$lvar,$args->[0]]];
+		  }
+		  else{
+		  	$retVal = [ '=', $lvar, ['join','',$lvar,@$args]];
+		  }
+		  $retVal;
+		 }
+	
+	# format string in the format commands
+	formatString: quotedString | curlyBracesString | /\S+/
+	
+	# vtk Object Constructor:
+	tcl_vtkConstructor: /vtk\w+/ object tcl_arg(s?) 
+			{ my ($rule, $class, $varName, $args) = @item;
+			  my $varLookup = $varName; # get rid of '$' for lookup
+			  $varLookup =~ s/^\$//g;
+			  $class =~ s/^vtk//;
+			  $Parse::RecDescent::vtkObjects{$varLookup} = 1;
+			  ['=', $varName,[ '->', "Graphics::VTK::".$class, 'new', @$args]];
+			} 
+
+	# tk add command
+	tcl_tkadd: lvar 'add' tcl_arg tkoption(s?)
+			{
+				my ($rule, $name, $add, $method, $options) = @item;
+				
+				# if name is a pre-defined MenuPath, then map it to
+				#  a menubutton
+				if( defined( $Parse::RecDescent::MenuPaths{$name} )){
+					$name = $Parse::RecDescent::MenuPaths{$name};
+				}
+				
+				
+				# Flatten the options
+				my @options = map {@$_} @$options;
+				
+				my %argHash = @options;
+				# convert -variable option to variable reference
+				if( defined( $argHash{-variable})){
+					my $varname = $argHash{-variable};
+					$argHash{-variable} = "\\\$".$varname;
+				}
+
+				@options = %argHash;
+				
+				my $retVal = ['->',$name, $method, @options];
+				
+			}
+
+	# tk methods command (currently only entry configure supported
+	tcl_tkentryconfig: lvar 'entryconfigure' tcl_arg tkoption(s?)
+			{
+				my ($rule, $name, $method, $entry, $options) = @item;
+				
+				# if name is a pre-defined MenuPath, then map it to
+				#  a menubutton
+				if( defined( $Parse::RecDescent::MenuPaths{$name} )){
+					$name = $Parse::RecDescent::MenuPaths{$name};
+				}
+				
+				
+				# Flatten the options
+				my @options = map {@$_} @$options;
+				
+				my %argHash = @options;
+				# convert -variable option to variable reference
+				if( defined( $argHash{-variable})){
+					my $varname = $argHash{-variable};
+					$argHash{-variable} = "\\\$".$varname;
+				}
+
+				@options = %argHash;
+				
+				my $retVal = ['->',$name, $method, $entry,@options];
+				
+			}
+
+
+	tcl_vtkCallback: object /Set\w+?Method/ callback
+			{
+				my ($rule, $name, $method, $callback) = @item;
+				
+				my $retVal =  ['->',$name,$method, $callback];
+			}
+
+	# vtk AddObserver method
+	tcl_vtkAddObserver: object /AddObserver/ tcl_arg callback
+			{
+				my ($rule, $name, $method, $event, $callback) = @item;
+				
+				my $retVal =  ['->',$name,$method, $event, $callback];
+			}
+
+	tcl_method: object tcl_arg tcl_arg(s?)
+			{ methodProc(@item) }
+
+	# Args to a tcl method/call
+	tcl_arg: 
+		      /[A-Za-z]\w*\([^)]+\)/ { '$'.$item[1]; } # Array Style Variable like a(man)
+		      | number
+		      |  rvar
+		      |  quotedString
+		      |  curlyBracesString
+		      | '[' statement ']'{ $item[2]; }
+		      | commandSub
+		      | colorNumber
+		      # Variables with embedded string, like xs$string, map to $xs($string)
+		      #   which will get translated to a perl hash like $xs{$string}
+		      | /[A-Za-z]\w*\$[A-Za-z]\w*/
+			      {
+				      my($var, $index) = $item[1] =~ /([A-Za-z]\w*)\$([A-Za-z]\w*)/;
+				      '$'.$var.'($'.$index.')';
+			      }
+		      # Another variation of Variables with embedded string, like ${cell}Centers, map to $centers($cell)
+		      #   which will get translated to a perl hash like $centers{$cell}
+		      | /\$\{[A-Za-z]\w*\}[A-Za-z]\w*/
+			      {
+				      my($index, $var) = $item[1] =~ /\$\{([A-Za-z]\w*)\}([A-Za-z]\w*)/;
+				      '$'.$var.'($'.$index.')';
+			      }
+		      # Another variation on variables with embedded string, like xs${string}Stuff, map to $xsStuff($string)
+		      #   which will get translated to a perl hash like $xsStuff{$string}
+		      | /[A-Za-z]\w*\$\{[A-Za-z]\w*\}\w+/
+			{
+				my($varA, $index, $varB) = $item[1] =~ /([A-Za-z]\w*)\$\{([A-Za-z]\w*)\}(\w+)/;
+				# [ '->{}', '$'.$var, '$'.$index];
+				my $retVal = $varA.$varB.'($'.$index.')';
+				$retVal = '$'.$retVal if($retVal !~ /^\$/);
+				$retVal;
+			}
+		      | bareword	
+		      | plainBareword
+	
+	
+	# Tcl procedure translates to a perl sub
+	tcl_proc: <rulevar: local %Parse::RecDescent::MyVariables > # New Context for keeping track of my Variables
+	tcl_proc: <rulevar: local %Parse::RecDescent::GlobalVariables > # New Context for keeping track of Declared Global Variables
+	tcl_proc: 'proc' /\w+/ tcl_proc_args block 
+		{
+			my $subName = $item[2];
+			my $subArgs = $item[3];
+			my $block = $item[4];
+			my $varDecs = [];  # variable declarations for the sub (including sub args)
+			#print "writing out proc\n";
+			foreach my $var(@$subArgs){  # Sub Args
+				delete $Parse::RecDescent::MyVariables{$var};
+				push @$varDecs, [ 'my', $var, ['shift']];
+			}
+			foreach my $var(sort keys %Parse::RecDescent::MyVariables){  # Program Args
+				push @$varDecs, [ 'my', $var];
+			}
+			
+			[ 'sub', $subName, [@$varDecs, @$block] ];
+		}
+
+	# Args for a tclproc
+	tcl_proc_args: lvar { [ $item[1] ] }
+			| '{' lvar(s?) '}' { $item[2] }
+
+	tcl_global: 'global'  plainBareword(s)  # Defer used here to keep from setting global variables when a higher-level rule fails
+		{ my $globals = $item[2];
+		  foreach my $global( @$globals ){
+		  	$Parse::RecDescent::GlobalVariables{$global} = $global;
+		  }
+		
+		  my $retVal = "# Global Variables Declared for this function: ".join(", ",@{$item[2]});
+		  $retVal;
+		}		
+
+	# return statment
+	tcl_return: 'return' tcl_arg(s?) { [ $item[1], @{$item[2]} ] }
+
+	# Generic  tcl call
+	tcl_call: /\w+/ tcl_arg(s?) { [ $item[1], @{$item[2]} ] }
+
+	# Generic  tcl exec statment, gets translated to system
+	tcl_exec: 'exec' tcl_arg(s?) { [ 'system', @{$item[2]} ] }
+
+
+        # tcl block (multi statments surrounded by {}
+	block: <skip:'\s*'> /\{\s*\n*/ statements /\}/ { $item[3] }
+		| /\{\s*\}/  { [['']] } # Null Block
+
+	# Object 
+	object: lvar
+		| tcl_arg
+
+ 
+ 	# Callbacks that show up in tk commands
+ 	tk_callback: '-command' callback 
+		{
+			my $retval = [ '-command', $item[2] ];
+		}
+ 
+ 	#options that appear in tk commands
+	tkoption: tk_callback 
+		 | tcl_arg 
+		 	{  
+			   my $retVal = [ $item[1]];
+			 } 
+		 | colorNumber { # tk color spec
+		 				[$item[1]]; }
+	
+ 	callback: block   { [ 'bindsub',  $item[1]] }
+		| /\w+/   { [ 'bindsub', [ [$item[1] ] ] ] }
+	
+	# Widget Names
+	widget: 'entry' | 'menubutton' | 'menu' | 'toplevel' | 'frame' | 'text' | 'canvas' | 'scale'
+		| 'scrollbar' | 'button' | 'label' | 'radiobutton' | 'checkbutton' |
+		'vtkTkImageViewerWidget' { 'vtkImageViewer' } |
+		'vtkTkImageWindowWidget' { 'vtkImageWindow' } |
+		'vtkTkRenderWidget' { 'vtkInteractor' }
+
+	
+	
+	
+	expr:  u_op1(?) subexpr1 
+		{ if( scalar(@{$item[1]}) ){
+			[@{$item[1]}, $item[2]] ;}
+		  else{
+		  	$item[2];
+		  }
+		}
+		
+			
+	
+	# Sub expressions, from the lowest to the highest precedence:
+	subexpr1: subexpr2 subexpr1continue(s?) 
+		{ processMatch(@item)}
+	subexpr1continue: bi_op1 subexpr1
+		{ processCont(@item)}
+
+	subexpr2: subexpr3 subexpr2continue(s?) 
+		{ processMatch(@item)}
+	subexpr2continue: bi_op2 subexpr2
+		{ processCont(@item)}
+
+	subexpr3: subexpr4 subexpr3continue(s?) 
+		{ processMatch(@item)}
+	subexpr3continue: bi_op3 subexpr3
+		{ processCont(@item)}
+
+	subexpr4: subexpr5 subexpr4continue(s?) 
+		{ processMatch(@item)}
+	subexpr4continue: bi_op4 subexpr4
+		{ processCont(@item)}
+
+	subexpr5: subexpr6 subexpr5continue(s?) 
+		{ processMatch(@item)}
+	subexpr5continue: bi_op5 subexpr5
+		{ processCont(@item)}
+
+	subexpr6: subexpr7 subexpr6continue(s?) 
+		{ processMatch(@item)}
+	subexpr6continue: bi_op6 subexpr6
+		{ processCont(@item)}
+
+	subexpr7: subexpr8 subexpr7continue(s?) 
+		{ processMatch(@item)}
+	subexpr7continue: bi_op7 subexpr7
+		{ processCont(@item)}
+
+	subexpr8: subexpr9 subexpr8continue(s?) 
+		{ processMatch(@item)}
+	subexpr8continue: bi_op8 subexpr8
+		{ processCont(@item)}
+
+	subexpr9: subexpr10 subexpr9continue(s?) 
+		{ processMatch(@item)}
+
+	subexpr9continue: bi_op9 subexpr9
+		{ processCont(@item)}
+
+	# lowest level subexpression:
+	subexpr10: primary subexpr10continue(s?) 
+		{ processMatch(@item)}
+
+	subexpr10continue: bi_op10 subexpr10
+		{ processCont(@item)}
+
+        # Bi operators, from lowest to highest precedence
+	bi_op1: '||'		 # Logical Or
+	bi_op2: '&&'		 # Logical And
+	bi_op3: '|'		 # Bitwise Or
+	bi_op4: '^'		 # Bitwise XOr
+	bi_op5: '&'		 # Bitwise And
+	bi_op6: '==' | '!='	 # Equal, not equal
+	bi_op7: '<=' | '>='	 # Comparison
+		| '<' | '>'
+	bi_op8: '<<' | '>>'	 # Left/Right Shift
+	bi_op9: '+' | '-'	 # Add/subtract
+	bi_op10: '*' | '/' | '%' # Multiply/Divide, remainder
+
+	# Urary Operators
+	u_op1: '!'		# logical negation
+
+	primary: number
+	      |  rvar
+	      |  '-' rvar { [$item[1],$item[2]] } # negated rvar
+	      |  quotedString
+	      |  curlyBracesString
+	      | exprFunction1 '(' subexpr1 ')' # functions like 'log', or 'exp' (1 arg)
+	      		 { if( $item[1] eq 'double'){  
+			 	[ '', $item[3] ];   # Double function is a nop in perl
+			   }
+			   else{
+			   	[ $item[1],$item[3]];
+			   }
+			 }
+	      | '-' exprFunction1 '(' subexpr1 ')' # negated functions
+	      		 { if( $item[1] eq 'double'){  
+			 	[ '-',['', $item[4]] ];   # Double function is a nop in perl
+			   }
+			   else{
+			   	[ '-',[$item[2],$item[4]] ];
+			   }
+			 }
+	      | exprFunction2 '(' subexpr1 ',' subexpr1 ')' # functions like 'log', or 'exp' (1 arg)
+	      		 { if( $item[1] eq 'pow'){  
+			 	[ '**',  $item[3], $item[5] ];   # Double function is a nop in perl
+			   }
+			   else{
+			   	[ $item[1],$item[3], $item[5]];
+			   }
+			 }
+			
+	      | '(' subexpr1 ')' 
+	      		{ if( ref($item[2])){
+				[ '_PAREN_', @{$item[2]}]; # subexpr is an array ref, like ( 0 + 3 + )
+			  }
+			  else{
+			  	$item[2];    # subexpr is a trivial expr, like (0.2)
+			  }
+			}
+	      | '-' '(' subexpr1 ')' { [$item[1],[ '_PAREN_', @{$item[3]}]] }  # negated subexpr1
+	      | '[' statement ']'{ $item[2]; }
+	      
+
+	number:  /[+-]?(?:\d|\.\d)\d*(?:\.\d*)?(?:[Ee](?:[+-]?\d+))?(?![A-Za-z0-9.])/ 	
+
+	# Valid functions in expressions (1 arg)
+	exprFunction1: 'abs' | 'cosh' | 'log' | 'sqrt' | 'acos' |
+			'double' | 'log10' | 'srand' | 'asin' |
+			 'exp' | 'pow' | 'tan' | 'atan' | 'floor' | 
+ 			 'rand' | 'tanh' | 'atan2' | 'fmod' | 'round' |
+			  'ceil' | 'hypot' | 'sin' | 'cos' | 'int' | 'sinh'
+
+	# Valid functions in expressions (1 arg)
+	exprFunction2: 'pow' | 'atan2'
+
+	# Variable with no '$' in front of it,
+	# typically used in 'set' commands
+	lvar:	# Array Style Variable like a(man)
+		/[A-Za-z]\w*\([^)]+\)/ { '$'.$item[1]; }
+		
+		# Variables with embedded string, like xs$string, map to $xs($string)
+		#   which will get translated to a perl hash like $xs{$string}
+		| /[A-Za-z]\w*\$[A-Za-z]\w*/
+			{
+				my($var, $index) = $item[1] =~ /([A-Za-z]\w*)\$([A-Za-z]\w*)/;
+				# [ '->{}', '$'.$var, '$'.$index];
+				my $retVal = $var.'($'.$index.')';
+				$retVal = '$'.$retVal if($retVal !~ /^\$/);
+				$retVal;
+			}
+
+		# Another variation on variables with embedded string, like xs${string}Stuff, map to $xsStuff($string)
+		#   which will get translated to a perl hash like $xsStuff{$string}
+		| /[A-Za-z]\w*\$\{[A-Za-z]\w*\}\w+/
+			{
+				my($varA, $index, $varB) = $item[1] =~ /([A-Za-z]\w*)\$\{([A-Za-z]\w*)\}(\w+)/;
+				# [ '->{}', '$'.$var, '$'.$index];
+				my $retVal = $varA.$varB.'($'.$index.')';
+				$retVal = '$'.$retVal if($retVal !~ /^\$/);
+				$retVal;
+			}
+
+
+		|/([A-Za-z]\w*)(?![A-Za-z0-9.])/	  # Normal Scalar Variables
+		{
+			# Put variable in MyVariables hash, unless
+			#  it is a defined GlobalVariable, or a vtk object, which appear to be global
+			if( !defined( $Parse::RecDescent::GlobalVariables{$item[1]}) 
+				&& !defined($Parse::RecDescent::vtkObjects{$item[1]}) ){
+				$Parse::RecDescent::MyVariables{'$'.$item[1]} = 1;
+			}
+		
+			'$'.$item[1];
+		}
+		| /[A-Za-z0-9.]+/  # Widget-style lvar, like '.widget'
+		{ 
+			my $retVal;
+			if( $item[1] eq '.' ){
+				$retVal = '$MW';
+			}
+			else{
+				$retVal = [ '->{}', '$MW',$item[1]]; # name is in MW hash
+			}
+			$retVal;
+		}
+				
+
+	# Variable with '$' in front of it, used in expressions
+	rvar:	# Array Style Variable like $a(man)
+		/\$[A-Za-z]\w*\([^)]+\)/ 
+		
+		# Normal Rvars like '$var'
+		|/\$([A-Za-z]\w*)/
+	
+	quotedString:  /^"([^\\"]|\\.)*"/
+		      | /^'([^\\']|\\.)*'/
+		      
+	# curlyBracesString: '{' /^[^\}]*/ '}' { $item[2] }
+	curlyBracesString:  <perl_codeblock> { my $retVal = $item[1];
+						$retVal =~ s/^\s*\{//; # get rid of leading/trailing braces
+						$retVal =~ s/\}\s*$//g; 
+						
+						# Reject if there are still embedded curly braces
+						($retVal =~ /[\{\}]/) ? undef : $retVal
+					     }
+		   	   | curlyBracesStringMDarray
+			   
+	# Curly braces string, with embedded braces, indended to
+	#  be interpreted as multi-dim array in perl
+	curlyBracesStringMDarray: <skip:'\s*'> /\{/ CBS_element(s?) /\}/ { [ '[]',@{$item[3]}] }
+	
+	CBS_element: 	curlyBracesString
+			 | tcl_arg 
+			 			
+	# Command Substitution char like '%x', or '%y'. Gets mapped to
+	#  $Ev->x, $Ev->y, etc, except for %W which gets mapped as '$w'
+	commandSub: /\%[A-Za-z]/
+		{ my $commandSub = $item[1];
+		  $commandSub =~ s/\%//g;
+		  my $retVal;
+		  unless( $commandSub =~ /^W/){
+		  	$retVal = [ '->', '$Ev', $commandSub ];
+		  }
+		  else{
+		  	$retVal = '$W';
+		 }
+		 $retVal;
+		}
+	
+	# Color Number of the form '#323', used in tk options to designate colors
+	colorNumber: /\#[0-9A-Fa-f]+/
+
+	bareword: /\-?[\w\.\*]+(?=[\s\}\]])/ { my $bareword = $item[1]; 
+	                      my $retval = $bareword;
+			      # if bareword is a vtkobject, return it as a variable,
+			      #  else just return the bareword
+			      if( defined ( $Parse::RecDescent::vtkObjects{$bareword}) ){
+			      	$retval = '$'.$bareword;
+			      }
+			      $retval;
+			     }
+
+	plainBareword: /[\w\.\:\/\$\-]+/ # Plain bareword, no processing 
+
+			
+
+EndGrammar
+
+#open(PARSEGRAPH, ">parsegraph.png") or die("can't open parsegraph.ps file\n");
+
+# or a Parse::RecDescent parser object
+#my $graph = GraphViz::Parse::RecDescent->new($parse);
+#print PARSEGRAPH $graph->as_png;
+#close PARSEGRAPH;
+
+############################# Original tcl2perl stuff ################
+
+
+@operators  = (
+[qw(return shift next last)],
+[qw(= += -=)],
+[qw(?:)],
+[qw([]),'()', '{}'],
+[qw(|| |)],
+[qw(&& &)],
+[qw(< <= > >= == != =~)],
+[qw(+ - .)],
+[qw(* / %)],
+[qw(.)],
+['->','&()','eval','bindsub','->{}','++','--','glob'],
+[qw(lindex **)],
+[qw(!)]
+);
+
+
+
+my $ClassInit;
+
+my $pri = 0;
+my $group;
+foreach $group (@operators)
+ {
+  $pri++;
+  my $op;
+  foreach $op (@$group)
+   {
+    $rightpri{$op} = $pri;
+   }
+ }
+
+%leftpri = %rightpri;
+%perlpri = %rightpri;
+
+$leftpri{'.'} = 0;
+
+
+$InBind = 0;
+
+%widget = ();
+
+foreach (qw(entry menu menubutton frame text canvas scale scrollbar 
+            button label radiobutton checkbutton))
+ {
+  $widget{$_} = \&tcl_widget;
+ }
+
+
+
+sub indent
+{
+ my $depth = shift;
+ return '' if ($depth <= 0);
+ return ' ' x $depth;
+}
+
+sub statement;
+sub expression;
+
+sub output_block
+{
+ my $depth = shift;
+ my $body  = shift;
+ print indent($depth),"{\n";
+ statements($depth+1,@$body);
+ print indent($depth),"}";
+ print shift if (@_);
+ print "\n";
+}
+
+sub subname
+{
+ local ($_) = shift;
+ croak $_ if (/^&/);
+ carp "Weird name ".Pretty($_) if (ref $_);
+ s/^${class}:+// if (defined $class);
+ s/^${prefix}:+// if (defined $prefix);
+ s/^config-//;
+ s/[:-]/_/g;
+ print STDERR "Bad '$_'\n" if (/[^\w:]/);
+ s/[^\w:]/_/g;
+ return $_;
+}
+
+sub output_sub 
+{
+ my ($depth,$key,$name,$body) = @_;
+ print indent($depth),"\nsub ",subname($name),"\n";
+ output_block($depth,$body);
+}
+
+sub output_foreach
+{
+ my ($depth,$key,$var,$list,$body) = @_;
+ print indent($depth),$key," ";
+ expression(0,$var);
+ print " (";
+ expression(0,$list);
+ print ")\n";
+ output_block($depth+1,$body);
+}
+
+sub output_for
+{
+ my ($depth,$key,$start,$cond,$end,$body) = @_;
+ print indent($depth),$key," (";
+ 
+ #Get rid of any starting brackes in the start/end conditions
+ # They aren't needed
+ shift @$start if( $start->[0] eq '{}');
+ shift @$end if( $end->[0] eq '{}');
+ expression(0,$start);
+ print "; ";
+ expression(0,$cond);
+ print "; ";
+ expression(0,$end);
+ print ")\n";
+ output_block($depth+1,$body);
+}
+
+sub output_if 
+{
+ my $depth = shift;
+ my $name  = shift;
+ if (@_ <= 3)
+  {
+   my $cond = $_[0];
+   croak Pretty($name,@_) unless defined $cond;
+   if (ref($cond) && @$cond == 2 && $cond->[0] eq '!')
+    {
+     $name = 'unless' if ($name eq 'if');
+     $name = 'until'  if ($name eq 'while');
+     $_[0] = $cond = $cond->[1];
+    }
+   if (@_ == 2 && @{$_[1]} == 1 && ref($_[1]->[0]))
+    {
+     my $kind = $_[1]->[0]->[0];
+     unless (exists $statement{$kind})
+      {
+       print indent($depth);
+       expression(0,$_[1]->[0]);
+       print " $name (";
+       expression(0,$cond);
+       print ");\n";
+       return;
+      }
+    }
+  }
+ while (@_ >= 2)
+  {
+   print indent($depth),$name," (";
+   expression(0,shift);
+   print ")\n";
+   output_block($depth+1,shift);
+   $name = 'elsif';
+  }
+ if (@_)
+  {
+   print indent($depth),"else\n";
+   output_block($depth+1,shift);
+  }
+}
+
+sub output_cond
+{
+ my ($pri,$name,$cond,$true,$false) = @_;
+ print '(';
+ expression(0,$cond);
+ print ') ? ';
+ expression(0,$true);
+ print " : ";
+ expression(0,$false);
+}
+
+sub output_diadic
+{
+ my $pri = shift;
+ my $name = shift;
+ if (@_ == 2)
+  {
+   expression($pri,shift); 
+   print " $name ";        
+   expression($pri,shift);
+  }
+ else
+  {
+   print $name;
+   expression($pri,shift);
+  }
+}
+
+sub isString
+{
+ my $op = shift;
+ # if not a ref and doesn't begin with $ or %, and not a C float, then it must be a string
+ my $test = !ref($op) && ($op !~ /^[\$\%]/) && ( $op !~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/);
+ return $test
+}
+
+%strCmp = ( '<'  => 'lt', '>'  => 'gt',
+            '<=' => 'le', '>=' => 'ge',
+            '==' => 'eq', '!=' => 'ne');
+
+sub output_compare
+{
+ my ($pri,$name,$lhs,$rhs) = @_;
+ $name = $strCmp{$name} if (isString($lhs) || isString($rhs));
+ &Tk::Pretty::PrintArgs unless (defined $name);
+ expression($pri,$lhs); 
+ print " $name ";        
+ expression($pri,$rhs);
+}
+
+sub output_member
+{
+ my ($pri,$name,$lhs,$rhs) = @_;
+ expression($pri,$lhs); 
+ print "->{";        
+ expression($pri,$rhs);
+ print "}";        
+}
+
+sub output_prefix
+{
+ my ($pri,$name,$right) = @_;
+ print "$name "; 
+ expression($pri,$right);
+}
+
+sub output_my
+{
+ my ($depth,$name,$left,$right) = @_;
+ print indent($depth),"my ";
+ expression(0,$left);
+ if (defined $right)
+  {
+   print " = "; 
+   expression(0,$right);
+  }
+ print ";\n";
+}
+
+sub output_eval
+{
+ my ($pri,$key,$block) = @_;
+ if (@$block == 1 && ref($block->[0]) && $block->[0]->[0] eq 'undef')
+  {
+   expression($pri,$block->[0]);
+  }
+ else
+  {
+   print "$key\n";
+   output_block($depth+1,$block);
+   print indent($depth);
+  }
+}
+
+sub output_list
+{
+ print "(";    
+ while (@_)
+  {        
+   expression(0,shift);
+   print "," if (@_);
+  }        
+ print ")";
+}
+
+sub output_call
+{
+ my $pri = shift;
+ print subname(shift);
+ &output_list;
+}
+
+sub output_glob
+{
+ my $pri   = shift;
+ my $key   = shift;
+ print "(";
+ while (@_)
+  {
+   print "<",shift,">";
+   print "," if (@_);
+  }
+ print ")";
+}
+
+sub output_return
+{
+ my $pri   = shift;
+ my $key   = shift;
+ print "$key";
+ if (@_)
+  {
+   print " ";
+   if (@_ > 1)
+    {
+     &output_list;
+    }
+   else
+    {
+     expression(0,shift);
+    }
+  }
+}
+
+sub output_method
+{
+ my $pri = shift;
+ my $op  = shift;
+ my $obj = shift;
+ expression($pri,$obj);
+ print $op;
+ if (@_ > 1)
+  {
+   output_call($pri,@_) if (@_);
+  }
+ else
+  {
+   my $subName = shift;
+   if( $subName =~ /\$\w+\(\$\w+\)/){ # hash lookup for sub name
+   	expression($pri,$subName);
+  }
+   else{
+      	print subname($subName);
+   }
+  }
+}
+
+sub output_bind
+{
+ my ($pri,$key,$body) = @_;
+ local $InBind = 1;
+ print "\n";
+ print indent($depth+1),"sub\n";
+ output_block($depth+2,$body);
+ print indent($depth);
+}
+
+sub output_lindex
+{
+ my ($pri,$key,$lhs,$rhs) = @_;
+ expression($pri,$lhs);
+ print '[';
+ expression($pri,$rhs);
+ print ']';
+}
+
+sub output_group
+{
+ my $pri = shift;
+ my $key = shift;
+ print substr($key,0,1);
+ while (@_)
+  {
+   expression($pri,shift);
+   print ',' if (@_);
+  }
+ print substr($key,1,1);
+}
+
+
+
+%expression = ( 
+               '=='    => \&output_compare, 
+               '!='    => \&output_compare, 
+               '<='    => \&output_compare, 
+               '<'     => \&output_compare, 
+               '>='    => \&output_compare, 
+               '>'     => \&output_compare, 
+               '='     => \&output_diadic, 
+               '.'     => \&output_diadic, 
+               '+='    => \&output_diadic, 
+               '+'     => \&output_diadic, 
+               '**'     => \&output_diadic, 
+               '||'    => \&output_diadic, 
+               '&'    => \&output_diadic, 
+               '&&'    => \&output_diadic, 
+               '=~'    => \&output_diadic, 
+               '[]'    => \&output_group, 
+               '()'    => \&output_group, 
+               '-'     => \&output_diadic, 
+               '*'     => \&output_diadic, 
+               '%'     => \&output_diadic, 
+               '/'     => \&output_diadic, 
+               '->'    => \&output_method,
+               '?:'    => \&output_cond,
+               '!'     => \&output_prefix,
+               '++'     => \&output_prefix,
+               'bindsub' => \&output_bind,
+               'eval'  => \&output_eval, 
+               'lindex'  => \&output_lindex, 
+               'return' => \&output_return, 
+               'last'   => \&output_return, 
+               'next'   => \&output_return, 
+               'shift'  => \&output_return, 
+               'glob'   => \&output_glob, 
+               '->{}'   => \&output_member, 
+              );
+
+
+sub expression
+{
+ my ($pri,$item) = @_;
+ croak "No item" unless defined($item);
+ if (ref($item))
+  {
+   if (ref($item) eq 'ARRAY')
+    {
+   
+     my $kind = $item->[0];
+     my $parenFlag = 0;
+     # Check for paren, set paren flag if so
+     if( $kind eq '_PAREN_'){
+     	$item = [@$item];
+	shift @$item;
+	$kind = $item->[0];
+	$parenFlag = 1;
+     }
+	
+     if (exists $expression{$kind})
+      {
+       unless (exists $perlpri{$kind})
+        {
+         warn "Don't know priority of $kind";
+         $perlpri{$kind} = $perlpri{'&()'};
+        }
+       my $opri = $perlpri{$kind};
+       print "(" if ($opri < $pri || $parenFlag);
+       push @output_context, $kind; # save context
+       &{$expression{$kind}}($opri,@$item);
+       pop @output_context; # pop context
+       print ")" if ($opri < $pri || $parenFlag);
+      }
+     else
+      {
+       output_call($pri,@$item);
+      }
+    }
+   else
+    {
+     die "Not an array reference $item";
+    }
+  }
+ else
+  {
+   if ($item =~ /^(\$\w[^(]*)\((.*)\)$/)
+    {
+     expression($pri,"$1");
+     my $index;
+     foreach $index (split(/,/,$2))
+      {
+       print "{";
+       expression(0,$index);
+       print "}";
+      }
+    }
+   elsif ($item =~ /^["\\\$]/ || $item =~ /^-?\d+(\.\d+)?$/)
+    {
+     print $item;
+    }
+   elsif ($item =~ /^%(\w)$/)
+    {
+     if ($1 eq 'W')
+      {
+       print '$w';
+      }
+     else
+      {
+       print "\$Ev->$1";
+      }
+    }
+   else
+    {
+     warn "$item" if ($item =~ /\(/);
+     if ($item =~ /\$/)
+      {
+       print "\"$item\"";
+      }
+     elsif( $item =~ /^Graphics\:\:VTK\:\:\w+/ ){ # VTK Object Barewords are OK
+     	print $item;
+     }
+     elsif( $item =~ /^0x[0-9a-f]+\b/i ){ # Hex Barewords ( Like 0x3dd) are ok
+     	print $item;
+     }
+     elsif( $item =~ /^\/.+?\/$/ ){ # regular expression-type barewords ( Like /something/ )
+     	print $item;
+     }
+     else
+      {
+       print "'$item'";
+      }
+    }
+  }
+}
+
+
+%statement = ( 'sub'   => \&output_sub,
+               'my'    => \&output_my, 
+               'if'    => \&output_if, 
+               'while' => \&output_if, 
+               'foreach' => \&output_foreach, 
+               'tixforeach' => \&output_foreach, 
+               'for'     => \&output_for, 
+           );
+
+sub statement
+{
+ local $depth = shift;
+ my $item = shift;
+ croak "No item!" unless defined $item;
+ if (ref($item))
+  {
+   if (ref($item) eq 'ARRAY')
+    {
+     if (@$item)
+      {
+       my $kind = $item->[0];
+       push @output_context, $kind; # save context
+       if (exists $statement{$kind})
+        {
+         &{$statement{$kind}}($depth,@$item);
+        }
+       else
+        {
+         print indent($depth);
+         expression(0,$item);
+         print ";\n";
+        }
+       pop @output_context; # pop context
+      }
+     else
+      {
+       print "\n";
+      }
+    }
+   else
+    {
+     die "Not an array reference $item";
+    }
+  }
+ else
+  {
+   print indent($depth),$item,"\n";
+  }
+}
+
+sub statements
+{
+ my $depth = shift;
+ while (@_)
+  {
+   statement($depth,shift);
+  }
+}
+
+############################## Main Program #######################
+$SIG{INT} = sub { croak "Interrupt" };
+
+undef $/;
+my $outPath = shift @ARGV;
+foreach $file (@ARGV)
+ {
+  if ($file =~ /\.tcl$/)
+   { # Clear Global Variables
+     %Parse::RecDescent::vtkObjects = ();  
+     %Parse::RecDescent::Procs = ();  
+     %Parse::RecDescent::Objects = ();  
+     %Parse::RecDescent::MyVariables= (); 
+     %Parse::RecDescent::GlobalVariables= ();  
+     %Parse::RecDescent::MenuPaths= (); 
+
+    
+    my $perl = basename($file);
+    $perl =~ s/\.tcl/.pl/;
+    
+    my $preprocedFile = preProcessFile($file, basename($file));
+    open(TCL,"<$preprocedFile") || die "Cannot open $preprocedFile:$!";
+    print STDERR "$file => $perl\n";
+    my $prog = <TCL>;
+    close(TCL);
+    unlink $preprocedFile;
+    $prog =~ s/\\\n/ /sg;
+    my $body = $parse->main($prog) || die("Invalid tcl Syntax\n");
+    
+    push(@$ClassInit,['return','$class']) if (defined $ClassInit);
+    open (PERL, ">tempFile$$") or die("Can't Open Temp Output File 'tempFile$$'\n");
+    
+
+    my $old = select(PERL);
+    if (defined $class)
+     {
+      print "package Tk::",$class,";\n";
+      if (exists $info{-superclass})
+       {
+        my $superclass = $info{-superclass};
+        $superclass =~ s/^[Tt]ix//;
+        print '@Tk::',$class,'::ISA = qw(Tk::',$superclass,");\n";
+       }
+     }
+    statements(0,@$body);
+    select($old);
+    close(PERL);
+    
+    # Post-Process the file:
+    postProcessFile("tempFile$$","$outPath/$perl",basename($file));
+    unlink "tempFile$$"; 
+     # open(PERL,">$outPath/$perl") || die "Cannot open $perl:$!";
+
+    #if (system("perl","-wc",$perl) != 0)
+    # {
+    #  rename($perl,"$perl.oops");
+    #  exit(4) 
+    # }
+   }
+ }
+ 
+ 
+ ################################ PreProcess File ######################
+ sub preProcessFile{ 
+ 
+ 	my $inputFile = shift;
+	my $outputFile = "tempFile$$"; # temporary pre-processed File
+	
+	my $basename = shift;
+
+	local( $/ );
+	$/ = "\n";
+
+
+	open( INFILE, $inputFile) or die("Can't open Input File '$inputFile'\n");
+	
+	open(OUTFILE, ">$outputFile") or die("Can't open Output File '$outputFile'\n");
+	
+	
+	while(<INFILE>){
+		
+		unless( /\S+/ ){ # Preserve whitespace lines by making them null comments
+			$_ = "#\n";
+			next;	
+		}
+		
+		# Get rid of any lines that end in ";' This is redundant to a \n, and confuses the parsing
+		s/\;\s*$/\n/g;
+		
+		# Put vtk Filenames in quotes. Should be able to setup Parse::RecDescent to
+		#      parse this correctly, but unquoted names like: $VTK_DATA/42400-IDGH.stl gets
+		#      interpereted incorrectly.
+		s/\s+(\$VTK_DATA\S+)\s*$/ \"$1\"\n/g;
+		s/\s+(\$VTK_DATA_ROOT\S+)\s*$/ \"$1\"\n/g;
+		
+		# Replace load vtktcl with use VTK
+		if( /^\s*catch\s*\{\s*load\s+vtktcl\}/ || /^\s*package\s+require\s+vtk\s*$/ ){
+			$_ = "# SET ENV VARS\n"; # allways set environment vars
+		}
+		# Get rid of std environment variable set
+		if( /^\s*if\s*\{\s*\[catch\s*\{\s*set\s+VTK/ ){
+			$_ = "";
+		}
+
+		# Change source vtkInt to #use vtkInit. Comment char will be removed during post processing 
+		if( /^\s*source\s+\$VTK_TCL\/vtkInt\.tcl/ || /^\s*package\s+require\s+vtkinteraction/ ){
+			$_ = "#use Graphics::VTK::Tk::vtkInt;\n";
+		}
+
+		# Change source TkImageViewerInteractor to #use VTK::Tk::vtkImageViewer. Comment char will be removed during post processing 
+		if( /^\s*source\s+TkImageViewerInteractor\.tcl/ ){
+			$_ = "#use Graphics::VTK::Tk::vtkImageViewer;\n";
+		}
+		# Change source TkInteractor to #use VTK::Tk::vtkInteractor. Comment char will be removed during post processing 
+		if( /^\s*source\s+TkInteractor\.tcl/ ){
+			$_ = "#use Graphics::VTK::Tk::vtkInteractor;\n";
+		}
+
+
+		# Change source WindowLevelInterface to #do WindowLevelInterface. Comment char will be removed during post processing 
+		if( /^\s*source\s+WindowLevelInterface\.tcl/ ){
+			$_ = "#do 'WindowLevelInterface.pl';\n";
+		}
+
+		# Change vtktesting to use VTK::Colors. Comment char will be removed during post processing 
+		if( /^\s*package\s+require\s+vtktesting/ ){
+			$_ = "#use Graphics::VTK::Colors;\n";
+		}
+
+		# Get rid of std start vtkInit.tcl source 
+		if( /^\s*source\s+\$VTK_TCL/ ){
+			$_ = "#$_";
+		}
+				
+		# Get rid of std start TkInteractor source 
+		if( /^\s*source\s+TkInteractor/ ){
+			$_ = "#$_";
+		}
+
+		# Get rid of std start vtkImageInclude source 
+		if( /^\s*source\s+vtkImageInclude/ ){
+			$_ = "#$_";
+		}
+
+		# Get rid of bindTksomething. Not needed for perltk 
+		if( /^\s*BindTk\w+/ ){
+			$_ = "#$_";
+		}
+		# Get rid of tkwait. Not needed for perltk 
+		if( /^\s*tkwait\s+/ ){
+			$_ = "#$_";
+		}
+
+		# Get rid of DeleteAllObjects. Not needed for perltk 
+		if( /^\s*vtkCommand\s+DeleteAllObjects/ ){
+			$_ = "#$_";
+		}
+		
+		
+		
+		
+		if( $inputFile =~ /CSpline/ ){ # more global variables needed in CSplit.pl
+			  s/(global numberOfInputPoints numberOfOutputPoints offset)/$1 points aSplineX aSplineY aSplineZ profileData/;
+		}
+
+		
+
+		if( $basename eq 'Plot3DScalars.tcl' || $basename eq 'Plot3DVectors.tcl'
+			|| $basename eq 'wha.tcl'){
+			s/(ren\$)\{(\w+?Function)\}/$1$2/;
+		}		
+
+		if( $basename eq 'SpatialRepAll.tcl' 
+			|| $basename eq 'wha.tcl'){ # Fix comment
+			s/^\s*\#\}\s*$/\}\n/;
+		}		
+
+		if( $basename eq 'cellCenters.tcl' 
+			|| $basename eq 'wha.tcl'){ # change grid vars to hash, so that later hash lookups work
+			s/\b(a\w+?)Grid\b/Grid($1)/g;
+			s/\b(a\w+?)Actor\b/Actor($1)/g;
+		}		
+
+		if( $basename eq 'expCos2.tcl' 
+			|| $basename eq 'wha.tcl'){ # get rid of expressions with elements like '$var.0' not don't need this in perl
+			s/(\$\w+)\.0/$1/g;
+		}		
+
+		if( $basename eq 'streamV.tcl' ){ # get rid of bogus setusermethod in streamV
+			s/(iren\s+SetUserMethod)/\#$1/;
+			s/^(\s*commandloop)/\#$1/;
+		}		
+
+		s/\;(\s*\})/$1/g; # get rid of ';' at the last statment in a block
+						# i.e. ';}' this confuses the parser
+
+
+		# Find any procs and store in global hash
+		if( /^\s*proc\s+(\w+)\b/){
+			$Parse::RecDescent::Procs{ $1 } =1;
+		}
+		
+		if( $basename eq 'streamV.tcl' ){
+			s/^\s*commandloop.+?$//; # get rid of wierd commandloop line
+		}		
+
+				
+		
+	}
+	continue{
+		print OUTFILE $_;
+	}
+	
+	close INFILE;
+	close OUTFILE;
+	
+	return $outputFile;
+}
+	
+
+
+ ################################ PostProcess File ######################
+ sub postProcessFile{ 
+ 
+ 	my $inputFile = shift;
+	my $outputFile = shift; 
+
+	my $basename = shift;
+
+	local( $/ );
+	$/ = "\n";
+
+	my $vtkInt = 0;   # flag =1 if 'use VTKint' is present
+	my $vtkInteractor = 0; # flag =1 if 'vtkInteractor' widget is present
+
+	open( INFILE, $inputFile) or die("Can't open Input File '$inputFile'\n");
+	
+	# set if there are any tk elements
+	my $tkFlag = 0; # 
+	my $irenInitialize = 0; # Flag = 1 if iren->Initialize is found
+				#  This is used to comment-out any $renWin->Render lines later
+
+	my $vtkTkImageWindowWidgetFlag = 0; # Flag = 1 if this widget is used
+	while( <INFILE>){
+		if ( /\$MW\b/ || /use\s+Graphics::VTK::Tk::vtkInt/ ){
+			$tkFlag = 1; # found some tk elements
+		}
+		if ( /vtkInteractor/ ){
+			$vtkInteractor = 1; # found some vtkInteractor widgets
+		}
+		if ( /vtkImageWindow/ ){
+			$vtkTkImageWindowWidgetFlag = 1; # found some tk elements
+		}
+	}
+	close INFILE;
+	
+	#reopen
+	open( INFILE, $inputFile) or die("Can't open Input File '$inputFile'\n");
+
+	
+	
+	open(OUTFILE, ">$outputFile") or die("Can't open Output File '$outputFile'\n");
+
+    	print OUTFILE "#!/usr/local/bin/perl -w\n#\nuse Graphics::VTK;\n\n";
+	
+	print OUTFILE "\n\nuse Tk;\nuse Graphics::VTK::Tk;\n\$MW = Tk::MainWindow->new;\n\n" if($tkFlag);
+	print OUTFILE "\n\nuse Graphics::VTK::Tk::vtkImageWindow;\n\n" if($vtkTkImageWindowWidgetFlag);
+	print OUTFILE "\n\nuse Graphics::VTK::Tk::vtkInteractor;\n\n" if($vtkInteractor);
+	
+	while(<INFILE>){
+		
+		unless( /\S+/ ){ # Preserve whitespace lines by making them null comments
+			$_ = "#\n";
+			next;	
+		}
+		
+		
+		# Set Env Variables for VTK Data
+		if( /^\# SET ENV VARS/ ){
+			$_ = "\$VTK_DATA_ROOT = 0;\n\$VTK_DATA_ROOT = \$ENV{VTK_DATA_ROOT};\n";
+		}
+
+		# change source Colors to use Colors 
+		if( /^\#\s*source\s+\$VTK_TCL\/colors/ ){
+			$_ = "use Graphics::VTK::Colors;\n";
+		}
+		
+		# Get rid of commented-out use-lines added during pre-processing
+		if(/^\s*#use\s+/ ){
+			s/^(\s*)\#/$1/;
+		}
+		if(/^\s*#do\s+\'/ ){
+			s/^(\s*)\#/$1/;
+		}
+
+		
+		# Change Colors References to use VTK::Colors
+		s/(\-\>\w*?Color\()\$(?!MW)/$1\@Graphics::VTK\:\:Colors\:\:/;
+		s/(\-\>\w*?Background\()\$(?!MW)/$1\@Graphics::VTK\:\:Colors\:\:/;
+
+
+		# Change VTK_FLOAT constants to VTK::FLOAT
+		s/\$VTK_FLOAT/\$VTK\:\:FLOAT/g;
+		s/\$VTK_UNSIGNED_CHAR/\$Graphics\:\:VTK\:\:UNSIGNED_CHAR/g;
+		
+		# Change any foreach $var ("dude dude dude") to
+		#            foreach $var (qw/ dude dude dude/)
+		s/^(\s*foreach\s+\$\w+\s+\(\s*)\"([^"]+)\"/$1 qw\/$2\//;
+
+		
+		# Change text like defined($var) eq "" to just defined($var)
+		s/(defined\(\$\w+\))\s*eq\s+\"\"/\!$1/g; 
+		
+		# get rid of any ->Delete Lines. Not Needed
+		if( /\-\>Delete/){
+			$_ = "\n";
+		}
+		
+		if( $basename eq 'quadricCut.tcl'  ){ # turn variables names made on the fly to hashes
+			# string to perl array
+			s/^\s*\$(\w+)\s+\=\s+\"([^"]+)\"/\@$1 = (qw\/$2\/)/;
+			s/^\s*\$(\w+\{\d+\})\s+\=\s+\"([^"]+)\"/\$$1 = [qw\/$2\/]/;
+			
+			s/\$solidTexture\)/\@solidTexture\)/;
+			s/\$clearTexture\)/\@clearTexture\)/;
+			s/\$edgeTexture\)/\@edgeTexture\)/;
+			s/\$positions\{\$i\}/\@\{\$positions\{\$i\}\}/;
+		}
+		if( $basename eq 'Plot3DScalars.tcl' || $basename eq 'wha.tcl'
+			|| $basename eq 'Plot3DVectors.tcl'
+			|| $basename eq 'SpatialRepAll.tcl' ){ # turn variables names made on the fly to hashes
+			# string to perl array
+			s/^\s*\$(\w+)\s+\=\s+\"([^"]+)\"/\@$1 = qw\/$2\//;
+			
+			s/\$scalarFunctions\)/\@scalarFunctions\)/;
+			s/\$vectorFunctions\)/\@vectorFunctions\)/;
+			s/\$locators\)/\@locators\)/;
+			s/^\s*\$ren(\d\d+)\-\>/\$ren\{$1\}\-\>/;
+		}
+		if( $basename eq 'SpatialRepAll.tcl' || $basename eq 'wha.tcl'
+			){ # Fix vtk constructors that tcl2perl couldn't get right
+			
+			my $from = quotemeta '$locator->$locator{$i}';
+			my $to = '$locator{$i} = "Graphics::VTK::$locator"->new';
+			s/$from/$to/;
+		}
+
+		if( $basename eq 'StructuredGridGeometry.tcl'
+			|| $basename eq 'StructuredPointsGeometry.tcl' || $basename eq 'wha.tcl' ){ #
+			# string to perl array
+			s/^\s*\$([A-Za-z0-9\{\}]+)\s+\=\s+\"([^"]+)\"/\$$1 = [ qw\/$2\/ ]/;
+
+			# Fix vtk constructors that tcl2perl couldn't get right
+			
+			my $from = quotemeta '$array{$dim}->$da{$dim}';
+			my $to = '$da{$dim} = "Graphics::VTK::$array{$dim}"->new';
+			s/$from/$to/;
+			s/\(\$dims\)/\(\@\$dims\)/;
+			
+		}
+
+		if( $basename eq 'streamV.tcl' || $basename eq 'InputStr.tcl'){
+			s/VTK_VARY_RADIUS_OFF/Graphics::VTK::VARY_RADIUS_OFF/; # fix constants setup
+			s/^(\s*\$renWin->Render)/#$1/;
+		}
+		
+		if( $basename eq 'contour3DAll.tcl' || $basename eq 'wha.tcl'
+			){ # 
+			# Space separated strings to arrays
+			s/^\s*\$(types)\s+\=\s+\"([^"]+)\"/\@$1 = (qw\/$2\/)/;
+			
+			# undo the VTK::Colors Addition
+			s/\@Graphics\:\:VTK\:\:Colors\:\:/\$/g;
+
+			if (/^\s*\$colors\s+\=\s+\"([^"]+)\"/){ # turn into big array
+				my $text = $1;  # exit
+				$text =~ s/\$/\@Graphics::VTK::Colors::/g;
+				my @elements = split('\s+',$text);
+				$text = join(", ",@elements);
+				$_ = "\@colors = ( $text );\n";
+			}
+				
+			if( s/\$SetOutputScalarTypeTo\{\$vtkType\}/\$method/   ){
+				$_ = "   \$method = \"SetOutputScalarTypeTo\$vtkType\";\n$_";
+				
+			}	
+			s/\$types\)/\@types\)/;
+			
+		}
+
+		if( $basename eq 'SimpleRayCast.tcl' || $basename eq 'SimpleTextureMap2D.tcl' ){ # 
+			
+			# undo the VTK::Colors Addition
+			s/\@Graphics\:\:VTK\:\:Colors\:\:/\$/g;
+		}
+
+		if( $basename eq 'TestGridSynchronizedTemplates3D.tcl' 	){ 
+			# Fix variable returning array in this script
+			s/^\s*\$range\s*\=/\@range =/;
+		}
+		if( $basename eq 'expCos.tcl' 	){ 
+			# Fix variable returning array in this script
+			s/^\s*\$x\s*\=/\@x =/;
+		}
+
+		if( $basename eq 'annotatePick.tcl' 	){ 
+			# Make scalar in to an array
+			s/\$pickPos\s*\=/\@pickPos =/;
+			s/\$selPt\s*\=/\@selPt =/;
+		}
+	
+
+		if( /^\s*use\s+Graphics::VTK::Tk::vtkInt\s*\;\s*$/){ # check for vtkInt usage
+			$vtkInt = 1;
+		}
+		
+		if( $basename eq 'rainbow.tcl' ){   # Fix the color arrays
+			if( /\-\>SetTableValue/){
+				s/\$(\w+)\s*\,\s*1/\@Graphics::VTK::Colors::$1\, 1/;
+			}
+		}
+				
+		# Change any blank comments to just a blank line:
+		s/^\s*\#\s*$/\n/;
+
+	}
+	continue{
+		print OUTFILE $_;
+	}
+	
+	if( $vtkInt){
+		print OUTFILE "Graphics::VTK::Tk::vtkInt::vtkInteract(\$MW);\n";
+	}
+	if( $tkFlag){
+		print OUTFILE "\nTk->MainLoop;\n";
+	}
+	
+	close INFILE;
+	close OUTFILE;
+	
+	return $outputFile;
+}
+#
+# Parse::RecDescent Vars
+#########################################################
+### Sub to process the item variable returned from a parse::recdecsent match
+sub Parse::RecDescent::processMatch{ 
+	my @item = @_;
+	my $subexpr = [@item]; # put the operator first
+	shift @$subexpr; # get rid of rule name
+	my $result;
+	if( scalar(@{$subexpr->[1]}) > 0){  # flatten array
+		$result = [$subexpr->[0], @{$subexpr->[1][0]}];
+		# Put operator first
+		my $op = splice(@$result,1,1);
+		@$result = ($op,@$result);
+	}
+	else{ 
+	# only 1st element present, return that
+
+	$result = $subexpr->[0];
+	}
+	#print " Subexpr1 = ".Data::Dumper::Dumper(\@item);
+	#print " Subexpr1 result = ".Data::Dumper::Dumper($result);
+	return	$result;
+
+}
+#########################################################
+### Sub to process the item variable returned from a continue-type rule match
+sub Parse::RecDescent::processCont{ 
+	my $subexpr = [@_]; # put the operator first
+	shift @$subexpr; # get rid of rule name
+	$subexpr;
+}
+
+## Sub to process widget commands
+sub Parse::RecDescent::widgetProc{
+
+	my ( $rule, $widget, $path, $args) = @_;
+	
+	# Flatten the options
+	@$args = map {@$_} @$args;
+
+	my ($parent,$name) = ($path =~ /^(.*)\.([^.]+)$/);
+	my $retVal;
+	$widget = ucfirst($widget) unless( $widget =~ /^vtk/);
+	if (defined($parent) && defined($name)){
+
+		my %argHash = @$args;
+		# Save Menubutton -menu if present:
+		if( $widget eq 'Menubutton'){
+			if( defined($argHash{-menu})){
+				$Parse::RecDescent::MenuPaths{$argHash{-menu}} = $path;
+				delete $argHash{-menu};
+			}
+		}
+		
+		# convert -variable option to variable reference
+		if( defined( $argHash{-variable})){
+			my $varname = $argHash{-variable};
+			$argHash{-variable} = "\\\$".$varname;
+		}
+
+		# convert -image option to variable 
+		if( defined( $argHash{-image})){
+			my $varname = $argHash{-image};
+			$argHash{-image} = "\$".$varname;
+		}
+
+
+		@$args = %argHash;
+		
+		# Add to object list:
+		$Parse::RecDescent::Objects{$path} = 1;
+		
+		# print "parent, name = '$parent', '$name'\n";
+		# If top level parent (.), make equal to MW
+		my $ourParent;
+		my $mainVar;
+		if( $parent !~ /\S/ ){
+			$ourParent = '$MW';
+			$mainVar = '$MW';
+		}
+		elsif( $parent =~ /^\$\w+/ ){ # parent is a variable
+			$ourParent = $parent;
+			$mainVar = $parent;
+			$path = ".$name";
+		}
+		else{
+			$ourParent = [ '->{}', '$MW',$parent]; # parent is in MW hash
+			$mainVar = '$MW';
+		}
+
+
+		$retVal = [ '=', [ '->{}', $mainVar, $path ], [ '->', $ourParent, $widget, @$args ]];
+	}
+	else{
+		warn("Can't get parent from '$path'\n");
+		$retVal = undef;
+	}
+
+	$retVal;
+}
+## Sub to process the tcl 'string' command:
+##  Currently only supports 'match' options
+sub Parse::RecDescent::tcl_stringProc{
+
+	my ( $rule, $string,$option,$args) = @_;
+
+	if( $option eq 'match'){ # Match option
+		my ($pattern, $string) = @$args;
+		
+		
+		# Convert pattern to regular expression
+		$pattern =~ s/\./\\\./g; # Change dots to real dots
+		$pattern =~ s/\*/\.\*\?/g; # change '*' to '.*?'
+		
+		# Get rid of any leading/trailing quotes
+		$pattern =~ s/^['"]//;
+		$pattern =~ s/['"]$//;
+		
+		$pattern = "/$pattern/";
+		
+		
+		my $retVal = [ '=~', $string, $pattern ];
+		
+		return $retVal;
+	}
+	
+	# Other forms of string not supported
+	warn ("Unsupport string option '$option'\n");
+	
+	return undef;
+	
+}
+
+## Sub to process image create commands
+sub Parse::RecDescent::imageCreateProc{
+
+	my ( $rule, $image, $create, $args) = @_;
+	
+	# Flatten the options
+	@$args = map {@$_} @$args;
+	
+	my $type = shift @$args;
+	
+
+	# Assumes name is always present
+	my $name = shift @$args;
+	$name = '$'.$name unless( $name =~ /^\$/ );
+	
+	$retVal = [ '=', $name , [ '->', '$MW', ucfirst($type), @$args ]];
+	
+	$retVal;
+	
+}
+## Sub to process tk bind commands
+sub Parse::RecDescent::bindProc{
+
+	my ( $rule, $bind, $var, $sequence, $block) = @_;
+
+	# Create starting stuff for the bind sub:
+	#   i.e. my $w = shift;
+	#        my $Ev = $w->XEvent
+	my @subStart = ( [ 'my', '$w', ['shift']], ['my','$Ev', ['->','$w','XEvent']]);
+	
+	# Put at the start of block:
+	unshift @$block, @subStart;
+	
+	my $retVal = ['->', $var, 'bind', $sequence, [ 'bindsub', [ @$block ]]];
+	
+	return $retVal;
+}
+
+## Sub to process tk tag bind commands
+sub Parse::RecDescent::tagbindProc{
+
+	my ( $rule, $widget, $tag, $bind, $var, $sequence, $block) = @_;
+
+	# Create starting stuff for the bind sub:
+	#   i.e. my $w = shift;
+	#        my $Ev = $w->XEvent
+	#my @subStart = ( [ 'my', '$w', ['shift']], ['my','$Ev', ['->','$w','XEvent']]);
+	
+	# Put at the start of block:
+	#unshift @$block, @subStart;
+	
+	my $retVal = ['->', $widget, $tag, $bind, $sequence, [ 'bindsub', [ @$block ]]];
+	
+	return $retVal;
+}
+
+## Sub to process tk scqn commands. see the tcl_scan
+sub Parse::RecDescent::scanProc{
+
+	my ( $rule, $scan, $dummy1, $statement, $dummy2, $format, $vars) = @_;
+	
+	my $retVal = [ '=', ['()',@$vars], $statement ];
+	
+	$retVal;
+	
+}
+## Sub process tcl method calls
+sub Parse::RecDescent::methodProc{
+  my ($rule, $name, $method, $args) = @_;
+  my $retVal;
+  if( ! ref($name)){ # $name wasn't a subexpr
+	  my $nameLookup = $name; # get rid of leading '$' in name for lookup
+	  $nameLookup =~ s/^\$//;
+	  if( ! defined( $Parse::RecDescent::Procs{$nameLookup} )){ # name is not a proc, assume it is a object
+		 $retVal =  ['->',$name,$method,@$args];
+		 delete $Parse::RecDescent::MyVariables{$nameLookup};
+	  }
+	  else {  # not a Method
+		$retVal = undef;
+	  }
+  }
+  else{
+	# name is a sub expr, assume method
+	 $retVal =  ['->',$name,$method,@$args];
+  }
+  $retVal;
+}
+
+## Sub to process switch commands. Maps the switch command to
+#   if and elseif statements
+sub Parse::RecDescent::switchProc{
+
+	my ( $caseArg, $cases) = @_;
+	
+	my $retVal;
+	
+	# first case
+	my $case = shift(@$cases);
+	$retVal = [ 'if', [ '==', $caseArg, $case->[0]], $case->[1]];
+	
+	#other Cases
+	foreach $case( @$cases){
+		push @$retVal, [ '==', $caseArg, $case->[0]], $case->[1];
+		
+	}
+	$retVal;
+	
+}
+
+## Sub to process for commands. 
+sub Parse::RecDescent::forProc{
+
+	my @item = @_;
+	
+	my ($for, $init, $cond, $after, $block) = @item[1,2,4,6,7];
+	
+	# Convert inits and after into single statment
+	if( scalar(@$init) == 1){
+		$init = $init->[0];
+	}
+	else{
+		$init = [ '()', @$init]; # convert to list
+	}
+	if( scalar(@$after) == 1){
+		$after = $after->[0];
+	}
+	else{
+		$after = [ '()', @$after]; # convert to list
+	}
+	
+	my $retVal = [ $for, $init, $cond, $after, $block ];
+	
+	$retVal;
+	
+}
+

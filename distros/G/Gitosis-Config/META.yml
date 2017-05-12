@@ -1,0 +1,31 @@
+---
+abstract: 'Parse and Write gitosis config files'
+author:
+  - 'Chris Prather  C<< <chris@prather.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0.27
+  Test::More: 0.92
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gitosis-Config
+no_index:
+  directory:
+    - ex
+    - inc
+    - t
+requires:
+  Config::INI: 0.013
+  Moose: 0.56
+  MooseX::AttributeHelpers: 0.13
+  MooseX::Types::Path::Class: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/perigrin/gitosis-config.git
+version: 0.06

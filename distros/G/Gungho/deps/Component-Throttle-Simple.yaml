@@ -1,0 +1,5 @@
+---
+name: 'Throttling By Number Of Requests'
+default: 1
+depends:
+    'Data::Valve': 0.00007

@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2014-08-24 18:56:53</currentTime>
+  <result>
+    <rowset name="outposts" key="stationID" columns="stationID,stationName,stationTypeID,solarSystemID,corporationID,corporationName">
+      <row stationID="61000854" stationName="4-EP12 VIII - 4-EP12 Inches for Mittens" stationTypeID="21645" solarSystemID="30004553" corporationID="667531913" corporationName="GoonWaffe" />
+      <row stationID="61000855" stationName="X-4WZD II - Outpost Ticonderoga" stationTypeID="21645" solarSystemID="30003744" corporationID="1089744282" corporationName="Organized-Chaos" />
+      <row stationID="61000856" stationName="AF0-V5 X - NO MORE YOLO" stationTypeID="21646" solarSystemID="30002107" corporationID="98008728" corporationName="Northern Associates Holdings" />
+    </rowset>
+  </result>
+  <cachedUntil>2014-08-24 19:47:49</cachedUntil>
+</eveapi>

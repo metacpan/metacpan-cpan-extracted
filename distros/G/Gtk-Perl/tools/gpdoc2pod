@@ -1,0 +1,97 @@
+#!/usr/bin/perl -w
+
+use Getopt::Std;
+use strict;
+
+my $inmethods;
+my $doneback;
+my $lasttag;
+my $tag;
+my $file;
+local $::opt_t = 'Gtk';
+
+getopts("t:");
+
+$tag = lc($::opt_t);
+$tag =~ s/://g;
+
+my $outf = $file = shift || "build/perl-$tag-ref.xml";
+
+$outf =~ s/\.xml$/.pod/;
+
+require XML::Parser;
+if ($@ || ! -f $file) {
+	print "Using provided pod file '$outf' because you probably don't have\n".
+		"the XML::parser and/or XML::Writer modules\n".
+		"The documentation for this module may not be up to date.\n" ;
+	$file = $outf;
+	$file =~ s(build/)();
+	system ("cp $file $outf");
+	exit(0);
+}
+
+open (OUT, ">$outf") || die "Cannot open $outf: $!";
+select OUT;
+
+my $refname = $::opt_t ."::reference";
+
+print <<"EOF";
+
+=head1 NAME
+
+$refname - Reference documentation for the $::opt_t module
+
+EOF
+
+my $parser = new XML::Parser(Style=>'Stream', Pkg=>'main');
+$parser->parsefile($file);
+
+close(OUT);
+
+sub StartTag {
+	my ($p, $t) = @_;
+	$lasttag = $t;
+	for ($t) {
+		/^package$/ && do {
+			print "\n=head1 $_{name}\n\n";
+			next;
+		};
+		/^desc$/ && do {
+			print "=back\n\n" unless $doneback;
+			$doneback = 1;
+		};
+		/^method$/ && do {
+			$inmethods = {%_};
+		};
+		/^arg$/ && do {
+			if (defined $inmethods) {
+				print "\n=head2 $inmethods->{out} $_{name}","-E<gt>","$inmethods->{name} ($inmethods->{args})\n\n";
+				print "=over 4\n\n";
+				$doneback = 0;
+				undef $inmethods;
+			} else {
+				print "=item * $_{name} (I<$_{type}>) $_{desc}\n\n";
+			}
+		};
+	}
+}
+
+sub EndTag {
+	my ($p, $t) = @_;
+	for ($t) {
+		/^package$/ && do {
+		};
+		/^method$/ && do {
+			print "=back\n\n" unless $doneback;
+			undef $inmethods;
+		};
+	}
+}
+
+sub Text {
+	if ($lasttag eq 'desc') {
+		print;
+		print "\n\n";
+	}
+}
+

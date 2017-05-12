@@ -1,0 +1,10 @@
+Changes
+lib/GPS/Point/Filter.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+scripts/perl-GPS-Point-Filter.pl
+t/001_load.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

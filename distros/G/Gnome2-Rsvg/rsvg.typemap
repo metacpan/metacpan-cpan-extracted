@@ -1,0 +1,13 @@
+TYPEMAP
+
+RsvgHandle *	T_RSVG_HANDLE
+
+INPUT
+
+T_RSVG_HANDLE
+	$var = INT2PTR ($type, SvIV ((SV *) SvRV ($arg)));
+
+OUTPUT
+
+T_RSVG_HANDLE
+	sv_setref_pv ($arg, "Gnome2::Rsvg::Handle", (void *) $var);

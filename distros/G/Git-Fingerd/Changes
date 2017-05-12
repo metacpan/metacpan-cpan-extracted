@@ -1,0 +1,10 @@
+Revision log for Git-Fingerd
+
+2.093521  2013-08-31 23:55:47 America/New_York
+          update bugtracker, repo metadata
+
+2.093520  2009-12-18 22:22:26 America/New_York
+          use Git::PurePerl to get heads, tags, and README
+
+1.000     2008-10-06
+          first release, by popular demand

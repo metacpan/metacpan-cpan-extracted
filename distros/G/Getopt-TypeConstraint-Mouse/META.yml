@@ -1,0 +1,41 @@
+---
+abstract: "A command line options processor uses Mouse's type constraints"
+author:
+  - 'Hiroki Honda <cside.story@gmail.com>'
+build_requires:
+  Project::Libs: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.9.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Getopt-TypeConstraint-Mouse
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Getopt::TypeConstraint::Mouse:
+    file: lib/Getopt/TypeConstraint/Mouse.pm
+    version: 0.05
+requires:
+  Mouse: 0
+  MouseX::Getopt: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/Cside/Getopt-Constraint-Mouse/issues
+  homepage: https://github.com/Cside/Getopt-Constraint-Mouse
+  repository: git://github.com/Cside/Getopt-Constraint-Mouse.git
+version: 0.05

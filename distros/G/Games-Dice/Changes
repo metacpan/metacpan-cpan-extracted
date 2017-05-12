@@ -1,0 +1,35 @@
+Revision history for Perl extension Games-Dice
+
+0.045     2015-04-26 21:21:14-04:00 America/New_York
+        - support Fudge/Fate dice, like 4dF (thanks, Mario Domgoergen!)
+
+0.044     2014-09-12 22:27:36-04:00 America/New_York
+        - numbers now roll their own value; you can roll "3" and get 3
+
+0.043     2013-08-31 23:48:19 America/New_York
+          update bug tracker, repo again
+
+0.042     2013-08-27 12:11:09 America/New_York
+          update bug tracker, repo
+
+0.041     2013-06-11 19:12:11 America/New_York
+          add the "roll" program (thanks, Mark Allen!)
+
+          documentation fixes (thanks, Mark Allen!)
+
+          use a better source of random numbers on Win32 (thanks, Mark Allen!)
+
+0.04      2013-04-10 10:41:18 America/New_York
+          why do I need to release this?  last release was strangely deleted at
+          some point
+
+0.03      2012-11-28 11:15:20 America/New_York
+          - anchor the dice-parsing regex to stop treating roll("1d8+1d12") as
+            roll("1d8+2")
+
+0.02      2002-02-20
+          - Added licence
+
+0.01        Mon Apr 19 10:15:58 1999
+          - original version; created by h2xs 1.18
+

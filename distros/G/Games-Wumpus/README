@@ -1,0 +1,7 @@
+Hunt the Wumpus!
+
+This is a implementation of the classical "Hunt the Wumpus!" game.
+The distribution consists of 4 modules (Games::Wumpus, Games::Wumpus::Cave,
+Games::Wumpus::Room, Games::Wumpus::Constants), and one program (wumpus).
+
+To play the game, run the wumpus command, and type 'H'.

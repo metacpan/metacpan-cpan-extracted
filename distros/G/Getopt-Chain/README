@@ -1,0 +1,131 @@
+NAME
+    Getopt::Chain - Command-line processing like svn and git
+
+VERSION
+    version 0.017
+
+DESCRIPTION
+    Getopt::Chain can be used to provide svn(1)- and git(1)-style option and
+    command processing. Any option specification covered by Getopt::Long is
+    fair game.
+
+    This is a new version of Getopt::Chain that uses Path::Dispatcher
+
+    CAVEAT 1: This is pretty beta, so the sugar/interface above WILL be
+    tweaked
+
+    CAVEAT 2: Unfortunately, Getopt::Long slurps up the entire arguments
+    array at once. Usually, this isn't a problem (as Getopt::Chain uses
+    pass_through). However, if a subcommand has an option with the same name
+    or alias as an option for a parent, then that option won't be available
+    for the subcommand. For example:
+
+        ./script --verbose --revision 36 edit --revision 48 --file xyzzy.c
+        # Getopt::Chain will not associate the second --revision with "edit"
+
+    So, for now, try to use distinct option names/aliases :)
+
+    DEBUG: You can get some extra information about what Getopt::Chain is
+    doing by setting the environment variable "GOC_TRACE" to 1
+
+SYNPOSIS
+        package My::Command;
+
+        use Getopt::Chain::Declare;
+
+        start [qw/ verbose|v /]; # These are "global"
+                                 # my-command --verbose initialize ...
+
+        # my-command ? initialize ... --> my-command help initialize ...
+        rewrite qr/^\?(.*)/ => sub { "help ".($1||'') };
+
+        # NOTE: Rewriting applies to the command sequence, NOT options
+
+        # my-command about ... --> my-command help about
+        rewrite [ ['about', 'copying'] ] => sub { "help $1" };
+
+        # my-command initialize --dir=...
+        on initialize => [qw/ dir|d=s /], sub {
+            my $context = shift;
+
+            my $dir = $context->option( 'dir' )
+
+            # Do initialize stuff with $dir
+        };
+
+        # my-command help
+        on help => undef, sub {
+            my $context = shift;
+
+            # Do help stuff ...
+            # First argument is undef because help
+            # doesn't take any options
+        };
+
+        under help => sub {
+
+            # my-command help create
+            # my-command help initialize
+            on [ [ qw/create initialize/ ] ] => undef, sub {
+                my $context = shift;
+
+                # Do help for create/initialize
+                # Both: "help create" and "help initialize" go here
+            };
+
+            # my-command help about
+            on 'about' => undef, sub {
+                my $context = shift;
+
+                # Help for about...
+            };
+
+            # my-command help copying
+            on 'copying' => undef, sub {
+                my $context = shift;
+
+                # Help for copying...
+            };
+
+            # my-command help ...
+            on qr/^(\S+)$/ => undef, sub {
+               my $context = shift;
+               my $topic = $1;
+
+               # Catch-all for anything not fitting into the above...
+
+               warn "I don't know about \"$topic\"\n"
+            };
+        };
+
+        # ... elsewhere ...
+
+        My::Command->new->run( [ @arguments ] )
+        My::Command->new->run # Just run with @ARGV
+
+LEGACY
+    The old-style, non Path::Dispatcher version is still available at
+    Getopt::Chain::v005
+
+SEE ALSO
+    Getopt::Long
+
+    App::Cmd
+
+    MooseX::App::Cmd
+
+ACKNOWLEDGEMENTS
+    Sartak for Path::Dispatcher
+
+    obra for inspiration on the CLI (via Prophet & Sd:
+    <http://syncwith.us/>)
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

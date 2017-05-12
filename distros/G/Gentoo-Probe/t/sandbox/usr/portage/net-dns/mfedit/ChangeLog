@@ -1,0 +1,24 @@
+# ChangeLog for net-dns/mfedit
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/mfedit/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  23 Apr 2004; David Holm <dholm@gentoo.org> mfedit-0.60.4.ebuild:
+  Added to ~ppc.
+
+*mfedit-0.60.4 (23 Apr 2004)
+
+  23 Apr 2004; <matsuu@gentoo.org> -mfedit-0.60.1.ebuild,
+  mfedit-0.60.2.ebuild, +mfedit-0.60.4.ebuild:
+  Version bumped.
+
+*mfedit-0.60.2 (02 Mar 2004)
+
+  02 Mar 2004; <matsuu@gentoo.org> mfedit-0.60.2.ebuild:
+  Version bumped.
+  Added ~amd64 to KEYWORDS.
+
+*mfedit-0.60.1 (02 Nov 2003)
+
+  02 Nov 2003; MATSUU Takuto <matsuu@gentoo.org> mfedit-0.60.1.ebuild:
+  Initial import. #26268
+

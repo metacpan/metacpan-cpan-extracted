@@ -1,0 +1,9 @@
+CHANGES
+Makefile.PL
+MANIFEST
+README
+t/GD-Graph-smoothlines.t
+t/GD-Graph-smootharea.t
+lib/GD/Graph/smoothlines.pm
+lib/GD/Graph/smootharea.pm
+META.yml

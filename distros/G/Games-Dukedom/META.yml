@@ -1,0 +1,30 @@
+---
+abstract: 'The classic big-iron game'
+author:
+  - 'Jim Bacon <jim@nortx.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-Dukedom
+no_index:
+  directory:
+    - t
+    - inc
+    - xt
+requires:
+  Moo: '1.004003'
+  MooX::ClassAttribute: '0'
+  MooX::StrictConstructor: '0'
+  MooX::Struct: '0'
+  Throwable: '0'
+  Try::Tiny: '0'
+  perl: '5.006000'
+version: v0.1.3

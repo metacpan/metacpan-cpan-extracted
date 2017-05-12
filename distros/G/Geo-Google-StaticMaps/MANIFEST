@@ -1,0 +1,5 @@
+Makefile.PL
+lib/Geo/Google/StaticMaps.pm
+MANIFEST
+CHANGES
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,392 @@
+#!/usr/bin/perl
+
+#
+# gpsketcher
+# A Glade-perl code sketcher for Gtk2::GladeXML::Simple
+# Author: Marco Antonio Manzo <amnesiac@unixmonkeys.com>
+#
+# Copyright (c) 2005, Marco Antonio Manzo
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation and/or
+#   other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+# OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+# TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+package main;
+
+use strict;
+use warnings;
+use Getopt::Std;
+
+our $VERSION = '0.4';
+
+my %opts;
+getopts( 'hvg:o:', \%opts );
+
+sub help {
+    print<<EOH;
+gpsketcher $VERSION, a Glade-Perl code sketcher for Gtk2::GladeXML::Simple
+
+usage: gpsketcher -g glade_file [options]
+
+[options]:
+
+   -h               This message
+   -o output_file   file to write the output code to
+   -v               Prints the program version
+
+Bug reports and suggestions to <marcoam\@perl.org.mx>
+EOH
+}
+
+help() and exit if $opts{h};
+print "gpsketcher $VERSION\n" and exit if $opts{v};
+
+die "You need to specify a glade file with the -g option"
+  unless defined $opts{g};
+my $parser = Parser->new( $opts{g} );
+my $parser_factory = XML::SAX::ParserFactory->parser( Handler => $parser );
+$parser_factory->parse_uri( $opts{g} );
+my $codegen = CodeGen->new( $parser->get_data );
+$codegen->build( $opts{o} );
+$codegen->write_file;
+
+############################################################
+#
+# Class: Parser
+#
+# Description:
+# Builds up a data tree from a glade XML file using SAX
+# events.
+#
+############################################################
+
+package Parser;
+
+use XML::SAX;
+
+use base qw( XML::SAX::Base );
+
+use constant TRUE => 1;
+use constant FALSE => !TRUE;
+
+sub new {
+    my ( $class, $glade_file ) = @_;
+    die "Invalid glade file filename" unless $glade_file =~ /\.glade$/;
+    my $self = bless { } => $class;
+    $self->{creation_function} = FALSE; # is it creation_function?
+    $self->{requires_gnome} = FALSE; # is it a Gnome App?
+    $self->{data} = {}; # data tree for CodeGen
+    $self->{stack} = []; # widgets stack
+    $self->{main_widget} = FALSE; # is main_widget set?
+    $self->{data}{glade_file} = $glade_file;
+    $self->{data}{date} = localtime( time );
+    $self->{data}{program_name} = ( split /\./, $glade_file )[0];
+    return $self;
+}
+
+sub get_data { shift->{data} }
+
+sub on_widget {
+    my ( $self, $element ) = @_;
+    my $widget = $element->{Attributes}{"{}id"}{Value};
+    unless ( @{ $self->{stack} } ) {
+	if ( !$self->{main_widget } ) {
+	    $self->{data}{main_package} = { name => $widget };
+	} else {
+	    $self->{data}{packages}{$widget} = { name => $widget };
+	}
+	$self->{top_widget} = $widget;
+    }
+    push @{ $self->{stack} }, $widget;
+}
+
+sub on_signal {
+    my ( $self, $element ) = @_;
+    my $widget = $self->_peek;
+    my $handler = $element->{Attributes}{"{}handler"}{Value};
+    if ( $self->{main_widget} ) {
+	my $node = $self->{data}{packages}{$self->{top_widget}};
+	push @{ $node->{callbacks} }, {
+				       widget_name => $widget,
+				       name => $handler
+				      };
+    } else {
+	my $node = $self->{data}{main_package};
+	push @{ $node->{callbacks} }, {
+				       widget_name => $widget,
+				       name => $handler
+				      };
+    }
+}
+
+sub on_property {
+    my ( $self, $element ) = @_;
+    my $prop = $element->{Attributes}{"{}name"}{Value};
+    $self->{creation_function} = TRUE if $prop eq 'creation_function';
+}
+
+sub on_widget_end {
+    my ( $self, $element ) = @_;
+    my $widget = pop @{ $self->{stack} };
+    $self->{main_widget} = TRUE if $widget eq $self->{top_widget};
+}
+
+sub on_property_end { shift->{creation_function} = FALSE }
+
+sub on_requires {
+    my ( $self, $element ) = @_;
+    my $attr = $element->{Attributes}{'{}lib'}{Value};
+    $self->{data}{requires_gnome} = TRUE if $attr and $attr eq "gnome";
+}
+
+sub on_creation_function_characters {
+    my ( $self, $content ) = @_;
+    my $widget = $self->_peek;
+    if ( $self->{main_widget} ) {
+	my $node = $self->{data}{packages}{$self->{top_widget}};
+	push @{ $node->{creation_functions} }, {
+						widget_name => $widget,
+						name => $content->{Data}
+					       }
+    } else {
+	my $node = $self->{data}{main_package};
+	push @{ $node->{creation_functions} }, {
+						widget_name => $widget,
+						name => $content->{Data}
+					       }
+    }
+}
+
+sub start_element {
+    my ( $self, $element ) = @_;
+    my $method = "on_" . $element->{Name};
+    $self->$method( $element ) if $self->can( $method  );
+}
+
+sub end_element {
+    my ( $self, $element ) = @_;
+    my $method = "on_" . $element->{Name} . "_end";
+    $self->$method( $element ) if $self->can( $method  );
+}
+
+sub characters {
+    my ( $self, $content ) = @_;
+    my $method = $self->{creation_function}
+      ? "on_creation_function_characters" : '';
+    $self->$method( $content ) if $self->can( $method )
+}
+
+sub _peek { @{ $_[0]->{stack} }[-1] }
+
+
+#############################################################
+#
+# Class: CodeGen
+#
+# Description:
+# Generates perl code stubs from the given data tree
+# returned from the Parser class.
+#
+#############################################################
+
+package CodeGen;
+
+sub new { bless $_[1], $_[0] }
+
+sub build {
+    my ( $self, $filename ) = @_;
+    $self->{buffer} = '';
+    $filename ||= $self->{program_name};
+    $filename .= '.pl' unless $filename =~ /\.pl$/;
+    $self->{filename} = $filename;
+
+    $self->_header;
+    $self->_main_package;
+    $self->_user_methods;
+    $self->_callbacks( $_ ) foreach @{ $self->{main_package}{callbacks} };
+    $self->_creation_funcs( $_ )
+      foreach @{ $self->{main_package}{creation_functions} };
+    foreach my $node ( keys %{ $self->{packages} } ) {
+	my $cur_node = $self->{packages}{$node};
+	$self->_package( $cur_node );
+	$self->_callbacks( $_ ) foreach @{ $cur_node->{callbacks} };
+	$self->_creation_funcs( $_ )
+	  foreach @{ $cur_node->{creation_functions} };
+    }
+    $self->_caller;
+    return $self->{buffer};
+}
+
+sub write_file {
+    my ( $self ) = @_;
+    open my $file, '>', $self->{filename} 
+      or die "Coulnt' create ", $self->{filename}, ": $!";
+    print $file $self->{buffer};
+    return;
+}
+
+### Code generation subroutines ###
+
+sub _header {
+    my ( $self ) = @_;
+    my $filename = $self->{filename};
+    my $date = $self->{date};
+    return $self->{buffer} .=<<HEADER;
+#!/usr/bin/perl
+
+#
+# $filename
+# Autogenerated by gpsketcher
+# Generated on $date
+#
+
+HEADER
+}
+
+sub _main_package {
+    my ( $self ) = @_;
+    my $glade_file = $self->{glade_file};
+    my $gnome = $self->{requires_gnome} ? "use Gnome2;" : '';
+    my $program_name = $self->{program_name};
+    my $name = $self->{main_package}{name};
+    return $self->{buffer} .=<<MAIN;
+#
+# Class: $name
+#
+package $name;
+
+use strict;
+use warnings;
+use Glib qw( TRUE FALSE );
+use Gtk2 '-init';
+$gnome
+use Gtk2::GladeXML::Simple;
+
+use base qw( Gtk2::GladeXML::Simple );
+
+our ( \$VERSION, \$APPNAME ) = ( '0.1', '$program_name' );
+
+sub new {
+    my ( \$class ) = \@_;
+    my \$self = \$class->SUPER::new( '$glade_file', '$name', '$program_name' );
+
+    print "A new $name object has been created\\n";
+
+    return \$self;
+}
+
+MAIN
+}
+
+sub _package {
+    my ( $self, $node ) = @_;
+    my $name = $node->{name};
+    my $glade_file = $self->{glade_file};
+    my $program_name = $self->{program_name};
+    return $self->{buffer} .=<<PACKAGE;
+#
+# Class: $name
+#
+package $name;
+
+use base qw( Gtk2::GladeXML::Simple );
+
+sub new {
+    my ( \$class ) = \@_;
+    my \$self = \$class->SUPER::new( '$glade_file', '$name', '$program_name' );
+
+    print "A new $name object has been created\\n";
+
+    return \$self;
+}
+
+PACKAGE
+}
+
+sub _user_methods {
+    my ( $self ) = @_;
+    return $self->{buffer} .=<<OWN;
+#
+# Write your own methods here
+# ...
+#
+
+OWN
+}
+
+sub _callbacks {
+    my ( $self, $cb ) = @_;
+    my ( $cname, $widget ) = ( $cb->{name}, $cb->{widget_name} );
+    return $self->{buffer} .=<<CALLBACK;
+#
+# Callback name: $cname
+# Called from widget: $widget
+#
+sub $cname {
+    my ( \$self, \$widget ) = \@_;
+
+    print "$cname called from ", \$widget->get_name, "\\n";
+}
+
+
+CALLBACK
+}
+
+sub _creation_funcs {
+    my ( $self, $cf ) = @_;
+    my ( $func, $widget ) = ( $cf->{name}, $cf->{widget_name} );
+    return $self->{buffer} .=<<FUNC;
+#
+# $func
+# Creates custom widget: $widget
+#
+sub $func {
+    my ( \$self, \$str1, \$str2, \$int1, \$int2 ) = \@_;
+
+    my \$widget = Gtk2::Label->new( "custom widget" );
+    \$widget->show_all;
+    return \$widget;
+}
+
+
+FUNC
+}
+
+sub _caller {
+    my ( $self ) = @_;
+    my $caller = $self->{main_package}{name};
+    my $gnome = $self->{requires_gnome} ?
+      "Gnome2::Program->init( \$APPNAME, \$VERSION );" : '';
+    return $self->{buffer} .=<<CALLER;
+#
+# main
+#
+package main;
+
+$gnome
+my \$app = $caller->new();
+\$app->run();
+
+1;
+
+CALLER
+}
+
+1;

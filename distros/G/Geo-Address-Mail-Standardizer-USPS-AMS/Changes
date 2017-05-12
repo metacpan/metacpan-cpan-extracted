@@ -1,0 +1,14 @@
+Revision history for Perl extension Geo::Address::Mail::Standardizer::USPS::AMS.
+
+0.03  Wed Dec 29 15:03:04 2010
+	- Add footnotes hash to the results object.
+
+0.02  Tue Oct 11 14:17:25 2010
+    - Results.pm moved to a separate dist to facilitate the use case where you need
+        one installation of AMS for an entire group of servers, and want to unfreeze
+        the Results object on a system without AMS.
+    - Various other additions, mostly fleshing out the module to better meet the specification
+
+0.01  Thu Apr 15 13:52:33 2010
+	- initial release
+

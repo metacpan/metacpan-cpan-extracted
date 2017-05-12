@@ -1,0 +1,742 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>Bus</name>
+  <program_name>Bus</program_name>
+  <directory></directory>
+  <source_directory>src</source_directory>
+  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>False</gnome_support>
+  <gettext_support>True</gettext_support>
+  <output_build_files>False</output_build_files>
+  <translatable_strings_file>ppo/xgettext.in</translatable_strings_file>
+</project>
+
+<widget>
+  <class>GtkDialog</class>
+  <name>BusFrame</name>
+  <width>820</width>
+  <height>600</height>
+  <signal>
+    <name>delete_event</name>
+    <handler>on_BusFrame_delete_event</handler>
+    <last_modification_time>Fri, 23 Jul 1999 19:56:37 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>destroy_event</name>
+    <handler>on_BusFrame_destroy_event</handler>
+    <last_modification_time>Fri, 23 Jul 1999 19:57:05 GMT</last_modification_time>
+  </signal>
+  <title>Bus Waybills</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_MOUSE</position>
+  <modal>False</modal>
+  <allow_shrink>True</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <child_name>Dialog:vbox</child_name>
+    <name>dialog-vbox1</name>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkHBox</class>
+      <child_name>Dialog:action_area</child_name>
+      <name>dialog-action_area1</name>
+      <border_width>10</border_width>
+      <homogeneous>False</homogeneous>
+      <spacing>5</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+	<pack>GTK_PACK_END</pack>
+      </child>
+    </widget>
+
+    <widget>
+      <class>GtkMenuBar</class>
+      <name>menubar2</name>
+      <tooltip>menubar 'tooltip'</tooltip>
+      <shadow_type>GTK_SHADOW_OUT</shadow_type>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>File</name>
+	<label>File</label>
+	<right_justify>False</right_justify>
+
+	<widget>
+	  <class>GtkMenu</class>
+	  <name>File_menu</name>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>New</name>
+	    <tooltip>Create a new BusData file</tooltip>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_N</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_New_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:07 GMT</last_modification_time>
+	    </signal>
+	    <label>New</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Open</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_O</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Open_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:44:29 GMT</last_modification_time>
+	    </signal>
+	    <label>Open...</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Save</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_S</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Save_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:07 GMT</last_modification_time>
+	    </signal>
+	    <label>Save</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Save_As</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_A</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Save_As_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:46:49 GMT</last_modification_time>
+	    </signal>
+	    <label>Save As...</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>separator1</name>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Print</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_P</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Print_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:11 GMT</last_modification_time>
+	    </signal>
+	    <label>Print...</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Mail_to</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_M</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Mail_to_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:13 GMT</last_modification_time>
+	    </signal>
+	    <label>Mail to...</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>separator2</name>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Exit</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_Q</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>destroy_Form</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 01:21:50 GMT</last_modification_time>
+	    </signal>
+	    <label>Exit</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>Edit</name>
+	<label>Edit</label>
+	<right_justify>False</right_justify>
+
+	<widget>
+	  <class>GtkMenu</class>
+	  <name>Edit_menu</name>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Undo</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_Z</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Undo_activate</handler>
+	      <last_modification_time>Sun, 28 Mar 1999 13:15:40 GMT</last_modification_time>
+	    </signal>
+	    <label>Undo</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Cut</name>
+	    <accelerator>
+	      <modifiers>GDK_SHIFT_MASK</modifiers>
+	      <key>GDK_Delete</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Cut_activate</handler>
+	      <last_modification_time>Sun, 28 Mar 1999 13:15:09 GMT</last_modification_time>
+	    </signal>
+	    <label>Cut</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Copy</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_C</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Copy_activate</handler>
+	      <last_modification_time>Sun, 28 Mar 1999 13:15:21 GMT</last_modification_time>
+	    </signal>
+	    <label>Copy</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Paste</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_V</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Paste_activate</handler>
+	      <last_modification_time>Sun, 28 Mar 1999 13:15:35 GMT</last_modification_time>
+	    </signal>
+	    <label>Paste</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>Options</name>
+	<label>Options</label>
+	<right_justify>False</right_justify>
+      </widget>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>Help</name>
+	<label>Help</label>
+	<right_justify>True</right_justify>
+
+	<widget>
+	  <class>GtkMenu</class>
+	  <name>Help_menu</name>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Contents</name>
+	    <accelerator>
+	      <modifiers>0</modifiers>
+	      <key>GDK_F1</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Contents_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:26 GMT</last_modification_time>
+	    </signal>
+	    <label>Contents</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Index</name>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Index_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:28 GMT</last_modification_time>
+	    </signal>
+	    <label>Index</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>Search</name>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_Search_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:28 GMT</last_modification_time>
+	    </signal>
+	    <label>Search</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>separator3</name>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>WWW</name>
+	    <signal>
+	      <name>activate</name>
+	      <handler>on_WWW_activate</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:46 GMT</last_modification_time>
+	    </signal>
+	    <label>WWW</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+
+	  <widget>
+	    <class>GtkMenuItem</class>
+	    <name>About</name>
+	    <accelerator>
+	      <modifiers>GDK_CONTROL_MASK</modifiers>
+	      <key>GDK_F1</key>
+	      <signal>activate</signal>
+	    </accelerator>
+	    <signal>
+	      <name>activate</name>
+	      <handler>about_Form</handler>
+	      <last_modification_time>Wed, 24 Mar 1999 04:45:46 GMT</last_modification_time>
+	    </signal>
+	    <label>About...</label>
+	    <right_justify>False</right_justify>
+	  </widget>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkVBox</class>
+      <name>vbox2</name>
+      <homogeneous>False</homogeneous>
+      <spacing>0</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkToolbar</class>
+	<name>Toolbar</name>
+	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+	<type>GTK_TOOLBAR_ICONS</type>
+	<space_size>5</space_size>
+	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+	<relief>GTK_RELIEF_NORMAL</relief>
+	<tooltips>True</tooltips>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>True</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkScrolledWindow</class>
+	<name>scrolledwindow1</name>
+	<hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
+	<vscrollbar_policy>GTK_POLICY_AUTOMATIC</vscrollbar_policy>
+	<hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+	<vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
+
+	<widget>
+	  <class>GtkNotebook</class>
+	  <name>notebook1</name>
+	  <can_focus>True</can_focus>
+	  <show_tabs>True</show_tabs>
+	  <show_border>True</show_border>
+	  <tab_pos>GTK_POS_TOP</tab_pos>
+	  <scrollable>True</scrollable>
+	  <tab_hborder>2</tab_hborder>
+	  <tab_vborder>2</tab_vborder>
+	  <popup_enable>False</popup_enable>
+
+	  <widget>
+	    <class>GtkHBox</class>
+	    <name>hbox1</name>
+	    <homogeneous>False</homogeneous>
+	    <spacing>0</spacing>
+
+	    <widget>
+	      <class>GtkVBox</class>
+	      <name>vbox9</name>
+	      <homogeneous>False</homogeneous>
+	      <spacing>0</spacing>
+	      <child>
+		<padding>0</padding>
+		<expand>True</expand>
+		<fill>True</fill>
+	      </child>
+
+	      <widget>
+		<class>Placeholder</class>
+	      </widget>
+
+	      <widget>
+		<class>GtkLabel</class>
+		<name>label17</name>
+		<label>Now you can try out some of the signal handlers
+
+Ctrl+C  Shows a skeleton signal handler message (in Generated::Bus)
+Ctrl+N  Opens a fileselection (in Bus_mySUBS)
+Ctrl+O  opens a Fileselection (in Bus_mySUBS)
+Ctrl+P  Shows a skeleton signal handler message (in Bus_mySUBS)
+
+------------------------------------------------------------------------------
+If you're running the base application eg BusFrame-&gt;run()
+Ctrl+F1 About box (in Generated::Bus)
+------------------------------------------------------------------------------
+If you\'re running the application subclass eg SubBusFrame-&gt;run()
+Ctrl+F1 About box (in Generated::SubBus overloads Generated::Bus)
+------------------------------------------------------------------------------
+
+Ctrl+Q  Quits the application
+</label>
+		<justify>GTK_JUSTIFY_LEFT</justify>
+		<wrap>False</wrap>
+		<xalign>0.5</xalign>
+		<yalign>0.5</yalign>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<child>
+		  <padding>0</padding>
+		  <expand>True</expand>
+		  <fill>False</fill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>Placeholder</class>
+	      </widget>
+	    </widget>
+
+	    <widget>
+	      <class>Placeholder</class>
+	    </widget>
+
+	    <widget>
+	      <class>Placeholder</class>
+	    </widget>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>Notebook:tab</child_name>
+	    <name>Trip-tab</name>
+	    <label>Trip</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>Placeholder</class>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>Notebook:tab</child_name>
+	    <name>Service-tab</name>
+	    <label>Service</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label18</name>
+	    <label>A label on the Driver notebook page</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>Notebook:tab</child_name>
+	    <name>Driver-tab</name>
+	    <label>Driver</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label19</name>
+	    <label>Another label, on the Options page this time</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>Notebook:tab</child_name>
+	    <name>Options-tab</name>
+	    <label>Options</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkCList</class>
+	    <name>clist1</name>
+	    <width>177</width>
+	    <can_focus>True</can_focus>
+	    <columns>5</columns>
+	    <column_widths>80,80,80,80,80</column_widths>
+	    <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+	    <show_titles>True</show_titles>
+	    <shadow_type>GTK_SHADOW_IN</shadow_type>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <child_name>CList:title</child_name>
+	      <name>FareType</name>
+	      <label>Type</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <child_name>CList:title</child_name>
+	      <name>FareAmount</name>
+	      <label>Amount</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <child_name>CList:title</child_name>
+	      <name>FareTickets</name>
+	      <label>Tickets</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <child_name>CList:title</child_name>
+	      <name>FareTotal</name>
+	      <label>Total</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <child_name>CList:title</child_name>
+	      <name>FareConc</name>
+	      <label>Conc</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>Notebook:tab</child_name>
+	    <name>Report-tab</name>
+	    <label>Report</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkStatusbar</class>
+	<name>statusbar1</name>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>True</fill>
+	  <pack>GTK_PACK_END</pack>
+	</child>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+<widget>
+  <class>GtkFileSelection</class>
+  <name>fileselection1</name>
+  <border_width>10</border_width>
+  <signal>
+    <name>delete_event</name>
+    <handler>on_fileselection1_delete_event</handler>
+    <last_modification_time>Fri, 23 Jul 1999 19:57:22 GMT</last_modification_time>
+  </signal>
+  <title>New version of Select File</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+  <show_file_op_buttons>True</show_file_op_buttons>
+
+  <widget>
+    <class>GtkButton</class>
+    <child_name>FileSel:ok_button</child_name>
+    <name>ok_button1</name>
+    <can_default>True</can_default>
+    <has_default>True</has_default>
+    <can_focus>True</can_focus>
+    <signal>
+      <name>clicked</name>
+      <handler>on_ok_button1_clicked</handler>
+      <last_modification_time>Mon, 16 Aug 1999 05:00:19 GMT</last_modification_time>
+    </signal>
+    <label>OK</label>
+  </widget>
+
+  <widget>
+    <class>GtkButton</class>
+    <child_name>FileSel:cancel_button</child_name>
+    <name>cancel_button1</name>
+    <can_default>True</can_default>
+    <can_focus>True</can_focus>
+    <label>Cancel</label>
+  </widget>
+</widget>
+
+</GTK-Interface>

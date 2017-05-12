@@ -1,0 +1,2 @@
+EGG_TYPE_TRAY_ICON	EggTrayIcon	GObject		Gtk2::TrayIcon
+

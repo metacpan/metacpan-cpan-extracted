@@ -1,0 +1,44 @@
+Revision history for Perl extension Google::API::Client
+
+0.14  2014-10-18 03:08:30 PDT
+        - allow no redirect_uri to support cross-client exchange request #14 (Thanks, razsh)
+        - Add SignedJWT support and Reseller API sample to Perl Client Library. #15 (Thanks, richieforeman)
+        - calendar event deletion #16 (Thanks, ljanvier)
+
+0.13  2013-11-27 00:59:57 JST
+        - Add approve prompt and offline #12 (Thanks, chylli and finn)
+
+0.12  2013-11-12 22:48:25 JST
+        - Add .travis.yml
+
+0.11  2013-11-12 01:57:03 JST
+        - Update dependencies #11
+
+0.10  2013-11-09 19:00:51 JST
+        - Start using Dist::Milla #8
+        - Important changes: Rename OAuth2::Client to Google::API::OAuth2::Client #9
+
+0.09  Fri Feb  8 22:13:43 JST 2013
+        - Fixed an issue #4
+
+0.08  Thu Sep 27 14:40:05 JST 2012
+        - Fixed an issue #7
+
+0.07  Fri Aug  3 23:25:39 JST 2012 
+        - Fixed an issue #6
+        - Added calendar events samples
+
+0.06  Wed Aug  1 01:24:21 JST 2012
+        - Fixed an issue #5 (Thanks, uehatsu)
+
+0.05  Tue Feb 14 01:01:42 JST 2012
+        - Fixed issues of URL delimiter at OAuth2::Client #1 #3 (uechoco, gnustavo)
+        - Performance improvement for method lookup #2 (gnustavo)
+0.04  Fri Oct 28 01:50:23 JST 2011
+        - Fixed a bug that G::A::Client didn't have methods if Resource Document has both nested resources and methods like blogger v2.
+0.03  Tue Sep 27 12:43:25 JST 2011
+        - Added key parameter on execute method for Simple API Access
+0.02  Tue Sep 27 02:43:30 JST 2011
+        - Implemented nested resource
+0.01  Wed Jul 13 02:34:42 2011
+        - original version

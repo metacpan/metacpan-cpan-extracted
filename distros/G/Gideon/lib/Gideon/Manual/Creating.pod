@@ -1,0 +1,73 @@
+package Gideon::Manual::Creating;
+
+#ABSTRACT: Creating objects
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Gideon::Manual::Creating - Creating objects
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 DESCRIPTION
+
+You can easily persist new object in any gideon data store by using the C<save>
+method
+
+=head2 C<save([ %opts ])>
+
+To store a new object you just simply need to call the C<save> method on any
+newly created instance. And returns the object if the saving was successful
+or C<undef> if the saving operation failed.
+
+    my $new_person = People->new( age => 34, name => 'Mike' );
+    say 'Success' if $new_person->save;
+
+Gideon has a plugin that would rise an exception in case the operation fails
+rather than returning C<undef>. Please refer to L<Gideon::Plugin::StrictMode> for
+more details.
+
+    my $new_person = People->new( age => 34, name => 'Mike' );
+
+    try {
+      $new_person->save( -strict => 1 );
+      say 'Success';
+    }
+    catch {
+      say 'Failed';
+    };
+
+In the case of objects persisted into RDB's and auto increment values, Gideon
+would auto populate the resulting id back into the object
+
+    my $new_person = People->new( age => 34, name => 'Mike' );
+    say $new_person->id; # undef
+
+    $new_person->save;
+    say $new_person->id; # '1'
+
+=head1 NAME
+
+Creating objects with Gideon
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 AUTHOR
+
+Mariano Wahlmann, Gines Razanov
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mariano Wahlmann, Gines Razanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

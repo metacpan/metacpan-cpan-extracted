@@ -1,0 +1,43 @@
+Perl module Geo::Coder::HostIP
+==============================
+
+Geo::Coder::HostIP is designed to provide a Perl OO interface to the
+hostip.org project's API for retrieving geocoding information from an
+IP address.
+
+It also provides several convenience methods, including writing code
+for a Google Map for you (though nothing super complex -- you can add
+Javascript, salt and wasabe later to taste).
+
+It provides methods for retrieving a hash of geographical information
+where possible, composed of (at best) Country, Country Code, City, State, 
+and Letitude and Longitude (in decimal format).
+
+It also uses gethostbyname() to be able to grab this info from hostip.org
+(which only accepts numeric IP addresses, not domain names) where possible.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libwww-perl (LWP)
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Sean Cannon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

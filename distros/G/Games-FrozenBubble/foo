@@ -1,0 +1,31 @@
+[Alien::SDL] Testing header(s): iconv.h
+[Alien::SDL] Testing header(s): math.h
+[Alien::SDL] Testing header(s): SDL.h
+[Alien::SDL] Testing header(s): SDL_mixer.h
+Checking prerequisites...
+  requires:
+    !  Compress::Bzip2 is not installed
+    !  File::Which is not installed
+  build_requires:
+    !  Compress::Bzip2 is not installed
+    !  SDL (2.504) is installed, but we need version >= 2.510
+
+ERRORS/WARNINGS FOUND IN PREREQUISITES.  You may wish to install the versions
+of the modules indicated above before proceeding with this installation
+
+Version '2.2.1beta1' from /home/kthakore/frozen-bubble/lib/Games/FrozenBubble.pm does not appear to be valid:
+BEGIN { q#  Hide from _packages_inside()
+    #; package Module::Build::ModuleInfo::_version::p14;
+    use Module::Build::Version;
+    no strict;
+
+    local $VERSION;
+    $VERSION=undef;
+      $vsub = sub {
+        our $VERSION = '2.2.1beta1';;
+        $VERSION
+      };
+  }
+
+The fatal error was: Invalid version format (non-numeric data) at /home/kthakore//.perl5/perlbrew/perls/perl-5.12.1/lib/5.12.1/Module/Build/ModuleInfo.pm line 348, <GEN20> line 3.
+

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Games/Score.pm
+t/00.load.t
+t/01.basic.t
+t/02.example.t
+t/03.extreme_cases.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/test.t
+lib/Getopt/Easy.pm
+META.yml                                 Module meta-data (added by MakeMaker)

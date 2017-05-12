@@ -1,0 +1,16 @@
+bin/sudoku
+Build.PL
+examples/050805
+examples/050806
+examples/050807c
+examples/050808
+examples/050809
+examples/README
+lib/Games/YASudoku.pm
+lib/Games/YASudoku/Board.pm
+lib/Games/YASudoku/Square.pm
+MANIFEST			This list of files
+META.yml
+t/board.t
+t/squares.t
+Makefile.PL

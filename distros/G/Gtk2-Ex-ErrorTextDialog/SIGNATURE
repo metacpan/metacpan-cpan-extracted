@@ -1,0 +1,102 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 a3a4c7628dc9d65b9810198ab6890de5f31b65fa Changes
+SHA1 86dd07fb99b6d64c5361080fe7edfb1ce8b784ef MANIFEST
+SHA1 b758f740af57256154bbf4e1f8a760a1b9f9dfe1 MANIFEST.SKIP
+SHA1 4a02894fc8b46f1d6580b05a21fb9f16d9e7aec8 META.yml
+SHA1 bfe1a5d37f495d4fffd4b2da55253752ef09edd3 Makefile.PL
+SHA1 7025827a532801413d9e032b9a32e9347629ae04 README
+SHA1 dc48c4aa4b662aa87a9fd8713cb325f4990feace debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 60d1aef73efabf40e691e080c22bcb0f621ca2b4 debian/control
+SHA1 c52f236fdf974ec30cc33acf7c6b43dfc4a858e9 debian/copyright
+SHA1 64c9f988fc8e16d9a111fa5dc052b76d10185658 debian/patches/pod-examples-dir.diff
+SHA1 fd77bd58065ce961d183399d2766203b1069c4fe debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 16ee210d7f4bd7302b0ecc0352f3759a1185398a debian/watch
+SHA1 bb2fa73f9aee3d3a167f857e30fc15ada021923e devel/Action.pm
+SHA1 da6f0cc0e261fdaa580a8e83a3ff5c759cf28ebe devel/AddOn-FollowAppend.pm
+SHA1 cc4e177edc2e0f048548995333c937fdc6e04bde devel/Foo.pm
+SHA1 07d3b19f3c251b621b1984707b13843cfb84b3e1 devel/Gtk2ExWindowManagerFrame.pm
+SHA1 8d260057247fc4257586ab1cae7f235a7d1ba5ee devel/MyRunawayWarnAndError.pm
+SHA1 3629fd7998c6d063313de855175dd02540adf94e devel/UsingBegin.pm
+SHA1 b5bd7a3ccabd5f171551e76081f1ef027fdd33ca devel/action.pl
+SHA1 1dca25545ce41ff6bafab7c3b1f2287bf7d5ee75 devel/devel-loading.pl
+SHA1 2a591b6d699ecef0fca1e4408f216ff3c6cfd046 devel/follow.pl
+SHA1 3b17979a70cda7602d2cb1aeb1cfd3c57c81566b devel/frame.pl
+SHA1 1f94f2531ed34c0b90e89d715ffff805cadd5dbf devel/horiz.pl
+SHA1 e88f13c46ac1bb3f7b8427e09a58ec6320c14f69 devel/loading.pl
+SHA1 da35f3f4e5e2a947799bc8edaa51bdad7842e3ca devel/max-chars.pl
+SHA1 a5a55273cd30f8e3f97512e34ec0641618448272 devel/message-set-text.pl
+SHA1 f66b64ff76052dfb680c842c91ddf05162a0bdce devel/message-text-fallback.t
+SHA1 9748dcaf71bc876d488889e7178e10a0add1c05a devel/not-safe-etd.pl
+SHA1 34c4cb6111754289f7fe8f96560b3861f9ce47c7 devel/not-safe-raw.pl
+SHA1 e4a22c1293db6c72b56921142cab73a3177247ee devel/propagated.pl
+SHA1 77827ebd398fc9490258ae28bb42a9edd18ee6e2 devel/recurse-handler.pl
+SHA1 0530c45a39f48f53c3803dc93d3f94ad2b7f2be1 devel/recurse-idle.pl
+SHA1 6e47dfb6c4201ff1c691017eb77ca93c55f0f6c6 devel/recursive-warn.pl
+SHA1 e7b6da986472affaa079aa6a882f1a6cec6d28e6 devel/run.pl
+SHA1 f8bea281517a08796a71b7f03bef5240649296ec devel/save-builder.pl
+SHA1 ba0bdee66909e91e46cf9583208a7e6ac2f258e5 devel/save-file.pl
+SHA1 b2616c3a6f3b11884b37542c359c5a028ebe74a4 devel/screenshot.pl
+SHA1 54b5345f6150d9d544672229626527b4682c63e4 devel/splice-grow.pl
+SHA1 73928fb3d9cb6ba316506ea085cafc2ebb497f2e devel/textview-delete.pl
+SHA1 f58d89cd3da6f112a311989951dc3157992ad5c5 devel/textview-flow.pl
+SHA1 6bd3e2ec294b901a6f7c26053e44fdeff8f514c7 devel/textview.pl
+SHA1 11e10b42efc0107d871e27ceb49b3997b2ec25ff devel/trace-bytes.pl
+SHA1 2608219a71b8172a0a7a49ce302059b73f5f7393 devel/version.pl
+SHA1 16f1cb35cbaee35241e44b5f6ca0155d387dddfb examples/keybindings.pl
+SHA1 8d3e0c5ce7f716c8e2c9f398272894dedf8b1e85 examples/simple.pl
+SHA1 355b182e01f918114bc6c85967b2de758e1dc9fe inc/MyMakeMakerExtras.pm
+SHA1 a2fa0855f3a1ea6140956ec567bea259e0099893 inc/MyMakeMakerGettext.pm
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b inc/my_pod2html
+SHA1 393300fbc8a314b5de99357e0d4049e517879d9f lib/Gtk2/Ex/ErrorTextDialog.pm
+SHA1 664310690bcca139ff39925d9d2b74ab0f12475a lib/Gtk2/Ex/ErrorTextDialog/Handler.pm
+SHA1 af4838bbbb05b201facee1f00317d1df1590df57 lib/Gtk2/Ex/ErrorTextDialog/SaveDialog.pm
+SHA1 e41df9fc284b84c01957806891b2a8f8c34fbcbf lib/Gtk2/Ex/TextView/FollowAppend.pm
+SHA1 b2744e2b9dfed2dfa9538628e1cc0b31e3faf0b6 po/Gtk2-Ex-ErrorTextDialog.pot
+SHA1 2f1b387c57b4661021ac7bb3a1e399156118b9d0 po/README
+SHA1 a5423919f4129764379d16438c2af2d941fe8e3d po/header.pot
+SHA1 fa7248c26546a2fb72847c29ed232c55319d17bb t/ErrorTextDialog.t
+SHA1 5a570f3563c610373e5030cf738a9119757a038d t/FollowAppend.t
+SHA1 c17fc6d0f46cbb0ee99b02a051d8841898422eaf t/Handler.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 fa364d5cb1d22fd669e664d311dee66647486673 t/SaveDialog.t
+SHA1 179a89c2e520d4e2f93c86e087e2b784c3279197 t/test-weaken.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 ec454b1b524d2d0b35e5a7d8292ad13d82becab5 xt/0-Test-YAML-Meta.t
+SHA1 3c929b147a70e1d0cfe63d69223a5ed407a295b2 xt/0-examples-xrefs.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 84a47c1d71fd58797a2754030998dfb673b62811 xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 1f28ea8151b0f8554e5ab4e5bbcf1c5371f788eb xtools/my-check-spelling.sh
+SHA1 f3e50b961e575e060e35ddc4d94c7b3e6101d660 xtools/my-deb.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 4db9c30b1fc96b04a794218ca19561b368f59679 xtools/my-pc.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iD8DBQFSFUUELFMCIV9q3ToRAtfOAJsF33Gq3cJWhmz2QTZovO1O5OoTOwCfUVbN
+y6NANJtNMcVYIzbo3FEiGxM=
+=kzdR
+-----END PGP SIGNATURE-----

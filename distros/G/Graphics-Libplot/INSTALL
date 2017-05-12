@@ -1,0 +1,13 @@
+libplot-perl
+In order to build this package, you need the libplot library to
+be built and installed.  It is part of the plotutils package,
+available wherever fine FSF products are sold. You need the plot.h
+header file as well.
+
+On some systems, the module will build with
+
+perl Makefile.PL
+make
+make test
+make install
+

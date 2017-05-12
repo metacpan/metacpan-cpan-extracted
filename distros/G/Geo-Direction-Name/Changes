@@ -1,0 +1,17 @@
+Revision history for Geo-Direction-Name
+
+0.0.4  Sun Mar 29 2009
+       - Fix the fatal data error of ja locale
+       - Add zh_CN, zh_TW locale
+       - Add direction specification add-on system
+
+0.0.3  Thu Oct 09 2008
+       Fix the error of test in Windows environment
+
+0.0.2  Sun Aug 31 2008
+       Add Test::Base to require modules
+       Write some more PODs
+
+0.0.1  Mon Jan 28 04:20:17 2008
+       Initial release.
+

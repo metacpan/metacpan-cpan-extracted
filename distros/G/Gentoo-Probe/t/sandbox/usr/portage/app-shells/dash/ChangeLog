@@ -1,0 +1,23 @@
+# ChangeLog for app-shells/dash
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/dash/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  09 Jun 2004; Luca Barbato <lu_zero@gentoo.org> dash-0.4.24.ebuild:
+  Marked ppc
+
+*dash-0.4.26 (09 Jun 2004)
+
+  09 Jun 2004; Seemant Kulleen <seemant@gentoo.org> dash-0.4.24.ebuild,
+  +dash-0.4.26.ebuild:
+  stabilise 24 on x86, and version bump 26 to ~x86 and ~ppc. Thanks to: Thomas
+  Eckert <eckert.thomas@gmx.net> in bug #52262
+
+  27 Mar 2004; David Holm <dholm@gentoo.org> dash-0.4.24.ebuild:
+  Added to ~ppc.
+
+*dash-0.4.24 (26 Mar 2004)
+
+  26 Mar 2004; Seemant Kulleen <seemant@gentoo.org> dash-0.4.24.ebuild:
+  this is the debian verison of NetBSDs ash. ebuild submitted by: Thomas Eckert
+  <eckert.thomas@gmx.net> in bug #26253
+

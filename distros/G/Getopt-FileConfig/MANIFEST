@@ -1,0 +1,8 @@
+Changes
+lib/Getopt/FileConfig.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/pcm.rc
+t/pcm.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+# ChangeLog for app-shells/sandboxshell
+# Copyright 2000-2003 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/sandboxshell/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+*sandboxshell-0.1 (09 Jul 2003)
+
+  31 Jul 2003; Mike Frysinger <vapier@gentoo.org> :
+  Added manpage.
+
+  09 Jul 2003; Mike Frysinger <vapier@gentoo.org> :
+  Initial import.  Ebuild submitted by me.

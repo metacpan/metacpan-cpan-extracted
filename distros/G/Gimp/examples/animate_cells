@@ -1,0 +1,116 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+sub fix_cell_layer {
+  my $image = shift; # The image
+  my $target = shift; # The target layer
+  my $prev = shift; # The layer before it
+  my $back = shift; # The background layer
+  my $lnum = shift; # The new layer's number
+  my $dup = $prev->copy(0);
+  # Tried to do a gimp_layer_get_position($target), here, but it failed...
+  $image->insert_layer($dup, 0, $lnum);
+  $image->selection_sharpen; # No feathered or fuzzy selection areas
+  $image->selection_grow(1); # XXX - Gets around gimp 1-pixel bug
+  $back->edit_copy();
+  my $float = $dup->edit_paste(0);
+  $float->floating_sel_anchor();
+  $image->select_item(CHANNEL_OP_REPLACE,$target);
+}
+
+podregister {
+  $image = $image->duplicate if $work_on_copy;
+  $image->undo_disable;
+  Gimp::Progress->init("Animating cell layers...",MESSAGE_BOX);
+
+  my @ids = reverse $image->get_layers;
+  my $back = shift @ids;
+
+  if (@ids < 2) {
+    $image->delete if $work_on_copy;
+    die "animate_cells: too few cells (layers) in image\n";
+    return;
+  }
+
+  $image->select_item(CHANNEL_OP_REPLACE,$ids[0]);
+  for(my $i=1;$i<@ids;$i++) {
+    Gimp::Progress->update(1/(@ids-1)/2*$i);
+    my $lnum = $#ids+1-$i;
+    fix_cell_layer($image, $ids[$i], $ids[$i-1], $back, $lnum);
+  }
+
+  for(my $i=$#ids;$i>=0;$i--) {
+    Gimp::Progress->update(0.5+1/@ids*(@ids-$i));
+    $image->merge_down($ids[$i], EXPAND_AS_NECESSARY);
+  }
+
+  Gimp::Progress->update(1.0);
+
+  eval { Gimp::Display->new($image) if $work_on_copy; };
+  $image->selection_none;
+  $image->undo_enable;
+  ();
+};
+
+exit main;
+
+__END__
+
+=head1 NAME
+
+animate_cells - Perform cell animation from a single, layered image
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Animation/Animate Cells...
+
+=head1 DESCRIPTION
+
+Use this plugin to animate a series of layers in the same way that
+a physical animation process would use cells. Version 1.2
+
+This GIMP plugin makes animation of images much simpler. The idea is that
+(as was the case with physical "cell" animation) you simply create a
+background and as many cell layers as you like. Each layer represents a
+frame to be animated on top of the background, but unlike normal Gimp
+animation, you don't have to worry about covering up previous frames.
+
+The effect is like taking the bottom layer, and flipping through
+the rest of the layers on top of it, one at a time. This greatly reduces
+the time involved in creating new animations, especially where a single
+object is moving over a static background (more complex animation may
+still require just as much work as before).
+
+The script only asks if you want to work on a copy of the image. Otherwise,
+you just need an image with a background layer and two or more layers
+on top of it which represent your "cells".
+
+=head1 PARAMETERS
+
+  [PF_TOGGLE, "work_on_copy", "Work on copy", 1]
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 DATE
+
+3/12/1999
+
+=head1 AUTHOR
+
+Aaron Sherman E<lt>ajs@ajs.comE<gt>
+
+=head1 LICENSE
+
+This plugin may be distributed under the same terms as GIMP itself.
+See L<http://www.gimp.org/> for more information on GIMP.
+
+=head1 SEE ALSO
+
+L<gimp>, L<perl>, L<Gimp>: the Gimp module for perl.

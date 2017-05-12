@@ -1,0 +1,80 @@
+<%
+    $t->{title}{showtag} = 0;
+-%>
+
+<html>
+<head>
+<TITLE>perlwar : <%= findvalue( '//configuration/title/text()' ) %></TITLE>
+<LINK REL="icon" HREF="perlwar.ico" />
+<LINK REL="SHORTCUT ICON" HREF="perlwar.ico" />
+<style>
+BODY { background-color: black; color: lightgreen; font-family: sans-serif;}
+
+A:link { text-decoration: overline; color: #00A713  }
+A:visited { text-decoration: overline; color: #00A713  }
+A:active { text-decoration: overline; color: maroon }
+
+
+dt { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>PerlWar : <%= findvalue( '//configuration/title/text()' ) %></h1>
+
+<% use Games::PerlWar; %>
+<p>using Perlwar version <%= $Games::PerlWar::VERSION %>
+</p>
+
+<h2>settings</h2>
+
+<dl>
+<dt>Game length<dt><dd><%= findvalue( '//configuration/gameLength/text()' ) %> iterations</dd>
+<dt>Array size</dt><dd><%= findvalue( '//configuration/theArraySize/text()' ) %> cells</dd>
+<dt>Agent maximal size</dt><dd><%= findvalue( '//configuration/agentMaxSize/text()' ) %> characters</dd>
+<% if ( my $m = findvalue( '//configuration/mamboDecrement/text()' ) ) { %>
+<dt>mambo option</dt><dd>enabled</dd>
+<dt>mambo decrement per turn</dt><dd><%= $m %></dd>
+<% } %>
+
+</dl>
+
+<% if ( my $n = findvalue( '//configuration/note/text()' ) ) { %>
+<h2>notes</h2>
+
+<pre><%= $n %></pre>
+
+<% } %>
+
+<h2>Current Status</h2>
+
+<dl>
+    <dt>Current iteration<dt>
+    <dd><%= findvalue( '//iteration/@nbr' ) %></dd>
+    <dt>Game status</dt>
+    <dd><%= findvalue( '//iteration/summary/gameStatus/text()' ) %></dd>
+</dl>
+
+
+<%
+    if ( $adhoc = findvalue( '//players/@list' ) eq 'adhoc' ) {
+        @players = findnodes( '//iteration/summary/player' );
+    } 
+    else {
+        @players = findnodes( '//configuration/players/player' );
+    }
+%>
+
+<h3>Players <%= '(ad hoc mode)' x !!$adhoc %> </h3>
+
+<dl>
+<% for my $p ( @players ) { %>
+    <dt><%= $p->findvalue( '@name' ) %></dt>
+    <dd><%= $p->findvalue( '@status' ) || 'active' %></dd>
+<% } %>
+</dl>
+
+<hr />
+<a href='round_current.xml'>main page</a>
+</body>
+</html>

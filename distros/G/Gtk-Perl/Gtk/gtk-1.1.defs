@@ -1,0 +1,157 @@
+(define-flags GtkSpinButtonUpdatePolicy
+  (always GTK_UPDATE_ALWAYS)
+  (if-valid GTK_UPDATE_IF_VALID))
+
+(define-object GtkProgressBar (GtkProgress)
+	)
+
+(define-object GtkProgress (GtkWidget)
+	)
+
+; gtk+ 1.1 
+
+(xxxdefine-enum GdkEventType
+  (nothing GDK_NOTHING)
+  (delete GDK_DELETE)
+  (destroy GDK_DESTROY)
+  (expose GDK_EXPOSE)
+  (motion-notify GDK_MOTION_NOTIFY)
+  (button-press GDK_BUTTON_PRESS)
+  (2button-press GDK_2BUTTON_PRESS)
+  (3button-press GDK_3BUTTON_PRESS)
+  (button-release GDK_BUTTON_RELEASE)
+  (key-press GDK_KEY_PRESS)
+  (key-release GDK_KEY_RELEASE)
+  (enter-notify GDK_ENTER_NOTIFY)
+  (leave-notify GDK_LEAVE_NOTIFY)
+  (focus-change GDK_FOCUS_CHANGE)
+  (configure GDK_CONFIGURE)
+  (map GDK_MAP)
+  (unmap GDK_UNMAP)
+  (property-notify GDK_PROPERTY_NOTIFY)
+  (selection-clear GDK_SELECTION_CLEAR)
+  (selection-request GDK_SELECTION_REQUEST)
+  (selection-notify GDK_SELECTION_NOTIFY)
+  (proximity-in GDK_PROXIMITY_IN)
+  (proximity-out GDK_PROXIMITY_OUT)
+  (drag_enter GDK_DRAG_ENTER)
+  (drag-leave GDK_DRAG_LEAVE)
+  (drag-motion GDK_DRAG_MOTION)
+  (drag-status GDK_DRAG_STATUS)
+  (drag-start GDK_DROP_START)
+  (drag-finished GDK_DROP_FINISHED)
+  (client-event GDK_CLIENT_EVENT)
+  (visibility-notify GDK_VISIBILITY_NOTIFY)
+  (no-expose GDK_NO_EXPOSE))
+
+
+(define-flags GtkDebugFlag
+  (objects GTK_DEBUG_OBJECTS)
+  (misc GTK_DEBUG_MISC)
+  (signals GTK_DEBUG_SIGNALS))
+
+(define-flags GtkAccelFlags
+  (visible GTK_ACCEL_VISIBLE)
+  (signal-visible GTK_ACCEL_SIGNAL_VISIBLE)
+  (locked GTK_ACCEL_LOCKED)
+  (mask GTK_ACCEL_MASK))
+
+(define-enum GtkMatchType
+  (all GTK_MATCH_ALL)
+  (all-tail GTK_MATCH_ALL_TAIL)
+  (head GTK_MATCH_HEAD)
+  (tail GTK_MATCH_TAIL)
+  (exact GTK_MATCH_EXACT)
+  (last GTK_MATCH_LAST))
+
+(define-enum GtkPathPriorityType
+  (lowest GTK_PATH_PRIO_LOWEST)
+  (gtk GTK_PATH_PRIO_GTK)
+  (application GTK_PATH_PRIO_APPLICATION)
+  (rc GTK_PATH_PRIO_RC)
+  (highest GTK_PATH_PRIO_HIGHEST)
+  (mask GTK_PATH_PRIO_MASK))
+
+(define-enum GtkPathType
+  (widget GTK_PATH_WIDGET)
+  (widget-class GTK_PATH_WIDGET_CLASS)
+  (class GTK_PATH_CLASS))
+
+(define-enum GtkReliefStyle
+  (normal GTK_RELIEF_NORMAL)
+  (half GTK_RELIEF_HALF)
+  (none GTK_RELIEF_NONE))
+
+(define-enum GtkResizeMode
+  (parent GTK_RESIZE_PARENT)
+  (queue GTK_RESIZE_QUEUE)
+  (immediate GTK_RESIZE_IMMEDIATE))
+
+(define-enum GtkScrollType
+  (none GTK_SCROLL_NONE)
+  (step-backward GTK_SCROLL_STEP_BACKWARD)
+  (step-forward GTK_SCROLL_STEP_FORWARD)
+  (page-backward GTK_SCROLL_PAGE_BACKWARD)
+  (page-forward GTK_SCROLL_PAGE_FORWARD)
+  (jump GTK_SCROLL_JUMP))
+
+(define-enum GtkTroughType
+  (none GTK_TROUGH_NONE)
+  (start GTK_TROUGH_START)
+  (end GTK_TROUGH_END)
+  (jump GTK_TROUGH_JUMP))
+
+(define-enum GtkVisibility
+  (none GTK_VISIBILITY_NONE)
+  (partial GTK_VISIBILITY_PARTIAL)
+  (full GTK_VISIBILITY_FULL))
+
+;;;;;;;;;;; random stuff
+
+(define-boxed GtkAccelGroup
+ gtk_accel_group_ref
+ gtk_accel_group_unref)
+
+(define-object GtkAccelLabel (GtkLabel))
+
+(define-object GtkFontSelection (GtkNotebook))
+(define-object GtkFontSelectionDialog (GtkWindow))
+(define-object GtkItemFactory (GtkObject))
+
+(define-object GtkProgress (GtkWidget))
+(define-object GtkProgressBar (GtkProgress))
+
+(define-enum GtkProgressBarStyle
+  (continuous GTK_PROGRESS_CONTINUOUS)
+  (discrete GTK_PROGRESS_DISCRETE))
+
+(define-enum GtkProgressBarOrientation
+  (left-to-right GTK_PROGRESS_LEFT_TO_RIGHT)
+  (right-to-left GTK_PROGRESS_RIGHT_TO_LEFT)
+  (bottom-to-top GTK_PROGRESS_BOTTOM_TO_TOP)
+  (top-to-bottom GTK_PROGRESS_TOP_TO_BOTTOM))
+
+(export-enum GtkWindowType)
+(export-enum GtkCellType)
+(export-flags GtkDebugFlag)
+(export-flags GtkAccelFlags)
+;(export-enum GtkArrowType)
+(export-flags GtkAttachOptions)
+(export-enum GtkButtonBoxStyle)
+(export-enum GtkCurveType)
+(export-enum GtkDirectionType)
+(export-enum GtkJustification)
+(export-enum GtkMatchType)
+(export-enum GtkMenuFactoryType)
+(export-enum GtkMetricType)
+(export-enum GtkOrientation)
+(export-enum GtkPackType)
+(export-enum GtkPathPriorityType)
+(export-enum GtkPathType)
+(export-enum GtkPolicyType)
+(export-enum GtkPositionType)
+(export-enum GtkPreviewType)
+(export-enum GtkReliefStyle)
+(export-enum GtkResizeMode)
+(export-flags GtkSignalRunType)
+

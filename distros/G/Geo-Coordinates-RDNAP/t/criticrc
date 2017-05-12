@@ -1,0 +1,12 @@
+# These, I don't agree with
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-ControlStructures::ProhibitPostfixControls]
+[-Miscellanea::RequireRcsKeywords]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+# Too many false positives
+[-References::ProhibitDoubleSigils]
+
+# Not practical for this module
+[-ValuesAndExpressions::RequireNumberSeparators]

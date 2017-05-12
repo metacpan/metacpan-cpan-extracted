@@ -1,0 +1,38 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use strict;
+use warnings;
+
+Gimp::on_lib {
+   die "Not intended to be run from within GIMP!\n";
+};
+
+# on_net is called if connecting to an already open Perl-Server, or if
+# spawning a GIMP without an interface to run on.
+Gimp::on_net {
+  my $img=Gimp::Image->new(600,300,RGB);
+  my $bg=$img->layer_new(30,20,RGB_IMAGE,"Background",100,NORMAL_MODE);
+  $img->insert_layer($bg,0,1); # you have to add a layer after you create it
+  eval { Gimp::Display->new($img); }; # Show it (this slows things down)
+# do a bunch of operations just as a speed test, flushing in between
+  Gimp::Context->push;
+  for $i (0..255) {
+     Gimp::Context->set_background([$i,255-$i,$i]);
+     $bg->edit_fill(BACKGROUND_FILL);
+     Gimp::Display->displays_flush();
+  }
+  Gimp::Context->pop;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+example-net - Demonstrate use of Gimp-Perl "net mode"
+
+=head1 LICENSE
+
+Copyright Marc Lehmann.
+Distributed under the same terms as Gimp-Perl.

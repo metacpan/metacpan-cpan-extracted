@@ -1,0 +1,44 @@
+---
+abstract: 'Geographical regions and groupings using UN M.49 and CLDR data'
+author:
+  - 'Nick Patch <patch@cpan.org>'
+build_requires:
+  English: '0'
+  Pod::Man: '2.04'
+  Test::Most: '0.22'
+  open: '0'
+configure_requires:
+  Module::Build: '0.4004'
+  Software::License: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Region
+provides:
+  Geo::Region:
+    file: lib/Geo/Region.pm
+    version: '0.07'
+  Geo::Region::Constant:
+    file: lib/Geo/Region/Constant.pm
+    version: '0.07'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '1.35'
+  Moo: '1.001000'
+  Scalar::Util: '1.10'
+  namespace::clean: '0'
+  parent: '0'
+  perl: v5.8.1
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/patch/geo-region-pm5/issues
+  homepage: https://github.com/patch/geo-region-pm5
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/patch/geo-region-pm5.git
+version: '0.07'

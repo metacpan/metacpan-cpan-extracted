@@ -1,0 +1,23 @@
+---
+name: Geo-Coordinates-RDNAP
+version: 0.11
+author:
+  - Eugene van der Pijll
+abstract: Convert coordinates from/to the Dutch RD-NAP system
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Params::Validate: 0
+build_requires:
+  Test::More: 0.34
+recommends:
+  Test::Pod: 1
+provides:
+  Geo::Coordinates::RDNAP:
+    file: lib/Geo/Coordinates/RDNAP.pm
+    version: 0.11
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

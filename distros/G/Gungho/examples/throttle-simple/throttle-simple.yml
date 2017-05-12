@@ -1,0 +1,15 @@
+# Will throttle the requests so that urls are only fetched once 
+# every 5 seconds
+---
+provider:
+    module: File::Simple
+    config:
+        filename: examples/throttle-simple/url.txt
+components:
+    - Throttle::Simple
+throttle:
+    simple:
+        max_items: 1
+        interval: 5
+logs:
+    min_level: debug

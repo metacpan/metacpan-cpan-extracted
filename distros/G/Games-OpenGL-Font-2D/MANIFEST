@@ -1,0 +1,17 @@
+BUGS
+CHANGES
+CREDITS
+MANIFEST
+README
+SIGNATURE
+LICENSE
+TODO
+Makefile.PL
+lib/Games/OpenGL/Font/2D.pm	# the bitmap font models
+t/font.t
+data/courier.bmp
+t/chars.txt
+examples/font.pl
+examples/lib/SDL/App/FPS/MyFont.pm
+examples/lib/SDL/OpenGL/Cube.pm
+META.yml                                 Module meta-data (added by MakeMaker)

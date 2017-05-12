@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Geo-Hashing.t
+lib/Geo/Hashing.pm
+lib/Geo/Hashing/Source/Peeron.pm
+lib/Geo/Hashing/Source/Random.pm
+lib/sample.pl
+META.yml                                 Module meta-data (added by MakeMaker)

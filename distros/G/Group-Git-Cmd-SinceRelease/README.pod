@@ -1,0 +1,53 @@
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/Group-Git-Cmd-SinceRelease?branch=master"><img src="https://travis-ci.org/ivanwills/Group-Git-Cmd-SinceRelease.png?branch=master" alt="Group-Git-Cmd-SinceRelease"></a>
+<a href="https://coveralls.io/r/ivanwills/Group-Git-Cmd-SinceRelease?branch=master"><img src="https://coveralls.io/repos/ivanwills/Group-Git-Cmd-SinceRelease/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=head1 Group::Git::Cmd::SinceRelease
+
+Provides the L<Group::Git> sub sommand since-release which gets the number
+of commits each repository is ahead of the last release.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Group::Git::Cmd::SinceRelease
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Group-Git-Cmd-SinceRelease
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Group-Git-Cmd-SinceRelease
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Group-Git-Cmd-SinceRelease
+
+    Search CPAN
+        http://search.cpan.org/dist/Group-Git-Cmd-SinceRelease/
+
+    Source Code
+        git://github.com/ivanwills/Group-Git-Cmd-SinceRelease.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

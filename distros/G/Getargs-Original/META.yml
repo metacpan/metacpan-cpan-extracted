@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Getargs-Original
+version: 0.1
+license: perl
+distribution_type: module
+requires:
+  Class::MethodMaker: 1.12
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Getargs::Original:
+    file: lib/Getargs/Original.pm
+    version: 0.001
+generated_by: Module::Build version 0.21

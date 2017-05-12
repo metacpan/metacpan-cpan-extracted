@@ -1,0 +1,145 @@
+Genezzo-Contrib-Clustered 
+=========================
+
+Shared data cluster support for Genezzo
+
+Genezzo is an extensible database with SQL and DBI.  It is written in Perl.
+Basic routines inside Genezzo are overridden via Havok SysHooks.  Override
+routines provide support for shared data clusters.  Routines
+provide transactions, distributed locking, undo, and recovery.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To prepare for use of Genezzo::Clustered
+
+  genprepundo.pl
+
+  gendba.pl
+  >@havok.sql
+  >@syshook.sql
+  >@clustered.sql
+
+LIMITATIONS
+
+  This is pre-alpha software; don't use it to store any data you hope
+  to see again!
+
+  Transactions, Rollback, etc. are not fully implemented.  Process death
+  and necessary cleanup is not detected.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Genezzo
+  FreezeThaw
+
+  OpenDLM
+
+SEE ALSO
+
+  For more information, please visit the Genezzo homepage
+  at http://www.genezzo.com
+
+  also 
+  http://eric_rollins.home.mindspring.com/genezzo/ClusteredGenezzoDesign.html
+  http://eric_rollins.home.mindspring.com/genezzo/cluster.html
+  http://opendlm.sourceforge.net/
+
+TODO
+
+  1)   [Genezzo fix done]
+
+  2)   [Genezzo update] Need a exception mechanism when SQL is run to catch
+       errors such as running out of disk space.  Currently multi-row
+       SQL statements can result in partial results on disk when system
+       runs out of disk space.
+      
+  3)   Use new exception mechanism (above) to handle deadlock with DLM.
+       Currently program exits on any error from OpenDLM.  Need to modify
+       inline::C interface to provide deadlock return code distinct from
+       other errors.  Need to modify GLock Perl code to throw SQL exception.
+
+  4)   [Genezzo update done]
+
+  5)   done.
+
+  6)   [Genezzo update] Need way to invalidate entire buffer cache.
+       Simply release all blocks, don't write them to disk (disk write
+       should already have been done in commit case). 
+
+  7)   Invalidate buffer cache (using new mechanism above) before releasing 
+       all locks on commit or rollback.  Actually only invalidate 
+       non-system tablespace portion, see below.
+
+  8)   [Genezzo update done] 
+
+  9)   done
+
+  10)  [Genezzo fix] fix "mystery" writes.  These bogus writes create 
+       unnecessary write locks,  generate unnecessary undo, and confuse 
+       rollback code.  Solution may be to attach syshook to new attachment 
+       point instead of Genezzo::BufCa::DirtyScalar::STORE.  Yes, some of
+       the writes are not "mysteries".  They occur when a pre-existing
+       buffer cache block is reused -- the reloading of new data from disk
+       or memory into the block triggers the STORE callback.  The cure
+       is to attach the syshook in a more intelligent location that is
+       aware of the different cases.
+
+  11)  [Genezzo update] complete tablespace support.
+
+  12)  Use tablespace support (above) to restrict locking to non-system
+       tablespace tables.  Otherwise we need to lock additional blocks
+       (for system tables) already read at startup prior to syshook
+       initialization.  And locking system tables prevents other
+       instances from running in parallel.  [this may not solve problems...]
+
+  13)  [Genezzo update] add pre-havok command line param which specifies
+       routine to run prior to opening database.
+
+  14)  Use pre-havok (above) to perform recovery prior to opening database.
+       Havok/syshook routines won't run if database cannot be opened due
+       to corruption.  Also unlocked startup reads create race conditions.
+
+  13)  [Genezzo redesign] Storing table directory and free space list in
+       block zero of each tablespace prevents any concurrency of writes
+       with reads.  Also cached structures become invalid whenever block
+       zero is written.
+
+  14)  [Genezzo refactoring done] 
+
+  15)  Done.
+
+  99)  After the above, complete rest of development per Design Document:
+   a)  [Done] Detect blocks needing recovery via process_id in block.
+   b)  [Done] Recover dead processes
+   c)  etc...
+
+  100) Recognize incomplete undo blocks and read buddy block instead.
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2005 by Eric Rollins.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+Address bug reports and comments to rollins@acm.org

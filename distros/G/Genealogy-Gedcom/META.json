@@ -1,0 +1,70 @@
+{
+   "abstract" : "An OS-independent processor for GEDCOM data",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Genealogy-Gedcom",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Slurper" : "0.008",
+            "Genealogy::Gedcom::Date" : "2.06",
+            "Getopt::Long" : "0",
+            "Log::Handler" : "0.84",
+            "Moo" : "2.000002",
+            "Pod::Usage" : "0",
+            "Set::Array" : "0.3",
+            "Types::Standard" : "1.000005",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "1.51",
+            "Test::Simple" : "1.302052"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Gedcom"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Genealogy-Gedcom.git",
+         "web" : "https://github.com/ronsavage/Genealogy-Gedcom"
+      }
+   },
+   "version" : "0.88",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

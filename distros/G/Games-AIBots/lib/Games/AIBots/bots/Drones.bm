@@ -1,0 +1,37 @@
+# Utility package
+
+sub fetch {
+    $lastammo = $ammo;
+    $lastlife = $life;
+    move forward;
+
+    if (&bumped('bot')) {
+        disable shield;
+        fire laser * 5;
+        enable shield;
+        redo;
+    }
+
+    return if &bumped();
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+    redo;
+}
+
+sub zap {
+    $oel = $enemy_l;
+    fire energy if (&inperim('enemy') and $life > 1);
+    return if ($enemy_l != $oel - 2);
+    redo;
+}
+
+sub lazer {
+    disable shield;
+    $oel = $enemy_l;
+    fire laser if (&inperim('enemy') and $life > 1);
+    if ($oel <= $enemy_l) {
+        enable shield;
+        return;
+    }
+    redo;
+}

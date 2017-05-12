@@ -1,0 +1,45 @@
+Revision history for GeNUScreen-Config
+
+0.0.10 Do 24. Jun 21:41:00 CEST 2010
+	- scripts/genuscreen-config.pl: If no option -config is given and
+	  there is a file named 'config.hdf' in the current working
+	  directory, this is taken as configuration file for all commands.
+	- t/script-genuscreen-config.t: Don't use the list form of pipe
+	  open.
+
+0.0.9  Di 22. Jun 22:08:18 CEST 2010
+	- deactivate Test::Perl::Critic unless $ENV{TEST_AUTHOR} is set
+	  to a true value
+
+0.0.8  Mo 21. Jun 22:03:36 CEST 2010
+	- renamed script genuscreen-config to genuscreen-config.pl
+	- use Probe::Perl to find Perl interpreter to test script
+	- generate Makefile.PL as 'passthrough', hoping to get rid of
+	  perlcritic error regarding Perls prior to 5.6
+
+0.0.7  So 20. Jun 21:47:31 CEST 2010
+	- tests for script genuscreen-config
+	- use 5.006 (Perls prior to 5.6 don't support the three-argument
+	  form of open)
+	- minor tweaks for Perl::Critic
+
+0.0.6  Fr 18. Jun 11:32:09 CEST 2010
+	- Build.PL: create a Makefile.PL automatically so that
+	  prerequisites mentioned in Build.PL get automatically
+	  transfered to Makefile.PL
+
+0.0.5  Fr 30. Apr 14:47:33 CEST 2010
+	- Module GeNUScreen::Config::Diff holding differences between
+	  two configs
+	- GeNUScreen::Config can parse either webexports or config.hdf
+	- Script genuscreen-config can compare two config files
+	- more tests
+
+0.0.3  Mo 12. Apr 23:00:09 CEST 2010
+       - Methods read_webexport(), get_keys(), get_value() work
+       - command line script genuscreen-config uses these to print
+	 configuration
+
+0.0.1  Fri Apr  9 14:00:41 2010
+       Initial release.
+

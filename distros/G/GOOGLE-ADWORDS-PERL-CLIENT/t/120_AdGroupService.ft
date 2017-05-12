@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+#
+# Copyright 2011, Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Functional tests for the AdGroupService.
+#
+# Author: David Torres <api.davidtorres@gmail.com>
+
+use strict;
+use lib qw(t/util);
+
+use Test::More (tests => 19);
+use TestClientUtils qw(get_test_client);
+use TestAPIUtils qw(get_api_package create_campaign delete_campaign
+                    create_ad_group);
+
+# Getting API client for functional tests.
+my $client = get_test_client();
+if (!$client) {
+  plan skip_all => "Can't create test client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+# Test can use AdGroupService related classes.
+use_ok(get_api_package($client, "AdGroup"));
+use_ok(get_api_package($client, "AdGroupOperation"));
+use_ok(get_api_package($client, "BiddingStrategyConfiguration"));
+use_ok(get_api_package($client, "CpcBid"));
+use_ok(get_api_package($client, "CpmBid"));
+use_ok(get_api_package($client, "ManualCpcBiddingScheme"));
+use_ok(get_api_package($client, "Money"));
+
+# API dependencies for this test.
+my $campaign_cpc = create_campaign($client,
+    get_api_package($client, "BiddingStrategyConfiguration", 1)->new({
+      biddingStrategyType => "MANUAL_CPC"
+    }));
+my $campaign_cpm = create_campaign($client,
+    get_api_package($client, "BiddingStrategyConfiguration", 1)->new({
+      biddingStrategyType => "MANUAL_CPM"
+    }));
+
+# Test create AdGroup with ManualCPC strategy and keywordMaxCPC.
+my $ad_group_manual_cpc_name = "Test AdGroup Manual CPC - " .
+    POSIX::strftime("%s", localtime);
+my $bids = [
+    get_api_package($client, "CpcBid")->new({
+      bid => get_api_package($client, "Money")->new({microAmount => 180000}),
+    })
+  ];
+my $result = create_ad_group($client, $campaign_cpc->get_id(),
+                            $ad_group_manual_cpc_name, $bids);
+
+isa_ok($result, get_api_package($client, "AdGroup"));
+my $ad_group_manual_cpc_id = $result->get_id();
+ok($ad_group_manual_cpc_id, "Added Manual CPC AdGroup id is correctly set");
+is($result->get_name(), $ad_group_manual_cpc_name,
+   "Added Manual CPC AdGroup name is set correctly");
+my $manual_cpc_ad_group = $result;
+
+# Test create AdGroup with ManualCPC strategy and keywordMaxCPC.  Note that
+# the CpmBid has to be at least 25 cents to avoid BiddingError.BID_TOO_SMALL.
+my $ad_group_manual_cpm_name = "Test AdGroup Manual CPM - " .
+    POSIX::strftime("%s", localtime);
+$bids = [
+    get_api_package($client, "CpmBid")->new({
+      bid => get_api_package($client, "Money")->new({microAmount => 250000}),
+    })
+  ];
+my $manual_cpm_ad_group = create_ad_group($client, $campaign_cpm->get_id(),
+                          $ad_group_manual_cpm_name, $bids);
+
+isa_ok($manual_cpm_ad_group, get_api_package($client, "AdGroup"));
+my $ad_group_manual_cpm_id = $manual_cpm_ad_group->get_id();
+ok($ad_group_manual_cpm_id, "Added Manual CPM AdGroup id is correctly set");
+is($manual_cpm_ad_group->get_name(), $ad_group_manual_cpm_name,
+   "Added Manual CPM AdGroup name is set correctly");
+
+# Test update AdGroups
+my $new_adgroup_name = "New AdGroup Name - " . POSIX::strftime("%s", localtime);
+my $adgroup_to_update = get_api_package($client, "AdGroup")->new({
+  id => $manual_cpc_ad_group->get_id(),
+  name => $new_adgroup_name
+});
+
+my $operations = [
+  get_api_package($client, "AdGroupOperation")->new({
+    operand => $adgroup_to_update,
+    operator => "SET"
+  })
+];
+
+$result = $client->AdGroupService()->mutate({
+  operations => $operations
+});
+isa_ok($result, get_api_package($client, "AdGroupReturnValue"));
+is(scalar(@{$result->get_value()}), 1,
+   "Updated AdGroups returned array size is correct");
+is($result->get_value()->[0]->get_name(), $new_adgroup_name,
+   "Updated campaign name is correctly set");
+
+# Test delete AdGroups.
+$operations = [
+  get_api_package($client, "AdGroupOperation")->new({
+    operand => get_api_package($client, "AdGroup")->new({
+      id => $manual_cpc_ad_group->get_id(),
+      status => "DELETED"
+    }),
+    operator => "SET"
+  }),
+  get_api_package($client, "AdGroupOperation")->new({
+    operand => get_api_package($client, "AdGroup")->new({
+      id => $manual_cpm_ad_group->get_id(),
+      status => "DELETED"
+    }),
+    operator => "SET"
+  })
+];
+
+$result = $client->AdGroupService()->mutate({
+  operations => $operations
+});
+isa_ok($result, get_api_package($client, "AdGroupReturnValue"));
+is(scalar(@{$result->get_value()}), 2,
+    "Deleted AdGroups returned array size is correct");
+is(scalar(grep($_->get_status() eq "DELETED", @{$result->get_value()})), 2,
+   "Deleted AdGroups status is correct");
+
+# Cleaning up test dependencies.
+delete_campaign($client, $campaign_cpc->get_id());
+delete_campaign($client, $campaign_cpm->get_id());

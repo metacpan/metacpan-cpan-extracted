@@ -1,0 +1,40 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            64
+    BUFR edition:                      3
+
+Section 1:
+    Length of section:                 18
+    BUFR master table:                 0
+    Originating subcentre:             0
+    Originating centre:                98
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           1
+    Data subcategory:                  0
+    Master table version number:       13
+    Local table version number:        1
+    Year of century:                   9
+    Month:                             12
+    Day:                               13
+    Hour:                              6
+    Minute:                            0
+
+Section 3:
+    Length of section:                 22
+    Number of data subsets:            2
+    Observed data:                     1
+    Compressed data:                   1
+    Data descriptors unexpanded:       201129 203015 022040 203255 022040 201000 203000
+
+Subset 1
+
+     1  922040           -10000  NEW REFERENCE VALUE FOR 022040
+     2  022040           16.000  METEOROLOGICAL RESIDUAL TIDAL ELEVATION (SURGE OR OFFSET) [M]
+
+Subset 2
+
+     1  922040           -10000  NEW REFERENCE VALUE FOR 022040
+     2  022040           14.000  METEOROLOGICAL RESIDUAL TIDAL ELEVATION (SURGE OR OFFSET) [M]

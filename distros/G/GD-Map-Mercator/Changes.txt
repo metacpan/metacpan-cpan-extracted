@@ -1,0 +1,13 @@
+Change history for GD::Map::Mercator
+
+1.03	2008-Feb-27	D. Arnold
+	- fix docs get_image() => image()
+	- fix backkground => background typo
+	- fix support for #RRGGBB color specs
+
+1.02	2008-Feb-12	D. Arnold
+	- fix test suite to use correct skip count
+
+1.01	2008-Jan-24	D. Arnold
+	- initial rewrite from GD::Map
+

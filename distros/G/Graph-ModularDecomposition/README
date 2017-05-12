@@ -1,0 +1,82 @@
+Graph/ModularDecomposition version 0.15
+=======================================
+
+Graph::ModularDecomposition implements finding the modular
+decomposition tree of an n-vertex directed graph in O(n^2) time.
+Several graph algorithms use the modular decomposition tree as a
+building block.
+
+This implementation derives from Graph::Directed, providing additional
+methods.  To decompose an undirected graph, represent it as a directed
+graph: replace each undirected edge by two directed edges.
+
+The code here is based on algorithm 6.1 for modular decomposition of
+two-structures, from
+
+    A. Ehrenfeucht, H. N. Gabow, R. M. McConnell, and S. J. Sullivan,
+    "An O(n^2) Divide-and-Conquer Algorithm for the Prime Tree
+    Decomposition of Two-Structures and Modular Decomposition of
+    Graphs", Journal of Algorithms 16 (1994), pp. 283-294.
+    doi:10.1006/jagm.1994.1013
+
+There are O(m+n) time algorithms that perform better for sparse graphs
+where the number m of edges is small compared to n^2, see
+
+    R. M. McConnell and F. de Montgolfier, "Linear-time modular
+    decomposition of directed graphs", Discrete Applied Mathematics
+    145 (2005), pp. 198-209.  doi:10.1016/j.dam.2004.02.017
+
+A simple example application of these routines is to construct and
+search the modular decomposition tree of a directed graph to decide
+if it is node-series-parallel.  This can also be done using the
+Valdes-Tarjan-Lawler algorithm published in 1982, but the approach
+here also yields the modular decomposition tree.  The method
+classify() uses the modular decomposition tree to classify a
+directed graph as non-transitive, or for transitive digraphs, as
+series-parallel (linear or parallel modules only), decomposable
+(not series-parallel, but with at least one non-primitive module),
+indecomposable (primitive), decomposable but consisting of primitive
+or series modules only (only applies to graphs of at least 7 vertices),
+or unclassified (should never apply).
+
+WARNING: Treat this as alpha quality code.  It has only been
+tested on small graphs with up to a few dozen vertices.
+
+On a make test, Devel::Cover currently reports the following test
+coverage statistics (without Bitvector2 present):
+
+File                           stmt branch   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+...h/ModularDecomposition.pm   99.7   85.7   74.1  100.0  100.0  100.0   93.8
+
+
+INSTALLATION
+
+To install this module, do the usual:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module is for Perl 5.006 or later (it has been tested on 5.24),
+and depends on modules Carp and Exporter.  For the Pod tests,
+Test::More is required.
+
+Graph::ModularDecomposition is derived from Graph::Directed, which is
+part of Jarkko Hietaniemi's Graph module.  At least version 0.20105
+of Graph is required.
+
+Two routines to convert to Graph::Bitvector2 objects are available if
+Graph::Bitvector2 is installed.  This module has not yet been released.
+
+
+COPYRIGHT AND LICENCE
+
+This module is licensed on the same copyright terms as Perl.
+
+Copyright (C) 2004-17 by Andras Salamon <azs@cpan.org>
+

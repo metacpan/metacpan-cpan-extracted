@@ -1,0 +1,11 @@
+Changes
+examples/maze.pl
+lib/Games/Maze/FirstPerson.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/10-maze.t
+t/pod-coverage.t
+t/pod.t

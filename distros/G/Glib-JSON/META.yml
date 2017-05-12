@@ -1,0 +1,43 @@
+---
+abstract: 'Perl interface to the JSON-GLib library'
+author:
+  - 'Emmanuele Bassi <ebassi@gnome.org>'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380'
+license:
+  - lgpl_2_1
+meta-spec:
+  url: http://search.cpan.org/perldoc?CPAN::Meta::Spec
+  version: '2'
+name: Glib-JSON
+prereqs:
+  configure:
+    requires:
+      ExtUtils::MakeMaker: '6.30'
+  develop:
+    requires:
+      Pod::Coverage::TrustPod: '0'
+      Test::Pod: '1.41'
+      Test::Pod::Coverage: '1.08'
+  runtime:
+    requires:
+      Carp: '0'
+      Exporter: '0'
+      Glib: '0'
+      Glib::IO: '0'
+      Glib::Object::Introspection: '0.016'
+      strict: '0'
+      warnings: '0'
+  test:
+    requires:
+      Test::More: '0'
+release_status: stable
+resources:
+  bugtracker:
+    web: https://github.com/ebassi/perl-Glib-JSON/issues
+  homepage: https://wiki.gnome.org/Projects/JsonGlib
+  repository:
+    type: git
+    url: https://github.com/ebassi/perl-Glib-JSON.git
+    web: https://github.com/ebassi/perl-Glib-JSON
+version: '0.002'

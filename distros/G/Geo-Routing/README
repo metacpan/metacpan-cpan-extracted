@@ -1,0 +1,27 @@
+NAME
+    Geo::Routing - Interface to the gosmore(1) and OSRM
+    <http://routed.sourceforge.net/> routing libraries
+
+DESCRIPTION
+    This is experimental software with an unstable API. It'll be better
+    soon, but for now don't trust anything here.
+
+ATTRIBUTES
+  driver
+    What driver should we be using to do the routing?
+
+  driver_args
+    ArrayRef of arguments to pass to the driver.
+
+METHODS
+  route
+    Find a route based on the attributes you've passed in. Takes a
+    Geo::Gosmore::Query object with your query, returns a
+    Geo::Gosmore::Route object.
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

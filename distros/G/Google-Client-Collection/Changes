@@ -1,0 +1,250 @@
+==================================================
+Changes from 2015-04-17 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2016-04-16 23:29:10 +0000
+------------------------------------------
+
+  Change: 40145d9786433f15de75b8346f13ed97d7fd604b
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-04-17 00:28:39 +0000
+
+    Merge pull request #4 from ziali088/bugfix/file-export-return-value
+
+    return http content directly if its not json data we are expecting 
+
+  Change: ccfac8cfc8872681eaf1b7a87a497f69d026fe35
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-04-17 00:25:24 +0000
+
+    return http content directly if its not json data we are expecting 
+
+------------------------------------------
+version 0.004 at 2016-04-16 21:41:56 +0000
+------------------------------------------
+
+  Change: b38fca7e64efaa3a16d849c29dfcab54e66886de
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-04-16 22:41:56 +0000
+
+    Merge pull request #3 from ziali088/v4-access-token-via-cache
+
+    V4 access token via cache 
+
+  Change: 541c4904ed39fad49bd82b77393e050c9dbb6e9e
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-04-16 22:36:06 +0000
+
+    update readme 
+
+  Change: 84420bd0297195f9ced68d0eead490f6d15721dc
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-04-16 22:34:29 +0000
+
+    instantiate with a cache instead of an access_token, makes it easier
+    in object-oriented systems 
+
+  Change: f812901d6e2a81db4e7b0a05c774f9b817ede38c
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-03-22 09:15:13 +0000
+
+    Merge pull request #2 from Manwar/minor-pod-changes
+
+    - Made link to Github repo. 
+
+  Change: d197d61df3454faaed3dfda98a9857454f681ea2
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-03-20 20:30:10 +0000
+
+    - Made link to Github repo. 
+
+------------------------------------------
+version 0.003 at 2016-03-18 21:01:04 +0000
+------------------------------------------
+
+  Change: 97d33955655864017852e00d5f8565d53d573145
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-18 21:01:04 +0000
+
+    update pod for file client 
+
+------------------------------------------
+version 0.002 at 2016-03-18 17:07:53 +0000
+------------------------------------------
+
+  Change: da2af204fa26730fbcbea31d42bb5573ec2549c9
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-18 17:07:53 +0000
+
+    grr, need to change name of base client as its already taken 
+
+------------------------------------------
+version 0.001 at 2016-03-18 16:38:52 +0000
+------------------------------------------
+
+  Change: 335f163d9abe442d839a8e5ecf48e3eca9f858a0
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-18 16:38:52 +0000
+
+    move files down in pod 
+
+  Change: 49ad6d9a98a744104084ddbf7eeb38984576089c
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-03-18 16:36:03 +0000
+
+    Merge pull request #1 from ziali088/api-client
+
+    First version of client with a Files resource client 
+
+  Change: 1129187d4a58794e34b483e881eb9a5f98ca87bb
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-18 16:33:37 +0000
+
+    add docs for file client 
+
+  Change: c13723f6ca505a7ee11b499153e17fb802c61559
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-15 21:11:19 +0000
+
+    pod again 
+
+  Change: b7adea388e038b487df645748a9fd9bb13fa1f46
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-15 21:10:21 +0000
+
+    pod update 
+
+  Change: d13fc7a099e14de9b6e1ac8642a0c2df82bcf47f
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-15 21:09:47 +0000
+
+    update file clients tests to return data like Google does, add pod to
+    everything 
+
+  Change: 715d3d8c6da21a5048ad505521fee6c0a27f621b
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-15 07:44:35 +0000
+
+    use roles for useragent and token, test api of clients, test that all
+    clients use the same roles, feel good about urself :) 
+
+  Change: 217199f0b961ce04d7aee498a6f918b6b678302e
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-14 21:08:57 +0000
+
+    facelift! make clients use a role which defines the reusable http
+    transaction methods; use singletons to instantiate clients in
+    Google::Client so that we can manage passing in access_tokens after
+    instantiation 
+
+  Change: 1450fb44d341f5f348dfa0c417ffd4dc072b614c
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-13 22:08:15 +0000
+
+    no need to declare a default in the individual clients, it will be
+    the ua from base client if used properly 
+
+  Change: aa705124a403a55763756876a193da42cff87129
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-13 22:03:59 +0000
+
+    add tests for files client 
+
+  Change: e49a36425395c40a159320931b664a3b8c8f26b6
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-13 21:33:55 +0000
+
+    each client will require arguments to be declared individually 
+
+  Change: 9f4e11463bccb639f8411a0360bbf1c33ef189ee
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 22:55:08 +0000
+
+    methods for all file resources 
+
+  Change: 686b9f997203e160a19dc5aa31fb97be8b7913b1
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 22:19:51 +0000
+
+    the fun stuff! starting to add methods to file client, made request a
+    private method so its clear it can only be used within the heirarchy 
+
+  Change: 3a858c0c85a2b1ec9e248f856d3fa597ea19f6ad
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 21:48:50 +0000
+
+    start of files client 
+
+  Change: 940785f85812c9f86249fc988daf6f9aec81b075
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 19:19:03 +0000
+
+    fix link 
+
+  Change: d2f22d2eb4784d03efc019c570db95bf49e12a3b
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 19:17:26 +0000
+
+    remove API from namespace, it is bad practice 
+
+  Change: 7bc9a126ed74108790e181179605da1852f4112d
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 18:03:04 +0000
+
+    remove oauth client from lib, authentication would be better handled
+    separately #lesscoupling 
+
+  Change: 2a552b00293443b5657e730aeab0426127243ade
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 13:39:03 +0000
+
+    docs for request() 
+
+  Change: a61ebf5af2ec6d64eaf45f03848119ff52724750
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 13:31:44 +0000
+
+    dont need pragmas with Moo 
+
+  Change: 611cd6fdba2c29e361ac47f41c85f1ce98b56314
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 13:30:33 +0000
+
+    do some de-coupling: allow applications to do token storage. some
+    tests for request() 
+
+  Change: f6ff78b8a4496e5c364e0fd5e9cfd49ebede227a
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-12 11:27:43 +0000
+
+    pod update 
+
+  Change: 3cdf5b0de34b155d84ed3fafa5ad06ddf2e13109
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-06 23:20:42 +0000
+
+    introduce before request hook to check access_token validity, make
+    first subclass (Files) 
+
+  Change: fe165e30deb7d9d7c944e0aa6928d7569e75a5a5
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-06 17:12:29 +0000
+
+    set attributes we think may be needed 
+
+  Change: 9d4caec5c441e1562a1795a1b26327d20453a5e2
+  Author: Ali <ziali088@gmail.com>
+  Date : 2016-03-06 15:54:50 +0000
+
+    initial commit 
+
+  Change: 63446f9573005e36807f3458ceaf40f0390c5eb6
+  Author: Ali Zia <ziali088@gmail.com>
+  Date : 2016-03-06 15:41:51 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

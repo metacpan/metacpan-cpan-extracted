@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2008-05-26 06:18:52</currentTime>
+  <result>
+    <rowset name="characters" key="characterID" columns="name,characterID,corporationName,corporationID">
+      <row name="Ardent Dawn" characterID="1972081734" corporationName="Bellator Apparatus" corporationID="1044143901" />
+    </rowset>
+  </result>
+  <cachedUntil>2008-05-26 07:16:23</cachedUntil>
+</eveapi>

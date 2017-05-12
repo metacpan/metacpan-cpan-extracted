@@ -1,0 +1,81 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 c8c38804d3fc0b3c67d5a0430b1db0e0e4fbc691 Changes
+SHA1 0a1f6501029e374cd845d7cd907cd74112836f41 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 5260c20a15a4028742f533d72d33d700ee87e070 META.json
+SHA1 f111af82eb187e9ec6f8c5a844c829e832937c2b META.yml
+SHA1 a53b65eeb47124864d364c8fb2585af2a6f8d449 Makefile.PL
+SHA1 aea14a529977e9cb395f110e57c97a967483772a README
+SHA1 850adf96283d9e1474f6eea70689fe7c949533de debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 c54514b9549fb3c0ef2de8ee283bcf13fdd42fad debian/control
+SHA1 fdb6809263f96b4dfbbc33c2b14c0b836503effb debian/copyright
+SHA1 bc98b616145701b8c6a72aec5c0f447455332987 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 e2e3436c7bdeb56c020c572192e2e38d337b1607 debian/watch
+SHA1 b64fb5068a1de90a2527dc52757bc75d6906b9be devel/SignalHookIds.pm
+SHA1 dc8b26639673a58353e3452de442ba5a19eefe3d devel/enum.pl
+SHA1 8cbe3e511427f62d32456973909e9764fe3d0ed6 devel/main-context.pl
+SHA1 fb20aa464d27a531662c1a63cba3aa492f589950 devel/prop-nicks.pl
+SHA1 019a8ef4ab55ce0f67b769b5a2407daa7330622f devel/signal-ids.pl
+SHA1 73355d136f590d0180d4d176fb565e78422ddcaf devel/tie-one.pl
+SHA1 4ef1001289c58fc53446bc8a0209a79bf8c291af devel/tie-properties.pl
+SHA1 8a186201ad5bb8b10f232e3db9822e34fffaa7b5 lib/Glib/Ex/EnumBits.pm
+SHA1 cbd6c3e160725a51333fbe074aef49b9b83fb942 lib/Glib/Ex/FreezeNotify.pm
+SHA1 28b87af521a13d56b91fe2f8337b33678b60dc3a lib/Glib/Ex/ObjectBits.pm
+SHA1 ff92e7731ca4b7376a2409ff91cf8320acb8144c lib/Glib/Ex/SignalBits.pm
+SHA1 87880ad1963e293ee6c9d12c23a765e8fbd76778 lib/Glib/Ex/SignalIds.pm
+SHA1 641ee19bbf08c7a9c4b7d1667f7e776eb905504a lib/Glib/Ex/SourceIds.pm
+SHA1 cb345258e9779a91bac160dc7838c4e8a13654ad lib/Glib/Ex/TieProperties.pm
+SHA1 5c91a3095d942fc27b6713990010a97fd8b50a5d t/EnumBits.t
+SHA1 b7ca26ac74fa524151dcfd5978544418b84c2d3e t/FreezeNotify.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 ebe1d0aa37fe28527e1f54265fb563b4e08de642 t/ObjectBits.t
+SHA1 f4e0c2edbf1a1988393354ecaa821952c6734da1 t/SignalBits-import.t
+SHA1 708f473cfa9dd33ac748a02055e162c2ca6a877c t/SignalBits-pod.t
+SHA1 aeacb03ac056a2f2e629216fa6833f4a3c6372f5 t/SignalBits.t
+SHA1 6eebd134e8e03dd5b5139c6a9c7f6d00c46dcbc1 t/SignalIds.t
+SHA1 422e888bec0e0d411cc1a6a807d16378a5735f06 t/SourceIds.t
+SHA1 9f91fc8e27a14960d16f7eac9d7e8fd117b561b3 t/TieProperties-test-weaken.t
+SHA1 e874e1982673bb46db9d551502a00bceccf5b540 t/TieProperties.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 f1c935ab99ee8cc82296292139a6e556c494826b xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 b6ef8bcb703236d2ce0df4a39aaeb9cc3a8d7ca3 xtools/my-check-spelling.sh
+SHA1 fa07c8e559adbd1af5ba613e021991b0819fc7ba xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 6c48137d49c3619eca39796d49f26332eea55d4a xtools/my-kwalitee.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 830acfc76ae9239a2c36143c437a3ec7c6736a0a xtools/my-pc.sh
+SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
+SHA1 f90084e1d6f95abb12eea896cd1cc850402d7726 xtools/my-wunused.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFTk4MZLFMCIV9q3ToRAjANAJ4/H0Jb5Wru17S+9xta336VH/+x2ACfYsBa
+4eUQv3/8pjYMm2BCh5J+dJA=
+=n2em
+-----END PGP SIGNATURE-----

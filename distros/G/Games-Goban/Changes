@@ -1,0 +1,23 @@
+Revision history for Perl extension Games::Goban.
+
+1.102     2013-09-24 20:54:18 America/New_York
+          replace busted test file
+
+1.101     2013-08-24 08:52:59 America/New_York
+          update bugtracker and repo
+
+1.100     2006-11-06
+          kwalitee improvement
+
+0.03      2003-12-05 16:47:10
+          rewrote hoshi calculation
+          enabled arbitrary (integer, 4 < n < 27) board sizes
+
+0.02      2003-12-04 18:31:06
+          fixed documentation bug 1722 (method is "move" not "play")
+          reorganized files
+
+0.01      2002-01-11 11:50:01
+          original version; created by h2xs 1.21 with options -XA -n
+          Games::Goban
+

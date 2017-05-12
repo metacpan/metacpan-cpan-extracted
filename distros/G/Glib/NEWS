@@ -1,0 +1,1223 @@
+Overview of changes in Glib 1.325 (stable)
+============================================
+* Try to avoid a possible hang in t/9.t
+* Handle removing '.' in @INC for perl-5.26.0 compatibility
+
+Overview of changes in Glib 1.324 (stable)
+============================================
+
+* Fix a POD error in the Glib::ParamSpec whatis entry
+* Fix POD for the benefit of whatis (Bugzilla #772329)
+* Fix typos in error message and POD (Bugzilla #772328)
+
+Overview of changes in Glib 1.323 (stable)
+============================================
+
+* Fix typos (Bugzilla #760065)
+* Docs: add missing blurbs for the benefit of 'whatis' (Bugzilla #753466)
+
+Overview of changes in Glib 1.322 (stable)
+============================================
+
+* Win32: only export the GVariant conversion symbols when available
+* Glib.exports: updated copyright date
+
+Overview of changes in Glib 1.321 (stable)
+============================================
+
+* GBoxed.xs: Check Glib version prior to enabling GBoxed types; RT#111150;
+  patch submitted by Torsten Lüttgert <st-cpan at luettgert.de>
+
+Overview of changes in Glib 1.320 (stable)
+============================================
+
+* Makefile.PL: added IRC link to metadata block
+* Glib::GenPod: supply default namespace blurbs (Bugzilla #753468)
+* Properly escape dash in generated API index POD (Bugzilla #753467)
+
+Overview of changes in Glib 1.314 (unstable)
+============================================
+
+* Fix compilation on libglib < 2.26
+* Add Glib::Bytes, a wrapper for GBytes
+* Sort the output of podify_signals in a deterministic way (BZ#743863)
+
+Overview of changes in Glib 1.313 (unstable)
+============================================
+
+* Fix compilation and test issues with Glib::Variant::ParseError
+* Add a short explanatory comment to the lazy-loading system
+
+Overview of changes in Glib 1.312 (unstable)
+============================================
+
+* Fix incorrect version in Glib::GenPod
+
+Overview of changes in Glib 1.311 (unstable)
+============================================
+
+* Add the GVariant converters to the win32 linker export list
+* Fix Glib::Variant::classify on big-endian machines
+
+Overview of changes in Glib 1.310 (unstable)
+============================================
+
+* Add Glib::Variant and Glib::VariantType
+* Add char_byte and char_byte_ornull typemaps
+* Reorder and reformat our header and typemap a little
+* Hush a compiler warning in GMainLoop.xs
+
+Overview of changes in Glib 1.308 (stable)
+==========================================
+
+* Release to replace stable version of Glib deleted from CPAN by accident;
+  closes RT#110119.  There are no code changes for this release.
+
+Overview of changes in Glib 1.307 (stable)
+==========================================
+
+* Fix hang of t/9.t on FreeBSD/NetBSD perls not built with "-pthread"; 
+  closes RT#82349
+* Add code comments about the peculiar Glib::InitiallyUnowned sink handling
+
+Overview of changes in Glib 1.306 (stable)
+==========================================
+
+* Fix libpthread-related building issues on OpenBSD
+
+Overview of changes in Glib 1.305 (stable)
+==========================================
+
+* Disable the warning message when handing callbacks over to the main loop.
+
+Overview of changes in Glib 1.304 (stable)
+==========================================
+
+* Fix compilation against glib < 2.34.0.
+
+Overview of changes in Glib 1.303 (stable)
+==========================================
+
+* Revert the change to ref counting of initial wrappers of custom subclasses,
+  introduced in Glib 1.300.  It caused issues with subclasses inheriting from
+  Glib::InitiallyUnowned.
+* Fix a test failure with perl >= 5.19.4.
+* Create a GType for GSpawnFlags and register it with the bindings.
+
+Overview of changes in Glib 1.302 (stable)
+==========================================
+
+* Avoid misusing the macro PL_na, thus preventing issues when Glib is used in
+  conjunction with certain XS modules, among them XML::Parser and
+  String::Approx.
+* Avoid memory corruption when registering boxed synonyms repeatedly.
+
+Overview of changes in Glib 1.301 (stable)
+==========================================
+
+* t/options.t: skip tests in non-UTF-8 locales; fixes RT#83490
+
+Overview of changes in Glib 1.300 (stable)
+==========================================
+
+* Stable release to coincide with the release of Perl 5.18.0
+
+ Since 1.28x (The previous stable release)
+ -----------------------------------------
+ * Ensure timely destruction of initial wrapper of custom subclasses
+ * Start changing module version numbers in all Perl modules in the
+   distribution, not just lib/Glib.pm; (Bugzilla #690464)
+ * Make Glib::Object subclassing more robust.  This should in particular fix
+   issues revealed by the change to hash randomization introduced in perl
+   5.17.6.
+ * Correctly handle utf8-encoded strings in GPerlArgv.  This should fix issues
+   seen with utf8-encoded strings in @ARGV with, for example, Gtk2->init.
+
+Overview of changes in Glib 1.291 (unstable)
+============================================
+
+* Ensure timely destruction of initial wrapper of custom subclasses
+* Start changing module version numbers in all Perl modules in the
+  distribution, not just lib/Glib.pm; (Bugzilla #690464)
+
+Overview of changes in Glib 1.290 (unstable)
+============================================
+
+* Make Glib::Object subclassing more robust.  This should in particular fix
+  issues revealed by the change to hash randomization introduced in perl
+  5.17.6.
+* Correctly handle utf8-encoded strings in GPerlArgv.  This should fix issues
+  seen with utf8-encoded strings in @ARGV with, for example, Gtk2->init.
+
+Overview of changes in Glib 1.280 (stable)
+==========================================
+
+ Since 1.26x (the previous stable series)
+ ----------------------------------------
+ * Correctly handle the boxed type for GError.
+ * Ensure that custom signal marshallers are always used irregardless of
+   the spelling used for the signal name.
+ * Make the stack handling of some marshallers more robust, in
+   preparation for custom Glib::Boxed converters that call back into
+   Perl code.
+ * Add new C API gperl_register_boxed_synonym.
+
+ Since 1.270
+ -----------
+ * Fix building with perl <= 5.14.
+
+Overview of changes in Glib 1.270 (unstable)
+============================================
+
+* Correctly handle the boxed type for GError.
+* Ensure that custom signal marshallers are always used irregardless of the
+  spelling used for the signal name.
+* Make the stack handling of some marshallers more robust, in
+  preparation for custom Glib::Boxed converters that call back into Perl
+  code.
+* Add new C API gperl_register_boxed_synonym.
+
+Overview of changes in Glib 1.262 (stable)
+==========================================
+
+* Properly specify our dependencies.
+* Distriubte a missing test file.
+
+Overview of changes in Glib 1.261 (stable)
+==========================================
+
+* Add NEWS entries comparing 1.260 to 1.24x
+* Add the 64 bit integer converters to the linker exports
+* updated README file similar to Cairo (RT#74870)
+* Created %meta_merge which follows v2 of meta-spec
+
+Overview of changes in Glib 1.260 (stable)
+==========================================
+
+ Since 1.24x (the previous stable series)
+ ----------------------------------------
+ * Make Glib::Object ref-counting compatible with perl >= 5.16.
+ * Make signal marshalling more thread-safe.
+ * Export the constants SOURCE_CONTINUE and SOURCE_REMOVE on request.
+ * Create and register a GType for GConnectFlags.
+ * Increase compatibility with older perls.
+
+ Since 1.253
+ -----------
+ * Tell CPAN to ignore POD fragments in Makefile.PL.
+ * Document that SOURCE_CONTINUE and _REMOVE can be exported.
+
+Overview of changes in Glib 1.253
+=================================
+
+* Export the constants SOURCE_CONTINUE and SOURCE_REMOVE on request.
+  (RT #48070)
+* Create and register a GType for GConnectFlags.
+
+Overview of changes in Glib 1.252
+=================================
+
+* Make the recent thread-safety improvements work for non-threaded perls too.
+
+Overview of changes in Glib 1.251
+=================================
+
+* Make signal marshalling more thread-safe.  When a signal handler is invoked
+  from a foreign thread without associated Perl interpreter, hand the
+  marshalling over to the main loop which in turn later wakes up the main
+  thread and lets it handle the request.  Since this approach is experimental,
+  there is debug print for now whenever it is used:
+    *** GPerl asked to invoke callback from a foreign thread;
+        handing it over to the main loop
+
+Overview of changes in Glib 1.250
+=================================
+
+* Add a fallback implementation of SvMAGIC_set; Bugzilla bug #665266
+* Avoid a syntax error on older perls
+* Glib::Object: make ref-counting compatible with perl >= 5.16 (RT#73650)
+* Fix some typos in POD (RT#73616)
+
+Overview of changes in Glib 1.242
+=================================
+
+* Glib::GenPod: fix typo in default pspec values
+  (https://bugzilla.gnome.org/show_bug.cgi?id=665331)
+* Glib::GenPod: delete a duplicate key in %basic_types
+  (https://bugzilla.gnome.org/show_bug.cgi?id=665332)
+* Change the FSF's address in all GPL license notices (RT#72664)
+
+Overview of changes in Glib 1.241
+=================================
+
+* Register the boxed type Glib::GString, based almost completely on a patch by
+  Emmanuel Rodriguez (https://bugzilla.gnome.org/show_bug.cgi?id=663881).
+* Fix linking against perl < 5.9.4 on some platforms; Do not use
+  SvREFCNT_inc_simple_void_NN as that was introduced in perl 5.9.4, which came
+  after the 5.8.0 we require.
+
+Overview of changes in Glib 1.240
+=================================
+
+ Since 1.22x (the previous stable series)
+ ----------------------------------------
+  * Add Glib::Param::GType support.
+  * Add Glib::Log->set_default_handler() and
+    Glib::Log::default_handler().
+  * Add Glib::ParamSpec->override() and get_redirect_target().
+  * Add Glib::Param->get_default_value().
+  * Support the fundamental type Glib::GType.
+  * Correctly handle variables with "magic" attached, like tied
+    variables.
+  * Don't copy boxed objects when passing from Perl to C.
+
+ Since 1.233
+ -----------
+  * Nada.
+
+Overview of changes in Glib 1.233
+=================================
+
+* Change the way we handle objects with floating references again, to be more
+  compatible.
+
+Overview of changes in Glib 1.232
+=================================
+
+* In the documentation generated by Glib::GenPod, show default values for
+  properties.
+* Correctly handle objects which have floating references.
+* When checking whether a variable is a reference, correctly account for "get
+  magic", which occurs for example for tied variables.  Add gperl_sv_is_ref for
+  other bindings to use.
+
+Overview of changes in Glib 1.231
+=================================
+
+* Add Glib::Log->set_default_handler() and Glib::Log::default_handler().
+* Add Glib::ParamSpec->override() and get_redirect_target().
+* Add Glib::Param->get_default_value().
+* Make Glib::ParamSpec->value_validate() copy boxed objects if necessary.
+* Support the fundamental type Glib::GType.
+* Correctly store and look up custom signal marshallers.
+* Fix fetching default values for unichar properties of custom subclasses.
+* Fix subclassing with {pspec, get, set}-style properties.
+* Allow the Glib::Object "magic" to coexist with other extensions' "magic".
+* Make Glib::GenPod create docs for child and style properties.
+* Improve the documentation in a few places.
+* Fix a few build and test failures.
+
+Overview of changes in Glib 1.230
+=================================
+
+* Don't copy boxed objects when passing from Perl to C.  This mainly affects
+  Perl subclasses which have signal handlers that involve boxed objects and use
+  signal_chain_from_overridden() to call parent signal handlers.  With this
+  change, the parent's handlers will now operator on the same object that the
+  Perl code sees, and changes consequently propagate properly.
+* Correctly handle variables with "set" magic attached in the default
+  SET_PROPERTY implementation for custom Perl subclasses.
+* Add Glib::Param::GType support.
+* Make Glib::Flags::bool() and as_arrayref() callable as methods.
+* Allow undef for default_value in Glib::ParamSpec->string.
+* Improve the documentation in a few places.
+* Add gperl_hv_take_sv, a wrapper for hv_store, to our C API.
+* Fix some build and test failures.
+
+Overview of changes in Glib 1.224
+=================================
+
+* Glib::ParamSpec->value_validate(): copy boxed objects if necessary.
+* Fix a test failure.
+
+Overview of changes in Glib 1.223
+=================================
+
+* Fix a few test failures.
+
+Overview of changes in Glib 1.222
+=================================
+
+* Properly handle slashes in copyright footers passed to Glib::MakeHelper.
+* Fix a test failure on s390.
+
+Overview of changes in Glib 1.221
+=================================
+
+* Fix a few build and test suite issues.
+
+Overview of changes in Glib 1.220
+=================================
+
+ Since 1.20x (the previous stable series)
+ ----------------------------------------
+  * Add constants Glib::SOURCE_CONTINUE and SOURCE_REMOVE for use in
+    source-type callbacks.
+  * Add Glib::Child::watch_add.
+  * Add Glib::OptionContext and Glib::OptionGroup.
+  * Allow calling Glib::Flags->as_arrayref directly, as an alternative to the
+    @{} syntax.
+  * Add Glib::ParamSpec->value_validate and Glib::ParamSpec->value_cmp.
+
+ Since 1.214
+ -----------
+  * Nada.
+
+Overview of changes in Glib 1.214
+=================================
+
+* Fix a leak in the handling of callback arguments.
+* Fix many errors and glitches in the POD generated by Glib::GenPod.
+* Fix some test suite issues and documentation glitches.
+
+Overview of changes in Glib 1.213
+=================================
+
+* Make the various Glib::Flags methods more robust with respect to receiving
+  undefined input.
+* Correctly handle signals with no return type when invoking signal class
+  closures.
+* Deprecate Glib::MakeHelper->get_configure_requires_yaml in favor of
+  ExtUtils::MakeMaker's new META_MERGE and META_ADD features.
+
+Overview of changes in Glib 1.212
+=================================
+
+* Allow calling Glib::Flags->as_arrayref directly, as an alternative to the @{}
+  syntax.
+* Add Glib::ParamSpec->value_validate and Glib::ParamSpec->value_cmp.
+* Add documentation for Glib->filename_to_uri and filename_from_uri.
+* Always use Data::Dumper instead of Storable on MSWin32 for serialization work
+  during documentation generation.
+* Make sure that messages with % chars in them make it through Glib->log and
+  friends safely.
+
+Overview of changes in Glib 1.211
+=================================
+
+* Add Glib::OptionContext and Glib::OptionGroup, wrapping glib's command line
+  option parser.
+* Make the internal package registration functions more robust.
+
+Overview of changes in Glib 1.210
+=================================
+
+* Add constants Glib::SOURCE_CONTINUE and SOURCE_REMOVE for use in source-type
+  callbacks.
+* Add Glib::Child::watch_add.
+* Provide gperl_register_boxed_alias, gperl_register_fundamental_alias, and
+  gperl_register_object_alias to register aliases for other registered types.
+* Improve the error message that occurs when an unknown interface is
+  encountered while registering a new type.
+
+Overview of changes in Glib 1.200
+=================================
+
+ Since 1.18x (the previous stable series)
+ ----------------------------------------
+  * Add Glib::Flags::new, a constructor for flags objects.
+  * Add Glib::strerror and Glib::strsignal.
+  * Increase the robustness of stack handling in Glib::Object::get, of
+    Glib::ParamSpec handling in general, of overloaded Glib::Flags operators,
+    and of the Glib::Object lazy-loader.
+
+ Since 1.193
+ -----------
+  * Update the TODO file.
+
+Overview of changes in Glib 1.193
+=================================
+
+* Make the stack handling in Glib::Object::get more robust.
+* Make the Glib::ParamSpec constructors return undef on failure.
+* Make sure the Glib::Object lazy loader can handle being invoked on packages
+  which aren't registered with the Glib type system.
+* The recent fix for user data handling in callback invocation involved a
+  change of semantics: modifying the user data directly had no effect anymore.
+  Change that back while still fixing the original bug.
+
+Overview of changes in Glib 1.192
+=================================
+
+* Fix the POD index page generation.
+
+Overview of changes in Glib 1.191
+=================================
+
+* Make overloaded Glib::Flags operators more robust.
+* Handle unset GParamSpecs gracefully.
+
+Overview of changes in Glib 1.190
+=================================
+
+* Add Glib::Flags::new, a constructor for flags objects.
+* Add Glib::strerror and Glib::strsignal.
+
+Overview of changes in Glib 1.183
+=================================
+
+* Make Glib::signal_add_emission_hook work even if called before any object of
+  the concerned type has been created.
+* Overload '!=' for Glib::Flags.
+* Avoid prematurely destroying callback user data in certain cases.
+* Improve the documentation of Glib::Object::Subclass' GET_PROPERTY and
+  SET_PROPERTY.
+
+Overview of changes in Glib 1.182
+=================================
+
+* Fix build and test suite issues, especially on MSWin32 and cygwin.
+
+Overview of changes in Glib 1.181
+=================================
+
+* Fix Makefile.PL problems encountered by CPAN testers.
+
+Overview of changes in Glib 1.180
+=================================
+
+ Since 1.16x (the previous stable series)
+ ----------------------------------------
+  * Add Glib::MakeHelper::get_configure_requires_yaml.
+  * Add Glib::Object::signal_get_invocation_hint.
+  * Make our lazy-loader compatible with perl-5.10.0.
+  * Allow Perl-derived GObjects to override GInterfaces that are implemented by
+    parent classes.
+  * Correct the way we check values for definedness: use the new function
+    gperl_sv_is_defined.  For convenience, also add gperl_sv_is_array_ref,
+    gperl_sv_is_code_ref, and gperl_sv_is_hash_ref.
+
+ Since 1.174
+ -----------
+  * Tell the compiler to always look for our headers in '.' first.
+  * Add a hyphen to the NAME section of generated POD indices.
+
+Overview of changes in Glib 1.174
+=================================
+
+* Increase compatibility with different `make´s by not using Makefile
+  conditionals for building our documentation.
+
+Overview of changes in Glib 1.173
+=================================
+
+* Make Glib::Type::list_values return the value of each enum/flags entry in
+  addition to the name and nickname.
+
+Overview of changes in Glib 1.172
+=================================
+
+* Make inproper usage of Glib::Object methods result in an error message and
+  not in a segfault.
+* Add Glib::Object::signal_get_invocation_hint.
+* In our lazy-loading machinery for packages, change the way we clear @ISA
+  arrays to avoid problems with perl 5.10.0.
+* Add new helpers to the C API: gperl_sv_is_defined, gperl_sv_is_array_ref,
+  gperl_sv_is_code_ref, and gperl_sv_is_hash_ref.
+* Allow Perl-derived GObjects to override GInterfaces that are implemented by
+  parent classes.
+* Load GInterface types immediately, instead of lazily.  This makes sure
+  GInterfaces are set up by the time they are needed.
+
+Overview of changes in Glib 1.171
+=================================
+
+* Correct the way we check values for definedness: add gperl_sv_defined(), an
+  XS version of perl's defined(), and use it everywhere.  Among other things,
+  this should fix the problems where tied values were reported as undefined.
+* Fix some build issues.
+
+Overview of changes in Glib 1.170
+=================================
+
+* Make our build output prettier.
+* Add Glib::MakeHelper::get_configure_requires_yaml.
+* Use the above to add configure_requires information to META.yml in order to
+  publicize our Makefile.PL-time requirements.
+* Try to fix some portability issues.
+
+Overview of changes in Glib 1.164
+=================================
+
+* Allow Perl-derived GObjects to override GInterfaces that are implemented by
+  parent classes.
+* Load GInterface types immediately, instead of lazily.  This makes sure
+  GInterfaces are set up by the time they are needed.
+
+Overview of changes in Glib 1.163
+=================================
+
+* In our lazy-loading machinery for packages, change the way we clear @ISA
+  arrays to avoid problems with perl 5.10.0.
+* Fix a few build issues.
+
+Overview of changes in Glib 1.162
+=================================
+
+* Fix a build failure in the documentation generation phase.  [Andreas König]
+
+Overview of changes in Glib 1.161
+=================================
+
+* Fix an assertion in Glib::Object::CLONE.
+* Make Makefile.PL more friendly to CPAN testers.
+
+Overview of changes in Glib 1.160
+=================================
+
+ Since 1.14x (the previous stable series)
+ ----------------------------------------
+  * Add Glib::get_user_special_dir.
+  * Add Glib::KeyFile::load_from_dirs.
+  * Add Glib::MainContext::is_owner.
+  * Add Glib::Timeout::add_seconds.
+  * Improve the automatic documentation generator.
+
+ Since 1.153
+ -----------
+  * Nothing.
+
+Overview of changes in Glib 1.153
+=================================
+
+* Add char_own_ornull and gchar_own_ornull typemaps.  [Torsten]
+* Fix some win32 test failures.  [Torsten]
+* Make it possible to document specific packages in different POD files by
+  providing a new =for object variant.  [Torsten]
+* Parse preprocessor conditionals in the XS code to add Since: tags to methods'
+  POD.  [Torsten]
+
+Overview of changes in Glib 1.152
+=================================
+
+* Wrap g_main_context_is_owner.  [Torsten]
+* Wrap g_timeout_add_seconds.  [Torsten]
+
+Overview of changes in Glib 1.151
+=================================
+
+* Use BSD make syntax on BSD systems by default.  [Slaven Rezic, Torsten]
+* Wrap g_key_file_load_from_dirs.  [Torsten]
+* Wrap g_get_user_special_dir.  [Torsten]
+
+Overview of changes in Glib 1.150
+=================================
+
+* Make it possible to mark objects and methods as deprecated with
+  Glib::ParseXSDoc and Glib::GenPod.  [Emmanuele]
+
+Overview of changes in Glib 1.144
+=================================
+
+* Use BSD make syntax on BSD systems by default.  [Slaven Rezic, Torsten]
+
+Overview of changes in Glib 1.143
+=================================
+
+* Call g_threads_init before g_type_init.  [Torsten]
+
+Overview of changes in Glib 1.142
+=================================
+
+* Switch back to WIN32 instead of G_OS_WIN32 to avoid compilation problems.
+  [Torsten]
+* Use _strtoi64 and _strtoui64 on Win32 for large integer conversion.
+  [Serguei Trouchelle]
+
+Overview of changes in Glib 1.141
+=================================
+
+* Fix a compilation problem on Win32.  [Torsten]
+* Fix some POD errors.  [Torsten]
+* Fix a few test suite issues.  [Torsten]
+
+Overview of changes in Glib 1.140
+=================================
+
+ Since 1.12x (the previous stable series)
+ ----------------------------------------
+  * Add accessors for double types to Glib::KeyFile.
+  * Add Glib::BookmarkFile
+  * Add Glib::Object::find_property.
+
+ Since 1.132
+ -----------
+  * Fix two test suite issues.
+
+Overview of changes in Glib 1.132
+=================================
+
+* Do some minor code cleanups here and there.  [Torsten]
+
+Overview of changes in Glib 1.131
+=================================
+
+* Add Glib::Object::find_property.  [Emmanuele]
+
+Overview of changes in Glib 1.130
+=================================
+
+* Wrap new GKeyFile API:  [Torsten]
+  - Glib::KeyFile::set_double,
+  - Glib::KeyFile::get_double,
+  - Glib::KeyFile::set_double_list, and
+  - Glib::KeyFile::get_double_list
+* Register GInitiallyUnowned as Glib::InitiallyUnowned.  [Torsten]
+* Add GBookmarkFile bindings.  [Emmanuele]
+
+Overview of changes in Glib 1.120
+=================================
+
+ Since 1.10x (the previous stable series)
+ ----------------------------------------
+  * Comepletely revamp the way GObject types are mapped to Perl package names.
+    The new algorithm is more robust and correct.
+  * Add custom 64 bit integer handlers.
+  * Add Glib::filename_display_name and Glib::filename_display_basename.
+  * Improve thread safety.
+  * Fix many bugs.
+
+ Since 1.118
+ -----------
+  * Nada.
+
+Overview of changes in Glib 1.118
+=================================
+
+* Improve the thread safety of Glib by correctly setting up perl's thread-local
+  storage in a few strategic places.  [Torsten]
+
+Overview of changes in Glib 1.117
+=================================
+
+* Fix compilation against perl 5.8.8.  [Torsten]
+
+Overview of changes in Glib 1.116
+=================================
+
+* Fix a bug that caused custom objects with properties that have no getter or
+  setter to misbehave on perl 5.8.8.  [muppet]
+* Optimize Glib::ParseXSDoc to use less memory.  [muppet]
+
+Overview of changes in Glib 1.115
+=================================
+
+* Don't try to be thread safe if perl wasn't built with threading support.
+  [Wim Lewis]
+* Don't create unique package names for types that have an ancestor which has
+  the "don't warn about unregistered subclasses" bit set.  Use this ancestor's
+  package name to represent affected types.  [muppet]
+
+Overview of changes in Glib 1.114
+=================================
+
+* Add bindings for g_filename_display_name and g_filename_display_basename.
+  [muppet]
+* Fix a crash that occured when properties of undead objects were modified.
+  [muppet]
+* Fix the undead object macros to work on 64-bit platforms.  [Rafael
+  Garcia-Suarez]
+* Completely redo the way GObject types are mapped to package names.  This
+  fixes the problem uncovered by the recent GInitiallyUnowned issue.  See the
+  ChangeLog for a detailed description of the changes.  [muppet, Torsten]
+
+Overview of changes in Glib 1.113
+=================================
+
+* Improve the automatic interface registration for objects by making it
+  independent of the order of package name registration.  [Torsten]
+
+Overview of changes in Glib 1.112
+=================================
+
+* Allow undef for some arguments in the Glib::KeyFile API.  [Emmanuele]
+* Register the package names Glib::Int64 and Glib::UInt64 for gint64 and
+  guint64 fundamentals.  [Torsten]
+
+Overview of changes in Glib 1.111
+=================================
+
+* Copy boxed objects coming from the GObject property interface to avoid
+  holding on to dead pointers.  [muppet]
+
+Overview of changes in Glib 1.110
+=================================
+
+* Add automatic package registration for interfaces.  [Torsten]
+* Fix a serious reference counting bug.  [Steven Walter]
+* Add custom 64 bit integer handlers that convert to and from strings if
+  necessary.  [Torsten]
+
+Overview of changes in Glib 1.105
+=================================
+
+* Fix a bug that caused custom objects with properties that have no getter or
+  setter to misbehave on perl 5.8.8.  [muppet]
+
+Overview of changes in Glib 1.104
+=================================
+
+* Don't use threading stuff if perl wasn't build with threading support.
+  [Wim Lewis]
+* Don't create unique package names for types that have an ancestor which has
+  the "don't warn about unregistered subclasses" bit set.  Use this ancestor's
+  package name to represent affected types.  [muppet]
+
+Overview of changes in Glib 1.103
+=================================
+
+* Fix a crash that occured when properties of undead objects were modified.
+  [muppet]
+* Fix the undead object macros to work on 64-bit platforms.  [Rafael
+  Garcia-Suarez]
+* Completely redo the way GObject types are mapped to package names.  This
+  fixes the problem uncovered by the recent GInitiallyUnowned issue.  See the
+  ChangeLog for a detailed description of the changes.  [muppet, Torsten]
+* Allow undef for some arguments in the Glib::KeyFile API.  [Emmanuele]
+
+Overview of changes in Glib 1.102
+=================================
+
+* Copy boxed objects coming from the GObject property interface to avoid
+  holding on to dead pointers.  [muppet]
+* Fix a serious reference counting bug.  [Steven Walter]
+
+Overview of changes in Glib 1.101
+=================================
+
+* Fix a test suite issue.  [Torsten]
+
+Overview of changes in Glib 1.100
+=================================
+
+ Since 1.08x (the previous stable series)
+ ----------------------------------------
+  * Add API that allows binding developers to specify conversion functions when
+    registering wrappers for custom fundamental types.
+  * Add Glib::Object::signal_add_emission_hook,
+    Glib::Object::signal_remove_emission_hook and Glib::Markup::escape_text.
+  * Add Glib::KeyFile and Glib::CodeGen.
+  * Fix a thread-related crasher in the default log handler.
+
+ Since 1.093
+ -----------
+  * Delete some cruft in CodeGen.pm.  [muppet]
+
+Overview of changes in Glib 1.093
+=================================
+
+* Take out the Gtk2-specific portions of Gtk2::CodeGen, make it extensible, and
+  call it Glib::CodeGen.  [muppet]
+
+Overview of changes in Glib 1.092
+=================================
+
+* Fix a thread-related crasher in the default log handler.  [Torsten]
+* Fix a test suite issue.  [Torsten]
+* Fix Glib::IO::add_watch on win32.  [Marc Lehmann]
+* Add Glib::Markup::escape_text.  [Torsten]
+
+Overview of changes in Glib 1.091
+=================================
+
+* Add GKeyFile bindings.  [Emmanuele]
+* Add tests for previously untested stuff.  [Torsten]
+* Add a GSignalFlags typemap.  [Torsten]
+
+Overview of changes in Glib 1.090
+=================================
+
+* Add API that allows binding developers to specify conversion functions when
+  registering wrappers for custom fundamental types.  [Torsten]
+* Add Glib::Object::signal_add_emission_hook and
+  Glib::Object::signal_remove_emission_hook.  [muppet]
+* Fix problems with the automatic creation of enum/flags listings.  [Ross]
+
+Overview of changes in Glib 1.082
+=================================
+
+* Update and expand the test suite.  [Torsten]
+* Fix a few bugs here and some typos there.  [Torsten]
+* Fix enum listings in the generated documentation.  [Ross]
+* Fix a thread-related crasher in the default log handler.  [Torsten]
+
+Overview of changes in Glib 1.081
+=================================
+
+* Documentation updates.  [Torsten]
+
+Overview of changes in Glib 1.080
+=================================
+
+ Since 1.06x (the previous stable series)
+ ----------------------------------------
+  * Support for GParamSpecUnichar and GStrv.
+  * Timely delivery of Perl's asynchronous signals.
+  * Fatal log messages call abort() rather than croak().
+  * Glib::MainLoop's are properly freed after use.
+  * New API:
+    - Glib::get_user_data_dir,
+    - Glib::get_user_config_dir,
+    - Glib::get_user_cache_dir,
+    - Glib::get_system_data_dirs,
+    - Glib::get_system_config_dirs,
+    - Glib::get_language_names,
+    - Glib::Object::signal_query.
+
+ Since 1.074
+ -----------
+  * Nothing.
+
+Overview of changes in Glib 1.074
+=================================
+
+* Fix a reference counting bug that prevented Glib::MainLoop's from ever being
+  freed.  [Ross]
+
+Overview of changes in Glib 1.073
+=================================
+
+* Bind, doc, and test g_signal_query as Glib::Object::signal_query. [muppet]
+* Fatal log messages call abort() rather than croak().  Croaking wasn't
+  all that useful (didn't stop in the perl debugger as expected), and 
+  aborting allows you to get a C backtrace in gdb.  [muppet]
+* Fix Glib::MakeHelper::select_files_by_version on Win32.  [muppet]
+* Implement missing support for the boxed type GStrv as a native perl
+  anonymous array of strings.  [muppet]
+* Docgen fixes.  [muppet]
+* Test suite updates and fixes.  [Ross, muppet]
+
+Overview of changes in Glib 1.072
+=================================
+
+* Ensure that asynchronous signals, deferred by perl's safe signal handling,
+  are delivered on time when a main loop is running.  [Jan Hudec, muppet]
+* Fix win32 linkage.  [muppet, thanks to Tyler Hepworth]
+* Test fixes.  [Ross]
+* Bind and test g_get_user_data_dir, g_get_user_config_dir,
+  g_get_user_cache_dir, g_get_system_data_dirs, g_get_system_config_dirs,
+  and g_get_language_names.  [Torsten]
+* Documentation updates.  [Torsten, muppet]
+
+Overview of changes in Glib 1.071
+=================================
+
+* Correct a warning message.  [Torsten]
+
+Overview of changes in Glib 1.070
+=================================
+
+* Add support for GParamSpecUnichar.  [Torsten]
+* Generate a correct META.yml.  [muppet]
+
+Overview of Changes in Glib 1.062
+=================================
+
+* Properly create META.yml.  [muppet]
+* Fix exports and some documentation.  [muppet]
+* Fix RPM generation on x86_64.  [Ross]
+* Fix test failure with newer versions of Test::More.  [Ross]
+
+Overview of Changes in Glib 1.061
+=================================
+
+* Minor cleanup.  [Torsten]
+
+Overview of Changes in Glib 1.060
+=================================
+
+ Since 1.04x (the previous stable series)
+ ----------------------------------------
+  * Documentation fixes and improvements, including bugfixes in the
+    documentation generation system.
+  * Improved error messages in several places.
+  * Code cleanup.
+  * Thread compatibility enhancements
+    - Disabled internal stash caching, which was broken to begin with.
+    - Added the ability to track Glib::Object instances so the bindings can
+      maintain proper reference counts when the interpreter clones a new
+      thread.  This feature must be enabled manually by calling
+      Glib->set_threadsafe(TRUE) before creating threads or GObjects.
+  * More fundamental types are registered, e.g. Glib::UChar, Glib::Float, etc.
+    This allows all paramspec types to be specified as package names.
+    Glib::UInt was previously misspelled as Glib::Uint; the old name is still
+    allowed, but the new name will be returned from Glib in all instances.
+  * The OUTPUT variant of T_GPERL_GENERIC_WRAPPER can now handle leading
+    "const" and trailing asterisks, like the INPUT variant.
+  * Greatly expanded GParamSpec support.
+    - Glib::ParamSpec instances are now blessed hash references containing a
+      few special keys (same as the hashes previously returned from
+      Glib::Object::list_properties()) to retain backwards compatibility.
+    - There are now accessors for all the member variables of the various
+      GParamSpec subclasses (e.g., GParamInt's minimum, maximum, and default
+      value); this tree is mapped as Glib::Param::<type>.
+    - Glib::ParamSpec->param() now works.
+    - All of this makes the Glib::Object "notify" signal usable.
+  * Glib::Object subclassing enhancements
+    - Glib::Object::Subclass can now be used in evals and other situations,
+      thanks to the removal of the CHECK block.  This change is otherwise
+      transparent.
+    - Added fallback and explicit handlers for Glib::Object properties;
+      the fallback handlers store the property data in the instance variable
+      under the hash key with the same name as the property.  Explicit
+      handlers may be specified at object creation time.  See the docs for
+      Glib::Type::register_object() for details.
+  * API additions:
+    - Glib::Object::notify()
+    - char_own typedef and typemap.
+    - Glib::MakeHelper::select_files_by_version() and
+      Glib::MakeHelper::read_source_list_file() for use by Makefile.PLs.
+
+ Since 1.055
+ -----------
+  * Release prep.
+
+Overview of Changes in Glib 1.055
+=================================
+
+* Documentation generation fixes.  [Ross]
+
+Overview of Changes in Glib 1.054
+=================================
+
+* Documentation fixes and improvements.  [Ross, muppet]
+
+Overview of Changes in Glib 1.053
+=================================
+
+* Add char_own typedef and typemap.  [Torsten]
+* Add Glib::MakeHelper::select_files_by_version() and
+  Glib::MakeHelper::read_source_list_file() for use by Makefile.PLs. [Torsten]
+
+Overview of Changes in Glib 1.052
+=================================
+
+* Remove CHECK block from Glib::Object::Subclass's import(), making it
+  possible to use Subclass in evals.  Changes should be perfectly backwards
+  compatible, with a few bugs fixed.  [muppet]
+* The OUTPUT variant of T_GPERL_GENERIC_WRAPPER can now handle leading
+  "const" and trailing asterisks, like the INPUT variant.  [Torsten]
+
+Overview of Changes in Glib 1.051
+=================================
+
+* Code fixes and cleanup for C89 compatibility.  [Albert Chin, muppet]
+* Fine-tune error message format helper.  [muppet]
+* Implement new fallback and explicit handlers for Glib::Object properties;
+  the fallback handlers use the wrapper hash keys (as in the defaults provided
+  by Glib::Object::Subclass), and explicit handlers may now be specified when
+  creating properties.  [muppet]
+* Handle undef gracefully in gperl_value_from_sv().  [muppet]
+
+Overview of Changes in Glib 1.050
+=================================
+
+* New unstable development branch.
+
+* Greatly expanded GParamSpec support. [muppet]
+  - Glib::ParamSpec instances are now blessed hash references containing a
+    few special keys (same as the hashes previously returned from
+    Glib::Object::list_properties()) to retain backwards compatibility.
+  - There are now accessors for all the member variables of the various
+    GParamSpec subclasses (e.g., GParamInt's minimum, maximum, and default
+    value); this tree is mapped as Glib::Param::<type>.
+  - Glib::ParamSpec->param() now works.
+  - All of this makes the Glib::Object "notify" signal usable.
+* More fundamental types are registered, e.g. Glib::UChar, Glib::Float, etc.
+  This allows all paramspec types to be specified as package names.
+  Glib::UInt was previously misspelled as Glib::Uint; the old name is still
+  allowed, but the new name will be returned from Glib in all instances.
+  This needs testing to see if it breaks anything.  [muppet]
+* Added autodetection of flags and enum types to the doc generation code, so
+  that all enum and flags types used in the methods and functions listed on
+  a page are documented on that page.  The "=for enum" directives are still
+  honored, and may be used to add descriptive text to the listings.  [Ross]
+* Added code to allow Glib::Object tracking, which allows the binding to
+  maintain proper reference counts on GObjects when the perl interpreter
+  clones a new thread.  Needs lots of testing, documentation, and needs a way
+  to tell if thread support was compiled into perl.  Right now it's enabled
+  (if compiled in) by calling Glib::Object->set_threadsafe.  [Ross]
+* Disable Glib::Object stash caching, which fixes a few bizarre things that
+  go wrong when using perl threads.  [muppet]
+* Add missing Glib::Object::notify() (to emit notify singals).  [muppet]
+* As always, incremental documentation improvements.  [Torsten]
+* Improved type-checking error messages, using the new helper function
+  gperl_format_variable_for_output().  [Torsten]
+* Various odds and ends of minor cleanup and commentary.  [Torsten, muppet]
+
+Overview of Changes in Glib 1.042
+=================================
+
+* Documentation improvements.  [muppet, Torsten]
+  - Fix grammar and spelling throughout.
+  - Improve the docs for Glib::Object::Subclass and the documentation
+    generation system itself.
+  - Add the main module of the extension to the generated see also list.
+* Don't clobber $_ when warning of unhandled exceptions.  [muppet]
+
+Overview of Changes in 1.041
+============================
+
+* Don't segfault on bad filenames in gperl_sv_from_filename() [Marc Lehmann]
+* Hush compiler warnings.  [Ross]
+* Make Glib::filename_from_unicode() actually do work.  [muppet]
+
+Overview of Changes in 1.040
+============================
+
+  Since 1.02x (the previous stable series)
+  ----------------------------------------
+  * Updated build requirement
+    - ExtUtils::Depends >= 0.2
+  * Support for a few new API features in glib-2.4.x.
+  * Functions that use GErrors in C throw magical Glib::Error exception
+    objects; these objects overload the stringification operator, so old code
+    won't be broken, but new code can match errors without worrying about
+    translated error messages.  User code and other extensions can register
+    their own error domains.  See the Glib::Error manpage for more info.
+  * Glib::Type enhancements
+    - Perl code can register enum and flags types for use as Glib::Object
+      property types.
+    - During Glib::Object class initialization, invoke INIT_BASE in the
+      object's package, if it exists.  (Analogue for GTypeClass's base_init.)
+    - It is now possible to add GInterface implementations to Glib::Object
+      types derived in Perl code.
+    - New param spec, Glib::ParamSpec::scalar
+  * Glib::MakeHelper is generally more helpful.
+  * The POD generation tools allow specification of cumulative data type
+    descriptions, and much finer control over the format and content of the
+    generated documentation.
+  * Glib can now export useful constants on request.
+  * New versioning API, see Glib::version.
+
+  Since 1.0391
+  ------------
+  * Nothing.  :-)
+
+Overview of Changes in 1.0391
+=============================
+
+* Bump 2.3.x version checks to 2.4.0.
+* Portability fixes for Glib::MakeHelper.
+* Add, document, and test Glib::GET_VERSION_INFO.
+* Documentation fixes.
+
+Overview of Changes in Glib 1.039
+=================================
+
+* Add missing symbols to the exports list, so we have half a hope of not
+  totally barfing on win32.  [muppet]
+* Code sweep for FIXMEs resulted in miscellaneous bugfixes and cleanups.
+  - Clean up properly when croaking on bad property name in Glib::Object::new.
+  - Use the same 'bad property' message in Glib::Object::set and "::new.
+  - Document the fact that Glib::ParamSpec::param_spec is unimplemented.
+* Document functions that can throw Glib::Error exceptions.  [Ross]
+* Glib::MakeHelper enhancements  [muppet]
+  - verify that ExtUtils::Depends is >= 0.2
+  - Don't generate broken makefiles if there are no C or XS files to compile.
+* Using Data::Dumper on an object with tied write-only properties no longer
+  results in an crash.  [Ross]
+
+Overview of Changes in Glib 1.038
+=================================
+
+* The API is frozen at this release for the 1.04x series.
+* g_main_depth (new in 2.3.5) bound as Glib::main_depth.  [Ross]
+* Glib::GenPod now works with strict, no user-visible changes.  [Ross]
+* POD updates.  [muppet]
+
+Overview of Changes in Glib 1.037
+=================================
+
+* Added bindings for missing utility functions, with tests and doc:
+  g_get_user_name, g_get_real_name, g_get_home_dir, g_get_tmp_dir,
+  g_get_application_name, g_set_application_name.  [muppet]
+* Decided on versioning API, implemented, used, and documented it.  There's
+  more documentation on the versioning stuff than code to implement it.
+  New functions:  Glib->CHECK_VERSION, Glib::MAJOR_VERSION,
+  Glib::MINOR_VERSION, Glib::MICRO_VERSION, Glib->check_version,
+  Glib::major_version, Glib::minor_version, Glib::micro_version.
+  [Ross, muppet]
+* GPerlClosure's exception handlers no longer clobber $_.  [muppet]
+* Add the ability to register new error domains and throw Glib::Errors from
+  Perl.  New utility function, Glib::Error::matches (binding for
+  g_error_matches), makes it easy to test errors.  New xs utility function
+  for parsing a perl data structure into a GError.  [muppet]
+* POD generation cleanups and fixes and enhancements.  [Ross]
+  - Methods are now sorted for readability
+  - Plain functions get proper non-method signatures
+  - Hiding works better, more extensibly
+  - Can now specify where in the file the POD should code.
+* Miscellaneous bug fixes.  [Torsten, Ross, muppet]
+
+Overview of Changes in Glib 1.036
+=================================
+
+* GErrors are now translated into exception objects instead of plain,
+  translatable strings; this is implemented as an additional functionality, 
+  so there is no break in either API or ABI.  [muppet]
+* gperl_alloc_temp() now complains but does not crash when requested to
+  allocate less than 1 byte.  [Torsten]
+* Quell some doc generation noisiness.  [muppet]
+* Updated copyright information in source code.  [muppet]
+
+Overview of Changes in Glib 1.035
+=================================
+
+* Updated ExtUtils::Depends requirement to 0.200.
+* Added Glib::MakeHelper::postamble_docs_full(), a more featureful, easier
+  to use, and more scalable front-end to the pod documentation generation
+  tools.  [muppet]
+* Extended Glib::Type::list_properties to handle properties on GInterfaces,
+  which is a new feature in gtk+ 2.4.  [Ross]
+* Added Glib::ParamSpec::scalar() for creating SV properties without needing
+  to know about boxed types.  [Ross]
+
+Overview of Changes in Glib 1.034
+=================================
+
+* Added infrastructure for installing Perl implementations of GObject vfuncs.
+  [muppet]
+* Added infrastructure for adding GInterfaces to perl-derived GObject types.
+  [muppet]
+* Added GPerlArgv utilities for unified @ARGV handling.  [Torsten]
+* Added startup-time linked version checking.  [Ross]
+* Several 64-bit portability fixes.  [muppet]
+
+Overview of Changes in Glib 1.033
+=================================
+
+* apidoc improvements, GenPod/ParseXSDoc. ability to add to the list of
+  see_also, and ways to orverride the copyright globals that GenPod uses.
+
+Overview of Changes in Glib 1.031
+=================================
+
+* New typemaps for gshort and gushort. [Torsten]
+* Updates to Glib::MakeHelper fix some build issues. [Ross]
+* Robustness fixes in the doc system's xs parser. [muppet]
+* Added $object->freeze_notify and $object->thaw_notify. [muppet]
+* Added a few new exportable constants. [muppet]
+
+Overview of Changes from Glib 1.02x to 1.030
+============================================
+
+* MakeHelper's utilities now allow "disable-doc" on a Makefile.PL command-line
+  to disable doc generation.  This works for all Glib::MakeHelper-based
+  projects.
+* It is now possible to register new GFlags and GEnum types from Perl.
+  These are typically useful as types for object properties of perl-derived
+  GObjects.
+* We now compile cleanly and pass tests on x86_64 platforms.  Some
+  tests are skipped until bugfixes in glib hit mainstream.
+  Thanks to Jacek Konieczny.
+* Added documentation for tie_properties.
+* ParseXSDoc now supports continuation lines in xsubs, and properly hides
+  things that want to be hidden.
+* Invocation of signal and event handlers no longer clobbers $@ at the
+  application level.  Thanks to Thierry Vignaud.
+* Added version information APIs.
+* Added filename_to_uri and filename_from_uri, but they have problems with
+  localization.  Need help debugging this.
+* Glib is now a proper Exporter, and can export the filename utilities.
+  We also allow method invocation of those functions to quell controversy.

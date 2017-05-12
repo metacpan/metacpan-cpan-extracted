@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+package App::Games::TicTacToe;
+
+use Games::TicTacToe;
+use Moo;
+use namespace::clean;
+use Types::Standard -all;
+use MooX::Options;
+
+option 'size'   => (is => 'ro', order => 1, isa => Int, format => 'i', default => sub {  3  }, doc => 'TicTacToe board size. Default is 3.');
+option 'symbol' => (is => 'ro', order => 2, isa => Str, format => 's', default => sub { 'X' }, doc => 'User preferred symbol. Default is X. The other possible value is O.');
+
+sub run {
+    my ($self) = @_;
+
+    select(STDOUT);
+    $|=1;
+
+    $SIG{'INT'} = sub { print {*STDOUT} "\n\nCaught Interrupt (^C), Aborting\n"; exit(1); };
+
+    my $tictactoe = Games::TicTacToe->new;
+
+    my $size = $self->{size};
+    die "ERROR: Invalid game board size ($size)."
+        unless ($tictactoe->isValidGameBoardSize($size));
+
+    $tictactoe->setGameBoard($size);
+
+    my $symbol = $self->{symbol};
+    die "ERROR: Invalid player symbol ($symbol)."
+        until ($tictactoe->isValidSymbol($symbol));
+
+    $tictactoe->setPlayers($symbol);
+
+    my ($response);
+    do {
+        print {*STDOUT} $tictactoe->getGameBoard;
+        my $index = 1;
+        my $board = $tictactoe->board;
+        do {
+            my $move = undef;
+            if ($tictactoe->needNextMove) {
+                my $available = $board->availableIndex;
+                if ($tictactoe->isLastMove) {
+                    $move = $available;
+                }
+                else {
+                    do {
+                        print {*STDOUT} "What is your next move [$available]? ";
+                        $move = <STDIN>;
+                        chomp($move);
+                    } until ($tictactoe->isValidMove($move));
+                }
+            }
+
+            $tictactoe->play($move);
+
+            print {*STDOUT} $tictactoe->getGameBoard
+                unless (($index % 2 == 1) || $tictactoe->isGameOver);
+
+            $index++;
+
+        } until ($tictactoe->isGameOver);
+
+        print {*STDOUT} $tictactoe->getGameBoard;
+        print {*STDOUT} $tictactoe->getResult;
+
+        $board->reset;
+
+        do {
+            print {*STDOUT} "Do you wish to continue (Y/N)? ";
+            $response = <STDIN>;
+            chomp($response);
+        } until (defined $response && ($response =~ /^[Y|N]$/i));
+
+    } until ($response =~ /^N$/i);
+
+    print {*STDOUT} "Thank you.\n";
+}
+
+package main;
+
+use strict; use warnings;
+
+App::Games::TicTacToe->new_with_options->run;

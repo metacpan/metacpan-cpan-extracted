@@ -1,0 +1,5 @@
+---
+name: 'Throttling with Memcached'
+default: 0
+depends:
+    'Data::Valve': 0.00007

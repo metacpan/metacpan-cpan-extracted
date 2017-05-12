@@ -1,0 +1,16 @@
+MANIFEST
+Makefile.PL
+SQL/Address.sql
+SQL/Line.sql
+examples/15212.png
+examples/15213.png
+examples/draw_zip
+lib/Geo/Walkabout.pm
+lib/Geo/Walkabout/Chain.pm
+lib/Geo/Walkabout/Class/DBI.pm
+lib/Geo/Walkabout/Line.pm
+lib/Geo/Walkabout/Utils.pm
+setup/rt1_to_line
+setup/rt2_to_line
+t/Chain.t
+t/Line.t

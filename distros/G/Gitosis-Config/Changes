@@ -1,0 +1,18 @@
+Revision history for Gitosis-Config
+
+0.05 2009-08-26
+	- Improve compat with coming Attribute Helpers Moose
+	- Fix so that gitosis.conf settings can have newlines
+	- Fix version number
+
+0.03 2008-09-29
+	- added save command to re-save config files
+	- Removed Build.PL stub
+
+0.02  2008-09-28
+	- Fixed dependencies
+
+
+0.0.1  Sun Sep 14 14:25:39 2008
+       Initial release.
+

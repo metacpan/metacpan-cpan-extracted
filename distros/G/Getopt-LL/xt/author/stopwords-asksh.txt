@@ -1,0 +1,10 @@
+ask
+solem
+hoel
+vim
+expandtab
+shiftround
+CPAN
+Bugtracker
+Initialize
+namespace

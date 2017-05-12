@@ -1,0 +1,270 @@
+1.5008: Mon Apr 22 2013
+   - provide fix for bug in Storable:
+     https://rt.cpan.org/Ticket/Display.html?id=84705
+
+1.5006: Sat Dec 29 2012
+   - added some experimental things, maybe develop later,
+     maybe not
+   - added is_on_map(target) to mapqueue
+
+1.5005: Sun Jul 10 2011
+   - use common::sense and use parent
+   - no AutoLoader
+
+1.5003: Sun Jul 10 2011
+   - during a crash, DESTROY that uses eval screws up the error
+     that's propagating.  Localize $@ to be polite to users.
+
+1.5000: Wed Jun 01 2011
+   - load_map() and save_map() were using Data::Dumper rather
+     than the more obvious choice: Storable — fixed.  I'm not
+     aware of anyone using these functions, or indeed this entire
+     package, so if I broke something sorry, didn't mean it.
+     Look at legacy_load_map() if necessary.
+   - added freeze/thaw hooks to both MapGen and MapQueue
+
+1.4002: Wed Jun 01 2011
+   - pure xml import (no file)
+
+1.4002: Wed Oct 21 2009
+   - Just added Data::Dumper to the Makefile.PL reqs
+
+1.4001: Tue Mar 31 07:59:51 EDT 2009
+   - added another keyword and versioned up
+
+1.4: ????
+   - added the chorny META.yml stuff
+
+1.4: Fri Aug 29 07:11:55 EDT 2008
+   - lost version.pm (not worth it)
+   - cleaned up the makefile quite a bit
+   - use prompt() instead of <STDIN> in makefile, to keep from
+     causing cpan testers to chase me down with pitchfork
+   - taught t/05_export to skip XML tests when broken XML::Simple
+     and/or broken XML::SAX are encountered.
+
+1.3.4: Sun Jul 27 06:42:04 EDT 2008
+   - I finished the SVG exporter.  I don't think enough things do
+     SVG correctly for it to matter though.  I was testing in eog
+     (eye of gnome) and it thinks it's a transparent image and
+     anti-aliases all the lines ...  I mean to run one of the
+     files though a validator though.  Perhaps I'm just reading
+     the standard incorrectly.
+   - validates fine (after adding the doctype, which was only a
+     warning...)   http://validator.w3.org/
+
+1.3.4: Sun Jul 20 20:20:03 EDT 2008
+   - I created the new sub-map generator
+   - I renamed BasicImage to PNG
+   - I created the SVG exporter.
+
+1.3.3: Mon Jul 14th
+   - I got the preliminary POE HTTP server
+     going, just the arch though, no guts yet.
+
+1.3.2: Sat Jun 28 07:42:02 EDT 2008
+   - I got items and creatures to show up (as dots) on the map
+     using the recently ported MapQueue stuff.
+
+1.3.1: Mon Jun 23 20:59:10 EDT 2008
+   - I commented some of the more esoteric portions of the
+     spaghetti code known as the Editor.pm -- wow, it was hard to
+     follow.  Now I remember what I was up to, but it took a
+     solid hour to figure out.
+
+1.3.0: Sun Jun 15 11:01:38 EDT 2008
+   - added the MapQueue module (which includes d20-like visicalc)
+
+1.2.20: Tue May 27 12:07:32 EDT 2008
+   - (wow, use version has to be on the same line as our $VERSION
+      for older EUMM)
+
+1.2.19: Mon May 26 14:48:22 EDT 2008
+   - I might as well do a new version of everything using
+     version.pm while I wait for all my CPAN deletes to go
+     through.  I just discovered that version.pm doesn't/didn't
+     go core until perl 5.9...  I really wish I'd have prereqed
+     it everywhere I used it, but I didn't.  *sigh*
+
+1.2.18: Tue May 24 09:21:19 EDT 2008
+   - using version.pm as suggested by Andreas Koenig
+
+1.2.18: Tue May 20 19:43:19 EDT 2008
+   - OK.  My tests should all pass everywhere now.  The problem was actually an
+     XML::Parser Handler Extern problem.  They say you can return a *GLOB or a
+     ref to "something" like an IO::Handle.  I was using open my $fh and
+     returning the which is a GLOB ref.  It's sorta half way inbetween their
+     allowed types and it only fails on like 15% of the perls out there.
+
+     Weird.
+
+1.2.17: Tue May 20 19:43:19 EDT 2008
+   - forgot to MANIFEST the xmllint.test/ directory
+
+1.2.16: Tue May 20 19:43:19 EDT 2008
+   - I built a special test, which I think should prove the
+     problem is with XML::Parser and not with the way I'm using
+     it.  If it doesn't fail, then it has something to do with my
+     Handler code I guess.
+
+1.2.15: Sun May 18 09:27:29 EDT 2008
+   - Un-Require the most recnet versions of XML::XPath and XML::Parser
+     (that actually didn't help.)
+   - I simply taught the Makefile.PL how to skip the import_xml()
+     tests on machines (bsd6.1) that can't parse similar xml.  I
+     suspect libexpat.so.5 is the culprit -- but I really have no idea
+     why it fails on 6.1.  If this doesn't work I'm going to build a
+     6.1 machine and try it myself.
+
+1.2.14: Sun May 18 09:27:29 EDT 2008
+   - Require the most recnet versions of XML::XPath and XML::Parser
+     (Yet another freebsd patch... this might work, who knows, it already works
+     fine on my freebsd virtual machine.)
+
+1.2.13: Sat May 17 15:52:35 EDT 2008
+   - Discovered various problems with different versions of XML::Parser less
+     than 2.33 -- Added numeric prereq
+   - Disabled the /usr/bin/xmllint test (a single test) for platforms where
+     xmllint doesn't behave exactly like mine.
+
+1.2.10: Sat May 10 11:23:51 EDT 2008
+   - Added visuals for door status (open, locked, etc)
+   - Added an editor
+   - Expanded the functioning of groups, ignoring all uses other than rooms.
+
+1.0.3: Sun Aug 26 19:43 EDT 2007
+   - More and more documentation problems.  Meh.
+
+1.0.2: Sun Aug 26 08:20:23 EDT 2007
+   - I added a crapload more docs.  The main module was sadly lacking.
+
+1.0.1:  Sat Aug 25 18:34:04 EDT 2007
+   - I fixed a drawing bug that was erasing some of the map data on an image.
+   - There exists a new test in t/08 for it.  Meh. 
+   - Sadly, the test showed that it was probably getting drawn correctly and the 
+     sad truth is that I was drawing the empty tile (white normally) over the doors 
+     that were previously drawn -- but only some of the time.  Nice.
+     fixed.
+
+0.33:  Sun Jul 15 07:39:56 EDT 2007
+   - jettero fixed irritating bugs left by FiveSplit and
+     Basic.pm -- all concerning tile groups.
+
+0.32.0:  Wed May 16 2007
+   - added an xml import shortcut.
+   - fixed abug in the main ::export() that failed to return
+     the exporter go() result properly
+
+0.31.1:  Mon May 14 2007 0.31.2:  Tue May 15 2007
+   - tried to immprove the Makefile.PL and the t/ test suite
+     so the results come out a little more accurately on
+     http://testers.cpan.org/ <-- lol awesome fyi
+
+0.31.0:  Wed Jan 17 09:37:32 EST 2007
+   - jettero added an XML importer
+
+0.29:  Wed Jan 17 09:37:32 EST 2007
+   - jettero added the Tie::IxHash requirement
+
+0.29.2:  Wed Nov 29 09:41:55 EST 2006
+   - omfg, changed the XML::Simplet prereq to XML::Simple
+
+0.29.1:  Tue Nov 28 13:33:16 EST 2006
+   - jettero added XML::Simple to the prereqs
+
+0.29:  Wed Aug 30 14:22:43 EDT 2006
+   - jettero added a corridor widening generator plugin and
+     adapted BasicDoors to be able to span gaps... it's all
+     very neato.
+
+0.28:  Mon Aug 28 14:55:46 EDT 2006
+   - jettero fixed a few distrubution things and skelled a
+     FiveSplit generator plugin
+
+0.27:  Tue Aug 22 11:55:20 EDT 2006
+   - jettero updated the xml exporter slightly, added xml
+     validation to the exporter test and built a DTD for the
+     XML output.
+   - jettero also added an xsl to transform the xml output
+     into a map in html... (neat, fyi)
+
+0.26:  Mon Apr  4 11:17:19 EDT 2005
+   - jettero renamed Visualizations ----> Exporters
+
+0.25:  Sat Apr  2 18:47:05 EST 2005
+   - jettero did half of the little door-open-arc-lines
+     things ... they're more work than you'd think.
+
+0.24:  Sat Apr  2 12:41:34 EST 2005
+   - jettero am prepared to draw doors with secrets and
+     locks -- including the direction they open, but he
+     needs to go shopping for a tiny refigerator. The big
+     one borked you see. Grrr.
+
+0.23:  Sat Apr  2 12:30:36 EST 2005
+   - jettero drew the doors (in a preliminary way)
+
+0.21:  Sat Apr  2 10:26:39 EST 2005
+   - jettero made a preliminary door generator
+
+0.20:  Sat Apr  2  7:15:32 EST 2005
+   - jettero redid the options passing in various
+     complicated ways
+
+0.19:  Wed Mar 30 11:56:07 EST 2005
+   - jettero added save_load and appropriate tests
+
+0.18:  Wed Mar 30 10:39:38 EST 2005
+   - jettero improved the irange tests... it was behaving
+     statistically stupidly and the tests missed it
+
+0.17:  Mon Mar 28 08:58:07 EST 2005
+   - jettero fixed the in-room tick marks
+
+0.16:  Sun Mar 27 07:53:48 EST 2005
+   - jettero started a cool door generator
+
+0.15:  Sun Mar 27 07:53:41 EST 2005
+   - jettero cleaned up the in-room-tick-marks
+
+0.14:  Fri Mar 25 16:20:02 EST 2005
+   - jettero further broke up the generators. Now only my
+     room dropping code will be in Basic.
+
+0.13:  Fri Mar 25 16:19:43 EST 2005
+   - jettero drestroyed many nonsensical leading underscores
+     on things that shouldn't have ever had them.
+
+0.09:  Fri Mar 25 14:42:56 EST 2005
+   - jettero just got a note from Jamis Buck -- an answer to
+     a question actually. He officially approves of my
+     project. Perhaps it's better to say he doesn't
+     disapprove. Whatever. Thanks Jamis!
+
+0.08:  Fri Mar 25 14:41:46 EST 2005
+   - jettero began working on the dead-end remover, but it
+     appears to have some bugs
+
+0.07:  Fri Mar 25 10:30:15 EST 2005
+   - jettero split up the generator further and added the
+     sparseness code
+
+0.06:  Thu Mar 24 11:50:57 EST 2005
+   - jettero started a GD visualization object
+
+0.05:  Thu Mar 24 11:38:11 EST 2005
+   - jettero finished the perfect maze algorithm from Jemis'
+     website.
+
+0.04:  Thu Mar 24 11:08:46 EST 2005
+   - jettero created a room dropper... but he needs to quick
+     adapt the perfect maze algorithm before he can use it
+
+0.03:  Sun Mar 20 08:26:58 EST 2005
+   - jettero added a huge test suite for the Tools.pm
+
+0.02:  Sun Mar 20 08:26:16 EST 2005
+   - jettero added the Tools.pm module
+
+0.01:  Wed Jan 12 15:12:24 EST 2005
+   - jettero made this

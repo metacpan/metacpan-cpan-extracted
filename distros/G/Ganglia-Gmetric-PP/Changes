@@ -1,0 +1,36 @@
+Revision history for Perl extension Ganglia::Gmetric::PP.
+
+1.04  Mon May 24 19:20:54 PDT 2010
+        - Add --pp-client option to aggregator to optionally use PP client instead of gmetric
+        - Allow OS to assign listening ports
+1.03  Mon Dec  7 16:26:02 PST 2009
+        - Make aggregator output using gmetric(1) to workaround protocol
+          incompatibility with ganglia 3.1
+1.02  Wed Oct 14 14:29:45 PDT 2009
+        - Add overall timeout to aggregator test to avoid cpan-testers reported hang
+1.01  Thu Oct  8 16:26:06 PDT 2009
+        - Skip aggregator test if its dependencies are missing
+1.00  Wed Sep 16 15:27:57 PDT 2009
+        - Add more options for manipulating output metrics in aggregator
+0.99  Tue Sep 15 16:38:28 PDT 2009
+        - Fix daemonization issue
+0.98  Tue Sep 15 14:49:19 PDT 2009
+        - Options changes
+0.97  Mon Sep 14 14:02:33 PDT 2009
+        - Use sendto
+0.96  Fri Sep 11 16:00:45 PDT 2009
+        - First CPAN release
+0.95  Fri Sep 11 14:34:58 PDT 2009
+        - Add ->receive method
+0.94  Fri Sep 11 13:36:20 PDT 2009
+        - Add tests
+0.93  Thu Sep 10 18:14:36 PDT 2009
+        - Add docs and comments to aggregator. Don't require AnyEvent
+0.91  Thu Sep 10 17:54:40 PDT 2009
+        - Support Danga::Socket as fallback from AnyEvent
+0.90  Thu Sep 10 17:36:50 PDT 2009
+        - first working version
+0.01  Tue Sep  1 23:43:33 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Ganglia::Gmetric::PP
+

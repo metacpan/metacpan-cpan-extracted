@@ -1,0 +1,12 @@
+---
+version: 0.02
+date:    Tue Dec 27 15:08:39 PST 2011
+changes:
+- Fixed leak
+- Added init(-bare)
+
+---
+version: 0.01
+date:    Mon Dec 26 21:41:24 PST 2011
+changes:
+- First Release

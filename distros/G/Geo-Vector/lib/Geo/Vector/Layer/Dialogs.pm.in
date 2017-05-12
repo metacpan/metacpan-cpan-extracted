@@ -1,0 +1,55 @@
+package Geo::Vector::Layer::Dialogs;
+# @brief A helper module to bring in the OGR dialogs in Glade XML
+
+use strict;
+use warnings;
+use Glib qw/TRUE FALSE/;
+
+require Exporter;
+
+use vars qw/$folder/;
+
+our @ISA = qw(Exporter Gtk2::Ex::Geo::DialogMaster);
+
+our %EXPORT_TAGS = ( 'all' => [ qw() ] );
+
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+our @EXPORT = qw( );
+
+=pod
+
+=head1 NAME
+
+Geo::Vector::Layer::Dialogs - Dialogs for Geo::Vector::Layer's
+
+=cut
+
+sub new {
+    my($class, %params) = @_;
+
+    my @buffer = <DATA>;
+    pop @buffer unless $buffer[$#buffer] =~ /^\</; # remove the extra content
+
+    my $self = Gtk2::Ex::Geo::DialogMaster::new($class, %params, buffer => \@buffer);
+
+    bless $self => (ref($class) or $class);
+     
+    return $self;
+}
+
+sub fill_render_as_combobox {
+    my($combobox) = @_;
+    my $renderer = Gtk2::CellRendererText->new;
+    $combobox->pack_start($renderer, TRUE);
+    $combobox->add_attribute($renderer, text => 0);
+    my $model = Gtk2::ListStore->new('Glib::String');
+    for (sort {$Geo::Vector::RENDER_AS{$a} <=> $Geo::Vector::RENDER_AS{$b}} 
+	 keys %Geo::Vector::RENDER_AS) {
+	$model->set($model->append, 0, $_);
+    }
+    $combobox->set_model($model);
+}
+
+1;
+__DATA__

@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:                Geo-OSM-Tiles
+version:             0.04
+abstract:            Calculate tile numbers for OpenStreetMap
+license:             perl
+author:              
+    - Rolf Krahl <rotkraut@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Cwd:                           0
+    File::Basename:                0
+    File::Find:                    0
+    File::Path:                    0
+    File::Spec:                    0
+    File::Temp:                    0
+    Getopt::Long:                  0
+    LWP:                           0
+    Math::Trig:                    0
+    Test::More:                    0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

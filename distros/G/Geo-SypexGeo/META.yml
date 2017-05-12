@@ -1,0 +1,24 @@
+---
+abstract: 'API to detect cities by IP thru Sypex Geo database v.2'
+author:
+  - 'Andrey Kuzmin <kak-tus@mail.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-SypexGeo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Text::Trim: '0'
+version: '0.8'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

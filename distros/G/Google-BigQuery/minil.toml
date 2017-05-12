@@ -1,0 +1,4 @@
+name = "Google-BigQuery"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

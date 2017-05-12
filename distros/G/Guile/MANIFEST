@@ -1,0 +1,17 @@
+ARTISTIC
+Changes
+GPL
+Guile.pm
+Guile.xs
+MANIFEST
+Makefile.PL
+README
+guile_wrap.c
+guile_wrap.h
+t/00init.t
+t/01eval.t
+t/02scalars.t
+t/03procs.t
+t/04list.t
+t/05math.t
+typemap

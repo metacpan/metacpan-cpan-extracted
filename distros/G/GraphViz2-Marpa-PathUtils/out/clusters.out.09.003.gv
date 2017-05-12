@@ -1,0 +1,26 @@
+strict digraph graph_09
+{
+	c[color = "blue" style = "filled"]
+	d[color = "orange" style = "filled"]
+	e[color = "goldenrod" style = "filled"]
+	c ->
+	
+	{
+		d
+		e
+	}
+
+	{
+
+	}
+
+	{
+
+	}
+ ->
+	
+	{
+
+	}
+
+}

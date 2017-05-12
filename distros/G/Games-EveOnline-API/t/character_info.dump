@@ -1,0 +1,27 @@
+{
+          'character_name' => 'Milolika Muvila',
+          'alliance_id' => undef,
+          'corporation_id' => '1000044',
+          'corporation' => 'School of Applied Knowledge',
+          'alliance' => undef,
+          'race' => 'Caldari',
+          'bloodline' => 'Civire',
+          'skill_points' => '969446',
+          'employment_history' => {
+                                    '33243315' => {
+                                                  'corporation_id' => '1000044',
+                                                  'start_date' => '2014-06-05 19:56:00',
+                                                  'record_id' => '33243315'
+                                                }
+                                  },
+          'ship_type_id' => '32880',
+          'account_balance' => '21418322.39',
+          'cached_until' => '2014-06-26 18:30:32',
+          'last_known_location' => 'Autama',
+          'character_id' => '94701913',
+          'alliance_date' => undef,
+          'corporation_date' => '2014-06-05 19:56:00',
+          'ship_type_name' => 'Venture',
+          'security_status' => '0.00487414693718598',
+          'ship_name' => '1'
+        }

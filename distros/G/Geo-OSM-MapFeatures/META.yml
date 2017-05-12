@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                Geo-OSM-MapFeatures
+version:             0.10
+abstract:            Parses and represents OpenStreetMap Map Features
+license:             perl
+author:              
+    - Knut Arne Bjørndal <bob@cakebox.net>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::Accessor:               0
+    Class::Factory:                0
+    Error:                         0
+    HTML::TableExtract:            0
+    LWP::UserAgent:                0
+    Test::More:                    0
+    URI::Escape:                   0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

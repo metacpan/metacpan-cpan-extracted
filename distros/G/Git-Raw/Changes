@@ -1,0 +1,866 @@
+Revision history for Git-Raw
+
+0.74      2017-03-24 11:04:26+02:00 Africa/Johannesburg
+
+ - Fixed crashes in Git::Raw::Diff -> print due to incorrect usages
+ of SPAGAIN/PUTBACK (GH#188) (thanks, @noah-kogler!)
+ - Added Odb methods:
+    + hash()
+    + write()
+
+0.73      2017-03-22 18:41:31+02:00 Africa/Johannesburg
+
+ - Added Object methods:
+    + id()
+    + lookup()
+    + type()
+
+ - Added Odb methods:
+    + foreach()
+
+ - Added Odb::Object methods:
+    + id()
+    + type()
+    + size()
+    + data()
+
+0.72      2017-01-10 07:10:50+02:00 Africa/Johannesburg
+
+ - Added Index method:
+    + entry_count()
+ - Update libgit2 to ee89941fa2
+
+0.71      2017-01-09 08:52:13+02:00 Africa/Johannesburg
+
+ - Added Tree::Entry method:
+    + type()
+
+0.70      2016-12-30 21:07:39+02:00 Africa/Johannesburg
+
+ - Documentation fixes
+ - Update libgit2 to 42ad85ef01
+ - Fixes OpenBSD FTBFS (LibreSSL is API compatible with OpenSSL 1.0.1)
+
+0.69      2016-12-30 10:09:34+02:00 Africa/Johannesburg
+
+ - No changes, stable release.
+
+0.68      2016-12-30 10:05:46+02:00 Africa/Johannesburg
+
+ - Tests now pass on macOS when run on a case-insensitive filesystem
+ - Index -> add_frombuffer() now accepts either a string or a string reference (GH#181)
+ - Index -> add_frombuffer() now returns an Index::Entry (GH#180)
+
+0.67      2016-12-28 19:01:36+02:00 Africa/Johannesburg
+
+ - Fixes compilation failure with blead perl 5.25.x (GH#177)
+
+0.66      2016-12-28 18:04:48+02:00 Africa/Johannesburg
+
+ - Added Diff methods:
+    + buffer()
+    + new()
+ - Repository -> index() now allows the index to be disassociated by passing
+   undef.
+ - The caller's information is now captured in Error objects
+ - Added Repository method:
+    + odb()
+ - Packbuilder has been completed
+ - Added Odb and Loose, Pack and OnePack backends
+ - Added Mempack backend
+ - Added Indexer
+ - The 'transfer_progress' callback used by a Remote and a Repository now receives
+   a single TransferProgress object instead of the individual items. (Incompatible change)
+ - Update libgit2 to 7829b4118a
+
+0.65      2016-12-21 18:00:44+02:00 Africa/Johannesburg
+
+ - Repository -> write_tree() no longer crashes when invoked on an index that
+   does not have a repository associated (GH#173).
+
+0.64      2016-12-16 14:54:58+02:00 Africa/Johannesburg
+
+ - Repository -> index() now allows for the index to be set.
+
+0.63      2016-12-08 20:30:21+02:00 Africa/Johannesburg
+
+ - Added Index methods:
+    + version()
+    + add_frombuffer()
+ - Documentation fixes
+ - Update libgit2 to 8339c66068
+
+0.62      2016-12-06 18:55:19+02:00 Africa/Johannesburg
+
+ - Added Diff method:
+    + deltas()
+
+0.61      2016-12-05 19:49:33+02:00 Africa/Johannesburg
+
+ - Update libgit2 to 5c18ece35f
+ - Reference -> create() can now create symbolic references (GH#168) (thanks, @richardipsum!)
+ - Removed documentation for previously removed Remote -> clear_refspecs method (GH#169)
+ - Documentation cleanup
+
+0.60      2016-06-09 19:46:33+02:00 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Perl 5.8.9 *should* work again
+ - Added Index method:
+    + checksum()
+
+0.59      2016-05-23 06:43:28+02:00 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Repository -> merge() and friends' merge options 'tree_flags' member has been
+   renamed to 'flags'. (Incompatible change)
+ - Update libgit2 to 1b56cda
+ - Added Repository methods (GH#124, GH#167):
+    + revparse()
+ - Added Commit method:
+    + body()
+ - Added Stash methods:
+    + apply()
+    + pop()
+ - Numerous constants are now documented.
+ - Nanosecond mtime and ctime resolutions are now enabled.
+
+0.58      2015-11-23 07:50:23+02:00 Africa/Johannesburg
+
+ - No changes, stable release.
+
+0.57      2015-11-21 15:28:01+02:00 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Update libgit2 to c4f6054
+ - Restored NetBSD 6 support
+
+0.56      2015-11-17 13:51:37+02:00 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Set the minimum required version of perl to 5.8.9
+ - Define _POSIX_C_SOURCE on NetBSD
+
+0.55      2015-11-14 11:18:33+02:00 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Update libgit2 to 32b9e64
+
+0.54      2015-11-12 21:28:02+02:00 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Enable support for libcurl at build-time
+ - Users can now specify the libcurl to use as argument
+    to Makefile.PL:
+    + --with-curl-include
+    + --with-curl-libs
+ - Enable support for OS X's Security framework
+ - Added Index::Entry methods:
+    + is_conflict()
+ - Try to support WinHTTP on Windows
+ - Removed Remote methods: (Incompatible change)
+    - save()
+    - callbacks()
+ - Remote -> create_anonymous() no longer accepts a 'fetch_refspecs' parameter (Incompatible change)
+ - The following Remote methods now take a callbacks parameter (Incompatible change)
+    - connect()
+    - prune()
+    - update_tips()
+ - Remote -> fetch() and Remote -> download() now takes a 'fetch_opts' parameter (Incompatible change)
+ - Repository -> clone() now takes a 'fetch_opts' parameter (Incompatible change)
+ - Repository -> clone() now takes an optional 'checkout_opts" parameter
+ - Remote -> push() and Remote -> upload() now takes a 'push_opts' parameter (Incompatible change)
+ - Added Remote callbacks:
+    + push_negotation
+
+0.53      2015-04-14 20:23:42+02:00 Africa/Johannesburg
+
+ - Update libgit2 to 623fbd9 (GH#161,GH#162)
+ - Fixed reference counting issues in Diff, Commit and Merge::File::Result objects. (GH#160)
+ - Added extra checkout flags. (GH#162)
+
+0.52      2015-03-19 13:45:38+02:00 Africa/Johannesburg
+
+ - Update libgit2 to 89ba9f1 (GH#158,GH#159)
+ - The 'safe_create' checkout strategy has been removed from libgit2 (use 'safe') (Incompatible change)
+ - Repository -> head() and Repository -> detach_head() no longer accept reflog messages (Incompatible change)
+ - Repository -> merge() and friends' merge options 'flag' member has been
+   renamed to 'tree_flags'. (Incompatible change) (GH#159)
+ - Repository -> merge() and friends' merge options gained a 'file_flags' member. (GH#159)
+ - Added additional file merge flags. (GH#159)
+
+0.51      2015-02-09 09:55:03+02:00 Africa/Johannesburg
+
+ - Update libgit2 to b703049 (GH#155, GH#156)
+ - Removed Push package completely (GH#155) (Incompatible change):
+    The functionality has been absorbed into the Remote package
+ - Added Remote methods (GH#155):
+    + prune()
+    + push()
+    + upload()
+ - Added Remote callbacks (GH#155):
+    + pack_progress
+    + push_transfer_progress
+    + push_update_reference
+
+0.50      2014-11-15 20:10:04+02:00 Africa/Johannesburg
+
+ - Update libgit2 to 057126c (GH#153)
+ - Removed Remote methods (Incompatible change):
+    + is_url_supported()
+ - Removed Config methods (Incompatible change):
+    + refresh()
+ - Split Remote -> name into Remote -> name and Remote -> rename
+   (Incompatible change)
+ - Added fallbacks for overloads (GH#151)
+ - Handle no EOF markers when printing diffs
+ - Added Note methods (GH#154):
+    + author
+    + committer
+
+0.49      2014-10-24 12:04:09+02:00 Africa/Johannesburg
+
+ - Update libgit2 to 4bb6ffb
+ - Push -> finish() now returns a truthy value to indicate success (GH#150)
+
+0.48      2014-10-13 23:08:26+02:00 Africa/Johannesburg
+
+ - Added FilterList class
+ - Update libgit2 to e0383fa
+
+0.47      2014-09-30 13:06:48+02:00 Africa/Johannesburg
+
+ - Added support for Notes (GH#144)
+ - Stash -> save() now returns a Commit object (GH#145) (Incompatible change)
+ - Stash -> foreach()'s callback now receives a Commit object instead of the
+   object id (GH#145) (Incompatible change)
+ - Added Index methods (Beta) (GH#146):
+    + add_conflict
+    + get_conflict
+    + merge
+ - Added Index::Entry methods (Beta) (GH#146):
+    + clone
+ - Added Merge::File::Result methods (Beta) (GH#146):
+    + automergeable
+    + content
+    + path
+ - The supported authentication types are now supplied to the Remote's
+   credentials callback.
+ - Update libgit2 to 4c53489 (GH#147)
+ - Removed Remote methods (GH#147) (Incompatible change):
+    + check_cert()
+ - Added Remote certificate callback (GH#148)
+
+0.46      2014-09-19 12:42:13+02:00 Africa/Johannesburg
+
+ - Fix more test cases that were failing if diff.mnemonicprefix is set (GH#143)
+ - Revert previous attempt at getting WinHTTP to work
+
+0.45      2014-09-18 23:29:31+02:00 Africa/Johannesburg
+
+ - Update libgit2 to 73dd663 (GH#126,GH#137)
+ - Added Walker methods (GH#127):
+    + sorting
+ - Added Index::Entry methods (GH#130):
+    + blob
+ - Added Graph methods (GH#131,GH#132):
+    + ahead()
+    + behind()
+    + ahead_behind()
+ - Added Commit methods (GH#134,GH#138):
+    + as_email()
+    + diff()
+ - Added Blob methods:
+    + is_binary()
+ - Added Walker methods (GH#140):
+    + all()
+ - Added methods:
+    + message_prettify()
+ - Removed Remote methods (GH#135) (Incompatible change):
+    + is_url_valid()
+ - Index -> write_tree() now returns a Tree object (GH#128). A stringify
+   overload has been provided for compatibility
+ - Repository -> merge_base() now returns a Commit object (GH#129)
+ - Commit, Tree and Blob now have overloads for equality and stringify (GH#129)
+ - Index -> conflicts() now returns Index::Conflict objects (GH#130)
+   (Incompatible change). The documenation was actually incorrect, a list
+   of hashes was returned whereas the documenation stated a list of
+   Index::Entry objects.
+ - Try to support WinHTTP on Windows
+ - Remote's update tips callback now set $a or $b to undef if the
+   reference was created or removed (Incompatible change) (GH#136)
+ - Added extra diff flags (GH#138)
+ - Remote -> load() used to consider a missing remote as an error.
+   It now returns undef instead of die'ing. (Incompatible change) (GH#139)
+ - Tag -> foreach() now also returns lightweight tags (GH#141,GH#142)
+ - Reference -> is_tag() was broken for lightweight tags (GH#142)
+
+0.44      2014-08-18 10:34:18+02:00 Africa/Johannesburg
+
+ - Update libgit2 to fa44a16 (GH#120)
+ - Added Remote methods (GH#120):
+    + default_branch
+ - Stash -> save() now returns a true value if files were stashed, and undef
+   if nothing was stashed (GH#121). (Potentially incompatible change if you
+   relied on the function die'ing if there was nothing to be stashed)
+ - Commit -> parents() and Tree -> entries() now return lists as per the
+   documentation (GH#122)
+ - Config -> foreach(), Stash -> foreach() and Tag -> foreach() now correctly
+   aborts the iteration. Previously it would die if the user requested
+   termination of the loop with a return value that is not GIT_USER. (GH#123)
+
+0.43      2014-08-14 15:19:12+02:00 Africa/Johannesburg
+
+ - Added Index methods:
+    + find
+ - Branch -> upstream() can now set/clear the upstream reference (GH#115)
+ - Reference -> lookup() used to consider a missing reference as an error.
+    It now returns undef instead of die'ing. (Incompatible change) (GH#116)
+ - Reference -> lookup() now tries harder to find a reference (GH#116)
+ - Reflog -> entries() now return real objects (Incompatible change) (GH#117)
+ - Added Repository methods (GH#118):
+    + detach_head
+ - Repository -> head() now accepts an optional message parameter (GH#118)
+
+0.42      2014-08-09 15:19:47+02:00 Africa/Johannesburg
+
+ - Added Blob methods (GH#108):
+    + owner
+ - Added Commit methods (GH#108):
+    + owner
+ - Added Index methods (GH#108):
+    + owner
+ - Added Remote methods (GH#108):
+    + owner
+ - Added Tag methods (GH#108):
+    + owner
+ - Added Tree methods (GH#108):
+    + owner
+ - Branch -> lookup(), upstream_name() and remote_name() used to consider
+    a missing branch or remote as an error. They now return undef instead of
+	die'ing. (Incompatible change) (GH#109)
+ - Update libgit2 to 8f759ac (GH#112)
+ - Repository -> lookup(), Commit -> lookup(), Blob -> lookup(), Tree -> lookup
+    and Tag -> lookup() used to consider a missing object as an error. They
+	now return undef instead of die'ing. (Incompatible change) (GH#110)
+ - Tree -> entry_byname(), entry_bypath() used to consider a missing entry as
+    an error. They now return undef instead of die'ing. (Incompatible change)
+	(GH#111)
+ - Repository -> merge_base() used to consider a missing merge base as an error.
+    It now returns undef instead of die'ing. (Incompatible change)
+ - Added Reference methods (GH#113)
+    + peel
+ - Reflog -> entries() now take an optional index and count argument. (GH#114)
+ - Added Reflog methods (GH#114):
+    + entry_count
+ - Documentation and example fixes.
+
+0.41      2014-08-03 18:08:19+02:00 Africa/Johannesburg
+
+ - Update libgit2 to 59e3f45 (GH#105)
+ - Remote -> name() now accepts an optional "problems" parameter
+ - Repository -> clone() options no longer accepts 'remote_name' and
+    'ignore_cert_errors' options (Incompatible change) (GH#105)
+ - Added Repository -> clone() callbacks (GH#105):
+    + remote_create
+ - Diff::File -> mode() and Diff::Delta -> status() return value(s) changed:
+    - "new" to "unreadable" (Incompatible change)
+ - Repository -> status() now takes options (GH#106) (Incompatible change):
+    - Options are mandatory.
+    - Pathspec matching is no longer auto-disabled if a list of files is
+	  specified. It is up to the user to disable it via the "flags" parameter.
+    - "worktree_unreadable" may now be returned as a status flag.
+ - Try to support ActiveState PPM builds
+    - Most Unices should build now
+    - Windows 32-bit will never build as the MSVC6 is too dated.
+    - Windows 64-bit should build, but will not work. As soon as
+	  https://github.com/libgit2/libgit2/pull/2471 is merged, it should work.
+
+0.40      2014-06-25 21:05:55SAST+0200 Africa/Johannesburg
+
+ - Tag -> tagger() now returns undef if a tag doesn't have a tagger instead
+    of crashing (GH#103, GH#104)
+
+0.39      2014-06-12 18:06:58SAST+0200 Africa/Johannesburg
+
+ - Fixed Windows specific path comparison test case (verified this time)
+
+0.38      2014-06-11 20:03:53SAST+0200 Africa/Johannesburg
+
+ - Fixed Windows specific path comparison test case
+ - (Possibly) Fix cross-compilation issues with ARM architectures
+
+0.37      2014-06-08 17:25:17SAST+0200 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Removed Index -> add_conflict() (Incompatible change) (GH#97)
+ - Index -> read() now takes an optional force argument (GH#97)
+ - Added Raw -> features() method. This may be used to query the features
+    built into libgit2 (and thus Git::Raw).
+ - Added Repository methods (GH#97):
+    + Repository -> cherry_pick()
+    + Repository -> revert()
+ - Update libgit2 to df19219 (GH#99,GH#102)
+ - Added Index methods (GH#100):
+    + Index -> capabilities()
+    + Index -> path()
+    + Index -> add_all()
+    + Index -> remove_all()
+ - Improved documentation (GH#101)
+ - Improved the error model (GH#101)
+    All errors are now Git::Raw::Error objects. Extended error information
+	provided by libgit2 may be queried (code/category/message) via the
+	corresponding accessor. All existing code should continue to work as is
+	(via "" and bool overloads).
+ - Added Error methods (GH#101):
+	+ Error -> code()
+	+ Error -> category()
+	+ Error -> message()
+ - Removed constants from Filter (Incompatible change) (GH#101):
+   They are now located in the Error namespace.
+
+0.36      2014-05-02 15:59:18SAST+0200 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Repository -> reset() now understands a 'hard' reset (GH #96)
+ - Removed the unused/unimplemented 'completion' callback type from Repository
+   and Remote (GH #96)
+ - Update libgit2 to 89e9c16
+ - Threaded libgit2 is now disabled when using the SunPro compiler (even with pthreads)
+ - Should now build on older versions of MidnightBSD and Cygwin
+ - Hopefully now builds against libssh2 if its available on OpenBSD
+
+0.35      2014-04-28 18:43:14SAST+0200 Africa/Johannesburg
+
+ - Added support for building with compilers other than gcc/clang (GH #93):
+    + Windows: MSVC
+    + Solaris: SunPro
+ - Silenced a number of warnings (GH #93)
+ - libgit2 is now built with the correct bits setting when building a 32-bit
+    version on a 64-bit system (GH #93)
+ - Remote -> is_url_supported() test cases only run when network testing
+    is enabled. (GH #93)
+ - Set core.autocrlf to "true" in the test repository for diff tests. This
+    fixes test cases failures on Windows (GH #93)
+ - Use file:/// on Windows for local push tests. (GH #93)
+ - Users can now specify the OpenSSL and/or libssh2 to use as argument
+    to Makefile.PL (GH #94):
+    + --with-openssl-include
+    + --with-openssl-libs
+    + --with-libssh2-include
+    + --with-libssh2-lib
+ - Improve reliability of time-dependent tests
+
+0.34      2014-04-27 12:38:41SAST+0200 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Add Repository -> message() method (GH#72) (thanks, @jacquesg!)
+ - Add Reference methods (GH#73) (thanks, @jacquesg!):
+    + Reference -> shorthand()
+    + Reference -> is_tag()
+    + Reference -> is_note()
+ - Enable libgit2 threading support (GH#74) (thanks, @jacquesg!)
+ - Add support for push callbacks (GH#75) (thanks, @jacquesg!)
+ - Update to libgit2 4f9d541 (GH#76) (GH#78) (GH#85) (thanks, @jacquesg!)
+ - Add support for SSH interactive login (GH#78) (thanks, @jacquesg!)
+ - Add Push -> update_tips() method (GH#79) (thanks, @jacquesg!)
+ - Make clone tests more robust (GH#79) (thanks, @jacquesg!)
+ - Add Repository -> is_head_detached() (GH#83) (thanks, @jacquesg!)
+ - Allow "tree" parameter to be undef in Repository -> tree()
+   (GH#81) (thanks, @jacquesg!)
+ - Added additional diff flags (GH#86):
+    + include_typechange
+    + include_typechange_trees
+    + ignore_case
+    + skip_binary_check
+    + enable_fast_untracked_dirs
+    + show_untracked_content
+    + show_unmodified
+ - Repository -> branches() now takes an optional branch
+    type argument (GH#85)
+ - Add Remote methods (GH#87):
+    + Remote -> pushurl()
+    + Remote -> check_cert()
+    + Remote -> clear_refspecs()
+    + Remote -> refspec_count()
+    + Remote -> refspecs()
+    + Remote -> fetch()
+    + Remote -> is_url_valid()
+    + Remote -> is_url_supported()
+ - Add RefSpec methods (GH#87):
+    + RefSpec -> dst_matches()
+    + RefSpec -> src_matches()
+    + RefSpec -> string()
+    + RefSpec -> direction()
+    + RefSpec -> transform()
+    + RefSpec -> rtransform()
+    + RefSpec -> is_force()
+ - Add Branch methods (GH#84):
+    + Branch -> remote_name()
+    + Branch -> upstream_name()
+ - The Reference returned by Branch -> remote() now has enough information
+    to be used as a real Reference. Previously it didn't capture the owning
+    Repository. (GH#84)
+ - Add Commit methods (GH#88):
+    + Commit -> ancestor()
+ - Add Graph methods (GH#88):
+    + Graph -> is_ancestor_of()
+ - Repository -> merge_base() now accepts a "commitish" (GH#88)
+ - Add Diff methods (GH#77):
+    + Diff -> find_similar()
+    + Diff -> stats()
+ - Add Diff::Stats methods (GH#77):
+    + Diff::Stats -> insertions()
+    + Diff::Stats -> deletions()
+    + Diff::Stats -> files_changed()
+    + Diff::Stats -> buffer()
+ - Add PathSpec methods (GH#89):
+    + PathSpec -> new()
+    + PathSpec -> match()
+ - Add PathSpec::MatchList methods (GH#89):
+    + PathSpec::MatchList -> count()
+    + PathSpec::MatchList -> entries()
+    + PathSpec::MatchList -> failed_count()
+    + PathSpec::MatchList -> failed_entries()
+ - Fixed branch test cases:
+    There may be a 1-2 second difference in time between commiting and
+	comparing against the current signature.
+ - Fixed internal callback leaks (GH#90)
+ - Cred -> sshkey() now doesn't require a passphrase (GH#90)
+ - 'progress' callback for Repository -> clone() and Remote -> set_callbacks()
+    has been renamed to 'sideband_progress' (incompatible change).
+ - Add Walker methods (GH#91):
+    + Walker -> push_range()
+ - Compiler options should be determined in Makefile.PL context (GH#91)
+    Fixes problems building a 32-bit perl on a 64-bit system
+
+0.33      2014-04-14 12:28:23+02:00 Europe/Rome
+
+ - Fix segfaults caused by invalid object creation (GH#66) (thanks, @pipcet!)
+ - Add Config -> default() method (GH#67) (thanks, @magnolia-k!)
+ - Do not fail when a lightweight tag is found in the Tag->foreach() callback
+   (GH#68) (thanks, @pipcet!)
+ - Add Tree::Entry -> file_mode() method (GH#69) (thanks, @pipcet!)
+ - Repository -> merge() now takes %merge_opts and %checkout_opts as 2
+   separate parameters. (incompatible change) (GH#70)
+ - Merge options parameter member 'automerge' has been renamed to 'favor',
+   inline with libgit2 API changes. (incompatible changes) (GH#70)
+   It has also learned about a 'union' merge.
+ - Checkout options has learned new options: 'target_directory', 'ancestor_label',
+   'our_label' and 'their_label'. (GH#70)
+ - Checkout strategy has additional options: (GH#70)
+   'use_ours', 'use_theirs', 'skip_locked_directories', 'dont_overwrite_ignored',
+   'conflict_style_merge', 'conflict_style_diff3' and 'disable_pathspec_match'.
+ - Added new Repository methods (#GH70):
+    + Repository -> merge_analysis()
+    + Repository -> merge_base()
+ - Added new Index methods (#GH70):
+    + Index -> write_tree_to()
+    + Index -> checkout()
+    + Index -> entries()
+    + Index -> add_conflict()
+    + Index -> remove_conflict()
+ - Added new Commit method (#GH70):
+    + Commit -> merge()
+ - Added new Tree method (#GH70):
+    + Tree -> merge()
+ - Index -> add() now either takes a path or a Index::Entry (GH#70)
+ - Remote->create_inmemory() has been replaced by Remote->create_anonymous()
+   (incompatible change) (GH#71).
+   The order of 'url' and 'fetchspec' has also been reversed to bring it
+   inline with the upstream changes.
+ - Update libgit2 to bcc6229
+
+0.32      2014-03-16 15:02:47+01:00 Europe/Rome
+
+ - Update libgit2 to 648a985 (GH#53, GH#56) (thanks, @jacquesg!)
+ - Minor Win32 build fix
+ - Add Reflog class (GH#55) (thanks, @jacquesg!)
+ - Suport non-default stash flags (GH#56) (thanks, @jacquesg!)
+ - Clean-up test repositories after test run (GH#59) (thanks, @jacquesg!)
+ - Rename classes (incompatible changes):
+    + Git::Raw::TreeBuilder -> Git::Raw::Tree::Builder
+    + Git::Raw::TreeEntry -> Git::Raw::Tree::Entry
+ - Improve patch and diff support (GH#61) (thanks, @jacquesg!)
+    + New classes: Git::Raw::Patch, Git::Raw::Diff::Delta,
+      Git::Raw::Diff::Hunk, Git::Raw::Diff::File
+ - Improve index conflicts handling (GH#62) (thanks, @jacquesg!)
+ - Add support for filters (GH#57) (thanks, @jacquesg!)
+ - Add support for blame (GH#63) (thanks, @jacquesg!)
+ - Visual Studio build fixes (GH#64) (thanks, @jacquesg!)
+ - Correctly handle Git::Raw::Remote refcount (GH#65) (thanks, @jacquesg!)
+
+0.31      2014-02-08 19:07:55 Europe/Rome
+
+ - Fix include paths on FreeBSD (GH#49) (GH#50) (thanks, @jacquesg!)
+ - (Try to) support building libgit2 on Windows
+ - Properly create Commit objects in Walker -> next()
+   (GH#52) (thanks, @karel-m for the test case!)
+
+0.30      2014-01-26 14:39:08 Europe/Rome (TRIAL RELEASE)
+
+ - Add "paths" checkout option (GH#23) (thanks, @jacquesg!)
+ - Various fixes to make it possible to build with MSVC
+   (GH#24, GH#25, GH#26, GH#27, GH#28) (thanks, @jacquesg!)
+ - Repository -> remotes() now returns a list like branches() and refs()
+   (incompatible change)
+ - Repository -> tags() now returns a list like branches() and refs()
+   (incompatible change)
+ - Add Commit -> summary() method (GH#32) (thanks, @jacquesg!)
+ - Add new Repository methods (GH#33) (thanks, @jacquesg!):
+    + Repository -> state()
+    + Repository -> state_cleanup()
+    + Repository -> is_shallow()
+ - Add new clone options (GH#34) (thanks, @jacquesg!):
+    + "remote_name"
+    + "checkout_branch"
+    + "ignore_cert_errors"
+    + "disable_checkout"
+ - Update to libgit2 426d845
+ - Move Blob/Tree -> is_blob() and -> is_tree() to XS
+   (GH#36) (thanks, @magnolia-k!)
+ - Add Repository -> new() (GH#37) (thanks, @jacquesg!)
+ - Add Remote -> create_inmemory() and Remote -> ls()
+   (GH#37) (thanks, @jacquesg!)
+ - Add support for more callbacks for:
+    + Remote -> callbacks()
+    + Repository -> clone()
+    + Repository -> checkout()
+   (GH#39) (thanks, @jacquesg!) (incompatible change)
+ - Add Repository -> path_is_ignored() (GH#38) (thanks, @jacquesg!)
+ - Improve Repository -> status() (incompatible change):
+    + It can now return the statuses of multiple files (GH#29)
+    + It can now detect file renames (GH#30) (thanks, @jacquesg!)
+ - Improve Repository -> diff() and Tree -> diff(), they can now take options
+   and flags (GH#42) (thanks, @jacquesg!) (incompatible change)
+ - Add Signature -> default() method (GH#43) (thanks, @jacquesg!)
+ - Repository -> reset() now takes an %opts argument, which can also be used
+   to specify the entries that should be updated (like "git reset -- file")
+   (GH#44) (thanks, @jacquesg!) (incompatible change)
+ - Reference -> target() now takes an additional optional parameter $new_target
+   used to change the reference's target (GH#47) (thanks, @jacquesg!)
+ - Add Index -> has_conflicts() and Index -> conflict_cleanup() methods
+   (GH#46) (thanks, @jacquesg!)
+ - Add Repository -> merge() method (GH#31) (thanks, @jacquesg!)
+
+0.29      2013-11-24 20:17:02 Europe/Rome
+
+ - Update to libgit2 v0.20
+    + Remove Branch -> foreach() (incompatible change)
+    + Repository -> branches() now returns a "real" list instead of an array
+      reference
+ - Rename Cred -> plaintext() to Cred -> userpass() and Cred -> keyfile()
+   to Cred -> sshkey() (incompatible change)
+ - Add Cred -> sshagent() method
+ - Add is_tree() and is_blob() to Tree and Blob (GH#22) (thanks, @ap!)
+
+0.28      2013-11-18 15:00:10 Europe/Rome
+
+ - Add Blob -> id() (GH#15) (thanks, @hoelzro!)
+ - Add TreeBuilder API (GH#16) (thanks, @hoelzro!)
+ - Add Reference -> create() (GH#17) (thanks, @hoelzro!)
+ - Add Repository -> refs() method (GH#19) (thanks, @hoelzro!)
+ - Make Commit -> create() take an optional parameter indicating the name
+   of a reference to update (GH#19) (thanks, @hoelzro!)
+
+0.27      2013-10-23 12:34:13 Europe/Rome
+
+ - Update to libgit2 1c74686
+ - Add Diff -> print() which replaces Diff -> patch() and Diff -> compact()
+ - Remove deprecated methods (incompatible change):
+    + Remote -> cred_acquire()
+    + Diff -> patch()
+    + Diff -> compact()
+
+0.26      2013-10-09 16:11:42 Europe/Rome
+
+ - Fix build with glibc < 2.17
+
+0.25      2013-10-09 15:17:56 Europe/Rome
+
+ - Update to libgit2 711333e
+    + Rename Branch -> tracking() to upstream() (incompatible change)
+    + Rename Remote -> fetchspec() to add_fetch and pushspec to add_push()
+      They will not return the remote spec anymore (incompatible change)
+ - Enable support for libssh2 at build-time
+ - Add support for SSH key credentials via Cred -> keyfile()
+ - Add Remote -> callbacks() method
+ - Add Remote -> load() method
+
+0.24      2013-03-31 13:06:30 Europe/Rome
+
+ - Update libgit2 to d2a4a54
+ - Config -> bool()/int()/str() now return undef when a configuration variable
+   is not found, instead of segfaulting (GH#13)
+
+0.23      2013-03-25 14:09:09 Europe/Rome
+
+ - Update libgit2 to 3f21a23
+    + The Branch -> move() method does not modify the Branch object anymore, as
+      per the new underlying libgit2 implementation. An additional lookup is
+      needed in order to get the new object (incompatible change)
+    + Remove Reference -> is_packed() method since it disappeared from libgit2
+ - Add Branch -> tracking() method
+
+0.22      2013-02-23 15:19:30 Europe/Rome
+
+ - Remove test_repo after tests, to allow "make test" to run multiple times
+   (should fix OpenBSD CPAN Testers)
+ - Update libgit2 to 5eeb357
+
+0.21      2013-02-20 17:41:56 Europe/Rome
+
+ - Reference -> target(), Tree -> diff() and TreeEntry -> object() methods do
+   not accept a Repository argument anymore (incompatible change)
+ - Fix memory leak in Tree -> entry_bypath() (GH#11)
+ - Tag -> delete() is now an object method just like other delete() methods
+   (incompatible change)
+ - Do not use Makefile.embed to build libgit2 to avoid FTBFS on *BSD
+ - Update libgit2 to fd69c7b
+
+0.20      2013-01-26 13:46:00 Europe/Rome
+
+ - Documentation fixes (GH#6) (thanks, @daknok!)
+ - Add note in the documentation about the API being unstable
+ - Update libgit2 to f42beff
+    + Update checkout strategies' names: "update_unmodified", "update_missing",
+      "update_modified" and "update_untracked" have been removed (incompatible
+      change)
+ - Repository -> head() now takes an additional optional parameter $new_head
+   used to change the repository's HEAD (GH#7)
+ - Repository -> workdir() now takes an additional optional parameter $new_dir
+   used to change the repository's working directory
+   (GH#8, #9) (thanks, @thaljef)
+ - Add Tree -> entry_by{name,path}() methods (GH#10) (thanks, @keedi!)
+
+0.19      2013-01-03 19:24:50 Europe/Rome
+
+ - Fix errors in the Push and Repository examples (no functional changes)
+ - Reference -> target() does not need a Repository argument anymore (its
+   documentation was also incorrect) (thanks, @ruz!)
+ - Repository -> head() now returns a Reference like the underlying libgit2 API
+   instead of a Commit (incompatible change) (thanks, @ruz!)
+ - Update libgit2 to 07871d3
+    + Rename Remote -> add() method to Remote -> create() and remove
+      Remote -> new() (incompatible changes)
+    + Update Repository -> clone() to take an URL again (instead of a remote)
+      and a generic %opts parameter (incompatible changes)
+ - Update Repository -> checkout() to take a generic %opts parameter and improve
+   its documentation (incompatible change)
+
+0.18      2012-12-14 18:39:16 Europe/Rome
+
+ - Add Walker -> push_*() and hide_*() methods (thanks, @ruz!)
+ - Update libgit2 to 37ac443
+ - Add Push and Cred classes
+    + Now pushing to remote HTTP(S) repositories is supported
+ - Fix a double-free bug in Reference -> delete() method (GH#4)
+ - Add Reference -> owner() method (thanks, @ruz)
+ - Now Repository -> clone() takes a Remote argument instead of a URL to support
+   authentication while cloning over HTTP(S) (incompatible change)
+
+0.17      2012-12-04 13:49:35 Europe/Rome
+
+ - Update libgit2 to da82043
+    + Add Tag -> foreach() method
+ - Documentation fixes (no functional changes)
+ - Add Branch -> is_head() method
+ - Add Config -> new(), add_file(), refresh() and foreach() methods
+ - Add Index -> read_tree() and remove() methods
+ - Add Repository -> checkout() method
+ - Support custom checkout strategies in Repository -> clone() and checkout()
+   methods
+    + This adds an additional parameter to Repository -> clone()
+      (incompatible change)
+ - SSL support is now enabled if OpenSSL is present at build time
+
+0.16      2012-11-30 12:43:50 Europe/Rome
+
+ - Load Git::Raw from other modules too (thanks, @ruz!)
+ - Make Branch ISA Reference (thanks, @ruz!)
+ - Add Branch -> foreach() method (thanks, @ruz!)
+    + Add Repository -> branches() method
+ - Add Repository -> ignore() method
+ - Add Stash class
+ - The Remote -> name() and url() methods now take an optional argument that
+   is used to change the name/url of a remote.
+ - Add RefSpec class
+    + Add Remote -> {fetch,push}spec() methods
+ - Add Blob -> size() method
+ - Add Blob -> create() method
+    + Add Repository -> blob() method
+ - Add Reference -> is_{branch,packed,remote}() methods (thanks, @ruz!)
+ - Add Branch -> move() method
+
+0.15      2012-10-30 22:39:50 Europe/Rome
+
+ - The $is_bare check in Repository -> clone() was inverted
+ - Update libgit2 to 6c21358a8
+    + Remove Index -> uniq() and append() methods
+
+0.14      2012-10-19 12:26:40 Europe/Rome
+
+ - Test fixes (GH#2) (thanks, @vlet)
+ - Update libgit2 to b2b571ce0
+
+0.13      2012-10-02 18:27:05 Europe/Rome
+
+ - Fix test failures
+
+0.12      2012-09-22 19:24:45 Europe/Rome
+
+ - Fix typo in Reference's docs
+ - Add a proper Changes file
+ - Update libgit2 to d75074:
+    + Remove Branch -> delete() method (incompatible change)
+    + Add Repository -> clone() method
+
+0.11      2012-08-23 09:41:38 Europe/Rome
+
+ - Various documentation fixes (no functional changes)
+
+0.10      2012-08-22 18:53:04 Europe/Rome
+
+ - Add delete() method for all the objects that support it
+ - Move Repository -> tag(), branch() and walker() functionality to the
+   respective object constructors
+
+0.09      2012-08-22 17:56:59 Europe/Rome
+
+ - Add lookup() method for all the objects that support it
+ - Add Diff class
+
+0.08      2012-08-21 15:15:17 Europe/Rome
+
+ - Add Repository -> reset() method
+ - Add Branch class and Repository -> branch() method
+ - Embed libgit2 sources to ease building
+
+0.07      2012-08-20 19:02:44 Europe/Rome
+
+ - Add Repository -> discover() method
+
+0.06      2012-08-17 14:13:05 Europe/Rome
+
+ - Add Remote class
+ - Add Repository -> tags() method
+
+0.05      2012-08-09 15:56:21 Europe/Rome
+
+ - Add Reference class
+
+0.04      2012-08-08 21:42:46 Europe/Rome
+
+ - Add Blob class
+ - Add TreeEntry class and Tree -> id() method
+ - Add Commit -> tree() method
+ - Rename Config -> string() method to Config -> str()
+
+0.03      2012-08-06 16:45:57 Europe/Rome
+
+ - Add proper support for commit parents
+ - Add Walker class
+ - Add Repository -> status() method
+ - Add more Config methods
+
+0.02      2012-08-05 20:18:56 Europe/Rome
+
+ - Improve exception messages
+ - Add Commit -> id() method
+ - Add Repository -> lookup() and -> head() methods
+ - Add Tag class
+
+0.01      2012-08-05 11:43:13 Europe/Rome
+
+ - Initial version

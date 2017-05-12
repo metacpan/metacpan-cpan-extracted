@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Geo-Parse-PolishFormat
+version:             0.02
+abstract:            Perl extension for parsing maps in polish text format (*.mp).
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - root <root@>

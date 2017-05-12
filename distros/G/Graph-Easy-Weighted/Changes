@@ -1,0 +1,27 @@
+Revision history for Graph-Easy-Weighted:
+
+0.07  2017-03-01
+    - Add and use the dump() function.
+
+0.06  2015-10-14
+    - Add support for population with Math::MatrixReal objects.
+
+0.0501 2015-10-09
+    - Improved documentation.
+
+0.05  2015-10-04
+    - Enable generic node attribute setting.
+    - Improve documentation.
+
+0.04  2015-10-03
+    - Handle an sprintf() format for the edge label.
+
+0.03  2015-10-03
+    - Remove the unneeded new() method.
+
+0.02  2015-10-03
+    - Set edge labels for the given attribute.
+
+0.01  2015-10-03
+    - Copied from the Graph::Easy::Weighted distribution.
+    - Tweaked for Graph::Easy usage.

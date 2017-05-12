@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Geo-Coder-YahooJapan-Inverse.t
+lib/Geo/Coder/YahooJapan/Inverse.pm
+META.yml                                 Module meta-data (added by MakeMaker)

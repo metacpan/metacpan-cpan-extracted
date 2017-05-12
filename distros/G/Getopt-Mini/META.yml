@@ -1,0 +1,23 @@
+---
+abstract: 'fast, no spec getopt'
+author:
+  - 'Rodrigo de Oliveira <rodrigolive@gmail.com>'
+build_requires:
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-Mini
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: git://github.com/rodrigolive/getopt-mini.git/issues
+  homepage: http://search.cpan.org/dist/Getopt-Mini/
+  repository: git://github.com/rodrigolive/getopt-mini.git
+version: '0.03'

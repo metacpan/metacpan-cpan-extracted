@@ -1,0 +1,6 @@
+Revision history for Perl extension GD::Window.
+
+0.01  Wed Oct 28 09:15:14 2009
+	- original version; created by h2xs 1.23 with options
+		-AX GD::Window
+

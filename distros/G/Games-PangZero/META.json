@@ -1,0 +1,225 @@
+{
+   "abstract" : "a fast-paced action game about popping balloons with a harpoon",
+   "author" : [
+      "UPi <upi@sourceforge.net>",
+      "SAdam <sadam@apocalypse.rulez.org>",
+      "DaniGM <danigm@gmail.com>",
+      "Elio Blanca <eblanca76@users.sourceforge.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-PangZero",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "File::Spec" : 0,
+            "SDL" : "2.536",
+            "Time::HiRes" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Games::PangZero" : {
+         "file" : "lib/Games/PangZero.pm",
+         "version" : "v1.4.1"
+      },
+      "Games::PangZero::Ball" : {
+         "file" : "lib/Games/PangZero/Ball.pm",
+         "version" : 0
+      },
+      "Games::PangZero::BonusDrop" : {
+         "file" : "lib/Games/PangZero/BonusDrop.pm",
+         "version" : 0
+      },
+      "Games::PangZero::ChallengeGame" : {
+         "file" : "lib/Games/PangZero/ChallengeGame.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Config" : {
+         "file" : "lib/Games/PangZero/Config.pm",
+         "version" : 0
+      },
+      "Games::PangZero::DeadGuy" : {
+         "file" : "lib/Games/PangZero/DeadGuy.pm",
+         "version" : 0
+      },
+      "Games::PangZero::DeathBall" : {
+         "file" : "lib/Games/PangZero/DeathBall.pm",
+         "version" : 0
+      },
+      "Games::PangZero::DemoGame" : {
+         "file" : "lib/Games/PangZero/DemoGame.pm",
+         "version" : 0
+      },
+      "Games::PangZero::DemoPlaybackGame" : {
+         "file" : "lib/Games/PangZero/DemoPlaybackGame.pm",
+         "version" : 0
+      },
+      "Games::PangZero::DemoRecordGame" : {
+         "file" : "lib/Games/PangZero/DemoRecordGame.pm",
+         "version" : 0
+      },
+      "Games::PangZero::EarthquakeBall" : {
+         "file" : "lib/Games/PangZero/EarthquakeBall.pm",
+         "version" : 0
+      },
+      "Games::PangZero::FpsIndicator" : {
+         "file" : "lib/Games/PangZero/FpsIndicator.pm",
+         "version" : 0
+      },
+      "Games::PangZero::FragileBall" : {
+         "file" : "lib/Games/PangZero/FragileBall.pm",
+         "version" : 0
+      },
+      "Games::PangZero::GameBase" : {
+         "file" : "lib/Games/PangZero/GameBase.pm",
+         "version" : 0
+      },
+      "Games::PangZero::GameObject" : {
+         "file" : "lib/Games/PangZero/GameObject.pm",
+         "version" : 0
+      },
+      "Games::PangZero::GamePause" : {
+         "file" : "lib/Games/PangZero/GamePause.pm",
+         "version" : 0
+      },
+      "Games::PangZero::GameTimer" : {
+         "file" : "lib/Games/PangZero/GameTimer.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Globals" : {
+         "file" : "lib/Games/PangZero/Globals.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Graphics" : {
+         "file" : "lib/Games/PangZero/Graphics.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Guy" : {
+         "file" : "lib/Games/PangZero/Guy.pm",
+         "version" : 0
+      },
+      "Games::PangZero::HalfCutter" : {
+         "file" : "lib/Games/PangZero/HalfCutter.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Harpoon" : {
+         "file" : "lib/Games/PangZero/Harpoon.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Hexa" : {
+         "file" : "lib/Games/PangZero/Hexa.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Highscore" : {
+         "file" : "lib/Games/PangZero/Highscore.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Joystick" : {
+         "file" : "lib/Games/PangZero/Joystick.pm",
+         "version" : 0
+      },
+      "Games::PangZero::MachineGun" : {
+         "file" : "lib/Games/PangZero/MachineGun.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Meltdown" : {
+         "file" : "lib/Games/PangZero/Meltdown.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Menu" : {
+         "file" : "lib/Games/PangZero/Menu.pm",
+         "version" : 0
+      },
+      "Games::PangZero::MenuItem" : {
+         "file" : "lib/Games/PangZero/MenuItem.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Music" : {
+         "file" : "lib/Games/PangZero/Music.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Palette" : {
+         "file" : "lib/Games/PangZero/Palette.pm",
+         "version" : 0
+      },
+      "Games::PangZero::PanicGame" : {
+         "file" : "lib/Games/PangZero/PanicGame.pm",
+         "version" : 0
+      },
+      "Games::PangZero::PlayableGameBase" : {
+         "file" : "lib/Games/PangZero/PlayableGameBase.pm",
+         "version" : 0
+      },
+      "Games::PangZero::PlaybackGame" : {
+         "file" : "lib/Games/PangZero/PlaybackGame.pm",
+         "version" : 0
+      },
+      "Games::PangZero::Pop" : {
+         "file" : "lib/Games/PangZero/Pop.pm",
+         "version" : 0
+      },
+      "Games::PangZero::PowerWire" : {
+         "file" : "lib/Games/PangZero/PowerWire.pm",
+         "version" : 0
+      },
+      "Games::PangZero::RecordGame" : {
+         "file" : "lib/Games/PangZero/RecordGame.pm",
+         "version" : 0
+      },
+      "Games::PangZero::SeekerBall" : {
+         "file" : "lib/Games/PangZero/SeekerBall.pm",
+         "version" : 0
+      },
+      "Games::PangZero::SlowEffect" : {
+         "file" : "lib/Games/PangZero/SlowEffect.pm",
+         "version" : 0
+      },
+      "Games::PangZero::SuperBall" : {
+         "file" : "lib/Games/PangZero/SuperBall.pm",
+         "version" : 0
+      },
+      "Games::PangZero::TutorialGame" : {
+         "file" : "lib/Games/PangZero/TutorialGame.pm",
+         "version" : 0
+      },
+      "Games::PangZero::UpsideDownBall" : {
+         "file" : "lib/Games/PangZero/UpsideDownBall.pm",
+         "version" : 0
+      },
+      "Games::PangZero::WaterBall" : {
+         "file" : "lib/Games/PangZero/WaterBall.pm",
+         "version" : 0
+      },
+      "Games::PangZero::XmasBall" : {
+         "file" : "lib/Games/PangZero/XmasBall.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/kthakore/pangzero/issues"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "http://github.com/kthakore/pangzero"
+      }
+   },
+   "version" : "v1.4.1"
+}

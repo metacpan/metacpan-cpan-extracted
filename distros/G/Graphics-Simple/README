@@ -1,0 +1,20 @@
+Graphics::Simple is a module that emulates something like the graphics
+API provided by Commodore-64 or VIC-20 in Perl:
+
+	use Graphics::Simple;
+
+	line(50,50,150,150);
+	line(10,10,290,10);
+	line(10,290,290,290);
+
+	circle(50,50,25);
+
+This can be rendered on a variety of devices, currently an X window
+(using the Gnome Canvas, requiring a recent gnome and gnome-perl interface:
+gnome-perl on the Gnome CVS, the CPAN module is out of date) 
+or postscript.
+
+See the pod documentation in Simple.pm for details on the operations
+provided. 
+
+

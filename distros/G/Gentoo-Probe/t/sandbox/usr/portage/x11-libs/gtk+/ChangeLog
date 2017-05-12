@@ -1,0 +1,555 @@
+# ChangeLog for x11-libs/gtk+
+# Copyright 2002-2004 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/x11-libs/gtk+/ChangeLog,v 1.1 2004/09/11 05:21:25 rich Exp $
+
+  30 Aug 2004; Tom Gall <tgall@gentoo.org> gtk+-2.4.4.ebuild:
+  only stable version of gtk+-2.4.3 for ppc64 was removed,
+  marking 2.4.4 stable on an emergancy basis
+
+*gtk+-2.4.9 (29 Aug 2004)
+
+  29 Aug 2004; foser <foser@gentoo.org. gtk+-2.4.9.ebuild :
+  New release
+
+  24 Aug 2004; Bryan Østergaard <kloeri@gentoo.org> gtk+-2.4.4.ebuild:
+  Stable on alpha.
+
+  22 Aug 2004; Travis Tilley <lv@gentoo.org> gtk+-2.4.4.ebuild,
+  gtk+-2.4.7.ebuild:
+  made arch specific config file patch apply on x86 when CONF_LIBDIR=lib32. this
+  is just to make building the emul-linux-x86-gtklibs package easier, and has no
+  effect on x86 users in general.
+
+  22 Aug 2004; Travis Tilley <lv@gentoo.org> gtk+-2.4.4.ebuild,
+  gtk+-2.4.7.ebuild:
+  added a patch that puts the config files for gtk in an arch specific directory
+  on amd64 so that the 32bit and 64bit versions dont clash
+
+*gtk+-2.4.7 (19 Aug 2004)
+
+  19 Aug 2004; foser <foser@gentoo.org> gtk+-2.4.7.ebuild :
+  New release
+  Add smoothscroll patch from gnome bugzilla for testing
+  
+  07 Aug 2004; Travis Tilley <lv@gentoo.org> gtk+-2.4.4.ebuild:
+  stable on amd64
+
+  07 Aug 2004; Michael Hanselmann <hansmi@gentoo.org> gtk+-1.2.10-r11.ebuild:
+  Added gnuconfig to replace config.* on Mac OS X and added to ~macos.
+
+  05 Aug 2004; Gustavo Zacarias <gustavoz@gentoo.org> gtk+-2.4.4.ebuild:
+  Stable on sparc
+
+  05 Aug 2004; Guy Martin <gmsoft@gentoo.org> gtk+-2.4.4.ebuild:
+  Stable on hppa.
+
+  31 Jul 2004; <spider@gentoo.org> gtk+-2.4.4.ebuild:
+  stable on x86 for gnome 2.6.2
+
+  27 Jul 2004; <agriffis@gentoo.org> gtk+-1.2.10-r11.ebuild,
+  gtk+-2.4.1.ebuild:
+  stable on alpha (1.2.10-r11) and ia64 (1.2.10-r11, 2.4.1)
+
+  26 Jul 2004; Tom Gall <tgall@gentoo.org> gtk+-1.2.10-r11.ebuild:
+  stable on ppc64
+
+  20 Jul 2004; Tom Gall <tgall@gentoo.org> gtk+-2.4.3-r1.ebuild:
+  stable on ppc64, bug #57154
+
+*gtk+-2.4.4 (11 Jul 2004)
+
+  11 Jul 2004; <spider@gentoo.org> +gtk+-2.4.4.ebuild:
+  Versionbump.
+
+*gtk+-2.4.3-r1 (06 Jul 2004)
+
+  06 Jul 2004; Martin Schlemmer <azarah@gentoo.org>
+  +files/gtk+-2.4.x-filesel-navbuttons.patch.bz2, +gtk+-2.4.3-r1.ebuild:
+  Add fileselect dialog patch from Ximian/Suse.
+
+  02 Jul 2004; Tom Gall <tgall@gentoo.org> gtk+-1.2.10-r11.ebuild:
+  fix repoman dep (imlib)
+
+  28 Jun 2004; Tom Gall <tgall@gentoo.org> gtk+-2.4.3.ebuild:
+  ~ppc64 , bug #54792
+
+  23 Jun 2004; Aron Griffis <agriffis@gentoo.org> gtk+-1.2.10-r10.ebuild:
+  QA - fix use invocation
+
+  19 Jun 2004; Gustavo Zacarias <gustavoz@gentoo.org> gtk+-2.4.1.ebuild:
+  sparc stable
+
+  16 Jun 2004; Bryan Østergaard <kloeri@gentoo.org> gtk+-2.4.1.ebuild:
+  Stable on alpha.
+
+*gtk+-2.4.3 (15 Jun 2004)
+
+  15 Jun 2004; foser <foser@gentoo.org> gtk+-2.4.3.ebuild :
+  New release (#53700)
+
+  03 Jun 2004; Stephen P. Becker <geoman@gentoo.org> gtk+-2.4.1.ebuild:
+  Stable on mips.
+
+  01 Jun 2004; Travis Tilley <lv@gentoo.org> gtk+-2.4.1.ebuild:
+  stable on amd64
+
+*gtk+-2.4.1 (04 May 2004)
+
+  04 May 2004; foser <foser@gentoo.org> gtk+-2.4.1.ebuild :
+  New release, add patch & dep to have a default icon theme available to the chooser
+
+  26 Apr 2004; Stephen P. Becker <geoman@gentoo.org> gtk+-2.2.4-r1.ebuild:
+  Marked stable on mips.
+
+  22 Apr 2004; Stephen P. Becker <geoman@gentoo.org> gtk+-2.4.0-r1.ebuild:
+  Breaks GNOME 2.4, so returned to ~mips.
+
+  14 Apr 2004; Stephen P. Becker <geoman@gentoo.org> gtk+-1.2.10-r10.ebuild,
+  gtk+-1.2.10-r11.ebuild, gtk+-2.4.0-r1.ebuild:
+  Marked stable on mips.
+
+*gtk+-2.4.0-r1 (09 Apr 2004)
+
+  09 Apr 2004; Travis Tilley <lv@gentoo.org> gtk+-2.4.0-r1.ebuild,
+  files/gtk+-2.4.0-uimanager-zero-becomes-null.patch:
+  added patch to fix a crash in epiphany that may or may not occur only on
+  amd64. for more information on this bug, please refer to
+  http://bugzilla.gnome.org/show_bug.cgi?id=138997
+
+  30 Mar 2004; Donnie Berkholz <spyderous@gentoo.org>; gtk+-2.2.4-r1.ebuild,
+  gtk+-2.4.0.ebuild:
+  Change x11-base/xfree dependency to virtual/x11. Everyone on xfree should be
+  on 4.3.0-r3 or greater by now, so #20407 shouldn't be an issue.
+
+*gtk+-2.4.0 (18 Mar 2004)
+
+  18 Mar 2004; foser <foser@gentoo.org> gtk+-2.4.0.ebuild :
+  New release
+  Remove incorporated patches
+  Removed wm patch, it's broken
+  Correct license
+  
+  06 Mar 2004; Stephen P. Becker <geoman@gentoo.org> gtk+-1.2.10-r10.ebuild,
+  gtk+-2.2.4-r1.ebuild:
+  Added ~mips keyword.
+
+*gtk+-1.2.10-r11 (05 Feb 2004)
+
+  05 Feb 2004; <spider@gentoo.org> gtk+-1.2.10-r11.ebuild:
+  Minor change to DEPEND, adding an RDEPEND to get intltool out of the RDEPEND
+  set. this deserves a revbump only to make sure that packages get updated.
+
+  07 Dec 2003; foser <foser@gentoo.org> gtk+-1.2.10-r10.ebuild :
+  Fix sysconfdir to /etc to fix gtkrc problems described in #34279
+
+  14 Nov 2003; Aron Griffis <agriffis@gentoo.org> gtk+-1.2.10-r10.ebuild:
+  Stable on ia64
+
+  08 Nov 2003; Todd Sunderlin <todd@gentoo.org> gtk+-2.2.4-r1.ebuild:
+  added sparc keyword
+
+  20 Oct 2003; Aron Griffis <agriffis@gentoo.org> gtk+-2.2.4-r1.ebuild:
+  Stable on alpha
+
+  08 Oct 2003; foser <foser@gentoo.org> gtk+-2.2.4-r1.ebuild :
+  Added patch to fix notification area, submitted by <pat@engsoc.org>
+
+  06 Oct 2003; Mike Gardiner <obz@gentoo.org> gtk+-2.2.4-r1.ebuild:
+  Marked stable on x86
+
+  23 Sep 2003; Bartosch Pixa <darkspecter@gentoo.org> gtk+-2.2.4-r1.ebuild:
+  set ppc in keywords
+
+*gtk+-2.2.4-r1 (10 Sep 2003)
+
+  16 Nov 2003; Guy Martin <gmsoft@gentoo.org> gtk+-2.2.4-r1.ebuild :
+  Added hppa to KEYWORDS.
+
+  10 Sep 2003; foser <foser@gentoo.org> gtk+-2.2.4-r1.ebuild :
+  Remove USE debug support, the not hardcoded disabling of debugging support 
+  should fix a lot of problems. Rev bump to propagate.
+
+*gtk+-2.2.4 (07 Sep 2003)
+
+  07 Sep 2003; foser <foser@gentoo.org> gtk+-2.2.4.ebuild :
+  New bugfix release
+
+*gtk+-2.2.3 (27 Aug 2003)
+
+  27 Aug 2003; foser <foser@gentoo.org> gtk+-2.2.3.ebuild :
+  New version
+
+  25 Jul 2003; foser <foser@gentoo.org> gtk+-2.2.2-r1.ebuild :
+  Fix xinput (#25203)
+
+  02 Jul 2003; Jason Wever <weeve@gentoo.org> gtk+-2.2.2-r1.ebuild:
+  Changed sparc keyword back to ~sparc to fix broken dependencies.
+
+*gtk+-2.2.2-r1 (12 Jun 2003)
+
+  01 Jul 2003; Guy Martin <gmsoft@gentoo.org> gtk+-2.2.2-r1.ebuild :
+  Added ~hppa to KEYWORDS.
+
+  01 Jul 2003; Todd Sunderlin <todd@gentoo.org> gtk+-2.2.2-r1.ebuild :
+  set stable on sparc
+
+  16 Jun 2003; foser <foser@gentoo.org> gtk+-2.2.2-r1.ebuild, gtk+-2.2.2-gtkwidget_pixmap_expose.patch :
+  Replace reverting patch with correct upstream patch for #22576
+
+  12 Jun 2003; foser <foser@gentoo.org> gtk+-2.2.2-r1.ebuild :
+  Added patch to 'fix' pixbuf corruption issues (#22576)
+
+  10 Jun 2003; Luca Barbato <lu_zero@gentoo.org> gtk+-2.2.2.ebuild :
+  Removed an unnecessary ppc patch.
+
+*gtk+-2.2.2 (10 Jun 2003)
+
+  10 Jun 2003; foser <foser@gentoo.org> gtk+-2.2.2.ebuild :
+  New version, enabled xinput support (#20407) which needs a recent xfree
+  Added GDK_USE_XFT as environment var as suggested by utx
+  
+  30 May 2003; Luca Barbato <lu_zero@gentoo.org> gtk+-2.2.1.ebuild:
+  Added ppc to keywords.
+
+*gtk+-2.2.1-r1 (11 Apr 2003)
+
+  19 Apr 2003; foser <foser@gentoo.org> gtk+-2.2.1-r1.ebuild :
+  Make sure we enable wm patch (better late then never)
+
+  11 Apr 2003; foser <foser@gentoo.org> gtk+-2.2.1-r1.ebuild :
+  Added gtktreeview patch for eclipse (#19084)
+
+*gtk+-1.2.10-r10 (08 Mar 2003)
+
+  01 Jul 2003; Guy Martin <gmsoft@gentoo.org> gtk+-1.2.10-r10.ebuild :
+  Marked stable on hpp.
+
+  04 Apr 2003; Jason Wever <weeve@gentoo.org> gtk+-1.2.10-r10.ebuild:
+  Changed ~sparc keyword to sparc.
+
+  30 Mar 2003; Aron Griffis <agriffis@gentoo.org> gtk+-1.2.10-r10.ebuild:
+  Mark stable on alpha
+
+  16 Mar 2003; Mark Guertin <gerk@gentoo.org> gtk+-1.2.10-r10.ebuild:
+  set ppc in keywords
+
+  16 Mar 2003; Guy Martin <gmsoft@gentoo.org> gtk+-1.2.10-r10.ebuild :
+  Added ~hppa to keywords.
+
+  09 Mar 2003; Martin Schlemmer <azarah@gentoo.org> gtk+-1.2.10-r10.ebuild :
+  Change to fully use epatch, and also make use of libtool eclass.
+
+  08 Mar 2003; foser <foser@gentoo.org> gtk+-1.2.10-r10.ebuild :
+  New patch to fix locale problems that have been bugging us for a long time
+  Patch done by Stanislav Brabec <sbrabec@suse.cz> 
+  Related gentoo bugs #10529, #16883
+
+*gtk+-2.2.1 (04 Feb 2003)
+
+  01 Jul 2003; Guy Martin <gmsoft@gentoo.org> gtk+-2.2.1.ebuild :
+  Added hppa to KEYWORDS.
+
+  04 Mar 2003; Jason Wever <weeve@gentoo.org> gtk+-2.2.1.ebuild:
+  Added sparc to keywords.
+
+  01 Mar 2003; Jason Wever <weeve@gentoo.org> gtk+-2.2.1.ebuild:
+  Added ~sparc to keywords.
+
+  21 Feb 2003; Aron Griffis <agriffis@gentoo.org> gtk+-2.2.1.ebuild :
+  Mark stable on alpha
+
+  13 Feb 2003; Jon Nall <nall@gentoo.org> gtk+-2.2.1.ebuild :
+  bumped pango version to 1.1.3 since the gtk+ configure script
+  barfs if xft-2 is installed, but pango <1.1.3 is installed
+
+  07 Feb 2003; foser <foser@gentoo.org> gtk+-2.2.1.ebuild :
+  Added alpha blended disabled icons patch
+
+  05 Feb 2003; Jon Nall <nall@gentoo.org> gtk+--2.2.1.ebuild :
+  added patch to fix endian problem for 15/24 bit displays
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+-2.2.1.ebuild :
+  bumped version
+
+  16 Jan 2003; foser <foser@gentoo.org> gtk+-2.2.0.ebuild :
+  Added some info about rebuilding gtk theme engines after an emerge
+
+  04 Jan 2003; Rodney Rees <manson@gentoo.org> gtk+-2.0.6-r3.ebuild :
+  changed ~sparc to sparc
+
+  01 Jan 2003; Aron Griffis <agriffis@gentoo.org> gtk+-2.0.9.ebuild gtk+-2.2.0.ebuild:
+  Reverted previous change on gtk+-2.0.9 since it sounds like 2.2.0 works on
+  Alpha.  Added ~alpha to KEYWORDS on 2.2.0
+
+  31 Dec 2002; Aron Griffis <agriffis@gentoo.org> gtk+-2.0.9.ebuild :
+  glib-2.0.7 is broken on alpha, so change the dependency here to version
+  2.0.6 which works fine with gtk+-2.0.9
+
+  24 Dec 2002; Martin Schlemmer <azarah@gentoo.org> gtk+-2.2.0.ebuild :
+  Fix to depend on glib-2.2.0, else it fails with unresolved symbols ..
+
+*gtk+-2.2.0 (22 Dec 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+
+  22 Dec 2002; foser <foser@gentoo.org> gtk+-2.2.0.ebuild :
+  New version
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+  21 Nov 2002; Martin Schlemmer <azarah@gentoo.org> gtk+-2.1.2.ebuild,
+  gtk+-2.0.9.ebuild :
+
+  Turn of --export-symbols-regex for now, since it removes
+  the wrong symbols.  Patch from Redhat.
+
+*gtk+-2.0.9 (20 Nov 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  20 Nov 2002; foser <foser@gentoo.org> gtk+-2.0.9.ebuild :
+  New version, mainly fixes a bug which made metacity crash
+
+*gtk-2.0.8-r1 (15 Nov 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  15 Nov 2002; Seemant Kulleen <seemant@gentoo.org> gtk+-2.0.8-r1.ebuild
+  files/digest-gtk+-2.0.8-r1 :
+
+  DirectFB patched version of it.
+
+*gtk+-2.1.2 (12 Nov 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  29 Nov 2002; Jon Nall <nall@gentoo.org> gtk+-2.1.2.ebuild :
+  added ~ppc to KEYWORDS
+
+  12 Nov 2002; foser <foser@gentoo.org> gtk+-2.1.2.ebuild :
+  GNOME 2.1.2 release
+
+*gtk+-2.0.8 (09 Nov 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  12 Nov 2002; L. Boshell <leonardop@gentoo.org> : Removed directfb dep
+  since it wasn't being used.
+
+  11 Nov 2002; Spider <spider@gentoo.org> gtk+-2.0.8.ebuild :
+  stabilized for x86
+  
+  09 Nov 2002; Spider <spider@gentoo.org> gtk+-2.0.8.ebuild 
+  files/digest-gtk+-2.0.8 : New version fixes the patch needed for last version
+  also fixed the dependencies, after 2.0.7-r1.
+  
+*gtk+-2.0.7-r1 (05 Nov 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  09 Nov 2002; foser <foser@gentoo.org> gtk+-2.0.7-r1 :
+  Added sgmltools-lite dep, to fix documentation problems
+
+  05 Nov 2002; foser <foser@gentoo.org> gtk+-2.0.7-r1 :
+  Added a patch to fix problems with gdk-pixbuf (bug #10261)
+
+*gtk+-2.0.7 (04 Nov 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  04  Nov 2002; Spider <spider@gentoo.org> gtk+-2.0.4.ebuild 
+  files/digest-gtk+-2.0.4: added the latest stable release, bugfixes and nothing
+  more. Ripped out the directfb (wow, it survived more than 10 days! )
+
+  
+*gtk+-2.1.1 (27 Oct 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  27 Oct 2002; foser <foser@gentoo.org> gtk+-2.1.1.ebuild :
+  gnome 2.1
+
+*gtk+-2.0.6-r3 (21 Oct 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  21 Oct 2002; Seemant Kulleen <seemant@gentoo.org> gtk+-2.0.6-r3.ebuild
+  files/digest-gtk+-2.0.6-r3 :
+
+  Added the DirectFB patch (finally!)
+
+*gtk+-2.0.6-r2 (10 Oct 2002)
+  
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  10 Oct 2002; foser <foser@gentoo.org> gtk+-2.0.6-r2.ebuild :
+  Bumped revision to get the safety replacement added in r1 spread  
+
+*gtk+-1.2.10-r9 (26 Sep 2002)
+ 
+  16 Mar 2003; Guy Martin <gmsoft@gentoo.org> gtk+-1.2.10-r9.ebuild :
+  Added hppa to keywords.
+ 
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  26 Sep 2002; Spider <spider@gentoo.org> gtk+-1.2.10-r9.ebuild :
+  This build enables minimal debugging for all users, this will fix some unexpected crashes in amongst other things xchat.
+
+*gtk+-2.0.6-r1 (04 Jul 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  08 Oct 2002; foser <foser@gentoo.org> gtk+-2.0.6-r1.ebuild :
+  Replace -O3 with -O2 to be on the safe side (bug 8762)
+
+  04 Jul 2002; Spider <spider@gentoo.org> gtk+-2.0.6-r1.ebuild :
+  remove unnecessary debugging
+  remove bad parts from SRC_URI  (broken use)
+  changed configure some
+
+*gtk+-2.0.6 (04 Jul 2002)
+
+  04 Feb 2003; Spider <spider@gentoo.org> gtk+*.ebuild:
+  changed all DEBUG to DEBUGBUILD
+
+  04 Jul 2002; Gabriele Giorgetti <stroke@gentoo.org> gtk+-2.0.6.ebuild:
+
+  New version.
+
+*gtk+-2.0.5-r2 (15 Jul 2002)
+
+  15 Jul 2002; Owen Stampflee <owen@gentoo.org> :
+
+  Added PPC to KEYWORDS.
+
+  15 Jul 2002; Seemant Kulleen <seemant@gentoo.org> gtk+-2.0.5-r2.ebuild
+  files/digest-gtk+-2.0.5-r2 :
+
+  directfb enabled GTK is now a patch on our mirrors instead of being a
+  separate tarball.  This makes the behaviour better for portage's server
+  side caching.
+
+*gtk+-2.0.5-r1 (03 Jul 2002)
+
+  03 Jul 2002; Seemant Kulleen <seemant@gentoo.org> gtk+-2.0.5-r1.ebuild
+  files/digest-gtk+-2.0.5-r1 :
+
+  The DirectFB tarball was replaced on the directfb.org server with one that
+  has bugfixes in it.  No need for paranoia, the directfb folks have
+  verified it for us.  Thanks to: gentoo@tuurlijk.eu.org (Tuurlijk!) in bug
+  #4451 for spotting it.
+
+*gtk+-2.0.5 (17 Jun 2002)
+
+  17 Jun 2002; Seemant Kulleen <seemant@gentoo.org> gtk+-2.0.5.ebuild
+  files/digest-gtk+-2.0.5 :
+
+  Version bump for both regular GTK+2 and GTK+DirectFB
+
+*gtk+-2.0.3-r1 (8 Jun 2002)
+
+  8 Jun 2002; Seemant Kulleen <seemant@gentoo.org> gtk+-2.0.3-r1.ebuild
+  files/digest-gtk+-2.0.3-r1 :
+
+  Option for directfb-patched gtk libs.  This actually gets and compiles a
+  separate source tarball from directfb.org
+
+*gtk+-2.0.3 (28 May 2002)                                                    
+  28 May 2002; Spider <spider@gentoo.org> gtk+-2.0.3.ebuild:
+  new stable branch  
+
+*gtk+-1.2.10-r8 (27 May 2002)
+
+  27 May 2002; Bruce A. Locke <blocke@shivan.org> gtk+-1.2.10-r8.ebuild:
+
+  Ximian patch set and redhat/mdk patch merged
+
+*gtk+-2.0.2-r6 (27 May 2002)                                                    
+  27 May 2002; Spider <spider@gentoo.org> gtk+-2.0.2-r6.ebuild:
+  fix for the use png bug, not libtoolized  
+
+*gtk+-2.0.2-r5 (23 May 2002)                                                    
+  23 May 2002; Spider <spider@gentoo.org> gtk+-2.0.2-r5.ebuild:
+  seems people who installed with the libtoolized version of gtk+ fails
+  when installing gtk+ again.  Test this version if it works (read
+libtoolize)
+	
+
+*gtk+-2.0.2-r4 (22 May 2002)                                                    
+  22 May 2002; Spider <spider@gentoo.org> gtk+-2.0.2-r4.ebuild:
+
+  lintool check
+  debug info back inside
+  remove libtoolize since it breaks things
+  singlethread make since this uses cludgy code 
+
+
+gtk+-1.2.10-r7 (14 Apr 2002)
+  14 Apr 2002; M.Schlemmer <azarah@gentoo.org>; gtk+-1.2.10-r7.ebuild :
+  Libtoolize.
+
+*gtk+-2.0.2-r2 (24 Apr 2002) 
+  24 Apr 2002; Spider <spider@gentoo.org>; gtk+-2.0.2-r2.ebuild:
+  Libtoolize 
+
+*gtk+-2.0.2-r2 (12 Apr 2002)
+  12 Apr 2002; Spider <spider@gentoo.org>; gtk+-2.0.2-r2.ebuild: 
+  Update so a user can disable png, jpeg, tiff support for gtk+
+  This will so break things if they disable it though ;)
+
+
+gtk+-2.0.2-r1
+  11 Apr 2002; Spider <spider@gentoo.org>; gtk+-1.2.10-r4.ebuild gtk+-1.2.10-r5.ebuild gtk+-1.2.10-r6.ebuild gtk+-1.2.10-r7.ebuild gtk+-2.0.2-r1.ebuild :
+  Update all glib dependencies to use glib-1.2*  in preparation of
+unmasking the glib-2.0.1 packages
+
+
+*gtk+-2.0.2 (11 Apr 2002)
+  11 Apr 2002; Spider <spider@gentoo.org>; gtk+-2.0.2-r1.ebuild:
+  New release with new api
+  USE="doc" will build api documentation
+  needs libpng 1.2.1 and is masked because of that.
+  needs glib 2.0 as well
+
+
+*gtk+-1.2.10-r7 (23 Mar 2002)
+
+  23 Mar 2002; Seemant Kulleen <seemant@gentoo.org> gtk+-1.2.10-r7.ebuild :
+
+  Man pages are now in LFH compliant /usr/share/man tree.  Changes submitted by
+  Matthew Kennedy.
+
+*gtk+-1.2.10-r6 (21 Mar 2002)
+
+  21 Mar 2002; Seemant Kulleen <seemant@gentoo.org> gtk+-1.2.10-r6.ebuild :
+
+  Changed the html documentation step to not be gzipped.  This is a small
+  enough change that it shouldn't matter to have users remerge it.
+
+*gtk+-1.2.10-r6 (13 Mar 2002)
+
+  13 Mar 2002; Bruce A. Locke <blocke@shivan.org> gtk+-1.2.10-r6.ebuild :
+
+  gtk+ 1.2.10-r6 now includes patches from Ximian Gnome that help make
+  the gtk+ file picker dialog a little more user friendly :)
+  
+*gtk+-1.2.10-r5 (10 Mar 2002)
+
+  10 Mar 2002; Bruce A. Locke <blocke@shivan.org> gtk+-1.2.10-r5.ebuild :
+
+  NLS fixes submitted by seemant@rocketmail.com (Seemant Kulleen)
+
+

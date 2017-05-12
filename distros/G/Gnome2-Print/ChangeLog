@@ -1,0 +1,427 @@
+2006-11-15  Emmanuele Bassi  <ebassi@gnome.org>
+
+	* README:
+	* Print.pm: Bump to 1.000.
+
+2006-11-15  Emmanuele Bassi  <ebassi@gnome.org>
+
+	* Print.pm: Add deprecation warning.
+
+	* README:
+	* Makefile.PL: Update requirements.
+
+2006-11-15  Emmanuele Bassi  <ebassi@gnome.org>
+
+	Patch by Torsten Schoenfeld for removing signedness warnings.
+
+	* xs/GnomePrintConfig.xs:
+	* xs/GnomePrintPaper.xs:
+	* xs/GnomePrintUnit.xs: Use gchar* instead of guchar* and
+	remove signedness warnings.
+
+2005/08/23 00:45 (-0400) muppetman
+
+	* README, Print.pm: update to version 0.951.
+
+	* xs/GnomePrintPaper.xs: fix compile bug.
+
+2005/08/13 01:03 (+0100) ebassi
+
+	* README, NEWS, Print.pm: update to version 0.95.
+	
+	* xs/GnomePrintConfig.xs: wrapped Gnome2::Print::Config::set, which
+	was left not bound.
+
+	* t/01.GnomePrintConfig.t: test Gnome2::Print::Config::set.
+
+	* xs/GnomePrintPaper.xs: change the Gnome2::Print::Paper wrapper into
+	a blessed reference.
+
+	* t/08.GnomePrintPaper.t: test Gnome2::Print::Paper name.
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+	* perl-Gnome2-Print.spec.in: new scheme that addresses x86_64 problems
+	found by Carl Nygard
+
+2004/07/05 23:32 (+0200) ebassi
+	
+	A t/08.GnomePrintPaper.t
+	
+	* xs/GnomePrintPaper.xs: fixed my stupid cut'n'paste typo for
+	gnome_print_paper_get_by_name (patch by Torsten Schoenfeld). Also
+	fixed the other class methods.
+	
+	* t/08.GnomePrintPaper.t: added a test case for the
+	Gnome2::Print::Paper object.
+
+	* Print.pm, NEWS, README: new release: 0.94
+
+2004/07/04 22:40 (+0200) ebassi
+
+	A AUTHORS
+	A NEWS
+	
+	* Print.pm, NEWS, README: new release: 0.93
+
+2004/07/04 21:41 (+0200) ebassi
+	
+	A copyright.pod
+	A gnomeprint.typemap
+	A doctypes
+	
+	* Makefile.PL: update required versions for ExtUtils::*; update the
+	maps list.
+
+	* xs/GnomePrintPaper.xs: implemented:
+		gnome_print_paper_get_default
+		gnome_print_paper_by_name
+		gnome_print_paper_get_by_size
+		gnome_print_paper_get_closest_by_size
+		gnome_print_paper_get_list
+	GnomePrintPaper is an unregistered boxed type; in perl it's an
+	hashref.
+
+2004/05/29 01:38 (+0100) ebassi
+	
+	* Print.pm, README: new release: 0.92.
+	* Makefile.PL: update required version for Glib and Gtk to >= 1.04.
+
+2004/05/27 17:22 (+0100) ebassi
+	
+	* Makefile.PL: remove dependency on Gnome2 and Gnome2::VFS modules.
+	* xs/GnomePrint2.xs: remove the gnome2perl.h include.
+
+2004/03/14 23:55 (+0100) ebassi
+
+	* xs/GnomePrint2.xs
+	t/00.GnomePrint.t: Adapt to the new version information
+	implementation policy.
+
+2004/03/14 08:40 (+0100) ebassi
+
+	* Print.pm: unindent ABSTRACT text (patch by Torsten Schoenfeld).
+
+2004/02/26 17:37 (-0500) muppetman
+
+	* README: fix the spelling of license; update the sandbox instructions.
+
+2004/02/21 02:56 (+0100) ebassi
+	
+	* Print.pm, README, META.yml: bumped version to 0.91 - this is the
+	last beta cycle for the Gnome2::Print module.
+	
+	* Makefile.PL: cleaned and updated build system.
+
+2004/02/05 15:38 (+0100) ebassi
+
+	* xs/GnomePrintUnit.xs, xs/GnomePrintUnitSelector.xs: hush compiler
+	warnings (patch by Torsten Schoenfeld).
+
+2004/01/24 21:44 (-0500) rwmcfa1
+
+	* Makefile.PL: removed runtime_reqs stuff, replaced by the pkg-config 
+	trick
+	
+	* perl-Gnome2-Print.spec.in: use pkg-config for Requires version
+
+2004/01/14 21:38 (-0500) muppetman
+
+	* Makefile.PL, README: update requirements to 1.020, since we need
+	Glib::MakeHelper
+
+2003/12/31 02:27 (-0500) muppetman
+
+	* xs/GnomePrint2.xs: mark ax unused in functions which don't touch
+	the input stack, to hush compiler warnings
+
+	* xs/GnomeFont.xs, xs/GnomePrintConfig.xs,
+	xs/GnomePrintPaperSelector.xs, xs/GnomePrintUnit.xs:
+	don't let RETVAL be used uninitialized in alias switches.
+
+	* xs/GnomePrintJobPreview.xs: don't give a type to 'class' when it's
+	not needed
+
+2003/12/29 16:32 (-0500) rwmcfa1
+
+	* perl-Gnome2-Print.spec.in: use the new DATE replacement in 
+	conjunction with VERSION to create the changlog on the fly, which is 
+	better.
+
+2003/12/23 00:02 (-0500) muppetman
+
+	* xs/GnomeFont.xs, xs/GnomeFontDialog.xs, xs/GnomeFontFace.xs,
+	xs/GnomeFontPreview.xs, xs/GnomeFontSelection.xs, xs/GnomeGlyphList.xs,
+	xs/GnomePrintConfig.xs, xs/GnomePrintContext.xs, xs/GnomePrintJob.xs,
+	xs/GnomePrintPaperSelector.xs, xs/GnomePrintUnit.xs,
+	xs/GnomePrintUnitSelector.xs: remove the type specifiers on the class
+	parameters, to keep xsubpp from creating a value that will be unused
+	and therefore cause unused variable warnings.
+
+2003/12/19 00:20 (+0100) ebassi
+	
+	* Print.pm: version 0.61
+	
+	* xs/GnomeGlyphList.xs: implemented:
+		gnome_glyphlist_advance
+		gnome_glyphlist_kerning
+		gnome_glyphlist_letterspace
+		gnome_glyphlist_font
+		gnome_glyphlist_moveto
+		gnome_glyphlist_rmoveto
+		gnome_glyphlist_glyph
+		gnome_glyphlist_glyphs
+		gnome_glyphlist_text_dumb
+	
+	* xs/GnomePrintUnit.xs: improved documentation.
+	
+	* xs/GnomePrintConfig.xs: implemented:
+		gnome_print_config_set_length
+
+2003/12/17 15:49 (+0100) ebassi
+	
+	* Print.pm: version 0.60
+	
+	* examples/buffer-print.pl: added this example program that prints a
+	  buffer of lines, wrapping them.
+	
+	* examples/basic-font.pl: changed font name to "Sans Regular".
+
+	* t/05.GnomeFont.t, t/06.GnomeFontDialog.t: since libgnomeprint now
+	  checks for a fontface (see this bugzilla entry:
+	  http://bugzilla.gnome.org/show_bug.cgi?id=125836), searching for
+	  font "Sans" broke these tests; changed to "Sans Regular" which
+	  should be the standard fallback.
+	  
+	* gnomeprintperl.h: revert last change, since it breaks (wrt pango)
+
+2003/12/02 18:22 (+0100) ebassi
+
+	* gnomeprintperl.h: include gperl.h instead of gnome2perl.h.
+
+2003/12/02 12:46 (-0500) muppetman
+
+	* t/06.GnomeFontDialog.t: this one slipped through the cracks when
+	Gnome2::Print::Font changed to Gnome2::Print::Font::Constants.
+
+	* t/00.GnomePrint.t: my version of Test::More's ok() was mortally
+	confused by Gnome2::Print->get_version_info returning a list; check
+	that it returns three elements instead.
+
+2003/11/29 18:45 (+0100) ebassi
+
+	* xs/GnomePrintJob.xs, xs/GnomeFont.xs, xs/GnomeFontFace.xs,
+	  xs/GnomePrintConfig.xs, xs/GnomePrintDialog.xs: better apidoc for
+	  PPCODE in methods.
+
+2003/11/29 18:15 (+0100) ebassi
+
+	* t/*: updated tests for constants modules change, and for unused
+	  variables.
+	* Makefile.PL: put constants modules in the right place.
+
+2003/11/28 23:20 (+0100) ebassi
+
+	* xs/GnomePrint2.xs: added methods:
+		
+		Gnome2::Print->get_version_info
+		Gnome2::Print->check_version
+	  
+	  based on code from Torsten Schoenfeld; those methods replace the
+	  get_version class method.
+
+2003/11/28 19:00 (+0100) ebassi
+
+	* xs/GnomeFont.xs, xs/GnomePrintJob.xs, xs/GnomePrintDialog.xs: added
+	  apidoc for PPCODE sections.
+
+2003/11/28 18:34 (+0100) ebassi
+
+	* Makefile.PL, pm/Config.pm, pm/Font.pm, t/05.GnomeFont.t: moved
+	  constants to another namespace to avoid collisions with the
+	  respective classes; these are the new namespaces for Config and
+	  Font constants:
+	  	
+		Gnome2::Print::Config -> Gnome2::Print::Config::Constants
+		Gnome2::Print::Font   -> Gnome2::Print::Font::Constants
+
+2003/11/25 17:26 (-0500) rwmcfa1
+
+	* Makefile.PL, xs/GnomePrint2.xs: add apidoc auto generation stuff
+
+2003/11/25 17:26 (-0500) rwmcfa1
+
+	* Makefile.PL: we depend on Gnome2-VFS now b/c Gnome2 does.
+
+2003/11/24 23:02 (-0500) rwmcfa1
+
+	* perl-Gnome2-Print.spec.in: fixed requires bug.
+
+2003/11/13 21:15 (-0500) muppetman
+
+
+	* Makefile.PL, README: require 1.00 rather than 1.00rc1 -- we disavow
+	the existence of the release candidates.
+
+2003/11/11 00:36 (-0500) muppetman
+
+	* MANIFEST, debian/*: remove the debian packaging files, since having
+	them in the upstream dist makes it difficult for the maintainers
+
+2003/10/20 19:59 ebassi
+
+	* t/05.GnomeFont.t: included tests for newly implemented methods.
+	* pm/Font.pm: corrected stupid typo inside package name.
+	* xs/GnomeFont.xs: implemented
+		gnome_font_get_glyph_stadvance
+		gnome_font_get_glyph_stdbbox
+		gnome_font_get_glyph_stdkerning
+	  these methods requires libart structures, but since libart has no
+	  perl binding, I've implemented the return values as arrayrefs of
+	  doubles.
+	* xs/GnomeFont.xs: implemented
+		gnome_font_face_get_name
+		gnome_font_face_get_ps_name
+		gnome_font_face_get_family_name
+		gnome_font_face_get_species_name
+		gnome_font_face_get_species_name
+		gnome_font_face_get_stdbbox
+		gnome_font_face_get_glyph_stdbbox
+		gnome_font_face_get_glyph_stdadvance
+		gnome_font_face_get_glyph_stdkerning
+		gnome_font_face_get_glyph_ps_name
+
+2003/10/10 15:40 ebassi
+
+	* Print.pm: bumped to version 0.51
+	
+	* debian/: debianized package
+
+2003/09/21 20:19 rwmcfa1
+
+	* Makefile.PL: fixed bug in specfile generation
+
+2003/09/17 10:44 rwmcfa1
+
+	* Makefile.PL: ExtUtils::PkgConfig can now deal with version 
+	requirements using pkg-config's interface, make use of it.
+
+	* t/04.GnomePrintDialog.t: skip unless we have a display
+
+2003/09/16 23:50 rwmcfa1
+
+	* Makefile.PL, perl-*spec.in: somewhat automated versioning system 
+	implemented for depenancy modules
+
+2003/09/15 22:26 rwmcfa1
+
+	* Makefile.PL: spec file dependancies improved
+
+2003/09/11 21:02 rwmcfa1
+	
+	* xs/GnomePrintUnit.xs, xs/GnomePrintConfig.xs: PREFIX added/moved.
+
+	* xs/GnomeFontFace.xs: PREFIX added, gnome_font_face_get_glyph_kerning
+	commented out, the func is declaired in the header files, but not in 
+	the .so libs on redhat 9 with libgnomeprint(ui)-2.2.
+
+2003/09/10 14:24 ebassi
+	
+	* xs/GnomeFontFace.xs: implemented:
+		gnome_font_face_find,
+		gnome_font_face_find_closest,
+		gnome_font_face_find_closest_from_weight_slant,
+		gnome_font_face_find_closest_from_pango_font,
+		gnome_font_face_find_closest_from_pango_description,
+		gnome_font_face_find_from_family_and_style,
+		gnome_font_face_get_font,
+		gnome_font_face_get_font_default,
+		gnome_font_face_is_italic,
+		gnome_font_face_is_fixed_width,
+		gnome_font_face_get_ascender,
+		gnome_font_face_get_descender,
+		gnome_font_face_get_underline_position,
+		gnome_font_face_get_underline_thickness,
+		gnome_font_face_get_num_glyphs,
+		gnome_font_face_get_glyph_width,
+		gnome_font_face_get_glyph_kerning
+	
+2003/09/06 19:23 rwmcfa1
+
+	* Makefile.PL: dist-rpms build target added
+
+	* perl-Gnome2-Prins.spec.in: initial import
+
+2003/09/02 09:45 rwmcfa1
+
+	* xs/GnomeFont.xs: xsubpp wants a blank line between each function,
+	at least mine/most do. a couple of the ones commited below didn't have
+	them.
+
+2003/08/29 15:26 ebassi
+
+	* xs/GnomeFont.xs: implemented more font size methods: 
+	  	gnome_font_get_glyph_width,
+	  	gnome_font_get_ascender,
+	  	gnome_font_get_descender,
+	  	gnome_font_get_underline_position,
+	  	gnome_font_get_underline_thickness,
+		gnome_font_get_width_utf8,
+		gnome_font_get_width_utf8_sized
+	* examples/basic-font.pl: changed the searched font name to
+	  "Monospace Regular".
+	
+2003/08/23 10:25 ebassi
+	
+	* pm/Config.pm, pm/Font.pm: corrected some typos in the pod
+	  documentation.
+	
+2003/08/22 12:37 ebassi
+
+	* Makefile.PL: prefixed the filename of the man pages with the correct
+	  namespace (Gnome2::*).
+
+2003/08/22 02:19 muppetman
+
+	* README: new file, need it if you're going to distribute
+
+	* Print.pm: mangled my email, tailored Gtk2 text to Gnome2::Print
+
+2003/08/21 0:41 ebassi
+
+	* t/07.GnomePrintUnit.t: fixed GnomePrintUnit test.
+
+2003/08/21 0:22 ebassi
+	
+	* xs/GnomePrintUnit.xs: implemented Gnome2::Print::Unit methods.
+	* xs/GnomePrintDialog.xs: default flag (=0) for GnomePrintDialog
+	  constructor.
+	* xs/GnomeFont.xs: corrected a stupid typo.
+	* Makefile.PL: removed libgnomeprintui-2.0 from the package
+	  configuration setup; libgnomeprintui-2.0 (version 1.11x), needed
+	  by GNOME 2.0, still uses the old Glib 1.2 type system, so it won't
+	  compile anyway. Only libgnomeprint/libgnomeprintui >= 2.2 will be
+	  supported.
+
+2003/08/19 21:11 rwmcfa1
+
+	* Makefile.PL: added realclean removal of build dir to postamble 
+	section.
+
+2003/08/18 14:44 ebassi
+	
+	* xs/GnomePrint2.xs: added "get_version" class method; this method
+	  returns a string containing the version of libgnomeprint, as taken
+	  from the package config.
+	* pm/Config.pm: constant keys for GnomePrintConfig.
+	* xs/GnomePrintConfig.xs: get/set methods and key macros.
+	* Makefile.PL: dropped libgnomeprint-2.2 from PkgConfig->find; added a
+	  check for libgnomeprint version, in order to support older releases.
+	
+2003/08/16 16:58 ebassi
+
+	* *: initial ChangeLog entry.  libgnomeprintui is completely wrapped,
+	     libgnomeprint binding lacks of GnomePrintUnit, GnomePrintPaper,
+	     GnomeFontFace and GnomeGlyphList.

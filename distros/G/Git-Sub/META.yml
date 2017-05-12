@@ -1,0 +1,37 @@
+---
+abstract: 'git commands imported as System::Sub subs in git:: namespace'
+author:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  Cwd: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Sub
+provides:
+  Git::Sub:
+    file: lib/Git/Sub.pm
+    version: '0.163320'
+requires:
+  Carp: '0'
+  File::Which: '0'
+  System::Sub: '0.162800'
+  strict: '0'
+  subs: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/dolmen-perl5/Git-Sub
+  repository: https://github.com/dolmen-perl5/Git-Sub.git
+version: '0.163320'

@@ -1,0 +1,60 @@
+		    README for Games::Cards module
+		    ------------------------------
+
+Games::Cards is a Perl module used to write card games. It's basically
+a bunch of object-oriented methods to create sets of cards and move cards
+within and between those sets---which, if you think about it, is all that a
+card game is.
+
+Games::Cards::Tk allows you to write games with a GUI, using card images
+created by Oliver Xymoron (see http://www.waste.org/~oxymoron/cards) and
+released under the GPL/Artistic License (Thanks, Oliver!).
+
+See the embedded pod documentation for more info, including known bugs.
+See Changes for recent changes in the module.
+See TODO for future plans.
+
+Games
+-----
+
+The module comes with some (free!) games in the script/ directory:
+
+klondike.tk - Otherwise known as regular old Solitaire. 
+
+freecell.tk - The popular Freecell variant of solitaire.
+
+war.pl - This game plays both sides in a game of War, saving time and effort
+	for weary users. And in case you saw the movie Wargames, don't worry:
+	Even though the module may be buggy, it probably won't lead to a
+	global thermonuclear war.
+
+gin.pl - Plays gin. Unfortunately, Games::Cards doesn't yet work over a network
+        so both players play on the same screen, which kind of ruins the
+	game. Support for Server/Client games is under development
+	(your help would be appreciated!)
+
+---------------------------------------------------------------
+WARNING! THIS CODE IS STILL ALPHA
+The whole package may change radically before it becomes beta.
+Games::Cards::Tk is even more alpha than the rest.
+---------------------------------------------------------------
+
+Installation
+------------
+
+This module uses MakeMaker, so to install it, just do:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+--------------------------------------------------
+Note:
+
+I suspect that many Games::Cards games will be solitaire, especially before
+networked game playing works. For general solitaire info, try
+http://www.solitairecentral.com or.  For rules to several gazillion (320)
+solitaire games, try http://www.goodsol.com/pgshelp/how_to_play.htm, which are
+the help pages for the shareware "Pretty Good Solitaire" distribution.

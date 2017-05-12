@@ -1,0 +1,13 @@
+Revision history for Getopt-Long-Any
+
+0.002   2016-12-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Downgrade Getopt::Long::{More,Complete} from
+	  runtime-requires to runtime-recommends.
+
+
+0.001   2016-12-18 (PERLANCAR)
+
+        - First release.

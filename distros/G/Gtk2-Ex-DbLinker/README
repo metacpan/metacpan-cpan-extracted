@@ -1,0 +1,76 @@
+NAME
+
+    Gtk2::Ex::DbLinker - Gui building part with Gtk2 of DbLinker
+
+VERSION
+
+    version 0.111
+
+INSTALLATION
+
+    To install Gtk2::Ex::DbLinker, cd to the directory that contains this
+    file and type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    On windows use nmake or dmake instead of make.
+
+    To install this module into a specific directory, do: perl Makefile.PL
+    PREFIX=/name/of/the/directory ...the rest is the same...
+
+    Please also read the perlmodinstall man page, if available.
+
+    Install one of Rose::DB::Object, SQL::Abstract::More or DBIx::Class if
+    you want to use these orm to access your data or run the examples (in
+    ./examples). Rose::DB object is required to get example2_rdb working.
+    DBIx::Class is required to get example 2_dbc working.
+    SQL::Abstract::More is required for runexample2_sqla.pl.
+
+DEPENDENCIES
+
+            Log::Log4perl   1.41
+            Class::InsideOut        1.13
+            Scalar::Util    1.45
+            Gtk2::Ex::DbLinker::DbTools     0.11
+            DBD::SQLite     1.46
+            Gtk2    1.24
+            Data::Dumper    2.154
+            Test::More      1
+            DateTime::Format::Strptime      1.5
+
+DESCRIPTION
+
+    This module automates the process of tying data from a database to
+    widgets on a Glade-generated form. All that is required is that you
+    name your widgets the same as the fields in your data source.
+
+    Steps for use:
+
+      * Create a DataManager object that contains the rows to display. Use
+      DbiDataManager, RdbDataManager or DbcDataManager depending on how you
+      access the database: sql commands and DBI, DBIx::Class or
+      Rose::DB::Object
+
+      * Create a Gtk2::GladeXML object to construct the Gtk2 windows
+
+      * Create a Gtk2::Ex::DbLinker::Form object that links the data and
+      the windows
+
+      * You would then typically connect the buttons to the methods below
+      to handle common actions such as inserting, moving, deleting, etc.
+
+AUTHOR
+
+    François Rappaz <rappazf@gmail.com>
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

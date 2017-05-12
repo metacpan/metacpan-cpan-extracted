@@ -1,0 +1,14 @@
+Revision history for Perl extension Google-BigQuery
+
+1.02 2015-07-30T05:03:02Z
+
+    - Fix typo viersion number.
+
+1.0.1 2015-07-30T04:48:44Z
+
+    - Add a async option to the load function.
+
+1.00 2014-11-21T15:21:08Z
+
+    - original version
+

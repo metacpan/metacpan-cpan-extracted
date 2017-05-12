@@ -1,0 +1,2 @@
+GTK_TYPE_INFO_BAR	GtkInfoBar	GtkObject	Gtk2::InfoBar
+GTK_TYPE_ENTRY_BUFFER   GtkEntryBuffer  GObject         Gtk2::EntryBuffer

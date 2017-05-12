@@ -1,0 +1,214 @@
+#!/opt/perl-5.10.1/bin/perl
+# -*- coding: utf-8 -*-
+
+# Uncomment and modify this and the shebang above if you have the Perl modules
+# in a custom directory and the panel's environment isn't set up so that perl
+# can find them.
+use lib qw(/opt/perl-5.10.1-lib/lib/perl5);
+
+use strict;
+use warnings;
+use utf8;
+
+use Test::More qw(no_plan);
+
+use Glib qw(:constants);
+use Gnome2::PanelApplet;
+
+Gnome2::Program->init ('Perl Test Applet', '0.01', 'libgnomeui',
+                       sm_connect => FALSE);
+
+Gnome2::PanelApplet::Factory->main ('OAFIID:PerlTestApplet_Factory',
+                                    'Gnome2::PanelApplet',
+                                    \&fill);
+
+sub fill {
+  my ($applet, $iid, $data) = @_;
+
+  if ($iid ne 'OAFIID:PerlTestApplet') {
+    return FALSE;
+  }
+
+  my $menu_xml = <<EOX;
+<popup name="button3">
+  <menuitem name="TestUno Item" verb="TestUno" _label="Test I ..."/>
+  <menuitem name="TestDos Item" verb="TestDos" _label="Test II ..."/>
+  <menuitem name="TestTres Item" verb="TestTres" _label="Test III ..."/>
+  <menuitem name="TestCuatro Item" verb="TestCuatro" _label="Test IV ..."/>
+  <menuitem name="TestCinco Item" verb="TestCinco" _label="Test V ..."/>
+</popup>
+EOX
+
+  my $cb_mapping = {
+    TestUno => [\&test_one, 'default!'],
+    TestDos => \&test_two,
+    TestTres => \&test_three,
+    TestCuatro => \&test_four,
+    TestCinco => \&test_five,
+  };
+
+  $applet->setup_menu($menu_xml, $cb_mapping, $applet);
+
+  my $label = Gtk2::Label->new ('Run the tests from the context menu, please');
+  $applet->add ($label);
+  $applet->show_all;
+
+  return TRUE;
+}
+
+sub _setup_output {
+  my ($fh) = @_;
+  my $output;
+  open $fh, '>', \$output;
+  Test::More->builder->output($fh);
+  Test::More->builder->failure_output($fh);
+  Test::More->builder->todo_output($fh);
+  return \$output;
+}
+
+sub _show_results {
+  my ($output) = @_;
+
+  my $buffer = Gtk2::TextBuffer->new;
+  $buffer->insert_at_cursor ($output);
+
+  my $view = Gtk2::TextView->new_with_buffer ($buffer);
+  my $window = Gtk2::ScrolledWindow->new;
+  $window->add ($view);
+
+  my $dialog = Gtk2::Dialog->new ('Test Output', undef, [], 'gtk-ok' => 'ok');
+  $dialog->vbox->add ($window);
+  $dialog->set_default_size (400, 400);
+  $dialog->show_all;
+  $dialog->run;
+  $dialog->destroy;
+}
+
+sub test_one {
+  my ($component, $data, $verb) = @_;
+
+  my $output_ref = _setup_output (my $fh);
+
+  is ($component, undef, 'component == undef');
+  is ($data, 'default!', 'data as expected');
+  is ($verb, 'TestUno', 'verb as expected');
+
+  _show_results ($$output_ref);
+}
+
+sub test_two {
+  my ($component, $applet, $verb) = @_;
+
+  my $output_ref = _setup_output (my $fh);
+
+  is ($component, undef, 'component == undef');
+  is ($verb, 'TestDos', 'verb as expected');
+
+  isa_ok ($applet, 'Gnome2::PanelApplet');
+
+  diag 'orient: ' . $applet->get_orient;
+  diag 'size: ' . $applet->get_size;
+
+  my ($type, $color, $pixmap) = $applet->get_background;
+  diag 'background: ' . join ', ', $type,
+                                   $color ? $color : 'undef',
+                                   $pixmap ? $pixmap : 'undef';
+
+  diag 'pref key: ' . $applet->get_preferences_key;
+
+  eval { $applet->add_preferences ('/schemas/apps/metacity'); };
+  diag 'result of add_preferences: ' . ($@ ? $@ : 'all ok');
+
+  $applet->set_flags ([qw/expand-major has-handle/]);
+  ok ($applet->get_flags == [qw/expand-major has-handle/], '[sg]et_flags');
+
+  $applet->set_size_hints ([1, 2, 3, 4, 5], 10);
+
+  _show_results ($$output_ref);
+}
+
+sub test_three {
+  my ($component, $applet, $verb) = @_;
+
+  my $output_ref = _setup_output (my $fh);
+
+  my $dialog = Gtk2::MessageDialog->new (undef, [],
+                                         'info', 'ok',
+                                         'This third test is interactive.  ' .
+                                         'It will wait for you to change ' .
+                                         'the orientation of the panel.  To ' .
+                                         'do that, just drag the panel to ' .
+                                         'another edge of your screen.');
+  $dialog->run;
+  $dialog->destroy;
+
+  my $loop = Glib::MainLoop->new;
+  $applet->signal_connect (change_orient => sub {
+    my ($applet_inside, $orient, $data) = @_;
+
+    is ($applet_inside, $applet, 'the applet object made it');
+    diag 'new orient: ' . $orient;
+    is ($data, 'bla');
+
+    $loop->quit;
+  }, 'bla');
+  $loop->run;
+
+  _show_results ($$output_ref);
+}
+
+sub test_four {
+  my ($component, $applet, $verb) = @_;
+
+  my $output_ref = _setup_output (my $fh);
+
+  diag 'full key: ', $applet->gconf_get_full_key ('test_key');
+
+  my $string = { type => 'string',
+                 value => 'Bla!' };
+  $applet->gconf_set_value ('string_key', $string);
+  is (($applet->gconf_get_value ('string_key'))->{value}, 'Bla!');
+
+  my $list = { type => 'string',
+               value => ['Blub!', 'Bla!'] };
+  $applet->gconf_set_value ('list_key', $list);
+  is_deeply (($applet->gconf_get_value ('list_key'))->{value}, ['Blub!', 'Bla!']);
+
+  $applet->gconf_set_list ('list_key', 'string', ['Blub!', 'Bla!']);
+  is_deeply ($applet->gconf_get_list ('list_key'), ['Blub!', 'Bla!']);
+
+  $applet->gconf_set_bool ('bool_key', TRUE);
+  is ($applet->gconf_get_bool ('bool_key'), TRUE);
+
+  $applet->gconf_set_int ('int_key', 23);
+  is ($applet->gconf_get_int ('int_key'), 23);
+
+  $applet->gconf_set_string ('string_key', '!Bla');
+  is ($applet->gconf_get_string ('string_key'), '!Bla');
+
+  $applet->gconf_set_float ('_key', 2.0);
+  is ($applet->gconf_get_float ('_key'), 2.0);
+
+  _show_results ($$output_ref);
+}
+
+sub test_five {
+  my ($component, $applet, $verb) = @_;
+
+  my $output_ref = _setup_output (my $fh);
+
+  if (Gnome2::PanelApplet->CHECK_VERSION(2, 10, 0)) {
+    my $locked_down = $applet->get_locked_down ();
+    ok(defined $locked_down, "locked down: $locked_down");
+
+    $applet->request_focus(0);
+    ok(TRUE, 'requested focus');
+  }
+
+  if (Gnome2::PanelApplet->CHECK_VERSION(2, 14, 0)) {
+    $applet->set_background_widget(Gtk2::Button->new ('Huh'));
+    ok(TRUE, 'set background widget');
+  }
+
+  _show_results ($$output_ref);
+}

@@ -1,0 +1,11 @@
+~\z
+.*\.tar\.gz
+^blib.*
+^[\w\.]+\.(html|txt|png|gif|dot|pl|svg|old|bak|org|vcg|gdl)
+^Makefile\z
+^Makefile.(old|bak)\z
+^fun\z
+^Graph-Easy-As
+pm_to_blib
+tmon.out
+^todos[\\\/]

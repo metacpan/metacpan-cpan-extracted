@@ -1,0 +1,307 @@
+=head1 Unique Identifiers for GEDCOM Records and Their Attributes
+
+=head2 Terminology
+
+=over 4
+
+=item o Must means mandatory and visa versa
+
+You know the drill.
+
+=item o UUID 'v' GUID
+
+UUIDs (Universally Unique Identifiers) are also known as GUIDs (Globally Unique Identifiers). This document uses UUID.
+
+=item o HEADER/INDI/FAM/etc
+
+To avoid endlessly referring to HEADER/INDI/FAM/etc, this document just uses INDI.
+
+=item o Page numbers
+
+Page numbers refer to DRAFT Release 5.5.1, in Ged551-5.pdf. See L</References> for downloading details.
+
+=back
+
+=head2 Purpose of this document
+
+This document is intended to formalize a set of proposals to add Unique Identifiers (UUIDs) to the GEDCOM specification, and hence to GEDCOM-structured data.
+
+These proposals are expected to be implementated within various software packages, without any expectation that they will be accepted by the original authors of the GEDCOM specification.
+
+UUIDs function to make it possible to combine GEDCOM files from multiple sources (files or systems), while retaining enough information so as to be able to uniquely identify the specific
+source from which any particular assertion about an individual or family originated.
+
+This document is written from the point of view that a specific software system handling GEDCOM data has the capability of storing UUIDs, without necessarily being able to generate them.
+
+This means that such a system which cannot generate UUIDs must nevertheless have the capability of reliably processing 1 or more UUIDs per GEDCOM record and/or attribute.
+
+This means handling an INDI record which has 1 or more UUIDs, and further it means handling a NAME (within that INDI) which itself has 1 or more UUIDs.
+
+Also, for a system which can generate UUIDs, the question arises: At what stage should these UUIDs be generated. This is discussed below.
+
+=head2 Limitations of this document
+
+This document does not attempt to define any mechanism whereby data is stored in any particular system.
+
+It discusses everthing in terms of GEDCOM-compatible (i.e. stand-alone) files.
+
+=head2 A Use Case for UUIDs
+
+=over 4
+
+=item o Import
+
+Import 2 GEDCOM files into a program which uses UUIDs, assigning a
+UUID to each input file.
+
+=item o Match individuals
+
+The program (somehow) decides an INDI record from file A matches an
+INDI record from file B. Let's say the names match.
+
+=item o Flag inconsistencies
+
+Then when there is inconsistent data (e.g. the asserted birthdays of
+the individual are different in the 2 files), the program saves the
+respective files' UUIDs I<attached to each to birthday>.
+
+=item o Multiple versions of data
+
+In this manner inconsistent data is saved permanently (carried
+forward in time), without any specific determination that one version is
+'right' and one is 'wrong'.
+
+=item o Returning to the roots
+
+At some later time we can then use these UUIDs to determine which
+source the specific values of the birthdays came from. Naturally any
+piece of data can be treated likewise.
+
+=back
+
+=head1 Identifying Unique Identifiers per INDI
+
+Proposal: Use _UID, UUID and TYPE as the GEDCOM-like tags for UUIDs.
+
+Usage:
+
+=over 4
+
+=item o Extension of the definition of HEADER and INDI
+
+	  HEADER :=
+	  n HEAD                                    {1:1}
+	  ...
+	    +1 _UID <<UNIQUE_IDENTIFIER_STRUCTURE>> {0:M}
+
+	  INDIVIDUAL_RECORD :=
+	  n @XREF:INDI@ INDI                        {1:1}
+	  ...
+	    +1 _UID <<UNIQUE_IDENTIFIER_STRUCTURE>> {0:M}
+
+Note:
+
+=over 4
+
+=item o The {0:M} limit
+
+The limit is not {0:1} because there needs to be provision for storing multiple UUIDs per HEADER or INDI, assuming these have been generated on, or on behalf of, different source systems.
+
+Perhaps every UUID in the file should be specified once in the header, for the convenience of the software importing the data. This also helps validation of the data.
+
+=item o REFN
+
+REFN is rejected as being suitable for this purpose because its length is limited to 20.
+
+=item o RIN
+
+RIN is rejected as being suitable for this purpose because its length is limited to 12.
+
+=back
+
+=item o UNIQUE_IDENTIFIER_STRUCTURE
+
+	  UNIQUE_IDENTIFIER_STRUCTURE :=
+	  n UUID <UNIQUE_IDENTIFIER>         {34:34}
+	    +1 TYPE <UNIQUE_IDENTIFIER_TYPE> {1:248}
+
+=item o UUID
+
+	  UUID := {Size=34:34}
+	  A unique identifier assigned to the INDI and, perhaps implicitly, to all attributes of the INDI.
+
+The following is a quotation from the documentation of the Perl module L<Data::UUID>:
+
+"The algorithm for UUID generation, used by this extension is described in the Internet Draft "UUIDs and GUIDs" by Paul J. Leach and Rich Salz. (See RFC 4122.)
+It provides reasonably efficient and reliable framework for generating UUIDs and supports fairly high allocation rates -- 10 million per second per machine -- and therefore is suitable for
+identifying both extremely short-lived and very persistent objects on a given system as well as across the network."
+
+The following is an adaptation of a quotation from the documentation of the Perl module L<Data::Session::ID::UUID34>:
+
+"Perl usage: my($uuid) = Data::UUID -> new -> create_hex.
+
+Note: Data::UUID returns '0x' as the prefix of the 34-byte hex digest. You have been warned."
+
+The point of including the '0x' in the UUID is to indicate to any system that the characters in the UUID are meant to be hex digits.
+
+=item o TYPE
+
+	  TYPE := {Size=1:248}
+	  A user-defined definition of the UUID.
+
+=back
+
+=head1 Avoiding Unnecessary Proliferation of UUIDs
+
+Proposal: A system must only generate the minimum number of UUIDs to satisfy the requirements of this document.
+
+This means only a single UUID need be stored in the header of a GEDCOM file, on the understanding it automatically applies ('trickles down') to each record within the file.
+
+Likewise, only a single UUID need be stored in an INDI record, on the understanding it trickles down to each attribute (e.g. NAME) within that INDI.
+
+The attribute is said to 'inherit' the UUID of its parent.
+
+=head1 Generation of UUIDs
+
+Proposal: That UUIDs, by default, need not be generated.
+
+In other words, UUIDs are not, by default, mandatory.
+
+Hence any (isolated) system can continue to operate in the absence of UUIDs.
+
+=head1 Lifetime of UUIDs
+
+Proposal: When a system does generate an INDI, then only 1 UUID is permanently associated with the corresponding data.
+
+Hence, within any (isolated) system, any number of UUIDs can be generated per INDI record, but only the most recently generated one is to be preserved. All trace of all preceeding UUIDs
+is to be expunged from the system.
+
+=head1 Importation of GEDCOM data
+
+When a file of GEDCOM data is imported, various cases arise:
+
+=over 4
+
+=item o Importation into an empty system
+
+In this case, one UUID must be generated, which willl then apply to all of the incoming data.
+
+=item o Importation into a system with pre-existing data
+
+=over 4
+
+=item o When the pre-existing data has at least 1 UUID
+
+Then, the imported data must have a UUID, or a UUID must be generated on-the-fly for the incoming data.
+
+=item o When the pre-exising data does not have UUIDs
+
+Then a UUID must be generated for the pre-existing data.
+
+After that, the incoming data is treated as in the preceeding case.
+
+The point of this is to specifically exclude any attempt to combine 2 datasets in some manner based on the false assumption that they can't have any matching data.
+
+=back
+
+=back
+
+In each case, 2 (at least) UUIDs must be output in the header when the data is exported.
+
+=head1 Merging and Matching Sources
+
+=over 4
+
+=item o Exactly matching data
+
+When data coming from the 2 sources exactly matches, there is no need to store a UUID with each attribute of the combined result. Here, attribute refers to, say, NAME within INDI.
+
+It only suffices to store the 2 UUIDs, if they exist, at the INDI level.
+
+Actually, if every data record matches, then there is only a need to store the UUID are the header level, and not at each INDI level.
+
+=item o Mis-matched data
+
+When the data does not match, then the UUIDs, if they exist, are to be stored at the INDI level. In practice, this means 1 or more levels below the INDI tag itself.
+See L</Exporting UUIDs> just below.
+
+At the level of the attribute which mis-matches, say NAME within INDI, it only suffices to store 1 UUID, although both can be stored.
+The one not stored can be inferred from the pair stored at the INDI level. This optimization is designed to reduce file sizes.
+
+Perhaps this can be extended to the header, where the first mentioned UUID becomes the default (or the default is explicitly tagged), so that any data lacking but needing a UUID takes
+the default as its UUID.
+
+=back
+
+=head1 Exporting UUIDs
+
+=head2 The Header
+
+Proposal: The header must list all UUIDs which appear in the data records.
+
+This allows importing code to better prepare for the data, and to perform validation of the data.
+
+=head2 Exporting more than 1 UUID per INDI
+
+If we start with 2 GEDCOM files:
+
+   0 @I1@ INDI
+   	 1 NAME Alfred E. /Newman/
+
+   0 @I2@ INDI
+   	 1 Name Alfred Einstein /Newman/
+
+Then, after they are been combined, how should they be exported? There are 2 obvious possibilities:
+
+=over 4
+
+=item o As above, but with cross-referencing
+
+   0 @I1@ INDI
+   	 1 NAME Alfred E. /Newman/
+	   2 ALIA @I2@
+	   2 _UID 0x1...
+
+   0 @I2@ INDI
+   	 1 NAME Alfred Einstein /Newman/
+	   2 ALIA @I1@
+	   2 _UID 0x2...
+
+=item o As one INDI with an AKA (alias)
+
+   0 @I1@ INDI
+   	 1 NAME Alfred E. /Newman/
+	   2 _UID 0x1...
+   	 1 NAME Alfred Einstein /Newman/
+   	   2 TYPE aka
+	   2 _UID 0x2...
+
+=back
+
+Proposal: That only the second format be supported.
+
+There is less processing complexity in handling the second format.
+
+=head1 References
+
+General:
+
+=over 4
+
+=item o L<GEDCOM Specification|http://wiki.webtrees.net/File:Ged551-5.pdf>
+
+=item o L<The Perl Genealogy::* Namespace|http://savage.net.au/Perl-modules/html/genealogy/rationale.html>
+
+=back
+
+Perl modules:
+
+=over 4
+
+=item o L<Gedcom>
+
+=item o L<Data::UUID>
+
+=item o L<Data::Session::ID::UUID34>
+
+=back

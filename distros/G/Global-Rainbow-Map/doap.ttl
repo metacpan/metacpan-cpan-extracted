@@ -1,0 +1,56 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://creativecommons.org/publicdomain/zero/1.0/>
+	dc:title             "CC0 1.0 Universal Public Domain Dedication".
+
+<http://purl.org/NET/cpan-uri/dist/Global-Rainbow-Map/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "XML::LibXML 1.70"^^doap-deps:CpanId ], [ doap-deps:on "Color::Library"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Global-Rainbow-Map>;
+	doap:created         "2012-06-13"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/Global-Rainbow-Map>;
+	doap:homepage        <https://metacpan.org/release/Global-Rainbow-Map>;
+	doap:license         <http://creativecommons.org/publicdomain/zero/1.0/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "Global-Rainbow-Map";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Global-Rainbow-Map/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Global-Rainbow-Map/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-global-rainbow-map>;
+	];
+	doap:shortdesc       "make the world look like a rainbow, but usefully".
+
+<http://purl.org/NET/cpan-uri/dist/Global-Rainbow-Map/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2012-06-13"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Global-Rainbow-Map-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Global-Rainbow-Map/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Global-Rainbow-Map-0.002"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Global-Rainbow-Map-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+

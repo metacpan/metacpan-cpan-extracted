@@ -1,0 +1,86 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+use Geo::Coder::Ja qw(:all);
+
+GetOptions(
+    'dbpath=s'    => \my $dbpath,
+    'loadlevel=s' => \my $level,
+    'encoding=s'  => \my $encoding,
+    'version|v'   => \my $version,
+    'help|h'      => \my $help,
+);
+if ($version) {
+    print "Geo::Coder::Ja version $Geo::Coder::Ja::VERSION\n\n";
+    exit;
+}
+pod2usage(0) if $help;
+
+$dbpath   ||= '/usr/local/share/geocoderja';
+$level    ||= 'DB_AUTO';
+$encoding ||= 'EUC-JP';
+my $load_level = eval $level;
+if ($@) {
+    warn qq/unknown level "$level"/;
+    exit 1;
+}
+
+my $geocoder = Geo::Coder::Ja->new(
+    dbpath     => $dbpath,
+    load_level => $load_level,
+    encoding   => $encoding,
+);
+
+while (1) {
+    print 'address/postcode>';
+    chomp(my $input = <STDIN>);
+    next unless $input;
+    my $location = $input =~ /^\d{7}$/ ? $geocoder->geocode(postcode => $input)
+            : $geocoder->geocode(location => $input);
+    if ($location) {
+        print "\n";
+        for (qw/latitude longitude address address_kana/) {
+            print "$_: $location->{$_}\n";
+        }
+        print "\n";
+    } else {
+        print "not found.\n\n";
+    }
+}
+exit 1;
+
+__END__
+
+=head1 NAME
+
+geocoderja - geocode address.
+
+=head1 SYNOPSIS
+
+geocoderja [options]
+
+ Options:
+   -d -dbpath         dbpath (defaults to /usr/local/share/geocoderja)
+   -l -loadlevel      loadLevel (defaults to DB_AUTO)
+   -e -encoding       encoding (defaults to EUC-JP)
+   -v -version        print version
+   -h -help           print this help
+
+ See also:
+   perldoc Geo::Coder::Ja
+
+=head1 DESCRIPTION
+
+Geocode address.
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

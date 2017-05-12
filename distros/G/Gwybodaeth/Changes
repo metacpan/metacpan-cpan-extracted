@@ -1,0 +1,15 @@
+Gwybodaeth
+----------
+
+0.02 Thu Oct 8, 2009
+    - added examples under examples/
+    - added file uploads to CGI script
+    - improved input handling: cruft etc.
+    - added 'end row' functionality to CSV parser
+    - updated documentation
+    - improved/extented tests
+    - fixed bug #49518
+    - updated perl dependancy to 5.8
+
+0.01 Fri Aug 28, 2009
+    - initial release

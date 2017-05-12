@@ -1,0 +1,10 @@
+0.03  2014-08-14 14:26:45 CEST
+    - added 'index_color' and 'work_color' (issue #1)
+    - fixed 'ignored' and 'tracked' (Michael G. Schwern)
+    - migrated to Milla
+
+0.02  2013-08-20
+    - new methods 'meaning' and 'unmerged'
+
+0.01  2013-08-19
+    - initial release

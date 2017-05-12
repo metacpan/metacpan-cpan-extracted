@@ -1,0 +1,335 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+pentominos - solver for the pentominos paving puzzle
+
+=head1 SYNOPSIS
+
+  pentominos --help    # usage help
+  pentominos --list    # list of builtin boards
+  pentominos [--box | --raw | --html] [-solutions <n>] [board]
+
+Computes <n> solutions for the pentomino paving puzzle.
+
+Solutions are displayed as boxed ASCII (the default),
+as raw ASCII (the pentomino letter names), or in HTML format.
+
+The board is either the name of a builtin board, or the name of a file
+containing a board description (according to the format 
+described in L<Games::Pentominos>). Filename '-' is accepted
+and means standard input.
+
+=head1 AUTHOR
+
+Laurent Dami, C<< <laurent.d...@justice.ge.ch> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007 Laurent Dami, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+use IO::Handle;
+use Getopt::Long;
+use Pod::Usage;
+use Games::Pentominos;
+
+
+# read board definitions from <DATA>
+my %builtin_board = do { 
+  local $/; # "slurp mode" 
+  <DATA> =~ /^(.+)\n     # name of board
+             ((?:.+\n)+) # lines of board
+            /mgx;
+};
+
+# parse command-line options
+my %option;
+GetOptions(\%option, qw/raw box html list help solutions=i/);
+my $solution_printer = $option{raw}  ? \&raw
+                     : $option{html} ? \&htmlize
+                                     : \&boxify; # the default
+$option{solutions} ||= -1; # no limit on number of solutions
+
+$option{help} and pod2usage();
+$option{list} and printf "Builtin board names are : %s\n" , 
+                         join " ", sort keys %builtin_board
+              and exit;
+
+
+
+# choose board (either builtin or from file)
+my $board_name = $ARGV[0] || "6x10";
+my $board = $builtin_board{$board_name};
+if (!$board) {
+  my $fh;
+  for ($board_name) {
+    $_ eq '-' and do {$fh = 'STDIN'; last;};
+    -f        and do {open $fh, "<", $_ or die "open $_ : $!"; last};
+    die "no such board: $_"; # otherwise
+  }
+  local $/; # "slurp mode" 
+  $board = <$fh>;
+}
+
+# HTML needs a header and footer
+if ($option{html}) {
+  html_header();
+  $SIG{INT} = sub {html_footer(); exit}; # footer get printed even if SIGINT
+}
+
+# compute solutions
+my $callback = wrap_callback($solution_printer, $option{solutions});
+Games::Pentominos->solve($board, $callback);
+
+if ($option{html}) {
+  html_footer();
+}
+
+#======================================================================
+# END OF MAIN PROGRAM
+#======================================================================
+
+#----------------------------------------------------------------------
+sub wrap_callback { # print solution, flush, and countdown # of solutions
+#----------------------------------------------------------------------
+  my ($solution_printer, $n_wanted) = @_;
+  return sub {
+    $solution_printer->(@_); 
+    STDOUT->flush;
+    return --$n_wanted; # stop searching if reaching 0
+  }
+}
+
+
+#----------------------------------------------------------------------
+sub raw {
+#----------------------------------------------------------------------
+  my ($placed, $n_solutions, $t_solution, $t_tot) = @_;
+  printf "Solution %d (%.3f / tot %.3f / avg %.3f)\n%s\n",
+    $n_solutions, $t_solution, $t_tot, $t_tot/$n_solutions, $placed;
+}
+
+
+#----------------------------------------------------------------------
+sub boxify {
+#----------------------------------------------------------------------
+  my ($placed, $n_solutions, $t_solution, $t_tot) = @_;
+
+  # transform into a 2-dimensional array, with additional border rows and cols
+  my @rows    = split /\n/, $placed;
+  my $add_row = "." x length($rows[0]);
+  my @cell    = map {[split //, ".$_."]} ($add_row, @rows, $add_row);
+  my $n_rows  = @cell - 2;
+  my $n_cols  = @{$cell[0]} - 2;
+
+  # build solution string, comparing adjacent cells on rows and cols
+  my $sol = "";
+  for my $i (0 .. $n_rows) {
+    for my $j (0 .. $n_cols) {
+      my $cmp_x = $cell[$i][$j] eq $cell[$i][$j+1] ? "sx" : "dx";
+      my $cmp_y = $cell[$i][$j] eq $cell[$i+1][$j] ? "sy" : "dy";
+      my $cell  = {sx => {sy => "  ", dy => "__"},
+                   dx => {sy => " |", dy => "_|"}}->{$cmp_x}{$cmp_y};
+      $sol .= $cell;
+    }
+    $sol .= "\n";
+  }
+
+  # print and return
+  printf "Solution %d (%.3f s. / tot %.3f s. / avg %.3f s.)\n%s\n",
+    $n_solutions, $t_solution, $t_tot, $t_tot/$n_solutions, $sol;
+}
+
+
+#----------------------------------------------------------------------
+sub htmlize {
+#----------------------------------------------------------------------
+  my ($placed, $n_solutions, $t_solution, $t_tot) = @_;
+  $placed =~ s[(\w)][<td class="$1"></td>]g; # inside cells
+  $placed =~ s[\.]  [<td></td>]g;            # outside cells
+  $placed =~ s[(.*)][<tr>$1</tr>]g;          # rows
+  printf "<h3>Solution %d (%.3f s. / tot %.3f s. / avg %.3f s.)</h3>"
+       . "<table>%s</table>\n",
+    $n_solutions, $t_solution, $t_tot, $t_tot/$n_solutions, $placed;
+}
+
+#----------------------------------------------------------------------
+sub html_header {
+#----------------------------------------------------------------------
+  print <<_EOHTML;
+<html>
+  <head>
+    <style>
+      TABLE  {border-collapse: collapse}
+      TD     {width: 20px; height: 20px}
+      .X     {background-color: red}
+      .I     {background-color: green}
+      .T     {background-color: blue}
+      .V     {background-color: cyan}
+      .W     {background-color: magenta}
+      .U     {background-color: yellow}
+      .P     {background-color: orange}
+      .F     {background-color: chocolate}
+      .Y     {background-color: pink}
+      .L     {background-color: purple}
+      .Z     {background-color: brown}
+      .S     {background-color: chartreuse}
+    </style>
+  </head>
+  <body>
+_EOHTML
+}
+
+#----------------------------------------------------------------------
+sub html_footer {
+#----------------------------------------------------------------------
+  print "</body></html>\n";
+}
+
+
+
+__DATA__
+6x10
+xxxxxxxxxx
+xxxxxxxxxx
+xxxxxxxxxx
+xxxxxxxxxx
+xxxxxxxxxx
+xxxxxxxxxx
+
+4x15
+xxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxx
+
+3x20
+xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxx
+
+8x8_corners
+.xxxxxx.
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+.xxxxxx.
+
+8x8_center
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+xxx..xxx
+xxx..xxx
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+
+X
+....xxxx....
+....xxxx....
+....xxxx....
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+....xxxx....
+....xxxx....
+....xxxx....
+
+Z
+xxxx........
+xxxx........
+xxxx........
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+........xxxx
+........xxxx
+........xxxx
+
+U
+xxxx....xxxx
+xxxx....xxxx
+xxxx....xxxx
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+
+W
+xxxxxxxx....
+xxxxxxxx....
+xxxxxxxx....
+....xxxxxxxx
+....xxxxxxxx
+....xxxxxxxx
+........xxxx
+........xxxx
+........xxxx
+
+F
+xxxxxxxx....
+xxxxxxxx....
+xxxxxxxx....
+....xxxxxxxx
+....xxxxxxxx
+....xxxxxxxx
+....xxxx....
+....xxxx....
+....xxxx....
+
+T
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+....xxxx....
+....xxxx....
+....xxxx....
+....xxxx....
+....xxxx....
+....xxxx....
+
+V
+xxxx........
+xxxx........
+xxxx........
+xxxx........
+xxxx........
+xxxx........
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+xxxxxxxxxxxx
+
+L
+xxxx....
+xxxx....
+xxxx....
+xxxx....
+xxxx....
+xxxx....
+xxxx....
+xxxx....
+xxxx....
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+
+P
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+xxxx....
+xxxx....
+xxxx....

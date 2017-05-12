@@ -1,0 +1,50 @@
+{
+   "abstract" : "simple interface to Google+",
+   "author" : [
+      "Zak B. Elep <zakame@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-Plus",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "IO::Socket::SSL" : "1.37",
+            "Mojo::Base" : 0,
+            "Mojo::URL" : 0,
+            "Mojo::UserAgent" : 0,
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Net::Ping" : 0,
+            "Test::More" : 0,
+            "Test::Most" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zakame/perl-google-plus.git",
+         "web" : "https://github.com/zakame/perl-google-plus"
+      }
+   },
+   "version" : "0.004"
+}
+

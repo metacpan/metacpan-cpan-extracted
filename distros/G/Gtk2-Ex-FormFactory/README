@@ -1,0 +1,98 @@
+NAME
+    Gtk2::Ex::FormFactory - Makes building complex GUI's easy
+
+SYNOPSIS
+      #-- Refer to http://www.exit1.org/ for 
+      #-- a comprehensive online documentation.
+
+      #-- Read Gtk2::Ex::FormFactory::Intro
+
+      use Gtk2::Ex::FormFactory;
+
+      my $context  = Gtk2::Ex::FormFactory::Context->new;
+  
+      $context->add_object (
+        name   => "worksheet",
+        object => My::Worksheet->new,
+      );
+  
+      # derived from Gtk2::Ex::FormFactory::Layout
+      my $layouter = My::Layout->new;
+
+      # derived from Gtk2::Ex::FormFactory::Rules
+      my $rule_checker = My::Rules->new;
+
+      my $ff = Gtk2::Ex::FormFactory->new (
+        context      => $context,
+        layouter     => $layouter,
+        rule_checker => $rule_checker,
+        content      => [
+          Gtk2::Ex::FormFactory::Window->new (
+            title   => "Worksheet Editor",
+            content => [
+              Gtk2::Ex::FormFactory::Form->new (
+                title   => "Main data",
+                content => [
+                  Gtk2::Ex::FormFactory::Entry->new (
+                    label => "Worksheet title",
+                    attr  => "worksheet.title",
+                    tip   => "Title of this worksheet",
+                  ),
+                  #-- More widgets...
+                ],
+              ),
+              Gtk2::Ex::FormFactory->DialogButtons->new,
+            ],
+          ),
+        ],
+      );
+
+      $ff->open;
+      $ff->update;
+  
+      Gtk2->main;
+
+ABSTRACT
+    With Gtk2::Ex::FormFactory you can build a GUI which consistently
+    represents the data of your application.
+
+DESCRIPTION
+    This is a framework which tries to make building complex GUI's easy, by
+    offering these two main features:
+
+      * Consistent looking GUI without the need to code resp. tune
+        each widget by hand. Instead you declare the structure of your
+        GUI, connect it to the data of your program (which should be
+        a well defined set of objects) and control how this structure
+        is transformed into a specific layout in a very generic way.
+
+      * Automatically keep widget and object states in sync (in both
+        directions), even with complex data structures with a lot of
+        internal dependencies, object nesting etc.
+
+    This manpage describes the facilities of Gtk2::Ex::FormFactory objects
+    which are only a small part of the whole framework. To get a full
+    introduction and overview of how this framework works refer to
+    Gtk2::Ex::FormFactory::Intro.
+
+AUTHORS
+     Jörn Reder <joern at zyn dot de>
+
+COPYRIGHT AND LICENSE
+    Copyright 2004-2006 by Jörn Reder.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Library General Public License as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Library
+    General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307
+    USA.
+

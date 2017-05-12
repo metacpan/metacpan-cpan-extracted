@@ -1,0 +1,79 @@
+Revision history for Geo-ICAO
+
+1.100140  2010-01-14 20:29:53 Europe/Paris
+ - requiring perl 5.8.x
+ - updated list of airport codes from wikipedia
+ - using file::sharedir to put data in its own file
+ - using sub::exporter instead of exporter
+
+1.093410  2009-12-07 09:06:31 Europe/Paris
+ - removing kwalitee test (need to work on it)
+
+1.093320  2009-11-28 17:15:58 Europe/Paris
+ - module is stable, moving to 1.yydddn version scheme
+ - updated list of airport codes from wikipedia
+ - migrated to dist-zilla (transparent for end user)
+
+**
+
+0.36 Fri Nov 30 09:02:10 CET 2007
+ - updated list of airport codes from wikipedia
+
+0.35 Mon Nov 26 13:09:35 CET 2007
+ - kwalitee/cpants release
+
+0.34 Mon Nov  5 18:57:34 CET 2007
+ - requiring perl 5.8 to quiet 5.6-related errors
+
+0.33 Tue Aug 14 18:45:01 CEST 2007
+ - new sub all_airport_names()
+
+0.32 Tue Aug 14 18:21:29 CEST 2007
+ - new sub all_airport_codes()
+
+0.31 Mon Aug 13 18:42:37 CEST 2007
+ - new sub airport2code()
+
+0.30 Mon Aug 13 10:48:08 CEST 2007
+ - new sub code2airport()
+
+**
+
+0.23 Sat Aug 11 16:06:58 CEST 2007
+ - fixing test for perl 5.6
+
+0.22 Sat Aug 11 14:46:23 CEST 2007
+ - new subs country2code() / code2country()
+
+0.21 Sat Aug 11 14:06:19 CEST 2007
+ - all_country_codes() / all_country_names() now accept a code to
+   restrict to a given region
+
+0.20 Fri Aug 10 16:03:58 CEST 2007
+ - new subs all_country_codes(), all_country_names()
+
+**
+
+0.12 Fri Aug 10 15:24:18 CEST 2007
+ - fixed bug in region2code: wrong hash used
+ - added tests for region
+
+0.11 Fri Aug 10 14:38:30 CEST 2007
+ - cleaned "Maritime Southeast Asia" name
+ - new subs region2code(), code2region()
+
+0.10 Fri Aug 10 10:26:05 CEST 2007
+ - export is in place
+ - dropped prereq Readonly (since hashes are less easy to handle with perl 5.6)
+ - new test for kwalitee
+
+**
+
+0.02 Thu Aug  9 14:23:19 CEST 2007
+ - protect country codes to quiet perl 5.6 warnings
+
+0.01 Wed Aug  8 19:13:52 CEST 2007
+ - initial release
+ - region & countries definition
+ - all_region_names() / all_region_codes()
+

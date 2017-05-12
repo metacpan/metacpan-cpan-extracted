@@ -1,0 +1,253 @@
+=head1 NAME
+
+Games::Go::SGF2misc - Reads SGF files and produces usable output in many formats
+
+=head1 SYNOPSIS
+
+    use Games::Go::SGF2misc;
+
+    my $sgf = new Games::Go::SGF2misc;
+    for my $file (<*.sgf>) {
+        $sgf->parse($file);
+
+        # do things with the parsed sgf:
+        # the output options are listed below
+    }
+
+=head1 nodelist
+
+    my $nodelist = $sgf->nodelist;  
+
+This returns a special list of node-id's (human readable
+C<$game_number.$variation-$move_no> node descriptors).  example:
+
+    $nodelist = { 1 => [
+        [ '1.1-root', '1.1-1', '1.1-2', '1.1-3', '1.1-4', '1.1-5', ],
+        [      undef,   undef,   undef,   undef,   undef, '1.2-5', '1.2-6', '1.2-7', ],
+        [      undef,   undef,   undef,   undef,   undef,   undef,   undef, '1.3-7', '1.3-8' ],
+    ] };
+
+What do you do with them?
+
+=head1 as_perl
+
+    my $game_info = $sgf->as_perl(1);
+    my $root_node = $sgf->as_perl('1.1-root');
+    my $move5_v2  = $sgf->as_perl('1.2-5');
+
+    my $s = $game_info->{game_properties}{SZ};
+    print "The board size is: ${s}x${s}!\n"; 
+
+    print my $c (@{ $move5_v2->{comments} }) {
+        print "Comment from 1.2-5: $c\n";
+    }
+
+Tada!!
+
+Oh, as_perl takes an optional second argument.
+    
+    $sgf->as_perl("doesn't exist node"); # will die on the spot...
+    $sgf->as_perl("isn't there", 1)      # will not
+        or print "yikes!!: " . $sgf->errstr;
+
+=head1 as_text 
+
+This is pretty much just an example
+
+    use strict;
+    use Games::Go::SGF2misc;
+
+    my $sgf = new Games::Go::SGF2misc; 
+       $sgf->parse("sgf/jettero-sixrusses-2004-03-18.sgf");
+
+    my $nl  = $sgf->nodelist;
+    my $end = $nl->{1}[0][ $#{$nl->{1}[0]} ];
+              # 1st game  1st variation    last node
+     
+    my $caps = $sgf->as_perl( $end )->{captures};
+
+    print $sgf->as_text($end), "Captures:  Black-$caps->{B} / White-$caps->{W}\n";
+
+    # Result:
+    #   X O . . . O . . . . . . . . . O O O .
+    #   . O O . O O X . X X O O X O O O X X X
+    #   X O . . . O X . X O . O O . O X . . .
+    #   O O . O O X O O O O O . . O X . X . .
+    #   O O O O O X X X X O . O O X . . . . .
+    #   O X X X O X . X . X O O X . X . . . .
+    #   X X X O O . X . X . X X . . . . . . .
+    #   X . . X O . . X . . . . . . . . X . .
+    #   X . X X O O O X . . . . . . . . . . .
+    #   X . X . X X O X O O O X . . . . . . .
+    #   . X . . . X O O X X X X X . . . X . .
+    #   . . . . X O O . O O O X . . . X X X X
+    #   X X X . X X O O . O X X X . . X O O X
+    #   X O O X . . X . O O O X X . X O O . O
+    #   O O . O X X X X X O X X O X X X O . .
+    #   . . O O O X . . X O O X O X O X O X .
+    #   . . . . O O X X O O . O O O O O O X .
+    #   . . . . . O X O . O . . . . O X X O O
+    #   . . . . . O X O O . . . . . . . . . .
+    #   Captures:  Black-11 / White-16
+
+=head1 as_html 
+
+This function works very much like the as_text function above, but
+instead prints out an html table full of images.
+
+    open my $out, ">", "example.html" or die $!;
+    print $out, $sgf->as_html( $end, "/image/dir/" );
+
+The only real difference is the image-dir argument (which defaults to
+"./img").  This is the URL image dir (<img # src="$image_dir/moku.gif">), 
+not the pysical image dir.  There is a directory of images included
+with SGF2misc.  They are from this page:
+
+L<http://www.britgo.org/gopcres/gopcres1.html#ag-gifs>
+
+They are Andrew Grant's GIF images.  I did NOT seek permission to
+re-distribute them.  Perhaps I have no right to do so.  I really
+don't know how to get ahold of him.  
+
+If anyone knows how who to ask, please tell me.  If anyone knows it's
+a problem, please tell me.
+
+3/22/04, Orien Vandenbergh made bc.gif, wc.gif, bq.gif and wq.gif for me.
+
+NOTE: On marks, this as_html only shows circles, triangles, squares,
+and numbers where there are stones.  It does not show letters at all.
+This is only because I don't have images for _everything_. :)
+
+=head1 as_image
+
+This uses the fantastic ::SGF2misc::GD package by Orien Vandenbergh
+that comes with this package.  It is a separate package, and as you
+will see, the interfaces aren't totally compatable -- however, it
+_is_ intended to be used with this package.
+
+You must install GD-2.15 (or so) in order to use it!!  You will also
+need the bleeding edge versions of libpng and libgd.  At the time of
+this writing, I used libgd-2.0.22 and got GD-2.12 to install and
+function normally.
+
+Here's a calling example:
+
+    $sgf->as_image($node, {filename=>"html/$x->[$i].png", gobanColor=>[255, 255, 255]});
+
+::SGF2misc::GD takes hash-like arguments.  So, so does as_image().
+filename=>"" and gobanColor=>[] are additions of mine, as they're
+actually used on separate calls in the ::SGF2misc::GD package.
+All other arguments are passed to the new() member function if
+::SGF2misc::GD.  Please read the Games::Go::SGF2misc::GD manpage; it
+contains much more information.
+
+Some SGF writers will automatically add a CR (circle) property to
+the current move, which as_image will render as expected.  However
+other SGF writers do not.  To have as_image automatically render
+circles on the current moves add the hash argument auto_mark=>1.
+With auto_mark enabled, any nodes which already have _any_ form of
+markup will not receive _any_ circles on the current moves.  This
+is to help ensure consistancy with SGFs where the markup has other
+(more important?) uses.*This could have undesirable results for
+nodes in which there are multiple stones placed.
+
+Also, in the interests of making this as clumsy as possible, if the
+filename is a dash followed by a type extension,
+
+        my $image = $sgf->as_image($l, {filename=>"-.png"});
+
+then the image will be returned as a string rather than written to a
+file.  
+
+Optionally, you can also install the ::SGF2misc::SVG package written
+by Orien.  To specify use of the SVG module call as_image with the 
+argument 'use' => 'Games::Go::SGF2misc::SVG'.  Functionally the two 
+rendering modules are equivalent, except SVG doesn't yet support
+returning the image as a string.  Aesthetically, however, ::SVG
+seems to render a cleaner image (at all resolutions), and does so
+significantly faster.
+
+=head1 as_freezerbag
+  
+What?  Yeah, this is a special way to save the parsed sgf data such
+that you can interact with it without having to re-parse it.  It
+seemed like it should be faster than re-parsing the SGF every time,
+but it isn't much of a speedup at all.  Unless I can speed it up, or
+someone asks me to leave it in, it could get axed.  I may leave it in
+anyway, because it's cute.
+
+Try it yourself:
+
+    $sgf->as_freezerbag( "freezer.pl",  # an export filename
+
+        # Some code to put in it.  This argument is optional.
+            q/my @nodes = @{ $sgf->nodelist->{1}[0] };
+
+            for my $n (@nodes) {
+                my $board = $sgf->as_text($n) or die $sgf->errstr; 
+                print "\e[1;1f$board";
+            }/,
+
+       # The location and/or switches for your perl
+       # I needed blib/lib (since I don't always install to test this
+       # stuff).  This argument is optional.
+
+       "/usr/bin/perl -I blib/lib",
+    );
+
+=head1 Board Postion Character Map
+
+    # This is how an empty 3x3 board would be stored:
+
+    $board = [
+        [ ' ', ' ', ' ' ],
+        [ ' ', ' ', ' ' ],
+        [ ' ', ' ', ' ' ],
+    ];
+
+    # ' ' - an empty board position
+    # 'W' - a white stone
+    # 'B' - a black stone
+
+Marks are not placed on the board!
+You'll just have to fetch the marks array from the $node.
+
+=head1 Miscellaneous
+
+=head2 is_node
+
+    print "There is a node called 1.1-root!\n" if $sgf->is_node('1.1-root');
+
+=head1 BUGS
+
+Besides the lack of documentation?  Well, I'm sure there's a bunch.  If you spot
+any bugs, please tell me.
+
+=head1 ENV VARIABLES
+
+=head2 DEBUG
+
+Try setting $ENV{DEBUG}=1, $ENV{DEBUG}=2, or $ENV{DEBUG}=3 to see the internals.
+
+Also, from your bash prompt you can 'DEBUG=1 perl ./myprog.pl' to enable
+debugging dynamically.
+
+DEBUG of 31 or over will show the lexical trace.  That's kinda fun.
+
+=head1 AUTHOR
+
+Please contact me with ANY suggestions, no matter how pedantic.
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+Some changes and patches provided by:
+
+Orien Vandenbergh C<< <orien@icecode.com> >>
+
+=head1 COPYRIGHT
+
+Copyright 2010 -- Paul Miller
+
+=head1 LICENSE
+
+GPL v3

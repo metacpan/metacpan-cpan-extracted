@@ -1,0 +1,73 @@
+--- #YAML:1.0
+name:               Gtk2-Ex-Clock
+version:            15
+abstract:           Simple digital clock widget.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Glib::Ex::SourceIds:  2
+    Glib::Object::Subclass:  0
+    Gtk2:                 1.200
+    perl:                 5.008
+    POSIX::Wide:          2
+    Tie::TZ:              0
+resources:
+    homepage:  http://user42.tuxfamily.org/gtk2-ex-clock/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - devel
+        - examples
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    maximum_devel:
+        description:  Stuff used variously for development.
+        requires:
+            DateTime:             0
+            DateTime::TimeZone:   0
+            DateTime::TimeZone::TAI:  0
+            Devel::FindRef:       0
+            Glib::Ex::ConnectProperties:  0
+            Glib::Ex::SignalIds:  0
+            Pod::Simple::HTML:    0
+            Time::Mock:           0
+            warnings::unused:     0
+    maximum_examples:
+        description:  Be able to run all the example programs.
+        requires:
+            DateTime:             0
+            DateTime::TimeZone:   0
+            DateTime::TimeZone::TAI:  0
+            DateTimeX::AATW:      0
+    maximum_tests:
+        description:  Have "make test" do as much as possible.
+        requires:
+            Parse::CPAN::Meta:   0
+            Test::DistManifest:  0
+            Test::Pod:           1.00
+            Test::Synopsis:      0
+            Test::Weaken:        2.000
+            Test::YAML::Meta:    0.15
+            YAML:                0
+            YAML::Syck:          0
+            YAML::Tiny:          0
+            YAML::XS:            0
+    with_datetime:
+        description:  Have "make test" do as much as possible.
+        requires:
+            DateTime:            0
+            DateTime::TimeZone:  0
+recommends:
+    DateTime:            0
+    DateTime::TimeZone:  0

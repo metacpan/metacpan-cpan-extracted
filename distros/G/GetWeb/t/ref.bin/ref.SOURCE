@@ -1,0 +1,23 @@
+Content-Type: multipart/mixed; boundary="------------856734672-20921-0"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/backgrd.gif>
+
+For help decoding this encoded binary file,
+ send a message with the body:
+
+HELP MIME
+
+--------------856734672-20921-0
+Content-Type: image/gif; name="backgrd.gif"
+Content-Disposition: inline; filename="backgrd.gif"
+Content-Transfer-Encoding: base64
+
+R0lGODdhhAMNAIAAAP///8zMzCwAAAAAhAMNAAACvIyPqcvtD6OcEtiLs968
++w+G4kiW5omm6sq27gvH8kzX9o3nekv1/g8MCgO7ovGITCqXzKbzCY1Kp6qh
+9YrNNqjcrvcLDovH5LK5qE2r15Sz+w2Py+f0uh3Kzuv3977/DxgoOEiYs3eI
+iFW4yNjo+AgZ+ZRIWdkjiZmpucnZuWgJGsrgSVpqeoqaqiPKyqr6ChsrO1va
+amtJm6u7y9t7dguM6DtMXGx8PBOsnIfc7PwMjbw8nRZtfY2d7VkAADs=
+
+--------------856734672-20921-0--
+

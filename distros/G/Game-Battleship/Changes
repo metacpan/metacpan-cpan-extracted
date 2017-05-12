@@ -1,0 +1,71 @@
+Revision history for Games-Battleship
+
+0.0601 2015-10-18
+    - Utilize additional Moo features.
+
+0.06  2015-10-18
+    - Use Moo!
+
+0.0505 2015-10-18
+    - Whoops! Removed accidentally left-in POD cruft.
+
+0.0504 2015-10-17
+    - Improved documentation.
+    - Removed imaginary "game type" logic.
+    - Update distribution metadata with modern tools.
+
+0.0503 Tue Jun 19 2012
+    - Add Test::PodSpelling to dist.ini and fixed more, horrendous, embarrassing typos in the POD.  OOF.
+
+0.0502 Tue Jun 19 2012
+    - Repair horrid doc typo.
+
+0.0501 Thu May 31 2012
+    - Shaking the inappropriate, orphaned cpan-rating by renaming.
+    - Refactored distrobution with Dist::Zilla.
+    - Renamed players.
+    - Improved POD.
+
+0.05 Wed Aug 25 2004
+    - Removed lame code fold markers.
+    - Fixed and enhanced POD and in-line comments all around.
+    - Used the warnings pragma.
+    - Removed core's Test::More from the Makefile prereqs.
+    - Improved the tests big-time.
+    - SPELL CHECKING? HELLO?
+
+0.0402 Fri Feb 9 2004
+    - Fixed POD again.  Argh.
+
+0.0401 Fri Feb 6 2004
+    - Fix and enhance documentation big time.
+
+0.04 Thu Feb 5 2004
+    - The VERSION goes on its own line.
+    - Added a $player->name accessor.
+    - Added a $game->players accessor.
+    - Added a "bogus user" test.
+    - Made play() work.  GRAR!
+    - Updated POD all around.
+
+0.03 Thu Sep 04 2003
+    - Find the least whole number that is not used as a player number.
+    - Update and fix documentation.
+    - In the Battleship.pm _init() loop, next if not player_, rather
+      than only if "type".
+    - Added an id attribute to creation of a new player.
+    - Remove the 10 player limit by just looking at a player id
+      attribute.
+    - Whoops.  Added <= 0 to the life decrement on hit condition.
+
+0.02 Wed Sep 03 2003
+    - Constructor allows multi player.
+    - Removed forgotton use lib directives.
+    - "Test more better now."
+    - Cleaned and enhanced POD.
+    - Added a not-yet-functioning game_type method.
+    - I'm sure there was much more that I changed, but forgot to keep
+      track.  : (
+
+0.01 Thu Aug 21 22:35:42 2003
+    - Created by Module::Husbandry.

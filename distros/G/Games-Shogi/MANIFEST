@@ -1,0 +1,25 @@
+Changes
+examples/Shogi.pl
+examples/Window/Changes
+examples/Window/Makefile.PL
+examples/Window/MANIFEST
+examples/Window/README
+examples/Window/t/1.t
+examples/Window/Window.pm
+lib/Games/Shogi/Chu.pm
+lib/Games/Shogi/Dai.pm
+lib/Games/Shogi/DaiDai.pm
+lib/Games/Shogi/Heian.pm
+lib/Games/Shogi/HeianDai.pm
+lib/Games/Shogi/MakaDaiDai.pm
+lib/Games/Shogi.pm
+lib/Games/Shogi/Tai.pm
+lib/Games/Shogi/Taikyoku.pm
+lib/Games/Shogi/Tenjiku.pm
+lib/Games/Shogi/Tori.pm
+lib/Games/Shogi/Wa.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+META.yml                                Module meta-data (added by MakeMaker)

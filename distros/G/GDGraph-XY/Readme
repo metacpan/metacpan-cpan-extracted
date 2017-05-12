@@ -1,0 +1,46 @@
+NAME
+
+  GD::Graph::XY v0.92
+
+DESCRIPTION
+
+  This package contains some XY graphing modules for GD::Graph
+
+COPYRIGHT
+
+  Copyright 2001 GAF-3 Industries, Inc. All rights reserved.
+  Written by George A. Fitch III (aka Gaffer), gaf3@gaf3.com
+
+  This program is free software, you can redistribute it and/or modify it under
+  the same terms as Perl istelf
+
+INSTALlATION
+
+  REQUIRED
+ 
+    perl 5.004
+    GD >= 1.18
+    GD::Graph >= 1.30,
+
+  WIN32 (GDGraph-XY-0.92.zip)
+
+    Extract zip file into a directory and type
+
+    ppm install GDGraph-XY.ppd
+
+  UN*X (GDGraph-XY-0.92.tar.gz)
+
+    Extract bundle into a directory and type
+
+    perl Makefile.PL
+    make
+    make install
+
+ TESTING
+
+  After installing, run test.pl by typing 
+
+    perl -w test.pl
+
+  while in the installation directory. This 
+  will create some sample graphs.

@@ -1,0 +1,120 @@
+%start cave
+%treasury throne
+
+%action score
+%result
+score
+
+%action inventory
+%result
+inventory
+
+%room cave
+cave mouth
+%exit e chamber
+
+%room throne
+gorgeously decorated throne room
+%exit s chamber
+
+%item sign
+Sign says: leave treasure here, then say SCORE
+
+%item lamp
+old-fashioned brass lamp
+%getdrop lamp
+%lightsource lamp
+
+%room chamber
+square chamber
+%exit e dungeon
+%exit n throne
+%exit w cave
+
+%occur
+at chamber
+%result
+clear_dark
+look
+
+%item cross
+Wooden cross
+%getdrop cross
+
+%room dungeon
+gloomy dungeon
+%exit w chamber
+%exit n crypt
+
+%occur
+at dungeon
+%result
+set_dark
+look
+
+%occur 25
+at dungeon
+%result
+msg I smell something rotting to the north.
+
+%item door
+Locked door
+
+%item key
+Brass key
+%getdrop key
+%at crypt
+
+%item door2
+Open door leads south
+%nowhere
+
+%action open door
+here door
+!accessible key
+%result
+msg It's locked.
+
+%action open door
+here door
+%result
+swap door door2
+msg OK
+
+%action go door
+here door2
+%result
+moveto cell
+
+%room cell
+dungeon cell
+%exit n dungeon
+
+%item coin
+*Gold coin*
+%getdrop coin
+
+%room crypt
+damp, dismal crypt
+%exit s dungeon
+
+%item vampire
+Vampire
+
+%occur
+here vampire
+!carried cross
+%result
+msg Vampire bites me!  I'm dead!
+game_over
+%comment vampire attacks unless cross is carried
+
+%occur
+here vampire
+carried cross
+%result
+msg Vampire cowers away from the cross!
+
+%valias take get
+%valias leave drop
+%nalias lantern lamp

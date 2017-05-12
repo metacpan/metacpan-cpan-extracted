@@ -1,0 +1,76 @@
+Changes
+=======
+
+0.00015 - Aug 29 2012
+    * Fix MANIFEST
+
+0.00014 - Aug 29 2012
+    * Update contents of inc/
+    * Apply STATIC_INLINE all over the place
+    * Do away with automatically generated xt/compat/ tests
+
+0.00013 - Sep 21 2010
+    * No code change. Just making CPAN Testers Happy.
+    * Fix xt/compat.t to actually run (tokuhirom)
+    * Add .gitignore in repo (tokuhirom)
+    * Add explicit Perl minimum version (tokuhirom)
+
+0.00012 - Sep 13 2010
+    * Make sure to check that values passed to encode() are in degrees,
+      not dotted dms values.
+    * Add tests for it.
+
+0.00011 - Aug 26 2010
+    * Minor C level tweaks
+    * Actually include ppport.h
+
+0.00010 - Aug 16 2010
+    * Stupid me forgot that compat tests would require Geo::Hash.
+      These tests are now moved to author tests, so users don't have to
+      worry about them
+
+0.00009 - Aug 16 2010
+    * !!!BACKWARD INCOMPATIBLE CHANGE!!!
+        -> decode_to_interval used to return
+            [ [ $lat_min, $lat_max ], [ $lon_min, $lon_max ] ]
+           but original Geo::Hash returns 
+            [ [ $lat_max, $lat_min ], [ $lon_max, $lon_min ] ]
+           so the return value was changed to return the same thing
+           as Geo::Hash (hiratara)
+    * Changed t/900_compat tests so that the test files are generated
+      when Makefile.PL runs
+
+0.00008 - Aug 16 2010
+    * Fix many memory leaks. Valgrind rocks
+    * Fix adjacent to work with edge case of 180 and -180 degrees (hiratara)
+    * XS tweak
+
+0.00007 - Aug 11 2010
+    * Update Test::More dependency
+    * No code changes
+
+0.00006 - Aug 09 2010
+    * Implement precision() (hiratara)
+    * Implement decode_to_precision() (hiratara)
+    * Fix documentation
+    * Add constants to specify direction for adjacent()
+    * Run tests from Geo::Hash 
+
+0.00005 - Aug 03 2010
+    * Make around/offset actually work for neighbors() (hiratara)
+
+0.00004 - Aug 03 2010
+    * Fix overflow (mattn)
+    * Add some author tests
+
+0.00003 - Aug 03 2010
+    * `index' is the BSD name for strchr (mattn)
+      (Apparently this allows compilation on Windows. Coolness!)
+
+0.00002 - Aug 03 2010
+    * Add tests for t/002_adjacent.t and t/003_neighbors.t (hiratara)
+    * Fix adjacent accordingly (hiratara)
+    * Fix neighbors
+
+0.00001 - Jul 29 2010
+    * Initial release

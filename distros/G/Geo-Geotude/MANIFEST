@@ -1,0 +1,12 @@
+# $Id: MANIFEST,v 1.1 2007/07/12 05:17:22 asc Exp $
+Build.PL
+Changes
+lib/Geo/Geotude.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/10-convert_point.t
+t/20-convert_geotude.t

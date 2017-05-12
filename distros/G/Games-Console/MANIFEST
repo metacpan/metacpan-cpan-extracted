@@ -1,0 +1,17 @@
+BUGS
+CHANGES
+MANIFEST
+README
+SIGNATURE
+LICENSE
+TODO
+META.yml
+Makefile.PL
+lib/Games/Console.pm
+lib/Games/Console/OpenGL.pm
+data/courier.bmp
+t/console.t
+t/opengl.t
+examples/opengl.pl
+examples/lib/SDL/App/FPS/MyConsole.pm
+examples/lib/SDL/OpenGL/Cube.pm

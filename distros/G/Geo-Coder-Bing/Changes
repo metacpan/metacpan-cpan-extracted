@@ -1,0 +1,52 @@
+Revision history for Geo-Coder-Bing
+
+0.13  Wed Mar  4 22:21:20 UTC 2015
+    - Added reverse_geocode method. (RT #102509)
+
+0.12  Sat Feb  8 03:44:39 UTC 2014
+    - Allowed optional query paramaters. (GH #2)
+
+0.11  Tue Mar 29 23:55:21 UTC 2011
+    - Required newer LWP with better HTTPS support.
+
+0.10  Wed Jun 23 01:28:42 UTC 2010
+    - Enabled compressed responses by default.
+    - Added method to get the HTTP::Response for the last request.
+    - Added Pod reference to the new Geo::Coder::Bing::Bulk module.
+
+0.09  Wed Jun 16 16:20:39 UTC 2010
+    - Added https option.
+
+0.08  Tue Jun 15 11:32:54 UTC 2010
+    - Migrated from the AJAX API to the new REST API.
+    - Maintained backwards compatibility, but issued a warning to encourage
+      users to migrate.
+
+0.07  Wed May 5 15:35:36 UTC 2010
+    - RT #57149: Properly decoded character encoding of response.
+
+0.06  Tue Dec 15 07:06:22 UTC 2009
+    - RT #52769: Added fix for changes to returned JSON data.
+    - Added debug option for HTTP requests and responses.
+
+0.05  Wed Sep 30 12:53:25 UTC 2009
+    - RT #47688: Location is no longer limited to only unicode-flagged
+      strings or UTF-8 bytes.
+
+0.04  Fri Sep 18 02:13:44 UTC 2009
+    - Added file portability author test.
+    - Renamed files for better portability.
+    - Added authortest Makefile target and added it to the disttest target.
+
+0.03  Wed Jul 8 14:42:46 UTC 2009
+    - Specified a minimum required version for URI.
+    - Added a note about non-ASCII locations.
+
+0.02  Tue Jul 7 19:01:23 UTC 2009
+    - Fixed prereqs.
+    - Added example for custom useragent.
+    - Added live tests (for author).
+    - Moved author tests into separate directory.
+
+0.01  Mon Jul 6 10:07:59 UTC 2009
+    - Initial distribution.

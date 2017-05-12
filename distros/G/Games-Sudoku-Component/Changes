@@ -1,0 +1,17 @@
+Revision history for Games::Sudoku::Component
+
+0.02  2006/04/04
+  - ::Table
+    - 'lock_all' now locks cells only that have real values
+
+  - ::Controller
+    - 'next' now returns found-and-set Item object
+    - status is cleared correctly after 'make_blank'
+
+  - added several tests on ::Controller::Loader
+
+  - various modules and files
+    - fixed typos
+
+0.01  2006/02/23
+  initial release

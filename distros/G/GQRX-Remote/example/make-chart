@@ -1,0 +1,40 @@
+#!/usr/bin/env gnuplot
+
+set ylabel "Signal Strength"
+set xlabel "Frequency"
+set key autotitle columnheader
+set style data lines
+set datafile separator ","
+
+set format x "%'.0f"
+
+# If this script is being used for other ranges, either comment out or
+# modify the next line
+set xtics 24000,40000,1766000
+
+set grid front x
+set grid front y
+
+# The output file size is 2560x960 and can be changed here
+set terminal pngcairo nocrop enhanced size 2560,960 font "arial,9"
+set output "output.png"
+
+# Columns: 1=frequency, 2=75th, 3=50th, 4=25th
+
+# Plot
+#    fill from 75th to 50th percentile
+#    fill from 50th percentile to 25th percentile
+#    fill to top of graph
+#    fill to bottom of graph
+#    75th percentile line
+#    50th percentile line
+#    25th percentile line
+plot "output_data.csv" \
+     using 1:4 with filledcurves x2 notitle linecolor rgb '#F0FFFF', \
+     '' using 1:4 with filledcurves x1 notitle linecolor rgb '#90FFFF', \
+     '' using 1:2:3 with filledcurves notitle linecolor rgb '#80CCFF', \
+     '' using 1:4:3 with filledcurves notitle linecolor rgb '#80CCFF', \
+     '' using 1:2 title columnheader(2) with lines linecolor rgb '#D61D32', \
+     '' using 1:3 title columnheader(3) with lines linecolor rgb '#1641EF', \
+     '' using 1:4 title columnheader(4) with lines linecolor rgb '#1DD62E'
+

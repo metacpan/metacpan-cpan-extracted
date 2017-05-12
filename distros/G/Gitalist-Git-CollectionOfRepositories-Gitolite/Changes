@@ -1,0 +1,8 @@
+Revision history for Gitalist-Git-CollectionOfRepositories-Gitolite
+
+0.002     2012-04-06 16:19:15 America/Vancouver
+  - Still new to moose/dzil, didn't know that dzil still needed package names for moose
+  - Split up the packages/class to seperate files
+
+0.001     2012-04-06 15:18:18 America/Vancouver
+  - original version

@@ -1,0 +1,144 @@
+NAME
+    Geo::PostalCode::NoBD - Find closest zipcodes, distance, latitude, and
+    longitude; no Berkeley DB.
+
+SYNOPSIS
+      use Geo::PostalCode::NoBD;
+
+      my $gp = Geo::PostalCode::NoBD->new(csvfile => "us_zip_codes.csv");
+
+      my $record = $gp->lookup_postal_code(postal_code => '07302');
+      my $lat   = $record->{lat};
+      my $lon   = $record->{lon};
+      my $city  = $record->{city};
+      my $state = $record->{state};
+
+      my $distance = $gp->calculate_distance(postal_codes => ['07302','10004']);
+
+      my $record = $gp->lookup_city_state(city => "Jersey City",state => "NJ");
+      my $lat          = $record->{lat};
+      my $lon          = $record->{lon};
+      my $postal_codes = $record->{postal_codes};
+
+      my $postal_codes = $gp->nearby_postal_codes(lat => $lat, lon => $lon,
+                                                       distance => 50);
+
+DESCRIPTION
+    Geo::PostalCode::NoBD is almost the same as Geo::PostalCode, except that
+    all Berkeley DB support has been removed in favor of loading the entire
+    CSV database into memory.
+
+ORIGINAL DESCRIPTION
+    This is a module for calculating the distance between two postal codes.
+    It can find the postal codes within a specified distance of another
+    postal code or city and state. It can lookup the city, state, latitude
+    and longitude by postal code.
+
+RATIONALE BEHIND NO BERKELEY DB
+    On a busy day at work, I couldn't get Geo::PostalCode to work with newer
+    data (the data source TJMATHER points to is no longer available), so the
+    tests shippsed with his module pass, but trying to use real data no
+    longer seems to work. DB_File marked the Geo::PostalCode::InstallDB
+    output file as invalid type or format. If you don't run into that issue
+    by not wanting to use this module, please drop me a note! I would love
+    to learn how other people made it work.
+
+    So, in order to get my shit done, I decided to create this module.
+    Loading the whole data into memory from the class constructor has been
+    proven to be enough for massive usage (citation needed) on a Dancer
+    application where this module is instantiated only once.
+
+DATA
+    I have mirrored working data at:
+
+    http://damog.net/files/misc/zipcodes-csv-10-Aug-2004.zip
+
+    Take a minute to go through its README to learn where this data comes
+    from and potentially send a thank you note to those who made it
+    available.
+
+METHODS
+    $gp = Geo::PostalCode::NoDB->new(csvfile => $csv_file_path, [units => mi
+    | km ,] [earth_radius => earth_radius_in_desired_units ,] );
+        Returns a new Geo::PostalCode::NoDB object.
+
+        You can control the distance units used by providing a `units'
+        option, which can be `mi' for miles (the default) or `km' for
+        kilometers, or by providing a `earth_radius' option set to the
+        radius of the Earth in your desired unit. The Earth's radius is
+        approximately 3956 miles.
+
+    $record = $gp->lookup_postal_code(postal_code => $postal_code);
+        Returns a hash reference containing four keys:
+
+          * lat - Latitude
+          * lon - Longitude
+          * city - City
+          * state - State two-letter abbreviation.
+
+    $record = $gp->lookup_city_state(city => $city, state => $state);
+        Returns a hash reference containing three keys:
+
+          * lat - Latitude (Average over postal codes in city)
+          * lon - Longitude (Average over postal codes in city)
+          * postal_codes - Array reference of postal codes in city
+
+    $miles = $gp->calculate_distance(postal_codes => \@postal_codes);
+        Returns the distance in miles between the two postal codes in
+        @postal_codes.
+
+    $postal_codes = $gp->nearby_postal_codes(lat => $lat, lon => $lon,
+    distance => $distance );
+        Returns an array reference containing postal codes with $distance
+        miles of ($lat, $lon).
+
+    $postal_codes = $gp->query_postal_codes(lat => $lat, lon => $lon,
+    distance => $distance, select => \@select, order_by => $order_by );
+        Returns an array reference of hash references with $distance miles
+        of ($lat, $lon). Each hash reference contains the following fields:
+
+          * postal_code - Postal Code
+          * lat - Latitude (If included in @select)
+          * lon - Longitude (If included in @select)
+          * city - City (If included in @select)
+          * state - State two-letter abbreviation (If included in @select)
+
+        If $order_by is specified, then the records are sorted by the
+        $order_by field.
+
+NOTES
+    This module is in early alpha stage. It is suggested that you look over
+    the source code and test cases before using the module. In addition, the
+    API is subject to change.
+
+    The distance routine is based in the distance routine in Zipdy. Zipdy is
+    another free zipcode distance calculator, which supports PostgreSQL. It
+    is available from http://www.cryptnet.net/fsp/zipdy/
+
+AUTHOR
+    Geo::PostalCode::NoDB module:
+
+    Copyright (c) 2012, David Moreno `david@axiombox.com'.
+
+    All rights reserved. This package is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+    Geo::PostalCode module:
+
+    Copyright (c) 2006, MaxMind LLC, http://www.maxmind.com/
+
+    All rights reserved. This package is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+CREDITS
+    Thanks to Scott Gifford of http://homesurfusa.com/ for contributing
+    multiple bug fixes and code cleanup.
+
+SEE ALSO
+        Geo::PostalCode - Find closest zipcodes, distance, latitude, and
+        longitude
+
+        Geo::IP - Look up country and city by IP Address
+
+        zipdy - Free Zip Code Distance Calculator
+

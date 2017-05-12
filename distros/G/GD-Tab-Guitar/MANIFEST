@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/GD/Tab/Guitar.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/01_methods.t
+t/files/BAR_206791.png
+t/files/C.png
+t/files/D7.png
+t/files/FOO_x_10_12_12_11_10.png
+t/files/G_334553.png
+xt/97_podspell.t
+xt/98_perlcritic.t
+xt/99_pod.t

@@ -1,0 +1,17 @@
+=head2 mailpath
+
+Generates an X-Mail-Path header from the Received headers of a mail
+message.  It attempts to figure out the real name of each host that the
+mail passed through based on the standard comment syntax used by most
+mailers, but this problem is inherently impossible to solve completely.
+
+X-Mail-Path is set to a !-separated list of hosts that the mail has passed
+through.  If from the Received headers the name of a host appears to be
+trusted, it's given; otherwise the name followed by the IP address in
+brackets is given.  If the IP address isn't available, "[UNTRUSTED]" is
+appended.
+
+The envelope sender is added to the end of the X-Mail-Path if known; if
+not, "UNKNOWN" is added instead.
+
+mailpath takes no arguments or configuration directives and cannot fail.

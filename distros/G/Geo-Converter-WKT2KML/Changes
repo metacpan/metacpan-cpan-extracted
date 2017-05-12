@@ -1,0 +1,12 @@
+Revision history for Geo-Converter-WKT2KML
+
+0.0.3  Wed Aug 27 2008
+       Use XML::Parser to parse KML
+
+0.0.2  Wed Aug 27 2008
+       Remove perlcritic.t to avoid perlcritic test fails.
+       # Perlcriic error is not occur in my local environment...
+
+0.0.1  Mon Aug 25 03:22:28 2008
+       Initial release.
+

@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib 'blib/lib';
+
+use Graph::Timeline::DiagonalGD;
+
+my $x = Graph::Timeline::DiagonalGD->new();
+
+while ( my $line = <> ) {
+    chomp($line);
+
+    next if $line =~ m/^\s*$/;
+    next if $line =~ m/^\s*#/;
+
+    my ( $id, $label, $start, $end, $url ) = split( ',', $line );
+    $x->add_interval( label => $label, start => $start, end => $end, id => $id, url => $url );
+}
+
+my %render = (
+    'graph-width' => 400,
+    'label-width' => 150,
+    'border'      => 10,
+    'colours'     => {
+        'Ended_Successfully' => [ 128, 128, 128 ],
+        'Failed'             => [ 255, 0,   0 ]
+    }
+);
+
+open( FILE, '>test_diagonal1.png' );
+binmode(FILE);
+print FILE $x->render(%render);
+close(FILE);
+
+open( FILE, '>test_diagonal1.map' );
+print FILE $x->map('line', 'image1' );
+close(FILE);
+
+$x->window( start => '2007/04/21T03:08:18', end => '2007/04/21T04:00:00', start_in => 1, end_in => 1 );
+
+open( FILE, '>test_diagonal2.png' );
+binmode(FILE);
+print FILE $x->render(%render);
+close(FILE);
+
+open( FILE, '>test_diagonal2.map' );
+print FILE $x->map('box', 'image2' );
+close(FILE);

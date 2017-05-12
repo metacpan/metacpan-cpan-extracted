@@ -1,0 +1,51 @@
+---
+abstract: "Generate signed XML documents as SAML responses for Google's SSO implementation"
+author:
+  - 'Manni Heumann (saml at lxxi dot org)'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-SAML-Response
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Google::SAML::Response:
+    file: lib/Google/SAML/Response.pm
+    version: '0.14'
+requires:
+  Carp: '0'
+  Crypt::OpenSSL::Bignum: '0'
+  Crypt::OpenSSL::DSA: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Date::Format: '0'
+  Digest::SHA: '0'
+  File::Which: '0'
+  Google::SAML::Request: '0'
+  HTML::Entities: '0'
+  Test::Exception: '0'
+  Test::Most: '0'
+  XML::CanonicalizeXML: '0'
+resources:
+  bugtracker: https://github.com/mannih/Google-SAML-Response/issues
+  homepage: https://github.com/mannih/Google-SAML-Response
+  repository: git://github.com/mannih/Google-SAML-Response.git
+version: '0.14'
+x_contributors:
+  - 'manni <manni@5c52eb61-1380-4012-85c8-26fb47f1eac4>'
+  - 'Manni Heumann <heumann@strato-rz.de>'
+  - 'Manni Heumann <github@lxxi.org>'

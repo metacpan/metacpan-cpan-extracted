@@ -1,0 +1,95 @@
+Changes
+======
+
+0.05014 - 21 Aug 2009
+  * Having completely forgotten about releasing a prod release for
+    4 months, I now version++ at the prodding of Adam Kennedy ;) 
+
+0.05014_01 - 30 Apr 2009
+  * Apply changes from Mike Schilli
+
+  (ms) Added support for XY type graphs
+  (ms) Added Google::Chart::Title support in Google::Chart
+  (ms) Added Google::Chart::Margin support
+  (ms) Google::Chart::Fill::LinearGradient now supports transitions from
+       color1/offset1 to color2/offset2 
+  (ms) Added 'D' option in Google::Chart::Marker for line and bar chart 
+       line styles
+
+  * TODO: Now that we (well, /I/) know more about meta programming, perhaps
+    there was an easier way to add the various functionalities using Roles?
+
+0.05013 - 30 Jan 2009
+  * Explicitly require Test::More 0.82 (rt #42907)
+
+0.05012 - 10 Jan 2009
+  * Google::Chart::Data::Simple was missing a 'with()' call. 
+
+0.05011 - 08 Dec 2008
+  * Make sure to set binmode() for render_to_file(), which caused Win32
+    people to not be able to read the rendered files. Reported by Ron Pero.
+
+0.05010 - 26 Oct 2008
+  * Fix tests to accomodate for stricter LWP::UserAgent
+  * Don't fail tests when you don't have network connectivity
+  * Make _build_ua() eplicitly private
+
+0.05009 - 25 Oct 2008
+  * Apply patch from Richard Faasen to read set env_proxy by default 
+
+0.05008 - 09 Oct 2008
+  * Fix doc/implementation mismatch rt #39889
+
+0.05007 - 23 Sep 2008
+  * No code change
+  * Fix doc problem
+    http://www.nntp.perl.org/group/perl.cpan.testers/2008/09/msg2267672.html
+
+0.05006 - 16 Sep 2008
+  * Fix rt #39317 by allowing parameter coercion to accept a plain
+    hashref (as the synopsis says it does).
+
+0.05005 - 10 Sep 2008
+  * Switch to using auto_include_deps, which seems to fix rt #39103
+  * Attempt to fix garbled UTF-8 encoding when UTF-8 encoded strings are
+    passed to QRcode.pm (reported by gugod)
+
+0.05004 - 08 Sep 2008
+  * Add Grid chart (Nobuo Danjou)
+  * Make it possible to work with negative values (Nobuo Danjou)
+  * Support multiple markers (Nobuo Danjou)
+  * Recent versions of Moose (properly) unimport blessed() and confess(), 
+    which breaks my code depending on it.
+
+0.05003 - 13 Aug 2008
+  * Fix semantics for Bar chart (Nobuo Danjou)
+
+0.05002 - 06 Aug 2008
+  * Fix stupid mistake in Makefile.PL to allow a simple "y" for
+    prompted question
+
+0.05001 - 06 Aug 2008
+  * Attempt to fix tests by using Test::UseAllModules (rt #38233)
+
+0.05000 - 29 Jul 2008
+  * Release new version. Please be careful as there are MANY backwards
+    incompatible changes
+  * Tweak Makefile.PL so it warns if you already have an old version
+    installed.
+
+0.05000_03 - 29 Jul 2008
+  * Make Data::Extended capable of handling multiple sets of data (danjou)
+  * Add proper color support and legend support (danjou)
+
+0.05000_02 - 25 Jul 2008
+  * Fix Fill::LinearStripes and Fill::LinearGradient
+  * Slight modification Google::Chart accessor generation
+
+0.05000_01 - 24 Jul 2008
+  * Mooooooooooooooose
+  * Backwards incompatible! Beware!
+
+Previous versions
+  * Much work done by Marcel Grünauer. Changes are not listed, because
+    I was too lazy to convert YAML changes to plain text.
+

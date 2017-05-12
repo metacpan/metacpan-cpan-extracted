@@ -1,0 +1,52 @@
+Changelog for Geo-CEP
+
+1.0 2014-06-20T14:08:01
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Sergey Romanov)
+
+0.9 2013-01-18T14:17:19
+ - removed drunk code (Stanislaw Pusep)
+ - refactored for memoization (Stanislaw Pusep)
+
+0.8 2013-01-12T15:21:03
+ - fixed misplaced eof() (Stanislaw Pusep)
+ - 2x speed increase! (thanks Devel::NYTProf ;) (Stanislaw Pusep)
+ - memoize get_idx() (Stanislaw Pusep)
+ - IO::File interface (Stanislaw Pusep)
+ - fetch_row() method added (Stanislaw Pusep)
+ - more specific prereqs (Stanislaw Pusep)
+
+0.7 2013-01-11T02:56:16
+ - nasty locale bug fix (thanks again, Blabos!) (Stanislaw Pusep)
+ - find() returns undef on failure (Stanislaw Pusep)
+ - ensure STDIO encoding in t/02-bit.t (Stanislaw Pusep)
+
+0.6 2013-01-10T14:20:24
+ - ensure it works on Perl down to v5.8 (Stanislaw Pusep)
+ - Q&D Unicode test (Stanislaw Pusep)
+ - minor refactoring (Stanislaw Pusep)
+
+0.5 2013-01-10T12:58:09
+ - references updated (Stanislaw Pusep)
+ - 90% code coverage (Stanislaw Pusep)
+ - s/Moose/Moo/g (Stanislaw Pusep)
+ - Dist::Zilla update (Stanislaw Pusep)
+ - Itarana has no accents (Blabos de Blebe)
+ - Dist::Zilla: AutoPrereqs/MinimumPerl (Stanislaw Pusep)
+ - Changelog commit. (Stanislaw Pusep)
+
+0.4 2011-05-31T01:23:32
+ - OpenBSD compatibility. (Stanislaw Pusep)
+
+0.3 2011-05-24T18:01:37
+ - Dist::Zilla stuff[2] (Stanislaw Pusep)
+ - Dist::Zilla stuff (Stanislaw Pusep)
+
+0.2 2011-05-23T17:12:08
+ - Added 'cep2city' utility. (Stanislaw Pusep)
+
+0.1 2011-05-21T02:42:15
+ - ++MojibakeTests (Stanislaw Pusep)
+ - fixed! (Stanislaw Pusep)
+ - INIT (still b0rked!) (Stanislaw Pusep)
+

@@ -1,0 +1,44 @@
+
+Section 0:
+    Length of BUFR message:            478
+    BUFR edition:                      3
+
+Section 1:
+    Length of section:                 18
+    BUFR master table:                 0
+    Originating subcentre:             0
+    Originating centre:                98
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           0
+    Data subcategory:                  0
+    Master table version number:       13
+    Local table version number:        1
+    Year of century:                   5
+    Month:                             6
+    Day:                               3
+    Hour:                              6
+    Minute:                            0
+
+Section 3:
+    Length of section:                 10
+    Number of data subsets:            3
+    Observed data:                     1
+    Compressed data:                   1
+    Data descriptors unexpanded:       307080
+
+Subset 3
+
+     1  001001               11  WMO BLOCK NUMBER [NUMERIC]
+     2  001002              520  WMO STATION NUMBER [NUMERIC]
+     3  004001             2005  YEAR [YEAR]
+     4  004002                5  MONTH [MONTH]
+     5  004003                6  DAY [DAY]
+     6  004004                6  HOUR [HOUR]
+     7  004005                0  MINUTE [MINUTE]
+     8  005001         50.00833  LATITUDE (HIGH ACCURACY) [DEGREE]
+     9  006001         14.44806  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    10  010004            97580  PRESSURE [PA]
+    11  012101           280.55  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    12  011001              240  WIND DIRECTION [DEGREE TRUE]
+    13  011002              4.0  WIND SPEED [M/S]

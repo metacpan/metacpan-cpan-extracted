@@ -1,0 +1,8 @@
+;(define-enum GdkImlibMode
+;  (plain-palette RT_PLAIN_PALETTE)
+;  (plain-palette-fast RT_PLAIN_PALETTE_FAST)
+;  (dither-palette RT_DITHER_PALETTE)
+;  (dither-palette-fast RT_DITHER_PALETTE_FAST)
+;  (plain-truecol RT_PLAIN_TRUECOL)
+;  (dither-truecol RT_DITHER_TRUECOL))
+

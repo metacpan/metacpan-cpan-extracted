@@ -1,0 +1,20 @@
+
+    TODO for Graph-ReadWrite
+
+* add test cases for reading and writing attributes
+
+* consider doing readers and writers for other graph formats:
+	- GraphML	graphml.graphdrawing.org
+	- GXL		http://www.gupro.de/GXL/
+	- GML		http://www.infosun.fmi.uni-passau.de/Graphlet/GML/
+	- XGMML		http://www.cs.rpi.edu/~puninj/XGMML/
+	- GDL		http://www.aisee.com/gdl/nutshell/
+	  (this is possibly exactly the same as the VCG format,
+	   as aiSee is the commercial version of VCG))
+
+* readers for formats we currently only have writers for:
+	- daVinci
+	- VCG
+
+
+$Id: TODO,v 1.2 2005/01/02 19:05:29 neilb Exp $

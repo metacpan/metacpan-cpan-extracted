@@ -1,0 +1,19 @@
+---
+round: Exam 3 (Part2)
+week: 13
+text: t/emile/activities.yaml
+questions:
+  - 9
+pass: 5
+assistant:
+absent:
+group:
+  Brown:
+    - Emile
+    - Rousseau
+    - Sophie
+    - Therese
+activity:
+  citrus:
+    2:
+      - Brown

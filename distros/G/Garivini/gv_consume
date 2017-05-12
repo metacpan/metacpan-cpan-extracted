@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+#
+# ./gv_consume --dsn="DBI:mysql:job:host=127.0.0.1;database=job" \
+# --username="job" --password="job" --gearmand="127.0.0.1:7003"
+# For low latency mode, add:
+# --pure
+# ... and --dsn/etc become optional.
+#
+
+use strict;
+use warnings;
+
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Getopt::Long;
+use Garivini::Client;
+use Gearman::Worker;
+use JSON;
+
+my %o = ();
+
+GetOptions(\%o,
+    'gearmand=s@',
+    'dsn=s',
+    'username=s',
+    'password=s',
+    'pure',
+    );
+
+die "Need dsn" unless $o{dsn};
+
+my $sm_client;
+my $count = 0;
+run();
+
+sub run {
+    $sm_client = Garivini::Client->new(
+        dbs => {1 => { id => 1, dsn => $o{dsn}, user => $o{username},
+        pass => $o{password}, }},
+        );
+
+    my $worker = Gearman::Worker->new;
+    $worker->job_servers(@{$o{gearmand}});
+    $worker->register_function('foo' => \&consume_thing);
+    $worker->work;
+}
+
+sub consume_thing {
+    my $job = decode_json(${$_[0]->argref});
+    #print "Hay it's a job: ", $job->{arg}, "\n" if $count++ % 100 == 0;
+    print "Hay it's a job: ", $job->{arg}, "\n";
+    # If we're running in "pure gearman" mode, let the remote ControllerWorker
+    # complete the job.
+    unless ($o{pure}) {
+        $sm_client->complete_job($job);
+    }
+}

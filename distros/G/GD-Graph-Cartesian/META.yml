@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                GD-Graph-Cartesian
+version:             0.11
+abstract:            Make Cartesian Graphs with GD Package
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    GD:                            2.02
+    List::MoreUtils:               0
+    List::Util:                    0
+    Package::New:                  0
+    Path::Class:                   0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

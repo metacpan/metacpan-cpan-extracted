@@ -1,0 +1,39 @@
+Revision history for Geo-Coder-OpenCage
+
+0.10    2017-05-05
+        - add support for 'abbrv' param, see:
+        http://blog.opencagedata.com/post/160294347883/shrtr-pls
+
+0.09    2016-12-12
+        - Documentation change, added link to Perl Advent Calendar article
+
+0.08    2016-12-04
+        - use https instead of http
+        - support 'no_record' optional param
+        
+0.07    2016-05-21
+        - support the API's various optional parameters
+          see: https://geocoder.opencagedata.com/api#forward-opt
+        - pod update
+        - 'countrycode', not 'country' as per the API
+        
+0.06    2015-04-14
+        - Github URL (organization) changed
+        
+0.05    2014-06-20
+        - Added reverse geocoding support
+
+0.04    2014-06-10
+        - Added Pod::Perldoc 3.21 as a dependency
+
+0.03    2014-06-10
+        - Added support for the 'language' and 'country' parameters
+        - Added lots of docs about supported and unsupported API parameters
+        - Fixed typo in POD
+        - Added link to API docs to POD
+
+0.02    2014-06-05
+        - Updated URL from prototype.opencagedata.com to api.opencagedata.com
+
+0.01    2014-05-20
+        - Initial release.

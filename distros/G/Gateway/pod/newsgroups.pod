@@ -1,0 +1,159 @@
+=head2 newsgroups
+
+Construct the Newsgroups header for a message.  This is the general module
+for this purpose, and is considerably more flexible than the simple
+handling built into the mailtonews module.
+
+The guiding purpose of this module is to attempt to deal with crossposting
+correctly in the context of a generic mail to news gateway (where incoming
+mail messages may not, unlike submissions for moderated groups, already
+have Newsgroups headers in them).  We're ambitious, though, and try to
+also handle the case where we do have an incoming Newsgroups header.
+
+All of the gory details of what this module does in every circumstance are
+documented in the comment block at the beginning of the code.  If you're
+really curious, I'd recommend reading that.  It's far more information
+than most people are going to want to know.  Here's the briefer summary:
+
+The program tells this module what the primary newsgroup is.  This should
+be the group to which we should post by default.  In other words, suppose
+you have several different mail to news gateway addresses for several
+different groups which all feed into the same program.  To use this
+module, configure such a system so that the program knows what address a
+given message arrived via (either by having access to the envelope
+recipient through using qmail, using procmail as a delivery agent, or some
+other method, or by having each mail to news gateway alias give the
+program the name of its primary newsgroup on the command line).  The
+program tells this module what group that is by providing it as an
+argument to the module.
+
+We also have a list of associations between addresses and newsgroups given
+to us in configuration directives.  An address can either be a literal
+address (which will be matched exactly, albeit without regard to case) or
+a regex.  Note that although this module wants to know about as many of
+those associations as possible, it can deal with not knowing about them
+all and will generally do the right thing.  It will just tend to multipost
+when it could have crossposted unless it knows which addresses correspond
+to which newsgroups.
+
+If the incoming message doesn't have a Newsgroups header, this module will
+construct one by inspecting the To and Cc headers and seeing where the
+message was sent.  If the primary group corresponds to one of the
+addresses in the To and Cc headers, then it will crosspost between the
+groups corresponding to the recognized addresses in the To and Cc headers
+(with the caveat given below).  Otherwise, it assumes that the address via
+which we received the message either is one we don't know about or was
+Bcc'd and posts only to the primary group.
+
+There is one problem with this.  If a message is addressed to a number of
+different addresses, all of which eventually gate to a newsgroup, if all
+of those gateways do this analysis and crosspost, the article ends up
+multiposted (one copy for each group crossposted to).  The solution to
+this problem is for one of the instances of the gateway program decide to
+post and all of the other ones exit quietly.  We support this by returning
+the error "Not primary instance" if the primary group is in the list
+formed from the To and Cc headers but isn't the first group in that list.
+We assume that we'll also get the mail going to the address corresponding
+to the first group in that list, and that instance will do the
+crossposting.  A program using this module should probably exit silently
+if we return "Not primary instance".
+
+If the message does contain a Newsgroups header, then what we do depends
+on whether our primary group is among the groups in that header, and
+whether any of the addresses in the To or Cc headers correspond to groups
+in that header.  The exact rules are very complicated (see the source
+comments), but we ignore the Newsgroups header entirely if neither the
+primary group nor the groups corresponding to addresses in the To and Cc
+headers occur in it, honor it if the primary group is in it, and post only
+to the groups corresponding to addreses in the To and Cc headers that
+aren't in the Newsgroups header if some addresses in the To and Cc headers
+correspond to groups in the Newsgroups header but our primary group isn't
+in that header.  We also return "Not primary instance" where appropriate
+to ensure that a post to a given set of newsgroups is only done once.
+
+(Yes, this is a simplification.  See the source comments for the B<real>
+complexity.)
+
+We also rename Message-ID to X-Original-Message-ID if we have some
+expectation that otherwise we'll clash with another post (either made by
+another instance of the same program or posted elsewhere).  We also rename
+Newsgroups to X-Original-Newsgroups if we don't honor the supplied header.
+Note that this module goes to some length to avoid renaming Message-ID
+unless necessary; if you want to drop all incoming message IDs and
+generate new ones, you should do that using the headers module.
+
+We take an argument specifying the primary group, and we take one
+configuration directive in one of three forms:
+
+=over 4
+
+=item group NEWSGROUP [ ADDRESS | /PATTERN/ ]
+
+Adds C<NEWSGROUP> to the list of valid newsgroups and optionally
+associates it with either C<ADDRESS> or C<PATTERN>.  C<ADDRESS> is a
+literal string that (case-insensitively) exactly matches the address
+associated with C<NEWSGROUP>.  C<PATTERN> is a Perl regex that matches
+addresses associated with C<NEWSGROUP>.
+
+=item group /PATTERN/
+
+Tells this module to consider any newsgroup matching C<PATTERN> to be
+valid to crosspost to.  Note that this directive doesn't set up any
+address to group mappings, just changes what groups are allowed in a
+pre-existing Newsgroups header.
+
+=item group FILE /PATTERN/
+
+Tells this module to add all newsgroups matching C<PATTERN> in the file
+C<FILE> to the list of valid newsgroups for crossposts.  Note that this
+directive doesn't set up any address to group mappings, just changes what
+groups are allowed in a pre-existing Newsgroups header.  C<FILE> must
+be an absolute path (i.e., it must begin with /).
+
+=back
+
+In all of the above, the /s around C<PATTERN> arguments are required, as
+they allow unambiguous parsing of the configuration file directives.
+
+There are three possible failure messages returned by this module:
+
+=over 4
+
+=item Invalid crossposted group %s
+
+The incoming message already had a Newsgroups header which included a
+group that wasn't on the list of allowable newsgroups for crossposting.
+
+=item Not primary instance
+
+Although the primary group is among the groups we would normally post to,
+it isn't the "first" such group.  This probably means that multiple copies
+of the message were received by different gateways and this instance
+should exit silently since another instance will be doing the posting.
+
+=back
+
+In addition to that, there are two possible fatal errors that can occur
+during the parsing of the configuration file and a third at the time of
+parsing the incoming message.  These errors are passed to the
+News::Gateway error() method.
+
+=over 4
+
+=item Invalid regex /%s/: %s
+
+An error occurred while compiling the given regex from a C<PATTERN>
+argument to a configuration directive.
+
+=item Can't open group file %s: %s
+
+An error occurred while attempting to open a file from a C<FILE> argument
+to a configuration directive.
+
+=item newsgroups module missing required argument
+
+The newsgroups module requires an argument giving the primary newsgroup,
+or all of the tricks we use to figure out crossposting and where to post
+won't work correctly.
+
+=back

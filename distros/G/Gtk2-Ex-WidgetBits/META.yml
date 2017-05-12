@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name:               Gtk2-Ex-WidgetBits
+version:            48
+abstract:           Helpers for Gtk2 widgets.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Glib:                 0
+    Glib::Ex::FreezeNotify:  1
+    Glib::Ex::SignalIds:  1
+    Glib::Object::Subclass:  0
+    Gtk2:                 1.200
+    Gtk2::Pango:          0
+    perl:                 5.008
+    Scope::Guard:         0
+resources:
+    homepage:  http://user42.tuxfamily.org/gtk2-ex-widgetbits/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - devel
+        - xt
+        - devel
+        - examples
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

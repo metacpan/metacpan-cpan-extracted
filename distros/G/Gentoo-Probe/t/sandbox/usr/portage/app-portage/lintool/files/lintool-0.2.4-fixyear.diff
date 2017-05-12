@@ -1,0 +1,27 @@
+--- lintool-0.2.4.orig/src/lintool/ebuild.py    2002-10-30 13:35:31.000000000 -0800
++++ lintool-0.2.4/src/lintool/ebuild.py 2003-09-25 18:22:30.000000000 -0700
+@@ -7,6 +7,7 @@
+ import os
+ import os.path
+ import string
++from time import gmtime, time, strftime
+ 
+ class TestSpaces(Test):
+ 
+@@ -56,12 +57,14 @@
+ 
+   def __init__(self, formatter, options):
+     Test.__init__(self,formatter, options)
++    # get current year
++    currentyear = strftime("%Y",gmtime(time()))
+     self.desc = "Testing for malformed headers"
+     self.want = [ [ 0, # count
+-                    re.compile("^(# Copyright .*2002.*)"), 
++                    re.compile("^(# Copyright .*"+currentyear+".*)"), 
+                     "Copyright statement" ],
+                   [ 0, # count
+-                    re.compile("^(# \$Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/lintool/files/lintool-0.2.4-fixyear.diff,v 1.1 2004/06/20 09:09:34 linguist Exp $)"),
++                    re.compile("^(# \$Header.*\$)"),
+                     "\$Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/lintool/files/lintool-0.2.4-fixyear.diff,v 1.1 2004/06/20 09:09:34 linguist Exp $" ],
+                   [ 0, # count
+                     re.compile("^(# Distributed under the terms of the GNU General Public License.*)"),

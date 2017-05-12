@@ -1,0 +1,66 @@
+{
+   "abstract" : "Calculate similarity of the vertices in graph(s)",
+   "author" : [
+      "Shohei Kameda <shoheik@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graph-Similarity",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Graph" : 0,
+            "Math::Matrix" : 0,
+            "Moose" : 0,
+            "Moose::Role" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0,
+            "Test::Output" : 0,
+            "Test::Perl::Critic" : 0,
+            "Text::Levenshtein" : 0,
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Graph::Similarity" : {
+         "file" : "lib/Graph/Similarity.pm",
+         "version" : "v0.0.5"
+      },
+      "Graph::Similarity::CoupledNodeEdgeScoring" : {
+         "file" : "lib/Graph/Similarity/CoupledNodeEdgeScoring.pm",
+         "version" : "0.02"
+      },
+      "Graph::Similarity::Method" : {
+         "file" : "lib/Graph/Similarity/Method.pm",
+         "version" : "0.02"
+      },
+      "Graph::Similarity::SimRank" : {
+         "file" : "lib/Graph/Similarity/SimRank.pm",
+         "version" : "0.02"
+      },
+      "Graph::Similarity::SimilarityFlooding" : {
+         "file" : "lib/Graph/Similarity/SimilarityFlooding.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.5"
+}

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Smart.xs
+t/Google-GeoCoder-Smart.t
+lib/Google/GeoCoder/Smart.pm

@@ -1,0 +1,94 @@
+$Id: README,v 1.5 2006/11/02 00:46:02 mike Exp $
+
+Games::ScottAdams - utilities for manipulating Scott Adams adventures
+
+
+INTRODUCTION
+------------
+
+Games::ScottAdams is a Perl module for manipulating adventure games in
+the very obsolete but strangely compelling Scott Adams format.  In
+particular, it includes "sac", the Scott Adams Compiler, which
+compiles a human-readable description of an adventure into a format
+that can be interpreted by common run-time systems such as scottfree.
+This provides a nice, low-overhead way in for people who want to start
+building their own adventures.
+
+Aside from the obvious Perl-module stuff (MANIFEST, Makefile.PL,
+ScottAdams.pm and the ScottAdams subdirectory for sub-modules and
+test.pl), what's what in this distribution?
+
+README		This file.
+GPL-2		The licence under which this software is distributed.
+Changes		History of the distribution, and things still to do.
+sac		The "wrapper" program that invokes the module.
+dubbin/		Uninteresting files used in regression-testing.
+crystal/	_Crystal of Chaos_, a sample adventure built with sac.
+tutorial/	The bits and pieces from which Tutorial.pm is built.
+		Change into this directory, run "make", and view the
+		generated HTML file "Tutorial.html"
+
+You may wish to avoid reading the _Crystal of Chaos_ source code
+(crystal/crystal.sac) until you've solved the game.
+
+
+SYNOPSIS
+--------
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ sudo make install
+	$ cd crystal
+	$ sac crystal.sac > crystal.sao
+	$ scottfree crystal.sao
+
+
+AUTHOR
+------
+
+All code and documentation by Mike Taylor <mike@miketaylor.org.uk>
+	http://www.miketaylor.org.uk/
+Please email me with bug-reports, wishlist items, patches, deployment
+stories and, of course, large cash donations.
+
+
+LICENCE
+-------
+
+The Games::ScottAdams module is Free Software, which is pretty much
+legally equivalent -- though not morally equivalent -- to Open Source.
+See
+	http://www.gnu.org/philosophy/free-software-for-freedom.html
+for a detailed if somewhat one-sided discussion of the differences,
+and particularly of why Free Software is an important idea.
+
+Games::ScottAdams is distributed under version 2 of the GPL (GNU
+GENERAL PUBLIC LICENSE) of June 1991.  A copy of the licence is
+included in this distribution, as the file GPL-2.  This licence does
+not allow you to restrict the freedom of others to use derived
+versions of Games::ScottAdams (i.e. you must share your enhancements),
+nor to deploy Games::ScottAdams as a part of a non-free larger work.
+
+
+SEE ALSO
+--------
+
+The Games::ScottAdams tutorial:
+	lib/Games/ScottAdams/Tuturial.pod
+
+The Games::ScottAdams reference manual:
+	lib/Games/ScottAdams/Manual.pod
+
+The "Changes" file, including the "Still to do" section.
+
+The web-page for this software,
+	http://www.miketaylor.org.uk/tech/advent/sac/
+
+ScottCom and other tools that act as compilers and decompilers for
+various Scott-Adams adventure languages:
+	http://ifarchive.flavorplex.com/if-archive/scott-adams/tools/?S=A
+
+ScottFree, a nice interpreter that uses sac's compiled files.  This is
+included as a standard package in many Linux distributions, including
+Debian and Ubuntu.

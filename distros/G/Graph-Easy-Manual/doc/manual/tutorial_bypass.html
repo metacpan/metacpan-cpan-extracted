@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - Manual - Tutorial - Bypass</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link rel="Start" href="index.html">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+  <a class="menubck" href="index.html" title="Back to the index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+
+  <a class="menuext" href="overview.html" title="How everything fits together">Overview</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+  <a class="menuext" href="hinting.html" title="Generating specific layouts">Hinting</a>
+  <a class="menuext" href="output.html" title="Output formats and their limitations">Output</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+  <a class="menuext" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+  <a class="menuext" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+  <a class="menucur" href="tutorial.html" title="Tutorials for often used graph types and designs">Tutorials</a>
+    <a class="menucin" href="tutorial_bypass.html" title="A bypass">Bypass</a>
+    <a class="menuind" href="tutorial_edges.html" title="Inline edge labels">Edge labels</a>
+    <a class="menuind" href="tutorial_tree.html" title="Tree-like layouts">Trees</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h2>
+
+<h2>Tutorials - Bypass (or How to Define The Layout Order)</h2>
+
+<div class="text">
+
+<h3>The goal</h3>
+
+<p>
+The goal of that tutorial is to show you how to create the following
+layout:
+</p>
+
+<pre class="graph" style="min-width: 50em;">
++------+     +---------+                   +-----------+     +---------+
+| Bonn | --> | Koblenz | ----------------> | Frankfurt | --> | Dresden |
++------+     +---------+                   +-----------+     +---------+
+               |                             ^
+               |                             |
+               |                             |
+               |             +-------+       |
+               +-----------> | Trier | ------+
+                             +-------+
+</pre>
+
+<h3 class="clear">Solution</h3>
+
+<pre class="graphtxt">
+[ Bonn ] --> [ Koblenz ] --> <em>{ minlen: 3; }</em> [ Frankfurt ]
+  --> [ Dresden ]
+
+[ Koblenz ] --> [ Trier ] <em>{ origin: Koblenz; offset: 2, 2; }</em>
+  --> [ Frankfurt ]
+</pre>
+
+<h3 class="clear">Explanation</h3>
+
+<p>
+Imagine you have a row of nodes like this:
+</p>
+
+<pre class="graphtxt clear">
+[ Bonn ] --> [ Koblenz ] --> [ Frankfurt ] --> [ Dresden ]
+</pre>
+
+<p>
+This would be rendered like this:
+</p>
+
+<pre class="graph">
++------+     +---------+     +-----------+     +---------+
+| Bonn | --> | Koblenz | --> | Frankfurt | --> | Dresden |
++------+     +---------+     +-----------+     +---------+
+</pre>
+
+<p class="clear">
+Now you want to show that there is an alternative route via 'Trier':
+</p>
+
+<pre class="graphtxt">
+[ Bonn ] --> [ Koblenz ] --> [ Frankfurt ] --> [ Dresden ]
+
+<em>[ Koblenz ] --> [ Trier ] --> [ Frankfurt ]</em>
+</pre>
+
+<p class="clear">
+Unfortunately, this doesn't render quite right, instead of showing
+the route via 'Trier' being a bypass, it shows it as the normal
+route and the route via Frankfurt as a shortcut:
+</p>
+
+<pre class="graph" style="min-width: 50em;">
+               +-----------------------------+
+               |                             v
++------+     +---------+     +-------+     +-----------+     +---------+
+| Bonn | --> | Koblenz | --> | Trier | --> | Frankfurt | --> | Dresden |
++------+     +---------+     +-------+     +-----------+     +---------+
+</pre>
+
+<p class="clear">
+The first idea would be to route the edge to 'Trier' to the right:
+</p>
+
+<pre class="graphtxt">
+[ Bonn ] --> [ Koblenz ] --> [ Frankfurt ] --> [ Dresden ]
+
+[ Koblenz ] --> <em>{ start: right; }</em> [ Trier ] --> [ Frankfurt ]
+</pre>
+
+<p class="clear">
+Unfortunately, the layouter is not so easily defeated:
+</p>
+
+<pre class="graph">
++------+     +---------+
+| Bonn | --> | Koblenz | ------+
++------+     +---------+       |
+               |               |
+               |               |
+               v               v
+             +---------+     +-----------+     +---------+
+             |  Trier  | --> | Frankfurt | --> | Dresden |
+             +---------+     +-----------+     +---------+
+</pre>
+
+<p class="clear">
+So lets put the node 'Trier' at a certain offset from Koblenz:
+</p>
+
+<pre class="graphtxt">
+[ Bonn ] --> [ Koblenz ] --> [ Frankfurt ] --> [ Dresden ]
+
+[ Koblenz ] --> [ Trier ] <em>{ origin: Koblenz; offset: 2, 2; }</em>
+  --> [ Frankfurt ]
+</pre>
+
+<p>
+This looks <i>almost</i> right:
+</p>
+
+<pre class="graph">
++------+     +---------+     +-----------+     +---------+
+| Bonn | --> | Koblenz | --> | Frankfurt | --> | Dresden |
++------+     +---------+     +-----------+     +---------+
+               |               ^
+               |               |
+               |               |
+               |             +-----------+
+               +-----------> |   Trier   |
+                             +-----------+
+</pre>
+
+<p class="clear">
+So in addition, we make the edge from 'Koblenz' to 'Frankfurt' longer via the
+minlen-attribute:
+</p>
+
+<pre class="graphtxt">
+[ Bonn ] --> [ Koblenz ] --> <em>{ minlen: 3; }</em> [ Frankfurt ]
+  --> [ Dresden ]
+
+[ Koblenz ] --> [ Trier ] <em>{ origin: Koblenz; offset: 2, 2; }</em>
+  --> [ Frankfurt ]
+</pre>
+
+<pre class="graph" style="min-width: 50em;">
++------+     +---------+                   +-----------+     +---------+
+| Bonn | --> | Koblenz | ----------------> | Frankfurt | --> | Dresden |
++------+     +---------+                   +-----------+     +---------+
+               |                             ^
+               |                             |
+               |                             |
+               |             +-------+       |
+               +-----------> | Trier | ------+
+                             +-------+
+</pre>
+
+<p class="clear">
+Et voila! Here is the same graph rendered as SVG:
+</p>
+
+<object width="540" height="120" data="svg/bypass.svg" type="image/svg+xml">
+<embed width="540" height="120" src="svg/bypass.svg" type="image/svg+xml" />
+<span class="warning">
+If you read this text, your browser does not yet support Scalable Vector graphics (SVG).
+</span>
+</object>
+
+<h3>Contact and Bugreports</h3>
+
+<p>
+If you have questions, feel free to send me an <a href="http://bloodgate.com/mail.html">email</a>
+<small>(<a href="http://bloodgate.com/tels.asc">Gnupg key</a>)</small>.
+<b>Bugreports</b> should go to <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Graph-Easy">rt.cpan.org</a>.
+</p>
+
+</div>
+
+<div class="footer">
+Page created <span class="date">2006-02-11</span> by <a href="http://bloodgate.com/mail.html">Tels</a>.
+Last update: <span class="date">2006-08-17</span>
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>

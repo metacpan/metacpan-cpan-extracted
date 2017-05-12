@@ -1,0 +1,75 @@
+# $Id$
+
+Gtk2::Spell version 1.04
+========================
+
+Perl bindings to the 2.x series of the GtkSpell graphical user interface
+library.  This module allows you to write perl applications that utilize the
+GtkSpell library for mis-spelled word highlighting.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you encounter problems in the linking step of the build process, with an
+error message similar to: '/usr/bin/ld: cannot find -lpspell' the
+gtkspell-2.0.pc file most likely needs to have the -lpspell changed to
+-lpspell-compat or -laspell-pspell. Thus using the pspell compatibility
+libraries of aspell.
+
+To avoid installing to a system directory, since this is a beta release,
+you can change the installation prefix at Makefile.PL time with
+
+   perl Makefile.PL PREFIX=/some/other/place
+
+This will install the module to the subdirectory lib/perl5 under the given
+prefix.  If this is not already in perl's include path, you'll need to tell
+perl how to get to this library directory so you can use it; there are three
+ways:
+
+  in your environment (the easiest):
+    PERL5LIB=/some/other/place/lib/perl5/site_perl:$PERL5LIB
+
+  on the perl command line:
+    perl -I /some/other/place/lib/perl5/site_perl yourscript
+
+  in the code of your perl script:
+    use lib '/some/other/place/lib/perl5/site_perl';
+  
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  perl >= 5.8.0
+  Glib >= 0.20 (perl module)
+  Gtk2 >= 0.20 (perl module)
+  GTK+ > 2.x (C library)
+  GTKSpell > 2.x (C library)
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 by the gtk2-perl team (see the file AUTHORS for a
+complete list)
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the 
+Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
+Boston, MA  02111-1307  USA.
+

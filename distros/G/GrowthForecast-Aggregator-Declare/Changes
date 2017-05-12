@@ -1,0 +1,18 @@
+Revision history for Perl extension GrowthForecast::Aggregator::Declare
+
+0.1.1 2013-03-02T09:32:06
+
+    - Added diag message in test case
+
+0.1.0 2013-02-28T09:02:12
+
+    - Added GrowthForecast::Aggregator::Callback
+
+0.0.2 2013-02-28T08:49:10
+
+    - docs
+
+0.0.1 2013-02-28T08:08:45
+
+    - initial release
+

@@ -1,0 +1,43 @@
+---
+abstract: 'Query directions from the google maps directions API'
+author:
+  - 'Robin Clarke <perl@robinclarke.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Google-Directions
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::GooglePolylineEncoding: 0
+  Cache::FastMmap: 0
+  Carp: 0
+  Digest::SHA: 0
+  Encode: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Aliases: 0
+  MooseX::Params::Validate: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  MooseX::WithCache: 0
+  Test::Mock::LWP::Dispatch: 0
+  Test::More: 0
+  Try::Tiny: 0
+  URL::Encode: 0
+resources:
+  bugtracker: https://github.com/robin13/Google-Directions/issues
+  homepage: https://github.com/robin13/Google-Directions
+  repository: https://github.com/robin13/Google-Directions
+version: 0.09

@@ -1,0 +1,3 @@
+* Process all assets at once
+    * Callback for each asset called this way
+* Count of total assets

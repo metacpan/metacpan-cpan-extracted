@@ -1,0 +1,58 @@
+#
+# type mapping definitions for stuff new in 2.4.0
+#
+
+# Error domains
+# domain	enum type	base type	package
+GTK_FILE_CHOOSER_ERROR	GTK_TYPE_FILE_CHOOSER_ERROR	GError Gtk2::FileChooser::Error
+GTK_ICON_THEME_ERROR	GTK_TYPE_ICON_THEME_ERROR	GError Gtk2::IconTheme::Error
+
+# the rest of the types
+# typemacro	C type name	base type	package
+GTK_TYPE_COMBO_BOX_ENTRY	GtkComboBoxEntry	GtkObject	Gtk2::ComboBoxEntry
+GTK_TYPE_COMBO_BOX	GtkComboBox	GtkObject	Gtk2::ComboBox
+
+GTK_TYPE_CELL_LAYOUT	GtkCellLayout	GInterface	Gtk2::CellLayout
+
+GTK_TYPE_COLOR_BUTTON	GtkColorButton	GtkObject	Gtk2::ColorButton
+GTK_TYPE_FONT_BUTTON	GtkFontButton	GtkObject	Gtk2::FontButton
+
+GTK_TYPE_ENTRY_COMPLETION	GtkEntryCompletion	GObject	Gtk2::EntryCompletion
+
+GTK_TYPE_EXPANDER	GtkExpander	GtkObject	Gtk2::Expander
+
+GTK_TYPE_FILE_CHOOSER	GtkFileChooser	GInterface	Gtk2::FileChooser
+GTK_TYPE_FILE_CHOOSER_ACTION	GtkFileChooserAction	GEnum	Gtk2::FileChooserAction
+GTK_TYPE_FILE_CHOOSER_ERROR	GtkFileChooserError	GEnum	Gtk2::FileChooserError
+GTK_TYPE_FILE_CHOOSER_DIALOG	GtkFileChooserDialog	GtkObject	Gtk2::FileChooserDialog
+GTK_TYPE_FILE_CHOOSER_WIDGET	GtkFileChooserWidget	GtkObject	Gtk2::FileChooserWidget
+
+GTK_TYPE_FILE_FILTER	GtkFileFilter	GtkObject	Gtk2::FileFilter
+GTK_TYPE_FILE_FILTER_INFO	GtkFileFilterInfo	GBoxed	Gtk2::FileFilterInfo
+GTK_TYPE_FILE_FILTER_FLAGS	GtkFileFilterFlags	GFlags	Gtk2::FileFilterFlags
+
+GTK_TYPE_ICON_THEME	GtkIconTheme	GObject	Gtk2::IconTheme
+GTK_TYPE_ICON_THEME_ERROR	GtkIconThemeError	GEnum	Gtk2::IconThemeError
+GTK_TYPE_ICON_INFO	GtkIconInfo	GBoxed	Gtk2::IconInfo
+GTK_TYPE_ICON_LOOKUP_FLAGS	GtkIconLookupFlags	GFlags	Gtk2::IconLookupFlags
+
+GTK_TYPE_TREE_MODEL_FILTER	GtkTreeModelFilter	GObject	Gtk2::TreeModelFilter
+
+GTK_TYPE_UI_MANAGER	GtkUIManager	GObject	Gtk2::UIManager
+GTK_TYPE_UI_MANAGER_ITEM_TYPE	GtkUIManagerItemType	GFlags	Gtk2::UIManagerItemType
+
+GTK_TYPE_ACTION_GROUP	GtkActionGroup	GObject	Gtk2::ActionGroup
+GTK_TYPE_ACTION	GtkAction	GObject	Gtk2::Action
+GTK_TYPE_TOGGLE_ACTION	GtkToggleAction	GObject	Gtk2::ToggleAction
+GTK_TYPE_RADIO_ACTION	GtkRadioAction	GObject	Gtk2::RadioAction
+GTK_TYPE_ACTION_ENTRY	GtkActionEntry	GBoxed	Gtk2::ActionEntry
+GTK_TYPE_TOGGLE_ACTION_ENTRY	GtkToggleActionEntry	GBoxed	Gtk2::ToggleActionEntry
+GTK_TYPE_RADIO_ACTION_ENTRY	GtkRadioActionEntry	GBoxed	Gtk2::RadioActionEntry
+
+GTK_TYPE_TOOL_ITEM	GtkToolItem	GtkObject	Gtk2::ToolItem
+GTK_TYPE_TOOL_BUTTON	GtkToolButton	GtkObject	Gtk2::ToolButton
+GTK_TYPE_TOGGLE_TOOL_BUTTON	GtkToggleToolButton	GtkObject	Gtk2::ToggleToolButton
+GTK_TYPE_RADIO_TOOL_BUTTON	GtkRadioToolButton	GtkObject	Gtk2::RadioToolButton
+GTK_TYPE_SEPARATOR_TOOL_ITEM	GtkSeparatorToolItem	GtkObject	Gtk2::SeparatorToolItem
+
+GTK_TYPE_ACCEL_MAP	GtkAccelMap	GObject	Gtk2::AccelMap

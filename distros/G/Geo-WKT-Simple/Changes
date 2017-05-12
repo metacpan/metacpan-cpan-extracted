@@ -1,0 +1,18 @@
+Change history of Geo::WKT::Simple
+
+0.05  Mon Jul 29 10:41:39 JST 2013
+        - Fix README.mkdn
+        - Add dependency parent(thanks to shohex)
+
+0.04  Fri Jul 26 11:43:03 2013
+        - Fix document bug (thanks to James)
+        - Refactor
+
+0.03  Tue Dec  5 13:27:00 2012
+        - There was no META.yml included. Little fix for docs.
+
+0.02  Tue Dec  5 11:26:07 2012
+        - Fix bug around WKT type verification
+
+0.01  Tue Dec  4 12:50:43 2012
+        - Initial release

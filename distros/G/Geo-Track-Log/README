@@ -1,0 +1,116 @@
+Geo::Track::Log(3)    User Contributed Perl Documentation   Geo::Track::Log(3)
+
+
+
+NNAAMMEE
+       Geo::Track::Log - A class to represent track logs and provide methods
+       to manage and manipulate track logs.
+
+SSYYNNOOPPSSIISS
+         use Geo::Track::Log;
+         my $log = new Geo::Track::Log;
+
+         # load track points from a Garnix format file
+         $log->loadTrackFromGarnix('filename');
+
+         Garnix format looks like this:
+         44?  3' 33.23" -123?  5'  0.07" 148.0 WGS84 00:50:19-2004/07/12 [1];
+
+         The '?' should be a degree marker.  The code handles that.
+
+         Garnix also has options to use the abbreviations 'deg' 'min' and 'sec' in
+         place of the symbols.  As well as having a -y flag to output data in
+         Waypoint+ format.
+
+         # add points to a track log.
+         $log->addPoint(\%point);
+
+DDEESSCCRRIIPPTTIIOONN
+       Geo::Track::Log provides a class to represent, manage, and manipulate
+       track logs.  At the simplest level, a track log is a series of coordi-
+       nates that represent the virtual bread crumbs of a journey.  As a
+       series of points a track log needs to special class.  Throw it into an
+       array of hash refs and off you go.  This structure is easy to extend to
+       handle track point level extensions.
+
+       And once you have lat/long geo data there are many attributes you can
+       add.  Timestamps? altitude? velocity?  Just fields in the hash ref.
+
+       And that is what I did while working on the Geo::Track::Animate module.
+       But as happens with software in development, the attributes of a track
+       log have grown.   First was the need for a name.  But that was easy.
+       No need to break the model.  A scalar name and a scalar pointer to an
+       array of hashrefs containing track point level attributes.
+
+       And then I started to throw track logs around.  Take this set of track
+       logs and plot them on a map, and then take this other set and aggregate
+       them into one track log to animate together.
+
+       No problem!  Perl is great!  Arrays of hash refs are wonderful!  Life
+       is good!
+
+       And next I wanted to animate multiple track logs and display each one
+       in a different color.  But hey, that is just a presentation level
+       requirement, and so why would it live with the track log?  And so I
+       told myself these stories while working on the code.
+
+       But all the stories came to an end when I wanted to display a descrip-
+       tive label on my track logs.  First I assumed I would use the track log
+       name as my label.  The problem arose that my track logs were stored in
+       individual files, and my file naming convention is not presentation
+       layer friendly.
+
+       I'm a bit of a geek, but even I was offended by an animated map with
+       track logs labeled 'tk04032004.txt' and 'tk04052004.txt.'  And I wasn't
+       going to change my file naming conventions since aside from its' ter-
+       sness, 'tk04032004.txt' is a more precise name then 'Tuesday bike
+       commute.'
+
+       And all of this is a round about way of getting to the point.  In biol-
+       ogy ontogeny recapitulates philogeny while in software, perhaps espe-
+       cially in Perl (which after all is less software than some variation on
+       runic majick) every program evolves in its conception of data from the
+       simple to the complex and on until the program is subsumed into a pure
+       representation as data.
+
+       When the actual masters like zool and danbri talk, it is nearly pure
+       ontology, with an afterthought instruction to the data telling it to
+       instantiate itself and perform.
+
+       Long ago I stumbled on one of my mantras of software development.  Sim-
+       ple data leads to complex code, and complex data allows for simple
+       code.
+
+       The complexity has to live somewhere.
+
+       And all of this leads to the basic knowledge that a module called
+       Geo::Track::Log is just one step along the path of creating an ontology
+       of place.
+
+       EEXXPPOORRTT
+
+       None by default.
+
+SSEEEE AALLSSOO
+       Mention other useful documentation such as the documentation of related
+       modules or operating system documentation (such as man pages in UNIX),
+       or any relevant external documentation such as RFCs or standards.
+
+       If you have a mailing list set up for your module, mention it here.
+
+       If you have a web site set up for your module, mention it here.
+
+AAUUTTHHOORRSS
+       Rich Gibson, <rich@testingrange.com>
+
+       Schuyler Erle <schuyler@nocat.net>
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright 2004 by Rich Gibson
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.8.1                       2004-08-18                Geo::Track::Log(3)

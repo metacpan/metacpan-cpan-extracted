@@ -1,0 +1,11 @@
+digraph graph_07
+{
+	graph[rankdir = "LR"]
+	node[shape = "oval"]
+	edge[color = "slateblue"]
+	node[style = "filled"]
+	B[color = "aquamarine"]
+	C
+	B -> C[arrowhead = "none" label = "" samehead = "1"]
+
+}

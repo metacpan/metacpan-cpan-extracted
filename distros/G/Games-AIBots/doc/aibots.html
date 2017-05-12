@@ -1,0 +1,967 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=Big5">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="./aibots.files/filelist.xml">
+<link rel=Edit-Time-Data href="./aibots.files/editdata.mso">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]-->
+<title>AIBots Manual</title>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Autrijus Tang</o:Author>
+  <o:LastAuthor>autrijus</o:LastAuthor>
+  <o:Revision>7</o:Revision>
+  <o:TotalTime>50</o:TotalTime>
+  <o:LastPrinted>2000-11-23T07:01:00Z</o:LastPrinted>
+  <o:Created>2001-08-28T15:27:00Z</o:Created>
+  <o:LastSaved>2001-08-28T16:08:00Z</o:LastSaved>
+  <o:Pages>6</o:Pages>
+  <o:Words>617</o:Words>
+  <o:Characters>3521</o:Characters>
+  <o:Company>Gotcha Software</o:Company>
+  <o:Lines>29</o:Lines>
+  <o:Paragraphs>7</o:Paragraphs>
+  <o:CharactersWithSpaces>4324</o:CharactersWithSpaces>
+  <o:Version>9.2812</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:HideSpellingErrors/>
+  <w:PunctuationKerning/>
+  <w:DrawingGridHorizontalSpacing>6 pt</w:DrawingGridHorizontalSpacing>
+  <w:DisplayHorizontalDrawingGridEvery>0</w:DisplayHorizontalDrawingGridEvery>
+  <w:DisplayVerticalDrawingGridEvery>2</w:DisplayVerticalDrawingGridEvery>
+  <w:Compatibility>
+   <w:SpaceForUL/>
+   <w:BalanceSingleByteDoubleByteWidth/>
+   <w:DoNotLeaveBackslashAlone/>
+   <w:ULTrailSpace/>
+   <w:DoNotExpandShiftReturn/>
+   <w:AdjustLineHeightInTable/>
+   <w:UseFELayout/>
+  </w:Compatibility>
+ </w:WordDocument>
+</xml><![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:2;
+	mso-generic-font-family:auto;
+	mso-font-pitch:variable;
+	mso-font-signature:0 268435456 0 0 -2147483648 0;}
+@font-face
+	{font-family:新細明體;
+	panose-1:2 2 3 0 0 0 0 0 0 0;
+	mso-font-alt:PMingLiU;
+	mso-font-charset:136;
+	mso-generic-font-family:roman;
+	mso-font-pitch:variable;
+	mso-font-signature:3 137232384 22 0 1048577 0;}
+@font-face
+	{font-family:"\@新細明體";
+	panose-1:2 2 3 0 0 0 0 0 0 0;
+	mso-font-charset:136;
+	mso-generic-font-family:roman;
+	mso-font-pitch:variable;
+	mso-font-signature:3 137232384 22 0 1048577 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:none;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:新細明體;
+	mso-font-kerning:1.0pt;}
+h1
+	{mso-style-next:內文;
+	margin-top:9.0pt;
+	margin-right:0cm;
+	margin-bottom:9.0pt;
+	margin-left:0cm;
+	mso-pagination:none;
+	page-break-after:avoid;
+	mso-outline-level:1;
+	font-size:26.0pt;
+	font-family:Arial;
+	mso-bidi-font-family:"Times New Roman";
+	mso-font-kerning:26.0pt;}
+h2
+	{mso-style-next:內文;
+	margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:36.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-36.0pt;
+	mso-pagination:none;
+	page-break-after:avoid;
+	mso-outline-level:2;
+	mso-list:l1 level1 lfo2;
+	tab-stops:list 36.0pt;
+	font-size:24.0pt;
+	font-family:Arial;
+	mso-bidi-font-family:"Times New Roman";
+	mso-font-kerning:1.0pt;}
+h3
+	{mso-style-next:內文;
+	margin:0cm;
+	margin-bottom:.0001pt;
+	line-height:200%;
+	mso-pagination:none;
+	page-break-after:avoid;
+	mso-outline-level:3;
+	font-size:18.0pt;
+	font-family:Arial;
+	mso-bidi-font-family:"Times New Roman";
+	mso-font-kerning:1.0pt;
+	text-decoration:underline;
+	text-underline:single;}
+h4
+	{mso-style-next:內文;
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:none;
+	page-break-after:avoid;
+	mso-outline-level:4;
+	font-size:18.0pt;
+	font-family:Arial;
+	mso-bidi-font-family:"Times New Roman";
+	mso-font-kerning:1.0pt;}
+h5
+	{mso-style-next:內文;
+	margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:2.0gd;
+	margin-bottom:.0001pt;
+	line-height:300%;
+	mso-pagination:none;
+	page-break-after:avoid;
+	mso-outline-level:5;
+	font-size:18.0pt;
+	font-family:Arial;
+	mso-bidi-font-family:"Times New Roman";
+	mso-font-kerning:1.0pt;}
+h6
+	{mso-style-next:內文;
+	margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:2.0gd;
+	margin-bottom:.0001pt;
+	line-height:300%;
+	mso-pagination:none;
+	page-break-after:avoid;
+	mso-outline-level:6;
+	font-size:18.0pt;
+	font-family:Arial;
+	mso-bidi-font-family:"Times New Roman";
+	mso-font-kerning:1.0pt;
+	font-weight:normal;}
+p.MsoDate, li.MsoDate, div.MsoDate
+	{mso-style-next:內文;
+	margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:right;
+	mso-pagination:none;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:新細明體;
+	mso-font-kerning:1.0pt;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;
+	text-underline:single;}
+ /* Page Definitions */
+@page
+	{mso-page-border-surround-header:no;
+	mso-page-border-surround-footer:no;}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:42.55pt 42.55pt 42.55pt 42.55pt;
+	mso-header-margin:42.55pt;
+	mso-footer-margin:49.6pt;
+	mso-columns:2 even 21.25pt;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+@list l0
+	{mso-list-id:642269571;
+	mso-list-type:hybrid;
+	mso-list-template-ids:113023792 1892312128 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:��;
+	mso-level-tab-stop:24.0pt;
+	mso-level-number-position:left;
+	margin-left:24.0pt;
+	text-indent:-24.0pt;
+	mso-ansi-font-size:10.0pt;
+	font-family:Wingdings;}
+@list l1
+	{mso-list-id:815413939;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-1674928622 -1584128202 67698713 67698715 67698703 67698713 67698715 67698703 67698713 67698715;}
+@list l1:level1
+	{mso-level-style-link:"標題 2";
+	mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	text-indent:-36.0pt;}
+ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="1057"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1"/>
+ </o:shapelayout></xml><![endif]-->
+</head>
+
+<body lang=ZH-TW link=blue vlink=purple style='tab-interval:24.0pt;text-justify-trim:
+punctuation'>
+
+<div class=Section1>
+
+<h1><span lang=EN-US>AIBots Manual</span></h1>
+
+<h2><![if !supportLists]><span lang=EN-US>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=EN-US>Introduction</span></h2>
+
+<p class=MsoNormal><span lang=EN-US>AIBots is a clone of <a
+href="http://www.tacticalneuronics.com/ai.htm">A.I. Wars</a>, with Tk and
+Console interfaces.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><span style="mso-spacerun:
+yes">&nbsp;</span></span></p>
+
+<h3><span lang=EN-US>Synopsis</span></h3>
+
+<p class=MsoNormal><span lang=EN-US>aibots [-c -s -m -o -r] [Map] [Bot1 Bot2 ...]</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><span lang=EN-US>Usually no arguments are required.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><span lang=EN-US>-c: Console mode, -s: Silent (Win32 only),
+-m: Music (Win32 only), -o: Messages only, -r Results only.</span></p>
+
+<h2><![if !supportLists]><span lang=EN-US>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=EN-US>Interface</span></h2>
+
+<h3><span lang=EN-US>The Setting Panel</span></h3>
+
+<h4><span lang=EN-US>Map Menu</span></h4>
+
+<p class=MsoNormal style='margin-left:12.0pt;text-indent:-12.0pt;mso-char-indent-count:
+-1.0;mso-char-indent-size:12.0pt'><span lang=EN-US>The drop-down menu in the
+bottom-left corner lists all available maps. The ones in square brackets (eg.
+[Solania]) denotes a "level" with pre-defined bots.</span></p>
+
+<p class=MsoNormal style='margin-left:12.0pt;text-indent:-12.0pt;mso-char-indent-count:
+-1.0;mso-char-indent-size:12.0pt'><span lang=EN-US>Beginners are encouraged to
+start with the Open or Arena map.</span></p>
+
+<h4><span lang=EN-US>Change Background (<!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:13.5pt;
+ height:13.5pt'>
+ <v:imagedata src="./aibots.files/image001.gif" o:title="wall"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image001.gif" v:shapes="_x0000_i1025"><![endif]>)</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Press this key to cycle through all
+available backgrounds. This has no effects on the actual game.</span></p>
+
+<h4><span lang=EN-US>Participating Bots</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>The nine menus in the bottom lets you pick bots
+to duel with each other.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Click on an empty menu to select; select
+the empty entry to delete a bot.</span></p>
+
+<h4><span lang=EN-US>Watch (<!--[if gte vml 1]><v:shape id="_x0000_i1026"
+ type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image002.gif" o:title="bot8"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image002.gif" v:shapes="_x0000_i1026"><![endif]>)</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>You could press the watch botton next to
+each bots, to have its statistics listed on the upper-left corner.</span></p>
+
+<h4><span lang=EN-US>About (<!--[if gte vml 1]><v:shape id="_x0000_i1027"
+ type="#_x0000_t75" style='width:18pt;height:18pt'>
+ <v:imagedata src="./aibots.files/image003.gif" o:title="anarchy"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=24 height=24
+src="./aibots.files/image003.gif" v:shapes="_x0000_i1027"><![endif]>)</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Displays author and version info.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>The Control Panel</span></h3>
+
+<h4><span lang=EN-US>Play (<!--[if gte vml 1]><v:shape id="_x0000_i1028"
+ type="#_x0000_t75" style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image004.gif" o:title="play"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image004.gif" alt="*" v:shapes="_x0000_i1028"><![endif]>)
+/ Pause (<!--[if gte vml 1]><v:shape id="_x0000_i1029" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image005.gif" o:title="pause"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image005.gif" alt="*" v:shapes="_x0000_i1029"><![endif]>)</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>After the maps and bots are selected, the
+Play button will be enabled. Press it to start the duel. All bots act upon
+their programs without human intervension.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>You could press the Pause button anytime
+during the game; press again to resume.</span></p>
+
+<h4><span lang=EN-US>Stop (<!--[if gte vml 1]><v:shape id="_x0000_i1030"
+ type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image006.gif" o:title="stop"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image006.gif" v:shapes="_x0000_i1030"><![endif]>)</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>A game usually ends when there’s only one
+remaining team left on the field. Before the game ends normally, you could
+press the Stop button to end a long endgame prematurely.</span></p>
+
+<h4><span lang=EN-US>Speed (<!--[if gte vml 1]><v:shape id="_x0000_i1031"
+ type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image007.gif" o:title="slow"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image007.gif" v:shapes="_x0000_i1031"><![endif]><!--[if gte vml 1]><v:shape
+ id="_x0000_i1032" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image008.gif" o:title="normal"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image008.gif" v:shapes="_x0000_i1032"><![endif]><!--[if gte vml 1]><v:shape
+ id="_x0000_i1033" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image009.gif" o:title="fast"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image009.gif" v:shapes="_x0000_i1033"><![endif]>)</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Toggles beterrn slow, medium and fast. You
+could slow down the game during close encounters, and fast-forwards boring
+intervals.</span></p>
+
+<h4><span lang=EN-US>Sound (<!--[if gte vml 1]><v:shape id="_x0000_i1034"
+ type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image010.gif" o:title="sound"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image010.gif" v:shapes="_x0000_i1034"><![endif]><!--[if gte vml 1]><v:shape
+ id="_x0000_i1035" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image011.gif" o:title="mute"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image011.gif" v:shapes="_x0000_i1035"><![endif]>)</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>If the Win32::Sound module is installed,
+AIBots could play sounds upon each event.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>The Title Panel</span></h3>
+
+<h4><span lang=EN-US>Watch and Status</span></h4>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><span lang=EN-US>When the game is playing, the black button
+in the upper-left corner will display the Bot currently under Watch. Press that
+button to toggle the target.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>The bot being watched will be surrounded by
+the <!--[if gte vml 1]><v:shape id="_x0000_i1036" type="#_x0000_t75" style='width:19.5pt;
+ height:19.5pt'>
+ <v:imagedata src="./aibots.files/image012.gif" o:title="watch"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=26 height=26
+src="./aibots.files/image012.gif" v:shapes="_x0000_i1036"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>symbol, and has its statistics listed on
+the upper panel, like this at the beginning of a game:</span></p>
+
+<p class=MsoNormal><b><span lang=EN-US style='font-family:"Courier New"'>[Mage-2]
+Score: 0 Ammo: 30 Life: 10 Fuel: 2499 [Turn Right]</span></b></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><span lang=EN-US>These columns denote the bot’s type (Mage),
+number (2), current score (0), ammo left (30), life points, (10), fuel (2499),
+and the action of this turn (Turn Right).</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Also, the window title will display (Tick:
+1), means this is the first step into the game.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h2><![if !supportLists]><span lang=EN-US>3.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=EN-US>Scoring and Rules</span></h2>
+
+<h3><span lang=EN-US>Basic Concepts</span></h3>
+
+<p class=MsoNormal><span lang=EN-US>In AIBots, players compete with each other
+not by reflexes, but ability to program ‘Bots’.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Score accumulated with each bots determines
+a game’s outcome. The primary mean to gain score is to deal damage to other
+team’s Bots. Additionally, the last Bot standing will receive a 500 point
+bonus.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>To inflict damage, Bots need weapons. All
+weapons except for Energy Zaps consume ammo points. The Life points represents
+the maximal damage a bot can take before dying. When a Bot’s killed, it’s
+turned into a Flag.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Turning, Moving and Launching projectile
+weapons consume fuel points. When a Bot runs out of fuel, it could not perform any
+of above actions anymore. The rate of fuel burning increases propotionally with
+damage received.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Life points and Ammo will not regenerate,
+but are replenished on Flag, Vault, and Strategy Points.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Each Tick, all Bots executes one Action
+Command and any number of other commands in turn.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>Board Elements</span></h3>
+
+<h4 style='tab-stops:list 36.0pt'><span lang=EN-US><!--[if gte vml 1]><v:shape
+ id="_x0000_i1037" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'
+ o:bullet="t">
+ <v:imagedata src="./aibots.files/image002.gif" o:title="bot8"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image002.gif" alt="*" v:shapes="_x0000_i1037"><![endif]><!--[if gte vml 1]><v:shape
+ id="_x0000_i1038" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image013.gif" o:title="bot6"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image013.gif" v:shapes="_x0000_i1038"><![endif]><!--[if gte vml 1]><v:shape
+ id="_x0000_i1039" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image014.gif" o:title="bot2"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image014.gif" v:shapes="_x0000_i1039"><![endif]><!--[if gte vml 1]><v:shape
+ id="_x0000_i1040" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'>
+ <v:imagedata src="./aibots.files/image015.gif" o:title="bot4"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image015.gif" v:shapes="_x0000_i1040"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>bot [^&gt;v&lt;]</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>The heading of each Bot determines the
+direction of weapon, move forward and move backward commands.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Bots do not stack. An attempt to move onto
+another bot results in a Bump.</span></p>
+
+<h4 style='tab-stops:list 36.0pt'><span lang=EN-US><!--[if gte vml 1]><v:shape
+ id="_x0000_i1041" type="#_x0000_t75" style='width:16.5pt;height:16.5pt'
+ o:bullet="t">
+ <v:imagedata src="./aibots.files/image016.gif" o:title="spawn"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=22 height=22
+src="./aibots.files/image016.gif" alt="*" v:shapes="_x0000_i1041"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>spawn [1..9@]</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Bots appear at random Spawn tiles when the
+game begin.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Entry Points in digits are for the bot with
+the identical number.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>After the game begins, spawn tiles are treated
+as empty tiles.</span></p>
+
+<h4 style='tab-stops:list 36.0pt'><span lang=EN-US><!--[if gte vml 1]><v:shape
+ id="_x0000_i1042" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'
+ o:bullet="t">
+ <v:imagedata src="./aibots.files/image001.gif" o:title="wall"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image001.gif" alt="*" v:shapes="_x0000_i1042"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>wall [#]</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Walls cannot be passed or destroyed.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1043" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image017.gif" o:title="fence"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image017.gif" alt="*" v:shapes="_x0000_i1043"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>fence [+]</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Fences cannot be passed, but could be
+destroyed with any weapon.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1044" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image018.gif" o:title="flag"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image018.gif" alt="*" v:shapes="_x0000_i1044"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>flag [P]</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>If a damaged Bot moves on a Flag tile, it
+regains all Life points and increases 30 Ammo and 350 Fuel.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>If the Bot is undamaged, Flag deals 5
+damage to it.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1045" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image019.gif" o:title="mine"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image019.gif" alt="*" v:shapes="_x0000_i1045"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>mine [O]</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>A Bot moves into a Mine tile suffers 5
+damage to its Life points and Fuel burn rates. If the mine was layed by an
+enemy, the enemy receives 400 points of Score.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1046" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image020.gif" o:title="vault"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image020.gif" alt="*" v:shapes="_x0000_i1046"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>vault [A]</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Vault contains 20 points of Ammo.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Any weapons inflicted on the Vault tile
+will cause an explosion, which deals 3 damage to all adjacent Bots’ Life and
+Fuel burning rates.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Vaults next to each other will explode simultaneously.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1047" type="#_x0000_t75"
+ style='width:36pt;height:36pt'>
+ <v:imagedata src="./aibots.files/image021.gif" o:title="snode"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=48 height=48
+src="./aibots.files/image021.gif" v:shapes="_x0000_i1047"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>snode [*]</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Bots staying on the Strategy Node tile will
+receive 1 points of Fuel every 5 turns, 1 point of Ammo every 10 turns, and heals
+1 point of Life every 15 turns.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>Weapons</span></h3>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1048" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image022.gif" o:title="laserh"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image022.gif" alt="*" v:shapes="_x0000_i1048"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>laser</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Laser is the most basic weapon. It consumes
+1 point of Ammo, and attacks to five tiles forward. Laser beam will stop after
+hitting the first object.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>When hit, Bots with Shield Off state will receive
+(6 - distance) points of damage. Shielded bots receives (3 - distance) points
+of damage in the first two tiles only.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Burn rate damage caused by Laser equals to
+its Life point damage.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1049" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image023.gif" o:title="bazooka6"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image023.gif" alt="*" v:shapes="_x0000_i1049"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>bazooka</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Bazookas consume 10 Ammo and 300 Fuel
+points each. They fly with the speed of 1 tile per Tick, and explode upon
+impact.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Upon explosion, a Bazooka deals 7 (shield
+off) / 4 (shield on) damage to adjacent Bots.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Direct hit to a Bot causes 9 / 6 points of
+damage, depends on its shield state.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Burn rate damage caused by Bazookas equals
+to its Life point damage.</span></p>
+
+<h4 style='tab-stops:list 36.0pt'><span lang=EN-US><!--[if gte vml 1]><v:shape
+ id="_x0000_i1050" type="#_x0000_t75" style='width:13.5pt;height:13.5pt'
+ o:bullet="t">
+ <v:imagedata src="./aibots.files/image024.gif" o:title="grenade6"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image024.gif" alt="*" v:shapes="_x0000_i1050"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>grenade</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Grenades consume 5 Ammo and 200 Fuel points
+each. They fly with the speed of 1 tile per Tick, and explode upon impact.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Upon explosion, a Grenade deals 5 (shield
+off) / 2 (shield on) damage to adjacent Bots.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Direct hit to a Bot causes 7 / 4 points of
+damage, depends on its shield state.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Burn rate damage caused by Grenades is 12 /
+9 upon direct impact, 4 / 1 collateral.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1051" type="#_x0000_t75"
+ style='width:40.5pt;height:40.5pt'>
+ <v:imagedata src="./aibots.files/image025.gif" o:title="energy"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=54 height=54
+src="./aibots.files/image025.gif" v:shapes="_x0000_i1051"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>energy</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Energy Zap consume 1 point of Life, and deals
+2 points of Life and Burn rate damage to all adjacent Bots.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Energy Zap is the only weapon capable of
+destroying Flag and Mines.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1052" type="#_x0000_t75"
+ style='width:27pt;height:27pt'>
+ <v:imagedata src="./aibots.files/image026.gif" o:title="destruct"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=36 height=36
+src="./aibots.files/image026.gif" v:shapes="_x0000_i1052"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>destruct</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Self-destruct deals the same amont of
+damage as remaining life points to all adjacent Bots, both to Life and Burn
+rate points.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>A self-destructed Bot will not turn into a
+Flag.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>On/Off Toggles</span></h3>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1053" type="#_x0000_t75"
+ style='width:16.5pt;height:16.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image027.gif" o:title="shield"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=22 height=22
+src="./aibots.files/image027.gif" alt="*" v:shapes="_x0000_i1053"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>shield</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Shields could be Enabled or Disabled at any
+given time.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Bots receives less damage when shielded,
+but cannot fire any weapon except for Enegy Zaps and Self-Destruct.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1054" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image019.gif" o:title="mine"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image019.gif" alt="*" v:shapes="_x0000_i1054"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>laymine</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>When Enabled, a Bot will leave a Landmine in
+the original tile every time it moves, which consumes 5 Ammo points.</span></p>
+
+<h4><span lang=EN-US><!--[if gte vml 1]><v:shape id="_x0000_i1055" type="#_x0000_t75"
+ style='width:13.5pt;height:13.5pt' o:bullet="t">
+ <v:imagedata src="./aibots.files/image028.gif" o:title="bot8c"/>
+</v:shape><![endif]--><![if !vml]><img border=0 width=18 height=18
+src="./aibots.files/image028.gif" alt="*" v:shapes="_x0000_i1055"><![endif]><span
+style="mso-spacerun: yes">&nbsp;</span>cloak (</span><span
+lang=EN-US>)</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Bots with Cloak enabled will not be seen by
+other Bots via $enemy_[x/y/h] and $friend[x/y/h] variables.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>A Bot lose 10 Fuel and 2 Ammo points each
+turn when cloaked.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>Scoring</span></h3>
+
+<h4><span lang=EN-US>Damage</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>Bazooka<span style='mso-tab-count:1'>&nbsp;&nbsp; </span><span
+style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Impact:
+Unshieled +500, Shielded +300.<span style='mso-tab-count:2'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Collateral:
+Unshielded +400, Shielded +200.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Grenade<span style='mso-tab-count:1'>&nbsp;&nbsp; </span><span
+style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Impact:
+Unshieled +500, Shielded +300.<span style='mso-tab-count:2'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Collateral:
+Unshielded +200, Shielded +100.</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Laser<span style='mso-tab-count:2'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Actual
+damage * 20</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Destruct<span style='mso-tab-count:2'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Actual
+damage * 50</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Energy Zap<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>+100</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Vault<span style='mso-tab-count:1'> </span><span
+style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>+200 </span></p>
+
+<p class=MsoNormal><span lang=EN-US>Mine<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>+400</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h4><span lang=EN-US>Bonus</span></h4>
+
+<p class=MsoNormal style='margin-left:24.0pt;text-indent:-24.0pt;mso-list:l0 level1 lfo4;
+tab-stops:list 24.0pt'><![if !supportLists]><span lang=EN-US style='font-size:
+10.0pt;mso-bidi-font-size:12.0pt;font-family:Wingdings'>&Oslash;<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=EN-US>+50 for every Life points left, or -50
+for every points below 0.</span></p>
+
+<p class=MsoNormal style='margin-left:24.0pt;text-indent:-24.0pt;mso-list:l0 level1 lfo4;
+tab-stops:list 24.0pt'><![if !supportLists]><span lang=EN-US style='font-size:
+10.0pt;mso-bidi-font-size:12.0pt;font-family:Wingdings'>&Oslash;<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=EN-US>-1 for every point of Burn rate causes
+by damage.</span></p>
+
+<p class=MsoNormal style='margin-left:24.0pt;text-indent:-24.0pt;mso-list:l0 level1 lfo4;
+tab-stops:list 24.0pt'><![if !supportLists]><span lang=EN-US style='font-size:
+10.0pt;mso-bidi-font-size:12.0pt;font-family:Wingdings'>&Oslash;<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=EN-US>The last Team surviving receives +500
+points.</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h2><![if !supportLists]><span lang=EN-US>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=EN-US>Programming Your Bot</span></h2>
+
+<h3><span lang=EN-US>Variables</span></h3>
+
+<h4><span lang=EN-US>Metadata</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>$name, $author</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$team</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$pic</span></p>
+
+<h4><span lang=EN-US>Current Status</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>$shield, $laymine, $cloak</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$bumped, $found</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$score, $burn</span></p>
+
+<h4><span lang=EN-US>Resources Left</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>$fuel, $max_fuel</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$ammo, $max_ammo</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$life, $max_life</span></p>
+
+<h4><span lang=EN-US>Coordinates and Heading</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>$x, $y, $h</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$enemy_x, $enemy_y, $enemy_h</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$friend_x, $friend _y, $friend_h</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$snode_x, $snode_y</span></p>
+
+<h4><span lang=EN-US>Internal Variables</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>$id, $botcount</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$lastcmd</span></p>
+
+<p class=MsoNormal><span lang=EN-US>$state, $line</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>Actions</span></h3>
+
+<h4><span lang=EN-US>Scanning</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>scan front, scan left, scan right;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>scan perimeter;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>scan cross, scan corner;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>scan longrange;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>scan position [1..9];</span></p>
+
+<p class=MsoNormal><span lang=EN-US>scan relative [1..9];</span></p>
+
+<p class=MsoNormal><span lang=EN-US>scan gps $x, $y;</span></p>
+
+<h4><span lang=EN-US>Moving</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>move forward, move backward;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>turn left, turn right;</span></p>
+
+<h4><span lang=EN-US>Attack</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>fire energy;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>fire laser;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>fire bazooka;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>fire grenade, fire grenade $d;</span></p>
+
+<h4><span lang=EN-US>Enable and Disable</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>enable/disable shield;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>enable/disable laymine;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>enable/disable cloak;</span></p>
+
+<h4><span lang=EN-US>Miscellanous</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>attempt repair;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>attempt destruct;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>beam fuel/ammo/command;</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>Exported Functions</span></h3>
+
+<h4><span lang=EN-US>Detection</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>&amp;nearst("friend"|"enemy")</span></p>
+
+<p class=MsoNormal><span lang=EN-US>&amp;inperim("friend"|"enemy")</span></p>
+
+<p class=MsoNormal><span lang=EN-US>&amp;headto("friend"|"enemy")</span></p>
+
+<h4><span lang=EN-US>Checking Return Values</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>&amp;found("$obj1|$obj2|...")</span></p>
+
+<p class=MsoNormal><span lang=EN-US>&amp;bumped("$obj1|$obj2|...")</span></p>
+
+<h4><span lang=EN-US>Current Status</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>&amp;damaged()</span></p>
+
+<p class=MsoNormal><span lang=EN-US>&amp;ready($weapon)</span></p>
+
+<p class=MsoNormal><span lang=EN-US>&amp;onnode()</span></p>
+
+<h4><span lang=EN-US>Miscellanous</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>&amp;turnto(2|4|6|8)</span></p>
+
+<p class=MsoNormal><span lang=EN-US>&amp;distance($x, $y)</span></p>
+
+<p class=MsoNormal><span lang=EN-US>&amp;toggle()</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h3><span lang=EN-US>Flow Control</span></h3>
+
+<h4><span lang=EN-US>Conditionals</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>if ($condition) {...}</span></p>
+
+<p class=MsoNormal><span lang=EN-US>unless($condition) {...}</span></p>
+
+<p class=MsoNormal><span lang=EN-US>elsif ($condition) {...}</span></p>
+
+<p class=MsoNormal><span lang=EN-US>else {...}</span></p>
+
+<p class=MsoNormal><span lang=EN-US>... if/unless ($condition)</span></p>
+
+<h4><span lang=EN-US>Subroutines</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>LABEL: {...}</span></p>
+
+<p class=MsoNormal><span lang=EN-US>redo;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>goto LABEL;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>call LABEL;</span></p>
+
+<p class=MsoNormal><span lang=EN-US>return;</span></p>
+
+<p class=MsoNormal><span lang=EN-US><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h2><![if !supportLists]><span lang=EN-US>5.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=EN-US>Customizing</span></h2>
+
+<h3><span lang=EN-US>The maps/ Directory</span></h3>
+
+<h4><span lang=EN-US>Metadata</span></h4>
+
+<p class=MsoNormal><span lang=EN-US>=background<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp; </span>Background
+image</span></p>
+
+<p class=MsoNormal><span lang=EN-US>=bot[1..9]<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Default
+Bots</span></p>
+
+<p class=MsoNormal><span lang=EN-US>=sound<span style='mso-tab-count:2'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Opening
+Sound</span></p>
+
+<p class=MsoNormal><span lang=EN-US>=snode x, y<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Strategy
+Node location</span></p>
+
+</div>
+
+</body>
+
+</html>

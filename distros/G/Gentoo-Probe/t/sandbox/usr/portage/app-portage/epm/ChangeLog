@@ -1,0 +1,87 @@
+# ChangeLog for app-portage/epm
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/epm/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  26 May 2004; Aron Griffis <agriffis@gentoo.org> epm-0.8.8.ebuild:
+  Mark stable everywhere
+
+*epm-0.8.8 (28 Apr 2004)
+
+  28 Apr 2004; Aron Griffis <agriffis@gentoo.org> -epm-0.7.ebuild,
+  -epm-0.8.1.ebuild, -epm-0.8.2.ebuild, -epm-0.8.3.ebuild, -epm-0.8.4.ebuild,
+  -epm-0.8.5.ebuild, -epm-0.8.6.ebuild, +epm-0.8.8.ebuild, -epm-0.8.ebuild:
+  Refrain from listing symlink target with -ql, problem introduced in
+  0.8.6/0.8.7. Trim old versions of epm.
+
+*epm-0.8.7 (05 Apr 2004)
+
+  05 Apr 2004; Aron Griffis <agriffis@gentoo.org> +epm-0.8.7.ebuild:
+  Add patch from Michael Sterret in bug 45927 to handle whitespace in filenames
+
+*epm-0.8.6 (29 Mar 2004)
+
+  29 Mar 2004; Aron Griffis <agriffis@gentoo.org> epm-0.8.6.ebuild:
+  Bump version to 0.8.6 to fix bug 45927: epm doesnt handle files which has
+  spaces in file its name
+
+*epm-0.8.5 (08 Mar 2004)
+
+  08 Mar 2004; Aron Griffis <agriffis@gentoo.org> epm-0.8.5.ebuild:
+  Bump version to 0.8.5 which includes code from Bram Dumolin to show the
+  package size with -qi and -qS
+
+  27 Aug 2003; Aron Griffis <agriffis@gentoo.org> metadata.xml:
+  Added metadata
+
+*epm-0.7 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> epm-0.7.ebuild,
+  epm-0.8.1.ebuild, epm-0.8.2.ebuild, epm-0.8.3.ebuild, epm-0.8.4.ebuild,
+  epm-0.8.ebuild:
+  moved from sys-apps to app-portage
+
+*epm-0.8.4 (26 May 2003)
+
+  26 May 2003; Aron Griffis <agriffis@gentoo.org> epm-0.8.4.ebuild:
+  Update to 0.8.4 with a patch from Michael Sterrett to report the package URL
+  with -qi
+
+*epm-0.8.3 (01 May 2003)
+
+  01 May 2003; Aron Griffis <agriffis@gentoo.org> epm-0.8.3.ebuild:
+  Fix nit pick reported by Bill Gjestvang at the end of 8832
+
+*epm-0.8.2 (30 Apr 2003)
+
+  30 Apr 2003; Aron Griffis <agriffis@gentoo.org> epm-0.8.2.ebuild:
+  Update to 8.2 which fixes bugs 8832, 12798, and 19806. Patches provided by
+  Wayne Davison and Scott Hunt. Thanks guys! Also added a shiny man-page.
+
+*epm-0.8.1 (23 Apr 2003)
+
+  23 Apr 2003; Aron Griffis <agriffis@gentoo.org> epm-0.8.1.ebuild:
+  Minor version bump to pick up bug fix submitted by Neil McCalden in bug 19681
+
+*epm-0.8 (22 Oct 2002)
+
+  24 Feb 2003; Nicholas Wourms <dragon@gentoo.org> epm-0.8.ebuild :
+  Mark as stable for mips.  Fixed version number in ChangeLog.
+
+  15 Dec 2002; Aron Griffis <agriffis@gentoo.org> epm-0.8.ebuild :
+  Added alpha to KEYWORDS
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+
+  22 Oct 2002; Aron Griffis <agriffis@gentoo.org>:
+  Updated to recent version
+
+*epm-0.7 (26 Mar 2002)
+
+  21 Jul 2002; Mark Guertin <gerk@gentoo.org>:
+  updated keywords (ppc)
+
+  14 Jul 2002; phoen][x <phoenix@gentoo.org> epm-0.7.ebuild :
+  Added LICENSE, KEYWORDS, SLOT.
+
+  26 Mar 2002; Aron Griffis <agriffis@gentoo.org> epm-0.7.ebuild :
+  Added ebuild for epm, an rpm workalike for Gentoo Linux.

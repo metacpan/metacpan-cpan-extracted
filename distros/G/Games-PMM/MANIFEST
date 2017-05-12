@@ -1,0 +1,16 @@
+Build.PL                                  Module::Build control program
+ChangeLog                                 The list of changes
+lib/Games/PMM.pm
+lib/Games/PMM/Actions.pm
+lib/Games/PMM/Arena.pm
+lib/Games/PMM/Monster.pm
+lib/Games/PMM/Monster/Commands.pm
+Makefile.PL                               Compatibility with ExtUtils::MakeMaker
+MANIFEST			                      This list of files
+META.yml                                  Distribution metadata
+README                                    Basic installation instructions
+t/Games/PMM.t
+t/Games/PMM/Actions.t
+t/Games/PMM/Arena.t
+t/Games/PMM/Monster.t
+t/Games/PMM/Monster/Commands.t

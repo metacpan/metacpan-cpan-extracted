@@ -1,0 +1,415 @@
+#!/usr/bin/env perl 
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use GH::Status;
+use GH::Msp;
+use GH::EditOp;
+use GH::MspTools qw(getMSPs MSPMismatches);
+use GH::Align qw(boundedGlobalMinDifferences);
+
+use Bio::Seq;
+use Bio::Tools::RestrictionEnzyme;
+
+use Set::IntSpan;
+
+use Data::Dumper;
+
+my($genomicFilename, $genomic, $genomicName);
+my($bac1Filename, $bac1, $bac1rev, $bac1Name);
+my($bac2Filename, $bac2, $bac2rev, $bac2Name);
+
+my($ecoRIRange, $bacMin, $bacMax);
+my($sloppy);
+my($verbose, $quiet);
+my($outputFilename, $fastaHandle);
+
+my($bac1Alignments, $bac1revAlignments);
+my($bac2Alignments, $bac2revAlignments);
+my(@locations);
+my $site = 'GAATTC';  # ecori by default
+
+#
+# process command line options.
+#
+GetOptions('genomic=s' => \$genomicFilename,
+	   'bac1=s' => \$bac1Filename,
+	   'bac2=s' => \$bac2Filename,
+	   'ecoRIRange=i' => \$ecoRIRange,
+	   'bacMin=i' => \$bacMin,
+	   'bacMax=i' => \$bacMax,
+	   'sloppy' => \$sloppy,
+	   'verbose' => \$verbose,
+	   'quiet' => \$quiet,
+	   'output=s' => \$outputFilename,
+           'site=s'   => \$site,
+	  );
+
+die &usage() if (not defined $genomicFilename);
+die &usage() if (not defined $bac1Filename);
+die &usage() if (not defined $bac2Filename);
+die &usage() if ((defined($bacMin) && not defined($bacMax)) ||
+		 (defined($bacMax) && not defined($bacMin)));
+
+$ecoRIRange = 100 if (not defined $ecoRIRange);
+$bacMin = 140000 if (not defined $bacMin);
+$bacMax = 200000 if (not defined $bacMax);
+if (defined($outputFilename)) {
+  open $fastaHandle, ">$outputFilename" ||
+    die "Could not open $outputFilename.\n";
+}
+else {
+  open $fastaHandle, ">&STDOUT" || die "Could not dup stdout.\n";
+  $|=1;
+}  
+
+#
+# load the sequences.
+#
+($genomicName, $genomic) = getFastaSeq($genomicFilename);
+die "Could not read $genomicFilename\n" if (not defined ($genomic));
+
+($bac1Name, $bac1) = getFastaSeq($bac1Filename);
+die "Could not read $bac1Filename\n" if (not defined ($bac1));
+$bac1rev = revcomp($bac1);
+
+($bac2Name, $bac2) = getFastaSeq($bac2Filename);
+die "Could not read $bac2Filename\n" if (not defined ($bac2));
+$bac2rev = revcomp($bac2);
+
+if (! defined($quiet)) {
+  print "\n";
+  print "bac1 name: $bac1Name, length: ", length($bac1), "\n";
+  print "bac2 name: $bac2Name, length: ", length($bac2), "\n";
+  print "genomic name: $genomicName, length: ", length($genomic), "\n";
+}
+
+#
+# find all of the places that each bac end seems to fit the genomic.
+# returns are ref's to sets of alignments.
+# 
+$bac1Alignments = placeBac($bac1, $genomic);
+$bac1revAlignments = placeBac($bac1rev, $genomic);
+$bac2Alignments = placeBac($bac2, $genomic);
+$bac2revAlignments = placeBac($bac2rev, $genomic);
+
+evaluatePairs($bac1Alignments, $bac2revAlignments, $bac1, $bac2rev, $genomic, $site);
+evaluatePairs($bac1revAlignments, $bac2Alignments, $bac1rev, $bac2, $genomic, $site);
+if ($sloppy) {
+  evaluatePairs($bac1Alignments, $bac2Alignments, $bac1, $bac2, $genomic, $site);
+  evaluatePairs($bac1revAlignments, $bac2revAlignments, $bac1rev, $bac2rev, $genomic, $site);
+}
+
+close($fastaHandle);
+
+print "\n" if (!$quiet);
+
+exit(0);
+
+################################################################
+# end of main                                                  #
+################################################################
+
+sub placeBac {
+  my($b, $g) = @_;
+  my($msps);
+  my($mspSets);
+  my($alignments);
+
+  $GH::MspTools::mspThreshold = 50; # ignore the little stuff for now.
+
+  $msps = getMSPs($b, $g);	# bac first runs faster!!!
+  $mspSets= linkMsps($msps);
+  $alignments = alignEm($mspSets, $b, $g);
+
+  return($alignments);
+}
+  
+#
+# This does a greedy walk through the set of msps, and ties together
+# the ones that go together well enough (defined by sub reachable).
+# It returns a reference to an array of references to arrays of msps.
+#
+sub linkMsps {
+  my($mspRef) = @_;
+  my(@sortedMsps);
+  my(@currentMspSet);
+  my($msp);
+  my(@mspSets);
+  
+  return(undef) if (not defined($mspRef));
+
+  @sortedMsps = sort {$a->getPos1() <=> $b->getPos1()} @{$mspRef};
+
+  while (scalar(@sortedMsps)) {
+    @currentMspSet = ();
+    $msp = shift(@sortedMsps);
+    push(@currentMspSet, $msp);
+    
+    while (scalar(@sortedMsps) && reachable($msp, $sortedMsps[0])) {
+      $msp = shift(@sortedMsps);
+      push(@currentMspSet, $msp);
+    }
+    
+    push(@mspSets, \@currentMspSet);
+  }
+  
+  return(\@mspSets);
+}
+
+#
+# this decides if a pair of msps overlap well enough to be considered
+# part of the same
+#
+sub reachable {
+  my($thisMsp, $nextMsp) = @_;
+  my($gap1, $gap2);
+  my($hardCodedConstant) = 50;
+  
+  $gap1 = $nextMsp->getPos1 - ($thisMsp->getPos1() + $thisMsp->getLen());
+  $gap2 = $nextMsp->getPos2 - ($thisMsp->getPos2() + $thisMsp->getLen());
+
+  if ((abs($gap1) < $hardCodedConstant) &&
+      (abs($gap2) < $hardCodedConstant)) {
+    return(1);
+  }
+  else {
+    return(0);
+  }
+
+  return(0);
+}
+
+sub linkCost {
+  my($thisMsp, $nextMsp) = @_;
+  my($gap1, $gap2);
+  my($hardCodedConstant) = 50;
+  
+  $gap1 = $nextMsp->getPos1 - ($thisMsp->getPos1() + $thisMsp->getLen());
+  $gap2 = $nextMsp->getPos2 - ($thisMsp->getPos2() + $thisMsp->getLen());
+
+  return(abs($gap1) + abs($gap2));
+}
+
+sub alignEm {
+  my($mspSets, $b, $g) = @_;
+  my(@alignments);
+  my($mspSet);
+
+  foreach $mspSet (@{$mspSets}) {
+    push(@alignments, alignIt($mspSet, $b, $g));
+  }
+  return(\@alignments);
+}
+
+sub alignIt {
+  my($mspSet, $b, $g) = @_;
+  my($msp);
+  my($_b, $_g);
+  my($maxCost);			# a bound on the cost of the alignment.
+  my($bStart, $bEnd);		# bounding box in bac-end
+  my($gStart, $gEnd);		# bounding box in genomic
+  my($i);
+  my($a);
+  my($status, $realCost);
+
+  $msp = $mspSet->[0];		# get the min-est msp.
+  $bStart = $msp->getPos1();
+  $gStart = $msp->getPos2();
+  $msp = $mspSet->[scalar(@{$mspSet}) - 1];	# get the max-est msp.
+  $bEnd = $msp->getPos1() + $msp->getLen() - 1;
+  $gEnd = $msp->getPos2() + $msp->getLen() - 1;
+
+  $_b = substr($b, $bStart, $bEnd - $bStart+1);
+  $_g = substr($g, $gStart, $gEnd - $gStart+1);
+
+  $maxCost = 0;
+
+  # count the mismatches in the msp segments
+  foreach $msp (@{$mspSet}) {
+    $maxCost += MSPMismatches($msp, $b, $g);
+  }
+  
+  # and penalize for the gaps between the msps.
+  for($i=0; $i<scalar(@{$mspSet}) - 1; $i++) {
+    $maxCost += linkCost($mspSet->[$i], $mspSet->[$i+1]);
+  }
+
+  $a = boundedGlobalMinDifferences($_b, $_g, $maxCost);
+
+  # the first element of the returned alignment is the status....
+  if ($a->[0] == STAT_OK) {
+    return([$bStart, $bEnd, $gStart, $gEnd, $a]);
+  }
+  else {
+    return(undef);
+  }
+}
+
+sub evaluatePairs {
+  my($a1Ref, $a2Ref, $bac1, $bac2, $genomic,$site) = @_;
+  my($a1, $a2);
+  my($tmpSeq);
+  my($b1Start, $b1End, $g1Start, $g1End, $alignment1);
+  my($b2Start, $b2End, $g2Start, $g2End, $alignment2);
+  my($gLength);
+  my($ecoRISet);
+  my($ecoRIRevSet);
+  my($start, $end);
+  my($tmpSet);
+  my($bacName, $bacSeq);
+
+  $gLength = length($genomic);
+
+  # cut before and after the entire cut site.
+  $ecoRISet = getRESet($genomic, $site, 0);
+  $ecoRISet = $ecoRISet->union(getRESet($genomic,join('',reverse(split(//,$site))),length($site)));
+
+  foreach $a1 (@{$a1Ref}) {
+    foreach $a2 (@{$a2Ref}) {
+
+      if ($a1->[2] < $a2->[2]) {
+	($b1Start, $b1End, $g1Start, $g1End, $alignment1) = @{$a1};
+	($b2Start, $b2End, $g2Start, $g2End, $alignment2) = @{$a2};
+      }
+      else {
+	($b1Start, $b1End, $g1Start, $g1End, $alignment1) = @{$a2};
+	($b2Start, $b2End, $g2Start, $g2End, $alignment2) = @{$a1};
+	$tmpSeq = $bac1;
+	$bac1 = $bac2;
+	$bac2 = $tmpSeq;	
+      }
+
+      $tmpSet = $ecoRISet->intersect("(-$g1Start"); # everything up to start
+      $start = $tmpSet->max();
+
+      $tmpSet = $ecoRISet->intersect("$g2End-)"); # everything up to the end.
+      $end = $tmpSet->min();
+
+      if (! defined($sloppy)) {
+	next if ($g2End - $g1Start < $bacMin);
+	next if ($g2End - $g1Start > $bacMax);
+	next if ($g1Start - $start > $ecoRIRange);
+	next if ($end - $g2End > $ecoRIRange);
+      }
+
+      if (!$quiet) {
+	print "\n";
+	print "alignment footprint: $g1Start --- $g2End (",
+	$g2End - $g1Start + 1, " bases)\n";
+	print "ecoRI defined range: $start --- $end (",
+	$end - $start + 1, " bases)\n";
+	print "\n";
+      }
+
+      if ($verbose) {
+	print "In the first bac, bases $b1Start -- $b1End aligned to ";
+	print "genomic bases $g1Start -- $g1End.\n\n";
+	print "Here is the alignment of the first bac's location.\n\n";
+	printAlignment(substr($bac1, $b1Start, $b1End - $b1Start + 1),
+		       substr($genomic, $g1Start, $g1End - $g1Start + 1),
+		       $alignment1->[2], 60, *main::STDOUT);
+	print "\n";
+	print "In the second bac, bases $b2Start -- $b2End aligned to ";
+	print "genomic bases $g2Start -- $g2End.\n\n";
+	print "Here is the alignment of the second bac's location.\n\n";
+	printAlignment(substr($bac2, $b2Start, $b2End - $b2Start + 1),
+		       substr($genomic, $g2Start, $g2End - $g2Start + 1),
+		       $alignment2->[2], 60, *main::STDOUT);
+      }
+
+      $bacName = $bac1Name;
+      $bacName =~ s/-.*$//;
+      $genomicName =~ m/^(\S*) /;
+      $bacName .= " from $1 ($start -- $end) by aligning bac-ends.";
+      $bacSeq = substr($genomic, $start, $end - $start + 6);
+      printFasta($fastaHandle, $bacName, $bacSeq);
+    }
+  }    
+}
+
+sub usage {
+  my($usage);
+
+  $usage .= $0;
+  $usage .= " -genomic fastafilename -bac1 fastafilename -bac2 fastafilename [-ecoRIRange range] [-bacMin min -bacMax max] [-verbose] [-quiet] [-output fastafilename] [-sloppy]\n";
+  $usage .= "\n\n";
+  $usage .= "-genomic specifies the name of the file of the genomic seq.\n";
+  $usage .= "-bac1 and -bac2 spec. the names of the files /w the bac seqs.\n";
+  $usage .= "-ecoRIRange is the distance the ecoRI site must be from the footprint.\n";
+  $usage .= "-bacMin and -bacMax are the min and max size of the bac.\n";
+  $usage .= "-verbose prints out information about the bac alignments.\n";
+  $usage .= "-quiet only prints out the fasta file of the pseudo bac.\n";
+  $usage .= "-output let's you explicitly name the file for the pseudo bac.\n";
+  $usage .= "-sloppy ignore constraints on size, re sites, etc...\n";
+  return($usage);
+}
+
+sub getFastaSeq{ 
+  my($filename) = @_;
+  my($SEQFILE);
+  my($name);
+  my($seq);
+  my($oldseparator);
+
+  open $SEQFILE, $filename || return undef;
+  $name = <$SEQFILE>;
+  chomp $name;
+  $name =~ s/^> *//;
+  if (length($name) > 35) {
+    $name = substr($name, 0, 32);
+    $name .= "...";
+  }
+
+  $oldseparator = $/;
+  $/ = undef;
+  $seq = <$SEQFILE>;
+  $/ = $oldseparator;
+
+  $seq =~ s/\n//g;
+  $seq =~ tr/acgt/ACGT/;	# force to upper case.
+
+  close $SEQFILE;
+  return($name, $seq);
+}
+
+sub revcomp {
+  my($seq) = @_;
+  my($rc);
+
+  $rc = $seq;
+  $rc =~ tr/acgtrymkswhbvdnxACGTRYMKSWHBVDNX/tgcayrkmswdvbhnxTGCAYRKMSWDVBHNX/;
+  $rc = reverse scalar($rc);
+  return($rc);
+}
+
+sub printFasta {
+  my($filehandle, $name, $seq) = @_;
+
+
+  print $filehandle ">$name\n";
+  $seq =~ s/(.{65})/$1\n/g;
+  chomp $seq;			# avoid extra cr's.
+  print $filehandle "$seq\n";
+}
+
+sub getRESet {
+  my($genomic, $site, $cuts_at) = @_;
+  my($pos, $cut, $runList);
+  
+  # build a Set::IntSpan that has all of the locations of EcoRI cut
+  # sites in the genomic sequence.
+  # This assumes that the sequence is upper case (enforced by the
+  # fasta loader.)
+  $pos = -1;
+  while (($pos = index($genomic, $site, $pos+1)) != -1) {
+    $cut = $pos + $cuts_at;		# cuts after first base....
+    $runList .= "$cut,";	
+  }
+  return(new Set::IntSpan $runList);
+}
+  
+

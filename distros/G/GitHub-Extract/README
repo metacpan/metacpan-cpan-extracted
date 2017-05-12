@@ -1,0 +1,203 @@
+NAME
+    GitHub::Extract - Extract an exported copy of a GitHub project
+
+SYNOPSIS
+            my $project = GitHub::Extract->new(
+                    username => 'adamkennedy',
+                    project  => 'PPI',
+            );
+            
+        $project->extract( to => '/my/directory' );
+
+DESCRIPTION
+    GitHub::Extract is a simple light weight interface to
+    <http://github.com/> for the sole purpose of retrieving and extracting a
+    "zipball" of a public (and likely open source) project.
+
+    It makes use of the plain route used by the user interface "zip" button,
+    and as a result it avoids the need to use the full GitHub API and
+    client.
+
+    This module shares extends (and emulates where needed) the API of
+    Archive::Extract. Any existing tooling code which uses Archive::Extract
+    to work with release tarballs should be trivially upgradable to work
+    with projects directly from GitHub instead.
+
+METHODS
+  new
+            my $branch = GitHub::Extract->new(
+                    username   => 'adamkennedy',
+                    repository => 'PPI',
+
+                    # Fetch a branch other than master
+                    branch     => 'mybranch',
+
+                    # A custom HTTP client can be provided to any constructor
+                    http       => HTTP::Tiny->new(
+                            # Custom HTTP setup goes here
+                    ),
+            );
+
+    The "new" constructor identifies a project to download (but does not
+    take any immediate action to do the download).
+
+    It takes a number of simple parameters to control where to download
+    from.
+
+    username
+        The GitHub username identifying the owner of the repository.
+
+    repository
+        The name of the repository within the account or organisation.
+
+    branch
+        An optional parameter identifying a particular branch to download.
+        If not specificied, the 'master' branch will be fetched.
+
+    http
+        GitHub::Extract will create a HTTP::Tiny object with default
+        settings to download the zipball from GitHub.
+
+        This parameter allows you to use your own custom HTTP::Tiny client
+        with alternative settings.
+
+    Returns a new GitHub::Extract object, or false on error.
+
+  username
+    The "username" method returns the GitHub username for the request.
+
+  repository
+    The "repository" method returns the GitHub repository name for the
+    request.
+
+  branch
+    The "branch" method returns the name of the branch to be fetched.
+
+  url
+    The "url" method returns the full download URL used to fetch the
+    zipball.
+
+  http
+    The "http" method returns the HTTP client that will be used for the
+    request.
+
+  archive
+    The "archive" method will return the absolute path to the downloaded zip
+    file on disk, if the download was successful.
+
+    Returns "undef" if the download was not completed successfully.
+
+  archive_extract
+    The "archive_extract" method will return the Archive::Extract object
+    used to extract the files from the zipball, whether or not it extracted
+    successfully.
+
+    Returns "undef" if the download was not completed successfully.
+
+  extract
+            $project->extract( to => '/output/path' );
+
+    Extracts the archive represented by the GitHub::Extract object to the
+    path of your choice as specified by the "to" argument. Defaults to
+    "cwd()".
+
+    In the case that you did not specify a "to" argument, the output file
+    will be the name of the archive file, stripped from its ".gz" suffix, in
+    the current working directory.
+
+    It will return true on success, and false on failure.
+
+  pushd
+            my $guard = $project->pushd( to => '/output/path' );
+
+    The "pushd" method downloads and extracts the project from GitHub, and
+    then temporarily changes the current working directory into the extract
+    path of the project.
+
+    Returns a File::pushd guard object which will return the current working
+    directory to the original location when it is deleted, or false if the
+    archive was not extracted.
+
+  extract_path
+            # Prints '/output/path/myproject-0.01-af41bc'
+            if ( $project->extract( to => '/output/path' ) ) {
+                    print $project->extract_path;
+            }
+
+    The "extract_path" method returns the absolute path of the logical root
+    directory of the zipball, once it has been extracted.
+
+    Since some archives will contain a single root directory within the zip
+    file with which the content is placed (and some will not) this
+    compensates for the different, detecting the logical root automatically.
+
+    See "extract" in Archive::Extract for more details.
+
+  files
+    The "files" method returns an array ref with the paths of all the files
+    in the archive, relative to the "to" argument you specified.
+
+    To get the full path to an extracted file, you would use:
+
+        File::Spec->catfile( $to, $ae->files->[0] );
+
+    See "extract" in Archive::Extract for more details.
+
+  error
+            my $simple  = $project->error;
+            my $verbose = $project->error(1);
+
+    The "error" method returns the last encountered error as string.
+
+    Pass it a true value to get the detailed output instead, as produced by
+    "longmess" in Carp.
+
+GLOBAL VARIABLES
+    All global variables share the names and behaviour of the equivalent
+    variables in Archive::Extract. Their value will be propogated down to
+    the equivalent variables in Archive::Extract whenever it is being used.
+
+  $GitHub::Extract::DEBUG
+    Set this variable to "true" to have all calls to command line tools be
+    printed out, including all their output.
+
+    This also enables "Carp::longmess" errors, instead of the regular "carp"
+    errors.
+
+    Good for tracking down why things don't work with your particular setup.
+
+    Defaults to "false".
+
+  $GitHub::Extract::WARN
+    This variable controls whether errors encountered internally by
+    "GitHub::Extract" should be "carp"'d or not.
+
+    Set to false to silence warnings. Inspect the output of the "error()"
+    method manually to see what went wrong.
+
+    Defaults to "true".
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Extract>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Archive::Extract
+
+    <http://github.com/>
+
+COPYRIGHT
+    Copyright 2012-2013 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,11 @@
+---
+worker_options:
+  'GLOBAL':
+    foo: 'GlobalTest'
+    global_foo: 'GlobalTest'
+  'Gearman::Driver::Test::Live::RuntimeOption':
+    foo: 'Test'
+job_runtime_attributes:
+  'Gearman::Driver::Test::Live::RuntimeOption::job1':
+    max_processes: 10
+    min_processes: 2

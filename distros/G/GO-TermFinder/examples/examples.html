@@ -1,0 +1,263 @@
+<html>
+
+<body bgcolor="white">
+
+<head>
+<title>Example Clients of GO::TermFinder and related modules</title>
+</head>
+
+<center>
+<h1>Example Clients of GO::TermFinder and related modules</h1>
+</center>
+
+
+<center>
+
+<table width=650>
+<tr>
+<td>
+<p>
+This directory contains various example client scripts that can be
+used to access the functionality of of the GO::TermFinder and related
+modules, that provide a rich API for accessing information from the
+Gene Ontology project.  These examples serve the purpose of providing
+useful example code for people who wish to write alternate clients of
+these objects, as well as providing useful functionality in their own
+right.
+</p>
+
+<p>
+Before running any of the example programs, you should first install
+the GO::TermFinder modules, according to the instructions in the
+README file.  Also, see the associated pod for each example program
+for more information about that particular program.
+
+<p>The example client programs are:</p>
+
+<ol>
+
+<li>analyze.pl</li>
+
+<p>
+This program takes a list of files, each of which contain a list of
+genes, with one gene per line.  It will findTerms for the lists of
+genes in each of the GO aspects, outputting the results to a file
+named for the original file, but with a .terms extension.  It will
+only output terms with a corrected P-value of <= 0.05.
+
+It will use the first supplied argument as the annotation file, the
+second argument as the expected number of genes within the organism,
+and all subsequent files as ones containing lists of genes.  You need
+to provide the ontology files in the same directory from which you are
+executing this script, and the GO-TermFinder libraries must be in your
+path.
+
+<pre>
+Usage:
+
+    analyze.pl &lt;annotation_file&gt; &lt;numGenes&gt; &lt;file1&gt; &lt;file2&gt; &lt;file3&gt; ... &lt;fileN&gt;
+
+e.g.
+
+    analyze.pl gene_association.sgd 7200 file1.txt file2.txt file3.txt
+</pre>
+
+</p>
+
+<li>ancestors.pl</li>
+
+<p>
+ancestors.pl simply takes as input a GOID, and an ontology file, and prints out
+the all the paths from that GO node to the root of the ontology, e.g:
+
+<pre>
+    &gt;ancestors.pl GO:0008346 ../t/process.ontology
+    GO:0003673    Gene_Ontology
+        GO:0008150    biological_process
+            GO:0007610    behavior
+                GO:0030537    larval behavior
+                    GO:0008345    larval locomotory behavior
+                        GO:0008346    larval walking behavior
+
+    GO:0003673    Gene_Ontology
+        GO:0008150    biological_process
+            GO:0007610    behavior
+                GO:0007626    locomotory behavior
+                    GO:0008345    larval locomotory behavior
+                        GO:0008346    larval walking behavior
+</pre>
+</p>
+
+<li>batchGOView.pl</li>
+
+<p>
+batchGoView.pl will read through a number of files, each containing a
+list of genes, and will create for each one an html page with a
+GO::View, such that you can graphically browse the results.  You need
+to provide a .conf file, and then a list of files for processing, each
+of which contain a list of genes.  An example .conf file exists in
+this directory - edit as appropriate.  The following usage should give
+you some output, using the example files.
+
+Usage:
+
+batchGOView.pl &lt;.conf_file&gt;> &lt;file1&gt;> &lt;file2> &lt;file3> ... &lt;fileN>
+
+e.g.
+
+batchGOView.pl GoView.conf genes.txt genes2.txt
+</p>
+
+<p>
+Notes about the conf file:<br><br>
+
+The .conf file is simply a file that describes various parameters that
+can be used by batchGOView.pl.  Each parameter is in the form of:
+<pre>
+
+name = value
+
+</pre>
+lines beginning with # are comment lines.  See the example .conf file
+in the same directory as this html file.
+</p>
+
+Output from batchGOView.pl looks something like:
+
+<center><h2>Terms for genes.txt</h2></center><hr /><MAP NAME='goPathImage'>
+<AREA SHAPE='RECT' COORDS='197,37,316,53' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0008150' title="">
+<AREA SHAPE='RECT' COORDS='83,628,184,653' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0009086' title="">
+<AREA SHAPE='RECT' COORDS='83,535,184,579' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0009067' title="">
+<AREA SHAPE='RECT' COORDS='83,455,184,480' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0008652' title="">
+<AREA SHAPE='RECT' COORDS='63,302,165,327' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0009309' title="">
+<AREA SHAPE='RECT' COORDS='135,225,236,250' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0009308' title="">
+<AREA SHAPE='RECT' COORDS='207,165,306,181' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0008152' title="">
+<AREA SHAPE='RECT' COORDS='206,97,307,122' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0007582' title="">
+<AREA SHAPE='RECT' COORDS='195,540,296,575' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0000097' title="">
+<AREA SHAPE='RECT' COORDS='201,378,302,404' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0006520' title="">
+<AREA SHAPE='RECT' COORDS='194,451,303,485' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0009066' title="">
+<AREA SHAPE='RECT' COORDS='306,545,407,570' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0006555' title="">
+<AREA SHAPE='RECT' COORDS='313,455,421,480' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0000096' title="">
+<AREA SHAPE='RECT' COORDS='206,297,306,331' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0006519' title="">
+<AREA SHAPE='RECT' COORDS='23,229,124,245' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0009058' title="">
+<AREA SHAPE='RECT' COORDS='316,302,415,327' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0019752' title="">
+<AREA SHAPE='RECT' COORDS='277,225,378,250' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0006082' title="">
+<AREA SHAPE='RECT' COORDS='389,225,490,250' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0006790' title="">
+<AREA SHAPE="RECT" COORDS="100,695,124,703" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=STR3">
+<AREA SHAPE="RECT" COORDS="130,695,154,703" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET2">
+<AREA SHAPE="RECT" COORDS="431,547,455,555" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MHT1">
+<AREA SHAPE="RECT" COORDS="348,633,378,641" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET17">
+<AREA SHAPE="RECT" COORDS="384,633,408,641" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET6">
+<AREA SHAPE="RECT" COORDS="414,633,438,641" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">
+<AREA SHAPE="RECT" COORDS="444,633,468,641" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">
+<AREA SHAPE="RECT" COORDS="474,633,504,641" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">
+<AREA SHAPE="RECT" COORDS="393,643,423,651" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">
+<AREA SHAPE="RECT" COORDS="429,643,459,651" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">
+<AREA SHAPE='RECT' COORDS='467,378,567,404' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0000103' title="">
+<AREA SHAPE='RECT' COORDS='462,302,563,327' HREF='http://godatabase.org/cgi-bin/go.cgi?query=GO:0006791' title="">
+<AREA SHAPE="RECT" COORDS="462,460,492,468" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=ECM17">
+<AREA SHAPE="RECT" COORDS="498,460,522,468" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">
+<AREA SHAPE="RECT" COORDS="528,460,552,468" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">
+<AREA SHAPE="RECT" COORDS="558,460,588,468" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">
+<AREA SHAPE="RECT" COORDS="594,460,624,468" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">
+<AREA SHAPE="RECT" COORDS="528,470,558,478" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET10">
+<AREA SHAPE="RECT" COORDS="211,631,241,639" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET28">
+<AREA SHAPE="RECT" COORDS="247,631,277,639" HREF="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">
+</MAP><center><img src='./example_goView.gif' usemap='#goPathImage'></center><p>
+
+<a name="table" /><center>
+<h3>Result Table</h3></center><p />
+<table cellpadding="2" width="300" align="center" border="1">
+<tr><td width="100%" align="left" bgcolor="#FFCC99"><b>Terms from the Process Ontology exceeding a pvalue cutoff of 1e-12</b></td></tr></table>
+<table align="center" border="2">
+<tr bgcolor="#CCCCFF">
+<th align="center">Gene Ontology term</th>
+<th align="center">Cluster frequency</th>
+<th align="center">Genome frequency of use</th>
+<th align="center">P-value</th>
+<th align="center">Genes annotated to the term</th></tr>
+
+<tr>
+<td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0006790">sulfur metabolism</a></td>
+<td>13 out of 19 genes, 68.4%</td>
+<td>45 out of 6905 genes, 0.7%</td>
+<td>1.79e-24</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=STR3">STR3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MHT1">MHT1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET17">MET17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET6">MET6</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=ECM17">ECM17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET2">MET2</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET28">MET28</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">MET11</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET10">MET10</a></td></tr><tr><td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0000096">sulfur amino acid metabolism</a></td>
+<td>11 out of 19 genes, 57.9%</td>
+<td>29 out of 6905 genes, 0.4%</td>
+<td>7.27e-22</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=STR3">STR3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MHT1">MHT1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET17">MET17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET6">MET6</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET2">MET2</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET28">MET28</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">MET11</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a></td></tr><tr><td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0006555">methionine metabolism</a></td>
+<td>9 out of 19 genes, 47.4%</td>
+<td>20 out of 6905 genes, 0.3%</td>
+<td>1.87e-18</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=STR3">STR3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET17">MET17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET6">MET6</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET2">MET2</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">MET11</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a></td></tr><tr><td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0009066">aspartate family amino acid metabolism</a></td>
+<td>9 out of 19 genes, 47.4%</td>
+<td>41 out of 6905 genes, 0.6%</td>
+<td>3.80e-15</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=STR3">STR3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET17">MET17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET6">MET6</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET2">MET2</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">MET11</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a></td></tr><tr><td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0000103">sulfate assimilation</a></td>
+<td>6 out of 19 genes, 31.6%</td>
+<td>8 out of 6905 genes, 0.1%</td>
+<td>6.04e-14</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=ECM17">ECM17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET10">MET10</a></td></tr><tr><td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0006791">sulfur utilization</a></td>
+<td>6 out of 19 genes, 31.6%</td>
+<td>8 out of 6905 genes, 0.1%</td>
+<td>6.04e-14</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=ECM17">ECM17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET10">MET10</a></td></tr><tr><td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0006520">amino acid metabolism</a></td>
+<td>11 out of 19 genes, 57.9%</td>
+<td>141 out of 6905 genes, 2.0%</td>
+<td>1.37e-13</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=STR3">STR3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MHT1">MHT1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET17">MET17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET6">MET6</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET2">MET2</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET28">MET28</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">MET11</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a></td></tr><tr><td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0006519">amino acid and derivative metabolism</a></td>
+<td>11 out of 19 genes, 57.9%</td>
+<td>151 out of 6905 genes, 2.2%</td>
+<td>2.96e-13</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=STR3">STR3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MHT1">MHT1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET17">MET17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET6">MET6</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET2">MET2</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET28">MET28</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">MET11</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a></td></tr><tr><td><a target="infowin" href="http://godatabase.org/cgi-bin/go.cgi?query=GO:0009308">amine metabolism</a></td>
+<td>11 out of 19 genes, 57.9%</td>
+<td>161 out of 6905 genes, 2.3%</td>
+<td>6.07e-13</td>
+<td><a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=STR3">STR3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MHT1">MHT1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET17">MET17</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET6">MET6</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET1">MET1</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET2">MET2</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET3">MET3</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET16">MET16</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET28">MET28</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET11">MET11</a>, <a target="infowin" href="http://db.yeastgenome.org/cgi-bin/SGD/locus.pl?locus=MET14">MET14</a></td></tr></table><p /></body></html>
+
+<li>children.pl</li>
+<p>
+children.pl simply takes as input a GOID, and an ontology file, and prints out
+the children of that GO node, e.g.:
+<pre>
+    &gt;children.pl GO:0008150 process.ontology
+
+    Children of GO:0008150 (biological_process) : 
+
+    GO:0000004    biological_process unknown
+    GO:0016032    viral life cycle
+    GO:0007582    physiological processes
+    GO:0007275    development
+    GO:0009987    cellular process
+    GO:0008371    obsolete
+    GO:0007610    behavior
+</pre>
+</p>
+
+<li>termFinderClient.pl
+
+<p>
+This program is a very simply client for the GO::TermFinder object,
+that prompts a user for the various pieces of information that are
+required to determine significant GO terms associated with the list of
+genes.  It uses a p-value cut-off (for the corrected p-value) of .001,
+and simply prints the information back to the screen.
+</p>
+
+</ol> 
+
+<p>
+Feedback on any and all of this software, clients or libraries alike,
+is welcomed and encouraged.  We are more than happy to implement
+reasonable improvements and changes, and of course we always want to
+fix bugs.  Please send feedback to <a
+href="mailto:sherlock@genome.stanford.edu">Gavin Sherlock</a>
+
+</td>
+</tr>
+</table>
+</center>
+</body>
+
+</html>

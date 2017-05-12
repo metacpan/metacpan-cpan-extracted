@@ -1,0 +1,59 @@
+Gftracks version 0.5
+====================
+
+Gftracks is a module intended for manipulation of gramofiles .track files.
+Gramofile is a program for manipulation of wav-files especially for splitting 
+into single tracks. 
+
+The splitting process with gramofile is a two step one. In the first, the file
+is analyzed for finding where the tracks begin and end, that information is
+saved into a .tracks file. In the next step, this file is used for the actual 
+splitting into tracks. 
+
+With a record with well-defined tracks and a decent sound card, gramofile 
+usually finds most of the tracks, but in some cases, the tracks may be 
+difficult or impossible to find or some tracks may be split. The .tracks file
+is quite easy to edit to adjust the beginning or end time of the tracks, but
+due to the indexing used, it is more cumbersome to add or remove tracks. 
+
+Gftracks will usually be used in interactive mode through the shell:
+
+i.e.
+export TRACKS=/home/morten/music.wav.tracks
+perl -MGftracks -e shell;
+
+until version 1.0, Gftracks will save the file with the extra extention .sav 
+to avoid messing up an existing file.
+
+TODO
+
+- More flexibility when entering times
+- Fix a cosmetic bug in how some times are displayed (an extra 0 may occur)
+- When deleting a track, select if it is to be combined with the track before 
+  or after (the default is the track after, except if the last track is 
+  deleted)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these no other modules and libraries. It is developed
+using perl 5.8.x, but should work under, at least all versions of perl 5.x.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by morten sickel, cpan@sickel.net
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

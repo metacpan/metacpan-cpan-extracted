@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Gtk2-Unique
+version:            0.05
+abstract:           Use single instance applications
+author:
+    - Emmanuel Rodriguez <potyl@cpan.org>
+license:            perl, lgpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Gtk2:  1.161
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+repository:         http://github.com/potyl/gtk2-unique/tree/master

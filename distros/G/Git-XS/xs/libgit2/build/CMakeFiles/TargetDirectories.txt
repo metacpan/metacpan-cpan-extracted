@@ -1,0 +1,2 @@
+/home/ingy/src/git-xs-pm/xs/libgit2/build/CMakeFiles/git2.dir
+/home/ingy/src/git-xs-pm/xs/libgit2/build/CMakeFiles/libgit2_test.dir

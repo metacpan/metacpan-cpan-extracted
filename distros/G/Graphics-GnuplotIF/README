@@ -1,0 +1,53 @@
+GnuplotIF version 1.8
+=====================
+
+GnuplotIF is a simple and easy to use Perl interface to gnuplot.  gnuplot is a
+freely available, command-driven graphical display tool for Unix.  It compiles
+and works quite well on a number of Unix flavours as well as other operating
+systems. The following module enables sending display requests to gnuplot
+through simple Perl subroutine calls.
+
+GnuplotIF starts gnuplot as a separate process. The plot commands are send
+through a pipe.  The graphical output from gnuplot will be displayed
+immediately.
+
+Several independent plots can be started from one script.  Each plot has its
+own pipe.  All pipes will be closed automatically when the script terminates.
+The gnuplot processes terminate when the corresponding pipes are closed.  Their
+graphical output will now disappear.
+
+GnuplotIF is similar to gnuplot_i , a C interface to gnuplot 
+( http://ndevilla.free.fr/gnuplot/ ), and to  gnuplot_i++ , a C++ interface
+to gnuplot ( http://jijo.cjb.net/code/cc++ ).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  gnuplot ( http://sourceforge.net/projects/gnuplot ) must be installed. 
+
+  The module IO::Handle is used to handle output pipes.
+  Your operating system must support pipes, of course.
+
+  The environment variable DISPLAY is checked for the display.
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2005-2016 by Fritz Mehner
+
+  This module is free software; you can redistribute it and/or modify it under
+  the same terms as Perl itself. See perlartistic.  This program is distributed
+  in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+

@@ -1,0 +1,75 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 00f33b36a8872bbfcc82f53588b4ecb5ec9aa636 Changes
+SHA1 64602dcf83992eb6bd0b94c133431c7943a3b839 MANIFEST
+SHA1 b758f740af57256154bbf4e1f8a760a1b9f9dfe1 MANIFEST.SKIP
+SHA1 cb4aa20bae6b8bad08c566c0241604e2eb006e76 META.yml
+SHA1 63cd4cb6f594e01bd70372be62b65d9196201af1 Makefile.PL
+SHA1 16b58d18d0386abef33f301e0d981daba8e2f713 README
+SHA1 9530b89677990142c7b59c5e0e5b1749a13a8446 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 820a7965dd55262ab5f02a9ddf16e02f6c922bfc debian/control
+SHA1 bcd93d70a70a628430cfa913348f1dd9ee205f3c debian/copyright
+SHA1 de6d54e18861079bcfef3df0397188f717b7aea9 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 8d74b057ea03c66f4729a4a630561d5d46431835 debian/watch
+SHA1 db0a59cec7a96bf41353e0cdb6a06f2125c71341 devel/Entry-WithCancel.pm
+SHA1 a7621758c5f9559e42d1aad0d08bff6fe023d629 devel/Entry-WithCancel.t
+SHA1 9f4c1215ca1150705fe5d49b0696418c16c609f0 devel/cell.pl
+SHA1 51d7a2938beffeb1e02ff662ca769b8b5b720fce devel/entry-completion.pl
+SHA1 ce15e9e4cb13d9693e47a4595f97894862ebe4b3 devel/entry.pl
+SHA1 83a1485da0732893d88441bf4c6eacc53339bb3d devel/entrywithcancel-alone.pl
+SHA1 55a2773186fa6402b34b72dc9c52402ace0f86f3 devel/entrywithcancel.pl
+SHA1 2b2bc10098952d283b08bb3fa8bcafaaaec45f6b devel/run.pl
+SHA1 2296cfe9db490ca5abf71aa7c2137c55e76ada34 devel/screenshot.pl
+SHA1 2fcd27609606d5119cb7eca7b857a6dc36efebd3 devel/spin-insert.pl
+SHA1 fe61194d08bb20100d743e7076113698407c4863 examples/builder.pl
+SHA1 404efcf32dae3d9e1ab7c1a770c7bd7ea7737a20 examples/cellrenderer.pl
+SHA1 dec408c002972e4c69dd7ea245bec67e9cbd6b39 examples/simple.pl
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b inc/my_pod2html
+SHA1 20076662ac6af1d3d6a97a881c8f44d74b9e8a6d lib/Gtk2/Ex/DateSpinner.pm
+SHA1 48b2c9fed9925cf4dbfa9eed88504073b9969080 lib/Gtk2/Ex/DateSpinner/CellRenderer.pm
+SHA1 0d4a5dad25d34df3870f66dc9f2bb6d121e0948a lib/Gtk2/Ex/DateSpinner/PopupForEntry.pm
+SHA1 b9b2b5e034587aad1cbefaca8e191041e210fe1f t/CellRenderer.t
+SHA1 b3f606ff8f45dcba3d286dfce731f6a9a335f46d t/DateSpinner-load.t
+SHA1 7c4c0aa017a9a0e99849105e9b5933611f440662 t/DateSpinner.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 fe87b7702dc68c5b15e6526322e6e7299356c998 t/PopupForEntry.t
+SHA1 4bc8c8b3359f6c0184729d72b6102f239f320909 t/test-weaken.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 ec454b1b524d2d0b35e5a7d8292ad13d82becab5 xt/0-Test-YAML-Meta.t
+SHA1 3c929b147a70e1d0cfe63d69223a5ed407a295b2 xt/0-examples-xrefs.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 84a47c1d71fd58797a2754030998dfb673b62811 xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 1f28ea8151b0f8554e5ab4e5bbcf1c5371f788eb xtools/my-check-spelling.sh
+SHA1 f3e50b961e575e060e35ddc4d94c7b3e6101d660 xtools/my-deb.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 4db9c30b1fc96b04a794218ca19561b368f59679 xtools/my-pc.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iD8DBQFSEWkuLFMCIV9q3ToRAnRcAJ4jX7pNiToVom+p5p4ud2nFY8IkZACgkEBx
+TyPRhFlBHxz1IHm5FrnIunw=
+=fE68
+-----END PGP SIGNATURE-----

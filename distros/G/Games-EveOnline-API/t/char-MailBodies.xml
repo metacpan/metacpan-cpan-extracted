@@ -1,0 +1,11 @@
+<?xml version='1.0'?>
+<eveapi version="2">
+  <currentTime>2014-07-10 18:13:16</currentTime>
+  <result>
+    <rowset name="messages" key="messageID" columns="messageID">
+      <row messageID="331477595"><![CDATA[<font size="12" color="#bfffffff"></font><font size="12" color="#fff7931e"><a href="contract:30004977//73497683">[Multiple Items]</a></font>]]></row>
+    </rowset>
+    <missingMessageIDs>331477591</missingMessageIDs>
+  </result>
+  <cachedUntil>2024-07-07 18:13:16</cachedUntil>
+</eveapi>

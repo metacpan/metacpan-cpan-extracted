@@ -1,0 +1,20 @@
+Revision history for Perl extension Games::AssaultCube
+
+* 0.04
+
+	Fixed Class::MOP deprecation of "get_attribute_map" function, thanks CPANTESTERS!
+
+* 0.03
+
+	Added POE::Component::AssaultCube::ServerQuery
+	Some minor cleanups for Kwalitee
+	Fixed Moose "where" problem
+
+* 0.02
+
+	CPANTesters caught a bug - I was using "freeze" not "nfreeze" from Storable in t/serverquery.t
+	Bumped Storable build_requires version so we're sure of image compatibility
+
+* 0.01
+
+	initial release

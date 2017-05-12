@@ -1,0 +1,9 @@
+Build.PL
+Makefile.PL
+Changes
+README
+MANIFEST
+META.yml
+lib/Games/Tetris.pm
+lib/Games/Tetris/Shape.pm
+t/Games-Tetris.t

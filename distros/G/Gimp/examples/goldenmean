@@ -1,0 +1,61 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  my $long = int(($short * 1.618) + 0.5);
+  my $width = $short;
+  my $height = $long;
+  if ($type == 1) {
+    $width = $long;
+    $height = $short;
+  }
+  my $img = Gimp::Image->new($width, $height, RGB_IMAGE);
+  my $layer = $img->layer_new($width, $height, RGB_IMAGE, "Layer 1", 100, NORMAL_MODE);
+  $img->insert_layer($layer, 0, -1);
+  Gimp::Context->push();
+  $layer->edit_fill(BACKGROUND_FILL);
+  Gimp::Context->pop();
+  eval { Gimp::Display->new($img); };
+  return $img;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+golden_mean - Creates a new image with a ratio according to the Golden Mean
+
+=head1 SYNOPSIS
+
+<Image>/File/Create/Golden Mean...
+
+=head1 DESCRIPTION
+
+Select shortest side and orientation and I will automagically calculate
+the long side. As a plug-in companion, see <Image>/Center Guide.
+
+=head1 PARAMETERS
+
+  [PF_INT32, "short", "Shortest side", 233],
+  [PF_RADIO, "type", "Orientation(0=Portrait,1=Landscape)", 0, [Portrait => 0, Landscape => 1]]
+
+=head1 IMAGE TYPES
+
+=head1 AUTHOR
+
+Claes G Lindblad <claesg@algonet.se>
+
+=head1 DATE
+
+990328
+
+=head1 LICENSE
+
+Copyright Claes G Lindblad.
+
+Distributed under the terms of the GNU Public Licesne.

@@ -1,0 +1,176 @@
+---
+0: &1 !!perl/hash:Games::Tournament::Swiss::Bracket
+  badpair: 0
+  biggroupx: 0
+  floatCheck: None
+  lastS2ids:
+    - 4
+    - 3
+    - 2
+  members:
+    - &2 !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: Down
+      floats:
+        - ~
+        - Not
+      id: 103
+      name: Carl
+      oldId: 103
+      pairingNumber: 5
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - White
+        sign: White
+      rating: 1960
+      roles:
+        - White
+      score: 1
+      scores:
+        1: ~
+      title: Mr.
+    - &3 !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: Up
+      floats:
+        - ~
+        - Not
+      id: 102
+      name: Bert
+      oldId: 102
+      pairingNumber: 3
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - Black
+        sign: Black
+      rating: 1980
+      roles:
+        - Black
+      score: 0
+      scores:
+        1: ~
+      title: Mr.
+  number: 2
+  pprime: 1
+  remainder: &4 !!perl/hash:Games::Tournament::Swiss::Bracket
+    floatCheck: None
+    lastS2ids:
+      - 4
+    members:
+      - &5 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: ''
+        floats:
+          - ~
+          - Not
+        id: 201
+        name: Ally
+        oldId: 201
+        pairingNumber: 2
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 1
+          lastTwo:
+            - Black
+          sign: Black
+        rating: 1990
+        roles:
+          - Black
+        score: 0
+        scores:
+          1: ~
+        title: Ms.
+      - &6 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 2
+        floats: []
+        id: 202
+        name: Bertha
+        oldId: 202
+        pairingNumber: 4
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          sign: ''
+        rating: 1970
+        scores: ~
+        title: Ms.
+    number: 2's Remainder Group
+    pprime: 1
+    remainderof: *1
+    s1:
+      - *5
+    s2:
+      - *6
+    score: 0
+    x: 0
+    xprime: 0
+  s1:
+    - *2
+  s2:
+    - *3
+    - *5
+    - *6
+  score: 0
+  x: 0
+  xdeduction: 0
+  xprime: 0
+0Remainder: *4
+1: !!perl/hash:Games::Tournament::Swiss::Bracket
+  badpair: 0
+  floatCheck: None
+  lastS2ids:
+    - 6
+    - 5
+  members:
+    - &7 !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: ''
+      floats:
+        - ~
+        - Not
+      id: 101
+      name: Al
+      oldId: 101
+      pairingNumber: 1
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - White
+        sign: White
+      rating: 2000
+      roles:
+        - White
+      score: 1
+      scores:
+        1: ~
+      title: Mr.
+    - &8 !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: ''
+      floats:
+        - ~
+        - Down
+      id: 104
+      name: Don
+      oldId: 104
+      pairingNumber: 6
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: ''
+      rating: 1940
+      roles:
+        - Bye
+      score: 1
+      scores:
+        1: Bye
+      title: Mr.
+  number: 1
+  pprime: 1
+  s1:
+    - *7
+  s2:
+    - *8
+    - *2
+  score: 1
+  x: 0
+  xprime: 0

@@ -1,0 +1,170 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            282
+    BUFR edition:                      3
+
+Section 1:
+    Length of section:                 18
+    BUFR master table:                 0
+    Originating subcentre:             0
+    Originating centre:                98
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           21
+    Data subcategory:                  202
+    Master table version number:       13
+    Local table version number:        1
+    Year of century:                   12
+    Month:                             11
+    Day:                               2
+    Hour:                              0
+    Minute:                            0
+
+Section 3:
+    Length of section:                 10
+    Number of data subsets:            2
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       310060
+
+Subset 1
+
+     1  001007              224  SATELLITE IDENTIFIER [CODE TABLE]
+     2  001033              160  IDENTIFICATION OF ORIGINATING/GENERATING CENTRE [CODE TABLE]
+     3  002019              620  SATELLITE INSTRUMENTS [CODE TABLE]
+     4  002020                3  SATELLITE CLASSIFICATION [CODE TABLE]
+     5  004001             2012  YEAR [YEAR]
+     6  004002               11  MONTH [MONTH]
+     7  004003                2  DAY [DAY]
+     8  004004                0  HOUR [HOUR]
+     9  004005                0  MINUTE [MINUTE]
+    10  004006           27.584  SECOND [SECOND]
+    11  027031          6675220  IN DIRECTION OF 0 DEGREES LONGITUDE, DISTANCE FROM THE EARTH'S C [M]
+    12  028031        2628450.5  IN DIRECTION 90 DEGREES EAST, DISTANCE FROM THE EARTH'S CENTRE [M]
+    13  010031        696570.75  IN DIRECTION OF THE NORTH POLE, DISTANCE FROM THE EARTH'S CENTRE [M]
+    14  005001          4.96669  LATITUDE (HIGH ACCURACY) [DEGREE]
+    15  006001         24.54144  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    16  007024            25.41  SATELLITE ZENITH ANGLE [DEGREE]
+    17  005021           282.91  BEARING OR AZIMUTH [DEGREE TRUE]
+    18  007025           150.05  SOLAR ZENITH ANGLE [DEGREE]
+    19  005022           111.28  SOLAR AZIMUTH [DEGREE TRUE]
+    20  008075                1  ASCENDING/DESCENDING ORBIT QUALIFIER [CODE TABLE]
+    21  005041                1  SCAN LINE NUMBER [NUMERIC]
+    22  005045                9  FIELD OF REGARD NUMBER [NUMERIC]
+    23  005043                7  FIELD OF VIEW NUMBER [NUMERIC]
+    24  005040             5258  ORBIT NUMBER [NUMERIC]
+    25  010001              597  HEIGHT OF LAND SURFACE [M]
+    26  007002           829880  HEIGHT OR ALTITUDE [M]
+    27  021166                1  ASCAT LAND FRACTION [NUMERIC]
+    28  008012                0  LAND/SEA QUALIFIER [CODE TABLE]
+    29  020010          missing  CLOUD COVER (TOTAL) [%]
+    30  020014          missing  HEIGHT OF TOP OF CLOUD [M]
+    31  002165             2048  RADIANCE TYPE FLAG [FLAG TABLE]
+    32  033075                0  SCAN LEVEL QUALITY FLAG [FLAG TABLE]
+    33  008076                2  TYPE OF BAND [CODE TABLE]
+    34  006029            65000  WAVE NUMBER [1/M]
+    35  006029           109500  WAVE NUMBER [1/M]
+    36  025140                1  START CHANNEL [NUMERIC]
+    37  025141              713  END CHANNEL [NUMERIC]
+    38  033076                0  CALIBRATION QUALITY FLAG [FLAG TABLE]
+    39  033077             1024  FIELD OF VIEW QUALITY FLAG [FLAG TABLE]
+    40  008076                3  TYPE OF BAND [CODE TABLE]
+    41  006029           121000  WAVE NUMBER [1/M]
+    42  006029           175000  WAVE NUMBER [1/M]
+    43  025140              714  START CHANNEL [NUMERIC]
+    44  025141             1146  END CHANNEL [NUMERIC]
+    45  033076                0  CALIBRATION QUALITY FLAG [FLAG TABLE]
+    46  033077             1024  FIELD OF VIEW QUALITY FLAG [FLAG TABLE]
+    47  008076                4  TYPE OF BAND [CODE TABLE]
+    48  006029           215500  WAVE NUMBER [1/M]
+    49  006029           255000  WAVE NUMBER [1/M]
+    50  025140             1147  START CHANNEL [NUMERIC]
+    51  025141             1305  END CHANNEL [NUMERIC]
+    52  033076                0  CALIBRATION QUALITY FLAG [FLAG TABLE]
+    53  033077             1024  FIELD OF VIEW QUALITY FLAG [FLAG TABLE]
+    54  008076          missing  TYPE OF BAND [CODE TABLE]
+    55  033078                0  GEOLOCATION QUALITY [CODE TABLE]
+    56  033003                0  QUALITY INFORMATION [CODE TABLE]
+    57  031002                5  EXTENDED DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    58  005042                1  CHANNEL NUMBER [NUMERIC]
+    59  014044        0.0462895  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+    60  005042                2  CHANNEL NUMBER [NUMERIC]
+    61  014044        0.0454931  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+    62  005042                3  CHANNEL NUMBER [NUMERIC]
+    63  014044        0.0421172  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+    64  005042                4  CHANNEL NUMBER [NUMERIC]
+    65  014044        0.0453741  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+    66  005042                5  CHANNEL NUMBER [NUMERIC]
+    67  014044        0.0431189  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+
+Subset 2
+
+     1  001007              224  SATELLITE IDENTIFIER [CODE TABLE]
+     2  001033              160  IDENTIFICATION OF ORIGINATING/GENERATING CENTRE [CODE TABLE]
+     3  002019              620  SATELLITE INSTRUMENTS [CODE TABLE]
+     4  002020                3  SATELLITE CLASSIFICATION [CODE TABLE]
+     5  004001             2012  YEAR [YEAR]
+     6  004002               11  MONTH [MONTH]
+     7  004003                2  DAY [DAY]
+     8  004004                0  HOUR [HOUR]
+     9  004005                0  MINUTE [MINUTE]
+    10  004006           27.584  SECOND [SECOND]
+    11  027031          6675220  IN DIRECTION OF 0 DEGREES LONGITUDE, DISTANCE FROM THE EARTH'S C [M]
+    12  028031        2628450.5  IN DIRECTION 90 DEGREES EAST, DISTANCE FROM THE EARTH'S CENTRE [M]
+    13  010031        696570.75  IN DIRECTION OF THE NORTH POLE, DISTANCE FROM THE EARTH'S CENTRE [M]
+    14  005001          5.05004  LATITUDE (HIGH ACCURACY) [DEGREE]
+    15  006001          24.3926  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    16  007024             24.2  SATELLITE ZENITH ANGLE [DEGREE]
+    17  005021           281.97  BEARING OR AZIMUTH [DEGREE TRUE]
+    18  007025           150.22  SOLAR ZENITH ANGLE [DEGREE]
+    19  005022           111.22  SOLAR AZIMUTH [DEGREE TRUE]
+    20  008075                1  ASCENDING/DESCENDING ORBIT QUALIFIER [CODE TABLE]
+    21  005041                1  SCAN LINE NUMBER [NUMERIC]
+    22  005045                9  FIELD OF REGARD NUMBER [NUMERIC]
+    23  005043                8  FIELD OF VIEW NUMBER [NUMERIC]
+    24  005040             5258  ORBIT NUMBER [NUMERIC]
+    25  010001              538  HEIGHT OF LAND SURFACE [M]
+    26  007002           829880  HEIGHT OR ALTITUDE [M]
+    27  021166                1  ASCAT LAND FRACTION [NUMERIC]
+    28  008012                0  LAND/SEA QUALIFIER [CODE TABLE]
+    29  020010          missing  CLOUD COVER (TOTAL) [%]
+    30  020014          missing  HEIGHT OF TOP OF CLOUD [M]
+    31  002165             2048  RADIANCE TYPE FLAG [FLAG TABLE]
+    32  033075                0  SCAN LEVEL QUALITY FLAG [FLAG TABLE]
+    33  008076                2  TYPE OF BAND [CODE TABLE]
+    34  006029            65000  WAVE NUMBER [1/M]
+    35  006029           109500  WAVE NUMBER [1/M]
+    36  025140                1  START CHANNEL [NUMERIC]
+    37  025141              713  END CHANNEL [NUMERIC]
+    38  033076                0  CALIBRATION QUALITY FLAG [FLAG TABLE]
+    39  033077             1024  FIELD OF VIEW QUALITY FLAG [FLAG TABLE]
+    40  008076                3  TYPE OF BAND [CODE TABLE]
+    41  006029           121000  WAVE NUMBER [1/M]
+    42  006029           175000  WAVE NUMBER [1/M]
+    43  025140              714  START CHANNEL [NUMERIC]
+    44  025141             1146  END CHANNEL [NUMERIC]
+    45  033076                0  CALIBRATION QUALITY FLAG [FLAG TABLE]
+    46  033077             1024  FIELD OF VIEW QUALITY FLAG [FLAG TABLE]
+    47  008076                4  TYPE OF BAND [CODE TABLE]
+    48  006029           215500  WAVE NUMBER [1/M]
+    49  006029           255000  WAVE NUMBER [1/M]
+    50  025140             1147  START CHANNEL [NUMERIC]
+    51  025141             1305  END CHANNEL [NUMERIC]
+    52  033076                0  CALIBRATION QUALITY FLAG [FLAG TABLE]
+    53  033077             1024  FIELD OF VIEW QUALITY FLAG [FLAG TABLE]
+    54  008076          missing  TYPE OF BAND [CODE TABLE]
+    55  033078                0  GEOLOCATION QUALITY [CODE TABLE]
+    56  033003                0  QUALITY INFORMATION [CODE TABLE]
+    57  031002                5  EXTENDED DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    58  005042                1  CHANNEL NUMBER [NUMERIC]
+    59  014044        0.0469285  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+    60  005042                2  CHANNEL NUMBER [NUMERIC]
+    61  014044        0.0458891  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+    62  005042                3  CHANNEL NUMBER [NUMERIC]
+    63  014044         0.041389  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+    64  005042                4  CHANNEL NUMBER [NUMERIC]
+    65  014044        0.0447059  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]
+    66  005042                5  CHANNEL NUMBER [NUMERIC]
+    67  014044        0.0430633  CHANNEL RADIANCE [(W/m**2)*(1/sr)*cm]

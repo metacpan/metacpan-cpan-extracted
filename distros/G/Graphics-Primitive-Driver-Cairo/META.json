@@ -1,0 +1,69 @@
+{
+   "abstract" : "Cairo backend for Graphics::Primitive",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graphics-Primitive-Driver-Cairo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cairo" : "0",
+            "Carp" : "0",
+            "Geometry::Primitive::Point" : "0",
+            "Geometry::Primitive::Rectangle" : "0",
+            "Graphics::Primitive::Driver" : "0",
+            "Graphics::Primitive::Driver::TextLayout" : "0",
+            "Graphics::Primitive::TextBox" : "0",
+            "IO::File" : "0",
+            "Math::Trig" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Text::Flow" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Graphics::Color::RGB" : "0",
+            "Graphics::Primitive::Font" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gphat/graphics-primitive-driver-cairo/issues"
+      },
+      "homepage" : "https://github.com/gphat/graphics-primitive-driver-cairo",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gphat/graphics-primitive-driver-cairo.git",
+         "web" : "https://github.com/gphat/graphics-primitive-driver-cairo"
+      }
+   },
+   "version" : "0.47",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

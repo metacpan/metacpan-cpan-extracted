@@ -1,0 +1,60 @@
+<html>
+<!-- version 1.00 3-24-12 -->
+<head>
+<title>Color Picker</title>
+<script language=javascript1.2>
+
+var cbID = null;	// set by onLoad of colorbar.html
+var textback = -1;	// 0 = text, 1 = back
+var mytext = '#FFFFFF';
+var myback = '#000000';
+
+function setHTML() {
+  cbID.innerHTML = "background color = " + myback + "&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;text color = " + mytext;
+}
+
+function setTcolor (child) {
+  mytext = '#' + child.hex;
+  cbID.style.color = mytext;
+  setHTML();
+}
+
+function setBcolor (child) {
+  myback = '#' + child.hex;
+  cbID.style.backgroundColor = myback;
+  setHTML();
+}
+
+function setText (child) {
+  if (textback < 0 || textback == 0)
+    setTcolor(child);
+  textback = 0;
+  return false;
+}
+
+function setBack (child) {
+  if (textback < 0 || textback == 1)
+    setBcolor(child);
+  textback = 1;
+  return false;
+}
+
+function update_hook (child) {
+  if (textback < 0)
+    return;
+  if (textback == 0) {
+    setTcolor(child);
+    return;
+  }
+  if (textback > 0)
+    setBcolor(child);
+}
+  
+  
+</script>
+</head>
+<frameset rows="100,*" frameborder="0" border="0" framespacing="0">
+  <frame name=colorbar src="colorbar.html" scrolling=auto marginwidth=10 marginheight=10 frameborder=0 noresize>
+  <frame name=thepicker src="./p_gen2.cgi" scrolling=auto marginwidth=10 marginheight=10 frameborder=0>
+</frameset>
+</html>

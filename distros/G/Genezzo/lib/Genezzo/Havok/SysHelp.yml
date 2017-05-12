@@ -1,0 +1,32 @@
+# havok version=7.17
+ABSTRACT:     
+AUTHOR:    Jeffrey I Cohen (jcohen@cpan.org)
+DML:    
+  -    
+    check:    
+      -    select * from user_functions where xname = 'Genezzo::Havok::SysHelp'
+
+    install:    
+      -    select add_user_function('sqlname=add_help', 'argstyle=HASH', 'function=sql_func_add_help', 'creationdate=2007-07-16T07:36:52', 'module=Genezzo::Havok::SysHelp') from dual
+      -    select add_help('Genezzo::BasicHelp') from dual
+      -    select add_help('Genezzo::Havok::Utils') from dual
+      -    select register_havok_package('modname=Genezzo::Havok::SysHelp', 'creationdate=2007-07-16T07:36:52', 'version=1.08') from dual
+
+
+
+LICENSE:    gpl
+NAME:    Genezzo::Havok::SysHelp
+PREREQ_HAVOK:    
+  Genezzo::Havok:    0.0
+  Genezzo::Havok::UserFunctions:    0.0
+  Genezzo::Havok::Utils:    0.0
+
+TABLEDEFS:    
+  sys_help:    
+    create_table:    id=n owner=c creationdate=c version=c module=c
+    dml:    
+
+
+
+UPDATED:    2007-07-16T00:39:37
+VERSION:    1.08

@@ -1,0 +1,136 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+#BEGIN { $Gimp::verbose = 3; }
+use Gimp;
+use Gimp::Fu;
+use Gimp::Extension;
+use Gimp::Data;
+use List::Util qw(min max);
+
+my $SAVEDIR = "$ENV{HOME}/.gimp-autosave2";
+my $OPENKEY = "extension_autosave2/openfiles";
+my $CONFKEY = "extension_autosave2/config";
+
+my %CHAR2ENCODED = ('%' => '%%', '/' => '%2F');
+sub encode_filename {
+  my $file = shift;
+  $file =~ s#([%/])#$CHAR2ENCODED{$1}#g;
+  $file;
+}
+
+my $config = { active => 1, interval => 5, };
+my $timeout_handle;
+
+sub save_dirty {
+  warn "$$-calling save_dirty" if $Gimp::verbose;
+  my @images = grep { $_->is_dirty } Gimp::Image->list;
+  return 1 unless @images;
+  warn "$$-save_dirty got @images" if $Gimp::verbose >= 2;
+  mkdir $SAVEDIR or die "$SAVEDIR: $!\n" unless -d $SAVEDIR;
+  my @openfiles;
+  for my $i (@images) {
+    my $file = $i->get_filename // '';
+    if ($file !~ /^$SAVEDIR/) {
+      $file = "$SAVEDIR/" . (encode_filename($file) || "Untitled-${$i}.xcf");
+    }
+    warn "$$-saving $$i as $file" if $Gimp::verbose >= 2;
+    eval { Gimp->xcf_save(0, $i, 0, $file, $file); };
+    if ($@) { warn "$file: $@\n"; next; }
+    push @openfiles, $file;
+  }
+  $Gimp::Data{$OPENKEY} = \@openfiles;
+  1;
+}
+
+podregister_temp autosave2_configure => sub {
+  my ($active, $interval) = @_;
+  warn "config got $active, $interval" if $Gimp::verbose;
+  $interval = max(5, min(600, $interval));
+  if ($timeout_handle and ($interval != $config->{interval} || !$active)) {
+    warn "$$-autosave2 removing timer $timeout_handle" if $Gimp::verbose >= 2;
+    Glib::Source->remove($timeout_handle);
+    undef $timeout_handle;
+  }
+  if ($active && !$timeout_handle) {
+    $timeout_handle = Glib::Timeout->add_seconds($interval, \&save_dirty);
+    warn "$$-autosave2 timer $interval seconds->$timeout_handle"
+      if $Gimp::verbose >= 2;
+  }
+  $config = $Gimp::Data{$CONFKEY} = {active => $active, interval => $interval};
+  ();
+};
+
+podregister {
+  $config = $Gimp::Data{$CONFKEY} || $config;
+  $config->{interval} = max(5, min(600, $config->{interval}));
+  if ($config->{active}) {
+    warn "$$-autosave2 active(interval=$config->{interval})"
+      if $Gimp::verbose >= 2;
+    my @images; # displaying won't work immediately!
+    for my $f (@{ $Gimp::Data{$OPENKEY} || [] }) {
+      eval { push @images, Gimp->file_load(Gimp::RUN_NONINTERACTIVE, $f, $f); };
+      warn "$$-autosave2 opening $f" if $Gimp::verbose >= 2;
+    }
+    Glib::Timeout->add_seconds(1, sub {
+      warn "$$-autosave2 delay display(@images)" if $Gimp::verbose >= 2;
+      for my $i (0..$#images) {
+	next unless defined $images[$i];
+	my $d = eval { Gimp::Display->new($images[$i]); };
+	next if $@;
+	$images[$i] = undef if $d or not $images[$i]->is_valid;
+      }
+      (grep { defined } @images) > 0;
+    });
+    $Gimp::Data{$OPENKEY} = [];
+    $timeout_handle = Glib::Timeout->add_seconds(
+      $config->{interval}, \&save_dirty
+    );
+  }
+  Gtk2->main;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+extension_autosave2 - Periodically save all open images to temporary files
+
+=head1 SYNOPSIS
+
+<None>
+
+=head1 DESCRIPTION
+
+Every so many seconds (configurable), go through open images, and if
+modified, save a copy in C<~/.gimp-autosave2>. On startup, if unsaved
+images were open, reopen them.
+
+=head1 TEMPORARY PROCEDURES
+
+=head2 autosave2_configure - Edit settings
+
+Set whether active, and how often to save.
+
+=head3 SYNOPSIS
+
+<Toolbox>/Edit/Autosave2 _settings...
+
+=head3 PARAMETERS
+
+  [PF_TOGGLE, 'active', 'Autosave active', 1],
+  [PF_SLIDER, 'interval', "Save interval in seconds", 120, [5, 600, 5]],
+
+=head1 AUTHOR
+
+Ed J, based on an idea by Rain.
+
+=head1 DATE
+
+2014-05-24
+
+=head1 LICENSE
+
+As Gimp-Perl.

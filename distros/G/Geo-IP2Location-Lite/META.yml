@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - 'Lee Johnson <leejo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Deep: '0.113'
+  Test::Exception: '0.32'
+  Test::More: '0.31'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-IP2Location-Lite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Humanstate/geo-ip2location-lite/issues
+  homepage: https://metacpan.org/module/Geo::IP2Location::Lite
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Humanstate/geo-ip2location-lite
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

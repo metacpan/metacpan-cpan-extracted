@@ -1,0 +1,68 @@
+NAME
+    Geo::Fips55 - Perl extension for parsing FIPS-55 gazetteer data
+
+SYNOPSIS
+      use Geo::Fips55;
+
+      @records = Geo::Fips55->parse_file( $filehandle );
+  
+      Geo::Fips55->parse_file( $filehandle, \&callback );
+
+      $record = Geo::Fips55->new( \%data );
+
+      $record->state_fips();
+      $record->place_fips();
+      $record->state();
+      $record->num_counties();
+      $record->crsn();
+      $record->class();
+      $record->name();
+      $record->county_fips();
+      $record->county();
+      $record->part_of();
+      $record->other_name();
+      $record->zip();
+      $record->postal_match();
+      $record->zip_range();
+      $record->gsa();
+      $record->mrf();
+      $record->msa();
+      $record->cd1(); # and so on up to cd14()
+
+DESCRIPTION
+    Geo::Fips55 provides a representation of the US Geological Survey
+    FIPS-55 gazetteer format. Each object is one record. It also contains
+    methods to parse FIPS-55 data files and turn them into objects.
+
+    This is intended as an intermediate format between pulling the raw data
+    out of the simplistic FIPS-55 data files into something more
+    sophisticated (a process you should only have to do once). As such, its
+    not very fast, but its careful, easy to use and performs some
+    verifications on the data being read.
+
+    This module subclasses Michael Schwern's very nice Geo::TigerLine
+    modules to do all the heavy lifting.
+
+BUGS, CAVEATS, ETC.
+    This module wasn't automatically generated like the
+    Geo::TigerLine::Record::* modules were. Probably it should have been,
+    but the FIPS data record layout changes even less often than the TIGER
+    data -- the last revision to the FIPS-55 spec was in 1994. If it ever
+    gets revised, I will gladly update this module by hand.
+
+SEE ALSO
+    You can learn more about the FIPS-55 standard and download the entire US
+    geographic names database from <http://geonames.usgs.gov/fips55.html>.
+
+    Geo::TigerLine(3pm)
+
+AUTHOR
+    Schuyler D. Erle <schuyler@nocat.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Schuyler D. Erle
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

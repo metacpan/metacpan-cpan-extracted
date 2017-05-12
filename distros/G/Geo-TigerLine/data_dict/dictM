@@ -1,0 +1,13 @@
+Record Type M - Feature Spatial Metadata Record
+
+Field      BV  Fmt Type  Beg End Len Description
+RT         No   L    A    1    1  1  Record Type 
+VERSION    No   L   N     2    5  4  Version Number 
+TLID       No   R   N     6   15 10  TIGER/Line ID, Permanent 1-Cell Number 
+RTSQ       No   R   N    16   18  3  Record Sequence Number 
+SOURCEID   Yes  L    A   19   28 10  TIGER 1-Cell Source Code 
+ID         Yes  L    A   29   46 18  Identification Code 
+IDFLAG     Yes  R    A   47   47  1  Identification Code Flag 
+RS-M1      Yes  L   N    48   65 18  Reserved Space M1 
+RS-M2      Yes  L    A   66   67  2  Reserved Space M2 
+RS-M3      Yes  L   N    68   90 23  Reserved Space M3 

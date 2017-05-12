@@ -1,0 +1,14 @@
+~$
+\.bak$
+blib
+\.bs$
+build
+\.c$
+CVS
+\.cvsignore$
+Makefile$
+Makefile\.old$
+\.o$
+perl-Gtk2-Ex-Simple-List.spec$
+\.sw.$
+\.tar.gz$

@@ -1,0 +1,40 @@
+{
+   "abstract" : "Implementing a myriad of Go rulesets",
+   "author" : [
+      "Zach Morgan <zpmorgan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300026, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Go-Cinderblock",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Moose" : "0",
+            "Scalar::Util::Numeric" : "0",
+            "Test::Exception" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://metacpan.org/release/Games-Go-Cinderblock",
+      "repository" : {
+         "url" : "https://github.com/zpmorgan/Games-Go-Cinderblock"
+      }
+   },
+   "version" : "0.13"
+}
+

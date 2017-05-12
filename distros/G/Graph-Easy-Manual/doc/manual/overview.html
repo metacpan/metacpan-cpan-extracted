@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - Manual - Overview</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link rel="Start" href="index.html">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+  <a class="menubck" href="index.html" title="Back to the manual index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+  <a class="menucur" href="overview.html" title="How everything fits together">Overview</a>
+    <a class="menuind" href="#inout" title="Input/Output and data flow">Dataflow</a>
+    <a class="menuind" href="#layout" title="Storage vs. Layout">Layouts</a>
+    <a class="menuind" href="features.html" title="Feature list - what is possible with Graph::Easy">Features</a>
+    <a class="menuind" href="glossary.html" title="You said what?">Glossary</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+  <a class="menuext" href="hinting.html" title="Generating specific layouts">Hinting</a>
+  <a class="menuext" href="output.html" title="Output formats and their limitations">Output</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+  <a class="menuext" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+  <a class="menuext" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+  <a class="menuext" href="tutorial.html" title="Tutorial for often used graph types and designs">Tutorial</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h1>
+
+<h2>Overview</h2>
+
+<div class="text">
+
+<a name="inout">
+<h3>Input and Output</h3>
+</a>
+
+<p>
+Here is an overview of the data flow. Input is shown green, while direct output of Graph::Easy
+is shown orange. The nodes in white are part of Graph::Easy.
+<br>
+Nodes in yellow show some possible output formats enabled via third-party
+applications like 'dot'.
+</p>
+
+<img src="img/dataflow.png" alt="Data flow of Graph::Easy" title="Data flow of Graph::Easy">
+
+<p>
+There are many ways to create the internal data necessary for
+<code>Graph::Easy</code> to work with it:
+</p>
+
+<ul>
+  <li>Use the <a href="http://bloodgate.com/graph-easy/">interactive graph editor</a>
+  <li>Write a text in one of the formats Graph::Easy understands (Graphviz, Graph::Easy, VCG, GDL) and use
+   the command line utility <b><a href="http://search.cpan.org/~tels/Graph-Easy/bin/graph-easy"
+     title="graph-easy manual">graph-easy</a></b> to parse, convert and layout it.
+   (This script is installed as part of Graph::Easy.)
+  <li>Write Perl code (see below)
+</ul>
+
+<p>&nbsp;</p>
+
+<p>
+Here is a bit of example Perl code:
+</p>
+
+<pre>
+use strict;
+use Graph::Easy;
+
+my $graph = Graph::Easy->new();
+
+$graph->add_edge('Bonn', 'Berlin');
+$graph->add_edge('Berlin', 'Bonn', 'train' );
+</pre>
+
+<p>
+And here is the corrosponding textual description:
+</p>
+
+<pre>
+[ Berlin ] -- train --> [ Bonn ]
+[ Bonn ] --> [ Berlin ]
+</pre>
+
+<p>
+As you can see, the textual description is a bit shorter. Wether you want to convert
+your input data to text and then parse it, or convert it directly with Perl
+code is up to you, of course.
+</p>
+
+<p>
+Likewise, once you have your data in an <code>Graph::Easy</code> object, you can output it in the
+format you desire.
+</p>
+
+<p>
+Note that the textual description format allows you a round-trip: you can feed
+it to the Parser, and then generate text again from the resulting <code>Graph::Easy</code> object.
+</p>
+
+<a name="layout">
+<h3>Storage vs. Layout</h3>
+</a>
+
+<p>
+Graph::Easy did use the <a href="http://search.cpan.org/~jhi/Graph/">Graph</a> module
+to internally store and manage the graph data. Since v0.25, it no longer does so, instead
+it stores the nodes/edges simply as Perl hashes and then accesses them directly.
+If you want to know why, please ready this <a href="benchmark.html">page</a>.
+<br>
+Note that both the <code>Graph</code> and <code>Graph::Easy</code> modules do
+<em>only</em> store a representation of the graph, but not a particular layout.
+For instance the following graph (given in the Graph::Easy syntax, more on that below):
+</p>
+
+<pre>
+[ A ] -> [ C ] -> [ D ]
+[ C ] -> [ E ]
+</pre>
+
+<p>
+can be laid out in (probably infinitely) many ways. Here are two examples:
+</p>
+
+<img src="img/example1.png" alt="Example layout of simple graph" class="float">
+<pre class="graph">
++---+     +---+     +---+
+| A | --> | C | --> | D |
++---+     +---+     +---+
+            |
+            |
+            v
+          +---+
+          | E |
+          +---+
+</pre>
+
+<div class="clear"></div>
+
+<h3>Layouts</h3>
+
+<p>
+To generate a specific layout, you need a module that provides this functionality.
+There are some possibilities for generating a layout from a graph via Perl:
+</p>
+
+<ul>
+  <li>Graph::Easy
+  <li><a href="http://www.graphviz.org/">dot</a> (via graphviz)
+  <li><a href="http://search.cpan.org/~pasky/Graph-Layderer/">Graph-Layderer</a>
+  <li><a href="http://search.cpan.org/~thospel/Graph-Layout-Aesthetic/">Graph-Layout-Aesthetic</a>
+</ul>
+
+<p>
+There might be more - when I started with <code>Graph::Easy</code>, this were the options.
+</p>
+
+<p>
+Unlike the others, <code>Graph::Easy</code> works on a checker-board tiled layout.
+<br>
+Note that the traditional way of placing the nodes <em>anywhere</em> does not enable you
+to generate ASCII output, nor HTML. Well, it might be possible, but it is quite hard to
+do when the edges don't run straight but all over the place :-)
+</p>
+
+<p>
+That's one of the reasons for the existance of this project. :-P
+</p>
+
+</div><div class="text next">
+
+<p>
+Please continue with the chapter about the <a href="features.html">feature set</a>.
+</p>
+
+</div>
+
+<div class="footer">
+Page created <span class="date">2005-08-07</span> by <a href="http://bloodgate.com/mail.html">Tels</a>.
+Last update: <span class="date">2007-09-09</span>
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>

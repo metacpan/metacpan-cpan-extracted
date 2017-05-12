@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+BEGIN
+{
+	unshift(@INC,".");
+};
+use Test::Harness qw( :DEFAULT $switches );
+$switches = "";  #no opt_w
+@testList = <t/*.t>;
+
+my $first = "t/get.t";
+grep {if ($_ eq $first) {$_ = $testList[0]; $testList[0] = $first}} @testList;
+@testList or die "no tests found: t/*.t";
+runtests @testList;
+
+
+__END__
+
+Synopsis:
+
+GT_UPDATE=1 perl t/TEST  # set original output for future comparison
+
+# edit source code internals in a way 
+
+perl t/TEST    # see diffs of output since you ran with GT_UPDATE

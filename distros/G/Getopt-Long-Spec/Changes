@@ -1,0 +1,26 @@
+Changelog for Getopt-Long-Spec
+
+0.002 2012-07-16T15:12:11
+ [Stephen R. Scaffidi <sscaffidi@gmail.com>]
+ - updated readme
+
+ - prefer link format used on metacpan
+
+
+ [Stephen R. Scaffidi <stephen@scaffidi.net>]
+ - fixed some documentation to reflect name change during development
+
+
+v0.001 2012-07-14T15:55:01
+ [Stephen R. Scaffidi <stephen@scaffidi.net>]
+ - whitespace
+
+ - lotsa tests
+
+ - cleanup, passing more tests
+
+ - removed explicit version from dist.ini
+
+ - initial commit
+
+

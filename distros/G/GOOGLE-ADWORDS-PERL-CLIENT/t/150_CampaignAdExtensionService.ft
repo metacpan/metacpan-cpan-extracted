@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+#
+# Copyright 2011, Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Functional tests for the CampaignAdExtensionService.
+#
+# Author: David Torres <api.davidtorres@gmail.com>
+
+use strict;
+use lib qw(t/util);
+
+use Test::More (tests => 32);
+use TestClientUtils qw(get_test_client);
+use TestAPIUtils qw(get_api_package create_campaign delete_campaign
+                    get_location_for_address);
+
+# Getting API client for functional tests.
+my $client = get_test_client();
+if (!$client) {
+  plan skip_all => "Can't create test client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+# Test can use CampaignAdExtensionService related classes.
+use_ok(get_api_package($client, "Address"));
+use_ok(get_api_package($client, "AdExtension"));
+use_ok(get_api_package($client, "CampaignAdExtension"));
+use_ok(get_api_package($client, "CampaignAdExtensionOperation"));
+use_ok(get_api_package($client, "CampaignAdExtensionPage"));
+use_ok(get_api_package($client, "CampaignAdExtensionReturnValue"));
+use_ok(get_api_package($client, "LocationExtension"));
+use_ok(get_api_package($client, "Selector"));
+
+# API dependencies for this test.
+my $campaign = create_campaign($client);
+my $location = get_location_for_address($client,
+    get_api_package($client, "Address")->new({
+      streetAddress => "1600 Amphitheatre Pkwy, Mountain View",
+      countryCode => "US"
+    }));
+
+# Test add a campaign ad extension.
+my $location_extension =
+    get_api_package($client, "LocationExtension")->new({
+      address => $location->get_address(),
+      geoPoint => $location->get_geoPoint(),
+      encodedLocation => $location->get_encodedLocation(),
+      source => "ADWORDS_FRONTEND"
+    });
+my $campaign_ad_extension =
+    get_api_package($client, "CampaignAdExtension")->new({
+      campaignId => $campaign->get_id(),
+      adExtension => $location_extension,
+      status => "ACTIVE"
+    });
+my $result = $client->CampaignAdExtensionService()->mutate({
+  operations => [get_api_package($client, "CampaignAdExtensionOperation")->new({
+    operator => "ADD",
+    operand => $campaign_ad_extension
+  })]
+});
+ok($result, "Result from adding CampaignAdExtension is valid");
+isa_ok($result, get_api_package($client, "CampaignAdExtensionReturnValue"));
+ok($result->get_value(), "Result value is valid");
+is(scalar(@{$result->get_value()}), 1, "Results array size is correct");
+ok($result->get_value()->[0], "Returned CampaignAdExtension is valid");
+isa_ok($result->get_value()->[0],
+       get_api_package($client, "CampaignAdExtension"));
+ok($result->get_value()->[0]->get_adExtension(),
+   "Returned LocationExtension is valid");
+isa_ok($result->get_value()->[0]->get_adExtension(),
+       get_api_package($client, "LocationExtension"),
+       "Results contain LocationExtension");
+$campaign_ad_extension = $result->get_value()->[0];
+
+# Test get all ad extensions.
+$result = $client->CampaignAdExtensionService()->get({
+  serviceSelector => get_api_package($client, "Selector")->new({
+    fields => ["CampaignId", "AdExtensionId"],
+    predicates => [
+      get_api_package($client, "Predicate")->new({
+        field => "CampaignId",
+        operator => "IN",
+        values => [$campaign->get_id()->get_value()]
+      })
+    ]
+  })
+});
+ok($result, "Result from getting campaign ad extension is valid");
+isa_ok($result, get_api_package($client, "CampaignAdExtensionPage"));
+ok($result->get_entries(), "Result entries is valid");
+is(scalar(@{$result->get_entries()}), 1, "Result entries length is correct");
+isa_ok($result->get_entries()->[0],
+       get_api_package($client, "CampaignAdExtension"));
+is($result->get_entries()->[0]->get_campaignId(), $campaign->get_id(),
+   "Campaign id of ad extension is correct");
+ok($result->get_entries()->[0]->get_adExtension(), "Ad extension is set");
+is($result->get_entries()->[0]->get_adExtension()->get_id(),
+   $campaign_ad_extension->get_adExtension()->get_id(),
+   "Ad extension id is correct");
+
+# Test remove ad extension.
+my $campaign_ad_extension_to_remove =
+    get_api_package($client, "CampaignAdExtension")->new({
+      campaignId => $campaign->get_id(),
+      adExtension => get_api_package($client, "AdExtension")->new({
+        id => $campaign_ad_extension->get_adExtension()->get_id()
+      })
+    });
+$result = $client->CampaignAdExtensionService()->mutate({
+  operations => [get_api_package($client, "CampaignAdExtensionOperation")->new({
+    operator => "REMOVE",
+    operand => $campaign_ad_extension_to_remove
+  })]
+});
+ok($result, "Result from removing ad extension is valid");
+isa_ok($result, get_api_package($client, "CampaignAdExtensionReturnValue"));
+is(scalar(@{$result->get_value()}), 1, "Result value length is correct");
+isa_ok($result->get_value()->[0],
+       get_api_package($client, "CampaignAdExtension"));
+is($result->get_value()->[0]->get_status(), "DELETED",
+   "Campaign ad extension status is deleted");
+is($result->get_value()->[0]->get_campaignId(), $campaign->get_id(),
+   "Campaign id of ad extension is correct");
+ok($result->get_value()->[0]->get_adExtension(), "Ad extension is set");
+is($result->get_value()->[0]->get_adExtension()->get_id(),
+   $campaign_ad_extension->get_adExtension()->get_id(),
+   "Ad extension id is correct");
+
+# Cleaning up test dependencies.
+delete_campaign($client, $campaign->get_id());

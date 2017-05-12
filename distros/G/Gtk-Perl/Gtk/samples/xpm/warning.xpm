@@ -1,0 +1,29 @@
+/* XPM */
+static char *texture[] = {
+/* width height ncolors chars_per_pixel */
+"20 20 2 1",
+/* colors */
+"` c #000000",
+"a c #FFFF00",
+/* pixels */
+"`````````aaaaaaaaaa`",
+"````````aaaaaaaaaa``",
+"```````aaaaaaaaaa```",
+"``````aaaaaaaaaa````",
+"`````aaaaaaaaaa`````",
+"````aaaaaaaaaa``````",
+"```aaaaaaaaaa```````",
+"``aaaaaaaaaa````````",
+"`aaaaaaaaaa`````````",
+"aaaaaaaaaa``````````",
+"aaaaaaaaa``````````a",
+"aaaaaaaa``````````aa",
+"aaaaaaa``````````aaa",
+"aaaaaa``````````aaaa",
+"aaaaa``````````aaaaa",
+"aaaa``````````aaaaaa",
+"aaa``````````aaaaaaa",
+"aa``````````aaaaaaaa",
+"a``````````aaaaaaaaa",
+"``````````aaaaaaaaaa"
+};

@@ -1,0 +1,33 @@
+---
+abstract: 'Show the working tree status'
+author:
+  - 'Jakob Voß'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.037'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Repository-Plugin-Status
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Git::Repository: '1.3'
+resources:
+  bugtracker: https://github.com/nichtich/Git-Repository-Plugin-Status/issues
+  homepage: https://github.com/nichtich/Git-Repository-Plugin-Status
+  repository: https://github.com/nichtich/Git-Repository-Plugin-Status.git
+version: '0.03'
+x_contributors:
+  - 'Jakob Voss <jakob@nichtich.de>'
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Michael G. Schwern <schwern@pobox.com>'

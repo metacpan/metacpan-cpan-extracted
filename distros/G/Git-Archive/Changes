@@ -1,0 +1,31 @@
+Revision history for Git-Archive
+
+0.10  2014-01-06 09:13:07 GMT
+        - Set git user name & email in tests if not already done
+
+0.09  2014-01-02 11:34:29 GMT
+        - Set git user name & email if not already done
+
+0.08  2013-12-24 11:29:11 GMT
+        - Added optional sudo parameter
+
+0.07  2013-12-23 12:39:35 GMT
+        - Accept multiple filenames in a single string, space-separated, after all
+
+0.06  2013-12-23 11:22:15 GMT
+        - Handle filenames with spaces in
+
+0.05  2013-12-23 09:35:54 GMT
+        - Minor test update
+
+0.04  2013-12-22 14:25:08 GMT
+        - Fix possibility of git not being installed
+
+0.03  2013-12-20 10:49:07 GMT
+        - Fix missing newline in error msg
+
+0.02  2013-12-20 10:46:44 GMT
+        - Fix adding multiple files when calling all_dirty
+
+0.01  2013-12-20 10:19:05 GMT
+        - Initial release

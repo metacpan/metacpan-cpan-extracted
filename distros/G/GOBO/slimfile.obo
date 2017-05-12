@@ -1,0 +1,127 @@
+format-version: 1.2
+date: 14:07:2009 13:33
+auto-generated-by: OBO-Edit 2.0
+synonymtypedef: systematic_synonym "Systematic synonym" EXACT
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_test "Test GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+remark: cvs version: $Revision: 1.239 $
+
+[Term]
+id: GO:0000001
+name: test term GO:0000001
+namespace: test_ontology
+subset: goslim_test
+relationship: negatively_regulates GO:0000010 ! test term GO:0000010
+
+[Term]
+id: GO:0000002
+name: test term GO:0000002
+namespace: test_ontology
+subset: goslim_test
+relationship: part_of GO:0000010 ! test term GO:0000010
+is_a: GO:0000006 ! test term GO:0000006
+is_a: GO:0000007 ! test term GO:0000007
+
+[Term]
+id: GO:0000003
+name: test term GO:0000003
+namespace: test_ontology
+subset: goslim_generic
+subset: goslim_pir
+subset: goslim_test
+subset: gosubset_prok
+relationship: part_of GO:0000007 ! test term GO:0000007
+
+[Term]
+id: GO:0000004
+name: test term GO:0000004
+namespace: test_ontology
+subset: goslim_test
+is_a: GO:0000014 ! test term GO:0000014
+relationship: negatively_regulates GO:0000014 ! test term GO:0000014
+relationship: positively_regulates GO:0000015 ! test term GO:0000015
+
+[Term]
+id: GO:0000006
+name: test term GO:0000006
+namespace: test_ontology
+subset: goslim_test
+is_a: GO:0000010 ! test term GO:0000010
+
+[Term]
+id: GO:0000007
+name: test term GO:0000007
+namespace: test_ontology
+subset: goslim_test
+relationship: part_of GO:0000010 ! test term GO:0000010
+
+[Term]
+id: GO:0000010
+name: test term GO:0000010
+namespace: test_ontology
+subset: goslim_test
+subset: gosubset_prok
+is_a: GO:0000019 ! test_ontology
+
+[Term]
+id: GO:0000014
+name: test term GO:0000014
+namespace: test_ontology
+subset: goslim_test
+is_a: GO:0000019 ! test_ontology
+
+[Term]
+id: GO:0000015
+name: test term GO:0000015
+namespace: test_ontology
+subset: goslim_test
+relationship: part_of GO:0000014 ! test term GO:0000014
+
+[Term]
+id: GO:0000019
+name: test_ontology
+namespace: test_ontology
+
+[Term]
+id: GO:0000024
+name: test term GO:0000024
+namespace: test_ontology
+subset: goslim_test
+is_a: GO:0000019 ! test_ontology
+relationship: part_of GO:0000025 ! test term GO:0000025
+
+[Term]
+id: GO:0000025
+name: test term GO:0000025
+namespace: test_ontology
+subset: goslim_test
+relationship: part_of GO:0000019 ! test_ontology
+
+[Typedef]
+id: negatively_regulates
+name: negatively_regulates
+namespace: test_ontology
+is_a: regulates ! regulates
+
+[Typedef]
+id: part_of
+name: part_of
+namespace: test_ontology
+is_transitive: true
+
+[Typedef]
+id: positively_regulates
+name: positively_regulates
+namespace: test_ontology
+is_a: regulates ! regulates
+
+[Typedef]
+id: regulates
+name: regulates
+namespace: test_ontology

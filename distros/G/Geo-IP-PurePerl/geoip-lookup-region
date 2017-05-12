@@ -1,0 +1,18 @@
+#!/usr/bin/perl -Ilib -w
+
+use strict;
+
+use Geo::IP::PurePerl;
+#use Getopt::Std;
+
+#use Locale::Country;
+
+
+my $addr = $ARGV[0];
+
+my $gi = Geo::IP::PurePerl->new("/usr/local/share/GeoIP/GeoIPRegion.dat",GEOIP_STANDARD);
+
+my ($country,$region) = $gi->region_by_name($addr);
+
+print $country . " " . $region . "\n";
+

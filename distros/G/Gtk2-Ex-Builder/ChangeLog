@@ -1,0 +1,28 @@
+2011-03-06  Hojung Youn  <amorette@cpan.org>
+
+	v0.003001
+	it's still not a stable version.
+
+	* lib/Gtk2/Builder.pm: 'meta' keyword renamed to 'info' from now on.
+	'meta' package symbol conflicts with Moose's 'meta' symbol when used
+	together.
+
+2011-03-04  Hojung Youn  <amorette@cpan.org>
+
+	v0.003
+	it's not a stable version.
+
+	* lib/Gtk2/Builder.pm: now you shoud build() your builder{}ed object
+	to create an widget in this wrapper. inner builder blocks as a 'hav' argument
+	are automatically builds before adding. <issue:0002>
+	* lib/Gtk2/Builder.pm: some exception checks have been added, which handle
+	whether functions are called for methods or not.
+	* lib/Gtk2/Builder.pm: 'is_built' accessor added.
+
+2011-03-02  Hojung Youn  <amorette@cpan.org>
+
+	v0.001 released! :3
+
+	* lib/Gtk2/Ex/Builder.pm: is a main module.
+	* dist.ini: added prerequisites and notice that Class::Accessor supports
+	moose-like keywords only from version 0.34.

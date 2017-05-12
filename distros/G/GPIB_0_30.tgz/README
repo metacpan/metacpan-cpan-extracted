@@ -1,0 +1,328 @@
+Perl Interface to GPIB 
+
+    Jeff Mock
+    1859 Scott St.
+    San Francisco, CA 94115
+    jeff@mock.com
+    (c) 1999
+
+    Second Release
+    Version 0.30
+    Jan 1, 2002
+
+    This release changes the root module name from "gpib" to "GPIB"
+    to match CPAN naming conventions.  It also fixes a little thing
+    that broke with Perl 5.6.x where one of the variable names in the
+    XS module collided with a new reserved word.  The interface to
+    LLP device driver has been disabled by default.  This interface
+    doesn't seem to be used any longer.  The code is still there 
+    but it is old and probably broken.
+
+    First Release
+    Version 0.20
+    May 31, 1999
+
+    http://www.mock.com/gpib
+
+This collection of Perl modules provides an easy method for doing 
+small programming tasks on GPIB devices and a structure for writing 
+sophisticated instrument control applications where code can be 
+easily resused.  Consistent with the overall Perl philosophy, these 
+modules hopefully make easy things easy and difficult things possible.
+
+This package has been tested on both Linux and NT4.0 on a variety of
+GPIB and serial devices.  I've tested with the following:
+
+    NT4.0 using National Instruments PCI-GPIB card
+    NT4.0 using remote network access to GPIB server
+    Linux 2.0.36 using National Instruments PCI-GPIB card (NI device driver)
+    Linux 2.0.36 using NI PCIIA GPIB card with LLP device driver
+    Linux 2.0.36 using serial access to HP33120A and HPE3631A.
+    Linux 2.0.36 using remote network access to GPIB server
+    Linux 2.0.36 running GPIB server for remote access
+
+First Release supports:
+    OS:                     Linux, NT4.0
+
+    Low level interfaces:   National Instruments GPIB-PCI card with
+                            NI device drivers (other NI products will likely 
+                            work, but untested) on Linux and NT4.0.
+
+                            Serial port connection to HP test equipment
+                            from Linux
+    
+                            Linux Lab Project (LLP) device driver for NI PCIIA
+                            GPIB card on Linux
+
+                            TCP/IP connection to remote machine acting
+                            as GPIB proxy.
+
+    Instrument Drivers      HP3585A  Spectrum Analyser
+                            HP33120A Function generator
+                            HPE3631A Power supply
+                            HP59306A Relay Acutator    
+                        
+
+History
+-------
+
+GPIB programming of test equipment has rarely been fun for me.  I seem to 
+spend too much time dealing with sundry aspects of the GPIB bus and not 
+enough time making instruments doing interesting tasks.  This is really 
+a shame, it should be a joy to program the flashing lights on an expensive 
+piece of test equipment.
+
+I'm a big Linux fan, I've followed the Linux Lab Project for some time.
+I ran across a Perl XS module Steve Tell at UNC (tell@cs.unc.edu)
+wrote for making GPIB calls from Perl.  This module showed me that
+Perl is a great programming language for GPIB control. I think this was the
+first time I actually had fun writing programs to control GPIB 
+devices.
+
+This set of modules is inspired by Steve's original module.  This
+is a collection of modules written in a bit more of an object oriented
+style to provide an infrastructure that makes it trivial (and fun) to
+do simple things and well suited to writing large control applications.
+
+Overview
+--------
+
+The central module is GPIB.pm.  This module reads a configuration file
+/etc/pgpib.conf that describes devices, the low level interface (GPIB,
+serial, remote network connections, etc), and various parameters 
+for accessing the devices.  This configuration is a simple text file
+and all local configuration parameters are described in this file.
+
+Gpib.pm provides GPIB functions familiar to anyone that has done
+GPIB programming in C.  The main difference is that it is an 
+object oriented module and the GPIB calls are method calls.
+The API is further simplified by the untyped nature of the Perl
+language.  Much of the format conversion common in GPIB programs
+is trivial or handled automatically by Perl.
+
+GPIB.pm delegates device operations to low level modules that do 
+the actual device access.  GPIB::ni uses the National Instruments
+device driver to access GPIB devices.  GPIB::llp use the Linux Lab Project
+device driver to access GPIB devices.  GPIB::hpserial uses local serial ports
+to access instruments with serial ports.  GPIB::rmt makes network
+connections to server machines that provide network access to devices.
+A server script written in Perl is provided for setting up a server.
+
+The GPIB.pm module combined with a configuration file abstracts the
+low level interface to the device from the application programmer.
+For example, an HP33120A function generator has both a serial port
+and a GPIB port.  The device can be connected to the system using 
+either interface, the connection is described in /etc/pgpib.conf.
+The appliction program is identical for both interfaces.  If the
+device is moved from one interface to another, only the configuration
+file needs to change.  In general, the programmer does not need to
+be aware of the low level interface modules.
+
+The low level module concept extends to a network access module that
+makes it trvial to access devices remotely over the network in
+exactly the same manner as a piece of locally connected test 
+equipment.  The same Perl programs work under both Linux and 
+NT.  My typical setup is to use a Linux machine with a National
+Instruments GPIB-PCI card and the National Instruments Linux device driver 
+for the card.  I run the perl script included with GPIB::rmt as a 
+GPIB server.  I access the GPIB devices remotely from both Linux and 
+NT machines.
+
+Instrument Drivers
+------------------
+
+Instrument drivers are modules that provide functionality specific to 
+certain instruments.  These modules are a subclass of GPIB.pm.  This way
+they automatically inherit all of the GPIB functions and provide
+additional functions specific to the device.  Drivers are
+simple to write and provide code that can be easily reused by
+others.
+
+You don't need to use instrument drivers.  An instrument driver
+provides convenient functions for manipulating an instrument
+and these can be easily shared with others.
+
+I've tried to use consistent terminology. "Instrument driver" refers
+to a high level module that inherits GPIB.pm for functionality specific
+to particular instruments.  "Interface" refers to a low level module that 
+GPIB.pm delegates the dirty work of reading and writing bits to the 
+interface (GPIB, serial, etc). Sometimes this gets a little confused 
+because the operating system has "device drivers" and the "interface"
+usually uses one of these "device drivers" for access to the hardware.
+Clear?  Hmm.
+
+Example
+-------
+
+Here's a simple script to set my HP33120A to output a
+1-volt 1MHz sine wave:
+
+    use GPIB::hp33120a;
+ 
+    $g = GPIB::hp33120a->new("HP33120A");
+    $g->set(SIN, 1000000.0, 1.0, 0);
+
+Simple.  Look in the examples directory for more involved examples
+using Tk for user interface, GD to generate graphs, and CGI to
+generate web pages to control instruments.
+
+As an aside, using GPIB.pm in conjunction with mod_perl and the
+Apache web server creates an incredibly efficient means for 
+using web pages to control or monitor instruments.  mod_perl
+effectively makes Perl and GPIB an integral part of the web server.
+No aditional processes are created for CGI scripts that access
+GPIB devices. Look at http://perl.apache.org for additional
+information on mod_perl, it's great.
+
+Linux Source Installation
+-------------------------
+
+First install a GPIB card and appropriate device driver software.  I 
+think the NI GPIB-PCI and their Linux device driver is a good choice, but
+the LLP device driver works as well.  Test the GPIB card first and make
+sure it works.  These modules won't fix a broken device driver installation.
+
+The Linux device driver for the NI GPIB-PCI is not included with the card,
+you have to get it off the net at:
+
+    ftp://ftp.natinst.com/support/gpib/linux/
+
+I'm using version 0.3 of their device driver.
+
+Make sure your Perl is at least 5.004, 5.005 is preferred. (perl -V)
+
+Edit the top level Makefile.PL to include modules of interest to you.
+You probably don't want to build both GPIB::ni and GPIB::llp.  Pick
+the one that corresponds to your preferred GPIB card and device driver.
+
+If you are building the NI interface GPIB::ni, edit Makefile.PL in
+the ni sub-directory and make sure the paths to the the library 
+and include files are correct.  The build process will complain 
+in a useful manner if it can't find these files.
+
+If you are building the LLP interface GPIB::llp, edit Makefile.PL in
+the llp sub-directory and make sure the paths to the the library 
+and include files are correct.  The build process will complain 
+in a useful manner if it can't find these files.
+
+Make sure you have the following CPAN modules, the installation process
+will complain with helpful messages if you don't have these modules.
+    MD5
+    Storable
+
+The module installation is familiar:
+
+    tar zxvf gpib-xxx.tgz
+    
+    -- edit Makefile.PL, ni/Makefile.PL, etc.
+
+    perl Makefile.PL
+    make
+    
+    -- Create an /etc/pgpib.conf file from pgpib.conf.sample
+
+    make test
+
+    -- The test scripts make rash assupmptions that you have all
+       of the pieces of test equipment hooked up to you machine,
+       so expect a few failures...
+
+    make install
+
+    Try out some sample scripts in the examples/ subdirectory.
+
+Windows NT Source Installation
+------------------------------
+
+This might work on WIN98 as well, but I haven't tested it.
+
+Install your GPIB card if you want to access devices directly 
+from the NT machine.  Make sure the GPIB card is working and 
+the Microsoft C libraries are installed.
+
+Make sure your Perl is at least 5.005.  Get the latest from
+http://www.activestate.com.
+
+Make sure you have the following CPAN modules, the installation process
+will complain with helpful messages if you don't have these modules.
+    MD5
+    Storable
+
+Edit Makefile.PL to exclude any modules that don't interest you.  Modules
+that don't yet function under NT (GPIB::hpserial, GPIB::llp) are
+automatically excluded.
+
+Edit ni/Makefile.PL if you are using a National Instruments GPIB card
+and make sure the paths to the include files and libraries are correct.
+
+    tar zxvf gpib-xxx.tgz
+
+    -- Edit Makefile.PL, ni/Makefile.PL 
+
+    perl Makefile.PL
+    nmake
+
+    -- Create C:\PGPIB.CONF
+
+    nmake test
+ 
+    -- The test scripts make rash assupmptions that you have all
+       of the pieces of test equipment hooked up to you machine,
+       so expect a few failures...
+
+    nmake install
+
+    Try out some sample scripts in the examples/ subdirectory.
+
+    See the note below about getting the HTML documentation
+    right.
+
+Windows NT Binary Installation
+------------------------------
+
+This is really nice.
+
+If you don't have Microsoft compilers and you are running a 
+reasonably new version of Perl you can use PPM to install a
+binary release for NT as follows.  This actually works pretty
+well, but I recommend getting the source as well so you get the 
+READMEs and examples and such:
+
+   C:> ppm
+   PPM>  install /location http://www.mock.com/gpib gpib
+
+   Create C:\PGPIB.CONF from pgpib.conf.sample in the 
+   source distribution
+
+   Try out some sample scripts in the examples/ subdirectory
+   of the source distribution.
+
+This doesn't install the HTML documentation correctly, I don't
+understand why.
+
+Here's a hack way to get the POD HTML documentation properly installed:
+Re-run the ActiveState Perl installation after installing the gpib
+module. It will magically turn the pod files into HTML documentation 
+in the same format as the rest of the ActiveState documentation.  
+It looks nice, this is the only way I know to see the man pages under 
+NT.  If someone can show me an addition to Makefile.PL that will 
+automatically generate HTML documentation for NT I would appreciate it. 
+
+Feedback
+--------
+
+Please send me some email if you use this stuff.  Please send
+bugs, feedback, new modules, suggestions, complaints, re-writes, 
+and patches. jeff@mock.com
+
+Todo
+----
+
+Add support for asynchronous notification.  NI provides two different
+calls: ibsgnl() under Linux and ibnotify() for NT.  LLP doesn't
+have any sort of async notification.  It's a little tricky
+to add async notification to network connections.
+
+
+
+

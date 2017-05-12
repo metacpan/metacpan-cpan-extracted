@@ -1,0 +1,20 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/pdnsd/files/pdnsd.online,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+depend() {
+	need pdnsd net.${IFACE}
+}
+
+start() {
+	ebegin "Starting pdnsd-online"
+	/usr/sbin/pdnsd-ctl server all up
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping pdnsd-online"
+	/usr/sbin/pdnsd-ctl server all down
+	eend $?
+}

@@ -1,0 +1,20 @@
+Revision history for GearmanX-Starter
+
+0.05    Thu Jun 24 18:33:30 PDT 2012
+        Add option to retry on Gearman worker errors.
+
+0.04    Thu Jun 24 14:02:30 PDT 2010
+        Create global flag to end worker.
+
+0.03    Wed Mar 24 18:14:12 PDT 2010
+        Removed FUNCTIONS hash
+
+0.02    Wed Mar 24 18:14:12 PDT 2010
+        Removed list function. Same/better functionality is
+        available from Net::Telnet::Gearman.
+        Simplified dereg function.
+        Require Gearman::XS 0.08.
+
+0.01    Tue Mar 23 00:00:00 PDT 2010
+        First version, released on an unsuspecting world.
+

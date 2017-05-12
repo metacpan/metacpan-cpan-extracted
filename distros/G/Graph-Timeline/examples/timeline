@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+################################################################################
+# Run this program as 
+#   ./timeline pres1.tab pres2.tab popes1.tab
+#
+# And this program will display five different views of the data between 
+# 1950/01/01 and 1999/12/31, and you can learn about which popes were in office
+# at the same time as the american presidents.
+#
+# $Id: timeline,v 1.8 2004/04/05 20:45:49 peterhickman Exp $
+################################################################################
+
+use strict;
+use warnings;
+
+use Graph::Timeline::GD;
+
+my $x = Graph::Timeline::GD->new();
+
+while ( my $line = <> ) {
+    chomp($line);
+
+    next if $line =~ m/^\s*$/;
+    next if $line =~ m/^\s*#/;
+
+    my ( $label, $start, $end, $group ) = split ( ',', $line );
+	if($end) {
+	    $x->add_interval( label => $label, start => $start, end => $end, group => $group );
+	}
+	else {
+		$x->add_point( label => $label, start => $start, group => $group );
+	}
+}
+
+################################################################################
+# Display all the input data
+################################################################################
+
+$x->window();
+
+open( FILE, '>test_timeline_01.png' );
+binmode(FILE);
+print FILE $x->render( border => 2, pixelsperyear => 100 );
+close(FILE);
+
+################################################################################
+# Display all the records that start and end between 1950/01/01 and 1999/12/31
+################################################################################
+
+$x->window(start=>'1950/01/01', end=>'1999/12/31');
+
+open( FILE, '>test_timeline_02.png' );
+binmode(FILE);
+print FILE $x->render( border => 2, pixelsperyear => 100 );
+close(FILE);
+
+################################################################################
+# Display all the records that start and end between 1950/01/01 and 1999/12/31
+# plus those records that start in that range but end beyond it.
+################################################################################
+
+$x->window(start=>'1950/01/01', end=>'1999/12/31', start_in=>1);
+
+open( FILE, '>test_timeline_03.png' );
+binmode(FILE);
+print FILE $x->render( border => 2, pixelsperyear => 100 );
+close(FILE);
+
+################################################################################
+# Display all the records that start and end between 1950/01/01 and 1999/12/31
+# plus those records that start in that range but end beyond it and those that
+# start before 1950/01/01 but end before 1999/12/31
+################################################################################
+
+$x->window(start=>'1950/01/01', end=>'1999/12/31', start_in=>1, end_in=>1);
+
+open( FILE, '>test_timeline_04.png' );
+binmode(FILE);
+print FILE $x->render( border => 2, pixelsperyear => 100 );
+close(FILE);
+
+################################################################################
+# Display all the records that have some part of their span between 1950/01/01 
+# and 1999/12/31
+################################################################################
+
+$x->window(start=>'1950/01/01', end=>'1999/12/31', start_in=>1, end_in=>1, span=>1);
+
+open( FILE, '>test_timeline_05.png' );
+binmode(FILE);
+print FILE $x->render( border => 2, pixelsperyear => 100 );
+close(FILE);

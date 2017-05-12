@@ -1,0 +1,54 @@
+Games-Trackword
+===============
+
+DESCRIPTION
+
+This module lets you set up a Trackword grid, and then query it for whether
+or not it is possible to find words on that grid.
+
+DEPENDENCIES
+
+This module has no dependencies.
+
+CHANGES
+
+See the Changes file for a list of updates to the distribution.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+BUGS, PATCHES & FIXES
+
+By its very nature the size of grid is the only limiting factor of this
+module. If you can create a grid that is too large to fit in memory, the
+author recommends that you not to do that!
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Games-Trackword
+
+AUTHOR
+
+  Barbie, <barbie@cpan.org>, http://birmingham.pm.org/
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+COPYRIGHT 
+
+  Copyright © 2003-2014 Barbie for Miss Barbell Productions.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.

@@ -1,0 +1,14 @@
+~$
+\.bak$
+blib
+\.bs$
+build
+\.c$
+\.git
+Makefile$
+Makefile\.old$
+\.o$
+\.spec$
+\.sw.$
+\.tar\.gz$
+\.releaserc$

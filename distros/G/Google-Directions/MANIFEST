@@ -1,0 +1,21 @@
+Changes
+samples/response.json
+lib/Google/Directions/Client.pm
+lib/Google/Directions/Response/Bounds.pm
+lib/Google/Directions/Response/Coordinates.pm
+lib/Google/Directions/Response/Leg.pm
+lib/Google/Directions/Response/Polyline.pm
+lib/Google/Directions/Response/Route.pm
+lib/Google/Directions/Response/Step.pm
+lib/Google/Directions/Response.pm
+lib/Google/Directions/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-client.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

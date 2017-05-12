@@ -1,0 +1,322 @@
+
+AdWords API Perl Client Library
+================================================================
+
+Google's AdWords services lets developers design computer programs that interact
+directly with the AdWords platform. With these applications, advertisers and
+third parties can more efficiently -- and creatively -- manage their large or
+complex AdWords accounts and campaigns.
+
+The AdWords API Perl Client Library makes it easier to write Perl clients to
+programmatically access AdWords accounts. One of the main features of this
+client library is that it hides SOAP layer from end user, which makes it
+much more easier to interact with API. The outgoing and incoming SOAP messages
+can be monitored and logged on demand.
+
+The backbone of the client library is based on the SOAP::WSDL module. It
+handles the serialization/de-serialization, transport, and generation of classes
+for the entities defined in the AdWords API WSDLs. SOAP::WSDL, in turn, uses
+SOAP::Lite under the hood for some operations. More information about
+compatibility can be found in the Perl Compatibility section of this README.
+
+The complete documentation for AdWords API is available at
+http://www.google.com/apis/adwords/developer/index.html.
+
+
+What's in the client library?
+-----------------------------
+
+The client library provides full access to all the functionality of the
+AdWords API web services plus more. It includes:
+
+  - Data classes: The client library provides all the necessary data classes.
+    For example, it provides the Campaign data class for encapsulating campaign
+    data. These classes are generated automatically from WSDLs and found under
+    Google::Ads:AdWords::{API VERSION}.
+
+  - Client class: The Google::Ads::AdWords::Client class provides methods for
+    setting credentials for accessing AdWords accounts as well as for creating
+    instances of the AdWords Service classes.
+
+  - Helpful utilities: The utilities located under "Google::Ads::Common" help
+    you manage handle API errors, manage images, fetch reports and others.
+
+  - Logging class: This class provides simple methods for logging the SOAP XML
+    messages of all requests and responses.
+
+  - Examples: The Perl client library comes with code examples in the
+    "examples/" directory. We encourage you to use code examples to get started
+    writing your own application. All the code examples are runnable out of the
+    box, but you will have to set your credentials in "~/adwords.properties" and
+    you may be required to insert object IDs in where you see "INSERT_***_HERE".
+
+
+How do I start?
+---------------
+
+1) Make sure you have Perl 5.8 or later installed. More information on Perl can
+   be found at http://www.perl.org/. If you are installing in Windows read the
+   important notes in the next section.
+
+2) From this directory, run
+
+     perl Build.PL
+
+   to generate your Build file. This relies on having Module::Build
+   pre-installed. Some warnings might be print out when running this command,
+   continue with the installation.
+
+3) The client library has a number of dependencies which are defined in the
+   Build.PL script. If you are missing any modules, you'll receive a warning in
+   step 2. You can install any dependencies manually using the CPAN shell
+   (http://search.cpan.org/~andk/CPAN-1.9304/lib/CPAN.pm) or automatically by
+   running
+
+     (sudo) perl Build installdeps
+
+   Note 1: Make sure Module::Build >= 0.36 is installed so you can use
+           installdeps
+   Note 2: In certain Linux installations you'll need to install openssl first
+
+4) Install this module, making use of the Build script generated in step 2:
+
+     perl Build
+     (sudo) perl Build install
+
+5) Sign up for a Google Account, if you don't already have one, at
+   https://www.google.com/accounts/NewAccount
+
+6) Copy the sample 'adwords.properties' file to your home directory, and edit it
+   to reflect the credentials for your Google Account.
+
+7) Try running the code examples in the 'examples' directory.
+
+8) Read over the documentation in 'docs/' to familiarize yourself with
+   the various classes and methods in the client library.
+
+
+Windows Installation
+--------------------
+
+The library is only supported on Windows for ActivePerl 5.14+ x86 (32bit
+version).
+
+Before following the "How do I start?" steps you need:
+
+1) Install the MinGW module by executing 'ppm install MinGW' in the command
+   prompt.
+
+
+Running the examples
+---------------------
+
+Examples can be run by executing the following on command line
+from a sub-directory of the "examples/" directory,
+
+  $ perl Example.pl
+
+Some examples require you replace object IDs in where you see placeholder
+like "INSERT_***_HERE"
+
+Using test accounts for development
+-----------------------------------
+
+It is recommended that during development of your library, you use AdWords Test
+Accounts, to find more information about these type of accounts visit:
+
+  https://developers.google.com/adwords/api/docs/test-accounts
+
+Authorization Options
+---------------------
+
+Authorization in the client library is handled through different authorization
+handlers attached to the Client object. The library supports the following
+authorization protocols:
+
+  - OAuth 2:
+
+    This protocol provides a way to access an AdWords account without needing to
+    retain the user credentials such as email and password, and it is the
+    preferred way for you to authorize your API requests. An access token is
+    required by the library to be able to send authorized requests against
+    the API. This access token can be generated with the library via two
+    different OAuth 2 handlers.
+
+    The library Client object provides the get_oauth_2_applications_handler
+    and the get_oauth_2_service_accounts_handler methods that
+    allows you to get a reference of the OAuth2 authorization handler for
+    Web/Installed Applications and the handler for Service Accounts,
+    respectively.
+
+    OAuth2 for Web/Installed Applications
+
+    The handler for applications provides methods such as
+    get_authorization_url() and issue_access_token() that can be used to follow
+    the authorization flow (i.e. user request for consent) and generation of
+    access and refresh tokens.
+
+    Also pre-stored access and refresh tokens can be passed to the authorization
+    handler using the method set_access_token() and set_refresh_token() to
+    re-used tokens already authorized by the user, it is up to you to code the
+    mechanism to preserve and restore these tokens.
+
+    After setting access and refresh tokens the library will handle the refresh
+    of access tokens automatically for you.
+
+    See the example examples/oauth/generate_offline_credentials.pl for a
+    comprehensive example on how to use this authorization protocol.
+
+    OAuth2 for Service Accounts
+
+    The handler for service accounts provides methods such as
+    set_email_address(), set_pem_file() and set_delegated_email_address()
+    that can be used to set the service account email address, private key
+    file and the delegated account email address, respectively. These values
+    can also be configured using the adwords.properties file.
+
+    Keep in mind that the use of service accounts for accessing AdWords API
+    requires user impersonation because a service account itself can't have
+    direct access to an AdWords Account, that is why the delegated email address
+    is a required parameter. Setting up impersonation requires setup a Google
+    Apps Domain for business. Refer to this Help Center article for more
+    information on this matter
+    http://support.google.com/a/bin/answer.py?hl=en&answer=162106&topic=2759255&ctx=topic
+
+    Additionally to use service accounts with the library you must transform
+    the private key file as provided by the API Console from PKCS12 format to
+    PEM format with NO password (usually the API console sets its password as
+    'notasecret'). In Linux/Unix environments with openssl installed this
+    transformation can be easily done as follows:
+    > openssl pkcs12 -in yourfile.p12 -out yourfile.pem -nodes
+
+
+  - ClientLogin:
+
+    ** This authorization protocol is consider deprecated given the support of
+       OAuth2 and should not be used for future development while strongly
+       consider migrating old code to OAuth2 **
+
+    - Email and Password: When the first request is sent an AuthToken is
+      generated using the ClientLogin API and using the credentials (login and
+      password) set in the authentication handler.
+
+      The email and password can be stored in the adwords.properties file,
+      passed into the Client object constructor, or set using the set_email()
+      and set_password() methods of the authorization handler.
+
+      AuthTokens are cached and automatically refresh by the library but
+      you can force its refresh using the refresh_auth_token() method of the
+      authorization handler.
+
+      To obtain the client login authorization handler out of your Client object
+      you just need to call the get_auth_token_handler() method.
+
+    - AuthToken: It is recommended to reuse AuthTokens since too many requests
+      to the ClientLogin API can lead to captcha challenge errors. You can pass
+      the authToken in the constructor of the Client or set it using the
+      set_token() method of the authorization handler.
+
+
+How do I enable logging?
+------------------------
+
+The client library uses a custom class for all logging purposes and is exposed
+through the Google::Ads:AdWords::Logging module. This classs relies in the
+Log::Log4perl module for all its logging tasks and provides a default
+configuration within the module which can be overriden by proving a
+log4perl.conf file in your home directory.
+
+There are two loggers within this class described below.
+
+  - AWAPI_LIB_LOG: Logs all requests from the client library along with
+    information such as the timestamp, authentication, service, method,
+    request Id, response time, operations and units count. The default behavior
+    is to log this information to "~/logs/aw_api_lib" relative to your project's
+    home directory.
+
+  - SOAP_XML_LOG: Logs all incoming and outgoing SOAP requests/responses. The
+    default behavior is to log this information to "~/logs/soap_xml.log"
+    relative to your project's home directory. Sensitive information, such as
+    authentication tokens, will be stripped.
+
+Logging can be enabled using the following methods.
+
+  - Google::Ads::AdWords::Logging::enable_all_logging(); - Enables logging both
+    loggers.
+
+  - Google::Ads::AdWords::Logging::enable_soap_logging(); - Only enables logging
+    of SOAP traffic.
+
+  - Google::Ads::AdWords::Logging::enable_awapi_logging(); - Only enables
+    logging of API requests.
+
+You can use the methods of the Logger class directly for even more control over
+how requests are logged.
+
+
+Requests accounting
+-------------------
+
+The Client class keeps a live count of requests, operations, units consumed, etc
+since it was instantiated. These counts are accessible using the methods
+get_requests_count, get_failed_requests_count, get_units_count,
+get_operations_count.
+
+Specific information about the last executed request
+is accessible using the method get_last_request_stats which returns an object of
+type Google::Ads::AdWords::RequestStats.
+
+Also, the last executed soap request and its response are available through the
+methods: get_last_soap_request, get_last_soap_response.
+
+
+Gzip support
+------------
+
+The library supports gzip compression in the transport layer by default. Based
+in the LWP:UserAgent module, the compression is detected by checking the
+contents of HTTP::Message::decodable.
+
+If gzip does not appear as the encodings supported in HTTP::Message::decodable,
+you need to make sure the Compress::Zlib module is installed.
+
+
+Compatibility:
+--------------
+
+The library relies on the SOAP::WSDL module to send and receive all SOAP
+traffic from and to the AdWords API servers, however multiple patches are
+applied to the module in runtime in order to support all the services. In order
+for these patches to get correctly applied version 2.00.10 of the SOAP::WSDL
+module must be used and the Google::Ads::AdWords::Client module must be included
+before any other of the library modules.
+
+
+Where do I submit bug reports and/or feature requests?
+---------------------------------------------------
+
+Use the issue tracker at:
+
+  https://github.com/googleads/googleads-perl-lib/issues
+
+Questions can be asked on forum:
+
+  http://groups.google.com/group/adwords-api
+
+Make sure to subscribe to our Google Plus page for API change announcements and
+other news:
+
+  https://plus.google.com/+GoogleAdsDevelopers
+
+
+External Dependencies:
+----------------------
+
+Full dependency list is maintained in Build.PL.
+
+Authors:
+    api.jeffy@gmail.com (Jeff Posnick)
+    david.t@google.com (David Torres)
+
+Maintainers:
+    api.jradcliff@gmail.com (Josh Radcliff)

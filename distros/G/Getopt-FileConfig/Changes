@@ -1,0 +1,74 @@
+2011-03-14  Matevz Tadel  <matevz.tadel@ijs.si>
+
+	Fix test to run on perl-5.6, hopefully.
+	Version 1.0001.
+
+	* lib/Getopt/FileConfig.pm:
+	Mark version 1.0001.
+	Slightly improve comments.
+
+	* t/pcm.t:
+	Use "no warnings" instead of "use vars qw(...)" when trying to
+	avoid warnings from single use of configuration variables.
+	This seemed not to work with perl-5.6.
+
+2011-03-13  Matevz Tadel  <matevz.tadel@ijs.si>
+
+	* lib/Getopt/FileConfig.pm:
+	Document -cfgbase argument to constructor.
+	Fix white-space in docs.
+
+2011-03-13  Matevz Tadel  <matevz.tadel@ijs.si>
+
+	* lib/Getopt/FileConfig.pm:
+	Change license in file to Perl.
+	Rename sub pook_href to assert_presence_of_keys and document it.
+
+2011-03-13  Matevz Tadel  <matevz.tadel@ijs.si>
+
+	Cleanup for use strict.
+	Add files needed for distribution.
+
+	Tag VERSION 1.00.
+
+	* MANIFEST:
+	* README:
+	New files needed for distribution.
+
+	* Makefile.PL:
+	Add author, abstract and license.
+
+	* lib/Getopt/FileConfig.pm:
+	Cleanup for use strict.
+
+	* t/pcm.t:
+	Make proper tests with parse into namespace and into hash-ref.
+
+2011-03-13  Matevz Tadel  <matevz.tadel@ijs.si>
+
+	Rename to Getopt::FileConfig, first version of Makefile.PL.
+
+2011-03-11  Matevz Tadel  <matevz.tadel@ijs.si>
+
+	First pass of changes towards a proper module structure.
+
+        * Changes:
+	New file.
+
+        * t:
+        * t/pcm.pl:
+        * t/pcm.rc:
+        * pcm.pl:
+        * pcm.rc:
+	Move example to t/ directory.
+
+        * ParseConfig.pod:
+	Merge into ParseConfig.pm.
+
+        * ParseConfig.pm:
+	Merge in the pod.
+	White-space around control structures.
+	Define VERSION, as 0.1.0.
+
+        * Makefile:
+	Fix for above changes.

@@ -1,0 +1,26 @@
+---
+abstract: 'Make radial bar charts'
+author:
+  - 'Gene Boggs <gene@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GD-Graph-radar
+requires:
+  GD: 0
+  GD::Graph: 0
+  GD::Graph::colour: 0
+  GD::Graph::utils: 0
+  GD::Text::Align: 0
+  base: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+version: 0.1101

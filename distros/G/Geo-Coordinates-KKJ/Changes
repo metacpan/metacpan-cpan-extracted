@@ -1,0 +1,6 @@
+Revision history for Perl extension Geo::Coordinates::KKJ.
+
+0.01  Sat Apr 24 19:11:49 2010
+	- original version; created by h2xs 1.23 with options
+		-XAn Geo::Coordinates::KKJ
+

@@ -1,0 +1,177 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::UI;
+use IO::All;
+use strict;
+use warnings;
+my %replace = (
+  "&" => "&amp;",
+  "<" => "&lt;",
+  ">" => "&gt;",
+);
+
+podregister {
+  my $export = Gimp::UI::export_image(
+    my $new_image=$image,
+    my $new_drawable=$drawable,
+    "COLORHTML",
+    EXPORT_CAN_HANDLE_RGB
+  );
+  return if $export == EXPORT_CANCEL;
+  my ($w,$h) = ($new_drawable->width, $new_drawable->height);
+  Gimp->tile_cache_ntiles($w / Gimp->tile_width + 1);
+  my $io = io($filename) or die __"write '$filename': $!\n";
+  my ($cssfile, $cssio);
+  if ($use_css) {
+    if ($filename =~ /(.*)\.[^.]+$/) {
+      $cssfile = "$1.css"
+    } elsif ($filename =~ /\.$/) {
+      $cssfile = "${filename}css"
+    } else {
+      $cssfile = "$filename.css"
+    }
+    $cssio = io($cssfile) or die __"write '$cssfile': $!\n";
+  }
+  my $data;
+  if ($character_source == 0) {
+    seek DATA, 0, 0;
+    local $/;
+    $data = <DATA>;
+  } elsif ($character_source == 1) {
+    $data = io($characters)->all or die "$characters: $!\n";
+  } elsif ($character_source == 2) {
+    $data = $characters;
+  }
+  my @data;
+  $data =~ y/\x21-\x7f//cd;
+  @data = split //, $data;
+  for (@data) { s/([&<>])/$replace{$1}/e; }
+  @data = ("X") x 80 unless @data;
+  my @chars;
+  my $region = $new_drawable->get->pixel_rgn(0, 0, $w, $h, 0, 0);
+  Gimp::Progress->init(__"Saving '$filename' as COLORHTML...");
+  $closetag = $closetag ? "</font>" : "";
+  if ($use_css) {
+    my $file = $cssfile;
+    $file = $1 if ($cssfile =~ m@/([^/]+)$@);
+    $io->print(<<HEADER);
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>css color html by GIMP</title>
+<link rel="stylesheet" type="text/css" href="$file">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+</head>
+<body><pre>
+HEADER
+   $font_size = 8 + ($font_size - 2) * 2;
+   $cssio->print(<<HEADER);
+body {
+width: 100%;
+font-weight: bold;
+font-family: Courier, "Courier New", "Andale Mono", Monaco, monospace;
+font-size: ${font_size}px;
+background-color: #000000;
+color: #ffffff;
+}
+HEADER
+  } else {
+    $io->print("<html><body bgcolor=black>\n<font size=\"$font_size\"><pre>\n");
+  }
+  my %colors;
+  my $bpp = $region->bpp;
+  die "Expected bpp to be either 3 or 4" unless $bpp == 3 or $bpp == 4;
+  my $pixel_re = '(.{3})' . ($bpp == 3 ? '' : '.');
+  for (my $y = 0; $y < $h; $y++) {
+    my $pel = $region->get_row2 (0, $y, $w);
+    push @chars,@data while @chars < $w;
+    if ($use_css) {
+       $pel =~ s{$pixel_re}{
+	  "<span class=\"N".unpack("H*",$1)."\">".shift(@chars)."</span>"
+       }ges;
+       while ($pel =~ /"N([0-9a-fA-F]{6})"/g) {
+	   my $color = $1;
+	   $cssio->print("span.N$color { color: #$color; background-color: #000000; }\n") unless exists $colors{$color};
+	   $colors{$color}++;
+       }
+    } elsif ($compatible) {
+       $pel =~ s{(...)}{
+	  "<font color=\"#".unpack("H*",$1)."\">".shift(@chars).$closetag;
+       }ges;
+    } else {
+       $pel =~ s{(...)}{
+	  "<font color=".unpack("H*",$1).">".shift(@chars).$closetag;
+       }ges;
+    }
+    $io->print($pel,"\n");
+    Gimp::Progress->update($y/$h);
+  }
+  $io->print("</pre>\n</html>\n");
+  $new_image->delete if $export == EXPORT_EXPORT;
+  ();
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+file_colorhtml_save - Saves the image as coloured html text
+
+=head1 SYNOPSIS
+
+<Save>/HTML with text coloured to match image/html
+
+=head1 DESCRIPTION
+
+Saves the image as coloured html text.
+
+=head1 COLORHTML FILE FORMAT
+
+This file save filter writes a large regular grid filled with coloured
+characters. The characters can be stored in file and don't have anything to do
+with the image. The colour of each character, though, is taken from the image
+to save.
+
+This creates some kind of mosaic effect with characters.
+The pictures should be limited to about 120x120 pixels, since most
+browsers do not view larger images. The aspect ratio depends on the
+fixed-width font the browser is using, and is usually around 2:1 (so you
+should squash your image accordingly).
+
+The FONT tags can be saved either HTML-4.0 compliant (C<font color="#rrggbb">)
+or in a proprietary format most browsers support (C<font color=rrggbb>).
+To save even more space you can leave out the closing tag (C</font>),
+but this will potentially leave thousands of font elements open in the browser,
+and will disturb the current font colour.
+
+=head1 PARAMETERS
+
+  [PF_RADIO, "character_source", "Where to take characters from", 0,
+    [sourcecode => 0, textfile => 1, textblock => 2]],
+  [PF_FILE, "characters", "Filename to read or characters to use", ""],
+  [PF_STRING, "font_size", "HTML font size (1..7 or -7 .. +7)", 2,],
+  [PF_BOOL, "use_css", "Use CSS", 1],
+  [PF_BOOL, "compatible", "HTML-4.0 compliance", 1],
+  [PF_BOOL, "closetag", "Add closing tag", 1],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+1999-11-22
+
+=head1 LICENSE
+
+Copyright Marc Lehmann.
+CSS additions (c) Carol Spears.
+
+Distributed under the same terms as Gimp-Perl.

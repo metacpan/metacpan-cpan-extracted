@@ -1,0 +1,11 @@
+
+TODO:
+
+- Clean up documentation again
+
+- Fix examples
+
+- revamp documentation
+
+- release 0.5
+

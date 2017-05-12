@@ -1,0 +1,5 @@
+<li><a href="[% c.uri_for_action('/entry/create') %]"><span>Create an entry</span></a></li>
+<li><a href="[% c.uri_for_action('/user/entries', [c.user.name] )  %]"><span>View your posts</span></a></li>
+<li><a href="[% c.uri_for_action('/user/manage_entries', [c.user.name] )  %]"><span>Manage your posts</span></a></li>
+<li><a href="[% c.uri_for_action('/user/list_drafts', [c.user.name] )  %]"><span>Drafts ([% c.user.draft_count %])</span></a></li>
+<li><a href="[% c.uri_for_action('/user/browse', [c.user.name] )  %]"><span>Your Profile</span></a></li>

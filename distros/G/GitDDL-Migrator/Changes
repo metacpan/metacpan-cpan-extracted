@@ -1,0 +1,35 @@
+Revision history for Perl extension GitDDL-Migrator
+
+0.08 2016-04-10T04:39:26Z
+    - Replace has_git by test_requires_git (fix test only) (BooK)
+
+0.07 2014-04-06T11:26:37Z
+    - MySQL's TEXT type limited only 65535 byte. So change sql_text columns definition to LONGTEXT.
+
+0.06 2013-12-19T07:05:00Z
+
+    - real_translator method up to public
+    - add diff_(to|from)_real_database method
+
+0.05 2013-11-04T05:35:05Z
+
+    - don't `_insert_version` if no differences found in `upgrade_database`
+    - add create_version_table method. ref #1
+    - fix splice usage
+
+0.04 2013-10-30T09:12:08Z
+
+    - follow up GitDDL 0.03
+
+0.03 2013-09-20T04:51:30Z
+
+    - fix deps
+
+0.02 2013-09-15T07:22:23Z
+
+    - suppress STDERR when calling `database_version`
+
+0.01 2013-09-15T06:44:49Z
+
+    - original version
+

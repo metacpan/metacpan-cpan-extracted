@@ -1,0 +1,49 @@
+Revision history for Perl extension Graph::Regexp
+
+2008-04-13 v0.05 Tels 100 tests
+  * add support for the changed output from v5.10
+    + spaces after node names (OPEN(8) vs. OPEN (8))
+    + TRIE-EXACT
+  * add support for CURLYM[1] nodes (like in /(foo){1,2}/
+  * fix undef warning in line 254 for /foo{1,2}/
+  * nodes with 0 matches possible (*, {0,1} etc) never fail
+  * add support for the following nodes:
+    + \b \B (BOUND, NBOUND)
+    + \d \D (DIGIT, NDIGIT)
+    + \w \W (ALNUM, NALNUM)
+  * handle exact nodes that contain ">" (like in />/)
+  * labels of special nodes like "BOL" drop the name and only
+    contain the text that appears in the regexp (f.i. ^ or $)
+    and the internal name is now mentioned in the title
+  * escape $ and @ in exact nodes like /\$\@/ => "\$\@"
+  * nodes that always match have their outgoing edge in class
+    'always' (instead of 'match') and these edges are black
+  * make examples/regraph support output of multiple regexps by only
+    parsing the last one. This happes f.i. with -Mcharnames=:full
+  * NOTHING nodes with no predecessors are filtered out, happens
+    with /((foo|bar)){1,2}/ and others
+
+2008-04-12 v0.04 Tels 52 tests
+  * require Graph::Easy v0.62 (for various bugfixes)
+  * add support for the following nodes:
+    + ^ (BOL)
+    + $ (EOL)
+    + \z (EOS)
+    + \Z (SEOL)
+    + \A (SBOL)
+  * update bundled Module::Install and remove Build.PL
+
+2006-10-27 v0.03 Tels 25 tests
+  * really works now for common regexps
+  * get rid of Regexp::Parser
+  * require Graph::Easy v0.49 (for various bugfixes)
+
+2006-08-06 v0.02 Tels 10 tests
+  * some fixes to the logic by using Regexp::Parser
+  * fix the POD to get rid of Copy&Paste nonsense
+  * prepare for release
+
+2006-07-24 v0.01 Tels 10 tests (unreleased)
+  * require Graph::Easy v0.46
+  * require Perl 5.8.1 for Unicode support
+  * first version to actually do something nearly usefull

@@ -1,0 +1,27 @@
+graph { flow: south; colorscheme: spectral9; }
+
+node { fill: white; }
+node.in { fill: 8; }
+node.dot { fill: 9; color: white; }
+node.out { fill: 2; }
+node.dotout { fill: 6; }
+
+[ Graphviz ], [ Text ], [ Perl ], [ VCG/GDL ] { class: in; }
+
+[ VCG/GDL ] { title: Graph Description Language }
+
+[ Graphviz ], [ Text ], [ VCG/GDL ] --> [ Graph::Easy::Parser ]
+
+ [ Graph::Easy::Parser ], [ Perl ] --> [ Graph::Easy ]
+  --> [ Graphviz2 ] { class: out; label: Graphviz; }
+  --> [ dot\n(or neato, fdb etc.) ] { class: dot; }
+  --> [ .svg ], [ .png ], [ .ps ], [ .pdf ] { class: dotout; }
+  
+  [ Graph::Easy ] --> [ Text2 ] { class: out; label: Text; }
+  [ Graph::Easy ] --> [ VCG_GDL ] { class: out; label: VCG/GDL; title: Graph Description Language }
+  [ Graph::Easy ] --> [ GraphML ] { class: out; title: GraphML }
+  [ Graph::Easy ] --> { minlen: 3; } [ Graph::Easy's Layouter ]
+
+  [ Graph::Easy's Layouter ] -->
+  [ ASCII /\nUnicode ], [ HTML ], [ SVG ] { class: out; }
+

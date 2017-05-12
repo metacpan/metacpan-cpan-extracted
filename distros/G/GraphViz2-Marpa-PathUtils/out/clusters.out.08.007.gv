@@ -1,0 +1,19 @@
+digraph graph_08
+{
+	graph[rankdir = "LR" nodesep = "0"]
+	node[shape = "point" label = ""]
+	edge[fontsize = "10"]
+	_inv -> inv[arrowhead = "inv" label = "inv"]
+	inv -> invinv[arrowhead = "invinv" label = "invinv"]
+	_inv -> linv[arrowhead = "linv" label = "linv"]
+	linv -> linvlinv[arrowhead = "linvlinv" label = "linvlinv"]
+	_inv -> rinv[arrowhead = "rinv" label = "rinv"]
+	rinv -> rinvrinv[arrowhead = "rinvrinv" label = "rinvrinv"]
+	_inv -> olinv[arrowhead = "olinv" label = "olinv"]
+	olinv -> olinvolinv[arrowhead = "olinvolinv" label = "olinvolinv"]
+	_inv -> orinv[arrowhead = "orinv" label = "orinv"]
+	orinv -> orinvorinv[arrowhead = "orinvorinv" label = "orinvorinv"]
+	_inv -> oinv[arrowhead = "oinv" label = "oinv"]
+	oinv -> oinvoinv[arrowhead = "oinvoinv" label = "oinvoinv"]
+
+}

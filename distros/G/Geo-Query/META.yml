@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Geo-Query
+version:            0.04
+abstract:           Perl extension for querying geo related data from different sources.
+author:
+    - root <root@localdomain>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Geo::Query::LatLong:  0
+    LWP::Simple:          0
+    Math::Trig:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

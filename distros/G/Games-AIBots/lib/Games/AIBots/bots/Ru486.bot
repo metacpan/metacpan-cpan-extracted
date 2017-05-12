@@ -1,0 +1,101 @@
+$name   = 'Ru486';
+$author = 'Andrew Lin';
+$team = 'Dear Baby';
+
+
+
+sub main {
+        enable shield;
+     if ($life - $enemy_l >= 0)  {
+        scan relative 8;
+        call chasing;
+        move forward;
+     if (&bumped('fence'))  {
+        disable shield;
+        fire laser;
+        enable shield;
+         }
+        }
+
+        if (&found('flag|mine|vault'))  {
+           call clear;
+        }
+        elsif (&found('wall'))  {
+           call leave;
+        }
+        if (&nearst('enemy') <=4 )  {
+           enable cloak;
+        }
+        if (&inperim('enemy'))  {
+           attempt destruct;
+        }
+        if ($xx * $yy == 0) {
+        turn right;
+        move forward;
+        disable cloak if (&nearst('enemy') >= 4)
+    }
+        redo;
+    }
+
+    sub chasing {
+    attempt destruct if &inperim('enemy');
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+                    }
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+    return;
+}
+    sub clear  {
+           if (&damaged == 0 and &found('flag'))  {
+           move backward;
+           fire energy;
+           move forward * 2;
+        }
+           if (&found('mine'))  {
+           fire energy;
+        }
+           move forward if(&found('vault'));
+
+        redo;
+    }
+    sub leave;
+           disable cloak;
+           $t =  (int(rand(1))) {
+            turn right if $t = 1;
+        }
+        else {
+            turn left;
+        }
+        redo;
+    }
+    

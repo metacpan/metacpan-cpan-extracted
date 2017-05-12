@@ -1,0 +1,9 @@
+help              this help text
+loc               tell you my location
+owner             tell you my owner
+inv               see a list of what I sell
+wanted            see a list of what I buy
+buy <N> <Item>    buy <N> <Item>(s) from me
+sell <N> <Item>   sell <N> <Item>(s) to me
+donate <N> <Item> give me <N> <Item>(s) for free
+sto [pattern]     list storage

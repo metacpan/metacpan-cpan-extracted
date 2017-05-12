@@ -1,0 +1,32 @@
+---
+abstract: 'Google Client Collection'
+author:
+  - 'Ali Zia <ziali088@gmail.com>'
+build_requires:
+  CHI: '0'
+  Class::Load: '0'
+  Path::Tiny: '0'
+  Test::Mock::Furl: '0'
+  Test::Most: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-Client-Collection
+requires:
+  Carp: '1.38'
+  Cpanel::JSON::XS: '0'
+  Furl: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/ziali088/googleapi-client
+  repository: https://github.com/ziali088/googleapi-client.git
+version: '0.005'

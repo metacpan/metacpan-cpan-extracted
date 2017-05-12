@@ -1,0 +1,17 @@
+Revision history for Perl extension Geo::IP2Proxy
+
+1.00  Mon Nov 21 16:00:00 2016
+      First release under the Geo::IP2Proxy
+      Added new function "open"
+      Added new function "getModuleVersion"
+      Added new function "getPackageVersion"
+      Added new function "getDatabaseVersion"
+      Added new function "isProxy"
+      Added new function "getCountryShort"
+      Added new function "getCountryLong"
+      Added new function "getRegion"
+      Added new function "getCity"
+      Added new function "getISP"
+      Added new function "getProxyType"
+      Added new function "getAll"
+      Added new function "close"

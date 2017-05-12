@@ -1,0 +1,44 @@
+Graphics::Primitive - Device and library agnostic graphic primitives
+
+Graphics::Primitive is a device and library agnostic system for creating
+and manipulating various graphical elements such as Borders, Fonts, Paths
+and the like.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Graphics::Primitive
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Graphics-Primitive
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Graphics-Primitive
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Graphics-Primitive
+
+    Search CPAN
+        http://search.cpan.org/dist/Graphics-Primitive
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Cory G Watson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

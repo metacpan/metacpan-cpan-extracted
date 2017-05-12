@@ -1,0 +1,27 @@
+Games-2048
+
+Games-2048 is an ASCII clone of the 2048 game.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+RUNNING THE GAME
+
+To run the game, simply type the command:
+
+	2048
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (C) 2015 by Blaise Roth.
+
+This is free software; you can redistribute and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+See L<http://dev.perl.org/licenses/> for more information.

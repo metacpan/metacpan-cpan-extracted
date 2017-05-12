@@ -1,0 +1,24 @@
+Build.PL
+Changes
+ignore.txt
+lib/Graph/Similarity.pm
+lib/Graph/Similarity/CoupledNodeEdgeScoring.pm
+lib/Graph/Similarity/Method.pm
+lib/Graph/Similarity/SimilarityFlooding.pm
+lib/Graph/Similarity/SimRank.pm
+Makefile.PL
+Makefile.PL.org
+MANIFEST			This list of files
+README
+t/00.load.t
+t/01-GraphSimilarity.t
+t/02-SimRank.t
+t/03-SimilarityFlooding.t
+t/04-CoupledNodeEdgeScoring.t
+t/boilerplate.t
+t/manifest.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+META.json

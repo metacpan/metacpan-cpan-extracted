@@ -1,0 +1,109 @@
+---
+name: Gtk2-Ex-MindMapView
+version: 0.000001
+author:
+  - 'James Muir <hemlock@vtlink.net>'
+abstract: Display mind map or outline on a Gnome2::Canvas
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Glib: 1.105
+  Gnome2::Canvas: 1.002
+  Graph: 0.67
+  Test::More: 0
+provides:
+  Gtk2::Ex::MindMapView:
+    file: lib/Gtk2/Ex/MindMapView.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::ArgUtils:
+    file: lib/Gtk2/Ex/MindMapView/ArgUtils.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Border:
+    file: lib/Gtk2/Ex/MindMapView/Border.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Border::Ellipse:
+    file: lib/Gtk2/Ex/MindMapView/Border/Ellipse.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Border::Rectangle:
+    file: lib/Gtk2/Ex/MindMapView/Border/Rectangle.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Border::RoundedRect:
+    file: lib/Gtk2/Ex/MindMapView/Border/RoundedRect.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::BorderFactory:
+    file: lib/Gtk2/Ex/MindMapView/BorderFactory.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Connection:
+    file: lib/Gtk2/Ex/MindMapView/Connection.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Content:
+    file: lib/Gtk2/Ex/MindMapView/Content.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Content::EllipsisText:
+    file: lib/Gtk2/Ex/MindMapView/Content/EllipsisText.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Content::Picture:
+    file: lib/Gtk2/Ex/MindMapView/Content/Picture.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Content::Uri:
+    file: lib/Gtk2/Ex/MindMapView/Content/Uri.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::ContentFactory:
+    file: lib/Gtk2/Ex/MindMapView/ContentFactory.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Graph:
+    file: lib/Gtk2/Ex/MindMapView/Graph.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::Grip:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/Grip.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::Grip::EllipseRound:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/Grip/EllipseRound.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::Grip::Lentil:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/Grip/Lentil.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::Grip::RightAngle:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/Grip/RightAngle.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::Grip::Round:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/Grip/Round.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::GripFactory:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/GripFactory.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::Toggle:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/Toggle.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::Toggle::Round:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/Toggle/Round.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::HotSpot::ToggleFactory:
+    file: lib/Gtk2/Ex/MindMapView/HotSpot/ToggleFactory.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Item:
+    file: lib/Gtk2/Ex/MindMapView/Item.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::ItemFactory:
+    file: lib/Gtk2/Ex/MindMapView/ItemFactory.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Layout::Balanced:
+    file: lib/Gtk2/Ex/MindMapView/Layout/Balanced.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Layout::Cluster:
+    file: lib/Gtk2/Ex/MindMapView/Layout/Cluster.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Layout::Column:
+    file: lib/Gtk2/Ex/MindMapView/Layout/Column.pm
+    version: 0.000001
+  Gtk2::Ex::MindMapView::Layout::Group:
+    file: lib/Gtk2/Ex/MindMapView/Layout/Group.pm
+    version: 0.000001
+generated_by: Module::Build version 0.2709
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

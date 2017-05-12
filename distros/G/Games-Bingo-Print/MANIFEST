@@ -1,0 +1,20 @@
+bin/bingo_print.pl
+bingo.pdf
+BUGS
+Build.PL
+CHANGES
+examples/bingo.pdf
+INSTALL
+lib/Games/Bingo/Print.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/critic.t
+t/kwalitee.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+t/Print.t
+TODO

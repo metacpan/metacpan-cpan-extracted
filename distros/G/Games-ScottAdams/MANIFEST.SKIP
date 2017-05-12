@@ -1,0 +1,15 @@
+.cvsignore
+CVS
+archive
+bin/.*\.sac
+bin/.*\.sao
+bin/Makefile
+crystal/crystal.sao
+lib/Games/ScottAdams/Manual.html
+tutorial/.*\.sao
+tutorial/Tutorial.html
+tutorial/Tutorial.man
+tutorial/Tutorial.pod
+tutorial/Tutorial.ps
+tutorial/pod2htmd.tmp
+tutorial/pod2htmi.tmp

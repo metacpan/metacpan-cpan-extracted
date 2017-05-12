@@ -1,0 +1,42 @@
+Getopt::Yagow version 2.00
+====================================
+
+Getopt::Yagow is an object oriented module that parses command line
+arguments. Its primary purpose is to facilitate development of
+command line utilities.
+
+It allows to especify the command line syntax as a function call or takes them
+from command line. Then it parses the specified command in a simple manner.
+If command line syntax is wrong, a message is displayed via
+Pod::Usage::pod2usage. Also help usage for util can be displayed (via
+pod2usage), using --help  --h or --? (this options are added default).
+
+Command line syntax can be especified 'a la Getopt::Long'. See documentation 
+for details.
+
+Using pod2usage simplifies maintenance of help usage and utility 
+documentation: both are he same. See Pod::Usage doc.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Getopt::Long version 2.25 or above.
+  Pod::Usage   version 1.14 or above.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Enrique Castilla Contreras. <ecastillacontreras@yahoo.es> .
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

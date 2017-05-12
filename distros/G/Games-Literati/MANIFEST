@@ -1,0 +1,22 @@
+Changes
+Literati.pm
+Makefile.PL
+MANIFEST
+README
+LICENSE
+t/01_import_wordlist.t
+t/02_board_init.t
+t/03_input_processing.t
+t/04_score_games.t
+t/game1
+t/game1ss
+t/game2
+t/game3
+t/game4
+t/game5
+t/game5ss
+t/game_i
+t/wordlist
+t/wordlist.2
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

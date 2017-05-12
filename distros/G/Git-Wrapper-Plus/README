@@ -1,0 +1,61 @@
+Git::Wrapper::Plus
+
+Initially, I started off with "Dist::Zilla::Util::" and friends, but I
+soon discovered so many quirks in "git", especially multiple-version
+support, and that such a toolkit would be more useful independent.
+
+So "Git::Wrapper::Plus" is a collection of tools for using
+"Git::Wrapper", aiming to work on all versions of Git since at least Git
+1.3.
+
+For instance, you probably don't realize this, but on older "git"'s,
+
+    echo > file
+    git add file
+    git commit
+    echo 2 > file
+    git add file
+    git commit
+
+does nothing, because on Git 1.3, "git add" is only for the addition to
+tree, not subsequent updates.
+
+    echo > file
+    git add file
+    git commit
+    echo 2 > file
+    git update-index file
+    git commit
+
+Is how it works there.
+
+And you'd have probably not realized this till you had a few smoke
+reports back with failures on old Gits.
+
+And there's more common failures, like some commands simply don't exist
+on old gits.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,159 @@
+Revision history for Geo::ShapeFile.
+
+2.64 2017-04-23
+    - Update some POD
+    - No functional changes from 2.63_001 dev release
+
+2.63_001 2017-04-17
+    - Add no_cache option to new method following
+      discussion at http://www.perlmonks.org/?node_id=1188065
+
+2.62 2017-01-08
+    - Add rlib to TEST_REQUIRES in Makefile.PL to avoid some
+      cygwin test failures
+
+2.61 2016-01-31
+    - Specify minimum Math::Trig version to avoid some cpantesters
+      fails on pre5.8.9 perls on Cygwin.  
+
+2.60 2014-03-14
+    - Add method to obtain the dbf header information.
+      https://github.com/shawnlaffan/Geo-ShapeFile/issues/15
+    - Clean up some POD formatting issues.  
+
+2.58 2014-03-06
+    - CPAN testers are green for 2.57_001 so make a production release.
+    - Fix incorrect passing of arguments in the shape index.
+      This should not affect most existing code as the indexing
+      is only used when called explicitly.
+      https://github.com/shawnlaffan/Geo-ShapeFile/issues/14
+    - Croak when an invalid file name is passed.
+      https://github.com/shawnlaffan/Geo-ShapeFile/issues/13
+
+2.57_001 2014-03-05
+    Development release towards 2.58.  Changes are listed there.  
+
+2.56 2014-02-18
+    - Shawn Laffan
+    - CPAN testers are green for 2.55_001, so bump the version number and release as a full version.
+
+2.55_001 2014-02-17
+    - Shawn Laffan
+    - Add Geo::ShapeFile::Shape::Index as a simple 2-d block based index.
+    - Geo::Shape::ShapeFile now uses a spatial index for the segments.
+      This speeds up the contains_point routines by about 50-70% when used.
+      The index is opt-in at the moment, so will have no effect on existing code.
+    - Geo::ShapeFile::get_part now returns an array ref in scalar context.
+    - Geo::ShapeFile::Point::angle_to now works.
+    - Many of the undocumented methods have been renamed to use a leading underscore,
+      as they are private methods.  This avoids a number of POD test warnings.
+    - Add parent, POSIX and autovovofication to the list of dependencies in the makefile.
+
+2.54 2014-02-11
+    - Shawn Laffan
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=89563
+      Thanks to Daniel Smith for reporting, and also providing an optimisation
+      which also handles edge overlap cases.
+    - Reorganise the test suite to allow running of subsets of tests.
+
+2.53_003 2014-02-10
+    - Shawn Laffan
+    - Clear up several longstanding RT tickets:
+        - https://rt.cpan.org/Ticket/Display.html?id=46698
+          Clarify docs such that point objects are passed to has_point, not coordinates.
+        - https://rt.cpan.org/Ticket/Display.html?id=46068
+          Values returned from width and height were swapped.  Thanks to Lee Goddard for reporting.
+        - https://rt.cpan.org/Ticket/Display.html?id=49054
+          $@ should have been @_ (thanks to rgsave@hotmail.com for reporting)
+        - https://rt.cpan.org/Ticket/Display.html?id=92790
+          DBF field names can now be accessed in file order.
+        - https://rt.cpan.org/Ticket/Display.html?id=63347
+          corners were incorrectly reported.  Thanks to Liam Gretton for reporting.
+    - Reorganise the test suite to use subtests, with tests in subs.  Add more tests. 
+    - General formatting and style changes to the code.
+    - Add List::Util as a dependency.
+    - Development is now on github, so update the metadata to reflect this.
+      https://github.com/shawnlaffan/Geo-ShapeFile
+
+
+2.52  2007-09-14
+    - Jason Kohles
+    - Fixed the overloading setup in Geo::ShapeFile::Point to keep it from
+      failing the tests caused by recent changes in Test::Builder (it was
+      definitely my bug though, don't blame the excellent Test modules for
+      it!)  This bug was reported by Hermann Schwaerzler, Andrew Koebrick,
+      Celia Mackie, Andrew McGregor, and probably a lot of other folks
+      (you can thank all these people for release 2.52, it was this bug that
+      clued me in how many people were actually using the package, I hadn't
+      intended to do another release until 3.00 was ready to go.)
+    - FINALLY fixed the (hopefully last of) the big-endian problem.  I
+      hadn't planeed to include this in this release, as I was still trying
+      to figure out how to fix it, but while going through my Geo::ShapeFile
+      related mail to see if there were any other little problems reported
+      that I could include, I discovered a wonderful patch that had been
+      sent to me some time ago by Jerry Leibold, which had somehow fallen
+      through the cracks.  My apologies for taking 2 years to get this
+      fixed, but every time I tried to figure out a solution I was stymied
+      by my lack of big-endian hardware (not to mention the fact that my
+      day job hasn't included mapping for several years, so I have precious
+      little free time to spend on maintaining Geo::ShapeFile, and most of
+      that time I've been putting into version 3.00)  This problem was also
+      reported by Josh Narins and probably other people whose emails I have
+      since misplaced.
+    - Reorganized the package layout a bit, so you can do 'prove -vl t' in
+      the distribution directory now.
+    - Roger Crew pointed out that the centroid of a polygonal area is
+      different from the centroid of its vertices, and contributed a new
+      area_centroid() method for Geo::ShapeFile::Shape.  I renamed the
+      existing centroid() method to vertex_centroid(), although for the
+      time being, centroid() is an alias to vertex_centroid().
+    - Roger Crew also contributed a contains_point() method for
+      Geo::ShapeFile::Shape that determines whether a given point falls
+      within the interior of the shape.  Miroslav Suchy also contributed
+      a similar method, but I used Roger's because it didn't add any more
+      external dependencies.
+    - Fixed an argument ordering bug in Geo::ShapeFile::bounds_contains_point
+      (also reported by Roger Crew, thanks for the all the help Roger!)
+
+2.51  2005-05-12
+    - Jason Kohles
+    - Corrected a stupid math problem in Geo::ShapeFile::Shape::centroid
+      function, reported by an anonymous rt.cpan.org user.
+    - Fixed a problem discovered by Celia Mackie, where some complex shape
+      types didn't have their Z and M values transferred into the points
+      correctly, making it difficult to access those values.
+
+2.50  2004-07-03
+    - Jason Kohles
+    - things calming down at new job, more free time at home for pet projects.
+      hopefully this means more Geo::ShapeFile support to come (as well as
+      posting some new modules in progress)
+    - fixed windows bug reported by Patrick Dughi
+    - object caching
+    - fixed another windows bug reported by A. B. Jones
+    - fixed dumb regexp bug that wouldn't let you use directories with a dot in
+      them (doh!).  Reported by Leo WEST
+    - fixed documentation bug for shapes_in_area reported by Chad Harp
+    - fixed endianess bug reported by Daniel Gildea
+    - fixed some count issues, and code cleanup reported by Fergus McMenemie
+    - documentation clarification suggested by Christopher Eykamp
+    - fixed divide by zero bug when using angle_to() on points with the same
+      X value, reported by Frank Maas
+    - fixed bug where has_point() missed points that fell exactly on the
+      boundary of the area specified, reported by Frank Maas
+    - modified dbf file reader to correctly load DBF files that don't have
+      an end-of-file marker byte.  This should correct the 'file size off
+      by one byte' bug first reported by Attila Csipa (sorry it took so long,
+      I couldn't find data that reproduced it), patch submitted by
+      Aleksandar Jelenak.
+
+2.10  2003-03-17
+    - Jason Kohles
+    - fixed missing prerequisites in Makefile.PL
+    - initial support for creating new shapefiles
+    - removed some less-than-useful required modules
+
+1.5   2003-02-16
+    - Jason Kohles
+    - initial release
+

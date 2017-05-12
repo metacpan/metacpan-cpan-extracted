@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 38dd40d4fe9a8a408648f2f2c1a2a3ac76bbac72 Build.PL
+SHA1 8cacb0dd2e22debbb7445194db3507266750cc87 CHANGES
+SHA1 10049617123d6b0b4348c470cae7e04843006413 INSTALL
+SHA1 02154445bc9831e791c35050f1a018ed99030016 LICENSE
+SHA1 bd573f68a9040f6f24d7118da0dc22fb25bdcde5 MANIFEST
+SHA1 9b4c835023a8a5801c53a0853524a5aeb90bf7c9 META.yml
+SHA1 55304786c8799a3c1b85f690da9bff750e51183a Makefile.PL
+SHA1 0a98bfe59e5bc92e31cbbe433df8e311a52b2bcf README
+SHA1 7e2cfa1b9efe0d502ee57717649c90ba4bd28ba9 inc/Module/Install.pm
+SHA1 6e1392d80a0f239eecd5664f7f21f922cedb9329 inc/Module/Install/Base.pm
+SHA1 c9121d9bff4f4ab617c78ada27f458355cad0f19 inc/Module/Install/Build.pm
+SHA1 f69417fe831d9cc22a78f00a617afadceade4d81 inc/Module/Install/Can.pm
+SHA1 c61d02895330310048bf388881b5e2e064031561 inc/Module/Install/Fetch.pm
+SHA1 54fcbed19232ec959bb17cfb4410599afc7f0779 inc/Module/Install/Makefile.pm
+SHA1 7d3be9b158e37b2b2c22084740099955623b1d56 inc/Module/Install/Metadata.pm
+SHA1 0a8b66180229ba2f9deaea1fedd0aacf7a7ace6b inc/Module/Install/Win32.pm
+SHA1 d3352eb33fe43a5f3ead513f645224fe34d73bc9 inc/Module/Install/WriteAll.pm
+SHA1 4d68eb5762c18fa1e631cd4e20c690ae47e8ed28 lib/Graph/Convert.pm
+SHA1 2473ad35975049c157042055dd0f6cc8b9575619 t/att.t
+SHA1 ee07f8ad54fc9dff70ed8b7d6aedc5487a9db840 t/convert.t
+SHA1 369fb5d95825052e392ada281cb01a8f8cce0a30 t/group.t
+SHA1 8e5b732ee43a03cfe044016ea7b879427fc3d19d t/pod.t
+SHA1 5343bb62424a4025d49346e7ef596d4349200c47 t/pod_cov.t
+SHA1 5fb81820f463aecc3b2f828e30ca6a5436dc0b2f t/undirected.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iQEVAwUBR0HMyXcLPEOTuEwVAQIcTwf+Nc4GhG2haiMd74H9zTrG9anJTSPw2UPK
+gnaz9yRAYO3YQ4qc4lnpFY9+tZqLE0s/GW6Rgn/4jXfEXDAJ0uui8IN/7ZALtGkh
+Fa/kxfTkAnulqO/cPLUvkP2NmqSJqU4Y5NTa/2WahBg/S/cASMqZ7veFwQbDIzup
+keckDgJr1LLQx0KTCJ3c0P4WPVCYkPH77ezRMcbuRRKxJncqEP2dYXc09iNJVl5s
+ZjIhg8PR22Mf7vBVJIRYKVkOILcIfI3e/9t3m1zbWYqHCB5ldmtxz1+egJqG65J/
+a8guXam5f5tor7bvTbN/WGw0Wn8SQr3DQebKLS51zB3ZW2l7SvHq2w==
+=Bs86
+-----END PGP SIGNATURE-----

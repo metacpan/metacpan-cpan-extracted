@@ -1,0 +1,19 @@
+Received: from neptune.healthnet.org (rolf@neptune.healthnet.org [198.115.132.11]) by satellife.healthnet.org (8.6.12/8.6.12) with ESMTP id LAA07026 for <rolf@satellife.healthnet.org>; Mon, 2 Dec 1996 11:42:03 -0500
+Received: (from rolf@localhost) by neptune.healthnet.org (8.6.12/8.6.9) id QAA00777; Mon, 2 Dec 1996 16:42:25 GMT
+Date: Mon, 2 Dec 1996 16:42:25 GMT
+Message-Id: <199612021642.QAA00777@neptune.healthnet.org>
+From: GetWeb Miser <getweb-miser-test@usa.healthnet.org>
+To: getweb(a)usa.healthnet.org
+Subject: mail test
+Reply-to: rolf@usa.healthnet.org
+
+GET file://test/promed_new.html
+
+GET file://test/promed.html
+
+GET file://test/promed_old.html
+
+GET TO getweb_test_other NOMIME SOURCE file://test/promed.html
+
+--
+This signature should be ignored.

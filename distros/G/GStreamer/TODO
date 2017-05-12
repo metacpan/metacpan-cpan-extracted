@@ -1,0 +1,23 @@
+# $Id$
+
+Stuff that still needs some love:
+
+* Make GStreamer::Buffer more robust.  Find out if enough of the related macros
+are bound.
+
+* Wrap missing API.  Many macros are not bound and need to be either exported
+or worked around.  Missing xsubs are mostly marked with FIXMEs.  Completely or
+nearly completely unbound headers include:
+  - gstfilter.h
+  - gstinterface.h
+  - gstsegment.h
+  - gsttask.h
+  - gsttrace.h
+  - gsttypefind.h
+  - gsturi.h
+  - gsturitype.h
+  - gstutils.h
+  - gstvalue.h
+  - gstxml.h
+
+* Figure out how to handle documentation generation for plugins.

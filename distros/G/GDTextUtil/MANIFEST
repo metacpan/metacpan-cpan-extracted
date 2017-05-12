@@ -1,0 +1,15 @@
+Changes
+README
+Makefile.PL
+MANIFEST
+Dustismo_Sans.ttf
+Dustismo.LICENSE
+demo/GDWrap.pl
+demo/GDWrap.ref.png
+t/lib.pl
+t/text.t
+t/align.t
+t/wrap.t
+Text.pm
+Text/Wrap.pm
+Text/Align.pm

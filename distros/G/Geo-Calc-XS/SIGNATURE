@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 80b178d404ac1700b93adf0963cd0ea4406086cc ChangeLog
+SHA1 b23f7f0edf62f804655e50a3d46e0a2d0f45d2fb MANIFEST
+SHA1 938f285960c87a2cf483509c8a156a5f6f6613ba MANIFEST.SKIP
+SHA1 39a8f5427bccd5b670a08bc405e913ca0d16656c META.json
+SHA1 26ba682d5fd30ac9f4c27563d2dec1b2b1b068ef META.yml
+SHA1 71b9c93d986aa5f8881b975eb3f66b260d25b7cb Makefile.PL
+SHA1 c8c9c81eb92155ddb51cec1bcb0a7c2d99a18664 README
+SHA1 57f1188635d4d03e49c678ab08c59b85b7176808 XS.xs
+SHA1 b4fc14ef7bc3598aaff8c11a09caf9d079995414 lib/Geo/Calc/XS.pm
+SHA1 56a2661a437c84c604f5648ae036edfd0e8829b9 t/01_use.t
+SHA1 6bb99792e10125572bc1335544a82db058b1d032 t/02_check_module.t
+SHA1 f590a1274aa265d683e6ba620a6e07d9c7b4612c t/03_properties.t
+SHA1 5ae0edff6aa55beed8b86d7ca376c450c10925ea t/04_units.t
+SHA1 082068db0161ed1bde5cfc8c79b8dd31f261ff0e t/05_fuzzy_input.t
+SHA1 aabb23aa4e63ac6e67b6f376a21f0f740bc13d81 t/06_memory_leak.t
+SHA1 2d194f61f76598b463a2aa5a76c6bb552cdb1a8e t/07_debugger.t
+SHA1 16ec71cde5eb575575adc75bb0c9f1b4c22cda0d t/90_benchmark.t
+SHA1 b42006549caf2a1f3d7d1e759dece02736346f81 t/99_pod.t
+SHA1 05686cceca4e29ebcb58fcf575facc15e8576562 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUP8jHAAoJEOJwqcz6i68zS7MIAINb0lly5tUiGgJ+m8TCywu3
+Z32UyQxTyhtUYloQq6UIVfbw9BjLP7z2XvrHcFwDh3ZH1Gjn+ulsmhEQ0E7g6E2n
+CTbvynCPe+CqcRL/rNJ2HoTNxd1pniJ9I1HrLYlg4zhYqlbRw/8JXbhMhyQ2D7rv
+UugAN8tVLttL5mc/SpG5n0aJYV5t+eRNfXvXL/OVAHOR4nrl/VVJxWFZpVr8pJPi
+FQBOLb1Ptr2WsVCXI0YXSOzJn0Vr0GWltzNofhts98Sf2JEn6Vt/Z18Lqihc0Bzs
+I8RvkVsmzp1AJOD0i7zVwFrJNP30KxTSY/wHcY5Pxoii7ASirXMfD6LjMczQRFw=
+=mPHI
+-----END PGP SIGNATURE-----

@@ -1,0 +1,26 @@
+---
+abstract: 'Convenience functions for the Gtk3 module'
+author:
+  - 'Thierry Vignaud <tvignaud@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gtk3-Helper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Gtk3: 0
+resources:
+  Bucktracker: https://github.com/potyl/perl-Gtk3-Helper/issues
+  homepage: https://github.com/potyl/perl-Gtk3-Helper
+  repository: https://github.com/potyl/perl-Gtk3-Helper
+version: 0.02

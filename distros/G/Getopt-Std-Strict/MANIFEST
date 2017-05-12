@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+lib/Getopt/Std/Strict.pm
+t/33_leocharre_cli_gopts.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+podregister {
+  $drawable->become('Gimp::Layer');
+  my $w = $drawable->width();
+  my $h = $drawable->height();
+  my $wspan = int ($w / 2 + 0.5);
+  my $hspan = int ($h / 2 + 0.5);
+  $image->undo_group_start;
+  my $temp1 = $drawable->copy(1);
+  $image->insert_layer($temp1, 0, -1);
+  my $orientation = ($mirror < 2)
+    ? &Gimp::ORIENTATION_VERTICAL
+    : &Gimp::ORIENTATION_HORIZONTAL;
+  $temp1 = $temp1->transform_flip_simple($orientation, TRUE, 0.0);
+  my @xywh;
+  if ($mirror == 0) {
+    # upper half
+    @xywh = (0, $hspan, $w, $h - $hspan);
+  } elsif ($mirror == 1) {
+    # lower half
+    @xywh = (0, 0, $w, $hspan);
+  } elsif ($mirror == 2) {
+    # left half
+    @xywh = ($wspan, 0, $w - $wspan, $h);
+  } elsif ($mirror == 3) {
+    # right half
+    @xywh = (0, 0, $wspan, $h);
+  };
+  $image->select_rectangle(&Gimp::CHANNEL_OP_REPLACE, @xywh);
+  $temp1->edit_copy;
+  $drawable->edit_paste(1)->floating_sel_anchor;
+  $image->remove_layer($temp1);
+  $image->selection_none;
+  $image->undo_group_end;
+  return;
+};
+exit main;
+__END__
+
+=head1 NAME
+
+mirror_split - Splits and mirrors half of the image, according to settings
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Distorts/MirrorSplit...
+
+=head1 DESCRIPTION
+
+Just tick appropriate radio button.
+
+=head1 PARAMETERS
+
+  [PF_RADIO, "mirror", "Which half to mirror (0=U,1=D,2=L,3=R)", 0,
+    [Upper => 0, Lower => 1, Left => 2, Right => 3]
+  ]
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 HISTORY
+
+<sjburges@gimp.org> 2/25/04: changed specifiers to explictly reference
+the GIMP namespace, s/undo_push/undo/, now have to add layer to image in
+order to flip it, or you get a PDB error.  So added, flipped, used, then
+removed.
+
+=head1 AUTHOR
+
+Claes G Lindblad <claesg@algonet.se>
+
+=head1 DATE
+
+990530
+
+=head1 LICENSE
+
+Claes G Lindblad <claesg@algonet.se>
+
+Distributed under terms of the GNU Public License.

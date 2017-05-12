@@ -1,0 +1,48 @@
+---
+abstract: 'sub-command friendly, like Getopt::Compact'
+author:
+  - 'xaicron <xaicron {at} cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.96
+  Test::Output: 0
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Getopt-Compact-WithCmd
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Getopt::Compact::WithCmd:
+    file: lib/Getopt/Compact/WithCmd.pm
+    version: 0.22
+recommends:
+  Text::ParseWords: 0
+requires:
+  Getopt::Long: 2.38
+  Text::Table: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/xaicron/p5-Getopt-Compact-WithCmd/issues
+  homepage: https://github.com/xaicron/p5-Getopt-Compact-WithCmd
+  repository: git://github.com/xaicron/p5-Getopt-Compact-WithCmd.git
+version: 0.22
+x_contributors:
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'

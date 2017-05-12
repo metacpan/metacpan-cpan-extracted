@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=<yourkey>&sensor=true">
+    </script>
+    <script type="text/javascript">
+      var overlayMaps = [{
+        getTileUrl: function(coord, zoom) {
+          return "hm.fcgi?tile="+coord.x+"+"+coord.y+"+"+zoom;
+        },
+
+        tileSize: new google.maps.Size(256, 256),
+        isPng: true,
+        opacity: 0.4 
+      }];
+
+      function initialize() {
+        var mapOptions = {
+          center: new google.maps.LatLng(48.2130, 16.375),
+          zoom: 9
+        };
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+
+      var overlayMap = new google.maps.ImageMapType(overlayMaps[0]);
+      map.overlayMapTypes.setAt(0,overlayMap);
+
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"/>
+  </body>
+</html>

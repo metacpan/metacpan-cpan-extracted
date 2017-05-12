@@ -1,0 +1,45 @@
+Virtual {
+  base = 'Games::3D::Thingy'
+  visible = off
+}
+
+Virtual::Link {
+  base = 'Games::3D::Link'
+}
+
+Virtual::Sensor {
+  base = 'Games::3D::Sensor'
+}
+
+Physical {
+  model = "default.md2"
+  visible = 1
+}
+
+Physical::Light {
+  r = FRACT=0
+  g = FRACT=0
+  b = FRACT=0
+  a = FRACT=0
+  state_0 = [ 75, a, 0 ]
+  state_1 = [ 250, a, 1 ]
+}
+
+Physical::Switch {
+  on_frob = SIG_FLIP
+}
+
+Physical::Loot {
+  value = 1
+  on_frob = CODE="$src->add('loot',$self->{value})"
+}
+Physical::Loot::Coin {
+  info = "A small gold coin"
+  model = "coin.md2"
+}
+Physical::Loot::Gem {
+  info = "A small white gem"
+  value = 12
+  model = "gem.md2"
+}
+

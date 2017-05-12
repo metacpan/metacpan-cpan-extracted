@@ -1,0 +1,36 @@
+
+				   GStreamer
+				  -----------
+
+This module allows you to use version 0.10.x of the GStreamer C libraries from
+Perl.  
+
+NOTE: There is a separate Perl module for the 1.x series of the GStreamer C
+libraries, available at https://metacpan.org/pod/GStreamer1.  The two C
+libraries, as well as their associated Perl modules, can be installed
+concurrently on the same host.
+
+GStreamer 0.10.x comes with automatically generated API documentation.  Its
+index can be accessed with:
+
+  perldoc GStreamer::index
+
+				 Installation
+				--------------
+
+To install GStreamer, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+				 Dependencies
+				--------------
+
+GStreamer depends on any release of the 0.10 series of the GStreamer library
+and on the following Perl modules:
+
+  ExtUtils::Depends
+  ExtUtils::PkgConfig
+  Glib >= 1.180

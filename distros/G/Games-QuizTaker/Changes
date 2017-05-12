@@ -1,0 +1,140 @@
+Revision history for Perl extension Games::QuizTaker.
+
+1.00  Mon Oct 01 13:35:59 2001
+	- Original version; created by h2xs 1.20 with options
+		-AXn Games::QuizTaker
+
+1.01  Sat Oct 20 19:27:50 2001
+	- Added the README file
+	
+1.02  Fri Nov 02 11:17:21 2001
+	- Located and fixed bug in the test function that kept
+	  it from printing all of the questions.
+
+1.03  Thu Nov 15 09:27:58 2001
+	- Redesigned object constructor call and added get/set
+	  functions for parameters within the object.
+		- Changed the name and style of the parameters when
+	  	  creating the object
+		- Modified test.pl to correspond with the above
+		  changes
+		- Added a debugging function
+
+	- Modified the POD to correspond with the above changes
+
+
+1.04  Tue Nov 20 14:25:09 2001
+	- Modified the system('clear') call in the test function so
+	  that it now will work on either Windows or Unix
+
+	- Added the ability for questions to have more than one answer
+		- modified the functions new,load, and test
+
+	- Modified the POD to correspond with the above changes
+
+1.05  Thu Dec  6 15:41:38 2001
+	- Added a test to check to see if the $Max_Questions is less
+	  than 1 in the generate function. If it is, the module will
+	  croak.
+
+1.06  Fri Dec 14 15:45:03 2001
+	- Added a _set and _get function for the number of max questions
+	  in the generate and test functions. The object will now store
+	  the max number within itself in the _Max_Questions parameter.
+
+	- Modified the POD to correspond with the above change
+
+1.07  Mon Jan 14 13:01:52 2002
+	- Added the option of turning off the _Final_Score subroutine
+
+	- Modified the POD to correspond with the above change
+
+1.08  Tue Apr  2 14:41:39 2002
+	- Corrected the internal _get_Score Function, so that it doesn't
+	  throw an error at the end of the quiz
+
+	- Added POD in HTML format for the ActiveState distribution of
+	  this module
+
+1.09  Sat Jun  8 23:16:09 2002
+	- Modified the AUTOLOAD subroutine
+
+	- Cleaned up some syntax in the test sub-routine
+
+1.091 Thu Jun 20 14:19:01 2002
+	- Corrected a typo in the POD
+
+1.10  Wed Jul  3 16:26:00 2002
+	- Updated the HTML version of the POD
+
+	- Optimized an if..elsif..else statement within the generate function
+
+1.12  Tue Nov 12 18:00:50 2002
+	- Removed some unnecessary variables and modified the calls to the
+	  generate and test functions.
+
+	- Made corresponding changes to the POD
+
+	- Made corresponding changes to HTML version of the POD
+
+1.20  Thu Nov 21 11:32:32 2002
+	- Renamed the internal get/set methods and made the calls to those
+	  methods more object oriented
+
+1.21  Mon Jan  6 14:21:28 2003
+	- Discovered a small bug in the load function and fixed it.
+
+1.22  Tue Jan 21 14:52:51 2003
+	- Corrected a problem with the Score parameter in the object. It
+	  is now undef by default, and will only print out a final score
+	  if set.
+
+	- Made the necessary changes in the test script, and added
+	  a new test to check for functionality
+
+	- Made corresponding changes to the POD
+
+	- Made corresponding changes to the HTML version of the POD
+
+1.24  Wed Feb  5 10:22:16 2003
+	- Fixed a small problem with the Answer_Separator and
+	  Answer_Delimiter. Cleaned it up so that the load and
+	  test functions will properly split/substitute on whatever
+	  is passed as a delimiter.
+
+1.25  Wed Oct 29 12:29:04 2003
+	- Re-implemented the tests using the Test::More module
+
+1.26  Fri Jan  2 11:20:10 2004
+	- Changed the new and load functions. The "new" function now
+	  checks to see if the question delimiter and the answer delimiter
+	  are the same, and croaks if they are.
+
+	- Added a new test for the above change, plus some additonal tests
+	  to check that all subroutine error functions are working properly
+
+	- Fixed a formatting problem within the pod
+
+1.27  Tue Jan 11 09:23:04 2005
+	- Reaccomplished the tests using Test::Harness and added a test for
+	  the POD using Test::Pod
+
+2.00  Tue Mar 21 00:06:10 2006
+	- New version of the module using the Object::Inside out module.
+	- Wrote/modified tests as needed
+
+2.01  Mon May 14 19:46:07 2007
+        - Added an answer_sort function that should now allow the user to enter
+	  multiple answers in any order and have them match
+	- Cosmetic changes to POD
+
+2.011 Sat May 19 18:13:54 2007
+        - More cosmetic changes to POD
+
+2.1   Tue Jun 19 19:13:24 2007
+        - Added a new test to cover the 'test' function
+	- Changed the 'test' function by adding a new inner module called
+	  Games::QuizTaker::IO, which has two functions called in and out,
+	  to allow for easier testing of the module.
+	- Added the global variable $TESTONLY that is only used by the tests
+

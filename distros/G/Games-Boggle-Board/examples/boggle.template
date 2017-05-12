@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//ajdelore//DTD XHTML 1.0 Strict Modified//EN" 
+ "http://www.sfu.ca/~ajdelore/dtd/xhtml1-strict-modified.dtd"> 
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <title>cgi-Boggle</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <link rel="stylesheet" 
+        href="http://www.sfu.ca/~ajdelore/anthony.css" 
+        type="text/css" />
+  <link rev="made" href="mailto:ajdelore@sfu.ca" />
+
+  <style type="text/css">
+  <!--
+  #board {
+    margin-top: 3em;
+  } 
+  #board td {
+    font-size: xx-large;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    margin: .25em;
+    padding: .5em;
+    text-align: center;
+  }
+    
+  -->
+  </style>
+
+</head>
+
+<body>
+
+<div id="navbar">
+  <a href="http://www.sfu.ca/~ajdelore/" 
+     title="Home">Home</a>
+  | back to <a href="http://www.sfu.ca/~ajdelore/boggle/" 
+               title="Games::Boggle::Board">Games::Boggle::Board</a>
+  | <a href="mailto:ajdelore@sfu.ca" title="E-Mail Link">ajdelore@sfu.ca</a>
+</div>
+
+<h1>cgi-Boggle</h1>
+
+<p>
+  Find as many words in the puzzle as you can within three minutes. 
+  Timing is on the honour system. Type in words separated by spaces, 
+  tabs, or press the enter key.
+</p>
+<p>
+  If you've never played, check the 
+  <a href="http://www.centralconnector.com/GAMES/boggle.html">official
+  boggle rules</a>.
+</p>
+
+<div style="text-align: center;">
+<table id="board">
+<TMPL_LOOP NAME="board">
+  <tr>
+  <TMPL_LOOP NAME="line">
+    <td><TMPL_VAR NAME="letter"></td>
+  </TMPL_LOOP>
+  </tr>
+</TMPL_LOOP>
+</table>
+
+<form method="post" action="http://cgi.sfu.ca/~ajdelore/boggle/boggle.cgi">
+  <p>
+  <input type="hidden" name="board" value="<TMPL_VAR NAME="board_string">" />
+  <textarea rows="8" cols="32" name="words"></textarea><br />
+  <input type="submit" value="Check my words" />
+  </p>
+</form>
+</div>
+
+</body>
+</html>

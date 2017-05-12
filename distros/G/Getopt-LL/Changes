@@ -1,0 +1,40 @@
+Revision history for Getopt-LL
+
+1.0.0  Fri Jan 04 14:13:12 2008 [asksh@cpan.org]
+    - Fixes some tests that broke in perl 5.10. (No serious bugs).
+    - This has been quite stable for some time now, so the version number has
+      been bumped to 1.0.
+    - No API changes.
+
+0.0.7  Tue Sep 11 12:13:14 2007 [asksh@cpan.org]
+    - Removed the class-name for DLList::Node properties in isa_Object
+      statements, to be sure that a new object is not created if it doesn't
+      exist.
+
+0.0.6  Mon Sep 10 13:36:03 2007 [asksh@cpan.org]
+    - Class::Dot moved into it's own distribution.
+    - Added dependency: Class::Dot
+
+0.0.5  Tue Aug 14 16:29:45 2007 [asksh@cpan.org]
+    - Now skips author tests. Removed author test modules from dependencies.
+
+0.0.5  Tue Jul 03 09:22:31 2007 [asksh@cpan.org]
+    - From: Tomohiro Hosaka
+    - CPAN RT ticket: http://rt.cpan.org/Ticket/Display.html?id=27924 
+    - Subject: Typo in Getopt::LL::Simple pod.
+    
+    Fixed.
+
+0.0.4  Thu Jun 28 08:26:45 2007 [asksh@cpan.org]
+    - From: Josts Smokehouse
+    > Subject: FAIL Getopt-LL-0.0.3 sun4-solaris-thread-multi 2.9
+    > [snip]...[/snip]
+    > t/dllist....................Can't locate Getopt/LL/properties.pm in @INC
+    > [snip]...[/snip]
+
+    Fixed. {use Getopt::LL::properties} changed to {use Class::Dot} in file
+    t/TestDLListCompare.pm.
+
+0.0.3  Sat Jun 22 01:25:23 2007 [asksh@cpan.org]
+       * Initial release.
+

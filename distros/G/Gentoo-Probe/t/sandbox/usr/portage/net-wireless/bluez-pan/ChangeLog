@@ -1,0 +1,28 @@
+# ChangeLog for net-wireless/bluez-pan
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/bluez-pan/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  15 Feb 2004; David Holm <dholm@gentoo.org> bluez-pan-1.1.ebuild:
+  Added to ~ppc.
+
+  12 Feb 2004; Ciaran McCreesh <ciaranm@gentoo.org> bluez-pan-1.1.ebuild:
+  Adding ~sparc (works with some kernels, see bug #39710)
+
+  30 Jan 2004; Peter Johanson <latexer@gentoo.org> bluez-pan-1.1.ebuild,
+  metadata.xml:
+  Fix for wireless->mobile herd change, and header dates
+
+  09 May 2003; Peter Johanson <latexer@gentoo.org> bluez-pan-1.1.ebuild:
+  Marked stable now that gentoo-sources-2.4.20-r4 is released
+
+*bluez-pan-1.1 (27 Apr 2003)
+
+  27 Apr 2003; Peter Johanson <latexer@gentoo.org> bluez-pan-1.1.ebuild:
+  version bump
+
+*bluez-pan-1.1_rc2 (18 Mar 2003)
+
+  18 Mar 2003; Patrick Kursawe <phosphan@gentoo.org> ChangeLog,
+  files/digest-bluez-pan-1.1_rc2, bluez-pan-1.1_rc2.ebuild :
+  Initial import. Ebuild submitted by Patrik Kullman 
+  <patrik.kullman@netsafe.se> in bug #17293.

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Games-Go-SGF2misc-SVG.t
+lib/Games/Go/SGF2misc/SVG.pm
+META.yml                                 Module meta-data (added by MakeMaker)

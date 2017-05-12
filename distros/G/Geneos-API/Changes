@@ -1,0 +1,20 @@
+Revision history for Perl extension Geneos::API.
+
+0.10  Mon Oct 13 14:21:39 2014
+	- original version
+
+0.11  Mon Oct 13 15:11:19 2014
+        - updated the POD documentation 
+
+0.12  Fri Dec 26 16:21:42 2014
+        - added API Streams implementation
+        - added custom error and debug handlers
+        - updated the POD documentation
+
+0.13  Thu Jan 22 18:17:27 2015
+        - get_sampler and sampler_exists methods can now reference samplers within types 
+        - added various examples
+        - updated the POD documentation
+
+1.00  Sat Jan 24 19:35:11 2015
+        - the module has reached state of maturity 

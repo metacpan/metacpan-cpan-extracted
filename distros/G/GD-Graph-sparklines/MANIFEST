@@ -1,0 +1,10 @@
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+lib/GD/Graph/sparklines.pm
+t/GD-Graph-sparklines.t
+t/draw-graphs.t
+Makefile.PL
+data/fxp0.csv
+README

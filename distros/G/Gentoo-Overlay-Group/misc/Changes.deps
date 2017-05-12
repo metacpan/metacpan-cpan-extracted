@@ -1,0 +1,71 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000001
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+1.000000 2014-10-08T06:59:17Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / runtime requires]
+ - Moo
+ - MooX::HandlesVia
+ - Types::Path::Tiny
+ - Types::Standard
+ - namespace::clean
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+
+ [Changed / runtime requires]
+ - Gentoo::Overlay v1.0.3 → 2.001001
+ - perl v5.10.0 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4003
+
+ [Removed / configure requires]
+ - Module::Build 0.4003
+
+ [Removed / runtime requires]
+ - Moose
+ - MooseX::Types::Moose
+ - MooseX::Types::Path::Tiny
+ - namespace::autoclean
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.2.0 2013-03-13T07:25:37Z
+ [Added / runtime requires]
+ - MooseX::Types::Path::Tiny
+
+ [Added / test requires]
+ - Path::Tiny
+
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / runtime requires]
+ - Gentoo::Overlay 1.0000002 → v1.0.3
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+ [Removed / runtime requires]
+ - MooseX::Types::Path::Class
+
+ [Removed / test requires]
+ - Path::Class::Dir

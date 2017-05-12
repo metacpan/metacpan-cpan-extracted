@@ -1,0 +1,172 @@
+#compdef emerge
+
+# $Id: _portage,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+# ZSH completion function for emerge
+# Author: baptux <bapt@ifrance.com>
+# Author: Mamoru KOMACHI <usata@gentoo.org>
+
+_emerge () {
+    local state
+    if (( CURRENT == 2 ));then
+        _arguments -s \
+            '*:*:->actions' \
+            "$common_args[@]" "$install_args[@]" && return 0
+    elif (( CURRENT > 2 ));then
+        case "$words[2]" in
+	    unmerge|-C)
+		_arguments -s \
+		    '*:installed pkgname with versions:_portage_unmerge' "$common_args[@]" && return 0
+		;;
+	    clean|-c)
+	    	_arguments -s \
+		    '*:installed pkgname:_portage_clean' "$common_args[@]" && return 0
+		;;
+	    --usepkgonly|-K)
+		_arguments -s \
+		    '*:use package only:_portage_tbz2list' "$common_args[@]" && return 0
+		;;
+	    depclean|help|-h|info|regen|sync|rsync|--searchdesc|-S|search|-s|inject|-j|prune|-P)
+		;;
+	    *)
+		_arguments -s \
+		    '*:*:->install_portage' \
+		    "$common_args[@]" \
+		    "$install_args[@]" && return 0
+		;;
+        esac
+    fi
+    while [[ -n "$state" ]]; do
+        lstate=$state
+        state=''
+        case "$lstate" in
+	    actions)
+		_alternative \
+		    ':emerge actions:_actions' \
+		    '*:portage:_portage_pkglist'
+		;;
+	    install_portage)
+		_alternative \
+		    '*:portage:_portage_pkglist'
+		;;
+        esac
+    done
+}
+
+#Function to show only installed packages "cat/name-ver"
+_portage_unmerge(){
+    installed_portage=(/var/db/pkg/*-*/*)
+    installed_dir=/var/db/pkg/
+    installed_pkg=${installed_portage//$installed_dir/}
+    _tags -s installed_pkg && { compadd "$@" -k installed_pkg || compadd "$@" ${(kv)=installed_pkg} }
+}
+
+#Functions to show "cat/name", classes and dependencies
+_portage_clean() {
+    installed_portage=(/var/db/pkg/*-*/*)
+    installed_dir=/var/db/pkg/
+    installed_pkg=${installed_portage//$installed_dir/}
+    installed_pkgname=${(M)${${installed_portage##*/}%%-[0-9]*}}
+    _tags -s installed_pkg && { compadd "$@" -k installed_pkg || compadd "$@" ${(kv)=installed_pkg} }
+    _tags -s installed_pkgname && { compadd "$@" -k installed_pkgname || compadd "$@" ${(kv)=installed_pkgname} }
+}
+
+#Function to show tbz2 files available
+_portage_tbz2list() {
+    # this doesn't take care of ${PORTAGE_BINHOST}. If Gentoo official
+    # binary mirror will be available we should rewrite it accordingly.
+    _path_files -g \*.tbz2 -W "${pkgdir}/All"
+}
+
+#Function to show all available portage names
+_portage_pkglist(){
+    portage_classlist="world system"
+    portage_pkglist="$portage_pkglist ${portage_classlist}"
+    _tags -s portage_pkglist && { compadd "$@" -k portage_pkglist || compadd "$@" ${(kv)=portage_pkglist} }
+    _path_files -/ -W "${portdir}"
+    # XXX: If I add ${portdir_overlay} category completion won't work properly
+    #[[ -n "${portdir_overlay}" ]] && _path_files -/ -W "${portdir_overlay}"
+    _path_files -g \*.ebuild
+}
+
+common_args=(
+    {'(-p)--pretend','(--pretend)-p'}'[simply  display  what would be done]'
+    {'(-d)--debug','(--debug)-d'}'[Tells emerge to run the emerge command in debug mode]'
+)
+install_args=(
+    {'(--upgradeonly -U --update -u --quiet -q --onlydeps -o --oneshot --nospinner --noreplace -n --nodeps -O --noconfmem -D --deep --changelog --buildpkg -B -b --buildpkgonly --emptytree -e -f --fetchonly)-l','(--upgradeonly -U --update -u --quiet -q --onlydeps -o --nospinner --noreplace -n --nodeps -O --noconfmem -D --deep --emptytree -e -f --fetchonly -l --buildpkg -b -B --buildpkgonly )--changelog'}'[This will show the ChangeLog]'
+    {'(-b --buildpkgonly -B --changelog -l)--buildpkg','(--changelog -l --buildpkg --buildpkgonly -B)-b'}'[Tells emerge to build binary packages]'
+    {'(-B -b --buildpkg --changelog -l)--buildpkgonly','(--changelog -l --buildpkgonly --buildpkg -b)-B'}'[Tells emerge to only build binary packages]'
+    {'(-D --changelog -l)--deep','(-l --changelog --deep)-D'}'[Consider the entire dependency tree of packages]'
+    {'(-e -l --changelog)--emptytree','(--emptytree -l --changelog)-e'}'[Only consider glibc as installed packages]'
+    {'(-f -l --changelog)--fetchonly','(-l --changelog --fetchonly)-f'}'[Just perform fetches for all packages]'
+    '(-l --changelog)--noconfmem[Causes portage to disregard merge records]'
+    {'(--changelog -l -O)--nodeps','(--nodeps --changelog -l)-O'}'[Merges specified packages without merging dependencies]'
+    {'(-l --changelog -n)--noreplace','(-l --changelog --noreplace)-n'}'[Skip packages already installed]'
+    '(-l --changelog)--nospiner[Disables the spinner for the session]'
+    '(-l --changelog)--oneshot[Do not add package to the world profile]'
+    {'(--onlydeps --changelog -l)-o','(--changelog -o -l)--onlydeps'}'[Only merge (or pretend to merge) the dependencies]'
+    {'(--quiet --changelog -l)-q','(-q --changelog -l)--quiet'}'[General outcome is a reduced or condensed output]'
+    {'(--update --changelog -l)-u','(-u --changelog -l)--update'}'[Updates packages to the most recent version available]'
+    {'(--upgradeonly --changelog -l)-U','(-U --changelog -l)--upgradeonly'}'[Do not update packages to a lower version]'
+    {'(--usepkg --changelog -l)-k','(-k --changelog -l)--usepkg'}'[Tells emerge to use binary packages if available]'
+    {'(--usepkgonly --changelog -l)-K','(-K --changelog -l)--usepkgonly'}'[Tells emerge to use binary packages only]'
+    {'(--verbose)-v','(-v)--verbose'}'[Tell emerge to run in verbose mode]'
+    '(-p --pretend)--columns[Displays versions in aligned format]'
+    '--resume[Resumes the last merge operation]'
+    '--skipfirst[Removes the first package in the resume list]'
+)
+
+_options() {
+    _arguments -s \
+	"$unmerge_args[@]" "$common_args[@]" "$install_args[@]"
+}
+
+_actions() {
+    _values "emerge actions" \
+	'sync[Initiates a portage tree update]' \
+	'rsync[Initiates a portage tree update]' \
+	'unmerge[Removes all matching packages]' \
+	'search[Searches for matches]' \
+	'regen[Causes portage to check and update the dependency cache]' \
+	'prune[Removes all but the latest versions of matching packages]' \
+	'inject[Portage thinks that this package is installed]' \
+	'info[This is a list of information to include in bug reports]' \
+	'help[Displays help]' \
+	'depclean[Clean all packages that have no reason for being installed]'\
+	'clean[Cleans the system by removing packages]' \
+	'-c[Cleans the system by removing packages]' \
+	'-h[Displays help]' \
+	'-i[Portage thinks that this package is installed]' \
+	'-P[Removes all but the latest versions of matching packages]' \
+	'-s[Searches for matches]' \
+	'-S[Matches the search string against the description field]' \
+	'--searchdesc[Matches the search string against the description field]' \
+	'-C[Removes all matching packages]' \
+	'world[Represent all packages in the world profiles]' \
+	'system[Represent all the system packages]' 
+}
+
+#Reading informations from make.conf
+[[ -n "${PORTDIR}" ]] && portdir="${PORTDIR}"
+[[ -n "${PKGDIR}" ]] && pkgdir="${PKGDIR}"
+if [[ -n "${PORTDIR_OVERLAY}" ]] ; then
+    for overlay in ${=PORTDIR_OVERLAY} ; do
+	portdir_overlay=(${overlay} ${portdir_overlay})
+    done
+fi
+[[ -r /etc/make.globals ]] && source /etc/make.globals
+[[ -r /etc/make.conf ]] && source /etc/make.conf
+
+[[ -z "${portdir}" ]] && portdir="${PORTDIR}"
+[[ -z "${pkgdir}" ]] && pkgdir="${PKGDIR}"
+if [[ -z "${portdir_overlay}" ]] ; then
+    for overlay in ${=PORTDIR_OVERLAY} ; do
+	portdir_overlay=(${overlay} ${portdir_overlay})
+    done
+fi
+
+portage_pkglist=(${portdir}/*-*/* ${portdir_overlay}/*-*/*)
+portage_pkglist=(${portage_pkglist##*/})
+
+_emerge "$@"

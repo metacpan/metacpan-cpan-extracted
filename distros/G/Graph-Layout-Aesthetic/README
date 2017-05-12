@@ -1,0 +1,67 @@
+Graph-Layout-Aesthetic version 0.01
+==============================
+
+Notice that this package contains C code, so you either need to get a 
+precompiled package, or you'll need a working development setup.
+
+DESCRIPTION
+
+The Graph::Layout::Aesthetic package allows the laying out of a graph.
+The idea is that a state is repeatedly modified until an acceptable layout is
+reached. This is done by considering the current state from the point of view
+of a number of aesthetic criteria, each of which will provide a a step along
+which it would like to change the current state. A weighted average is then
+taken of all these steps, leading to a proposed step. The size of this step
+is then limited using a decrasing parameter (the temperature) and applied.
+Small random disturbances may also be applied to avoid getting stuck
+in a subspace.
+
+The package also comes with a simple commandline tool L<gloss.pl|gloss.pl(1)>
+(based on this package) that allows you to lay out graphs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   # Answer some questions
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More"	      only needed to run the selftests
+  Graph::Undirected   optional module, but needed if you want to use the
+                      graph related methods on this kind of graph.
+  Graph::Directed     optional module, but needed if you want to use the
+                      graph related methods on this kind of graph.
+  gnuplot             optional, only needed if you want to use the gnuplot
+                      based progress monitor.
+
+=head1 AUTHOR
+
+Ton Hospel, <Graph-Layout-Aesthetic@ton.iguana.be> for the perl code
+and the xs wrappers.
+
+Much of the C code is equal to or derived from the original code by
+D. Stott Parker.
+
+=head1 COPYRIGHT AND LICENSE
+
+Much of the C code is copyrighted by D. Stott Parker, who released it under
+the GNU GENERAL PUBLIC LICENSE (version 1).
+
+Copyright (C) 2004 by Ton Hospel for the perl code and the xs wrappers.
+To be compatible with the original license these pieces are also under the
+GNU GENERAL PUBLIC LICENSE.
+
+=cut

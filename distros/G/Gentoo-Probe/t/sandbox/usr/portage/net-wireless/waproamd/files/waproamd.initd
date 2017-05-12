@@ -1,0 +1,38 @@
+#!/sbin/runscript
+
+# waproamd initscript adapted by Peter Johanson <latexer@gentoo.org>
+#
+# Configuration resides in /etc/conf.d/waproamd.conf instead of
+# /etc/waproamd/waproamd.conf
+
+get_config() {
+	if [ -z "${INTERFACES}" -o "x${INTERFACES}" = "xauto" ]
+	then
+		INTERFACES="`cat /proc/net/wireless | awk '{ print $1 }' | egrep '^[wlan|eth]' | cut -d: -f1`"
+	fi
+}
+
+start() {
+	get_config
+        ebegin "Starting Wireless Access Point Roaming Daemon:"
+	for IF in $INTERFACES ; do
+		ebegin " ${IF}"
+		A="`eval echo \$\{ARGS_${IF}\}`"
+		[ -z "$A" ] && A="$ARGS"
+		/usr/sbin/waproamd -i $IF $A
+		eend $?
+	done
+	save_options "ifaces" "${INTERFACES}"
+	eend $?
+}
+
+stop() {
+	INTERFACES="$(get_options 'ifaces')"
+        ebegin "Stopping Wireless Access Point Roaming Daemon:"
+        for IF in $INTERFACES ; do 
+	    ebegin " ${IF}"
+            /usr/sbin/waproamd -k -i $IF
+	    eend $?
+        done
+	eend $?
+}

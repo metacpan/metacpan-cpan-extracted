@@ -1,0 +1,27 @@
+TYPEMAP
+const char *		T_PV
+Plotter *		O_OBJECT
+MetaPlotter *		O_OBJECT
+TekPlotter *		O_OBJECT
+HPGLPlotter *		O_OBJECT
+PCLPlotter *		O_OBJECT
+FigPlotter *		O_OBJECT
+PSPlotter *		O_OBJECT
+AIPlotter *		O_OBJECT
+PNMPlotter *		O_OBJECT
+GIFPlotter *		O_OBJECT
+XDrawablePlotter *	O_OBJECT
+XPlotter *		O_OBJECT
+
+OUTPUT
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+INPUT
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else {
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}

@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+# Andrew Wyllie <wyllie@dilex.net>
+# July 2005
+
+=head1 SCRIPT
+
+sudoku
+
+=head1 USAGE
+
+sudoko file_name
+
+=head1 DESCRIPTION
+
+This script loads a Sudoku board and solves it using the
+Games::YASudoku::Board module.  The data file contains a list
+of square numbers and the values for those squares. The squares
+on the board are numbered 0 through 80 starting with the top left
+square and moving across the board to the right.  So the top left
+square is 0, the first square on the second row is number 9, and the
+last square, bottom right, is number 80.
+
+=cut
+
+use strict;
+use lib qw( ../lib );
+use Games::YASudoku::Board;
+
+my $file_name = $ARGV[0];
+die "Usage: sudoku puzzle_file\n" unless $file_name;
+
+my $board = Games::YASudoku::Board->new();
+
+open IN, $file_name or die "Could not find: $file_name, $!\n";
+
+while(<IN>){
+    chomp;
+    my ( $cell, $value ) = split;
+    $board->[ $cell ]->value( $value );
+}
+
+close IN;
+
+print "Starting Board\n";
+print $board->show_board;
+
+foreach my $element ( @{ $board } ){
+    for my $i ( 1 .. 9 ) {
+        $element->valid_add( $i );
+    }
+}
+
+my $passes = $board->run_board;
+
+print "Solved in $passes passes";
+print $board->show_board;
+
+
+=head1 AUTHOR
+
+Andrew Wyllie <wyllie@dilex.net>
+
+=head1 BUGS
+
+Please send any bugs to the author
+
+=head1 COPYRIGHT
+
+This script and the Games::YASudoku moudule are free software and can
+be redistributed and/or modified under the same terms as Perl itself.
+

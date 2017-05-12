@@ -1,0 +1,81 @@
+NAME
+    Gallery::Remote::API - Perl Module to access the Gallery Remote Protocol
+
+VERSION
+    This document describes Gallery::Remote::API version 0.1.4
+
+SYNOPSIS
+            use Gallery::Remote::API;
+
+            my $gallery = new Gallery::Remote::API ({
+                    url => $url, version => $ver,
+					username => $user, password => $pass
+            });
+
+            $gallery->login || die "can't log in!";
+
+            ## Then...
+
+            if (my $result = $gallery->fetch_albums) { #etc
+                    # success! $result is a hashref of returned data
+            }
+            else {
+                    # failed! But we can still get $result, to see the error
+                    my $result = $gallery->result;
+                    print "error = " . $result->{status_text};
+            }
+
+DESCRIPTION
+    "Gallery" is a PHP web photo gallery package; this module allows you to
+    interact with their Remote Protocol API. It is an alternative to
+    Gallery::Remote, which does not support Gallery2.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDENCIES
+    Class::Accessor
+
+    URI
+
+    URI::QueryParam
+
+    LWP::UserAgent
+
+    HTTP::Cookies
+
+    File::Temp
+
+    Config::Properties
+
+    Data::Diver
+
+    Sub::Name
+
+
+AUTHOR
+    Jonathan Wright `<mysteryte@cpan.org>'
+
+    Latest development version available at
+    http://github.com/mysteryte/gallery-remote-api
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Jonathan Wright
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

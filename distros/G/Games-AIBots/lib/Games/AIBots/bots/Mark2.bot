@@ -1,0 +1,152 @@
+$name   = 'mark2';
+$author = 'Mark Chou';
+
+
+
+enable shield;
+
+
+$xy = 0;
+
+sub main {
+     $xx = $enemy_x - $x;
+     $yy = $enemy_y - $y;
+        if ($life >= $enemy_l) {
+                call turn;
+                move forward;
+        if (&nearst('enemy') <= 6) {
+                enable cloak;
+                }
+        }
+        if ($xx * $yy == 0) {
+        turn right;
+        move forward;
+    }
+        if  ($enemy_l > $life) {
+     call go_x;
+    }
+        if (&inperim('enemy')) {
+                attempt destruct;
+        }
+        redo;
+}
+
+
+
+sub turn {
+    attempt destruct if &inperim('enemy');
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+    }
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+
+
+    return;
+}
+sub go_x {
+    $xx = $snode_x - $x;
+    $yy = $snode_y - $y;
+    if ($snode_x ne '') {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        elsif ($xx < 0) {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+        else {
+                 goto go_y;
+        }
+        $xy = 0;
+        goto smove;
+    }
+}
+
+sub go_y {
+    $xx = $snode_x - $x;
+    $yy = $snode_y - $y;
+    if ($snode_x ne '') {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        elsif ($yy < 0) {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+        else {
+            goto go_x;
+        }
+        $xy = 1;
+        goto smove;
+    }
+}
+
+sub smove {
+    if (&bumped('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+    }
+    elsif (&bumped()) {
+        move backward;
+        turn right;
+        move forward;
+        if ($xy) {
+            goto go_x;
+        }
+        else {
+            goto go_y;
+        }
+    }
+    elsif (not $xy) {
+        goto go_x;
+        }
+    else {
+        goto go_y;
+    }
+}
+

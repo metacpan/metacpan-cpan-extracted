@@ -1,0 +1,68 @@
+#!/usr/bin/make -f
+
+# Local installation place
+DEST=target
+
+VERSION=$(shell perl -le "print `grep VERSION lib/Gtk2/Ex/Entry/Pango.pm`")
+PACKAGE=Gtk2-Ex-Entry-Pango
+EMAIL=$(shell git config --global user.email)
+
+
+.PHONY: info
+info:
+	@echo "EMAIL   ${EMAIL}"
+	@echo "VERSION ${VERSION}"
+	@echo "PACKAGE ${PACKAGE}"
+
+
+.PHONY: install
+install:
+	rm -rf ${DEST} || true
+	mkdir -p ${DEST}
+	perl Makefile.PL INSTALLDIRS=vendor && make && sudo make install PREFIX=target
+
+
+.PHONY: dist
+dist: ${PACKAGE}-${VERSION}.tar.gz
+${PACKAGE}-${VERSION}.tar.gz:
+	perl Makefile.PL && make && make dist
+
+
+.PHONY: distcheck
+distcheck: dist
+	make distcheck
+
+
+.PHONY: test
+test:
+	perl Makefile.PL && make && make test
+
+
+.PHONY: tag
+tag:
+	git tag "${VERSION}"
+
+
+.PHONY: push
+push:
+	git push --tags origin master
+
+
+.PHONY: upload
+upload: dist
+	cpan-upload -verbose -mailto "${EMAIL}" -user potyl "${PACKAGE}-${VERSION}.tar.gz"
+
+
+.PHONY: release
+release: clean test dist distcheck tag push upload
+	@echo "Release ${PACKAGE} ${VERSION} done."
+
+
+.PHONY: clean
+clean:
+	- [ -f make ] && make clean  > /dev/null 2>&1 || true
+	-rm -f Makefile.old 2> /dev/null || true
+	-rm -rf ${PACKAGE}-*/ 2> /dev/null || true
+	-rm ${PACKAGE}-*.tar.gz 2> /dev/null || true
+	-rm -f pm_to_blib 2> /dev/null || true
+	-rm -rf blib 2> /dev/null || true

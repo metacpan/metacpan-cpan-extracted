@@ -1,0 +1,73 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::Throttle.ja - スロットリング用ベースクラス
+
+=head1 SYNOPSIS
+
+  package Gungho::Component::Throttle::Domain;
+  use base qw(Gungho::Component::Throttle);
+
+=head1 DESCRIPTION
+
+クローラー作成時には必ずリクエスト数を調整するスロットリングが必要になります。
+このコンポーネントはスロットリングの親クラスとして機能します。実際の
+スロットリングはThrottle::SimpleやThrottle::Domainのような子クラスが行います。
+
+Gungho::Component::Throttle::Simpleは単純に時間あたりのリクエスト総数を
+ベースにスロットリングを行います。どんなリクエストであっても時間あたりの
+リクエスト総数が規定値を上回った時点でスロットリングされます。
+
+  # throttle down to 100 requests / hour
+  components:
+    - Throttle::Simple
+  throttle:
+    simple:
+      max_iterms: 100
+      interval: 3600
+
+Gungho::Component::Throttle::Domainはホストネーム毎にスロットリングを行います。
+ホスト毎に時間あたりのリクエスト総数が規定値を上回った時点でスロットリング
+されるようになります。
+
+  # throttle down to 100 requests / host / hour
+  components:
+    - Throttle::Domain
+  throttle:
+    domain:
+      max_iterms: 100
+      interval: 3600
+
+Throttle::DomainとThrottle::Simpleは内部的にData::Throttler、もしくは
+Data::Throttler::Memcachedを使用します。１台のホストでクローラーを動かしている
+場合は普通のData::Throttlerで事足りますが、もし複数ホストでの運用を行う
+場合はスロットリングデータを全てのホスト間で共有する必要があります。この場合は
+設定でthrottlerタイプを指定し、memcachedバックエンドを使用する
+Data::Throttler::Memcachedを使用してください：
+
+  components:
+    - Throttle::Domain
+  throttle:
+    domain:
+      throttler: Data::Throttler::Memcached
+      cache:
+        data: 127.0.0.1:11211
+      max_items: 100
+      interval: 3600
+
+=head1 METHODS
+
+=head2 feature_name
+
+=head2 throttle
+
+=head2 send_request
+
+=head1 SEE ALSO
+
+L<Gungho::Component::Throttle::Simple|Gungho::Component::Throttle::Simple>
+L<Gungho::Component::Throttle::Domain|Gungho::Component::Throttle::Domain>
+
+=cut
+

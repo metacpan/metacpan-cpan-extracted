@@ -1,0 +1,67 @@
+{
+   "abstract" : "Perl Port of Kage",
+   "author" : [
+      "Daisuke Maki C<< <daisuke@endeworks.jp> >>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geest",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::ReadmeMarkdownFromPod" : "0.02",
+            "Module::Build::Pluggable::Repository" : "0.01",
+            "Pod::Markdown" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0.05",
+            "Module::Build::Pluggable::ReadmeMarkdownFromPod" : "0.02",
+            "Module::Build::Pluggable::Repository" : "0.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
+            "AnyEvent::Socket" : "0",
+            "HTTP::Message::PSGI" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "Log::Minimal" : "0",
+            "Moo" : "1.000008",
+            "Plack::Request" : "0",
+            "Twiggy" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Geest" : {
+         "file" : "lib/Geest.pm",
+         "version" : "0.02"
+      },
+      "Geest::Backend" : {
+         "file" : "lib/Geest/Backend.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "git://github.com/lestrrat/p5-Geest.git"
+      }
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,64 @@
+To install Gtk-Perl-0.7005:
+
+First install the Gtk part of the package by executing the following
+commands at your shell:
+
+   $ tar -xvzf Gtk-Perl-0.7005.tar.gz
+   $ cd Gtk-Perl-0.7005
+   $ perl Makefile.PL
+   $ make
+   $ make install 
+
+   *** NOTE *** : The 'make install' step may need to be performed as user root.
+
+Starting with version 0.7005 the toplevel makefile tries to autodetect
+what modules can be compiled on your system and will do that for you
+taking into account any dependencies between the modules. This means that
+if you have all the developement packages installed, the above steps will
+compile Perl support for all the "stable" modules. If you know better, read on.
+
+If you want to disable autodetection, use the flag --without-guessing:
+
+	perl Makefile.PL --without-guessing
+
+This will compile the main Gtk module only.
+You may disable autodetection of any submodule with the --without-module switch,
+where module is one on the submodule tags:
+
+	gdkimlib, gtkglarea, gdkpixbuf, gtkhtml, gnome, gnomeprint, applets, glade
+
+You may force the compilation of a misdetected submodule with the --with-module-force switch,
+where module is one of the submodule tags above.
+
+To install any of the optional modules such as Glade, Gnome, GdkImlib,
+GtkGLArea, GtkHTML, Mozilla, Bonobo or GtkXmHTML at a later time do the following:
+
+   cd <module>           ( Where <module> is the name of the module
+                           you wish to compile and install ).
+   perl Makefile.PL
+   make
+   make install 
+
+   *** NOTE *** : The 'make install' step may need be performed as user root.
+
+Repeat the above steps for each of the modules you wish to install on 
+your system.
+
+Note that support for panel applets has moved in his own submodule an is no longer
+compiled in the Gnome module with the --panel-applet switch. Compile the applets
+submodule instead (directory Applet).
+
+  *** NOTE *** : GdkImlib MUST be compiled and installed BEFORE Gnome 
+                 support may be installed. Please make sure you install 
+                 GdkImlib first to make sure your Gnome support gets 
+                 installed correctly.  
+
+If your system supports it, you can try to use the LD version script (ldscript) to
+improve the loading time of the module: the script will instruct the linker to
+make fewer symbols shared in the shared module, speeding up the dynamic linker.
+When you compile, simply set the LDDLFLAGS make variable:
+
+	make LDDLFLAGS="--shared -Wl,--version-script=`pwd`/ldscript"
+
+This works on modern Linux systems and should work also on Solaris.
+

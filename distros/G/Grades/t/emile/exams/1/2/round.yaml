@@ -1,0 +1,19 @@
+---
+round: Exam 1 (Part2)
+week: 4
+text: t/emile/activities.yaml
+questions:
+  - 9
+pass: 5
+assistant:
+absent:
+group:
+  Brown:
+    - Emile
+    - Rousseau
+    - Sophie
+    - Therese
+activity:
+  internet:
+    1:
+      - Brown

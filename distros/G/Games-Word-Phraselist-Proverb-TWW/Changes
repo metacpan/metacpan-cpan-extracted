@@ -1,0 +1,19 @@
+Revision history for Games-Word-Phraselist-Proverb-TWW
+
+0.03    2016-01-13 (PERLANCAR)
+
+	- [Bugfix] Bump prereq version WordList::Phrase::EN::Proverb::TWW
+	  -> 0.03 (requires all_words() from WordList 0.1.1) [CT].
+
+
+0.02    2016-01-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- To avoid duplication of efforts, now source the word list from
+	  WordList::Phrase::EN::Proverb::TWW.
+
+
+0.01    2014-08-10 (SHARYANTO)
+
+        - First release.

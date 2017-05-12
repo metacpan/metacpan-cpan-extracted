@@ -1,0 +1,10 @@
+dir /usr
+dir /usr/sbin
+obj /usr/sbin/ufed c0f0ff0df43009b2a62903099771616e 1086837251
+dir /usr/share
+dir /usr/share/man
+dir /usr/share/man/man8
+obj /usr/share/man/man8/ufed.8.gz 3854efacb881c18265a4d87d04fccd56 1086837251
+dir /usr/share/doc
+dir /usr/share/doc/ufed-0.35
+obj /usr/share/doc/ufed-0.35/ChangeLog.gz 1e457efc2b862bcb78ac36744b1c8416 1086837251

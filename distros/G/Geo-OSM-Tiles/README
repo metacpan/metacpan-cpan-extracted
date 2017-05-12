@@ -1,0 +1,81 @@
+Geo-OSM-Tiles
+=============
+
+Geo::OSM::Tiles - Calculate tile numbers for OpenStreetMap
+
+This module provides functions for calculating the path to a map tile
+at OpenStreetMap out of geographic coordinates.
+
+It contains the script downloadosmtiles.pl that downloads all map
+tiles from an OpenStreetMap tile server for some geographic region in
+a range of zoom levels.
+
+
+PREREQUISITES
+
+This module requires these other modules and libraries:
+
+   Math::Trig
+   LWP
+   Getopt::Long
+   YAML
+   File::Path
+   File::Basename
+   File::Spec
+   Cwd
+   Test::More
+   File::Temp
+   File::Find
+
+Note that all but LWP and YAML are core modules in Perl 5.8 and later.
+In order to verify the signature of the distribution, you furthermore
+need
+
+   Module::Signature
+
+
+INSTALLATION
+
+You might want to verify the signature of the distribution first, see
+below.  To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+SIGNATURE
+
+This distribution is cryptographically signed using the following key:
+
+   pub   1024D/FDCF7486 2010-04-03
+         Key fingerprint = 342E 56B5 F5B3 6A34 9BE3  82DD C1D4 D7E2 FDCF 7486
+   uid                  Rotkraut CPAN Package Signing Key <rotkraut@cpan.org>
+
+To verify the signature type the following:
+
+   cpansign -v
+
+See the instructions in the file SIGNATURE and the man page of
+cpansign for details.
+
+
+AUTHOR
+
+Rolf Krahl <rotkraut@cpan.org>
+
+The latest release of this module can be found at CPAN, see
+http://search.cpan.org/dist/Geo-OSM-Tiles/.  The project is hosted at
+BerliOS, see the project page at http://geo-osm-tiles.berlios.de/.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2010 by Rolf Krahl
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

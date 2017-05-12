@@ -1,0 +1,122 @@
+#!perl
+# Copyright (C) 2003-2005, 2016 by the gtk2-perl team (see the file AUTHORS
+# for the full list)
+#
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Library General Public License as published by the Free
+# Software Foundation; either version 2.1 of the License, or (at your option)
+# any later version.
+#
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
+# more details.
+#
+# You should have received a copy of the GNU Library General Public License
+# along with this library; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+@exports = qw(
+SvGChar
+SvGKeyFile
+SvGParamFlags
+SvGParamSpec
+SvGSignalFlags
+SvGInt64
+SvGUInt64
+_gperl_attach_mg
+_gperl_call_XS
+_gperl_find_mg
+_gperl_remove_mg
+gperl_alloc_temp
+gperl_argv_free
+gperl_argv_new
+gperl_argv_update
+gperl_boxed_package_from_type
+gperl_boxed_type_from_package
+gperl_callback_destroy
+gperl_callback_invoke
+gperl_callback_new
+gperl_closure_new
+gperl_closure_new_with_marshaller
+gperl_convert_back_enum
+gperl_convert_back_enum_pass_unknown
+gperl_convert_back_flags
+gperl_convert_enum
+gperl_convert_flag_one
+gperl_convert_flags
+gperl_croak_gerror
+gperl_default_boxed_wrapper_class
+gperl_filename_from_sv
+gperl_format_variable_for_output
+gperl_fundamental_package_from_type
+gperl_fundamental_type_from_package
+gperl_gerror_from_sv
+gperl_get_boxed_check
+gperl_get_object
+gperl_get_object_check
+gperl_handle_logs_for
+gperl_hv_take_sv
+gperl_install_exception_handler
+gperl_new_boxed
+gperl_new_boxed_copy
+gperl_new_object
+gperl_object_check_type
+gperl_object_package_from_type
+gperl_object_set_no_warn_unreg_subclass
+gperl_object_stash_from_type
+gperl_object_type_from_package
+gperl_option_context_get_type
+gperl_option_group_get_type
+gperl_package_from_type
+gperl_param_spec_package_from_type
+gperl_param_spec_type_from_package
+gperl_prepend_isa
+gperl_register_boxed
+gperl_register_boxed_alias
+gperl_register_boxed_synonym
+gperl_register_error_domain
+gperl_register_fundamental
+gperl_register_fundamental_alias
+gperl_register_object
+gperl_register_object_alias
+gperl_register_param_spec
+gperl_register_sink_func
+gperl_remove_exception_handler
+gperl_run_exception_handlers
+gperl_set_isa
+gperl_signal_connect
+gperl_signal_set_marshaller_for
+gperl_str_eq
+gperl_str_hash
+gperl_sv_copy
+gperl_sv_is_defined
+gperl_sv_free
+gperl_sv_from_filename
+gperl_sv_from_gerror
+gperl_sv_from_value
+gperl_sv_get_type
+gperl_try_convert_enum
+gperl_try_convert_flag
+gperl_type_class
+gperl_type_from_package
+gperl_value_from_sv
+newSVGChar
+newSVGParamFlags
+newSVGParamSpec
+newSVGSignalFlags
+newSVGSignalInvocationHint
+newSVGSignalQuery
+newSVGInt64
+newSVGUInt64
+);
+if (ExtUtils::PkgConfig->atleast_version ('glib-2.0', '2.24.0')) {
+  push @exports, qw(
+    SvGVariant
+    SvGVariantType
+    newSVGVariant
+    newSVGVariant_noinc
+    newSVGVariantType
+    newSVGVariantType_own);
+}
+1;

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+examples/examples.txt
+lib/Games/Trackword.pm
+t/01basic.t
+t/02board.t
+t/90podtest.t
+t/91podcover.t
+t/94metatest.t
+t/95changedate.t
+t/96metatest.t

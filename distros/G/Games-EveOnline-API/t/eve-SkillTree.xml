@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2008-05-26 02:22:03</currentTime>
+  <result>
+    <rowset name="skillGroups" key="groupID" columns="groupName,groupID">
+      <row groupName="Corporation Management" groupID="266">
+        <rowset name="skills" key="typeID" columns="typeName,groupID,typeID">
+          <row typeName="Anchoring" groupID="266" typeID="11584">
+            <description>Skill at Anchoring Deployables. Can not be trained on Trial Accounts.</description>
+            <rank>3</rank>
+            <rowset name="requiredSkills" key="typeID" columns="typeID,skillLevel" />
+            <requiredAttributes>
+              <primaryAttribute>memory</primaryAttribute>
+              <secondaryAttribute>charisma</secondaryAttribute>
+            </requiredAttributes>
+            <rowset name="skillBonusCollection" key="bonusType" columns="bonusType,bonusValue">
+              <row bonusType="canNotBeTrainedOnTrial" bonusValue="1" />
+            </rowset>
+          </row>
+          <row typeName="CFO Training" groupID="266" typeID="3369">
+            <description>Skill at managing corp finances. 5% discount on all fees at non-hostile NPC station if acting as CFO of a corp. </description>
+            <rank>3</rank>
+            <rowset name="requiredSkills" key="typeID" columns="typeID,skillLevel">
+              <row typeID="3363" skillLevel="2" />
+              <row typeID="3444" skillLevel="3" />
+            </rowset>
+            <requiredAttributes>
+              <primaryAttribute>memory</primaryAttribute>
+              <secondaryAttribute>charisma</secondaryAttribute>
+            </requiredAttributes>
+            <rowset name="skillBonusCollection" key="bonusType" columns="bonusType,bonusValue" />
+          </row>
+          <row typeName="Corporation Management" groupID="266" typeID="3363">
+            <description>Basic corporation operation. +10 corporation members allowed per level.</description>
+            <rank>1</rank>
+            <rowset name="requiredSkills" key="typeID" columns="typeID,skillLevel" />
+            <requiredAttributes>
+              <primaryAttribute>memory</primaryAttribute>
+              <secondaryAttribute>charisma</secondaryAttribute>
+            </requiredAttributes>
+            <rowset name="skillBonusCollection" key="bonusType" columns="bonusType,bonusValue">
+              <row bonusType="corporationMemberBonus" bonusValue="10" />
+            </rowset>
+          </row>
+          <row typeName="Empire Control" groupID="266" typeID="3732">
+            <description>Advanced corporation operation. +200 corporation members allowed per level.</description>
+            <rank>5</rank>
+            <rowset name="requiredSkills" key="typeID" columns="typeID,skillLevel">
+              <row typeID="3731" skillLevel="5" />
+            </rowset>
+            <requiredAttributes>
+              <primaryAttribute>memory</primaryAttribute>
+              <secondaryAttribute>charisma</secondaryAttribute>
+            </requiredAttributes>
+            <rowset name="skillBonusCollection" key="bonusType" columns="bonusType,bonusValue">
+              <row bonusType="corporationMemberBonus" bonusValue="200" />
+            </rowset>
+          </row>
+          <row typeName="Ethnic Relations" groupID="266" typeID="3368">
+            <description>Skill at operating multiracial corporations. Extra 20% corporation members of other race than CEO allowed per skill level.  Percentage is based on CEO's corporation management skills, not the number of people in the corporation.</description>
+            <rank>2</rank>
+            <rowset name="requiredSkills" key="typeID" columns="typeID,skillLevel">
+              <row typeID="3363" skillLevel="2" />
+              <row typeID="3355" skillLevel="3" />
+            </rowset>
+            <requiredAttributes>
+              <primaryAttribute>memory</primaryAttribute>
+              <secondaryAttribute>charisma</secondaryAttribute>
+            </requiredAttributes>
+            <rowset name="skillBonusCollection" key="bonusType" columns="bonusType,bonusValue">
+              <row bonusType="nonRaceCorporationMembersBonus" bonusValue="20" />
+            </rowset>
+          </row>
+          <row typeName="Megacorp Management" groupID="266" typeID="3731">
+            <description>Advanced corporation operation. +50 members per level.</description>
+            <rank>3</rank>
+            <rowset name="requiredSkills" key="typeID" columns="typeID,skillLevel">
+              <row typeID="3363" skillLevel="5" />
+            </rowset>
+            <requiredAttributes>
+              <primaryAttribute>memory</primaryAttribute>
+              <secondaryAttribute>charisma</secondaryAttribute>
+            </requiredAttributes>
+            <rowset name="skillBonusCollection" key="bonusType" columns="bonusType,bonusValue">
+              <row bonusType="corporationMemberBonus" bonusValue="50" />
+            </rowset>
+          </row>
+          <row typeName="Sovereignty" groupID="266" typeID="12241">
+            <description>Advanced corporation operation. +1000 corporation members allowed per level.</description>
+            <rank>8</rank>
+            <rowset name="requiredSkills" key="typeID" columns="typeID,skillLevel">
+              <row typeID="3732" skillLevel="5" />
+            </rowset>
+            <requiredAttributes>
+              <primaryAttribute>memory</primaryAttribute>
+              <secondaryAttribute>charisma</secondaryAttribute>
+            </requiredAttributes>
+            <rowset name="skillBonusCollection" key="bonusType" columns="bonusType,bonusValue">
+              <row bonusType="corporationMemberBonus" bonusValue="1000" />
+            </rowset>
+          </row>
+          <row typeName="Starbase Defense Management" groupID="266" typeID="3373">
+            <description>Skill at using starbase weapon systems. Allows control of one array per level. Arrays must be placed outside of the forcefield to be controlled.</description>
+            <rank>7</rank>
+            <rowset name="requiredSkills" key="typeID" columns="typeID,skillLevel">
+              <row typeID="11584" skillLevel="5" />
+            </rowset>
+            <requiredAttributes>
+              <primaryAttribute>memory</primaryAttribute>
+              <secondaryAttribute>charisma</secondaryAttribute>
+            </requiredAttributes>
+            <rowset name="skillBonusCollection" key="bonusType" columns="bonusType,bonusValue">
+              <row bonusType="canNotBeTrainedOnTrial" bonusValue="1" />
+              <row bonusType="posStructureControlAmount" bonusValue="0" />
+            </rowset>
+          </row>
+        </rowset>
+      </row>
+    </rowset>
+  </result>
+  <cachedUntil>2008-05-27 02:22:03</cachedUntil>
+</eveapi>

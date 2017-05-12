@@ -1,0 +1,116 @@
+
+    Change log for Games::Go::Sgf2Dg
+
+from 4.249 to 4.252:
+    fix coords in MetaPost converter (Dg2Mp)
+
+from 4.246 to 4.249:
+    installation:
+        move after_build to extra/ dir
+        improved TeX installation
+
+from 4.221 to 4.246:
+    distribution:
+        convert from Subversion to git
+        convert to Dist::Zilla
+        fix directory structure
+    installation:
+        improved finding TeX directories and font installation
+        added a 'clean' target to tex/Makefile
+    code:
+        fix some MetaPost bugs noted by Przemek Wesolek
+        add initialDiagram option
+    documentation:
+        fixed a lot of POD errors
+        minor updates to the manual
+
+from 4.211 to 4.221:
+    fixed t/Dg2Tk.t when X server is not available (for automated testing)
+    changed character mappings affected by -texComments to consistently map (or not)
+        all the special TeX characters.
+    some minor changes to Makefile.PL for auto-testing
+
+from 4.167 to 4.211:
+    added -mag N option to set \magnification in Dg2TeX converter
+    added \setGoFonts at <size> macro to tex/gooemacs.tex
+    updates to manual.tex for all the following changes
+    added a section to manual.tex on special gooegb font symbols and
+        another section on overlapping fonts
+    sgf2dg and Dg2TeX: changed generated TeX quite a bit: normal mode (not
+        -simple and not -twoColumn) uses a 'floatLeft' or 'floatRight'
+        macro to place the diagram to the left or right of the accompanying
+        text.  The float* macros also handle long text, so the
+        -longComments option is no longer necessary (it has been removed).
+        A 'floatControl' command line option has been added to control
+        diagram placement.  The 'float*' macros also manage the diagram
+        gap, and the gap in -simple and -twoColumn is now fixed, so the
+        -gap command line option has been removed.
+    added -placeHandi option to recognize old-style HAndicap property
+        by default HAndicap no longer causes the handicap stones to be placed
+    added -cs | -coord-style for different coordinate styles
+    coordinates are managed centrally by Diagram.pm
+    changed magnification default to 1000 so diagrams with coordinates can
+        now fit in -twoColumn mode.  Removed restriction preventing using
+        twoColum and coords together.
+    finishDiagram now takes an text argument which is printed if a diagram is finished
+        and verbose mode is on (for an explanation of why new diagrams must be created)
+    most verbose messages have been improved
+    SZ[x:y] - boards can now be any size (X and Y) - hoshi points are not defined except for some standard sizes
+    significant re-structuring of property handling to better handle FF4 SGF files:
+        Game properties (players, place, date, etc) are explicitly stored in
+            node 0, and are now centrally managed in Diagram.pm for better
+            consistency across different converters.
+        W/B[tt] still works on 19x19 boards, but other sizes must use W/B[] for a pass
+        MN[number] to force move number is supported
+        Composed points ([bc:de]) are supported for appropriate properties
+    special characters and linebreaks in comments are treated as per the FF4 rules
+    All four MArk styles are supported (triangle, circle, square, and X)
+    Labeling now works on empty intersections, and for multi-character labels
+        some converters are clever enough to switch to a smaller font for labels and
+        numbers that are too big (typically between 2 and 3 characters), but only once,
+        very big labels will go beyond the boundaries of the intersection
+    VW[bc:de] is supported
+
+    Not supported:
+       AR[c_pt]      Arrow
+       DD[elst]      Dim points: DD[] clears any previous dimming
+       LN[c_pt]      Line
+       DM[dbl]       Even position
+       GB[dbl]       Good for black
+       GW[dbl]       Good for white
+       HO[dbl]       Hotspot
+       UC[dbl]       Unclear
+       V[real]       Value (estimated game score)
+       BM[dbl]       bad move
+       DO            doubtful move
+       IT            interesting move
+       TE[dbl]       tesuji (good move)
+       SL[pt]        Select points (markup unknown)
+       AP[stxt:stxt] application name:version
+       CA[stxt]      charset
+       FF[1-4]       FileFormat
+       GM[1-16]      Game
+       ST[0-3]       how to show variations (style?)
+       FG[pt:stext]] Figure - see spec
+       PM[num]       Print mode: 0=>no numbers, 1=>normal 2=>modulo 100 (see spec for details)
+
+    However, sgf2dg stores all properties in the Diagram.pm object for any converter that might like to
+        retrieve them
+
+from 4.144 to 4.167:
+    don't create manual.dvi until after install is done.
+    check and report down-rev PDF::Create (don't use the one on CPAN!).
+    some changes in TeX subdir about making manual.dvi.
+    improved end-of-diagram handling.
+    added Dg2SL converter for Sensei's Library contributed by Marcel Gruenauer.
+    added -crop command line option to automatically crop diagrams (shamelessly
+        stolen from Marcel's Dg2SL converter).
+    significant improvements to the MetaPost (Dg2Mp) converter:
+        draw_board can now change with different edge limits.
+        hoshi points are drawn based on sgf2dg's concept of hoshis.
+        board edges are bold.
+        illusory stone is (un)drawn in upper left corner so all diagrams
+            line up correctly after stones are placed on the edges.
+        black and white stones are now the same size (black stones
+            were missing their borders).
+        moved game title above first diagram.

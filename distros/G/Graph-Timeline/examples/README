@@ -1,0 +1,34 @@
+How to use the examples
+=======================
+
+1. Ordinary timeline
+--------------------
+
+The data files list the lives of popes and presidents of the USA in popes1.tab and pres1.tab. In
+the other files (popes2.tar and pres2.tab) we have a list when they were in office. The additional
+file events.tab lists a few point event from more recent history.
+
+To generate some charts run it
+
+$ ./timeline popes2.tab pres2.tab events.tab
+
+The will create charts showing when the various popes and presidents were in office, plus a few 
+other events.
+
+* test_timeline_01.png - All the data in a very wide chart!
+* test_timeline_02.png - Only the data started AND ended within 1950/01/01 to 1999/12/31
+* test_timeline_03.png - The same as 02 but including events that started after 1950/01/01
+                         but ended after 1999/12/31
+* test_timeline_04.png - The same as 3 but including events that started before 1950/01/01
+* test_timeline_05.png - All the data that happened in whole or part between 1950/01/01 and
+                         1999/12/31
+
+2. Diagonal Timeline
+--------------------
+
+$ ./diagonal diagonal.dat
+
+* test_diagonal1.png - Lists all the events in the source file
+* test_diagonal2.png - List only those events that start or end between 2007/04/21T03:08:18 and 
+                       2007/04/21T04:00:00
+

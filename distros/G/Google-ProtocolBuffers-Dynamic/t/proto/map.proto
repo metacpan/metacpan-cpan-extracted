@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package test;
+
+message Maps {
+    map<string, int32> string_int32_map = 1;
+}
+
+message Item {
+    int32 one_value = 1;
+    string another_value = 2;
+}

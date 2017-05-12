@@ -1,0 +1,91 @@
+=head2 config
+
+This module contains the code for reading and parsing configuration
+directives and calling the appropriate module callback hooks.  Nearly all
+News::Gateway programs will make use of this module.
+
+B<WARNING>: Information in configuration directives is B<trusted> by
+modules, and modules may go so far as to eval things from configuration
+directives as Perl code.  This means that anyone who has access to the
+configuration directives read by this module has as much control over what
+a program does as someone who can edit the source.  Any necessary sanity
+or security checking on the content of configuration directives must be
+done B<before> they are passed off to modules, and C<config_file()> does
+no such checking.
+
+=over 4
+
+=item config (DIRECTIVE, ARGUMENT [, ARGUMENT ...])
+
+Calls the registered module callbacks for all modules who have expressed
+an interest in C<DIRECTIVE>.  This bypasses any parsing, and the arguments
+are given to the callbacks exactly as passed in.  C<DIRECTIVE> is
+case-insensitive.
+
+=item config_file (FILE | HANDLE)
+
+Reads in configuration directives from the supplied file name or file
+handle (which can be either an object reference or a reference to a
+typeglob) until end of file is reached.
+
+Blank lines and lines beginning with a C<#> are ignored.  All other lines
+are parsed into a directive (the first whitespace-separated word) and some
+number of arguments, and then the parse results are passed along to the
+module which has registered interest in that directive.  If an argument
+contains embedded whitespace, it can be enclosed in double quotes.  A
+backslash will escape the next character, whatever it is.  A line is
+considered to be continued on the next line if it ends in a backslash, and
+if the line continuation occurs inside double quotes, a literal newline
+will be part of the string.
+
+For example, the following configuration directive tells the C<headers>
+module to add a new header named X-Comment with the content "This is a
+long comment about this newsgroup":
+
+    header x-comment add \
+           "This is a long comment about this newsgroup"
+
+Multiple configuration files can be read by calling C<config_file()>
+multiple times.  One handy trick for simple scripts using News::Gateway is
+to put the configuration lines at the end of the script after an __END__
+and then pass them to News::Gateway with:
+
+    $gateway->config_file (\*DATA);
+
+C<config_file()> should be called before any C<apply()> it is supposed to
+affect.
+
+=item config_line (LINE)
+
+Parses and handles a single configuration line, just as if it were read
+from a file (in fact, C<config_file()> calls this method for each
+non-blank, non-comment line).  This can be used to feed individual
+configuration lines to the News::Gateway object without having to give it
+a file or file handle.
+
+=item config_parse (LINE)
+
+Parses a configuration file line, returning the results as an array.  This
+is the method used by C<config_file()> and C<config_line()> to parse
+configuration files.  This probably isn't generally useful.
+
+=back
+
+These methods adds two additional fatal error messages, which may be
+passed to C<error()>.
+
+=over 4
+
+=item Parse error in %s
+
+A configuration line was unable to be parsed.  The most likely cause is
+unbalanced double quotes.
+
+=item Unknown configuration directive %s
+
+News::Gateway encountered a configuration directive that no module had
+expressed interest in.  Chances are you made a typo in your configuration
+file or forgot to register a module with C<modules()> that you were
+planning on using.
+
+=back

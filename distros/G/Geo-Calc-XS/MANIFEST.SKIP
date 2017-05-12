@@ -1,0 +1,13 @@
+^[.]gitignore$
+^XS[.][oc]$
+^.*\.un~$
+^Geo-Calc-XS.*\.tar\.gz$
+^Geo-Calc-XS
+^[.]git
+\.swp$
+^Makefile$
+^MYMETA
+\.bak$
+^blib
+^pm_to_blib
+.*\.bs$

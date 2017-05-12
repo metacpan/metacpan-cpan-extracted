@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+SVG.pm
+examples/generate_test_image.pl
+examples/test_image.svg
+examples/test_image.png
+t/1.t
+META.yml                                Module meta-data (added by MakeMaker)

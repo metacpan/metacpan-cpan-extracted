@@ -1,0 +1,6 @@
+TYPEMAP
+
+Gtk::Gdk::ImlibImage	T_SimpleVal
+Gtk::Gdk::Imlib::ColorModifier	T_SimpleVal
+Gtk::Gdk::Imlib::SaveInfo	T_SimpleVal
+

@@ -1,0 +1,22 @@
+(;GM[1]FF[3]
+SZ[13]HA[0]KM[0.5]
+PW[GnuGo (GNU Go 3.3.12)]
+WR[10k*]
+PB[fgh]
+BR[NR]PC[NNGS]
+DT[2002-12-01]
+AP[gnugoclient:2.0]
+RE[W+Resign]
+;B[dd];W[kj];B[tt];W[jc];B[tt];W[fc];B[dj];W[fk];B[ke];W[cf];B[df];
+W[dg];B[ef];W[ce];B[cd];W[ei];B[ch];W[cg];B[dh];W[eg];B[de];W[dl];
+B[ck];W[ik];B[ej];W[kg];B[lc];W[fg];B[eb];W[cl];B[bl];W[fj];B[hc];
+W[id];B[hd];W[ie];B[kb];W[fb];B[hb];W[he];B[gd];W[jb];B[jf];W[hg];
+B[jg];W[jh];B[gf];W[ff];B[ge];W[fe];B[fd];W[hf];B[gg];W[ec];B[db];
+W[gh];B[hh];W[gi];B[ih];W[bm];B[bk];W[bg];B[bh];W[ah];B[ai];W[ig];
+B[kh];W[ji];B[lh];W[al];B[ak];W[li];B[bj];W[lg];B[ek];W[el];B[lf];
+W[mg];B[mf];W[mh];B[lk];W[be];B[bd];W[ad];B[ac];W[ed];B[ee];W[fa];
+B[dc];W[ae];B[jl];W[il];B[jk];W[bc];B[bb];W[ab];B[cc];W[ac];B[ea];
+W[ca];B[ba];W[kc];B[lb];W[ka];B[ga];W[cb];B[lm];W[la];B[kd];W[mb];
+B[md];W[jm];B[km];W[le];B[im];W[ml];B[ll];W[jj];B[kk];W[mk];B[mj];
+W[lj]
+)

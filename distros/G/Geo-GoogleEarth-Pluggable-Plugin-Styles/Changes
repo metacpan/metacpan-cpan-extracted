@@ -1,0 +1,7 @@
+Revision history for Perl module Geo::GoogleEarth::Pluggable::Plugin::Styles
+
+0.02 2009-11-16
+  - Add script example to distribution
+  - Added Documentation
+0.01 2009-11-14
+  - original version

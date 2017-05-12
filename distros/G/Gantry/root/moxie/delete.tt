@@ -1,0 +1,13 @@
+[% title = view.title %]
+
+<form method='post' action='[% site.uri %]/yes' class='form-box' >
+    <div class="form-box">
+        <h5 class="heading">[% view.form.legend  || 'Delete' %]</h5>
+        <dl><dd>[% view.form.message %]</dd></dl>
+    </div>
+
+    <div class="form-box actions">
+        <input type="submit" name="submit" value="Continue with Delete" />
+        <input type="submit" name="cancel" value="Cancel" />
+    </div>
+</form>

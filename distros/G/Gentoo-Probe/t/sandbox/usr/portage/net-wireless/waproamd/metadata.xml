@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>mobile</herd>
+<maintainer>
+  <email>latexer@gentoo.org</email>
+  <name>Peter Johanson</name>
+  <description>This is about the most useful wireless config daemon out there. I'm here to make sure it jives in gentoo.</description>
+</maintainer>
+<longdescription>waproamd provides an easy way to handle roaming with wireless cards, in particular with setting WEP keys based on either ESSID or AP MAC address.</longdescription>
+</pkgmetadata>

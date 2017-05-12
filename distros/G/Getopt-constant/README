@@ -1,0 +1,108 @@
+README for Getopt::constant
+                                        Time-stamp: "2001-02-23 03:23:33 MST"
+
+                           Getopt::constant
+
+[Excerpted from the POD.]
+
+NAME
+     Getopt::constant -- set constants from command line options
+
+SYNOPSIS
+       # Assuming @ARGV is: ('-foo=9,8,7', '-bar', 'wakawaka.txt')
+       use Getopt::constant (
+         ':prefix' => 'C_',
+         'foo' => [3,5],
+         'bar' => 0,
+         ':usage' =>
+       "Usage:
+       thingamabob
+         -foo=one,two,three  :  fooey on these items
+         -bar                :  enable barriness
+       ",
+       );
+       # @ARGV is now 'wakawaka.txt', and you've now got
+       #  a constant C_foo with value (9,8,7)
+       #  and a constant C_bar with value 1
+
+DESCRIPTION
+     Other command-line options processing modules (like
+     Getopt::Std) parse command-line arguments (from @ARGV) and
+     set either variables or hash entries based on them.  This
+     module, however, parses command-line arguments into
+     constants.
+
+     You provide default values for each constant in the list
+     that you pass in the "use Getopt::constant (...);"
+     statement.  Values can be a scalar (in which case you will
+     get a scalar constant) or an arrayref (in which case you
+     will get a list constant).
+[...]
+
+COPYRIGHT AND DISCLAIMER
+     Copyright (c) 2001 Sean M. Burke.  All rights reserved.
+
+     This library is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.
+
+     This program is distributed in the hope that it will be
+     useful, but without any warranty; without even the implied
+     warranty of merchantability or fitness for a particular
+     purpose.
+
+AUTHOR
+     Sean M. Burke, sburke@cpan.org
+
+[End of POD]
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004 and
+later, so for anything lower, you're on your own.
+
+Getopt::constant doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Getopt::constant, as you would install any
+perl module library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Getopt::constant
+in your home directory, then you should try to produce the initial
+Makefile with something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+Or see perldoc perlmodinstall
+
+
+DOCUMENTATION
+
+POD-format documentation is included in constant.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+You needn't bother with the makefiles.  Just make a Getopt directory
+and move constant.pm into there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Getopt::constant should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Getopt::constant is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+

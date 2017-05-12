@@ -1,0 +1,51 @@
+Revision history for Geo-Gpx
+
+0.13    2006-11-26
+        Implement complete support for parsing and generating GPX 1.0
+        and 1.1 documents
+
+0.14    2006-12-12
+        Added support for 'input' option that is passed through unchanged
+        to XML::Descent. The old 'xml' option is still supported for legacy
+        use.
+
+0.15    2006-12-14
+        Minor documentation typos fixed.
+        Fixed problems due to differing numeric precision on different
+        platforms in t/03.gen-parse.t and t/04.legacy.t
+
+0.16    2007-02-11
+        Fixed idiotic dependency on rand producing the same values given
+        the same seed on all platforms.
+
+0.17    2007-02-23
+        Added machine readable licence.
+        
+0.18    2007-08-07
+        Replaced AUTOLOAD with generated accessors.
+        Added bd foy's suggested add_waypoint method.
+
+0.19    2007-10-11
+        Fixed wpt element ordering per #29909
+
+0.20    2007-10-11
+        Release to (hopefully) fix bizarre test failures.
+
+0.21    2007-10-13
+
+0.22    2009-03-08
+        Always use UTC for timestamps. Refs #34463. 
+        Make bounds work as documented. Add TO_JSON support for JSON
+        encoding. Refs #34458. Thanks to Steve Purkis.
+
+0.23    2009-03-08
+        Skip JSON tests if installed JSON is too old.
+
+0.24    2009-03-10
+        Avoid clock skew in JSON tests.
+
+0.25    2009-05-05
+        Implement time zone support. Refs #28532.
+
+0.26    2009-05-26
+        Move to GitHub

@@ -1,0 +1,13 @@
+my $exceptions = {
+#	map ISO				=> CIA short names
+  'korea republic'			=> 'korea south',
+  'libyan arab jamahiriya'		=> 'libya',
+  'myanmar'				=> 'burma',
+  'russian federation'			=> 'russia',
+  'syrian arab republic'		=> 'syria',
+  'timorleste'				=> 'east timor',
+  'macao'				=> 'macau',
+  'virgin islands british'		=> 'british virgin islands',
+  'palestinian territory occupied'	=> 'west bank',
+};
+

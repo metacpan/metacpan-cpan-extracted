@@ -1,0 +1,27 @@
+Revision history for Getopt-Long-Negate-EN
+
+0.05    2016-03-01 (PERLANCAR)
+
+	- Add enabled<->disabled, allowed<->disallowed, allow<->disallow.
+
+
+0.04    2016-03-01 (PERLANCAR)
+
+	- Add enable <-> disable.
+
+
+0.03    2016-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update Synopsis.
+
+
+0.02    2016-01-03 (PERLANCAR)
+
+	- Add can <-> cant, has <-> hasnt, have <-> havent.
+
+
+0.01    2015-03-19 (PERLANCAR)
+
+        - First release. Extracted from Perinci::Sub::Getargs::Argv.

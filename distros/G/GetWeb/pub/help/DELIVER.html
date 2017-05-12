@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+<TITLE>Online Help: DELIVER</TITLE>
+</HEAD>
+<BODY>
+<H1>How can I control how my documents are delivered?</H1>
+
+<p>The TO user@host modifier specifies that documents
+should be sent to user@host rather than to the original
+send address.
+
+<p>To send the healthnet home-page as source to me@myotheraddress.com,
+send this command:
+
+<p><code>GET TO my@myotheraddress.com http://www.healthnet.org</code>
+
+<p>Messages are split into chunks of about 20k by default.  To raise
+or lower this value, use the SPLIT command.  The following command
+splits the file into 40k chunks instead:
+
+<p>SPLIT 40000 http://www.big.com/mybigfile.html
+
+<p><A HREF=HELP.html>Back to the main help page</A>
+</BODY>
+</HTML>

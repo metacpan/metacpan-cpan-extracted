@@ -1,0 +1,137 @@
+{
+   "abstract" : "Framework for implementing Git (and Gerrit) hooks",
+   "author" : [
+      "Gustavo L. de M. Chaves <gnustavo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Git-Hooks",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Email::Valid" : "0",
+            "Gerrit::REST" : "0",
+            "JIRA::REST" : "0",
+            "Text::SpellChecker" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Email::Valid" : "0",
+            "Encode" : "0",
+            "Error" : "0",
+            "Exporter" : "0",
+            "File::pushd" : "0",
+            "Git" : "0",
+            "List::MoreUtils" : "0",
+            "Path::Tiny" : "0",
+            "Sub::Util" : "0",
+            "Test::More" : "0",
+            "Text::Glob" : "0",
+            "URI::Escape" : "0",
+            "URI::file" : "0",
+            "parent" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "Data::Dumper" : "0",
+            "Test::Requires::Git" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Git::Hooks" : {
+         "file" : "lib/Git/Hooks.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::CheckAcls" : {
+         "file" : "lib/Git/Hooks/CheckAcls.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::CheckCommit" : {
+         "file" : "lib/Git/Hooks/CheckCommit.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::CheckFile" : {
+         "file" : "lib/Git/Hooks/CheckFile.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::CheckJira" : {
+         "file" : "lib/Git/Hooks/CheckJira.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::CheckLog" : {
+         "file" : "lib/Git/Hooks/CheckLog.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::CheckRewrite" : {
+         "file" : "lib/Git/Hooks/CheckRewrite.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::CheckStructure" : {
+         "file" : "lib/Git/Hooks/CheckStructure.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::CheckWhitespace" : {
+         "file" : "lib/Git/Hooks/CheckWhitespace.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::GerritChangeId" : {
+         "file" : "lib/Git/Hooks/GerritChangeId.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::Hooks::Test" : {
+         "file" : "lib/Git/Hooks/Test.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::More" : {
+         "file" : "lib/Git/More.pm",
+         "version" : "v1.15.1"
+      },
+      "Git::More::Message" : {
+         "file" : "lib/Git/More/Message.pm",
+         "version" : "v1.15.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gnustavo/Git-Hooks/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Git-Hooks/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gnustavo/Git-Hooks.git",
+         "web" : "https://github.com/gnustavo/Git-Hooks"
+      }
+   },
+   "version" : "1.15.1"
+}
+

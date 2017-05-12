@@ -1,0 +1,33 @@
+Revision history for Perl extension Geo::OSM::Tiles.
+
+0.04  2010-05-15
+	- Added command line options --dumptilelist and --loadtilelist
+	  to downloadosmtiles.pl to read and write the list of tiles
+	  selected for download.
+	- Portability fix in the test scripts.
+
+0.03  2010-04-05
+        - Portability fixes: use File::Spec to compose file names,
+	  fix passing of command line arguments to the script under
+	  MSWin32 (thanks to Ekkehard Horner for the hint).
+
+	  Note that i do not have access to other platforms then Linux
+	  for testing.  I have to rely on the reports from CPAN
+	  testers for any portability issues.  Thanks folks, your
+	  input is greatly appreciated!
+
+	- Sign the distribution using Module::Signature.
+	- Some minor fixes in the test scripts.
+	- Some documentation fixes.
+
+0.02  2008-12-30
+	- downloadosmtiles.pl: fixes in parsing command line options.
+	- downloadosmtiles.pl: diagnostic messages about how many
+	  tiles are to be downloaded.  May be switched off by new
+	  command line option --quiet.
+	- More tests.
+	- Cleanup in dependencies.
+	- Some documentation fixes.
+
+0.01  2008-11-30
+	- initial version.

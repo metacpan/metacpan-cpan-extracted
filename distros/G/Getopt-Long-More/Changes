@@ -1,0 +1,31 @@
+Revision history for Getopt-Long-More
+
+0.004   2016-12-03 (PERLANCAR)
+
+        - [Bugfix] Fix checking required and setting default (ignore) for opt
+          spec '<>'.
+
+        - [Bugfix] Don't copy array.
+
+        - Add a test suite.
+
+
+0.003   2016-12-03 (PERLANCAR)
+
+	- Tweak usage and POD message.
+
+	- Update demo script.
+
+	- [doc] Mention Getopt::Long::Modern.
+
+
+0.002   2016-12-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix POD section name.
+
+
+0.001   2016-12-04 (PERLANCAR)
+
+        - First release.

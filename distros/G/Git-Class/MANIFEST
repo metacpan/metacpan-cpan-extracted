@@ -1,0 +1,42 @@
+Changes
+cpanfile
+lib/Git/Class.pm
+lib/Git/Class/Cmd.pm
+lib/Git/Class/Role/Add.pm
+lib/Git/Class/Role/Bisect.pm
+lib/Git/Class/Role/Branch.pm
+lib/Git/Class/Role/Checkout.pm
+lib/Git/Class/Role/Clone.pm
+lib/Git/Class/Role/Commit.pm
+lib/Git/Class/Role/Config.pm
+lib/Git/Class/Role/Cwd.pm
+lib/Git/Class/Role/Diff.pm
+lib/Git/Class/Role/Error.pm
+lib/Git/Class/Role/Execute.pm
+lib/Git/Class/Role/Fetch.pm
+lib/Git/Class/Role/Grep.pm
+lib/Git/Class/Role/Init.pm
+lib/Git/Class/Role/Log.pm
+lib/Git/Class/Role/Merge.pm
+lib/Git/Class/Role/Move.pm
+lib/Git/Class/Role/Pull.pm
+lib/Git/Class/Role/Push.pm
+lib/Git/Class/Role/Rebase.pm
+lib/Git/Class/Role/Remove.pm
+lib/Git/Class/Role/Reset.pm
+lib/Git/Class/Role/Show.pm
+lib/Git/Class/Role/Status.pm
+lib/Git/Class/Role/Tag.pm
+lib/Git/Class/Worktree.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_role_error.t
+t/10_role_execute.t
+t/20_cmd.t
+t/30_worktree.t
+t/99_pod.t
+t/99_podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

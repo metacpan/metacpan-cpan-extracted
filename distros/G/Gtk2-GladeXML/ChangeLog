@@ -1,0 +1,296 @@
+2008-09-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* GladeXML.pm
+	* NEWS
+	* README: Stable release 1.007.
+
+2008-09-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Depend on ExtUtils::Depends 0.300 so that we can
+	remove our custom find_extra_libs hack.  Also play nice with CPAN
+	testers and exit with status 0 if we can't find libglade-2.0.
+
+2006-09-04	kaffeetisch
+
+	* GladeXML.pm, NEWS, README: Stable release 1.006.
+
+2006-09-04	kaffeetisch
+
+	* MANIFEST: Add the two new examples.
+
+	* MANIFEST, META.yml, Makefile.PL: Let EU::MM generate META.yml on
+	'make dist'.
+
+2006-08-26	kaffeetisch
+
+	* AUTHORS, examples/TODO, examples/clipboard.glade,
+	examples/clipboard.gladep, examples/clipboard.pl,
+	examples/dnd.glade, examples/dnd.gladep, examples/dnd.pl: Add the
+	examples Fabrice added to the SourceForge tracker two ages ago.
+
+2006/05/07	kaffeetisch
+
+	* GladeXML.xs: Hush a signedness warning.
+
+2005/09/28	kaffeetisch
+
+	* GladeXML.pm: Add a link to Grant's TPR article.
+
+2005/06/17	kaffeetisch
+
+	* GladeXML.pm, META.yml, NEWS, README: stable release 1.005.
+
+2005/06/14	muppetman
+
+        * GladeXML.pm, AUTHORS: apply documentation patch from Marco
+        Antonio Manzo to demystify custom widget handling.
+
+2005/06/14	muppetman
+
+	* GladeXML.pm, AUTHORS: apply documentation patch from Grant McLean.
+
+2005/02/07 21:28 (-0500) muppetman
+
+	* Makefile.PL: Add a copy of the find_extra_libs hack from Gtk2's
+	Makefile.PL.  This ought to go into ExtUtils::Depends, but i haven't
+	found a fully portable solution.
+
+2005/02/07 21:22 (-0500) muppetman
+
+	* GladeXML.pm: Update docs to mention that the application is
+	responsible for calling Gnome2::Program::init in gnome apps.
+
+2005/01/17 20:44 (-0500) rwmcfa1
+
+	* GladeXML.pm, NEWS, README: stable bugfix release 1.004
+
+2005/01/11 21:33 (-0500) rwmcfa1
+
+	* GladeXML.pm, NEWS, README: stable bugfix release 1.003
+
+2004/11/28 12:20 (-0500) rwmcfa1
+
+	* GladeXML.pm, NEWS, README: stable bugfix release 1.002
+
+2004/11/28 12:20 (-0500) rwmcfa1
+
+	* GladeXML.xs: added _ornull's to new functions where appropriate.
+	default value of NULL on signal_connect_full. bug found by: Martin G.
+	http://bugzilla.gnome.org/show_bug.cgi?id=159184
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+	* perl-Gtk2-GladeXML.spec.in: new scheme that addresses x86_64 problems
+	found by Carl Nygard
+
+2004/09/15 23:14 (-0400) muppet
+
+	* GladeXML.pm, NEWS, README: stable bugfix release 1.001
+
+	* examples/README, examples/TODO: the 'after' bugfix seems to
+	have fixed the scribble sample.
+
+2004/09/14 23:21 (-0400) muppet
+
+	* MANIFEST, t/custom.t, t/more.t: new regression tests should hit
+	quite a lot more of the API.
+
+	* GladeXML.pm: factor out common code into a helper function.
+	fix a few typos.
+
+	* t/0.GladeXML.t: the second Gtk2->init doesn't do anything,
+	removed.
+
+2004/09/14 17:30 (-0500) rwmcfa1
+
+	* GladeXML.pm: fix for major bug where all signals were being 
+	connected after. (muppet)
+
+2004/07/21 21:41 (-0500) muppetman
+
+	* examples/fileman.pl: use File::Spec instead of manual path string
+	manipulation when changing directores.  thanks to Fabrice, the
+	anonymous poster of #979248 in the sourceforge tracker.
+	http://sourceforge.net/tracker/index.php?func=detail&aid=979248&group_id=64773&atid=508620
+
+2004/07/19 18:15 (-0500) muppetman
+
+	* examples/scribble.pl: fix the bad arg in expose bug.  thanks to
+	Fabrice, the anonymous poster of #979266 in the sourceforge tracker.
+	http://sourceforge.net/tracker/index.php?func=detail&aid=979266&group_id=64773&atid=508620
+
+2004/03/30 00:17 (-0500) muppetman
+
+	* README, NEWS, GladeXML.pm: stable release 1.00
+
+	* GladeXML.pm: add import version-checking, fix pod links.
+
+	* Makefile.PL: fix requirements.  don't use postamble_docs, we don't
+	have any XS that needs documenting.
+
+2004/03/19 03:10 (-0500) muppetman
+
+	* GladeXML.pm, README: beta release 0.96
+
+	A NEWS 
+	* MANIFEST:
+	  add a news file
+
+	* Makefile.PL: cleanup
+
+2004/02/26 17:37 (-0500) muppetman
+
+	* README: fix the spelling of license; update the sandbox instructions.
+
+2004/02/12 19:00 (-0500) muppetman
+
+	* Makefile.PL: add_headers is a noop in ExtUtils::Depends >= 0.2,
+	and doesn't do anything useful that install doesn't do in < 0.2,
+	so take it out.  this avoids some noise on stderr as well.
+
+2004/01/02 15:45 (-0500) rwmcfa1
+
+	* Makefile.PL: removed runtime_reqs stuff, replaced by the pkg-config 
+	trick. use Glib::MakeHelper.
+
+	* perl-Gtk2-GladeXML.spec.in: use pkg-config for Requires version
+
+2004/01/02 15:45 (-0500) rwmcfa1
+
+	* examples/README: initial import
+
+	* MANIFEST: updates
+
+2004/01/09 00:10 (-0500) muppetman
+
+	* GladeXML.pm, README: release 0.95
+
+	* Makefile.PL: now strict-safe.  remove unused stuff.  actually create
+	the DATE subst that the specfile wants.
+
+2004/01/07 14:58 pcg
+
+        * GladeXML.pm: fix typoe reported by Florian Ragwitz :).
+
+2003/12/29 16:32 (-0500) rwmcfa1
+
+	* perl-Gtk2-GladeXML.spec.in: use the new DATE replacement in
+	conjunction with VERSION to create the changlog on the fly, which is
+	better.
+
+2003/12/03 23:57 muppetman
+
+	* GladeXML.pm: update the docs.
+
+2003/11/12 14:05 rwmcfa1
+
+	* examples/*: import of some excellent examples by Bruce Alderson.
+
+2003/11/12 14:05 pcg
+
+	* GladeXML.xs: use GPerlFilename.
+        * GladeXML.pm: improve docs, add a convinience method, bump version.
+
+2003/11/11 01:01 muppetman
+
+	* MANIFEST, debian/*: remove debian packaging files, since having
+	them in the upstream dist makes things difficult for the packagers
+
+2003/10/09 23:52 muppetman
+
+	* Makefile.PL, GladeXML.pm, README, META.yml, debian/changelog:
+	require the freshly released 1.00 instead of release candidates,
+	and bump the version to 0.93.
+
+2003/10/06 22:41 muppetman
+
+	* GladeXML.pm: fix a couple of minor bugs that appear to have sneaked
+	in during the port from gtk-perl.
+
+2003/10/06 22:41 muppetman
+
+	* GladeXML.xs: chas' changes to make custom widgets work, and update
+	stuff to use GPerlCallbacks.  (i'm committing because chas has no
+	'net access at home.)
+
+2003/09/21 20:19 rwmcfa1
+
+	* Makefile.PL: fixed bug in specfile generation
+
+2003/09/21 10:49 muppetman
+
+	* GladeXML.pm Makefile.PL README: updated for 0.92 release
+
+2003/09/17 10:44 rwmcfa1
+
+	* Makefile.PL: ExtUtils::PkgConfig can now deal with version 
+	requirements using pkg-config's interface, make use of it.
+
+2003/09/16 23:50 rwmcfa1
+
+	* Makefile.PL, perl-*spec.in: somewhat automated versioning system 
+	implemented for depenancy modules
+
+2003/09/15 22:26 rwmcfa1
+
+	* Makefile.PL: spec file dependancies improved
+
+2003/09/06 19:23 rwmcfa1
+
+	* Makefile.PL: dist-rpms build target added
+
+	* perl-Gtk2-GladeXML.spec.in: initial import
+
+2003/08/15 11:16 muppetman
+
+	* debian/*, MANIDEST, AUTHORS: patch from James Curbo adds debian
+	packaging files.
+
+	* GladeXML.pm, README: we haven't changed in three weeks, so let's go
+	to 0.90 and try to get more bug reports.
+
+2003/07/25 10:21 muppetman
+
+	* GladeXML.pm, README: bump version to 0.28
+
+2003/07/05 07:13 rwmcfa1
+
+	* Makefile.PL: put in a pre-req. of Glib >= 0.90, due to using
+	gchar_own
+
+2003/07/05 07:13 pcg
+
+	* META.xml: added.
+
+        * GladeXML.xs: use gchar_own to avoid memleak (untested).
+
+2003/07/04 11:45 muppetman
+
+	* GladeXML.pm: bump to 0.26 for release
+
+2003/06/30 21:15 rwmcfa1
+
+	* GladeXML.pm, GladeXML.xs, etc.: Got things ready for a beta
+	quality release. Added pod documentation...
+
+2003/06/20 11:28 muppetman
+
+	* README: fix some of the info that looks like it was never touched
+	after copying from Gtk2-Perl
+
+2003/05/27 20:36 rwmcfa1
+
+	* GladeXML.xs: a pass at the custom_handler stuff, very close to what's
+	in gtk-perl
+	
+2003/05/27 10:57 rwmcfa1
+
+	* GladeXML.pm: from what we can tell the method used to work around the
+	lack of signal_connect_object (which is irrelivent with gtk2-perl)
+	should be ok. this comments on the fact and cleans it up slightly.
+
+2003/05/26 22:09 rwmcfa1
+
+	* : ChangeLog created

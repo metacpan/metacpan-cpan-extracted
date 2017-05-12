@@ -1,0 +1,27 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::Throttle::Simple.ja - リクエスト総数でスロットル
+
+=head1 SYNOPSIS
+
+  ---
+  throttle:
+    simple:
+      max_items 1000
+      interval: 3600
+  components:
+    - Throttle::Simple
+
+=head1 METHODS
+
+=head2 setup
+
+オブジェクトを初期化します。
+
+=head2 throttle($request)
+
+設定されたリクエスト総数範囲内であれば正、超えると負を返します
+
+=cut

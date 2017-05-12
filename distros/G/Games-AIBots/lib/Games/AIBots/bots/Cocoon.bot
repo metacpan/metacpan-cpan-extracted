@@ -1,0 +1,128 @@
+$name   = 'Cocoon';
+$author = 'Autrijus Tang';
+$team   = 'Sunicrass Forever';
+
+require 'Drones.bm';
+
+$a = 0;
+
+sub main {
+    enable shield;
+
+    call layegg;
+    turn left;
+    call layegg;
+    turn left;
+    call layegg;
+    turn left;
+    call layegg;
+
+    goto lurk;
+}
+
+sub lurk {
+    scan perimeter;
+
+    if (&found('enemy')) {
+        $ol = $enemy_l;
+        call zap;
+    }
+    elsif (&found('vault|flag')) {
+        call move;
+        turn left;
+        call move;
+        turn left;
+        call move;
+        call move;
+        turn left;
+        call move;
+        call move;
+        turn left;
+        call move;
+        call move;
+        turn left;
+        call move;
+        turn right;
+        move backward;
+    }
+
+    call check;
+    redo;
+}
+
+sub layegg {
+    $eggs{$h} = 0;
+    scan relative 8;
+    call zap if &found('enemy');
+
+    if (&found('space|flag|vault|enemy')) {
+        if (&damaged == 0 and &found('flag')) {
+            move backward;
+            fire energy;
+        }
+        move forward;
+        scan relative 8;
+        call bite if &found('enemy');
+
+        if (&found('space|flag|vault|enemy')) {
+            if (&damaged == 0 and &found('flag')) {
+                move backward;
+                fire energy;
+            }
+            move forward;
+            enable laymine;
+            $eggs{$h} = 1;
+
+            move backward;
+            disable laymine;
+            move backward;
+        }
+        else {
+            move backward;
+            $eggs{$h} = 1 if &found('mine|fence');
+        }
+    }
+    return;
+}
+
+sub bite {
+    disable shield;
+    fire laser * 5;
+    enable shield;
+    return;
+}
+
+sub move {
+    move forward;
+    if (&bumped('enemy')) {
+        call bite;
+        redo;
+    }
+    return;
+}
+
+sub check {
+    $u  = ($u % 8) + 2;
+    $oh = (qw/x d d l l u u r r/)[$u];
+    return unless $eggs{$u};
+
+    $ox = $x + (1 - ((9 - $u) % 3)) * 2;
+    $oy = $y + (1 - int(($u - 1) / 3)) * 2;
+    # print join(' ', $u, $x, $y, $ox, $oy);
+    scan gps $ox, $oy;
+
+    if (&found('enemy')) {
+        turn $dir if ($dir = &turnto($oh));
+        move forward;
+        call zap;
+        move forward;
+        move backward * 2;
+    }
+    elsif (&found('space|flag|vault')) {
+        fire energy if &damaged == 0 and &found('flag');
+        turn $dir if ($dir = &turnto($oh));
+        call layegg;
+    }
+
+    return;
+}

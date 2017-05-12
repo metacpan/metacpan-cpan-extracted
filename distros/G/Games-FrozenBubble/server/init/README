@@ -1,0 +1,59 @@
+             [[ Frozen-Bubble server ]]
+
+    Copyright (c) 2004, 2008 Guillaume Cottenceau.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+version 2, as published by the Free Software Foundation.
+
+
+This directory contains a suggested initscript and skeleton
+configuration file for automatic starting of the Frozen-Bubble
+server.
+
+Since the Frozen-Bubble server at least needs to know the preferred
+language for players (it is just an indication used by players
+when choosing a server, so that they can chat using their native
+language), a configuration file is best suited for this purpose.
+
+The initscript by default launches one server for each
+'/etc/fb-server*.conf' files (-c commandline option controls the
+name of the configuration file, if you need to modify its
+location or name). You have to install and modify the skeleton
+configuration file specifying the name of your server to setup a
+unique server, and copy the file to a different name (and change
+option values) for all subsequent servers you can host. For first
+server you must at least set the language, and for all subsequent
+servers you must also specify a different port. Note: if you host
+multiple servers, it is probably a good idea to not use the same
+server name for each of them (even if languages are different) so
+that players can easily rendez-vous on the correct server.
+
+If needed, other configuration parameters can be set in the
+configuration file. Each configuration parameter must be on its
+own line, first character is the name of the option, followed if
+needed by a space character and the string parameter of the
+option. The list of options can be retrieved by launching the
+Frozen-Bubble server with option '--help'.
+
+Here's an example of configuration file copied from the skeleton
+configuration file, but also specifying the server name and
+language, a different server port and LAN mode:
+
+--------8<--------8<--------8<--------8<--------8<--------8<-----
+# Name of the server as seen by FB players
+n zarb
+# Preferred language of players
+a en
+# Change default port
+p 1789
+# Also create an UDP server for easy LAN games.
+l
+--------8<--------8<--------8<--------8<--------8<--------8<-----
+
+Notice that the registration process of the server is done
+automatically if the -q option is not set. The remote end as seen
+by www.frozen-bubble.org is used as IP, and the TCP port used
+(defaults to 1511 or specified with -p) as port. If you're using
+host/port forwarding, you can use the options -H and -P to
+register the proper host/port as seen from outside.

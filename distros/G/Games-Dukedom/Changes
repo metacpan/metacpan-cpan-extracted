@@ -1,0 +1,22 @@
+Revision history for Perl module Games::Dukedom
+
+v0.1.3 2014-11-06 20:09:53
+    - Fixed bug with $self->grain being used as an lavue.
+
+v0.1.2 2014-11-06 19:18:32
+    - Bumped version to 0.1.2
+    - Added Try::Tiny to dependencies for dukedom
+    - Replaced some $x vars with better names in war methods
+    - Added detail_report
+    - Tightened up requirements for valid _next_step checks
+    - Added detail reports option to dukedom
+    - Updated POD for Games::Dukedom
+    - Updated POD for Games::Dukedom::Signal
+    - Updated POD for dukedom
+    - bugfix for Bug #99741
+
+v0.1_1 2014-10-22 10:18:32
+    - First public release to CPAN
+
+v0.1_1 2014-10-03 22:50:32
+    - original version; created by Module::Cooker v0.1.4

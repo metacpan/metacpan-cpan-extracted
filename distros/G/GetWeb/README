@@ -1,0 +1,78 @@
+See the GetWeb home-page for an on-line demo:
+
+http://www.healthnet.org/dist/getweb/
+
+See COPYING for copyright information.
+
+Install Directions
+==================
+
+You must have Perl 5.002 or Perl 5.003.
+
+Install instructions for GetWeb 1.11 (1.1 release):
+
+1.  First install libwww-perl with the following steps:
+
+    a)  Install IO-1.12 or later
+    b)  Install libnet-1.01 or later
+    c)  Install libwww-perl-5.04 or later.  Ignore any MD5 warnings.
+
+I have tested with both libwww-perl-5.04 and 5.07.  Please install
+5.07 or later if you are installing a new libwww-perl from scratch.
+
+2.  Install MIME-tools with the following steps:
+
+    a)  Install MailTools-1.06 or later
+    b)  Install MIME-tools-2.04 or later
+
+I have tested with both MIME-tools-2.04 and 3.204.  3.204 encodes
+Latin-1 accents a little better, so use 3.204 if you are installing
+from scratch.
+
+3.  Untar the latest GetWeb distribution into the getweb home
+    directory.  Chdir to that directory.
+
+4.  Run:
+
+     # perl Makefile.PL
+     # make
+     # make test
+     # make install
+
+5.  Create a new user account, "getweb".
+
+6.  Copy config/mailbot.config into /usr/local/getweb/config.  Edit
+    it to reflect your local configuration.  (In particular, if you
+    have a thicker link to the internet than our 56k line, you can
+    set quota.message higher than our 70 messages per week.)
+
+7.  For now, copy the pub/ area into /usr/local/getweb/pub.  You may
+    want to change these files later.  (In particular, you should
+    eventually change 'getweb@usa.healthnet.org' to the address that you
+    are running getweb as.)
+
+8.  Create a ~getweb/.forward file containing the following line:
+
+     "| getweb.pl"
+
+    (Or, if you want to batch these, you can instead have getweb run
+     a daemon process like: "getweb.pl -f /var/spool/mail/getweb".  If
+     you do this, change set spool.get in mailbot.config to a command
+     which fetches mail on your local system.)
+
+AutoLoader Patch
+================
+
+If your AutoLoader.pm file is buggy, you may get this line while
+running 'make test':
+
+      You must use AutoLoader.patch; see README file.  Test failed!
+
+If so, you need to patch your Autoload file because of a bug in
+perl5.003.  One way to do this is to apply AutoLoader.patch, included
+in this distribution:
+
+      # cd /usr/lib/perl5
+      # ls AutoLoader.pm
+      AutoLoader.pm
+      # patch < /usr/home/getweb/GetWeb-x.xx/AutoLoader.patch

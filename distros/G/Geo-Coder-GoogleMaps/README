@@ -1,0 +1,43 @@
+Geo-Coder-GoogleMaps
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Please take care to export you Google API key as the GAPI_KEY envirronement variable.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Geo::Coder::GoogleMaps
+
+You can also look for information at:
+
+    Nabla Development
+        http://www.nabladev.com and http://opensource.nabladev.com
+
+    Search CPAN
+        http://search.cpan.org/dist/Geo-Coder-GoogleMaps
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-GoogleMaps
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Geo-Coder-GoogleMaps
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Geo-Coder-GoogleMaps
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Arnaud DUPUIS, Nabla Development
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

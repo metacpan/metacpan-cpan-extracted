@@ -1,0 +1,55 @@
+dir /usr
+dir /usr/share
+dir /usr/share/doc
+dir /usr/share/doc/gentoolkit-dev-0.2.0_pre3
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/AUTHORS 02702cbcf0d1872d88713d2874f2cc76 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ChangeLog 9b7f7b712376686d4041a636833ee7d6 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/COPYING 0636e73ff0215e8d672dc4c32c317bb3 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/NEWS d41d8cd98f00b204e9800998ecf8427e 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/README de1106d2f48c3c52e398fbf5ea36e8bf 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/README.Developer bab0946140bcd28b728a6143091c797d 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/TODO 8dacff3c4b8c57c78d16acd320fbc63b 1082881532
+dir /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ekeyword
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ekeyword/AUTHORS 80c4e3bb8ad194bb1605fc98f390627e 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ekeyword/README 6124b4b3299c462a4a1c1376c7c5eee8 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ekeyword/TODO d41d8cd98f00b204e9800998ecf8427e 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ekeyword/ChangeLog e1cc97cd5ff4d1faf3d2d36ed0a71496 1082881532
+dir /usr/share/doc/gentoolkit-dev-0.2.0_pre3/echangelog
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/echangelog/AUTHORS 80c4e3bb8ad194bb1605fc98f390627e 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/echangelog/README ae604fb77bd30174177863b22a65ea77 1082881532
+dir /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ego
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ego/AUTHORS 80c4e3bb8ad194bb1605fc98f390627e 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ego/README c26c44ea931a0cee6b574e91b0f35ff5 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ego/ego 3998627eb535e7d1adb059d7ca1dc864 1082881532
+dir /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ebump
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ebump/AUTHORS 6861c59435678d1191f76b83ceb65e91 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ebump/README 0ad5777289625775e5d957bccb8f497d 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ebump/TODO d41d8cd98f00b204e9800998ecf8427e 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/ebump/ChangeLog 3d469fd14046a507f7db8386bb48e119 1082881532
+dir /usr/share/doc/gentoolkit-dev-0.2.0_pre3/gensync
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/gensync/AUTHORS 282d4b69e047183063f130b72abf3122 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/gensync/README fcfcf2eba43194d60d6f09e76431e69b 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/gensync/TODO 6d2e43611848dacf36afb09104ef0d6f 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/gensync/ChangeLog 1771ba641ea132518768aba44e6fa087 1082881532
+dir /usr/share/doc/gentoolkit-dev-0.2.0_pre3/epkgmove
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/epkgmove/AUTHORS b3f9a7389ae5e31af16f6418fe3bc432 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/epkgmove/README 2cebf8fd1842f2bee9d8b1947e95f7e1 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/epkgmove/TODO d41d8cd98f00b204e9800998ecf8427e 1082881532
+obj /usr/share/doc/gentoolkit-dev-0.2.0_pre3/epkgmove/ChangeLog 9b4a4fa542c482fee58bb146a22b0de0 1082881532
+dir /usr/share/man
+dir /usr/share/man/man1
+obj /usr/share/man/man1/ebump.1.gz e45f4beb521f40c6a12803c2da7c5b0d 1082881532
+obj /usr/share/man/man1/gensync.1.gz 816011c48ba7d0aea756b8f39ba0e74e 1082881532
+obj /usr/share/man/man1/ekeyword.1.gz 0a3f7276998b49d12a90d7f8de89c983 1082881532
+obj /usr/share/man/man1/echangelog.1.gz ef6fb44841648a3400ea6b9a8586820f 1082881532
+dir /usr/bin
+obj /usr/bin/ekeyword 1953cb8f32444be87f6ee58ef059dbad 1082881532
+obj /usr/bin/echangelog fe7306afcf82915c423c124d3ee60b19 1082881532
+obj /usr/bin/ebump fb88c70b5007acccbee7e351b5519063 1082881532
+obj /usr/bin/gensync d1ec7bd3cef74df51623fea5c8677a91 1082881532
+obj /usr/bin/epkgmove 54f3900a7b68e9d203cde74f3640864f 1082881532
+dir /etc
+dir /etc/gensync
+obj /etc/gensync/gensync.conf 68a640d99e42ccfc20a2c60fe5d8d6eb 1082881532
+obj /etc/gensync/bmg-main.syncsource 50b042b8ebbad535b115b40dac929884 1082881532
+obj /etc/gensync/bmg-gnome-current.syncsource f83af67f27c52eb79b1a07633b4d25e0 1082881532

@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 da81aa32f54c12f50e2c52182861b296b9819a89 Changes
+SHA1 ff52688eb5f0afd8c04bf973bef62fd5d1753f14 MANIFEST
+SHA1 f42e495e55aa5c6fa78de6ca47938b84cd7015b2 MANIFEST.SKIP
+SHA1 a3e15761b9a86b88741b0ca4549567adfb6c0f3f META.yml
+SHA1 290afea51cfc0fcb529e5a1a9228d6d01693f664 Makefile.PL
+SHA1 1598333ccc1f6e33c7d78c269b0eda005a4ecb88 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 0bce3ab0ad53b7b4d7eb61eb5cf68c1d65f3f0dd debian/control
+SHA1 d03ef88dafa4136f9833a8e37f16c2e5253b3f47 debian/copyright
+SHA1 1fcf4ff5f03cd48bc5b31bf23a2068c393be6782 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 68e004f4eff8cc6790a68e09b8737fc051c0223b debian/watch
+SHA1 4a53d811847ebfcf06cac46e55a889b49d9c691a devel/SplashGdk.pm
+SHA1 ee56cd16faa76bbe23e24b75b5977cdb11c90c86 devel/gtk2-ex-splash.desktop
+SHA1 e98d3f0a08d05413f0c38b8e7dc0747d670d980e devel/root.pl
+SHA1 4e2af9fc8380340a3ce93ecce19f1f51a0d3c795 devel/run-splash-gdk.pl
+SHA1 159d46d24c6534aaac7ecb1319653c1b15317d12 devel/run-splash.pl
+SHA1 7564dc15d7eb3cfb33746ad2ef839079475021f6 gtk2-ex-splash
+SHA1 b8b118de25ddcda14762cde4107e1669d1855c35 inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 94054c4c0d3410d12eb57aeab55099e611f34f92 lib/Gtk2/Ex/Splash.pm
+SHA1 51456d64ca8f20d6808f6f3c8aa1f4f2553cb78d t/MyTestHelpers.pm
+SHA1 5e5e367425ca62c4b0921b4ff829d54a08dec034 t/Splash-load.t
+SHA1 d8df144e14482cc9358e8d10e8869e815c21bea6 t/Splash-weaken.t
+SHA1 577f2b1c9c025491de9e9aa7fd8e83d26c1c9f20 t/Splash.t
+SHA1 1a0dee3ed339f3c1d681f29e7c32e8e218159b4d t/Test/Weaken/ExtraBits.pm
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 219395eb91b03829e6f14db4ebd57d88ea972e61 xt/0-Test-ConsistentVersion.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
+SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
+SHA1 c84fa2f39a57885c647ebb69a456f3129de706c1 xt/0-exe-shebang.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFNr1epLFMCIV9q3ToRAqweAJ0TmtWuMA8MeicUjos7zwtrSW0ymwCgn8wh
+tvwAgEbYIO0aptEyLUdIk+A=
+=1Y4V
+-----END PGP SIGNATURE-----

@@ -1,0 +1,13 @@
+---
+name: Graph-Usage
+abstract: ~
+version: 0.12
+version_from: lib/Graph/Usage.pm
+license: gpl
+distribution_type: module
+generated_by: Graph-Usage version 0.12
+installdirs: site
+requires:
+  Graph::Easy: 0.4
+  Heap: 0.71
+  Scalar::Util: 1.13

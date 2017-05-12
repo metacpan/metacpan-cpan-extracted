@@ -1,0 +1,8 @@
+This is the minimal playable game, consisting of rooms only - and only
+two of them.
+
+This stage is built entirely using the
+C<%room>
+and
+C<%exit>
+directives.

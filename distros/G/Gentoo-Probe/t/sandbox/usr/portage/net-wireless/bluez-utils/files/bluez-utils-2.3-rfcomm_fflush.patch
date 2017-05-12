@@ -1,0 +1,26 @@
+--- work/bluez-utils-2.3/rfcomm/main.c-orig	2003-01-27 12:42:07.000000000 +0100
++++ work/bluez-utils-2.3/rfcomm/main.c	2003-11-04 17:33:13.000000000 +0100
+@@ -339,6 +339,11 @@
+ 	printf("Connected %s to %s on channel %d\n", devname, dst, req.channel);
+ 	printf("Press CTRL-C for hangup\n");
+ 
++	/* Added by Sybren Stuvel <sybren AT thirdtower.com> - Flush
++	 * stdout so other scripts can benefit from rfcomm's output and
++	 * react to connections being made. */
++	fflush(stdout);
++
+ 	memset(&sa, 0, sizeof(sa));
+ 	sa.sa_flags   = SA_NOCLDSTOP;
+ 	sa.sa_handler = SIG_IGN;
+@@ -443,6 +448,11 @@
+ 	printf("Connection from %s to %s\n", dst, devname);
+ 	printf("Press CTRL-C for hangup\n");
+ 
++	/* Added by Sybren Stuvel <sybren AT thirdtower.com> - Flush
++	 * stdout so other scripts can benefit from rfcomm's output and
++	 * react to connections being made. */
++	fflush(stdout);
++
+ 	memset(&sa, 0, sizeof(sa));
+ 	sa.sa_flags   = SA_NOCLDSTOP;
+ 	sa.sa_handler = SIG_IGN;

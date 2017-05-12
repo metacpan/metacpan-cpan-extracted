@@ -1,0 +1,239 @@
+=encoding utf8
+
+=head1 NAME
+
+Geo::Shape - base class for 2-dimensional points on the earth surface
+
+=head1 INHERITANCE
+
+ Geo::Shape is extended by
+   Geo::Line
+   Geo::Point
+   Geo::Space
+   Geo::Surface
+
+=head1 SYNOPSIS
+
+ use Geo::Shape;
+
+ my $p1 = Geo::Point->new(lat => 2.17, ...);
+ my $p2 = Geo::Point->latlong(2.17, 3.14);   # wgs84 is default
+
+ my $p3 = $p1->in('wgs84');                  # conversion
+ my $p4 = $p1->in('utm');                    # conversion
+
+=head1 DESCRIPTION
+
+Base class for the many geo-spatial objects defined by the GeoPoint
+distribution.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Geo::Shape-E<gt>B<new>(%options)
+
+Create a new object.
+
+ -Option--Default
+  proj    see Geo::Proj::defaultProjection()
+
+=over 2
+
+=item proj => LABEL
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<proj>()
+
+Returns the nickname of the projection used by the component.
+B<Be warned:> this is not a L<Geo::Point|Geo::Point> object, but just a label.
+
+=item $obj-E<gt>B<proj4>()
+
+Returns the proj4 object which handles the projection.
+
+=back
+
+=head2 Projections
+
+=over 4
+
+=item $obj-E<gt>B<in>(<$label|'utm'>)
+
+The coordinates of this point in a certain projection, refered to with
+the $label.  The projection is defined with L<new()|Geo::Shape/"Constructors">.  When simply
+'utm' is provided, the best UTM zone is selected.
+
+In LIST context, the coordinates are returned.  In SCALAR context,
+a new object is returned.
+
+example: 
+
+  my $gp       = Geo::Point->latlong(1,2);
+
+  # implicit conversion to wgs84, if not already in latlong
+  my ($lat, $long) = $pr->latlong;
+
+  # will select an utm zone for you
+  my $p_utm    = $gp->in('utm');
+  my ($x, $y)  = $p_utm->xy;
+  my $label    = $p_utm->proj;
+  my ($datum, $zone) = $label =~ m/^utm-(\w+)-(\d+)$/;
+
+=item $obj-E<gt>B<projectOn>($nick, @points)
+
+The @points are ARRAYs with each an X and Y coordinate of a single
+point in space.  A list of transformed points is returned, which is empty
+if no change is needed.  The returned list is preceded by the projection
+nick of the result; usually the same as the provided $nick, but in
+some cases (for instance UTM) it may differ.
+
+=back
+
+=head2 Geometry
+
+=over 4
+
+=item $obj-E<gt>B<area>()
+
+Returns the area covered by the geo structure. Points will return zero.
+
+=item $obj-E<gt>B<bbox>()
+
+Returns the bounding box of the object as four coordinates, respectively
+xmin, ymin, xmax, ymax.  The values are expressed in the coordinate
+system of the object.
+
+=item $obj-E<gt>B<bboxCenter>()
+
+Returns a L<Geo::Point|Geo::Point> which represent the middle of the object.  It is
+the center of the bounding box.  The values is cached, once computed.
+
+Be warned that the central point in one projection system may be quite
+different from the central point in some other projectionsystem .
+
+=item $obj-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+
+=item Geo::Shape-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+
+Returns a L<Geo::Line|Geo::Line> which describes the outer bounds of the
+object called upon, counter-clockwise and left-bottom first.  As class
+method, you need to specify the limits and the PROJection.
+
+=item $obj-E<gt>B<distance>($object, [$unit])
+
+Calculate the distance between this object and some other object.
+For many combinations of objects this is not supported or only
+partially supported.
+
+This calculation is performed with L<Geo::Distance> in accurate mode.
+The default $unit is kilometers.  Other units are provided in the manual
+page of L<Geo::Distance>.  As extra unit, C<degrees> and C<radians> are
+added as well as the C<km> alias for kilometer.
+
+=item $obj-E<gt>B<perimeter>()
+
+Returns the length of the outer border of the object's components.  For
+points, this returns zero.
+
+=back
+
+=head2 Display
+
+=over 4
+
+=item $obj-E<gt>B<deg2dm>($degrees, $pos, $neg)
+
+=item Geo::Shape-E<gt>B<deg2dm>($degrees, $pos, $neg)
+
+Like L<deg2dms()|Geo::Shape/"Display"> but without showing seconds.
+
+example: 
+
+ print $point->deg2dm(0.12, 'e', 'w');
+ print Geo::Shape->deg2dm(0.12, 'e', 'w');
+
+=item $obj-E<gt>B<deg2dms>($degrees, $pos, $neg)
+
+=item Geo::Shape-E<gt>B<deg2dms>($degrees, $pos, $neg)
+
+Translate floating point $degrees into a "degrees minutes seconds"
+notation.  An attempt is made to handle rounding errors.
+
+example: 
+
+ print $point->deg2dms(-12.34, 'E', 'W');'     # --> 12d20'24"W
+ print Geo::Shape->deg2dms(52.1234, 'E', 'W'); # --> 52d07'24"E
+
+=item $obj-E<gt>B<dms2deg>($dms)
+
+=item Geo::Shape-E<gt>B<dms2deg>($dms)
+
+Accepts for instance 3d12'24.123, 3d12"E, 3.12314w, n2.14, s3d12",
+-12d34, and returns floating point degrees.
+
+=back
+
+=head1 OVERLOAD
+
+=over 4
+
+=item overload: B<'""' (stringification)>
+
+Returns a string "$proj($lat,$long)" or "$proj($x,$y)".  The C<$proj>
+is the nickname you have assigned to the projection.
+
+=item overload: B<'bool' (truth value)>
+
+A point is always true: defined.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: distance calculation not implemented between a $kind and a $kind
+
+Only a subset of all objects can be used in the distance calculation.
+The limitation is purely caused by lack of time to implement this.
+
+=item Error: in() not implemented for a $class
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Geo-Point distribution version 0.96,
+built on January 21, 2014. Website: F<http://perl.overmeer.net/geo/>
+All modules in this suite:
+L</Geo::Point>,
+L</Geo::Proj4>,
+L</Geo::WKT>,
+L</Math::Polygon>,
+L</Geo::GML>,
+L</Geo::ISO19139>,
+L</Geo::EOP>,
+L</Geo::Format::Envisat>, and
+L</Geo::Format::Landsat>.
+
+Please post questions or ideas to the mailinglist at
+F<http://geo-perl@list.hut.fi>
+
+=head1 LICENSE
+
+Copyrights 2005-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

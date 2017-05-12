@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+
+use Geo::TigerLine::Record::1;
+use Geo::Walkabout::Line;
+use Geo::Walkabout::Chain;
+
+use strict;
+
+Geo::TigerLine::Record::1->input_check(0);
+
+sub callback {
+    my($rt1, $num) = @_;
+
+    # Print every 100 records
+    unless( $num % 100 ) { 
+        local $| = 1;
+        printf "%6d records entered\r", $num;
+    }
+
+    my $chain = Geo::Walkabout::Chain->new([$rt1->frlong, $rt1->frlat],
+                                           [$rt1->tolong, $rt1->tolat]);
+    my $line = Geo::Walkabout::Line->new({
+                                          TLID     => $rt1->tlid,
+
+                                          FeDirP   => $rt1->fedirp,
+                                          FeName   => $rt1->fename,
+                                          FeType   => $rt1->fetype,
+                                          FeDirS   => $rt1->fedirs,
+
+                                          ZipL     => $rt1->zipl,
+                                          ZipR     => $rt1->zipr,
+
+                                          Chain    => $chain
+                                         });
+    $line->add_addresses('R', [$rt1->fraddr, $rt1->toaddr]) if $rt1->fraddr;
+    $line->add_addresses('L', [$rt1->fraddl, $rt1->toaddl]) if $rt1->fraddl;
+
+    $line->commit;
+    $line->db_Main->commit if defined $line && $chain;
+};
+
+Geo::TigerLine::Record::1->parse_file(\*STDIN, \&callback);
+print "\n";

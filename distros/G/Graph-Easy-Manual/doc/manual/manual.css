@@ -1,0 +1,85 @@
+span.node { background: #ffffff; }
+span.edge { background: #ffff80; }
+span.cell { background: #a0a0ff; }
+span.port { background: #ffa0ff; }
+span.port2 { background: #ffffa0; }
+span.port3 { background: #a0ffff; }
+table.features td {
+  background: #a0a0a0;
+  border: #606060 solid 1px;
+  font-size: 0.75em;
+}
+th, th.l { font-size: 0.9em; }
+th.l { font-weight: normal; }
+td.b, td.b, td.c {
+  background: #404040;
+  border: #606060 solid 1px;
+  }
+td.c {
+  background: #ffffff;
+  }
+table.features th {
+  background: #ffffff;
+  border: black solid 1px;
+  }
+table.features td {
+  background: #dfd5ff;
+  }
+tr.odd td { 
+  background: #ffd5df;
+  }
+tr.even td { 
+  background: #ffa0a0;
+  }
+table.features caption {
+  font-weight: bold;
+  }
+table.map {
+  border-collapse: collapse;
+  border: black solid 1px;
+}
+table.features
+  {
+  empty-cells: show;
+  border-collapse: collapse;
+  border: black solid 1px;
+  margin: 0.5em;
+  }
+table.features td, th
+  {
+  padding: 0.3em;
+  }
+table.features td.r {
+  text-align: center;
+  background: #ff8080;
+  }
+table.features td.g {
+  text-align: center;
+  background: #80ff80;
+  }
+table.features td.y {
+  text-align: center;
+  background: #ffff80;
+  }
+pre.wide { max-width: 50em; }
+pre.table { background: inherit; margin: 0; border: none; }
+div.entry { padding-left: 2em; }
+pre.graph
+  {
+  background: white;
+  float: left;
+  font-weight: bold;
+  }
+img.float { float: left; margin-right: 1em; margin-left: 1em; }
+pre.graphtext { float: left; }
+table.clr { margin-left: 1em; }
+.next { margin-top: 1em; padding-top: 0.2em; padding-bottom: 0.2em; }
+span.a, span.q
+  {
+  display: block;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding-bottom: 0.5em;
+  padding-top: 0.5em;
+  }
+

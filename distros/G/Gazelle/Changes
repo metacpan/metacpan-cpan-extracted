@@ -1,0 +1,152 @@
+Revision history for Perl extension Gazelle
+
+0.46 2016-07-05T06:41:37Z
+
+ - do not shutdown if server_starter was used (Thank you zhanghjster)
+
+0.45 2016-06-15T13:19:53Z
+
+ - introduced --child-exit inspired by Starlet
+
+0.44 2016-06-06T15:20:06Z
+
+ - Changed SIGTERM handling in the parent to shutdown the socket
+   Thank you markwellis!
+
+0.43 2016-05-05T14:32:02Z
+
+ - fixed testutils for HTTP::Tiny 0.058
+
+0.42 2016-03-18T00:16:33Z
+
+ - logging errno and rv of writev
+
+0.41 2016-02-17T01:28:18Z
+
+ - requires Parallel::Prefork 0.18
+
+0.40 2015-11-09T17:18:25Z
+
+ - fix null character in read body. shortage buffer
+ - refactor tests
+
+0.39 2015-11-09T14:57:25Z
+
+ - more trial
+ - test requested body
+ - fix types
+
+0.38 2015-11-08T06:19:33Z
+
+ - update deps
+ - fix test. HTTP::Tiny::Handle::write_request_header
+ - null terminate chunked header
+
+0.37 2015-11-06T00:55:50Z
+
+ - race free graceful shutdown. inspired by Starlet
+ - add bigpost test. a few tests were failed on cpantesters
+
+0.36 2015-10-30T02:03:58Z
+
+ - change read buffer size for OpenBSD
+
+0.35 2015-10-26T07:07:55Z
+
+ - define __need_IOV_MAX for FreeBSD
+ - experimental support FreeBSD
+
+0.34 2015-10-18T13:16:21Z
+
+ - fix chunked_zero test. tests on child process
+
+0.33 2015-10-18T12:44:13Z
+
+ - fix accept4 and flags detection
+
+0.32 2015-10-17T14:54:09Z
+
+ - fix failing graceful shutdown while accepting ( Thanks shogo82148)
+ - fix accept4 detection
+
+0.31 2015-10-06T16:20:23Z
+
+ - fix iovcnt calculation (Thanks badalex)
+ - support a server_ready callback
+
+0.30 2015-09-03T05:10:33Z
+
+ - POD tweaks (Thanks Arthur Axel fREW Schmidt)
+ - fix iovcn calculation (Thanks syohex)
+
+0.25 2015-06-12T07:18:44Z
+
+  - fixed test. prevent stopping test around signal
+  - no write 0 byte message in write_all
+
+0.23 2015-06-09T05:49:41Z
+
+  - fixed test with Plack v1.0035+ (Thank you veryrusty)
+
+0.22 2015-01-30T14:27:20Z
+
+  - does not support freebsd and solaris.
+    They have poor writev support?
+    see https://groups.google.com/forum/#!topic/mailing.unix.samba-technical/2xER4neCrT4
+
+0.21 2015-01-30T01:46:38Z
+
+  - trial release for cpantesters
+
+0.20 2015-01-26T14:55:56Z
+
+  - optimize around chunked transfer
+
+0.12 2015-01-26T02:31:11Z
+
+  - support HTTP/1.1
+
+0.11 2014-12-25T06:58:30Z
+
+  - tweek header order
+
+0.10 2014-12-05T05:45:09Z
+
+  - fix test. failed test if there is transparent proxy.
+
+0.08 2014-12-01T08:56:40Z
+
+   - optimize. 2-5% increase performance
+
+0.07 2014-11-27T03:56:03Z
+
+    - has compatibility with HTTP::Parser::XS
+    - fix failed test in FreeBSD
+
+0.06 2014-11-18T08:02:38Z
+
+    - fix path_info. add 0 terminate
+
+0.05 2014-11-18T04:24:06Z
+
+    - add Server header
+    - add some tests
+
+0.04 2014-11-18T01:33:24Z
+
+    - update picohttpparser. fixed infinite loop problem
+    - remove unnecessary srand() (Thanks bayashi)
+
+0.03 2014-11-13T07:30:29Z
+
+    - use older picohttpparser
+
+0.02 2014-11-13T02:57:35Z
+
+    - fix install problem. mv ppport.h to rootdir
+    - change poll timing when writev
+
+0.01 2014-11-12T05:45:55Z
+
+    - original version
+

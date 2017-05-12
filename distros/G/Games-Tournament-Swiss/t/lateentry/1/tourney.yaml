@@ -1,0 +1,102 @@
+--- !!perl/hash:Games::Tournament::Swiss
+entrants:
+  - &1 !!perl/hash:Games::Tournament::Contestant::Swiss
+    firstround: 1
+    floats: []
+    id: 101
+    name: Al
+    oldId: 101
+    pairingNumber: 1
+    preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+      difference: 0
+      sign: Black
+    rating: 2000
+    scores: ~
+    title: Mr.
+  - &2 !!perl/hash:Games::Tournament::Contestant::Swiss
+    firstround: 1
+    floats: []
+    id: 201
+    name: Ally
+    oldId: 201
+    pairingNumber: 2
+    preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+      difference: 0
+      sign: White
+    rating: 1990
+    scores: ~
+    title: Ms.
+  - &3 !!perl/hash:Games::Tournament::Contestant::Swiss
+    firstround: 1
+    floats: []
+    id: 102
+    name: Bert
+    oldId: 102
+    pairingNumber: 3
+    preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+      difference: 0
+      sign: ''
+    rating: 1980
+    scores: ~
+    title: Mr.
+  - &4 !!perl/hash:Games::Tournament::Contestant::Swiss
+    firstround: 1
+    floats: []
+    id: 103
+    name: Carl
+    oldId: 103
+    pairingNumber: 4
+    preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+      difference: 0
+      sign: ''
+    rating: 1960
+    scores: ~
+    title: Mr.
+  - &5 !!perl/hash:Games::Tournament::Contestant::Swiss
+    firstround: 1
+    floats: []
+    id: 104
+    name: Don
+    oldId: 104
+    pairingNumber: 5
+    preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+      difference: 0
+      sign: ''
+    rating: 1940
+    scores: ~
+    title: Mr.
+log:
+  ASSIGNPAIRINGNUMBERS:
+    strings:
+      - "\t1: 101, 2: 201, 3: 102, 4: 103, 5: 104\n"
+logged:
+  ASSIGNPAIRINGNUMBERS: 1
+play:
+  1:
+    101: &6 !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *3
+        White: *1
+      floats:
+        Black: ~
+        White: ~
+      result: ~
+      round: 1
+    102: *6
+    103: &7 !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *2
+        White: *4
+      floats:
+        Black: ~
+        White: ~
+      result: ~
+      round: 1
+    104: !!perl/hash:Games::Tournament::Card
+      contestants:
+        Bye: *5
+      result:
+        Bye: Bye
+      round: 1
+    201: *7
+round: 1

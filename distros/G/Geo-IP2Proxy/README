@@ -1,0 +1,32 @@
+Geo::IP2Proxy
+=============
+
+This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes and data center ranges using IP2Proxy BIN database. This module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/proxy-database upon subscription. It supports both IPv4 and IPv6 addressing.
+
+The complete IPv4 and IPv6 proxy database are available at https://www.ip2location.com/proxy-database
+
+The database will be updated in daily basis for greater accuracy.
+
+Free creative-common monthly database with open proxies data only is available at https://lite.ip2location.com
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+The complete IP2Proxy databases (PX1, PX2, PX3 and PX4) are available at https://www.ip2location.com/proxy-database under subscription package.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by IP2Location.com, support@ip2location.com
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.6 or, at your option, any later version of Perl 5 you may have available.

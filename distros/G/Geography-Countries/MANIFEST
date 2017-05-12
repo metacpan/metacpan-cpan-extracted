@@ -1,0 +1,8 @@
+lib/Geography/Countries.pm
+MANIFEST
+Makefile.PL
+t/000_tests.t
+Changes
+README
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

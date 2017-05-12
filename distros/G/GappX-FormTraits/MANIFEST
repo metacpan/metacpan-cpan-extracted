@@ -1,0 +1,15 @@
+CHANGES
+GappX-FormTraits.komodoproject
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/GappX/FormTraits.pm
+lib/GappX/FormTraits/Meta/Widget/Custom/Trait/CityEntry.pm
+lib/GappX/FormTraits/Meta/Widget/Custom/Trait/EmailEntry.pm
+lib/GappX/FormTraits/Meta/Widget/Custom/Trait/StateEntry.pm
+lib/GappX/FormTraits/Meta/Widget/Custom/Trait/StreetEntry.pm
+lib/GappX/FormTraits/Meta/Widget/Custom/Trait/ZipCodeEntry.pm
+t/01_form_traits.t

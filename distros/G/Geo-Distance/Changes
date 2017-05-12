@@ -1,0 +1,116 @@
+Revision history for Perl extension Geo::Distance.
+
+0.20      2012-10-19
+ - Fix a test that was comparing floating point numbers and falling over on
+   some platforms.
+
+0.19      2012-04-03
+ - Fix various typos.
+ - Fix floating point error in the hsin formula.
+
+0.18      2012-03-23
+ - Fix gcd calculation to use ** instead of ^.
+
+0.17      2011-06-28
+ - Fix circular package dependencies with Geo::Distance::XS (not really
+   an issue practically, but then again it wasn't really helping).
+
+0.16
+ - No changes.  The 0.15 package was broken.
+
+0.15
+ - Stop "Too late to run INIT block" warning (gray <gray@cpan.org>)
+
+0.14
+ - Fix "splice() offset past end of array" as filed in RT 26446.
+
+0.13
+ - Use Geo::Distance::XS if available. (gray <gray@cpan.org>)
+ - Declare Math::Trig dependency.
+
+0.12
+ - Noted GIS::Distance in POD.
+ - Some cleanups to install process.
+ - Check for DBI in tests before using it.
+
+0.11 : 2005-09-01
+ - Fixed some errors in the documentation.
+ - Added an highly accurate ellipsoid formula.
+ - lon_field and lat_field were not being used by closest. (D. Hageman)
+
+0.10 : 2005-07-11
+ - The closest() method has a changed argument syntax and no longer 
+   supports array searches.
+ - The closest() method works!
+ - A real gcd formula (still, hsin is much better).
+ - Tweaked docs.
+ - Added some tests (yay!).
+
+0.09 : 2005-04-01
+ - Modified the todo list to include ideas for future algorithms.
+ - Fixed the nautical mile, mile, yard, and light second units.
+ - Added the British spellings for kilometre, metre, and centimetre.
+ - Added the poppy seed, barleycorn, rod, pole, perch, chain, 
+   furlong, league, fathom, millimeter, and millimetre units.
+ - The totw.pl script was written by Ren and can be used to 
+   take over the world.
+
+0.08 : 2005-03-20
+ - Updated the README description.
+ - Removed debug print()s.  Eeek!
+
+0.07 : 2005-03-16
+ - Intermixed documentation with code so it is easier to keep 
+   the docs up-to-date.
+ - OO interface only - method interface completely removed.
+ - By default no units are defined.  Call default_units.
+ - Slightly more precise measurement of the base kilometer rho.
+ - Added "nautical mile" unit type.
+ - Reworked the closest() function.
+
+0.06 : 2004-06-29
+ - Optional Haversine formula.
+ - Misc documentation tweaks.
+
+0.05 : 2003-03-19
+ - Added a note in the documentation about the 
+   inaccuracies of using Math::Trig.
+ - The 'mile' unit was being calculated wrong which 
+   meant it was returning very inaccurate distances.
+ - Fixed a silly bug where a sub was being relied 
+   on that no longer exists.
+ - Documentation tweaks as usual.
+
+0.04 : 2003-02-18
+ - Documentation revised once again.
+ - Added reg_unit() for adding your own unit type.
+ - find_closest has been overhauled:
+   - Now accepts more than one field in the 
+     field=>'' parameter.
+   - Will now return an array reference 
+     of distances instead of attaching the 
+     distances to the locations array ref.
+   - A little more effecient.
+   - Now accepts a count argument.
+   - Accepts an array reference for searching. 
+     Mostly good for testing, but who knows?
+ - Removed geo_ portion of names for exported 
+   functions.
+ - Removed some of the input checking.  Just not 
+   necessary.
+ - Enhanced tests.  Now we're actually doing some 
+   real testing.  Need more tests tho.
+
+0.03 : 2003-02-15
+ - Documentation modified.
+ - Added find_closest() which accepts a $dbh for 
+   searching in an SQL database.
+ - distance_dirty() can now accept locations as 
+   array refs.
+
+0.02 : 2003-02-14
+ - Based on a suggestion by Jack D. I migrated the code 
+   to use Math::Trig for most of the distance math.
+ - POD documentation written.
+ - Object oriented interface created.
+

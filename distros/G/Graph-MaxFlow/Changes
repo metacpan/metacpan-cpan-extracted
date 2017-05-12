@@ -1,0 +1,14 @@
+Revision history for Perl extension Graph::MaxFlow.
+
+0.01  Fri 20 Jul 2007 08:14:23 PM EDT
+	Initial release
+
+0.02  Mon 23 Jul 2007 05:26:04 PM EDT
+        Fixed logic for using residual capacities
+        Added more tests to check flow conservation and capacity constraints
+        Added another graph to the test script
+
+0.03  Sun 19 Dec 2010 09:28:30 PM EST
+        Require Graph.pm version 0.50 or later
+        Switched from svn to git, so removed $Id$ tags
+        No changes to the core algorithm

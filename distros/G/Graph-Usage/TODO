@@ -1,0 +1,33 @@
+
+* does not work under -T taint mode
+* if you do a "use Text::Balanced", you also get "Text::Balanced::ErrorMsg" and
+  "Text::Balanced::Extractor", because they are defined in the same file. Should
+  these be recorded as edges in the graph, too?
+  (These should be a node-cluster, with the file name as "center" node and the
+   others added below it like:
+
+  +-----------+
+  | Foo       |
+  +...........+
+  | Foo:Error |
+  +...........+
+  | Foo:Msg   |
+  +-----------+
+
+* it should also catch things like:
+
+  package A; use B;
+  require C;
+  sub foo { require D; }
+  BEGIN { require E; }
+
+  e.g. find A => B, A => C, A => E, but NOT A => D.
+
+  The current heuristics is a bit spotty. We could use PPI for this, albeit this
+  would slow things down quite a bit. So optimize PPI.
+
+* Edges should as title have the connection (A => B), and nodes a text like:
+  "vX.YZ uses x, is used by y"
+
+* implement --depth (max recursion level)
+* implement --mode=(recurse|glob), remove --recurse, implement --use

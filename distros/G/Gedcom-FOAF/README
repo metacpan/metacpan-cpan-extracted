@@ -1,0 +1,66 @@
+NAME
+    Gedcom::FOAF - Output FOAF files from Gedcom individuals and families
+
+SYNOPSIS
+        use Gedcom;
+        use Gedcom::FOAF;
+        
+    my $gedcom = Gedcom->new( gedcom_file => 'myfamily.ged' );
+        my $i = $gedcom->get_individual( 'Butch Cassidy' );
+        
+    # print the individual's FOAF
+        print $i->as_foaf;
+        
+    my( $f ) = $i->famc;
+        
+    # print the individual's family's (as a child) FOAF
+        print $f->as_foaf;
+
+DESCRIPTION
+    This module provides "as_foaf" methods to individual and family records.
+    The resulting files can be parsed and crawled (scuttered) by any code
+    that understands the FOAF and RDF specs.
+
+URL TEMPLATES
+    You can supply 3 different url templates.
+
+    *   individual
+
+    *   family
+
+    *   photo
+
+    These templates are used to link between foaf representations of
+    individuals and families, plus provide photo urls for their profiles.
+    The individual and family templates will have an "xref" param, and the
+    photo template will have a "photo" param.
+
+        {
+            individual => 'http://foo.com/i/{xref}?fmt=foaf',
+            family     => 'http://foo.com/f/{xref}?fmt=foaf',
+            photo      => 'http://foo.com/static/photos/{photo}',
+        }
+
+METHODS
+  Gedcom::Individual
+   as_foaf( \%opts )
+    Generates a FOAF (XML) string from the Gedcom::Individual object. Pass
+    in the url templates as described above to suit your needs.
+
+   label_name
+    Generates a string suitable for an "foaf:name" element.
+
+  Gedcom::Family
+   as_foaf( \%opts )
+    Generates a FOAF (XML) string from the Gedcom::Family object. Pass in
+    the url templates as described above to suit your needs.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

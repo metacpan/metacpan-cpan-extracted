@@ -1,0 +1,97 @@
+Getargs::Long - Named subroutine arguments, with optional type checking
+
+The "Getargs::Long" module allows usage of named parameters in function calls,
+along with optional argument type-checking.  It provides an easy way to get at
+the parameters within the routine, and yields concise descriptions for the
+common cases of all-mandatory and all-optional parameter lists.
+
+         *** This is alpha software -- use at your own risk ***
+
+MODULE DEPENDENCIES
+ 
+To use this module, you will need to install:
+
+- Log::Agent
+- version::Limit
+
+To test this module, you will need to install:
+
+- Test::More
+
+
+INSTALLATION
+
+To install this package, change to the directory where you unarchived this
+distribution and type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+You can install this package into a non-default location by appending one of
+the following to the "perl Makefile.PL" command:
+
+- "PREFIX=/installation/path" (for installation into a custom location),
+- "INSTALLDIRS=site" (for installation into site-specific Perl directories)
+- "INSTALLDIRS=perl" (for installation into standard Perl directories).
+
+If you make the installation into your own directory, then remember that you
+must tell perl where to search for modules before trying to 'use' them. For
+example:
+
+  use lib '/home/userid/lib';
+  use Getargs::Long;
+
+
+INSTALLATION PROBLEMS
+
+If "make test" fails, run
+
+  make test TEST_VERBOSE=1
+
+and see which test(s) are failing. Please email the results to the address
+below, or submit a bug report on the project website as described in the
+section REPORTING BUGS below.
+
+For other bugs, see the section REPORTING BUGS below.
+
+
+DOCUMENTATION
+
+Just "perldoc Getargs::Long". After installation on Unix systems, you can also
+do "man Getargs::Long".
+
+
+RESOURCES
+
+The CPAN Page:
+http://search.cpan.org/dist/Getargs-Long/
+
+The GitHub page:
+https://github.com/coppit/getargs-long/
+
+Bug and feature tracking:
+http://rt.cpan.org/Public/Dist/Display.html?Name=Getargs-Long
+
+
+KNOWN BUGS
+
+This module is known to exercise a bug in perl 5.6.0.  Don't use that
+version of perl: use 5.005_03, or try 5.6.1.
+
+The interface of this module changed between 0.1.2 and 0.1.3, and is
+NOT backward compatible. 
+
+
+COPYRIGHT
+
+Copyright (c) Mar 2 2001-Mar 20 2001 Raphael Manfredi. Copyright (c) Mar 20
+2001-2015 David Coppit. All rights reserved, save those granted by the
+license. See the file LICENSE for licensing terms.
+
+
+AUTHOR
+
+David Coppit <david@coppit.org> (current maintainer)
+Raphael Manfredi <Raphael_Manfredi@pobox.com> (original author)

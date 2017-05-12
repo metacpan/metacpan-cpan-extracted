@@ -1,0 +1,165 @@
+NAME
+    Geo::SpaceManager - Place rectangles without overlap
+
+SYNOPSIS
+
+    use Geo::SpaceManager;
+
+    $sm = Geo::SpaceManager->new([0,0,100,100]);
+    my $r1 = [10,10,40,30];
+    my $r2 = [20,20,60,40];
+    my $r3 = [50,10,80,70];
+    my $r4 = [20,50,90,90];
+    my $p1 = $sm->nearest($r1);  # returns [10,10,40,30];
+    $sm->add($p1);
+    my $p2 = $sm->nearest($r2);  # returns [20,30,60,50];
+    $sm->add($p2);
+    my $p3 = $sm->nearest($r3);  # returns [60,10,90,70]
+    $sm->add($p3);
+    my $p4 = $sm->nearest($r4);  # returns undef
+
+
+DESCRIPTION
+    Geo::SpaceManager keeps track of the free space available in a
+    two-dimensional space as upright (non-rotated) rectangles are
+    added. The module can find the nearest available location where
+    a rectangle may be placed or indicate that the rectangle cannot
+    be placed in any of the remaining free space.
+
+    Rectangles are specified by references to four-element arrays
+    giving the boundaries of the rectangle:
+
+      [ left, bottom, right, top ]
+
+    Reflected boundary values may be used by swapping left <-> right
+    and top <-> bottom when specifying rectangles, but the return
+    value of nearest() will return a value as shown above.
+
+CONSTRUCTOR
+  new
+    The new() constructor should be called with the rectangle
+    representing the entire free space to be managed. A second,
+    optional argument turns debugging on if it has a true value.
+
+        my $sm = Geo::SpaceManager->new( [0, 0, 100, 100] );
+        my $sm_debug = Geo::SpaceManager->new( [0, 0, 100, 100], 1 );
+    
+METHODS
+  set_minimum_size
+    Set the minimum size for rectangles to be added.
+
+    The following all set the minimum size of rectangles to (10,20):
+
+      $sm->set_minimum_size([10,20]);
+      $sm->set_minimum_size([0,0,10,20]);
+      $sm->set_minimum_size([10,30,20,50]);
+      $sm->set_minimum_size([20,50,10,30]);
+
+    Setting a minimum size means that SpaceManager can be more
+    efficient in space and time by discarding free-space areas if
+    they are too small to contain any more rectangles of the minimum
+    size.
+
+    You should set the minimum size before adding any rectangles and
+    not change it afterwards with another call to set_minimum_size.
+
+  add
+    Add a rectangle to the current free space.
+
+      $sm->add( [10,20,50,40] );
+
+    The free space will be reduced by the rectangle. The method
+    returns 1 if successful and undef on failure. The only failures
+    will be if the rectangle argument is missing or if it lies
+    entirely outside of the space.
+
+  nearest
+    Find the nearest location in which to place the specified
+    rectangle.
+
+      $r = $sm->nearest([10,30,30,50]);
+
+    The method will return a reference to an array of four scalars
+    specifying a rectangle of the same size as the supplied one that
+    fits wholly into an available free space if space can be found.
+    The rectangle will be a copy of the provided one if it fits as
+    is. The method will return undef if there is no free space that
+    can contain the supplied rectangle.
+
+  distance
+    Return the distance between two (x,y) points or two rectangles.
+
+      $dist = $sm->distance( $rect1, $rect2 );
+      $dist = $sm->distance( [0,0], [3,4] );        # returns 5
+
+    Calculate the distance between the two arguments, which should
+    be references to arrays with at least two elements. Only the
+    first two elements will be used, so you may pass refereces to
+    two arrays with four elements that represent rectangles. This
+    method may be used to find how far away the nearest available
+    location is from a desired rectangle placement location.
+
+      $s = $sm->nearest($r);
+      $d = $sm->distance($r,$s);
+      print "nearest available location is $d units away\n";
+        
+  dump
+      $sm->dump()
+
+    Print out the current set of free-space rectangles to standard
+    output. The area of each rectangle is also printed.
+
+ACKNOWLEDGMENTS
+    The algorithm used is based on that described by Bernard and
+    Jacquenet in "Free space modeling for placing rectangles without
+    overlap" which appeared in the Journal of Universal Computer
+    Science, vol. 3, no. 6, 1997. See
+    http://www.jucs.org/jucs_3_6/free_space_modeling_for
+
+    The term "space manager" was used by Bell and Feiner in their
+    paper "Dynamic Space Management for User Interfaces", Proc. UIST
+    '00, San Diego, CA, November 5-8 2000. pp. 239-248.
+
+LIMITATIONS
+    The algorithm used is first-come-first-served and makes no
+    attempt at optimization such as minimum displacements. The first
+    rectangle placed will occupy its desired location, while others
+    may have to be moved, farther and farther as more are placed.
+
+    There is no method for removing rectangles and restoring the
+    space they occupied. Doing so is not trivial and remains the
+    goal of a later update to this module, if there turns out to be
+    a demand for such a feature. See the Bell and Feiner paper cited
+    above for details on how this could be done.
+
+    This module does in theory handle the placement of overlapping
+    rectangles. You can place a rectangle that overlaps a
+    rectangle that was already added and was, therefore, not
+    returned by a call to the nearest method. The module should
+    reduce the free space correctly in this case. However, this
+    feature has not been thoroughly tested and there may still be
+    bugs. It is safest to add only rectangles that have been
+    returned from the nearest method.
+
+BUGS
+    None known at this time.
+
+SUPPORT
+    Please e-mail the author if any bugs are found.
+
+AUTHOR
+            Jim Gibson
+            CPAN ID: JGIBSON
+        
+            Jim@Gibson.org
+            jim.gibson.org
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file
+    included with this module.
+
+SEE ALSO
+    perl(1).

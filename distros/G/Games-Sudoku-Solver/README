@@ -1,0 +1,38 @@
+Games-Sudoku-Solver version 1.1.0
+
+    This module solves 9x9-Sudoku puzzles by recursion.
+    There is no restriction to the difficulty and the number of solutions. 
+    The puzzle can be stored in a single dimension array or in a file,
+    where unknown cells are presented by zeros or points.
+    The module contains a POD documentation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Clone - recursively copy Perl datatypes
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Dr.-Ing. Fritz Mehner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

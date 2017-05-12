@@ -1,0 +1,375 @@
+SYNOPSIS
+       Graph::Chart
+
+               A Wrapper around GD to easyly graph chart
+
+METHODS
+            OO interface
+
+  new
+        Create a new Chart
+
+            my $graph = Graph::Chart->new( \%options );
+
+              %options could be defined like this:
+
+              size => [ W, H ]                                                      # the size ( Width, Height ) in pixel of the real graph ( without border ) 
+              bg_color => '0xfffff0'                                                #  an ARRAY with all possible section
+              frame  => { color => '0xff00ff', thickness => 1 },                    # an optional frame around the real chart
+              border => [ 150,  80,            100,      100 ],                     # extra space around the graph in pixel [ left side, right side , top side, bottom side ]"
+  
+                  grid   => {                                                       # a grid over the graph
+                      debord => [ 5, 20, 10, 30 ],                                  # some extension of the grid size ( same order as border ) B<test>
+                      x      => {                                                   # vertical grid
+                        color  => '0xff00ff'                                        # color of the grid ( hex HTML value )
+                        number => 5,                                                # number of grid division
+                       thickness => 1,                                              # size of the division's line ( default = 1 )
+                       type => log,                                                 # create a log graduation (only one modules). If missing, normal graduation.
+           
+                        label  => {                                                 # an optional label on the left side
+                            font  => '/usr/lib/cinelerra/fonts/trebucbi.ttf',       # a TrueType font to use
+                            color => '0xff0000',                                    # the color of the label
+                            size  => 10,                                            # the size of the font
+                            text  => [ 'toto', undef, 'truc', 'bazar', 122 ],       # the text to render ( a undef element is not ploted, this allow to skip some label )
+                            space => 80,                                            # an extra space between the division and the text
+                            align    => 'right',                                    # align the text on the right ( = aligned on the division )
+                            rotation => 30,                                         # a rotation of the text in degree
+                            kerning_correction => 0.85,                             # a kerning correcting to correct align of text when rotated ( default 0.91 ) 
+                            surround => { color => '0x0000ff' , thickness => 1 },   # create a frame around the text with the specified color and thickness
+                        },
+            
+                    x_up      => {                                                  # vertical grid on the upper half of the graph ( to use with up_ graph)
+                        color  => '0xff00ff'                                        # color of the grid ( hex HTML value )
+                        number => 5,                                                # number of grid division
+                       thickness => 1,                                              # size of the division's line ( default = 1 )
+                       type => log,                                                 # create a log graduation (only one modules). If missing, normal graduation.
+           
+                        label  => {                                                 # an optional label on the left side
+                            font  => '/usr/lib/cinelerra/fonts/trebucbi.ttf',       # a TrueType font to use
+                            color => '0xff0000',                                    # the color of the label
+                            size  => 10,                                            # the size of the font
+                            text  => [ 'toto', undef, 'truc', 'bazar', 122 ],       # the text to render ( a undef element is not ploted, this allow to skip some label )
+                            space => 80,                                            # an extra space between the division and the text
+                            align    => 'right',                                    # align the text on the right ( = aligned on the division )
+                            rotation => 30,                                         # a rotation of the text in degree
+                            kerning_correction => 0.85,                             # a kerning correcting to correct align of text when rotated ( default 0.91 ) 
+                            surround => { color => '0x0000ff' , thickness => 1 },   # create a frame around the text with the specified color and thickness
+                        },
+            
+                    x_down      => {                                                # vertical grid on the lower half of the graph ( to use with down_ graph)
+                        color  => '0xff00ff'                                        # color of the grid ( hex HTML value )
+                        number => 5,                                                # number of grid division
+                       thickness => 1,                                              # size of the division's line ( default = 1 )
+                       type => log,                                                 # create a log graduation (only one modules). If missing, normal graduation.
+           
+                        label  => {                                                 # an optional label on the left side
+                            font  => '/usr/lib/cinelerra/fonts/trebucbi.ttf',       # a TrueType font to use
+                            color => '0xff0000',                                    # the color of the label
+                            size  => 10,                                            # the size of the font
+                            text  => [ 'toto', undef, 'truc', 'bazar', 122 ],       # the text to render ( a undef element is not ploted, this allow to skip some label )
+                            space => 80,                                            # an extra space between the division and the text
+                            align    => 'right',                                    # align the text on the right ( = aligned on the division )
+                            rotation => 30,                                         # a rotation of the text in degree
+                            kerning_correction => 0.85,                             # a kerning correcting to correct align of text when rotated ( default 0.91 ) 
+                            surround => { color => '0x0000ff' , thickness => 1 },   # create a frame around the text with the specified color and thickness
+                        },
+            
+                        label2 => {                                                 # an optional label on the right side
+                            font  => '/usr/lib/cinelerra/fonts/lucon.ttf',          # a TrueType font to use
+                            color => '0xff0000',                                    # the color of the label
+                            size  => 10,                                            # the size of the font
+                            text  => [ 'toto', undef, 'truc', 'bazar', 122 ],,      # the text to render ( a undef element is not ploted, this allow to skip some label )
+                            space => 50,                                            # an extra space between the division and the text
+                            align => 'right',                                       # align the text on the right ( not really useful )
+                            rotation => -30,                                        # an rotation of the text in degree
+                            kerning_correction => 0.85,                             # a kerning correcting to correct align of text when rotated ( default 0.91 ) 
+                            surround => { color => '0x0000ff' , thickness => 1 },   # create a frame around the text with the specified color and thickness
+
+                        },
+                    },              "
+                   y => {                                                           # horizontal grid
+                       color     => '0x00fff0','                                    # color of the grid ( hex HTML value )
+                       number    => 8,                                              # number of grid division
+                       thickness => 1,                                              # size of the division's line ( default = 1 )
+                       label     => {                                               # an optional label on the bottom side
+                            font  => '/usr/lib/cinelerra/fonts/trebuc.ttf',         # a TrueType font to use
+                            color => '0xff0000',',                                  # the color of the label
+                            size  => 12,                                            # the size of the font
+                            text  => [ 100, undef, '20', undef, 1585, undef, 555 ], # the text to render ( a undef element is not ploted, this allow to skip some label )
+            #               space => 10,                                            # an extra space between the division and the text
+                            rotation => 45,                                         # an rotation of the text in degree
+                            kerning_correction => 0.85,                             # a kerning correcting to correct align of text when rotated ( default 0.91 ) 
+                            surround => { color => '0x0000ff' , thickness => 1 },   # create a frame around the text with the specified color and thickness
+                       },
+            #            label2     => {                                            # an optional label on the top side
+            #               font  => '/usr/lib/cinelerra/fonts/trebuc.ttf', # a TrueType font to use
+                            color => '0xff0000',',                                  # the color of the label
+                            size  => 12,                                            # the size of the font
+                            text  => [ 100, undef, '20', undef, 1585, undef, 555 ], # the text to render ( a undef element is not ploted, this allow to skip some label )
+            #               space => 10,                                            # an extra space between the division and the text
+                            rotation => 45,                                         # an rotation of the text in degree
+                            kerning_correction => 0.85,                             # a kerning correcting to correct align of text when rotated ( default 0.91 ) 
+                            surround => { color => '0x0000ff' , thickness => 1 },   # create a frame around the text with the specified color and thickness
+            #             }
+                     }
+
+                    reticle => {                                                    # when the Chart's type is of any circular shape, create polar division 
+                    debord => 30,                                                   # the extra debord of the division
+                    color => '0xff0000',                                            # the color of the division
+                    number => 10,                                                   # the number of division
+                    label_middle => {                                               # the label to write between 2 division
+                            font  => '/usr/lib/cinelerra/fonts/lucon.ttf',          # a TrueType font to use
+                            kerning_correction => 0.85,                             # a kerning correcting to correct align of text when rotated ( default 0.91 ) 
+                            color => '0xff0000',                                    # the text color
+                            size  => 10,                                            # the font size to use
+            #               space => 10,                                            # an extra space between the division and the text
+            #               rotate => 'follow',                                     # rotate the text to be following the division direction
+                            rotate => 'perpendicular',                              # rotate the the to be perpendicular to the division
+                                                                                    # if missing write the text without rotation
+                            text => [700031220,45,90,135,180,225,270,31500 , 1 ,2], #  the text to render ( a undef element is not ploted, this allow to skip some label )
+                            },
+            #       label => {                                                      # the label to write at the division
+                            font  => '/usr/lib/cinelerra/fonts/lucon.ttf',          # a TrueType font to use
+                            kerning_correction => 0.85,                             # a kerning correcting to correct align of text when rotated ( default 0.91 ) 
+                            color => '0xff0000',                                    # the text color
+                            size  => 10,                                            # the font size to use
+            #               space => 10,                                            # an extra space between the division and the text
+            #               rotate => 'follow',                                     # rotate the text to be following the division direction
+                            rotate => 'perpendicular',                              # rotate the the to be perpendicular to the division
+                                                                                    # if missing write the text without rotation
+                            text => [700031220,45,90,135,180,225,270,31500 , 1 ,2], #  the text to render ( a undef element is not ploted, this allow to skip some label )
+            #               },      
+
+                    overlay=> {                                                     # add an overlay to the graph (useful to show an alert period )
+                      layer => 10,                                                  # the layer where the data is plotted ( the lowest number is the deepest layer ) If missing, the layer is created by call order of the method data 
+                      set   => \@alarm,                                             # a array ref with the data ( the number of dot plotted is the number  W provided by the size parameter/method
+                      type  => 'pie',                                               # the type of graph ( dot, line, bar, up_dot, up_bar, up_line , down_dot,down_line, down_bar, pie, target, radial )
+                      color => '0xFFD2D2',                                          # color of the plotted element
+                      type => 'pie',                                                # if missing normal overlay are used, if present use a polar structure ( data are in the range of 0 to 360 ° ) 
+                      merge  => 1,                                                  # if present and not = 0 all overlay are overwrited by the overlay from a higer layer
+                      opacity => 100,                                               # when merge is missing, the overlay % of opacity copied on the chart
+                      debord => 50,                                                 # the debord of the overlay. if missing use the full graph height and in polar ( pie ) use the smallest vertical border ( top or bottom ) 
+                      },
+          
+                      glyph => {                                                    # add some ornament on the graph like line, text or polygon
+                    x     => $graph->{x}{min}+200,                                          # the origin of the glyph, all other position are relative to this origin
+                    y     => $graph->{x}{max} ,                                             # either in pixel  x =>0 , y=> 0 = corner lower left
+                                                                                    # see the active method
+                    type  => 'filled',                                              # type of glyph ( missing = open polygyn, 'filled' = filled polygon, 'text' = text )
+                    color => '0x00FFff',                                            # color of the glyph
+                    data  => [                                                      # if one of the polygon type, the data is a set of point to plot ( value relative to the origin )
+                        [ 0,  0 ],
+                        [ 8,  10 ],
+                        [ 0,  10 ],
+                        [ 0,  10 + 20 ],
+                        [ 0,  10 ],
+                        [ -8, 10 ],
+                        [ 0,  0 ]
+                      ],
+          
+                    glyph => {      
+                       x     => 100,
+                    y     => 'active_max',
+                    type  => 'text',
+                    color => '0xff0000',
+                    size  => 12,                                                    # if the glyph's type is 'text', this is the font size 
+                    font  => '/usr/lib/cinelerra/fonts/lucon.ttf',                  # the TrueType font to use
+                    data  => [                                                      # the data set contain an array with all the text to plot followed by the relative position + the optional rotation
+                         [ 'hello world', 0, 0, 30 ],                               # 
+                         [ 'hello universe', 100, 0, 0 ], 
+                    ],
+                    },
+               },
+            },
+
+            all these parameters are optional except the size
+
+            my $a = Graph::Chart->new( size => [ 800,400 ] );
+
+  reduce
+      get a set of data as input and return the data to fill the array with the plotting values
+      if more input data then the dot in the graph, process by averaging for a sample calculated on the target size
+      if lower input data then the dot in the graph, repeat the input data in the slice related
+      if called in array context return a ref to the array with reduced data and a ref to a hash with the statistical data
+      in sclar context return a ref to the array with reduced data
+  
+      my $dr= $graph->reduce( 
+        {
+              start => 5,                           # start to fill the destination array at that element ( optional, default = 0 )
+              end => 50,                            # fill the destination array until that element ( optional, default = plot width )
+              data => \@dot,                        # the input data set 
+              init => 0,                            # a default value for the destination set if not filled ( optional, default = undef )
+              type => 'line'                        # type of interpollation if lower element in the input data set then in the target
+                                                    # default = step, the value is duplicate to fill-in all the destination dot for the slice
+                                                    # if line, the dot are filled with an increasing/decreasing step created by the to adjacent value/ by the number of dot in the slice 
+                                                    # if nrz = keep the previous value if now value == 0
+             percentile =>  0.90                    # a percentile to use (default = 0.95 )
+        }
+     );
+
+  grid
+            set the grid 
+
+      use the same parameter as the new()
+      if the option is already present, overwrite this option
+
+  reticle
+            set the reticle 
+            the reticle are the division when using a polar chart ( pie, target .... )
+
+      use the same parameter as the new()
+      if the option is already present, overwrite this option
+
+  frame
+            set the frame 
+
+      use the same parameter as the new()
+      if the option is already present, overwrite this option
+
+  size
+            set the size ( this is the only mandatory option ) 
+
+      use the same parameter as the new()
+      if the option is already present, overwrite this option
+
+  active
+            get the active border size
+
+     return a hash ref with 
+      $ref->{ x }{ max }  ==> left border of the main graph
+      $ref->{ x }{ min }  ==> right border of the main graph
+      $ref->{ y }{ max }  ==> upper border of the main graph
+      $ref->{ y }{ min }  ==> lower border of the main graph
+  
+  bg_color
+            set the bg_color
+            set the background color of the graph
+
+      use the same parameter as the new()
+      if the option is already present, overwrite this option
+
+  data
+            set the data to be plotted 
+
+      $graph->data(
+        {
+              layer => 10,                  # the layer where the data is plotted ( the lowest number is the deepest layer ) If missing, the layer is created by call order of the method data 
+              set   => \@dot,               # a array ref with the data ( the number of dot plotted is the number  W provided by the size parameter/method
+              type  => 'pie',               # the type of graph ( dot, line, bar, up_dot, up_bar, up_line , down_dot,down_line, down_bar, pie, target, radial )
+              bar_size => 1,                # if any type of bar used, this is an extra width of the bar created, if not defined, the bar width= 1 if set to 1 the size of the bar became 3 ( 1 before, 1 for the bar and one after )
+              color => '0x0000ff',          # color of the plotted element
+              thickness => 1,               # for any type of dot and line, the thiskness to used ( default = 1 )
+              scale => '90%',               # a vertical scale on the value provided ( a decimal number scale all the data value using the value ( data could be outside of the graph) 1 = 100%
+                                            # a percent value like, '90%' scale the graph to that percentage ( lower then 100% = some data are plotted outside the graph )
+                                            # missing or '100%' resize the graph using the maximal value 
+                                            # 'auto' or '110%' allow to always have a small extra gap and never reach to extremity of the graph area, 
+              max => 3000,                  # a maximal value to use to create the graph ( if missing, max = maximal value from the data set )
+          
+              }
+    );
+    =cut
+
+    sub data { my $self = shift; my $object = shift;
+
+        if ( $object )
+        {
+            if ( exists $object->{ layer } )
+            {
+                $self->{ data }[ $object->{ layer } ] = clone( $object );
+            }
+            else
+            {
+                push @{ $self->{ data } }, clone( $object );
+            }
+        }
+        return $self->{ data };
+    }
+
+    ########################################################################
+    ###
+
+    ########################################################################
+    ### ### method to put an overlay on top of the graph ###
+    ########################################################################
+    ###
+
+  overlay
+            method to put an overlay on top of the graph ( to show alarm period ... )
+
+      use the same parameter as the new()
+      if the same layer is already present, overwrite this layer
+
+  overlay
+            method to put a glyph on the graph ( to show the latest data polled, or a trend value, ... )
+
+      use the same parameter as the new()
+      if the same layer is already present, overwrite this layer
+
+  png_zEXt
+            method to add a png data TAG 
+            This tag is not a PNG standard, but allowed by the RFC
+            see code in img_info.pl 
+        
+            my $png_out1 =$graph->png_zEXt( { eerer => 1, ggg => 'zed' } );
+            this overwrite the png TAG data with the new value and return the new image
+
+  render
+            render the chart and return a png image
+
+      my $img = $graph->render( \%tag )
+   
+      the hash ref contain data to put in the PNG meta tag.
+      the tools img_info.pl allow to see the result.
+      the tag is serialized in the png
+  
+      the returned value could be writted in a file like this:
+      my $png_out = $graph->render();
+  
+        open( my $IMG, '>', $file ) or die $!;
+        binmode $IMG;
+        print $IMG $png_out;
+        close $IMG;
+    );
+
+COLOR format
+      the color could be in the form of html hexa value '0xff00ff' of simple the hexa value 'ff00ff' all must be read as a string 0xff0000 = 16711680
+      it is also possible to use an array with multiple color to create a 'gdDtyled' color ( see GP.pm doc )
+      example:
+      color => [
+            '0xff0000',
+            '0xff0000',
+            '0xff0000',
+            '0xff0000',
+            '0x00ff00',
+            '0x00ff00',
+            '0x00ff00',
+            'gdTransparent',
+            'gdTransparent'
+            ],
+        
+TODO
+    *   A good test.pl for the install
+
+AUTHOR
+    Fabrice Dulaunoy <fabrice@dulaunoy.com>
+
+    june 2010
+
+LICENSE
+    Under the GNU GPL2
+
+        This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public 
+        License as published by the Free Software Foundation; either version 2 of the License, 
+        or (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+        without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+        See the GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License along with this program; 
+        if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+        Proc::Forking    Copyright (C) 2010 DULAUNOY Fabrice  Proc::Forking comes with ABSOLUTELY NO WARRANTY; 
+        for details See: L<http://www.gnu.org/licenses/gpl.html> 
+        This is free software, and you are welcome to redistribute it under certain conditions;
+   

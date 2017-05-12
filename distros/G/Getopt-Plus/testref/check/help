@@ -1,0 +1,24 @@
+Usage:
+    test-script-2 [options]
+
+      Option         Value      Default   Unit   Meaning
+      --fail1
+      --fail2
+      --fail3                                    doesn't actually fail
+      --msg
+
+      -v|--verbose                               output informational messages
+      --progress                                 output progress messages
+      --stats                                    output statistical information
+
+      --help         [string]                    produce summary help on stdout
+      --longhelp                                 produce long help on stdout
+      --man                                      produce full man page on
+                                                 stdout
+      --version                                  produce full version on stdout
+      -V|--briefversion                          produce brief version on
+                                                 stdout
+
+      --debug
+
+end

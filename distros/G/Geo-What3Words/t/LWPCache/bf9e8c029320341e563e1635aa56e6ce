@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Connection: close
+Date: Wed, 15 Jun 2016 19:52:42 GMT
+Server: nginx
+Content-Length: 198
+Content-Type: application/json;charset=UTF-8
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Allow-Headers: X-Api-Key
+Access-Control-Allow-Methods: GET
+Access-Control-Allow-Origin: *
+Client-Response-Num: 1
+Client-SSL-Cert-Issuer: /C=US/O=GeoTrust Inc./CN=RapidSSL SHA256 CA - G3
+Client-SSL-Cert-Subject: /OU=GT36478046/OU=See www.rapidssl.com/resources/cps (c)15/OU=Domain Control Validated - RapidSSL(R)/CN=*.what3words.com
+Client-SSL-Cipher: ECDHE-RSA-AES128-SHA
+Client-SSL-Socket-Class: IO::Socket::SSL
+
+{"status":{"status":200,"reason":"OK","code":104,"message":"The 'coords' parameter is invalid or missing coordinates"},"thanks":"Thanks from all of us at index.home.raft for using a what3words API"}

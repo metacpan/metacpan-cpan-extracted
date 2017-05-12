@@ -1,0 +1,9 @@
+\.git
+build
+Makefile$
+\.bak$
+\.bs$
+blib
+xs/\w+\.c$
+xs/\w+\.o$
+\.releaserc$

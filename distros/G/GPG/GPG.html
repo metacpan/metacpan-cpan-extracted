@@ -1,0 +1,313 @@
+<HTML>
+<HEAD>
+<TITLE>GPG - a Perl2GnuPG interface</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFEB" TEXT='#000000' link="#680202" vlink="#680202" alink="#680202">
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#INSTALLATION">INSTALLATION</A>
+	<LI><A HREF="#METHODS">METHODS</A>
+	<LI><A HREF="#FAQ">FAQ</A>
+	<LI><A HREF="#KNOWN_BUGS">KNOWN BUGS</A>
+	<LI><A HREF="#TODO">TODO</A>
+	<LI><A HREF="#SUPPORT">SUPPORT</A>
+	<LI><A HREF="#DOWNLOAD">DOWNLOAD</A>
+	<LI><A HREF="#DEVELOPPEMENT">DEVELOPPEMENT</A>
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+GPG - a Perl2GnuPG interface
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+GPG.pm is a Perl5 interface for using GnuPG. GPG works with
+<CODE>$scalar</CODE> (string), as opposed to the existing Perl5 modules
+(GnuPG.pm and GnuPG::Interface, which communicate with gnupg through
+filehandles or filenames)
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>  use GPG;
+</PRE>
+<P>
+<PRE>    my ($passphrase,$key_id) = (&quot;1234567890123456&quot;,'');
+</PRE>
+<P>
+<PRE>  my $gpg = new GPG(homedir  =&gt; './test'); # Creation
+</PRE>
+<P>
+<PRE>  die $gpg-&gt;error() if $gpg-&gt;error(); # Error handling
+</PRE>
+<P>
+<PRE>  my ($pubring,$secring) = $gpg-&gt;gen_key(key_size =&gt; &quot;512&quot;,
+                                        real_name  =&gt; &quot;Joe Test&quot;,
+                                        email      =&gt; 'nobody@yahoo.com',
+                                        comment    =&gt; &quot;&quot;,
+                                        passphrase =&gt; $passphrase);
+</PRE>
+<P>
+<PRE>  my $pubkey = $gpg-&gt;list_packets($pubring);
+  my $seckey = $gpg-&gt;list_packets($secring);
+  $key_id = $pubkey-&gt;[0]{'key_id'};
+</PRE>
+<P>
+<PRE>  $gpg-&gt;import_keys($secring);
+  $gpg-&gt;import_keys($pubring);
+</PRE>
+<P>
+<PRE>  my $signed = $gpg-&gt;clearsign($key_id,$passphrase,&quot;TEST_TEXT&quot;);
+  my $verify = $gpg-&gt;verify($signed);
+</PRE>
+<P>
+<PRE>  my $TEST_TEXT = $gpg-&gt;encrypt(&quot;TEST_TEXT&quot;,$key_id);
+     $TEST_TEXT = $gpg-&gt;decrypt($passphrase,$TEST_TEXT);
+</PRE>
+<P>
+<PRE>     $TEST_TEXT = $gpg-&gt;sign_encrypt($key_id,$passphrase,$TEST_TEXT,$key_id);
+  my $decrypt_verify = $gpg-&gt;decrypt_verify($passphrase,$TEST_TEXT);
+</PRE>
+<P>
+<PRE>  my $keys = $gpg-&gt;list_keys();
+  my $sigd = $gpg-&gt;list_sig();
+</PRE>
+<P>
+<HR>
+<H1><A NAME="INSTALLATION">INSTALLATION</A></H1>
+<P>
+<PRE> % perl Makefile.PL
+ % make
+ % make test
+ % make install
+</PRE>
+<P>
+<PRE>  Tips :
+  - if you want secure memory, do not forget :
+    % chown root /usr/local/bin/gpg ; chmod 4755 /usr/local/bin/gpg
+</PRE>
+<P>
+<HR>
+<H1><A NAME="METHODS">METHODS</A></H1>
+<P>
+Look at the ``test.pl'' and ``quick_test.pl'' for examples and futher
+explanations.
+
+<P>
+You can set ``VERBOSE'' in ``test.pl'' to ``1'' and restart the test, to
+see more extensive output.
+
+<DL>
+<DT><STRONG><A NAME="item_new">new %params</A></STRONG><DD>
+<P>
+<PRE> Parameters are :
+ - gnupg_path (most of time, 'gpg' stand inside /usr/local/bin)
+ - homedir (gnupg homedir, default is $HOME/.gnupg)
+ - config (gnupg config file)
+ - armor (armored if 1, DEFAULT IS *1* !)
+ - debug (1 for debugging, default is 0)
+</PRE>
+<DT><STRONG><A NAME="item_gen_key">gen_key %params</A></STRONG><DD>
+<P>
+<PRE> Parameters are :
+ - key_size (see gnupg doc)
+ - real_name (usually first name and last name, must not be empty)
+ - email (email address, must not be empty)
+ - comment (may be empty)
+ - passphrase (*SHOULD* be at least 16 chars long...)
+</PRE>
+<P>
+Please note that the keys are not imported after creation, please read
+``test.pl'' for an example, or read the description of the ``list_packets''
+method.
+
+<DT><STRONG><A NAME="item_list_packets">list_packets $packet</A></STRONG><DD>
+<P>
+Output a packet description for public and secret keys, run ``test.pl''
+with ``VERBOSE=1'' for a better description.
+
+<DT><STRONG><A NAME="item_import_keys">import_keys $key</A></STRONG><DD>
+<P>
+Import the <CODE>key(s)</CODE> into the current keyring.
+
+<DT><STRONG><A NAME="item_clearsign">clearsign $key_id, $passphrase, $text</A></STRONG><DD>
+<P>
+Clearsign the current text.
+
+<DT><STRONG><A NAME="item_detach_sign">detach_sign $key_id, $passphrase, $text</A></STRONG><DD>
+<P>
+Make a detached signature of the current text.
+
+<DT><STRONG><A NAME="item_verify">verify $signed_text</A></STRONG><DD>
+<P>
+Verify a signature.
+
+<DT><STRONG><A NAME="item_verify_files">verify_files $signed_text</A></STRONG><DD>
+<P>
+Verify signature of a all files from stdin, faster than
+<CODE>verify()</CODE> method.
+
+<DT><STRONG><A NAME="item_encrypt">encrypt $text, ($dest_1, ...)</A></STRONG><DD>
+<P>
+Encrypt.
+
+<DT><STRONG><A NAME="item_decrypt">decrypt $passphrase, $text</A></STRONG><DD>
+<P>
+Decrypt (yes, really).
+
+<DT><STRONG><A NAME="item_sign_encrypt">sign_encrypt $key_id, $passphrase, $text, ($dest_1, ...)</A></STRONG><DD>
+<P>
+Sign and Encrypt.
+
+<DT><STRONG><A NAME="item_decrypt_verify">decrypt_verify $passphrase, $text</A></STRONG><DD>
+<P>
+Decrypt and verify signature.
+
+<DT><STRONG><A NAME="item_list_keys">list_keys()</A></STRONG><DD>
+<P>
+List all keys from your standard pubring
+
+<DT><STRONG><A NAME="item_list_sig">list_sig()</A></STRONG><DD>
+<P>
+List all keys and signatures from your standard pubring
+
+<DT><STRONG><A NAME="item_delete_secret_key">delete_secret_key $key_id</A></STRONG><DD>
+<P>
+No yet implemented, gnupg doesn't accpt this in batch mode.
+
+<DT><STRONG><A NAME="item_delete_key">delete_key $key_id</A></STRONG><DD>
+<P>
+No yet implemented, gnupg doesn't accept this in batch mode.
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="FAQ">FAQ</A></H1>
+<P>
+<PRE> Q: How does it work ?
+ A: it uses IPC::Open3 to connect the 'gpg' program. 
+IPC::Open3 is executing the fork and managing the filehandles for you.
+</PRE>
+<P>
+<PRE>  Q: How secure is GPG ?
+  A: As secure as you want... Be carefull. First, GPG is no 
+more securer than 'gpg'. 
+Second, all passphrases are stored in non-secure memory, unless
+you &quot;chown root&quot; and &quot;chmod 4755&quot; your script first. Third, your
+script probably store passpharses somewhere on the disk, and 
+this is *not* secure.
+</PRE>
+<P>
+<PRE>  Q: Why using GPG, and not GnuPG or GnuPG::Interface ??
+  A: Because of their input/output facilities, 
+GnuPG.pm only works on filenames. 
+GnuPG::Interface works with fileshandles, but is hard to use - all filehandle
+management is left up to the user. GPG is working with $scalar only for both
+input and output. Since I am developing for a web interface, I don't want to
+write new files each time I need to communicate with gnupg.
+</PRE>
+<P>
+<HR>
+<H1><A NAME="KNOWN_BUGS">KNOWN BUGS</A></H1>
+<P>
+Currently known bugs are caused by gnupg (www.gnupg.org) and *not* by
+GPG.pm :
+
+<P>
+<PRE> - the methods &quot;delete_key&quot; and &quot;delete_secret_key&quot; do not work, 
+   Not because of a bug but because gnupg cannot do that in batch mode.
+ - sign_key() and lsign_key() : &quot;gpg: can't do that in batchmode&quot;
+ - verify() and verify_files() output only the wrong file, even only one has
+   a wrong signature. Other files are ignored.
+</PRE>
+<P>
+I hope a later version of gnupg will correct this issues...
+
+<P>
+<HR>
+<H1><A NAME="TODO">TODO</A></H1>
+<P>
+<PRE> see CHANGES.txt.
+</PRE>
+<P>
+<PRE> most of awaiting changes cannot be done until gnupg itself
+ get an extented batch mode (currently very limited)
+</PRE>
+<P>
+<HR>
+<H1><A NAME="SUPPORT">SUPPORT</A></H1>
+<P>
+Feel free to send me your questions and comments.
+
+<P>
+Feedback is ALWAYS welcome !
+
+<P>
+Commercial support on demand, but for most problems read the ``Support''
+section on <A HREF="http://www.gnupg.org.">http://www.gnupg.org.</A>
+
+<P>
+<HR>
+<H1><A NAME="DOWNLOAD">DOWNLOAD</A></H1>
+<P>
+CPAN : ${CPAN}/authors/id/M/MI/MILES/
+
+<P>
+sourceforge : <A
+HREF="https://sourceforge.net/project/filelist.php?group_id=8630">https://sourceforge.net/project/filelist.php?group_id=8630</A>
+
+
+<P>
+developpers info at <A
+HREF="https://sourceforge.net/projects/gpg">https://sourceforge.net/projects/gpg</A>
+
+
+<P>
+doc and home-page at <A
+HREF="http://gpg.sourceforge.net/">http://gpg.sourceforge.net/</A> (this
+document)
+
+<P>
+<HR>
+<H1><A NAME="DEVELOPPEMENT">DEVELOPPEMENT</A></H1>
+<P>
+<PRE> CVS access :
+ 
+ look at <A HREF="http://acity.sourceforge.net/devel.html">http://acity.sourceforge.net/devel.html</A>
+ ... and replace &quot;agora&quot; or &quot;acity&quot; by &quot;gpg&quot;.
+</PRE>
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<P>
+<PRE> GnuPG            - <A HREF="http://www.gnupg.org">http://www.gnupg.org</A>
+ GnuPG.pm         - input/output only through file_names
+ GnuPG::Interface - input/output only through file_handles
+                    see <A HREF="http://GnuPG-Interface.sourceforge.net/">http://GnuPG-Interface.sourceforge.net/</A> or CPAN
+ IPC::Open3       - communication with 'gpg', see &quot;perldoc perlipc&quot;
+</PRE>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+<PRE> miles@_REMOVE_THIS_users.sourceforge.net, pf@_REMOVE_THIS_spin.ch
+ extra thanks to tpo_at_spin
+</PRE>
+</BODY>
+
+</HTML>

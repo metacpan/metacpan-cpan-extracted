@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Geo-Query-LatLong
+version:      0.8011
+version_from: lib/Geo/Query/LatLong.pm
+installdirs:  site
+requires:
+    JSON::Syck:                    0
+    LWP::UserAgent:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

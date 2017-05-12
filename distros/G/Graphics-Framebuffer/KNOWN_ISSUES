@@ -1,0 +1,7 @@
+KNOWN ISSUES
+
+Some color mapping errors are happening with textured shapes in 16 bit
+mode.  Use double-buffering and "blit_flip" to overcome this.
+
+blit_transform - flip_horizontal - has known issues.  Try instead rotating
+180 degrees and then flip_vertical.

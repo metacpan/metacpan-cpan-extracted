@@ -1,0 +1,30 @@
+---
+name: Games-Bingo-Print
+version: 0.04
+author:
+  - 'Jonas B. Nielsen, <jonasbn@cpan.org>'
+abstract: a PDF Generation Class for Games::Bingo
+license: artistic
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Data::Dumper: 0
+  Games::Bingo: 0.09
+  Getopt::Long: 0
+  PDFLib: 0.12
+  POSIX: 0
+  Test::Harness: 0
+  Test::More: 0
+  Test::Pod: 0.95
+provides:
+  Games::Bingo::Print:
+    file: lib/Games/Bingo/Print.pm
+    version: 0.04
+no_index:
+  directory:
+    - t
+    - examples
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

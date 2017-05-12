@@ -1,0 +1,4 @@
+default:
+    address_template: |
+        {{one}}, {{two}}
+        {{three}}

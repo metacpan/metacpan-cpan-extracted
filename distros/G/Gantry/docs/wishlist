@@ -1,0 +1,18 @@
+This file lists docs wished for, but not yet written.
+
+ Working with join tables
+
+ Row level permissions
+
+ json examples
+
+ explanations for gantry/samples:
+    file upload
+    auth cookie
+
+ ajax integration (jquery)
+
+ default form.tt (could be a pointer to the file itself, if its internal
+ docs are up to date)
+
+ how to enable and work with submit and add another.

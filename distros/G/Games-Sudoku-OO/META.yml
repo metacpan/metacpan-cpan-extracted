@@ -1,0 +1,24 @@
+---
+name: Games-Sudoku-OO
+version: 0.03
+author:
+  - |-
+    cpan@copito.org
+    http://www.copito.org/perl
+abstract: Object oriented Sudoku solver
+license: perl
+provides:
+  Games::Sudoku::OO::Board:
+    file: lib/Games/Sudoku/OO/Board.pm
+    version: 0.03
+  Games::Sudoku::OO::Cell:
+    file: lib/Games/Sudoku/OO/Cell.pm
+  Games::Sudoku::OO::Set:
+    file: lib/Games/Sudoku/OO/Set.pm
+  Games::Sudoku::OO::Set::Column:
+    file: lib/Games/Sudoku/OO/Set/Column.pm
+  Games::Sudoku::OO::Set::Row:
+    file: lib/Games/Sudoku/OO/Set/Row.pm
+  Games::Sudoku::OO::Set::Square:
+    file: lib/Games/Sudoku/OO/Set/Square.pm
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Gaim-Log-Parser
+version:             0.14
+abstract:            Parse Gaim's Log Files
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    DateTime:                      0
+    DateTime::Format::Strptime:    0
+    DateTime::TimeZone:            0
+    Log::Log4perl:                 0
+    Text::Wrap:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <cpan@perlmeister.com>

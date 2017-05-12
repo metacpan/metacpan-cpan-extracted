@@ -1,0 +1,32 @@
+This is a fork from the Geo-GDAL module that is developed and
+distributed as a part of GDAL. For GDAL see http://www.gdal.org/
+
+This fork is for developing the Geo::GDAL CPAN module separately
+especially for testing and independent setups. Thus the main
+difference is in the build process. The module in GDAL distribution
+expects to be built within the GDAL source tree. This module can use
+GDAL source or development files from anywhere in the system, or it
+can even download and compile GDAL as a part of the build process. If
+it downloads and compiles GDAL, it will install the GDAL data files
+into a module based share.
+
+This module will be based on the latest released version of GDAL
+but may include changes from the trunk. These changes are currently:
+
+* The logic of field names vs. field indexes is done in Perl
+
+* The Driver method Extension returns a processed DMD_EXTENSIONS
+
+* PDL support
+
+* GeoTransform.Apply adjusts to point in addition to points
+
+* Fix for GeoTransform.Inv
+
+* Fix for Layer.SpatialReference
+
+* Detect 64bit Integer fields in Feature.SetField
+
+* Fix for connectedness in Band.Polygonize
+
+* Fix for https://trac.osgeo.org/gdal/ticket/6796

@@ -1,0 +1,51 @@
+Revision history for Games-Trackword
+====================================
+
+1.09    2014-10-10
+        - fixed license fields in META.json to be lists.
+        - extended META test suites.
+
+1.08    2014-06-18
+        - fixed distribution name in META.
+        - added git repository links to metadata.
+
+1.07    2012-12-31
+        - change file dates changed to meet W3CDTF standards.
+        - License updated to Artistic License v2.0.
+        - added META.json.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - updated test suite.
+        - removed Artictic License file.
+
+1.06    2008-06-02
+        - updated Meta.yml and 94metatest.t to reference Test-CPAN-Meta.
+
+1.05    2007-03-02
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE and Artistic files.
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - POD/README updates
+        - Devel::Cover - 100%
+
+1.04    2005-03-21
+        - More tests thanks to Devel::Cover
+        - Added DSLIP information
+
+1.03    2005-03-19
+        - Reworked test scripts
+        - Added pod test scripts
+
+1.02    2004-04-19
+        - ABSTRACT fixed. Line endings fixed.
+
+1.01    2003-10-08
+        - META.yml added to distribution
+        - POD updates
+
+1.00    2003-09-02
+        - Original version
+

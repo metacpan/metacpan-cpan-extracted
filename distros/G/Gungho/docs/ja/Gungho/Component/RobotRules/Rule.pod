@@ -1,0 +1,37 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::RobotRules::Rule - robots.txtルール
+
+=head1 SYNOPSIS
+
+  use Gungho::Component::RobotRules::Rule;
+  my $rule = Gungho::Component::RobotRules::Rule->new(
+    'UserAgent A' => [ '/foo', '/bar' ],
+    'UserAgent B' => [ '/baz', '/quux' ],
+  );
+
+=head1 DESCRIPTION
+
+特定のホストのrobots.txtルールを保存します。
+
+=head1 METHODS
+
+=head2 new
+
+新規にルールオブジェクトを作成します。
+
+=head2 setup
+
+オブジェクトを初期化します。
+
+=head2 allowed($c, $uri)
+
+C<$url>で指定されたURLが取得を許可されていれば正を返します。
+
+=head2 is_me($c,$string)
+
+C<$string>がC<$c>のC<user_agent>にマッチすれば正を返します。
+
+=cut

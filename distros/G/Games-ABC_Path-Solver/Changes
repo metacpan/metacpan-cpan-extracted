@@ -1,0 +1,48 @@
+Revision history for Games-ABC_Path-Solver
+
+0.4.0   2014-03-06
+        - Add the --gen-v1-template flag to generate a skeleton file.
+
+0.3.3   2014-01-30
+        - Explicit minimal perl version - 5.8 (CPANTS Kwalitee)
+        - Add LICENSE file.
+
+0.3.2   2013-05-21
+        - Correct scripts/tag-release.pl
+
+0.3.1   2013-05-21
+        - Remove trailing space.
+            - With a test at t/style-trailing-space.t
+        - Add t/cpan-changes.t .
+
+0.3.0   2012-02-23
+        - Extract the class lib/Games/ABC_Path/Solver/Coord.pm .
+            - Backwards incompatible change: get_var for 'coords'/etc.
+            in Games::ABC_Path::Solver::Move now returns them instead of
+            an [x,y] array ref.
+
+0.2.0   2011-07-23
+        - Create lib/Games/ABC_Path/Solver/Constants.pm based on the one
+        from Games::ABC_Path::Generator.
+        - Merge common functionality into lib/Games/ABC_Path/Solver/Base.pm .
+
+0.1.0   2011-07-20
+        - Add the input_from_v1_string class method to input from a version
+        1 string, so there will be a way to input from something besides
+        a file.
+        - Add the scripts/tag-release.pl file to tag a release in the
+        Subversion repository.
+
+0.0.3   2011-01-21
+        - Encapsulated scripts/abc-path-solve inside
+        lib/Games/ABC_Path/Solver/App.pm .
+        - Add POD to scripts/abc-path-solve
+
+0.0.2   2011-01-10
+        - Add the missing Test::Differences to the build_requires. It caused
+        some build failures.
+        - Add scripts/bump-version-number.pl .
+
+0.0.1   2011-01-09
+        First version, released on an unsuspecting world.
+

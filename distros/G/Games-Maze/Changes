@@ -1,0 +1,203 @@
+
+###
+NOTE: This module is being re-written.  From now on version 1.0x will
+only be changed for bug fixes and maintenance.  New features will be in
+the version 2.00-track.
+###
+
+Revision history:
+
+1.08
+	Mon Sep 10 2012
+	- Bareword -norequire as part of the "use parent"  line makes
+	  perl sad. Put everthing in qw().
+	- Added 'create_license => 1' to the Build.PL list of attributes.
+	- Added 'dynamic_config => 0' to the Build.PL list of attributes.
+	- Added LICENSE to the MANIFEST file.
+
+1.07
+	Fri May 25 2012
+	- Huh. A tester didn't have parent.pm in its BSD set-up. Weird.
+	  Put 'parent' in the 'requires' block in Build.PL.
+
+	Wed May 23 2012
+	- Sigh. Typo-d the 'resources' keyword in Build.PL.
+
+1.06
+	Wed May 23 2012
+	- Took a while to work out that 'provides', whatever its
+	  purpose, does not tell Build to put the version number
+	  of the child modules in the META files. You have to
+	  put the $VERSION declaration in the child modules' code.
+
+	Tue May 22 2012
+	- Fixed a missing closing brace in the BUILD.PL 'meta_merge'
+	  key. The github URL should show up now on CPAN.
+	- Removed the PREREQUISITE section in the POD. Useful back
+	  when CPAN was simpler, but it's unneccesary now.
+	- Add the 'provides' key to BUILD.PL. Now PAUSE should
+	  be able to figure out the versions of the child modules.
+
+1.05
+	Mon May 21 2012
+	- Named the distribution Games-Mazes insteade of Games-Maze
+	  in the Build.PL. Very stupid typo fixed.
+	- Changed 'use base' in submodules to 'use parent'.
+	- Missed changing the internal hash keys to bareword
+	  format in the previous version. Caught them all now.
+
+1.04
+	Tue May 15 2012
+	- The lc operator now complains about undef values in
+	  modern (5.14 right now) perl. Made the undef checking
+	  more robust.
+	- Changed old style {'quoted'} hash keys to {barewords}.
+
+	Sun May 6 2012
+	- Some more documentation changes, including updating the
+	  e-mail address and adding some Build.PL instructions in
+	  the README file.
+
+	Fri May 4 2012
+	- Minimum perl requirement bumped up to 5.8.3, as module
+	  support code begins to drop 5.6 and related constructs.
+	- Updated the Build.PL file to meet current perl standards.
+
+1.03	Wed Feb 21 2007
+	- Some changes to the structure of the distribution directory
+	  in order to keep up with the current state of perl.
+	- Use Test::Simple for tests, Module::Build for buiding, and
+	  add a META.yml file.
+
+1.02	Mon Jun 03 19:29:53 2002
+	- Documentation fixes as pointed out by David Hand.
+
+1.01	Tue May 07 21:55:39 2002
+	- Bug fixes for bugs found by Pete Stewart.  Having added the 'entry'
+	  and 'exit' parameters, the case where those parameters aren't used
+	  became broken.
+	- Fix to two of the test files involving an unintialized variable.
+	- Add a Northward entry to the cell with the entrance.
+	  Hadn't done that before because the printing routine to_ascii()
+	  didn't need it, but now that another module will be using this,
+	  i need to knock down the wall on both the border and maze cells.
+	- Added the unsolve() method.
+
+1.0	Wed Apr 24 13:27:19 2002
+	- Hexagonal Hexagon mazes
+	- Big changes in the stringifying functions, mostly by deleting
+	  code, and fixing up the border cells values.
+	- The 'cols', 'rows', and 'lvls' parameters have been replaced by
+	  a single 'dimensions' parameter.
+	- New parameter 'start' tells the make() method where to start
+	  the random walk from.
+	- New parameter 'fn_choosedir' chooses which direction your random
+	  walk takes while making the maze.
+	- New parameters 'entry' and 'exit' let you place the beginning
+	  and ending points.
+
+0.9	Thu Oct 19 11:39:54 2000
+	- The maze object is now created via a call to
+	  Games::Maze->new() only.  The child classes ::Rect and
+	  ::Hex are dealt with in new().  The user need not deal
+	  with it at all.
+
+0.8	Wed Apr 19 10:57:35 2000
+	- Games::MazeFlat goes away.  There was no real reason
+	  beyond sentimentality to keep it.
+	- The direction values for all mazes are now the same.  South,
+	  for example, is now 0x20 for all mazes, instead of being 0x08
+	  for square mazes, and 0x10 for hexagon mazes.  This is an
+	  obvious thing to do in retrospect, but way back when they were
+	  separate programs with separate constants.
+	- This lets me move the contants and some more functions
+	  into the base class, which makes the reading of the hex
+	  dump easier.
+
+0.7	Tue Feb	8 16:51:03 2000
+	- Many incremental changes, leading up to:
+	  1) Hash-style parameters to new()
+	  2) Inheritance in similarly-dimensioned classes.
+	     We now have Games::Maze, and Games::MazeFlat.
+	  3) Code re-organized as a result of inheritance -
+	     there are a lot more hidden member functions
+	     created from sniplets of code that cannot cross the
+	     package barrier.
+	  4) More efficient use of internal constants.  We
+	     no longer have separate constants for the direction
+	     and the wall in that direction.  Now one constant
+	     handles both the wall and the direction we face.
+	  5) "make test" has tests for the 48-bit rand() function.
+
+0.01	Wed Apr 28 14:14:56 1999
+	- original version; created by h2xs 1.18
+
+HISTORY & BACKGROUND INFORMATION
+
+The code started out as a fairly direct translation of the CDC Pascal
+source, which in turn was translated from the original CDC Fortran
+(well, MNF to be precise) program written back in 1978 or 1979. 
+
+The Algorithm
+
+The algorithm is simple. The maze is considered to be an array of cells,
+each cell bounded by walls that are shared with its neighbor.  The
+program starts with a random cell, and randomly 'walks' through a wall
+(knocking it down in the process) into a neighboring enclosed cell. If
+it reaches a dead end, it returns to a point where it can continue its
+random walk. When it runs out of enclosed cells to break into, the
+algorithm is done.
+
+Solving
+
+Since this process creates singly-connected mazes (that is, a maze where
+there is only one path between any two points), the solving method is
+straightforward.  Go forward until either you reach the exit, or until
+you run into a wall.  If you have run into a wall, turn to the next
+direction and walk forward.  Repeat.  Drop off or pick up path marks as
+you exit one cube for another.
+
+A 'hand-on-wall' method of solving (not included in the packages) that
+you may have learned as a kid works, but only for the 2-dimensional
+mazes.  Sadly, it will often wind up in an infinite loop when it is
+extended to the three-dimensional case.  I suspect that for this solving
+algorithm to work, it would have to chose its next move based not only
+on the current wall, but the prior move's wall as well.  I haven't
+bothered to test this, though.  Since the go-forward method works so well
+with both 2- and 3-dimensional mazes, I haven't attempted to adapt the
+hand-on-wall methd.
+
+Representing Hexagonal Mazes
+
+Hexagonal mazes, as you may notice if you study the code, are simply
+rectangular mazes with a 'hexagonal drift'.  That is,
+
+      hexagonal mesh                 square grid with 'hexagonal drift'
+
+  1  2  3  4  5  6  7  8             1   2   3   4   5   6   7   8
+  __    __    __    __              ___     ___     ___     ___    
+ /  \__/  \__/  \__/  \__          |   |___|   |___|   |___|   |___
+ \__/  \__/  \__/  \__/  \         |___|   |___|   |___|   |___|   |
+ /  \__/  \__/  \__/  \__/         |   |___|   |___|   |___|   |___|
+ \__/  \__/  \__/  \__/  \         |___|   |___|   |___|   |___|   |
+ /  \__/  \__/  \__/  \__/         |   |___|   |___|   |___|   |___|
+ \__/  \__/  \__/  \__/  \         |___|   |___|   |___|   |___|   |
+ /  \__/  \__/  \__/  \__/         |   |___|   |___|   |___|   |___|
+ \__/  \__/  \__/  \__/  \         |___|   |___|   |___|   |___|   |
+    \__/  \__/  \__/  \__/             |___|   |___|   |___|   |___|
+
+
+Moving the squares back in position gives us a basic 8x4 matrix, which
+is easy to represent in perl code.  This leaves only the question of
+which six of the eight cells we can move to after choosing one of the
+six possible directions to go.  There are two possible choices:
+
+      _\|/_  or   __|__
+        |          /|\
+
+Which one we use depends upon whether we are in an up-shifted column or
+not.
+
+Incidently, these are also the moves allowed to the opposing Gold
+General pieces in the game Shogi (a chess-like game from Japan).
+Coincidence? Well, probably, but it is interesting to contemplate.

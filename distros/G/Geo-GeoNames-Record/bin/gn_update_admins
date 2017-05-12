@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+######
+# Update admins data. Stored in user's home directory.
+####
+
+use strict;
+use warnings;
+
+use Storable;
+use File::Basename;
+use File::HomeDir;
+use File::Temp qw/tempfile/;
+use LWP::Simple qw/get getstore/;
+
+use Geo::GeoNames::DB::SQLite;
+
+unless( @ARGV <= 1 )
+{
+  print STDERR "usage: " . basename(__FILE__) . " [geonames_db]" . "\n";
+  exit;
+}
+
+my $db_filename;
+my $fh;
+
+if ( @ARGV == 0 )
+{
+  # Download database from my website.
+  my $admins_url = "http://www.stanford.edu/~mengxr/software/Geo-GeoNames-Record/admins.sqlite";
+
+  ($fh, $db_filename) = tempfile();
+  
+  getstore( $admins_url, $db_filename );
+}
+else
+{
+  # Use user-specified database.
+  $db_filename = $ARGV[0];
+}
+
+my $dbh = Geo::GeoNames::DB::SQLite->connect( $db_filename );
+
+my $dir  = File::Spec->catdir( File::HomeDir->my_home(), ".Geo-GeoNames-Record" );
+
+mkdir $dir unless -d $dir;
+
+my $base_url = "http://download.geonames.org/export/dump";
+
+my @tasks = ( { 'filename' => 'countryInfo.txt',      'code_col' => 0, 'id_col' => 16 },
+	    { 'filename' => 'admin1CodesASCII.txt', 'code_col' => 0, 'id_col' => 3 },
+	    { 'filename' => 'admin2Codes.txt',      'code_col' => 0, 'id_col' => 3 } );
+
+my $admin_code_to_record;
+
+my $n_saved   = 0;
+my $n_missing = 0;
+
+foreach my $task (@tasks)
+{
+  my $content  = LWP::Simple::get( $base_url . "/" . $task->{filename} )
+    or Carp::croak("Cannot download " . $base_url . "/" . $task->{filename} . ".");
+  
+  foreach ( split /\n/, $content )
+  {
+    next if /^#/;
+    chomp;
+      
+    my @data = split /\t/;
+
+    my $code = $data[$task->{code_col}];
+    my $id   = $data[$task->{id_col}];
+
+    my ($record) = $dbh->query($id);
+
+    if ( $record )
+    {
+      $admin_code_to_record->{$code} = $record;
+      $n_saved++;
+    }
+    else
+    {
+      $n_missing++;
+    }
+  }
+}
+
+my $output = "admin_code_to_record.hash";
+Storable::store( $admin_code_to_record, File::Spec->catfile( $dir, $output ) );
+
+$dbh->disconnect();
+
+close $fh if $fh;
+
+print STDERR "$n_saved records saved.\n";
+
+if( $n_missing )
+{
+  print STDERR "Missing $n_missing records.\n";
+}

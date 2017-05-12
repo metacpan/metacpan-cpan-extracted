@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/GD-Graph-splined.t
+lib/GD/Graph/splined.pm
+META.yml                                 Module meta-data (added by MakeMaker)

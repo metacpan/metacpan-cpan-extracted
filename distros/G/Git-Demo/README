@@ -1,0 +1,80 @@
+Git-Demo
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+USAGE
+
+To run you will need a story file, and a log4perl configuration.
+By default the application (git-demo) will look for a configuration file in 
+~/.git-demo/config.yaml
+and a log4perl configuration
+~/.git-demo/log4perl.conf
+
+There are examples of all in the samples directory
+
+Usage without a .git-demo directory in your home:
+git-demo --log4perl /path/to/my/log4perl.conf --story_file /path/to/my/story.yaml
+
+Usage with a .git-demo directory in your home:
+git-demo
+
+FAQ
+
+File::Temp is used to create a temporary directory to work in.  In this directory a
+sub directory is created for each character, and a git repository initialised there.
+
+In the current form, each character has just one repository, and it is assumed that
+all the characters are working on the same project.
+
+It is possible to run multiple Git::Demo instanses simultaneously - each one will
+create its own temporary directory to work in.
+
+To create a bare repository, create a character like this:
+
+  characters:
+  - name: origin
+    git_args:
+    - --bare
+
+This is also a good way to simulate a central repository from which the other characters
+can synchronise and collaborate in.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Git::Demo
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Demo
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Git-Demo
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Git-Demo
+
+    Search CPAN
+        http://search.cpan.org/dist/Git-Demo/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Robin Clarke
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

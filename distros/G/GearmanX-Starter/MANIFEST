@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/GearmanX/Starter.pm
+t/00-load.t
+t/01-starter.t
+t/02-cleanup.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

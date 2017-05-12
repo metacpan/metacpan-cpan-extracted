@@ -1,0 +1,38 @@
+---
+abstract: 'Git subcommands as Git::Repository methods'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Git::Repository: '1.309'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Git: '0'
+  Test::More: '0'
+  Test::Requires::Git: '1.005'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Repository-Plugin-AUTOLOAD
+requires:
+  Git::Repository: '1.309'
+  Git::Repository::Plugin: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Repository-Plugin-AUTOLOAD
+  repository: http://github.com/book/Git-Repository-Plugin-AUTOLOAD.git
+version: '1.003'
+x_contributors:
+  - 'Dan Book <dbook@cpan.org>'
+  - 'Petr Písař <ppisar@cpan.org>'

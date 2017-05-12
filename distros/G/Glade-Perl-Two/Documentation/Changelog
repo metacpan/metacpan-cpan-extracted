@@ -1,0 +1,21 @@
+Revision history for Perl module Glade-Perl-Two development branch.
+
+Sun Nov 17 06:02:01 GMT 2002 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.01
+* Completely overhauled for glade-2 file formats and ability
+  to generate gtk2/gnome2 code when available in Gtk2-Perl.
+* New and reorganised and renamed modules 
+    New module              Glade-Perl (<= 0.61)    What it does
+    ----------              --------------------    ------------
+    Glade::Two::Run         Glade::PerlRun          Run-time utilities
+    Glade::Two::App         Glade::PerlRun          App options handling
+    Glade::Two::Source      Glade::PerlSource       Source code generation
+    Glade::Two::Generate    Glade::PerlProject,     Main entry point and
+                            Glade::PerlGenerate     options handling
+                            Glade::PerlUI           UI generation
+    Glade::Two::Gtk         Glade::PerlUIGtk        Gtk2 widgets
+    Glade::Two::Gnome       Glade::PerlUIExtra      Gnome widgets (dummy)
+
+Sun Nov 17 06:02:01 GMT 2002 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.02
+

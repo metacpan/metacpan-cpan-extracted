@@ -1,0 +1,10 @@
+dir /usr
+dir /usr/bin
+obj /usr/bin/dnsquery 3db2d6a6eba05a8466c22ea50c08b3c0 1082990440
+dir /usr/share
+dir /usr/share/doc
+dir /usr/share/doc/dnsquery-0.60.4
+obj /usr/share/doc/dnsquery-0.60.4/ChangeLog.gz 4f3cc0a186bab97f63cc4e6e515dbc8d 1082990440
+obj /usr/share/doc/dnsquery-0.60.4/INSTALL.gz 41425cabe7745c1316012f0cb918718d 1082990440
+obj /usr/share/doc/dnsquery-0.60.4/README.gz 501e4c1b86069fe3b7c3ff9ba830b5ab 1082990440
+obj /usr/share/doc/dnsquery-0.60.4/TODO.gz 7195774f41a2cf66947b5d9ad10f48f7 1082990440

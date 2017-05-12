@@ -1,0 +1,58 @@
+Overview of changes in Gnome2::Rsvg 0.11
+========================================
+
+* Wrap new API:
+  - rsvg_set_default_dpi_x_y
+  - rsvg_handle_new_from_data
+  - rsvg_handle_new_from_file
+  - rsvg_handle_get_pixbuf_sub
+  - rsvg_handle_get_dimensions
+  - rsvg_handle_get_dimensions_sub
+  - rsvg_handle_get_position_sub
+  - rsvg_handle_has_sub
+  - rsvg_handle_set_dpi_x_y
+* Allow undef for the id passed to
+  Gnome2::Rsvg::Handle->render_cairo_sub.
+* Add a boolean return value to Gnome2::Rsvg::Handle->render_cairo and
+  render_cairo_sub if librsvg-2.0 >= 2.22.
+* Fix a leak in Gnome2::Rsvg::Handle->get_pixbuf.
+* Fix small documentation, build and test suite issues.
+* Add an example for rendering to Cairo.
+
+Overview of changes in Gnome2::Rsvg 0.10
+========================================
+
+* Add support for rsvg_handle_render_cairo and rsvg_handle_render_cairo_sub.
+
+Overview of changes in Gnome2::Rsvg 0.06
+========================================
+
+* Fix small build and test issues.
+
+Overview of changes in Gnome2::Rsvg 0.05
+========================================
+
+* Track API changes in librsvg: Remove rsvg_pixbuf_from_file_*_ex and
+  rsvg_handle_new_gz.  Require librsvg 2.12.0.
+* Change some internal implementation details, update some documentation.
+
+Overview of changes in Gnome2::Rsvg 0.04
+========================================
+
+* Fix various test issues.
+* Bind new API: rsvg_handle_set_base_uri, rsvg_handle_get_base_uri, and
+  rsvg_handle_get_metadata.
+
+Overview of changes in Gnome2::Rsvg 0.03
+========================================
+
+* Bind and test rsvg_handle_get_title, rsvg_handle_get_desc,
+  rsvg_set_default_dpi_x_y, and rsvg_handle_set_dpi_x_y.
+* Make using gzip'ed images work by not using strlen() in
+  Gnome2::Rsvg::Handle::write.
+
+Overview of changes in Gnome2::Rsvg 0.02
+========================================
+
+* Miscellaneous small infrastructure and documentation improvements.
+* Improved compatability with older versions of librsvg.

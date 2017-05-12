@@ -1,0 +1,25 @@
+<?xml version='1.0'?>
+<eveapi version="2">
+  <currentTime>2014-06-26 18:20:05</currentTime>
+  <result>
+    <characterID>94701913</characterID>
+    <characterName>Milolika Muvila</characterName>
+    <race>Caldari</race>
+    <bloodline>Civire</bloodline>
+    <accountBalance>21418322.39</accountBalance>
+    <skillPoints>969446</skillPoints>
+    <nextTrainingEnds>2014-06-23 14:27:36</nextTrainingEnds>
+    <shipName>1</shipName>
+    <shipTypeID>32880</shipTypeID>
+    <shipTypeName>Venture</shipTypeName>
+    <corporationID>1000044</corporationID>
+    <corporation>School of Applied Knowledge</corporation>
+    <corporationDate>2014-06-05 19:56:00</corporationDate>
+    <lastKnownLocation>Autama</lastKnownLocation>
+    <securityStatus>0.00487414693718598</securityStatus>
+    <rowset name="employmentHistory" key="recordID" columns="recordID,corporationID,startDate">
+      <row recordID="33243315" corporationID="1000044" startDate="2014-06-05 19:56:00" />
+    </rowset>
+  </result>
+  <cachedUntil>2014-06-26 18:30:32</cachedUntil>
+</eveapi>

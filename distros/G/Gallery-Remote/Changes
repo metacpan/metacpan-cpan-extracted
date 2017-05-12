@@ -1,0 +1,10 @@
+Revision history for Perl extension Gallery::Remote.
+----------------------------------------------------
+2004-04-07  Tanner Lovelace  <lovelace@wayfarer.org> 0.2
+
+	* Fix protocol comparison.
+
+2004-01-31  Tanner Lovelace  <lovelace@wayfarer.org> 0.01
+
+	* original version
+

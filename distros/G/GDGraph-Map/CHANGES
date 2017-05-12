@@ -1,0 +1,46 @@
+Version 1.05	March 15 2001
+- Fixed bug with empty Maps. See BUGS.
+
+
+Version 1.03	May 30 2000
+
+- Renamed to GD::Graph::Map
+- Fixed bug with dispalaying status information for the bar chart
+  with two datasets.
+- Added Title attribute to the MAP tag description. It offers advisory 
+  information about the element for which it is set.
+- Added mapName and noImgMarkup options, that allow you to set name
+  of the map (mapName) and don't use IMG tag (noImgMarkup).
+  (added by Tomas Andersson <tomas@ibissoft.se>)
+- Added support of the GD::Graph::lines object.
+- Changed handling of the GD::Graph:linespoints object.
+
+
+Version 1.02	September 18 1999
+
+- Added GIFgraph bar_spacing option handling.
+- Fixed bug with showing information in status line.
+- Fixed bug with formating info and legend strings.
+- Fixed bug with opening new navigator window. See BUGS.
+- Modifing constructor. Now it has following syntax:
+  new GIFgraph::Map($gr_object, [key1 => value1, key2 => value2, ...]);
+  and you can seting options in constructor immediately.
+
+
+Version 1.01	August 4 1999
+
+- Enable using the same format as use printf routine, for set %x
+  and %y parameters. If x or y values is floating numbers your
+  may use '%.d[xy]' for round ones (d - simple digit).
+- Adding newWindow options. If newWindow is true you may set
+  windows parameters; overwise using defaults, and when you 
+  click on link will be open new navigator window.
+- Allow set another options, wich are using IMG tag.
+  If you need it, you may set 'img_option' parameters in your 
+  object using set routine (option - options of IMG tag).
+- Fixed bugs with seting @hrefs array for some objects. See BUGS.
+- Fixed bug with calculating percent for pie object.
+
+Version 1.00	June 26 1999
+
+- Initial reliase.

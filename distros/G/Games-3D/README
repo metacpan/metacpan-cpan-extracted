@@ -1,0 +1,77 @@
+
+############################################################################ 
+Games::3D - package to provide an in-game object and scripting system
+
+=pod
+
+=head1 DESCRIPTION
+
+This package provides a base object type that can be used as primary
+game objects in a 3D game.
+
+The base class is C<Thingy>, which gives things an ID, and a name as well
+as a state (activated, deactivated, on, off etc) as well as the capability
+to send/receive signals and to be linked to other objects.
+
+There is also a C<Link> (which is a C<Thingy> nderneath), which can be used
+to link other C<Thingy>s together in complicated ways (the link basically
+relays signals between the C<Thingy>s).
+
+This allows you to build signal networks that can track state changes.
+
+In a typical game there would be exist both virtual objects (like Marker and
+SoundSources, Camera) as well es physical objects like NPCs, the Player, Button,
+Switch, Lever etc.
+
+Please see the documentation in lib/Games/3D.pm for an overview and a very
+detailed discussion.
+
+For some background information, as well reasoning why this was developed and
+why in this way, browse to:
+
+	http://bloodgate.com/perl/game/
+
+Installation
+============
+
+* untar/ungzip the package (replace 0.09 with the version you got)
+
+	tar -xzf Games-3D-0.09.tar.gz
+
+* Check the signature. Download my key from http://bloodgate.com/tels.asc or
+  from my CPAN directory. Then do in the build directory (where you unwrapped
+  stuff):
+
+	cpansign --verify
+
+* if the signature verifies OK, proceed. Otherwise NOTIFY ME IMMIDIATELY. Do
+  NOT INSTALL THE PACKAGE! Your system might get compromised!
+
+* Build the make file:
+
+	perl Makefile.PL
+
+* Make the project
+
+	make
+
+* Run the tests:
+
+	make test
+
+* If some tests fail, please notify me.
+
+* If all tests pass, install as root:
+
+	su
+	[enter password]
+	make install
+	exit
+
+Now download Games::Irrlicht from CPAN and look at it's examples to see how to
+use this.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

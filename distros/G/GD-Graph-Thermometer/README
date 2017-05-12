@@ -1,0 +1,32 @@
+GD-Graph-Thermometer version 0.0.1
+
+This module may be used to create a thermometer graphic which
+can track progress on a fundraising or other campaign, to
+graphically represent progress to a pre-defined goal.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+This module requires GD and GD::Text::Align in order to work.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Hugh Esco
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the Gnu Public License.

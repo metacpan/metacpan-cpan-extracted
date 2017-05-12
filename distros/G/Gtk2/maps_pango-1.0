@@ -1,0 +1,57 @@
+# Copyright (C) 2004 by the gtk2-perl team (see the file AUTHORS for the full
+# list)
+# 
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Library General Public License as published by the Free
+# Software Foundation; either version 2.1 of the License, or (at your option)
+# any later version.
+# 
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
+# more details.
+# 
+# You should have received a copy of the GNU Library General Public License
+# along with this library; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+#
+# $Id$
+#
+
+#
+# this file defines mappings only for types that existed in pango 1.0.x
+#
+
+PANGO_TYPE_ALIGNMENT	PangoAlignment	GEnumAlias	Gtk2::Pango::Alignment
+PANGO_TYPE_ATTR_LIST	PangoAttrList	GBoxedAlias	Gtk2::Pango::AttrList
+PANGO_TYPE_ATTR_TYPE	PangoAttrType	GEnumAlias	Gtk2::Pango::AttrType
+PANGO_TYPE_COLOR	PangoColor	GBoxedAlias	Gtk2::Pango::Color
+PANGO_TYPE_CONTEXT	PangoContext	GObjectAlias	Gtk2::Pango::Context
+PANGO_TYPE_COVERAGE_LEVEL	PangoCoverageLevel	GEnumAlias	Gtk2::Pango::CoverageLevel
+PANGO_TYPE_DIRECTION	PangoDirection	GEnumAlias	Gtk2::Pango::Direction
+PANGO_TYPE_FONT_DESCRIPTION	PangoFontDescription	GBoxedAlias	Gtk2::Pango::FontDescription
+PANGO_TYPE_FONT_FACE	PangoFontFace	GObjectAlias	Gtk2::Pango::FontFace
+PANGO_TYPE_FONT_FAMILY	PangoFontFamily	GObjectAlias	Gtk2::Pango::FontFamily
+PANGO_TYPE_FONT_MAP	PangoFontMap	GObjectAlias	Gtk2::Pango::FontMap
+PANGO_TYPE_FONT_MASK	PangoFontMask	GFlagsAlias	Gtk2::Pango::FontMask
+PANGO_TYPE_FONT_METRICS	PangoFontMetrics	GBoxedAlias	Gtk2::Pango::FontMetrics
+PANGO_TYPE_FONT	PangoFont	GObjectAlias	Gtk2::Pango::Font
+PANGO_TYPE_FONTSET	PangoFontset	GObjectAlias	Gtk2::Pango::Fontset
+PANGO_TYPE_GLYPH_STRING	PangoGlyphString	GBoxedAlias	Gtk2::Pango::GlyphString
+PANGO_TYPE_LANGUAGE	PangoLanguage	GBoxedAlias	Gtk2::Pango::Language
+PANGO_TYPE_LAYOUT	PangoLayout	GObjectAlias	Gtk2::Pango::Layout
+PANGO_TYPE_SCRIPT	PangoScript	GEnumAlias	Gtk2::Pango::Script
+PANGO_TYPE_STRETCH	PangoStretch	GEnumAlias	Gtk2::Pango::Stretch
+PANGO_TYPE_STYLE	PangoStyle	GEnumAlias	Gtk2::Pango::Style
+PANGO_TYPE_TAB_ALIGN	PangoTabAlign	GEnumAlias	Gtk2::Pango::TabAlign
+PANGO_TYPE_TAB_ARRAY	PangoTabArray	GBoxedAlias	Gtk2::Pango::TabArray
+PANGO_TYPE_UNDERLINE	PangoUnderline	GEnumAlias	Gtk2::Pango::Underline
+PANGO_TYPE_VARIANT	PangoVariant	GEnumAlias	Gtk2::Pango::Variant
+PANGO_TYPE_WEIGHT	PangoWeight	GEnumAlias	Gtk2::Pango::Weight
+PANGO_TYPE_WRAP_MODE	PangoWrapMode	GEnumAlias	Gtk2::Pango::WrapMode
+
+# custom types
+PANGO_TYPE_ATTRIBUTE		PangoAttribute		GBoxedAlias	Gtk2::Pango::Attribute
+PANGO_TYPE_ATTR_ITERATOR	PangoAttrIterator	GBoxedAlias	Gtk2::Pango::AttrIterator
+PANGO_TYPE_LAYOUT_ITER		PangoLayoutIter		GBoxedAlias	Gtk2::Pango::LayoutIter
+PANGO_TYPE_LAYOUT_LINE		PangoLayoutLine		GBoxedAlias	Gtk2::Pango::LayoutLine

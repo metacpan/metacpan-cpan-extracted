@@ -1,0 +1,29 @@
+Revision history for Getopt-Panjang
+
+0.04    2015-09-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- [ux] Give more helpful/usable error message.
+
+
+0.03    2015-09-15 (PERLANCAR)
+
+	- [doc] Show sample results in Synopsis.
+
+	- [ux] Give appropriate error message if spec is not given.
+
+
+0.02    2015-09-15 (PERLANCAR)
+
+	- No functional changes.
+
+        - [ux] Don't set error information func.*_opts if there is no
+	  corresponding error.
+
+	- [doc] Add Synopsis.
+
+
+0.01    2015-09-14 (PERLANCAR)
+
+        - First release.

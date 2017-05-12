@@ -1,0 +1,125 @@
+#!/usr/local/bin/perl -W
+
+# (X)Emacs mode: -*- cperl -*-
+
+=head1 DESCRIPTION
+
+No description
+
+=head1 EXAMPLES
+
+Z<>
+
+=head1 BUGS
+
+Z<>
+
+=head1 REPORTING BUGS
+
+Log them in gnats.
+
+=head1 AUTHOR
+
+Martyn J. Pearce C<fluffy@cpan.org>
+
+=head1 SEE ALSO
+
+Z<>
+
+=cut
+
+# Pragmas -----------------------------
+
+require 5.005_62;
+use strict;
+
+# Utility -----------------------------
+
+use Fatal              1.02 qw( :void close open seek sysopen );
+use Fcntl              1.03 qw( :DEFAULT );
+use Log::Info          1.09 qw( :DEFAULT :default_channels :log_levels );
+
+# Package Master
+use Getopt::Plus qw( :opt_types :exit_codes $PACKAGE );
+# Fix version to make testing easier
+BEGIN {
+  our $VERSION = '0.01';
+}
+
+# Constants ---------------------------
+
+my ($fail, $fail2, $fail3, $msg);
+
+my $RSE =
+  Getopt::Plus->new(scriptname => 'test-script-2',
+                    scriptsumm => 'Test Getopt-Plus functionality',
+                    check      => sub { print "check\n";
+                                        die "Message\n"
+                                          if $msg;
+                                        # Deliberately leave this to test
+                                        # that 0 return *doesn't* cause failure
+                                        return $fail3 ? 0 : 1;
+                                      },
+                    initialize => sub { print "initialize\n";
+                                        $_[0]->die(ERR_USAGE, "Squeek\n")
+                                          if defined $fail;
+                                        $_[0]->die(ERR_UNKNOWN, "Squawk\n")
+                                          if defined $fail2;
+                                      },
+                    finalize   => sub { print "finalize\n"; },
+                    end        => sub { print "end\n"; },
+                    main       => sub { print "main\n"; },
+                    mode_info  => { 'secondary' =>
+                                    { initialize =>
+                                      sub { print "INITIALIZE\n" },
+                                      main       =>
+                                      sub { print "MAIN\n";
+                                            $_[0]->set_args_done },
+                                      finalize   =>
+                                      sub { print "FINALIZE\n" },
+                                    },
+                                  },
+                    arg_ary    => '+',
+                    argtype    => 'foo',
+                    c_years    => [ 2002 ],
+                    options    => [{ names   => [qw/ fail1 /],
+                                     type    => OPT_BOOLEAN,
+                                     linkage => \$fail,
+                                   },
+                                   { names   => [qw/ fail2 /],
+                                     type    => OPT_BOOLEAN,
+                                     linkage => \$fail2,
+                                   },
+                                   { names   => [qw/ fail3 /],
+                                     type    => OPT_BOOLEAN,
+                                     linkage => \$fail3,
+                                     summary => "doesn't actually fail",
+                                   },
+                                   { names   => [qw/ msg /],
+                                     type    => OPT_BOOLEAN,
+                                     linkage => \$msg,
+                                   },
+                                   { names   => [qw/ secondary /],
+                                     linkage => \&secondary,
+                                     hidden  => 1,
+                                   }
+                                  ],
+                 );
+
+# Subrs ----------------------------------------------------------------------
+
+sub secondary {
+  $RSE->mode('secondary');
+}
+
+sub initialize {
+  my $rse = shift;
+}
+
+# Main -----------------------------------------------------------------------
+
+$RSE->run;
+
+
+__END__
+

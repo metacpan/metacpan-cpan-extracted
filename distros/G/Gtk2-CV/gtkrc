@@ -1,0 +1,14 @@
+# I am lame, but this will grow
+
+style "xv" {
+   bg[INSENSITIVE] = "#8b99b5"
+   bg[NORMAL] = "#b2d0dc"
+   bg[ACTIVE] = "#8b99b5"
+   base[NORMAL] = "#b2d0dc"
+}
+
+style "xv-dark" {
+   bg[NORMAL] = "#8b99b5"
+}
+
+widget_class "*" style :application "xv"

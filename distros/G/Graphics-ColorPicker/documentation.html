@@ -1,0 +1,281 @@
+<HTML>
+<HEAD>
+<TITLE>ColorPicker.pm</TITLE>
+<LINK REV="made" HREF="mailto:root@grommet.slackware.lan">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#sample website  24 million color picker">SAMPLE WEBSITE - 24 million color picker</A></LI>
+	<UL>
+
+		<LI><A HREF="#http://www.bizsystems.net/downloads/graphics/demo2.html"><A HREF="http://www.bizsystems.net/downloads/graphics/demo2.html">http://www.bizsystems.net/downloads/graphics/demo2.html</A></A></LI>
+		<LI><A HREF="#http://www.bizsystems.net/downloads/graphics/demo.html"><A HREF="http://www.bizsystems.net/downloads/graphics/demo.html">http://www.bizsystems.net/downloads/graphics/demo.html</A></A></LI>
+	</UL>
+
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#export">EXPORT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright and license">COPYRIGHT and LICENSE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+  Graphics::ColorPicker : A perl module for WYSIWYG web 
+  applications that allow selection of HEX color numbers</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Graphics::ColorPicker;
+    or
+  require  Graphics::ColorPicker;</PRE>
+<PRE>
+  make_page($path_to_images);
+  send_page(\$html_txt,$type);
+  $time_string = http_date($time);
+  $name = script_name;
+  $butabref = buttontext([optional array ref])
+  $html_text=frames($websafe);
+  $html_text = msie_frame;
+  $html_text=picker($darkimg,$liteimg,$size,$bsize,greyimg);
+  $html_text=no_picker;
+  $html_text=cp216_ds($clrdot,$border,$square)
+  $javascript_text = jslib;
+  $html=make_buttons(\%look_n_feel,$url,$active,\@buttons,$xtra);
+  $html_text=pluck($color);
+  $html_text=hex_update($hex_color);</PRE>
+<P>
+<HR>
+<H1><A NAME="sample website  24 million color picker">SAMPLE WEBSITE - 24 million color picker</A></H1>
+<P>
+<H2><A NAME="http://www.bizsystems.net/downloads/graphics/demo2.html"><A HREF="http://www.bizsystems.net/downloads/graphics/demo2.html">http://www.bizsystems.net/downloads/graphics/demo2.html</A></A></H2>
+<P>
+<H2><A NAME="http://www.bizsystems.net/downloads/graphics/demo.html"><A HREF="http://www.bizsystems.net/downloads/graphics/demo.html">http://www.bizsystems.net/downloads/graphics/demo.html</A></A></H2>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module generates a set of palettes to select a HEX or DECIMAL color
+number via a web browser. <STRONG>make_page()</STRONG> can be called by <CODE>javascript</CODE> from
+your web page and will set the HEX value in a variable in the calling page
+and scope. The selector page can be created for 24 million or web safe
+colors only.</P>
+<PRE>
+  &lt;script language=javascript1.1&gt;
+  var colorhex = '';
+  var w;
+  function pop() {
+    if (document.forms.color.what.checked){w=180;}else{w=630;}
+    var colorwin = open(&quot;&quot;,&quot;colorpicker&quot;,
+    &quot;width=&quot; + w + &quot;,height=440,status=no,directories=no,&quot; +
+    &quot;location=no,menubar=no,scrollbars=no,toolbar=no&quot;);
+    if (colorwin.opener == null) newin.opener = self;  
+    colorwin.document.close();
+    colorwin.focus();
+    return true;
+  }
+  &lt;/script&gt;
+  &lt;body&gt;
+  &lt;form name=&quot;color&quot; onSubmit=&quot;return(pop());&quot;
+   action=&quot;p_gen.cgi&quot; target=&quot;colorpicker&quot;&gt;   
+  &lt;input type=text name=hex size=10&gt;&lt;br&gt;
+  &lt;input type=checkbox name=what value=wo&gt; web safe colors only&lt;br&gt;
+  &lt;input type=submit value=&quot;Pop Picker Window&quot;&gt;
+  &lt;/form&gt;</PRE>
+<PRE>
+  See B&lt;examples/demo.html&gt; and B&lt;scripts/p_gen.cgi&gt;
+  Read INSTALL</PRE>
+<P>NOTE: as of version 0.13 ColorPicker can be used in a captive frame to
+dynamically update color values in the DOM.</P>
+<PRE>
+  See B&lt;examples/demo2.html&gt;, 
+      B&lt;examples/colorbar.html&gt; and
+      B&lt;scripts/p_gen2.cgi&gt;</PRE>
+<DL>
+<DT><STRONG><A NAME="item_make_page">make_page($path_to_images);</A></STRONG><BR>
+<DD>
+<PRE>
+  Generate Color Picker Pages</PRE>
+<PRE>
+  This is the only routine that really needs to be called
+  externally. You could roll your own from the following
+  calls for a special purpose, but it's really not necessary.</PRE>
+<PRE>
+  i.e. Graphics::ColorPicker::make_page('./');</PRE>
+<PRE>
+  will generate the picker pages as required</PRE>
+<DT><STRONG><A NAME="item_http_date">$time_string = http_date($time);</A></STRONG><BR>
+<DD>
+<PRE>
+  Returns time string in HTTP date format, same as...</PRE>
+<PRE>
+  Apache::Util::ht_time(time, &quot;%a, %d %b %Y %T %Z&quot;,1));</PRE>
+<PRE>
+  i.e. Sat, 13 Apr 2002 17:36:42 GMT</PRE>
+<DT><STRONG><A NAME="item_%24name_%3D_script_name%3B">$name = script_name;</A></STRONG><BR>
+<DD>
+<PRE>
+  Returns the subroutine name of the calling 
+  script external to this library</PRE>
+<DT><STRONG><A NAME="item_buttontext">$but_table_ref = buttontext([optional ref]);</A></STRONG><BR>
+<DD>
+<PRE>
+  Always return and optionally set the contents of cp216_ds button text.</PRE>
+<PRE>
+    input:      optional reference to button table array
+    returns:    reference to button table array</PRE>
+<PRE>
+  Default contents:</PRE>
+<PRE>
+  my $butable = [
+    'Submit'   =&gt; 'javascript:void(0);&quot; OnMouseDown=&quot;doSubmit();return false;',
+    '','',
+    'Restore'  =&gt; 'javascript:void(0);&quot; OnClick=&quot;doRestore();return false;',
+    '','',
+    'Close'    =&gt; 'javascript:void (0);&quot; OnClick=&quot;parent.close();return false;',
+  ];</PRE>
+<DT><STRONG><A NAME="item_frames">$html_text=frames($websafe);</A></STRONG><BR>
+<DD>
+<PRE>
+  Returns the frame text for top window.</PRE>
+<PRE>
+  input:  true = 24 million colors
+          false = web safe colors only</PRE>
+<PRE>
+  return:  html text for page</PRE>
+<DT><STRONG><A NAME="item_%24html_text_%3D_msie_frame%3B">$html_text = msie_frame;</A></STRONG><BR>
+<DD>
+<PRE>
+  Return the text for the copyright notice
+  (sample frame) for browsers that can't do
+  &quot;javascript:xxx()&quot; from within a frame 
+  like brain dead MSIE browsers.</PRE>
+<DT><STRONG><A NAME="item_picker">$html_text=picker($darkimg,$liteimg,$size,$bsize,greyimg);</A></STRONG><BR>
+<DD>
+<PRE>
+  Return frame text for color picker</PRE>
+<PRE>
+  input:   $darkimg, # path to dark image
+           $liteimg, # path to light image
+           $size,    # pixel size of image
+           $bsize,   # button pixel size
+           $greyimg  # path to grey image</PRE>
+<PRE>
+  returns: html text</PRE>
+<DT><STRONG><A NAME="item_%24html_text%3Dno_picker%3B">$html_text=no_picker;</A></STRONG><BR>
+<DD>
+<PRE>
+  Returns minimum contents for a blank 24 million
+  color page when only &quot;Web Only&quot; colors are called</PRE>
+<DT><STRONG><A NAME="item_cp216_ds">$html_text=cp216_ds($clrdot,$border,$square)</A></STRONG><BR>
+<DD>
+<PRE>
+  Returns 216 color &amp; digits page</PRE>
+<PRE>
+  input:   clrdot, # path to clear dot image
+           border, # border of color square
+           square, # square size</PRE>
+<PRE>
+  returns: html text</PRE>
+<DT><STRONG><A NAME="item_%24javascript_text_%3D_jslib%3B">$javascript_text = jslib;</A></STRONG><BR>
+<DD>
+<PRE>
+  Return contents of javascript library</PRE>
+<PRE>
+  input: none</PRE>
+<DT><STRONG><A NAME="item_make_buttons">$html=make_buttons(\%look_n_feel,$url,$active,\@buttons,$xtra);</A></STRONG><BR>
+<DD>
+<PRE>
+  Called internally</PRE>
+<PRE>
+  Return the html text for a button bar</PRE>
+<PRE>
+  input:  button_color, width, \@buttons</PRE>
+<PRE>
+  @buttons is a list of the form = (
+        # text        command 
+        'BUTT1' =&gt; 'command1',
+        'BUTT2' =&gt; 'command2',
+        ''      =&gt; '',          # empty
+  );
+        If the button text is false,
+        a spacer is inserted in the button bar</PRE>
+<PRE>
+  returns:      html for button bar</PRE>
+<PRE>
+  NOTE:         class NU must be defined
+  example:
+                &lt;style&gt;
+                A.NU { 
+                  color: red; // #ff0000
+                  background: transparent;
+                  font-family: VERDANA,ARIAL,HELVETICA,SAN-SERIF;
+                  font-size:  12px !important;
+                  font-weight: bold;
+                  text-decoration: none;
+                }
+                &lt;/style&gt;</PRE>
+<DT><STRONG><A NAME="item_hex_update">$html_text=hex_update($hex_color);</A></STRONG><BR>
+<DD>
+<PRE>
+  Return the command and color number
+  to the 'data' frame to force an update
+  of the 'sample' frame and 'digits'</PRE>
+<PRE>
+  input: hex color      # i.e. 6699CC</PRE>
+<DT><STRONG><A NAME="item_%24rv_%3D_env_dumb_browser%3B">$rv = env_dumb_browser;</A></STRONG><BR>
+<DD>
+<PRE>
+  Return true if $ENV{HTTP_USER_AGENT}
+  contains a dumb browser</PRE>
+</DL>
+<P>
+<HR>
+<H1><A NAME="export">EXPORT</A></H1>
+<PRE>
+  None by default.</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+
+Michael Robinton, michael@bizsystems.com</PRE>
+<P>
+<HR>
+<H1><A NAME="copyright and license">COPYRIGHT and LICENSE</A></H1>
+<PRE>
+  Copyright 2002 - 2008 Michael Robinton, BizSystems.</PRE>
+<P>This module is free software; you can redistribute it and/or modify it
+under the terms of either:</P>
+<PRE>
+  a) the GNU General Public License as published by the Free Software
+  Foundation; either version 1, or (at your option) any later version,
+</PRE>
+<PRE>
+
+  or</PRE>
+<PRE>
+  b) the &quot;Artistic License&quot; which comes with this module.</PRE>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+the GNU General Public License or the Artistic License for more details.</P>
+<P>You should have received a copy of the Artistic License with this
+module, in the file ARTISTIC.  If not, I'll be glad to provide one.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</P>
+
+</BODY>
+
+</HTML>

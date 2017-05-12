@@ -1,0 +1,17 @@
+Revision history for Perl extension Graph::Timeline
+
+1.5  Sat 29th September 2009
+    - Allow - as a date seperator as requested by Duncan Ferguson
+
+1.4  Wed 20th June 2007
+    - New map method for DiagonalGD allow the user to create an
+      imagemap.
+
+1.3  Sun 17th June 2007
+    - Start and end can now be input down to the second level with
+      the yyyy-mm-ddThh:mm:ss format. However GraphGD only operates
+      at the yyyy-mm-dd level. The new format was introduced for the
+      DiagonalGD chart.
+
+1.2  Wed 14th September 2005
+	- Realised I needed a change log file

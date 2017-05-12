@@ -1,0 +1,228 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use IO::All;
+use File::Basename;
+use strict;
+use warnings;
+
+sub makeHeader {
+  my ($rf, $gf, $bf, $r, $g, $b, $gallerytitle) = @_;
+  sprintf <<EOF,$r,$g,$b,$rf,$gf,$bf;
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<body bgcolor='#%x%x%x'>
+<center><font face="verdana,arial" size="5" color="#%x%x%x">
+$gallerytitle
+<table><tr>
+EOF
+}
+
+sub makeFooter {
+  my ($URL) = @_;
+  <<EOF;
+<br><br><hr size="1" color="white"><a href="$URL">Back to previous page</a>
+</body>
+</html>
+EOF
+}
+
+podregister {
+  Gimp::Context->push();
+  die __"No path supplied\n" if $path eq "";
+  $path .= '/';
+  die __"Scale factor must not be 0\n" if $fixed == 0;
+  die __"Gallery title must be filled in. Please retry!\n" if $gallerytitle eq "";
+  die __"You must also provide a filename (e.g. index) for your gallery generated html file.\n" if $galleryfile eq "";
+  my @imagefiles = glob "$path*.{jpg,JPG,gif,GIF}";
+  die "Can't adjust brightness or contrast on GIFs\n"
+    if $bright != 0 or $contrast != 0 and grep { /\.gif$/i } @imagefiles;
+  $gallerytitle =~ s/ /_/g;
+  my $dirname = "$path$gallerytitle";
+  mkdir $dirname or die __"$dirname: $!" unless -d $dirname;
+  my $dpath = "$dirname/";
+  my $topfh = io("$dpath$galleryfile.html");
+  my ($rf, $gf, $bf) = @$foregroundcolor;
+  my ($r, $g, $b) = @$color;
+  $topfh->print(makeHeader($rf, $gf, $bf, $r, $g, $b, $gallerytitle))
+    or die "Unable to process HTML File: $!\n";
+  $topfh->append("<table><tr>\n");
+  my $totalentries = 0;
+  my $entries = 1;
+  my $twidthEval = 0;
+  my $txtwidth = 0;
+  my $txtheight = 0;
+  my $ycorrection = 0;
+  my $xcorrection = 0;
+  Gimp::Progress->init("Releasing the gallery");
+  for my $cfile (@imagefiles) {
+    my $img = Gimp->file_load($cfile, $cfile);
+    $cfile = basename $cfile;
+    my $clayer = $img->get_active_layer;
+    $clayer->transform_rotate_simple($rotate, TRUE, 0, 0) if $rotate >= 0;
+    my $width = $img->width;
+    my $height = $img->height;
+    $clayer->brightness_contrast($bright, $contrast)
+      if $bright != 0 or $contrast != 0;
+    if ($label ne "") {
+      my $newlayer = $img->layer_new(200, 100, RGB_IMAGE, "newlayer", 100, NORMAL_MODE);
+      Gimp::Context->set_foreground($labelcolor);
+      my $txtlayer = $img->text_fontname(-1, 1, 1, $label, 0, 0, 16, 0, $font);
+      if ($twidthEval == 0) {
+	$txtwidth = $txtlayer->width;
+	$txtheight = $txtlayer->height;
+	$twidthEval = 1;
+      }
+      $ycorrection = $height - $txtheight if (($labelpos == 2) || ($labelpos == 3));
+      $xcorrection = $width-$txtwidth if (($labelpos == 1) || ($labelpos == 3));
+      $txtlayer->translate($xcorrection, $ycorrection);
+      $img->merge_visible_layers(EXPAND_AS_NECESSARY);
+    }
+    my $cvname="$dpath$cfile";
+    $cvname =~ s/\s/c/g;
+    $cfile =~ s/\s/c/g;
+    $img->get_active_layer->file_save(($cvname) x 2);
+    #Processing Thumbnail
+    my $tbheight = 1;
+    my $tbwidth = 1;
+    if ($scalefix == 1) {
+      my $scalefactor = $width / $fixed;
+      $tbheight = $height / $scalefactor;
+      $tbwidth = $fixed;
+    } elsif ($scalefix == 2) {
+      my $scalefactor = $height / $fixed;
+      my $newwidth = $width / $scalefactor;
+      $tbwidth = $newwidth;
+      $tbheight = $fixed;
+    } else {
+      # scalefix 0 => both scaled by factor (value_factor)
+      $tbwidth = $width / $fixed;
+      $tbheight = $height / $fixed;
+    }
+    my $tbfname = "$dpath $cfile";
+    $tbfname =~ s/ /m/g;
+    io($tbfname)->print(io($cvname)->all);
+    $img->delete;
+    $img = Gimp->file_load("$tbfname", "$tbfname");
+    $clayer = $img->get_active_layer;
+    $img->scale($tbwidth, $tbheight);
+    (my $htmlDetail = $cfile) =~ s/.(jpg|gif)/.html/gi;
+    io("$dpath$htmlDetail")->print(
+      makeHeader($rf, $gf, $bf, $r, $g, $b, $gallerytitle),
+      "<img src=\"$cfile\"></img>",
+      makeFooter("$galleryfile.html"),
+    ) or die "Unable to process HTML File $dpath$htmlDetail: $!\n";
+    $clayer->file_save(($tbfname) x 2);
+    $topfh->append("		<td><a href=\"$htmlDetail\"><img src=\"m$cfile\" border='0'></a></td>\n");
+    if ($entries >= $columns){
+      $topfh->append("</tr><tr>");
+      $entries = 1;
+    } else {
+      $entries += 1;
+    }
+    $totalentries += 1;
+    Gimp::Progress->update($totalentries / @imagefiles);
+    $img->delete;
+  }
+  Gimp::Progress->update(1);
+  $topfh->append("</table>\n" . makeFooter($parent_url));
+  Gimp->message(__"Your gallery ($dpath) has been generated through Gallery plug-in with $totalentries entries");
+  Gimp::Context->pop();
+  return undef;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+gallerymaker - Generate your gallery in HTML format + some picture improvements
+
+=head1 SYNOPSIS
+
+<Image>/File/Create/_HTML Gallery
+
+=head1 DESCRIPTION
+
+Generates an HTML file from all pictures it finds in a designed path. A
+thumbnail is generated from each picture with a desired global scale or X
+or Y fixed...This tool will hopefully help batch conversions from photo
+albums for instance as you can add copyright notice on source picture
+but also adjust brightness/contrast or give polar rotations.
+
+Convention used here is the following : All pictures converted is c<name>.
+Relative thumbnail is m<name>.
+
+Note : This plugin only processes JPG pictures.
+
+=head1 PARAMETERS
+
+  [PF_FILE,   "path", "Gallery source directory"],
+  [PF_STRING, "label", "Text at top of each picture"],
+  [PF_COLOR,  "labelcolor", "Color of label on each picture", [255,255,255]],
+  [PF_RADIO,  "labelpos", "Position of text label", 0, [ UpLeft => 0, UpRight => 1, DownLeft => 2, DownRight => 3 ]],
+  [PF_FONT,   "font", "Select font", 'Arial', ],
+  [PF_SLIDER, "bright", "Brightness correction", 0, [ -127, 127]],
+  [PF_SLIDER, "contrast", "Contrast correction", 0, [-127,127]],
+  [PF_RADIO,  "rotate", "Rotation angle", -1, [ None => -1, Rotate90CCW => 2, Rotate90 => 0]],
+  [PF_RADIO,  "scalefix", "Scale fixing for thumbnails", 1 ,[ both_by_factor => 0, X => 1, Y => 2 ]],
+  [PF_INT32,  "fixed", "Value or factor", 150],
+  [PF_STRING, "gallerytitle", "Gallery output directory", "MyGallery" ],
+  [PF_COLOR,  "color", "Gallery background color", [100,100,100]],
+  [PF_COLOR,  "foregroundcolor","Gallery foreground color", [255,255,255]],
+  [PF_STRING, "galleryfile", "HTML file generated (.html will be added)", "index" ],
+  [PF_INT32,  "columns", "Gallery columns number", 5],
+  [PF_STRING, "parent_url", "Gallery's parent URL", ".." ]
+
+=head1 AUTHOR
+
+Fabian Frederick <fabian.frederick@gmx.fr>
+
+=head1 DATE
+
+20010601
+
+=head1 HISTORY
+
+ 2004-03-28 (Dov)
+       - Fixed for Gimp-2.0
+
+ 17/07/2001 (Fab)
+ V2.0
+	-Adding Html instance per picture + Header
+	-Adding URL
+
+ 07/07/2001 (Darkin)
+	-Item was unreachable from menu because of RGB requesite -> undef.
+
+ 17/6/2001 (Fab)
+ V1.3
+	-Adding global progression bar
+	-Preserving Gimp cache (progressive image_delete)
+	-Adding trailing / to path
+	-Plugin crashed when no label was given
+ 25/5/2001 (Fab)
+ V1.2 -Bug in rotation parameter : OK
+	-Adding color for label(Parasite editor helped here :) ).
+	-Register as gallery_maker
+	-Adding corner selection for copyright using layer_translate
+	-Recovering colors for HTML (Thanks Marc).
+
+ 18/19/5/2001 (Fab)
+ V1.01 -Moving plug-in to Toolbox/Render menu
+	-Added some error-handling
+	-Automatically put html file in gallery path
+	-Added some features to HTML generated
+	-Simplified I/O
+	-Status supply
+	-Source is not overwritten anymore .... c$name applied.
+	-Working in sub-path (using gallery title)
+	-HTML file not deployed in /tmp (directly in dpath)
+ 10-13/5/2001 (Fab)
+ V1.0	First workable version.
+
+=head1 LICENSE
+
+Copyright Fabian Frederick.
+This plugin may be distributed under the same terms as GIMP itself.

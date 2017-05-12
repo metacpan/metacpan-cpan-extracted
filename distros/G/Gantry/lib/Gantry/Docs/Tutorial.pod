@@ -1,0 +1,1512 @@
+=head1 Name
+
+Gantry::Docs::Tutorial - The Gantry Tutorial
+
+=head1 Introduction
+
+Gantry is a mature web framework, released in late 2005 onto
+an unsuspecting world.  For more information on the framework, its
+features and history, see Gantry::Docs::About.
+
+Here we will explore the basic workings of Gantry by constructing a
+very simple application.  Don't let the simplicity of this example 
+fool you -- this framework has extreme flexibility in delivering
+applications with web and scripted components.  The example in
+this document is only to get you started.
+
+This document begins by describing a simple one-table management application.
+It walks through the process of building the application.  Then,
+it shows a tool -- called Bigtop -- which can be used to build the application
+from a relatively small configuration file.  Finally, it shows how
+to add another table and regenerate the app via Bigtop.
+
+=head1 Sample App Description
+
+I'm worried about my wife's address book.  There is only one copy and
+without it, we would lose track of many of our friends and some of
+our relatives.  I want to put my wife's address book into a database,
+but allow her to use it through a web interface.
+
+Here are the things that Lisa tracks:
+
+=over 4
+
+=item name
+
+the name of a person or nuclear family
+
+=item address
+
+postal address, so we can send toys to the kids etc.
+
+=item phone
+
+one or more numbers (email addresses are in the margin, but that
+will have to wait for version 1.1)
+
+=back
+
+This leads to one table:
+
+    CREATE SEQUENCE address_seq;
+    CREATE TABLE address (
+        id int4 PRIMARY KEY DEFAULT NEXTVAL( 'address_seq' ),
+        name   varchar,
+        street varchar,
+        city   varchar,
+        state  varchar,
+        zip    varchar,
+        phone  varchar
+    );
+
+The application needs to show all the addresses in a single table,
+allow for adding new ones and editing or deleting existing ones.  To make
+it easier to accomodate Lisa's international family and friends, we won't
+do any validation of the data -- except to make sure she enters
+some.  For example, this will allow her to wedge several numbers
+(home, cell, etc.) into the phone field.
+
+=head1 Hand-writing the Sample App
+
+After creating a directory called Apps-Address, I made a lib subdirectory
+for the code.  (You could use h2xs to help with the initial steps.  Or,
+you could use Bigtop, as I did, see L<Using Bigtop> below.)
+
+There are four key modules in this application:
+
+=over 4
+
+=item Apps::Address
+
+the base module
+
+=item Apps::Address::Model
+
+the DBIx::Class schema which controls the model.  In a bigger app, it would
+control all models.
+
+=item Apps::Address::Address
+
+the controller for the address table
+
+=item Apps::Address::Model::address
+
+the object relational mapper class, which inherits from DBIx::Class
+
+=back
+
+We'll walk through each of these in a subsection, showing the code
+with commentary interspersed.  After our tour I'll show the modules
+again without the commentary, so you can see how they look when whole,
+in L<Complete Code Listings>.
+
+=head2 Apps::Address
+
+The job of the base module is to provide a home for shared code and
+a common place to hold site navigation links.
+
+Here is our module (without its documentation but with commentary
+interspersed):
+
+    package Apps::Address;
+  
+    use strict;
+  
+    our $VERSION = '0.01';
+
+It begins like any other module...
+
+    use Gantry qw{ -TemplateEngine=TT };
+  
+    our @ISA = ( 'Gantry' );
+
+...but, it uses Gantry with a template engine (Template Toolkit).
+
+Note that somewhere you need to use Gantry with the -Engine option.
+I'll do that in the stand alone server script.  You could also do it
+in a CGI dispatching script or in httpd.conf for mod_perl deployments.
+
+    use Apps::Address::Address;
+
+For the convenience of future readers, the base module has an explicit use
+for the single controller Apps::Address::Address (which we will see below).
+This is purely for documentation.
+
+    #-----------------------------------------------------------------
+    # $self->site_links(  )
+    #-----------------------------------------------------------------
+    sub site_links { 
+        my ( $self ) = @_;
+ 
+        return [
+            { link => $self->app_rootp() . 'address', label => 'Address' },
+        ];
+    } # END site_links
+
+The C<site_links> method provides a common place for all (or most) app
+pages to look for site navigation links.  The only link here takes users
+to the default page in the address table's controller.
+
+    #-----------------------------------------------------------------
+    # $self->do_main(  )
+    #-----------------------------------------------------------------
+    sub do_main {
+        my ( $self ) = @_;
+  
+        $self->stash->view->template( 'main.tt' );
+        $self->stash->view->title( 'Main Listing' );
+    
+        $self->stash->view->data( {
+            pages => [ 
+                { link => 'address', label => 'Address' },
+            ],
+        } );
+    } # END do_main
+  
+    1;
+
+C<do_main> is one (of two) default methods Gantry dispatches to.  If you
+hit the controller on its base URL, Gantry will try to dispatch to C<do_main>.
+If you don't have one of those, it will fall back to C<do_default> (which
+we use sparingly, usually to accept URL parameters without having to use
+the query string).
+
+This main method merely displays the site links in C<main.tt> which ships
+with Gantry.  It shows a bulleted list of all navigation links.
+
+There is one other commonly useful method in the base controller: C<init>.
+Gantry.pm handles a set of standard configuration parameters.
+If you need to handle others, implement an init sub and accessors for them.
+First, dispatch to SUPER, so it can handle the standard parameters.  Then
+handle your app specific ones.  For example, an init to catch an SMTP host
+name might look like this:
+
+    sub init {
+        my ( $self ) = @_;
+ 
+        # process SUPER's init code
+        $self->SUPER::init( );
+ 
+        $self->smtp_host( $self->fish_conf( 'smtp_host' ) || '' );
+    } # END init
+
+Using fish_conf has two advantages over a more direct approach like this:
+
+        $self->smtp_host( $self->r->dir_config( 'smtp_host' ) || '' );
+
+First, using dir_config ties you to mod_perl.  Second, directly fishing
+from the request object prevents a more general solution, like
+Gantry::Conf (see Gantry::Conf::Tutorial for how to use that).
+
+=head2 Apps::Address::Model
+
+The Model might better be called Apps::Address::Schema, since it inherits from
+DBIx::Class::Schema.  But we call it the model.  It has two purposes.
+First, is to load the actual model classes.  Second, it sets the DBI
+options for the database connections.
+
+    package Apps::Address::Model;
+    use strict; use warnings;
+ 
+    use base 'DBIx::Class::Schema';
+ 
+    __PACKAGE__->load_classes( qw/
+            address
+    / );
+ 
+    sub get_db_options {
+        return { AutoCommit => 1 };
+    }
+ 
+    1;
+
+See C<DBIx::Class::Schema> for a discussion of C<load_classes> and the
+other things you can set up in your schema.
+
+This schema only loads C<address>, since that is our only table.  Even
+for complex apps, there is rarely any more complexity to this module.
+But, it will have more classes to load.
+
+=head2 Apps::Address::Address
+
+This is the workhorse for this application.  It manages the CRUD (create,
+retrieve, update, and delete) for address book rows.  Again, I'll include
+it a piece at a time with running commentary.
+
+    package Apps::Address::Address;
+ 
+    use strict;
+ 
+    use base 'Apps::Address';
+
+It begins like any subclass.  Note that it is a subclass of Apps::Address
+which is itself a subclass of Gantry.  The only C<handler> sub is in Gantry.pm
+(unless you count user authentication, but that's way ahead of our little
+story about the vulnerable address book with the flowers on the cover).
+
+    use Gantry::Plugins::DBIxClassConn qw( get_schema );
+ 
+    use Apps::Address::Model;
+    use Apps::Address::Model::address qw( $ADDRESS );
+
+To ease DBIx::Class use, Gantry provides a
+plugin: C<Gantry::Plugins::DBIxClassConn>.  That plugin exports C<get_schema>,
+which controllers need to read their database.  We'll see how to use it below.
+
+In addition to loading the plugin, our controller also needs to use the
+base model (a.k.a., the schema) and which ever models it actually needs.
+
+Each table has a model in the Model namespace with the same name as the
+table (note the case -- this exactly matches the sql shown in the previous
+section).  The model exports an alias to its full name as C<$ADDRESS> to
+save us some typing when we use it.  It uses uc on the table's name to
+make the alias more visible.
+
+    use Gantry::Plugins::AutoCRUD;
+
+This is the real key to avoiding work.  AutoCRUD handles create, update
+and delete (we'll see retrieval in a minute).  This module is more of a
+mixin than a plugin.  It exports five methods to us: C<do_add>, C<do_edit>,
+C<do_delete>, C<form_name>, and C<write_file>.  The C<form_name> is just
+the name of the template to use for add/edit input.  If you don't want
+the standard C<form.tt>, that comes with Gantry, don't import that method.
+Instead, implement that method so it returns the name of your template file.
+
+The C<write_file> method handles file uploads, which we don't need for
+this app.
+
+In Gantry, the handler calls methods named do_* where the star is replaced
+with a string from the url.  So the URL for adding an entry to the
+address book would be something like:
+
+    http://somehost.example.com/address/add
+
+where somehost.example.com is our host (or virtual host) and /address/add
+is the requested page.  address is a Location in our apache conf and
+add becomes do_add, the name of the method to execute.  Using the do_ prefix
+has two advantages.  First, since URL pieces are used directly, it keeps
+people from running non-handlers by clever url spoofing.  Second, and
+for our company more importantly, it makes it clear which methods
+are accessible, and which are not.  This aids us when we are modifying
+a controller.  If it starts with do_ it can be reached via url.
+
+So, we are mixing in C<do_add>, C<do_edit>, and C<do_delete>.  We need
+to implement a few methods to complete our controller.
+
+We need a small sub so the DBIx::Class plugin can find our schema:
+
+    sub schema_base_class { return 'Apps::Address::Model'; }
+
+Now we are coming to the real code.  The default action for a Location
+in Gantry is do_main.  We usually use it to display a table with one
+summary row for each database row like this.  It looks like this:
+
+=for html <img src='http://www.usegantry.org/images/mainlist.png' alt='Main Listing Screen Shot' />
+
+    #-----------------------------------------------------------------
+    # $self->do_main(  )
+    #-----------------------------------------------------------------
+    sub do_main {
+        my ( $self ) = @_;
+ 
+        $self->stash->view->template( 'results.tt' );
+        $self->stash->view->title( 'Address' );
+
+The C<do_main> controller uses the C<results.tt> default main listing
+template which ships with Gantry.  If you change templates, you'll probably
+need to substantially modify the rest of C<do_main>.
+
+        my $real_location = $self->location() || '';
+        if ( $real_location ) {
+            $real_location =~ s{/+$}{};
+            $real_location .= '/';
+        }
+
+Some care is required to avoid missing or doubled slashes when forming URLs.
+But, that's nothing a little string work can't address.  With a clean
+address in place we are ready to build the output.
+
+        my $retval = {
+            headings       => [
+                'Name',
+                'Street',
+            ],
+            header_options => [
+                {
+                    text => 'Add',
+                    link => $real_location . "add",
+                },
+            ],
+        };
+
+The template always receives a hash reference.  I frequently call mine
+C<$retval>, short for return value.  For C<results.tt>, the hash describes
+the main listing table.  The are two parts to that: the heading row and
+the body rows.  There is one heading row for the table.  This one has labels:
+'Name' and 'Street.'  There is one option the user can invoke for the whole
+table: Add.  Clicking that will lead to the same URL with 'add' appended.
+That URL will be dispatched to the C<do_add> we mixed in from the AutoCRUD
+plugin.
+
+Now we need the data for the main listing.  For simplicity, I'll get all the
+data.  It is not hard to get pages of data, but I'll leave that for later
+documents (look for C<rows> or C<paged_conf> in bigtop or tentmaker's docs).
+
+        my $schema = $self->get_schema();
+        my @rows   = $ADDRESS->get_listing( { schema => $schema } );
+
+First, I asked for the DBIx::Class schema, but calling the C<get_schema>
+accessor mixed in for us by the C<DBIxClassConn> plugin.  Next, I called
+C<get_listing> on the address model, through its alias.  This sugar method
+returns the rows for our main listing.  Note that it expects named arguments
+in a hash reference and C<schema> is required.
+
+Now, it's a fairly simple matter to loop over each database row making
+a table row in the template data.
+
+        foreach my $row ( @rows ) {
+            my $id = $row->id;
+            push(
+                @{ $retval->{rows} }, {
+                    data => [
+                        $row->name,
+                        $row->street,
+                    ],
+                    options => [
+                        {
+                            text => 'Edit',
+                            link => $real_location . "edit/$id",
+                        },
+                        {
+                            text => 'Delete',
+                            link => $real_location . "delete/$id",
+                        },
+                    ],
+                }
+            );
+        }
+
+First, I fished the row id out of the DBIx::Class object, and stored it
+in a scalar.  This allows direct interpolation into a couple of URL link
+strings.  Then I pushed the data and the row options into the C<rows>
+key of the return value hash.  The data are just the family's name and
+street address.  You could add any other columns from the underlying
+table.  For instance, to add phone, add:
+
+    $row->phone,
+
+to the data list after C<$row->street>.  The order and contents of the
+data are up to you.
+
+Just as the header row has an Add option, each data row has an Edit
+and a Delete option.  Note that their URLs include the row id to work on.
+The only thing I have left to do in C<do_main> is to set the return value data
+in place:
+
+        $self->stash->view->data( $retval );
+    } # END do_main
+
+The only other large piece is the form, in which users enter new addresses
+or edit existing ones.  AutoCRUD calls this method for you when the users
+visits do_add and do_edit pages.  Call this method form.  If an edit triggered
+the call, it will pass in the row as it stands in the database.
+
+The following code produces this on the screen:
+
+=for html <img src='http://www.usegantry.org/images/form.png' alt='Form Screen Shot' />
+
+    #-----------------------------------------------------------------
+    # $self->form( $row )
+    #-----------------------------------------------------------------
+    sub form {
+ 
+        return {
+            row    => $row,
+            legend => $self->path_info =~ /edit/i ? 'Edit' : 'Add',
+            fields => [
+
+The default template is called C<form.tt>.  Among other things, it expects
+the return value hash to contain C<row> (if editing), C<legend> (legend
+of form's fieldset), and C<fields> (what the user will see and enter or edit).
+If the C<row> is supplied, its values are used for initial form population.
+The C<legend> is set based on the C<path_info> which contains part of the
+URL.  If that URL fragment includes 'edit,' the legend is 'Edit.'  Otherwise,
+it is 'Add.'
+
+The C<fields> are an array of the entry elements the user will see.  The
+order of the array controls the on screen order.  Each field is a little
+hash.  While there are other keys, the four most common are used over and
+over, not just in this example.
+
+                {
+                    name => 'name',
+                    optional => 0,
+                    label => 'Name',
+                    type => 'text',
+                },
+
+The C<name> must be the name of the column in the database and will also
+be used as the name of the html form element.
+
+If C<optional> is true, the field is optional.  Otherwise, it is required.
+I could have omitted optional from the Name hash, since required is the
+default.
+
+The C<label> is displayed in the left hand column of the form input table.
+
+The C<type> is the HTML form element type.  See C<form.tt> in Gantry's
+templates for a complete list of types is understands.  That will also
+explain how to include other field hash keys to specify things like
+pull down options.
+
+The other C<fields> hashes are all of the same form.  Only the field names
+and labels change.  Here is one example:
+
+                {
+                    name => 'city',
+                    optional => 1,
+                    label => 'City',
+                    type => 'text',
+                },
+                #...
+            ],
+        };
+    } # END form
+
+Finally, there are some small subs which return strings used by the
+AutoCRUD plugin at various points.
+
+    #-----------------------------------------------------------------
+    # get_model_name( )
+    #-----------------------------------------------------------------
+    sub get_model_name {
+        return $ADDRESS;
+    }
+
+Gantry::Plugins::AutoCRUD uses get_model_name to find out which model
+class to use for create, update, delete, and lookups.
+
+    #-----------------------------------------------------------------
+    # get_orm_helper( )
+    #-----------------------------------------------------------------
+    sub get_orm_helper {
+        return 'Gantry::Plugins::AutoCRUDHelper::DBIxClass';
+    }
+
+For historical reasons, the AutoCRUD plugin defaults to using Class::DBI.
+We no longer use that.  So, we have to provide C<get_orm_helper> to
+identify our CRUD helper.
+
+    #-----------------------------------------------------------------
+    # text_descr( )
+    #-----------------------------------------------------------------
+    sub text_descr     {
+        return 'address';
+    }
+
+Gantry::Plugins::AutoCRUD uses text_descr to fill in the blank in things
+like:
+
+    Delete _____?
+
+That's the whole controller (save the #... where the other fields go
+-- see below for L<Complete Code Listing>).
+
+=head2 Apps::Address::Model::address
+
+To separate sql from the controller (and view) we use Gantry with an
+Object-Relational Mapper (ORM).  For this example I will show
+DBIx::Class, since it the one we've settled on.  You could also
+use Class::DBI or Gantry's native models, but I won't show you how.
+
+Gantry provides its own base class to add to C<DBIx::Class> it is
+L<Gantry::Utils::DBIxClass>.  Each model subclasses it and represents one table
+in the database.  These classes are standard C<DBIx::Class> subclasses.  Here
+is the own for my address table:
+
+    package Apps::Address::Model::address;
+    use strict; use warnings;
+ 
+    use base 'Gantry::Utils::DBIxClass', 'Exporter';
+ 
+    our $ADDRESS = 'Apps::Address::Model::address';
+ 
+    our @EXPORT_OK = ( '$ADDRESS' );
+
+Note that we export the alias for controllers to use when referring to
+the model class.  This mitigates the length of the name.  Gantry does not
+require you to do this.  If you prefer to type the name, feel free.
+
+    __PACKAGE__->load_components( qw/ PK::Auto Core / );
+    __PACKAGE__->table( 'address' );
+    __PACKAGE__->add_columns( qw/
+        id
+        name
+        street
+        created
+        modified
+        city
+        state
+        zip
+        phone
+    / );
+    __PACKAGE__->set_primary_key( 'id' );
+    __PACKAGE__->base_model( 'Apps::Address::Model' );
+
+All of these calls are common when using C<DBIx::Class>, except C<base_model>.
+Gantry uses it to hide the connection inside C<Gantry::Plugins::DBIxClassConn>.
+
+Various parts of Gantry use other methods I should define here.  They are
+all simple.
+
+    sub foreign_display {
+        my $self = shift;
+ 
+        my $name = $self->name() || '';
+ 
+        return "$name";
+    }
+
+The C<foreign_display> controls the default sort order of C<get_listing>
+which I called in C<do_main> of the controller for the address table.  It
+also controls how rows from the table will be summarized when other tables
+refer to this one via a foreign key.
+
+    sub get_foreign_display_fields {
+        return [ qw( name ) ];
+    }
+
+This tells anyone who is interested the names in the foreign display string
+in their order of appearance there.  C<get_foreign_display_fields> is what
+actually controls C<get_listing> sort order.
+
+    sub get_foreign_tables {
+        return qw(
+        );
+    }
+
+This returns a list of table names for which this table has foreign keys.
+
+    sub table_name {
+        return 'address';
+    }
+
+Finally, this returns the name of the table.  This becomes important if you
+are using Postgres schemas which preface the table name with its schema
+name and a dot (for instance: my_schema.my_table).  This table name will
+have the dot, even though the dot is converted to an underscore for the
+package name and in other places where Perl objects to dots.
+
+See the perldoc for C<DBIx::Class> and C<DBIx::Class::ResultSet> for more
+details.
+
+=head2 Complete Code Listings
+
+Note that all POD sections have been omitted for brevity.
+
+SQL for database creation
+
+    CREATE SEQUENCE address_seq;
+    CREATE TABLE address (
+        id int4 PRIMARY KEY DEFAULT NEXTVAL( 'address_seq' ),
+        name   varchar,
+        street varchar,
+        city   varchar,
+        state  varchar,
+        zip    varchar,
+        phone  varchar
+    );
+
+Apps::Address
+
+    package Apps::Address;
+ 
+    use strict;
+ 
+    our $VERSION = '0.01';
+ 
+    use Apps::Address::Address;
+ 
+    use Gantry qw{ -TemplateEngine=TT };
+ 
+    our @ISA = qw( Gantry );
+ 
+    #-----------------------------------------------------------------
+    # $self->do_main(  )
+    #-----------------------------------------------------------------
+    sub do_main {
+        my ( $self ) = @_;
+ 
+        $self->stash->view->template( 'main.tt' );
+        $self->stash->view->title( 'Main Listing' );
+ 
+        $self->stash->view->data( {
+            pages => [
+                { link => 'address', label => 'Address' },
+            ],
+        } );
+    } # END do_main
+ 
+    #-----------------------------------------------------------------
+    # $self->site_links(  )
+    #-----------------------------------------------------------------
+    sub site_links {
+        my ( $self ) = @_;
+ 
+        return [
+            { link => $self->app_rootp() . 'address', label => 'Address' },
+        ];
+    } # END site_links
+ 
+    1;
+
+Apps::Address::Model
+
+    package Apps::Address::Model;
+    use strict; use warnings;
+ 
+    use base 'DBIx::Class::Schema';
+ 
+    __PACKAGE__->load_classes( qw/
+        address
+    / );
+ 
+    sub get_db_options {
+        return { AutoCommit => 1 };
+    }
+ 
+    1;
+
+Apps::Address::Address
+
+    package Apps::Address::Address;
+ 
+    use strict;
+ 
+    use base 'Apps::Address';
+ 
+    use Gantry::Plugins::DBIxClassConn qw( get_schema );
+ 
+    use Apps::Address::Model;
+    use Apps::Address::Model::address qw( $ADDRESS );
+ 
+    use Gantry::Plugins::AutoCRUD qw(
+        do_add
+        do_edit
+        do_delete
+        form_name
+        write_file
+    );
+ 
+    sub schema_base_class { return 'Apps::Address::Model'; }
+ 
+    #-----------------------------------------------------------------
+    # $self->do_main(  )
+    #-----------------------------------------------------------------
+    sub do_main {
+        my ( $self ) = @_;
+ 
+        $self->stash->view->template( 'results.tt' );
+        $self->stash->view->title( 'Address' );
+ 
+        my $real_location = $self->location() || '';
+        if ( $real_location ) {
+            $real_location =~ s{/+$}{};
+            $real_location .= '/';
+        }
+ 
+        my $retval = {
+            headings       => [
+                'Name',
+                'Street',
+            ],
+            header_options => [
+                {
+                    text => 'Add',
+                    link => $real_location . "add",
+                },
+            ],
+        };
+ 
+        my $schema = $self->get_schema();
+        my @rows   = $ADDRESS->get_listing( { schema => $schema } );
+ 
+        foreach my $row ( @rows ) {
+            my $id = $row->id;
+            push(
+                @{ $retval->{rows} }, {
+                    data => [
+                        $row->name,
+                        $row->street,
+                    ],
+                    options => [
+                        {
+                            text => 'Edit',
+                            link => $real_location . "edit/$id",
+                        },
+                        {
+                            text => 'Delete',
+                            link => $real_location . "delete/$id",
+                        },
+                    ],
+                }
+            );
+        }
+ 
+        $self->stash->view->data( $retval );
+    } # END do_main
+ 
+    #-----------------------------------------------------------------
+    # $self->form( $row )
+    #-----------------------------------------------------------------
+    sub form {
+        my ( $self, $row ) = @_;
+ 
+        return {
+            row        => $row,
+            legend => $self->path_info =~ /edit/i ? 'Edit' : 'Add',
+            fields     => [
+                {
+                    name => 'name',
+                    optional => 0,
+                    label => 'Name',
+                    type => 'text',
+                },
+                {
+                    name => 'street',
+                    optional => 1,
+                    label => 'Street',
+                    type => 'text',
+                },
+                {
+                    name => 'city',
+                    optional => 1,
+                    label => 'City',
+                    type => 'text',
+                },
+                {
+                    name => 'state',
+                    optional => 1,
+                    label => 'State',
+                    type => 'text',
+                },
+                {
+                    name => 'zip',
+                    optional => 1,
+                    label => 'Zip',
+                    type => 'text',
+                },
+                {
+                    name => 'phone',
+                    optional => 1,
+                    label => 'Phone',
+                    type => 'text',
+                },
+            ],
+        };
+    } # END form
+ 
+    #-----------------------------------------------------------------
+    # get_model_name( )
+    #-----------------------------------------------------------------
+    sub get_model_name {
+        return $ADDRESS;
+    }
+ 
+    #-----------------------------------------------------------------
+    # get_orm_helper( )
+    #-----------------------------------------------------------------
+    sub get_orm_helper {
+        return 'Gantry::Plugins::AutoCRUDHelper::DBIxClass';
+    }
+ 
+    #-----------------------------------------------------------------
+    # text_descr( )
+    #-----------------------------------------------------------------
+    sub text_descr     {
+        return 'address';
+    }
+ 
+    1;
+
+Apps::Address::Model::address
+
+    package Apps::Address::Model::address;
+    use strict; use warnings;
+ 
+    use base 'Gantry::Utils::DBIxClass', 'Exporter';
+ 
+    our $ADDRESS = 'Apps::Address::Model::address';
+ 
+    our @EXPORT_OK = ( '$ADDRESS' );
+ 
+    __PACKAGE__->load_components( qw/ PK::Auto Core / );
+    __PACKAGE__->table( 'address' );
+    __PACKAGE__->add_columns( qw/
+        id
+        name
+        street
+        created
+        modified
+        city
+        state
+        zip
+        phone
+    / );
+    __PACKAGE__->set_primary_key( 'id' );
+    __PACKAGE__->base_model( 'Apps::Address::Model' );
+ 
+    sub get_foreign_display_fields {
+        return [ qw( name ) ];
+    }
+ 
+    sub get_foreign_tables {
+        return qw(
+        );
+    }
+ 
+    sub foreign_display {
+        my $self = shift;
+ 
+        my $name = $self->name() || '';
+ 
+        return "$name";
+    }
+ 
+    sub table_name {
+        return 'address';
+    }
+ 
+    1;
+
+=head1 Deploying the Application
+
+After coding the above modules we only need to do two more things:
+create the database and add our application to httpd.conf.
+
+In Postgres, you can merely say something like
+
+    createdb address
+    psql address -U apache < schema.postgres
+
+(supplying passwords as requested) where schema.postgres is the one shown above
+in L<Sample App Description>.
+
+Assuming you are using mod_perl 1.3, you can add the following to your
+httpd.conf:
+
+    <Perl>
+        #!/usr/bin/perl
+ 
+        use lib '/home/me/Apps-Address/lib';
+ 
+        use Address;
+        use Address::Address;
+    </Perl>
+ 
+    <Location />
+        PerlSetVar dbconn dbi:Pg:dbname=address
+        PerlSetVar dbuser apache
+        PerlSetVar dbpass secret
+        PerlSetVar template_wrapper wrapper.tt
+        PerlSetVar root /home/me/Apps-Address/html:/home/me/srcgantry/root
+    </Location>
+ 
+    <Location /address>
+        SetHandler  perl-script
+        PerlHandler Apps::Address::Address
+    </Location>
+
+Adjust the dbconn, dbuser, and dbpass PerlSetVars for your database.  The root
+needs to include the directory where wrapper.tt lives.  You can copy one
+from the sample_wrapper.tt that ships with gantry (look in the directory
+named root).
+
+Now all that remains is to restart the server.
+
+If you are using Gantry::Conf (which we prefer, but didn't discuss above),
+you need to set one var:
+
+    PerlSetVar GantryConfInstance addressbook
+
+Then create a config file for the set vars shown above.  See
+L<Gantry::Conf::Tutorial> for details.
+
+If you are using CGI you need to make a script instead of adjusting apache
+locations.  Here is ours:
+
+    #!/usr/bin/perl
+ 
+    use CGI::Carp qw( fatalsToBrowser );
+ 
+    use lib '/home/me/Apps-Address/lib';
+ 
+    use Apps::Address qw{ -Engine=CGI -TemplateEngine=TT };
+ 
+    use Gantry::Engine::CGI;
+ 
+    my $cgi = Gantry::Engine::CGI->new( {
+        config => {
+            dbconn => 'dbi:Pg:dbname=address',
+            dbuser => 'apache',
+            template_wrapper => 'wrapper.tt',
+            root => '/home/me/Apps-Address/html:',
+                    '/home/me/srcgantry/root',
+        },
+        locations => {
+            '/' => 'Apps::Address',
+            '/address' => 'Apps::Address::Address',
+        },
+    } );
+ 
+    $cgi->dispatch();
+
+If you are using Gantry::Conf with CGI, use the single config hash key:
+
+    my $cgi = Gantry::Engine::CGI->new( {
+        config => {
+            GantryConfInstance => 'address',
+        }
+        # locations as above
+    } );
+
+If you want to deploy the app as a stand alone server (most useful
+during testing), change the above cgi script to this:
+
+    #!/usr/bin/perl
+ 
+    use Gantry::Server;
+ 
+    use lib '/home/me/Apps-Address/lib';
+ 
+    use Apps::Address qw{ -Engine=CGI -TemplateEngine=TT };
+    use Gantry::Engine::CGI;
+ 
+    my $cgi = Gantry::Engine::CGI->new( {
+        config => {
+            dbconn => 'dbi:Pg:dbname=address',
+            dbuser => 'apache',
+            template_wrapper => 'wrapper.tt',
+            root => '/home/me/Apps-Address/html:',
+                    '/home/me/srcgantry/root',
+        },
+        locations => {
+            '/' => 'Apps::Address',
+            '/address' => 'Apps::Address::Address',
+        },
+    } );
+ 
+    my $port = shift || 8080;
+    my $server = Gantry::Server->new( $port );
+ 
+    $server->set_engine_object( $cgi );
+    $server->run();
+
+That is, trade use CGI::Carp for use Gantry::Server and C<<$cgi->dispatch>>
+for the last four lines shown above.  Running the script will start a
+server on port 8080 (or whatever port was supplied on the command line).
+
+=head1 Using Bigtop
+
+Now I have a confession.  I never coded the example in the previous section.
+I let Bigtop do it.
+
+Bigtop is a code generator which can safely regenerate as thing change (like
+the data model).  The bigtop script reads a Bigtop file to produce apps
+like the one shown above.  There is a more detailed example in the tutorial
+for Bigtop.
+
+Bigtop uses its own little language to describe web applications.  The language
+is designed for simplicity of structure.  There are basically only two
+constructs: semi-colon terminated statements and brace delimited blocks.
+
+The easiest way to edit bigtop files is to use tentmaker, a browser
+delivered editor.  It saves a lot of typing.  If you really want to
+see what the bigtop file looks like, see L<Complete Bigtop Code Listings>
+below.  If you want to just build the app from that listing, use
+C<address-new.bigtop> from the examples directory of the Bigtop distribution.
+Type:
+
+    bigtop -c address-new.bigtop all
+
+If you want to build that bigtop file, keep reading.
+
+First, type:
+
+    tentmaker -n Apps::Address address
+
+This will start tentmaker, tell it to make a new app called C<Apps::Address>
+and give it a single table C<address>.  Once it starts, tentmaker will
+print a URL on your screen like this:
+
+ ...You can connect to your server at http://localhost:8080/
+
+Go to the URL indicated with a DOM compliant browser like Firefox or Safari.
+There are five tabs in tentmaker.  We need to change things only in the
+App Body, so click it.
+
+Scroll down to edit the tables called 'address' (it should be the only
+table).  After clicking 'edit,' scroll down further until you see the
+'Field Quick Edit' table.  Change the 'Column Name' ident to 'name.'  Click
+'Apply Quick Edit.'  (Actually, you can click anywhere in the browser outside
+fo the input box to update it.)  Change 'description' to 'street'.  Then,
+under 'Create Field(s),' enter a single string:
+
+    city state zip phone email
+
+Then press 'Create.'  You should see the new fields in the quick edit table.
+
+Click optional in the quick edit heading row to make all fields
+optional.  Finally, uncheck optional for the name.
+
+Now click the 'Bigtop Config' table.  Enter a file name next to 'Save As:'
+After you enter a name, click 'Save As:'.  tentmaker will print a little
+message under the the buttons telling you whether save your file or not.
+If it saved successfully, press 'Stop Server' and confirm that you want
+to stop the server.
+
+In the same shell where you launched tentmaker, you should have your prompt
+back.  Type:
+
+    bigtop -c address.bigtop all
+
+Change C<address.bigtop> to whatever you called the bigtop file.  Bigtop will
+build the application and give you instructions on how to start it.  Follow
+those.  For example, since I have an executable 'sqlite' in my path,
+bigtop said this:
+
+    I have generated your 'Apps::Address' application.  I have also
+    taken the liberty
+    of making an sqlite database for it to use.  To run the application:
+ 
+        cd Apps-Address
+        ./app.server [ port ]
+ 
+    The app.server runs on port 8080 by default.
+ 
+    Once the app.server starts, it will print a list of the urls it can serve.
+    Point your browser to one of those and enjoy.
+ 
+    If you prefer to run the app with Postgres or MySQL type one of these:
+ 
+        bigtop --pg_help
+        bigtop --mysql_help
+
+If you don't have sqlite, it will add a step for building the database.
+Do type:
+
+        bigtop --pg_help
+
+or
+
+        bigtop --mysql_help
+
+if you use one of those databases.
+
+=head2 Generating with bigtop
+
+There are about 100 lines in the example bigtop file built above.
+Here is a complete list of what bigtop built for you from that file
+(with directory levels shown by indentation):
+
+ Apps-Address/ - a directory where everything in the app lives
+    app.cgi        CGI script
+    app.db         sqlite database, if you sqlite in your path
+    app.server     stand alone server script
+    Build.PL
+    Changes        ready for use
+    MANIFEST       complete as of the initial generation
+    MANIFEST.SKIP
+    README         in need of heavy editing
+    docs/
+       address.bigtop  - the original bigtop file
+       schema.mysql    - ready for use with mysql
+       schema.postgres - ready for use with psql
+       schema.sqlite   - ready for use with sqlite
+    html/
+        templates/
+            genwrapper.tt     - a simple site look
+    lib/
+       Apps/
+          Address.pm    - base module stub for the app
+          GENAddress.pm - generated base module for the app
+          Address/
+             Address.pm - controller stub for the address table
+                GEN/
+                   Address.pm - generated code for Address.pm above
+                Model.pm  - DBIx::Class schema to all models
+                Model/
+                   address.pm - model stub for the address table
+                   GEN/
+                      address.pm - generated code for address.pm above
+    t/
+       01_use.t      - tests whether each controller compiles
+       02_pod.t      - if you have Test::Pod, validates all pod in all modules
+       03_podcover.t - if you have Test::Pod::Coverage, looks for missing pod
+       10_run.t      - hits the default page of each controller
+
+Note that there are more modules than in the hand written version.  This
+allows you to change the data model and regenerate without fear of losing
+hand coded changes.  So, Address.pm, Address::Model, Address::Address, and
+Address::Model::address are stubs providing a place for you to add
+your customized code as needed; while Address::GEN::Address,
+Address::Model::GEN::address, etc. are generated each time you run
+bigtop.  If you need to do something other than what the generated code does, 
+simply redefine the behavior in the non-generated code stubs and that will be
+used.  Do not edit the GEN modules, instead only add code to the stubs as
+needed.
+
+=head2 Revisions
+
+Suppose that you want some validation of the input.
+
+Further, suppose my wife wants us to add a birth day table so she can
+send cards.
+
+We'll see how to add those things here, by manually editing the bigtop file.
+You could do these things with tentmaker as well.  But sometimes it is
+easier to work with your favorite text editor.  Do what makes sense.
+
+=head3 Constraining things
+
+No data in the sample address book is validated (because Lisa has
+too many friends and relatives living in too many places for meaningful
+validation).
+
+But, if you want validation, you can include it like so:
+
+    field zip {
+        is    varchar;
+        label Zip;
+        html_form_type text;
+        html_form_optional 1;
+        html_form_constraint `qr{^\d{5}$}`;
+    }
+
+The constraint could be a valid Perl regex.  You could also call a sub which
+returns a regex.  If you include a uses statement in your controller like
+this:
+
+    uses Data::FormValidator::Constraints => `qw(:closures)`;
+
+You can set the constraint like so:
+
+        html_form_constraint `zip_or_postcode()`;
+
+See perldoc Data::FormValidator::Constraints for details of the closures
+available.  All of them return a regex suitable for use as shown.
+
+=head3 Email address field
+
+It is particularly easy to add a new field to the address table:
+
+    field email {
+        is                 varchar;
+        label              `Email Address`;
+        html_form_type     text;
+        html_form_optional 1;
+    }
+
+Note that I put the label for this field in backquotes, since its name
+contains a space.
+
+We don't have to change the Address controller block, because the
+only thing affected is the form.  tentmaker already specified that the form
+should have all_fields_but id.  So, email will show up upon regeneration.
+
+=head3 Birthday table
+
+The most interesting change is adding birthdays.  In my mind, this leads
+to a new table with this schema:
+
+    CREATE SEQUENCE birth_seq;
+    CREATE TABLE birth (
+        id int4 PRIMARY KEY DEFAULT NEXTVAL( 'birth_seq' ),
+        name varchar,
+        family int4,
+        birthday date
+    );
+
+To generate this sql, its model and controller we can add this
+to our bigtop file (again, I'll show it a bit at a time with commentary):
+
+    table birth {
+        field id { is int4, primary_key, auto; }
+        field name {
+            is             varchar;
+            label          Name;
+            html_form_type text;
+        }
+
+This will be the name of one person in a nuclear family.
+
+        field family {
+            is                int4;
+            label             Family;
+            html_form_type    select;
+            refers_to         address;
+        }
+
+This field becomes a foreign key pointing to the address table, since it
+uses the C<refers_to> statement.  When the user enters a value for this
+field, they must choose one family defined in the address table.
+
+        field birthday {
+            is                date;
+            label             Birthday;
+            html_form_type    date;
+            date_select_text `Popup Calendar`;
+        }
+        foreign_display `%name`;
+    }
+
+I've chosen to store the actual date of birth (which leads to recording
+women's ages, shame on me).  This is to show how date selection works
+smoothly for your users.  There are three steps to this process.  The
+first one is shown here: use the date_select_text statement.  Its value
+becomes the link text the user clicks to popup the calendar selection
+mini-window.  See, the controller below for the other two steps.
+
+    controller Birth is AutoCRUD {
+        controls_table   birth;
+        rel_location     birthday;
+        uses             Gantry::Plugins::Calendar;
+
+Step two in easy dates is to use Gantry::Plugins::Calendar which provides
+javascript code generation routines.
+
+        text_description birthday;
+        page_link_label  `Birth Day`;
+
+This page will show up in site navigation with its page_link_label
+
+        method do_main is main_listing {
+            title            `Birth Day`;
+            cols             name, family, birthday;
+            header_options   Add;
+            row_options      Edit, Delete;
+        }
+
+The main listing is just like the one for the address table, except for
+the names of the displayed fields.
+
+        method form is AutoCRUD_form {
+            form_name        birthday_form;
+            all_fields_but   id;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`,
+                javascript => `$self->calendar_month_js( 'birthday_form' )`;
+        }
+    }
+
+Now the name of the form becomes important.  The calendar_month_js
+method (mixed in by Gantry::Plugins::Calendar) generates the javascript
+for the popup and its callback, which populates the date fields.
+Note that we don't tell it which fields to handle.  It will work on
+all fields that have date_select_text statements.
+
+Once these changes are made, we can regenerate the application:
+
+    bigtop docs/address.bigtop all
+
+Execute this command while in the build directory (the one with the Changes
+file in it).
+
+For the app to work successfully, you will need to alter the existing
+database so it has the new columns and birth day table.  Either throw out
+the old database or alter it at your option.  Bigtop has data statements
+which allow you to specify initial data for tables.  This makes discarding
+a database less painful.
+
+Again, I confess that I used tentmaker to get me started with the changes
+above, then cleaned its output until it became the
+L<Complete Bigtop Code Listing> below.
+
+You can continue to edit the bigtop file with a text editor or tentmaker
+and regenerate as the app matures.  We have regenerated production apps
+months after deployment.
+
+=head2 Complete Bigtop Code Listing
+
+ config {
+     engine CGI;
+     template_engine TT;
+     Init Std {  }
+     SQL SQLite {  }
+     SQL Postgres {  }
+     SQL MySQL {  }
+     CGI Gantry { gen_root 1; with_server 1; flex_db 1; }
+     Control Gantry { dbix 1; }
+     Model GantryDBIxClass {  }
+     SiteLook GantryDefault {  }
+ }
+ app Apps::Address {
+     config {
+         dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+         template_wrapper `genwrapper.tt` => no_accessor;
+     }
+     controller is base_controller {
+         method do_main is base_links {
+         }
+         method site_links is links {
+         }
+     }
+     table address {
+         field id {
+             is int4, primary_key, auto;
+         }
+         field name {
+             is varchar;
+             label Name;
+             html_form_type text;
+             html_form_optional 0;
+         }
+         field street {
+             is varchar;
+             label Street;
+             html_form_type text;
+             html_form_optional 1;
+         }
+         foreign_display `%name`;
+         field city {
+             is varchar;
+             label City;
+             html_form_type text;
+             html_form_optional 1;
+         }
+         field state {
+             is varchar;
+             label State;
+             html_form_type text;
+             html_form_optional 1;
+         }
+         field zip {
+             is varchar;
+             label Zip;
+             html_form_type text;
+             html_form_optional 1;
+             html_form_constraint `qr{^\d{5}$}`;
+         }
+         field country {
+             is varchar;
+             label Country;
+             html_form_type text;
+             html_form_optional 1;
+         }
+         field email {
+             is varchar;
+             label Email;
+             html_form_type text;
+             html_form_optional 1;
+         }
+         field phone {
+             is varchar;
+             label Phone;
+             html_form_type text;
+             html_form_optional 1;
+         }
+     }
+     controller Address is AutoCRUD {
+         controls_table address;
+         rel_location address;
+         text_description address;
+         page_link_label Address;
+         method do_main is main_listing {
+             cols name, street;
+             header_options Add;
+             row_options Edit, Delete;
+             title Address;
+         }
+         method form is AutoCRUD_form {
+             all_fields_but id, created, modified;
+             extra_keys
+                 legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+         }
+     }
+     table birth {
+         field id {
+             is int4, primary_key, auto;
+         }
+         field name {
+             is varchar;
+             label Name;
+             html_form_type text;
+         }
+         field family {
+             is int4;
+             label Family;
+             refers_to address;
+             html_form_type select;
+         }
+         field birthday {
+             is date;
+             label Birthday;
+             html_form_type text;
+             date_select_text `Popup Calendar`;
+         }
+         foreign_display `%name`;
+     }
+     controller Birth is AutoCRUD {
+         controls_table   birth;
+         rel_location     birthday;
+         uses             Gantry::Plugins::Calendar;
+         text_description birthdays;
+         page_link_label `Birth Days`;
+         method do_main is main_listing {
+             title `Birth Day`;
+             cols name, family, birthday;
+             header_options Add;
+             row_options Edit, Delete;
+         }
+         method form is AutoCRUD_form {
+             form_name birthday_form;
+             all_fields_but id;
+             extra_keys
+                 legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`,
+                 javascript => `$self->calendar_month_js( 'birthday_form' )`;
+         }
+     }
+ }
+
+=head1 Summary
+
+In this document we have seen how a simple Gantry app can be written
+and deployed.  While building a simple app with bigtop can take just
+a few minutes, interesting parts can be fleshed out as needed.  Our
+goal is to provide a framework that automates the 50-80% of most apps
+which is repetitive, allowing us to focus our time on the more interesting
+bits that vary from app to app.
+
+If you want to see a more realistic app, see Bigtop::Docs::Tutorial
+which builds a basic freelancer's billing app.
+
+There are other documents you might also want to read.
+
+=over 4
+
+=item Gantry::Docs::FAQ
+
+categorized questions and answers explaining how to do common tasks
+
+=item Gantry::Docs::About
+
+marketing document listing the features of Gantry and telling its history
+
+=back
+
+The modules have their own docs which is where would be gantry developers
+should look for more information.
+
+=head1 Author
+
+Phil Crow <philcrow2000@yahoo.com>
+
+=head1 Copyright and License
+
+Copyright (c) 2006-7, Phil Crow.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

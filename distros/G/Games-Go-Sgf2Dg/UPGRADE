@@ -1,0 +1,97 @@
+
+Note: this file is mostly obsolete (reid - 050214)
+
+
+                This is sgf2tex-3.1
+
+There are new fonts in sgf2tex-3.1, implementing letters 
+a-z on stones. 
+
+If you are reinstalling from sgf2tex-1.0, be aware that the
+fonts have changed. This means that in addition to repeating
+the installation steps described in INSTALL, you must delete
+.pk fonts which are cached in the system. When you run
+MakeTeXPK you print or preview the file, files with names
+such as gooa.300pk, etc. are generated and stored
+somewhere---if you do not delete these you may have
+problems. This point is discussed in the manual under FONT
+DESIGN NOTES.
+
+If you are reinstalling from sgf2tex-2.0 or later, you do
+not need to delete any the fonts. However you will need to
+copy the new metafont sources gobl.mf, gowl.mf, goxl.mf
+paramsc.mf and itallg.mf to their appropriate places.
+
+You can get the version number by running sgf2tex -v.
+
+You may need Perl 5.001 or later in order to successfully run
+sgf2tex.
+
+                 New in sgf2tex-2.0
+
+The fonts have been changed from sgf2tex-1.0. A bug in the
+fonts caused dvips to generate incorrect postscript. The
+affected files are bodd.mf and wodd.mf, which are included
+in each of the font files. The italic correction and
+adjust_fit now are set to zero in each character. Also,
+the value of fine has been reset to 17/36pt in paramsb.mf, 
+which improves the appearance of some numerals.
+
+The perl script sgf2tex has been extensively rewritten. The
+current version uses more correct perl, fixes some bugs,
+generates better TeX and has a new option, -coords, which
+prints a coordinate grid.
+
+A patch from Jan van der Steen was applied to sgfsplit.c,
+to aid portability.
+
+		New in sgf2tex 2.1
+
+There have been no changes to the fonts since sgf2tex-2.0. 
+The only change to sgf2tex itself is the correction of a
+bug, which could cause the text to overwrite the diagram
+if a comment contained one or more spaces or tabs on a line 
+by themselves. The manual and INSTALL files have been
+modified with the inclusion of instructions for DOS/Windows 95,
+and the package has been made available as a .zip file. 
+
+		New in sgf2tex-2.2
+
+A bug has been corrected which could cause the title to be
+omitted from a diagram if the first move of the game happens to 
+be in the same node as the title information.
+
+                New in sgf2tex-2.3
+
+Support for 9x9 and 13x13 games has been added. If the board
+size equals 9 or 13 (specified by the SZ property in the SGF
+file) then the appropriate smaller board is used; otherwise
+19x19 is assumed.
+
+In earlier versions a pass could cause the move numbers to be
+incremented in order to maintain parity. This is as it should
+be, but sometimes the move numbers were being incremented
+unnecessarily. This bug has been fixed.
+
+Another bug could cause comments to be omitted. This has been
+corrected.
+
+The Komi is now printed without trailing zeros. This is an issue
+with IGS games.
+
+The Makefile has been rewritten. There is now an option to
+``Make install.''
+
+                New in sgf2tex-3.0
+
+Many bugfixes, some new features. Formatting of the TeX
+files is improved. Runtime messages are more clear and
+helpfully indented to show the nesting of variations. New
+options -absoluteVarNums and -correlativeVarNums are
+alternative schemes for numbering variations. The -gap
+option allows you to control the spacing between
+diagrams.
+
+                New in sgf2tex-3.1
+
+Letters on stones.

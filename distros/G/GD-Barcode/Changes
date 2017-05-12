@@ -1,0 +1,23 @@
+Revision history for Perl extension GD::Barcode.
+
+1.15  Mon Apr 24 15:50:00 2004
+        - Add QRcode support
+            based on QRcode image CGI version 0.50   (C)2000-2002,Y.Swetake
+        - Little change new metho of GD module.
+
+1.14  Sat May 31 5:30:00 2003
+        - Change all GD::Barcode::* to be able to use without GD module.
+              Thank you Lars Lundberg for suggestion.
+
+1.13  Sat Dec 30 9:30:00 2000
+        - Add Industrail2of5, IATA2of5, Matrix2of5 and COOP(NEC?)2of5 support
+        - Modifty sample(smp_ind.pl, smp_all.pl)
+        - Add COPYRIGHT to all modules
+
+1.12  Sat Dec 16 10:00:00 2000
+        - Add ITF(Interleaved 2 of 5) support
+        - Modifty EAN8
+
+1.10  Sun Oct 29 10:00:00 2000
+        - First release (Converted from KbBarcode.pm)
+

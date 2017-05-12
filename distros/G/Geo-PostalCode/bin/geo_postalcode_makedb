@@ -1,0 +1,20 @@
+#!/usr/bin/perl -Ilib
+
+use strict;
+
+use Geo::PostalCode::InstallDB;
+
+use vars qw($ZIP $DEFZIP $DIR $DEFDIR $IS_CSV);
+$DEFZIP = "Geo-PostalCode_19991101.txt";
+$DEFDIR = ".";
+
+$ZIP=$ARGV[0]||$DEFZIP;
+$DIR=$ARGV[1]||$DEFDIR;
+
+# detect CSV, assumed to be the CSV from
+# http://civicspacelabs.org/releases/zipcodes/zipcodes-csv-10-Aug-2004.tgz
+$IS_CSV=1 if $ZIP =~ /\.csv$/ or /\.csv\.gz$/;
+
+Geo::PostalCode::InstallDB->install(zipdata => $ZIP,
+				    db_dir => $DIR,
+				    is_csv => $IS_CSV);

@@ -1,0 +1,11 @@
+Host tegasaste
+HostName tegasaste.pcg.ull.es
+User edusegre
+
+Host orion
+HostName orion.pcg.ull.es
+User edusegre
+
+Host bolido
+HostName bolido.pcg.ull.es
+User edusegre

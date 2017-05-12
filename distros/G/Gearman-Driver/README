@@ -1,0 +1,566 @@
+NAME
+    Gearman::Driver - Manages Gearman workers
+
+SYNOPSIS
+        package My::Workers::One;
+
+        # Yes, you need to do it exactly this way
+        use base qw(Gearman::Driver::Worker);
+        use Moose;
+
+        # this method will be registered with gearmand as 'My::Workers::One::scale_image'
+        sub scale_image : Job {
+            my ( $self, $job, $workload ) = @_;
+            # do something
+        }
+
+        # this method will be registered with gearmand as 'My::Workers::One::do_something_else'
+        sub do_something_else : Job : MinProcesses(2) : MaxProcesses(15) {
+            my ( $self, $job, $workload ) = @_;
+            # do something
+        }
+
+        # this method wont be registered with gearmand at all
+        sub do_something_internal {
+            my ( $self, $job, $workload ) = @_;
+            # do something
+        }
+
+        1;
+
+        package My::Workers::Two;
+
+        use base qw(Gearman::Driver::Worker);
+        use Moose;
+
+        # this method will be registered with gearmand as 'My::Workers::Two::scale_image'
+        sub scale_image : Job {
+            my ( $self, $job, $workload ) = @_;
+            # do something
+        }
+
+        1;
+
+        package main;
+
+        use Gearman::Driver;
+
+        my $driver = Gearman::Driver->new(
+            namespaces => [qw(My::Workers)],
+            server     => 'localhost:4730,otherhost:4731',
+            interval   => 60,
+        );
+
+        #or should save all config into a YAML config file, then read config from it.
+        my $driver = Gearman::Driver->new(configfile => '/etc/gearman-driver/config.yml');
+
+        $driver->run;
+
+DESCRIPTION
+    Warning: This framework is still EXPERIMENTAL!
+
+    Having hundreds of Gearman workers running in separate processes can
+    consume a lot of RAM. Often many of these workers share the same
+    code/objects, like the database layer using DBIx::Class for example.
+    This is where Gearman::Driver comes in handy:
+
+    You write some base class which inherits from Gearman::Driver::Worker.
+    Your base class loads your database layer for example. Each of your
+    worker classes inherit from that base class. In the worker classes you
+    can register single methods as jobs with gearmand. It's even possible to
+    control how many workers doing that job/method in parallel. And this is
+    the point where you'll save some RAM: Instead of starting each worker in
+    a separate process Gearman::Driver will fork each worker from the main
+    process. This will take advantage of copy-on-write on Linux and save
+    some RAM.
+
+    There's only one mandatory parameter which has to be set when calling
+    the constructor: namespaces
+
+        use Gearman::Driver;
+        my $driver = Gearman::Driver->new( namespaces => [qw(My::Workers)] );
+
+    See also: namespaces. If you do not set server (gearmand) attribute the
+    default will be used: "localhost:4730"
+
+    Each module found in your namespaces will be loaded and introspected,
+    looking for methods having the 'Job' attribute set:
+
+        package My::Workers::ONE;
+
+        sub scale_image : Job {
+            my ( $self, $job, $workload ) = @_;
+            # do something
+        }
+
+    This method will be registered as job function with gearmand, verify it
+    by doing:
+
+        plu@mbp ~$ telnet localhost 4730
+        Trying ::1...
+        Connected to localhost.
+        Escape character is '^]'.
+        status
+        My::Workers::ONE::scale_image   0       0       1
+        .
+        ^]
+        telnet> Connection closed.
+
+    If you dont like to use the full package name you can also specify a
+    custom prefix:
+
+        package My::Workers::ONE;
+
+        sub prefix { 'foo_bar_' }
+
+        sub scale_image : Job {
+            my ( $self, $job, $workload ) = @_;
+            # do something
+        }
+
+    This would register 'foo_bar_scale_image' with gearmand.
+
+    See also: prefix
+
+ATTRIBUTES
+    See also "ATTRIBUTES" in Gearman::Driver::Loader.
+
+  server
+    A list of Gearman servers the workers should connect to. The format for
+    the server list is: "host[:port][,host[:port]]"
+
+    See also: Gearman::XS
+
+    *   default: "localhost:4730"
+
+    *   isa: "Str"
+
+  console_port
+    Gearman::Driver has a telnet management console, see also:
+
+    Gearman::Driver::Console
+
+    *   default: 47300
+
+    *   isa: "Int"
+
+    Set this to 0 to disable management console at all.
+
+  interval
+    Each n seconds Net::Telnet::Gearman is used in Gearman::Driver::Observer
+    to check status of free/running/busy workers on gearmand. This is used
+    to fork more workers depending on the queue size and the
+    MinProcesses/MaxProcesses attribute of the job method. See also:
+    Gearman::Driver::Worker
+
+    *   default: 5
+
+    *   isa: "Int"
+
+  max_idle_time
+    Whenever Gearman::Driver::Observer notices that there are more processes
+    running than actually necessary (depending on min_processes and
+    max_processes setting) it will kill them. By default this happens
+    immediately. If you change this value to 300, a process which is not
+    necessary is killed after 300 seconds.
+
+    Please remember that this also depends on what value you set "interval"
+    to. The max_idle_time is only checked each n seconds where n is
+    "interval". Besides that it makes only sense when you have workers where
+    "MinProcesses" in Gearman::Driver::Worker is set to 0.
+
+    *   default: 0
+
+    *   isa: "Int"
+
+  logfile
+    Path to logfile.
+
+    *   isa: "Str"
+
+    *   default: "gearman_driver.log"
+
+  loglayout
+    See also Log::Log4perl.
+
+    *   isa: "Str"
+
+    *   default: "[%d] %p %m%n"
+
+  loglevel
+    See also Log::Log4perl.
+
+    *   isa: "Str"
+
+    *   default: "INFO"
+
+  unknown_job_callback
+    Whenever Gearman::Driver::Observer sees a job that isnt handled it will
+    call this CodeRef, passing following arguments:
+
+    *   $driver
+
+    *   $status
+
+        my $driver = Gearman::Driver->new(
+            namespaces           => [qw(My::Workers)],
+            unknown_job_callback => sub {
+                my ( $driver, $status ) = @_;
+                # notify nagios here for example
+            }
+        );
+
+    $status might look like:
+
+        $VAR1 = {
+            'busy'    => 0,
+            'free'    => 0,
+            'name'    => 'GDExamples::Convert::unknown_job',
+            'queue'   => 6,
+            'running' => 0
+        };
+
+  worker_options
+    You can pass runtime options to the worker module, these will merged
+    with 'GLOBAL' and pass to the worker constructor. ( worker options
+    override globals )
+
+    *   default: "{}"
+
+    *   isa: "HashRef"
+
+    Example:
+
+        my $driver = Gearman::Driver->new(
+            namespaces     => [qw(My::Workers)],
+            worker_options => {
+                'GLOBAL' => {
+                    'config' => $config,
+                },
+                'My::Workers::MysqlPing' => {
+                    'dsn' => 'DBI:mysql:database=test;host=localhost;mysql_auto_reconnect=1;mysql_enable_utf8=1;mysql_server_prepare=1;',
+                },
+                'My::Workers::ImageThumbnail' => {
+                    'default_format' => 'jpeg',
+                    'default_size => ' 133 x 100 ',
+                }
+            }
+        );
+
+    You should define these in a runtime config (See also "configfile"),
+    might be:
+
+        ---
+        worker_options:
+            'My::App::Worker::MysqlPing':
+                'dsn': 'DBI:mysql:database=test;host=localhost;mysql_auto_reconnect=1;mysql_enable_utf8=1;mysql_server_prepare=1;'
+                'user': 'root'
+                'password:': ''
+            'My::App::Worker::ImageThumbnail':
+                'default_format': 'jpeg'
+                'default_size': '133x100'
+
+  Job runtime attributes
+    You can override a job attribute by its name here. This help to tuning
+    job some runtime-related options (like max_processes, min_processes)
+    handy. You just change the options in a config file, no need to modify
+    the worker code anymore.
+
+    Currently only 'max_processes', 'min_processes' make sense. The hash key
+    is "worker_module::job_key", job_key is ProcessGroup attribute or job
+    method name.
+
+        #in your config file: /etc/gearman-driver.yml (YAML)
+        ---
+        job_runtime_attributes:
+            'My::App::Worker::job1':
+                max_processes: 25
+                min_processes: 2
+            #job has a ProcessGroup attribute named 'group1'
+            'My::App::Worker::group1':
+                max_processes: 10
+                min_processes: 2
+        #then run as:
+        gearman_driver.pl --configfile /etc/gearman_driver.yml
+
+  configfile
+    Runtime config file path, You can provide a default configfile pathname
+    like so:
+
+        has +configfile ( default => '/etc/gearman-driver.yaml' );
+
+    You can pass an array of filenames if you want, like:
+
+        has +configfile ( default => sub { [ '/etc/gearman-driver.yaml','/opt/my-app/etc/config.yml' ] });
+
+  daemonize
+    Detach self and run as a daemon.
+
+INTERNAL ATTRIBUTES
+    This might be interesting for subclassing Gearman::Driver.
+
+  jobs
+    Stores all Gearman::Driver::Job instances. There are also two methods:
+
+    *   get_job
+
+    *   has_job
+
+    Example:
+
+        {
+            'My::Workers::ONE::scale_image'       => bless( {...}, 'Gearman::Driver::Job' ),
+            'My::Workers::ONE::do_something_else' => bless( {...}, 'Gearman::Driver::Job' ),
+            'My::Workers::TWO::scale_image'       => bless( {...}, 'Gearman::Driver::Job' ),
+        }
+
+    *   isa: "HashRef"
+
+    *   readonly: "True"
+
+  observer
+    Instance of Gearman::Driver::Observer.
+
+    *   isa: "Gearman::Driver::Observer"
+
+    *   readonly: "True"
+
+  console
+    Instance of Gearman::Driver::Console.
+
+    *   isa: "Gearman::Driver::Console"
+
+    *   readonly: "True"
+
+METHODS
+  add_job
+    There's one mandatory param (hashref) with following keys:
+
+    *   max_processes (mandatory)
+
+        Maximum number of processes that may be forked.
+
+    *   min_processes (mandatory)
+
+        Minimum number of processes that should be forked.
+
+    *   name (mandatory)
+
+        Job name/alias that method should be registered with Gearman.
+
+    *   methods (mandatory)
+
+        ArrayRef of HashRefs containing following keys:
+
+        *   body (mandatory)
+
+            CodeRef to the job method.
+
+        *   name (mandatory)
+
+            The name this method should be registered with gearmand.
+
+        *   decode (optionally)
+
+            Name of a decoder method in your worker object.
+
+        *   encode (optionally)
+
+            Name of a encoder method in your worker object.
+
+    *   worker (mandatory)
+
+        Worker object that should be passed as first parameter to the job
+        method.
+
+    Basically you never really need this method if you use "namespaces". But
+    "namespaces" depends on method attributes which some people do hate. In
+    this case, feel free to setup your $driver this way:
+
+        package My::Workers::One;
+
+        use Moose;
+        use JSON::XS;
+        extends 'Gearman::Driver::Worker::Base';
+
+        # this method will be registered with gearmand as 'My::Workers::One::scale_image'
+        sub scale_image {
+            my ( $self, $job, $workload ) = @_;
+            # do something
+        }
+
+        # this method will be registered with gearmand as 'My::Workers::One::do_something_else'
+        sub do_something_else {
+            my ( $self, $job, $workload ) = @_;
+            # do something
+        }
+
+        sub encode_json {
+            my ( $self, $result ) = @_;
+            return JSON::XS::encode_json($result);
+        }
+
+        sub decode_json {
+            my ( $self, $workload ) = @_;
+            return JSON::XS::decode_json($workload);
+        }
+
+        1;
+
+        package main;
+
+        use Gearman::Driver;
+        use My::Workers::One;
+
+        my $driver = Gearman::Driver->new(
+            server   => 'localhost:4730,otherhost:4731',
+            interval => 60,
+        );
+
+        my $worker = My::Workers::One->new();
+
+        # run each method in an own process
+        foreach my $method (qw(scale_image do_something_else)) {
+            $driver->add_job(
+                {
+                    max_processes => 5,
+                    min_processes => 1,
+                    name          => $method,
+                    worker        => $worker,
+                    methods       => [
+                        {
+                            body   => $w1->meta->find_method_by_name($method)->body,
+                            decode => 'decode_json',
+                            encode => 'encode_json',
+                            name   => $method,
+                        },
+                    ]
+                }
+            );
+        }
+
+        # share both methods in a single process
+        $driver->add_job(
+            {
+                max_processes => 5,
+                min_processes => 1,
+                name          => 'some_alias',
+                worker        => $worker,
+                methods       => [
+                    {
+                        body   => $w1->meta->find_method_by_name('scale_image')->body,
+                        decode => 'decode_json',
+                        encode => 'encode_json',
+                        name   => 'scale_image',
+                    },
+                    {
+                        body   => $w1->meta->find_method_by_name('do_something_else')->body,
+                        decode => 'decode_json',
+                        encode => 'encode_json',
+                        name   => 'do_something_else',
+                    },
+                ]
+            }
+        );
+
+        $driver->run;
+
+  get_jobs
+    Returns all Gearman::Driver::Job objects ordered by jobname.
+
+  run
+    This must be called after the Gearman::Driver object is instantiated.
+
+  shutdown
+    Sends TERM signal to all child processes and exits Gearman::Driver.
+
+  has_job
+    Params: $name
+
+    Returns true/false if the job exists.
+
+  get_job
+    Params: $name
+
+    Returns the job instance.
+
+SCRIPT
+    There's also a script "gearman_driver.pl" which is installed with this
+    distribution. It just instantiates Gearman::Driver with its default
+    values, having most of the options exposed to the command line using
+    MooseX::Getopt.
+
+        usage: gearman_driver.pl [long options...]
+                --loglevel          Log level (default: INFO)
+                --lib               Example: --lib ./lib --lib /custom/lib
+                --server            Gearman host[:port][,host[:port]]
+                --logfile           Path to logfile (default: gearman_driver.log)
+                --console_port      Port of management console (default: 47300)
+                --interval          Interval in seconds (see Gearman::Driver::Observer)
+                --loglayout         Log message layout (default: [%d] %p %m%n)
+                --namespaces        Example: --namespaces My::Workers --namespaces My::OtherWorkers
+                --configfile        Read options from this file. Example: --configfile ./etc/gearman-driver-config.yml
+                --daemonize         Run as daemon.
+
+AUTHOR
+    Johannes Plunien <plu@cpan.org>
+
+CONTRIBUTORS
+    Uwe Voelker, <uwe.voelker@gmx.de>
+
+    Night Sailer <nightsailer@gmail.com>
+
+    Robert Bohne, <rbo@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2009 by Johannes Plunien
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   Gearman::Driver::Adaptor
+
+    *   Gearman::Driver::Console
+
+    *   Gearman::Driver::Console::Basic
+
+    *   Gearman::Driver::Console::Client
+
+    *   Gearman::Driver::Job
+
+    *   Gearman::Driver::Job::Method
+
+    *   Gearman::Driver::Loader
+
+    *   Gearman::Driver::Observer
+
+    *   Gearman::Driver::Worker
+
+    *   Gearman::XS
+
+    *   Gearman
+
+    *   Gearman::Server
+
+    *   Log::Log4perl
+
+    *   Module::Find
+
+    *   Moose
+
+    *   MooseX::Getopt
+
+    *   MooseX::Log::Log4perl
+
+    *   MooseX::MethodAttributes
+
+    *   Net::Telnet::Gearman
+
+    *   POE
+
+    *   <http://www.gearman.org/>
+
+REPOSITORY
+    <http://github.com/plu/gearman-driver/>
+

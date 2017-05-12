@@ -1,0 +1,64 @@
+
+############################################################################## 
+OpenGL::Font::2D - load and render 2D fonts with OpenGL
+
+DESCRIPTION
+===========
+
+This package provides you with 2D font support for your OpenGL applications.
+
+For some background information, as well reasoning why this was developed and
+why in this way, browse to:
+
+	http://bloodgate.com/perl/sdl/game.html
+
+See the above URL for examples on how to use this code. The distribution
+contains an example, this uses SDL::App::FPS as a framework. So you will need
+SDL::App::FPS for the example, but you could also use this module stand-alone.
+
+Prerequisites
+=============
+
+You need SDL, SDL_image and SDL_perl v1.20.2 to use this.
+
+Installation
+============
+
+* untar/ungzip the package (replace 0.04 with the version you got)
+
+	tar -xzf Games-OpenGL-Font-2D-0.04.tar.gz
+
+* Check the signature. Download my key from http://bloodgate.com/tels.asc or
+  from my CPAN directory. Then do in the build directory (where you unwrapped
+  stuff):
+
+	cpansign -v
+
+* if the signature verifies OK, proceed. Otherwise NOTIFY ME IMMIDIATELY. Do
+  NOT INSTALL THE PACKAGE! Your system might get compromised!
+
+* Build the make file:
+
+	perl Makefile.PL
+
+* Make the project
+
+	make
+
+* Run the tests:
+
+	make test
+
+* If some tests fail, please notify me.
+
+* If all tests pass, install as root:
+
+	su
+	[enter password]
+	make install
+	exit
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

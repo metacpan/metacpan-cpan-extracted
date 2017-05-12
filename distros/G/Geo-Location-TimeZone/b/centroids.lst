@@ -1,0 +1,848 @@
+# Lat	Lon	Timezone	Effective-Radius
+# Lat, Lon and Radius must have a decimal point in them.
+# Oceans first.
+# Found via Wikipedia
+-66.283333	110.533333	Antartica/Casey
+-68.583333	77.966667	Antartica/Davis
+-66.666667	140.016667	Antartica/DumontDUrville
+-67.6		62.883333	Antartica/Mawson
+-77.7		166.6		Antarctica/McMurdo
+-64.77		-64.05		Antartica/Palmer
+-67.566667	-68.133333	Antartica/Rothera
+# South Pole gets repeated to be in all longitudes.
+-89.9		0.0		Antartica/South_Pole
+-89.9		15.0		Antartica/South_Pole
+-89.9		30.0		Antartica/South_Pole
+-89.9		45.0		Antartica/South_Pole
+-89.9		60.0		Antartica/South_Pole
+-89.9		75.0		Antartica/South_Pole
+-89.9		90.0		Antartica/South_Pole
+-89.9		105.0		Antartica/South_Pole
+-89.9		120.0		Antartica/South_Pole
+-89.9		135.0		Antartica/South_Pole
+-89.9		150.0		Antartica/South_Pole
+-89.9		165.0		Antartica/South_Pole
+-89.9		179.9		Antartica/South_Pole
+-89.9		-15.0		Antartica/South_Pole
+-89.9		-30.0		Antartica/South_Pole
+-89.9		-45.0		Antartica/South_Pole
+-89.9		-60.0		Antartica/South_Pole
+-89.9		-75.0		Antartica/South_Pole
+-89.9		-90.0		Antartica/South_Pole
+-89.9		-105.0		Antartica/South_Pole
+-89.9		-120.0		Antartica/South_Pole
+-89.9		-135.0		Antartica/South_Pole
+-89.9		-150.0		Antartica/South_Pole
+-89.9		-165.0		Antartica/South_Pole
+-89.9		-179.9		Antartica/South_Pole
+-66.0		39.583333	Antartica/Syowa
+-66.0		39.583333	Antartica/Syowa
+-77.0		105.0		Antartica/Vostok
+# Just one item in POSIX Artic series.
+78.2166667	15.6333333	Artic/Longyearbyen
+# from wikipedia
+38.6		-27.15		Atlantic/Azores
+# another right across the border
+36.6		-27.15		Atlantic/Azores
+32.0		-64.7		Atlantic/Bermuda
+28.10		-15.4		Atlantic/Canary
+14.916667	-23.516667	Atlantic/Cape_Verde
+62.0		-6.783		Atlantic/Faeroe
+70.97		-8.6		Atlantic/Jan_Mayen
+-32.3		-16.3		Atlantic/Madeira
+64.15		-21.95		Atlantic/Reykjavik
+# another right across the border
+64.15		-23.95		Atlantic/Reykjavik
+-54.1561111	-36.7161111	Atlantic/South_Georgia
+-54.2766667	-36.5116667	Atlantic/South_Georgia
+# Edinburgh, Tristan da Cunha, St Helena
+-37.05		-12.3		Atlantic/St_Helena
+# An extra right across the border
+-38.05		-12.3		Atlantic/St_Helena
+# Jamestown, St Helena Island, St Helena
+-15.9333333	-5.7166667	Atlantic/St_Helena
+# Georgetown, Ascension Island, St Helena
+-7.9333333	-14.4166667	Atlantic/St_Helena
+# An extra item just the other side of the 15x15 border.
+-7.3		-14.4166667	Atlantic/St_Helena
+-8.0		-14.4166667	Atlantic/St_Helena
+-51.7		-57.85		Atlantic/Stanley
+# Pacific Ocean
+-13.8333333	-171.7333333	Pacific/Apia
+Found 2 matches for auckland
+-36.8666667	174.7666667	Pacific/Auckland
+# from wikipedia
+-43.9		-176.3		Pacific/Chatham
+34.6455556	-102.3963	Pacific/Easter
+-16.69		168.36		Pacific/Efate
+-3.13		-171.08		Pacific/Enderbury
+-9.416667	-171.25		Pacific/Fakaofo
+-18.166667	178.45		Pacific/Fiji
+-8.5166667	179.2166667	Pacific/Funafuti
+0.35		-78.7333333	Pacific/Galapagos
+-23.346111	-134.474444	Pacific/Gambier
+-9.580777	160.208817	Pacific/Guadalcanal
+13.5		144.5		Pacific/Guam
+21.3069444	-157.8583333	Pacific/Honolulu
+16.75		-169.516667	Pacific/Johnston
+1.87558		-157.701187	Pacific/Kiritimati
+# Trivia; the 'Lost' numbers are near here. 
+5.33		163.0		Pacific/Kosrae
+8.716667	167.73		Pacific/Kwajalein
+7.06		171.26		Pacific/Majuro
+7.1		171.3833333	Pacific/Majuro
+-28.8166667	-70.3666667	Pacific/Marquesas
+28.2166		-177.366	Pacific/Midway
+-0.533333	166.91666	Pacific/Nauru
+-19.063333	-169.869722	Pacific/Niue
+17.9		-77.6833333	Pacific/Norfolk
+-22.2666667	166.45		Pacific/Noumea
+-14.2780556     -170.7025000    Pacific/Pago_Pago
+27.9166667	-101.4166667	Pacific/Palau
+# Hi Simon and Shirley!
+-25.066667	-130.1		Pacific/Pitcairn
+6.9638889	158.2083333	Pacific/Ponape
+-9.4647222      147.1925        Pacific/Port_Moresby
+# Copy across the border
+-6.5		147.1		Pacific/Port_Moresby
+-8.5		141.5		Pacific/Port_Moresby
+-6.5		141.5		Pacific/Port_Moresby
+-21.0		-160.0		Pacific/Rarotonga
+# Saipan
+15.183		145.75		Pacific/Saipan
+# Samoa
+# Apia, Samoa
+-13.583333	-172.333333	Pacific/Samoa
+-17.666667	-149.45		Pacific/Tahiti
+-0.8833333	169.5333333	Pacific/Tarawa
+-21.211389	-175.153056	Pacific/Tongatapu
+7.0		152.0		Pacific/Truk
+19.3		166.633		Pacific/Wake
+-13.167		-176.133	Pacific/Wallis
+9.533		138.1166	Pacific/Yap
+
+# Land Masses.  Australia first.
+-35.282778	149.131389	Australia/ACT
+-34.9333333	138.6	 Australia/Adelaide
+# Brisbane
+# au,brisbane,Brisbane,04,-27.5,153.0166667
+-27.5   153.0166667     Australia/Brisbane
+# Broken_Hill
+# au,broken hill,Broken Hill,02,-31.95,141.4333333
+-31.95  141.4333333     Australia/Broken_Hill
+-35.282778	149.131389	Australia/Canberra
+Found 8 matches for currie
+-39.9333333	143.8666667	 Australia/Currie
+# Darwin
+# au,darwin,Darwin,03,-12.4666667,130.8333333
+-12.466		130.833		Australia/Darwin
+Found 13 matches for hobart
+-42.9166667	147.3333333	Australia/Hobart
+-20.45		149.033333	Australia/Lindeman
+-31.555556	159.088889	Australia/Lord_Howe
+Found 11 matches for melbourne
+-37.8166667	144.9666667	 Australia/Melbourne
+-21.0		130.833		Australia/North
+# Perth
+# au,perth,Perth,08,-31.9333333,115.8333333
+-31.9333333     115.8333333     Australia/Perth
+Found 7 matches for sydney
+-33.8833333	151.2166667	 Australia/Sydney
+-30.9333333	138.6	 Australia/South
+-20.0		142.0		Australia/Queensland
+-30.0		120.0		Australia/West
+-20.0		120.0		Australia/West
+-30.0		128.0		Australia/West
+-20.0		128.0		Australia/West
+
+52.3	4.8	Europe/Amsterdam
+56.3	4.8	Europe/Amsterdam
+Denmark
+60.6	7.4	 Europe/Copenhagen
+# [[7.5,55.2489852905273],[7.5,52.5],[4.55341181162739,52.5],[4.69843530654907,53.0724601745605],[5.02363443374634,53.3357162475586],[5.49594640731812,53.4673461914062],[6.26248645782471,53.5215454101562],[6.86642646789551,53.6918869018555],[7.49904346466064,53.7906532287598],[7.49904346466064,57.9596252441406],[7.01353979110718,57.9736709594727],[6.59542751312256,58.051097869873],[5.68177366256714,58.4846954345703],[5.4572319984436,58.6860122680664],[5.10880470275879,59.1660652160645],[4.93071985244751,60.2500610351562],[4.65197801589966,60.7456016540527],[4.5900354385376,61.0166015625],[4.79909181594849,61.8683128356934],[5.03911924362183,62.1935119628906],[7.5,63.2501265938743],[7.5,67.4533233642578],[7.5,55.2489852905273],],
+50.0    -57.0	America/St_Johns
+52.7    -56.5	America/St_Johns
+41.3275	19.8188889	Europe/Tirane
+41.0186111	28.9647222	Europe/Istanbul
+Found 14 matches for amsterdam
+52.35	4.9166667	 Europe/Amsterdam
+Found 4 matches for prague
+50.0833333	14.4666667	 Europe/Prague
+Found 2 matches for helsinki
+60.1755556	24.9341667	 Europe/Helsinki
+60.6	21.4333333	 Europe/Helsinki
+Found 27 matches for london
+51.5	-0.1166667	 Europe/London
+Found 1 matches for chisinau
+47.0055556	28.8575	 Europe/Chisinau
+Found 19 matches for warsaw
+52.25	21.0	 Europe/Warsaw
+Found 1 matches for yerevan
+40.1811111	44.5136111	Asia/Yerevan
+Found 1 matches for uzhgorod
+48.6166667	22.3	 Europe/Uzhgorod
+Found 1 matches for yekaterinburg
+56.85	60.6	Asia/Yekaterinburg
+Found 3 matches for oslo
+59.9166667	10.75	 Europe/Oslo
+Found 3 matches for krasnoyarsk
+# 56.0097222	92.7916667	Asia/Krasnoyarsk
+# 51.4316667	60.1458333	Asia/Krasnoyarsk
+# 47.3666667	142.5333333	Asia/Krasnoyarsk
+Found 25 matches for cairo
+30.05	31.25	 Africa/Cairo
+XXXX
+Found 3 matches for minsk
+# 53.9	27.5666667	 Europe/Minsk
+# 52.1833333	21.5666667	 Europe/Minsk
+# 57.0997222	93.335	 Europe/Minsk
+Found 1 matches for vladivostok
+43.1333333	131.9	 Asia/Vladivostok
+Found 2 matches for kaliningrad
+# 54.71	20.5	 Europe/Kaliningrad
+# 55.9141667	37.8255556	 Europe/Kaliningrad
+Found 14 matches for riga
+56.95	24.1	 Europe/Riga
+Found 24 matches for rome
+41.9	12.4833333	Europe/Rome
+Found 1 matches for luxembourg
+49.6116667	6.13	 Europe/Luxembourg
+Found 3 matches for magadan
+45.4	26.3833333	Asia/Magadan
+Found 20 matches for lisbon
+38.7166667	-9.1333333	 Europe/Lisbon
+Found 1 matches for tallinn
+59.4338889	24.7280556	 Europe/Tallinn
+Found 69 matches for berlin
+54.0333333	10.45	 Europe/Berlin
+52.5166667	13.4	 Europe/Berlin
+Found 24 matches for dublin
+53.3330556	-6.2488889	Europe/Dublin
+52.5744444	-7.5502778	Europe/Dublin
+XXXX
+Found 26 matches for gibraltar
+36.1333333	-5.35	 Europe/Gibraltar	1.0
+Found 26 matches for malta
+# Wikipedia
+35.6	14.3	Europe/Malta
+Found 4 matches for andorra
+42.5	1.5166667	 Europe/Andorra		2.0
+Found 23 matches for moscow
+55.7522222	37.6155556	 Europe/Moscow
+Found 9 matches for belgrade
+44.8186111	20.4680556	 Europe/Belgrade
+Found 12 matches for gaza
+31.3		34.3		 Asia/Gaza
+Found 2 matches for novosibirsk
+55.0411111	82.9344444	Asia/Novosibirsk
+Found 19 matches for madrid
+40.4	-3.6833333	 Europe/Madrid
+Found 3 matches for brussels
+50.8333333	4.3333333	 Europe/Brussels
+Found 4 matches for copenhagen
+55.6666667	12.5833333	 Europe/Copenhagen
+Found 1 matches for amman
+31.95	35.9333333	 Asia/Amman
+Found 2 matches for beirut
+33.8719444	35.5097222	Asia/Beirut
+Found 1 matches for irkutsk
+52.2666667	104.3333333	 Asia/Irkutsk
+Found 22 matches for chatham
+Found 11 matches for madeira
+XXXX
+Found 7 matches for zaporozhye
+46.9588889	35.0402778	 Europe/Zaporozhye
+Found 1 matches for simferopol
+44.95	34.1	 Europe/Simferopol
+Found 1 matches for yakutsk
+62.0338889	129.7330556	Asia/Yakutsk
+Found 19 matches for vienna
+48.2	16.3666667	 Europe/Vienna
+Found 4 matches for hovd
+49.3	90.5166667	 Asia/Hovd
+48.0166667	91.6333333	 Asia/Hovd
+44.6666667	102.1666667	 Asia/Hovd
+49.2666667	90.9	 Asia/Hovd
+Found 3 matches for budapest
+47.5	19.0833333	 Europe/Budapest
+Found 7 matches for zurich
+47.3666667	8.55	 Europe/Zurich
+Found 6 matches for sakhalin
+# 54.1325	30.2522222	Asia/Sakhalin
+# 53.3333333	77.9166667	Asia/Sakhalin
+# 54.2	56.3	Asia/Sakhalin
+# 52.4258333	32.9041667	Asia/Sakhalin
+# 46.5822222	40.3794444	Asia/Sakhalin
+# 54.4333333	48.0666667	Asia/Sakhalin
+Found 1 matches for choibalsan
+48.0666667	114.5	 Asia/Choibalsan
+Found 42 matches for paris
+48.8666667	2.3333333	 Europe/Paris
+45.6333333	5.7333333	 Europe/Paris
+Found 12 matches for kamchatka
+54.85	99.65	 Asia/Kamchatka
+63.7166667	58.1166667	 Asia/Kamchatka
+44.7075	37.6316667	 Asia/Kamchatka
+55.1202778	90.8627778	 Asia/Kamchatka
+55.8894444	63.7013889	 Asia/Kamchatka
+54.7333333	45.4666667	 Asia/Kamchatka
+55.7166667	38.2166667	 Asia/Kamchatka
+56.3666667	71.2833333	 Asia/Kamchatka
+54.1166667	53.0	 Asia/Kamchatka
+54.0822222	33.3911111	 Asia/Kamchatka
+58.6166667	38.9166667	 Asia/Kamchatka
+Found 1 matches for vilnius
+54.6833333	25.3166667	 Europe/Vilnius
+Found 2 matches for nicosia
+35.1666667	33.3666667	 Asia/Nicosia
+Found 21 matches for samara
+53.2	50.15	 Europe/Samara
+Found 5 matches for baghdad
+33.3386111	44.3938889	Asia/Baghdad
+Found 1 matches for ulaanbaatar
+47.9166667	106.9166667	Asia/Ulaanbaatar
+Found 2 matches for kiev
+50.4333333	30.5166667	 Europe/Kiev
+Found 1 matches for bucharest
+44.4333333	26.1	 Europe/Bucharest
+Found 14 matches for damascus
+33.5	36.3	 Asia/Damascus
+Found 1 matches for vaduz
+47.1333333	9.5166667	 Europe/Vaduz
+Found 1 matches for omsk
+55.0	73.4	 Asia/Omsk
+Found 1 matches for volgograd
+48.8047222	44.5858333	 Europe/Volgograd
+Found 9 matches for baku
+40.3952778	49.8822222	 Asia/Baku
+Found 8 matches for stockholm
+61.8830556	13.75	 Europe/Stockholm
+59.3333333	18.05	 Europe/Stockholm
+56.1333333	13.4166667	 Europe/Stockholm
+Found 13 matches for sofia
+42.6833333	23.3166667	 Europe/Sofia
+Found 1 matches for anadyr
+64.75	177.4833333	Asia/Anadyr
+Found 1 matches for istanbul
+41.0186111	28.9647222	 Europe/Istanbul
+Found 1 matches for tirane
+41.3275	19.8188889	 Europe/Tirane
+Found 24 matches for athens
+37.9833333	23.7333333	 Europe/Athens
+Found 5 matches for monaco
+43.7333333	7.4166667	 Europe/Monaco	1.0
+Found 3 matches for menominee
+# 42.4877778	-90.5330556	 America/Menominee
+# 45.1077778	-87.6141667	 America/Menominee
+# 42.7869444	-97.3741667	 America/Menominee
+Found 11 matches for knox
+41.2958333	-86.6250000	 America/Indiana/Knox
+Found 5 matches for cuiaba
+# -2.5333333	-66.3833333	 America/Cuiaba
+# -15.5833333	-56.0833333	 America/Cuiaba
+# -18.4166667	-43.8166667	 America/Cuiaba
+# -22.3	-52.1	 America/Cuiaba
+# -9.7	-37.8166667	 America/Cuiaba
+Found 32 matches for petersburg
+38.4919444	-87.2786111	 America/Indiana/Petersburg
+Found 1 matches for yakutat
+59.5469444	-139.7272222	America/Yakutat
+Found 7 matches for adak
+51.8800000	-176.6580556	America/Adak
+Found 2 matches for vancouver
+49.25	-123.1333333	 America/Vancouver
+Found 3 matches for boise
+# 43.6136111	-116.2025000	America/Boise
+# 35.2144444	-102.8591667	America/Boise
+# 47.1805556	-122.0144444	America/Boise
+Found 3 matches for juneau
+# 58.3019444	-134.4197222	 America/Juneau
+# 40.8883333	-78.9627778	 America/Juneau
+# 43.4055556	-88.7050000	 America/Juneau
+Found 4 matches for whitehorse
+60.7166667	-135.05	America/Whitehorse
+# 35.8111111	-107.7472222	America/Whitehorse
+# 39.9897222	-75.4688889	America/Whitehorse
+# 45.2705556	-100.8861111	America/Whitehorse
+Found 7 matches for chihuahua
+# 32.4844444	-115.2388889	 America/Chihuahua
+# 16.025	-91.975	 America/Chihuahua
+# 28.6333333	-106.0833333	 America/Chihuahua
+# 25.1833333	-99.75	 America/Chihuahua
+# 27.4666667	-110.3166667	 America/Chihuahua
+# -5.2266667	-79.9961111	 America/Chihuahua
+# 26.2247222	-98.4133333	 America/Chihuahua
+Found 4 matches for thule
+# 51.7166667	8.5833333	 America/Thule
+# 77.4894444	-69.3322222	 America/Thule
+# 76.55	-68.8	 America/Thule
+# 50.8666667	18.15	 America/Thule
+Found 1 matches for scoresbysund
+70.4833333	-21.9666667	America/Scoresbysund
+Found 1 matches for moncton
+46.0833333	-64.7666667	 America/Moncton
+Found 32 matches for asuncion
+# -16.8833333	-65.1166667	 America/Asuncion
+# -11.7666667	-67.8333333	 America/Asuncion
+# -17.85	-60.1666667	 America/Asuncion
+# 11.2538889	-73.2630556	 America/Asuncion
+# 9.9833333	-84.1666667	 America/Asuncion
+# 9.9	-83.1666667	 America/Asuncion
+# 22.3166667	-80.8166667	 America/Asuncion
+# 22.5	-80.15	 America/Asuncion
+# -3.2	-79.25	 America/Asuncion
+# -1.65	-79.0333333	 America/Asuncion
+# -2.9166667	-79.8	 America/Asuncion
+# -2.4833333	-78.1666667	 America/Asuncion
+# 14.3308333	-89.7108333	 America/Asuncion
+# 14.9166667	-91.7	 America/Asuncion
+# 13.5666667	-87.0333333	 America/Asuncion
+# 28.6	-106.1166667	 America/Asuncion
+# 28.65	-100.7166667	 America/Asuncion
+# 19.2166667	-98.9	 America/Asuncion
+# 16.1902778	-97.1091667	 America/Asuncion
+# 12.15	-85.5166667	 America/Asuncion
+# -6.0	-77.6666667	 America/Asuncion
+# -7.3166667	-78.5333333	 America/Asuncion
+# -9.4166667	-76.05	 America/Asuncion
+# -11.6833333	-76.5666667	 America/Asuncion
+# -6.2833333	-75.7333333	 America/Asuncion
+# 8.3086111	125.7136111	 America/Asuncion
+# 7.5341667	125.7666667	 America/Asuncion
+# 15.1	120.8166667	 America/Asuncion
+# 10.1338889	124.8613889	 America/Asuncion
+# -25.2666667	-57.6666667	 America/Asuncion
+# 35.5150000	-120.6783333	 America/Asuncion
+# 8.4386111	-61.6044444	 America/Asuncion
+Found 8 matches for anchorage
+61.2180556	-149.9002778	 America/Anchorage
+# Copying to get all of the zone across 15x15 boundaries.
+61.2	-158.0	 America/Anchorage
+68.2	-158.0	 America/Anchorage
+51.2	-158.0	 America/Anchorage
+61.2	-173.0	 America/Anchorage
+68.2	-149.0	 America/Anchorage
+51.2	-149.0	 America/Anchorage
+56.2	178.0	 America/Anchorage
+Found 1 matches for yellowknife
+62.45	-114.35	 America/Yellowknife
+Found 1 matches for miquelon
+47.0975	-56.3813889	 America/Miquelon
+Found 14 matches for merida
+# 7.1605556	-73.6183333	 America/Merida
+# 22.1886111	-79.2036111	 America/Merida
+# 38.9166667	-6.3333333	 America/Merida
+# 32.6586111	-114.9180556	 America/Merida
+# 18.15	-90.85	 America/Merida
+# 16.1	-93.3416667	 America/Merida
+# 24.55	-98.9166667	 America/Merida
+# 20.9666667	-89.6166667	 America/Merida
+# 12.6166667	-87.0833333	 America/Merida
+# 11.4333333	-85.5666667	 America/Merida
+# 10.9105556	124.5363889	 America/Merida
+# 12.2833333	124.7333333	 America/Merida
+# 47.2427778	-100.9288889	 America/Merida
+# 8.5983333	-71.145	 America/Merida
+Found 5 matches for edmonton
+53.55	-113.5	 America/Edmonton
+XXXX
+Found 14 matches for halifax
+44.65	-63.6	 America/Halifax
+Found 2 matches for tijuana
+32.5333333	-117.0166667	 America/Tijuana
+# 25.25	-111.1333333	 America/Tijuana
+Found 25 matches for palmer (Antarctica/Palmer)
+Found 29 matches for monterrey
+# -37.2666667	-72.75	 America/Monterrey
+# 8.6297222	-75.7652778	 America/Monterrey
+# 12.2166667	-71.2833333	 America/Monterrey
+# 10.5	-74.2333333	 America/Monterrey
+# 8.5444444	-72.7291667	 America/Monterrey
+# 6.8438889	-73.6897222	 America/Monterrey
+# 3.8502778	-76.2558333	 America/Monterrey
+# 4.8783333	-72.8972222	 America/Monterrey
+# 10.55	-84.6666667	 America/Monterrey
+# 9.75	-84.1166667	 America/Monterrey
+# 23.0977778	-82.3141667	 America/Monterrey
+# -2.0166667	-79.7333333	 America/Monterrey
+# 43.5	-6.0666667	 America/Monterrey
+# 41.95	-7.4166667	 America/Monterrey
+# 15.5833333	-87.8833333	 America/Monterrey
+# 14.8666667	-86.9833333	 America/Monterrey
+# 32.5480556	-115.0705556	 America/Monterrey
+# 18.0305556	-91.975	 America/Monterrey
+# 16.0833333	-93.3833333	 America/Monterrey
+# 25.4833333	-103.6166667	 America/Monterrey
+# 25.6666667	-100.3166667	 America/Monterrey
+# 25.6666667	-107.45	 America/Monterrey
+# 29.2166667	-110.7666667	 America/Monterrey
+# 17.8833333	-93.5833333	 America/Monterrey
+# 26.0333333	-98.0833333	 America/Monterrey
+# -9.4666667	-77.5166667	 America/Monterrey
+# 18.4233333	-66.3138889	 America/Monterrey
+# 9.4719444	-64.4761111	 America/Monterrey
+# 10.7155556	-69.1977778	 America/Monterrey
+Found 2 matches for winnipeg
+49.8833333	-97.1666667	 America/Winnipeg
+Found 9 matches for chicago
+41.8500000	-87.6500000	 America/Chicago
+Found 140 matches for santiago (America/Santiago)
+Found 4 matches for vincennes
+38.6772222	-87.5286111	 America/Indiana/Vincennes
+Found 21 matches for denver
+39.7391667	-104.9841667	 America/Denver
+Found 1 matches for inuvik
+68.35	-133.7	 America/Inuvik
+Found 18 matches for center
+47.1163889	-101.2991667	 America/North_Dakota/Center
+Found 8 matches for mazatlan
+# 14.8666667	-92.45	 America/Mazatlan
+# 17.45	-99.4833333	 America/Mazatlan
+# 19.45	-103.8	 America/Mazatlan
+# 21.15	-104.9666667	 America/Mazatlan
+# 16.1166667	-95.45	 America/Mazatlan
+# 23.2166667	-106.4166667	 America/Mazatlan
+# 29.0	-110.1333333	 America/Mazatlan
+# 12.0166667	-86.3333333	 America/Mazatlan
+Found 20 matches for dawson
+64.0666667	-139.4166667	 America/Dawson
+Found 6 matches for nome
+# 64.5011111	-165.4063889	 America/Nome
+# 46.6777778	-97.8100000	 America/Nome
+# 30.0355556	-94.4241667	 America/Nome
+Found 5 matches for bermuda
+# 13.8713889	-89.0375	 Atlantic/Bermuda
+# 31.4872222	-87.1883333	 Atlantic/Bermuda
+# 31.4888889	-84.4916667	 Atlantic/Bermuda
+# 31.6622222	-93.0036111	 Atlantic/Bermuda
+# -30.15	26.7333333	 Atlantic/Bermuda
+Found 1 matches for cancun
+21.1666667	-86.8333333	 America/Cancun
+Found 26 matches for montevideo
+# -12.95	-64.7	America/Montevideo
+# -10.0833333	-65.7166667	America/Montevideo
+# -14.7333333	-61.9166667	America/Montevideo
+# -5.3166667	-43.9166667	America/Montevideo
+# -20.3166667	-69.8666667	America/Montevideo
+# 7.7	-75.4833333	America/Montevideo
+# 8.1713889	-76.0266667	America/Montevideo
+# 7.3213889	-73.2972222	America/Montevideo
+# 9.3833333	-75.1166667	America/Montevideo
+# 3.4225	-74.925	America/Montevideo
+# 5.9333333	-72.1666667	America/Montevideo
+# 15.7166667	-86.9	America/Montevideo
+# 25.0	-101.3666667	America/Montevideo
+# 23.2166667	-100.0166667	America/Montevideo
+# 7.4166667	-80.5166667	America/Montevideo
+# -6.6333333	-77.7166667	America/Montevideo
+# -7.2	-79.5166667	America/Montevideo
+# -22.2333333	-57.6333333	America/Montevideo
+# 34.2722222	-82.8219444	America/Montevideo
+# 39.1625000	-76.7672222	America/Montevideo
+# 44.9425000	-95.7233333	America/Montevideo
+# 38.3644444	-78.7697222	America/Montevideo
+# -34.8580556	-56.1708333	America/Montevideo
+# 9.55	-65.8	America/Montevideo
+# 9.8705556	-70.13	America/Montevideo
+# 10.1	-65.7666667	America/Montevideo
+Found 4 matches for godthab
+# 56.4166667	10.75	 America/Godthab
+# 56.9833333	9.8166667	 America/Godthab
+# 55.6833333	11.4	 America/Godthab
+# 64.1833333	-51.75	 America/Godthab
+XXXX
+5.3411111	-4.0280556	Africa/Abidjan
+5.55		-0.2166667	Africa/Accra
+-26.6166667	24.0666667	Africa/Algiers
+15.3333333	38.9333333	Africa/Asmara
+# Bamako
+# ml,bamako,Bamako,01,12.65,-8.0
+# sn,bamako,Bamako,11,12.8666667,-14.0833333
+# bf,bamako,Bamako,48,10.9333333,-3.3333333
+# bf,bamako,Bamako,55,10.55,-4.45
+# Bangui
+# gn,bangui,Bangui,22,12.1,-12.75
+# ne,bangui,Bangui,06,13.6736111,6.1988889
+13.4530556	-16.5775	Africa/Banjul
+11.85		-15.5833333	Africa/Bissau
+-15.7833333	35.0		Africa/Blantyre
+-3.3761111	29.36		Africa/Bujumbura
+9.5091667	-13.7122222	Africa/Conakry
+14.6708333	-17.4380556	Africa/Dakar
+11.595		43.1480556	Africa/Djibouti
+9.0166667	-7.9833333	Africa/Douala
+7.8327778	-8.8808333	Africa/Douala
+# Freetown
+# sl,freetown,Freetown,04,8.49,-13.2341667
+# lr,freetown,Freetown,02,5.3447222,-7.5297222
+# lr,freetown,Freetown,09,6.7833333,-8.6666667
+# lr,freetown,Freetown,12,7.0666667,-10.9166667
+-24.6463889	25.9119444	Africa/Gaborone
+-17.8177778	31.0447222	Africa/Harare
+-26.2		28.0833333	Africa/Johannesburg
+# Kampala
+# ug,kampala,Kampala,37,0.3155556,32.5655556
+# zr,kampala,Kampala,07,-2.2,27.75
+# zr,kampala,Kampala,09,2.3,30.5666667
+# zm,kampala,Kampala,06,-14.4166667,31.6166667
+15.5880556	32.5341667	Africa/Khartoum
+-2.3		29.95		Africa/Kigali
+-1.9536111	30.0605556	Africa/Kigali
+# Lagos
+# gh,lagos,Lagos,09,6.0333333,-1.7166667
+# ng,lagos,Lagos,05,6.4530556,3.3958333
+# Lome
+# gw,lome,Lomé,04,12.0666667,-15.3166667
+# gh,lome,Lome,04,5.4166667,-0.75
+# tg,lome,Lomé,18,6.4886111,1.0066667
+# tg,lome,Lomé,24,6.1319444,1.2227778
+# zr,lome,Lome,00,3.1333333,27.1833333
+# et,lome,Lome,10,9.7166667,38.3
+# et,lome,Lome,03,6.1333333,39.3666667
+# Luanda
+# gw,luanda,Luanda,04,12.0666667,-15.3166667
+# gw,luanda,Luanda,05,11.5833333,-15.4833333
+# ke,luanda,Luanda,07,-0.8,34.2166667
+# ke,luanda,Luanda,09,0.3077778,34.0586111
+# zm,luanda,Luanda,03,-15.55,23.1
+# zm,luanda,Luanda,06,-12.5333333,33.1833333
+-11.6666667	27.4666667	Africa/Lubumbashi
+# Lusaka
+# ug,lusaka,Lusaka,71,-0.5283333,31.6552778
+# zr,lusaka,Lusaka,00,-7.1666667,29.45
+# zr,lusaka,Lusaka,04,-6.9666667,25.3166667
+# zm,lusaka,Lusaka,05,-14.8833333,27.9333333
+# zm,lusaka,Lusaka,09,-15.4166667,28.2833333
+# za,lusaka,Lusaka,03,-29.15,26.7666667
+# Malabo
+# bf,malabo,Malabo,32,12.4666667,-0.9
+# zm,malabo,Malabo,02,-13.0,28.6666667
+-25.9652778	32.5891667	Africa/Maputo
+-14.8475	40.7202778	Africa/Maputo
+# Maseru
+# ls,maseru,Maseru,14,-29.3166667,27.4833333
+# za,maseru,Maseru,10,-26.4166667,22.9
+# Mbabane
+# sn,mbabane,Mbabane,10,14.4833333,-15.2666667
+# sz,mbabane,Mbabane,01,-26.3166667,31.1333333
+2.0666667	45.3666667	Africa/Mogadishu
+6.6666667	-9.6666667	Africa/Monrovia
+6.3105556	-10.8047222	Africa/Monrovia
+# Nairobi
+# ke,nairobi,Nairobi,05,-1.2833333,36.8166667
+# tz,nairobi,Nairobi,18,-4.95,38.9333333
+13.6666667	1.7833333	Africa/Niamey
+13.5166667	2.1166667	Africa/Niamey
+18.0863889	-15.9752778	Africa/Nouakchott
+12.3702778	-1.5247222	Africa/Ouagadougou
+-24.4166667	30.0333333	Africa/Windhoek
+# Almaty
+# kz,almaty,Almaty,02,43.25,76.95
+43.25	76.95	Asia/Almaty
+# Aqtau
+# kz,aqtau,Aqtau,12,47.7397222,71.4405556
+47.7397222	71.4405556	Asia/Aqtau
+# Aqtobe
+# kz,aqtobe,Aqtöbe,04,50.2980556,57.1813889
+50.2980556	57.1813889	Asia/Aqtobe
+# kz,aqtobe,Aqtöbe,12,49.8994444,72.4230556
+49.8994444	72.4230556	Asia/Aqtobe
+# Ashgabat
+# tm,ashgabat,Ashgabat,01,37.95,58.3833333
+37.95	58.3833333	Asia/Ashgabat
+# Bahrain
+# pk,bahrain,Bahrain,03,35.2088889,72.5483333
+35.2088889	72.5483333	Asia/Bahrain
+# Bangkok
+# th,bangkok,Bangkok,40,13.75,100.5166667
+13.75	100.5166667	Asia/Bangkok
+# Bishkek
+# kg,bishkek,Bishkek,01,42.8730556,74.6002778
+42.8730556	74.6002778	Asia/Bishkek
+# Brunei
+# bn,brunei,Brunei,00,4.8833333,114.9333333
+4.8833333	114.9333333	Asia/Brunei
+# Calcutta
+# in,calcutta,Calcutta,28,22.5697222,88.3697222
+22.5697222	88.3697222	Asia/Calcutta
+# Chongqing
+# cn,chongqing,Chongqing,33,29.5627778,106.5527778
+29.5627778	106.5527778	Asia/Chongqing
+# Colombo
+# lk,colombo,Colombo,36,6.9319444,79.8477778
+# 6.9319444	79.8477778	Asia/Colombo
+# id,colombo,Colombo,16,-4.5083333,129.8916667
+# -4.5083333	129.8916667	Asia/Colombo
+# Dhaka
+# pk,dhaka,Dhaka,03,34.05,73.2819444
+# 34.05	73.2819444	Asia/Dhaka
+# pk,dhaka,Dhaka,04,29.0666667,70.6
+# 29.0666667	70.6	Asia/Dhaka
+# pk,dhaka,Dhaka,06,34.3111111,73.5319444
+# 34.3111111	73.5319444	Asia/Dhaka
+# bd,dhaka,Dhaka,81,23.7230556,90.4086111
+# 23.7230556	90.4086111	Asia/Dhaka
+# in,dhaka,Dhaka,34,26.6833333,85.1666667
+# 26.6833333	85.1666667	Asia/Dhaka
+# Dili
+# in,dili,Dili,12,32.6680556,74.8833333
+32.6680556	74.8833333	Asia/Dili
+# Dubai
+# ae,dubai,Dubai,03,25.2522222,55.28
+25.2522222	55.28	Asia/Dubai
+# Dushanbe
+# tj,dushanbe,Dushanbe,02,38.56,68.7738889
+38.56	68.7738889	Asia/Dushanbe
+# Harbin
+# cn,harbin,Harbin,08,45.75,126.65
+45.75	126.65	Asia/Harbin
+# Jakarta
+# id,jakarta,Jakarta,06,-6.1744444,106.8294444
+-6.1744444	106.8294444	Asia/Jakarta
+# Jayapura
+# id,jayapura,Jayapura,09,-2.5333333,140.7
+-2.5333333	140.7	Asia/Jayapura
+# Kabul
+# af,kabul,Kabul,13,34.5166667,69.1833333
+# 34.5166667	69.1833333	Asia/Kabul
+# pk,kabul,Kabul,05,26.4166667,69.8833333
+# 26.4166667	69.8833333	Asia/Kabul
+# ph,kabul,Kabul,12,8.5166667,124.95
+# 8.5166667	124.95	Asia/Kabul
+# my,kabul,Kabul,16,4.3666667,116.15
+# 4.3666667	116.15	Asia/Kabul
+# Karachi
+# ru,karachi,Karachi,55,51.715,55.1030556
+# 51.715	55.1030556	Asia/Karachi
+# # pk,karachi,Karachi,05,24.8666667,67.05
+# 24.8666667	67.05	Asia/Karachi
+# # kg,karachi,Karachi,04,41.4166667,74.1
+# 41.4166667	74.1	Asia/Karachi
+# Kashgar
+# cn,kashgar,Kashgar,13,39.3913889,76.04
+# 39.3913889	76.04	Asia/Kashgar
+# kg,kashgar,Kashgar,05,40.6208333,72.8305556
+# 40.6208333	72.8305556	Asia/Kashgar
+# kz,kashgar,Kashgar,01,43.1,79.8166667
+# 43.1	79.8166667	Asia/Kashgar
+# uz,kashgar,Kashgar,01,40.9166667,72.5333333
+# 40.9166667	72.5333333	Asia/Kashgar
+# Katmandu
+# np,katmandu,Katmandu,00,27.7166667,85.3166667
+27.7166667	85.3166667	Asia/Katmandu
+# Kuching
+# my,kuching,Kuching,02,5.9666667,100.55
+# 5.9666667	100.55	Asia/Kuching
+# my,kuching,Kuching,11,1.55,110.3333333
+# 1.55	110.3333333	Asia/Kuching
+# cn,kuching,Kuching,04,31.5194444,120.6744444
+# 31.5194444	120.6744444	Asia/Kuching
+# cn,kuching,Kuching,30,22.35,113.1
+# 22.35	113.1	Asia/Kuching
+# Macau
+# mo,macau,Macau,01,22.2,113.55
+22.2	113.55	Asia/Macau
+# Makassar
+# id,makassar,Makassar,20,2.45,99.7833333
+2.45	99.7833333	Asia/Makassar
+# Manila
+# ph,manila,Manila,05,13.2333333,123.95
+13.2333333	123.95	Asia/Manila
+# ph,manila,Manila,41,12.3663889,121.3380556
+12.3663889	121.3380556	Asia/Manila
+# ph,manila,Manila,A8,8.8055556,125.5672222
+8.8055556	125.5672222	Asia/Manila
+# ph,manila,Manila,D9,14.6041667,120.9822222
+14.6041667	120.9822222	Asia/Manila
+# Muscat
+# om,muscat,Muscat,06,23.6133333,58.5933333
+23.6133333	58.5933333	Asia/Muscat
+# Oral
+# kg,oral,Oral,04,41.8666667,74.3666667
+41.8666667	74.3666667	Asia/Oral
+# Pontianak
+# id,pontianak,Pontianak,11,-0.0333333,109.3333333
+-0.0333333	109.3333333	Asia/Pontianak
+# Pyongyang
+# kp,pyongyang,Pyongyang,12,39.0194444,125.7547222
+39.0194444	125.7547222	Asia/Pyongyang
+# Qyzylorda
+# kz,qyzylorda,Qyzylorda,14,44.8527778,65.5091667
+44.8527778	65.5091667	Asia/Qyzylorda
+# Rangoon
+# mm,rangoon,Rangoon,17,16.7833333,96.1666667
+16.7833333	96.1666667	Asia/Rangoon
+# Saigon
+# vn,saigon,Saigon,20,10.75,106.6666667
+10.75	106.6666667	Asia/Saigon
+# Samarkand
+# uz,samarkand,Samarkand,10,39.6541667,66.9597222
+# 39.6541667	66.9597222	Asia/Samarkand
+# kz,samarkand,Samarkand,12,50.0544444,72.9483333
+# 50.0544444	72.9483333	Asia/Samarkand
+# uz,samarkand,Samarkand,12,38.5833333,68.05
+# 38.5833333	68.05	Asia/Samarkand
+# uz,samarkand,Samarkand,15,40.4333333,67.9666667
+# 40.4333333	67.9666667	Asia/Samarkand
+# Seoul
+# kr,seoul,Seoul,11,37.5663889,126.9997222
+37.5663889	126.9997222	Asia/Seoul
+# Shanghai
+# cn,shanghai,Shanghai,23,31.005,121.4086111
+31.005	121.4086111	Asia/Shanghai
+# Singapore
+# sg,singapore,Singapore,00,1.2930556,103.8558333
+1.2930556	103.8558333	Asia/Singapore
+# Taipei
+# tw,taipei,Taipei,03,25.0391667,121.525
+25.0391667	121.525	Asia/Taipei
+# Tashkent
+# uz,tashkent,Tashkent,13,41.3166667,69.25
+41.3166667	69.25	Asia/Tashkent
+# uz,tashkent,Tashkent,15,40.1333333,68.3666667
+40.1333333	68.3666667	Asia/Tashkent
+# Tbilisi
+# Tehran
+# ir,tehran,Tehran,11,27.4586111,55.4755556
+27.4586111	55.4755556	Asia/Tehran
+# Thimphu
+# bt,thimphu,Thimphu,20,27.4833333,89.6
+27.4833333	89.6	Asia/Thimphu
+# Tokyo
+# jp,tokyo,Tokyo,40,35.685,139.7513889
+35.685	139.7513889	Asia/Tokyo
+# Urumqi
+# cn,urumqi,Ürümqi,13,43.8,87.5833333
+43.8	87.5833333	Asia/Urumqi
+# Vientiane
+# la,vientiane,Vientiane,11,17.9666667,102.6
+17.9666667	102.6	Asia/Vientiane
+22.2833333	114.15	Asia/Hong_Kong
+# Kuala_Lumpur
+# my,kuala lumpur,Kuala Lumpur,14,3.1666667,101.7
+3.1666667       101.7   Asia/Kuala_Lumpur
+# Phnom_Penh
+# kh,phnom penh,Phnom Penh,11,11.55,104.9166667
+11.55   104.9166667     Asia/Phnom_Penh
+# Aden
+# ye,aden,Aden,02,12.7794444,45.0366667
+12.7794444      45.0366667      Asia/Aden
+# Jerusalem
+# il,jerusalem,Jerusalem,06,31.78,35.23
+31.78   35.23   Asia/Jerusalem
+# Kuwait
+# kw,kuwait,Kuwait,02,29.3697222,47.9783333
+29.3697222      47.9783333      Asia/Kuwait
+# Qatar
+# sy,qatar,Qatar,09,36.2333333,37.4833333
+# 36.2333333      37.4833333      Asia/Qatar
+# ir,qatar,Qatar,33,39.1166667,47.5
+# 39.1166667      47.5    Asia/Qatar
+# ir,qatar,Qatar,02,37.0166667,46.3833333
+# 37.0166667      46.3833333      Asia/Qatar
+# Riyadh
+# iq,riyadh,Riyadh,13,35.3,43.9166667
+# 35.3    43.9166667      Asia/Riyadh
+# sa,riyadh,Riyadh,10,24.6408333,46.7727778
+# 24.6408333      46.7727778      Asia/Riyadh
+

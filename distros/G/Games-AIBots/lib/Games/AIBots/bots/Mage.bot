@@ -1,0 +1,321 @@
+$name   = 'Mage';
+$author = 'Bestian Tang';
+$team   = 'Dark Ally';
+
+require '[DarkAlly].bm';
+
+sub chase {
+#    enable shield if &nearst('enemy') > 1;
+    call quaterstaff;
+    call divine;
+    call fireball;
+    if (&nearst('enemy') >= 5) {
+        scan front;
+        if (&found('enemy')) {
+            call fireball;
+        }
+
+        elsif (&found('flag|vault') and &nearst('enemy') > 8) {
+            if ($life == $max_life and &found('flag')) {
+                move backward;
+                fire energy;
+            }
+            call leap;
+        }
+        elsif (&found('fence') and $ammo > 10) {
+            disable shield;
+            fire laser;
+#            enable shield;
+        }
+    }
+
+    redo;
+
+}
+
+sub quaterstaff {
+    if (&nearst('enemy') > 8 and $life < $max_life) {
+        disable shield;
+        attempt repair * 3;
+#        enable shield;
+    }
+
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+    $foe = $enemy_l;
+    attempt destruct if (&inperim('enemy') and $life <= int($enemy_l/2));
+    fire energy if (&inperim('enemy') and $life > 1);
+    if ($enemy_l != $foe - 2) {
+        enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+        disable cloak if &nearst('enemy') > 2;
+        scan perimeter;
+        if (&found('enemy')) {
+            attempt destruct if $life <= int($enemy_l/2);
+            enable cloak;
+            $time = int($enemy_l/2);
+            fire energy * $time;
+            redo;
+        }
+        elsif (&found('flag|vault') and &nearst('enemy') > 4) {
+            call search;
+            redo;
+        }
+        elsif (&found('mine') and $life > 1) {
+            fire energy;
+        }
+        elsif (&found('friend')) {
+            if (int(rand(2))) {
+                call move;
+            }
+            else {
+                call moveb;
+            }
+        }
+        return;
+    }
+
+    return if &nearst('enemy') >= 3;
+    redo;
+}
+
+sub divine {
+    call quaterstaff if &inperim('enemy');
+
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+    }
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+
+    call quaterstaff if &inperim('enemy');
+
+    call retreat if &nearst('enemy') <= 3 and $xx * $yy != 0;
+
+    if ($life > 5 and $fuel >= 600 and $ammo > 5) {
+        call move;
+    }
+
+    elsif ($snode_x ne '') {
+        goto drain;
+    }
+    else {
+        call moveb;
+    }
+
+    call quaterstaff if &inperim('enemy');
+
+    redo if &nearst('enemy') <= 3;
+
+    return;
+}
+
+sub fireball {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+
+    if &inperim('enemy') {
+        call quaterstaff;
+        return;
+    }
+
+    elsif (($enemy_x == $x or $enemy_y == $y) and $enemy_h + $h == 10) {
+        if (&nearst('enemy') <= 2 and $ammo >= 5) {
+            call move;
+        }
+        elsif (&nearst('enemy') <= 6 and $ammo >= 5 and $fuel >= 300 and $enemy_h - $h != 0) {
+            disable shield;
+            fire grenade 5;
+#            enable shield;
+        }
+
+        call moveb;
+        call moveb;
+        call moveb;
+        if (int(rand(2))) {
+            turn right;
+        }
+        else {
+            turn left;
+        }
+
+        call moveb;
+    }
+
+    elsif (($xx == 0 or $yy == 0) and $enemy_h - $h == 0 and &nearst('enemy') <= 5 and $ammo >= 10 and $fuel >= 300) {
+        disable shield;
+        fire bazooka;
+#        enable shield;
+    }
+
+    elsif (((abs($xx) == 1 and $h == 2 | $h == 8) or (abs($yy) == 1 and $h == 4 | $h == 6)) and $enemy_h - $h != 0 and &nearst('enemy') <= 5 and $ammo >= 5 and $fuel >= 300) {
+        disable shield;
+        fire grenade 4;
+#        enable shield;
+        if ($enemy_h + $h == 10) {
+            call moveb;
+            call moveb;
+        }
+    }
+
+    if (&nearst('enemy') <= 3) {
+        if ($ammo < 5) {
+            call move;
+            call move;
+        }
+        else {
+            call divine;
+        }
+    }
+
+    return;
+}
+
+sub leap {
+    $lastammo = $ammo;
+    $lastlife = $life;
+    call move;
+
+    if (&bumped('enemy')) {
+        if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+            call quaterstaff;
+        }
+        else {
+            disable shield;
+            fire laser * 5;
+#            enable shield;
+        }
+    }
+
+    return if &bumped();
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+    return if &nearst('enemy') < 8;
+    redo;
+}
+
+sub move {
+    enable cloak if &nearst('enemy') < 4 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 3;
+    move forward;
+    call quaterstaff if &inperim('enemy');
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+    if (&bumped('enemy')) {
+        if ($enemy_h + $h != 10 and $enemy_h - $h != 0) {
+            call quaterstaff;
+        }
+        else {
+            disable shield;
+            fire laser * 5;
+#            enable shield;
+        }
+    }
+
+    elsif (&bumped()) {
+        if (int(rand(2))) {
+            turn right;
+        }
+        else {
+            turn left;
+        }
+
+        call moveb;
+    }
+
+    return;
+}
+
+sub moveb {
+    enable cloak if &nearst('enemy') < 4 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 3;
+    move backward;
+    call quaterstaff if &inperim('enemy');
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+    if (&bumped('enemy')) {
+        call quaterstaff;
+    }
+
+    elsif (&bumped()) {
+        if (int(rand(2))) {
+            turn right;
+        }
+        else {
+            turn left;
+        }
+        call move;
+    }
+
+    return;
+}
+
+sub retreat {
+    enable shield;
+    if (&nearst('enemy') <= 3) {
+        call moveb;
+        call moveb if (&nearst('enemy') <= 4);
+        redo;
+    }
+    return;
+}
+
+drain: {
+    enable shield;
+    scan perimeter;
+    fire energy if &found('mine');
+    if (&found('enemy')) {
+        fire energy;
+        redo;
+    }
+    elsif (&found('friend')) {
+        call moveb;
+    }
+
+    call search if &found('vault|flag') and &nearst('enemy') > 3;
+
+    if (abs($enemy_x - $snode_x) >= 2 and abs($enemy_y - $snode_y) >= 2) {
+        goto dock if abs($enemy_x - $x) < 2 or abs($enemy_y - $y) < 2;
+        goto go_x if abs($snode_x - $x) > abs($snode_y - $y) - ($h eq '4' or $h eq '6');
+        goto go_y;
+    }
+
+    goto chase if $life == $max_life and $fuel >= 1000 and $ammo >= 10;
+    goto dock;
+}
+
+dock: {
+    $flag = 0;
+    goto dock_x if abs($delta_x = $enemy_x - $x) < 2; # + (&nearst('enemy') <= 5);
+    goto dock_y if abs($delta_y = $enemy_y - $y) < 2; # + (&nearst('enemy') <= 5);
+    goto drain if not &onnode and $snode_x and (abs($enemy_x - $snode_x) >= 2 and abs($enemy_y - $snode_y) >= 2);
+    goto heal;
+}

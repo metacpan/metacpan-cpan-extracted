@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Geo-Raster
+version:            0.65
+abstract:           Perl extension for geospatial rasters
+author:
+    - Ari Jolma <ari.jolma @ aalto.fi>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::Depends:    0
+    ExtUtils::PkgConfig:  0
+    Gtk2:                 0
+build_requires:
+    Test::More:  0
+requires:
+    Geo::GDAL:      0
+    Gtk2::Ex::Geo:  0
+resources:
+    repository:  https://github.com/ajolma/geoinformatica.git/trunk/Geo-Raster
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

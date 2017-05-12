@@ -1,0 +1,49 @@
+Revision history for Gtk2-Ex-TreeMaker
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+        
+0.02 and 0.03
+	Lost in the sea of darkness and confusion. Awaiting new light !
+	
+0.04	Feb 1, 2005
+	Lets start getting serious here!
+	* First decent release
+	* Cleaned up META.yml
+	* Cleaned up MANIFEST
+	* Added attributes like editable, underline etc.
+	
+0.05	Feb 4, 2005
+	* Added a custom attribute called 'hyperlinked'. The mouse pointer changes when moved over a 'hyperlinked' cell. A specified call-back is called when the cell is clicked.
+	* In addition to this custom attribute, any of the attributes of the Gtk2::CellRendererText can also be passed to this widget. (background, editable etc)
+	* Added signal handler for 'cell-clicked', 'cell-edited'. Cleaned up the code defining the signal_connect.
+	* Cleaned up code in other areas too.
+	* Updated documentation.
+	* Updated the MANIFEST to include the /examples.
+	
+0.06	Feb 8, 2005
+	* Fixed the issue with the Makefile.pl
+	* Added tests (40 of them) to verify the model that is being created
+	* (Still to add tests for the UI events, cell-edited, cell-clicked etc)
+	* Cleaned up the API for setting the column_names.
+
+0.07	Feb 11, 2005
+	* Added two more signals (cell-enter and cell-leave)
+	* These signals are applicable only for the 'hyperlinked' cells. Call-back will be called when the mouse enters or leaves a 'hyperlinked' cell.
+	* Updated the example to reflect the new capability
+	* Updated the documentation to reflect the new capability
+
+0.08	Feb 23, 2005
+	* Fixed packaging issues
+	* Fixed bugs related to null values if no attributes are specified
+	* Added more tests
+
+0.09	Sep 08, 2005
+	* Some tests were broken due to the new sort thingy that was added.
+	* Still not sure if this is right... may be I should revert
+	
+0.10	Sep 21, 2005
+	* Added prerequisites to Makefile.PL (to fix broken tests in CPAN)
+
+0.11	May 19, 2006
+	* Fixed a bug in the locate_record() sub

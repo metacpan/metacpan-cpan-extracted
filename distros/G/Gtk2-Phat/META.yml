@@ -1,0 +1,35 @@
+---
+abstract: 'Perl interface to the Phat widget collection'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires:
+  Gtk2::TestHelper: 0
+configure_requires:
+  Cwd: 0
+  ExtUtils::Depends: 0
+  ExtUtils::PkgConfig: 0
+  File::Spec: 0
+  Glib::MakeHelper: 0
+  Gtk2::CodeGen: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gtk2-Phat
+no_index:
+  directory:
+    - inc
+    - ext
+    - inc
+    - t
+    - examples
+provides:
+  Gtk2::Phat:
+    file: lib/Gtk2/Phat.pm
+    version: 0.08
+requires:
+  Gtk2: 0
+  perl: 5.8.0
+version: 0.08

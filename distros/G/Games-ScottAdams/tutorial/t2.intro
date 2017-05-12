@@ -1,0 +1,7 @@
+This stage introduces the first items: one portable (the coin) and one
+not (the sign).
+
+This stage uses the directives from the previous stage, plus
+C<%item>
+and
+C<%getdrop>.

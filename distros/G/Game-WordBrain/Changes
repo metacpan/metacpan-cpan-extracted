@@ -1,0 +1,19 @@
+v0.2.2 2016-07-01
+  - Added missing Test::Deep and Readonly testing deps to dist.ini
+
+v0.2.1 2016-07-01
+  - Added missing Test::Exception testing dep to dist.ini
+
+v0.2.0 2016-06-30
+  - Additional POD Error Fixed (Contribution by Mohammad S Anwar)
+  - Refactored to remove dependency on Text::Aspell
+    - Text::Aspell requires a ton of other deps and it also requires
+      users to install things outside of Perl.
+    - Much easier to use (and test) this module without the need
+      for Text::Aspell
+
+v0.1.1 2016-06-23
+  - Fixed POD error with links in Game::WordBrain
+
+v0.1.0 2016-06-23
+  - Initial CPAN Release of WordBrain Solver

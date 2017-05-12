@@ -1,0 +1,16 @@
+<p>GRIMLOCK CMS</p>
+[% IF c.config.show_debug %]
+<pre>
+[%- USE Dumper %]
+USER: [%
+Dumper.dump(c.user.obj)
+%]
+STASH: [%
+Dumper.dump(c.stash) %]
+</pre>
+[%
+END;
+
+%]
+
+

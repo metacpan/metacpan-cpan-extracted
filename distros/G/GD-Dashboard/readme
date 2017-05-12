@@ -1,0 +1,18 @@
+GD::Dashboard
+=============
+
+The Dashboard module aims at providing users with a quick and
+easy way to create dashboard or cockpit like JPGs to display
+key information.
+
+This distribution contains the module as well
+as some examples.
+
+Examples
+========
+
+Examples are located in the examples directory.
+
+ex1.pl - A simple dashboard with one gauge.
+
+ex2.pl - A dashboard with two horizontal bars.

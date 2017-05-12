@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Geo-Coder-YahooJapan.t
+lib/Geo/Coder/YahooJapan.pm
+META.yml                                 Module meta-data (added by MakeMaker)

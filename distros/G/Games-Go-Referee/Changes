@@ -1,0 +1,18 @@
+Revision history for Perl extension Games::Go::Referee.
+
+0.01  Sun Feb 24 21:56:30 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Games::Go::Referee
+
+0.07 Sun Oct 26 2008
+
+Now correctly interprets AB[aa:bb] type tags
+TODO : check that they correctly define a rectangle.
+
+0.08 
+
+Added tests
+Changed misprint, pointformat now understands 'gtp' not 'gmp'.
+Added logfile method to a specified debugging output file.
+Altered the sgffile method to allow it to handle input Games::Go::SGF objects.
+

@@ -1,0 +1,124 @@
+Getopt-CommandLineExports
+
+Getopt::CommandLineExports - Allow suroutines within a script to export command line options with bash auto completion
+
+
+Example Code:
+
+    use strict;
+    use warnings;
+    use Getopt::CommandLineExports qw(&regAC &parseArgsByPosition &parseArgs
+        &checkArgs $scriptName @exportedSubs %cmdLines);
+
+    $scriptName = qq[TestCommandLineExports];
+    %cmdLines = (
+        twoScalars          => [qw/ ONE=s TWO=s /],
+        oneHash         => [qw/ ONE=s% /],
+        oneList         => [qw/ ONE=s@ /],
+    );
+    sub twoScalars
+    {
+        my %h = (
+            ONE => undef,
+            TWO => undef,
+            ( parseArgs \@_, @{$cmdLines{twoScalars}}),
+        );
+        print "twoScalars missing required argument:\n"
+            . join( "\n", checkArgs \%h ) . "\n"
+            if ( checkArgs \%h );
+        return " $h{ONE} , $h{TWO} \n";
+    }
+
+    sub oneHash
+    {
+        my %h = (
+            ONE => undef,
+            ( parseArgs \@_, @{$cmdLines{oneHash}}),
+        );
+        print "oneHash missing required argument:\n"
+            . join( "\n", checkArgs \%h ) . "\n"
+            if ( checkArgs \%h );
+        print "oneHash\n";
+        print join("\n", (%{$h{ONE}}));
+    }
+
+    sub oneList
+    {
+        my %h = (
+            ONE => undef,
+            ( parseArgs \@_, @{$cmdLines{oneList}}),
+        );
+        print "oneList missing required argument:\n"
+            . join( "\n", checkArgs \%h ) . "\n"
+            if ( checkArgs \%h );
+        print "oneList\n";
+        print join("\n",@{$h{ONE}});
+    }
+
+    # The "Main" subroutine. Not included in package, must be added manually to a script
+    # The following 10 lines of code hook in the included "regAC" function that will
+    # Generate a bash auto completion script (it will try to install it in /etc/bash_completion.d, 
+    # otherwise it will print to stdout).
+    if ( defined $ARGV[0] )
+    {
+        if ( defined( &{ $ARGV[0] } ) )
+        {
+            no strict 'refs';
+            my $subRef = shift @ARGV;
+            print join( "\n", &$subRef(@ARGV) ) . "\n" unless $subRef =~ /regAC/ ;
+            &$subRef($scriptName, \@exportedSubs, \%cmdLines, \%additionalWordCompletions) if $subRef =~ /regAC/ ;
+            exit 0;
+        }
+    }
+
+    # some unit test examples:
+    twoScalars "Hello1", "Hello2";
+    twoScalars {ONE => "Hello1", TWO => "Hello2"};
+    twoScalars "--ONE Hello1 --TWO Hello2";
+    twoScalars "--ONE", "Hello1", "--TWO", "Hello2";
+    twoScalars "--ONE", "Hello1", "--TWO", "Hello2", "--THREE", "Hello3"; # complains about "unknown option: three"
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Getopt::CommandLineExports
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Getopt-CommandLineExports
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Getopt-CommandLineExports
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Getopt-CommandLineExports
+
+    Search CPAN
+        http://search.cpan.org/dist/Getopt-CommandLineExports/
+        
+    Code Repository
+        https://code.google.com/p/getopt-cle/
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2008-2012 Robert Haxton
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

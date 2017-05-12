@@ -1,0 +1,8 @@
+Changes
+lib/GD/Persian.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001_simple_test.pl
+TODO

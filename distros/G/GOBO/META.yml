@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               GOBO
+version:            0.03
+abstract:           Perl library for GO and OBO
+author:
+    - Chris Mungall <cjm@fruitfly.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DateTime::Format::ISO8601:  0
+    List::MoreUtils:      0
+    Moose:                0.81
+    Test::Deep:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

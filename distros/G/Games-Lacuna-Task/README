@@ -1,0 +1,95 @@
+NAME
+    Games::Lacuna::Task - Automation framework for the Lacuna Expanse MMPOG
+
+SYNOPSIS
+        my $task   = Games::Lacuna::Task->new(
+            task    => ['recycle','repair'],
+            config  => {
+                recycle => ...
+            },
+        );
+        $task->run();
+
+    or via commandline (see "lacuna_task" in bin and "lacuna_run" in bin)
+
+DESCRIPTION
+    This module provides a framework for implementing various automation
+    tasks for the Lacuna Expanse MMPOG. It provides
+
+    *   a way of customizing which tasks to run in which order
+
+    *   a convinient command line interface
+
+    *   a logging mechanism
+
+    *   configuration handling
+
+    *   cache for increasing speed and reducing rpc calls
+
+    *   simple access to the Lacuna API (via Games::Lacuna::Client)
+
+    *   many useful helper methods and roles
+
+    *   implements several common tasks
+
+CONFIGURATION
+    Games::Lacuna::Task uses a yaml configuration file which is loaded from
+    the database directory (defaults to ~/.lacuna). The filename should be
+    config.yml or lacuna.yml.
+
+    If you run "lacuna_task" for the first time the programm will guide you
+    through the setup process and create a basic config file.
+
+    Example config.yml
+
+     ---
+     connect:
+       name: "empire_name"          
+       password: "empire_password"  
+       uri: "http://..."            # optional
+       api_key: "a1f9...."          # optional
+     global:
+       task: 
+         - excavate
+         - bleeder
+         - repair
+         - dispose
+       dispose_percentage: 80
+     excavate: 
+       excavator_count: 3
+
+    The data of the configuration file must be a hash with hash keys
+    corresponding to the lowecase task names. The hash key 'global' should
+    be used for global settings.
+
+    global.task specifies which tasks should be run by default and is only
+    used if no tasks have been set explicitly (e.g. via command line).
+
+    global.exclude specifies which tasks should be skipped default and is
+    only used if no tasks have been set explicitly or via config.
+
+    global.exclude_planet and *.exclude_planet can be used to exclude
+    certain bodies from being processed.
+
+    All other values in the global section are used as default values for
+    tasks. (e.g. the 'dispose_percentage' setting can be used by the
+    WasteMonument and the WasteDispose task)
+
+    Username, password, empire name, api key and server url must be stored
+    under the connect key in the config file.
+
+AUTHOR
+        Maroš Kollár
+        CPAN ID: MAROS
+        maros [at] k-1.com
+    
+        L<http://www.revdev.at>
+
+COPYRIGHT
+    Games-Lacuna-Task is Copyright (c) 2012 Maroš Kollár -
+    <http://www.k-1.com>
+
+LICENCE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

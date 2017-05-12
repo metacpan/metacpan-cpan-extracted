@@ -1,0 +1,180 @@
+# ChangeLog for app-portage/mirrorselect
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/mirrorselect/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+*mirrorselect-0.84 (15 Jun 2004)
+
+  15 Jun 2004; <solar@gentoo.org> mirrorselect-0.84.ebuild:
+  security update for bug found by Daniel Drake
+
+  13 May 2004; Michael McCabe <randy@gentoo.org> mirrorselect-0.83.ebuild:
+  Added s390 keywords
+
+  02 May 2004; Tom Gall <tgall@gentoo.org> mirrorselect-0.83.ebuild:
+  stable on ppc64
+
+*mirrorselect-0.83 (21 Mar 2004)
+
+  21 Mar 2004; John Mylchreest <johnm@gentoo.org> mirrorselect-0.82-r2.ebuild,
+  mirrorselect-0.82-r3.ebuild, mirrorselect-0.83.ebuild:
+  fixes up all currently opened bugs in mirrorselect
+
+  07 Mar 2004; Tom Gall <tgall@gentoo.org> mirrorselect-0.82-r3.ebuild:
+  stable on ppc64
+
+  01 Mar 2004; <agriffis@gentoo.org> mirrorselect-0.82-r3.ebuild:
+  stable on alpha and ia64
+
+*mirrorselect-0.82-r3 (02 Feb 2004)
+
+  02 Feb 2004; John Mylchreest <johnm@gentoo.org> mirrorselect-0.82-r3.ebuild,
+  mirrorselect-0.82.ebuild:
+  Bump to use id -u instead of whoami to check for root ID. resolves bug #40201
+
+*mirrorselect-0.82-r2 (25 Jan 2004)
+
+  25 Jan 2004; Brad House <brad_mssw@gentoo.org> mirrorselect-0.82-r2.ebuild:
+  stable on amd64
+
+*mirrorselect-0.82-r1 (29 Sep 2003)
+
+  27 Oct 2003; Guy Martin <gmsoft@gentoo.org> mirrorselect-0.82-r1.ebuild:
+  Marked stable on hppa.
+
+  29 Sep 2003; John Mylchreest <johnm@gentoo.org>; metadata.xml,
+  mirrorselect-0.82-r1.ebuild:
+  adding metadata.xml
+
+*mirrorselect-0.82-r1 (29 Sep 2003)
+
+  29 Sep 2003; John Mylchreest <johnm@gentoo.org>;
+  mirrorselect-0.82-r1.ebuild:
+  Fixes bug 29869 - thanks to evanm@frap.net
+
+  27 Sep 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.7-r1.ebuild,
+  mirrorselect-0.82.ebuild:
+  bumping to stable
+
+*mirrorselect-0.82 (14 Sep 2003)
+
+  14 Sep 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.81.ebuild,
+  mirrorselect-0.82.ebuild:
+  Version bump. fixes #28158 and a few other minors
+
+  21 Aug 2003; Jason Wever <weeve@gentoo.org> mirrorselect-0.81.ebuild:
+  Marked stable for sparc.
+
+  18 Aug 2003; Jason Wever <weeve@gentoo.org> mirrorselect-0.7-r1.ebuild:
+  Marked stable for sparc.
+
+*mirrorselect-0.7-r1 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> mirrorselect-0.7-r1.ebuild,
+  mirrorselect-0.81.ebuild:
+  moved from app-admin to app-portage
+
+  11 Aug 2003; John Mylchreest <johnm@gentoo.org>; :
+  incorrect digest
+
+  11 Aug 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.8.ebuild:
+  Slight fix on deeptest, added support for Xdialog. code cleanups
+
+*mirrorselect-0.8 (09 Aug 2003)
+
+  09 Aug 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.6.ebuild,
+  mirrorselect-0.7-r1.ebuild, mirrorselect-0.8.ebuild:
+  0.7-r1 -> stable, 0.8 added boasting block scan, deeptest and vhost support if
+  bind-utils is installed
+
+  06 Aug 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.7-r1.ebuild:
+  fix quick borkage
+
+*mirrorselect-0.7-r1 (06 Aug 2003)
+
+  06 Aug 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.7-r1.ebuild,
+  mirrorselect-0.7.ebuild:
+  mirror order being returned slowest->fastest, now fastest->slowest
+
+*mirrorselect-0.7 (05 Aug 2003)
+
+  05 Aug 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.5.ebuild,
+  mirrorselect-0.6.ebuild, mirrorselect-0.7.ebuild:
+  Adding support for block-selects. Fixes #25243
+
+*mirrorselect-0.6 (09 Jul 2003)
+ 
+  11 Jul 2003; Daniel Ahlberg <aliz@gentoo.org> :
+  Added missing changelog entry.
+
+  18 May 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.5.ebuild:
+  moved 0.5 to stable to prevent problems im 0.3 surfacing
+
+  15 May 2003; John Mylchreest <johnm@gentoo.org>; :
+  removed debug echo
+
+*mirrorselect-0.5 (13 May 2003)
+
+  13 May 2003; John Mylchreest <johnm@gentoo.org>; mirrorselect-0.5.ebuild:
+  Code Restructure, and RSYNC correction. Automatic RSYNC not supported as yet,
+  until policy is agreed
+
+  12 May 2003; John Mylchreest <johnm@gentoo.org>; :
+  Fixed rsync side of mirrorselect. list needs updating
+
+*mirrorselect-0.4 (11 May 2003)
+  11 May 2003; John Mylchreest <johnm@gentoo.org> mirrorselect-0.4.ebuild
+  added rsync support, and sorting by geographical location.
+
+*mirrorselect-0.3 (9 May 2003)
+
+  9 May 2003; John Mylchreest <johnm@gentoo.org> mirrorselect-0.3.ebuild files/mirrorselect :
+  added the option of a -o, so it wont write, but print the line
+
+  9 May 2003; John Mylchreest <johnm@gentoo.org> mirrorselect-0.3.ebuild files/mirrorselect :
+  Removed static lists, in favour of all dynamic ones
+
+  9 May 2003; John Mylchreest <johnm@gentoo.org> mirrorselect-0.3.ebuild files/mirrorselect :
+  Re-write. removed perl requirements, and sped up usage.  
+
+*mirrorselect-0.2-r1 (27 Feb 2003)
+
+  27 Feb 2003; Mark Guertin <gerk@gentoo.org> mirrorselect-0.2-r1.ebuild files/mirrorselect :
+  fixup to close bug #16315.
+
+*mirrorselect-0.2 (27 Feb 2003)
+
+  27 Feb 2003; Mark Guertin <gerk@gentoo.org> mirrorselect-0.2.ebuild :
+  fixed missing deps (netselect and perl)
+
+  27 Feb 2003; Mark Guertin <gerk@gentoo.org> mirrorselect-0.2.ebuild 
+  files/digest-mirrorselect-0.2 files/mirrorselect :
+  new version, now has auto mode, just for spanky :), run with -a for
+  automode or with no options to show usage
+
+  22 Feb 2003; Guy Martin <gmsoft@gentoo.org> mirrorselect-0.1-r2.ebuild :
+  Added hppa to keywords.
+
+*mirrorselect-0.1-r2 (10 Feb 2003)
+
+  24 Feb 2003; Jason Wever <weeve@gentoo.org> mirrorselect-0.1-r2.ebuild:
+  Changed ~sparc keyword to sparc.
+
+  10 Feb 2003; Mark Guertin <gerk@gentoo.org> mirrorselect-0.1-r2.ebuild:
+  Rev bump.  Added a santify check for small screens.  Older version would 
+  cause garbage to be added to make.conf.  Thanks SpanKY.
+
+  02 Feb 2003; Mark Guertin <gerk@gentoo.org> mirrorselect-0.1-r1.ebuild:
+  updated to stable for ppc + x86 (have tested quite a bit).
+
+*mirrorselect-0.1-r1 (30 Jan 2003)
+  30 Jan 2003; Jon Nall <nall@gentoo.org> mirrorselect-0.1-r1.ebuild,
+  files/mirrorselect :
+  made the GENTOO_MIRROR variable replacement a bit more robust; 
+  added support for parsing what's already in /etc/make.conf's 
+  GENTOO_MIRROR variable and automatically checking those
+
+*mirrorselect-0.1 (30 Jan 2003)
+  30 jan 2003; Mark Guertin <gerk@gentoo.org> mirrorselect-0.1.ebuild :
+  Initial release, quick and ditry little dialog based script to pick
+  your distfile mirror.  For now mirrors are hardcoded into script, but
+  this will move of to something more dynamic when possible

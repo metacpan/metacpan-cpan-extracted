@@ -1,0 +1,137 @@
+NAME
+    Geography::Countries - 2-letter, 3-letter, and numerical codes for
+    countries.
+
+SYNOPSIS
+        use Geography::Countries;
+
+        $country = country 'DE';  # 'Germany'
+        @list    = country  666;  # ('PM', 'SPM', 666,
+                                  #  'Saint Pierre and Miquelon', 1)
+
+DESCRIPTION
+    This module maps country names, and their 2-letter, 3-letter and
+    numerical codes, as defined by the ISO-3166 maintenance agency [1], and
+    defined by the UNSD.
+
+  The "country" subroutine.
+    This subroutine is exported by default. It takes a 2-letter, 3-letter or
+    numerical code, or a country name as argument. In scalar context, it
+    will return the country name, in list context, it will return a list
+    consisting of the 2-letter code, the 3-letter code, the numerical code,
+    the country name, and a flag, which is explained below. Note that not
+    all countries have all 3 codes; if a code is unknown, the undefined
+    value is returned.
+
+    There are 3 categories of countries. The largest category are the
+    current countries. Then there is a small set of countries that no longer
+    exist. The final set consists of areas consisting of multiple countries,
+    like *Africa*. No 2-letter or 3-letter codes are available for the
+    second two sets. (ISO 3166-3 [3] defines 4 letter codes for the set of
+    countries that no longer exist, but the author of this module was unable
+    to get her hands on that standard.) By default, "country" only returns
+    countries from the first set, but this can be changed by giving
+    "country" an optional second argument.
+
+    The module optionally exports the constants "CNT_F_REGULAR",
+    "CNT_F_OLD", "CNT_F_REGION" and "CNT_F_ANY". These constants can also be
+    important all at once by using the tag ":FLAGS". "CNT_F_ANY" is just the
+    binary or of the three other flags. The second argument of "country"
+    should be the binary or of a subset of the flags "CNT_F_REGULAR",
+    "CNT_F_OLD", and "CNT_F_REGION" - if no, or a false, second argument is
+    given, "CNT_F_REGULAR" is assumed. If "CNT_F_REGULAR" is set, regular
+    (current) countries will be returned; if "CNT_F_OLD" is set, old, no
+    longer existing, countries will be returned, while "CNT_F_REGION" is
+    used in case a region (not necessarely) a country might be returned. If
+    "country" is used in list context, the fifth returned element is one of
+    "CNT_F_REGULAR", "CNT_F_OLD" and "CNT_F_REGION", indicating whether the
+    result is a regular country, an old country, or a region.
+
+    In list context, "country" returns a 5 element list. To avoid having to
+    remember which element is in which index, the constants "CNT_I_CODE2",
+    "CNT_I_CODE3", "CNT_I_NUMCODE", "CNT_I_COUNTRY" and "CNT_I_FLAG" can be
+    imported. Those constants contain the indices of the 2-letter code, the
+    3-letter code, the numerical code, the country, and the flag explained
+    above, respectively. All index constants can be imported by using the
+    ":INDICES" tag.
+
+  The "code2", "code3", "numcode" and "countries" routines.
+    All known 2-letter codes, 3-letter codes, numerical codes and country
+    names can be returned by the routines "code2", "code3", "numcode" and
+    "countries". None of these methods is exported by default; all need to
+    be imported if one wants to use them. The tag ":LISTS" imports them all.
+    In scalar context, the number of known codes or countries is returned.
+
+REFERENCES
+    The 2-letter codes come from the ISO 3166-1:1997 standard [2]. ISO 3166
+    bases its list of country names on the list of names published by the
+    United Nations. This list is published by the Statistical Division of
+    the United Nations [4]. The UNSD uses 3-letter codes, and numerical
+    codes [5]. The information about old countries [6] and regions [7] also
+    comes from the United Nations.
+
+    In a few cases, there was a conflict between the way how the United
+    Nations spelled a name, and how ISO 3166 spells it. In most cases, is
+    was word order (for instance whether *The republic of* should preceed
+    the name, or come after the name. A few cases had minor spelling
+    variations. In all such cases, the method in which the UN spelled the
+    name was choosen; ISO 3166 claims to take the names from the UN, so we
+    consider the UN authoritative.
+
+    [1] ISO Maintenance Agency (ISO 3166/MA)
+        *http://www.din.de/gremien/nas/nabd/iso3166ma/index.html*.
+
+    [2] *Country codes*,
+        *http://www.din.de/gremien/nas/nabd/iso3166ma/codlstp1.html*, 7
+        September 1999.
+
+    [3] ISO 3166-3, *Code for formerly used country names*.
+        *http://www.din.de/gremien/nas/nabd/iso3166ma/info_pt3.html*.
+
+    [4] United Nations, Statistics Division.
+        *http://www.un.org/Depts/unsd/statdiv.htm*.
+
+    [5] *Country or area codes in alphabetical order*.
+        *http://www.un.org/Depts/unsd/methods/m49alpha.htm*, 26 August 1999.
+
+    [6] *Codes added or changed*.
+        *http://www.un.org/Depts/unsd/methods/m49chang.htm*, 26 August 1999.
+
+    [7] *Geographical regions*.
+        *http://www.un.org/Depts/unsd/methods/m49regin.htm*, 26 August 1999.
+
+BUGS
+    Looking up information using country names is far from perfect. Except
+    for case and the amount of white space, the exact name as it appears on
+    the list has to be given. *USA* will not return anything, but *United
+    States* will.
+
+DEVELOPMENT
+    The current sources of this module are found on github,
+    <git://github.com/Abigail/geography--countries.git>.
+
+AUTHOR
+    Abigail <mailto:geography-countries@abigail.be>.
+
+COPYRIGHT and LICENSE
+    Copyright (C) 1999, 2009 by Abigail
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+

@@ -1,0 +1,12 @@
+Gtk2::SourceView TODO:
+----------------------
+
+*** GtkSourceStyleScheme
+  See GtkCellRenderer in order to enable the perl subclassing of this generic
+  GInterface.
+
+*** GtkSourceIter
+  Add its three methods to the Gtk2::TextIter class.
+
++++
+$ Last Modified: Fri Feb 06 09:39:35 CET 2004 ebassi $

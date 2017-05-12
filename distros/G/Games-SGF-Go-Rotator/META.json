@@ -1,0 +1,50 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-SGF-Go-Rotator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Games::SGF::Go" : "0.993",
+            "Games::SGF::Util" : "0.993"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-Games-SGF-Go-Rotator/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-Games-SGF-Go-Rotator"
+      }
+   },
+   "version" : "1.21"
+}

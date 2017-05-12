@@ -1,0 +1,41 @@
+GPS-Tracer
+==========
+
+This module reads geographical location data (longitude, latitude and
+time) and converts them into various other formats and pre-processed
+files that can be used to display route information, for example using
+Google Maps.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Text::CSV::Simple
+   XML::Simple
+   LWP::UserAgent
+   File::Temp
+   File::Spec
+   Date::Calc
+   GD::Graph
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007, Martin Senger, Kim Senger.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This software is provided "as is" without warranty of any kind.
+
+
+

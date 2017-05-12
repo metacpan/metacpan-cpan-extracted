@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+use strict;
+use Data::Dumper;
+
+use Getopt::Complete (
+    # list the explicit values which are valid for this option
+    'frog'    => ['ribbit','urp','ugh'],
+
+    # you can add any valid Getopt::Long specification to the key
+    # if you put nothing: "=s" is assumed
+    'names=s@' => ['eenie','meanie','miney'],
+
+    # undef means we don't know how to complete the value: any value specified will do
+    # this will result in no shell ompletions, but will still expect a value to be entered
+    # unless it is boolean
+    'name=s'  => undef,
+
+    # boolean values never have a completion list, and will yell if you are that foolish
+    'go!'       => undef,
+    'fast!'      => undef,
+
+    # handle unnamed arguments from the command-line ("non-option" arguments) with a spcial key:
+    # you can control completions on these too...
+    '<>'      => 'd',
+
+    # CODE callbacks allow a the completion list to be dynamically resolved 
+    'fraggle' => sub { return ['rock','roll','fried fish','fried taters','fries and squid'] },
+
+    # support for Bash "compgen" builtins is present with some pre-made callbacks
+    'myfile'    => \&Getopt::Complete::files,
+    'mydir'     => \&Getopt::Complete::directories,
+    
+    # callbacks get extra info to help them, including the part of the
+    # word already typed, and the remainder of the options already processed for context
+    'type'    => ['people','places'],
+    'instance'=> sub {
+                        my ($command, $value, $key, $other_opts) = @_;
+                        if (my $type = $other_opts->{type}) {
+                            if ($type eq 'people') {
+                                return [qw/larry moe curly/]
+                            }
+                            elsif ($type eq 'places') {
+                                return [qw/here there everywhere/],
+                            }
+                        }
+                        return [];
+                    },
+
+    # we used-to fail to process these
+    'dash-key' => ['dancer','prancer','vixen'],
+    
+    # options with dashes in the values are confusing to the user, but not the app...
+    'valdash' => [qw/-a -b -bc -bd/],
+);
+
+print Dumper($ARGS);
+
+1;
+
+

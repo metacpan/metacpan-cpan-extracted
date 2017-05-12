@@ -1,0 +1,284 @@
+#!/usr/bin/env perl
+
+use Pod::Usage;
+use Getopt::Long;
+use Digest::MD5 qw(md5_hex);
+use Compress::Zlib;
+use LWP::UserAgent;
+use Image::Term256Color;
+
+my $ua = LWP::UserAgent->new;
+my $gravatars = { empty => [] };
+for( 0..19 ){
+  $gravatars->{empty}->[$_] = ' 'x40;
+}
+
+sub print_usage {
+  pod2usage( { -message => $_[0] , -exitval => 1 , -verbose => 0 } );
+}
+
+my $options = {};
+GetOptions( "width=i" => \$options->{width},
+            "dir=s"   => \$options->{dir},
+            "help|?"  => \$options->{help} );
+
+if( $options->{help} == 1 ){
+  print_usage();
+}
+
+# Global gravs dir.  Only really need to load this once.
+my @gravs_dir;
+
+{ # Do all the setup / options checking
+  my @config = `git config --list`;
+
+  foreach my $i ( @config ){
+    if( $i =~ /^glog\.dir=(.+)\n/ ){
+      $options->{dir} = defined( $options->{dir} ) ? $options->{dir} : $1;
+    }
+  }
+
+  $options->{dir} = defined( $options->{dir} ) ? $options->{dir} : $ENV{HOME} . '/.git-glog';
+  if( ! -d $options->{dir} ){
+    mkdir( $options->{dir} ) or die "Failed to create git-glog dir: $options->{dir}\n";
+  }
+
+  opendir(DIR, $options->{dir});
+  @gravs_dir = readdir(DIR);
+  closedir(DIR);
+
+  my $cols_wide = `tput cols`;
+  $options->{width} = defined( $options->{width} ) ? $options->{width} : $cols_wide - 44;
+
+  if( -t STDOUT ){
+    open( $OUT, '| less -R' );
+  } else {
+    $OUT = STDOUT;
+  }
+
+} # End setup / options
+
+sub get_gravatar_hash {
+  my $email = $_[0];
+  $email = lc $email;
+  $email =~ s/^\s+|\s+$//g;
+
+  return md5_hex($email);
+}
+
+sub get_gravatar_url {
+  return 'http://www.gravatar.com/avatar/' . $_[0] . '?s=20&d=retro';
+}
+
+sub get_term_gravatar {
+  my $email = $_[0];
+  my $hash = get_gravatar_hash($email);
+
+  if( exists($gravatars->{$hash}) ){
+    return @{$gravatars->{$hash}};
+  }
+
+  foreach my $grav ( @gravs_dir ){
+    if( $grav eq $hash && -M $options->{dir} . "/$hash" < 3 ){
+      my $input = $options->{dir} . "/$hash";
+      my $z = gzopen( $input , 'rb' );
+      my @gravatar;
+      my $line;
+      while( $z->gzreadline($line) > 0 ){
+        $line =~ s/\n|\r//g;
+        push( @gravatar, $line );
+      }
+      $z->gzclose();
+
+      $gravatars->{$hash} = \@gravatar;
+      return @gravatar;
+    }
+  }
+  
+  my $response = $ua->get(get_gravatar_url($hash));
+  
+  if( $response->is_success ){
+    my @gravatar = Image::Term256Color::convert($response->decoded_content);
+      my $output = $options->{dir} . "/$hash";
+      my $z = gzopen( $output, 'wb' );
+      map { $z->gzwrite( "$_\n" ) } @gravatar;
+      $z->gzclose();
+
+
+    $gravatars->{$hash} = \@gravatar;
+    return @gravatar;
+  } else {
+    return @{$gravatars->{empty}};
+  }
+}
+
+# A whole lot of gunk to actually spit out the log
+
+my @buffer;
+my @cur_grav;
+my $auth;
+my $new_auth;
+my $commit_stored = 0;
+my $pipes = { top      => ' ╓→' ,
+              joint    => '═╣ ' , 
+              straight => ' ║ ' ,
+              bottom   => ' ╙→' };
+my $pipe;
+
+# Print the commit in the buffer, except for the last line.
+#   We don't know if we need to print a new gravatar yet
+sub print_commit {
+  my $length = scalar( @buffer ) - 1;
+
+  for( my $i=0; $i<$length; $i++ ){
+    if( scalar( @cur_grav ) == 20 ){ $pipe = $pipes->{'top'}; }
+    elsif( scalar( @cur_grav ) == 18 ){ $pipe = $pipes->{'joint'}; }
+    else { $pipe = $pipes->{'straight'}; }
+
+    if( @cur_grav ){
+      print $OUT shift( @cur_grav ) . $pipe . shift( @buffer ) . "\n";
+    } else {
+      print $OUT ' 'x40 . $pipe . shift( @buffer ) . "\n";
+    }
+  }
+}
+
+# If the commit is fewer lines then the gravatar and the next commit
+#   is by another author, finish printing the current gravatar.
+sub print_grav {
+  unless(@cur_grav || $commit_stored < 2){
+    print $OUT ' 'x40 . $pipes->{bottom} . shift( @buffer ) . "\n";
+  }
+  my $length = @cur_grav;
+
+  for( my $i=0; $i<$length; $i++ ){
+    if( $i == 0 ){
+      print $OUT shift( @cur_grav ) . $pipes->{'straight'} . shift( @buffer ) . "\n";
+    } elsif( $i == ($length - 1) ){
+      print $OUT shift( @cur_grav ) . $pipes->{'bottom'} . "\n";
+    } else {
+      print $OUT shift( @cur_grav ) . $pipes->{'straight'} . "\n";
+    }
+  }
+}
+
+# Open git log with some pretty colors and the provided args
+open(GIT, 'git log --color=always --decorate ' . join(' ', @ARGV) . '|');
+while(<GIT>){
+  chomp;
+  if( $_ =~ /^.{5}commit\s[0-9a-z]{40}/ ){
+    if( $commit_stored ){
+      # print out previous commit
+      print_commit();
+    }
+    $commit_stored++;
+  }
+  if( $_ =~ /^Author:\s+.+<(.+)>/ ){
+    $new_auth = $1;
+
+    if( $auth ne $new_auth){
+      print_grav();
+      @cur_grav = get_term_gravatar($1);
+      $auth = $new_auth;
+    } else {
+      unless(@cur_grav || $commit_stored < 2){
+        print $OUT ' 'x40 . $pipes->{straight} . shift( @buffer ) . "\n";
+      }
+    }
+  }
+
+  if( length( $_ ) > $options->{width} ){
+    my $width = $options->{width};
+    push( @buffer, split( /(.{$width})/, $_ ));
+  } else {
+    push( @buffer, $_ );
+  }
+}
+
+# Need to make sure our buffers are empty
+print_commit();
+print_grav();
+
+exit 0;
+
+__END__
+ 
+=head1 NAME
+ 
+git-glog - Spicey git-log with a hint of gravatars, nutmeg and cinnamon
+ 
+=head1 SYNOPSIS
+ 
+git glog [options] [-- git-log options]
+ 
+ Options:
+   --help|-h            brief help message
+   --width|-w           set the width of the output ascii
+   --dir|-d             directory to fetch/store ascii gravatars
+
+=head1 OPTIONS
+
+=over 8
+
+=item --help|-h
+
+Prints a brief help message and exits.
+
+=item --width|-w
+
+Controls how wide the resulting ascii is in columns.  The Default will
+take up the entire width ( if necessary ).
+
+=item --dir|-d
+
+The directory to store and read the gzipped ascii gravatars from.
+Same as glog.dir in the L</SETTINGS> section of the man page.  
+This option overrides any stored settings.
+
+=back
+ 
+=head1 DESCRIPTION
+ 
+git-glog is a perl wrapper around git-log that displays gravatars in your
+256 color terminal. git-glog is a part of the L<Git::Glog> perl module
+distribution.
+
+=head1 SETTINGS
+
+git-glog will attempt to read your git settings for the following:
+
+=over 8
+
+=item glog.dir
+
+The directory to store and read the gzipped ascii gravatars from.
+Default is F<$HOME/.git-glog/>
+
+    git config --global --add glog.dir $HOME/.git-glog
+
+To take a peek at the stored ascii gravatars, try:
+
+    cat $(git config --get glog.dir)/* | gunzip | less -R
+
+or
+
+    cat ~/.git-glog/* | gunzip | less -R
+
+=back
+
+=head1 EXAMPLES
+
+A fancy git log:
+
+    git glog -- --stat --summary --pretty=fuller
+
+=head1 CAVEATS
+
+git may complain of a non-zero exit code if git-glog does not complete.
+This will probably occur if the log is generated from a large repository or
+is left completely open ended ( no from... to ).
+
+Right now the output is piped to F<less -R> ( when STDOUT is a tty ). FYI.
+
+=cut
+

@@ -1,0 +1,44 @@
+---
+name: Games-Perlwar
+version: 0.03
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+abstract: |
+  Perlwar is inspired by the classic Corewar game.
+  In this game, players pit snippets of Perl code (called 'agents') 
+  against each other in order to gain control of the vicious virtual
+  battlefield known as... the Array.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Carp: 0
+  Class::Std: 0
+  Cwd: 0
+  File::Copy: 0
+  IO::File: 0
+  IO::Prompt: 0
+  Safe: 0
+  XML::LibXML: 0
+  XML::Simple: 0
+  XML::Writer: 0
+provides:
+  Games::Perlwar:
+    file: lib/Games/Perlwar.pm
+    version: 0.03
+  Games::Perlwar::AgentEval:
+    file: lib/Games/Perlwar/AgentEval.pm
+    version: 0.03
+  Games::Perlwar::Array:
+    file: lib/Games/Perlwar/Array.pm
+    version: 0.03
+  Games::Perlwar::Cell:
+    file: lib/Games/Perlwar/Cell.pm
+    version: 0.03
+  Games::Perlwar::Shell:
+    file: lib/Games/Perlwar/Shell.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

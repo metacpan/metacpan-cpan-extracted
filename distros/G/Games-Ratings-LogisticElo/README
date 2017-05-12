@@ -1,0 +1,36 @@
+Games-Ratings-LogisticElo version 0.001
+===============================
+
+Games-Ratings-LogisticElo provides methods to calculate Elo rating
+changes. Unlike L<Games::Ratings::Chess::FIDE>, this Elo
+implementation uses the logistic distribution instead of the standard
+distribution.
+
+Games-Ratings-LogisticElo can be used both for a single player who
+played multiple rated games, and for a single competition with an
+arbitrary number of players.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Games::Ratings
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

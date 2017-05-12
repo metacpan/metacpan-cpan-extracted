@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<!-- <?xml version="1.0" encoding="utf-8"?> -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Auth Control: [% title %]</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <style type="text/css">
+            [% INCLUDE 'css/default.css' %]
+        </style>        
+    </head>
+    <body id="">
+	
+	<br />
+
+	<!-- START: title bar -->
+	<div id="title_bar">
+		[% title %]
+	</div>
+	<!-- END: title bar -->
+	
+	<!-- START: page -->
+	<div id="page">
+	
+		<!-- START: content -->
+		<div id="content">
+	
+			[% content %]
+			
+			<br class="clear" />
+		</div>
+		<!-- END: content -->
+	
+	</div>
+	<!-- END: page -->
+
+	<!-- START: footer -->
+	<div id="footer">
+        <div id="site_links">
+            [% FOREACH page IN self.site_links %]
+            <a href='[% page.link %]'> [% page.label %] </a>
+            [% IF ! loop.last; ' | '; END; %]
+            [% END %]
+         </div>
+        
+		[% USE Date %]
+		<p>Page generated on 
+		[% Date.format(Date.now, "%A, %B %d, %Y at %l:%M %p") %]
+		[% IF site.user; "for $site.user"; END; %]
+	</div>
+	<!-- END: footer -->
+	
+    </body>
+</html>

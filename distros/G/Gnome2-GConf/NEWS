@@ -1,0 +1,108 @@
+Overview of changes since 1.043
+===============================
+
+* Make it possible for other bindings to use symbols from Gnome2::GConf's API.
+
+Overview of changes since 1.042
+===============================
+
+* Treat Gnome2::GConf::Schema objects as fundamental types
+  in Gnome2::GConf::Value.
+* Fix usage of Gnome2::GConf::Client getters for keys of type
+  'schema' (#361103, Laurent Simonneau)
+* Fix a leak inside Gnome2::GConf::Schema.
+
+Overview of changes since 1.041
+===============================
+
+* Implement GConf::Client::recursive_unset() to recursively
+  unset a directory in the database. (#361094, based on a patch
+  by Laurent Simonneau)
+
+Overview of changes since 1.040
+===============================
+
+* Fix a leak in GConfValue. (#358294, Santeri Paavolainen)
+
+Overview of changes since 1.031
+===============================
+
+* Fix loaded flags on Darwin. [Daniel Macks]
+
+Overview of changes since 1.020
+===============================
+
+* The "An Address Indicates Where It Is" release.
+* Wrap Gnome2::GConf::Engine::get_for_addresses. [Emmanuele]
+
+Overview of changes since 1.013
+===============================
+
+* The "Differential Engine" release
+* Fix Gnome2::GConf::Engine reference mechanism. [Emmanuele] 
+* Use Glib::CodeGen from the stable Glib release. [Emmanuele]
+
+Overview of changes since 1.012
+===============================
+
+* The "Breaking up is hard to do" release.
+* Implemented the new error handling system. [Emmanuele]
+* Changed Gnome2::GConf::Client::all_entries semantics. [Emmanuele]
+* Documentation fixes. [Emmanuele]
+
+Overview of changes since 1.011
+===============================
+
+* Finished the GConfEngine bindings. [Emmanuele]
+
+Overview of changes since 1.010
+===============================
+
+* Require GConf 2.0.0. [Emmanuele]
+
+Overview of changes since 1.000
+===============================
+
+* Wrapped GConfEngine. [Emmanuele]
+* Documentation fixes. [Emmanuele]
+* Require Glib 1.070. [Emmanuele]
+
+Overview of changes since 0.94
+==============================
+
+* New test suite for GConfClient. [Emmanuele]
+* Adapted version information methods to the current policy. [Toersten]
+* Updated documentation. [Emmanuele]
+* Require Glib 1.040. [Emmanuele]
+
+Overview of changes since 0.93
+==============================
+
+* Fixed a stupid bug in GConfValue [Emmanuele]
+
+Overview of changes since 0.92
+
+* Split-up API documentation for GConfValue, GConfEntry,
+  GConfChangeSet and GConfSchema. [Emmanuele]
+* API frozen [Emmanuele]
+* Require Glib 1.038 (for API freeze state) [Emmanuele]
+
+Overview of changes since 0.91
+==============================
+
+* Require Glib 1.037 [Emmanuele]
+* Use the new Glib::Error exception handling. [Emmanuele]
+* Updated documentation. [muppet]
+
+Overview of changes since 0.46
+==============================
+
+* Require ExtUtils::PkgConfig 1.03
+* Require Glib 1.020
+* Remove runtime dependency on Gtk2; Gtk2's Gtk2::CodeGen is a
+  build-only requirement.  [muppet]
+* Build system updates.  [muppet]
+* Updated documentation.  [Emmanuele]
+* Added some test methods that apps should not use.  [Emmanuele]
+
+[started NEWS]

@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Geo/Parse/OSM.pm
+lib/Geo/Parse/OSM/Multipass.pm
+lib/Geo/Parse/OSM/Singlepass.pm
+t/00-load.t
+t/author-critic.t
+t/parse_file.t
+t/release-pod-coverage.t

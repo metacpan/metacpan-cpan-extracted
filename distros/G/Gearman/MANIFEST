@@ -1,0 +1,44 @@
+CHANGES
+lib/Gearman/Client.pm
+lib/Gearman/Job.pm
+lib/Gearman/JobStatus.pm
+lib/Gearman/Objects.pm
+lib/Gearman/ResponseParser.pm
+lib/Gearman/ResponseParser/Taskset.pm
+lib/Gearman/Task.pm
+lib/Gearman/Taskset.pm
+lib/Gearman/Util.pm
+lib/Gearman/Worker.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP			This list of files
+t/00-use.t
+t/01-object.t
+t/02-client.t
+t/03-worker.t
+t/04-task.t
+t/05-taskset.t
+t/06-response-parser.t
+t/07-response-parser-taskset.t
+t/08-jobstatus.t
+t/09-connect.t
+t/10-job.t
+t/11-unit.t
+t/12-sum.t
+t/13-fail.t
+t/14-sleep.t
+t/15-priority.t
+t/16-background.t
+t/17-status.t
+t/18-ssl.t
+t/20-send-work-command.t
+t/25-work-finish-command.t
+t/40-prefix.t
+t/50-wait_timeout.t
+t/65-responseparser.t
+t/Server.pm
+t/Worker.pm
+README
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

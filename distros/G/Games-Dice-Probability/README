@@ -1,0 +1,36 @@
+Games-Dice-Probability version 0.01
+===================================
+
+Games::Dice::Probability calculates probabilities and distributions for complex
+dice expressions.  The expression provided when creating a new object is
+parsed, and each node's combinations distribution is computed and then combined
+appropriately to create the combinations distribution for the full expression.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Parse::RecDescent
+   Math::Symbolic::AuxFunctions
+
+Optionally:
+
+   Debug::ShowStuff
+   Memoize
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Jason A. Dour <jad@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.8.6 or, at your option,
+any later version of Perl 5 you may have available.

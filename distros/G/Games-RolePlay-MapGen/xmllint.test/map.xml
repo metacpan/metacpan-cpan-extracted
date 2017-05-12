@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MapGen SYSTEM "MapGen.dtd">
+<?xml-stylesheet type="text/xsl" href="MapGen.xsl"?>
+
+
+<MapGen>
+  <map>
+    <row>
+      <tile/>
+    </row>
+  </map>
+</MapGen>

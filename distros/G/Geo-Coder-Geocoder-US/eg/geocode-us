@@ -1,0 +1,98 @@
+#!/usr/local/bin/perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Geo::Coder::Geocoder::US;
+use Getopt::Long 2.33;
+use Pod::Usage;
+use YAML;
+
+our $VERSION = '0.007';
+
+my %opt;
+
+GetOptions( \%opt,
+##  qw{ interface=s },
+    qw{ debug! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+)
+    and @ARGV
+    or pod2usage( { -verbose => 0 } );
+
+my $gc = Geo::Coder::Geocoder::US->new();
+defined $opt{debug}
+    and $gc->debug( $opt{debug} );
+## defined $opt{interface}
+##     and $gc->interface( $opt{interface} );
+
+foreach my $addr ( @ARGV ) {
+    my @rslt = $gc->geocode( $addr );
+    my $resp = $gc->response();
+    if ( $resp->is_success() ) {
+	print "$addr: ", Dump( \@rslt );
+    } else {
+	warn "Failed to geocode $addr: ", $resp->status_line();
+    }
+}
+
+__END__
+
+=head1 TITLE
+
+geocode-us - Use L<Geo::Coder::Geocoder::US|Geo::Coder::Geocoder::US> to geocode addresses
+
+=head1 SYNOPSIS
+
+ geocode-us '1600 Pennsylvania Ave, Washington DC'
+ geocode-us -help
+ geocode-us -version
+
+=head1 OPTIONS
+
+=head2 -debug
+
+This option sets the C<debug> attribute of the object. The author makes
+no commitment as to what will happen if you assert this option.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script uses the
+L<Geo::Coder::Geocoder::US|Geo::Coder::Geocoder::US> module to geocode
+addresses. You can specify more than one address to geocode. The output
+for each is a YAML dump of the response, or the status if the query
+fails.
+
+Note that the underlying web server, L<http://geocode.us/>, limits
+queries by unregistered users to one every 15 seconds.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

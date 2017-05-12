@@ -1,0 +1,9 @@
+Geo::Approx
+-----------
+
+Install from CPAN shell, or:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

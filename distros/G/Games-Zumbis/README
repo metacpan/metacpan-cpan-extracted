@@ -1,0 +1,41 @@
+A idéia do jogo é ter um mapa, onde o jogador pode atirar para as
+quatro direções para matar os zumbis:
+
+Brainstorm:
+
+ * O jogador anda nas quatro direções e pode atirar para onde ele está
+   apontando.
+
+ * A princípio ter munição infinita, mas depois ter munição finita com
+   cartuchos aparecendo ao longo do mapa.
+
+ * Ter obstáculos no meio do mapa.
+
+ * A princípio ser "time trial", depois ter o tempo de cada fase. O
+   jogo acaba quando o jogador morre (tocado por um zumbi).
+
+ * Os zumbis aparecem aleatoriamente no mapa, através de um dos "spawn
+   points"
+
+ * A princípio sem scroll.
+
+ * Ter prioridade nos spawn points.
+
+ * O zumbi vai ficando mais rápido com o tempo.
+
+ * A velocidade com que os zumbis aparecem aumenta com o tempo.
+
+ * O mapa diz o estado inicial do player;
+
+ * O mapa diz, por spawn point, o estado inicial do zumbi;
+
+ * Desenvolver uma nova Tela de Game Over, com um Zumbi na mesma;
+
+ * Dar ao jogador uma bomba de som para que ele possa matar todos os zumbis na tela através de uma alta frequência;
+
+ * O Jogo irá ter um segundo modo, sendo de sobrevivencia nas fases, e ao trocar o mapa, irá ter um helicoptero passando
+   por cima da mesma, com o objetivo de na fase final ele aterrisar para resgatar o agente;
+
+Tileset:
+
+ *  http://silveiraneto.net/tag/pixelart

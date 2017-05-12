@@ -1,0 +1,42 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::RobotsMETA.ja - ページ内のRobotsMETAをパースする
+
+=head1 SYNOPSIS
+
+  components:
+    - RobotsMETA
+
+=head1 DESCRIPTION
+
+クローラーの動作を制御する情報はrobots.txtだけではなくページ内部のメタタグ
+にも記される事があります。このコンポーネントを組み込む事によって、このデータを
+自動的にパースしHTTPレスポンス内のrobots_metaスロットに格納します。
+
+この情報にアクセスするにはnotes()案数を使ってください：
+
+  my $meta = $response->notes('robots_meta');
+
+$metaはHTML::RobotsMETA::Rulesオブジェクトが格納されています。
+
+このコンポーネントを組み込んでも、metaタグを自動的に解釈してくれるものでは
+ありません。Handler等にこのタグをきちんと使用するかどうかのロジックを
+組み込むのはアプリケーションの責任となります。
+
+=head1 METHODS
+
+=head2 setup
+
+コンポーネントを初期化します。
+
+=head2 handle_response
+
+Gungho::Component::Core::handle_response()オーバーライドします。
+
+=head1 SEE ALSO
+
+L<HTML::RobotsMETA|HTML::RobotsMETA>
+
+=cut

@@ -1,0 +1,55 @@
+Revision history for Perl extension Games::Go::AGA::BayRate
+
+0.119     2016-11-15 13:12:12-08:00 America/Los_Angeles
+    remove dependency on swig
+    use Alien::GSL to install GSL library
+
+0.102     2016-03-13 13:40:34-07:00 America/Los_Angeles
+    IMPORTANT NOTE: some names have been changed from the previous release!
+        my_fminimizer_set        --> my_gsl_multimin_fminimizer_set
+        my_fdfminimizer_set      --> my_gsl_multimin_fdfminimizer_set
+        my_fminimizer_fval       --> raw_gsl_multimin_fminimizer_fval
+        my_fdfminimizer_f        --> raw_gsl_multimin_fdfminimizer_f
+        my_fdfminimizer_gradient --> raw_gsl_multimin_fdfminimizer_gradient
+        my_vector_size           --> raw_gsl_vector_size
+
+    Remove swig dependancy.
+    Copy the vector type passed into my_gsl_multimin_f(df)minimizer_set and
+        recreate objects of that type when passing back to the callbacks
+        (sometimes it's a Math::GSL::Vector::gsl_vector and sometimes it's
+        a Math::GSL::Matrix::gsl_vector).
+    Remove artificial restriction on handicaps (9) in Game.pm.
+    Add extra/collection.pl as an example of how to use Collection.pm.
+
+0.084     2015-06-04 10:38:35-07:00 America/Los_Angeles
+    Add a copy of swigperlrun.h.  If swig isn't installed, use the copy
+        instead of creating a new swigperlrun.h.
+
+0.081     2015-06-02 11:10:25-07:00 America/Los_Angeles
+    Change to Dist::Zilla::Plugin::CheckLib to properly install
+        Devel::Checklib.
+
+0.080     2015-05-31 11:06:55-07:00 America/Los_Angeles
+    use Devel::CheckLib to test-and-bail on GLS library
+    Add Inline::C to prerequisites (change to Inline requires this now)
+
+0.079     2015-05-28 13:15:35-07:00 America/Los_Angeles
+    Skip tests if swig is not available.
+    Fix some POD.
+
+0.077     2015-01-18 11:54:56-08:00 America/Los_Angeles
+    fix typo in README_mysql_init
+    improve err msg on swigperlrun.h not found
+
+0.071     2014-01-21 08:59:32 America/Los_Angeles
+    Allow set_crating to have a value of 0
+
+0.066     2013-12-04 15:00:52 America/Los_Angeles
+    Check for GSL libs using pkg-config or gsl-config instead
+        of Devel::CheckLib.
+    Modified G::G::A::B::GSL::Multimin.pm to use pkg-config or
+        gsl-config.  this make GSL install via Alien::GSL work.
+
+0.064     2013-10-05
+    Original release.
+

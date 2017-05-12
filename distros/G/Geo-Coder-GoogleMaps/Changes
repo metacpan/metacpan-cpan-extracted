@@ -1,0 +1,37 @@
+Revision history for Geo-Coder-GoogleMaps
+
+0.4    2009-12-13
+	Integrate Slaven Rezic (SREZIC@cpan.org) patch which fix the typo in the Serialize() method name (compatibility is still assured) (https://rt.cpan.org/Ticket/Display.html?id=52711)
+	Fix the version number bug (https://rt.cpan.org/Ticket/Display.html?id=52709)
+	Fix Links problem in the POD all thanks to Slaven again ! (https://rt.cpan.org/Ticket/Display.html?id=52712)
+
+0.3.2  2009-12-12
+	Finally fix the documentation !
+
+0.3.1  2009-12-11
+	Fix the followings bugs:
+		* 49483 : Encoding problems with non-latin1 data and json transport
+		* 49480 : Non-existing URLs (nabladev.com)
+		* 32221 : feature request (check Google's error status code)
+		* 49482 : Specify encoding in Pod
+	API change to be able to fullfill the feature request 32221
+	Fix test that failed in 0.3
+	Update Changes file
+
+0.2  2007-07-02
+        Code clean-up
+        Rewrite toKML() function to make it more flexible.
+        Add some basic tests (around 60).
+
+0.12  2007-05-29
+        Correct a major issue : Mr Tatsuhiko Miyagawa wasn't in the module credit ! 
+        My deep apologies to Mr Miyagawa.
+        Also fix the lacking documentation. 
+        No code modification.
+
+0.1    2007-05-28
+        First release. Support JSON, XML/KML output and translation from/to these formats.
+        This version is still messy since we use it in our internal development as a test module.
+        Particularly the toKML() method is the worst with its static code.
+        All those things will be corrected in the next release (in few days).
+

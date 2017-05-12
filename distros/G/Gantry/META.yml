@@ -1,0 +1,253 @@
+---
+name: Gantry
+version: 3.64
+author:
+  - 'Tim Keefer <tkeefer@gmail.com>'
+  - 'Phil Crow <philcrow2000@yahoo.com>'
+abstract: Web application framework for mod_perl, cgi, etc.
+license: perl
+requires:
+  CGI::Simple: 0
+  Config::General: 2.31
+  Crypt::CBC: 0
+  DBI: 0
+  Data::FormValidator: 0
+  Data::UUID: 0
+  Date::Calc: 0
+  File::Copy::Recursive: 0
+  HTML::Prototype: 0
+  HTML::SuperForm: 0
+  HTTP::Server::Simple::CGI: 0
+  Hash::Merge: 0
+  JSON: 0
+  Mail::RFC822::Address: 0
+  Sub::Install: 0
+  Template: 2.0
+  Template::Plugin::HTML::SuperForm: 0
+  URI: 0
+  perl: 5.008000
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Gantry:
+    file: lib/Gantry.pm
+    version: 3.64
+  Gantry::Build:
+    file: lib/Gantry/Build.pm
+  Gantry::Conf:
+    file: lib/Gantry/Conf.pm
+  Gantry::Conf::Provider:
+    file: lib/Gantry/Conf/Provider.pm
+  Gantry::Conf::Provider::FlatFile::Config::General:
+    file: lib/Gantry/Conf/Provider/FlatFile/Config/General.pm
+  Gantry::Conf::Provider::FlatFile::Config::Tiny:
+    file: lib/Gantry/Conf/Provider/FlatFile/Config/Tiny.pm
+  Gantry::Conf::Provider::HTTP:
+    file: lib/Gantry/Conf/Provider/HTTP.pm
+  Gantry::Conf::Provider::HTTP::Config::General:
+    file: lib/Gantry/Conf/Provider/HTTP/Config/General.pm
+  Gantry::Conf::Provider::ParamBuilder:
+    file: lib/Gantry/Conf/Provider/ParamBuilder.pm
+  Gantry::Conf::Provider::PerlSetVar:
+    file: lib/Gantry/Conf/Provider/PerlSetVar.pm
+  Gantry::Conf::Provider::SQL::PostgreSQL:
+    file: lib/Gantry/Conf/Provider/SQL/PostgreSQL.pm
+  Gantry::Control:
+    file: lib/Gantry/Control.pm
+  Gantry::Control::C::Access:
+    file: lib/Gantry/Control/C/Access.pm
+  Gantry::Control::C::AuthenBase:
+    file: lib/Gantry/Control/C/AuthenBase.pm
+  Gantry::Control::C::AuthenCDBI:
+    file: lib/Gantry/Control/C/AuthenCDBI.pm
+  Gantry::Control::C::AuthenRegular:
+    file: lib/Gantry/Control/C/AuthenRegular.pm
+  Gantry::Control::C::Authz::PageBasedBase:
+    file: lib/Gantry/Control/C/Authz/PageBasedBase.pm
+  Gantry::Control::C::Authz::PageBasedCDBI:
+    file: lib/Gantry/Control/C/Authz/PageBasedCDBI.pm
+  Gantry::Control::C::Authz::PageBasedRegular:
+    file: lib/Gantry/Control/C/Authz/PageBasedRegular.pm
+  Gantry::Control::C::AuthzBase:
+    file: lib/Gantry/Control/C/AuthzBase.pm
+  Gantry::Control::C::AuthzCDBI:
+    file: lib/Gantry/Control/C/AuthzCDBI.pm
+  Gantry::Control::C::AuthzRegular:
+    file: lib/Gantry/Control/C/AuthzRegular.pm
+  Gantry::Control::C::Groups:
+    file: lib/Gantry/Control/C/Groups.pm
+  Gantry::Control::C::Pages:
+    file: lib/Gantry/Control/C/Pages.pm
+  Gantry::Control::C::Users:
+    file: lib/Gantry/Control/C/Users.pm
+  Gantry::Control::Model::GEN::auth_group_members:
+    file: lib/Gantry/Control/Model/GEN/auth_group_members.pm
+  Gantry::Control::Model::GEN::auth_groups:
+    file: lib/Gantry/Control/Model/GEN/auth_groups.pm
+  Gantry::Control::Model::GEN::auth_pages:
+    file: lib/Gantry/Control/Model/GEN/auth_pages.pm
+  Gantry::Control::Model::GEN::auth_users:
+    file: lib/Gantry/Control/Model/GEN/auth_users.pm
+  Gantry::Control::Model::auth_group_members:
+    file: lib/Gantry/Control/Model/auth_group_members.pm
+  Gantry::Control::Model::auth_group_members_cdbi:
+    file: lib/Gantry/Control/Model/auth_group_members_cdbi.pm
+  Gantry::Control::Model::auth_groups:
+    file: lib/Gantry/Control/Model/auth_groups.pm
+  Gantry::Control::Model::auth_groups_cdbi:
+    file: lib/Gantry/Control/Model/auth_groups_cdbi.pm
+  Gantry::Control::Model::auth_pages:
+    file: lib/Gantry/Control/Model/auth_pages.pm
+  Gantry::Control::Model::auth_pages_cdbi:
+    file: lib/Gantry/Control/Model/auth_pages_cdbi.pm
+  Gantry::Control::Model::auth_users:
+    file: lib/Gantry/Control/Model/auth_users.pm
+  Gantry::Control::Model::auth_users_cdbi:
+    file: lib/Gantry/Control/Model/auth_users_cdbi.pm
+  Gantry::Engine::CGI:
+    file: lib/Gantry/Engine/CGI.pm
+  Gantry::Engine::MP13:
+    file: lib/Gantry/Engine/MP13.pm
+  Gantry::Engine::MP20:
+    file: lib/Gantry/Engine/MP20.pm
+  Gantry::Exception:
+    file: lib/Gantry/Exception.pm
+  Gantry::Init:
+    file: lib/Gantry/Init.pm
+  Gantry::Plugins::AjaxCRUD:
+    file: lib/Gantry/Plugins/AjaxCRUD.pm
+  Gantry::Plugins::AjaxFORM:
+    file: lib/Gantry/Plugins/AjaxFORM.pm
+  Gantry::Plugins::AuthCookie:
+    file: lib/Gantry/Plugins/AuthCookie.pm
+  Gantry::Plugins::AuthCookie::AuthUserObject:
+    file: lib/Gantry/Plugins/AuthCookie.pm
+  Gantry::Plugins::AutoCRUD:
+    file: lib/Gantry/Plugins/AutoCRUD.pm
+  Gantry::Plugins::AutoCRUDHelper::CDBI:
+    file: lib/Gantry/Plugins/AutoCRUDHelper/CDBI.pm
+  Gantry::Plugins::AutoCRUDHelper::DBIxClass:
+    file: lib/Gantry/Plugins/AutoCRUDHelper/DBIxClass.pm
+  Gantry::Plugins::CRUD:
+    file: lib/Gantry/Plugins/CRUD.pm
+  Gantry::Plugins::Cache:
+    file: lib/Gantry/Plugins/Cache.pm
+  Gantry::Plugins::Cache::FastMmap:
+    file: lib/Gantry/Plugins/Cache/FastMmap.pm
+  Gantry::Plugins::Cache::Memcached:
+    file: lib/Gantry/Plugins/Cache/Memcached.pm
+  Gantry::Plugins::Cache::Storable:
+    file: lib/Gantry/Plugins/Cache/Storable.pm
+  Gantry::Plugins::Calendar:
+    file: lib/Gantry/Plugins/Calendar.pm
+  Gantry::Plugins::DBIxClassConn:
+    file: lib/Gantry/Plugins/DBIxClassConn.pm
+  Gantry::Plugins::PageCache:
+    file: lib/Gantry/Plugins/PageCache.pm
+  Gantry::Plugins::SOAP::Doc:
+    file: lib/Gantry/Plugins/SOAP/Doc.pm
+  Gantry::Plugins::SOAP::RPC:
+    file: lib/Gantry/Plugins/SOAP/RPC.pm
+  Gantry::Plugins::Shibboleth:
+    file: lib/Gantry/Plugins/Shibboleth.pm
+  Gantry::Plugins::Shibboleth::AuthUserObject:
+    file: lib/Gantry/Plugins/Shibboleth.pm
+  Gantry::Plugins::Static:
+    file: lib/Gantry/Plugins/Static.pm
+  Gantry::Plugins::Validate:
+    file: lib/Gantry/Plugins/Validate.pm
+  Gantry::Server:
+    file: lib/Gantry/Server.pm
+  Gantry::Server::Tier:
+    file: lib/Gantry/Server.pm
+  Gantry::Stash:
+    file: lib/Gantry/Stash.pm
+  Gantry::Stash::Controller:
+    file: lib/Gantry/Stash/Controller.pm
+  Gantry::Stash::View:
+    file: lib/Gantry/Stash/View.pm
+  Gantry::Stash::View::Form:
+    file: lib/Gantry/Stash/View/Form.pm
+  Gantry::State::Constants:
+    file: lib/Gantry/State/Constants.pm
+  Gantry::State::Default:
+    file: lib/Gantry/State/Default.pm
+  Gantry::State::Exceptions:
+    file: lib/Gantry/State/Exceptions.pm
+  Gantry::State::Simple:
+    file: lib/Gantry/State/Simple.pm
+  Gantry::Template::Default:
+    file: lib/Gantry/Template/Default.pm
+  Gantry::Template::Framing:
+    file: lib/Gantry/Template/Framing.pm
+  Gantry::Template::TT:
+    file: lib/Gantry/Template/TT.pm
+  Gantry::Utils::AuthCDBI:
+    file: lib/Gantry/Utils/AuthCDBI.pm
+  Gantry::Utils::CDBI:
+    file: lib/Gantry/Utils/CDBI.pm
+  Gantry::Utils::CRON:
+    file: lib/Gantry/Utils/CRON.pm
+  Gantry::Utils::CRUDHelp:
+    file: lib/Gantry/Utils/CRUDHelp.pm
+  Gantry::Utils::Captcha:
+    file: lib/Gantry/Utils/Captcha.pm
+  Gantry::Utils::Crypt:
+    file: lib/Gantry/Utils/Crypt.pm
+  Gantry::Utils::DB:
+    file: lib/Gantry/Utils/DB.pm
+  Gantry::Utils::DBConnHelper:
+    file: lib/Gantry/Utils/DBConnHelper.pm
+  Gantry::Utils::DBConnHelper::MP13:
+    file: lib/Gantry/Utils/DBConnHelper/MP13.pm
+  Gantry::Utils::DBConnHelper::MP20:
+    file: lib/Gantry/Utils/DBConnHelper/MP20.pm
+  Gantry::Utils::DBConnHelper::Script:
+    file: lib/Gantry/Utils/DBConnHelper/Script.pm
+  Gantry::Utils::DBIxClass:
+    file: lib/Gantry/Utils/DBIxClass.pm
+  Gantry::Utils::FormErrors:
+    file: lib/Gantry/Utils/FormErrors.pm
+  Gantry::Utils::FormMunger:
+    file: lib/Gantry/Utils/FormMunger.pm
+  Gantry::Utils::HTML:
+    file: lib/Gantry/Utils/HTML.pm
+  Gantry::Utils::Model:
+    file: lib/Gantry/Utils/Model.pm
+  Gantry::Utils::Model::Auth:
+    file: lib/Gantry/Utils/Model/Auth.pm
+  Gantry::Utils::Model::Regular:
+    file: lib/Gantry/Utils/Model/Regular.pm
+  Gantry::Utils::ModelHelper:
+    file: lib/Gantry/Utils/ModelHelper.pm
+  Gantry::Utils::PODViewer:
+    file: lib/Gantry/Utils/PODViewer.pm
+  Gantry::Utils::PerlbalFixup:
+    file: lib/Gantry/Utils/PerlbalFixup.pm
+  Gantry::Utils::SQL:
+    file: lib/Gantry/Utils/SQL.pm
+  Gantry::Utils::TablePerms:
+    file: lib/Gantry/Utils/TablePerms.pm
+  Gantry::Utils::Threeway:
+    file: lib/Gantry/Utils/Threeway.pm
+  Gantry::Utils::Validate:
+    file: lib/Gantry/Utils/Validate.pm
+  My::View:
+    file: lib/Gantry/Utils/PODViewer.pm
+  Template::Plugin::GantryAuthCookie:
+    file: lib/Template/Plugin/GantryAuthCookie.pm
+  controller:
+    file: lib/Gantry/Stash/Controller.pm
+  form:
+    file: lib/Gantry/Stash/View/Form.pm
+  stash:
+    file: lib/Gantry/Stash.pm
+  view:
+    file: lib/Gantry/Stash/View.pm
+resources:
+  license: http://dev.perl.org/licenses/

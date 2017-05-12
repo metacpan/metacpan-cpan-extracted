@@ -1,0 +1,15 @@
+---
+abstract: "a pluggable \"git status\"-replacement toolbox"
+author:
+  - 'Shawn M Moore <code@sartak.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Git-Status-Tackle
+version: 0.01

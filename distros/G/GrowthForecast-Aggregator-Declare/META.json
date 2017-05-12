@@ -1,0 +1,68 @@
+{
+   "abstract" : "Declarative interface for GrowthForecast client",
+   "author" : [
+      "Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GrowthForecast-Aggregator-Declare",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "HTTP::Request::Common" : "6",
+            "Mouse" : "0",
+            "parent" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "GrowthForecast::Aggregator::Callback" : {
+         "file" : "lib/GrowthForecast/Aggregator/Callback.pm",
+         "version" : 0
+      },
+      "GrowthForecast::Aggregator::DB" : {
+         "file" : "lib/GrowthForecast/Aggregator/DB.pm",
+         "version" : 0
+      },
+      "GrowthForecast::Aggregator::DBMulti" : {
+         "file" : "lib/GrowthForecast/Aggregator/DBMulti.pm",
+         "version" : 0
+      },
+      "GrowthForecast::Aggregator::Declare" : {
+         "file" : "lib/GrowthForecast/Aggregator/Declare.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.1.1"
+}

@@ -1,0 +1,16 @@
+ChangeLog
+Fig.pm
+GnomeCanvas.pm
+MANIFEST
+MANIFEST.SKIP
+MANIFEST.bak
+Makefile.PL
+Makefile.old
+PDLPlot.pm
+PostScript.pm
+README
+Simple.pm
+TODO
+TkCanvas.pm
+gt1.pl
+gt2.pl

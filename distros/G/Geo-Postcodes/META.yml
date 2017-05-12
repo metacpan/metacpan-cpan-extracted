@@ -1,0 +1,21 @@
+---
+name: Geo-Postcodes
+version: 0.32
+author:
+abstract: "Base class for the Geo::Postcodes::* modules"
+license: perl
+requires:
+  perl: 5.6.1
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Geo::Postcodes:
+    file: lib/Geo/Postcodes.pm
+    version: 0.32
+  Geo::Postcodes::Update:
+    file: lib/Geo/Postcodes/Update.pm
+    version: 0.311
+resources:
+  license: http://dev.perl.org/licenses/

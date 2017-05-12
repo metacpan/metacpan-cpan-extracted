@@ -1,0 +1,11 @@
+#! /usr/bin/perl
+
+use strict;
+
+use Gtk2 -init;
+use Games::Minesweeper;
+
+my $win = new_minesweeper Games::Minesweeper;
+$win->show_all;
+main Gtk2;
+

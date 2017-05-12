@@ -1,0 +1,5 @@
+Print the version number (of the source package), in the form
+
+  scriptname (packagename): version
+
+and exit. scriptname is the canonical installed name of the script.

@@ -1,0 +1,58 @@
+{
+   "abstract" : "modules for reading and writing directed graphs",
+   "author" : [
+      "Neil Bowers <neilb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graph-ReadWrite",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Graph" : "0",
+            "IO::File" : "0",
+            "Parse::Yapp::Driver" : "0",
+            "XML::Parser" : "0",
+            "XML::Writer" : "0",
+            "constant" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Compare" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Graph-ReadWrite",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Graph-ReadWrite.git",
+         "web" : "https://github.com/neilb/Graph-ReadWrite"
+      }
+   },
+   "version" : "2.09",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

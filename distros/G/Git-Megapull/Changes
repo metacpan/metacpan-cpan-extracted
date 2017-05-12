@@ -1,0 +1,17 @@
+Revision history for Git-Megapull
+
+0.101752  2013-10-31 10:00:10 America/New_York
+          update repo; direct new users to App::GitGot instead
+
+0.101751  2011-10-31 22:48:24 America/New_York
+          use Config::GitLike, not Config::INI (thanks, AVAR!)
+
+          use LWP::UserAgent instead of LWP::Simple so that we can provide
+          better error messages (thanks again, AVAR!)
+
+0.101750  2010-06-24 10:28:09 America/New_York
+          improve interaction with bare repositories (thanks, AVAR)
+          better error messages (thanks, AVAR)
+
+0.100110  2010-01-11 19:10:14 America/New_York
+          do not require users to install JSON::XS

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>no-herd</herd>
+<maintainer>
+  <email>matsuu@gentoo.org</email>
+</maintainer>
+<longdescription>Posadis is a powerful Domain Name Server for various platforms. It can be an authoritive DNS server for your zones (it supports standard DNS master files, DNS Notify and zone transfers), but it can also speed up DNS resolution for your local network by acting as a caching DNS server.</longdescription>
+</pkgmetadata>

@@ -1,0 +1,110 @@
+# NAME
+
+Geo::Coordinates::Converter - simple converter of geo coordinates
+
+# SYNOPSIS
+
+    use strict;
+    use warnings;
+
+    use Geo::Coordinates::Converter;
+
+    my $geo = Geo::Coordinates::Converter->new( lat => '35.65580', lng => '139.65580', datum => 'wgs84' );
+    my $point = $geo->convert( dms => 'tokyo' );
+    print $point->lat;
+    print $point->lng;
+    print $point->datum;
+    print $point->format;
+
+    my $clone = $point->clone;
+    my $geo2 = Geo::Coordinates::Converter->new( point => $clone );
+    my $point2 = $geo->convert( degree => 'wgs84' );
+    print $point2->lat;
+    print $point2->lng;
+    print $point2->datum;
+    print $point2->format;
+
+can you use milliseconds format
+
+    my $geo = Geo::Coordinates::Converter->new( lat => -128064218, lng => 502629380 );
+    $geo->format('degree');
+    is($geo->lat, -35.573394);
+    is($geo->lng, 139.619272);
+
+# DESCRIPTION
+
+the format and datum of geo coordinates are simply converted.
+when it is insufficient in the coordinate system and the format of the standard, it is possible to add it easily.
+
+# CONSTRUCTOR
+
+- new
+
+    my $geo = Geo::Coordinates::Converter->new( lat => '35.65580', lng => '139.65580', datum => 'wgs84' );
+    my $geo = Geo::Coordinates::Converter->new( point => $point );
+
+## Options
+
+- lat
+
+set to latitude
+
+- lng
+
+set to longitude
+
+- point
+
+set to [Geo::Coordinates::Converter::Point](http://search.cpan.org/perldoc?Geo::Coordinates::Converter::Point) object.
+
+when this is set, neither 'lat' and 'lng' and 'datum' and 'format' options are necessary having.
+
+- datum
+
+set to datum
+
+- format
+
+set to format.
+it is detected automatically.
+
+- converter
+
+set to converter object.
+[Geo::Coordinates::Converter::Datum](http://search.cpan.org/perldoc?Geo::Coordinates::Converter::Datum) can be used by default, and other conversion classes also use it.
+
+- formats
+
+the object of the format is set by the ARRAY reference when using it excluding the formatter of default.
+
+- internal_format
+
+the specification format is set internally. default is degree.
+when it dose not like on internal format when datum is customized, it use it.
+
+# METHODS
+
+- convert
+
+the geometric transformation is done.
+after it converts it, [Geo::Coordinates::Converter::Point](http://search.cpan.org/perldoc?Geo::Coordinates::Converter::Point) object it returned.
+
+    # Examples:
+    my $point = $geo->convert( grs80 => 'degree' );
+    my $point = $geo->convert( tokyo => 'dms' );
+    my $point = $geo->convert( dms => 'wgs84' );
+    my $point = $geo->convert('wgs84');
+    my $point = $geo->convert('degree');
+
+# AUTHOR
+
+Kazuhiro Osawa <yappo {at} shibuya {dot} pl>
+
+# SEE ALSO
+
+[Geo::Coordinates::Converter::Point](http://search.cpan.org/perldoc?Geo::Coordinates::Converter::Point), [Geo::Coordinates::Converter::Format](http://search.cpan.org/perldoc?Geo::Coordinates::Converter::Format), [Geo::Coordinates::Converter::Datum](http://search.cpan.org/perldoc?Geo::Coordinates::Converter::Datum)
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

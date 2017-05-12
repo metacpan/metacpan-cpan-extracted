@@ -1,0 +1,163 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Carp;
+use Getopt::Long;
+use LWP::UserAgent;
+use Ganglia::Gmetric::XS;
+use Data::Dumper;
+$Data::Dumper::Indent   = 1;
+$Data::Dumper::Deepcopy = 1;
+
+my $RCSID    = q$Id$;
+my $REVISION = $RCSID =~ /,v ([\d.]+)/ ? $1 : 'unknown';
+my $PROG     = substr($0, rindex($0, '/')+1);
+
+my $Debug     = 0;
+my $No_Daemon = 0;
+my $INTERVAL  = $ENV{INTERVAL} || 60;
+
+sub dprint (@) {
+    return unless $Debug;
+    my @m = @_;
+    chomp @m;
+    print STDERR 'DEBUG: ', @m,"\n";
+}
+
+sub dprint2(@) {
+    dprint @_ if $Debug >= 2;
+}
+
+sub usage() {
+    my $mesg = shift;
+
+    print "[ERROR] $mesg\n" if $mesg;
+    print "usage:\n";
+    print "    $PROG [ -d ] [-X] url\n";
+    print "
+
+v$REVISION
+";
+    exit 1;
+}
+
+MAIN: {
+    my %opt;
+    Getopt::Long::Configure("bundling");
+    GetOptions(\%opt,
+               'nodaemon|X' => \$No_Daemon,
+               'debug|d+'   => \$Debug,
+               'help|h|?') or &usage();
+    dprint "DEBUG MODE LEVEL=$Debug";
+
+    my $url = $ARGV[0] ? shift @ARGV : 'http://localhost/server-status?auto';
+    unless ($url) {
+        &usage('missing arugment.');
+    }
+    dprint2 "url=$url";
+
+    ### initialize
+    my $ua = LWP::UserAgent->new(agent => "apache-status/$REVISION",
+                                 timeout => 8,
+                                );
+    my $req = HTTP::Request->new(GET => $url);
+    # $req->header(Host => 'example.org'); # set vhost name if you need
+
+    my $gmetric = Ganglia::Gmetric::XS->new;
+
+    for (;;) {
+        ### get status data
+        my $res = $ua->request($req);
+        unless ($res->is_success) {
+            carp "failed to get $url";
+            sleep $INTERVAL;
+            next;
+        }
+
+        my $content = $res->content;
+        unless ($content) {
+            carp "failed to get content of $url";
+            sleep $INTERVAL;
+            next;
+        }
+        dprint2 "content=$content";
+
+        ### parse status data
+        ## request per second (ExtendedStatus On)
+        my $rps;
+        if ($content =~ /^ReqPerSec:\s*([\d\\.]+)$/m) {
+            $rps = $1;
+        } else {
+            $rps = -1;
+        }
+        $rps += 0;              # as numeric
+        dprint2 "rps=$rps";
+
+        ## process status
+        my @sc_order = (
+                       'waiting',
+                       'starting',
+                       'reading_request',
+                       'sending_reply',
+                       'keepalive',
+                       'dns_lookup',
+                       'closing',
+                       'logging',
+                       'gracefully_finishing',
+                       'idle',
+                       'open_slot',
+                      );
+        my %sc_byname = (
+                         'waiting'              => '_',
+                         'starting'             => 'S',
+                         'reading_request'      => 'R',
+                         'sending_reply'        => 'W',
+                         'keepalive'            => 'K',
+                         'dns_lookup'           => 'D',
+                         'closing'              => 'C',
+                         'logging'              => 'L',
+                         'gracefully_finishing' => 'G',
+                         'idle'                 => 'I',
+                         'open_slot'            => '.',
+                        );
+        my %sc_bychar = reverse %sc_byname;
+        my $score;
+        if ($content =~ /^Scoreboard:\s*(.+)$/m) {
+            $score = $1;
+        } else {
+            $score = "";
+        }
+        dprint2 "score=$score";
+
+        my %scoreboard;
+        map { $scoreboard{$_} = 0 } keys %sc_byname; # initialize
+        map { $scoreboard{ $sc_bychar{$_} }++ } split //, $score;
+        dprint2(Dumper(\%scoreboard));
+
+        ### gmetric
+        if ($rps >= 0) {
+            $gmetric->send(
+                name  => "ap_rps",
+                value => $rps,
+                type  => 'uint16',
+                units => 'r/s',
+               );
+        }
+        while (my ($k, $v) = each %scoreboard) {
+            $gmetric->send(
+                name  => "ap_${k}",
+                value => $v,
+                type  => 'uint16',
+                units => 'proc',
+               );
+        }
+
+        last if $No_Daemon;
+        dprint2 "sleep $INTERVAL";
+        sleep $INTERVAL;
+    }
+
+    exit 0;
+}
+
+__END__

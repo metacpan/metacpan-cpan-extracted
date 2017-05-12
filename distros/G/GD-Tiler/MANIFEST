@@ -1,0 +1,8 @@
+Changes.txt
+MANIFEST
+Makefile.PL
+lib/GD/Tiler.pm
+t/01tiler.t
+t/imgs/smallimg.png
+t/imgs/mediumimg.png
+t/imgs/bigimg.png

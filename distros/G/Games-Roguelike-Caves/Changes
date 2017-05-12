@@ -1,0 +1,7 @@
+Revision history for Perl extension Games::Roguelike::Caves.
+
+0.01  Wed Mar  5 16:01:00 2008
+	- original version; created by h2xs 1.23 with options
+		-X Games::Roguelike::Caves -b 5.8.0
+    - pretty much copied from a roguelike that I started writing.
+

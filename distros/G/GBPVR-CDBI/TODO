@@ -1,0 +1,20 @@
+TODO - GBPVR-CDBI
+
+(in no particular order)
+
+* port (either retrieve_all or set_sql) clean_pending.pl from Win32::ODBC and add to contrib.
+* Make sure there are methods for easy to searching for a date or date range
+* Make sure there are methods for easy date creation/updates for new rows (e.g. fix manual.pl)
+* Include TYPE constants, and complete the status_string() method and others. (see http://forums.gbpvr.com/showthread.php?t=4399&highlight=recording_schedule+statuses for reference)
+* complete the status_string mappings (and any others)
+* Make sure POD is complete
+* consider if chosen namespace (GBPVR::CDBI) is good or should be changed
+* make a XML::Simple (or similar) class for config file
+* create a test suite
+* make make a bundle so it's easier for people w/o DBI, DBD::ODBC, Class::DBI to get them installed
+* add docs for making exes from perl (mention PAR, perl2exe, etc .. link to perlmonks.com nodes)
+* register namespace https://pause.perl.org/pause/authenquery?ACTION=apply_mod
+* fill in synopsis section and include sample programs
+* investigate zapdb.mdb and zapcleandb.mdb and making classes for them
+* Verify all classes against newest version of RecTracker, and VideoArchive
+

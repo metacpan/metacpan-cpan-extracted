@@ -1,0 +1,2 @@
+Enable informational messages about choices made, etc. to stderr. This
+option may be invoked multiple times to increase the level of verbosity.

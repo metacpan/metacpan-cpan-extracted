@@ -1,0 +1,48 @@
+---
+abstract: 'Client and worker libraries for gearman job dispatch dispatch. Server is in separate package.'
+author:
+  - 'Brad Fitzpatrick <brad@danga.com>'
+build_requires:
+  File::Which: '0'
+  IO::Socket::IP: '0'
+  IO::Socket::SSL: '0'
+  Perl::OSType: '0'
+  Proc::Guard: '0.07'
+  Storable: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::TCP: '2.17'
+  Test::Timer: '0'
+  version: '0.77'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gearman
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  IO::Select: '0'
+  IO::Socket::IP: '0'
+  IO::Socket::SSL: '0'
+  List::MoreUtils: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Storable: '0'
+  String::CRC32: '0'
+  Time::HiRes: '0'
+  fields: '0'
+  perl: '5.008001'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/p-alik/perl-Gearman/issues
+  repository: https://github.com/p-alik/perl-Gearman.git
+version: v2.4.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

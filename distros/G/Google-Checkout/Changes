@@ -1,0 +1,65 @@
+Revision history for Google Checkout
+
+1.0     2007-02-07
+        First version, released on an unsuspecting world.
+
+1.0.1   2007-03-01
+        Allow user to pass in merchant ID, key and Checkout URL when
+        constructing a Google::Checkout::General::GCO object. With this
+        change, it's no longer necessary to maintain an external configuration
+        file.
+
+1.0.3   2007-03-23
+        * Support posting to "/merchantCheckout"
+	    * get_items() of Notification/NewOrder.pm dies if given a single item
+	    * Support Google Analytics (http://code.google.com/apis/checkout/developer/checkout_analytics_integration.html)
+
+1.0.4   2007-04-27
+	    * Code now works with 5.6.x
+	    * New order notification is broken if shipping or buyer info is missing
+
+1.0.5   2007-05-01
+        * Code still doesn't work with 5.6.x. Fixed a few more of those
+
+1.0.6   2007-06-04
+        * Add support for parameterized URL tracking
+
+1.0.7   2007-06-25
+        * Handles notification with multiple anonymous addresses
+        * Writes merchant item IDs to XML
+        * Coupon code now accepts both true and false values
+
+1.0.8   2007-06-26
+        * Support <authorize-order> command
+        * Support for <platform-id>
+
+1.0.9   2007-06-29
+        * NewOrder.pm incorrectly fetch coupon info
+	    * Support new gift certificate format
+        * Support digital delivery
+
+1.1.0   2007-08-07
+        * Updated Gift Cert code with full subroutine name to avoid crashing for some user.
+        * Added support for <address-filters>, <allow-us-po-box>, <world-area>
+        * Fixed "buyer_phone" documentation for Google::Checkout::General::MerchantCheckoutFlow
+          to indicate it is a boolean instead of a phone number
+        * Added the ability to get the acutal XML that was sent to Google for  
+          easier logging and troubleshooting with Google support staff
+        * Explicitly closed </merchant-checkout-flow-support>, </checkout-flow-support>,
+          </checkout-shopping-cart> tags instead of relying on cleanup code        
+        * Thanks to <Jason Terry> for his contributions above in this release
+        * Added AddressFilters.pm - basically extended from ShippingRestrictions.pm
+        
+1.1.1   2007-09-23
+        * Use forcearray for anonymous address and item in XMLin.  get_addresses
+          dies because XMLin did not return the right data structure when there 
+          is only one item or anonymous address.
+        * Factory.pm now gives proper error for invalid XML
+        * Fixed bug so that it now supports an array of parameterized URLs.
+          Added ParameterizedUrl.pm and deprecated ParameterizedUrls.pm.
+          (See checkout_example5.pl on how specify multiple parameterized URLs)
+        * Corrected AddMerchantOrderNumber.pm synopsis documentation
+        * Added postal-area support for shipping and tax
+          (See checkout_example5.pl for how to ship to EU countries)
+        * Added EU_COUNTRIES to simplify adding EU countries for ShippingRestrictions,
+          AddressFilters and TaxTableAreas

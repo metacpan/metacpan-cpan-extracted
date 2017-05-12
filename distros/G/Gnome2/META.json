@@ -1,0 +1,76 @@
+{
+   "abstract" : "Perl interface to the 2.x series of the GNOME libraries",
+   "author" : [
+      "Gnome2 Perl Team <gtk-perl-list at gnome dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gnome2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : [
+         "inc/MakeHelper.pm"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.20",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "1.03",
+            "Glib" : "1.04",
+            "Gnome2::Canvas" : "1.00",
+            "Gnome2::VFS" : "1.00",
+            "Gtk2" : "1.00"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.20",
+            "ExtUtils::PkgConfig" : "1.03",
+            "Glib" : "1.04",
+            "Gnome2::Canvas" : "1.00",
+            "Gnome2::VFS" : "1.00",
+            "Gtk2" : "1.00"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Number::Delta" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Gnome2 [at] rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Gnome2"
+      },
+      "homepage" : "http://gtk2-perl.sourceforge.net",
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-2.1.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnome.org/perl-Gnome2",
+         "web" : "http://git.gnome.org/browse/perl-Gnome2"
+      },
+      "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
+   },
+   "version" : "1.046"
+}

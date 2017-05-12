@@ -1,0 +1,9 @@
+^Makefile$
+^Makefile[.]old$
+^blib/
+^Gtk3-Helper-
+^pm_to_blib$
+[.]gitignore
+^[.]git/
+MYMETA.json
+MYMETA.yml

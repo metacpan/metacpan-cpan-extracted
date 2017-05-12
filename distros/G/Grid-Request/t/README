@@ -1,0 +1,6 @@
+To run the unit tests successfully, please define the following two environment variable:
+
+  GRID_REQUEST_TEST_PROJECT - Used to set the project to use for grid tests.
+
+  GRID_REQUEST_TEST_HOST - Used to set the hostname to use for grid tests
+                           which use the Grid::Request hosts() method.

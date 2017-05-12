@@ -1,0 +1,229 @@
+#!/pro/bin/perl
+
+use strict;
+use warnings;
+use autodie;
+use Data::Peek;
+
+sub usage
+{
+    my $err = shift and select STDERR;
+    print "usage: $0 [--depth=0] [ME|SM] [path]\n";
+    exit $err;
+    } # usage
+
+use Getopt::Long qw(:config bundling);
+my $depth = 0;
+my $gui   = 0;
+my $opt_v = 1;
+my $mtype = "ME";
+GetOptions (
+    "help|?"		=> sub { usage (0); },
+
+    "d|depth=i"		=> \$depth,
+    "x|x11|gui"		=> \$gui,
+
+    "v|verbose:2"	=> \$opt_v,
+    ) or usage (1);
+
+my @mt;
+my @path;
+for (@ARGV) {
+    if (m/^(me|sm)$/i) {
+	push @mt, uc $_;
+	}
+    else {
+	s{[/\\]*$}{};
+	s{^[/\\]*}{/};
+	s{/}{\\}g;
+	push @path, $_;
+	}
+    }
+
+@mt or @mt = qw( ME SM );
+
+use GSM::Gnokii;
+use JSON;
+
+my $gsm = GSM::Gnokii->new ({ verbose => $opt_v })->connect;
+END { $gsm->disconnect; }
+
+$opt_v >= 9 and DDumper { mt => \@mt, path => \@path };
+
+unless ($gui) {
+    binmode STDOUT, ":encoding(utf-8)";
+
+    my %dt;
+    foreach my $mt (@mt) {
+	$dt{$mt} = @path
+	    ? [ map { [ $gsm->GetDir ($mt, $_, $depth) ] } @path ]
+	    : $gsm->GetDirTree ($mt, $depth);
+	}
+
+    print to_json (\%dt, {
+	utf8	=> 1,
+	pretty	=> 1,
+	});
+    exit 0;
+    }
+
+use GSM::Gnokii::Tk::GSMTree;
+use Tk;
+use Tk::ROText;
+use Tk::JPEG;
+use Tk::PNG;
+#se Tk::TIFF;
+use Tk::Bitmap;
+use Tk::Pixmap;
+use Tk::Photo;
+use File::Temp qw( tempfile );
+
+my $mw = MainWindow->new;
+
+my $dt = $mw->GSMTree (
+    -gsm     => $gsm,
+    -memtype => $mtype,
+    -width   => 40,
+    -height  => 80,
+    -browsecmd => \&x_info,
+    )->pack (-side => "left", -anchor => "nw");
+my $fi = $mw->Frame ()->pack (-side => "left", -anchor => "nw");
+my %fi;
+my %cache;
+for (qw( path name date size id type folder_id )) {
+    my $f = $fi->Frame ()->pack (qw( -side top -expand 1 -fill x ));
+    $f->Label (-text => $_, -width => 10, -foreground => "Green4", -anchor => "w")->pack (qw( -side left -anchor w -fill both -expand 1 ));
+    $f->Label (-textvariable => \$fi{"f_$_"}, -width => 40, -anchor => "w")->pack (qw( -side left -anchor w -fill both -expand 1 ));
+    }
+my ($txt, $img, $filename);
+my $img_dash = $mw->Pixmap ("dash", -data => join "\n",
+    qq(/* XPM */),
+    qq(static char *dash[] = {),
+    qq("4 3 2 1",),
+    qq("  c none",),
+    qq("x c #000000",),
+    qq("    ",),
+    qq(" xx ",),
+    qq("    "),
+    qq(};));
+
+sub GSM::Gnokii::get_file
+{
+    my ($gsm, $path) = @_;
+    $path =~ s{/}{\\}g;
+    substr $path, 0, 0, $mtype eq "SM" ? "B:" : "A:";
+
+    $cache{$path} //= $gsm->GetFile ($path);
+    return $cache{$path};
+    } # get_file
+
+{   my $f = $fi->Frame  ()->pack (qw( -side top -expand 1 -fill x    -anchor nw ));
+    my $t = $fi->Scrolled ("ROText",
+	-scrollbars	=> "oe",
+	    -height	=> 10,
+	    -width	=> 40,
+	    -setgrid	=> 1,
+	    )->pack (
+		qw( -side top -expand 1 -fill both -anchor nw )
+		)->Subwidget ("scrolled");
+    my $i = $fi->Frame  ()->pack (qw( -side top -expand 1 -fill both -anchor nw ));
+    $f->Button (
+	-text		=> "Save",
+	-command	=> sub {
+	    unless ($filename) {
+		$t->delete ("0.0", "end");
+		$t->insert ("end", "No filename");
+		return;
+		}
+
+	    my $path = $fi{f_path};
+	    $t->insert ("end", "Saving $path to $filename\n");
+	    if (my $h = $gsm->get_file ($path)) {
+		$t->insert ("end", sprintf "\n\nLength: %d\n", $h->{size});
+		if (open my $fh, ">", $filename) {
+		    print $fh $h->{file};
+		    close $fh;
+		    $t->insert ("end", "Done");
+		    }
+		else {
+		    $t->insert ("end", "Fail: $!\n");
+		    }
+		}
+	    else {
+		$t->insert ("end", "ERROR: ".$gsm->{ERROR});
+		}
+	    },
+	)->pack (qw( -side left -expand 0 -fill none ));
+    $f->Entry (-textvariable => \$filename, -width => 14)->pack (qw( -side left -expand 0 -fill none ));
+    $f->Button (
+	-text		=> "Show",
+	-command	=> sub {
+	    $t->delete ("0.0", "end");
+	    my $path = $fi{f_path};
+	    $t->insert ("end", "Content for $path\n");
+	    if (my $h = $gsm->get_file ($path)) {
+		$t->insert ("end", sprintf "\n\nLength: %d\n--8<---\n", $h->{size});
+		$t->insert ("end", DDisplay ($h->{file}));
+		$t->insert ("end", "-->8---");
+		}
+	    else {
+		$t->insert ("end", "ERROR: ".$gsm->{ERROR});
+		}
+	    },
+	)->pack (qw( -side left -expand 0 -fill none ));
+    $f->Button (
+	-text		=> "Preview",
+	-command	=> sub {
+	    $t->delete ("0.0", "end");
+	    my $path = $fi{f_path};
+	    $t->insert ("end", "Preview for $path\n");
+	    if (my $h = $gsm->get_file ($path)) {
+		$t->insert ("end", sprintf "\n\nLength: %d\n", $h->{size});
+		my ($fh, $filename) = tempfile ();
+		print $fh $h->{file};
+		close $fh;
+		# $mw->Photo (-data => $h->{file}) doen't work on jpeg
+		my $p = eval { $mw->Photo (-file => $filename) };
+		if ($p and ref $p eq "Tk::Photo" and !$@) {
+		    $img->configure (-image => $p);
+		    }
+		else {
+		    $t->insert ("end", "--8<---\n$h->{file}-->8---");
+		    }
+		unlink $filename;
+		}
+	    else {
+		$t->insert ("end", "ERROR: ".$gsm->{ERROR});
+		}
+	    },
+	)->pack (qw( -side left -expand 0 -fill none ));
+    $img = $i->Label (-image => $img_dash, -anchor => "nw",
+	)->pack (qw( -side left -expand 0 -fill none -anchor nw ));
+    $txt = $t;
+    }
+
+$mw->update;
+$dt->chdir ("/");
+$mw->update;
+if ($opt_v > 1) {
+    open my $log, ">", "cache.out";
+    print $log scalar $dt->show_cache ();
+    close $log;
+    }
+
+MainLoop;
+
+sub x_info
+{
+    $opt_v > 3 and print STDERR "XI (@{[join', '=>@_]})\n";
+    @_ == 1 or return;
+    my $dir = shift;
+    my $info = $dt->fileinfo ($dir);
+    $_ = "" for values %fi;
+    $fi{$_} = $info->{$_} for keys %$info;
+    $fi{f_path} = $dir;
+    ($filename = $dir) =~ s{.*/}{};
+    $txt->delete ("0.0", "end");
+    $img->configure (-image => $img_dash);
+    $opt_v > 2 and print STDERR DDumper $info;
+    } # x_info

@@ -1,0 +1,130 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+2.001002
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+2.001001 2014-10-08T05:01:33Z
+ [Changed / runtime requires]
+ - Moo 0 → 1.006000
+
+2.001000 2014-10-07T07:14:56Z
+ [Removed / runtime requires]
+ - Role::HasMessage
+ - Role::Identifiable::HasIdent
+ - Role::Identifiable::HasTags
+
+2.000000 2014-10-07T06:27:58Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / runtime requires]
+ - Const::Fast
+ - Moo
+ - MooX::ClassAttribute
+ - MooX::HandlesVia
+ - Role::HasMessage
+ - String::Errf
+ - Sub::Exporter::Progressive
+ - Try::Tiny
+ - Type::Library 0.008
+ - Type::Utils
+ - Types::Path::Tiny
+ - Types::Standard
+ - namespace::clean
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4004
+
+ [Removed / configure requires]
+ - Module::Build 0.4004
+
+ [Removed / runtime requires]
+ - Data::Dump
+ - Moose
+ - MooseX::ClassAttribute
+ - MooseX::OneArgNew
+ - MooseX::Types
+ - MooseX::Types::Moose
+ - MooseX::Types::Path::Tiny
+ - Readonly
+ - Role::HasMessage::Errf
+ - Sub::Exporter
+ - namespace::autoclean
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+1.0.5 2013-04-29T00:32:53Z
+
+1.0.4 2013-04-28T20:24:18Z
+ [Changed / build requires]
+ - Module::Build 0.4003 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.4003 → 0.4004
+
+1.0.3 2013-03-13T06:58:04Z
+ [Added / runtime requires]
+ - MooseX::Types::Path::Tiny
+
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+ [Removed / runtime requires]
+ - MooseX::Types::Path::Class
+
+1.0.2 2012-06-21T11:34:49Z
+
+1.0.1 2012-03-17T05:14:32Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+1.0.0 2011-08-02T10:24:40Z
+
+0.03000000 2011-02-10T22:15:53Z
+ [Added / runtime requires]
+ - Data::Dump
+ - MooseX::OneArgNew
+ - Readonly
+ - Role::HasMessage::Errf
+ - Role::Identifiable::HasIdent
+ - Role::Identifiable::HasTags
+ - StackTrace::Auto
+ - Sub::Exporter
+ - Throwable
+ - overload
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.96
+
+ [Removed / runtime requires]
+ - IO::Dir
+
+0.02004319 2011-01-04T12:25:26Z
+
+0.01000020 2010-11-21T08:17:06Z
+ [Added / runtime requires]
+ - MooseX::Types

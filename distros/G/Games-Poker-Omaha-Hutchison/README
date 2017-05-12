@@ -1,0 +1,60 @@
+NAME
+    Games::Poker::Omaha::Hutchison - Hutchison method for scoring Omaha
+    hands
+
+SYNOPSIS
+            my $evaluator = Games::Poker::Omaha::Hutchison->new("Ah Qd 3s 1d");
+
+            my $score = $evaluator->hand_score;
+
+DESCRIPTION
+    This module implements the Hutchison Omaha Point System for evaluating
+    starting hands in Omaha poker, as described at
+    http://www.thepokerforum.com/omahasystem.htm
+
+CONSTRUCTOR
+  new
+            my $evaluator = Games::Poker::Omaha::Hutchison->new("Ah Qd Ts 3d");
+
+    This takes 4 cards, expresed as a single string. The 'pip value' of the
+    card should be 2-9,T,J,Q,K or A, and the suit, of course, s, h, c or d.
+
+METHODS
+  hand_score
+            my $score = $evaluator->hand_score;
+
+    This returns the number of points assigned to the hand by this System.
+    This figure is roughly equivalent to the percentage chance of this
+    turning into a winning hand in a 10 player game, where each player plays
+    until the end. See the URL above for more information.
+
+  flush_score / pair_score / straight_score
+    The final hand_score() is made up from three component scores, for
+    suited cards, paired cards, and straight cards. These component scores
+    can also be accessed individually.
+
+AUTHOR
+    Tony Bowden, based on the rules created by Edward Hutchison.
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Games-Poker-Omaha-Hutchison@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2004-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License; either version
+      2 of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+    This is based on the version at
+    http://www.thepokerforum.com/omahasystem.htm
+
+    An alternative version is available at
+    http://erh.homestead.com/omaha.html
+

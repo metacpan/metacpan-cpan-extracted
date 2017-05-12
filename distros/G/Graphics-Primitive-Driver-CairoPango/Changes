@@ -1,0 +1,61 @@
+Revision history for Graphics-Primitive-Driver-CairoPango
+
+0.61    May 5th, 2011
+  - Fix alignment error when vertical_alignment is set to center.
+
+0.60    October 2nd, 2009
+  - Add support for new antialias/subpixel/hint attributes of Font
+  - Depend on latest Graphics::Primitive
+
+0.59
+  - Remove accidental debugging code
+  - README
+
+0.58
+  - Vertical alignment fixes
+
+0.57
+  - Proper text rotation
+  - Depend on latest Cairo driver
+
+0.56
+  - Fix busted test
+  - Inherit from Cairo driver, no sense duplicating all that code
+
+0.55
+  - Turn units_from_double back on, since it apparently holds the fabric of
+    universe together
+  - Don't return useless components from a TextLayout slice
+  - Adjust lots of little indexes here and there to fix various off-by-one
+    style problems
+
+0.54
+  - Switch to Gtk-less Pango bindings
+  - Stop using units_from_double, as I don't know what it's doing and it was
+    breaking stuff
+
+0.53
+  - Rewrite Pango text rendering, works much better
+
+0.52
+  - Fix TextBoxes generated from TextLayout
+
+0.51
+  - Add new_sub_path before arc call, removing impossible-to-fix line segment
+
+0.05
+  - Add Radial Gradient support
+
+0.04
+  - Optionally set some Pango values rather than using TextBox's defaults
+
+0.03
+  - Add antialias_mode attribute
+
+0.02
+  - POD update
+  - Dependency bumps
+
+0.01
+  First version, released on an unsuspecting world.
+

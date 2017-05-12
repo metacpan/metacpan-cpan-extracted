@@ -1,0 +1,12 @@
+commands
+Changes
+Makefile.PL
+MANIFEST
+README
+examples/live.pl
+examples/simple.pl
+examples/podview.pl
+examples/validation.pl
+t/Gtk2-Ex-Entry-Pango.t
+lib/Gtk2/Ex/Entry/Pango.pm
+META.yml                                 Module meta-data (added by MakeMaker)

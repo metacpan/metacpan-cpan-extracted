@@ -1,0 +1,301 @@
+19540
+32
+70
+32
+19
+5
+1
+3
+3
+100
+45
+8
+
+1200 0 0 0 0 0 9900 0
+618 0 0 0 0 0 9900 0
+1650 0 0 0 0 0 9750 0
+1977 0 0 0 0 0 10650 0
+100 29 20 0 0 0 8701 373
+0 0 0 0 0 0 454 0
+100 264 100 0 0 0 8700 0
+100 284 100 0 0 0 8700 0
+100 304 100 0 0 0 8700 0
+100 324 100 0 0 0 8700 0
+100 344 100 0 0 0 8700 0
+100 244 100 0 0 0 9000 0
+100 364 100 0 0 0 9000 0
+100 224 100 0 0 0 9000 0
+100 384 100 0 0 0 9000 0
+100 39 0 0 0 0 750 0
+100 16 0 0 0 0 11550 0
+100 16 0 0 0 0 978 1050
+100 19 108 100 0 0 1260 9150
+100 48 362 360 60 0 1405 8700
+100 68 422 420 0 0 1511 8323
+0 480 80 0 0 0 8008 0
+100 88 44 100 120 60 8312 0
+100 40 60 80 0 0 9060 9000
+2100 12 0 0 0 0 1800 0
+2400 192 0 0 0 0 1950 0
+2250 32 0 0 0 0 2100 0
+925 42 60 0 0 0 8100 0
+1522 102 0 0 0 0 2250 0
+750 102 0 0 0 0 2400 0
+2125 142 140 180 160 0 2605 8003
+482 162 0 0 0 0 2700 0
+1358 282 0 0 0 0 2850 0
+2558 282 280 300 320 0 8303 8023
+0 0 0 0 0 0 3021 0
+2108 282 280 320 0 0 8303 3321
+2408 282 280 320 0 0 8303 3471
+160 322 120 0 0 0 8100 0
+1358 342 0 0 0 0 3600 0
+2558 342 0 0 0 0 3750 0
+2108 342 340 360 380 0 8303 8023
+0 0 0 0 0 0 3927 0
+2408 342 340 380 0 0 8303 3477
+167 382 140 0 0 0 8100 0
+1358 402 0 0 0 0 4200 0
+2558 402 0 0 0 0 3750 0
+2108 402 0 0 0 0 4350 0
+2408 402 400 420 440 0 8303 8023
+0 0 0 0 0 0 4531 0
+180 442 160 0 0 0 8100 0
+2879 463 0 0 0 0 4800 0
+2259 361 0 0 0 0 4950 0
+2259 362 20 0 0 0 5135 8250
+2263 422 20 0 0 0 5435 8250
+2263 421 0 0 0 0 4950 0
+2276 301 0 0 0 0 4950 0
+2276 302 20 0 0 0 5585 8323
+0 300 40 0 0 0 8308 0
+178 522 0 0 0 0 5700 0
+178 184 200 0 0 0 8100 0
+2722 522 520 80 540 0 8305 7989
+465 0 0 0 0 0 6000 0
+165 562 20 220 0 0 13104 0
+1065 224 20 0 0 0 13050 0
+161 602 260 0 0 0 8100 0
+1821 36 0 0 0 0 6150 0
+1821 120 0 0 0 0 11892 0
+170 622 280 0 0 0 8100 0
+328 200 0 0 0 0 6504 0
+750 0 0 0 0 0 6600 0
+450 0 0 0 0 0 6834 0
+
+"<auto>"	"<any>"
+"GO"	"NORTH"
+"TELEPORT"	"SOUTH"
+"EXAMINE"	"EAST"
+"TAKE"	"WEST"
+"HELP"	"UP"
+"CLIMB"	"DOWN"
+"LEAVE"	"CHIGGERS"
+"INVENTORY"	"DOOR"
+"OPEN"	"PLYWOOD"
+"GET"	"TUNNEL"
+"SCORE"	"POOL"
+"HOLD"	"OIL"
+"SAVE"	"OAK"
+"CHOP"	"CROWN"
+"LIGHT"	"VASE"
+"RAM"	"MUD"
+"KICK"	"PASSAGE"
+"DROP"	"INVENTORY"
+"READ"	"TRUNK"
+""	"INFLOW"
+""	"BREATH"
+""	"HONEY"
+""	"MATCH"
+""	"MEDALLION"
+""	"TREE"
+""	"BALSA"
+""	"GAME"
+""	"PATH"
+""	"NOTE"
+""	"ENTRANCE"
+""	"AXE"
+""	"STUMP"
+
+0 0 0 0 0 0 "[nowhere]"
+4 9 2 0 0 0 "clearing"
+5 12 0 1 0 0 "glade"
+0 0 0 0 0 2 "the top of a beech tree"
+0 1 5 0 0 0 "dismal swamp"
+0 2 0 4 0 0 "rocky area by an outcrop"
+0 5 0 0 0 0 "dingy north-south tunnel"
+0 6 0 0 0 0 "gloomy north-south passage"
+0 7 0 0 0 0 "empty room"
+1 0 12 0 0 0 "forest"
+9 0 0 0 0 0 "forest path"
+0 0 0 0 0 0 "*I'm INSIDE a huge vase!"
+2 0 0 9 0 0 "forest"
+0 0 0 0 12 0 "bubbling pool, just below the water level"
+13 15 0 0 0 0 "*I'm swimming in an underground river.
+Light pours from the north."
+14 16 0 0 0 0 "*I'm swimming in an underground river.
+There's a faint glimmer of light to the north."
+15 17 0 0 0 0 "*I'm swimming in an underground river.
+There's a faint glimmer of light to the south."
+16 18 0 0 0 0 "*I'm swimming in an underground river.
+Light pours from the south."
+17 0 0 0 0 0 "brightly lit underground chamber.
+An underground river disappears into the north wall."
+0 0 1 0 0 0 "*I'm dead.  Great.  Try again."
+
+"[dummy]"
+"Welcome to `CRYSTAL OF CHAOS`"
+"Written by Mike Taylor, starting Monday 10th April 2001"
+"This is a demo for the `sac` adventure system --"
+"See http://www.miketaylor.org.uk/tech/advent/sac.html"
+"I have to breathe NOW!"
+"I can only hold my breath for"
+"more turns."
+"I can't breathe ..."
+"The plywood also catches fire and burns quickly."
+"The oak catches, and becomes a roaring fire."
+"Smoke pours upwards."
+"I can't chop anything without an axe."
+"I don't have a battering ram."
+"I don't have anything to light it with."
+"No!  Bees would sting me!"
+"Smoke 'em out!"
+"TIMBER!"
+"There's nothing there all right! Maybe I should forget it?"
+"It's locked."
+"It splinters easily."
+"There's a tunnel beyond."
+"CRUNCH!  It's smashed to smithereens!"
+"DOOSH!  It's absolutely annihilated!"
+"It's also locked."
+"Ouch!"
+"CRUNCH!"
+"There's a passage beyond."
+"OF COURSE it's locked!"
+"It's too solid for the axe to make much impression."
+"DOOSH!"
+"There's an entrance beyond."
+"It says - `Leave *TREASURES* here, the say: SCORE`"
+"Not while I'm carrying it!"
+"I can't get it to catch fire."
+"My match goes out."
+"There's no way it will catch fire."
+"OK.  It burns up very quickly."
+"Bear won't let me"
+"Bear eats the honey and falls asleep."
+"It's bigger than I am."
+"I'm already holding my breath!"
+"OK"
+">Fzing!<"
+"You'll have to figure it out for yourself."
+"It looks like a pretty average"
+
+"Axe/AXE/" 1
+"Single match/MATCH/" 1
+"Beech tree" 2
+"Bees' nest" 3
+"Wild honey/HONEY/" 3
+"Killer bees" 3
+"Drowsy bees" 0
+"Cypress tree" 4
+"-SOLID- stump" 0
+"Trunk of cypress tree/TRUNK/" 0
+"Evil smelling mud/MUD/" 4
+"Swamp gas" 4
+"Patches of `OILY` slime/OIL/" 4
+"Chiggers/CHIGGERS/" 4
+"Balsa-wood door set into the rock" 5
+"Balsa wood/BALSA/" 0
+"Tunnel disappears into the rock" 0
+"Plywood door blocks the way north" 6
+"Plywood/PLYWOOD/" 0
+"Passage disappears into the rock" 0
+"Oak door blocks the way north" 7
+"Oak/OAK/" 0
+"Entrance to the north" 0
+"Note/NOTE/" 8
+"Blazing hot fire" 0
+"Path leads south into the forest" 9
+"Very thin black bear" 9
+"Sleeping bear" 0
+"*Huge vase*/VASE/" 10
+"*Silver medallion*/MEDALLION/" 11
+"Bubbling pool" 12
+"inflow from the south" 13
+"*Gold crown*/CROWN/" 18
+
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+"Fire-building must happen all in one go"
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+"no balsa wood"
+"no balsa wood"
+""
+""
+""
+""
+""
+"no plywood"
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+""
+
+1
+18400
+0

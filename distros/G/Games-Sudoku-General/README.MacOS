@@ -1,0 +1,60 @@
+This README covers MacPerl and Mac OS classic. If you are running
+Darwin (i.e. Mac OS X) this information does not apply.
+
+The "usual incantation" in the README is probably useless to
+you. But you _can_ get there if you have Stuffit expander.
+Here's what you do.
+
+1) Download the kit from CPAN.
+
+2) Expand the kit with Stuffit Expander.
+
+3) Make a MacPerl droplet out of the following Perl script:
+
+foreach (@ARGV) {
+    my $fn = $_;
+    print "Reading $fn\n";
+    open (IN, "<$fn") or die <<eod;
+Error - Failed to open input file $fn
+        $!
+eod
+    my @data;
+    while (<IN>) {push @data, split ('\r', $_)}
+    close IN;
+    print "Writing $fn\n";
+    open (OUT, ">$fn") or die <<eod;
+Error - Failed to open output file $fn
+        $!
+eod
+    foreach (@data) {print OUT "$_\n"}
+    close OUT;
+    }
+
+4) Run General.pm from the expanded kit through this droplet.
+
+5) Open folder 'MacPerl f' (or whatever it's called). Then open
+folder site_perl in the 'MacPerl f' folder. Create folder
+Games if it does not already exist, then open it. Create
+folder Sudoku in Games (if it does not already exist) and
+open it. Drop General.pm in the Sudoku folder.
+
+6) Open the bin folder in the expanded kit, and drop file
+sudokug on the droplet.
+
+7) Open file sudokug with MacPerl and save it as an executable.
+
+Caveat:
+
+Date::Manip is a heavyweight but useful module. Unfortunately,
+it also assumes that time 0 is January 1, 1970. But MacPerl's
+time 0 is January 1, 1904. Rather than try to get this patched,
+I have simply had the satpass script add a fudge factor. This
+implementation will break if Date::Manip ever gets wise to
+"non-standard" epochs. Be aware of this should you decide to
+use Date::Manip for other purposes.
+
+The sudokug script's 'help' function doesn't work under MacPerl.
+This is because it tries to parse the POD out of the script, but
+when MacPerl converts the script to an executable, the POD gets
+lost. You can find the docs by hunting up the package at
+http://search.cpan.org/

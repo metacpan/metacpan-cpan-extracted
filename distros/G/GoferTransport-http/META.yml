@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                GoferTransport-http
+version:             1.017
+abstract:            HTTP transport for DBI stateless proxy driver DBD::Gofer
+license:             ~
+author:              
+    - Tim Bunce <Tim.Bunce@pobox.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBI:                           1.605
+    HTTP::Request:                 0
+    LWP::UserAgent:                0
+    Test::More:                    0
+    URI:                           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

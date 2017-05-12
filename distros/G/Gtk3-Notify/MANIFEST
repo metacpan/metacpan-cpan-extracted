@@ -1,0 +1,10 @@
+lib/Gtk3/Notify.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/notify.t
+COPYING
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

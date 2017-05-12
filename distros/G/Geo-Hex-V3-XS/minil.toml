@@ -1,0 +1,13 @@
+name = "Geo-Hex-V3-XS"
+badges   = ["travis"]
+c_source = ["src"]
+license  = "mit"
+
+[build]
+build_class = "builder::MyBuilder"
+
+[XSUtil]
+needs_compiler_c99  = 1
+generate_xshelper_h = "src/xshelper.h"
+generate_ppport_h   = "src/ppport.h"
+cc_warnings = 1

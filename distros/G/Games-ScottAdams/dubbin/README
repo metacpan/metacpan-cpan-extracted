@@ -1,0 +1,13 @@
+$Id: README,v 1.2 2006/11/01 17:28:44 mike Exp $
+
+You shouldn't really be wasting your time looking at this directory.
+It contains a rather pointless game, "test.sac", broken up into a
+bunch of sub-files so we can test that %include works the way it
+should.
+
+We also have a pre-built "test.sao", so that the module's "make test"
+routine can regression-test its output against a known-good object
+file.
+
+(The test game is an early version of _Crystal of Chaos_ -- see
+../crystal for the current version which is much more interesting.)

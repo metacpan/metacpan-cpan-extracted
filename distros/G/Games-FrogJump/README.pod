@@ -1,0 +1,32 @@
+=head1 NAME
+
+Games::FrogJump - An ASCII game for fun
+
+=head1 SYNOPIS
+
+ use Games::FrogJump;
+ Games::FrogJump->new->run;
+
+=head1 DESCRIPTION
+
+This module is an ASCII game , It runs at command-line. Control the frogs jump to each side.
+
+Play the game with command:
+
+  frogjump
+
+=begin HTML
+
+<p><img src="http://ww3.sinaimg.cn/large/a8e976cegw1ej24klqiqkj20gf07gt8t.jpg" /></p>
+
+=end HTML
+
+=head1 ACKNOWLEDGEMENTS
+
+BLAIZER, Author of L<Games::2048>
+
+=head1 AUTHOR
+
+tadegenban <tadegenban@gmail.com>
+
+=cut

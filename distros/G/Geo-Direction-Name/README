@@ -1,0 +1,32 @@
+Geo-Direction-Name
+
+Geo::Direction::Name transforms direction name and direction in degree
+each other.
+It can also manage many locales, but now supports only en_US, ja_JP and
+ko_KR.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Scalar::Util
+Class::Inspector
+UNIVERSAL::require
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, OHTSUKA Ko-hei
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

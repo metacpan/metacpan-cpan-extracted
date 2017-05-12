@@ -1,0 +1,32 @@
+Revision history for Github-Fork-Parent
+
+1.0     2017-02-23
+        Support repository names containing '.'
+
+0.24    2016-01-06
+        Fix in case there are no forks
+
+0.23    2015-11-15
+        Different repository in test
+
+0.22    2014-05-01
+        Update URL in test
+
+0.21    2013-01-27
+        Made online test check api.github.com availability first
+
+0.20    2012-11-11
+        Move to GitHub API v3
+        Small fix for test
+
+0.11    2011-05-09
+        Parse https links too
+        Modify tests to mirror github changes
+
+0.10    2010-01-12
+        Add 'github_parent_author'
+        Fix error in test
+
+0.01    2009-11-08
+        First version.
+

@@ -1,0 +1,65 @@
+# Copyright 2010, 2011 Kevin Ryde
+#
+# This file is part of Gtk2-Ex-History.
+#
+# Gtk2-Ex-History is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 3, or (at your option) any
+# later version.
+#
+# Gtk2-Ex-History is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Gtk2-Ex-History.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# See the file README for notes on translations.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Gtk2-Ex-History @VERSION@\n"
+"POT-Creation-Date: @DATE@\n"
+"PO-Revision-Date: YYYY-MM-DD HH:MM+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Gtk2/Ex/History/Action.pm:46 lib/Gtk2/Ex/History/Dialog.pm:52
+#: lib/Gtk2/Ex/History/Menu.pm:50
+msgid "History object"
+msgstr ""
+
+#: lib/Gtk2/Ex/History/Action.pm:144
+msgid "Go back."
+msgstr ""
+
+#: lib/Gtk2/Ex/History/Action.pm:145
+msgid "Go forward."
+msgstr ""
+
+#: lib/Gtk2/Ex/History/Dialog.pm:62
+#, perl-brace-format
+msgid "{appname}: History"
+msgstr ""
+
+#: lib/Gtk2/Ex/History/Dialog.pm:76
+msgid "Current"
+msgstr ""
+
+#: lib/Gtk2/Ex/History/Dialog.pm:125
+msgid "Back"
+msgstr ""
+
+#: lib/Gtk2/Ex/History/Dialog.pm:125
+msgid "Forward"
+msgstr ""
+
+#: lib/Gtk2/Ex/History/Menu.pm:74
+msgid "Open the back/forward history dialog"
+msgstr ""

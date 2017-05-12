@@ -1,0 +1,15 @@
+Changes for GappX::FileTree
+
+{{$NEXT}}
+
+0.03 Sept 7 2012
+- added support for windows style directory separators
+- addes support for absolute paths
+
+0.02 Sep 6 2012
+- BUG FIX: Fixed bug displaying sub-directories
+- added filter_func property to filter results
+- "update" now called upon gobject construction
+
+0.01
+- Initial Release

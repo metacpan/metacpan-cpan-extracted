@@ -1,0 +1,22 @@
+---
+name: Gantry-Plugins-CookieCheck
+version: 0.02
+author:
+  - 'John Weigel <jweigel@sunflowerbroadband.com>'
+abstract: Plugin for testing browser cookie functionality.
+license: perl
+requires:
+  Gantry: 3.59
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Gantry::Plugins::CookieCheck:
+    file: lib/Gantry/Plugins/CookieCheck.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/

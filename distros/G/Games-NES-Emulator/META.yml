@@ -1,0 +1,22 @@
+--- 
+abstract: An object-oriented NES (6502) emulator
+author: Brian Cassidy <bricas@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Games-NES-Emulator
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor::Fast: 0
+  Games::NES::ROM: 0
+  Module::Pluggable::Object: 0
+  Scalar::Util: 0
+  Test::More: 0
+  Text::SimpleTable: 0
+version: 0.03

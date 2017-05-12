@@ -1,0 +1,143 @@
+Book does not describe:
+    fields statements html_form_...: content, width, label_width
+    (bigtop doesn't know about these either)
+
+Clean params is still too aggressive.  Example if a user enters zero for
+a varchar, it gets nulled.
+
+Auth concerns:
+    name of the user<->group three way is forced on you and it isn't groups
+    encryption is forced upon you
+    there is no way to specify other criteria for the auth users search
+    (only username and password are checked, not things like active flags)
+    Cannot use salt-based IV generation if literal IV is specified at ../lib/Gantry/Plugins/AuthCookie.pm line 342
+
+Make sure Gantry::Conf is working on a per location basis with CGI.
+
+AuthCookie plugin requires Crypt::CBC, Crypt::Blowfish, and
+Authen::Htpasswd but doesn't let you know in a nice way.
+
+Add the following to documentation (including to the book):
+    auth (job ad case study)
+    many-to-many (job ad case study)
+    callback registration (plugins)
+
+We are still struggling with questions during ./Build install both in and
+out of CPAN now.  These questions need to move to the perl Build.PL phase
+like the ones that seem to work well for Bigtop.
+
+Install problems pointed out by Apps::Cyrus:
+    1. The generated tests fail when pages call user_row, it returns undef.
+    2. The generated Build.PL wants to help you install web content, but
+       that content is not moved to blib/web for you.
+Both of these occur on production only.
+
+Phil Crow Thu May 11 12:05:59 CDT 2006
+Tim suggested a Gantry notes section to be features on usegantry.org.
+I like the idea and here are some notes that need writing:
+    Using Gantry with a templating system
+    Using Gantry with a ORM
+    Using Gantry::Server to deliver a GUI app (think tentmaker)
+    Using Gantry::Server as a genuine server
+
+Phil Crow Thu Feb  2 10:55:24 CST 2006
+Gantry::Utils::Model needs some more features:
+    caching (but users can always override the retrieve and construct methods)
+    place holders in SQL (or any SQL caching)
+    has_many
+        items (a method which returns a list of the associated items)
+        add_to_items
+        cascading update
+        cascading delete
+
+DONE:
+    AutoCRUD needs to stop relying on autocommit.
+
+    When form.tt reports missing fields, it should use the label of the field
+    and not the name.
+
+    DBIx::Class support should:
+        be converted to let DBIx::Class handle the primary keys (if possible)
+        be more careful with commits
+
+    CRUD should also have a new flag no_clean_params which if set turns off
+    the default behavior of calling clean_params for you.
+
+    AutoCRUD should undef all blank form param fields before doing edit updates.
+    It does this for dates, because those caused problems with Class::DBI, but
+    it should apply to all fields (except booleans).
+
+    Based on initial user feedback we need to resolve some issues:
+        The prereq list is far too long, while many modules have dependencies
+        those modules may not be needed by users.  We should install them,
+        but skip their tests.
+            This is mostly done Class::DBI is no longer on the list.
+            Template Toolkit was retained since all but the simplest samples
+            in the docs rely on it.
+
+        We need a better list of web install directories (possibly with hidden
+        shortcut words for us).
+            Done.  Now there is a default (which is our dev/prod dir) and
+            a chance to type something.
+            I'm not sure if this gives them the chance to skip install.
+            We probably need a 'type space to skip' or some such.
+
+        We need a more complete README.
+            Fleshed out some.
+
+        The auth test offered to the user is doomed to fail.
+            Now they just have to have a database with the proper schema.
+            This is unlikely to succeed, but at least it's more sensible.
+
+    DBIx::Class support should:
+        be converted to let DBIx::Class handle the primary keys (if possible)
+        be more careful with commits
+
+    Abstract out all references to the apache request object.  This object
+    is subject to mod_perl api changes.  Further, other systems don't have
+    this option.  What we need is a way to set config variables and have
+    them show up in the app in an engine independent way.
+        This is still not finished because there is no accessor for the
+        hostname in the engines.
+        Acutally, there is a base_server in each engine which performs
+        this task.
+
+    Requests for auth db conn info should fall back on regular db conn info if
+    auth forms aren't defined.
+        Not really tested, but the change didn't break the existing test app.
+
+    AutoCRUD should try to call form, then fallback to _form if that fails.
+
+    When all elements on a form are optional, you can't add or edit rows
+    with AutoCRUD or CRUD.
+
+    Missing template is not displaying its error correctly in MP13 engine
+    (works in CGI).
+        Headers were sent at the wrong time.  Tim fixed it.
+
+    Fix Gantry::Utils::DB, module should not export subs
+        that module was abandoned in favor of better schemes
+
+    Fix all Auth modules
+
+    Make it possible for different modules in the same app to use different
+    template engines (think TT and plain).
+        $self->content_type( 'text/plain' );  # or 'text/xml' etc.
+        $self->template_disable( 1 );
+
+    Tim's advice from OSCON: there should be more defaults.  In particular:
+        when you tell Gantry where to put the templates, it should write a
+        module with that path in it which init will call to postpend it to
+        your root path.  If you have no custom templates, you don't need root.
+        This will also allow bigtop to find the sample wrapper without being
+        told where to look.
+
+        You should be able to run bigtop in a mode where you list models
+        you want to make and it generates models and controllers for them
+        with trivial structure for immediate use with sqlite.
+
+        Tentmaker should make a table and a controller whenever you enter
+        a sequence.  Its controllers should be ready for auto crud including
+        a form with all_fields_but id already in it and a do_main with
+        the trivial fields except id.
+

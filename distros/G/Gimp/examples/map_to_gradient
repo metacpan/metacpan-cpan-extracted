@@ -1,0 +1,94 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use PDL::LiteF;
+use strict;
+use warnings;
+#BEGIN { $Gimp::verbose = 3; }
+
+# convert to greyscale. could be improved, but should still be fast!
+sub togrey {
+   my $pdl = shift;
+   $pdl->convert(ushort);
+   $pdl=$pdl->inner(pdl[54,183,18])/256;
+   $pdl->convert(byte);
+   $pdl;
+}
+
+podregister {
+   Gimp->progress_init ("Mapping to '$gradient'", -1);
+
+   my $grad = pdl byte, map $_*255, Gimp->gradient_get_uniform_samples($gradient,256,0);
+   $grad->reshape(4,256);
+
+   my $alpha = $drawable->has_alpha;
+
+   $grad = $grad->slice('0:-2') unless $alpha;
+   $grad = togrey($grad)->dummy(0) unless $drawable->is_rgb;
+
+   my $depth = ($grad->dims)[0]; # precalculate
+   $grad = $grad->xchg(0,1); # this form is later needed in index, so do it now
+
+   my @bounds = $drawable->bounds;
+   {
+      my $src = new Gimp::PixelRgn ($drawable,@bounds,0,0);
+      my $dst = new Gimp::PixelRgn ($drawable,@bounds,1,1);
+
+      my $iter = Gimp->pixel_rgns_register($src,$dst);
+      my $area = $bounds[2]*$bounds[3];
+      my $progress = 0;
+
+      do {
+         my $data = $src->data;
+         $data = $data->slice("0:-2") if $alpha; # get rid of alpha
+         $data = $src->bpp > 2 ? togrey($data) : $data->clump(2);
+
+         # now map from grey values to gradient
+         $dst->data( index($grad,$data->dummy(0,$depth)) );
+
+         $progress += ($src->w*$src->h)/$area;
+         Gimp->progress_update ($progress);
+      } while (Gimp->pixel_rgns_process ($iter));
+   }
+   Gimp->progress_update (1);
+   $drawable->merge_shadow (1);
+   $drawable->update (@bounds);
+   ();
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+map_to_gradient - Map grayscale values to gradient
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Colors/Map/Map To Gradient...
+
+=head1 DESCRIPTION
+
+Map all the pixels to the colours of a gradient according to their
+greyscale value.
+
+=head1 PARAMETERS
+
+  [PF_GRADIENT, "gradient", "The gradient to map to", 'FG to BG (RGB)'],
+
+=head1 IMAGE TYPES
+
+RGB*, GRAY
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+19990802
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

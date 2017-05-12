@@ -1,0 +1,222 @@
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="713.91" height="441" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Generated at Sun Apr  9 18:19:18 2006 by:
+  Graph::Easy v0.44
+  Graph::Easy::As_svg v0.18
+-->
+
+<title>My sample graph</title>
+<defs>
+ <!-- open arrow head -->
+ <g id="ah" stroke-linecap="round" stroke-width="1">
+  <line x1="-8" y1="-4" x2="1" y2="0" />
+  <line x1="1" y1="0" x2="-8" y2="4" />
+ </g>
+
+ <!-- class definitions -->
+ <style type="text/css"><![CDATA[
+ .edge {
+  fill: inherit;
+  font: monospaced, courier-new, courier, sans-serif;
+  stroke: black;
+ }
+ .node {
+  text-anchor: middle;
+  fill: #ffdead;
+ }
+ .text {
+  text-anchor: middle;
+  font-size: 17px;
+ }
+ ]]></style>
+</defs>
+
+<!-- background with border -->
+<rect x="17" y="17" width="679.91" height="407" fill="white" stroke="#000000" stroke-width="1" />
+
+  <!-- graph label -->
+  <text class="text" x="356.955" y="51" fill="black">My sample graph</text>
+
+<g class="edge">
+ <!-- edge from Five to Three -->
+ <!-- horizontal -->
+ <g stroke="#0000ff" stroke-width="1">
+  <line x1="325.09" y1="228.5" x2="395.02" y2="228.5" />
+  <line x1="325.09" y1="230.5" x2="395.02" y2="230.5" />
+ </g>
+ <use stroke="#0000ff" xlink:href="#ah" transform="translate(322.59 229.5)rotate(180)"/>
+ <use stroke="#0000ff" xlink:href="#ah" x="397.52" y="229.5"/>
+</g>
+
+<g class="edge">
+ <!-- edge from Five to Seven -->
+ <!-- south/west corner -->
+ <g stroke="#ff0000" stroke-dasharray="4, 2" stroke-width="1">
+  <line x1="276.12" y1="178" x2="276.12" y2="195.5" />
+  <line x1="239.02" y1="178.5" x2="276.62" y2="178.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="85" y1="178.5" x2="239.02" y2="178.5" stroke="#ff0000" stroke-dasharray="4, 2" stroke-width="1" />
+
+ <!-- south/east corner -->
+ <g stroke="#ff0000" stroke-dasharray="4, 2" stroke-width="1">
+  <line x1="59.5" y1="178" x2="59.5" y2="204" />
+  <line x1="59" y1="178.5" x2="85" y2="178.5" />
+ </g>
+
+ <!-- vertical -->
+ <line x1="59.5" y1="204" x2="59.5" y2="357" stroke="#ff0000" stroke-dasharray="4, 2" stroke-width="1" />
+
+ <!-- north/east corner -->
+ <g stroke="#ff0000" stroke-dasharray="4, 2" stroke-width="1">
+  <line x1="59.5" y1="357" x2="59.5" y2="383" />
+  <line x1="59" y1="382.5" x2="85" y2="382.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="85" y1="382.5" x2="239.02" y2="382.5" stroke="#ff0000" stroke-dasharray="4, 2" stroke-width="1" />
+ <text class="text" x="162" y="377" fill="#2f4f4f" stroke="none">Test label</text>
+
+ <!-- north/west corner -->
+ <g stroke="#ff0000" stroke-dasharray="4, 2" stroke-width="1">
+  <line x1="276.12" y1="363.1" x2="276.12" y2="383" />
+  <line x1="239.02" y1="382.5" x2="276.62" y2="382.5" />
+ </g>
+ <use stroke="#ff0000" xlink:href="#ah" transform="translate(276.12 362.1)rotate(-90)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from One to Two -->
+ <!-- horizontal -->
+ <line x1="323.59" y1="110.5" x2="397.52" y2="110.5" stroke="#0000ff" stroke-width="1" />
+ <use stroke="#0000ff" xlink:href="#ah" transform="translate(322.59 110.5)rotate(180)"/>
+ <text class="text" x="363" y="88" fill="#008000" stroke="none">label</text>
+</g>
+
+<g class="edge">
+ <!-- edge from Five to Eight -->
+ <!-- north/east corner -->
+ <g stroke="#0000ff" stroke-width="1">
+  <line x1="276.12" y1="263.5" x2="276.12" y2="281" />
+  <line x1="275.62" y1="280.5" x2="313.22" y2="280.5" />
+ </g>
+
+ <!-- horizontal -->
+ <line x1="313.22" y1="280.5" x2="406.89" y2="280.5" stroke="#0000ff" stroke-width="1" />
+
+ <!-- south/west corner -->
+ <g stroke="#0000ff" stroke-width="1">
+  <line x1="440.89" y1="280" x2="440.89" y2="299.9" />
+  <line x1="406.89" y1="280.5" x2="441.39" y2="280.5" />
+ </g>
+ <use stroke="#0000ff" xlink:href="#ah" transform="translate(440.89 300.9)rotate(90)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from Seven to Eight -->
+ <!-- horizontal -->
+ <line x1="322.59" y1="331.5" x2="397.52" y2="331.5" stroke="#0000ff" stroke-width="1" />
+</g>
+
+<g class="edge">
+ <!-- edge from One to Four -->
+ <!-- horizontal -->
+ <line x1="490.29" y1="110.5" x2="612.51" y2="110.5" stroke="#0000ff" stroke-dasharray="2, 2" stroke-width="1" />
+ <use stroke="#0000ff" xlink:href="#ah" x="613.51" y="110.5"/>
+ <text class="text" x="547" y="88" fill="#008000" stroke="none">
+  <tspan x="547" y="86">Test</tspan>
+  <tspan x="547" y="105">label</tspan>
+  <tspan x="547" y="124"></tspan>
+</text>
+</g>
+
+<g class="edge">
+ <!-- edge from One to Three -->
+ <!-- vertical -->
+ <g stroke="#0000ff" stroke-width="1">
+  <line x1="439.89" y1="163" x2="439.89" y2="196.4" />
+  <line x1="441.89" y1="163" x2="441.89" y2="196.4" />
+ </g>
+ <use stroke="#0000ff" xlink:href="#ah" transform="translate(440.89 198.9)rotate(90)"/>
+</g>
+
+<g class="edge">
+ <!-- edge from Five to Seven -->
+ <!-- south/east corner -->
+ <g stroke="#0000ff" stroke-width="1">
+  <line x1="162.01" y1="229" x2="162.01" y2="255" />
+  <line x1="161.51" y1="229.5" x2="223.62" y2="229.5" />
+ </g>
+
+ <!-- vertical -->
+ <line x1="162.01" y1="255" x2="162.01" y2="306" stroke="#0000ff" stroke-width="1" />
+
+ <!-- north/east corner -->
+ <g stroke="#0000ff" stroke-width="1">
+  <line x1="162.01" y1="306" x2="162.01" y2="332" />
+  <line x1="161.51" y1="331.5" x2="222.62" y2="331.5" />
+ </g>
+ <use stroke="#0000ff" xlink:href="#ah" x="223.62" y="331.5"/>
+</g>
+
+<g class="edge">
+ <!-- edge from Three to Six -->
+ <!-- horizontal -->
+ <line x1="491.29" y1="229.5" x2="612.51" y2="229.5" stroke="#0000ff" stroke-dasharray="2, 2" stroke-width="1" />
+ <use stroke="#0000ff" xlink:href="#ah" transform="translate(490.29 229.5)rotate(180)"/>
+ <use stroke="#0000ff" xlink:href="#ah" x="613.51" y="229.5"/>
+ <text class="text" x="551" y="224" fill="#008000" stroke="none">Test label</text>
+</g>
+
+<g class="node">
+ <!-- One, rect -->
+ <rect fill="#2e8b57" height="84" stroke="black" width="67" x="407.39" y="68.5" />
+ <text class="text" x="441" y="117" fill="#ffffff">One</text>
+</g>
+
+<g class="node">
+ <!-- Two, triangle -->
+ <polygon points="276.12,68.5, 312.22,152.6, 240.02,152.6" fill="#ffdead" stroke="black" />
+ <text class="text" x="276" y="142.5" fill="black">Two</text>
+</g>
+
+<g class="node">
+ <!-- Three, rect -->
+ <rect fill="#ffdead" height="50" stroke="black" width="67" x="407.39" y="204.5" />
+ <text class="text" x="441" y="236" fill="black">Three</text>
+</g>
+
+<g class="node">
+ <!-- Five, rect -->
+ <rect fill="#800000" height="50" stroke="black" width="73.2" x="239.52" y="204.5" />
+ <text class="text" x="276" y="236" fill="#ffff00">Five</text>
+</g>
+
+<g class="node">
+ <!-- Four, rect -->
+ <rect fill="#ffdead" height="84" stroke="black" width="51" x="629.41" y="68.5" />
+ <text class="text" x="655" y="117" fill="black">Four</text>
+</g>
+
+<g class="node">
+ <!-- Six, rect -->
+ <rect fill="#ffdead" height="50" stroke="black" width="51" x="629.41" y="204.5" />
+ <text class="text" x="655" y="236" fill="black">Six</text>
+</g>
+
+<g class="node">
+ <!-- Seven, rect -->
+ <rect fill="#ffdead" height="50" stroke="black" width="73.2" x="239.52" y="306.5" />
+ <text class="text" x="276" y="338" fill="black">Seven</text>
+</g>
+
+<g class="node">
+ <!-- Eight, rect -->
+ <rect fill="#ffdead" height="50" stroke="black" width="67" x="407.39" y="306.5" />
+ <text class="text" x="441" y="338" fill="black">Eight</text>
+</g>
+
+</svg>

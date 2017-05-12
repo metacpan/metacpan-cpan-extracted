@@ -1,0 +1,326 @@
+Revision history for Perl module Glade::PerlGenerate development branch.
+
+Sun Nov 17 03:21:11 GMT 2002 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.61
+- PerlRun->fix_name() a new sub to substitute illegal chars in perl names
+  will also deal with + - / * ! . ' ' chars in project/class/handler names
+- PerlUI->new_signal() changed to use fix_name()
+- PerlUI->construct_widget() also now fixes toplevel widget names so that
+  package names are more likely to be valid.
+- PerlUI->construct_widget() now dies if you define two forms with the same 
+  name in one project.
+- PerlProject new user option <gnome_incs> to point to Gnome include files.
+- README/Gtk-Perl-Docs.html new gtk-perl mailing list and email addresses.
+- Makefile.PL Gtk 0.7000 added to PREREQ_PM for automatic installs
+- PerlSource->dist_test_pl() spurious curly bracket removed from output.
+- PerlRun->load_pixmap() will now take pixmap data as string.
+- PerlUI->internal_pack_widget() fixed to add() Gnome::Canvas instead
+  of add_with_viewport() - thanks to Rolf Herzog
+- PerlUI->new_signal() fixed to escape any double-quotes in data.
+- PerlUI->set_window_properties() generates 'set_position()' now.
+  
+Fri May  3 03:56:25 BST 2002 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.60
+- Documentation and dist files written for Libglade style apps as well.
+- PerlRun->save_file_from_string() allows writing undef string.
+- PerlUI->new_GtkSpinButton() bug fix for set_wrap() code.
+- PerlProject->use_Glade_Project() forces a leading '#' for 'copying'.
+- PerlSource->perl_preamble() (extra) leading '#' removed from 'copying.
+- PerlSource->dist_Makefile_PL() now uses Glade-Perl's min. requirements
+  as defaults for Makefile.PL version checks for Gtk and Gnome.
+- PerlUI->internal_pack_widget() fixed to add() Gnome::IconLists instead
+  of add_with_viewport() - thanks to René Seindal <rene at seindal.dk>
+- PerlUI->new_accelerator() changed to generate code that looks up the
+  keyval at UI construction time so that apps are more portable.
+  Also generated code will use Gtk::Gdk->keyval_from_name() in case any
+  subsequent app user doesn't have a populated Gtk::Keysyms.pm (some RPMs)
+- PerlUIExtra->new_GtkPixmapMenuItem() similarly changed.
+- PerlUIExtra->new_GnomeEntry() fixed to set history ID correctly.
+  Thanks to Franco Broi for the bug report.
+- PerlSource->perl_AUTOLOAD_top() small change to generated sub AUTOLOAD()
+- PerlSource->perl_*_top() now generate modules with initial version
+  number of 0.10 (was 0.01) to make scripts handling the distribution of
+  modules more predictable - minor version now always has 2 significant
+  digits and can be incremented without packing (eg. 0.10 > 0.11).
+  Also %params now passed through from toplevel script to app_run()
+- New user option <source><save_connect_id>1</save_connect_id></source>
+  and PerlUI->new_signal() changed to generate code that will save all 
+  the signal connection ids in a predictable way so that signals can be
+  blocked and unblocked in handlers. The connection id is held in eg:
+    my $id = $forms->{'__CONNECT_ID'}{'entry1'}{'after_key_press_event'}
+  and can be used like $form->{'entry1'}->signal_handler_block($id);
+  and later $form->{'entry1'}->signal_handler_unblock($id);
+  or $form->{'entry1'}->signal_disconnect($id);
+  or $form->{'entry1'}->signal_emit($id);
+  The last hash key is either 'signal' or 'after_signal' depending on
+  whether the signal is connected normally or after. I have never needed
+  this functionality but someone asked for it, the costs of the changes
+  are negligible and they should not affect any existing code - just 
+  don't give any widget the name '__CONNECT_ID'. 
+  The default (0) produces the same code as previous versions.
+- PerlProject->use_Glade_project() fixed to write missing project logo.
+- PerlSource->dist_MANIFEST_SKIP() generates file MANIFEST.SKIP such that
+  src/ProjectSIGS.pm will not be included in default MANIFEST file when 
+  you run 'make manifest'
+- PerlRun->write_missing_gettext_strings() produces better .pot file
+- FAQ - new Q/A about automatic installion using CPAN.pm and updated Q/A 
+  about accessing widgets with PerlRun->lookup_widget() new in 0.59
+- PerlUI->use_par() fixed to escape leading single quote in string
+- PerlUI->Widget_from_Proto() split into construct_widget() and 
+  new_sub_widget(). This is an attempt to tidy the code a little.
+- PerlRun data fields altered to double quote default 'copying' message
+  so that the \n is interpolated. Thanks to Mark W. Eichin for report.
+- PerlProject->use_Glade_project() fixed to not escape author strings
+  and PerlSource->perl_preamble() to cope with the change. Also Mark :)
+- PerlSource->perl_about() fixed to pass author/description/copying
+  as single-quoted literals in generated code (see above).
+- $PACKAGE, $VERSION, $AUTHOR, $DATE fields not now inherited from
+  Glade::PerlRun. This was bad behaviour and broke the CPAN automatic
+  updating module so each module is separately updated now.
+
+Wed Jun 20 14:48:25 BST 2001 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.59
+- All modules now have empty DESTROY() sub as perl 5.6 demands.
+  PerlRun->AUTOLOAD() also caters for (ignores) AUTOLOADED DESTROY() call.
+  PerlRun perldoc corrected to lose warnings in pod2man.
+  Thanks to Jim Edwards for the super-fast reports and patches.
+- PerlRun->lookup_widget() is a new method that accesses a window or a
+  form's widget by name. It prints an error if the widget does not exist.
+  e.g. my $widget = $window->lookup_widget('clist1');
+    OR my $form = $window->FORM; # or use $form in signal handlers
+       my $widget = $form->lookup_widget('clist1');
+- Glade-Perl will now create skeleton documentation files if they
+  do not already exist. These default to directory 'Documentation' files
+  called COPYING, Changelog, FAQ, INSTALL, NEWS, README, ROADMAP and TODO
+  If you don't want to generate the doc files add a line to site or 
+  project options file:
+    <doc><write>0</write></doc>
+- Glade-Perl will now create skeleton distribution files if they
+  do not already exist. These default to - Makefile.PL, MANIFEST.SKIP, 
+  Project.spec and test.pl - so you should be able to call:
+  'perl Makefile.PL; make manifest; make dist;' and then either
+  'rpm -ta Project-0.01.tar.gz' to build a RPM or the normal perl methods
+  of 'make test' and 'make install'. This is all at a very early stage 
+  and will probably fail in many cases but you should, at least, have 
+  some files to edit :)
+  If you don't want to generate the dist files add a line to site or 
+  project options file:
+    <dist><write>0</write></dist>
+  
+Fri Apr 13 01:01:22 BST 2001 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.58
+- Mimimum requirements increased to Gtk-Perl-0.7000 and gnome-libs-1.2.0
+  These have been around for a year or more now and fix many problems.
+- All packages - Extensive tidying of options handling with a new data
+  structure. Old format options files will be read as before but project 
+  options will be saved in the new hierarchically nested structure.
+- The options handling and diagnostics utilities have been moved to
+  Glade::PerlRun so that you can use them in your own apps.
+- PerlUI - some variables updated for Gtk-Perl-0.7004 and later.
+- Some changes to generated comments and source code.
+- glade2perl - removed redundant 'use English' call
+  New, more meaningful 'set_by' value and 
+  New (2nd) arg to specify verbosity in glade2perl call 
+  eg. 'glade2perl Project.glade 2'
+  Simplified usage so that a separate Glade::PerlGenerate->options() call
+  is not needed and the options can be specified to Form_from_File()
+  Also, undefined glade_filename causes most recently used file stored
+  in your user options file to run.
+- PerlRun->reload_any_altered_modules() is a new sub for app testing to 
+  reload any modules that have been edited. This idea is from Stas Bekman
+  and gives you the ability to edit and reload any signal handlers and 
+  support modules without closing down the app and restarting it. 
+  This is not possible if you regenerate the UI module and reload it.
+  Your app will crash in flames if you try this.
+  Simply call '__PACKAGE__->reload_any_altered_modules;' in a handler 
+  for any widget/signal you like (I usually use a Refresh button).
+- PerlGenerate->Form_from_Glade_File() amended to call two new subs
+  parse_form() and build_form() to allow use in future Glade::Helper app.
+- PerlGenerate->about_Form() fixed to use proper pixmap option
+- PerlGenerate->Form_from_Proto() now only generates subclass for simple
+  AUTOLOAD style runs.
+- PerlRun->load_translations() amended to look for .mo files in several
+  possible places if a catalog path is not specified.
+- An extra form element is now returned from generated UI constructor so
+  that you can call $form->{'TOPLEVEL'} in any signal handler to get a
+  toplevel form widget - ie. use $form->{'TOPLEVEL'}->get_filename() to
+  get the file name entered in a fileselection dialog from the
+  'on_ok_button_clicked' signal handler.
+- PerlUI->my_gtk_perl_can_do() now also checks for particular versions
+  that are known to be flawed in certain ways.
+- FAQ split into 3 files - all old FAQs are available on the website.
+    FAQ       - Frequently asked questions (general)
+    FAQ.i18n  - FAQs relating to internationalisation (I18N) issues.
+    FAQ.old   - FAQs relating to old/flawed software versions
+- PerlSource->perl_about() generates `gnome-config --version` call in
+  Gnome about_Form() sub in App/SubApp. If the gnome-libs-devel RPM 
+  is not installed the gnome-libs version number will not be reported.
+- PerlSource now generates lines in app_run to load translations.
+- Glade-Perl.spec file based on one from George, the mp3 organiser. 
+  This one works I think and allows RPM builds from the tarball by 
+  calling eg. 'rpm -ta Glade-Perl-0.58.tar.gz'.
+- PerlUI->new_accelerator() - accelerator key now defaults to ''.
+  PerlUIExtra->new_GtkPixmapMenuItem() also defaults key to ''
+  PerlProject->use_Glade_Project() now escapes double quotes in author.
+  Thanks for bug reports for the above reports to Joe "Markus" Clark.
+  
+Fri Oct 20 01:19:45 BST 2000 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.57
+- PerlUIGtk->new_GtkPixmap() fixed to use project logo as default rather
+  than crash in flames if no pixmap is specified.
+- PerlUIExtra->new_GnomePixmap() now also uses project logo as default
+- PerlUI->Widget_from_Proto() fixed to report missing constructors 
+  and properties correctly rather than die()ing.
+- $PerlUI::perl_gtk_depends updated to ignore gnome-db widgets until
+  Gtk::Perl can handle them.
+- PerlRun->full_Path() fixed to remove any /../ parts in the filename
+  so that the returned full path is exact and unique if possible.
+- PerlGenerate pod corrected and improved.
+- COPYING file changed to invite commercial users to make a donation to 
+  perl.org (donors at perlmongers.org) rather than me ;-> I borrowed the 
+  COPYING file from a CPAN module and was embarrassed to reread it when
+  Scott Barninger of Piedmont Airlines accepted the invitation!
+- PerlUI->internal_pack_widget() fixed to pack Gtk::PixmapMenuItem
+  submenus correctly.
+- Glade-Perl.spec file borrowed from Gtk-Perl dist to allow RPM builds.
+  This doesn't work yet - but if you can help ...
+- PerlSource amended to also write a method app_run() to ProjectSIGS.pm
+  and Project.pm (first time) for any user UI initialisation code.
+- PerlGUIGtk->new_GtkButton() now caters for 'relief' (in Glade-0.5.10)
+- PerlGUIGtk->new_GtkToggleButton() now caters for 'relief' (as above)
+- Null source_directory now generates source in project directory (and
+  not in ./src) to match the actions of Glade 0.5.11.
+- New error message if there are minus signs/spaces/dots in signal handler 
+  names - they are substituted by _MINUS_/_SPACE_/_DOT_. This is really 
+  to deal with the new (Glade 0.5.10) default widget names for combo_box
+  entry widgets (eg combo-entry1 and handler on_combo-entry1_activate)
+- Changelog - this file reduced to versions >= 0.50. (Older on website)
+- If the user option <style> includes 'split' the app and signal handler
+  modules will be generated with each class in its own file. See the
+  test example to see how this works.
+- test.pl extended to test both the split base classes and the subclass.
+
+Wed Apr 19 02:28:58 BST 2000 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.56 - embarassment release
+- Makefile.PL unchanged so that it will install all the modules correctly.
+  
+Wed Apr 19 02:28:58 BST 2000 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.55
+- New FAQ about building Unicode::String for perl 5.6
+- PerlXML->Proto_from_XML_Parser_Tree() changed to cancel the use of 
+  encodings if Unicode::String is not available. You should not need to
+  install Unicode::String now unless you use european characters.
+- Documentation/Gtk-Perl-Docs.html tidied and Stephen Wilhelm's Gtk-Perl
+  tutorial http://personal.riverusers.com/~swilhelm/perlgtk/tutorial/
+  now pushed as the best starting point for learning Gtk-Perl.
+  
+Sun Apr 16 00:07:26 BST 2000 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.54
+- PerlUI->new_from_child_name() fixed to use gnome_app_docked_item() and
+  not construct our own widgets and containers (Damon's ideas)
+  Also now better handles notebooks as children of Gnome Dialogs
+- PerlGenerate->unused_elements() name now check_for_unused_elements()
+- PerlUI->new_signal() changed 'Missing signal handler' message to 
+  verbose level 4 so that verbose => 2 gives more compact diagnostics. 
+  Skeleton signal handlers are still generated in ProjectSIGS.pm for you 
+  to copy somewhere and edit as before.
+- Makefile.PL fixed to use the correct module name (Glade-Perl)
+- PerlSource->write_LIBGLADE() fixed to produce working signal handlers.
+- PerlUIExtra->new_GtkPixmapMenuItem() changed to use the new bindings in
+  Gtk-Perl (CVS 20000410) that actually construct a PixmapMenuItem 
+  instead of just a Gtk::MenuItem. Earlier versions of Gtk-Perl will now
+  construct Gtk::MenuItem explicitly.
+- Documentation - all email addresses in online documentation are now 
+  mangled to reduce spam for those kind enough to send bug reports/patches.
+  
+Tue Apr 11 15:45:29 BST 2000 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.53
+- New FAQ about character encodings.
+- PerlProject two new user options to handle character encodings.
+  <glade_encoding> to specify the Glade file character encoding.
+  <glade2perl_encoding> to specify the glade2perl.xml project options 
+  file character encoding (defaults to glade_encoding).
+- PerlXML->QuoteXMLChars() characters x80-xff not now encoded so project
+  options are saved without re-encoding eg european characters.
+- PerlXML->save_options() extra declaration line with character encoding
+  eg <?xml version="1.0" encoding="ISO-8859-1"?> written to head of file.
+- PerlUIGtk->new_GtkAccelLabel() underlines now parsed correctly.
+- PerlUIGtk->new_GtkLabel() underlines now parsed correctly.
+- PerlUIGtk->new_GtkButton() underlines now parsed correctly.
+- PerlUIGtk->new_GtkCheckButton() underlines now parsed correctly.
+- PerlUIGtk->new_GtkRadioButton() underlines now parsed correctly.
+- PerlUIGtk->new_GtkToggleButton() underlines now parsed correctly.
+- PerlUIGtk->new_GtkCheckMenuItem() underlines now parsed correctly.
+- PerlUIGtk->new_GtkMenuItem() underlines now parsed correctly.
+- PerlUIGtk->new_GtkRadioMenuItem() underlines now parsed correctly.
+- PerlUIExtra->new_GtkPixmapMenuItem() much simplified and underlines 
+  now parsed correctly.
+- Perl* all packages now have an empty DESTROY method to keep perl 5.006
+  happy when it is running cleanup with warnings enabled.
+- PerlSource->perl_AUTOLOAD_top, perl_SUBCLASS_top, perl_LIBGLADE_top
+  amended to write empty DESTROY() subs to generated classes (see above)
+- PerlGenerate documentation - perldoc (and manpage) corrected and 
+  improved to include all user options.
+
+Fri Mar 31 16:44:38 BST 2000 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.52
+- PerlSource->check_gettext_strings() and write_gettext_strings() are
+  two new subs to help you spot missing translations and write a .pot file
+- PerlRun->D_(), S_() moved to to PerlSource to remove run-time pollution.
+- PerlSource->_() overrides PerlRun->_()  for gettext string checking.
+- PerlSource added some commented lines to the generated sources to do the 
+  gettext string checking for the user.
+- PerlSource->perl_LIBGLADE_top() added a file check and better 
+  explanation if the Glade file is missing in the generated run() sub.
+- ppo/Glade-Perl.pot I have found some more strings to be translated :(
+- PerlSource all subs now have '} # End of sub %name' as last line
+- PerlUI->set_widget_properites() finally implemented set_events() and
+  set_extension_events() generation.
+- PerlGenerate->Form_from_Glade_file() and Form_from_XML() amended to 
+  create proto to allow multiple accelerators for a widget.
+- Perl* all subs that use Glade-Perl user options improved. The defaults 
+  are now more correctly determined and fewer options should be saved in 
+  the project_options file 
+- PerlGenerate->Form_from_XML() fixed to do what it should again.
+- PerlUIGtk->new_GtkVPaned() fixed to supply a default position. This 
+  seems to be caused because Glade-0.5.7 doesn't save all default values.
+  Most other defaults also now supplied in case of further changes.
+  Thanks to Ned Konz <ned at bike-nomad.com> for the report
+- Popup menus with keyboard accelerators and tooltips generated correctly
+  Thanks to Skywolf Lu <skywolf at ms21.hinet.net> for the report
+- PerlGenerate->unused_widgets() now only warns (verbose >= 4) when C++
+  specific widget properties are encountered (they are currently ignored).
+  Thanks to Robert Schwebel <robert at schwebel.de> for the report.
+  
+Thu Mar  2 04:30:08 GMT 2000 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.51
+- PerlUI testing source comments removed from generated code
+- PerlRun->create_image() pixmaps made relative to usual global.
+- PerlUIExtra->new_GnomeAbout() pixmaps made relative to usual global.
+- PerlUIExtra->new_GnomePixmap() pixmaps made relative to usual global.
+  so now there should be no hard-coded paths in the generated code :)
+- PerlUI->internal_pack_widget() fixed to add() Gtk::Text objects to a
+  Gtk::ScrolledWindow correctly (like Gtk::CTree or Gtk::CList).
+  Thanks to Frank de Lange for an excellent report and suggestions.
+- PerlUI->new_from_child_name() amended to deal with Gnome::Dialogs
+- PerlUIExtra->frig_Gnome_Dialog_buttons() to add Gnome::Dialog buttons
+  and accelerators in a better way (unstandard in Glade-Perl though :( )
+  This works for all Gnome Dialogs (MessageBox, PropertyBox, Dialog)
+  but only with gnome-perl CVS after 20000301.
+- PerlRun->load_translations() and mo_format_value() _(), S_() and D_() 
+  new subs to implement gettext support for apps, source and diagnostics. 
+- PerlUI* generate gettext code for all text fields in widgets.
+- PerlSource->perl_AUTOLOAD_top() now generates load_translation() call 
+- All modules diagnostics messages converted to sprintf-like format so
+  that diag_print can translate them.
+- PerlProject->diag_print() became diag_ref_print() and new diag_print()
+  written for i18n of Glade-Perl. You can now specify the language for
+  diagnostics, the language for the source (comments) and the generated 
+  apps can use their own languages! 
+  All defaults are $ENV{'LANG'} but diagnostics and source languages can 
+  be overridden in the site, user or Project.glade2perl.xml options files
+  
+Thu Feb 24 22:57:47 GMT 2000 Dermot Musgrove <dermot.musgrove at virgin.net>
+- Version 0.50 embarassment release
+- PerlUiExtra->new_GtkPixMeneuItem() fixes to string quoting
+  

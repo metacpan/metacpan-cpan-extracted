@@ -1,0 +1,42 @@
+---
+abstract: 'programmable shell completion for Perl apps'
+author: []
+build_requires:
+  App::Prove: ''
+  Test::More: 0.86
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Getopt-Complete
+provides:
+  Getopt::Complete:
+    file: lib/Getopt/Complete.pm
+    version: 0.26
+  Getopt::Complete::Args:
+    file: lib/Getopt/Complete/Args.pm
+    version: 0
+  Getopt::Complete::Cache:
+    file: lib/Getopt/Complete/Cache.pm
+    version: 0
+  Getopt::Complete::Compgen:
+    file: lib/Getopt/Complete/Compgen.pm
+    version: 0
+  Getopt::Complete::LazyOptions:
+    file: lib/Getopt/Complete/LazyOptions.pm
+    version: 0
+  Getopt::Complete::Options:
+    file: lib/Getopt/Complete/Options.pm
+    version: 0
+requires:
+  Carp: ''
+  Getopt::Long: ''
+  IPC::Open2: ''
+  Scalar::Util: ''
+  perl: v5.8.7
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.26

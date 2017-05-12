@@ -1,0 +1,52 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621",
+   "keywords" : [
+      "graph",
+      "open",
+      "close"
+   ],
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GD-Graph-ohlc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GD::Graph" : 0,
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/jettero/gd--graph--ohlc/"
+      }
+   },
+   "version" : "0.9703"
+}

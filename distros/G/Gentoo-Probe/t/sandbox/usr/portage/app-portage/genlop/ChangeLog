@@ -1,0 +1,54 @@
+# ChangeLog for app-portage/genlop
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/genlop/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  15 May 2004; Joshua Kinard <kumba@gentoo.org> genlop-0.20.2.ebuild:
+  Marked stable on mips.
+
+  28 Apr 2004; Jon Portnoy <avenj@gentoo.org> genlop-0.20.2.ebuild :
+  Stable on AMD64.
+
+  02 Apr 2004; Michael Sterrett <mr_bones_@gentoo.org> genlop-0.30.1.ebuild:
+  removed hppa since it needs dev-perl/DateManip first
+
+*genlop-0.30.1 (28 Mar 2004)
+
+  28 Mar 2004; Marius Mauch <genone@gentoo.org> genlop-0.20.2.ebuild,
+  genlop-0.30.1.ebuild:
+  version bump + moving the bash-completion file from /usr/share/doc to
+  /usr/share/bash-completion (closing #45237 and #45840)
+
+  20 Mar 2004; Jon Portnoy <avenj@gentoo.org> genlop-0.20.2.ebuild :
+  AMD64 keywords.
+
+*genlop-0.20.2 (14 Dec 2003)
+
+  14 Dec 2003; Marius Mauch <genone@gentoo.org> genlop-0.16.1.ebuild,
+  genlop-0.20.2.ebuild:
+  version bump, removing unnecessary deps
+
+  13 Nov 2003; <tuxus@gentoo.org> genlop-0.16.3.ebuild:
+  added mips to KEYWORDS
+
+  05 Nov 2003; <rac@gentoo.org> genlop-0.16.3.ebuild:
+  keywording for amd64
+
+  23 Oct 2003; Sven Blumenstein <bazik@gentoo.org> genlop-0.16.3.ebuild:
+  Bumped to stable on sparc.
+
+*genlop-0.16.3 (22 Aug 2003)
+
+  22 Aug 2003; Michael Cummings <mcummings@gentoo.org> genlop-0.16.3.ebuild:
+  Version bump from authors, bug 25325
+
+*genlop-0.16.1 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> genlop-0.16.1.ebuild:
+  moved from app-admin to app-portage
+
+*genlop-0.16.1 (14 Jul 2003)
+
+  14 Jul 2003; Michael Cummings <mcummings@gentoo.org> genlop-0.16.1.ebuild:
+  Ebuild submitted in bug 21970 by Antonio Dolcetta (zagarna@yahoo.com), tool
+  written by giorgio@pollycoke.org
+

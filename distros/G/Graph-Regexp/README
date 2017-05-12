@@ -1,0 +1,73 @@
+=pod
+
+=head1 Graph::Regexp
+
+This module will turn a regexp dump like the following:
+
+ perl -Mre=debug -e '/just|another|perl|hacker/'
+ Freeing REx: `","'
+ Compiling REx `just|another|perl|hacker'
+ size 15 Got 124 bytes for offset annotations.
+    1: BRANCH(4)
+    2:   EXACT <just>(15)
+    4: BRANCH(8)
+    5:   EXACT <another>(15)
+    8: BRANCH(11)
+    9:   EXACT <perl>(15)
+   11: BRANCH(15)
+   12:   EXACT <hacker>(15)
+   15: END(0)
+ minlen 4
+ Offsets: [15]
+         0[0] 1[4] 0[0] 5[1] 6[7] 0[0] 0[0] 13[1] 14[4] 0[0] 18[1] 19[6] 0[0] 0[0] 25[0]
+ Omitting $` $& $' support.
+ EXECUTING...
+ Freeing REx: `"just|another|perl|hacker"'
+
+into a Graph::Easy object, which lets you then generate output like
+the following:
+
+   +---------------------------------------------------------------+
+   v                                                               |
+ +-------+     +--------+          +-----------------+           +-----+
+ | start | --> | BRANCH | -+-----> |  EXACT <perl>   | ------+-> | end |
+ +-------+     +--------+  |       +-----------------+       |   +-----+
+                           |                                 |
+                           |                                 |
+                           |                                 |
+                           |       +-----------------+       |
+                           +-----> | EXACT <hacker>  | ------+
+                           |       +-----------------+       |
+                           |                                 |
+                           |                                 |
+                           |                                 |
+                           |       +-----------------+       |
+                           +-----> |  EXACT <just>   | ------+
+                           |       +-----------------+       |
+                           |                                 |
+                           |                                 |
+                           |                                 |
+                           |       +-----------------+       |
+                           +-----> | EXACT <another> | ------+
+                                   +-----------------+
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or all in one line:
+
+   perl Makefile.PL && make test && make install
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Tels C<http://bloodgate.com>
+
+See the LICENSE file for more information.
+
+=cut

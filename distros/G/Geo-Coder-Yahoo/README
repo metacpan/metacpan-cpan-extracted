@@ -1,0 +1,168 @@
+NAME
+    Geo::Coder::Yahoo - Geocode addresses with the Yahoo! API
+
+SYNOPSIS
+    Provides a thin Perl interface to the Yahoo! Geocoding API.
+
+        use Geo::Coder::Yahoo;
+
+        my $geocoder = Geo::Coder::Yahoo->new(appid => 'my_app' );
+        my $location = $geocoder->geocode( location => 'Hollywood and Highland, Los Angeles, CA' );
+
+OFFICIAL API DOCUMENTATION
+    Read more about the API at
+    <http://developer.yahoo.net/maps/rest/V1/geocode.html>.
+
+    Yahoo! says that this API is deprecated and suggest using the
+    placefinder API instead. There's a module for that in
+    Geo::Coder::Placefinder.
+
+    See also Geo::Coder::Many.
+
+PROXY SETTINGS
+    We use the standard proxy setting environment variables via LWP. See the
+    LWP documentation for more information.
+
+METHODS
+  new
+        $geocoder = Geo::Coder::Yahoo->new(appid => $appid)
+
+        $geocoder = Geo::Coder::Yahoo->new(
+            appid => $appid,
+            on_error => sub { ... },
+            ua => LWP::UserAgent->new,
+        )
+
+    Instantiates a new object.
+
+    appid specifies your Yahoo Application ID. You can register at
+    <http://api.search.yahoo.com/webservices/register_application>.
+
+    If you don't specify it here you must specify it when calling geocode.
+
+    on_error specifies an error handler to be called if the HTTP response
+    code does not indicate success. The subroutine is called with the
+    geocode object as the first argument and the HTTP::Response object as
+    the second. The return value from the subroutine is used as the return
+    value from "geocode".
+
+    ua specifies the user agent object to use. If not set then a new
+    LWP::UserAgent will be instanciated.
+
+  geocode( location => $location )
+    Parameters are the URI arguments documented on the Yahoo API page
+    (location, street, city, state, zip). You usually just need one of them
+    to get results.
+
+    "geocode" returns a reference to an array of results (an arrayref). More
+    than one result may be returned if the given address is ambiguous.
+
+    Each result in the arrayref is a hashref with data like the following
+    example:
+
+        {
+         'country' => 'US',
+         'longitude' => '-118.3387',
+         'state' => 'CA',
+         'zip' => '90028',
+         'city' => 'LOS ANGELES',
+         'latitude' => '34.1016',
+         'warning' => 'The exact location could not be found, here is the closest match: Hollywood Blvd At N Highland Ave, Los Angeles, CA 90028',
+         'address' => 'HOLLYWOOD BLVD AT N HIGHLAND AVE',
+         'precision' => 'address'
+         }
+
+    precision
+        The precision of the address used for geocoding, from specific
+        street address all the way up to country, depending on the precision
+        of the address that could be extracted. Possible values, from most
+        specific to most general are:
+
+        address
+        street
+        zip+4
+        zip+2
+        zip
+        city
+        state
+        country
+
+    warning
+        If the exact address was not found, the closest available match will
+        be noted here.
+
+    latitude
+        The latitude of the location.
+
+    longitude
+        The longitude of the location.
+
+    address
+        Street address of the result, if a specific location could be
+        determined.
+
+    city
+        City in which the result is located.
+
+    state
+        State in which the result is located.
+
+    zip Zip code, if known.
+
+    country
+        Country in which the result is located.
+
+  ua
+        $ua = $geocoder->ua;
+
+        $geocoder->ua( $new_ua );
+
+    Sets the user agent object to be used, if one is passed. Returns the
+    user agent object.
+
+AUTHOR
+    Ask Bjørn Hansen, "<ask at develooper.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-geo-coder-yahoo at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-Yahoo>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Geo::Coder::Yahoo
+
+    You can also look for information at:
+
+    *   Git Repository
+
+        The latest code is available from the git repository at
+        <git://git.develooper.com/Geo-Coder-Yahoo.git>. You can browse it at
+        <http://git.develooper.com/?p=Geo-Coder-Yahoo.git;a=summary>.
+
+        It is also at <http://github.com/abh/geo-coder-yahoo/tree/master>.
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Geo-Coder-Yahoo>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-Yahoo>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Geo-Coder-Yahoo>
+
+ACKNOWLEDGEMENTS
+    Thanks to Yahoo for providing this free API.
+
+COPYRIGHT & LICENSE
+    Copyright 2005-2010 Ask Bjoern Hansen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

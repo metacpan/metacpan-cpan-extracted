@@ -1,0 +1,35 @@
+GD/SIRDS version 0.01
+=====================
+
+Creates Single Image Random Dot Stereograms from a source image or depth
+map.  Uses GD::Image objects as its input and output.
+
+The algorithm for this module may be found at in an article for IEEE
+Computer:
+
+       Thimbleby, H.W., Inglis, S., and Witten, I.H.  "Displaying
+       3D images: algorithms for single-image random-dot stere-
+       ograms" IEEE Computer, 27 (10) 38-48, October 1994.
+	
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 David "Cogent" Hand.  All rights reserved.  This
+module is free software; you may redistribute and/or modify it under the
+same terms as Perl itself.
+

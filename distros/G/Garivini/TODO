@@ -1,0 +1,12 @@
+- tests.
+- Gearman::Server needs a fast "queue depth" command, along with
+  Gearman::Client support so we don't have to manually do socket crap.
+- Factor loop time for batch_run_sleep and only sleep the difference.
+- Error handling needs to be sussed out everywhere.
+- ::DB should use String::CRC32 to pick a dbid when uniqkeys are supplied.
+  (same as Gearman::Client)
+- Improve docs more? It's missing notes about DB scalability that it already
+  does.
+- Add some ASCII charts to describe flow better.
+- Gearman::Server also needs batch job submission and batch job fetch
+  commands. Mainly batch submission would speed things up a lot.

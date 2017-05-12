@@ -1,0 +1,30 @@
+Geo-Coder-Bing
+==============
+
+This module provides an interface to the Bing Maps Geocoding API
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Encode
+    JSON
+    LWP::UserAgent
+    Test::More
+    URI
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2015 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

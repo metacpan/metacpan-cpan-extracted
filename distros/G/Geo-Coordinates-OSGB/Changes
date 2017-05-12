@@ -1,0 +1,255 @@
+Revision history for Perl extension Geo::Coordinates::OSGB
+
+2.16 February 2016
+
+    - Fix bug in OSGB.pm with "unpack" under Perl V5.8
+
+    - Minor documentation corrections
+
+2.15 February 2016
+
+    - Clearer explanation of changes since V2.10 in README and Background.pod
+
+    - Changed examples/plot_maps to use proper OSTN02 polygons instead of just marking points
+
+    - Improved decimal degrees to degrees, minutes, seconds function in examples/bng_to_ll
+
+    - Fixed examples/plot_maps.pl so that it makes a better attempt to show more 
+      than one map series on the same plot
+
+    - Minor corrections and additions to documentation
+
+    - Moved build utilities to new 'build' directory + improved documentation for them
+
+    - Packed OSTN02 data more densely so that OSGB.pm is smaller
+
+    - Corrected data points at eastern boundary of OSTN02 area 
+
+
+2.14 February 2016
+
+    - Found and fixed a bug the core ellipsoid projection routine that was causing 
+      the unexpectedly inaccurate results in higher latitudes. 
+
+    - Extensive performance improvements to OSTN02 data look up
+
+    - random_grid function now checks that the random grid position
+      it selects is well inside the OSTN02 boundary
+
+    - parse_grid function will now parse a grid square name.  For example
+      "parse_grid('TA')" will return (500000,400000).
+
+    - Fixed various typos in Pod sections in all modules, and added more
+      explanations in Background.pod
+
+2.13 February 2016
+
+    - Re-organized, and much faster, OSTN02 data look up 
+
+    - format_grid now supports ... { form => 'SS' } ... to get just the grid square.
+
+    - Updated examples with proper documentation and improved plotting of maps
+
+    - Minor change in t/08out_of_range.t and t/13edge.t tests to allow for Perl
+      with "long double" enabled.  Corresponding updates to documentation.
+      This does not affect any function; I've simply made the tests more
+      robust.  I should add that "long doubles" do not appear to benefit this
+      module at all.  The results and accuracy that I get are the same with
+      "long doubles" but everything runs about 10% slower.
+
+2.12 January 2016
+
+    - Re-worked the handling of points near the boundary of the OSTN02 polygon,
+      to avoid a potential loop in rare cases.  This is unlikely to affect any
+      transformations with real coordinates (unless you spend a lot of time in
+      boats about 10km offshore), but avoids some problems in my testing with
+      random grid points.
+
+    - Simplified OSTN02 data access.  Removed the OSGM02 height part of the
+      data as this is no longer used.  This makes the module somewhat smaller
+      and a little faster to load. 
+
+    - Added user interface to approximate conversion routines for quick Helmert
+      transformations:  "grid_to_ll_helmert" and "ll_to_grid_helmert" 
+
+    - Fixed a small bug in "parse_grid", so that it allows '/' character in map
+      sheet names, and therefore works with sheet names like: 'B:110/OL44'
+
+    - Corrected structure of POD documentation in Maps.pm and Background.pm
+
+    - Simplified testing of random grid references to give more reliable
+      results.  Added more tests based on OS transformations, and to prove
+      some edge conditions.
+       
+
+2.11 January 2016
+
+    - Small bug fixes only
+
+    - Removed the 'r' switch from the single use of the 'tr' function. This accidentally
+      created a dependency on perl 5.14 which caused several CPAN testers to fail 2.10.
+
+    - Added 'use 5.008' to main modules: everything should now work on perl 5.8 or better.
+
+    - Added note about accuracy of OSTN02 in grid square HP (far north of Shetland) and changed
+      the random round-trip tests to avoid this square.  For reasons I do not understand, the 
+      accuracy of round trip conversion with this implementation of OSTN02 is within a few mm 
+      for most of the country, but suddenly drops to an average of about 25m in grid square HP.
+
+    - Minor clean up of pod formatting in a couple of places
+
+
+2.10 January 2016
+
+    - Complete simplification and restructure of the entire module
+
+    - Geo::Coordinates::OSGB now provides only: 
+
+        grid_to_ll
+        ll_to_grid
+
+    - WGS84 is assumed as the default ellipsoid shape
+    - OSTN02 data is automatically used where necessary providing much a simpler interface
+    - New Helmert transformation routines automatically used outside OSTN02 coverage
+    
+    - New module Geo::Coordinates::OSGB::Grid provides routines to parse and format grid references
+      -- general purpose "format_grid" for all formatting
+      -- general purpose "parse_grid" for all parsing
+    
+    - New module Geo::Coordinates::OSGB::Maps provides outlines, bounding boxes, and titles for OSGB maps
+
+
+2.09 October 2015
+
+    - Improved and generalized handling of maps to allow for multiple series, insets, and irregular boundaries
+    - New generic functions "format_grid_map" and "parse_map_grid" to replace the Landranger-specific functions
+    - Complete insets and extensions to sheet boundaries for Landranger maps
+    - Complete sheet boundaries for old One Inch 7th series maps
+    - Complete sheet boundaries for Explorer series of 1:25000 maps
+    - Reorganized distribution: 
+      -- example scripts are in examples/
+      -- map definitions are in maps/
+    - Minor improvements to precision
+
+2.08 June 2015
+
+    - reduced size of the data table in OSTN02 and improved loading time
+
+    - new "random_grid" function in OSGB returns a random point on a random Landranger map.
+      See "gbguessr.pl" script for example use to compare OS maps and Google maps on same point
+    
+    - removed old kml generating example script
+    - revised and improved documentation
+
+2.07  June 2015
+
+    - removed dependency on Math::Trig for tan and sec functions
+    - removed unnecessary package variables from OSTN02
+    - simplified unpacking of data in OSTN02
+
+2.06  October 2013
+
+    - removed precise URL for theory paper - the OS keep moving it about, so just Google for the name
+    - removed non-ascii characters from POD in OSGB.pm to avoid encoding issue
+    
+2.05  31 August 2013
+
+    - Put blank lines back in OSTN02 to prevent pod2html taking an age during install
+    - Refactored OSGB and OSTN02 lightly to conform more closely to "Perl Best Practices"
+    - corrected corner coordinate data for Landranger sheets 1 and 185
+
+2.04  6 November 2008
+
+    - Rework search of OSTN02 data to improve performance and reliability
+    - Add range checking of OSTN02 coordinates
+    - Compress OSTN02 data to hexadecimal form to speed up loading
+    - Change selection of data in 03random.t test to avoid off-the-sheet errors
+    - Minor tidy up changes in OSGB
+    - Complete overhaul of the documentation
+    - removed old "coco.pl" example script
+    - added new example script to show all "000 000" grid references
+
+2.03 Not released
+
+2.02 22 September 2008
+
+    - Removed irritating degree sign from verbose test message (no functional change)
+    - Make parse_landranger_grid behave better in scalar context
+    - Improve useability of parse_grid
+    - Correct GR of SW corner of Landranger Sheet 3
+    - Further optimize handling of OSTN02 data to prevent data parsing at pod2man time
+    - Improve documentation
+    - More example scripts (with notes)
+
+2.01 6 September 2007
+
+    - Optimized handling of OSTN02 data to reduce memory requirements *and* speed it up.
+
+2.00 4 September 2007
+
+    - New version with routines to do adjustment to and from latitude and
+      longitude coordinates based on the (now ubiquitous) WGS84 model, for
+      more compatible use with GPS receivers and Google Earth and similar
+      tools.
+
+    - Includes not only fast approximate adjustment as used in most
+      coordinate tools and devices, but also the definitive-but-slow OSTN02
+      transformation based on OSGB data
+
+    - Step version number
+
+    - POD completely revised
+
+
+1.07 7 September 2005
+
+       - corrected link in POD
+
+       - various minor documentation corrections
+
+1.06 16 May 2005
+
+       - general clean up
+
+       - made the format and parse routines external to avoid spaghetti connections
+
+       - added support for grid references in GPS format (eg TQ 32342 24312)
+
+1.05 29 March 2005
+
+       - Not released
+
+1.04  29 September 2004
+
+        - corrected a bug in grid2ll, where long/lat values with 0 degrees
+          were always printed as positive in scalar form The problem was that
+          -1 * 0 = +0 in Perl (as it says in the Camel book somewhere).
+
+        - added simple coco.pl script to provide command line coordinate
+          conversions.
+
+        - actually implemented the long-promised map2ll and ll2map functions
+          as well as map2grid and grid2map for completeness.  With these
+          functions you can convert to and from coordinates in a more useable
+          form, such as "OS Sheet 43; 875123".
+
+        - added a demonstration script --- plotmaps.pl --- which will produce
+          a pretty index of the Landranger maps, showing the GB coast line
+          and the large grid squares.  The output is in PostScript.  Use
+          GhostScript to process it.  A PDF version of the output is also
+          included.
+
+        - added a useful file with all the names and other details of the
+          Landranger Sheets
+
+1.03  18 December 2002
+        - changed name for CPAN release
+        - improved ll2grid function
+        - new ll2map and map2ll functions
+
+
+1.02  November 13, 2002
+        - No changes to code, just tidied the documentation
+
+0.01  Fri Mar  2 19:05:50 2001
+        - original version; created by h2xs 1.19

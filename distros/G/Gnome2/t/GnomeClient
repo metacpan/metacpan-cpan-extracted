@@ -1,0 +1,118 @@
+#!/usr/bin/perl -w
+use strict;
+use Gnome2;
+
+use constant TESTS => 1;
+use Test::More tests => TESTS;
+
+# $Id$
+
+###############################################################################
+
+SKIP: {
+  our $application;
+  do "t/TestBoilerplate";
+
+  #############################################################################
+
+  my $client = Gnome2::Client -> master();
+  isa_ok($client, "Gnome2::Client");
+
+  $client -> connect();
+
+  ok($client -> connected());
+
+  is($client -> get_config_prefix(), "/Test/");
+
+  $client -> set_global_config_prefix("/_Test_/");
+  is($client -> get_global_config_prefix(), "/_Test_/");
+
+  is($client -> get_flags() -> [0], "is-connected");
+
+  $client -> set_restart_style("never");
+  $client -> set_priority(42);
+
+  $client -> set_restart_command(qw(bla blub blob));
+  $client -> set_discard_command(qw(bla blub blob));
+  $client -> set_resign_command(qw(bla blub blob));
+  $client -> set_shutdown_command(qw(bla blub blob));
+  $client -> set_clone_command(qw(bla blub blob));
+
+  $client -> add_static_arg(qw(hmm mmh));
+
+  $client -> set_current_directory($ENV{ HOME });
+  $client -> set_environment(BLA => "blub");
+
+  $client -> flush();
+
+ SKIP: {
+    skip("this only works if we're connected to the session manager", 3)
+      unless ($client -> connected());
+
+    foreach ($client -> get_id(),
+             $client -> get_previous_id(),
+             $client -> get_desktop_id()) {
+      # ok(defined($_));
+      ok(1);
+    }
+  }
+
+  $client -> signal_connect(save_yourself => sub {
+    my ($client,
+        $phase,
+        $save_style,
+        $shutting_down,
+        $interact_style,
+        $fast) = @_;
+
+    isa_ok($client, "Gnome2::Client");
+    like($phase, qr/^(?:1|2)$/);
+    is($save_style, "both");
+    ok(not $shutting_down);
+    is($interact_style, "errors");
+    ok($fast);
+
+    $client -> save_any_dialog(Gtk2::Dialog -> new());
+    $client -> save_error_dialog(Gtk2::Dialog -> new());
+
+    # FIXME
+    $client -> request_interaction("error", sub {
+      my ($client, $key, $dialog_type);
+
+      die "foobar";
+
+      isa_ok($client, "Gnome2::Client");
+      warn $key;
+      is($dialog_type, "error");
+
+      Gnome2::Client -> interaction_key_return($key, 0);
+    });
+
+    return 1;
+  });
+
+  $client -> request_save("both", 0, "errors", 1, 0);
+  # $client -> request_phase_2();
+
+  while (Gtk2 -> events_pending()) {
+    Gtk2 -> main_iteration();
+  }
+
+  #############################################################################
+
+  Glib::Idle -> add(sub {
+    $client -> disconnect();
+
+    foreach (Gnome2::Client -> new(),
+             Gnome2::Client -> new_without_connection()) {
+      isa_ok($_, "Gnome2::Client");
+      $_ -> connect();
+      $_ -> disconnect();
+    }
+
+    Gtk2 -> main_quit();
+    return 0;
+  });
+
+  Gtk2 -> main();
+}

@@ -1,0 +1,51 @@
+Geneos-API
+==========
+
+The Geneos::API module provides an implementation of ITRS Geneos 
+XML-RPC Instrumentation API. The main focus of the module is to 
+provide classes that allow you to create Geneos clients.
+
+The package also contains implementation of XML-RPC client using
+XML::LibXML module. The reason for implementing the XML-RPC client 
+is because the Geneos XML-RPC Server implementation does not conform
+to the XML-RPC standard.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   LWP::UserAgent
+   XML::LibXML
+
+DOCUMENTATION
+ 
+See the lib/Geneos/API.pm file for an overview of the library. See the
+Changes file for recent changes.
+ 
+POD style documentation is included in all modules and scripts.  These
+are normally converted to manual pages and installed as part of the
+"make install" process.  You should also be able to use the 'perldoc'
+utility to extract and read documentation from the module files
+directly.
+
+SUPPORT
+ 
+Bug reports and suggestions for improvements can be sent to <tot@cpan.org>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Ivan Dmitriev 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Have fun!

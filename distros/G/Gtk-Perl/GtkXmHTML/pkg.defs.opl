@@ -1,0 +1,9 @@
+
+#if ( exists $object{GtkXmHTML} ) {
+#	$object{GtkXmHTML} = {perlname => "Gtk::XmHTML", cast => "GTK_XMHTML",
+#			xsname => "Gtk__XmHTML", prefix => "gtk_xmhtml",
+#			parent => 'GtkContainer', directory => "GtkXmHTML/"};
+#}
+
+# We provide our own pack/unpack routines
+$overridestruct{XmAnyCallbackStruct} = 1;

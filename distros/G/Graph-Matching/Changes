@@ -1,0 +1,8 @@
+Revision history for Graph-Matching
+
+0.02    2012-04-30
+        Add dependency on Carp::Assert; update email address.
+
+0.01    2008-06-08
+        First version, released on an unsuspecting world.
+

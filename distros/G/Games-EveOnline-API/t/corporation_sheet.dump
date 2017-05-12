@@ -1,0 +1,26 @@
+{
+          'shares' => '1000',
+          'faction_id' => '0',
+          'cached_until' => '2014-08-24 22:18:02',
+          'member_count' => '43',
+          'alliance_id' => '0',
+          'corporation_id' => '1043735888',
+          'description' => "Research and develop",
+          'station_id' => '60004861',
+          'ceo_name' => 'Krasotulya',
+          'logo' => {
+                      'color3' => '674',
+                      'color1' => '677',
+                      'shape3' => '415',
+                      'shape2' => '480',
+                      'graphic_id' => '0',
+                      'shape1' => '437',
+                      'color2' => '676'
+                    },
+          'tax_rate' => '5',
+          'corporation_name' => 'Zaporozhye Sich',
+          'ceo_id' => '423270919',
+          'ticker' => 'ZPR',
+          'url' => 'http://',
+          'station_name' => 'Lasleinur V - Moon 11 - Republic Fleet Assembly Plant'
+        }

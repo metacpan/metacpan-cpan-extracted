@@ -1,0 +1,9 @@
+NEWS for Graph::ModularDecomposition
+
+0.14 fix intermittent test failure on Perl 5.8.1+ due to randomized hashes
+0.13 now allows multicharacter vertex labels
+0.12 fixed broken test 12.t, added pod tests
+0.11 more compatibility with Graph-0.50 beta
+0.10 now requires Graph-0.20105, removed workarounds for broken inheritance
+0.09 first public release
+

@@ -1,0 +1,45 @@
+---
+name: Geo-Direction-Name-Spec-Chinese
+version: 0.0.1
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: Add chinese traditional direction specification to Geo::Direction::Name
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Geo::Direction::Name: 0.0.4
+  Test::Base: 0
+  version: 0
+provides:
+  Geo::Direction::Name::Locale::Bagua::en:
+    file: lib/Geo/Direction/Name/Locale/Bagua/en.pm
+  Geo::Direction::Name::Locale::Bagua::ja:
+    file: lib/Geo/Direction/Name/Locale/Bagua/ja.pm
+  Geo::Direction::Name::Locale::Bagua::ko:
+    file: lib/Geo/Direction/Name/Locale/Bagua/ko.pm
+  Geo::Direction::Name::Locale::Bagua::zh_CN:
+    file: lib/Geo/Direction/Name/Locale/Bagua/zh_CN.pm
+  Geo::Direction::Name::Locale::Bagua::zh_TW:
+    file: lib/Geo/Direction/Name/Locale/Bagua/zh_TW.pm
+  Geo::Direction::Name::Locale::Dizhi::en:
+    file: lib/Geo/Direction/Name/Locale/Dizhi/en.pm
+  Geo::Direction::Name::Locale::Dizhi::ja:
+    file: lib/Geo/Direction/Name/Locale/Dizhi/ja.pm
+  Geo::Direction::Name::Locale::Dizhi::ko:
+    file: lib/Geo/Direction/Name/Locale/Dizhi/ko.pm
+  Geo::Direction::Name::Locale::Dizhi::zh:
+    file: lib/Geo/Direction/Name/Locale/Dizhi/zh.pm
+  Geo::Direction::Name::Spec::Bagua:
+    file: lib/Geo/Direction/Name/Spec/Bagua.pm
+    version: 0.0.1
+  Geo::Direction::Name::Spec::Chinese:
+    file: lib/Geo/Direction/Name/Spec/Chinese.pm
+    version: 0.0.1
+  Geo::Direction::Name::Spec::Dizhi:
+    file: lib/Geo/Direction/Name/Spec/Dizhi.pm
+    version: 0.0.1
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

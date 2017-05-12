@@ -1,0 +1,16 @@
+Changes
+examples/get-agency-info.pl
+examples/get-items.pl
+examples/get-private-info.pl
+examples/get-syndicate-info.pl
+examples/inventory.xml
+lib/Games/CroqueMonster.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-methods.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

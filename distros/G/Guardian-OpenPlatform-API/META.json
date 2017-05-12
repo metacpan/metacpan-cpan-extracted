@@ -1,0 +1,58 @@
+{
+   "abstract" : "Access the Guardian OpenPlatform API",
+   "author" : [
+      "Dave Cross <davecross@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Guardian-OpenPlatform-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.001014"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "2.023",
+            "Moo" : "2.000000",
+            "namespace::clean" : "0.24",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Guardian::OpenPlatform::API" : {
+         "file" : "lib/Guardian/OpenPlatform/API.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/guardian-openplatform-api.git",
+         "web" : "https://github.com/manwar/guardian-openplatform-api"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,137 @@
+######################################################################
+    Games::Blackjack 0.04
+######################################################################
+
+NAME
+    Games::Blackjack - Blackjack Utility Classes
+
+SYNOPSIS
+        use Games::Blackjack;
+
+            # Create new shoe of cards
+        my $shoe = Games::Blackjack::Shoe->new(nof_decks => 4);
+
+            # Create two hands, player/dealer
+        my $player = Games::Blackjack::Hand->new(shoe => $shoe);
+        my $dealer = Games::Blackjack::Hand->new(shoe => $shoe);
+
+            # Two dealer cards
+        $dealer->draw();
+        print "Dealer: ", $dealer->as_string(), "\n";
+        $dealer->draw(); # 2nd card not shown
+
+        $player->draw();
+        $player->draw();
+        print "Player: ", $player->as_string, "(", 
+              $player->count_as_string, ")\n";
+
+        # Let's assume player decides to stand. Dealer's turn.
+
+           # Dealer plays Las Vegas rules
+        while(!$dealer->busted() and 
+              $dealer->count("soft") < 17) {
+            $dealer->draw();
+        }
+
+           # Show winner (-1: Dealer, 1: Player, 1.5: Player Blackjack)
+        print "Player score: ", $player->score($dealer), "\n";
+
+DESCRIPTION
+    Games::Blackjack provides the plumbing for implementing Blackjack games.
+    It was originally published in the German "Linux-Magazin", the article
+    is available online at
+
+        http://www.linux-magazin.de/Artikel/ausgabe/2003/12/perl/perl.html
+
+    The English version appeared in the British "Linux-Magazine" 01/2004 on
+    the newsstands and will be available online later at
+
+        http://www.linux-magazine.com/issue/38
+
+    A sample program, available in the distribution as "eg/blackjack", shows
+    a simple command line tool allowing a simplified game against a
+    Las-Vegas-Style dealer.
+
+    The module uses Quantum::Superpositions under the hood for educational
+    purposes.
+
+Classes and Methods
+  Games::Blackjack::Shoe
+    Abstracts the "shoe", the container which the dealer extracts the cards
+    from. A shoe typically holds a number of decks of cards.
+
+    $shoe = Games::Blackjack::Shoe->new(nof_decks => $n)
+        Create a new "Games::Blackjack::Shoe" object, containing the
+        specified number of decks.
+
+    $shoe->remaining()
+        Number of cards still available in the shoe.
+
+    $shoe->reshuffle()
+        Refill the shoe with a number of decks, as specified in the
+        constructor call earlier and shuffle them with Fisher-Yates.
+
+    $card = $shoe->draw_card()
+        Extract a card from the shoe. $card is a reference to an array
+        containing the suit of the card ("Heart", "Diamond", "Spade",
+        "Club") as the first element and the value ("A", "2", "3", "4", "5",
+        "6", "7", "8", "9", "10", "J", "Q", "K") as the second. "undef" is
+        returned if no more cards are available. This Method is being called
+        by a Games::Blackjack::Hand object if its draw() method gets called.
+
+  Games::Blackjack::Hand
+    Abstracts a player's or the dealer's "hand", a number of cards held by
+    either party.
+
+    $hand = Games::Blackjack::Hand->new(shoe => $shoe)
+        Create a new "Games::Blackjack::Hand" object, connected to a "shoe",
+        which will feed this "hand" via the "draw()" method.
+
+    $hand->draw()
+        Draw a card from the shoe and put it into the hand. This will change
+        the count of the hand. If the shoe runs out of cards, it
+        automatically refills itself.
+
+    $hand->as_string()
+        Show the cards of a hand as string, e.g. "Heart A, Spade 10".
+
+    $hand->count_as_string()
+        Show the different counts of a hand as a string.
+
+    $hand->count($how)
+        Count a hand. If $how is set to "soft", the soft count of the hand
+        is calculated. If $how is set to "hard", the hard count is returned.
+        If the hand is busted, undef is returned.
+
+    $hand->busted()
+        Returns true if the hand is busted (hard count exceeds 21), and
+        false otherwise.
+
+    $hand->blackjack()
+        Returns true if the hand is a Blackjack and false otherwise.
+
+    $player->score($dealer)
+        Returns the score of the player against the dealer hand object,
+        passed in as $dealer. According to the Blackjack rules, this can be
+        -1, 0, 1 and 1.5 (if the Player has a Blackjack).
+
+Debugging with Log::Log4perl
+    "Games::Blackjack" is "Log::Log4perl"-enabled. To figure out what goes
+    on behind the scenes, simple put something like
+
+        use Log::Log4perl qw(:easy);
+        Log::Log4perl->easy_init($DEBUG);
+
+    in front of your program. For more detailed Log::Log4perl option, check
+    out
+
+        http://log4perl.sourceforge.net
+
+LEGALESE
+    Copyright 2003 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2003, Mike Schilli <cpan@perlmeister.com>
+

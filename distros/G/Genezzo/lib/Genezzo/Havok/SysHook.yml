@@ -1,0 +1,30 @@
+# havok version=7.19
+ABSTRACT:     
+AUTHOR:    Jeffrey I Cohen (jcohen@cpan.org)
+DML:    
+  -    
+    check:    
+      -    select * from user_functions where xname = 'Genezzo::Havok::SysHook'
+
+    install:    
+      -    select add_user_function('sqlname=add_sys_hook', 'argstyle=HASH', 'function=sql_func_add_sys_hook', 'creationdate=2007-11-20T07:41:42', 'module=Genezzo::Havok::SysHook') from dual
+      -    select add_help('Genezzo::Havok::SysHook') from dual
+      -    select register_havok_package('modname=Genezzo::Havok::SysHook', 'creationdate=2007-11-20T07:41:42', 'version=7.14') from dual
+
+
+
+LICENSE:    gpl
+NAME:    Genezzo::Havok::SysHook
+PREREQ_HAVOK:    
+  Genezzo::Havok:    0.0
+  Genezzo::Havok::Utils:    0.0
+
+TABLEDEFS:    
+  sys_hook:    
+    create_table:    xid=n pkg=c hook=c replace=c xtype=c xname=c args=c owner=c creationdate=c version=c
+    dml:    
+
+
+
+UPDATED:    2007-11-20T00:02:50
+VERSION:    7.14

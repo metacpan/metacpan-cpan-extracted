@@ -1,0 +1,63 @@
+---
+abstract: 'Command line option passing with with lots of features'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-Alt
+provides:
+  Getopt::Alt:
+    file: lib/Getopt/Alt.pm
+    version: v0.4.2
+  Getopt::Alt::Command:
+    file: lib/Getopt/Alt/Command.pm
+    version: v0.4.2
+  Getopt::Alt::Dynamic:
+    file: lib/Getopt/Alt/Dynamic.pm
+    version: v0.4.2
+  Getopt::Alt::Exception:
+    file: lib/Getopt/Alt/Exception.pm
+    version: v0.4.2
+  Getopt::Alt::Option:
+    file: lib/Getopt/Alt/Option.pm
+    version: v0.4.2
+recommends:
+  JSON: '0'
+  JSON::XS: '0'
+  Pod::Coverage: '0'
+  Test::Kwalitee: '0'
+  Test::Perl::Critic: '0'
+  Test::Spelling: '0'
+  YAML: '0'
+  YAML::Syck: '0'
+  YAML::XS: '0'
+requires:
+  Config::Any: '0'
+  File::HomeDir: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  Throwable::Error: '0'
+  Tie::Handle::Scalar: '0'
+  Try::Tiny: '0'
+  parent: '0'
+  perl: '5.008'
+  version: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Getopt-Alt
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ivanwills/Getopt-Alt.git
+version: v0.4.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

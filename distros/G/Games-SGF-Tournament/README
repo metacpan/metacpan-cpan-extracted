@@ -1,0 +1,52 @@
+Games-SGF-Tournament version 1.0
+====================================
+
+Smart Go Format (SGF) is a file format used to store game records of
+two player board games. This module used to collect tournament
+information from a set of SGF files and produce statistic HTML tables
+for creating WWW tournament pages.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+or:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+version
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Al Nikolov
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+USA
+
+
+

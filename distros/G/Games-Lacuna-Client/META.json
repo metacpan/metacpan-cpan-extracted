@@ -1,0 +1,370 @@
+{
+   "abstract" : "An RPC client for the Lacuna Expanse",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>",
+      "Gavin Mogan <halkeye@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Lacuna-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : 0,
+            "Browser::Open" : "0.04",
+            "Class::MOP" : 0,
+            "Class::XSAccessor" : "1.07",
+            "Crypt::SSLeay" : 0,
+            "Data::Dumper" : 0,
+            "Date::Format" : 0,
+            "Date::Parse" : 0,
+            "DateTime" : 0,
+            "Exception::Class" : 0,
+            "FindBin" : 0,
+            "HTTP::Request" : 0,
+            "HTTP::Response" : 0,
+            "IO::Interactive" : 0,
+            "JSON::RPC::Common" : 0,
+            "JSON::RPC::LWP" : "0.006",
+            "LWP::UserAgent" : 0,
+            "MIME::Lite" : 0,
+            "Moose" : 0,
+            "Number::Format" : 0,
+            "Scalar::Util" : 0,
+            "Time::HiRes" : 0,
+            "Try::Tiny" : "0.07",
+            "URI" : 0,
+            "YAML::Any" : 0,
+            "namespace::clean" : "0.20"
+         }
+      }
+   },
+   "provides" : {
+      "Games::Lacuna::Cache" : {
+         "file" : "lib/Games/Lacuna/Cache.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client" : {
+         "file" : "lib/Games/Lacuna/Client.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Alliance" : {
+         "file" : "lib/Games/Lacuna/Client/Alliance.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Body" : {
+         "file" : "lib/Games/Lacuna/Client/Body.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Archaeology" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Archaeology.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::ArtMuseum" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/ArtMuseum.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::BlackHoleGenerator" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/BlackHoleGenerator.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Capitol" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Capitol.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::CulinaryInstitute" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/CulinaryInstitute.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Development" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Development.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::DistributionCenter" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/DistributionCenter.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Embassy" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Embassy.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::EnergyReserve" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/EnergyReserve.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Entertainment" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Entertainment.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::FoodReserve" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/FoodReserve.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::GeneticsLab" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/GeneticsLab.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::HallsOfVrbansk" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/HallsOfVrbansk.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::IBS" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/IBS.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::IntelTraining" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/IntelTraining.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Intelligence" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Intelligence.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::LibraryOfJith" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/LibraryOfJith.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::MayhemTraining" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/MayhemTraining.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::MercenariesGuild" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/MercenariesGuild.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::MiningMinistry" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/MiningMinistry.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::MissionCommand" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/MissionCommand.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Network19" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Network19.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Observatory" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Observatory.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::OperaHouse" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/OperaHouse.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::OracleOfAnid" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/OracleOfAnid.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::OreStorage" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/OreStorage.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Park" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Park.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Parliament" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Parliament.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::PlanetaryCommand" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/PlanetaryCommand.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::PoliceStation" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/PoliceStation.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::PoliticsTraining" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/PoliticsTraining.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::SSLA" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/SSLA.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Security" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Security.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Shipyard" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Shipyard.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Simple" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Simple.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::SpacePort" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/SpacePort.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::StationCommand" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/StationCommand.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::SubspaceSupplyDepot" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/SubspaceSupplyDepot.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::TempleOfTheDrajilites" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/TempleOfTheDrajilites.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::TheDillonForge" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/TheDillonForge.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::TheftTraining" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/TheftTraining.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::ThemePark" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/ThemePark.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Trade" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Trade.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Transporter" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Transporter.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::Warehouse" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/Warehouse.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::WasteExchanger" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/WasteExchanger.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::WasteRecycling" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/WasteRecycling.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Buildings::WaterStorage" : {
+         "file" : "lib/Games/Lacuna/Client/Buildings/WaterStorage.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Captcha" : {
+         "file" : "lib/Games/Lacuna/Client/Captcha.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Empire" : {
+         "file" : "lib/Games/Lacuna/Client/Empire.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Governor" : {
+         "file" : "lib/Games/Lacuna/Client/Governor.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Governor::Archaeology" : {
+         "file" : "lib/Games/Lacuna/Client/Governor/Archaeology.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Governor::Astronomer" : {
+         "file" : "lib/Games/Lacuna/Client/Governor/Astronomer.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Governor::Party" : {
+         "file" : "lib/Games/Lacuna/Client/Governor/Party.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Governor::Scows" : {
+         "file" : "lib/Games/Lacuna/Client/Governor/Scows.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Inbox" : {
+         "file" : "lib/Games/Lacuna/Client/Inbox.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Map" : {
+         "file" : "lib/Games/Lacuna/Client/Map.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Market" : {
+         "file" : "lib/Games/Lacuna/Client/Market.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Market::Trade" : {
+         "file" : "lib/Games/Lacuna/Client/Market.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Market::Trade::Glyph" : {
+         "file" : "lib/Games/Lacuna/Client/Market.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Market::Trade::Item" : {
+         "file" : "lib/Games/Lacuna/Client/Market.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Market::Trade::Plan" : {
+         "file" : "lib/Games/Lacuna/Client/Market.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Market::Trade::Ship" : {
+         "file" : "lib/Games/Lacuna/Client/Market.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Market::Trade::SimpleItem" : {
+         "file" : "lib/Games/Lacuna/Client/Market.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Module" : {
+         "file" : "lib/Games/Lacuna/Client/Module.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::PrettyPrint" : {
+         "file" : "lib/Games/Lacuna/Client/PrettyPrint.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::RPC" : {
+         "file" : "lib/Games/Lacuna/Client/RPC.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Stats" : {
+         "file" : "lib/Games/Lacuna/Client/Stats.pm",
+         "version" : "0.003"
+      },
+      "Games::Lacuna::Client::Types" : {
+         "file" : "lib/Games/Lacuna/Client/Types.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/tsee/Games-Lacuna-Client",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tsee/Games-Lacuna-Client.git",
+         "web" : "https://github.com/tsee/Games-Lacuna-Client"
+      }
+   },
+   "version" : "0.003"
+}
+

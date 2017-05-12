@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+t/Getopt-Tree.t
+lib/Getopt/Tree.pm

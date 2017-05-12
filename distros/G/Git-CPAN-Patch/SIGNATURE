@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d3f72516f6c8cacd16bac19a21973d37f2fa4ccf AUTHOR_PLEDGE
+SHA1 b0a811de239199665ec1ff1d94eae76fe647ab6c CONTRIBUTORS
+SHA1 5ac2d249f4e906b5494a9e1b3debeae074aeeb70 Changes
+SHA1 41646419b93884c28071420a3c5e360712b5ec9d INSTALL
+SHA1 96d23fd0d5fce92a90b5c6cce7a1d10dc7f7afe8 LICENSE
+SHA1 98eb47dfa73d8985d516fc28191c69b6c7476f0b MANIFEST
+SHA1 9f9408e7fdfd32be58244f5a56193eba85e4902d META.json
+SHA1 70d9ad934afaa2e43b1b86cde635943a69920783 META.yml
+SHA1 d53eafbf78ee01bee3fe87c933493d2f76492ee4 Makefile.PL
+SHA1 d16fecac04eb062a286d656a15b218055b2f1440 README
+SHA1 b02222d3237a1c7e49b785c410c5dda838f8e629 README.mkdn
+SHA1 fb371bf5ca2c65e9931ab199540b898ce6af58f8 bin/git-cpan
+SHA1 eda18815777da6675979076ff7f60e8e3d3fed8d cpanfile
+SHA1 78b5364b6deec7bd9eabf3befb2d0d1fb0e1b182 doap.xml
+SHA1 4789635cbe6d282d0783af74a931b2fbbed92c6c lib/Git/CPAN/Patch.pm
+SHA1 598e62df2118d27f9c8d83e5ef3f9d0a9c0417f6 lib/Git/CPAN/Patch/Command/Clone.pm
+SHA1 998f0f26c8f35580a260792a326d0b56a2d2eb56 lib/Git/CPAN/Patch/Command/FormatPatch.pm
+SHA1 44d81a1f30e961a426c95d835d1527a776ca94f2 lib/Git/CPAN/Patch/Command/Import.pm
+SHA1 ef1f376cc97dc274b83dff01f8b01385e6683c92 lib/Git/CPAN/Patch/Command/SendEmail.pm
+SHA1 989df2765f6e18b83d60c143452437ef96a8d5e1 lib/Git/CPAN/Patch/Command/SendPatch.pm
+SHA1 11f5737222251987b24957e9490548adf6cc3917 lib/Git/CPAN/Patch/Command/Sources.pm
+SHA1 ef2265344af2d21ad887ddaa2e8c20f89e89b090 lib/Git/CPAN/Patch/Command/Squash.pm
+SHA1 6e45577753fb7d922d7f70f6963583bc5903fb3c lib/Git/CPAN/Patch/Command/Update.pm
+SHA1 09c302ede07c359bd33f3f00fa29f879203d0486 lib/Git/CPAN/Patch/Command/Which.pm
+SHA1 41e435a75b03c7fade2c9123aa4dbe57a5f03959 lib/Git/CPAN/Patch/Import.pm
+SHA1 39264da8aa236d9a9a6c6f67c56b7ea4dcfdc5da lib/Git/CPAN/Patch/Release.pm
+SHA1 2709df1485614407211a146b7ad6b925d6def3f3 lib/Git/CPAN/Patch/Role/Git.pm
+SHA1 0c102eb9c6a6b72c5f10bce1ddd0a847ced7e4da lib/Git/CPAN/Patch/Role/Patch.pm
+SHA1 5e1cdbc4ee65be311d4cc08f3ec54ed05be4b264 t/00-compile.t
+SHA1 4f2471497515ddf996904a3e99db4e21253a764a t/00-load.t
+SHA1 03d256340c4ef38ddbccf0a2456e14c299fa9c2b t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 a866bd103a00e47c4af1c89fe70a17b2e5d5af4c t/clone.t
+SHA1 62f5f17a9d19113f39ecd115bc7bab5adc205514 t/corpus/Git-CPAN-Patch-0.4.5.tar.gz
+SHA1 80b775b46bac5e99062149c6ccc76c6d8c2687c9 xauth/clone-from-github.t
+SHA1 30c46c97deef22ae98f0cf85da230f6181f603d0 xauth/clone-from-module.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlh4E4UACgkQ34Hwf+GwC4zqDgCg42IFqhSarMGRpxxUK8J2AqM7
+FiYAni4igTmiN1NK7d0QBDaEogrGf4iV
+=BwFG
+-----END PGP SIGNATURE-----

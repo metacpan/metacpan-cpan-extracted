@@ -1,0 +1,14 @@
+BUFR.pm ERROR: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+In message 1 contained in bulletin with ahl IOZX11 XXXX 052100 CCR
+BUFR.pm ERROR: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+In message 2 contained in bulletin with ahl IOZX11 XXXX 052100 CCS
+BUFR.pm ERROR: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+In message 3 contained in bulletin with ahl IOZX11 XXXX 051800 CCX
+BUFR.pm ERROR: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+In message 4 contained in bulletin with ahl IOZX11 XXXX 060000 CCC
+BUFR.pm ERROR: Local reference value for compressed CCITTIA5 data hasn't all bits set to zero, but is '000000000000' at ./bufrread.pl line 143
+In message 5 contained in bulletin with ahl IOZX11 XXXX 060000 CCD
+BUFR.pm ERROR: Local reference value for compressed CCITTIA5 data hasn't all bits set to zero, but is '000000000000' at ./bufrread.pl line 143
+In message 7 contained in bulletin with ahl IOZX11 XXXX 060300
+BUFR.pm ERROR: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+In message 9 contained in bulletin with ahl IOZX11 XXXX 052100 CCT

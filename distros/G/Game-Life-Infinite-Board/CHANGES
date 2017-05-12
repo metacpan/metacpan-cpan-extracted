@@ -1,0 +1,37 @@
+0.07:
+
+- Added tests for file formats.
+- Minor fixes.
+
+0.06:
+
+- Removed dependency on File::Slurp.
+- RLE file format support.
+- Life 1.05 file format support.
+- Life 1.06 file format support.
+
+0.05:
+
+- Fixed shrinkBoard bug that caused random test failures in perl versions 
+  >= 5.18.2.
+- File format detection and .cells format loading. Rest of formats in next
+  version.
+
+0.04:
+
+- Support for colorised life - Immigration
+- Support for colorised life - Quadlife
+- Garbage collection (deleting unused hash entries) is now performed on each 
+  tick. shrinkBoard is now deprecated from this aspect and must only be used 
+  to shrink the board's boundaries.
+
+0.03:
+
+- Small code style fixes.
+- Test fix.
+- Changes in oscilator check.
+- Added license in Makefile.PL
+
+0.02:
+
+- Better tests.

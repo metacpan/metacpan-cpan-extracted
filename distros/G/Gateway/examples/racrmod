@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+$version = q$Id: racrmod,v 0.3 1998/04/12 12:13:39 eagle Exp $;
+#
+# racrmod -- Robomoderator script for rec.arts.comics.reviews.
+#            Copyright 1998 by Russ Allbery <rra@stanford.edu>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
+# This is a front-end robomoderator used for rec.arts.comics.reviews.  All
+# incoming messages can be fed directly to this script, which either posts
+# them automatically or forwards them to the hand moderation address.
+
+############################################################################
+# Configuration
+############################################################################
+
+# The address to which any bounces or rejection messages should be cc'd.
+$maintainer = 'XXX';
+
+# The address to which posts that fail any check should be relayed.
+$moderator = 'XXX';
+
+
+############################################################################
+# Implementation
+############################################################################
+
+use News::Gateway qw();
+
+use strict;
+use vars qw($maintainer $moderator $version);
+
+# Create our gateway object, non-interactive, setting the maintainer
+# address, and then load in the hooks for the modules that we're going to
+# need.
+my $gateway = News::Gateway->new (0, $maintainer);
+$gateway->modules ('mailpath',
+                   'bodyheaders',
+                   newsgroups => ['rec.arts.comics.reviews'],
+                   mailtonews => ['rec.arts.comics.reviews'],
+                   'crosspost',
+                   'headers',
+                   keywords => [ sub { $_[0] =~ /^(\S+):/ } ],
+                   'nobinaries',
+                   'cleanbody');
+
+# Read our configuration information from the end of this script.
+$gateway->config_file (\*DATA);
+
+# Read in the message, and then run our various checks against it.  If none
+# of the checks failed, post the message.
+$gateway->read (\*STDIN);
+my $error = $gateway->apply ();
+unless ($error) {
+    $error = $gateway->post ();
+}
+
+# If we got some sort of error message, we need to resend the post to the
+# moderation address.  We also need to add a header saying why the post was
+# rejected.
+if ($error) {
+    my $article = $gateway->get_article ();
+    $article->add_headers ('x-rejected-for' => $error);
+    $gateway->mail ($moderator)
+        or $gateway->error ('Unable to resend to moderator');
+}
+__END__
+
+############################################################################
+# Configuration directives
+############################################################################
+
+header approved replace XXX
+header cc       drop
+header date     rename
+header path     drop
+header to       drop
+keywords XXX/racr/keywords
+group /^rec.arts.comics\..*/
+crosspost max 2
+crosspost reject rec.arts.comics.info
+followup  remove rec.arts.comics.reviews
+followup  max 3
+bodyheaders "newsgroups" "x-no-archive"

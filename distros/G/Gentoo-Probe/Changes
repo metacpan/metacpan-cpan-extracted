@@ -1,0 +1,36 @@
+Revision history for Perl extension Gentoo::Probe.
+
+ver 1.0.5: Sat May 10 06:53:34 EDT 2008
+	Removed useless and annoying CHLD signal handler from bin/pkg.
+
+ver 1.0.4:
+	Added MANIFEST depends to GNUmakefile for targets like dist.
+
+	Added automated version updates to Makefile.PL.  Uses sed to replace
+	__VERSION__ with the value of $VERSION from Gentoo::Probe.
+
+	Added cvs ci and cvs tag commands to Makefile.PL
+
+	Added proper module dependency list to readme, and to Makefile.
+
+	Added ability to return an array of keys for keyword KEYS to pkg-faq.
+
+	All tools now use environment variable / portage setting VDB_DIR for the /var/db/pkg
+	location.  Is there a setting for this in portage, or is it hardcoded?
+
+	Cleaned up the version logic (-v switch).  It used to report a version of
+	gentoolkit with a number 'dev-###...'.  This was actually a different
+	package, not a version.
+
+	Changed the implementation of searches.  I always check both port_dir and vdb_dir
+	now.  If you request -iv, I report the installed versions of the installed packages.
+	If you request -uv, I report all versions of those packages which are not installed.
+
+	Removed the local option parsing in Gentoo::Probe::Opts, and replaced it with the
+	Getopt::WonderBra package.  It lifts and separates your args!
+
+	Added Verbose switch, to control whether package names are included in pkg-files output.
+
+	Fixed up the unit tests a bit.
+
+

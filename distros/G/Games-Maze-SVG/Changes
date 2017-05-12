@@ -1,0 +1,65 @@
+Revision history for Games-Maze-SVG
+
+0.90 2014-09-01T10:30:00-0600
+    - Add author tests for RELEASE_TESTING
+    - Add repository and Perl minimum version information
+0.80 2014-08-16T12:00:00-0500
+    - Make module versions consistent across distribution
+    - Update Changes file to match CPAN::Changes::Spec
+    - Tidy files that were inconsistently indented.
+0.78 2013-07-20T23:10:00-0500
+    - Corrected test to match some formatting and copyright corrections.
+0.77 2013-07-20T10:10:00-0500
+    - Fixed mistake in MANIFEST.SKIP that removed Makefile.PL from
+      distribution.
+0.76 2013-07-17T10:20:00-0500
+    - Corrected some typos and other deficiencies in the manual.
+    - Changed the toString method to to_string to be consistent with other
+      capitalization. Made alias to old name that I can deprecate later.
+    - Corrected POD error found by CPANTESTERs.
+    - Moved POD tests so that they don't stop install.
+0.75 Unknown Release Date
+    - Somewhere in 6/2006
+    - Corrected dependency on Test::MockModule that was causing CPAN
+      tests to fail. If you don't have Test::MockModule, some tests
+      will be skipped.
+0.74 Unknown Release Date
+    - Somewhere in 6/2006
+    - Cleaned up event handling a little further in the script code.
+      Now supports Batik and ASV a bit better.
+    - Minor code cleanups to satisfy Perl::Critic.
+0.73 Unknown Release Date
+    - Somewhere in 6/2006
+    - Finally added support for FireFox. The problem was caused by the
+      keystroke handling interface. Corrected based on examples from the
+      SVG Developers mailing list.
+0.72 Not Released
+    - Added support for maze:board element which allowed bigger mazes on
+      Batik and cleaned up initialization code.
+    - Swapped the arrow buttons back.
+    - Fixed problem with very short mazes cutting off the help.
+    - Change background on non-interactive mazes for easier printing.
+0.71 Unknown Release Date
+    - Somewhere in 12/2005
+    - Various code clean ups
+    - Extend testing to cover new hex shapes.
+    - Corrected drawing anomally when running on a hex maze.
+0.7 Unknown Release Date
+    - Somewhere in 12/2005
+    - Coverage testing to flush out remaining bugs.
+    - Fix a few bugs in error-handling found by coverage testing.
+    - Factor out common code from RectHex and Hex.
+    - Remove obsolete Ascii.pm module.
+    - Convert to new hex cell definitions.
+0.6 Unknown Release Date
+    - Somewhere in 11/2005
+    - Reorganized the SVG and code to give better separation of static
+      and interactive portions. Converted the quick JavaScript into more OO
+      design. Release on CPAN.
+0.5 Not Released
+    - Refactor into multiple classes.
+0.4 Not Released
+    - Rewrite earlier versions as a Perl module.
+0.1 Not Released
+    - Initial hack, developed for fun.
+

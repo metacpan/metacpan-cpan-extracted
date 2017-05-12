@@ -1,0 +1,55 @@
+NAME
+    Games::NES::Emulator - An object-oriented NES (6502) emulator
+
+SYNOPSIS
+        use Games::NES::Emulator;
+    
+        my $emu = Games::NES::Emulator->new;
+        $emu->load_rom( 'mario.nes' );
+        $emu->run;
+
+WARNING
+    Don't get too excited -- this code doesn't really do anything yet. Don't
+    complain to me that "Blaster Master" isn't working. It's not ready yet.
+
+DESCRIPTION
+    Games::Emulator::NES contains a set of modules to emulate a classic NES
+    gaming machine.
+
+RATIONALE
+    I've always been interested in hardware emulation. I grew up playing the
+    NES, so I figured it would be a decent place to start. Over the last
+    year I've written some (non-functioning) code based on some freely
+    available emulators on the web. Hopefully by putting the skeleton of the
+    code online, it will spur me on to continue the development.
+
+    As for choosing Perl for the emulation language, Perl is what I'm most
+    comfortable with, and I don't particularly care about speed -- yet.
+    Perhaps some bits can be rewritten in XS, but I'll cross that bridge
+    when i get to it.
+
+METHODS
+  new( )
+    Create a new instance of the emulator. Initializes the CPU.
+
+  load_rom( $filename )
+    Loads the rom from $filename.
+
+  run( )
+    Begins execution of the code found in the ROM.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * Games::NES::ROM
+    * Games::NES::Emulator::CPU
+    * Games::NES::Emulator::APU
+    * Games::NES::Emulator::PPU
+

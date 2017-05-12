@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use 5.12.0;
+use Getopt::Long;
+use Git::Release;
+use Term::ANSIColor;
+
+my $opt_testing;
+GetOptions(
+    't|testing=s' => \$opt_testing,
+);
+
+my $re = Git::Release->new;
+$|++;
+
+my @ready = $re->branch->ready_branches;
+
+my $rc = $re->checkout_rc_branch;
+
+say "Ready branches:";
+for my $b ( @ready ) {
+    say "\t", $b->name;
+}
+
+for my $b ( @ready ) {
+    say "===> Merging " , $b->ref;
+    my @lines = $rc->merge( $b );
+    say for @lines;
+    die 'Merge error' unless @lines;
+    if( $opt_testing ) {
+        system( $opt_testing ) == 0
+            or die("test command $opt_testing failed.");
+    }
+    elsif( -e 't' ) {
+        say "Found perl style test dirctory, run perl prove for testing";
+        system( qw'prove -lv t' ) == 0
+            or die("test command prove -lv failed");
+    }
+}
+
+say color('green'), "Testing done successfully, now it's ready for release.", color('reset');

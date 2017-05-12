@@ -1,0 +1,137 @@
+Revision history for Games::Domino
+
+0.30    Fri Apr 28 15:20:00 2017
+        - Removed dependency on Moo::Role.
+        - Fixed error in the game script.
+
+0.29    Wed Apr 26 13:55:00 2017
+        - Exposed 'cheat' flag.
+
+0.28    Tue Apr 25 10:15:00 2017
+        - Updated game script to be more user friendly.
+
+0.27    Sun Apr 23 10:50:00 2017
+        - Updated how the instructions get displayed.
+        - Updated result to be more descriptive.
+
+0.26    Mon Apr 03 16:40:00 2017
+        - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.25    Wed Oct 05 10:40:00 2016
+        - Documented method reset() in the package Games::Domino::Player.
+        - Added fallback switch to overload pragma.
+
+0.24    Thu Sep 29 10:50:00 2016
+        - Improved type definitions for 'ZeroOrOne', 'ZeroToSix' and 'HorC'.
+
+0.23    Wed Aug 24 10:10:00 2016
+        - Updated copyright year information.
+        - Tidied up unit test scripts.
+
+0.22    Wed Mar 09 15:45:00 2016
+        - Assigned minimum version required for Moo and namespace::clean.
+        - Added key 'provides' to the Makefile.PL script.
+
+0.21    Sun Sep 27 09:40:00 2015
+        - Updated section "SYNOPSIS" to reflect the changes to the game script.
+
+0.20    Fri Jun 05 12:00:00 2015
+        - Fixed method result() to spit out the right result.
+        - Dropped private method _play() and moved the code to the method play().
+        - Updated the game script to respect the above changes.
+        - Updated the section "SYNOPSIS" w.r.t the changes to the game script.
+
+0.19    Thu Jun 04 12:00:00 2015
+        - Updated method result() to return correct result string efficiently.
+        - Refactored method show() to return state of the game.
+        - Added new method instructions().
+        - Updated game script to respect the above changes.
+
+0.18    Wed Jun 03 10:35:00 2015
+        - Updated method result() to return the result.
+        - Updated method play() to continue unless the game is over.
+        - Updated method show() to show 'EMPTY' if the game board is empty.
+
+0.17    Mon Jun 01 13:35:00 2015
+        - Added dependency on Term::ANSIColor::Markup in the Makefile.PL script.
+        - Added new attribute 'color' to the class Games::Domino::Tile.
+        - Updated method _play() to mark with color code who picked the tile.
+        - Updated method _board() to return color coded board.
+
+0.16    Fri May 29 10:20:00 2015
+        - Fixed the failed Kwalitee Core metric 'consistent version'.
+
+0.15    Wed May 27 09:50:00 2015
+        - Added method get_available_tiles()
+        - Updated method is_valid_tile()
+        - Updated game script w.r.t the above addition.
+        - Updated code in the section "SYNOPSIS".
+
+0.14    Tue May 26 14:50:00 2015
+        - Updated method play() and extracted out prompting for data.
+        - Added method is_valid_tile()
+        - Updated method _play() w.r.t above changes.
+        - Added method _pick_from_bank()
+        - Refactored method is_over()
+        - Refactored method _next()
+        - Updated game script w.r.t the above changes.
+
+0.13    Fri May 22 09:55:00 2015
+        - Added method reset() to the package Games::Domino.
+        - Added method reset() to the package Games::Domino::Player.
+        - Updated game script to allow replay the game in the same session.
+        - Tidied up pod document of the methods in the package Games::Domino.
+
+0.12    Wed May 13 11:00:00 2015
+        - Fine-tuned the flow of the game.
+        - Improved method is_over() slightly.
+        - Renamed the script play-domino.
+        - Updated pod document to reflect the above changes.
+
+0.11    Mon Mar 23 12:50:00 2015
+        - Updated Makefile.PL script to install the game script alongwith the package.
+        - Updated pod document about the same.
+
+0.10    Thu Feb 19 15:50:50 2015
+        - Fixed the typo in the pod document of Games::Domino.
+
+0.09    Thu Feb 19 14:10:50 2015
+        - Added section SYNOPSIS.
+        - Minor tweak to the code in the pod document.
+
+0.08    Thu Feb 05 11:10:50 2015
+        - Updated MANIFEST.SKIP file to ignore folder '_eumm'.
+        - Added LICENSE file.
+        - Defined $AUTHORITY in all the packages of the distribution.
+        - Updated Copyright year information.
+
+0.07    Fri Dec 12 10:36:50 2014
+        - Tidied up the pod document.
+
+0.06    Fri Dec 12 03:00:50 2014
+        - Re-structured the code using 'Moo' i.e. downgrading from 'Moose'.
+        - Added package Games::Domino::Params to support common data types.
+        - Deleted Build.PL file.
+        - Deleted SIGNATURE file.
+        - Updated unit test to respect 'Moo'.
+
+0.05    Mon Aug 20 13:11:50 2012
+        - Fixed the typo in the pod for "DESCRIPTION".
+
+0.04    Sat Aug 18 21:33:29 2012
+        - Updated the text for "DESCRIPTION".
+
+0.03    Sat Aug 18 18:19:20 2012
+        - Major changes to let the user play with the computer (interactive mode).
+        - Fixed couple of bugs encountered while making changes.
+        - Minor cosmetics changes.
+        - Updated the sample game script (play-domino.pl) to reflect the changes in the core module.
+
+0.02    Thu Jul 26 16:38:29 2012
+        - Extended Games::Domino::Tile class to hold double property
+          as well top/bottom. This is to support the vertical branch.
+        - Added unit test around the new attributes.
+        - Fixed few typo in the pod for Games::Domino::Tile class.
+
+0.01    Thu Jul 26 04:00:00 2012
+        - First version, released.

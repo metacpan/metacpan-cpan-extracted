@@ -1,0 +1,26 @@
+---
+abstract: "Create a diagram of database tables, using the\nforeign key information in the schema"
+author:
+  - 'Smylers <smylers@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GraphViz-DBI-FromSchema
+provides:
+  GraphViz::DBI::FromSchema:
+    file: lib/GraphViz/DBI/FromSchema.pm
+    version: 0.5
+requires:
+  File::Temp: 0
+  Getopt::Long: 0
+  GraphViz::DBI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.5

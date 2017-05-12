@@ -1,0 +1,7 @@
+Revision history for Perl extension Gtk2::OSXApplication.
+
+0.06 Changed email address to oesterhol@cpan.org
+0.01  Tue Jun 26 11:37:18 2012
+	- original version; created by h2xs 1.23 with options
+		/Users/oesterholt/gtk/inst/include/gtkmacintegration/gtkosxapplication.h -n Gtk2::OSXApplication
+

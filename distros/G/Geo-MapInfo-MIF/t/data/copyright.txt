@@ -1,0 +1,13 @@
+This product (Test suite for Geo::MapInfo::MIF) incorporates data that is:
+
+© Commonwealth of Australia (Australian Electoral Commission) 2009
+
+The Data (Commonwealth Electoral Boundaries (various years)) has been used in Test suite for Geo::MapInfo::MIF with the permission of the Australian Electoral Commission. The Australian Electoral Commission has not evaluated the Data as altered and incorporated within Test suite for Geo::MapInfo::MIF, and therefore gives no warranty regarding its accuracy, completeness, currency or suitability for any particular purpose.
+
+Limited End-user licence provided by the Australian Electoral Commission: You may use Test suite for Geo::MapInfo::MIF to load, display, print and reproduce views obtained from the Data, retaining this notice, for your personal use, or use within your organisation only.
+
+(The minimum level of attribution, which applies to simple publications, such as a map, but not including digital products, is as follows)
+
+This product (Test suite for Geo::MapInfo::MIF) incorporates data that is:
+
+© Commonwealth of Australia (Australian Electoral Commission) 2009

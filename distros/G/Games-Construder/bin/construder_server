@@ -1,0 +1,19 @@
+#!/opt/perl/bin/perl
+use common::sense;
+use AnyEvent;
+use Games::Construder;
+use Games::Construder::Server;
+use Games::Construder::Logging;
+
+ctr_enable_log_categories ('info', 'error', 'warn', 'memory_prof');
+
+Games::Construder::Debug::init ("server");
+
+our $CV = AE::cv;
+
+our $server;
+$server = Games::Construder::Server->new;
+$server->init;
+$server->listen;
+
+$CV->recv;

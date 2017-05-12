@@ -1,0 +1,78 @@
+=encoding utf8
+
+=head1 NAME
+
+Geo::GML::GeoPoint - convert Geo::Point objects into GML
+
+=head1 SYNOPSIS
+
+ my $geopoint = Geo::Surface->new(...);
+ my $gml  = Geo::GML->new('WRITER', version => '3.2.1');
+ my $data;
+ $data->{..somewhere..} = $gml->GPtoGML($geopoint);
+
+=head1 DESCRIPTION
+
+Convert Geo::Point objects into GML data structures.  The implementation
+is partial: please help with providing me with examples.
+
+=head1 METHODS
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<GPtoGML>(OBJECT, OPTIONS)
+
+ -Option--Default
+  srs     <from OBJECT>
+
+=over 2
+
+=item srs => SRS-name
+
+Overrule the projection name as found in the Geo::Point object, which
+is just a simple label.  Be sure that your OBJECT is in the correct
+projection, for instance via
+
+   $gml->GPtoGML($gp->in('wgs84'), srs => 'EPGS:4326');
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Geo-GML distribution version 0.16,
+built on January 05, 2014. Website: F<http://perl.overmeer.net/geo/>
+All modules in this suite:
+L</Geo::GML>,
+L</Geo::ISO19139>,
+L</Geo::EOP>,
+L</Geo::Point>,
+L</Geo::Proj4>,
+L</Geo::WKT>, and
+L</Math::Polygon>.
+
+Please post questions or ideas to
+F<https://list.hut.fi/mailman/listinfo/geo-perl|the Geo-Perl mailinglist>
+
+=head1 COPYRIGHTS
+
+=head2 License of the CODE
+
+Copyrights of the perl code and the related documentation by
+2008-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+
+=head2 License of the SCHEMAS
+
+The included schemas are copyrighted by the Open Geospatial Consortium, Inc.
+They are unmodified copied from the files at F<http://schemas.opengis.net>.
+Read OGCs disclaimer and copyright statements on documentation and software
+at F<http://www.opengeospatial.org/ogc/legal>.  The license text is also
+included in this CPAN distribution.
+

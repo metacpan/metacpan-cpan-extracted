@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Gtk2/Ex/Graph/GD.pm
+examples/graph-gd-demo.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+t/00.load.t
+t/area.1.t
+t/bars.1.t
+t/lines.1.t
+t/lines_points.1.t
+t/pie.1.t
+t/pod-coverage.t
+t/pod.t
+t/test.1.t

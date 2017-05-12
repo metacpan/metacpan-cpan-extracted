@@ -1,0 +1,122 @@
+This file is ordered roughly chronologically (meaning that I add new
+entries to the bottom of the file and don't change the order of existing
+ones except to go back and add to already existing entries).  I considered
+breaking things up between major and minor contributions, but that's
+obvious from the text, and no contribution is too minor to be greatly
+appreciated.
+
+The (growing) length of this file is a testimony to the efficacy of the
+free software community, which is a community in action as well as name
+and includes some of the most helpful, intelligent, patient, and gracious
+people I have had the honor of dealing with.
+
+Larry Wall, et. al.
+    For Perl, without which this program would be at least twice as long
+    and probably wouldn't be finished yet; for the infrastructure that
+    made the modular concept both possible and easy to implemen; and for
+    the inspiration to everyone who writes free software.
+
+The rec.arts.comics.creative community
+    My alpha testers at every phase of the development of this package,
+    they've seen more versions and more bugs than anyone else other than
+    me.  Their excellent problem reports and gracious tolerance for the
+    inevitable problems made this project possible.
+
+Daniel P. Faigin <faigin@shamash.org>
+    Provided the starting point for the list of mail headers to drop from
+    a news post.  The code I wrote from this information has long since
+    migrated out of this module and been rethought from scratch, but it
+    was greatly appreciated at the time.
+
+Betty Lee <bettylee@leland.stanford.edu>
+    Provided the initial idea for the header rewrite rules and who helped
+    with early testing by using gateway as Stanford's mail to news gateway
+    for internal newsgroups.  Also implemented the original code that
+    became the previoushop module (but relying on a sendmail rewrite hack
+    to do it) and gave me the idea of how to do it.  Provided the news
+    error status codes that indicated temporary errors for me early on,
+    and requested the prepend directive for the headers module.  Also the
+    source of the idea behind the previoushop module.
+
+Larry Schwimmer <schwim@cs.stanford.edu>
+    Suggested the autoreply feature, which now exists in a much altered
+    form, served as a sounding board, and gave advice on numerous aspects
+    of the program and documentation.
+
+Matt Petach <mpetach@netflight.com>
+    Prompted me to add support for wildcards in group directives, which
+    now needs more work *again*, requested the nntpserver directive which
+    has disappeared again and will be showing up in the form of the
+    example mail to news gateway, and pointed out that not all vendor
+    versions of cp have the -f flag.  This is one of the few areas where
+    switching to ExtUtils::MakeMaker actually created *fewer* problems.
+
+Andrew Gierth <andrew@erlenstar.demon.co.uk>
+    When told that I was writing a module to handle robomoderation and
+    mail to news gatewaying, Andrew mentioned that he'd already written a
+    News::Article class to encapsulate manipulation of articles for a
+    similar application.  At which point, I asked myself why I didn't do
+    that in the first place and took an extended break from working on
+    this module to send him patches and suggestions for his.  Most of the
+    low-level manipulations of articles is now handled seamlessly by his
+    module and I don't even have to think about it.  It's wonderful.  The
+    mailpath code is also based on Andrew's original work, and many of the
+    improvements and additions to News::Gateway have been inspired by his
+    comments.
+
+Jeremy Billones <billones@primenet.com>
+    Needed the ability to give the keywords module a regex to specify how
+    to obtain keywords from the Subject line.  Also needed a way of
+    limiting and controlling crossposting for rec.arts.comics.reviews,
+    which served as the inspiration for the crosspost module, and wanted
+    the ability to have posters include headers at the beginnings of
+    messages, which prompted the bodyheaders module.
+
+Chris Meadows <robotech@eyrie.org>
+    The rec.games.mecha charter requires some keyword, but doesn't have a
+    set list of keywords, thus requiring the anykeyword module.  It also
+    requires banning of binaries, which provided the motivation for
+    writing the nobinaries module.
+
+George A. Theall <george.a.theall@mail.tju.edu>
+    Wrote the program purge-binaries, which takes a channel feed from a
+    news server and removes binaries from the spool.  The isBinary()
+    method of this program provides the heart of the binary detection
+    logic in the nobinaries module.
+
+Tim Skirvin <tskirvin@uiuc.edu>
+    First person to use my original gateway script as a robomoderator
+    (with modifications).  Also gave me the idea to check for base64 in
+    Content-Transfer-Encoding when checking for binaries.
+
+Christopher Davis <ckd@loiosh.kei.com>
+    Provided the original script on which listgate was based, as well as
+    motivation for writing the listgate example, and let me use his ideas
+    and his code for it.  Also provided the m4 file and the documentation,
+    and provided the initial implementation of the mungeids module and the
+    post_ihave() and post_program() methods.
+
+Ollivier Robert <roberto@keltia.freenix.fr>
+    Found a bug in the newsgroups module (addresses not being downcased
+    before being checked against regex patterns that were downcased).
+
+Jeff Garzik <jeff.garzik@spinne.com>
+    Found a bug in the documentation of how to call the News::Gateway
+    constructor and also pointed out that post() should take a hostname or
+    Net::NNTP connection as an optional argument.
+
+Tom Hughes <tom@compton.demon.co.uk>
+    Found various bugs in mailtonews' extraction of message IDs from the
+    In-Reply-To header.
+
+Jon Lennox <lennox@cs.columbia.edu>
+    Noticed that backslashes didn't work as expected outside of double
+    quotes in configuration directives and that line continuation in
+    config files wasn't handled as neatly as it could be.  Both problems
+    have now been fixed.
+
+Curtis (Jewell) Whalen <curtis_whalen@geocities.com>
+    Provided a *lot* of new ideas and new modules that I still need to add
+    into the standard distribution.  Also tested News::Gateway on Windows
+    95 and confirmed that it worked correctly there (with some tweaks to
+    News::Article).

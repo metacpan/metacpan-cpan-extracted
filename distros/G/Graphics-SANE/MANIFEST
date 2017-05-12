@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+SANE.xs
+typemap
+const-c.inc
+const-xs.inc
+lib/Graphics/SANE.pm
+t/Sane.t
+examples/photocopy.pl
+META.yml                                 Module meta-data (added by MakeMaker)

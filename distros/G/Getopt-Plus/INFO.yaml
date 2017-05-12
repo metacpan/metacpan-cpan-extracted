@@ -1,0 +1,23 @@
+---
+perlmodule: Getopt-Plus
+description: >-
+  This package provides a way to set up executables with standard options for
+  help (--help, --longhelp, --man), logging (--verbose, --debug, and more),
+  keeping the relevant documentation in one place instead of spreading it
+  liberally across your source file(s).  It provides a common behaviour for
+  your executables with minimum effort.
+author: Martyn J. Pearce
+author-email: fluffy@cpan.org
+copyright: Copyright 2002, 2003, 2011, 2012 Martyn J. Pearce
+licence: perl
+perl-version: 5.005_62
+perl-requires:
+  Class::MethodMaker: 1.04
+  Pod::Usage: 1.12
+  Log::Info: 1.13
+  List::Util:
+    version: 1.06
+    package: Scalar-List-Utils
+  IPC::Run: 0.44
+perl-test-requires:
+  IPC::Run: 0.44

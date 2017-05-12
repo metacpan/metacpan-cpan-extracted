@@ -1,0 +1,9 @@
+Record Type T - TIGER Zero-Cell ID
+
+Field     BV  Fmt Type Beg End Len Description
+RT        No   L   A    1    1  1  Record Type
+VERSION   No   L   N    2    5  4  Version Number
+FILE      No   L   N    6   10  5  File Code
+TZID      No   R   N   11   20 10  TIGER Zero-Cell ID, Permanent Zero-Cell Number
+SOURCE    Yes  L   A   21   30 10  TIGER Zero-Cell Source Code (not filled)
+FTRP      Yes  L   A   31   47 17  FTRP ID (AAAAA.O.XXXXXXXXX) (Authority-P-ID) FGDC Transportation ID Standard (not filled)

@@ -1,0 +1,36 @@
+Graph::Usage - generate graph with usage patterns from Perl packages
+
+The included script gen_graph parses Perl package files and generates a
+graph from the packges they use.
+
+Usage examples:
+
+        ./gen_graph --inc=lib/ --format=graphviz --output=usage_graph
+        ./gen_graph --nocolor --inc=lib --format=ascii
+        ./gen_graph --recurse=Graph::Easy
+
+For more information run
+
+	./gen_graph
+
+or
+	perldoc Graph::Usage
+
+You can also find more information including example output at:
+
+	http://bloodgate.com/perl/graph/usage/
+
+Requirements
+============
+
+You need Perl, Heap and Graph::Easy. For PNG and SVG output you also
+need graphviz installed with "dot", "neato" or a similiar program.
+
+AUTHOR
+======
+
+Copyright (C) 2005 by Tels http://bloodgate.com/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL version 2.
+

@@ -1,0 +1,22 @@
+# havok version=7.13
+ABSTRACT:     
+AUTHOR:    Jeffrey I Cohen (jcohen@cpan.org)
+DML:    
+  -    
+    check:    
+      -    select * from user_functions where xname = 'Genezzo::Havok::SQLCompare'
+
+    install:    
+      -    select add_user_function('function=sql_func_compare_function', 'creationdate=2006-11-17T07:52:56', 'module=Genezzo::Havok::SQLCompare') from dual
+
+
+
+LICENSE:    gpl
+NAME:    Genezzo::Havok::SQLCompare
+PREREQ_HAVOK:    
+  Genezzo::Havok::UserFunctions:    0.0
+
+TABLEDEFS:    
+
+UPDATED:    2006-11-17T00:19:20
+VERSION:    1.02

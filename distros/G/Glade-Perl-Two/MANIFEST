@@ -1,0 +1,12 @@
+Documentation/Changelog
+Documentation/README
+Documentation/INSTALL
+Glade/Two/App.pm
+Glade/Two/Generate.pm
+Glade/Two/Gnome.pm
+Glade/Two/Gtk.pm
+Glade/Two/Run.pm
+Glade/Two/Source.pm
+MANIFEST
+Makefile.PL
+bin/glade2perl-2

@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Graph-Easy-StateMachine.t
+lib/Graph/Easy/StateMachine.pm
+META.yml                                 Module meta-data (added by MakeMaker)

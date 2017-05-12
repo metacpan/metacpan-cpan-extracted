@@ -1,0 +1,29 @@
+---
+abstract: 'Create a Github repository for your Perl module'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Git-Github-Creator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::IniFiles: 0
+  File::Find::Closures: 0
+  Log::Log4perl: 0
+  Net::GitHub: 0.48
+  Test::More: 0
+  Test::Output: 0
+  YAML: 0
+resources: {}
+version: 0.18

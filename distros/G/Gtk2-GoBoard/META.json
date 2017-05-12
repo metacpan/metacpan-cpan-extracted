@@ -1,0 +1,32 @@
+{
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "ExtUtils::MakeMaker::JSONMETA version 7.000",
+   "distribution_type" : "module",
+   "version" : "1.02",
+   "name" : "Gtk2-GoBoard",
+   "author" : [],
+   "license" : "unknown",
+   "build_requires" : {
+      "ExtUtils::MakeMaker" : 0
+   },
+   "requires" : {
+      "Games::Go::SimpleBoard" : 1.01,
+      "Gtk2" : 1.043
+   },
+   "recommends" : {
+      "Audio::Play" : 1
+   },
+   "abstract" : null,
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : 0
+   }
+}

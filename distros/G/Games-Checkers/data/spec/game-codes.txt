@@ -1,0 +1,30 @@
+Code  Game
+----  ----
+   0  Chess
+   1  Shogi
+  20  International Checkers
+  21  Checkers
+  22  Italy Checkers
+  24  Spanish Checkers
+  25  Russian Shahki
+  27  Canadian checkers
+  30  Pool
+  31  Russian Give-Away
+  52  Ataxx
+  50  Othello
+  51  Reverse-Othello
+  80  Go
+  81  Tanbo
+ 105  Tic-tac-Toe
+ 100  Gomoku
+ 101  Renju
+ 102  Pente
+ 103  Keryo-Pente
+ 104  Repensi
+ 120  Stack 4
+ 123  Connectris
+ 122  Stack 4x4
+ 121  Anti-Stack 4
+ 124  Gravity
+ 201  Entropy
+ 200  Quadrature

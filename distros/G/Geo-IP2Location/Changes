@@ -1,0 +1,84 @@
+Revision history for Perl extension Geo::IP2Location.
+
+8.04  Wed Jul 13 12:00:00 2016
+      Fourteenth release under the Geo::IP2Location
+      Fixed bug in function "bytes2int" due to bigint
+
+8.02  Sun Jul 03 12:00:00 2016
+      Thirteenth release under the Geo::IP2Location
+      Removed bigint during IPv4 processing
+      Added error message when reading IPv6 address from IPv4 BIN file
+
+8.01  Mon Jun 20 12:00:00 2016
+      Twelveth release under the Geo::IP2Location
+      Fixed regex error in older version of Perl
+      Fixed error message array in function "get_all"
+
+8.00  Mon Jun 01 12:00:00 2016
+      Eleventh release under the Geo::IP2Location
+      Support new BIN file with index to speed up query time
+
+7.00  Mon Jul 21 12:00:00 2014
+      Tenth release under the Geo::IP2Location
+      Support new IPv6 BIN file
+      Skip version 6.00 to standardize with other IP2Location library
+
+5.01  Wed Jun 05 11:16:00 2013
+      Fixed the elevation value issue
+
+5.00  Mon Apr 15 17:16:00 2012
+      Ninth release under the Geo::IP2Location
+      Added new function "get_elevation"
+      Added new function "get_usagetype"
+
+4.00  Mon Aug 09 12:00:00 2010
+      Eighth release under the Geo::IP2Location
+      Added new function "get_mcc"
+      Added new function "get_mnc"
+      Added new function "get_mobilebrand"
+
+3.00  Mon Aug 01 12:00:00 2008
+      Seventh release under the Geo::IP2Location
+      Added new function "get_iddcode"
+      Added new function "get_areacode"
+      Added new function "get_weatherstationcode"
+      Added new function "get_weatherstationname"
+
+2.10  Mon Oct 16 12:00:00 2006
+      Sixth release under the Geo::IP2Location
+      Added new function "get_timezone"
+      Added new function "get_netspeed"
+      Fixed minor bugs in IPv6 Module
+
+2.00  Mon Feb 6 12:00:00 2006
+      Fifth release under the Geo::IP2Location
+      Added new support for IPv6 IP to Country lookup
+      Added free sample of IP2Location IPV6-COUNTRY database
+
+1.30  Thu Oct 13 16:59:58 2005
+      Forth release under the Geo::IP2Location
+      Fixed get_zipcode API to report proper ZIP code
+      Fixed test data to convert from Windows file format to Unix
+      Simplify get_record() function
+
+1.20  Fri Aug 26 16:59:58 2005
+      Third release under the Geo::IP2Location
+      Added new function "get_module_version"
+      Added new function "get_database_version"
+
+1.10  Wed Aug 17 16:59:58 2005
+      Second release under the Geo::IP2Location
+      Added new function "get_zipcode"
+
+1.00  Wed Jun  8 16:59:58 2005
+      First release under the Geo::IP2Location
+      Added new function "open"
+      Added new function "get_country_short"
+      Added new function "get_country_long"
+      Added new function "get_region"
+      Added new function "get_city"
+      Added new function "get_isp"
+      Added new function "get_latitude"
+      Added new function "get_longitude"
+      Added new function "get_domain"
+      Added new function "get_all"

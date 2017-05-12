@@ -1,0 +1,4 @@
+TYPEMAP
+AvObject *	O_AvRV
+HvObject *	O_HvRV
+long *          T_LONG

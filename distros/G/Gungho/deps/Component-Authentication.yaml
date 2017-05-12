@@ -1,0 +1,7 @@
+---
+name: 'Authentication Base'
+default: 1
+depends:
+    'HTTP::Status': 0
+    'HTTP::Headers::Util': 0
+

@@ -1,0 +1,11 @@
+CHANGES
+GappX-FileTree.komodoproject
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+ex/filetree.pl
+lib/GappX/FileTree.pm
+t/01_filetree.t

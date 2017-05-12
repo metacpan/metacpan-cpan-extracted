@@ -1,0 +1,163 @@
+=head1 NAME
+
+Git::Database::Tutorial - Learn how to use Git::Database
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+    use Git::Database;
+
+    # do cool stuff with Git, using the following advice
+    # and the Perl Git wrapper of your choice
+
+=head1 GLOSSARY
+
+=over 4
+
+=item repository
+
+The local Git repository, as managed by B<git>.
+
+=item backend
+
+A class doing the L<Git::Database::Role::Backend> role.
+The L<Git::Database> module acts as a frontend that returns a backend
+object.
+
+It manages all interactions with the Git repository, via its L<store>.
+A backend instance is always connected to a store instance.
+
+The backend interface is split across several roles, each
+requiring one or more access methods to be defined. The
+roles are: L<Git::Database::Role::Backend> (this is
+the minimum required role that a class must do to be
+considered a backend), L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>, L<Git::Database::Role::RefReader>
+and L<Git::Database::Role::RefWriter>.
+
+L<Git::Database::Backend::None> is a special backend class
+that is not connected to a store. The only supported method is
+L<hash_object|Git::Database::Role::Backend/hash_object>.
+
+=item store
+
+The Perl Git wrapper that reads and write the data from and to the repository.
+
+A store instance is always connected to an actual Git repository.
+
+The backend class is named after the store class. For example,
+the backend class for L<Git::Repository> stores is named
+L<Git::Database::Backend::Git::Repository>.
+
+The currently supported stores are (by order of appearance):
+L<Git::Repository>, L<Git::Sub>, L<Git::PurePerl>, L<Cogit>, L<Git>,
+L<Git::Wrapper>, and L<Git::Raw>.
+If you know of other Git wrappers, please let me know or submit patches.
+Thanks!
+
+=item object
+
+An object from the Git object database. Represented in Perl by the
+L<Git::Database::Object::Blob>, L<Git::Database::Object::Tree>,
+L<Git::Database::Object::Commit> and L<Git::Database::Object::Tag>
+classes.
+
+=item ref
+
+A reference (tag or branch) in the Git repository.
+
+=back
+
+=head1 HOW TO
+
+=head2 Obtain a Git::Database object from an existing repository
+
+The L<Git::Database> module is really a simple factory class that returns
+L</backend> objects. The actual backend class depends on the Git wrapper
+module used to access the Git repository.
+
+The generic way is:
+
+    # $r is an instance of some Perl Git wrapper
+    my $db = Git::Database->new( store => $r );
+
+For example, if C<$r> is a L<Git::Repository> object, C<$db> is going
+to be a L<Git::Database::Backend::Git::Repository> object.
+
+Example:
+
+    # use Git::Repository with a repository in the current working directory
+    my $db = Git::Database->new( store => Git::Repository->new );
+
+    $db->isa('Git::Database::Backend::Git::Repository');    # true
+
+L<Git::Sub> is a special backend, as it's the only one that does not
+provide an object-oriented interface. When given a L</store> that does
+not the L<Git::Database::Role::Backend> role, L<Git::Database> assumes
+it's a directory name, and creates a L<Git::Database::Backend::Git::Sub>
+object to handle it.
+
+For the moment, there is no way to perform an "automatic selection"
+of the backend based on what's available.
+
+=head2 Create a new repository using Git::Database
+
+This is outside of the realm of L<Git::Database>, since it must be handed
+an existing L</store> object.
+
+The L<Git::Repository::Tutorial> documentation has detailed examples
+of how to L<create|Git::Repository::Tutorial/"Create a new repository">
+or L<clone|Git::Repository::Tutorial/"Clone a repository"> a new repository.
+
+Other Git wrappers may also be able to create new repositories.
+
+The resulting object can then be passed to C<< Git::Database->new >>
+as the C<store> attribute.
+
+=head2 Create a Git object
+
+There are two ways to create a Git object (doing the
+L<Git::Database::Role::Object> role), with subtle differences between them.
+
+=over 4
+
+=item using the class directly
+
+    my $blob = Git::Database::Object::Blob->new( content => "Hello, world!" );
+    $blob->isa("Git::Database::Object::Blob");    # true
+    $blob->has_backend;                           # false
+    $blob->digest;    # use hash_object() from Git::Database::Backend::None
+    $blob->has_backend;                           # true
+    $blob->backend->isa("Git::Database::Backend::None");
+
+=item using the backend
+
+    my $blob = $backend->create_object( kind => 'blob',  content => "Hello, world!" );
+    $blob->isa("Git::Database::Object::Blob");    # true
+    $blob->has_backend;                           # true
+    $blob->digest;    # use hash_object() from $backend (might be faster)
+    $blob->backend->isa( ref $backend );
+
+=back
+
+When no backend is provided, a default L<Git::Database::Backend::None> is
+created as needed. Its L<hash_object|Git::Database::Role::Backend/hash_object>
+method is the default implementation provided by L<Git::Database::Role::Backend>.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
+=head1 COPYRIGHT
+
+Copyright 2016 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

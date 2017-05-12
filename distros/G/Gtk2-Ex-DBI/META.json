@@ -1,0 +1,43 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Daniel Kasak <dan@entropy.homelinux.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-Ex-DBI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.3",
+            "Gtk2" : "1.04",
+            "Gtk2::Ex::Dialogs" : "0.08"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.30"
+}

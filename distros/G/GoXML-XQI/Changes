@@ -1,0 +1,6 @@
+Revision history for Perl extension GoXML::XQI.
+
+1.1.1  Wed Oct  6 10:48:21 1999
+	- Repackaged XQI.pm into GoXML namespace.
+
+

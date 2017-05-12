@@ -1,0 +1,128 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use strict;
+use warnings;
+
+podregister {
+  $drawable->become('Gimp::Layer');
+
+  $image->undo_group_start;
+
+  my @selbounds = $image->selection_bounds;
+  $image->selection_all if $selbounds[0] == 0;
+
+  my $saved_selection = $image->selection_save;
+  $image->selection_none;
+
+  # 1) take the original photo, duplicate the layer
+  my $edge_layer = $drawable->Gimp::Layer::copy(1);
+  $image->insert_layer($edge_layer,0,-1);
+
+  # 2) convert the copy to grayscale
+  $edge_layer->desaturate;
+
+  # 3) run edge detect to the gray layer (default works)
+  $edge_layer->edge(2.0, 2, 0);
+
+  # 4) blur it slightly
+  $edge_layer->gauss_iir2(3.0, 3.0);
+
+  # 5) boost contrast (I can give you a specific curve or such)
+  $edge_layer->curves_spline(HISTOGRAM_VALUE,
+			    [0,0,
+			     45,20,
+			     160,225,
+			     255,255]
+			    );
+
+  # 6) then make the boosted, gray edge-detection into a selection mask
+  my $selchan = $image->channel_new($image->width, $image->height, "sharpen_mask",
+		    100.0, [1.0,0,0]);
+
+  $image->insert_channel($selchan, 0, -1);
+  $edge_layer->edit_copy;
+  $selchan->edit_paste(1);
+  $image->get_floating_sel->anchor;
+  $selchan->combine_masks($saved_selection, CHANNEL_OP_INTERSECT, 0, 0);
+  $image->select_item(CHANNEL_OP_REPLACE, $selchan);
+
+  # 7) then use unsharp mask to that selection (scratch the gray layer)
+  $drawable->unsharp_mask($sharpen_radius, $sharpen_amt, $threshold);
+
+  # cleanup
+  $image->select_item(CHANNEL_OP_REPLACE, $saved_selection);
+  $image->remove_channel($saved_selection);
+  $image->remove_channel($selchan);
+  $image->remove_layer($edge_layer);
+
+  $image->undo_group_end;
+  ();
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+selective_sharpen - Sharpen edges in controlled fashion
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Enhance/Selective Sharpen...
+
+=head1 DESCRIPTION
+
+Taken from an IRC log:
+
+  02:00 <@         tigert> selective sharpening
+  02:00 <@         tigert> UnNamed: 1) take the original photo, duplicate the
+			   layer
+  02:01 <@         tigert> UnNamed: 2) convert the copy to grayscale
+  02:01 <@         tigert> 3) run edge detect to the gray layer
+  02:01 <@         tigert> 4) blur it slightly
+  02:01 <@         tigert> 5) boost contrast (I can give you a specific curve or
+			   such)
+  02:01 <        sjburges> tigert: on 3, what edge detect?
+  02:01 <@         tigert> sjburges: default works
+  02:01 <@         tigert> sjburges: size: 3 or 2 (default)
+  02:02 <@         tigert> sjburges: then make the boosted, gray edge-detection
+			   into a selection mask
+  02:02 <@         tigert> sjburges: then use unsharp mask to that selection
+			   (scratch the gray layer)
+  02:03 <@         tigert> sjburges: sjburges now, one could do two versions
+  02:03 <@         tigert> sjburges: so one version could just be "Select edges"
+  02:04 <@         tigert> sjburges: another could ask for unsharp mask
+			   parameters as well and sharpen
+  02:04 <@         tigert> sjburges: the idea for the script is to sharpen it
+			   without sharpening the noise on flat areas
+  02:04 <        sjburges> tigert: could you fire me an email, and I can try to
+			   get to it tonight/tomorrow?  It sounds simple enough.
+			   I need to head to a party for work shortly here
+  02:04 <@         tigert> sjburges: ok
+
+=head1 PARAMETERS
+
+ [ PF_SPINNER, "sharpen_radius", "Radius of unsharp", 5.0, [0.1,120,0.1]],
+ [ PF_SPINNER, "sharpen_amt", "Amount to unsharp", 1.0, [0.0,4.0,0.1]],
+ [ PF_SPINNER, "threshold", "What delta to decide to sharp on", 20, [0,255,1]],
+
+=head1 IMAGE TYPES
+
+RGB*
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+2004/14/04
+
+=head1 LICENSE
+
+Copyright 2004, Seth Burgess.
+
+This filter may be distributed under the same terms as Gimp-Perl.

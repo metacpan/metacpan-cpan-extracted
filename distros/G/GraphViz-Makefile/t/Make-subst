@@ -1,0 +1,7 @@
+DATA=data
+
+model: $(DATA)/features.tab
+	perl prog1.pl $<
+
+$(DATA)/features.tab: otherfile
+	perl prog3.pl $< > $@

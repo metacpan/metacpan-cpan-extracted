@@ -1,0 +1,64 @@
+{
+   "abstract" : "Interface to the Google Fusion Tables API",
+   "author" : [
+      "Robin Clarke <perl@robinclarke.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-Fusion",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Encode" : 0,
+            "File::HomeDir" : 0,
+            "IO::String" : 0,
+            "LWP::Protocol::https" : 0,
+            "LWP::UserAgent" : 0,
+            "Moose" : 0,
+            "Moose::Util::TypeConstraints" : 0,
+            "MooseX::Params::Validate" : 0,
+            "Net::OAuth2::Moosey::Client" : "0.02",
+            "Test::More" : 0,
+            "Text::CSV" : 0,
+            "Text::Table" : 0,
+            "URL::Encode" : 0,
+            "YAML" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robin13/Google-Fusion/issues"
+      },
+      "homepage" : "https://github.com/robin13/Google-Fusion",
+      "repository" : {
+         "url" : "https://github.com/robin13/Google-Fusion"
+      }
+   },
+   "version" : "0.10"
+}

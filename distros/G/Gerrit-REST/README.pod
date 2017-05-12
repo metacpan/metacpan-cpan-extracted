@@ -1,0 +1,21 @@
+=pod
+
+Gerrit::REST - Thin wrapper around Gerrit's REST API
+
+"L<Gerrit|https://code.google.com/p/gerrit/> is a web based code
+review system, facilitating online code reviews for projects using the
+Git version control system."
+
+This module is a thin wrapper around L<Gerrit's REST
+API|http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/rest-api.html>,
+which is superseding it's old L<SSH
+API|http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/cmd-index.html>,
+for which there is another Perl module called
+L<Gerrit::Client|http://search.cpan.org/dist/Gerrit-Client/>.
+
+Copyright (c) 2013-2014 by CPqD (http://www.cpqd.com.br/)
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

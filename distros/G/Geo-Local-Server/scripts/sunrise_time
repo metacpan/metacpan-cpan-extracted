@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Std qw{getopts};
+use DateTime;
+use DateTime::Event::Sunrise;
+use Geo::Local::Server;
+
+my $opt     = {};
+getopts("f:m:", $opt);
+
+my $syntax  = "sunrise_time [-f FILE] [-m +/-minutes]";
+my $file    = $opt->{"f"};
+my $offset  = $opt->{"m"} || 0;
+die("$syntax\n") unless $offset =~ m/^[+-]?\d+$/;
+my $now     = DateTime->now;
+my $gls     = Geo::Local::Server->new(configfile=>$file);
+my $lat     = $gls->lat;
+my $lon     = $gls->lon;
+my $sunrise = DateTime::Event::Sunrise
+                ->sunrise(longitude=>$lon, latitude=>$lat)
+                  ->next($now)
+                    ->add(minutes=>$offset)
+                      ->set_time_zone("local");
+
+printf "%02d:%02d\n", $sunrise->hour, $sunrise->minute;
+
+__END__
+
+=head1 NAME
+
+sunrise_time - Prints the time of the next sunrise
+
+=head1 SYNOPSIS
+
+  sunrise_time
+  sunrise_time [-f FILE] [-m +/-minutes]
+  echo "task" | at `sunrise_time`
+
+=head1 OPTIONS
+
+=head2 -f FILE - default /etc/local.coordinates
+
+Specify alternate configuration file
+
+=head2 -m Output offset in minutes
+
+Specify a certain offset before or after the sunrise
+
+=head1 DESCRIPTION
+
+Uses the system coordinates as configured from the perl package Geo::Local::Server and with the perl package DateTime::Event::Sunrise to calculate the next sunrise.
+
+=cut

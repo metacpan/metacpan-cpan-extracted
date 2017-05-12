@@ -1,0 +1,12 @@
+AMS.xs
+Changes
+lib/Geo/Address/Mail/Standardizer/USPS/AMS.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/01pod.t
+t/02use.t
+t/03init.t
+t/04results.t
+META.yml                                 Module meta-data (added by MakeMaker)

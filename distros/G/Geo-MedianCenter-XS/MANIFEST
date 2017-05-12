@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+XS.xs
+t/01basic.t
+t/02simple.t
+t/98podsyn.t
+t/99podcov.t
+lib/Geo/MedianCenter/XS.pm
+eg/synopsis.pl
+META.yml                                 Module meta-data (added by MakeMaker)

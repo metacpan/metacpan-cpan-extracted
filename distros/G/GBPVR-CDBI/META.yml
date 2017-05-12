@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                GBPVR-CDBI
+version:             0.04
+abstract:            Database Abstraction for GBPVR
+license:             unknown
+generated_by:        ExtUtils::MakeMaker version 6.30_01
+author:              David Westbrook <dwestbrook@gmail.com>
+distribution_type:   module
+requires:     
+    Class::DBI:                    0
+    DBD::ODBC:                     0
+    File::Spec:                    0
+    Test::More:                    0.44
+    Win32::TieRegistry:            0
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1

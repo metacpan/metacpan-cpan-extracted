@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+use vars qw($IDL_PATH);
+
+BEGIN {
+    my $datadir = `gnome-config --datadir`;
+    chomp $datadir;
+    $IDL_PATH = "$datadir/idl";
+}
+
+use CORBA::ORBit idl_path => $IDL_PATH, 
+                 idl => [ qw(gnome-unknown.idl Gnumeric.idl) ];
+ 
+use GNOME::GNORBA;
+
+GNOME::GNORBA::init();
+
+$workbook_factory = GNOME::GOAD::activate (id => 'IDL:GNOME:Gnumeric:WorkbookFactory:1.0');
+defined $workbook_factory or die "Cannot activate Gnumeric\n";
+
+$workbook = $workbook_factory->create_object ('IDL:GNOME:Gnumeric:Workbook:1.0', []);
+$workbook->show(1);
+
+$sheet = $workbook->sheet_new("Main Sheet");
+$sheet->cell_set_value  (0,0, [ GNOME::Gnumeric::VALUE_INTEGER, 1 ]);
+$sheet->cell_set_value  (1,0, [ GNOME::Gnumeric::VALUE_INTEGER, 1 ]);
+$sheet->cell_set_text  (0,1, "This is a test of text");
+$sheet->cell_set_formula (2,0, "=A1+B1");
+$workbook->recalc();
+
+

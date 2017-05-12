@@ -1,0 +1,31 @@
+$name   = 'Drone2';
+$author = 'Bestian Tang';
+
+require 'drones.bm';
+
+sub main {
+    enable shield;
+    scan longrange;
+
+    if (&found('enemy')) {
+        move backward if &nearst('enemy') <= 2;
+        disable shield;
+        fire grenade;
+        enable shield;
+        turn left;
+        move backward;
+        turn right;
+        redo;
+    }
+    elsif (&found('vault|flag')) {
+        if (&damaged == 0 and &found('flag')) {
+            move backward;
+            fire energy;
+        }
+        call fetch;
+    }
+    else {
+        turn left;
+    }
+    redo;
+}

@@ -1,0 +1,31 @@
+---
+abstract: "Simple API for querying Gentoo's installed-package database"
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::Needs: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gentoo-VDB
+provides:
+  Gentoo::VDB:
+    file: lib/Gentoo/VDB.pm
+    version: '0.001002'
+  Gentoo::VDB::Portage:
+    file: lib/Gentoo/VDB/Portage.pm
+    version: '0.001002'
+requires:
+  Path::Tiny: '0.048'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/kentnl/Gentoo-VDB/issues
+  repository: https://github.com/kentnl/Gentoo-VDB
+version: '0.001002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

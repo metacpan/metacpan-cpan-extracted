@@ -1,0 +1,65 @@
+{
+   "abstract" : "For word games like Literati (or Scrabble, or Words With Friends), find the best-scoring solution(s) for a board and hand of tiles.",
+   "author" : [
+      "Peter C. jones <petercj AT cpan.org>, Chicheng Zhang"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "Scrabble",
+      "Literati",
+      "Words with Friends",
+      "tile",
+      "word",
+      "game"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Literati",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "IO::String" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Games-Literati"
+      },
+      "repository" : {
+         "url" : "https://github.com/pryrt/Games-Literati"
+      }
+   },
+   "version" : 0.04,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

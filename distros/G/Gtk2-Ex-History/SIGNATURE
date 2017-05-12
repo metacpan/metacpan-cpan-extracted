@@ -1,0 +1,79 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 2eb490e7d92971a08fdf46dd055c3560e3edaf24 Changes
+SHA1 3244fc84db42f8500c3001e80e11dfb2e17a0cdc MANIFEST
+SHA1 d6f9595a0ae02220d6781c9460782ae32c0d4aaf MANIFEST.SKIP
+SHA1 4366498d7647711afbafec39c9ae1afc1eb8389a META.yml
+SHA1 64de57ae5033470c4d813f1f894cb345ed353ece Makefile.PL
+SHA1 071e661436e3ab64b115f78a6064259f134134b5 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 5ef8e6ac84b4b636adefbed1391c9d5d6ce0c33f debian/control
+SHA1 df9b627d1bcada8a280fa8a167b2f5c7c6eed9f0 debian/copyright
+SHA1 1dd4ed6ca9717ba5a40175cbb4e0b4c8b21833d9 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 64da2e44f057b8c13748de559f28ff3e16f019ec debian/watch
+SHA1 07d3b19f3c251b621b1984707b13843cfb84b3e1 devel/Gtk2ExWindowManagerFrame.pm
+SHA1 0925aa5e242f15a14d4b9b3f0a5aa027837713de devel/button.pl
+SHA1 4d9b8648619f035684ecf64f94c6233ce118aaec devel/menutoolbutton.pl
+SHA1 e4dca6b8314895ef9a51ece428547dc336657bad devel/run.pl
+SHA1 f55e204f2a14a1b16ea51977f47e9e69930c474d devel/screenshot-dialog.pl
+SHA1 3967a292e6e127845a93462f5fc45285b7d80b87 devel/screenshot.pl
+SHA1 cbe9e62e304ebe0e1c49922186c3552e8490cb75 devel/toolbar.pl
+SHA1 10edfa5e73193845d126c8da56cc0ce329fae130 devel/ui.pl
+SHA1 321bf9dc4e6f26ccac0aff4a5749d6ea6e2fba1f devel/unused/ModelSensitive.pm
+SHA1 c115e1d28c7a5df789b2613ca3c4115fa59c0277 devel/unused/ModelSensitive.t
+SHA1 aa5d421c61420cb3bdb8829210a832517c2c1381 devel/uri.pl
+SHA1 f984ee5fe1988bb1a01b68f7c56fc4084bfc463d examples/iri.pl
+SHA1 e328d750fcfa81100759f3f48cb62dd0187ed1b9 inc/MyMakeMakerExtras.pm
+SHA1 a2fa0855f3a1ea6140956ec567bea259e0099893 inc/MyMakeMakerGettext.pm
+SHA1 b14a2da8d944253a21d6805b8e90bf7f914f4629 lib/Gtk2/Ex/History.pm
+SHA1 003ab3ef234406231966937cb1a2367e02d15782 lib/Gtk2/Ex/History/Action.pm
+SHA1 2fb414f598105bc9e0eb853760f0486a73389a37 lib/Gtk2/Ex/History/Button.pm
+SHA1 2f1e69e75f8cfa800260b744c3dafb5fbe82b65b lib/Gtk2/Ex/History/Dialog.pm
+SHA1 753d0bbdba7bfe88f34505c3fd4453a03fbf16e3 lib/Gtk2/Ex/History/ListStore.pm
+SHA1 96ab5e9971fe1be4beca9a502e546c304b9a258f lib/Gtk2/Ex/History/Menu.pm
+SHA1 4addbf54faabb6c7167d07a3a95582b4628806c5 lib/Gtk2/Ex/History/MenuToolButton.pm
+SHA1 af54473651037466af9b1ddc332c079ff9609437 po/Gtk2-Ex-History.pot
+SHA1 ceab03b1599a11baa24c259e5f74931ab99b9ef6 po/README
+SHA1 8ab20e40dd4b97ac05dd46d8a9a89cc91ec5ce15 po/header.pot
+SHA1 23b52b5c64ce39c8bd8abeb32f1b277c4ba94ebd t/Button-weaken.t
+SHA1 891883c2c0b5e6a84c000ec15b473fb3b6e0836f t/Button.t
+SHA1 abf5e54a31928af1ce7e94627ae9fce400a7c2e4 t/Dialog-weaken.t
+SHA1 823bdac6059d45af988f8f4b2ef9951553c18c42 t/Dialog.t
+SHA1 50bfe568023bde97421b3308985b926ca076447d t/History-weaken.t
+SHA1 348d02eb7cb4566e87999ba84f4ec85c30c996a7 t/History.t
+SHA1 f7d6c7076889c0c4b16df765706e93352753be40 t/Menu-weaken.t
+SHA1 e75e0c37c79fcb7c9ec552fd08d04e1b37fcd77f t/Menu.t
+SHA1 78f2c657a1f65820f829a62ec87e467bd762039e t/MenuToolButton-weaken.t
+SHA1 914cbc40928f178be787d68b74d770f2e288a8ef t/MenuToolButton.t
+SHA1 c403f69bce1a210d3e150de65a26d06320ef8a43 t/MyTestHelpers.pm
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 219395eb91b03829e6f14db4ebd57d88ea972e61 xt/0-Test-ConsistentVersion.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
+SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
+SHA1 8609ab0ed7dfa7261d85dd7c9c11736fc4e8df0b xt/0-examples-xrefs.t
+SHA1 3510bcc61725fe294e5a508bca4ae78cfe05684e xt/0-no-debug-left-on.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFN8XW0LFMCIV9q3ToRAgVvAJ9xDwH3JDh4q1+QAb23uOiW6xzwZgCgnuWR
+ez0zOy5I/daYhM3V2eUWM14=
+=JvvS
+-----END PGP SIGNATURE-----

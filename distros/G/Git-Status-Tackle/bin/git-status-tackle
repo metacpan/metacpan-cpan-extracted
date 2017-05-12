@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Git::Status::Tackle;
+use File::Basename 'basename';
+
+my $tackle = Git::Status::Tackle->new;
+
+GetOptions(
+    "version" => \(my $version),
+    "help"    => \(my $help),
+    "plugins" => \(my $plugins),
+    "config"  => \(my $config),
+);
+
+sub version {
+    my $name = basename($0);
+    return "$name version $Git::Status::Tackle::VERSION";
+}
+
+sub each_plugin (&) {
+    my $code = shift;
+    my @plugins = $tackle->all_plugins;
+
+    for my $name (@plugins) {
+        my $plugin = $tackle->load_plugin($name);
+        (my $nickname = $name) =~ s/^Git::Status::Tackle:://;
+        $code->($plugin, $name, $nickname);
+    }
+}
+
+if ($help) {
+    my $version = version();
+    my $name = basename($0);
+
+    die << "HELP";
+$version
+
+usage: $name [--version] [--plugins] [--config]
+HELP
+}
+
+if ($version) {
+    die version() . "\n";
+}
+
+if ($plugins) {
+    each_plugin {
+        my ($plugin, $name, $nickname) = @_;
+        print "$nickname\n    " . $plugin->synopsis . "\n\n";
+    };
+
+    exit 0;
+}
+
+if ($config) {
+    my @plugins;
+    each_plugin {
+        my ($plugin, $name, $nickname) = @_;
+        push @plugins, $nickname;
+    };
+
+    print "git config --replace-all status-tackle.plugins '@plugins'\n";
+    exit 0;
+}
+
+print $tackle->status;
+

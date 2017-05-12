@@ -1,0 +1,44 @@
+--- /local/perl/lib/AutoLoader.pm	Thu Feb 29 15:12:52 1996
++++ AutoLoader.pm	Mon Sep  9 09:50:34 1996
+@@ -23,25 +23,27 @@
+ AUTOLOAD {
+     my $name = "auto/$AUTOLOAD.al";
+     $name =~ s#::#/#g;
++    my $save = $@;
+     eval {require $name};
+     if ($@) {
+-	# The load might just have failed because the filename was too
+-	# long for some old SVR3 systems which treat long names as errors.
+-	# If we can succesfully truncate a long name then it's worth a go.
+-	# There is a slight risk that we could pick up the wrong file here
+-	# but autosplit should have warned about that when splitting.
+-	if ($name =~ s/(\w{12,})\.al$/substr($1,0,11).".al"/e){
+-	    eval {require $name};
+-	}
+-	elsif ($AUTOLOAD =~ /::DESTROY$/) {
+-	    # eval "sub $AUTOLOAD {}";
++	if ($AUTOLOAD =~ /::DESTROY$/) {
+ 	    *$AUTOLOAD = sub {};
+-	}
+-	if ($@){
+-	    $@ =~ s/ at .*\n//;
+-	    croak $@;
++	} else {
++	    # The load might just have failed because the filename was too
++	    # long for some old SVR3 systems which treat long names as errors.
++	    # If we can succesfully truncate a long name then it's worth a go.
++	    # There is a slight risk that we could pick up the wrong file here
++	    # but autosplit should have warned about that when splitting.
++	    if ($name =~ s/(\w{12,})\.al$/substr($1,0,11).".al"/e){
++		eval {require $name};
++	    }
++	    if ($@){
++		$@ =~ s/ at .*\n//;
++		croak $@;
++	    }
+ 	}
+     }
++    $@ = $save;
+     $DB::sub = $AUTOLOAD;	# Now debugger know where we are.
+     goto &amp;$AUTOLOAD;
+ }

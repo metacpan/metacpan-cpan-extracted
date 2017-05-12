@@ -1,0 +1,13 @@
+
+############################################################################## 
+Games::3D
+
+* sending SIG_STATE_x to a thingy that is already in a state change will
+  interpolate the variables from the start values of the current state to the
+  end values of the target state, instead of picking up the interpolation
+  from the current (in mid-state-change) values
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

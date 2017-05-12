@@ -1,0 +1,616 @@
+{
+   "abstract" : "base class for LM-Solve solvers factories",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001",
+   "keywords" : [
+      "alice",
+      "brfs",
+      "dfs",
+      "game",
+      "games",
+      "inheritance",
+      "logic",
+      "logic",
+      "mazes",
+      "mazes",
+      "minotaur",
+      "plank",
+      "pure-perl",
+      "puzzle",
+      "puzzles",
+      "riddle",
+      "riddles",
+      "scan",
+      "search",
+      "swamp",
+      "theseus",
+      "tilt"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Games-LMSolve",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::EOL" : "0",
+            "Test::Kwalitee::Extra" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "blib" : "1.01"
+         }
+      }
+   },
+   "provides" : {
+      "Games::LMSolve" : {
+         "file" : "lib/Games/LMSolve.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Alice" : {
+         "file" : "lib/Games/LMSolve/Alice.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Base" : {
+         "file" : "lib/Games/LMSolve/Base.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Input" : {
+         "file" : "lib/Games/LMSolve/Input.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Input::Scalar::FH" : {
+         "file" : "lib/Games/LMSolve/Input.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Minotaur" : {
+         "file" : "lib/Games/LMSolve/Minotaur.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Numbers" : {
+         "file" : "lib/Games/LMSolve/Numbers.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Plank::Base" : {
+         "file" : "lib/Games/LMSolve/Plank/Base.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Plank::Hex" : {
+         "file" : "lib/Games/LMSolve/Plank/Hex.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Registry" : {
+         "file" : "lib/Games/LMSolve/Registry.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Tilt::Base" : {
+         "file" : "lib/Games/LMSolve/Tilt/Base.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Tilt::Multi" : {
+         "file" : "lib/Games/LMSolve/Tilt/Multi.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Tilt::RedBlue" : {
+         "file" : "lib/Games/LMSolve/Tilt/RedBlue.pm",
+         "version" : "v0.10.1"
+      },
+      "Games::LMSolve::Tilt::Single" : {
+         "file" : "lib/Games/LMSolve/Tilt/Single.pm",
+         "version" : "v0.10.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-games-lmsolve@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Games-LMSolve"
+      },
+      "homepage" : "http://metacpan.org/release/Games-LMSolve",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shlomif/lm-solve-source.git",
+         "web" : "https://github.com/shlomif/lm-solve-source"
+      }
+   },
+   "version" : "0.10.1",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.022003"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "@SHLOMIF/TestMoreDoneTesting",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@SHLOMIF/AutoPrereqs",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@SHLOMIF/ExecDir",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [],
+                  "exclude_match" : [],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 0,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               }
+            },
+            "name" : "@SHLOMIF/GatherDir",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@SHLOMIF/License",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@SHLOMIF/ManifestSkip",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@SHLOMIF/MetaYAML",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@SHLOMIF/PruneCruft",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@SHLOMIF/Readme",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RunExtraTests",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@SHLOMIF/RunExtraTests",
+            "version" : "0.028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@SHLOMIF/ShareDir",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@SHLOMIF/MakeMaker",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@SHLOMIF/Authority",
+            "version" : "1.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
+            "name" : "@SHLOMIF/CheckChangesHasContent",
+            "version" : "0.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@SHLOMIF/ConfirmRelease",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@SHLOMIF/Manifest",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@SHLOMIF/MetaConfig",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@SHLOMIF/MetaJSON",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@SHLOMIF/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "5.047"
+                     }
+                  ]
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.001011",
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
+               }
+            },
+            "name" : "@SHLOMIF/MetaProvides::Package",
+            "version" : "2.003002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@SHLOMIF/MetaResources",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuild",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@SHLOMIF/ModuleBuild",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@SHLOMIF/PkgVersion",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@SHLOMIF/PodCoverageTests",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@SHLOMIF/PodSyntaxTests",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodVersion",
+            "name" : "@SHLOMIF/PodVersion",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : "0",
+                  "fail_on_warning" : "author",
+                  "fake_home" : 0,
+                  "filename" : "t/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : 0,
+                  "phase" : "test",
+                  "script_finder" : [
+                     ":PerlExecFiles"
+                  ],
+                  "skips" : []
+               }
+            },
+            "name" : "@SHLOMIF/Test::Compile",
+            "version" : "2.054"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
+            "name" : "@SHLOMIF/Test::CPAN::Changes",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::EOL",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::EOL" : {
+                  "filename" : "xt/author/eol.t",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles",
+                     ":TestFiles"
+                  ],
+                  "trailing_whitespace" : "1"
+               }
+            },
+            "name" : "@SHLOMIF/Test::EOL",
+            "version" : "0.18"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::NoTabs",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::NoTabs" : {
+                  "filename" : "xt/author/no-tabs.t",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles",
+                     ":TestFiles"
+                  ]
+               }
+            },
+            "name" : "@SHLOMIF/Test::NoTabs",
+            "version" : "0.15"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Kwalitee::Extra",
+            "name" : "@SHLOMIF/Test::Kwalitee::Extra",
+            "version" : "v0.2.1"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::TrailingSpace",
+            "name" : "@SHLOMIF/Test::TrailingSpace",
+            "version" : "0.2.0"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@SHLOMIF/TestRelease",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles"
+                  ],
+                  "plugins" : [
+                     {
+                        "class" : "Pod::Weaver::Plugin::EnsurePod5",
+                        "name" : "@CorePrep/EnsurePod5",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::H1Nester",
+                        "name" : "@CorePrep/H1Nester",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "NAME",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Version",
+                        "name" : "Version",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "prelude",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "SYNOPSIS",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "DESCRIPTION",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "OVERVIEW",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "ATTRIBUTES",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "METHODS",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Leftovers",
+                        "name" : "Leftovers",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "postlude",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "Authors",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "Legal",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Bugs",
+                        "name" : "Bugs",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Support",
+                        "name" : "Support",
+                        "version" : "1.007"
+                     }
+                  ]
+               }
+            },
+            "name" : "@SHLOMIF/PodWeaver",
+            "version" : "4.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@SHLOMIF/UploadToCPAN",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Keywords",
+            "config" : {
+               "Dist::Zilla::Plugin::Keywords" : {
+                  "keywords" : [
+                     "alice",
+                     "brfs",
+                     "dfs",
+                     "game",
+                     "games",
+                     "inheritance",
+                     "logic",
+                     "logic",
+                     "mazes",
+                     "mazes",
+                     "minotaur",
+                     "plank",
+                     "pure-perl",
+                     "puzzle",
+                     "puzzles",
+                     "riddle",
+                     "riddles",
+                     "scan",
+                     "search",
+                     "swamp",
+                     "theseus",
+                     "tilt"
+                  ]
+               }
+            },
+            "name" : "Keywords",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "5.047"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@SHLOMIF/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "5.047"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "5.047"
+      }
+   },
+   "x_authority" : "cpan:SHLOMIF"
+}
+

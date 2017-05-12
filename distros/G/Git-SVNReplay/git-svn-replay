@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '1.0214';
+
+use Git::SVNReplay;
+use Getopt::Long;
+use Pod::Usage;
+
+Getopt::Long::Configure("bundling"); # make switches case sensitive (and turn on bundling)
+
+my %gsr_opts;
+my $create_svn_repo;
+my @add_dir_to_co;
+
+my %o = ( 'q' => \&Git::SVNReplay::quiet, 'h'=> sub{ pod2usage(-verbose=>1) },
+    'b=s' => \$gsr_opts{src_branch}, 'd=s' => \$gsr_opts{db_file}, 'l=s' => \$gsr_opts{stdoutlog},
+    'f=s' => \$gsr_opts{patch_format}, 'S=s' => \$create_svn_repo, 's=s@' => \@add_dir_to_co,
+);
+
+GetOptions(%o) or pod2usage();
+for(keys %gsr_opts) { delete $gsr_opts{$_} unless defined $gsr_opts{$_} }
+
+my $gsr = Git::SVNReplay->new( %gsr_opts );
+
+if( $create_svn_repo or @add_dir_to_co ) {
+    $gsr->set( svn_co   => shift @ARGV ) if @ARGV;
+    $gsr->set( svn_repo => $create_svn_repo )->create_svn_repo if $create_svn_repo;
+    $gsr->add_svn_dir($_) for @add_dir_to_co;
+
+} else {
+    pod2usage() if not @ARGV and not -d $Git::SVNReplay::DEFAULTS{svn_co};
+    $gsr->set( git_repo => shift @ARGV ) if @ARGV;
+    $gsr->set( svn_co   => shift @ARGV ) if @ARGV;
+    $gsr->setup_git_in_svnco->run;
+}
+
+__END__
+
+=head1 NAME
+
+git-svn-replay - replay git commits into a throwaway svn repo
+
+=head1 SYNOPSIS
+
+  git-svn-replay [options] [git.repo] [checked_out.svn]
+              or -S svn.repo [checked_out.svn]
+              or -s dirname [checked_out.svn]
+
+    -q: quiet operations
+    -b: branch to pull (default: master)
+    -d: database (default: ./replay.rdb)
+    -l: stdout logfile (default: /dev/null)
+    -f: .msg format
+    -S: create an svn repo and check it out
+    -s: directory to add to the svn repo (can be specified more than once)
+    -h: help
+
+B<git.repo>: The source repo will be untouched, can be remote or local, all git
+urls will work just fine (default ./g.repo).
+
+B<checked_out.svn>: This will issue svn commands to the checked_out.svn (and
+the corresponding repo) (default: ./s.co).  It is assumed this is a throwaway
+repo used for nothing besides interacting with trac.
+
+=head1 DESCRIPTION
+
+This tool simply replays a git repo into an svn repo for the purpose of using
+svn natively in Trac.  It has the side effect of helping to import more than one
+project into Trac -- something it did not yet support at the time of this
+writing.
+
+The svn repo that this tool creates and uses is assumed to be a throwaway and is
+not meant for people to pull from or push to.  It will most likely get dropped
+and recreated from scratch more than once (from bugs in this app or other
+problems).  This means that the revision numbers will be almost useless and
+patches may not align quite right.
+
+This tool is really I<only> useful for viewing commits in Trac.  It probably has
+no other purpose.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-q>
+
+Shhhhh
+
+=item B<-b> branchname
+
+The name of the branch to pull (defaults to master).
+
+=item B<-d> dbname
+
+The location of the database file (defaults to: ./replay.rdb).
+
+=item B<-l> logfilename
+
+Git and SVN make a lot of racket.  By default the racket is ignored, but you
+may choose to dump the racket to a file if you wish.
+
+=item B<-f> formatstring
+
+The git pretty=format: argument describing the .msg used in svn.  By default,
+it's:
+
+   %s [%h]%n%n%b%n%aN <%aE>%n%ai%n%H
+
+... which looks like this:
+
+    git commit subject
+
+    git commit message body git commit message body
+    git commit message body
+
+    Paul Miller <jettero@cpan.org>
+    ddc7db5df1261cfef79b8bfce524a7b7452ac95d.
+
+=item B<-S> svnreponame
+
+Create an svn repo and check it out.  It is harmless to specify this if the
+repo already exists -- it will simply skip the creation.
+
+When B<-S> is specified, no replays will be performed and the first non-switch
+argument is assumed to be the checked out location, not a git repo.  You may
+specify B<-s> switches along with B<-S>.  The repo will not be (re)created if
+it is already there.
+
+=item B<-s> subdirname
+
+Add a subdirectory to the checked out svn.
+
+When B<-s> is specified, no replays will be performed and the first non-switch
+argument is assumed to be the checked out location, not a git repo.  You may
+specify more than one B<-s>.  The directory will not be (re)added if it is
+already there.
+
+=back
+
+=head1 EXAMPLES
+
+Create an svn repo, check it out, and add a few subdirs to it:
+
+    git svn-replay -S s.repo -s blarg1 -s blarg2 -s blarg3 s.co
+
+Add another dir later:
+
+    git svn-replay -s blarg4 s.co
+
+Create an svn repo, check it out, and pull the public branch of repo.git into it:
+
+    git svn-replay -S s.repo s.co
+    git svn-replay -b public repo.git s.co # repeat this every day or hour
+
+Create an svn repo, check it out, create a dir for proj1, another for proj2 ...:
+
+    git svn-replay -S s.repo -s proj1 -s proj2 s.co
+    git svn-replay -b public proj1-repo.git s.co/proj1 # do this from cron
+    git svn-replay -b maint  proj2-repo.git s.co/proj2 # do this from cron
+
+=head1 DISCLAIMER
+
+It's maybe 100% certain that there's bugs in this strange thing.
+
+Please make backups of all your svn and git repositories before you try to use
+this for anything.  Also, please do not blame me if it ruins your repos.  I
+warned you to make backups.
+
+Do not attempt to use the generated svn repo as a code repository.
+
+=head1 REPORTING BUGS
+
+You can report bugs either via rt.cpan.org or via the issue tracking system on
+github.  I'm likely to notice either fairly quickly.
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+=head1 COPYRIGHT
+
+Copyright 2009 Paul Miller -- released under the GPL
+
+=head1 SEE ALSO
+
+perl(1), git(1), svn(1), L<Git::SVNReplay>, L<DBM::Deep>, L<IPC::System::Simple>

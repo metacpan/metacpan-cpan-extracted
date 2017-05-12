@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/Geography/China/Provinces.pm
+minil.toml
+t/00.load.t
+t/01.area.t
+t/02.province.t
+META.yml
+MANIFEST

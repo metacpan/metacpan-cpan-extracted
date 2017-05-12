@@ -1,0 +1,37 @@
+use strict;
+use warnings;
+
+use Games::Ratings::Chess::FIDE;
+
+use Test::More tests => 2;
+
+## see the following link for the official calculation 
+## * http://ratings.fide.com/individual_calculations.phtml?idnumber=4625200&rating_period=2010-05-01
+
+my %expected = (
+                rating_change   => '3.9',
+                points_expected => '3.24',
+               );
+my $player = Games::Ratings::Chess::FIDE->new();
+$player->set_rating(2224);
+$player->set_coefficient(15);
+my @opponent_ratings =   (2319,2181,2246,2261,2312,2297,2144);
+my @results          = qw(loss win  win  draw loss loss win );
+foreach my $game ( 0 .. $#results ) {
+    $player->add_game( { opponent_rating => $opponent_ratings[$game],
+                         result          => $results[$game], });  
+}
+
+my %computed;
+
+## test 1: check rating change
+$computed{rating_change} = $player->get_rating_change();
+
+## test 2: check points expected
+$computed{points_expected} = $player->get_points_expected();
+
+## run actual tests for all test_items in %expected
+foreach my $test_item ( sort keys %expected ) {
+    is( $computed{$test_item}, $expected{$test_item}, 
+        "$test_item: $computed{$test_item} -> $expected{$test_item}" );
+}

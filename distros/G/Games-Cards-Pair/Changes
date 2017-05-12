@@ -1,0 +1,65 @@
+Revision history for Games::Cards::Pair
+
+0.16  Fri Oct 14 10:20:00 2016
+      - Added missing dependency Type::Tiny.
+      - Added new attribute type definitions 'Card' and 'Cards'.
+
+0.15  Thu Oct 13 12:10:00 2016
+      - Improved type definitions for 'ZeroOrOne', 'Suit' and 'Value'.
+
+0.14  Sun Aug 14 08:10:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.13  Thu Mar 24 15:25:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+      - Updated copyright year information.
+
+0.12  Thu Oct 01 10:10:00 2015
+      - Added $AUTHORITY to each package of the distribution.
+      - Updated the section "DESCRIPTION" in the pod document.
+
+0.11  Sat May 30 21:15:00 2015
+      - Made the game interactive (long overdue).
+      - Renamed game script play-pelmanism.
+      - Added section "SYNOPSIS" to the pod document.
+      - Updated section "DESCRIPTION" to respect the above changes.
+      - Added method init(), is_valid_card_count() and _pick().
+      - Updated Games::Cards::Pair::Card::as_string().
+      - Updated the card value as 1-10,A,J,K,Q.
+      - Updated the card suite as C,D,H,S.
+
+0.10  Mon Mar 09 13:55:30 2015
+      - Added LICENSE file.
+
+0.09  Sat Jan 17 00:55:30 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.08  Mon Oct 20 07:15:30 2014
+      - Removed the reference of 'Mouse' from the package Games::Cards::Pair::Card.
+
+0.07  Sun Oct 19 15:40:15 2014
+      - Corrected the typo in the pod document of Games::Cards::Pair::Params package.
+
+0.06  Sun Oct 19 15:19:20 2014
+      - Added the missing default 0 to 'count'.
+
+0.05  Sun Oct 19 13:23:52 2014
+      - Restructured the code using 'Moo'.
+      - Added section 'Repository' to the pod document.
+
+0.04  Sun Oct 19 09:37:20 2014
+      - Removed the use of 'Carp' and 'Readonly'.
+      - Added Copyright year details to the pod document.
+      - Slight style changes overall.
+
+0.03  Sun Oct 19 08:50:15 2014
+      - Removed Build.PL file.
+      - Converted file to unix format.
+
+0.02  Fri Jul 27 11:35:27 2012
+      - Added dependency check for Attribute::Memoize module.
+
+0.01  Thu Jul 26 12:00:00 2012
+      - First version, released.

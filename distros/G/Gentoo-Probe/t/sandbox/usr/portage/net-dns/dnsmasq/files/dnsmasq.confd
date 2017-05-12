@@ -1,0 +1,8 @@
+# Copyright 1999-2002 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/dnsmasq/files/dnsmasq.confd,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+# Config file for /etc/init.d/dnsmasq
+
+# See the dnsmasq(8) man page for possible options to put here.
+DNSMASQ_OPTS=""

@@ -1,0 +1,71 @@
+td .even_left
+{
+background-color:#FFFFFF;
+border-color: #7F7F7F;
+border-style: solid;
+border-width:1px 0px 0px 1px;
+padding: 2px 4px 2px 4px;
+}
+
+td .even_right
+{
+background-color:#FFFFFF;
+border-color: #7F7F7F;
+border-style: solid;
+border-width:1px 1px 0px 1px;
+padding: 2px 4px 2px 4px;
+}
+
+td .last_even_left
+{
+background-color:#FFFFFF;
+border-color: #7F7F7F;
+border-style: solid;
+border-width:1px 0px 1px 1px;
+padding: 2px 4px 2px 4px;
+}
+
+td .last_even_right
+{
+background-color:#FFFFFF;
+border-color: #7F7F7F;
+border-style: solid;
+border-width:1px 1px 1px 1px;
+padding: 2px 4px 2px 4px;
+}
+
+td .last_odd_left
+{
+background-color:#DBEAFF;
+border-color: #7F7F7F;
+border-style: solid;
+border-width:1px 0px 1px 1px;
+padding: 2px 4px 2px 4px;
+}
+
+td .last_odd_right
+{
+background-color:#DBEAFF;
+border-color: #7F7F7F;
+border-style: solid;
+border-width:1px 1px 1px 1px;
+padding: 2px 4px 2px 4px;
+}
+
+td .odd_left
+{
+background-color:#DBEAFF;
+border-color: #7F7F7F;
+border-style: solid;
+border-width:1px 0px 0px 1px;
+padding: 2px 4px 2px 4px;
+}
+
+td .odd_right
+{
+background-color:#DBEAFF;
+border-color: #7F7F7F;
+border-style: solid;
+border-width:1px 1px 0px 1px;
+padding: 2px 4px 2px 4px;
+}

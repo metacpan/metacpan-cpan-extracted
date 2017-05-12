@@ -1,0 +1,148 @@
+=head1 NAME
+
+  GnuCash::SQLite - A module to access GnuCash SQLite files
+
+=head1 VERSION
+
+  version 0.06
+
+=head1 SYNOPSIS
+
+  use GnuCash::SQLite;
+
+  # create the book
+  $book = GnuCash::SQLite->new(db => 'my_accounts.gnucash');
+
+  # get account balances
+  $on_hand = $book->account_balance('Assets:Cash');
+  $total   = $book->account_balance('Assets');
+
+  # check if book is locked by another application
+  die "Book is currently used by another application." 
+    if $book->is_locked;
+
+  # add a transaction
+  $book->add_transaction({
+      date         => '20140102',
+      description  => 'Deposit monthly savings',
+      from_account => 'Assets:Cash',
+      to_account   => 'Assets:aBank',
+      amount       => 2540.15,
+      number       => ''
+  });
+
+  # access internal GUIDs
+  $book->account_guid('Assets:Cash');     # GUID of account
+  $book->commodity_guid('Assets:Cash');   # GUID of currency 
+
+=head1 DESCRIPTION
+
+GnuCash::SQLite provides an API to read account balances and write
+transactions against a GnuCash set of accounts (only SQLite3 backend
+supported).
+
+When using the module, always provide account names in full e.g. "Assets:Cash"
+rather than just "Cash". This lets the module distinguish between accounts
+with the same name but different parents e.g. Assets:Misc and
+Expenses:Misc
+
+=head1 METHODS
+
+=head2 Constructor
+
+  $book = GnuCash::SQLite->new(db => 'my_account.gnucash');
+
+Returns a new C<GnuCash::SQLite> object that accesses a GnuCash with and
+SQLite backend. The module assumes you have already created a GnuCash file
+with an SQLite backend and that is the file that should be passed as the
+parameter.
+
+If no file parameter is passed, or if the file is missing, the program will
+terminate.
+
+=head2 account_balance
+
+  $book->account_balance('Assets:Cash');   # always provide account names in full
+  $book->account_balance('Assets');        # includes child accounts e.g. Assets:Cash
+
+Given an account name, return the balance in the account. Account names must
+be provided in full to distinguish between accounts with the same name but
+different parents e.g. Assets:Alice:Cash and Assets:Bob:Cash
+
+If a parent account name is provided, the total balance, which includes all
+children accounts, will be returned.
+
+=head2 add_transaction
+
+  $deposit = {
+      date         => '20140102',
+      description  => 'Deposit monthly savings',
+      from_account => 'Assets:Cash',
+      to_account   => 'Assets:aBank',
+      amount       => 2540.15,
+      number       => ''
+  };
+  $book->add_transaction($deposit);
+
+A transaction is defined to have the fields as listed in the example above.
+All fields are mandatory and hopefully self-explanatory. Constraints on some
+of the fields are listed below:
+
+    date         Date of the transaction. Formatted as YYYYMMDD.
+    from_account Full account name required.
+    to_account   Full account name required.
+
+
+=head1 CAVEATS/LIMITATIONS
+
+Some things to be aware of:
+
+    1. You should have created a GnuCash file with an SQLite backend already
+    2. Module accesses the GnuCash SQLite3 db directly; i.e. use at your own risk.
+    3. Only transactions between Asset accounts have been tested.
+    4. Only two (2) splits for each transaction will be created
+
+This module works with GnuCash v2.4.13 on Linux.
+
+=head1 SEE ALSO
+
+GnuCash wiki pages includes a section on C API and a section on Python
+bindings which may be of interest.
+
+    C API          : http://wiki.gnucash.org/wiki/C_API
+    Python bindings: http://wiki.gnucash.org/wiki/Python_Bindings
+
+This module does not rely on the C API (maybe it should). Instead it relies on
+some reverse engineering work to understand the changes a transaction makes
+to the sqlite database. See
+http://wideopenstudy.blogspot.com/search/label/GnuCash for details.
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker at
+L<https://github.com/hoekit/GnuCash-SQLite/issues>. You will be notified
+automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for public
+review and contribution under the terms of the license.
+
+    <https://github.com/hoekit/GnuCash-SQLite>
+
+    git clone git@github.com:hoekit/GnuCash-SQLite.git
+
+=head1 AUTHOR
+
+Hoe Kit CHEW, E<lt>hoekit at gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Chew Hoe Kit
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

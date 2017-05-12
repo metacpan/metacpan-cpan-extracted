@@ -1,0 +1,51 @@
+# ChangeLog for app-shells/scsh
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/scsh/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+*scsh-0.6.5 (26 Feb 2004)
+
+  26 Feb 2004; <mkennedy@gentoo.org> metadata.xml, scsh-0.6.5.ebuild:
+  New upstream; new metadata.xml; use new DESTDIR support
+
+*scsh-0.6.4 (15 Apr 2003)
+
+  15 Apr 2003; Matthew Kennedy <mkennedy@gentoo.org> scsh-0.6.4.ebuild:
+  minor version bump
+
+*scsh-0.6.3 (15 Mar 2003)
+
+  15 Mar 2003; Matthew Kennedy <mkennedy@gentoo.org> scsh-0.6.3.ebuild:
+  Minor version bump. Moved from /bin to /usr/bin. Documentation fix.
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*scsh-0.6.1-r1 (12 Jul 2002)
+
+  28 Jul 2002; Calum Selkirk <cselkirk@gentoo.org> scsh-0.6.1-r1 :
+
+  Added ppc to KEYWORDS.
+
+  12 Jul 2002; Seemant Kulleen <seemant@gentoo.org> scsh-0.6.1-r1 :
+
+  Man page edited to remove ${D} and repoman fixes. Also, the license is
+  just as-is or BSD.
+
+*scsh-0.6.1-r1 ( 6 Mar 2002 )
+
+  6 Mar 2002; Karl Trygve Kalleberg <karltk@gentoo.org> ChangeLog scsh-0.6.1-r1 files/digest-scsh-0.6.1-r1:
+
+  Fixed a bug where scsh.1 was installed in /usr/share/man instead of 
+  /usr/share/man/man1.
+
+*scsh-0.6.0 ( 25 Feb 2002 )
+
+  25 Feb 2002; Karl Trygve Kalleberg <karltk@gentoo.org> ChangeLog scsh-0.6.0 files/digest-scsh-0.6.0:
+
+  Scsh is a Unix shell embedded in Scheme. It provides full access to POSIX as
+  well as extensions common to most Unix implementations. Scsh also features 
+  many abstractions to ease system programming: process abstraction, 
+  event-based interrupt handling, sophisticated I/O support and enables 
+  concurrent system programming.
+
+  Ebuild contributed by Matthew Kennedy <mbkennedy@ieee.org>.
+

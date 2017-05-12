@@ -1,0 +1,9 @@
+Makefile.PL
+Changes
+LICENSE
+MANIFEST
+README.md
+t/Geo-OGC-Service-WMTS.t
+lib/Geo/OGC/Service/WMTS.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

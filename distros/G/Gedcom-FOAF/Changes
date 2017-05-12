@@ -1,0 +1,21 @@
+Revision history for Perl extension Gedcom::FOAF.
+
+0.05  Thu Sep 17 2009
+    - Allow the user to supply url templates rather than a base url
+    - Change UTF8 to UTF-8 in the xml declaration
+
+0.04  Tue Feb 05 2008
+    - Fix for unknown date and place for events (RT #30226)
+
+0.03  Mon Oct 22 2007
+    - updated deps
+    - switch to module::install
+
+0.02  Thu Dec 08 2005
+    - pod updates
+    - use public methods instead of get_record /
+      get_value (Paul Johnson)
+
+0.01  Thu Dec 08 2005
+    - original version
+

@@ -1,0 +1,4 @@
+[ ] --> [ Bonn ] -- [ train ] --> [ Ulm ] -- [ car ] --> [ Hof ]
+
+[ ] -- bye --> [ train ] { shape: none; }
+[ ] -- rent --> [ car ] { shape: none; }

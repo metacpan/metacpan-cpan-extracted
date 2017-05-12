@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Git-DescribeVersion,
+version 1.015:
+
+  Use git-describe to show a repo's version
+
+This software is copyright (c) 2010 by Randy Stauner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

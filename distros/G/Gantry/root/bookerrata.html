@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Gantry | Perl Web Application Framework</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" 
+    type="text/css" 
+    media="screen" title="Default"
+    href="/css/default.css" />
+</head>
+
+<body id="gantry-org">
+     
+    <!-- START: top nav logo (using page element style) -->
+    <div class="page">
+        <a href="/">
+            <img style="margin-bottom: -5px;"
+             src="/images/gantry_logo.png" alt="Gantry Logo"
+             width="740" />
+        </a>
+    </div>
+
+    <!-- END: top nav logo -->
+
+    <!-- START: page -->
+    <div id="page">
+    
+        <!-- START: content -->
+        <div id="content">
+
+            <div id="column_one_of_one">
+
+<h1> Gantry Book Errata</h1>
+
+<h2> Version 1.1 </h2>
+
+In Chapter 7, on pages 74-75 the Job Ad example uses the traditional
+CGI approach to multi-valued selects, namely it splits them on the
+null character.  As of Gantry 3.51 multi-valued selects come in as
+either a scalar (if there is only one) or as an array reference (if
+there are more than one).
+
+<h2> Version 1.0 </h2>
+
+<h3>In chapter 2:</h3>
+<p>
+The first footnote should refer to Bigtop::ScriptHelp::Style::KickStart,
+whose perldoc describes the new kickstart syntax.
+</p>
+
+<p>
+On page 9 and in Table 2.1, the book says there are five tabs in tentmaker.
+There are four tabs in tentmaker now.  The App Config tab has become a
+regular block on the App Body tab.
+</p>
+
+<p>
+For at least some versions of mysql, app.db is not a legal database name.
+If you have that problem, replace app.db with app_db and add the -n app_db
+flag when you start app.server.
+</p>
+
+<h3>In chapter 3:</h3>
+<p>
+The first footnote should explain that after you move app.cgi to the cgi-bin
+directory for your Apache server, you need to make sure that Apache can
+read and write in your build directory, that it can read and write app.db,
+and read the conf files in the docs sub-directory of the build directory.
+Further, if you move app.db or change database engines, you will need to
+change the CGI config block in the bigtop file and regenerate.  You need to
+work on the dbconn variable where the database connection information is.
+Change it to suit your system's paths.
+</p>
+
+<p>
+In Moving to Mod Perl, the advice to switch engines on the Bigtop Config
+tab is probably unnecessary if you use mod_perl 2.  The defaults now target
+that and make CGI work in the app.cgi script.  Likewise, the advice to check
+and uncheck backends is probably not necessary since CGI and mod_perl no
+co-exists peacefully.
+</p>
+
+<p>
+On page 22, when told to click on the App Config tab, scroll back up to the
+config block while staying on the App Body tab.
+</p>
+
+<p>
+The section on moving to Gantry::Conf is largely moot now.  It's not wrong
+about what needs to happen to make use of Gantry::Conf.  But, Gantry::Conf
+is now the default behavior for all new apps built from the command line
+with tentmaker or bigtop.  (If you build with bigtop -c file.bigtop,
+file.bigtop will govern how conf is setup.  In particular, if you download
+the code for the book and use the bigtop files from it, conf will be
+setup according to those bigtop files' contents.  In that case, the
+advice in section 3.2 might help a lot.)
+</p>
+
+<p>
+The only thing you might want to do is remove the conffile value, so it
+will default to /etc/gantry.conf.  If you do that, put this in
+/etc/gantry.conf:
+</p>
+
+<pre>
+    Include /etc/gantry.d/*.conf
+</pre>
+
+<p>
+Then create the /etc/gantry.d directory and copy (or symbolically link)
+docs/AppName.gantry.conf to the /etc/gantry.d directory.
+</p>
+
+<p>
+You can achieve the effects of sub-section 3.2.1 using named config
+blocks in your bigtop file now.  But, you can also do it manually as
+explained in that sub-section.
+</p>
+
+<h3>In chapter 4:</h3>
+<p>
+The book asserts that you must prefix URLs with POST: in order for
+Gantry tests to treat their query strings as form parameters.  Actually,
+query strings are always treated that way during testing.  But, labeling
+with POST is still good documentation.
+</p>
+
+<h3>In chapters 6 and 7:</h3>
+<p>
+There are new versions of all the large code examples in the new
+book code tar ball.  These are slightly different than the ones in the book.
+</p>
+
+<p>
+Note that form methods are no longer generated in CRUD stubs.  Look for
+them in GEN modules instead.  To modify them, you can override the
+GEN code with a method of the same name in the stub.  Then it is useful
+to dispatch to SUPER (as is shown for do_main) and use
+Gantry::Utils::FormMunger to achieve desired form changes.
+</p>
+
+<h3>In chapter 8:</h3>
+<p>
+Form methods are no longer generated in the stub module for CRUD controllers.
+</p>
+
+<p>
+There is a new util module to help you munge forms, see
+Gantry::Utils::FormMunger.  You don't need to use it, but it sure is nice.
+You can use it with both AutoCRUD and CRUD.
+</p>
+
+<h3>In chapter 9:</h3>
+<p>
+There is a new plugin callback phase: post_engine_init which fires
+just after engine_init returns and before uri, location, path_info,
+and method are called.  The Cache plugin uses it.
+</p>
+
+<h3>In chapter 13:</h3>
+<p>
+Tentmaker's App Config tab is gone.  The config table it managed is
+now the first config block on the App Body (the one with no name or called
+base).  You can create additional blocks.  These lead to additional
+Gantry::Conf instances you can switch between.  See for example, the
+help message from a current app.server.  If your have an unnamed block
+and another called postgresql, you can start app.server to access the
+named block like this:
+</p>
+
+<pre>
+    ./app.server -t postgresql
+</pre>
+
+<p>
+All of that is optional, but default apps (those built from the command
+line) now have a CGI block with hard coded paths.
+</p>
+
+<h3>In chapter 14:</h3>
+<p>
+You can now have multiple config blocks (see the note for chapter
+13 for one possible use).  The first one does not need a name (but could
+be called base).  The others can have any name you like.  These
+create additional Gantry::Conf instances.  Again, you don't need multiple
+config blocks, but they can be useful for dev, qual, prod progressions and
+the like.
+</p>
+            </div>
+        </div>
+    </div>
+
+<!-- END: content -->
+
+<!-- START: footer -->
+
+    <div id="footer">
+        <p>
+        <a href="http://groups.google.com/group/gantry">Mailing List</a> | <a href="/pod/bigtop">Bigtop</a>
+        </p>
+
+        This site is licensed under a 
+        <a rel="license" href="http://creativecommons.org/licenses/by/2.0/">
+        Creative Commons License</a>,<br />
+        except where otherwise noted.
+    </div>
+
+<!-- END: footer -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-249892-1";
+urchinTracker();
+</script>    
+    
+</body>
+</html>

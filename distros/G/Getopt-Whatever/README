@@ -1,0 +1,129 @@
+NAME
+    Getopt::Whatever - Collects whatever options you pass it!
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use Getopt::Whatever;
+    
+        for my $key (keys %ARGV) {
+            if(ref $ARGV{$key}) {
+                print $key, ' -> ', join(', ', @{$ARGV{$key}}), "\n";
+            }
+            else {
+                print $key, ' -> ', $ARGV{$key}, "\n";
+            }
+        }
+    
+        print "@ARGV\n";
+
+DESCRIPTION
+    Getopt::Whatever parses whatever command line options that it can find
+    in @ARGV and places them into %ARGV. The parsing only supports long
+    options (double-dashed), but might eventually also support short-form
+    options. After parsing, anything that was not considered an option is
+    left in @ARGV.
+
+    The best way to describe what this module does is probably just to give
+    an illustration, so here goes... suppose you use "Getopt::Whatever" in
+    your program, "my_program". Here are some combinations of what you'll
+    get.
+
+    As just a basic example:
+
+      my_program --verbose --data_file=/tmp/data.out go now -bob
+
+    Produces:
+
+        @ARGV = ('go', 'now', '-bob');
+    
+        %ARGV = (
+            verbose => 1,
+            data_file => '/tmp/data.out',
+        );
+
+    What about double-keys:
+
+      my_program --data_file=/tmp/data.out --data_file=/tmp/more_data.out
+
+    Produces:
+
+        @ARGV = ();
+    
+        %ARGV = (
+            data_file => [ '/tmp/data.out', '/tmp/more_data.out' ],
+        );
+
+    The results are hopefully what most users would expect.
+
+    You might be asking why you would need this module. We'll, I've found it
+    to be useful for creating programs that drive templates. The programs
+    can accept a template file and then whatever arguments you give it to
+    fill in the template. There are probably other uses, but this is enough
+    for me.
+
+    * Options with no values are considered flags and given a value of one.
+    * Options with arguments are placed as a key-value pair into %ARGV.
+    * Duplicate key-value options cause the hash value to become an array of
+    values.
+    * Key-value pairs take precidence over flags.
+    * Processing stops at a lone '--'.
+    * Everything not considered an option is left on @ARGV.
+
+    You can find a fairly detailed list of what you should expect from edge
+    cases in "t/argv_tests.t".
+
+SUBROUTINES/METHODS
+    There aren't any subroutines exported because everything that this
+    module does happens on import. About the only thing that you'll notice
+    is that %ARGV will be populated if you were passed any arguments.
+
+AUTHOR
+    Josh McAdams, "<joshua.mcadams at gmail.com>"
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to "bug-getopt-whatever at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Getopt-Whatever>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+INCOMPATIBILITIES
+    It is not recommended to use this alongside any other of the "Getopt::"
+    modules because you'll have multiple modules dinking around with @ARGV.
+
+DEPENDENCIES
+    None that I know of.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Getopt::Whatever
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Getopt-Whatever>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Getopt-Whatever>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Getopt-Whatever>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Getopt-Whatever>
+
+SEE ALSO
+    Getopt::Casual - the inspiration for "Getopt::Whatever" because it
+    seemed like a good idea, but didn't do exactly what I wanted.
+    Getopt::Long - One of the standard "Getopt::" modules.
+    Getopt::Std - Another of the standard "Getopt::" modules.
+
+LICENSE AND COPYRIGHT
+    Copyright 2007 Josh McAdams, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

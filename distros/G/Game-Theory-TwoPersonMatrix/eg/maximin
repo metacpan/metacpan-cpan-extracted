@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+#
+# Ch 4
+#
+
+use Game::Theory::TwoPersonMatrix;
+use Math::Algebra::Symbols;
+
+my ($p) = symbols(qw(p));
+
+my $strategy0 = { 1 => '(1 - $p)', 2 => '$p' };
+my $strategy1 = { 1 => 1, 2 => 0 };
+my $strategy2 = { 1 => 0, 2 => 1 };
+
+print "Ex 1:\n";
+my $g = Game::Theory::TwoPersonMatrix->new(
+    1 => $strategy0,
+    2 => $strategy1,
+    payoff => [ [1,-1], [-1,1] ]
+);
+print 'expected_payoff: ', $g->s_expected_payoff(), "\n";
+my $r1 = eval $g->s_expected_payoff();
+print "\tsimplify: ", $r1->simplify, "\n";
+$g = Game::Theory::TwoPersonMatrix->new(
+    1 => $strategy0,
+    2 => $strategy2,
+    payoff => [ [1,-1], [-1,1] ]
+);
+print 'expected_payoff: ', $g->s_expected_payoff(), "\n";
+my $r2 = eval $g->s_expected_payoff();
+print "\tsimplify: ", $r2->simplify, "\n";
+my $s = $r1 eq $r2;
+my $q = $s->solve($p);
+print "\tmaximin strategy: ", $q, "\n";
+$s = $r2->sub( p => $q );
+print "\tmaximin expectation: ", $s, "\n";
+
+print "Ex 2:\n";
+$g = Game::Theory::TwoPersonMatrix->new(
+    1 => $strategy0,
+    2 => $strategy1,
+    payoff => [ [0.8, 1], [0.9, 0.5] ]
+);
+print 'expected_payoff: ', $g->s_expected_payoff(), "\n";
+$r1 = eval $g->s_expected_payoff();
+print 'simplify: ', $r1->simplify, "\n";
+$g = Game::Theory::TwoPersonMatrix->new(
+    1 => $strategy0,
+    2 => $strategy2,
+    payoff => [ [0.8, 1], [0.9, 0.5] ]
+);
+print 'expected_payoff: ', $g->s_expected_payoff(), "\n";
+$r2 = eval $g->s_expected_payoff();
+print "\tsimplify: ", $r2->simplify, "\n";
+$s = $r1 eq $r2;
+$q = $s->solve($p);
+print "\tmaximin strategy: ", $q, "\n";
+$s = $r2->sub( p => $q );
+print "\tmaximin expectation: ", $s, "\n";
+
+print "Ex 4:\n";
+$g = Game::Theory::TwoPersonMatrix->new(
+    1 => $strategy0,
+    2 => $strategy1,
+    payoff => [ [0,-1], [2,3] ]
+);
+print 'expected_payoff: ', $g->s_expected_payoff(), "\n";
+$r1 = eval $g->s_expected_payoff();
+print "\tsimplify: ", $r1->simplify, "\n";
+$g = Game::Theory::TwoPersonMatrix->new(
+    1 => $strategy0,
+    2 => $strategy2,
+    payoff => [ [0,-1], [2,3] ]
+);
+print 'expected_payoff: ', $g->s_expected_payoff(), "\n";
+$r2 = eval $g->s_expected_payoff();
+print "\tsimplify: ", $r2->simplify, "\n";
+$s = $r1 eq $r2;
+$q = $s->solve($p);
+print "\tmaximin strategy: ", $q, "\n";
+$s = $r2->sub( p => $q );
+print "\tmaximin expectation: ", $s, "\n";
+
+print "Ex 6:\n";
+$g = Game::Theory::TwoPersonMatrix->new(
+    1 => $strategy0,
+    2 => $strategy1,
+    payoff => [ [0,1], [2,1] ]
+);
+print 'expected_payoff: ', $g->s_expected_payoff(), "\n";
+$r1 = eval $g->s_expected_payoff();
+print "\tsimplify: ", $r1->simplify, "\n";
+$g = Game::Theory::TwoPersonMatrix->new(
+    1 => $strategy0,
+    2 => $strategy2,
+    payoff => [ [0,1], [2,1] ]
+);
+print 'expected_payoff: ', $g->s_expected_payoff(), "\n";
+$r2 = eval $g->s_expected_payoff();
+print "\tsimplify: ", $r2->simplify, "\n";
+$s = $r1 eq $r2;
+$q = $s->solve($p);
+print "\tmaximin strategy: ", $q, "\n";
+$s = $r2->sub( p => $q );
+print "\tmaximin expectation: ", $s, "\n";

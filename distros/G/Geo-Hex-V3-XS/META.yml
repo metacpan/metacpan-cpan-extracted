@@ -1,0 +1,44 @@
+---
+abstract: 'GeoHex implementation with XS. (c-geohex3 Perl5 binding.)'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Cwd::Guard: '0'
+  File::Which: '0'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.03'
+  parent: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.3, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Hex-V3-XS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Geo::Hex::V3::XS:
+    file: lib/Geo/Hex/V3/XS.pm
+    version: '0.11'
+requires:
+  Exporter: '5.57'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/Geo-Hex-V3-XS/issues
+  homepage: https://github.com/karupanerura/Geo-Hex-V3-XS
+  repository: git://github.com/karupanerura/Geo-Hex-V3-XS.git
+version: '0.11'
+x_contributors:
+  - 'Pine Mizune <pinemz@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

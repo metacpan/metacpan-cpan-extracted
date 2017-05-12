@@ -1,0 +1,192 @@
+---
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Bye: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 3
+      floats: []
+      id: 203
+      name: Carla
+      oldId: 203
+      pairingNumber: 6
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: ''
+      rating: 1950
+      scores: ~
+      title: Ms.
+  result:
+    Bye: Bye
+  round: 3
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Black: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: Down
+      floats:
+        - ~
+        - Down
+        - Not
+      id: 104
+      name: Don
+      oldId: 104
+      pairingNumber: 7
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - White
+        sign: White
+      rating: 1940
+      roles:
+        - Bye
+        - White
+      score: 2
+      scores:
+        1: Bye
+        2: ~
+      title: Mr.
+    White: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: Up
+      floats:
+        - ~
+        - Not
+        - Down
+      id: 103
+      name: Carl
+      oldId: 103
+      pairingNumber: 5
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        lastTwo:
+          - White
+          - Black
+        sign: Black
+      rating: 1960
+      roles:
+        - White
+        - Black
+      score: 1
+      scores:
+        1: ~
+        2: ~
+      title: Mr.
+  floats:
+    Black: Down
+    White: Up
+  result: ~
+  round: 3
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Black: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: ''
+      floats:
+        - ~
+        - Not
+        - Not
+      id: 201
+      name: Ally
+      oldId: 201
+      pairingNumber: 2
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        lastTwo:
+          - Black
+          - White
+        sign: White
+      rating: 1990
+      roles:
+        - Black
+        - White
+      score: 1
+      scores:
+        1: ~
+        2: ~
+      title: Ms.
+    White: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: ''
+      floats:
+        - ~
+        - Not
+        - Not
+      id: 101
+      name: Al
+      oldId: 101
+      pairingNumber: 1
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        lastTwo:
+          - White
+          - Black
+        sign: Black
+      rating: 2000
+      roles:
+        - White
+        - Black
+      score: 1
+      scores:
+        1: ~
+        2: ~
+      title: Mr.
+  floats:
+    Black: ''
+    White: ''
+  result: ~
+  round: 3
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Black: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: Down
+      floats:
+        - ~
+        - Not
+        - Up
+      id: 102
+      name: Bert
+      oldId: 102
+      pairingNumber: 3
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        lastTwo:
+          - Black
+          - White
+        sign: White
+      rating: 1980
+      roles:
+        - Black
+        - White
+      score: 1
+      scores:
+        1: ~
+        2: ~
+      title: Mr.
+    White: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 2
+      floater: Up
+      floats:
+        - ~
+        - ~
+        - Not
+      id: 202
+      name: Bertha
+      oldId: 202
+      pairingNumber: 4
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - Black
+        sign: Black
+      rating: 1970
+      roles:
+        - Black
+      score: 0
+      scores:
+        2: ~
+      title: Ms.
+  floats:
+    Black: Down
+    White: Up
+  result: ~
+  round: 3

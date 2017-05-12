@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6fe097cf8c1fd7a0a2bd358384b68ee410a73709 Changes
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 bf83c38349cfd1ef42ee38ebf0b7d35e67d54369 MANIFEST
+SHA1 d5b50ef49659d0b1212bc21377ac3bcaca92ed5f META.yml
+SHA1 0fba58ac0e9562547714cad4e3c5b2c589cb7948 Makefile.PL
+SHA1 f1f81fcc014933775963500e0122a687580781ac README
+SHA1 5d905a8cad8531bbbef994544374d1cf2726fc11 TGF.pm
+SHA1 43156d71b3768487ee1b0d920cbf65c02384a740 examples/ex1.pl
+SHA1 e1a998750627040ec475fbde14873cb05b175a6c examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 49be701547ff45878fd3e1fce377d1d30262759d t/Graph-Reader-TGF/01-use.t
+SHA1 bd5f5e275bc3144a397b8429ed9111b15ef502cb t/Graph-Reader-TGF/02-version.t
+SHA1 b65f93c03ebbc3feb96caaf7d928de4a2a05abd3 t/Graph-Reader-TGF/03-new.t
+SHA1 44452788c51039c66f7f2f50e1ae9027486fd665 t/Graph-Reader-TGF/04-read_graph.t
+SHA1 eefe1f1dda9b50d91cde57537988387023a005e7 t/data/ex1.tgf
+SHA1 ace4eba9f1e7f61b6e74611b2fdf87018546337d t/data/ex2.tgf
+SHA1 5c63be1cb3de79bbec88a989ad8b13350b1f4b14 t/data/ex3.tgf
+SHA1 3b2af9c10ce9d907bd4e1ca46738ca52fa8271e8 xt/Graph-Reader-TGF/01-pod_coverage.t
+SHA1 66c74ef5d335b8771171fed1d1db754fdeab0696 xt/Graph-Reader-TGF/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWMh4kAAoJEJe+XXKaIuTl4iMIAIoXcfYadTgwDP9kt8wC0oi+
+qe9F9Zl3MI6JZQKnCj4sFzPKKyMF3Yn2AJc2bMDZBDT4MDgtRnp+8ahyJNjXD1UY
+qw+oSm5jnzgb79JOPLFxx/ge8KPPFEv8oKM9f2Rk+gytq7UgBfnxeaO5CjES88qa
+Wd6wOFAArPMr1RbTV2IO6lV7J1UaKkKHc6d+XQ9G3TJyFHp1mfHLGglWNzhORY3Y
+ecndYOMyVxkHxzx03I1rzUV+4eaWA7rZQcT+rwbdu7mAmhVzl58D4aFLiLok+BMJ
+hKZpKAXoQ6nPrerqflNQDPrFd71B99aKowQQz2eb2jsRW4s1h7bIHfLsUUuOdsE=
+=XEZe
+-----END PGP SIGNATURE-----

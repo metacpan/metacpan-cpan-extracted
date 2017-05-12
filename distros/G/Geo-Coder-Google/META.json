@@ -1,0 +1,66 @@
+{
+   "abstract" : "Google Maps Geocoding API",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-Coder-Google",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "2.27",
+            "LWP" : "5.5",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::HMAC_SHA1" : "0",
+            "MIME::Base64" : "0",
+            "Test::More" : "0.32",
+            "Test::Number::Delta" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Geo-Coder-Google@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Google"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/arcanez/geo-coder-google.git",
+         "web" : "https://github.com/arcanez/geo-coder-google"
+      }
+   },
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

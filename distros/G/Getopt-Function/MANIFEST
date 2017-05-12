@@ -1,0 +1,14 @@
+.cvsignore
+COPYING
+INSTALL
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+PkgData/description
+PkgData/doc_files
+README
+TODO
+lib/Getopt/Function.pm
+make-rpm-command
+simple-example
+t/basic.t

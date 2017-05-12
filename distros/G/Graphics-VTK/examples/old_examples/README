@@ -1,0 +1,52 @@
+The scripts in the graphics, imaging, contrib, and patented subdirectores
+are converted from the tcl examples that came with the old VTK 3.2 package.
+
+There were auto-converted (for the most part) using a tcl2perl script
+in this directory. Not all of the converted scripts have been tested.
+
+Additionally, there is some examples in the Pipeline directory which
+contain sample scripts using the Pipeline widget.
+
+Converted TCL Examples that are known to work:
+
+Graphics:
+
+  Decimate.pl*
+  volSimple.pl*
+  InputStr.pl
+  3DMorph.pl
+  CSpline.pl
+  CamBlur.pl
+  ColorSph.pl
+  TkRenderWidget.pl
+  quadricCut.pl
+  TestTubeCap.pl
+  polyViewer.pl*
+  sphereFlake.pl*
+
+Imaging:
+
+  TkViewer.pl
+  TestTkImageWindowWidget.pl
+  xyPlot.pl
+
+Contrib:
+  
+  cubeAxis.pl
+  squadviewer.pl*
+  subDivideTetra.pl
+  
+Patented:
+   
+   3DMorph.pl
+   TestGridSynchronizedTemplates3D.pl
+   ParallelStream.pl
+   financialField2.pl*
+
+pipeline:
+
+   Cone.pl*
+   financialField.pl*
+
+*Manually Updated (i.e. not totally
+ autoconverted using tcl2perl)

@@ -1,0 +1,12 @@
+Revision history for Perl extension GitDDL
+
+0.03 2013-10-30T17:26:00+09:00
+     - remove Any::Moose dependency (Songmu)
+     - fix some typos (Songmu)
+     - add sql_filter callback (soh335)
+
+0.02 2012-10-15T11:13:25+09:00
+     - depends File::Path 2.07 because this module is core but make_path method introduced at 2.06_05
+
+0.01 2012-10-10T18:40:12+09:00
+     - initial version

@@ -1,0 +1,49 @@
+---
+abstract: 'Graphviz Perl interface with DSL'
+author:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.6, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Graphviz-DSL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Graphviz::DSL:
+    file: lib/Graphviz/DSL.pm
+    version: 0.03
+  Graphviz::DSL::Component:
+    file: lib/Graphviz/DSL/Component.pm
+  Graphviz::DSL::Edge:
+    file: lib/Graphviz/DSL/Edge.pm
+  Graphviz::DSL::Graph:
+    file: lib/Graphviz/DSL/Graph.pm
+  Graphviz::DSL::Node:
+    file: lib/Graphviz/DSL/Node.pm
+  Graphviz::DSL::Util:
+    file: lib/Graphviz/DSL/Util.pm
+requires:
+  File::Which: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/syohex/p5-Graphviz-DSL/issues
+  homepage: https://github.com/syohex/p5-Graphviz-DSL
+  repository: git://github.com/syohex/p5-Graphviz-DSL.git
+version: 0.03

@@ -1,0 +1,34 @@
+NAME
+    Gentoo::Perl::Distmap::FromOverlay - Scrape an Overlay to produce a
+    "Distmap"
+
+VERSION
+    version 0.1.0
+
+SYNOPSIS
+        use Gentoo::Perl::Distmap::FromOverlay;
+
+        my $translator = Gentoo::Perl::Distmap::FromOverlay->new( overlay => Gentoo::Overlay->new( '/path/to/overlay' ) )
+        # or
+        my $og = Gentoo::Overlay::Group->new();
+        $og->add_overlay('/path/to/overlay');
+        my $translator = Gentoo::Perl::Distmap::FromOverlay->new( overlay => $og )
+        # or
+        my $translator = Gentoo::Perl::Distmap::FromOverlay->new( overlay => Gentoo::Overlay::Group::INI->load_named('foo')->overlay_group );
+
+    and then
+
+        my $result = $translator->distmap;
+
+    And see "Gentoo::Perl::Distmap" for details on using the result.
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

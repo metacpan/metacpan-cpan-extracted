@@ -1,0 +1,44 @@
+{
+   "abstract" : "Earth Observation Products meta-data",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-EOP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Geo::GML" : "0.13",
+            "Test::More" : "0.54",
+            "XML::Compile" : "1.50",
+            "XML::Compile::Cache" : "1.04"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.50"
+}

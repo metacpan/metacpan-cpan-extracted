@@ -1,0 +1,49 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::BlockPrivateIP.ja - 内部IPアドレスに解決するリクエストを拒否する
+
+=head1 SYNOPSIS
+
+  components:
+    - BlockPrivateIP
+
+=head1 DESCRIPTION
+
+一部のホストネームはDNS解決を行うと内部IPアドレスに解決するようになっています。
+これをクローラー等で行うとDoS攻撃を自身のネットワークに行ってしまう事に
+なることがあります。
+
+このコンポーネントはそれを阻止するため、192.168.1.1や127.0.0.1等、内部
+IPアドレスに変換されるホストネームを全て拒否し、エラーレスポンスを返す
+ようにします。
+
+ただし、このGungho::Engine::POEのようにGungho内部でのDNS解決を停止する事が
+できるエンジン内で使用してもGungho内部ではIPアドレスを取得しませんので
+このコンポーネントは正しく動作しません。
+
+=head1 METHODS
+
+=head2 request_is_allowed
+
+Gungho::Component::Core::request_is_allowed()をオーバーライドします。
+
+=head2 handle_dns_response
+
+Gungho::Component::Core::handle_dns_response()をオーバーライドします。
+
+=head2 block_private_ip_address
+
+渡されたアドレスが内部アドレスかどうかaddress_is_private()で確認し、
+内部アドレスであるようであればエラーレスポンスを作成します。
+
+=head2 address_is_private
+
+IPアドレスが内部アドレスかどうか確認します。
+
+=head1 SEE ALSO
+
+L<Regexp::Common|Regexp::Common>
+
+=cut

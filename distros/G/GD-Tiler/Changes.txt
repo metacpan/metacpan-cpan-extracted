@@ -1,0 +1,11 @@
+Vers. 0.11	2006-Jun-7		D. Arnold
+	- added ImagesPerRow parameter to permit explicit
+	specification of rows/columns (rather than default
+	square layout)
+	
+	- fixed several POD typos
+	
+	- permit tile() to be EXPORTed
+
+Vers. 0.10	2006-Jun-2		D. Arnold
+	Coded.

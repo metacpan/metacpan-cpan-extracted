@@ -1,0 +1,31 @@
+# ChangeLog for net-dns/posadis
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/posadis/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  13 Jun 2004; <matsuu@gentoo.org> files/posadis-init:
+  Added 'provide dns' in files/posadis-init. Bugs #50437.
+
+  23 Apr 2004; David Holm <dholm@gentoo.org> posadis-0.60.4_p1.ebuild:
+  Added to ~ppc.
+
+*posadis-0.60.4_p1 (23 Apr 2004)
+
+  23 Apr 2004; <matsuu@gentoo.org> -files/posadis-0.60.1-init,
+  -posadis-0.60.1.ebuild, posadis-0.60.2.ebuild, +posadis-0.60.4_p1.ebuild:
+  Version bumped.
+
+*posadis-0.60.2 (02 Mar 2004)
+
+  02 Mar 2004; <matsuu@gentoo.org> posadis-0.60.2.ebuild, files/posadis-init:
+  Version bumped. Bugs # 40194.
+  Added ~amd64 to KEYWORDS.
+
+*posadis-0.60.1 (02 Nov 2003)
+
+  07 Dec 2003; foser <foser@gentoo.org> posadis-0.60.1.ebuild :
+  Fix fam-oss dep to fam, due to move
+
+  02 Nov 2003; MATSUU Takuto <matsuu@gentoo.org> metadata.xml,
+  posadis-0.60.1.ebuild:
+  Initial import
+

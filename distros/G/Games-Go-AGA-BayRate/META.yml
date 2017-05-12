@@ -1,0 +1,45 @@
+---
+abstract: 'implementation of AGA BayRate (player ratings) as perl object'
+author:
+  - 'Reid Augustin <reid@hellosix.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Devel::CheckLib: '0.9'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-Go-AGA-BayRate
+requires:
+  Alien::GSL: '0'
+  Carp: '0'
+  DBI: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  Exporter: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  Inline: '0'
+  Inline::C: '0'
+  Math::GSL::BLAS: '0'
+  Math::GSL::Const: '0'
+  Math::GSL::Errno: '0'
+  Math::GSL::Interp: '0'
+  Math::GSL::Linalg: '0'
+  Math::GSL::Matrix: '0'
+  Math::GSL::Multimin: '0'
+  Math::GSL::Permutation: '0'
+  Math::GSL::SF: '0'
+  Math::GSL::Spline: '0'
+  Math::GSL::Vector: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+version: '0.119'

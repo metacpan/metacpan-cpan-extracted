@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+  <Document>
+    <name>My Document</name>
+    <Snippet maxLines="1">The KMZ version is more interesting.</Snippet>
+    <NetworkLink>
+      <Snippet maxLines="1">My Snippet</Snippet>
+      <Link>
+        <href>doc.kml</href>
+      </Link>
+      <name>My NetworkLink</name>
+    </NetworkLink>
+  </Document>
+</kml>

@@ -1,0 +1,10 @@
+^build/
+^Makefile$
+^Makefile[.]old$
+^xs/.*[.][co]$
+^blib/
+^pm_to_blib$
+^[.]git
+^SourceView2[.]bs$
+^Gtk2-SourceView2-.+\.tar\.gz$
+^perl-Gtk2-SourceView2[.]doap$

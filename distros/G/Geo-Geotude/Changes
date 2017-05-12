@@ -1,0 +1,25 @@
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+                                     
+<>
+        dc:identifier           "$Id: Changes,v 1.2 2007/08/09 02:13:07 asc Exp $" ;
+        dc:description          "Changes for Geo::Geotude.pm" ;
+        dcterms:references      <http://aaronland.info/perl/geo/geotude/> .
+
+<http://aaronland.info/perl/geo/geotude/Geo-Geotude-1.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/geo/geotude/> ;
+
+        doap:Version    [
+                        doap:revision     "1.0" ;
+                        doap:created      "2007-08-08" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/geo/geotude/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Geo-Geotude/" ;
+        doap:download-mirror    "http://aaronland.info/perl/geo/geotude/" .

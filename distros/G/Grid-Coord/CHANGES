@@ -1,0 +1,4 @@
+0.05 2007-12-27
+    - Fixed test breakage due to cmp_ok no longer working on overloaded objects
+    - added != overloading
+    

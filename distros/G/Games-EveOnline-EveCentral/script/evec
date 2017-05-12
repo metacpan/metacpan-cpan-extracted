@@ -1,0 +1,90 @@
+
+use strict;
+use warnings;
+
+use Games::EveOnline::EveCentral;
+
+# ABSTRACT: A simple Eve Central client to show the library in use.
+
+use 5.012;
+
+use Getopt::Long 2.39;
+use Pod::Usage 1.61;
+
+=head1 SYNOPSIS
+
+This program will query L<http://eve-central.com/> to obtain market data. It is
+intended as a showcase for the L<Games::EveOnline::EveCentral> library.
+
+Usage:
+
+    evec --help
+
+=head1 DESCRIPTION
+
+A more lengthy description with extra details.
+
+=head1 OPTIONS
+
+=for :list
+* option1
+* option2
+
+
+=head1 AUTHOR
+
+Pedro Figueiredo, C<< <me at pedrofigueiredo.org> >>
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/pfig/games-eveonline-evecentral/issues>.
+I will be notified, and then you'll automatically be notified of progress on your
+bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Games::EveOnline::EveCentral
+
+
+You can also look for information at:
+
+=over 4
+
+=item * GitHub (report bugs here)
+
+L<https://github.com/pfig/games-eveonline-evecentral/issues>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Games-EveOnline-EveCentral>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Games-EveOnline-EveCentral>
+
+=item * CPAN
+
+L<http://metacpan.org/module/Games::EveOnline::EveCentral>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Pedro Figueiredo.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut

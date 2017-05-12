@@ -1,0 +1,58 @@
+Gentoo::PerlMod::Version
+
+This module acts as a reference implementation of how Gentoo maps CPAN
+and Perl versions, and transforms them into derived versions that are
+suitable for Gentoo dependency tracking.
+
+Perl has several primary formats of versions, the most notable one being
+"float" style versions, in the form "x.yyyyyyyyyyy" where the number of
+"y"'s are arbitrary, and are interpreted as a floating point value.
+
+That is, 1.001 is NOT the same as 1.01 and 1.1
+
+However, Gentoo's version scheme sees 1.001 similar to 1.001.000 which
+is similar to 1.1.0 and thus, similar to 1.1.
+
+Obviously this will not do, because when somebody says they need ">=1.05
+(g:1.5)" expecting "1.06 (g:1.6)", but instead get "1.009 (g:1.9)",
+things will break.
+
+Hence, detection of these cases and normalizing them is essential:
+
+  1.001 -> 1.1.0
+  1.01  -> 1.10.0
+  1.1   -> 1.100.0
+  1.05  -> 1.50.0
+  1.06  -> 1.60.0
+  1.009 -> 1.9.0
+
+  1.9.0 < 1.50.0 < 1.60.0
+
+The simplest use of this library is with the shipped tool,
+"gentoo-perlmod-version.pl"
+
+  gentoo-perlmod-version.pl --oneshot 1.06  # 1.6.0
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

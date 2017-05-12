@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         GPS-SpaceTrack
+version:      0.11
+version_from: lib/GPS/SpaceTrack.pm
+installdirs:  site
+requires:
+    Astro::Coord::ECI:             0
+    Astro::Coord::ECI::TLE:        0
+    Astro::SpaceTrack:             0
+    GD::Graph::Polar:              0.09
+    Geo::Functions:                0.05
+    GPS::PRN:                      0.04
+    Net::GPSD::Satellite:          0.3
+    strict:                        0
+    Time::HiRes:                   0
+    vars:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

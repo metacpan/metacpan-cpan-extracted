@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+examples/flexible
+examples/simple
+lib/Getopt/Mixed.pm
+t/00-all_prereqs.t
+t/00-load.t
+t/10-getopt.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

@@ -1,0 +1,30 @@
+---
+abstract: 'How long can you survive in a zombies attack'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>, Daniel Ruoso <ruoso@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Games-Zumbis
+requires:
+  Carp: 1.0
+  File::ShareDir: 1.02
+  FindBin: 1.0
+  Getopt::Long: 2.35
+  Locale::Maketext: 0
+  Mouse: 0.64
+  Path::Class: 0.19
+  Pod::Usage: 1.32
+  SDL: 2.518
+  XML::Compile: 1.16
+resources:
+  homepage: http://search.cpan.org/dist/Games-Zumbis
+  repository: http://github.com/ruoso/Zumbis
+version: 0.05

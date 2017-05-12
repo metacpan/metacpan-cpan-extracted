@@ -1,0 +1,104 @@
+
+2006-11-03 v0.10 Tels - 143 tests
+  * require Perl v5.8.1 (anything older is untested and unsupported!)
+  * bundle and use Module::Install
+  * update the distribution
+  * rename reset_ID() to _reset_ID() to mark it as internal
+  * add POD correctness and coverage tests
+  * fix all POD errors and ommisions, fix spellings and some grammer
+
+############################################################################## 
+Older revision history:
+
+2003-03-02 v0.01 Tels - 166 tests (first version)
+ * added Game::3D::Point, w/ 3D center
+ * added Game::3D::Area, Point plus 3D size and shape
+ * added Game::3D::Thingy, id, name, state, active/inactive, has outputs
+   and can receive/send signals
+ * added Game::3D::Signal, export the signal names
+ * added Game::3D::Link to link two thingies together (in more complicated
+     ways than just connecting the output from thingy #1 to thingy #2),
+     features count, initial delay, resend delay, one-shot, invert, fixed
+     output signal etc
+ * added Game::3D::Physical, isa Area and Thingy, plus mass
+ * added Game::3D::Living, a living thing (like NPCs etc)
+ * added Game::3D::Marker, isa Point and a Thingy
+ * added Game::3D::Trigger, isa Area and a Thingy
+
+2003-03-06 v0.02 Tels - 181 tests
+ added:
+  * basic tests for Trigger.pm
+  * Area: has rotation()
+ fixed:
+  * Game::3D::Point::center() renamed to pos()
+
+2003-03-08 v0.03 Tels - 180 tests
+ added:
+  * Thingy: load() and _construct(), load hirarchy and objects from text file
+  * example text-adventure game in ./examples showing class-hirarchy and level
+    loading code
+  * forgot to include trigger tests
+ Caveat: Some classes like Trigger, Living, Marker, Physical etc might be gone
+         from the next version, since they can be replaced by text-definitions
+         in the object hierarchy, completely!
+
+2004-02-29 v0.05 Tels - 73 tests
+  * removed anything except base classes: Thingy.pm, Link.pm and Signal.pm
+  * Links are by default OR gates, but can be switched to AND gate type
+  * Thingy: keep inputs
+  * Thingy: on DESTROY, remove links to and from us, and ourself from
+    parent Thingy 
+  * Thingy: del_input(), del_output(), unlink()
+  * Link: react to DIE, KILL, ACTIVATE, DEACTIVATE and don't relay them
+  * Thingy: react to DIE and KILL signals
+  * Thingy: don't relay ACTIVATE and DEACTIVATE signales
+
+2004-03-02 v0.06 Tels - 83 tests (not released)
+  * Sensor.pm: sense state change and trigger on them
+  * Thingy: inputs(), outputs(): IDs if input/output objects
+  * 3D.pm: wrote a lot of documentation to cover basics and details
+  * added: World.pm: contains everything
+
+2004-03-05 v0.07 Tels - 102 tests
+  * added Template.pm
+  * World.pm: update(), render(), register(), unregister(), thinkers()
+  * Thingy.pm: as_string()
+
+2004-03-20 v0.08 Tels - 111 tests
+  * SIGNAL_xxx to SIG_xxx
+  * removed SIG_KILL
+  * added 15 states (STATE_0..STATE_15) and signals so that you can send these
+    to objects to change their state
+  * added 15 signales (SIG_NOW_0..SIG_NOW_15) so objects can announce when
+    they finished changing their state
+  * SIG_ON and SIG_OFF (and their aliases) switch between STATE_0 and STATE_1
+  * World: cache time upon update, added method time()
+  * added an update() routine to Thingy so that state transitions can happen
+
+2004-03-21 v0.09 Tels - 129 tests
+  * Thingy:
+    + added get(), and fixed is() and make() for fields
+    + also Link, Sensor: call kill(), not DESTROY()
+    + kill() sends out SIG_KILLED
+    + don't output empty arrays/hashes in as_string()
+    + also Template: store states as key 'state_0', not under 'states->[0]'
+    + only unregister with world if actually contained in a world
+  * Templtate:
+    + fixed bug in from_string(), can now read more than one template in a row
+    + simplify as_string() output, from_string() reads back this format
+    + honour field 'base' to set base class ('Thingy', 'Link' etc)
+    + init_thing() has inheritance ('Foo::Bar' inherits defaults from 'Foo')
+    + fixed bug in init_thing() regarding existing fields
+    + init_thing() can deal with typeless defaults ("foo" vs STR="foo")
+  * Signal:
+    + added SIG_UNKNOWN
+    + map signal names <=> signal numbers (signal_name(), signal_by_name()) 
+  * World: 
+    + load templates really from a file, added tests for that
+    + find_template()
+  * added some more doc for methods in World, Template etc
+  
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

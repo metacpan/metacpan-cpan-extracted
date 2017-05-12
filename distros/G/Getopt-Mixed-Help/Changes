@@ -1,0 +1,91 @@
+Revision history for Perl extension Getopt::Mixed::Help.
+
+0.26	(04.05.2012)
+	requires now 5.8.9 cause Getopt::Long<2.37 has problems with arrays
+
+0.25	(07.03.2011-06.04.2012)
+	big rework: replaced Getopt::Mixed with Getopt::Long
+	fixed error message with modified help option
+
+0.24	(09.03.2012)
+	fixed tests for Carp >= 1.25
+
+0.23	(07.03.2011-10.08.2011)
+	added support for ARRAY defaults
+
+0.22	(20.02.2009)
+	still another fixed test for Windows
+
+0.21	(05.04.2008-18.12.2008)
+	hopefully finally fixed tests for Windows
+	added support of default constants
+	added Build.PL
+
+0.20	(31.10.2007)
+	improved path to Perl executable in test (failed on Cygwin)
+
+0.19	(29.07.2007)
+	skipping test with redirections if redirection doesn't work
+	made redirection tests robust for running with Devel::Coverage
+	added POD and POD coverage tests
+
+0.18	(21.01.2007)
+	fixed missing dependency for Getopt::Mixed
+
+0.17	(13.01.2007)
+	Improved abstract, renamed to Getopt::Mixed::Help
+
+0.16	(05.01.2007)
+	fixed arrays per option for options without short option
+
+0.15	(24.12.2006)
+	implemented arrays per option
+
+0.14	(20.12.2006)
+	implemented multiple options
+	improved test suite (maximum coverage)
+
+0.13	(17.12.2006)
+	refactored using Getopt::Mixed's flexible method instead simple method
+
+0.12	(16.12.2006)
+	implemented alternative help and debug options
+	implemented alternative texts
+	greatly improved documentation
+
+0.11	(07.12.2006)
+	created self-test and CPAN environment
+	prepared alternative help option
+
+0.10	(31.08.2006) 
+	fix for handling of optional strings:
+	If only the option is passed the variable is empty, if it is
+	not used the variable is undefined.
+
+0.09	(25.07.2006) 
+	added support for '{...|...}' parameter description
+
+0.08	(21.07.2006) 
+	removed obsolet "use lib"
+
+0.07	(04.10.2005) 
+	added automatic help text for parameters passed to parameterless
+	scripts (they have only options)
+
+0.06	(30.09.2005) 
+	added support for long options without short abbreviation
+
+0.05	(01.06.2005)
+	bugfix for handling of "one for all" environment variable
+
+0.04	(11.02.2005) 
+	added support for option's value identifier
+
+0.03	(14.12.2004) 
+	bugfix: disabled warning "only used once" for global option variables
+
+0.02	(07.12.2004) 
+	added better help for options
+
+0.01	(02.12.2004) 
+	original version

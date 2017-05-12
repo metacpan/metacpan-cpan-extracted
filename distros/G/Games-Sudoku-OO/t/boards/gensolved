@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use File::Basename;
+use strict;
+use warnings;
+use Games::Sudoku::OO::Board;
+
+die "usage: $0 testfile.txt\n" unless @ARGV;
+
+foreach (@ARGV){
+    solve($_);
+}	
+   
+
+sub solve {
+    my $board_file = shift;
+    my $board = new Games::Sudoku::OO::Board;
+    print STDERR "$board_file -> $board_file.solution\n";
+    
+    $board->importGrid($board_file);
+    
+    $board->solveAll;
+
+    open SOLVED, ">$board_file.solution" or die $!;
+    print SOLVED $board->toStr();
+    close SOLVED;
+
+}
+
+
+

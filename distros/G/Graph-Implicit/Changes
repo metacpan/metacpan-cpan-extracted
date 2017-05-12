@@ -1,0 +1,12 @@
+Revision history for Graph-Implicit
+
+0.03  9/27/2009
+    Actually... just switch to Heap::Fibonacci::Fast, it seems to be better
+    than Heap::Simple in general
+
+0.02  6/30/2009
+    Explicitly depend on Heap::Simple::Perl, to work around Heap::Simple's dumb
+    way of doing dependencies
+
+0.01  6/21/2009
+    Initial release

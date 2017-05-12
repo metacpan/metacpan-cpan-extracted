@@ -1,0 +1,6 @@
+LogicPuzzle.pm
+Makefile.PL
+MANIFEST
+README
+t/01-word-puzzle.t
+t/02-sudoku.t

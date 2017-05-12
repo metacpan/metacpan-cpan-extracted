@@ -1,0 +1,16 @@
+Revision history for Perl extension Gtk2::Ex::Dialogs.
+
+0.11 - Wed Jan 11 13:15:34 EDT 2006
+    - Fix for the getcwd() breakage which came from the abs_path fix. Yes, I suck.
+
+0.10 - Wed Oct  5 00:17:47 EDT 2005
+    - Fixes from ofey aikon:
+       - switched to File::Type from Gnome2::VFS for mime handling
+       - use abs_path instead of cwd
+
+0.09 - Fri Feb  4 17:39:22 EST 2005
+	- initial public release
+
+0.08 - Tue Sep 28 14:30:48 EDT 2004
+	- initial public release
+

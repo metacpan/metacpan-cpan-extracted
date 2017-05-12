@@ -1,0 +1,10 @@
+0.92 Fri Mar 24 13:08 2017
+   - Added parens around a qw() string that was breaking tests.
+     Thanks SREZIC!
+
+0.91 Sun Apr 3 12:46 2011
+   - Corrected skip in t/01index_handling.t so test will succeed
+     if Test::Exception is not installed.
+
+0.9 Sat Apr 2 14:54 2011
+   - Initial release.

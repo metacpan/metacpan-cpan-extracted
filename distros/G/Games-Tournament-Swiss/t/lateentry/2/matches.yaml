@@ -1,0 +1,143 @@
+---
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Black: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: ''
+      floats:
+        - ~
+        - Not
+      id: 101
+      name: Al
+      oldId: 101
+      pairingNumber: 1
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - White
+        sign: White
+      rating: 2000
+      roles:
+        - White
+      score: 1
+      scores:
+        1: ~
+      title: Mr.
+    White: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: ''
+      floats:
+        - ~
+        - Down
+      id: 104
+      name: Don
+      oldId: 104
+      pairingNumber: 6
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: ''
+      rating: 1940
+      roles:
+        - Bye
+      score: 1
+      scores:
+        1: Bye
+      title: Mr.
+  floats:
+    Black: ''
+    White: ''
+  result: ~
+  round: 2
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Black: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: Down
+      floats:
+        - ~
+        - Not
+      id: 103
+      name: Carl
+      oldId: 103
+      pairingNumber: 5
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - White
+        sign: White
+      rating: 1960
+      roles:
+        - White
+      score: 1
+      scores:
+        1: ~
+      title: Mr.
+    White: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: Up
+      floats:
+        - ~
+        - Not
+      id: 102
+      name: Bert
+      oldId: 102
+      pairingNumber: 3
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - Black
+        sign: Black
+      rating: 1980
+      roles:
+        - Black
+      score: 0
+      scores:
+        1: ~
+      title: Mr.
+  floats:
+    Black: Down
+    White: Up
+  result: ~
+  round: 2
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Black: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 2
+      floats: []
+      id: 202
+      name: Bertha
+      oldId: 202
+      pairingNumber: 4
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: ''
+      rating: 1970
+      scores: ~
+      title: Ms.
+    White: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floater: ''
+      floats:
+        - ~
+        - Not
+      id: 201
+      name: Ally
+      oldId: 201
+      pairingNumber: 2
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 1
+        lastTwo:
+          - Black
+        sign: Black
+      rating: 1990
+      roles:
+        - Black
+      score: 0
+      scores:
+        1: ~
+      title: Ms.
+  floats:
+    Black: ~
+    White: ''
+  result: ~
+  round: 2

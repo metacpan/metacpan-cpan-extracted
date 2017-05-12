@@ -1,0 +1,19 @@
+---
+abstract: unknown
+author:
+  - 'Jarkko Hietaniemi <jhi@iki.fi>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graph
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: git://github.com/neilbowers/Graph.git
+version: '0.9704'

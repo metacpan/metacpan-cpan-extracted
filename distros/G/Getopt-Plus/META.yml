@@ -1,0 +1,27 @@
+---
+name: Getopt-Plus
+version: 0.99
+author:
+  - 'Martyn J. Pearce C<fluffy@cpan.org>'
+abstract: 'Options wrapper with standard options, help system and more'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  IPC::Run: 0.44
+requires:
+  Class::MethodMaker: 1.04
+  IPC::Run: 0.44
+  List::Util: 1.06
+  Log::Info: 1.13
+  Pod::Usage: 1.12
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Getopt::Plus:
+    file: lib/Getopt/Plus.pm
+    version: 0.99
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

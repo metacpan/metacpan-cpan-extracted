@@ -1,0 +1,115 @@
+NAME
+    Global::Rainbow::Map - make the world look like a rainbow, but usefully
+
+SYNOPSIS
+     my $map = Global::Rainbow::Map->new(
+       gb => 'red',
+       ca => 'orange',
+       in => 'yellow',
+       nz => 'green',
+       au => 'blue',
+       lk => 'purple',
+     );
+     print $map->svg;
+
+DESCRIPTION
+    Global::Rainbow::Map generates a map of the world (Robinson projection)
+    with each country shaded whatever colour you like. In fact, you can even
+    choose colours that don't appear in the rainbow... like magenta!
+
+    The possibilities for such a module are clearly endless. If you had a
+    table listing per-capita alcohol consumption, you could create a map of
+    the world in different colours to illustrate per-capita alcohol
+    consumption. Or if you had a table of which countries had won the most
+    Olympic medals for swimming, then you could create a map of the world in
+    different colours to illustrate which countries had won the most Olympic
+    medals for swimming.
+
+    The template map used is Wikipedia's public domain blank world map
+    <http://en.wikipedia.org/wiki/File:BlankMap-World6.svg>, the 14 Feb 2012
+    revision.
+
+  Constructor
+    `new(%colours)`
+        Creates a new map. The hash is a list of country code to colour
+        pairings.
+
+        Country codes are typically ISO 3166-1 two letter codes. If you don't
+        know the code for a particular country, Locale::Country can help you
+        out. There are a number of additional codes like "eu" (the whole
+        European Union) and "aq" (Antarctica). These codes are all lower case.
+
+        Colours can be hexadecimal codes like '#ff0000' or named colours from
+        the SVG or X11 palettes. Countries not coloured will remain a pale
+        grey.
+
+        Hash keys which do not match the regular expression
+        `/^[a-z][a-z0-9-]*[a-z0-9]$/`, in particular hash keys starting with a
+        hyphen are reserved for future use.
+
+  Object Methods
+    The useful ones:
+
+    `svg`
+        Returns the coloured SVG map as a string.
+
+    `libxml_document`
+        Returns the same coloured SVG map, but as an XML::LibXML::Document.
+
+    Somewhat less useful for everyday use, but may be useful for people
+    subclassing this module...
+
+    `countries`
+        Returns the list of country codes which have been explicitly assigned
+        a colour (i.e. the keys to the hash given in the constructor).
+
+    `colour_for_country($country_code)`
+        Returns the colour for a country, as a blessed Color::Library::Color
+        object.
+
+        Will return undef if the country has not been explicitly assigned a
+        colour.
+
+    `generate_css`
+        Generates the CSS that would be inserted into the SVG output.
+
+  Class Methods
+    Again, these are mostly useful for people subclassing the module.
+
+    `get_template`
+        Returns the template used for maps as an XML::LibXML::Document.
+
+        Fetching the template and modifying it using DOM methods will affect
+        all maps subsequently generated for the lifetime of the process. So
+        beware.
+
+    `clone_template`
+        As per `get_template`, but returns a clone of the template.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Global-Rainbow-Map>.
+
+SEE ALSO
+    <http://commons.wikimedia.org/wiki/File_talk:BlankMap-World6.svg/Documenta
+    tion>.
+
+    <http://www.biotele.com/magenta.html>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Toby Inkster, 2012. No rights reserved.
+
+    To the extent possible under law, Toby Inkster has waived all copyright
+    and related or neighboring rights to Global::Rainbow::Map. This work is
+    published from: United Kingdom.
+
+    <http://creativecommons.org/publicdomain/zero/1.0/>.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

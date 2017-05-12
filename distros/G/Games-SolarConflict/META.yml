@@ -1,0 +1,44 @@
+---
+abstract: 'Spacewar! clone'
+author:
+  - 'Jeffrey T. Palmer <jtpalmer@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Games-SolarConflict
+requires:
+  File::ShareDir: 0
+  FindBin: 0
+  Math::Trig: 0
+  Mouse: 0
+  Mouse::Role: 0
+  Path::Class: 0
+  SDL: 2.532
+  SDL::Color: 0
+  SDL::Event: 0
+  SDL::Events: 0
+  SDL::GFX::Primitives: 0
+  SDL::Rect: 0
+  SDLx::App: 0
+  SDLx::Controller::Interface: 0
+  SDLx::Controller::State: 0
+  SDLx::Sprite: 0
+  SDLx::Sprite::Animated: 0
+  SDLx::Surface: 0
+  SDLx::Text: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/jtpalmer/Games-SolarConflict/issues
+  homepage: https://github.com/jtpalmer/Games-SolarConflict
+  repository: https://github.com/jtpalmer/Games-SolarConflict.git
+version: 0.000001

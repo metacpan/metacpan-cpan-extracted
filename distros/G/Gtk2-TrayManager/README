@@ -1,0 +1,9 @@
+
+The EggTrayManager library is used internally by GNOME to implement the
+server-side of the Notification Area (or system tray) protocol.
+Gtk2::TrayManager allows you to create notification area applications using
+Gtk2-Perl.
+
+The module requires Gtk2 to be installed. But includes the code for
+eggtraymanager in the distribution.
+

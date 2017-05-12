@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+hpserial.pm
+hpserial.xs
+test.pl
+typemap
+gpib.h

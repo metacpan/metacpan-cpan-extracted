@@ -1,0 +1,123 @@
+Revision history for Perl extension Geo::BUFR.
+1.36 2016-12-02
+- Fixes in code and test scripts allowing for parallell testing and
+  for bufrextract.pl to work on Windows
+1.35 2016-11-29
+- New utility program bufrextract.pl, for extraction of BUFR messages
+  and/or AHLs from BUFR file(s), possibly filtering on AHL
+- New methods get_bufr_message(), bad_bufrlength() and
+  ahl_is_reused(), all needed by bufrextract.pl
+- AHLs extracted also when BUFR messages are given as argument to new()
+  (instead of read from file)
+1.34 2016-07-12
+- Fixed "Insecure dependency in sprintf" when running under -T switch
+  introduced in 1.32.
+1.33 2016-04-22
+- Changed quoting in some test scripts, needed to pass 'make test' on
+  Windows.
+1.32 2016-04-18
+- Added option of skipping decoding of section 4 either globally: new
+  method set_nodata(), or in a filter fashion: new method
+  set_filter_cb() takes a user defined callback function as argument
+  for filtering on AHL and metadata in section 0-3.
+- New method reuse_current_ahl() for settling what get_current_ahl()
+  should return when the processed BUFR message has no immediately
+  preceding AHL.
+- New options --nodata and --ahl in bufrread.pl for skipping section 4
+  and filtering on AHL.
+- Decoded decimal values now displayed with the precision provided for
+  in BUFR. E.g. "0.0" instead of "0" for value=0 and scale=1.
+- Supporting decoding of BUFR messages missing descriptors to be
+  repeated (when corresponding delayed replication/repetition factor
+  in section 4 is 0 and this is last data item).
+1.31 2015-03-11
+- Fix in bufralter.pl to hopefully make it work on Windows.
+1.30 2015-03-05
+- Fixed bug in a test script, causing make test to fail on some systems.
+1.29 2015-03-04
+- Fixed bug introduced in 1.26: bytes for local use by ADP centres in
+  section 1 weren't always reset when handling multiple messages.
+- No longer uses File::Slurp (so all modules required should now be
+  part of a standard Perl distribution).
+1.28 2015-02-27
+- If local table cannot be found, try master table instead.
+- Supporting encoding of data description operator 206Y.
+- Default tables for utility programs changed to master table version 23.
+1.27 2014-05-23
+- Bugfix for data description operator 237000.
+- Strict checking for 0 subsets.
+1.26 2014-05-07
+- For BUFR messages with errors, start searching for next BUFR message
+  right after 'BUFR' (length in section 0 should not be trusted). Last
+  call to next_observation in 'while (not $bufr->eof())' loops is now
+  likely to return empty list.
+- No BUFR message in file is no longer considered an error.
+- Strict checking for missing CCITTIA5 value encoded as spaces.
+- New verbose level 6 (useful for inspecting BUFR messages with errors).
+1.25 2013-09-13
+- Supporting data description operators 232000 and 232225.
+1.24 2013-08-28
+- Bugfix in bufrread.pl (when running with --strict_checking 2).
+- Strict_checking for (reserved) 0 bits 3-8 in octet 7 in section 3.
+- Default tables for utility programs changed to master table version 19.
+1.23 2013-05-14
+- Supporting data description operators 207Y and 235000.
+- Several bugfixes related to bit maps.
+1.22 2013-04-03
+- Format of ECMWF tables version 15-17 changed slightly from previous
+  versions, requiring some changes in processing.
+- Strict checking for value encoded using BUFR compression which would
+  be too big to encode without compression.
+- Had to change a test script because newer versions of perl might add
+  a '.' to end of warning/error messages.
+1.21 2012-02-06
+- Better recovery from some error conditions (like table D descriptor
+  not found).
+- Strict_checking for character data not being CCITTIA5.
+1.20 2011-03-08
+- Supporting delayed repetition (031011,031012)
+- Allow total length of BUFR message as stated in section 0 to be
+  bigger than actual length (if $Strict_checking not set).
+- Strict_checking for null characters in CCITTIA5 data.
+- New option --on_error_stop to bufrread.pl.
+- copy_from altered to copy also section 2 if copying of metadata is
+  requested. Makes bufralter.pl work for messages with optional section.
+1.19 2010-11-29
+- Bugfix in bufrread.pl --filter
+- If local table version is 255, treat this as if it was 0 when
+  finding which table to use.
+1.18 2010-09-30
+- join_subsets altered to always respect order of subsets specified
+- encode_nil_message altered to set number of subsets to 1 and data
+  compression to 0, saving user from remembering this.
+1.17 2010-09-14
+- Data description operator 208Y implemented.
+1.16 2010-07-21
+- Strip trailing nulls from CCITTIA5 data.
+- dumpsections() now takes optional argument for controlling width and
+  whether bitmapped values are displayed side by side.
+- copy() renamed to copy_from().
+- Use looks_like_number from Scalar::Util to check that numeric input
+  to encoding routines is indeed numeric.
+1.15 2010-07-02
+- clone() replaced with copy() with somewhat different syntax.
+- New methods rewind() and join_subsets().
+- Added optional parameter to encode_nil_message() making it possible
+  to set delayed replication factors > 1.
+- Default tables for utility programs changed to master table version 14.
+1.14  2010-05-18
+- Apply binmode to filehandle in fopen.
+- Added two more methods for extracting info from BUFR B and D tables.
+1.13  2010-05-07
+- Bugfix in dec2bitstream: could cause rounding errors when encoding
+  big width numerical values.
+1.12  2010-04-13
+- Test script t/bufralter.t: fixed a quoting bug.
+1.11  2010-04-12
+- Test scripts: removed shebang line and use Config to find perl path.
+1.1   2010-04-09
+- Resolving of flag values fixed to work for big endian platforms.
+- Scaling of values fetched from bitstream transferred from BUFR.xs
+  to BUFR.pm, resulting in new signature for method bitstream2dec.
+1.0 2010-04-06
+- First release for CPAN.

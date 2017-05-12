@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Gtk2/Ex/NumberRange.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/show-range.t
+t/show-range-visible.t
+examples/number-range.pl
+examples/number-range-popup.pl

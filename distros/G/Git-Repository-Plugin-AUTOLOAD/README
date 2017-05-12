@@ -1,0 +1,45 @@
+NAME
+
+Git::Repository::Plugin::AUTOLOAD
+
+SYNOPSIS
+
+    use Git::Repository 'AUTOLOAD';
+
+    my $r = Git::Repository->new();
+
+    $r->add($file);
+    $r->commit( '-m' => 'message' );
+
+    # NOTE: might be overridden by the 'Log' plugin
+    my $log = $r->log('-1');
+
+    # use "_" for "-" in command names
+    my $sha1 = $r->rev_parse('master');
+
+    # can be used as a class method
+    Git::Repository->clone( $url );
+
+DESCRIPTION
+
+This module adds an "AUTOLOAD" method to Git::Repository, enabling it
+to automagically call git commands as methods on Git::Repository
+objects.
+
+SEE ALSO
+
+Git::Repository, Git::Repository::Plugin.
+
+AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+COPYRIGHT
+
+Copyright 2014-2016 Philippe Bruhat (BooK), all rights reserved.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

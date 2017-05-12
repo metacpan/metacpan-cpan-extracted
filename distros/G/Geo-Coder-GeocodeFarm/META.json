@@ -1,0 +1,54 @@
+{
+   "abstract" : "Geocode addresses with the GeocodeFarm API",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-Coder-GeocodeFarm",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::RequiresInternet" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "URI" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::Coder::GeocodeFarm" : {
+         "file" : "lib/Geo/Coder/GeocodeFarm.pm",
+         "version" : "0.0402"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/perl-Geo-Coder-GeocodeFarm/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perl-Geo-Coder-GeocodeFarm"
+      }
+   },
+   "version" : "0.0402"
+}

@@ -1,0 +1,27 @@
+Revision history for Perl extension Getopt-Kingpin
+
+0.06 2016-11-03T13:56:23Z
+
+    - Support global flag in sub-command
+        - ref t/23_command.t (command help 9-2)
+    - Fix meta data for metacpan
+
+0.05 2016-11-02T12:39:12Z
+
+    - Support perl 5.8.1 or later
+    - Use Object::Simple
+
+0.04 2016-09-22T04:26:28Z
+
+    - Support hidden flag
+    - Change default value of app name
+    - Fix default value of list arg/flag
+
+0.03 2016-08-22T05:29:18Z
+
+    - fix some bugs
+
+0.02 2016-08-04T06:29:47Z
+
+    - original version
+

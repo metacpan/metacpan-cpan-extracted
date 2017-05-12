@@ -1,0 +1,31 @@
+Revision history for Games::Blackjack
+
+0.04  01/25/2004
+      * Fixed what was suspected to be a bug in Quantum::Superpositions, 
+        but was indeed a bug in Games::Blackjack, as Damian Conway pointed 
+        out: To access eigenstates in nested superpositions, they need to 
+        be flattened out. So if
+            $count = any(any(2,12),any(12,22))
+        then $count <= 21 will return both nested superpositions, 
+        any(2,12) and any(12,22), resulting in any(2,12,22) for the 
+        superposition's eigenstates. Instead,
+            $count = any(map {eigenstates $_} any(2,12), any(12,22))
+        will flatten out the eigenstates and have $count <= 21 return
+        any(2,12), as expected.
+
+0.03  12/07/2003
+      * Updated docs for CPAN release
+
+0.02  12/01/2003
+      * Fixed bug with shuffle(), see
+        http://www.perlmeister.com/errata/2003-12-Snapshot/
+
+0.01  11/01/2003
+      * First public release in an issue of the monthly "Perl Snapshot",
+        a column in the Germany-based "Linux-Magazin" 
+        (http://www.linux-magazin.de/Artikel/ausgabe/2003/12/perl/perl.html)
+        and the UK-based "Linux-Magazine" 
+        (http://www.linux-magazine.com/issue/38).
+
+TODO:
+      * Add doubling/splitting of hands

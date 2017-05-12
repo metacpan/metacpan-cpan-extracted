@@ -1,0 +1,68 @@
+#!perl
+
+use strict;
+use warnings;
+use Games::SGF::Go::Rotator;
+
+my $sgf = Games::SGF::Go::Rotator->new();
+
+my($rotate, $infile, $outfile) = (180, '-', '-');
+
+=head1 NAME
+
+sgfrotate
+
+=head1 DESCRIPTION
+
+Rotate an SGF record of a game of Go
+
+=head1 ARGUMENTS
+
+  $ sgfrotate [90|180] [infile|- [outfile|-]]
+
+The defaults are to rotate by 180 degrees and read/write STDIN/OUT.
+
+=head1 SEE ALSO
+
+Games::SGF::Go::Rotator
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+Copyright 2010 David Cantrell E<lt>david@cantrell.org.ukE<gt>
+
+This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence.  It's up to you which one you use.  The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+
+=cut
+
+my $arg = shift;
+if($arg) {
+  if($arg =~ /^-?-h(elp)?$/) {
+    system(qw(perldoc -T), $0);
+    exit(0);
+  }
+  elsif($arg =~ /^(9|18)0$/) { $rotate = $arg; }
+   else { unshift @ARGV, $arg; }
+
+  $arg = shift;
+  if($arg) {
+    if(-r $arg && (-l $arg || -f $arg)) { $infile = $arg }
+     elsif($arg ne '-') { die("$0: $arg: can't read\n") }
+
+    $arg = shift;
+    if($arg) {
+      if(!-e $arg || (-w $arg && (-f $arg || -l $arg))) { $outfile = $arg; }
+       elsif($arg ne '-') { die("$0: $arg: can't write\n") }
+    }
+  }
+}
+
+undef $/;
+
+if($infile eq '-') { $sgf->readText(<STDIN>); }
+ else { $sgf->readFile($infile); }
+
+if($rotate == 90) { $sgf->rotate90() }
+ else { $sgf->rotate(); }
+
+if($outfile eq '-') { print $sgf->writeText(); }
+ else { $sgf->writeFile($outfile); }

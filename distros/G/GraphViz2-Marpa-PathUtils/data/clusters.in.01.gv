@@ -1,0 +1,6 @@
+digraph graph_01
+{
+	node [color = red]
+
+	A
+}

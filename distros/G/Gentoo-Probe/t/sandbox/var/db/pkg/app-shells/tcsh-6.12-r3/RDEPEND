@@ -1,0 +1,3 @@
+virtual/glibc
+	>=sys-libs/ncurses-5.1
+	perl? ( dev-lang/perl ) 

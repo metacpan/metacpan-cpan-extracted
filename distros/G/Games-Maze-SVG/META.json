@@ -1,0 +1,51 @@
+{
+   "abstract" : "Build mazes in SVG.",
+   "author" : [
+      "G. Wade Johnson <gwadej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Maze-SVG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Games::Maze" : "1.02",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gwadej/Games-Maze-SVG.git",
+         "web" : "https://github.com/gwadej/Games-Maze-SVG"
+      }
+   },
+   "version" : "0.9"
+}

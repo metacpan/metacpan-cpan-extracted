@@ -1,0 +1,34 @@
+--- #YAML:1.0
+name:               Games-Go-SGF2misc
+version:            0.9782
+abstract:           ~
+author:  []
+license:            GPL
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CGI:             0
+    Compress::Zlib:  0
+    Data::Dumper:    0
+    Devel::Size:     0
+    GD:              2.12
+    Number::Format:  0
+    Parse::Lex:      2.19
+    perl:            5.006001
+    Time::HiRes:     0
+resources:
+    repository:  http://github.com/jettero/SGF2misc
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - go
+    - sgf

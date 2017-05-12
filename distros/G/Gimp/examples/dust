@@ -1,0 +1,144 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+# this is silly, sorry that I am too dumb to come up with niftier functions :(
+# btw, this should generate something between 1/f and 1/f² noise.
+{
+   my @weight = (1/8, 1/4, 1/2, 1);
+   my @dice;
+   my $total = 0;
+   my $tweight = 0;
+   my $n = 0;
+   my $seed;
+
+   sub gen_rand() {
+      my ($prevrand, $newrand, $k);
+
+      $n++;
+      for (0..$#weight) {
+         if ($n & (1<<$_)) {
+            $prevrand = $dice[$_];
+            $newrand = rand() * $weight[$_];
+            $dice[$_] = $newrand;
+            $total += $newrand - $prevrand;
+         }
+      }
+
+      $total / $tweight;
+   }
+
+   sub set_seed($) {
+      if ($_[0]) {
+         srand $_[0];
+      } else {
+         srand;
+      }
+      $total = 0;
+      $tweight = 0;
+      for (0..$#weight) {
+         $dice[$_] = rand()*$weight[$_];
+         $total += $dice[$_];
+         $tweight += $weight[$_];
+      }
+   }
+}
+
+# the next line  just shows a graph of the "random" numbers.
+#set_seed 0; use PDL; use PDL::Graphics::PGPLOT; line(pdl(float,map gen_rand, 1..500));
+
+podregister {
+  $length *= 0.75;
+  set_seed $seed;
+  my ($w, $h) = ($image->width, $image->height);
+  $image->undo_group_start;
+  Gimp::Context->push;
+  Gimp::Context->set_foreground("white");
+  my $brush = Gimp->brush_duplicate("Circle (01)");
+  Gimp::Context->set_brush($brush);
+  Gimp::Brushes->set_spacing($brush, 100);
+  Gimp::Context->set_opacity(50);
+  Gimp::Context->set_paint_mode(NORMAL_MODE);
+  $drawable = $image->add_new_layer (0, TRANSPARENT_FILL, 1);
+  $drawable->set_mode (DIFFERENCE_MODE);
+  for (1..($w*$h*$density)) {
+    my ($x, $y) = (rand $w, rand $h);
+    my $l = int($length + rand $length);
+    my @c;
+    my $b = 0;
+    for (1..$l) {
+       push @c, $b += 5*(gen_rand-0.5);
+       push @c, $b += 5*(gen_rand-0.5);
+    }
+    $drawable->paintbrush_default([map { $x+$c[$_], $y+$c[$_+$l] } 0..$l-1]);
+  }
+  Gimp::Context->pop;
+  $image->undo_group_end;
+  ();
+};
+
+#register "gen_rand_1f",
+#         "generate 1/f noise",
+#         "Generate approximate 1/f (white) noise in the range [0,1[",
+#         "Marc Lehmann",
+#         "Marc Lehmann <pcg\@goof.com",
+#         "0.1",
+#         "<None>",
+#         undef,
+#         # Eingabeparameter
+#         # Typ		Name		Beschreibung		Wert
+#         [
+#          [PF_FLOAT,	'count',	'the number of values',	 1],
+#          [PF_INT32,	'seed',		'the random seed (0 == unspecified)', 0],
+#         ],
+#         [
+#          [&Gimp::PDB_FLOATARRAY,'noise','the requested number of 1/f noise values'],
+#         ],
+#         sub {
+#            my ($count, $seed) = @_;
+#            set_seed $seed;
+#            [map gen_rand_1f, 1..$count];
+#         };
+
+exit main;
+__END__
+
+=head1 NAME
+
+dust - Add dust to image
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Render/Add Dust...
+
+=head1 DESCRIPTION
+
+Add the appearance of dust to an image.
+
+=head1 PARAMETERS
+
+  [PF_FLOAT,	'density',	'Dust density in dust/pixel',	 0.0001],
+  [PF_INT32,	'seed',		'Random seed (0 == unspecified)', 0],
+  [PF_SPINNER,	'length',	'Average dust corn length', 50, [1,300]],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+Version 0.1
+
+=head1 LICENSE
+
+Copyright Marc Lehmann.
+
+Distributed under the same terms as Gimp-Perl.

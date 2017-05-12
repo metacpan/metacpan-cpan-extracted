@@ -1,0 +1,25 @@
+TYPEMAP
+aglo_graph		T_PTROBJ_TOPOLOGY
+aglo_state		T_PTROBJ_GRAPH
+aglo_force		T_PTROBJ_FORCE
+aglo_real		T_DOUBLE
+aglo_boolean		T_BOOL
+aglo_unsigned		T_UV
+aglo_vertex		T_UV
+aglo_signed		T_IV
+
+INPUT
+T_PTROBJ_TOPOLOGY
+        $var = C_OBJECT($arg, \"Graph::Layout::Aesthetic::Topology\",\"$var\");
+T_PTROBJ_GRAPH
+        $var = C_OBJECT($arg, \"Graph::Layout::Aesthetic\", \"$var\");
+T_PTROBJ_FORCE
+        $var = C_OBJECT($arg, \"Graph::Layout::Aesthetic::Force\", \"$var\");
+
+OUTPUT
+T_PTROBJ_TOPOLOGY
+	sv_setref_pv($arg, \"Graph::Layout::Aesthetic::Topology\", (void*)$var);
+T_PTROBJ_GRAPH
+	sv_setref_pv($arg, \"Graph::Layout::Aesthetic\", (void*)$var);
+T_PTROBJ_FORCE
+	sv_setref_pv($arg, \"Graph::Layout::Aesthetic::Force\", (void*)$var);

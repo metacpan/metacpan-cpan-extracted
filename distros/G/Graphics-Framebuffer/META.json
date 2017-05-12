@@ -1,0 +1,52 @@
+{
+   "abstract" : "A Simple Framebuffer Graphics Library",
+   "author" : [
+      "Richard Kelsch <rich@rk-internet.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graphics-Framebuffer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "List::Util" : "1.20",
+            "Test::Most" : "0.30"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "Inline::MakeMaker" : "0.45"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "0.91",
+            "Inline" : "0.53",
+            "Inline::C" : "0.53",
+            "List::Util" : "1.20",
+            "Math::Bezier" : "0.01",
+            "Math::Gradient" : "0.03",
+            "Math::Trig" : "1.10",
+            "Sys::Mmap" : "0.16",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "6.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

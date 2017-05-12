@@ -1,0 +1,85 @@
+##-*- Mode: Change-Log; indent-width: 8; -*-
+##
+## Change Log for perl package Gfsm::XL
+
+v0.10 Wed, 24 Feb 2016 09:10:10 +0100 mooocow
+	* added CONFIGURE_REQUIRES to fix RT bug #112321
+
+v0.09 Mon, 22 Feb 2016 13:27:54 +0100 moocow
+	* external c library dependencies now use Alien::Gfsm, Alien::GfsmXL
+
+v0.08 Fri, 25 Sep 2015 13:54:34 +0200 moocow
+	* renamed distribution to Gfsm::XL for CPAN-friendliness
+	* added README, Changes
+
+v0.07 2013-05-08  moocow
+	* [r716] GfsmXLPerl.c, XL.pm, perlobject.map: + gfsmxl-perl v0.07:
+	  use GINT_TO_POINTER and friends for pointer-int conversions
+	  - shuts up gcc-4.7 (debian wheezy) compiler warnings
+
+v0.06 2012-11-20  moocow
+	* [r713] testme.perl: + added DEBUG_DO for lookup_free_inline debug
+	  message
+	* [r712] testme.perl: + cleaned up testme.perl a bit
+	* [r709] gfsm-indexed-dump.perl, testme.perl: + hunted 'sezen ->
+	  *setze (!=setzen)' bug
+	  - problem was mis-constructed upper bounds in gfsmxlArcBlockIndex
+	  in gfsmxlLabelIndex.c
+	  - symptom was non-NULL app with NULL app_max in
+	  gfsmxl_arcrange_open_block_index() (gfsmxlLabelIndex.hi:79)
+	  - see src/libgfsmxl/tests/maxbug.txt
+
+v0.06 2012-11-19  moocow
+	* [r705] GfsmXLPerl.c, XL/Cascade.pm, gfsm-indexed-dump.perl,
+	  testme.perl: added debugging utility gfsm-indexed-dump.perl --
+	  still no joy really
+	* [r704] Cascade.xs, GfsmXLPerl.c, GfsmXLPerl.h, Lookup.xs,
+	  XL/Cascade.pm, XL/Cascade/Lookup.pm: + fixes for set_nth (still
+	  weird perl bug with setzen/sezen)
+	* [r703] XL/Cascade/Lookup.pm: + added rudimentary docs (summary)
+	  for Gfsm::XL::Cascade::Lookup
+
+v0.06 2012-11-16  moocow
+	* [r701] Cascade.xs, GfsmXLPerl.c, GfsmXLPerl.h, csc2.tfst,
+	  testme.perl: + added cascade set_nth() and pop() methods for
+	  dynamic target-language switching
+	* [r700] Cascade.xs, GfsmXLPerl.c, GfsmXLPerl.h, Makefile.PL,
+	  XL.pm, XL/Cascade.pm, XL/Cascade/Lookup.pm: + added cascade
+	  methods pop(), set(N,XFSM)
+	* [r699] t/01_ini.t: + verbose t/01_ini.t
+
+v0.05 2012-03-19  moocow
+	* [r690] Makefile.PL: * set default OPTIMIZE key in Makefile.PL
+
+v0.05 2011-10-21  moocow
+	* [r661] Cascade.xs, GfsmXLPerl.c, Lookup.xs, XL.xs, testme.perl: +
+	  chased memory bugs appearing with new slice allocators
+	  - seems to work now (small dta subset eqrw db builds ok)
+
+v0.05 2011-10-20  moocow
+	* [r655] GfsmXLPerl.c, XL.pm: + Gfsm::XL v0.05: updated for gfsmxl
+	  v0.0.10, gfsm v0.0.10: slice allocators
+
+v0.04 2011-04-06  moocow
+	* [r626] XL.pm, typemap: + v0.04: typemap fix for empty label
+	  vectors (e.g. lookup)
+
+v0.03 2009-07-24  moocow
+	* [r599] XL.pm, XL/Cascade/Lookup.pm, testme.perl: + v0.03: added
+	  Storable I/O for Gfsm::XL::Cascade::Lookup
+
+v0.02 2008-02-04  moocow
+	* [r527] GfsmPerl.h, MANIFEST, MANIFEST.SKIP, t, t/.cvsignore,
+	  t/01_ini.t, t/common.plt: + added MANIFEST etc.
+	* [r525] gfsm-all-final.perl: + added gfsm-all-final.perl: what was
+	  this for again?
+
+v0.02 2008-01-21  moocow
+	* [r519] ., .cvsignore, XL.pm, XL/Cascade/Lookup.pm, testme.perl: +
+	  added alias lookup() -> lookup_best() for
+	  Gfsm::XL::Cascade::Lookup
+
+v0.01 2008-01-09  moocow
+	* [r494] GfsmXLPerl.c, GfsmXLPerl.h, Lookup.xs, Makefile.PL, XL.xs,
+	  testme.perl, typemap: + added Lookup.xs
+

@@ -1,0 +1,88 @@
+Guard-Stats
+
+Guard::Stats - Guard object generator with utilisation meters.
+
+BASIC USAGE
+
+Suppose we have a long-running application making heavy use of closures,
+and need to monitor the lifetimes of those. So...
+
+    # in initial section
+    use Guard::Stats;
+    my $stat = Guard::Stats->new;
+
+    # when running
+    my $guard = $stat->guard;
+    my $callback = sub {
+        $guard->end("taken route 1");
+        # now do useful stuff
+    };
+    # ... do whatever I need and call $callback eventually
+
+    # in diagnostic procedures started via external event
+    my $data = $stat->get_stat;
+    warn "$data->{running} instances still running";
+
+METER TABLE
+
+Statistics show numbers of guards for which end()/DESTROY() were called
+in various combinations.
+
+    DESTROY: *        0        1
+    end:*    total+   alive    dead
+    end:0    ?        running  broken+
+    end:1    done+    zombie   complete+
+
+A "+" marks values directly measured by Guard::Stats. They all are monotonous.
+Other counterss are derived from these.
+
+TIME AND LEVELS
+
+The on_level( [-] $n, CODEFER ) method allows to perform certain actions
+upon guard count changes. (-$n means "count decreased to $n").
+
+With a helper class provided, also life times of guards can be measured.
+
+See perldoc for more.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Guard::Stats
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Guard-Stats
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Guard-Stats
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Guard-Stats
+
+    Search CPAN
+        http://search.cpan.org/dist/Guard-Stats/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Konstantin S. Uvarin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

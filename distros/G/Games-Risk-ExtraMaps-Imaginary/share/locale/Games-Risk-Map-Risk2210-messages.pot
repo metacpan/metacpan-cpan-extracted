@@ -1,0 +1,360 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR 'Jerome Quelin'
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Games-Risk-ExtraMaps-Imaginary\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-09-26 15:19+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Games/Risk/Map/Risk2210.pm:27
+msgid "Risk 2210 Map"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:37
+msgid "North America"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:38
+msgid "South America"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:39
+msgid "Europe"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:40
+msgid "Africa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:41
+msgid "Asia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:42
+msgid "Australia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:43
+msgid "US Pacific"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:44
+msgid "Asia Pacific"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:45
+msgid "North Atlantic"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:46
+msgid "South Atlantic"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:47
+msgid "Indian"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:55
+msgid "Northwestern Oil Emirate"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:56
+msgid "Nunavut"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:57
+msgid "Exiled States of America"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:58
+msgid "Alberta"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:59
+msgid "Canada"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:60
+msgid "Republique du Quebec"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:61
+msgid "Continental Biospheres"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:62
+msgid "American Republic"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:63
+msgid "Mexico"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:64
+msgid "Nuevo Timoto"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:65
+msgid "Andean Nations"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:66
+msgid "Amazon Desert"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:67
+msgid "Argentina"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:68
+msgid "Iceland GRC"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:69
+msgid "Jotenheim"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:70
+msgid "Ukrayina"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:71
+msgid "New Avalon"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:72
+msgid "Warsaw Republic"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:73
+msgid "Andorra"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:74
+msgid "Imperial Balkania"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:75
+msgid "Saharan Empire"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:76
+msgid "Egypt"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:77
+msgid "Zaire Military Zone"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:78
+msgid "Ministry of Djibouti"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:79
+msgid "Lesotho"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:80
+msgid "Madagascar"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:81
+msgid "Siberia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:82
+msgid "Enclave of the Bear"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:83
+msgid "Hong Kong"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:84
+msgid "Afghanistan"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:85
+msgid "Middle East"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:86
+msgid "United Indiastan"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:87
+msgid "Angkhor Wat"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:88
+msgid "Sakha"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:89
+msgid "Alden"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:90
+msgid "Khan Industrial State"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:91
+msgid "Japan"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:92
+msgid "Pevek"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:93
+msgid "Java Cartel"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:94
+msgid "New Guinea"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:95
+msgid "Aboriginal League"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:96
+msgid "Australian Testing Ground"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:97
+msgid "Sung Tzu"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:98
+msgid "Neo Tokyo"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:99
+msgid "Poseidon"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:100
+msgid "Hawaiian Preserve"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:101
+msgid "New Atlantis"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:102
+msgid "Western Ireland"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:103
+msgid "New York"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:104
+msgid "Nova Brasilia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:105
+msgid "Neo Paulo"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:106
+msgid "The Ivory Reef"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:107
+msgid "South Ceylon"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:108
+msgid "Microcorp"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:109
+msgid "Akara"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:187
+msgid "Conquer the continents of Asia and South America."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:188
+msgid ""
+"Conquer the continents of Europe and Australia and a third continent of your "
+"choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:189
+msgid "Conquer the continents of Asia and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:190
+msgid ""
+"Conquer the continents of Europe and South America and a third continent of "
+"your choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:191
+msgid "Conquer the continents of North America and Australia."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:192
+msgid "Conquer the continents of North America and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:193
+msgid ""
+"Occupy 18 countries of your choice and occupy each with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:194
+msgid ""
+"Occupy 24 countries of your choice and occupy each with at least 1 army."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:195
+msgid ""
+"Destroy all of Player1's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:196
+msgid ""
+"Destroy all of Player2's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:197
+msgid ""
+"Destroy all of Player3's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:198
+msgid ""
+"Destroy all of Player4's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:199
+msgid ""
+"Destroy all of Player5's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk2210.pm:200
+msgid ""
+"Destroy all of Player6's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""

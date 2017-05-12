@@ -1,0 +1,22 @@
+
+http://svn.haxx.se/dev/archive-2003-08/1096.shtml
+
+Date: 2003-08-21 00:33:37 CEST
+
+james-tigris@jrv.org wrote:
+
+>I'm trying to write a program to import from old PVCS files into SVN
+>and retain the authorship and timestamps.
+>
+>I'm wondering if doing a propset of svn:date is going to really do
+>what I want, which is to allow me to retrieve an entire project as of
+>a particular date. The files are being committed one by one, revision
+>by revision from the original PVCS archives
+>
+You must be very, very careful when changing svn:date. At the moment,
+SVN assumes that commit dates increase monotonically with revision
+numbers. So, while it's possible to change svn:date, braking this
+assumption would mean that the -r{date} option would not work reliably
+any more.
+
+Yes, we have A Plan to remove this restriction in future. 

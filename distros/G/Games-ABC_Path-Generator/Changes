@@ -1,0 +1,27 @@
+Revision history for Games-ABC_Path-Generator
+
+0.2.0   2014-03-06
+    - Add command line usage documentation and --help and --man flags.
+
+0.1.1   2013-05-21
+    - Fix the documentation of FinalLayoutObj - it had some remnants of
+    the RiddleObj documentation.
+    - Got rid of lib/Games/ABC_Path/Generator/Constants.pm - it was no
+    longer used.
+    - Add t/style-trailing-space.t .
+    - Add t/cpan-changes.t .
+    - Correct the URL.
+
+0.1.0   2011-07-23
+    - Improved lib/Games/ABC_Path/Generator.pm with acknowldgements, a
+    "SEE ALSO" section and a "DESCRIPTION" section.
+    - Add the shuffle method to lib/Games/ABC_Path/MicrosoftRand.pm .
+    - Convert the constants module to Games::ABC_Path::Solver::Constants
+    to merge the common parts of Games::ABC_Path::Solver and
+    Games::ABC_Path::Generator.
+    - Convert to the methods of Games::ABC_Path::Solver::Base .
+        - Now requires Games::ABC_Path::Solver version 0.2.0.
+
+0.0.1   2011-07-21
+    - First version, released on an unsuspecting world.
+

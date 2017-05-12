@@ -1,0 +1,33 @@
+---
+round: 2
+week: 17
+text: t/emile/activities.yaml
+not folded:
+activity:
+  citrus:
+    0:
+      - young 
+      - old
+pair:
+#  young:
+#    Black: 34113
+#    White: S09413
+#  old:
+#    Black: 1
+#    White: 222
+  0:
+    White: 223
+    Black: 222
+  1:
+    White: 1
+    Black: S09413
+  2:
+    Bye: 34113
+#  0:
+#    White: 34113
+#    Black: 1
+#  1:
+#    White: 223
+#    Black: 222
+#  2:
+#    Bye: S09413

@@ -1,0 +1,89 @@
+--- file.c.orig	2003-06-12 20:41:07.000000000 +0100
++++ file.c	2003-07-31 12:07:34.000000000 +0100
+@@ -92,7 +92,7 @@
+ 
+ static void setup_tty(int);
+ static void back_to_col_1(void);
+-static int pushback(Char *);
++static int pushback(Char *, int);
+ static void catn(Char *, Char *, int);
+ static void copyn(Char *, Char *, int);
+ static Char filetype(Char *, Char *);
+@@ -167,7 +167,7 @@
+  * Push string contents back into tty queue
+  */
+ static int
+-pushback(Char *string)
++pushback(Char *string, int doecho)
+ {
+     struct termios tty, tty_normal;
+     char buf[TTYHOG], svchars[TTYHOG];
+@@ -181,13 +181,14 @@
+     (void)sigaddset(&sigset, SIGINT);
+     (void)sigprocmask(SIG_BLOCK, &sigset, &osigset);
+     (void)tcgetattr(SHOUT, &tty);
+-    tty_normal = tty;
+-    tty.c_lflag &= ~(ECHOKE | ECHO | ECHOE | ECHOK | ECHONL | ECHOPRT | ECHOCTL);
+-    /* FIONREAD works only in noncanonical mode. */
+-    tty.c_lflag &= ~ICANON;
+-    tty.c_cc[VMIN] = 0;
+-    (void)tcsetattr(SHOUT, TCSADRAIN, &tty);
+-
++    if (!doecho) {
++	    tty_normal = tty;
++	    tty.c_lflag &= ~(ECHOKE | ECHO | ECHOE | ECHOK | ECHONL | ECHOPRT | ECHOCTL);
++	    /* FIONREAD works only in noncanonical mode. */
++	    tty.c_lflag &= ~ICANON;
++	    tty.c_cc[VMIN] = 0;
++	    (void)tcsetattr(SHOUT, TCSADRAIN, &tty);
++    }
+     for (retrycnt = 5; ; retrycnt--) {
+ 	/*
+ 	 * Push back characters.
+@@ -243,7 +244,8 @@
+     (void)tcsetattr(SHOUT, TCSADRAIN, &tty);
+     (void)ioctl(SHOUT, FIONREAD, (ioctl_t) &i);
+ #endif
+-    (void)tcsetattr(SHOUT, TCSADRAIN, &tty_normal);
++    if (!doecho)
++    	(void)tcsetattr(SHOUT, TCSADRAIN, &tty_normal);
+     (void)sigprocmask(SIG_SETMASK, &osigset, NULL);
+ 
+     return nsv;
+@@ -380,6 +382,7 @@
+ /*
+  * Cause pending line to be printed
+  */
++#if 0
+ static void
+ retype(void)
+ {
+@@ -389,6 +392,7 @@
+     tty.c_lflag |= PENDIN;
+     (void)tcsetattr(SHOUT, TCSADRAIN, &tty);
+ }
++#endif
+ 
+ static void
+ beep(void)
+@@ -710,15 +714,20 @@
+ 	}
+ 	if (command == LIST)	/* Always retype after a LIST */
+ 	    should_retype = TRUE;
++#if 0
+ 	if (pushback(inputline))
+ 	    should_retype = TRUE;
++#endif
+ 	if (should_retype) {
+ 	    if (command == RECOGNIZE)
+ 		(void) fputc('\n', cshout);
+ 	    printprompt();
+ 	}
++#if 0
+ 	if (should_retype)
+ 	    retype();
++#endif
++	pushback(inputline, should_retype);
+     }
+     setup_tty(OFF);
+     return (num_read);

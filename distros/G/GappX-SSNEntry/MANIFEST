@@ -1,0 +1,14 @@
+CHANGES
+GappX-SSNEntry.komodoproject
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/GappX/Gtk2/SSNEntry.pm
+lib/GappX/Moose/Meta/Attribute/Trait/GappSSNEntry.pm
+lib/GappX/SSNEntry.pm
+t/01_gtk_ssn_entry.t
+t/02_gapp_ssn_entry.t
+t/03_moose_trait.t

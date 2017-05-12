@@ -1,0 +1,23 @@
+Revision history for Perl module Games::PerlWar
+
+0.03
+    * Added Test::Signature test
+    * Added git repository URL to CONTACT section of G::PW.
+
+0.02 - Oct 22, 2006
+    * Huge refactoring. The Array, each cell/agent and the
+        agent execution have all been pushed to their own 
+        classes.
+    * Web interface is now pure XPathScript. No more need
+        for Embperl.
+    * Introduction of the PerlWar shell.
+    * Added the long-promised ownership variables
+    * New blitzkrieg game variant.
+    * New type of player registration (ad-hoc)
+    * And a truckload more!
+
+0.01_01 - Jan 28, 2006
+    * interim version
+
+0.01 - Oct 16, 2005
+    * Original version

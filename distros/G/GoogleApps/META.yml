@@ -1,0 +1,28 @@
+---
+abstract: 'Base class for all commands'
+author:
+  - 'Joenio Costa <joenio@colivre.coop.br>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GoogleApps
+requires:
+  Config::Auto: 0
+  Data::Dumper: 0
+  Modern::Perl: 0
+  Moose: 0
+  MooseX::App::Cmd: 0
+  MooseX::App::Cmd::Command: 0
+  Test::Class::Most: 0
+  Test::MockObject: 0
+  Test::More: 0
+  VUser::Google::ApiProtocol::V2_0: 0
+  VUser::Google::Provisioning::V2_0: 0
+  strict: 0
+version: 0.002

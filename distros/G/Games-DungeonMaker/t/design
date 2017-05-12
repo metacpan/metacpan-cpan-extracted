@@ -1,0 +1,136 @@
+XX  this is a comment
+XX  the first letter of every line determines what data are expected
+
+XX  background must be OPEN or CLOSED, openings must be of "Direction"-type
+XX  dimX   dimY   background   joinDist  tunnelJoinDist  opening1  opening 2 ...  
+D   80     200    CLOSED       12        18              WE    
+
+XX  enter rectangles this way 
+XX  startX    startY   endX   endY   type 
+XX----- R   94        1        98     5      OPEN 
+XX----- R   94        134      98     138    OPEN 
+
+XX probabilities that a baby Crawler will be born after i generations
+XX indices above 10 are illegal, enter integer values for all 11 indices
+XX i =   0     1     2     3     4     5     6     7     8     9     10
+BC       0     0     50    0     50    0     0     0     0     0     0
+XX values must add up to 100
+
+XX probabilities that a baby Roomie will be born after i generations
+XX indices above 10 are illegal, enter integer values for all 11 indices
+XX i =   0     1     2     3     4     5     6     7     8     9     10
+BR       0     0     0     50    50    0     0     0     0     0     0
+XX values must add up to 100
+
+XX probabilities that a baby Tunneler will be born after i generations
+XX (applicable only for those Tunnelers who are not larger than their parents -
+XX - for those larger than their parents, use sizeUpGenDelay)
+XX indices above 10 are illegal, enter integer values for all 11 indices
+XX i =   0     1     2     3     4     5     6     7     8     9     10
+BT       0     20    30    50    0     0     0     0     0     0     0
+XX values must add up to 100
+
+XX probabilities that a baby Tunneler of generation gen will have a tunnelWidth 1 size larger than its parent
+XX sizeUpProb - end with -1 to repeat last value 
+XX gen = 0   1   2   3   4   5   6   7   8   9   10  11 12 13 14 15 16 17 18 19 20 
+ZU       0   10  10  10  20  30  40  -1
+XX probabilities that a baby Tunneler of generation gen will have a tunnelWidth 1 size smaller than its parent
+XX sizeDownProb - end with -1 to repeat last value 
+XX gen = 0   1   2   3   4   5   6   7   8   9   10  11 12 13 14 15 16 17 18 19 20 
+ZD       0   0   20  50  60  50  60  -1
+XX for every generation, 100 - (sizeUpProb(gen) + sizeDownProb(gen) = probability that size remains the same,
+XX and this value must be >= 0
+
+XX probability that a Tunneler will make an anteroom when changing direction or spawning
+XX tunnelWidth = 0    1    2    3    4    5    6    7    8   ...
+F                20   20   50   0    0    100
+XX value 100 ends the input and repeats for larger tunnels
+
+XX joinPreference for generations of Tunneler, end with -1 to repeat last value
+XX gen = 0   1   2   3   4   5   6   7   8   9   10  11 12 13  14  15 
+J        0   0   10  100 100 -1
+
+XX Roomsizes and maximum numbers of rooms - first in Labyrinth - - - then in dungeon
+XX minSize  medSize   larSize   maxSize  numSmlL   numMedL   numLarL   numSmlD   numMedD   numLarD 
+T  20       50        100       300      20        5         1         100       20        2
+
+XX probabilities to use a room of a certain size depending on tunnelWidth
+XX the first line is for rooms coming out sideways from the tunnel, the second for rooms at branching sites
+XX tW=0 SM  MD  LG    tW=1 SM  MD  LG   tW=2 SM  MD  LG   tW=3  SM  MD  LG   tW=4  SM  MD  LG   tW=5  SM  MD  LG  
+GS      100 0   0          100 0   0         70  30  0          50  50  0          0   50  50         0   0   100 
+GB      100 0   0          50  50  0         0   30  70         0   0   100
+XX input ends when LG is at 100, then repeats at 100% large rooms
+XX all probabilities should add up to 100
+
+XX stepLength for generations of Crawler, end with 0 to repeat last value
+XX gen = 0   1   2   3   4   5   6   7   8   9   10  
+S        3   3   3   3   3   3   0
+
+XX corridorWidth for generations of Crawler, end with 0 to repeat last value
+XX gen = 0   1   2   3   4   5   6   7   8   9   10  11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+C        15  15  7   7   3   3   2   2   1   0
+
+XX maxAge for generations of Crawler, end with 0 to repeat last value
+XX gen = 0   1   2   3   4   5   6   7   8   9   10  11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+AC       20  10  10  10  10  10  10  10  10  10  30  3  15 10 5  20 10 6  15 10 7  20 20 20 20 10 20 5  20 5  0
+
+XX maxAge for generations of Tunneler, end with 0 to repeat last value
+XX gen = 0   1   2   3   4   5   6   7   8   9   10  11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+AT       5   12  12  15  15  15  15  15  15  20  30  10 15 10 10 20 10 10 15 10 10 20 20 20 20 10 20 10 20 5  0
+
+XX miscellaneous parameters:
+XX mutator  noHeadingProb  patience   sizeUpGenDelay   columnsInTunnels  crawlersInTunnels   roomAspectRatio  genSpeedUpOnAnteRoom
+M  20       40             90         1                0                 0                   0.6              2
+XX seedCrawlersInTunnels   tunnelCrawlerGeneration   showMovie  storeMovie       randSeed          crawlersInAnterooms
+N  0                       -1                        1          0                1015776839        0
+ 
+XX Randomly distributed Crawlers starting from the edge of the map, heading inwards, 99 stops it
+XX Give the number per 1000 squares of outer wall (e.g. 5 would have a random Crawler every 200 squares)
+XX Per generation 0  1  2  3  4  5  6  7  8  9  10  11  12  13  14 15  16  17  18  19  20
+XX--------- K                 0  20 40 60 16 32 64 32 0  66  0  32  16  99
+K                 0  99
+XX Probability profile for all RandCrawlers (irrespective of generation)  
+XX Expected value and variance for the genetic variables
+XX   sSSP   sDSP   tSSP   tDSP   cDP
+PR   0      20     0      80     20
+
+XX Probability profile for all Crawlers that are seeded in Tunnels   
+XX Expected value and variance for the variables
+XX   maxAge  sL   sSSP  sDSP  tSSP  tDSP  cDP    closedProb
+PT   20      3    0     0     0     0     0      100
+
+XX Parameters for "last-chance-Tunnelers" that are created when a Tunneler runs out of room
+XX   roomLeftProb  roomRightProb  changeDirProb  straightSpawnProb  turnSpawnProb  generationalDelay  
+PU   80            80             30             0                  30             4
+
+XX WallCrawlers entered here, singles and pairs
+XX   locX   locY   dir  intDir dorm  maxAge  gen  sL  op   cW  sSSP  sDSP  tSSP  tDSP  cDP
+XX-------         WS   40     50     SO   SO     0     20      1    3   1    1   0     30    0     80    10
+XX-commented out- WS   66     70     NO   NO     0     20      0    3   0    5   20    50    0     30    50
+
+XX--------- WP1  20     70     NO   NO     0     20      5    3   2    1   50    50    0     100   40
+XX--------- WP2  20     70     SO   SO     0     50      5    3   2    1   50    50    0     100   40
+
+XX Tunnelers entered here:
+XX   locX   locY   dir  intDir  dorm  maxAge  gen  sL  tW   sDSP   tDSP  cDP  mRRP  mRLP  jP
+U    40     2      EA   EA      0     16      0    5   1    25     50    30   100   100   100
+
+XX MOBs and treasure follows below - input ended by negative number
+XX MOBs in the labyrinth - index = category - E1 in rooms, E2 in the open
+XX groupSize gSVariance  0   1   2   3   4   5   6   7
+E1 5         3           -1
+XX                       0   1   2   3   4   5   6   7
+E2                       -1
+XX MOBs in the dungeon - H1 in rooms, H2 in tunnels and anterooms
+XX groupSize gSVariance  0   1   2   3   4   5   6   7
+H1 4         2           50  20  50  5   2   -1
+XX anteRoomProb          0   1   2   3   4   5   6   7
+H2 50                    0   30  0   20  2   -1
+
+XX Treasure - I1 in labyrinth, I2 in dungeon
+XX groupSize gSVariance  0   1   2   3   4   5   6   7
+I1 1         2           -1
+I2 0         2           3   3   2   2   1   -1
+
+XX Here endeth the file - USED LETTERS: W K P M A C S B R L D T Z J U F G N E F H I
+

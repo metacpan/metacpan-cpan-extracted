@@ -1,0 +1,6 @@
+proc main ()
+{
+  "te\"st1\n"
+  'te\'st2'
+  nl()
+}

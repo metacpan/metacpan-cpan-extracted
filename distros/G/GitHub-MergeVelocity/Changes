@@ -1,0 +1,25 @@
+Revision history for GitHub-MergeVelocity
+
+0.000007  2015-02-09 12:25:35-05:00 America/Toronto
+    - Bumps minimum version of Moo to 1.007000
+
+0.000006  2015-02-08 23:01:49-05:00 America/Toronto
+    - Bumps minimum version of WWW::Mechanize::Cached to 1.46
+
+0.000005  2015-02-07 22:24:30-05:00 America/Toronto
+    - Makes CHI, WWW::Mechanize::Cached and LWP::ConsoleLogger recommended
+      rather than required
+    - No longer special cases closed pull requests
+
+0.000004  2015-02-07 00:12:27-05:00 America/Toronto
+    - Converts dist from Moose to Moo
+
+0.000003  2015-02-06 18:17:48-05:00 America/Toronto
+    - Makes printed report easier to decipher
+
+0.000002  2015-02-05 23:32:12-05:00 America/Toronto
+    - Be more liberal when parsing repo urls
+    - Fixes pod name of included script
+
+0.000001  2015-02-04 22:16:57-05:00 America/Toronto
+    - Initial release

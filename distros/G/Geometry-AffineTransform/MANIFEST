@@ -1,0 +1,11 @@
+lib/Geometry/AffineTransform.pm
+Makefile.PL
+MANIFEST
+perl-Geometry-AffineTransform.spec
+README
+Changes
+run-test.sh
+t/1.t
+t/lib/Geometry/AffineTransform/Test.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

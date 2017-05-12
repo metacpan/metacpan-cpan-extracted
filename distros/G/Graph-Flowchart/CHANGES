@@ -1,0 +1,85 @@
+Revision history for Perl extension Graph::Flowchart:
+
+0.11 2007-12-15 Tels 36 tests
+  * require Graph::Easy v0.60
+  * require Test::More 0.62 for build
+  * fix Makefile.PL for outdated Perls (older than v5.6.0)
+
+0.10 2007-02-02 Tels 36 tests
+  * require Perl v5.8.1
+  * require Graph::Easy v0.52
+  * bundle and use Module::Install v0.64
+  * add start_node(), end_node()
+  * finish(): remove start/end node if they are isolated and only connected
+    to each other, unless they are the only nodes
+
+0.09 2006-01-29 Tels 36 tests
+  * fix Makefile.PL to work with newer YAML
+  * require Graph::Easy v0.40
+
+0.08 2006-01-08 Tels 36 tests
+  * require Graph::Easy v0.39 (to correctly be able to merge blocks)
+  * fix an undef warning in line 321 
+  * fix the conversion of "\n" to "\\n" to actually work
+  * add N_WHILE, N_UNTIL types
+  * add: insert_block(), insert_new_block(), insert_new_joint()
+  * document that these are not working when used recursive:
+    + add_while
+    + add_until
+    + add_foreach
+    + add_for
+    + add_if_then
+    + add_if_then_else
+
+0.07 2006-01-01 Tels 36 tests
+  * require Graph::Easy v0.38
+  * set edge flow to better handle the flow after loops
+  * use constant;
+  * add: add_until(), add_foreach()
+  * add_for() returns (current, body, continue) blocks
+
+0.06 2005-12-27 Tels 36 tests
+  * require Graph::Easy v0.37
+  * add:
+    + add_goto(), add_break(), add_return(), add_last(), add_new_block()
+    + make_current(), current(), add_new_join(),
+    + N_GOTO N_RETURN N_BREAK N_NEXT N_LAST N_SUB N_USE
+  * connect() can set the edge class, too
+  * set edge classes for: true, false, goto, return, break, last, next
+  * remove dead code relating to setting graph attributes
+  * new_block(): handle label names (for goto)
+  * Node.pm: turn '\n' into '\n' for correct node labels
+  * fix POD of Node.pm
+  * use strict, not warnings in .pm files
+  * add_if_then() and add_if_then_else() return all blocks in list context
+
+0.05 2005-12-19 Tels 23 tests
+  * require Graph::Easy v0.36
+  * set a subclass for each node
+  * set attributes on a per-class basis
+  * fix pod.t and pod_cov.t when Pod::Test/Pod::Coverage are not installed
+  * fix the POD in both .pm files
+  * fix README and include example
+  * add_if_then_else() can handle undef else block
+  * first_block(), last_block() and current_block() can now also set the block
+
+0.04 2005-12-07 Tels 19 tests
+  * taken code over from Devel::Graph
+  * require Graph::Easy v0.34
+  * fix to work with Graph::Easy 0.34
+  * make pod tests also cover ::Node
+  * fix graph detailing usage of merge()
+
+0.03 2005-11-13 Tels 17 tests
+  * require Graph::Easy v0.33
+  * require PPI v1.04
+  * require Perl v5.8.0
+  * update POD with examples and note that decomposing is not implemented yet
+  * add: add_while()
+
+0.02 2005-11-06 Tels 18 tests
+  * require Graph::Easy 0.32
+
+0.01 2005-11-06 Tels 18 tests
+  * first version
+

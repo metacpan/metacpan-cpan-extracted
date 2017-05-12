@@ -1,0 +1,4 @@
+(define-object GtkMozEmbed (GtkBin))
+(define-object GtkMozBox (GtkWindow))
+(define-object GtkMozArea (GtkWidget))
+

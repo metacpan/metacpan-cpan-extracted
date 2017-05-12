@@ -1,0 +1,25 @@
+---
+abstract: 'Geocode addresses with the Yahoo! API '
+author:
+  - 'Ask Bjørn Hansen <ask@develooper.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Coder-Yahoo
+requires:
+  Encode: 0
+  JSON: 2
+  LWP::UserAgent: 0
+  URI: 1.36
+  Yahoo::Search::XML: 20100614.1
+resources:
+  homepage: http://search.cpan.org/dist/Geo-Coder-Yahoo/
+  repository: http://git.develooper.com/Geo-Coder-Yahoo.git
+version: 0.50

@@ -1,0 +1,184 @@
+Git::Release
+============
+(Working in progress, alpha stage)
+
+Git::Release provides many useful features 
+to reduce your release process efforts.
+
+it defines many tasks for release process and 
+which are generalized, easy to use.
+
+# The Release Process
+
+## The main branches
+
+* master
+* develop
+
+### Master Branch
+
+The master branch at origin should be familiar to every Git user. Parallel to
+the master branch.
+
+We consider origin/master to be the main branch where the source code of HEAD
+always reflects a production-ready state.
+
+### Develop Branch
+
+We consider origin/develop to be the main branch where the source code of HEAD
+always reflects a state with the latest delivered development changes for the
+next release. Some would call this the “integration branch”. This is where
+any automatic nightly builds are built from.
+
+### Feature Branch
+
+A feature branch may branch off from `develop` branch,
+
+Once the feature branch is finished, the branch 
+should be renamed with ready/ prefix first, 
+which means this branch is ready to be released.
+
+it should be merged back to a release branch later
+if the feature branch is schuduled to be released. 
+
+By using ready/ prefix, you can easily distinguish 
+what branch is going to be released, what
+branch should be waiting the next release.
+
+To create a feature branch from current branch:
+
+    $ git feature [feature name]
+
+To create a feature branch from a branch:
+
+    $ git feature [feature name] [your branch]
+
+This will create a feature branch with prefix `feature/`, you can configure the prefix in your `.gitconfig` file.
+
+A branch named like `feature/ajax` will be created.
+
+To list feature branches:
+
+    $ git feature --list
+
+### Branch document
+
+To show the document of a branch:
+
+    $ git branch-doc
+
+
+### Hotfix Branch
+
+May branch off from `master`,
+
+Must merge back to `develop` and `master`.
+
+To create a hotfix branch from master:
+
+    $ git hotfix [hotfix name]
+
+This is not recommended, but you can still create a hotfix branch from a specified branch, 
+if your production branch is not named master,
+
+    $ git hotfix [hotfix name] your_branch
+
+To list hotfix branches:
+
+    $ git hotfix --list
+
+### Release Ready Branch
+
+When your feature branch or hotfix branch are ready to go, move into ready/ directory,
+and the branch will be merged into current release branch for testing.
+
+To move current branch to ready/:
+
+    $ git ready
+
+To move specified branch to ready/:
+
+    $ git ready [branch name]
+
+For example, to setup hotfix-3011 branch to ready.
+
+    $ git ready hotfix/bug3011
+    > ready/hotfix/bug3011
+
+Steps are followed below:
+
+* Trigger unit tests, selenium tests, continue to next step if it passed.
+* Prune remote branches.
+* Rename branch prefix to ready/
+
+### Release Candidate Branch
+
+A release candidate branch may branch off from `develop`, 
+and must merge back into: `develop` & `master`.
+
+Branch naming convention: `rc` or `rc-{version name}`
+
+To create a release candiate branch:
+
+    $ git rc
+
+Steps are followed below:
+
+* checkout rc branch
+* find release ready branches (with ready/ prefix)
+* merge ready branches one by one, and do testing after each merge.
+
+Once your release branch is ready, you can run release.
+
+    $ git release 
+    
+(Not implemented yet)
+
+The release steps are followed below,
+
+* Rename current ready/ branches with released prefix.
+* Merge current release branch into master.
+* Delete current release branch.
+* Tag a release version on master.
+* Rebase master branch onto `develop` branch.
+
+### Site Branch
+
+Each different site depends on a different released framework version,
+So a site branch is branched off from a released framework version.
+
+Custom Features might be developed on it, some of them can be merged back into
+the next release branch.
+
+# Setup
+
+To install Git::Release process flow helper scripts.
+
+    git release-init
+
+# Configuration
+
+to customzie your git-release config, edit your .gitconfig:
+    
+    [release]
+        develop-branch = development
+        production-branch = master
+        production-branch = production
+        release-branch-prefix = release
+        feature-branch-prefix = feature
+        hotfix-branch-prefix  = hotfix
+        site-branch-prefix    = site
+
+# Reference
+
+http://nvie.com/posts/a-successful-git-branching-model/
+
+http://reinh.com/blog/2009/03/02/a-git-workflow-for-agile-teams.html
+
+
+# Todo
+
+* redmine ticket integration.
+* config integration.
+
+(Comments are welcome)

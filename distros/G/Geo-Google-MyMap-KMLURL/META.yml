@@ -1,0 +1,20 @@
+---
+name: Geo-Google-MyMap-KMLURL
+version: 0.0.1
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: Create URL for downloading Full-spec KML from Google MyMap msid
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::Base: 0
+  version: 0
+provides:
+  Geo::Google::MyMap::KMLURL:
+    file: lib/Geo/Google/MyMap/KMLURL.pm
+    version: 0.0.1
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

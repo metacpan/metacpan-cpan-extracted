@@ -1,0 +1,47 @@
+Copyright 2009, 2010, 2013 Kevin Ryde
+
+This file is part of Gtk2-Ex-DateSpinner.
+
+Gtk2-Ex-DateSpinner is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+Gtk2-Ex-DateSpinner is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-DateSpinner.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 9, August 2013
+    - avoid recent glib or gtk not liking $subwidget->parent in INIT_INSTANCE
+
+Version 8, September 2010
+    - test manifest only as an author test
+
+Version 7,  June 2010
+    - accept paste of YYYY-MM-DD string
+    - tooltips on the spinner fields
+
+Version 6,  February 2010
+    - can use direct GtkEntry rather than EntryWithCancel subclass
+
+Version 5,  July 2009
+    - in the tests avoid a slew of warnings from Gtk 2.16 when display
+      not yet initialized
+
+Version 4,  February 2009
+    - avoid some stupid adjustment page size warnings from Gtk 2.14
+
+Version 3,  January 2009
+    - fixes for dependencies and some test skips
+
+Version 2,  January 2009
+    - new Gtk2::Ex::DateSpinner::CellRenderer with popup datespinner
+
+Version 1,  September 2008
+    - the first version

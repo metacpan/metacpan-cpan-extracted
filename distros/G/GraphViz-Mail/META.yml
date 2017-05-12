@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: GraphViz-Mail
+version: 0.1
+license: perl
+distribution_type: module
+requires:
+  Class::Accessor::Chained: 0
+  Date::Parse: 0
+  GraphViz: 0
+  Mail::Thread: 2.41
+  Test::More: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  GraphViz::Mail:
+    file: lib/GraphViz/Mail.pm
+    version: 0.1
+generated_by: Module::Build version 0.21

@@ -1,0 +1,126 @@
+README for Games::Dissociate
+
+			  Games::Dissociate
+
+[Partially excerpted from the POD.]
+
+Games::Dissociate - a Dissociated Press algorithm and filter
+
+NAME
+    Games::Dissociate - a Dissociated Press algorithm and filter
+
+SYNOPSIS
+        use Games::Dissociate;
+        ...
+        $brilliant_prose = dissociate($normal_prose);
+
+    or
+
+        perl -MGames::Dissociate -e dissociate_filter meno.txt
+
+ABSTRACT
+    This module provides the function `dissociate', which implements a
+    Dissociated Press algorithm, well known to Emacs users as "meta-x
+    dissociate". The algorithm here is by no means a straight port of
+    Emacs's `dissociate.el', but is instead merely inspired by it.
+
+    (I actually intended to make it a straight port, but couldn't manage it
+    -- the code in `dissociate.el' is totally uncommented, and is
+    *especially* obscure Lisp.)
+
+    This module also provides a procedure `dissociate_filter', for use in
+    the one-liner context:
+
+      perl -MGames::Dissociate -e 'dissociate_filter(2)'
+        < thesis.txt  > snip.txt
+
+    or
+
+      perl -MGames::Dissociate -e 'dissociate_filter(-2)'
+        < thesis.txt  > snip.txt
+
+    or in a script consisting of
+
+      #!/usr/local/bin/perl
+      use Games::Dissociate;  dissociate_filter;
+
+  Sample Dissociation
+
+    I got this text from feeding the UNIX man page for "regexp" (in
+    plaintext) to `dissociate' with a $group_size parameter of 3:
+
+        nd of then the full list of the more branch is zero or "*", "."
+        (matching thand regexp(n) right initional argumented by a pieces of
+        the left to match that (ab|a) general other worDS match to the
+        first, followed by "?". It matcheS In of the next start was been
+        could exp. The characters in expreSSIons belowed in the full
+        matching the in starticular EXpression in "[0-9]" include a list of
+        sequence of the are may before the regexp even therwise. REgexp(n)
+        Tcl regular expression to regexp(n) regexp(n) right. Input string),
+        "\",
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Games::Dissociate doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Games::Dissociate, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Games::Dissociate in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+For more information on module installation, see perldoc perlmodinstall
+
+
+DOCUMENTATION
+
+POD-format documentation is included in Dissociate.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a Games directory in your
+MacPerl site_lib or lib directory, and move Dissociate.pm into there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Games::Dissociate should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Games::Dissociate is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+
+COPYRIGHT
+
+Copyright 1998-2010 Sean M. Burke <sburke@cpan.org> &
+Avi Finkel <avi@finkel.org>, all rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+

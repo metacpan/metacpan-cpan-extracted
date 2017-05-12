@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         GD-Image-CopyIFS
+version:      0.25
+installdirs:  site
+requires:
+    GD:                      2.05
+license:      perl
+abstract:     fractal-based image copying and resizing
+authored_by:
+    - Randy Kobes <r.kobes@uwinnipeg.ca>
+distribution_type: module
+provides:
+    GD::Image::CopyIFS:
+        file: CopyIFS.pm
+        version: 0.25
+generated_by: ExtUtils::MakeMaker version 6.17

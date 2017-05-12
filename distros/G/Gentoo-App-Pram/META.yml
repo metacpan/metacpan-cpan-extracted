@@ -1,0 +1,34 @@
+---
+abstract: 'Library to fetch a GitHub Pull Request as an am-like patch.'
+author:
+  - 'Patrice Clement <monsieurp@gentoo.org>'
+  - 'Kent Fredric <kentnl@gentoo.org>'
+build_requires:
+  Test::More: '0.89'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.011, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gentoo-App-Pram
+provides:
+  Gentoo::App::Pram:
+    file: lib/Gentoo/App/Pram.pm
+    version: '0.004000'
+requires:
+  Encode: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny: '0'
+  Pod::Usage: '0'
+  Term::ANSIColor: '0'
+  constant: '0'
+  perl: '5.010'
+resources:
+  repository: https://github.com/monsieurp/Gentoo-App-Pram/
+version: '0.004000'

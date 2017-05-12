@@ -1,0 +1,700 @@
+From slaven@rezic.de Fri May 16 19:09:58 2008
+Delivered-To: japh@voltar-confed.org
+Received: by 10.86.57.10 with SMTP id f10cs12901fga;
+        Fri, 16 May 2008 16:10:01 -0700 (PDT)
+Received: by 10.114.144.1 with SMTP id r1mr4285542wad.97.1210979398931;
+        Fri, 16 May 2008 16:09:58 -0700 (PDT)
+Return-Path: <slaven@rezic.de>
+Received: from x1.develooper.com (x1.develooper.com [63.251.223.170])
+        by mx.google.com with SMTP id c26si9610913waa.10.2008.05.16.16.09.58;
+        Fri, 16 May 2008 16:09:58 -0700 (PDT)
+Received-SPF: neutral (google.com: 63.251.223.170 is neither permitted nor denied by best guess record for domain of slaven@rezic.de) client-ip=63.251.223.170;
+Authentication-Results: mx.google.com; spf=neutral (google.com: 63.251.223.170 is neither permitted nor denied by best guess record for domain of slaven@rezic.de) smtp.mail=slaven@rezic.de
+Received: (qmail 5362 invoked by uid 225); 16 May 2008 23:09:57 -0000
+Delivered-To: JETTERO@cpan.org
+Received: (qmail 5358 invoked by alias); 16 May 2008 23:09:57 -0000
+X-Spam-Status: No, hits=-6.6 required=8.0
+	tests=BAYES_00,PERLBUG_CONF
+X-Spam-Check-By: la.mx.develooper.com
+Received: from la.mx.develooper.com (HELO x1.develooper.com) (63.251.223.176)
+    by la.mx.develooper.com (qpsmtpd/0.28) with SMTP; Fri, 16 May 2008 16:09:49 -0700
+Received: (qmail 5244 invoked from network); 16 May 2008 23:09:45 -0000
+Received: from x16.dev (10.0.100.26)
+  by x1.dev with QMQP; 16 May 2008 23:09:45 -0000
+X-Spam-Level: *
+Received: from mail3.ixls.de (HELO mail3.ixls.de) (78.47.208.109)
+    by 16.mx.develooper.com (qpsmtpd/0.43rc1) with ESMTP; Fri, 16 May 2008 16:09:33 -0700
+Received: from e179037061.adsl.alicedsl.de ([85.179.37.61] helo=localhost.localdomain)
+	by mail3.ixls.de with esmtpa (Exim 4.63)
+	id 1Jx93H-0002C9-Vi; Sat, 17 May 2008 01:09:28 +0200
+Received: from biokovo.herceg.de (localhost [127.0.0.1])
+	by biokovo.herceg.de (8.13.6/8.13.6) with ESMTP id m4GN87dF094093;
+	Sat, 17 May 2008 01:08:07 +0200 (CEST)
+	(envelope-from srezic@cpan.org)
+Date: Sat, 17 May 2008 01:08:07 +0200
+Subject: FAIL Games-RolePlay-MapGen-1.2.10 i386-freebsd 6.1-release
+From: srezic@cpan.org
+To: cpan-testers@perl.org
+Cc: JETTERO@cpan.org
+Message-ID: <1210979287.Aff63Ff0.66443@biokovo.herceg.de>
+X-Reported-Via: Test::Reporter 1.38, via CPAN::Reporter 1.13
+X-Virus-Checked: Checked
+X-Old-Spam-Check-By: 16.mx.develooper.com
+X-Old-Spam-Status: No, hits=-6.6 required=8.0
+	tests=BAYES_00,PERLBUG_CONF
+Status: RO
+X-Status: A
+Content-Length: 11991
+Lines: 206
+
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+--
+Dear Paul Miller,
+    
+This is a computer-generated report for Games-RolePlay-MapGen-1.2.10
+on perl 5.10.0, created by CPAN-Reporter-1.13. 
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://cpantest.grango.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /usr/local/bin/perl5.10.0 "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00_load...................ok
+t/01_mg_new_auto............ok
+t/03_tools..................ok
+t/04_irange.................ok
+t/05_export.................Can't exec "/usr/bin/xmllint": No such file or directory at t/05_export.t line 46.
+ok
+t/05_perfect................ok
+t/05_save_load..............ok
+t/07_basic..................ok
+t/08_interconnects..........ok
+t/08_interconnects_xml......
+error in processing external entity reference at line 2, column 36, byte 80:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MapGen SYSTEM "MapGen.dtd">
+===================================^
+<?xml-stylesheet type="text/xsl" href="MapGen.xsl"?>
+
+ at /usr/perl5.10.0/lib/site_perl/5.10.0/i386-freebsd/XML/Parser.pm line 187
+ Dubious, test returned 25 (wstat 6400, 0x1900)
+ No subtests run 
+t/08_xmlinter...............
+error in processing external entity reference at line 2, column 36, byte 80:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MapGen SYSTEM "MapGen.dtd">
+===================================^
+<?xml-stylesheet type="text/xsl" href="MapGen.xsl"?>
+
+ at /usr/perl5.10.0/lib/site_perl/5.10.0/i386-freebsd/XML/Parser.pm line 187
+ Dubious, test returned 25 (wstat 6400, 0x1900)
+ No subtests run 
+t/09_xml_export_import......
+error in processing external entity reference at line 2, column 36, byte 80:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MapGen SYSTEM "MapGen.dtd">
+===================================^
+<?xml-stylesheet type="text/xsl" href="MapGen.xsl"?>
+
+ at /usr/perl5.10.0/lib/site_perl/5.10.0/i386-freebsd/XML/Parser.pm line 187
+ Dubious, test returned 25 (wstat 6400, 0x1900)
+ Failed 1/1 subtests 
+t/10_groups.................ok
+t/11_groups_a5s.............ok
+
+Test Summary Report
+-------------------
+t/08_interconnects_xml.t (Wstat: 6400 Tests: 0 Failed: 0)
+  Non-zero exit status: 25
+  Parse errors: No plan found in TAP output
+t/08_xmlinter.t         (Wstat: 6400 Tests: 0 Failed: 0)
+  Non-zero exit status: 25
+  Parse errors: No plan found in TAP output
+t/09_xml_export_import.t (Wstat: 6400 Tests: 0 Failed: 0)
+  Non-zero exit status: 25
+  Parse errors: Bad plan.  You planned 1 tests but ran 0.
+Files=14, Tests=19840, 57 wallclock secs ( 1.84 usr  0.08 sys + 10.77 cusr  0.91 csys = 13.60 CPU)
+Result: FAIL
+Failed 3/14 test programs. 0/19840 subtests failed.
+*** Error code 255
+
+Stop in /var/tmp/CPAN-build/Games-RolePlay-MapGen-1.2.10-X8wn9a.
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module                      Need Have   
+    --------------------------- ---- -------
+    Algorithm::Diff             0    1.1902 
+    File::Slurp                 0    9999.13
+    Software::License::LGPL_2_1 0    0      
+    Test                        1.25 1.25   
+    Tie::IxHash                 0    1.21   
+    XML::Simple                 0    2.18   
+    XML::XPath                  0    1.13   
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    PATH = /usr/local/bin:/usr/X11R6/bin:/usr/X11/bin:/usr/perl5.8.0/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/pilot/bin:/home/cpansand/bin/freebsd6.1:/home/cpansand/bin/sh:/home/cpansand/bin:/usr/X386/bin:/usr/games:/home/cpansand/devel:/usr/home/e/eserte/work/srezic-misc/scripts
+    PERL5LIB = /usr/local/src/CPAN/build/Software-License-0.004-335dJV/blib/arch:/usr/local/src/CPAN/build/Software-License-0.004-335dJV/blib/lib:/usr/local/src/CPAN/build/Text-Template-1.45-j1QsBU/blib/arch:/usr/local/src/CPAN/build/Text-Template-1.45-j1QsBU/blib/lib:/usr/local/src/CPAN/build/Sub-Install-0.924-WookcC/blib/arch:/usr/local/src/CPAN/build/Sub-Install-0.924-WookcC/blib/lib:/usr/local/src/CPAN/build/XML-XPath-1.13-Rj_hJc/blib/arch:/usr/local/src/CPAN/build/XML-XPath-1.13-Rj_hJc/blib/lib:/usr/local/src/CPAN/build/Catalyst-Plugin-AutoRestart-0.90-tlrp8i/blib/arch:/usr/local/src/CPAN/build/Catalyst-Plugin-AutoRestart-0.90-tlrp8i/blib/lib:/usr/local/src/CPAN/build/Class-C3-0.19-TS9jf2/blib/arch:/usr/local/src/CPAN/build/Class-C3-0.19-TS9jf2/blib/lib:/usr/local/src/CPAN/build/Catalyst-Runtime-5.7012-trFcIa/blib/arch:/usr/local/src/CPAN/build/Catalyst-Runtime-5.7012-trFcIa/blib/lib:/usr/local/src/CPAN/build/CGI-Simple-1.105-JI605F/blib/arch:/usr/local/src/CPAN/build/CGI-Simple-1.105-JI605F/blib/lib:/usr/local/src/CPAN/build/Path-Class-0.16-yVeNIB/blib/arch:/usr/local/src/CPAN/build/Path-Class-0.16-yVeNIB/blib/lib:/usr/local/src/CPAN/build/HTTP-Body-1.03-QHfYPh/blib/arch:/usr/local/src/CPAN/build/HTTP-Body-1.03-QHfYPh/blib/lib:/usr/local/src/CPAN/build/HTTP-Request-AsCGI-0.5-LaHMFD/blib/arch:/usr/local/src/CPAN/build/HTTP-Request-AsCGI-0.5-LaHMFD/blib/lib:/usr/local/src/CPAN/build/File-Modified-0.07-ex_IdX/blib/arch:/usr/local/src/CPAN/build/File-Modified-0.07-ex_IdX/blib/lib:/usr/local/src/CPAN/build/Data-Dump-1.08-JnzPaw/blib/arch:/usr/local/src/CPAN/build/Data-Dump-1.08-JnzPaw/blib/lib:/usr/local/src/CPAN/build/Tree-Simple-VisitorFactory-0.10-JhiG9F/blib/arch:/usr/local/src/CPAN/build/Tree-Simple-VisitorFactory-0.10-JhiG9F/blib/lib:/usr/local/src/CPAN/build/Tree-Simple-1.18-WfuB1y/blib/arch:/usr/local/src/CPAN/build/Tree-Simple-1.18-WfuB1y/blib/lib:/usr/local/src/CPAN/build/Proc-ProcessTable-0.42-ZBagOw/blib/arch:/usr/local/src/CPAN/build/Proc-ProcessTable-0.42-ZBagOw/blib/lib:/usr/local/src/CPA!
+ N/build/
+Text-SimpleTable-0.03-nKEdRq/blib/arch:/usr/local/src/CPAN/build/Text-SimpleTable-0.03-nKEdRq/blib/lib:/usr/local/src/CPAN/build/Net-uFTP-0.111-n1Kgmc/blib/arch:/usr/local/src/CPAN/build/Net-uFTP-0.111-n1Kgmc/blib/lib:/usr/local/src/CPAN/build/Net-SSH2-0.18-JWtS7C/blib/arch:/usr/local/src/CPAN/build/Net-SSH2-0.18-JWtS7C/blib/lib:/usr/local/src/CPAN/build/UNIVERSAL-require-0.11-Fz46bH/blib/arch:/usr/local/src/CPAN/build/UNIVERSAL-require-0.11-Fz46bH/blib/lib:/usr/local/src/CPAN/build/File-Stat-ModeString-1.00-0qarIW/blib/arch:/usr/local/src/CPAN/build/File-Stat-ModeString-1.00-0qarIW/blib/lib:/usr/local/src/CPAN/build/File-Stat-Bits-1.01-Gp8B50/blib/arch:/usr/local/src/CPAN/build/File-Stat-Bits-1.01-Gp8B50/blib/lib:/usr/local/src/CPAN/build/Net-FTP-AutoReconnect-0.2-S1r6u7/blib/arch:/usr/local/src/CPAN/build/Net-FTP-AutoReconnect-0.2-S1r6u7/blib/lib:/usr/local/src/CPAN/build/Unix-SavedIDs-0.4.1-MmUopM/blib/arch:/usr/local/src/CPAN/build/Unix-SavedIDs-0.4.1-MmUopM/blib/lib:/usr/local/src/CPAN/build/Config-General-2.38-Ox3p2S/blib/arch:/usr/local/src/CPAN/build/Config-General-2.38-Ox3p2S/blib/lib:/usr/local/src/CPAN/build/Test-Script-1.03-9xK26Z/blib/arch:/usr/local/src/CPAN/build/Test-Script-1.03-9xK26Z/blib/lib:/usr/local/src/CPAN/build/File-UserConfig-0.05-rOXTCL/blib/arch:/usr/local/src/CPAN/build/File-UserConfig-0.05-rOXTCL/blib/lib:/usr/local/src/CPAN/build/File-ShareDir-0.05-2vRdsX/blib/arch:/usr/local/src/CPAN/build/File-ShareDir-0.05-2vRdsX/blib/lib:/usr/local/src/CPAN/build/Class-Inspector-1.22-FOId8i/blib/arch:/usr/local/src/CPAN/build/Class-Inspector-1.22-FOId8i/blib/lib:/usr/local/src/CPAN/build/Params-Util-0.31-2wQx4d/blib/arch:/usr/local/src/CPAN/build/Params-Util-0.31-2wQx4d/blib/lib:/usr/local/src/CPAN/build/File-Remove-1.40-675WX9/blib/arch:/usr/local/src/CPAN/build/File-Remove-1.40-675WX9/blib/lib:/usr/local/src/CPAN/build/YAML-Tiny-1.32-YQm3uR/blib/arch:/usr/local/src/CPAN/build/YAML-Tiny-1.32-YQm3uR/blib/lib:/usr/local/src/CPAN/build/Algorithm-CheckDigits-0.49-YWH8DO/blib/arch:/usr/loca!
+ l/src/CP
+AN/build/Algorithm-CheckDigits-0.49-YWH8DO/blib/lib:/usr/local/src/CPAN/build/HTML-WikiConverter-0.62-xKUr82/blib/arch:/usr/local/src/CPAN/build/HTML-WikiConverter-0.62-xKUr82/blib/lib:/usr/local/src/CPAN/build/Class-Data-Inheritable-0.08-b5Mrf5/blib/arch:/usr/local/src/CPAN/build/Class-Data-Inheritable-0.08-b5Mrf5/blib/lib:/usr/local/src/CPAN/build/CSS-1.08-efqfYi/blib/arch:/usr/local/src/CPAN/build/CSS-1.08-efqfYi/blib/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 66443
+    PERL5_CPAN_IS_RUNNING = 66443
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 66296,66443
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_HTML_DISPLAY_CLASS = HTML::Display::Mozilla
+    SHELL = /usr/local/bin/zsh
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /usr/local/bin/perl5.10.0
+    $UID/$EUID = 1023 / 1023
+    $GID = 1023 1023 1023
+    $EGID = 1023 1023 1023
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.92_61  
+    Cwd                 3.2701   
+    ExtUtils::CBuilder  0.23     
+    ExtUtils::Command   1.14     
+    ExtUtils::Install   1.50     
+    ExtUtils::MakeMaker 6.44     
+    ExtUtils::Manifest  1.51_01  
+    ExtUtils::ParseXS   2.19     
+    File::Spec          3.2701   
+    Module::Build       0.2808_01
+    Module::Signature   n/a      
+    Test::Harness       3.10     
+    Test::More          0.80     
+    YAML                0.66     
+    YAML::Syck          1.04     
+    version             0.74     
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0) configuration:
+  Platform:
+    osname=freebsd, osvers=6.1-release, archname=i386-freebsd
+    uname='freebsd biokovo.herceg.de 6.1-release freebsd 6.1-release #0: sun may 7 04:32:43 utc 2006 root@opus.cse.buffalo.edu:usrobjusrsrcsysgeneric i386 '
+    config_args='-Dprefix=/usr/perl5.10.0 -Dusemymalloc=n -D cc=ccache cc -Dgccansipedantic -Duse64bit -de -D hintfile=myfreebsd'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=undef, usemultiplicity=undef
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=undef, use64bitall=undef, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='ccache cc', ccflags ='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -I/usr/local/include',
+    optimize='-O2 -mtune=athlon64 -pipe',
+    cppflags='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -I/usr/local/include'
+    ccversion='', gccversion='3.4.4 [FreeBSD] 20050518', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='ccache cc', ldflags ='-Wl,-E  -L/usr/local/lib'
+    libpth=/usr/lib /usr/local/lib
+    libs=-lm -lcrypt -lutil -lc
+    perllibs=-lm -lcrypt -lutil -lc
+    libc=, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-DPIC -fPIC', lddlflags='-shared  -L/usr/local/lib'
+
+From david@cantrell.org.uk Sat May 17 11:51:51 2008
+Delivered-To: japh@voltar-confed.org
+Received: by 10.86.57.10 with SMTP id f10cs26016fga;
+        Sat, 17 May 2008 08:51:52 -0700 (PDT)
+Received: by 10.114.180.18 with SMTP id c18mr5185525waf.128.1211039511321;
+        Sat, 17 May 2008 08:51:51 -0700 (PDT)
+Return-Path: <david@cantrell.org.uk>
+Received: from x1.develooper.com (x1.develooper.com [63.251.223.170])
+        by mx.google.com with SMTP id m17si11822336waf.35.2008.05.17.08.51.50;
+        Sat, 17 May 2008 08:51:51 -0700 (PDT)
+Received-SPF: neutral (google.com: 63.251.223.170 is neither permitted nor denied by domain of david@cantrell.org.uk) client-ip=63.251.223.170;
+Authentication-Results: mx.google.com; spf=neutral (google.com: 63.251.223.170 is neither permitted nor denied by domain of david@cantrell.org.uk) smtp.mail=david@cantrell.org.uk
+Received: (qmail 25794 invoked by uid 225); 17 May 2008 15:51:49 -0000
+Delivered-To: JETTERO@cpan.org
+Received: (qmail 25785 invoked by alias); 17 May 2008 15:51:48 -0000
+X-Spam-Status: No, hits=-5.9 required=8.0
+	tests=BAYES_00,PERLBUG_CONF,SPF_HELO_PASS,SPF_NEUTRAL
+X-Spam-Check-By: la.mx.develooper.com
+Received: from ohno.mrbill.net (HELO ohno.mrbill.net) (207.200.6.75)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Sat, 17 May 2008 08:51:45 -0700
+Date: Sat, 17 May 2008 10:51:45 -0500
+Subject: FAIL Games-RolePlay-MapGen-1.2.10 sun4-solaris-thread-multi 2.9
+From: david@cantrell.org.uk
+To: cpan-testers@perl.org
+Cc: JETTERO@cpan.org
+Message-ID: <1211039505.07AB20.7745@ohno.mrbill.net>
+X-Reported-Via: Test::Reporter 1.38, via CPAN::Reporter 1.13
+X-Virus-Checked: Checked
+Status: RO
+Content-Length: 5926
+Lines: 165
+
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+--
+Dear Paul Miller,
+    
+This is a computer-generated report for Games-RolePlay-MapGen-1.2.10
+on perl 5.10.0, created by CPAN-Reporter-1.13. 
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://cpantest.grango.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/local/bin/make test':
+
+PERL_DL_NONLAZY=1 /usr/local/home/david/cpantesting/perl-5.10.0/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00_load.................ok
+t/01_mg_new_auto..........ok
+t/03_tools................ok
+t/04_irange...............ok
+t/05_export...............Unknown option --path
+# Test 6 got: "256" (t/05_export.t at line 46)
+#   Expected: "0"
+#  t/05_export.t line 46 is: skip( (not (-f "/usr/bin/xmllint")) => system(qw(/usr/bin/xmllint --path blib/lib/Games/RolePlay/MapGen --postvalid --noout map.xml)), 0);
+FAILED test 6
+	Failed 1/631 tests, 99.84% okay
+t/05_perfect..............ok
+t/05_save_load............ok
+t/07_basic................ok
+t/08_interconnects........ok
+t/08_interconnects_xml....ok
+t/08_xmlinter.............ok
+t/09_xml_export_import....ok
+t/10_groups...............ok
+t/11_groups_a5s...........ok
+Failed Test   Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+t/05_export.t              631    1  6
+Failed 1/14 test scripts. 1/46639 subtests failed.
+Files=14, Tests=46639, 157 wallclock secs (135.94 cusr +  1.88 csys = 137.82 CPU)
+Failed 1/14 test programs. 1/46639 subtests failed.
+make: *** [test_dynamic] Error 255
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module                      Need Have   
+    --------------------------- ---- -------
+    Algorithm::Diff             0    1.1902 
+    File::Slurp                 0    9999.13
+    Software::License::LGPL_2_1 0    0      
+    Test                        1.25 1.25   
+    Tie::IxHash                 0    1.21   
+    XML::Simple                 0    2.18   
+    XML::XPath                  0    1.13   
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING = 1
+    LD_LIBRARY_PATH = /usr/local/lib:/usr/lib:/usr/openwin/lib:/usr/ucblib:.
+    PATH = /usr/local/bin:/usr/bin:/sbin:/usr/sbin:/usr/openwin/bin:/usr/ccs/bin:/usr/ucb:/etc:.
+    PERL5LIB = 
+    PERL5_CPANPLUS_IS_RUNNING = 7745
+    PERL5_CPAN_IS_RUNNING = 7745
+    SHELL = /bin/bash
+    TERM = screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /usr/local/home/david/cpantesting/perl-5.10.0/bin/perl
+    $UID/$EUID = 10217 / 10217
+    $GID = 1 1
+    $EGID = 1 1
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.9205   
+    Cwd                 3.2701   
+    ExtUtils::CBuilder  0.21     
+    ExtUtils::Command   1.13     
+    ExtUtils::Install   1.44     
+    ExtUtils::MakeMaker 6.42     
+    ExtUtils::Manifest  1.51_01  
+    ExtUtils::ParseXS   2.18_02  
+    File::Spec          3.2701   
+    Module::Build       0.2808_01
+    Module::Signature   n/a      
+    Test::Harness       2.64     
+    Test::More          0.72     
+    YAML                n/a      
+    YAML::Syck          n/a      
+    version             0.74     
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0) configuration:
+  Platform:
+    osname=solaris, osvers=2.9, archname=sun4-solaris-thread-multi
+    uname='sunos ohno.mrbill.net 5.9 generic_122300-03 sun4u sparc sunw,ultra-80 solaris '
+    config_args='-de -Dprefix=/usr/local/home/david/cpantesting/perl-5.10.0 -Dusethreads'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=define, usemultiplicity=define
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=undef, use64bitall=undef, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-D_REENTRANT -fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O',
+    cppflags='-D_REENTRANT -fno-strict-aliasing -pipe -I/usr/local/include'
+    ccversion='', gccversion='4.2.1', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=4321
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=16
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=8, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -L/usr/local/lib '
+    libpth=/usr/local/lib /usr/lib /usr/ccs/lib
+    libs=-lsocket -lnsl -lgdbm -ldb -ldl -lm -lpthread -lc
+    perllibs=-lsocket -lnsl -ldl -lm -lpthread -lc
+    libc=/lib/libc.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-fPIC', lddlflags='-G -L/usr/local/lib'
+
+From slaven@rezic.de Mon May 19 15:11:53 2008
+Delivered-To: japh@voltar-confed.org
+Received: by 10.86.57.10 with SMTP id f10cs127859fga;
+        Mon, 19 May 2008 12:11:54 -0700 (PDT)
+Received: by 10.114.66.2 with SMTP id o2mr7861124waa.102.1211224313284;
+        Mon, 19 May 2008 12:11:53 -0700 (PDT)
+Return-Path: <slaven@rezic.de>
+Received: from x1.develooper.com (x1.develooper.com [63.251.223.170])
+        by mx.google.com with SMTP id n30si18425711wag.13.2008.05.19.12.11.52;
+        Mon, 19 May 2008 12:11:53 -0700 (PDT)
+Received-SPF: neutral (google.com: 63.251.223.170 is neither permitted nor denied by best guess record for domain of slaven@rezic.de) client-ip=63.251.223.170;
+Authentication-Results: mx.google.com; spf=neutral (google.com: 63.251.223.170 is neither permitted nor denied by best guess record for domain of slaven@rezic.de) smtp.mail=slaven@rezic.de
+Received: (qmail 24530 invoked by uid 225); 19 May 2008 18:45:11 -0000
+Delivered-To: JETTERO@cpan.org
+Received: (qmail 24522 invoked by alias); 19 May 2008 18:45:11 -0000
+X-Spam-Status: No, hits=-6.6 required=8.0
+	tests=BAYES_00,PERLBUG_CONF
+X-Spam-Check-By: la.mx.develooper.com
+Received: from la.mx.develooper.com (HELO x1.develooper.com) (63.251.223.176)
+    by la.mx.develooper.com (qpsmtpd/0.28) with SMTP; Mon, 19 May 2008 11:45:03 -0700
+Received: (qmail 24460 invoked from network); 19 May 2008 18:44:59 -0000
+Received: from x16.dev (10.0.100.26)
+  by x1.dev with QMQP; 19 May 2008 18:44:59 -0000
+X-Spam-Level: *
+Received: from mail3.ixls.de (HELO mail3.ixls.de) (78.47.208.109)
+    by 16.mx.develooper.com (qpsmtpd/0.43rc1) with ESMTP; Mon, 19 May 2008 11:44:51 -0700
+Received: from e178096013.adsl.alicedsl.de ([85.178.96.13] helo=localhost.localdomain)
+	by mail3.ixls.de with esmtpa (Exim 4.63)
+	id 1JyALo-0001wX-4n; Mon, 19 May 2008 20:44:48 +0200
+Received: from biokovo.herceg.de (localhost [127.0.0.1])
+	by biokovo.herceg.de (8.13.6/8.13.6) with ESMTP id m4JIiKnA089881;
+	Mon, 19 May 2008 20:44:20 +0200 (CEST)
+	(envelope-from srezic@cpan.org)
+Date: Mon, 19 May 2008 20:44:20 +0200
+Subject: FAIL Games-RolePlay-MapGen-1.2.14 i386-freebsd 6.1-release
+From: srezic@cpan.org
+To: cpan-testers@perl.org
+Cc: JETTERO@cpan.org
+Message-ID: <1211222660.2b610.89260@biokovo.herceg.de>
+X-Reported-Via: Test::Reporter 1.38, via CPAN::Reporter 1.13
+X-Virus-Checked: Checked
+X-Old-Spam-Check-By: 16.mx.develooper.com
+X-Old-Spam-Status: No, hits=-6.6 required=8.0
+	tests=BAYES_00,PERLBUG_CONF
+Content-Length: 7927
+Lines: 200
+
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+--
+Dear Paul Miller,
+    
+This is a computer-generated report for Games-RolePlay-MapGen-1.2.14
+on perl 5.10.0, created by CPAN-Reporter-1.13. 
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://cpantest.grango.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /usr/local/bin/perl5.10.0 "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00_load...................ok
+t/01_mg_new_auto............ok
+t/03_tools..................ok
+t/04_irange.................ok
+t/05_export.................ok
+t/05_perfect................ok
+t/05_save_load..............ok
+t/07_basic..................ok
+t/08_interconnects..........ok
+t/08_interconnects_xml......
+error in processing external entity reference at line 2, column 36, byte 80:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MapGen SYSTEM "MapGen.dtd">
+===================================^
+<?xml-stylesheet type="text/xsl" href="MapGen.xsl"?>
+
+ at /usr/perl5.10.0/lib/site_perl/5.10.0/i386-freebsd/XML/Parser.pm line 187
+ Dubious, test returned 25 (wstat 6400, 0x1900)
+ No subtests run 
+t/08_xmlinter...............
+error in processing external entity reference at line 2, column 36, byte 80:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MapGen SYSTEM "MapGen.dtd">
+===================================^
+<?xml-stylesheet type="text/xsl" href="MapGen.xsl"?>
+
+ at /usr/perl5.10.0/lib/site_perl/5.10.0/i386-freebsd/XML/Parser.pm line 187
+ Dubious, test returned 25 (wstat 6400, 0x1900)
+ No subtests run 
+t/09_xml_export_import......
+error in processing external entity reference at line 2, column 36, byte 80:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MapGen SYSTEM "MapGen.dtd">
+===================================^
+<?xml-stylesheet type="text/xsl" href="MapGen.xsl"?>
+
+ at /usr/perl5.10.0/lib/site_perl/5.10.0/i386-freebsd/XML/Parser.pm line 187
+ Dubious, test returned 25 (wstat 6400, 0x1900)
+ Failed 1/1 subtests 
+t/10_groups.................ok
+t/11_groups_a5s.............ok
+
+Test Summary Report
+-------------------
+t/08_interconnects_xml.t (Wstat: 6400 Tests: 0 Failed: 0)
+  Non-zero exit status: 25
+  Parse errors: No plan found in TAP output
+t/08_xmlinter.t         (Wstat: 6400 Tests: 0 Failed: 0)
+  Non-zero exit status: 25
+  Parse errors: No plan found in TAP output
+t/09_xml_export_import.t (Wstat: 6400 Tests: 0 Failed: 0)
+  Non-zero exit status: 25
+  Parse errors: Bad plan.  You planned 1 tests but ran 0.
+Files=14, Tests=19884, 13 wallclock secs ( 1.78 usr  0.12 sys +  9.23 cusr  0.31 csys = 11.45 CPU)
+Result: FAIL
+Failed 3/14 test programs. 0/19884 subtests failed.
+*** Error code 255
+
+Stop in /var/tmp/CPAN-build/Games-RolePlay-MapGen-1.2.14-sQVsNP.
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module                      Need Have   
+    --------------------------- ---- -------
+    Algorithm::Diff             0    1.1902 
+    File::Slurp                 0    9999.13
+    Software::License::LGPL_2_1 0    0      
+    Test                        1.25 1.25   
+    Tie::IxHash                 0    1.21   
+    XML::Parser                 2.36 2.36   
+    XML::Simple                 0    2.18   
+    XML::XPath                  1.13 1.13   
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    PATH = /usr/local/bin:/usr/X11R6/bin:/usr/X11/bin:/usr/perl5.8.0/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/pilot/bin:/home/cpansand/bin/freebsd6.1:/home/cpansand/bin/sh:/home/cpansand/bin:/usr/X386/bin:/usr/games:/home/cpansand/devel:/usr/home/e/eserte/work/srezic-misc/scripts
+    PERL5LIB = /usr/local/src/CPAN/build/XML-XPath-1.13-qRgM2k/blib/arch:/usr/local/src/CPAN/build/XML-XPath-1.13-qRgM2k/blib/lib:/usr/local/src/CPAN/build/Software-License-0.004-R2SJpo/blib/arch:/usr/local/src/CPAN/build/Software-License-0.004-R2SJpo/blib/lib:/usr/local/src/CPAN/build/Text-Template-1.45-VJkUnZ/blib/arch:/usr/local/src/CPAN/build/Text-Template-1.45-VJkUnZ/blib/lib:/usr/local/src/CPAN/build/Sub-Install-0.924-xmBwTC/blib/arch:/usr/local/src/CPAN/build/Sub-Install-0.924-xmBwTC/blib/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 89260
+    PERL5_CPAN_IS_RUNNING = 89260
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 89244,89260
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_HTML_DISPLAY_CLASS = HTML::Display::Mozilla
+    SHELL = /usr/local/bin/zsh
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /usr/local/bin/perl5.10.0
+    $UID/$EUID = 1023 / 1023
+    $GID = 1023 1023 1023
+    $EGID = 1023 1023 1023
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.92_61  
+    Cwd                 3.2701   
+    ExtUtils::CBuilder  0.23     
+    ExtUtils::Command   1.14     
+    ExtUtils::Install   1.50     
+    ExtUtils::MakeMaker 6.44     
+    ExtUtils::Manifest  1.51_01  
+    ExtUtils::ParseXS   2.19     
+    File::Spec          3.2701   
+    Module::Build       0.2808_01
+    Module::Signature   n/a      
+    Test::Harness       3.10     
+    Test::More          0.80     
+    YAML                0.66     
+    YAML::Syck          1.04     
+    version             0.74     
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0) configuration:
+  Platform:
+    osname=freebsd, osvers=6.1-release, archname=i386-freebsd
+    uname='freebsd biokovo.herceg.de 6.1-release freebsd 6.1-release #0: sun may 7 04:32:43 utc 2006 root@opus.cse.buffalo.edu:usrobjusrsrcsysgeneric i386 '
+    config_args='-Dprefix=/usr/perl5.10.0 -Dusemymalloc=n -D cc=ccache cc -Dgccansipedantic -Duse64bit -de -D hintfile=myfreebsd'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=undef, usemultiplicity=undef
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=undef, use64bitall=undef, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='ccache cc', ccflags ='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -I/usr/local/include',
+    optimize='-O2 -mtune=athlon64 -pipe',
+    cppflags='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -I/usr/local/include'
+    ccversion='', gccversion='3.4.4 [FreeBSD] 20050518', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='ccache cc', ldflags ='-Wl,-E  -L/usr/local/lib'
+    libpth=/usr/lib /usr/local/lib
+    libs=-lm -lcrypt -lutil -lc
+    perllibs=-lm -lcrypt -lutil -lc
+    libc=, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-DPIC -fPIC', lddlflags='-shared  -L/usr/local/lib'
+

@@ -1,0 +1,47 @@
+# ChangeLog for app-shells/psh
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/psh/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  14 Mar 2004; Michael Sterrett <mr_bones_@gentoo.org> psh-0.009-r1.ebuild,
+  psh-0.009-r2.ebuild, psh-1.8.ebuild:
+  Don't assign default to S; header fix
+
+  06 Feb 2004; <gustavoz@gentoo.org> psh-1.8.ebuild:
+  marked stable on sparc
+
+  06 Feb 2004; Aron Griffis <agriffis@gentoo.org> psh-1.8.ebuild:
+  Mark stable on alpha and ia64; fix bug 33406 by setting myinst
+
+*psh-1.8 (06 May 2003)
+
+  06 May 2003; Aron Griffis <agriffis@gentoo.org> psh-1.8.ebuild:
+  Update to 1.8 but mark for testing since we're frozen right now
+
+  17 Jan 2003; Daniel Ahlberg <aliz@gentoo.org> psh-0.009-r2.ebuild :
+  Closes #4669 again. To make a long story short: inherit perl-module.
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*psh-0.009-r2 (8 Jul 2002)
+  
+  28 Jul 2002; Calum Selkirk <cselkirk@gentoo.org> psh-0.009-r2.ebuild :
+
+  Added ppc to KEYWORDS.
+  Fixed illegal space characters.
+  Fixed date in header.
+
+  8 Jul 2002; Daniel Ahlberg <aliz@gentoo.org> psh-0.009-r2.ebuild files/digest-psh-0.009-r2:
+
+  Fixes bug #4669.
+
+*psh-0.009-r1 (1 Feb 2002)
+
+  03 Nov 2002; Mark Guertin <gerk@gentoo.org> psh-0.009-r1.ebuild:
+  added ppc to keywords
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

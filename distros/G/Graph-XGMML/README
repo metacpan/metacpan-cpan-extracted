@@ -1,0 +1,142 @@
+NAME
+    Graph::XGMML - Simple Graph.pm-like interface for generating XGMML
+    graphs
+
+SYNOPSIS
+      use Graph::XGMML;
+      
+  my $output = '';
+      my $graph  = Graph::XGMML->new(
+          directed => 1,
+          OUTPUT   => \$output,
+      );
+      $graph->add_node('foo');
+      $graph->add_node('bar');
+      $graph->add_edge('foo', 'bar');
+      $graph->end;
+
+DESCRIPTION
+    To produce useful diagrams on extremely large graphs, sometimes it is
+    necesary to move beyond simple graphing tools to applications
+    specifically designed for rendering very large graphs, many of which
+    were designed for biology applications (such as my favourite Cytoscape).
+
+    Graph::XGMML is a module that can be used to generate export files for
+    arbitrarily large graphs in eXtensible Graph Modelling Markup Language,
+    so that the graphs can be imported into these specialised tools.
+
+    The API is intentionally designed to appear similar to more popular
+    modules such as Graph, Graph::Easy and GraphViz.
+
+METHODS
+  new
+      # Quick constructor to write to a file
+      $graph  = Graph::XGMML->new(
+          directed => 1,
+          OUTPUT   => IO::File->new('file', 'w'),
+      );
+      
+  # Anonymous constructor
+      $graph = Graph::XGMML->new(
+          directed => 1,
+      );
+
+    The "new" constructor is used to create a graph writer.
+
+    It takes a single optional boolean "directed" parameter, which indicates
+    if the graphs you will be generating will be directed or undirected.
+
+    If any additional parameters are passed to "new", the constructor will
+    make an additional call to the "start" method to start writing the
+    document header and to open the root "graph" node, passing it the extra
+    parameters.
+
+    Returns a new Graph::XGMML object, or throws an exception (dies) on
+    error.
+
+  start
+    The "start" method allows you to explicitly start the document writing,
+    if the original constructor was produced without additional parameters.
+
+    Any parameters are passed directly to the underlying XML::Writer
+    constructor which produces the object that will be used to generate the
+    XML.
+
+    Returns true if the document is started successfully, or throws an
+    exception (dies) on error.
+
+  add_node
+      # Add a simple node
+      $graph->add_node( 'name' );
+      
+  # Add optional tag attributes
+      $graph->add_node( 'name',
+          label  => 'Tag Label',
+          weight => 100,
+      );
+
+    The "add_node" method is used to add a new node to the graph.
+
+    Because the Graph::XGMML object doesn't remember its state as it
+    produces the graph, you must specify all nodes in the graph explicitly.
+
+    The first parameter is the identifier for the node. Any additional
+    parameters will be treated XGMML "node" element tag pairs.
+
+    Returns true or throws an exception (dies) on error.
+
+  add_vertex
+    The "add_vertex" method is an alias to "add_node", provided for
+    increased compatibility with the Graph API.
+
+    It takes the same parameters as "add_node".
+
+  add_edge
+      # Add a simple edge
+      $graph->add_edge( 'foo' => 'bar' );
+      
+  # Add with optional attributes
+      $graph->add_edge( 'foo' => 'bar',
+          weight => 1,
+      );
+
+    The c<add_edge> method adds an edge to the graph.
+
+    The first two parameters are the source and target of the edge. Any
+    additional parameters should be a set of key/value pairs of edge
+    attributes.
+
+    Returns true or throws an exception (dies) on error.
+
+  end
+      # Explicitly terminate the document
+      $graph->end;
+
+    The "end" method is used to indicate that the graph is completed that
+    the XML should be terminated.
+
+    If you do not call it yourself, it will be called for you at
+    "DESTROY"-time.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Graph-XGMML>
+
+    For other issues, contact the maintainer.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Graph, Graph::Easy, GraphViz
+
+COPYRIGHT
+    Copyright 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

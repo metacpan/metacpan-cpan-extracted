@@ -1,0 +1,17 @@
+Revision history for Perl extension Getopt::Std::WithCheck.
+
+0.04  Fri Aug 15 09:45:00 2007
+	- doc fix: incorrect synopsis. Thanks to Daniel McBrearty.
+
+0.03  Fri Aug 10 15:20:00 2007
+	- bugfix: The distribution contains a blib/ directory and is therefore not being indexed.
+	- README fixed
+	- Makefile.PL fixed to mark a dependancy
+
+0.02  Fri Aug 10 15:10:00 2007
+	- Minor bigfix (getops string was not displayed properly in usage message)
+
+0.01  Wed May 30 19:47:17 2007
+	- original version; created by h2xs 1.23 with options
+		-AXcfn Getopt::Std::WithCheck
+

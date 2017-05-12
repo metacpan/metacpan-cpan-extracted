@@ -1,0 +1,43 @@
+Revision history for Perl module Geo::Region
+
+0.07 2015-03-23
+ - Upgraded from CLDR v26 to v27, which only changed the version number and no
+   functional or data changes affecting Geo::Region
+
+0.06 2014-12-17
+ [ Geo::Region ]
+ - Constructor arguments may now optionally be passed as a hashref to `new`
+ - `contains` and `is_within` methods now only accept a single region as a
+   scalar value and no longer accept a list or arrayref of regions, which was
+   never a documented feature
+
+ [ Geo::Region::Constant ]
+ - Added constants for ISO 3166-1 alpha-2 country codes
+ - Added `:region` and `:country` export tags, in addition to `:all`, for
+   exporting region constants or country constants, respectively
+
+0.05 2014-12-05
+ - Added Geo::Region::Constant to provide named constants for all supported
+   region codes
+
+0.04 2014-12-04
+ - Added a warning when using the deprecated `region` constructor argument
+   instead of `include`
+
+0.03 2014-11-11
+ - Added country code `UK` as a deprecated alias of `GB` (United Kingdom)
+ - Changed deprecated region `QU` from being within `150` (Europe) to being a
+   deprecated alias of `EU` (European Union), which is also within `150`
+
+0.02 2014-11-09
+ - The `region` param to the constructor has been renamed `include` while the
+   deprecated alias `region` has been added for backward compatibility
+ - Passing the `include` key is now optional when the value is passed as the
+   first or only argument to the constructor
+
+0.01 2014-10-10
+ - First official release to CPAN
+ - Improved docs
+
+0.00_01 2014-10-07
+ - First development release to CPAN

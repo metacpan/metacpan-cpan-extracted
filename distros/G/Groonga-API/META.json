@@ -1,0 +1,52 @@
+{
+   "abstract" : "raw interface to Groonga",
+   "author" : [
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132620",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Groonga-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "JSON::XS" : "0",
+            "Path::Extended" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0.88",
+            "Test::UseAllModules" : "0.10",
+            "version" : "0.77"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/charsbar/groonga-api"
+      }
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,112 @@
+Usage:
+    test-script [options] file+
+
+      Option        Value       Default  Unit  Meaning
+      -a|--arg1     string      foo            No meaning
+      -A|--arg2     [float]     1.5            
+      -b|--bob                  ------         
+
+      -v|--verbose                             Output informational messages
+      --progress                               Output progress messages
+      --stats                                  Output statistical information
+
+      --help        [string]                   Produce summary help on stdout
+      --longhelp                               Produce long help on stdout
+      --man                                    Produce full man page on stdout
+      --version                                Produce full version on stdout
+      --copyright                              Produce full copyright on stdout
+      -V|--briefversion                        Produce brief version on stdout
+
+      --dry-run                                Don't really do anything
+      --debug       [fd/level]
+
+Options:
+    Options come in short (single-character) and/or long forms. Short
+    options are preceded by a single dash (-x), whilst long options are
+    preceded by a double-dash (--option). Long options may be abbreviated to
+    the minimal distinct prefix. Single char options may not be bundled (-v
+    -a -x != -vax). Options taking string values will assume that anything
+    immediately following is a string value, even if the string is optional
+    and/or the "value" could be interpreted as another option (if -v takes a
+    string, -vax will give the value "ax" to the option -v).
+
+    Options which are boolean must use the long form (if available) to
+    negate, prefixed by "no" (--foo may be negated by --nofoo).
+
+    Options which are repeating may be invoked multiple times for greater
+    effect.
+
+    Option & argument order does not matter: all options will be processed
+    prior to any arguments.
+
+    A lone "--" may be used to terminate options processing; any text(s)
+    following this will be treated as arguments, rather than options.
+
+    Some options are marked as type 'fd/level'. These take options of the
+    form "+([0-9]+)" to set a specific level, and/or either a simple file
+    name ([A-Za-z0-9_-.\/]+) or a file-descriptor number (preceded by a
+    colon). They come in the order file,level,fd (but it is illegal to
+    specify a filename and a file descriptor together). E.g., "+1" sets to
+    level one (to the default filehandle), "/tmp/foo" sets it to output to
+    /tmp/foo (at the default level); "+2:3" outputs at level 2 to file
+    descriptor 3.
+
+    If a filename is given, an error will ensue if that file already exists
+    (and is a plain file). This is to avoid accidents due to the optional
+    string syntax.
+
+    Beware optional arguments; if you use an option that takes an optional
+    argument, then any likely-looking (in the case of string arguments,
+    anything) following it will be treated as an argument to the option. If
+    you mean for an argument-looking thing to be an argument to the option,
+    use "--foo=bob" (for clarity). If you want to follow it with a value
+    that looks like an argument to the option (but you intend to be a value
+    for the program), follow it with "--", e.g., "myprog --foo -- bob"
+
+    arg1|a
+        No description
+
+    verbose|v
+        Enable informational messages about choices made, etc. to stderr.
+        This option may be invoked multiple times to increase the level of
+        verbosity.
+
+    progress
+        Enable regular messages to inform the user of progress made. These
+        may be in simple text form, or where appropriate, progress bars or
+        the like may be used (when connected to a suitable terminal).
+
+    stats
+        Enable statistical information to be output to the user.
+
+    help
+        Print a brief help message and exit. If an argument is given, then
+        it is treated as an option name, and the description for that option
+        is given (a la longhelp).
+
+    longhelp
+        Print a longer help message and exit.
+
+    man Print the manual page and exit.
+
+    version
+        Print the version info (as for "briefversion") and the copyright
+        notice, and exit.
+
+    copyright
+        Print the copyright notice, and exit.
+
+    briefversion|V
+        Print the version number (of the source package), in the form
+
+          scriptname (packagename): version
+
+        and exit. scriptname is the canonical installed name of the script.
+
+    dry-run
+        Do not write any files (other than temporary files), nor make any
+        changes to any RDBMS (other than disposable ones).
+
+    debug
+        Enable debugging output.
+

@@ -1,0 +1,42 @@
+# -*- Mode: Text -*-
+# gengetopt specification for 'test'
+package "test"
+version	"0.01"
+purpose	"Test for moogengetopt.perl."
+details "Some details about the program."
+author "Bryan Jurish <examples/config.h>"
+
+# Arguments
+argument "ARG1" "The first non-option argument"
+
+# Options
+group "Basic Options"
+option	"toggleme"	t	"A toggle option"		 no
+option	"flagme"	f	"A flag option"			 flag	on
+option	-		x	"A shortform-only option called 'x'" no
+
+group "Options With Arguments"
+option	"stringme"	s \
+	"A stringy option" \
+	string \
+	default="my default string value" \
+	details="Some details about the string argument." \
+	no
+
+option "fileme"  F \
+       "A file option" \
+       string \
+       default="file.txt" arg="FILE" \
+       no
+
+option	"verbose" v \
+	"Specify verbosity level (type=short)" \
+	int \
+	default="1" arg="LEVEL" \
+	yes
+
+option	"floatme"	- \
+	"A floating-point argument (no short-option)" \
+	float \
+	default="1.0" arg="FLOATARG" \
+	no

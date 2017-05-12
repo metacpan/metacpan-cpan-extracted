@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/GD/Chord/Piano.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.pod
+t/00.load.t
+t/01.jamin.t
+xt/01_perlcritic.t
+xt/02_pod-coverage.t
+xt/03_pod.t

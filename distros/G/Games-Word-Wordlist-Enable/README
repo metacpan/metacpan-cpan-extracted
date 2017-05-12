@@ -1,0 +1,60 @@
+NAME
+    Games::Word::Wordlist::Enable - Manages the Enable word list
+
+SYNOPSIS
+     use Games::Word::Wordlist::Enable;
+     my $wl = Games::Word::Wordlist::Enable -> new;
+     my $word = $wl -> random_word;
+     print "We have a word." if $wl -> is_word ($word);
+
+DESCRIPTION
+    "Games::Word::Wordlist::Enable" subclasses "Games::Word::Wordlist",
+    giving you a managable wordlist preloaded with the words from the public
+    domain *Enable* wordlist. "Games::Word::Wordlist::Enable" defines just
+    one method, the class method "new", which doesn't take any arguments.
+
+    Since "Games::Word::Wordlist" is subclassed, all its methods (except
+    "new") are available.
+
+SEE ALSO
+    "Games::Word::Wordlist".
+
+DEVELOPMENT
+    The current sources of this module are found on github,
+    <git://github.com/Abigail/Games--Word--Wordlist--Enable.git>.
+
+AUTHOR
+    Abigail, <mailto:cpan@abigail.be>.
+
+COPYRIGHT and LICENSE
+    Copyright (C) 2009 by Abigail, except the word list itself, which is in
+    the public domain.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+
+INSTALLATION
+    To install this module, run, after unpacking the tar-ball, the following
+    commands:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+

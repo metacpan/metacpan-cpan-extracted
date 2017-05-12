@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Geo-GeoNames-Record.t
+t/Geo-GeoNames-File.t
+t/Geo-GeoNames-DB-SQLite.t
+t/geonames_sample.txt
+lib/Geo/GeoNames/Record.pm
+lib/Geo/GeoNames/File.pm
+lib/Geo/GeoNames/DB/SQLite.pm
+bin/gn_txt_to_sqlite
+bin/gn_query
+bin/gn_update_admins

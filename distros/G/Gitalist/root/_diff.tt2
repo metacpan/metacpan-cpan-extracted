@@ -1,0 +1,33 @@
+[% INCLUDE inc/syntax_highlight_css.tt2 %]
+
+<h2>Differences</h2>
+
+<div class="differences">
+
+[% FOREACH item IN diff %]
+
+<h4 id="diff[% loop.count %]" class='diff-head'>diff --git [%# FIXME %]
+ [% IF !item.src.match('^0+$') %]
+   <a href='[% c.uri_for_action("/ref/blob", [Repository.name, item.src]) %]' title="Blob">[% item.a %]</a>
+ [% ELSE %]
+   [% item.a %]
+ [% END %]
+ [% IF !item.dst.match('^0+$') %]
+ <a href='[% c.uri_for_action("/ref/blob", [Repository.name, item.dst]) %]' title="Blob">[% item.b %]</a>
+ [% ELSE %]
+   [% item.b %]
+ [% END %]
+</h4>
+
+
+<div class='diff-patch'>
+	<pre>[% blobs.${loop.index} %]</pre>
+</div>
+
+<div class='diff-index'>
+	[% item.index.replace("index","<b>Index</b>") %]
+</div>
+
+[% END %]
+
+</div>

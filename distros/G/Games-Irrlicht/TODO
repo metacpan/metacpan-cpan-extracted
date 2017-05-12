@@ -1,0 +1,16 @@
+
+############################################################################## 
+Games::Irrlicht
+
+* Games::Irrlicht should get you access to the driver, device, filemanager etc
+  and then let you call functions on them. While this works, it really is just
+  a fake front, you could call all functions directly. They need to live in
+  their own cozy namespace.
+* The techdemo should be converted to Perl just to show we can do it
+* There are too many functions not working yet
+* win32 port
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

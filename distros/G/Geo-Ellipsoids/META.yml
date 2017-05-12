@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Geo-Ellipsoids
+version:      0.16
+version_from: lib/Geo/Ellipsoids.pm
+installdirs:  site
+requires:
+    constant:                      0
+    Geo::Constants:                0.04
+    Geo::Functions:                0.03
+    strict:                        0
+    vars:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

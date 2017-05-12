@@ -1,0 +1,10 @@
+Revision history for Geo-IATA
+
+0.0.3  Sat Jun 27 14:04:40 2009
+       added short lookups for airport and location 
+       added wikipedia license stuff
+       fixed developer tests (Test::Perl::Critic)
+
+0.0.1  Sun Jun 21 12:04:40 2009
+       Initial release.
+

@@ -1,0 +1,43 @@
+                                    # Time-stamp: "2003-05-10 20:52:07 AHDT"
+
+Getopt::Janus -- get program options via command-line or via a GUI
+
+This module is a simple framework for writing programs that can get
+their options either on the command line, or via a GUI.
+
+This module requires Tk for running in GUI mode; but without
+it, you can still use the command-line mode.
+
+On an MSWindows machine, you can install Tk by just entering this at a
+DOS prompt:  ppm install Tk
+
+See perldoc perlmodinstall for the help on installing modules.
+
+
+
+Here's a complete sample Janus-using program with just one option:
+
+  use strict;
+  use Getopt::Janus;
+  choose my $ice_cream, '-i', \"What kind of ice cream",
+   'from' => [ 'Lemon sorbet', 'Vanilla ice cream', 'Mango zabaglione' ];
+  $ice_cream = 'Mango zabaglione';
+
+  license_gnu;
+  run \&main, \"Ice cream chooser";
+
+  sub main {
+    print "Ice cream is $ice_cream.\n";
+    return;
+  }
+
+It can be run from a command line as:
+
+  icecream -i "Lemon sorbet"
+
+To get a GUI for choosing the value of -i (and any other values), you
+just run the program without any options:
+
+  icecream
+
+See perldoc Getopt::Janus for more info.

@@ -1,0 +1,27 @@
+---
+abstract: 'simple interface to Google+'
+author:
+  - 'Zak B. Elep <zakame@cpan.org>'
+build_requires:
+  Net::Ping: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Google-Plus
+requires:
+  Carp: 0
+  IO::Socket::SSL: 1.37
+  Mojo::Base: 0
+  Mojo::URL: 0
+  Mojo::UserAgent: 0
+  perl: v5.10.1
+resources:
+  repository: git://github.com/zakame/perl-google-plus.git
+version: 0.004

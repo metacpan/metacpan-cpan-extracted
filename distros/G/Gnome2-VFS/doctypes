@@ -1,0 +1,13 @@
+GnomeVFSFileSize		unsigned
+GnomeVFSFileOffset		unsigned
+GnomeVFSMimeApplication		Gnome2::VFS::Mime::Application
+GnomeVFSFileInfo		Gnome2::VFS::FileInfo
+GnomeVFSApplication		Gnome2::VFS::Application
+GnomeVFSMimeType		Gnome2::VFS::Mime::Type
+GnomeVFSHandle			Gnome2::VFS::Handle
+GnomeVFSMonitorHandle		Gnome2::VFS::Monitor::Handle
+GnomeVFSDirectoryHandle		Gnome2::VFS::Directory::Handle
+GnomeVFSAsyncHandle		Gnome2::VFS::Async::Handle
+GnomeVFSDNSSDBrowseHandle	Gnome2::VFS::DNSSD::Browse::Handle
+GnomeVFSDNSSDResolveHandle	Gnome2::VFS::DNSSD::Resolve::Handle
+GnomeVFSResolveHandle		Gnome2::VFS::Resolve::Handle

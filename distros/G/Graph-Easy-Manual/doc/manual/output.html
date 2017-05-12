@@ -1,0 +1,564 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - Manual - Output</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+  <a class="menubck" href="index.html" title="Back to the manual index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+
+  <a class="menuext" href="overview.html" title="How everything fits together">Overview</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+  <a class="menuext" href="hinting.html" title="Generating specific layouts">Hinting</a>
+  <a class="menucur" href="output.html" title="Output formats and their limitations">Output</a>
+    <a class="menuind" href="#ascii" title="ASCII Art">ASCII</a>
+    <a class="menuind" href="#boxart" title="Box Art">Box Art</a>
+    <a class="menuind" href="#html" title="HTML + CSS">HTML</a>
+    <a class="menuind" href="svg.html" title="Scalable Vector Grafics">SVG</a>
+    <a class="menuind" href="#graphviz" title="Graphviz code suitable for dot, neato etc.">Graphviz</a>
+    <a class="menuind" href="#graphml" title="GraphML code">GraphML</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+  <a class="menuext" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+  <a class="menuext" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+  <a class="menuext" href="tutorial.html" title="Tutorial for often used graph types and designs">Tutorial</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h1>
+
+<h2>Output Formats and their Limitations</h2>
+
+<div class="text">
+
+<p>
+If you haven't done so, please read the <a href="overview.html">Overview</a> first.
+</p>
+
+<p>
+This chapter describes the possible output formats and their limitations,
+strengths and weaknesses.
+
+<h3>Formats</h3>
+
+<p>
+Graph::Easy layout graphs in the following output formats:
+</p>
+
+<ul>
+  <li><a href="#ascii">ASCII</a> - creates an ASCII art "drawing" of the graph
+  <li><a href="#boxart">Box Art</a> - uses Unicode "box drawing" characters to create a textual "drawing"
+  <li><a href="#html">HTML</a> - outputs HTML+CSS code (actually a big table) to render the graph in your browser
+  <li><a href="svg.html">SVG</a> - creates Scalable Vector Graphics output
+</ul>
+
+<p>
+In addition, the graph can be dumped in any of the following graph description languages:
+</p>
+
+<ul>
+  <li>txt - Graph::Easy's own textual description, parsable by Graph::Easy::Parser
+  <li><a href="#graphviz">graphviz</a> - text in the Graphviz langauge. This can be feed to external programs like <i>dot</i> to generate PNG, SVG etc.
+  <li><a href="#graphml">GraphML</a> - the GraphML format as described at http://graphml.graphdrawing.org/
+</ul>
+
+<a name="ascii">
+<h3>ASCII</h3>
+</a>
+
+<p>
+The ASCII output is limited to only two colors, one for the foreground, and one for the
+background.
+</p>
+
+<pre class="graph" style="min-width: 45em;">
+
+  #============================================#
+  H                                            v
++---------+     ........     +---------+     +--------+     +--------+
+| Bautzen | --> : Bonn : --> | Koblenz | --> | Berlin | --> | Kassel |
++---------+     :......:     +---------+     +--------+     +--------+
+  ^               |            ^               ^
+  :               +------------+---------------+
+  :                            |
+  :             +------+       |
+  ............. | Ulm  | ------+
+                +------+
+</pre>
+
+<p class="clear">
+The following limitations apply:
+</p>
+
+<ul>
+  <li>
+  The edge arrows are always rendered open, regardless of the actual
+  arrow style.
+  </li>
+  <li>Node shapes with slanted or round borders are not yet supported.</li>
+  <li>Edge styles <code>bold</code>, <code>broad</code> and <code>wide</code> are all rendered
+      with '#' and thus look the same.</li>
+</ul>
+
+<a name="boxart">
+<h3>Box Art</h3>
+</a>
+
+<p>
+Works like the <a href="#ascii">ASCII output</a>, but uses Unicode
+"box drawing" characters instead. This creates gap-less edges, and looks
+generally much better.
+<br>
+Box art output shares most of the limitations with the ASCII output,
+except:
+</p>
+
+<ul>
+  <li>corners on borders look better
+  <li>rounded node borders are supported
+  <li>the different arrow-styles work
+  <li>edge styles <code>bold</code>, <code>broad</code> and <code>wide</code> work
+</ul>
+
+<pre class="graph" style="font-style: monospaced; min-width: 52em;">
+
+                                My sample graph
+
+                                             Test
+                                             label
+            ┌···············································┐
+            :                                               v
+          ┌─────────────┐  label   ▛▀▀▀▀▀▀▜               ┌───────┐
+          │     One     │ ───────> ▌ Two  ▐ ▬▬▬▬▬▬▬▬▬▬▬▬> │ Four  │ ···   None
+          └─────────────┘          ▙▄▄▄▄▄▄▟               └───────┘
+            ║                                Test label
+            ║                        ┌╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴┐
+            v                        ╵                      v
+          ┌−−−−−−−−−−−−−┐          ████████               ┏━━━━━━━┓     ┌───────┐
+  ┌·······╎    Three    ╎ <══════> █ Five █ ────────────> ┃ Seven ┃ ─── │ Eight │
+  :       └−−−−−−−−−−−−−┘          ████████               ┗━━━━━━━┛     └───────┘
+  :         ^                        │                                    ^
+  :         │                        │                                    │
+  : Test    │ Test label             └────────────────────────────────────┘
+  : label   v
+  :       ┌─────────────┐
+  :       │    Sixty    │
+  :       │    Six      │
+  :       │    and      │
+  └······>│    six      │
+          └─────────────┘
+</pre>
+
+<div class="clear"></div>
+
+<a name="html">
+<h3>HTML</h3>
+</a>
+
+<p>
+The following table shows the main features and their support in the
+main browsers.
+</p>
+
+<table class="features">
+
+<tr>
+<th>Feature</th>
+<th>Opera</th>
+<th>Mozilla<br>Firefox</th>
+<th>Konqueror</th>
+<th>IE</th>
+</tr>
+
+<tr>
+<td class="c">Node shapes:<br> rounded, circle, ellipse</td>
+<td class="r">No</td>
+<td class="g">Yes</td>
+<td class="r">No</td>
+<td class="r">No</td>
+</tr>
+
+<tr>
+<td class="c">Nodes with angled borders:<br> diamond, house, triangle, etc.</td>
+<td class="r">No</td>
+<td class="g">Yes</td>
+<td class="g">Yes</td>
+<td class="g">5.x +</td>
+</tr>
+
+<tr>
+<td class="c">Node shape: point</td>
+<td class="g">Yes</td>
+<td class="g">Yes</td>
+<td class="g">Yes</td>
+<td class="g">5.x +</td>
+</tr>
+
+<tr>
+<td class="c">Gapless edges</td>
+<td class="g">Yes</td>
+<td class="g">Yes</td>
+<td class="g">Yes</td>
+<td class="g">Yes</td>
+</tr>
+
+<tr>
+<td class="c">Padding between graph content and border</td>
+<td class="g">Yes</td>
+<td class="g">Yes</td>
+<td class="y">3.4 +</td>
+<td class="r">No</td>
+</tr>
+
+</table>
+
+<p>
+Here is a sample graph:
+</p>
+
+ <style type="text/css">
+ <!--
+ table.graph .edge {
+  background: inherit;
+  border: none;
+  color: #0000ff;
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+  border: none;
+}
+table.graph {
+  background: #daa520;
+  border: none;
+  background: #fdf5e6;
+  margin: 0.5em;
+  padding: 0.5em;
+  border: 1px solid black;
+}
+table.graph .node {
+  border: 1px solid black;
+  background: white;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  text-align: center;
+  border: 1px solid black;
+}
+table.graph td {
+  padding: 2px;
+  background: inherit;
+  }
+table.graph .va {
+  vertical-align: bottom;
+  line-height: 1.5em;
+  width: 0.4em;
+  }
+table.graph .ve {
+  width: 0em;
+  }
+table.graph .lh, table.graph .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph .eb {
+  height: 1em;
+  line-height: 0.5em;
+  }
+table.graph .el {
+  width: 0.5em;
+  }
+table.graph .v, table.graph .hat, table.graph .he {
+  text-align: left;
+  height: 0.5em;
+  line-height: 0.6em;
+  }
+table.graph .hat {
+  padding-top: 0.5em;
+  line-height: 0.2em;
+  }
+table.graph { empty-cells: show; }
+
+  -->
+ </style>
+
+<table class="graph" cellpadding=0 cellspacing=0>
+<caption style='background: #daa520'>My sample graph</caption>
+<tr>
+ <td colspan=4 rowspan=4></td>
+  <td colspan=2 rowspan=2 class="edge eb"></td>
+ <td colspan=2 rowspan=2 class="edge eb" style="border-bottom: dashed  #ff0000;">&nbsp;</td>
+  <td colspan=4 rowspan=2 class="edge lh" style="border-bottom: dashed  #ff0000;##lc##">Test label</td>
+  <td colspan=2 rowspan=2 class="edge eb" style="border-bottom: dashed  #ff0000;">&nbsp;</td>
+ <td colspan=2 rowspan=2 class="edge eb"></td>
+</tr>
+
+<tr></tr>
+
+<tr>
+  <td colspan=2 rowspan=2 class="edge eb"></td>
+ <td colspan=2 rowspan=1 class="edge eb" style="border-left: dashed  #ff0000;">&nbsp;</td>
+ <td colspan=4 rowspan=2 class="edge eb" >&nbsp;</td>
+  <td colspan=2 class="edge eb"></td>
+ <td colspan=2 class="edge eb" style="border-left: dashed  #ff0000;">&nbsp;</td>
+</tr>
+
+<tr>
+  <td colspan=4 class="edge eb"></td>
+ 
+  <td colspan=4 class="edge v" style="color: #ff0000;">&nbsp;v</td>
+</tr>
+
+<tr>
+  <td colspan=2 rowspan=2 class="edge eb"></td>
+ <td rowspan=2 class="edge eb" style="border-bottom: double  #0000ff;">&nbsp;</td>
+ <td rowspan=4 class="edge ha" style="color: #0000ff;">&gt;</td>
+ <td colspan=4 rowspan=4 class='node' style="background: #800000; color: #ffff00">Five</td>
+ <td rowspan=4 class="edge ve" ></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid  #0000ff;##lc##">&nbsp;</td>
+
+ <td rowspan=4 class="edge va" style="color: #0000ff;">&gt;</td>
+ <td colspan=4 rowspan=4 class='node'>Seven</td>
+ <td rowspan=4 class="edge ve" ></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid  #0000ff;##lc##">&nbsp;</td>
+
+ <td rowspan=4 class="edge ve" ></td>
+ <td colspan=4 rowspan=4 class='node'>Eight</td>
+ <td rowspan=4 class="edge ve" ></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: dotted  #0000ff;##lc##">&nbsp;</td>
+
+ <td rowspan=4 class="edge ve" ></td>
+ <td colspan=4 rowspan=4 class='node' style="background: inherit; border: none; color: #a52a2a">None</td>
+</tr>
+
+<tr></tr>
+
+<tr>
+  <td colspan=2 rowspan=2 class="edge eb"></td>
+ <td colspan=1 rowspan=2 class="edge eb" style="border-left: double  #0000ff;">&nbsp;</td>
+ <td colspan=10 rowspan=2 class="edge eb" >&nbsp;</td>
+</tr>
+
+<tr></tr>
+
+<tr>
+ <td colspan=2 rowspan=4 class="edge el">&nbsp;</td>
+ <td colspan=2 rowspan=4 class="edge lv" style="border-left: double  #0000ff;##lc##">&nbsp;</td>
+  <td colspan=4 class="edge eb"></td>
+  <td colspan=12 rowspan=2 class="edge lh" style="border-bottom: solid  #0000ff;##lc##">&nbsp;</td>
+  <td colspan=4 class="edge hat" style="color: #0000ff;">&nbsp;^</td>
+</tr>
+
+<tr>
+ 
+  <td colspan=2 rowspan=3 class="edge eb"></td>
+ <td colspan=2 rowspan=1 class="edge eb" style="border-bottom: solid  #0000ff; border-left: solid  #0000ff;">&nbsp;</td>
+ 
+  <td colspan=2 class="edge eb" style="border-bottom: solid  #0000ff;">&nbsp;</td>
+ <td colspan=2 class="edge eb" style="border-left: solid  #0000ff;">&nbsp;</td>
+</tr>
+
+<tr>
+ 
+  <td colspan=2 rowspan=2 class="edge eb"></td>
+ <td colspan=12 rowspan=2 class="edge eb" >&nbsp;</td>
+  <td colspan=4 rowspan=2 class="edge eb"></td>
+</tr>
+
+<tr></tr>
+
+<tr>
+  <td colspan=2 rowspan=2 class="edge eb"></td>
+ <td rowspan=2 class="edge eb" style="border-bottom: double  #0000ff; border-left: double  #0000ff;">&nbsp;</td>
+ <td rowspan=4 class="edge va" style="color: #0000ff;">&gt;</td>
+ <td colspan=4 rowspan=4 class='node' style="border-style: dashed">Three</td>
+ <td rowspan=4 class="edge va" style="color: #0000ff;">&lt;</td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: double  #0000ff;##lc##">&nbsp;</td>
+
+ <td rowspan=4 class="edge ve" ></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #2e8b57; color: #ffffff">One</td>
+ <td rowspan=4 class="edge ve" ></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid  #0000ff;##lc##">label</td>
+
+ <td rowspan=4 class="edge va" style="color: #0000ff;">&gt;</td>
+ <td colspan=4 rowspan=4 class='node'>Two</td>
+ <td rowspan=4 class="edge ve" ></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid  #0000ff;##lc##">&nbsp;</td>
+
+ <td rowspan=4 class="edge va" style="color: #0000ff;">&gt;</td>
+ <td colspan=4 rowspan=4 class='node'>Four</td>
+</tr>
+
+<tr></tr>
+
+<tr>
+  <td colspan=3 rowspan=2 class="edge eb"></td>
+ <td colspan=10 rowspan=2 class="edge eb" >&nbsp;</td>
+</tr>
+
+<tr></tr>
+
+<tr>
+ <td colspan=4 rowspan=4></td>
+ <td colspan=4 class="edge hat" style="color: #0000ff;">&nbsp;^</td>
+ <td colspan=4 rowspan=4></td>
+  <td colspan=4 class="edge eb"></td>
+  <td colspan=8 rowspan=2 class="edge lh" style="border-bottom: dotted  #0000ff;##lc##">&nbsp;</td>
+  <td colspan=4 rowspan=2 class="edge lh" style="border-bottom: dotted  #0000ff;##lc##">Test<br /> label</td>
+  <td colspan=4 class="edge hat" style="color: #0000ff;">&nbsp;^</td>
+</tr>
+
+<tr>
+ <td colspan=2 rowspan=2 class="edge el">&nbsp;</td>
+ <td colspan=2 rowspan=2 class="edge lv" style="border-left: solid  #0000ff;##lc##">Test label</td>
+  <td colspan=2 rowspan=3 class="edge eb"></td>
+ <td colspan=2 rowspan=1 class="edge eb" style="border-bottom: dotted  #0000ff; border-left: dotted  #0000ff;">&nbsp;</td>
+ 
+  <td colspan=2 class="edge eb" style="border-bottom: dotted  #0000ff;">&nbsp;</td>
+ <td colspan=2 class="edge eb" style="border-left: dotted  #0000ff;">&nbsp;</td>
+</tr>
+
+<tr>
+ 
+  <td colspan=2 rowspan=2 class="edge eb"></td>
+ <td colspan=12 rowspan=2 class="edge eb" >&nbsp;</td>
+  <td colspan=4 rowspan=2 class="edge eb"></td>
+</tr>
+
+<tr>
+ <td colspan=4 class="edge v" style="color: #0000ff;">&nbsp;v</td>
+ 
+</tr>
+
+<tr>
+ <td colspan=4 rowspan=4></td>
+ <td colspan=4 rowspan=4 class='node'>Six</td>
+</tr>
+
+<tr></tr>
+
+<tr></tr>
+
+<tr></tr>
+
+</table>
+
+<p>
+Notes:
+</p>
+
+<ul>
+  <li>Nodes with shape point: are always drawn solid, e.g. their outline and
+      interiour have the same color.
+  <li>Edge arrows can be open or closed, but a different fill color will not
+      show.
+</ul>
+
+<a name="svg">
+<h3>SVG</h3>
+</a>
+
+<p>
+Please see the <a href="svg.html">SVG</a> example page.
+</p>
+
+<a name="graphviz">
+<h3>Graphviz</h3>
+</a>
+
+<p>
+Graph::Easy also allows the output of Graphviz code, which can be feed to an
+external program like <code>dot</code> or <code>neato</code> to create
+<code>.png</code>, <code>.ps</code>, <code>.svg</code> or many other
+file formats:
+</p>
+
+<pre>
+perl examples/as_graphviz my_graph.txt | dot -Tpng -o graph.png
+perl examples/as_graphviz my_graph.txt | dot -Tsvg -o graph.svg
+</pre>
+
+<p>
+The output to graphviz does not yet take some features of
+<code>Graph::Easy</code> into account. The reason is that graphviz works
+differently than <code>Graph::Easy</code> and at the moment there seems no
+easy way to implement this. Here is a short list of features that are incomplete:
+</p>
+
+<ul>
+  <li>nodes that are placed <a href="hinting.html#relative">relatively to each other</a> 
+  <li>multi-celled nodes (labels like "{ A | B }" could emulate this)
+  <li>per-node flow directions (flow for the entire graph will work, though)
+</ul>
+
+<p>
+In addition, the following output styles are not yet supported. These probably
+can be emulated with some graphviz-fu, but there was not enough time
+to find out how:
+</p>
+
+<ul>
+  <li>node border-styles: wave, dot-dot-dash and dot-dash
+  <li>edge-styles: wave, dot-dot-dash and dot-dash
+  <li>filled edge arrows with different fill colors
+  <li>node shape: point with other point-styles than "circle"
+  <li>text-styles like bold, italic, underline, overline, strike-through
+  <li>alignment for certain types of labels
+</ul>
+
+<p>
+Note that unlike with the other output methods, <code>Graph::Easy</code> has less control
+over the layout when outputting graphviz code. Sometimes this improves
+graph layout, because <code>dot</code> et. al. are not restricted to a grid-like
+layout, but certain features might be rendered quite differently
+by dot than by <code>Graph::Easy</code>.
+<br>
+Especially the per-node and per-edge flow and relatively placed nodes
+will likely be lost in the generated graphviz code.
+</p>
+
+<p>
+If you are familiar with graphviz code and want to improve the output
+of <code>Graph::Easy</code>, please drop me a <a href="http://bloodgate.com/mail.html">message</a>.
+</p>
+
+<a name="graphml">
+<h3>GraphML</h3>
+</a>
+
+<p>
+<code>GraphML</code> is an XML-based text format for describing graphs.
+<br>
+More details about GraphML can be found at the <a href="http://graphml.graphdrawing.org/">GraphML</a>
+homepage.
+</p>
+
+</div><div class="text next">
+
+Please continue with the chapter about the <a href="syntax.html">syntax</a>.
+
+</div>
+
+<div class="footer">
+Page created <span class="date">2005-08-19</span> by <a href="http://bloodgate.com/mail.html">Tels</a>.
+Last update: <span class="date">2007-08-17</span>
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>
+

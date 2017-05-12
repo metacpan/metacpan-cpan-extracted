@@ -1,0 +1,27 @@
+---
+abstract: 'Let your modules define/export their own arguments'
+author:
+  - 'Pablo Fischer (pablo@pablo.com.mx).'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Getopt-Awesome
+no_index:
+  directory:
+    - examples
+    - inc
+requires:
+  Getopt::Long: 2.34
+  Text::Wrap: 2001.09292
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/pfischer/Getopt-Awesome
+version: 0.1.3

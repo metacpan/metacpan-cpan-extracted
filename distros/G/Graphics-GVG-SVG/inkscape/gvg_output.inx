@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+    <_name>GVG Output</_name>
+    <id>org.inkscape.output.gvg</id>
+	<dependency type="executable" location="extensions">gvg_output.pl</dependency>
+    <output>
+        <extension>.gvg</extension>
+        <mimetype>image/x-gvg</mimetype>
+        <_filetypename>Graphics::GVG (*.gvg)</_filetypename>
+        <_filetypetooltip>Export Game Vector Graphics</_filetypetooltip>
+    </output>
+    <script>
+        <command reldir="extensions" interpreter="perl">gvg_output.pl</command>
+    </script>
+</inkscape-extension>

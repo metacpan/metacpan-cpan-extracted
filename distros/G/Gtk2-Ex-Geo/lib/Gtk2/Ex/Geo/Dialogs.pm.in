@@ -1,0 +1,144 @@
+## @class Gtk2::Ex::Geo::Dialogs
+# @brief Generic dialogs for geospatial layers
+# @author Copyright (c) Ari Jolma
+# @author This library is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself, either Perl version 5.8.5 or,
+# at your option, any later version of Perl 5 you may have available.
+
+package Gtk2::Ex::Geo::Dialogs;
+
+=pod
+
+=head1 NAME
+
+Gtk2::Ex::Geo::Dialogs - Generic dialogs for geospatial layers
+
+The <a href="http://geoinformatics.aalto.fi/doc/Geoinformatica/html/">
+documentation of Gtk2::Ex::Geo</a> is written in doxygen format.
+
+=cut
+
+use strict;
+use warnings;
+use UNIVERSAL;
+#use URI::Escape;
+
+require Exporter;
+
+use vars qw/$folder/;
+
+our @ISA = qw(Exporter Gtk2::Ex::Geo::DialogMaster);
+
+our %EXPORT_TAGS = ( 
+    'all' => [ 
+	qw(&progress &get_value_from_combo &set_combo_to
+&get_selected_from_selection &file_chooser &get_number_from_entry) ] );
+
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+our @EXPORT = qw( );
+
+sub new {
+    my($class, %params) = @_;
+
+    my @buffer = <DATA>;
+    pop @buffer unless $buffer[$#buffer] =~ /^\</; # remove the extra content
+
+    return Gtk2::Ex::Geo::DialogMaster::new($class, %params, buffer => \@buffer);
+}
+
+sub progress {
+    my($progress, $msg, $bar) = @_;
+    $progress = 1 if $progress > 1;
+    $bar->set_fraction($progress);
+    Gtk2->main_iteration while Gtk2->events_pending;
+    return 1;
+}
+
+## @ignore
+sub get_value_from_combo {
+    my($dialog, $name_of_combo) = @_;
+    my $combo = $dialog->get_widget($name_of_combo);
+    my $model = $combo->get_model;
+    return unless $model;
+    my $a = $combo->get_active();
+    if ($a == -1) { # comboboxentry
+	if ($combo->isa('Gtk2::ComboBoxEntry')) {
+	    return $combo->child->get_text;
+	} else {
+	    return '';
+	}
+    }
+    my $iter = $model->get_iter_from_string($a);
+    return unless $iter;
+    return $model->get_value($iter);
+}
+
+## @ignore
+sub set_combo_to {
+    my($combo, $value) = @{pop()};
+    my($model, $path, $iter) = @_;
+    my($x) = $model->get($iter);
+    if ($x eq $value) {
+	$combo->set_active_iter($iter);
+	return 1;
+    }
+}
+
+##@ignore
+sub get_selected_from_selection {
+    my $selection = shift;
+    my @sel = $selection->get_selected_rows;
+    my %sel;
+    for (@sel) {
+	$sel{$_->to_string} = 1;
+    }
+    my $model = $selection->get_tree_view->get_model;
+    my $iter = $model->get_iter_first();
+    my $i = 0;
+    my %s;
+    while ($iter) {
+	my($id) = $model->get($iter, 0);
+	$s{$id} = 1 if $sel{$i++};
+	$iter = $model->iter_next($iter);
+    }
+    return \%s;
+}
+
+## @ignore
+sub file_chooser {
+    my($title, $action, $entry) = @_;
+    my $file_chooser =
+	Gtk2::FileChooserDialog->new ($title, undef, $action,
+				      'gtk-cancel' => 'cancel',
+				      'gtk-ok' => 'ok');
+    $file_chooser->set_current_folder($folder) if $folder;
+    my $filename;
+    if ($file_chooser->run eq 'ok') {
+	$folder = $file_chooser->get_current_folder();
+	$filename = $file_chooser->get_filename;
+	#$filename =~ s/^file:\/\///;
+	#$filename =~ s/^\/// if $filename =~ /^\/\w:/; # hack for windows
+	$entry->set_text($filename) if $entry;
+    }
+    $file_chooser->destroy;
+    #$filename = filename_unescape($filename);
+    #print STDERR "$filename\n";
+    return $filename;
+}
+
+##@ignore
+sub get_number_from_entry {
+    my($entry) = @_;
+    #print STDERR "get_number_from_entry $entry\n";
+    my $text = $entry->get_text;
+    #print STDERR "got $text\n";
+    $text =~ s/\s//g;
+    $text =~ s/,/./;
+    ($text) =~ /(\d+)/;
+    #print STDERR "return $text\n";
+    $text;
+}
+
+1;
+__DATA__

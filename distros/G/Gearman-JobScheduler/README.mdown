@@ -1,0 +1,195 @@
+[![Build Status](https://travis-ci.org/pypt/p5-Gearman-JobScheduler.svg?branch=master)](https://travis-ci.org/pypt/p5-Gearman-JobScheduler)
+
+# NAME
+
+`Gearman::JobScheduler::AbstractFunction` - An abstract class for a Gearman
+"function" which is to be derived by working Gearman "functions".
+
+# LINGO
+
+- Gearman function
+
+    A function to be run by Gearman or locally, e.g. `add_default_feeds`.
+
+- Gearman job
+
+    An instance of the Gearman function doing the actual job with specific parameters.
+
+# ABSTRACT INTERFACE
+
+The following subroutines must be implemented by the subclasses of this class.
+
+## REQUIRED
+
+### `run($self, $args)`
+
+Run the job.
+
+Parameters:
+
+- `$self`, a reference to the instance of the Gearman function class
+- (optional) `$args` (hashref), arguments needed for running the
+Gearman function
+
+An instance (object) of the class will be created before each run. Class
+instance variables (e.g. `$self->_my_variable`) will be discarded after
+each run.
+
+Returns result on success (serializable by the [JSON](https://metacpan.org/pod/JSON) module). The result
+will be discarded if the job is ordered on Gearman as a background process.
+
+Provides progress reports when available:
+
+- by calling `$self->set_progress($numerator, $denominator)`
+
+`die()`s on error.
+
+Writes log to `STDOUT` or `STDERR` (preferably the latter).
+
+### (static) `retries()`
+
+Return the number of retries for each job.
+
+Returns a number of retries each job will be attempted at. For example, if the
+number of retries is set to 3, the job will be attempted 4 four times in total.
+
+Returns 0 if the job should not be retried (attempted only once).
+
+Default implementation of this subroutine returns 0 (no retries).
+
+### (static) `unique()`
+
+Return true if the function is "unique" (only for Gearman requests).
+
+Returns true if two or more jobs with the same parameters can not be run at the
+same and instead should be merged into one.
+
+Default implementation of this subroutine returns "true".
+
+### (static) `notify_on_failure()`
+
+Return true if the client / worker should send error report by email when the
+function fails.
+
+Returns true if the GJS client (in case `run_locally()` is used) or worker
+(in case `run_on_gearman()` or `enqueue_on_gearman()` is being used) should
+send an email when the function fails to run.
+
+Default implementation of this subroutine returns "true".
+
+### (static) `unify_logs()`
+
+Return true if the worker should write logs of each of the jobs into a single
+file as opposed to writing into separate files.
+
+Returns true if GJS workers should write their job logs into a single file,
+i.e. into `NinetyNineBottlesOfBeer/NinetyNineBottlesOfBeer.log` instead of
+`NinetyNineBottlesOfBeer/gearman_job_id.gjs_job_id.log`.
+
+Default implementation of this subroutine returns "false".
+
+### (static) `configuration()`
+
+Return an instance or a subclass of `Gearman::JobScheduler::Configuration` to
+be used as default configuration by both workers and clients.
+
+Workers and clients will still be able to override this configuration by
+passing their own `config` argument. This configuration will be used if no
+such argument is present.
+
+Default implementation of this subroutine returns an instance of
+`Gearman::JobScheduler::Configuration` (default configuration).
+
+### (static) `priority()`
+
+Return priority of the job ("low", "normal" or "high"). This will influence
+Gearman's queueing mechanism and prioritize "high priority" jobs.
+
+Returns one of the three constants:
+
+- `GJS_JOB_PRIORITY_LOW()`, if the job is considered of "low priority".
+- `GJS_JOB_PRIORITY_NORMAL()` if the job is considered of "normal priority".
+- `GJS_JOB_PRIORITY_HIGH()` if the job is considered of "high priority".
+
+Default implementation of this subroutine returns `GJS_JOB_PRIORITY_NORMAL()`
+("normal priority" job).
+
+# HELPER SUBROUTINES
+
+The following subroutines can be used by the deriving class.
+
+## `$self->set_progress($numerator, $denominator)`
+
+Provide progress report while running the task (from `run()`).
+
+Examples:
+
+- `$self->set_progress(3, 10)`
+
+    3 out of 10 subtasks are complete.
+
+- `$self->set_progress(45, 100)`
+
+    45 out of 100 subtasks are complete (or 45% complete).
+
+# CLIENT SUBROUTINES
+
+The following subroutines can be used by "clients" in order to issue a Gearman
+function.
+
+## (static) `$class->run_locally([$args, $config])`
+
+Run locally and right away, blocking the parent process until it gets finished.
+
+Parameters:
+
+- (optional) `$args` (hashref), arguments required for running the
+Gearman function  (serializable by the [JSON](https://metacpan.org/pod/JSON) module)
+- (optional) instance of Gearman::JobScheduler::Configuration to be used by the worker
+- (optional, internal) instance of Gearman::XS::Job to be later used by
+send\_progress()
+
+Returns result (may be false of `undef`) on success, `die()`s on error
+
+## (static) `$class->run_on_gearman([$args, $config])`
+
+Run on Gearman, wait for the task to complete, return the result; block the
+process until the job is complete.
+
+Parameters:
+
+- (optional) `$args` (hashref), arguments needed for running the Gearman
+function (serializable by the [JSON](https://metacpan.org/pod/JSON) module)
+- (optional) Instance of Gearman::JobScheduler::Configuration to be used by the client.
+
+Returns result (may be false of `undef`) on success, `die()`s on error
+
+## (static) `$class->enqueue_on_gearman([$args, $config])`
+
+Enqueue on Gearman, do not wait for the task to complete, return immediately;
+do not block the parent process until the job is complete.
+
+Parameters:
+
+- (optional) `$args` (hashref), arguments needed for running the Gearman
+function (serializable by the [JSON](https://metacpan.org/pod/JSON) module)
+- (optional) Instance of Gearman::JobScheduler::Configuration to be used by the client.
+
+Returns Gearman-provided string job identifier (Gearman job ID) if the job was
+enqueued successfully, `die()`s on error.
+
+## (static) `name()`
+
+Returns a Gearman function's name (e.g. `NinetyNineBottlesOfBeer`).
+
+Usage:
+
+        NinetyNineBottlesOfBeer->name();
+
+Parameters:
+
+- Class or class instance
+
+# TODO
+
+- code formatting

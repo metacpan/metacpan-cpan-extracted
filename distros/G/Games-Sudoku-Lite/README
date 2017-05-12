@@ -1,0 +1,52 @@
+NAME
+    Games::Sudoku::Lite -- Fast and simple Sudoku puzzle solver
+
+SYNOPSIS
+     use Games::Sudoku::Lite;
+
+     my $board = <<END;
+     3....8.2.
+     .....9...
+     ..27.5...
+     24.5..8..
+     .85.74..6
+     .3....94.
+     1.4....72
+     ..69...5.
+     .7.612..9
+     END
+
+     my $puzzle = Games::Sudoku::Lite->new($board);
+        $puzzle->solve;
+
+     print $puzzle->solution, "\n";
+
+AUTHOR
+    Bob O'Neill, <bobo@cpan.org>
+
+ACKNOWLEDGEMENTS
+    Thanks to:
+
+    Brian Helterline for help in solving 6x6 puzzles and making this more
+    configurable.
+
+    Jean-Pierre Vidal for providing puzzles that the previous version could
+    not solve.
+
+    Eugene Kulesha (<http://search.cpan.org/~jset/>) for providing a test
+    that I could not initially pass and for the idea of keeping test data in
+    data files rather than in the tests themselves.
+
+    Tom Wyant (<http://search.cpan.org/~wyant/>)) for the idea of using dots
+    rather than spaces to represent unknowns in the text representation of
+    the board.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 Bob O'Neill. All rights reserved.
+
+    This code is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * perl.
+

@@ -1,0 +1,32 @@
+Changes
+lib/Grep/Query.pm
+lib/Grep/Query/Parser.pm
+lib/Grep/Query/Parser/QOPS.pm
+lib/Grep/Query/FieldAccessor.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+LICENSE.md
+t/00-load.t
+t/10-basic.t
+t/11-invalid.t
+t/20-numbers.t
+t/21-strings.t
+t/22-regexps.t
+t/30-records.t
+t/31-objects.t
+t/40-lonehash.t
+t/lib/TestInfo.pm
+t/lib/TestUtils.pm
+t/lib/TestObject.pm
+script/qgrep
+xt/lib/XTestInfo.pm
+xt/lib/XTestUtils.pm
+xt/author/manifest.t
+xt/author/pod-coverage.t
+xt/author/pod.t
+xt/author/x20-numbers.t
+xt/author/x22-regexps.t
+xt/author/x30-records.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

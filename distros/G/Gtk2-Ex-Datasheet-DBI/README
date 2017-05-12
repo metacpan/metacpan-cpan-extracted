@@ -1,0 +1,11 @@
+Thanks for trying out Gtk2::Ex::Datasheet::DBI
+
+This module provides a fantastic datasheet interface
+to a table in a database.
+
+For a brief description of what does what, see the
+POD documentation ( man Gtk2::Ex::Datasheet DBI does
+it on my system ).
+
+For more info, see the project's homepage:
+http://entropy.homelinux.org/axis

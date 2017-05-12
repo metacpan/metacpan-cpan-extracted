@@ -1,0 +1,51 @@
+Overview of changes in Gtk2::GladeXML 1.007
+===========================================
+
+* Depend on ExtUtils::Depends 0.300 for improved portability.
+
+Overview of changes in Gtk2::GladeXML 1.006
+===========================================
+
+* Add two new examples from Fabrice.
+* Add a link to Grant McLean's TPR article to the docs.
+
+Overview of Changes in Gtk2::GladeXML 1.005
+===========================================
+
+* Multiple documentation fixes and additions.
+* Win32 build fixes.
+
+Overview of Changes in Gtk2::GladeXML 1.004
+===========================================
+
+* none, don't do make disttest dist or tarballs will be invalid
+
+Overview of Changes in Gtk2::GladeXML 1.003
+===========================================
+
+* none, last rel tarballs had uncommited changes
+
+Overview of Changes in Gtk2::GladeXML 1.002
+===========================================
+
+* allow undef/NULL in new functions where appropriate
+
+Overview of Changes in Gtk2::GladeXML 1.001
+===========================================
+
+* Fixed a bug that resulted in all signals being connected with
+  signal_connect_after.  The scribble example works now.
+* Lots of new tests.
+* Documentation and example code improvements.
+
+Overview of Changes in 1.0
+==========================
+
+* Import version checking.
+* Build improvements.
+
+Overview of Changes in 0.96
+===========================
+
+* Build system fixes.
+* Spec file improvements.

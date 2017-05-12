@@ -1,0 +1,29 @@
+---
+abstract: 'Style Graphics::Primitive documents with CSS'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Graphics-Primitive-CSS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CSS::DOM: 0.06
+  Check::ISA: 0.04
+  Graphics::Color: 0.23
+  Graphics::Primitive: 0.44
+  Moose: 0.87
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

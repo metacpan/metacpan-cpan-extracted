@@ -1,0 +1,18 @@
+0.002000
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::MinimumPerl
+ - Dist::Zilla::Plugin::RunExtraTests
+
+ [Added / runtime requires]
+ - GraphViz2::Abstract::Util::Constants
+
+ [Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.005000 → 2.006001
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::MinimumPerl
+ - Dist::Zilla::Plugin::CheckExtraTests
+
+ [Removed / runtime requires]
+ - constant
+

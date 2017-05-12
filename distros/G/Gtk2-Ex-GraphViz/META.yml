@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Gtk2-Ex-GraphViz
+version:      0.01
+version_from: lib/Gtk2/Ex/GraphViz.pm
+installdirs:  site
+requires:
+    Data::Dumper:                  0
+    GD:                            0
+    GD::Polyline:                  0
+    Glib:                          0
+    GraphViz:                      0
+    Gtk2:                          0
+    Gtk2::TestHelper:              0
+    Math::Geometry::Planar:        0
+    Test::More:                    0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,4 @@
+<!ELEMENT MapGen (map)>
+<!ELEMENT map (row*)>
+<!ELEMENT row (tile*)>
+<!ELEMENT tile EMPTY>

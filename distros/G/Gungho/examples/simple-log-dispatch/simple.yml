@@ -1,0 +1,15 @@
+---
+debug: 1
+provider:
+    module: Simple
+    config:
+        url:
+            - "http://search.cpan.org"
+            - "http://www.perl.org"
+log:
+    module: Dispatch
+    logs:
+        - module: Screen
+          name: stderr
+          stderr: 1
+          min_level: debug

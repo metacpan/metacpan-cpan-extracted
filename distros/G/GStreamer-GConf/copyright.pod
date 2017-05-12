@@ -1,0 +1,4 @@
+Copyright (C) 2005 by the gtk2-perl team.
+
+This software is licensed under the LGPL.  See the file I<LICENSE> in the
+tarball for a full notice.

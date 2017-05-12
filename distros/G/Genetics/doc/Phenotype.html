@@ -1,0 +1,135 @@
+<HTML>
+<HEAD>
+<TITLE>Phenotype.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#public methods">Public methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#printxml">printXML</A></LI>
+		<LI><A HREF="#ashtml">asHTML</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::Phenotype</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $pt = new Genetics::Phenotype(name =&gt; 'JXPed1-1-Age',
+                                importID =&gt; 266,
+                                dateCreated =&gt; $today,
+                                dateCollected =&gt; &quot;1987-03-17&quot;,
+                                Keywords =&gt; [ {name =&gt; &quot;Test Data&quot;, 
+                                               dataType =&gt; &quot;Boolean&quot;, 
+                                               value =&gt; 1}, 
+                                            ], 
+                                Subject =&gt; {name =&gt; &quot;JXPed1-1&quot;, importID =&gt; 12},
+                                StudyVariable =&gt; {name =&gt; &quot;Age&quot;, importID =&gt; 444},
+                                AssayAttrs =&gt; [ {name =&gt; &quot;Clinic Name&quot;,
+                                                 dataType =&gt; &quot;String&quot;,
+                                                 value =&gt; &quot;Sister of Gracious Mercy and Hope&quot;},
+                                              ],
+                                value =&gt; 12,
+                                isActive =&gt; 1,
+                               ) ;
+</PRE>
+<PRE>
+
+See the GenPerl Tutorial for more information.</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Phenotype objects represent the experimentally determined value an 
+individual has for a trait, affection status, environmental exposure, 
+or drug treatment.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+ Genetics::Object       Superclass
+ strict                 Just to be anal
+ vars                   Global variables</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public methods</A></H1>
+<PRE>
+  printXML              Print an XML representation of the object</PRE>
+<P>
+<H2><A NAME="printxml">printXML</A></H2>
+<PRE>
+  Function  : Print an XML representation of the object.
+  Argument  : A Genetics::Genotype object and the XML::Writer object being used 
+              to generate the XML.
+  Returns   : String
+  Scope     : Public
+  Comments  : Calls Genetics::Object-&gt;printGeneralXML to generate XML elements
+              common to all Genetics::Object objects.</PRE>
+<P>
+<H2><A NAME="ashtml">asHTML</A></H2>
+<PRE>
+  Function  : Generate an HTML representation of the object.
+  Argument  : A Genetics::Phenotype object and a scalar containing the name 
+              of the GenPerl database in which the object is stored. 
+  Returns   : Scalar containing the HTML text.
+  Scope     : Public Instance Method
+  Comments  : Calls Genetics::Object-&gt;_generalHTMLParam to generate HTML 
+              elements common to all Genetics::Object objects.  An 
+              HTML::Template object is used to actually generate the HTML.</PRE>
+
+</BODY>
+
+</HTML>

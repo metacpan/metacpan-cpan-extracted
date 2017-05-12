@@ -1,0 +1,16 @@
+SYNOPSIS
+
+      use Games::Word::Wordlist::HSK;
+      my $wl = Games::Word::Wordlist::HSK->new;
+      my $word = $wl->random_word;
+      print "We have a word." if $wl->is_word ($word);
+
+DESCRIPTION
+
+SEE ALSO
+
+    WordList::ZH::HSK (which also comes with per-level word lists as well
+    as character lists).
+
+    Games::Word::Wordlist
+

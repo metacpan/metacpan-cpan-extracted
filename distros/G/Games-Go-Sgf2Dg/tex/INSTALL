@@ -1,0 +1,263 @@
+
+
+OVERVIEW
+--------
+
+The Makefile in this directory needs four variables defined in
+order to (re)install the GOOE fonts and include files in the
+correct places: MFDIR, TFMDIR, TEXINPUTS, and PKFONTS.  Normally,
+the 'perl Makefile.PL' step in the directory above this directory
+creates the Makefile in this directory and fills in the correct
+values for these variables.  This file is here to help in case
+something goes wrong.
+
+If something goes wrong, you may either edit the Makefile to fix
+the variable names and any other problems you think need fixing
+(but be aware that if you run 'perl Makefile.PL' in the directory
+above again, it will write over tex/Makefile, destroying your
+changes), or you can do the install by hand, ignoring
+tex/Makefile.  This file assumes you will do it by hand, but the
+instructions and information are applicable to changing the
+Makefile too.
+
+The variables are:
+
+MFDIR: path to where the Metafont sources should be installed.
+
+TFMDIR: path to where the .tfm (font metrics) files should be
+installed.
+
+TEXINPUTS: path to where the TeX include files should be
+installed
+
+PKFONTS: 0 or more glob patterns for anywhere that font cache
+(go*pk) files might have been built from previous installs of
+sgf2tex/sgf2dg.  If this is a first-time installation of sgf2dg,
+there will be no cached fonts, and PKFONTS should be empty.  Note
+that PKFONTS will be used like this:
+
+    rm -f $(PKFONTS)
+
+so it must contain file globs (like '/path/to/cache_dir/go*pk')
+or file names to work correctly.  It can contain several
+globs/names if you find go*pk files scattered around in different
+places.
+
+Older versions of sgf2tex required additional variables TEXHASH,
+MANDIR and BINDIR.  MANDIR and BINDIR are now handled by the
+top-level Makefile and are not used here.  TEXHASH is now handled
+by trying both 'texhash' and 'MakeTeXls-R' - one or both will
+probably fail, but if either one is available, it will work
+correctly.
+
+
+MANUAL INSTALL (Unix - brief)
+---------------------
+
+See INSTALLATION DETAILS below for more details. Briefly, here is
+the procedure on UNIX machines. You may automate this process to
+some extent by using the Makefile (see MAKE INSTALL below).
+
+Assuming you have TeX and perl already installed, and that you
+are currently in the sgf2dg/tex directory created from
+extracting the sgf2dg package:
+
+1. Running as root, copy the *.mf files into your metafont search
+path. (See SEARCH PATHS, below.) Make sure they are publicly
+readable.
+
+2. Copy the *.tfm files into your TeX metric file (tfm) search
+path.  Make sure they are publically readable. Consult SEARCH
+PATHS for more details.
+
+3. (Optional) Copy gooemacs.tex and gotcmacs.tex into your TeX
+input search path. You may omit this step if you prefer to keep a
+copy of these files in your working directory whenever you are
+using sgf2dg, but copying them to the TeX input search path
+allows you to use sgf2dg from any subdirectory.
+
+4. If your TeX distribution is TeTeX, run texhash. If you have
+the web2c distribution, run MakeTeXls-R. Other distributions such
+as NTEX do not require this step.
+
+INSTALLATION DETAILS (Unix)
+---------------------------
+
+On a UNIX TeX distribution, which will typically use Karl Berry's
+kpathsea library, the following instructions should work.
+Download the file Games-Go-Sgf2Dg-XXX.tar.gz, where XXX is the
+latest revision.  We will use revision 4.190 for this example.
+
+Extract the sources with
+
+   $ tar xzvf Games-Go-Sgf2Dg-4.190.tar.gz
+
+if you have gnu tar, or
+
+   $ gunzip Games-Go-Sgf2Dg-4.190.tar.gz 
+   $ tar xvf Games-Go-Sgf2Dg-4.190.tar.gz
+
+otherwise. Here $ represents your UNIX command prompt. It may be
+different on your system.
+
+This will build a subdirectory of your current directory called
+Games-Go-Sgf2Dg-4.190.  cd to that directory. Then
+
+    $ tex manual
+
+should build manual.dvi. In order to print or preview it, you
+need to install the Metafont sources (.mf) and metric (.tfm)
+files into your TeX source tree, as we will explain. You must
+have superuser privileges to do this installation, so log on as
+root.
+
+You need to find where, on your system, Metafont source files
+(with the .mf suffix) are kept. This is the default path for the
+MFINPUTS environment variable, and should be listed on the mf(1)
+man page. On the other hand we've seen wrong directories listed
+on man pages, so in the next section, we will give some pointers
+for finding the Metafont search path.
+
+Next, you will need to know the TeX search path for .tfm files.
+(Again, consult the following section if you have trouble
+obtaining this information.) Copy the .tfm files to a directory
+in the search path for .tfm files. Make sure the read permissions
+are public.
+
+You want TeX to be able to find the file gooemacs.tex. So you
+need a copy of this file in a directory in the tex search path.
+You may copy this file into the default TeX search path.
+Alternatively, you may specify a search path using the TEXINPUTS
+environment variable, or you may simply keep a copy of this file
+in whatever directory you choose to work.
+
+IMPORTANT: Some TeX distributions have a utility for updating a
+search path database. This utility may be called texhash (in the
+teTeX distribution) or MakeTeXls-R (in the Web2c distribution).
+If you have this utility, you must run it. The NTEX distribution
+has no such utility, so if you are using NTEX this step may be
+omitted.
+
+The final step in installation is to copy sgf2dg and any
+converter plugins (Dg2TeX.pm, etc) into /usr/local/bin with
+public read and execute permissions. You may also build the
+utility sgfsplit, for which see below under Variations, by typing
+make at the command line. This utility may also be copied into
+/usr/local/bin.
+
+Type:
+
+    $ tex manual
+
+to build the file manual.dvi. Then preview or print it. The first
+time you do, MakeTeXPK should invoke Metafont to build .gf and
+.pk font files. The second time you print or preview the
+document, these files will already exist, so Metafont will not be
+invoked the second time.
+
+
+SEARCH PATHS (Unix)
+-------------------
+
+In the TeX installation as described above, you need to know
+where Metafont source files and TeX .tfm files are kept on your
+system.  In case you have trouble obtaining this information,
+here are some pointers. We begin with the search path for
+Metafont source files, which have the suffix .mf.
+
+FIRST METHOD:
+
+If kpsewhich is installed as part of your TeX distribution, you
+can use it to query TeX variables.  Note that the top-level
+Makefile.PL attempts to use kpsewhich to determine the variables.
+If you are reading this because the top-level 'perl Makefile.PL'
+failed to find the correct variables, you may not have much luck
+with this method either.
+
+To query kpsewhich for the TEXINPUTS variable for example:
+
+    $ kpsewhich --expand-braces `kpsewhich --expand-var \\$TEXINPUTS`
+
+NOTE: the quotes are back-ticks.  This causes kpsewhich to
+execute with the --expand-var option and the TeX variable name,
+then the result is passed to a second invocation of kpsewhich to
+expand the braces.  NOTE also: the $ in front of TEXINPUTS must be
+escaped from the shell.  This requires two back-slashes (in bash)
+because it's inside the back-tick quotes.  Different command
+shells may require modifications to the way kpsewhich is invoked.
+
+SECOND METHOD:
+
+Read the man page for mf(1). The default value of MFINPUTS is the
+search path for these fonts. This information should be on the
+man page. On the other hand, it is possible that the information
+on the man page may be missing or wrong. So we give two other
+methods of finding the Metafont search path.
+
+THIRD METHOD:
+
+Find out where the Metafont (mf) executable file is:
+
+  $ which mf
+  usr/local/bin/mf    (for example)
+
+Apply strings to the Metafont executable:
+
+  $ strings /usr/local/bin/mf
+
+Scan this output for MFINPUTS. The line following this keyword
+will be the default search path for Metafont. According to the
+kpathsea conventions, // stands for ``all subdirectories.'' Thus
+the search path
+
+.:/usr/local/share/texmf/metafont//:{/usr/local/share/texmf/fonts,/var/tex/fonts}//source//
+
+consists of the current directory, all subdirectories of
+/usr/local/share/texmf/metafont, and all subdirectories of
+/usr/local/share/texmf/fonts or /var/tex/fonts containing a
+subdirectory called source.
+
+FOURTH METHOD:
+
+The command
+
+    find / -print 2>/dev/null|grep "\.mf\$"
+
+will return a list of files with the suffix .mf on your system.
+Most of these will be subdirectories of some top directory.
+Typically metafont, or more precisely the program MakeTeXPK
+which invokes metafont, will be able to find .mf files which are
+contained in any subdirectory of this, or (as we saw above---see
+SECOND METHOD) depending on the kpathsea search path, the
+search may be restricted to subdirectories of some fixed top
+directory whose path names contain an intermediate directory with
+a name such as source or src. 
+
+Next repeat this process with the .tfm files. Just as with the
+Metafont sources, you can learn the search path for these by
+reading the man page for xdvi(1), or by scanning the output of
+strings /usr/local/bin/xdvi or /usr/local/bin/dvips for TFMFONTS,
+or by studying the output of:
+
+   find / -print 2>/dev/null|grep "\.tfm\$"
+
+EXAMPLE: On a system running the web2c distribution, we find that
+.mf files are kept in subdirectories of
+/usr/local/share/texmf/fonts/source/. The actual default value of
+MFINPUTS, found by scanning the output of strings
+/usr/local/bin/mf is
+
+.:/usr/local/share/texmf/metafont//:{/usr/local/share/texmf/fonts,/var/tex/fonts}//source//
+
+(This could be in different directory on another machine.) We
+copy the .mf files to
+
+     /usr/local/share/texmf/fonts/source/public/misc/ 
+
+which seems a good directory in this search path. We copy the
+.tfm files to:
+
+    /usr/local/share/texmf/fonts/tfm/public/misc/
+
+After this, we run MakeTeXls-R.
+

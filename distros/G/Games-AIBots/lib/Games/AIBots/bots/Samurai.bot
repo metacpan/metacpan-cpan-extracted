@@ -1,0 +1,165 @@
+$name   = 'Samurai';
+$author = 'Autrijus Tang';
+$team   = 'Clam Clan';
+
+require 'Drones.bm';
+
+main: {
+    enable shield;
+
+    bumpy() if &bumped();
+    goto zazen if $fuel < 0;
+
+    scan cross;
+
+    if (&found('enemy')) {
+        if (&headto('enemy') eq $h) {
+            if ($ammo > 0) {
+                call wakizashi;
+            }
+            else {
+                call zap;
+            }
+        }
+        else {
+            move backward;
+            call zap;
+        }
+    }
+    elsif (&found('vault|flag|mine')) {
+        $obj = $found;
+        if (&found('mine') and int(rand(2)) and $life > 7) {
+            fire energy;
+            goto main;
+        }
+        else {
+            goto teki;
+        }
+    }
+    elsif (&found('wall|fence')) {
+        call bumpy if int(rand(5))
+    }
+
+    move forward;
+    goto boshi;
+}
+
+boshi: {
+    call bumpy if &bumped();
+    scan front;
+    call takana if &found('enemy');
+
+    if (&found('flag|vault')) {
+        fire energy if &damaged == 0 and &found('flag');
+        call fetch;
+    }
+    elsif (&found('space|fence|wall')) {
+        move forward * 2;
+    }
+    elsif (&found('mine')) {
+        call tenko;
+    }
+    else {
+        move forward;
+    }
+
+    goto main;
+}
+
+teki: {
+    if ($teki == 4) {
+        $teki = 0;
+        goto main;
+    }
+    $teki++;
+
+    scan relative 8;
+    call wakizashi if &found('enemy');
+
+    if (&found('vault|flag') or &found('space') and $obj eq 'mine') {
+        $teki = 0;
+        if (&found('flag') and not &damaged) {
+            move backward;
+            fire energy;
+            move forward;
+        }
+        move forward;
+        goto main;
+    }
+
+    turn left;
+    redo;
+}
+
+zazen: {
+    if (&damaged) {
+        disable shield;
+        attempt repair;
+        redo;
+    }
+
+    enable shield;
+
+    if ($ammo) {
+        scan front unless &found('enemy');
+        call wakizashi;
+    }
+    else {
+        scan perimeter unless &found('enemy');
+        attempt destruct;
+    }
+
+    redo;
+}
+
+
+sub wakizashi {
+    disable shield;
+    $time = int($enemy_l / 3) + 2;
+    fire laser * $time;
+    enable shield;
+
+    return;
+}
+
+sub takana {
+    disable shield;
+    $time = int($enemy_l / 6) + 2;
+    fire bazooka * $timne;
+    enable shield;
+
+    return;
+}
+
+sub tenko {
+    call mark;
+
+    if ($pos{join(':', $x, $y, $h)} xor index('urld', $h) + $x + $y) {
+        turn left;
+    }
+    else {
+        turn right;
+    }
+
+    move forward;
+    return;
+}
+
+sub mark {
+    $pos{join(':', $x, $y, $h)} = not $pos{join(':', $x, $y, $h)};
+
+    return;
+}
+
+sub bumpy {
+
+    if (&bumped('enemy')) {
+        call wakizashi;
+    }
+    else {
+        call tenko;
+    }
+
+    return;
+}
+

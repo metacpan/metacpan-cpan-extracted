@@ -1,0 +1,73 @@
+
+Graphics::Plotter v1.0.1 - a perl5 interface to Robert S. Maier' plotter plotutils' library
+
+This is Plotter.pm, a Perl5 binding for GNU plotutils
+libplotter C++ library. With this module you can create
+two-dimensional graphics for different kinds of plotters.
+Plotter outputs include 'Meta', 'Tek', 'HPGL', 'PCL',
+'Fig', 'PS', 'AI', 'PNM', 'GIF', 'XDrawable' and 'X'.
+
+COPYRIGHT INFO
+
+The Plotter.pm interface is copyright 1999 by Piotr Klaban
+<makler@man.torun.pl>. You are free to use it for any purpose,
+commercial or noncommercial, provided that if you redistribute the source
+code this statement of copyright remains attached.  Code from the
+libplotter library is covered separately, under GNU Generic Public Licence
+version 2.
+
+INSTALLATION
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you have not /usr/X11/include/X11/Xlib.h nor /usr/local/include/X11/Xlib.h
+nor /usr/X11R6/include/X11/Xlib.h, then you could not compile
+support for Graphics::Plotter::X, your X display is missing. Under RedHat
+Linux you need to install XFree86-devel package (before the plotutils
+compilation, I have not seen plotutils rpm package).
+
+Plotter.pm package appears to run successfuly either on RedHat Linux
+and on SUN Solaris2.6 with GNU g++ compiler.
+
+REQUIREMENTS
+
+You have to have plotutils v2.2 or later installed. To compile
+a module you need C++ compiler.
+
+EXAMPLES
+
+See examples/ subdirectory.
+
+DOCUMENTATION
+
+To learn how to use this module, you can read manual created from the
+Plotter.pm pod documentation (just "man Graphics::Plotter" after installation).
+You can learn more from the plotutils documentation (pod manual
+is mainly based on this) at http://www.gnu.org/manual/plotutils/
+or info documentation in the plotutils distribution.
+
+CHANGES
+
+See Changes file.
+
+BUGS
+
+If you want dynamically load a module on Solaris2.6 and you have
+set locale to iso8859-2, and you have Euro currency patch installed,
+then you would get the following error:
+
+ld.so.1: /usr/bin/perl: fatal: relocation error: file
+/usr/openwin/lib/locale/iso8859-2/xomEuro.so.2: symbol
+_XlcCompileResourceList: referenced symbol not found
+
+To avoid this message, just set locale to "C" (setenv LC_ALL C, or export LC_ALL=C).
+
+The parampl functions used to set XDRAWABLE_COLORMAP XDRAWABLE_DISPLAY
+XDRAWABLE_DRAWABLE1 and XDRAWABLE_DRAWABLE2 should not work because
+this params need specific arguments (Display * pointer etc.)

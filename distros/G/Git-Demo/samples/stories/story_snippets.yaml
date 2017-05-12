@@ -1,0 +1,41 @@
+### Create the first file on the origin and add to git
+- type: file
+  characters: origin
+  action: append
+  args:
+  - first_file.txt
+  - Some text [% NAME %] [% DATE %]
+- type: git
+  characters: origin
+  action: add
+  args:
+  - -A
+- type: git
+  characters: origin
+  action: commit
+  args:
+  - -m
+  - First checkin
+
+
+
+# Bob is happy
+- type: print
+  characters: Bob
+  action: screen
+  text: Yeah
+
+# Bob pushes 
+- type: git
+  action: push
+  characters: Bob
+  args:
+  - origin
+  - master
+
+- type: file
+  action: append
+  characters: Jane
+  args:
+  - config.yaml
+  - "new_key: Bob sucks"  

@@ -1,0 +1,13 @@
+bin/example-point.pl
+bin/example-pointlist.pl
+bin/example-track2spline.pl
+CHANGES
+doc/spline.png
+doc/spline.xls
+lib/Geo/Spline.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/base.t

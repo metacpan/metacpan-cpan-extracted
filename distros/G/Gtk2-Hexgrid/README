@@ -1,0 +1,27 @@
+Gtk2-Hexgrid
+
+This module sipploes a widget that displays a grid of hexagons. At this
+time only vertical orientation is supported, as in wesnoth. Choose the
+dimensions, tile size, tile colors, alignment, border stuff, and give
+it text, sprites or backgrounds to display.
+
+This module was written for the purpose of displaying strategy board
+games. For example, see "Survive!" and "Hey, That's my Fish!". A
+hexagonal variant of Minesweeper would also be easy to write.
+
+Don't count on this module to remain backwards-compatible.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Copyright (C) 2007 Zach Morgan
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

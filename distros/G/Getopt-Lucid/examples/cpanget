@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Getopt::Lucid qw( :all );
+use WWW::Mechanize;
+
+my $CPAN_DIST_URL = 'http://search.cpan.org/dist/';
+
+my @option_specs = (
+    Param('--dist|-d')->required,
+    Param('--version|-v'),
+);
+
+my $opt = Getopt::Lucid->getopt( \@option_specs );
+
+my $dist_name = $opt->get_dist . $opt->get_version;
+
+print "Looking for $dist_name...\n";
+
+my $output_file = $dist_name . ".tar.gz";
+
+my $mech = WWW::Mechanize->new( autocheck => 1 );
+$mech->get( $CPAN_DIST_URL . $dist_name );
+
+my $download_url = $mech->find_link( text_regex => qr/download/i );
+
+die "Couldn't find $dist_name\n" unless $download_url;
+
+my $filename = ( split q{/}, $download_url->url )[-1] || $output_file;
+
+print "Downloading $filename\n";
+
+$mech->get( $download_url->url_abs, ':content_file' => $filename);
+

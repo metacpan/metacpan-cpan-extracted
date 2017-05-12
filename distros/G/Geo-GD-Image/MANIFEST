@@ -1,0 +1,11 @@
+Changes
+lib/Geo/GD/Image.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+ppport.h
+README
+t/01basic.t
+typemap
+Image.xs
+Makefile.PL

@@ -1,0 +1,63 @@
+{
+   "abstract" : "Helpers for Glib objects.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Glib-Ex-ObjectBits",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel"
+      ]
+   },
+   "optional_features" : {
+      "maximum_tests" : {
+         "description" : "Have \"make test\" do as much as possible.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Test::Weaken" : "3.002"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::GlobalDestruction" : "0",
+            "Glib" : "0",
+            "Glib::Object::Subclass" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/glib-ex-objectbits/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "16"
+}

@@ -1,0 +1,48 @@
+=encoding utf8
+
+=pod
+
+README for perl package Gfsm::XL (formerly known as gfsmxl-perl)
+
+=head1 ABSTRACT
+
+Gfsm::XL - Perl interface to the libgfsmxl finite-state cascade library
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item libgfsmxl E<gt>= v0.0.11
+
+Current sources for the libgfsmxl package should be available from
+http://kaskade.dwds.de/~moocow/projects/gfsm/#gfsmxl
+
+=back
+
+
+=head1 DESCRIPTION
+
+The Gfsm::XL package provides Perl bindings for the libgfsmxl finite-state cascade library.
+
+=head2 Citations
+
+If you use the Gfsm::XL package in a scientific publication, please acknowledge its use by citing
+the following paper:
+
+=over 4
+
+Bryan Jurish. "Efficient online k-best lookup in weighted finite-state cascades."
+In Thomas Hanneforth and Gisbert Fanselow, editors,
+I<Language and Logos: Studies in Theoretical and Computational Linguistics>,
+volume 72 of I<Studia grammatica>.
+Akademie Verlag, Berlin, 2010.
+ISBN 978-3-05-004931-1.
+
+=back
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=cut

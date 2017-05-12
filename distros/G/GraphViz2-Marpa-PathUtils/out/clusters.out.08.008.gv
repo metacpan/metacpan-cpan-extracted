@@ -1,0 +1,19 @@
+digraph graph_08
+{
+	graph[rankdir = "LR" nodesep = "0"]
+	node[shape = "point" label = ""]
+	edge[fontsize = "10"]
+	_normal -> normal[arrowhead = "normal" label = "normal"]
+	normal -> normalnormal[arrowhead = "normalnormal" label = "normalnormal"]
+	_normal -> lnormal[arrowhead = "lnormal" label = "lnormal"]
+	lnormal -> lnormallnormal[arrowhead = "lnormallnormal" label = "lnormallnormal"]
+	_normal -> rnormal[arrowhead = "rnormal" label = "rnormal"]
+	rnormal -> rnormalrnormal[arrowhead = "rnormalrnormal" label = "rnormalrnormal"]
+	_normal -> olnormal[arrowhead = "olnormal" label = "olnormal"]
+	olnormal -> olnormalolnormal[arrowhead = "olnormalolnormal" label = "olnormalolnormal"]
+	_normal -> ornormal[arrowhead = "ornormal" label = "ornormal"]
+	ornormal -> ornormalornormal[arrowhead = "ornormalornormal" label = "ornormalornormal"]
+	_normal -> onormal[arrowhead = "onormal" label = "onormal"]
+	onormal -> onormalonormal[arrowhead = "onormalonormal" label = "onormalonormal"]
+
+}

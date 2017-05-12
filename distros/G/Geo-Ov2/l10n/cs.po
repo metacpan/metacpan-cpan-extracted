@@ -1,0 +1,119 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2007 Petr Vraník <hpa AT suteren.net>
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: Petr Vraník <hpa AT suteren.net>\n"
+"POT-Creation-Date: 2007-10-07 01:02+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>=2 && n<=4 ? 1 : 2;\n"
+
+#: ../lib/Geo/Ov2.pm:127
+msgid "undefined parameter."
+msgstr "parametr není definován."
+
+#: ../lib/Geo/Ov2.pm:241 ../lib/Geo/Ov2.pm:257 ../lib/Geo/Ov2.pm:261
+#: ../lib/Geo/Ov2.pm:265 ../lib/Geo/Ov2.pm:277 ../lib/Geo/Ov2.pm:281
+#: ../lib/Geo/Ov2.pm:293 ../lib/Geo/Ov2.pm:297 ../lib/Geo/Ov2.pm:302
+#: ../lib/Geo/Ov2.pm:313 ../lib/Geo/Ov2.pm:317 ../lib/Geo/Ov2.pm:322
+#: ../lib/Geo/Ov2.pm:341 ../lib/Geo/Ov2.pm:345 ../lib/Geo/Ov2.pm:349
+#: ../lib/Geo/Ov2.pm:354
+msgid "Unexpected end of ov2 file."
+msgstr "Neočekávaný konec souboru."
+
+#: ../lib/Geo/Ov2.pm:365 ../lib/Geo/Ov2.pm:452
+msgid "Unknown type of POI."
+msgstr "Neznámý typ záznamu."
+
+#: ../ttn2device:134
+msgid "Bad options."
+msgstr "Špatné parametry."
+
+#: ../ttn2device:164
+#, perl-format
+msgid "cat: %s\n"
+msgstr "kat: %s\n"
+
+#: ../ttn2device:187
+#, perl-format
+msgid "src: %s (%d)\n"
+msgstr "puv: %s (%d)\n"
+
+#: ../ttn2device:189
+#, perl-format
+msgid "written: %d record\n"
+msgid_plural "written: %d records\n"
+msgstr[0] "zapsán: %d záznam\n"
+msgstr[1] "zapsány: %d záznamy\n"
+msgstr[2] "zapsáno: %d záznamů\n"
+
+#: ../ttn2device:215
+#, perl-format
+msgid "dat: %s=%s\n"
+msgstr "dat: %s=%s\n"
+
+#: ../ttn2device:244
+#, perl-format
+msgid "new: %s\n"
+msgstr "nov: %s\n"
+
+#: ../ttn2device:248
+#, perl-format
+msgid "old: %s\n"
+msgstr "sta: %s\n"
+
+#: ../ttn2device:16 ../ttn2device:108
+msgid ""
+"Usage:\n"
+"    {progname} [--configfile=filename|-c filename] [sourceDir [destDir]]\n"
+"\n"
+"    {progname} --help|-h\n"
+"\n"
+"Options:\n"
+"    --help|-h\n"
+"        Display this help message.\n"
+"\n"
+"    --quiet|-q\n"
+"        Suppress output messages. If used more than once, output will be\n"
+"        more quiet.\n"
+"\n"
+"    --verbose|-v\n"
+"        Display extra runtime informations.\n"
+"\n"
+"    --configfile=path_and_filename|-a path_and_filename\n"
+"        Using of specified config file.\n"
+"\n"
+"    config: {configfile}\n"
+"\n"
+msgstr ""
+"Použití:\n"
+"    {progname} [--configfile=názevsouboru|-c názevsouboru] [zdrojovýadresář "
+"[cílovýadresář]]\n"
+"\n"
+"    {progname} --help|-h\n"
+"\n"
+"Volby:\n"
+"    --help|-h\n"
+"        zobrazí tuto nápovědu.\n"
+"\n"
+"    --quiet|-q\n"
+"        Redukuje počet zobrazovaných informací.\n"
+"        Pokud je zadáno vícekrát, výstup bude ještě ořezanější.\n"
+"\n"
+"    --verbose|-v\n"
+"        Zobrazí více informací na výstupu.\n"
+"\n"
+"    --configfile=cesta/názevsouboru|-a cesta/názevsouboru\n"
+"        Umožňuje specifikovat vlastní konfigurační soubor.\n"
+"\n"
+"    konfigurace: {configfile}\n"
+"\n"

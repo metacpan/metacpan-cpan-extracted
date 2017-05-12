@@ -1,0 +1,16 @@
+
+Installing of GNU Ghostscript shared library:
+
+  tar zxvpf gnu_ghostscript-8.15.tar.gz
+  cd gnu_ghostscript-8.15
+  ./configure --prefix=/usr/local
+  make so
+  make soinstall
+
+Installing of GSAPI Perl-Module:
+  
+/usr/bin/perl Makefile.PL CCFLAGS=-I../gnu_ghostscript-8.15/src
+make
+make test
+make UNINST=1 install
+

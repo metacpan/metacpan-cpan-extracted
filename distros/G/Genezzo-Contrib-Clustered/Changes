@@ -1,0 +1,158 @@
+Revision history for Perl extension Genezzo::Contrib::Clustered.
+0.43  Mon Oct 01 01:00:00 2007
+	Move Genezzo/Contrib/Clustered/Clustered.pm up one level.
+	Fix Genezzo-Contrib-Clustered.t by adding removal of trailing semi in SQL.
+
+0.33  Wed Jan 18 23:00:00 2006
+	Revised POD in ModPerlWrap.  Requires Apache 2.  Signal handling
+	  problem on Mac OS X is due to Apache 1.3.
+
+0.32  Mon Jan 16 23:00:00 2006
+	Revised SIGUSR2 handling in GLockUR and ModPerlWrap.
+	OS X 10.3.9 kill SIGUSR2 handling is sometimes delayed till 
+	  next request (WHY?).
+
+0.31  Sun Jan 15 01:00:00 2006
+	POD doc fixes.
+
+0.30  Sat Jan 14 23:00:00 2006
+	Added new locking module GLockUR, based on Unix Record locking.
+	Works on OS X, EXCEPT processes exit immediately after 
+	  signal handlers are run (why?)
+	Also on OS X need to add to httpd.conf
+	  PerlHeaderParserHandler "sub { tie *STDOUT, 'Apache' unless tied *STDOUT; }"
+
+0.29  Tue Jan 10 20:30:00 2006
+	Fix race condition in ModPerlWrap.
+
+0.28  Tue Jan 03 23:30:00 2006
+	Modify ModPerlWrap to run better when preloaded with PerlModule.
+	Added use test case for ModPerlWrap.
+
+0.27  Tue Jan 03 09:00:00 2006
+	Modify ModPerlWrap to reset $processing and $restart on each
+	  PageStart()
+
+0.26  Mon Jan 02 23:00:00 2006
+	Modified VerifyChecksum and UpdateChecksum to use new
+	  Genezzo::Block::Util routines.
+
+0.25  Sun Jan 01 17:00:00 2006
+	Added ModPerlWrap.pm and sample genezzo_form.pl to use Apache
+	  web server as multi-user XML over HTTP interface to 
+	  Clustered Genezzo.
+	Added support for asyncronous notification of blocking lock
+	  requests.  See ModPerlWrap or modified genloopclient.pl for
+	  examples.
+
+0.24  Sat Dec 24 01:00:00 2005
+	Modified DLM code to raise DEADLOCK error on deadlock.
+	Added experimental Kngz_Execute hook to catch DEADLOCK.
+	Modified DLM code to support demoteAll (to SH) besides unlockAll.
+	Commit now uses demoteAll insead of unlockAll, to match current
+	  buffer cache behavior.
+	Added DLM function ast_poll to determine whether there are any
+	  recent requests for locks held by that process.
+	Added new client genloopclient.pl to test locking interactions between 
+	  clients. 
+	Now recommend rollback as first action in gendba or scripts,
+	  so all blocks will be locked.
+
+0.23  Fri Dec 23 12:00:00 2005
+	Modify ReadBlock to replace instead of wrap _filereadblock
+	  to avoid duplicate reads.
+	Attempted moving DirtyBlock to BufCaElt::_dirty; doesn't work
+	  so left old DirtyScalar::STORE method registered.
+	sync is no longer called on non-Cygwin Win32.  autoflush(1) is
+	  called instead.  Yes, this probably gives terrible performance,
+	  but it should pass CPAN Testers :-)
+
+0.22  Tue Dec 20 11:00:00 2005
+	HTML doc fix.
+
+0.21  Mon Dec 19 23:00:00 2005
+	Handle corrupted transaction code byte case.
+	Add another TODO.
+
+0.20  Mon Dec 19 07:00:00 2005
+	Update ClusteredGenezzoDesign.html
+	Pad transaction status block with '=' instead of '-'
+	Restore write of PID in transaction status block
+	Update Pod
+
+0.19  Sun Dec 18 23:00:00 2005
+	Detect blocks needing recovery via PID in block.
+	Recover blocks and processes, resetting PID to zero.
+	Converted entire package to OO methods.
+
+0.18  Sun Oct 23 19:00:00 2005
+        Writing PIDs to blocks.  No set to zero yet.
+	Print to STDERR, not STDOUT.
+
+0.17  Tue Aug 30 11:59:00 2005
+        modified PrepUndo to use DictSetFileInfo to add undo_filename
+	  to default.dbf file header
+	modified clustered.sql to use oo_require
+	modified Clustered to use new OO style methods, use dict
+	  to look up undo_filename and gnz_home
+
+0.16  Sun Aug 21 12:40:00 2005
+        added TODO to README
+
+0.15  Sun Aug 21 10:21:00 2005
+	moved body of genprepundo.pl to PrepUndo.pm
+	expanded tests to verify rollback really works
+
+0.14  Wed Aug 10 21:40:00 2005
+	maintain own dirty_block list instead of relying on dirty flag
+	pod fixes
+	add license to Makefile.PL
+
+0.12  Thu Aug 04 07:30:00 2005
+	pod fixes
+
+0.11  Thu Aug 04 00:20:00 2005
+	pod fixes
+
+0.10  Wed Aug 03 19:45:00 2005
+	use SVR lock to allocate unique processid at startup
+	fix strictness of genprepundo.pl
+	variable renamings
+	pod fixes
+	documentation fixes
+
+0.09  Mon Aug 01 11:55:00 2005
+	documentation fixes
+
+0.08  Mon Aug 01 08:00:00 2005
+	Added 1; to GTXLock
+	documentation fixes
+
+0.07  Sun Jul 31 23:00:00 2005
+	Added OpenDLM-based locking support
+
+0.06  Sun Jul 31 20:45:00 2005
+	added ClusteredGenezzoDesign.html design document
+	added message to genprepundo.pl
+
+0.05  Thu Jul 28 22:00:00 2005
+	fix make test
+	documentation additions
+
+0.04  Tue Jul 26 23:00:00 2005
+        transactional fixes
+	documentation fixes
+
+0.03  Mon Jul 25 21:00:00 2005
+	documentation fixes
+	raw device fix
+	documented params for genprepundo.pl
+
+0.02  Mon Jul 25 01:00:00 2005
+	documentation fixes
+	raw device fix
+
+0.01  Mon Jul 25 00:12:16 2005
+	- original version; created by h2xs 1.23 with options
+		-X Genezzo::Contrib::Clustered
+

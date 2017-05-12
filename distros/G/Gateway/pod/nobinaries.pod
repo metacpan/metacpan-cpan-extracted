@@ -1,0 +1,49 @@
+=head2 nobinaries
+
+Checks the message to see if it is or contains a binary and rejects it if
+it is.  The following checks are performed:  Ensure that no Content-Type
+header in the headers or the body contains the strings "application",
+"image", "audio", or "video"; ensure that no Content-Transfer-Encoding
+header in the headers or the body is equal to "base64", and ensure that
+encoded lines do not exceed 50% of the number of lines in the body for any
+article with at least 40 lines.
+
+An encoded line is defined as a line beginning with an M (with optional
+leading whitespace or quoting characters) and exactly 60 or 61 characters
+in length, or a line containing no spaces, not starting with M or ~, and
+between 59 and 80 characters in length.
+
+Lines meeting those criteria are counted separately (the first as
+potential uuencoding, the second as potential base64 encoding), and if the
+count of lines in any one category is over half of the total body lines,
+the message is rejected.
+
+The rejection messages are:
+
+=over 4
+
+=item base64 encoded
+
+The message contains a Content-Transfer-Encoding header with a value of
+"base64".
+
+=item Invalid content type
+
+The message contains a Content-Type header that contains one of the
+strings "application", "image", "audio", or "video".
+
+=item Apparently uuencoded
+
+The message body is at least 40 lines and more than 50% of those lines
+start with M (modulo whitespace and quoting) and are exactly 60 or 61
+characters long.
+
+=item Apparently base64-encoded
+
+The message body is at least 40 lines and more than 50% of those lines
+contain no spaces, do not begin with M or ~, and are between 59 and 80
+characters long.
+
+=back
+
+This article takes no arguments or configuration directives.

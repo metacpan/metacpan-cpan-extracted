@@ -1,0 +1,21 @@
+graph utf8_03
+{
+	rankdir = TB
+
+	"Reichwaldstraße" -- "Böhme" [color = blue penwidth = 2]
+
+	Three [ label = "ʎ ʏ ʐ ʑ ʒ ʓ ʙ ʚ"]
+
+	Four  [ label = "Πηληϊάδεω Ἀχιλῆος"]
+
+	"ΔΔΔΔΔΔΔΔΔΔΔΔΔ"
+
+	Snowman   [ label = "Label has a ☃"]
+
+	Tick [ label = "Label has a ✔"]
+
+	Three -- Four [color = green penwidth = 4]
+
+	"ΔΔΔΔΔΔΔΔΔΔΔΔΔ" -- Snowman -- Tick [color = red  penwidth = 2]
+	Tick -- Snowman -- "ΔΔΔΔΔΔΔΔΔΔΔΔΔ" [color = gold penwidth = 2]
+}

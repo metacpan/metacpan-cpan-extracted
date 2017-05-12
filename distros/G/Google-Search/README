@@ -1,0 +1,201 @@
+NAME
+    Google::Search - Interface to the Google AJAX Search API and suggestion
+    API (DEPRECATED)
+
+VERSION
+    version 0.028
+
+SYNOPSIS
+    NOTE: The Google AJAX Search API has been deprecated:
+    <http://developers.google.com/web-search/docs/>
+
+        my $search = Google::Search->Web( query => "rock" );
+        while ( my $result = $search->next ) {
+            print $result->rank, " ", $result->uri, "\n";
+        }
+
+    You can also use the single-argument-style invocation:
+
+        Google::Search->Web( "query" )
+
+    The following kinds of searches are supported
+
+        Google::Search->Local( ... )
+        Google::Search->Video( ... )
+        Google::Search->Blog( ... )
+        Google::Search->News( ... )
+        Google::Search->Image( ... )
+        Google::Search->Patent( ... )
+
+    You can also take advantage of each service's specialized interface
+
+        # The search below specifies the latitude and longitude:
+        $search = Google::Search->Local( query => { q => "rock", sll => "33.823230,-116.512110" }, ... );
+
+        my $result = $search->first;
+        print $result->streetAddress, "\n";
+
+    You can supply an API key and referrer (referer) if you have them
+
+        my $key = ... # This should be a valid API key, gotten from:
+                      # http://code.google.com/apis/ajaxsearch/signup.html
+
+        my $referrer = "http://example.com/" # This should be a valid referer for the above key
+
+        $search = Google::Search->Web(
+            key => $key, referrer => $referrer, # "referer =>" Would work too
+            query => { q => "rock", sll => "33.823230,-116.512110" }
+        );
+
+    Get suggestions from the unofficial Google suggestion API using
+    "suggest"
+
+        my $suggestions = Google::Search->suggest( $term )
+
+DESCRIPTION
+    NOTE: The Google AJAX Search API has been deprecated:
+    <http://developers.google.com/web-search/docs/>
+
+    Google::Search is an interface to the Google AJAX Search API
+    (<http://code.google.com/apis/ajaxsearch/>).
+
+    Currently, their API looks like it will fetch you the top 64 results for
+    your search query.
+
+    You may want to sign up for an API key, but it is not required. You can
+    do so here: <http://code.google.com/apis/ajaxsearch/signup.html>
+
+Shortcut usage for a specific service
+  Google::Search->Web
+  Google::Search->Local
+  Google::Search->Video
+  Google::Search->Blog
+  Google::Search->News
+  Google::Search->Book
+  Google::Search->Image
+  Google::Search->Patent
+USAGE
+  Google::Search->new( ... )
+    Prepare a new search object (handle)
+
+    You can configure the search by passing the following to "new":
+
+        query           The search phrase to submit to Google
+                        Optionally, this can also be a hash of parameters to submit. You can
+                        use the hash form to take advantage of each service's varying interface.
+                        Make sure to at least include a "q" parameter with your search
+
+        service         The service to search under. This can be any of: web,
+                        local, video, blog, news, book, image, patent
+
+        start           Optional. Start searching from "start" rank instead of 0.
+                        Google::Search will skip fetching unnecessary results
+
+        key             Optional. Your Google AJAX Search API key (see Description)
+
+        referrer        Optional. A referrer that is valid for the above key
+                        For legacy purposes, "referer" is an acceptable spelling
+
+    Both "query" and "service" are required
+
+  $search->first
+    Returns a Google::Search::Result representing the first result in the
+    search, if any.
+
+    Returns undef if nothing was found
+
+  $search->next
+    An iterator for $search. Will the return the next result each time it is
+    called, and undef when there are no more results.
+
+    Returns a Google::Search::Result
+
+    Returns undef if nothing was found
+
+  $search->result( <rank> )
+    Returns a Google::Search::Result corresponding to the result at <rank>
+
+    These are equivalent:
+
+        $search->result( 0 )
+
+        $search->first
+
+  $search->all
+    Returns Google::Search::Result list which includes every result Google
+    has returned for the query
+
+    In scalar context an array reference is returned, a list otherwise
+
+    An empty list is returned if nothing was found
+
+  $search->match( <code> )
+    Returns a Google::Search::Result list
+
+    This method will iterate through each result in the search, passing the
+    result to <code> as the first argument. If <code> returns true, then the
+    result will be included in the returned list
+
+    In scalar context this method returns the number of matches
+
+  $search->first_match( <code> )
+    Returns a Google::Search::Result that is the first to match <code>
+
+    This method will iterate through each result in the search, passing the
+    result to <code> as the first argument. If <code> returns true, then the
+    result will be returned and iteration will stop.
+
+  $search->error
+    Returns a Google::Search::Error if there was an error with the last
+    search
+
+    If you receive undef from a result access then you can use this routine
+    to see if there was a problem
+
+        warn $search->error->reason;
+
+        warn $search->error->http_response->as_string;
+
+        # Etc, etc.
+
+    This will return undef if no error was encountered
+
+  Google::Search->suggest( $term, ... )
+    Return a nested array from the Google auto-complete suggestion service.
+    Each inner array consists of: the suggestion, the number of results, and
+    the rank of the suggestion:
+
+        my $suggestions = Google::Search->suggest( 'monkey' )
+        print $suggestions->[0][0] # "monkey bread recipe"
+        print $suggestions->[0][1] # "413,000 results"
+        print $suggestions->[0][2] # 0
+
+        for my $suggestion ( @$suggestions ) {
+            ...
+        }
+
+    To override the language (or any query parameter or to add in your own
+    parameters), pass in an array:
+
+        # Get the results back in German (de)
+        Google::Search->suggest( [ hl => 'de' ], 'monkey' )
+
+    To alter the URI hostname/path or to give a custom user agent, pass in a
+    hash:
+
+        Google::Search->suggest( [ hl => 'de' ], 'monkey', {
+            host => 'clients1.google.de',
+            agent => 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
+        } )
+
+    The passing order of the array, hash, and string does not matter
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

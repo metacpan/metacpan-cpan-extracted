@@ -1,0 +1,31 @@
+Revision history for Perl extension Geography::NationalGrid::TW.
+
+0.08  Sat Sep  5 19:42:02 PDT 2009
+	- update example (suggested by jidanni)
+
+0.07  Sat Sep  5 19:42:02 PDT 2009
+	- *actually* add "use Exportor" to fix "Can't locate package Exporter" warnings
+
+0.06  Sun Jun 28 13:46:01 PDT 2009
+	- add "use Exportor" to fix "Can't locate package Exporter" warnings
+	- add two "use ..." in the example of manpage to complete it
+	- correct wrong statement in manpage. Default to 'TWD97', not 'TWD67'
+	- add my email per jidanni's request
+
+0.05  Sun Mar 16 21:07:35 PDT 2008
+	- update test case(s) to support 64-bit
+
+0.04  Tue Dec  4 17:04:15 PST 2007
+	- fix typo. See: http://rt.cpan.org/Public/Bug/Display.html?id=31203
+
+0.03  Wed Mar  1 00:00:58 CST 2006
+        - add transform() between TWD67 and TWD97
+	- first release
+
+0.02  Tue Feb 28 15:54:35 CST 2006
+        - first beta release
+
+0.01  Tue Feb 28 10:37:59 2006
+	- original version; created by h2xs 1.23 with options
+		-b 5.5.3 -X -n Geography::NationalGrid::TW
+

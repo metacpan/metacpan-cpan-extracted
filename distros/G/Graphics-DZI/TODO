@@ -1,0 +1,15 @@
+- testing DZI::Files: files are really written, all of them
+- A4: draw a zigzag line over the pages to indicate the sequence
+- A4: accept a document linear/exponential parameter, linear generates 1x1, 2x2, 3x3, 4x4, ..
+
+- DZI: stretch parameter != 1? then do a more intelligent crop:
+    1) crop larger than tile necessary
+    2) resize this (to avoid artefacts)
+    3) crop again, at tile size
+
+- add Graphics::DZI::cpio (if there were a streaming solution)
+- add Graphics::DZI::tar (if there were a *working* streaming solution
+- add Graphics::DZI::DAV
+- tests must be improved over time
+- add --overlay option to deepzoom
+

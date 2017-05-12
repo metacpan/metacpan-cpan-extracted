@@ -1,0 +1,36 @@
+# Copyright 2010, 2011 Kevin Ryde
+# 
+# This file is part of Gtk2-Ex-QuadButton.
+# 
+# Gtk2-Ex-QuadButton is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+# 
+# Gtk2-Ex-QuadButton is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with Gtk2-Ex-QuadButton.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libgtk2-ex-quadbutton-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.2
+Homepage: http://user42.tuxfamily.org/gtk2-ex-quadbutton/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libgtk2-ex-quadbutton-perl
+Architecture: all
+Depends: perl (>= 5.8.0), libglib-perl, libgtk2-perl (>= 1:1.220), libgtk2-ex-widgetbits-perl (>= 40), ${perl:Depends}, ${misc:Depends}
+Description: Widget button with four arrows
+ An up/down/left/right button widget.

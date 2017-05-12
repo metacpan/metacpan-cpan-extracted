@@ -1,0 +1,6 @@
+Revision history for Perl extension GD::Map.
+
+1.00  Wed May 24 22:11:08 2006
+	- original version; created by h2xs 1.22 with options
+		-X -n GD::Map
+

@@ -1,0 +1,3024 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MapGen SYSTEM "MapGen.dtd">
+<?xml-stylesheet type="text/xsl" href="MapGen.xsl"?>
+
+
+<MapGen>
+  <option name="bounding_box" value="40x40" />
+  <option name="cell_size" value="23x23" />
+  <option name="exporter" value="Games::RolePlay::MapGen::Exporter::XML" />
+  <option name="fname" value="vis1.map.xml" />
+  <option name="generator" value="Games::RolePlay::MapGen::Generator::Basic" />
+  <option name="max_room_size" value="7x7" />
+  <option name="max_span" value="50" />
+  <option name="min_room_size" value="2x2" />
+  <option name="num_rooms" value="2d4" />
+  <option name="remove_deadend_percent" value="60" />
+  <option name="same_node_percent" value="30" />
+  <option name="same_way_percent" value="90" />
+  <option name="sparseness" value="10" />
+  <option name="tile_size" value="5" />
+  <option name="x_size" value="20" />
+  <option name="xml_input_file" value="vis1.map.xml" />
+  <option name="y_size" value="20" />
+  <option name="closed_corridor_corridor_door_percent" value="door: 1; locked: 30; secret: 95; stuck: 10;" />
+  <option name="closed_room_corridor_door_percent" value="door: 5; locked: 30; secret: 95; stuck: 10;" />
+  <option name="open_corridor_corridor_door_percent" value="door: 1; locked: 50; secret: 10; stuck: 25;" />
+  <option name="open_room_corridor_door_percent" value="door: 95; locked: 50; secret: 2; stuck: 25;" />
+  <tile_group name="Room #1" type="room">
+    <rectangle loc="32,22" size="6x14" />
+  </tile_group>
+  <tile_group name="Room #2" type="room">
+    <rectangle loc="0,0" size="14x8" />
+  </tile_group>
+  <tile_group name="Room #3" type="room">
+    <rectangle loc="0,24" size="10x14" />
+  </tile_group>
+  <tile_group name="Room #4" type="room">
+    <rectangle loc="14,24" size="12x14" />
+  </tile_group>
+  <tile_group name="Room #5" type="room">
+    <rectangle loc="28,12" size="10x6" />
+  </tile_group>
+  <tile_group name="Room #6" type="room">
+    <rectangle loc="22,0" size="12x4" />
+  </tile_group>
+  <tile_group name="Room #7" type="room">
+    <rectangle loc="2,8" size="10x12" />
+  </tile_group>
+  <map>
+    <row ypos="0">
+      <tile xpos="0" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="3" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="4" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="5" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="6" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="7" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="8" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="9" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="10" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="11" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="12" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="13" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="24" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="25" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="26" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="27" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="28" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="29" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="30" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="31" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="33" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="34" type="wall" />
+      <tile xpos="35" type="wall" />
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="1">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room" />
+      <tile xpos="12" type="room" />
+      <tile xpos="13" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room" />
+      <tile xpos="26" type="room" />
+      <tile xpos="27" type="room" />
+      <tile xpos="28" type="room" />
+      <tile xpos="29" type="room" />
+      <tile xpos="30" type="room" />
+      <tile xpos="31" type="room" />
+      <tile xpos="32" type="room" />
+      <tile xpos="33" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="34" type="wall" />
+      <tile xpos="35" type="wall" />
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="2">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room" />
+      <tile xpos="12" type="room" />
+      <tile xpos="13" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room" />
+      <tile xpos="26" type="room" />
+      <tile xpos="27" type="room" />
+      <tile xpos="28" type="room" />
+      <tile xpos="29" type="room" />
+      <tile xpos="30" type="room" />
+      <tile xpos="31" type="room" />
+      <tile xpos="32" type="room" />
+      <tile xpos="33" type="room">
+        <closure dir="east" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="34" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="3">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room" />
+      <tile xpos="12" type="room" />
+      <tile xpos="13" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="24" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="25" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="26" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="27" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="28" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="29" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="30" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="31" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="33" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="34" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="4">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room" />
+      <tile xpos="12" type="room" />
+      <tile xpos="13" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="wall" />
+      <tile xpos="23" type="wall" />
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="5">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room" />
+      <tile xpos="12" type="room" />
+      <tile xpos="13" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="wall" />
+      <tile xpos="23" type="wall" />
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="6">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room" />
+      <tile xpos="12" type="room" />
+      <tile xpos="13" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="wall" />
+      <tile xpos="23" type="wall" />
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor" />
+      <tile xpos="32" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="33" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="34" type="corridor" />
+      <tile xpos="35" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="7">
+      <tile xpos="0" type="room">
+        <closure dir="south" type="door" locked="no" stuck="yes" secret="no" open="no" major_open_dir="north" minor_open_dir="east" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="3" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="4" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="5" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="6" type="room">
+        <closure dir="south" type="door" locked="no" stuck="no" secret="yes" open="no" major_open_dir="north" minor_open_dir="east" />
+      </tile>
+      <tile xpos="7" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="8" type="room">
+        <closure dir="south" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="north" minor_open_dir="west" />
+      </tile>
+      <tile xpos="9" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="10" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="11" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="12" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="13" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="wall" />
+      <tile xpos="23" type="wall" />
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="32" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="33" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="34" type="corridor" />
+      <tile xpos="35" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="8">
+      <tile xpos="0" type="corridor">
+        <closure dir="north" type="door" locked="no" stuck="yes" secret="no" open="no" major_open_dir="north" minor_open_dir="east" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="4" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="5" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="6" type="room">
+        <closure dir="north" type="door" locked="no" stuck="no" secret="yes" open="no" major_open_dir="north" minor_open_dir="east" />
+      </tile>
+      <tile xpos="7" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="8" type="room">
+        <closure dir="north" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="north" minor_open_dir="west" />
+      </tile>
+      <tile xpos="9" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="10" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="11" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="16" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="18" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="20" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="21" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="22" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="24" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="26" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="27" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="28" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="32" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="33" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="34" type="corridor" />
+      <tile xpos="35" type="corridor" />
+      <tile xpos="36" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="37" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="38" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="39" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+    </row>
+    <row ypos="9">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="door" locked="no" stuck="yes" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="door" locked="no" stuck="yes" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="16" type="corridor" />
+      <tile xpos="17" type="corridor" />
+      <tile xpos="18" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="20" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="21" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="22" type="corridor" />
+      <tile xpos="23" type="corridor" />
+      <tile xpos="24" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="26" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="27" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="28" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="32" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="33" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="34" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="36" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="37" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="38" type="corridor" />
+      <tile xpos="39" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+    </row>
+    <row ypos="10">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="corridor">
+        <closure dir="south" type="door" locked="yes" stuck="no" secret="yes" open="no" major_open_dir="north" minor_open_dir="west" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor" />
+      <tile xpos="24" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="26" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="27" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="28" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="32" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="33" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="34" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="36" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="37" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="38" type="corridor" />
+      <tile xpos="39" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+    </row>
+    <row ypos="11">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="corridor">
+        <closure dir="north" type="door" locked="yes" stuck="no" secret="yes" open="no" major_open_dir="north" minor_open_dir="west" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor" />
+      <tile xpos="24" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="26" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="27" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="28" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="32" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="33" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="34" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="36" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="37" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="38" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="39" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+    </row>
+    <row ypos="12">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="16" type="corridor" />
+      <tile xpos="17" type="corridor" />
+      <tile xpos="18" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="30" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="31" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="33" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="34" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="35" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="36" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="37" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="13">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor" />
+      <tile xpos="14" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="16" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="18" type="corridor" />
+      <tile xpos="19" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="room" />
+      <tile xpos="30" type="room" />
+      <tile xpos="31" type="room" />
+      <tile xpos="32" type="room" />
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="14">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="west" minor_open_dir="north" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="west" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="west" minor_open_dir="north" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor" />
+      <tile xpos="24" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="room" />
+      <tile xpos="30" type="room" />
+      <tile xpos="31" type="room" />
+      <tile xpos="32" type="room" />
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="15">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor" />
+      <tile xpos="24" type="corridor" />
+      <tile xpos="25" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="room" />
+      <tile xpos="30" type="room" />
+      <tile xpos="31" type="room" />
+      <tile xpos="32" type="room" />
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="16">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor" />
+      <tile xpos="20" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="21" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="22" type="corridor" />
+      <tile xpos="23" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="24" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="room" />
+      <tile xpos="30" type="room" />
+      <tile xpos="31" type="room" />
+      <tile xpos="32" type="room" />
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="17">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="south" type="door" locked="yes" stuck="yes" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor" />
+      <tile xpos="15" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="20" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="21" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="22" type="corridor" />
+      <tile xpos="23" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="24" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="30" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="31" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="33" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="34" type="room">
+        <closure dir="south" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+      </tile>
+      <tile xpos="35" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="36" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="37" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="18">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="door" locked="yes" stuck="no" secret="yes" open="no" major_open_dir="east" minor_open_dir="north" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="west" type="door" locked="yes" stuck="no" secret="yes" open="no" major_open_dir="east" minor_open_dir="north" />
+      </tile>
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room" />
+      <tile xpos="10" type="room" />
+      <tile xpos="11" type="room">
+        <closure dir="east" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="west" minor_open_dir="north" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="north" type="door" locked="yes" stuck="yes" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+        <closure dir="west" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="west" minor_open_dir="north" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor" />
+      <tile xpos="16" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="18" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="24" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="corridor">
+        <closure dir="north" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="36" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="37" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="19">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="3" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="4" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="5" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="6" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="7" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="8" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="9" type="room">
+        <closure dir="south" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+      </tile>
+      <tile xpos="10" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="11" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="16" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="18" type="corridor" />
+      <tile xpos="19" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="24" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="36" type="corridor" />
+      <tile xpos="37" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="20">
+      <tile xpos="0" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor" />
+      <tile xpos="2" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="3" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="4" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="5" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="6" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="7" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="8" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="9" type="corridor">
+        <closure dir="north" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="wall" />
+      <tile xpos="11" type="wall" />
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="18" type="corridor" />
+      <tile xpos="19" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor" />
+      <tile xpos="24" type="corridor" />
+      <tile xpos="25" type="corridor" />
+      <tile xpos="26" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="27" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="28" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="36" type="corridor" />
+      <tile xpos="37" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="21">
+      <tile xpos="0" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="2" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="3" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="4" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="5" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="6" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="7" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="8" type="corridor" />
+      <tile xpos="9" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="wall" />
+      <tile xpos="11" type="wall" />
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="corridor">
+        <closure dir="east" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="18" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="19" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor" />
+      <tile xpos="24" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="25" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="26" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="27" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="28" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor" />
+      <tile xpos="31" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="corridor">
+        <closure dir="south" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="35" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="36" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="37" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="22">
+      <tile xpos="0" type="wall" />
+      <tile xpos="1" type="wall" />
+      <tile xpos="2" type="wall" />
+      <tile xpos="3" type="wall" />
+      <tile xpos="4" type="wall" />
+      <tile xpos="5" type="wall" />
+      <tile xpos="6" type="wall" />
+      <tile xpos="7" type="wall" />
+      <tile xpos="8" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="9" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="16" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="east" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="east" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="33" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="34" type="room">
+        <closure dir="north" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+      </tile>
+      <tile xpos="35" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="36" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="37" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="23">
+      <tile xpos="0" type="wall" />
+      <tile xpos="1" type="wall" />
+      <tile xpos="2" type="wall" />
+      <tile xpos="3" type="wall" />
+      <tile xpos="4" type="wall" />
+      <tile xpos="5" type="wall" />
+      <tile xpos="6" type="wall" />
+      <tile xpos="7" type="wall" />
+      <tile xpos="8" type="corridor">
+        <closure dir="south" type="door" locked="no" stuck="yes" secret="no" open="no" major_open_dir="north" minor_open_dir="east" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="9" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor" />
+      <tile xpos="12" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="14" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="15" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="16" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="west" minor_open_dir="south" />
+      </tile>
+      <tile xpos="17" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+        <closure dir="west" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="west" minor_open_dir="south" />
+      </tile>
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="23" type="corridor">
+        <closure dir="south" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="24">
+      <tile xpos="0" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="3" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="4" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="5" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="6" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="7" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="8" type="room">
+        <closure dir="north" type="door" locked="no" stuck="yes" secret="no" open="no" major_open_dir="north" minor_open_dir="east" />
+      </tile>
+      <tile xpos="9" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="16" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="17" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="18" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="19" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="20" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="21" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="22" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="23" type="room">
+        <closure dir="north" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="east" />
+      </tile>
+      <tile xpos="24" type="room">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="25" type="room">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="25">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="26">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="27">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="28">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="29">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="east" minor_open_dir="north" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="east" minor_open_dir="north" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="south" type="door" locked="yes" stuck="yes" secret="yes" open="no" major_open_dir="south" minor_open_dir="west" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="30">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="door" locked="yes" stuck="yes" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="door" locked="yes" stuck="yes" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="north" type="door" locked="yes" stuck="yes" secret="yes" open="no" major_open_dir="south" minor_open_dir="west" />
+      </tile>
+      <tile xpos="12" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="14" type="room">
+        <closure dir="west" type="door" locked="yes" stuck="no" secret="no" open="no" major_open_dir="east" minor_open_dir="south" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="27" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="28" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="west" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="31">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor" />
+      <tile xpos="12" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="13" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="west" minor_open_dir="north" />
+      </tile>
+      <tile xpos="26" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="west" minor_open_dir="north" />
+      </tile>
+      <tile xpos="27" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="28" type="corridor">
+        <closure dir="north" type="door" locked="no" stuck="no" secret="no" open="no" major_open_dir="south" minor_open_dir="west" />
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="32">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="corridor">
+        <closure dir="north" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="north" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor" />
+      <tile xpos="31" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="33">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="door" locked="no" stuck="no" secret="yes" open="no" major_open_dir="east" minor_open_dir="north" />
+      </tile>
+      <tile xpos="10" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="door" locked="no" stuck="no" secret="yes" open="no" major_open_dir="east" minor_open_dir="north" />
+      </tile>
+      <tile xpos="11" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor" />
+      <tile xpos="30" type="corridor" />
+      <tile xpos="31" type="corridor">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="34">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="wall" />
+      <tile xpos="11" type="wall" />
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="corridor">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor" />
+      <tile xpos="30" type="corridor" />
+      <tile xpos="31" type="corridor">
+        <closure dir="east" type="door" locked="no" stuck="no" secret="yes" open="no" major_open_dir="west" minor_open_dir="north" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="west" type="door" locked="no" stuck="no" secret="yes" open="no" major_open_dir="west" minor_open_dir="north" />
+      </tile>
+      <tile xpos="33" type="room" />
+      <tile xpos="34" type="room" />
+      <tile xpos="35" type="room" />
+      <tile xpos="36" type="room" />
+      <tile xpos="37" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="35">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="wall" />
+      <tile xpos="11" type="wall" />
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="29" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="30" type="corridor">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="31" type="corridor">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="32" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="33" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="34" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="35" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="36" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="37" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="36">
+      <tile xpos="0" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room" />
+      <tile xpos="2" type="room" />
+      <tile xpos="3" type="room" />
+      <tile xpos="4" type="room" />
+      <tile xpos="5" type="room" />
+      <tile xpos="6" type="room" />
+      <tile xpos="7" type="room" />
+      <tile xpos="8" type="room" />
+      <tile xpos="9" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="wall" />
+      <tile xpos="11" type="wall" />
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room" />
+      <tile xpos="16" type="room" />
+      <tile xpos="17" type="room" />
+      <tile xpos="18" type="room" />
+      <tile xpos="19" type="room" />
+      <tile xpos="20" type="room" />
+      <tile xpos="21" type="room" />
+      <tile xpos="22" type="room" />
+      <tile xpos="23" type="room" />
+      <tile xpos="24" type="room" />
+      <tile xpos="25" type="room">
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="wall" />
+      <tile xpos="35" type="wall" />
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="37">
+      <tile xpos="0" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="1" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="2" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="3" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="4" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="5" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="6" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="7" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="8" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="9" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="10" type="wall" />
+      <tile xpos="11" type="wall" />
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="west" type="wall" />
+      </tile>
+      <tile xpos="15" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="16" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="17" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="18" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="19" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="20" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="21" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="22" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="23" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="24" type="room">
+        <closure dir="south" type="wall" />
+      </tile>
+      <tile xpos="25" type="room">
+        <closure dir="south" type="wall" />
+        <closure dir="east" type="wall" />
+      </tile>
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="wall" />
+      <tile xpos="35" type="wall" />
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="38">
+      <tile xpos="0" type="wall" />
+      <tile xpos="1" type="wall" />
+      <tile xpos="2" type="wall" />
+      <tile xpos="3" type="wall" />
+      <tile xpos="4" type="wall" />
+      <tile xpos="5" type="wall" />
+      <tile xpos="6" type="wall" />
+      <tile xpos="7" type="wall" />
+      <tile xpos="8" type="wall" />
+      <tile xpos="9" type="wall" />
+      <tile xpos="10" type="wall" />
+      <tile xpos="11" type="wall" />
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="wall" />
+      <tile xpos="23" type="wall" />
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="wall" />
+      <tile xpos="35" type="wall" />
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+    <row ypos="39">
+      <tile xpos="0" type="wall" />
+      <tile xpos="1" type="wall" />
+      <tile xpos="2" type="wall" />
+      <tile xpos="3" type="wall" />
+      <tile xpos="4" type="wall" />
+      <tile xpos="5" type="wall" />
+      <tile xpos="6" type="wall" />
+      <tile xpos="7" type="wall" />
+      <tile xpos="8" type="wall" />
+      <tile xpos="9" type="wall" />
+      <tile xpos="10" type="wall" />
+      <tile xpos="11" type="wall" />
+      <tile xpos="12" type="wall" />
+      <tile xpos="13" type="wall" />
+      <tile xpos="14" type="wall" />
+      <tile xpos="15" type="wall" />
+      <tile xpos="16" type="wall" />
+      <tile xpos="17" type="wall" />
+      <tile xpos="18" type="wall" />
+      <tile xpos="19" type="wall" />
+      <tile xpos="20" type="wall" />
+      <tile xpos="21" type="wall" />
+      <tile xpos="22" type="wall" />
+      <tile xpos="23" type="wall" />
+      <tile xpos="24" type="wall" />
+      <tile xpos="25" type="wall" />
+      <tile xpos="26" type="wall" />
+      <tile xpos="27" type="wall" />
+      <tile xpos="28" type="wall" />
+      <tile xpos="29" type="wall" />
+      <tile xpos="30" type="wall" />
+      <tile xpos="31" type="wall" />
+      <tile xpos="32" type="wall" />
+      <tile xpos="33" type="wall" />
+      <tile xpos="34" type="wall" />
+      <tile xpos="35" type="wall" />
+      <tile xpos="36" type="wall" />
+      <tile xpos="37" type="wall" />
+      <tile xpos="38" type="wall" />
+      <tile xpos="39" type="wall" />
+    </row>
+  </map>
+</MapGen>

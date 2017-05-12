@@ -1,0 +1,296 @@
+format-version: 1.2
+date: 14:07:2009 13:33
+auto-generated-by: OBO-Edit 2.0
+default-namespace: test_ontology
+subsetdef: goslim_test "Test GO slim"
+
+[Term]
+id: GO:0000000
+name: GO:0000000
+subset: goslim_test
+
+[Term]
+id: GO:0000001
+name: GO:0000001
+subset: goslim_test
+is_a: GO:0000000
+
+[Term]
+id: GO:0000002
+name: GO:0000002
+subset: goslim_test
+relationship: part_of GO:0000000
+
+[Term]
+id: GO:0000003
+name: GO:0000003
+subset: goslim_test
+relationship: regulates GO:0000000
+
+[Term]
+id: GO:0000004
+name: GO:0000004
+subset: goslim_test
+relationship: negatively_regulates GO:0000000
+
+[Term]
+id: GO:0000005
+name: GO:0000005
+subset: goslim_test
+relationship: positively_regulates GO:0000000
+
+[Term]
+id: GO:0000006
+name: GO:0000006
+subset: goslim_test
+relationship: has_part GO:0000000
+
+[Term]
+id: GO:0000011
+name: GO:0000011
+subset: goslim_test
+is_a: GO:0000001
+
+[Term]
+id: GO:0000021
+name: GO:0000021
+subset: goslim_test
+relationship: part_of GO:0000001
+
+[Term]
+id: GO:0000031
+name: GO:0000031
+subset: goslim_test
+relationship: regulates GO:0000001
+
+[Term]
+id: GO:0000041
+name: GO:0000041
+subset: goslim_test
+relationship: negatively_regulates GO:0000001
+
+[Term]
+id: GO:0000051
+name: GO:0000051
+subset: goslim_test
+relationship: positively_regulates GO:0000001
+
+[Term]
+id: GO:0000061
+name: GO:0000061
+subset: goslim_test
+relationship: has_part GO:0000001
+
+
+[Term]
+id: GO:0000012
+name: GO:0000012
+subset: goslim_test
+is_a: GO:0000002
+
+[Term]
+id: GO:0000022
+name: GO:0000022
+subset: goslim_test
+relationship: part_of GO:0000002
+
+[Term]
+id: GO:0000032
+name: GO:0000032
+subset: goslim_test
+relationship: regulates GO:0000002
+
+[Term]
+id: GO:0000042
+name: GO:0000042
+subset: goslim_test
+relationship: negatively_regulates GO:0000002
+
+[Term]
+id: GO:0000052
+name: GO:0000052
+subset: goslim_test
+relationship: positively_regulates GO:0000002
+
+[Term]
+id: GO:0000062
+name: GO:0000062
+subset: goslim_test
+relationship: has_part GO:0000002
+
+
+[Term]
+id: GO:0000013
+name: GO:0000013
+subset: goslim_test
+is_a: GO:0000003
+
+[Term]
+id: GO:0000023
+name: GO:0000023
+subset: goslim_test
+relationship: part_of GO:0000003
+
+[Term]
+id: GO:0000033
+name: GO:0000033
+subset: goslim_test
+relationship: regulates GO:0000003
+
+[Term]
+id: GO:0000043
+name: GO:0000043
+subset: goslim_test
+relationship: negatively_regulates GO:0000003
+
+[Term]
+id: GO:0000053
+name: GO:0000053
+subset: goslim_test
+relationship: positively_regulates GO:0000003
+
+[Term]
+id: GO:0000063
+name: GO:0000063
+subset: goslim_test
+relationship: has_part GO:0000003
+
+
+[Term]
+id: GO:0000014
+name: GO:0000014
+subset: goslim_test
+is_a: GO:0000004
+
+[Term]
+id: GO:0000024
+name: GO:0000024
+subset: goslim_test
+relationship: part_of GO:0000004
+
+[Term]
+id: GO:0000034
+name: GO:0000034
+subset: goslim_test
+relationship: regulates GO:0000004
+
+[Term]
+id: GO:0000044
+name: GO:0000044
+subset: goslim_test
+relationship: negatively_regulates GO:0000004
+
+[Term]
+id: GO:0000054
+name: GO:0000054
+subset: goslim_test
+relationship: positively_regulates GO:0000004
+
+[Term]
+id: GO:0000064
+name: GO:0000064
+subset: goslim_test
+relationship: has_part GO:0000004
+
+
+[Term]
+id: GO:0000015
+name: GO:0000015
+subset: goslim_test
+is_a: GO:0000005
+
+[Term]
+id: GO:0000025
+name: GO:0000025
+subset: goslim_test
+relationship: part_of GO:0000005
+
+[Term]
+id: GO:0000035
+name: GO:0000035
+subset: goslim_test
+relationship: regulates GO:0000005
+
+[Term]
+id: GO:0000045
+name: GO:0000045
+subset: goslim_test
+relationship: negatively_regulates GO:0000005
+
+[Term]
+id: GO:0000055
+name: GO:0000055
+subset: goslim_test
+relationship: positively_regulates GO:0000005
+
+[Term]
+id: GO:0000065
+name: GO:0000065
+subset: goslim_test
+relationship: has_part GO:0000005
+
+
+[Term]
+id: GO:0000016
+name: GO:0000016
+subset: goslim_test
+is_a: GO:0000006
+
+[Term]
+id: GO:0000026
+name: GO:0000026
+subset: goslim_test
+relationship: part_of GO:0000006
+
+[Term]
+id: GO:0000036
+name: GO:0000036
+subset: goslim_test
+relationship: regulates GO:0000006
+
+[Term]
+id: GO:0000046
+name: GO:0000046
+subset: goslim_test
+relationship: negatively_regulates GO:0000006
+
+[Term]
+id: GO:0000056
+name: GO:0000056
+subset: goslim_test
+relationship: positively_regulates GO:0000006
+
+[Term]
+id: GO:0000066
+name: GO:0000066
+subset: goslim_test
+relationship: has_part GO:0000006
+
+[Typedef]
+id: part_of
+name: part_of
+xref: OBO_REL:part_of
+is_transitive: true
+
+[Typedef]
+id: has_part
+name: has_part
+inverse_of_on_instance_level: part_of
+is_reflexive: true
+is_anti_symmetric: true
+is_transitive: true
+
+[Typedef]
+id: negatively_regulates
+name: negatively_regulates
+is_a: regulates 
+
+[Typedef]
+id: positively_regulates
+name: positively_regulates
+is_a: regulates 
+
+[Typedef]
+id: regulates
+name: regulates
+transitive_over: part_of ! part_of

@@ -1,0 +1,31 @@
+                            METAR Wishlist
+
+Following is a list of items that I'd like to add to METAR or that
+others have requested. I've listed them here in the order that they're
+likely to be completed.
+
+
+  * Improved the test suite.
+
+    It'd be nice to have a lot of METARs which encompass various
+    weather condition which we can test against.
+
+
+  * International METAR support.
+
+    Sites around the world use similar (but slightly different)
+    formats for their METARs. There is always a METAR format the parser
+    will fail on.
+
+
+  * Calculate Heat Index and/or Wind Chill
+
+    Both would be fairly easy to do, provided you get the formulas
+    correct. (Those vary around the world!)
+
+
+If you'd like to submit a patch for any of these, please let me know!
+Please put 'METAR' in the subject of your e-mail.
+
+Koos van den Hout <koos@kzdoos.xs4all.nl>
+

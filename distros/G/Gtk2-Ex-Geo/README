@@ -1,0 +1,157 @@
+Gtk2-Ex-Geo
+========================
+
+Gtk2::Ex::Geo is a namespace for modules, classes, and widgets for
+geospatial applications. This package contains the modules:
+
+Gtk2::Ex::Geo
+
+The main module to 'use'.
+
+Gtk2::Ex::Geo::Canvas
+
+A subclass of Gtk2::Gdk::Pixbuf. Constructs a pixbuf from a stack of
+geospatial layer objects by calling the 'render' method for each
+$layer. Embedded in Gtk2::Ex::Geo::Overlay.
+
+Gtk2::Ex::Geo::Overlay
+
+A subclass of Gtk2::ScrolledWindow. A canvas in a scrolled
+window. Contains a list of layer objects. Functionality includes
+redraw, support for selections (point, line, path, rectangle, polygon,
+or many of them), zoom, pan, and conversion between event and world
+(layer) coordinates.
+
+Gtk2::Ex::Geo::Layer
+
+The root class for geospatial layers. A geospatial layer is a
+typically a subclass of a geospatial data (raster, vector features, or
+something else) and of this class. The idea is that this class
+contains visualization information (transparency, palette, colors,
+symbology, label placement, etc) for the data. Contains many callbacks
+that are fired as a result of user using context menu, making a
+selection, etc. Uses layer dialogs.
+
+Gtk2::Ex::Geo::DialogMaster
+
+A class which maintains a set of Glade dialogs taken from XML in DATA
+section.
+
+Gtk2::Ex::Geo::Dialogs
+
+A subclass of Gtk2::Ex::Geo::DialogMaster. Contains dialogs for
+Gtk2::Ex::Geo::Layer.
+
+Gtk2::Ex::Geo::Glue
+
+Typically a singleton class for an object, which manages a
+Gtk2::Ex::Geo::Overlay widget, a Gtk2::TreeView widgets, and other
+widgets of a geospatial application. The object also takes care of
+popping up context menus and other things.
+
+Gtk2::Ex::Geo::History
+
+Embedded in Gtk2::Ex::Geo::Glue. Input history a'la (at least
+attempting) GNU history that is used by Glue object with Gtk2::Entry.
+
+Gtk2::Ex::Geo::TreeDumper
+
+From http://www.asofyet.org/muppet/software/gtk2-perl/treedumper.pl-txt
+For inspecting layer and other objects.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+use Glib qw/TRUE FALSE/;
+use Gtk2::Ex::Geo;
+# use any geospatial layer classes you wish
+use Gtk2 '-init';
+
+# it is a good thing to catch errors and show them to user
+# instead of dying
+Glib->install_exception_handler(\&my_exception_handler);
+
+# the main window for your application
+my $window = Gtk2::Window->new;
+
+# the geospatial application (layer container + controller)
+my $app = Gtk2::Ex::Geo::Glue->new(%params);  
+
+# extend the controller with the geospatial layer capabilities
+for (qw/your_geospatial_layer_classes/) {
+    $app->register_class($_);
+}
+
+# visible layer list
+my $list = Gtk2::ScrolledWindow->new();
+$list->set_policy("never", "automatic");
+$list->add($app->{tree_view});
+    
+# a panel with the layer list and the map
+my $hbox = Gtk2::HPaned->new();
+$hbox->add1($list);
+$hbox->add2($app->{overlay});
+    
+# stack all GUI elements vertically
+my $vbox = Gtk2::VBox->new(FALSE, 0);
+$vbox->pack_start($app->{toolbar}, FALSE, FALSE, 0);
+$vbox->pack_start($hbox, TRUE, TRUE, 0);
+$vbox->pack_start($app->{entry}, FALSE, FALSE, 0);
+$vbox->pack_start($app->{statusbar}, FALSE, FALSE, 0);
+
+$window->add($vbox);
+$window->signal_connect("destroy", \&my_destroy);
+$window->set_default_size(900,600);
+$window->set_position('center');
+$window->show_all;
+
+Gtk2->main;
+
+sub my_exception_handler {
+    my $msg = shift;
+    my $dialog = Gtk2::MessageDialog->new(undef,
+					  'destroy-with-parent',
+					  'info',
+					  'close',
+					  $msg);
+    $dialog->signal_connect(response => sub {
+    				     	my($dialog) = @_;
+    					$dialog->destroy;
+					});
+    $dialog->show_all;
+    return 1;
+}
+
+# break circular references before exiting
+sub my_destroy {
+    $app->close();
+    $window->destroy;
+    undef $app;
+    undef $window;
+    Gtk2->main_quit;
+    exit(0);
+}
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Gtk2
+Gtk2::GladeXML
+Graphics::ColorUtils
+Geo::OGC::Geometry
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2012 Ari Jolma
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of Artistic License 2.0 (included as LICENCE).

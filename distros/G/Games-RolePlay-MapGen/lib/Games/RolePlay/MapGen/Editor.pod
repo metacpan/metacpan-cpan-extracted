@@ -1,0 +1,40 @@
+=head1 NAME
+
+Games::RolePlay::MapGen::Editor - An experimental (eventually possibly cool) Map Editor
+
+=head1 SYNOPSIS
+
+    use Games::RolePlay::MapGen::Editor;
+
+    my $editor = new Games::RolePlay::MapGen::Editor;
+       $editor->run;
+
+Here are some screenshots of the Editor:
+
+L<http://voltar.org/PerlModules/grm-editor-shot1.png>
+
+L<http://voltar.org/PerlModules/grm-editor-shot2.png>
+
+=head1 INSTRUCTIONS
+
+The documentation is pretty light on this, sorry.  I think most things in the
+editor are pretty self explanatory if you mess around with it.  There are a few
+things I should explain though.
+
+The editor supports three types of tiles: walls, corridors and rooms.  Each tile
+has four "closures" (north, east, south, and west).
+
+There are three types of closures: walls, openings, and doors.  The doors have
+various settings as well.
+
+The only other thing that you need to know is that room tiles are special and
+are linked to their group-mates.  They cannot be modified unless they're
+converted to corridor tiles -- although their closures can be modified.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008 Paul Miller -- LGPL [Software::License::LGPL_2_1]
+
+=head1 SEE ALSO
+
+perl(1), Games::RolePlay::MapGen(1), Gtk2(1)

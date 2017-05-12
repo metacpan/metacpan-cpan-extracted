@@ -1,0 +1,8 @@
+Revision history for Perl extension GedNav.
+
+0.02  Tue Dec 14 11:14:44 CST 1999
+	- noted module dependencies properly in Makefile.PL
+
+0.01  Wed Aug 11 11:19:25 1999
+	- original version; created by h2xs 1.19
+

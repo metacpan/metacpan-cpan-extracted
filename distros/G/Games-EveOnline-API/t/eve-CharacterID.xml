@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2014-08-24 18:47:15</currentTime>
+  <result>
+    <rowset name="characters" key="characterID" columns="name,characterID">
+      <row name="Chips Merkaba" characterID="90922771" />
+      <row name="libzar" characterID="1879838281" />
+      <row name="Krion" characterID="121591735" />
+    </rowset>
+  </result>
+  <cachedUntil>2014-09-24 18:47:15</cachedUntil>
+</eveapi>

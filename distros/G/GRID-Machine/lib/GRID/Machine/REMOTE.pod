@@ -1,0 +1,386 @@
+=head1 NAME
+
+GRID::Machine::REMOTE - The server that runs on the other side of the SSH link
+
+=head1 DESCRIPTION
+
+
+=head2 The Structure of the Remote Server
+
+As with most servers, the server side of the C<GRID::Machine> object consists of an infinite
+loop waiting for requests:
+
+  while( 1 ) {
+     my ( $operation, @args ) = $server->read_operation();
+
+     if ($server->can($operation)) {
+       $server->$operation(@args);
+       next;
+     }
+
+     $server->send_error( "Unknown operation $operation\nARGS: @args\n" );
+  }
+
+=head2 The Protocol
+
+The protocol simply consists of the name of the method to execute and the arguments
+for such method. The programmer - using inheritance - can extend the protocol
+with new methods (see the section L<EXTENDING THE PROTOCOL>). The following 
+operations are currently supported:
+
+=over 2
+
+=item * C<GRID::Machine::EVAL>
+
+Used by the local method C<eval>
+
+=item * C<GRID::Machine::STORE>
+
+Used by the local methods C<compile> and C<sub> to install code on the remote side.
+
+=item * C<GRID::Machine::EXISTS>
+
+Used by the local method C<exists>
+
+=item * C<GRID::Machine::CALL>
+
+Used by the local method C<call>
+
+=item * C<GRID::Machine::MODPUT>
+
+Used by the C<modput> method. A list of pairs (C<Module::Name, code for Module::Name>) is sent to the remote machine.
+For each pair, the remote side writes to disk a file C<Module/Name.pm> with the contents of the string 
+C<code for Module::Name>. The file is stored in the directory referenced by the C<prefix> attribute 
+of the C<GRID::Machine> object.
+
+
+=item * C<GRID::Machine::OPEN>
+
+Used by the C<open> method. As arguments receives a string
+defining the way the file will be accessed.
+
+=item * C<GRID::Machine::QUIT>
+
+Usually is automatically called when the C<GRID::Machine> object
+goes out of scope 
+
+=item * C<GRID::Machine::GPRINT>
+
+Most requests go from the local machine to the remote Perl server.
+However, this and the next go in the other direction. This request
+is generated in the remote machine and served by the local machine.
+It is used when inmediate printing is required
+(see section L<Functions gprint and gprintf>)
+
+
+=item * C<GRID::Machine::GPRINTF>
+
+This request
+is generated in the remote machine and served by the local machine.
+It is used when inmediate printing is required
+(see section L<Functions gprint and gprintf>)
+
+=item * C<GRID::Machine::CALLBACK>
+
+Used to implement callbacks
+
+=back 
+
+=head2 The C<SERVER> function
+
+The C<SERVER> function is available on the remote machine. Returns
+the object representing the remote side of the C<GRID::Machine> object.
+This way code on the remote side can gain access to the C<GRID::Machine> 
+object. See an example:
+
+    my $m = GRID::Machine->new( host => 'beowulf');
+
+    $m->sub(installed => q { return  keys %{SERVER->stored_procedures}; });
+    my @functions = $m->installed()->Results;
+    local $" = "\n";
+    print "@functions\n";
+
+The C<stored_procedures> method returns a reference to the hash containing
+the subroutines installed via the C<sub> and C<compile> methods. The keys are
+the names of the subroutines, the values are the C<CODE> references implementing
+them.  When executed the former program produces the list of installed subroutines:
+
+                    $ accessobject.pl
+                    tar
+                    system
+                    installed
+                    getcwd
+                    etc.
+
+=head2 The C<read_operation> Method 
+
+Syntax:
+
+     my ( $operation, @args ) = $server->read_operation( );
+
+Reads from the link. Returns the type of operation/tag and the results of the 
+operation.
+
+=head2 The C<send_error> Method 
+
+Syntax:
+
+     $server->send_error( "Error message" );
+
+Inside code to be executed on the remote machine we can use the function
+C<send_error> to send  error messages to the client
+
+=head2 The C<send_result> Method
+
+Syntax:
+
+    $server->send_result( 
+	stdout  => $stdout,
+	stderr  => $stderr,
+        errmsg  => $errmsg,
+        results => [ @results ],
+    );
+
+Inside code to be executed on the remote machine we can use the function
+C<send_result> to send  results to the client
+
+=head1 EXTENDING THE PROTOCOL
+
+Let us see a simple example. We will extend the
+protocol with a new tag C<MYTAG>. 
+We have to write a module that will be used in the remote
+side of the link:
+
+  $ cat -n MyRemote.pm      
+     1  package GRID::Machine;
+     2  use strict;
+     3
+     4  sub MYTAG {
+     5    my ($server, $name) = @_;
+     6
+     7    $server->send_operation("RETURNED", "Hello $name!\n") if defined($name); 
+     8    $server->send_operation("DIED", "Error: Provide a name to greet!\n");
+     9  }
+    10
+    11  1;
+
+
+This component will be loaded on the remote machine via the ssh link.
+The name of the handling method C<MYTAG>
+must be the same than the name of the tag (operation type) used to send the request. 
+Here is a client program using the new tag:
+
+  $ cat -n extendprotocol.pl
+     1  #!/usr/local/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4
+     5  my $name = shift;
+     6  my $host = 'user@remote.machine';
+     7
+     8  my $machine = GRID::Machine->new(host => $host, remotelibs => [ qw(MyRemote) ]);
+     9
+    10  $machine->send_operation( "MYTAG", $name);
+    11  my ($type, $result) = $machine->read_operation();
+    12
+    13  die $result unless $type eq 'RETURNED';
+    14  print $result;
+
+
+When the program is executed we get the following output:
+
+                          $ extendprotocol.pl Larry
+                          Hello Larry!
+                          $ extendprotocol.pl
+                          Error: Provide a name to greet!
+
+=head1 INMEDIATE PRINTING
+
+=head2 Functions C<gprint> and C<gprintf>
+
+When running a RPC the output generated during the execution
+of the remote subroutine isn't available until the return of the 
+RPC. Use C<gprint> and C<gprintf> 
+if what you want is inmediate output (for debugging purposes, for instance).
+They work as C<print> and C<printf> respectively.
+
+See an example:
+
+  $ cat -n gprint.pl
+     1  #!/usr/local/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4
+     5  my $host = $ENV{GRID_REMOTE_MACHINE};
+     6
+     7  my $machine = GRID::Machine->new(host => $host, uses => [ 'Sys::Hostname' ]);
+     8
+     9  my $r = $machine->sub(
+    10    rmap => q{
+    11      my $f = shift; # function to apply
+    12      die "Code reference expected\n" unless UNIVERSAL::isa($f, 'CODE');
+    13
+    14
+    15      print "Inside rmap!\n"; # last message
+    16      my @result;
+    17      for (@_) {
+    18        die "Array reference expected\n" unless UNIVERSAL::isa($_, 'ARRAY');
+    19
+    20        gprint hostname(),": Processing @$_\n";
+    21
+    22
+    23        push @result, [ map { $f->($_) } @$_ ];
+    24      }
+    25
+    26      gprintf "%12s:\n",hostname();
+    27      for (@result) {
+    28        my $format = "%5d"x(@$_)."\n";
+    29        gprintf $format, @$_
+    30      }
+    31      return @result;
+    32    },
+    33  );
+    34  die $r->errmsg unless $r->ok;
+    35
+    36  my $cube = sub { $_[0]**3 };
+    37  $r = $machine->rmap($cube, [1..3], [4..6], [7..9]);
+    38  print $r;
+
+When executed the program produces the following output:
+
+          $ gprint.pl
+          orion: Processing 1 2 3
+          orion: Processing 4 5 6
+          orion: Processing 7 8 9
+                 orion:
+              1    8   27
+             64  125  216
+            343  512  729
+          Inside rmap!
+
+Observe how the message C<'Inside rmap!'> generated at line 15 using C<print> is the last 
+(actually is sent to C<STDOUT> in line 38).
+The messages generated using C<gprint> and C<gprintf> (lines 20, 26 and 29)
+were inmediately sent to C<STDOUT>.
+
+=head1 REMOTE DEBUGGING 
+
+To run the remote side under the control of the perl debugger use the C<debug>
+option of C<new>. The associated value must be a port number higher than 1024:
+
+     my $machine = GRID::Machine->new(
+        host => $host,
+        debug => $port,
+        includes => [ qw{SomeFunc} ],
+     );
+
+Before running the example open a SSH session to the remote machine
+in a different terminal and execute C<netcat> to listen (option C<-l>)
+in the chosen port:
+
+  pp2@nereida:~/LGRID_Machine$ ssh beowulf 'netcat -v -l -p 12345'
+  listening on [any] 12345 ...
+                              
+Now run the program in the first terminal:
+
+  pp2@nereida:~/LGRID_Machine/examples$ debug1.pl beowulf:12345
+  Debugging with 'ssh beowulf PERLDB_OPTS="RemotePort=beowulf:12345" perl -d'
+  Remember to run 'netcat -v -l -p 12345' in beowulf
+
+The program looks blocked. If you go to the other terminal you will find
+the familiar perl debugger prompt:
+
+  casiano@beowulf:~$ netcat -v -l -p 12345
+  listening on [any] 12345 ...
+  connect to [193.145.102.240] from beowulf.pcg.ull.es [193.145.102.240] 38979
+
+  Loading DB routines from perl5db.pl version 1.28
+  Editor support available.
+
+  Enter h or `h h' for help, or `man perldebug' for more help.
+
+  GRID::Machine::MakeAccessors::(/home/pp2/LGRID_Machine/lib/GRID/Machine/MakeAccessors.pm:33):
+  33:     1;
+  auto(-1)  DB<1> c GRID::Machine::main
+  GRID::Machine::main(/home/pp2/LGRID_Machine/lib/GRID/Machine/REMOTE.pm:490):
+  490:      my $server = shift;
+    DB<2>                        
+
+From now on you can execute almost any debugger command. Unfortunately
+you are now inside C<GRID::Machine> code and - until you gain some familiarity 
+with C<GRID::Machine> code -
+it is a bit difficult to find where your code is and where to put 
+your breakpoints.  Future work: write a proper debugger front end.
+
+
+
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * L<GRID::Machine>
+
+=item * L<GRID::Machine::IOHandle>
+
+=item * L<GRID::Machine::Group>
+
+=item * L<GRID::Machine::Process>
+
+=item * L<GRID::Machine::perlparintro>
+
+
+=item *  L<Net::OpenSSH> 
+
+=item * L<IPC::PerlSSH>
+
+=item * L<IPC::PerlSSH::Async>
+
+=item * Man pages of C<ssh>, C<ssh-key-gen>, C<ssh_config>, C<scp>, 
+C<ssh-agent>, C<ssh-add>, C<sshd>
+
+=item * L<http://www.openssh.com>
+
+=back
+
+
+
+=head1 AUTHOR
+
+Casiano Rodriguez Leon E<lt>casiano@ull.esE<gt>
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+Support from Gobierno de Canarias was through GC02210601
+(I<Grupos Consolidados>).
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+I wish to thank Paul Evans for his C<IPC::PerlSSH> module: it was the source
+of inspiration for this module. To 
+Alex White,
+Dmitri Kargapolov, 
+Eric Busto
+and
+Erik Welch 
+for their contributions.
+To the Perl Monks, and the Perl Community for generously sharing their knowledge.
+Finally, thanks to Juana, Coro and  my students at La Laguna.
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2007 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+

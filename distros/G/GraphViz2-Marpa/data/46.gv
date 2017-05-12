@@ -1,0 +1,23 @@
+graph graph_46
+{
+	node
+	[
+		shape = box
+	]
+	course;
+	institute;
+	student;
+	node
+	[
+		shape = ellipse
+	]
+	{
+		node
+		[
+			label = "name"
+		]
+		name0;
+		name1;
+		name2;
+	}
+}

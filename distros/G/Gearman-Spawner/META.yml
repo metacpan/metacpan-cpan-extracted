@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Gearman-Spawner
+version:            1.11
+abstract:           Lifecycle manager for Gearman workers
+author:
+    - Adam Thomason <athomason@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:              0
+    Danga::Socket:     1.59
+    Gearman::Server:   1.11
+    IO::Socket::INET:  1.31
+    POSIX:             0
+    Storable:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

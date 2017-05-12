@@ -1,0 +1,61 @@
+$name   = 'mark';
+$author = 'Mark Chou';
+
+sub main {
+        enable shield;
+
+        if ($life >= $enemy_l) {
+                call turn;
+                move forward;
+        }
+
+        if (&nearst('enemy') <= 6) {
+                enable cloak;
+        }
+
+        if (&inperim('enemy')) {
+                attempt destruct;
+        }
+        redo;
+}
+
+sub turn {
+    attempt destruct if &inperim('enemy');
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+    }
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+    return;
+}
+
+

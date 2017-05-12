@@ -1,0 +1,62 @@
+Gtk2-Ex-MindMapView version 0.0.1
+
+Gtk2-Ex-MindMapView displays an outline or mind map on a
+Gnome2::Canvas. This module is an extension of the Gnome2::Canvas
+which is a Gtk2::Widget, so it can be placed in any Gtk2 container.
+
+This software allows you to create a balanced display of text items
+each with a border. You may assign a font and change the color of the
+mind map items. You may also create clickable URLs and display
+pictures.
+
+This is an alpha version of the software. It has been released in this
+state so that I may receive feedback on it. All constructive feedback
+is welcome.
+
+This software should not be used for anything important. The
+interfaces WILL change and any code you write that uses this software
+will probably break on the next release.
+
+You may run the examples that come with this software prior to the
+install step. This will give you a glimpse of what it can do without
+having to do the full install.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the
+following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+You must have the following additional modules installed in order to
+use Gtk2::Ex::MindMapView :
+
+Gnome2::Canvas
+
+Graph
+
+as well as all their dependencies.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, James Muir
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

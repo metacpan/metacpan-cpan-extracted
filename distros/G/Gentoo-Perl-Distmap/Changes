@@ -1,0 +1,90 @@
+﻿Release history for Gentoo-Perl-Distmap
+
+0.2.0 2013-05-06T03:56:12Z
+ [Dependencies::Added / develop requires]
+ - Test::CPAN::Changes 0.19
+
+ [Dependencies::Added / runtime requires]
+ - Moose
+ - Moose::Role
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.4003 → 0.4004
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.4003 → 0.4004
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.0 → v1.7.3
+
+ [Dependencies::Removed / runtime requires]
+ - Moo
+ - Moo::Role
+ - MooseX::Has::Sugar
+ - Sub::Quote
+
+0.1.4 2013-03-13T06:00:14Z
+ [!Notable Changes]
+ - Move to Path::Tiny
+
+ [Dependencies::Added / develop requires]
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta
+ - Test::Pod 1.41
+ - Test::Pod::Coverage 1.08
+ - version 0.9901
+
+ [Dependencies::Added / runtime requires]
+ - Path::Tiny
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.4002 → 0.4003
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.4002 → 0.4003
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.5.0 → v1.7.0
+
+ [Dependencies::Removed / runtime requires]
+ - Path::Class::File
+
+ [Dependencies::Removed / test requires]
+ - Path::Class::Dir
+
+ [Documentation]
+ - Copyright year updated
+ - Added README.mkdn
+ - Misc spelling fixes
+ - Slightly improved POD Coverage
+
+ [Meta]
+ - Bug tracker moved to github
+
+0.1.3 2012-08-13T05:46:53Z
+ [Dependencies::Added / runtime requires]
+ - Data::Dump
+ - Digest::SHA
+ - Moo::Role
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.4.3 → v1.5.
+
+ [Features]
+ - Add ->hash method on various things.
+ - Add various data fetching methods on maps
+
+0.1.2 2012-08-02T11:03:53Z
+ [Bugs]
+ - Fixed the failure to load ::RecordSet
+
+0.1.1 2012-07-31T21:38:56Z
+ [API]
+ - Change all use of the term 'repo' to be 'repository' codewide.
+
+ [Features]
+ - add a `add_version` method.
+
+0.1.0 2012-07-31T20:41:46Z
+ - First version.
+

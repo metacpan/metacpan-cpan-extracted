@@ -1,0 +1,314 @@
+#!/usr/bin/perl
+
+# This example exists in three different versions,
+#  one using OpenGL.pm (this one)
+#  one using SDL::OpenGL
+#  one using PDL::Graphics::OpenGL
+# It's main purpose is to show how different OpenGL-implementations in perl
+# differ.
+
+use strict;
+use Gtk2 '-init';
+use Gtk2::GLExt;
+use OpenGL qw/:all/;
+
+# this is nothing, a better example should be created!
+
+use Data::Dumper;
+
+my $length = 20;
+my $width = 12;
+my $height = 8;
+
+my $room;
+my $room_rot;
+my $room_ang = 0;
+my @room_pos = (0, 0, 3 * -$length);
+
+my $source;
+
+my @corners = ();
+# ceiling
+push @corners, [ $width, $height,-$length];
+push @corners, [-$width, $height,-$length];
+push @corners, [-$width, $height, $length];
+push @corners, [ $width, $height, $length];
+# floor
+push @corners, [ $width,-$height, $length];
+push @corners, [-$width,-$height, $length];
+push @corners, [-$width,-$height,-$length];
+push @corners, [ $width,-$height,-$length];
+# front wall
+push @corners, [ $width, $height, $length];
+push @corners, [-$width, $height, $length];
+push @corners, [-$width,-$height, $length];
+push @corners, [ $width,-$height, $length];
+# back wall
+push @corners, [ $width,-$height,-$length];
+push @corners, [-$width,-$height,-$length];
+push @corners, [-$width, $height,-$length];
+push @corners, [ $width, $height,-$length];
+# left wall
+push @corners, [-$width, $height, $length];
+push @corners, [-$width, $height,-$length];
+push @corners, [-$width,-$height,-$length];
+push @corners, [-$width,-$height, $length];
+# right wall
+push @corners, [ $width, $height,-$length];
+push @corners, [ $width, $height, $length];
+push @corners, [ $width,-$height, $length];
+push @corners, [ $width,-$height,-$length];
+
+my @sources = ();
+# source 1
+push @sources, [ 1,-1,1-$length];
+push @sources, [-1,-1,1-$length];
+push @sources, [-1, 1,1-$length];
+push @sources, [ 1, 1,1-$length];
+
+my @rays = ();
+
+do_rays();
+
+sub do_rays
+{
+	my ($x, $y, $z);
+	$x = ($sources[0][0]+$sources[1][0]) / 2;
+	$y = ($sources[1][1]+$sources[2][1]) / 2;
+	$z = $sources[0][2];
+	my $len = $length*2;
+	my $ang = (45 * 180) / 3.14;
+	my $tmp = $len*cos($ang);
+
+	push @rays, [ [1, 1, 1, 0], [$x, $y, $z], [$x, $y, $z+$len] ];
+	push @rays, [ [1, 0, 0, 0], [$x, $y, $z], [$x, $y+$tmp, $z+$len] ];
+	push @rays, [ [1, 0, 0, 0], [$x, $y, $z], [$x, $y-$tmp, $z+$len] ];
+	push @rays, [ [1, 0, 0, 0], [$x, $y, $z], [$x+$tmp, $y, $z+$len] ];
+	push @rays, [ [1, 0, 0, 0], [$x, $y, $z], [$x-$tmp, $y, $z+$len] ];
+}
+
+
+main();
+
+sub main
+{
+
+	my $glconfig;
+
+	my $window;
+	my $vbox;
+	my $drawing_area;
+	my $button;
+
+	# Init GtkGLExt.
+	Gtk2::GLExt->init;
+
+	# Try double-buffered visual
+	$glconfig = Gtk2::Gdk::GLExt::Config->new_by_mode
+				(['rgb', 'depth', 'double']);
+
+	unless( $glconfig )
+	{
+		print "*** Cannot find the double-buffered visual.\n";
+		print "*** Trying single-buffered visual.\n";
+
+		# Try single-buffered visual
+		$glconfig = Gtk2::Gdk::GLExt::Config->new_by_mode
+					(['rgb', 'depth']);
+
+		unless( $glconfig )
+		{
+          		print "*** No appropriate OpenGL-capable "
+			     ." visual found.\n";
+			exit 1;
+		}
+	}
+
+	# Top-level window.
+
+	$window = Gtk2::Window->new;
+	$window->set_title ("Reflections");
+
+	# Perform the resizes immediately if on win32
+	$window->set_resize_mode ('immediate') if( $^O eq 'MSWin32' );
+
+	# Get automatically redrawn if any of their children changed allocation.
+	$window->set_reallocate_redraws (1);
+
+	$window->signal_connect (delete_event => sub { Gtk2->main_quit; 1});
+
+	# VBox.
+	$vbox = Gtk2::VBox->new (0, 0);
+	$window->add($vbox);
+	$vbox->show;
+
+	# Drawing area for drawing OpenGL scene.
+	$drawing_area = Gtk2::DrawingArea->new ();
+	$drawing_area->set_size_request (640, 512);
+
+	# Set OpenGL-capability to the widget.
+	$drawing_area->set_gl_capability ($glconfig, undef, 1, 'rgba-type');
+
+	$drawing_area->signal_connect_after (realize => \&realize);
+
+	$vbox->pack_start ($drawing_area, 1, 1, 0);
+
+	$drawing_area->show;
+
+	# Simple quit button.
+	$button = Gtk2::Button->new ("_Quit");
+
+	$button->signal_connect (clicked => sub { Gtk2->main_quit; });
+
+	$vbox->pack_start ($button, 0, 0, 0);
+
+	$button->show;
+
+	# Show window.
+	$window->show;
+
+	Glib::Timeout->add( 30, \&draw_scene, $drawing_area );
+
+	# Main loop.
+	Gtk2->main;
+
+	return 0;
+}
+
+sub realize
+{
+	my $widget = shift;
+	my $data = shift;
+
+	my $glcontext = $widget->get_gl_context;
+	my $gldrawable = $widget->get_gl_drawable;
+
+	# OpenGL BEGIN
+	return unless( $gldrawable->gl_begin ($glcontext) );
+
+	my @LightAmbient = ( 0.5, 0.5, 0.5, 1.0 );
+	my @LightDiffuse = ( 1.0, 1.0, 1.0, 1.0 );
+	my @LightPosition = ( 0.0, 0.0, 2.0, 1.0 );
+
+	my $alloc = $widget->allocation;
+	glViewport(0, 0, $alloc->width, $alloc->height);
+	glShadeModel(GL_SMOOTH);
+	glClearColor(0, 0, 0, 0);
+	glClearDepth(1.0);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+	glLightfv_p(GL_LIGHT1, GL_AMBIENT, @LightAmbient);
+	glLightfv_p(GL_LIGHT1, GL_DIFFUSE, @LightDiffuse);
+	glLightfv_p(GL_LIGHT1, GL_POSITION, @LightPosition);
+	glEnable(GL_LIGHT1);
+
+	glPolygonMode( GL_BACK, GL_FILL );
+	glPolygonMode( GL_FRONT, GL_LINE );
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0,$alloc->width/$alloc->height,0.1,100.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	$room = glGenLists(3);
+
+	my @tmp = @corners;
+
+	glNewList($room, GL_COMPILE);
+		glBegin(GL_QUADS);
+		glColor4f(0.75, 0, 0, 1);
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glColor4f(0, 0, 0.75, 1);
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glColor4f(0, 0.75, 0, 1);
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glEnd();
+	glEndList();
+
+	$source = $room+1;
+
+	@tmp = @sources;
+	glNewList($source, GL_COMPILE);
+		glBegin(GL_QUADS);
+		glColor4f(1, 1, 1, 1);
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glVertex3f(@{shift(@tmp)});
+		glEnd();
+	glEndList();
+
+
+	$gldrawable->gl_end;
+	# OpenGL END
+}
+
+# The main drawing function.
+sub draw_scene
+{
+	my $widget = shift;
+
+	my $glcontext = $widget->get_gl_context;
+	my $gldrawable = $widget->get_gl_drawable;
+
+	# OpenGL BEGIN
+	return unless( $gldrawable->gl_begin ($glcontext) );
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glLoadIdentity();
+	glTranslated(@room_pos);
+	glRotated($room_rot, 0, 1, 0);
+	glRotated(5, 1, 0, 0);
+	glCallList($room);
+	glCallList($source);
+
+	glBegin(GL_LINES);
+	foreach (@rays)
+	{
+		glColor4f( @{$_->[0]} );
+		glVertex3f( @{$_->[1]} );
+		glVertex3f( @{$_->[2]} );
+	}
+	glEnd();
+
+	$room_ang += 0.1;
+	$room_rot += 0.5;
+
+	if( $gldrawable->is_double_buffered )
+	{
+		$gldrawable->swap_buffers;
+	}
+	else
+	{
+		glFlush ();
+	}
+
+	$gldrawable->gl_end;
+
+	1;
+}

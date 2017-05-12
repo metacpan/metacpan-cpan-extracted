@@ -1,0 +1,200 @@
+Overview of changes in Gnome2-VFS 1.083
+=======================================
+
+* Fix a logic error in the args checking of Gnome2::VFS::read
+* Update FSF address; resolves RT#89039
+
+Overview of changes in Gnome2-VFS 1.082
+=======================================
+
+* Avoid misusing the macro PL_na, thus preventing issues when Gnome2::VFS is
+  used in conjunction with certain XS modules, among them XML::Parser and
+  String::Approx.
+
+Overview of changes in Gnome2-VFS 1.081
+=======================================
+
+* Fix the GnomeVFSMimeApplication handling on libgnomevfs >= 2.10.
+
+Overview of changes in Gnome2-VFS 1.080
+=======================================
+
+ Since 1.06x (the previous stable series)
+ ----------------------------------------
+  * Add Gnome2::VFS::URI::resolve_symbolic_link and
+    Gnome2::VFS::Drive::needs_eject.
+
+ Since 1.070
+ -----------
+  * Nothing.
+
+Overview of changes in Gnome2-VFS 1.070
+=======================================
+
+* Add Gnome2::VFS::URI::resolve_symbolic_link.
+* Add Gnome2::VFS::Drive::needs_eject.
+
+Overview of changes in Gnome2-VFS 1.061
+=======================================
+
+* Fix a test failure.
+* Fix a POD error that caused the main documentation in the Gnome2::VFS POD
+  page to be shadowed.
+
+Overview of changes in Gnome2-VFS 1.060
+=======================================
+
+ Since 1.04x (the previous stable series)
+ ----------------------------------------
+  * Add Gnome2::VFS::Address::equal, Gnome2::VFS::Address::match and
+  Gnome2::VFS::get_slow_mime_type.
+  * Add Gnome2::VFS::get_mime_type_for_name and
+  Gnome2::VFS::get_mime_type_for_name_and_data.
+
+ Since 1.031
+ -----------
+  * Make the Gnome2::VFS::Xfer test more robust.
+
+Overview of changes in Gnome2-VFS 1.051
+=======================================
+
+* Add Gnome2::VFS::get_mime_type_for_name and
+  Gnome2::VFS::get_mime_type_for_name_and_data.
+
+Overview of changes in Gnome2-VFS 1.050
+=======================================
+
+* Fix a test suite issue.
+* Add Gnome2::VFS::Address::equal, Gnome2::VFS::Address::match and
+  Gnome2::VFS::get_slow_mime_type.
+
+Overview of changes in Gnome2-VFS 1.041
+=======================================
+
+* Get rid of the Gtk2 dependency.
+
+Overview of changes in Gnome2-VFS 1.040
+=======================================
+
+ Since 1.02x (the previous stable series)
+ ----------------------------------------
+  * Export some constants on demand.
+  * Add new API in Gnome2::VFS::Mime::Type, Gnome2::VFS::Mime::Application,
+    Gnome2::VFS::Handle and Gnome2::VFS.
+  * Fix Gnome2::VFS::make_uri_from_input_with_trailing_ws by adding the missing
+    class parameter.
+
+ Since 1.031
+ -----------
+  * Fix a test suite issue.
+
+Overview of changes in Gnome2-VFS 1.031
+=======================================
+
+* Add an example demonstrating Gnome2::VFS::Monitor.
+* Fix minor test suite issues.
+* Fix Gnome2::VFS::make_uri_from_input_with_trailing_ws by adding the missing
+  class parameter.
+
+Overview of changes in Gnome2-VFS 1.030
+=======================================
+
+* Export the following constants on demand GNOME_VFS_PRIORITY_MIN,
+  GNOME_VFS_PRIORITY_MAX, GNOME_VFS_PRIORITY_DEFAULT,
+  GNOME_VFS_SIZE_FORMAT_STR, GNOME_VFS_OFFSET_FORMAT_STR,
+  GNOME_VFS_MIME_TYPE_UNKNOWN, GNOME_VFS_URI_MAGIC_STR, and
+  GNOME_VFS_URI_PATH_STR.
+
+* Add Gnome2::VFS::Mime::Type::get_default_application_for_uri,
+  Gnome2::VFS::Mime::Type::get_all_applications_for_uri,
+  Gnome2::VFS::Mime::Application::new_from_desktop_id,
+  Gnome2::VFS::Mime::Application::get_desktop_id,
+  Gnome2::VFS::Mime::Application::get_desktop_file_path,
+  Gnome2::VFS::Mime::Application::get_name,
+  Gnome2::VFS::Mime::Application::get_generic_name,
+  Gnome2::VFS::Mime::Application::get_icon,
+  Gnome2::VFS::Mime::Application::get_exec,
+  Gnome2::VFS::Mime::Application::get_binary_name,
+  Gnome2::VFS::Mime::Application::supports_uris,
+  Gnome2::VFS::Mime::Application::requires_terminal,
+  Gnome2::VFS::Mime::Application::supports_startup_notification and
+  Gnome2::VFS::Mime::Application::get_startup_wm_class,
+  Gnome2::VFS::Handle::forget_cache and
+  Gnome2::VFS::make_uri_from_input_with_trailing_ws.
+
+Overview of changes in Gnome2-VFS 1.022
+=======================================
+
+* Add a monitor example.  [Christian Borup]
+* Fix a testsuite issue.
+
+Overview of changes in Gnome2-VFS 1.021
+=======================================
+
+* Use simple opaque scalars instead of boxed types for several objects.
+* Some internal reorganization.
+* Documentation fixes.
+
+Overview of changes in Gnome2-VFS 1.020
+=======================================
+
+ Since 1.00x (the previous stable series)
+ ----------------------------------------
+  * New objects: Gnome2::VFS::Address, Gnome2::VFS::DNSSD, Gnome2::VFS::Drive,
+    Gnome2::VFS::Resolve, Gnome2::VFS::Volume, and Gnome2::VFS::VolumeMonitor.
+  * New API in: Gnome2::VFS::Mime, Gnome2::VFS::Async, and
+    Gnome2::VFS::FileInfo.
+  * Plug a few leaks.
+
+ Since 1.011
+ -----------
+  * "Fix" a test failure.
+
+Overview of changes in Gnome2-VFS 1.011
+=======================================
+
+* Don't leak the GnomeVFSDrive and GnomeVFSVolume callbacks.
+
+Overview of changes in Gnome2-VFS 1.010
+=======================================
+
+* Depend on Glib 1.053.
+* Wrapped GnomeVFSAddress, GnomeVFSDNSSD, GnomeVFSDrive, GnomeVFSResolve,
+  GnomeVFSVolume, and GnomeVFSVolumeMonitor.
+* Wrapped new stuff in GnomeVFSMime and GnomeVFSAsync.
+* Implemented a constructor for GnomeVFSFileInfo.
+
+Overview of changes in Gnome2-VFS 1.003
+=======================================
+
+* Make Gnome2::VFS::read_entire_file not crash on invalid input.
+* Fix a small test bug.
+* Don't depend on Gtk2 at runtime.
+
+Overview of changes in Gnome2-VFS 1.002
+=======================================
+
+* Hushed compiler warnings that might occur under certain circumstances.
+
+Overview of changes in Gnome2-VFS 1.001
+=======================================
+
+* Made all version checks refer to stable releases.
+* Made the test suite more robust.
+
+Overview of changes in Gnome2-VFS 1.00
+======================================
+
+* Depend on Glib 1.040.
+
+Overview of changes in Gnome2-VFS 0.99
+======================================
+
+* Made some tests a bit more tolerant.
+
+Overview of changes in Gnome2-VFS 0.98
+======================================
+
+* Fixed version information implementation to stick to the new policy.
+* Fixed a bug in Gnome2::VFS::read that would result in a segfault when
+  called with a bytes argument that is not greater than 0.

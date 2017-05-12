@@ -1,0 +1,33 @@
+---
+abstract: 'look up location by IP address in Russia'
+author:
+  - 'Ruslan Zakirov >Ruslan.Zakirov@gmail.com<'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Geo::IP::RU::IpGeoBase
+name: Geo-IP-RU-IpGeoBase
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Archive::Extract: 0
+  DBI: 0
+  Encode: 0
+  File::Spec: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  LWP::Simple: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

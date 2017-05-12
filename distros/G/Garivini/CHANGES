@@ -1,0 +1,8 @@
+2011-08-18: Release version 0.002
+
+No functional changes. Adam made the POD less hideous.
+
+2011-08-17: Release version 0.001
+
+Initial release. Code is experimental. Beware of bugs, and we reserve the
+right to rename methods and queue names for a few versions.

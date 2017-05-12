@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+#
+# remotegallery - execute Gallery2 Remote commands via Gallery::Remote::API
+#
+#
+
+use strict;
+use vars qw($VERSION);
+
+$VERSION='0.01';
+
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+
+use Gallery::Remote::API;
+
+my %opts;
+my $result = GetOptions(
+	"help"         => \$opts{help},
+	"verbose"      => \$opts{verbose},
+	"url=s"        => \$opts{url},
+	"username=s"   => \$opts{username},
+	"password=s"   => \$opts{password},
+	"version=i"    => \$opts{version},
+	"command=s"    => \$opts{command},
+	"parameters=s" => \$opts{parameters},
+	"add_file=s"   => \$opts{add_file}
+);
+
+pod2usage(-verbose => 1) && exit if
+	($opts{help}) || (!$result);
+
+
+my $gallery = Gallery::Remote::API->new({
+	url      => $opts{url},
+	username => $opts{username},
+	password => $opts{password},
+	version  => $opts{version},
+});
+
+#login command always assumed if username & password are specified,
+#else pass the login command itself to test fail when not specified
+if (($opts{username} && $opts{password})
+		|| ($opts{command} eq 'login')) {
+
+	my $result = $gallery->login;
+	if ($result) {
+		print "logged in\n";
+	}
+	else {
+		$result = $gallery->result;
+		print "login failed: " . $result->{status_text} . "\n";
+	}
+	if ($opts{verbose}) {
+		print "\nresponse = \n" . $gallery->response . "\n\n";
+		print "result   = " . Dumper $result;
+	}
+	print "\n";
+}
+
+my $command = $opts{command} || '';
+if ($command && ($command ne 'login')) {
+
+	my %params;
+	if (my $p = $opts{parameters}) {
+		foreach my $pair (split(/&/,$p)) {
+			my ($key,$val) = split(/=/,$pair);
+			
+			pod2usage(-verbose => 1,
+				-msg => "Improperly formatted --parameters '$p'"
+			) && exit unless ((defined $key) && (defined $val));
+
+			$params{$key} = $val;
+		}
+	}
+
+	&execute($gallery,$command,\%params);
+}
+elsif ($command ne 'login') {
+	print "No valid command received\n\n";
+}
+
+exit;
+
+sub execute {
+	my ($gallery,$command,$params) = @_;
+
+	my $result = $gallery->execute_command($command,$params);
+	if ($result) {
+		print "$command success\n";
+	}
+	else {
+		$result = $gallery->result;
+		print "$command failed: ". $result->{status_text} . "\n";
+	}
+	if ($opts{verbose}) {
+		print "\nresponse = \n" . $gallery->response . "\n\n";
+		print "result   = " . Dumper $result;
+	}
+	print "\n";
+}
+
+__END__
+
+=head1 TITLE
+
+ remotegallery
+
+=head1 SYNOPSIS
+
+ remotegallery --url url --version N --username myusername --password mypassword --command command
+
+=head1 DESCRIPTION
+
+ This program executes the specified command against the specified Gallery
+ installation via Gallery::Remote::API. It is a brain-dead stupid worker / 
+ testing script and is not meant to serve as any sort of full-featured client.
+
+=head1 OPTIONS
+
+ --help         prints usage and options
+ --url          url to your Gallery installation
+ --username     your Gallery username
+ --password     your Gallery password
+ --command      the command you want to execute
+
+ --parameters   parameters to send to the command. Available parameters for each
+                command are found at <http://codex.gallery2.org/Gallery_Remote:Protocol>
+				Format this like a querystring:	param1=val1&parm2=val2...
+
+
+=head1 LICENSE
+
+This software is released under the same terms as perl itself.
+If you don't know what that means visit http://perl.com/
+
+=head1 AUTHOR
+
+Jonathan Wright <development@neuralspace.com>
+All rights reserved
+
+=cut
+

@@ -1,0 +1,421 @@
+[%#
+
+Shows a user input form, usually for adding a single row to a single table.
+
+Parameters:
+
+    self       - the site object (if self has a params hash values shown on
+                 the form are taken from it)
+    view.title - thr browser window title
+    view.form  - a hash with these keys:
+        method      - POST or GET (defaults to POST)
+        action      - url of page to process form (defaults to self.uri)
+        name        - the name of the form (useful for javascript references)
+        row         - the current row object from the table (if available)
+        javascript  - javascript code the form needs (like for date popups.
+                      Consider using Gantry::Plugins::Calendar and calling
+                      its calendar_month_js.
+                      (This could actually be anything, it just gets copied to
+                      the output immediately after the form opening tag)
+        legend      - The title for the legend box wrapping the form.
+        change_log  - An array of change_log entries (optional).  Each entry
+                      is a hash with these keys:
+                          date    - the date the change happened
+                          by      - the name of the person making the change
+                          message - what happened
+        results     - the return value from Data::FormValidator->check
+        cellspacing - becomes the cellspacing parameter of the form's table
+                      (defaults to 0)
+        width       - becomes the width parameter of the form's table
+
+        fields      - an array of inputable items.  Each element is a has
+                      with these keys:
+                          raw_html - copied to the table before the row for
+                                     the field
+                          label    - text description displayed to user
+                          content  - additional description text used only
+                                     next to the input box, not in errors.
+                          width    - width of the field's <td>
+                          label_width - width of the field's label <td>
+                          name     - the name of the field in the form
+                                     (much match the database column name)
+                          default_value - what shows up if there is no previous
+                                          value and nothting is in the
+                                          database
+                          type     - One of:
+                                         select (pick one drop down list)
+                                         select_multiple (pick 1 or more)
+                                         text
+                                         textarea
+                      the rest of the keys in the fields hash depend on the
+                      type:
+                          select
+                              options - An array of hashes with these keys:
+                                            value - the form's value for this
+                                                    option
+                                            label - what the user sees in the
+                                                    list
+                          select_multiple
+                              options - just as for select
+                              selected - a code reference which accepts one
+                                         value, and the form params.  Return
+                                         true if the value is selected, false
+                                         otherwise.  Usually
+                                         Gantry::Plugins::CRUD's
+                                         select_multiple_closure works well.
+                          text
+                              date_select_text - the text of the href link for
+                                                 the date popup window.
+                                                 You must include this to
+                                                 get a date popup link.
+                              display_size     - the size attribute of the
+                                                 input element
+                              (this is called display_size because TT has
+                              a pseudo-method .size which tells how many keys
+                              are in the field's hash)
+                          textarea
+                              rows - how tall the area is
+                              cols - how wide the area is
+                          checkbox
+                              checked - true if you want initial check mark
+                          display
+                              foreign - use foreign_display to get the text
+
+    Default values are taken in the following order:
+    1. from the params hash (which was made in a previous failed
+       add/edit attempt)
+    2. from the data model row object (on first edit attempt)
+    3. from the default_value entry in the field's hash (if available)
+    If none of those work, text and textarea fields will be blank and
+    select lists will rest on the first item in the options list.
+%]
+[% title = view.title %]
+
+<script type="text/javascript">
+    <!--
+		var button_clicked = false;
+		function AntiClicker() {
+			if(button_clicked == true) {
+				return false;
+			}
+			button_clicked = true;
+			return true;
+		}
+	-->
+</script>
+
+[% IF view.form.editor == 1 %]
+	[% INCLUDE "editor_init.ttc" %]
+[% END %]
+
+[% IF view.form.description %]
+<div id='class_description'>
+[% view.form.description %]
+</div>
+[% END %]
+
+<form 	
+	method="[% view.form.method || 'post' %]" 
+	action="[% view.form.action || self.uri %]" 
+	name="[% view.form.name %]"
+	[% IF view.form.enctype != ''; "enctype='$view.form.enctype'"; END; %]
+>
+
+[% view.form.javascript %]
+
+<fieldset>
+	<legend>
+		[% view.form.legend %]
+	</legend>
+	
+	[%- IF view.form.change_log %]
+	    <div style="float: right; width: 240px">
+	
+		<fieldset>
+        	<legend><a href='[% view.form.change_log_url %]'>Change Log</a>
+			</legend>
+    	
+		<div id="change_log">
+		[% FOREACH entry IN view.form.change_log %]
+        	<b>[% entry.date %]</b> By [% entry.by %]<br />
+        	&middot; [% entry.message %]<br />
+		[% END %]
+    	</div>
+    	</fieldset>
+		</div>
+	[%- END %]
+
+    [% IF view.form.error_text %]
+        <div style="float: left; color: red">
+            <b>Error:</b>
+            [% view.form.error_text %]
+            <br />
+        </div>
+        <br style="clear:both" />
+    [% END %]
+    
+    [% IF view.form.results.msgs.group_by_field %]
+        [% IF view.form.results.has_invalid || view.form.results.has_missing %]
+            <div style="float: left;  color: red">
+                [%
+                    CALL view.form.results.msgs(
+                        {
+                            invalid_separator   => ', ',
+                            format              => '%s',
+                        }
+                    );
+                    msgs = view.form.results.msgs;
+                
+                    FOREACH field IN view.form.fields;
+                        field_labels.${field.name} = field.label;
+                    END;
+                %]
+                [% FOREACH field IN view.form.fields %]
+                    [% IF view.form.results.invalid(field.name) || view.form.results.missing(field.name) %]
+                        <b>[% field.label %]:</b> [% msgs.${field.name} %]
+                        <br />
+                    [% END %]
+                [% END %]
+         	</div>
+    		<br style="clear:both" />
+    	[% END %]
+    [% ELSE %]
+        [% IF view.form.results.missing %]
+            <div style="float: left; color: red">
+                <b>Missing:</b>
+                [% missing_names = [] %]
+                [% FOREACH field IN view.form.fields %]
+                    [% IF view.form.results.missing( "${field.name}" ) %]
+                    [% missing_names.push( field.label ) %]
+                    [% END %]
+                [% END %]
+                [% missing_names.join( ', ' ) %]
+                <br />
+            </div>
+    		<br style="clear:both" />
+        [% END %]
+
+        [% IF view.form.results.invalid %]
+            <div style="float: left;  color: red">
+                <b>Invalid:</b>
+                [% invalid_names = [] %]
+                [% FOREACH field IN view.form.fields %]
+                    [% IF view.form.results.invalid( "${field.name}" ) %]
+                    [% invalid_names.push( field.label ) %]
+                    [% END %]
+                [% END %]
+                [% invalid_names.join( ', ' ) %]
+                <br />
+         	</div>
+        	<br style="clear:both" />
+        [% END %]
+    [% END %]
+
+	<div id="float_left">
+		<table class="results" 
+			cellspacing="[% view.form.cellspacing || 0 %]"
+			border="0" 
+			width="[% view.form.width || '100%' %]"	>
+			
+			[%- FOREACH field IN view.form.fields -%]
+		    [% input_value = ''; %]
+
+			[%- IF field.raw_html %]
+			    [%- field.raw_html %]
+			[%- END %]
+
+            [%- IF field.type == 'hidden' %]
+                <input type="[% field.type %]" 
+				    size="[% field.display_size || 30 %]"
+				    value="[% field.default_value  %]" 
+                    id="[% field.name %]" 
+				    name="[% field.name %]" />
+			    [%- NEXT %]
+			[%- END %]
+			
+			<tr class="results-row">
+				[%- IF view.form.results.missing( "${field.name}" )
+                        OR view.form.results.invalid( "${field.name}" ) %]
+					[% style_str = ' style="color: red"' %]
+                [%- ELSE %]
+                    [% style_str = '' %]
+                [%- END %]
+
+				<!-- LABEL -->
+				<td class="shd" valign="top"[% style_str %] style="width: [%-
+					field.label_width || '30%' %]">		
+					[%- field.label %]
+                    [%- IF field.content %] [% field.content %][% END %]
+					[%- UNLESS field.optional 
+                            or field.type == 'checkbox'
+                            or field.type == 'display' -%]*[% END %]
+				</td>
+				
+				<!-- FORM INPUT -->
+				<td class="dta" style="width: [% field.width 
+					|| '70%' %]" valign="top">
+					
+					[%- IF field.type == 'select' %]
+                        [%- IF field.onchange -%]
+                        [%-
+                            IF field.onchange.match('\)');
+                                onchange = field.onchange;
+                            ELSE;
+                                onchange = field.onchange _ '(this)';
+                            END;
+                        -%]
+                        <select 
+                            id="[% field.name %]" 
+                            class="[% field.class %]"
+                            name="[% field.name %]"
+                                onchange='javascript:[% onchange %]' >
+                        [%- ELSE %]
+						<select name="[% field.name %]" id="[% field.name %]">
+                        [%- END %]
+                        
+                        [%-# clear field_val_hash for each loop %]
+                        [%- field_val_hash = {} -%]
+                       
+						[%- FOR option IN field.options -%]
+                          [%- IF view.form.row.defined %]
+						      [% row_value = view.form.row.${field.name} %]
+                          [%- END -%]
+
+							[%- IF ( option.value == self.params.${field.name} 
+                                && self.params.defined("${field.name}") ) %]
+								[%- field_val_hash.param_field = option.value %]
+							[%- ELSIF option.value == row_value %]
+                     			[%- field_val_hash.database_field = option.value %]
+							[%- ELSIF option.value == field.default_value %]
+								[%- field_val_hash.default_field = option.value %]
+							[%- END %]
+						[%- END -%]
+
+                        [%- IF field_val_hash.defined('param_field');
+                               selected_value = field_val_hash.param_field;
+                           ELSIF field_val_hash.defined('database_field');
+                               selected_value = field_val_hash.database_field;
+                           ELSE;
+                               selected_value = field_val_hash.default_field;
+                           END;
+                        -%]
+                        
+						[%- FOR option IN field.options %]
+                            <option value="[% option.value %]"[% " selected='selected'" IF option.value == selected_value %]>[%- option.label || option.value %]</option> 
+						[%- END %]
+						</select>
+                    [%- ELSIF field.type == 'select_multiple' %]
+						<select multiple name="[% field.name %]"
+                            id="[% field.name %]">
+						[%- FOR option IN field.options %]
+                            <option value="[% option.value %]"[% " selected='selected'" IF field.selected( option.value, self.params ) %]>[%- option.label || option.value %]</option> 
+						[%- END %]
+                        </select>
+					[%- ELSIF field.type == 'textarea' %]
+                        [%- IF self.params.${field.name}.defined;
+                               input_value = self.params.${field.name};
+                           ELSIF view.form.row.${field.name}.defined;
+                               input_value = view.form.row.${field.name};
+                           ELSE;
+                               input_value = field.default_value;
+                           END;
+                        -%]
+						<textarea name="[% field.name %]" 
+                            class="[% field.class %]"
+                            id="[% field.name %]"
+							rows="[% field.rows || '0' %]"
+							cols="[% field.cols || '0' %]"
+						>[%- input_value -%]</textarea>
+							
+					[%- ELSIF field.type == 'checkbox' %]
+                        <input type="checkbox"
+                            name="[% field.name %]"
+                            class="[% field.class %]"
+                            id="[% field.name %]"
+                            value="[% field.value %]"
+                            [%- IF field.checked -%]checked[%- END -%]
+                        />
+									
+					[%- ELSIF field.type == 'html' -%]
+						[% field.text || field.html %]
+					
+					[%- ELSIF field.type == 'display' -%]
+						[% IF field.foreign %]
+                            [% view.form.row.${field.name}.foreign_display %]
+                        [% ELSE %]
+                            [% view.form.row.${field.name} %]
+                        [% END %]
+
+					[%- ELSIF field.type == 'date' -%]
+                        [%- IF self.params.${field.name}.defined;
+                               input_value = self.params.${field.name};
+                           ELSIF view.form.row.${field.name}.defined;
+                               input_value = view.form.row.${field.name};
+                           ELSE;
+                               input_value = field.default_value;
+                           END;
+                        -%]
+
+                        <div dojoType="dropdowndatepicker"
+                            date="[% input_value.replace( '-', '/' ) %]"
+                            fieldName="[% field.name %]">
+                        </div>
+						
+					[%- ELSE -%]
+                        [%- IF self.params.${field.name}.defined;
+                               input_value = self.params.${field.name};
+                           ELSIF view.form.row.${field.name}.defined;
+                               input_value = view.form.row.${field.name};
+                           ELSIF field.default_value.defined;
+                               input_value = field.default_value;
+                           END;
+                        -%]
+   
+						<input type="[% field.type %]" 
+							size="[% field.display_size || 30 %]"
+							[%- UNLESS input_value.match('^$') -%]
+							value="[% input_value %]"
+							[%- END -%] 
+                            class="[% field.class %]"
+							name="[% field.name %]"
+							id="[% field.name %]"
+						 />
+						[%- IF field.date_select_text -%]
+							[% popup = "datepopup('$field.name')" %]
+							<a href="javascript://" onClick="[% popup %]" >
+							[% field.date_select_text %]
+							</a>
+						[%- END %]
+					[%- END %]
+					<div class="hint">
+                        [% field.hint ? field.hint : '' %]
+                    </div>
+				</td>
+			</tr>
+			
+			[%- END %]			
+			
+            <tr>
+                <td colspan="2" class="shd">
+                    * required field
+                </td>
+            </tr>
+			<tr>
+				<td colspan="2" class="rshd">
+    			<input type="submit" name="submit" value="Submit" />
+				[% IF view.form.submit_and_add_another %] 
+				    <input type="submit" name="submit_add_another" 
+				    value="Submit &amp; Add Another" />
+				[% END %]
+                [% UNLESS view.form.no_cancel %]
+				    <input type="submit" name="cancel" value="Cancel" />
+                [% END %]
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<br style="clear: both" />	
+</fieldset>
+
+</form>

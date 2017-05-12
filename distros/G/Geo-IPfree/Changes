@@ -1,0 +1,116 @@
+Revision history for Perl extension Geo::IPfree.
+
+1.151940 2015-07-13
+    - Cache limit increased to 5000 entries
+    - Instead of a full cache clear, only 1 item is pushed off the end of
+      the cache when full
+    - Updated database: Mon Jul 13 06:40:01 2015 UTC.
+
+1.143630 2014-12-29
+    - Updated country codes and names (including reservations)
+    - Updated database: Mon Dec 29 06:40:01 2014 UTC.
+
+1.141670 2014-06-16
+    - Spelling fix (RT #93091)
+    - Updated database: Mon Jun 16 06:40:01 2014 UTC.
+
+1.140470 2014-02-16
+    - Updated database: Sun Feb 16 06:40:01 2014 UTC.
+
+1.132870 2013-10-14
+    - Updated database: Mon Oct 14 06:40:01 2013 UTC.
+
+1.131650 2013-06-14
+    - Updated database: Fri Jun 14 06:40:02 2013 UTC.
+
+1.130450 2013-02-14
+    - Updated database: Thu Feb 14 06:40:01 2013 UTC.
+
+1.130110 2013-01-11
+    - Added Sint Maarten country code: SX
+    - Updated database: Fri Jan 11 06:40:01 2013 UTC.
+
+1.122880 2012-10-14
+    - Updated database: Sun Oct 14 06:40:02 2012 UTC.
+    - Added Bonaire, Sint Eustatius and Saba country code: BQ
+
+1.121660 2012-06-14
+    - Updated database: Thu Jun 14 06:40:01 2012 UTC.
+
+1.120460 2012-02-15
+    - Updated database: Wed Feb 15 06:40:01 2012 UTC.
+    - Fix tests due to updated data
+
+1.112870 2011-10-14
+    - Added South Sudan country code: .ss
+    - Updated database: Fri Oct 14 06:40:01 2011 UTC.
+
+1.112490 2011-09-06
+    - Add a "country name" for code ZZ (private IP addresses) (Neil Bowers)
+    - Various POD improvements (Neil Bowers)
+    - Updated database: Tue Sep  6 06:40:01 2011 UTC.
+
+1.111650 2011-06-14
+    - Updated database: Tue Jun 14 06:40:01 2011 UTC.
+
+1.110450 2011-02-14
+    - Updated database: Mon Feb 14 06:40:01 2011 UTC.
+
+1.102870 2010-10-14
+    - Updated database: Thu Oct 14 06:40:01 2010 UTC.
+
+1.101650 2010-06-14
+    - Minor code and test cleanup
+    - Updated database: Mon Jun 14 06:40:01 2010 UTC.
+
+1.100470 2010-02-16
+    - Added Timor-Leste country code: .tl
+    - Updated database: Tue Feb 16 06:40:01 2010 UTC
+    - Using date-based version number
+
+0.8 2009-10-07
+    - Code and documentation cleanup
+    - Added some new tests
+    - Updated list of country codes
+    - Updated database: Wed Oct  7 06:40:02 2009 UTC
+
+0.7 2009-09-14
+    - Removed webgeo2ipct.pl script as you can now download a suitable file
+      straight from the web: http://software77.net/geo-ip/
+    - Updated database: Tue Sep  8 06:40:01 2009 UTC
+    - Fix undef warning in Faster(); (RT #49468)
+    - Tidy up benchmark script
+    - Tidy up txt<->dat conversion scripts
+
+0.6 2009-05-11
+    - fix awful - yet popular - usage of Geo::IPfree::new (RT #45192)
+      corrected docs to use ->new instead
+    - more dist cleanup
+
+0.5 2009-02-03
+    - include Memoize in prereqs for older perls
+
+0.4 2008-12-01
+    - fix "undef" test
+
+0.3 2009-11-19
+    - Add webgeo2ipct script (RT #40938)
+    - Add new data file (RT #40938, #7663)
+    - Fix all warnings (RT #24333)
+    - Handle hosts that fail nslookup (RT #18434)
+    - find_db_file() now looks in user-overridable locations before looking
+      for the shipped version.
+    - /tmp removed from possible db locations.
+    - Dist cleanup.
+
+0.2 2003-03-22
+    - Change sysread() to read() for better portability.
+    - Speed improvement for multiples LookUp().
+      4 times faster!
+
+0.011 2002-11-06
+    - Fix seek bug for Perl 5.6.0 on multiples LookUp().
+   
+0.01 2002-10-20
+    - Released the 1st version!
+

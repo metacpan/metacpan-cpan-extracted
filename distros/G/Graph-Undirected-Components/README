@@ -1,0 +1,142 @@
+NAME
+    "Graph::Undirected::Components::External" - Computes components of an
+    undirected graph.
+
+SYNOPSIS
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      use Graph::Undirected::Components::External;
+      Log::Log4perl->easy_init ($WARN);
+      my $componenter = Graph::Undirected::Components::External->new(outputFile => 'vertexCompId.txt', purgeSizeBytes => 5000);
+      my $vertices = 10000;
+      for (my $i = 0; $i < $vertices; $i++)
+      {
+        $componenter->add_edge (int rand $vertices, int rand $vertices);
+      }
+      dump $componenter->finish ();
+
+DESCRIPTION
+    "Graph::Undirected::Components::External" computes the components of an
+    undirected graph limited only by the amount of free disk space. All
+    errors, warnings, and informational messages are logged using
+    Log::Log4perl.
+
+CONSTRUCTOR
+  "new"
+    The method "new" creates an instance of
+    "Graph::Undirected::Components::External" with the following parameters.
+
+    "workingDirectory"
+          workingDirectory => File::Temp::tempdir()
+
+        "workingDirectory" is an optional parameter specifying the path to a
+        directory that all temporary files are written to; the default is
+        set using File::Temp::tempdir().
+
+    "purgeSizeBytes"
+          purgeSizeBytes => 1000000
+
+        "purgeSizeBytes" is an optional parameter specifying the aggregate
+        byte size that all the vertices added to the internal instance of
+        Graph::Undirected::Components must exceed before its content is
+        purged to disk. The optimal value depends on the total internal
+        memory available.
+
+    "purgeSizeVertices"
+          purgeSizeVertices => undef
+
+        "purgeSizeVertices" is an optional parameter specifying the total
+        vertices added to the internal instance of
+        Graph::Undirected::Components that must be exceed before its content
+        is purged to disk. If "purgeSizeBytes" and "purgeSizeVertices" are
+        both defined, then a purge occurs when either threshold is exceeded.
+
+    "retainPercentage"
+          retainPercentage => 0.10
+
+        "retainPercentage" is an optional parameter specifying the
+        percentage of the most recently used vertices to be retained in the
+        internal instance of Graph::Undirected::Components when it is
+        purged. If the edges of the graph are not added in a random order,
+        caching some of the vertices can speedup the computation of the
+        components.
+
+    "outputFile"
+          outputFile => ...
+
+        "outputFile" is the path to the file that the
+        "(vertex,component-id)" pairs are written to; the directory of the
+        file should exist. An exception is thrown if "outputFile" is
+        undefined or the file cannot be written to.
+
+    "delimiter"
+          delimiter => ','
+
+        "delimiter" is the delimiter used to separate the vertices of an
+        edge when they are written to temporary files. All vertices should
+        be encoded so that they do not contain the delimiter, that is, it
+        should be true that "index($vertex,$delimiter)==-1" for all
+        vertices.
+
+METHODS
+  "add_edge (vertexA, vertexB)"
+    The method "add_edge" updates the components of the graph using the edge
+    "(vertexA, vertexB)".
+
+    vertexA, vertexB
+        The vertices of the edge "(vertexA, vertexB)" are Perl strings. If
+        only "vertexA" is defined, then the edge "(vertexA, vertexA)" is
+        added to the graph. The method always returns undef.
+
+  "add_file"
+    The method "add_file" adds all the edges in a file to the graph.
+
+    fileOfEdges => ...
+        "fileOfEdges" specifies the path to the file containing the edges to
+        add. An exception is thrown if there are problems openning or
+        reading the file.
+
+    delimiter
+        The edges are read from "fileOfEdges" using Text::CSV; "delimiter"
+        must be to the delimiter used to separate the vertices of an edge in
+        the file. The default is the value set with the "new" constructor.
+
+  "finish"
+    The method "finish" completes the computation of the connected
+    components and writes the pairs "(vertex,component-id)" to the
+    "outputFile". For each component "component-id" is the lexographical
+    minimum of all the vertices in the component.
+
+    No edges can be added to the graph after "finish" is called.
+
+INSTALLATION
+    Use CPAN to install the module and all its prerequisites:
+
+      perl -MCPAN -e shell
+      cpan[1]> install Graph::Undirected::Components
+
+BUGS
+    Please email bugs reports or feature requests to
+    "bug-graph-undirected-components@rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Graph-Undirected-Compone
+    nts>. The author will be notified and you can be automatically notified
+    of progress on the bug fix or feature request.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    connected components, network, undirected graph
+
+SEE ALSO
+    Graph, Graph::Undirected::Components, Log::Log4perl, Sort::External
+

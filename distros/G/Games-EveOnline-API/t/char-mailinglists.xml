@@ -1,0 +1,10 @@
+<?xml version='1.0'?>
+<eveapi version="2">
+  <currentTime>2014-07-10 18:09:57</currentTime>
+  <result>
+    <rowset name="mailingLists" key="listID" columns="listID,displayName">
+      <row listID="145156367" displayName="RAISA Shield Fits" />
+    </rowset>
+  </result>
+  <cachedUntil>2014-07-11 00:06:57</cachedUntil>
+</eveapi>

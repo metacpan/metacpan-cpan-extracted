@@ -1,0 +1,19 @@
+VER_1 {
+	global:
+		boot_*;
+		SV*;
+		Sv*;
+		newSV*;
+		pgtk_*;
+		GTK_*;
+		Gtk*;
+		Gnome*;
+		Bonobo*;
+		AddSignalHelperParts;
+		AddTypeHelper;
+		FindArgumentTypeWithObject;
+		UnregisterMisc;
+		gtnumber_for_ptname;
+	local:
+		*;
+};

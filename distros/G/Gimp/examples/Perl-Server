@@ -1,0 +1,59 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+#BEGIN { $Gimp::verbose = 3; }
+use Gimp;
+use Gimp::Net;
+use Gimp::Extension;
+
+Gimp::on_quit \&Gimp::Net::perl_server_quit;
+podregister \&Gimp::Net::perl_server_run;
+
+exit Gimp::main;
+__END__
+
+=head1 NAME
+
+extension_perl_server - Gimp-Perl scripts net server
+
+=head1 SYNOPSIS
+
+<Toolbox>/Filters/Languages/_Perl/_Server
+
+=head1 DESCRIPTION
+
+Allow scripting GIMP with Perl providing Gimp::Net server.
+
+If activated by the user, allows Gimp-Perl scripts to connect to the
+running GIMP instance. Also provides a working example of a GIMP extension
+in Gimp-Perl.
+
+If C<run_mode> is C<RUN_NONINTERACTIVE>, will run in "batch mode" and
+expect the C<filehandle> argument to be correct to communicate with the
+client. If C<RUN_INTERACTIVE>, expects to wait for connections.
+
+There is a security advisory about GIMP scripting servers. This program
+will only allow TCP connections if a password is specified (the "auth"
+option), thereby eliminating any network-related security risk.
+
+=head1 PARAMETERS
+
+ [&Gimp::PDB_INT32, "filehandle", "Batch file-handle"],
+ [&Gimp::PDB_INT32, "verbose", "Gimp verbose var"],
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+1999-12-02
+
+=head1 LICENSE
+
+Same terms as Gimp-Perl.
+
+=head1 SEE ALSO
+
+L<Gimp::Net>

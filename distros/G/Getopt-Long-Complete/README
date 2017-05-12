@@ -1,0 +1,167 @@
+SYNOPSIS
+
+ First example (simple)
+
+    You just replace use Getopt::Long with use Getopt::Long::Complete and
+    your program suddenly supports tab completion. This works for most/many
+    programs (see "INCOMPATIBILITIES". For example, below is source code
+    for delete-user.
+
+     use Getopt::Long::Complete;
+     my %opts;
+     GetOptions(
+         'help|h'     => sub { ... },
+         'on-fail=s'  => \$opts{on_fail},
+         'user|U=s'   => \$opts{name},
+         'force'      => \$opts{force},
+         'verbose!'   => \$opts{verbose},
+     );
+
+    Several shells are supported. To activate completion, see
+    "DESCRIPTION". After activation, tab completion works:
+
+     % delete-user <tab>
+     --force --help --noverbose --no-verbose --on-fail --user --verbose -h
+     % delete-user --h<tab>
+
+ Second example (additional completion)
+
+    The previous example only provides completion for option names. To
+    provide completion for option values as well as arguments, you need to
+    provide more hints. Instead of GetOptions, use
+    GetOptionsWithCompletion. It's basically the same as GetOptions but
+    accepts an extra coderef in the first argument. The code will be
+    invoked when completion to option value or argument is needed. Example:
+
+     use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+     use Complete::Unix qw(complete_user);
+     use Complete::Util qw(complete_array_elem);
+     my %opts;
+     GetOptionsWithCompletion(
+         sub {
+             my %args  = @_;
+             my $word  = $args{word}; # the word to be completed
+             my $type  = $args{type}; # 'optname', 'optval', or 'arg'
+             my $opt   = $args{opt};
+             if ($type eq 'optval' && $opt eq '--on-fail') {
+                 return complete_array_elem(words=>[qw/die warn ignore/], word=>$word);
+             } elsif ($type eq 'optval' && ($opt eq '--user' || $opt eq '-U')) {
+                 return complete_user(word=>$word);
+             } elsif ($type eq 'arg') {
+                 return complete_user(word=>$word);
+             }
+             [];
+         },
+         'help|h'     => sub { ... },
+         'on-fail=s'  => \$opts{on_fail},
+         'user=s'     => \$opts{name},
+         'force'      => \$opts{force},
+         'verbose!'   => \$opts{verbose},
+     );
+
+DESCRIPTION
+
+    This module provides a quick and easy way to add shell tab completion
+    feature to your scripts, including scripts already written using the
+    venerable Getopt::Long module. Currently bash and tcsh are directly
+    supported; fish and zsh are also supported via shcompgen.
+
+    This module is basically just a thin wrapper for Getopt::Long. Its
+    GetOptions function just checks for COMP_LINE/COMP_POINT environment
+    variable (in the case of bash) or COMMAND_LINE (in the case of tcsh)
+    before passing its arguments to Getopt::Long's GetOptions. If those
+    environment variable(s) are defined, completion reply will be printed
+    to STDOUT and then the program will exit. Otherwise, Getopt::Long's
+    GetOptions is called.
+
+    To keep completion quick, you should do GetOptions() or
+    GetOptionsWithCompletion() as early as possible in your script.
+    Preferably before loading lots of other Perl modules.
+
+    To activate tab completion in bash, put your script somewhere in PATH
+    and execute this in the shell or put it into your bash startup file
+    (e.g. /etc/bash.bashrc or ~/.bashrc). Replace delete-user with the
+    actual script name:
+
+     complete -C delete-user delete-user
+
+    For tcsh:
+
+     complete delete-user 'p/*/`delete-user`/'
+
+    For other shells (but actually for bash too) you can use shcompgen.
+
+FUNCTIONS
+
+ GetOptions([\%hash, ]@spec)
+
+    Will call Getopt::Long's GetOptions, except when COMP_LINE environment
+    variable is defined, in which case will print completion reply to
+    STDOUT and exit.
+
+    Note: Will temporarily set Getopt::Long configuration as follow:
+    bundling, no_ignore_case, gnu_compat, no_getopt_compat, permute (if
+    POSIXLY_CORRECT environment is false). I believe this a sane default.
+    You can turn off bundling via $opt_bundling. You can turn on/off
+    permute explicitly by via $opt_permute. You can turn on pass_through
+    via $opt_pass_through.
+
+ GetOptionsWithCompletion(\&completion, [\%hash, ]@spec)
+
+    Just like GetOptions, except that it accepts an extra first argument
+    \&completion containing completion routine for completing option values
+    and arguments. This will be passed as completion argument to
+    Complete::Getopt::Long's complete_cli_arg. See that module's
+    documentation on details of what is passed to the routine and what
+    return value is expected from it.
+
+VARIABLES
+
+    Because we are "bound" by providing a Getopt::Long-compatible function
+    interface, these variables exist to allow configuring
+    Getopt::Long::GetOptions. You can use Perl's local to localize the
+    effect.
+
+ $opt_permute => bool (default: 1 or 0 if POSIXLY_CORRECT)
+
+ $opt_pass_through => bool (default: 0)
+
+ $opt_bundling => bool (default: 1)
+
+INCOMPATIBILITIES
+
+    Although you can use Getopt::Long::Complete (GLC) as a drop-in
+    replacement for Getopt::Long (GL) most of the time, there are some
+    incompatibilities or unsupported features:
+
+      * GLC does not allow passing configure options during import
+
+      GLC only supports running under a specific set of modes anyway:
+      bundling, no_ignore_case. Other non-default settings have not been
+      tested and probably not supported.
+
+      * Aside from GetOptions, no other GL functions are currently
+      supported
+
+      This include GetOptionsFromArray, GetOptionsFromString, Configure,
+      HelpMessage, VersionMessage.
+
+SEE ALSO
+
+    Getopt::Long::More, another drop-in replacement for Getopt::Long with
+    tab completion support and more stuffs: default value, required value,
+    summary in auto_help.
+
+    Complete::Getopt::Long (the backend for this module), Complete::Bash,
+    Complete::Tcsh.
+
+    Other option-processing modules featuring shell tab completion:
+    Getopt::Complete.
+
+    Perinci::CmdLine - an alternative way to easily create command-line
+    applications with completion feature.
+
+    shcompgen
+
+    Pod::Weaver::Section::Completion::GetoptLongComplete
+

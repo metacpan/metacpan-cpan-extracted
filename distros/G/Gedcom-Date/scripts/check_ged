@@ -1,0 +1,187 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Gedcom;
+use Gedcom::Date;
+
+my $file = shift;
+
+my $ged = Gedcom->new( gedcom_file => $file,
+                       read_only   => 1,
+                     ) or die "Usage: check_ged FILE\n";
+
+my %limit = (
+    old_father   => [ years => 60 ],
+    young_father => [ years => 16 ],
+    father_dead  => [ days  => 300 ],
+    old_mother   => [ years => 47 ],
+    young_mother => [ years => 16 ],
+
+    old_christening => [ years => 12 ],
+    old_death       => [ years => 100 ],
+    old_burial      => [ years => 100 ],
+    old_cremation   => [ years => 100 ],
+    old_adoption    => [ years => 18 ],
+    old_baptism     => [ years => 100 ],
+    old_bar_mitsvah => [ years => 14 ],
+    old_bas_mitsvah => [ years => 14 ],
+    young_bar_mitsvah => [ years => 12 ],
+    young_bas_mitsvah => [ years => 12 ],
+);
+
+# Possible checks; from lifelines report verify.ll
+#
+# individual checks:
+# person's age at death is older than _oldage_
+#    oldage key name birth death age
+# person is baptized before birth
+#    bpbef  key person birth baptism
+# person dies before birth
+#    dbefb  key person birth death
+# person is buried before birth
+#    bubefb key person birth burial
+# person dies before baptism
+#    dbefbp key person baptism death
+# person is buried before baptism
+#    bubfbp key person baptism burial
+# person is buried before death
+#    bubefd key person death burial
+# person is baptised after birth year
+#    bpspac key person birth baptism
+# person is buried after death year
+#    buspac key person death burial
+# person has unkown gender
+#    unkgen key person
+# person has ambiguous gender
+#    hermaf key person
+# person has multiple parentage
+#    mulpar key person familynum familynum
+# person has no family pointers
+#    nofams key person
+#
+#
+# marriage checks:
+# person marries before birth
+#    unbmar key person birth marriage spouse
+# person marries after death
+#    dedmar key person death marriage spouse
+# person has more than _wedder_ spouses
+#    wedder key person nspouses
+# person marries someone more than _jundec_ years older
+#    jundec key person birth family spouse spouse_birth
+# person marries younger than _yngmar_
+#    yngmar key person age spouse
+# person marries older than _oldmar_
+# marriage out of order
+#    morder key person spouse
+# marriage before birth from previous marriage
+#    mrbbpm key person marriage spouse previous_birth
+# homosexual marriage
+#    hommar key person marriage spouse
+# person is a female husband
+#    femhus key person marriage
+# person is a male wife
+#    malwif key person marriage
+# person was a widow(er) longer than _lngwdw_ years
+#    lngwdw key person years
+# person lived more than _oldunm_ years and never married
+#    oldunm key person years
+# person has multiple marriages, this one with no spouse and no children
+#    mmnsnk key person family
+# person has same surname as spouse
+#    samnam key person marriage spouse
+#
+# parentage checks:
+# mother has more than _fecmom_ children
+#    fecmom key person nkids nfamilies
+# mother is older than _oldmom_ at time of birth of child
+#    oldmom key person age familynum childnum child
+# child is born before mother
+#    unbmom key person birth familynum childnum child child_birth
+# mother is younger than _yngmom_
+#    yngmom key person age familynum childnum child
+# mother is dead at birth of child
+#    dedmom key person death familynum childnum child birth
+# same as above, but for father
+#    [fecdad, olddad, unbdad, yngdad, deddad]
+# child doesn't inherit father's surname
+#    nonpat key person familynum childnum child
+# children checks:
+# child is born out of order with respect to a previous child
+#    corder key person familynum childnum child child_birth
+# prev_child_birth
+# child is born in the same year as a previous child
+#    ctwins key person familynum childnum child child_birth
+# child is born more than _cspace_ years after previous child
+#    cspace key person familynum childnum child birthspace
+# children's births span more than _cbspan_ years
+#    cbspan key person birthspan
+# family checks:
+# family has no parents
+#    noprnt fkey firstchild nchildren
+
+for (keys %limit) {
+    $limit{$_} = DateTime::Duration->new( @{$limit{$_}} );
+}
+
+for my $indi ($ged->individuals) {
+    my $birth_date_str = $indi->get_value('birth date') or next;
+    my $birth_date = Gedcom::Date->parse($birth_date_str) or next;
+
+    for my $father ($indi->father) {
+        my ($death_date_str, $death_date);
+        if ($death_date_str = $father->get_value('death date') and
+            $death_date = Gedcom::Date->parse($death_date_str)) {
+
+            print "$indi->{xref} Father dead $indi->{xref} :: ",
+                  $indi->name, " ($indi->{xref}) born $birth_date_str :: ",
+                  $father->name, " ($father->{xref}) died $death_date_str\n"
+                        if $birth_date->earliest >
+                           $death_date->latest + $limit{father_dead};
+        }
+
+        my ($fbirth_date_str, $fbirth_date);
+        if ($fbirth_date_str = $father->get_value('birth date') and
+            $fbirth_date = Gedcom::Date->parse($fbirth_date_str)) {
+
+            print "$indi->{xref} Father old :: ",
+                  $indi->name, " ($indi->{xref}) born $birth_date_str :: ",
+                  $father->name, " ($father->{xref}) born $fbirth_date_str\n"
+                        if $birth_date->earliest >
+                           $fbirth_date->latest + $limit{old_father};
+            print "$indi->{xref} Father young :: ",
+                  $indi->name, " ($indi->{xref}) born $birth_date_str :: ",
+                  $father->name, " ($father->{xref}) born $fbirth_date_str\n",
+                        if $birth_date->latest <
+                           $fbirth_date->earliest + $limit{young_father};
+        }
+    }
+    for my $mother ($indi->mother) {
+        my ($death_date_str, $death_date);
+        if ($death_date_str = $mother->get_value('death date') and
+            $death_date = Gedcom::Date->parse($death_date_str)) {
+
+            print "$indi->{xref} Mother dead :: ",
+                  $indi->name, " ($indi->{xref}) born $birth_date_str :: ",
+                  $mother->name, " ($mother->{xref}) died $death_date_str\n"
+                        if $death_date < $birth_date;
+        }
+        my ($fbirth_date_str, $fbirth_date);
+        if ($fbirth_date_str = $mother->get_value('birth date') and
+            $fbirth_date = Gedcom::Date->parse($fbirth_date_str)) {
+
+            print "$indi->{xref} Mother old :: ",
+                  $indi->name, " ($indi->{xref}) born $birth_date_str :: ",
+                  $mother->name, " ($mother->{xref}) born $fbirth_date_str\n"
+                        if $birth_date->earliest >
+                           $fbirth_date->latest + $limit{old_mother};
+            print "$indi->{xref} Mother young :: ",
+                  $indi->name, " ($indi->{xref}) born $birth_date_str :: ",
+                  $mother->name, " ($mother->{xref}) born $fbirth_date_str\n"
+                        if $birth_date->latest <
+                           $fbirth_date->earliest + $limit{young_father};
+        }
+    }
+}

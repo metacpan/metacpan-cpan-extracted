@@ -1,0 +1,72 @@
+2017-03-27  Dave Cross <dave@dave.org.uk>
+
+  * lib/Genealogy/Ahnentafel.pm, t/01-basic.t: Fix test
+
+  * lib/Genealogy/Ahnentafel.pm: Bump to version 1.0.0.
+
+2016-02-28  Dave Cross <dave@dave.org.uk>
+
+  * lib/Genealogy/Ahnentafel.pm: Use a simpler defintion for lazy attributes.
+
+  * lib/Genealogy/Ahnentafel.pm, t/01-basic.t: Added parent tests.
+
+2016-02-23  Dave Cross <dave@dave.org.uk>
+
+  * lib/Genealogy/Ahnentafel.pm: Fixed POD errors.
+
+2016-02-22  Dave Cross <dave@dave.org.uk>
+
+  * lib/Genealogy/Ahnentafel.pm: Bump version for release.
+
+  * lib/Genealogy/Ahnentafel.pm, t/01-basic.t: Added first/last_in_generation
+  attributes.
+
+  * image.png, image.txt: Added explanatory image
+
+  * README.md, lib/Genealogy/Ahnentafel.pm: Fix typos
+
+2016-02-21  Dave Cross <dave@dave.org.uk>
+
+  * lib/Genealogy/Ahnentafel.pm: Bump version to upload less broken tarball :-/
+
+2016-02-20  Dave Cross <dave@dave.org.uk>
+
+  * Makefile.PL: Add MIN_PERL_VERSION to Makefile.PL
+
+  * .gitignore: More .gitignore additions
+
+  * .gitignore: Added Changes to .gitignore
+
+  * lib/Genealogy/Ahnentafel.pm: Bump version
+
+  * Makefile.PL: Added repo metadata
+
+  * Makefile.PL: Add missing build prereq
+
+  * lib/Genealogy/Ahnentafel.pm: Fix heading levels
+
+2016-02-19  Dave Cross <dave@dave.org.uk>
+
+  * README.md, lib/Genealogy/Ahnentafel.pm: More docs and a README
+
+  * lib/Genealogy/Ahnentafel.pm: More documentation.
+
+  * .gitignore: Added .gitignore
+
+  * Makefile.PL: Added Makefile.PL
+
+  * lib/Genealogy/Ahnentafel.pm: Add $VERSION and start POD
+
+  * .travis.yml: Added .travis.yml
+
+  * lib/Genealogy/Ahnentafel.pm: Use class attributes. Tidy the properties.
+
+  * lib/Genealogy/Ahnentafel.pm: Added more stuff.
+
+  * lib/Genealogy/Ahnentafel.pm, t/01-basic.t: Switch to Moo.
+
+2016-02-18  Dave Cross <dave@dave.org.uk>
+
+  * lib/Genealogy/Ahnentafel.pm: First go at showing ancestry
+
+  * lib/Genealogy/Ahnentafel.pm, t/01-basic.t: Add descriptions of the people

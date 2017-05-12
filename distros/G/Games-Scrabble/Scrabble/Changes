@@ -1,0 +1,6 @@
+Revision history for Perl extension Games::Scrabble.
+
+0.91  Sat Jan  4 23:05:55 2003
+	- original version; created by h2xs 1.21 with options
+		-AXcfn Games::Scrabble
+

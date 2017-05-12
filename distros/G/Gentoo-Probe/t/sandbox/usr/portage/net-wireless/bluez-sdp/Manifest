@@ -1,0 +1,6 @@
+MD5 5ab50c9c4306611b9ed39d3510cee99c ChangeLog 1937
+MD5 5749b89a94512d27fe4aefd7107fc020 bluez-sdp-1.4.ebuild 607
+MD5 a45193f313a576addedf17a99a8a67a4 bluez-sdp-1.5.ebuild 625
+MD5 d894f85c99ef4d0adca5119b187b6f27 metadata.xml 239
+MD5 38ae18aa288994906e0882a27d34cf64 files/digest-bluez-sdp-1.4 65
+MD5 6961202ee46b976e7097d13f1f1391f4 files/digest-bluez-sdp-1.5 65

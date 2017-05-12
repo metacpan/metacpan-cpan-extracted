@@ -1,0 +1,322 @@
+=head1 SYNOPSIS
+
+This is a basic specification for a human moderation support package using
+News::Gateway, including design concerns and a draft of the interface
+between a front end and the back-end package.
+
+If you are reading this from some other source, the canonical version of
+this document is doc/moderate.pod in the News::Gateway distribution.
+
+=head1 OVERVIEW
+
+The role of the core News::Gateway module is to provide an interface to do
+article rewrites and checks, leaving what to do about failing checks up to
+the program using it.  As such, a full implementation of human moderation
+support is beyond the scope of the core module and should be implemented
+separately.  This is a specification for how that could be done, using the
+News::Gateway core to do the rewriting.
+
+Human moderation has an inherently more complex data path than
+robomoderation, since the article has to be stored until a human moderator
+can look at it, the moderator should be able to approve or reject it
+easily, the moderator needs to be able to edit the stored article, and a
+variety of interfaces (including e-mail and web) need to be supported,
+each with its own implementation and security concerns.
+
+This implementation is designed to allow for easy separation of the front
+end that the moderator talks to and the back end that actually manipulates
+the article spool.  This is crucial to being able to cleanly implement a
+variety of front ends.  This implementation also seeks to impose no policy
+limitations on what the moderator can do to articles, as things
+inappropriate for one group may be appropriate for others.
+
+=head1 INTERFACE
+
+The core of such a specification is therefore the interface between a
+front end and the common back end.  The following set of commands would
+seem to be comprehensive:
+
+=over 4
+
+=item authenticate USERNAME PASSWORD
+
+Authenticate to the back end using a given username and password.  Note
+that depending on implementation, the password may be in a form other than
+plain text -- encrypted text, or possibly even a PGP signature may be used
+instead.  This is necessary to allow actions to be associated with a
+particular moderator, and possibly even have different moderators be able
+to do different things.
+
+Depending on the C<USERNAME> specified, the availability of further
+commands may differ, or things may work slightly differently (timeouts on
+locks, etc.).
+
+=item next
+
+Return the unique identifier for the next pending article in the incoming
+moderation queue.  The returned identifier may differ depending on the
+moderator (for example, each moderator could have their own queue if
+moderators specialize by topic).
+
+This command establishes a short-term lock on that message.  This lock
+should expire in a reasonably short period of time (an hour or less), and
+if a longer term lock is needed, it should be set up separately.  This
+lock is solely to prevent two moderators from working on the same message
+at the same time.
+
+=item article IDENTIFIER
+
+Return the headers and body of the article C<IDENTIFIER>.  This command
+should fail unless we have a lock on that article, since otherwise someone
+else may be locking it, modifying it, or otherwise manipulating it.
+
+=item approve IDENTIFIER
+
+Approve the article C<IDENTIFIER>.  This means attempt to complete any
+pending article rewrites and then post the article.  Any resulting error
+messages should be returned; in the absence of error messages, it should
+be possible to assume the article was posted (but see the note about
+queuing for downed servers below).
+
+This command requires a lock on article C<IDENTIFIER>.
+
+=item reject IDENTIFIER MESSAGE [ VARIABLE ... ]
+
+Reject the article C<IDENTIFIER>, sending the rejection message back to
+the author.  C<MESSAGE> should be the file name of a News::FormReply
+template, and C<VARIABLE>, if present, are variable bindings for that
+module.  There should be some way for the moderator to specify what e-mail
+address to send the rejection message to; the easiest way to handle that
+is probably to provide a default value for the To line but allow it to be
+overridden.
+
+Alternately, one can let rejections sent to spam blocked addresses bounce,
+and then resend from the bounce, or just dump the bounces and let spam
+blocked posters deal with it themselves.
+
+This command requires a lock on article C<IDENTIFIER>.
+
+=item checkout IDENTIFIER
+
+Checks out (establishes a long-term lock) on the article C<IDENTIFIER>.
+The article will be mailed to the moderator (addresses will need to be on
+file).  This is how editing of articles is supported, as editing via a web
+interface would be far too unwieldy to be easily usable.
+
+These locks should be checked periodically, and an upper limit on the
+amount of time an article can be locked before it's recycled back into the
+pending queue should be established by policy.
+
+This command requires a short-term lock on article C<IDENTIFIER>.
+
+=item replace IDENTIFIER SOURCE
+
+Replace the article C<IDENTIFIER> with the given article (passed in as a
+source, so either a file name, a file handle, a string, etc.).  This is
+the other half of how article editing is supported; after the editing is
+complete, the moderator can send the message back and have it replace the
+original copy in the queue.
+
+How to log this is implementation-dependent; some groups may wish to save
+a copy of the original article, and some groups may not care.
+
+This command requires a long-term lock (obtained via checkout) on article
+C<IDENTIFIER>.
+
+=item release IDENTIFIER
+
+Releases either a short-term or a long-term lock on a message.  Obviously,
+this requires the existence of a lock.  This should be used after a next
+or checkout command when the moderator decides they don't want to deal
+with this message right now.
+
+=item quit
+
+Closes the connection to the back end.  May be unnecessary for most
+implementations.
+
+=back
+
+Looking over this interface, there are a variety of obvious issues which
+are raised:
+
+=over 2
+
+=item *
+
+What do we do about PGP signatures?  Incoming mail from moderators should
+be able to be signed via a PGP signature, and that signature should be
+checked by the moderation software.  On the other hand, that's definitely
+a front-end problem and the signature check shouldn't have to be done by
+the back end.  How do we pass that sort of authentication to the back end?
+Bear in mind that due to the requirements of a web interface, the
+interface to the back end may have to be world-writeable, and therefore
+some sort of password protection is necessary.
+
+=item *
+
+Different front ends are going to have different requirements for
+communicating with the back end.  In particular, implementing a web front
+end is *very* problematic.
+
+=item *
+
+We need to be able to deal with a news server being down, thus causing an
+approve to not succeed right away.  Furthermore, the front end should not
+have to handle this.  The solution, I think, is to provide a queue
+separate from the moderation incoming queue for articles ready to be
+posted, and on temporary posting failure, put the article in that queue.
+A cron job should then attempt to repost the messages on a periodic basis,
+and send error reports to the moderators if a message sits in the queue
+for too long without being posted.
+
+=back
+
+There are also several supporting processes separate from the standard
+backend (at least conceptually) that have to be written, including
+something to go through and look at the locked messages and release them
+(with error mail) if they've been locked for too long.
+
+=head1 BACKEND DESIGN
+
+Behind the scenes, the obvious storage model for the incoming moderation
+queue would appear to be a maildir.  For those who are not familiar with
+that format (a native delivery format for qmail and possibly other MTAs),
+it consists of three subdirectories (which have to be on the same file
+system to allow atomic rename), one of which is used for temporary
+storage, one of which contains new incoming messages, and one of which
+contains messages that have been read.  Messages are given a unique file
+name consisting of a timestamp, PID, and hostname.
+
+The obvious mapping to a moderation queue is to have the new directory be
+the incoming moderation queue, the cur directory be the messages which are
+locked, and the filename of a message be the unique identifier.  This
+gives us a consistent method for generating unique identifiers, allows the
+MTA to deliver messages directly into the moderation queue if desired, and
+gains all of the locking benefits of maildirs (such as the fact that
+locking is clean and atomic even on file systems without flock support and
+is even mostly safe across NFS).  It also allows trivial unique ID to
+message mapping.
+
+The standard maildir method of storing message status is to encode it in
+the filename of messages in the cur directory (by appending a : and then
+arbitrary text).  We can encode the username of the locking moderator and
+the length of the lock that way, making it trivial to check the lock
+policy.
+
+We will need some sort of logging system that logs all actions taken by a
+moderator on a message.  We also need to support archiving of posted
+messages, archiving of rejected messages, generation of message traces
+through the system from the logs, and so forth.
+
+The backend should be implemented as a module that does most of the above
+work, and the program using that module can determine how to link the
+back end to the front end.  A variety of methods are possible, from
+straight method calls from the front end to a Unix domain socket to a file
+containing commands that's periodically read, to actually running the
+moderation back end on a network port.
+
+=head1 FRONT END DESIGN
+
+=head2 E-mail Interface
+
+This is by far the simplest to deal with, since the security model
+problems should be dealt with for us by the MTA if we run the front-end
+out of a .forward file or the moral equivalent.  If the front-end is being
+run from sendmail aliases directly, some of the same issues apply as with
+the web front end; see below for further discussion.
+
+The e-mail front end in the simplest case could just authenticate by
+incoming e-mail address, but it would probably be best to at least require
+a password (a la majordomo or similar such systems).  Ideally, the
+incoming mail should be PGP-signed and the signature verified.  That
+causes some problems with the authentication mechanism with the back end;
+see above for the details.
+
+This is probably the most workable system for low-volume and possibly even
+high-volume newsgroups.  Incoming messages are put into the queue,
+assigned to a moderator via some mechanism, locked to that moderator, and
+mailed out.  If the moderator approves the message as is, they can just
+send back the approve command and the unique ID (probably encoded on the
+subject line).  If they need to edit the article for whatever reason, they
+can send back a replace and an approve.
+
+The front end is going to need to be lenient about how it gets the article
+back for a replace operation, as different e-mail clients are going to
+vary on how they can handle such things.  It should ideally support both
+attachments and straight forwarded messages, and possibly some quoting
+syntaxes.  Whenever possible, moderators should be supplied with a small
+Perl script that does the work of mailing the commands back for them, but
+depending on what e-mail clients they're using, this won't always be
+possible.
+
+The final implementation of this is going to look a lot like STUMP, I
+think, out of necessity.  There are some significant differences, though,
+such as supporting article editing by moderators.
+
+=head2 Web Interface
+
+This is a lot harder to make work correctly.  The major problem here is
+the security model.  The web server runs CGI scripts as nobody, but we
+need to act as the moderator user (whoever owns the moderation spool) in
+order to lock, delete, edit, and move messages.
+
+I consider it to be an absolute requirement that any web front end work
+across a wide variety of browsers.  That means no requirement of frames,
+no Java, no JavaScript, and no plug-ins.  It's possible to get around some
+of the below concerns by using those tools, but at a severe degredation of
+portability and an increase in the number of different languages things
+have to be written in.
+
+This also won't be as portable in terms of setup, as most anyone with
+procmail and a reasonably cooperative ISP should be able to set up the
+e-mail interface, but the web interface requires CGI script support and
+quite probably either a long-running daemon or a setuid program.
+
+There are three basic ways to allow the web server, running CGI scripts,
+to access and manipulate the moderation queue:
+
+=over 2
+
+=item *
+
+Have the web server run the CGI scripts as the moderator user.  This in
+practice will require a setuid program to change users from nobody to the
+moderator user.  I'm extremely reluctant to use setuid programs, as are
+many other system administrators, so it may be difficult in practice to
+take this course of action.  This would probably be ideal if the process
+of dropping priviledges were totally secure, but it's difficult to ensure
+that.
+
+=item *
+
+Have the moderation queue be owned by the web server user.  I think this
+is a bad idea, as then any security compromise anywhere in the web system
+results in a compromise of moderation queue.  It's probably safe in
+practice, under most cases, but like setuid programs I'd rather avoid
+doing things like this.
+
+=item *
+
+There can be some sort of interface between programs that run as the
+moderator user and programs that run unauthenticated.  Two ways in which
+this can be done is to create a file of commands which is read
+periodically or to have a local Unix domain socket that accepts commands
+from unauthenticated users.  (The Unix domain socket idea can be expanded
+to accepting network connections if desired.)  The disadvantage of this
+approach is that it requires a long-running daemon which is difficult to
+write correctly (as it would probably have to fork) and which may have to
+be written in C until Perl has reliable signal handling.
+
+=back
+
+All of these solutions have their advantages and disadvantages; it would
+probably be a good idea to support all three.  I'd be very interested in
+other alternatives as well, particularly designs that avoid the drawbacks
+of these.
+
+One possibility that has come to mind is that the web interface could send
+e-mail, which would allow the web interface to leverage off of the
+existing e-mail interface.  The difficulty there is lack of immediate
+response; the mail message is sent, and then the CGI script has no real
+way of knowing whether and when it has been acted upon.

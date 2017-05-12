@@ -1,0 +1,7 @@
+TYPEMAP
+
+Gtk::ItemFactory::Entry		T_SimpleVal
+Gtk::TargetEntry		T_SimpleVal
+Gtk::Gdk::Geometry		T_SimpleVal
+#Gtk::Gdk::DragContext		T_SimpleVal
+

@@ -1,0 +1,74 @@
+INSTALL file for Games::Bingo
+
+$Id: INSTALL 1511 2005-03-05 09:38:34Z jonasbn $
+
+INSTALLATION
+
+The installation of Games::Bingo has some requirements which need to be
+installed also.
+
+PDFLIB
+
+This module requires PDFLib. PDFLib can be downloaded from
+http://www.pdflib.com/ and is owned by PDFLib. The prebuilt version
+apparently does not hold the Perl bindings, which leaves the unuseful
+in conjunction with this project so the PDFLib has to be compiled in
+order to work.
+
+Games::Bingo have only been tested with PDFLib 4.0.3
+
+Download from:
+
+http://www. pdflib .com/pdflib/download/pdflib-4.0.3.tar.gz 
+
+For OS X 10.2 users there is a patch to the configure file please see:
+
+http://www.pdflib.com/pdflib/patches.html
+
+% ./configure
+
+% make
+
+% make test
+
+% make install
+
+PDFLib from CPAN
+
+Apart from the installation of the PDFLib libraries you will require the
+PDFLib module from CPAN, which wraps the library.
+
+To install PDFLib from CPAN
+
+% perl -MCPAN -e 'install Games::Bingo'
+
+To install PDFLib from tar-ball:
+
+% perl Makefile.PL
+
+% make
+
+% make install
+
+Games::Bingo from CPAN
+
+Finally you have to install Games::Bingo
+
+To install Games::Bingo from CPAN
+
+% perl -MCPAN -e 'install Games::Bingo'
+
+To install Games::Bingo from tar-ball:
+
+% perl Build.PL
+
+% ./Build
+
+% ./Build test
+
+% ./Build install
+
+To install Games::Bingo from CPAN, the Makefile.PL will trigger and installation 
+of Module::Build.
+
+jonasbn <jonasbn@cpan.org>

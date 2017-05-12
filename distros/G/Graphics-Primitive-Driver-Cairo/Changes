@@ -1,0 +1,167 @@
+Revision history for Graphics-Primitive-Driver-Cairo
+
+0.47 Dec 14 2016
+
+0.46 Feb 17 2014
+
+0.45 Jan 24 2014
+
+0.44 Sep 27 2011
+  - Fix margin bug in bottom border drawing. (Thanks Jay Shirley)
+
+0.43    February 12, 2010
+  - Copyright updates.
+
+0.42    November 26th, 2009
+  - Fix POD typo (Thanks Brian Cassidy)
+
+0.41    November 26th, 2009
+  - Match text changes (show_text) in angled text rendering, which was    
+    preventing angled text from drawing.
+
+0.40    October 2nd, 2009
+  - Use show_text rather than text_path + fill for text rendering
+  - Set new font options from Graphics::Primitive::Font (antialias, hint, etc)
+
+0.39
+  - Honor padding when drawing backgrounds... ;)
+
+0.38
+  - Honor margins when drawing background of components.
+
+0.37
+  - Properly handle sizing of TextBoxes with rotated text
+
+0.36
+  - Disable taint mode in 00-load.t (rafl)
+
+0.35
+  - Fix big in draw image (was drawing box of width/width, not width/height)
+    (Danny Luna)
+
+0.34
+  - Remove various unnecessary bits
+
+0.33
+  - Add new_sub_path before arc call, removing impossible-to-fix line segment
+
+0.32
+  - Remove accidental inclusion of some debugging code
+
+0.31
+  - Add relatively naive, but surprisingly effective, method for handling
+    rotated text.
+  - POD fixes
+
+0.30
+  - Add Radial Gradient support
+
+0.29
+  - Dependency Bump
+  - Move pod tests to t/author
+
+0.28
+  - Dependency Bumps
+  - Add antialias_mode attribute
+
+0.27
+  - POD updates
+
+0.26
+  - TextLayout: slice now returns a TextBox with it's minimum_(height|width)
+    set, rather than the (height|width).
+
+0.25
+  - Implement get_textbox_layout
+  - Implement _draw_ellipse and _draw_circle
+
+0.24
+  - Keep up with Graphics::Primitive API changes
+  - Bump dependencies
+
+0.23
+  - Add _draw_polygon
+
+0.22
+  - Fix the bug that the fix from 0.21 created.
+
+0.21
+  - Fix data method not "finishing" the scene.
+
+0.20
+  - Test adjustments for missing Test::Image::GD (thanks to Vladimir Timofeev)
+
+0.19
+  - Take out debugging leftovers
+
+0.18
+  - Dashed borders
+  - Dashed stroke
+
+0.17
+  - Fix retrieval of PNG surface via data
+
+0.16
+  - Fiddle with text widths in get_text_bounding_box
+  - Add image drawing (experimental)
+  - Fix textbox alignment paired with margins
+
+0.15
+  - Remove useless move_to and hash assignment in get_text_bounding_box
+  - Get rid of surface_data accessor for a simple concatenation, remove
+    some useless API pieces (append_surface_data and surface_data)
+  - Fix broken margins when drawing complex borders.
+
+0.14
+  - Use cairo's text_extents instead of text_path and fill_extents, this
+    unfortunately breaks rotation for now
+
+0.13
+  - Non-rotated TextBox alignment
+
+0.12
+  - Make format case-insensitive
+
+0.11
+  - Skip 0-width borders
+
+0.10
+  - Handle per-side borders in Graphics::Primitive 0.17
+  - Add some simple output testing of borders, more to come
+
+0.09
+  - Add caching to get_text_bounding_box
+
+0.08
+  - TextBox: line_height
+  - TextBox: don't ignore empty lines
+
+0.07
+  - Ditch stupid component attribute!!
+  - Implement _resize and _finish_page
+
+0.06
+  - Add _draw_bezier
+
+0.05
+  - Add check for arc_negative and use it if necessary
+  - Add angle support to get_text_bounding box and _draw_textbox
+  - Add reset
+
+0.04
+  - Minor optimizations
+  - Add arc to primitive elsif
+
+0.03
+  - Add support for preserve operations
+  - Add _draw_rectangle
+
+0.02
+  - Add _draw_arc, _draw_path and _do_fill
+  - Change to new Line accessor names
+  - TextBox: tighten up height & width of text
+  - Honor contiguous hint
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

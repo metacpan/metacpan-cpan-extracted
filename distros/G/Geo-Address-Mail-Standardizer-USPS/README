@@ -1,0 +1,61 @@
+NAME
+    Geo::Address::Mail::Standardizer::USPS - Offline implementation of USPS
+    Postal Addressing Standards
+
+SYNOPSIS
+    This module provides an offline implementation of the USPS Publication
+    28 - Postal Addressing Standards as defined by
+    <http://pe.usps.com/text/pub28/welcome.htm>.
+
+        my $std = Geo::Address::Mail::Standardizer::USPS->new;
+
+        my $address = Geo::Address::Mail::US->new(
+            name => 'Test Testerson',
+            street => '123 Test Street',
+            street2 => 'Apartment #2',
+            city => 'Testville',
+            state => 'TN',
+            postal_code => '12345'
+        );
+
+        my $res = $std->standardize($address);
+        my $corr = $res->standardized_address;
+
+WARNING
+    This module is not a complete implementation of USPS Publication 28. It
+    intends to be, but that will probably take a while. In the meantime it
+    may be useful for testing or for pseudo-standardizaton.
+
+USPS Postal Address Standards Implemented
+    This module currently handles the following sections from Publication
+    28:
+
+    *212 Format*
+         <http://pe.usps.com/text/pub28/pub28c2_002.htm>
+
+    *213.1 Common Designators*
+         <http://pe.usps.com/text/pub28/pub28c2_003.htm>
+
+         Also, Appendix C2
+
+         <http://pe.usps.com/text/pub28/pub28apc_003.htm#ep538629>
+
+    *222 Punctuation*
+         Punctuation is removed from all fields except "postal_code". Note
+         that this isn't really kosher when using address ranges...
+
+         <http://pe.usps.com/text/pub28/pub28c2_007.htm>
+
+AUTHOR
+    Cory G Watson, "<gphat at cpan.org>"
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2010 Cory G Watson.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,14 @@
+Revision history for GD-Tab-Guitar
+
+0.03 Tue Oct 28 09:29:44 2008
+     - applied a patch to t/01_method.t for MSWin32 environment (#40408).
+       thanks to Taro Nishino.
+
+0.02 Sat Oct 25 13:19:00 2008
+     - moved fuckin' test scripts using
+       Test::Spelling, Test::Perl::Critic and Test::Pod to xt directory
+       to avoid test failures.
+       was adviced by tokuhirom on Wassr.
+
+0.01 Fri Oct 24 14:03:09 2008
+     - original version

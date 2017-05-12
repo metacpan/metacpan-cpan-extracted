@@ -1,0 +1,82 @@
+Revision history for Perl extension Geo::WeatherNWS.
+
+1.053 Sat Dec 22 12:40:00 2012
+    - Minor changes: clean up and avoid division by zero.
+
+1.052 Thu Dec 20 15:08:00 2012
+    - Handle undefined dewpoint
+    - Minor performance improvement
+    - Add test for getreporthttp
+
+1.051 Tue Mon 27 22:13:00 2012
+    - Add POD documention for new functions.
+
+1.05  Mon Nov 26 21:27:00 2012
+    - Address bug 14632 (METAR Decoding) from dstroma.
+    - Address bug 27513 (Geo-WeatherNWS returns wrong station code) from Guenter Knauf.
+    - Changes to deal with undefined values used for calculations to avoid warnings.
+      To make it easier to check for undefined values, some calculations were moved
+      into functions.
+    - Windchill is now returned as undefined for temperatures above 50 F or
+      wind speeds below 4 mph.
+    - The knots to mph conversion is slightly different.
+    - The distance conversion is slightly different.
+    - We now round results instead of truncating them to integers, which
+      will provide slightly different answers in some cases.
+    - The value "ptemerature" is now spelled "ptemperature"
+      Added wind speed in kmh
+    - Fix bug for handling conditions without modifiers
+    - Relax rules for ICAO names to allow numbers as well as letters for the last 3 characters
+    - Change ICAO website
+    - Change http web site from weather.noaa.gov (which is being phased out)
+      to www.aviationweather.gov
+
+1.041 Wed Nov 14 22:00:00 2012
+    - Minor changes: removed unneeded /d after tr,
+      made network tests optional,
+      check status of opens.
+
+1.04  Wed Aug 10 10:00:00 2011
+    - Changed default ftp server name to tgftp.nws.noaa.gov,
+      added ftp timeout,
+      did some restructuring, 
+      added tests and some documentation
+
+1.03  Sun Feb 9 13:52:00 2003
+	- added the getreporthttp call to get the metar data from the nws 
+	  website at http://weather.noaa.gov/cgi-bin/mgetmetar.pl
+
+1.02  Sun Feb 9 12:45:00 2003
+	- changed ftp connection to passive to work behind firewalls
+	- added automated station code provided by Jim Metzger
+
+1.01  Thu Aug 08 13:07:00 2002
+	- updated version number and docs
+	- fixed "isn't numeric" error in remarks processing
+
+0.23  Fri Aug 02 10:28:00 2002
+	- fixed some documentation errors
+	- added new wind chill calculation formula
+
+0.22  Thu May 16 16:14:00 2002
+	- fixed temperature reading /pressure reading errors
+
+0.21  Mon Feb 25 08:50:00 2002
+        - added support for mb encoded pressures (Q[XXXX])
+        - added decodeobs function to decode metar obs from a string
+
+0.20  Sun Feb 24 11:33:00 2002
+        - added support for template files
+
+0.19  Sun Feb 24 10:25:00 2002
+        - added support for error codes
+        - added support for changing the server/user/directory settings
+
+0.18  Wed Jan 23 21:26:08 2002
+	- added support for fractional visibility readings
+	- fixed "uninitialized value" bugs
+
+0.17  Tue Dec 18 11:46:52 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n Geo::WeatherNWS
+

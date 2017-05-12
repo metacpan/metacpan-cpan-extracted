@@ -1,0 +1,27 @@
+diff -u -r1.565 ipw2100_main.c
+--- ipw2100_main.c	16 Mar 2004 21:42:52 -0000	1.565
++++ ipw2100_main.c	17 Mar 2004 21:10:56 -0000
+@@ -4867,6 +5105,7 @@
+ 	struct ipw2100_priv *priv = NULL;
+ 	int err = 0;
+ 	int registered = 0;
++	u32 val;
+ 
+ 	IPW2100_DEBUG_INFO("enter\n");
+ 
+@@ -4891,6 +5130,15 @@
+ 		pci_disable_device(pdev);
+ 		return err;
+ 	}
++	
++	/* I'm not sure what this does, but loading the Windows driver under
++	 * ndiswrapper was clearing these bits of the PCI config table--and 
++	 * doing so seems to fix the C3 conflict.  If anyone knows what these 
++	 * bits do in the PCI table, let me know so I can update this comment 
++	 * :) */
++	pci_read_config_dword(pdev, 0x40, &val); 
++	if ((val & 0x0000fff00) != 0) 
++		pci_write_config_dword(pdev, 0x40, val & 0xffff00ff);
+ 
+ 	mem_start = pci_resource_start(pdev, 0);
+ 	mem_len = pci_resource_len(pdev, 0);

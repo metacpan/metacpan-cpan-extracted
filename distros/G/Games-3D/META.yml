@@ -1,0 +1,15 @@
+abstract: a package containing an object system for (not only) 3D games
+author: Tels <nospam-abuse@bloodgate.com>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: gpl
+name: Games-3D
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  perl: 5.8.1
+version: 0.10

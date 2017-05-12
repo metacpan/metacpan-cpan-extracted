@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Benchmark qw(:all);
+
+use Graph::Directed;
+use Graph::Fast::GraphPM;
+use BoostGraphWrapper;
+
+sub test_params {
+	my %args = @_;
+
+	print "\n\n" . "-" x 80;
+	print "\nStarting test with parameters:\n";
+	print "  static node count = $args{nodes}\n";
+	print "  edge chain count  = $args{xedges}\n";
+	print "  edge chain length = $args{xedges_c}\n";
+	print "  edge weight dev.  = $args{randlen}\n";
+
+	my %contestants = (
+		"Graph::Directed"          => "Graph.pm",
+		"Graph::Fast::GraphPM"     => "FastG*hash",
+		"Graph::Fast_LPQ::GraphPM" => "FastG*list",
+		"BoostGraphWrapper"        => "Boost"
+	);
+	my %instance;
+	for my $contestant (keys %contestants) {
+		if ($args{"opt_$contestant"}) {
+			print "  Special parameters for $contestant: " . join("'", @{$args{"opt_$contestant"}}) . "\n";
+			$instance{$contestant} = $contestant->new(@{$args{"opt_$contestant"}});
+		} else {
+			$instance{$contestant} = $contestant->new();
+		}
+	}
+	print "\n";
+
+	print "Center edge:\n";
+	cmpthese(1, {
+		map { my $co = $_;  $contestants{$co} => sub {
+			for my $n (1..$args{nodes}) {
+				$instance{$co}->add_weighted_edge($n, "center", 9_999_999);
+				$instance{$co}->add_weighted_edge("center", $n, 9_999_999);
+			}
+		} } keys %contestants
+	});
+
+	print "Random edge creation:\n";
+	cmpthese($args{xedges}, {
+		map { my $co = $_;  $contestants{$co} => sub {
+			my @n;
+			push(@n, int(rand($args{nodes}) + 1)) foreach (1..$args{xedges_c});
+			for (my $i = 0; $i < scalar(@n) - 1; $i++) {
+				$instance{$co}->add_weighted_edge($n[$i], $n[$i + 1], int(rand($args{randlen}) + 1));
+			}
+		} } keys %contestants
+	});
+
+	print "Dijkstra:\n";
+	cmpthese($args{cdijkstra}, {
+		map { my $co = $_;  $contestants{$co} => sub {
+			srand(266524);
+			my @w = $instance{$co}->SP_Dijkstra(int(rand($args{nodes}) + 1), int(rand($args{nodes}) + 1));
+			# if ($co eq "Graph::Fast::GraphPM") { print join(" - ", $w[0]->[0], map { $_->[1] } @w); } else { print join(" - ", @w); }
+		} } keys %contestants
+	});
+}
+
+$| = 1;
+
+foreach my $params (
+	{ nodes => 1000,  xedges => 1000,  xedges_c => 5, randlen => 100     , cdijkstra => 10  },
+	{ nodes => 1000,  xedges => 1000,  xedges_c => 5, randlen => 10      , cdijkstra => 10  },
+	{ nodes => 10000, xedges => 20000, xedges_c => 5, randlen => 10000000, cdijkstra => 1   },
+) {
+	test_params(%{$params});
+}
+
+

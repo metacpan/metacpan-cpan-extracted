@@ -1,0 +1,2 @@
+NOTIFY_TYPE_NOTIFICATION	NotifyNotification	GObject	Gtk2::Notify
+NOTIFY_TYPE_URGENCY	NotifyUrgency	GEnum	Gtk2::Notify::NotifyUrgency

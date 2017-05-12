@@ -1,0 +1,427 @@
+METHODS
+
+            OO interface
+
+ Graph::ChartSVG->new
+
+      Create a new Chart
+
+      possible parameters are :
+
+  active_size
+
+        an array ref with x,y size of the active graph ( without the reserved border for label )
+        
+     
+
+  bg_color
+
+      an hex color for the global background color
+     
+
+  frame
+
+      a Frame object to surround the active part of the graph
+
+  grid
+
+      a Grid oject to add to the graph
+      
+      
+
+  overlay
+
+     a Overlay to add on top of the graph ( useful to enhance a period in alarm )
+      
+
+  layer
+
+     a Layer object
+      
+
+  border
+
+     a Border object ( = some extra space to fit aroubd the active graph to allow label.
+                    This increase the actual_size and create the total_size)
+     
+
+  tag
+
+     a Tag objet ( if missing create a automatically incremented one )
+     
+
+  glyph
+
+     a Glyph object to add on the graph ( like a arrow to point at the end of the current data )
+        
+
+    my $graph = Graph::ChartSVG->new( active_size => \@size, bg_color =>
+    'FCF4C6', frame => $f, png_tag => 1 );
+
+ Frame->new
+
+  color
+
+     a hex color of the frame
+     
+
+  thickness
+
+     thickness of the frame
+
+    my $f = Frame->new( color => 'ff0000', thickness => 3 );
+
+ Border->new
+
+  top
+
+     space between the active part of the graph and the top of the image
+     
+
+  bottom
+
+     space between the active part of the graph and the bottom of the image
+     
+
+  left
+
+     space between the active part of the graph and the left of the image
+
+  right
+
+    space between the active part of the graph and the right of the image
+
+    my $b = Border->new( top => 200, bottom => 100, left => 80, right =>
+    200 );
+
+ $graph->border
+
+    method to add or change a border on the graph
+
+ Data->new
+
+     create a new set of data 
+     
+
+  type
+
+     the type of graph used for that data set.
+     could be :
+     
+
+      * line
+
+      a normal line
+
+      * line_up
+
+      a line with zero starting at the middle of the active graph with
+      increasing value in the top direction
+
+      * line_down
+
+      a line with zero starting at the middle of the active graph with
+      increasing value in the bottom direction
+
+      * bar
+
+      a filled graph
+
+      * bar_up
+
+      a filled graph with zero starting at the middle of the active graph
+      with increasing value in the top direction
+
+      * bar_down
+
+      a filled graph with zero starting at the middle of the active graph
+      with increasing value in the bottom direction
+
+      * line_stack
+
+      a set of line stacked under each other
+
+      * line_stack_up
+
+      a set of line stacked under each other with zero starting at the
+      middle of the active graph with increasing value in the top direction
+
+      * line_stack_down
+
+      a set of line stacked under each otherwith zero starting at the
+      middle of the active graph with increasing value in the bottom
+      direction
+
+      * bar_stack
+
+      a set of filled graph stacked under each other
+
+      * bar_stack_up
+
+      a set of filled graph stacked under each other with zero starting at
+      the middle of the active graph with increasing value in the top
+      direction
+
+      * bar_stack_down
+
+      a set of filled graph stacked under each other with zero starting at
+      the middle of the active graph with increasing value in the bottom
+      direction
+
+  color
+
+    the hex color of the graph
+
+    if Data is stack type, it should be a array ref with all the hex color
+
+  thickness
+
+    the thickness of the line used
+
+    in bar the thickness of the border
+
+  label
+
+    a label to set to the SVG object
+
+  offset
+
+    a vertical offset ( where the zero start )
+
+   example:
+
+        my $l = Data->new( type => 'line', color => 'ff9800A0', thickness => 3, label => 'oblique' ,  offset    => 50 );
+
+ $l->data_set( ... )
+
+    include a set of data to a Data object
+
+    it is an array ref with all data
+
+    or an array ref of array ref for the stack type of Graph
+
+   example:
+
+      $l->data_set( \@data1 );
+      
+      
+
+ $graph->add( ... )
+
+    add a element in the graph
+
+    the element could be:
+
+      * data_set
+
+      * Glyph
+
+      * Overlay
+
+   example:
+
+     $graph->add( $l );
+     
+
+    method to add an object to a graph
+
+ graph->grid( debord => ..., x => Grid_object, y = > Grid_object, )
+
+        $graph->grid(
+    
+            Grid->new(
+                debord => Border->new( # the debord size of the grid ( = the grid is greater than the active size )
+                    top => 20, 
+                    bottom => 10, 
+                    left => 10,
+                    right => 10 ), 
+    
+                x => Grid_def->new(         # label on the left border of the graph
+                    color     => '1292FF',
+                    number    => 10,
+                    thickness => 2,
+                    label     => Label->new(
+                        font  => 'verdana',
+                        color => '0000ff',
+                        size  => 15,
+                        text  => \@text,    # a array ref with all the text to set on the left border of the graph
+                        space => 10,        # space between the end of the label and the start of the grid
+                        align => 'right',
+                        rotation => -30,
+                    ),
+                        label2 => Label->new(   # label on the right border of the graph
+                        font  => 'times',
+                        color => '0000ff',
+                        s ize  => 20,
+                        text  => \@text2,
+                        space => 10,
+                        # align => 'right',
+                        # rotation => -45,
+                    ),
+                ),
+    
+                y => Grid_def->new(
+                    color     => '00fff0',
+                    number    => $VERT_GRID,
+                    thickness => 1,
+                    label     => Label->new(  # label on the left bottom of the graph
+                        font     => 'verdana',
+                        color    => 'ff00ff',
+                        size     => 14,
+                        text     => \@DATE,
+                        space    => 10,
+                        rotation => -30,
+                        align    => 'right',
+                    ),
+                    label2 => Label->new( # label on the left top of the graph
+                        font         => 'verdana',
+                        font_scaling => 0.558,
+                        color        => 'B283FF',
+                        size         => 16,
+                        text         => \@DATE2,
+                        align        => 'right',
+                        space        => 0,
+                        rotation     => -30,
+                    ),
+                )
+            )
+        );
+    
+     
+
+ $graph->label( label_name);
+
+    search for the layer with the label = label_name
+
+    in array context return ( ref_data, layer_level) in scalar context
+    return ref_data
+
+    (ref_data = an array ref with the data set )
+
+     my ( $Mal, $Mlan ) = $graph->label( 'src_all' );
+     
+
+ $graph->move( from, to );
+
+    Move a speciied layer to another level.
+
+    the other layer are shifted to allow the insert
+
+ Glyph->new
+
+    3 type of glyph are available:
+
+    'line' draw a polyline or polygon 'text' draw a text 'image' include a
+    PNG image Embeded in the SVG
+
+    To draw an arrow:
+
+        my $g1 = Glyph->new(
+            x        => $graph->border->left ,  
+            y        =>$graph->active_size->[1] +$graph->border->bottom ,       
+            type     => 'line',
+            filled   => 1,                  # if 1 = fill the polygon ( be sure to correctly close the path )
+            color    => '0faFff',
+            data_set => [
+                {
+                    data => [ [ 0, 0 ], [ 8, 10 ], [ 0, 10 ], [ 0, 10 + 20 ], [ 0, 10 ], [ -8, 10 ], [ 0, 0 ] ], # the list of point to create the polyline
+                    thickness => 3
+                }
+            ]
+        );
+
+    To write 2 text label ( in one Glyph )
+
+            $g = Glyph->new(
+                label =>'label_max',
+                x => 100 ,
+                y        =>200,
+                type     => 'text',
+                color    =>0xff0000,
+                size     => 9,                              # if the glyph's type is 'text', this is the font size
+                font     => 'Verdana',                      # the TrueType font to use
+                data_set => [                               # the data set contain an array with all the text to plot followed by the relative position + the optional rotation
+                    {
+                        text   => "hello text 1",
+                        x      => 0,                                # the relative position in x for that specific text
+                        y      => 15,                               # the relative position in yfor that specific text
+                        anchor => 'end',                                    # the text anchor ( could be  start, middle or end )
+                        rotation => -45,                            # a rotation in ° in trigonometric direction ( anti-clock )
+                        style => 'oblique'                          # could be      normal (default) ,| italic = oblique
+                    },
+                    {
+                        text =>"Bye text 2",
+                        x      => 60,                                # the relative position in x for that specific text
+                        y      => 15,                              # the relative position in yfor that specific text
+                        anchor => 'end',
+                        # rotation => -45,
+                        style => 'oblique'
+                    },
+                ],
+            );
+            
+           
+     To inlude a PNG image ( the image is encoded with MIME::Base64 )
+          
+             $g = Glyph->new(
+                label => 'port_label',
+                x     => $graph->active_size->[0] + $graph->border->left + 250,
+                y     => $graph->active_size->[1] + $graph->border->top+$graph->border->bottom  -4,
+                type  => 'image',
+                data_set => [    
+                    {
+                        image  => $img_bin,   
+                        x      => 0,
+                        y      => -5,
+                        width  => $buf_x,           # the width of the image
+                        height => $buf_y,           # the height of the image
+                    },
+                ],
+            ); 
+            
+
+ $graph>image
+
+    return the SVG image ( to be writed in a file )
+
+        open( my $IMG, '>', $file_svg ) or die $!;
+        binmode $IMG;
+        print $IMG $graph>image;
+        close $IMG;
+        
+
+    !!!! This object is only available after the render method !!!!
+
+ $graph->reduce( data => \@dot1, start => 50, end => 360, init => 300 );
+
+    This method allow to create a set of data directly usable a a data_set.
+    If there are more plotting value in the input data then the size of the
+    graph, use some average to create the plotting dot If there are lower
+    plotting value in the input data then the size of the graph, fill the
+    gap to smooth the graph data = an array ref with the input data start =
+    where the data start in the reduced data ( if missing =0 ) end = where
+    the data end in the reduced data ( f missing = end of the active size
+    graph ) init = a default value to set the element when there is no data
+    to add, like before start or after end ( if missing use undef )
+
+    return a array of 2 element
+
+    The first one contains an array refwith the reduced set of data The
+    second a hash ref with the statistic info
+
+    $VAR1 = { 'perc' => 345, 'last_val' => 359, 'avg' => '400', 'min' => 0,
+    'last' => 360, 'max' => 800, 'sum' => 320400 };
+
+ $graph->render
+
+    create the SVG from all the objects
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 502:
+
+      Non-ASCII character seen before =encoding in '°'. Assuming UTF-8
+

@@ -1,0 +1,557 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+pexeso - Play the pexeso game
+
+=head1 SYNOPSIS
+
+pexeso [columns rows]
+
+Where I<columns> is the number of columns to use and I<rows> the number or rows.
+
+=head1 DESCRIPTION
+
+Play the pexeso game a simple and educational mind game with a Perl variant! In
+this version the cards are downloaded directly from the internet and are
+displaying your favorite CPAN contributer (a.k.a Perl hacker).
+
+=head1 RULES
+
+A deck of shuffled cards where each card appears twice is placed in front of you
+with the cards facing down so you can see which card is where. The idea is to
+match the pairs of cards until there are no more cards available.
+
+At each turn you are allowed to flip two cards. If the two cards are identical
+then the pair is removed otherwise the card are flipped again so you can't see
+them. You are allowed to remember the cards positions once you have seen them,
+in fact that's the purpose of the game! You continue flipping pairs of cards
+until you have successfully matched all cards.
+
+=head1 AUTHORS
+
+Emmanuel Rodriguez E<lt>potyl@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Emmanuel Rodriguez.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms of:
+
+=over 4
+
+=item the GNU Lesser General Public License, version 2.1; or
+
+=item the Artistic License, version 2.0.
+
+=back
+
+This module is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+You should have received a copy of the GNU Library General Public
+License along with this module; if not, see L<http://www.gnu.org/licenses/>.
+
+For the terms of The Artistic License, see L<perlartistic>.
+
+=cut
+
+use strict;
+use warnings;
+
+use FindBin;
+
+use Glib qw(TRUE FALSE);
+use Gtk2;
+use Game::Pexeso::Card;
+use Game::Pexeso::Spinner;
+use Clutter qw(-init);
+use Data::Dumper;
+use AnyEvent::HTTP;
+use XML::LibXML;
+use URI;
+use Carp 'carp';
+use List::Util 'shuffle';
+use File::Spec;
+use base 'Class::Accessor::Fast';
+
+__PACKAGE__->mk_accessors qw(
+	columns
+	rows
+	stage
+	backface
+	card_1
+	card_2
+	number_pairs
+	disable_selection
+	timeline
+	spinner
+);
+
+
+my $ICON_WIDTH = 80;
+my $ICON_HEIGHT = 80;
+my $MAX_WORKERS = 5;
+
+my $APP_FOLDER = File::Spec->catdir($FindBin::Bin, '..');
+
+exit main();
+
+
+sub main {
+	my ($columns, $rows) = @ARGV;
+	$columns ||= 8;
+	$rows ||= 4;
+
+	my $pexeso = __PACKAGE__->new({
+		columns  => $columns,
+		rows     => $rows,
+	});
+
+	$pexeso->construct_game();
+	$pexeso->play_game();
+	return 0;
+}
+
+
+#
+# Creates the main Clutter components needed for the game: a stage (the board
+# game) and the default texture used to display the back of each card. The cards
+# themselves are downloaded from the internet so they have to be created latter.
+#
+sub construct_game {
+	my $pexeso = shift;
+
+	# The main clutter stage
+	my $stage = Clutter::Stage->get_default();
+	$pexeso->stage($stage);
+
+	$stage->set_color(Clutter::Color->new(0xb4, 0xcf, 0xec));
+	$stage->set_size(
+		$pexeso->columns * $ICON_WIDTH,
+		$pexeso->rows * $ICON_HEIGHT,
+	);
+	$stage->show_all();
+
+
+	# The back of each card. This particular actor is not going to be displayed.
+	# Instead clones of this actor will be used. Since Clutter 1.0 an actor can
+	# only be cloned if it is added to the stage. Since this actor is not shown
+	# it is hidden in the stage.
+	my $icon_file = File::Spec->catfile(
+		$APP_FOLDER, 'share', 'pexeso', 'back-card.png'
+	);
+	my $backface = Clutter::Texture->new($icon_file);
+	$backface->hide();
+	$stage->add($backface);
+	$pexeso->backface($backface);
+}
+
+
+#
+# Starts the game (the main loop). This consists of two things schedule the
+# download of the cards and start the main loop.
+#
+# Since the card are downloaded from the internet they have to be downloaded
+# asynchronously while the board is displayed. This way the download doesn't
+# freeze the user interface.
+#
+# The downloading of the cards has to be done asynchronously and in this order:
+#  1. Get the list of cards available (Perl hackers with an avatar).
+#  2. Parse the avatar list.
+#  3. Download each card that will be displayed.
+#
+sub play_game {
+	my $pexeso = shift;
+	$pexeso->download_icon_list();
+	Clutter->main();
+}
+
+
+#
+# Schedule the download of the icon's list. Once the icon list is downloaded
+# successfully it will be automatically parsed.
+#
+sub download_icon_list {
+	my $pexeso = shift;
+
+	my $spinner = Game::Pexeso::Spinner->new();
+	my $stage = $pexeso->stage;
+	$spinner->set_position($stage->get_width/2, $stage->get_height/2);
+	$stage->add($spinner);
+	$spinner->pulse_animation_start();
+	$pexeso->spinner($spinner);
+
+
+	my $uri = URI->new('http://hexten.net/cpan-faces/');
+
+	# Asyncrhonous download the list of icons available
+	http_request(
+		GET     => $uri,
+		timeout => 10,
+		sub {$pexeso->parse_icon_list($uri, @_)},
+	);
+}
+
+
+#
+# Parse the icon list from the page listing the CPAN avatars. Once the icon list
+# is parsed the icons will be shuffled and they will be picked (not all icons
+# are needed). The icons picked will then be scheduled for download.
+#
+# The icons are not all downloaded simultaneously, this should avoid the server
+# from getting too many requests. Instead the icons are placed in a queue and
+# a few workers (5) are started. These workers will download the items in queue.
+#
+sub parse_icon_list {
+	my $pexeso = shift;
+	my ($base_uri, $content, $headers) = @_;
+
+	if ($headers->{Status} != 200) {
+		$pexeso->quit("Failed to download $base_uri: $headers->{Reason} (Status: $headers->{Status})");
+		return;
+	}
+
+	# Find all icon candidates
+	my $parser = XML::LibXML->new();
+	my $doc = $parser->parse_html_string($content);
+	my @icons;
+	foreach my $node ($doc->findnodes('//div[@class="icon"]/a/img[@src]')) {
+		my $src = $node->getAttribute('src');
+		my $uri = URI->new_abs($src, $base_uri);
+		push @icons, $uri;
+	}
+
+	# Find how many icons have to be downloaded
+	my $max = $pexeso->columns * $pexeso->rows;
+	if ($max > @icons) {
+		$pexeso->rows(int(@icons/$pexeso->columns));
+		$max = $pexeso->columns * $pexeso->rows;
+	}
+	$max = int($max/2);
+
+	# Pick the icons to download
+	my @picked = shuffle @icons;
+	my $data = {
+		urls    => [ @picked[0 .. $max - 1] ],
+		workers => 0,
+		actors  => [],
+	};
+
+	# Start to download the icons
+	for (1 .. $MAX_WORKERS) {
+		++$data->{workers};
+		$pexeso->download_next_icon($data);
+	}
+}
+
+#
+# Downloads the next icon waiting in the queue. When the queue is over and the
+# last worker has finished then the cards will be placed in the board.
+#
+# This function request the download to be done asynchronously and places a
+# callback that will transform the image into a clutter actor and then will call
+# this same function once more.
+#
+# This will process will be repeated until the queue is empty. When the queue is
+# empty and the last worker has finished then the cards will be placed in the
+# board.
+#
+sub download_next_icon {
+	my $pexeso = shift;
+	my ($data) = @_;
+
+	if (my $url = pop @{ $data->{urls} }) {
+		# Asyncrhonous download the list of icons available
+		http_request(
+			GET     => $url,
+			timeout => 10,
+			sub {
+				my $actor = $pexeso->parse_icon($url, @_);
+				push @{ $data->{actors} }, $actor;
+				$pexeso->download_next_icon($data);
+			},
+		);
+		return;
+	}
+
+	# No more icons to download
+	--$data->{workers};
+
+	# When the last worker has finished place the cards in the board
+	if ($data->{workers} == 0) {
+		$pexeso->place_cards(@{ $data->{actors} });
+	}
+}
+
+
+#
+# Parses an icon from an HTTP response. That is to convert an image received by
+# HTTP into a Clutter actor (something that can be displayed).
+#
+sub parse_icon {
+	my $pexeso = shift;
+	my ($url, $content, $headers) = @_;
+
+	if ($headers->{Status} != 200) {
+		$pexeso->quit("Failed to download $url: $headers->{Reason} (Status: $headers->{Status})");
+		return;
+	}
+
+	my ($mime) = split(/\s*;/, $headers->{'content-type'}, 1);
+	if ($mime !~ m,^(image/\S+),) {
+		$pexeso->quit("Document $url is not an image (Mime: $mime)");
+		return;
+	}
+
+	my $loader = Gtk2::Gdk::PixbufLoader->new_with_mime_type($mime);
+	$loader->write($content);
+	$loader->close;
+	my $pixbuf = $loader->get_pixbuf;
+
+	# Transform the Pixbuf into a Clutter::Texture
+	my $texture = Clutter::Texture->new();
+	$texture->set_from_rgb_data(
+		$pixbuf->get_pixels,
+		$pixbuf->get_has_alpha,
+		$pixbuf->get_width,
+		$pixbuf->get_height,
+		$pixbuf->get_rowstride,
+		($pixbuf->get_has_alpha ? 4 : 3),
+		[]
+	);
+
+	return $texture;
+}
+
+
+#
+# Creates the cards, shuffles them and places then in the board.
+#
+# For each icon (clutter actor) downloaded two cards are created in order to
+# form a pair. Each card has two sides: the front face (the unique clutter actor
+# downloaded previously) and the back face (a shared icon among all cards).
+#
+# The pair of cards are given the same name, this is important as the name is
+# used for matching two cards.
+#
+# Once the cards are placed on the board the user can start playing.
+#
+sub place_cards {
+	my $pexeso = shift;
+	my (@actors) = @_;
+	$pexeso->number_pairs(scalar @actors);
+
+	# Collect the cards to show. For each original card generate a matching
+	# card (clone) in order to get a pair.
+	my @cards;
+	foreach my $actor (@actors) {
+		my $clone = Clutter::Clone->new($actor);
+
+		# Cards will match if they have the same name
+		my $i = @cards;
+		foreach my $frontface ($actor, $clone) {
+
+			my $card = Game::Pexeso::Card->new({
+				front => $frontface,
+				back  => Clutter::Clone->new($pexeso->backface),
+			});
+
+			$pexeso->stage->add($card);
+			$card->set_name("$i");
+			$card->set_reactive(TRUE);
+			$card->signal_connect('button-release-event', sub {
+				$pexeso->turn_card(@_);
+			});
+
+			push @cards, $card;
+		}
+	}
+
+	# Shuffle and place the cards in the board
+	@cards = shuffle @cards;
+	for (my $row = 0; $row < $pexeso->rows; ++$row) {
+		for (my $column = 0; $column < $pexeso->columns; ++$column) {
+			my $card = pop @cards or return;
+			$card->set_position($column * $ICON_WIDTH, $row * $ICON_HEIGHT);
+			$card->show();
+		}
+	}
+
+	# Stop the progress animation
+	$pexeso->spinner->pulse_animation_stop();
+}
+
+
+#
+# Called each time that a user selects a card. This function will turn the card
+# and will check what the next action should be depending on the number of
+# cards turned so far.
+#
+sub turn_card {
+	my $pexeso = shift;
+	my ($card) = @_;
+
+	if ($pexeso->disable_selection) {
+		return;
+	}
+
+	# Check if two cards are already flipped
+	if ($pexeso->card_1 && $pexeso->card_2) {
+		# Can't flip more cards, reset the other cards but make sure that the
+		# selected card stays flipped! The user could have selected an already
+		# flipped card.
+		my $flip = TRUE;
+		# Flip the previous cards and show the new card
+		if ($pexeso->card_1 != $card) {
+			$pexeso->card_1->flip();
+		}
+		else {
+			$flip = FALSE;
+		}
+		$pexeso->card_1($card);
+
+		if ($pexeso->card_2 != $card) {
+			$pexeso->card_2->flip();
+		}
+		else {
+			$flip = FALSE;
+		}
+		$pexeso->card_2(undef);
+
+		$card->flip() if $flip;
+	}
+	elsif (! $pexeso->card_1) {
+		$pexeso->card_1($card);
+		$card->flip();
+	}
+
+	# Flipping the first card again?
+	elsif ($pexeso->card_1 == $card) {
+		# Can't unflip a card, that's cheating!
+	}
+
+	# Flipping the second card
+	elsif (! $pexeso->card_2) {
+		$pexeso->card_2($card);
+		$card->flip();
+
+		# Check if the cards are the same
+		if ($pexeso->card_1->get_name eq $card->get_name) {
+			$pexeso->matching_pair();
+		}
+	}
+}
+
+#
+# Called when a matching pair is found. This function removes the pair from the
+# board.
+#
+sub matching_pair {
+	my $pexeso = shift;
+
+	# Don't let the user pick new cards until we remove the matching pair
+	$pexeso->disable_selection(1);
+	--$pexeso->{number_pairs};
+
+	Glib::Timeout->add(500, sub {
+		$pexeso->matching_pair_animation();
+		return FALSE;
+	});
+}
+
+
+#
+# The animation to run when a matching pair is found.
+#
+sub matching_pair_animation {
+	my $pexeso = shift;
+	my $timeline = Clutter::Timeline->new(300);
+
+	# Hide the cards
+	$pexeso->card_1->fade($timeline);
+	$pexeso->card_1(undef);
+	$pexeso->card_2->fade($timeline);
+	$pexeso->card_2(undef);
+	$pexeso->disable_selection(0);
+
+	# Check if the game is won (no more cards left)
+	if ($pexeso->number_pairs == 0) {
+		$timeline->signal_connect(completed => sub {
+			$pexeso->winning_screen();
+		});
+	}
+
+	# Start the timeline and keep a reference otherwise the signal connected
+	# here will not run
+	$timeline->start();
+	$pexeso->timeline($timeline);
+}
+
+
+#
+# Called to display a winning screen.
+#
+sub winning_screen {
+	my $pexeso = shift;
+	my $stage = $pexeso->stage;
+
+	my $label = Clutter::Text->new(
+		"Purisa Bold Italic 20",
+		"You won!",
+		Clutter::Color->new(0xFF, 0x80, 0x40, 0xFF),
+	);
+	$label->set_anchor_point_from_gravity('center');
+	$label->set_position(
+		($stage->get_width/2),
+		($stage->get_height/2),
+	);
+	$label->show();
+	$stage->add($label);
+
+
+	# Animate the victory text
+	my $timeline = Clutter::Timeline->new(300);
+	my $alpha = Clutter::Alpha->new($timeline, 'linear');
+
+	# Expand the card
+	my $zoom = Clutter::Behaviour::Scale->new($alpha, 1.0, 1.0, 1.5, 1.5);
+	$zoom->apply($label);
+
+	# Keep a handle to the behaviours otherwise they wont be applied
+	$pexeso->{zoom} = $zoom;
+
+	# Start an infinite loop that will end after two iterations. In the first
+	# iteration the text is zoomed in a linear way and at the second iteration
+	# the text is zoomed out with a bouncy effect. Afterwards the animation is
+	# stopped.
+	$timeline->set_loop(TRUE);
+	my $count = 0;
+	$timeline->signal_connect(completed => sub {
+		++$count;
+		if ($count == 2) {
+			$timeline->stop();
+			return;
+		}
+
+		# Reverse the animation once completed
+		$alpha->set_mode('ease-in-bounce');
+		my $reverse = $timeline->get_direction eq 'forward' ? 'backward' : 'forward';
+		$timeline->set_direction($reverse);
+	});
+	$timeline->start()
+}
+
+
+#
+# Called to quit the game. If an optional error messages is passed it will be
+# also printed.
+#
+sub quit {
+	my $pexeso = shift;
+	carp @_ if @_;
+	Clutter->main_quit();
+}
+

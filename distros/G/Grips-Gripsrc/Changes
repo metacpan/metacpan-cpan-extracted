@@ -1,0 +1,6 @@
+Revision history for Perl extension Grips::Gripsrc.
+
+0.01  Tue Dec 10 09:33:20 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Grips::Gripsrc
+

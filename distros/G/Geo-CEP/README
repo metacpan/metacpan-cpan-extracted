@@ -1,0 +1,118 @@
+NAME
+
+    Geo::CEP - Resolve Brazilian city data for a given CEP
+
+VERSION
+
+    version 1.0
+
+SYNOPSIS
+
+        use common::sense;
+        use utf8::all;
+    
+        use Data::Printer;
+    
+        # 'memoize' é extremamente vantajoso em casos aonde a mesma
+        # instância é utilizada para resolver lotes grandes de CEPs
+        use Geo::CEP qw(memoize);
+    
+        my $gc = Geo::CEP->new;
+        p $gc->find("12420-010");
+    
+        # Saída:
+        # \ {
+        #     cep_final    12449999
+        #     cep_initial  12400000
+        #     city         "Pindamonhangaba",
+        #     ddd          12,
+        #     lat          -22.9166667,
+        #     lon          -45.4666667,
+        #     state        "SP",
+        #     state_long   "São Paulo"
+        # }
+
+DESCRIPTION
+
+    Obtém os dados como: nome da cidade, do estado, número DDD e
+    latitude/longitude (da cidade) para um número CEP (Código de
+    Endereçamento Postal) brasileiro.
+
+    Diferentemente do WWW::Correios::CEP, consulta os dados armazenados
+    localmente. Por um lado, isso faz Geo::CEP ser extremamente rápido (5
+    mil consultas por segundo); por outro, somente as informações à nível
+    de cidade são retornadas.
+
+ATTRIBUTES
+
+ data, index
+
+    FileHandle para os respectivos arquivos.
+
+ length
+
+    Tamanho do índice.
+
+ states
+
+    Mapeamento de código de estado para o nome do estado (AC => 'Acre').
+
+ idx_len
+
+    Tamanho do registro de índice.
+
+METHODS
+
+ find($cep)
+
+    Busca por $cep (no formato 12345678 ou "12345-678") e retorna HashRef
+    com:
+
+      * cep_initial: o início da faixa de CEPs da cidade;
+
+      * cep_final: o término da faixa de CEP da cidade;
+
+      * state: sigla da Unidade Federativa (SP, RJ, MG);
+
+      * state_long: nome da Unidade Federativa (São Paulo, Rio de Janeiro,
+      Minas Gerais);
+
+      * city: nome da cidade;
+
+      * ddd: código DDD (pode estar vazio);
+
+      * lat/lon: coordenadas geográficas da cidade (podem estar vazias).
+
+    Retorna undef quando não foi possível encontrar.
+
+ list()
+
+    Retorna HashRef com os dados de todas as cidades.
+
+SEE ALSO
+
+      * cep2city
+
+      * Business::BR::CEP
+
+      * WWW::Correios::CEP
+
+      * WWW::Correios::PrecoPrazo
+
+      * WWW::Correios::SRO
+
+CONTRIBUTORS
+
+      * Blabos de Blebe <https://metacpan.org/author/BLABOS>
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,33 @@
+0.06    2017-03-05 (PERLANCAR)
+
+	- Add option --max-len.
+
+
+0.05    2016-10-19 (PERLANCAR)
+
+	- Deal with non-ASCII words (try to unaccent word first, then skip if
+          still contains non-ASCII letters).
+
+
+0.04    2016-01-08 (PERLANCAR)
+
+	- Switch from Games::Word::Wordlist::* to WordList::*.
+
+
+0.03    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.02    2014-08-12 (SHARYANTO)
+
+        - POD fixes.
+
+        - Implement --min-len.
+
+
+0.01    2014-08-12 (SHARYANTO)
+
+        - First release.

@@ -1,0 +1,25 @@
+Revision history for Gtk2::Unique
+
+
+0.05 Wed May  5 19:48:14 CEST 2010
+	Minor XS update: the length of a string was computed twice.
+
+
+0.04 Tue Nov  3 22:27:54 CEST 2009
+	The signal Gtk2::UniqueApp::message-received now receives the command name
+	instaed of the command id.
+	The macro UNIQUE_CHECK_VERSION will be fixed in 1.1.0.
+
+
+0.03 Tue Oct 20 20:21:27 CEST 2009
+	Add the version check macros to the bindings.
+	Fix the unit tests (now using the bacon backend).
+	Documentation updates.
+
+
+0.02 Sun Jul 12 16:28:57 CEST 2009
+	More perlish API with send_message_by_name().
+
+
+0.01 Thu Apr  2 15:44:36 CEST 2009
+	First version, released on an unsuspecting world.

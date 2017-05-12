@@ -1,0 +1,44 @@
+GeNUScreen-Config version 0.0.1
+
+GeNUScreen::Config is a perl module that supports the work with
+GeNUScreen firewalls. It allows you to easily compare different versions
+and types of firewall configuration files, identify changes and display
+any aspect of a given configuration as clearly arranged as possible.
+
+There are two types of configuration files used with these firewalls.
+One is exported via the web interface while the other is accessible as
+file 'config.hdf' via secure shell from the firewall. Although both of
+them are fully equvialent on the semantic level they differ
+syntactically. With GeNUScreen::Config you may work with either of the
+files and are able to tell whether they belong to the same
+configuration. If you want to compare two different configurations you
+get the difference in a simple yet unambigous form.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Mathias Weidner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

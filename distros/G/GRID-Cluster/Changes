@@ -1,0 +1,8 @@
+Revision history for Perl extension GRID::Cluster.
+
+0.01  Mon Mar 30 10:06:00 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n GRID::Cluster
+
+0.04	Tue Jan 18 13:06:00 2010
+	- pki.pl script, which improves the setup of the public/private key infrastructure, has been added

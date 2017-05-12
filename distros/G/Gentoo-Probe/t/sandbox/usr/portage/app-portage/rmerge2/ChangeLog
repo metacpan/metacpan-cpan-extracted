@@ -1,0 +1,27 @@
+# ChangeLog for app-portage/rmerge2
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/rmerge2/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  05 May 2004; Bryan Østergaard <kloeri@gentoo.org> rmerge2-0.9.9.ebuild:
+  Stable on alpha.
+
+*rmerge2-0.9.7 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> rmerge2-0.9.7.ebuild,
+  rmerge2-0.9.9.ebuild, files/rmerge2-0.9.7, files/rmerge2-0.9.9:
+  moved from app-admin to app-portage
+
+*rmerge2-0.9.9 (07 May 2003)
+
+  07 May 2003; Martin Holzer <mholzer@gentoo.org> rmerge2-0.9.9.ebuild,
+  files/rmerge2-0.9.9:
+  Version bumped. Submitted by Bardur Arantsson
+  <bardur-gta@odense.kollegienet.dk> in #11495.
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*rmerge2-0.9.7 (31 Oct 2002)
+
+  31 Oct 2002; Karl Trygve Kalleberg <karltk@gentoo.org> rmerge2-0.9.7.ebuild files/digest-rmerge2-0.9.7 files/rmerge2-0.9.7 :
+  Initial import. Ebuild submitted by Bardur Arantsson 
+  <bardur-gta@odense.kollegienet.dk>.

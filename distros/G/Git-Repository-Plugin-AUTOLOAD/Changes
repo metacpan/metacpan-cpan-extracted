@@ -1,0 +1,19 @@
+Revision history for Git-Repository-Plugin-AUTOLOAD
+
+1.003 2016-04-06 BOOK
+    - Use test_requires_git (Test::Requires::Git) instead of has_git (Test::Git)
+    - Replaced t/00-load.t by the Test::Compile dzil plugin
+    - Updated release header lines to follow CPAN::Changes::Spec
+
+1.002 2016-02-02 BOOK
+    - Prevent system/global configs from messing with test expectations
+      (Fix for RT #111645, reported by DBOOK)
+    - Load Config when using %Config
+      (Fix for RT #100806, reported by PPISAR)
+
+1.001 2014-02-23 BOOK
+    - skip t/autoload.t when running against git older than 1.5.0
+
+1.000 2014-01-10 BOOK
+    - Git::Repository can be made to look like the other git wrappers
+      and call unknown methods as git subcommands

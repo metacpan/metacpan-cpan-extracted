@@ -1,0 +1,50 @@
+--- hesiod-3.0.2/Makefile.in	Fri Oct  5 15:43:35 2001
++++ hesiod-3.0.2/Makefile.in	Fri Oct  5 15:47:42 2001
+@@ -21,20 +21,24 @@
+ CFLAGS=@CFLAGS@
+ LDFLAGS=@LDFLAGS@
+ LIBS=@LIBS@
+-ALL_CFLAGS=-I. -DSYSCONFDIR=\"${sysconfdir}\" ${CPPFLAGS} ${CFLAGS}
++ALL_CFLAGS=-I. -DSYSCONFDIR=\"${sysconfdir}\" ${CPPFLAGS} ${CFLAGS} -fPIC
+ OBJS=hesiod.o hesmailhost.o hespwnam.o hesservbyname.o hescompat.o
++SOVERSION=0
+ 
+-all: libhesiod.a hesinfo hestest
++all: libhesiod.a hesinfo hestest libhesiod.so.$(SOVERSION)
++
++libhesiod.so.$(SOVERSION): ${OBJS}
++	$(LD) -G -o $@ -soname=$@ ${OBJS} ${LIBS} -lc
+ 
+ libhesiod.a: ${OBJS}
+ 	ar cru $@ ${OBJS}
+ 	${RANLIB} $@
+ 
+-hesinfo: hesinfo.o libhesiod.a
+-	${CC} ${LDFLAGS} -o $@ hesinfo.o libhesiod.a ${LIBS}
++hesinfo: hesinfo.o libhesiod.so.$(SOVERSION)
++	${CC} ${LDFLAGS} -o $@ hesinfo.o libhesiod.so.$(SOVERSION) ${LIBS}
+ 
+-hestest: hestest.o libhesiod.a
+-	${CC} ${LDFLAGS} -o $@ hestest.o libhesiod.a ${LIBS}
++hestest: hestest.o libhesiod.so.$(SOVERSION)
++	${CC} ${LDFLAGS} -o $@ hestest.o libhesiod.so.$(SOVERSION) ${LIBS}
+ 
+ ${OBJS}: hesiod.h resscan.h
+ 
+@@ -42,6 +46,7 @@
+ 	${CC} -c ${ALL_CFLAGS} $<
+ 
+ check:
++	LD_LIBRARY_PATH="`pwd`":"$(LD_LIBRARY_PATH)" \
+ 	HESIOD_CONFIG=${srcdir}/hesiod.config.sample \
+ 		./hestest ${srcdir}/hestest.conf
+ 
+@@ -55,6 +60,8 @@
+ 	${INSTALL} -c -m 644 libhesiod.a ${DESTDIR}${libdir}
+ 	${RANLIB} ${DESTDIR}${libdir}/libhesiod.a
+ 	chmod u-w ${DESTDIR}${libdir}/libhesiod.a
++	${INSTALL} -c -m 755 libhesiod.so.$(SOVERSION) ${DESTDIR}${libdir}
++	ln -s libhesiod.so.$(SOVERSION) ${DESTDIR}${libdir}/libhesiod.so
+ 	${INSTALL_PROGRAM} -c -m 555 hesinfo ${DESTDIR}${lbindir}
+ 	${INSTALL} -c -m 444 ${srcdir}/hesiod.h ${DESTDIR}${includedir}
+ 	${INSTALL} -c -m 444 ${srcdir}/hesinfo.1 ${DESTDIR}${mandir}/man1

@@ -1,0 +1,15 @@
+<configuration
+><title
+>bob2</title
+><gameLength
+>95</gameLength
+><theArraySize
+>97</theArraySize
+><agentMaxSize
+>67</agentMaxSize
+><players list="predefined"
+><player name="yanick" password="" color="pink"
+ /><player name="bob" password="" color="lightblue"
+ /></players
+></configuration
+>

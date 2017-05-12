@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Encode qw(encode decode);
+use Games::Crossword::Puzzle;
+
+sub xcode { return encode('utf-8', decode('ISO-8859-1', $_[0])) }
+
+my $filename = $ARGV[0];
+my $html_out = $ARGV[1];
+
+my $puzzle = Games::Crossword::Puzzle->from_file($filename);
+
+printf "TITLE : %s\n", xcode( $puzzle->title );
+printf "AUTHOR: %s\n", xcode( $puzzle->author );
+printf "(C)   : %s\n", xcode( $puzzle->copyright || '' );
+printf "NOTE  : %s\n", xcode( $puzzle->note      || '' );
+
+for my $line (@{ $puzzle->{grid} }) {
+  print join q{}, map { $_->value // '.' } @$line;
+  print "    ";
+  print join q{}, map { $_->guess // (defined $_->value ? '-' : '.') } @$line;
+  print "\n";
+}
+
+if ($html_out) {
+  die "bad filename: $html_out" unless $html_out =~ /\.html\z/;
+  open my $output, ">", $html_out or die "couldn't open $html_out: $!";
+
+  print { $output } "<table border=1>";
+
+  for my $line (@{ $puzzle->{grid} }) {
+    print { $output } "<tr>";
+    for my $square (@$line) {
+      my $style = 'height:25px;width:25px';
+
+      if (not defined $square->value) {
+        $style .= ';background-color:black';
+      }
+
+      print { $output } qq{<td style="$style">};
+      print { $output } "<span style='float:left;font-size:x-small;vertical-align:top'>$square->{number}</span>" if $square->{number};
+      print { $output } $square->{value} || '-';
+      print { $output } "</td>";
+    }
+    print { $output } "</tr>\n";
+  }
+
+  print { $output } "</table>";
+
+  print { $output } "<ul>";
+  for (sort { $a <=> $b } keys %{ $puzzle->{number} }) {
+    print { $output } "<li>Across $_: $puzzle->{number}{$_}{across}</li>\n"
+      if $puzzle->{number}{$_}{across};
+  }
+  for (sort { $a <=> $b } keys %{ $puzzle->{number} }) {
+    print { $output } "<li>Down $_: $puzzle->{number}{$_}{down}</li>\n"
+      if $puzzle->{number}{$_}{down};
+  }
+  print { $output } "</ul>";
+}

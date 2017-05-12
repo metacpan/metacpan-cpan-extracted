@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+COPYING
+TODO
+lib/Games/SGF/Tournament.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/functional.t

@@ -1,0 +1,42 @@
+Gpx-Addons-Filter
+
+filter Geo::Gpx-data based on time-boundaries
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Gpx::Addons::Filter
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Gpx-Addons-Filter
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Gpx-Addons-Filter
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Gpx-Addons-Filter
+
+    Search CPAN
+        http://search.cpan.org/dist/Gpx-Addons-Filter/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Ingo LANTSCHNER
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,6 @@
+Changes.txt
+MANIFEST
+Makefile.PL
+lib/Geo/Mercator.pm
+lib/Geo/Mercator.pod
+t/01basic.t

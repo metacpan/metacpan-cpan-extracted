@@ -1,0 +1,56 @@
+very sketchy, how I (unknown who "I" is in this context; it is NOT sjburges@gimp.org) got it running:
+
+- download tml's win32 builds of everything (gtk+2 etc.)
+  http://www.gimp.org/win32
+- download cygwin, including perl5.8
+
+using Glib and Gtk2 from cvs (> 0.9)
+
+tml's libs, pkg-config etc are all unpacked under /gnuwin32. if some dlls
+are not in the bin dir, move them there:
+
+   mv /gnuwin32/lib/*.dll /gnuwin32/bin
+
+my /gnuwin32/bin looks like this:
+
+   asprintf.dll        fttimer.exe                   intl.dll                 miniunz-static.exe  msgunfmt.exe            tiffdither.exe
+   charset.dll         fttry.exe                     libatk-1.0-0.dll         miniunz.exe         msguniq.exe             tiffdump.exe
+   example-static.exe  ftview.exe                    libfontconfig-1.dll      minizip-static.exe  ngettext.exe            tiffinfo.exe
+   example.exe         gdk-pixbuf-csource.exe        libgdk-win32-2.0-0.dll   minizip.exe         pal2rgb.exe             tiffmedian.exe
+   fax2ps.exe          gdk-pixbuf-query-loaders.exe  libgdk_pixbuf-2.0-0.dll  msgattrib.exe       pango-querymodules.exe  tiffset.exe
+   fax2tiff.exe        gettext.exe                   libglib-2.0-0.dll        msgcat.exe          pkg-config.exe          tiffsplit.exe
+   fc-cache.exe        gif2tiff.exe                  libgmodule-2.0-0.dll     msgcmp.exe          ppm2tiff.exe            untgz-static.exe
+   fc-list.exe         glib-genmarshal.exe           libgobject-2.0-0.dll     msgcomm.exe         ras2tiff.exe            untgz.exe
+   freetype-6.dll      glib-gettextize               libgthread-2.0-0.dll     msgconv.exe         rgb2ycbcr.exe           xgettext.exe
+   freetype-config     glib-mkenums                  libgtk-win32-2.0-0.dll   msgen.exe           testnames.exe           xmlparse.dll
+   ftbench.exe         gobject-query.exe             libpango-1.0-0.dll       msgexec.exe         thumbnail.exe           xmltok.dll
+   ftdump.exe          gspawn-win32-helper.exe       libpangoft2-1.0-0.dll    msgfilter.exe       tiff2bw.exe             xmlwf.exe
+   ftlint.exe          gtk-demo.exe                  libpangowin32-1.0-0.dll  msgfmt.exe          tiff2ps.exe             zlib-1.dll
+   ftmemchk.exe        gtk-query-immodules-2.0.exe   libtiff.dll              msggrep.exe         tiff2rgba.exe
+   ftmulti.exe         iconv.dll                     minigzip-static.exe      msginit.exe         tiffcmp.exe
+   ftstring.exe        iconv.exe                     minigzip.exe             msgmerge.exe        tiffcp.exe
+
+(note pkg-config!)
+
+WARNING, THIS IS A BIG UNSUPPORTED HACK (just as windows itself)
+
+    PATH=/gnuwin32/bin:$PATH
+
+    cd Glib
+    perl Makefile.PL
+    make CC="gcc -mms-bitfields" LDLOADLIBS="$(pkg-config gthread-2.0 gmodule-2.0 gobject-2.0 --libs) -lintl"
+    make test
+    make install
+
+    cd Gtk2
+    perl Makefile.PL
+    make CC="gcc -mms-bitfields" LDLOADLIBS="$(pkg-config gthread-2.0 gtk+-2.0 --libs) -lintl -L/usr/lib/perl5/site_perl/5.8.0/cygwin-multi-64int/auto/Glib/ -lGlib"
+    make install
+
+    cd gimp-1.3
+    CC="gcc -mms-bitfields" ./configure --prefix=/gimp
+    make
+    make install
+
+
+

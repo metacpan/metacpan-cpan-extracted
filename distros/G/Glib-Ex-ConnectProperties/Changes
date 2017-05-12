@@ -1,0 +1,83 @@
+Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+
+This file is part of Glib-Ex-ConnectProperties.
+
+Glib-Ex-ConnectProperties is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Glib-Ex-ConnectProperties is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Glib-Ex-ConnectProperties.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 19, September 2012
+    - new Glib::Ex::ConnectProperties::Element
+
+Version 18, August 2012
+    - new textbuffer# empty,not-empty,char-count
+
+Version 17, August 2011
+    - new screen-size# width,height,width-mm,height-mm
+
+Version 16, May 2011
+    - new combobox-active# exists,path,iter,text
+
+Version 15, May 2011
+    - new tree-selection# and iconview-selection# with
+      empty, not-empty, count, selected-path
+
+Version 14, November 2010
+    - new response-sensitive#ID
+
+Version 13, November 2010
+    - new child#prop
+    - new model-rows#empty, #not-empty
+    - new widget#direction, #screen, #has-screen, #state, #toplevel
+
+Version 12, November 2010
+    - new widget-allocation#rectangle
+    - workaround bad value_validate() on non ref counted boxed types
+      like rectangles
+
+Version 11, September 2010
+    - new widget-allocation#width, #height, #x, #y
+
+Version 10, September 2010
+    - new dynamic() connection style
+
+Version 9, August 2010
+    - tests fix to avoid signal ID warnings on Glib 2.4.1
+
+Version 8, August 2010
+    - new element options read_only, write_only, read_signal, and
+      read_signal_return
+
+Version 7, June 2010
+    - new element options func_in, func_out, hash_in, hash_out, bool_not
+
+Version 6, January 2010
+    - test script fix, explain() only in new enough Test::More
+
+Version 5, July 2009
+    - in the tests on Gtk 2.16 need display initialized to create a
+      Gtk2::Entry
+
+Version 4, January 2008
+    - use Glib::ParamSpec values_cmp and value_validate when available
+
+Version 3, August 2008
+    - use get_property() to cope with objects which override plain
+      get(), eg. Gtk2::ListStore
+    - fix disconnect() removing the signal handlers
+
+Version 2, June 2008
+    - fix for t/POSIX.t in perl 5.8
+
+Version 1, May 2008
+    - the first version

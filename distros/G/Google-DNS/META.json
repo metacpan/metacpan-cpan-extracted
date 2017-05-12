@@ -1,0 +1,72 @@
+{
+   "abstract" : "resolve domain name by Google Public DNS",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-DNS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "Getopt::Long" : "2.42",
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Google::DNS" : {
+         "file" : "lib/Google/DNS.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/Google-DNS/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/Google-DNS"
+      },
+      "x_IRC" : {
+         "url" : "irc://chat.freenode.org/#bayadev",
+         "web" : "http://webchat.freenode.net/?channels=%23bayadev"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

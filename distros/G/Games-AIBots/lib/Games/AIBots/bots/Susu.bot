@@ -1,0 +1,47 @@
+$name   = 'susu';
+$author = 'ME littli';
+
+require 'Drones.bm';
+
+sub main {
+    enable shield;
+    scan front;
+
+    if (&found('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+        redo;
+    }
+   elsif (&found('flag')){
+      if ($life == $max_life){
+        move backward;
+        fire energy;
+    }
+    call fetch;
+    redo;
+   }
+
+   elsif (&bumped('wall')) {
+                attempt destruct;
+   }
+
+   elsif (&found('enemy')){
+             move backward if (&nearst('enemy') <= 2);
+         disable shield;
+         fire grenade;
+         enable shield;
+         turn right;
+         move forward;
+      if (&nearst('enemy') >= 3 and $ammo >= 10){
+         fire bazooka;
+         enable shield;
+         redo;
+          }
+   }
+   else {
+         move forward*3;
+         turn right;
+   }
+   redo;
+}

@@ -1,0 +1,12 @@
+Revision history for GitInsight
+
+0.06  2014-11-03 20:00:57 CET
+
+	- Fixing POD
+
+0.05  2014-11-03 19:51:41 CET
+
+	- updated META, added git repo
+
+0.04  2014-11-03 18:27:35 CET
+	- Added accuracy computation

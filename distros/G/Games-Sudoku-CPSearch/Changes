@@ -1,0 +1,36 @@
+Revision history for Games-Sudoku-CPSearch
+
+1.00    2010-09-14
+            documentation fix
+
+0.99    2010-09-13
+            new() accepts file input
+
+0.14    2008-06-10
+            saner initialisation
+
+0.13    2008-05-30
+            added underscores to the name of the internal sub-routines
+
+0.12    2008-05-09
+            added build prerequisites to Build.PL
+
+0.11    2008-04-27
+            added build prerequisite for List::MoreUtils
+
+0.09    2008-04-01
+            added verify() method (changed empty puzzle test)
+            require perl 5.10
+
+0.08    2008-03-31
+            empty puzzle problem: puzzle is now undef upon new()
+
+0.07    2008-03-31
+            cleaned up of new() method
+
+0.06    2008-03-31
+            initialization is through the set_puzzle method, not new()
+
+0.05    2008-03-30
+            better documentation, minor changes to the solve function,
+            more robust input checking

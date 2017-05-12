@@ -1,0 +1,9 @@
+Revision history for Graph-Subgraph
+
+0.02    Sun Oct 7 2012
+        * API: added list form: $G->subgraph(qw(foo bar))
+        * TST: improved test suite
+
+0.01    Sat Mar 10 2012
+        First version, released on an unsuspecting world.
+

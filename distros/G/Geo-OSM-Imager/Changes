@@ -1,0 +1,10 @@
+Revision history for Perl extension Geo-OSM-Imager
+
+0.03 2017-05-05T17:47:19Z
+
+    - add dependency on LWP::UserAgent
+
+0.02 2017-05-04T10:55:46Z
+
+    - original version
+

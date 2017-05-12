@@ -1,0 +1,19 @@
+ChangeLog
+README
+MANIFEST
+Makefile.PL
+lib/GSM/Gnokii.pm
+lib/GSM/Gnokii/Tk/GSMTree.pm
+Gnokii.xs
+perlobject.map
+typemap
+ppport.h
+t/00_pod.t
+t/01_pod.t
+t/10_all.t
+xt/00_perlversion.t
+examples/backup
+examples/dirtree
+examples/kgnokii-sms
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

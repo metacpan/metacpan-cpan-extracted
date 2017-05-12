@@ -1,0 +1,17 @@
+This package tries to implement the rules of the game affenspiel.
+
+Please see http://www.artsoft.org/affenspiel/ for the original game.
+
+I tried to solve it and failed, so I decided to do it programmatically.
+
+You may run scripts from bin/ directory, they show the usage on --help.
+If you don't see pseudographics, try to run mc (Midnight Commander) first,
+I am sorry about this. Or use -C (--dumb-chars) option.
+
+Only an automatical game play is done, it is not hard to add an interactive
+game for one player, but you may better try the original instead.
+
+File doc/affenspiel-solution-best.txt contains what I believe is the best
+solution (at least "bin/affenspiel-solve -a" says so after a deep thought).
+
+If you have any questions, "man Games::Affenspiel" or mail migo@cpan.org.

@@ -1,0 +1,94 @@
+Revision history for Perl extension Getopt::Simple.
+
+0.01  Thu Aug 12 10:00:00 1999
+	- original version; created by h2xs 1.18
+
+0.02  Fri Aug 13 07:30:00 1999
+	- corrected algorithm so that it produces predictable results
+
+0.03  Thu Jan 20 10:15:00 2000
+	- created a distribution with documentation and less
+	  obfuscated code.
+	- released code for peer review
+
+0.04  Thu Jan 24 16:30:00 2000
+	- Added README
+	- Changed name from Getopt::Simple to Getopt::Simpler to 
+	  avoid namesapce collisionn
+	- Added $verbose for debugging.
+
+0.05  Mon Feb 07 02:30:00 2000
+	- Changed name from Getopt::Simpler to Getopt::Casual because
+	  casual implies the module wears sunglasses at night.
+	- Fixed "unitialized variable" warning when @ARGV ends in two 
+	  scalars that begin with '-'
+	- Changed test.pl to t/1_check_args.t
+
+0.06  Tue Feb 08 04:55:00 2000
+        - Added import method for setting defaults.  The import method
+	  works just like @ARGV, instead with the format 
+
+	    use Getopt::Casual qw/ -a 33 -b 21 -c /;
+
+0.07  Tue Feb 08 09:05:00 2000
+	- Added subroutine casual() instead of repeating code.
+	- Added documentation for import().
+	- Fixed pod2html errors by escaping '-' with C<->.
+        - Changed shebang line to #!/usr/bin/perl
+	- Added 2_check_import.t
+	- Added Copying (GPL v2)
+	- Added TODO
+        - Added benchmark.pl for kicks
+
+0.08  Mon Mar 20 09:00:00 2000
+	- Removed benchmark.pl
+	- rewrote the entire casual subroutine to handle most of the
+	  common kinds of argument passing
+	- Fixed make test errors (caused by an unitialized variable 
+	  see $dash in the code for more)
+	- Added -w and use strict; to example.pl
+	- Added comments to the code to explain what the code does
+	- Fixed all of the documentation to reflect what Casual.pm
+	  really does now
+
+0.09  Mon Apr 11 13:42:00 2000
+        - Changed the &casual( @ARGV ) to be called from within the
+	  import() function, since it is called magically anyways.
+	  This allows people to override defaults that may have been
+	  set on the use Getopt::Casual line.
+	- Discovered a bug when the value of an argument is set to 0.
+	  If that argument is seen again, then it will overwrite the 0
+	  because it is depending on ||=.  Have not fixed this yet.
+
+0.10  Wed May 10 16:49:00 2000 
+        - Was a bad boy and did not update the changes file.
+
+0.11  Mon Sep 11 10:04:00 2000
+        - Fixed above bug when value is set to 0.
+        - Fixed error that wouldn't allow the module to compile under
+          perl 5.005_03.
+        - Discovered Makefile is not actually making a Getopt::Casual.3
+	  manpage.
+
+0.12  Fri Jan 01 03:30:30 2001
+        - Added Copying to MANIFEST.
+
+0.13  Fri May 10 08:58:45 2002
+        - Finally begun working on fixing outstanding bugs and requests
+          again.  I had unfortunately lost a copy of the most recent
+          unreleased version.  Thanks to a bug, it was sent back to me
+          though.  :-)
+        - Removed Copying from MANIFEST, as the GPL v2 is contained
+          within the README.  If you need help copying man cp.
+        - The clean_argv subroutine would infinitely loop if the
+          the arguments contained "-a -b".  This was fixed at the
+          expense of some ugly code.  (see line 161)
+0.13.1	Fri May  9 11:53:35 EDT 2003	(by ahicox)
+	- fixed for MakeMaker:
+		- removed .pl suffix from example.pl so that it won't
+		  be picked up by MakeMaker
+		- moved Casual.pm out of 'Getopt' subdirectory, so that
+		  it WILL be picked up by MakeMaker
+		- modified MANIFEST to reflect changes
+		- modified this document
+		- incremented $VERSION in Casual.pm

@@ -1,0 +1,23 @@
+---
+name: Geo-IATA
+version: 0.0.3
+author:
+  - 'Joerg Meltzer <joerg <at> joergmeltzer.de>'
+abstract: 'Search airports by iata, icao codes'
+license: perl
+resources:
+  license: ~
+requires:
+  DBD::SQLite: 0
+  DBI: 0
+  Sub::Install: 0
+  Test::More: 0
+  version: 0
+provides:
+  Geo::IATA:
+    file: lib/Geo/IATA.pm
+    version: 0.0.3
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

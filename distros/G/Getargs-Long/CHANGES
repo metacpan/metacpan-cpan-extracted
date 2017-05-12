@@ -1,0 +1,93 @@
+Version 1.1007: Mon Apr 20 2015
+- Clarify licensing terms
+- Move verbose testing to a private module, and implement it in a way that
+  doesn't require editing the Makefile after it is generated.
+
+Version 1.1006: Sun Apr 12 2015
+- Enable verbose testing for CPAN-testers
+- Consolidate issue tracking at rt.cpan.org
+
+Version 1.1005: Mon Mar 23 2015
+- Minor update to developer notes
+- Re-uploading. 1.1004 didn't work due to some permissions issues that have
+  been resolved.
+
+Version 1.1004: Sun Mar 22 2015
+- Moved code to github
+- Added POD test
+- Fixed goofy licensing. (Thanks to Colin Watson <cjwatson@debian.org> for the
+  heads up.)
+
+Version 1.1003: Tue Jul 15 2008
+- Updated to the latest version of Module::Install
+- Removed auto-install for better compatibility with CPAN and others
+- Moved hosting to Google Code
+
+Version 1.1002 : Tues Nov 6 2007
+- Dual-licensed the code under the GPL and Artistic licenses. (By the request
+  of Brandon Forehand <b4hand@users.sourceforge.net>.) Raphael Manfredi agreed
+  over email to changing the license on his code.
+
+Version 1.1001 : Mon Jun 6 2005
+- Fixed incorrect comments in Long.pm and test cases
+
+Version 1.1000: Tue Dec 21 2004
+- Fixed version numbers, which were incompatible with some modules. (Thanks to
+  Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de> for the bug
+  report)
+- Removed custom installation prompt.
+- Cleaned up documentation a bit.
+
+Version 1.0.1: Thu Sep 16 2004
+- Added missing inc/ dependency
+- Switched to Test::More for better test reporting
+
+Version 1.0.0: Wed Sep 15 2004
+- David Coppit <david@coppit.org> is the new maintainer.
+- License changed to GPL
+- Changed Makefile.PL to use Module::Install
+- Version numbering changed
+- Added a check for the perl version number
+
+Tue Mar 20 11:37:54 MET 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+	Version 0.1.3.
+
+	Changed interface of all getargs() routines.  This change is
+	NOT backward compatible, but this is the privilege of still
+	being at the alpha stage...  Previous calls were made as:
+
+	    getargs(\@_, ...)
+
+	and must now be written as:
+
+	    getargs (@_, ...)
+
+	with an implicit reference being taken, via Perl prototyping.
+
+	Added mention of similar module Params::Validate.  His author
+	contacted me to mention it, and apparently we independently
+	invented the same thing, albeit with slight different goals
+	and interfaces.
+
+	Added warning about interface change during the run of
+	Makefile.PL if a previous incompatible version is detected.
+
+	Updated all getargs() calls to new interface in the regression
+	test suite.
+
+Thu Mar 15 01:14:21 MET 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+	Added warning when using perl 5.6.0.  Don't use that version
+	of Perl.  Either use 5.005_03, or try 5.6.1.
+
+Fri Mar  2 19:00:00 MET 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+	Forgot to include t/code.pl in distribution
+

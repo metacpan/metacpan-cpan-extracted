@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Git/Repository/Plugin/Hooks.pm
+minil.toml
+t/00_compile.t
+t/install_hook.t
+META.yml
+MANIFEST

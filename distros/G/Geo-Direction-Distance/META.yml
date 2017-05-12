@@ -1,0 +1,23 @@
+---
+name: Geo-Direction-Distance
+version: 0.0.2
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: 'Process between Lat-Lng coordinates and direction - distance'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Math::Trig: 0
+  Test::More: 0
+  version: 0
+build_requires:
+  Test::Base: 0
+provides:
+  Geo::Direction::Distance:
+    file: lib/Geo/Direction/Distance.pm
+    version: 0.0.2
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,96 @@
+Revision history for Perl extension Getopt::Compact::WithCmd
+
+0.22 2014-01-16T14:09:28Z
+      [New Features]
+        - Added show_completion() and completion() method (hirose31++)
+
+0.21  Tue Nov  6 03:00:38 2012
+      [Bug Fixed]
+        - Fixed an issue that when specify a default value with Bool type, the arguments is shifted.
+
+0.20  Mon Mar 26 00:04:33 2012
+      [Bug Fixed]
+        - If the option takes an argument same as sub-command was not works.
+
+0.19  Thu Nov 17 01:29:56 2011
+      [New Features]
+        - Added new_from_string() method
+        - Support type constraints
+
+0.18  Tue Oct 25 18:55:42 2011
+      [Bug Fixed]
+        - Fixed a problme that \@argv hadn't been destroyed on new_from_array() (mandy++)
+
+0.17  Tue Jun 28 22:58:27 2011
+      [Changed]
+        - Changed global_struct default behavior
+
+0.16  Wed May 11 00:52:59 2011
+      [Bug Fixed]
+        - Fixed required and $dest problem
+
+0.15  Sun May  1 21:28:02 2011
+      [Other]
+        - Fixed docs. (No code changes)
+
+0.14  Sun May  1 21:10:22 2011
+      [New Features]
+        - Supported hash style options
+        - added column option type, required and default value for usage
+
+0.13  Sat Jan 22 20:28:32 2011
+      [New Features]
+        - first help command became can be given more than one args
+        - wrote commands() into document
+
+0.12  Tue Jan 18 01:46:55 2011
+      [Bug Fixed]
+        - Fixed help command problem (reported by bayashi++)
+
+0.11  Sun Nov 21 16:10:32 2010
+      [New Features]
+        - Implemented new_from_array() (idea from gfx)
+        - Supported $go->usage($command) (idea from tokuhirom)
+
+0.10  Thu Oct 14 02:06:58 2010
+      [Bug Fixed]
+        - Fixed help command issue
+
+0.09  Thu Oct 14 01:32:30 2010
+      [Bug Fixed]
+        - Fixed a problem check_requires did not work
+
+0.08  Thu Oct 14 01:14:15 2010
+      [Bug Fixed]
+        - Fixed usage message
+
+0.07  Thu Oct 14 00:30:52 2010
+      [Bug Fixes]
+        - Suppress error message if set help option
+
+0.06  Mon Oct 11 17:25:39 2010
+      [New Features]
+        - command_struct support nesting
+
+0.05  Sun Oct 10 20:54:34 2010
+      [Bug Fixes]
+        - Supported any specs (=s%, =s@ and etc)
+        - $dest can now be specified in coderef
+
+0.04  Wed Oct  6 02:13:27 2010
+      [Other]
+        - Getopt:: Compact compatible (if we have not defined command_struct)
+
+0.03  Tue Sep 28 23:26:44 2010
+      [Bug Fixes]
+        - Getopt::Long 2.38 or later
+
+      [Other]
+        - Loads faster
+
+0.02  Sun Sep 26 15:09:58 2010
+      [Bug Fixes]
+        - maybe fixed fail test problem
+
+0.01  Sun Sep 12 04:55:02 2010
+        - original version

@@ -1,0 +1,42 @@
+Games::PMM - Paper Maché Monsters README
+----------------------------------------
+
+version 0.10 - Sat Nov 29 21:15:22 UTC 2003
+
+Paper Maché Monsters is a game of wind-up monster fighting.  Monsters battle
+each other in an arena.  Monsters run through individual command lists to
+govern their behavior.
+
+The last standing (or least damaged) monster wins.
+
+INSTALLATION
+------------
+
+As per a normal Perl module, installation is simple.  You must have
+Module::Build installed first, however:
+
+	$ perl Build.PL
+	$ ./Build
+	$ ./Build test
+	$ ./Build install
+
+USAGE
+-----
+
+See the documentation of Games::PMM for detailed instructions.  If you've
+installed this distribution, use:
+
+	$ perldoc Games::PMM
+
+Otherwise, use the following invocation (with the path changed appropriately
+for your platform):
+
+	$ perldoc lib/Games/PMM.pm
+
+COPYRIGHT
+---------
+
+Copyright (c) 2003, chromatic (chromatic@wgz.org).
+
+This distribution is licensed under the same terms as Perl itself.  Share and
+enjoy.

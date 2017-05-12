@@ -1,0 +1,34 @@
+This package was debianized by Gürkan Sengün <gurkan@phys.ethz.ch> on
+Tue, 31 Jul 2007 09:18:56 +0200.
+
+It was downloaded from http://gnu.ethz.ch/linuks.mine.nu/atari/
+                       http://hea-www.harvard.edu/~fine/Tech/x11fonts.html
+
+Upstream Authors:
+
+    Tom Fine <fine@head.cfa.harvard.edu>
+    Gürkan Sengün <gurkan@phys.ethz.ch>
+
+Copyright: 
+
+    Copyright (C) 1999 Thomas A. Fine
+    Copyright (C) 2007 Gürkan Sengün
+
+License:
+
+    Theses fonts are available for free, to use as you please.
+    The minimal license is included in the header of each font.
+
+    License to copy, modify, and distribute for both commercial and
+    non-commercial use is herby granted, provided this notice
+    is preserved.
+
+    Produced with bdfedit, a tcl/tk font editing program
+    written by Thomas A. Fine
+
+    The Atari.sfd is a fontforge native font created by Gurkan Sengun.
+    Released under the same license as the original font, and extended
+    with the latin1 charset.
+
+The Debian packaging is (C) 2007, Gürkan Sengün <gurkan@phys.ethz.ch> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.

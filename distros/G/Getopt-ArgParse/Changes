@@ -1,0 +1,43 @@
+Revision history for Getopt-ArgParse
+
+1.0.6     2015-05-02 20:12:44 
+        - Added new functionality to print_usage #8
+        - Merged the pull request from apinco@github (https://github.com/mytram/perl-argparse/pull/8 for the above change
+
+1.0.5     2015-03-06 21:46:00
+        - Added new line in die to surpress developmental text (RT#102491)
+        - Started using the terms: postional arguments vs. named
+          arguments in replacement of "optional" arguments (RT#102497)
+        - Updated to output argument help texts in required and
+          optional sections for positional arguments and named
+          arguments
+        - Merged apinco@github for suggesting the above change
+        - Merged rbonthond@github's pull (#5) for help text
+          consistency improvement
+
+1.0.4     2014-11-24 15:48:43 
+        - Added artistic 2 license (issue#2)
+	    - Worked around what seemed to be a corrupted stack issue,
+          which caused "Bizarre copy of HASH in list assignment at
+          Carp" to be thrown (issue#3)
+        - Updated error messages to be more consisten with
+          Getopt::Long (issue#3)
+
+1.0.3     2013-10-28 07:41:38 
+        - Added module dependency Test::Exception in Makefile
+	    - Fixed a typo in perldoc
+
+1.0.2     2013-10-04 14:27:23 
+        - The same release as 1.0.2 as uploading 1.0.1 to CPAN before
+          by mistake
+
+1.0.1     2013-10-04 14:08:32 
+        - Added add_arg and add_args aliases to add_argument and
+          add_arguments, respectively, based on feedback on prepan
+        - Fixed the unknown option error for current_command if not
+          parsing for subcommands
+        - Updates to conform to CPAN conventions
+        - Perldoc improvement
+
+1.0.0     2013-09-26
+        - Initial Release

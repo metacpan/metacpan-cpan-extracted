@@ -1,0 +1,5 @@
+MD5 d80daec431bd383e452e69f1f82dbff5 files/digest-smrsh-8.12.10 69
+MD5 91f9d000e7a1e50ef639134d209f592f files/site.config.m4 478
+MD5 4ca356d94b41521a9de29ba81d8326f5 ChangeLog 745
+MD5 5721b86fd871bdfab77231abc6e02f68 metadata.xml 161
+MD5 d74b70289138a8341281a56108ff37aa smrsh-8.12.10.ebuild 1126

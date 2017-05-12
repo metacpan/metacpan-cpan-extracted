@@ -1,0 +1,18 @@
+.travis.yml
+Build.PL
+Changes
+lib/Gravatar/URL.pm
+lib/Libravatar/URL.pm
+lib/Unicornify/URL.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/deprecated.t
+t/error.t
+t/id.t
+t/libravatar.t
+t/unicornify.t
+t/url.t
+LICENSE

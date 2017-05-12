@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Geo/Formatter.pm
+lib/Geo/Formatter/CalcurateDMS.pm
+lib/Geo/Formatter/Format/Degree.pm
+lib/Geo/Formatter/Format/DMS.pm
+lib/Geo/Formatter/FormatBase.pm
+lib/Geo/Formatter/FormatBase/Double.pm
+lib/Geo/Formatter/FormatBase/Single.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/01.ll2deg.t
+t/02.deg2ll.t
+t/03.ll2dms.t
+t/04.dms2ll.t
+t/05.alias.t

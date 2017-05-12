@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Games-Roguelike-Caves.t
+lib/Games/Roguelike/Caves.pm
+demo.pl
+META.yml                                 Module meta-data (added by MakeMaker)

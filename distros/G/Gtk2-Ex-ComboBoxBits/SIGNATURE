@@ -1,0 +1,78 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 79486cc3bd19ed01fd95bb4ca33939de6fd363ab Changes
+SHA1 74383029b3ee51207d78b13ce05c8531d2352d13 MANIFEST
+SHA1 d6f9595a0ae02220d6781c9460782ae32c0d4aaf MANIFEST.SKIP
+SHA1 208e1d2ebdf74757a220c3634b67f2cb426879c0 META.yml
+SHA1 f7335d105a221fd7a78b9d2bff2add3b176e4621 Makefile.PL
+SHA1 9cc6e2dae5d004a73dddbe238447c5125f9fa756 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 63539a14af9a31581ec3d399a5ec1a412d788136 debian/control
+SHA1 a115f6ab8e6b490c2ab243a595e6ace6de672ee1 debian/copyright
+SHA1 85f28ce6d58e45775ee87430e0118760cce0d454 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 12a6576f2d7f5727007fcd8820a9ef146fe591be debian/watch
+SHA1 f50a3bb4c9418500f629d7add5e699d2c9d77aaf devel/Makefile
+SHA1 93a7d808c3697fb9e80762cfbaf30628d8faaa97 devel/bits.pl
+SHA1 471040fd34f1c48e9a6f1030940a59641db7df17 devel/builder-activetext.pl
+SHA1 e84a1b1049cb81e0dab6e34af1d870c1ef4dccf3 devel/enum-leak.pl
+SHA1 579afdf951d1945a2a99a5163554be1ca77220ff devel/enum.pl
+SHA1 19cecdbaaecb39c382f19af0a2c076505cfa97e8 devel/menu-enum.pl
+SHA1 b07bd56c3381821db25e49017bb0c6d92c37be17 devel/pixbuf.pl
+SHA1 c2ab0c94143258856dd8758084b923fbf08b1359 devel/tool-enum.pl
+SHA1 5bb0ec7c5368682b09191a47c8707123a88d1e8c devel/toolbutton-overflow-leak.c
+SHA1 700fd67ed34034f99607eae27f32f8e90e8901f1 devel/toolbutton-overflow-leak.pl
+SHA1 f866b99f6db06943bf0071747da4eda50254393e examples/text-builder.pl
+SHA1 f3f0ee887cfc665485b71b709a7c57d423324593 examples/tool-enum-builder.pl
+SHA1 7aa92b5074cf12916763acbfc1c440575679a07e inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 265d7747cb841b5aa822b552c33c6835c98c084b lib/Gtk2/Ex/ComboBox/Enum.pm
+SHA1 3952a94435e9529b5ddb86b7cedefda5b14ac802 lib/Gtk2/Ex/ComboBox/PixbufType.pm
+SHA1 f50531babce896fa4582239b0f62a52bc49ce118 lib/Gtk2/Ex/ComboBox/Text.pm
+SHA1 942eadd15bcd0891b58b93ad90f484adb5ab64f9 lib/Gtk2/Ex/ComboBoxBits.pm
+SHA1 4f06b672ccbd6fd0e3bfbbebc3ac53f3bab4792d lib/Gtk2/Ex/Menu/EnumRadio.pm
+SHA1 049835f4c76948d9a16bdf03d4da3ce8646cc225 lib/Gtk2/Ex/Menu/EnumRadio/Item.pm
+SHA1 cda7f3de06f5a88ab6741b1a2b9ed69d3a312c2a lib/Gtk2/Ex/ToolItem/ComboEnum.pm
+SHA1 7a9d7b217111159ef57e07e4a729333bed5763e6 t/ComboBoxBits-import.t
+SHA1 b225b40d1f88c173c58a9ee106608263d006c2f2 t/ComboBoxBits-load.t
+SHA1 b2859671b75af55dcba8329fc26aff19abc2e846 t/ComboBoxBits.t
+SHA1 7512277482173bbc6ca7f4c7c1db39bcdea0111f t/Enum-display.t
+SHA1 ae0f4fc34a80a2e5294733be4b1df3dd410eeb5a t/Enum-weaken.t
+SHA1 72090c5c7ca071ecbb6da7a59a6ff4ecb906f819 t/Enum.t
+SHA1 f0621c32b583c36ad6ec4d716d0a6b6d0c20a8c2 t/Menu-EnumRadio.t
+SHA1 4dc04c5401c223a0beedf001b5d8fb71afbdabfd t/MyTestHelpers.pm
+SHA1 d756372ca936b60869b75647b4f68054ec5e4e5b t/PixbufType-weaken.t
+SHA1 2f27811b3f7444859423249e0879032f3021f555 t/PixbufType.t
+SHA1 1a0dee3ed339f3c1d681f29e7c32e8e218159b4d t/Test/Weaken/ExtraBits.pm
+SHA1 e7ee85a7fc5a83e51bb3b470259ed22ad90cd382 t/Text-display.t
+SHA1 b82cd3332164503637d5332b201076b2a0325dc5 t/ToolItem-EnumCombo-weaken.t
+SHA1 47a7fec8936064f33a883a1022b2bf63d7b2a31c t/ToolItem-EnumCombo.t
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 219395eb91b03829e6f14db4ebd57d88ea972e61 xt/0-Test-ConsistentVersion.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
+SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
+SHA1 439687ac1489fcb62c3cf200fedf9ebf210e7bf7 xt/0-no-debug-left-on.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFN1bB/LFMCIV9q3ToRAsJQAKCRpchcIAg01vgoIzyHngTK+LWohQCaAlEe
+HIudlB3MVqUr3VQHlPE026I=
+=xOuO
+-----END PGP SIGNATURE-----

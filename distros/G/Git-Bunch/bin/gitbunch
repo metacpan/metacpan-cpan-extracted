@@ -1,0 +1,819 @@
+#!perl
+
+our $DATE = '2016-12-20'; # DATE
+our $VERSION = '0.60'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+# workaround for current bug
+$ENV{LOG} //= 1;
+
+Perinci::CmdLine::Any->new(
+    url => '/Git/Bunch/',
+    subcommands => {
+        ls     => { url => '/Git/Bunch/list_bunch_contents' },
+        check  => { url => '/Git/Bunch/check_bunch'  },
+        sync   => { url => '/Git/Bunch/sync_bunch'   },
+        exec   => { url => '/Git/Bunch/exec_bunch'   },
+    },
+    log => 1,
+)->run;
+
+1;
+# ABSTRACT: Manage gitbunch directory (directory which contain git repos)
+# PODNAME: gitbunch
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gitbunch - Manage gitbunch directory (directory which contain git repos)
+
+=head1 VERSION
+
+This document describes version 0.60 of gitbunch (from Perl distribution Git-Bunch), released on 2016-12-20.
+
+=head1 SYNOPSIS
+
+To check the status of bunch (will do a 'git status' for each git repo inside
+the bunch and report which repos are 'unclean', e.g. needs commit, has untracked
+files, etc):
+
+ % gitbunch check ~/repos
+
+To synchronize bunch to another (will do a 'git pull/push' for each git repo,
+and do an rsync for everything else):
+
+ % gitbunch sync ~/repos /mnt/laptop/repos
+
+=head1 DESCRIPTION
+
+A I<gitbunch> or I<bunch> directory is just a term I coined to refer to a
+directory which contains, well, a bunch of git repositories. It can also contain
+other stuffs like files and non-git repositories (but they must be dot-dirs).
+Example:
+
+ repos/            -> a gitbunch dir
+   proj1/          -> a git repo
+   proj2/          -> ditto
+   perl-Git-Bunch/ -> ditto
+   ...
+   .videos/        -> a non-git dir
+   README.txt      -> file
+
+If you organize your data as a bunch, you can easily check the status of your
+repositories and synchronize your data between two locations, e.g. your
+computer's harddisk and an external/USB harddisk.
+
+A little bit of history: after I<git> got popular, in 2008 I started using it for
+software projects, replacing Subversion and Bazaar. Soon, I moved everything*)
+to git repositories: notes & writings, Emacs .org agenda files, configuration,
+even temporary downloads/browser-saved HTML files. I put the repositories inside
+I<$HOME/repos> and add symlinks to various places for conveniences. Thus, the
+I<$HOME/repos> became the first bunch directory.
+
+*) everything except large media files (e.g. recorded videos) which I put in
+dot-dirs inside the bunch.
+
+See also L<rsybak>, which I wrote to backup everything else.
+
+=head1 SUBCOMMANDS
+
+=head2 B<check>
+
+Check status of git repositories inside gitbunch directory.
+
+Will perform a 'git status' for each git repositories inside the bunch and
+report which repositories are clean/unclean.
+
+Will die if can't chdir into bunch or git repository.
+
+
+=head2 B<exec>
+
+Execute a command for each repo in the bunch.
+
+For each git repository in the bunch, will chdir to it and execute specified
+command.
+
+
+=head2 B<ls>
+
+List contents inside gitbunch directory.
+
+Will list each repo or non-repo dir/file.
+
+
+=head2 B<sync>
+
+Synchronize bunch to another bunch.
+
+For each git repository in the bunch, will perform a 'git pull/push' for each
+branch. If repository in destination doesn't exist, it will be rsync-ed first
+from source. When 'git pull' fails, will exit to let you fix the problem
+manually.
+
+For all other non-repo file/directory, will simply synchronize by one-way rsync.
+But, for added safety, will first check the newest mtime (mtime of the newest
+file or subdirectory) between source and target is checked first. If target
+contains the newer newest mtime, rsync-ing for that non-repo file/dir will be
+aborted. Note: you can use C<--skip-mtime-check> option to skip this check.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Set log level to debug (note: you also need to set LOG=1 to enable logging, or use DEBUG=1).
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level (note: you also need to set LOG=1 to enable logging).
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--quiet>
+
+Set log level to quiet (note: you also need to set LOG=1 to enable logging, or use QUIET=1).
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Set log level to trace (note: you also need to set LOG=1 to enable logging, or use TRACE=1).
+
+=item B<--verbose>
+
+Set log level to info (note: you also need to set LOG=1 to enable logging, or use VERBOSE=1).
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand check
+
+=over
+
+=item B<--exclude-files>
+
+Exclude files from processing.
+
+This only applies to `sync_bunch` operations. Operations like `check_bunch` and
+`exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-non-git-dirs>
+
+Exclude non-git dirs from processing.
+
+This only applies to and `sync_bunch` operations. Operations like `check_bunch`
+and `exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-repos-json>=I<s>
+
+Exclude some repos from processing (JSON-encoded).
+
+See C<--exclude-repos>.
+
+=item B<--exclude-repos-pat>=I<s>
+
+Specify regex pattern of repos to exclude.
+
+=item B<--exclude-repos>=I<s@>
+
+Exclude some repos from processing.
+
+Can be specified multiple times.
+
+=item B<--include-files>
+
+Alias for --no-exclude-files.
+
+See C<--exclude-files>.
+
+=item B<--include-non-git-dirs>
+
+Alias for --no-exclude-non-git-dirs.
+
+See C<--exclude-non-git-dirs>.
+
+=item B<--include-repos-json>=I<s>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed (JSON-encoded).
+
+See C<--include-repos>.
+
+=item B<--include-repos-pat>=I<s>
+
+Specify regex pattern of repos to include.
+
+=item B<--include-repos>=I<s@>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed.
+
+Can be specified multiple times.
+
+=item B<--min-repo-access-time>=I<s>
+
+Limit to repos that are accessed (mtime, committed, status-ed, pushed) recently.
+
+This can significantly reduce the time to process the bunch if you are only
+interested in recent repos (which is most of the time unless you are doing a
+full check/sync).
+
+
+=item B<--repo>=I<s>
+
+Only process a single repo.
+
+=item B<--source>=I<s>*
+
+Directory to check.
+
+=back
+
+=head2 Options for subcommand exec
+
+=over
+
+=item B<--command>=I<s>*
+
+Command to execute.
+
+=item B<--exclude-files>
+
+Exclude files from processing.
+
+This only applies to `sync_bunch` operations. Operations like `check_bunch` and
+`exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-non-git-dirs>
+
+Exclude non-git dirs from processing.
+
+This only applies to and `sync_bunch` operations. Operations like `check_bunch`
+and `exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-repos-json>=I<s>
+
+Exclude some repos from processing (JSON-encoded).
+
+See C<--exclude-repos>.
+
+=item B<--exclude-repos-pat>=I<s>
+
+Specify regex pattern of repos to exclude.
+
+=item B<--exclude-repos>=I<s@>
+
+Exclude some repos from processing.
+
+Can be specified multiple times.
+
+=item B<--include-files>
+
+Alias for --no-exclude-files.
+
+See C<--exclude-files>.
+
+=item B<--include-non-git-dirs>
+
+Alias for --no-exclude-non-git-dirs.
+
+See C<--exclude-non-git-dirs>.
+
+=item B<--include-repos-json>=I<s>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed (JSON-encoded).
+
+See C<--include-repos>.
+
+=item B<--include-repos-pat>=I<s>
+
+Specify regex pattern of repos to include.
+
+=item B<--include-repos>=I<s@>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed.
+
+Can be specified multiple times.
+
+=item B<--min-repo-access-time>=I<s>
+
+Limit to repos that are accessed (mtime, committed, status-ed, pushed) recently.
+
+This can significantly reduce the time to process the bunch if you are only
+interested in recent repos (which is most of the time unless you are doing a
+full check/sync).
+
+
+=item B<--repo>=I<s>
+
+Only process a single repo.
+
+=item B<--source>=I<s>*
+
+Directory to check.
+
+=back
+
+=head2 Options for subcommand ls
+
+=over
+
+=item B<--detail>, B<-l>
+
+Show detailed record for each entry instead of just its name.
+
+=item B<--exclude-files>
+
+Exclude files from processing.
+
+This only applies to `sync_bunch` operations. Operations like `check_bunch` and
+`exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-non-git-dirs>
+
+Exclude non-git dirs from processing.
+
+This only applies to and `sync_bunch` operations. Operations like `check_bunch`
+and `exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-repos-json>=I<s>
+
+Exclude some repos from processing (JSON-encoded).
+
+See C<--exclude-repos>.
+
+=item B<--exclude-repos-pat>=I<s>
+
+Specify regex pattern of repos to exclude.
+
+=item B<--exclude-repos>=I<s@>
+
+Exclude some repos from processing.
+
+Can be specified multiple times.
+
+=item B<--include-files>
+
+Alias for --no-exclude-files.
+
+See C<--exclude-files>.
+
+=item B<--include-non-git-dirs>
+
+Alias for --no-exclude-non-git-dirs.
+
+See C<--exclude-non-git-dirs>.
+
+=item B<--include-repos-json>=I<s>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed (JSON-encoded).
+
+See C<--include-repos>.
+
+=item B<--include-repos-pat>=I<s>
+
+Specify regex pattern of repos to include.
+
+=item B<--include-repos>=I<s@>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed.
+
+Can be specified multiple times.
+
+=item B<--min-repo-access-time>=I<s>
+
+Limit to repos that are accessed (mtime, committed, status-ed, pushed) recently.
+
+This can significantly reduce the time to process the bunch if you are only
+interested in recent repos (which is most of the time unless you are doing a
+full check/sync).
+
+
+=item B<--repo>=I<s>
+
+Only process a single repo.
+
+=item B<--sort>=I<s>
+
+Order entries.
+
+Valid values:
+
+ ["name","-name","mtime","-mtime","commit_time","-commit_time","status_time","-status_time","pull_time","-pull_time"]
+
+=item B<--source>=I<s>*
+
+Directory to check.
+
+=back
+
+=head2 Options for subcommand sync
+
+=over
+
+=item B<--backup>
+
+Whether doing backup to target.
+
+This setting lets you express that you want to perform synchronizing to a backup
+target, and that you do not do work on the target. Thus, you do not care about
+uncommitted or untracked files/dirs in the target repos (might happen if you
+also do periodic copying of repos to backup using cp/rsync). When this setting
+is turned on, the function will first do a `git clean -f -d` (to delete
+untracked files/dirs) and then `git checkout .` (to discard all uncommitted
+changes). This setting will also implicitly turn on `create_bare` setting
+(unless that setting has been explicitly enabled/disabled).
+
+
+=item B<--create-bare-target>, B<--use-bare>
+
+Whether to create bare git repo when target does not exist.
+
+When target repo does not exist, gitbunch can either copy the source repo using
+`rsync` (the default, if this setting is undefined), or it can create target
+repo with `git init --bare` (if this setting is set to 1), or it can create
+target repo with `git init` (if this setting is set to 0).
+
+Bare git repositories contain only contents of the .git folder inside the
+directory and no working copies of your source files.
+
+Creating bare repos are apt for backup purposes since they are more
+space-efficient.
+
+Non-repos will still be copied/rsync-ed.
+
+
+=item B<--delete-branch>
+
+Whether to delete branches in dest repos not existing in source repos.
+
+=item B<--exclude-files>
+
+Exclude files from processing.
+
+This only applies to `sync_bunch` operations. Operations like `check_bunch` and
+`exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-non-git-dirs>
+
+Exclude non-git dirs from processing.
+
+This only applies to and `sync_bunch` operations. Operations like `check_bunch`
+and `exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-repos-json>=I<s>
+
+Exclude some repos from processing (JSON-encoded).
+
+See C<--exclude-repos>.
+
+=item B<--exclude-repos-pat>=I<s>
+
+Specify regex pattern of repos to exclude.
+
+=item B<--exclude-repos>=I<s@>
+
+Exclude some repos from processing.
+
+Can be specified multiple times.
+
+=item B<--include-files>
+
+Alias for --no-exclude-files.
+
+See C<--exclude-files>.
+
+=item B<--include-non-git-dirs>
+
+Alias for --no-exclude-non-git-dirs.
+
+See C<--exclude-non-git-dirs>.
+
+=item B<--include-repos-json>=I<s>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed (JSON-encoded).
+
+See C<--include-repos>.
+
+=item B<--include-repos-pat>=I<s>
+
+Specify regex pattern of repos to include.
+
+=item B<--include-repos>=I<s@>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed.
+
+Can be specified multiple times.
+
+=item B<--min-repo-access-time>=I<s>
+
+Limit to repos that are accessed (mtime, committed, status-ed, pushed) recently.
+
+This can significantly reduce the time to process the bunch if you are only
+interested in recent repos (which is most of the time unless you are doing a
+full check/sync).
+
+
+=item B<--repo>=I<s>
+
+Only process a single repo.
+
+=item B<--rsync-del>
+
+Whether to use --del rsync option.
+
+When rsync-ing non-repos, by default `--del` option is not used for more safety
+because rsync is a one-way action. To add rsync `--del` option, enable this
+
+
+=item B<--rsync-opt-maintain-ownership>
+
+Whether or not, when rsync-ing from source, we use -a (= -rlptgoD) or -rlptD (-a minus -go).
+
+Sometimes using -a results in failure to preserve permission modes on
+sshfs-mounted filesystem, while -rlptD succeeds, so by default we don't maintain
+ownership. If you need to maintain ownership (e.g. you run as root and the repos
+are not owned by root), turn this option on.
+
+
+=item B<--skip-mtime-check>
+
+Whether or not, when rsync-ing non-repos, we check mtime first.
+
+By default when we rsync a non-repo file/dir from source to target and both
+exist, to protect wrong direction of sync-ing we find the newest mtime in source
+or dir (if dir, then the dir is recursively traversed to find the file/subdir
+with the newest mtime). If target contains the newer mtime, the sync for that
+non-repo file/dir is aborted. If you want to force the rsync anyway, use this
+option.
+
+
+=item B<--source>=I<s>*
+
+Directory to check.
+
+=item B<--target>=I<s>*
+
+Destination bunch.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C gitbunch gitbunch
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete gitbunch 'p/*/`gitbunch`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/gitbunch.conf>, F<~/gitbunch.conf>, or F</etc/gitbunch.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand 'check'
+
+ exclude_files (see --exclude-files)
+ exclude_non_git_dirs (see --exclude-non-git-dirs)
+ exclude_repos (see --exclude-repos)
+ exclude_repos_pat (see --exclude-repos-pat)
+ include_repos (see --include-repos)
+ include_repos_pat (see --include-repos-pat)
+ min_repo_access_time (see --min-repo-access-time)
+ repo (see --repo)
+ source (see --source)
+
+=head2 Configuration for subcommand 'exec'
+
+ command (see --command)
+ exclude_files (see --exclude-files)
+ exclude_non_git_dirs (see --exclude-non-git-dirs)
+ exclude_repos (see --exclude-repos)
+ exclude_repos_pat (see --exclude-repos-pat)
+ include_repos (see --include-repos)
+ include_repos_pat (see --include-repos-pat)
+ min_repo_access_time (see --min-repo-access-time)
+ repo (see --repo)
+ source (see --source)
+
+=head2 Configuration for subcommand 'ls'
+
+ detail (see --detail)
+ exclude_files (see --exclude-files)
+ exclude_non_git_dirs (see --exclude-non-git-dirs)
+ exclude_repos (see --exclude-repos)
+ exclude_repos_pat (see --exclude-repos-pat)
+ include_repos (see --include-repos)
+ include_repos_pat (see --include-repos-pat)
+ min_repo_access_time (see --min-repo-access-time)
+ repo (see --repo)
+ sort (see --sort)
+ source (see --source)
+
+=head2 Configuration for subcommand 'sync'
+
+ backup (see --backup)
+ create_bare_target (see --create-bare-target)
+ delete_branch (see --delete-branch)
+ exclude_files (see --exclude-files)
+ exclude_non_git_dirs (see --exclude-non-git-dirs)
+ exclude_repos (see --exclude-repos)
+ exclude_repos_pat (see --exclude-repos-pat)
+ include_repos (see --include-repos)
+ include_repos_pat (see --include-repos-pat)
+ min_repo_access_time (see --min-repo-access-time)
+ repo (see --repo)
+ rsync_del (see --rsync-del)
+ rsync_opt_maintain_ownership (see --rsync-opt-maintain-ownership)
+ skip_mtime_check (see --skip-mtime-check)
+ source (see --source)
+ target (see --target)
+
+=head1 ENVIRONMENT
+
+=head2 GITBUNCH_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/gitbunch.conf
+
+~/gitbunch.conf
+
+/etc/gitbunch.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Git-Bunch>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Git-Bunch>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Bunch>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<rsybak>.
+
+L<http://joeyh.name/code/mr/>. You probably want to use this instead. I<mr> supports other control version
+software aside from git, doesn't restrict you to put all your repos in one
+directory, supports more operations, and has been developed since 2007. Had I
+known about I<mr>, I probably wouldn't have started gitbunch. On the other hand,
+gitbunch is simpler (I think), doesn't require any config file, and can
+copy/sync files/directories not under source control. I mainly use gitbunch to
+quickly: 1) check whether there are any of my repositories which have
+uncommitted changes; 2) synchronize (pull/push) to other locations. I put all my
+data in one big gitbunch directory; I find it simpler. gitbunch works for me and
+I use it daily.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

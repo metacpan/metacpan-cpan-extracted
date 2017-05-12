@@ -1,0 +1,33 @@
+Gearman client, task and worker implementation for perl
+
+Gearman::Client - Client for gearman distributed job system
+Gearman::Task - a task in Gearman, from the point of view of a client
+Gearman::Worker - Worker for gearman distributed job system
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Log::Log4perl::Appender::Elasticsearch
+    perldoc Log::Log4perl::Appender::Elasticsearch::Bulk
+
+    perldoc Gearman::Client
+    perldoc Gearman::Task
+    perldoc Gearman::Worker
+
+LICENSE AND COPYRIGHT
+
+Copyright 2006-2007 Six Apart, Ltd.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

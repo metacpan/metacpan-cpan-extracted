@@ -1,0 +1,104 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  $drawable->become('Gimp::Layer');
+  $image->undo_group_start;
+  Gimp::Context->push();
+  $drawable->add_alpha unless $drawable->has_alpha;
+  Gimp::Context->set_foreground('white');
+  Gimp::Context->set_background('black');
+  $image->selection_all;
+  # Now the fun begins :)
+  $drawable->pixelize($blocksize);
+  my $shadowlayer = $drawable->copy(FALSE);
+  $image->insert_layer($shadowlayer,0,0);
+  my $checkmask = $shadowlayer->create_mask(ADD_WHITE_MASK);
+  $shadowlayer->add_mask($checkmask);
+  $image->checkerboard($checkmask, 0, $blocksize);
+
+  my $frontlayer = $shadowlayer->copy(0);
+  $image->insert_layer($frontlayer,0,0);
+  Gimp::Context->set_background([0,0,0]);
+  $shadowlayer->fill(BACKGROUND_FILL);
+  $checkmask->gauss_iir(0.3*$blocksize, 1, 1);
+  $checkmask->offset (1, 0, 0.2*$blocksize, 0.2*$blocksize);
+
+  my $gridlayer = $image->layer_new($image->width, $image->height, RGBA_IMAGE, "Grid 1", 100, 0);
+  $image->insert_layer($gridlayer,0,0);
+  $image->selection_all;
+  $gridlayer->edit_clear;
+  Gimp::Context->set_background([255,255,255]);
+  $gridlayer->edit_fill(BACKGROUND_FILL);
+  $gridlayer->grid((1, $blocksize, 0, [0,0,0], 255) x 3);
+
+  $gridlayer->set_mode(3);
+  # Clean up stuff
+  Gimp::Context->pop;
+  $image->selection_none;
+  $image->undo_group_end;
+  return;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+xach_shadows - Xach's Shadows o' Fun
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Map/Xach Shadows...
+
+=head1 DESCRIPTION
+
+Screen of 50% of your drawing into a dropshadowed layer.
+
+=head1 PARAMETERS
+
+  [PF_SLIDER, "blocksize", "Size of blocks", 10, [4, 255, 1]],
+
+=head1 IMAGE TYPES
+
+RGB*, GRAY*
+
+=head1 HISTORY
+
+  [Xach] start off with an image, then pixelize it
+  [Xach] then add alpha->add layer mask                                   [20:21]
+  [Xach] render a checkerboard into the layer mask
+  [Xach] duplicate the image. fill the original with black, then blur the layer
+             mask (i used 30% of pixelize size) and offset it by some value (i
+             chose 20% of the pixelize size)
+  [Xach] duplicate the duplicate, remove the layer mask, move it below everything
+  [Xach] then add a new white layer on top, set the mode to multiply, and render
+             a grid into it at pixelize size
+  [Xach] that's a bit roundabout, but it's also in the xcf
+
+Because the way xach does it is a bit awkward, I'm switching it around a bit
+and working from the bottom up..
+
+  Revision 1.1: Marc Lehman <pcg@goof.com> added undo capability
+  Revision 1.2: Marc Lehman <pcg@goof.com>, changed function name
+  Revision 1.3: Seth Burgess <sjburges@gimp.org>, changed location and
+                  added my email address
+  Revision 1.4: Seth Burgess <sjburges@gimp.org> removed deprecated stuff
+
+=head1 AUTHOR
+
+Seth Burgess
+
+=head1 DATE
+
+2-15-98
+
+=head1 LICENSE
+
+Seth Burgess <sjburges@gimp.org>
+
+Distributed under the same terms as Gimp-Perl.

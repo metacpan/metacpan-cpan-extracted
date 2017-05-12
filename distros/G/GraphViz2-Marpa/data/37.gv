@@ -1,0 +1,9 @@
+digraph graph_37
+{
+# Bash-style comment.
+	node_37_1
+	[
+		color = red
+		fontcolor = green
+	];
+}

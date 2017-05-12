@@ -1,0 +1,16 @@
+TYPEMAP
+projPJ	O_OBJECT
+
+OUTPUT
+O_OBJECT
+    sv_setref_pv( $arg, "Geo::Proj4", (void*)$var );
+
+INPUT
+O_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+	$var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+	/* original version had a line break here that broke the code. */
+	warn( \"${Package}::$func_name() - $var is not a blessed reference\" );
+	XSRETURN_UNDEF;
+    }

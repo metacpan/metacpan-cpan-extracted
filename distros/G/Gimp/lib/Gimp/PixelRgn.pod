@@ -1,0 +1,215 @@
+=head1 NAME
+
+Gimp::PixelRgn - Operate on raw pixels in powerful, efficient way.
+
+=head1 SYNOPSIS
+
+  use Gimp;
+  use PDL; # to do sensible things with the pixels
+  my $i = Gimp::Image->new(10,10,RGB);
+  my $l = $i->layer_new(10,10,RGBA_IMAGE,"new layer",100,VALUE_MODE);
+  $i->insert_layer($l,0,0);
+  my $gd = $l->get;
+  my $region = $gd->pixel_rgn(0,0,10,10,0,0);
+  my $piddle = $region->get_pixel($x,$y);
+  print $piddle."\n"; # stringified piddle is readable
+
+=head1 DESCRIPTION
+
+Perl interface to GIMP's low-level pixel-access functions. In
+Gimp-Perl (mirroring how GIMP does it), to access these functions you must
+get a C<Gimp::GimpDrawable> from a C<Gimp::Drawable>. You can then
+get either a C<Gimp::Tile> or C<Gimp::PixelRgn> object, and work with
+that. Since the tile interface is very low-level, it is not further
+documented here. The C<Gimp::PixelRgn> methods take and return L<PDL>
+objects to handle the data, with a few exceptions.
+
+=head1 COLOURS
+
+It is B<vital> to note that while GIMP uses the C<GimpRGB> format
+(each colour a floating point number from 0 to 1.0) to pass colours
+around as parameters, the pixel functions all work on bytes, integers
+with values from 0 to 255. Depending on the type of layer/image colour
+mode (e.g. RGB vs indexed), the meaning of the integers' values may
+also vary.
+
+=head1 Gimp::GimpDrawable
+
+In GIMP, drawables (also known as PARAM_DRAWABLE or Gimp::Drawable)
+are things you can draw on: layers or channels.  While in GIMP most
+functions named C<gimp_drawable_something> operate on C<drawable_ID>s,
+some functions (notably the ones operating on raw pixel data!) need a
+C<GimpDrawable> instead. In Gimp-Perl, this distinction is made explicit
+in that every function that operates on a C<GimpDrawable> is no longer
+called C<gimp_drawable_something> but C<gimp_gdrawable_something>.
+
+Every drawable has a corresponding C<GimpDrawable>, you can get it with
+the C<gimp_drawable_get> function:
+
+  my $gdrawable = $drawable->get;
+
+When the C<$gdrawable> is destroyed, it is automatically flushed &
+detached, so you don't need to do this yourself. Do not call this method
+more than once; each time it is called, GIMP makes a new internal list
+of tiles, which will cause mayhem if done more than once.
+
+=head1 Gimp::PixelRgn
+
+GIMP's C<PixelRgn>s are rectangular parts of a drawable. You can access
+single pixels, rows, columns and rectangles within these regions.
+
+To create a pixel region, you first get a GimpDrawable structure as
+above. Then you can create a C<Gimp::PixelRgn> structure:
+
+  $region = $gdrawable->pixel_rgn(0,0,50,30,0,0); # read-only
+  $region = $gdrawable->pixel_rgn(0,0,50,30,1,1); # read-write
+  $region = $gdrawable->pixel_rgn(0,0,50,30,1,0); # means undo won't work!
+
+The last two parameters are respectively C<dirty> and C<shadow>.
+Be warned that if you set C<shadow> to be true, the "shadow" tile(s)
+start out as all-zero. If you only set some, e.g. with C<set_pixel>,
+then once you have called C<$drawable-E<gt>merge_shadow($undo)>, nearly
+all the drawable's contents will be zeros.
+
+The main "use case" for this functionality is to have a read-only "source"
+region, and a writable "destination" region:
+
+  $gdrawable = $drawable->get;
+  $src = $gdrawable->pixel_rgn(0,0,50,30,0,0); # read-only
+  $dst = $gdrawable->pixel_rgn(0,0,50,30,1,1); # read-write
+  my ($x,$y,$w,$h)=($dst->x,$dst->y,$dst->w,$dst->h);
+  my $pdl = $src->get_rect($x,$y,$w,$h);
+  $pdl += 7; # trivial operation
+  $dst->set_rect($pdl, $x, $y);
+  $drawable->merge_shadow(1);
+
+However, it B<is> possible to use dirty=1, shadow=0; see the "setpixel"
+example below. The GIMP API document says that it "could prevent the
+Undo-System from working as expected".
+
+The following functions return pixel data in L<PDL> objects:
+
+  $piddle = $region->get_pixel(45,60); # return the pixel at (45|60)
+  $piddle = $region->get_row(45,60,10); # return ten horizontal pixels
+  $piddle = $region->get_col(45,60,10); # same but vertically
+  $piddle = $region->get_rect(45,60,10,12); # a 10x12 rectangle
+
+And the corresponding set-functions:
+
+  $region->set_pixel($piddle,45,60);	# set pixel at (45|60)
+  $region->set_row($piddle,45,60);	# set a row
+  $region->set_col($piddle,45,60);	# set a column
+  $region->set_rect($piddle,45,60);	# set a whole rectangle
+
+Please note that (unlike the C functions they call), the size arguments
+(width and/or height) are omitted; they are calculated from the piddle.
+
+The dimensions of the piddle are, for a rectangle (due to how GIMP stores
+the data):
+
+  ($bytesperpixel, $width, $height) = $r->get_rect($l->bounds)->dims;
+
+For a row or column:
+
+  ($bytesperpixel, $width) = $r->get_row(0, 0, $width)->dims;
+  ($bytesperpixel, $height) = $r->get_col(0, 0, $height)->dims;
+
+=head1 EXAMPLES
+
+Functions demonstrating getting and setting the colour of a pixel on an
+RGB layer:
+
+  use PDL;
+  sub setpixel {
+    my ($i, $l, $x, $y, $colour) = @_;
+    my @bounds = $l->bounds;
+    my $region = $l->get->pixel_rgn(@bounds,1,0); # warning! see above
+    my $piddle = pdl [ @{$colour}[0..2] ]; # remove any alpha
+    $piddle *= 255; # so it's bytes, not floats
+    $region->set_pixel($piddle, $x, $y);
+    $l->update(@bounds);
+  }
+
+  sub getpixel {
+    my ($i, $l, $x, $y) = @_;
+    my $region = $l->get->pixel_rgn($l->bounds,0,0);
+    my $piddle = $region->get_pixel($x,$y);
+    return unpdl $piddle;
+  }
+
+=head2 ITERATORS
+
+GIMP uses "tiles" as a way of breaking drawables into smaller
+chunks. This allows a potentially very large image to be process in
+manageable pieces. To use this, GIMP (and therefore Gimp-Perl) provides
+an "iterator" functionality to process each part of the image. This is
+best explained with a simple working example:
+
+  sub iterate {
+    my ($i, $l, $inc) = @_;
+    my @bounds = $l->bounds;
+    {
+      # in block so $src/$dst go out of scope before merge
+      my $src = Gimp::PixelRgn->new($l,@bounds,0,0);
+      my $dst = Gimp::PixelRgn->new($l,@bounds,1,1);
+      my $iter = Gimp->pixel_rgns_register($dst);
+      do {
+	my ($x,$y,$w,$h)=($dst->x,$dst->y,$dst->w,$dst->h);
+	my $pdl = $src->get_rect($x,$y,$w,$h);
+	$pdl += $inc;
+	$dst->data($pdl);
+      } while (Gimp->pixel_rgns_process($iter));
+    }
+    $l->merge_shadow(1);
+    $l->update(@bounds);
+  }
+
+The key points are:
+
+=over 2
+
+=item Iterator registration and processing
+
+Done respectively with C<$iter = Gimp-E<gt>pixel_rgns_register($dst)>
+and C<do { ... } while (Gimp-E<gt>pixel_rgns_process($iter))>.
+
+=item Block scope
+
+The source and destination C<Gimp::PixelRgn>s are in a block so
+their lexical variables go out of scope at the end, and therefore the
+objects get destroyed, and they get flushed and detached.
+
+=item Merge shadow tiles
+
+Once the operation is complete and the shadow tiles have all been set with
+the right data, C<$drawable-E<gt>merge_shadow($undo)> is called. C<$undo>
+is a boolean telling GIMP "whether to add an undo step for the operation".
+
+=item data method only valid for iterators
+
+The C<$region-E<gt>data> method is only valid for use within an iterator.
+
+=back
+
+=head1 NON-PDL METHODS
+
+These functions take/return not PDL objects, but Perl scalars:
+
+  gimp_gdrawable_get_tile2
+  gimp_pixel_rgn_get_col2
+  gimp_pixel_rgn_get_rect2
+  gimp_pixel_rgn_set_rect2
+  gimp_pixel_rgn_get_row2
+
+=head1 AUTHOR
+
+Ed J, based on C<Gimp::Pixel.pod> by Marc Lehmann <pcg@goof.com>
+
+=head1 SEE ALSO
+
+perl(1), Gimp(1), L<PDL>.
+
+These GIMP API docs are also relevant:
+
+L<http://developer.gimp.org/api/2.0/libgimp/libgimp-gimppixelrgn.html>
+L<http://developer.gimp.org/api/2.0/libgimp/libgimp-gimpdrawable.html>

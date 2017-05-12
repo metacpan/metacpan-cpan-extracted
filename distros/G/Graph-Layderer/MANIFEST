@@ -1,0 +1,14 @@
+Changes
+CREDITS
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+eg/trivial.pl
+eg/weight.pl
+lib/Graph/Layouter.pm
+lib/Graph/Layouter/Spring.pm
+lib/Graph/Renderer.pm
+lib/Graph/Renderer/Imager.pm
+t/00bootstrap.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,76 @@
+=== ChangeLog discontinued ===
+
+	With the move to git, we stop maintaining a separate ChangeLog and
+	rely on proper commit messages instead.
+
+2008-03-16  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Interfaces.pm
+	* Makefile.PL
+	* NEWS
+	* README: Version 0.04.
+
+2008-01-19  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/GstXOverlay.t: Fix test failure.
+
+2007-11-04  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Require Glib 1.170 for the configure_requires
+	stuff.
+
+2007-10-19  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Use a more compatible way to indicate which perl
+	version we require.  Use Glib::MakeHelper's new configure_requires
+	stuff to announce our Makefile.PL-time dependencies.
+
+	* Interfaces.pm: Fix mistakes in the synopsis.  (Found by James
+	Bromberger)
+
+2006-10-03	kaffeetisch
+
+	* Interfaces.pm: Fix POD errors.
+
+2006-07-07	kaffeetisch
+
+	* Interfaces.pm, NEWS, copyright.pod: Version 0.03.
+
+2006-07-07	kaffeetisch
+
+	* Interfaces.pm: Fix a doc glitch.
+
+	* t/GstPropertyProbe.t: Fix a potential failure.
+
+2006-01-29	kaffeetisch
+
+	* Makefile.PL: Require GStreamer 0.06.
+
+	* Interfaces.pm: Document GStreamer::XOverlay.
+
+	* Interfaces.pm, MANIFEST, NEWS: Version 0.02.
+
+2006-01-24	kaffeetisch
+
+	* Makefile.PL: Require Glib 1.103 and gstreamer-plugins-base-0.10
+	>= 0.10.0.
+
+	* gstinterfacesperl.h, maps, t/GstXOverlay, xs/GstXOverlay.xs: Add
+	bindings for GstXOverlay.
+
+	* t/GstPropertyProbe.t: Use alsamixer instead of osssink.  Remove
+	now unneeded SKIP block.
+
+	* xs/GstPropertyProbe.xs: Remove manual gperl_set_isa call; Glib
+	1.103 handles that for us.
+
+2005-10-06	kaffeetisch
+
+	* NEWS, README: Version 0.01.
+
+2005-09-28	kaffeetisch
+
+	* .cvsignore, ChangeLog, Interfaces.pm, LICENSE, MANIFEST,
+	MANIFEST.SKIP, Makefile.PL, NEWS, README, copyright.pod,
+	gstinterfacesperl.h, maps, t/GstPropertyProbe.t, xs/.cvsignore,
+	xs/GstInterfaces.xs, xs/GstPropertyProbe.xs: Initial import.

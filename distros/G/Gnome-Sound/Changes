@@ -1,0 +1,9 @@
+Revision history for Perl extension Gnome::Sound.
+
+0.01  Thu Feb 21 23:12:25 2002
+	- original version; created by h2xs 1.21 with options
+		-O -n Gnome::Sound /usr/include/gnome-1.0/libgnome/gnome-sound.h
+
+0.02
+	- made Makefile.PL more robust (gnome-config)
+	- Added a list of dependancies to the README

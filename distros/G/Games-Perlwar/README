@@ -1,0 +1,36 @@
+Games::Perlwar version 0.03
+===========
+
+===== INSTALLATION
+
+To install this module type the following:
+
+   perl ./Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+   or, if you are old-school,
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+===== WEB ENVIROMENT
+
+To run PerlWar's web environment, you'll need an Apache 
+server and the following modules:
+
+    * AxKit
+    * XML::XPathScript
+    * Embperl
+
+Copy the directory 'web' included in the distribution as 'perlwar' 
+at the document root of Apache. E.g.:
+
+    cp -R web /home/web/htdocs/perlwar
+
+Games must be created as sub-directories of this directory. Don't
+forget to change the permission of the game directories so that
+they are writable by the Apache user. 

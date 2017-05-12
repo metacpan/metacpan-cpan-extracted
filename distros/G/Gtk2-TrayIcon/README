@@ -1,0 +1,16 @@
+README for Gtk2::TrayIcon
+
+This module allows a Perl developer to embed an arbitrary widget in a
+System Tray like the Gnome notification area.
+
+It requires the Gtk2 modules to be installed, but includes the code for
+libeggtray which it wraps.
+
+Install as allways.
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+

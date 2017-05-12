@@ -1,0 +1,53 @@
+/*! \page gtk2_ex_geo Gtk2::Ex::Geo
+
+\section index_geg_intro Gtk2::Ex::Geo modules
+
+The Gtk2::Ex::Geo modules provide a plaform for developing geospatial
+applications. The idea is to provide a canvas for geospatial data,
+a set of dialogs, and glue code.
+
+The tools build the abstract geospatial data layer defined by the
+Geo::Layer module.
+
+\section index_geg_glue Gtk2::Ex::Geo::Glue
+
+A glue object manages the GUI. The dialog boxes of the registered
+layer classes can be obtained from it. It maintains an overlay.
+
+\section index_cli The CLI in an entry
+
+The entry widget that is managed by a glue object is used for getting
+commands from the user. The glue object maintains a history of the
+objects. Old commands can be browsed with the arrow up and arrow down
+keys. The user command is givent to Perl's eval function.
+
+1) the variable names are inspected and found layer names are replaced
+with pointers to real layers
+
+2) keyword "focal:" in the beginning of an entry is removed and all
+references to layers are replaced with clipped versions
+
+3) commands p, plot, and inspect are recognized without explicit
+reference to the Gtk2::Ex::Geo::Glue package
+
+\section index_geg_dialogs Gtk2::Ex::Geo::Layer
+
+The root class of all layer classes.
+
+Layer classes should be registered with the glue object. The
+registration information comprises a dialogs object (an instance of
+DialogMaster or its subclass), and class methods it offers (typically
+a subset of 'new', 'open', 'save', etc.).
+
+\section index_geg_overlay Gtk2::Ex::Geo::Overlay
+
+An overlay is a widget, subclassed from Gtk2::ScrolledWindow. An
+overlay contains a list of layers, which it renders on a canvas, which
+it puts into its window.
+
+Rubberbanding and keyboard zoom-in (with + key), zoom-out (with -
+key), and panning (with arrow keys) is built-in.
+
+\section index_geg_dialogs Gtk2::Ex::Geo::Dialogs
+
+*/	

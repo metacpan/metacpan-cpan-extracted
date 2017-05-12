@@ -1,0 +1,39 @@
+strict digraph graph_06
+{
+	label = "Complex Syntax Test"
+
+	node[shape = "house"]
+	edge[color = "purple"]
+
+	{
+		rank = "same"
+
+		node[fillcolor = "goldenrod" shape = "circle" style = "filled"]
+		node[fillcolor = "turquoise4"]
+
+		{
+			node[fillcolor = "darkorchid" shape = "pentagon"]
+
+		}
+
+	}
+	node[fillcolor = "lightblue" fontsize = "20" style = "filled"]
+
+	subgraph cluster_outer
+	{
+		label = "Outer"
+
+		H -> I
+		subgraph cluster_inner
+		{
+			label = "Inner"
+
+			node[fillcolor = "magenta" fontsize = "26" shape = "triangle"]
+			edge[color = "blue"]
+
+		}
+
+	}
+	graph[rankdir = "TB"]
+
+}

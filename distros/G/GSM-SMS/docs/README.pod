@@ -1,0 +1,218 @@
+=pod
+
+=head1 NAME
+
+GSM::SMS - Perl Modules For Smart Messaging
+
+=head1 INTRODUCTION
+
+This set of modules allows you to send and receive SMS messages. Besides text 
+messages you can also use Smart Messages, also known as ringing tones, 
+groupgraphics, vcards etc...
+
+Out of the box, it comes with a serial transport and a transport for Novelsoft,
+a HTTP based SMSC (http://www.sms-wap.com ). To use the serial transport you 
+will need a GSM modem, like the wavecom WMOD2B ( http://www.wavecom.com ). If 
+you want to receive SMS messages, the serial solution is the only one for the 
+moment. 
+
+Some mobile phones (e.g. Nokie 6110) will install a custom serial friver for 
+you on the Windows platform.  Please follow the guidelines for your GSM support 
+software.
+
+You can do the same on linux using the AT command emaulator from the gnokii
+project (L<gnokii.org> when using these special phones.
+
+More generic options are the M20 from Siemens and the A1 or A2 from Falcom.
+
+A good start is to read the docs for L<GSM::SMS::NBS>. This class is a facade
+for the rest of the package and provides easy to use methods.
+
+(Upcoming) When using EMS, you can use the L>GSM::SMS::EMS> package.
+
+For the moment the package comes with support for the following Smart Messaging 
+formats:
+
+=over 4
+
+=item ring tones (RTTTL)
+
+=item Caller Line Identification logos
+
+=item Operator logos
+
+=item VCard
+
+=item OTA Configuration for WAP phones
+
+=item PictureMessage
+
+=back
+
+More are on their way, as is support for EMS. 
+
+=head1 NEW IN THIS RELEASE
+
+=over 4
+
+=item Win32 support
+
+=item Flash SMS support
+
+=item Refactored directory structure layout
+
+=item More docs
+
+=item Better error reporting
+
+=item Configuration wizard update
+
+=back
+
+Look in the 'Changes' file for a complete review and credits.
+
+=head1 PREREQUISITES
+
+Following packages are mandatory
+
+=over 4
+
+=item Data::Dumper
+
+=item MIME::Base64
+
+=item Image::Magick
+
+=item LWP
+
+=item Device::SerialPort or Win32::SerialPort
+
+=item Log::Agent
+
+=back
+
+B<Note:> Device::SerialPort and Win32::SerialPort are only necessary when using serial transport. 
+
+=head1 INSTALL
+
+It *should* be a simple:
+
+	perl Makefile.PL
+	make
+	make install
+
+When you want to use the default values for installing, you can set
+PERL_MM_USE_DEFAULT to true before running perl Makefile.PL. This can
+be of interest when installing GSM::SMS from a script.
+
+=head1 CONFIGURATION
+
+This package needs configuration, period. When you're installing the package
+on a Windows machine then you'll need to type double back slashes when providing
+a path, e.g. for the log directory:
+
+  c:\\gsmsms\\log
+
+You have three options to configure the package:
+
+=over 4
+
+=item On installation
+
+Running C<perl Makefile.PL> will invoke the configuration wizard.
+
+=item After installation
+
+You can always run the configuration wizard again by the following command
+
+  perl -MGSM::SMS::Config -esetup
+
+=item When instantiating GSM::SMS::NBS (or GSM::SMS::EMS)
+
+You can provide a configuration file to the constructor. This configuration
+file can be generated from the default configuration (created by previous config
+methods) by running the next command
+
+  perl -MGSM::SMS::Config -egenerate_config
+
+=back
+
+=head1 SERIAL TRANSPORT
+
+To use the serial transport, you'll need to have either Device::SerialPort or
+Win32::SerialPort installed.
+
+A problem that can arise when using the serial transport is the setting of the 
+service center address. If this happens, or if you want to set this manually, 
+use the following command(s) in your favourite comms program. I use minicom ...
+(Win32 users can use I<terminal>).
+
+	>minicom -s
+	AT+CPIN?
+		Check for pincode
+	AT+CPIN="nnnn"
+		Set pincode. Important ... only 3 tries!!!
+	AT+CSCA?
+		Check for service center address
+	AT+CSCA="+32475161616"
+		Set service center address. ( This one is for proximus belgium ).
+
+=head1 EXAMPLES
+
+Look in the examples directory, this should get you started.
+The most complex one is the smartmessagingserver, allowing you to request a
+rttl or groupgraphic by sending an sms message. The slashdot example allows
+you to receive the latest slashdot headlines in a SMS message. The ideas are
+ofcourse endless. 
+
+=head1 Win32 Specific issues
+
+Sometimes I need to open up a terminal program to connect to the modem
+manually. If I don't do that, Perl cannot connect to the serial port. I only
+need to do that one time, when I boot up the system. Afterwards, everything
+works fine.
+
+You probably will get warnings when running the test suite. These do not
+originate from GSM::SMS, but from Image::Magick. They are harmless I guess, as
+I did not see apatch from ActiveState yet.
+
+=head1 BUGS
+
+Probably a lot. I hope I get a lot of feedback so we can figure the bugs out 
+and start fixing them!
+
+=head1 AUTHOR
+
+Johan Van den Brande <johan@vandenbrande.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999-2002 Johan Van den Brande
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+=head1 DISCLAIMER
+
+NO WARRANTY
+
+BECAUSE THE SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
+TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU.  SHOULD THE
+SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
+REPAIR OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
+OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED
+TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
+YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER
+SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.

@@ -1,0 +1,64 @@
+Revision history for Perl extension GD-Graph3d.
+
+See individual files for file-specific changes.
+
+0.61  16.Oct.2002
+	- Added support for h_bars (or rotate_graph) (Chia-liang Kao)
+	- Added a new cynlider.pm bar style (Chia-liang Kao)
+0.60  Dec 07 2001
+	- Fixed another bug with x_tick_number rendering - off by one tick.
+	  Sent patch to MVERB for same bug in GD::Graph::axestype.pm
+0.59  Dec 05 2001
+	- Fixed bug with x_tick_number
+0.58  Dec 05 2001
+	- Added visual tests and note in Makefile.PL
+	- Built test suite in t/
+0.57  Nov 08 2001
+	- Rebuilt with h2xs 1.20 with options
+		-v 0.57 -X -n GD::Graph3d
+0.56 Aug 10 2001
+	- Added lengend support to pie charts
+0.55 Oct 09 2000
+	- Allowed box_clr without box axis
+0.54 Sep 05 2000
+	- Fixed a bug in MANIFEST
+0.53 Sep 04 2000
+	- Added ability to render box_clr without box_axis
+	- Added a small segment to 'one point' line graphs
+0.52 Aug 29 2000
+	- Reorganized distribution to pacify CPAN. No change to code.
+0.51 Aug 23 2000
+	- Fixed bug in shading with cycle_clrs on
+	- Fixed bug in shading on lines of positive or negative slope
+0.50 Aug 19-21 2000
+	- Sent patch to MVERB for pie.pm -- 100% didn't color edge and 
+	  length and width were one pixel too wide
+	- Changed rendering code so that lines have consistent width
+	  Sent patch of lines.pm to MVERB with similar fix
+	- Added shading to the bar and line charts and to the axes
+0.42 July 07 2000
+	- Attempt to make CPAN index it better
+0.41 April 24 2000
+	- Fixed axes rendering to maintain right side
+	- Fixed frame rendering so 'box' and 'no box' make more sense
+	- Set default color for text on pie chart slices to black
+0.40 Apr 18 2000
+	Updated for compatibility with GD::Graph 1.30.
+0.34 Mar 10 2000
+	- Fixed bar bottom rendering bug in bars3d module.
+0.33 Feb 21 2000
+	- Fixed axes rendering bug in bars3d module.
+0.32 Feb 11 2000
+	- Fixed rendering bug in bars3d module.
+0.31 Feb 07 2000
+	- Fixed bug in version data.
+0.30  Jan 19 2000
+	- Converted to GD::Graph subclasses.
+	- First CPAN release
+0.20  Oct 15 2000
+	- Modified all files to support GD with PNG output.
+0.10  Sep 15 2000
+	- Original version. Based on GIFgraph.
+
+
+

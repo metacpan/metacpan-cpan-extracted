@@ -1,0 +1,9 @@
+Version 0.1.4, 2012-01-27
+
+	- And the fix for the new feature
+	- Added test (05.t) for usage generation
+
+Version 0.1.3, 2012-01-27
+
+	- description can be now array reference or scalar (string)
+

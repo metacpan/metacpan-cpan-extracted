@@ -1,0 +1,168 @@
+Revision history for Perl extension Games::Object.
+
+0.11  Wed Oct 15 2003
+
+    This is a patch release only to fix critical bugs:
+
+    - Fixed bug in save() where -filename was not parsed properly.
+
+    - Fixed bug in define_relation() where the relate_method was being used
+      as the name passed from the relator instead of the actual name of the
+      relationship. Changed relate.t test to tickle this bug again if it
+      ever resurfaces.
+
+    - Adding manager code broke flag inheritance. Fixed. Also added missing
+      tests for flag inheritance to inherit.t
+
+    - Undefined flags no longer croak(), but instead simply return false,
+      in order to be consistent with the way attributes work.
+
+0.10  Tue Jul 29 2003
+	WARNING: This version is a redesign of several key components of the
+	system. This version is most likely incompatible with all older
+	versions.
+
+	Instead of using Games::Object as the object manager as well as the
+	object structure, a new Games::Object::Manager module has been added.
+	A manager acts as a container for objects, thus stuff that used to
+	be functions (like Find(), Process(), etc) are now methods on the
+	manager. Thus you can manage several lists of self-contained objects.
+	This is much more in keeping with an overall OO approach.
+
+	The event system was ripped out and rewritten from scratch. The
+	new version is much more integrated into the objects, so it appears
+	more seamless. This has the nice side-effect of getting rid of the
+	GlobalObject kludginess. The new code is actually smaller than the
+	original.
+
+	With the introduction of object managers, I have been able to provide
+	a framework for defining and tracking object relationships. Object
+	inheritance is now simply a predefined object relationship referenced
+	by the Games::Object module.
+
+	Ripped out the class registration code for non-Games::Object derived
+	object references. Instead, I simply require that you have a load() and
+	save() method to handle file IO (id and find methods no longer needed).
+	This is more in keeping with OO programming methodology.
+
+	A new flag provided to have simplified accessor methods autocreated
+	for you when adding attributes (and yes, I considered using AUTOLOAD,
+	but I don't much care for it because of the inheritance nightmare,
+	and to quote the Perl Cookbook: "AUTOLOAD eventually begins to feel
+	like a kludge piled on a hack piled on a workaround")
+
+	User-defined object flags are created on objects on the fly as needed,
+	much like attributes, rather than requiring the user to predefine
+	them globally.
+
+	You can now choose the starting ID for auto-generated object IDs (object
+	IDs now maintained by the object manager module).
+
+	Fixed bug where -w on Perl 5.8.0 gave "v-string ... non-portable"
+	warning.
+
+	Added overloaded operators so objects can be compared more easily.
+
+	You can now specify an arbitrary filter function when processing all
+	objects in a manager (i.e. the functionality handled by Process()
+	in previous versions).
+
+	Adjusted some tests to deal with Perl 5.8.0 weirdness causing false
+	test failures on some platforms (this one a suspected mathematical
+	precision problem).
+
+0.05  Mon Nov 25 2002
+	Added a feature that allows a more deterministic way of specifying
+	processing order of objects with the same priority.
+
+	Fixed a false assumption problem in event.t that caused a test
+	failure under Perl 5.8.0.
+
+	Persistent mods can now be made to take effect immediately by adding
+	-apply_now => 1 to the mod_attr() call. This indirectly helps
+	alleviate the timing issue with process(), enough that I have removed
+	it from the BUGS section.
+
+	Persistent mods can now work properly with attributes at OOB conditions.
+	This was more a documentation change than a code change, as this
+	feature was always present, but was not obvious from the docs.
+
+	Added ability to inherit attribute values via object parenting. Added
+	the corresponding inherit.t test suite.
+
+	Made some corrections to examples in the POD docs.
+
+0.04  Sat Jun  8 2002
+	Much of the changes here are to support the upcoming release of the
+	Games::TileMap module.
+
+	This module now requires a minimum Perl version of 5.6.0.
+
+	Added ability to assert validity of ID in Find() and fail if not valid.
+
+	Added the Id() function to achieve similar assertion functionality.
+
+	Added the objectDestroyed event, triggered when destroy() is called on
+	an object.
+
+	Added attr_ref() to allow attributes to be used in -textvariable
+	and -variable options in Perl Tk widgets.
+
+	Fixed bug in load() that caused an annoying but harmless "substr
+	outside of string" warning under -w if the save file had undefined
+	hash values.
+
+	Documented the attribute flags and added flag ATTR_AUTOCREATE.
+
+0.03  Sat Apr  6 2002
+	Completely reworked the event handling mechanism to allow events
+	to be targeted for specific objects.
+
+	Events also now trigger as soon as they happen. Queueing them didn't
+	really make any sense once I really looked at it.
+
+	The "round" option for -on_fractional now works properly.
+
+	Added events objectLoaded and objectSaved to allow for class-specific
+	data manipulation.
+
+	Fixed bug where the persistent mod table was not being initialized
+	properly and probably caused perl to complain under -w, though the
+	code still worked.
+
+	Altered the default process_list by removing the second call to
+	process_queue(), since the changes to the event structure obviates
+	the need for this.
+
+	Expanded the priority.t test suite to cover tend-to and persistent mods.
+
+	Added event.t test suite.
+
+	Corrected some erroneous examples in the docs.
+
+	Put the perldoc stuff into a separate file, as it was growing
+	as large as the code itself.
+
+0.02  Sun Feb 24 2002
+	The docs stated that a reference to an object subclassed to
+	Games::Object assigned to an attribute of 'any' would save/load
+	the reference correctly. Now it really does.
+
+	The docs also stated that GLOB references worked in the -file
+	parameter to new(), load(), and save(). Now they really do.
+
+	Added attr_exists() and del_attr().
+
+	attr() and raw_attr() no longer croak with the attribute does not
+	exist; they simply return undef instead.
+
+	Added 'readable_filename' as a datatype to FetchParams()
+
+	Added function TotalObjects()
+
+	Added some missing tests to loadsave.t (object references and
+	PLACEHOLDER functionality)
+
+0.01  Sun Jan 20 2002
+	Initial alpha release. Probably stable, but lacking in some polish
+	and some functionality. Reasonably comprehensive docs, though.

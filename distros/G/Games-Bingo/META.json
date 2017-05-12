@@ -1,0 +1,94 @@
+{
+   "abstract" : "a bingo game Perl implementation",
+   "author" : [
+      "Jonas B. Nielsen <jonasbn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Games-Bingo",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.30"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "POSIX" : "0",
+            "UNIVERSAL" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      }
+   },
+   "provides" : {
+      "Games::Bingo" : {
+         "file" : "lib/Games/Bingo.pm",
+         "version" : "0.18"
+      },
+      "Games::Bingo::Card" : {
+         "file" : "lib/Games/Bingo/Card.pm",
+         "version" : "0.18"
+      },
+      "Games::Bingo::Column" : {
+         "file" : "lib/Games/Bingo/Column.pm",
+         "version" : "0.18"
+      },
+      "Games::Bingo::ColumnCollection" : {
+         "file" : "lib/Games/Bingo/ColumnCollection.pm",
+         "version" : "0.18"
+      },
+      "Games::Bingo::Constants" : {
+         "file" : "lib/Games/Bingo/Constants.pm",
+         "version" : "0.18"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jonasbn/Games-Bingo/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Games-Bingo/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonasbn/Games-Bingo.git",
+         "web" : "https://github.com/jonasbn/Games-Bingo"
+      }
+   },
+   "version" : "0.18"
+}
+

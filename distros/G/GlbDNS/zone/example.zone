@@ -1,0 +1,74 @@
+
+
+$ORIGIN example.local.
+
+600 IN SOA ns-lon-2.example.local. dnsmaster.wikia-inc.com. 2009022108 1200 120 1209600 300
+
+60 IN NS ns1.example.local
+60 IN NS ns2.example.local
+
+ns1.example.local. 60 IN A 127.0.0.1
+ns2.example.local. 60 IN A 127.0.0.2
+
+images1 60 IN CNAME glb
+images2 60 IN CNAME glb
+images3 60 IN CNAME glb
+images4 60 IN CNAME glb
+
+
+; this is a violation of the zone file spec
+; need to use something else
+; we dont violate DNS though
+; because we only return one result
+glb 120 IN CNAME sjc
+glb 120 IN CNAME london
+glb 120 IN CNAME cdn-apac
+glb 120 IN CNAME cdn-us
+glb 120 IN CNAME io
+; this is a backup IP for use when we dont 
+; know anything
+glb 120 IN A 192.168.1.1
+
+
+; datacenter 1
+sjc 60 IN A 192.168.2.1
+sjc 60 IN LOC 37 00 00.000 N 121 00 00.000 W 0.00m 0.00m 0.00m 0.00m
+; this directs only send stuff within the 700 km radius
+sjc 60 IN TXT GlbDNS::RADIUS 700 km
+
+; datacenter 2
+london 60 IN A 192.168.3.1
+london 60 IN A 192.168.3.2
+london 60 IN LOC 51 00 00.000 N 0 00 00.000  W 0.00m 0.00m 0.00m 0.00m
+; check that the server is responding
+; otherwise remove it from the pool
+london 60 IN TXT GlbDNS::CHECK /lvscheck.html "varnish is okay"
+
+; datacenter 3
+iowa   60 IN A 208.68.167.133
+iowa   60 IN A 208.68.167.134
+iowa   60 IN LOC 42 00 00.000 N 91 00 00.000 W 0.00m 0.00m 0.00m 0.00m
+iowa   60 IN TXT GlbDNS::RADIUS 700 km
+iowa 60 IN TXT GlbDNS::CHECK /lvscheck.html "varnish is okay"
+
+; in this example
+; we place a fake external CDN node in apac
+; otherwise london is closer than the CDN node
+cdn-apac 60 IN CNAME cdn.com.
+cdn-apac 60 IN LOC 01 00 00.000 N 103 00 00.000 E 0.00m 0.00m 0.00m 0.00m
+
+; and randomly place a cdn node in US
+; we dont know where they all are
+; but we reply on it being closer
+; if we are more than the Radius away
+cdn-us 60 IN CNAME cdn.com.
+cdn-us 60 IN LOC 32 00 00.000 N 97 00 00.000 W 0.00m 0.00m 0.00m 0.00m
+
+test 60 IN CNAME sjc-images
+test 60 IN CNAME london
+test 60 IN CNAME iowa
+test 60 IN CNAME panther-apac
+test 60 IN CNAME panther-us
+test 60 IN A 216.151.156.12
+
+

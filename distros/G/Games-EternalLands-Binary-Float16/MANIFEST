@@ -1,0 +1,15 @@
+Changes
+Float16.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/00-load.t
+t/01-value.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+lib/Games/EternalLands/Binary/Float16.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,159 @@
+=head1 NAME
+
+GD::Graph::FAQ - Frequently asked questions
+
+=head1 IMPORTANT
+
+Take a look at L<GD::Graph/DISTRIBUTION STATUS> first.
+
+=head1 DESCRIPTION
+
+=head2 I get errors like "Can't call method METHOD on an undefined value". What gives?
+
+You probably had an error somewhere, most likely in the plot() method,
+and you didn't check for it. See the section on Error Handling in the
+documentation for L<GD::Graph> to find out how to deal with this sort
+of thing, and how to get more information about what the error was.
+
+=head2 I am drawing a bar chart, and the chart area is a lot smaller than the image. What is going on?
+
+As of version 1.30, GD::Graph automatically corrects the width of the
+plotting area of a chart if it needs to draw bars (i.e. for bars and
+some mixed charts). This is necessary, because rounding errors cause
+irregular gaps between or overlaps of bars if the bar is not an exact
+integer number of pixels wide.  
+
+If you want the old behaviour back, set the correct_width attribute to a
+false value.
+
+
+=head2 I have my data in some format that doesn't look at all like the array that I am supposed to give to GD::Graph's plot method. Do I really need to mess around with array references?
+
+Not necessarily. Check out the GD::Graph::Data class. 
+
+
+=head2 How do I stop those pesky accents appearing around bars or inside area charts?
+
+You can set the C<accent_treshold> option to a large enough value
+(larger than your chart). Alternatively, you may like it better to set
+the C<borderclrs> attribute to be the same as the dclrs one.
+
+I'll probably include an option in a future version that gives better
+control over this.
+
+
+=head2 Where is the ActiveState ppm of GD::Graph?
+
+Ask them. I have asked them, but didn't get an answer. I don't know what
+to do to get it included in their set of ppms, and I really do not have
+the time to keep asking them.
+
+I believe that GD::graph has finally made it into ActiveState's ppm
+archive. However, I am going to leave this question here in case they
+get behind again.
+
+
+=head2 Do you have some example code for me?
+
+The distribution has a large set of examples in it. If you don't have
+the original distribution, please get it from CPAN (http://www.cpan.org/
+or some local mirror). 
+
+
+=head2 Will you support X or Y?
+
+If you send me a patch that (in a decent manner) adds the functionality
+to the latest version, I may very well add it for the next release. If
+you don't send me a patch, but just a question, you will have to be
+patient.  (Please also see the section on bugs in the main body 
+of L<GD::Graph>.)
+
+=head2 Why does export_format give me a weird string, instead of just 'png' or 'gif'?
+
+As of version 1.31, export_format in a list context returns all formats
+that GD can export. If you are only interested in the answer 'gif' or
+'png', make sure that you call it in a scalar context.
+
+  $export_format = GD::Graph->export_format;
+  $export_format = $graph->export_format;
+  print "Export format is ", scalar $graph->export_format, "\n";
+  print "Export format is " .  $graph->export_format . "\n";
+  @export_formats = $graph->export_format;
+
+
+=head2 TrueType fonts don't work when I use GD::Graph from a CGI program.
+
+When your programs run as CGI, they typically do not have the same
+environment as when you use them from the command line. The Perl FAQ,
+section 9, has some information on this. It is also not guaranteed that
+your script runs from the directory that it is in. It is probably better
+to include something like:
+
+  use GD::Text;
+  GD::Text->font_path("/path/to/my/font_dir");
+
+See the GD::Text documentation for more information about font paths.
+
+=head2 I'm trying to use GD's builtin fonts, but it's not working.
+
+Most likely, you are using the font short name, like gdGiantFont or
+gdMediumBoldFont, and you have not put a C<use GD> in your program.
+This is needed, because these short names need to be exported into
+your name space by the GD library:
+
+  use GD;
+  # ...
+  $graph->set_x_axis_font(gdMediumBoldFont);
+
+If you don't want to include the GD library, you can use the
+longer alternative names (which is what I'd recommend anyway):
+
+  $graph1->set_x_axis_font(GD::Font->MediumBold);
+
+If you C<use strict> then you will actually get an error message if
+you try to use the short names without including the GD module.
+
+Also see the L<GD::Text> documentation for this information.
+
+=head2 When I have many data sets, some end up having the same colour.
+
+The default number of colours for data sets is seven, so if you use
+more than seven data sets, those colours will be re-used for the
+higher data sets.
+
+This is described in the entry for the C<dclrs> attribute in the
+L<GD::Graph> documentation.
+
+=head2 Can you tell me how to do X?
+
+Not necessarily (X might be kind of complicated, after all).
+Did you look in the samples for something similar?
+If not, you're probably best off seeing if you can get 
+help from a group of people, rather than one or the other 
+of the overworked individuals whose e-mail addresses are shown below.
+
+If you're more comfortable with asking a newsgroup for help, the
+canonical resource is E<lt>comp.lang.perl.miscE<gt>; if you prefer
+web forums, there is a good one at E<lt>http://www.perlmonks.orgE<gt>.
+
+In either case, if you are not familiar with the forum and its denizens, 
+you might wish to read the following helpful guide before posting your
+question: http://www.perlmonks.org/?node_id=172086
+
+=head2 Can you fix this bug I've found?
+
+Well, I hope so.  Please see the "BUGS" section in the main body of 
+L<GD::Graph> for the best way to report it.
+
+=head1 AUTHOR
+
+Martien Verbruggen E<lt>mgjv@tradingpost.com.auE<gt>
+
+Current maintenance (including this release) by
+Benjamin Warfield E<lt>bwarfield@cpan.orgE<gt>
+
+(c) Martien Verbruggen.
+
+All rights reserved. This package is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+

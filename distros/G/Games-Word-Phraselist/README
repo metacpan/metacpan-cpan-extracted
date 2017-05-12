@@ -1,0 +1,14 @@
+METHODS
+
+ new($filename | \@phrases) => obj
+
+ phrases() => int
+
+ random_phrase() => str
+
+ each_phrase
+
+ phrases_like($regex) => list
+
+ is_phrase($str) => bool
+

@@ -1,0 +1,10 @@
+Changes
+lib/Git/CPAN/Hook.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-cpan.t
+t/20-init.t
+t/21-commit.t
+META.yml                                 Module meta-data (added by MakeMaker)

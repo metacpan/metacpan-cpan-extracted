@@ -1,0 +1,173 @@
+=== Gtk2::SourceView 1.000 ===
+
+2005-09-27 22:55 (+0200) ebassi
+
+	* NEWS: changes from 0.900
+
+2005-09-27 22:53 (+0200) ebassi
+
+	* README, SourceView.pm: mark this as the 1.000 release
+
+	* xs/GtkSourceTagStyle.xs: add support for accessor methods.
+
+	* t/GtkSourceTagStyle.t: test newly added accessor methods.
+
+2005-09-06 18:10 (+0200) ebassi
+
+	A NEWS
+
+	* NEWS, README, SourceView.pm: mark this the 0.900 release
+
+	* Makefile.PL, README: require Glib and Gtk2 >= 1.100 (stable)
+
+2005/08/11	kaffeetisch
+
+	* MANIFEST, META.yml, Makefile.PL, README: Update version and
+	requirements.  Add requirements to the second WriteMakefile call
+	so that EU::MM generates a correct META.yml.  Remove the stub
+	META.yml.
+
+	* MANIFEST, AUTHOR, AUTHORS, SourceView.pm: Use Gnome2::Print.
+	Update mime type used in the synopsis.  Add muppet and me to the
+	authors list.
+
+	* TODO: Update.
+
+	* gtksourceviewperl.h: Include gtk2perl.h and gnomeprintperl.h.
+
+	* maps: Add new types and reformat.
+
+	* examples/source-view.pl: Cosmetical update.
+
+	* MANIFEST, t/GtkSourceView.t, t/GtkSourceTagTable.t,
+	t/GtkSourceTagStyle.t, t/GtkSourceTag.t, t/GtkSourceStyleScheme.t,
+	t/GtkSourcePrintJob.t, t/GtkSourceMarker.t,
+	t/GtkSourceLanguagesManager.t, t/GtkSourceLanguage.t,
+	t/GtkSourceBuffer.t, 00.SourceView.t: Add test suite.
+
+	* xs/GtkSourceBuffer.xs: Don't ref the objects returned by the
+	ctors.  Do ref gtk_source_buffer_get_language's return value and
+	allow undef.  Wrap gtk_source_buffer_set_bracket_match_style,
+	gtk_source_buffer_create_marker, gtk_source_buffer_move_marker,
+	gtk_source_buffer_delete_marker, gtk_source_buffer_get_marker,
+	gtk_source_buffer_get_markers_in_region,
+	gtk_source_buffer_get_first_marker,
+	gtk_source_buffer_get_last_marker,
+	gtk_source_buffer_get_iter_at_marker,
+	gtk_source_buffer_get_next_marker,
+	gtk_source_buffer_get_prev_marker.
+
+	* xs/GtkSourceLanguage.xs: Wrap tk_source_language_get_tags,
+	gtk_source_language_get_escape_char,
+	gtk_source_language_get_mime_types,
+	gtk_source_language_set_mime_types,
+	gtk_source_language_get_style_scheme,
+	gtk_source_language_set_style_scheme,
+	gtk_source_language_get_tag_style,
+	gtk_source_language_set_tag_style,
+	gtk_source_language_get_tag_default_style.
+
+	* xs/GtkSourceLanguagesManager.xs: Don't ref the return value of
+	gtk_source_languages_manager_new.  Do ref the return value of
+	gtk_source_languages_manager_get_language_from_mime_type and also
+	allow undef.  Wrap
+	gtk_source_languages_manager_get_available_languages,
+	gtk_source_languages_manager_get_lang_files_dirs.
+
+	* xs/GtkSourcePrintJob.xs: Wrap
+	gtk_source_print_job_set_font_desc,
+	gtk_source_print_job_get_font_desc,
+	gtk_source_print_job_set_numbers_font_desc,
+	gtk_source_print_job_get_numbers_font_desc,
+	gtk_source_print_job_set_header_footer_font_desc,
+	gtk_source_print_job_get_header_footer_font_desc.
+
+	* xs/GtkSourceTagTable.xs: Don't ref the return value of
+	gtk_source_tag_table_new.  Wrap gtk_source_tag_table_add_tags.
+
+	* xs/GtkSourceView.xs: Wrap
+	gtk_source_view_set_highlight_current_line,
+	gtk_source_view_get_highlight_current_line.  Make
+	gtk_source_view_set_marker_pixbuf accept undef for the pixbuf.
+	Allow gtk_source_view_get_marker_pixbuf to return undef.
+
+	* MANIFEST, xs/.cvsignore: Ignore *.c.
+
+	* MANIFEST, xs/SourceView.xs: Remove this file and move its
+	contents to GtkSourceView.xs.
+
+	* MANIFEST, xs/GtkSourceMarker.xs, xs/GtkSourceStyleScheme.xs,
+	xs/GtkSourceTag.xs, xs/GtkSourceTagStyle.xs: Add initial wrappers
+	for these.
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+2004/03/15 00:08 (+0100) ebassi
+
+	* xs/SourceView.xs: Adapt to the new version information
+	implementation policy.
+
+	* SourceView.pm: fixed example code.
+
+	* Makefile.PL: fixed Gnome2::Print requirement.
+
+	* Makefile.PL: updated build system - new required versions:
+	ExtUtils::PkgConfig >= 1.03 (for the write_version_macros() helper),
+	Glib 1.20 (first stable release with Glib::MakeHelper) and Gtk2 >=
+	1.020 (accompanies Glib 1.020).
+
+2004/02/26 17:37 (-0500) muppetman
+
+	* README: fix the spelling of license; update the sandbox instructions.
+
+2004/02/13 11:41 (+0100) ebassi
+
+	* maps,
+	examples/source-view.pl,
+	xs/GtkSourceBuffer.xs,
+	xs/GtkSourceIter.xs,
+	xs/GtkSourceLanguage.xs
+	xs/GtkSourceLanguagesManager.xs,
+	xs/GtkSourcePrintJob.xs,
+	xs/GtkSourceTagTable.xs,
+	xs/GtkSourceView.xs: changed object names; removed "Source" from every
+	object name, in order to shorten it.
+
+2004/02/06 09:45 (+0100) ebassi
+
+	A xs/GtkSourceIter.xs
+
+2004/02/06 09:38 (+0100) ebassi
+
+	* TODO: updated with comments
+
+2004/01/30 09:43 (+0100) ebassi
+
+	* examples/source-view.pl: s/set_default_size/set_size_request/
+
+2004/01/29 13:46 (+0100) ebassi
+
+	A TODO
+
+2004/01/28 23:26 (+0100) ebassi
+
+	A AUTHOR
+	A ChangeLog
+	A examples/source-view.pl
+	A gtksourceviewperl.h
+	A Makefile.PL
+	A MANIFEST
+	A MANIFEST.SKIP
+	A maps
+	A README
+	A SourceView.pm
+	A t/00.SourceView.t
+	A xs/GtkSourceBuffer.xs
+	A xs/GtkSourceLanguage.xs
+	A xs/GtkSourceLanguagesManager.xs
+	A xs/GtkSourcePrintJob.xs
+	A xs/GtkSourceTagTable.xs
+	A xs/GtkSourceView.xs
+	A xs/SourceView.xs

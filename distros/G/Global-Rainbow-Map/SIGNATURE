@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 941c9283c5644795724b9d241a099df175fb6e67 COPYRIGHT
+SHA1 540e627824058dc4b3f75009923f7af8f8e388c8 CREDITS
+SHA1 920527a259f9df290f10db077cf26d2679f28473 Changes
+SHA1 6e0d26c0c530c599c39d9a50f545503cf1d5ef58 INSTALL
+SHA1 727a96a71ab563bc7bbfde0a89cdb0557e253bff MANIFEST
+SHA1 7836e671fd93f329d16508a90aefcda4c0750c0e META.json
+SHA1 5f1b6e710a2c2d7d2938d49248d36c6ae40b803a META.yml
+SHA1 97256f6a91c0e34449e835ab00865ff74c29190a Makefile.PL
+SHA1 f0f25206e65695024a89619f810ebb6c48443a32 README
+SHA1 2f8f010a3d3efb85c0272c360b556b1e02c3b52c dist.ini
+SHA1 170bc1abe4e25a4ab01fe42aa39963c7e1bb8aeb doap.ttl
+SHA1 52ae08163dfe6eee403d750e5ee377d5306dc90a examples/commonwealth-of-nations.pl
+SHA1 56e1bfe119379bb243636b2b8fb1977499cb84a9 lib/Global/Rainbow/Map.pm
+SHA1 98f07a077435011adef1f556498751f515e6e6f5 t/01basic.t
+SHA1 568bdf3d9e2405cc41f7c400b36bdc44a2d50f42 t/02gen-css.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ1zwACgkQzr+BKGoqfTmZaQCgrWMQ0nDDek8QYijowk7rAYKT
+FW8AnjJiAsc0dZovp1SN5BsfFD11jXhj
+=Z4dS
+-----END PGP SIGNATURE-----

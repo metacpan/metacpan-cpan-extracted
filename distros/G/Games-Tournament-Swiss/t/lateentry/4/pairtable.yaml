@@ -1,0 +1,89 @@
+---
+floats:
+  101:
+    - ~
+    - ~
+  102:
+    - Up
+    - Down
+  103:
+    - Down
+    - Up
+  104:
+    - ~
+    - Down
+  201:
+    - ~
+    - ~
+  202:
+    - ~
+    - Up
+  203:
+    - ~
+    - Down
+opponents:
+  101:
+    - 102
+    - 104
+    - 201
+  102:
+    - 101
+    - 103
+    - 202
+  103:
+    - 201
+    - 102
+    - 104
+  104:
+    - Bye
+    - 101
+    - 103
+  201:
+    - 103
+    - 202
+    - 101
+  202:
+    - Bye
+    - 201
+    - 102
+  203:
+    - Bye
+    - Bye
+    - Bye
+roles:
+  101:
+    - White
+    - Black
+    - White
+  102:
+    - Black
+    - White
+    - Black
+  103:
+    - White
+    - Black
+    - White
+  104:
+    - Bye
+    - White
+    - Black
+  201:
+    - Black
+    - White
+    - Black
+  202:
+    - Bye
+    - Black
+    - White
+  203:
+    - Bye
+    - Bye
+    - Bye
+score:
+  101: 2
+  102: 1
+  103: 2
+  104: 2
+  201: 1
+  202: 1
+  203: 1

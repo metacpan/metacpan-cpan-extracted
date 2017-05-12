@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+use Progress::Any::Output;
+Progress::Any::Output->set('TermProgressBarColor');
+
+use Git::ReleaseRepo;
+Git::ReleaseRepo->run;

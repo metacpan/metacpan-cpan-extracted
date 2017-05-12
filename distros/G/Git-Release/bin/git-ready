@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+use lib 'lib';
+use 5.12.0;
+use Getopt::Long;
+use Git::Release;
+
+my $re = Git::Release->new;
+$|++;
+
+my $opt_list;
+GetOptions
+    list => \$opt_list,
+;
+
+sub move_branch_to_ready { 
+    my $branch_name = shift;
+    my ($branch) = $branch_name
+                ? $re->branch->find_branches($branch_name) 
+                : $re->branch->current;
+    die "branch $branch_name not found." unless $branch;
+    $branch->move_to_ready;
+}
+
+if( $opt_list ) {
+    # list ready branches
+    $re->update_remote_refs;
+    my @branches = $re->branch->ready_branches;
+    for my $b ( @branches ) {
+        say $b->ref;
+    }
+} else {
+    $re->update_remote_refs;
+    move_branch_to_ready shift;
+}
+
+
+__END__
+=pod
+
+Move branch to ready/
+
+=cut
+# my $version = Git::command_oneline('version');
+my $working_dir = getcwd();
+my $repo = Git->repository ( WorkingSubdir => $working_dir );
+my $ref = $repo->command( 'symbolic-ref' , 'HEAD' );
+chomp($ref);
+my $branch = $ref;
+$branch =~ s{^refs/heads/}{};
+my $ready_prefix ||= $repo->config('release.ready-prefix') || 'ready/';
+
+
+die('skipped') if $branch eq 'master'
+            || $branch =~ m/^$ready_prefix/;
+
+my $new_branch = $ready_prefix . $branch;
+
+# Updating remote & prune branches
+# $repo->command( 'remote' , 'update' , '--prune' );
+$repo->command( 'branch' , '-m' , $branch , $new_branch );
+
+for( split /\n/,$repo->command( 'remote' ) ) {
+    $repo->command( 'push' , $_ , $branch , '--delete' );
+    $repo->command( 'push' , $_ , $new_branch );
+}
+$repo->command( 'gc' , '--aggressive' , '--prune=now' );

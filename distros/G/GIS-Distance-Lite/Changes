@@ -1,0 +1,4 @@
+Revision history for Perl extension GIS::Distance::Lite.
+
+1.0 : 2010-05-13
+ - Initial simplified version based on GIS::Distance.

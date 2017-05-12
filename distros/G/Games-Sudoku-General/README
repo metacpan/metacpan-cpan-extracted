@@ -1,0 +1,72 @@
+Games-Sudoku-General is Copyright (C) 2005, 2006, 2008, 2011-2013 by
+Thomas R.  Wyant, III
+
+DESCRIPTION
+
+Games::Sudoku::General is a module to solve the class of puzzle that
+involves allocating symbols among sets such that no set contains more
+than one of any symbol. Sudoku is the most common name for such
+puzzles, though Number Place and Wasabi have also been used.
+
+Each puzzle is considered to be made up of a number of cells, each of
+which is a member of one or more sets, and each of which may contain
+exactly one symbol. The contents of a number of cells are gven, and the
+problem is to deduce the contents of the rest of the cells.
+
+INSTALLATION
+
+Most Perl users will want to install using their favorite of either
+'cpan' or 'cpanp'. For either of these, installing
+Games::Sudoku::General gets you everything. ActivePerl users will want
+to use ActiveState's 'ppi', and install Games-Sudoku-General.
+
+If for some reason neither of these works for you, you can download the
+distribution and expand it using something like
+
+    tar -xzf Games-Sudoku-General-9.999.tar.gz
+
+Users of MSWin32 (and perhaps other operating systems) may need to
+convert the line endings in the expanded files from Unix to their native
+system before proceeding.
+
+Then, issue one of the following two incantations:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+or
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Unix users may want to use 'su' rather than 'sudo' for the install.
+Non-unix users may need to be logged in to an administrative or
+otherwise privileged accout, and turn on privileges (if applicable) for
+the install.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+the .pm files into the Games/Sudoku directory (creating it if necessary)
+in the appropriate place in your @INC directories.
+
+OS-specific notes exist for (at least) MacOS (meaning, Mac OS 9
+and lower), MSWin32, and VMS. See the relevant README files for
+details.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

@@ -1,0 +1,27 @@
+
+#: ../ttn2device:16
+#: ../ttn2device:108
+#, pod-format
+msgid ""
+"Usage:\n"
+"    {progname} [--configfile=filename|-c filename] [sourceDir [destDir]]\n"
+"\n"
+"    {progname} --help|-h\n"
+"\n"
+"Options:\n"
+"    --help|-h\n"
+"        Display this help message.\n"
+"\n"
+"    --quiet|-q\n"
+"        Suppress output messages. If used more than once, output will be\n"
+"        more quiet.\n"
+"\n"
+"    --verbose|-v\n"
+"        Display extra runtime informations.\n"
+"\n"
+"    --configfile=path_and_filename|-a path_and_filename\n"
+"        Using of specified config file.\n"
+"\n"
+"    config: {configfile}\n"
+"\n"
+msgstr ""

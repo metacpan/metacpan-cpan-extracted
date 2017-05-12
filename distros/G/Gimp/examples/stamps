@@ -1,0 +1,68 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+N_"/Xtns/Render"; # dummy translation for i18n bugs
+
+podregister {
+  Gimp::Context->set_background($paper);
+  my $img = Gimp::Image->new($size, $size, RGB);
+  my $layer = $img->layer_new($size, $size, RGB_IMAGE, "Layer 1", 100, NORMAL_MODE);
+  $img->insert_layer($layer, 0, -1);
+  Gimp::Context->set_background($hole);
+  $layer->edit_fill(BACKGROUND_FILL);
+  $img->selection_none;
+  my $ncircles = int(($size + $gap) / ($diameter + $gap));
+  my $x = 0;
+  for (my $i=0; $i<$ncircles; $i++) {
+    $img->select_ellipse( CHANNEL_OP_ADD, $x, 0, $diameter, $diameter);
+    $img->select_ellipse( CHANNEL_OP_ADD, 0, $x, $diameter, $diameter);
+    $x += $diameter + $gap;
+  }
+  Gimp::Context->set_background($paper);
+  $layer->edit_fill(BACKGROUND_FILL);
+  $img->selection_none;
+# here, at last, comes the clever part! :-)
+  $layer->offset(1, 0, -($diameter / 2), -($diameter / 2));
+  eval { Gimp::Display->new($img); };
+  return $img;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+stamps - Creates a rectangular image with stamp-like perforations
+
+=head1 SYNOPSIS
+
+<Image>/File/Create/Logos/Stamps...
+
+=head1 DESCRIPTION
+
+Default values are not bad!
+
+=head1 PARAMETERS
+
+  [PF_INT32, "size", "Image size", 90],
+  [PF_COLOR, "paper", "Paper color", [255, 255, 255]],
+  [PF_COLOR, "hole", "Hole color", [0, 0, 0]],
+  [PF_INT32, "diameter", "Diameter", 10],
+  [PF_INT32, "gap", "Gap", 5]
+
+=head1 AUTHOR
+
+Claes G Lindblad <claesg@algonet.se>
+
+=head1 DATE
+
+990314
+
+=head1 LICENSE
+
+Claes G Lindblad <claesg@algonet.se>
+Distributed under the terms of the GNU Public License, v2 or higher.

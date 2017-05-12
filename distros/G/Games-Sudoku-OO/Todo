@@ -1,0 +1,11 @@
+TODO list for Games::Sudoku::OO
+
+- better docs
+- better tests
+- make debug test conditional
+- solve more than one step at a time
+- board generator
+- difficulty classifier
+- handle diagonal boards
+
+

@@ -1,0 +1,35 @@
+TYPEMAP
+	ral_grid * T_PTROBJ
+	ral_cell * T_PTROBJ
+	ral_point * T_PTROBJ
+	ral_geometry * T_PTROBJ
+	ral_integer_grid_layer * T_PTROBJ
+	ral_real_grid_layer * T_PTROBJ
+	double * T_DOUBLEP
+	int * T_INTP
+	RAL_INTEGER T_IV
+	RAL_INTEGER * T_SHORTP
+	RAL_REAL T_FLOAT
+	RAL_REAL * T_FLOATP
+	GDALDatasetH T_PTROBJ
+	GDALColorTableH T_PTROBJ
+	gtk2_ex_geo_pixbuf * T_PTROBJ
+	ral_layer * T_PTROBJ
+	ral_pixbuf * T_PTROBJ
+	ral_visual_layer * T_PTROBJ
+	ral_visual_feature_table * T_PTROBJ
+	OGRLayerH T_PTROBJ
+
+INPUT
+
+T_DOUBLEP
+        $var = ($type)pack1D($arg,'d')
+
+T_FLOATP
+        $var = ($type)pack1D($arg,'f')
+
+T_INTP
+        $var = ($type)pack1D($arg,'i')
+
+T_SHORTP
+        $var = ($type)pack1D($arg,'s')

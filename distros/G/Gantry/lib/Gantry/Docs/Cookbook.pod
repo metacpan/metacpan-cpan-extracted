@@ -1,0 +1,828 @@
+=head1 Name
+
+Gantry::Docs::Cookbook - Gantry How Tos
+
+=head1 Intro
+
+This document is set up like a cookbook, but all the recipes are fully
+implemented in Gantry::Samples.  The first recipe explains how to run
+the samples.
+
+You might also be interested in L<Gantry::Docs::FAQ> which answers a different
+set of questions that are not covered in Gantry::Samples.  Bigtop has
+its own L<Bigtop::Docs::Cookbook> and full documentation suite, see
+L<Bigtop::Docs::TOC>.
+
+The questions are:
+
+=over 4
+
+=item *
+
+L<How do I run the samples?>
+
+=item *
+
+L<How do I upload files?>
+
+=item *
+
+L<How should I configure an app?>
+
+=item *
+
+L<How do I authenticate users?>
+
+=item *
+
+L<How do I authorize users?>
+
+=item *
+
+L<How do I authorize based at the row level?>
+
+=item *
+
+L<What is a three way join?>
+
+=item *
+
+L<How do I work with a simple three way join?>
+
+=item *
+
+L<How do I make my Gantry app respond to SOAP requests?>
+
+=item *
+
+L<What is Submit and Add Another? How do I turn it on?>
+
+=back
+
+=head1 How do I run the samples?
+
+To run the samples, you need sqlite 3 and Gantry.  Once those are in place
+just change to the samples directory of the Gantry distribution and type:
+
+    ./app.server
+
+The stand alone server will print a list of available URLs like this:
+
+  Available urls:
+    http://localhost:8080/
+    http://localhost:8080/ajaxrequest
+    http://localhost:8080/authcookie
+    http://localhost:8080/authcookie/sqlite
+    http://localhost:8080/authcookie/sqlite/closed
+    http://localhost:8080/fileupload
+    http://localhost:8080/table_perms
+    http://localhost:8080/table_perms_crud
+    http://localhost:8080/user
+    http://localhost:8080/user/group
+
+These locations will be mentioned again in the appropriate sections below.
+
+=head1 How do I upload files?
+
+You need three things to upload a file...
+
+=over 4
+
+=item 1
+
+A controller method expecting the file, which knows what to do with it.
+
+=item 2
+
+A form for the user to supply the file info from their browser.
+
+=item 3
+
+The C<file_upload> method supplied by all engines.
+
+=back
+
+Note that there is no special plugin to load.  Gantry engines all know
+how to upload files and are happy to do so at any time.
+
+L<Gantry::Samples::FileUpload> provides an example.  It has a single
+do_ method, C<do_main>, which uses C<fileupload.tt> supplied in the
+samples C<html/templates> sub directory.
+
+Once the form validates, C<do_main> says:
+
+    my $upload = $self->file_upload( 'file' );
+
+where file is the name of the form field containing the file name.  This
+method returns a hash ref with thses keys:
+
+=over 4
+
+=item unique_key
+
+A unique identifier for the file based on the current time and a random number.
+
+=item name
+
+Base name of user's file.
+
+=item suffix
+
+File suffix (e.g. txt).
+
+=item fullname
+
+Name of user's file including suffix.
+
+=item size
+
+Number of bytes in file.
+
+=item mime
+
+Mime type of file.
+
+=item filehandle
+
+The handle from which you read the file.
+
+=back
+
+To see how to catch and store the file, see do_main in
+L<Gantry::Samples::FileUpload>.
+
+Note that Bigtop does not help with file uploads, since the actual upload is
+done by a single method call and the details of processing the received
+file vary too much for a generic scheme.
+
+=head1 How should I configure an app?
+
+The short answer is: not like the samples.  The samples are set up to run
+exclusively in a stand aloner server environment, so that people trying
+them can more easily run them.
+
+For configuration best practice advice, see the L<Gantry::Docs::FAQ>
+question "How should I configure an app?"  It shows how we
+prefer to configure apps in a normal life cycle.
+
+=head1 How do I authenticate users?
+
+While you could authenticate users in a variety of ways, our prefered
+scheme is with a cookie.  Gantry provides C<Gantry::Plugins::AuthCookie>
+to manage those cookies.  To see a demonstration, run the samples and
+visit C<http://localhost:8080/authcookie/sqlite/closed>.
+
+You need two pieces to make authentication work.  First, you need
+to modify the config information.  This is best done in its Bigtop file.
+Second, you need to set up a database to keep track of the users and
+their passwords.  I'll explain the Bigtop changes first.
+
+=head2 Config Adjustments
+
+In the top level config block, where the engine statement is, add:
+
+    plugins AuthCookie;
+
+This will make every controller in the application use the authentication
+plugin, but you still have to ask nicely for it to keep people out.  By
+default, everyone is still allowed in to all pages.  To keep people out,
+set config variables at that controller level.  For example:
+
+    controller AuthCookie::SQLite::Closed {
+        page_link_label `AuthCookie w/ SQLite Closed`;
+        rel_location `authcookie/sqlite/closed`;
+        config {
+            auth_deny yes => no_accessor;
+            auth_require `valid-user` => no_accessor;
+        }
+    }
+
+This creates a controller which denies access unless the user is valid.
+The C<auth_require `valid-user`> syntax is meant to mimic Apache basic auth
+syntax.
+
+This controller doesn't have any methods.  Rather, it inherits them from
+this one:
+
+    controller AuthCookie {
+        page_link_label AuthCookie;
+        rel_location authcookie;
+        method do_open is stub {
+        }
+        method do_closed is stub {
+        }
+    }
+
+These stubs are filled inside C<Gantry::Samples::AuthCookie>.  They
+are not particularly interesting, but here they are:
+
+    sub do_open {
+        my ( $self ) = @_;
+
+        return( "you're in" );
+
+    } # END do_open
+
+    sub do_closed {
+        my ( $self ) = @_;
+
+        my @lines;
+        push( @lines, "you're in: " . $self->user );
+        push( @lines,
+            ht_br(), ht_br(),
+            ht_a(
+                ( $self->app_rootp . "/login?logout=1" ),
+                ('logout ' . $self->user),
+            ),
+        );
+        return( join( "", @lines ) );
+
+    } # END do_closed
+
+Some pages display differently for logged in users than they do for
+others.  For instance the front page of perlmonks always shows the
+Seekers of Perl Wisdom section for anyone not logged in, but a page
+of the user's choice for those logged in.  This requires looking at
+the cookie, to find out who is logged in, without denying access.
+These modules in the samples demonstrate this:
+
+    Gantry::Samples::AuthCookie::SQLite
+    Gantry::Samples::TablePermissions
+    Gantry::Samples::TablePermCRUD
+
+They do this by setting:
+
+    auth_optional yes => no_accessor;
+
+in their controller level config blocks.  This sets the C<user_row>
+attribute of the site object, without keeping anyone out of the page
+for failure to have a valid cookie.  Now that the config tells the
+auth cookie plugin where to look for user data and which pages to
+restrict, we must have database tables for that user data.
+
+=head2 Authentication Database
+
+For C<Gantry::Plugins::AuthCookie> to work, you need to set up a
+database for it to use, or add tables to your app's existing database.
+Using a separate database is good in a corporate setting where users
+have various access to many different apps.  Combining the auth
+tables into an existing database is better for self standing sites.
+The samples use a single database, so I'll show that approach first.
+
+There are three essential columns in the user table needed for
+authentication: id, user name, and pass word.  The id is for the benifit
+of the ORM.  The other fields hold the user's credentials.  The names
+of these columns is not fixed by the AuthCookie plugin.  The defaults
+are ident and password.  We'll see how to control the names the plugin
+uses below.
+
+You are welcome to put additional information in the user rows.  The
+user table from the samples has this schema (which was generated by bigtop):
+
+    CREATE TABLE user (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        active INTEGER,
+        username varchar,
+        password varchar,
+        email varchar,
+        fname varchar,
+        lname varchar,
+        created datetime,
+        modified datetime
+    );
+
+When you use authentication, with either auth_require or auth_optional, you
+can get the ORM row for the logged in user by calling C<user_row> on your
+Gantry site object.  If auth is optional, and the user is not logged in,
+you will still get a user row, but it won't have data in it.
+
+To tell the plugin about the table, the samples use these variables
+in the app level config block:
+
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        auth_table user => no_accessor;
+        auth_user_field username;
+        #...
+    }
+
+To use a separate database for auth, set C<auth_dbconn> like dbconn, but
+pointing to the other database.  We need to tell the plugin the name
+of our user table with the C<auth_table> config parameter.  Since sqlite
+allows us to, we call it C<user>.  Since our user names are stored in
+the C<username> column, and not in C<ident>, we must set the
+C<auth_user_field> config parameter to C<username>.  To change the pass word
+column away from C<password>, we would use C<auth_password_field>, but we
+don't need to in this case.
+
+That's all you need to set up cookie base user log-ins.  If you want
+to further restrict pages to subsets of logged-in users, see the next
+question.
+
+=head1 How do I authorize users?
+
+Once you have mastered authenticating users, it is usually a short step
+to wanting to divide them into groups with different access rights.
+For instance, a message board like slashdot needs special access for
+editors.
+
+As with authentication, there are two parts to authorization.  First, you
+need to change the config info (or code).  Then, you need to include
+the groups and their member lists in the database.  I'll take them in
+that order.
+
+Note well, that the samples do not use group authorization at the
+controller level.  They do use groups at the row level (see the next
+question).  Thus, the tables and models are in place to handle groups.
+You could alter the examples as described below to convert the valid-user
+requirement into a group membership requirement.
+
+To restrict the closed controller to a specific group, first change
+the C<auth_require> value from C<valid-user> to C<group>.  Then, add
+C<auth_groups> with the name of the group whose members are allowed
+to reach the page.
+
+    controller AuthCookie::SQLite::Closed {
+        page_link_label `AuthCookie w/ SQLite Closed`;
+        rel_location `authcookie/sqlite/closed`;
+        config {
+            auth_deny yes => no_accessor;
+            auth_require `group` => no_accessor;
+            auth_groups `admin` => no_accessor;
+        }
+    }
+
+Note that the value for the C<auth_groups> config statement may be
+a comma separated list of group names (with optional internal whitespace).
+Logged in users who are members of any listed group, will be allowed
+to access the page.
+
+=head2 Database additions for authorized groups
+
+In addition to the user table described above, you need two other
+tables to make groups work.  The first table names the groups.  The
+second lists the members.
+
+Here is the definition of the group table (it was generated by bigtop):
+
+    CREATE TABLE user_group (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ident varchar,
+        description varchar,
+        created datetime,
+        modified datetime
+    );
+
+The short name of the group is C<ident>.  This is the name you list
+in C<auth_groups> values.  The usually longer C<description> is meant
+to be a more verbose and therefore understandable description of the group.
+Only the ident field is used by the AuthCookie plugin.
+
+The group membership table represents a three way join between the
+user and user_group tables.  (See L<What is a three way join?> if you
+aren't familiar with the three way join concept.)  Each row in this
+table links one user to one group in classic many-to-many fashion
+(again, bigtop generated the table layout):
+
+    CREATE TABLE user_user_group (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user INTEGER,
+        user_group INTEGER
+    );
+
+If you generate these tables with bigtop, it will make controllers to
+manage them.  You will almost surely want to secure those with group
+level authorization.  You will probably need to add one user manually
+through the database command line tool to bootstrap the management process.
+The samples allow anyone to update the user information, a method
+suitable only for development, if ever there was one.
+
+=head1 How do I authorize based at the row level?
+
+In order to answer this question, let's begin by talking about how
+the samples of this work.  The Table Permissions controller represents
+a one table 'For Sale' bulletin board (so does the Table Permissions with
+Manual CRUD, see below).  Note that this is not a fully functional site.
+It just demonstrates row level permissions.
+
+Any user may visit the Table Permissions main listing and see all of the
+items for sale.  But what else you may do there is governed by whether you
+are logged in and whether your logged in user is n the admin authorization
+group.
+
+=head1 What is a three way join?
+
+A three way join is a many-to-many relationship between two tables.
+For example, the relationship between authors and books.  An author
+of one book likely has written other books.  For each author, there
+are many books.  But, in the other direction a good number of books
+have multiple authors.  For each book there could be many authors.
+
+Generally, you need a special extra table to hold the relationship:
+
+    +--------+             +------+
+    | author |             | book |
+    +--------+             +------+
+           ^                 ^
+            \               /
+          +-------------------+
+          |    author_book    |
+          +-------------------+
+
+Here the author_book table has only two (or three fields if you give it
+an id).  Both are foriegn keys to the tables on the end of the relationship.
+
+=head1 How do I work with a simple three way join?
+
+You need two things for easy use of a three way structure, once your
+SQL is in place.  First, you need your model to understand it.  Second,
+you need an easy way to perform CRUD on the join table rows.
+
+=head2 Making and using the model directly
+
+Making the model understand your three way preferences is easy.  Start
+with the two tables on the ends of the relationship as normal.  Then add
+this to the bigtop file:
+
+    join_table author_book {
+        joins author => book;
+    }
+
+You can do this with kickstart syntax when you make or augment the
+bigtop file:
+
+    bigtop -n BookStore 'author(name)<->book(title,year:int4)'
+
+That will make the two regular tables and the joining table.
+
+=head2 The Threeway utils module
+
+Once you have a three way structure, you can use L<Gantry::Utils::Threeway>
+to manage the rows in the joining table (the one in the middle).  You
+can do this from the controller for the table on either end of the
+many-to-many relationship, or for both of them.
+
+To show this, I'll pull code from L<Gantry::Samples::User>.
+
+First, use the module:
+
+    use Gantry::Utils::Threeway;
+
+Then provide a do_ method.  The one in the user example manages group
+membership for users.  In kickstart syntax, the relationship is
+user<->groups.  The full method is:
+
+ #-----------------------------------------------------------------
+ # $self->do_groups(  )
+ #-----------------------------------------------------------------
+ sub do_groups {
+     my ( $self, $user_id ) = @_;
+
+     my $threeway = Gantry::Utils::Threeway->new( {
+         self            => $self,
+         primary_id      => $user_id,
+         primary_table   => 'user',
+         join_table      => 'user_user_group',
+         secondary_table => 'user_group',
+         legend          => 'Assign Groups to User'        
+     } );
+
+     $threeway->process();
+
+ } # END do_groups
+
+All you have to do is construct the three way object and call process
+on it.  This displays a form with a check box for each group.  The current
+memberships are already checked.  Clicking in the boxes and submitting
+the form updates them.
+
+The keys needed by C<new> are:
+
+=over 4
+
+=item self
+
+The Gantry site object.
+
+=item primary_id
+
+The value of the foreign key in the joining table that points to this
+controller.
+
+=item primary_table
+
+The name of the controller's table.
+
+=item join_table
+
+The name of the joining table.
+
+=item secondary_table
+
+The name of the table on the other end of the many-to-many.
+
+=item legend
+
+HTML fieldset legend around the form where new joining table rows
+are created from check box values.
+
+=back
+
+=head3 Using the three way manually
+
+If you want to access rows from the table on the other end of the
+many-to-many relationship, use the C<many_to_many> relationship in the model:
+
+    my @groups = $user->user_groups();
+
+That will return an array of groups to which the current user belongs.
+You can turn that around through a group row:
+
+    my @members = $group->users();
+
+If you need the rows from the joining table, use the C<has_many>
+relationship from the model:
+
+    my @joining_rows = $user->user_user_groups();
+
+=head3 Making a three way manually
+
+By far, the easiest way to create a three way joining structure is
+with a bigtop C<join_table> block as shown above.  But you can do
+it yourself.  In your author model, add calls like these:
+
+    __PACKAGE__->has_many(
+        author_books => 'YourApp::Model::author_book',
+        'author' # your table name
+    );
+    __PACKAGE__->many_to_many(
+        books => 'author_books',  # value matches the has many above
+        'book' # the other table name
+    );
+
+Then do the same in the book model.  Finally, make sure you have a model
+for the joining rows with a normal foreign key C<belongs_to> for each of
+the end point tables:
+
+    __PACKAGE__->belongs_to( user => 'YourApp::Model::author' );
+    __PACKAGE__->belongs_to( user => 'YourApp::Model::book' );
+
+=head1 How do I make my Gantry app respond to SOAP requests?
+
+There are two types or 'styles' of SOAP requests.  Gantry can help with
+either, but it is better at the document style, so that is what I'll
+discuss here.
+
+To see a sample of this approach, run the samples app.server in one
+shell and samples/bin/soap_client in another.  Give the client a
+Farenheit temperature on the command line.  You should see a SOAP
+request packet.  The client will send that packet to the server immediately
+after printing it for you.  Then, you should see a SOAP response packet
+with the temperature in Celcius.
+
+Here's what you need to do to make your own server.
+
+Make a controller.  For instance, you could add this to your bigtop file:
+
+    controller SOAP {
+        rel_location GantrySoapService;
+        skip_test 1;
+        plugins SOAP::Doc;
+        method do_f2c is stub {
+        }
+    }
+
+When you regenerate, you'll have a new SOAP.pm in which to place your
+code.  It will inherit from a GEN module that uses the document style
+SOAP plugin.  Then you'll have to fill in the code for the do_f2c routine.
+Bigtop made this stub:
+
+    #-----------------------------------------------------------------
+    # $self->do_f2c(  )
+    #-----------------------------------------------------------------
+    sub do_f2c {
+        my ( $self ) = @_;
+    }
+
+All we need to do is fill it in.
+
+If all the SOAP request parameters are at the same level in their packet
+(a fairly common case), you can take advantage of the plugin's automated
+conversion of the SOAP packet into form parameters.  If your SOAP packet
+has nested tags, you'll need to parse the XML with a module like
+C<XML::LibXML> or C<XML::Twig>.  The sample's packets are simple.
+
+Here is the finished routine (less comments offering advice on XML::LibXML):
+
+  1   sub do_f2c {
+  2     my ( $self ) = @_;
+  3     my $time     = $self->soap_current_time();
+  4     my $params   = $self->params();  # easy way
+  5
+  6     my $f_temp   = $params->{ farenheit };
+  7     my $celcius  = 5.0 * ( $f_temp - 32 ) / 9.0;
+  8
+  9     my $ret_struct = [
+ 10         {
+ 11             GantrySoapServiceResponse => [
+ 12                 { currentUTCTime => $time },
+ 13                 { celcius        => $celcius },
+ 14             ]
+ 15         }
+ 16     ];
+ 17
+ 18     $self->soap_namespace_set(
+ 19         'http://usegantry.org/soapservice'
+ 20     );
+ 21
+ 22     return $self->soap_out( $ret_struct, 'internal', 'pretty' );
+ 23 } # END do_f2c
+
+If you need to tell your client the UTC time of your response in valid
+SOAP time format, call C<soap_current_time>, as I did on line 3.
+
+Since my server's SOAP requests are simple, I can call C<params>
+on line 5, just as I would to handle form parameters.  The input
+parameter is in the C<farenheit> key (line 6).  A grade school formula
+does the conversion on line 8.
+
+Lines 9-16 build the structure of the return packet.  The top level
+tag is C<GantrySoapServiceResponse>.  Inside it will be a list of tags
+(order often matters to DTDs), one for the time, the other for the
+converted temperature.
+
+To control the namespace of C<GantrySoapServiceResponse> and its children,
+I called C<soap_namespace_set> (line 18).
+
+Finally, line 22 uses C<soap_out> to send the packet back to the client.
+It expects:
+
+=over 4
+
+=item return structure
+
+See the example above.  If you need a empty tag like <empty />, use
+
+    { empty => undef }
+
+=item namespace position
+
+This must be a string chosen from 'prefix' or 'internal'.  The default
+is prefix.  This governs where the namespace is defined, and therefore
+has a cosmetic effect on the SOAP packet.  A prefix namespace is
+defined in the SOAP Envelope tag where it is given the prefix tns.
+That prefix appears on all tags in the returned packet.
+
+If you use internal instead, the namespace is defined in the top level tag:
+
+    <GantrySoapServiceResponse
+        xmlns="http://usegantry.org/soapservice">
+
+Then the elements in the body of the response have no explicit namespace
+prefix.
+
+=item pretty print
+
+If this has a true value, the resulting XML packet will have various
+whitespace added to it to improve human readability.  No whitespace will
+be added anywhere that would affect parsing the result.
+
+=back
+
+That's all there is to a document style SOAP server in Gantry.
+
+=head1 How do I use Gantry to build a SOAP client?
+
+There is a sample SOAP client in samples/bin/soapclient.  There are three
+parts to a SOAP client: build the XML for the request, send that XML to
+the proper URL, parse the response (this list leaves out coming up with
+the data for the request).  Gantry can help with the first one, but you
+need LWP or something similar for the other two.
+
+Here is commentary on the soapclient sample.
+
+    se strict; use warnings;
+
+    use lib qw( lib ../lib );
+
+This lib directory makes sure that code comes from the samples or from
+distribution and not from installed locations.  This is useful for
+developers working on the samples.
+
+    use LWP::UserAgent;
+    use Gantry::Plugins::SOAP::Doc;
+
+LWP will handle the actual http request/response.  The SOAP::Doc plugin
+will make the XML to send.
+
+    my $f_temp = shift || 68;
+    my $url    = 'http://localhost:8080/GantrySoapService/f2c';
+
+These set the URL or the web service.  You must be running the samples
+app.server on port 8080 of the local host for this to work.
+
+    my $site = {
+        action_url       => $url,
+        post_to_url      => $url,
+        target_namespace => 'http://sunflower.com/soapns',
+    };
+
+This structure will be passed to helper routines below.  The namespace
+is not particularly important, but it services as documentation for
+users of the service.
+
+    my $request_args = [
+        {
+            temperature => [
+                { farenheit => $f_temp },
+            ]
+        },
+    ];
+
+This structure is the data for the request.  It has an outer XML tag
+called temperature.  Inside that tag is one parameter for the remote
+method called farenheit.  To add other parameters, add more hashes
+with keys for the parameters and legal values.  If you need an empty
+tag, use
+            { key_name => undef }
+
+Which will generate:
+
+            <key_name />
+
+Note that ensuring valid parameters is totally up to you.
+
+    my $soap_obj    = Gantry::Plugins::SOAP::Doc->new( $site );
+
+Instantiate a SOAP::Doc plugin object.  If you happened to have a
+Gantry object with the SOAP plugin like a server, you could skip this
+step and just use the Gantry object as the invocant of C<soap_out>
+in the next step.
+
+    my $request_xml = $soap_obj->soap_out(
+            $request_args, 'internal', 'pretty'
+    );
+
+Calling C<soap_out> on a SOAP::Doc plugin object (or a Gantry site object)
+returns a valid XML SOAP packet.
+
+    warn "request:\n$request_xml\n";
+
+    transact_via_xml( $site, $request_xml );
+
+The packet is first printed for the user's benefit, then sent to the
+server.
+
+The C<transact_via_xml> sub is not that interesting, but I'll include
+it for completeness.  Mostly it makes sure to get everything aligned for
+proper LWP functioning.
+
+    sub transact_via_xml {
+        my ( $site, $request_xml ) = @_;
+
+        # make the request
+        my $user_agent = LWP::UserAgent->new();
+        $user_agent->agent( 'Sunflower/1.0' );
+
+        my $request = HTTP::Request->new(
+            POST => $site->{ post_to_url }
+        );
+
+        $request->content_type( 'text/xml; charset=utf-8' );
+        $request->content_length( length $request_xml );
+        $request->header( 'Host' => $site->{host} );
+        $request->header( 'SoapAction' => $site->{ action_url } );
+        $request->content( $request_xml );
+
+        my $response = $user_agent->request( $request );
+
+        warn $response->content . "\n";
+    }
+
+That's a complete stand alone client.  You could do the same three
+steps in a Gantry controller to contact a foreign web service
+while serving a page request, depending on the service throughput
+and your users' patience.
+
+=head1 What is Submit and Add Another? How do I turn it on?
+
+When a user is adding a row to a database table, they often need to add
+more than one.  Gantry provides a little feature to make this easier
+called 'Submit and Add Another'.  If you turn it on, the user will see it as
+a button between 'Submit' and 'Cancel'.  Clicking it will first validate
+the form.  If it validates, the row will be created.  But, instead of going
+back to a main listing, the user will be returned to the add form.
+
+To turn on this feature in a manual form method, add:
+
+    submit_and_add_another => 1,
+
+to the returned hash.
+
+Bigtop and tentmaker can do this for you.  Simply add:
+
+    submit_and_add_another => 1
+
+to the C<extra_keys> for the form.  Note that there is no specific
+keyword for this.  You can set any key in the forms hash by adding
+it to C<extra_keys>.

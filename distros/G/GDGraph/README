@@ -1,0 +1,193 @@
+This is GDGraph, a package to generate charts, using Lincoln Stein's
+GD.pm. See the documentation for some history and more information.
+
+The latest release is available from CPAN: http://www.cpan.org/.
+
+INSTALLATION
+
+Requirements:
+
+	perl 5.6.0
+	GD >= 1.19 (recommended >= 1.23)
+	GD::Text::Align (part of the GDTextUtils package)
+
+GD::Graph will not work with Perl 5.004. It most likely works with
+5.005 (except for some odd problems with GD::Graph::Data::read(),
+which seem to be related to some obscure 5.005_03 bug, which I have
+not been able to track down), but I will no longer actively support it.
+
+to install:
+
+	perl Makefile.PL
+	make
+	make install
+
+The tests are of limited value. The samples directory contains
+examples which also function as a test suite. To see the samples:
+
+	make samples
+	(use viewer to see samples/sample*.png or .gif)
+
+or
+
+	cd samples
+	make
+	(use viewer to see sample*.png)
+
+The documentation available is contained in GD::Graph.pm, as pod. See it
+with 
+
+perldoc GD::Graph
+
+after installation or 
+
+perldoc -F Graph.pm
+
+before installation.
+
+TESTED PLATFORMS
+
+I have discontinued this list, because it is too hard to maintain.
+There is hardly any code in the module that could provide problems
+with inter-platform portability, but you never know. I will always
+test the modules against the latest stable perl (5.8.0 right now) and
+at least one older version (5.6.2). I will not explicitly test against
+older versions of Perl. I normally test against the newest version of
+GD, the last pre-2.0 version (1.41), and one version of the pre-PNG
+days (1.19). All of this happens on Linux.
+
+AUTHOR
+
+Martien Verbruggen
+mgjv@tradingpost.com.au
+
+Currently maintained by Benjamin Warfield
+bwarfield@cpan.org
+
+FIRST PNG PORT as Chart::PNGgraph
+
+Steve Bonds
+sbonds@agora.rdrop.com
+
+MOST IMPORTANT CHANGES SINCE VERSION 1.34
+
+See file CHANGES
+
+MOST IMPORTANT CHANGES FOR VERSION 1.34
+
+- Added GD::Graph::hbars, to create horizontal bar charts. Many thanks
+  to brian d foy for doing almost all of the actual work. :)
+
+MOST IMPORTANT CHANGES FOR VERSION 1.30
+
+- Added GD::Graph::Data as the preferred way of working with data sets.
+  Internally all code has been changed to use these objects.
+- Many, many fundamental code changes, mainly to facilitate a future
+  breakup of the code into separate Data, Chart and Graphics handling.
+  All of this is internal, and there are not that many new options.
+  (check the CHANGES file for more information)
+
+MOST IMPORTANT CHANGES FOR VERSION 1.20
+
+- Namespace change to GD::Graph
+- No more links to GIF or PNG. We return a GD object now. It's the
+  user's responsibility to save the right format. GIFgraph and
+  (hopefully) Chart::PNGgraph will become wrappers around all this
+- Font support no longer part of these modules. Instead the package
+  GDTextUtils is necessary.
+- Some bug fixes and extra options.
+
+MOST IMPORTANT CHANGES SINCE VERSION 1.10
+
+- Namespace change from GIFgraph --> Chart::PNGgraph
+- No longer generates GIF format images due to Unisys LZW patent
+- Supports TrueType fonts
+
+MOST IMPORTANT CHANGES SINCE VERSION 1.04
+
+- added bar_spacing option
+- added limited support for numerical X axis for equidistant X values
+  (NOT for a real numerical graph!), thanks to Scott Prahl.
+- routines to automatically 'guess' nice upper and lower values for
+  graphs have been replaced by one written by Scott Prahl
+
+MOST IMPORTANT CHANGES SINCE VERSION 1.03
+
+- Added mixed type graph.
+  GIFgraph::mixed
+  options types and default_type
+- Added callback functionality to format y values
+  option y_number_format
+- Added control over axis label placement
+  option [xy]_label_position
+
+MOST IMPORTANT CHANGES SINCE VERSION 1.01
+
+- Vertical printing of X axis labels
+- CHANGED DEFAULTS for zero_axis and zero_axis_only
+- Fixed problems with negative values, data ranges without 0, and
+  printing of the x axis labels (I hope)
+- No more support for perl 5.003. Since perl 5.005 is out, and I don't
+  have a 5.003 here to test all the time, I won't support it anymore.
+
+MOST IMPORTANT CHANGES SINCE VERSION 0.91
+
+- Legends
+- Support for negative numbers
+- Ticks for X axis
+- line types and widths
+- Allow entries in data set to be undef (to skip them)
+- Changed 'zero' angle for pie charts (was right, now is front/bottom)
+- Definition of colours now possible. See PNGgraph::colour::read_rgb
+  for details
+- See file CHANGES for more
+
+BUG FIXES IN THIS VERSION
+
+See file CHANGES
+
+REPORTING BUGS
+
+Please use rt.cpan.org to report any bugs with GD::Graph or GD::Text.
+Alternatively, you can email me, but I prefer it if you use the RT
+interface. When reporting a bug, please include the version of the
+module distribution you use, as well as your Perl version and platform
+(perl -V output will do).
+
+NOTES FOR WIN32 and Mac (pre OSX)
+
+These modules _should_ work on all platforms.
+
+Please direct any questions about the availability of these modules as
+PPM packages to ActiveState. I only make this available as a standard
+tar on CPAN. I have emailed ActiveState to ask what I was supposed to
+do, and have, until today, not received any answers. 
+
+THANKS
+
+First of all. many, many thanks to Steve Bonds for adapting GIFgraph to
+version 1.20 of GD (the first version that did not support GIF anymore),
+and releasing it as Chart::PNGgraph. I really didn't have the time to
+look at it, and he stepped in and fixed the headache that Unisys had
+given me.
+
+Others who have contributed are mentioned in the documentation for
+GD::Graph in the AUTHOR section.
+
+COPYRIGHT
+
+GD::Graph
+Copyright (c) 1999-2002 Martien Verbruggen. All rights reserved.
+Chart::PNGgraph
+Copyright (c) 1999 Steve Bonds.  All rights reserved.
+GIFgraph
+Copyright (c) 1995-1999 Martien Verbruggen. All rights reserved.
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+I really felt like adding a clause to the copyright that excluded Unisys
+and its employees from the use of any of my code, at least without a
+license bought from me. I decided against it for several reasons, the
+main one being that I would just feel too dirty doing that.
+

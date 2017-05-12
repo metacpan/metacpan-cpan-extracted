@@ -1,0 +1,40 @@
+MANIFEST                            # This file
+Makefile.PL                         # MakeMaker input file (run 'perl Makefile.PL')
+Glade-Perl.spec                     # RPM spec file
+
+Documentation/COPYING               # How we encourage copying
+Documentation/Changelog             # History of the changes made
+Documentation/FAQ                   # Frequently asked questions
+Documentation/FAQ.i18n              # FAQs about internationalisation
+#Documentation/FAQ.old               # FAQs about old or flawed versions of software
+Documentation/Gtk-Perl-Docs.html    # Some notes on Gtk-Perl documentation
+Documentation/INSTALL               # How to install and run Glade-Perl
+Documentation/NEWS                  # What is new in each version
+Documentation/TODO                  # What still must be done <sigh>
+Documentation/README                # Some documentation
+Documentation/ROADMAP               # Where will the module go?
+Documentation/TODO                  # What still must be done <sigh>
+#Documentation/PerlGenerate.html     # Glade-Perl user options (pod2html output)
+#Documentation/apps.html             # Some apps developed using Glade-Per
+#Documentation/index.html            # Glade-Perl home page
+
+Glade/PerlGenerate.pm               # Perl Generator toplevel
+Glade/PerlSource.pm                 # Source code generation module
+Glade/PerlUI.pm                     # UI construction module
+Glade/PerlUIGtk.pm                  # Gtk widgets
+Glade/PerlUIExtra.pm                # Gnome and other widgets
+Glade/PerlProject.pm                # Project options module
+Glade/PerlXML.pm                    # XML load/save module
+Glade/PerlRun.pm                    # Run time module
+
+Example/Bus/Project.glade               # A test Glade project file
+Example/Bus/README.example          # A README file for the example
+Example/Bus/Bus_mySUBS.pm           # A module containg some signal handlers
+#Example/Bus/Generated/Bus.pm        # An edited version of the generated APP class
+#Example/Bus/Generated/SubBus.pm     # One way to subclass a generated APP class
+Example/Bus/pixmaps/new.xpm         # Some toolbar icons
+Example/Bus/pixmaps/open.xpm        #   "
+Example/Bus/pixmaps/save.xpm        #   "
+Example/glade2perl                  # Script to generate source code from Glade
+ppo/Glade-Perl.pot                  # An untranslated .pot file
+test.pl                             # A test script to generate Bus etc

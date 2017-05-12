@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+#
+# gda-ls-log
+#
+# $Revision: 1.1.1.1 $
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+#
+# This program is free software. It may be modified and/or
+# distributed under the same terms as Perl itself.
+#
+
+use strict;
+
+use GDA 'gda-ls-log', $GDA::VERSION, $0;
+use GDA::Config;
+
+use Getopt::Std;
+
+my %opts;
+
+getopts('a:d:e:m:', \%opts);
+
+my %found;
+
+#
+# Find the entries we'll be listing:
+#
+
+my $log  = GDA::Config::SECTION_LOG();
+my @apps = GDA::Config::list_sections($log);
+
+foreach my $app (@apps) {
+  next if $opts{a} and not $app =~ $opts{a};
+
+  my @dates = GDA::Config::list_sections("$log/$app");
+
+  foreach my $date (@dates) {
+    next if $opts{d} and not $date =~ $opts{d};
+
+    my @entries = GDA::Config::list_keys("$log/$app/$date");
+
+    foreach my $entry (@entries) {
+      next if $opts{e} and not $entry =~ $opts{e};
+
+      my $value = GDA::Config::get_string("$log/$app/$date/$entry");
+
+      next if $opts{m} and not $value =~ $opts{m};
+
+      $found{$app}{$date}{$entry} = $value;
+    }
+  }
+}
+
+
+#
+# Print the entries out:
+#
+
+foreach my $app (sort { $a cmp $b } keys %found) {
+  print "$app\n";
+
+  foreach my $date (sort { $a cmp $b } keys %{$found{$app}}) {
+    print "  $date\n";
+
+    foreach my $entry (sort { $a cmp $b } keys %{$found{$app}{$date}}) {
+      print "    $entry: $found{$app}{$date}{$entry}\n";
+    }
+  }
+}
+
+exit 0;
+

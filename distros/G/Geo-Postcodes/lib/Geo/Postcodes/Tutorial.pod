@@ -1,0 +1,671 @@
+=head1 NAME
+
+Geo::Postcodes::Tutorial - How to use the Geo::Postcodes::* modules
+
+=head1 SYNOPSIS
+
+ use Geo::Postcodes::U2;
+ 
+ my $postcode = '1104';
+ my $location = Geo::Postcodes::U2::location_of($postcode);
+
+=head1 INTRODUCING UTOPIA
+
+This tutorial uses the fictious country I<Utopia> (with country code 'U2'),
+and the rest of this document will refer to the non-existent module
+C<Geo::Postcodes::U2>. Any differences with the two existing country modules
+(C<Geo::Postcodes::DK>; Denmark and C<Geo::Postcodes::NO>; Norway) are
+explained.
+
+=head1 INSTALLING UTOPIA
+
+The latest version of I<Geo::Postcodes::U2> if had it existed, that is) can be
+installed or updated from CPAN with the following commands (, preferably as
+root. This will automatically install or update the core module
+I<Geo::Postcodes> as well.
+
+ shell> perl -MCPAN -e shell
+ cpan> install Geo::Postcodes::U2
+
+It may be possible to use the command C<cpan> instead of the first line.
+
+=head1 USING UTOPIA
+
+Include the following line in the program, after installing the module:
+
+ use Geo::Postcodes::U2;
+
+=head1 VERIFYING UTOPIA
+
+=head2 legal
+
+Use the I<legal> procedure to check that the specified postcode is legal,
+i.e. that it follows the syntax rules for our utopian postcodes.
+
+Utopian postcodes are four digit numbers, and the lowest number in use
+is '1003'. This procedure is programmed to return true for any four digit
+number where the first digit is non-zero. 
+
+ $boolean = Geo::Postcodes::U2::legal('ABBA'); # 0 -> Illegal
+ $boolean = Geo::Postcodes::U2::legal('0900'); # 0 -> Illegal
+ $boolean = Geo::Postcodes::U2::legal('1900'); # 1 -> Legal
+ $boolean = Geo::Postcodes::U2::legal('1000'); # 1 -> Legal
+
+=head2 valid
+
+The procedure I<valid> will check if the postcode is valid; that it is in
+actual use. The code may or may not be legal.
+
+ $boolean = Geo::Postcodes::U2::valid('1000'); # 0 -> Not in use
+ $boolean = Geo::Postcodes::U2::valid('ABBA'); # 0 -> Not in use
+
+=head1 UTOPIAN FIELDS
+
+Utopian postcodes support all the 8 fields set up by the core module.
+Every field is available as C<$P-E<gt>xxx> or C<xxx_of($postcode)>, where
+C<xxx> is the field name. The procedures/methods will return I<undef> if the
+value is unspecified for the given postcode.
+
+=head2 postcode - postcode_of
+
+ $postcode = $P->postcode();
+ $postcode = Geo::Postcodes::U2::location_of($postcode); # Silly
+
+The actual I<postcode> value is available with C<postcode> method, as the object
+itself does not have this information. The corresponding
+I<postcode_of>-procedure is used internally by L<selection>-procedure/method,
+but should be avoided in applications.
+
+=head2 location - location_of
+
+ $location = $P->location();
+ $location = Geo::Postcodes::U2::location_of($postcode);
+
+The location (or postal location) of the postcode. This is the value shown
+after the postcode in addresses. 
+
+=head2 borough - borough_of
+
+ $borough = $P->borough();
+ $borough = $Geo::Postcodes::U2::borough_of($postcode);
+
+The borough where the postcode is located.
+
+This field is not used by danish postcodes.
+
+=head2 county - county_of
+
+ $county = $P->county();
+ $county = $Geo::Postcodes::U2::county_of($postcode);
+
+The county where the postcode is located.
+
+This field is not used by danish postcodes.
+
+=head2 owner - owner_of
+
+ $owner = $P->owner();
+ $owner = $Geo::Postcodes::U2::owner_of($postcode);
+
+The owner of the postcode. This value is only used if the postcode is used by
+a single user.
+
+This field is not used by norwegian postcodes.
+
+=head2 address - address_of
+
+ $address = $P->address();
+ $address = $Geo::Postcodes::U2::address_of($postcode);
+
+The street address of the postcode. This value is only used if the postcode is used by
+a single street, and the street does not use any other posrcode.
+
+This field is not used by norwegian postcodes.
+
+=head2 type - type_of
+
+ $type = $P->type();
+ $type = $Geo::Postcodes::U2::type_of($postcode);
+
+The type of the postcode, as a short (2-4 characters) code. The types supported
+by the core module are:
+
+=over
+
+=item BX
+
+Post Office box
+
+=item ST
+
+Street address
+
+=item SX
+
+Service box (as a Post Office box, but the mail is delivered to
+the customer).
+
+=item IO
+
+Individual owner (a company with its own postcode).
+
+=item STBX
+
+Either a Street address (ST) or a Post Office box (BX)
+
+=item MU
+
+Multiple usage (a mix of the other types)
+
+=item PP
+
+Porto Paye receiver (mail where the reicever will pay the postage).
+
+=item PN
+
+Place name
+
+=back
+
+The child classes can use as many of the codes as they want. Utopian postcodes
+support them all.
+
+=head2 type_verbose - type_verbose_of
+
+A textual description of the codes, as specified in the previous section, as
+the codes themselves are not very user friendly.
+
+ $utopian_description = $P->type_verbose();
+ $utopian_description = Geo::postcodes::U2::type_verbose_of($postcode);
+
+This will give the description in utopian, if set up by the utopian module,
+and english otherwise. 
+
+The individual country classes are responsible for translating the
+descriptions of the codes they use to the native language, if appropriate.
+
+ $english_description = Geo::postcodes::type_verbose_of($postcode);
+ $english_description = $P->Geo::Postcodes::type_verbose();
+
+Use the version in the base class for the english version.
+
+The danish and norwegian modules have translations for the codes they use.
+
+=head1 MAKING UTOPIA
+
+The modules can be used as procedures on postcodes, or object oriented.
+
+=head2 Example Using Procedures
+
+  my $postcode = '1010';
+
+  if (Geo::Postcodes::U2::valid($postcode))
+  {
+    printf "Postcode"        '%s'.\n", $postcode;
+    printf "Postal location: '%s'.\n", location_of($postcode);
+    printf "Borough:         '%s'.\n", borough_of($postcode);
+    printf "County:          '%s'.\n", county_of($postcode);
+    printf "Owner:           '%s'.\n", owner_of($postcode);
+    printf "Address:         '%s'.\n", address_of($postcode);
+    printf "Postcode type:   '%s'.\n", type_of($postcode); 
+    printf "- in utopian:    '%s'.\n", type_of_verbose($postcode); 
+    printf "- in english:    '%s'.\n", Geo::Postcodes::type_of_verbose($postcode); 
+  }
+
+The fields are described in the prevoius section; L<UTOPIAN FIELDS>.
+
+=head2 Object Oriented Example
+
+  if (Geo::Postcodes::U2::valid($postcode))
+  {
+    my $P = Geo::Postcodes::U2->new($postcode);
+    printf "Postcode         '%s'.\n", $P->postcode();
+    printf "Postal location: '%s'.\n", $P->location();
+    printf "Borough:         '%s'.\n", $P->borough();
+    printf "County:          '%s'.\n", $P->county();
+    printf "Owner:           '%s'.\n", $P->owner();
+    printf "Address:         '%s'.\n", $P->address();
+    printf "Postcode type:   '%s'.\n", $P->type(); 
+    printf "- in norwegian:  '%s'.\n", $P->type_verbose(); 
+    printf "- in english:    '%s'.\n", $P->Geo::Postcodes::type_verbose(); 
+  }
+
+If speed is a concern, use the procedure version.
+
+=head2 new
+
+ my $P = Geo::Postcodes::U2->new($postcode);
+
+Create a new postcode object. Internally this will call the C<xxx_of> procedures
+for the fields supported by utopian postcodes.
+
+The constructor will return I<undef> if given an invalid or illegal postcode.
+Do not try method calls on it, as it is not an object (and will result in a
+runtime error). See the description of the I<legal> and I<valid> procedures above.
+
+=head1 COMPACT UTOPIA
+
+The test for a valid postcode can also be done on the object itself, as
+it will be I<undef> when passed an illegal or invalid postcode (and thus no
+object at all.)
+
+The example in the prevous section had a line for each field, but it is
+possible to use a loop instead:
+
+  if ($P = Geo::Postcodes::U2->new($postcode))
+  {
+    foreach my $field (Geo::Postcodes::U2::get_fields())
+    {
+      printf("%-20s %s\n", ucfirst($field), $P->$field())
+    }
+  }
+
+This will B<not> show the english description of the type, and the
+printed labels are slightly different than in the previous example.
+
+=head2 get_fields
+
+Use this procedure/method to get a list of the supported fields for utopian
+postcodes.
+
+  my @fields = Geo::postcodes::U2::get_fields();
+  my @fields = $P->get_fields();
+
+=head2 is_field
+
+Use this procedure/method to check if the specified field exist for utopian
+postcodes.
+
+  my $boolean = Geo::postcodes::U2::is_field($field);
+  my $boolean = $P->is_field($field);
+
+=head2 A sample program
+
+This sample program is available as "C<eg/basic_dk>" in the danish, and
+"C<eg/basic_no>" in the norwegian distributions. The line numbers are used
+for clarity only.
+
+Specify one or more postcodes on the command line; e.g. "C<basic_u2 1001 1003>".
+
+ 01 #! /usr/bin/perl -w
+ 02 use strict;
+ 03 use Geo::Postcodes::U2 0.30;
+
+The example will not work with older versions of the module.
+ 
+ 04 unless (@ARGV)
+ 05 {
+ 06   print "Usage: basic_u2 <one or more utopian postcodes>\n";
+ 07   exit;
+ 08 }
+
+Exit with an error message if the program hasn't been given any arguments.
+
+ 09 foreach my $postcode (@ARGV)
+ 10 {
+
+Loop through the arguments, and create a postcode object for each one.
+
+ 11   if (my $P = Geo::Postcodes::U2->new($postcode)))
+ 12   {
+
+Skip the argument if it isn't a valid postcode. The C<new>-call returns an
+object reference on success, and I<undef> on failure (i.e. an illegal or
+unvalid postcode).
+ 
+ 13     foreach my $field (Geo::Postcodes::U2::get_fields())
+ 14     {
+ 15       printf("%-10s\t%s\n", ucfirst($field), $P->$field() || ""),
+ 16     }
+
+For each field supported by the module, we print the field name (with an
+initial uppercase letter), followed by the value of the field. All tabulated
+nicely.
+
+ 17      printf("%-10s\t%s\n\n", "Type_english", 
+ 18        Geo::Postcodes::type2verbose($P->type()));
+ 19   }
+
+We must ask for the I<english> description of the type manually.
+
+ 20   else # Not valid.
+ 21   {
+ 22     if (Geo::Postcodes::U2::legal($postcode))
+ 23     {
+ 24       print "Postcode '$postcode' not in use.\n\n";
+ 25     }
+ 26     else
+ 27     {
+ 28       print "Illegal postcode '$postcode'.\n\n";
+ 29     }
+ 30   }
+ 31 }
+
+This part will be called if the C<new>-call fails, and we will get an
+error message telling us what is wrong; if the argument is illegal (not
+following the rules for utopian postcodes) or invalid (not in use).
+
+=head1 ADVANCED UTOPIA
+
+The procedures and methods mentioned till now will only give us one (or zero)
+postcode at a time, but it is possibly to get I<several postcodes> at once.
+
+=head2 get_postcodes
+
+  @postcodes =      Geo::postcodes::U2::get_postcodes(); # Unsorted
+  @postcodes = sort Geo::postcodes::U2::get_postcodes(); # Sorted
+
+This procedure returns an unsorted list of all the postcodes.
+
+It is possible to use this call to write your own selection code:
+
+  my @list;
+  foreach my $postcode (Geo::postcodes::U2::get_postcodes())
+  {
+    push(@list, $postcode) if check_the_postcode_for_something($postcode);
+  }
+
+Write the C<check_the_postcode_for_something>-procedure to decide if the
+postcode should be included. Use the C<xxx_of>-procedures, or whatever else is
+needed. Do I<not> create postcode objects inside this loop, as this will
+increase the time of execution quite a lot.
+
+=head2 selection
+
+The module has a selection procedure/method, that can be used if the check can
+be expressed as a regular expression on one or more if the fields.
+
+See the selection manual (I<perldoc Geo::Postcodes::Selection> or
+I<man Geo::Postcodes::Selection>) for further information.
+
+=head2 selection_loop
+
+This procedure/method can be used to get rid of the loop in the following example:
+
+  my @list = Geo::postcodes::U2::selection(....);
+  foreach my $postcode (@list)
+  {
+    do_something($postcode)
+  }
+
+The following line of code will do the same thing:
+
+  Geo::postcodes::U2::selection_loop(\&do_something, ....);
+
+The loop can use postcode objects instead of plain postcodes, as with
+L<selection>.
+
+  Geo::postcodes::U2->selection_loop(\&do_something, ....);
+
+The benefit of this is that the C<selection>-method will generate all the
+postcode objects, before passing them on, while this method will generate
+one at a time, destroying the prevoius one before creating a new.
+
+=head2 verify_selectionlist
+
+This will check the list of arguments for correctness, and should
+be used before calling C<selection> or C<selection_loop>. The procedure
+returns a modified version of the arguments on success, and diagnostic
+messages on failure.
+
+  my ($status, @modified) = Geo::Postcodes::U2::verify_selectionlist(@args);
+
+  if ($status)
+  {
+    my @result = Geo::Postcodes::U2::selection(@modified);
+     # And do something with the list of postcodes.
+  }
+  else
+  {
+    print "Diagnostic messages:\n";
+    map { print " - $_\n" } @modified;
+  }
+
+=head2 A second program
+
+This sample program is available as "C<eg/selection_dk>" in the danish, and
+"C<eg/selectionc_no>" in the norwegian distributions. The line numbers are used
+for clarity only.
+
+Specify a field and a value on the command line, e.g.
+"C<selection_u2 postcode %12>".
+
+ 01 #! /usr/bin/perl -w
+ 02 use strict;
+ 03 use Geo::Postcodes::DK 0.30;
+ 
+ 04 unless (@ARGV == 2)
+ 05 {
+ 06  print "Usage: selection_u2 <field> <value>\n";
+ 07  print "Legal fields: ", join(" ", Geo::Postcodes::U2::get_fields()), ".\n";
+ 08  exit;
+ 09 }
+
+This program requires exactly two arguments, a field and a value, and is
+terminated if the are missing.
+
+ 10 my $field = shift(@ARGV);
+ 11 my $value = shift(@ARGV);
+ 12 my @fields;
+
+ 13 if (Geo::Postcodes::U2::is_field($field))
+ 14 {
+
+Do we have a legal field? (If not, the C<else>-part below will
+give an error message.
+
+ 15   @fields = Geo::Postcodes::U2::get_fields();
+
+Get the list of available fields for this class.
+
+ 16   foreach my $m (@fields)
+ 17   {
+ 18     printf("%-14s", ucfirst($m));
+ 19   }
+ 20   print "\n";
+
+We are going to print one line for each matching postcode, and this
+will give us a header line.
+
+ 21   Geo::Postcodes::U2->selection_loop(\&print_it, $field, $value);
+
+This piece of magic will use the C<select> method to find any matching
+postcodes, and pass them on as a postcode pbject to the specified
+C<print_it> procedure - one at a time.
+
+ 22   print "\n";
+ 23 }
+
+ 24 else # illegal field.
+ 25 {
+ 26   print "Not a legal field '$field'.\n";
+ 27 }
+
+A simple error message.
+
+ 28 sub print_it
+ 29 {
+ 30   my $object = shift;
+ 31   foreach my $method (@fields)
+ 32   {
+ 33     printf("%-14s", $object->$method() || "");
+ 34   }
+ 35   print "\n";
+ 36 }
+
+This procedure is called for each matching postcode, and receives a postcode
+object as argument. The C<foreach> loop uses the list of fields set up in line
+15. The second part of the argument in the C<print> statement traps errors, as
+the call returns I<undef> if the value is undefined for the given postcode,
+and printing an undefined value gives a warning.
+
+=head2 A third program
+
+This sample program is available as "C<eg/multiselection_dk>" in the danish,
+and "C<eg/multiselectionc_no>" in the norwegian distributions. The line
+numbers are used for clarity only.
+
+Specify a field and a value on the command line, e.g.
+"C<multiselection_u2 postcode %12>" (for postcodes ending with '12'). 
+
+ 01 #! /usr/bin/perl -w
+ 02 use strict;
+ 03 use Geo::Postcodes::U2 0.30;
+
+This should be familiar by now.
+
+ 04 my ($status, @lines) = Geo::Postcodes::U2::verify_selectionlist(@ARGV);
+
+Simply passing a list of arguments on to C<selection> is not a good idea, as
+it will return an empty list I<both on failure> (as in syntax errors, illegal
+modes or fields) and when the call itself didn't match anything. 
+
+Use C<verify_selectionlist> to check the argument list for errors. The
+C<$status> variable is I<true> if the argument list is legal, and I<false>
+otherwise.
+
+ 11 if ($status == 0)
+ 12 {
+ 13   print "Usage: \n",
+ 14         " * multiselection_u2 [all|none]\n",
+ 15         " * multiselection_u2 [" , 
+ 16         join("|", Geo::Postcodes::get_initial_selectionmodes()),
+ 17         "]? <field> <value> [[",
+ 18         join("|", Geo::Postcodes::get_selectionmodes()),
+ 19         "]? [<field> <value>]]*\n\n";
+ 20   print "Legal fields: ", join(", ", Geo::Postcodes::U2::get_fields()), "\n\n";
+
+We use several procedures to show the legal modes and fields. This ensures
+that we do not have to update the program if we add new modes or fields in the
+modules later on (and that the code, as shown, will work for all country
+modules; after substituting 'U2' and 'u2' with another country code.) 
+).
+
+ 21   print "Diagnostic output:\n";
+ 22   foreach (@lines)
+ 23   {
+ 24     print " * $_\n";
+ 25   }
+
+The C<@lines> variable contains diagnostic output on failure, and they are
+printed as a service to the user - to help correct the error.
+
+ 26   exit;
+ 27 }
+
+ 28 my @fields = Geo::Postcodes::U2::get_fields();
+ 29 foreach my $m (@fields)
+ 30 {
+ 31   printf("%-14s", ucfirst($m)); # Print headers for each column
+ 32 }
+ 33 print "\n";
+ 
+ 34 foreach my $P (Geo::Postcodes::U2->selection(@lines))
+ 35 {
+
+Note that we use the argument list as returned by the C<verify_selectionlist>
+call, as it corrects some mistakes that the C<selection> procedure/method does
+not cope with.
+
+ 36   foreach my $method (@fields)
+ 37   {
+ 38     printf("%-14s", $P->$method() || "");
+ 39   }
+ 40   print "\n";
+ 41 }
+ 42 print "\n";
+
+=head2 Advanced selection
+
+The arguments to the I<selection> procedure/method is not restricted to pairs
+of field/value, combined together with the logical operators 'and', 'or' and
+so on.
+
+It is also possible to call external procedures, and have them decide if the
+postcode should be included. Specify C<'procedure'> and
+C<\&procedure_to_do_the_job>, instead of a field/value pair.
+
+The procedure is passed the postcode, and must return true or false.
+
+ sub procedure_to_do_the_job
+ {
+   my postcode = shift;
+   return 1 if ...
+   return 0;
+ }
+
+Passing a pointer to a non-existing procedure to I<selection> will result in
+an empty list in return. I<verify_selectionlist> can be used to check that
+any specified procedures actually exist.
+
+=head2 A fourth program
+
+This sample program is available as "C<eg/static_dk>" in the danish, and
+"C<eg/static_no>" in the norwegian distributions. The line numbers are used
+for clarity only.
+
+ 01 #! /usr/bin/perl -w
+ 02 use strict;
+ 03 use Geo::Postcodes::U2 0.30;
+
+This should be familiar by now.
+
+ 04 use Digest::SHA1;
+
+For the sake of this example, som computation had to be done that could not
+be done by a regular expression. This module was chosen.
+
+ 05 my @arg1 = ('postcode' => '(.)(.)\2\1');
+
+We start with a regular expression, matching postcodes where the first and
+fourth digit are identical, as is the second and third.
+
+ 06 print "All norwegian postcodes where (...),\n";
+ 06 print "All norwegian postcodes where :\n";
+ 07 my @postcodes = Geo::Postcodes::NO::selection(@arg1);
+ 08 print join ",", @postcodes; print ".\n\n";
+
+This prints the matching postcodes. Nothing fancy so far.
+
+ 09 print "As above, but with the addition of a procedure:\n";
+ 10 my @arg2 = (@arg1, 'procedure' => \&selector_procedure);
+
+Now we have added a procedure to the argument list, and the I<selection> call
+below does the job for us.
+
+ 11 @postcodes = Geo::Postcodes::NO::selection(@arg2);
+ 12 print join ",", @postcodes; print ".\n\n";
+
+ 13 sub selector_procedure
+ 14 {
+ 15   my $postcode = shift;
+ 16   my $location = Geo::Postcodes::NO::location_of($postcode);
+ 17   my $digest = Digest::SHA1::sha1($location);
+ 18   return 1 if substr($digest, 10, 5) =~ /[a-z]/;
+ 19   return 0;
+ 20 }
+
+The procedure computes the SHA1-digest for the postal location, and returns
+true if the there is a lower case letter (a-z) among the 11th to 15th
+characters of the digest. This may not be very useful in practice... 
+
+=head1 SEE ALSO
+
+See also the documentation for the core module I<Geo::Postcodes>, the
+selection family (I<perldoc Geo::Postcodes::Selection> or I<man
+Geo::Postcodes::Selection>) and the individual country modules; currently
+I<Geo::Postcodes::DK> (Denmark) and I<Geo::Postcodes::NO> (Norway).
+
+The latest version of everyting is available on CPAN, but see also the library
+home page; F<http://bbop.org/perl/GeoPostcodes> for additional information and
+sample usage.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Arne Sommer - perl@bbop.org
+
+This library is free software; you can redistribute them and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

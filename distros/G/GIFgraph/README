@@ -1,0 +1,55 @@
+This is GIFgraph a package to generate GIF charts, using Lincoln
+Stein's GD.pm.
+
+This package is deprecated. I would recommend that you use GD::Graph
+directly. I also do not recommend the use of GIF images anymore, since
+Unisys has decided to be childish about their patent on LZW compression.
+
+INSTALLATION
+
+needed to install (also see TESTED PLATFORMS):
+
+	perl 5.005 (5.004 might work)
+	GD > 1.18
+	GD::Graph
+	GDTextUtils (for GD::Graph)
+
+	Image::Magick, or edit GIFgraph/Convert.pm And Makefile.PL
+
+to install:
+
+	perl Makefile.PL
+	make
+	make install
+
+IMPORTANT CHANGE SINCE VERSION 1.10
+
+GIFgraph no longer contains any of the code to generate charts. Instead
+it has become a wrapper around GD::Graph. The main reason for this is
+that since version 1.20 GD does not support generation of GIF images
+directly anymore. Dropping support for GIFgraph alltogether was not
+really an option, and having a module called GIFgraph that produces PNG
+was a bit silly. So I decided to create GD::Graph, and recommend the use
+of that directly, and make GIFgraph a wrapper around that, its only
+function being to provide a backward compatible interface to GD.
+
+GD VERSIONS
+
+If you want to use a GD version 1.20 or up, you will need to have
+something installed that can do an on-the-fly conversion of PNG to GIF.
+I recommend that you use Image::Magick, since that is what the GIFgraph
+module has been setup to use. If you don't want to, or can't install
+Image::Magick, you will have to edit the file GIFgraph/Convert.pm to
+provide a different sub png2gif.
+
+AUTHOR
+
+Martien Verbruggen
+mgjv@comdyn.com.au
+
+COPYRIGHT
+
+Copyright (c) 1995-2000 Martien Verbruggen. All rights reserved.
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,46 @@
+---
+abstract: 'A client for Google APIs Discovery Service'
+author:
+  - 'Takatsugu Shigeta <shigeta@cpan.org>'
+build_requires:
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.038'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-API-Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  HTTP::Request: '0'
+  JSON: '0'
+  JSON::WebToken: '0'
+  LWP::Protocol::https: '0'
+  URI: '0'
+  URI::Escape: '0'
+resources:
+  bugtracker: https://github.com/comewalk/google-api-perl-client/issues
+  homepage: https://github.com/comewalk/google-api-perl-client
+  repository: https://github.com/comewalk/google-api-perl-client.git
+version: '0.14'
+x_contributors:
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Chylli <chylli@163.com>'
+  - 'Gustavo Chaves <gustavo@gnustavo.com>'
+  - 'Ludwin Janvier <lud.janvier@gmail.com>'
+  - 'Raz Shlomovich <raz.shlomovich@buzzfeed.com>'
+  - 'Richie Foreman <richie.foreman@gmail.com>'
+  - 'Takatsugu Shigeta <shigeta@cpan.org>'
+  - 'Takatsugu Shigeta <tshigeta@user200.sixapart.jp>'
+  - 'Yusuke Ueno <uechoco@gmail.com>'
+  - 'shigeta <shigeta@typhoon.(none)>'

@@ -1,0 +1,36 @@
+--- 
+abstract: Perl API to libgnokii
+author: 
+  - H.Merijn Brand <h.m.brand@xs4all.nl>
+build_requires: 
+  Config: 0
+configure_requires: 
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: Author, CPAN::Meta::Converter version 2.132510
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GSM-Gnokii
+provides: 
+  GSM::Gnokii: 
+    file: lib/GSM/Gnokii.pm
+    version: '0.09'
+recommends: 
+  Data::Peek: '0.39'
+  Test::More: '0.98'
+  perl: '5.016003'
+requires: 
+  Carp: 0
+  Data::Peek: '0.32'
+  DynaLoader: 0
+  JSON: 0
+  Test::Harness: 0
+  Test::More: '0.88'
+  Test::NoWarnings: 0
+  perl: '5.008004'
+resources: 
+  license: http://dev.perl.org/licenses/
+  repository: http://repo.or.cz/r/GSM-Gnokii.git
+version: '0.09'

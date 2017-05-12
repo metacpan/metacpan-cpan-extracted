@@ -1,0 +1,154 @@
+# ChangeLog for net-wireless/wireless-tools
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/wireless-tools/ChangeLog,v 1.1 2004/06/20 09:09:37 linguist Exp $
+
+  14 Jun 2004; Aron Griffis <agriffis@gentoo.org>
+  wireless-tools-27_pre17.ebuild, wireless-tools-27_pre22.ebuild:
+  Fix use invocation
+
+  13 Jun 2004; Travis Tilley <lv@gentoo.org> wireless-tools-26.ebuild,
+  wireless-tools-27_pre22.ebuild:
+  marked 26 as stable and 27_pre22 as testing on amd64
+
+*wireless-tools-27_pre22 (01 May 2004)
+
+  01 May 2004; Peter Johanson <latexer@gentoo.org> wireless-tools-25.ebuild,
+  wireless-tools-27_pre2.ebuild, wireless-tools-27_pre22.ebuild,
+  wireless-tools-27_pre3.ebuild, wireless-tools-27_pre7.ebuild:
+  Bump to latest 27_pre, and remove a bunch of old ebuilds.
+
+*wireless-tools-27_pre2-r1 (18 Mar 2004)
+*wireless-tools-27_pre17 (18 Mar 2004)
+
+  18 Mar 2004; Peter Johanson <latexer@gentoo.org> wireless-tools-24.ebuild,
+  wireless-tools-25-r1.ebuild, wireless-tools-25.ebuild,
+  wireless-tools-26_pre9.ebuild, wireless-tools-27_pre17.ebuild,
+  wireless-tools-27_pre2-r1.ebuild, wireless-tools-27_pre2.ebuild,
+  wireless-tools-27_pre3.ebuild, wireless-tools-27_pre7.ebuild:
+  Bump, now includes ifrename, and french docs behind USE='nls'. Also fixed all
+  the headers.
+
+  20 Feb 2004; Peter Johanson <latexer@gentoo.org> wireless-tools-26.ebuild:
+  Fix for bug #42226 to install iwlib.h
+
+*wireless-tools-27_pre7 (29 Dec 2003)
+
+  29 Dec 2003; Peter Johanson <latexer@gentoo.org> 
+  wireless-tools-27_pre7.ebuild:
+  New version that creates libiw.so now again instead of libiw${WE-VERSION}.so
+  
+  11 Nov 2003; Peter Johanson <latexer@gentoo.org> metadata.xml:
+  Added metadata.xml
+
+  10 Nov 2003; Peter Johanson <latexer@gentoo.org> :
+  Added 27_pre2-r1 which now creates /usr/lib/libiw.so symlink (bug #32802) and
+  added 27_pre3 (bug #33043) which also creates /usr/lib/libiw.so
+
+  02 Nov 2003; Luca Barbato <lu_zero@gentoo.org> wireless-tools-26.ebuild:
+  Added to ppc.
+
+  15 Sep 2003; Luca Barbato <lu_zero@gentoo.org> wireless-tools-27_pre2.ebuild:
+  Changed the sed script to be ppc sources friendly.
+
+  14 Sep 2003; David Holm <dholm@gentoo.org> wireless-tools-27_pre2.ebuild:
+  Added to ~ppc.
+
+*wireless-tools-27_pre2 (19 Aug 2003)
+
+  19 Aug 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-26.ebuild,
+  wireless-tools-27_pre2.ebuild:
+  Bumping 27_pre2 to ~x86, and marking v26 stable on x86. Has been very stable,
+  and includes some nice bugfixes and better WE-v16 suppport
+
+*wireless-tools-26 (14 Jul 2003)
+
+  14 Jul 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-26.ebuild:
+  Bump. Finally released v26.
+
+  31 May 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-26_pre7.ebuild,
+  wireless-tools-26_pre8.ebuild, wireless-tools-26_pre9.ebuild:
+  Two fixes by different people had happened.. should be fixed now
+
+  29 May 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-26_pre7.ebuild,
+  wireless-tools-26_pre8.ebuild, wireless-tools-26_pre9.ebuild:
+  Fixed presense of WARN. bug #21844
+
+  27 May 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-26_pre9.ebuild:
+  Masking for ppc. Let someone else test and unmask
+
+*wireless-tools-26_pre9 (27 May 2003)
+
+  27 May 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-26_pre9.ebuild:
+  New beta version
+
+  09 May 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-25-r1.ebuild:
+  Fixed libiw.so.25 installation. Bug #20714
+
+*wireless-tools-26_pre8 (25 Apr 2003)
+
+  28 Apr 2003; Lars Weiler <pylon@gentoo.org> wireless-tools-26_pre8.ebuild:
+  Set ppc in KEYWORDS
+
+  25 Apr 2003; Lars Weiler <pylon@gentoo.org> wireless-tools-26_pre8.ebuild:
+  Added another pre-version and keyworded it also ~ppc
+
+*wireless-tools-26_pre7 (24 Mar 2003)
+
+  24 Mar 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-26_pre7.ebuild:
+  Version bump for testing. This is the latest beta of the wireless-tools
+
+*wireless-tools-25-r1 ( 08 Mar 2003 )
+
+  08 Mar 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-25-r1.ebuild :
+  Revision bump. Wireless tools now compiles against /usr/src/linux/includes, so
+  that it gets the proper wireless extensions version.
+
+  08 Mar 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-25.ebuild :
+  Reverted back, and did a -r1 bump instead.
+
+  08 Mar 2003; Peter Johanson <latexer@gentoo.org> wireless-tools-25.ebuild :
+  Changed to use includes from /usr/src/linux. Should fix wireless extension mismatch errors.
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+  31 Oct 2002; Hannes Mehnert <hannes@gentoo.org>:
+  moved to net-wireless
+  
+*wireless-tools-25 ( 15 Oct 2002 )
+
+  19 Feb 2003; Mark Guertin <gerk@gentoo.org> wireless-tools-25.ebuild :
+  set -ppc in keywords, our kernel does not yet support the latest wireless.h needed by this to run
+
+  15 Oct 2002; Hanno Boeck <hanno@gentoo.org> wireless-tools-25.ebuild :
+  New version. Changed ebuild to read the version number from the filename.
+
+*wireless-tools-24 ( 28 May 2002 )
+
+  14 Jul 2002; phoen][x <phoenix@gentoo.org> wireless-tools-24.ebuild :
+  Added LICENSE, KEYWORDS, SLOT.
+
+  28 May 2002; Karl Trygve Kalleberg <karltk@gentoo.org> wireless-tools-24.ebuild files/digest-wireless-tools-24:
+
+  New upstream version. 
+
+*wireless-tools-23 ( 10 Feb 2002 )
+
+  14 Jul 2002; phoen][x <phoenix@gentoo.org> wireless-tools-23.ebuild :
+  Added LICENSE, KEYWORDS, SLOT.
+  15 Mar 2002: Chad Huneycutt <chadh@gentoo.org>
+  fixed description
+
+  10 Feb 2002; Karl Trygve Kalleberg <karltk@gentoo.org> ChangeLog wireless-tools-23.ebuild files/digest-wireless-tools-23:
+  
+  The Wireless Tools is a set of tools allowing to manipulate the Wireless 
+  Extensions. They use a textual interface and are rather crude, but aim to
+  support the full Wireless Extension.
+
+    * iwconfig manipulate the basic wireless parameters
+    * iwlist (formerly part of iwspy) allow to list addresses, frequencies,
+      bit-rates...
+    * iwspy allow to get per node link quality
+    * iwpriv allow to manipulate the Wireless Extensions specific to a driver
+      (private)
+
+

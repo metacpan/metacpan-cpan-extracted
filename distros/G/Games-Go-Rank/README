@@ -1,0 +1,73 @@
+NAME
+    Games::Go::Rank - Represents a player's rank in the game of Go
+
+VERSION
+    version 1.100860
+
+SYNOPSIS
+        use Games::Go::Rank;
+
+        my $black_rank = Games::Go::Rank->new(rank => '1k');
+        my $white_rank = Games::Go::Rank->new(rank => '2d');
+        if ($white_rank > $black_rank) {
+            # ...
+        }
+
+DESCRIPTION
+    This class represents a player's rank in the game of Go. Rank objects
+    can be compared to see whether two ranks are equal or whether one rank
+    is higher than the other. Rank objects stringify to the rank notation.
+
+    Use the standard notation for ranks such as "30k", "5k", "1d", "2p" and
+    so on. You can also use other common formats such as "6-dan" or "2 dan".
+    Anything after the first "k", "d" or "p" is ignored. So "6-dan*" is the
+    same as "6-dan", which is the same as "6d".
+
+METHODS
+  as_value
+    Returns a number representing the rank. "1k" is returned as 0, lower kyu
+    ranks are returned as negative numbers ("2K" is -1, "3k" is -2 etc.).
+    Dan ranks are returned as positive numbers, with pro ranks coming
+    immediately after dan ranks. For example, "1d" == 1, "7d" == 7, "1p" ==
+    8, "2p" == 9. Only dan ranks up to 7d are recognized as amateur ranks -
+    that is, "8d" == "1p".
+
+  from_value
+    Sets the rank from a numerical value that is interpreted as described
+    above.
+
+  num_cmp
+    FIXME
+
+  stringify
+    FIXME
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Games-Go-Rank>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/Games-Go-Rank/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Games-Go-Rank/>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

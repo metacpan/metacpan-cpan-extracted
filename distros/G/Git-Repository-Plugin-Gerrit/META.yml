@@ -1,0 +1,44 @@
+---
+abstract: 'Work with Gerrit-specific features in a Git::Repository'
+author:
+  - 'Nathaniel Nutter <nnutter@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Repository-Plugin-Gerrit
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Git::Repository::Plugin::Gerrit:
+    file: lib/Git/Repository/Plugin/Gerrit.pm
+    version: '0.05'
+requires:
+  Git::Repository: '1.13'
+  Git::Repository::Plugin::Log: '0'
+  Test::Requires::Git: '1.005'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/nnutter/Git-Repository-Plugin-Gerrit/issues
+  homepage: https://github.com/nnutter/Git-Repository-Plugin-Gerrit
+  repository: git://github.com/nnutter/Git-Repository-Plugin-Gerrit.git
+version: '0.05'
+x_contributors:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+  - 'Nathaniel Nutter <iam@nnutter.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

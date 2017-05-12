@@ -1,0 +1,38 @@
+Revision history for Perl module Geo::Cloudmade.
+
+0.1  2009-05-06
+	- first release
+
+0.2  2009-11-22
+	- new geocoding api from cloudmade (v2)
+	- support for reverse geocoding and routes
+	- some tests has been added
+
+0.3  2010-03-31
+	- trivial changes in tests (geo-objects used for testing was a bit shifted)
+
+0.4  2010-11-01
+        - small changes in tests
+        - small changes in documentations
+
+0.5  2011-03-03
+        - part of tests was simplified in order to avoid false alarm due to changed geodata
+
+0.6 2013-02-01
+       - bug about planning route was fixed (#82838 in rt.cpan.org)
+
+0.7 2013-04-23
+       Improvements from Tim Bunce <Tim.Bunce@pobox.com>:
+         Cache the user agent.
+         Enable connection caching.
+         Make the http status code available.
+         Return undef, not empty list, on error.
+         Return undef if centroid type is not POINT.
+
+0.8 2014-03-25
+       Fix tests by changing default API key.
+       Some minor improvements.
+
+0.9 2015-01-03
+       Default API key in tests was removed.
+       Update documentation. (CloudMade has no free services anymore)

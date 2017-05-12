@@ -1,0 +1,34 @@
+Revision history for Perl module Geo::Local::Server
+
+0.09 2015-01-12
+  - Updated scripts to be compatible with older versions of DateTime::Event::Sunrise
+  - Updated scripts (-m option) to remove possible math issues in locales that practice daylight savings
+
+0.08 2014-12-30
+  - Updated scripts sunrise_time and sunset_time to add minute offset as it is easier to do in Perl than in bash
+
+0.07 2014-12-17
+  - Updated scripts to use a different DateTime::Event::Sunrise API as the sunrise_datetime and sunset_datetime method do not return the "next" sunrise/sunset as documented but a sunrise and sunset on the day
+ 
+0.06 2014-11-30
+  - Updated logic for local.coordinates in case there is no support for wgs84 in the file
+
+0.05 2014-11-26
+  - Updated Documentation
+  - Renamed property env to envname
+  - Renamed accessor from Config to ci
+  - Updated logic on configfile to support disable setting like environment
+
+0.04 2014-11-25
+  - Fixed spec file config
+
+0.03 2014-11-25
+  - Fixed spec file requires
+
+0.02 2014-11-24
+  - Operational
+  - Added value added scripts
+  - Added RPM spec file
+
+0.01 2014-11-23
+  - original version; created by ExtUtils::ModuleMaker 0.51

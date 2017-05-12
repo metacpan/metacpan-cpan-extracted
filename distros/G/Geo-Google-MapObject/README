@@ -1,0 +1,38 @@
+Geo-Google-MapObject version
+
+This module is intended to help with the server side of using the Google Maps API.
+It is further intended to meet the following requirements.
+* The solution must degrade gracefully from a javascript enabled environment to a javascript free environment.
+* The solution must make as few assumptions about the surrounding framework as possible.
+* The data should be concentrated in a single place.
+* I don't like perl code that generates javascript or CSS. That seems messy and would prevent caching of what should be static resources.
+* One assumption about the framework I will make is that we are using HTML::Template::Pluggable and HTML::Template::Plugin::Dot. It might work for some other templating frameworks but I will not look into that.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Nicholas Bamber
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

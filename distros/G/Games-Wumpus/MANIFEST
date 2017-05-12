@@ -1,0 +1,19 @@
+lib/Games/Wumpus.pm
+lib/Games/Wumpus/Cave.pm
+lib/Games/Wumpus/Room.pm
+lib/Games/Wumpus/Constants.pm
+bin/wumpus
+Makefile.PL
+MANIFEST
+t/000_basic.t
+t/005_version.t
+t/010_constants.t
+t/100_room.t
+t/200_cave.t
+t/201_describe.t
+t/950_pod.t
+t/960_pod_coverage.t
+t/990_kwalitee.t
+Changes
+README
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+CHANGES				history of the package
+GetRc.pm			The GetRc module
+MANIFEST			This file
+Makefile.PL			Makefile generator
+README				README file
+t/00load.t			test sample
+t/01getrc.t			test sample
+t/02writerc.t			test sample
+t/03updaterc.t			test sample

@@ -1,0 +1,23 @@
+---
+abstract: 'Convert Swiss LV03 coordinates to WSG84 and vice versa'
+author:
+  - 'RenÃ© Nyffenegger <rene.nyffenegger@adp-gmbh.ch>'
+build_requires:
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Coordinates-Converter-LV03
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

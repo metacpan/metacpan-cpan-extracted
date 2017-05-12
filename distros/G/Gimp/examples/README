@@ -1,0 +1,12 @@
+Please read the POD for the scripts in here; either with "perldoc",
+or run them from the command-line and click the "Help" button, or find
+them on the Gimp-Perl CPAN POD docs.
+
+Other sources of inspiration:
+
+http://www.ualberta.ca/~cwant/gimp/postprocess.html
+	Using Gimp-Perl for animation post-processing; some very neat effects
+	produced here.
+
+http://www.gimp.org/tutorials/Basic_Perl/
+	Dov Grobgeld's excellent intro to Gimp-Perl, updated for 2.31

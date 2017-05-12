@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b2339bd934c11cbce619fde36e4100d742edf823 Changes
+SHA1 f9443360de42a7b6bb33abbf20745936f3bd7016 INSTALL
+SHA1 05207cbc5971035849c1de2c7cb3babaeaccb6fb LICENSE
+SHA1 dc7acab1f2d1f7f9aaf68d81887246841d3681f9 MANIFEST
+SHA1 86d61f579b38a620bd06b5298941c76c0c5d309f META.json
+SHA1 adff1e1e0c5ebbf673e0de6a2d1e1a0e15d4d778 META.yml
+SHA1 07ea26f9995504a4e11f6249d8efbc1153f301d3 Makefile.PL
+SHA1 eee7eac584997810a4d02c6efbdb42e99fdee397 README
+SHA1 6bb1a2169681b755510ec75a4f3216aaee49bbff cpanfile
+SHA1 a18bc916ba80ee8865e7e67fc509275cd02e7019 dist.ini
+SHA1 0f0efbf10f0311aaf6ea333edbb1d07178054121 lib/GitHub/Authorization.pm
+SHA1 261890bad644f3e4de3db2e97867503252f1e3ef t/00-compile.t
+SHA1 661ac9595ebd12a22b0b4d1f344bdfe47369fcdc t/000-report-versions-tiny.t
+SHA1 4f0f17a0294026749844d7cdeee591e4817f7ba0 t/author-pod-spell.t
+SHA1 8980c6ba5386c5f3b153ecda58918b06a92a309f t/live.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 605f1fdbb8f0524760d33780834e44181c308b90 t/release-has-version.t
+SHA1 4f2a32cfe271f001e08109450b81e988daf31197 t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 343dfc2c50f315d4697ac14b020f431f878eef02 t/release-pod-coverage.t
+SHA1 2e4b1e1ec0b73242547bf3f3704baad936aeed7c t/release-pod-linkcheck.t
+SHA1 8f33a7704179eb135bd843a93b96102b641cd481 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJRRUqhAAoJEOd5N1CvIgQkfVcH/ja1+iWHgimgx5Ifi49bvjkX
+ifz2YXz2jfyYnbUiRqcMlzoAffRFBC8FT7wgcN/56GBpEs+C7YBEoNVsBCIWWkKF
+R+dJ66ELw19cBa7wxSnu3nBviI5/oOZqEujK/Fqwd9PRSKQuCCYQjz+NCbMftOb2
+7jLOHc93A++VUd0KebtR5vECb0/R2Wfq0dy/ROupd6zYv1Gph/GenuJHdT2QsstL
+iilncb7jRa4fhGSLIrh4k3HKVZjagkrUQ2kML1ewlzgWCf91BXxbuuKY0FiRLaxk
+iic89NcgD6UZUfca8ypVaExnqHC/rbRolyAAgvnWr9+oZkyHwQi76krP9kxeYqk=
+=fZyU
+-----END PGP SIGNATURE-----

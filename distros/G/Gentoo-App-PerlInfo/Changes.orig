@@ -1,0 +1,36 @@
+0.17 2016-05-23
+ - First release on CPAN
+ - No longer relies on legacy getFileContents method.
+ - No longer relies on legacy getPortDir method.
+ - No longer queries sys-libs/libperl ( Gone )
+ - Uses modern print_ok methods.
+ - Eclass revisions identified by Copyright year and SHA1 instead of (removed)
+   CVS Headers
+ - perl-functions.eclass included in eclass report
+ - virtual/perl-* data included in installed package report
+ - use Config.pm instead of looping `perl -V:fieldname`
+<<<<<<< HEAD
+
+0.16 - 2010-11-03
+ - Remove perl-post.eclass from reported eclass list
+
+0.15 - 2007-04-19
+ - Fix extraction of perl and libperl useflags
+
+0.14 - 2007-02-06
+ - Add dumping of interesting Perl Configuration flags
+
+0.13 - 2006-11-13
+ - More PortageXS based simplifications
+
+0.12 - 2006-09-26
+ - Reimplement certain logic using PortageXS
+
+0.11 - 2006-09-10
+ - Added perl-gcpan to portage categories
+
+0.10 - 2006-09-02
+ - First release in Git
+=======
+ - Internals restructured and all real logic relocated to Gentoo::App::PerlInfo
+>>>>>>> 69050a0... Move last of real logic into main module

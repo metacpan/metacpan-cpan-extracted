@@ -1,0 +1,26 @@
+#
+# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Glade/gladexmlperl.typemap,v 1.1 2003/05/19 02:35:20 rwmcfa1 Exp $
+#
+
+TYPEMAP
+
+GladeXML *	T_GLADE_TYPE_XML
+GladeXML_ornull *	T_GLADE_TYPE_XML_NULLOK
+GladeXML_noinc *	T_GLADE_TYPE_XML_NOINC
+
+INPUT
+
+T_GLADE_TYPE_XML
+	$var = SvGladeXML($arg);
+T_GLADE_TYPE_XML_NULLOK
+	$var = SvGladeXML_ornull($arg);
+
+
+OUTPUT
+
+T_GLADE_TYPE_XML
+	$arg = newSVGladeXML($var);
+T_GLADE_TYPE_XML_NULLOK
+	$arg = newSVGladeXML_ornull($var);
+T_GLADE_TYPE_XML_NOINC
+	$arg = newSVGladeXML_noinc($var);

@@ -1,0 +1,194 @@
+#!/usr/bin/perl -w
+
+use constant { PI => 3.14159 };
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use List::Util qw(max);
+use strict;
+use warnings;
+#$Gimp::verbose = 3;
+
+use POSIX qw(fmod);
+sub saw {  # a sawtooth function on PI
+  my $val = shift() / PI;
+  return $val - (fmod($val, 1.0) < 0.5 ? 0 : 1);
+}
+
+sub spin_layer { # the function for actually spinning the layer
+  my ($img, $source, $destination, $numframes, $prp) = @_;
+  my ($floater,  # The transformed image
+     $framelay, # The background color
+     $frameno);  # The current frame
+  # Now let's spin it!
+  my $stepsize = PI/$numframes; # in radians
+  $frameno = 0;
+  for (my $i=0; $i<=PI; $i+=$stepsize) {
+    Gimp::Progress->update ($i/PI);
+    # create a new layer for spinning
+    $framelay = ($i < PI/2.0) ? $source->copy(1) : $destination->copy(1);
+    $img->insert_layer($framelay, 0, 0);
+    $floater = $framelay->copy(1);
+    $img->insert_layer($floater, 0, 0);
+    # spin it a step
+    $img->selection_all;
+    my @x = $img->selection_bounds;
+    $img->selection_none;
+    # x[1],x[2]                  x[3],x[2]
+    # x[1],x[4]                  x[3],x[4]
+    my $height_sin_i2 = $source->height *sin($i)/2;
+    my $y1 = int($x[2]+$height_sin_i2);
+    my $y3 = int($x[4]-$height_sin_i2);
+    # height must be != 0
+    $y3++ if ($y1 == $y3);
+    my $saw_prp_width = saw($i)*$prp*$framelay->width;
+    $floater = $floater->transform_perspective(
+      $x[1]+$saw_prp_width,$y1,
+      $x[3]-$saw_prp_width,$y1,
+      $x[1]-$saw_prp_width,$y3,
+      $x[3]+$saw_prp_width,$y3,
+    );
+    $framelay->fill(BACKGROUND_FILL);
+    # merge the two layers together before we continue
+    $img->set_visible($floater, $framelay); # all others invis
+    $framelay = $img->merge_visible_layers(EXPAND_AS_NECESSARY);
+    $frameno++;
+    $framelay->set_name("Spin Layer $frameno (50ms)");
+  }
+}
+
+podregister {
+  Gimp::Context->push;
+  Gimp::Context->set_background($color);
+  $perspective /= 255.0; # PF_SLIDER doesn't work right for < 1
+  Gimp::Progress->init(__"Seth Spin...");
+  # Copy source and destination to new image
+  my $maxwide = max($drawable->width, $destination->width);
+  my $maxhigh = max($drawable->height, $destination->height);
+  my $img = Gimp::Image->new($maxwide, $maxhigh, RGB);
+  my $tmpimglayer = $img->add_new_layer(0,3,1); # have to have a layer before displaying
+  eval { Gimp::Display->new($img); };
+  $drawable->edit_copy;
+  my $spinlayer = $tmpimglayer->edit_paste(1);
+  $spinlayer->floating_sel_to_layer;
+  $destination->edit_copy;
+  my $destlayer = $tmpimglayer->edit_paste(1);
+  $destlayer->floating_sel_to_layer;
+  $tmpimglayer->remove_layer;                # remove temporary layer.
+  # set the layer size to be the full layer for each copied layer
+  $spinlayer->resize($maxwide, $maxhigh, $spinlayer->offsets);
+  $destlayer->resize($maxwide, $maxhigh, $destlayer->offsets);
+  $img->set_invisible($img->get_layers); # so they don't get merged
+  # need an even number of frames for spinback
+  if ($frames%2 && $spinback) {
+    $frames++;
+    Gimp->message(__"An even number of frames is needed for spin back.\nAdjusted frames up to $frames");
+  }
+  spin_layer($img, $spinlayer, $destlayer, $frames/($spinback ? 2 : 1), $perspective);
+  # go back from destination to spinlayer if spinning back
+  spin_layer($img, $destlayer, $spinlayer, $frames/2, $perspective) if $spinback;
+  $img->remove_layer($destlayer);
+  $img->remove_layer($spinlayer);
+  $img->set_invisible(); # sets all visible
+  my @all_layers = $img->get_layers;
+  $all_layers[$frames/2-1]->set_name(__"Spin Layer DEST (250ms)") if $spinback;
+  $all_layers[$frames-1]->set_name(__"Spin Layer SRC (250ms)");
+  $img->convert_indexed(1,MAKE_PALETTE,255,0,1,"buffy") if $indexed;
+  Gimp::Context->pop;
+  return $img;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+seth_spin - Seth Spin
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Animation/Seth Spin...
+
+=head1 DESCRIPTION
+
+Take one image.  Spin it about the horizontal axis, and end up with
+another image.  I made it for easy web buttons.
+
+=head1 PARAMETERS
+
+  [PF_DRAWABLE, "destination","Drawable to spin to"],
+  [PF_INT8, "frames", "How many frames to use", 16],
+  [PF_COLOR, "color", "Color to use for background if not transparent", [0,0,0]],
+  [PF_SLIDER, "perspective", "How much perspective effect to get", 40, [0,255,5]],
+  [PF_TOGGLE, "spinback", "Spin back" , 1],
+  [PF_TOGGLE, "indexed", "Convert to indexed", 1],
+
+=head1 RETURN VALUES
+
+  [PF_IMAGE, "output","Output image"],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 HISTORY
+
+ Note: Seth has transferred the maintainer `position' to me, so bother me
+ instead of him now :-)
+       - Steinar H. Gunderson <sgunderson@bigfoot.com>
+
+ This one's all mine.  Well, its GPL/Artistic but I'm the author and creator.
+ You need gimp 1.1 or better for this; too much has changed, and I don't think
+ 1.0.x had a perspective PDB function anyway
+
+ Here's the working theory on this:
+  There's a function called spinlayer which will spin from a spinlayer to a
+  destlayer.  It won't touch those 2 layers at all, and will leave its results
+  on the top of the layer stack.
+
+  If the user wants to spin back, it will take 1/2 the layers otherwise required
+  per call to the spin_layer, so that the number of total layers comes out the
+  same.
+
+  The main function makes a new image, copies the source and destination onto it
+  with appropriate offsets, and passes this image with the bottom 2 layers to
+  spin_layer.  At the end, remove the original 2 layers, since they won't be
+  needed, and add in some Layer comments for timing your gif.
+
+  Many thanks to Steinar and Marc, for expressing an interest in the
+  script that kept me going, and to Steinar in particular for helping me
+  track down why the script was crashing gimp (hint - don't make layers
+  of height=0, and if you do make sure you're logging to console since
+  the Gtk messagebox will never show up due to a rapid segfault).
+
+  Just a comment on that: We fixed the bug, so height=0 no longer segfaults, but
+  gives the error message it should. However, if GIMP segfaults, you should try
+  logging to console to make sure you get all applicable error messages. This
+  will make it _much_ easier to find the bug. - Steinar
+
+ Revision History:
+ 1.0 - Initial (too early) release
+ 1.1 - Second (still ugly) release: Made the perspective setting actually do
+       something
+ 1.2 - Used some of the convienence functions, and made things a little eaiser
+       from the user's standpoint too.  Also moved it from the
+       Filters->Animations-> menu to Xtns->Animations.  I think its
+       clearer whats going on this way.  It also works w/ any 2 layers now.
+ 1.5 - Some debugging by Steinar and myself to make it work again.
+ 1.6 - Moved some renaming into the main loop, more cleanups.
+ 1.7 - Fixed up set_name to drawable_set_name
+
+ Seth Burgess
+ <sjburges@gimp.org>
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+1.7
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

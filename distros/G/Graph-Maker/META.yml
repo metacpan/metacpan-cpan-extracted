@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Module-Starter
+version:             1.470
+abstract:            a simple starter kit for any module
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36_01
+distribution_type:   module
+requires:
+    Graph:                         0.8
+    Class::Factory:                0
+    Math::Random:                  0
+    Test::More:                    0
+    Test::Pod:                     1.22
+    Test::Pod::Coverage:           1.08
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Matt Spear <batman900+cpan@gmail.com>

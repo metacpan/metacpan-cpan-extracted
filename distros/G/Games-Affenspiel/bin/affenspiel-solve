@@ -1,0 +1,149 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Games::Affenspiel::Board;
+use Getopt::Long;
+
+no warnings 'recursion';
+
+my $max_level = undef;
+my $board_num = undef;
+my $policy = 0;
+my $all = 0;
+my $replay = 0;
+
+sub show_help {
+	my $text = qq{
+		Affenspiel Game Solver.
+		Usage: $0 [OPTIONS]
+		Options:
+			-h --help          show this help and exit
+			-b --board N       different initial board configuration
+			-p --policy N      change policy for choosing moves
+			-a --all           search among all solutions rather then the first
+			-m --max-level N   limit solutions to this level
+			-r --replay        replay the solution (one second between boards)
+			-T --dumb-term     do not position terminal cursor
+			-C --dumb-chars    do not use fancy drawing characters
+	};
+	$text =~ s/^\n//; $text =~ s/\t$//; $text =~ s/^\t\t//mg;
+	print $text;
+	exit 0;
+}
+
+sub wrong_usage {
+	die "Try '$0 --help' for more information.\n";
+}
+
+GetOptions(
+	"h|help"         => \&show_help,
+	"b|board=i"      => \$board_num,
+	"p|policy=i"     => \$policy,
+	"a|all"          => \$all,
+	"m|max-level=s"  => \$max_level,
+	"r|replay"       => \$replay,
+	"D|dumb-term!"   => \$ENV{DUMB_TERM},
+	"C|dumb-chars!"  => \$ENV{DUMB_CHARS},
+) || wrong_usage();
+
+$| = 1;
+
+my %boards = ();
+my %board_solutions = ();
+my %visited_boards = ();
+
+sub find_board_solution ($;$$) {
+	my $board = shift;
+	my $level = shift || 0;
+	return undef if $max_level && $level > $max_level;
+	my $hash  = shift || $board->hash;
+
+	$boards{$hash} ||= $board;
+	my $solution = $board_solutions{$hash};
+	my $visited_level = $visited_boards{$hash};
+
+	if (defined $visited_level) {
+		if (!$all || $visited_level <= $level) {
+			return $solution;
+		} elsif ($solution) {
+			$visited_boards{$hash} = $level;
+			if (!$max_level || $level + $solution->[0] <= $max_level) {
+				return $solution;
+			}
+		} elsif (!$max_level) {
+			return undef;
+		}
+	}
+	$visited_boards{$hash} = $level;
+
+	if ($ENV{DEBUG_BOARDS}) {
+		print "Level $level\n"; $board->show;
+	}
+
+	if ($board->is_final) {
+		$solution = [ 0, undef ];
+		goto GOT_SOLUTION;
+	}
+
+	my $move_infos = $board->expand_valid_moves;
+
+	foreach my $move_info (@$move_infos) {
+		my ($bar, $gap_position, $direction, $next_board) = @$move_info;
+		my $next_hash = $next_board->hash;
+		printf "%s%4d | bar%s %s -> %s | %s |\n",
+			"" x $level, $level, $bar, $direction,
+			$board->stringify_position($gap_position), $next_hash
+			if $ENV{DEBUG_MOVES};
+
+		my $next_solution = &find_board_solution(
+			$next_board, $level + 1, $next_hash
+		);
+
+		if ($next_solution) {
+			my $num_moves = $next_solution->[0] + 1;
+			$max_level = $num_moves + $level
+				unless $max_level && $max_level < $num_moves + $level;
+			next if $num_moves + $level > $max_level;  # should not happen
+
+			print "Got solution for board $hash in $num_moves moves\n"
+				if $ENV{DEBUG};
+			$solution = [ $num_moves, $next_hash ]
+				if !$solution || $solution->[0] > $num_moves;
+			last unless $all;
+		}
+	}
+
+GOT_SOLUTION:
+	$board_solutions{$hash} = $solution;
+
+	return $solution;
+}
+
+sub find_solution () {
+	my $board = Games::Affenspiel::Board->new($board_num);
+	Games::Affenspiel::Board::set_policy($policy);
+
+	print "\e[1;1H\e[J" if $replay && !$ENV{DUMB_TERM};
+	$board->show;
+
+	my $solution = find_board_solution($board);
+	die "No solution found\n" unless $solution;
+	my $num_moves = $solution->[0];
+
+	while (my $hash = $solution->[1]) {
+		my $board = $boards{$hash};
+		sleep(1) if $replay;
+		print "\e[1;1H" if $replay && !$ENV{DUMB_TERM};
+		$board->show;
+		$solution = $board_solutions{$hash};
+	}
+
+	print STDERR "Solved in $num_moves moves\n";
+}
+
+find_solution();

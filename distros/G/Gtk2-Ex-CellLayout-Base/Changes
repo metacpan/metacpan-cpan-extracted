@@ -1,0 +1,32 @@
+Copyright 2008, 2009, 2010 Kevin Ryde
+
+This file is part of Gtk2-Ex-CellLayout-Base.
+
+Gtk2-Ex-CellLayout-Base is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+Gtk2-Ex-CellLayout-Base is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-CellLayout-Base.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 5, November 2010
+    - test manifest only as an author test
+
+Version 4,  December 2009
+    - new _cellinfo_starts() and _cellinfo_ends() functions
+
+Version 3,  August 2008
+    - fixes for _set_cell_data(), and use my FreezeNotify there
+
+Version 2,  May 2008
+    - add Gtk2::Buildable
+
+Version 1,  April 2008
+    - the first version

@@ -1,0 +1,18 @@
+Revision history for Perl extension Git-Repository-Plugin-Hooks
+
+0.04 2016-05-14T16:40:07Z
+
+    - Updated testing dependencies.
+
+0.03 2014-05-14T18:44:37Z
+
+    - Updated docs.
+
+0.02 2014-02-03T05:50:30Z
+
+    - Skip tests if Git is not installed.
+
+0.01 2014-01-11T20:45:14Z
+
+    - Initial release.
+

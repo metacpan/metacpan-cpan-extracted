@@ -1,0 +1,47 @@
+---
+abstract: 'Google BigQuery Client Library for Perl'
+author:
+  - 'Shoji Kai <sho2kai@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-BigQuery
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Google::BigQuery:
+    file: lib/Google/BigQuery.pm
+    version: '1.02'
+  Google::BigQuery::V2:
+    file: lib/Google/BigQuery/V2.pm
+requires:
+  Class::Load: '0'
+  Crypt::OpenSSL::PKCS12: '0'
+  Crypt::OpenSSL::RSA: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  JSON::WebToken: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  URI::Escape: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/shojikai/Google-BigQuery/issues
+  homepage: https://github.com/shojikai/Google-BigQuery
+  repository: git://github.com/shojikai/Google-BigQuery.git
+version: '1.02'

@@ -1,0 +1,33 @@
+use strict;
+
+use Test::More tests => 4;
+use Test::Exception;
+
+use File::Spec;
+use Gantry::Conf;
+
+my $gconf = File::Spec->catfile( qw( t conf badgantry.conf ) );
+
+#-------------------------------------------------------------------------
+# Can we use the backend modules?
+#-------------------------------------------------------------------------
+
+use_ok( 'Gantry::Conf::Provider::HTTP' );
+use_ok( 'Gantry::Conf::Provider::HTTP::Config::General' );
+
+#-------------------------------------------------------------------------
+# Couldn't load backend
+#-------------------------------------------------------------------------
+
+throws_ok { Gantry::Conf->retrieve( 'httpsample', $gconf ) }
+          qr/Unable to require/,
+          'missing instance';
+
+#-------------------------------------------------------------------------
+# grab from web
+#-------------------------------------------------------------------------
+
+$gconf = File::Spec->catfile( qw( t conf gantry.conf ) );
+my $conf = Gantry::Conf->retrieve( 'httpsample', $gconf );
+
+is_deeply( $conf, { by => 'Phil', num => 4 }, 'http retrieval' );

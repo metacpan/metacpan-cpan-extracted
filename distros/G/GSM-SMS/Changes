@@ -1,0 +1,177 @@
+Revision history for Perl extension GSM::SMS.
+
+0.160 Tue Dec 24 00:36:06 PST 2002
+	- Win32 compatibility for GSM::SMS, Win32 defaults in configuration
+	- Autogenerating README
+	- Bug in GSM::SMS::Config::_config_wizard prevented creation of directories
+
+	Mon Dec  9 00:12:10 PST 2002
+	- Added a test for the acessors (t/22_transport_accessor)
+	- GSM::SMS::Transport::get_transports now returns an array instead of
+	  an array ref.
+
+	Sat Dec  7 18:37:52 PST 2002
+	- Added an accessor to GSM::SMS::NBS to access the GSM::SMS::Transport object
+	- Added a method to get a transport object by name to GSM::SMS::Transport
+	  (get_transport_by_name)
+
+	Sat Nov 23 19:58:51 PST 2002
+	- Makefile.PL appended Config/Default.pm, no just writes it out
+	- t/03_transport_serial.t now uses the correct parameters for serial
+	  object.
+	- Config.pm mistakingly used 'pin-code' instead of 'pin_code'. The same
+	  for baud_rate, serial_port
+
+	Fri Nov 22 21:03:22 PST 2002
+	- Added an extra parameter to NBS::SendSMSTextMessage for flash messages.
+	- Added 4 constant definitions to NBS:
+	    FLASH_YES, FLASH_NO, MULTIPART_YES, MULTIPART_NO
+
+	Thu Oct 17 21:56:20 PDT 2002
+	- GSM::SMS should be Win32 compatible now.
+	- bin directory contains the first 'app', GSsend_text
+
+	Sun Sep 29 21:36:57 PDT 2002
+	- Changed the complete layout of the directory
+	   <project>/lib
+	   <project>/bin
+	   <project>/t
+	   <project>/docs
+	   <project>/examples
+	- Term::ReadLine is no more for Makefile.PL, using ExtUtils::MakeMaker
+      prompt instead.
+	- perl -MGSM::SMS::Config -egenerate_config generates a config file
+	  form the default configuration.
+	- Minor doc update in NBS.pm
+
+0.151 Tue Jul 23 20:21:31 CEST 2002
+	- Passed all unit test
+
+      Mon Jul 15 22:42:59 CEST 2002
+	- Term::ReadLine troubles under 5.8.0RC3 fixed
+	- CONFIGURE hook in Makefile.PL fixed for 5.8.0RC3
+
+0.150 Sun Jul 14 14:47:39 CEST 2002
+	- All unit tests pass
+	- All example apps pass
+	- Changed default loop in RTTTL.pm, got errors when loop not defined in
+	  song string.
+
+	  Thu Jul 11 21:23:21 CEST 2002
+	- Added tests for all the NBS formats
+	- Removed the newline from generated RTTTL streams
+	
+	  Wed Jul 10 18:56:54 CEST 2002
+	- Got a version that passes the tests today.
+	- Simple router now works as expected
+	- Got rid of some annoying 'value not initialized' warnings
+	- test_72x28.gif is now in 2 color format
+	- Transport/File.pm now returns the correct value on succes 'sending'
+	- Lot's of other bugfixes
+	  
+	  Sun Jul  7 13:46:30 CEST 2002
+	- I've been debugging this week.
+	- Lot's of small bugfixes
+
+	  Tue Jul  2 21:20:47 CEST 2002
+	- All the stuff below has been done over a timespan of 3 months,
+	  made no Changes log entries
+	- Refactored all the Transport classes 
+	- Implemented a better routing facility. Routing is now done in
+	  a separate class and expandable. A simple router has been implemented
+	  GSM::SMS::TransportRouter::Simple. All is being driven by a
+	  TransportRouterFactory  class.
+	- All logging is now done via the Log::Agent framework from Mark Rogaski
+	- GSM::SMS::NBS constructor can now accept a -transport and -config_file
+	  argument.
+
+	  Wed Apr 17 21:11:45 CEST 2002
+	- RTTTL now supports looping, thanks to Joao Pedro Goncalves 
+	  <joaop@co.sapo.pt>.
+	- Configuration wizard when running perl Makefile.PL added.
+
+	  Mon Feb 25 23:09:34 UTC 2002
+	- Implemented the PictureMessage format.
+	  
+	  Sun Feb 24 18:13:53 UTC 2002
+	- Decided to go for a separate living space for EMS messages.
+	  This has consequences ... it is now clear that the OTA namespace
+	  is wrongly chosen, but will be further used, only for NBS. For EMS
+	  a better namespace lives within the EMS sub directory.
+	- Changed the GSM::SMS::OTA::Bitmap class to support also a height of
+	  28 pixels, as used in the Picture message format.
+
+	  Thu Dec 20 22:44:59 CET 2001
+	- Got a nice patch from David Wright. He fixed some bugs in the
+	  code handling the ringtones (RTTTL.pm)
+	- PDU.pm: Solved warning when doing test with Test::More
+	- Transport.pm : Bails out properly now when a transport fails to load.
+
+0.142 Wed Dec 12 23:13:04 CET 2001
+	- Fixed the mysteriously vanishing of SMS messages from the GSM modem.
+	  I can't reproduce the error anymore, since I fixed the 
+	  TTL (Time To Live) in Stack.pm.
+
+0.141 Sat Aug 18 16:11:35 CEST 2001
+	- Fixed export of OTAOperatorlogo_from{file,b64} in GSM::SMS::OTA::
+	  Operatorlogo.
+
+0.14  Wed Aug  8 19:13:44 CEST 2001
+	- Release for 1.4 
+
+0.133 Tue Aug  7 22:31:33 CEST 2001
+	- We now have MIDI support!
+	  Added GSM::SMS::Support::RTTTL2MIDI, kindly donated by isminiz 
+	  <ethemevlice@yahoo.com>. Based upon code from G.Babakhani ...
+
+0.132 Tue Aug  7 20:03:30 CEST 2001
+	- Serial transport now waites for the GSM modem to come up. It will
+	  read out the SIM card ( phonebook? ) when first coming up, and
+	  this could cause some trouble. Thanks to Warwick Smith for fixing
+	  this.
+
+0.131 Mon Aug  6 23:11:59 CEST 2001
+	- Updated NBS.pm and Transport.pm. Now the return value from
+	  the Trnsport subsystem really gets into the upper API.
+	  Thanks to Warwick Smith for pointing this one out to me.
+
+0.13 Tue Jul 24 22:45:37 CEST 2001
+	- Updated examples/slashdot/slashdot to be verbose
+	  on not being able to send. Using the new return
+	  values from GSM::SMS::NBS.
+
+	 Sat Jul 21 17:57:11 CEST 2001
+	- Changed the return value in NBS.pm of all functions.
+	  The return value was 'hardwired' to -1, meaning success.
+	  Now this value has changed to the C convention:
+	 	-1 means failure.
+		 0 means success.
+	  ( This oddity needs to get in the release documentation,
+        as it can break existing implementations. )
+
+0.12 Sat Jul 14 23:27:00 CEST 2001
+	- Adding support for an XmlRpc node transport.
+	  This transport is application specific, it used by the
+	  mercury project, a small SMS Messaging Server build
+	  on top of the GSM::SMS package.
+
+0.11 Sat Jul 14 20:52:24 CEST 2001
+	- MCube (www.mcube.be) support for text messages implemented
+	  Binary support does not seem to work correctly for now.
+	- Implemented optimised delete for Serial transport.
+	  Attributed by Toni Mattila <tontsa@asiaonline.net.my>.
+	- New config parameter for Serial transport:
+		memorylimit	= nn
+		( nn = 10 for WaveCom, nn = 15 for Siemens C25 )
+	  Pointed out by Toni Mattila <tontsa@asiaonline.net.my>
+
+0.1  Sun Jun 17 01:06:12 2001
+	- Preparing launch on CPAN
+	- added documentation and examples
+
+0.0  Sun Jun  3 21:46:04 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n GSM::SMS
+	- used the iSMS library modules and put them in another base
+	  directory (class path). ( Tektonica::iSMS -> GSM::SMS ). I did this
+	  to able to release them on CPAN. 

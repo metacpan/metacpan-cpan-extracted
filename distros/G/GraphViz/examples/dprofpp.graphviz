@@ -1,0 +1,108 @@
+#!/usr/bin/perl
+#
+# This is a replacement for Devel::DProf's dproffpp,
+# which instead produces a graph from the tmon.out
+# file.
+#
+# Example usage:
+#   perl -d:DProf test.pl
+#   dprofpp.graphviz tmon.out > tmon.png
+
+use strict;
+use lib '..';
+use GraphViz;
+
+1 until <> eq "PART2\n";
+
+my %package; 
+my %subroutine;
+my %name;
+my %id;
+
+my %calls;
+my %call_tree;
+
+my @stack = (-1);
+$package{-1} = 'main';
+$subroutine{-1} = 'main';
+$name{-1} = 'main::main';
+
+my $maxcalls;
+
+while (defined(my $line = <>)) {
+  chomp $line;
+
+  if (my($id, $package, $subroutine) = $line =~ m/^& (.+?) (.+?) (.+?)$/) {
+    my $name = "$package::$subroutine";
+    $name{$id} = $package . '::' . $subroutine;
+    $package{$id} = $package;
+    $subroutine{$id} = $subroutine;
+  } elsif (my($id) = $line =~ m/^\+ (.+?)$/) {
+    if (ignore($id)) {
+      $calls{$id}++;
+      $call_tree{$stack[-1]}{$id}++;
+      $maxcalls = $call_tree{$stack[-1]}{$id} > $maxcalls ? $call_tree{$stack[-1]}{$id} : $maxcalls;
+    }
+    push @stack, $id;
+  } elsif (my($id) = $line =~ m/^\- (.+?)$/) {
+    die "Pop problem!" unless $id = pop @stack;
+  }
+}
+
+die "Stack not empty: (" . (join ', ', @stack) . ')!' if @stack > 1;
+
+my %time;
+my $maxtime;
+
+my %id = reverse %name;
+
+my $text = `dprofpp -q -O 50000 tmon.out`;
+foreach my $line (split /\n/, $text) {
+  my(undef, $time, $excl, $cumul, $calls, $secspcall, $callspsec, $name) = split /\s+/, $line;
+  next unless ignore($id{$name});
+  $maxtime = $excl > $maxtime ? $excl : $maxtime;
+  $time{$id{$name}} = $excl;
+#  print "$name $excl\n";
+}
+
+my $g = GraphViz->new;
+
+my %traversed;
+
+traverse(-1);
+
+sub traverse {
+  my $id = shift;
+  return if $traversed{$id}++;
+
+  my $count = $time{$id};
+  my $ratio = $count / $maxtime;
+  my $w = 100 * (1 - $ratio);
+
+  $g->add_node($name{$id}, label => $subroutine{$id}, cluster => $package{$id}, color => "0,1,$ratio", w => $w);
+
+  my @called = sort keys %{$call_tree{$id}};
+
+  foreach my $called_id (@called) {
+    traverse($called_id);
+    my $count = $call_tree{$id}{$called_id};
+    my $ratio = $count / $maxcalls;
+    my $w = 100 * (1 - $ratio);
+
+
+    $count = "" if $count == 1;
+    $g->add_edge($name{$id} => $name{$called_id}, label => $count, color => "0,1,$ratio", w => $w, len => 2);
+  }
+}
+
+#print $g->_as_debug;
+print $g->as_png;
+
+sub ignore {
+  my $id = shift;
+  return 0 if $subroutine{$id} eq 'BEGIN';
+  return 0 if $subroutine{$id} eq 'END';
+  return 0 if $subroutine{$id} eq '__ANON__';
+#  return 0 if $subroutine{$id} =~ /double|square|cons|id|flip|fst|snd|min|max/; # temporary for clarity
+  return 1;
+}

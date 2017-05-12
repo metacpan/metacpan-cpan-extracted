@@ -1,0 +1,14 @@
+Revision history for Geo::GoogleEarth::AutoTour
+
+1.05      2016-11-29 13:32:33-08:00 America/Los_Angeles
+        - Set Math::Trig dependency to require >= 1.23
+        - Fixed rounding code in test to add back a bit more precision
+
+1.04      2016-11-28 14:52:56-08:00 America/Los_Angeles
+        - Round long-precision floats in test output to pass failing tests due to floating point inaccuracies
+
+1.03      2016-07-06 08:54:53-07:00 America/Los_Angeles
+        - Fixing missing files in distribution
+
+1.01      Wed Jul  6  8:50:25 PDT 2016
+        - First version, released on an unsuspecting world.

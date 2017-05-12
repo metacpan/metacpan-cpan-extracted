@@ -1,0 +1,16 @@
+Related Module Notes
+--------------------
+
+Reasons this module doesn't make use of the Games::BlackJack module (yet, at least):
+
+  - I didn't like the way their card and deck representations worked. Mine (in deck.pm) uses one scalar value per card,
+    Games::BlackJack uses an array reference. Mine can be printed without any more preprocessing than a join, theirs
+    requires a loop or subroutine to interpret the cards.. We both supply utility
+    functions to minimize the necessity for accessing the cards directly in any case, but when you have to do so, 
+    I believe my way is better. I prefer to offload as much effort as possible from my users.
+  - Maybe a bit of NIH syndrome..
+  - I wasn't aware Games::Blackjack existed until after I already had a working deck.pm, and was happy with it's API.
+  - I haven't had time to try to integrate it, and I'm not sure I'm willing to give up my deck representation. But I do plan to use what's useful in the long run.
+  
+Reasons this module doesn't make use of the Games::Cards module:
+  - I didn't know of it in time. It looks useful, I may want to integrate it later.

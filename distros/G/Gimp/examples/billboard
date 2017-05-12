@@ -1,0 +1,189 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+use constant PI => 3.14159;
+
+use POSIX qw(fmod);
+sub saw {  # a sawtooth function on PI
+  my $val = shift() / PI;
+  return $val - (fmod($val, 1.0) < 0.5 ? 0 : 1);
+}
+
+sub spin_layer { # the function for actually spinning the layer
+  my ($img, $spin, $destination, $numframes, $prp, $blinds) = @_;
+  # Now lets spin it!
+  $stepsize = PI/$numframes; # in radians
+  for ($i=0; $i<=PI; $i+=$stepsize) {
+    Gimp->progress_update ($i/PI);
+    # create a new layer for spinning
+    $framelay = ($i < PI/2.0) ?  $spin->copy(1) : $destination->copy(1);
+    $img->insert_layer($framelay, 0, 0);
+    # spin it a step
+    # Here I need to make the proper selection, repeatedly if necessary
+    $blindheight = $img->height/$blinds;
+    for ($j=0; $j<$blinds; $j++) {
+      # select a section
+      $img->select_rectangle(2, 0, $j*$blindheight, $img->width, $blindheight);
+      @x = $img->selection_bounds();
+      # x[1],x[2]                  x[3],x[2]
+      # x[1],x[4]                  x[3],x[4]
+      $framelay->transform_perspective_default(
+      $x[1]+saw($i)*$prp*$framelay->width,$x[2]+$blindheight *sin($i)/2,
+      $x[3]-saw($i)*$prp*$framelay->width,$x[2]+$blindheight *sin($i)/2,
+      $x[1]-saw($i)*$prp*$framelay->width,$x[4]-$blindheight *sin($i)/2,
+      $x[3]+saw($i)*$prp*$framelay->width,$x[4]-$blindheight *sin($i)/2,
+      1, 1);
+
+      #   Gimp Perspective Functionality has changed.  It used to create
+      #   a floating selection if there was a selection active already.
+      #   Now it only does that in interactive - PDB makes it a new layer.
+      #   Fine by me, wish the docs had changed though.
+      #$floater->floating_sel_anchor;
+
+    } # end for ($j=0;...
+
+    # I need to create another layer behind this spun one now
+    $backlayer = $framelay->layer_copy(0);
+    $img->insert_layer($backlayer, 0, 1);
+    $backlayer->fill(1); # BG-IMAGE-FILL
+  }
+  for ($i=0; $i<$numframes; $i++) {
+    @all_layers = $img->get_layers();
+    $img->set_visible($all_layers[$i],$all_layers[$i+1]);
+    $img->merge_visible_layers(0);
+  }
+  @all_layers = $img->get_layers();
+  $destfram = $all_layers[$numframes]->copy(0);
+  $img->insert_layer($destfram,0,0);
+
+  # clean up my temporary layers
+  $img->remove_layer($all_layers[$numframes]);
+  $img->remove_layer($all_layers[$numframes+1]);
+}
+
+podregister {
+  $maxwide = ($drawable->width > $destination->width) ? $drawable->width : $destination->width;
+  $maxhigh = ($drawable->height > $destination->height) ? $drawable->height: $destination->height;
+  $img = gimp_image_new($maxwide, $maxhigh, RGB);
+
+  $tmpimglayer = $img->add_new_layer(0,3,1);
+  eval { Gimp::Display->new($img); };
+  Gimp::Progress->init("Billboard...",-1);
+  Gimp::Context->push();
+  Gimp::Context->set_background($background);
+  $drawable->edit_copy();
+  $spinlayer = $tmpimglayer->edit_paste(1);
+  $spinlayer->floating_sel_to_layer();
+
+  $destination->edit_copy();
+  $destination = $tmpimglayer->edit_paste(1);
+  $destination->floating_sel_to_layer();
+
+  $tmpimglayer->remove_layer;
+
+  $spinlayer->resize($maxwide, $maxhigh, $spinlayer->offsets);
+  $destlayer->resize($maxwide, $maxhigh, $destlayer->offsets);
+  # work around for PF_SLIDER when < 1
+  $perspective = $perspective/255.0;
+
+  # need an even number of frames for spin_back
+  if ($frames%2 && $spin_back) {
+    $frames++;
+    Gimp->message(<<EOF);
+An even number of frames is needed for spin back.
+Adjusted frames up to $frames
+EOF
+  }
+
+  spin_layer($img, $spinlayer, $destlayer, $spin_back ? $frames/2 : $frames-1, $perspective, $billboard_slats);
+  $img->set_visible($img->add_new_layer(1),($img->get_layers)[0]);
+  $img->merge_visible_layers(0);
+
+  if ($spin_back) {
+    @layerlist = $img->get_layers();
+    $img->insert_layer($layerlist[$frames/2]->copy(0),0,0);
+    @layerlist = $img->get_layers();
+    spin_layer($img, $layerlist[1], $layerlist[0], $frames/2, $perspective, $billboard_slats);
+    $img->remove_layer(($img->get_layers)[0]);
+  }
+
+  # unhide and name layers
+  @all_layers = $img->get_layers;
+  $img->set_visible(@all_layers);
+  for ($i=1; $i<=$frames ; $i++) {
+    $all_layers[$i-1]->set_name("Spin Layer $i (50ms)");
+  }
+  $all_layers[$frames-1]->set_name("Spin Layer SRC (250ms)");
+
+  if ($spin_back) {
+    $all_layers[$frames/2-1]->set_name("Spin Layer DEST (250ms)");
+  } else {
+    $all_layers[0]->set_name("Spin Layer DEST (250ms)");
+  }
+
+  # indexed conversion wants a display for some reason
+  if ($convert_indexed) {
+    $img->convert_indexed(1,            # dither type = fs
+      MAKE_PALETTE, # palette type
+      255,          # number of colors
+      0,            # don't dither transparency
+      1,            # (ignored)
+      "Custom"      # custom palette name
+    );
+  }
+
+  Gimp::Context->pop();
+  Gimp->displays_flush();
+  return();
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+billboard - Spin image about the horizontal axis, and end up with another image.
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Animation/Billboard...
+
+=head1 DESCRIPTION
+
+Take one image.  Spin image about the horizontal axis, and end up with
+another image.  I made it for easy web buttons, mostly because somebody
+suggested to me.
+
+I think it was tigert that suggested this.
+
+=head1 PARAMETERS
+
+  [PF_DRAWABLE, "destination", "What drawable to spin to"],
+  [PF_INT8, "frames", "How many frames to use", 16],
+  [PF_COLOR, "background", "What color to use for background if not transparent", 'black'],
+  [PF_INT8, "perspective", "How much perspective effect to get", 40],
+  [PF_TOGGLE, "spin_back", "Also spin back" , 0],
+  [PF_TOGGLE, "convert_indexed", "Convert to indexed", 1],
+  [PF_SPINNER, "billboard_slats", "Number of shades", 3, [1,50,1]],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+Version 1.3
+
+=head1 LICENSE
+
+Copyright Seth Burgess.
+
+Distributed under the same terms as Gimp-Perl.

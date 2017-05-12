@@ -1,0 +1,35 @@
+---
+abstract: 'an SQL object for holding AGA TDList data'
+author:
+  - 'Reid Augustin <reid@hellosix.com>'
+build_requires:
+  Carp: '0'
+  DBD::SQLite: '0'
+  File::Slurp: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-Go-AGA-TDListDB
+requires:
+  DBI: '0'
+  Games::Go::AGA::Parse::TDList: '0'
+  Games::Go::AGA::Parse::Util: '0'
+  Getopt::Long: '0'
+  IO::Handle: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  POSIX: '0'
+  Readonly: '0'
+  Try::Tiny: '0'
+  open: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '0.048'

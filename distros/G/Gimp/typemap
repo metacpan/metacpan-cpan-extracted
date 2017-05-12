@@ -1,0 +1,153 @@
+TYPEMAP
+
+gchar						T_IV
+gint						T_IV
+gint32						T_IV
+guchar						T_U_CHAR
+guint						T_IV
+gulong						T_U_LONG
+guint32						T_IV
+gdouble						T_DOUBLE
+gchar *						T_PV
+gint *						T_PTROBJ
+guchar *					T_PV
+
+utf8_str					T_UTF8
+utf8_str_const					T_UTF8
+
+GimpDrawable *					T_GDRAWABLE
+GimpTile *					T_TILE
+GimpPixelRgn *					T_PIXELRGN
+GimpPixelRgn_PDL *				T_PIXELRGN_PDL
+
+GtkWidget *					T_IV
+
+GimpPixelRgnIterator				T_PTROBJ
+
+IMAGE						T_PREF
+LAYER						T_PREF
+COLOR						T_PREF
+CHANNEL						T_PREF
+DRAWABLE					T_PREF_ANY
+DISPLAY						T_PREF
+REGION						T_PREF
+
+GimpMemsizeEntry *	GOBJECT
+GimpMemsizeEntry_own *	GOBJECT_OWN
+GimpButton *		GOBJECT
+GimpButton_own *	GOBJECT_OWN
+GimpChainButton *	GOBJECT
+GimpChainButton_own *	GOBJECT_OWN
+GimpColorArea *		GOBJECT
+GimpColorArea_own *	GOBJECT_OWN
+GimpColorButton *	GOBJECT
+GimpColorButton_own *	GOBJECT_OWN
+GimpColorDisplay *	GOBJECT
+GimpColorDisplay_own *	GOBJECT_OWN
+GimpColorNotebook *	GOBJECT
+GimpColorNotebook_own *	GOBJECT_OWN
+GimpColorScale *	GOBJECT
+GimpColorScale_own *	GOBJECT_OWN
+GimpColorSelect *	GOBJECT
+GimpColorSelect_own *	GOBJECT_OWN
+GimpColorSelector *	GOBJECT
+GimpColorSelector_own *	GOBJECT_OWN
+GimpDialog *		GOBJECT
+GimpDialog_own *	GOBJECT_OWN
+GimpFileEntry  *	GOBJECT
+GimpFileEntry_own *	GOBJECT_OWN
+GimpFontSelectButton *	GOBJECT
+GimpFontSelectButton_own *	GOBJECT_OWN
+GimpOffsetArea *	GOBJECT
+GimpOffsetArea_own *	GOBJECT_OWN
+GimpPathEditor *	GOBJECT
+GimpPathEditor_own *	GOBJECT_OWN
+GimpPickButton *	GOBJECT
+GimpPickButton_own *	GOBJECT_OWN
+GimpPixmap *		GOBJECT
+GimpPixmap_own *	GOBJECT_OWN
+GimpSizeEntry *		GOBJECT
+GimpSizeEntry_own *	GOBJECT_OWN
+GimpUnitMenu *		GOBJECT
+GimpUnitMenu_own *	GOBJECT_OWN
+
+GimpRGB				T_GIMP_RGB
+GimpHSV				T_GIMP_HSV
+GimpUnit			T_GIMP_ENUM
+GimpColorAreaType		T_GIMP_ENUM
+GimpChainPosition		T_GIMP_ENUM
+GimpColorSelectorChannel	T_GIMP_ENUM
+GimpSizeEntryUpdatePolicy	T_GIMP_ENUM
+
+INPUT
+
+T_UTF8
+	$var = SvPVutf8_nolen ($arg);
+
+T_PREF
+	$var = unbless_croak ($arg, PKG_$ntype)
+
+T_PREF_ANY
+	$var = unbless_croak ($arg, PKG_ANY)
+
+T_GDRAWABLE
+	$var = old_gdrawable ($arg)
+
+T_TILE
+	$var = old_tile ($arg)
+
+T_PIXELRGN
+	$var = old_pixelrgn ($arg)
+
+T_PIXELRGN_PDL
+	$var = old_pixelrgn_pdl ($arg)
+
+GOBJECT
+	$var = ($type) SvGObject ($arg);
+
+T_GIMP_RGB
+	SvGimpRGB ($arg, $var);
+
+T_GIMP_HSV
+	SvGimpHSV ($arg, $var);
+
+T_GIMP_ENUM
+	$var = gperl_convert_enum (${
+          my $t = $ntype;
+          $t =~ s/(?=[A-Z])/_/g;
+          \lc substr $t, 1;
+        }_type (), ($arg));
+
+OUTPUT
+
+T_UTF8
+	sv_setpv ($arg, $var);
+        SvUTF8_on ($arg);
+
+T_PREF
+	$arg = autobless (newSViv ($var), GIMP_PDB_$ntype);
+
+T_PREF_ANY
+	$arg = autobless (newSViv ($var), GIMP_PDB_$ntype);
+
+T_GDRAWABLE
+
+GOBJECT
+	$arg = newSVGObject (G_OBJECT ($var));
+
+GOBJECT_OWN
+	$arg = newSVGObject_noinc (G_OBJECT ($var));
+
+T_GIMP_ENUM
+	$arg = gperl_convert_back_enum (${
+          my $t = $ntype;
+          $t =~ s/(?=[A-Z])/_/g;
+          \lc substr $t, 1;
+        }_type (), ($var));
+
+T_GIMP_RGB
+	$arg = newSVGimpRGB ($var);
+
+T_GIMP_HSV
+	$arg = newSVGimpHSV ($var);
+

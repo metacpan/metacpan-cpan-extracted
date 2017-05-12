@@ -1,0 +1,6 @@
+* Localize strings used in widgets (using gettext and locale)
+* Remove redundant code, e.g:
+  * various internal utility methods (e.g. to_string) - move to separate utility module
+  * use inheritance to centralize code because there's too much copy-paste coding:
+    * initialization code (extract abstract LdapView and LdapSelector superclasses and handle common initialization stuff over there)
+* Make variable naming more consistent

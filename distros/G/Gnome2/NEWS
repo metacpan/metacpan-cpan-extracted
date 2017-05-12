@@ -1,0 +1,138 @@
+Overview of changes in Gnome2 1.045
+===================================
+
+* Bugzilla #710417; Fix typo: correspoding -> corresponding
+
+Overview of changes in Gnome2 1.044
+===================================
+
+* RT#89191: Fix FSF's address
+* RT#89188: Make enums.pod depend on Gnome2 directory creation
+
+Overview of changes in Gnome2 1.043
+===================================
+
+* Avoid misusing the macro PL_na, thus preventing issues when Gnome2 is used in
+  conjunction with certain XS modules, among them XML::Parser and
+  String::Approx.
+* Created %meta_merge, which is used to pass META_MERGE values to EU::MM and
+  CPAN::Meta; these populate META.[yml|json] and MYMETA.[yml|json]
+
+Overview of changes in Gnome2 1.042
+===================================
+
+* Support the sm-connect property in Gnome2::Program::init.
+
+Overview of changes in Gnome2 1.041
+===================================
+
+* Fix a test failure.
+* Fix a POD error.
+
+Overview of changes in Gnome2 1.040
+===================================
+
+ Since 1.02x (the previous stable series)
+ ----------------------------------------
+  * Fix some test suite issues.
+
+ Since 1.030
+ -----------
+  * Nada.
+
+Overview of changes in Gnome2 1.030
+===================================
+
+* Fix some test issues.
+
+Overview of changes in Gnome2 1.023
+===================================
+
+* Fix yet another test suite issue.
+
+Overview of changes in Gnome2 1.022
+===================================
+
+* Fix some test suite issues.
+
+Overview of changes in Gnome2 1.021
+===================================
+
+* Update some build infrastructure.
+* "Fix" a test failure.
+
+Overview of changes in Gnome2 1.020
+===================================
+
+ Since 1.001 (the previous stable series)
+ ----------------------------------------
+  * Many internal changes and fixes to the test suite.
+  * Possibility to use construct-only properties with
+    Gnome2::Program::init.
+  * A Gnome2::enums page that lists all enums and their values.
+  * API additions:
+    - Some new things in GnomePasswordDialog.
+    - Gnome2::AuthenticationManager::dialog_is_visible.
+    - Gnome2::IconList::select_all.
+
+ Since 1.014
+ -----------
+  * Nada.
+
+Overview of changes in Gnome2 1.014
+===================================
+
+* Bind and test gnome_authentication_manager_dialog_is_visible.
+* Generate a Gnome2::enums man page with all enum and flag values.
+  [Kevin C. Krinke]
+
+Overview of changes in Gnome2 1.013
+===================================
+
+* Make construct-only properties work when using Gnome2::Program::init.
+
+Overview of changes in Gnome2 1.012
+===================================
+
+* Fix man small glitches in the test suite; add a new test for GnomeSound.
+* Bind and test new API in GnomePasswordDialog.
+
+Overview of changes in Gnome2 1.011
+===================================
+
+* Bind and test Gnome2::IconList::select_all.
+* Test Gnome2::DruidPageStandard::set_contents_background.
+
+Overview of changes in Gnome2 1.010
+===================================
+
+* Rearrange many private functions and make them static.
+
+Overview of changes in Gnome2 1.001
+===================================
+
+* Fix some building and testing issues.
+* Fix a bug in Gnome2::IconTheme.
+* Make Gnome2.pm use() Gnome2::Canvas so that Gnome2::IconList works.
+
+Overview of changes in Gnome2 1.00
+==================================
+
+* Depend on Glib 1.04, Gnome2::Canvas 1.00, and Gnome2::VFS 1.00.
+
+Overview of changes in Gnome2 0.94
+==================================
+
+* Document which functions may croak on error.
+
+Overview of changes in Gnome2 0.93
+==================================
+
+* Changed the binding of gnome_popup_menu_append from Gtk2::Menu::append to
+  Gtk2::Menu::append_from.  This is API breakage.  Any existing application
+  using Gtk2::Menu::append and expecting to get gnome_popup_menu_append needs
+  to be changed.
+* Added new GnomePasswordDialog methods.
+* Switched to the new version information policy introduced by Glib and Gtk2.
+* Made minor bug fixes and improvements.
+* In accordance with the GNOME Bindings release plan, Gnome2 froze API.

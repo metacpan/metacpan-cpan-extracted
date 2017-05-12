@@ -1,0 +1,22 @@
+---
+name: Geo-Proj-Japan
+version: 0.0.2
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: Add famous Japanese datums to Geo::Proj
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Geo::Proj: 0.06
+  version: 0
+build_requires:
+  Test::Base: 0
+provides:
+  Geo::Proj::Japan:
+    file: lib/Geo/Proj/Japan.pm
+    version: 0.0.2
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

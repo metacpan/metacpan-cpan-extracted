@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+t/Google-Cloud-Speech.t
+lib/Google/Cloud/Speech.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

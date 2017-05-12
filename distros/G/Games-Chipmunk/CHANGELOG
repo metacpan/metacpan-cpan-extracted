@@ -1,0 +1,19 @@
+Revision history for Perl extension Games::Chipmunk.
+
+0.5 2017-05-01
+    - Implemented pachinko example
+
+0.4 2017-02-21
+    - Fixed class name of cpVectPtr in __perlCpBodyVelocityFunc
+    - Minor documentation
+
+0.3 2017-02-20
+    - Most callbacks implemented
+
+0.2 2017-01-09
+    - Convert to v7 API
+
+0.01 2016-11-23
+	- original version; created by h2xs 1.23 with options
+		-n Games::Chipmunk --compat-version=5.8.0 /usr/include/chipmunk/chipmunk.h
+

@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+no warnings qw(once);
+use Getopt::Declare;
+
+my $args = Getopt::Declare->new(<<EOARGS);
+	-f <filename:if>	Parse file <filename>
+EOARGS
+
+my $data = q{
+	absmith,1234567,20
+	"aesmith, the other one",7635656,DNS
+	cat,dog,22.2
+	7637843,dejones,66.7
+	rmwilliams,288721,88
+	help me,I'm trapped,in the marks system
+	vtthan,872829,94
+};
+
+my $csv_spec = <<'EOCSV';
+	<name:qs> , <id:+i> , <score:0+n>	STD FORMAT
+		[repeatable]
+		{ push @::students, {name=>$name, id=>$id, score=>$score} }
+	
+	<id:+i> , <name:qs> , <score:0+n>	VARIANT FORMAT
+		[repeatable]
+		{ push @::students, {name=>$name, id=>$id, score=>$score} }
+	
+	<name:qs> , <id:+i> , DNS		DID NOT SIT
+		[repeatable]
+		{ push @::absent, {name=>$name, id=>$id, score=>0} }
+	
+	<other:/.+/>				SOMETHING ELSE
+		[repeatable]
+		{ print "Unknown entry format: [$other]\n"; }
+EOCSV
+
+
+if ($args->{"-f"})
+{
+	$args = Getopt::Declare->new($csv_spec,[$args->{"-f"}]);
+}
+else
+{
+	$args = Getopt::Declare->new($csv_spec,$data);
+}
+
+print "\nList of students:\n";
+foreach ( @::students )
+{
+	print "   ".$_->{id}." (".$_->{name}."):	".$_->{score}."\n";
+}
+
+foreach ( @::absent )
+{
+	print "   ".$_->{id}." (".$_->{name}."):	ABSENT\n";
+}

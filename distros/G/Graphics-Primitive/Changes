@@ -1,0 +1,289 @@
+Revision history for Graphics-Primitive
+
+0.67    2015-01-21
+  - Allow default font to be overridden with $GRAPHICS_PRIMITIVE_DEFAULT_FONT
+    and default MSWin32 to 'Arial' (TobyLL)
+
+0.66    2014-01-04
+  - Add a missing requires on Data::Visitor::Callback (tests failed without it)
+  - Convert "Changes" to the CPAN::Changes spec.
+
+0.65    2014-03-31
+  - Make a TextLayout's component a weak_ref to prevent circular references.
+
+0.64    2014-02-17
+  - POD encoding fixes (thanks Gregor Herrmann)
+
+0.63    2014-02-17
+  - Doc speclling fixes (thanks Gregor Herrmann!)
+
+0.61    2011-06-02
+  - Fix broken merge (thanks Ansgar Burchardt)
+
+0.60    2011-05-05
+  - If minimum_width or minimum_height is set, don't allow height or width to
+    be set to anything smaller!
+
+0.53    2011-02-18
+  - Add callback to Component
+
+0.52    2010-08-21
+  - POD updates
+
+0.51    2010-03-22
+  - Convert all remaining uses of AttributeHelpers with native traits
+    (Florian Ragwitz).
+
+0.50    2010-03-09
+  - Convert Path to use Moose's native traits rather than AttributeHelpers
+
+0.49    2010-01-10
+  - Remove typing for Path's primitives accessor
+
+0.48    2009-12-24
+  - Add _draw_arc to Driver's require
+
+0.47    2009-12-24
+  - Use BUILD and triggers to handle Border's color & width in constructor
+    and via setting width/color.
+
+0.46    2009-11-10
+  - Add JSON::Any dependency (Thanks NPW via RT)
+
+0.45    2009-10-02
+  - Add antialias_mode, hint_style, hint_metrics and subpixel_order attributes
+    to Font.
+
+0.44    Unknown
+  - Fix typo in Canvas' hints attribute
+
+0.43    Unknown
+  - README update
+
+0.42    Unknown
+  - Reverting 0.41 (ha!)
+  - Add width to insets, sets all insets in one call
+
+0.41    Unknown
+  - Don't re-layout already laid out textboxes (might get reverted)
+
+0.40    Unknown
+  - Fix some deprecated Moose stuff
+
+0.39    Unknown
+  - POD fixes
+  - Don't short-circuit TextBox prepare if there are lines or a layout.
+  - If there's no layout, don't try and create one.  This breaks things.
+
+0.38    Unknown
+  - Fix error in Component->outside_width
+
+0.37    Unknown
+  - More POD fixes
+
+0.36    Unknown
+  - POD fixes
+
+0.35    Unknown
+  - Gradient: Break out into separate Line and Radial classes
+
+0.34    Unknown
+  - Move pod tests to t/author
+
+0.33    Unknown
+  - Driver: Don't mark things prepared, that's Layout::Manager's job
+  - TextBox: simplify logic and return from prepare immediately after super if
+    there is no text
+  - TextBox: make some 'enumed' attributes plain Strings, since different
+    drivers will have different values
+  - Remove Text::Flow requirement
+
+0.32    Unknown
+  - Fix POD typo (thanks Brian Cassidy)
+  - TextBox: Don't resize during prepare unless it's new minimums are bigger
+  - Fix TextLayout's POD (thanks Brian Cassidy)
+  - Driver: add _draw_bezier to requires (thanks Budrica Petre Cosmin)
+
+0.31    Unknown
+  - Fix POD typo (thanks Brian Cassidy)
+  - Driver: Add _draw_circle and _draw_ellipse
+  - Bump Deps
+  - Revamp text handling, see Driver::TextLayout
+
+0.30    Unknown
+  - Bump Forest dependency to 0.4 to ease Win32 problems
+
+0.29    Unknown
+  - MooseX::Storage support
+  - Rename pack to finalize
+
+0.28    Unknown
+  - Require _draw_polygon method for Driver role
+
+0.27    Unknown
+  - Fill: Make paint a required attribute
+  - Operations: Make Fill and Stroke clone properly
+
+0.26    Unknown
+  - Add Image component (experimental)
+  - POD fixes
+  - Component: make parent a weakref
+
+0.25    Unknown
+  - TextBox: Normalize multi-line rendering on line height
+
+0.24    Unknown
+  - TextBox: Fix broken multi-line rendering
+
+0.23    Unknown
+  - Component: Add parent attribute
+  - Container: Set and unset parent attribute on add/remove/clear
+  - Add Aligned role
+  - Textbox: Use Aligned role
+  - POD updates
+
+0.22    Unknown
+  - Properly append component lists in find.
+
+0.21    Unknown
+  - Remove duplicate code in Driver's prepare method
+
+0.20    Unknown
+  - Fix accidentally marking containers as prepared when they are not
+
+0.19    Unknown
+  - Component: Add class attribute
+  - ComponentList: Add each and find
+
+0.18    Unknown
+  - Add ComponentList and use it to keep container components.
+  - Container: find_component now returns the component's index, not the
+    component.
+
+0.17    Unknown
+  - Useless whitespace changes
+  - POD typos fixed
+  - Border: switch from a single width to per-side Brushes
+  - Brush: add derive, equal_to and not_equal_to
+  - Border: now cloneable
+  - Border: add homogeneous, equal_to and not_equal_to
+  - Insets: ad as_array
+
+0.16    Unknown
+  - Opps, I forgot. :(
+
+0.15    Unknown
+  - Add prepared flag to components.  Attributes that affect rendering have
+    been modified to set prepared to 0 via a trigger.  Any new attributes
+    added henceforth should do the same.
+  - Containers (being Components) also have a prepared flag, but it is set
+    to true by the layout manager, not by the container itself.  Also, a
+    container is not prepared unless all of it's child components are
+    prepared.  See Layout::Manager for more details.
+  - TextBox: Fix bug when prepared & packed with text attribute set
+  - POD
+
+
+0.14    Unknown
+  - TextBox: handle text layout with Text::Flow
+  - Component: coercion of Insets from ArrayRef and Num
+  - Add pop_component to Container for removing the last component.
+  - POD updates
+  - Component: explicitly return from outside_width and outside_height
+  - Component: if minimum width or height are set already, don't change them
+    in prepare
+  - Font: add derive
+
+0.13    Unknown
+  - Reorganize prepare/pack/draw API to be handled by the Driver
+  - Add _resize and _finish_page to Driver API
+  - Component: Add page attribute
+  - Driver: Don't check class of incoming component before asking if it has
+    components and treating it like a container.
+
+0.12    Unknown
+  - Path: Add curve_to and rel_curve_to
+
+0.11    Unknown
+  - Small optimizations
+  - Driver: add reset
+  - Textbox: Add angle
+  - Use Forest rather than Tree::Simple per stevan's request
+
+0.10    Unknown
+  - Path: add rectangle
+  - New feature & hint: Add "preserve" to Operation.  Setting this causes
+    the canvas to NOT clear the current path on a do().  This operation can
+    then be used as a hint to the driver to not create a new path, but to
+    reuse the old one.
+
+0.09    Unknown
+  - Path: add arc, close_path, get_path
+  - Path: rename get_primitive_at to get_primitive
+  - Path: rename count_primitives to primitive_count
+  - Path: clone points rather than using them, they tend to change
+  - Path: don't inherit or implement anything out of Geo::Primitive, it's
+    not necessary
+  - Path: add hints attr with for driver hinting and add contiguous flag for
+    use with same
+  - Gradient: add line attr for guiding Gradient
+  - Canvas: update path proxy methods
+  - Make everything cloneable, adding Clone trait to 'deep' clone attrs
+
+0.08    Unknown
+  - Path: default starting point to 0,0
+  - Rename Graphics::Primitive::Stroke to Graphics::Primitive::Brush
+  - Brush: Add Color
+  - Add Canvas calls to Driver
+  - Add Operation::Fill and Operation::Stroke
+  - Lots of POD
+  - Add Paint and children
+
+0.07    Unknown
+  - Remove do_prepare
+  - Add disclaimer
+  - Add lines to Textbox and chop up input, this is likely temporary
+  - Add optional layout manager to container
+  - prepare now expects the driver to be passed in
+  - Component's prepare sets minimum sizes to the outside ones
+  - Return default font size from coderef
+  - Use isa to check component classes and put container at the bottom
+    so that the parent container is drawn before it's children.
+  - Add get_tree method to component for visualizing the entire component
+  - Prepare children before parents
+  - Don't return inside_height or width < 0
+  - Default Component::prepare to setting a minimum height/width based on
+    outside values
+  - Add Component::to_string
+  - Let Container's layout_manager handle do_layout
+  - Add 'pack' to the plan...
+  - Path: modify line_to and move_to to accept scalars
+  - Stroke: add dash_pattern
+
+0.06    Unknown
+  - Add Driver
+  - Set default border width to 0
+  - Move component management out of LM and into Container
+  - Move stuff from LM::Component role into Component
+  - Remove LM dependency
+  - Add Textbox
+  - Change Component's inside_bounding_box origin to be a relative value
+
+0.05    Unknown
+  - Don't prepare or draw invisible components in Containers
+
+0.04    Unknown
+  - POD fixes
+  - Add find_component and get_component as proxies in Container
+
+0.03    Unknown
+  - Check for definedness of components in a Container before prepare & draw
+
+0.02    Unknown
+  - Add visible to component
+  - Fix Description
+  - Add MI version because Yuval yelled at me
+
+0.01    Unknown
+        First version, released on an unsuspecting world.
+

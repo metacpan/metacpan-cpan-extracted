@@ -1,0 +1,21 @@
+Changelog.ini
+Changes
+lib/Genealogy/Gedcom/Date.pm
+lib/Genealogy/Gedcom/Date/Actions.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/compare.pl
+scripts/parse.pl
+scripts/pod2html.sh
+scripts/synopsis.pl
+t/compare.t
+t/English.t
+t/French.t
+t/German.t
+t/Hebrew.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

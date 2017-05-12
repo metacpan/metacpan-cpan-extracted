@@ -1,0 +1,94 @@
+NAME
+    Geography::States - Map states and provinces to their codes, and vica
+    versa.
+
+SYNOPSIS
+     use Geography::States;
+
+     my $obj = Geography::States -> new (COUNTRY [, STRICT]);
+
+EXAMPLES
+     my $canada = Geography::States -> new ('Canada');
+
+     my  $name          =  $canada -> state ('NF');      # Newfoundland.
+     my  $code          =  $canada -> state ('Ontario'); # ON.
+     my ($code, $name)  =  $canada -> state ('BC');      # BC, British Columbia.
+     my  @all_states    =  $canada -> state;             # List code/name pairs.
+
+DESCRIPTION
+    This module lets you map states and provinces to their codes, and codes
+    to names of provinces and states.
+
+    The "Geography::States -" new ()> call takes 1 or 2 arguments. The
+    first, required, argument is the country we are interested in. Current
+    supported countries are *USA*, *Brazil*, *Canada*, *The Netherlands*,
+    and *Australia*. If a second non-false argument is given, we use *strict
+    mode*. In non-strict mode, we will map territories and alternative codes
+    as well, while we do not do that in strict mode. For example, if the
+    country is USA, in non-strict mode, we will map GU to Guam, while in
+    strict mode, neither GU and Guam will be found.
+
+  The state() method
+    All queries are done by calling the "state" method in the object. This
+    method takes an optional argument. If an argument is given, then in
+    scalar context, it will return the name of the state if a code of a
+    state is given, and the code of a state, if the argument of the method
+    is a name of a state. In list context, both the code and the state will
+    be returned.
+
+    If no argument is given, then the "state" method in list context will
+    return a list of all code/name pairs for that country. In scalar
+    context, it will return the number of code/name pairs. Each code/name
+    pair is a 2 element anonymous array.
+
+    Arguments can be given in a case insensitive way; if a name consists of
+    multiple parts, the number of spaces does not matter, as long as there
+    is some whitespace. (That is "NewYork" is wrong, but "new    YORK" is
+    fine.)
+
+ODDITIES AND OPEN QUESTIONS
+    I found conflicting abbreviations for the US *Northern Mariana Islands*,
+    listed as *NI* and *MP*. I picked *MP* from the USPS site.
+
+    One site listed *Midway Islands* as having code *MD*. It is not listed
+    by the USPS site, and because it conflicts with *Maryland*, it is not
+    put in this listing.
+
+    The USPS also has so-called *Military "States"*, with non-unique codes.
+    Those are not listed here.
+
+    Canada's *Quebec* has two codes, the older *PQ* and the modern *QC*.
+    Both *PQ* and *QC* will map to *Quebec*, but *Quebec* will only map to
+    *QC*. With strict mode, *PQ* will not be listed. Similary, Newfoundland
+    has an old code *NF*, and a new code *NL* (the province is now called
+    *Newfoundland and Labrador*).
+
+DEVELOPMENT
+    The current sources of this module are found on github,
+    <git://github.com/Abigail/geography--states.git>.
+
+AUTHOR
+    Abigail <mailto:geography-states@abigail.be>.
+
+COPYRIGHT and LICENSE
+    Copyright (C) 1999 - 2001, 2009 by Abigail.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+

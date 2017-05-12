@@ -1,0 +1,17 @@
+bin/geo_postalcode_makedb
+Changes
+INSTALL
+lib/Geo/PostalCode.pm
+lib/Geo/PostalCode/InstallDB.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00_compile.t
+t/01_installdb.t
+t/02_basic.t
+t/03_polevault.t
+t/04_km.t
+t/basictest.data
+t/polevault.data

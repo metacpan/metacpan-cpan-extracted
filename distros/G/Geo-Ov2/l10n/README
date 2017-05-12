@@ -1,0 +1,92 @@
+$Id: README,v 1.6 2006/06/18 12:42:31 joern Exp $
+
+Notes for translators
+=====================
+
+This document describes briefly the steps for adding a new
+translation to dvd::rip and maintaining this translation in
+case of software updates.
+
+1. Install required packages
+----------------------------
+
+* Package       gettext              >= 0.13
+* Perl Module   Locale::TextDomain   >= 1.10
+* Program       inkscape             (for splash screen)
+
+Locale::TextDomain is packaged as libintl-perl in Debian
+(and probably also in other Linux distributions).
+
+
+2. Add a new translation
+------------------------
+
+- Open the PACKAGE file in a text editor and add your language
+  code to the LINGUAS variable.
+
+- Copy the file 'video.dvdrip.pot' to 'LANGCODE.po', e.g. for french
+  this would be this command:
+  
+  % cp video.dvdrip.pot fr.po
+
+- Now edit your .po file using an UTF-8 aware text editor or a
+  .po file editor like gtranslator, emacs, kbabel or something else.
+
+- Run 'make install' to build/rebuild all messages databases and
+  install them in dvd::rip's library path
+
+- Start dvd::rip from the source directory to test your translation.
+  If you don't have LC_MESSAGES set to your language code, you need
+  to do this now or set it temporarily for each dvdrip call like this:
+  
+  % LC_MESSAGES=fr_FR ./dvdrip
+
+
+3. Maintaining a translation
+----------------------------
+
+In case of software updates, messages could have been changed, deleted
+or added. So you need to keep your translation up-to-date.
+
+- run 'make update-po' to extract new, changed or deleted messages
+  from the dvd::rip source code. This updates all .po files
+  correspondently.
+
+- edit your .po file. At this point a .po aware editor like gtranslator
+  saves you a lot of work, because it shows you which messages are
+  new resp. changed.
+
+- as explained above a 'make install' will rebuild all messages
+  catalogs and you're done.
+
+
+4. Splash screen
+----------------
+
+dvd::rip has a splash screen showing at startup. It's a .png file
+generated from an Inkscape .svg drawing. To add a splash screen
+for your language, just copy the english version, launch inkscape
+and translate the text parts. "make install" converts the .svg
+file to .png and installs it into the right place:
+
+  % cp splash.en.svg splash.fr.svg
+  % inkscape splash.fr.po
+  % make install
+
+The dvd::rip version number is replaced during the installation
+process, so keep the "DVDRIP-VERSION" placeholder unchanged.
+
+
+Credits
+-------
+
+* The whole l10n framework is based on Guido Flohr's Perl module
+  Locale::TextDomain. When I began adding l10n support to dvd::rip
+  I was wondering about all this gettext stuff, which wasn't really
+  Perlish and I thought about implementing my own small framework.
+  But luckily enough I found this module well timed and I was surprised
+  how easy l10n can be ;)
+
+* The current layout of the splash screen is a contribution of
+  Christophe Combelles. He replaced the swanky "A full featured
+  DVD ripper" by this nice ->CD drawing ;)

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Geo-Constants
+version:      0.06
+version_from: lib/Geo/Constants.pm
+installdirs:  site
+requires:
+    Exporter:                      0
+    strict:                        0
+    vars:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

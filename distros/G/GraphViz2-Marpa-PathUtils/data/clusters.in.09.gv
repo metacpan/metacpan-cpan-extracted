@@ -1,0 +1,40 @@
+strict digraph graph_09
+{
+	# Node to node.
+
+	a [color = red   style = filled]
+	b [color = green style = filled]
+
+	a -> b
+
+	# Node to subgraph.
+
+	c [color = blue      style = filled]
+	d [color = orange    style = filled]
+	e [color = goldenrod style = filled]
+
+	c -> { d e }
+
+	# Subgraph to node.
+
+	f [color = coral     style = filled]
+	g [color = salmon    style = filled]
+	h [color = mistyrose style = filled]
+
+	{ f g } -> h
+
+	# Subgraph to subgraph.
+
+	i [color = lemonchiffon style = filled]
+	j [color = yellow       style = filled]
+	k [color = olivedrab    style = filled]
+	l [color = lime         style = filled]
+
+	{ i j } -> { k l }
+
+	# Standalone clusters.
+
+	x
+	y
+	z
+}

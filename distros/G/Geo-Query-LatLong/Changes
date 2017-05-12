@@ -1,0 +1,17 @@
+Revision history for Perl extension Geo::Query::LatLong.
+
+
+0.8008	Sat Feb  9 15:04:38 CET 2008
+	- Added dynamic requirement LWP::UserAgent
+
+
+0.8007	18 Jun 2007
+	- Initial Alpha release
+
+
+0.01  Thu Jun 14 16:26:57 2007
+	- original version; created by h2xs 1.23 with options
+		-A -n Geo::Query::LatLong
+
+
+Please go to my Wiki on http://meta.pgate.net/perl-modules/

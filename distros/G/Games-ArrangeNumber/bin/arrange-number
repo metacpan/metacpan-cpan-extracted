@@ -1,0 +1,90 @@
+#!perl
+
+our $DATE = '2015-01-03'; # DATE
+our $VERSION = '0.05'; # VERSION
+
+use Games::ArrangeNumber;
+use Getopt::Long qw(:config bundling auto_version auto_help);
+
+my %opts = (
+    board_size => 4,
+);
+GetOptions(
+    'size|s=i' => \$opts{board_size},
+);
+
+my $game = Games::ArrangeNumber->new(
+    board_size => $opts{board_size},
+);
+$game->run;
+
+# ABSTRACT: Arrange number game
+# PODNAME: arrange-number
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+arrange-number - Arrange number game
+
+=head1 VERSION
+
+This document describes version 0.05 of arrange-number (from Perl distribution Games-ArrangeNumber), released on 2015-01-03.
+
+=head1 SYNOPSIS
+
+ % arrange-number     ; # default board size is 4
+ % arrange-number -s 5; # set board size (3-7)
+
+ % arrange-number --help
+ % arrange-number --version
+
+Example of game display
+
+ Moves:  58   | Time: 23
+ +-------+-------+-------+
+ |       |       |       |
+ |   3   |   5   |   2   |
+ |       |       |       |
+ +-------+-------+-------+
+ |       |       |       |
+ |   1   |   4   |   6   |
+ |       |       |       |
+ +-------+-------+-------+
+ |       |       |       |
+ |   8   |       |   7   |
+ |       |       |       |
+ `-------+-------+-------'
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Games-ArrangeNumber>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-Games-ArrangeNumber>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-ArrangeNumber>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,7 @@
+advent.pod
+bin/pack-script.sh
+cpanfile.snapshot
+fatpacker.trace
+local
+packed.pl
+packlists

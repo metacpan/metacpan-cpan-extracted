@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+# Convert an input file containing a Graph::Easy description to
+# standalone SVG file
+
+# Example usage:
+#  examples/as_svg t/in/2nodes.txt >test.svg
+#  echo "[ A ] -> [ B ]" | examples/as_svg
+
+BEGIN { $|++; }
+
+use strict;
+use lib 'lib';
+use Graph::Easy::Parser;
+
+my $file = shift;
+
+if (!defined $file)
+  {
+  $file = \*STDIN;
+  binmode STDIN, ':utf8' or die ("binmode STDIN, ':utf8' failed: $!");
+  }
+my $parser = Graph::Easy::Parser->new( debug => (shift||0) );
+
+my $graph = $parser->from_file( $file );
+
+die ($parser->error()) unless defined $graph;
+$graph->timeout(60);
+$graph->layout();
+warn ($graph->error()) if $graph->error();
+
+binmode STDOUT, ':utf8' or die ("binmode STDOUT, ':utf8' failed: $!");
+print $graph->as_svg_file();
+

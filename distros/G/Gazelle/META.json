@@ -1,0 +1,102 @@
+{
+   "abstract" : "a Preforked Plack Handler for performance freaks",
+   "author" : [
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gazelle",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::CheckCompiler" : "0.04",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Guard" : "0",
+            "Parallel::Prefork" : "0.18",
+            "Plack" : "1.0037",
+            "Server::Starter" : "0",
+            "Stream::Buffered" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "HTTP::Tiny" : "0.058",
+            "Plack::Test" : "0",
+            "Plack::Test::Suite" : "0",
+            "Test::More" : "0.98",
+            "Test::TCP" : "2"
+         }
+      }
+   },
+   "provides" : {
+      "Gazelle" : {
+         "file" : "lib/Gazelle.pm",
+         "version" : "0.46"
+      },
+      "Plack::Handler::Gazelle" : {
+         "file" : "lib/Plack/Handler/Gazelle.pm",
+         "version" : "0.46"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Gazelle/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Gazelle",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Gazelle.git",
+         "web" : "https://github.com/kazeburo/Gazelle"
+      }
+   },
+   "version" : "0.46",
+   "x_authority" : "cpan:KAZEBURO",
+   "x_contributors" : [
+      "mattn <mattn.jp@gmail.com>",
+      "bayashi <bayashi@cpan.org>",
+      "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Alex Hunsaker <badalex@gmail.com>",
+      "Ichinose Shogo <shogo82148@gmail.com>",
+      "Shlomi Fish <shlomif@shlomifish.org>",
+      "meru_akimbo <merukatoruayu0@gmail.com>",
+      "karupanerura <karupa@cpan.org>",
+      "Mark Ellis <mark.ellis@cartridgesave.co.uk>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

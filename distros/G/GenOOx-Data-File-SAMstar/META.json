@@ -1,0 +1,56 @@
+{
+   "abstract" : "GenOO framework extension to read SAM files created by the STAR aligner",
+   "author" : [
+      "Emmanouil \"Manolis\" Maragkakis <mns.marag@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GenOOx-Data-File-SAMstar",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GenOO::Data::File::SAM::Record" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::Class::Load" : "0",
+            "Test::Moose" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "base" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/genoo/GenOOx-Sam-STAR/issues"
+      },
+      "homepage" : "https://github.com/genoo/GenOOx-Sam-STAR",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/genoo/GenOOx-Sam-STAR.git",
+         "web" : "https://github.com/genoo/GenOOx-Sam-STAR"
+      }
+   },
+   "version" : "0.0.3"
+}
+

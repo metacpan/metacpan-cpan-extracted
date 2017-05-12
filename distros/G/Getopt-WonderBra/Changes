@@ -1,0 +1,6 @@
+Revision history for Perl extension Getopt::WonderBra.
+
+0.01  Mon Sep 19 14:04:20 2005
+	- original version; created by h2xs 1.23 with options
+		-n Getopt::WonderBra
+

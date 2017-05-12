@@ -1,0 +1,132 @@
+######################################################################
+    Gaim::Log::Mailer 0.02
+######################################################################
+
+NAME
+    Gaim::Log::Mailer - Have your Gaim/Pidgin logs mailed to you
+
+SYNOPSIS
+        use Gaim::Log::Mailer;
+        my $mailer = Gaim::Log::Mailer->new();
+        $mailer->process();
+
+        # ~/.gaimlogmailer.yml
+         logfile:  /tmp/gaimlogmailer.log
+         email_to: foo@bar.com
+         min_age:  3600
+         throttle_interval:   3600
+         throttle_max_emails: 10
+
+DESCRIPTION
+    Have you ever wanted to look at the content of an IM conversation you
+    had earlier? But you couldn't, because you had the conversation on a
+    different system than the one you're using now? You need to centralize
+    your Gaim/Pidgin logs.
+
+    Gaim::Log::Mailer figures out if you have new IM conversations in your
+    Gaim log directory and mails them to your account, so you have them
+    available in your email, which you can check, wherever you are.
+
+    This module comes with a script "gaimlogmailer" which just reads in a
+    YAML configuration file (usually ~/.gaimlogmailer.yml>, then processes
+    availabe logs up to an adjustable threshold, sends them nicely formatted
+    to the specified email address and then exits.
+
+    It is recommended that you run this script in a cronjob, to make sure
+    all new IM conversations are picked up and forwarded. For example,
+    here's a cronjob that runs "gaimlogmailer" every hour on the 13th
+    minute:
+
+        $ crontab -l
+        13 * * * * /path/to/gaimlogmailer
+
+  Configuration
+    The configuration file "~/.gaimlogmailer.yml" specifies a number of
+    parameters that "gaimlogmailer" needs to operate. They are given in YAML
+    format, which basically just means
+
+        # comment
+        key: value
+
+    and comment lines are ignored. Strings need to be enclosed in quotes.
+    For details on this format, check http://yaml.org.
+
+    Here are the parameters in detail:
+
+    email_to
+        (Mandatory) The email address the script sends the log to.
+
+    logfile
+        (Optional) The log file where the script logs all activity, using
+        Log4perl.
+
+            logfile: "/tmp/gaimlogmailer.log"
+
+        (Note the quotes, YAML insists on them here).
+
+    min_age
+        (Optional, defaults to 3600). The minimum number of seconds a log
+        file needs to stay untouched by the Gaim application before the
+        mailer processes it. Reason for this is that there is no way to
+        figure out if Gaim is done writing a log file or if it will still
+        append to it at some point.
+
+        The mailer knows this and won't mail a file that has a modification
+        date younger than "min_age" seconds in the past to make sure no
+        half-written log files are processed. However, this method isn't
+        bullet-proof, and the mailer deals with this situation: if the
+        mailer notices that an already processed file has new data, it will
+        process it again. This way, you'll get two emails, so make sure this
+        happens rarely and choose min_age accordingly and wisely.
+
+    throttle_interval
+        (Optional, defaults to 3600/10). A new installation of gaimlogmailer
+        might find thousands of logfiles which need to be mailed out one by
+        one. To avoid overwhelming the mail system or triggering spam
+        filters, the number of emails can be limited to
+        "throttle_max_emails" per "throttle_interval".
+
+        For example, if you want gaimlogmailer to only send a maximum of 10
+        emails per hour, set
+
+            throttle_interval:   3600
+            throttle_max_emails: 10
+
+        in your configuration file. Even if the script is rate-limited in
+        this way, it'll pick up slowly and handle all logs eventually.
+
+    throttle_max_emails
+        See "throttle_interval".
+
+    exclude_words
+        A list of blank-separated words
+
+            # configuration file
+            exclude_words: maybe thanks thx doesn hey put already
+
+    languages
+        A blank-separated list of languages the term extractor should try.
+
+            # Try English and German
+            languages: en de
+
+  Mail Preferences
+    Gaim::Log::Mailer uses Mail::DWIM to send out mail. By default, it uses
+    a sendmail daemon on the local machine, if you want something else, you
+    can change the local .maildwim file and specify a different transport
+    (e.g. SMTP). See the Mail::DWIM documentation for details.
+
+  References
+    This module is based on an article I wrote for the German Linux
+    Magazine, where IM logs were sent to an IMAP server:
+    http://www.linux-magazin.de/heft_abo/ausgaben/2007/06/gespraechsprotokol
+    le
+
+LEGALESE
+    Copyright 2008 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2008, Mike Schilli <cpan@perlmeister.com>
+

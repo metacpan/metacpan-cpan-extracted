@@ -1,0 +1,162 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+#$Gimp::verbose = 1;
+
+my @BUCKET_ARGS = (FG_BUCKET_FILL,NORMAL_MODE,100,0,0,0,0);
+
+podregister {
+  # Create new image
+  my $img = Gimp::Image->new($width,$height,0);
+  eval { Gimp::Display->new($img); };
+  my $layer = $img->layer_new($width,$height,1,"Yin/Yang",100,0);
+  $img->insert_layer($layer,0,0);
+  $img->set_active_layer($layer);
+  my $draw = $img->get_active_drawable;
+  Gimp::Context->push();
+  Gimp::Context->set_foreground([0,0,0]);
+  $img->selection_all;
+  $draw->edit_bucket_fill(@BUCKET_ARGS);
+  # Create the yin-yang shape
+  $img->select_rectangle(CHANNEL_OP_REPLACE,0,0,$width/2,$height);
+  Gimp::Context->set_antialias($aa);
+  $img->select_ellipse(
+    CHANNEL_OP_ADD,     $width/4,0,        $width/2,$height/2
+  );
+  $img->select_ellipse(
+    CHANNEL_OP_SUBTRACT,$width/4,$height/2,$width/2,$height/2
+  );
+  Gimp::Context->set_foreground([255,255,255]);
+  $draw->edit_bucket_fill(@BUCKET_ARGS);
+  # Cut away all but the central circle
+  $img->image_select_ellipse(CHANNEL_OP_REPLACE,0,0,$width,$height);
+  $img->selection_invert;
+  $draw->edit_clear;
+
+  # Create the "eyes"
+  if ($do_eyes) {
+    my $x1 = $width/2-$width/16;
+    my $y1 = $height/2-$height/4-$height/16;
+    my $x2 = $x1;
+    my $y2 = $height/2+$height/4-$height/16;
+    my $eyewidth = $width/8;
+    my $eyeheight = $height/8;
+    insert_eye($img,$eye_images,$white_eye_image,[0,0,0],$x1,$y1,$eyewidth,
+	       $eyeheight,$draw,$aa);
+    insert_eye($img,$eye_images,$black_eye_image,[255,255,255],$x2,$y2,
+	       $eyewidth,$eyeheight,$draw,$aa);
+  }
+
+  # Finish up
+  Gimp::Context->pop();
+  $img->selection_none;
+
+  $img;
+};
+
+# This subroutine inserts an "eye" (a dot in the center of the cicular
+# part of each of the halves of the yin-yang). The eye is either
+# a solid dot of the opposite color from that half of the yin-yang or
+# an image, which is loaded and scaled to fit.
+sub insert_eye {
+  my ($img, $do_image, $file, $color, $x, $y, $width, $height, $draw, $aa) = @_;
+  $img->select_ellipse(CHANNEL_OP_REPLACE,$x,$y,$width,$height);
+  Gimp::Context->set_foreground($color);
+  if ($do_image) {
+    my $eye = Gimp->file_load($file,$file);
+    $eye->scale($width,$height);
+    $eye->selection_all;
+    my $eyedraw = $eye->get_active_drawable;
+    $eyedraw->edit_copy;
+    my $float = $draw->edit_paste(1);
+    $float->floating_sel_anchor();
+    $eye->delete;
+  } else {
+    $draw->edit_bucket_fill(@BUCKET_ARGS);
+  }
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+yinyang - Render a stand-alone Yin/Yang image
+
+=head1 SYNOPSIS
+
+<Image>/File/Create/Logos/Yin-Yang...
+
+=head1 DESCRIPTION
+
+Renders a black-and-white Yin/Yang symbol optionally with "eyes" that
+may optionally be images.
+
+B<yinyang> is a L<Gimp> plugin. It generates a Yin/Yang symbol, which
+is a Chinese symbol of duality. It takes as parameters (provided by the
+Gimp user interface) the width and height of the resulting image;
+a toggle to indicate if "eyes" should be inserted;
+a toggle to indicate if the eyes should be images that are
+loaded separately; the two filenames for the eyes and a toggle to
+indicate if anti-aliasing should be used.
+
+The "eyes" are normally either black or white dots in the middle of the
+circular regions of the two halves of the Yin and Yang. If you like
+you can load these eyes from another image.
+
+=head1 IDEAS
+
+Here are some thoughts on how the plugin could be used:
+
+=over 5
+
+=item *
+
+Use as a low-opacity layer over an image to indicate duality or harmony.
+
+=item *
+
+Use to replace circular objects in an image (e.g. eyes, street signs,
+the sun, etc.)
+
+=item *
+
+Map two opposed or dualistic images. One into the black region, one
+into the white. For a really cool look, make the eyes show a piece of
+the other image.
+
+=back
+
+=head1 PARAMETERS
+
+  [PF_INT32, "width", "Width", 256],
+  [PF_INT32, "height", "Height", 256],
+  [PF_TOGGLE, 'do_eyes', "Insert eyes", 1],
+  [PF_TOGGLE, 'eye_images', "Eyes are images", 0],
+  [PF_FILE, 'white_eye_image', "Top eye filename", ""],
+  [PF_FILE, 'black_eye_image', "Bottom eye filename", ""],
+  [PF_TOGGLE, 'aa', "Anti-aliasing", 1]
+
+=head1 HISTORY
+
+ Written by Aaron Sherman, (c) 1998
+   04-22-2001, peter@kirchgessner.net: fix problems with functions
+               that changed number of arguments
+   2004-03-29, dov@imagic.weizmann.ac.il: fixed for Gimp-2.0
+
+=head1 AUTHOR
+
+Written by Aaron Sherman <ajs@ajs.com>, (c) 1998.
+
+=head1 DATE
+
+1999b
+
+=head1 LICENSE
+
+(c) 1998, Aaron Sherman
+
+Distributed under unknown license terms.

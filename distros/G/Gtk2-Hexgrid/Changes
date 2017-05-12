@@ -1,0 +1,26 @@
+Revision history for Gtk2-Hexgrid
+
+0.01    December 7 2007
+       -First version, released on an unsuspecting world.
+
+0.02    December 11 2007
+       -default color, tile items (just text for now)
+
+0.03    December 11 2007
+       -background images, tile-relativeness
+
+0.04    December 15 2007
+       -more complete pod, more complete tests
+
+0.05    December 17 2007
+       -fixed some pod
+       -functions to get particular groups of tiles
+         *corners of the hexgrid
+         *all tiles within some distance from a certain tile
+
+0.06    probably april 08-ish
+       -fixed some earlier decisions
+       -num_tiles
+       -made some tests nicer
+       -local image caches per hexgrid (safety)
+       -renamed Items to Sprites

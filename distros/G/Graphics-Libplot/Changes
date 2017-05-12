@@ -1,0 +1,19 @@
+Revision history for Perl extension Libplot.
+
+2.2.2   Fri, 28 Jul 2006 22:20:49 -0700
+        Olle Nilsson provided a fix that prevented output other
+        than X from working. (removed file related types from the
+        typemap.)
+
+2.2.1    Sun, 16 Jul 2006 22:21:24 -0700
+         Fixed pod docs. Cleaned up some other docs
+
+2.2-1    Thu, 22 Apr 1999 00:24:11 -0700
+	 C API of libplot changed, so we have to make our API change
+
+2.1.6.2  Wed, 18 Nov 1998 01:24:20 -0700
+	- Spruced up documentation a bit.
+
+0.01  Thu Oct 22 20:01:58 1998
+	- original version; created by h2xs 1.18
+

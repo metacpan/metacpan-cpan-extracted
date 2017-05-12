@@ -1,0 +1,26 @@
+Build.PL
+Changes
+eg/assign-keywords.pl
+eg/autocomplete.pl
+eg/check-articles.pl
+eg/check-doi.pl
+eg/create_report.pl
+eg/del-prov.pl
+eg/delete-instrument.pl
+eg/fix-file-sizes.pl
+eg/list-instruments.pl
+eg/login.pl
+eg/lookup-instrument.pl
+eg/README-examples.md
+eg/send_file.pl
+eg/show-figures.pl
+eg/update-ref.pl
+lib/Gcis/Client.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/00-load.t
+t/01-login.t
+t/02-report.t

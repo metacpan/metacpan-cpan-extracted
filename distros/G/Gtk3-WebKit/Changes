@@ -1,0 +1,21 @@
+Revision history for Gtk3::WebKit
+
+0.06 Mon Apr 14 22:27:41 CEST 2014
+    Migrate to Dist::Zilla
+    Issue #5 - Fix installation failing if Test::NeedsDisplay is not installed
+
+0.05 Sat Mar  1 07:30:12 CET 2014
+    RT 93421 - Unit tests can run in headless Fedora 20
+
+0.04 Mon Apr 15 22:13:50 CEST 2013
+    Tests don't fail on a headless system
+    MYMETA files are no longer in the bundle
+
+0.03 Wed Nov 28 08:30:51 CET 2012
+    Add Gtk3 as a dependency
+
+0.02 Thu Nov 17 12:27:01 CET 2011
+    Add DOM constants
+
+0.01 Mon Sep 19 21:37:15 CEST 2011
+    First version, released on an unsuspecting world.

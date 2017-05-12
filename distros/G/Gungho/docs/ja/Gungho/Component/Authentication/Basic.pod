@@ -1,0 +1,48 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::Authentication::Basic.ja - GunghoでBasic認証を行う
+
+=head1 SYNOPSIS
+
+  ---
+  components:
+    - Authentication::Basic
+  credentials:
+    basic:
+      -
+        - http://example.com
+        - "Admin Only"
+        - username
+        - password
+      -
+        - http://example2.com
+        - "Admin Only"
+        - username2
+        - password2
+
+=head1 DESCRIPTION
+
+このモジュールはGunghoにBasic認証を行う機能を追加します。
+
+=head1 METHODS
+
+=head2 setup($c)
+
+コンポーネントを初期化します。
+
+=head2 authenticate($is_proxy, $realm, $request, $response)
+
+Basic認証を行います。認証が必要な最初のリクエストが401で失敗した場合は
+認証ヘッダーを付与し再度リクエストを行います。
+
+=head2 set_basic_credentials($uri, $realm, $uid, $pass)
+
+指定のURLとRealmに対して認証情報を設定します。
+
+=head2 get_basic_credentials($uri, $realm)
+
+指定のURLとRealmに対して認証情報を返します
+
+=cut

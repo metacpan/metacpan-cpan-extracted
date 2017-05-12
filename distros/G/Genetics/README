@@ -1,0 +1,64 @@
+Genetics version 0.03
+=====================
+
+The Genetics bundle consists of a collection of OO Perl modules designed to
+facilitate the development of Perl scripts and applications in the area of
+genetic analysis.  This includes modules encapsulating data related to genetic
+analysis (Genetics::Object subclasses) and modules that implement an API for
+interacting with these objects (Genetics::API and its derivatives), including
+managing their persistence in a relational database (Genetics::API::DB::*).
+The classes/objects, API and database are collectively referred to as GenPerl.
+The original version of GenPerl was developed in the Research Department of
+Genomica Corp. where it was used to produce research protytypes and to manage
+and analyze data related to research projects with which Genomica was
+involved.
+
+See the files doc/index.html and doc/gptutorial.html for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Writer
+  DBI
+  DBD::mysql
+
+The latter two are only needed if you want to use the GenPerl database
+backend.  Obviously, you must also have a MySQL instance with an appropriate
+database and schema in place.  If you have the necessary permissions,
+something like the following should do the trick:
+
+   % mysql 
+   mysql> use mysql
+   mysql> create database genperl;
+   mysql> exit
+   % mysql genperl < doc/createGenPerlSchema.sql
+
+AUTHOR
+
+Steve Mathias, smathias1@qwest.net
+
+LICENCE
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA

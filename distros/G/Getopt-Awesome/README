@@ -1,0 +1,154 @@
+NAME
+    Getopt::Awesome - Let your modules define/export their own arguments
+
+DESCRIPTION
+    First of, this module was very inspired in the Getopt::Modular CPAN
+    package however at the moment of using it I found it was giving me
+    "more" of what I was looking so I thought I could borrow some ideas of
+    it, make it lighter and add some of the features/functionalities I was
+    looking for and so this is the result: a module I've been using every
+    day for all my perl scripts and modules, though would be nice to give it
+    to the Perl community.
+
+    Now, this module is handy if you want to give your modules the freedom
+    of definining their own "getopt options" so next time they get called
+    (or *used*) the options will be available in the form of arguments
+    (--foo, --bar).
+
+    Another feature of this module is that when user asks for help (-h or
+    --help) a usage will be printed by showing all the options available by
+    the current perl script and by all the modules in use.
+
+    All options are prefixed by the package name in lowercase where
+    namespace separator (::) gets replaced by a dash (-), so --help will
+    return:
+
+        --foo-bar-option   Description.
+        --foo-bar-option2  Description 2.
+
+    and so on..
+
+    See the SYNOPSYS section for examples.
+
+    Notes:
+
+    *   The use of short aliases is not supported for options defined in
+        modules, this feature (provided by Getopt) is only available in the
+        main script (.pl)
+
+    *   In your perl script (.pl) remember to call parse_opts otherwise the
+        values of the options you request might be undef, empty or have
+        their default values.
+
+    *   *Remember:* ARGV is ONLY parsed when parse_opt is called.
+
+SYNOPSYS
+        package Your::Package;
+
+        use Getopt::Awesome qw(:common);
+        define_option('foo=s', 'Foo bar');
+        # ...or...
+
+        define_options(
+            ('foo=s', 'Foo'),
+            ('bar=s', 'Bar'));
+
+        parse_opts();
+        my $foo_val = get_opt('option_name', 'Default value');
+
+AUTHOR
+    Pablo Fischer (pablo@pablo.com.mx).
+
+COPYRIGHT
+    Copyright (C) 2009 by Pablo Fischer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+FUNCTIONS
+    define_options (@options)
+            use Getopt::Awesome;
+            Getopt::Awesome qw(:common);
+
+            define_options(
+                ('option_name', 'Option description')
+            );
+
+        It defines the given options for the package/script that is making
+        *the call*.
+
+        Please note the options defined in the current caller package are
+        not shared with other modules unless it's explicitly specified (see
+        *get_opt()*).
+
+        Each array item should consist at least of 1 item with a max of 2.
+        The first parameter should be the option name while the second one
+        (optional) is the description.
+
+        Some notes about the option name, the first item of every array:
+
+        *   It's a required parameter.
+
+        *   It accepts any of the "Getopt::Long" option name styles (=s, !,
+            =s@, etc).
+
+    define_option( $name, $description )
+            use Getopt::Awesome qw(:common);
+
+            define_option('option_name', 'Description');
+
+        It calls the *define_options* subroutine for adding the given option
+        (*$name*) with an optional description (*$description*).
+
+        Please refer to the documentation of "define_options" for a more
+        complete description about it, but basically some notes:
+
+        *   The option name is a required parameter
+
+        *   The option accepts any of te "Getopt::Long" option name styles.
+
+    get_opt($option_name, $default_value)
+            use Getopt::Awesome qw(:common);
+
+            my $val = get_opt('option_name', 'Some default opt');
+            # Gets the 'foome' option value of Foo::Bar module and defaults to 'foobie'
+            my $val = get_opt('Foo::Bar::foome', 'foobie');
+
+        It will return the value of the given option, if there's no option
+        set then undefined will be returned.
+
+        Please note that if the option is set to expect a list you will
+        receive a list, same for integer, strings, booleans, etc. Same as it
+        happens with the Getopt::Long.
+
+    set_opt ($option_name, $value)
+            use Getopt::Awesome qw(:common);
+
+            set_opt('option_name', 'Value');
+            # Sets the 'foome' option value to foobie of the Foo::Bar package.
+            set_opt('Foo::Bar::foome', 'foobie')
+
+        Sets the given value to the given option.
+
+    parse_opts()
+        This subroutine should never be called directly unless you want to
+        re-parse the arguments or that your module is not getting called
+        from a perl script (.pl).
+
+        In case you want to call it:
+
+            use Getopt::Awesome qw(:common);
+
+            parse_opts();
+
+    usage()
+        Based on all the current options it returns a nice and helpful
+        'guide' of all the available options.
+
+        Although the usage gets called directly if a -h or --help is passed
+        and also if no_usage is set you can call it directly:
+
+            use Getopt::Awesome qw(:all);
+
+            usage();
+

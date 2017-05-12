@@ -1,0 +1,29 @@
+# ChangeLog for net-wireless/gnome-bluetooth
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/gnome-bluetooth/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  27 Apr 2004; Aron Griffis <agriffis@gentoo.org>
+  gnome-bluetooth-0.4.1.ebuild:
+  Add inherit eutils
+
+  10 Apr 2004; Alastair Tse <liquidx@gentoo.org> gnome-bluetooth-0.4.1.ebuild,
+  files/gnome-bluetooth-0.4.1-gtk24.patch:
+  patch to compile under gtk2.4. thanks to Krist <klen@pandora.be> (#46676)
+
+  12 Feb 2004; Ciaran McCreesh <ciaranm@gentoo.org>
+  gnome-bluetooth-0.4.1.ebuild:
+  Adding ~sparc (works with some kernels, see bug #39710)
+
+  30 Jan 2004; Peter Johanson <latexer@gentoo.org> metadata.xml:
+  Fixed metadata.xml for wireless->mobile herd change and copyright date in
+  the ebuild's header
+
+  20 Sep 2003; Alastair Tse <liquidx@gentoo.org> gnome-bluetooth-0.4.1.ebuild:
+  add more deps and NEWS to DOCS
+
+*gnome-bluetooth-0.4.1 (20 Sep 2003)
+
+  20 Sep 2003; Alastair Tse <liquidx@gentoo.org> gnome-bluetooth-0.4.1.ebuild,
+  metadata.xml:
+  initial commit. thanks to johnm@gentoo.org (#24302)
+

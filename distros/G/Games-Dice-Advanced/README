@@ -1,0 +1,18 @@
+This module simulates dice rolls, both for normal dice, for dice with
+weird numbers of sides, and dice with uneven probability distributions.
+There are many different ways of tweaking the distribution.
+
+Because this module is dealing with random data, it is not practical to
+test it in a deterministic way.  The tests *should* pass, but if they
+don't, please try again.  If you get any particular test failing
+consistently, then please let me know.  Any more detailed investigations
+you can do would be useful.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.

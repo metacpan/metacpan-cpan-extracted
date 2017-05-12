@@ -1,0 +1,15 @@
+Revision history for Games::Risk::ExtraMaps::Imaginary.
+
+3.113460  2011-12-12 14:25:05 Europe/Paris
+ - new map: lord of the ring
+ - new map: ameroki
+
+3.112710  2011-09-28 14:09:16 Europe/Paris
+ - fix risk 2210 continent information
+
+3.112691  2011-09-26 16:08:13 Europe/Paris
+ - bumping major version to makesure cpan indexing works
+
+1.112690  2011-09-26 15:34:47 Europe/Paris
+ - initial release
+ - maps included: godstorm, risk2210

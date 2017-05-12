@@ -1,0 +1,52 @@
+GSM::Gnokii
+    A driver module to interface Perl with libgnokii.
+
+DESCRIPTION
+    This module is an attempt to interface perl with libgnokii to
+    communicate with Nokia phones in a fast and gnokii compatable
+    way. Much of the code is based on code in gnokii itself and
+    on earlier code written by Konstantin Agouros.
+
+COPYING:
+    Copyright (c) 2011-2013 H.Merijn Brand.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    Recent changes can be (re)viewed in the public GIT repository
+    at http://repo.or.cz/w/GSM-Gnokii.git
+    Feel free to clone your own copy:
+
+     $ git clone http://repo.or.cz/r/GSM-Gnokii.git GSM-Gnokii
+
+    or get it as a tgz:
+
+     $ wget --output-document=GSM-Gnokii-git.tgz \
+	   'http://repo.or.cz/w/GSM-Gnokii.git?a=snapshot;sf=tgz'
+
+PREREQUISITES
+    perl-5.8.4
+    libgnokii-0.6.28 or higher (and the header files)
+
+BUILDING AND INSTALLATION
+
+    # perl Makefile.PL
+    # make test
+    # make install UNINST=1
+
+CHANGES
+    See ChangeLog
+
+OTHER RESOURCES
+    Gnokii home:       http://www.gnokii.org
+
+    To get the most recent development branch:
+      $ git clone git://git.savannah.nongnu.org/gnokii.git gnokii-git
+    To view the most recent changes:
+      http://git.savannah.gnu.org/gitweb/?p=gnokii.git;a=summary
+    All gnokii projects:
+      http://git.savannah.gnu.org/gitweb/?s=gnokii
+
+    GSMI/GSMD::Gnokii: http://www.agouros.de/gnokii/
+
+As always, have the appropriate amount of fun!

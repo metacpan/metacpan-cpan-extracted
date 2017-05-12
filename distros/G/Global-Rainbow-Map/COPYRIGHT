@@ -1,0 +1,60 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Global-Rainbow-Map
+Upstream-Contact: TOBYINK <tobyink@cpan.org> and Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/Global-Rainbow-Map
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Global/Rainbow/Map.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: CC0
+
+Files: CONTRIBUTING
+ INSTALL
+ README
+ examples/commonwealth-of-nations.pl
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: t/01basic.t
+ t/02gen-css.t
+Copyright: Copyright 2012 Toby Inkster.
+License: CC0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: CC0
+ 
+ Toby Inkster has dedicated the work to the Commons by waiving all of his
+ or her rights to the work worldwide under copyright law and all related or
+ neighboring legal rights he or she had in the work, to the extent allowable by
+ law.
+ 
+ Works under CC0 do not require attribution. When citing the work, you should
+ not imply endorsement by the author.
+
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

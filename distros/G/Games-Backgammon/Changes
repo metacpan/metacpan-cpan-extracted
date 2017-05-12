@@ -1,0 +1,60 @@
+Revision history for Perl extension Games::Backgammon.
+
+0.01  Thu Feb  5 
+	- original version; created by h2xs 1.22 with options
+		-b5.6.1 -XA Games::Backgammon
+        - implemented only a rudimentary possibility to initialize a position
+
+0.02  Fri Feb 6
+        - fixed position settings to forbid that both players are at the bar while closed boards
+
+0.03  Fri Feb 6
+        - use now the routines of gnubg instead of own written
+        - more than 15 checkers are forbidden now!
+        - changed license to GPL
+
+0.04  Tue Feb 11
+        - function position_id from gnubg used
+        - internal rewritten of the inlined c code in a more object oriented way
+
+0.05  Tue Feb 11
+        - removed assert commands from the c code part,
+          as there had been problems with some perl/gcc versions
+        - changed including of header files, so that <assert.h> is included before <perl.h>
+          (import that assert.h doesn't overwrite Perl's assert in older gcc's)
+        - removed own defined macros
+
+0.06  Tue Feb 11
+        - tried to add as many possibilities to explain all different gcc versions
+          that assert.h is already included :-)
+
+0.07  Fri Feb 14
+        - bundled whole the source code of gnubg into this module
+        - let create a static library "libgnubg.a" of them
+          and use it with Inline::C
+
+0.08  Tue Mar 4
+        - use only the necessary part of gnubg source code (via Copy+Paste)
+        - implemented legal_moves method
+
+0.09  Tue Mar 4
+       - removed assert commands from the c code part again :-(
+         as there had been problems with some perl/gcc versions
+       - removed dependency of Archive::Tar
+
+0.10  Thu Mar 6
+       - changed __generate_moves(HV*, int, int) to
+                 __generate_moves(HV*, SV*, SV*)
+         to avoid problems that occured with some perl/gcc versions
+       - incremented internal buffer for the moves
+
+0.11  Fri Mar 7
+       - moved Inline_Stack_Vars and Inline_Stack_Reset macros to the top
+         in the used functions
+
+0.12 Fri Mar 7
+       - removed a variable definition to have a good work with
+         Inline_Stack_Vars and Inline_Stack_Reset macros
+
+0.13 Sat Mar 8
+       - added Set::Scalar module to the dependencies

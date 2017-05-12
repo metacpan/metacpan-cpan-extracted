@@ -1,0 +1,20 @@
+bin/dukedom
+Changes
+lib/Games/Dukedom.pm
+lib/Games/Dukedom/Signal.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-constructor.t
+t/03-input_is.t
+t/10-exceptions.t
+Todo
+xt/boilerplate.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

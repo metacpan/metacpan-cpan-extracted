@@ -1,0 +1,215 @@
+# Script to produce perl bindings from VTK source code header files
+
+
+do 'cmakeParse';  # Get the cmakeParse routines
+
+#my $VTKdirName = "contrib"; # VTK director we are reading files from
+#my $dirName = "Contrib";    # Directory we will be putting files to 
+
+# VTK directories to parse
+#my @VTKdirs = qw/ common graphics imaging patented contrib /;
+my @VTKdirs = qw/ Common Filtering Rendering Graphics Imaging IO Hybrid Patented/;
+#my @VTKdirs = qw/ Graphics/;
+
+my $vtkBaseDir = "/home/cerney/vtk/vtk40";
+
+my $version = '4.0.001';
+
+my %constants;  # hash of constants that will be setup in the main VTK.pm file
+
+# Go thru each VTK dir:
+foreach my $VTKdirName (@VTKdirs){
+
+	my $dirName = ucfirst($VTKdirName);    # Directory we will be putting files to 
+
+	my $makeFile = "$vtkBaseDir/$VTKdirName/CMakeLists.txt";
+
+	unless( -d $dirName){
+		warn ("'$dirName' not found, creating...\n");
+		system("mkdir $dirName");
+	}
+
+	
+	my %makeObjects = parseVTKmakefile($makeFile);
+
+	# Flatten into a command string for feeding to parseVTKdir
+	#   e.g. something like -mesa obj1 obj2 ob3 -oglr obj4 obj5 ...
+	my @commandObjectString = map( ("-$_ ",join(" ",@{$makeObjects{$_}})) ,sort( keys %makeObjects));
+	my $commandObjectString = join(" ",@commandObjectString);
+
+	print "Creating perl interface to VTK library $dirName ...\n";
+	my $command = "perl -w parseVTKdir $VTKdirName $dirName $vtkBaseDir ".$commandObjectString;
+	
+	# Write-out the command for debugging purposes
+	open( CMDFILE, ">$dirName.cmd") or die("Error, Can't Open Command File $dirName.cmd\n");
+	print CMDFILE $command."\n";
+	close CMDFILE;
+	system($command) && die("Error Executing command for $dirName\n");
+
+	# Add header file to Imaging.xs:
+	if( $VTKdirName =~ /imaging/){
+		my $command = "perl -pi -e 's/\#include \"vtkImagingFactory.h\"/\#include \"vtkImagingFactory.h\"\n\#include \"vtkDataSetCollection.h\"\n/' Imaging/Imaging.xs";
+		system $command;
+	}
+
+
+	
+	# Get the comstants
+	my $regexp = '^\#define\s+VTK_\w+\s+\d+\b';
+	$command = "tcgrep -h '$regexp' $vtkBaseDir/$VTKdirName/*.h";
+	
+	my $constantText = `$command`;
+	die( "Error Executing command '$command'\n$^E\n") if( $?>256);
+	
+	my @lines = split '\n', $constantText;
+	foreach my $line(@lines){
+		if( $line =~ /^\#define\s+(VTK_\w+)\s+(\d+)/){
+			$constants{$1} = $2;
+		}
+	}
+
+	
+}
+
+############################### Print the VTK.pm File ####################
+open( VTK, ">VTK.pm") or die("Can't Open VTK.pm\n");
+
+print VTK 'package Graphics::VTK;
+use 5.004;
+use strict;
+use Carp;
+use vars qw/ $VERSION /;
+
+# Load the Real Libs:
+use Graphics::VTK::Common;
+use Graphics::VTK::Filtering;
+use Graphics::VTK::Rendering;
+use Graphics::VTK::Graphics;
+use Graphics::VTK::Imaging;
+use Graphics::VTK::IO;
+use Graphics::VTK::Hybrid;
+use Graphics::VTK::Patented;
+
+';
+
+print VTK "\$VERSION = '$version';
+
+# VTK Pre-defined Constants:
+";
+
+foreach my $key(sort keys %constants){
+	my $name = $key;
+	$name =~ s/^VTK_/Graphics::VTK\:\:/; # Put in VTK Namespace
+	next if( $name =~ /\:\:\d/); # dont print constants that start with a digit
+					# These variable names are not allowed in perl
+	print VTK '$'.$name." = $constants{$key};\n";
+}
+print VTK <<'EOF'
+
+=head1 NAME
+
+Graphics::VTK  - A Perl interface to Visualization ToolKit
+
+=head1 SYNOPSIS
+
+C<use Graphics::VTK;>
+
+=head1 DESCRIPTION
+
+
+PerlVTK is an interface to the C++ visualization toolkit VTK 3.20.
+
+It is designed to work similarly to the TCL bindings that come with the stock VTK 
+package.
+
+For installation instructions, see the README file.
+You must have VTK installed before installing PerlVTK.
+The homepage for VTK is http://www.kitware.com/.
+
+To see how to use the module, check out the examples in the examples 
+directory. 
+
+All vtk objects in Perl must be created through the function new.
+For example: 
+
+  $renderer = Graphics::VTK::vtkRenderer->new;
+
+To know exactly which functions are supported by this module, check the 
+perldocs in L<Graphics::VTK::Common>, L<Graphics::VTK::Contrib>, L<Graphics::VTK::Graphics>,
+L<Graphics::VTK::Imaging>.
+
+Have fun!
+
+
+=head1 SEE ALSO
+
+
+=head1 AUTHOR
+
+Roberto De Leo <rdl@math.umd.edu>
+John Cerney <j-cerney1@raytheon.com>
+
+=cut
+
+
+package Graphics::VTK::Object;
+
+use vars qw/%objectList %executeMethodList $debug/;
+%objectList = (); 
+$debug = 0;
+
+# Hash of any sub refs that are passed to an objects
+#  'SetExecuteMethod' routines. (e.g. vtkProgrammableSource::SetExecuteMethod)
+#  Sub refs are stored in this hash table by the XS code so that perl doesn't
+#   garbage-collect the sub refs when they are still being used by the VTK library
+#  The hash is cleaned up when the object is destroyed
+%executeMethodList = ();
+
+# Stub for any objects New command
+#  Creates a list of the vtk objects we have created,
+#  so that we will be sure to only DESTROY the objects
+#  that are created in perl, and not in VTK
+sub Graphics::VTK::Object::new{
+
+	my $type = shift;
+	
+	print "In VTKobject::new type = '$type'\n" if $debug;
+	my $obj = $type->New(@_);
+	
+	$objectList{$obj}= 1;
+	$executeMethodList{$obj} = {};
+	
+	
+	return $obj;
+	
+}
+	
+	
+
+
+# Destroy methods for objects (only if we created them)
+sub Graphics::VTK::Object::DESTROY{
+		my $self = shift;
+		
+		if( defined( $objectList{$self} )){
+			print "Deleteing vtk object ".ref($self)."\n" if $debug;
+			$self->Delete;
+			delete $executeMethodList{$self};
+			delete $objectList{$self};
+		}
+		else{
+			print "Not Deleting vtk object ".ref($self)."\n" if $debug;
+		}
+}
+
+1;
+
+
+EOF
+;
+
+close VTK;
+
+
+print "Completed\n";
+	

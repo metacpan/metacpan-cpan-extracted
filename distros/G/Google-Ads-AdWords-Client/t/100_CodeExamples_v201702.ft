@@ -1,0 +1,329 @@
+#!/usr/bin/perl
+#
+# Copyright 2017, Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Functional test for all code examples. Make sure the example runs with no
+# exceptions.
+
+use strict;
+use lib qw(t/util);
+use lib qw(lib);
+
+use File::Temp qw(tempfile);
+use Test::More (tests => 67);
+use TestClientUtils qw(get_test_client get_test_manager_account_client);
+use TestAPIUtils;
+use Data::Uniqid qw(uniqid);
+binmode STDOUT, ":encoding(UTF-8)";
+
+# Getting API client for functional tests.
+my $client = get_test_client("v201702");
+if (!$client) {
+  plan skip_all => "Can't create test client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+my $manager_account_client = get_test_manager_account_client("v201702");
+if (!$manager_account_client) {
+  plan skip_all => "Can't create test manager account client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+################################## Examples ##################################
+
+# account_management
+# NOTE: The get_account_changes test is intentionally run before the creation
+# of test campaigns. This example uses the current set of campaign IDs to build
+# a CustomerSyncService request. If this test runs after the creation of
+# test campaigns, it will fail sporadically because CustomerSyncService is
+# not always 100% in sync with the latest changes and will throw an error
+# if it does not recognize the newly created test campaign IDs.
+require qw(examples/v201702/account_management/get_account_changes.pl);
+ok(get_account_changes($client), "Test of get_account_changes example");
+
+###############################################################################
+
+############################## Test Dependencies ##############################
+# Set up the objects that are required to run all the examples.
+
+# Objects for search campaigns.
+my $search_campaign = TestAPIUtils::create_campaign($client, "SEARCH");
+my $search_campaign_id = $search_campaign->get_id()->get_value();
+my $search_ad_group = TestAPIUtils::create_ad_group($client, $search_campaign_id);
+my $search_ad_group_id = $search_ad_group->get_id()->get_value();
+my $search_text_ad = TestAPIUtils::create_text_ad($client, $search_ad_group_id);
+my $search_text_ad_id = $search_text_ad->get_id()->get_value();
+my $search_keyword = TestAPIUtils::create_keyword($client, $search_ad_group_id);
+my $search_keyword_id = $search_keyword->get_id()->get_value();
+my $search_draft = TestAPIUtils::create_draft($client, $search_campaign_id);
+my $search_draft_id = $search_draft->get_draftId()->get_value();
+my $search_trial = TestAPIUtils::create_trial($client, $search_campaign_id,
+  $search_draft_id);
+my $search_trial_id = $search_trial->get_id()->get_value();
+
+# Objects for display campaigns.
+my $display_campaign = TestAPIUtils::create_campaign($client, "DISPLAY");
+my $display_campaign_id = $display_campaign->get_id()->get_value();
+my $display_ad_group = TestAPIUtils::create_ad_group($client, $display_campaign_id);
+my $display_ad_group_id = $display_ad_group->get_id()->get_value();
+my $display_draft = TestAPIUtils::create_draft($client, $display_campaign_id);
+my $display_draft_id = $display_draft->get_draftId()->get_value();
+
+###############################################################################
+
+################################## Examples ##################################
+
+# account_management
+# Skipping accept_service_link as it requires an unavailable ID.
+require qw(examples/v201702/account_management/create_account.pl);
+ok(create_account($manager_account_client), "Test of create_account example");
+require qw(examples/v201702/account_management/get_account_hierarchy.pl);
+ok(get_account_hierarchy($manager_account_client),
+  "Test of get_account_hierarchy example");
+
+# advanced_operations
+require qw(examples/v201702/advanced_operations/add_ad_customizer.pl);
+ok(add_ad_customizers($client, [$search_ad_group_id, $search_ad_group_id], uniqid()),
+   "Test of add_ad_customizer example");
+require qw(examples/v201702/advanced_operations/add_ad_group_bid_modifier.pl);
+ok(add_ad_group_bid_modifier($client, $search_ad_group_id),
+   "Test of add_ad_group_bid_modifier example");
+require qw(examples/v201702/advanced_operations/add_click_to_download_ad.pl);
+ok(add_click_to_download_ad($client, $display_ad_group_id),
+   "Test of add_click_to_download_ad example");
+require qw(examples/v201702/advanced_operations/add_expanded_text_ad_with_upgraded_urls.pl);
+ok(add_text_ad_with_upgraded_urls($client, $search_ad_group_id),
+  "Test of add_expanded_text_ad_with_upgraded_urls example");
+require qw(examples/v201702/advanced_operations/add_html5_ad.pl);
+ok(add_html5_ad($client, $display_ad_group_id),
+   "Test of add_html5_ad example");
+require qw(examples/v201702/advanced_operations/add_responsive_display_ad.pl);
+ok(add_responsive_display_ad($client, $display_ad_group_id),
+   "Test of add_responsive_display_ad example");
+require qw(examples/v201702/advanced_operations/add_universal_app_campaign.pl);
+ok(add_universal_app_campaign($client),
+  "Test of add_universal_app_campaign example");
+require qw(examples/v201702/advanced_operations/create_and_attach_shared_keyword_set.pl);
+ok(create_and_attach_shared_keyword_set($client, $search_campaign_id),
+   "Test of create_and_attach_shared_kewyord_set example");
+require qw(examples/v201702/advanced_operations/find_and_remove_criteria_from_shared_set.pl);
+ok(find_and_remove_criteria_from_shared_set($client, $search_campaign_id),
+   "Test of find_and_remove_criteria_from_shared_set example");
+require qw(examples/v201702/advanced_operations/get_ad_group_bid_modifier.pl);
+ok(get_ad_group_bid_modifier($client),
+   "Test of get_ad_group_bid_modifier example");
+# Skipping uploading offline conversions. Requires known setup.
+require qw(examples/v201702/advanced_operations/use_portfolio_bidding_strategy.pl);
+ok(use_portfolio_bidding_strategy($client),
+   "Test of use_portfolio_bidding_strategy example");
+
+# basic_operations
+require qw(examples/v201702/basic_operations/add_ad_groups.pl);
+ok(add_ad_groups($client, $search_campaign_id), "Test of add_ad_groups example");
+require qw(examples/v201702/basic_operations/add_campaigns.pl);
+ok(add_campaigns($client), "Test of add_campaigns example");
+require qw(examples/v201702/basic_operations/add_expanded_text_ads.pl);
+ok(add_expanded_text_ads($client, $search_ad_group_id),
+  "Test of add_expanded_text_ads example");
+require qw(examples/v201702/basic_operations/add_keywords.pl);
+ok(add_keywords($client, $search_ad_group_id), "Test of add_keywords example");
+require qw(examples/v201702/basic_operations/get_ad_groups.pl);
+ok(get_ad_groups($client, $search_campaign_id), "Test of get_ad_groups example");
+require qw(examples/v201702/basic_operations/get_campaigns_with_awql.pl);
+ok(get_campaigns_with_awql($client), "Test of get_campaigns with AWQL example");
+require qw(examples/v201702/basic_operations/get_campaigns.pl);
+ok(get_campaigns($client), "Test of get_campaigns example");
+require qw(examples/v201702/basic_operations/get_expanded_text_ads.pl);
+ok(get_expanded_text_ads($client, $search_ad_group_id),
+  "Test of get_expanded_text_ads example");
+require qw(examples/v201702/basic_operations/get_keywords.pl);
+ok(get_keywords($client, $search_ad_group_id), "Test of get_keywords example");
+require qw(examples/v201702/basic_operations/get_text_ads.pl);
+ok(get_text_ads($client, $search_ad_group_id), "Test of get_text_ads example");
+require qw(examples/v201702/basic_operations/pause_ad.pl);
+ok(pause_ad($client, $search_ad_group_id, $search_text_ad_id),
+  "Test of pause_ad example");
+# NOTE: Skipping examples that remove as objects will be removed later.
+require qw(examples/v201702/basic_operations/update_ad_group.pl);
+ok(update_ad_group($client, $search_ad_group_id),
+  "Test of update_ad_group example");
+require qw(examples/v201702/basic_operations/update_campaign.pl);
+ok(update_campaign($client, $search_campaign_id), "Test of update_campaign example");
+require qw(examples/v201702/basic_operations/update_keyword.pl);
+ok(update_keyword($client, $search_ad_group_id, $search_keyword_id),
+   "Test of update_keyword example");
+
+# campaign_management
+# Skipping add_campaign_labels as it requires additional setup.
+require qw(
+  examples/v201702/campaign_management/add_complete_campaign_using_batch_job.pl);
+ok(add_complete_campaign_using_batch_job($client),
+   "Test of add_complete_campaign_using_batch_job example");
+require qw(examples/v201702/campaign_management/add_draft.pl);
+ok(add_draft($client, $search_campaign_id), "Test of add_draft example");
+require qw(
+  examples/v201702/campaign_management/add_keywords_using_incremental_batch_job.pl);
+ok(add_keywords_using_incremental_batch_job($client, $search_ad_group_id),
+   "Test of add_keywords_using_incremental_batch_job example");
+require qw(examples/v201702/campaign_management/add_trial.pl);
+ok(add_trial($client, $display_campaign_id, $display_draft_id), "Test of add_trial example");
+require qw(examples/v201702/campaign_management/get_all_disapproved_ads_with_awql.pl);
+ok(get_all_disapproved_ads_with_awql($client, $search_ad_group_id),
+   "Test of get_all_disapproved_ads_with_awql example");
+require qw(examples/v201702/campaign_management/get_all_disapproved_ads.pl);
+ok(get_all_disapproved_ads($client, $search_ad_group_id),
+   "Test of get_all_disapproved_ads example");
+# Skipping get_campaigns_by_label.pl. Need additional setup.
+require qw(examples/v201702/campaign_management/graduate_trial.pl);
+ok(graduate_trial($client, $search_trial_id), "Test of graduate_trial example");
+require qw(examples/v201702/campaign_management/set_ad_parameters.pl);
+ok(set_ad_parameters($client, $search_ad_group_id, $search_keyword_id),
+   "Test of set_ad_parameters example");
+require qw(examples/v201702/campaign_management/set_bid_modifier.pl);
+ok(set_bid_modifier($client, $display_campaign_id),
+   "Test of set_bid_modifier example");
+require qw(examples/v201702/campaign_management/validate_text_ad.pl);
+ok(validate_text_ad($client, $search_ad_group_id), "Test of validate_text_ad example");
+# Reset validateOnly to false after validating ads.
+# Otherwise, it carries on into the next test.
+$client->set_validate_only(0);
+
+# error_handling
+require qw(examples/v201702/error_handling/handle_partial_failures.pl);
+ok(handle_partial_failures($client, $search_ad_group_id),
+   "Test of handle_partial_failures example");
+require qw(examples/v201702/error_handling/handle_policy_violation_error.pl);
+ok(handle_policy_violation_error($client, $search_ad_group_id),
+  "Test of handle_policy_violation_error example");
+
+# extensions
+# Skipping add_google_my_business_location_extensions since it requires GMB.
+require qw(examples/v201702/extensions/add_prices.pl);
+ok(add_prices($client, $search_campaign_id), "Test of add_prices example");
+require qw(examples/v201702/extensions/add_site_links_using_feeds.pl);
+my $feed_name = 'Feed for sitelinks #' . uniqid();
+ok(add_site_links_using_feeds($client, $display_campaign_id, $feed_name),
+   "Test of add_site_links_using_feeds example");
+require qw(examples/v201702/extensions/add_site_links.pl);
+ok(add_site_links($client, $search_campaign_id),
+   "Test of add_site_links example");
+
+# migration
+# Skipping migrate_to_extension_settings because it's not predictable as
+# to what is in the account at this point in time.
+
+# misc
+require qw(examples/v201702/misc/get_all_images_and_video.pl);
+ok(get_all_images_and_video($client),
+   "Test of get_all_images_and_video example");
+require qw(examples/v201702/misc/upload_image.pl);
+ok(upload_image($client), "Test of upload_image example");
+require qw(examples/v201702/misc/upload_media_bundle.pl);
+ok(upload_media_bundle($client), "Test of upload_media_bundle example");
+require qw(examples/v201702/misc/use_hashes.pl);
+ok(use_hashes($client), "Test of use_hashes example");
+# Skipping use_oauth2 as it would require hardcoded credentials.
+require qw(examples/v201702/misc/use_xpath.pl);
+ok(use_xpath($client), "Test of use_xpath example");
+
+# optimization
+require qw(examples/v201702/optimization/estimate_keyword_traffic.pl);
+ok(estimate_keyword_traffic($client),
+   "Test of estimate_keyword_traffic example");
+require qw(examples/v201702/optimization/get_campaign_criterion_bid_modifier_simulations.pl);
+ok(get_campaign_criterion_bid_modifier_simulations($client, $search_campaign_id),
+    "Test of get_campaign_criterion_bid_modifier_simulations example");
+require qw(examples/v201702/optimization/get_keyword_bid_simulations.pl);
+ok(get_keyword_bid_simulations($client, $search_ad_group_id, $search_keyword_id),
+   "Test of get_keyword_bid_simulations example");
+require qw(examples/v201702/optimization/get_keyword_ideas.pl);
+ok(get_keyword_ideas($client), "Test of get_keyword_ideas example");
+
+# remarketing
+require qw(examples/v201702/remarketing/add_audience.pl);
+ok(add_audience($client), "Test of add_audience example");
+require qw(examples/v201702/remarketing/add_conversion_tracker.pl);
+ok(add_conversion_tracker($client), "Test of add_conversion_tracker example");
+require qw(examples/v201702/remarketing/add_crm_based_user_list.pl);
+ok(add_crm_based_user_list($client), "Test of add_crm_based_user_list example");
+require qw(examples/v201702/remarketing/add_rule_based_user_lists.pl);
+ok(add_rule_based_user_lists($client),
+    "Test of add_rule_based_user_lists example");
+# Skipping upload_offline_call_conversions because extra setup is required.
+# Skipping upload_offline_conversions because extra setup is required.
+
+# reporting
+my ($fh, $filename) = tempfile();
+require qw(examples/v201702/reporting/download_criteria_report_with_awql.pl);
+ok(download_criteria_report_with_awql($client, $filename),
+   "Test of download_criteria_report_with_awql example");
+require qw(examples/v201702/reporting/download_criteria_report_with_selector.pl);
+ok(download_criteria_report_with_selector($client, $filename),
+   "Test of download_criteria_report_with_selector example");
+require qw(examples/v201702/reporting/get_report_fields.pl);
+ok(get_report_fields($client), "Test of get_report_fields example");
+# Skipping parallel_report_download since it takes a very long time to complete.
+require qw(examples/v201702/reporting/stream_criteria_report_results.pl);
+ok(stream_criteria_report_results($client),
+   "Test of stream_criteria_report_results example");
+
+# shopping_campaigns
+require qw(examples/v201702/shopping_campaigns/add_product_partition_tree.pl);
+ok(add_product_partition_tree($client, $search_ad_group_id), "Test of add_product_partition_tree example");
+# Skipping add_product_scope because a shopping campaign is needed.
+# Skipping add_shopping_campaign because it requires a merchant account.
+# Skipping add_shopping_campaign_for_showcase_ads because it requires a merchant
+# account.
+require qw(examples/v201702/shopping_campaigns/get_product_category_taxonomy.pl);
+ok(get_product_category_taxonomy($client),
+    "Test of get_product_category_taxonomy example");
+
+# targeting
+require qw(examples/v201702/targeting/add_campaign_targeting_criteria.pl);
+ok(add_campaign_targeting_criteria($client, $search_campaign_id),
+   "Test of add_campaign_targeting_criteria example");
+require qw(examples/v201702/targeting/add_demographic_targeting_criteria.pl);
+ok(add_demographic_targeting_criteria($client, $search_ad_group_id),
+   "Test of add_demographic_targeting_criteria example");
+require qw(examples/v201702/targeting/get_campaign_targeting_criteria.pl);
+ok(get_campaign_targeting_criteria($client, $search_campaign_id),
+   "Test of get_campaign_targeting_criteria example");
+require qw(examples/v201702/targeting/get_targetable_languages_and_carriers.pl);
+ok(get_targetable_languages_and_carriers($client, $search_campaign_id),
+   "Test of get_targetable_languages_and_carriers example");
+require qw(examples/v201702/targeting/lookup_location.pl);
+ok(lookup_location($client), "Test of lookup_location example");
+
+###############################################################################
+
+############################## Test Dependencies ##############################
+# Cleaning up the test dependencies.
+
+# Objects for search campaigns.
+TestAPIUtils::delete_trial($client, $search_trial_id);
+TestAPIUtils::delete_draft($client, $search_campaign_id, $search_draft_id);
+TestAPIUtils::delete_text_ad($client, $search_ad_group_id, $search_text_ad_id);
+TestAPIUtils::delete_keyword($client, $search_ad_group_id, $search_keyword_id);
+TestAPIUtils::delete_ad_group($client, $search_ad_group_id);
+TestAPIUtils::delete_campaign($client, $search_campaign_id);
+
+# Objects for display campaigns.
+TestAPIUtils::delete_draft($client, $display_campaign_id, $display_draft_id);
+TestAPIUtils::delete_ad_group($client, $display_ad_group_id);
+TestAPIUtils::delete_campaign($client, $display_campaign_id);
+
+###############################################################################

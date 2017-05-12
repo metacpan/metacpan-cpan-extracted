@@ -1,0 +1,271 @@
+<HTML>
+<HEAD>
+<TITLE>API.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#public methods">Public Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#getdbh">getDBH</A></LI>
+		<LI><A HREF="#today">today</A></LI>
+		<LI><A HREF="#gettypebyid">getTypeByID</A></LI>
+		<LI><A HREF="#getimportid">getImportID</A></LI>
+		<LI><A HREF="#getkwtypesbyobjecttype">getKwTypesByObjectType</A></LI>
+		<LI><A HREF="#createcluster">createCluster</A></LI>
+		<LI><A HREF="#writemultixml">writeMultiXML</A></LI>
+		<LI><A HREF="#destroy">DESTROY</A></LI>
+	</UL>
+
+	<LI><A HREF="#private methods">Private methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#_initialize">_initialize</A></LI>
+		<LI><A HREF="#_getidbyimportid">_getIDByImportID</A></LI>
+		<LI><A HREF="#_getorganismid">_getOrganismID</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::API</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Genetics::API ;</PRE>
+<PRE>
+  $api = new Genetics::API(DSN =&gt; {driver =&gt; &quot;mysql&quot;,
+                                   host =&gt; $Host,
+                                   database =&gt; $Database},
+                           user =&gt; $UserName,
+                           password =&gt; $Password) ;</PRE>
+<PRE>
+  $sv = $api-&gt;getObject({NAME =&gt; &quot;Aff&quot;}) ;</PRE>
+<PRE>
+  @affSubjects = $api-&gt;getSubjectsByPhenotype($sv, 2) ;
+  $affCluster = $api-&gt;createCluster(&quot;HT Affecteds&quot;, \@affSubjects) ;
+  $api-&gt;insertCluster($affCluster) ;
+  @unaffSubjects = $api-&gt;getSubjectsByPhenotype($sv, 1) ;
+  $unaffCluster = $api-&gt;createCluster(&quot;Normals&quot;, \@unaffSubjects) ;
+  $api-&gt;insertCluster($unaffCluster) ;</PRE>
+<PRE>
+  $marker = $api-&gt;getObject({TYPE =&gt; &quot;Marker&quot;, NAME =&gt; &quot;agtT174M&quot;}) ;</PRE>
+<PRE>
+  $api-&gt;chiSquareAssocTest(
+                           MARKER =&gt; $marker, 
+                           SC1 =&gt; $affCluster,
+                           SC2 =&gt; $unaffCluster,
+                           ALLELETYPE =&gt; &quot;Nucleotide&quot;, 
+                          ) ;</PRE>
+<P>See also the GenPerl Tutorial document.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides an API for interfacing with genperl objects.</P>
+<P>An instance of Genetics::API must be instantiated in order to interact with 
+GenPerl objects in a database (or to access any other API methods, for that 
+matter). The parameters passed to the Genetics::API constructor are the database 
+connection parameters. These parameters are passed directly to DBI-&gt;connect for 
+the creation of a database handle.</P>
+<P>The GenPerl API functionality is separated into the following packages.</P>
+<P>The Genetics::API package contains general API methods that do not fit anywhere 
+else right now. This is the only package that needs to be imported into your 
+programs.</P>
+<P>Teh Genetics::API::DB::*  packages contain methods for managing the persistance 
+of GenPerl objects in a relational database.</P>
+<P>The Genetics::API::Analysis package contains methods for the analysis of data 
+contained in GenPerl objects.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+  strict                Just to be anal
+  vars                  Global variables
+  Carp                  Error reporting
+  DBI                   Database interface
+  Genetics::API::Insert 
+  Genetics::API::Read   
+  Genetics::API::Update
+  Genetics::API::DB::Query ;
+  Genetics::API::Delete 
+  Genetics::API::Analysis  Analysis functions
+  Genetics::API::Analysis::Linkage  Linkage analysis functions
+  Genetics::Object      GenPerl object modules</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public Methods</A></H1>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+  Function  : Object constructor
+  Arguments : Class name and hash array containing initialization arguments.
+  Returns   : Blessed hash
+  Scope     : Public
+  Called by : Main
+  Comments  : Creates an empty hash, blesses it into the class name and calls
+              _initialize with the arguments passed</PRE>
+<P>
+<H2><A NAME="getdbh">getDBH</A></H2>
+<PRE>
+  Function  : Return the DBI database handle associated with an instance 
+              of Genetics::API.
+  Arguments : Genetics::API instance.
+  Returns   : DBI database handle object.
+  Scope     : Public
+  Called by : Main
+  Comments  :</PRE>
+<P>
+<H2><A NAME="today">today</A></H2>
+<PRE>
+ Function  : Generate a date string, corresponding to the current date-time, 
+             suitable for the dateCreated created field.
+ Arguments : N/A
+ Returns   : String
+ Example   : today()
+ Scope     : Public class method
+ Comments  : The format of the date string generated is YYYY-MM-DD</PRE>
+<P>
+<H2><A NAME="gettypebyid">getTypeByID</A></H2>
+<PRE>
+  Function  : Return the object type corresponding to a database ID. 
+  Arguments : A database id.
+  Returns   : 1 on success or undef if an object witht he input id was not 
+              successfully deleted.
+  Scope     : Public
+  Comments  : Only objects saved in a GenPerl database should have an id.</PRE>
+<P>
+<H2><A NAME="getimportid">getImportID</A></H2>
+<PRE>
+  Function  : Return the ImportID associated with an object. 
+  Arguments : A Genetics::Object object.
+  Returns   : Scalar containing the ImportID associated with the object, or 
+              undef if one does not exist.
+  Scope     : Public
+  Comments  : ImportIDs are stored as Keywords with keywordTypeID 1.  ImportID 
+              Keywords are created automatically (by _saveObjectData()) when a 
+              new object is created.</PRE>
+<P>
+<H2><A NAME="getkwtypesbyobjecttype">getKwTypesByObjectType</A></H2>
+<PRE>
+ Function  : For a given object type, return the list of distinct KeywordType 
+             names for which there are corresponding Keyword values in the 
+             database.
+ Arguments : Scalar containing an object type.
+ Returns   : Array of scalar text strings.
+ Scope     : Public
+ Comments  :</PRE>
+<P>
+<H2><A NAME="createcluster">createCluster</A></H2>
+<PRE>
+  Function  : Create a Genetics::Object::Cluster
+  Arguments : A string containing a name for the Cluster and an array 
+              reference to a list of Genetics::Object objects.
+  Returns   : A Genetics::Object::Cluster object.
+  Scope     : Public
+  Comments  : This method only creates a Cluster; it does not save it.</PRE>
+<P>
+<H2><A NAME="writemultixml">writeMultiXML</A></H2>
+<PRE>
+  Function  : Write a list of objects out in well-formed GnomML XML format.
+  Argument  : Array reference to a list of Genetics::Object objects.
+  Returns   : N/A
+  Scope     : Public
+  Called by :</PRE>
+<P>
+<H2><A NAME="destroy">DESTROY</A></H2>
+<PRE>
+  Function  : Deallocate object storage
+  Argument  : N/A
+  Returns   : N/A
+  Scope     : Public
+  Called by : Called automatically when the object goes out of scope 
+              (ie the internal reference count in the symbol table is 
+              zero).  Can be called explicitly.</PRE>
+<P>
+<HR>
+<H1><A NAME="private methods">Private methods</A></H1>
+<P>
+<H2><A NAME="_initialize">_initialize</A></H2>
+<PRE>
+  Function  : Initialize object
+  Arguments : Hash array of attributes/values passed to new
+  Returns   : N/A
+  Scope     : Private
+  Called by : 
+  Comments  :</PRE>
+<P>
+<H2><A NAME="_getidbyimportid">_getIDByImportID</A></H2>
+<PRE>
+  Function  : Return an Object ID based on an ImportID Keyword. 
+  Arguments : Scalar containing an ImportID.
+  Returns   : Scalar containing an Object ID or undef if one does 
+              not exist.
+  Scope     : Private
+  Comments  : ImportID Keywords are created by _saveObjectData().</PRE>
+<P>
+<H2><A NAME="_getorganismid">_getOrganismID</A></H2>
+<PRE>
+  Function  : Return an Organism ID.   
+  Arguments : Hash reference to a hash containing Organism data.
+  Returns   : Scalar containing an Organism ID.
+  Scope     : Private
+  Called by : saveSubject(), saveMarker(), saveSNP, saveMap(), updateSubject(), 
+              updateMarker(), updateSNP, updateMap().
+  Comments  : A new Organism is created if one matching the data in %$orgPtr 
+              does not exist.</PRE>
+
+</BODY>
+
+</HTML>

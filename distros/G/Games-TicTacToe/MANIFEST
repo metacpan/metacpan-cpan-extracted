@@ -1,0 +1,30 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Games/TicTacToe.pm
+lib/Games/TicTacToe/Board.pm
+lib/Games/TicTacToe/Move.pm
+lib/Games/TicTacToe/Player.pm
+lib/Games/TicTacToe/Params.pm
+script/play-tictactoe
+t/00-load.t
+t/01-Games-Tictactoe-new.t
+t/02-Games-Tictactoe-setPlayers.t
+t/03-Games-Tictactoe-getPlayers.t
+t/04-Games-Tictactoe-play.t
+t/05-Games-Tictactoe-isGameOver.t
+t/06-Games-Tictactoe-Board-isFull.t
+t/07-Games-Tictactoe-Board-setCell.t
+t/08-Games-Tictactoe-Board-getCell.t
+t/09-Games-Tictactoe-Player-new.t
+t/10-Games-Tictactoe-Move-foundWinner.t
+t/11-Games-Tictactoe-Move-now.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

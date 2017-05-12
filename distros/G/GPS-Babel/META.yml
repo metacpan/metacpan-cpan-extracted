@@ -1,0 +1,23 @@
+---
+name: GPS-Babel
+version: 0.11
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Perl interface to gpsbabel
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=GPS-Babel
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/GPS--Babel.git
+requires:
+  File::Which: 0
+  Geo::Gpx: 0.15
+  Test::More: 0
+provides:
+  GPS::Babel:
+    file: lib/GPS/Babel.pm
+    version: 0.11
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

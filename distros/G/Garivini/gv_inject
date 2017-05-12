@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+#
+# ./gv_inject --dsn="DBI:mysql:job:host=127.0.0.1;database=job" \
+# --username="job" --password="job" --loops=1000
+# For low latency mode, add:
+# --gearmand="127.0.0.1:7003" --pure
+#
+
+use strict;
+use warnings;
+
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Getopt::Long;
+use Garivini::Client;
+use Gearman::Client;
+use JSON;
+
+my %o = (loops => 1);
+
+GetOptions(\%o,
+    'dsn=s',
+    'username=s',
+    'password=s',
+    'loops=i',
+    'pure',
+    'gearmand=s@',
+    );
+
+die "Need dsn" unless $o{dsn};
+
+run();
+
+sub run {
+    my $sm_client = Garivini::Client->new(
+        dbs => {1 => { id => 1, dsn => $o{dsn}, user => $o{username},
+        pass => $o{password}, }},
+        );
+    my $gm_client = Gearman::Client->new;
+    my $job = {
+        funcname => 'foo',
+    };
+
+    for (my $i = 0; $i < $o{loops}; $i++) {
+        if ($o{pure}) {
+            $gm_client->job_servers(@{$o{gearmand}});
+            $job->{arg} = 'hello: ' . time();
+            $gm_client->dispatch_background('inject_jobs', \encode_json($job),
+                {});
+        } else {
+            $sm_client->insert_job(funcname => 'foo', arg => 'hello: ' . time());
+        }
+    }
+}

@@ -1,0 +1,29 @@
+---
+abstract: 'Security image (captcha) generator.'
+author:
+  - 'Burak Gursoy <burak@cpan.org>'
+build_requires:
+  Test::More: 0.40
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GD-SecurityImage
+no_index:
+  directory:
+    - monolithic_version
+    - builder
+    - t
+    - xt
+recommends:
+  Image::Magick: v6.0.4
+requires:
+  GD: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/burak/cpan-gd-securityimage/
+version: 1.73

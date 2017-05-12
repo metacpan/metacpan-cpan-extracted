@@ -1,0 +1,59 @@
+Getopt::GetArgs - README
+
+
+DESCRIPTION
+===========
+
+GetArgs needs to know
+  * what your subroutine was passed,
+  * and what it expected to be passed.
+  * If you like, you can also supply default values to use
+    when an argument is not passed.
+
+Using this information, GetArgs will create a hash of
+arguments for you to use throughout your subroutine.
+
+Using GetArgs has several advantages:
+
+  1) Calls to your subroutine can pass named arguments, making the code more readable.
+  2) If it's easier to pass a list of arguments as you normally would, that's fine.
+  3) With GetArgs your use of arguments in your subroutine code is more readable.
+  4) Your subroutines are no longer limited in the number of arguments they expect.
+  5) Arguments can be passed in any order (if passed inside the hash ref), thus
+     only the arguments relevant to that call need to be passed--unnecessary
+     arguments can be ignored.
+  6) Case is not important, as GetArgs matches argument names case insensitively.
+
+
+EXAMPLE USAGE
+=============
+
+  sub WHATEVER {
+    my @DEFAULT_ARGS =
+      ( Content => "Default content",
+        Verbose => 0
+        );
+    my %ARGS=GetArgs(@_,@DEFAULT_ARGS);
+    # do some stuff with $ARGS{Content}
+    # show all kinds of detail if $ARGS{Verbose}
+  }
+
+  # a simple call to WHATEVER
+  WHATEVER( "Just deal with my content" );
+
+  # a flexible call to WHATEVER
+  WHATEVER({ verbose => 1,
+             content => "This is my content",
+           });
+
+See the t/*.t tests for additional examples.
+
+
+COPYRIGHT
+=========
+
+Copyright (c) 2001, Rob Brown.  All rights reserved.
+Getopt::GetArgs is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+$Id: README,v 1.1 2001/06/08 06:29:11 rob Exp $

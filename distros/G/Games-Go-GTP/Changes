@@ -1,0 +1,6 @@
+Revision history for Perl extension Games::Go::GTP.
+
+0.01  Sun Feb 24 21:22:55 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Games::Go::GTP
+

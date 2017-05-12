@@ -1,0 +1,29 @@
+---
+name: Gpx-Addons-Filter
+version: 0.04
+author:
+  - "Ingo LANTSCHNER <perl [at] lantschner.name>"
+abstract: filter Geo::Gpx-data based on time-boundaries
+license: perl
+configure_requires:
+  FindBin: 0
+  SUPER: 0
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Geo::Gpx: 0.13
+  perl: 5.8.0
+build_requires:
+  Sub::Identify: 0
+  Test::More: 0
+  Test::Output: 0
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Gpx::Addons::Filter:
+    file: lib/Gpx/Addons/Filter.pm
+    version: 0.04
+resources:
+  license: http://dev.perl.org/licenses/

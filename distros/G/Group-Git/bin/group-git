@@ -1,0 +1,494 @@
+#!/usr/bin/perl
+
+# Created on: 2013-05-04 16:16:56
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use threads;
+use List::MoreUtils qw/uniq/;
+use Getopt::Alt qw/get_options/;
+use English qw/ -no_match_vars /;
+use Path::Tiny;
+use Group::Git;
+use Config::Any;
+use Term::ANSIColor qw/colored/;
+use File::chdir;
+
+our $VERSION = version->new('0.6.0');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+main();
+exit 0;
+
+sub main {
+
+    # do stuff here
+    my $conf = Config::Any->load_stems({
+        stems   => [ qw/group group-git/ ],
+        use_ext => 1,
+    });
+    $conf = {
+        map { %$_        }
+        map { values %$_ }
+        @{$conf}
+    };
+
+    my ($opt, $cmd) = get_options(
+        {
+            sub_command   => 1,
+            auto_complete => \&auto,
+            conf_prefix   => '',
+            default       => {
+                max      => 10,
+                page     => 1,
+                separate => 1,
+                %{ $conf },
+            }
+        },
+        [
+            'skip|s=s',
+            'match|m=s',
+            'max|M=i',
+            'local|l!',
+            'recurse|r!',
+            'page|p!',
+            'tag|t=s',
+            'test|T!',
+            'bw',
+            'separate|S!',
+            'verbose|v+',
+            'quiet|q',
+        ]
+    );
+
+    my $module = $conf->{type} && !$opt->local ? 'Group::Git::' . ucfirst $conf->{type} : 'Group::Git';
+    my $file   = "$module.pm";
+    $file =~ s{::}{/}g;
+    require $file;
+    my $group = $module->new(
+        %{ $opt },
+        conf => $conf,
+    );
+
+    if (!$cmd) {
+        require Pod::Usage;
+        warn "No command specified!\n";
+        Pod::Usage::pod2usage( -verbose => 1 );
+    }
+
+    my $action = $cmd;
+    my $skip   = $opt->skip;
+    my $match  = $opt->match;
+    my %exclude = map { $_ => 1 } @{ $conf->{exclude} || [] };
+    my %include = map { $_ => 1 } @{ $conf->{include} || [] };
+    my $outfh = \*STDOUT;
+
+    if ($opt->page) {
+        my $tmp;
+        $outfh = $tmp if open $tmp, '|-', $ENV{PAGER} || 'less -Rx4SFX';
+        $group->paging(1);
+    }
+
+    my $cmd_start = do_cmd( $group, $action . '_start' );
+    my $cmd_end   = do_cmd( $group, $action . '_end' );
+    my $cmd_body  = do_cmd( $group, $action, 1 );
+
+    die "Can't find group-git sub-command '$action'!\n" if !$cmd_body;
+
+    print {$outfh} $cmd_start->() if $cmd_start;
+
+    my @threads;
+    my $cwd = $CWD;
+
+    while ($group->runs) {
+        $group->runs(0);
+
+        for my $project ( sort sorter keys %{ $group->repos } ) {
+            next if $skip  && $project =~ /$skip/;
+            next if $match && $project !~ /$match/;
+            next if $exclude{$project};
+            next if %include && !$include{$project};
+            next if !tagged($conf, $opt->tag, $project, $group->repos->{$project});
+
+            push @threads, {
+                project => $project,
+                thread  => threads->new(
+                    sub {
+                        local $CWD = $cwd;
+                        $cmd_body->($project);
+                    }
+                ),
+            };
+
+            while ( threads->list(threads::running) > $opt->max ) {
+                if ( ! $threads[0]{thread}->is_running ) {
+                    process_thread((shift @threads), $opt, $outfh);
+                }
+                else {
+                    sleep 1;
+                }
+            }
+        }
+    }
+
+    while ( my $thread = shift @threads ) {
+        process_thread($thread, $opt, $outfh);
+    }
+
+    print {$outfh} $cmd_end->() if $cmd_end;
+
+    return;
+}
+
+sub process_thread {
+    my ($thread_object, $opt, $outfh) = @_;
+    my $project = $thread_object->{project};
+    my $thread = $thread_object->{thread};
+    my $out = $thread->join();
+
+    if ($out) {
+        $project = colored($project, 'blue') if !$opt->bw;
+        print {$outfh} "\n"                  if $opt->separate;
+        print {$outfh} "$project\n"          if ! $opt->quiet;
+        print {$outfh} $out;
+        print {$outfh} "-- $project --\n"    if $opt->verbose;
+    }
+
+    return;
+}
+
+sub do_cmd {
+    my ($group, $cmd, $fallback) = @_;
+    my $cmd_under = $cmd;
+    $cmd_under =~ s/-/_/g;
+
+    if ( $group->can($cmd) ) {
+        return sub { $group->$cmd( @_ ) };
+    }
+    elsif ( $group->can($cmd_under) ) {
+        return sub { $group->$cmd_under( @_ ) };
+    }
+    else {
+        for my $path ( split /[:;]/, $ENV{PATH} ) {
+            next if !-d $path;
+            my $script = "$path/group-git-$cmd";
+            next if !-x $script;
+
+            return sub { system $script, @_; }
+        }
+    }
+
+    return if !$fallback;
+
+    return sub { $group->cmd( $cmd, @_ ) };
+}
+
+sub sorter {
+    no warnings qw/once/;
+    my $A = $a;
+    $A =~ s/(\d+)/sprintf "%06d", $1/egxms;
+    my $B = $b;
+    $B =~ s/(\d+)/sprintf "%06d", $1/egxms;
+    return lc $A cmp lc $B;
+}
+
+my $tagged;
+sub tagged {
+    my ($conf, $tag, $project, $object) = @_;
+
+    # everything is "tagged" if none is specified
+    return 1 if !$tag;
+
+    if ( !defined $tagged ) {
+        $tagged = { map { $_ => 1 } @{ $conf->{tags}{$tag} || [] } };
+    }
+
+    # return true if the project is tagged in the config file or has a tag file
+    return $tagged->{$project} || $object->tags->{$tag} || dyna_tags($tag, $project);
+}
+
+sub dyna_tags {
+    my ($tag, $project) = @_;
+
+    if ( $Group::Git::taggers->{$tag} && ! ref $Group::Git::taggers->{$tag} ) {
+        $Group::Git::taggers->{$tag} = $Group::Git::taggers->{$tag}->new;
+    }
+
+    return $Group::Git::taggers->{$tag} && $Group::Git::taggers->{$tag}->matches($project);
+}
+
+sub auto {
+    my ($opt, $auto, $errors) = @_;
+
+    my @commands = _commands();
+
+    print join "\n", @commands, '';
+    return;
+}
+
+sub _commands {
+    $ENV{TMP} ||= $ENV{HOME};
+    my $cache = path("$ENV{TMP}/.group-git-commands");
+    if ( -f $cache ) {
+        return split /\n/, $cache->slurp;
+    }
+
+    # get all the commands
+    my @commands;
+    # first up the module commands
+    for my $dir (@INC) {
+        next if !-d $dir;
+        my $module_dir = path($dir, qw/Group Git Cmd/);
+        next if !-d $module_dir;
+
+        for my $module ( $module_dir->children ) {
+            next if $module !~ /[.]pm$/;
+            my $cmd = lc join '-', split /(?<=[a-z])(?=[A-Z])/, $module->basename;
+            $cmd =~ s/[.]pm//;
+            push @commands, $cmd;
+        }
+    }
+
+    # then get any found in the path
+    for my $dir (split /:/, $ENV{PATH}) {
+        next if !-d $dir;
+
+        for my $file ( path($dir)->children ) {
+            next if $file !~ /(?:group-)?git-[\w-]+$/;
+            my ($cmd) = $file =~ /(?:group-)?git-([\w-]+)$/;
+            push @commands, $cmd;
+        }
+    }
+
+    for my $env ($ENV{__git_all_commands}, $ENV{__git_porcelain_commands}) {
+        next if !$env;
+        $env =~ s/^.*[(][)]\s*//;
+        push @commands, split /\s+/, $env;
+    }
+
+    # save the found commands for next time
+    $cache->spew(join "\n", @commands);
+
+    return ( sort uniq @commands );
+}
+
+__DATA__
+
+=head1 NAME
+
+group-git - Perform operations over many git repositories at once
+
+=head1 VERSION
+
+This documentation refers to group-git version 0.6.0.
+
+=head1 SYNOPSIS
+
+   group-git [option] (git-command) -- [args]
+
+ OPTIONS:
+  Filtering:
+  -s --skip[=]regexp
+                Skip any project matching this regexp
+  -m --match[=]regexp
+                Only process any project matching this regexp
+  -l --local    Ignore any management type and just look at what is checked out
+                Only useful if you have a group-git.yml file defining Github,
+                Bitbucked or Gitosis types.
+  -t --tag[=]str
+                Only opperate on repositories tagged with str. Tags can be
+                specified in the config file (see --man), with a file .[tag].tag
+                in the project directory or programatically by tagger plugin.
+     --bw       Don't colour the repository names in the output.
+
+  Finding projects:
+  -r --recurse  Recurses into subdirectories to check if they contain git
+                repositories rather than only stopping at the current level.
+
+  Output:
+  -p --page     Turns on paginating out put uses $PAGER environment variable if
+                set or 'less -Rx4SFX' if not.
+     --no-page  Turn off pagination.
+  -S --separate Add a new line separator before each repository output (Default)
+     --no-separate
+                Don't show the new repository separator
+  -q --quiet    Don't show project names before running git on the directory
+  -v --verbose  Show more details
+
+  Other:
+  -M --max[=]int
+                Limit the number of symultanious threads running at once.
+                Default 10 threads
+     --VERSION  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for group-git
+
+  eg
+   # run "git log -n 1" in each repository
+   group-git log -- -n 1
+   # run "git pull" for only repositories tagged with "perl"
+   group-git --tag perl pull
+   # run "git grep 'where is it'" for each repository showing the repository even if nothing found
+   group-git --verbose grep 'where is it'
+   # run "git status" with out trying to get new repositories (configured in group-git.yml)
+   group-git --local status
+
+=head1 DESCRIPTION
+
+C<group-git> allows you to run any git command over all repositories in the
+current directory (or sub directories if C<--recurse> is used). It can help
+with the management of many git repositories with a simple tool set.
+
+=head2 Configuration
+
+If you have a config file set up in the current directory (group-git.yml or some
+other suffix group-git file supported by L<Config::Any>) extra functionality
+becomes available if you use Github, Bitbucket or Gitosis as your repository
+remote store. The config file will be read to supply the appropriate user
+credentials or in the case of gitosis the admin project location.
+
+With this extra information both the pull and the update commands will try to
+clone any repository that are not currently checked out in the current directory.
+
+ eg group-git.yml
+ ---
+ # Type may be any of Github, Bitbucket or Gitosis
+ type: Github
+ #type: Bitbucket
+ #type: Gitosis
+
+ # if username or password are missing they will be prompted for
+ username: joeblogs@example.com
+ password: securepass
+
+ # for github you can specify an access token if using 2 factor auth
+ #access_token: ....
+
+ # Gitosis uses it's git url which needs to be defined or will be prompted for
+ #gitosis: gituser@gitosis.server.com:gitosis-admin.git
+
+ # Global Exclude a git project
+ #exclude:
+ #  - project_not_to_be_managed
+ #  - ...
+
+ # Global Include only these projects (if mentioned only projects listed will be
+ # processed any others found will be ignored)
+ #include:
+ #  - project_of_interest_1
+ #  - project_of_interest_2
+ #  - ...
+
+ # Set up tags for groups of projects so you can opperate only on that tag
+ # Tags can also be defined with the projects directory creating a file with
+ # a name of the format ".[tag].tag"
+ #  eg to tag a project as mytag create a file .mytag.tag
+ #tags:
+ #  mytag:
+ #    - project1
+ #    - project2
+ #  myothertag:
+ #    - project2
+ #    - project3
+
+ # Aliases of commands can be made using the aliases element in a similar
+ # fashon to git's own aliases functionality
+ #aliases:
+ #  log: log --oneline
+
+For Github and Bitbucket if username or password are missing you will be
+prompted to enter the details.
+
+=head3 Tags
+
+There are several ways of defining tags that can be used:
+
+=over 4
+
+=item group-git.yml
+
+You can define tags in the C<group-git.yml> file.
+
+=item I<project>/.I<tag>.tag
+
+In the individual repositories you can add a file .I<tag-name>.tag to the root
+directory and it will be picked up as a tag
+
+=item dynamic
+
+There are several ways this is done:
+
+=over 4
+
+=item Github
+
+Forks are tagged as C<fork> and non-forks are tagged as C<original>.
+
+=item Stash
+
+If you have stash repositories are tagged as the project they are in.
+
+=item Taggers
+
+Automatic tagging can be done by modules in the L<Group::Git::Taggers::*>, two
+are provided by default:
+
+=over 4
+
+=item local
+
+Repositories that are only local to your computer
+
+=item remote
+
+Clones of remote repositories.
+
+=back
+
+=back
+
+=back
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+If paginating the C<$PAGER> environment variable is used if it is not set the
+command C<'less -Rx4SFX'> is used for paginating, if C<$PAGER> not set and
+less not installed no pagination will be done.
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2013-2016 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

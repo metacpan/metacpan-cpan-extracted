@@ -1,0 +1,21 @@
+
+20021024: 0.01
+
+	- Initial release
+
+20021030: 0.02
+
+	- Added Makefile.PL
+	- Added support for LAB section
+
+20030501: 0.03
+	- Added support for PAL, IFO, PRJ, log section, 
+	- documentation
+
+20030524: 0.04
+
+	- Bugs removed for negative x-y pairs and PAL section
+
+20030525: 0.05
+
+	- Some minor style changes and fixes

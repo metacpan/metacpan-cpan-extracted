@@ -1,0 +1,17 @@
+Revision history for Perl extension Gtk2::GoBoard.
+
+1.02 Fri May  6 19:35:31 CEST 2011
+	- add missing data/cross* files.
+        - mention that Audio::Data/Play is broken on 64 bit platforms.
+
+1.01 Tue Jul 29 12:12:01 CEST 2008
+        - small stones can now also be grayed out with MARK_SMALL_GRAYED.
+        - fixed bug where the cursor button press wasn't recognized
+          at the 0-0 point.
+	- first release, out-bundled from KGS.
+        - added sound support.
+
+0.2  Mon May 17 03:35:10 CEST 2004
+	- first release, part of KGS.
+
+

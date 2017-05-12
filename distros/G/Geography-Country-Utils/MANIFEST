@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+lib/Geography/Country/Dial.pm
+lib/Geography/Country/FIPS.pm
+lib/Geography/Country/FIPS/Capitals.pm
+lib/Geography/Country/TZ.pm
+lib/Geography/Country/TZ/Zone.pm
+lib/Geography/Country/Utils.pm
+t/0fips.t
+t/1capital.t
+t/2dial.t
+META.yml                                 Module meta-data (added by MakeMaker)

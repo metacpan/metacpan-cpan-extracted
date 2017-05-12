@@ -1,0 +1,199 @@
+Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+
+This file is part of Gtk2-Ex-WidgetBits.
+
+Gtk2-Ex-WidgetBits is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-WidgetBits is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-WidgetBits.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 48, October 2012
+    - AdjustmentBits set_maybe(value=>$v) avoid double notify in Gtk 2.12
+
+Version 47, August 2012
+    - AdjustmentBits new set_empty()
+    - new Gtk2::Ex::Statusbar::Message
+    - new Gtk2::Ex::TableBits with update_attach()
+
+Version 46, July 2012
+    - AdjustmentBits new scroll_increment(), scroll_event()
+    - EntryBits new x_to_text_index(), scroll_number(), funcs exportable
+
+Version 45, January 2012
+    - Test::Without::Gtk2Things fix for "menuitem_label_property"
+      method removal (and perhaps other method removals)
+    - ToolItem::OverflowToDialog workaround some glib 2.30 closure dubiousness
+
+Version 44, July 2011
+    - ToolItem::OverflowToDialog new buildable internal-child
+      overflow_menuitem and dialog
+
+Version 43, June 2011
+    - new Gtk2::Ex::LayoutBits move_maybe()
+    - AdjustmentBits new set_maybe()
+
+Version 42, June 2011
+    - new Gtk2::Ex::ToolItem::CheckButton
+
+Version 41, June 2011
+    - ToolItem::OverflowToDialog fix set of overflow-mnemonic when
+      menuitem exists
+
+Version 40, May 2011
+    - new Gtk2::Ex::AdjustmentBits with scroll_value()
+    - WidgetBits new pixel_size_mm(), pixel_aspect_ratio()
+    - WidgetBits xy_distance_mm() undef if no screen instead of croak
+
+Version 39, May 2011
+    - Test::Weaken::Gtk2 new ignore_default_screen() and
+      ignore_default_root_window()
+    - Test::Without::Gtk2Things without gdkdisplay quieten
+      Gtk2::Gdk->get_default_root_window()
+    - PixbufBits type_supports_size() don't enforce 1x1 minimum for now
+
+Version 38, May 2011
+    - GdkBits new draw_rectangle_corners()
+    - PixbufBits new type_max_size(), type_supports_size()
+
+Version 37, February 2011
+    - PixbufBits fix save_adapt_options() return, affecting save_adapt() too
+
+Version 36, January 2011
+    - new Gtk2::Ex::ToolItem::OverflowToDialog
+    - ContainerBits allow export (of remove_all and remove_widgets)
+    - ToolbarBits fix stray 5.010 meant to be 5.008
+    - PixbufBits save_adapt() fix tEXt goes to png always
+    - tests fix PixbufBits tiff exercising
+
+Version 35, January 2011
+    - new Gtk2::Ex::PixbufBits with save_adapt(), save_adapt_options(),
+      type_to_format(), sampled_majority_color()
+    - MenuBits new mnemonic_escape(), mnemonic_undo()
+
+Version 34, January 2011
+    - new Gtk2::Ex::ToolbarBits move_item_after()
+
+Version 33, December 2010
+    - Test::Without::Gtk2Things new without builder, draw_as_radio, gdkdisplay
+
+Version 32, November 2010
+    - new Gtk2::Ex::FreezeChildNotify
+    - TreeModelBits new iter_prev(), and allow export of individual funcs
+
+Version 31, November 2010
+    - WidgetBits new xy_root_to_widget()
+
+Version 30, November 2010
+    - fix MenuItem::Subclass missed $VERSION variable
+    - Units millimetres, MenuBits position and WidgetBits warp allow
+      for no GdkScreen in Gtk 2.0.x
+
+Version 29, November 2010
+    - new Gtk2::Ex::MenuItem::Subclass
+    - MessageUntilKey, SyncCall allow for no GdkDisplay in Gtk 2.0.x
+
+Version 28, October 2010
+    - Test::Without::Gtk2Things new without menuitem_label_property
+
+Version 27, October 2010
+    - Test::Without::Gtk2Things fix for set_property mangling, and
+      hide from Glib::Object::new() too
+
+Version 26, October 2010
+    - Units width()/height() arg checking
+    - Test::Without::Gtk2Things new without widget_tooltip
+
+Version 25, September 2010
+    - Test::Without::Gtk2Things new without warp_pointer
+    - Test::Weaken::Gtk2 contents_submenu() also MenuToolButton
+    - tests fix WidgetBits for no warp_pointer pre Gtk 2.8
+
+Version 24, September 2010
+    - Test::Weaken::Gtk2
+        - new contents_cell_renderers()
+	- fix contents_submenu() return empty list for no submenu
+    - Test::Without::Gtk2Things
+        - new without cell_layout_get_cells
+        - fix $VERSION number
+
+Version 23, August 2010
+    - ActionTooltips and MenuBits fix Exporter setups
+    - GdkBits new window_clear_region
+
+Version 22, August 2010
+    - reduce some stray "use 5.010"s
+
+Version 21, August 2010
+    - new Gtk2::Ex::ContainerBits with remove_widgets(), remove_all()
+    - new Gtk2::Ex::WidgetEvents
+
+Version 20, August 2010
+    - new Gtk2::Ex::Statusbar::DynamicContext
+
+Version 19, July 2010
+    - new Test::Without::Gtk2Things
+
+Version 18, May 2010
+    - new Gtk2::Ex::TextBufferBits
+
+Version 17, April 2010
+    - new Gtk2::Ex::MenuBits, Gtk2::Ex::TreeModel::ImplBits and
+      Test::Weaken::Gtk2
+
+Version 16, March 2010
+    - TreeModelBits remove_matching_rows() extra arguments passed to $subr
+    - MessageUntilKey call remove() through object for subclassing
+
+Version 15, February 2010
+    - test script fix for WidgetBits get_root_position()
+
+Version 14, December 2009
+    - TreeViewBits remove_selected_rows() use TreeRowReference for more safety
+    - Units new char_width()
+
+Version 13, December 2009
+    - new Gtk2::Ex::Units
+
+Version 12, December 2009
+    - SyncCall workaround for gtk 2.18.4 bug in property-change-event delivery
+
+Version 11, December 2009
+    - new Gtk2::Ex::EntryBits and Gtk2::Ex::Statusbar::MessageUntilKey
+
+Version 10, June 2009
+    - new Gtk2::Ex::ActionTooltips
+
+Version 9, April 2009
+    - new Gtk2::Ex::TreeModelFilter::Change
+
+Version 8, March 2009
+    - new Gtk2::Ex::TreeViewBits
+
+Version 7, November 2008
+    - allow for older Gtk in the TreeModel tests
+
+Version 6, November 2008
+    - new Gtk2::Ex::TreeModelBits
+
+Version 5, November 2008
+    - forgot dependency on Glib::Ex::SignalIds
+
+Version 4, September 2008
+    - don't use Glib::Ex::SourceIds in SyncCall.t
+
+Version 3, September 2008
+    - first collected up version, comprising
+          Gtk2::Ex::GdkBits
+          Gtk2::Ex::KeySnooper
+          Gtk2::Ex::SyncCall
+          Gtk2::Ex::WidgetBits
+      (SyncCall version 2 was in Gtk2-Ex-Dragger)

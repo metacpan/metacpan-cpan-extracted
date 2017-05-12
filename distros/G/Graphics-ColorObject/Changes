@@ -1,0 +1,35 @@
+Revision history for Perl extension Graphics::ColorObject.
+
+0.5.0  2005/10/12
+  - added gamut checks and clipping (not all colorspaces
+  supported yet)
+  - added several color-difference algorithms
+  - added arbitrary white-points (any temperature from 4000K to 25000K)
+  - added several predefined white-points, and made others more accurate
+  - added YUV, YIQ, PhotoYCC spaces
+  - added documentation
+  - changed many conversion matrices to be more accurate 
+  (from 3 significant digits to >5)
+  - bug: HSL_to_RGB incorrect hue round-off produced rare but
+  significant errors in H (fixed)
+  - bug: wrong implicit colorspaces in colorbars test caused some
+  tests to fail (fixed)
+
+0.4a4  2004/03/07 23:00:48
+  - added convert-color.pl in examples, fixed draw-lab-colorspace.pl
+  - bug: converting anything to xyY failed (and the tests didn't catch it) (fixed)
+  - general cleanup, now we run with use strict and use warnings
+  - changed dependency to be perl 5.6, not 5.8
+
+0.4a3  2004/03/05 00:39:46
+  - bug: tests weren't working properly (fixed)
+  - bug: HSL conversions off-by-one (not fixed, just disabled tests for now)
+  - added Luv and LCHuv color spaces
+  - minor documentation fixes
+
+0.4a2  2004/03/04 20:26:00
+  - bug: some conversions failed if no rgb working space was specified (fixed)
+
+0.4a1  2004/03/04 19:27:21
+  - initial release, very alpha
+

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+Query.xs
+README
+t/Geo-Query.t
+lib/Geo/Query.pm
+META.yml                                 Module meta-data (added by MakeMaker)

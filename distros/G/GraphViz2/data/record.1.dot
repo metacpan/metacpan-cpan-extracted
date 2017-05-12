@@ -1,0 +1,10 @@
+digraph structs
+{
+	graph [label="Record demo 1 - Nested records using strings as labels"]
+	node [shape=record];
+	struct1 [label="<f0> left|<f1> mid dle|<f2> right"];
+	struct2 [label="<f0> one|<f1> two"];
+	struct3 [label="hello\nworld |{ b |{c|<here> d|e}| f}| g | h"];
+	struct1:f1 -> struct2:f0 [color=blue];
+	struct1:f2 -> struct3:here [color=red];
+}

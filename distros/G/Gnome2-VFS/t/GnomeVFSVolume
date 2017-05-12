@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+use strict;
+use Gnome2::VFS;
+
+use Test::More;
+
+# $Id$
+
+unless (-d "$ENV{ HOME }/.gnome") {
+  plan(skip_all => "You have no ~/.gnome");
+}
+
+unless (Gnome2::VFS -> CHECK_VERSION(2, 6, 0)) {
+  plan(skip_all => "This is new in 2.6");
+}
+
+plan(tests => 14);
+
+Gnome2::VFS -> init();
+
+###############################################################################
+
+my $monitor = Gnome2::VFS -> get_volume_monitor();
+my $volume = ($monitor -> get_mounted_volumes())[0];
+
+ok(defined($volume -> get_volume_type()));
+ok(defined($volume -> get_device_type()));
+
+my $drive = $volume -> get_drive();
+ok(not defined $drive or ref $drive eq "Gnome2::VFS::Drive");
+
+ok(defined $volume -> get_device_path());
+ok(defined $volume -> get_activation_uri());
+ok(defined $volume -> get_filesystem_type());
+ok(defined $volume -> get_display_name());
+ok(defined $volume -> get_icon());
+
+my $boolean = qr/^(?:1|)$/;
+
+like($volume -> is_user_visible(), $boolean);
+like($volume -> is_read_only(), $boolean);
+like($volume -> is_mounted(), $boolean);
+like($volume -> handles_trash(), $boolean);
+
+is($volume -> compare($volume), 0);
+
+SKIP: {
+  skip("get_hal_udi is new in 2.8", 1)
+    unless (Gnome2::VFS -> CHECK_VERSION(2, 8, 0));
+
+  ok(defined $volume -> get_hal_udi());
+}
+
+# Gnome2::VFS -> connect_to_server("/mnt/win", "Windows", "windows.png");
+
+###############################################################################
+
+# $volume -> unmount(sub { warn @_; });
+# $volume -> eject(sub { warn @_; });
+
+# use Gtk2 -init;
+# Glib::Timeout -> add(1000, sub { Gtk2 -> main_quit(); 0; });
+# Gtk2 -> main();
+
+###############################################################################
+
+Gnome2::VFS -> shutdown();

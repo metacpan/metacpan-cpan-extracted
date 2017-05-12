@@ -1,0 +1,2 @@
+(define-object ZvtTerm (GtkWidget) (perl Gnome::ZvtTerm))
+

@@ -1,0 +1,43 @@
+{
+   "abstract" : "abstraction layer for Git::Raw and libgit2",
+   "author" : [
+      "Stanislav Sinyagin <ssinyagin@k-open.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Git-ObjectStore",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Git::Raw" : "0.71",
+            "perl" : "v5.8.9"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ssinyagin/p5-Git-ObjectStore/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ssinyagin/p5-Git-ObjectStore.git",
+         "web" : "https://github.com/ssinyagin/p5-Git-ObjectStore"
+      }
+   },
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

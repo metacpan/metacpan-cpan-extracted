@@ -1,0 +1,39 @@
+$name   = 'Drone1';
+$author = 'Bestian Tang';
+$team   = 'Free Drones';
+
+sub main {
+    enable shield;
+    scan front;
+
+    if (&found('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+        redo;
+    }
+
+    elsif (&found('wall|mine|friend')) {
+        if (int(rand(2))) {
+            turn left;
+        }
+        else {
+            turn right;
+        }
+        redo;
+    }
+    elsif (&found('enemy')) {
+        disable shield;
+        fire bazooka;
+        enable shield;
+    }
+    elsif (&found('flag')) {
+        if ($life == $max_life) {
+            move backward;
+            fire energy;
+        }
+    }
+
+    move forward * int(rand(5)) + 1;
+    redo;
+}

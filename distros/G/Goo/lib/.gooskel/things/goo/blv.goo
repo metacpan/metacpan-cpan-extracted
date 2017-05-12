@@ -1,0 +1,10 @@
+# provide commands while viewing backlinks
+title			=	Back Link Viewer
+description		=	Store commands for display with back links
+
+[S]hell			=	Goo::ShellCommander.pm
+[P]rofile		=	Goo::BackLinkManager.pm
+[B]ack      	=   Goo::TrailGoBackOne.pm
+[Z]one      	=   Goo::Zone.pm
+Care[O]Meter 	=   Goo::CareOMeter.pm
+E[X]it			=	Goo::Exiter.pm

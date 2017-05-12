@@ -1,0 +1,268 @@
+2.004.004 2017-05-09 07:53:00 Europe/Berlin
+    - refactoring: Taskset carefully loops over loaned_sock
+
+2.004.003 2017-04-11 22:24:00 Europe/Berlin
+    - Client and Worker could set SSL ca_file parameter
+    - Taskset.pm refactoring:
+      replace fileno handling by IO::Select
+
+2.004.002 2017-04-11 11:01:00 Europe/Berlin
+    - do not force Client and Worker to set useless SSL ca_certs parameter
+
+2.004.001 2017-04-11 14:38:00 Europe/Berlin
+     - Gearman::Client and Gearman::Worker could set prefix separator
+       - It would be recommended to replace default prefix separator to insure
+         gearmand persistent queue recovery.
+
+2.003.002 2017-03-26 22:01:00 Europe/Berlin
+     - tests are perl 5.25 ready (use lib .)
+     -- GEARMAN_WORKER_USE_STDIO test only with AUTHOR_TESTING
+
+2.003.001 2017-03-13 21:47:00 Europe/Berlin
+     -- test compatibility for gearmand and Gearman::Server
+
+2.003_002 2017-03-02 14:45:00 Europe/Berlin
+     -- restore Gearman::Client::Async support. #10
+     -- try to bug fix ssl callback testing
+
+2.003_001 2017-02-18 18:37:00 Europe/Berlin
+     -- worker:
+        -- remove THROW_EXCEPTIONS defination in BEGIN block
+        -- add support of protocol commands WORK_DATA and WORK_WARNING
+        -- new methods:
+           -- send_work_data
+           -- send_work_warning
+           -- send_work_complete
+           -- send_work_fail
+        -- _get_js_sock: no execution of object _on_connect if callback is defined
+     -- fixing client do_task: do not overwrite on_fail callback
+     -- Gearman::Task support of low priority
+     -- remove Ref::Util dependency
+
+2.002.004 2016-12-05 09:02:16 Europe/Berlin
+     -- requires Ref::Util >= 0.020; see cpan tester report 848fbc3e-b94f-11e6-8baf-a6caeafb6ca6
+     -- Makefile.PL updates
+        LICENSE: perl
+        min perl version 5.8.1
+     -- fixing worker GEARMAN_WORKER_USE_STDIO env test
+
+2.002.003 2016-12-04 22:13:00 Europe/Berlin
+     -- add DISTNAME into Makefile.PL to get back to the old distribution name
+
+2.002.002 2016-12-03 12:10:00 Europe/Berlin
+     -- skip worker stop_if test if no gearmand
+
+2.002.001 2016-12-02 22:01:00 Europe/Berlin (TRIAL RELEASE)
+     -- job_servers entries could be a hash references or string
+     -- bug fixing Gearman::Util::send_req() SSL frame limitation (esabol)
+
+2.001.001 2016-10-13 10:45:00 Europe/Berlin (TRIAL RELEASE)
+     -- support for SSL connection to gearmand
+     -- support IPv6
+     -- tests refactoring
+
+1.130.004 (2016-08-06)
+     -- add Gearman::ResponseParser pod
+     -- add Gearman::ResposeParser::Taskset pod
+     -- rename Gearman::Taskset->_process_packet to process_packet
+     -- issue 116744 Utility pod
+
+1.130.003 (2016-08-05)
+     -- check OS in Test::Gearman and don't use "which" on Windows
+     -- replace 'use Errno qw(EAGAIN)' by 'POSIX qw(:errno_h)'
+        see: http://www.cpantesters.org/cpan/report/d801a704-5975-11e6-9451-9b92aab8e0c0
+
+1.130.002 (2016-08-03)
+     -- skip worker _get_js_sock test without gearmand
+
+1.130.001 (2016-08-02)
+     -- refactoring of Gearman::Util::read_res_packet: no goto/redo
+     -- test suite refactoring
+     -- solved issue 85191 Programming error prevents Gearman::Worker::work() from connecting to servers
+     -- solved issue 59185 document Gearman::Client::get_status
+     -- solved issue 56508 using $task->fail("reason goes here") in Gearman::Taskset
+
+1.12.009 (2016-06-04)
+     -- run t/30-maxqueue.t and t/40-prefix.t only with AUTHOR_TESTING
+     -- s/::Object/::Objects/
+
+1.12.008 (2016-06-03)
+     -- rename Gearman::Base back to Geamrman::Object because Gearman-Client-Async depends on it
+
+1.12.007 (2016-05-20)
+     -- more tests only with AUTHOR_TESTING
+
+1.12.006 (2016-05-19)
+     -- tests refactoring
+     -- execute some tests only if AUTHOR_TESTING env is defined
+
+1.12.005 (2016-05-06)
+     -- rm META.*
+
+1.12.004 (2016-05-06)
+
+     -- solved issue 5324ce04-0bae-11e6-a317-839d20bbf307
+        there was a bug in test script
+
+1.12.003 (2016-05-01)
+
+     -- tested with perl5-22-1 to improve cpan tester resport
+        5324ce04-0bae-11e6-a317-839d20bbf307
+
+     -- fields moved from Gearman::Objects to proper modules
+
+     -- rm obsolete Gearman::Objects
+
+     -- use warnings (except redefine)
+
+     -- perltidy applied to all modules
+
+1.12.002 (2014-12-19)
+
+     -- attempt to fix bugs: 89037, 100594, 101012
+
+     -- cpan tester report 586f5968-8489-11e4-adb9-802de0bfc7aa is - ugly - fixed too
+
+     -- refactoring: Client/Worker base class added
+
+     -- dynamic tests by using environment variable GEARMAN_SERVERS
+
+1.12 (2014-12-14)
+
+     -- Repoint HACKING file.
+
+     -- Make a jobserver connection use the command timeout during exception negotiation.
+
+     -- Make $taskset->add_task use the command timeout to not hang during job submission.
+
+     -- Add a client option 'command_timeout' to indicate how long we should wait before considering a
+        gearman command to have failed. This not the same as a job timeout, and only affects commands
+        that should generally not block apart from the roundtrip on the network.
+
+     -- When a connection to a gearman server fails, start counting how many failures we've had and
+        do an exponential backoff (1s, 4s, 9s, 16s...) to a maximum of 90 seconds (default) that we
+        treat the server as 'gone' quickly.
+
+     -- Change dispatch_background to share code paths with other dispatching, this will make
+        background jobs now be hashed to a particular server (rather than handed to a random server)
+
+1.11 (2010-01-17)
+
+     -- Switch read_res_packet to use sysread with a large buffer and offsets. This improves
+        memory usage (sometimes drastically) and performance.
+
+     -- Fix from Martin Atkins, don't print() in the Gearman::Util code and close sockets
+        when you have an error of some kind (indicating we're out of sync)
+
+1.10 (2009-10-04)
+
+     -- Make workers wake up periodically for a particular server to make sure they aren't
+        stale connections. This happened naturally (although at relatively low interval) in
+        previous releases.
+
+     -- Help prevent leaks when Gearman::Task->add_hook is used.
+
+     -- Change worker to only 'wake up' against a gearmand that has woken it up, this prevents
+        a constant flood of pre-sleep command from arriving at an otherwise silent gearmand.
+
+     -- Fix issue where prefixes were double-prepended on function names on worker
+        upon reconnect.
+
+     -- Fix issue where the other response parser code in Util would silently truncate
+        argument strings longer than 20*the socket buffer size.
+
+     -- Fix issue where the ResponseParser class would not correctly handle messages with
+        zero-length bodies.
+
+     -- Make the Gearman::Task class autoload Storable and fail gracefully when it's not
+        loadable.
+
+     -- Initial fold-in of exceptions support in the gearman client, makes an option
+        to the gearman server to enable it, and is disabled by default. Workers will
+        will attempt to throw exceptions anytime Storable is available.
+
+     -- fix jobs of > 32kilobytes in size so they work properly (workers would disconnect
+        when a job greater than 32kb would arrive.)
+
+     -- expose the time that the last job was processed in the stop_if hook of worker.
+        Since a jobserver wakes up all workers in the case of a new job to be processed
+        the concept of is_idle doesn't actually reflect if a worker has procssed jobs,
+        rather it indicates whether the jobserver has been silent for 10 seconds.
+
+     -- change server polling order in workers to start at a random point in the list
+        during every worker pass. So we drain jobs from all servers rather than
+        working on each of them in order.
+
+1.09 (2007-06-29)
+
+     -- document the license and copyright
+
+1.08 (2007-05-21)
+
+     -- add "package Gearman::Objects" line to Objects.pm, to ease RPM
+        building
+
+     -- reserve the packet number for "all_yours", not yet implemented
+
+     -- In pack_res_command, silence any warnings about 'undefined' or 'uninitialized'
+        variables if we aren't sending an argument along with the command.
+
+1.07 (2007-05-07)
+
+     -- continued improved support for child processes as workers,
+        making workers go away cleanly if parent pipe dies/EPIPEs.
+
+1.06 (2007-05-04)
+
+     -- better support for Gearman::Workers as child processes talking
+        to a Gearman::Server over unix pipe to parent
+
+     -- In worker class, broke out the on connection work, and use that better
+        in the case of being a sub process of the gearmand.
+
+1.05 (2007-04-26)
+
+     -- update the prefix code to not break Gearman::Client::Async, which
+        was also updated to be compatible.
+
+     -- Add ability for workers to be launched as sub processes of the
+        gearmand, using a duped socketpair for communication.
+
+     -- just some extra debugging/deaths during weird cases (helped find
+        bugs when server code was massively refactored)
+
+1.04 (2007-04-16)
+
+     -- Let Gearman::Worker use hostnames for job_servers (like
+        Gearman::Client does)  (Ask)
+
+     -- Add prefix setting to Gearman::Client and Gearman::Worker for simple
+        namespace separation of different instances of the same worker and
+        client code sharing job servers. (Ask Bjoern Hansen)
+
+     -- Refactor tests to have less duplicate code (Ask Bjoern Hansen)
+
+     -- Make Gearman::Client / Gearman::Worker tests use $^X instead
+        of hardcoded 'perl' to start gearmand (Ask Bjoern Hansen)
+
+1.03
+     -- Workers can now specify a timeout that when a task exceeds the time, the
+        jobserver will reassign the task and ignore results from the defunct job.
+
+1.02
+     -- Task objects weren't reusable before anyway, and now they're really not:
+        when they complete or fail, they wipe all their internal subref members
+        to break any potential loops.  also now support a new internal hook
+        that happens after your on_complete or on_failure callback.  this
+        is used by Gearman::Client::Async now, for cancelling timers.
+
+1.01
+     -- when workers are writing status messages up to parent, die on SIGPIPE,
+        or really any write errors, but just trap SIGPIPE now, if parent goes away.
+        fixes a bug found via Gearman::Client::Async's test suite.
+
+1.00
+     -- finally package it up and call it 1.00 now that we've been using
+        it in (LiveJournal) production for quite a while, finding/fixing
+        the bugs that happen when you put something into production.
+ 

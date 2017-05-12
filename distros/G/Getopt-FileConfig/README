@@ -1,0 +1,54 @@
+Module Getopt::FileConfig
+=========================
+
+Getopt::FileConfig is a module for processing of configuration files which
+define some variables to be exported into the callers namespace(s) or
+hash-refs. These variables can be optionally overriden from environment
+variables and unconditionally from command line arguments. Getopt::Long is
+used for the last part.
+
+Example
+=======
+
+Having a config file pcm.rc:
+
+  simple          =s      .       SIMPLE          "blak"
+  aref            =s      .       AREF            []
+  href            =s      Kazaan  HREF            {}
+
+and perl script pcm.pl:
+
+  #!/usr/bin/perl
+  use Getopt::FileConfig;
+  use Data::Dumper;
+
+  $XX = {};
+  my $cfg = new Getopt::FileConfig(-hash=>$XX);
+  $cfg->parse();
+  print Dumper($XX);
+
+The result of running:
+
+  pcm.pl -aref pepe -aref lojz -href drek=shit -href joska=boob is:
+
+  $VAR1 = {
+      'AREF' => [
+                  'pepe',
+                  'lojz'
+                ],
+      'Kazaan' => {
+                    'HREF' => {
+                                'drek' => 'shit',
+                                'joska' => 'boob'
+                              }
+                  },
+      'SIMPLE' => 'blak'
+    };
+
+Docs
+====
+  http://www-f9.ijs.si/~matevz/soft/Getopt-FileConfig/Getopt-FileConfig.html
+
+Requires
+========
+  Getopt::Long

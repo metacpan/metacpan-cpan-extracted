@@ -1,0 +1,21 @@
+---
+name: Games-Pentominos
+version: 1.0
+author:
+  - 'Laurent Dami <laurent.dami@justice.ge.ch>'
+abstract: solving the pentominos paving puzzle
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  List::MoreUtils: 0
+build_requires:
+  Test::More: 0
+provides:
+  Games::Pentominos:
+    file: lib/Games/Pentominos.pm
+    version: 1.0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

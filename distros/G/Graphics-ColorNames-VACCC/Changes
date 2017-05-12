@@ -1,0 +1,12 @@
+Change log for Graphics::ColorNames::VACCC:
+
+1.02   26 Aug 2004
+	- corrected minor typo in POD
+
+1.01   18 Aug 2004
+	- fix issues with Graphics::ColorNames bug
+	- added better tests
+	- added README
+
+1.00   18 Aug 2004
+	- first release

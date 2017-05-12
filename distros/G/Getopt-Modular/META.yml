@@ -1,0 +1,33 @@
+---
+abstract: 'Modular access to Getopt::Long'
+author:
+  - 'Darin McBride <dmcbride@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  Module::Build: '0.3601'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-Modular
+requires:
+  Carp: '0'
+  Exception::Class: '0'
+  Getopt::Long: '0'
+  List::MoreUtils: '0'
+  Scalar::Util: '0'
+  Text::Table: '0'
+  Text::Wrap: '0'
+  Text::WrapI18N: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/dmcbride/Getopt-Modular.git
+version: '0.13'

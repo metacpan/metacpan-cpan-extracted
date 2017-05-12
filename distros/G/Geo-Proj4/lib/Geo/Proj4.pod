@@ -1,0 +1,379 @@
+=encoding utf8
+
+=head1 NAME
+
+Geo::Proj4 - PROJ.4 cartographic projections library
+
+=head1 INHERITANCE
+
+ Geo::Proj4
+   is a DynaLoader
+
+=head1 SYNOPSIS
+
+  use Geo::Proj4;
+
+  my $proj = Geo::Proj4->new(proj => "merc",
+     ellps => "clrk66", lon_0 => -96)
+       or die "parameter error: ".Geo::Proj4->error. "\n";
+
+  my $proj = Geo::Proj4->new("+proj=merc +ellps=clrk66 +lon_0=-96")
+       or die "parameter error: ".Geo::Proj4->error. "\n";
+
+  my $proj = Geo::Proj4->new(init => "epsg:28992");
+
+  my ($x, $y) = $proj->forward($lat, $lon);
+
+  if($proj->hasInverse)
+  {   my ($lat, $lon) = $proj->inverse($x, $y);
+      ...
+  }
+
+  my $proj = Geo::Proj4->new(init => "epsg:26985") or die;
+  my ($lat, $lon) = $proj->inverse(401717.80, 130013.88);
+
+  my $point = [ 123.12, -5.4 ];
+  my $projected_point = $from->transform($to, $point);
+  my $projected_multi = $from->transform($to, \@points);
+
+=head1 DESCRIPTION
+
+The Open Source PROJ.4 library converts between geographic coordinate
+systems.  It is able to convert between geodetic latitude and longitude
+(LL, most commonly the WGS84 projection), into an enormous variety of
+other cartographic projections (XY, usually UTM).
+
+WARNING: It is not always clear what the source projection is when
+L<forward()|Geo::Proj4/"Converters"> or L<inverse()|Geo::Proj4/"Converters"> are used, i.e. in what projection system the
+source data is expected to be in.  Therefore, you can better be specific
+on both source and destination projection and use L<transform()|Geo::Proj4/"Converters">.
+
+=head1 METHODS
+
+=head2 Instantiation
+
+=over 4
+
+=item Geo::Proj4-E<gt>B<new>($string|%options)
+
+The object defines the target projection, but that's easier said than
+done: projections have different parameter needs.  The parameters which
+can (or need to) be used are listed with C<cs2cs -lP>.  The manual
+page of C<cs2cs> explains how the configuration works.
+
+Two ways are provided to define the projection.  Either, use a list
+of %options, which are pairs of parameters, or pass one string which
+contains all parameters at once.  You must supply a C<proj> parameter.
+
+In case of an OPTION list: WARNING: Specify boolean parameters (e.g. the
+south parameter to the UTM projection) with a matching value of undef.
+
+example: 
+
+ my $proj = Geo::Proj4->new(proj => "merc",
+    ellps => "clrk66", lon_0 => -96 )
+       or die Geo::Proj4->error;
+
+ my $proj = Geo::Proj4->new("+proj=merc +ellps=clrk66 +lon_0=096")
+    or die Geo::Proj4->error;
+
+ my $proj = Geo::Proj4->new(init => "epsg:$epsg");
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<datum>()
+
+Tries to return a datum name for this projection.
+
+=item $obj-E<gt>B<dump>()
+
+Write the definition in extended form to stdout.  This output cannot be
+caught, because it is done on stdio level, below the reach of PerlIO.
+
+=item Geo::Proj4-E<gt>B<error>()
+
+Returns a dualvar (see Scalar::Util) containing the
+error number and error string of the last reported error.
+
+example: 
+
+ my $proj = Geo::Proj4->new(...);
+ unless(defined $proj)
+ {   my $error = Geo::Proj4->error;
+     warn "error-code: ".$error+0;
+     warn "error-string: $error\n";
+ }
+
+=item $obj-E<gt>B<hasInverse>()
+
+Returns whether the reverse function for the projection exists.  Some
+projections are one-way.
+
+=item $obj-E<gt>B<isGeocentric>()
+
+Returns true when the source projection is using a geocentric coordinate
+system; i.e. uses x-y coordinates.
+
+=item $obj-E<gt>B<isGeodesic>()
+
+Returns true when the source projection is using a geodetic coordinate
+system; i.e. uses lat long coordinates.  Same as L<isLatlong()|Geo::Proj4/"Accessors">
+
+=item $obj-E<gt>B<isLatlong>()
+
+Returns true when the source projection is using a geodetic coordinate
+system; i.e. uses lat long coordinates.  Same as L<isGeodesic()|Geo::Proj4/"Accessors">.
+
+=item $obj-E<gt>B<normalized>()
+
+Returns a string which is produced by the library based on the data
+extracted from the initiation parameters.  This string may be more
+explicit than the passed values, and could be used for debugging.
+
+=item $obj-E<gt>B<projection>()
+
+Returns the projection type.
+
+=back
+
+=head2 Converters
+
+=over 4
+
+=item $obj-E<gt>B<forward>($latitude, $longitude)
+
+Perform a forward projection from $latitude and $longitude (LL) to the
+cartographic projection (XY) represented by the Geo::Proj4 instance.
+
+WARNING: for historic reasons, latitude and longitude are assumed to be in 
+(floating point) degrees, although the library expects rads.  See
+L<forwardRad()|Geo::Proj4/"Converters">. A latitude south of the Equator and longitude west of
+the Prime Meridian given with negative values.
+
+Returned are two values, usually X and Y in meters, or whatever units are
+relevant to the given projection.  When the destination projection also
+than the order of parameters will be returned as LONG,LAT (not lat,long!)
+
+On error, C<forward> will return undef for both values.
+
+example: 
+
+ my ($x, $y) = $proj->forward($lat, $lon);
+ my ($long2, $lat2) = $proj->forward($lat, $lon);
+
+=item $obj-E<gt>B<forwardRad>($latitude, $longitude)
+
+Perform a forward projection from $latitude and $longitude (LL) to the
+cartographic projection (XY) represented by the Geo::Proj4 instance.
+This function reflects to library function C<forward()>, expecting
+radians, not degrees.
+
+=item $obj-E<gt>B<inverse>(($x,$y) | ($lat,$long))
+
+Perform an inverse projection from the (cartographic) projection represented
+by this Geo::Proj4 object, back into latitude and longitude values.
+
+WARNING: for historic reasons, latitude and longitude are assumed to be in 
+(floating point) degrees, although the library expects rads.  See
+L<inverseRad()|Geo::Proj4/"Converters">.
+
+On error, C<inverse> will return undef for both values.
+
+example: 
+
+  if($proj->hasInverse)
+  {  my ($lat, $lon) = $proj->inverse($x, $y);
+     ...
+  }
+
+=item $obj-E<gt>B<inverseRad>(($x,$y) | ($lat|$long))
+
+Perform an inverse projection from the (cartographic) projection
+represented by this Geo::Proj4 object, back into latitude and longitude
+values.  Latitude and longitude are assumed to be in radians. See
+L<inverse()|Geo::Proj4/"Converters">.
+
+=item $obj-E<gt>B<transform>($to, $point|ARRAY-of-$points)
+
+Translate the $points into the projecten of $to.  Each point is specified
+as two or three values in an ARRAY.  In case of latlong source or
+destination projections, coordinates are translated into radians and/or
+back.  Both input and output values are always in X-Y/LongLat order.
+See L<transformRad()|Geo::Proj4/"Converters">
+
+example: 
+
+ my $from  = Geo::Proj4->new("+proj=latlong +datum=NAD83");
+ my $to    = Geo::Proj4->new("+proj=utm +zone=10 +datum=WGS84");
+
+ my $point = [ 1.12, 3.25 ];  # See Geo::Point
+ my $pr_point = $from->transform($to, $point);
+
+ my $pr    = $from->transform($to, [ $point1, $point2 ]);
+ my $pr_point1 = $pr->[0];
+ my $pr_point2 = $pr->[1];
+
+=item $obj-E<gt>B<transformRad>($to, $point|ARRAY-of-$points)
+
+Translate the $points into the projecten of $to.  Each point is specified
+as two or three values in an ARRAY.  In case of latlong source or
+destination projections, coordinates are expected to be in radians.
+Both input and output values are always in X-Y/LongLat order.
+See L<transform()|Geo::Proj4/"Converters">
+
+=back
+
+=head2 Library introspection
+
+=over 4
+
+=item Geo::Proj4-E<gt>B<datumInfo>($label)
+
+Returns a hash with information about the specified datum.  With
+L<listDatums()|Geo::Proj4/"Library introspection">, all defined LABELS can be found.
+
+=item Geo::Proj4-E<gt>B<ellipsoidInfo>($label)
+
+Returns a hash with information about the specified ellipsis.  With
+L<listEllipsoids()|Geo::Proj4/"Library introspection">, all defined LABELS can be found.
+
+=item $obj-E<gt>B<libVersion>()
+
+=item Geo::Proj4-E<gt>B<libVersion>()
+
+Returns the version of the proj4 library
+
+=item Geo::Proj4-E<gt>B<listDatums>()
+
+Returns a list with all defined datum labels.
+
+example: 
+
+ foreach my $id (Geo::Proj4->listDatums)
+ {   my $def = Geo::Proj4->datum($id);
+     print "$id = $def->{ellips_id}\n";
+ }
+
+=item Geo::Proj4-E<gt>B<listEllipsoids>()
+
+Returns a list with all defined ellips labels.
+
+example: 
+
+ foreach my $id (Geo::Proj4->listEllipsoids)
+ {   my $def = Geo::Proj4->ellipsoid($id);
+     print "$id = $def->{name}\n";
+ }
+
+=item Geo::Proj4-E<gt>B<listTypes>()
+
+Returns a list with all defined projection types.
+
+example: 
+
+ foreach my $id (Geo::Proj4->listTypes)
+ {   my $def = Geo::Proj4->type($id);
+     print "$id = $def->{description}\n";
+ }
+
+=item Geo::Proj4-E<gt>B<listUnits>()
+
+Returns a list with all defined unit labels.
+
+example: 
+
+ foreach my $id (Geo::Proj4->listUnits)
+ {   my $def = Geo::Proj4->unit($id);
+     print "$id = $def->{name}\n";
+ }
+
+=item Geo::Proj4-E<gt>B<typeInfo>($label)
+
+Returns a hash with information about the specified projection type.  With
+L<listTypes()|Geo::Proj4/"Library introspection">, all defined LABELS can be found.
+
+=item Geo::Proj4-E<gt>B<unitInfo>($label)
+
+Returns a hash with information about the specified unit.  With
+L<listUnits()|Geo::Proj4/"Library introspection">, all defined LABELS can be found.
+
+=back
+
+=head1 DETAILS
+
+=head2 Install
+
+Geo::Proj4 uses XS to wrap the PROJ.4 cartographic projections library. You
+will need to have the PROJ.4 library installed in order to build and use
+this module. You can get source code and binaries for the PROJ.4 library
+from its home page at L<http://www.remotesensing.org/proj/>.
+
+=head2 Projections
+
+Covering all the possible projections and their arguments in PROJ.4
+is well beyond the scope of this document. However, the C<cs2cs(1)>
+utility that ships with PROJ.4 will list the projections it knows about
+by running B<cs2cs -lp>, the ellipsoid models it knows with the B<-le>
+parameter, the units it knows about with B<-lu>, and the geodetic datums
+it knows with B<-ld>. Read L<cs2cs(1)> for more details.
+
+Alternately, you can read the PROJ.4 documentation, which can be found
+on the project's homepage. There are links to PDFs, text documentation,
+a FAQ, and more.
+
+=head2 Bugs
+
+One common source of errors is that latitude and longitude are
+swapped: some projection systems use lat-long, other use x-y
+which is a swapped order.  Especially the L<forward()|Geo::Proj4/"Converters"> and L<inverse()|Geo::Proj4/"Converters">
+cause this problem, always flipping the coordinate order.  The
+L<transform()|Geo::Proj4/"Converters"> method is much easier: input and output in x-y/long-lat
+order.
+
+Also be warned  that the values must have the right sign. Make sure you
+give negative values for south latitude and west longitude.  For
+calculating projections, this is more important than on maps.
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: transform() expects array of points
+
+=item Error: transformRad() expects array of points
+
+=back
+
+=head1 REFERENCES
+
+See the Geo::Point website at L<http://perl.overmeer.net/geo/> for
+an html version of this and related modules;
+L</Geo::GML>,
+L</Geo::Point>,
+L</Geo::WKT> and
+L</Math::Polygon>
+
+Effusive thanks to Frank Warmerdam (maintainer of PROJ.4) and Gerald
+Evenden (main contributor of PROJ.4). Their PROJ.4 library home page:
+L<http://www.remotesensing.org/proj/>
+
+proj(1), cs2cs(1), pj_init(3).
+
+=head1 COPYRIGHTS
+
+Developed and maintained by Mark Overmeer E<lt>geo@overmeer.netE<gt>.
+Copyright (c) 2004-2007 by the authors. All rights reserved.
+
+Originally Written by Schuyler Erle E<lt>schuyler@nocat.netE<gt> and
+Rich Gibson E<lt>rich@nocat.netE<gt>.  Their site: Mapping Hacks home
+page: L<http://www.mappinghacks.com>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,14 @@
+Record Type R - TIGER/Line ID Record Number Range
+
+Field    BV  Fmt Type Beg End Len Description
+RT       No   L   A    1    1  1  Record Type
+VERSION  No   L   N    2    5  4  Version Number
+FILE     No   L   N    6   10  5  File Code
+CENID    No   L   A   11   15  5  Census File Identification Code
+TLMAXID  No   R   N   16   25 10  Highest Possible TIGER/Line ID in range for Census File Identification Code
+TLMINID  No   R   N   26   35 10  Lowest Possible TIGER/Line ID in range for Census File Identification Code
+TLIHGHID No   R   N   36   45 10  Current High TIGER/Line ID for Census File Identification Code
+TZMAXID  No   R   N   46   55 10  Highest Possible TIGER Zero-Cell ID in range for Census File Identification Code
+TZMINID  No   R   N   56   65 10  Lowest Possible TIGER Zero-Cell ID in range for Census File Identification Code
+TZHIGHID No   R   N   66   75 10  Current High TIGER Zero-Cell ID for Census File Identification Code
+FILLER   Yes  L   A   76   76  1  Filler (to make even character count)

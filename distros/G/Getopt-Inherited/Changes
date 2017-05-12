@@ -1,0 +1,7 @@
+Revision history for Perl extension Getopt-Inherited
+
+1.100860  2010-03-27 11:28:31 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.01  Wed 2010.02.03 13:43:57 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

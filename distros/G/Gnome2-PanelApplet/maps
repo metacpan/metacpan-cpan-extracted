@@ -1,0 +1,6 @@
+PANEL_TYPE_APPLET			PanelApplet			GtkObject	Gnome2::PanelApplet
+PANEL_TYPE_PANEL_APPLET_BACKGROUND_TYPE	PanelAppletBackgroundType	GEnum		Gnome2::PanelApplet::BackgroundType
+PANEL_TYPE_PANEL_APPLET_FLAGS		PanelAppletFlags		GFlags		Gnome2::PanelApplet::Flags
+
+# Custom GType
+PANEL_PERL_TYPE_PANEL_APPLET_ORIENT	PanelAppletOrient		GEnum		Gnome2::PanelApplet::Orient

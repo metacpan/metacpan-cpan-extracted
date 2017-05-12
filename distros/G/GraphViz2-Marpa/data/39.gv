@@ -1,0 +1,9 @@
+digraph graph_39
+{
+	node_39_1
+	[
+		color = red
+		fontcolor = green
+		label = "Quoted label with \n embedded newline"
+	]
+}

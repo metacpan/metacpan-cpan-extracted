@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Games-Multiplayer-Manager.t
+lib/Games/Multiplayer/Manager.pm

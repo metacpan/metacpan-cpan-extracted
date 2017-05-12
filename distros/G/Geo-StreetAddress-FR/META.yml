@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Geo-StreetAddress-FR
+version:             0.0.4
+abstract:            Perl extension for parsing French street addresses
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Class::Accessor::Fast:         0
+    Test::More:                    0
+    Test::Perl::Critic:            0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - franck cuny <franck.cuny@gmail.com>

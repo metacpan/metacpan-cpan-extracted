@@ -1,0 +1,109 @@
+package Gideon::Manual::Finding;
+
+#ABSTRACT: Finding objects
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Gideon::Manual::Finding - Finding objects
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 DESCRIPTION
+
+The Gideon API defines two methods for finding records: C<find> and C<find_one>
+
+=head2 C<find( [%opts] )>
+
+Find is used for finding one or more records within your data store, the query
+DSL may vary from different providers. In the case of the DBI driver it uses the
+L<SQL::Abstract> interface, for example
+
+   # Search all
+   Class->find;
+
+   # Search object with id = 1
+   Class->find( id => 1 )
+
+   # Search object using like
+   Class->find( name => { like => 'Doe' } );
+
+   # Complex search
+   Class->find( name => [ { like => 'Doe' }, { 'not like' => 'John' } ] );
+
+You can additionally request a particular sorting criteria, or limit. To do that
+you need to add C<-order> and C<-limit> in your options
+
+   # Search all order by id descending
+   Class->find( -order => { -desc => 'id' } )
+
+   # Search first 10 elements
+   Class->find( -limit => 10 )
+
+   # Next page
+   Class->find( -limit => 10, -offset => 10);
+
+Another particular aspect of Gideon is that C<find> behaves differently depending
+on the calling context.
+
+=head3 C<find( [%opts] )> in Scalar Context
+
+When called in scalar context it returns a L<Gideon::ResultSet> object and B<does
+not retrieve> object from the data store deferring the operation to when results
+are really needed. This allows you to, for instance, combine different searches
+together.
+
+   # Find in scalar context
+   my $grown_ups = Poeple->find( age => { '>' => 16 } );
+   my $us_grown_ups = $grown_ups->find( country => 'US' );
+
+   # This has the same effect as
+   # my $usa_grown_ups = Poeple->find( age => { '>' => 16 }, country => 'US' );
+
+   say $_->name for $usa_grown_ups;
+
+=head3 C<find> in Array Context
+
+When find is called in Array Context it queries the data store immediately and
+returns an array with the results.
+
+   # Same results as previous example
+   say $_->name for Poeple->find( age => { '>' => 16 }, country => 'US' );
+
+=head2 C<find_one( [%opts] )>
+
+C<find_one> is a shortcut to search one record only, in case there are multiple
+results it will only return the first object, if C<-order> is not provided it
+will return the first result using data store's natural ordering
+
+   my $first_grown_up = People->find_one( age => { '>' => 16 } );
+   say $first_grown_up->name;
+
+The you can use the same C<%opts> as with the C<find> method with one exception:
+C<limit> is not used as it is forced to C<1>
+
+=head1 NAME
+
+Finding objects with Gideon
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 AUTHOR
+
+Mariano Wahlmann, Gines Razanov
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mariano Wahlmann, Gines Razanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

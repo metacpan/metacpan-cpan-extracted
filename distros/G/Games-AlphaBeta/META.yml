@@ -1,0 +1,34 @@
+---
+name: Games-AlphaBeta
+version: v0.4.7
+author:
+  - 'Stig Brautaset, E<lt>stig@brautaset.orgE<gt>'
+abstract: game-tree search with object oriented interface
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  File::Spec::Functions: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Games::AlphaBeta:
+    file: lib/Games/AlphaBeta.pm
+    version: v0.4.7
+  Games::AlphaBeta::Position:
+    file: lib/Games/AlphaBeta/Position.pm
+    version: v0.1.2
+  Games::AlphaBeta::Reversi:
+    file: lib/Games/AlphaBeta/Reversi.pm
+    version: v0.1.5
+  Games::Sequential:
+    file: lib/Games/Sequential.pm
+    version: v0.4.2
+  Games::Sequential::Position:
+    file: lib/Games/Sequential/Position.pm
+    version: v0.3.1
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

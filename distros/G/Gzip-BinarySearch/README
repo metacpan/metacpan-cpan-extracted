@@ -1,0 +1,11 @@
+Gzip::BinarySearch binary searches gzipped TSVs, etc.
+without decompressing the whole file first. See the POD
+for more information.
+
+INSTALLATION
+
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ # make install
+

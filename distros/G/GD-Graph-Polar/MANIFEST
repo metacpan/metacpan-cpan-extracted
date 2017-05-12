@@ -1,0 +1,20 @@
+Changes
+Todo
+lib/GD/Graph/Polar.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+rgb.txt
+t/001_base.t
+scripts/example-locate.pl
+scripts/example-locate.png
+scripts/example-mrdvt92.pl
+scripts/example-mrdvt92.png
+scripts/example-plot.cgi
+scripts/example-plot.pl
+scripts/example-plot.png
+scripts/example-text.pl
+scripts/example-text.png
+perl-GD-Graph-Polar.spec
+META.yml                                 Module meta-data (added by MakeMaker)

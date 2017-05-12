@@ -1,0 +1,947 @@
+package Dijsktra;
+
+use strict;
+use warnings;
+use Carp qw(croak carp);
+$|=1;
+
+ 
+use vars qw($VERSION);
+$VERSION = '0.1';
+
+my $VERBOSE = 0;
+
+
+
+#############################################################################
+#used Modules                                                               #
+#############################################################################
+
+
+use Benchmark qw(:hireswallclock);
+use Array::Heap::ModifiablePriorityQueue;
+
+
+#############################################################################
+#Methods                                                                    #
+#############################################################################
+
+sub VERBOSE {
+	my $either = shift;
+	$VERBOSE = shift;
+	print "verbose output set\n" if ($VERBOSE);
+}
+
+
+sub _initialize {
+	my $self = shift;
+	$self->{graph} = ();
+	$self->{maxcost} = 0;
+}
+
+sub new {
+	my $class = shift;
+	
+	my $self = {};
+  bless $self, $class;
+
+  $self->_initialize();
+
+  return $self;
+}
+
+sub node {
+	my $self = shift;
+	my $nodeA = shift;
+	
+	if (scalar(@_) == 0) {
+		if (defined($nodeA) and exists($self->{graph}{$nodeA})) {
+			return $self->{graph}{$nodeA}{label};
+		}
+		else {
+			return undef;
+		}
+	}
+	elsif (scalar(@_) == 1) {
+		$self->{graph}{$nodeA}{label} = $_[0];
+		return $self;
+	}
+	croak "node: invalid parameters";
+}
+
+sub nodeExists {
+	my $self = shift;
+	my $nodeA = shift;
+	
+	if (defined($nodeA) and exists($self->{graph}{$nodeA})) {
+		return 1;
+	}
+	return 0;
+}
+
+sub adjacent {
+	my ($self, $nodeA, $nodeB) = @_;
+	
+	if (!defined($nodeA) or !defined($nodeB) ) {
+		return undef;
+	}
+	if ( !exists($self->{graph}{$nodeA}{edges}) or !exists($self->{graph}{$nodeB}{edges}) or !exists($self->{graph}{$nodeA}{edges}{$nodeB}) ) {
+		return 0;
+	}
+	return 1;
+}
+
+
+sub adjacentNodes {
+	my ($self, $nodeA) = @_;
+	
+	my @neighbors = ();
+	if (defined($nodeA) and exists($self->{graph}{$nodeA}{edges})) {
+		foreach my $nodeB (sort keys %{$self->{graph}{$nodeA}{edges}}) {
+			push(@neighbors, $nodeB);
+		}
+	}
+	return @neighbors;
+}
+
+sub removeNode {
+	my ($self, $nodeA) = @_;
+	
+	croak "removeNode: missing node parameter" if !defined($nodeA);
+	
+	if (exists($self->{graph}{$nodeA})) {
+		if (exists($self->{graph}{$nodeA}{edges})) {
+			foreach my $nodeB (sort keys %{$self->{graph}{$nodeA}{edges}}) {
+				delete($self->{graph}{$nodeB}{edges}{$nodeA});
+			}
+		}
+		delete($self->{graph}{$nodeA});
+		return $self;
+	}
+	return undef;
+}
+
+
+sub removeEdge {
+	my ($self, $nodeA, $nodeB) = @_;
+	
+	if (!defined($nodeA) or !defined($nodeB)) {
+		croak "removeEdge: missing parameters";
+	}
+		
+	if (exists($self->{graph}{$nodeA}{edges}{$nodeB})) {
+		delete($self->{graph}{$nodeA}{edges}{$nodeB});
+		delete($self->{graph}{$nodeB}{edges}{$nodeA});
+		foreach my $node ($nodeA, $nodeB) {
+			my $hasNeighbors = 0;
+			foreach my $neighbor (keys %{$self->{graph}{$node}{edges}}) {
+				$hasNeighbors = 1;
+				last;
+			}
+			if (!$hasNeighbors) {
+				delete($self->{graph}{$node}{edges});
+			}
+		}
+	}
+	return $self;
+}
+
+			
+sub edge {
+	my $self = shift;
+	if (scalar(@_) == 3) {
+		my ($nodeA, $nodeB, $cost) = @_;
+		if ($cost <= 0) {
+			carp "edge: invalid edge cost $nodeA $nodeB $cost";
+			return undef;
+		}
+		elsif ($nodeA eq $nodeB) {
+			carp "edge: source and target node IDs must be different";
+			return undef;
+		}
+		else {
+			$self->{graph}{$nodeA}{edges}{$nodeB} = $cost;
+			$self->{graph}{$nodeB}{edges}{$nodeA} = $cost;
+			
+			$self->{maxcost} += $cost;
+		}
+		return($self);
+	}
+	elsif (scalar(@_) == 2) {
+		my ($nodeA, $nodeB) = @_;
+		if (exists($self->{graph}{$nodeA}{edges}{$nodeB})) {
+			return($self->{graph}{$nodeA}{edges}{$nodeB});
+		}
+		if (exists($self->{graph}{$nodeA}) and exists($self->{graph}{$nodeB})) {
+			carp "edge: no edge between $nodeA and $nodeB";
+			return 0;
+		}
+		if (!exists($self->{graph}{$nodeA})) {
+			carp "edge: nodeA $nodeA does not exist";
+			return undef;
+		}
+		if (!exists($self->{graph}{$nodeB})) {
+			carp "edge: nodeB $nodeB does not exist";
+			return undef;
+		}
+	}
+	else {
+		croak "edge: invalid parameters";
+	}
+}
+
+sub edgeExists {
+	my ($self, $nodeA, $nodeB) = @_;
+	
+	if (defined($nodeA) and defined($nodeB) and exists($self->{graph}{$nodeA}{edges}{$nodeB})) {
+		return 1;
+	}
+	return 0;
+}
+
+
+
+sub nodeList {
+	my $self = shift;
+	
+	my @nodeList = ();
+	foreach my $node (keys %{$self->{graph}}) {
+		push(@nodeList, [$node, $self->{graph}{$node}{label}]);
+	}
+	return @nodeList;
+}
+
+
+sub farthestNode {
+	my ($self, $origin) = @_;
+	
+	if (!exists($self->{graph}{$origin})) {
+		carp "farthestNode: origin node not found: $origin\n";
+		return "<solution desc='farthest' origin='$origin' status='error: origin node not found in graph' />\n";
+	}
+	elsif (!exists($self->{graph}{$origin}{edges})) {
+		carp "farthestNode: origin node $origin has no edges\n";
+		return "<solution desc='farthest' origin='$origin' status='error: origin node has no edges' />\n";
+	}
+	my $pq = Array::Heap::ModifiablePriorityQueue->new();
+	
+	my %solution = ();
+	my %unvisited = ();
+	foreach my $node (keys %{$self->{graph}}) {
+		if (exists($self->{graph}{$node}{edges})) {  #nodes without edges cannot be part of the solution
+			$solution{$node}{cost} = $self->{maxcost};
+			$solution{$node}{prevnode} = '';
+			$pq->add($node, $self->{maxcost});
+		}
+	}
+		
+	$solution{$origin}{cost} = 0;
+	$pq->add($origin,0); #modify weight of origin node
+	
+	my $cycle = 0;
+	my $t0 = Benchmark->new;
+	
+	while ($pq->size()) {
+		$cycle++;
+		print '.' if $VERBOSE and ($cycle % 1000 == 0);
+		
+		my $visitNode = $pq->get();
+		
+		foreach my $adjacentNode (keys %{$self->{graph}{$visitNode}{edges}}) {
+			next if !defined($pq->weight($adjacentNode));
+			
+			my $thisCost = $solution{$visitNode}{cost} + $self->{graph}{$visitNode}{edges}{$adjacentNode};
+			if ($thisCost < $solution{$adjacentNode}{cost}) {
+				$solution{$adjacentNode}{cost} = $thisCost;
+				$solution{$adjacentNode}{prevnode} = $visitNode;
+				$pq->add($adjacentNode, $thisCost);
+			}
+		}
+	}
+	if ($VERBOSE) {
+		my $t1 = Benchmark->new;
+		if ($cycle >= 1000) {
+			print "\n";
+		}
+		my $td = timediff($t1, $t0);
+	  print "dijkstra's algorithm took: ",timestr($td),"\n";
+	}
+  
+	my $farthestcost = 0;
+	foreach my $node (sort keys %solution) {
+		if ($solution{$node}{cost} < $self->{maxcost} and $solution{$node}{cost} > $farthestcost) {
+			$farthestcost = $solution{$node}{cost};
+			#$farthestnode = $node;
+		}
+	}
+	
+	my $solutioncnt = 0;
+	my $xml = "<solution desc='farthest' origin='$origin' status='success' cost='$farthestcost'>\n";
+	foreach my $farthestnode (sort keys %solution) {
+		if ($solution{$farthestnode}{cost} == $farthestcost) {
+			
+			$solutioncnt++;
+			
+			print "\nfarthestNode: (solution $solutioncnt) farthest node from origin $origin is $farthestnode at cost $farthestcost\n" if $VERBOSE;
+			
+			my $fromNode = $solution{$farthestnode}{prevnode};
+			my @path = ( $farthestnode, $fromNode );
+			
+			my %loopCheck = ();
+			while ($solution{$fromNode}{prevnode} ne '') {
+				$fromNode = $solution{$fromNode}{prevnode};
+				if (exists($loopCheck{$fromNode})) {
+					print "farthestNode: path loop at $fromNode\n";
+					print "farthestNode: path = ", join(',',@path), "\n";
+					die "farthestNode: destination to origin path logic error";
+				}
+				$loopCheck{$fromNode} = 1;
+				push(@path,$fromNode);
+			}
+			
+			@path = reverse(@path);
+			
+			my $nexttolast = $#path - 1;
+			$xml .= "\t<path id='$solutioncnt' destination='$farthestnode'>\n";
+			foreach my $i (0 .. $nexttolast) {
+				$xml .= "\t\t<edge source='$path[$i]' target='$path[$i+1]' cost='" . $self->edge($path[$i],$path[$i+1]). "'/>\n";
+			}
+			$xml .= "\t</path>\n";
+	
+#			my $pathcost = 0;
+#			my $halfcost = $farthestcost / 2;
+#			$fromNode = '';
+#			while ($pathcost < $halfcost) {
+#				my $nextNode = shift @path;
+#				if ($nextNode eq '') {
+#					print "problem in mid-point.\n";
+#					print "pathcost = $pathcost\n";
+#					print "halfcost = $halfcost\n";
+#					print "fromnode = $fromNode\n";
+#					last;
+#				}
+#				if ($fromNode ne '') {
+#					my $edgecost = $self->{graph}{$fromNode}{edges}{$nextNode};
+#					if ($pathcost + $edgecost > $halfcost) {
+#						#print "center from $origin to $farthestnode is between $fromNode and $nextNode\n";
+#						#print "length from $origin to $fromNode is $pathcost\n";
+#						#print "length from $fromNode to $nextNode is $edgecost\n";
+#						last;
+#					}
+#					$pathcost += $edgecost;
+#				}
+#				$fromNode = $nextNode;
+#			}
+		}
+	}
+	$xml .= "</solution>\n";
+	return($xml);
+}
+
+sub shortestPath {
+	my ($self, $origin, $destination) = @_;
+	
+	if (!exists($self->{graph}{$origin})) {
+		carp "shortestPath: origin node not found: $origin\n";
+		return "<solution desc='path' origin='$origin' destination='$destination' status='error: origin node not found in graph' />\n";
+	}
+	elsif (!exists($self->{graph}{$origin}{edges})) {
+		carp "shortestPath: origin node $origin has no edges\n";
+		return "<solution desc='path' origin='$origin' destination='$destination' status='error: origin node has no edges' />\n";
+	}
+	elsif (!exists($self->{graph}{$destination})) {
+		carp "shortestPath: destination node not found: $origin\n";
+		return "<solution desc='path' origin='$origin' destination='$destination' status='error: destination node not found in graph' />\n";
+	}
+	elsif (!exists($self->{graph}{$destination}{edges})) {
+		carp "shortestPath: destination node $destination has no edges\n";
+		return "<solution desc='path' origin='$origin' destination='$destination' status='error: destination node has no edges' />\n";
+	}
+	my $pq = Array::Heap::ModifiablePriorityQueue->new();
+	
+	my %solution = ();
+	my %unvisited = ();
+	foreach my $node (keys %{$self->{graph}}) {
+		if (exists($self->{graph}{$node}{edges})) {  #nodes without edges cannot be part of the solution
+			$solution{$node}{cost} = $self->{maxcost};
+			$solution{$node}{prevnode} = '';
+			$pq->add($node, $self->{maxcost});
+		}
+	}
+		
+	$solution{$origin}{cost} = 0;
+	$pq->add($origin,0); #modify weight of origin node
+	
+	my $cycle = 0;
+	my $t0 = Benchmark->new;
+	
+	my $foundSolution = 0;
+	while ($pq->size()) {
+		$cycle++;
+		print '.' if $VERBOSE and ($cycle % 1000 == 0);
+		
+		my $visitNode = $pq->get();
+		
+		if ($visitNode eq $destination) {
+			$foundSolution = 1 if $solution{$destination}{cost} < $self->{maxcost};
+			last;
+		}
+		
+		foreach my $adjacentNode (keys %{$self->{graph}{$visitNode}{edges}}) {
+			next if !defined($pq->weight($adjacentNode));
+			
+			my $thisCost = $solution{$visitNode}{cost} + $self->{graph}{$visitNode}{edges}{$adjacentNode};
+			if ($thisCost < $solution{$adjacentNode}{cost}) {
+				$solution{$adjacentNode}{cost} = $thisCost;
+				$solution{$adjacentNode}{prevnode} = $visitNode;
+				$pq->add($adjacentNode, $thisCost);
+			}
+		}
+	}
+	if ($VERBOSE) {
+		my $t1 = Benchmark->new;
+		if ($cycle >= 1000) {
+			print "\n";
+		}
+		my $td = timediff($t1, $t0);
+	  print "dijkstra's algorithm took: ",timestr($td),"\n";
+	}
+  
+  my $xml = '';
+  if ($foundSolution) {
+	  my $pathcost = $solution{$destination}{cost};
+		print "shortestPath: pathcost = $pathcost\n" if $VERBOSE;
+		
+		my $solutioncnt = 0;
+		$xml = "<solution desc='path' origin='$origin' destination='$destination' status='success' cost='$pathcost'>\n";
+		
+		my $fromNode = $solution{$destination}{prevnode};
+		my @path = ( $destination, $fromNode );
+		
+		my %loopCheck = ();
+		while ($solution{$fromNode}{prevnode} ne '') {
+			$fromNode = $solution{$fromNode}{prevnode};
+			if (exists($loopCheck{$fromNode})) {
+				print "shortestPath: path loop at $fromNode\n";
+				print "shortestPath: path = ", join(',',@path), "\n";
+				die "shortestPath: destination to origin path logic error";
+			}
+			$loopCheck{$fromNode} = 1;
+			push(@path,$fromNode);
+		}
+		
+		@path = reverse(@path);
+		
+		my $nexttolast = $#path - 1;
+		$xml .= "\t<path>\n";
+		foreach my $i (0 .. $nexttolast) {
+			$xml .= "\t\t<edge source='$path[$i]' target='$path[$i+1]' cost='" . $self->edge($path[$i],$path[$i+1]). "'/>\n";
+		}
+		$xml .= "\t</path>\n";
+		$xml .= "</solution>\n";
+	}
+	else {
+		$xml = "<solution desc='path' origin='$origin' destination='$destination' status='failed' />\n";
+	}
+	return($xml);
+}
+
+
+sub inputGraphfromCSV($$) {
+	my ($self, $filename) = @_;
+	
+	use Text::CSV_XS;
+
+	my $nodecount = 0;
+	my $edgecount = 0;
+	
+	open(my $infile, '<:encoding(UTF-8)', $filename) or croak "could not open '$filename'";
+
+	my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
+	while (my $row = $csv->getline ($infile)) {
+		if (lc($row->[0]) eq 'node') {
+			$self->node($row->[1], $row->[2]);
+			$nodecount++;
+		}
+		elsif (lc($row->[0]) eq 'edge') {
+			$self->edge($row->[1], $row->[2], $row->[3]);
+			$edgecount++;
+		}
+	}
+	close($infile);
+	if ($VERBOSE) {
+		print "inputGraphfromCSV: found $nodecount nodes and $edgecount edges\n";
+		print "inputGraphfromCSV: maxcost = $self->{maxcost}\n";
+	}
+	return $self;
+}
+
+sub inputGraphfromJSON {
+	my ($self, $filename) = @_;
+	
+	use JSON;
+	
+	my $json_text = '';
+	open(my $infile, '<:encoding(UTF-8)', $filename) or croak "could not open '$filename'";
+	
+	while (my $line = <$infile>) {
+		$json_text .= $line;
+	}
+	close($infile);
+
+	my $graphHref = from_json( $json_text, {utf8 => 1} );
+	if (ref($graphHref) ne 'HASH' or !exists($graphHref->{graph}{edges}) ) {
+		return undef;
+	}
+	
+	my $nodecount = 0;
+	my $edgecount = 0;
+	
+	foreach my $nodeHref (@{$graphHref->{graph}{nodes}}) {
+		$nodecount++;
+		$self->node($nodeHref->{id}, $nodeHref->{label});
+	}
+	foreach my $edgeHref (@{$graphHref->{graph}{edges}}) {
+		$edgecount++;
+		$self->edge($edgeHref->{source}, $edgeHref->{target}, $edgeHref->{value});
+	}
+	if ($VERBOSE) {
+		print "inputGraphfromJSON: found $nodecount nodes and $edgecount edges\n";
+		print "inputGraphfromJSON: maxcost = $self->{maxcost}\n";
+	}
+	return $self;
+}
+
+sub inputGraphfromGML($$) {
+	my ($self, $filename) = @_;
+	
+	use Regexp::Common;
+	
+	my $buffer = '';
+	my $linecount = 0;
+	open(my $infile, '<', $filename) or croak "could not open '$filename'";
+	print "inputGraphfromGML: opened '$filename'\n" if $VERBOSE;
+	while (my $line = <$infile>) {
+		$buffer .= $line;
+		$linecount++;
+	}
+	close($infile);
+	print "inputGraphfromGML: read $linecount lines\n" if $VERBOSE;
+	
+	my $nodecount = 0;
+	my $edgecount = 0;
+	
+	if ($buffer =~ /graph\s+\[\s+directed\s+(\d)/is) {
+		my $directed = $1;
+		if ($directed) {
+			croak "graph type is directed.  Not supported."
+		}
+	}
+			
+	my %keyvals = ();
+	while ($buffer =~ /(node|edge)\s+$RE{balanced}{-parens=>'[]'}/gis) {
+		my $type = $1;
+		my $attribs = $2;
+		my $bufferPos = $-[0];
+		
+		$attribs = substr($attribs, 1, -1);
+	
+		$attribs =~ s/graphics\s+$RE{balanced}{-parens=>'[]'}//i;
+		
+		while ($attribs =~/(id|label|source|target|value)\s+(?|([0-9\.]+)|\"([^\"]+)\")/gis) {
+			$keyvals{lc($1)} = $2;
+		}
+
+		if ($type eq 'node') {
+			$nodecount++;
+			if (exists($keyvals{id})) {
+				$self->{graph}{$keyvals{id}}{label} = (exists($keyvals{label})) ? $keyvals{label} : '';
+			}
+			else {
+				croak "inputGraphfromGML: node: missing id problem at position $bufferPos -- matched attribs: '$attribs'";
+			}
+		}
+		else {
+			$edgecount++;
+			if (exists($keyvals{source}) and exists($keyvals{target}) and exists($keyvals{value}) and $keyvals{value} > 0) {
+				$self->edge( $keyvals{source}, $keyvals{target}, $keyvals{value} );
+			}
+			else {
+				croak "inputGraphfromGML: edge: at position $bufferPos, missing source, target, value, or value <= 0 problem -- matched attribs '$attribs'";
+			}
+		}
+	}
+	if ($VERBOSE) {
+		print "inputGraphfromGML: found $nodecount nodes and $edgecount edges\n";
+		print "inputGraphfromGML: maxcost = $self->{maxcost}\n";
+	}
+	return $self;
+}
+
+sub inputGraphfromGraphML($$) {
+	my ($self, $filename) = @_;
+	
+	use XML::LibXML;
+	
+	my $dom = XML::LibXML->load_xml(location => $filename);
+	
+	my $xpc = XML::LibXML::XPathContext->new($dom);
+	$xpc->registerNs('gml', 'http://graphml.graphdrawing.org/xmlns');
+	
+	my $weightKey = '';
+	my $defaultWeight = 0;
+	my $labelKey = '';
+	
+	my $nodecount = 0;
+	my $edgecount = 0;
+	
+	if (my $graphNode = @{$xpc->findnodes('/gml:graphml/gml:graph')}[0] ) {
+		my $directed = $graphNode->getAttribute('edgedefault') || '';
+		croak "inputGraphfromGraphML: graph edgedefault is 'directed'.  Not supported." if $directed eq 'directed';
+	}
+	
+	if (my $graphNode = @{$xpc->findnodes('/gml:graphml/gml:graph[2]')}[0] ) {
+		croak "inputGraphfromGraphML: file contains more than one graph.  Not supported.";
+	}
+	
+	if (my $graphNode = @{$xpc->findnodes('/gml:graphml/gml:graph/gml:node/gml:graph')}[0] ) {
+		croak "inputGraphfromGraphML: file contains one or more embedded graphs.  Not supported.";
+	}
+	
+	if (my $keyWeightNode = @{$xpc->findnodes('/gml:graphml/gml:key[@for="edge" and @attr.name="weight"]')}[0]) {
+		$weightKey = $keyWeightNode->getAttribute('id');
+		if (my $defaultNode = @{$xpc->findnodes('.//gml:default[1]',$keyWeightNode)}[0]) {
+			$defaultWeight = $defaultNode->textContent();
+		}
+	}
+	else {
+		croak "inputGraphfromGraphML: graph does not contain graphml/key element for attribute edge weight '<key id=\"somevalue\" for=\"edge\" attr.name=\"weight\" />'.  Not supported.";
+	}
+	
+	my $labelXPATH = '';
+	if (my $keyNameNode = @{$xpc->findnodes('/gml:graphml/gml:key[@for="node" and @attr.name="name" or @attr.name="label"]')}[0]) {
+		my $labelKey = $keyNameNode->getAttribute('id');
+		$labelXPATH = ".//gml:data[\@key=\"$labelKey\"]";
+	}
+	else {
+		carp "inputGraphfromGraphML: name or label attribute not found in graphml/key element";
+	}
+
+	
+	foreach my $nodeElement ($xpc->findnodes('/gml:graphml/gml:graph/gml:node')) {
+		
+		my $node = $nodeElement->nodeName();
+		my $id = $nodeElement->getAttribute('id');
+		my $label = '';
+		if ($labelXPATH and my $dataNameNode = @{$xpc->findnodes($labelXPATH,$nodeElement)}[0]) {
+			$label = $dataNameNode->textContent();
+		}
+		$self->node($id,$label);
+		$nodecount++;
+	}
+	
+	my $weightXPATH = ".//gml:data[\@key=\"$weightKey\"]";
+	
+	foreach my $edgeElement ($xpc->findnodes('/gml:graphml/gml:graph/gml:edge')) {
+		
+		my $edge = $edgeElement->nodeName();
+		my $source = $edgeElement->getAttribute('source') || '';
+		my $target = $edgeElement->getAttribute('target') || '';
+		my $weight = $defaultWeight;
+		if (my $dataWeightNode = @{$xpc->findnodes($weightXPATH,$edgeElement)}[0]) {
+			$weight = $dataWeightNode->textContent();
+		}
+		if ($weight) {
+			$self->edge($source,$target,$weight);
+			$edgecount++;
+		}
+		else {
+			carp "inputGraphfromGraphML: edge $source $target has no weight. Not created."
+		}
+	
+	}
+	if ($VERBOSE) {
+		print "inputGraphfromGraphML: found $nodecount nodes and $edgecount edges\n";
+		print "inputGraphfromGraphML: maxcost = $self->{maxcost}\n";
+	}
+	return $self;
+}
+
+
+1;
+
+__END__
+
+
+=head1 NAME
+ 
+Graph::Dijkstra - Dijkstras shortest path algorithm with methods to load graph datasets from different file formats
+ 
+=head1 SYNOPSIS
+ 
+  # create the object
+  use Graph::Dijkstra;
+  my $graph = Graph::Dijkstra->new();
+ 
+  # input graph from a supported file format
+  $graph->inputGraphfromGML('astro-ph.gml');
+  $graph->inputGraphfromCSV('another.csv');
+  $graph->inputGraphfromJSON('another.json');
+  $graph->inputGraphfromGraphML('graphML.xml');
+  
+  #SET methods to create graph nodes and edges "manually"
+  $graph->node( 0, 'nodeA');
+  $graph->node( 1, 'nodeB');
+  $graph->node( 2, 'nodeC');
+  $graph->edge(0, 1, 3);  #create or update an edge between source and target;  cost(dist) must be > 0
+  $graph->edge(1, 2, 2);
+  $graph->removeNode( 0 ); #removes the node with ID = 0 and all associated edges; returns "self" or undef if node not found
+  $graph->removeEdge( 0, 1 ); #removes the edge that connects the two nodes; returns "self" or undef if either node or the edge not found
+  
+  #GET methods for graph nodes and edges
+  $graph->node( 0 ); #returns the label associated with node ID '0' or undef if there is no node with that id
+  $graph->nodeExists( 0 );  #returns true if a node with an ID value of '0' has been defined; false if not.
+  $graph->edge( 0, 1 ); #returns the cost (distance) associated with the edge between node's 0 and 1; undef if there is no edge
+  $graph->edgeExists( 0, 1 );  #returns true if an edge between nodes with id values of '0' and '1' has been defined; false if not.
+  $graph->nodeList();  #returns 2 dimensional array of all nodes, each node (array) element contains ID and LABEL values
+  $graph->adjacent( 0, 1 ); #returns true or false if there is an edge between nodeA and nodeB
+  $graph->adjacentNodes( 0 ); #returns a list of node IDs of immediately connected nodes (edges)
+  
+  #compute shortest path to farthest node from the origin
+  my $solutionXML = $graph->farthestNode( 0 );
+  
+  #compute shortest path between two nodes
+  my $solutionXML = $graph->shortestPath( 0, 2 );
+  
+=head1 DESCRIPTION
+ 
+Efficient implementation of Dijkstras shortest path algorithm in Perl
+using a Minimum Priority Queue.  Includes methods to load graph datasets from 
+various file formats.
+ 
+=head1 ABSTRACT
+ 
+Efficient implementation of Dijkstras shortest path algorithm in Perl
+using a Minimum Priority Queue. Minimum Priority Queue itself uses Array::Heap, an xs module.
+
+Includes methods to load graph datasets from multiple file formats.  Currently supports 
+GML (Graph Modelling Language, not to be confused with Geospatial Markup Language), 
+JSON (a draft specification with the addition of a "value" attribute to edges), 
+CSV (a simple row column format modelled after GML), and GraphML (XML based specification) with limitations.
+
+=head1 METHODS
+ 
+=over 4
+
+=item Dijkstra->VERBOSE( $bool );
+
+Class method that turns on or off informational output to STDOUT.
+
+=item my $graph = Dijsktra->new();
+ 
+Create a new, empty graph object. Returns the object on success.
+ 
+=item $graph->node( $id, $label );
+
+SET method that adds new or updates existing node and returns self.  Node ID values must be simple scalars.
+
+=item $graph->node( $id );
+ 
+GET method that returns the label associated with the node ID or returns undef if the node ID does not exist.
+ 
+=item $graph->nodeExists( $id );
+ 
+GET method that returns true if the node ID exists in the graph or false if it does not.
+
+=item $graph->adjacent( $source, $target );
+ 
+GET method that returns true if an edge connects $source and $target or false if not.  Returns undef if $source or $target do not exist.
+
+=item my @list = $graph->nodeList();
+
+Returns 2 dimensional array (list of lists) of all the nodes in the graph.  Each node element includes the ID value (element 0) and the LABEL value (element 1).
+$list[0][0] is the ID value of the first node and $list[0][1] is the LABEL value of the first node in the list.  Not sorted.
+
+=item my @list = $graph->adjacentNodes( $id );
+ 
+Returns list of node IDs that are connected to $id by an edge.  Returns undef if $id does not exist
+ 
+=item $graph->removeNode( $id );
+ 
+Removes node identified by $id and all connecting edges and returns self.  Returns undef if $id does not exist.
+ 
+=item $graph->removeEdge( $source, $target );
+ 
+Removes edge between $source and $target and returns self.  Returns undef if $source or $target does not exist.
+ 			
+=item $graph->edge( $source, $target, $cost );
+ 
+SET method that creates new or updates existing edge between $source and $target and returns $self. $cost must be > 0. 
+Returns undef if $cost <= 0 or $source or $target does not exist.
+									 
+=item $graph->edge( $source, $target );
+
+GET method that returns existing cost (distance) of edge between $source and $target.  Returns 0 if there is no edge between $source and $target.
+Returns undef if $source or $target does not exist. 											 
+ 
+=item $graph->edgeExists( $source, $target );
+ 
+GET method that returns true if an edge connects the source and target IDs or false if an edge has not been defined.
+
+
+=item my $solution = $graph->farthestNode( $origin );
+ 
+Returns a string in XML format that identifies the shortest path to the farthest node.
+When there is more than one solution (two or more farthest nodes with the same cost),  XML includes "<path>" for each solution.
+
+	example XML
+
+	<solution desc='farthest' origin='1' status='success' cost='1.8'>
+        <path id='1' destination='5'>
+                <edge source='1' target='3' cost='0.4'/>
+                <edge source='3' target='4' cost='0.4'/>
+                <edge source='4' target='5' cost='1.0'/>
+        </path>
+        <path id='2' destination='7'>
+                <edge source='1' target='2' cost='0.6'/>
+                <edge source='2' target='6' cost='0.4'/>
+                <edge source='6' target='7' cost='0.8'/>
+        </path>
+	</solution>
+
+
+=item my $solution = $graph->shortestPath( $nodeA, $nodeB );
+ 
+Returns a string in XML format that identifies the shortest path between $nodeA and $nodeB.  Returns undef if $nodeA or $nodeB does not exist.
+
+	example XML
+
+	<solution desc='path' origin='1' destination='5' status='success' cost='1.8'>
+        <path>
+                <edge source='1' target='3' cost='0.4'/>
+                <edge source='3' target='4' cost='0.4'/>
+                <edge source='4' target='5' cost='1.0'/>
+        </path>
+	</solution>
+
+=item $graph->inputGraphfromJSON($filename);
+
+Inputs nodes and edges from a JSON format file following the draft JSON Graph Specification with the addition of a "value" attribute for edges.
+Maybe the "value" attribute should be defined as metadata?
+
+See JSON Graph Specification L<https://www.npmjs.com/package/json-graph-specification>
+
+=item $graph->inputGraphfromGML($filename);
+
+Inputs nodes and edges from a Graphics Modelling Language format file (not to be confused with the Geospatial Markup Language XML format).  
+Implemented using pattern matching (regexp's) on "node" and "edge" constructs.
+An unmatched closing bracket (']') inside a quoted string attribute value will break the pattern matching.  
+Quoted string attribute values (e.g., a label value) should not normally include an unmatched closing bracket.
+Report as a bug and I'll work on re-implementing using a parser.
+
+See Graph Modelling Language L<https://en.wikipedia.org/wiki/Graph_Modelling_Language>
+
+=item $graph->inputGraphfromCSV($filename);
+
+Inputs nodes and edges from a CSV format file loosely modelled after GML.  
+The first column in each "row" is either a "node" or "edge" value.  For "node" rows, the next two columns are the ID and LABEL values.
+For "edge" rows, the next three columns are "source", "target", and "value" values.  No column header row.
+
+Example
+
+	node,A,"one"
+	node,B,"two"
+	node,C,"three"
+	node,D,"four"
+	node,E,"five"
+	node,F,"six"
+	edge,A,B,4
+	edge,A,F,5
+	edge,A,E,7
+	edge,A,D,3
+	edge,D,E,5
+	
+
+=item $graph->inputGraphfromGraphML($filename);
+
+Inputs nodes and edges from an XML format file following the GraphML specification.  EXPERIMENTAL... has not been tested with real world data sets.
+
+Input files must contain only a single graph and cannot contain embedded graphs.  Hyperedges are not supported.
+
+Graphs must contain a "key" element that contains C<< for="edge" attrib.name="weight" >> and optionally includes a child element that specifies the default value.
+These are used to populate the cost (weight) value for each edge.  Seems odd to specify a default edge weight but ok.
+ 
+  <key id="d1" for="edge" attr.name="weight" attr.type="double">
+    <default>2.2</default>
+  </key>
+
+	<edge id="7" source="1" target="2">
+		<data key="weight">0.5</data>
+	</edge>
+
+Optionally, graphs should contain a "key" element that contains C<< for="node" attrib.name="name" >> or C<< for="node" attrib.name="label" >>.  These
+are used to populate the "label" value for each node.
+
+	<key id="name" for="node" attr.name="name" attr.type="string"/>
+	
+	<node id="4">
+		<data key="name">josh</data>
+	</node>
+
+See GraphML Primer L<http://graphml.graphdrawing.org/primer/graphml-primer.html> and
+GraphML example L<http://gephi.org/users/supported-graph-formats/graphml-format/>
+
+=back
+
+=head1 PERFORMANCE
+
+On an unremarkable laptop, with a test graph of 16+K nodes and 121+K edges, both farthest and shortestPath complete in under 1 second.  
+Reading files from disk takes longer than computing the shortest path to the farthest node.
+ 
+=head1 LIMITATIONS
+ 
+Node ID values must be simple scalars.
+
+Currently only works with undirected graphs.
+
+For simplicity, InputGraphfromGML implemented using pattern matching (regexp's).  An unmatched closing bracket inside a quoted string (value) will break it. Will re-implement using a parser as necessary.
+
+=head1 TODO
+
+Add support for user defined data for nodes and edges in a comprehensive manner. Support in loadGraphfrom* methods and $graph->node methods.
+
+Add methods to save graphs to different file formats, for example C<< $graph->outputGraphtoGraphML($filename) >>.
+
+Evaluate support for directed graphs.
+
+Evaluate different formats to return results from farthest node and shortest path methods.
+
+ 
+=head1 SEE ALSO
+ 
+L<Array::Heap::ModifiablePriorityQueue>
+
+Graph Modelling Language L<https://en.wikipedia.org/wiki/Graph_Modelling_Language>
+
+JSON Graph Specification L<https://www.npmjs.com/package/json-graph-specification>
+
+GraphML Primer L<http://graphml.graphdrawing.org/primer/graphml-primer.html>
+
+GraphML example L<http://gephi.org/users/supported-graph-formats/graphml-format/>
+ 
+=head1 AUTHOR
+ 
+D. Dewey Allen C<< <ddallen16@gmail.com> >>
+
+ 
+=head1 COPYRIGHT
+
+Copyright (C) 2015, D. Dewey Allen
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+ 
+=cut
+
+

@@ -1,0 +1,41 @@
+Copyright 2008, 2009 Kevin Ryde
+
+This file is part of Gtk2-Ex-CellLayout-Base.
+
+Gtk2-Ex-CellLayout-Base is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-CellLayout-Base is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-CellLayout-Base.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Gtk2::Ex::CellLayout::Base provides a basic set functions for use in
+new data viewer widgets written in Perl and wanting to implement the
+Gtk2::CellLayout interface.
+
+This code started life in Gtk2::Ex::TickerView, and because a
+renderers list in Gtk2::CellLayout style is pretty much the same in
+every new viewer it's offered for general use.
+
+A few subtleties of GtkCellLayout aren't particularly well documented
+in the Gtk reference manual, so even if you decide you don't like this
+code you might still see if you agree with some of the details of
+packing order, attribute application, etc.
+
+The prerequisites are Gtk2-Perl and my Glib-Ex-ObjectBits.  Gtk2-Perl
+1.180 or higher is needed to implement GtkCellLayout as an actual
+GInterface from Perl code.
+
+The CellLayout-Base home page is
+
+    http://user42.tuxfamily.org/gtk2-ex-celllayout-base/index.html
+
+Bug reports to the author at user42@zip.com.au please.

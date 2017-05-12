@@ -1,0 +1,406 @@
+#
+# Support routines for  parsing CMakeLists.txt files
+#
+#  Notes:
+#   Need to get source_file lists, with conditions
+#         SOURCE_FILES( src_grp_name src_file1 src_file2 ...)
+#            (lists appear to add to previously added lists)
+#         ABSTRACT_FILES
+#
+#     Build a structure like:  
+#         Condition1:Condition2... => { listName => [ list ] }
+#			
+#			Condition
+use Parse::RecDescent;
+use DataArray;
+
+
+####################################################################
+#  Sub to parse the concrete and abstact objects listed in the VTK
+#  makefile
+#  Inputs:  Makefile
+#  Outputs:  Array ref of concrete and abstact class names
+sub parseVTKmakefile{
+
+
+
+	my ($makeFile) = @_;
+
+	# Make Parse RecDescent object to parse the cmake file
+	my $parse = Parse::RecDescent->new(<<'EndGrammar');
+
+		main: <skip:'[ \t\n]*'> command(s) /\Z/ { $item[2] }
+
+
+		command:
+
+			if_command
+		|	item_list 
+		|       comment
+		| 	<error>
+
+
+		item:  /[A-z0-9\/\{\}\$\.\-]+/   
+
+		item_list: item '(' item(s) ')'  <reject: $item[1] eq 'IF' || $item[1] eq 'ENDIF' || $item[1] eq 'ELSE'>
+				 { #print "Item List $item[1], ".join( ", ", @{$item[3]})."\n";
+				   [ 'ITEMLIST',$item[1], @{$item[3]} ];
+				 }
+
+
+		if_command: 'IF' '(' if_condition ')' command(s) else_clause[$item[3]](?) 'ENDIF' '(' "$item[3]" ')'
+			{ #print "IF Statement $item[3]\n";
+			  my $retval = [ $item[1], $item[3], $item[5]];
+			  if( scalar(@{$item[6]}) ){
+		  		push @$retval,  'ELSE', @{$item[6]} 
+			  }
+			  $retval;
+			}
+
+		if_condition: not_text(?) item matches_text(?)
+			{  my $retval;
+			   if( scalar( @{$item[1]}) ){ $retval = $item[1]->[0]." ".$item[2]; }
+			   else{ $retval = $item[2]; }
+
+			   # Check for matches_text present
+			   if( scalar( @{$item[3]}) ){ $retval .= " ".$item[3]->[0]; }
+			   $retval;
+			}
+
+		not_text: 'NOT'
+
+		# clause in if_condition like 'TK_LIBRARY MATCHES tk83.lib'
+		matches_text: 'MATCHES' item { $item[1]." ".$item[2]}
+
+
+		else_clause: 'ELSE' '(' "$arg[0]" ')' command(s)
+			{ #print "Else Clause\n";
+			  [ @{$item[5]} ];
+			}
+
+		comment: /#.*\n/  { [ 'COMMENT', $item[1]]}
+
+EndGrammar
+
+	local $/ = undef;
+
+	open(CMAKE,"<$makeFile") || die "Cannot open $makeFile:$!";
+	my $prog = <CMAKE>;
+	close(CMAKE);
+	#$prog =~ s/\\\n/ /sg;
+
+	my $body = $parse->main($prog) || die("Can't parse cmake file\n");
+
+
+	my $sourceFileHash = {};
+
+	# Default condition name is DEFAULT
+	#  Go thru the structure generated from Parse::RecDescent and build sourceFileHash structure
+	parseStructure($body, '$DEFAULT', $sourceFileHash);
+
+	my $parsedStructure = new DataArray( array => $sourceFileHash, dimNames => [ qw/ conditions itemList sourceList sourceName/]);
+
+	# Build the 'concrete' list ############################################
+	## (Default concrete classes)
+	my $concreteArray = $parsedStructure->dice(
+		{ 'itemList' => [ qw/  SOURCE_FILES / ],
+		  'sourceList' => [ qw/ Imaging_SRCS Rendering_SRCS Graphics_SRCS Filtering_SRCS Patented_SRCS IO_SRCS Hybrid_SRCS Common_SRCS _general/ ]
+	   }
+	   );
+
+	my $DEFAULT = 1;
+	my $WIN32 =   0;
+	my $APPLE =   0;
+	my $VTK_HAVE_VG500 = 0;
+	my $VTK_HAVE_VP1000 = 0;
+	my $UNIX = 0;
+	my $OPENGL_LIBRARY = 0;
+	my $VTK_MANGLE_MESA = 0;
+	my $MESA_LIBRARY = 0;
+
+	# Sub used for dice'ing the dataArray:
+	$diceSub = sub{  # Remove default condition if there are others:
+			    my $condition = $_[0];
+			    $condition =~ s/^\$DEFAULT\s+\&\&//g if( $condition =~ /\&\&/);
+			    my $rc = eval $condition;
+			    print $@ if $@;
+			    return $rc;
+			  };
+
+	# Don't do anything else if no data found from dice operation
+	my @concreteList;
+	unless( !defined($concreteArray->{array}) || !scalar( keys %{$concreteArray->{array}} ) ){
+
+		my $concreteList = $concreteArray->dice({ 'conditions' => $diceSub});
+		$concreteList = $concreteList->combineDims('total', [$concreteList->getDims]);
+		@concreteList = values %{$concreteList->{array}};
+	}
+	
+	# Build the 'abstract' list ############################################
+	my $abstractArray = $parsedStructure->dice(
+		{ 'itemList' => [ qw/ ABSTRACT_FILES  / ],
+		  'sourceList' => [ qw/ _general  / ]
+	   }
+	   );
+
+	$DEFAULT = 1;
+	$WIN32 =   0;
+	$APPLE =   0;
+	$VTK_HAVE_VG500 = 0;
+	$VTK_HAVE_VP1000 = 0;
+	$UNIX = 0;
+	$OPENGL_LIBRARY = 0;
+	$VTK_MANGLE_MESA = 0;
+	$MESA_LIBRARY = 0;
+
+
+	# Don't do anything else if no data found from dice operation
+	my @abstractList;
+	unless( !defined($abstractArray->{array}) || !scalar( keys %{$abstractArray->{array}} ) ){
+		my $abstractList = $abstractArray->dice({ 'conditions' => $diceSub});
+		$abstractList = $abstractList->combineDims('total', [$abstractList->getDims]);
+		@abstractList = values %{$abstractList->{array}};
+	}
+	# Build the 'Unix Concrete' list ############################################
+	my $concreteUnixArray = $parsedStructure->dice(
+		{ 'itemList' => [ qw/ ABSTRACT_FILES SOURCE_FILES / ],
+		  'sourceList' => [ qw/ RenderingOpenGL_SRCS Rendering_SRCS/ ]
+	   }
+	   );
+
+	$DEFAULT = 0;
+	$WIN32 =   0;
+	$APPLE =   0;
+	$VTK_HAVE_VG500 = 0;
+	$VTK_HAVE_VP1000 = 0;
+	$UNIX = 1;
+	$OPENGL_LIBRARY = 1;
+	$VTK_MANGLE_MESA = 0;
+	$MESA_LIBRARY = 0;
+
+
+	# Don't do anything else if no data found from dice operation
+	my @concreteUnixList;
+	unless( !defined($concreteUnixArray->{array}) || !scalar( keys %{$concreteUnixArray->{array}} ) ){
+		my $concreteUnixList = $concreteUnixArray->dice({ 'conditions' => $diceSub});
+		$concreteUnixList = $concreteUnixList->combineDims('total', [$concreteUnixList->getDims]);
+		@concreteUnixList = values %{$concreteUnixList->{array}};
+	}
+
+	# Build the 'Mesa' list ############################################
+	my $mesaArray = $parsedStructure->dice(
+		{ 'itemList' => [ qw/  SOURCE_FILES / ],
+		  'sourceList' => [ qw/ RenderingOpenGL_SRCS / ]
+	   }
+	   );
+
+	$DEFAULT = 0;
+	$WIN32 =   0;
+	$APPLE =   0;
+	$VTK_HAVE_VG500 = 0;
+	$VTK_HAVE_VP1000 = 0;
+	$UNIX = 0;
+	$OPENGL_LIBRARY = 0;
+	$VTK_MANGLE_MESA = 1;
+	$MESA_LIBRARY = 1;
+
+
+	# Don't do anything else if no data found from dice operation
+	my @mesaList;
+	unless( !defined($mesaArray->{array}) || !scalar( keys %{$mesaArray->{array}} ) ){
+		my $mesaList = $mesaArray->dice({ 'conditions' => $diceSub});
+		$mesaList = $mesaList->combineDims('total', [$mesaList->getDims]);
+		@mesaList = values %{$mesaList->{array}};
+	}
+
+	# Build the 'opengl' list ############################################
+	my $openglArray = $parsedStructure->dice(
+		{ 'itemList' => [ qw/  SOURCE_FILES / ],
+		  'sourceList' => [ qw/ RenderingOpenGL_SRCS / ]
+	   }
+	   );
+
+	$DEFAULT = 1;
+	$WIN32 =   0;
+	$APPLE =   0;
+	$VTK_HAVE_VG500 = 0;
+	$VTK_HAVE_VP1000 = 0;
+	$UNIX = 0;
+	$OPENGL_LIBRARY = 0;
+	$VTK_MANGLE_MESA = 0;
+	$MESA_LIBRARY = 0;
+
+
+	# Don't do anything else if no data found from dice operation
+	my @openglList;
+	unless( !defined($openglArray->{array}) || !scalar( keys %{$openglArray->{array}} ) ){
+		my $openglList = $openglArray->dice({ 'conditions' => $diceSub});
+		$openglList = $openglList->combineDims('total', [$openglList->getDims]);
+		@openglList = values %{$openglList->{array}};
+	}
+
+	# Build the 'win32' list ############################################
+	my $win32Array = $parsedStructure->dice(
+		{ 'itemList' => [ qw/  SOURCE_FILES / ],
+		  'sourceList' => [ qw/ RenderingOpenGL_SRCS Common_SRCS/ ]
+	   }
+	   );
+
+	$DEFAULT = 0;
+	$WIN32 =   1;
+	$APPLE =   0;
+	$VTK_HAVE_VG500 = 0;
+	$VTK_HAVE_VP1000 = 0;
+	$UNIX = 0;
+	$OPENGL_LIBRARY = 0;
+	$VTK_MANGLE_MESA = 0;
+	$MESA_LIBRARY = 0;
+
+
+	# Don't do anything else if no data found from dice operation
+	my @win32List;
+	unless( !defined($win32Array->{array}) || !scalar( keys %{$win32Array->{array}} ) ){
+		my $win32List = $win32Array->dice({ 'conditions' => $diceSub});
+		$win32List = $win32List->combineDims('total', [$win32List->getDims]);
+		@win32List = values %{$win32List->{array}};
+	}
+
+	########################################################################
+	# Build the wrap-exclude list. Any source files in this list will be excluded
+	#  from any of the other categories
+	my $excludeArray = $parsedStructure->dice(
+		{ 'itemList' => [ qw/  WRAP_EXCLUDE_FILES / ],
+		  'sourceList' => [ qw/ _general/ ]
+	   }
+	   );
+
+	$DEFAULT = 1;
+	$WIN32 =   0;
+	$APPLE =   0;
+	$VTK_HAVE_VG500 = 0;
+	$VTK_HAVE_VP1000 = 0;
+	$UNIX = 0;
+	$OPENGL_LIBRARY = 0;
+	$VTK_MANGLE_MESA = 0;
+	$MESA_LIBRARY = 0;
+
+
+	# Don't do anything else if no data found from dice operation
+	my @excludeList;
+	unless( !defined($excludeArray->{array}) || !scalar( keys %{$excludeArray->{array}} ) ){
+		my $excludeList = $excludeArray->dice({ 'conditions' => $diceSub});
+		$excludeList = $excludeList->combineDims('total', [$excludeList->getDims]);
+		@excludeList = values %{$excludeList->{array}};
+		my %excludeList;  # hash for quick lookup
+		@excludeList{@excludeList} = @excludeList;
+		# Remove files from any list that are in the exclude list
+		@concreteList = grep !defined($excludeList{$_}), @concreteList;
+		@concreteUnixList = grep !defined($excludeList{$_}), @concreteUnixList;
+		@mesaList = grep !defined($excludeList{$_}), @mesaList;
+		@openglList = grep !defined($excludeList{$_}), @openglList;
+		@win32List = grep !defined($excludeList{$_}), @win32List;
+		@abstractList = grep !defined($excludeList{$_}), @abstractList;
+		
+	}
+
+	
+	
+	# Remove Any from the abstract list that are in the concrete list
+	my %concreteList;
+	my %abstractList;
+	@concreteList{@concreteList} = @concreteList;
+	@abstractList{@abstractList} = @abstractList;
+	foreach (@concreteList){
+		delete $abstractList{$_} if( defined($abstractList{$_}));
+	}
+	
+	@abstractList = sort keys %abstractList;
+
+	# Make Return hash:
+	my %outputs = ( concrete => [@concreteList], unix_concrete => [@concreteUnixList],
+			mesa => [@mesaList], oglr => [@openglList], win32 => [@win32List],
+			abstract => [@abstractList]);
+	return %outputs;
+
+
+}
+
+###############################
+# Recursive sub to walk down the parsed structure and build
+#  the source file list and condition hash
+#
+#  Build a 3d hash structure like:
+# 
+#   { Conditions => { itemListType => { sourceListName => { sourceList }}}}
+#
+#    Where 
+#       Conditions: Concatenated conditions for the source list (parsed from if and else statements)
+#       itemListType: SOURCE_FILES or ABSTRACT FILES (parsed from the list type in the cmake file)
+#       sourceListName: Name of the source file list. This is the first element in the source file list.
+#                       e.g. 'RenderingOpenGL_SRCS'. If not present, this will be set to '_general'.
+#       sourceList:   List of files.
+sub parseStructure{
+
+	my ($structure, $conditionText, $sourceFileHash) = @_;
+	
+	# Go thru each element
+	foreach my $element(@$structure){
+	
+		# If Statement processing
+		if( $element->[0] eq 'IF'){
+			
+			my $condition = $element->[1];
+			# Turn condition text into perl code that can be evaled later
+			$condition =~ s/NOT/\!/g;
+			$condition =~ s/\b(\w+)\b/\$$1/g;
+			# Set the condition, and recurse down actions for this if statement
+			
+			parseStructure( $element->[2], $conditionText ." && ".$condition, $sourceFileHash);
+			
+			if( defined($element->[3]) &&  $element->[3] eq 'ELSE'){
+			
+					parseStructure( $element->[4], $conditionText ." && ! ".$condition, $sourceFileHash);
+
+			}
+			
+		}
+		
+		# Item List Processing
+		if( $element->[0] eq 'ITEMLIST'){
+			
+			my @list = @$element;
+			shift @list;
+			my $listtype = shift @list;
+			
+			# Process only SOURCE_FILES and ABSTRACT files
+			next unless( $listtype =~ /SOURCE_FILES/ || $listtype =~ /ABSTRACT/ || $listtype =~ /WRAP_EXCLUDE_FILES/);
+			
+			my $sourceListType = "_general"; # default source list type
+			unless( $list[0] =~ /^vtk/){ # set source list type if one is there
+				$sourceListType = shift @list;
+			}
+			
+			# Skip any source file lists that have something to do with tcl or python
+			next if( $sourceListType =~ /tcl/i || $sourceListType =~ /python/i);
+			
+			# Add on to existing list if already there
+			if( defined( $sourceFileHash->{$conditionText}{ $listtype}{$sourceListType} )){
+				my $listHash = $sourceFileHash->{$conditionText}{ $listtype}{$sourceListType};
+				my @listKeys = sort{ $a <=> $b} keys %$listHash;
+				@list = @$listHash{@listKeys};
+			}
+				
+			my %listHash;
+			@listHash{0..$#list} = @list;
+			$sourceFileHash->{$conditionText}{ $listtype}{$sourceListType} = \%listHash;
+			
+		}
+		
+	}
+	
+}
+			
+			
+1;
+		
+	

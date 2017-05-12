@@ -1,0 +1,11 @@
+<?xml version='1.0'?>
+<eveapi version="2">
+  <currentTime>2014-07-10 18:18:59</currentTime>
+  <result>
+    <rowset name="messages" key="messageID" columns="messageID,senderID,senderName,sentDate,title,toCorpOrAllianceID,toCharacterIDs,toListID">
+      <row messageID="336393982" senderID="90922771" senderName="Chips Merkaba" sentDate="2014-03-02 13:30:00" title="TSG -&amp;gt; Z-H" toCorpOrAllianceID="" toCharacterIDs="1203082547" toListID="" senderTypeID="1383" />
+      <row messageID="331477595" senderID="91669871" senderName="Valerii Ostudnev" sentDate="2013-10-08 06:30:00" title="Total Sell" toCorpOrAllianceID="" toCharacterIDs="" toListID="145156607" senderTypeID="1377" />
+    </rowset>
+  </result>
+  <cachedUntil>2014-07-10 18:33:59</cachedUntil>
+</eveapi>

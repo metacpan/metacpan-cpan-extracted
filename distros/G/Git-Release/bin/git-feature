@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+use 5.12.0;
+use Getopt::Long;
+use Git::Release;
+
+my $re = Git::Release->new;
+$|++;
+
+my $opt_list;
+my $opt_remote;
+
+GetOptions(
+    'l|list' => \$opt_list,
+    'remote=s' => \$opt_remote,
+);
+
+if( $opt_list ) {
+    my @branches = $re->branch->feature_branches;
+    for my $b ( @branches ) {
+        say $b->name;
+    }
+}
+else {
+    my $feature_name = shift;
+    my $ref = shift;
+    exit unless $feature_name;
+
+    $opt_remote ||= $re->remote->origin;
+    my $prefix = $re->config->feature_prefix;
+    my $name = $prefix . '/' . $feature_name;
+
+    say "Creating feature branch $name.";
+    my $b = $re->branch->new_branch( $name )->create( from => ($ref || 'master') );
+    $b->checkout;
+
+    if( $opt_remote ) {
+        say "Pushing feature branch @{[ $b->name ]} to remote $opt_remote... ";
+        $b->push($opt_remote, upstream => 1);
+    }
+    say 'Done';
+}
+

@@ -1,0 +1,36 @@
+=head1 Simple example
+
+This is the simplest example of how to use it, to just provide program
+identification informaion and usage help.. you probably even want to
+get rid of the help-opts option
+
+=cut
+
+use Getopt::Function; #don't need yet qw(maketrue makevalue);
+
+$::opthandler = new Getopt::Function 
+  [ "version V>version",
+    "usage h>usage help>usage",
+    "help-opt=s",
+    "verbose:i v>verbose",
+  ],  {};
+
+$::opthandler->std_opts;
+
+$::opthandler->check_opts;
+
+sub usage() {
+  print <<EOF;
+extract-changed [options] page-url...
+
+EOF
+  $::opthandler->list_opts;
+}
+
+sub version() {
+  print <<'EOF';
+extract-changed version 
+$Id: simple-example,v 1.1.1.1 1997/04/20 15:27:35 mikedlr Exp $
+EOF
+}
+

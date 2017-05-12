@@ -1,0 +1,13 @@
+--- hostap-2002-10-12/hostapd/hostapd.h	2002-09-08 13:49:35.000000000 -0400
++++ hostapd.h.new	2003-02-06 19:03:47.000000000 -0500
+@@ -49,9 +49,8 @@
+ 	struct sta_info *sta_aid[MAX_AID_TABLE_SIZE];
+ 
+ 	enum { HOSTAPD_DEBUG_NO = 0, HOSTAPD_DEBUG_MINIMAL = 1,
+-	       HOSTAPD_DEBUG_MSGDUMPS = 2 };
++	       HOSTAPD_DEBUG_MSGDUMPS = 2 } debug; /* debug verbosity level */
+ 
+-	int debug; /* debug verbosity level */
+ 	char *dump_log_name; /* file name for state dump (SIGUSR1) */
+ 
+ 	int ieee802_1x; /* use IEEE 802.1X */

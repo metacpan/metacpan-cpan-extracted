@@ -1,0 +1,135 @@
+Content-Type: text/plain; name=".info.html"
+Content-Disposition: inline; filename=".info.html"
+Mime-Version: 1.0
+To: rolf@usa.healthnet.org
+Subject: <URL:file:./help/.info.html> About SatelLife
+Errors-To: owner-getweb@usa.healthnet.org
+X-Loop: MailBot
+
+ About SatelLife
+================
+
+SatelLife is an international not-for-profit organization employing
+satellite, telephone and radio networking technology to serve the
+health communication and information needs of countries in the
+developing world.
+
+More information is available at the SatelLife home page:
+
+http://www.healthnet.org
+
+If you do not have Web access, you can still access the home page by
+sending a message to getweb@usa.healthnet.org with the body:
+
+GET http://www.healthnet.org
+
+
+
+How to use the GetWeb MailBot server
+====================================
+
+This software is currently in beta testing. Please report any
+problems to getweb-admin@usa.healthnet.org.
+
+Please note all requests are logged; we cannot guarantee that your
+requests will remain private.
+
+To request a document from the World Wide Web, send a message to
+getweb@usa.healthnet.org with the body containing one or more
+requests like:
+
+GET url
+
+Where url is the URL of the document you request. If the message
+contains more than one request, separate each request with a blank
+line.
+
+Here is a message which would fetch the HealthNet home page:
+
+GET http://www.healthnet.org
+
+After recieving the above message, the GetWeb server would format the
+HealthNet home page as human-readable plain-text and send it to you.
+
+You can enclose your commands in a begin/end block, or comment out
+lines with '#':
+
+
+This preamble will not be processed by the MailBot...
+begin
+GET http://www.healthnet.org
+# ...neither will this comment
+end
+...and neither will this signature.
+
+
+A hotlist[1] of URLs which we consider especially interesting is
+available.
+
+Each hypertext link is represented by a number in brackets. Suppose
+you get a message like this from a GetWeb server:
+
+--------------------------------------------------------------------
+
+Some important conferences carried by SatelLife include:
+
+     * ProMED: Program for Monitoring Emerging Diseases[1]
+     * ProCAARE: Program for Collaboration Against AIDS[2]
+     * E-Drug: Essential Drugs[3]
+
+** References from this document **
+[1] http://www.healthnet.org/programs/promed.html
+[2] http://www.healthnet.org/programs/procaare.html
+[3] http://www.healthnet.org/programs/edrug.html
+
+--------------------------------------------------------------------
+
+To get more information about ProCAARE, you would look up link 2 at
+the bottom of the message to find out the URL is
+http://www.healthnet.org/programs/procaare.html. You would then send
+a message to the GetWeb server:
+
+GET http://www.healthnet.org/programs/procaare.html
+
+Follow the links below for more help.
+
+How can I:
+
+  * fill out HTML Forms?[2]
+  * search the Web?[3]
+  * break a long command between multiple lines?[4]
+  * follow chains of linked documents with a single command?[5]
+  * request raw HTML source rather than formatted text?[6]
+  * configure how documents are delivered?[7]
+  * use Agora (w3mail) commands?[8]
+  * decode binary files?[9]
+
+How quotas limit server load[10]
+
+Accessing ProMED archives[11]
+
+Other GetWeb-type servers[12]
+
+About the GetWeb MailBot server software[13]
+
+Also see the GetWeb home page.[14]
+
+Send bugs or suggestions for improvement to
+getweb-admin@usa.healthnet.org.
+
+*** References from this document ***
+[orig] file:./help/.info.html
+[1] file:/help/HOTLIST.html
+[2] file:/help/FORMS.html
+[3] file:/help/SEARCHING.html
+[4] file:/help/BREAK.html
+[5] file:/help/FOLLOWING.html
+[6] file:/help/FORMAT.html
+[7] file:/help/DELIVER.html
+[8] file:/help/AGORA.html
+[9] file:/help/MIME.html
+[10] file:/help/QUOTA.html
+[11] file:/help/PROMED.html
+[12] file:/help/SERVERS.html
+[13] file:/help/INFO.html
+[14] http://www.healthnet.org/dist/getweb/

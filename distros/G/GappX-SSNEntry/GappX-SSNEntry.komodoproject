@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="fa90f2c5-d016-4d6e-acba-abf91310c71f" kpf_version="5" name="GappX-SSNEntry.komodoproject">
+<preference-set idref="fa90f2c5-d016-4d6e-acba-abf91310c71f">
+  <string id="perlDefaultInterpreter"></string>
+  <string relative="path" id="perlExtraPaths">lib</string>
+</preference-set>
+</project>

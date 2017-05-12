@@ -1,0 +1,60 @@
+NAME
+    Geo::Coder::Ja - geocoder.ja library module for Perl
+
+SYNOPSIS
+      use Geo::Coder::Ja;
+
+      my $geocoder = Geo::Coder::Ja->new(
+          dbpath     => '/usr/local/share/geocoderja', # required
+          load_level => DB_AUTO,  # optional. default DB_AUTO
+          encoding   => 'UTF-8',  # optional. default 'SHIFT_JIS'
+      );
+      # same as $geocoder->geocode($location);
+      my $location = $geocoder->geocode(location => $location);
+      # $location->{latitude}
+      # $location->{longitude}
+      # $location->{address}
+      # $location->{address_kana}
+
+DESCRIPTION
+    This module is an interface for geocoder.ja library. It is available at:
+    http://www.postlbs.org/postlbs-cms/ja/geocoder
+
+METHODS
+  new(%options)
+    It should be called with following arguments (items with default value
+    are optional)
+
+      dbpath     => geocoder.ja's database files directory
+      load_level => load level. must be DB_AUTO, DB_JUKYO, DB_GAIKU, DB_AZA, DB_CHO or DB_GYOSEI.
+      encoding   => default 'SHIFT_JIS'. must be 'UTF-8', 'EUC-JP' or 'SHIFT_JIS'.
+
+    Returns an instance of this module.
+
+  geocode(%param)
+    geocode(location => $location) or geocode(postcode => $postcode) are
+    supported.
+
+    Get latitude/longitude from the address or postcode.
+
+    Returns a hashref, contains the following fields:
+
+      latitude
+      longitude
+      address
+      address_kana
+
+    Returns undef if multiple candidates or failure.
+
+  encoding([$encoding])
+    Set/get encoding. $encoding must be 'UTF-8', 'EUC-JP' or 'SHIFT_JIS'.
+
+AUTHOR
+    Jiro Nishiguchi <jiro@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    <http://www.postlbs.org/postlbs-cms/ja/geocoder>
+

@@ -1,0 +1,843 @@
+#fOrTyTwO
+$hz=100;
+$XS_VERSION='DProf 20000000.00_00';
+# All values are given in HZ
+$over_utime=8; $over_stime=7; $over_rtime=15;
+$over_tests=10000;
+$rrun_utime=45; $rrun_stime=5; $rrun_rtime=63;
+$total_marks=682                                                                                                                                                                                 
+
+PART2
+@ 2 0 2
+& 2 main BEGIN
++ 2
+& 3 strict import
++ 3
+& 4 strict bits
++ 4
+- 4
+- 3
+- 2
++ 2
+& 5 main BEGIN
++ 5
++ 3
++ 4
+- 4
+- 3
+- 5
+& 6 Test BEGIN
++ 6
+@ 1 0 1
+& 7 Test::Harness BEGIN
++ 7
+- 7
+& 8 Test::Harness BEGIN
++ 8
+& 9 Exporter import
++ 9
+- 9
+- 8
++ 8
+@ 1 0 1
+& a Benchmark BEGIN
++ a
++ 9
+- 9
+- a
++ a
++ 9
+- 9
+- a
+@ 2 0 2
+& b Benchmark init
++ b
+& c Benchmark disablecache
++ c
+- c
+& d Benchmark clearallcache
++ d
+- d
+- b
++ 9
+- 9
+- 8
++ 8
+& e Config BEGIN
++ e
+- e
+@ 3 0 3
+& f Config TIEHASH
++ f
+- f
+& 10 Config import
++ 10
+- 10
+- 8
++ 8
+& 11 FileHandle BEGIN
++ 11
+- 11
+& 12 FileHandle BEGIN
++ 12
++ 3
++ 4
+- 4
+- 3
+- 12
+& 13 FileHandle BEGIN
++ 13
+& 14 strict unimport
++ 14
++ 4
+- 4
+- 14
+- 13
+@ 1 0 1
+& 15 IO::File BEGIN
++ 15
++ 3
++ 4
+- 4
+- 3
+- 15
+& 16 IO::File BEGIN
++ 16
++ 9
+- 9
+- 16
+& 17 IO::File BEGIN
++ 17
+& 18 Symbol BEGIN
++ 18
+- 18
+@ 1 0 1
++ 9
+- 9
+- 17
++ 17
+& 19 SelectSaver BEGIN
++ 19
++ 9
+- 9
+- 19
+& 1a SelectSaver BEGIN
++ 1a
++ 9
+- 9
+- 1a
+- 17
++ 17
+& 1b IO::Seekable BEGIN
++ 1b
++ 9
+- 9
+- 1b
+& 1c IO::Seekable BEGIN
++ 1c
++ 3
++ 4
+- 4
+- 3
+- 1c
+& 1d IO::Seekable BEGIN
++ 1d
+& 1e IO::Handle BEGIN
++ 1e
++ 3
++ 4
+- 4
+- 3
+- 1e
+@ 1 0 1
+& 1f IO::Handle BEGIN
++ 1f
++ 9
+- 9
+- 1f
+& 20 IO::Handle BEGIN
++ 20
++ 9
+- 9
+- 20
+& 21 IO::Handle BEGIN
++ 21
+- 21
+& 22 IO::Handle BEGIN
++ 22
+& 23 IO BEGIN
++ 23
+- 23
+& 24 IO BEGIN
++ 24
++ 9
+- 9
+- 24
+& 25 XSLoader load
++ 25
+& 26 DynaLoader dl_load_file
++ 26
+@ 1 0 1
+- 26
+& 27 DynaLoader dl_undef_symbols
++ 27
+- 27
+& 28 DynaLoader dl_find_symbol
++ 28
+- 28
+& 29 DynaLoader dl_install_xsub
++ 29
+- 29
+& 2a IO bootstrap
++ 2a
+- 2a
+- 25
+- 22
+@ 1 0 1
+& 2b IO::Handle BEGIN
++ 2b
++ 14
++ 4
+- 4
+- 14
+- 2b
+- 1d
++ 1d
+@ 1 0 1
+& 2c Fcntl BEGIN
++ 2c
+- 2c
++ 25
++ 26
+- 26
++ 27
+- 27
++ 28
+- 28
++ 29
+- 29
+& 2d Fcntl bootstrap
++ 2d
+- 2d
+- 25
++ 9
+- 9
+- 1d
+@ 1 0 1
++ 9
+- 9
+- 17
++ 17
+& 2e File::Spec BEGIN
++ 2e
++ 3
++ 4
+- 4
+- 3
+- 2e
+& 2f File::Spec BEGIN
++ 2f
+& 30 vars BEGIN
++ 30
+& 31 warnings BEGIN
++ 31
++ 9
+- 9
+- 31
+@ 3 0 3
+& 32 warnings::register import
++ 32
+& 33 warnings::register mkMask
++ 33
+- 33
++ 33
+- 33
+- 32
+- 30
+@ 0 1 1
++ 30
+- 30
+- 2f
+& 34 File::Spec::Unix BEGIN
++ 34
++ 3
++ 4
+- 4
+- 3
+- 34
+& 35 File::Spec::Unix BEGIN
++ 35
++ 30
+- 30
+- 35
+@ 1 0 1
++ 35
+& 36 Cwd BEGIN
++ 36
++ 3
++ 4
+- 4
+- 3
+- 36
+& 37 Cwd BEGIN
++ 37
++ 9
+- 9
+- 37
+& 38 Cwd BEGIN
++ 38
+& 39 base BEGIN
++ 39
+- 39
+& 3a base import
++ 3a
+& 3b UNIVERSAL isa
++ 3b
+- 3b
+- 3a
+- 38
+@ 2 0 2
+& 3c Cwd BEGIN
++ 3c
+& 3d warnings unimport
++ 3d
+& 3e warnings bits
++ 3e
+- 3e
+- 3d
+- 3c
++ 9
+@ 0 1 1
+- 9
+- 35
+@ 1 0 1
+- 17
++ 9
+- 9
++ 9
+& 3f Exporter export
++ 3f
+@ 2 0 2
+& 40 Exporter heavy_export
+* 40
+- 40
+- 9
+& 41 FileHandle import
++ 41
++ 3f
+* 40
+- 40
++ 3f
+* 40
+@ 1 0 1
+- 40
+- 41
+- 8
+& 42 Test::Harness BEGIN
++ 42
++ 3
++ 4
+- 4
+- 3
+- 42
+@ 4 0 4
+& 43 UNIVERSAL VERSION
++ 43
+- 43
+- 6
++ 6
++ 9
+- 9
+- 6
+@ 1 0 1
++ 9
++ 3f
+* 40
+- 40
+- 9
+- 2
++ 2
+& 44 Test plan
++ 44
+@ 0 1 1
+- 44
+- 2
+& 45 main BEGIN
++ 45
+& 46 Functional BEGIN
++ 46
++ 3
++ 4
+- 4
+- 3
+- 46
+& 47 Functional BEGIN
++ 47
++ 9
+- 9
+- 47
+& 48 Functional BEGIN
++ 48
++ 14
++ 4
+- 4
+- 14
+- 48
+& 49 Functional BEGIN
++ 49
++ 30
+- 30
+- 49
+@ 5 0 5
+& 4a InfiniteList BEGIN
++ 4a
++ 3
++ 4
+- 4
+- 3
+- 4a
+& 4b InfiniteList BEGIN
++ 4b
++ 9
+- 9
+- 4b
+& 4c InfiniteList BEGIN
++ 4c
+& 4d Tie::Array BEGIN
++ 4d
+- 4d
+& 4e Tie::Array BEGIN
++ 4e
++ 3
++ 4
+- 4
+- 3
+- 4e
+& 4f Tie::Array BEGIN
++ 4f
++ 9
+- 9
+- 4f
+@ 1 0 1
+& 50 Tie::StdArray BEGIN
++ 50
++ 30
+- 30
+- 50
+@ 1 0 1
+- 4c
++ 4c
++ 30
+- 30
+- 4c
+@ 2 0 2
++ 9
+- 9
+- 45
+@ 2 0 2
+& 51 Test ok
++ 51
+& 52 Test to_value
++ 52
+- 52
+- 51
+& 53 Functional show
++ 53
+& 54 Functional show_aux
++ 54
+@ 1 0 1
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
++ 53
++ 54
++ 53
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
+- 53
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+- 51
+& 55 Functional inc
++ 55
+- 55
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 2
+- 51
+& 56 Functional double
++ 56
+- 56
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+- 51
+& 57 Functional square
++ 57
+- 57
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 2
+- 51
+& 58 Functional cons
++ 58
+- 58
++ 53
++ 54
++ 53
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
+- 53
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+- 51
+& 59 Functional min
++ 59
+- 59
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
+& 5a Functional max
++ 5a
+- 5a
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
+& 5b Functional even
++ 5b
+- 5b
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+- 51
+& 5c Functional odd
++ 5c
++ 5b
+- 5b
+- 5c
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
+& 5d Functional gcd
++ 5d
+& 5e Functional gcd_aux
++ 5e
+& 5f Functional rem
++ 5f
+- 5f
++ 5e
++ 5f
+- 5f
++ 5e
++ 5f
+- 5f
++ 5e
+- 5e
+- 5e
+- 5e
+- 5e
+- 5d
++ 53
++ 54
+@ 1 0 1
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+- 51
+& 60 Functional lcm
++ 60
++ 5d
++ 5e
++ 5f
+- 5f
++ 5e
++ 5f
+- 5f
++ 5e
++ 5f
+- 5f
++ 5e
+- 5e
+- 5e
+- 5e
+- 5e
+- 5d
+& 61 Functional quot
++ 61
+- 61
+- 60
++ 53
++ 54
+- 54
+- 53
+@ 1 0 1
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 1 1
+- 51
+& 62 Functional id
++ 62
+- 62
++ 53
++ 54
++ 53
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
++ 54
+- 54
+- 53
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
+& 63 Functional const
++ 63
+- 63
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
+& 64 Functional flip
++ 64
+- 64
+& 65 Functional __ANON__
++ 65
+& 66 main __ANON__
++ 66
+- 66
+- 65
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 1 1
+- 51
+& 67 Functional Until
++ 67
+& 68 main __ANON__
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
++ 55
+- 55
++ 67
++ 68
+- 68
+- 67
+- 67
+- 67
+- 67
+- 67
+- 67
+- 67
+- 67
+- 67
+- 67
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+- 51
+& 69 Functional fst
++ 69
+- 69
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
+& 6a Functional snd
++ 6a
+- 6a
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
+& 6b Functional head
++ 6b
+- 6b
++ 53
++ 54
+- 54
+- 53
++ 51
++ 52
+- 52
++ 52
+- 52
+@ 0 0 1
+- 51
+& 6c Test END
++ 6c
+- 6c

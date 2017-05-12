@@ -1,0 +1,26 @@
+Changes
+doc/getopt-complete.odp
+doc/getopt-complete.pdf
+INSTALL
+lib/Getopt/Complete.pm
+lib/Getopt/Complete/Args.pm
+lib/Getopt/Complete/Cache.pm
+lib/Getopt/Complete/Compgen.pm
+lib/Getopt/Complete/LazyOptions.pm
+lib/Getopt/Complete/Options.pm
+LICENSE
+Build.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-try-many.in
+t/01-try-many.t
+t/02-boilerplate.t
+t/03-demoapp-completion.t
+t/04-exercise.t
+t/05-bad-arg-name.t
+t/demoapp
+t/demoapp.opts
+t/myprogram
+t/mytreeapp

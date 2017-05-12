@@ -1,0 +1,2 @@
+BUFR.pm ERROR: Rest of BUFR message (307 bytes) shorter than stated length of section 4 (678 bytes). Probably the BUFR message is truncated at ./bufrread.pl line 143
+In message 1 at ./bufrread.pl line 155, <GEN0> line 2.

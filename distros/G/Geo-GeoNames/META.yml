@@ -1,0 +1,34 @@
+---
+abstract: 'Perform geographical queries using GeoNames Web Services'
+author:
+  - 'Per Henrik Johansen <per.henrik.johansen@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - geo
+  - geonames
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-GeoNames
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: '1.14'
+  Mojo::UserAgent: '0'
+  XML::Simple: '2.13'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/geo-geonames/issues
+  homepage: https://github.com/briandfoy/geo-geonames
+  repository: https://github.com/briandfoy/geo-geonames.git
+version: '1.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

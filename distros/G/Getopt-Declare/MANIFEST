@@ -1,0 +1,15 @@
+Changes
+demos/demo_cmdline
+demos/demo_csv
+demos/demo_interp
+demos/demo_shell
+lib/Getopt/Declare.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-parse-args.t
+t/02-infinite-loop.t
+t/03-optional-spaces.t
+t/04-build-parser.t

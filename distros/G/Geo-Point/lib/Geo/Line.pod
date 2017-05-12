@@ -1,0 +1,472 @@
+=encoding utf8
+
+=head1 NAME
+
+Geo::Line - a sequence of connected points
+
+=head1 INHERITANCE
+
+ Geo::Line
+   is a Geo::Shape
+
+ Geo::Line
+   is a Math::Polygon
+
+=head1 SYNOPSIS
+
+ my $line  = Geo::Line->new(points => [$p1, $p2]);
+ my $line  = Geo::Line->line($p1, $p2);
+
+ my $ring  = Geo::Line->ring($p1, $p2, $p3, $p1);
+ my $ring  = Geo::Line->ring($p1, $p2, $p3);
+
+ my $plane = Geo::Line->filled($p1, $p2, $p3, $p1);
+ my $plane = Geo::Line->filled($p1, $p2, $p3);
+
+=head1 DESCRIPTION
+
+A 2-dimensional sequence of connected points.  The points will be forced
+to use the same projection.
+
+Extends L<"DESCRIPTION" in Math::Polygon|Math::Polygon/"DESCRIPTION">.
+ 
+Extends L<"DESCRIPTION" in Geo::Shape|Geo::Shape/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Math::Polygon|Math::Polygon/"METHODS">.
+ 
+Extends L<"METHODS" in Geo::Shape|Geo::Shape/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Math::Polygon|Math::Polygon/"Constructors">.
+ 
+Extends L<"Constructors" in Geo::Shape|Geo::Shape/"Constructors">.
+ 
+=over 4
+
+=item Geo::Line-E<gt>B<bboxFromString>($string, [$projection])
+
+Create a square from the $string.  The coordinates can be separated by
+a comma (preferrably), or blanks.  When the coordinates end on NSEW, the
+order does not matter, otherwise lat-long or xy order is presumed.
+
+This routine is very smart.  It understands 
+ PROJLABEL: <4 coordinates in any order, but with NSEW>
+ ...
+
+example: bbox from string
+
+ my $x = '5n 2n 3e e12';       # coordinates in any order
+ my $x = '5e , 2n, 3n, e12';   # coordinates in any order
+ my $x = '2.12-23.1E, N1-4';   # stretches
+ my $x = 'wgs84: 2-5e, 1-8n';  # starts with projection
+ my $x = 'wgs84: e2d12' -3d, n1, n7d12'34"';
+
+ my ($xmin, $ymin, $xmax, $ymax, $proj)
+    = Geo::Line->bboxFromString($x);
+
+ my $p = Geo::Line->ringFromString($x);
+
+ # When parsing user applications, you probably want:
+ my $p = eval { Geo::Line->bboxFromString($x) };
+ warn $@ if $@;
+
+=item $obj-E<gt>B<filled>($points, %options)
+
+=item Geo::Line-E<gt>B<filled>($points, %options)
+
+The $points form a L<ring()|Geo::Line/"Constructors"> and the filled is part of the geometrical
+shape.
+
+=item $obj-E<gt>B<line>($points, %options)
+
+=item Geo::Line-E<gt>B<line>($points, %options)
+
+construct a line, which will probably not have the same begin and end
+point.  The $points are passed as L<new(points)|Geo::Line/"Constructors">, and the other %options
+are passed to L<new()|Geo::Line/"Constructors"> as well.
+
+=item $obj-E<gt>B<new>([%options])
+
+=item Geo::Line-E<gt>B<new>([%options])
+
+When called as instance method, the projection, ring, and filled attributes
+are taken from the initiator, like a clone with modification.
+
+ -Option   --Defined in     --Default
+  bbox       Math::Polygon    undef
+  clockwise  Math::Polygon    undef
+  filled                      <false>
+  points                      <data>
+  proj       Geo::Shape       see Geo::Proj::defaultProjection()
+  ring                        <false>
+
+=over 2
+
+=item bbox => ARRAY
+
+=item clockwise => BOOLEAN
+
+=item filled => BOOLEAN
+
+Implies ring.  The filled of the ring is included in the geometrical
+shape.
+
+=item points => ARRAY-OF-POINTS|ARRAY-OF-COORDINATES
+
+With this option, you can specify either L<Geo::Point|Geo::Point> objects, or
+coordinate pairs which will get transformed into such objects.  WARNING:
+in that case, the coordinates must be in xy order.
+
+=item proj => LABEL
+
+=item ring => BOOLEAN
+
+The first point is the last point.  When specified, you have to make
+sure that this is the case.  If L<ring()|Geo::Line/"Constructors"> is used to create this object,
+that routine will check/repair it for you.
+
+=back
+
+example: 
+
+ my $point = Geo::Point->xy(1, 2);
+ my $line  = Geo::Line->new
+   ( points => [$point, [3,4], [5,6], $point]
+   , ring   => 1
+   );
+ my $clone = $line->new(filled => 1);
+
+=item $obj-E<gt>B<ring>($points, %options)
+
+=item Geo::Line-E<gt>B<ring>($points, %options)
+
+The first and last point will be made the same: if not yet, than a reference
+to the first point is appended to the list.  A "ring" does not cover the
+internal.
+
+=item Geo::Line-E<gt>B<ringFromString>($string, [$projection])
+
+Calls L<bboxFromString()|Geo::Line/"Constructors"> and then produces a ring object from than.
+Don't forget the C<eval> when you call this method.
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Math::Polygon|Math::Polygon/"Attributes">.
+ 
+Extends L<"Attributes" in Geo::Shape|Geo::Shape/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<geopoint>($index, [$index, ..])
+
+Returns the L<Geo::Point|Geo::Point> for the point with the specified $index or
+indices.
+
+=item $obj-E<gt>B<geopoints>()
+
+In LIST context, this returns all points as separate scalars: each is a
+L<Geo::Point|Geo::Point> with projection information.  In SCALAR context, a
+reference to the coordinates is returned.
+
+With L<points()|Math::Polygon/"Attributes">, you get arrays with XY coordinates returned, but
+without the projection information.  That will be much faster, but
+not sufficient for some uses.
+
+=item $obj-E<gt>B<isFilled>()
+
+Returns a true value is the internals of the ring of points are declared
+to belong to the shape.
+
+=item $obj-E<gt>B<isRing>()
+
+Returns a true value if the sequence of points are a ring or filled: the
+first point is the last.
+
+=item $obj-E<gt>B<nrPoints>()
+
+Inherited, see L<Math::Polygon/"Attributes">
+
+=item $obj-E<gt>B<order>()
+
+Inherited, see L<Math::Polygon/"Attributes">
+
+=item $obj-E<gt>B<point>($index, [$index,...])
+
+Inherited, see L<Math::Polygon/"Attributes">
+
+=item $obj-E<gt>B<points>()
+
+Inherited, see L<Math::Polygon/"Attributes">
+
+=item $obj-E<gt>B<proj>()
+
+Inherited, see L<Geo::Shape/"Attributes">
+
+=item $obj-E<gt>B<proj4>()
+
+Inherited, see L<Geo::Shape/"Attributes">
+
+=back
+
+=head2 Projections
+
+Extends L<"Projections" in Geo::Shape|Geo::Shape/"Projections">.
+ 
+=over 4
+
+=item $obj-E<gt>B<in>(<$label|'utm'>)
+
+Inherited, see L<Geo::Shape/"Projections">
+
+=item $obj-E<gt>B<projectOn>($nick, @points)
+
+Inherited, see L<Geo::Shape/"Projections">
+
+=back
+
+=head2 Geometry
+
+Extends L<"Geometry" in Math::Polygon|Math::Polygon/"Geometry">.
+ 
+Extends L<"Geometry" in Geo::Shape|Geo::Shape/"Geometry">.
+ 
+=over 4
+
+=item $obj-E<gt>B<area>()
+
+Returns the area enclosed by the polygon.  Only useful when the points
+are in some orthogonal projection.
+
+=item $obj-E<gt>B<bbox>()
+
+The bounding box coordinates.  These are more useful for rings than for
+open line pieces.
+
+=item $obj-E<gt>B<bboxCenter>()
+
+Inherited, see L<Geo::Shape/"Geometry">
+
+=item $obj-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+
+=item Geo::Line-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+
+Inherited, see L<Geo::Shape/"Geometry">
+
+=item $obj-E<gt>B<beautify>(%options)
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<centroid>()
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<clip>(<$xmin,$xmax,$ymin,$ymax>|$object)
+
+Clip the shape to the bounding box of $object, or the boxing parameters
+specified.  A list of L<Geo::Line|Geo::Line> objects is returned if anything is
+inside the object.
+
+On the moment L<Math::Polygon::lineClip()|Math::Polygon/"Clipping"> and
+L<Math::Polygon::fillClip1()|Math::Polygon/"Clipping"> are used to do the job.  In the future,
+that may change.
+
+=item $obj-E<gt>B<clockwise>()
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<contains>($point)
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<counterClockwise>()
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<distance>($object, [$unit])
+
+Inherited, see L<Geo::Shape/"Geometry">
+
+=item $obj-E<gt>B<equal>(<$other | ARRAY,[$tolerance]> | $points)
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<isClockwise>()
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<isClosed>()
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<length>()
+
+The length of the line, only useful in a orthogonal coordinate system
+(projection).  See also L<perimeter()|Geo::Line/"Geometry">.
+
+=item $obj-E<gt>B<perimeter>()
+
+The length of the line on the ring.  A check is performed that the ring
+is closed, but further this returns the result of L<length()|Geo::Line/"Geometry">
+
+=item $obj-E<gt>B<same>(<$other | ARRAY,[$tolerance]> | $points)
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<startMinXY>()
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=back
+
+=head2 Transformations
+
+Extends L<"Transformations" in Math::Polygon|Math::Polygon/"Transformations">.
+ 
+=over 4
+
+=item $obj-E<gt>B<grid>(%options)
+
+Inherited, see L<Math::Polygon/"Transformations">
+
+=item $obj-E<gt>B<mirror>(%options)
+
+Inherited, see L<Math::Polygon/"Transformations">
+
+=item $obj-E<gt>B<move>(%options)
+
+Inherited, see L<Math::Polygon/"Transformations">
+
+=item $obj-E<gt>B<resize>(%options)
+
+Inherited, see L<Math::Polygon/"Transformations">
+
+=item $obj-E<gt>B<rotate>(%options)
+
+Inherited, see L<Math::Polygon/"Transformations">
+
+=item $obj-E<gt>B<simplify>(%options)
+
+Inherited, see L<Math::Polygon/"Transformations">
+
+=back
+
+=head2 Clipping
+
+Extends L<"Clipping" in Math::Polygon|Math::Polygon/"Clipping">.
+ 
+=over 4
+
+=item $obj-E<gt>B<fillClip1>($box)
+
+Inherited, see L<Math::Polygon/"Clipping">
+
+=item $obj-E<gt>B<lineClip>($box)
+
+Inherited, see L<Math::Polygon/"Clipping">
+
+=back
+
+=head2 Display
+
+Extends L<"Display" in Math::Polygon|Math::Polygon/"Display">.
+ 
+Extends L<"Display" in Geo::Shape|Geo::Shape/"Display">.
+ 
+=over 4
+
+=item $obj-E<gt>B<deg2dm>($degrees, $pos, $neg)
+
+=item Geo::Line-E<gt>B<deg2dm>($degrees, $pos, $neg)
+
+Inherited, see L<Geo::Shape/"Display">
+
+=item $obj-E<gt>B<deg2dms>($degrees, $pos, $neg)
+
+=item Geo::Line-E<gt>B<deg2dms>($degrees, $pos, $neg)
+
+Inherited, see L<Geo::Shape/"Display">
+
+=item $obj-E<gt>B<dms2deg>($dms)
+
+=item Geo::Line-E<gt>B<dms2deg>($dms)
+
+Inherited, see L<Geo::Shape/"Display">
+
+=item $obj-E<gt>B<string>()
+
+Inherited, see L<Math::Polygon/"Display">
+
+=item $obj-E<gt>B<toString>([$projection])
+
+Returns a string representation of the line, which is also used for
+stringification.  The old method named C<string> is deprecated.
+
+=back
+
+=head1 OVERLOAD
+
+Extends L<"OVERLOAD" in Geo::Shape|Geo::Shape/"OVERLOAD">.
+ 
+=over 4
+
+=item overload: B<'""' (stringification)>
+
+Inherited, see L<Geo::Shape/"OVERLOAD">
+
+=item overload: B<'bool' (truth value)>
+
+Inherited, see L<Geo::Shape/"OVERLOAD">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: area requires a ring of points
+
+If you think you have a ring of points (a polygon), than do specify
+that when that object is instantiated (L<ring()|Geo::Line/"Constructors"> or L<new(ring)|Geo::Line/"Constructors">).
+
+=item Error: distance calculation not implemented between a $kind and a $kind
+
+Only a subset of all objects can be used in the distance calculation.
+The limitation is purely caused by lack of time to implement this.
+
+=item Error: in() not implemented for a $class
+
+=item Error: perimeter requires a ring of points
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Geo-Point distribution version 0.96,
+built on January 21, 2014. Website: F<http://perl.overmeer.net/geo/>
+All modules in this suite:
+L</Geo::Point>,
+L</Geo::Proj4>,
+L</Geo::WKT>,
+L</Math::Polygon>,
+L</Geo::GML>,
+L</Geo::ISO19139>,
+L</Geo::EOP>,
+L</Geo::Format::Envisat>, and
+L</Geo::Format::Landsat>.
+
+Please post questions or ideas to the mailinglist at
+F<http://geo-perl@list.hut.fi>
+
+=head1 LICENSE
+
+Copyrights 2005-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

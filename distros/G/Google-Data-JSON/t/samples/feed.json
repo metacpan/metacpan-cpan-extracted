@@ -1,0 +1,106 @@
+{
+  "feed" : {
+    "xmlns" : "http://www.w3.org/2005/Atom",
+    "xmlns$openSearch" : "http://a9.com/-/spec/opensearchrss/1.0/",
+    "title" : {
+      "$t" : "Test Feed"
+    },
+    "id" : {
+      "$t" : "tag:example.com,2007:1"
+    },
+    "updated" : {
+      "$t" : "2007-01-01T00:00:00Z"
+    },
+    "link" : {
+      "rel" : "self",
+      "href" : "http://example.com/feed.atom"
+    },
+    "openSearch$startIndex" : {
+      "$t" : "1"
+    },
+    "entry" : [
+      {
+        "published" : {
+          "$t" : "2007-02-01T00:00:00Z"
+        },
+        "link" : [
+          {
+            "rel" : "alternate",
+            "href" : "http://example.com/1"
+          },
+          {
+            "rel" : "edit",
+            "href" : "http://example.com/edit/1"
+          }
+        ],
+        "content" : {
+          "div" : {
+            "xmlns" : "http://www.w3.org/1999/xhtml",
+            "span" : {
+              "$t" : "Test 1"
+            }
+          },
+          "type" : "xhtml"
+        },
+        "title" : {
+          "$t" : "Test Entry 1"
+        },
+        "id" : {
+          "$t" : "tag:example.com,2007:2"
+        },
+        "updated" : {
+          "$t" : "2007-02-01T00:00:00Z"
+        },
+        "author" : {
+          "email" : {
+            "$t" : "foo@example.com"
+          },
+          "name" : {
+            "$t" : "Foo"
+          }
+        }
+      },
+      {
+        "published" : {
+          "$t" : "2007-03-01T00:00:00Z"
+        },
+        "link" : [
+          {
+            "rel" : "alternate",
+            "href" : "http://example.com/2"
+          },
+          {
+            "rel" : "edit",
+            "href" : "http://example.com/edit/2"
+          }
+        ],
+        "content" : {
+          "div" : {
+            "xmlns" : "http://www.w3.org/1999/xhtml",
+            "span" : {
+              "$t" : "Test 2"
+            }
+          },
+          "type" : "xhtml"
+        },
+        "title" : {
+          "$t" : "Test Entry 2"
+        },
+        "id" : {
+          "$t" : "tag:example.com,2007:3"
+        },
+        "updated" : {
+          "$t" : "2007-03-01T00:00:00Z"
+        },
+        "author" : {
+          "email" : {
+            "$t" : "bar@example.com"
+          },
+          "name" : {
+            "$t" : "Bar"
+          }
+        }
+      }
+    ]
+  }
+}

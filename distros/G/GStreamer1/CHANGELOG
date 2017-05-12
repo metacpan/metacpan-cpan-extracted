@@ -1,0 +1,16 @@
+Revision history for perl module CHANGELOG
+
+0.003 2014-11-27
+
+- Specify libgstreamer >= 1.0.0 as a requirement
+- Add repository URL
+- Build META.json
+
+0.002 2014-11-22
+
+- Don't include sintel trailer in dist
+- Cleanup POD typos
+
+0.001 2014-11-21
+
+- Initial release

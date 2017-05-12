@@ -1,0 +1,4 @@
+$name   = 'Test';
+$author = 'Autrijus Tang';
+
+attempt destruct;

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="2.20"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkWindow" id="sflang_window">
+    <child>
+      <object class="GtkVBox" id="vbox1">
+        <property name="visible">True</property>
+        <property name="border_width">30</property>
+        <child>
+          <object class="GtkHBox" id="hbox1">
+            <property name="visible">True</property>
+            <child>
+              <object class="GtkLabel" id="label1">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Langue</property>
+              </object>
+              <packing>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkComboBoxEntry" id="langid">
+                <property name="height_request">50</property>
+                <property name="visible">True</property>
+                <signal name="changed" handler="on_langid_changed" swapped="no"/>
+              </object>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="countryid">
+                <property name="sensitive">False</property>
+                <property name="can_focus">False</property>
+                <property name="editable">False</property>
+                <property name="has_frame">False</property>
+                <property name="invisible_char">●</property>
+                <property name="width_chars">0</property>
+              </object>
+              <packing>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkFrame" id="frame1">
+            <property name="height_request">150</property>
+            <property name="visible">True</property>
+            <property name="label_xalign">0</property>
+            <property name="shadow_type">none</property>
+            <child>
+              <object class="GtkAlignment" id="alignment1">
+                <property name="visible">True</property>
+                <property name="left_padding">12</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+            </child>
+            <child type="label">
+              <object class="GtkLabel" id="label2">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">&lt;b&gt;Also spoken there:&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

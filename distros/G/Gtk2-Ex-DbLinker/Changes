@@ -1,0 +1,71 @@
+Revision history for Perl module Gtk2::Ex::DbLinker
+
+0.01 Tue May 20 15:03:43 2014
+    - original version; created by ExtUtils::ModuleMaker 0.51
+0.02 Added support informations
+0.03 Added example2_dbc with DBIx::Class, and the database ex1_1 database that holds the table 'speaks' without a counter (pk is composed of the 2 fields langid + countryid).
+	Added example_dbi with uses sql commands and DBI 
+	Bug corrected in DbcDataManager (occured when a new reccord is added)
+	Removed 'use of Data::Dumper;'
+0.05 Form::add_combo corrected use of set_text_column
+0.06 Form::add_combo delete existing model 
+     DbcDataManager 
+	new parameters columns => {name =>type} which replace the call to $rs->result_source->columns to supplied the column's names and types
+	+columns => {name => type} the columns supplied are added to those found with  $rs->result_source->columns. 
+	if a primary_keys array ref is supplied the search of the row at a given pos is done with $rs->search, not $rs->find
+0.07 Test failed - updated
+0.08 
+	Datasheet: 	
+		get/set_column_value, 
+		call back function with on_row_select + on_changed ; 
+	DbiDataManager:
+		before_query
+0.09
+	DbiDataManager:
+		auto_incrementing use from the start, in the module, $self->get_primarykeys must be called instead of @{$self->{primary_keys}}
+		$self->{cols} holds field's names without their changing to lower case
+	Form:
+		set_data_manager method to replace the current data manager
+0.091 Datasheet.pm binrary in my disc and missing in the zip in 0.09 
+0.092 DbiDataManager save({pk_name 0 => pk_value}) to update one of the field composing a multi field primarykey.
+0.093 Corrected bugs in Form (dateformater), remove use of Gtk2::Ex::Dialogs in DbiDM, more changes in update in table with 2 primary keys
+0.094 corrected bugs with textview in Form.pm
+0.094 DbcDataManager
+	Fields added with columns or +columns are readonly.
+	$self->set_row_pos($self->{row}->{pos}) in query
+      RbDataManager
+	$self->set_row_pos($self->{row}->{pos}) in query
+0.095 RdbDataManager
+	Fields added with columns or +columns to read data from joined tables
+	These fields are readonly.
+0.096 Bug corrected in Form
+0.097 Form 
+	auto_apply can be defined (defaults to true)
+	add_childform to cascade auto_apply down to child form or datasheet
+	has_changed return true if children forms or datasheets have been changed in the form but not applied to the database
+0.098 Form save return 1 (success) or 0 (failure)
+	DbcDataManager save return 1 (success) or 0 (failure)
+ 	Removed mailing support (and the list alltogether)
+0.100  Split the distribution: 
+	- Form + Datasheet remains in Gtk2::Ex::DbLinker
+	- xxxDataManager are in this Gtk2::Ex::DbLinker::DbTools distribution (but the package is unchanged)
+	- Wx Form and Datasheet objects are in Wx::Perl::DbLinker
+0.101  Changed in Makefile.pl
+0.102  Delete in Form tests for the number of rows in dman and display an empty row if necessary
+	Form : added a inserting flag to display default values added in the dataManager. pos = -1 used to display no data
+0.103  Form: new method add_combo_values
+0.104 Parameters to public methods are passed as list or hash ref. 
+      Added examle using SqlADatamanager.
+0.105 Corrected Makefile.pl to fetch a version of Gtk2::Ex::DbLinker-DbTools >= 0.104
+0.106 Created AbForm in Gtk2::Ex::DbLinker::DbTools to hold common methods to Wx::Perl::DbLinker::Wxform and Gtk2::Ex::DbLinker::Form
+0.107 Datasheet->get_current_row return the row last edited
+0.108 DatasheetHelper holds common methods to Wxdatasheet and Datasheet
+	Form : new adjustement set by spinbutton->configure, to prevent warnings: 
+	(seting values when page size is 0 is deprecated, appeared with the compile on w10)
+0.109 Example 2: moved the calls to the dataManagager in a common wraper so that just two form modules are needed (Langues2.pm + Sflang2.pm) 
+      instead of 8 modules (2 form modules for each of xxxDataManager object)
+      Use Class::InsideOut for Gtk2::Ex::DbLinker::Form to enforce encapsulation and to prevent for manipulating Abform properties in derived class directly
+0.110 No change, but update the version number to have the same as DbTools
+0.111 Corrections in pod. example: Dumper in log msg, Log4Perl init_easy 
+      ./lib: logcroak, logconfess ... instead of croak, confess
+      Improved readme file

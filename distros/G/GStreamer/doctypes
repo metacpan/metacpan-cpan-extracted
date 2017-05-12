@@ -1,0 +1,8 @@
+GstMessage_noinc	GStreamer::Message
+
+GstClockTime		unsigned integer
+GstClockTimeDiff	integer
+GstClockID		GStreamer::ClockID
+
+GstIterator		GStreamer::Iterator
+GstStructure		GStreamer::Structure

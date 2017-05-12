@@ -1,0 +1,178 @@
+Sun Dec 10 2006  Mark Solomon
+	* WeatherNOAA.pm:
+	Changed url from noaa's to weather.gov
+	Changed algorythm to new one to accomodate NOAA's minor formatting changes in text output of their app to be able to find data
+
+Wed Jan 30 21:58:11 2002  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm, t.pl:
+	Fix not to ignore second line of multi-line warnings, thanks to Bob Anderson
+
+	* t.pl, WeatherNOAA.pm:
+	Changes to fix bug of m8ulti-line warnings breaking forecast
+
+Mon Jan  3 14:19:45 2000  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm: Change backslash-[nr] to octal equiv
+
+	* WeatherNOAA.pm:
+	Allowed for new current conditions format; Changed minor text output
+
+Tue Apr  6 14:03:18 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm:
+	A Moore Reported value not added to the forecast item if there was a "..." - fixed.
+
+Thu Apr  1 22:21:03 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm: Inside get_city_zone() we're no longer looking for
+	  the state's first letters then a Z, now just \012\w\wZ
+	  this seems to work.  Good ol' regex's
+
+Wed Mar 17 14:14:53 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm: Skip .< temp data
+
+Fri Feb 26 16:41:48 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* t.pl, WeatherNOAA.pm:
+	Thanks to Timothy Kimball <kimball@stsci.edu>, fixed bug in Relitive
+	Humidity where 100% would be reparted as 00%
+
+	* WeatherNOAA.pm, t.pl: Per Pat Ludwig, fixed the proxy bug
+
+Mon Feb 22 15:01:00 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm:
+	Per pudge@pobox.com from cpan-testers@perl.org, changed splitting on
+	"\n"'s to "\012"'s for the MacOS folks
+
+Fri Feb 19 21:20:47 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* dist/icons.tar: Added
+
+Thu Feb 18 20:12:21 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* examples/wx.cgi, examples/hash.pl, examples/simple2.pl:
+	Changed WeahterNOAA to Geo::WeatherNOAA
+
+Wed Feb 17 17:39:44 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm: Added return of Coverage area in process_city_zone()
+	Added coverage table row to make_noaa_table()
+	Added doc about opt_v
+
+	* README: Added Geo::
+
+Tue Feb 16 05:27:48 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm:
+	Inside get_city_zone(), when looking for correct data section, also
+	look for four digits which is the year which is always in the date line of
+	the section.  Without this date, we'll consider the forecast invalid.  Any help?
+
+Thu Feb 11 19:26:02 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm, Makefile.PL, README:
+	Fixed Makefile.PL to install in correct place, and check for packages
+	Added listserv info
+
+Tue Feb  9 20:25:57 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm: Added MaxItems to make_noaa_table()
+
+Sun Feb  7 04:27:55 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* test.pl: Fixed WeatherNOAA to be Geo::WeatherNOAA
+
+Sat Feb  6 04:04:44 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* examples/wx.cgi, examples/simple2.pl, examples/hash.pl, examples/simple.pl, README, WeatherNOAA.pm, t.pl, MANIFEST:
+	added examples, added print_*()
+
+	* WeatherNOAA.pm: Corrected Home URL
+
+	* WeatherNOAA.pm: Tweak on error reporting
+
+	* WeatherNOAA.pm: Added better error reporting
+
+	* WeatherNOAA.pm: Added Geo::
+
+Wed Feb  3 21:05:13 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm:
+	Check for existance of $line as well before unpack'ing
+	Assume 'get' as fileopt in make_noaa_table
+
+Mon Jan 25 16:09:39 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* t.pl, WeatherNOAA.pm:
+	Last fix broke warnings, but added if block to correct
+
+	* WeatherNOAA.pm:
+	Changed split to regexp when parsing for key/value pairs
+	(they use ... inside a forecast)
+
+Wed Jan 20 04:44:04 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm: Added proxy support and fixed docs
+
+	* test.pl: Added test funcs
+
+	* WeatherNOAA.pm:
+	Added main:: independent defaults for colors in make_noaa_table()
+
+Mon Jan 18 08:55:01 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* t.pl, WeatherNOAA.pm:
+	Added return to empty ref if city hourly has NOT AVBL
+
+	* WeatherNOAA.pm:
+	line 315 - had to pad $line to 64 chars as unpack dies if string to pack was
+	smaller than the unpack string
+
+Wed Jan 13 15:41:58 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm:
+	Changed: process_city_* now calls get_city_* with same args - no need to pass one func's output to another.
+
+	* README: Added testing notes to README
+
+	* WeatherNOAA.pm: Left in code frag of sub newone { - removed
+
+	* WeatherNOAA.pm: Added quite a bit to the pod
+
+Sun Jan 10 06:14:34 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm: Finally got sent_caps() working correctly
+
+Sat Jan  9 23:22:28 1999  Mark Solomon  <msolomon@fido.seva.net>
+
+	* WeatherNOAA.pm: Remembered that forecast keys all start with '.'
+
+	* WeatherNOAA.pm: Uncommented  line
+
+	* WeatherNOAA.pm:
+	in make_noaa_table(), for warnig line, moved COLSPAN to TD where it belongs
+
+	* Makefile.PL, README: Added NOTE
+
+	* MANIFEST, README: Added Files
+
+	* t.pl, WeatherNOAA.pm: Added and finished make_noaa_table()
+
+	* WeatherNOAA.pm, t.pl:
+	Added get_data() for file opts with opts to 'get' 'save' or 'usefile'
+
+	* t.pl, va_hourly.html, va_zone.html: added test files
+
+	* WeatherNOAA.pm:
+	Good working copy with process_city_hourly() and process_city_zone()
+
+	* WeatherNOAA.pm:
+	Changed this version to 4.1 to keep with Geo::WeatherNOAA
+
+	* WeatherNOAA.pm: Added functionality
+
+	* MANIFEST, Makefile.PL, WeatherNOAA.pm, test.pl: Initial rev
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Geo-Parse-PolishFormat.t
+lib/Geo/Parse/PolishFormat.pm
+META.yml                                 Module meta-data (added by MakeMaker)

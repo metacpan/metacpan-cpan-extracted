@@ -1,0 +1,43 @@
+#! /usr/bin/perl -w
+#===============================================================================
+#
+#         FILE:  sgf2dg
+#
+#      PODNAME:  sgf2dg
+#     ABSTRACT:  turn Smart Go Format (SGF) files into diagrams
+#
+#       AUTHOR:  Reid Augustin (REID), <reid@hellosix.com>
+#===============================================================================
+
+# perl code to turn an SGF file into diagrams
+#   Copyright (C) 1997-2005 Reid Augustin reid@hellosix.com
+#                      1000 San Mateo Dr.
+#                      Menlo Park, CA 94025 USA
+#
+
+=head1 NAME
+
+sgf2dg - convert Smart Go Format (SGF) files to diagrams similar to
+those seen in Go books and magazines.
+
+=head1 SYNOPSIS
+
+sgf2dg [ option ... ] file[.sgf|.mgt]
+
+=head1 DESCRIPTION
+
+B<sgf2dg> takes a Smart Go Format (SGF) file I<filename> or
+I<filename>.sgf or I<filename>.mgt and produces a diagram file
+I<filename>.suffix where suffix is determined by the B<converter>.
+
+For more detailed description, see the 'perldoc B<Games::Go::Sgf2Dg>'.
+
+=cut
+
+use strict;
+require 5.005;
+use Games::Go::Sgf2Dg; # the SGF to diagram converter module
+
+our $VERSION = '4.252'; # VERSION
+
+Games::Go::Sgf2Dg->run; # parse command line and do the conversion

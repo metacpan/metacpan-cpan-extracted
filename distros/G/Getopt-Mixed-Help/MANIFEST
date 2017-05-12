@@ -1,0 +1,12 @@
+Build.PL
+Changes
+Examples/gmh-example.pl
+MANIFEST
+Makefile.PL
+README
+lib/Getopt/Mixed/Help.pm
+t/GMH-pod-coverage.t
+t/GMH-pod.t
+t/Getopt-Mixed-Help.t
+t/fail.pl
+META.yml

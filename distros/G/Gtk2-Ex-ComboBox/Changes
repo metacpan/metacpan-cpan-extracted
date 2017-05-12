@@ -1,0 +1,25 @@
+Revision history for Gtk2-Ex-ComboBox
+
+0.01	Sep 21, 2005
+	* First version, released on an unsuspecting world.
+
+0.02	Sep 21, 2005
+	* Added method get_treeview()
+	* Added real tests
+	
+0.03	Sep 22, 2005
+	* Added method get_selected_values()
+	* Added method get_selected_indices()
+	* Added method set_list_preselected()
+
+0.04	Sep 23, 2005
+	* Added a frame around the slist. Improves visibility
+
+0.05	Sep 28, 2005
+	* Added 'changed' signal. To be triggered if selection changes
+	
+0.06	Sep 30, 2005
+	* Add scrolling if the list is too large
+	
+0.07	Oct 18, 2005
+    * Added ok-button to 'with-buttons' option to improve usability

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Getopt-Std-Strict
+version:             1.01
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Exporter:                      5.58
+    Getopt::Std:                   1.05
+    Test::Simple:                  0.74
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

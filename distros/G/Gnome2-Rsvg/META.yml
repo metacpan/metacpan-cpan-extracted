@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Gnome2-Rsvg
+version:            0.11
+abstract:           Perl interface to the RSVG library
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    Cairo:                1.00
+    ExtUtils::Depends:    0.20
+    ExtUtils::MakeMaker:  0
+    ExtUtils::PkgConfig:  1.03
+    Glib:                 1.02
+    Gtk2:                 1.02
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Cairo:                1.00
+    ExtUtils::Depends:    0.20
+    ExtUtils::PkgConfig:  1.03
+    Glib:                 1.02
+    Gtk2:                 1.02
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

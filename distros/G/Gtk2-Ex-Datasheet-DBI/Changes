@@ -1,0 +1,204 @@
+CHANGELOG
+
+Version 2.1, released 01-Jul-2007
+    
+    Fixed blocking of insert / delete / apply operations when open in read_only mode
+    Imported setup_combo() from Gtk2::Ex::DBI - setup & requery a combo
+    Added on_row_select key to run external code when a row is selected
+    Fixed text of error message when closing a windows that had an 'un-applied' datasheet
+    Don't include identity columns in insert / update SQL ( fixes SQL Server updates )
+    Added support for setting individual fields read_only
+    Renamed column_value() to get_column_value() and added alias
+    Added set_column_value()
+    Renamed column_from_name() to column_from_sql_name ( and add legacy support )
+    Don't append a primary key column if one is already defined
+    Fixed warnings when hiding the status column ( don't set width to 0 )
+    Fixed warnings when searching for a primary key ( uninitialised value )
+    Renamed packages for custom cell renderers from MOFO:: to Gtk2::Ex::Datasheet::DBI::
+        - even though the MOFOs still don't work :)
+    Queue iter deletion until the end of the apply() method ( otherwise can't move to next )
+    Added before_apply key to object constructor, to run external function before applying
+        - return 1 to allow update, return 0 to abort update ( and continue with next record )
+    Added 'no warnings' directive and commented out 'use warnings'. Switch around if you want warnings
+    Added 'align' key to field hash - use either a string or a decimal from 0 to 1
+    Default to right alignment for number fields
+    Added DOUBLE to the list of numeric fields
+    Added 'access_time' renderer to deal with weird MS Access formatted time values
+        ( 1899-12-30 hh:mm:ss ) format - ie ALL times have 1899-12-30 prepended to them
+    Allow setup_treeview() to continue without a primary key, but force to READ-ONLY
+    More verbose and prettier warnings
+    Added missing documentation for foreground_colour key in fields hash
+    Fixed warnings when rendering a date cell with a NULL date
+    Added support for pass_through queries that return a recordset ( including stored procedures ) - read_only
+    Better detection of DATE column types from column_info ( use regex instead of exact match )
+    Optimisation: Use stock gtk2 text renderers where possible ( ie when read-only )
+    Added support for hard-coding a cell's background colour ( ie a field's background_colour key )
+    Added sum_column() function, which returns the total off all values in the given column
+    Added support for custom_cell_data_func - a user-defined function for formatting cell data
+    Added 'quiet' flag to supress non-fatal warnings
+    Added parser for SQL Server default definitions
+    Allow 'faked' column_info hash to be passed into constructor
+    Exclude the primary key column in updates for ALL databases
+    ( also just use our $self->{primary_key} field to detect the primary key column )
+    Fixed failure in setup_treeview() when column_info() fails
+    Don't worry about detecting more than 1 primary key from column_info()
+        - it doesn't work on multi-table queries anyway
+    Added friendly_table_name key to constructor for use in dialogs ( imported from Gtk2::Ex::DBI )
+    Added support for setting up chains of functions to be attached to a cell's custom_cell_data_func
+    Added dd-mm-yyyy support to CellRendererDate
+    Fixed incompatibility between us, CellRendererDate and gtk+-2.8.18+
+    Re-implemented date_only renderer with a builtin_render_function
+        - this is to deal with SQL Server's combination datetime fields when we only want a date
+    Mark columns with a currency builtin render function
+    Strip out dollar signs and commas from currency columns when applying, in get_column_value, and in sum_column
+    Attached $self->{columns} ( Gtk2::TreeViewColumns ) to $self->{fields} ( and removed $self->{columns} )
+    Store width of each column whatever in 'current_width' ( ie $self->{fields}[_field_no_]->{current_width} )
+    Rename size_allocate() to on_size_allocate()
+    Added support for using pango markup in the column heading, via a field's header_markup key
+    Store column name in the treeview_column hash so we can easily figure what what column someone's clicked in
+    Major reorganisation of $self->{fieldlist}, $self->{fields} and column handling to avoid off-by-one BS with status column
+    Work-around for http://bugzilla.gnome.org/show_bug.cgi?id=317387! Woot!
+    Removed Number::Format dependancy - doesn't install well under Windows
+    Added count() function, with optional conditions ( similar to sum_column() )
+    Optimised column_from_column_name and setup_treeview
+    Fixed focus-out-event in custem CellRendererText not triggering the 'edited' signal. Finally. Thanks Muppet :)
+    Fixed cell editable height problem in gtk-2.10.x. Thanks Torsten :)
+    Fixed setting up primary_key_column and primary key in field list if a primary key is passed ( ie if column_info fails - very rare )
+    Ported data lock functionality from Gtk2::Ex::DBI, adding functions:
+        lock()
+        unlock()
+    Automatically scroll the treeview as the cursor changes
+    Copy a cell's font size to the editable when editing ( currently fixed at Arial though )
+    Update CellRendererDate to accept font sizes
+    Imported calculator from Gtk2::Ex::DBI ( and added ->calculator( column_name ) method )
+    Added GST removal and rounding to calculator
+    Added on_changed functionality ( gets passed { treepath => $treepath, iter => $iter } )
+    Pass model and iter to before_apply() and on_apply() functions
+    Added DBD::SQLite support
+    Added ( slightly buggy for some data, but hey ... ) initial column sorting support. Double-click in column headers to sort
+    Fixed duplicate execution of validation code
+    Added support for ticking over gtk2 main loop while populating a treeview ( good for slow networks )
+    Fixed header alignment for datasheets that aren't visible when being constructed
+    Added support for custom dialogs when datasheets need applying
+    Added icons to all dialogs
+    Added footer support, with sum, max, average
+    Better currency formatting
+    Added max_column() function
+    Added average_column() function
+    
+    Documentation updates
+    
+    Patches from DLB:
+        Add support for Postgres:
+            Set search path in constructor when Postgres driver detected
+            Added support for Postgres in last_insert_id()
+        Added detection of primary key columns
+    Other patches and suggestions merged
+        Simplified primary key detection
+        Allow 'faked' column_info hash to be passed into constructor
+    
+Version 2.0, released 16-Jan-2006
+    
+    Overhaul SQL clause handling - now all SQL-related stuff is in the 'sql' hash
+    Added support for placeholders in where clause
+    Added detection of primary key from column_info() ( MySQL & SQL Server only at present )
+    Added destroy method, which destroys all signal handlers we've created, then destroys itself
+        ( not working yet )
+    Renamed $model_setup->{table} to $model_setup->{from} in dynamic models
+    Added legacy mode to support 1.x requests
+    Process dynamic models out of order when querying - no need to queue them for later
+    Added method revert(), which is a synonym of undo()
+    Added graceful handling of failure of $dbh->column_info ( warn to console what's happened )
+    Warn to console if $dbh->column_info fails AND we don't have a primary_key definition
+    Only ask to apply changes if not read_only
+    Addded missing schema request to self
+        - harmless anyway because we only support automatic renderer selection for MySQL currently
+    Updated documentation & cleaned up POD somewhat
+    
+Version 1.0, ( not released )
+    
+    Added dump_on_error flag to dump SQL on a DBI error
+    Converted more 0s to FALSEs
+    
+Version 0.9, released 16-Sep-2005
+    
+    Add some logic to MOFO::CellRendererDate so that popup calendar gets placed completely on-screen
+    Added MOFO::CellRendererTime and use when a Time column is encountered
+    Dialog question asking user whether to apply if window is closed with unapplied changes to recordset
+    Add missing code to process sql_order_by
+    Renamed readonly flag to read_only ( for consistency ) and hide status column when read_only
+    
+Version 0.8, released 15-Aug-2005
+    
+    Refresh dynamic combos when a toggle that they depend on is edited
+    Automatically choose a renderer type based on the database field type of each field ( can be overriden )
+    Automatically choose a default value for each column based on the database field definition ( can be overriden )
+    Removed more Perl warnings re: uninitialised use of ...
+    Choose string / numeric comparison based on database field type for combo renderers
+    Rename 'none' renderer to 'hidden' ( and still support old 'none' renderers )
+    Use text renderer for hidden columns ... so we can point dynamic combos at them and catch changes
+    
+Version 0.7, released 02-Aug-2005
+    
+    Added support for dynamic combos - ie combos whose options depend on the current row
+    Disabled MOFO::CellRendererSpinButton ... not exactly working properly yet
+    Add support for CellRendererCombos with a string ID ( previously only supported int IDs )
+    Added undo() method - convenience function that basically does $self->query( undef, TRUE );
+    Added MOFO::CellRendererDate - copied and pasted from Torsten Schoenfeld's example in the Gtk2 distribution
+    Separated demo app from main package
+    
+Version 0.6, released 10-Jun-2005
+    
+    Switched standard CellRendererText with a custom renderer that has better focus policy after editing
+    Added custom CellRendererSpinButton ( with improved focus policy ) for numeric values
+    Fixed segfault on exit of example app
+    
+Version 0.5, released 08-Jun-2005
+    
+    Fixed make test so module actually installs via cpan
+    
+Version 0.4, released 27-May-2005
+    
+    Changed calculation of primary key column to use $self->fieldlist
+    Added renderer type 'none' for hidden fields
+    Insert method accepts a list of column / value pairs to set initial values
+    Added column_from_name function to convert a column name into it's number in the model
+    Added column_value to look up a value in the selected row
+    Added question dialog to ask whether to apply current datasheet before querying ( override with 'dont_apply' )
+    Cache the fieldlist array in $self->{fieldlist} so we don't have to query the DB every time we need a field list
+    Remove requirement of field definitions - will use fieldnames from the database if none are given ( CellRendererText for everything )
+    Added POD documentation
+    
+Version 0.3, released 24-May-2005
+    
+    Worked around 'Use of uninitialized value' warnings
+    Added support for CellRendererCombo - thanks muppet :)
+    Fixed bug where only the 1st updated row was applied
+    Added support for CellRendererToggle
+    Added dynamic column sizing, with mix of percentage and absolute values
+    Added 'multi_select' property which sets 'multiple' selection mode ( only really affects deleting )
+    
+Version 0.2, released 19-May-2005
+    
+    Ported to Gtk2::ListStore / Gtk2::TreeView
+        ( only supports text cell renderers currently )
+    Renamed sql_fields to sql_select and changes requirement back to and SQL select statement
+    Don't use the '!' special character for inserts - instead use record status indicator ( column 0 )
+    All SQL operations occur in the 'apply' method as a batch
+    Added constants for status indicators
+    Added pixbuf column to display record status
+    Added field validation plugin functionality
+    Added intelligent detection of record status - don't consider non-changing 'row-changed' events a 'change'
+    Added ReadOnly flag: prevents edits, inserts and deletes if set
+    Put some actual data into the sql dump in the example application
+    Cleaned up error dialogs and added more of them
+    Removed all ComboBox stuff from example app for now
+    
+Version 0.1, released 16-May-2005
+
+    First Version :)
+    Querying database and dumping records into a Gtk2::Ex::Simple::List
+    Detecting changes
+    Updating affected records in the data as a batch
+    Inserting records
+    Deleting records

@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+use strict;
+use Gnome2::VFS;
+
+use Test::More;
+
+# $Id$
+
+unless (-d "$ENV{ HOME }/.gnome") {
+  plan(skip_all => "You have no ~/.gnome");
+}
+
+unless (Gnome2::VFS -> CHECK_VERSION(2, 6, 0)) {
+  plan(skip_all => "This is new in 2.6");
+}
+
+plan(tests => 6);
+
+Gnome2::VFS -> init();
+
+###############################################################################
+
+my $monitor = Gnome2::VFS -> get_volume_monitor();
+isa_ok($monitor, "Gnome2::VFS::VolumeMonitor");
+
+my @volumes = $monitor -> get_mounted_volumes();
+isa_ok($volumes[0], "Gnome2::VFS::Volume");
+
+my @drives = $monitor -> get_connected_drives();
+isa_ok($drives[0], "Gnome2::VFS::Drive");
+
+isa_ok($monitor -> get_volume_for_path("/dev/cdrom"), "Gnome2::VFS::Volume");
+
+is($monitor -> get_volume_by_id($volumes[0] -> get_id()), $volumes[0]);
+is($monitor -> get_drive_by_id($drives[0] -> get_id()), $drives[0]);
+
+###############################################################################
+
+Gnome2::VFS -> shutdown();

@@ -1,0 +1,11 @@
+Nov 18 2005
+ - Documentaion cleanup
+
+Nov 19 2005
+ - Change UserAgent and Gmail namespace
+
+Nov 21 2005
+ - Added CacheDBH support
+
+Jan 19 2005
+ - Fixed Gmail.pm to work with new Google authentication

@@ -1,0 +1,28 @@
+#! /sbin/runscript
+
+depend() {
+	need localmount
+	need net
+}
+
+start() {
+	if [ ! -f /etc/no-ip.conf ]
+	then
+		einfo "Answer the following questions about your no-ip account."
+		cd /tmp
+		(no-ip.sh && mv no-ip.conf /etc/no-ip.conf) || eend 1
+		ln -s /etc/no-ip.conf /usr/lib/no-ip.conf >& /dev/null
+	fi
+	ebegin "Starting noip"
+	noip -c /etc/no-ip.conf
+	eend $? "noip did not start, error code $?"
+}
+
+stop() {
+	ebegin "Stopping noip"
+	kill `ps -A | grep noip | awk '{print $1}'` >& /dev/null 
+	eend $? "Either noip did not start or there was a problem stopping" 
+	ebegin "Setting noip addresses to 0.0.0.0"
+	noip -c /etc/no-ip.conf -i 0.0.0.0
+	eend $? "Failed to set noip addresses to 0.0.0.0"
+}

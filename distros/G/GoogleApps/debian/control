@@ -1,0 +1,26 @@
+Source: google-apps
+Section: perl
+Priority: optional
+Maintainer: Joenio Costa <joenio@colivre.coop.br>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: libmodern-perl-perl,
+ libmoose-perl,
+ libmoosex-app-cmd-perl,
+ libvuser-google-api-perl,
+ perl,
+ perl-modules
+Standards-Version: 3.9.3
+Homepage: http://search.cpan.org/dist/GoogleApps/
+
+Package: google-apps
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libmodern-perl-perl,
+ libmoose-perl,
+ libmoosex-app-cmd-perl,
+ libvuser-google-api-perl,
+ perl,
+ libconfig-auto-perl
+Description: command line tool to manage Google Apps via API 2.0
+ command line tool written in Perl to manage Google Apps via API 2.0 by using
+ VUser::Google::API module.

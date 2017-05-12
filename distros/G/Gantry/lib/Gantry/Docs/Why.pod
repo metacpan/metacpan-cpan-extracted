@@ -1,0 +1,156 @@
+=head1 Name
+
+Gantry::Docs::Why - What's a framework and why should I want one?
+
+=head1 Intro
+
+This document attempts to explain why a programmer should want a web
+app framework.  It is not specific to the Gantry framework.  There are
+reasons why we prefer Gantry to other frameworks, but they are not
+discussed here.
+
+=head1 Do It Yourself
+
+Once upon a time, I had a computer savvy friend with an unorthodox opinion.
+He hated the idea of using an SQL database, unless the amount of data or
+the frequency of accessing it justified its use solely on the basis of
+run time performance.  "Why not roll your own?" was his continual question.
+After all, he reasoned, a small application probably has only a small
+amount of data which can be easily described.  Therefore, a flat file
+scheme is sufficient for almost all apps.
+
+For the moment, set aside the problems of scalability.  That is,
+ignore for the moment the valid point that the complexity of apps
+tends to grow as they age and that more and more users come from the
+woodwork to use successful apps.
+
+The argument against databases falls on its own, just based on developer
+efficiency.  If you have your data in a hand written scheme I have a hurdle
+to clear before I can work on your app.  With an SQL database, I can
+use standard tools to explain your data layout.  This leads quickly
+to an understanding of the app itself (as the famous quote about
+sharing and concealing flowcharts so well states).
+
+So, there is an important lesson to be learned from SQL databases.
+Even when they make no sense in terms of throughput during app execution,
+they still make a great deal of sense in a typical shop.  They create
+a lingua franca for describing data.  That common language, by itself, is
+a great help to developers.
+
+=head1 Web Apps
+
+No matter what a web application does, it shares an obvious trait with
+all other web apps: the web.  Users will interact with our web apps
+through their browsers.  The details of the interaction may differ
+depending on whether we use mod_perl, CGI, or something else, but
+the fact remains that all the data coming into and out of our apps
+travels in http requests.
+
+This leads naturally to a common set of problems and benefits for
+all web apps.  When we notice that programs have things in common, we
+should immediately begin thinking of code they can share.  Factoring
+out the common code will save us development time.  If we factor out
+enough behavior, we can call it a framework.  If other people use our
+framework it can become a lingua franca at least among our friends
+and colleagues.
+
+The following section describes one of the most common web app features.
+
+=head1 Typical Web Apps
+
+Though there is some variation in what web applications do (we have some
+that provision cable modems) they are primarily occupied with the
+same basic task.  They manage data in an SQL database.  This leads
+to a small number of common tasks that each app must perform.  In fact,
+most apps have multiple database tables to manage, so they perform
+these common tasks repeatedly.
+
+Consider a typical work flow.  A user comes to a customer facing web
+site to update their address.  From a generic front page, they
+choose a link to the app which updates the relevant data.  On that app,
+they log in (providing account name or number and a password or two).
+Once authenticated, they choose a navigation tab or link which displays
+an address form with their current information.  The user then updates
+the relevant bits and presses submit.  The site validates data (shunting
+the user back to the page with error messages on failure) and updates
+it in the underlying SQL table.  Finally, the site takes them back
+to some reasonable page, like their account home.
+
+Our company does not allow users to update their address as described
+above, since we are a wire line data provider (cable TV, telephone,
+internet).  Yet, the outline above is exactly correct for a large number
+of the pieces in almost all of our apps.  Here are the steps in summary:
+
+=over 4
+
+=item 1.
+
+Display a page of information with links to update some of it.
+
+=item 2.
+
+Upon a user click, display a form for entering or editing data.
+
+=item 3.
+
+Upon user submission of the form, validate the data.  If it is not
+valid, point out errors and repeat from step 2.
+
+=item 4.
+
+Update database table(s) to reflect the change.
+
+=item 5.
+
+Display a reasonable page to the user.
+
+=back
+
+Now, there may be substantial additional work to be done in concert
+with step 4 (like configuring those cable modems or sending
+spam to the marketing department).  And there may be other activities,
+like report generation (but that may really be a special case of the
+above).  Yet, for all the special things that a particular application
+needs to do, the five steps above are repeated by multiple pieces of
+almost all apps.
+
+Programmers are (or should be) lazy.  We don't want to continually recode
+the above.  Not only is that tedious, but it suffers from the same problems
+that rolling our own data scheme for each app would.  It makes for lots
+of apps which are almost the same, to the point that the details which
+differ are hard to deduce.  Further, newly hired programmers face a number
+of hurdles to understanding a bunch of separately coded apps.
+
+=head1 Conclusion
+
+So, we want a lingua franca for web applications in the same way that
+we wanted SQL for database access.  The problems of a web app are more
+numerous and more disparate, so the solution is more complex.  But, a
+web framework is a lingua franca for web apps.
+
+There are many web app frameworks in the wild these days.  I'll not even
+bother to start a list of them.  Suffice it to say, if you find one that
+will work for you and your shop, it will save you development time.
+And, it will provide an easier path for those new to your shop.
+If it happens to be wildly popular, you might even be able to hire
+people already familiar with it.
+
+In our shop we go one step further.  Since database backed web apps
+are so similar, we developed a language for describing them called Bigtop.
+By describing an app in Bigtop syntax, we can generate and regenerate
+its repetitive bits.  This leaves us free to work on the more interesting
+bits.
+
+=head1 Author
+
+Phil Crow <philcrow2000@yahoo.com>
+
+=head1 Copyright and License
+
+Copyright (c) 2006, Phil Crow.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

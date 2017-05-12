@@ -1,0 +1,24 @@
+Revision history for Games-Messages
+
+0.05  Thu Nov 03 23:51:00 2005
+	- added tests to check if the output is OK
+	- added tests with Test::RandomResults
+
+0.04  Mon Nov 08 01:06:00 2004
+	- added some tests
+	- added some more messages
+	- improved the documentation
+	- added pod.t and pod-coverage.t to the tests directory
+
+0.03  Thu Oct 14 14:12:32 2004
+	- added META.yml
+	- Perl required version is now 5.006 (was 5.008)
+	- minor changes in the documentation
+
+0.02  Wed May 13 14:16:41 2004
+	- slight changes; improved documentation
+
+0.01  Wed May 12 22:22:41 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn Games::Messages
+

@@ -1,0 +1,513 @@
+NAME
+    GRID::Cluster - Virtual clusters using SSH links
+
+SYNOPSIS
+      use GRID::Cluster;
+
+      my $np = 4;     # Number of processes
+      my $N = 1000;   # Number of iterations
+      my $clean = 0;  # The files are not removed when the execution is finished
+
+      my $machine = [ 'host1', 'host2', 'host3' ];                # Hosts
+      my $debug = { host1 => 0, host2 => 0, host3 => 0 };         # Debug mode in every host
+      my $max_num_np = { host1 => 1, host2 => 1, host3 => 1 };    # Maximum number of processes supported by every host
+
+      my $c = GRID::Cluster->new(host_names => $machine, debug => $debug, max_num_np => $max_num_np);
+        || die "No machines has been initialized in the cluster";
+
+      # Transference of files to remote hosts
+      $c->copyandmake(
+        dir => 'pi',
+        makeargs => 'pi',
+        files => [ qw{pi.c Makefile} ],
+        cleanfiles => $clean,
+        cleandirs => $clean, # remove the whole directory at the end
+        keepdir => 1,
+      );
+
+      # This method changes the remote working directory of all hosts
+      $c->chdir("pi/")  || die "Can't change to pi/\n";
+
+      # Tasks are created and executed in remote machines using the method 'qx'
+      my @commands = map {  "./pi $_ $N $np |" } 0..$np-1
+      print "Pi Value: ".sum @{$c->qx(@commands)}."\n";
+
+DESCRIPTION
+    This module is based on the module GRID::Machine. It provides a set of
+    methods to create 'virtual' clusters by the use of SSH links for
+    communications among different remote hosts.
+
+    Since main features of "GRID::Machine" are zero administration and
+    minimal installation, GRID::Cluster directly inherites these features.
+
+    Mainly, "GRID::Cluster" provides:
+
+    *   An extension of the Perl "qx" method. Instead of a single command it
+        receives a list of commands. Commands are executed - via SSH - using
+        the master-worker paradigm.
+
+    *   Services for the transference of files among machines.
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+    *   GRID::Machine module by Casiano Rodriguez Leon
+
+    *   Term::Prompt module by Allen Smith
+
+METHODS
+  The Constructor "new"
+    This method returns a new instance of an object.
+
+    There are two ways to call the constructor. The first one looks like:
+
+      my $cluster = GRID::Cluster->new(
+                                       debug      => {machine1 => 0, machine2 => 0,...},
+                                       max_num_np => {machine1 => 1, machine2 => 1,...},
+                                      );
+
+    where:
+
+    * "debug" is a reference to a hash that specifies which machines will be
+      in debugging mode. It is optional.
+
+    * "max_num_np" is a reference to a hash containing the maximum number of
+      processes supported for each machine.
+
+    The second one looks like:
+
+      my $cluster = GRID::Cluster->new(config => $config_file_name);
+
+    where:
+
+    * "config" is the name of the file containing the cluster specification.
+      The specification is written in Perl itself. The code inside the
+      "config" file must return a list defining the "max_num_np" and "debug"
+      parameters as in the previous call. See the following example:
+
+        $ cat -n MachineConfig.pm
+        1  my %debug = (machine1 => 0, machine2 => 0, machine3 => 0, machine4 => 0);
+        2  my %max_num_np = (machine1 => 3, machine2 => 1, machine3 => 1, machine4 => 1);
+        3
+        4  return (debug => \%debug, max_num_np => \%max_num_np);
+
+  The Method "modput"
+    The syntax of the method "modput" is:
+
+      my $result = $cluster->modput(@modules);
+
+    It receives a list of strings describing modules (like
+    'Math::Prime::XS'), and it returns a GRID::Cluster::Result object.
+
+    An example is in following lines:
+
+      $ cat -n modput.pl
+      1  #!/usr/bin/perl
+      2  use warnings;
+      3  use strict;
+      4
+      5  use GRID::Cluster;
+      6  use Data::Dumper;
+      7
+      8  my $cluster = GRID::Cluster->new( debug =>      { orion => 0, beowulf => 0 },
+      9                                    max_num_np => { orion => 1, beowulf => 1 } );
+     10
+     11
+     12  my $result = $cluster->modput('Math::Prime::XS');
+     13
+     14  $result = $cluster->eval(q{
+     15                use Math::Prime::XS qw(primes);
+     16
+     17                primes(9);
+     18              }
+     19            );
+     20
+     21  print Dumper($result);
+
+    When this program is executed, the following output is produced:
+
+      $ ./modput.pl
+      $VAR1 = bless( {
+                       'beowulf' => bless( {
+                                             'stderr' => '',
+                                             'errmsg' => '',
+                                             'type' => 'RETURNED',
+                                             'stdout' => '',
+                                             'errcode' => 0,
+                                             'results' => [
+                                                            2,
+                                                            3,
+                                                            5,
+                                                            7
+                                                          ]
+                                           }, 'GRID::Machine::Result' ),
+                       'orion' => bless( {
+                                           'stderr' => '',
+                                           'errmsg' => '',
+                                           'type' => 'RETURNED',
+                                           'stdout' => '',
+                                           'errcode' => 0,
+                                           'results' => [
+                                                          2,
+                                                          3,
+                                                          5,
+                                                          7
+                                                        ]
+                                         }, 'GRID::Machine::Result' )
+                     }, 'GRID::Cluster::Result' );
+
+  The Method "eval"
+    The syntax of the method "eval" is:
+
+      $result = $cluster->eval($code, @args)
+
+    This method evaluates $code in the cluster, passing arguments and
+    returning a GRID::Cluster::Result object.
+
+    An example of use:
+
+       $ cat -n eval_pi.pl
+       1  #!/usr/bin/perl
+       2  use warnings;
+       3  use strict;
+       4
+       5  use GRID::Cluster;
+       6  use Data::Dumper;
+       7
+       8  my $cluster = GRID::Cluster->new( debug =>      { orion => 0, beowulf => 0, localhost => 0, bw => 0 },
+       9                                    max_num_np => { orion => 1, beowulf => 1, localhost => 1, bw => 1} );
+      10
+      11  my @machines = ('orion', 'bw', 'beowulf', 'localhost');
+      12  my $np = @machines;
+      13  my $N = 1000000;
+      14
+      15  my $r = $cluster->eval(q{
+      16
+      17               my ($N, $np) = @_;
+      18
+      19               my $sum = 0;
+      20
+      21               for (my $i = SERVER->logic_id; $i < $N; $i += $np) {
+      22                   my $x = ($i + 0.5) / $N;
+      23                   $sum += 4 / (1 + $x * $x);
+      24               }
+      25
+      26               $sum /= $N;
+      27
+      28           }, $N, $np );
+      29
+      30  print Dumper($r);
+      31
+      32  my $result = 0;
+      33
+      34  foreach (@machines) {
+      35    $result += $r->{$_}{results}[0];
+      36  }
+      37
+      38  print "\nEl resultado del cálculo de PI es: $result\n";
+
+    The cluster initialization (lines 8 -- 9) assigns a logical identifier
+    to each machine. In lines 15 -- 28, the "eval" method evaluates the
+    block of code located at the "q" operator for each machine of the
+    cluster. In lines 32 - 36, an addition of every obtained values is
+    performed. So on, the example produces the following output:
+
+      $VAR1 = bless( {
+                       'bw' => bless( {
+                                        'stderr' => '',
+                                        'errmsg' => '',
+                                        'type' => 'RETURNED',
+                                        'stdout' => '',
+                                        'errcode' => 0,
+                                        'results' => [
+                                                       '0.785398913397203'
+                                                     ]
+                                      }, 'GRID::Machine::Result' ),
+                       'beowulf' => bless( {
+                                             'stderr' => '',
+                                             'errmsg' => '',
+                                             'type' => 'RETURNED',
+                                             'stdout' => '',
+                                             'errcode' => 0,
+                                             'results' => [
+                                                            '0.785398413397751'
+                                                          ]
+                                           }, 'GRID::Machine::Result' ),
+                       'orion' => bless( {
+                                           'stderr' => '',
+                                           'errmsg' => '',
+                                           'type' => 'RETURNED',
+                                           'stdout' => '',
+                                           'errcode' => 0,
+                                           'results' => [
+                                                          '0.785397913397739'
+                                                        ]
+                                         }, 'GRID::Machine::Result' ),
+                       'localhost' => bless( {
+                                               'stderr' => '',
+                                               'errmsg' => '',
+                                               'type' => 'RETURNED',
+                                               'stdout' => '',
+                                               'errcode' => 0,
+                                               'results' => [
+                                                              '0.785397413397209'
+                                                            ]
+                                             }, 'GRID::Machine::Result' )
+                     }, 'GRID::Cluster::Result' );
+
+      El resultado del cálculo de PI es: 3.1415926535899
+
+    The GRID::Cluster::Result object contains the obtained results, and the
+    addition of every results is the final calculation of number PI.
+
+  The Method "qx"
+    The syntax of the method "qx" is:
+
+      my $result = $cluster->qx(@commands);
+
+    It receives a list of commands and executes each command as a remote
+    process. It uses a farm-based approach. At some time a chunk of commands
+    - the size of the chunk depending on the number of processors - is being
+    executed. As soon as some command finishes, another one is sent to the
+    new idle worker (if there are pending tasks).
+
+    In a scalar context, a reference to a list that contains every results
+    is returned. Such list contains the outputs of the @commands. Observe
+    however that no assumption can be made about the processor where an
+    individual command "c" in @commands is eexecuted. See the following
+    example:
+
+    An example of use:
+
+      $ cat -n uname_echo_qx.pl
+         1    #!/usr/bin/perl
+         2    use strict;
+         3    use warnings;
+         4  
+         5    use GRID::Cluster;
+         6    use Data::Dumper;
+         7  
+         8    my $cluster = GRID::Cluster->new(max_num_np => {orion => 1, europa => 1},);
+         9  
+        10    my @commands = ("uname -a", "echo Hello");
+        11    my $result = $cluster->qx(@commands);
+        12  
+        13    print Dumper($result);
+
+    The result of this example produces the following output:
+
+      $ ./uname_echo_qx.pl 
+      $VAR1 = [                                                   
+                'Linux europa 2.6.24-24-generic #1 SMP Wed Apr 15 15:11:35 UTC 2009 x86_64 GNU/Linux
+      ',                                                                                            
+                'Hello                                                                              
+      '                                                                                             
+              ];
+
+    Observe that the first output corresponds to the first command "uname
+    -a", and the second output to the second command "echo Hello". Notice
+    also that we can't assume that the first command will be executed in the
+    first machine, the second one in the second machine, etc. We can only be
+    certain that all the commands will be executed in some machine of the
+    cluster pool.
+
+  The Method "copyandmake"
+    The syntax of the method "copyandmake" is:
+
+      my $result = $cluster->copyandmake(
+                     dir => $dir,
+                     files => [ @files ],      # files to transfer
+                     make => $command,         # execute $command $commandargs
+                     makeargs => $commandargs, # after the transference
+                     cleanfiles => $cleanup,   # remove files at the end
+                     cleandirs => $cleanup,    # remove the whole directory at the end
+                   )
+
+    and it returns a GRID::Cluster::Result object.
+
+    "copyandmake" copies (using "scp") the files @files to a directory named
+    $dir in remote machines. The directory $dir will be created if it does
+    not exists. After the file transfer the "command" specified by the
+    "copyandmake" option
+
+                         make => 'command'
+
+    will be executed with the arguments specified in the option "makeargs".
+    If the "make" option is not specified but there is a file named
+    "Makefile" between the transferred files, the "make" program will be
+    executed. Set the "make" option to number 0 or the string '' if you want
+    to avoid the execution of any command after the transfer. The
+    transferred files will be removed when the connection finishes if the
+    option "cleanfiles" is set. If the option "cleandirs" is set, the
+    created directory and all the files below it will be removed. Observe
+    that the directory and the files will be kept if they were not created
+    by this connection. The call to "copyandmake" by default sets "dir" as
+    the current directory in remote machines. Use the option "keepdir => 1"
+    to one to avoid this.
+
+  The Method "chdir"
+    The syntax of this method is as follows:
+
+      my $result = $cluster->chdir($remote_dir);
+
+    and it returns a GRID::Cluster::Result object.
+
+    The method "chdir" changes the remote working directory to $remote_dir
+    in every remote machine.
+
+INSTALLATION
+    To install "GRID::Cluster", follow these steps:
+
+    * Set automatic ssh-authentication with machines where you have an
+      account.
+
+      SSH includes the ability to authenticate users using public keys.
+      Instead of authenticating the user with a password, the SSH server on
+      the remote machine will verify a challenge signed by the user's
+      *private key* against its copy of the user's *public key*. To achieve
+      this automatic ssh-authentication you have to:
+
+      * Configure each remote machine in a configuration file (*man
+        ssh_config*). By default, the configuration file is
+        $HOME/.ssh/config. The basic syntax which this script needs is the
+        following:
+
+                Host host_1
+                HostName myHost1.mydomain.com
+                User myUser
+
+                Host host_2
+                HostName myHost2.mydomain.com
+                User anotherUser
+                .
+                .
+                .
+                Host host_n
+                HostName myHostn.mydomain.com
+                User myUser
+
+      * Run the script *pki.pl* which is included in this distribution. This
+        script allows the generation of public/private key pairs, using the
+        ssh-keygen command. Generated public key is copied to a list of
+        remote machines. Specifically, the public key is added, if not
+        exist, in the file $HOME/.ssh/authorized_keys of each specified
+        remote machine.
+
+        The basic execution of the script is as follows:
+
+          local.machine$ ./pki.pl [-v] -c host_1,host_2,...host_n
+
+        In this case, a public/private key pair is generated in the local
+        directory $HOME/.ssh/, using the *ssh-keygen* command, which must be
+        located in some directory included in $PATH. By default, the
+        filenames of the generated public and private keys are
+        *grid_cluster_rsa.pub* and *grid_cluster_rsa*, respectively.
+
+        By default, generated keys have the following characteristics:
+
+        * Type: RSA
+
+        * Number of bits: 2048
+
+        * No passphrase
+
+        Once the public/private key pair has been generated, the public key
+        is copied to remote machines specified by the option -c. This option
+        can be used several times to specify sets of machines with the same
+        password to login. By this way, the copy process of the public key
+        to remote machines is easier.
+
+        The behaviour of the script can be modified by the different
+        supported options. For more information, you can execute the script
+        with the option -h.
+
+      * Add a line for each remote machine in the configuration file that
+        specifies the public/private key which is going to be used to
+        authenticate the user.
+
+          Host host_1
+          HostName myHost1.mydomain.com
+          User myUser
+          IdentityFile ~/.ssh/grid_cluster_rsa
+
+          Host host_2
+          HostName myHost2.mydomain.com
+          User anotherUser
+          IdentityFile ~/.ssh/grid_cluster_rsa
+          .
+          .
+          .
+          Host host_n
+          HostName myHostn.mydomain.com
+          User myUser
+          IdentityFile ~/.ssh/grid_cluster_rsa
+
+      * Once the generated public key is installed on remote machines, you
+        should be able to authenticate using your private key:
+
+          $ ssh host_1
+          Linux host_1 2.6.15-1-686-smp #2 SMP Mon Mar 6 15:34:50 UTC 2006 i686
+          Last login: Sat Jul  7 13:34:00 2007 from local.machine
+          user@host_1:~$
+
+        You can also automatically execute commands in the remote server:
+
+          local.machine$ ssh host_1 uname -a
+          Linux host_1 2.6.15-1-686-smp #2 SMP Mon Mar 6 15:34:50 UTC 2006 i686 GNU/Linux
+
+    * Before running the tests. Set on the local machine the environment
+      variable "GRID_REMOTE_MACHINES" to point to a set of machines that is
+      available using automatic authentication. For example, on a "bash":
+
+              export GRID_REMOTE_MACHINES=host_1:host_2:...:host_n
+
+      Otherwise most connectivity tests will be skipped. This and the
+      previous steps are optional.
+
+    * Follow the traditional steps:
+
+         perl Makefile.PL
+         make
+         make test
+         make install
+
+SEE ALSO
+    * GRID::Cluster::Tutorial
+
+    * GRID::Machine
+
+    * IPC::PerlSSH
+
+    * <http://www.openssh.com>
+
+    * <http://www.csm.ornl.gov/torc/C3/>
+
+    * Man pages of "ssh", "ssh-key-gen", "ssh_config", "scp", "ssh-agent",
+      "ssh-add", "sshd"
+
+AUTHORS
+    Eduardo Segredo Gonzalez <esegredo@ull.es> and Casiano Rodriguez Leon
+    <casiano@ull.es>
+
+AKNOWLEDGEMENTS
+    This work has been supported by the EC (FEDER) and the Spanish Ministry
+    of Science and Innovation inside the 'Plan Nacional de I+D+i' with the
+    contract number TIN2008-06491-C04-02.
+
+    Also, it has been supported by the Canary Government project number
+    PI2007/015.
+
+    The work of Eduardo Segredo was funded by grant FPU-AP2009-0457.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Casiano Rodriguez Leon and Eduardo Segredo
+    Gonzalez. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.2 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

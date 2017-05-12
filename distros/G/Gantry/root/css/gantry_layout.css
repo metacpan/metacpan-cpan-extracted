@@ -1,0 +1,52 @@
+/* Resets-------------------------------------------------------------------------------- */
+body, div, dl, dt, dd, ul, ol, li,h1, h2, h3, h4, h5, h6,pre, form, fieldset, input, p, blockquote, th, td {  margin: 0;  padding: 0;}
+table {  border-collapse: collapse;  border-spacing: 0;}
+fieldset, img {  border: 0;}
+address, caption, cite, code, dfn, em, strong, th, var {  font-style: normal;  font-weight: normal;}
+ol, ul {  list-style: none;}
+caption, th {  text-align: left;}
+h1, h2, h3, h4, h5, h6 {  font-size: 100%;}
+q:before, q:after {  content:'';}
+hr {  border: none;}
+
+/* page  -------------------------------------------------------------------------------- */
+body {  height: 100%;  font-size: 62.5%; /* resets EM's to 11px == 1.1em */  text-align: center;}
+#page {  position: relative;  margin: auto;  text-align: left;}
+#header,  #body,  #footer {    position: relative;  }
+
+/* Template presets */
+.block {  float: right;}
+#primary {  float: left;}
+
+/* Basic grid groups-------------------------------------------------------------------------------- */
+.group2 .unit,.group2 .group2,.group2 .group3,.group3 .unit,.group4 .unit {  float: right;  display: inline; /* IE */}
+.group2 .first,.group3 .first,.group4 .first {  float: left;}
+
+/* Group 2 */  
+.group2 .unit,  .group2 .group2,  .group2 .group3 {    width: 50%;  }
+.group2 .first {    width: 49%;  }
+
+/* Group3 */  
+.group3 .unit {    width: 33%;  }
+.group3 .first {    width: 33%;  }
+
+/* Group4 */  .group4 .unit {    width: 25%;  }
+.group4 .first {    width: 24%;  }
+
+/* Basic tabs-------------------------------------------------------------------------------- */
+.tabs ul {  margin: 0;  padding: 0;}
+.tabs li {  float: left;  margin: 0;  padding: 0;}
+.tabs li a {  float: left;  display: block;}
+
+/* Calendar-------------------------------------------------------------------------------- */
+.calendar table {  width: 100%;  border-collapse: collapse;}
+.calendar table caption {  text-align: center;}
+.calendar td, .calendar th {  border: 1px solid #CCC;  font-size: 1.1em;  text-align: center;}
+
+/* Tricks and Hacks-------------------------------------------------------------------------------- */
+#body:after,.group2:after,.group3:after,.group4:after,.tabs:after {  content:  ".";  display: block;  height: 0;  clear: both;  visibility: hidden;}
+#body,.group2,.group3,.group4,.tabs {  zoom: 1;}
+
+/* IE */
+html {  font-size: 100%; /* IE Hack */}
+table, input, select, textarea {  font-size: 100%; /* IE Hack */}

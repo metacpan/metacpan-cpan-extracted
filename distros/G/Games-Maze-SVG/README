@@ -1,0 +1,33 @@
+Games-Maze-SVG
+
+This module is an extension to the Games::Maze module. Games::Maze::SVG
+takes the mazes created by Games::Maze and converts them into an SVG
+output. As an option, the SVG version of the maze can be made playable.
+
+This module depends on Games::Maze, and Carp. The tests depend on Test::More.
+
+Displaying the SVG mazes requires an SVG viewer or a browser that supports
+SVG either natively or through a plugin. The mazes have been tested using
+the Squiggle viewer (part of the Batik library), and Adobe SVG viewer on
+both Firefox and Internet Explorer.
+
+When using the Squiggle viewer to play the interactive maze, the arrow keys
+are also used by Squiggle to move the image around. I have not yet found a
+way around this. Using Ctrl-T to restore the original view is a workaround.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 G. Wade Johnson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

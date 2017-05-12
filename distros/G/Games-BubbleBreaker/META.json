@@ -1,0 +1,53 @@
+{
+   "abstract" : "a mouse based logic game",
+   "author" : [
+      "Tobias Leich <froggs@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-BubbleBreaker",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::HomeDir" : 0,
+            "File::ShareDir" : "1.00",
+            "File::Spec" : 0,
+            "SDL" : "2.532",
+            "Time::HiRes" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Games::BubbleBreaker" : {
+         "file" : "lib/Games/BubbleBreaker.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/FROGGS/Games-BubbleBreaker"
+      }
+   },
+   "version" : "0.03"
+}

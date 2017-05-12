@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Sample files created by GraphViz2::Marpa::PathUtils</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="pragma" content="no-cache">
+	<link rel="stylesheet" type="text/css" href="<: $default_css :>">
+</head>
+<body>
+	<h1 align="center">Sample files created with <a href="http://metacpan.org/release/GraphViz2-Marpa-PathUtils">GraphViz2::Marpa::PathUtils</a> V <: $version :>.</h1>
+
+	<p align="center">This page shows the result of calling find_clusters() on the input file <: $input_file :>.</p>
+
+	<p align="center">All scripts, input files and output files required to generate these examples are shipped in the GraphViz2::Marpa::PathUtils distro.</p>
+
+	<hr />
+
+	<h2 align="center" class="page_heading">Part 1: Input data</h2>
+
+: include "basic.table.tx" { border => $border, row => $input_data };
+
+	<hr />
+
+	<h2 align="center" class="page_heading">Part 2: Output data</h2>
+
+: include "basic.table.tx" { border => $border, row => $output_data };
+
+	<hr />
+
+	<h3 class="global_toc_text">Links</h3>
+
+	<h2 align="center">Index page for <a href="http://savage.net.au/Graphviz.html">all graph module demos</a></h2>
+
+	<hr />
+
+	<h3 class="global_toc_text">Environment</h3>
+
+: include "fancy.table.tx" { data => $environment };
+
+	<hr />
+
+</body>
+</html>

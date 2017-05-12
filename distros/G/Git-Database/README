@@ -1,0 +1,60 @@
+NAME
+
+    Git::Database - Provide access to the Git object database
+
+SYNOPSIS
+
+        # get a store
+        my $r  = Git::Repository->new();
+
+        # build a backend to access the store
+        my $db = Git::Database::Backend::Git::Repository->new( store => $r );
+
+        # or let Git::Database figure it out by itself
+        my $db = Git::Database->new( store => $r );
+
+DESCRIPTION
+
+    Git::Database provides access from Perl to the object database stored in a
+    Git repository. It can use any supported Git wrapper to access the Git
+    object database maintained by Git.
+
+    Git::Database is actually a factory class: "new" returns backend
+    instances.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Git::Database
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Database>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Git-Database>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Git-Database>
+
+    *   MetaCPAN
+
+        <http://metacpan.org/release/Git-Database>
+
+AUTHOR
+
+    Philippe Bruhat (BooK) <book@cpan.org>.
+
+COPYRIGHT
+
+    Copyright 2013-2017 Philippe Bruhat (BooK), all rights reserved.
+
+LICENSE
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

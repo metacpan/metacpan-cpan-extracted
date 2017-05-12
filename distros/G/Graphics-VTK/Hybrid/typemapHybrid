@@ -1,0 +1,25 @@
+TYPEMAP
+vtk3DSImporter*			O_OBJECT
+vtkArcPlotter*			O_OBJECT
+vtkCaptionActor2D*			O_OBJECT
+vtkCubeAxesActor2D*			O_OBJECT
+vtkDepthSortPolyData*			O_OBJECT
+vtkEarthSource*			O_OBJECT
+vtkGridTransform*			O_OBJECT
+vtkImageToPolyDataFilter*			O_OBJECT
+vtkImplicitModeller*			O_OBJECT
+vtkIterativeClosestPointTransform*			O_OBJECT
+vtkLandmarkTransform*			O_OBJECT
+vtkLegendBoxActor*			O_OBJECT
+vtkPolyDataToImageStencil*			O_OBJECT
+vtkRIBExporter*			O_OBJECT
+vtkRIBLight*			O_OBJECT
+vtkRIBProperty*			O_OBJECT
+vtkRenderLargeImage*			O_OBJECT
+vtkThinPlateSplineTransform*			O_OBJECT
+vtkTransformToGrid*			O_OBJECT
+vtkVRMLImporter*			O_OBJECT
+vtkVectorText*			O_OBJECT
+vtkVideoSource*			O_OBJECT
+vtkWeightedTransformFilter*			O_OBJECT
+vtkXYPlotActor*			O_OBJECT

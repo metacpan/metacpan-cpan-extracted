@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+lib/Gentoo/App/Demerge.pm
+script/demerge
+t/00-compile.t

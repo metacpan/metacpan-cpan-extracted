@@ -1,0 +1,86 @@
+.TH "SANDBOXSHELL" "1" "Jul 2003" "WH0RD.ORG" "Gentoo"
+.SH "NAME"
+sandboxshell \- Launch a bash shell inside of the Portage sandbox
+.SH "SYNOPSIS"
+.TP
+.BR sandboxshell
+.SH "DESCRIPTION"
+\fBsandboxshell\fR serves two basic functions.  The first (and 
+original reason for design) was to aid in the debugging of ebuilds 
+for Gentoo.  The second is to provide access to a safe environment 
+for running programs whose functions are not entirely known.  A 
+good example would be an installer obtained off of the internet 
+for a game.  Who knows where it is going to be writing files !
+.SH "USAGE"
+For debugging ebuilds, simply change dir anywhere below the build 
+root for the package.  For example, if you are working on the 
+package app-games/aaquake2, it will be based in the directory 
+(by default) /var/tmp/portage/aaquake2-0.1/.  Simply enter that 
+directory and then run \fBsandboxshell\fR.  The portage environment 
+will automatically be detected and you can load it if you want.  
+This environment should be an exact duplicate of the portage 
+environment under which ebuild scripts run.  So if you are 
+trying to track down a bug in the compile stage, you need not 
+keep running `ebuild aaquake2-0.1.ebuild clean unpack compile` 
+and then waiting for it to break.
+.br
+When you are finished using the shell, just type `exit` like you 
+would when leaving any other shell.
+.SH "DEFAULT SETUP"
+The defaults can be adjusted via \fI/etc/sandboxshell.conf\fR.  
+The default working setup will grant write permissions to the 
+following directories (and their subdirectories):
+.br
+/dev/tty
+.br
+/dev/pts
+.br
+/dev/null
+.br
+/tmp
+.br
+${PWD}
+.br
+Additionally, the shell we be granted read only access to /.
+.SH "HELPER FUNCTIONS"
+To manipulate the sandbox environment, a few functions have been 
+provided so that you do not have to manipulate the relevant 
+variables yourself.
+.TP
+.BR sandboxon
+This will turn on the sandbox.  Basically that means that 
+control over reading/writing files will be filtered by the 
+access controls in the sandbox.
+.TP
+.BR sandboxoff
+This will turn off the sandbox.  Basically that means that 
+control over reading/writing files will no longer be filtered.
+.TP
+.BR "addread " \fI<path>\fR
+Allow the shell to read \fIpath\fR and everything below it.
+.TP
+.BR "addwrite " \fI<path>\fR
+Allow the shell to write to \fIpath\fR and everything below it.
+.TP
+.BR "adddeny " \fI<path>\fR
+Prevent the shell from writing to \fIpath\fR and everything below it.
+.TP
+.BR "addpredict " \fI<path>\fR
+Add fake access to write to \fIpath\fR and everything below it.  
+This means that write calls will not fail, but they will not 
+actually succeed either.  The shell says that the operation 
+worked just fine when in reality nothing happened.
+.SH "REPORTING BUGS"
+Please report any bugs you encounter through our website:
+.LP
+\fBhttp://bugs.gentoo.org/\fR
+.SH "SEE ALSO"
+.BR ebuild (5)
+.SH "FILES"
+.TP
+\fB/etc/sandboxshell.conf\fR
+The bash script loaded when the shell is initially launched.
+.SH "AUTHORS"
+Mike Frysinger <vapier@gentoo.org>
+.SH "CVS HEADER"
+$Id: sandboxshell.1,v 1.1 2004/06/20 09:09:35 linguist Exp $

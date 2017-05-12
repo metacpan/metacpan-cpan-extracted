@@ -1,0 +1,49 @@
+Copyright 2008, 2010, 2011 Kevin Ryde
+
+This file is part of Gtk2-Ex-Dragger.
+
+Gtk2-Ex-Dragger is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-Dragger is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-Dragger.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 10, June 2011
+    - tests at least one .t to make smoke testing happy
+
+Version 9, May 2011
+    - no value-changed/notify signals when unchanged at limit of adjustment
+
+Version 8, November 2010
+    - an actual Glib::Object so can make from Gtk2::Builder
+
+Version 7, October 2010
+    - use WidgetEvents for event mask cleanup
+    - docs on event mask setups if creating dragger under press event handler
+
+Version 6, September 2010
+    - test manifest only as an author test
+
+Version 5, February 2010
+    - new home page
+
+Version 4,  November 2008
+    - use Gtk2 1.200
+
+Version 3,  September 2008
+    - SyncCall split out to WidgetBits
+
+Version 2,  June 2008
+    - allow external adj changes during a drag, eg. from the keyboard
+
+Version 1,  May 2008
+    - the first version

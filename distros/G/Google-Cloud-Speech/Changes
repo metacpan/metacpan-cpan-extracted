@@ -1,0 +1,8 @@
+0.03  Tue Apr  25 18:55:00 2017
+    - Update Speech.pm to use Service Account credentials insteadd of API Key.
+
+0.02  Sun Apr  20 09:45:23 2017
+    - Fixed some minor bugs and updated pod
+
+0.01  Sun Apr  19  23:20:50 2017
+    - Very first version, just for own purpose

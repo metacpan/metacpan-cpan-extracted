@@ -1,0 +1,83 @@
+Content-Type: message/partial; number=1; total=4; 
+    id="aaaa.21106.856734914@ariel.healthnet.org"
+Content-Disposition: inline
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed_new.html> ProMED-mail (1/4)
+Message-Id: <1.aaaa.21106.856734914@ariel.healthnet.org>
+
+Content-Type: text/html; name="promed_new.html"
+Content-Disposition: inline; filename="promed_new.html"
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed_new.html> ProMED-mail
+Message-Id: <aaaa.21106.856734914@ariel.healthnet.org>
+
+<html>
+<html>
+<head>
+<title>ProMED-mail</title>
+</head>
+<IMG  HEIGHT=54 WIDTH=291 SRC="/images/satlogo.jpg">
+<p>
+<p>
+Welcome!
+<p>
+Here is 1k of junk:
+<p>
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+
+Content-Type: message/partial; number=2; total=4; 
+    id="aaaa.21106.856734914@ariel.healthnet.org"
+Content-Disposition: inline
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed_new.html> ProMED-mail (2/4)
+Message-Id: <2.aaaa.21106.856734914@ariel.healthnet.org>
+References: <1.aaaa.21106.856734914@ariel.healthnet.org>
+
+foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foofoo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+
+Content-Type: message/partial; number=3; total=4; 
+    id="aaaa.21106.856734914@ariel.healthnet.org"
+Content-Disposition: inline
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed_new.html> ProMED-mail (3/4)
+Message-Id: <3.aaaa.21106.856734914@ariel.healthnet.org>
+References: <1.aaaa.21106.856734914@ariel.healthnet.org> 
+    <2.aaaa.21106.856734914@ariel.healthnet.org>
+
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foofoo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+
+Content-Type: message/partial; number=4; total=4; 
+    id="aaaa.21106.856734914@ariel.healthnet.org"
+Content-Disposition: inline
+Mime-Version: 1.0
+To: terminal
+Subject: <URL:file:./test/promed_new.html> ProMED-mail (4/4)
+Message-Id: <4.aaaa.21106.856734914@ariel.healthnet.org>
+References: <1.aaaa.21106.856734914@ariel.healthnet.org> 
+    <2.aaaa.21106.856734914@ariel.healthnet.org> 
+    <3.aaaa.21106.856734914@ariel.healthnet.org>
+
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+</body>
+</html>
+
+
+

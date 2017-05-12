@@ -1,0 +1,93 @@
+---
+abstract: 'A Toolkit for working with Git::Wrapper in an Object Oriented Way.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Wrapper-Plus
+provides:
+  Git::Wrapper::Plus:
+    file: lib/Git/Wrapper/Plus.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Branches:
+    file: lib/Git/Wrapper/Plus/Branches.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Ref:
+    file: lib/Git/Wrapper/Plus/Ref.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Ref::Branch:
+    file: lib/Git/Wrapper/Plus/Ref/Branch.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Ref::Tag:
+    file: lib/Git/Wrapper/Plus/Ref/Tag.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Refs:
+    file: lib/Git/Wrapper/Plus/Refs.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Support:
+    file: lib/Git/Wrapper/Plus/Support.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Support::Arguments:
+    file: lib/Git/Wrapper/Plus/Support/Arguments.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Support::Behaviors:
+    file: lib/Git/Wrapper/Plus/Support/Behaviors.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Support::Commands:
+    file: lib/Git/Wrapper/Plus/Support/Commands.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Support::Range:
+    file: lib/Git/Wrapper/Plus/Support/Range.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Support::RangeDictionary:
+    file: lib/Git/Wrapper/Plus/Support/RangeDictionary.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Support::RangeSet:
+    file: lib/Git/Wrapper/Plus/Support/RangeSet.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Tags:
+    file: lib/Git/Wrapper/Plus/Tags.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Tester:
+    file: lib/Git/Wrapper/Plus/Tester.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Util:
+    file: lib/Git/Wrapper/Plus/Util.pm
+    version: '0.004011'
+  Git::Wrapper::Plus::Versions:
+    file: lib/Git/Wrapper/Plus/Versions.pm
+    version: '0.004011'
+recommends:
+  Moo: '1.000008'
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Git::Wrapper: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  Sort::Versions: '0'
+  Sub::Exporter::Progressive: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Git-Wrapper-Plus/issues
+  homepage: https://github.com/kentnl/Git-Wrapper-Plus
+  repository: https://github.com/kentnl/Git-Wrapper-Plus.git
+version: '0.004011'

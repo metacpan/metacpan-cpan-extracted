@@ -1,0 +1,23 @@
+---
+abstract: "This is the Git.pm, plus the other files in the perl/Git directory, from github's git/git."
+author:
+  - 'Really Just Maintainer <msouth@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Error: '0'
+  Fcntl: '0'
+  IPC::Open2: '0'
+  Time::Local: '0'
+  perl: '5.008'
+version: '0.41'

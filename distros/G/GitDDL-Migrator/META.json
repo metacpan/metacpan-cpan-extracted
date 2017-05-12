@@ -1,0 +1,88 @@
+{
+   "abstract" : "database migration utility for git managed SQL extended L<GitDDL>",
+   "author" : [
+      "Masayuki Matsuki <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GitDDL-Migrator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GitDDL" : "0.03",
+            "Mouse" : "0",
+            "SQL::Translator" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::mysqld" : "0"
+         },
+         "requires" : {
+            "DBI" : "0",
+            "Test::Git" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0",
+            "Test::Requires::Git" : "1.005"
+         }
+      }
+   },
+   "provides" : {
+      "GitDDL::Migrator" : {
+         "file" : "lib/GitDDL/Migrator.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/GitDDL-Migrator/issues"
+      },
+      "homepage" : "https://github.com/Songmu/GitDDL-Migrator",
+      "repository" : {
+         "url" : "git://github.com/Songmu/GitDDL-Migrator.git",
+         "web" : "https://github.com/Songmu/GitDDL-Migrator"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ]
+}

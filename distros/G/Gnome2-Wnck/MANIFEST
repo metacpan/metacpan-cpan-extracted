@@ -1,0 +1,31 @@
+ChangeLog
+copyright.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+maps
+NEWS
+perl-Gnome2-Wnck.spec.in
+README
+t/Wnck.t
+t/WnckApplication.t
+t/WnckClassGroup.t
+t/WnckPager.t
+t/WnckScreen.t
+t/WnckSelector.t
+t/WnckTasklist.t
+t/WnckWindow.t
+t/WnckWorkspace.t
+Wnck.pm
+wnck2perl.h
+xs/Wnck.xs
+xs/WnckApplication.xs
+xs/WnckClassGroup.xs
+xs/WnckPager.xs
+xs/WnckScreen.xs
+xs/WnckSelector.xs
+xs/WnckTasklist.xs
+xs/WnckWindow.xs
+xs/WnckWorkspace.xs
+META.yml                                 Module meta-data (added by MakeMaker)

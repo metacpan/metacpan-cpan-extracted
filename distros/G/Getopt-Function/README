@@ -1,0 +1,32 @@
+	Getopt::Function - interface to Getopt::Mixed based on
+	function calls
+
+*************************************************************************
+This is an experimental alpha release.  All interfaces are subject to
+change.  Little experience is available on the quality and reliability
+of the software.
+*************************************************************************
+
+Getopt::Function is designed to provide a more sophisticated interface
+to Getopt::Mixed.  It's key disadvantage is some more overhead.  It is
+most suitable for use in large programs which have a large number of
+complex options.  
+
+Features:-	
+
+	makes coding easier by simply storing options code in a hash
+
+	makes documenting options automatic, in particular,
+	--help/--usage,  --help-opt and --version functions are
+	standard features.
+
+I expect to have some interface to negative options (--no-delete as
+opposed to --delete) via new symbols in the options list.  This part
+of the interface should not interfere with the current interface
+though. 
+
+Obviously this package requres Getopt::Mixed to be installed to be
+useful.  
+
+This package is available uder the terms of the GNU Public
+license.  Please see the file COPYING included.

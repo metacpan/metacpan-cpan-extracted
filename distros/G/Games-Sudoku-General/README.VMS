@@ -1,0 +1,35 @@
+Installation considerations specific to the VMS operating system.
+
+You will of course need a VMS version of GZIP, and VMSTAR, just to
+unpack the kit.
+
+In lieu of 'make', you need either MMS or MMK. The former should
+be available from Hewlett-Packard, but the last time I priced it
+(quite a while back, before Compaq bought DEC and H-P bought
+Compaq) it was fairly pricey. MMK is free, and available from
+http://www.madgoat.com/mmk.html
+
+Since the package is pure Perl, you can also install by copying
+General.pm to the appropriate place in your @INC directories,
+creating directory Games and Sudoku if necessary and placing
+General.pm in the latter.
+
+The executable needs to be run through the following (or something
+equivalent) to be useful:
+
+$fn = 'sudokug'
+$fhi = FileHandle->new ("<$fn") or die <<eod;
+Error - Unable to open $fn
+        $!
+eod
+$fho = FileHandle->new (">$fn.com") or die <<eod;
+Error - Unable to open $fn.com
+        $!
+eod
+print $fho "$Config{startperl}\n";
+while (<$fhi>) {print $fho $_}
+
+This needs to be executed from the bin directory of the expanded
+kit. Place the resultant .com file in a directory that is in your
+DCL$PATH. Or, place it with the other Perl scripts, and make sure
+your DCL$PATH includes this directory.

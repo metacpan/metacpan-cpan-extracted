@@ -1,0 +1,26 @@
+Changes
+COPYING
+debian/changelog
+debian/control
+debian/copyright
+debian/NOTES.debian
+debian/README.debian
+debian/rules
+examples/ccurve
+examples/movingeye
+examples/README.examples
+examples/rothello
+examples/spiralbox
+examples/spiraltext
+INSTALL
+Libplot.pm
+Libplot.xs
+Makefile.PL
+MANIFEST
+README
+test.pl
+typemap
+util/plot.h
+util/trans
+util/transout
+META.yml                                 Module meta-data (added by MakeMaker)

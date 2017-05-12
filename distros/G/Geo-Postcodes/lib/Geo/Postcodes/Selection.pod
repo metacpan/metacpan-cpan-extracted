@@ -1,0 +1,463 @@
+=head1 NAME
+
+Geo::Postcodes::Selection - How to use the selection procedure/method of the
+Geo::Postcodes::* modules.
+
+=head1 INTRODUCTION
+
+This document uses the fictious country I<Utopia> (with country code 'U2'),
+and the rest of this document will refer to the non-existent module
+C<Geo::Postcodes::U2>.
+
+=head1 SELECTION
+
+=head2 selection procedure
+
+ my @postcodes = Geo::Postcodes::U2::selection($field => $value);
+
+This simple form will give a list of postcodes matching the specified field
+and value. Substitute 'U2' by a valid country subclass. The fields can be 
+anyone given by the C<Geo::Postcodes::U2::get_fields()> call, and the value
+either a literal text or a regular expression. The resulting list of postcodes
+is sorted. An empty list is also returned if one ore more of the arguments are
+invalid, but this can be checked by using the I<verify_selectionlist>
+procedure described later on.
+
+It is possible to specify more than one field/value pair, but then the mode 
+should be given (but it will default to 'and' otherwise). Use as many
+field/value-pairs as required. The mode can be specified initially, between
+the field/value pairs, or not at all.
+
+The following examples are equivalent:
+
+ Geo::Postcodes::U2::selection('and', $field  => $value, 
+                                      $field2 => $value2);
+ Geo::Postcodes::U2::selection(       $field  => $value,
+                               'and', $field2 => $value2);
+ Geo::Postcodes::U2::selection(       $field  => $value,
+                                      $field2 => $value2);
+
+The field/value pairs are evaluated in the specified order, and the modes
+can be mixed freely:
+
+ Geo::Postcodes::U2::selection($field1 => $value1,
+                     'and',    $field2 => $value2,
+                     'or',     $field3 => $value3,
+                     'or not', $field3 => $value3,
+                     'and not, $field4 => $value4,
+                     'xor',    $field5 => $value5);
+
+=head3 Modes
+
+The modes (except 'all', 'none', 'not', and 'one') can be summarised by the
+following truth table:
+
+ A  B | and and nand nand nor nor  or or  xnor xnor xor xor
+      |     not      not      not     not      not      not
+ -----+----------------------------------------------------
+ 0  0 |  0   0   1    1    1   0   0   1   1    0    0   1
+ 0  1 |  0   0   1    1    0   1   1   0   0    1    1   0
+ 1  0 |  0   1   1    0    0   0   1   1   0    1    1   0
+ 1  1 |  1   0   0    1    0   0   1   1   1    0    0   1
+
+Using 'not' after the mode negates the second argument, and the 'nxxx'
+variants negate the result.
+
+=over
+
+=item all
+
+All the postcodes. This mode is only legal as the first argument, and any additional
+arguments are silently ignored.
+
+ my @postcodes = Geo::Postcodes::U2::selection('all');
+
+This will return I<all> the postcodes, as a sorted list. 
+
+This is the same as I<sort get_postcodes()>. The object oriented version
+(see below for syntax) will return a postcode object for each postcode,
+and may be handy in some circumstances - if time and memory usage is
+of no concern. Otherwise create the postcode objects only when needed,
+inside a I<foreach>-loop on the procedure version - or use
+L<selection_loop>.
+
+=item and
+
+The postcode is included in the result if it is included in B<all> the expressions.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'and', $field2 => $value2);
+
+Return postcodes matching I<all> the field/value pairs.
+
+The computation will work faster if the field/value pairs are given with the one with
+the most matches first, and the one with the least matches last.
+given first
+
+=item and not
+
+The postcode is included in the result if it is included in B<the first expression,
+but not the second one>.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'and not', $field2 => $value2);
+
+Return the postcodes I<not> matching any of the field/value pairs. (This is the same as
+C<all - or>, on sets of postcodes.)
+
+=item nand
+
+The postcode is included in the result if it is included in B<none or only
+one> of the expressions.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'nand', $field2 => $value2);
+
+=item nand not
+
+The postcode is included in the result unless it is included in B<the first
+but not the second expression only>.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'nand not', $field2 => $value2);
+
+=item nor
+
+The postcode is included in the result if it is included in B<none of> the
+expressions.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'nor', $field2 => $value2);
+
+=item nor not
+
+The postcode is included in the result if it is included in B<the second expression only>.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'nor not', $field2 => $value2);
+
+=item none
+
+This will return absolutely nothing.
+
+This mode is only legal as the first argument, and any additional
+arguments are silentliy ignored.
+
+ my @postcodes = Geo::Postcodes::U2::selection('none');
+
+This will return I<undef>. 
+
+=item not
+
+This mode can be used initially (as the first argument) to negate the first
+field/value pair. It is also possible to use 'and not' or any other
+'xxx not'-mode initially.
+
+Note that 'not' is not a valid mode, and it will default to 'and' for any
+additional field/value pairs if no mode is given.
+
+The following examples are equivalent:
+
+ Geo::Postcodes::U2::selection('not',     $field  => $value,
+                               'and',     $field2 => $value2);
+ Geo::Postcodes::U2::selection('not',     $field  => $value, 
+                                          $field2 => $value2);
+ Geo::Postcodes::U2::selection('or not',  $field  => $value,
+                               'and',     $field2 => $value2);
+ Geo::Postcodes::U2::selection('and not', $field  => $value,
+                               'and',     $field2 => $value2);
+ Geo::Postcodes::U2::selection('and not', $field  => $value,
+                                          $field2 => $value2);
+
+The following examples are equivalent:
+
+ Geo::Postcodes::U2::selection('or not', $field  => $value,
+                                         $field2 => $value2);
+ Geo::Postcodes::U2::selection('not',    $field  => $value,
+                               'or not', $field2 => $value2);
+
+=item one
+
+This mode can be used initially to limit the returned list of postcodes to just
+one (or zero). The returned postcode is chosen randomly from the result list.
+
+ Geo::Postcodes::U2::selection('one', $field => $value);
+
+It can also be used on its own, just to get a random postcode.
+
+ Geo::Postcodes::U2::selection('one');
+
+=item or
+
+The postcode is included in the result if it is included in at least B<one of> the
+expressions.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'or', $field2 => $value2);
+
+Return postcodes matching I<one or more> of the field/value pairs.
+
+The computation will work faster if the field/value pairs are given with the one with
+the least matches first, and the one with the most matches last.
+given first
+
+=item or not
+
+The postcode is included in the result unless it is B<included in the second
+expression only>.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'or not', $field2 => $value2);
+
+It is also possible to achieved this by using 'or' and a reversed regular expression.
+
+=item xnor
+
+The postcode is included in the result if it is included in B<none or both> expressions.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'xnor', $field2 => $value2);
+
+=item xnor not
+
+The postcode is included in the result if it is included in B<only one of> the
+expressions. This mode is the same as 'xor'.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'xnor not', $field2 => $value2);
+
+=item xor (exlusive or)
+
+The postcode is included in the result if it is included in B<only one of> the expressions.
+
+ my @postcodes = Geo::Postcodes::U2::selection(
+    $field1 => $value1, 'xor', $field2 => $value2);
+
+=item xor not
+
+The postcode is included in the result if it is included in B<both or none> of
+the expressions.
+
+=back
+
+=head3 The Search Value
+
+The search value is parsed as the regular expression C<m{^$value$}i>.
+This has the following implications:
+
+=over
+
+=item m{...}i
+
+The trailing i means that the search is done case insensitive. This does not work for
+the special norwegian and danish characters 'Æ', 'Ø' and 'Å' (as used in the subclasses
+'NO' and 'DK') unless a C<use locale> is used in the program, and the current locale
+supports these characters. (This will probably not work when the code is running with
+mod_perl on a web server.)
+
+I<'As'> will match 'AS', 'As', 'aS', and 'as'.
+
+=item m{^...$}
+
+The first (I<^>; caret) and last (I<$>; dollar sign) character inside
+the expression force a matcth to the whole expression. 
+
+I<'AS'> will match exactly the four variations mentioned above, and
+nothing else (so that 'CHAS' or 'ASIMOV' will not match).
+
+Use L<"Wildcards"> or L<"Regular expressions"> to match several
+characters at once.
+
+=back
+
+=head3 Wildcards
+
+The character I<%> (the percent character) will match zero or more
+arbitrary characters (and is borrowed from standard SQL).
+
+I<'%12'> will match '1112' but not '1201'. I<'O%D'> will match all
+strings starting with an 'O' and ending with a 'D'. I<'%A%'> will match all
+strings with an 'A' somewhere.
+
+(The character I<%> is changed to the regular expression '.*' (dot star)
+by the module.)
+
+=head3 Regular expressions
+
+=over
+
+=item .
+
+The character . (a single dot) will match exactly one character.
+
+I<'..11'> will match a four character string, where the first two can be anything,
+followed by '11'.
+
+=item ?
+
+The character ? (a question mark) will match the previous character
+zero or one time.
+
+I<'%ØYA?'> will match strings ending with 'ØY' or 'ØYA'.
+
+=item '*'
+
+The character * (a star) will match the previous character zero or
+more times. 
+
+=item []
+
+The expression I<'[AB]'> will match one of 'A' or'B'.
+
+I<%'[AB]'> will match all names ending with an 'A' or 'B'.
+
+=item ()
+
+The expression I<'(..)'> will remember the part inside the paranthesis.
+See the next item for usage.
+
+It can also be used in combination with back references; C<\1>, C<\2>
+and so on. I<(..)\1> will match postcodes starting with two caharcters,
+and ending with the same ones (e.g. '1919', 7272', but not '1221').
+I<(.)(.)\2\1> will match postcodes where the first and fourth digit is
+the same, and the second and third digit is the same.
+
+=item |
+
+The expression I<'A|BBB'> will match either 'A' or 'BBB'.
+
+Be careful with this construct, as I<'%ÅS|%SKOG'> will B<not>
+match '%ÅS' or '%SKOG', but rather everything starting with 'ÅS'
+or ending with 'SKOG' - caused by the C<'^...$'> that the expression
+is wrapped in. Use I<'%(ÅS|SKOG)'> to get the desired result.
+
+=back
+
+=head3 External Procedures
+
+It is also possible to call external procedures, and have them decide if the
+postcode should be included. Specify C<'procedure', \&procedure_to_do_the_job>
+instead of a field/value pair.
+
+The procedure is passed the postcode, and must return true or false.
+
+ sub procedure_to_do_the_job
+ {
+   my postcode = shift;
+   return 1 if ...
+   return 0;
+ }
+
+=head2 selection method
+
+ my @postcodobjects = Geo::Postcodes::U2->selection(xxxx);
+
+This works just as the procedure version (see above), but will return
+a list of postcode objects (instead of just a list of postcodes).
+
+=head2 When not to use Selection
+
+Do not use I<selection> when you are after a single postcode, but use
+the constructor (the I<new> call) or the I<xxx_of> procedures to access
+the values of the fields directly.
+
+  my @obj_list = Geo::Postcodes::U2->selection('postcode' -> '1178');
+  my $obj      = Geo::Postcodes::U2->new('1178');
+
+Using I<selection> causes a loop that iterates over all the postcodes, and
+this is not a good idea when you have the answer already - a single postcode.
+
+The C<valid> procedure can be used to check if the postcode actually
+exist. See the tutorial.
+
+=head1 SELECTION_LOOP
+
+It is possible, even adviceable, to use external procedures in the argument
+list to the I<selection> call itself, if the procedure is only used to select
+from the postcodes. The procedure shown in this section have a I<print>
+statement, and is okay - if somewhat contrived.
+
+=head2 selection_loop procedure
+
+The first argument is a pointer to a procedure which will be called for
+each postcode returned by the I<selection> call, with the rest of the
+arguments.
+
+ sub post_check
+ {
+   my $postcode = shift;
+   print "$postcode\n" if something($postcode) > 3.14;
+ }
+
+ Geo::Postcodes::U2::selection_loop(\&post_check, xxx, yyy);
+
+=head2 selection_loop method
+
+As above, but the value passed to the specified procedure is a postcode
+object.
+
+ sub post_check
+ {
+   my $object = shift;
+   print $object->postcode() . "\n" if something($object->postcode()) > 3.14;
+ }
+
+ Geo::Postcodes::U2->selection_loop(\&post_check, xxx, yyy);
+
+=head1 SUPPORTING PROCEDURES
+
+=head2 verify_selectionlist
+
+The I<selection> procedure/method will return an empty list, if there are
+errors in the argument list, or if the selection did not find any matches. Use
+this procedure (from the child class) to verify that the arguments are valid
+for use by the I<selection> procedure/method.
+
+ my($status, @list) = Geo::Postcodes::U2::verify_selectionlist(@arguments);
+
+A status value of true (1) is followed by a modified version of the original
+arguments. This will replace things as 'and' 'not' by 'and not', but the
+I<selection> procedure/method copes with both. (The returned list may be
+optimised in future versions of the module.)
+
+A status value of false (0) is followed by a list of diagnostic messages, up to
+the point where the verification failed.
+
+External procedures are recognised, and must actually exist for the test to
+accept them.
+
+=head2 Geo::Postcodes::is_legal_selectionmode
+
+Returns true if the mode is one of the list returned by C<get_selectionmodes>,
+documented below. 
+
+=head2 Geo::Postcodes::is_legal_initial_selectionmode
+
+Returns true if the mode is one of the list returned by
+C<get_initial_selectionmodes>, documented below.
+
+=head2 Geo::Postcodes::get_selectionmodes
+
+A sorted list of legal selection modes; 'and', 'and not', 'nand', 'nand not',
+'nor', 'nor not', 'or', 'or not', 'xnor', 'xnor not', 'xor' and 'xor not'.
+
+=head2 Geo::Postcodes::get_initial_selectionmodes
+
+As L<Geo::Postcodes::get_selectionmode>, with the addition of 'all', none',
+'not' and 'one'. The list is sorted.
+
+=head1 SEE ALSO
+
+The tutorial I<perldoc Geo::Postcodes::Tutorial> or
+I<man Geo::Postcodes::Tutorial>, and the documentation for the individual
+country modules; e.g. I<perldoc Geo::Postcodes::NO> or
+I<man Geo::Postcodes::NO>.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Arne Sommer - perl@bbop.org
+
+This library is free software; you can redistribute them and/or modify
+it under the same terms as Perl itself.
+
+=cut

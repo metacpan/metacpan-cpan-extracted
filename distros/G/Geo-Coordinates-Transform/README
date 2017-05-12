@@ -1,0 +1,38 @@
+Geo-Coordinates-Transform version 0.10
+====================================
+
+No dependencies and should run on any platform 
+
+A simple module performing a simple but useful function. Useful
+when working between different software packages and hardware
+devices that have different format preferences.
+
+Unique capability...
+
+  1. Do not need to know lat/long format of input data a priori
+
+  2. Input data can be mixed ie a list where one is DD.DDDDD and
+  another DD MM.MMM format.
+
+  3. List oriented input/output
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None... 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Steve Troxel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

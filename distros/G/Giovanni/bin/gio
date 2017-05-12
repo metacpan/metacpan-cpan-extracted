@@ -1,0 +1,159 @@
+#!/usr/bin/env perl
+#
+# PODNAME: gio
+
+use 5.010;
+use strict;
+use warnings;
+use Giovanni;
+use Getopt::Long;
+use Pod::Usage;
+use Config::GitLike;
+
+my $help;
+my $man;
+my $conf  = '.giovanni.conf';
+my $debug = 0;
+my $offset;
+
+GetOptions(
+    "offset|o=s" => \$offset,
+    "config|c=s" => \$conf,
+    "help|h"     => \$help,
+    "debug|d"    => \$debug,
+    "man"        => \$man,
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+my $command = pop(@ARGV);
+pod2usage(2) unless $command;
+
+my $config = Config::GitLike->load_file($conf);
+my $cnf;
+foreach my $line (keys %{$config}) {
+    my (undef, $name, $key) = split(/\./, $line);
+    $cnf->{$name}->{$key} = $config->{$line};
+}
+
+foreach my $project (keys %{$cnf}) {
+    $cnf->{$project}->{project} = $project;
+    $cnf->{$project}->{command} = $command;
+    my $gio = Giovanni->new(debug => $debug, config => $cnf->{$project});
+    if(exists $cnf->{$project}->{hipchat_token}){
+        $gio->notifyer('HipChat');
+    }
+
+    given ($command) {
+        when ('deploy') {
+            print "Running deploy for '$project'\n";
+            $gio->deploy;
+        }
+        when ('rollback') {
+            print "Running rollback for '$project'\n";
+            $gio->rollback($offset);
+        }
+        when ('restart') {
+            print "Running restart for '$project'\n";
+            $gio->restart;
+        }
+        default { print "Could not find command '$command'\n"; }
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gio
+
+=head1 VERSION
+
+version 1.12
+
+=head1 SYNOPSIS
+
+gio [options] [deploy|rollback|restart]
+
+ Options:
+   --config|c        config file to use
+   --offset|o        offset to start from in stage list
+   --help|h          brief help message
+   --debug|d         turn on debug output
+   --man             full documentation
+
+=head1 AUTHOR
+
+Lenz Gschwendtner, C<< <lenz@springtimesoft.com> >>
+
+=head1 CONFIG
+
+To configure a project to use Giovanni simply put a `.giovanni.conf`
+file in the root directory of your project and run `gio deploy`. The
+syntax of the config for timestamped rollouts looks like this:
+
+    [project "PROJECT"]
+        hosts    = HOST, IP
+        root     = /usr/local/PROJECT
+        init     = /etc/init.d/START_STOP_SCRIPT
+        deploy   = update_cache, rollout_timestamped, restart_phased, cleanup_timestamped, notify
+        rollback = rollback_timestamped, restart_phased, notify
+        repo     = git://github.com/PROJECT.git
+        cache    = /tmp/repo_cache/
+        user     = DEPLOY USER
+        jabber_user = USER@jabber.org
+        jabber_pass = PASS
+        jabber_to = ROOM@conference.jabber.org
+
+The config for a deployment into the git checkout directory looks like
+this:
+
+    [project "PROJECT"]
+        hosts    = HOST, IP
+        root     = /var/www/PROJECTNAME
+        init     = /etc/init.d/START_STOP_SCRIPT
+        deploy   = update_cache, rollout, restart, cleanup_timestamped, notify
+        rollback = rollback, restart, notify
+        repo     = git://github.com/PROJECT.git
+        user     = DEPLOY USER
+        jabber_user = USER@jabber.org
+        jabber_pass = PASS
+        jabber_to = ROOM@conference.jabber.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<< <lenz@springtimesoft.com> >>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the man command.
+
+    man gio
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks for capistrano for showing me how to deploy nicely
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2011 Lenz Gschwendtner, springtimesoft LTD, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Lenz Gschwendtner <mail@norbu09.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by ideegeo Group Limited.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

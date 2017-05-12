@@ -1,0 +1,33 @@
+Changes for Graphics::Potrace
+
+Changes for Graphics::Potrace
+
+0.76      2016-09-12 22:14:05+02:00 Europe/Rome
+   - Dist::Zilla cosmetics
+   - Fix bug showing up in Mac OS X related to integer/long sizes
+     (courtesy Boris Zentner)
+     https://github.com/polettix/Graphics-Potrace/pull/3
+   - Fix bug in EPS generator (courtesy Boris Zentner)
+
+0.75      2015-09-01 13:29:21+02:00 Europe/Rome
+   - created alias "text" for loading data from scalar, makes
+     example in documentation work
+   - irrelevant change to make dzil happy about setting
+     VERSION in Graphics::Potrace
+
+0.74      2015-01-11 19:10:13 Europe/Rome
+   - no change to code, only to ancillary installation and
+     documentation files
+   - thanks to Ben Bullock for documentation cleanup hints
+
+0.73      2013-12-27 04:42:38 Europe/Rome
+   - got feedback from Peter Selinger about his surname
+   - bumped copyright notice to include 2013 too
+
+0.72      2013-08-03 20:10:30 Europe/Rome
+   - Added one test on trace
+   - release!
+
+0.1.0_03  2012-03-04 01:11:20 Europe/Rome
+   - Checking for potrace executable before generating Makefile
+   - Added README.md to the project

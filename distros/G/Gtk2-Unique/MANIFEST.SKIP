@@ -1,0 +1,9 @@
+^build/
+^Makefile$
+^Makefile[.]old$
+^xs/.*[.][co]$
+^blib/
+^pm_to_blib$
+^[.]git
+^Unique[.]bs$
+^Gtk2-Unique-.+\.tar\.gz$

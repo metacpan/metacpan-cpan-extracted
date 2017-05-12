@@ -1,0 +1,149 @@
+Messages.pm version 0.05
+========================
+
+=head1 NAME
+
+Games::Messages - Random messages for common situations in games
+
+=head1 SYNOPSIS
+
+  use Games::Messages qw/:all/;
+
+  print player_wins($player);
+  # prints something like "$player wins." or "Hurray for $player!"
+
+  print player_loses($player);
+  # prints something like "$player is gone with the wind."
+
+  print computer_beats_computer();
+  # prints something like "The winner: Computer!! The loser:
+  # Computer!! Hurray...'
+
+  print computer_beats_player($player);
+  # prints something like 'Maybe you should leave the game to me and
+  # go do something else.'
+
+  print player_beats_computer($player);
+  # prints something like "Next time my AI will be better, you'll see"
+
+  print player_beats_player($winner, $loser);
+  # prints something like '$winner wipes the floor with $loser.'
+
+  print player_is_idle($player);
+  # prints something like 'I hope you have a good reason for leaving
+  # me here alone.'
+
+  print player_exagerates($player);
+  # prints something like 'Enough is enough, you know?'
+
+=head1 DESCRIPTION
+
+Games::Messages returns random messages for common situations in
+games.
+
+=head1 FUNCTIONS
+
+There are eight functions available, suitable for different
+situations.
+
+There are functions for situations where a computer interacts with a
+human player. However, if your computer player has a name, you might
+consider using instead the function I<player_beats_player>, passing as
+parameters the name of the winning player (which might be human or
+not) and the defeated player (likewise).
+
+Messages returned are meant as direct speech directed to the human
+player (that is, the person with the keyboard; yes, you). They might
+not be suitable for anything else apart than showing them to that
+person.
+
+=head2 player_wins
+
+Returns a message suitable for a player who has won a game.
+
+  print player_wins($player_name);
+  # that prints something like "$player_name wins."
+
+=head2 player_loses
+
+Returns a message suitable for a player who has lost a game.
+
+  print player_loses($player_name);
+  # that prints something like "No more $player_name."
+
+=head2 computer_beats_computer
+
+Returns a message suitable for a situation where a computer player as
+defeated another computer player.
+
+  print computer_beats_computer();
+  # that prints something like 'Oh yeah... I just love playing against
+  # myself...'
+
+=head2 computer_beats_player
+
+Returns a message suitable for a situation where a computer has
+defeated a human player.
+
+  print computer_beats_player($player_name);
+  # that prints something like "I tell you... artificial intelligence
+  # rulez!"
+
+=head2 player_beats_computer
+
+Returns a message suitable for a situation where a human player has
+defeated a computer player.
+
+  print player_beats_computer($player_name);
+  # that prints something like "$player_name rulez."
+
+=head2 player_beats_player
+
+Returns a message suitable for a situation where a human player has
+beaten another human player.
+
+  print player_beats_player($winner_name, $loser_name);
+  # that prints something like "$winner_name beats the hell out of
+  # $loser_name."
+
+=head2 player_is_idle
+
+Returns a message suitable to be shown to an idle user.
+
+  print player_is_idle($player_name);
+  # that prints something like 'Gone to the bathroom, uh?'
+
+=head2 player_exagerates
+
+Returns a message suitable to be shown to a player who is exagerating
+and should leave the game.
+
+  print player_exagerates($player_name);
+  # that prints something like "Don't you think it's about time you
+  # turn me off?"
+
+=head1 TO DO
+
+=over 6
+
+=item * More messages;
+
+=item * Offensive messages;
+
+=item * Perhaps a way to guarantee that messages don't repeat
+themselves too fast? (that is, go through all messages before
+repeating one?)
+
+=back
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog@cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004 Jose Castro, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,148 @@
+Revision history for Perl module Getopt::Lucid
+
+1.08      2017-04-15 22:49:56-04:00 America/New_York
+
+    - Fixed for perls without . in @INC
+
+1.07      2016-08-20 21:53:47-04:00 America/New_York
+
+    - update SYNOPSIS to correct a bug
+
+1.06      2016-01-11 11:18:37-05:00 America/New_York
+
+    - update contributors and repository metadata
+
+1.05      2013-03-28 20:01:43 America/New_York
+
+    - work around parsing bug in perl 5.12
+
+1.04      2013-03-27 11:58:02 America/New_York
+
+    - added error message for missing values for other
+      option types as well
+
+    - fixed some documentation typos
+
+    - removed documentation of 'required' modifier, which was
+      actually removed in 1.00
+
+1.03      2013-03-27 10:23:55 America/New_York
+
+    - added error message for missing parameter value
+
+1.02      2013-03-22 23:44:15 America/New_York
+
+    - added newlines to error messages
+
+1.01      2012-02-23 18:07:19 EST5EDT
+
+    - fixed validation() to make hashref argument actually optional like
+      the documentation says it is [rt.cpan.org #74269]
+    - fixed typos in Pod
+
+1.00      2011-12-10 23:32:42 EST5EDT
+
+    - new() takes optional hashref of parameters
+    - Remove global $STRICT and replace with 'strict' object parameter
+    - Remove 'required' modifier for parameters and provide a new
+      'validate' method for late checking of prerequisites
+    - Fix missing $VERSION
+
+0.19      2010-11-05 17:07:26 EST5EDT
+
+    - Added valid() modifier and deprecated old way of validating options
+    - Added getopts() as an alias for getopt()
+    - Allows setting param default to undef [Robert Bohne]
+
+0.18 Thu Mar 12 00:11:11 EDT 2009
+    - Options with validation specs will not fail just because the option
+      is not seen on the command line.  Validation is now only done on default
+      values provided in the spec or in merge/append/replace (to ensure
+      consistency) and on options that appear on the command line.
+
+0.17 Thu Feb 21 07:15:40 EST 2008
+    - Clarify 5.006 as minimum requirement; updated other minimum requirements
+    - A repeated param option now replaces instead of throwing an error
+    - Fix for ambiguous param bug (RT#33462, patch from Torsten Link)
+    - Updated distribution packaging (custom Build.PL, author tests moved
+      to xt/ directory, documentation with Pod::WikiDoc, etc.)
+    - Changed to the Apache License, version 2.0; (it's clearer, relicensable,
+      and is explicit about contributions)
+
+0.16 Thu Aug 17 23:04:38 EDT 2006
+    - Required Param options with validation no longer throw and error
+      from failing to validate the default empty-string (fixes RT#20938)
+    - Clarified documentation about validation and default values
+    - Various Pod revisions
+
+0.14 Wed Feb  8 11:32:22 EST 2006
+    - fixed typo in Pod
+    - removed Test::Exception dependencies
+    - removed 5.006 specific syntax
+    - added optional pod/podcoverage tests (skipped by default)
+    - switching to even numbering for releases
+
+0.12 Tue Sep 20 13:10:19 EDT 2005
+    - added support for option names with GNU-style dashes; accessors
+      substitute underscore for dashes. (Suggested by Steven Vasilogianis)
+
+0.11 Sat Jul 30 11:03:46 EDT 2005
+    - moved build_requires prereqs into requires to work around
+      a CPANPLUS bug for users preferring Build.PL
+    - replaced Clone::Any::clone with Storable::dclone for fewer
+      non-core dependencies
+    - removed Cookbook stub for now
+
+0.10 Tue Jul 12 19:28:59 EDT 2005
+    - Single character (alphanumeric) switches
+    - Exception-based error handling
+    - Specification validation
+    - Command-line validation against spec
+    - Bundled single-character switches
+    - Long-style (alphanumeric) switches
+    - Long/short/multiple switch aliases
+    - Keys in resulting option hash are names stripped of any leading dashes
+    - Option names/aliases must be unique
+    - Option termination string "--"
+    - Counters
+    - Parameters (w/o "=") (values can't be ambiguous)
+    - Parameters (w "=")
+    - Lists
+    - Pass through non-options (preserving order)
+    - Throw exceptions on unrecognized non-bareword options
+    - Check for valid and invalid option name characters
+    - Keypairs (e.g. "--define os=linux")
+    - Bareword options
+    - Required options
+    - Default values
+    - Case insensitivity
+    - Validation (regex)
+    - Validation (code subroutine)
+    - Dependencies
+    - parse other arrays than @ARGV
+    - names() function
+    - accessors for options in spec
+    - merge() function
+    - pass through single dash
+    - provide separate merge_default() and add_default() functions
+    - require option_spec for new()
+    - make getopt call new if called as a class function and return the object
+      not a hash of options
+    - provide defaults() and reset_defaults() functions
+    - rename push_defaults to append_defaults
+    - make sure merge_defaults ignores anything not in the spec
+    - implement replace_defaults()
+    - make *_defaults check that lists/keypairs are passing right type
+    - Support *_defaults() taking a hashref or a hash as input
+    - revamp argument spec to new, simpler format
+    - validation on lists (validate each value)
+    - validation on keypairs (simple validation for keys/values as a whole)
+    - "magic" mode as the default: take barewords in spec and handle any form
+      that appears to match it
+    - add "strict" argument to use for less magic on names/aliases
+    - Negation (only for switch/counter/parameter bare/longform): 
+      sets to zero/undef
+    - Negation with = (for list/keypair bare/longform):  
+      removes matching element/key
+    - Negation without = (for list/keypair bare/longform): 
+      blanks entire list/hash

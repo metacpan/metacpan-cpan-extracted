@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+lib/Games/Roshambo.pm
+lib/Games/Roshambo/Thrownames.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/pod.t
+throw.pl

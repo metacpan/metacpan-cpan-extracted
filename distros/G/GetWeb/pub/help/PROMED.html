@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>Online Help: PROMED</TITLE>
+</HEAD>
+<BODY>
+<H1>Accessing ProMED archives</H1>
+
+<p>To search the ProMED database, send a message to
+getweb@usa.healthnet.org.  The body of the message should contain the
+line:
+
+<p><code>SEARCH PROMED keyword1 keyword2 ...</code>
+
+<p>Where "keyword1 keyword2 ..." is a list of one or more keywords
+which you expect the documents you're searching for to contain.
+
+<p>For example, to search for articles on yellow fever in ghana,
+send a message:
+
+<p><code>SEARCH PROMED yellow fever ghana</code>
+
+<p>You will get back a list of messages which have text matching
+one or more keywords:
+
+<hr>
+<pre>90%  promed-mail 9612: PRO/AH/EDR> Yellow fever - Ghana[3]
+78%  promed-mail 9611: Yellow fever, imported - USA from Brazil[4]
+
+...
+
+[3] http://www.healthnet.org/programs/promed-hma/9612/0010.html
+[4] http://www.healthnet.org/programs/promed-hma/9611/0040.html<pre>
+<hr>
+
+<p>To access the message titled "Yellow fever - Ghana", look at the
+end of the message for an index of hypertext links and choose the link
+for 3.  Then send another message to getweb@usa.healthnet.org:
+
+<p>GET http://www.healthnet.org/programs/promed-hma/9611/0040.html
+
+<hr>
+
+<p><A HREF=HELP.html>Back to the main help page</A>
+</BODY>
+</HTML>

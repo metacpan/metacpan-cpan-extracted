@@ -1,0 +1,133 @@
+NAME
+    Geo::OSM::StaticMap - Generate URLs to Open Street Map static maps
+
+VERSION
+    version 0.4
+
+SYNOPSIS
+        my $staticmap = Geo::OSM::StaticMap->new(
+            center  => [ 48.213950, 16.336290 ], # lat, lon
+            zoom    => 17,
+            size    => [ 756, 476 ], # width, height
+            markers => [ [ 48.213950, 16.336290, 'red-pushpin' ] ], # lat, lon, marker
+            maptype => 'mapnik',
+        );
+
+        my $url = $staticmap->url();
+
+        # Alternatively let center and zoom be calculated from markers
+        my $staticmap_url = Geo::OSM::StaticMap->new(
+            size    => [ 756, 476 ], # width, height
+            markers => [ [ 51.8785011494, -0.3767887732, 'ol-marker' ],
+                         [ 51.455313, -2.591902, 'ol-marker' ], ],
+                         # lat, lon, marker
+        )->url();
+
+DESCRIPTION
+    Generate URLs for Open Street Map static maps. This is basically a
+    simple wrapper for staticMapLite <http://staticmap.openstreetmap.de/>
+
+    Map center and zoom level will be (not very exactly) calculated from the
+    coordinates of markers given if center and zoom parameters are ommited.
+
+    If no markers are given, the center parameter will default to 0 lat, 0
+    lon which very likely will not be what you need.
+
+    Consult <http://staticmap.openstreetmap.de/> for a list of valid values
+    for markers and maptype.
+
+METHODS
+  url
+    Returns URL string to fetch actual static map image via HTTP(S). All
+    parameters can also be passed to the constructor.
+
+   Parameters
+    baseurl
+        Baseurl of the static map service. Defaults to
+        <http://staticmap.openstreetmap.de/>
+
+    markers
+        Array reference of array references of latitude and longitude pairs
+        with a marker specifier.
+
+        E.g. [ [ 51.8785011494, -0.3767887732, 'ol-marker' ], [ 51.455313,
+        -2.591902, 'ol-marker' ], ]
+
+        See <http://staticmap.openstreetmap.de/> for a list of valid values
+        for markers.
+
+    size
+        Mapsize string. Width and height separated by 'x'
+
+    maptype
+        See <http://staticmap.openstreetmap.de/> for a list of valid values.
+        Defaults to 'mapnik'
+
+    center
+        Array reference to latitude and longitude pair. Will be calculated
+        automatically of ommited and markers have been given.
+
+    zoom
+        OSM zoom level. Will be calculated automatically of ommited and
+        markers have been given.
+
+Private methods
+  _build_center
+    Builder for the center of the map. Defaults to [0,0] which is not useful
+    in most cases.
+
+    Center will be calculated along the markers' bounding box if markers
+    have been given.
+
+  _build_zoom
+    Builder for the OSM zoom level. Defaults to 17. If no center and no zoom
+    parameters but markers have been supplied, zoom level will be calculated
+    along the markers' bounding box
+
+  _midpoint_to
+     $self->midpoint_to( { lat => $lat1, lon => $lon1 }, { lat => $lat2, lon => $lon2 } );
+
+    Returns the midpoint along a great circle path between the two points.
+
+    This function is more or less a copy of Geo::Calc::midpoint_to but
+    without the baggage the module dependencies of Geo::Calc are bringing
+    in.
+
+SEE ALSO
+    Geo::Google::StaticMaps
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Geo::OSM::StaticMap
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-OSM-StaticMap>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Geo-OSM-StaticMap>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Geo-OSM-StaticMap>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Geo-OSM-StaticMap>
+
+ACKNOWLEDGEMENTS
+    Midpoint calculation inspired by Geo::Calc
+
+AUTHOR
+    Michael Kröll <pepl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Michael Kröll.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

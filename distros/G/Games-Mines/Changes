@@ -1,0 +1,10 @@
+0.02  2004-07-18
+	- Finaly figured out how to do tests on a random field.
+	- Added the 'count', 'flags', and 'why' method, to help
+	  make gameplay easier.
+	- Changed a number of recursive method to iteritive methods.
+	- Added a number of hooks into the printing method,
+	  so others can cusomize it better.
+
+0.01  2003-07-21
+Inital release.

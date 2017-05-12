@@ -1,0 +1,64 @@
+dir /usr
+dir /usr/share
+dir /usr/share/doc
+dir /usr/share/doc/gentoolkit-0.2.0_pre8
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/AUTHORS 02702cbcf0d1872d88713d2874f2cc76 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/ChangeLog 9b7f7b712376686d4041a636833ee7d6 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/COPYING 0636e73ff0215e8d672dc4c32c317bb3 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/NEWS d41d8cd98f00b204e9800998ecf8427e 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/README de1106d2f48c3c52e398fbf5ea36e8bf 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/TODO 8dacff3c4b8c57c78d16acd320fbc63b 1080856136
+dir /usr/share/doc/gentoolkit-0.2.0_pre8/equery
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/equery/README d41d8cd98f00b204e9800998ecf8427e 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/equery/AUTHORS 3bc1556c10bdf429c03717e128b50948 1080856136
+dir /usr/share/doc/gentoolkit-0.2.0_pre8/etcat
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/etcat/README 782dd99f37b0706b20b17e41ee5aefd4 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/etcat/AUTHORS 94fa183773a5c8569a26342766e38664 1080856136
+dir /usr/share/doc/gentoolkit-0.2.0_pre8/euse
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/euse/README 8ac906ab7791d60344eb357af4002247 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/euse/AUTHORS ecdc98ddd4a26bb34f3b803d9895c5cc 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/euse/TODO d41d8cd98f00b204e9800998ecf8427e 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/euse/ChangeLog 57066231d3a9286f08afdca9d3b3a08f 1080856136
+dir /usr/share/doc/gentoolkit-0.2.0_pre8/qpkg
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/qpkg/README d41d8cd98f00b204e9800998ecf8427e 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/qpkg/AUTHORS d41d8cd98f00b204e9800998ecf8427e 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/qpkg/ChangeLog b7409f5cc52ebcac5588b0f0c66cdd18 1080856136
+dir /usr/share/doc/gentoolkit-0.2.0_pre8/gentoolkit
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/gentoolkit/AUTHORS d41d8cd98f00b204e9800998ecf8427e 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/gentoolkit/README d41d8cd98f00b204e9800998ecf8427e 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/gentoolkit/TODO d41d8cd98f00b204e9800998ecf8427e 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/gentoolkit/ChangeLog d41d8cd98f00b204e9800998ecf8427e 1080856136
+dir /usr/share/doc/gentoolkit-0.2.0_pre8/revdep-rebuild
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/revdep-rebuild/AUTHORS 5bda47a4b5ecb787f842019eeeaa951a 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/revdep-rebuild/README 8f0ab5f1c0432feadc233a68d2c94527 1080856136
+obj /usr/share/doc/gentoolkit-0.2.0_pre8/revdep-rebuild/TODO 9a709ed26a7f37fae4214da1274100ef 1080856136
+dir /usr/share/man
+dir /usr/share/man/man1
+obj /usr/share/man/man1/euse.1.gz 759a4158ca8b034ea59e63683a581081 1080856136
+obj /usr/share/man/man1/qpkg.1.gz d2fa600355c1b627303110311980f86f 1080856136
+obj /usr/share/man/man1/dep-clean.1.gz 0f51cb3a91235b9ec653822d8be64d3d 1080856136
+obj /usr/share/man/man1/pkg-clean.1.gz 9a47dd02e75b9865056c19b99e342668 1080856136
+obj /usr/share/man/man1/ewhich.1.gz 9599d15c038a00c02fbb8fe5754fdb07 1080856136
+obj /usr/share/man/man1/mkebuild.1.gz 8a344a53ba123377ee981ae5bd2dab35 1080856136
+obj /usr/share/man/man1/pkg-size.1.gz cff469bc5497ba7849569fcca9931d94 1080856136
+obj /usr/share/man/man1/equery.1.gz f6074d7b3894bab1eee5a56e7411a643 1080856136
+obj /usr/share/man/man1/etcat.1.gz 3a396d98c48d305e5a9833dc6f8c2b58 1080856136
+obj /usr/share/man/man1/revdep-rebuild.1.gz f8350de511094225d412c3c52698fb3e 1080856136
+dir /usr/bin
+obj /usr/bin/equery 7ccd3f670d72083cb5e50a6c3c7dd901 1080856136
+obj /usr/bin/etcat 63f01356ad522416a0d3898d4321f1eb 1080856136
+obj /usr/bin/euse 1fdf94e41b73fbba7504786ba247d87b 1080856136
+obj /usr/bin/qpkg aef7a36a5068b15356de97c1cb8d4c92 1080856136
+obj /usr/bin/revdep-rebuild 805159cea01fab41b9d3662cb07b1d3b 1080856136
+obj /usr/bin/dep-clean 1f01c8cc6c2c6254f7d6066d03b42303 1080856136
+obj /usr/bin/ewhich 1a8dd69242406163f12f4c84679ce2c2 1080856136
+obj /usr/bin/pkg-size dc4837fddd1c312586855d5517a87755 1080856136
+obj /usr/bin/glsa-check c6491857fa94b29fa6a0e589a18e9636 1080856136
+dir /usr/sbin
+obj /usr/sbin/pkg-clean 61d10dbfc5ec78845e16096d84e2a95d 1080856136
+obj /usr/sbin/mkebuild be6b22f6ac70646a172680dcfa51f8f3 1080856136
+dir /usr/lib
+dir /usr/lib/gentoolkit
+dir /usr/lib/gentoolkit/pym
+obj /usr/lib/gentoolkit/pym/gentoolkit.py 299ad44d45656226d86f61eafdc305d2 1080856136
+obj /usr/lib/gentoolkit/pym/glsa.py 164b4076d41c1e2f0544fd18790f80fa 1080856136

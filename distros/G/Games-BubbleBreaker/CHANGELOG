@@ -1,0 +1,10 @@
+Revision history for Perl module Games::BubbleBreaker
+
+0.03 Tue Jan 08 2013
+     - use File::HomeDir (thanks to Mithaldu)
+
+0.02 Fri Jun 24 2011
+     - better tests
+
+0.01 Sun Jun 22 2011
+     - first release

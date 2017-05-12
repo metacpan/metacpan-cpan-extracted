@@ -1,0 +1,18 @@
+At the moment only GTop->new objects will survive cloning. The
+following objects need to go through their own possess() methods via
+CLONE:
+
+package            new() equivalent
+-----------------------------------
+GTop::Mountlist           mountlist
+GTop::Proclist            proclist
+GTop::ProcArgs            proc_args
+GTop::ProcMap             proc_map
+
+
+
+
+
+
+
+

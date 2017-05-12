@@ -1,0 +1,69 @@
+NAME
+    Gentoo::Dependency::AST - Convert a canonicalized (R|P|)DEPEND into an
+    Abstract Syntax Tree
+
+VERSION
+    version 0.001001
+
+SYNOPSIS
+    Those familiar with Gentoo's "ebuild" format will be aware there are
+    several variables that contain strings of dependencies that are
+    required.
+
+    Namely: "PDEPEND" , "RDEPEND" and "DEPEND"
+
+    If you're a "paludis" user, one can get the canonicalized versions of
+    these variables via
+
+        cave show -c =cat/pkg-version
+
+    This module exists to parse those strings and provide a structured graph
+    representing the dependencies:
+
+        use Gentoo::Dependency::AST;
+
+        my $node = Gentoo::Dependency::AST->parse_dep_string( $string_from_portage );
+
+METHODS
+  "parse_dep_string"
+        $class->parse_dep_string( $string )  # returns Gentoo::Dependency::AST::Node of some kind
+
+SUPPORTED FEATURES
+  "use?"
+        useflag? (
+            children
+        )
+
+    Maps to a "::Node::Group::Use"
+
+  "!use?"
+        !useflag? (
+            children
+        )
+
+    Maps to a "::Node::Group::NotUse"
+
+  "|| ()"
+        || (
+            children
+        )
+
+    Maps to "::Node::Group::Or"
+
+  "()"
+        (
+            children
+        )
+
+    Maps to "::Node::Group::And"
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

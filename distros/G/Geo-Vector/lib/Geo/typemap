@@ -1,0 +1,12 @@
+TYPEMAP
+	ral_grid * T_PTROBJ
+	OGRDataSourceH T_PTROBJ
+	OGRLayerH T_PTROBJ
+	OGRwkbGeometryType T_INT
+
+	gtk2_ex_geo_pixbuf * T_PTROBJ
+	
+	ral_layer * T_PTROBJ
+	ral_pixbuf * T_PTROBJ
+	ral_visual_layer * T_PTROBJ
+	ral_visual_feature_table * T_PTROBJ

@@ -1,0 +1,22 @@
+ARTISTIC.txt
+CHANGELOG
+GPL2.txt
+lib/Games/SGF/Go/Rotator.pm
+Makefile.PL
+MANIFEST
+README
+t/00-rotate.t
+t/pod-coverage.t
+t/pod.t
+bin/sgfrotate
+t/AE-AB-AW.sgf
+t/normal-game-180.sgf
+t/normal-game-90.sgf
+t/normal-game.sgf
+t/01-AE-AB-AW.t
+t/AE-AB-AW-180.sgf
+t/AE-AB-AW-90.sgf
+t/AE-AB-AW.sgf
+t/lib/Games/SGF/Go/Rotator/Test.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

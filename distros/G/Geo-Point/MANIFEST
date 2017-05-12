@@ -1,0 +1,26 @@
+ChangeLog
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Geo/Line.pm
+lib/Geo/Line.pod
+lib/Geo/Point.pm
+lib/Geo/Point.pod
+lib/Geo/Proj.pm
+lib/Geo/Proj.pod
+lib/Geo/Shape.pm
+lib/Geo/Shape.pod
+lib/Geo/Space.pm
+lib/Geo/Space.pod
+lib/Geo/Surface.pm
+lib/Geo/Surface.pod
+t/09proj.t
+t/10dms.t
+t/11point.t
+t/12surface.t
+t/20pstr.t
+t/21lstr.t
+t/22rstr.t
+t/99pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

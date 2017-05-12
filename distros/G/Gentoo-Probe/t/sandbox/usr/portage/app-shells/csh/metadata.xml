@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>no-herd</herd>
+<maintainer>
+  <email>taviso@gentoo.org</email>
+  <name>Tavis Ormandy</name>
+</maintainer>
+<longdescription>
+The Unix command-line interpreter shell and script language by William Joy, 
+originating from Berkeley Unix.
+
+Unix systems up to around Unix Version 7 only had one shell - the Bourne shell, sh. 
+Csh had better interactive features, notably command input history, allowing earlier 
+commands to be recalled and edited. 
+
+This version of csh was ported from the current release of NetBSD to Linux for the
+Gentoo project.
+</longdescription>
+</pkgmetadata>

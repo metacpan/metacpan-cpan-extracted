@@ -1,0 +1,33 @@
+Getopt::Auto is Copyright (C) 2010, Geoffrey Leach
+Getopt::Auto is Copyright (C) 2003-2009, Simon Cozens
+
+Getopt::Auto version 2.0
+========================
+
+Getopt:Auto automates the processing of command-line options
+for Perl scripts.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+DEPENDENCIES
+
+Please check Build.PL for this information.
+
+LICENSE INFORMATION
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl 5.10.1.  For more details,
+see the full text of the licenses at
+    <http://www.perlfoundation.org/artistic_license_1_0>,
+and
+    <http://www.gnu.org/licenses/gpl-2.0.html>.
+
+
+

@@ -1,0 +1,8 @@
+ChangeLog
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Gtk2/Ex/Builder.pm

@@ -1,0 +1,31 @@
+---
+abstract: 'Geo::Hash* wrapper with any utils'
+author:
+  - 'Kazuhiro Osawa <yappo {at} shibuya {dot} pl>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::Require: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GeoHash
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Geo::Hash: 0
+  parent: 0
+resources:
+  homepage: https://github.com/yappo/p5-GeoHash/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yappo/p5-GeoHash.git
+version: 0.01

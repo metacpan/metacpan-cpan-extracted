@@ -1,0 +1,28 @@
+
+			     GStreamer::Interfaces
+			    -----------------------
+
+GStreamer::Interfaces provides access to some of the interfaces in the
+GStreamer Interfaces library.  Currently, that's GStreamer::PropertyProbe and
+GStreamer::XOverlay.
+
+				 Installation
+				--------------
+
+To install GStreamer, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+				 Dependencies
+				--------------
+
+GStreamer::GConf depends on any release of the 0.10 series of the GStreamer
+Interfaces library and on the following Perl modules:
+
+  ExtUtils::Depends
+  ExtUtils::PkgConfig
+  GStreamer >= 0.06
+  Glib >= 1.180

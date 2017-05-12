@@ -1,0 +1,55 @@
+{
+   "abstract" : "The main module to use for geospatial applications",
+   "author" : [
+      "Ari Jolma <ari.jolma @ aalto.fi>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-Ex-Geo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : 0,
+            "ExtUtils::PkgConfig" : 0,
+            "Gtk2" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "Geo::OGC::Geometry" : 0,
+            "Glib" : 0,
+            "Graphics::ColorUtils" : 0,
+            "Gtk2" : 0,
+            "Gtk2::GladeXML" : 0,
+            "Scalar::Util" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/ajolma/geoinformatica.git/trunk/Gtk2-Ex-Geo"
+      }
+   },
+   "version" : "0.66"
+}

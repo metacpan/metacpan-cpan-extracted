@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Std qw{getopts};
+use DateTime;
+use DateTime::Event::Sunrise;
+use Geo::Local::Server;
+
+my $opt     = {};
+getopts("vf:", $opt);
+
+my $verbose = $opt->{"v"}||=0;
+my $file    = $opt->{"f"};
+my $now     = DateTime->now;
+my $gls     = Geo::Local::Server->new(configfile=>$file);
+my $lat     = $gls->lat;
+my $lon     = $gls->lon;
+my $sunrise = DateTime::Event::Sunrise->sunrise(longitude=>$lon, latitude=>$lat)->next($now);
+my $sunset  = DateTime::Event::Sunrise->sunset(longitude=>$lon, latitude=>$lat)->next($now);
+my $state   = "";
+my $exit    = 0;
+
+if ($sunrise < $sunset) {
+  $state = "Nighttime";
+  $exit  = 0;
+} else {
+  $state = "Daytime";
+  $exit  = 1;
+}
+
+if ($verbose) {
+ printf "Lat: %s, Lon: %s, Now: %s, Sunrise: %s, Sunset: %s, State: %s\n",
+        $lat,
+        $lon,
+        $now,
+        $sunrise,
+        $sunset,
+        $state;
+}
+
+exit $exit;
+
+__END__
+
+=head1 NAME
+
+is_nighttime - Exit status of true if it is currently nighttime
+
+=head1 SYNOPSIS
+
+  is_nighttime [-v] [-f FILE]
+  is_nighttime && echo 'It is Nighttime!'
+
+=head1 OPTIONS
+
+=head2 -v
+
+verbose
+
+=head2 -f FILE - default /etc/local.coordinates
+
+Specify alternate configuration file
+
+=head1 DESCRIPTION
+
+Uses the system coordinates as configured from the perl package Geo::Local::Server and with the perl package DateTime::Event::Sunrise calculates the next sunset and sunrise to determine if it is currently daytime or nighttime
+
+=head1 EXIT STATUS
+
+The exit status is 0 if it is nighttime.  The exit status is 1 if it is daytime.
+
+=cut
+

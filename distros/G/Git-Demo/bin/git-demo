@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Log::Log4perl;
+use File::HomeDir;
+use File::Spec::Functions;
+use Git::Demo;
+use Getopt::Long;
+use YAML::Any qw/LoadFile/;
+
+my $home = File::HomeDir->my_home;
+my $conf_dir = catfile( $home, '.git-demo' );
+
+my $args;
+GetOptions( 'conf=s'       => \$args->{conf},
+            'story_file=s' => \$args->{story_file},
+            'log4perl=s'   => \$args->{log4perl} );
+
+$args->{conf}     ||= catfile( $conf_dir, 'config.yaml' );
+$args->{log4perl} ||= catfile( $conf_dir, 'log4perl.conf' );
+my $conf = LoadFile( $args->{conf} );
+if( $args->{story_file} ){
+    $conf->{story_file} = $args->{story_file};
+}
+
+Log::Log4perl->init( $args->{log4perl} );
+my $logger = Log::Log4perl->get_logger( 'git-demo' );
+
+my $demo = Git::Demo->new( $conf );
+$demo->play();
+print "Hit return to end...\n";
+my $in = <STDIN>;
+
+

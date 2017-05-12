@@ -1,0 +1,136 @@
+﻿Revision history for Gentoo-MirrorList
+
+1.0.2 2013-04-06T04:47:36Z
+ - Maintenance release for Module::Build 0.4004
+
+ [Dependencies::Added / develop_requires]
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta
+ - Test::Pod 1.41
+ - Test::Pod::Coverage 1.08
+ - version 0.9901
+
+ [Dependencies::Changed / build_requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Dependencies::Changed / configure_requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Dependencies::Changed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803 → v1.3.0
+
+ [Dependencies::Changed / develop_suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.1.0 → v1.7.2
+
+ [Dependencies::Changed / test_requires]
+ - Test::More 0.88 → 0.98
+
+ [Documentation]
+ - Update License indentation
+ - Update License address
+ - Update copyright year
+ - Add README.mkdn
+
+ [Meta]
+ - bugtracker to github issues
+
+ [Packaging]
+ - utilise Module::Build 0.4004 test_requires
+
+1.0.1 2011-10-30T18:49:12Z
+ - Maintenance Release
+
+ [Dependencies]
+ - removed: test requires english
+ - added: runtime requires perl 5.10
+ - added: runtime requires strict
+ - added: runtime requires warnings
+
+ [Packaging]
+ - Update LICENSE ( Indent, Address )
+ - author/release tests moved to xt/
+ - github uri's point to https://
+ - added x_authority to meta
+ - turn on -Encoding in POD
+ - C<> wrap method/attribute names in pod
+
+ [Tests]
+ - added: xt/release/minimum-version.t
+
+1.0.0 2011-04-03T19:25:50Z
+ [Packaging]
+ - Move to Git::NextVersion.
+
+0.01052115 2011-04-03T18:45:46Z
+ [Dependencies]
+ - Test::More is no longer a runtime dep.
+ - Carp is now a runtime Dep.
+
+ [Dependencies::Develop]
+ - Now adverties Dist::Zilla bundles as being useful for developing.
+
+ [Dependencies::Test]
+ - English.pm needed for testing.
+ - File::Find needed.
+ - File::Temp needed
+ - FindBin needed.
+ - Test::More 0.88 Needed.
+
+ [Documentation]
+ - Hack weaver.ini to fix generation issues.
+
+ [Packaging]
+ - Move to @Author::KENTNL
+ - Update toolchain
+ - drop custom critic/kwalitee tests.
+ - more critic rules to shut it up.
+ - Reorganised the tests dir.
+ - Ship .perltidyrc
+ - add .gitignore.
+
+ [Tests]
+ - Duplicated and reworked 01_simple.t to 02_simple.t with a current copy
+   of the mirror list.
+ - Added test plugins: DistMeta, EOL, Kwalitee, CPAN-Changes,
+   ReportVersions::Tiny
+
+0.01000614 2009-11-14T17:12:09Z
+ [Dependencies::Build]
+ - Adds Module::Build 0.35
+
+ [Features]
+ - Adds a ->file method to Mirror's to return the path to a file on a
+   mirror.
+
+ [Packaging]
+ - drop EUMM installer.
+
+ [Tests]
+ - Removed debug code  Data::Dump ( was hidden test dep )
+
+0.01000112 2009-11-09T15:29:43Z
+ [Dependencies]
+ - Added Test::More 0.94
+
+ [Documentation]
+ - Redocumented With Pod::Weaver.
+
+ [Packaging]
+ - Fixed MirrorList filters using regex processing.
+
+ [Tests]
+ - Add a test which does sample parsing and sanity checking of a sample xml
+   file.
+
+0.01000102 2009-11-09T05:03:10Z
+ - Me-- / Dzil++ # its too easy to make a working dist without thinking.
+
+ [Dependencies]
+ - Add namespace::autoclean
+ - Add XML::Simple
+ - Add App::Cache
+ - Add Moose.
+
+0.01000101 2009-11-09T04:02:14Z
+ - First version.
+

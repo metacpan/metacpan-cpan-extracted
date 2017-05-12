@@ -1,0 +1,11 @@
+digraph graph_47_02
+{
+	{
+		small
+		smaller
+		smallest
+	}
+	->
+	big
+	[pencolor = green]
+}

@@ -1,0 +1,12 @@
+--- cmd_chattr.c.orig	2004-02-28 21:44:15.242130528 -0600
++++ cmd_chattr.c	2004-02-28 21:45:51.734239664 -0600
+@@ -12,6 +12,9 @@
+ 
+ #include <sys/ioctl.h>
+ #include <sys/types.h>
++#define __KERNEL__
++#include <asm/types.h>
++#undef __KERNEL__
+ #include <linux/ext2_fs.h>
+ 
+ #include "sash.h"

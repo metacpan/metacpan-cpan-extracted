@@ -1,0 +1,8 @@
+Getopt::Function is an interface to Getopt::Mixed which is designed to 
+make the option interface more easy to maintain.  In particular, it 
+automatically builds up the --help description from option descriptions
+which are kept in a hash alongside the actual option definitions.
+
+It will be somewhat less efficient than Getopt::Mixed.  
+
+The system supports long and short options etc. etc.

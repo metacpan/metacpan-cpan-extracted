@@ -1,0 +1,12 @@
+Revision history for Perl extension Google::ProvisioningAPI.
+
+0.11 Mon Dec 11 2006
+	- New API call 'Create Account with Email' added as CreateAccountEmail() method
+	  older CreateAccount() and UpdateAccountEmail() are now deprecated, and will be
+	  removed in a future version
+	- Makefile.PL includes module dependencies
+	- documentation bug and style fixes
+
+0.1  Tue Dec 05 2006
+	- initial release version
+

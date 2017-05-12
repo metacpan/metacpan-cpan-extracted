@@ -1,0 +1,47 @@
+---
+abstract: 'Interface to the TicTacToe (nxn) game.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-TicTacToe
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Games::TicTacToe:
+    file: lib/Games/TicTacToe.pm
+    version: '0.24'
+  Games::TicTacToe::Board:
+    file: lib/Games/TicTacToe/Board.pm
+    version: '0.24'
+  Games::TicTacToe::Move:
+    file: lib/Games/TicTacToe/Move.pm
+    version: '0.24'
+  Games::TicTacToe::Params:
+    file: lib/Games/TicTacToe/Params.pm
+    version: '0.24'
+  Games::TicTacToe::Player:
+    file: lib/Games/TicTacToe/Player.pm
+    version: '0.24'
+requires:
+  Moo: '2.000000'
+  MooX::Options: '4.023'
+  Term::ANSIColor::Markup: '0.06'
+  Type::Tiny: '1.000005'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Games-TicTacToe.git
+version: '0.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

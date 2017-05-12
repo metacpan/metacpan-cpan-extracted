@@ -1,0 +1,16 @@
+<markers>
+  <marker elevation="" lat="78.223287" lng="15.650132" name="UNIS" type="3"><![CDATA[
+  The University Centre in Svalbard, Longyearbyen<p/>
+  <a href="http://www.svalbard-images.com/photos/webcam-svalbard-002-2-e.php" target="_blank">WebCam in Longyearbyen</a><br/>
+<a href="http://haldde.unis.no/vaerdata/" target="_blank">The Current Weather</a>
+      ]]>
+  </marker>
+  <marker elevation="" lat="76.560956" lng="16.680584" name="South End" type="3">
+    The southernmost expedition point
+  </marker>
+  <marker elevation="" lat="77.000653" lng="15.545245" name="Hornsund" type="2"><![CDATA[
+    An expedition depot<p>
+    <a href="http://hornsund.igf.edu.pl/index_en.php" target="_blank">Polish Polar Station</a>
+      ]]>
+  </marker>
+</markers>

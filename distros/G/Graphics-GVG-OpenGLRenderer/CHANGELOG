@@ -1,0 +1,9 @@
+Revision history for perl module Graphics::GVG::OpenGLRenderer
+
+0.2 2016-12-23
+
+- Fix missing prereq
+
+0.1 2016-12-23
+
+- Initial version

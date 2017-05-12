@@ -1,0 +1,27 @@
+Graph-Convert
+=============
+
+Graph::Convert lets you convert graphs between the graph formats
+from "Graph" and "Graph::Easy".
+
+It takes a graph object in either format, and converts it to the desired
+output format. It handles undirected and directed graphs, in either simple
+or multi-edged form, and also carries all the attributes over.
+
+This enables you to use all the layout and formatting capabilities
+of "Graph::Easy" on "Graph" objects, as well as using the extensive
+graph algorithms and manipulations of "Graph" on "Graph::Easy" objects.
+
+Installation
+============
+
+See INSTALL on how to install this module.
+
+AUTHOR
+======
+
+Copyright (C) 2006-2007 by Tels http://bloodgate.com/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL version 2 or later.
+

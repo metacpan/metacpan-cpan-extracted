@@ -1,0 +1,6 @@
+These files form an Ajax service showing the location for a given postcode
+automatically. 
+
+See the Ajax Tutorial (the file "lib/Geo/Postcodes/Ajax.pod") for usage
+information. The tutorial os availabe as "man Geo::Postcodes::Ajax" or
+"perldoc Geo::Postcodes::Ajax" after installation of the module.

@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+use Getopt::GUI::Long;
+
+my %opts =
+  ('auto-default' => 42);
+
+
+Getopt::GUI::Long::Configure(qw(display_help no_ignore_case capture_output));
+GetOptions(\%opts,
+	   ['GUI:screen','Main Screen Title',
+	    introduction => 'This is a test application that tests various aspects of how a Getopt::GUI::Long module behaves and serves as a good example of how you con do various things.'],
+
+	   ['GUI:separator', 'This is a separator describing these options:'],
+	   ["f|some-flag=s",   "my flag value"],
+	   ["o|other-flag=s",   "some other important value"],
+
+	   ['GUI:separator', 'Test Widget Types:'],
+	   ['I|int-flag=i', 'Integer'],
+	   ['F|float-flag=f', 'Float'],
+	   ['S|string-flag=s', 'String'],
+	   ['B|boolean-flag', 'Boolean', refresh_on_change => 1],
+	   ['boolean2-flag', 'Sub Boolean2', indent => 1],
+#	   ['boolean3-flag', 'Conditional Boolean3', indent => 1,
+#	    doif => sub { return qwparam('B');}],
+	   ['R|required-flag=s', 'Required', required => 1],
+
+	   ['GUI:separator', 'Special widgets for GUI screens:'],
+	   ['option-list=i', 'A menu of options',
+	    question => {'type' => 'menu',
+			 'labels' => [qw(0 zero 1 one 2 two)]}],
+	   ['radio-list=s', 'A radio group of options',
+	    question => {'type' => 'radio',
+			 'labels' => [qw(0 zero 1 one 2 two)]}],
+	   ['auto-default=s', 'A pre-set default'],
+
+	   ['GUI:screen','More Options',
+	    introduction =>
+	    'This provides another screen of options the user can fill out'],
+
+	   ['another-flag=s','Another flag value'],
+	   ['s|long-flag','Short and Long flag'],
+
+	   ['GUI:screen','Secondary Options', doif => 'boolean-flag',
+	    introduction =>
+	    'This provides another screen of options the user can fill out but only if they checked the boolean-flag checkbox on the first page.'],
+
+	   ['dependant-check','Checkbox only available if boolean-flag on'],
+	   ['dependant-value=s','Value only available if boolean-flag on'],
+	  );
+
+print "Output flags:\n";
+foreach my $key (keys(%opts)) {
+    printf "%-20s => %s\n", $key, $opts{$key};
+}
+
+print "sleepping for 5 to test screen closure...\n";
+$Getopt::GUI::Long::GUI_qw->set_progress(0) if ($Getopt::GUI::Long::GUI_qw);
+for (my $i = 0; $i < 5; $i++) {
+    sleep 1;
+    $Getopt::GUI::Long::GUI_qw->set_progress(($i+1)/5) if ($Getopt::GUI::Long::GUI_qw);
+}
+print "done";
+
+

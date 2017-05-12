@@ -1,0 +1,448 @@
+Grips/Cmd version 1.05
+======================
+NAME
+    Grips::Cmd - Perl-Schnittstelle zur grips-open Skriptsprache
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Carp
+	IO::Socket
+	Data::Dumper
+	Parse::RecDescent
+	Grips::Gripsrc
+
+SYNOPSIS
+	use grips::Cmd;
+	$grips = new Grips::Cmd(host => 'gripsdb.dimdi.de', port => 5101);
+	$grips->login(user => '1234abcd', pwd => "");
+	$grips->setAttribute(grips_object_name => $grips->getSessionID, timeout => 600);
+	$grips->defineBase(grips_object_name => $grips->getSessionID, id => "bas1", dbs => ["ml66"]);
+	$grips->open(grips_object_name => "bas1");
+	$searchResponse = $grips->search(grips_object_name => "bas1", 'query.string' => "nix");
+
+	$hits = $searchResponse->{result}->{hits};
+
+	for (1..$hits) {
+			$gdbResponse = $grips->getDocBody(grips_object_name => 2, subset => $_, layout => "CBI_HTML", req_modifier => "CBI_FULL");
+			$htmlText = $gdbResponse->{doc_body};
+			print $htmlText;
+	}
+
+	$grips->close(grips_object_name => "bas1");
+	$grips->logout(grips_object_name => $grips->getSessionID);
+
+DESCRIPTION
+    Dieses Modul implementiert eine Perl-Schnittstelle zur grips-open
+    Skriptsprache. Dabei ersetzt es die flache Skriptstruktur sowohl beim
+    Request als auch bei der Response durch Perl-Datenstrukturen.
+
+  Struktur des Requests
+
+    Die grips-open-Skriptfunktionen werden als Methoden auf dem
+    grips::Cmd-Objekt aufgerufen. Dabei fangen sämtliche Methoden mit einem
+    Kleinbuchstaben an und heissen ansonsten exakt wie die Skriptfunktionen.
+    Die Parameter für den Request werden den Methoden in der perlüblichen
+    Hash-Schreibweise übergeben:
+
+            $grips->methodenName(par1 => 'wert1', par2 => 'wert2');
+
+    Hat ein Parameter die Form einer Liste, muss diese als Referenz auf
+    einen Array bzw. als anonymer Array übergeben werden:
+
+            $grips->methodenName(par1 => \@werte);
+
+    oder
+
+            $grips->methodenName(par1 => ['wert1', 'wert2']);
+
+    Desweiteren muss bei Methoden allgemein der grips-Script-Objektname als
+    Parameter 'grips_object_name' (oder alternativ '_') übergeben werden,
+    also etwa
+
+            $grips->getDocBody(_ => 2, subset => 1-10, layout => "CBI_HTML", req_modifier => "CBI_FULL");
+
+    wo die Methode "getDocBody()" auf dem Search-Result-Objekt mit der ID
+    '2' aufgerufen wird oder
+
+            $grips->close(_ => "bas1");
+
+    wenn das base-Objekt mit der ID "bas1" geschlossen werden soll. Hierbei
+    muss angemerkt werden, dass diese Vorgehensweise nicht ganz durchgehend
+    implementiert wurde. Bei einigen Methoden müssen möglicherweise andere
+    Parameter gesetzt werden.
+
+  Struktur der Response
+
+    Die grips-Skript-Response wird in eine komplexe Perl-Datenstruktur nach
+    folgenden Regeln umgesetzt: Sämtliche Methoden liefern eine Referenz auf
+    einen Hash zurück. Die Parameter der Response bilden Schlüssel dieses
+    Hashs, die je nach Struktur der Response wieder unterschiedliche
+    Strukturen annehmen können. Ist der Wert eines solchen Schlüssels ein
+    schlichter skalarer Wert, wird dies auch in der Perl-Datenstruktur so
+    abgebildet. Ist der Wert in der grips-Response eine Liste, so wird er in
+    der Perl-Datenstruktur als Array abgebildet. Hierbei ist zu beachten,
+    dass in der grips-Response die Listennumerierung mit 1, in der
+    Perl-Datenstruktur aber natürlich mit 0 beginnt. Kommt ein Schlüssel in
+    der grips-Response mehrfach vor, wird er in der Perl-Datenstruktur in
+    einen Hash umgesetzt. Ein Beispiel macht dies vielleicht deutlicher:
+    Eine grips-Response mit der Struktur
+
+            {CBI_RESPONSE=103960370811963.0000005
+            request=bas1.Search
+            status=CBI_OK
+            message=Base.Search: Search was o.K.
+            result.id=2
+            result.hits=1
+            result.query=ND=381095
+            }
+
+    wird in folgende Perl-Datenstruktur umgewandelt
+
+            $response = {
+                    'result' => {
+                            'hits' => '1',
+                            'id' => '2',
+                            'query' => 'ND=381095'
+                    },
+                    'status' => 'CBI_OK',
+                    'message' => 'Base.Search: Search was o.K.',
+                    'CBI_RESPONSE' => '103960370811963.0000005',
+                    'request' => 'bas1.Search'
+            };
+
+    Zur Betrachtung der Perl-Datenstruktur ist das "Data::Dumper"-Modul sehr
+    hilfreich, mit dem auch die obige Ausgabe produziert wurde ("print
+    Dumper $response;").
+
+    Listen in der grips-Response werden folgendermassen umgesetzt:
+
+            {CBI_RESPONSE=103960871526624.0000006
+            request=2.GetDocs
+            status=CBI_OK
+            message=SearchResult.GetDocs: end of subset
+            docs_num=2
+            doc(1).id=1
+            doc(1).title=In vitro effects of NIPRISAN (Nix-0699).
+            doc(1).$DBNAME=MEDLINE
+            doc(1).$DBKEY=ML66
+            doc(1).$COPYR=NLM
+            doc(1).TI=In vitro effects of NIPRISAN (Nix-0699).
+            doc(2).id=2
+            doc(2).title=Mitochondrial death protein Nix.
+            doc(2).$DBNAME=MEDLINE
+            doc(2).$DBKEY=ML66
+            doc(2).$COPYR=NLM
+            doc(2).TI=Mitochondrial death protein Nix.
+            }
+
+    wird zu
+
+            $response = {
+                    'status' => 'CBI_OK',
+                    'docs_num' => '2',
+                    'message' => 'SearchResult.GetDocs: end of subset',
+                    'CBI_RESPONSE' => '103960863726019.0000006',
+                    'doc' => [
+                            {
+                                    'DBNAME' => 'MEDLINE',
+                                    'title' => 'In vitro effects of NIPRISAN (Nix-0699).',
+                                    'COPYR' => 'NLM',
+                                    'DBKEY' => 'ML66',
+                                    'id' => '1',
+                                    'TI' => 'In vitro effects of NIPRISAN (Nix-0699)'
+                            },
+                            {
+                                    'DBNAME' => 'MEDLINE',
+                                    'title' => 'Mitochondrial death protein Nix.',
+                                    'COPYR' => 'NLM',
+                                    'DBKEY' => 'ML66',
+                                    'id' => '2',
+                                    'TI' => 'Mitochondrial death protein Nix.'
+                            }
+                    ],
+                    'request' => '2.GetDocs'
+            };
+
+METHODS
+  gsc-Methoden
+
+    Das Modul unterstützt einen grossen Teil der Methoden der
+    grips-open-Skriptsprache. Definitiv funktionieren folgende Methoden:
+
+	login();
+	<SESSION|BASE|SEARCH_RESULT|HOST_SERVICES|USER>.getAttributes();
+	<SESSION|BASE|SEARCH_RESULT|HOST_SERVICES|USER>.setAttribute();
+	<SESSION|BASE|SEARCH_RESULT|HOST_SERVICES|USER>.setAttributePermanent();
+
+	<SESSION>.getSubjectList();
+	<SESSION>.getBaseList();
+	<SESSION>.getIndexedBaseList();
+	<SESSION>.getApplicationInfo();
+	<SESSION>.defineBase();
+	<SESSION>.logout();
+
+	<BASE>.open();
+	<BASE>.setLimit();
+	<BASE>.getFieldsInfo();
+	<BASE>.browseIndex();
+	<BASE>.search();
+	<BASE>.removeDuplicates();
+	<BASE>.getResults();
+	<BASE>.deleteResult();
+	<BASE>.getDocForUpdate();
+	<BASE>.getNewDocKey();
+	<BASE>.storeDocument();
+	<BASE>.lock();
+	<BASE>.unlock();
+	<BASE>.close();
+
+	<SEARCH_RESULT>.sort();
+	<SEARCH_RESULT>.getDocBody();
+	<SEARCH_RESULT>.getDocs();
+	<SEARCH_RESULT>.getField();
+	<SEARCH_RESULT>.getFullTextInfo()
+	<SEARCH_RESULT>.analyseTerms();
+	<SEARCH_RESULT>.analyseTermsStatistic();
+
+	<SERVICE>.getSupplList();
+	<SERVICE>.getSupplInfo();
+
+    Diverse andere Methoden sollten automatisch funktionieren, für einige
+    Methoden ist allerdings eine Spezialimplementierung erforderlich. Dies
+    kann bei Bedarf auf Anfrage an den Autor hin geschehen.
+
+    Die Parameter der Methoden entprechen den im grips-open Script
+    verwendeten. Das in spitzen Klammern vorangestellte grips-Objekt sollte
+    bei allen Methoden über den Parameter 'grips_object_name' (oder
+    alternativ '_') referenziert werden, also z.B.
+
+            $grips->search(grips_object_name => "bas1", ...)
+        
+    wenn das Base-Object in defineBase() "bas1" genannt wurde,
+
+            $grips->getField(grips_object_name => 2, ...)
+        
+    wenn ein Feld des Profiltabelleneitrags mit der ID 2 gefunden werden
+    soll etc.
+
+    Darüber hinaus hat das Modul folgende eigene Methoden:
+
+  new()
+
+    Legt ein neues grips::Cmd-Objekt an.
+
+   Parameters
+
+    *   "host" - Host des Socket-CBI-Dämons, also z.B. gripsdb.dimdi.de.
+        Kann weggelassen werden, ist dann app01testgrips.dimdi.de.
+
+    *   "port" - Port des Socket-CBI-Dämons. Kann weggelassen werden, ist
+        dann 5101.
+
+    *   "sessionID" - Session-ID für die Session. Kann weggelassen werden,
+        wird dann generiert aus "unix-Epochensekunden.pid"
+
+   croaks if ...
+
+    *   ... keine Verbindung zum CBI-Dämon hergestellt werden kann
+
+  getHost()
+
+    Liefert den Host des Script-CBI-Dämons.
+
+  getPort()
+
+    Liefert den Port des Script-CBI-Dämons.
+
+  getSessionID()
+
+    Liefert die Session ID
+
+  checkGripsResponse()
+
+    Überprüft, ob der Status der Response CBI_OK bzw. ein anderer erwarteter
+    Status ist.
+
+   Parameters
+
+    *   1. Parameter - (HARD|SOFT) wenn HARD, wird eine Exception geworfen,
+        sonst wird eine Warnung ausgegeben.
+
+    *   2. Parameter - die Response einer grips-Skriptfunktion
+
+    *   3. Parameter - der erwartete Status der script-Response. Wenn der
+        Parameter nicht übergeben wird, 'CBI_OK'
+
+   croaks if ...
+
+    *   ... s.o.
+
+    *   ... wenn der Wert des ersten Parameter das nicht entweder HARD oder
+        SOFT ist
+
+   Beispiel
+
+            $response = checkGripsResponse("HARD", $grips->defineBase(_ => $grips->getSessionID, id => "bas1", dbs => ["ml66"]), 'CBI_OK');
+
+    wirft Exception, wenn defineBase() nicht CBI_OK liefert
+
+  connectionIsAlive()
+
+    Liefert 1, wenn noch eine Verbindung zum Socket-CBI-Dämon besteht, sonst
+    0.
+
+EXPORT_OK
+            checkGripsResponse();
+
+.gripsrc-Datei
+    Im $HOME-Verzeichnis des aufrufenden Users kann eine Datei namens
+    ".gripsrc" mit der Berechtigung 700 angelegt werden, in der Host,
+    Usercode und Passwort angegeben werden können. In diesem Fall müssen
+    Usercode und Passwort nicht der Login-Methode mit übergeben werden. Die
+    gripsrc-Datei kann folgendermassen aussehen:
+
+            host app01grips.dimdi.de
+            pwd  blubb
+            user abcd1234
+
+            host app01testgrips.dimdi.de
+            user wxyz9876
+
+    Hier wird für den Host gripsdb.dimdi.de der Usercode abcd1234 mit dem
+    Passwort blubb und für den Host app01testgrips.dimdi.de der Usercode wxyz9876
+    ohne Passwort eingetragen.
+
+    Die Verwendung einer solchen Datei empfiehlt sich sehr, da es ein
+    Sicherheitsrisiko ist, in Perlscripten Usercode und Passwort anzugeben.
+
+    ACHTUNG!!! Um böse Fallen gleich zu vermeiden: eine solche
+    .gripsrc-Lösung funktioniert natürlich nicht in CGI-Kontexten. Hier
+    müssen Usercode und Passwort der login()-Methode direkt übergeben
+    werden. Wie sie dort hinkommen, ohne grosse Sicherheitslöcher zu
+    reissen, ist eine Frage, die unabhängig von diesem Modul gelöst werden
+    muss.
+
+VERIONS
+    0.01
+
+    - Rudimentäre und wenig systematisierte Funktionalität
+
+    0.80
+
+    - Dokumentation hinzugefügt
+
+    - Methodenschnittstellen vereinheitlicht
+
+    - alle Methoden mit Parameter grips_object_name versehen, der den Namen
+    des grips-open-Objekts bezeichnet, auf dem der Scriptrequest ausgeführt
+    wird
+
+    - Parameter request_id vorhanden, aber deprecated
+
+    - Fehler mit Session-ID korrigiert
+
+    - hochzählende Transaction-ID hinzugefügt
+
+    - auch login()-Methode liefert jetzt Response-Objekt zurück
+
+    - Bei getDocs() kommen jetzt auch die '$'-Felder (DBKEY, COPYRIGHT
+    etc.), allerdings ohne '$' davor
+
+    0.81
+
+    - Dokumentation erweitert
+
+    - 3. Parameter (erwarteten Status) zu checkGripsResponse() hinzugefügt
+
+    1.00
+
+    - Perl-Datenstrukturen werden jetzt automatisch in beliebiger Tiefe in
+    gsc-requests umgesetzt. Damit sollte theoretisch jeder grips-Request,
+    der sich an die gsc-eigenen Regeln hält, funktionieren.
+
+    - Alle Funktionen ausser login() und logout() geben jetzt eine Warnung
+    aus, wenn sie ohne den Parameter "grips_object_name" aufgerufen werden.
+
+    - Damit man nicht so viel tippen muss, kann statt des Parameternamens
+    "grips_object_name" jetzt auch "_" eingegeben werden.
+
+    1.01
+
+    - Fehler bei getCost() und analogen response-Strukturen beseitigt, wo
+    Reponsezeile die Struktur key(n)=value (im Ggs. zu keyA(n).keyB=value)
+    hat
+
+    - Open kann jetzt auch 'rd_from' und 'rd_to'
+
+    - Search kann jetzt auch 'query.mode'
+
+    1.02
+
+    - Abwärtskompatibilität bei search() hergestellt: Request versteht jetzt
+    auch wieder skalaren Parameter "query", der query.string enthält.
+
+    1.03
+
+    - Funktion connectionIsAlive() hinzugefügt. Liefert 1, wenn noch eine
+    Verbindung zum Socket-CBI-Dämon besteht, sonst 0.
+
+    1.04
+
+    - Problem beim Parsen der Response von GetFields() behoben, wenn
+    Periodengruppen zurückkommen. Gelöst über Funktion _cleanRetVal()
+
+    - Fehler beim Parsen von #1 in Response von GetFields() behoben
+
+    1.05
+
+    - Fehler beim Parsen von Periodengruppen namens "P-Group" behoben
+
+    1.06
+
+    - Konstruktor stirbt nicht mehr, wenn kein Socket da, sondern
+      warnt und liefert undef
+
+    1.07
+
+    - Nur Quelltextlayoutverschönerungen
+
+    1.08
+
+    - Parse::RecDescent auskomentiert, ist ja eigentlich nicht noetig
+
+    1.09
+
+    - new response syntax implementiert
+
+    1.10
+
+    - Fix package declarationAUTHOR
+    
+    
+    1.11
+
+    - Fix Makefile.PL
+    
+    Tarek Ahmed, <ahmed@dimdi.de>
+
+COPYRIGHT
+    Copyright (c) 2002 Tarek Ahmed. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+SEE ALSO
+    Grips::Gripsrc für die Entwicklung eigener grips-perl-Schnittstellen
+    (Das Modul ist inklusive Dokumentation von Net::Netrc abgekupfert. Daher
+    ist die Dokumentation in englisch und möglicherweise zu umfangreich und
+    nicht ganz auf grips-Bedürfnisse zugeschnitten.)

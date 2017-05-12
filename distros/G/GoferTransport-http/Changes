@@ -1,0 +1,71 @@
+=head1 NAME
+    
+Changes - List of significant changes to GoferTransport-http
+    
+As of $Date: 2007-03-23 13:48:54 +0000 (Fri, 23 Mar 2007) $
+
+$Revision: 11766 $
+
+=cut
+
+Add retry_delay & retry_scale as transport attributes
+or better to move to DBI transport base class
+
+Add perl-status ui to recent_errors queue
+
+Add more/clearer docs re configuration
+
+Add note about HTTP::Engine - perhaps someone could contribute a driver that
+uses it. Would probably want to refactor out parts of the mod_perl transport.
+
+=head2 Changes in 1.017 (svn rev 11766), 12th September 2008
+
+  Fixed a memory leak in mod_perl2 by avoiding $r->push_handlers().
+
+=head2 Changes in 1.016 (svn rev 11760), 10th September 2008
+
+  Enabled use of http persistent-connections by default
+    which give significant performance boost by reducing latency.
+  Allow build to continue even if mod_perl can't be found.
+  Client now warns when retring request afer receiving a 503.
+  Documented some env vars that influence retry-on-503 behaviour.
+
+=head2 Changes in 1.015 (svn rev 11432), 16th June 2008
+
+  Requires DBI 1.605
+
+  Add retry with delay with exponential backoff on 503 error.
+  Now check_response_hook can throw an exception hash/object
+    which can control how the httpd responds to the error.
+  Check Client_ip and X-Forwarded-For headers to get client ip address.
+  Added set of gofer_request & gofer_response pnotes for handlers.
+
+  Moved update_stats() call to PerlCleanupHandler.
+  Improved handling of corrupt requests.
+  Status now shows distribution of requests per IP address.
+  Status now marks and reports duplicate requests.
+  Status can now optionally show recent errors.
+  Record severe transport errors via update_stats so they can be seen remotely via trace_recent.
+  More detailed status reports from track_recent data.
+
+=head2 Changes in 1.014 (svn rev 10068), 10th October 2007
+
+  Added DBD_GOFER_RETRY_ON_EMPTY mechanism to work around problems
+    with some load balancer configurations.
+
+=head2 Changes in 1.012 (svn rev 9867), 22nd August 2007
+
+  Fixed for mod_perl2, better.
+  Support GET requests with ?req=<base64 encoded Storable request>
+  Added 'replay' urls to the gofer status reports.
+  Added a little more support for multiple serializations.
+
+=head2 Changes in 1.011 (svn rev 9805), 26th July 2007
+
+  Fix for mod_perl2
+
+=head2 Changes in 1.0.0
+
+  Initial release.
+
+=cut

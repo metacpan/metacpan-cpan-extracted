@@ -1,0 +1,56 @@
+Copyright 2009, 2010, 2011, 2013 Kevin Ryde
+
+This file is part of Gtk2-Ex-ErrorTextDialog.
+
+Gtk2-Ex-ErrorTextDialog is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-ErrorTextDialog is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-ErrorTextDialog.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 11, August 2013
+    - workaround for dodgy signal_chain_from_overridden() of recent glib
+
+Version 10, June 2011
+    - tests more diagnostics on the Test::Weaken checks
+
+Version 9, October 2010
+    - don't raise on every error, too instrusive
+
+Version 8, September 2010
+    - test manifest only as an author test
+
+Version 7, August 2010
+    - oops, fix popup out of exception_handler()
+
+Version 6, August 2010
+    - new "Popup on Error" check button
+
+Version 5, December 2009
+    - new max-chars property limiting textbuf size
+    - new action signals for clear and popup-save-dialog
+    - protect against repeated errors from idle handler itself
+
+Version 4, October 2009
+    - support messages during perl "compile error" by using a Glib
+      idle to defer dialog loading
+
+Version 3, March 2009
+    - during "global destruction" only print to STDERR
+
+Version 2, March 2009
+    - try to cope with warnings during compilation errors where
+      further module loading is not possible
+    - join up a second warn call with parenthetical remark
+
+Version 1, March 2009
+    - the first version

@@ -1,0 +1,14 @@
+digraph utf8_01
+{
+	rankdir = TB
+
+	"Reichwaldstraße"
+
+	"Böhme"
+
+	"ΔΔΔΔΔΔΔΔΔΔΔΔΔ"
+
+	"☃"
+
+	"✔"
+}

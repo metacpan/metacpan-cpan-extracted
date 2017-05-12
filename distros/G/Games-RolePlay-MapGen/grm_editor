@@ -1,0 +1,7 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Games::RolePlay::MapGen::Editor;
+
+my $editor = new Games::RolePlay::MapGen::Editor;
+   $editor->run;

@@ -1,0 +1,11 @@
+--- ddclient-3.6.2/ddclient~	Mon Jul  2 18:18:12 2001
++++ ddclient-3.6.2/ddclient	Mon Jul  9 16:52:02 2001
+@@ -20,7 +20,7 @@
+ $program  =~ s/d$//;
+ my $now       = time;
+ my $hostname  = hostname();
+-my $etc       = ($program =~ /test/i) ? './'   : '/etc/';
++my $etc       = ($program =~ /test/i) ? './'   : '/etc/ddclient/';
+ my $savedir   = ($program =~ /test/i) ? 'URL/' : '/tmp/';
+ my $msgs      = '';
+ my $last_msgs = '';

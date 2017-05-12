@@ -1,0 +1,36 @@
+Gentoo::Util::VirtualDepend
+
+This module serves as a low level glue layer for the handful of manual
+mappings that are needed in Gentoo due to things not strictly tracking
+upstream.
+
+"CPANPLUS::Dist::Gentoo" has similar logic to this, but not as simple (
+or for that matter, usable without "CPANPLUS" )
+
+This module is not intended to be used entirely on its own, but as a
+short-circuit before calling complicated "MetaCPAN" code.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

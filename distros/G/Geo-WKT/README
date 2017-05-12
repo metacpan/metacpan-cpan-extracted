@@ -1,0 +1,25 @@
+=== README for Geo-WKT version 0.95
+=   Generated on Wed Jan 14 16:37:33 2015 by OODoc 2.01
+
+There are various ways to install this module:
+
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d Geo-WKT-0.95.tar.gz
+       tar -xf Geo-WKT-0.95.tar
+       cd Geo-WKT-0.95
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/Geo-WKT-0.95/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=Geo-WKT
+

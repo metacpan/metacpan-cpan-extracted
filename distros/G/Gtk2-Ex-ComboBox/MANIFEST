@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Gtk2/Ex/ComboBox.pm
+examples/combobox.pl
+t/test.1.t
+t/test.2.t
+t/test.3.t
+t/test.4.t
+t/test.5.t
+t/test.6.t

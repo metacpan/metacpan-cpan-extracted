@@ -1,0 +1,122 @@
+---
+abstract: 'Convert or render graphs (as ASCII, HTML, SVG or via Graphviz)'
+author:
+  - unknown
+build_requires:
+  Test::More: '0.62'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150001'
+keywords:
+  - generation
+  - graph
+  - graphviz
+  - 'text generation'
+  - text
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graph-Easy
+provides:
+  Graph::Easy:
+    file: lib/Graph/Easy.pm
+    version: '0.76'
+  Graph::Easy::As_ascii:
+    file: lib/Graph/Easy/As_ascii.pm
+    version: '0.76'
+  Graph::Easy::As_graphml:
+    file: lib/Graph/Easy/As_graphml.pm
+    version: '0.76'
+  Graph::Easy::As_graphviz:
+    file: lib/Graph/Easy/As_graphviz.pm
+    version: '0.76'
+  Graph::Easy::As_txt:
+    file: lib/Graph/Easy/As_txt.pm
+    version: '0.76'
+  Graph::Easy::As_vcg:
+    file: lib/Graph/Easy/As_vcg.pm
+    version: '0.76'
+  Graph::Easy::Attributes:
+    file: lib/Graph/Easy/Attributes.pm
+    version: '0.76'
+  Graph::Easy::Base:
+    file: lib/Graph/Easy/Base.pm
+    version: '0.76'
+  Graph::Easy::Edge:
+    file: lib/Graph/Easy/Edge.pm
+    version: '0.76'
+  Graph::Easy::Edge::Cell:
+    file: lib/Graph/Easy/Edge/Cell.pm
+    version: '0.76'
+  Graph::Easy::Edge::Cell::Empty:
+    file: lib/Graph/Easy/Edge/Cell.pm
+    version: '0.76'
+  Graph::Easy::Group:
+    file: lib/Graph/Easy/Group.pm
+    version: '0.76'
+  Graph::Easy::Group::Anon:
+    file: lib/Graph/Easy/Group/Anon.pm
+    version: '0.76'
+  Graph::Easy::Group::Cell:
+    file: lib/Graph/Easy/Group/Cell.pm
+    version: '0.76'
+  Graph::Easy::Heap:
+    file: lib/Graph/Easy/Layout/Scout.pm
+  Graph::Easy::Layout:
+    file: lib/Graph/Easy/Layout.pm
+    version: '0.76'
+  Graph::Easy::Layout::Chain:
+    file: lib/Graph/Easy/Layout/Chain.pm
+    version: '0.76'
+  Graph::Easy::Layout::Force:
+    file: lib/Graph/Easy/Layout/Force.pm
+    version: '0.76'
+  Graph::Easy::Layout::Grid:
+    file: lib/Graph/Easy/Layout/Grid.pm
+    version: '0.76'
+  Graph::Easy::Layout::Path:
+    file: lib/Graph/Easy/Layout/Path.pm
+    version: '0.76'
+  Graph::Easy::Layout::Repair:
+    file: lib/Graph/Easy/Layout/Repair.pm
+    version: '0.76'
+  Graph::Easy::Layout::Scout:
+    file: lib/Graph/Easy/Layout/Scout.pm
+    version: '0.76'
+  Graph::Easy::Node:
+    file: lib/Graph/Easy/Node.pm
+    version: '0.76'
+  Graph::Easy::Node::Anon:
+    file: lib/Graph/Easy/Node/Anon.pm
+    version: '0.76'
+  Graph::Easy::Node::Cell:
+    file: lib/Graph/Easy/Node/Cell.pm
+    version: '0.76'
+  Graph::Easy::Node::Empty:
+    file: lib/Graph/Easy/Node/Empty.pm
+    version: '0.76'
+  Graph::Easy::Parser:
+    file: lib/Graph/Easy/Parser.pm
+    version: '0.76'
+  Graph::Easy::Parser::Graphviz:
+    file: lib/Graph/Easy/Parser/Graphviz.pm
+    version: '0.76'
+  Graph::Easy::Parser::VCG:
+    file: lib/Graph/Easy/Parser/VCG.pm
+    version: '0.76'
+  Graph::Easy::Util:
+    file: lib/Graph/Easy/Util.pm
+recommends:
+  Graph::Easy::As_svg: '0.23'
+requires:
+  Scalar::Util: '1.13'
+  perl: v5.8.2
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+  repository: https://bitbucket.org/shlomif/perl-graph-easy
+version: '0.76'

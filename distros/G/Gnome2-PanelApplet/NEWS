@@ -1,0 +1,15 @@
+Overview of changes in Gnome2::PanelApplet 0.03
+===============================================
+
+* Wrap panel_applet_get_locked_down, panel_applet_request_focus and
+  panel_applet_set_background_widget.
+
+Overview of changes in Gnome2::PanelApplet 0.02
+===============================================
+
+* Wrap the GConf helper API.
+
+Overview of changes in Gnome2::PanelApplet 0.01
+===============================================
+
+* Initial release.

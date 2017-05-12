@@ -1,0 +1,62 @@
+
+Graph-Convert
+=============
+
+To install this module type the following:
+
+Untar the package:
+
+	tar -xzf Graph-Convert-x.xx.tar.gz
+
+where x.xx is the current revision.
+
+Change into the directory:
+
+	chdir Graph-Convert-x.xx/
+
+Verify the package:
+
+	cpansign --verify
+
+If the package fails to verify, do NOT run Makefile.pl nor install it and
+notify me immidiately. YOUR SYSTEM MIGHT GET COMPROMISED! 
+
+When the package verified okay, then proceed:
+
+        perl Makefile.PL
+
+If you get warnings about missing or outdated modules, then
+upgrade/install these first. 
+
+Then run the testsuite:
+
+        make test
+
+If all tests pass, install the package:
+
+        sudo make install
+
+You also might want to install the following packages from CPAN:
+
+	Graph::Easy::Manual	full manual for Graph::Easy (POD & HTML)
+
+Under windows, install first the free nmake utility from Microsoft, then
+replace "make" with "nmake".
+
+HELP
+====
+
+An comprehensive online manual can be found at:
+
+	http://bloodgate.com/perl/graph/manual/
+
+AUTHOR
+======
+
+Copyright (C) 2006-2007 by Tels http://bloodgate.com/perl/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL version 2 or later.
+
+See the LICENSE file for a copy of the GPL.
+

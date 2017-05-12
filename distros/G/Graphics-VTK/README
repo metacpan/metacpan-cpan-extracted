@@ -1,0 +1,122 @@
+****************************************************************
+** WARNING: There is absolutely no warranty for this software **
+** package. See the file COPYING for details.                 **
+****************************************************************
+
+			    Graphics::VTK 
+			    Version  4.0.001
+			  	 by 
+			    Roberto De Leo
+			        and
+			    John Cerney
+			 j-cerney1@raytheon.com
+
+  What is it?
+  -----------
+  Graphics::VTK  is a module that allows you to call VTK (Visualization
+  ToolKit) functions from a perl script. The Visualization ToolKit is
+  an open-source 3D Graphics Visualization library available at
+  www.kitware.com.
+  
+  Graphics::VTK is designed to work similarly to the  TCL bindings
+  that come with the stock VTK package. For example, Perl Tk Widgets are provided that 
+  interface with VTK, similar to the tcl/tk widget interfaces provided with 
+  the stock VTK.
+
+
+  Prerequisites
+  -------------
+
+  You need to install two packages before trying to compile this:
+  - the Tk module, that you can get from http://www.cpan.org
+  - the VTK library, version 4.0, that is freely available 
+    from ftp://public.kitware.com/pub/vtk/vtk4.0
+    (Version 4.0 is of VTK is required, not version 3.1, or 3.2. 
+    Graphics::VTK 4.0.001 is specifically for VTK version 4.0.)
+    
+  To test the module, you will need the VTK test data available
+  at www.kitware.com. Once you have this data installed, set
+  the environment variable VTK_DATA_ROOT to point to the installation
+  path of this data. For example, if you extracted the vtk data
+  to /home/mydir/vtkdata, set VTK_DATA_ROOT=/home/mydir/vtkdata
+
+
+  Installation
+  ------------
+
+  First of all, you should modify the file VTK.config according to your 
+  system. Example files are provided that a known to work with Redhat 7.1,
+  Solaris 2.6.1, and win32 (with the mingw compiler on win32). Note
+  that the installation process is slightly different from the standard
+  perl module compilation because we have to use a C++ compiler. Perl
+  modules typically use a C compiler.
+  
+  Then you can now start the compilation with the standard
+
+  perl makefile.PL
+  make
+  make test
+  make install
+
+  WARNING: during the compilation, consumption of memory arrives to ~200Mb
+  so do not try to compile this module if you do not have enough RAM+Swap
+  
+  Note: As of this release. This package has been successfully built and
+  tested on Sun Solaris, Linux (Red Hat 7.1, 7.3), and Windows NT (using mingw32
+  compiler).
+
+  Testing
+  -------
+  
+  With the VTK data installed (see Prerequisites section), this package
+  is tested by running a set of example scripts that are known to work. 
+  See the examples/README file, or the test.pl script itself for a list
+  of these scripts. These test scripts are interactive, so you will
+  have to view the results and exit-out of each test as they are run.
+  
+  Example Scripts
+  ---------------
+  
+  The example tcl scripts from the VTK 4.0 distribution have been converted
+  to perl and placed in the following directories under the 'examples' dir:
+  Annotation, DataManipulation,GUI,  ImageProcessing, IO, Modeling, Rendering,
+  Tutorial, VisualizationAlgorithms, VolumeRendering.
+  
+  Documentation
+  -------------
+
+  Detailed documentation of the VTK package is available at the VTK 
+  web site at http://www.kitware.com. The documentation included in this 
+  package details which object methods are  supported. After
+  installing type 'perldoc VTK', or perldoc 'Graphics::VTK::Common', etc,
+  to access these docs.
+
+
+  VTK Versions and Graphics::VTK Versions
+  ---------------------------------------
+  
+  Due to differences between c++ methods of different VTK versions, 
+  Graphics::VTK versions are closely tied to a particular VTK version.
+  For example, Graphics::VTK 4.0.001 is written to work with VTK 4.0 
+  only. Similarly, Graphics::VTK 3.2.001 is written to work with VTK 3.2
+  only.
+ 
+  Note that any scripts you write using Graphics::VTK 3.2.001 should
+  still work with any new releases (version 3.2.001, or 4.0.001), 
+  unless you are using some feature of VTK that has changed between 
+  VTK 3.2 and 4.0. 
+
+
+  Known Issues
+  ------------
+  Under some conditions, perl/VTK will deadlock (i.e. freeze/hang-up) when
+  performing i/o operations using C++ streams. This has been observed for
+  the using glibc/gcc on a redhat linux 7.2 platform, where the
+  supplied perl was not linked against the pthread library. (libpthread
+  doesn't show up when performing a perl -V).
+  As a work-around, the LD_PRELOAD environment variable can be set to 
+  fix this problem. i.e. before running perl on the command line (or
+  in your .bashrc file) type the following:
+  export LD_PRELOAD=libpthread.so 
+  
+  

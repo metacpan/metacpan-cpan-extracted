@@ -1,0 +1,6 @@
+Revision history for Perl extension Games::Quake::Stats.
+
+0.01  Sun May 24 18:00:47 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn Games::Quake::Stats
+

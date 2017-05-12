@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/git-megapull
+dist.ini
+lib/Git/Megapull.pm
+lib/Git/Megapull/Source.pm
+lib/Git/Megapull/Source/Github.pm
+t/000-report-versions-tiny.t
+t/compile.t
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

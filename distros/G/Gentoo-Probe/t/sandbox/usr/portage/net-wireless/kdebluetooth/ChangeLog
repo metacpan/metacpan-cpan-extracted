@@ -1,0 +1,29 @@
+# ChangeLog for net-wireless/kdebluetooth
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/kdebluetooth/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  22 Apr 2004; Luca Barbato <lu_zero@gentoo.org> kdebluetooth-20040416.ebuild:
+  Marked ~ppc and fixed the sourcepath
+
+*kdebluetooth-20040416 (16 Apr 2004)
+
+  16 Apr 2004; Caleb Tennis <caleb@gentoo.org> kdebluetooth-20031218.ebuild,
+  kdebluetooth-20040128.ebuild, kdebluetooth-20040416.ebuild:
+  New version, remove old versions
+
+*kdebluetooth-20040308 (09 Mar 2004)
+
+  09 Mar 2004; Caleb Tennis <caleb@gentoo.org> kdebluetooth-20040308.ebuild:
+  Version bump, ebuild provided by author (bug #44106)
+
+*kdebluetooth-20040128 (05 Feb 2004)
+
+  05 Feb 2004; Caleb Tennis <caleb@gentoo.org> kdebluetooth-20040128.ebuild:
+  New version, closes bug #39704
+
+*kdebluetooth-20031218 (06 Jan 2004)
+
+  06 Jan 2004; Caleb Tennis <caleb@gentoo.org> kdebluetooth-20031218.ebuild,
+  metadata.xml:
+  Initial import - see bug #35351.
+

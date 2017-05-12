@@ -1,0 +1,9 @@
+o should positionals be supported for action-type options?
+
+o integer/number type assertions
+
+o test coverage
+  o actions
+  o arg_handler
+  o quit/stop
+  o type checking

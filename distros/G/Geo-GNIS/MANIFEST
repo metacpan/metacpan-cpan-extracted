@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/gnis.t
+t/gnis-sample.txt
+GNIS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

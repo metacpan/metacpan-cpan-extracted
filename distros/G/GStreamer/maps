@@ -1,0 +1,66 @@
+# $Id$
+
+GST_TYPE_BIN			GstBin			GstObject	GStreamer::Bin
+GST_TYPE_BUS			GstBus			GstObject	GStreamer::Bus
+GST_TYPE_CLOCK			GstClock		GstObject	GStreamer::Clock
+GST_TYPE_ELEMENT		GstElement		GstObject	GStreamer::Element
+GST_TYPE_ELEMENT_FACTORY	GstElementFactory	GstObject	GStreamer::ElementFactory
+GST_TYPE_GHOST_PAD		GstGhostPad		GstObject	GStreamer::GhostPad
+GST_TYPE_INDEX			GstIndex		GstObject	GStreamer::Index
+GST_TYPE_INDEX_FACTORY		GstIndexFactory		GstObject	GStreamer::IndexFactory
+GST_TYPE_OBJECT			GstObject		GstObject	GStreamer::Object
+GST_TYPE_PAD			GstPad			GstObject	GStreamer::Pad
+GST_TYPE_PAD_TEMPLATE		GstPadTemplate		GstObject	GStreamer::PadTemplate
+GST_TYPE_PIPELINE		GstPipeline		GstObject	GStreamer::Pipeline
+GST_TYPE_PLUGIN			GstPlugin		GstObject	GStreamer::Plugin
+GST_TYPE_PLUGIN_FEATURE		GstPluginFeature	GstObject	GStreamer::PluginFeature
+GST_TYPE_QUEUE			GstQueue		GstObject	GStreamer::Queue
+GST_TYPE_REGISTRY		GstRegistry		GstObject	GStreamer::Registry
+GST_TYPE_SYSTEM_CLOCK		GstSystemClock		GstObject	GStreamer::SystemClock
+GST_TYPE_TASK			GstTask			GstObject	GStreamer::Task
+GST_TYPE_TYPE_FIND_FACTORY	GstTypeFindFactory	GstObject	GStreamer::TypeFindFactory
+
+GST_TYPE_CHILD_PROXY		GstChildProxy		GInterface	GStreamer::ChildProxy
+GST_TYPE_TAG_SETTER		GstTagSetter		GInterface	GStreamer::TagSetter
+GST_TYPE_URI_HANDLER		GstURIHandler		GInterface	GStreamer::URIHandler
+
+GST_TYPE_BUFFER			GstBuffer		GstMiniObject	GStreamer::Buffer
+GST_TYPE_EVENT			GstEvent		GstMiniObject	GStreamer::Event
+GST_TYPE_MESSAGE		GstMessage		GstMiniObject	GStreamer::Message
+GST_TYPE_MINI_OBJECT		GstMiniObject		GstMiniObject	GStreamer::MiniObject
+GST_TYPE_QUERY			GstQuery		GstMiniObject	GStreamer::Query
+
+GST_TYPE_CAPS			GstCaps			GBoxed		GStreamer::Caps
+GST_TYPE_INDEX_ENTRY		GstIndexEntry		GBoxed		GStreamer::IndexEntry
+GST_TYPE_TAG_LIST		GstTagList		GBoxed		GStreamer::TagList
+
+GST_TYPE_CLOCK_RETURN		GstClockReturn		GEnum		GStreamer::ClockReturn
+GST_TYPE_EVENT_TYPE		GstEventType		GEnum		GStreamer::EventType
+GST_TYPE_FLOW_RETURN		GstFlowReturn		GEnum		GStreamer::FlowReturn
+GST_TYPE_FORMAT			GstFormat		GEnum		GStreamer::Format
+GST_TYPE_INDEX_CERTAINTY	GstIndexCertainty	GEnum		GStreamer::IndexCertainty
+GST_TYPE_INDEX_LOOKUP_METHOD	GstIndexLookupMethod	GEnum		GStreamer::IndexLookupMethod
+GST_TYPE_PAD_DIRECTION		GstPadDirection		GEnum		GStreamer::PadDirection
+GST_TYPE_PAD_LINK_RETURN	GstPadLinkReturn	GEnum		GStreamer::PadLinkReturn
+GST_TYPE_PAD_PRESENCE		GstPadPresence		GEnum		GStreamer::PadPresence
+GST_TYPE_QUERY_TYPE		GstQueryType		GEnum		GStreamer::QueryType
+GST_TYPE_SEEK_TYPE		GstSeekType		GEnum		GStreamer::SeekType
+GST_TYPE_STATE			GstState		GEnum		GStreamer::State
+GST_TYPE_STATE_CHANGE_RETURN	GstStateChangeReturn	GEnum		GStreamer::StateChangeReturn
+GST_TYPE_TAG_MERGE_MODE		GstTagMergeMode		GEnum		GStreamer::TagMergeMode
+GST_TYPE_URI_TYPE		GstURIType		GEnum		GStreamer::URIType
+
+GST_TYPE_ASSOC_FLAGS		GstAssocFlags		GFlags		GStreamer::AssocFlags
+GST_TYPE_BUFFER_FLAG		GstBufferFlag		GFlags		GStreamer::BufferFlag
+GST_TYPE_EVENT_TYPE_FLAGS	GstEventTypeFlags	GFlags		GStreamer::EventTypeFlags
+GST_TYPE_MESSAGE_TYPE		GstMessageType		GFlags		GStreamer::MessageType
+GST_TYPE_SEEK_FLAGS		GstSeekFlags		GFlags		GStreamer::SeekFlags
+GST_TYPE_TAG_FLAG		GstTagFlag		GFlags		GStreamer::TagFlag
+
+GST_CORE_ERROR			GST_TYPE_CORE_ERROR			GError		GStreamer::CoreError
+GST_CORE_ERROR_MISSING_PLUGIN	GST_TYPE_CORE_ERROR_MISSING_PLUGIN	GError		GStreamer::CoreErrorMissingPlugin
+GST_LIBRARY_ERROR		GST_TYPE_LIBRARY_ERROR			GError		GStreamer::LibraryError
+GST_PARSE_ERROR			GST_TYPE_PARSE_ERROR			GError		GStreamer::ParseError
+GST_PLUGIN_ERROR		GST_TYPE_PLUGIN_ERROR			GError		GStreamer::PluginError
+GST_RESOURCE_ERROR		GST_TYPE_RESOURCE_ERROR			GError		GStreamer::ResourceError
+GST_STREAM_ERROR		GST_TYPE_STREAM_ERROR			GError		GStreamer::StreamError

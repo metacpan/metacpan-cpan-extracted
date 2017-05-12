@@ -1,0 +1,1 @@
+media-fonts/encodings x11-apps/mkfontscale x11-apps/mkfontdir || ( >=sys-apps/man-1.6b-r2 >=sys-apps/man-db-2.4.3-r1 ) !<=x11-base/xorg-x11-6.9

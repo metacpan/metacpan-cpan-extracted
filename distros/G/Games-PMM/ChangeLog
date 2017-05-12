@@ -1,0 +1,11 @@
+Games::PMM
+----------
+
+Sat Nov 29 07:55:18 UTC 2003 (0.10, chromatic)
+	- cleaned up scanning algorithm
+	- implemented attacking
+	- filled in Games::PMM::Monster documentation
+
+Sat Nov 29 00:00:00 UTC 2003 (initial version)
+	- created
+	- first distributed

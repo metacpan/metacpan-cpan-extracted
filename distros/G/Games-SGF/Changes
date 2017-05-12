@@ -1,0 +1,118 @@
+Revision history for Games-SGF
+
+0.01    3/18/2008
+        First version, released on an unsuspecting world.
+
+0.02    3/19/2008
+        Added t/copy.t and fixed some bugs which it exposed
+        Removed t/boilerplate.t
+        Added t/addon.t and fixed some bugs which it exposed
+
+0.03    3/19/2008
+        Added t/sgf_test.pl For common test subs
+        Rewrote t/copy.t and t/addon.t in order to use t/sgf_test.pl
+        Fixed bug in _isSpaceRemovable, where it did not give $self
+           to _getTagType
+        Fixed handling of spaces in _read
+        Removed random _debug statements
+        Added Games::SGF::Go
+        Moved $errstr and $DEBUG to be encapsulated as {'errstr'} and {'debug'}
+
+        3/20/2008
+        Added t/go_test.t and t/sgf/go-1.sgf which it uses
+        Added err method to SGF.pm
+
+        3/21/2008
+        FIXED empty tag handling.
+        UPDATED the docs for the callbacks
+
+        3/22/2008
+        Added Pass move handling to Go.pm
+
+0.04
+        3/27/2008
+        Changed enum requirement 1.016
+        Rewrote test scripts in order to deep test structures better
+        Added t/text.t for testing SIMPLE_TEXT and TEXT types
+        Fixed SIMPLE_TEXT and TEXT type handling
+        Fixed sgf_test.pl undef warnings
+
+0.05
+        3/29/08
+        Stubbed LoA and Twixt subclass modules
+        Writing Module::Build script
+        Added isMove, Move type subs for SGF.pm and Go.pm
+        Restructured _typeFunc's
+        Modified tests to have better coverage over code
+        Removed from setProperty tag check on compose _tagCheck handles it
+
+        3/30/08
+        Integrated isType, and type(move|point|stone) methods
+        Added edit.t test (removal and split methods)
+        Fixed Bugs when during test writing
+
+        3/31/08
+        Added inherit.t
+        Fixed some bugs related to inherited tags
+        Added example/sgf_plit.pl
+        
+        4/02/08 -released
+        set to Beta
+
+0.06
+        4/05/08
+        Wrote more tests, and fixed bugs that poped up
+
+        4/06/08
+        Added Games::SGF::Util
+        Added t/util.t
+        Added gotoRoot to Games::SGF
+        Changed nextGame and prevGame to use Games::SGF
+        Changed tests to use gotoRoot
+        Restructured SGF.pm
+        Made Build.pm Compatible with Makefile.PL
+        Added Pod::Coverage, Test::Pod, and Test::Pod::Coverage to PRE_REQ
+
+        4/07/08
+        Worked on SGF.pm's POD
+
+0.07
+        07/16/08
+        Updated Debuging API
+        Fixed AW[aa]AW[bb] Handling
+        Fixed some other buggs as noticed
+
+0.08
+        07/30/08
+        Added redefineTag to Games::SGF
+        Allowed Games::SGF::Go to make stone 
+            types into point types using redefineTag.
+        Modified _getTag* to check $ff_properties first
+        Fixed and Added tests to:
+            t/addon.t
+            t/go-game.t
+            t/sgf_prop.t
+
+0.99
+      09/30/09
+      Added clone method to Games::SGF, using Clone::PP
+      Added Games::SGF::Util, for useful functions
+      Added t/util.t for testing of Util.pm
+      Modified other tests to improve coverage
+
+0.991
+      10/02/09
+      Clean module, setting permissions, and removing uneeded files
+      Added $sgf->empty and $sgf->isEmpty, and incorperated them into the core 
+      Made sure _clear comes before the Debug statements
+
+0.992
+      10/11/09
+      Changed some documentation in Games::SGF::Util
+      SGF.pm now checks for invalid tags need to pass /^[a-zA-Z]+$/
+      restructuring navigation, and tree manipulation code
+
+0.993
+      04/28/10
+      Games::SGF::Util touch method fixed for deep recursion
+      Remove clone feature, deep recursion problem

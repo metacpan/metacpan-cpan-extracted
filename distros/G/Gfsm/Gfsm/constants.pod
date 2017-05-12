@@ -1,0 +1,123 @@
+
+# Below is stub documentation for your module. You'd better edit it!
+
+=head1 NAME
+
+Gfsm::constants - constants defined in the Gfsm module.
+
+=head1 SYNOPSIS
+
+ use Gfsm;
+
+ ##------------------------------------------------------------
+ ## Library Information
+ $version_string = Gfsm::library_version();
+
+ ##------------------------------------------------------------
+ ## Arc Labels
+ use Gfsm qw(:labels);
+ $lab = $Gfsm::epsilon  = Gfsm::epsilon();
+ $lab = $Gfsm::noLabel  = Gfsm::noLabel();
+ 
+ $lab = $Gfsm::epsilon1 = Gfsm::epsilon1(); # for low-level composition
+ $lab = $Gfsm::epsilon2 = Gfsm::epsilon2(); # for low-level composition
+
+ ##------------------------------------------------------------
+ ## State IDs
+ use Gfsm qw(:states);
+ $id  = $Gfsm::noState = Gfsm::noState();
+
+ ##--------------------------------------------------------------
+ ## Semiring types
+ use Gfsm qw(:srtypes);
+ $typ = $Gfsm::SRTUnknown  = Gfsm::SRTUnknown();
+ $typ = $Gfsm::SRTBoolean  = Gfsm::SRTBoolean();
+ $typ = $Gfsm::SRTLog      = Gfsm::SRTLog();
+ $typ = $Gfsm::SRTReal     = Gfsm::SRTReal();
+ $typ = $Gfsm::SRTTrivial  = Gfsm::SRTTrivial();
+ $typ = $Gfsm::SRTTropical = Gfsm::SRTTropical();
+ $typ = $Gfsm::SRTPLog     = Gfsm::SRTPLog();
+ $typ = $Gfsm::SRTPUser    = Gfsm::SRTPUser();
+
+ ##--------------------------------------------------------------
+ ## Automaton arc-sort modes
+ use Gfsm qw(:sortmodes);
+ $mod = $Gfsm::ASMNone   = Gfsm::ASMNone();
+ $mod = $Gfsm::ASMLower  = Gfsm::ASMLower();
+ $mod = $Gfsm::ASMUpper  = Gfsm::ASMUpper();
+ $mod = $Gfsm::ASMWeight = Gfsm::ASMWeight();
+ 
+ $mod = $Gfsm::ACNone    = Gfsm::ACNone();
+ $mod = $Gfsm::ACReverse = Gfsm::ACReverse();
+ $mod = $Gfsm::ACAll     = Gfsm::ACAll();
+ 
+ $mod = $Gfsm::ACLower   = Gfsm::ACLower();
+ $mod = $Gfsm::ACUpper   = Gfsm::ACUpper();
+ $mod = $Gfsm::ACWeight  = Gfsm::ACWeight();
+ $mod = $Gfsm::ACSource  = Gfsm::ACSource();
+ $mod = $Gfsm::ACTarget  = Gfsm::ACTarget();
+ $mod = $Gfsm::ACUser    = Gfsm::ACUser();
+ 
+ $mod = $Gfsm::ACLowerR  = Gfsm::ACLowerR();
+ $mod = $Gfsm::ACUpperR  = Gfsm::ACUpperR();
+ $mod = $Gfsm::ACWeightR = Gfsm::ACWeightR();
+ $mod = $Gfsm::ACSourceR = Gfsm::ACSourceR();
+ $mod = $Gfsm::ACTargetR = Gfsm::ACTargetR();
+ $mod = $Gfsm::ACUserR   = Gfsm::ACUserR();
+ 
+ ##-- mask construction & parsing
+ $bits = $Gfsm::ACShift  = Gfsm::ACShift();
+ $maxn = $Gfsm::ACMaxN   = Gfsm::ACMaxN();
+ 
+ $mask  = Gfsm::acmask_from_chars($chars);   ##-- $chars a string matching /^[lLuUsStTwW_]*$/
+ $mask  = Gfsm::acmask_from_args(@cmps);     ##-- @cmps a list of elementary comparisons
+ $chars = Gfsm::acmask_to_chars($mask);
+ 
+ $mask  = Gfsm::acmask_new($cmp,$n);          ##-- new mask for ${n}th comparison $cmp
+ $cmp   = Gfsm::acmask_nth($mask,$n);         ##-- get ${n}th comparison in $mask
+ $cmp0  = Gfsm::acmask_nth_comp($mask,$n);    ##-- get ${n}nth field in $mask (modulo sort direction)
+ $bool  = Gfsm::acmask_nth_reverse($mask,$n); ##-- is the ${n}th comparison in $mask reversed?
+ $char  = Gfsm::acmask_nth_char($mask,$n);    ##-- single-character representation of ${n}th comp in $mask
+
+ ##--------------------------------------------------------------
+ ## Label sides
+ use Gfsm qw(:labelsides);
+ $sid = $Gfsm::LSBoth  = Gfsm::LSBoth();
+ $sid = $Gfsm::LSLower = Gfsm::LSLower();
+ $sid = $Gfsm::LSUpper = Gfsm::LSUpper();
+
+ ##--------------------------------------------------------------
+ ## NULL objects
+ $abet = $Gfsm::Alphabet::NULL;
+ $fsm  = $Gfsm::Automaton::NULL;
+
+ ##--------------------------------------------------------------
+ ## all of the above
+ use Gfsm qw(:constants);
+
+
+=head1 DESCRIPTION
+
+A number of constants may be exported by the Gfsm module.  They are
+listed above.
+
+=head1 SEE ALSO
+
+Gfsm(3perl),
+gfsmutils(1).
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by Bryan Jurish
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

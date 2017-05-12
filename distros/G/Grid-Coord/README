@@ -1,0 +1,86 @@
+NAME
+    Grid::Coord - abstract representation and manipulation of points and
+    rectangles
+
+SYNOPSIS
+      use Grid::Coord
+            my $point1 = Grid::Coord->new(5,4);        # point(y=>5, x=>4)
+            my $rect1  = Grid::Coord->new(2,3 => 6,5); # rectangle
+            print "TRUE" if $rect1->contains($point1);
+
+            my $rect2  = Grid::Coord->new(3,4 => 5,5); # another rectangle
+            my $rect3  = $rect1->overlap($rect2)       # (3,4 => 5,5)
+            print $rect3->stringify;                   # "(3,4 => 5,5)"
+            print $rect3;                              # "(3,4 => 5,5)"
+            print "TRUE" if $rect3->equals(Grid::Coord->new(3,4 => 5,5));
+            print "TRUE" if $rect3 == Grid::Coord->new(3,4 => 5,5);
+
+DESCRIPTION
+    Manage points or rectangles on a grid. This is generic, and could be
+    used for spreadsheets, ascii art, or other nefarious purposes.
+
+USAGE
+  Constructor
+     Grid->Coord->new($y, $x);
+     Grid->Coord->new($min_y, $min_x,  $max_y, $max_x);
+
+  Accessing coordinates
+    The "min_y", "min_x", "max_y", "max_x" functions:
+
+     print $coord->max_x; # get value
+     $coord->min_x(4);    # set value to 4
+
+  Relationships with other Coords
+     $c3 = $c1->overlap($c2);
+     print "TRUE" if $rect1->contains($rect2);
+     print "TRUE" if $rect1->equals($rect2);
+
+  Overloaded operators
+    Four operators are overloaded:
+
+    * the stringification operator
+        So that "print $coord" does something reasonable
+
+    * the equality operator
+        so that "if ($coord1 == $coord2)" does the right thing.
+
+    * the add operator
+        So that "$c1 + $c2" is a synonym for "$c1-"offset($c2)>
+
+    * the subtract operator
+        So that "$c1 - $c2" is a synonym for "$c1-"delta($c2)>
+
+  Iterating
+    The iterator returns a Grid::Coord object for each cell in the current
+    Grid::Coord range.
+
+      my $it = $grid->cell_iterator; # or ->cell_iterator_rowwise
+      # my $it = $grid->cell_iterator_colwise; # top to bottom
+
+      while (my $cell = $it3->()) {
+        # do something to $cell
+      }
+
+    You can also iterate columns/rows with $grid->cells_iterator
+    $grid->rows_iterator
+
+BUGS
+    None reported yet.
+
+SUPPORT
+    From the author.
+
+AUTHOR
+            osfameron@cpan.org
+            http://osfameron.perlmonk.org/
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

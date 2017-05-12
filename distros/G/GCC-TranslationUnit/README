@@ -1,0 +1,22 @@
+GCC/TranslationUnit version 1.0
+================================
+
+This module will parse the output of gcc -fdump-translation-unit and
+return a datastructure with methods to access the internal data of GCC.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Ashley Winters
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

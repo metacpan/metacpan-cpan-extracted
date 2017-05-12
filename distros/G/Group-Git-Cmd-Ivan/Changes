@@ -1,0 +1,37 @@
+Revision history for Group-Git-Cmd-Ivan
+
+0.0.3   2016-05-22
+        Updating for release of version 0.0.3
+        tagging that this is a CPAN release (Ivan Wills)
+        Removed stats as it's now in its own repo (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Group-Git-Cmd-Ivan (Ivan Wills)
+        Added all other Group::Git addon to this one (Ivan Wills)
+        Removed SinceRelease reference (Ivan Wills)
+        Added in todo (Ivan Wills)
+        Updated date (Ivan Wills)
+        Removed old file from test (Ivan Wills)
+        Removed old file from test (Ivan Wills)
+        Fixed skip file (Ivan Wills)
+        #1 Added missing dependency (Ivan Wills)
+        Setting default editor vtide configs (Ivan Wills)
+        Removed creation of makefile (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+        Moved to their own repositories (Ivan Wills)
+        Added option to show that the repository is released (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        Removed final new line to make output more consistent (Ivan Wills)
+        Updated TODO (Ivan Wills)
+        Fixed up TODO in MD format (Ivan Wills)
+        New TODO summarizer (Ivan Wills)
+        New TODO file (Ivan Wills)
+
+0.0.2   2015-01-25
+        Updating for release of version 0.0.2
+        Added documentation (Ivan Wills)
+        Added --no-release option for describing branches that have never been released (Ivan Wills)
+
+0.0.1   2013-05-15
+        First version, released on an unsuspecting world.
+

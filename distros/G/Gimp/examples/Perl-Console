@@ -1,0 +1,181 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+#BEGIN { $Gimp::verbose = 1; }
+use Gimp;
+use Gimp::Fu;
+use Gimp::UI; # will initialise GIMP UI including theme
+use Gtk2::Gdk::Keysyms;
+
+my $INIT_TEXT = "Gimp-Perl Console v1.0\n\n";
+my $TITLE = "Perl Console";
+my %KEYVAL2HANDLER = (
+  $Gtk2::Gdk::Keysyms{Return} => \&key_return,
+  $Gtk2::Gdk::Keysyms{KP_Enter} => \&key_return,
+  $Gtk2::Gdk::Keysyms{ISO_Enter} => \&key_return,
+  $Gtk2::Gdk::Keysyms{KP_Up} => \&key_up,
+  $Gtk2::Gdk::Keysyms{Up} => \&key_up,
+  $Gtk2::Gdk::Keysyms{KP_Down} => \&key_down,
+  $Gtk2::Gdk::Keysyms{Down} => \&key_down,
+);
+my @INIT_COMMANDS = (
+  '($i) = Gimp::Image->list',
+  '($l) = $i->get_layers if $i',
+);
+my @history;
+my $history_index = 0;
+
+podregister {
+  Gimp::gtk_init;
+  my $window = Gtk2::Window->new('toplevel');
+  $window->signal_connect('delete_event' => sub { Gtk2->main_quit; });
+  $window->set_border_width(5);
+  $window->set_title($TITLE);
+  my ($buffer, $vbox) = make_vbox($INIT_TEXT);
+  for my $line (@INIT_COMMANDS) { gui_process_command($buffer, $line); }
+  $window->add($vbox);
+  $window->show;
+  Gtk2->main;
+};
+
+exit main;
+
+sub key_return {
+  my ($e, $buffer) = @_;
+  my $line = $e->get_text;
+  $e->set_text("");
+  $e->grab_focus;
+  return if $line =~ m/^\s*$/; # ignore empty lines
+  push @history, $line unless @history > 0 and $line eq $history[-1];
+  $history_index = @history;
+  gui_process_command($buffer, $line);
+}
+
+sub gui_process_command {
+  my ($buffer, $line) = @_;
+  $buffer->insert($buffer->get_end_iter, "\n".process_input($line));
+}
+
+sub entry_newtext {
+  my ($e, $text) = @_;
+  $e->set_text($text);
+  $e->set_position(length $text);
+}
+
+sub key_up {
+  my ($e, $buffer) = @_;
+  return if $history_index == 0;
+  entry_newtext($e, $history[--$history_index] // '');
+}
+
+sub key_down {
+  my ($e, $buffer) = @_;
+  return if $history_index >= @history;
+  entry_newtext($e, $history[++$history_index] // '');
+}
+
+sub make_vbox {
+  my ($text) = @_;
+  my $vbox = Gtk2::VBox->new(FALSE,0);
+
+    my $sw = Gtk2::ScrolledWindow->new (undef, undef);
+    $sw->set_policy ('automatic', 'automatic');
+    $sw->set_size_request (500, 300);
+    $sw->set_border_width(5);
+
+      my $tview = Gtk2::TextView->new;
+      $tview->set_editable(FALSE);
+      $tview->set_cursor_visible(FALSE);
+      $tview->set_wrap_mode('word');
+      my $buffer = $tview->get_buffer;
+      $buffer->insert($buffer->get_end_iter, $text);
+      $buffer->create_mark ('end', $buffer->get_end_iter, FALSE);
+      $buffer->signal_connect (insert_text => sub {
+	# textview idle updates - we must too
+	Glib::Idle->add(sub {
+	  $tview->scroll_to_mark ($buffer->get_mark ('end'), 0.0, TRUE, 0, 0.5);
+	  0;
+	});
+      });
+
+    $sw->add($tview);
+  $vbox->pack_start($sw,TRUE,TRUE,4);
+    #--------------------------------------
+    my $hbox = Gtk2::HBox->new;
+
+      my $entry = Gtk2::Entry->new;
+    $hbox->pack_start($entry,TRUE,TRUE,0);
+
+      $entry->signal_connect('key_press_event'=> sub {
+	my ($widget,$event) = @_;
+	return 0 unless my $func = $KEYVAL2HANDLER{$event->keyval};
+	$func->($entry, $buffer);
+	1;
+      });
+
+    # $hbox->pack_end($btn_send,FALSE,TRUE,0); will be browse
+  #--------------------------------------
+  $vbox->pack_start($hbox,FALSE,TRUE,4);
+  $vbox->set_focus_child($hbox);
+  $vbox->show_all;
+  return ($buffer, $vbox);
+}
+
+sub process_input {
+  my ($input)= @_;
+  $input = 'Gtk2->main_quit' if $input eq 'exit';
+  my @out = eval("no strict;no warnings;\n#line 1 \"code\"\n".$input);
+  my $output;
+  if ($@) {
+    $output = $@;
+  } else {
+    $output = eval { join ' ', map { $_ // '(undef)' } @out; };
+    $output = "Error stringifying output: $@" if $@;
+  }
+  chomp $output;
+  my $to_add = "> $input\n$output";
+  $to_add =~ s#\0#\\0#g;
+  $to_add;
+}
+__END__
+
+=head1 NAME
+
+perl_fu_console - Gimp-Perl console
+
+=head1 SYNOPSIS
+
+<Toolbox>/Filters/Languages/_Perl/_Console
+
+=head1 DESCRIPTION
+
+Console for running Gimp-Perl commands and seeing output. Runs a couple
+of commands for you on startup, setting C<$i> to the current image,
+if any, and C<$l> to that image's active layer.
+
+Be warned that for many operations, the display(s) will not be updated,
+and you'll need to do C<Gimp-E<gt>displays_flush> to see changes.
+
+Try this:
+
+ $b = Gimp::Plugin->inner_bevel('Arial', 80, "Perl", 'red', 'purple', 132, 30, 7, 2)
+ Gimp::Display->new($b)
+ $b->get_layers
+
+You can run the console from the command line, and it will work in
+"batch mode":
+
+  <path-to-plugins>/Perl-Console
+
+=head1 AUTHOR
+
+Ed J
+
+=head1 DATE
+
+2014-05-19
+
+=head1 LICENSE
+
+Same terms as Gimp-Perl.

@@ -1,0 +1,107 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+N_"/Xtns/Render"; N_"/Xtns/Render/Logos"; # i18n workaround
+
+podregister {
+  # -- step 1 --
+  Gimp::Context->push();
+  Gimp::Context->set_background($color1);
+  Gimp::Context->set_foreground($color2);
+  my @dims = Gimp->text_get_extents_fontname($text, $fontsize, PIXELS,$font);
+  my $img = Gimp::Image->new($dims[0]+30, $dims[1]+10, RGB_IMAGE);
+
+  # none of the macro's did quite what I was looking for here.
+  # i.e. create a text layer on transparent only...
+
+  # -- step 2 --
+  $img->add_new_layer(0,TRANSPARENT_FILL);
+  $img->text_fontname(-1, 10, 10, $text, 0, 1, $fontsize, PIXELS, $font);
+  eval { Gimp::Display->new($img); }; # display the image early
+  my $layer = $img->merge_visible_layers(EXPAND_AS_NECESSARY);
+  my @pt1 = ($layer->width * 0.5 -1, 0);
+  my @pt2 = ($layer->width * 0.5 +1, $layer->height);
+  # -- step 3 --
+  $layer->set_lock_alpha(1);
+  $layer->edit_blend(FG_BG_RGB_MODE, NORMAL_MODE, GRADIENT_LINEAR, 100, 0, REPEAT_NONE, 0, 0, 0, 3, 0.20, @pt1, @pt2);
+  # -- step 4 --
+  my $layer2 = $layer->copy(0);     # Can you override these to have a default? (would be nice)
+  $img->insert_layer($layer2, 0, 0);
+  # -- step 5 --
+  $layer2->set_lock_alpha(1);
+  $img->selection_all;
+  Gimp::Context->set_background([1.0,1.0,1.0]);
+  $layer2->edit_fill(BACKGROUND_FILL);
+  # -- step 6 --
+  $layer2->set_lock_alpha(0);
+  $layer2->gauss_rle(6,1,1);
+  # -- step 7 --
+  $layer->plug_in_bump_map($layer2, $azimuth, $elevation, $depth, 0,0,0,0,1,0,$maptype);
+  # -- step 8 --
+  $layer2->invert;
+  $img->lower_item($layer2);
+  # -- step 9 --
+  $layer2->translate(2, 3);
+  # extra stuff
+  $img->add_new_layer(2);
+  $img->gimp_selection_none();
+  Gimp::Context->pop();
+  return $img
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+inner_bevel - Perform an inner bevel on text
+
+=head1 SYNOPSIS
+
+<Image>/File/Create/Logos/Inner Bevel...
+
+=head1 DESCRIPTION
+
+This uses tigert's inner bevel method on text, which can be found with
+his other excellent tutorials at http://tigert.gimp.org/
+
+Effect taken from L<http://tigert.gimp.org/gimp/tutorials/beveled_text/>, 
+perl-ified by Seth Burgess <sjburges@gimp.org>
+
+Programatically, this script is about as dull as they come.  The only
+exceptions are those of the neat util functions (that aren't all quite
+working btw).  You can follow step by step with the website at
+L<http://tigert.gimp.org/gimp/tutorials/beveled_text/>
+
+=head1 PARAMETERS
+
+ [PF_FONT, "font", "Font Name","URW Bookman L, Bold"],
+ [PF_FLOAT, "fontsize", "Size of text", 80],
+ [PF_STRING, "text", "Enter your text to be beveled", "INNERBEVEL"],
+ [PF_COLOR, "color1", "Blend to this color", [200,19,27]],
+ [PF_COLOR, "color2", "Blend from this color", [124,10,18]],
+ [PF_SLIDER, "azimuth", "Direction of the shine", 132, [0,255,5]],
+ [PF_SLIDER, "elevation", "How shiny the final image will be",30, [0,90,5]],
+ [PF_SLIDER, "depth", "Determines the final shape", 7 , [0,64,32]],
+ [PF_RADIO, "maptype", "The type of Map to use(0=Linear,1=Spherical,2=Sinusoidal)", 2, [Linear => 0, Spherical => 1, Sinusoidal => 2] ],
+
+=head1 IMAGE TYPES
+
+=head1 AUTHOR
+
+Seth Burgess
+
+=head1 DATE
+
+1999-03-23
+
+=head1 LICENSE
+
+Seth Burgess <sjburges@gimp.org>
+
+Distributed under the same terms as Gimp-Perl.

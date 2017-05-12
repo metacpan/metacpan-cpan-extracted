@@ -1,0 +1,34 @@
+--- #YAML:1.0
+name:                   Games-BonDigi
+version:                0.02
+abstract:               Very simple, but very crazy "social" game. This module demonstrates how to teach a computer to play it.
+author:
+  - Cosimo Streppone <cosimo@cpan.org>
+
+license:                gpl
+distribution_type:      module
+installdirs:            site
+
+requires:
+  Test::Class:          0.27
+  Test::More:           0.47
+recommends:
+  Test::Pod:            1.00
+  Test::Pod::Coverage:  0.08
+  Test::YAML::Meta:     0
+build_requires:
+  Test::Class:          0.27
+  Test::More:           0.47
+
+provides:
+  Games::BonDigi:
+    file: lib/Games/BonDigi.pm
+    version: 0.02
+  Test::Games::BonDigi:
+    file: lib/Test/Games/BonDigi.pm
+    version: 0.02
+
+meta-spec:
+   version: 1.3
+   url: http://module-build.sourceforge.net/META-spec-v1.3.html
+generated_by: vim

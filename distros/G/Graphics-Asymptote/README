@@ -1,0 +1,34 @@
+Graphics-Asymptote version 0.0.3
+
+This module provides a wrapper around the interpretor for Asymptote, a vector
+graphics language.  This is the initial release of the module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Perl version 5.10 or higher (you need the //= operator).
+
+Also, asy, the Asymptote interpreter.  To install this dependency, go to
+
+  http://asymptote.sourceforge.net/
+
+Note that the Asymptote package distributed with Ubuntu (and probably with
+Debian in general) is quite out-of-date and some of the command-line options
+that are used in Graphics::Asymptote will give that version of Asymptote
+trouble.  Therefore, you would do well to install a newer edition of Asymptote.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, David Mertens
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

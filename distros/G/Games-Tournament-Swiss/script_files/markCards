@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $man = 0;
+my $help = 0;
+
+GetOptions ( 'help|?' => \$help, man => \$man) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+use YAML qw/LoadFile DumpFile/;
+
+use Games::Tournament::Swiss::Config;
+
+my $league = LoadFile "../league.yaml";
+my $roles = $league->{roles} || [qw/Black White/];
+my $scores = $league->{scores} ||
+	{ win => 1, loss => 0, draw => 0.5, absent => 0, bye => 1 };
+my $firstRound = $league->{firstround} || 1;
+
+$Games::Tournament::Swiss::Config::firstround = $firstRound;
+%Games::Tournament::Swiss::Config::scores = %$scores;
+@Games::Tournament::Swiss::Config::roles = @$roles;
+
+require Games::Tournament::Swiss;
+require Games::Tournament::Contestant::Swiss;
+require Games::Tournament::Card;
+
+use File::Spec;
+use File::Basename;
+my $round = basename( File::Spec->rel2abs( '.' ) );
+die "round $round directory name not a round number" unless
+						    $round =~ m/^\d+$/;
+my $n = 0;
+
+my $results = LoadFile( "../scores/$round.yaml" ) unless $round < $firstRound;
+
+my $oldlist;
+my $lineup;
+my @absentees = @{ $league->{absent} } if $league->{absent};
+if ( -e "./player.yaml" and $round >= $firstRound ) {
+    $oldlist = LoadFile qq{./player.yaml};
+    for my $player (@$oldlist) {
+	push @$lineup, $player unless grep {$player->{name} eq $_} @absentees;
+    }
+}
+else {
+    for my $member ( @{ $league->{member} } ) {
+	next if grep {$member->{name} eq $_} @absentees;
+	next if $lineup and grep {$_->{name} eq $member->{name}} @$lineup;
+        push @$lineup, Games::Tournament::Contestant::Swiss->new(
+            oldId     => $member->{id},
+	    pairingNumber => $member->{pairingNumber},
+	    id => $member->{pairingNumber},
+            name   => $member->{name},
+            title  => $member->{title},
+            rating => $member->{rating},
+	    preference => Games::Tournament::Contestant::Swiss::Preference->new
+        );
+    }
+}
+
+use orz;
+
+my $tourney;
+if ( -e "./tourney.yaml" and $round >= $firstRound )
+{
+	$tourney = LoadFile "./tourney.yaml";
+	$tourney->entrants($lineup);
+	$tourney->round( $round );
+}
+else
+{
+	$tourney = Games::Tournament::Swiss->new(
+		entrants => $lineup );
+	$tourney->entrants($lineup);
+	$tourney->round( $round );
+	$tourney->assignPairingNumbers;
+	$tourney->initializePreferences;
+}
+
+no orz;
+
+my $games;
+$games = LoadFile "./matches.yaml";
+DumpFile "./matches.yaml.bak", $games;
+my @replayedGames = @$games;
+for my $game (@replayedGames) {
+    my %result;
+    for my $role ( @$roles, "Bye" ) {
+	my $player = $game->contestants->{$role};
+	next unless $player
+	  and $player->isa('Games::Tournament::Contestant');
+	my $result = $results->{ $player->id };
+	$result{$role} =
+	    $role eq 'Bye' ? 'Bye'
+	  : $result == $scores->{win}    ? 'Win'
+	  : $result == $scores->{draw}   ? "Draw"
+	  : $result == $scores->{loss}   ? "Loss"
+	  : $result == $scores->{absent} ? 'Absent'
+	  : "Error";
+	die "$result result for $role player $player->{id} in $game->{round} round"
+			unless defined $result and defined $result{$role};
+    }
+$game->result( \%result );
+}
+
+DumpFile "./matches.yaml", \@replayedGames;
+
+__END__
+
+=head1 NAME
+
+markCards - Mark cards with results of matches
+
+=head1 SYNOPSIS
+
+markCards
+
+--help            This help message
+
+--man            A man page
+
+=head1 DESCRIPTION
+
+B<markCards> tallies results from $scores/$round.yaml, marking the Games::Tournament::Card cards from matches.yaml with them. It then serializes the cards back into matches.yaml. The unmarked cards are preserved in matches.yaml.bak.
+
+The configuration file, ../league.yaml, holds the value of $scores, and $round is the directory name in which the command is run and where matches.yaml and player.yaml, a file of serialized player objects, exist. (The name must be a round number.)
+
+=cut
+# vim: set ts=8 sts=4 sw=4 noet:

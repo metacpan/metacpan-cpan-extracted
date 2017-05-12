@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+use strict;
+use Data::Dumper;
+
+use Getopt::Complete (
+    '>animal' => [
+        '>dog' => [
+            '>bark' => [
+                'ferocity'  => ['yip','wail','ruf','grrrr'], 
+                'count'  => ['1','2','one too many'], 
+            ],
+            '>drool' => [
+                'buckets=n' => undef, 
+                'lick'      => 'users', 
+            ],
+            'list!' => undef,
+        ],
+        '>cat' => [
+            '>purr' => [],
+            '>meow' => [ 
+                'volume=n' => undef,
+                'bass' => ['low','medium','high'],
+            ]
+        ],
+    ],
+    '>plant' => [
+        '>taters' => [
+            '>bake' => [
+                'hard!'     => undef,
+                'temp=n'    => undef,
+            ],
+            '>fry' => [
+                'greasiness'    => ['crispy','drippy'],
+                'width'         => ['fat','thin','frite'],
+            ]
+        ],
+        '>daisies' => [
+            '>pick' => [
+                '<>'            => ['mine','yours','theirs'],
+            ],
+            '>plant' => [
+                'season'        => ['winter','spring','summer','fall'],
+                'seeds=n'       => undef,
+                'deep!'         => undef,
+            ]
+        ]
+    ],
+);
+
+print Dumper($ARGS);
+
+1;
+
+

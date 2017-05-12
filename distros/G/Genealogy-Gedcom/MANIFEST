@@ -1,0 +1,31 @@
+Changelog.ini
+Changes
+data/GEDCOMANSELTable.xhtml
+data/royal.ged
+data/sample.1.ged
+data/sample.2.ged
+data/sample.3.ged
+data/sample.4.ged
+data/sample.5.ged
+data/sample.6.ged
+data/sample.7.ged
+docs/uuid.proposal.html
+docs/uuid.proposal.pod
+lib/Genealogy/Gedcom.pm
+lib/Genealogy/Gedcom/Reader.pm
+lib/Genealogy/Gedcom/Reader/Lexer.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/find.unused.limits.pl
+scripts/lex.pl
+scripts/parse.sample.7.pl
+scripts/pod2html.sh
+scripts/test.all.dates.pl
+t/date.t
+t/lex.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

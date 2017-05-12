@@ -1,0 +1,26 @@
+###############################################################################
+#
+# /home/goo/src/things/goo/idea.goo - goo config file
+#
+###############################################################################
+
+# what is this Thing?
+title			=	Idea
+description		=	Remember all those good ideas
+
+# actions and the programs that handle them
+[J]ump       =   Goo::JumpManager.pm                 
+[P]rofile    =   Goo::Thing::conf::ConfigProfiler.pm 
+E[X]it       =   Goo::Exiter.pm                      
+[D]elete     =   Goo::FileThing::Deleter.pm          
+Care[O]Meter =   Goo::CareOMeter.pm                  
+[C]lone      =   Goo::FileThing::Cloner.pm           
+[Z]one       =   Goo::Zone.pm                        
+[E]dit       =   Goo::Editor.pm                      
+[M]ake       =   Goo::Thing::goo::Maker.pm           
+
+
+# where is this Thing
+# database details
+table					= 	idea
+column_display_order	=	ideaid title description createdon createdby importance

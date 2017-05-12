@@ -1,0 +1,54 @@
+## ABOUT
+
+  sterile.yaml
+
+## Tests
+
+### Version conformance tests
+
+Every version of Perl that can be tested on travis is tested.
+
+    - perl: <V>
+      env:  STERILIZE_ENV=0
+
+This is to test simply that the code works on that platform
+
+### Installable tests
+
+This tests both the maximum and minimum perls on travis to ensure
+that:
+
+  a. All dependencies are installable on all versions of Perl
+  b. No dependencies are inherently required by the code which are not specified.
+
+    - perl: <V>
+      env: STERILIZE_ENV=1
+
+Tree sterilization occurs here to ensure that only the versions of things
+that are provided by that version of perl exists prior to installing dependencies.
+
+### Pending upstream breakage
+
+This tests that of all the listed direct dependencies, that the code works as expected
+after upgrading to the latest version of all direct dependencies.
+
+Presently this only runs on the newest `perl` on travis, because it is seemed that
+if "-dev" versions are going to be a problem, they'll exhibit the same problems on all perls.
+
+Tree sterilization is not performed here, though may be in future, because that will reveal breakages
+between downstream dependencies.
+
+    - perl: <V>
+      env: STERILIZE_ENV=0 DEVELOPER_DEPS=1
+
+### Author Testing
+
+This is the most dependency expensive method, as this mode pulls in all dependencies
+listed in `develop.requires`, and additionally runs `xt/*`
+
+This is presently only performed on the latest perl due to the time expensiveness
+of this, requiring significantly more dependencies to perform tests.
+
+    - perl: <V>
+      env: STERILIZE_ENV=0 RELEASE_TESTING=1 AUTHOR_TESTING=1
+

@@ -1,0 +1,22 @@
+---
+name: Geo-GoogleMaps-MobileTool
+version: 0.0.1
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: Provide some functions useful for using GoogleMaps Static API on mobile sites
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Exporter: 0
+  Math::Trig: 0
+  Test::Base: 0
+  version: 0
+provides:
+  Geo::GoogleMaps::MobileTool:
+    file: lib/Geo/GoogleMaps/MobileTool.pm
+    version: 0.0.1
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

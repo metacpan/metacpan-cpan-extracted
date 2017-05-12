@@ -1,0 +1,24 @@
+
+== INSTALL
+
+= Libray from scratch
+
+Geo::Proj4 uses XS to wrap the PROJ.4 cartographic projections library.
+You will need to have at least version 4.4.9 of the PROJ.4 library
+installed in order to build and use this module. You can get source
+code and binaries for the PROJ.4 library from its home page at
+http://www.remotesensing.org/proj/.
+
+= FWTools
+
+An other way to get the library is by installing FWTools, available
+at http://fwtools.maptools.org/
+
+In case you have installed FWTools, set environment variable
+GEOPROJ_FWTOOLS_DIR to the right location, before running Makefile.PL
+
+   export GEOPROJ_FWTOOLS_DIR=/home/myself/FWTools
+   perl Makefile.PL
+   make
+   make test
+   make install

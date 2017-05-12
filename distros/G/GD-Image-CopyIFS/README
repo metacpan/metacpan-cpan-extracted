@@ -1,0 +1,88 @@
+NAME
+
+  GD::Image::CopyIFS - fractal-based image resizing
+
+SYNOPSIS
+
+  # zoom in on an area of an image
+  use GD::Image::CopyIFS;
+  my $width = 64;
+  my $height = 60;
+  my $scale = 4;
+  my $neww = $scale * $width;
+  my $newh = $scale * $height;
+  my $src_file = 'src.jpeg';
+  my $src_img = GD::Image->newFromJpeg($src_file, 1);
+  my $dst_img = GD::Image->new($neww, $newh, 1);
+  my @opts = ($src_img, 0, 0, 110, 120,
+              $neww, $newh, $width, $height);
+  $dst_img->copyIFS(@opts);
+  my $dst_file = 'dst.jpeg';
+  open(my $fh, '>', $dst_file) or die "Cannot open $dst_file: $!";
+  binmode $fh;
+  print $fh $im->jpeg;
+  close $fh;
+
+  # create a resized image scaled by a factor $scale
+  use GD::Image::CopyIFS;
+  my $src_file = 'src.jpeg';
+  my $src_img = GD::Image->newFromJpeg($src_file, 1);
+  my $scale = 2.45;
+  my $dst_img = GD::Image->thumbIFS($src_img, scale => $scale);
+  my $dst_file = 'dst.jpeg';
+  open(my $fh, '>', $dst_file) or die "Cannot open $dst_file: $!";
+  binmode $fh;
+  print $fh $im->jpeg;
+  close $fh;
+
+DESCRIPTION
+
+This module adds to GD::Image of the GD module
+two methods: copyIFS, used to copy and rescale an area of
+one image onto another image, and thumbIFS, used to
+create a resized image from an original. The copyIFS
+method is used analagously to the copyResized or
+copyResampled methods of the GD module. See the pod
+documentation for GD::Image::CopyIFS for more details.
+
+The algorithm employed uses what is known as a fractal
+interpolating function, which uses an Iterated Function
+System (IFS) to interpolate functions specified at
+discrete points. The basic procedure is to create an
+IFS based on the pixel colors of an image, and then
+from this construct a new IFS based on the parameters
+specified when zooming in on an area of the image or
+when resizing. A random iteration algorithm is then used
+to construct an image from this new IFS. For details, see
+http://ecommons.uwinnipeg.ca/archive/00000026/.
+
+Note that this algorithm may give good results for images
+of natural objects, as there generally is a fractal
+nature present in most such shapes. It typically
+will not give good results for more geometric shapes,
+such as lettering.
+
+INSTALLATION
+
+The GD module is a prerequisite for this module, and
+a C compiler will be needed. Installation follows the standard
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+procedure. The tests will create, in the t/ subdirectory, zoomed-in 
+areas and a resized image based on the original lena.jpeg image. 
+These images are all named "*_ifs.jpeg"; one can
+compare these with the analagous "*_resized.jpeg" and
+"*_resampled.jpeg" images made with, respectively, the
+"copyResized" and "copyResampled" methods of GD.
+
+COPYRIGHT
+
+Copyright (c) 2005, by Randy Kobes <r.kobes@uwinnipeg.ca>.
+All rights reserved.  This package is free software;
+you can redistribute it and/or modify it under the 
+same terms as Perl itself.
+

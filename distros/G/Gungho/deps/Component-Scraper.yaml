@@ -1,0 +1,7 @@
+---
+name: 'Web::Scraper Integration'
+default: 0
+depends:
+    'Web::Scraper::Config': 0
+    'Data::Dumper': 0
+    'Digest::MD5': 0

@@ -1,0 +1,70 @@
+NAME
+    Geo::GNIS - Perl extension for parsing USGS GNIS gazetteer data
+
+SYNOPSIS
+      use Geo::GNIS;
+
+      @records = Geo::GNIS->parse_file( $filehandle );
+  
+      Geo::GNIS->parse_file( $filehandle, \&callback );
+
+      $record = Geo::GNIS->new( \%data );
+
+      $record->fid();
+      $record->state();
+      $record->name();
+      $record->type();
+      $record->county();
+      $record->coord(); # this is raw DMS
+      $record->cell();
+      $record->elev();
+      $record->est_pop();
+      $record->status();
+
+      $record->lat(); # decimal degrees
+      $record->lon(); # decimal degrees
+
+DESCRIPTION
+    Geo::GNIS provides a representation of the US Geological Survey's
+    Geographic Names Information Service (GNIS) gazetteer format. Each
+    object is one record. It also contains methods to parse GNIS Columnar
+    Format data files and turn them into objects.
+
+    This is intended as an intermediate format between pulling the raw data
+    out of the simplistic GNIS data files into something more sophisticated
+    (a process you should only have to do once). As such, it's not very
+    fast, but it's careful, easy to use, and performs some verifications on
+    the data being read.
+
+    This module subclasses Michael Schwern's very nice Geo::TigerLine
+    modules to do all the heavy lifting.
+
+BUGS, CAVEATS, ETC.
+    This module wasn't automatically generated like the
+    Geo::TigerLine::Record::* modules were. Probably it should have been,
+    but the GNIS data record layout changes even less often than the TIGER
+    data. If it ever gets revised, I will gladly update this module by hand.
+
+    Currently, only the population file format is supported.
+
+SEE ALSO
+    You can learn all about the Geographic Names Information Service at
+    <http://geonames.usgs.gov/>. If you decide to download data for the
+    state or topical gazetteers from <http://geonames.usgs.gov/stategaz/>,
+    be sure to get the so-called Columnar Format Files.
+
+    The data dictionary was transcribed from
+    <http://geonames.usgs.gov/stategaz/00README.html>.
+
+    Geo::TigerLine(3pm), Geo::Fips55(3pm)
+
+AUTHOR
+    Schuyler D. Erle <schuyler@nocat.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Schuyler D. Erle
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

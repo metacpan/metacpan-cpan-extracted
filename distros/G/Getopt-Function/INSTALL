@@ -1,0 +1,12 @@
+This module requires Getopt::Mixed.  This can be retrieved from any
+CPAN mirror site.  See the documentation included with perl (perlmod
+manual page e.g.) for details of CPAN.
+
+Build and install the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+
+

@@ -1,0 +1,57 @@
+{
+   "abstract" : "a simple git wrapper to capture output",
+   "author" : [
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Git-Class",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.98",
+            "Test::UseAllModules" : "0.12"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Carp::Clan" : "0",
+            "MRO::Compat" : "0",
+            "Module::Find" : "0",
+            "Moo" : "0",
+            "Path::Tiny" : "0",
+            "Scope::Guard" : "0",
+            "String::ShellQuote" : "0",
+            "Try::Tiny" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/charsbar/git-class"
+      }
+   },
+   "version" : "0.15"
+}

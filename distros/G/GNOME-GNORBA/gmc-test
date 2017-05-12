@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+
+use vars qw($IDL_PATH);
+
+BEGIN {
+    my $datadir = `gnome-config --datadir`;
+    chomp $datadir;
+    $IDL_PATH = "$datadir/idl";
+}
+
+use CORBA::ORBit idl_path => $IDL_PATH, idl => [ "FileManager.idl" ];
+use GNOME::GNORBA;
+
+GNOME::GNORBA::init();
+
+$gmc = GNOME::GOAD::activate (id => 'IDL:GNOME:FileManager:WindowFactory:1.0');
+defined $gmc or die "Cannot activate GMC\n";
+
+my $dir = "/tmp/SomeDirectory";
+mkdir ($dir, 0755);
+for (qw(Red Green Blue Orange Yellow)) {
+    system("touch $dir/$_");
+}
+$win = $gmc->create_window ($dir);
+
+sleep 5;
+system ("rm -rf $dir");
+$win->close;

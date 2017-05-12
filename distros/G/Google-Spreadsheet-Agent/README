@@ -1,0 +1,499 @@
+Google-Spreadsheet-Agent
+
+Google::Spreadsheet::Agent is a framework for creating massively distributed pipelines
+across many different servers, each using the same google spreadsheet as a
+control panel.  It is extensible, and flexible.  It doesnt specify what
+goals any pipeline should be working towards, or which goals are prerequisites
+for other goals, but it does provide logic for easily defining these relationships
+based on your own needs.  It does this by providing a subsumption architecture,
+whereby many small, highly focused agents are written to perform specific goals,
+and also know what resources they require to perform them.  In addition, it is
+designed from the beginning to support the creation of simple human-computational
+workflows.
+
+SUBSUMPTION ARCHITECTURE
+
+Subsumption architectures were developed within the Robotics and AI communities
+beginning in the 50s (1, 2, 3).  Recently, the success of the Mars Rover mission
+demonstrated the flexibility and strength of the subsumption architecture. There 
+are many subsumption architecture packages available, such as the Algernon (4)
+system written using the Java(tm) Simbad robotics platform.
+
+One of the core ideas of a subsumption architecture is that of creating lots of
+small, loosely coordinated autonomous agents.  Each agent is designed to respond
+to a specific set of inputs to produce a specific set of outputs.  Some agents
+are able to override the inputs, and/or outputs of other agents, but this is
+very limited.  There is no central processing agent that knows everything about
+all other agents.  Each agent represents a small, reusable chunk of expertise,
+much like an object in object oriented programming.
+
+In this system, agents should be written to recieve a defined set of input 
+arguments, and perform a specific data manipulation task, called a 'goal',
+on the data defined by these inputs.  Furthermore, each agent should be 
+loosely coordinated to work together nicely with other agents (potentially)
+running on the same node using the subsumption architecture.  As long as agents
+work and play nicely with each other on the same node, it is possible to deploy
+the same Google-Spreadsheet-Agent implementation on many different nodes.
+
+GOOGLE SPREADSHEET
+
+This system is designed to work with a single Google Spreadsheet which has
+one or more pages designed with the same, simple format.  The first row on
+a page should define the field names for each column, and each subsequent
+row should define the specific values for these fields on a single record.
+When Net::Google::Spreadsheet returns the rows on this kind of page,
+it returns a hashref for each record, with the column names as keys.
+As of version 0.04 of Net::Google::Spreadsheets, column names with
+underscores in them must be referenced in the hashref without
+underscores, e.g. the 'my_favorite_stuff' field will be accessed using
+$entry->{myfavoritestuff}.  This may change in the future.
+
+There are 3 kinds of fields which must be represented in a
+spreadsheet page.
+
+  a. keys: These fields are used to find specific records, like a database
+           table key.  Some keys are optional, but there must be at least
+           one required key field for any google agents implementation.
+
+  b. goals: These fields are tasks to be completed for each record.
+
+  c. ready and complete: Every page should define fields named 'ready' and
+     'complete'.  When an agent attempts to run a job for a particular record,
+     it will skip the job if that particular dataset is not ready (lacks a 1 in
+     the 'ready' field  on the record), or if all goals are completed (has a 1
+     in the 'complete' field on the record).
+
+In addition, a spreadsheet page can define any number of fields that are used
+for other purposes, such as communicating other data needed by the agents tied to its goals,
+or simply providing information to human agents that might want to read the spreadsheet
+as well.
+
+Each Google::Spreadsheet::Agent implementation should be defined around the same spreadsheet
+architecture, e.g. all of its agents should use the same spreadsheet (regardless of the
+number of pages defined in the spreadsheet), and each page in the spreadsheet should
+have the same key field or fields represented.  The key fields should be generalized
+to provide the information required to pull out a specific record on a specific page.
+If one or more pages have 3 required key fields, but one page only requires 2 of those
+3 fields for its tasks, then the 3rd field can be optional at the implementation level,
+but that page must define the field and leave it blank for all records.  This is important
+for the runners to function (see below), as they may be provided only with a set of 
+values for the defined set of keys, and need to be able to use these values (even
+if null) in a query for a specific record.
+
+HUMAN-COMPUTATIONAL WORKFLOWS
+
+Certain fields on a particular spreadsheet may be setup to require human agents
+to set their values.  Computational agents may be designed to depend on these fields
+to be set to some value before they can run, or otherwise use data in these fields
+for their processing.  This sets up a very intuitive, easy to understand workflow
+system whereby humans and computational agents work together to achieve the goals
+for a particular project.
+
+AGENTS
+
+An agent is a small script designed to accomplish a specific goal for a specific set
+of key values defining a record on a page.  Each agent should use Google::Spreadsheet::Agent 
+(see the Google::Spreadsheet::Agent pod for details), create a new instance of this object
+with the required/optional parameters, and use the run_my method on the object to run
+a subroutine reference.  The best way to accomplish this is by naming the agent for the
+goal, e.g. fooby_agent.pl would accomplish the fooby goal.  The agent can also define the
+prerequisite goals required to be completed before it can run, the number of maximum
+instances of itself that should be allowed on one node, any other agents and processes
+which it should avoid running concurrently with, and any other agents that its functions
+subsume.
+
+RUNNERS
+
+Runners are scripts designed to be fed an ordered set of key fields and goals to be worked
+on.  Google::Spreadsheet::Agent::Runner is a framework for creating these programs which
+programmatically work through some or all pages in a Google Spreadsheet, and run some or
+all of the possible entry-goals on a particular node.  Using cron, or some other scheduling
+software, a well designed system of different runner scripts can be created which will
+attempt goals for every record of every page until they are all completed over time, but
+can use plans of some sort (simple collections of key-goal records) to temporarily influence
+the order in which these key-goal jobs are attempted, opportunistically.  Agents and runners
+can then be spread onto multiple nodes to work in a coordinated fashion to accomplish the tasks
+specified on the same Google Spreadsheet.  This begins to approach one of the goals of
+subsumption programming, the concept of using plans instead of programs to define and
+prioritize a large, complex set of tasks to be completed (3).
+
+SCENARIOS
+
+The following scenarios all use a series of perl scripts named for specific tasks
+(e.g. basename $0 =~ s/\.*$// returns the agent_name) located in a single directory,
+with their executable bits set.  A runner is used which scans through the configured
+google spreadsheet looking for fields tied to executable scripts in dir (e.g. -x $dir/$name)
+and runs them with the configured key_field arguments.  This runner is configured to run in
+cron every hour on 6 different servers with the same script directory, and datafiles 
+made available using NFS.
+
+1. Basic Pipeline
+Five scripts need to run:
+  - taskA
+  - taskB
+  - taskC
+  - taskD
+  - taskE
+
+taskB and taskC require taskA to have finished for an entry before they
+can run, but can then run in parallel on different servers. taskD requires
+taskC, and taskE requires taskB and taskD to have run (e.g. it needs all tasks
+to have been completed for a given record).
+
+taskB and taskC cannot run together on the same machine at the same time.
+
+google spreadsheet is setup with fields:
+
+arg1 arg2 ready taskA taskB taskC taskD taskE complete
+
+and 3 arg1 entries:
+foo
+bar
+baz
+
+taskA:
+
+  use Google::Spreadsheet::Agent;
+
+  my $arg1 = shift;
+
+  my $google_agent = Google::Spreadsheet::Agent->new(
+                                        agent_name => 'taskA',
+                                        page_name => $google_page,
+                                        debug => $debug,
+                                        max_selves => $max, 
+                                        bind_key_fields => {
+                                             'arg1' => $arg1
+                                        }
+                                        );
+
+  $google_agent->run_my(sub {
+                               eval {
+                                    # ... do taskA stuff
+                               };
+                               if ($@) {
+                                 print STDERR $@;
+                                 return;
+                               }
+                               return 1;
+                        });
+
+
+taskB:
+
+  use Google::Spreadsheet::Agent;
+
+  my $arg1 = shift;
+
+  my $google_agent = Google::Spreadsheet::Agent->new(
+                                          agent_name => 'taskB',
+                                          page_name => $google_page,
+                                          debug => $debug,
+                                          max_selves => $max, 
+                                          bind_key_fields => {
+                                             'arg1' => $arg1
+                                          },
+                                          prerequisites => [ 'taskA' ],
+                                          conflicts_with => {
+                                                           'taskC' => 1,
+                                                         }
+                                          );
+
+  $google_agent->run_my(sub {
+                               eval {
+                                    # ... do taskB stuff
+                               };
+                               if ($@) {
+                                 print STDERR $@;
+                                 return;
+                               }
+                               return 1;
+                        });
+
+
+taskC:
+
+  use Google::Spreadsheet::Agent;
+
+  my $arg1 = shift;
+
+  my $google_agent = Google::Spreadsheet::Agent->new(
+                                          agent_name => 'taskC',
+                                          page_name => $google_page,
+                                          debug => $debug,
+                                          max_selves => $max, 
+                                          bind_key_fields => {
+                                             'arg1' => $arg1
+                                          },
+                                          prerequisites => [ 'taskA' ],
+                                          conflicts_with => {
+                                                           'taskB' => 1,
+                                                         }
+                                          );
+
+  $google_agent->run_my(sub {
+                               eval {
+                                    # ... do taskC stuff
+                               };
+                               if ($@) {
+                                 print STDERR $@;
+                                 return;
+                               }
+                               return 1;
+                        });
+
+
+taskD:
+
+  use Google::Spreadsheet::Agent;
+
+  my $arg1 = shift;
+
+  my $google_agent = Google::Spreadsheet::Agent->new(
+                                          agent_name => 'taskD',
+                                          page_name => $google_page,
+                                          debug => $debug,
+                                          max_selves => $max, 
+                                          bind_key_fields => {
+                                             'arg1' => $arg1
+                                          },
+                                          prerequisites => [ 'taskC' ]
+                                          );
+
+  $google_agent->run_my(sub {
+                               eval {
+                                    # ... do taskD stuff
+                               };
+                               if ($@) {
+                                 print STDERR $@;
+                                 return;
+                               }
+                               return 1;
+                        });
+
+taskE:
+
+  use Google::Spreadsheet::Agent;
+
+  my $arg1 = shift;
+
+  my $google_agent = Google::Spreadsheet::Agent->new(
+                                          agent_name => 'taskE',
+                                          page_name => $google_page,
+                                          debug => $debug,
+                                          max_selves => $max, 
+                                          bind_key_fields => {
+                                             'arg1' => $arg1
+                                          },
+                                          prerequisites => [ 'taskB', 'taskD' ]
+                                          );
+
+  $google_agent->run_my(sub {
+                               eval {
+                                    # ... do taskE stuff
+                               };
+                               if ($@) {
+                                 print STDERR $@;
+                                 return;
+                               }
+                               return 1;
+                        });
+
+Runner:
+
+   use Google::Spreadsheet::Agent::Runner;
+
+   my $runner = Google::Spreadsheet::Agent::Runner->new();
+   $runner->run();
+
+2. Simple Human Computational Workflow
+
+A field called taskA_passes_qc (which would be referenced in the perl code as taskApassesqc)
+is added to the google spreadsheet.  Code will never write to it, but a human will see that
+taskA has run successfully, and view its output to verify that it ran correctly.  If so, the
+human will set that field to something 'true' in perl for that record.  If not, the
+taskA_passes_qc field is left blank (false).  taskB and taskC are modified to depend on
+taskApassesqc instead of taskA.
+
+taskA remains as is (or it could add information to field(s) on the spreadsheet to help the
+human QC its result).
+
+modified taskB and taskC simply change their google_agent constructor to have:
+
+  my $google_agent = Google::Spreadsheet::Agent->new(
+                                          agent_name => 'taskB', # or taskC for taskC
+                                          page_name => $google_page,
+                                          debug => $debug,
+                                          max_selves => $max, 
+                                          bind_key_fields => {
+                                             'arg1' => $arg1
+                                          },
+                                          prerequisites => [ 'taskApassesqc' ],
+                                          #.....same
+                                          );
+
+The rest of the pipeline runs as above.
+
+3. Human Computational Workflow where Human can override 'failure'
+
+google spreadsheet modified to have 'taskCmetricA' and taskCmetricB' fields.
+taskC modfied to set these back to the google spreadsheet for the record on failure:
+
+  $google_agent->run_my(sub {
+                               my ($metric_a, $metric_b);
+                               eval {
+                                    # ... do taskC stuff, setting $metric_a and b
+                               };
+                               if ($@) {
+                                 print STDERR $@;
+                                 return (
+                                    undef, 
+                                    {
+                                      'taskCmetricA' => $metric_a,
+                                      'taskCmetricB' => $metric_b 
+                                    }
+                                 );
+                               }
+                               return 1;
+                        });
+
+Human sees that taskC has failed for a specific record, but decides that metricA and metricB
+are sufficient to override the failure to a 1 for taskC.  This allows taskD to run as planned.
+
+There are many more combinations that can be utilized here.
+
+There are also different runners possible.  You can set up a page on the spreadsheet that
+is for prioritization.  This will have the key_fields represented, but will not have a ready
+flag, so the normal runner will just skip over all the entries on this page and proceed to
+the next page or pages.  The normal runner can be modified to run less often in cron, while
+the priority runner can run 4 times per hour in cron.  A human can then place things in the
+priority queue that need to run at higher priority than the others, but the normal runner can
+still attempt to launch processes that are needing to be run but are not high priority, and
+let the subsumption rules determine whether these can run or not on any given machine.
+
+Basic Runner:
+
+  use Google::Spreadsheet::Agent::Runner;
+
+  # the basic runner should not process the page named priority
+  my $runner = Google::Spreadsheet::Agent::Runner->new('skip_pages' => [ 'priority' ]);
+  $runner->run();
+
+Priority Page Runner:
+
+  use Google::Spreadsheet::Agent::Runner;
+
+  # the priority runner should only process the priority page
+  my $runner = Google::Spreadsheet::Agent::Runner->new('only_pages' => [ 'priority' ]);
+  $runner->run();
+
+WHY NOT AN RDBMS?
+
+This code is not built on the premise that a google spreadsheet is a suitable replacement
+for a fully functional RDBMS system.  There are many, many advantages that a proper RDBMS
+has over a google spreadsheet, such as robust transactions, locking, and even querying
+capabilities.  What a google spreadsheet provides is a robust webservice that is available
+worldwide to computers and humans alike with high availability, and concurrent editing
+capabilities.
+To use a proper RDBMS system to duplicate this system, one would also need to write this
+webservice on top of it, which would be much more complicated. That being said,
+it is possible for agents to access an RDBMS before calling the run_my method, and/or
+within the subref passed to run_my to get access to these features along with the google
+service.
+
+REQUIREMENTS
+
+FindBin
+YAML::Any
+YAML (YAML::Syck preferred)
+Net::Google::Spreadsheets
+Net::SMTP::TLS
+IO::CaptureOutput
+Sys::Hostname
+Moose
+
+ACKNOWLEDGEMENTS
+
+Many thanks go to Mark Delong, Peyton Vaughn, Darrin Mann, Robert Wagner, and others
+of the Institute for Genome Sciences and Policy, as well as Terry Furey for giving me
+the freedom to design this sytem to process his immense amount of data.
+
+LICENSE
+
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+TESTING
+
+Most of tests for this module will be skipped unless you configure a test spreadsheet and
+corresponding config/agent.conf.yml (use config/test.agent.conf.yml.tmpl as a template)
+file to work with it.
+
+The test spreadsheet must have a single page in it, called 'testing', the tests will
+add and remove all other fields and pages that are required to run.  One important thing
+to note is that it is possible that one or more tests will fail simply do to timing issues
+and transient failures when communicating with the Google Spreadsheet service.
+Rerunning the tests that have failed should show that they pass.  It is possible to run
+the entire suite of tests through to completion, but it may take several runs to accomplish.
+For this reason, all tests are skipped on initial installation of the modules using cpan.
+If you are installing into a production system, you can set up the testing config and run
+the tests manually to verify that they everything works.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for its modules with the
+perldoc command.
+
+    perldoc Google::Spreadsheet::Agent
+    perldoc Google::Spreadsheet::Agent::Runner
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Google-Spreadsheet-Agent
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Google-Spreadsheet-Agent
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Google-Spreadsheet-Agent
+
+    Search CPAN
+        http://search.cpan.org/dist/Google-Spreadsheet-Agent/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Darin London
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+REFERENCES
+
+1. Brooks, Rodney A. 'A Robust Layered Contol System for a Mobile Robot' 
+  IEEE Journal of Robotics and Automation, Vol. RA-2, No. 1, March 1986
+  pg. 14-23.
+
+2. Brooks, Rodney A., 'Intelligence without representation'
+  Artificial Intelligence 47 (1991), pg. 139-159.
+
+3. Agre, P. E., and Chapman, D., 'What are Plans for?'
+  In Maes, Pattie, 'Designing Autonomous Agents'
+  1990 Elsevier Science Publishers.
+
+4. Algernon: http://sourceforge.net/projects/lemaze/
+

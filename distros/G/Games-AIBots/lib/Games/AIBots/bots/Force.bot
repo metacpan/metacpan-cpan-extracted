@@ -1,0 +1,226 @@
+$name   = 'Force';
+$author = 'Wayne Lin';
+$team   = 'Force Union'
+
+$xy = 0;
+
+sub main {
+    enable shield;
+    scan relative 8;
+    if (&found('mine')) {
+        fire energy;
+        redo;
+    }
+    elsif (&found('friend')) {
+        call turning;
+        redo;
+    }
+    elsif (&found('flag|vault')) {
+        if (&damaged == 0 and &found('flag')) {
+            move backward;
+            fire energy;
+            move forward;
+        }
+        move forward;
+        redo;
+    }
+    elsif (&found('enemy')) {
+        disable shield;
+        fire laser * 2;
+        call zap;
+    }
+    if (&nearst('enemy') <= 3) {
+        enable cloak if $ammo >= 10;
+        call zap if &inperim('enemy');
+    }
+    elsif (&damaged >= 5 or $fuel <= 500 or $ammo <= 5) {
+        goto go_x;
+    }
+    call run;
+    redo;
+}
+
+sub run {
+    disable cloak if &nearst('enemy') > 3;
+    move forward;
+    $xx = $enemy_x - $x;
+    $yy = $enemy_x - $x;
+    if (&bumped('wall'))  {
+        call turning;
+    }
+    elsif (&bumped('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+    }
+    elsif (&bumped('enemy')) {
+        call zap;
+    }
+    elsif ($xx * $yy == 0) {
+        turn left;
+        move forward;
+        call zap if &inperim('enemy');
+        if (&bumped()) {
+            move backward;
+        }
+        turn right;
+        move forward;
+        call zap if &inperim('enemy');
+        if (&bumped()) {
+            move backward;
+        }
+    }
+    call zap if &inperim('enemy');
+    return;
+}
+
+sub turning {
+    if (int(rand(2))) {
+        turn left;
+    }
+    else {
+        turn right;
+    }
+    return;
+}
+
+sub go_x {
+    $xx = $snode_x - $x;
+    $yy = $snode_y - $y;
+    goto onnode if &onnode;
+    if ($snode_x ne '') {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {
+                turn right * 2;
+            }
+        }
+        elsif ($xx < 0) {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {
+                turn right * 2;
+            }
+        }
+        else {
+            goto go_y;
+        }
+        $xy = 0;
+        goto smove;
+    }
+    else {
+        goto repair;
+    }
+}
+
+sub go_y {
+    $xx = $snode_x - $x;
+    $yy = $snode_y - $y;
+    goto onnode if &onnode;
+    if ($snode_x ne '') {
+        if ($yy > 0) {
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {
+                turn right * 2;
+            }
+        }
+        elsif ($yy < 0) {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+        else {
+            goto go_x;
+        }
+        $xy = 1;
+        goto smove;
+    }
+    else {
+        goto repair;
+    }
+}
+
+sub smove {
+    if (&nearst('enemy') <= 3) {
+        enable cloak if $ammo >= 2;
+        move forward * 2 if &inperim('enemy');
+    }
+    disable cloak unless &nearst('enemy') <= 3;
+    move forward;
+
+    if (&bumped('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+    }
+    elsif (&bumped()) {
+        move backward;
+        turn right;
+        move forward;
+        if ($xy) {
+            goto go_x;
+        }
+        else {
+            goto go_y;
+        }
+    }
+    elsif (not $xy) {
+        goto go_x;
+    }
+    else {
+        goto go_y;
+    }
+}
+
+sub repair {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    disable shield;
+    attempt repair;
+    if ($life < $max_life and $fuel > 700 and $xx * $yy) {
+        redo;
+    }
+    else {
+        goto main;
+    }
+}
+
+sub onnode {
+    $xx = $enemy_x - $x;
+    $yy = $enemy_y - $y;
+    if ($life < $max_life or $ammo < 30 or $fuel < 1000 and $xx * $yy) {
+        scan perimeter;
+        if (&found('enemy')) {
+            fire energy * 2;
+        }
+        call zap if &inperim('enemy');
+        redo;
+    }
+    goto main;
+}
+
+sub zap {
+    $oel = $enemy_l;
+    if ($life >= $oel) {
+        attempt destruct;
+    }
+    else {
+        fire energy if (&inperim('enemy') and $life > 1);
+        if ($enemy_l != $oel - 2) {
+            if ($oel <= 2) {
+                return;
+            }
+            else {
+                $energy = int(($oel - 1) / 2);
+                fire energy * $energy;
+                return;
+            }
+        }
+        redo;
+    }
+}
+

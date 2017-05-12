@@ -1,0 +1,26 @@
+---
+abstract: 'Maintains a database for Google Access Tokens'
+author:
+  - 'Jim Schueler <jim@tqis.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Google-OAuth
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Copy: 2.13
+  JSON: 2.57
+  LWP: 5.83
+  LWP::Protocol::https: 0
+  NoSQL::PL2SQL: 1.21
+version: 0.05

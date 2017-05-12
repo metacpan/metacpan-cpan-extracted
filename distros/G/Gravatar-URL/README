@@ -1,0 +1,142 @@
+NAME
+
+    Gravatar::URL - Make URLs for Gravatars from an email address
+
+SYNOPSIS
+
+        use Gravatar::URL;
+    
+        my $gravatar_id  = gravatar_id($email);
+    
+        my $gravatar_url = gravatar_url(email => $email);
+
+DESCRIPTION
+
+    A Gravatar is a Globally Recognized Avatar for a given email address.
+    This allows you to have a global picture associated with your email
+    address. You can look up the Gravatar for any email address by
+    constructing a URL to get the image from gravatar.com. This module does
+    that.
+
+    Examples of use include the author faces on http://search.cpan.org.
+
+    See http://gravatar.com for more info.
+
+Functions
+
+  gravatar_url
+
+        # By email
+        my $url = gravatar_url( email => $email, %options );
+    
+        # By gravatar ID
+        my $url = gravatar_url( id => $id, %options );
+
+    Constructs a URL to fetch the gravatar for a given $email or $id.
+
+    $id is a gravatar ID. See "gravatar_id" for more information.
+
+    %options are optional and are...
+
+   rating
+
+    A user can rate how offensive the content of their gravatar is, like a
+    movie. The ratings are g, pg, r and x. If you specify a rating it is
+    the highest rating that will be given.
+
+        rating => "r"   # includes g, pg and r
+
+   size
+
+    Specifies the desired width and height of the gravatar (gravatars are
+    square).
+
+    Valid values are from 1 to 512 inclusive. Any size other than 80 may
+    cause the original gravatar image to be downsampled using bicubic
+    resampling before output.
+
+        size    => 40,  # 40 x 40 image
+
+   default
+
+    The url to use if the user has no gravatar or has none that fits your
+    rating requirements.
+
+        default => "https://secure.wikimedia.org/wikipedia/en/wiki/File:Mad30.jpg"
+
+    Relative URLs will be relative to the base (ie. gravatar.com), not your
+    web site.
+
+    Gravatar defines special values that you may use as a default to
+    produce dynamic default images. These are "identicon", "monsterid",
+    "wavatar" and "retro". "404" will cause the URL to return an HTTP 404
+    "Not Found" error instead whereas "mm" will display the same "mystery
+    man" image for all missing people. See
+    http://en.gravatar.com/site/implement/url for more info.
+
+    If omitted, Gravatar will serve up their default image, the blue G.
+
+   border
+
+    DEPRECATED! This key has been removed from the Gravatar protocol. It
+    will be removed from future versions of Gravatar::URL.
+
+    Gravatars can be requested to have a 1 pixel colored border. If you'd
+    like that, pass in the color to border as a 3 or 6 digit hex string.
+
+        border => "000000",  # a black border, like my soul
+        border => "000",     # black, but in 3 digits
+
+   base
+
+    This is the URL of the location of the Gravatar server you wish to grab
+    Gravatars from. Defaults to http://www.gravatar.com/avatar/" for HTTP
+    and https://secure.gravatar.com/avatar/ for HTTPS.
+
+   short_keys
+
+    If true, use short key names when constructing the URL. "s" instead of
+    "size", "r" instead of "ratings" and so on.
+
+    short_keys defaults to true.
+
+   https
+
+    If true, serve avatars over HTTPS instead of HTTP.
+
+    You should select this option if your site is served over HTTPS to
+    avoid browser warnings about the presence of insecure content.
+
+    https defaults to false.
+
+  gravatar_id
+
+        my $id = gravatar_id($email);
+
+    Converts an $email address into its Gravatar $id.
+
+THANKS
+
+    Thanks to gravatar.com for coming up with the whole idea and Ashley
+    Pond V from whose Template::Plugin::Gravatar I took most of the
+    original code.
+
+LICENSE
+
+    Copyright 2007 - 2009, Michael G Schwern <schwern@pobox.com>. Copyright
+    2011, Francois Marier <fmarier@gmail.com>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/artistic.html
+
+SEE ALSO
+
+    Template::Plugin::Gravatar - a Gravatar plugin for Template Toolkit
+
+    http://www.gravatar.com - The Gravatar web site
+
+    http://en.gravatar.com/site/implement/url - The Gravatar URL
+    implementor's guide
+

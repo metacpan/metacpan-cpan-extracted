@@ -1,0 +1,108 @@
+Revision history for Perl extension Geo::Coder::Google
+
+0.18
+   - non-dev release of 0.17_01
+
+0.17_01
+   - added channel param (Thanks to jipipayo)
+
+0.17
+   - update metadata to v2: listing test prereqs properly, and update the
+     github repository
+
+0.16 Tue Aug 11 10:16:31 EDT 2015
+   - release 0.15_01 as a non-dev release
+
+0.15_01 Tue Aug  4 20:53:28 EDT 2015
+   - Don't croak when Google returns ZERO_RESULTS (RT#104618)
+       (Thanks to Klaus S. Madsen)
+
+0.15 Tue May 26 21:51:10 EDT 2015
+   - release 0.14_02 as a non-dev release
+
+0.14_02 Mon May  4 22:00:26 EDT 2015
+   - make v3 the default (Thanks to Ken Harris)
+   - add license info (Thanks to Ken Harris)
+
+0.14_01 Thu Nov 20 10:04:19 EST 2014
+   - provide API key to request (RT#100471)
+       (Thanks to Klaus S. Madsen)
+
+0.14 Tue Jan 21 10:41:18 EST 2014
+   - release 0.13_01 as a non-dev release
+
+0.13_01 Thu Jan 2 14:15:20 EDT 2014
+   - added support for 'Component Filtering'
+
+0.13 Thu Oct  3 16:46:05 EDT 2013
+   - remove MYMETA.json & MYMETA.yml from dist (RT#89140)
+
+0.12 Thu Jun  6 16:15:55 EDT 2013
+   - non-dev release
+
+0.11_04 Tue Jun 4 10:28:00 EDT 2013
+    - add reverse geocode
+
+0.11_03 Fri Mar 15 09:09:16 EDT 2013
+    - make the croaking if status not ok
+      a bit more generic
+
+0.11_02 Mon Nov 26 22:46:31 EST 2012
+    - croak if geo-coder status is not ok
+
+0.11_01 Wed Sep 12 10:31:24 EDT 2012
+    - Updated pod to pass tests
+    - Lazy load LWP::UserAgent and JSON
+    - Cache JSON object
+    - Stash data in variables last_data, last_res, last_status
+
+0.11 Wed Jul 25 11:50:34 EDT 2012
+    - fix live test data
+    - skip live tests by default, providing an $ENV var to enable them
+
+0.10_01 Tue May 22 10:09:00 EST 2012
+    - relax the precision in tests
+
+0.10 Fri Dec 16 09:32:00 EST 2011
+    - non developer release
+
+0.09_02 Tue Dec 13 12:36:00 EST 2011
+    - fix for RT#73237
+
+0.09_01 Mon Dec 05 17:32:00 EST 2011
+    - Use Test::Number::Delta to account
+      for 32bit vs 64bit
+
+0.09  Fri Nov 25 09:42:00 EST 2011
+    - Add support for Premier Client IDs
+          (Thanks to Drew Taylor)
+
+0.08  Fri Oct 28 20:18:33 EST 2011
+    - remove api key requirement
+    - fix test failures
+
+0.07  Thu Oct 20 13:43:00 EST 2011
+    - Add support for v3 of the API
+
+0.06  Thu Oct 15 17:31:33 PDT 2009
+    - This module now adds oe=utf8 to the query parameters by default. This
+      requests that all data be returned as utf-8, with no Javascript \uXXXX
+      escaping. (Dave Rolsky)
+
+0.05  Fri Mar 20 16:55:43 PDT 2009
+    - Added 'gl' country code parameter
+          (Thanks to Ilia Lobsanov)
+
+0.04  Thu Jan 15 13:08:00 MSK 2009
+	- Added 'language' attribute for specifying response language
+	  (Thanks to Andrew Shitov)
+
+0.03  Sat Jun 23 11:52:05 PDT 2007
+    - Added ua() method and document it.
+      (Thanks to Beirne Konarski)
+
+0.02  Sat Jul  1 12:27:38 JST 2006
+    - Fix charset= regexp to match with utf-8
+
+0.01  Tue Jun 13 19:54:08 2006
+	- original version

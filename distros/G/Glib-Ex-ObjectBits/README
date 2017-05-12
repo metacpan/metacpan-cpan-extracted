@@ -1,0 +1,43 @@
+Copyright 2007, 2008, 2009 Kevin Ryde
+
+This file is part of Glib-Ex-ObjectBits.
+
+Glib-Ex-ObjectBits is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Glib-Ex-ObjectBits is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Glib-Ex-ObjectBits.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+This is some helpers for working with Glib::Objects.
+
+  * Glib::Ex::FreezeNotify holds a freeze_notify on one or more
+    objects, for use in "scope guard" style.
+
+  * Glib::Ex::SignalIds holds a set of signal IDs and disconnects them
+    when destroyed.
+
+  * Glib::Ex::SourceIds holds a set of main loop source IDs and
+    disconnects them when destroyed.
+
+  * Glib::Ex::TieProperties ties the properties of an object to a Perl
+    hash.
+
+The common theme in FreezeNotify, SignalIds and SourceIds is that it
+can be a good deal easier to manage the lifespan of a helper object
+than to catch all the places your code jumps out or might drop its IDs
+etc.
+
+The only prerequisite is Glib-Perl, but of course Glib::Object does
+very little by itself so in practice you'll be using this code with
+Gtk2-Perl etc.  The ObjectBits home page is
+
+    http://user42.tuxfamily.org/glib-ex-objectbits/index.html

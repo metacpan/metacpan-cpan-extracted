@@ -1,0 +1,14 @@
+Revision history for Gtk2-Ex-SearchBox
+
+0.01    Oct 20, 2005
+        First version, released on an unsuspecting world.
+
+0.02    Oct 20, 2005
+	Added to_sql_condition()
+	Added set_model()
+	Added more POD
+	Added more examples
+
+0.03    Oct 23, 2005
+	Bug fixes with ok_button
+	More tests

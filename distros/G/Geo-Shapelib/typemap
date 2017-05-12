@@ -1,0 +1,4 @@
+TYPEMAP
+	SHPHandle T_PTROBJ
+	DBFHandle T_PTROBJ
+	SHPObject * T_PTROBJ

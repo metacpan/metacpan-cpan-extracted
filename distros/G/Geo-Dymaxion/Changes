@@ -1,0 +1,8 @@
+Revision history for Perl extension Geo::Dymaxion.
+
+0.10  Mon May 12 20:24:07 2003
+	- original version
+
+0.11  Wed Jun 11 00:38:06 PDT 2003
+	- just documentation enhancements. next version will probably use
+	vterrain.org's C++ routines instead.

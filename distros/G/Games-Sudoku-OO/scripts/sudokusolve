@@ -1,0 +1,38 @@
+#!/usr/bin/env perl  
+use Games::Sudoku::OO::Board;
+use warnings;
+
+my $grid = Games::Sudoku::OO::Board->new();
+$grid->importGrid(shift);
+
+print $grid->toStr();
+print "\n";
+
+my $help = "Enter Command (solve [ ((row|column|square) N) | all ]\n";
+my $prompt = "\n% ";
+
+print $prompt;
+
+while (<>){
+    chomp;
+    print "input: $_\n";
+    my ($command, @args) = split;
+    if ($command eq "solve"){
+	print "solving @args\n";
+	if ($args[0] eq "row"){
+	    $grid->solveRow($args[1]);
+	}elsif(($args[0] eq "column")){
+	    $grid->solveColumn($args[1]);
+	}elsif(($args[0] eq "square")){
+	    $grid->solveSquare($args[1]);
+	}elsif(($args[0] eq "all")){
+	    $grid->solveAll();
+	}
+	print "solved $args[0]\n";
+	print $grid->toStr(), "\n";
+    } else {
+        print $help;
+    }
+} continue {
+    print $prompt;
+}

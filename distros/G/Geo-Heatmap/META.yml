@@ -1,0 +1,39 @@
+---
+abstract: 'generate a density map (aka heatmap) overlay layer for Google Maps, see the www directory in the distro how it works'
+author:
+  - 'Mark Hofstetter <hofstettm@cpan.org>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  Module::Build::Tiny: 0.030
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Heatmap
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  CHI: 0.56
+  Imager: 0.94
+  Moose: 2.0604
+  perl: 5.012000
+resources:
+  bugtracker: https://github.com/MarkHofstetter/GoogleMapsHeatmap/issues
+  homepage: https://github.com/MarkHofstetter/GoogleMapsHeatmap
+  repository: https://github.com/MarkHofstetter/GoogleMapsHeatmap.git
+version: 0.18
+x_contributors:
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Mark Hofstetter <mark@univie.ac.at>'
+  - 'Mark Hofstetter <mh@univie.ac.at>'
+  - 'MarkHofstetter <mark@hofstetter.at>'
+  - 'brian d foy <brian.d.foy@gmail.com>'

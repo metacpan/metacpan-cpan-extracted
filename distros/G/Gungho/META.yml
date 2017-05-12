@@ -1,0 +1,86 @@
+--- 
+abstract: Yet Another High Performance Web Crawler Framework
+author: 
+  - Copyright (c) 2007 Daisuke Maki <daisuke@endeworks.jp>
+build_requires: 
+  DirHandle: 0
+  File::Spec: 0
+  Test::MockObject: 0
+  Test::More: 0
+  YAML: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Gungho
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Best: 0
+  Class::C3: 0.16
+  Class::C3::XS: 0.02
+  DBI: 0
+  DB_File: 0
+  Danga::Socket: 1.57
+  Danga::Socket::Callback: 0
+  Data::Dumper: 0
+  Data::Throttler: 0
+  Data::Throttler::Memcached: 0.00003
+  Digest::MD5: 0
+  File::Temp: 0
+  GunghoX::FollowLinks: 0
+  HTML::RobotsMETA: 0
+  HTTP::Headers::Util: 0
+  HTTP::Parser: 0
+  HTTP::Status: 0
+  IO::Async::Buffer: 0
+  IO::Socket::INET: 0
+  MIME::Base64: 0
+  Net::DNS: 0
+  POE: 0.9999
+  POE::Component::Client::DNS: 0
+  POE::Component::Client::HTTP: 0.81
+  POE::Component::Client::Keepalive: 0
+  Path::Class::Dir: 0
+  Regexp::Common: 0
+  Sys::Hostname: 0
+  Time::HiRes: 0
+  URI: 0
+  WWW::RobotRules::Parser: 0
+  Web::Scraper::Config: 0
+  XML::LibXML: 0
+  YAML: 0
+requires: 
+  Best: 0
+  Class::Accessor::Fast: 0
+  Class::C3::Componentised: 0
+  Class::Data::Inheritable: 0
+  Class::Inspector: 0
+  Config::Any: 0
+  Data::Dumper: 0
+  Event::Notify: 0.00004
+  Exception::Class: 0
+  FindBin: 0
+  Getopt::Long: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  HTTP::Status: 0
+  Log::Dispatch: 0
+  POE: 0.9999
+  POE::Component::Client::DNS: 0
+  POE::Component::Client::HTTP: 0.81
+  POE::Component::Client::Keepalive: 0
+  Path::Class: 0
+  Pod::Usage: 0
+  Regexp::Common: 0
+  Storable: 0
+  UNIVERSAL::isa: 0.06
+  UNIVERSAL::require: 0
+  URI: 0
+  perl: 5.8.0
+tests: t/01_load.t t/02_config.t t/03_live/perl-proxy.t t/03_live/perl.t t/03_live/twitter.t t/99_kwalitee.t t/99_pod-coverage.t t/99_pod.t t/component/authentication/01_load.t t/component/cache/01_load.t t/component/robot_rules/01_load.t t/component/robot_rules/02_storage.t t/component/robot_rules/regression_daiba.t t/component/robot_rules/regression_jkim_20071201.t t/component/robots_meta/01_load.t t/component/scraper/01_load.t t/component/throttle/01_load.t t/engine/danga-socket/01_load.t t/engine/danga-socket/02_live.t t/engine/danga-socket/04_dns.t t/engine/io-async/01_load.t t/engine/io-async/02_live.t t/engine/io-async/04_dns.t t/engine/poe/01_load.t t/engine/poe/02_live.t t/engine/poe/04_dns.t t/engine/poe/05_dns_params.t t/engine/poe/06_dns_disable.t t/plugin/request_log/01_basic.t t/plugin/statistics/01_load.t t/plugin/statistics/02_parts.t t/request/regression_jkim_20071201.t t/response/regression_jkim_20071201.t
+version: 0.09006

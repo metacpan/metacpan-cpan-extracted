@@ -1,0 +1,55 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Plugin::RequestLog.ja - リクエスト履歴をログする
+
+=head1 SYNOPSIS
+
+  plugins:
+    - module: RequestLog
+      config:
+        - module: File
+          file: /path/to/filename
+  
+=head1 DESCRIPTION
+
+このプラグインを利用するとGunghoが取得しているリクエストの履歴をログに保存
+する事ができます。
+
+=head1 LOG FORMAT
+
+ログフォーマットは以下のようになっています：
+
+  CURRENT_TIME | ELAPSED TIME | RESPONSE CODE | URI | REQUEST ID
+
+リクエスト履歴はGungho::Log::Dispatchの'info'レベルでログされますので、設定
+に注意してください。詳しい設定はGungho::Log::Dispatch及びLog::Dispatchを
+参照してください。
+
+Gunghoがリクエストを確実に取得しているかどうか確認したい場合はmin_levelで
+ログレベルを変更することによってリクエストが返ってきた時間だけではなく
+リクエストを発行した時間もログに保存する事が可能です：
+
+  plugins:
+    - module: RequestLog
+      config:
+        - module: File
+          file: /path/to/filename
+          min_level: debug
+
+リクエスト発行ログは以下の形式で出力されます：
+
+  # CURRENT_TIME | URI | REQUEST ID
+
+先頭の'#'はログをgrep等でフィルターしやすいように意図的に配置されています。
+
+=head1 METHODS
+
+=head2 setup
+
+=head2 log_request
+
+=head2 log_response
+
+=cut

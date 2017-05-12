@@ -1,0 +1,150 @@
+SYNOPSIS
+
+     use Getopt::Panjang qw(get_options);
+    
+     my $opts;
+     my $res = get_options(
+         # similar to Getopt::Long, except values must be coderef (handler), and
+         # handler receives hash argument
+         spec => {
+             'bar'   => sub { $opts->{bar} = 1 },
+             'baz=s' => sub { my %a = @_; $opts->{baz} = $a{value} },
+             'err=s' => sub { die "Bzzt\n" },
+         },
+         argv => ["--baz", 1, "--bar"], # defaults to @ARGV
+     );
+    
+     if ($res->[0] == 200) {
+         # do stuffs with parsed options, $opts
+     } else {
+         die $res->[1];
+     }
+
+    Sample success result when @ARGV is ["--baz", 1, "--bar"]:
+
+     [200, "OK", undef, { "func.remaining_argv" => [] }]
+
+    Sample error result (ambiguous option) when @ARGV is ["--ba", 1]:
+
+     [
+       500,
+       "Ambiguous option 'ba' (bar/baz?)",
+       undef,
+       {
+         "func.ambiguous_opts" => { ba => ["bar", "baz"] },
+         "func.remaining_argv" => [1],
+       },
+     ]
+
+    Sample error result (option with missing value) when @ARGV is ["--bar",
+    "--baz"]:
+
+    [ 500, "Missing required value for option 'baz'", undef, {
+    "func.remaining_argv" => [], "func.val_missing_opts" => { baz => 1 },
+    }, ]
+
+    Sample error result (unknown option) when @ARGV is ["--foo", "--qux"]:
+
+     [
+        500,
+       "Unknown options 'foo', 'qux'",
+       undef,
+       {
+         "func.remaining_argv" => ["--foo", "--qux"],
+         "func.unknown_opts"   => { foo => 1, qux => 1 },
+       },
+     ]
+
+    Sample error result (option with invalid value where the option handler
+    dies) when @ARGV is ["--err", 1]:
+
+     [
+       500,
+       "Invalid value for option 'err': Invalid value for option 'err': Bzzt\n",
+       undef,
+       {
+         "func.remaining_argv"   => [],
+         "func.val_invalid_opts" => { err => "Invalid value for option 'err': Bzzt\n" },
+       },
+     ]
+
+DESCRIPTION
+
+    EXPERIMENTAL WORK.
+
+    This module is similar to Getopt::Long, but with a rather different
+    interface. After experimenting with Getopt::Long::Less and
+    Getopt::Long::EvenLess (which offers interface compatibility with
+    Getopt::Long), I'm now trying a different interface which will enable
+    me to "clean up" or do "more advanced" stuffs.
+
+    Here are the goals of Getopt::Panjang:
+
+      * low startup overhead
+
+      Less than Getopt::Long, comparable to Getopt::Long::EvenLess.
+
+      * feature parity with Getopt::Long::EvenLess
+
+      More features will be offered in the future.
+
+      * more detailed error return
+
+      This is the main goal which motivates me to write Getopt::Panjang. In
+      Getopt::Long, if there is an error like an unknown option, or
+      validation error for an option's value, or missing option value, you
+      only get a string warning. Getopt::Panjang will instead return a data
+      structure with more details so you can know which option is missing
+      the value, which unknown option is specified by the user, etc. This
+      will enable scripts/frameworks to do something about it, e.g. suggest
+      the correct option when mistyped.
+
+    The interface differences with Getopt::Long:
+
+      * There is only a single function, and no default exports
+
+      Getopt::Long has GetOptions, GetOptionsFromArray,
+      GetOptionsFromString. We only offer get_options which must be
+      exported explicitly.
+
+      * capitalization of function names
+
+      Lowercase with underscores (get_options) is used instead of camel
+      case (GetOptions).
+
+      * get_options accepts hash argument
+
+      This future-proofs the function when we want to add more
+      configuration.
+
+      * option handler also accepts hash argument
+
+      This future-proofs the handler when we want to give more arguments to
+      the handler.
+
+      * There are no globals
+
+      Every configuration is specified through the get_options function.
+      This is cleaner.
+
+      * get_options never dies, never prints warnings
+
+      It only returns the detailed error structure so you can do whatever
+      about it.
+
+      * get_options never modifies argv/@ARGV
+
+      Remaining argv after parsing is returned in the result metadata.
+
+    Sample startup overhead benchmark:
+
+    # COMMAND: perl devscripts/bench-startup 2>&1
+
+SEE ALSO
+
+    Getopt::Long
+
+    Getopt::Long::Less, Getopt::Long::EvenLess
+
+    Perinci::Sub::Getopt
+

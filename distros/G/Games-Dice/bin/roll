@@ -1,0 +1,157 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Command line interface for dice rolls
+# PODNAME: roll
+
+use 5.010;
+use strict;
+use warnings;
+
+use Games::Dice qw(roll);
+
+if ( @ARGV ) {
+    for ( @ARGV ) {
+        if ( ! -f $_ ) {
+            do_roll($_);
+        }
+        else {
+            open my $f, "<", $_;
+            while ( <$f> ) {
+                do_roll(chomp);
+            }
+        }
+    }
+}
+else {
+    while (<STDIN>) {
+        do_roll(chomp);
+    }
+}
+
+sub do_roll {
+    say "$_: " . roll("$_");
+}
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+roll - Command line interface for dice rolls
+
+=head1 VERSION
+
+version 0.045
+
+=head1 SYNOPSIS
+
+    # Evaluate these command line params
+    roll 3d6 2d8
+
+    echo "5d6" > f
+    echo "2d4+1" >> f
+
+    # Read the contents of 'f' from STDIN
+    roll < f
+
+    # Evaluate 1d100 and open file 'f'
+    roll d% f
+
+=head1 OVERVIEW
+
+This is a command line interface to the L<Games::Dice> library. It takes
+die rolling specifications in the form of I<a>dI<b>[+-*/b]I<c>. 
+
+(This specification may change a bit over time, but not radically.)
+
+=over
+
+=item *
+
+I<a> is optional and defaults to 1; this is number of dice to roll. 
+
+=item * 
+
+I<b> is the number of sides on each die. '%' is shorthand for 100. 
+
+=back
+
+The optional end modifies the sum of the rolls. 'b' means take the 
+"best" I<c> rolls and sum them. Also '/' truncates the result to
+an integer after division.
+
+Dice specifications can be piped in, given on STDIN or as positional 
+parameters from the command line.
+
+If a positional parameter matches a file name, it will be opened and 
+each line of the file evaluated.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Philip Newton <pne@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 1999 by Philip Newton.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut
+
+__END__
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     # Evaluate these command line params
+#pod     roll 3d6 2d8
+#pod
+#pod     echo "5d6" > f
+#pod     echo "2d4+1" >> f
+#pod
+#pod     # Read the contents of 'f' from STDIN
+#pod     roll < f
+#pod
+#pod     # Evaluate 1d100 and open file 'f'
+#pod     roll d% f
+#pod
+#pod =head1 OVERVIEW
+#pod
+#pod This is a command line interface to the L<Games::Dice> library. It takes
+#pod die rolling specifications in the form of I<a>dI<b>[+-*/b]I<c>. 
+#pod
+#pod (This specification may change a bit over time, but not radically.)
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod I<a> is optional and defaults to 1; this is number of dice to roll. 
+#pod
+#pod =item * 
+#pod
+#pod I<b> is the number of sides on each die. '%' is shorthand for 100. 
+#pod
+#pod =back 
+#pod
+#pod The optional end modifies the sum of the rolls. 'b' means take the 
+#pod "best" I<c> rolls and sum them. Also '/' truncates the result to
+#pod an integer after division.
+#pod
+#pod Dice specifications can be piped in, given on STDIN or as positional 
+#pod parameters from the command line.
+#pod
+#pod If a positional parameter matches a file name, it will be opened and 
+#pod each line of the file evaluated.

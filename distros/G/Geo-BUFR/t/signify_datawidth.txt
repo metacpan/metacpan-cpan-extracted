@@ -1,0 +1,108 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            170
+    BUFR edition:                      3
+
+Section 1:
+    Length of section:                 18
+    BUFR master table:                 0
+    Originating subcentre:             0
+    Originating centre:                56
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           4
+    Data subcategory:                  4
+    Master table version number:       11
+    Local table version number:        1
+    Year of century:                   15
+    Month:                             2
+    Day:                               20
+    Hour:                              6
+    Minute:                            3
+
+Section 3:
+    Length of section:                 30
+    Number of data subsets:            2
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       301065 301066 311003 013003 033025 033026 004015 103004 004032 206006 011244
+
+Subset 1
+
+     1  001006         ERMTWMRA  AIRCRAFT FLIGHT NUMBER [CCITTIA5]
+     2  001008         MX000026  AIRCRAFT REGISTRATION NUMBER OR OTHER IDENTIFICATION [CCITTIA5]
+     3  002001                0  TYPE OF STATION [CODE TABLE]
+     4  002002                4  TYPE OF INSTRUMENTATION FOR WIND MEASUREMENT [FLAG TABLE]
+     5  002005             0.25  PRECISION OF TEMPERATURE OBSERVATION [K]
+     6  002062                3  TYPE OF AIRCRAFT DATA RELAY SYSTEM [CODE TABLE]
+     7  002070               10  ORIGINAL SPECIFICATION OF LATITUDE/LONGITUDE [CODE TABLE]
+     8  002065              TUS  ACARS GROUND RECEIVING STATION [CCITTIA5]
+     9  004001             2015  YEAR [YEAR]
+    10  004002                2  MONTH [MONTH]
+    11  004003               20  DAY [DAY]
+    12  004004                6  HOUR [HOUR]
+    13  004005                3  MINUTE [MINUTE]
+    14  004006          missing  SECOND [SECOND]
+    15  005002            27.81  LATITUDE (COARSE ACCURACY) [DEGREE]
+    16  006002          -110.61  LONGITUDE (COARSE ACCURACY) [DEGREE]
+    17  007004            22730  PRESSURE [PA]
+    18  002064                0  AIRCRAFT ROLL ANGLE QUALITY [CODE TABLE]
+    19  008004                3  PHASE OF AIRCRAFT FLIGHT [CODE TABLE]
+    20  010070            10973  INDICATED AIRCRAFT ALTITUDE [M]
+    21  011001              276  WIND DIRECTION [DEGREE TRUE]
+    22  011002             25.2  WIND SPEED [M/S]
+    23  012001            222.7  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    24  013002          missing  MIXING RATIO [KG/KG]
+    25  013003          missing  RELATIVE HUMIDITY [%]
+    26  033025          missing  ACARS INTERPOLATED VALUES [CODE TABLE]
+    27  033026          missing  MOISTURE QUALITY [CODE TABLE]
+    28  004015               -1  TIME INCREMENT [MINUTE]
+    29  004032                1  DURATION OF TIME RELATING TO FOLLOWING VALUE [MINUTE]
+    30  011244               10  LOCAL DESCRIPTOR [K]
+    31  004032                1  DURATION OF TIME RELATING TO FOLLOWING VALUE [MINUTE]
+    32  011244               20  LOCAL DESCRIPTOR [K]
+    33  004032                1  DURATION OF TIME RELATING TO FOLLOWING VALUE [MINUTE]
+    34  011244               30  LOCAL DESCRIPTOR [K]
+    35  004032                1  DURATION OF TIME RELATING TO FOLLOWING VALUE [MINUTE]
+    36  011244               40  LOCAL DESCRIPTOR [K]
+
+Subset 2
+
+     1  001006         ERMTWMRA  AIRCRAFT FLIGHT NUMBER [CCITTIA5]
+     2  001008         MX000026  AIRCRAFT REGISTRATION NUMBER OR OTHER IDENTIFICATION [CCITTIA5]
+     3  002001                0  TYPE OF STATION [CODE TABLE]
+     4  002002                4  TYPE OF INSTRUMENTATION FOR WIND MEASUREMENT [FLAG TABLE]
+     5  002005             0.25  PRECISION OF TEMPERATURE OBSERVATION [K]
+     6  002062                3  TYPE OF AIRCRAFT DATA RELAY SYSTEM [CODE TABLE]
+     7  002070               10  ORIGINAL SPECIFICATION OF LATITUDE/LONGITUDE [CODE TABLE]
+     8  002065              TUS  ACARS GROUND RECEIVING STATION [CCITTIA5]
+     9  004001             2015  YEAR [YEAR]
+    10  004002                2  MONTH [MONTH]
+    11  004003               20  DAY [DAY]
+    12  004004                6  HOUR [HOUR]
+    13  004005                6  MINUTE [MINUTE]
+    14  004006          missing  SECOND [SECOND]
+    15  005002            28.08  LATITUDE (COARSE ACCURACY) [DEGREE]
+    16  006002          -110.87  LONGITUDE (COARSE ACCURACY) [DEGREE]
+    17  007004            22730  PRESSURE [PA]
+    18  002064                0  AIRCRAFT ROLL ANGLE QUALITY [CODE TABLE]
+    19  008004                3  PHASE OF AIRCRAFT FLIGHT [CODE TABLE]
+    20  010070            10973  INDICATED AIRCRAFT ALTITUDE [M]
+    21  011001              272  WIND DIRECTION [DEGREE TRUE]
+    22  011002             25.7  WIND SPEED [M/S]
+    23  012001            222.7  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    24  013002          missing  MIXING RATIO [KG/KG]
+    25  013003          missing  RELATIVE HUMIDITY [%]
+    26  033025          missing  ACARS INTERPOLATED VALUES [CODE TABLE]
+    27  033026          missing  MOISTURE QUALITY [CODE TABLE]
+    28  004015               -1  TIME INCREMENT [MINUTE]
+    29  004032                1  DURATION OF TIME RELATING TO FOLLOWING VALUE [MINUTE]
+    30  011244               11  LOCAL DESCRIPTOR [K]
+    31  004032                1  DURATION OF TIME RELATING TO FOLLOWING VALUE [MINUTE]
+    32  011244               22  LOCAL DESCRIPTOR [K]
+    33  004032                1  DURATION OF TIME RELATING TO FOLLOWING VALUE [MINUTE]
+    34  011244               33  LOCAL DESCRIPTOR [K]
+    35  004032                1  DURATION OF TIME RELATING TO FOLLOWING VALUE [MINUTE]
+    36  011244               44  LOCAL DESCRIPTOR [K]

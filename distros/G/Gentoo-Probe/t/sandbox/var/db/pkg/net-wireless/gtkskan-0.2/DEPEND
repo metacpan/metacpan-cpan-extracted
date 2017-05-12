@@ -1,0 +1,4 @@
+virtual/glibc
+	=sys-libs/db-1.85*
+	=x11-libs/gtk+-1.2*
+	gnome? ( >=gnome-base/gnome-libs-1.4 >=gnome-base/gnome-core-1.4 ) 

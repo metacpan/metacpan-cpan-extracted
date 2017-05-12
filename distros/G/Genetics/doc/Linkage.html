@@ -1,0 +1,429 @@
+<HTML>
+<HEAD>
+<TITLE>Linkage.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#inheritance">Inheritance</A></LI>
+	<LI><A HREF="#public methods">Public Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#writelinkagefiles">writeLinkageFiles</A></LI>
+		<LI><A HREF="#rungenehunter">runGenehunter</A></LI>
+		<LI><A HREF="#writekemfiles">writeKEMFiles</A></LI>
+		<LI><A HREF="#processkemresults">processKemResults</A></LI>
+		<LI><A HREF="#printprocessedkemresults">printProcessedKemResults</A></LI>
+		<LI><A HREF="#htmlizekemresults">htmlizeKemResults</A></LI>
+		<LI><A HREF="#ordermarkerswithmap">orderMarkersWithMap</A></LI>
+	</UL>
+
+	<LI><A HREF="#private methods">Private Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#_renumberalleles">_renumberAlleles</A></LI>
+		<LI><A HREF="#_reverserenum">_reverseRenum</A></LI>
+		<LI><A HREF="#_validatetraitinput">_validateTraitInput</A></LI>
+		<LI><A HREF="#_validatelcinput">_validateLCInput</A></LI>
+		<LI><A HREF="#_validateqtlinput">_validateQTLInput</A></LI>
+		<LI><A HREF="#_processmarkersandmap">_processMarkersAndMap</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::API::Analysis::Linkage</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  # The following code runs a full Genehunter genome scan using two different 
+  # disease models:
+  use Genetics::API ;</PRE>
+<PRE>
+  $api = new Genetics::API(DSN =&gt; {driver =&gt; &quot;mysql&quot;,
+                                   host =&gt; $Host,
+                                   database =&gt; $Database},
+                           user =&gt; $UserName,
+                           password =&gt; $Password) ;</PRE>
+<PRE>
+  # Kindreds
+  $kindredCluster = $api-&gt;getObject({TYPE =&gt; &quot;Cluster&quot;, 
+                                     NAME =&gt; &quot;Bpall two generations&quot;}) ;
+  @kindreds = $api-&gt;getClusterContents($kindredCluster, 1) ;
+  # Allele FrequencySource:
+  $bpall = $api-&gt;getObject({TYPE =&gt; &quot;Cluster&quot;, NAME =&gt; &quot;Bpall&quot;}) ;
+  # StudyVariables:
+  $bp = $api-&gt;getObject({TYPE =&gt; &quot;StudyVariable&quot;, NAME =&gt; &quot;BP&quot;}) ;
+  $bpup = $api-&gt;getObject({TYPE =&gt; &quot;StudyVariable&quot;, NAME =&gt; &quot;BPUP&quot;}) ;
+  @studyVars = ($bp, $bpup) ;
+  $lcd = $api-&gt;getObject({TYPE =&gt; &quot;StudyVariable&quot;, NAME =&gt; &quot;AoO Dom LC&quot;}) ;</PRE>
+<PRE>
+  @chromosomes = qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 XY) ;
+  foreach $chr (@chromosomes) {
+    $markerCluster = $api-&gt;getObject({TYPE =&gt; &quot;Cluster&quot;, 
+                                      NAME =&gt; &quot;Chr$chr Markers&quot;}) ;
+    @markers = $api-&gt;getClusterContents($markerCluster, 1) ;
+    $map = $api-&gt;getObject({TYPE =&gt; &quot;Map&quot;, 
+                            NAME =&gt; &quot;Marshfield Chr$chr Map&quot;}) ;
+</PRE>
+<PRE>
+
+    foreach $sv (@studyVars) {
+      $svName = $sv-&gt;name() ;
+      $runName = $chr . $svName ;
+      $api-&gt;runGenehunter(
+                        KINDREDS =&gt; \@kindreds, 
+                        MARKERS =&gt; \@markers, 
+                        MAP =&gt; $map,
+                        ALLELETYPE =&gt; &quot;Size&quot;, 
+                        AFS =&gt; $bpall, 
+                        TRAIT =&gt; $sv, 
+                        LC =&gt; $lcd,
+                        SETUPFILENAME =&gt; &quot;$runName.setup&quot;, 
+                        PHOTOFILENAME =&gt; &quot;$runName.out&quot;, 
+                        DATFILENAME =&gt; &quot;$runName.dat&quot;, 
+                        PEDFILENAME =&gt; &quot;$runName.pre&quot;, 
+                        ANALYSIS =&gt; &quot;BOTH&quot;, 
+                        SINGLEPOINT =&gt; &quot;off&quot;, 
+                        OFFEND =&gt; &quot;5.0&quot;,
+                        INCREMENT =&gt; &quot;step 3&quot;,
+                        MAXBITS =&gt; 18,
+                       ) ;
+    }
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This package contains methods relating to the use of data contained in GenPerl 
+objects in genetic linkage analyses.  Generally speaking, this means reading 
+and writing linkage format pedigree and locus files, and/or running programs 
+such as genehunter, etc.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the methods. The names of 
+internal variables and methods are preceded with an underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+ strict             Just to be anal
+ vars               Global variables
+ Carp               Error reporting</PRE>
+<P>
+<HR>
+<H1><A NAME="inheritance">Inheritance</A></H1>
+<PRE>
+ Exporter           Make methods available to importing packages</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public Methods</A></H1>
+<P>
+<H2><A NAME="writelinkagefiles">writeLinkageFiles</A></H2>
+<PRE>
+  Function  : Write LINKAGE format pedigree and locus files.
+  Arguments : A hash of parameters as follows
+              KINDREDS =&gt; Array pointer to a list of Kindred objects.
+                          These define the Subjects being analyzed.
+                          Required, for obvious reasons.
+              MARKERS =&gt; Array pointer to a list of Marker objects.
+                         These define the Markers being analyzed.
+                         Required, for obvious reasons.
+              ALLELETYPE =&gt; String containing the allele type of the alleles 
+                            to be used.
+                            Optional.  Default value is Code.
+              AFS =&gt; Array pointer to a list of Subject or Kindred objects, or 
+                     a single Cluster (Kindred or Subject) object.
+                     The source for allele frequencies.
+                     Optional.  If not provided, the input Kindreds will be used
+              EXTAFS =&gt; A FrequencySource object.
+                        The source for allele frequencies.
+                        Optional.  If not provided, the input Kindreds will be used
+              TRAIT =&gt; A StudyVariable object.
+                       The trait locus being analyzed.  The category of this 
+                       StudyVariable must be DynamicAffectionStatus or 
+                       StaticAffectionStatus.
+                       Optional.
+              LC =&gt; A StudyVariable object.
+                    This StudyVariable defines the liability classes to be used 
+                    with the trait locus being analyzed.  The category of this 
+                    StudyVariable must be StaticLiabilityClass.
+                    Optional.
+              QTLS =&gt; Array pointer to a list of StudyVariable objects.
+                      QTLs to be analyzed.
+                      Optional.
+              MAP =&gt; A Map object.
+                     This Map will be used to order the markers.  Also, the distances 
+                     will be used.  Right now, every input Marker MUST be on the Map 
+                     and there MUST NOT be any markers on the map that are not being 
+                     analyzed.
+                     Optional.  
+              DATFILE =&gt; Filehandle reference.
+                         The filehandle to which the locus file will be written.
+                         Optional.  If not provided, STDOUT will be used.
+              PEDFILE =&gt; Filehandle reference.
+                         The filehandle to which the pedigree file will be 
+                         written.
+                         Optional.  If not provided, STDOUT will be used.
+              MARKERDELIM =&gt; Scalar containint the string to be used to 
+                             delimit marker names in the locus file.
+                             Optional.  If not provided, # is used.
+              RENUMBER =&gt; Boolean.
+                          Optional.  If not provided, alleles are NOT re-
+                          numbered.
+  Returns   : N/A
+  Scope     : Public
+  Called by : 
+  Comments  : To Do: support for X-linked data
+                     support for dynamic trait loci
+                     support for dynamic liability classes
+                     support for QTLs</PRE>
+<P>
+<H2><A NAME="rungenehunter">runGenehunter</A></H2>
+<PRE>
+  Function  : Run a Genehunter analysis
+  Arguments : A hash of parameters as follows
+              KINDREDS =&gt; Array pointer to a list of Kindred objects.
+                          These define the Subjects being analyzed.
+                          Required, for obvious reasons.
+              MARKERS =&gt; Array pointer to a list of Marker objects.
+                         These define the Markers being analyzed.
+                         Required, for obvious reasons.
+              AFS =&gt; Array pointer to a list of Subject or Kindred objects, or 
+                     a single Cluster (Kindred or Subject) object.
+                     The source for allele frequencies.
+                     Optional.  If not provided, the input Kindreds will be used
+              EXTAFS =&gt; A FrequencySource object.
+                        The source for allele frequencies.
+                        Optional.  If not provided, the input Kindreds will be used
+              TRAIT =&gt; A StudyVariable object.
+                       The trait locus being analyzed.  The category of this 
+                       StudyVariable must be AffectionStatus or StaticAffectionStatus.
+                       Optional.
+              LC =&gt; A StudyVariable object.
+                    This StudyVariable defines the liability classes to be used 
+                    with the trait locus being analyzed.  The category of this 
+                    StudyVariable must be StaticLiabilityClass.
+                    Optional.
+              DATFILENAME =&gt; A name to be used for the locus file.
+                             Required.
+              PEDFILENAME =&gt; A name to be used for the pedigree file.
+                             Required.
+              PHOTOFILENAME =&gt; A name to be used for the photo file.
+                               Optional.
+              FILESONLY =&gt; Boolean.  If true, only write files.
+                           Optional, defaults to false.
+  Returns   : N/A
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="writekemfiles">writeKEMFiles</A></H2>
+<PRE>
+  Function  : Write &quot;LINKAGE format&quot; pedigree and locus files for use by KEM.
+  Arguments : A hash of parameters as follows
+              SUBJECTS =&gt; Array pointer to a list of Kindred objects.
+                          These define the Subjects being analyzed.
+                          Required, for obvious reasons.
+              MARKERS =&gt; Array pointer to a list of Marker objects.
+                         These define the Markers being analyzed.
+                         Required, for obvious reasons.
+              DISTANCES =&gt; Array pointer to a list of distances bewtween the 
+                           Markers.
+              ALLELETYPE =&gt; String containing the allele type of the alleles 
+                            to be used.
+                            Optional.  Default value is Code.
+              DATFILE =&gt; Filehandle reference.
+                         The filehandle to which the locus file will be written.
+                         Optional.  If not provided, STDOUT will be used.
+              PEDFILE =&gt; Filehandle reference.
+                         The filehandle to which the pedigree file will be 
+                         written.
+                         Optional.  If not provided, STDOUT will be used.
+  Returns   : A hash, keyed on marker names that maps the codes (used in the 
+              output files) to the allele names of the markers.  The hash has 
+              the following structure:
+                 markerNames =&gt; code2alleleName hash references
+  Scope     : Public
+  Called by : 
+  Comments  : Alleles have to be re-numbered for KEM.
+              Markers and distances are used in their input order.</PRE>
+<P>
+<H2><A NAME="processkemresults">processKemResults</A></H2>
+<PRE>
+ Function  : Process K-EM output, as descibed below.
+ Arguments : A file handle reference to a K-EM output file, an array reference 
+             to the list of markers used in the analysis, and a hash reference 
+             to the hash mapping allele codes to names (as returned by 
+             writeKEMFiles()).
+ Returns   : An array.  the first element is a scalar containing the best log 
+             liklihood of the K-EM run.  The rest of the elements are hash 
+             pointers containing processed results.  The structure of the 
+             referenced hashes is:
+               $htResult{name} = Ht number
+               $htResult{freq} = float
+               $htResult{ht}   = array reference to a list of allele names
+ Example   : @kemResults = processKemResults(\@snps, \%poNameCode2Allele) ;
+ Scope     : Public Class Method
+ Comments  : Converts codes in K-EM output file back into allele names</PRE>
+<P>
+<H2><A NAME="printprocessedkemresults">printProcessedKemResults</A></H2>
+<PRE>
+ Function  : 
+ Arguments : 
+ Returns   : 
+ Example   : printProcessedKemResults(%kemResults)
+ Scope     : Public Class Method
+ Comments  :</PRE>
+<P>
+<H2><A NAME="htmlizekemresults">htmlizeKemResults</A></H2>
+<PRE>
+ Function  : Format processed K-EM results as HTML
+ Arguments : An array of hash references as returned by processKemResults()
+ Returns   : Scalar text string containing HTML
+ Example   : $html = htmlizeKemResults(@processedKemResults)
+ Scope     : Public Class Method
+ Comments  :</PRE>
+<P>
+<H2><A NAME="ordermarkerswithmap">orderMarkersWithMap</A></H2>
+<PRE>
+ Function  : Order markers and generate distances based on a Map object.
+ Arguments : An array reference to a list of input Markers/SNPs, a Map, and two 
+             array reference to be populated with the ordered markers and 
+             distances, respecitvely.
+ Returns   : N/A
+ Example   : $api-&gt;orderMarkersWithMap(\@snps, undef, \@orderedSnps, \@distances) ;
+ Scope     : Public Instance Method
+ Comments  : This is used inconjunction with runKEM().
+             This is basically a stub method right now.  It populates to 
+             ordered list with a copy of the input list and populates the 
+             distance list with 0.1s.</PRE>
+<P>
+<HR>
+<H1><A NAME="private methods">Private Methods</A></H1>
+<P>
+<H2><A NAME="_renumberalleles">_renumberAlleles</A></H2>
+<PRE>
+  Function  : Renumber alleles into consecutive integers
+  Arguments : A Marker or SNP object and a string containing an allele type.
+  Returns   : A reference to a hash with the following structure:
+                %hash = (alleleName =&gt; code)
+  Scope     : Private instance method
+  Called by : writeLinkageFiles().
+  Comments  :</PRE>
+<P>
+<H2><A NAME="_reverserenum">_reverseRenum</A></H2>
+<PRE>
+ Function  : See below
+ Arguments : A hash of with the following structure:
+                 markerNames =&gt; alleleName2code hash references
+ Returns   : A hash of with the following structure:
+                 markerNames =&gt; code2alleleName hash references
+ Example   : %poName_c2a = _reverseRenum(%poName_a2c)
+ Scope     : Private Class Method
+ Comments  : This is needed because the linkage file writing routines 
+             need to keep track of allele-&gt;code mapping, but they need 
+             to return code-&gt;allele mappings.</PRE>
+<P>
+<H2><A NAME="_validatetraitinput">_validateTraitInput</A></H2>
+<PRE>
+  Function  : Verify that a StudyVariable may be used as a trait locus.
+  Arguments : A StudyVariable object and two pointers to flag variables used 
+              in writeLinkageFiles().
+  Returns   : N/A
+  Scope     : Private class method
+  Called by : writeLinkageFiles()
+  Comments  : The fisrt flag pointer is to the trait flag; it is set to 1 if 
+              the input StudyVariable may be used for static liability class 
+              definition and assignments.  The second flag pointer is to 
+              the liability class flag.  It is set to 2 if the input 
+              StudyVariable may be used for dynamic liability class definition 
+              and assignments.</PRE>
+<P>
+<H2><A NAME="_validatelcinput">_validateLCInput</A></H2>
+<PRE>
+  Function  : Verify that a StudyVariable may be used for static liability 
+              class definition and assignments.
+  Arguments : A StudyVariable object a pointer to a flag variable used 
+              in writeLinkageFiles().
+  Returns   : 
+  Scope     : Private class method
+  Called by : writeLinkageFiles()
+  Comments  : The flag pointer is to the the liability class flag.  It is set 
+              to 1 if the input StudyVariable may be used for static liability 
+              class definition and assignments.</PRE>
+<P>
+<H2><A NAME="_validateqtlinput">_validateQTLInput</A></H2>
+<PRE>
+  Function  : Verify that StudyVariable(s) may be used as QTL varibales in a 
+              linkage analysis.
+  Arguments : N/A
+  Returns   : N/A
+  Scope     : Private class method
+  Called by : writeLinkageFiles()
+  Comments  : Not implemented.</PRE>
+<P>
+<H2><A NAME="_processmarkersandmap">_processMarkersAndMap</A></H2>
+<PRE>
+  Function  : Order markers and generate distances for linkage analysis.
+  Arguments : An array reference to a list of input Markers/SNPs, a Map 
+  Returns   : N/A
+  Scope     : Private class method
+  Called by : writeLinkageFiles()
+  Comments  : There does not have to be a Map object.  If there is not the 
+              marker order used is that of the input list and all distances are 
+              set to 0.1.  If there are input Markers/SNPs that are not on the 
+              Map, they are included in the analysis after the ordered 
+              Markers/SNPs with all distances are set to 0.1.</PRE>
+<PRE>
+              NB. This does not yet deal with the following:
+                - markers on the map that are not in the input set
+                - global map order (it may never do this)
+                - map distance units other than Theta or cM (it may never do this)</PRE>
+
+</BODY>
+
+</HTML>

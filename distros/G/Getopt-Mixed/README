@@ -1,0 +1,78 @@
+Getopt::Mixed version 1.12, released February 8, 2014
+
+
+This module is obsolete.
+
+Getopt::Mixed provides GNU-style option processing for Perl 5 scripts,
+with both long and short options.  Please see the documentation at the
+end of the module for instructions on its use and licensing
+restrictions.
+
+However, some time ago Getopt::Long was changed to support short
+options as well, and it has the huge advantage of being part of the
+standard Perl distribution.  So, Getopt::Mixed is now effectively
+obsolete.  I don't intend to make any more changes, but I'm leaving it
+available for people who have code that already uses it.  For new
+modules, I recommend using Getopt::Long like this:
+
+    use Getopt::Long;
+    Getopt::Long::Configure(qw(bundling no_getopt_compat));
+    GetOptions(...option-descriptions...);
+
+You can use Makefile.PL to install Getopt::Mixed, but all you really
+need to do is copy lib/Getopt/Mixed.pm to your Perl library.
+
+There are two sample scripts in the examples/ directory.
+They accept the following options and associated arguments:
+  -a, --apples=N     Mandatory real number argument
+      --apricots=N   Mandatory real number argument
+  -b[N]              Optional integer argument
+  -c                 No arguments
+  -d[STRING]         Optional string argument
+  -f, --file=STRING  Mandatory string argument
+      --pears=N      Mandatory real number argument
+  -?, --help         No arguments
+  -V, --version      No arguments
+
+Since these are just sample scripts, the options don't actually mean
+anything.  simple demonstrates the simple method of using
+Getopt::Mixed, and flexible demonstrates the flexible method.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package   Minimum Version
+  --------- ---------------
+  perl       5.000
+  Carp       
+  Exporter
+
+
+
+CHANGES
+    Here's what's new in version 1.12 of Getopt-Mixed:
+    (See the file "Changes" for the full revision history.)
+
+	- No functional changes
+	- Minor documentation & metadata improvements
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 1995 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Gimp-ScriptFu-Client.t
+t/t.pl
+lib/Gimp/ScriptFu/Client.pm
+META.yml                                 Module meta-data (added by MakeMaker)

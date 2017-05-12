@@ -1,0 +1,17 @@
+Revision history for Glib::EV
+
+2.02 Mon Nov  1 23:22:19 CET 2010
+	- port to EV 4.00 API.
+
+2.01 Sat Jan 31 10:47:04 CET 2009
+	- fixed the problem of glib users being unable to
+          poll for writing (analysed by common@gmx.ch).
+
+2.0  Sat Dec 22 17:49:53 CET 2007
+	- upgrade to EV version 2.0 API.
+
+1.0  Sun Nov 25 10:44:58 CET 2007
+	- update META.yml, no functional changes.
+
+0.1  Sat Nov 24 17:10:16 CET 2007
+	- original version, a Glib::Event clone.

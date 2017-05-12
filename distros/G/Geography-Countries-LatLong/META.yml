@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Geography-Countries-LatLong
+version:             1.0
+abstract:            Mean latitude and longitude
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:     
+    Geography::Countries:          0.1
+    Test::More:                    0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Lee Goddard <lgoddard -at- cpan -dot- org>

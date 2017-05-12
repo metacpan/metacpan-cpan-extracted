@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Getopt-ApacheCommonsCLI.t
+lib/Getopt/ApacheCommonsCLI.pm
+eg/nodetool_parser.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+{
+    '61000854' => {
+                        'station_type_id' => '21645',
+                        'corporation_name' => 'GoonWaffe',
+                        'corporation_id' => '667531913',
+                        'station_name' => '4-EP12 VIII - 4-EP12 Inches for Mittens',
+                        'solar_system_id' => '30004553',
+                        'station_id' => '61000854'
+                      },
+    '61000855' => {
+                        'station_type_id' => '21645',
+                        'corporation_name' => 'Organized-Chaos',
+                        'corporation_id' => '1089744282',
+                        'station_name' => 'X-4WZD II - Outpost Ticonderoga',
+                        'solar_system_id' => '30003744',
+                        'station_id' => '61000855'
+                      },                  
+    '61000856' => {
+                        'station_type_id' => '21646',
+                        'corporation_name' => 'Northern Associates Holdings',
+                        'corporation_id' => '98008728',
+                        'station_name' => 'AF0-V5 X - NO MORE YOLO',
+                        'solar_system_id' => '30002107',
+                        'station_id' => '61000856'
+                      },
+    'cached_until' => '2014-08-24 19:47:49'
+}

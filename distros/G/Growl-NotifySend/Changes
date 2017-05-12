@@ -1,0 +1,7 @@
+Revision history for Perl extension Growl::NotifySend
+
+0.02 2011-02-21 12:24:25
+    - Encode the arguments of show() with UTF-8
+
+0.01 2011-02-21 11:23:49
+    - original version; created by dim at Mon Feb 21 09:49:25 2011.

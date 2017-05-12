@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               GlbDNS
+version:            0.30
+abstract:           Perl daemon for global load balancing
+author:
+    - Artur Bergman <sky+cpan@crucially.net
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Geo::IP:          0
+    LWP::Simple:      0
+    Net::DNS:         0
+    Working::Daemon:  0.31
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

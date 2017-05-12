@@ -1,0 +1,24 @@
+1) Make sure that /dev/audio is writable by the user
+using the program.
+
+2) Make sure Requisite Module Dependencies Are In Place:
+
+	use MIME::Base64 ();
+	use Time::HiRes qw( usleep );
+
+for Guitar::Tuner
+
+and:
+	use Term::ReadKey;
+
+for "guitar-tuner.pl"
+
+3) Uses usleep() for timing to wait for /dev/audio to close
+before playing next string. May need to be adjusted in
+source for your hardware to prevent "Device or Resource Busy"
+error.
+
+4) Uses alsa mixer program (amixer) to adjust volume,
+via system(), in "guitar-tuner.pl", included in distribution.
+Can also use `aumix` on some systems, with appropriate
+command line options. 

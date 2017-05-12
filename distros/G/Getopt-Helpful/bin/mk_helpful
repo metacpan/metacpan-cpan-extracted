@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+# transform GetOptions(\nfoo => \$foo\n); format into the helpful kind
+
+# in vim, just filter your lines through this with something like:
+#  V4j!mk_helpful
+
+# this will be a fairly naïve approach, with a simple split
+my %repl = (
+	help    => "'+help'",
+	verbose => "'+verbose'",
+	debug   => "'+debug'",
+	);
+my $debug = 0;
+
+while(my $line = <>) {
+	chomp($line);
+	my $sp = "";
+	if($line =~ s/^(\s+)//) {
+		$sp = $1;
+		$debug and print "got space\n";
+	}
+	my ($this, $that) = split(/=>/, $line, 2);
+	unless($that =~ m/,\s*$/) {
+		die "no continuations allowed";
+	}
+	my $key = eval($this);
+	$key =~ s/^.\|//;
+	$debug and print "now key: '$key'\n";
+	if($repl{$key}) {
+		$debug and print "replacing\n";
+		print $sp . "$repl{$key}\n";
+		next;
+	}
+	print $sp . "[$this,$that'',''],\n";
+}

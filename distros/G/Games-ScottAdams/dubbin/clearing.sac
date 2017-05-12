@@ -1,0 +1,8 @@
+%room clearing
+clearing
+%exit n swamp
+%exit e glade
+%exit s forest
+
+%include sub/items.sac
+

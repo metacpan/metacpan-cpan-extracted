@@ -1,0 +1,45 @@
+{
+   "abstract" : "function call \"router\" and load balancer",
+   "author" : [
+      "Brad Fitzpatrick (brad@danga.com), Brad Whitaker (whitaker@danga.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gearman-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Script" : "1.12",
+            "version" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Danga::Socket" : "1.52",
+            "Gearman::Util" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.130.1"
+}

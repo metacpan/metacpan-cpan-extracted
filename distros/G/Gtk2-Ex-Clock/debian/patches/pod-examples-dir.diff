@@ -1,0 +1,21 @@
+diff -Nur -x '*.orig' -x '*~' clock//lib/Gtk2/Ex/Clock.pm clock.new//lib/Gtk2/Ex/Clock.pm
+--- clock//lib/Gtk2/Ex/Clock.pm	2011-01-02 17:02:11.000000000 +1100
++++ clock.new//lib/Gtk2/Ex/Clock.pm	2011-01-02 17:04:14.000000000 +1100
+@@ -313,7 +313,7 @@
+ 
+ If you've got a 7-segment LED style font you can display alarm clock style
+ by selecting that font in the usual ways from an RC file setting or Pango
+-markup.  F<examples/7seg.pl> in the sources does it with Pango markup and
++markup.  F</usr/share/doc/libgtk2-ex-clock-perl/examples/7seg.pl> does it with Pango markup and
+ Harvey Twyman's font.  (Unzip into your F<~/.fonts> directory.)
+ 
+ =over
+@@ -400,7 +400,7 @@
+ =back
+ 
+ The properties of C<Gtk2::Label> and C<Gtk2::Misc> will variously control
+-padding, alignment, etc.  See the F<examples> directory in the sources for
++padding, alignment, etc.  See F</usr/share/doc/libgtk2-ex-clock-perl/examples> for
+ some complete programs displaying clocks in various forms.
+ 
+ =head1 LOCALIZATIONS

@@ -1,0 +1,57 @@
+---
+abstract: 'Provide access to the Git object database'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  Test::Requires::Git: '1.005'
+  blib: '1.01'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - git
+  - database
+  - wrapper
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Database
+requires:
+  Cwd: '0'
+  DateTime: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  File::pushd: '0'
+  Git::Raw: '0'
+  Git::Sub: '0'
+  Git::Version::Compare: '0'
+  Git::Wrapper: '0'
+  IO::Select: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Object: '0'
+  Moo::Role: '0'
+  Path::Class: '0'
+  Sub::Quote: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Database
+  repository: http://github.com/book/Git-Database.git
+version: '0.009'
+x_contributors:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Сергей Романов <sromanov@cpan.org>'

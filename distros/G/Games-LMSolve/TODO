@@ -1,0 +1,12 @@
+* Document the Games::LMSolve interface.
+
+* Put on CPAN
+
+* Implement other scans such as A*, etc.
+
+* Implement support for No U-Turn and Changing Rules Number Mazes.
+
+* Document the moves that are being outputted to the screen.
+
+* Write more automated tests
+

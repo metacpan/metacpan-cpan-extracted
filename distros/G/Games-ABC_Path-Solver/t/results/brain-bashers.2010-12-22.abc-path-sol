@@ -1,0 +1,103 @@
+B cannot be at (4,2) due to lack of vicinity from A.
+B cannot be at (5,2) due to lack of vicinity from A.
+C cannot be at (2,4) due to lack of vicinity from B.
+C cannot be at (2,5) due to lack of vicinity from B.
+D cannot be at (4,1) due to lack of vicinity from C.
+D cannot be at (5,1) due to lack of vicinity from C.
+E cannot be at (1,3) due to lack of vicinity from D.
+E cannot be at (1,4) due to lack of vicinity from D.
+E cannot be at (1,5) due to lack of vicinity from D.
+D cannot be at (3,1) due to lack of vicinity from E.
+F cannot be at (1,4) due to lack of vicinity from E.
+F cannot be at (1,5) due to lack of vicinity from E.
+G cannot be at (3,3) due to lack of vicinity from F.
+G cannot be at (4,3) due to lack of vicinity from F.
+G cannot be at (5,3) due to lack of vicinity from F.
+For G only (1,3) is possible.
+F cannot be at (1,1) due to lack of vicinity from G.
+H cannot be at (3,4) due to lack of vicinity from G.
+H cannot be at (4,4) due to lack of vicinity from G.
+H cannot be at (5,4) due to lack of vicinity from G.
+I cannot be at (2,1) due to lack of vicinity from H.
+I cannot be at (2,2) due to lack of vicinity from H.
+J cannot be at (4,5) due to lack of vicinity from I.
+J cannot be at (5,5) due to lack of vicinity from I.
+K cannot be at (5,1) due to lack of vicinity from J.
+K cannot be at (4,2) due to lack of vicinity from J.
+K cannot be at (3,3) due to lack of vicinity from J.
+L cannot be at (4,5) due to lack of vicinity from K.
+L cannot be at (5,5) due to lack of vicinity from K.
+M cannot be at (3,1) due to lack of vicinity from L.
+M cannot be at (3,2) due to lack of vicinity from L.
+M cannot be at (3,3) due to lack of vicinity from L.
+L cannot be at (1,5) due to lack of vicinity from M.
+N cannot be at (1,1) due to lack of vicinity from M.
+N cannot be at (2,2) due to lack of vicinity from M.
+N cannot be at (5,5) due to lack of vicinity from M.
+P cannot be at (1,1) due to lack of vicinity from O.
+P cannot be at (5,5) due to lack of vicinity from O.
+Q cannot be at (4,1) due to lack of vicinity from P.
+P cannot be at (2,2) due to lack of vicinity from Q.
+S cannot be at (1,1) due to lack of vicinity from R.
+S cannot be at (5,1) due to lack of vicinity from R.
+R cannot be at (3,3) due to lack of vicinity from S.
+R cannot be at (3,4) due to lack of vicinity from S.
+R cannot be at (3,5) due to lack of vicinity from S.
+T cannot be at (3,3) due to lack of vicinity from S.
+T cannot be at (2,4) due to lack of vicinity from S.
+T cannot be at (1,5) due to lack of vicinity from S.
+S cannot be at (2,1) due to lack of vicinity from T.
+U cannot be at (1,2) due to lack of vicinity from T.
+U cannot be at (2,2) due to lack of vicinity from T.
+V cannot be at (5,4) due to lack of vicinity from U.
+V cannot be at (5,5) due to lack of vicinity from U.
+U cannot be at (3,2) due to lack of vicinity from V.
+W cannot be at (1,4) due to lack of vicinity from V.
+W cannot be at (2,4) due to lack of vicinity from V.
+W cannot be at (3,4) due to lack of vicinity from V.
+V cannot be at (5,1) due to lack of vicinity from W.
+V cannot be at (5,2) due to lack of vicinity from W.
+X cannot be at (5,1) due to lack of vicinity from W.
+X cannot be at (5,2) due to lack of vicinity from W.
+Y cannot be at (4,1) due to lack of vicinity from X.
+The only letter that can be at (4,1) is S. Invalidating it for all other cells.
+The only letter that can be at (5,1) is T. Invalidating it for all other cells.
+The only letter that can be at (5,2) is U. Invalidating it for all other cells.
+The only letter that can be at (1,4) is H. Invalidating it for all other cells.
+The only letter that can be at (3,4) is M. Invalidating it for all other cells.
+The only letter that can be at (5,5) is X. Invalidating it for all other cells.
+For F only (1,2) is possible.
+Q cannot be at (4,4) due to lack of vicinity from R.
+Q cannot be at (4,5) due to lack of vicinity from R.
+For V only (5,3) is possible.
+Y cannot be at (4,2) due to lack of vicinity from X.
+Y cannot be at (4,3) due to lack of vicinity from X.
+The only letter that can be at (3,1) is R. Invalidating it for all other cells.
+The only letter that can be at (3,2) is B. Invalidating it for all other cells.
+The only letter that can be at (4,2) is Q. Invalidating it for all other cells.
+The only letter that can be at (4,3) is O. Invalidating it for all other cells.
+The only letter that can be at (5,4) is W. Invalidating it for all other cells.
+The only letter that can be at (4,5) is Y. Invalidating it for all other cells.
+For E only (1,1) is possible.
+P cannot be at (4,4) due to lack of vicinity from Q.
+The only letter that can be at (2,2) is C. Invalidating it for all other cells.
+The only letter that can be at (4,4) is N. Invalidating it for all other cells.
+For D only (2,1) is possible.
+For P only (3,3) is possible.
+We have non-conclusive cells. Trying I for (2,4).
+ => For K only (1,5) is possible.
+ => J cannot be at (3,5) due to lack of vicinity from K.
+ => L cannot be at (3,5) due to lack of vicinity from K.
+ => For L only (2,5) is possible.
+Trying I for (2,4) results in an error.
+We have non-conclusive cells. Trying K for (2,4).
+ => For I only (2,5) is possible.
+ => For L only (3,5) is possible.
+ => The only letter that can be at (1,5) is J. Invalidating it for all other cells.
+Trying K for (2,4) returns a success.
+| X = 1 | X = 2 | X = 3 | X = 4 | X = 5 |
+|   E   |   D   |   R   |   S   |   T   |
+|   F   |   C   |   B   |   Q   |   U   |
+|   G   |   A   |   P   |   O   |   V   |
+|   H   |   K   |   M   |   N   |   W   |
+|   J   |   I   |   L   |   Y   |   X   |

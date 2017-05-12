@@ -1,0 +1,7 @@
+Tiny.pm
+Tiny.pod
+Makefile.PL
+MANIFEST
+README
+CHANGELOG
+t/getopt.t

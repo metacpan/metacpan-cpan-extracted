@@ -1,0 +1,39 @@
+NAME
+    Games::Boggle::Board - create a boggle board
+
+SYNOPSIS
+      use Games::Boggle::Board;
+
+      my $board = Games::Boggle::Board->new();
+      print $board->as_formatted_string;
+
+DESCRIPTION
+    This module creates a random boggle board for play.
+
+METHODS
+  new
+
+      my $board = Games::Boggle::Board->new();
+
+  as_string
+
+    Returns a single string, suitable to pass to Games::Boggle my $b
+    = Games::Boggle->new( $board->as_string );
+
+  as_formatted_string
+
+    Returns a string formatted in a 4x4 block
+
+      print $board->as_formatted_string;
+
+  as_array
+
+    Returns a one-dimensional array of letters
+
+      foreach ($board->as_array) {
+        # do something
+      } 
+
+AUTHOR
+    Anthony DeLorenzo <ajdelore@cpan.org>.
+

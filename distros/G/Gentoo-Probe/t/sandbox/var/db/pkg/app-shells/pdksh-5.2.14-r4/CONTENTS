@@ -1,0 +1,22 @@
+dir /bin
+obj /bin/ksh 771b8d30109371bf1955be7b8e2ea5f3 1082907928
+dir /usr
+dir /usr/share
+dir /usr/share/man
+dir /usr/share/man/man1
+obj /usr/share/man/man1/ksh.1.gz 1d0d9186df300ab891fc1cece2221477 1082907928
+dir /usr/share/doc
+dir /usr/share/doc/pdksh-5.2.14-r4
+dir /usr/share/doc/pdksh-5.2.14-r4/etc
+obj /usr/share/doc/pdksh-5.2.14-r4/etc/ksh.kshrc.gz 3fc816c1629570600bac904aeb09c6ab 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/etc/profile.gz 45e1f263c3cd0536975238b4eea11bd1 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/etc/sys_config.sh.gz 04681ed2b554ffcc2061bebb37626015 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/BUG-REPORTS.gz 93f6c9d6f14caf9e86e84bbd221ea902 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/ChangeLog.gz b138d989d4f8989b136f1b0c9885521e 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/ChangeLog.0.gz edf7d65725387090409f384f4b7cf2cd 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/CONTRIBUTORS.gz 0afbdba0f66cc0a4a4fa52f24035b326 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/LEGAL.gz 3096b38a1eb83b750debe0cbbeb795b4 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/NEWS.gz b30237bf4a8579a8cdaddf8ee160d546 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/NOTES.gz 3cc0915df813575c17d472605777f2a2 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/PROJECTS.gz 5d5ec5f88e541bbb26b0c261e6937f52 1082907928
+obj /usr/share/doc/pdksh-5.2.14-r4/README.gz 391a52d1c9ef98b20cad7aba20b5ca28 1082907928

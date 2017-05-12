@@ -1,0 +1,18 @@
+digraph graph_28
+{
+	edge
+	[
+		dir = both
+	]
+	node_28_1
+	[
+		color = red
+		fontcolor = green
+	]
+	node_28_2
+	[
+		color = green
+		fontcolor = red
+	]
+	node_28_1 -> node_28_2
+}

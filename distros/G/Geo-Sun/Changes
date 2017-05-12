@@ -1,0 +1,14 @@
+Revision history for Perl module Geo::Sun
+
+0.01 Sun Jul 20 22:56:24 2008
+    - original version; created by ExtUtils::ModuleMaker 0.51
+0.02 2008-07-25
+    - Added two example scripts
+    - Added bearing methods
+0.03 2008-07-26
+    - Moved math out of point method and into a recalulate method
+    - Moved bearing methods to Geo::Sun::Bearing
+    - Added hooks for 'use base qw{Geo::Sun};'
+    - Changed prereq from Geo::Forward to Geo::Inverse
+0.04 2008-07-26
+    - updates to pod

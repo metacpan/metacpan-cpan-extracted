@@ -1,0 +1,26 @@
+title		=	Perl5 Script
+description	=	Perl5 and Perl6 scripts
+
+# Action handlers for pl files
+[P]rofile	=	Goo::Thing::pm::Profiler.pm
+[R]un		=	Goo::Thing::pm::Runner.pm
+Comp[I]le	=	Goo::Thing::pm::Compiler.pm
+[E]dit		=	Goo::Thing::pm::Editor.pm
+
+# General Handlers
+[D]elete	=	Goo::FileThing::Deleter.pm
+E[X]it		= 	Goo::Exiter.pm
+[J]ump		=	Goo::JumpManager.pm
+[C]loner	=	Goo::FileThing::Cloner.pm
+Care[O]Meter =	Goo::CareOMeter.pm
+[S]hell		=	Goo::ShellCommander.pm
+[Z]one      =   Goo::Zone.pm
+
+#[G]o Live	=	Goo::GoLiveCommand.pm
+#[A]dd		=	Goo::Thing::pm::ProgramAdder.pm
+#[B]ack		= 	Goo::TrailGoBackOne.pm
+#[T]est		= 	Goo::Thing::pl::ProgramTester
+# [M]ake		=	Goo::Thing::pl::ScriptMaker.pm
+
+location	=	bin
+location	=	Goo

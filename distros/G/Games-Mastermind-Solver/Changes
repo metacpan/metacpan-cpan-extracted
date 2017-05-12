@@ -1,0 +1,9 @@
+Revision history for Perl extension Games::Mastermind::Solver.
+
+0.02  Fri Sep  1 20:53:36 CEST 2006
+	- Renamed the implementation to Games::MasterMind::Solver::BruteForce
+	  and left Games::Mastermind::Solver as an interface/documentation
+	  module. (suggestion by Philippe "BooK" Bruhat)
+
+0.01  Fri Jun 19 21:24:20 CEST 2006
+	- Initial release.

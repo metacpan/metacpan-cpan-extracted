@@ -1,0 +1,25 @@
+Revision history for Perl extension Games::SGF::Tournament.
+
+1.0       Fri Sep  9 18:31:28 MSD 2005
+          * Little dependencies correction
+          * Polishing functional tests
+
+0.1_5     Wed Sep  7 19:02:30 MSD 2005
+          * Functionality tests with help of HTML::TreeBuilder
+
+0.1_4     Tue Aug 23 12:23:49 MSD 2005
+          * Fix: wrong score counting
+
+0.1_3     Fri Aug 19 18:08:39 MSD 2005
+          * Distribution remade with help of Module::Starter::PBP and Module::Build
+          * Style corrections
+          
+0.01_02   Thu Aug 16 13:03:32 MSD 2005
+          * Packaging done
+          * Fix: opening files not in '.'
+          * Style corrections
+
+0.01_01   Thu Aug  4 16:58:21 MSD 2005
+          * original version for Go with games and scores tables only
+
+

@@ -1,0 +1,10 @@
+Revision history for Perl extension Guile.
+
+0.001  Sat Jul 22 12:00:00 2001
+   - First version released!
+
+0.002
+   - Matt S Trout added as co-maintainer
+   - Guile list elements no longer get stringified on conversion to perl array
+   - Corrected SCM->SV code to return correct error for unknown types
+   - Improved (FSVO) the Makefile.PL's technique for finding libguile.h

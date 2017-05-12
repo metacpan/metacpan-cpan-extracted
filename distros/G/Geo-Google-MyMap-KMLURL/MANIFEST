@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Geo/Google/MyMap/KMLURL.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/01.url.t
+t/02.download.t
+META.yml

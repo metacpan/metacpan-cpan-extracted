@@ -1,0 +1,35 @@
+Status:
+
+First release of GraphViz::Zone.  Suggestions/bug reports/patches
+greatly appreciated.
+
+Description:
+
+This perl module is an parser/grapher for BIND Zone files.  It will
+parse a user-supplied .zone file and output a .png of the nodes in
+the zone along with their IPs and any TXT information registered.
+
+Installation:
+
+This module needs Leon Brocard's GraphViz module, available from the
+CPAN.  It also needs the GraphViz programs that GraphViz.pm wraps,
+available from http://www.research.att.com/sw/tools/graphviz/ .
+
+Usual CPAN installation rules apply:
+
+        perl Makefile.PL 
+        make
+	make test
+        make install
+
+There is documentation - including sample usage - in Zone.pm itself. 
+
+Copyright:
+
+Copyright (c) 2002 Chris J. Ball. All rights reserved.  This
+package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+-- 
+Chris Ball.
+chris@cpan.org || http://printf.net/

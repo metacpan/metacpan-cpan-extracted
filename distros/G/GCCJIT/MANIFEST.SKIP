@@ -1,0 +1,10 @@
+^GCCJIT\.(c|o|bs)$
+^\.
+~$
+\.old$
+\.bak$
+^blib
+^MYMETA
+^Makefile$
+^const-(c|xs)\.inc$
+pm_to_blib

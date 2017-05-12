@@ -1,0 +1,10 @@
+Revision history for Perl module GraphViz::ISA::Multi
+
+0.02 Tue Oct 7
+	- fixed a bug - graph was called too often
+
+
+0.01 Tue Oct  7 09:38:03 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

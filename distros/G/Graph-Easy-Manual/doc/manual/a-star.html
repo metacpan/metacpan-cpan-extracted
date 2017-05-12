@@ -1,0 +1,741 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - Manual - A*</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link rel="Start" href="index.html">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+  <a class="menubck" href="index.html" title="Back to the manual index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+
+  <a class="menuext" href="overview.html" title="How everything fits together">Overview</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+    <a class="menucin" href="a-star.html" title="A* algorithm (pathfinding)">A*</a>
+    <a class="menuind" href="#terminating" title="Nodes">Stopping</a>
+  <a class="menuext" href="hinting.html" title="Generating specific layouts">Hinting</a>
+  <a class="menuext" href="output.html" title="Output formats and their limitations">Output</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+  <a class="menuext" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+  <a class="menuext" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+  <a class="menuext" href="tutorial.html" title="Tutorial for often used graph types and designs">Tutorial</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h1>
+
+<h2>Layouter - A* (A-star)</h2>
+
+<div class="text">
+
+<p>
+If you haven't done so, please read the <a href="overview.html">Overview</a> first.
+</p>
+
+<p>
+For a general overview of the A* algorithm please read Amit J. Patel's
+<a href="http://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html">great page</a>
+and then come back here.
+</p>
+
+<h3>The Good and The Bad Paths</h3>
+
+<p>
+The pathfinding algorithm has the goal to find a path between two nodes. It considers
+each starting port and each ending port and needs to return the best possible path.
+Here is a list of things that are considered good:
+</p>
+
+<ul>
+  <li>shorter paths are better than longer ones
+  <li>the less bends a path has, the better
+  <li>crossings are doubleplusungood
+</ul>
+
+<p>
+The best possible path goes straight and occupies only one cell.
+</p>
+
+<h3>Multi-celled Nodes</h3>
+
+<p>
+Consider the following two placed nodes with their appropriate ports:
+</p>
+
+<pre>
+...........................................
+:     :<span class="port">     </span>:<span class="port">     </span>:     :     :     :     :
+: 0,0 :<span class="port">North</span>:<span class="port">North</span>: 3,0 : 4,0 : 5,0 : 6,0 :
+:     :<span class="port">     </span>:<span class="port">     </span>:     :     :     :     :
+...........................................
+:<span class="port">     </span>:<span class="node">+---------+</span>:<span class="port2">     </span>:     :     :     :
+:<span class="port">West </span>:<span class="node">|    A    |</span>:<span class="port2"> East</span>: 4,1 : 5,1 : 6,1 :
+:<span class="port">     </span>:<span class="node">+---------+</span>:<span class="port2">     </span>:     :     :     :
+...........................................
+:     :<span class="port">     </span>:<span class="port3">     </span>:     :     :     :     :
+: 0,2 :<span class="port">South</span>:<span class="port3">South</span>: 3,2 : 4,2 : 5,2 : 6,2 :
+:     :<span class="port">     </span>:<span class="port3">     </span>:     :     :     :     :
+...........................................
+:     :     :     :     :     :     :     :
+: 0,3 : 1,3 : 2,3 : 3,3 : 4,3 : 5,3 : 6,3 :
+:     :     :     :     :     :     :     :
+...........................................
+:     :     :     :<span class="port2">     </span>:<span class="port">     </span>:     :     :
+: 0,4 : 1,4 : 2,4 :<span class="port2">North</span>:<span class="port">North</span>: 3,4 : 4,4 :
+:     :     :     :<span class="port2">     </span>:<span class="port">     </span>:     :     :
+...........................................
+:     :     :<span class="port3">     </span>:<span class="node">+---------+</span>:<span class="port">     </span>:     :
+: 0,5 : 1,5 :<span class="port3">West </span>:<span class="node">|         |</span>:<span class="port"> East</span>: 4,5 :
+:     :     :<span class="port3">     </span>:<span class="node">|         |</span>:<span class="port">     </span>:     :
+...................<span class="node">|    B    |</span>.............
+:     :     :<span class="port">     </span>:<span class="node">|         |</span>:<span class="port">     </span>:     :
+: 0,6 : 1,6 :<span class="port">West </span>:<span class="node">|         |</span>:<span class="port"> East</span>: 4,6 :
+:     :     :<span class="port">     </span>:<span class="node">+---------+</span>:<span class="port">     </span>:     :
+...........................................
+:     :     :     :<span class="port">     </span>:<span class="port">     </span>:     :     :
+: 0,7 : 1,7 : 2,7 :<span class="port">South</span>:<span class="port">South</span>: 6,7 : 7,7 :
+:     :     :     :<span class="port">     </span>:<span class="port">     </span>:     :     :
+...........................................
+</pre>
+
+<p>
+There exist two optimal paths from A to B, one from 3,1 to 3,4 (colored <span class="port2">yellow</span>),
+and the other one from 2,2 to 2,5 (colored <span class="port3">cyan</span>). However,
+this holds only if there are no obstacles along these paths. With obstacles, every combination
+of each starting port and each ending port would need to be examined. This are 2+1+2+1=6 x 2+2+2+2=8 == 48
+possible simple paths. Clearly just trying each of them would not scale very well. Just consider
+what happens if you have two nodes, each with 20 ports...
+</p>
+
+<p>
+One of the strengths of the general A* algorithm is that it supports with ease
+multiple start- and endpoints.
+</p>
+
+<h4>Multiple Startpoints</h4>
+
+<p>
+Multiple start points are very easy to implement, instead of adding a single start point to
+the list of OPEN nodes, we add all possible starting points. We also apply a very small
+tie-breaker so that the algorithm favours a certain direction in case of ties.
+</p>
+
+<p>
+In the example above, the algorithm would explore both equally likely paths at the
+same time, choosing the one that hits (arbitrarily) one end port first.
+<br>
+With the tie-breaker, it will follow only one of the paths (f.i. East, then South),
+until it either hits the endpoint, or finds an obstacle.
+</p>
+
+<h4>Multiple Endpoints</h4>
+
+<p>
+Multiple endpoints are easily implemented, too. Instead of stopping the algorithm
+when we hit <i>the</i> endpoint, we watch for all of them simultanously.
+<br>
+In addition, instead of calculating the distance from the current node to the
+endpoint, we calculate the distance to each endpoint, and then use the smallest
+one.
+</p>
+
+<p>
+Thus the algorithm will automatically gravitate towards the nearest port, but
+still work around obstacles just fine.
+</p>
+
+<h4>Crossings</h4>
+
+<p>
+The pathfinding will also find crossings. However, since edge crossings are considered
+bad, each crossing bears a heavy penalty. The penalty is so high that if a possible
+path around the edge without a crossing exists, it will be found. However, the penalty
+is not so high as that the algorithm searches endless for a way around that does not
+exist.
+</p>
+
+<a name="terminating"></a>
+<h4>Stopping</h4>
+
+<p>
+The algorithm will stop when it reaches one of the possible endpoints. However, if
+the path to the goal is blocked on all sides, it will run into trouble. The reason
+is that our layout plane is essential infinitely big, and the algorithm would
+spiral outwards and out of control, never finishing.
+</p>
+
+<p>
+To protect against run-away situations (occuring mainly due to bugs),
+the algorithm stops after a hard-coded number of steps. This is
+currently set to 10,000 steps as to not interfere with normal
+working conditions, and yet stop the algorithm if it runs
+into a cycle (which should not happen, but experience has shown
+that some bugs always creep in :)
+</p>
+
+<p>
+To prevent the algorithm from spiraling out of control, we define a working
+space:
+</p>
+
+<pre class="graph">
+.............................
+:                           :
+:   +-------+               :
+:   | Start | ------+       :
+:   +-------+       |       :
+:                   |       : 
+:                   |       :
+:                   v       :
+:                 +------+  :
+:                 | Dest |  :             
+:                 +------+  :
+:                           : 
+.............................
+</pre>
+
+<div class="clear"></div>
+
+<p>
+The working space is the rectangle that encompasses all used cells at the
+start of the algorithm, plus one cell in each direction.
+<br>
+Since it is possible to reach any cell in the outer stripe from any other
+cell in the same region, the algorithm never needs to leave that
+working space to find a path. By confining the algorithm into this
+region (simple dropping all OPEN cells outside this area), we
+make sure that there is a finite number of cells to check and visit.
+<br>
+When A* runs out of cells to check (OPEN is empty), we know we have reached
+every possible location reachable from our start position(s), and if
+no stop position was among them, the target is not reachable at all.
+The pathfinding thus stops without a result, but after a small finite amount
+of steps.
+</p>
+
+<h3>A* Map</h3>
+
+<p>
+Below is a diagnostic output of the A* algorithm finding a path from a one-cell node
+to a 2x2 celled node, which has a few ports blocked. Empty cells are lightgrey, blocked
+darkgrey, and nodes are white. The lime to orange cells were still in the to-be-done
+phase when the algorithm finished, the purple-blue-teal fields were already
+considered while finding the path. The found path (clearly not optimal, since it has too
+many bends) is outlined in white.
+</p>
+
+<p>
+Nodes examined: <b>168</b> <br>
+Nodes still to do (open): <b>50</b> <br>
+Nodes in path: <b>21</b>
+</p>
+<table class="map">
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0ef00;'>&nbsp;2</td>
+  <td style='background: #a0e700;'>&nbsp;3</td>
+  <td style='background: #a0d700;'>&nbsp;5</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0b700;'>&nbsp;9</td>
+  <td style='background: #a0af00;'>&nbsp;10</td>
+  <td style='background: #a0a700;'>&nbsp;11</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a09700;'>&nbsp;13</td>
+  <td style='background: #a08f00;'>&nbsp;14</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0e700;'>&nbsp;3</td>
+  <td style='background: #c018a0;'>1+22</td>
+  <td style='background: #b820a0;'>2+21</td>
+  <td style='background: #b030a0;'>4+20</td>
+  <td style='background: #a0d700;'>&nbsp;5</td>
+  <td style='background: #a0cf00;'>&nbsp;6</td>
+  <td style='background: #a0c700;'>&nbsp;7</td>
+  <td style='background: #9050a0;'>8+16</td>
+  <td style='background: #8858a0;'>9+15</td>
+  <td style='background: #8060a0;'>10+14</td>
+  <td style='background: #a0a700;'>&nbsp;11</td>
+  <td style='background: #6870a0;'>12+11</td>
+  <td style='background: #6078a0;'>13+10</td>
+  <td style='background: #a08700;'>&nbsp;15</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0e700;'>&nbsp;3</td>
+  <td style='background: #c018a0;'>1+22</td>
+  <td style='background: #a010a0;'>0+18</td>
+  <td style='background: #b018a0;'>1+20</td>
+  <td style='background: #a828a0;'>3+19</td>
+  <td style='background: #a030a0;'>4+18</td>
+  <td style='background: #9838a0;'>5+17</td>
+  <td style='background: #9040a0;'>6+16</td>
+  <td style='background: #8848a0;'>7+15</td>
+  <td style='background: #8050a0;'>8+14</td>
+  <td style='background: #7858a0;'>9+13</td>
+  <td style='background: #7060a0;'>10+12</td>
+  <td style='background: #6068a0;'>11+10</td>
+  <td style='background: #5870a0;'>12+9</td>
+  <td style='background: #a08f00;'>&nbsp;14</td>
+  <td style='background: #a08f00;'>&nbsp;14</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0ef00;'>&nbsp;2</td>
+  <td style='background: #c018a0;'>1+22</td>
+  <td style='background: #a010a0;'>0+18</td>
+  <td class='c'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #9010a0;border: 2px white solid;'>0+16</td>
+  <td style='background: #a018a0;border: 2px white solid;'>1+18</td>
+  <td style='background: #9820a0;border: 2px white solid;'>2+17</td>
+  <td style='background: #9028a0;border: 2px white solid;'>3+16</td>
+  <td style='background: #8830a0;border: 2px white solid;'>4+15</td>
+  <td style='background: #8038a0;border: 2px white solid;'>5+14</td>
+  <td style='background: #7840a0;border: 2px white solid;'>6+13</td>
+  <td style='background: #7048a0;border: 2px white solid;'>7+12</td>
+  <td style='background: #6850a0;border: 2px white solid;'>8+11</td>
+  <td style='background: #5858a0;border: 2px white solid;'>9+9</td>
+  <td style='background: #5060a0;border: 2px white solid;'>10+8</td>
+  <td style='background: #6068a0;'>11+10</td>
+  <td style='background: #6870a0;'>12+11</td>
+  <td style='background: #a09700;'>&nbsp;13</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0e700;'>&nbsp;3</td>
+  <td style='background: #b820a0;'>2+21</td>
+  <td style='background: #b018a0;'>1+20</td>
+  <td style='background: #9010a0;'>0+16</td>
+  <td style='background: #a018a0;'>1+18</td>
+  <td style='background: #9828a0;'>3+17</td>
+  <td style='background: #9030a0;'>4+16</td>
+  <td style='background: #8838a0;'>5+15</td>
+  <td style='background: #8040a0;'>6+14</td>
+  <td style='background: #7848a0;'>7+13</td>
+  <td style='background: #7050a0;'>8+12</td>
+  <td style='background: #6858a0;'>9+11</td>
+  <td style='background: #6060a0;'>10+10</td>
+  <td style='background: #5068a0;'>11+8</td>
+  <td style='background: #4870a0;border: 2px white solid;'>12+7</td>
+  <td style='background: #5880a0;'>14+9</td>
+  <td style='background: #a08700;'>&nbsp;15</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0d700;'>&nbsp;5</td>
+  <td style='background: #b030a0;'>4+20</td>
+  <td style='background: #a828a0;'>3+19</td>
+  <td style='background: #a018a0;'>1+18</td>
+  <td style='background: #9828a0;'>3+17</td>
+  <td style='background: #9048a0;'>7+16</td>
+  <td style='background: #8850a0;'>8+15</td>
+  <td style='background: #8040a0;'>6+14</td>
+  <td style='background: #7850a0;'>8+13</td>
+  <td style='background: #7068a0;'>11+12</td>
+  <td style='background: #6858a0;'>9+11</td>
+  <td style='background: #6060a0;'>10+10</td>
+  <td style='background: #5880a0;'>14+9</td>
+  <td style='background: #4870a0;'>12+7</td>
+  <td style='background: #4078a0;border: 2px white solid;'>13+6</td>
+  <td style='background: #5088a0;'>15+8</td>
+  <td style='background: #a07f00;'>&nbsp;16</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0cf00;'>&nbsp;6</td>
+  <td style='background: #a838a0;'>5+19</td>
+  <td style='background: #a030a0;'>4+18</td>
+  <td style='background: #9820a0;'>2+17</td>
+  <td style='background: #9030a0;'>4+16</td>
+  <td style='background: #8838a0;'>5+15</td>
+  <td style='background: #8058a0;'>9+14</td>
+  <td style='background: #7848a0;'>7+13</td>
+  <td style='background: #7058a0;'>9+12</td>
+  <td style='background: #6870a0;'>12+11</td>
+  <td style='background: #6060a0;'>10+10</td>
+  <td style='background: #5868a0;'>11+9</td>
+  <td style='background: #5088a0;'>15+8</td>
+  <td style='background: #4078a0;'>13+6</td>
+  <td style='background: #3880a0;border: 2px white solid;'>14+5</td>
+  <td style='background: #4890a0;'>16+7</td>
+  <td style='background: #a07700;'>&nbsp;17</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0c700;'>&nbsp;7</td>
+  <td style='background: #a040a0;'>6+18</td>
+  <td style='background: #9838a0;'>5+17</td>
+  <td style='background: #9028a0;'>3+16</td>
+  <td style='background: #8838a0;'>5+15</td>
+  <td style='background: #8058a0;'>9+14</td>
+  <td style='background: #7860a0;'>10+13</td>
+  <td style='background: #7068a0;'>11+12</td>
+  <td style='background: #6870a0;'>12+11</td>
+  <td style='background: #6078a0;'>13+10</td>
+  <td style='background: #5868a0;'>11+9</td>
+  <td style='background: #5070a0;'>12+8</td>
+  <td style='background: #4890a0;'>16+7</td>
+  <td style='background: #3880a0;'>14+5</td>
+  <td style='background: #3088a0;border: 2px white solid;'>15+4</td>
+  <td style='background: #4098a0;'>17+6</td>
+  <td style='background: #a06f00;'>&nbsp;18</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0bf00;'>&nbsp;8</td>
+  <td style='background: #9848a0;'>7+17</td>
+  <td style='background: #9040a0;'>6+16</td>
+  <td style='background: #8830a0;'>4+15</td>
+  <td style='background: #8040a0;'>6+14</td>
+  <td style='background: #7848a0;'>7+13</td>
+  <td style='background: #7050a0;'>8+12</td>
+  <td style='background: #6858a0;'>9+11</td>
+  <td style='background: #6060a0;'>10+10</td>
+  <td style='background: #5880a0;'>14+9</td>
+  <td style='background: #5070a0;'>12+8</td>
+  <td style='background: #4878a0;'>13+7</td>
+  <td style='background: #4098a0;'>17+6</td>
+  <td style='background: #3088a0;'>15+4</td>
+  <td style='background: #2890a0;border: 2px white solid;'>16+3</td>
+  <td style='background: #38a0a0;'>18+5</td>
+  <td style='background: #a06700;'>&nbsp;19</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0b700;'>&nbsp;9</td>
+  <td style='background: #9050a0;'>8+16</td>
+  <td style='background: #8848a0;'>7+15</td>
+  <td style='background: #8038a0;'>5+14</td>
+  <td style='background: #7848a0;'>7+13</td>
+  <td style='background: #7058a0;'>9+12</td>
+  <td style='background: #6860a0;'>10+11</td>
+  <td style='background: #6068a0;'>11+10</td>
+  <td style='background: #5870a0;'>12+9</td>
+  <td style='background: #5088a0;'>15+8</td>
+  <td style='background: #4878a0;'>13+7</td>
+  <td style='background: #4080a0;'>14+6</td>
+  <td class='b'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td class='b'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #2098a0;border: 2px white solid;'>17+2</td>
+  <td style='background: #30a8a0;border: 2px white solid;'>19+4</td>
+  <td style='background: #a05f00;'>&nbsp;20</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0af00;'>&nbsp;10</td>
+  <td style='background: #8858a0;'>9+15</td>
+  <td style='background: #8050a0;'>8+14</td>
+  <td style='background: #7840a0;'>6+13</td>
+  <td style='background: #7050a0;'>8+12</td>
+  <td style='background: #6870a0;'>12+11</td>
+  <td style='background: #6078a0;'>13+10</td>
+  <td style='background: #5880a0;'>14+9</td>
+  <td style='background: #5088a0;'>15+8</td>
+  <td style='background: #4890a0;'>16+7</td>
+  <td style='background: #4098a0;'>17+6</td>
+  <td class='b'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td class='c'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td class='c'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td class='b'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #28b8a0;border: 2px white solid;'>21+3</td>
+  <td style='background: #a04700;'>&nbsp;23</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0a700;'>&nbsp;11</td>
+  <td style='background: #7860a0;'>10+13</td>
+  <td style='background: #7058a0;'>9+12</td>
+  <td style='background: #6848a0;'>7+11</td>
+  <td style='background: #6058a0;'>9+10</td>
+  <td style='background: #5860a0;'>10+9</td>
+  <td style='background: #5068a0;'>11+8</td>
+  <td style='background: #4870a0;'>12+7</td>
+  <td style='background: #4078a0;'>13+6</td>
+  <td style='background: #3880a0;'>14+5</td>
+  <td style='background: #3088a0;'>15+4</td>
+  <td class='b'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td class='c'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td class='c'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #10d0a0;border: 2px white solid;'>24+0</td>
+  <td style='background: #18c0a0;border: 2px white solid;'>22+1</td>
+  <td style='background: #a03f00;'>&nbsp;24</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a09f00;'>&nbsp;12</td>
+  <td style='background: #7068a0;'>11+12</td>
+  <td style='background: #6860a0;'>10+11</td>
+  <td style='background: #6050a0;'>8+10</td>
+  <td style='background: #5860a0;'>10+9</td>
+  <td style='background: #5068a0;'>11+8</td>
+  <td style='background: #4870a0;'>12+7</td>
+  <td style='background: #4078a0;'>13+6</td>
+  <td style='background: #3880a0;'>14+5</td>
+  <td style='background: #3088a0;'>15+4</td>
+  <td style='background: #2890a0;'>16+3</td>
+  <td style='background: #2098a0;'>17+2</td>
+  <td class='b'>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a04700;'>&nbsp;23</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a09700;'>&nbsp;13</td>
+  <td style='background: #a0a700;'>&nbsp;11</td>
+  <td style='background: #7058a0;'>9+12</td>
+  <td style='background: #6870a0;'>12+11</td>
+  <td style='background: #6078a0;'>13+10</td>
+  <td style='background: #5880a0;'>14+9</td>
+  <td style='background: #5088a0;'>15+8</td>
+  <td style='background: #4890a0;'>16+7</td>
+  <td style='background: #4098a0;'>17+6</td>
+  <td style='background: #38a0a0;'>18+5</td>
+  <td style='background: #30a8a0;'>19+4</td>
+  <td style='background: #a05700;'>&nbsp;21</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a09f00;'>&nbsp;12</td>
+  <td style='background: #7860a0;'>10+13</td>
+  <td style='background: #a09f00;'>&nbsp;12</td>
+  <td style='background: #a08f00;'>&nbsp;14</td>
+  <td style='background: #a08700;'>&nbsp;15</td>
+  <td style='background: #a07f00;'>&nbsp;16</td>
+  <td style='background: #a07700;'>&nbsp;17</td>
+  <td style='background: #a06f00;'>&nbsp;18</td>
+  <td style='background: #a06700;'>&nbsp;19</td>
+  <td style='background: #a05f00;'>&nbsp;20</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td style='background: #a0a700;'>&nbsp;11</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+ </tr>
+
+</table>
+</div>
+
+<div class="footer">
+Page created <span class="date">2005-08-07</span> by <a href="http://bloodgate.com/mail.html">Tels</a>. Last update: <span class="date">2006-02-11</span>
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>
+

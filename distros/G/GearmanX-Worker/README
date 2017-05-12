@@ -1,0 +1,26 @@
+GearmanX-Worker
+---------------
+
+This is a deluxe (comfort) version for writing workers for the gearman
+job system. Instead of fiddling around with the servers and the
+serialization, this package does this for you.
+
+Alongside with the Worker package there is also a fitting Client
+package.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Robert Barta
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

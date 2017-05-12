@@ -1,0 +1,140 @@
+{
+   "abstract" : "find mutations of significance in cancer",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Genome-Model-Tools-Music",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Genome" : "0.06",
+            "Regexp::Common" : "0",
+            "Statistics::Distributions" : "0",
+            "Text::CSV_XS" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Genome" : "0.06",
+            "Regexp::Common" : "0",
+            "Statistics::Distributions" : "0",
+            "Text::CSV_XS" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Genome::Model::Tools::Music" : {
+         "file" : "lib/Genome/Model/Tools/Music.pm",
+         "version" : "0.04"
+      },
+      "Genome::Model::Tools::Music::Base" : {
+         "file" : "lib/Genome/Model/Tools/Music/Base.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Bmr" : {
+         "file" : "lib/Genome/Model/Tools/Music/Bmr.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Bmr::Base" : {
+         "file" : "lib/Genome/Model/Tools/Music/Bmr/Base.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Bmr::CalcBmr" : {
+         "file" : "lib/Genome/Model/Tools/Music/Bmr/CalcBmr.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Bmr::CalcCovg" : {
+         "file" : "lib/Genome/Model/Tools/Music/Bmr/CalcCovg.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Bmr::CalcCovgHelper" : {
+         "file" : "lib/Genome/Model/Tools/Music/Bmr/CalcCovgHelper.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Bmr::CalcWigCovg" : {
+         "file" : "lib/Genome/Model/Tools/Music/Bmr/CalcWigCovg.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::ClinicalCorrelation" : {
+         "file" : "lib/Genome/Model/Tools/Music/ClinicalCorrelation.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::CosmicOmim" : {
+         "file" : "lib/Genome/Model/Tools/Music/CosmicOmim.pm",
+         "version" : 0
+      },
+      "Genome::Model::Tools::Music::Galaxy" : {
+         "file" : "lib/Genome/Model/Tools/Music/Galaxy.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::MutationRelation" : {
+         "file" : "lib/Genome/Model/Tools/Music/MutationRelation.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::PathScan" : {
+         "file" : "lib/Genome/Model/Tools/Music/PathScan.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::PathScan::CombinePvals" : {
+         "file" : "lib/Genome/Model/Tools/Music/PathScan/CombinePvals.pm",
+         "version" : 0
+      },
+      "Genome::Model::Tools::Music::PathScan::PathScan" : {
+         "file" : "lib/Genome/Model/Tools/Music/PathScan/PathScan.pm",
+         "version" : 0
+      },
+      "Genome::Model::Tools::Music::PathScan::PopulationPathScan" : {
+         "file" : "lib/Genome/Model/Tools/Music/PathScan/PopulationPathScan.pm",
+         "version" : 0
+      },
+      "Genome::Model::Tools::Music::Pfam" : {
+         "file" : "lib/Genome/Model/Tools/Music/Pfam.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Play" : {
+         "file" : "lib/Genome/Model/Tools/Music/Play.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Plot" : {
+         "file" : "lib/Genome/Model/Tools/Music/Plot.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Plot::MutationRelation" : {
+         "file" : "lib/Genome/Model/Tools/Music/Plot/MutationRelation.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Proximity" : {
+         "file" : "lib/Genome/Model/Tools/Music/Proximity.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Smg" : {
+         "file" : "lib/Genome/Model/Tools/Music/Smg.pm",
+         "version" : "0"
+      },
+      "Genome::Model::Tools::Music::Survival" : {
+         "file" : "lib/Genome/Model/Tools/Music/Survival.pm",
+         "version" : "0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/lgpl-license.php"
+      ]
+   },
+   "version" : "0.04"
+}

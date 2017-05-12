@@ -1,0 +1,27 @@
+This is Perl module Geo::Direction::Name::Spec::Chinese.
+
+INSTALLATION
+
+Geo::Direction::Name::Spec::Chinese installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Geo::Direction::Name::Spec::Chinese
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Geo::Direction::Name::Spec::Chinese documentation is available as in POD. So you can do:
+
+    % perldoc Geo::Direction::Name::Spec::Chinese
+
+to read the documentation online with your favorite pager.
+
+OHTSUKA Ko-hei

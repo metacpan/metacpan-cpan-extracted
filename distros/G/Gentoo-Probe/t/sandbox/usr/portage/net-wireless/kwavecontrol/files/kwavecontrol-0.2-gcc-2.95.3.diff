@@ -1,0 +1,19 @@
+--- kwavecontrol/wcard.cpp~	2003-02-02 18:48:21.000000000 +0100
++++ kwavecontrol/wcard.cpp	2003-02-02 18:50:05.000000000 +0100
+@@ -201,11 +201,11 @@
+ 
+     switch (cnt)
+     {
+-      case  0: br->bitRate[i].unit = "bps\0"; break;
+-      case  1: br->bitRate[i].unit = "kbps";  break;
+-      case  2: br->bitRate[i].unit = "Mbps";  break;
+-      case  3: br->bitRate[i].unit = "Gbps";  break;
+-      case  4: br->bitRate[i].unit = "Tbps";  break;
++      case  0: strncpy(br->bitRate[i].unit, "bps\0", 5); break;
++      case  1: strncpy(br->bitRate[i].unit, "kbps", 5);  break;
++      case  2: strncpy(br->bitRate[i].unit, "Mbps", 5);  break;
++      case  3: strncpy(br->bitRate[i].unit, "Gbps", 5);  break;
++      case  4: strncpy(br->bitRate[i].unit, "Tbps", 5);  break;
+     }
+     
+   }

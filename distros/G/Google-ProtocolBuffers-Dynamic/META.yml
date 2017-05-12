@@ -1,0 +1,30 @@
+---
+abstract: 'fast and complete protocol buffer implementation'
+author:
+  - 'Mattia Barbon <mattia@barbon.org>'
+build_requires:
+  ExtUtils::ParseXS: '2.30'
+  ExtUtils::Typemaps::Default: '1.05'
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::Warn: '0'
+configure_requires:
+  Alien::ProtoBuf: '0.01'
+  Alien::uPB: '0.06'
+  Module::Build: '0.28'
+  Module::Build::WithXSpp: '0.14'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-ProtocolBuffers-Dynamic
+requires:
+  autodie: '0'
+  perl: '5.008'
+resources:
+  homepage: https://github.com/mbarbon/google-protobuf-dynamic
+  repository: https://github.com/mbarbon/google-protobuf-dynamic.git
+version: '0.16'
+x_serialization_backend: 'YAML::Tiny version 1.63'

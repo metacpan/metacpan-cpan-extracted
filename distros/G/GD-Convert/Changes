@@ -1,0 +1,52 @@
+Revision history for Perl extension GD::Convert.
+
+2.16
+	- test improvements, no functional code changes
+
+2.15
+	- test improvements, no functional code changes
+
+2.14
+	- fixed possible test failure if no $DISPLAY is available
+	- fixed test failure with old netpbm without -transparent
+	  support
+2.13
+	- fixed test failures if netpbm was not installed
+
+2.12
+	- support for GD 2.15
+
+2.11
+	- removed accidental debugging code
+	- rephrased parts of the Pod 
+	- ppmtogif conversion is now always silent
+	- tests are more robust on systems with old perl and old GD
+
+2.08
+	- test fix
+
+2.07
+	- compatibility fix for perl 5.00503 and GD 1.37
+
+2.06
+	- fixed multiple import calls
+
+2.05
+	- workaround for mod_perl (use temporary files instead of
+	  IPC::Open3)
+
+2.04
+	- support for wbmp output
+
+2.03
+	- support for newFromPpm(Data), newFromGif(Data)
+
+2.01
+	- GD 2.x support
+
+1.17
+	- test cleanups (should now pass all tests on MSWin32)
+
+1.02
+	- maybe first public version
+

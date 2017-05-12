@@ -1,0 +1,37 @@
+---
+abstract: 'Airport and ICAO codes lookup'
+author:
+  - 'Jerome Quelin'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+generated_by: 'Dist::Zilla version 1.100130'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-ICAO
+provides:
+  Geo::ICAO:
+    file: lib/Geo/ICAO.pm
+    version: 1.100140
+requires:
+  Carp: 0
+  Encode: 0
+  English: 0
+  Exporter: 0
+  File::Find: 0
+  File::ShareDir: 0
+  List::Util: 0
+  Module::Build: 0.3601
+  Path::Class: 0
+  Readonly: 0
+  Sub::Exporter: 0
+  Test::More: 0
+  charnames: 0
+  perl: 5.008
+resources:
+  homepage: http://search.cpan.org/dist/Geo-ICAO
+  repository: http://github.com/jquelin/geo-icao
+version: 1.100140

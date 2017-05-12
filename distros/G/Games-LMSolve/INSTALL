@@ -1,0 +1,11 @@
+At the command-line, type:
+
+perl Makefile.PL
+make
+
+To prepare the package for installation and then:
+
+make install
+
+to install it.
+

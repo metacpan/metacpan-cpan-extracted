@@ -1,0 +1,21 @@
+MANIFEST              List of files in this kit
+README                Introductionary text
+INSTALL               Installation information
+CHANGES               List of changes
+lib/Getopt/Long.pm    Getopt::Long
+lib/newgetopt.pl      newgetopt.pl (subroutine NGetOpt)
+Makefile.PL           Makefile for installation
+t/gol-basic.t         Test basic functionality
+t/gol-compat.t        Test compatibility
+t/gol-linkage.t       Test user linkage
+t/gol-oo.t            Test OO interface
+t/gol-xargv.t         Test parsing from array
+t/gol-xstring.t       Test parsing from string
+examples/README       Explanation of skeleton programs
+examples/skel1.pl     Skeleton program to use Getopt::Long
+examples/skel2.pl     Skeleton program to use Getopt::Long
+examples/skel3.pl     Skeleton program to use Getopt::Long
+examples/skel4.pl     Skeleton program to use Getopt::Long
+examples/parsetime.pl Sample user handler for options
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

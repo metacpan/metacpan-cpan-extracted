@@ -1,0 +1,30 @@
+Revision history for Perl extension Graphics::ColorNames::WWW
+
+1.13  Sat Dec 19 00:00:00 2009
+	- better documentation
+	- fix FAIL in t/11pod_cover.t
+
+1.12  Thu Dec 17 00:00:00 2009
+	- only use ASCII in POD, fixes FAILs with perl 5.6.x
+	- add examples in eg/
+	- FIX: #52870 Depending on itself (reported by ANDK)
+
+1.11  Tue Dec 14 00:00:00 2009
+	- switch to Module::Build
+	- fixes FAILures during make test
+
+1.10  Fri Dec 11 00:00:00 2009
+	- added Graphics::ColorNames::CSS
+
+	- re-organisation and cleanup
+	- updated Makefile.PL
+	- added LICENSE, SIGNATURE
+	- use Test::More and Test::NoWarnings
+
+	- move to Github
+
+1.00  Fri Sep 12 00:00:00 2008
+	- cleanup 
+
+0.01  Sat Nov 26 00:00:00 2005
+	- first public release

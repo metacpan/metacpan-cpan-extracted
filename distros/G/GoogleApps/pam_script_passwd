@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# 1. install libpam-script package
+#
+# 2. copy this file to:
+# /usr/share/libpam-script/
+#
+# 3. add to the /etc/pam.d/passwd following line:
+# password optional pam_script.so pam_script_passwd
+
+if [ ! -z $PAM_SERVICE ] && [ $PAM_SERVICE = 'passwd' ]; then
+   # We are in PAM passwd context (the script was called by PAM)
+   # (see libpam-script doc to details)
+   if [ ! -z $PAM_USER ] && [ ! -z $PAM_AUTHTOK ]; then
+      /usr/bin/google-apps update --username $PAM_USER --password $PAM_AUTHTOK
+   fi
+fi

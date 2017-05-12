@@ -1,0 +1,26 @@
+Revision history for Perl extension Games::Dice::Probability.
+
+0.02  Wed Aug 03 09:55:00 2005
+	- second release.  now on cpan.
+		- added proper pre-requisite module handling to Makefile.PL
+
+0.01  Thu May 19 15:24:00 2005
+	- first limited release
+		- added all core methods
+			- new()
+			- bounds()
+			- min()
+			- max()
+			- distribution()
+			- combinations([targetvalue])
+			- probability([targetvalue])
+			- debug()
+		- faux import() method to allow toggle of Memoize
+		- mid method for dice (nMs) stubbed but not implemented
+		- added test files
+		- benchmarking using Benchmark :hireswallclock highly
+		  successful...Memoize very effective.
+
+0.00  Wed May  4 08:07:22 2005
+	- original version; created by h2xs 1.23 with options
+		-AXc -b 5.6.0 -n Games::Dice::Probability

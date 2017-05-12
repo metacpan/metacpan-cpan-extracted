@@ -1,0 +1,6 @@
+Revision history for Perl extension Getopt::ExPar.
+
+1.00  Tue Sep  2 09:40:29 2008
+	- original version; created by h2xs 1.22 with options
+		-AX --skip-exporter --use-new-tests -n Getopt::ExPar
+

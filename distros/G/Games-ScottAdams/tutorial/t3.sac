@@ -1,0 +1,55 @@
+%action score
+%result
+score
+
+%action inventory
+%result
+inventory
+
+%room chamber
+square chamber
+%exit e dungeon
+
+%item sign
+Sign says: leave treasure here, then say SCORE
+
+%room dungeon
+gloomy dungeon
+%exit w chamber
+
+%item door
+Locked door
+
+%item key
+Brass key
+%getdrop key
+%at chamber
+
+%item door2
+Open door leads south
+%nowhere
+
+%action open door
+here door
+!accessible key
+%result
+msg It's locked.
+
+%action open door
+here door
+%result
+swap door door2
+msg OK
+
+%action go door
+here door2
+%result
+moveto cell
+
+%room cell
+dungeon cell
+%exit n dungeon
+
+%item coin
+*Gold coin*
+%getdrop coin

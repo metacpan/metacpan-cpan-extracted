@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Gtk2/Ex/ICal/Recur.pm
+lib/Gtk2/Ex/ICal/Recur/Selection.pm
+examples/blank-start.pl
+examples/pre-populated-1.pl
+examples/pre-populated-2.pl
+t/ical-recur-test-1.t
+t/ical-recur-test-2.t
+META.yml                                 Module meta-data (added by MakeMaker)

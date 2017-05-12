@@ -1,0 +1,7 @@
+# X	 Y1	 Y2	 Y3	 Y4	 Y5
+A	1	2	3	4	5
+B	2	3	4	5
+C	1	2	3
+D	1		4
+# num_sets should return 5
+# num_points should return 4

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Chess position with Unicode pieces",
+   "author" : [
+      "Sergey Romanov <sromanov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Chess-Position-Unicode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Games::Chess" : "0.003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sergeyromanov/games-chess-position-unicode/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/sergeyromanov/games-chess-position-unicode"
+      }
+   },
+   "version" : "0.01",
+   "x_test_requires" : {
+      "Test::More" : "0.47"
+   }
+}

@@ -1,0 +1,87 @@
+{
+   "abstract" : "Graphviz Perl interface with DSL",
+   "author" : [
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.6",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graphviz-DSL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Graphviz::DSL" : {
+         "file" : "lib/Graphviz/DSL.pm",
+         "version" : "0.03"
+      },
+      "Graphviz::DSL::Component" : {
+         "file" : "lib/Graphviz/DSL/Component.pm"
+      },
+      "Graphviz::DSL::Edge" : {
+         "file" : "lib/Graphviz/DSL/Edge.pm"
+      },
+      "Graphviz::DSL::Graph" : {
+         "file" : "lib/Graphviz/DSL/Graph.pm"
+      },
+      "Graphviz::DSL::Node" : {
+         "file" : "lib/Graphviz/DSL/Node.pm"
+      },
+      "Graphviz::DSL::Util" : {
+         "file" : "lib/Graphviz/DSL/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/syohex/p5-Graphviz-DSL/issues"
+      },
+      "homepage" : "https://github.com/syohex/p5-Graphviz-DSL",
+      "repository" : {
+         "url" : "git://github.com/syohex/p5-Graphviz-DSL.git",
+         "web" : "https://github.com/syohex/p5-Graphviz-DSL"
+      }
+   },
+   "version" : "0.03"
+}

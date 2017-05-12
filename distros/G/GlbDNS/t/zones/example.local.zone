@@ -1,0 +1,50 @@
+
+
+
+$ORIGIN example.local.
+
+600 IN SOA ns1.example.local. dnsmaster.example.local. 2009012610 1200 120 1209600 1
+
+86400 IN NS ns1.example.local
+86400 IN NS ns2.example.local
+86400 IN NS ns3.example.local
+86400 IN NS ns4.example.local
+
+; white space here for tsting
+ 
+
+ns1 60  IN A 127.0.0.2
+ns2 60  IN A 127.0.0.3
+ns3.example.local. 60 IN A 127.0.0.4
+ns4.example.local. 60 IN A 127.0.0.5
+
+86400 IN MX 10 smtp1
+
+smtp1 60 IN A 127.0.0.6
+
+cname 60 IN CNAME resolved_cname
+resolved_cname 60 IN A 127.0.0.7
+cnamecname 60 IN CNAME cname
+
+; multiple cname is not legal
+; so we have to resolve it to a location
+geo 86400 IN CNAME london
+geo 86400 IN CNAME sjc
+geo 86400 IN CNAME singapore
+
+; default to use in case of no geodata
+; cannot be a cname
+geo  60 IN A 127.0.0.8
+
+sjc 60 IN A 127.0.0.9
+sjc 86400 IN LOC 37 00 00.000 N 121 00 00.000 W 0.00m 0.00m 0.00m 0.00m
+sjc 86400 IN TXT GlbDNS::RADIUS 500 km
+
+london 60 IN A 127.0.0.10
+london 60 IN A 127.0.0.11
+london 86400 IN LOC 51 00 00.000 N 0 00 00.000  W 0.00m 0.00m 0.00m 0.00m
+london 60 IN TXT random text
+
+singapore 60 IN CNAME sing.example_other.local.
+singapore 86400 IN LOC 01 00 00.000 N 103 00 00.000 E 0.00m 0.00m 0.00m 0.00m
+

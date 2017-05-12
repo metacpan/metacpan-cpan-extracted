@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TAF.pm
+example/cmd_chunks.pl
+example/cmd_taf.pl
+example/fetch_weather.pl
+example/cgi_weather.pl
+example/scgi_weather.pl
+t/1.t

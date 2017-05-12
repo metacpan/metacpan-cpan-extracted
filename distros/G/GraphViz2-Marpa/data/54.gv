@@ -1,0 +1,7 @@
+# V 1.05 would mis-parse 'A [] B' as 'A'.
+# Node B would be lost because [] is empty.
+
+digraph graph_54
+{
+A [] B
+}

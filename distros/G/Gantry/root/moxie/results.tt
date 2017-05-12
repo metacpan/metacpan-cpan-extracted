@@ -1,0 +1,98 @@
+[%- title = view.title %]
+
+[% colspan = ( view.data.headings.size || 0 ) + 1 %]
+
+[% IF view.data.overheading %]
+    <h3>[% view.data.overheading %]</h3>
+[% END %]
+
+[%- IF self.fish_config( 'show_dev_navigation' ) %]
+<dl class="dev_nav">
+   
+    <dd>
+        <select id="linkMenu" 
+            onchange="window.location = this.options[this.selectedIndex].value">
+            [%- FOREACH page IN self.site_links.sort( 'label' ) %]
+            <option value='[% page.link %]'
+                [% page.link == self.location ? 'selected="selected"' : '' %]>
+                [%- page.label %]</option>
+            [%- END %]
+        </select>    
+    </dd>
+    
+    [%- IF view.data.livesearch %]
+    <dd>
+        <input type="text"   name="livesearch" id="livesearch" value="" />
+        <input type="button" name="search" value="search"
+            onclick="javascript: livesearch();">
+    </dd>
+    [%- END %]
+    
+</dl>
+[%- ELSIF view.data.livesearch %]
+<dl class="search-box">
+    <dd>
+        <input type="text"   name="livesearch" id="livesearch" value="" />
+        <input type="button" name="search" value="search"
+            onclick="javascript: livesearch();">
+    </dd>
+</dl>
+[%- END %]
+
+<div class="results-box">       
+	<table id="results" class="results">
+		<tr class="heading">
+			[% FOREACH heading IN view.data.headings %]
+			<td class="hdr">[% heading %]</td>
+			
+				[% IF loop.last %]
+					<td class="rhdr">
+					[% FOREACH option IN view.data.header_options %]
+                        [% "[" IF loop.first %]
+						<a href="[% option.link %]">[% option.text %]</a>
+						[% "|" IF ! loop.last %]
+                        [% "]" IF loop.last %]
+					[% END %]
+					</td>
+				[% END %]
+									
+			[% END %]
+		</tr>	  	
+		
+		[% FOREACH row IN view.data.rows %]
+		<tr class="results-row [% row.class %]">
+			[% FOREACH elem IN row.data %]
+			    [%
+			        elem_class  = 'dta';
+			        elem_text   = elem;
+			        
+			        IF elem.class;
+			            elem_class  = elem.class;
+			            elem_text   = elem.text;
+			        END;
+			    %]
+				<td class="[% elem_class %]">[% elem_text %]</td>							
+			
+				[% IF loop.last %]
+					<td class="rdta">
+					[% FOREACH option IN row.options %]
+                        [% "[" IF loop.first %]
+						<a href="[% option.link %]">[% option.text %]</a>
+						[% "|" IF ! loop.last %]
+                        [% "]" IF loop.last %]
+					[% END %]
+					</td>
+				[% END %]				
+			[% END %]
+		</tr>
+		[% END %]
+		
+		[% IF view.data.rows == '' %]
+			<tr><td colspan="[% colspan %]">No Data</td></tr>	
+		[% END %]
+		
+	</table>
+
+	[% INCLUDE paging.ttc %]
+
+</div>

@@ -1,0 +1,23 @@
+# $Id: Head,v 1.3 2006/11/02 00:25:14 mike Exp $
+
+# Tutorial.pm - reference manual for the Scott Adams adventure compiler
+
+package Games::ScottAdams::Tutorial;
+use strict;
+
+
+=head1 NAME
+
+Games::ScottAdams::Tutorial - The Scott Adams Adventure Compiler Tutorial
+
+
+=head1 INTRODUCTION
+
+This document walks you through the process of creating a small but
+complete and playable game with six rooms, seven items including a
+single treasure, and a couple of puzzles.  It makes no attempt to be
+complete: you need the reference manual for that.  But by the time
+you've worked your way through this tutorial you should be familiar
+with rooms, items, actions and occurrences, and you'll be ready to
+start writing your own games.
+

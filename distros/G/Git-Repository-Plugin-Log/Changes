@@ -1,0 +1,62 @@
+Revision history for Git-Repository-Plugin-Log
+
+Git::Repository::Plugin::Log and support modules used to be packaged
+in the Git-Repository distribution from version 1.13 (which introduced
+capability to write plugins) to 1.308. For earlier history, please
+consult the changelog for that distribution.
+
+1.314 2016-04-10 BOOK
+    [DOCUMENTATION]
+    - Updated release header lines to follow CPAN::Changes::Spec
+    [TESTS]
+    - Replaced t/00-load.t by the Test::Compile dzil plugin
+    - Use Test::Requires::Git instead of has_git
+
+1.313 2016-01-26 BOOK
+    [ENHANCEMENTS]
+    - Add some more unsupported options to Git::Repository::Log::Iterator
+      constructor's blacklist (BJAKUBSKI, via the January 2016 CPAN PRC)
+    - Parse 'from' field in the commit line, and add it as the 'diff_from'
+      attribute to Git::Repository::Log (VYF)
+    - Minor documentation improvements
+    [TESTS]
+    - Prevent system/global configs from messing with test expectations
+    - Add [Prereqs / TestRequires] section to dist.ini
+      (PSCUST, via the October 2015 CPAN PRC)
+    - Use Test::ReportPrereqs instead of ReportVersions::Tiny
+    [ACKNOWLEDGEMENT]
+    - Thanks to NEILB for organizing the CPAN Pull Request Contest,
+      which brought several contributions to this release.
+      Check out http://cpan-prc.org/ and join the fun!
+
+1.312 2014-07-23 BOOK
+    [ENHANCEMENTS]
+    - new Git::Repository::Log::Iterator constructors new_from_fh() and
+      new_from_file() to enable dealing with log stream directly
+    - the new 'fh' attribute to Git::Repository::Log::Iterator provides
+      direct access to the filehandle if needed (see RT #97045)
+    [TESTS]
+    - update the test bundle
+
+1.311 2014-04-25 BOOK
+    [TESTS]
+    - output the git version, to help debug FAIL reports
+    - change the test bundle to use "SJIS" instead of "shift-jis" encoding
+    [DOCUMENTATION]
+    - simplify the titles when documenting methods and functions
+
+1.310 2013-11-05 BOOK
+    [ENHANCEMENTS]
+    - Git::Repository::Log now properly handles commits where the
+      author or committer name is empty
+
+1.309 2013-11-03 BOOK
+    [ENHANCEMENTS]
+    - the mergetag key is now an array reference, to support
+      commits with multiple mergetag headers
+    [TESTS]
+    - tested using a bundle containing several very special cases
+      (see http://github.com/book/git-test-repo-tool/)
+    [PACKAGING]
+    - split into its own distribution as of Git-Repository 1.309
+      (and Git-Repository-Plugin-Log 1.309)

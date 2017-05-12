@@ -1,0 +1,41 @@
+const char *					T_PV
+enum gcc_jit_binary_op				T_ENUM
+enum gcc_jit_bool_option			T_ENUM
+enum gcc_jit_comparison				T_ENUM
+enum gcc_jit_function_kind			T_ENUM
+enum gcc_jit_global_kind			T_ENUM
+enum gcc_jit_int_option				T_ENUM
+enum gcc_jit_output_kind			T_ENUM
+enum gcc_jit_str_option				T_ENUM
+enum gcc_jit_types				T_ENUM
+enum gcc_jit_unary_op				T_ENUM
+gcc_jit_block *					T_PTROBJ
+gcc_jit_case *					T_PTROBJ
+gcc_jit_context *				T_PTROBJ
+gcc_jit_field *					T_PTROBJ
+gcc_jit_function *				T_PTROBJ
+gcc_jit_location *				T_NULLABLE_PTROBJ
+gcc_jit_lvalue *				T_PTROBJ
+gcc_jit_object *				T_PTROBJ
+gcc_jit_param *					T_PTROBJ
+gcc_jit_result *				T_PTROBJ
+gcc_jit_rvalue *				T_PTROBJ
+gcc_jit_struct *				T_PTROBJ
+gcc_jit_type *					T_PTROBJ
+##
+INPUT
+T_NULLABLE_PTROBJ
+	if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else if (!SvOK($arg)) {
+	    $var = NULL;
+	} else
+	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+##
+OUTPUT
+T_NULLABLE_PTROBJ
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);

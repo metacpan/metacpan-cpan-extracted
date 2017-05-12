@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 8557cc91d7be4477fe416e52aa21c259b2eae42c BUGS
+SHA1 803d2ed3dea9dbb5c5d7530609797c74ad5dfbe5 CHANGES
+SHA1 9fa6c4d0143137dea78c556296f6654e5c5eff11 Irrlicht.xs
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 8b18f53b48d50854251875ad398581b197720aa9 MANIFEST
+SHA1 63de33828d9a93cfe752ce1b4209f0c703bb6fbc META.yml
+SHA1 f3a03df77ae5278ee1e3212f3eafd4f2dd48df5d Makefile.PL
+SHA1 c195767b35a43743918853030c3571f90786982c Makefile.PL.win32
+SHA1 f8756543c5ddcba3b0b76fdec006a71da3b2036a NEW
+SHA1 e6bcc196578df5fd5f17a679f4c88951d84622c8 README
+SHA1 d666212748d2d03fdde8fb1275b156b3e53f232b README.win32
+SHA1 d19d60fb2a2d3de0e90e0978975df4b000e36982 TODO
+SHA1 46cc9c0d7b491c19bbb490f12a882b541e510a22 examples/lib/Games/Irrlicht/TechDemo.pm
+SHA1 92103edbc56d4e53f402b8ed9e24c4460cb40f63 examples/techdemo.pl
+SHA1 f5dc39074dfc237e67f654aeee6c0fa2de25d6c4 lib/Games/Irrlicht.pm
+SHA1 68bb907e929822c01cf5c862eba1b31b2842906c lib/Games/Irrlicht/Constants.pm
+SHA1 e52a24d50a6d086015f00f8ac8917e45caac3d6c lib/Games/Irrlicht/EventHandler.pm
+SHA1 da254802c350218f96448f2dd9e37cb7e3351136 lib/Games/Irrlicht/Group.pm
+SHA1 346e05d4459195ba647d2be6f48d87b175823526 lib/Games/Irrlicht/Thingy.pm
+SHA1 a3b2f61f8908ed926bceeee9d61aae01a4a916c7 lib/Games/Irrlicht/Timer.pm
+SHA1 244b79828de68c21e44940d471de20411b3e29d1 t/Games/Irrlicht/MyApp.pm
+SHA1 534f4eac0f901f6db0d8896fefd4bef7b1a12e5c t/config/client.cfg
+SHA1 b0fe0ebd9a7aff893c75ca81f81a34f1d3963713 t/config/test.cfg
+SHA1 8c631a050bb8db45f440cd5a60129b5b6b90d05c t/config/test2.cfg
+SHA1 3816ec012ef73c7d039089e259235abc77205a06 t/constant.t
+SHA1 212318c5a5ce350faba78ec35ebd792b1de05604 t/irrlichtpm.t
+SHA1 a14f9fd152f1454ddef2b1c3ce0f003ac9a7afcd t/media/test.zip
+SHA1 c4604e8fb7e8340f0c477ab51a477fc38053d528 t/mycfg.t
+SHA1 1b4dd2e7081f357489831e9b20b889aa4f83ea66 t/myirrlicht.t
+SHA1 3281c5c4aba00ca437da343622faec9a7f3905d0 t/myopt.t
+SHA1 458d53878668b2113196ed59e0b1bdcda44bcb98 t/thingy.t
+SHA1 e07ff63a4ee4a2186bbceae8379aee252eabc9a4 t/timer.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2-rc1-SuSE (GNU/Linux)
+Comment: When cryptography is outlawed, bayl bhgynjf jvyy unir cevinpl.
+
+iQEVAwUBQFS+lXcLPEOTuEwVAQHSnQf+O3Ik/z7c9SOT8+H6J+NEFfwdr83wiOSQ
+ARApQ923PG3LEzyG+ceI7wYiJtlmtSp+rDTYOGxRNmRI0otF0RsFLEZeVcftap1/
+si00DNLv4b8x5ar/f2MPdjH4R7glEpqbdx5YAeHmkP8E5y/fdBJOy6Dbgwd1rPB9
+ijcKRjgz2awffwKmg+gOnceIUhb1euePJ++mPblPI9Ta9KM9SBNY86vh7DAJt7cf
+9znxbtRa61XGhmiFhLB60KCw2lgQRDpnzYUhHKEP10w5QFjmyFyzbCNsq25MHIJB
+IKehXyGhHvdRArGIwUi/q/AzAnBPN7B5I3HjAGK4CKOf3Yaf/xgF2Q==
+=tpjM
+-----END PGP SIGNATURE-----

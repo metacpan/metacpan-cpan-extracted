@@ -1,0 +1,7 @@
+digraph graph_02
+{
+	rankdir = "TB"
+
+	node[color = "green"]
+	D
+}

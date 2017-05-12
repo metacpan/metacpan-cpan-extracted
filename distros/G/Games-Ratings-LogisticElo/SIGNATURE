@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 51dff9fbaf1f693f2ac04d2b653a4cda6181a40a Changes
+SHA1 72d23c4db991e9428ca04187f69804fde27bd1ae MANIFEST
+SHA1 661732106504c0989fc2da2207bb6a8c18e54037 META.json
+SHA1 0d82e82ba9a3bdf83c9de6dbb4b48749e23cf83f META.yml
+SHA1 a1532b2db726e3e24577cc573472e9c3f2478915 Makefile.PL
+SHA1 de7565ed345d2241077e7c780d7eaa455c8f9357 README
+SHA1 720f2b9ff450dd614b6e80f08abef0410279685b lib/Games/Ratings/LogisticElo.pm
+SHA1 2f7fd5f5afdf501a1ee475ad53eda123e2a253f2 t/Games-Ratings-LogisticElo.t
+-----BEGIN PGP SIGNATURE-----
+
+iQItBAEBCgAXBQJYP2RVEBxtYXJpdXNAaWV2YWwucm8ACgkQygQ1vl7Bs2Je+xAA
+h7RXNhSWZDRXjnE/y7gfo/NDwbkys1p7mfVNu7+9dSH5FeWXWyoAV708uIPsXXO8
+wpTcQgnS6/kkkoV+nrhMPebv9auWDcBOLXfGpuItKE59QEOvChu2etHCUHXq94xu
+0dp+PLqxyfJfuCZ+lL5KYCIZ4UKq+i4ZXzlkWwfNka4tNaPJ/94E/pSnw8y+eVUQ
+0+zAGzfK7xKiWmGvgbUAzWB6gIR8ZKK5ytsReqxOQfM/O6Tf6wsSX3xb0GTndxt/
+dFF7g//nh+8CO2je7BA3tSMTD8G84+wO4HMAS/Oo4RQQIzg0xjBEj2ZonuGfiKZu
+V6/m8408sXDwMNJYkoRgh0HRZ6wIQfdtlpggtk7S9k2z6mtwSsSTd9WEGpXQIFod
+0N5sjL5YXSE8VsXNJ389WKaoazHxp7yA6toFrAOp/GLQNxm6YhDK0249QiqAGVDj
+F5hY4Rr5xhRmcyfx4reC6LKoYUrQDBVp6ru2x/zLqEi1E2I/ryPdWSBG1aodTrc1
+UnsRTbUgD7xk6s1SR8f1ewRva5pGBl3TbiZA67+V34dbQtpd9DCWcsVIq+xlnons
+5UKkKMQc3u/jUHpYTNC7DIDNjGl7DzFgtD86pBD2TdlMRgCHF/qdFepWsVhvrWZo
+rujVH21CJWfVFTrwQsvActUo/1QOVtGERP/xrDUCq68=
+=Yp2d
+-----END PGP SIGNATURE-----

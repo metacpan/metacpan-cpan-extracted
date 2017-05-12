@@ -1,0 +1,15 @@
+~$
+\.bak$
+blib
+\.bs$
+build
+\.c$
+\.git
+\.gitigore$
+Makefile$
+Makefile\.old$
+MYMETA.*
+\.o$
+\.spec$
+\.sw.$
+\.tar\.gz$

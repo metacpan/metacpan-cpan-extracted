@@ -1,0 +1,170 @@
+TYPEMAP
+
+# These are synonyms for Gtk::Gdk::Pixmap (which itself is a renamed Gtk::Gdk::Window)
+
+Gtk::Gdk::Window	T_SimpleVal
+Gtk::Gdk::Bitmap	T_SimpleVal
+
+Gtk::Gdk::Window_OrNULL	T_SimpleValOrNULL
+Gtk::Gdk::Bitmap_OrNULL	T_SimpleValOrNULL
+
+Gtk::Gdk::Cursor	T_MISCPTROBJ
+Gtk::Gdk::GC		T_MISCPTROBJ
+Gtk::Gdk::Image		T_SimpleVal
+Gtk::Gdk::GCValues	T_MISCPTROBJ
+Gtk::Gdk::Atom		T_UV
+
+Gtk::Gdk::Image_OrNULL		T_SimpleValOrNULL
+
+Gtk::Requisition	T_SimpleVal
+
+Gtk::MenuFactory	T_MISCPTROBJ
+Gtk::SelectionData      T_MISCPTROBJ
+
+Gtk::Widget_Up		T_GtkPTROBJUp
+Gtk::Widget_Sink_Up		T_GtkPTROBJSinkUp
+Gtk::Widget_OrNULL_Up		T_GtkPTROBJOrNULLUp
+
+Gtk::Object_Up		T_GtkPTROBJUp
+Gtk::Object_Sink_Up		T_GtkPTROBJSinkUp
+Gtk::Object_OrNULL_Up		T_GtkPTROBJOrNULLUp
+
+Gtk::Gdk::Event		T_SimpleVal
+Gtk::Gdk::Region	T_SimpleVal
+Gtk::Gdk::Rectangle	T_SimplePtr
+Gtk::Gdk::Color		T_SimpleVal
+
+gfloat				T_FLOAT
+gdouble				T_DOUBLE
+gboolean			T_BOOL
+guint				T_UV
+gint				T_IV
+glong				T_IV
+gulong				T_UV
+guint32				T_UV
+
+bool				T_BOOL
+
+gstring				T_GSTRING
+
+INPUT
+
+T_BOOL
+	$var = (int)SvIV($arg)
+
+T_GtkPTROBJ
+	do {
+		void * _o = SvGtkObjectRef($arg, \"${ntype}\");
+		if (!_o) 
+			croak(\"$var is not of type ${ntype}\");
+		else
+			$var = Cast$type(_o);
+	} while(0)
+
+T_GtkPTROBJOrNULL
+	$var = SvTRUE($arg) ? Cast$type(SvGtkObjectRef($arg, \"" . ($foo=$ntype,$foo=~s/_OrNULL//,$foo). "\")) : 0
+
+T_GtkPTROBJUp
+	$var = Cast$type(SvGtkObjectRef($arg, \"${ntype}\"))
+
+T_GtkPTROBJSink
+	$var = Cast$type(SvGtkObjectRef($arg, \"${ntype}\"))
+
+T_GtkPTROBJSinkUp
+	$var = Cast$type(SvGtkObjectRef($arg, \"${ntype}\"))
+
+T_GtkPTRREF
+	$var = Cast$type(SvGtkObjectRef($arg, 0))
+
+T_GtkPTRREF_Up
+	$var = Cast$type(SvGtkObjectRef($arg, 0))
+
+T_MISCPTROBJ
+	$var = ($type)SvMiscRef($arg, \"${ntype}\")
+
+T_MISCPTRREF
+	$var = ($type)SvMiscRef($arg, 0);
+
+T_REFPTROBJ
+	$var = ($type)SvMiscRef($arg, \"${ntype}\")
+
+T_REFPTRREF
+	$var = ($type)SvMiscRef($arg, 0);
+
+T_SimpleVal
+	do {
+		if (!$arg || !SvOK($arg))
+			croak(\"$var is not of type ${ntype}\");
+		$var = Sv" . ($foo=$ntype, $foo=~s/://g, $foo=~s/^GtkGdk/Gdk/, $foo) . "($arg);
+	} while (0)
+
+T_SimpleValOrNULL
+	$var = ($arg && SvOK($arg)) ? Sv" . ($foo=$ntype, $foo=~s/://g, $foo=~s/^GtkGdk/Gdk/, $foo=~s/_OrNULL$//, $foo) . "($arg) : 0
+
+T_SimplePtr
+	$var = Sv" . ($foo=$ntype, $foo=~s/://g, $foo=~s/^GtkGdk/Gdk/, $foo) . "($arg,0)
+
+OUTPUT
+
+T_BOOL
+	$arg = boolSV($var);
+
+T_GSTRING
+	sv_setpv((SV*)$arg, $var);
+	g_free($var);
+
+T_GtkPTROBJ
+    if (!$var) {
+    	croak("failed to return mandatory object of type $ntype");
+    }
+	$arg = sv_2mortal(newSVGtkObjectRef(GTK_OBJECT($var), NULL));
+
+T_GtkPTROBJSink
+    if (!$var) {
+    	croak("failed to return mandatory object of type @{[grep {s/_Sink//,1} $ntype]}");
+    }
+	$arg = sv_2mortal(newSVGtkObjectRef(GTK_OBJECT($var), \"@{[grep {s/_Sink//,1} $ntype]}\"));
+	gtk_object_sink(GTK_OBJECT($var));
+
+T_GtkPTROBJOrNULL
+    if ($var) {
+		$arg = sv_2mortal(newSVGtkObjectRef(GTK_OBJECT($var), NULL));
+	} else
+		$arg = newSVsv(&PL_sv_undef);
+
+T_GtkPTROBJUp
+	$arg = newSVGtkObjectRef(GTK_OBJECT($var), 0);
+
+T_GtkPTROBJOrNULLUp
+	if ($var) {
+		$arg = newSVGtkObjectRef(GTK_OBJECT($var), 0);
+	} else
+		$arg = newSVsv(&PL_sv_undef);
+
+T_GtkPTROBJSinkUp
+	$arg = newSVGtkObjectRef(GTK_OBJECT($var), 0);
+	gtk_object_sink(GTK_OBJECT($var));
+
+T_MISCPTROBJ
+	$arg = newSVMiscRef((void*)$var, \"${ntype}\", 0);
+
+T_REFPTROBJ
+	{
+		int n;
+		$arg = newSVMiscRef((void*)$var, \"${ntype}\", &n);
+		if (n)
+			@{[grep {s/://g, s/^GtkGdk/Gdk/, s/([a-z])([A-Z]+)/$1_$2/g, tr/A-Z/a-z/, 1} $ntype]}_ref($var);
+	}
+
+T_SimpleVal
+    /*if (!$var) {      Oh, right smart that one, sheesh... For my next trick...
+    	croak("failed to return mandatory object of type @{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}");
+    } else*/
+		$arg = sv_2mortal(newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var));
+		/*sv_setsv($arg, newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var));*/
+
+T_SimpleValOrNULL
+	$arg = $var ? newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,s/_OrNULL$//,1} $ntype]}($var) : newSVsv(&PL_sv_undef);
+
+T_SimplePtr
+	$arg = newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var);

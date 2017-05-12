@@ -1,0 +1,155 @@
+This is the Frequently Asked Question list for Glade-Perl source generator
+especially those that relate to internationalisation (I18N) issues
+--------------------------------------------------------------------------
+Q   I wanted my real name and address in the files, so I added
+      <author>René</author> 
+    to the project xml file but when inspecting the generated files, I found
+    # Copyright (c) Date Sat Apr  1 13:21:33 CEST 2000
+    # Author RenÃfÂ©
+    Clearly glade2perl (or some module used herein) is doing something weird
+    to the accented e in my name.
+
+A   You guessed correctly - XML::Parser (which I use to read the options files
+    as well as the Glade file) produces UTF8 encoded characters and these need
+    to be converted from UTF8 to Latin1 in your case.
+
+    Glade-Perl >= 0.53 should handle ISO-8859-1 characters correctly in both
+    the Glade file and the project options files. If you want to use another
+    encoding, you can edit Glade/PerlGenerate at or near line 76 to read:
+        $Glade_Perl->{'options'}{'glade_encoding'} ||= 'ISO-8859-9';
+    so that Glade-Perl will default to another encoding (see XML::Parser docs).
+    
+    You can also specify a user option (either in glade2perl or in the project 
+    options file as 
+      <glade2perl_encoding>ISO-8859-9</glade2perl_encoding> 
+    to read the user options file as Latin9 characters.
+    
+    In Glade-Perl 0.52 there are some commented lines that you can uncomment
+    to handle Latin1 characters.
+
+    If you always want to use European characters there are some changes that
+    you can make to Glade/PerlXML.pm so that your characters will be handled 
+    correctly. This will also allow European characters in the UI.
+
+    First download from CPAN and install perl module Unicode::String. 
+    Then uncomment PerlXML.pm line 23 to use() the module
+      use Unicode::String qw(utf8 latin1);    # To read ISO-8859-1 chars
+
+    Comment out PerlXML line 181 and uncomment line 183
+            # Comment out the line below if you are using european characters
+    #        $np->{$self->[$count]} = $self->[$count+1][2];
+            # Uncomment the line below if you are using european characters
+            $np->{$self->[$count]} = &utf8($self->[$count+1][2])->latin1;
+  
+    I am working on a proper solution that will allow Glade-Perl to handle all
+    character encodings and I would greatly appreciate any advice :)
+
+--------------------------------------------------------------------------
+Q   How can I generate i18n apps?
+
+A   Just generate the UI and app as normal :)
+
+    If you want to gettext/translate strings in your signal handlers, surround 
+    them with a call like '_("Your text to translate")' and they will be 
+    translated when the app is run (if you have loaded a .mo file). You can
+    edit the generated ProjectUI.pm file to specify a test .mo file but by
+    default the app will look for a file called Project.mo (your project name)
+    
+    NB  The only difference with Glade-Perl gettext and the original C gettext 
+        is that the empty string ('') is returned as '' and to get the .mo file 
+        header information you must call _('__MO_HEADER_INFO'). 
+        
+        This stops widgets that are set to the empty string being translated 
+        to the .mo header info :)
+    
+--------------------------------------------------------------------------
+Q   How do I find out which strings to translate (put in the Project.pot file).
+
+A   Make a directory (eg ppo) to keep all the i18n stuff together
+    
+    There are two easy ways to find out which strings to translate, otherwise
+    you have to read through all the source and copy them.
+    
+    1)  First of all, check (set ON) the project option
+        'Glade/User Option/LibGlade Options/Save Translatable Strings'
+        Enter a filename in the 'File' to something eg ppo/xgettext.in and
+        save the project.
+
+        Use xgettext to generate a .pot (work) file for later editing by:
+        xgettext -LC -ao ppo/Project.pot xgettext.in
+    
+    2)  Or insert 4 lines in your app (or uncomment them in the generated 
+        subclass).
+
+        i)  In the BEGIN sub insert the lines
+              use Glade::PerlSource;
+              @ISA = qw( Project Glade::PerlSource ); # use your project name
+
+        ii) Just after you call     '$class->load_translations('Project');'
+                (see FAQ   How do I test the translation file)
+            insert the line         '$class->start_checking_gettext_strings;'
+
+        iii)Just after you call     'Gtk->main;'
+            insert the line         '$class->write_missing_gettext_strings;'
+            
+        Then when you run your app, go to every corner so that all the strings 
+        get loaded. Any that are still missing from any loaded .mo file are 
+        noted and written in .po format so that you can cut and paste them 
+        from the run log or disk file into your work ppo/Project.pot file.
+
+        You can call $class->stop_checking_gettext_strings; at any time to
+        stop logging the strings.
+        
+        You can merge the new strings in ppo/Project.pot into any existing
+        ppo/fr.pot file by calling 'msgmerge ppo/fr.pot ppo/Project.pot' 
+        The order of the files is important - the first file gets updated.
+        
+--------------------------------------------------------------------------
+Q   How do I make the ppo/fr.mo translation file
+
+A   1)  copy ppo/Project.pot to file (eg ppo/fr.pot) and edit the translations
+        Make sure that you have edited the all the strings in the header and 
+        when you are ready to try it out remove the msgfmt directive line
+          #, fuzzy
+        from just above the header info at the top of the ppo/fr.po file 
+        or the next step will fail (it means ignore the next definition).
+        
+    2)  When you want to try out the translations, copy ppo/fr.pot (temporary)
+        to ppo/fr.po (final file) and use msgfmt to create a ppo/fr.mo file 
+        for use by gettext by calling: msgfmt -o ppo/fr.mo ppo/fr.po
+    
+--------------------------------------------------------------------------
+Q   How do I test the translation file
+
+A   1)  You can edit the Project->app_run() sub or wherever you call 
+        'Gtk->init;' to specify your test src/fr.mo file with a line like:
+        $class->load_translations('Project', 'test', undef, '/path/to/ppo/fr.mo');
+       
+        Then run your program and see your UI in another language!
+        Repeat the edit/test until you are happy with the translations.
+           
+    2)  Install /path/to/ppo/fr.mo to 
+        /usr/local/share/locale/LC_MESSAGES/fr/Project.mo (or wherever)
+    
+        Set your $LANG env variable to a language that you have translated and
+        run your app (after removing the testing line from Project->app_run).
+
+-------------------------------------------------------------------------
+Q   Unicode::String 2.05 fails compilation under (default) Perl 5.6.0.
+
+A   The maintainers have been notified and should fix this problem soon 
+    (17 Apr 2000) but if you are brave you can amend String.xs as below
+    
+    It dies because PERL_POLLUTE is disabled by default in 5.6 which
+    includes these two lines (from embedvar.h):
+    
+    #define na                    PL_na
+    #define dowarn                PL_dowarn
+
+    Adding those to the top of String.xs should cure any "'dowarn'
+    undeclared/undefined  (first use in this function)" messages when
+    compiling Unicode::String.
+
+    Thanks to Jay J <linux at zeroink.com> for this temporary fix
+
+-------------------------------------------------------------------------

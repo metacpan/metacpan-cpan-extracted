@@ -1,0 +1,153 @@
+#############################################################################
+##
+## Gentoo system tcsh scripts
+##
+## $Id: tcsh-settings,v 1.1 2004/06/20 09:09:35 linguist Exp $
+##
+## Based on the TCSHRC package (http://tcshrc.sourceforge.net)
+##
+## Please do not change this file!  Place your personal customizations in
+## ~/.tcshrc and system-wide customizations in /etc/profiles.d/local.csh
+##
+## .tcshrc.set            2Sep2001, Simos Xenitellis (simos@hellug.gr)
+##
+## 2003-01-13  --  Alain Penders (alain@gentoo.org)
+##     Renamed to /etc/profile.d/tcsh-settings
+##     Major rework - settings are now closer to a normal default.
+##
+
+
+##
+## Setup some useful globals.
+##
+if ( ! $?HOST ) then
+    setenv HOST `hostname -s`
+endif
+if ( -r /etc/inputrc && ! $?INPUTRC ) then
+    setenv INPUTRC /etc/inputrc
+endif
+setenv COLORTERM 1
+
+
+##
+## Everything beyond this point is for interactive shells only!
+##
+if (! ${?prompt}) goto end
+
+
+##
+## Should CTRL-D exit the shell?
+##
+if ( $?TCSH_SHELL_CTRLD ) then
+    unset ignoreeof
+else
+    set ignoreeof
+endif
+
+##
+## Set a correct shell prompt
+##
+if ( -o /dev/$tty ) then
+    set prompt="%C2%# "
+else
+    set prompt="%B%m%b %C2%# "
+endif
+
+##
+## Handle history
+##
+set history=200
+set histdup=erase
+if ( $?TCSH_SHELL_SAVEHISTORY ) then
+    set savehist=( $history merge )
+else
+    unset savehist
+endif
+
+##
+## Various settings
+##
+
+# Switch to insert mode at the start of each line.
+set inputmode=insert
+
+# Do autolisting of commands while completing.
+set autolist
+
+# Do autocorrection while completing...
+set autocorrect
+
+# Use the history of commands to aid expansion.
+# Found in new versions of tcsh (at least 6.10)
+set autoexpand
+
+# Enable enhanded completion: 1) ignores case and 2) considers
+# periods, hyphens and underscores (`.', `-' and `_')  to  be
+# word separators and hyphens and underscores to be equivalent.
+set complete=enhance
+
+# Perform both completion and spelling correction of the command line.
+set correct=all
+
+# Configure the auto-logout feature.
+if ( $?TCSH_SHELL_AUTOLOGOUT ) then
+    set autologout=$TCSH_SHELL_AUTOLOGOUT
+else
+    unset autologout
+endif
+
+# How to handle symbolic links.  Can be unset, or set to chase, ignore, or expand.
+set symlinks=ignore
+
+# After a 'Ctrl-Z', it lists all the jobs.
+set listjobs=long
+
+# Ask for confirmation when 'rm *'.
+set rmstar
+
+# Files that are to be ignored from completion.
+set fignore=(.o \~ .bck)
+
+# Ask before listing more than 20 rows of choices
+set listmaxrows=20
+
+# Show job completions when they're done
+set notify
+
+# Change the window title of X terminals
+if ( $?TERM ) then
+  switch ( $TERM )
+    case xterm*:
+    case rxvt:
+    case eterm:
+      alias cwdcmd 'echo -n "\033]0;${USER}@${HOST}: $cwd\007"'
+      breaksw
+    case screen:
+      alias cwdcmd 'echo -n "\033_${USER}@${HOST}: $cwd\033\\"'
+      breaksw
+    default:
+      alias cwdcmd 'echo "Directory: $cwd"'
+      breaksw
+  endsw
+  cd .
+endif
+
+# Enable editing in EUC encoding for the languages where this make sense:
+# (From SuSE's csh.cshrc)
+if ( ${?LANG} ) then
+  switch ( ${LANG:r} )
+    case ja*:
+      set dspmbyte=euc
+      breaksw
+    case ko*:
+      set dspmbyte=euc
+      breaksw
+    case zh_TW*:
+      set dspmbyte=big5
+      breaksw
+    default:
+      breaksw
+  endsw
+endif
+
+end:

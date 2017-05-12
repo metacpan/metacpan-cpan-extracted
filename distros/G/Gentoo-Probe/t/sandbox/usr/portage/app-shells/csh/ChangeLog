@@ -1,0 +1,87 @@
+# ChangeLog for app-shells/csh
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/csh/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  15 May 2004; Danny van Dyk <kugelfang@gentoo.org> csh-1.29-r3.ebuild:
+  Marked ~amd64.
+
+  09 Mar 2004; <agriffis@gentoo.org> csh-1.29-r3.ebuild:
+  stable on alpha and ia64
+
+  27 Feb 2004; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r3.ebuild:
+  stable
+
+*csh-1.29-r3 (09 Jan 2004)
+
+  09 Jan 2004; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r3.ebuild:
+  splite points out in #37608 that csh traditionally does not use the SIG prefix.
+
+  29 Dec 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r2.ebuild:
+  typo #36642
+
+  15 Dec 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r2.ebuild:
+  change to mirror:// syntax.
+
+  02 Dec 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r2.ebuild:
+  no need to append-flags one at a time, minor syntax change.
+
+  17 Nov 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r2.ebuild:
+  "William Joy" => "Bill Joy", I think most people would recognise the 
+  latter :)
+  block tcsh.
+
+  17 Sep 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r1.ebuild,
+  csh-1.29.ebuild:
+  cleaning up
+
+  05 Sep 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r2.ebuild:
+  stable on x86 and alpha.
+  made compliant with repoman's new whitespace syntax detection.
+
+*csh-1.29-r2 (31 Jul 2003)
+
+  31 Jul 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r2.ebuild,
+  files/retype-input.diff:
+  splite <splite-gentoo@sigint.cs.purdue.edu> contributes a patch to
+  fix printing of exisiting buffer after displaying completion options.
+  # 24290
+
+  re-organizing ebuild and seperating patching into src_unpack()
+
+  16 Jun 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r1.ebuild:
+  no outstanding bugs, several users have requested by email that this 
+  be marked stable, so marking stable on x86 and alpha.
+
+  13 Jun 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r1.ebuild,
+  files/dot.cshrc, files/dot.login:
+  include the example login scripts in ${FILESDIR}.
+  
+  modified the scripts to turn on some nice things, like set emacs, and
+  aliased ls to ls --color.
+
+  12 Jun 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r1.ebuild:
+  put some empty csh login scripts in /etc, provide some skel files with docs.
+
+*csh-1.29-r1 (12 Jun 2003)
+
+  12 Jun 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29-r1.ebuild:
+  no longer uses cvs.eclass to fetch sources (#22678).
+  
+  no longer dual license, generate list of signal names from `kill -l` output.
+  
+  informational messages tweak.
+  
+  produced binary will have better `kill` builtin (no more SIGJUNK fillers),
+  so version bump.
+
+  04 Jun 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29.ebuild:
+  inherit eclasses _after_ my own dependencies, or they get clobbered. 
+  fixes #22189, thanks to Bruce Chiarelli.
+
+  29 May 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29.ebuild:
+  doc use flag.
+
+*csh-1.29 (28 May 2003)
+
+  28 May 2003; Tavis Ormandy <taviso@gentoo.org> csh-1.29.ebuild:
+  Initial import, the classic C Shell from NetBSD, tricky to write ebuild for.

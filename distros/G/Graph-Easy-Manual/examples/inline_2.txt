@@ -1,0 +1,6 @@
+graph { root: Bonn; }
+
+[ Bonn ] -- [ train ] --> [ Ulm ] -- [ car ] --> [ Hof ]
+
+[ ] -- buy --> [ train ] { shape: none; }
+[ ] -- rent --> [ car ] { shape: edge; }

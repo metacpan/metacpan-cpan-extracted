@@ -1,0 +1,96 @@
+[%#
+    Standard WSDL template.  In view.data, pass:
+        soap_name  - prefix for all service specific names
+        location   - URL relative to app_rootp where SOAP controller lives
+        operations - an array (ref) of hashes.  Each hash has three keys:
+            name - method name
+            expects - array (ref) of hashes of input params with one keys:
+                name - name of parameter
+                type - type of parameter
+            returns - array (ref) of hashes of return values same as expects
+%]
+<?xml version="1.0"?>
+[% base_name = self.protocol _ view.data.namespace_base _ view.data.location %]
+[% wsdl_url = base_name _ '/' _ 'wsdl' %]
+<wsdl:definitions name='[% view.data.soap_name %]Service'
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    targetNamespace='[% base_name %]'
+    xmlns:tns='[% base_name %]' >
+
+<wsdl:types>
+  <xsd:schema elementFormDefault='qualified' targetNamespace='[% base_name %]'>
+[% FOREACH op IN view.data.operations %]
+    <xsd:element name='[% op.name %]'>
+      <xsd:complexType>
+        <xsd:sequence>
+    [% FOREACH input IN op.expects %]
+          <s:element minOccurs='1' maxOccurs='1' name='[% input.name %]' type='xsd:string' />
+    [% END %]
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:element>
+    <xsd:element name='[% op.name %]_response'>
+      <xsd:complexType>
+        <xsd:sequence>
+    [% FOREACH output IN op.returns %]
+          <s:element minOccurs='1' maxOccurs='1' name='[% output.name %]' type='xsd:string' />
+    [% END %]
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:element>
+[% END %]    
+  </xsd:schema>
+</wsdl:types>
+
+[% FOREACH op IN view.data.operations %]
+<wsdl:message name='[% op.name %]_in'>
+  <wsdl:part name='parameters' element='tns:[% op.name %]' />
+</wsdl:message>
+<wsdl:message name='[% op.name %]_out'>
+  <wsdl:part name='parameters' element='tns:[% op.name %]_response' />
+</wsdl:message>
+[% END %]
+
+    <wsdl:portType name='[% view.data.soap_name %]_PortType'>
+    [% FOREACH op IN view.data.operations %]
+        <wsdl:operation name='[% op.name %]'>
+            <wsdl:input message='tns:[% op.name %]_in' />
+            <wsdl:output message='tns:[% op.name %]_out' />
+        </wsdl:operation>
+    [% END %]
+    </wsdl:portType>
+
+    <wsdl:binding name='[% view.data.soap_name%]_Binding'
+             type='tns:[% view.data.soap_name %]_PortType'>
+        <soap:binding
+          transport='http://schemas.xmlsoap.org/soap/http'
+          style='document'
+        />
+        [% FOREACH op IN view.data.operations %]
+        <wsdl:operation name='[% op.name %]'>
+            <soap:operation
+                style='document'
+                soapAction='[% base_name %]' />
+            <wsdl:input>
+                <soap:body use='literal' />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use='literal' />
+            </wsdl:output>
+        </wsdl:operation>
+        [% END %]
+    </wsdl:binding>
+
+    <wsdl:service name='[% view.data.soap_name %]_Service'>
+        <wsdl:port binding='tns:[% view.data.soap_name %]_Binding'
+              name='[% view.data.soap_name %]_Port'>
+            <soap:address
+                location='[% base_name %]' />
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

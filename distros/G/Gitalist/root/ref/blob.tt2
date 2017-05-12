@@ -1,0 +1,17 @@
+<h3 class="header">[% INCLUDE 'nav/path.tt2' %]</h3>
+
+  [% IF object.type == 'commit' %]
+   <div class='commit-message'>
+    [% short_cmt(head.comment) %]
+   </div>
+  [% END %]
+
+<div id="blob">
+<table class="listing">
+<tbody>
+[% subinclude('/fragment/ref/blob', c.req.captures, c.req.args.to_path) %]
+</tbody>
+</table>
+</div>
+
+

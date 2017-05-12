@@ -1,0 +1,13 @@
+SYNOPSIS
+
+      use Games::Word::Wordlist::KBBI;
+      my $wl = Games::Word::Wordlist::KBBI->new;
+      my $word = $wl->random_word;
+      print "We have a word." if $wl->is_word ($word);
+
+DESCRIPTION
+
+SEE ALSO
+
+    Games::Word::Wordlist.
+

@@ -1,0 +1,342 @@
+# http://sports.espn.go.com/mlb/gameLog?gameId=241027124&full=1
+# http://sports.espn.go.com/mlb/boxscore?gameId=241027124
+
+scorer	Pudge
+date	2004-10-27, 20:10-23:24
+at	Busch Stadium, St. Louis
+att	52,037
+temp	62 cloud
+wind	9 to RF
+
+away	Boston Red Sox
+starter	32
+lineup
+	18 8
+	44 6
+	24 7
+	34 3
+	33 2
+	11 5
+	 7 9
+	12 4
+	32 1
+
+home	St. Louis Cardinals
+starter	21
+lineup
+	 4 4
+	33 9
+	 5 3
+	27 5
+	15 8
+	 3 6
+	47 7
+	41 2
+	21 1
+
+__INIT__
+
+inn T1
+	ab
+		p s b b
+		hit 4 r
+	ab
+		5-3
+	ab
+		p b s b b
+		bb
+	ab
+		p b b s s b
+		F7
+	ab
+		p s s b b f
+		K
+
+inn B1
+	ab
+		p b s
+		hit 1 cl
+		-> 2 SAC
+		-> 3
+	ab
+		p b
+		SAC1-3
+	ab
+		p f
+		4-3
+	ab
+		p f b
+		1u
+
+inn T2
+	ab
+		p b b s
+		4-3
+	ab
+		p b b
+		hit 2 cr
+		-> 3 SAC
+	ab
+		p b s b b f
+		bb
+		-> 2 SAC
+	ab
+		p b
+		SAC5-3
+	ab
+		p b b s f
+		3u
+
+inn B2
+	ab
+		p s
+		F7
+	ab
+		p s b b f
+		5-3
+	ab
+		p b s
+		F9
+
+inn T3
+	ab 
+		p s b b
+		F7
+	ab
+		p f
+		hit 1 lc
+		-> 3
+		tout 4 FC3-2
+	ab
+		p b
+		hit 2 r
+		-> 3
+		-> 4
+	ab
+		p b b s b
+		reach FC
+		-> 2
+		-> 4
+	ab
+		p b b b
+		bb
+	ab
+		p b b b
+		hit 2 cr
+		rbi 2
+	ab
+		p b b b
+		ibb
+	ab
+		p b s s b
+		K
+
+inn B3
+	ab
+		p s s
+		K
+	ab
+		6-3
+	ab
+		p s b b s
+		6-3
+
+inn T4
+	ab
+		p f b b s
+		4-3
+	ab
+		p b f b b f
+		F8
+	ab
+		p b b b
+		F8
+
+inn B4
+	ab
+		p b b s
+		F9
+	ab
+		p s b f
+		K
+	ab
+		FO3
+
+inn T5
+	ab
+		p s b b f b
+		bb
+		-> 2
+	ab
+		p b b s f
+		!K
+	ab
+		p s f f b b b
+		4-3
+	ab
+		F8
+
+inn B5
+	ab
+		p s
+		L5
+	ab
+		p b b s f b
+		hit 2 cl
+		-> 3 WP
+	ab
+		p b f f
+		wp
+		K
+	ab
+		p b s b
+		6-3
+
+inn T6
+	ab
+		p s b s b
+		K
+	ab
+		p f
+		1-3
+	ab
+		p b
+		hit 3 cr
+	ab
+		p b b s s f
+		F9
+
+inn B6
+	add_player 9 8 PH
+	ab
+		p s
+		1-3
+	ab
+		p b b s
+		F8
+	ab
+		p b f b b
+		bb
+	ab
+		p s f b b b
+		F4
+
+inn T7
+	add_pitcher 55
+	ha add_player 9 55 1
+	ab
+		p s b b s
+		K
+	ab
+		p b f b
+		3-1
+	ab
+		p b
+		F8
+
+add_player 4 13 3 7
+
+inn B7
+	ab
+		p b f b s b
+		F8
+	ab
+		L8
+	ab
+		p s b
+		hit 1 rc
+	ab
+		p f s b
+		K
+
+inn T8
+	ab
+		p s b
+		hit 1 rc
+		-> 3
+		tout 4 FC3-2 2 44
+	ab
+		hit 2 r
+		add_player 7 19 PR/9 8/9
+		-> 3
+
+	add_pitcher 44
+	ha add_player 7 44 1
+	ha add_player 9 16 9
+
+	ab
+		p b s b f b
+		bb
+		add_player 8 3 PR/4 8/9
+		-> 2
+	
+	add_player 9 15 PH
+	ab
+		p b b s f
+		K
+	ab
+		reach FC
+	ab
+		p b b b s s f f f
+		K
+
+inn B8
+	add_pitcher 61
+	ha add_player 9 61 1
+
+	add_player 8 32 PH
+	ab
+		p s b f b
+		F4
+	ab
+		p b f s b b
+		bb
+		-> 2 SB
+
+	add_pitcher 43
+	ha add_player 9 43 1
+
+	add_player 1 7 PH/4 8/9
+	ab
+		p s b b f
+		K
+	ab
+		p f
+		F6
+
+add_player 8 22 2 9
+inn T9
+	ab
+		5-3
+	ab
+		p b
+		F9
+	ab
+		p b f s b f f
+		hit 1 l
+		tout 2 FC6u
+	ab
+		reach FC
+
+inn B9
+	add_pitcher 29
+	ha add_player 9 29 1
+	ab
+		p s b f f
+		hit 1 cl
+		-> 2 FI
+	ab
+		p s s b
+		F9
+	ab
+		p s f
+		K
+	ab
+		p b
+		1-3
+
+win 32
+save 29
+
+inn
+loss 21

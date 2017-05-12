@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+t/01_init.t
+t/02_coordinates.t
+t/03_coord_undefined.t
+t/04_dies.t
+t/96_critic.t
+t/97_pod.t
+t/98_pod_coverage.t
+t/99_kwalitee.t
+t/perlcriticrc
+lib/Geo/Coordinates/ETRSTM35FIN.pm

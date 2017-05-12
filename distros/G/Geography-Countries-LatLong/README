@@ -1,0 +1,102 @@
+Geography/Countries/LatLong version 0.92
+========================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Geography::Countries
+
+
+NAME
+    Geography::Countries::LatLong - mean latitude and longitude
+
+SYNOPSIS
+            use Geography::Countries::LatLong;
+            if ( Geography::Countries::LatLong::supports('Hungary') ){
+                    my $array_ref    = latlong('Hungary');
+                    my ($lat, $long) = latlongr('Hungary');
+            }
+
+DESCRIPTION
+    This module provides mean latitude and longitude for a large number of
+    countries named in English.
+
+    Regions and continents are not supported - please see the list below.
+
+    Look-up is by the English name of the country, as returned by the
+    "Geography::Countries" module, of which this is a sub-class that exports
+    none of its parent's properties or methods.
+
+    The mean values were arrived at with the following *MATLAB* code, where
+    "name" is a country name recognised by *MATLAB*:
+
+            function [lat,lon] = country_latlon(name);
+              load worldmtx;
+              c=worldhi(name);
+              lat = mean(c.latlim);
+              lon = mean(c.longlim);
+              fprintf( '"%s" => ["%.4f","%.4f"],', name,lat,lon);
+            % end function country_latlon
+
+    You will need the Mapping Toolbox to run the above snippet.
+
+  EXPORT
+            countries
+            latlong
+
+  latlong ($country_name)
+    Returns as a 1x2 anonymous array the latitude and longitude for the
+    country supplied as the sole argument, or "undef" if the country is not
+    supported.
+
+  supports ($country)
+    Returns a true value if the sole argument is a country name supported by
+    this module; otherwise, returns "undef".
+
+  unsupported
+    "warn"s to "STDERR" a list of "Geography::Countries::countries" that are
+    not supported by this module.
+
+  country
+    Just "Geography::Countries"'s routine.
+
+UNSUPPORTED NAMES
+    It is no reflection on the countries listed: I just don't have the data
+    at the time of writing.
+
+            Democratic Kampuchea
+            Faeroe Islands
+            French Guiana
+            French Southern Territories
+            Holy See
+            Melanesia
+            Micronesia-Polynesia
+            Myanmar
+            Pacific Islands (Trust Territory)
+            Svalbard and Jan Mayen Islands
+            Tokelau
+            Turks and Caicos Islands
+            Upper Volta
+            Wallis and Futuna Islands
+
+AUTHOR
+    Lee Goddard - lgoddard -at- cpan -dot- org
+
+SEE ALSO
+    perl, Geography::Countries.
+
+COPYRIGHT
+    Copyright (C) Lee Goddard, 2003, 2006. All Rights Reserved. Made
+    publically available under the same terms as Perl itself.
+
+

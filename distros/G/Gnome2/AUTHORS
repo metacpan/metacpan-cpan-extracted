@@ -1,0 +1,16 @@
+
+The Gtk2-Perl Team - contact us at gtk-perl-list@gnome.org
+================================================================
+muppet                   scott at asofyet dot org
+Ross McFarland           rwmcfa1 at neces dot com
+Torsten Schoenfeld       kaffeetisch at web dot de
+Goran Thyni              goran at kirra dot net
+Joern Reder              joern at zyn dot de
+Chas Owens               alas at wilma dot widomaker dot com
+Guillaume Cottenceau     gc at mandrakesoft dot com
+
+
+several important bits of gtk2-perl were heavily inspired by pygtk, gtk-perl,
+and a good read-through of the gtk source code, so credit goes to those guys as
+well -- thanks!
+

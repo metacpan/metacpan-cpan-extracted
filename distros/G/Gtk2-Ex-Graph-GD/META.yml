@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Gtk2-Ex-Graph-GD
+version:      0.04
+version_from: lib/Gtk2/Ex/Graph/GD.pm
+installdirs:  site
+requires:
+    GD::Graph::area:               0
+    GD::Graph::bars:               0
+    GD::Graph::lines:              0
+    GD::Graph::linespoints:        0
+    GD::Graph::pie:                0
+    Glib:                          0
+    Gtk2:                          0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

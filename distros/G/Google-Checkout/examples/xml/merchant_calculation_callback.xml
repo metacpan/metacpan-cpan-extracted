@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<merchant-calculation-callback xmlns="http://checkout.google.com/schema/2-beta1">
+  <shopping-cart>
+    <merchant-private-data>
+      <merchant-note>affiliate code 01234</merchant-note>
+    </merchant-private-data>
+    <cart-expiration>
+      <good-until-date>2006-12-31T23:59:59.000Z</good-until-date>
+    </cart-expiration>
+    <items>
+      <item>
+        <merchant-item-id>GGLAA1453</merchant-item-id>
+        <quantity>1</quantity>
+        <unit-price currency="USD">35.00</unit-price>
+        <item-name>Dry Food Pack AA1453</item-name>
+        <item-description>A pack of highly nutritious dried food for emergency</item-description>
+        <tax-table-selector>food</tax-table-selector>
+      </item>
+      <item>
+        <merchant-item-id>MGS2GBMP3</merchant-item-id>
+        <quantity>100</quantity>
+        <unit-price currency="USD">178.00</unit-price>
+        <item-name>MegaSound 2GB MP3 Player</item-name>
+        <item-description>Portable MP3 player - stores 500 songs</item-description>
+        <merchant-private-item-data>
+          <item-note>Popular item: Check inventory and order more if needed</item-note>
+        </merchant-private-item-data>
+      </item>
+    </items>
+  </shopping-cart>
+  <buyer-language>en_US</buyer-language>
+  <buyer-id>294873009217523</buyer-id>
+  <calculate>
+    <addresses>
+      <anonymous-address id="739030698069958">
+        <country-code>US</country-code>
+        <city>Ventura</city>
+        <region>CA</region>
+        <postal-code>93003</postal-code>
+      </anonymous-address>
+      <anonymous-address id="421273450774618">
+        <country-code>US</country-code>
+        <city>Mountain View</city>
+        <region>CA</region>
+        <postal-code>94043</postal-code>
+      </anonymous-address>
+    </addresses>
+    <tax>true</tax>
+    <shipping>
+      <method name="SuperShip" />
+      <method name="UPS Ground" />
+    </shipping>
+    <merchant-code-strings>
+      <merchant-code-string code="GiftCert012345" pin = "1234" />
+      <merchant-code-string code="FirstVisitCoupon" pin = "5678" />
+    </merchant-code-strings>
+  </calculate>
+</merchant-calculation-callback>

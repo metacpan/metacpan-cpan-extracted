@@ -1,0 +1,389 @@
+---
+floats:
+  1:
+    - ~
+    - ~
+  11:
+    - ~
+    - ~
+  12:
+    - ~
+    - ~
+  13:
+    - ~
+    - ~
+  14:
+    - ~
+    - ~
+  15:
+    - Down
+    - Up
+  16:
+    - Up
+    - Down
+  17:
+    - ~
+    - Up
+  19:
+    - ~
+    - Down
+  2:
+    - ~
+    - ~
+  20:
+    - Up
+    - ~
+  21:
+    - ~
+    - ~
+  22:
+    - ~
+    - ~
+  23:
+    - ~
+    - ~
+  24:
+    - ~
+    - ~
+  25:
+    - ~
+    - Down
+  26:
+    - ~
+    - ~
+  27:
+    - Down
+    - ~
+  28:
+    - ~
+    - ~
+  3:
+    - ~
+    - ~
+  5:
+    - ~
+    - ~
+  6:
+    - Down
+    - ~
+  8:
+    - ~
+    - ~
+  9:
+    - ~
+    - ~
+opponents:
+  1:
+    - 17
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+  11:
+    - 25
+    - 6
+    - 18
+    - 8
+    - 24
+  12:
+    - Bye
+    - Bye
+    - 27
+    - Bye
+    - Bye
+  13:
+    - 20
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+  14:
+    - Bye
+    - 19
+    - Bye
+    - Bye
+    - 27
+  15:
+    - 27
+    - 24
+    - 22
+    - 20
+    - 28
+  16:
+    - Bye
+    - 5
+    - 24
+    - 6
+    - Bye
+  17:
+    - 1
+    - 20
+    - 8
+    - 24
+    - 19
+  19:
+    - 2
+    - 14
+    - 20
+    - 21
+    - 17
+  2:
+    - 19
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+  20:
+    - 13
+    - 17
+    - 19
+    - 15
+    - 26
+  21:
+    - 4
+    - 18
+    - Bye
+    - 19
+    - 23
+  22:
+    - 6
+    - Bye
+    - 15
+    - Bye
+    - Bye
+  23:
+    - Bye
+    - Bye
+    - 6
+    - 27
+    - 21
+  24:
+    - Bye
+    - 15
+    - 16
+    - 17
+    - 11
+  25:
+    - 11
+    - Bye
+    - 9
+    - Bye
+    - 18
+  26:
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+    - 20
+  27:
+    - 15
+    - 3
+    - 12
+    - 23
+    - 14
+  28:
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+    - 15
+  3:
+    - Bye
+    - 27
+    - Bye
+    - Bye
+    - Bye
+  5:
+    - Bye
+    - 16
+    - Bye
+    - Bye
+    - Bye
+  6:
+    - 22
+    - 11
+    - 23
+    - 16
+    - 4
+  8:
+    - Bye
+    - Bye
+    - 17
+    - 11
+    - Bye
+  9:
+    - Bye
+    - Bye
+    - 25
+    - Bye
+    - Bye
+roles:
+  1:
+    - Black
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+  11:
+    - White
+    - Black
+    - White
+    - Black
+    - White
+  12:
+    - Bye
+    - Bye
+    - Black
+    - Bye
+    - Bye
+  13:
+    - White
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+  14:
+    - Bye
+    - Black
+    - Bye
+    - Bye
+    - Bye
+  15:
+    - Black
+    - White
+    - Black
+    - White
+    - Black
+  16:
+    - Bye
+    - Black
+    - White
+    - Black
+    - Bye
+  17:
+    - White
+    - Black
+    - White
+    - Black
+    - White
+  19:
+    - Black
+    - White
+    - Black
+    - White
+    - Black
+  2:
+    - White
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+  20:
+    - Black
+    - White
+    - White
+    - Black
+    - White
+  21:
+    - Black
+    - White
+    - Bye
+    - Black
+    - White
+  22:
+    - White
+    - Bye
+    - White
+    - Bye
+    - Bye
+  23:
+    - Bye
+    - Bye
+    - White
+    - Bye
+    - Bye
+  24:
+    - Bye
+    - Black
+    - Black
+    - White
+    - Black
+  25:
+    - Black
+    - Bye
+    - White
+    - Bye
+    - Black
+  26:
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+    - Black
+  27:
+    - White
+    - Black
+    - White
+    - Black
+    - Bye
+  28:
+    - Bye
+    - Bye
+    - Bye
+    - Bye
+    - White
+  3:
+    - Bye
+    - White
+    - Bye
+    - Bye
+    - Bye
+  5:
+    - Bye
+    - White
+    - Bye
+    - Bye
+    - Bye
+  6:
+    - Black
+    - White
+    - Black
+    - White
+    - Black
+  8:
+    - Bye
+    - Bye
+    - Black
+    - White
+    - Bye
+  9:
+    - Bye
+    - Bye
+    - Black
+    - Bye
+    - Bye
+score:
+  1: 0.5
+  11: 2
+  12: 0.5
+  13: 0.5
+  14: 0.5
+  15: 1.5
+  16: 2
+  17: 2
+  19: 1.5
+  2: 0.5
+  20: 2
+  21: 1.5
+  22: 1
+  23: 1.5
+  24: 2
+  25: 2
+  26: 0.5
+  27: 2
+  28: 0.5
+  3: 0.5
+  5: 0.5
+  6: 2
+  8: 1
+  9: 0.5

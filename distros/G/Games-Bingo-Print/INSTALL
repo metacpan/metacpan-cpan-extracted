@@ -1,0 +1,86 @@
+INSTALL file for Games::Bingo::Print
+
+$Id: INSTALL 1835 2007-03-17 17:36:20Z jonasbn $
+
+INSTALLATION
+
+The installation of Games::Bingo has some requirements which need to be
+installed also.
+
+PDFLIB
+
+This module requires PDFLib. PDFLib can be downloaded from
+http://www.pdflib.com/ and is owned by PDFLib. The prebuilt version
+apparently does not hold the Perl bindings, which leaves the unuseful
+in conjunction with this project so the PDFLib has to be compiled in
+order to work.
+
+Games::Bingo::Print have only been tested with:
+
+- PDFLib 4.0.3
+  http://www.pdflib.com/pdflib/download/pdflib-4.0.3.tar.gz 
+  
+- PDFLib 7.0.1 on OSX
+  http://www.pdflib.com/download/free-software/pdflib-lite/
+
+
+NB for PDFLib 4.0.3 users on MacOSX
+
+For OS X 10.2 users there is a patch to the configure file please see:
+
+http://www.pdflib.com/pdflib/patches.html
+
+However the freeware version works perfectly and it is freeware.
+
+% ./configure
+
+% make
+
+% make install #might require super user privileges
+
+PDFLib from CPAN
+
+Apart from the installation of the PDFLib libraries you will require the
+PDFLib module from CPAN, which wraps the library.
+
+To install PDFLib from CPAN
+
+% perl -MCPAN -e 'install Games::Bingo'
+
+To install PDFLib from tar-ball:
+
+% perl Makefile.PL
+
+% make
+
+% make install #might require super user privileges
+
+Games::Bingo::Print
+
+Finally you have to install Games::Bingo::Print
+
+Games::Bingo::Print from CPAN
+
+
+To install Games::Bingo::Print from CPAN
+
+% perl -MCPAN -e 'install Games::Bingo::Print'
+
+To install Games::Bingo::Print from tar-ball:
+
+% perl Makefile.PL
+
+% make
+
+% make install #might require super user privileges
+
+Or if you like me prefer Module::Build
+
+% perl Build.PL
+
+% ./Build
+
+% ./Build install #might require super user privileges
+
+
+jonasbn <jonasbn@cpan.org>

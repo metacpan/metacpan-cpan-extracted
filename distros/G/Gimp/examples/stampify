@@ -1,0 +1,92 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  my $nw = int($image->width + 2 * $marg + $diameter);
+  my $nh = int($image->height + 2 * $marg + $diameter);
+  my $img2 = Gimp::Image->new($nw, $nh, RGB);
+  my $layer1 = $img2->layer_new($nw, $nh, RGBA_IMAGE, "Layer 1", 100, NORMAL_MODE);
+  $img2->insert_layer($layer1, 0, 0);
+  $img2->set_active_layer($layer1);
+  Gimp::Context->set_background($paper);
+  $layer1->edit_fill(BACKGROUND_FILL);
+# create horisontal holes
+  $img2->selection_none;
+  my $nholes = int (($nw + $gap) / ($diameter + $gap) + 0.5);
+  my $pos = 0;
+  for (my $i = 0; $i<$nholes; $i++) {
+    $img2->select_ellipse(
+      CHANNEL_OP_ADD, $pos, 0,
+      $diameter, $diameter,
+    );
+    $pos = $pos + $diameter + $gap;
+  }
+# create vertical holes
+  $pos = 0;
+  for (my $i = 0; $i<$nholes; $i++) {
+    $img2->select_ellipse(CHANNEL_OP_ADD, 0, $pos, $diameter, $diameter);
+    $pos = $pos + $diameter + $gap;
+  }
+  Gimp::Context->set_background($hole);
+  $layer1->edit_fill(BACKGROUND_FILL);
+  $img2->selection_none;
+# here comes the clever part! :-)
+# offset horis and vert holes by half the diameter
+  $layer1->offset(TRUE, OFFSET_BACKGROUND, -($diameter / 2), -($diameter / 2));
+  $image->selection_all;
+  $drawable->edit_copy;
+  $layer1->edit_paste(FALSE)->floating_sel_anchor;
+# and return command to The Gimp.
+  eval { Gimp::Display->new($img2); };
+  return $img2;
+};
+exit main;
+__END__
+
+=head1 NAME
+
+stampify - Makes an image look like a postage stamp.
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Render/Stampify...
+
+=head1 DESCRIPTION
+
+This plug-in works from the active layer. Depending on the size of the
+image, perforations may look strange. Test alternatives!
+
+=head1 PARAMETERS
+
+  [PF_COLOR, "paper", "Paper colour", [242, 242, 242]],
+  [PF_COLOR, "hole", "Hole colour", [0, 0, 0]],
+  [PF_INT32, "diameter", "Diameter of perforation", 10],
+  [PF_INT32, "gap", "Gap between perforations", 5],
+  [PF_INT32, "marg", "Marginal between art and perforations", 7]
+
+=head1 RETURN VALUES
+
+  [PF_IMAGE, 'image', 'Return image'],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Claes G Lindblad <claesg@algonet.se>
+
+=head1 DATE
+
+990328
+
+=head1 LICENSE
+
+Copyright Claes G. Lindblad.
+Distributed under the terms of the GNU Public License, v2 or higher.
+
+=cut

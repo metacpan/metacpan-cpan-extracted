@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+
+=pod
+
+GdkPixbuf is a client-side image data object; in C you just deal with 24-bit
+RGB or 32-bit RGBA image data, but in Perl such things are a little difficult.
+
+This code shows how to find pixels within a GdkPixbuf, as well as how to
+create new GdkCursors.
+
+ -- muppet, 3 March 04
+
+=cut
+
+use strict;
+use warnings;
+use Glib qw(FALSE TRUE);
+use Gtk2 -init;
+
+die "Usage: $0 imagefile\n" unless @ARGV;
+my $pixbuf = Gtk2::Gdk::Pixbuf->new_from_file ($ARGV[0]);
+# grab this now, so we only keep one copy of it.
+my $pixels = $pixbuf->get_pixels;
+
+# create a bunch of widgets...
+my $window = Gtk2::Window->new;
+my $hbox = Gtk2::HBox->new;
+my $ebox = Gtk2::EventBox->new;
+my $align = Gtk2::Alignment->new (0.5, 0.5, 0.0, 0.0);
+my $image = Gtk2::Image->new_from_pixbuf ($pixbuf);
+my $frame = Gtk2::Frame->new ('Color');
+my $vbox = Gtk2::VBox->new;
+my $label = Gtk2::Label->new;
+my $darea = Gtk2::DrawingArea->new;
+
+# lay 'em out...
+$window->add ($hbox);
+$ebox->add ($image);
+$align->add ($ebox);
+$hbox->add ($align);
+$hbox->pack_start ($frame, FALSE, FALSE, 0);
+$frame->add ($vbox);
+$vbox->pack_start ($label, FALSE, FALSE, 0);
+$vbox->pack_start ($darea, FALSE, FALSE, 0);
+
+# hook 'em up...
+$window->set_title ("Color Snooper");
+$window->show_all;
+$window->signal_connect (delete_event => sub {Gtk2->main_quit;});
+
+$darea->set_size_request (64, 64);
+
+$ebox->window->set_cursor (create_cursor());
+$ebox->add_events (['pointer-motion-mask', 'pointer-motion-hint-mask']);
+$ebox->signal_connect (motion_notify_event => sub {
+	my ($widget, $event) = @_;
+	# this is so we keep getting pointer events.
+	$widget->window->get_pointer;
+	# the Gtk2::Image is a no-window widget; translate its coords.
+	# it should be packed tightly in the event box, thanks to the
+	# alignment, but this is for paranoia's sake.
+	my ($x, $y) = $widget->translate_coordinates ($image,
+						      $event->x, $event->y);
+
+	# the image data is packed RGB or RGBA data.  if we can calculate
+	# the location of our pixel-of-interest, then we can use substr
+	# and unpack to get to its values.
+	my ($r, $g, $b, $a) =
+		unpack "C*",
+			substr $pixels, 
+			       $pixbuf->get_rowstride * $y
+			        + $pixbuf->get_n_channels * $x,
+			       $pixbuf->get_n_channels;
+	$label->set_text ("x,y: ".$event->x.", ".$event->y."\n"
+			 ."R: $r\n"
+			 ."G: $g\n"
+			 ."B: $b"
+			 .($pixbuf->get_has_alpha ? "\nA: $a" : ""));
+
+	# GdkColors use 16-bit color values, but GdkPixbufs use 8-bit.
+	# note the bitshifts to account for that.
+	my $color = Gtk2::Gdk::Color->new ($r << 8, $g << 8, $b << 8);
+	
+	$darea->modify_bg ('normal', $color);
+	$darea->queue_draw;
+});
+
+
+# and go.
+Gtk2->main;
+
+
+sub create_cursor {
+  # these icons borrowed from the gimp.
+  use constant width => 32;
+  use constant height => 32;
+  use constant x_hot => 13; # the tip of the dropper, coords
+  use constant y_hot => 30; # picked out by hand.
+  my $dropper_small_bits = pack 'C*',
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x1c, 0x00, 0x00, 0x00, 0x22, 0x00, 0x00, 0x00, 0x41,
+     0x00, 0x00, 0xc0, 0xa1, 0x00, 0x00, 0x20, 0xbc, 0x00, 0x00, 0x40, 0xbb,
+     0x00, 0x00, 0x80, 0x44, 0x00, 0x00, 0x40, 0x34, 0x00, 0x00, 0x20, 0x13,
+     0x00, 0x00, 0x90, 0x15, 0x00, 0x00, 0xc8, 0x00, 0x00, 0x00, 0x64, 0x00,
+     0x00, 0x00, 0x32, 0x00, 0x00, 0x00, 0x19, 0x00, 0x00, 0x80, 0x0c, 0x00,
+     0x00, 0x40, 0x06, 0x00, 0x00, 0x40, 0x03, 0x00, 0x00, 0xe0, 0x01, 0x00,
+     0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00;
+  my $dropper_small_mask_bits = pack 'C*',
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x1c, 0x00, 0x00, 0x00, 0x3e, 0x00, 0x00, 0x00, 0x7f,
+     0x00, 0x00, 0xc0, 0xff, 0x00, 0x00, 0xe0, 0xff, 0x00, 0x00, 0xc0, 0xff,
+     0x00, 0x00, 0xc0, 0x7f, 0x00, 0x00, 0xe0, 0x3f, 0x00, 0x00, 0xf0, 0x1f,
+     0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0xfc, 0x01, 0x00, 0x00, 0xfe, 0x00,
+     0x00, 0x00, 0x7f, 0x00, 0x00, 0x80, 0x3f, 0x00, 0x00, 0xc0, 0x1f, 0x00,
+     0x00, 0xe0, 0x0f, 0x00, 0x00, 0xe0, 0x07, 0x00, 0x00, 0xf0, 0x03, 0x00,
+     0x00, 0xe0, 0x01, 0x00, 0x00, 0x40, 0x00, 0x00;
+
+  my $icon = Gtk2::Gdk::Bitmap->create_from_data
+	  	(undef, $dropper_small_bits, width, height);
+  my $mask = Gtk2::Gdk::Bitmap->create_from_data
+	  	(undef, $dropper_small_mask_bits, width, height);
+  return Gtk2::Gdk::Cursor->new_from_pixmap
+		($icon, $mask,
+		 Gtk2::Gdk::Color->new (0, 0, 0),
+		 Gtk2::Gdk::Color->new (65535, 65535, 65535),
+		 x_hot, y_hot);
+}

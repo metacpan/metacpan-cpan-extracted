@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use 5.12.0;
+use Git::Release;
+$|++;
+my $m = Git::Release->new;
+my $action = shift;
+
+if( $action && $action eq 'edit' ) {
+    say "Launching editor ...";
+    $m->get_current_branch->edit_doc;
+    say "Done";
+}
+else {
+    $m->get_current_branch->print_doc;
+}
+

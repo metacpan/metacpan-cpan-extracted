@@ -1,0 +1,6 @@
+GCONF_TYPE_ENGINE	GConfEngine	GBoxed 	Gnome2::GConf::Engine
+GCONF_TYPE_CLIENT	GConfClient	GObject	Gnome2::GConf::Client
+GCONF_TYPE_VALUE_TYPE	GConfValueType	GEnum	Gnome2::GConf::ValueType
+GCONF_TYPE_UNSET_FLAGS  GConfUnsetFlags GFlags  Gnome2::GConf::UnsetFlags
+GCONF_TYPE_CLIENT_PRELOAD_TYPE	GConfClientPreloadType	GEnum	Gnome2::GConf::ClientPreloadType
+GCONF_TYPE_CLIENT_ERROR_HANDLING_MODE	GConfClientErrorHandlingMode	GEnum	Gnome2::GConf::ClientErrorHandlingMode

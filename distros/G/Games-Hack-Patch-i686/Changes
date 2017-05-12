@@ -1,0 +1,21 @@
+Revision history for Perl extension Games::Hack::Patch::i686.
+
+0.52
+  - Support for "fstpl"
+
+0.5 Wed Nov 14 09:52:25 CET 2007
+  - Support for "pop [mem]"
+
+0.4 Oct 23rd, 2007
+	- Support for direct modification - eg. OR into memory.
+
+0.3 Oct 23rd, 2007
+	- Support for fstps
+
+0.2 Oct 22nd, 2007
+	- Floating point ops
+	- Namespace used to avoid PAUSE warning
+
+0.1  Tue Oct 16 06:26:07 CEST 2007
+	- first published version;
+

@@ -1,0 +1,380 @@
+<HTML>
+<HEAD>
+<TITLE>Query.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#inheritance">Inheritance</A></LI>
+	<LI><A HREF="#public methods">Public Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#getobject">getObject</A></LI>
+		<LI><A HREF="#getobjects">getObjects</A></LI>
+		<LI><A HREF="#countobjects">countObjects</A></LI>
+		<LI><A HREF="#getclustercontents">getClusterContents</A></LI>
+		<LI><A HREF="#getclustersbytype">getClustersByType</A></LI>
+		<LI><A HREF="#getfounders">getFounders</A></LI>
+		<LI><A HREF="#getsubjectsbyphenotype">getSubjectsByPhenotype</A></LI>
+		<LI><A HREF="#getphenotypesbysubject">getPhenotypesBySubject</A></LI>
+		<LI><A HREF="#getgenotypesbysubject">getGenotypesBySubject</A></LI>
+		<LI><A HREF="#getsubjectsbykindred">getSubjectsByKindred</A></LI>
+		<LI><A HREF="#getsiblings">getSiblings</A></LI>
+		<LI><A HREF="#getposbychromosome">getPOsByChromosome</A></LI>
+		<LI><A HREF="#getallelesbytype">getAllelesByType</A></LI>
+		<LI><A HREF="#getpoallelesbytype">getPOAllelesByType</A></LI>
+		<LI><A HREF="#getallelecounts">getAlleleCounts</A></LI>
+		<LI><A HREF="#getallelefreqs">getAlleleFreqs</A></LI>
+		<LI><A HREF="#getgtalleles">getGtAlleles</A></LI>
+		<LI><A HREF="#getsnpgtcounts">getSNPGtCounts</A></LI>
+		<LI><A HREF="#getgtallelesbygt">getGtAllelesByGt</A></LI>
+		<LI><A HREF="#getptvalue">getPtValue</A></LI>
+	</UL>
+
+	<LI><A HREF="#private methods">Private Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#_generatesql">_generateSQL</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::API::DB::Query</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Genetics::API ;</PRE>
+<PRE>
+  $api = new Genetics::API(DSN =&gt; {driver =&gt; &quot;mysql&quot;,
+                                   host =&gt; $Host,
+                                   database =&gt; $Database},
+                           user =&gt; $UserName,
+                           password =&gt; $Password) ;</PRE>
+<PRE>
+  $sv = $api-&gt;getObject({TYPE =&gt; &quot;StudyVariable&quot;, 
+                         NAME =&gt; &quot;Aff&quot;, 
+                         FULL =&gt; 1}) ;</PRE>
+<PRE>
+  @affSubjects = $api-&gt;getSubjectsByPhenotype($sv, 2) ;</PRE>
+<PRE>
+  @kindreds = $api-&gt;getObjects({TYPE =&gt; &quot;Kindred&quot;}) ;</PRE>
+<PRE>
+  @d1s = $api-&gt;getObjects({TYPE =&gt; &quot;Marker&quot;, Name =&gt; &quot;D1S*&quot;}) ;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Genetics::API::DB packages provide an interface for the manipulation of 
+Genperl objects in a realtional database.  This package contains methods to 
+query for and return objects based on attributes/relationships other than id 
+(for methods to do that, see Genetics::API::DB::Read).</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+ strict             Just to be anal
+ vars               Global variables
+ Carp               Error reporting</PRE>
+<P>
+<HR>
+<H1><A NAME="inheritance">Inheritance</A></H1>
+<PRE>
+ Exporter           Make methods available to importing packages</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public Methods</A></H1>
+<P>
+<H2><A NAME="getobject">getObject</A></H2>
+<PRE>
+  Function  : Get and return Genetics::Object object(s) based on a set of query 
+              parameters.. 
+  Arguments : A reference to a hash containing the query parameters:
+                %query = (
+                          ID =&gt; integer
+                          TYPE =&gt; Object type
+                          NAME =&gt; text
+                          WHERE =&gt; SQL where clause
+                          FULL =&gt; Boolean
+                         )
+              If $query{FULL} is false (the default) mini objects returned.
+  Returns   : A Genetics::Object object, or undef there are zero or more than 
+              one that satisfy the query parameters.
+  Scope     : Public
+  Comments  : This is experimental and the interface may change.
+              If the NAME parameter contains Perl wildcard characters * or ?, 
+              these are converted to the SQL wildcards % and _.  This hopefully 
+              results in the expected behavior.</PRE>
+<P>
+<H2><A NAME="getobjects">getObjects</A></H2>
+<PRE>
+  Function  : Get and return Genetics::Object object(s) based on a set of query 
+              parameters.. 
+  Arguments : A reference to a hash containing the query parameters:
+                %query = (
+                          TYPE =&gt; Object type
+                          NAME =&gt; text
+                          KW =&gt; {KeywordType.name =&gt; Keyword.value}
+                          WHERE =&gt; SQL where clause
+                          FULL =&gt; Boolean
+                         )
+              If $query{FULL} is false (the default) mini objects returned.
+  Returns   : An array of Genetics::Object object(s) which satisfy the query 
+              parameters, or undef if there are none.
+  Scope     : Public
+  Comments  : This is experimental and the interface may change.
+              If the NAME parameter contains Perl wildcard characters * or ?, 
+              these are converted to the SQL wildcards % and _.  This hopefully 
+              results in the expected behavior.</PRE>
+<P>
+<H2><A NAME="countobjects">countObjects</A></H2>
+<PRE>
+  Function  : Return the count of Genetics::Object object(s) that match a set 
+              of query parameters.
+  Arguments : A reference to a hash containing the query parameters:
+                %query = (
+                          TYPE =&gt; Object type
+                          NAME =&gt; text
+                          WHERE =&gt; SQL where clause
+                         )
+  Returns   : Scalar
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getclustercontents">getClusterContents</A></H2>
+<PRE>
+  Function  : Get the objects referenced by a Cluster.
+  Argument  : A Genetics::Cluster object
+  Returns   : A list of Genetics::Object objects.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getclustersbytype">getClustersByType</A></H2>
+<PRE>
+ Function  : 
+ Arguments : 
+ Returns   : 
+ Example   : getClustersByType()
+ Scope     : 
+ Comments  :</PRE>
+<P>
+<H2><A NAME="getfounders">getFounders</A></H2>
+<PRE>
+  Function  : Query for and return the founders (Subjects without parents) in a 
+              Kindred.
+  Argument  : A Genetics::Kindred object.
+  Returns   : A list of Genetics::Subject objects.
+</PRE>
+<PRE>
+
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getsubjectsbyphenotype">getSubjectsByPhenotype</A></H2>
+<PRE>
+  Function  : Query for Subjects based on their associated Phenotype values.
+  Argument  : A Genetics::Object::StudyVariable object and a phenotype value.
+  Returns   : Genetics::Object::Subject objects that have associated Phenotypes 
+              with the query value.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getphenotypesbysubject">getPhenotypesBySubject</A></H2>
+<PRE>
+  Function  : Query for Phenotypes based on their associated Subject.
+  Argument  : A Genetics::Object::Subject object.
+  Returns   : Genetics::Object::Phenotype objects.
+  Scope     : Public
+  Comments  : Returns only active Phenotypes.</PRE>
+<P>
+<H2><A NAME="getgenotypesbysubject">getGenotypesBySubject</A></H2>
+<PRE>
+  Function  : Query for Genotypes based on their associated Subject.
+  Argument  : A Genetics::Object::Subject object.
+  Returns   : An array of Genetics::Object::Genotype objects.
+  Scope     : Public
+  Comments  : Returns only the active Genotypes.</PRE>
+<P>
+<H2><A NAME="getsubjectsbykindred">getSubjectsByKindred</A></H2>
+<PRE>
+  Function  : Query for and return all the Subjects in a Kindred.
+  Argument  : A Kindred object
+  Returns   : A list of Subject objects
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getsiblings">getSiblings</A></H2>
+<PRE>
+  Function  : Query for and return all the siblings of a Subject.
+  Argument  : A Subject object
+  Returns   : A list of Subject objects
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getposbychromosome">getPOsByChromosome</A></H2>
+<PRE>
+ Function  : 
+ Arguments : 
+ Returns   : 
+ Example   : getPOsByChromosome()
+ Scope     : 
+ Comments  : Right now this returns all SequenceObject types.  This works 
+             because all SequenceObject types are also PolymorphicObjects.  
+             It will have to be modified if new SequenceObject types are 
+             introduced that are not also PolymorphicObjects.</PRE>
+<P>
+<H2><A NAME="getallelesbytype">getAllelesByType</A></H2>
+<PRE>
+  Function  : Query for and return a Markers allele names, by type.
+  Argument  : A Marker or SNP object and a string containing an allele type.
+  Returns   : An array of allele names.
+  Scope     : Public
+  Comments  : The returned allele names are sorted, first numerically then 
+              alphabetically.</PRE>
+<P>
+<H2><A NAME="getpoallelesbytype">getPOAllelesByType</A></H2>
+<PRE>
+  Function  : Query for and return a Markers alleles by type.
+  Argument  : A Marker or SNP object and a string containing an allele type.
+  Returns   : An array of allele names.
+  Scope     : Public
+  Comments  : The returned allele names are sorted, first numerically then 
+              alphabetically.</PRE>
+<P>
+<H2><A NAME="getallelecounts">getAlleleCounts</A></H2>
+<PRE>
+  Function  : Query for and return raw allele counts.
+  Argument  : A Marker or SNP object, a string containing an allele type, and 
+              a Subject Cluster object.
+  Returns   : Hash pointer.  The hash structure is:
+                     $count{AlleleName} = $number
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getallelefreqs">getAlleleFreqs</A></H2>
+<PRE>
+  Function  : Query for and return the allele frequencies for a group of Subjects.
+  Argument  : A Marker object, a string containing an allele type, and one of 
+              the following defining the Subject group:
+                - a Subject Cluster object 
+                - an array reference to a list of Subject objects
+                - a Kindred Cluster object 
+                - an array reference to a list of Kindred objects
+  Returns   : Hash reference to a hash with the following structure:
+                $freqs{AlleleName} = $number
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getgtalleles">getGtAlleles</A></H2>
+<PRE>
+  Function  : For a given Subject and Marker, query for and return the allele 
+              names from the active Genotype.
+  Argument  : A Subject object and a Marker object
+  Returns   : An array containing the allele names or undef if there is not an 
+              active Genotype associated with the input Subject and Marker.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getsnpgtcounts">getSNPGtCounts</A></H2>
+<PRE>
+ Function  : 
+ Arguments : 
+ Returns   : 
+ Example   : getSNPGtCounts()
+ Scope     : 
+ Comments  :</PRE>
+<P>
+<H2><A NAME="getgtallelesbygt">getGtAllelesByGt</A></H2>
+<PRE>
+  Function  : For a given genotype, query for and return the allele names.
+  Argument  : A Genotype object or id.
+  Returns   : An array containing the allele names or undef if there is not an 
+              active Genotype associated with the input Subject and Marker.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="getptvalue">getPtValue</A></H2>
+<PRE>
+  Function  : For a given Subject and StudyVariable, query for and return the 
+              associated Phenotype value for the active Phenotype.
+  Argument  : A Subject object and a StudyVariable object
+  Returns   : An scalar containing the Phenotype value or undef if there is not 
+              an active Phenotype associated with the input Subject and 
+              StudyVariable.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<HR>
+<H1><A NAME="private methods">Private Methods</A></H1>
+<P>
+<H2><A NAME="_generatesql">_generateSQL</A></H2>
+<PRE>
+  Function  : Generate SQL based on a hash reference of query parameters.
+  Arguments : A reference to a hash containing the query parameters:
+                %query = (
+                          ID =&gt; integer
+                          TYPE =&gt; Object type
+                          NAME =&gt; text
+                          KW =&gt; KeywordType.name=Keyword.value
+                          WHERE =&gt; SQL where clause
+                         )
+  Returns   : A string containing the SQL.
+  Scope     : Private instance method
+  Called by : getObject() and getObjects()
+  Comments  : If the NAME parameter contains Perl wildcard characters * or ?, 
+              these are converted to the SQL wildcards % and _.  This hopefully 
+              results in the expected behavior.
+              NB. KW can only be used by itself or combined with TYPE</PRE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,10 @@
+Makefile.PL
+Changes
+LICENSE
+MANIFEST
+README.md
+t/Geo-OGC-Service.t
+t/Geo-OGC-Service.conf
+lib/Geo/OGC/Service.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

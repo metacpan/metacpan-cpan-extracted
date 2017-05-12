@@ -1,0 +1,90 @@
+# ChangeLog for net-wireless/bluez-utils
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/bluez-utils/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  16 Jun 2004; Jeremy Huddleston <eradicator@gentoo.org>
+  bluez-utils-2.7.ebuild:
+  Readding ~amd64.
+
+  14 Jun 2004; Aron Griffis <agriffis@gentoo.org> bluez-utils-2.3-r1.ebuild,
+  bluez-utils-2.3-r2.ebuild, bluez-utils-2.3.ebuild, bluez-utils-2.5.ebuild,
+  bluez-utils-2.7.ebuild:
+  Fix use invocation
+
+*bluez-utils-2.7 (27 May 2004)
+
+  27 May 2004; Douglas Russell <puggy@gentoo.org> bluez-utils-2.7.ebuild,
+  bluez-utils-2.7.ebuild:
+  Bump to 2.7, blocks bluez-pan as incorporated in utils. #50620
+
+  26 Apr 2004; Aron Griffis <agriffis@gentoo.org> bluez-utils-2.3-r1.ebuild,
+  bluez-utils-2.3-r2.ebuild, bluez-utils-2.5.ebuild:
+  Add die following econf for bug 48950
+
+*bluez-utils-2.5 (29 Mar 2004)
+
+  29 Mar 2004; Alastair Tse <liquidx@gentoo.org> bluez-utils-2.5.ebuild:
+  version bump (#44589). removed gtk1 option as bluepin has been revamped
+
+  15 Feb 2004; David Holm <dholm@gentoo.org> bluez-utils-2.3-r2.ebuild:
+  Added to ~ppc.
+
+  12 Feb 2004; Ciaran McCreesh <ciaranm@gentoo.org> bluez-utils-2.3-r2.ebuild:
+  Adding ~sparc (works with some kernels, see bug #39710)
+
+  30 Jan 2004; Peter Johanson <latexer@gentoo.org> bluez-utils-2.3-r1.ebuild,
+  bluez-utils-2.3-r2.ebuild, bluez-utils-2.3.ebuild, metadata.xml:
+  Fix for wireless->mobile herd change, and header dates
+
+*bluez-utils-2.3-r2 (09 Jan 2004)
+
+  09 Jan 2004; Alastair Tse <liquidx@gentoo.org>:
+  files/bluez-utils-2.3-bluepin-gtk2.patch bluez-utils-2.3-r2.ebuild
+  new revision bump. added gtk2 patch to /usr/bin/bluepin (#35987).
+  changed default pin_helper to /usr/bin/bluepin.
+
+  07 Jan 2004; Alastair Tse <liquidx@gentoo.org> files/bluetooth.rc:
+  added 'after hotplug' in rc script (#36762)
+
+  22 Nov 2003; Alastair Tse <liquidx@gentoo.org> bluez-utils-2.3-r1.ebuild,
+  files/bluez-utils-2.3-rfcomm_fflush.patch:
+  added patch to flush output for rfcomm (#32719)
+
+  29 Sep 2003; Alastair Tse <liquidx@gentoo.org> bluez-utils-2.3-r1.ebuild:
+  fix exec perms on init script
+
+  19 Sep 2003; Alastair Tse <liquidx@gentoo.org> bluez-utils-2.3-r1.ebuild:
+  really fix the bluetooth pin stuff in hcid.conf
+
+  19 Sep 2003; Alastair Tse <liquidx@gentoo.org> bluez-utils-2.3-r1.ebuild,
+  files/pin.sample:
+  added sample pin script
+
+*bluez-utils-2.3-r1 (19 Sep 2003)
+
+  19 Sep 2003; Alastair Tse <liquidx@gentoo.org> bluez-utils-2.1.ebuild,
+  bluez-utils-2.2.ebuild, bluez-utils-2.3-r1.ebuild, metadata.xml:
+  added patch for bluepin, fixed ref to bluepin in hcid.conf, added init
+  scipt, removed mknod for rfcomm (not needed for devfs)
+
+  21 May 2003; Peter Johanson <latexer@gentoo.org> bluez-utils-2.3.ebuild:
+  Add gtk USE flag for pygtk dependancy. bug #21129
+
+  09 May 2003; Peter Johanson <latexer@gentoo.org> bluez-utils-2.1.ebuild, bluez-utils-2.2.ebuild,
+  bluez-utils-2.3.ebuild:
+  Marked stable now that gentoo-sources-2.4.20-r4 is released
+
+*bluez-utils-2.3 (27 Apr 2003)
+
+  27 Apr 2003; Peter Johanson <latexer@gentoo.org> bluez-utils-2.3.ebuild:
+  Bump. Bug #18571. Thanks to Loke <faune@broadpark.no>
+
+*bluez-utils-2.2 (20 Feb 2003)
+
+  20 Feb 2003; Peter Johanson <latexer@gentoo.org> bluez-utils-2.2.ebuild files/digest-bluez-utils-2.2 :
+  Version bump. Thanks to Patrik Kullman <patrik.kullman@netsafe.se>
+
+*bluez-utils-2.1 (08 Nov 2002)
+
+  08 Nov 2002; J Robert Ray <jrray@gentoo.org> :
+  New ebuild.

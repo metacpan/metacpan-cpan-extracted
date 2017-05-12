@@ -1,0 +1,90 @@
+{
+   "abstract" : "Git as versioned data store in Perl",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>",
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GitStore",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "Git::PurePerl" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Path::Class" : "0",
+            "Path::Tiny" : "0",
+            "Storable" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "lib" : "0",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "GitStore" : {
+         "file" : "lib/GitStore.pm",
+         "version" : "0.17"
+      },
+      "GitStore::Revision" : {
+         "file" : "lib/GitStore/Revision.pm",
+         "version" : "0.17"
+      },
+      "MooseX::Storage::IO::GitStore" : {
+         "file" : "lib/MooseX/Storage/IO/GitStore.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/perl-git-store/issues"
+      },
+      "homepage" : "https://github.com/yanick/perl-git-store",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/perl-git-store.git",
+         "web" : "https://github.com/yanick/perl-git-store"
+      }
+   },
+   "version" : "0.17",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Chris Forbes <chrisf@ijw.co.nz>"
+   ]
+}
+

@@ -1,0 +1,16 @@
+---
+abstract: "graph algorithms for graphs that aren\\'t necessarily fully specified"
+author:
+  - 'Jesse Luehrs <doy at tozt dot net>'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.091440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Graph-Implicit
+requires:
+  Heap::Fibonacci::Fast: 0
+  List::MoreUtils: 0
+  Test::Deep: 0
+  Test::More: 0
+version: 0.03

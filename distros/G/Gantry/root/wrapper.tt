@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<!-- <?xml version="1.0" encoding="utf-8"?> -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Gantry: [% view.title %]</title>
+		<link rel="stylesheet" type="text/css" media="screen"
+			title="Default" href="/style/default.css" />
+	
+		<script language="JavaScript">
+		function view_pod() {
+			location.href= 
+				document.getElementById("module").value;
+		}
+		</script>
+    </head>
+    <body id="timkeefer-com">
+	
+	<!-- START: top nav logo (using page element style) -->
+	<div class="page">
+		<img style="margin-bottom: -5px" width="740" src="/images/gantry_logo.png" alt="Tim Keefer Logo" />
+	</div>
+	<!-- END: top nav logo -->
+
+	<!-- START: top navigation -->
+	<div class="nav">
+		<div class="lowtech">Site Navigation:</div>	
+		<ul>
+			<li><a href="/">Home </a></li>
+
+			<li><a href="/mailinglists/">Mailing List</a></li>
+		</ul>
+	</div>
+	<!-- END: top navigation -->
+
+	<p><br /></p>
+	
+	<!-- START: top navigation -->
+	<div class="nav">
+		<div class="lowtech">Site Navigation:</div>	
+		<ul>
+			<li style="border-top: solid 1px #99d">
+			<a href="/cgi-bin/gantry">Gantry</a></li>
+			<li style="border-top: solid 1px #99d">
+			<a href="/cgi-bin/bigtop">Bigtop </a></li>
+		</ul>
+	</div>
+	<!-- END: top navigation -->
+
+	<!-- START: title bar -->
+	<div id="title">
+		<p style="text-align: left; float: left">
+			<select name="module" id="module">
+				<option value="[% self.location %]">
+					[% view.data.base_module %]
+				</option>
+
+				[%- FOREACH pm IN view.data.files %]
+                [%- pm = pm.replace( '^/', '' ) %]
+                [%- pm = pm.replace( '/', '::' ) %]
+                [%- pm = pm.replace( '\.pm$', '' ) %]
+
+                [%- NEXT IF pm.match( 'Model::' ) %]
+                [%- NEXT IF pm.match( '::ModelHelper' ) %]
+				[% myloc = self.location _ 'main/' _ pm %]
+
+                <option [% myloc == self.uri ? 'SELECTED' : '' %]
+					value="[% myloc %]">
+					[% view.data.base_module %]::[% pm %]
+                </option>
+
+            	[%- END %]
+				
+			</select>	
+			<input type="button" value="view" name="view"
+				onClick="view_pod()" />
+		</p>
+		<div style="float: right">
+		<form method="get" action="http://www.google.com/search">
+		<input name="num" value="10" type="hidden">
+		<input name="hl" value="en" type="hidden">
+
+		<input name="btnG" value="Google+Search" type="hidden">
+		<input name="as_sitesearch" value="usegantry.org" type="hidden">
+		<input name="safe" value="images" type="hidden">
+		
+		<p>
+			<input name="as_q" value="" size="10" type="text">
+			<input value="Search" type="submit">
+		</p>
+		</form>
+		</div>
+		<br style="clear: both" />
+	</div>
+	<!-- END: title bar -->
+
+	<!-- START: page -->
+	<div id="page">
+		<!-- START: content -->
+		<div id="content">
+			
+			<div class="one_of_one">	
+				
+				<div style="float: right">
+				<ul class="pod_links2">
+				<li style="background: #99d; color: #FFF;">
+				<a href="[% self.location %]main/[% view.data.module_name 
+					|| view.data.base_module %].pdf">PDF
+					<img src="/images/pdf.gif" alt="pdf" 
+					style="border: 0; margin-bottom: -2px" />
+					</a>
+				</li>
+				[%- FOREACH head IN view.data.headings %]
+				<li>[% head %]</li>
+				[%- END %]
+				</ul>
+				<ul class="pod_links2">
+				<li>
+			
+								</li> 
+
+</ul>
+				</div>
+		
+				[% content %]	
+			
+			</div>
+			
+			<br style="clear: both" />
+			
+		</div>
+		<!-- END: content -->
+	
+	</div>
+	<!-- END: page -->
+
+	<!-- START: footer -->
+	<div id="footer">
+		[% USE Date %]
+		<p>Page generated on [% Date.format(Date.now, "%A, %B %d, %Y at %l:%M
+%p") %]
+		[% IF r.user; "for $r.user"; END; %]
+		<br />
+			
+		This site is licensed under a 
+		<a rel="license" href="http://creativecommons.org/licenses/by/2.0/">
+		Creative Commons License</a>,<br />
+		except where otherwise noted.
+		<br />
+	
+		</p>
+	</div>
+	<!-- END: footer -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-249892-1";
+urchinTracker();
+</script>
+
+    </body>
+</html>
+

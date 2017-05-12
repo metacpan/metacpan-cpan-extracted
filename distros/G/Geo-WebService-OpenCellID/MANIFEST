@@ -1,0 +1,24 @@
+Changes
+lib/Geo/WebService/OpenCellID.pm
+lib/Geo/WebService/OpenCellID/Base.pm
+lib/Geo/WebService/OpenCellID/cell.pm
+lib/Geo/WebService/OpenCellID/measure.pm
+lib/Geo/WebService/OpenCellID/Response.pm
+lib/Geo/WebService/OpenCellID/Response/cell.pm
+lib/Geo/WebService/OpenCellID/Response/cell/get.pm
+lib/Geo/WebService/OpenCellID/Response/cell/getMeasures.pm
+lib/Geo/WebService/OpenCellID/Response/measure.pm
+lib/Geo/WebService/OpenCellID/Response/measure/add.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+scripts/example-cell-get.pl
+scripts/example-cell-getMeasures.pl
+scripts/example-measure-add.pl
+t/001_load.t
+t/002_get.t
+t/003_getMeasures.t
+t/004_add.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

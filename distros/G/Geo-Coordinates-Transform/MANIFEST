@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Geo-Coordinates-Transform.t
+lib/Geo/Coordinates/Transform.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,55 @@
+Gas-Prices version 0.0.1
+
+Gas::Prices - Perl Module to get the gas prices around a particular zip code
+
+It gets its data by scraping msn autos webpage.
+
+It retrieves a bunch of gas stations around the particular zip code, and for each gas station, it retrives the following data
+
+Example
+    
+    use Gas::Prices;
+    my $gp = new Gas::Prices("75023"); #or any other zip code
+    my @gas_stations = @{$gp->get_stations};
+    
+    foreach(@gas_stations)
+    {
+        print   "Station name:" . $_->{station_name} . "\n" .
+        "Station address:" . $_->{station_address} . "\n" .
+	"Unleaded price:" . $_>{unleaded_price} . "\n" .
+	"Unleaded date:" . $_->{unleaded_date} . "\n" .
+	"Plus price:" . $_->{plus_price} . "\n" .
+	"Plus date:" . $_->{plus_date} . "\n" .
+	"Premium price:" . $_->{premium_price} . "\n" .
+	"Premium_date:" . $_->{premium_date} . "\n" .
+	"Diesel price:" . $_->{diesel_price} . "\n" .
+	"Diesel date:" . $_->{diesel_date} . "\n";
+    }
+    
+    my $cheapest_unleaded = $gp->get_cheapest_station("unleaded");
+    Print the cheapest unleaded grade gas near 75023 is " . $cheapest_unleaded{station_name} . " at " . $cheapest_unleaded->{station_address} . ' for $' . $cheapest_unleaded->{unleaded_price} . "/gallon.";
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Ashish Kasturia
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

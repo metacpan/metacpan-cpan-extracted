@@ -1,0 +1,62 @@
+{
+   "abstract" : "Show the working tree status",
+   "author" : [
+      "Jakob Voß"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Git-Repository-Plugin-Status",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.037"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Git::Repository" : "1.3"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nichtich/Git-Repository-Plugin-Status/issues"
+      },
+      "homepage" : "https://github.com/nichtich/Git-Repository-Plugin-Status",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nichtich/Git-Repository-Plugin-Status.git",
+         "web" : "https://github.com/nichtich/Git-Repository-Plugin-Status"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Jakob Voss <jakob@nichtich.de>",
+      "Jakob Voss <voss@gbv.de>",
+      "Michael G. Schwern <schwern@pobox.com>"
+   ]
+}
+

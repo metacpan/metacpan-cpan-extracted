@@ -1,0 +1,46 @@
+digraph graph_10
+{
+	node [shape = "record"]
+
+	edge [color = "blue" penwidth = 1]
+
+	node_10_01 [label = "<p11> left|<p12> middle|<p13> right"]
+
+	node_10_02 [label = "<p21> one|<p22> two"]
+
+	node_10_01:p12:n -> node_10_02:p22
+	[
+		arrowtail = "empty"
+		arrowhead = "halfopen"
+		dir       = "both"
+	]
+
+	node_10_01:p13 -> node_10_02:p22:s
+	[
+		arrowtail = "invdot"
+		arrowhead = "dot"
+		color     = green
+		dir       = "both"
+	]
+
+	node_10_01:p13:ne -> node_10_02:p21:s
+	[
+		arrowtail = "crow"
+		arrowhead = "tee"
+		color     = red
+		dir       = "both"
+	]
+
+	node_10_03 [label = "<p11> big|<p12> medium|<p13> small"]
+
+	node_10_04 [label = "<p21> huge|<p22> tiny"]
+
+	"node_10_03":p11 -> "node_10_04":p22:s
+	[
+		arrowhead = "odiamond";
+		arrowtail = "odot",
+		color     = red
+		dir       = both;
+	];
+
+}

@@ -1,0 +1,15 @@
+BUGS
+CHANGES
+MANIFEST
+Makefile.PL
+README
+boxplot.pm
+samples/Makefile
+samples/sample01.pl
+samples/sample02.pl
+samples/sample03.pl
+samples/sample04.pl
+samples/sample05.pl
+t/boxplot.gif
+t/boxplot.t
+t/ff.pl

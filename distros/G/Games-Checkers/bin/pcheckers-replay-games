@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+
+# Games::Checkers, Copyright (C) 1996-2012 Mikhael Goikhman, migo@cpan.org
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Try --help for usage.
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use Games::Checkers::PDNParser;
+use Games::Checkers::Game;
+
+my $script_name = ($0 =~ m:([^/]+)$:, $1);
+my $pause = 1;
+my $break = 10;
+my $game_start = 1;
+my $use_term = 0;  # 0 means detect automatically
+my $dumb_term = 0;
+my $dumb_chars = 0;
+my $fullscreen = 0;
+
+sub show_help (;$) {
+	my $is_error = shift || 0;
+	my $out = $is_error ? \*STDERR : \*STDOUT;
+	my $usage = qq{
+		Usage: $script_name [OPTIONS] file.pdn
+		The automatic replay of recorded Checkers games from PDN file.
+
+		Options:
+			-h --help          show this help and exit
+			-p --pause N       pause in seconds between the moves ($pause sec)
+			-b --break N       pause in seconds between the games ($break sec)
+			-s --start N       skip N-1 games, start with N's game
+			-t --use-term      use terminal even if graphical frontend is available
+			-T --dumb-term     do not position terminal cursor
+			-C --dumb-chars    do not use fancy drawing characters
+			-f --fullscreen    start in fullscreen mode (incompatible with -t)
+	};
+	$usage =~ s/^\n//; $usage =~ s/^\t\t?//mg;
+	print $out $usage;
+	exit $is_error;
+}
+
+GetOptions(
+	"h|help"        => sub { show_help(0) },
+	"p|pause=i"     => \$pause,
+	"b|break=i"     => \$break,
+	"s|start=i"     => \$game_start,
+	"t|use-term!"   => \$use_term,
+	"T|dumb-term!"  => \$dumb_term,
+	"C|dumb-chars!" => \$dumb_chars,
+	"f|fullscreen!" => \$fullscreen,
+) || show_help(1);
+
+my %result_string = (
+	'1-0' => "Black resigned",
+	'0-1' => "White resigned",
+	'1/2-1/2' => "Draw is agreed",
+);
+
+my $games_dir = "$FindBin::Bin/../data/games";
+$games_dir = "$FindBin::Bin/../share/pcheckers/games"
+	unless -d $games_dir;
+my $filename = shift;
+$filename = "default/default.pdn" if !$filename && -t;
+$filename ||= "-" unless -t;
+show_help() unless $filename;
+$filename = "$games_dir/$filename" if $filename =~ m!^\w+\/[^\/]+$!;
+
+$ENV{ITALIAN_BOARD_NOTATION} = 1 if $filename =~ m!/italian/!;
+
+my $pdn_parser = Games::Checkers::PDNParser->new($filename);
+
+my $game_count = 0;
+while (my $pdn_record = $pdn_parser->next_record) {
+	$game_count++;
+	next if $game_count < $game_start;
+	my ($move_verge_trios, $values) = @$pdn_record;
+
+	my $game = Games::Checkers::Game->new(
+		title => ($values->{White} || "???") . ' - ' . ($values->{Black} || "???"),
+		description => join("\n", map {
+			$values->{$_} ? "$_: $values->{$_}" : ()
+		} qw(Event Site Date Round Game)),
+		use_term => $use_term,
+		dumb_term => $dumb_term,
+		dumb_chars => $dumb_chars,
+		fullscreen => $fullscreen,
+	);
+
+	$game->show_board;
+
+	while (@$move_verge_trios) {
+		$game->sleep($pause);
+
+		my $move_verge_trio = shift @$move_verge_trios;
+		my ($is_beat, $src, $dst) = @$move_verge_trio;
+
+		my $move = $game->create_move($is_beat, $src, $dst);
+		die "Corrupt game #$game_count record? Move ($src, $dst) can't be created\n"
+			unless $move;
+
+		$game->show_move($move);
+		$game->show_board;
+	}
+
+	my $result = $values->{Result} || "";
+	$game->show_result($result_string{$result} || "Unknown result ($result)");
+	$game->sleep($break);
+}

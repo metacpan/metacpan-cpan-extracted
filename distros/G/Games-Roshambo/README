@@ -1,0 +1,116 @@
+NAME
+    Games::Roshambo - Perl OO Rock/Paper/Scissors
+
+VERSION
+    This document describes Games::Roshambo version 1.01
+
+SYNOPSIS
+            #!/usr/bin/perl
+
+            use Games::Roshambo;
+
+            my $rps = Games::Roshambo->new();
+
+            print $rps->judge("rock") . "\n";
+            print $rps->judge("scissors", "rock") . "\n";
+
+DESCRIPTION
+    This module manages a game of Rock/Paper/Scissors, aka Roshambo
+    <http://en.wikipedia.org/wiki/Rock,_Paper,_Scissors>
+
+INTERFACE
+    "new(...)"
+        You can specify an optional hashref containing configuration items.
+
+        Valid configuration items are:
+
+        "numthrows"
+            The number of separate valid throws for a game, for example, in
+            Rock, Paper, Scissors, there are 3 throws, while in a spirited
+            game of RPS-101, there are 101 valid throws. If not specified,
+            this defaults to 3.
+
+        "sortable"
+            OPTIONAL: Behold the madness of Chris Prather. Passing a TRUE
+            value to "new" for this item will cause the "judge" method to
+            return values of -1 if Player 1 wins, 0 for a tie and 1 for
+            Player 2, instead of the 0, 1 and 2 it does normally.
+
+            The entirely dubious benefit of this is that the function can be
+            used in conjunction with "sort". It's his fault. He asked for
+            it. Any questions as to the relative usefulness of this should
+            be directed at him. The management disavows all knowledge.
+
+    "judge(...)"
+        This method will judge a game of RPS, returning a 1 for Player 1
+        winning, a 2 for Player 2, and a 0 for a tie. (See the "sortable"
+        option to "new" above for a twist.)
+
+        It takes up to two arguments, indicating the throws for Player 1 and
+        Player 2, as text representations.
+
+        If one or both arguments are omitted, the method will internally
+        call $self->gen_throw to randomly generate one.
+
+    "getaction"
+        When called with two throws, this will return the text of the action
+        for this combination. For example, if called as
+        "$rps-"getaction("rock", "paper")> the returned value will be
+        "covers".
+
+        This module contains actions for three throw (Rock, Paper, Scissors)
+        and 101 throw games, in any other number of throws, this method will
+        return undef.
+
+DEPENDENCIES
+    None.
+
+RPS-101
+    This module exists solely because I was trying to come up with an
+    algorithmic method of judging a game of RPS-101.
+    <http://www.umop.com/rps101.htm>.
+
+    David Lovelace has done a bang-up job, some would say to the point of
+    obsession, in defining the throws and actions of a game of Roshambo with
+    101 separate throws. The throw names and actions defined in this module
+    are taken from his set of definitions.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-acme-rps@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Chris Thompson <cpan@cthompson.com>
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008, Chris Thompson <cpan@cthompson.com>. All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

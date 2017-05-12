@@ -1,0 +1,24 @@
+Description
+ - GraphViz::Data::Structure produces simple and elegant visualizations
+   of Perl data structures using Leon Brocard's GraphViz module.
+
+Copyright
+ - GraphViz::Data::Structure is copyright (c) 2001-2002 by Joe McMahon.
+   All rights reserved. This program is free software; you can redistribute 
+   it and/or modify it under the same terms as Perl itself. 
+
+Prerequisites
+ - Test::More for running the test suite
+ - GraphViz for actually rendering the graphs
+
+Building it
+ - You should be able to use a standard build sequence:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   If you want to install it in your own library, do
+
+   perl Makefile.PL PREFIX=~

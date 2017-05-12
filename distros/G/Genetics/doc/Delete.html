@@ -1,0 +1,249 @@
+<HTML>
+<HEAD>
+<TITLE>Delete.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#inheritance">Inheritance</A></LI>
+	<LI><A HREF="#public methods">Public Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#deletecluster">deleteCluster</A></LI>
+		<LI><A HREF="#deletesubject">deleteSubject</A></LI>
+		<LI><A HREF="#deletekindred">deleteKindred</A></LI>
+		<LI><A HREF="#deletemarker">deleteMarker</A></LI>
+		<LI><A HREF="#deletesnp">deleteSNP</A></LI>
+		<LI><A HREF="#deletegenotype">deleteGenotype</A></LI>
+		<LI><A HREF="#deletestudyvariable">deleteStudyVariable</A></LI>
+		<LI><A HREF="#deletephenotype">deletePhenotype</A></LI>
+		<LI><A HREF="#deletefrequencysource">deleteFrequencySource</A></LI>
+		<LI><A HREF="#deletehtmarkercollection">deleteHtMarkerCollection</A></LI>
+		<LI><A HREF="#deletehaplotype">deleteHaplotype</A></LI>
+		<LI><A HREF="#deletednasample">deleteDNASample</A></LI>
+		<LI><A HREF="#deletetissuesample">deleteTissueSample</A></LI>
+		<LI><A HREF="#deletemap">deleteMap</A></LI>
+	</UL>
+
+	<LI><A HREF="#private methods">Private methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#_deleteobjectdata">_deleteObjectData</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::API::DB::Delete</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Genetics::API ;</PRE>
+<PRE>
+  $api = new Genetics::API(DSN =&gt; {driver =&gt; &quot;mysql&quot;,
+                                   host =&gt; $Host,
+                                   database =&gt; $Database},
+                           user =&gt; $UserName,
+                           password =&gt; $Password) ;</PRE>
+<PRE>
+  foreach $id (@badGenotypeIDs ) {
+    $rv = $api-&gt;deleteGenotype($id) ;
+    defined $rv or print &quot;Error deleting Genotype w/ ID $id\n&quot; ;
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Genetics::API::DB packages provide an interface for the manipulation of 
+GenPerl objects in a relational database.  This package contains the methods 
+for deleting objects from the database.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+ strict             Just to be anal
+ vars               Global variables
+ Carp               Error reporting</PRE>
+<P>
+<HR>
+<H1><A NAME="inheritance">Inheritance</A></H1>
+<PRE>
+ Exporter           Make methods available to importing packages</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public Methods</A></H1>
+<P>
+<H2><A NAME="deletecluster">deleteCluster</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::Cluster object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletesubject">deleteSubject</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::Subject object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="deletekindred">deleteKindred</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::Kindred object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletemarker">deleteMarker</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::Marker object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletesnp">deleteSNP</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::SNP object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletegenotype">deleteGenotype</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::Genotype object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletestudyvariable">deleteStudyVariable</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::StudyVariable object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletephenotype">deletePhenotype</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::Phenotype object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletefrequencysource">deleteFrequencySource</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::FrequencySource object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletehtmarkercollection">deleteHtMarkerCollection</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::HtMarkerCollection object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletehaplotype">deleteHaplotype</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::Haplotype object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletednasample">deleteDNASample</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::DNASample object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletetissuesample">deleteTissueSample</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::TissueSample object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="deletemap">deleteMap</A></H2>
+<PRE>
+  Function  : Delete a Genetics::Object::Map object from the database.
+  Argument  : The id of the object to be deleted.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<HR>
+<H1><A NAME="private methods">Private methods</A></H1>
+<P>
+<H2><A NAME="_deleteobjectdata">_deleteObjectData</A></H2>
+<PRE>
+  Function  : Delete data common to all Genetics::Object objects to the database.
+  Argument  : A Genetics::Object ID.
+  Returns   : 1 on success, undef otherwise.
+  Scope     : Private
+  Called by : The various deleteObjectSubClass methods.</PRE>
+
+</BODY>
+
+</HTML>

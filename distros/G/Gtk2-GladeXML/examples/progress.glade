@@ -1,0 +1,252 @@
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+
+<glade-interface>
+
+<widget class="GtkWindow" id="main">
+  <property name="visible">True</property>
+  <property name="title" translatable="yes">Progress Example</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="modal">False</property>
+  <property name="default_width">300</property>
+  <property name="default_height">200</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <signal name="delete_event" handler="on_main_delete_event" last_modification_time="Tue, 18 Nov 2003 04:26:43 GMT"/>
+  <signal name="destroy_event" handler="on_main_delete_event" last_modification_time="Tue, 18 Nov 2003 04:26:54 GMT"/>
+
+  <child>
+    <widget class="GtkVBox" id="main_vbox">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">4</property>
+
+      <child>
+	<widget class="GtkHBox" id="top_hbox">
+	  <property name="visible">True</property>
+	  <property name="homogeneous">False</property>
+	  <property name="spacing">0</property>
+
+	  <child>
+	    <widget class="GtkProgressBar" id="nw_progressbar">
+	      <property name="visible">True</property>
+	      <property name="orientation">GTK_PROGRESS_BOTTOM_TO_TOP</property>
+	      <property name="fraction">0</property>
+	      <property name="pulse_step">0.1</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">8</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkProgressBar" id="ne_progressbar">
+	      <property name="visible">True</property>
+	      <property name="orientation">GTK_PROGRESS_BOTTOM_TO_TOP</property>
+	      <property name="fraction">0</property>
+	      <property name="pulse_step">0.1</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">8</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">4</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkHBox" id="mid_hbox">
+	  <property name="visible">True</property>
+	  <property name="homogeneous">False</property>
+	  <property name="spacing">0</property>
+
+	  <child>
+	    <widget class="GtkProgressBar" id="w_progressbar">
+	      <property name="visible">True</property>
+	      <property name="orientation">GTK_PROGRESS_LEFT_TO_RIGHT</property>
+	      <property name="fraction">0</property>
+	      <property name="pulse_step">0.1</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">8</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkProgressBar" id="e_progressbar">
+	      <property name="visible">True</property>
+	      <property name="orientation">GTK_PROGRESS_RIGHT_TO_LEFT</property>
+	      <property name="fraction">0</property>
+	      <property name="pulse_step">0.1</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">8</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">4</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkHBox" id="bottom_hbox">
+	  <property name="visible">True</property>
+	  <property name="homogeneous">False</property>
+	  <property name="spacing">0</property>
+
+	  <child>
+	    <widget class="GtkProgressBar" id="sw_progressbar">
+	      <property name="visible">True</property>
+	      <property name="orientation">GTK_PROGRESS_TOP_TO_BOTTOM</property>
+	      <property name="fraction">0</property>
+	      <property name="pulse_step">0.1</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">8</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkProgressBar" id="se_progressbar">
+	      <property name="visible">True</property>
+	      <property name="orientation">GTK_PROGRESS_TOP_TO_BOTTOM</property>
+	      <property name="fraction">0</property>
+	      <property name="pulse_step">0.1</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">8</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">4</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkHScale" id="scale">
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="draw_value">True</property>
+	  <property name="value_pos">GTK_POS_BOTTOM</property>
+	  <property name="digits">0</property>
+	  <property name="update_policy">GTK_UPDATE_CONTINUOUS</property>
+	  <property name="inverted">False</property>
+	  <property name="adjustment">0 0 110 1 10 10</property>
+	  <signal name="format_value" handler="on_scale_format_value" last_modification_time="Tue, 18 Nov 2003 04:28:05 GMT"/>
+	  <signal name="move_slider" handler="on_scale_move_slider" last_modification_time="Tue, 18 Nov 2003 04:28:10 GMT"/>
+	  <signal name="value_changed" handler="on_scale_value_changed" last_modification_time="Tue, 18 Nov 2003 04:28:17 GMT"/>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkHSeparator" id="hseparator">
+	  <property name="visible">True</property>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkHButtonBox" id="hbuttonbox">
+	  <property name="visible">True</property>
+	  <property name="layout_style">GTK_BUTTONBOX_DEFAULT_STYLE</property>
+	  <property name="spacing">0</property>
+
+	  <child>
+	    <widget class="GtkButton" id="decrement_button">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <signal name="clicked" handler="on_decrement_button_clicked" last_modification_time="Tue, 18 Nov 2003 04:06:03 GMT"/>
+
+	      <child>
+		<widget class="GtkImage" id="image2">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-remove</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="quit_button">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-quit</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <signal name="clicked" handler="on_quit_button_clicked" last_modification_time="Tue, 18 Nov 2003 04:05:51 GMT"/>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="increment_button">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <signal name="clicked" handler="on_increment_button_clicked" last_modification_time="Tue, 18 Nov 2003 04:06:19 GMT"/>
+
+	      <child>
+		<widget class="GtkImage" id="image1">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-add</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+</glade-interface>

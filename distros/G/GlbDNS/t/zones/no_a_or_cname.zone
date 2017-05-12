@@ -1,0 +1,19 @@
+
+
+$ORIGIN example.local.
+
+
+600 IN SOA ns1.example.local. dnsmaster.example.local. 2009012605 1200 120 1209600 1
+
+86400 IN NS ns1.example.local
+86400 IN NS ns2.example.local
+86400 IN NS ns3.example.local
+86400 IN NS ns4.example.local
+
+
+geo 86400 IN CNAME london
+geo 86400 IN CNAME sjc
+
+
+sjc 86400 IN LOC 37 00 00.000 N 121 00 00.000 W 0.00m 0.00m 0.00m 0.00m
+london 86400 IN LOC 51 00 00.000 N 0 00 00.000  W 0.00m 0.00m 0.00m 0.00m

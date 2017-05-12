@@ -1,0 +1,70 @@
+{
+   "abstract" : "Interface to the Pelmanism (Pair) Card Game.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Cards-Pair",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Memoize" : "1.01",
+            "List::MoreUtils" : "0.33",
+            "List::Util" : "1.19",
+            "Moo" : "2.000000",
+            "Term::Screen::Lite" : "0",
+            "Type::Tiny" : "1.000005",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Games::Cards::Pair" : {
+         "file" : "lib/Games/Cards/Pair.pm",
+         "version" : "0.16"
+      },
+      "Games::Cards::Pair::Card" : {
+         "file" : "lib/Games/Cards/Pair/Card.pm",
+         "version" : "0.16"
+      },
+      "Games::Cards::Pair::Params" : {
+         "file" : "lib/Games/Cards/Pair/Params.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Games-Cards-Pair.git",
+         "web" : "https://github.com/manwar/Games-Cards-Pair"
+      }
+   },
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

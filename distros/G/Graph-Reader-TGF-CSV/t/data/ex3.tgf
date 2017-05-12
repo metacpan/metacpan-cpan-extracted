@@ -1,0 +1,4 @@
+1 "label=Node #1",color=red
+2 label=Node #2,color=green
+#
+1 2 "label="Edge",color=cyan

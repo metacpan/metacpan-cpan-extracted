@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Graph-GML.t
+lib/Graph/GML.pm
+META.yml                                 Module meta-data (added by MakeMaker)

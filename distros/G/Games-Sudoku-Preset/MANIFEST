@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Games/Sudoku/Preset.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/verify_noerr.t
+t/verify_toolong.t
+xt/manifest.t
+Makefile.PL
+META.yml
+META.json

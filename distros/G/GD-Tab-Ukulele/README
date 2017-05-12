@@ -1,0 +1,51 @@
+NAME
+    GD::Tab::Ukulele - Ukulele tab image generator.
+
+VERSION
+    This document describes GD::Tab::Ukulele version 0.0.1
+
+SYNOPSIS
+        use GD::Tab::Ukulele;
+        my $uk = GD::Tab::Ukulele->new;
+ 
+        # print png image
+        print $uk->chord('D#sus4')->png;
+
+        # get GD::Image instance
+        my $im = $uk->chord('C');
+        print $im->png;
+
+        # other tab generate
+        $uk->generate('D7',[0,2,0,2])->png;
+
+        # set color
+        $uk->color(255, 0, 0);
+
+        # set background-color and no interlace
+        $uk->bgcolor(200, 200, 200);
+        $uk->interlaced(0);
+
+        # all tabs image save to file.
+        use IO::File;
+        for my $chord (@{$uk->all_chords}) {
+            (my $filename = $chord) =~ s/M/Maj/; # for case-insensitive filesystem
+            my $file = IO::File->new("images/$filename.png", 'w');
+            $file->print($uk->chord($chord)->png);
+        }
+
+DESCRIPTION
+    This modules is generate ukulele tab.
+
+AUTHOR
+    Yuichi Tateno "<hotchpotch@gmail.com>"
+
+SEE ALSO
+    GD
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2006, Yuichi Tateno "<hotchpotch@gmail.com>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

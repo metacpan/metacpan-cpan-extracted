@@ -1,0 +1,78 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Games::Sudoku::General;
+use Getopt::Long;
+
+my $usage = <<eod;
+
+Solve a Sudoku puzzle.
+
+usage: solver [options]
+
+The puzzle comes in from standard input unless -demo is asserted,
+which solves the appended puzzle.
+
+The options are:
+ -demo
+  solves a canned puzzle;
+ -help
+  gets you this text.
+
+The puzzle data may optionally be preceded by lines reading
+
+ -set attribute value
+
+to modify the Games::Sudoku::General object before solving the puzzle.
+The allowed_symbols attribute is not well supported by the parser.
+Sorry about that.
+
+eod
+
+my %opt;
+
+GetOptions (\%opt, qw{demo help}) or die $usage;
+
+$opt{help} and do {print $usage; exit};
+
+my $su = Games::Sudoku::General->new ();
+
+my $fh = $opt{demo} ? *DATA : *STDIN;
+
+my $puzzle = '';
+print "\nInput:\n";
+while (<$fh>) {
+    print;
+    next if m/^\s*$/ || m/^\s*#/;
+    my ($name, $value) = m/^\s*-set\s+(\S+)\s+(.*)/ or do {
+	$puzzle .= $_;
+	next;
+    };
+    chomp $value;
+    $su->set ($name, $value);
+}
+
+$su->problem ($puzzle);
+
+print "\nSolution:\n";
+if (my $soln = $su->solution ()) {
+    print $soln, "\nConstraints used: ", scalar $su->constraints_used, "\n";
+} else {
+    print "No solution found.\n";
+}
+__DATA__
+# The following -set is optional, since this is the default setting.
+-set sudoku 3
+
+# Spaces are optional in the following, as are line breaks.
+...4..789
+4.6...1..
+.8.....5.
+2.4..5...
+.95......
+6..9.2.4.
+.3..7.9.8
+.67......
+9....8..2

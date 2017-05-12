@@ -1,0 +1,35 @@
+---
+round: 1
+week: 16
+text: t/emile/activities.yaml
+not folded:
+activity:
+  citrus:
+    0:
+      - men
+      - women
+pair:
+#  0:
+#    Black: 222
+#    White: 1
+#  1:
+#    Black: 34113
+#    White: 223
+  0:
+    White: 222
+    Black: 1
+  1:
+    White: 34113
+    Black: 223
+  2:
+    Bye: S09413
+forfeit:
+  - 34113
+tardy:
+  - 1
+#  men:
+#    Black: 34113
+#    White: 1
+#  women:
+#    Black: S09413
+#    White: 222

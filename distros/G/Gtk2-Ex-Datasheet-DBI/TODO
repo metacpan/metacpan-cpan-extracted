@@ -1,0 +1,41 @@
+Things, to do, in order of priority:
+
+
+----------------------------------------------------------------------------------------------------
+
+Changes to complete before releasing this version ...
+
+- Check make test and cpan stuff
+
+----------------------------------------------------------------------------------------------------
+
+
+Changes for a later version ...
+
+- Create a 'date' definition hash, similar to the number definition hash
+	- Call builtin_render_functions internally, but remove references to this in documentation
+	- Make sure date definition hash matches the one from Gtk2::Ex::DBI
+
+-  *** CellRendererTime - 1st use doesn't receive cell data ( all successive uses do )
+
+- Set up dynamic width columns in 'flying blind' mode.
+
+- Support italic formatting of cells
+    I've never wanted it myself, but it should be in for completeness ...
+
+- Push customer cell renderers out into another project :) Maybe Gtk2::Ex
+    They would be handy for other people to use. Maybe they're already there? Investigate
+
+- Add support for calculated fields
+	- Already supported via custom_render_function ??? Investigate with some test cases
+
+- Enforce database field definitions for char, varchar length
+
+- Add record paging similar to Gtk2::Ex::DBI for huge results
+    - How do we do this?
+
+- Support detecting primary keys for more DB servers
+
+- Watch for support for the new CellRendererSpinButton, which has just made it into Gtk2 stock :)
+
+- Figure out what's up with blocking the size_allocate signal

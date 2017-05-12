@@ -1,0 +1,28 @@
+(define-boxed GdkPixbuf
+  gdk_pixbuf_ref
+  gdk_pixbuf_unref)
+
+(define-boxed GdkPixbufAnimation
+  gdk_pixbuf_animation_ref
+  gdk_pixbuf_animation_unref)
+
+(define-enum GdkPixbufFrameAction
+  (retain GDK_PIXBUF_FRAME_RETAIN)
+  (dispose GDK_PIXBUF_FRAME_DISPOSE)
+  (revert GDK_PIXBUF_FRAME_REVERT))
+
+(define-enum GdkPixbufAlphaMode
+  (bilevel GDK_PIXBUF_ALPHA_BILEVEL)
+  (full GDK_PIXBUF_ALPHA_FULL))
+
+(define-enum GdkInterpType
+  (nearest GDK_INTERP_NEAREST)
+  (tiles GDK_INTERP_TILES)
+  (bilinear GDK_INTERP_BILINEAR)
+  (hyper GDK_INTERP_HYPER))
+
+(define-enum GdkColorspace
+  (rgb GDK_COLORSPACE_RGB))
+
+(define-object GdkPixbufLoader (GtkObject))
+

@@ -1,0 +1,59 @@
+google-apps
+-----------
+
+Command line tool to manage Google Apps via API 2.0.
+
+Write new commands
+------------------
+
+Create file under lib/GoogleApps/Command/ (like retrieve.pm)
+
+see:
+* how to write App::Cmd commands http://metacpan.org/module/MooseX::App::Cmd::Command)
+* how to manage with Google API http://search.cpan.org/~rsmith/VUser-Google-Api-1.0.1/
+* if needed see Google API doc http://developers.google.com/google-apps/provisioning/auth
+
+Running tests
+-------------
+
+$ prove -lr t
+
+or
+
+$ dzil test
+
+dzil will build package before run tests.
+
+Generating Debian PKG
+---------------------
+
+Update debian/changelog
+
+$ dch -v <version number>
+
+Install Perl Module Dist::Zilla::Deb
+
+$ dzil debuild
+
+package will be generated under debuild directory
+
+Bug/Issue tracking
+------------------
+
+Install 'ticgit' to see the list of issues. Ticgit is a issue tracking system
+built on top of Git.
+
+$ ti list
+
+Releasing new version to CPAN
+-----------------------------
+
+Before release, delete any untracked files, then:
+
+$ dzil release
+
+It will:
+
+* run tests
+* build a tarball
+* upload to the CPAN

@@ -1,0 +1,91 @@
+NAME
+
+    Game::Tibia::Packet - Session layer support for the MMORPG Tibia
+
+SYNOPSIS
+
+        use Game::Tibia::Packet;
+    
+        # decrypt Tibia packet
+        my $read; my $ret = $sock->recv($read, 1024);
+        my $res = Game::Tibia::Packet->new(packet => $read, xtea => $xtea_key);
+        $packet_type = unpack('C', $res->payload);
+    
+    
+        # encrypt a Tibia speech packet
+        my $p = Game::Tibia::Packet->new;
+        $p->payload .= pack("C S S S/A S C SSC S/A",
+            0xAA, 0x1, 0x0, "Perl", 0, 1, 1, 1, 8,
+            "Game::Tibia::Packet says Hi!\n:-)");
+        $sock->send($p->finalize($xtea_key}))
+
+DESCRIPTION
+
+    Methods for constructing Tibia Gameserver (XTEA) packets. Handles
+    checksum calculation and symmetric encryption depending on the
+    requested Tibia version.
+
+    Tested working with Tibia 8.1, but will probably work with other
+    protocol versions too.
+
+METHODS AND ARGUMENTS
+
+    new([packet => $payload, xtea => $xtea, version => 860])
+
+      Constructs a new Game::Tibia::Packet instance. If payload and XTEA
+      are given, the payload will be decrypted and trimmed to correct size.
+      version argument defaults to 860.
+
+    isValid($packet)
+
+      Checks if packet's adler32 digest matches (A totally unnecessary
+      thing on Cipsoft's part, as we already have TCP checksum. Why hash
+      again?)
+
+    payload() : lvalue
+
+      returns the payload as lvalue (so you can concat on it)
+
+    finalize([$XTEA_KEY])
+
+      Finalizes the packet. XTEA encrypts, prepends checksum and length.
+
+    version($version)
+
+      Returns a hash reference with size information about a protocol
+      version. For example, for 860 it returns:
+
+          {XTEA => 16, RSA => 128, ADLER32 => 4, ACCNUM => 0, GET_CHARLIST => 147, LOGIN_CHAR => 135}
+
+      Sizes are in bytes.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Game-Tibia-Packet
+
+SEE ALSO
+
+    The protocol was reverse engineered as part of writing my Tibia
+    Wireshark Plugin <https://github.com/a3f/Tibia-Wireshark-Plugin>.
+
+    Game::Tibia::Packet::Login
+
+    Game::Tibia::Packet::Charlist
+
+    http://tpforums.org/forum/forum.php http://tibia.com
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+DISCLAIMER
+
+    Tibia is copyrighted by Cipsoft GmbH.
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

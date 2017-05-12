@@ -1,0 +1,12 @@
+Examples (skeletons) for applications that use Getopt::Long.
+
+skel1.pl: simple, straightforward use of Getopt::Long.
+
+skel2.pl: Using Getopt::Long with Pod::Usage.
+
+skel3.pl: Using Getopt::Long with built-in Help and Version messages.
+
+skel4.pl: Extended framework with Getopt::Long, config files, and so
+          on. 
+
+

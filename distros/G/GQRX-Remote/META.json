@@ -1,0 +1,39 @@
+{
+   "abstract" : "Control Gqrx using the Remote Control protocol",
+   "author" : [
+      "Doug Haber <dhaber@node99.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GQRX-Remote",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0.1"
+}

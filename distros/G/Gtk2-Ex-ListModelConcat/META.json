@@ -1,0 +1,55 @@
+{
+   "abstract" : "Concatenate list models in Gtk2-Perl.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-Ex-ListModelConcat",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Glib::Ex::SignalIds" : "0",
+            "Glib::Object::Subclass" : "0",
+            "Gtk2" : "1.201",
+            "Gtk2::Ex::TreeModel::ImplBits" : "17",
+            "Scalar::Util" : "1.18",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/gtk2-ex-listmodelconcat/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "11",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

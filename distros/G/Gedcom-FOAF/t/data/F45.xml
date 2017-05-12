@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:bio="http://purl.org/vocab/bio/0.1/">
+  <foaf:Group rdf:about="F45.xml#F45">
+    <rdfs:label>The Family of James Robert Bruce Ogilvy and Julia Rawlinson</rdfs:label>
+    <rdf:type rdf:resource="http://xmlns.com/wordnet/1.6/Family"/>
+    <bio:Marriage>
+      <bio:date>AFT    1989</bio:date>
+    </bio:Marriage>
+    <foaf:member rdf:resource="I72.xml#I72"/>
+    <foaf:member rdf:resource="I73.xml#I73"/>
+  </foaf:Group>
+  <foaf:Person rdf:about="I72.xml#I72">
+    <foaf:name>James Robert Bruce Ogilvy</foaf:name>
+    <rdfs:seeAlso rdf:resource="I72.xml#I72"/>
+  </foaf:Person>
+  <foaf:Person rdf:about="I73.xml#I73">
+    <foaf:name>Julia Rawlinson</foaf:name>
+    <rdfs:seeAlso rdf:resource="I73.xml#I73"/>
+  </foaf:Person>
+</rdf:RDF>

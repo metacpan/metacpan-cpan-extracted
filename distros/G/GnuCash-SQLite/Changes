@@ -1,0 +1,26 @@
+Revision history for Perl module GnuCash::SQLite.
+
+0.06 20 May 2015
+    - Use Test::Number::Delta for checking numeric values in tests
+
+0.05 17 May 2015
+    - add required module DBD::SQLite in Makefile
+
+0.04 25 Jan 2015
+    - added "is_locked" function to check is SQLite db is locked by another
+      application.
+
+0.03 22 Jan 2015
+    - test now work in various timezones
+
+0.02  16 Jun 2014
+	- use full words instead of variables in interface
+		- e.g. account_balance instead of acct_bal, See below:
+        - http://bit.ly/1sV5vej
+        - http://bit.ly/1vihVE3
+        - http://c2.com/cgi/wiki?GoodVariableNames
+
+0.01  14 Jun 2014
+	- original version; created by h2xs 1.23 with options
+		-XAn GnuCash::SQLite
+

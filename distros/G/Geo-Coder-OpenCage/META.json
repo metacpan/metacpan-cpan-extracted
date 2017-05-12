@@ -1,0 +1,61 @@
+{
+   "abstract" : "Geocode addresses with the OpenCage Geocoder API",
+   "author" : [
+      "edf <edf@opencagedata.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-Coder-OpenCage",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.26",
+            "HTTP::Tiny" : "0.028",
+            "JSON" : "2.53",
+            "List::MoreUtils" : "0.33",
+            "Pod::Perldoc" : "3.21",
+            "URI" : "1.60"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.32",
+            "Test::More" : "0.92",
+            "Test::Pod" : "1.51"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::Coder::OpenCage" : {
+         "file" : "lib/Geo/Coder/OpenCage.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage/issues"
+      },
+      "homepage" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage.git",
+         "web" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+}
+

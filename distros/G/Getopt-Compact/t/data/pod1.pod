@@ -1,0 +1,30 @@
+
+=pod
+
+=head1 NAME
+
+Pod data
+
+=head1 SYNOPSIS
+
+This is test data
+
+=head1 DESCRIPTION
+
+Foo.
+
+Bar
+
+=over 4
+
+=item foo
+
+=item gah
+
+=back
+
+=head1 AUTHOR
+
+Andrew Stewart Williams
+
+=cut

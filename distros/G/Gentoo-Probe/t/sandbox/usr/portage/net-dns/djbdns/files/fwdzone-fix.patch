@@ -1,0 +1,11 @@
+--- dnscache-setup.old	2004-05-23 06:06:55.236468624 -0500
++++ dnscache-setup	2004-05-23 06:07:41.586422360 -0500
+@@ -127,7 +127,7 @@
+ 	if [ "$myforward" != "" ]
+ 	then
+ 		echo $myforward > ${mypath}/${mycachedir}/root/servers/\@
+-		echo -n "1" > ${mypath}/${mycachedir}/env/FORWARDONLY
++		chmod +t ${mypath}/${mycachedir}/root/servers/\@
+ 
+ 		read -p "enter forward-to IP [hit Enter to stop]> " myforward
+ 		while [ "$myforward" != "" ]

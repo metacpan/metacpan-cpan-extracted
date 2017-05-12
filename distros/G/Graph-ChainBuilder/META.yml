@@ -1,0 +1,27 @@
+---
+name: Graph-ChainBuilder
+version: v0.0.2
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: build directed 2-regular cyclic graphs
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Graph-ChainBuilder
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://scratchcomputing.com/svn/Graph-ChainBuilder/trunk
+requires:
+  Class::Accessor::Classy: v0.9.0
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+provides:
+  Graph::ChainBuilder:
+    file: lib/Graph/ChainBuilder.pm
+    version: v0.0.2
+  Graph::ChainBuilder::edge:
+    file: lib/Graph/ChainBuilder.pm
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

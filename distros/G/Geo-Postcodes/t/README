@@ -1,0 +1,3 @@
+All the test files in this directory are executed automatically by the
+'./Build test' or 'make test' command. They can be run individually as
+'perl <testfile>, after installation.

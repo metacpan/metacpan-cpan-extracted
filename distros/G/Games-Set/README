@@ -1,0 +1,63 @@
+README for Games::Set 0.01
+
+=head1 NAME
+
+Games::Set - The rules for the game of Set
+
+=head1 SYNOPSIS
+
+  my $game = Games::Set->new({ deck => [ Games::Set->standard_deck ] });
+  $game->shuffle;
+  my @cards = map { $game->deal } 1..3; # give me 3 cards
+  print $game->set( @cards ) ? "set\n" : "no set\n";
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Algorithm::ChooseSubsets
+ Algorithm::GenerateSequence
+ Class::Accessor::Fast
+ List::Util
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.01	Monday 8th September, 2003
+
+	initial CPAN release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+Rules of Set by Set Enterprises.  http://setgame.com/
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<http://setgame.com|The Set Game Company>, purveyors of Set
+
+L<http://set.omino.com> David Van Brink's site detailling some of the
+maths involved
+

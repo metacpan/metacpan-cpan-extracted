@@ -1,0 +1,308 @@
+format-version: 1.2
+
+[Instance]
+id: ZFIN:ZDB-GENO-050322-1
+name: Df(LG03:sox8,sox9b)b971/b971
+instance_of: SO:0001027 
+namespace: ZFIN
+
+[Instance]
+id: ZFIN:ZDB-GENO-070219-2
+name: Df(LG03:sox8,sox9b)b971/b971;sox9a<sup>hi1134Tg/hi1134Tg</sup>
+instance_of: SO:0001027 
+namespace: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000051)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+description: TEST DESC
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000586^OBO_REL:inheres_in(CL:0000148)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000586^OBO_REL:inheres_in(CL:0000148)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0001205)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0001399)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0001400)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0001422)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0001456)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0001461)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000184)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000184)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000051)^during(ZFIN:ZDB-STAGE-010723-35) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000191)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000191)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000250)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000250)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000270)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000270)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000422)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000422)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000476)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000476)^during(ZFIN:ZDB-STAGE-010723-36) 
+assigned_by: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000191)^during(ZFIN:ZDB-STAGE-010723-35) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFIN:ZDB-ANAT-011113-505)^during(ZFIN:ZDB-STAGE-010723-36) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFIN:ZDB-ANAT-011113-505)^during(ZFIN:ZDB-STAGE-010723-36) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000657)^during(ZFIN:ZDB-STAGE-010723-36) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000657)^during(ZFIN:ZDB-STAGE-010723-36) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000672)^during(ZFIN:ZDB-STAGE-010723-36) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000672)^during(ZFIN:ZDB-STAGE-010723-36) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0001239)^during(ZFIN:ZDB-STAGE-010723-36) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0001239)^during(ZFIN:ZDB-STAGE-010723-36) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000250)^during(ZFIN:ZDB-STAGE-010723-35) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000587^OBO_REL:inheres_in(ZFA:0000270)^during(ZFIN:ZDB-STAGE-010723-35) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000488)^during(ZFIN:ZDB-STAGE-010723-35) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000462^OBO_REL:inheres_in(ZFA:0000488)^during(ZFIN:ZDB-STAGE-010723-35) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-050322-1  ! Df(LG03:sox8,sox9b)b971/b971
+relation: OBOL:influences 
+object: PATO:0000419^OBO_REL:inheres_in(CL:0000431)^during(ZFIN:ZDB-STAGE-010723-35) 
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-050209-1 
+subject: ZFIN:ZDB-GENO-070219-2  ! Df(LG03:sox8,sox9b)b971/b971;sox9a&lt;sup&gt;hi1134Tg/hi1134Tg&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0000419^OBO_REL:inheres_in(CL:0000431)^during(ZFIN:ZDB-STAGE-010723-35) 
+
+[Instance]
+id: ZFIN:ZDB-GENO-980202-234
+name: ttna<sup>m171/m171</sup>
+instance_of: SO:000102
+namespace: ZFIN
+
+[Annotation]
+namespace: zfin 
+source: ZFIN:ZDB-PUB-061229-5 
+subject: ZFIN:ZDB-GENO-980202-234  ! ttna&lt;sup&gt;m171/m171&lt;/sup&gt;
+relation: OBOL:influences 
+object: PATO:0001444^OBO_REL:inheres_in(GO:0030018^part_of(CL:0000746))^during(ZFIN:ZDB-STAGE-010723-9) 

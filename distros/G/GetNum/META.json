@@ -1,0 +1,35 @@
+{
+   "abstract" : "Utility module to return numbers from strings",
+   "author" : [],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GetNum",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Inline::C" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "GetNum" : {
+         "file" : "lib/GetNum.pm",
+         "version" : "v1.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.2"
+}

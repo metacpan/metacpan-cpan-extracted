@@ -1,0 +1,6 @@
+['foo', 'b', 'bar'],
+['foo', '.', 'foo'],
+['bar', 'a', 'foo'],
+['bar', 'b', 'bar'],
+['bar', 'c', 'baz'],
+['baz', '.', 'baz'],

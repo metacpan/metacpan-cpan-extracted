@@ -1,0 +1,136 @@
+#!perl
+
+our $DATE = '2017-03-05'; # DATE
+our $VERSION = '0.06'; # VERSION
+
+use Games::Hangman;
+use Getopt::Long qw(:config bundling auto_version auto_help);
+
+my %opts = (
+    list => undef,
+    min_len => undef,
+    max_len => undef,
+);
+GetOptions(
+    'list|l=s' => \$opts{list},
+    'min-len=i' => \$opts{min_len},
+    'max-len=i' => \$opts{max_len},
+);
+
+binmode(STDOUT, ":utf8");
+my $game = Games::Hangman->new(%opts);
+$game->run;
+
+# ABSTRACT: A text-based hangman
+# PODNAME: hangman
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+hangman - A text-based hangman
+
+=head1 VERSION
+
+This document describes version 0.06 of hangman (from Perl distribution Games-Hangman), released on 2017-03-05.
+
+=head1 SYNOPSIS
+
+ % hangman
+ % hangman -l Proverb::TWW; # select specific word-/phraselist
+
+ % hangman --help
+ % hangman --version
+
+Example of game display:
+
+    ____
+   |    |      Phrase #:    2
+   |    o      Guessed : abcmtwxyz
+   |   /|\     Average :  50%
+   |    |
+   |   /
+  _|_
+ |   |______
+ |          |
+ |__________|
+
+ List  : Proverb::TWW
+ Phrase: A--'- w--- t-at ---- w---.
+ Guess :
+
+=head1 DESCRIPTION
+
+This is yet another text-based implementation of the popular word game Hangman.
+In Hangman, you guess a word letter-by-letter. There is a maximum of seven wrong
+guesses. Each wrong guess will incrementally draw a figure of a man being hung.
+What's different about this particular variant:
+
+=over
+
+=item * Wordlist is searched from C<Games::Word::Wordlist::*> modules
+
+=item * Phraselist
+
+Aside from words, phrases are also allowed. Non-letters will be revealed first.
+Phraselists are searched in C<Games::Word::Phraselist::*> modules.
+
+=back
+
+=head1 OPTIONS
+
+=head2 C<--list=s, -l>
+
+Select word-/phraselist, will be searched in C<Games::Word::Wordlist::> or
+C<Games::Word::Phraselist::>.
+
+=head2 C<--min-len=i>
+
+Minimum word/phrase length. The default is 5 for word, 0 for phrase.
+
+=head2 C<--max-len=i>
+
+Maximum word/phrase length. The default is unlimited.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Games-Hangman>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Games-Hangman>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Hangman>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+hangman from C<bsdgames> Debian package
+
+hangman from C<ppt> (Perl Power Tools) on CPAN
+
+L<Games::Word::Wordlist>
+
+L<Games::Word::Phraselist>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

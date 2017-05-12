@@ -1,0 +1,104 @@
+=pod
+
+=head1 NAME
+
+Geo::Mercator - Compute Mercator Projection of latitude/longitude into meters
+
+=head1 SYNOPSIS
+
+    use Geo::Mercator;
+    #
+    #    get projected meters for bounding box coords
+    #
+    my ($minx, $miny) = mercate($minlat, $minlong);
+    my ($maxx, $maxy) = mercate($maxlat, $maxlong);
+    #
+    #    now we can generate horizontal and vertical 
+    #    meters-per-pixel scales
+    #
+    #    once we've got an image, we might want to
+    #    translate back (e.g., an interactive map)
+    #
+    my ($lat, $long) = demercate($x, $y);
+
+=head1 DESCRIPTION
+
+Computes Mercator Projection of input latitude/longitude coordinates
+(in degrees) into (x, y) coordinates (as distances in meters) from the 
+meridian/equator. Also provides a method to convert back into latitude,
+longitude.
+
+=head2 Notes
+
+Use of Mercator projection on latitudes above/below +70/-70
+degrees is strongly discouraged, due to the gross distortions
+of the projection. In fact, any use of the Mercator projection
+is strongly discouraged...but its the view we've all been programmed
+to see for 400 years, so its genetic sense memory by now.
+And if its good enough for Google, its good enough for me.
+
+This module was developed primarily for graphic rendering purposes.
+The returned distance values B<should not be used for navigational
+purposes>. They are only useful for certain mapping operations,
+e.g., rendering a map to scale. For better approximations
+of actual distances, consider L<Math::Trig>'s great_circle_distance()
+function instead.
+
+There are B<many> other packages available on CPAN to compute various
+(and probably more accurate) geographic projections, but many
+rely on external libraries, or are kitchen sink packages. I just needed
+a simple, pure Perl interface for Mercator Projections, so, in the
+spirit of I<"Simple things should be easy.">, I whipped up this simple module.
+
+=head1 METHODS
+
+All methods are package methods, and are exported by default.
+
+=head2 ($x, $y) = mercate($lat, $long)
+
+Converts the input latitude and longitude values I<(in degrees)> 
+into Mercator projected points I<(in meters)> from the equator/
+meridian. 
+
+=head3 Notes
+
+=over
+
+=item 1
+
+Values are returned in opposite order from the input 
+($x => $long, $y => $lat), due to the difference in common 
+conventions for GIS ordering vs. cartesian ordering.
+
+=item 2
+
+Both input and output values may be negative. Negative latitude
+is south of the equator; negative longitude is west of
+the meridian.
+
+=back
+
+=head2 ($lat, $long) = demercate($x, $y)
+
+Converts the input Mercator projected distances I<(in meters)> 
+back into latitude and longitude values I<(in degrees)>.
+Note that, like C<mercate()>, the outputs are in opposite
+order from the inputs, due to GIS vs. cartesian ordering
+conventions.
+
+=head1 SEE ALSO
+
+The Mercator Projection is described at L<http://en.wikipedia.org/wiki/Mercator_Projection>
+I<(and at many other sites as well)>.
+
+L<GD::Map::Mercator> uses this module to translate WDB data.
+
+Any of the Geo packages at L<http://search.cpan.org/search?m=all&q=Geo&s=1>.
+
+=head1 AUTHOR, COPYRIGHT, and LICENSE
+
+Copyright(C) 2008, L<Dean Arnold|mailto:darnold@presicient.com>, Presicient Corp.
+
+Permission is granted to use, copy, modify, and redistribute this software
+under the terms of the Academic Free License Vers. 3.0, available for
+review at L<http://www.opensource.org/licenses/afl-3.0.php>.

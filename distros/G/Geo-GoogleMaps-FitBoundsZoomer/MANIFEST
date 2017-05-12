@@ -1,0 +1,11 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+README
+dist.ini
+lib/Geo/GoogleMaps/FitBoundsZoomer.pm
+t/00-load.t
+t/01-fit-bounds-zoomer.t

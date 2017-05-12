@@ -1,0 +1,71 @@
+NAME
+
+    Getopt::Long::Modern - Use Getopt::Long with modern defaults
+
+SYNOPSIS
+
+     use Getopt::Long::Modern;
+     GetOptions(
+       "f|foo=i" => \my $foo,
+       "b|bar"   => \my $bar,
+       "Z|baz=s" => \my @baz,
+     );
+
+DESCRIPTION
+
+    Getopt::Long::Modern is a simple wrapper of Getopt::Long to reduce the
+    amount of typing needed to get modern defaults, and to avoid having to
+    remember the correct incantations. See "Summary of Option
+    Specifications" in Getopt::Long for details on specifying options using
+    Getopt::Long.
+
+    Only the GetOptions function from Getopt::Long is exported. Additional
+    Getopt::Long configuration may be passed as import parameters.
+
+     use Getopt::Long::Modern qw(auto_help auto_version pass_through);
+
+    For any more advanced usage, you should probably use Getopt::Long
+    directly. The equivalent Getopt::Long configuration to using this
+    module is:
+
+     use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+
+DEFAULTS
+
+    Getopt::Long::Modern currently sets the following configuration options
+    by default. See "Configuring Getopt::Long" in Getopt::Long for more
+    details on available configuration.
+
+ gnu_getopt
+
+    This sets gnu_compat to allow --opt= for setting an empty string
+    option, bundling to allow short options to be bundled together, permute
+    to allow specifying options before or after other arguments, and
+    no_getopt_compat to disallow + for specifying options.
+
+ no_ignore_case
+
+    This makes all options case-sensitive, which is expected and required
+    when explicitly specifying short options of the same character but
+    different case.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Getopt::Long::Descriptive, Getopt::Again, Opt::Imistic
+

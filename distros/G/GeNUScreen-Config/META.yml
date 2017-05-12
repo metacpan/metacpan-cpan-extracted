@@ -1,0 +1,26 @@
+---
+name: GeNUScreen-Config
+version: 0.0.10
+author:
+  - 'Mathias Weidner <mamawe@cpan.org>'
+abstract: Work with config files for GeNUScreen firewalls
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Std: 0
+  Test::More: 0
+  perl: 5.6.0
+  version: 0
+build_requires:
+  Probe::Perl: 0
+provides:
+  GeNUScreen::Config:
+    file: lib/GeNUScreen/Config.pm
+    version: 0.0.10
+  GeNUScreen::Config::Diff:
+    file: lib/GeNUScreen/Config/Diff.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

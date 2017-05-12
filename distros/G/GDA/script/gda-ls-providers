@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+#
+# gda-ls-providers
+#
+# $Revision: 1.1.1.1 $
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+#
+# This program is free software. It may be modified and/or
+# distributed under the same terms as Perl itself.
+#
+
+
+use strict;
+
+use GDA::Provider;
+
+print join("\n", GDA::Provider->list_names), "\n";
+
+exit 0;
+

@@ -1,0 +1,11 @@
+/* C comment. */
+
+// C++ comment.
+
+# Hash comment.
+
+strict graph graph_11
+{
+	rankdir = LR;
+	ranksep = "0.2"
+}

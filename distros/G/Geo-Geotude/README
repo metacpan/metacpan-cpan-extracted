@@ -1,0 +1,79 @@
+NAME
+    Geo::Geotude - OOP for performing geotude location conversions.
+
+SYNOPSIS
+     my $lat = '3.106254';
+     my $lon = '101.630517';
+
+     my $geo = Geo::Geotude->new('latitude' => $lat, 'longitude' => $lon);
+     print $geo->geotude();
+
+     # prints '53281.86.93.30.75.41.67'
+
+DESCRIPTION
+    Geowhat? A Geotude is : "permanent and hierarchical. [As] a trade-off: A
+    Geotude is less intuitive than address, but more intuitive than
+    latitude/longitude. A Geotude is more precise than address, but less
+    precise than latitude/longitude."
+
+    This package provides OOP methods for converting a decimal latitude and
+    longitude in to Geotude and vice versa.
+
+PACKAGE METHODS
+  __PACKAGE__->new(%args)
+
+    Valid arguments are :
+
+    * geotude
+        A Geotude string.
+
+        Must be present if neither *latitude* or *longitude* are defined.
+
+    * latitude
+        A latitude, in decimal format.
+
+        Must be present if *longitude* is defined.
+
+    * longitude
+        A longitude, in decimal format.
+
+        Must be present if *latitude* is defined.
+
+    Returns a *Geo::Geotude* object.
+
+OBJECT METHODS
+  $obj->point()
+
+    Returns a comma-separated string when called in a scalar context.
+
+    When called in an array context, returns a list containing decimal
+    latitude and longitude.
+
+  $obj->geotude()
+
+    Returns a geotude string when called in scalar context.
+
+    When called in an array context, returns a list containing the major and
+    minor (or sub) geotudes.
+
+VERSION
+    1.0
+
+DATE
+    $Date: 2007/08/09 02:10:54 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    http://www.geotude.com/
+
+BUGS
+    Please report all bugs via http://rt.cpan.org/
+
+LICENSE
+    Copyright (c) 2007 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

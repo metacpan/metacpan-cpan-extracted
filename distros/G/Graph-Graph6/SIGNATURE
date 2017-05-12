@@ -1,0 +1,98 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 34d3bb2d9646ce0f4b37bc7f638aea05498b67d3 Changes
+SHA1 665acee6b7cbaa352f865ec47f4500e90aaa4915 MANIFEST
+SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
+SHA1 5e7866198a0a8c2e4accc982a5db7dea89e53170 META.json
+SHA1 2a356c874db36afb318c41cba71a1092344f587b META.yml
+SHA1 03eb25da2c0254189c8eaf7ef1d214f95e1eaf7e Makefile.PL
+SHA1 a2e6330f71a463044de22c1bd58906a127717d2f debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 ec18fd5cc59a473a56e8272545d8d4bb056a639c debian/control
+SHA1 ed2b9a66036bead341282939080c71285c7c2b07 debian/copyright
+SHA1 d00ac967998580b1b6a40c77e3ea37350db3c71b debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 4fb7c678220a81130b0352f2e3e229f3b9d2bbeb debian/watch
+SHA1 4c2b5420f51a45e13b9a96232e750db971d7d2fd devel/all9-1.dot
+SHA1 18ad29b72403d4fc4ef8a6acadb83277c469d9ac devel/dimacs.pl
+SHA1 d039827027d12141d5dc12c3772c18d408c4d216 devel/graphviz2.pl
+SHA1 bd9e6a6643205699317d386f10eb255ad1f5e91e devel/hog.pl
+SHA1 d01fa65fa1a40c0d887b3e90018d3f82d8ee25e5 devel/lib/Graph/DIMACS.pm
+SHA1 c244580c38ffa1a4569a33cd91abdd79e6974538 devel/lib/Graph/Writer/Matrix.pm
+SHA1 2e18811f4cb60365dea42d1eb6a424e00985fe5c devel/lib/MyGraphs.pm
+SHA1 0f66e8e76d295fd6c2fed7590b2ef9f37e882b3a devel/listen.pl
+SHA1 90a0179b22c886a0983800b5cf72ed485670b7f5 devel/misc.pl
+SHA1 7070b4662be66c907048206d456274937a718722 devel/random.pl
+SHA1 b9d1994aa371735a0ccfa7e2ea61e8141346db54 devel/round-trip.pl
+SHA1 c296a5ecfdeedd89e9984ec3d6c52da286897737 devel/run.pl
+SHA1 d6f63377df4f34eff9a503e6498f72ca37f5ab14 devel/taint.pl
+SHA1 ba9583fb419a7c28acbfcf48ccc408cf84cfcb98 examples/graph-easy-print.pl
+SHA1 5ad47673cb12e498ddd9f5ba972422d5d17df231 examples/graph-random.pl
+SHA1 af5057035a92045ade75e4a83b383902def78dc4 examples/graphviz2-geng.pl
+SHA1 fa1c7ac0189c1fc16bdb984d066456d714f4f8bb lib/Graph/Easy/As_graph6.pm
+SHA1 1c3341123c19b432ea1f045152b8ed2001cbdaf5 lib/Graph/Easy/As_sparse6.pm
+SHA1 c9de27ee9c406a70daf1b28a9f7a2cbd48b7385a lib/Graph/Easy/Parser/Graph6.pm
+SHA1 e6e3af7cc31fbdb2b4cf19dde0fa2ded7f433846 lib/Graph/Graph6.pm
+SHA1 c754517237125b9ab679d2729e71f34a43bf2543 lib/Graph/Reader/Graph6.pm
+SHA1 f730f9a2bb2afe697d2db419cb3b5ab519674657 lib/Graph/Writer/Graph6.pm
+SHA1 ca646b7ac71ba83fb1b0315635613d83d561d118 lib/Graph/Writer/Sparse6.pm
+SHA1 2bb2f179f001ec5a31949d454f0029d824efc913 lib/GraphViz2/Parse/Graph6.pm
+SHA1 e9a697f9e23dda7aeb0aac912cc35c462a322dac t/Graph-Easy-As_graph6.t
+SHA1 064b590c35fea0dd3f41c3e4e478f027a53c3616 t/Graph-Easy-As_sparse6.t
+SHA1 a346e9d9b70e056c68c626ac0b668cda938acd46 t/Graph-Easy-Parser-Graph6.t
+SHA1 a2c5da10d2ddde06511c7c0fcf0e22153e24352e t/Graph-Graph6-import.t
+SHA1 c0e4191f4189962e735f645fde0a9673128877ee t/Graph-Graph6-taint.t
+SHA1 f7be1b8807bef239d1c7921beb47b17cfeac07cc t/Graph-Graph6.t
+SHA1 47a3b8fa92e2d99b9a45186f5e7b8aa44c1244a6 t/Graph-Reader-Graph6.t
+SHA1 9ed532fa1fe6815a42d4c2d0e4d281b4c76669a2 t/Graph-Writer-Graph6.t
+SHA1 a53e2263a642284395c97dac986b28fe061b82e5 t/Graph-Writer-Sparse6.t
+SHA1 6da0aae24b2de609f444489ede19af7e1d0e6b5d t/GraphViz2-Parse-Graph6.t
+SHA1 47ebbf1d71ebdc462f51055161de9cd0838f45dc t/MyTestHelpers.pm
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 5c2017c5ddf98ca4ee52cd5ca1096ee2e703b624 xtools/my-check-spelling.sh
+SHA1 d76762639d4ac9a709b1de9d0ad61974aa5026b2 xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 eec6a78c6ed57242d151597b048df6ea5efc5cc4 xtools/my-pc.sh
+SHA1 5c86dd9ca3d2ecf3ee9d90da1537b71e56c8b321 xtools/my-wunused.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXuBiJAAoJEPjQtOfS0hGR8kgQAJr3g4wFJ4kVEoqHDzzeOTgg
+ZM5nU1TyyW/5xfHFeRWZExsCC27fyjiizMd4OFYe8oDe8af20vUKamcOsCWVRojF
+QJfw7pMU5mB8B+YnuxH6c2Y9jvl89XG/rLp+aHskdmYWHdvcYajHdHcyOr43uim+
+00kd59UcH3JQz3FTLugQsvj+Aoj0dvwBT7Q7YI/TfTQQnwGUwlzkD9KZNe+uKTPp
+riE6zUPl9CUZk0NMvDQDYos9G83sqsMMsh1rUo6tFAtJh0VU00V1qr0L0ugghNgY
+S7Ows0G0iec9/Q29ITjrLvofrHKhXAEyiZX1QY/VQU59bO8yp32ox8mUgB6u5mXZ
+uX1o2Cw36YXdJmqK4B6KWQKIhoE0nxcRE/9JvkPiSke9IoiCNx5grsS44A3O9nVy
+OC0Zkv4CszqN97AU4lFr17cwKvfwVe0YtMtTzm9gVKW2m7xOU5lYQQhGAMQhWZVa
+8QN+ZtSkAwoecMoPiEFuQfgg687HwuamZizghidKgqrJ8ygw6on2Vl5Y6tEB8+Ld
+pgqBa4Eh5lNwJigricz8HIej/ypyQ0tx+uErNUGPh18CDw/Hgw7XIDfo+6BdHMNT
+GFOYVPnVMIDHSsher5UDErcVIOyqMq9PvLHLS32uUUeZbigE6p2iNmBYWUqxxySt
+2B2d0s9YtGR8d/uCTfqx
+=uTr3
+-----END PGP SIGNATURE-----

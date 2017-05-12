@@ -1,0 +1,55 @@
+#! /usr/bin/perl
+
+#  Copyright (C) 2010, Geoffrey Leach
+#
+#===============================================================================
+#
+#         FILE:  03-options_podfile.pod
+#
+#  DESCRIPTION:  Test run-time options determined by the POD
+#                This is the behavior of version 1.0 of Getopt::Auto
+#                This file contains the POD for 03.options_podfile.t
+#
+#       AUTHOR:  Geoffrey Leach (), <geoff@hughes.net>
+#      VERSION:  1.9.8
+#      CREATED:  Mon Aug 10 15:14:54 PDT 2009
+#===============================================================================
+
+use strict;
+use warnings;
+use 5.006;
+
+our $VERSION = '1.9.8';
+
+__END__
+
+=pod
+
+=begin stopwords
+nosub
+Nosub
+=end stopwords
+
+=head2 -foo - do a foo
+
+This is the help for -foo
+
+=head2 -bar - do a bar
+
+This is the help for -bar
+
+=head2 -tar - do a tar
+
+This is the help for -tar
+
+=head2 -foobar - do a foobar
+
+This is the help for -foobar, which won't be executed
+because of the '-' in the command line
+
+=head2 -nosub - bump a counter
+
+Nosub has -- surprise -- no associated sub
+
+=cut
+

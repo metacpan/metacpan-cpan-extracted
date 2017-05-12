@@ -1,0 +1,36 @@
+---
+abstract: 'simple converter of geo coordinates'
+author:
+  - 'Kazuhiro Osawa <yappo {at} shibuya {dot} pl>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Base: 0
+  Test::More: 0
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Coordinates-Converter
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Accessor::Lite: 0.05
+  Module::Load: 0
+  Storable: 0
+  String::CamelCase: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  homepage: https://github.com/yappo/p5-Geo-Coordinates-Converter/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yappo/p5-Geo-Coordinates-Converter.git
+version: 0.13

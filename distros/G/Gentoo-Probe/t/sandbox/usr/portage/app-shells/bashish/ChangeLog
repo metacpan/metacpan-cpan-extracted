@@ -1,0 +1,14 @@
+# ChangeLog for app-shells/bashish
+# Copyright 2000-2003 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/bashish/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+*bashish-1.9.21 (16 Jun 2003)
+
+  16 Jun 2003; Mike Frysinger <vapier@gentoo.org> :
+  Reworked the ebuild so that it uses the bashish install process.
+
+*bashish-1.9.19 (24 Apr 2003)
+
+  24 Apr 2003; Bartosch Pixa <darkspecter@gentoo.org> bashish-1.9.19.ebuild:
+  initial import, ebuild submited by the bashish author
+

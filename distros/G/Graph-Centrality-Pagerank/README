@@ -1,0 +1,361 @@
+NAME
+    "Graph::Centrality::Pagerank" - Computes pagerank of all nodes in a
+    graph.
+
+SYNOPSIS
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[1,2],[3,4]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges);
+      # dumps:
+      # {
+      #   1 => "0.175438596989046",
+      #   2 => "0.324561403010954",
+      #   3 => "0.175438596989046",
+      #   4 => "0.324561403010954",
+      # }
+
+DESCRIPTION
+    "Graph::Centrality::Pagerank" computes the pagerank of the all nodes in
+    a graph. The input can be a list of edges or a Graph.
+    "Graph::Centrality::Pagerank" is written entirely in Perl and is not
+    recommended for use in high performance applications.
+
+CONSTRUCTOR
+  "new"
+    The method "new" creates an instance of the
+    "Graph::Centrality::Pagerank" class with the following parameters:
+
+    "dampeningFactor"
+         dampeningFactor => 0.85
+
+        "dampeningFactor" is the dampening factor used when computing
+        pagerank. It must be a value ranging from zero to one; the default
+        is 0.85. Note the incidence matrix generated from the graph is
+        multiplied (scaled) by "dampeningFactor", *not* by "1 -
+        dampeningFactor".
+
+    "maxRelError"
+         maxRelError => sqrt (machine-epsilon)
+
+        "maxRelError" is the maximum *average* relative error that is
+        permitted between successive pagerank vectors before the iterative
+        process to approximate the pagerank vector should be stopped. The
+        default is the square root of the systems machine epsilon. Usually,
+        most pagerank values computed will have "-log10(maxRelError)" digits
+        of accuracy. "maxRelError" must be positive and less than or equal
+        to 0.01.
+
+    "minIterations"
+         minIterations => 0
+
+        "minIterations" is the minimum number of iterations that will be
+        computed before the pagerank iterations are stopped, even if
+        "maxRelError" is achieved. The default is zero.
+
+    "maxIterations"
+         maxIterations => int (2 * ((maxRelError / ln (dampeningFactor) + 1))
+
+        "maxIterations" is the maximum number of iterations that can be
+        performed to approximate the pagerank vector even if "maxRelError"
+        is not achieved. The default is "2 * ((maxRelError / ln
+        (dampeningFactor) + 1)". If "dampeningFactor" is zero, then
+        "maxIterations" is one. If "dampeningFactor" is one, then
+        "maxIterations" is equal to the total nodes in the graph.
+
+    "linkSinkNodes"
+         linkSinkNodes => 1
+
+        In a directed graph sink nodes are the nodes with no edges emanating
+        out from them. In the pagerank algorithm these nodes are
+        automatically linked to all other nodes in the graph. To prevent
+        this set "linkSinkNodes" to zero; the default is one.
+
+    "directed"
+         directed => 1
+
+        If "directed" is true, the pagerank computations are done with the
+        graph edges being directed. If "directed" is false, the pageranks
+        are computed treating the graph as undirected; the default value of
+        "directed" is one.
+
+    "useEdgeWeights"
+         useEdgeWeights => 0
+
+        If "useEdgeWeights" is true, then any weight associated with an edge
+        is used in the computation of pagerank. The default weight for any
+        edge without an assigned weight is one. The default value of
+        "useEdgeWeights" is zero, which forces all edge weights to be one.
+
+METHOD
+  "getPagerankOfNodes"
+    The method "getPagerankOfNodes" computes the pagerank of each node in
+    the graph. The graph can be defined using the "graph" parameter or by
+    supplying a list of edges. All the parameters used by the constructor
+    "new" can also be set here and they will override the values used with
+    "new". "getPagerankOfNodes" returns a reference to a hash where the keys
+    are the graph nodes and the values are the pageranks of the node.
+
+    "graph"
+         graph => Graph
+
+        "graph" must be a Graph object. If the "directed" parameter was not
+        set with the constructor "new" or with this method, then "directed"
+        is set to the value of Graph->is_directed().
+
+    "listOfEdges"
+         listOfEdges => [['a',10],[10,11]]
+
+        "listOfEdges" must be a list of edges, where an edge is a pair of
+        strings of the form "[from-node, to-node]" or a triple of the form
+        "[from-node, to-node, numeric-edge-weight]". Note that "graph" and
+        "listOfEdges" can both be defined, in which case the union of their
+        list of edges is used to compute the pageranks of the nodes.
+
+    "listOfNodes"
+         listOfNodes => ['a',10, 'b']
+
+        "listOfNodes" is optional but, must be the list of nodes in the
+        graph when provided; it defaults to all the nodes comprising the
+        edges in "listOfEdges" or "graph".
+
+    "nodeWeights"
+          nodeWeights => {}
+
+        "nodeWeights" is an optional hash reference that can provide a
+        weight for the nodes. If "nodeWeights" is not defined for any node
+        in the graph, then each node has a weight of
+        "1/scale(@listOfNodes)". If "nodeWeights" is defined for at least
+        one node in the graph, then the default weight of any undefined node
+        is zero.
+
+EXAMPLES
+    A rather dull example with one node and no edges:
+
+      use Graph;
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfNodes = [1];
+      dump $ranker->getPagerankOfNodes (listOfNodes => $listOfNodes);
+      # dumps:
+      # {
+      #   1 => 1
+      # }
+
+    An example of a graph with two components:
+
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[1,2],[3,4]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges);
+      # dumps:
+      # {
+      #   1 => "0.175438596989046",
+      #   2 => "0.324561403010954",
+      #   3 => "0.175438596989046",
+      #   4 => "0.324561403010954",
+      # }
+
+    In this case the edges are placed in a Graph:
+
+      use Graph;
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $listOfEdges = [[1,2],[3,4]];
+      my $graph = Graph->new (edges => $listOfEdges);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      dump $ranker->getPagerankOfNodes (graph => $graph);
+      # dumps:
+      # {
+      #   1 => "0.175438596989046",
+      #   2 => "0.324561403010954",
+      #   3 => "0.175438596989046",
+      #   4 => "0.324561403010954",
+      # }
+
+    Below is the first example in the paper *How Google Finds Your Needle in
+    the Web's Haystack* by David Austin.
+
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[1,2],[1,3],[2,4],[3,2],[3,5],[4,2],[4,5],[4,6],[5,6],
+        [5,7],[5,8],[6,8],[7,5],[7,1],[7,8],[8,6],[8,7]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges,
+        dampeningFactor => 1);
+      # dumps:
+      # {
+      #   1 => "0.0599999994835539",
+      #   2 => "0.0675000002254998",
+      #   3 => "0.0300000002967361",
+      #   4 => "0.0674999997408677",
+      #   5 => "0.0974999994123176",
+      #   6 => "0.202500001447512",
+      #   7 => "0.180000001348251",
+      #   8 => "0.294999998045262",
+      # }
+
+    Below is the second example in the paper. Notice "linkSinkNodes" is set
+    to zero.
+
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[1,2]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges,
+        dampeningFactor => 1, linkSinkNodes => 0);
+      # dumps:
+      # { 1 => 0, 2 => 0 }
+
+    Below is the third example in the paper. Notice in this case
+    "linkSinkNodes" is set to one, the default value.
+
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[1,2]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges,
+        dampeningFactor => 1, linkSinkNodes => 1);
+      # dumps:
+      # { 1 => "0.33333333209157", 2 => "0.66666666790843" }
+
+    Below is the fourth example in the paper. The result is different from
+    the paper since the starting vector for Graph::Centrality::Pagerank is
+
+      { 1 => "0.2", 2 => "0.2", 3 => "0.2", 4 => "0.2", 5 => "0.2" }
+
+    while the starting vector in the paper is
+
+      { 1 => 1, 2 => 0, 3 => 0, 4 => 0, 5 => 0 }.
+
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[1,2],[2,3],[3,4],[4,5],[5,1]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges,
+        dampeningFactor => 1, linkSinkNodes => 0);
+      # dumps:
+      # { 1 => "0.2", 2 => "0.2", 3 => "0.2", 4 => "0.2", 5 => "0.2" }
+
+    Below is the fifth example in the paper.
+
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[1,3],[1,2],[2,4],[3,2],[3,5],[4,2],[4,5],[4,6],[5,6],
+        [5,7],[5,8],[6,8],[7,5],[7,8],[8,6],[8,7]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges,
+        dampeningFactor => 1, linkSinkNodes => 0);
+      # dumps:
+      # {
+      #   1 => 0,
+      #   2 => "2.39601089109228e-54",
+      #   3 => 0,
+      #   4 => "5.47659632249665e-54",
+      #   5 => "0.119999999997811",
+      #   6 => "0.240000000003975",
+      #   7 => "0.240000000003975",
+      #   8 => "0.399999999994238",
+      # }
+
+    An example of the effect of including edge weights:
+
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[2,1],[2,3]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges);
+      $listOfEdges = [[2,1,2],[2,3,1]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges,
+        useEdgeWeights => 1);
+
+      # dumps:
+      # all edges have weight 1.
+      # {
+      #   1 => "0.370129870353883",
+      #   2 => "0.259740259292235",
+      #   3 => "0.370129870353883",
+      # }
+      # edge [2, 1] has twice the weight of edge [2,3].
+      # {
+      #   1 => "0.406926407374432",
+      #   2 => "0.259740259292235",
+      #   3 => "0.333333333333333",
+      # }
+    }
+
+    An example of the effect of including node weights:
+
+      use Graph;
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my $listOfEdges = [[1,2],[2,3]];
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges);
+      dump $ranker->getPagerankOfNodes (listOfEdges => $listOfEdges,
+        nodeWeights => {2 => .9, 3 => .1 });
+
+      # dumps:
+      # {
+      #   1 => "0.184416783248514",
+      #   2 => "0.341171047056969",
+      #   3 => "0.474412169694517",
+      # }
+      # {
+      #   1 => "0.135592438389592",
+      #   2 => "0.385846009631034",
+      #   3 => "0.478561551979374",
+      # }
+
+    A example of the modules speed, or lack of.
+
+      use Graph::Centrality::Pagerank;
+      use Data::Dump qw(dump);
+      my $ranker = Graph::Centrality::Pagerank->new();
+      my @listOfEdges;
+      for (my $i = 0; $i < 1000000; $i++)
+        { push @listOfEdges, [int rand 10000, int rand 10000]; }
+      my $startTime = time;
+      my $pageranks = $ranker->getPagerankOfNodes (listOfEdges => \@listOfEdges);
+      print time()-$startTime . "\n";
+      # prints:
+      # a non-negative integer after a long time.
+
+INSTALLATION
+    To install the module run the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    If you are on a windows box you should use 'nmake' rather than 'make'.
+
+BUGS
+    Please email bugs reports or feature requests to
+    "bug-graph-centrality-pagerank@rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Graph-Centrality-Pageran
+    k>. The author will be notified and you can be automatically notified of
+    progress on the bug fix or feature request.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    centrality measure, eigenvector centrality, graph, network, pagerank
+
+SEE ALSO
+    Graph
+

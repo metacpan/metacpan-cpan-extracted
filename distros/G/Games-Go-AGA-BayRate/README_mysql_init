@@ -1,0 +1,61 @@
+
+bayrate as provided by the AGA (the C++ version) expects to connect to a
+MySQL server to get the AGA players, rating, game, and tournament
+databases.
+
+The perl version (bayrate.pl) connects by default to an SQLite database
+instead.  The bayrate.pl script initializes the SQLite database
+automatically if the normal database file doesn't already exist (it uses
+the information in testdata.sql.dump to create database.sql).  This
+means it's safe to delete the database file if you want to start over.
+
+If you would rather connect to a mySQL server, use the 'mysql' option to
+the bayrate.pl script.  The remainder of this file is instruction for
+initializing your mySQL database:
+
+MySQL needs a one-time setup as follows:
+
+Start the mysql daemon.  On Fedora:
+
+    sudo service mysqld start
+
+Some administrative setup:
+
+    $ /usr/bin/mysqladmin -u root password mysql_root_password
+    $ /usr/bin/mysqladmin -u root -h hostname password mysql_root_password
+    $ mysql -u root -p
+    Enter password:
+    Welcome to the MySQL monitor. [ . . . ]
+
+create the databases:
+
+    mysql> create database usgo_agagd;
+    mysql> create user 'aga'@'localhost' identified by 'aga';
+    mysql> grant all privileges on usgo_agagd.* to 'aga'@'localhost';
+    mysql> flush privileges;
+    mysql> exit;
+
+load the bayrate AGA test data into mysql:
+
+    $ mysql -u aga -p usgo_agagd < testdata.sql
+
+check that the databases exist:
+
+    $ mysql -u aga -p usgo_agagd
+    mysql> show databases;
+    mysql> use usgo_agagd;
+    mysql> show tables;
+
+
+    +----------------------+
+    | Tables_in_usgo_agagd |
+    +----------------------+
+    | games                |
+    | players              |
+    | ratings              |
+    | tournaments          |
+    +----------------------+
+    4 rows in set (0.00 sec)
+
+
+

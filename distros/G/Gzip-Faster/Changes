@@ -1,0 +1,87 @@
+Revision history for Perl module 'Gzip::Faster'
+
+0.19 2017-01-19
+
+* File modification time setting and retrieval
+
+0.18 2016-12-13
+
+* Documentation improved
+* File name setting and retrieval in *_file routines
+
+0.17 2016-12-11
+
+* Bug fix release
+
+0.16 2016-12-09
+
+* Add deflate, inflate, deflate_raw, inflate_raw methods
+* Experimental new/zip/unzip/copy_perl_flags methods
+
+0.15 2016-12-07
+
+* Test for zlib in Makefile.PL
+
+0.14 2015-11-06
+* Remove dependence on Devel::CheckLib from distribution
+
+0.13 2015-10-20
+* Minor speed improvement for short strings
+* Better documentation of benchmarks
+
+0.12 2015-09-27
+
+* Update of benchmarks
+* Clearer documentation in the INSTALLATION section
+
+0.11 2015-09-19
+
+* Avoid build errors on 64 bit systems (unsigned int -> STRLEN)
+
+0.10 2014-08-30
+
+* Installation notes in main document
+* Change minimum Perl version to 5.8.1.
+
+0.09 2014-08-16
+
+* Include Compress::Raw::Zlib in benchmarks.
+* Document lack of safety features in gzip.
+* Add "ACKNOWLEDGEMENTS" section to documentation.
+
+0.08 2014-04-22
+
+* New function "gzip_to_file" (write data to file in gzipped format).
+
+0.07 2014-04-21
+
+* Better documentation
+
+0.06 2014-04-21
+
+* Documentation of gzip_file/gunzip_file
+* Load time benchmark
+
+0.05 2014-04-21
+
+* Correct handling of Z_BUF_ERROR
+
+0.04 2014-04-19
+
+* Add a check to "Makefile.PL" that zlib is present.
+* "gzip_file" and "gunzip_file" added.
+* Clearer documentation of module's intended purpose.
+
+0.03 2014-04-18
+
+* Build script cleanup
+
+0.02 2014-04-18
+
+* Documentation, benchmark.
+* Provisional support for UTF-8 encoding / decoding but regretably
+  this had to be commented out due to tripping a bug in FireFox.
+
+0.01 2014-04-18
+
+* Initial release

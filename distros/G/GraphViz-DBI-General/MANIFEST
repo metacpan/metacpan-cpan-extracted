@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/GraphViz-DBI-General.t
+lib/GraphViz/DBI/General.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,190 @@
+format-version: 1.2
+date: 14:07:2009 13:33
+auto-generated-by: OBO-Edit 2.0
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: test_goslim "Test GO slim"
+subsetdef: test_next_goslim "Second test set"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+synonymtypedef: systematic_synonym "Systematic synonym" EXACT
+default-namespace: test_ontology
+remark: cvs version: $Revision: 1.239 $
+
+[Term]
+id: GO:0000001
+name: test term GO:0000001
+subset: test_goslim
+subset: test_next_goslim
+is_a: GO:0000008 ! test term GO:0000008
+relationship: part_of GO:0000008 ! test term GO:0000008
+relationship: regulates GO:0000008 ! test term GO:0000008
+
+[Term]
+id: GO:0000002
+name: test term GO:0000002
+subset: test_goslim
+subset: test_next_goslim
+is_a: GO:0000006 ! test term GO:0000006
+is_a: GO:0000007 ! test term GO:0000007
+
+[Term]
+id: GO:0000003
+name: test term GO:0000003
+subset: test_goslim
+subset: test_next_goslim
+relationship: part_of GO:0000007 ! test term GO:0000007
+
+[Term]
+id: GO:0000004
+name: test term GO:0000004
+subset: test_goslim
+is_a: GO:0000012 ! test term GO:0000012
+relationship: positively_regulates GO:0000015 ! test term GO:0000015
+relationship: negatively_regulates GO:0000016 ! test term GO:0000016
+
+[Term]
+id: GO:0000005
+name: test term GO:0000005
+subset: test_goslim
+subset: test_next_goslim
+relationship: regulates GO:0000008 ! test term GO:0000008
+
+[Term]
+id: GO:0000006
+name: test term GO:0000006
+subset: test_goslim
+is_a: GO:0000009 ! test term GO:0000009
+
+[Term]
+id: GO:0000007
+name: test term GO:0000007
+subset: test_goslim
+relationship: part_of GO:0000011 ! test term GO:0000011
+
+[Term]
+id: GO:0000008
+name: test term GO:0000008
+subset: test_next_goslim
+relationship: negatively_regulates GO:0000010 ! test term GO:0000010
+
+[Term]
+id: GO:0000009
+name: test term GO:0000009
+is_a: GO:0000010 ! test term GO:0000010
+
+[Term]
+id: GO:0000010
+name: test term GO:0000010
+subset: test_goslim
+is_a: GO:0000018 ! test term GO:0000018
+
+[Term]
+id: GO:0000011
+name: test term GO:0000011
+is_a: GO:0000010 ! test term GO:0000010
+
+[Term]
+id: GO:0000012
+name: test term GO:0000012
+is_a: GO:0000013 ! test term GO:0000013
+
+[Term]
+id: GO:0000013
+name: test term GO:0000013
+subset: test_next_goslim
+is_a: GO:0000014 ! test term GO:0000014
+
+[Term]
+id: GO:0000014
+name: test term GO:0000014
+subset: test_goslim
+is_a: GO:0000018 ! test term GO:0000018
+
+[Term]
+id: GO:0000015
+name: test term GO:0000015
+subset: test_goslim
+relationship: part_of GO:0000014 ! test term GO:0000014
+
+[Term]
+id: GO:0000016
+name: test term GO:0000016
+is_a: GO:0000014 ! test term GO:0000014
+
+[Term]
+id: GO:0000017
+name: test term GO:0000017
+is_a: GO:0000019 ! test_ontology
+
+[Term]
+id: GO:0000018
+name: test term GO:0000018
+is_a: GO:0000019 ! test_ontology
+
+[Term]
+id: GO:0000019
+name: test_ontology
+subset: goslim_generic
+subset: goslim_goa
+subset: goslim_pir
+subset: goslim_plant
+
+[Term]
+id: GO:0000020
+name: test term GO:0000020
+subset: test_goslim
+is_obsolete: true
+
+[Term]
+id: GO:0000021
+name: test term GO:0000021
+subset: test_next_goslim
+is_a: GO:0000019
+
+[Term]
+id: GO:0000022
+name: test term GO:0000022
+is_a: GO:0000021
+
+[Term]
+id: GO:0000023
+name: test term GO:0000023
+is_a: GO:0000022
+
+[Term]
+id: GO:0000024
+name: test term GO:0000024
+subset: test_goslim
+is_a: GO:0000023
+relationship: part_of GO:0000025 ! test term GO:0000025
+
+[Term]
+id: GO:0000025
+name: test term GO:0000025
+subset: test_goslim
+relationship: part_of GO:0000019 ! test term GO:0000019
+
+
+[Typedef]
+id: negatively_regulates
+name: negatively_regulates
+is_a: regulates ! regulates
+
+[Typedef]
+id: positively_regulates
+name: positively_regulates
+is_a: regulates ! regulates
+
+[Typedef]
+id: part_of
+name: part_of
+is_transitive: true
+
+[Typedef]
+id: regulates
+name: regulates
+transitive_over: part_of ! part_of
+

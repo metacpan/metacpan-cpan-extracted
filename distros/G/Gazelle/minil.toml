@@ -1,0 +1,9 @@
+name = "Gazelle"
+# badges = ["travis"]
+authority="cpan:KAZEBURO"
+
+[build]
+build_class = "builder::MyBuilder"
+
+[FileGatherer]
+exclude_match = ['^lib/Plack/Handler/picohttpparser/picotest']

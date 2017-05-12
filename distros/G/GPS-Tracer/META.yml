@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                GPS-Tracer
+version:             1.2
+abstract:            A processor of geographical route information
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Date::Calc:                    0
+    File::Temp:                    0
+    GD::Graph:                     0
+    LWP::UserAgent:                0
+    Text::CSV::Simple:             0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Martin Senger <martin.senger@gmail.com>

@@ -1,0 +1,77 @@
+Games-Tournament-BlackJack version 0.01
+==========================================
+
+This is the README file for the Games::Tournament::BlackJack. The
+interfaces are likely to change, this is largely untested code.
+
+The main purpose for this module is to allow users to develop new
+subclasses of Games::Tournament::BlackJack::Player for use in
+Games::Tournament::BlackJack tournaments. The Thousand-Oaks PerlMongers
+group will be organizing the 'official' 2005 tournament that this
+codebase was originally written to support. The author felt it would be
+most appropriate to open the code running the tournament to reap the
+usual litany of benefits.
+
+All entries to this and future 'official' tournaments must be submitted
+under a license approved under the Open Source Definition. (
+http://www.opensource.org/docs/definition.php )
+
+You can use this set of modules to:
+
+=over 4
+=item *
+
+Develop and objectively evaluate BlackJack strategies. 
+
+=item *
+
+Simulate a human player of varying memory facility (not yet implemented in 0.01)
+=item *
+
+Win the BlackJack programming competition. 
+
+=item *
+
+Help find and eliminate any bugs in the competition engine prior 
+to the actual competition.
+
+=back
+
+There is further documentation in the modules themselves, and the
+discuss folder of the distribution. Start with
+C<Games::Tournament::BlackJack>.
+
+This is an early version, much more documentation is planned, especially
+on the user-developer side for tournament entrants.
+
+Feedback, patches, etc.. are welcome (though I make no guarantees on
+acceptance for patches.. or agreement for feedback.)
+
+INSTALLATION
+
+To install this module type the following:
+
+perl Makefile.PL make make test make install
+
+
+INSTRUCTIONS
+
+See POD for Games::Tournament::BlackJack.
+
+DEPENDENCIES
+
+This module does not depend on any other module except Exporter.pm. If
+you don't have Exporter.pm installed, you have bigger problems to deal
+with than running a BlackJack simulation. If you don't know if you have
+it installed, but you can get perl to run, you almost definitely have it
+installed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Paul Jacobs
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.8.4 or, at
+your option, any later version of Perl 5 you may have available.
+
+

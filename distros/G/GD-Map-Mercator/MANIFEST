@@ -1,0 +1,17 @@
+Changes.txt
+TODO.txt
+Makefile.PL
+MANIFEST
+lib/GD/Map/Mercator.pm
+lib/GD/Map/Mercator.pod
+basemaps/usa.png
+basemaps/usa.conf
+bin/wdb2merc.pl
+t/01basic.t
+eg/mkafrica.pl
+eg/mkakhi.pl
+eg/mkamericas.pl
+eg/mkeurope.pl
+eg/mknewengland.pl
+eg/mkusa.pl
+

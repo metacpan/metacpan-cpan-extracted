@@ -1,0 +1,118 @@
+{
+   "abstract" : "Module to tie together multiple Geo::Coder::* modules.",
+   "author" : [
+      "Ed Freyfogle <cpan@lokku.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-Coder-Many",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Simple" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Geo::Coder::OSM" : "0.01",
+            "Geo::Coder::OpenCage" : "0.02",
+            "Geo::Distance::XS" : "0.08",
+            "HTTP::Request" : "5.827",
+            "List::MoreUtils" : "0.22",
+            "List::Util" : "1.23",
+            "List::Util::WeightedRoundRobin" : "0.4",
+            "Net::Ping" : "2.33",
+            "Sort::Versions" : "1.5",
+            "Time::HiRes" : "1.9711",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::Coder::Many" : {
+         "file" : "lib/Geo/Coder/Many.pm",
+         "version" : "0.47"
+      },
+      "Geo::Coder::Many::Bing" : {
+         "file" : "lib/Geo/Coder/Many/Bing.pm",
+         "version" : "0.02"
+      },
+      "Geo::Coder::Many::Generic" : {
+         "file" : "lib/Geo/Coder/Many/Generic.pm",
+         "version" : "0.01"
+      },
+      "Geo::Coder::Many::Googlev3" : {
+         "file" : "lib/Geo/Coder/Many/Googlev3.pm",
+         "version" : "0.02"
+      },
+      "Geo::Coder::Many::Mapquest" : {
+         "file" : "lib/Geo/Coder/Many/Mapquest.pm",
+         "version" : "0.02"
+      },
+      "Geo::Coder::Many::OSM" : {
+         "file" : "lib/Geo/Coder/Many/OSM.pm",
+         "version" : "0.02"
+      },
+      "Geo::Coder::Many::OpenCage" : {
+         "file" : "lib/Geo/Coder/Many/OpenCage.pm",
+         "version" : "0.02"
+      },
+      "Geo::Coder::Many::Response" : {
+         "file" : "lib/Geo/Coder/Many/Response.pm",
+         "version" : "0.01"
+      },
+      "Geo::Coder::Many::Scheduler" : {
+         "file" : "lib/Geo/Coder/Many/Scheduler.pm",
+         "version" : "0.01"
+      },
+      "Geo::Coder::Many::Scheduler::OrderedList" : {
+         "file" : "lib/Geo/Coder/Many/Scheduler/OrderedList.pm",
+         "version" : "0.01"
+      },
+      "Geo::Coder::Many::Scheduler::Selective" : {
+         "file" : "lib/Geo/Coder/Many/Scheduler/Selective.pm",
+         "version" : "0.01"
+      },
+      "Geo::Coder::Many::Scheduler::UniquenessScheduler" : {
+         "file" : "lib/Geo/Coder/Many/Scheduler/UniquenessScheduler.pm",
+         "version" : "0.01"
+      },
+      "Geo::Coder::Many::Scheduler::UniquenessScheduler::WRR" : {
+         "file" : "lib/Geo/Coder/Many/Scheduler/UniquenessScheduler/WRR.pm",
+         "version" : "0.01"
+      },
+      "Geo::Coder::Many::Scheduler::UniquenessScheduler::WeightedRandom" : {
+         "file" : "lib/Geo/Coder/Many/Scheduler/UniquenessScheduler/WeightedRandom.pm",
+         "version" : "0.01"
+      },
+      "Geo::Coder::Many::Util" : {
+         "file" : "lib/Geo/Coder/Many/Util.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/lokku/Geo-Coder-Many"
+      }
+   },
+   "version" : "0.47"
+}

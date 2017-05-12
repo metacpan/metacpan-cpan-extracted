@@ -1,0 +1,57 @@
+{
+   "abstract" : "Sgf2Dg.pm",
+   "author" : [
+      "Reid Augustin <reid@hellosix.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Go-Sgf2Dg",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "IO::File" : "0",
+            "PDF::Create" : "0",
+            "POSIX" : "0",
+            "PostScript::File" : "0",
+            "Tk" : "0",
+            "Tk::Canvas" : "0",
+            "Tk::NoteBook" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "4.247"
+}

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Security image (captcha) generator.",
+   "author" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GD-SecurityImage",
+   "no_index" : {
+      "directory" : [
+         "monolithic_version",
+         "builder",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.40"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Image::Magick" : "v6.0.4"
+         },
+         "requires" : {
+            "GD" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/burak/cpan-gd-securityimage/"
+      }
+   },
+   "version" : "1.73"
+}

@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+dist.ini~
+lib/Geo/TigerLine/Abbreviations.pm
+test.pl

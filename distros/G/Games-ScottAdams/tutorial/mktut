@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+# $Id: mktut,v 1.1.1.1 2002/12/20 01:37:30 mike Exp $
+
+# mktut - create "sac" tutorial as a POD from specified stages
+
+use IO::File;
+use strict;
+
+
+if (@ARGV < 2) {
+    print STDERR "Usage: $0 <head-file> <tail-file> [<stage-number>...]\n";
+    exit 1;
+}
+
+my $headname = shift @ARGV;
+my $tailname = shift @ARGV;
+
+cat($headname);
+foreach my $stagenum (@ARGV) {
+    process($stagenum);
+}
+cat($tailname);
+
+
+sub cat {
+    my($filename, $indent) = @_;
+
+    my $fh = new IO::File("<$filename")
+	or die "can't open '$filename': $!";
+
+    while (my $line = <$fh>) {
+	$line = "\t" . $line
+	    if defined $indent;
+
+	print $line;
+    }
+
+    $fh->close();
+}
+
+
+sub process {
+    my($stagenum) = @_;
+
+    print "=head1 STAGE $stagenum\n\n";
+    cat("t$stagenum.intro");
+    print "\n";
+
+    print "=head2 Stage $stagenum Map\n\n";
+    cat("t$stagenum.map", 1);
+    print "\n";
+
+    print "=head2 Stage $stagenum Source\n\n";
+    cat("t$stagenum.sac", 1);
+    print "\n";
+}

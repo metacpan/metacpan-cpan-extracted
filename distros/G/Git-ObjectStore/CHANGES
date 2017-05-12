@@ -1,0 +1,189 @@
+==================================================
+Changes from 2016-02-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2017-02-08 00:41:02 +0000
+------------------------------------------
+
+  Change: eebbee5ae112a6f44a7e77c52878d1589d87b317
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-02-08 01:41:02 +0000
+
+    cleanup the branch after a writer crash 
+
+------------------------------------------
+version 0.006 at 2017-01-24 09:35:53 +0000
+------------------------------------------
+
+  Change: c2017260af40c7db6bb15d7b38ccd9152cb074fe
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-24 10:35:53 +0000
+
+    release-0.006 
+
+  Change: aa628bf0677bffb4a7bb94741c1272d5945f3b93
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-24 10:33:15 +0000
+
+    Remove loose backend from ODB 
+
+  Change: d21bcfa5b4db89ef13b39598a2313b8040c482a4
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-24 10:23:51 +0000
+
+    Initialize mempack before any writing; create_commit_and_packfile()
+    writes a mempack if only initial commit is made 
+
+------------------------------------------
+version 0.005 at 2017-01-22 23:42:12 +0000
+------------------------------------------
+
+  Change: 5be19261901d7dff4f5af2c78fe5b91dd1a4ded3
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-23 00:42:12 +0000
+
+    new() will only create a repo in writer mode 
+
+  Change: 2a50047a38a4fe813c7f1fa8c3c2e2d003f7689a
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-10 12:47:05 +0000
+
+    file_exists() works for directories too 
+
+  Change: f02b0a3b7b02b1cb84273b78b4e5befae4d18bc3
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-10 12:46:37 +0000
+
+    prereq: perl 5.8.9 
+
+  Change: 254f7c84cd0db0fcaac727ea98ca75f5dcae1168
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-10 12:42:50 +0000
+
+    Merge pull request #1 from manwar/fix-cpants-issue
+
+    Fix cpants issue 
+
+  Change: cbdfbb01fadc70480a93b125ed5ccb2c51910ca3
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-10 11:21:17 +0000
+
+    Add minimum perl version using dzil plugin [MinimumPerlFast] 
+
+  Change: 3cb8f5064c1f6a34dbc5fea5da811bef5db4db9c
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-10 11:19:57 +0000
+
+    Auto generate META.json using dzil plugin [MetaJSON] 
+
+  Change: c6ccf5f614219b7ff9905d2becf8d68e8ff0c661
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-09 23:13:12 +0000
+
+    t/10-readwrite.t: forgot the fourth argument for read_updates 
+
+------------------------------------------
+version 0.004 at 2017-01-09 22:08:13 +0000
+------------------------------------------
+
+  Change: 68c193114f6ce43a1d9a4273e5eeac4b646197af
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-09 23:08:13 +0000
+
+    Release 0.004 
+
+  Change: e7f5b0af564ef44a5afae88534aa804d3d459962
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-09 23:06:47 +0000
+
+    recursive_read(): added fourth argument $no_content() 
+
+  Change: 53f50d3fcbd0cb15217615d1f6b940af17787c89
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-09 01:17:54 +0000
+
+    read_updates(): added fourth argument $no_content 
+
+  Change: 22832d1bd21c87c612e327184beaece4acf30c95
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-08 14:36:22 +0000
+
+    dist.ini: replace [@GitHub] with [GitHub::Meta] 
+
+------------------------------------------
+version 0.003 at 2017-01-08 13:30:34 +0000
+------------------------------------------
+
+  Change: 7c4fb54bb0cb1a5830b0cd87d2eefc1926d3f237
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-08 14:30:34 +0000
+
+    write_file_nocheck() is now write_file(), and old write_file() is now
+    write_and_check() 
+
+  Change: 7fb31598cc853cb0792131cba60072ccf60ecde8
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-07 19:45:25 +0000
+
+    typo fix 
+
+  Change: aa44c53db46d09cd11bc2474a6a9e1a12da1d25f
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-07 19:41:21 +0000
+
+    Dist::Zilla tuning; better README.md; typos 
+
+  Change: 0434517ea2f80c65275e2ead55a17f650e7d6014
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-07 02:28:13 +0000
+
+    CPAN automation 
+
+------------------------------------------
+version 0.002 at 2017-01-07 01:24:36 +0000
+------------------------------------------
+
+  Change: f9fe98018c5e5a10e3ab3baa009566c5646a0d1f
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-07 02:24:36 +0000
+
+    Release 0.002: added created_init_commit() and repo() 
+
+  Change: 2b8716e483db365529635b67d5551748a009d90c
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-07 01:22:39 +0000
+
+    CPAN automation 
+
+------------------------------------------
+version 0.001 at 2017-01-07 00:05:17 +0000
+------------------------------------------
+
+  Change: 3ff5d0f678ce013a76183660f59ecf3770a4c929
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-07 01:05:17 +0000
+
+    more tests. Releasing the module 
+
+  Change: 6f23b7696e40c99f6688b1c2933a8b7ce6f0279b
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-07 00:27:26 +0000
+
+    test suite and bugfixing 
+
+  Change: 7356888dea1b17ae80f3578a5373242ff66a6274
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-06 01:51:29 +0000
+
+    formatting 
+
+  Change: 91188c433cd3b4547fdcf7146023f4f7d04ea6ef
+  Author: Stanislav Sinyagin <ssinyagin@k-open.com>
+  Date : 2017-01-06 01:49:22 +0000
+
+    First commit. Tests are yet to be written 
+
+================
+End of releases.
+================

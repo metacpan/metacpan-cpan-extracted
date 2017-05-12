@@ -1,0 +1,58 @@
+#define PERL_NO_GET_CONTEXT	/* we want efficiency */
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include "ppport.h"
+
+/* aesthetic 'sample' - doesn't do anything */
+
+#include "aesth.h"
+
+declare_aesth(sample);
+
+/* Something like this should be at the top. */
+
+
+define_setup(sample) {
+    /* Gets called once when a force is added to a state.
+       You can allocate private data and return that here. 
+       The private data will be available to the aesth and cleanup methods */
+    return NULL;
+}
+
+define_aesth(sample) {
+    /* Given a state, calculate the forces to be
+       imparted by this aesthetic (i.e., to move towards an improved state)
+       and assign them to the gradient.  (Note that 'gradient' is a slight
+       misnomer; a real gradient would be the opposite of what we're calling a
+       gradient here.) */
+
+    /* See the builtin aesthetics for examples of how to step through graph
+       structures. */
+    return;
+}
+
+define_cleanup(sample) {
+    /* Gets called once when a force is detached from a state.
+       You can clean up any private data here */
+    return;
+}
+
+MODULE = Graph::Layout::Aesthetic::Force::Sample	PACKAGE = Graph::Layout::Aesthetic::Force::Sample
+PROTOTYPES: ENABLE
+
+SV *
+new(const char *class)
+  PREINIT:
+    aglo_force force;
+  CODE:
+    New(__LINE__, force, 1, struct aglo_force);
+    force->aesth_gradient = ae_sample;
+    force->aesth_setup    = ae_setup_sample;
+    force->aesth_cleanup  = ae_cleanup_sample;
+    force->user_data = force->private_data = NULL;
+    RETVAL = NEWSV(1, 0);
+    sv_setref_pv(RETVAL, class, (void*) force);
+  OUTPUT:
+    RETVAL

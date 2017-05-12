@@ -1,0 +1,175 @@
+NAME
+    Gentoo::ChangeLog::Parser::Eventual - Rudimentary Event-Based ChangeLog
+    format parser, inspired by Pod::Eventual.
+
+VERSION
+    version 0.1.2
+
+SYNOPSIS
+        use Gentoo::ChangeLog::Parser::Eventual
+        my $parser = Gentoo::ChangeLog::Parser::Eventual->new(
+            callback => sub {
+                my ( $parser, $event, $opts ) = @_ ;
+            },
+        );
+
+        $parser->handle_line( "This is a line", { key => 'value', line => 1 });
+
+DESCRIPTION
+    In the proceeds of making a ChangeLog parser, I kept getting stuck on
+    various parts with writing it cleanly.
+
+    This design, inspired by RJBS' Great "Pod::Eventual", greatly simplifies
+    the process by using very rudimentary and loose data validation.
+
+    Lines are fed in manually, because we didn't want to implement all the
+    File IO our self and didn't want to limit the interface by forcing
+    passing a file handle.
+
+    You can do the IO quite simply anyway.
+
+        while( my $line = <$fh> ){
+            chomp $line;
+            $parser->handle_line( $line , { line => $. } );
+        }
+
+    A parser instance has a bit of state persistence, so you should use only
+    1 parser per input file.
+
+    Currently, it can only detect a few basic things.
+
+    1. Header blocks.
+        We go naive and classify that entire "# ChangeLog for " section at
+        the top of a ChangeLog as a "Header".
+
+        The header itself is not validated or parsed in any way beyond the
+        notion that its a series of comments.
+
+    2. Release statements.
+        Raises an event when it sees
+
+            *perl-5.12.2 (10 Jun 2010)
+
+    3. Change Headers.
+        This is the part on the top of each ChangeLog entry as follows:
+
+            10 Jun 2010; Bob Smith <asd>:
+
+        There are multiple ways this can be done however, so there are 3
+        events for this.
+
+    4. Change bodies.
+        This is the part after the header.
+
+    5. Blank Lines.
+
+METHODS
+  handle_line
+    handle_line is the only public method on this object. It takes one line,
+    processes its own state a bit, works out what event(s) need to be
+    thrown, and call the passed callback.
+
+   Specification: $object->handle_line( Str $line, HashRef $opts )
+   Parameter: $line : Mandatory, Str
+    This must be a string, and this is the string that represents a singular
+    line from the ChangeLog to be parsed. This code is written under the
+    assumption that you have also pre-chomped all your lines, but doesn't
+    enforce it. However, its not guaranteed to work, and is not tested for,
+    and may in a future revision be enforced.
+
+   Parameter: $opts : Mandatory, HashRef
+    This is a HashRef of data to be sent through to the event handler.
+
+    This is a good place to specify the source line number of the line you
+    are currently parsing if you want that.
+
+         $object->handle_line("this line", { line => 4 } );
+
+    and then in the callback:
+
+         my( $parser, $event, $opts ) = @_ ;
+         print $opts->{line} = 4;
+
+ATTRIBUTES
+  _callback
+    Outside construction and providing this (required) attribute, no public
+    methods exist for working with it.
+
+   Specification: CodeRef, rw, required, init_arg => callback
+   Construction.
+        my $object = ::Elemental->new( callback => sub {
+            my( $parser, $event, $opts ) = @_ ;
+             .... event handler code here ....
+        });
+
+   Parameter: $event : Str
+    This is the name of the event that has been triggered. See "EVENTS".
+
+   Parameter: $opts : HashRef
+    This is a Hash Reference of data about the event. Mostly, it contains
+    whatever data was passed from "handle_line", but it injects its own
+    'content' key containing a copy of the string that was parsed.
+
+   Executing.
+    You can manually execute the CodeRef as if it were called internally,
+    but there is little point to this.
+
+        $object->handle_event( 'an-event-name' => { } );
+
+    Note, that the event-names list is baked into this class, and manually
+    calling this method and passing an unsupported event name will result in
+    casualties.
+
+EVENTS
+  start
+    Fires when the first line is parsed.
+
+  blank
+    Fires on blank ( i.e.: all white space ) lines.
+
+  header
+    Fires on the first header line.
+
+  header_comment
+    Fires on all comments that are deemed "part of the header"
+
+  header_end
+    Fires on the first line that is obviously not part of the header,
+    terminating the header.
+
+  release_line
+    Fires on "*perl-5.12.2" lines.
+
+  change_header
+    Fires on Single-line change headers.
+
+  change_body
+    Fires on each line that looks like it was a child of the previous change
+    header.
+
+  end_change_body
+    Fires when the first line is seen that indicates the change body is
+    complete.
+
+  begin_change_header
+    Fires on the first line of a multi-line change header.
+
+  continue_change_header
+    Fires on all non-blank lines in a multi-line change header other than
+    the first and last.
+
+  end_change_header
+    Fires on the last line of a multi-line change header
+
+  UNKNOWN
+    Fires in the event no processing rules indicated a success state.
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

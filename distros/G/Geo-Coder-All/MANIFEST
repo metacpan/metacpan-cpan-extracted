@@ -1,0 +1,21 @@
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+ignore.txt
+Changes
+LICENSE
+lib/Geo/Coder/All.pm
+lib/Geo/Coder/All/Bing.pm
+lib/Geo/Coder/All/Google.pm
+lib/Geo/Coder/All/OSM.pm
+lib/Geo/Coder/All/Ovi.pm
+lib/Geo/Coder/All/TomTom.pm
+lib/Geo/Coder/Role/Geocode.pm
+t/01google.t
+t/02tomtom.t
+t/03ovi.t
+t/04osm.t
+t/05bing.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

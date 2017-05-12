@@ -1,0 +1,32 @@
+---
+abstract: 'Group-Git tools to show combined markdown TODOs'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Group-Git-Cmd-Todo
+provides:
+  Group::Git::Cmd::Todo:
+    file: lib/Group/Git/Cmd/Todo.pm
+    version: v0.0.1
+requires:
+  File::chdir: '0'
+  Getopt::Alt: '0.003001'
+  Moose::Role: '2.1'
+  Path::Tiny: '0.06'
+  perl: '5.008'
+  version: '0.9902'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Group::Git::Cmd::Todo
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ivanwills/Group-Git-Cmd-Todo.git
+version: v0.0.1

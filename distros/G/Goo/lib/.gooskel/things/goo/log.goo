@@ -1,0 +1,12 @@
+title			=	Log File
+description		=	Log File
+location		=	/tmp
+
+[Z]one			= 	Goo::Zone.pm
+E[X]it			= 	Goo::Exiter.pm
+[J]ump			=	Goo::JumpManager.pm
+[S]hell			=	Goo::ShellCommander.pm
+Back [L]inks	= 	Goo::BackLinkManager.pm
+Care[O]Meter	= 	Goo::CareOMeter.pm
+#[D]elete		=	Goo::FileThing::Deleter.pm
+[P]rofile		=	Goo::Thing::log::Profiler.pm

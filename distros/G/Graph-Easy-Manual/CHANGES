@@ -1,0 +1,170 @@
+Revision history for Graph::Easy::Manual:
+
+2008-05-22 v0.41 Tels 2 tests - Doc, doc, doc, document the code...
+  * regen from and require Graph::Easy v0.63
+  * remove Build.PL (bundle Module::Install v0.71)
+
+2007-09-09 v0.40 Tels 2 tests
+  * regen from Graph::Easy v0.58
+  * fix garbled HTML tags in some HTML files
+  * small fixes all around
+  * add GraphML where appropriate
+  * add editor section
+
+2007-08-12 v0.39 Tels 2 tests
+  * regen from Graph::Easy v0.57
+  * fix link to color attributes
+  * add VCG/GDL support
+  * add notes about special chars \N, \G, \E, \H and \T
+  * mention graph-easy
+
+2007-03-18 v0.38 Tels 2 tests
+  * remove the broken POD2HTML (see Mediawiki-POD for a working version)
+  * regen from Graph::Easy v0.54
+
+2007-02-19 v0.37 Tels 2 tests
+  * regen from Graph::Easy v0.53
+  * add section about class selectors and class selector lists
+  * add FAQ about install under windows
+  * add note about special color "inherit" and remove it from generated tables
+  * mention HSL and HSV colors
+  * shorten HTML of color attribute page (164 Kb vs. formerly 228 Kb)
+  * make link back to the main page absolute, so it works on mirror sites
+
+2006-12-17 v0.36 Tels 2 tests
+  * regen from Graph::Easy 0.50
+  * mention the two mirrors of the HTML version
+  * mentionescaping of '#' to avoid parsing of attribute values as comments
+  * add FAQ about the extension for Graph::Easy texts
+
+2006-10-29 v0.35 Tels 2 tests
+  * regen from Graph::Easy 0.49
+  * make background of normal text a bit lighther to look more clean
+  * move color names and tables to extra page
+  * list all attribute name aliases with "-" ("font-size" etc)
+  * generate lists from the new default attribute entries
+
+2006-09-01 v0.34 Tels 2 tests
+  * regen from Graph::Easy 0.47
+  * add the tutorial about creating a bypass
+  * add the tutorial about inline edge labels
+
+2006-08-11 v0.33 Tels 2 tests
+  * regen from Graph::Easy 0.46
+  * add a Build.PL file
+  * various small fixes and examples added
+  * update section about joints with more examples, fix links to it
+  * update FAQ
+  * output all the color schemes with their colors
+  * gen-manual: allow different output styles for example graphs
+  * update the overview image, and make it safe for colorblind people
+
+2006-04-17 v0.32 Tels 2 tests
+  * regen from Graph::Easy 0.44
+  * add doc about quoting, escaping and encoding to syntax.html
+  * clarify (sub) class name section
+  * make link to IE CSS workaround absolute to make it work on CPAN, too
+  * fix stylesheet to only change color on hovering over links (seems
+    IE allows hover on anything and causes wierd colors)  
+  * quote <, > and & in sample graph texts
+
+2006-02-21 v0.31 Tels 2 tests
+  * regen from Graph::Easy 0.42
+  * add FAQ and tutorial
+  * fix a few broken links and add some small explanations
+  * add more examples and images (minlen, joints, colors, unicode)
+  * complete redesign of the menu structure:
+    + move three menu items to submenus
+    + get rid of container-<p>'s by making <a> as "display: block"
+
+    The background of these changes is:
+    + The menu got too long, cutting of most entries on systems with 800x600
+    + Hovering over a menu-item could only color the text, not the background,
+      since the <a> was not as big as the container-<p> with the border
+    + the base.css file shrunk from 3520 bytes to 2985, and we save a couple
+      hundred bytes on each page in the menu
+
+2006-02-05 v0.30 Tels 2 tests
+  * regen from Graph::Easy 0.41
+  * add section about invisible and anonymous nodes to syntax and features
+  * remove rendundant 'ascii' class from CSS
+  * add more examples:
+    + invisible edges
+    + groups with empty label
+    + point-style: invisible
+  * update HTML output section to match current code status
+  * add a paragraph about the input format and charset/encoding to syntax.html
+  * make links absolute (so that they works on mirrors)
+
+2006-01-28 v0.29 Tels 2 tests
+  * regen from Graph::Easy 0.40
+  * include the missing pages errors.html and glossary.html
+  * move the feature set to an extra page, making the overview slimmer
+  * add more examples of joints to features.html
+  * fix doc about classes (multiple classes)
+  * fix Makefile.PL to work with newer YAML
+
+2006-01-08 v0.28 Tels 2 tests
+  * regen from Graph::Easy 0.39
+  * add Glossary
+  * fix the various menus on the pages to contain all chapters
+  * support "C<..>" in attribute descriptions
+
+2006-01-01 v0.27 Tels 2 tests
+  * regen from Graph::Easy 0.38
+  * update doc about node ports, add examples of joints
+  * add section about flow control
+
+2005-12-18 v0.26 Tels 2 tests
+  * regen from Graph::Easy 0.36
+  * update output.html
+
+2005-12-10 v0.25 Tels 2 tests
+  * regen from Graph::Easy 0.35
+  * add space before "One of..."
+  * add support for "B<...>"
+  * output HTML files in utf-8
+  * add error.html
+  * make Pod2HTML use Pod::Simple::XHTML (easier to override)
+
+2005-12-03 v0.24 Tels 2 tests
+  * add examples/pod2html and lib/graph/Easy/Pod2HTML.pm
+  * require Graph::Easy 0.34
+  * fix object tag for SVG example (needs width/height for firefox)
+  * include explanation for non-SVG browsers
+  * include Graph::Easy::Manual version in output
+  * document:
+    + autosplit nodes with basenames
+    + A* runaway catcher
+    + edge start/ending port restrictions
+    + undirected/bidirectional edges with example 
+  * update benchmark page
+  * move specific hinting-examples from "Syntax" to "Hinting" chapter
+
+2005-11-12 v0.23 Tels 2 tests
+  * regenerate from Graph::Easy 0.33
+  * update the docs with the new edge styles, autosplit attributes etc
+
+2005-11-06 v0.22 Tels 2 tests
+  * regenerate from Graph::Easy 0.32
+  * support "I<>" markup in descriptions
+  * add X<> keywords to POD for indexing
+
+2005-10-30 v0.21 Tels 2 tests
+  * regenerate from Graph::Easy 0.31
+  * encode HTML pages in UTF-8
+
+2005-09-18 v0.20 Tels 2 tests - Doc, doc, doc, document the code...
+  * removed the POD-bases manual, and added the plain HTML
+  * doc/gen_manual creates only the attributes pages
+  * add POD tests via Test::POD (t/pod.t)
+  * add POD coverage tests via Test::POD::Coverage (t/pod_cov.t)
+  * build/gen_manual: sort example colors by brightness
+  * build/gen_manual: create output path if it doesn't exist yet
+
+2005-06-13 v0.19 Tels 10 tests - Doc, doc, doc, document the code...
+  * Split up from Graph::Easy to avoid dependency on Pod::Simple
+  * fix doc/gen_manual to include correct links in index
+  * included more tests for Pod2HTML
+  * support for format 'ascii' via as_ascii_html()
+ 

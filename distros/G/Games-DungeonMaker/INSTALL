@@ -1,0 +1,19 @@
+If you have DungeonMaker installed as a shared library, then simply 
+install as normal:
+
+$ perl Makefile.PL
+$ make
+$ make test
+# make install
+
+If, however, you wish to statically link the module, simply copy the files 
+DungeonMaker.cpp and DungeonMaker.h to the top directory and instead do:
+
+$ perl Makefile.PL.static
+$ make
+$ make test
+# make install
+
+- Aaron Dalton
+aaron@daltons.ca
+

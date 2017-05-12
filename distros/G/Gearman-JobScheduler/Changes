@@ -1,0 +1,76 @@
+Revision history for Perl module Gearman::JobScheduler
+
+0.16   2014-07-01
+    * Fix support for Perl 5.19+.
+    * Remove support for "timeout()" subroutine because it wasn't working as
+      expected.
+    * Add basic, sanity checking unit tests.
+    * Add compile test.
+    * Fix list of module dependencies.
+
+0.15   2014-02-18
+    * Add FILENO() subroutine to Gearman::JobScheduler::ErrorLogTrapper because
+      otherwise IPC::Open3 fails (see
+      http://stackoverflow.com/a/6012757/200603).
+
+0.14   2014-02-05
+    * Remove fork()-based workers because they're more of a bug than a feature;
+      clients should run separate processes instead.
+    * Use JSON instead of Storable to encode / decode job arguments in order to
+      improve compatibility with Gearman clients / workers in other languages.
+
+0.13   2014-02-03
+    * Sanitize function name when writing to a single ("unified") log.
+
+0.12   2014-02-03
+    * Added support for writing worker logs into a single file.
+    * Print job arguments into a single line for clarity.
+
+0.11   2013-11-19
+    * Got rid of the Sys::Path dependency because it doesn't work on Perl 5.18
+      without warnings (requires JSON::Util -> IO::Any -> uses "~~" and "given"
+      which emit warnings).
+
+0.10   2013-11-18
+    * Got rid of an outdated/experimental "given-when" syntax so Perl 5.18
+      doesn't complain.
+    * Dropped leading 'v' off versions to satisfy CPAN::Changes::Spec.
+    * Added GitHub repo to Build.PL / META.yml.
+
+0.09   2013-10-28
+    * Make "unique_job_id()" public for the use of client applications because
+      they might want to generate their own unique job IDs in order to test
+      whether or not a job with given parameters is enqueued.
+
+0.08   2013-10-21
+    * Gearman::JobScheduler::Admin utility package for administering the
+      server (just like "gearadmin" does).
+    * Removed Gearman::JobScheduler::cancel_gearman_job() subroutine as
+      redundant.
+    * Don't die() when a log path is not found.
+    * Added Gearman/JobScheduler/Worker.pm to the list of "provided" files.
+
+0.07   2013-10-07
+    * Moose 2.1005 requirement.
+
+0.06   2013-10-07
+    * Handle (log) undefined arguments to run() correctly.
+
+0.05   2013-10-07
+    * Use SHA256 hashes for GJS-generated unique job identifiers because the
+      job identifier is limited to 64 bytes by Gearman which is usually not
+      enough.
+
+0.04   2013-09-30
+    * Ability to start multiple worker instances of a single Gearman function.
+
+0.03   2013-09-30
+    * Gearman functions can now provide their own default configurations.
+
+0.02   2013-09-30
+    * Moved worker helper subroutines to a separate package so that they can be
+      reused more easily.
+
+0.01   2013-09-16
+    * Initial release.
+

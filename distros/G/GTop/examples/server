@@ -1,0 +1,25 @@
+#!perl
+
+use strict;
+
+use ExtUtils::testlib;
+use GTop::Server ();
+
+my $gtops = GTop::Server->new;
+my $config = shift || "server.conf";
+
+if (-e $config) {
+    print "reading server config from $config..\n";
+    $gtops->read_config($config);
+}
+else {	
+    print "$config not found, falling back to default config..\n";
+    #same as server.conf
+    $gtops->allow("127.0.0.1");
+
+    $gtops->debug(1);
+    $gtops->no_fork(1);
+    $gtops->no_daemon(1);
+}
+
+$gtops->start;

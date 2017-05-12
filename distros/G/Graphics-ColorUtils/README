@@ -1,0 +1,40 @@
+Graphics-ColorUtils version 0.17
+================================
+
+A collection of easy-to-use utilities for handling colors:
+- Color space conversions
+- Color lookup by name
+- Color gradients
+
+Initial Release Version (alpha)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module was designed to have as few dependencies as possible,
+in particular it does NOT rely on any specific OS or graphical 
+environment. 
+
+This module requires the standard "Carp" module.
+
+EXAMPLES AND WEBSITE
+
+Check the author's website at www.beyondcode.org.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006,2007 by Philipp K. Janert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

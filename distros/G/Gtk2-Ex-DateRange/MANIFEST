@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Gtk2/Ex/DateRange.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/show-range.t
+t/show-range-popup.t
+examples/show-range.pl
+examples/show-range-popup.pl
+examples/show-range-with-model-1.pl
+examples/show-range-with-model-2.pl

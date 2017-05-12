@@ -1,0 +1,45 @@
+This is GIFgraph::boxplot 1.00, a package to generate GIF box and whisker plots,
+using Lincoln Stein's GD.pm and Martien Verbruggen's GIFgraph.pm
+
+INSTALLATION
+
+needed to install:
+
+	perl 5.004
+	GD > 1.14
+	GIFgraph >= 1.10
+	Statistics::Descriptive >= 2.4
+
+to install:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+to see some samples:
+
+	cd samples
+	make
+
+That should generate a set of gifs.
+
+The documentation available is contained in GIFgraph/boxplot.pm, as pod.
+
+AUTHOR
+
+Nigel Wright
+nwright@hmc.edu
+
+THANKS
+
+Mark Landry, Client/Server Architects, Inc.
+brian d foy
+
+COPYRIGHT
+
+Copyright (c) 1999 Nigel Wright. All rights reserved.
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

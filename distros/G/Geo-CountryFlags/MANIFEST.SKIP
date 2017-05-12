@@ -1,0 +1,9 @@
+~$
+work/*
+flags/*
+blib/*
+Geo*
+Makefile
+Makefile.old
+pm_to_blib
+tmp*

@@ -1,0 +1,47 @@
+GTK_TYPE_ASSISTANT			GtkAssistant			GtkObject	Gtk2::Assistant
+GTK_TYPE_ASSISTANT_PAGE_TYPE		GtkAssistantPageType		GEnum		Gtk2::AssistantPageType
+
+GTK_TYPE_CELL_RENDERER_ACCEL		GtkCellRendererAccel		GtkObject	Gtk2::CellRendererAccel
+GTK_TYPE_CELL_RENDERER_ACCEL_MODE	GtkCellRendererAccelMode	GEnum		Gtk2::CellRendererAccelMode
+
+GTK_TYPE_CELL_RENDERER_SPIN		GtkCellRendererSpin		GtkObject	Gtk2::CellRendererSpin
+
+GTK_TYPE_LINK_BUTTON			GtkLinkButton			GtkObject	Gtk2::LinkButton
+
+GTK_PRINT_ERROR				GTK_TYPE_PRINT_ERROR		GError		Gtk2::PrintError
+GTK_TYPE_PAGE_ORIENTATION		GtkPageOrientation		GEnum		Gtk2::PageOrientation
+GTK_TYPE_PAGE_SET			GtkPageSet			GEnum		Gtk2::PageSet
+GTK_TYPE_PAGE_SETUP			GtkPageSetup			GObject		Gtk2::PageSetup
+GTK_TYPE_PAPER_SIZE			GtkPaperSize			GBoxed		Gtk2::PaperSize
+GTK_TYPE_PRINT_CONTEXT			GtkPrintContext			GObject		Gtk2::PrintContext
+GTK_TYPE_PRINT_DUPLEX			GtkPrintDuplex			GEnum		Gtk2::PrintDuplex
+GTK_TYPE_PRINT_OPERATION		GtkPrintOperation		GObject		Gtk2::PrintOperation
+GTK_TYPE_PRINT_OPERATION_ACTION		GtkPrintOperationAction		GEnum		Gtk2::PrintOperationAction
+GTK_TYPE_PRINT_OPERATION_PREVIEW	GtkPrintOperationPreview	GInterface	Gtk2::PrintOperationPreview
+GTK_TYPE_PRINT_OPERATION_RESULT		GtkPrintOperationResult		GEnum		Gtk2::PrintOperationResult
+GTK_TYPE_PRINT_PAGES			GtkPrintPages			GEnum		Gtk2::PrintPages
+GTK_TYPE_PRINT_QUALITY			GtkPrintQuality			GEnum		Gtk2::PrintQuality
+GTK_TYPE_PRINT_SETTINGS			GtkPrintSettings		GObject		Gtk2::PrintSettings
+GTK_TYPE_PRINT_STATUS			GtkPrintStatus			GEnum		Gtk2::PrintStatus
+
+GTK_RECENT_CHOOSER_ERROR		GTK_TYPE_RECENT_CHOOSER_ERROR	GError		Gtk2::RecentChooser::Error
+GTK_RECENT_MANAGER_ERROR		GTK_TYPE_RECENT_MANAGER_ERROR	GError		Gtk2::RecentManager::Error
+GTK_TYPE_RECENT_CHOOSER			GtkRecentChooser		GInterface	Gtk2::RecentChooser
+GTK_TYPE_RECENT_CHOOSER_DIALOG		GtkRecentChooserDialog		GtkObject	Gtk2::RecentChooserDialog
+GTK_TYPE_RECENT_CHOOSER_MENU		GtkRecentChooserMenu		GtkObject	Gtk2::RecentChooserMenu
+GTK_TYPE_RECENT_CHOOSER_WIDGET		GtkRecentChooserWidget		GtkObject	Gtk2::RecentChooserWidget
+GTK_TYPE_RECENT_FILTER			GtkRecentFilter			GtkObject	Gtk2::RecentFilter
+GTK_TYPE_RECENT_FILTER_FLAGS		GtkRecentFilterFlags		GFlags		Gtk2::RecentFilterFlags
+GTK_TYPE_RECENT_INFO			GtkRecentInfo			GBoxed		Gtk2::RecentInfo
+GTK_TYPE_RECENT_MANAGER			GtkRecentManager		GObject		Gtk2::RecentManager
+GTK_TYPE_RECENT_SORT_TYPE		GtkRecentSortType		GEnum		Gtk2::RecentSortType
+
+GTK_TYPE_SENSITIVITY_TYPE		GtkSensitivityType		GEnum		Gtk2::SensitivityType
+
+GTK_TYPE_STATUS_ICON			GtkStatusIcon			GObject		Gtk2::StatusIcon
+
+GTK_TYPE_TARGET_LIST			GtkTargetList			GBoxed		Gtk2::TargetList
+
+GTK_TYPE_TREE_VIEW_GRID_LINES		GtkTreeViewGridLines		GEnum		Gtk2::TreeViewGridLines
+
+GTK_TYPE_UNIT				GtkUnit				GEnum		Gtk2::Unit

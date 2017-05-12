@@ -1,0 +1,12 @@
+0.05 Minor perlcritic adjustments. Also hoping a rebuild will fix
+     CPANTS license complaints.
+
+0.04 Added transparent background support (b="transparent")
+
+0.03 Fixed divide-by-zero, thanks for the report, Todd!
+     Added a few more tests
+
+0.02 Fixed off by one error
+     Extended to support different chart types using 't' param (t='b' by default)
+
+0.01 Initial release

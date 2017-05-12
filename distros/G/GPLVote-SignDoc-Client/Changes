@@ -1,0 +1,30 @@
+Revision history for Perl extension GPLVote::SignDoc::Client.
+
+0.9  30/03/2015 01:20
+  - fix package format
+
+0.8  30/03/2015 01:20
+  - decrise required Perl version
+
+0.7  06/02/2015 20:38
+  - Translate russian comments to english
+  - Remove functions for work with system proxy-servers
+  - Add CRC sha256 in encrypt function
+  - Optional use sha256 hash for verify sign
+
+0.5  22/12/2014 01:39
+  - Fix errors
+  - Change params for get_docs
+
+0.4  21/12/2014 00:14:00
+  - Fix encryption for big documents
+
+0.3  20/12/2014 00:51:00
+  - Encryption for big documents
+
+0.2  18/12/2014 00:51:00
+  - Fix description
+  - Fix get_docs function
+
+0.1  16/12/2014 23:44:03
+  - First version

@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+pairyaml2txt - Convert a pairingtable in YAML format into readable text
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $man = 0;
+my $help = 0;
+
+GetOptions ( 'help|?' => \$help, man => \$man) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+use YAML qw/LoadFile/;
+use List::MoreUtils qw/all/;
+
+use Games::Tournament::Swiss::Config;
+
+my $swiss = Games::Tournament::Swiss::Config->new;
+
+my $league = LoadFile "./league.yaml";
+die 'round.yaml already exists' if -e 'round.yaml';
+my $roleNames = $league->{roles} || [qw/White Black/];
+my $scores = $league->{scores} ||
+	{ win => 1, loss => 0, draw => 0.5, absent => 0, bye => 1 };
+my $firstround = $league->{firstround} || 1;
+my $algorithm = $league->{algorithm} || 'Games::Tournament::Swiss::Procedure::FIDE';
+my $abbrev = $league->{abbreviation} ||
+    { W => 'White', B => 'Black', 1 => 'Win', 0 => 'Loss',
+	0.5 => 'Draw', '=' => 'Draw'  };
+
+$swiss->frisk($scores, $roleNames, $firstround, $algorithm, $abbrev);
+
+$Games::Tournament::Swiss::Config::firstround = $firstround;
+%Games::Tournament::Swiss::Config::scores = %$scores;
+@Games::Tournament::Swiss::Config::roles = @$roleNames;
+$Games::Tournament::Swiss::Config::algorithm = $algorithm;
+
+require Games::Tournament::Swiss;
+require Games::Tournament::Contestant::Swiss;
+require Games::Tournament::Card;
+
+my %abbrev = reverse %$abbrev;
+my $file;
+
+if ($ARGV[0]) { $file = $ARGV[0]; }
+else { $file = "./pairtable.yaml"; }
+
+my $players = $league->{member};
+my $yaml = LoadFile $file;
+my $opponents = $yaml->{ opponents };
+my $roles = $yaml->{ roles };
+my $floats = $yaml->{ floats };
+my $score = $yaml->{ score };
+
+my $table;
+my %brackets;
+
+my $round = @{$opponents->{1}} + 1;
+my @ids = 1 .. @$players;
+for my $id ( @ids )
+{
+	my $score = $table->{$id}->{score} = $score->{$id};
+	$table->{$id}->{opponents} = join ',', @{$opponents->{$id}};
+	$table->{$id}->{roles} = join '', map { $abbrev{$_} } @{$roles->{$id}};
+	$table->{$id}->{floats} = $floats->{$id};
+	push @{ $brackets{$score} }, $id;
+}
+my $playerN = 0;
+
+print "
+		Round $round Pairing Groups
+-------------------------------------------------------------------------
+Place  No  Opponents     Roles     Float Score
+";
+for my $score ( reverse sort keys %brackets )
+{
+	$playerN++;
+	my $place = $playerN;
+	my @members = @{ $brackets{$score} };
+	$place .= '-' . ($playerN+$#members) if $#members;
+	$playerN += $#members;
+	print "$place\n";
+	foreach my $id ( @members )
+	{
+		my $floats = $table->{$id}->{floats};
+		my $float = '';
+		$float = 'd' if $floats->[-2] and $floats->[-2] eq 'Down';
+		$float = 'u' if $floats->[-2] and $floats->[-2] eq 'Up';
+		$float .= 'D' if $floats->[-1] and $floats->[-1] eq 'Down';
+		$float .= 'U' if $floats->[-1] and $floats->[-1] eq 'Up';
+
+	# no warnings;
+	format STDOUT =
+@<<<<< @<< @<<<<<<<<<<<<< @<<<<<<<< @<< @<<<
+"\t", $id,  $table->{$id}->{opponents}, $table->{$id}->{roles}, $float, $score
+.
+	write;
+	# use warnings;
+	}
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+pairyaml2txt pairtable.yaml
+
+Options:
+
+--help            This help message
+
+--man            A man page
+
+=head1 DESCRIPTION
+
+B<pairyaml2txt> converts a pairing table in YAML form into one in more traditional readable form, as produced by B<pairingtable> for example.
+
+The script expects the YAML pairing table and the league.yaml file to be in the same directory the command is run in. So run it in the directory league.yaml is in and pass the name of a pairing table in that directory. The default name is B<pairtable.yaml>. The table is printed to STDOUT.
+
+To go the other way from a traditional pairing table to one in YAML form, use B<pairtable2yaml>.
+
+=cut
+
+# vim: set ts=8 sts=4 sw=4 noet:

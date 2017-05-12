@@ -1,0 +1,8 @@
+Build.PL
+MANIFEST
+Makefile.PL
+META.yml
+README
+lib/Games/Set.pm
+lib/Games/Set/Card.pm
+t/set.t

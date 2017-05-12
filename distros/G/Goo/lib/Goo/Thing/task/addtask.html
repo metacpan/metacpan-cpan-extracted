@@ -1,0 +1,62 @@
+<html>
+
+<head>
+<title>Add a New Task</title>
+</head>
+<body>
+<h1>Add New Task</h1>
+<form action="/addtask.pl" method=GET>
+Requested By 
+<select name="requestedby">
+<option value="nigel">Nigel</option>
+<option value="megan">Megan</option>
+<option value="sven">Sven</option>
+<option value="rena">Rena</option>
+</select><br>
+Company
+<select name="company">
+<option value="trexy">Trexy</option>
+<option value="turbo10">Turbo10</option>
+</select><br>
+Task Title <input type=text width=100 name=title><br>
+Priority 
+<select name="importance">
+<option value="1">1 (least important)</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10 (most important)</option>
+</select><br>
+Description (why/what/where/how/when?)<br>
+<textarea cols=60 rows=20 name="description"></textarea><br>
+<input type="submit" value="Add Task">
+</form>
+</body>
+</html>
+
+__END__
+
+=head1 NAME
+
+ - 
+
+=head1 SYNOPSIS
+
+use ;
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+
+=head1 AUTHOR
+
+Nigel Hamilton <nigel@trexy.com>
+
+=head1 SEE ALSO
+

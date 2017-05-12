@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 7772303d42cb305452948ecf11f1080d3773df43 Changes
+SHA1 05706763728e5f6c8f2f08344d4baded3f9dbf28 MANIFEST
+SHA1 e6e7c2904ea5d300c0ddf70fc5a80f5005229aa9 MANIFEST.SKIP
+SHA1 5a36df1e464504c772834e090ba9058e8e916d96 META.yml
+SHA1 67ebdca30d76dc4f6dce3334551ed1bc9ec07434 Makefile.PL
+SHA1 3e3c601a54f8f3fb57a1d69ef692a9f977e15b85 README
+SHA1 b34f535929ee9403689df17125db139b53201c32 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 69076eab94dc9845b1d3899080a4960ffa7427e2 debian/control
+SHA1 1c91f2e47fbb0dbd594c33375ff9889ef1f7551b debian/copyright
+SHA1 99a81fdc21691535dc2a98271015b88c8e2de700 debian/patches/pod-examples-dir.diff
+SHA1 8038e74813b8dd23df6433cac4c144e4ba39f57f debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 26b99e374b7801d6e59bae6ad141af149ea3cbb7 debian/watch
+SHA1 b37183c3414f09a6a4d309ab0feb463227e5e323 devel/Pause-backup.pm
+SHA1 66ef4f91fda0a9eb6a5998657010e3fde0361fa3 devel/StopForMenu.pm
+SHA1 22abc584a240a0b9b739e887306e8d7464b9ac5f devel/Stopper.pm
+SHA1 0608baf2cf49f2cf5490cdb582338359c4adac59 devel/buildable.pl
+SHA1 aa9747f765b8b06898b9fc25dd25d1bb829e8484 devel/clock-gettime.pl
+SHA1 38120643445b6f51b62130acffd44eac37b13b7c devel/display.t
+SHA1 b28704439eaee724d0e545598a99e295db99d896 devel/refilter.pl
+SHA1 95ad35391301315ad68e82fadd24510c3c843e1d devel/run.pl
+SHA1 786b7b60670350d2e891eb904a50f819709e70bf devel/window-move.pl
+SHA1 9b20da300ff48f6784cfd7a63342aed4da92c1ad examples/builder.pl
+SHA1 e77c780dd30dda71ed41d11e34107c2b4a95f3d6 examples/financequote.pl
+SHA1 9ccc45e1fc3e3f23e68948f2119578124e8c2633 examples/news.pl
+SHA1 2aefce1e3530993fe88063a87d50ef45c5aad650 examples/order.pl
+SHA1 75704bc9e622165a9904d756d3c19f954490f1af examples/poe-yahoo-quotes.pl
+SHA1 7b2e9c6c335b7e6e47b4aa031779f7ca381c4695 examples/simple.pl
+SHA1 88a0bd1c6ab0ed93cf49f1d9d39196f444b8ea9f examples/vertical-rottext.pl
+SHA1 3a11ff215938f89a662d00c269a09aff2c66fbb7 examples/vertical.pl
+SHA1 d8b634a08fc8606e43c279e5a53370c10e984984 examples/wrap-width.pl
+SHA1 4fb53efe76b3b2264eaa4cf7780cb0c4923e18a5 inc/MyMakeMakerExtras.pm
+SHA1 692a1ddc2ca6b98cac7b48ea40bc1ac1509e8ed9 inc/my_pod2html
+SHA1 dedf5552bfb1b92325ab22b96b4516ceaeb0646e lib/Gtk2/Ex/TickerView.pm
+SHA1 d2f58e66e0965c50aefc0479cd5712e8df53336e t/MyTestHelpers.pm
+SHA1 06b321c36977d841dedc60d0e4afb7d59ce1bd6f t/Test/Weaken/ExtraBits.pm
+SHA1 a932fa238f60b3ec2dd744a23d03499ec9e5df08 t/TickerView.t
+SHA1 3a0c36bbcdae616e449c23625a234b1baecb2458 t/buildable.t
+SHA1 29c671858c90e69e2e402c55f74d4640b90a7b8c t/test-weaken.t
+SHA1 9127f78a0dfa04976acbb979dd7862ef59a74c58 xt/0-META-read.t
+SHA1 37abd43b41068804ea4bb099fdd89af21be82926 xt/0-Test-DistManifest.t
+SHA1 8f93fb4c8f0424a4442cc93c9a2e86342ef55281 xt/0-Test-Pod.t
+SHA1 1de8f07883f6bf1a2ef79f2cb8adf1deb3f61cee xt/0-Test-Synopsis.t
+SHA1 fb517c2fae5ddac559318bf6a224949115ea3129 xt/0-Test-YAML-Meta.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFNGRnXLFMCIV9q3ToRAjk1AJ4i0C6ot2xWBM1nFrC+nfnUjrWg6QCgnK7Q
+ZyEGGvSqm+AGX5b7/C27VxA=
+=51TY
+-----END PGP SIGNATURE-----

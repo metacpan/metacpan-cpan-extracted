@@ -1,0 +1,89 @@
+Revision history for Perl module GPS::Point
+
+TODO
+  - Port new error methods from gpsd
+  - Allow the setting of the DateTime property
+  
+0.20 2013-06-11
+  - Added GPS::Point->buffer method and tests
+  - Updated all tests to use strict
+  - Fixed three spelling issues
+
+0.19 2011-05-05
+  - Added spec file to distribution
+
+0.18 2010-02-17
+  - Require a Geo::ECEF->can("new")
+  - Update to get tests to pass on Win32
+  - Removed test using Geo::WebService::Elevation::USGS from dist
+
+0.17 2010-01-02
+  - Win32 Test fail becuse they cannot tell difference between Geo::ECEF and geo::ecef.  "geo" is a depricated name space in favor of Geo.
+
+0.16 2009-12-15
+  - RT 52364 fixed test
+  - Added test for datetime method
+  - Renamed q2u to _q2u
+
+0.15 2009-11-27
+  - Fixed bug where a 0 lat, lon, or alt returns as undef in initializeMulti
+
+0.14 2009-11-26
+  - Broke out forward method
+  - Re-wrote track method as a wrapper around forward method
+  - Added tests for track method
+  - Added tests for forward method
+  - Updated SKIP in tests
+
+0.13 2008-12-31
+  - Updated SKIP in test
+
+0.12 2008-12-30
+  - Updated setAltitude method to handle undef return
+  - Added setAltitude tests
+
+0.11 2008-12-29
+  - Documentation
+  - Organized tests
+  - Added setAltitude method
+
+0.10 2008-12-28
+  - Fixed time ||/+ precedent bug in track method in version 0.09
+  - Added copy and track tests
+  - Updated documentation
+  - Exposed point capabilities from distance method as newMulti constructor
+  - Added datetime method
+
+0.09 2008-12-27
+  - Added track method (ported from Net::GPSD::Point)
+
+0.08 2008-07-28
+  - Require Geo::Inverse to pass tests
+  - Changed license to BSD from perl
+  - Fixed test issue
+
+0.07 2008-07-27
+  - updated distance method to support multiple point formats.
+
+0.06 2007-04-08
+  - Documentation
+
+0.05 2007-04-07
+  - Documentation
+  - Added method aliases e.g long, latitude...
+  - Added fix method
+
+0.04 2007-04-07
+  - test floats with Test::Number::Delta
+  - added skip tests
+  - newGPSD constructor
+  - documentation
+
+0.03 2007-04-06
+  - Added ecef, distance, GeoPoint methods
+
+0.02 2007-03-29
+  - First Version on CPAN
+
+0.01 2007-02-26
+  - original version; created by ExtUtils::ModuleMaker 0.47

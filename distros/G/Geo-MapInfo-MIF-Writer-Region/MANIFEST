@@ -1,0 +1,15 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Geo/MapInfo/MIF/Writer/Region.pm
+t/001_load.t
+perl-Geo-MapInfo-MIF-Writer-Region.spec
+scripts/perl-Geo-MapInfo-MIF-Writer-Region-data.pl
+scripts/perl-Geo-MapInfo-MIF-Writer-Region-empty.pl
+scripts/perl-Geo-MapInfo-MIF-Writer-Region-example.pl
+scripts/perl-Geo-MapInfo-MIF-Writer-Region-minimal.pl
+scripts/perl-Geo-MapInfo-MIF-Writer-Region-mrdvt92.pl
+META.yml                                 Module meta-data (added by MakeMaker)

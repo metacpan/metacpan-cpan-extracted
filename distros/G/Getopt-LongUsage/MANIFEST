@@ -1,0 +1,7 @@
+CHANGES
+Makefile.PL
+MANIFEST
+README
+runtests
+t/Getopt-LongUsage.t
+lib/Getopt/LongUsage.pm

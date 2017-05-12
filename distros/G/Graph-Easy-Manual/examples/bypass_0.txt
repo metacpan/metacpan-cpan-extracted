@@ -1,0 +1,4 @@
+
+[ Bonn ] --> [ Koblenz ] --> [ Frankfurt ] --> [ Dresden ]
+
+[ Koblenz ] --> [ Trier ] --> [ Frankfurt ]

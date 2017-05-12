@@ -1,0 +1,50 @@
+# ChangeLog for app-shells/ksh
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/ksh/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  27 Apr 2004; Aron Griffis <agriffis@gentoo.org> ksh-93.20030724.ebuild,
+  ksh-93.20040229.ebuild:
+  Add flag-o-matic for bug 49179
+
+  15 Apr 2004; Michael McCabe <randy@gentoo.org> ksh-93.20040229.ebuild:
+  adding s390 keywords
+
+*ksh-93.20040229 (10 Apr 2004)
+
+  10 Apr 2004; Tavis Ormandy <taviso@gentoo.org> ksh-93.20040229.ebuild:
+  new release
+
+  06 Dec 2003; Jason Wever <weeve@gentoo.org> ksh-93.20030724.ebuild:
+  Marked stable on sparc, closes #25668
+
+  02 Dec 2003; Tavis Ormandy <taviso@gentoo.org> ksh-93.20030724.ebuild:
+  die if build script fails, no longer required to fail first.
+
+  11 Oct 2003; Jason Wever <weeve@gentoo.org> ksh-93.20030724.ebuild:
+  Added ~sparc keyword, resolves bug #25668.
+
+  22 Sep 2003; <paul@gentoo.org> metadata.xml:
+  Fix metadata.xml
+
+  17 Sep 2003; Tavis Ormandy <taviso@gentoo.org> ksh-93.20030422.ebuild:
+  removing old ebuilds.
+
+*ksh-93.20030724 (10 Sep 2003)
+
+  10 Sep 2003; Tavis Ormandy <taviso@gentoo.org> ksh-93.20030724.ebuild:
+  --> stable
+
+  06 Sep 2003; Tavis Ormandy <taviso@gentoo.org> :
+  New version of ast-ksh and INIT, testing a patch that seems to 
+  stop linking errors.
+  some syntax changes.
+  make repomans whitespace checker happy.
+
+  20 Jul 2003; Tavis Ormandy <taviso@gentoo.org> ksh-93.20030422.ebuild:
+  save some bandwidth, and mark stable on Alpha
+
+*ksh-93.20030422 (29 May 2003)
+
+  29 May 2003; Tavis Ormandy <taviso@gentoo.org> ksh-93.20030422.ebuild:
+  Initial import of David Korn's original shell.
+

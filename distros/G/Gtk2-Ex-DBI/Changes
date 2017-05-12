@@ -1,0 +1,227 @@
+CHANGELOG
+
+Version 2.30 released 08-Feb 2014
+
+    Added support for multi-column primary keys
+    Added support for sequences
+    Added support for Netezza
+    Added partial support for Oracle ( I didn't get much time to test it out )
+    Added support for prefixing widget names with a string ( helps separate multiple instances with common field names )
+    Added ability to skip primary keys in update statements
+    Added GtkBuilder support
+    7 years worth of other stuff I don't quite remember
+    Ported to Gtk3 ( coming soon )
+
+Version 2.2, not released ( oops )
+    Look for an SQL alias widget before checking for the primary key in apply()
+    Use $widget->set_value() for Gtk2::SpinButton, or some strange stuff happens to invisible widgets
+    Warn if set_widget_value() fails for combos because a value wan't in the model
+    Fixed some recursion in changed() for on_changed and on_initial_changed() callbacks
+	
+Version 2.1, released 01-Jul-2007
+    
+    Added debugging messages for signal connection / disconnection
+    Fixed bug in disconnecting signal from a textview's buffer
+    Check if a combo has a model before trying to get an iter; warn if no model present
+    Optimisation: don't keep calling $widget->get_model ... keep model around for re-use
+    Add primary key detection for SQL Server ( and re-enables SQL Server support which was completely broken )
+    Fixed bug in disconnecting signal from a ComboBoxEntry's child entry widget
+    Added setup_combo() for creating / refreshing combo models & setting up autocompletion
+    Added 'Find' right-click menu item for ComboBoxEntry's children
+    Added 'Refresh Combo' right-click menu item for ComboBoxEntry's children we have setup definitions for
+    Added get_widget_value method and use it in apply method ( remove code duplication )
+    Added set_widget_value method and use it in paint method ( remove code duplication )
+    Renamed 'readonly' option to 'read_only' ( and added legacy support with warning )
+    Added data-driven record locking ( via data_lock_field ), lock() and unlock() methods
+    'tab-forward' when an Enter key is pressed instead of leaving the focus in the current field
+    Fixed rare off-by-one error in fetch_new_slice() that was creating invalid SQL
+    Added record_status_label_set() to handle setting the record status label, and added some more colour
+    Fixed nuking of where object in constructor
+    Added reset_record_status() to reset 'changed' flag ( so Gtk2::Ex::DBI considers the record synchronised )
+    Added more error handling in constructor ( die with a descriptive error if we're missing something )
+    Removed duplicate set_record_spinner_range() in query()
+    Added support for pass_through queries that return a recordset ( including stored procedures ) - read_only
+    Added 'status_label' key to allow you to specify a label ( by name ) to use to indicate the record status
+    Don't include identity columns in insert / update SQL ( fixes SQL Server updates )
+    Added 'record_spinner' key to allow you to specify a SpinButton ( by name ) to use as the record spinner
+    Added ability to pass a new where object to setup_combo
+    Added 'widgets' hash, to store metadata about fields
+    Added support for using SQL aliases ( select field as alternative_field ) and binding to the alias
+    Suppress more non-fatal warnings when quiet mode is activated
+    Added support for custom 'before_apply' function, which can block the apply method
+    Dump $local_sql to console via warn() if query() fails and debug is set
+    Added support for using a set of SpinButtons to create 1 TimeSpinner ( experimental )
+    Replaced padding code with sprintf()
+    Added friendly_table_name key to override $self->{sql}->{from} in GUI errors
+    Added date_only input formatter
+    Added currency input formatter
+    Added date_dd-mm-yyyy input formatter
+    Added parser for SQL Server default definitions
+    INCOMPATIBLE CHANGE:
+       get_column_value() now returns an ARRAY if multi_select is turned on
+    Populate the widgets hash and the sql_to_widget_map hash with details of the primary key after detection
+    Added date_dd-mm-yyyy output formatter
+    Disable 'find' menu item in right-click menu of widgets for pass-through queries
+    Don't require a formname - if one isn't passed, get the 1st window title from the Glade XML object
+    Added currency output_formatter
+    Imported more robust primary key detection from Gtk2::Ex::Datasheet::DBI
+    Don't set the changed flag if we're in read_only mode
+    Added 'type' key to widgets hash and automatically set up input / output formatters based on type
+    Added sum_widgets()
+    Fixed bug in inserting a record when we're at the end of the keyset
+    Simplified apply() and improved debugging output
+    Strip dollar signs from values in formatter_number() - we add our own if requested
+    Added DBD::SQLite support
+    Added original_value()
+    
+    Patches from DLB:
+        Add support for Postgres:
+            Set search path in constructor when Postgres driver detected
+            Add support for Postgres in last_insert_id()
+    
+Version 2.0, released 19-Dec-2005
+    
+    Overhaul SQL clause handling - now all SQL-related stuff is in the 'sql' hash ( see docs )
+    Added support for placeholders in where clause
+    Added legacy mode to support 1.x requests
+    Added find tool ( right-click in a widget and select 'find', or call find_dialog() ) for user searches
+    Added detection of primary key from column_info() ( MySQL only at present )
+    Added destroy method, which destroys all signal handlers we've created, then destroys itself
+    Don't modify $self->{sql}->{select} in fetch_new_slice - assemble $local_sql and modify that
+    Added missing 'order by' string to fetch_new_slice ... I was wondering what was up with that :)
+    Change suspicious signal_connect calls to signal_connect_after ( avoid GtkEntry focus-out-event error )
+    Remove unnecessary signal_handler_block() and signal_handler_unblock() calls before set_record_spinner_range()
+    Delete records in $self->{records} before querying ( fixes display of 'stale' records if query() returns no records )
+    Fixed rare bug in display of 'stale' record if there's only 1 record, and it gets deleted
+    Added method undo(), which is a synonym of revert()
+    Updated documentation & cleaned up POD somewhat
+    
+Version 1.3, released 16-Sep-2005
+    
+    Dialog question asking user whether to apply if window is closed with unapplied changes to recordset
+    Added support for placeholders in sql_where clause ( avoid SQL injection )
+    Fixed setting of calculated field if result of calculation is 0
+    Fixed dialog description of DBI error message if apply fails
+    Fixed bug in trying to block non-existant signal when setting a primary key retrieved from an insert
+    Replaced remaining 0s and 1s to FALSEs and TRUEs
+    
+Version 1.2, released 15-Aug-2005
+    
+    Set default values from database field definitions when inserting a new record ( ie onscreen )
+    Create a key in our records hash for each field when inserting a new record ( avoids Perl warnings about uninitialised values )
+    Removed set_defaults() - incorporated into assemble_new_record()
+    Added more eval{} stuff around DB interaction, with Gtk2::Ex::Dialog::ErrorMsg warnings when things fail
+    Gtk2::Ex::DBI->new() returns FALSE if initial query fails
+    
+Version 1.1, released 02-Aug-2005
+    
+    Ask user if they want to apply changes to current record before requerying ( ie don't simply apply without asking )
+    Add $sth->finish commands throughout to make things more SQLServer friendly when using DBD::ODBC with FreeTDS
+    INCOMPATIBLE CHANGE: Automatically move to a new position when the record spinner is clicked
+    Add missing $self->paint_calculated call at the end of $self->paint
+    Added debug key to dump some info to the terminal
+    Added calculator dialog to right-click menu of Gtk2::Entry widgets
+    Withdrew claim that we work with SQL Server ( see man page )
+    Removed unnecessary documentation of internal functions
+    Removed support for Gnome2::DateEdit, which is not suitable for database use due to it's handling of NULL values
+    See http://bugzilla.gnome.org/show_bug.cgi?id=169787
+    
+Version 1.0, released 10-Jun-2005
+    
+    Removed broken last_insert_id code - everything now uses select @@IDENTITY
+    Cache the fieldlist array in $self->{fieldlist} so we don't have to query the DB every time we need a field list
+    
+Version 0.9, released 11-May-2005
+    
+    Add checks to get rid of ( some ) warnings about 'Use of uninitialized value' in various places
+    Moved set_active_iter_for_broken_combo_box to run on 'changed' signal of combo's child instead of 'focus_out_event'
+    Removed $widget->get_child->set_text("") from set_active_iter_for_broken_combo_box ... WTF was that for?
+    Fixed a bug in 'delete' method that was deleting the wrong record from the *in-memory* recordset ( DB data was OK )
+    Add insertion marker to primary key of *in-memory* recordset if there are no records ( otherwise users must first insert() before entering data )
+    Updated TODO
+
+Version 0.8, released 10-Mar-2005
+    
+    INCOMPATIBLE CHANGE: don't call on_current while we're constructing ourself - external code won't be able to 'see' us yet
+    Added constructor_done flag to indicate whether we have been returned to the calling code yet
+    You should manually call the on_current code immediately *after* the object constructor ... when your Gtk2::Ex::DBI object will be available
+    Added method of running external code before applying changes to the current record ( on_apply - similar to on_current )
+    Apply changes to the current record before requerying ( query method )
+    Properly handle empty recordsets in count method
+    Append primary key to sql_select if necessary in fetch_new_slice method
+    Added 'quiet' flag to silence warnings such as missing widgets
+    Added 'use strict' directive and fixed up issues this raised
+    Added demo application - a dream database ( distributed separately - see download page on website )
+    Use 'make dist' to create distributable package instead of manually creating archive - thanks Ofey
+    Updated website to make better use of space - also thanks to Ofey for suggestion to clean it up
+    
+Version 0.7, released 10-Feb-2005
+    
+    Rewrote 'insert into' syntax in 'apply' method to be more DB-neutral
+    Completed support for MS SQL server ( and most likely Sybase ... maybe even others ) via DBD::ODBC
+
+Version 0.6, released 18-Jan-2005
+
+    MAJOR CHANGE: Implemented selecting of partial recordsets ( slices ) instead of simply selecting the whole recordset at once
+        Dramatically improves performance on low-memory machines, and in cases of large recordsets
+    INCOMPATIBLE CHANGE: The min / max values that are passed to the record spinner are now the recordset position PLUS ONE
+        ( ie starts at 1 now instead of 0 )
+    Update the range of the record spinner when inserting / deleting
+    Added workaround for http://bugzilla.gnome.org/show_bug.cgi?id=156017
+    Added support for default values. TODO: Support for fetching default values from DB Server
+    Added support for Gtk2::CheckButton
+    Broke out last_insert_id functionality into it's own method
+    Fixed logic problem in 'move' method if there are no records ( don't try to move to position -1 )
+    Added ( dodgy ) workaround for http://bugzilla.gnome.org/show_bug.cgi?id=52372 - we bail out :)
+    Documentation additions / cleanups
+    Got website back online at http://entropy.homelinux.org after a large outage
+    ( I was in Cambodia for a month, and someone stole my hostname after it expired )
+    
+Version 0.5, released 22-Nov-2004
+
+    Reformatted all indentation & removed a lot of whitespace ( big change, I know ). Now looks outstanding in ActiveState's Komodo :)
+    Removed attempted locking of fields if 'read_only' is set.
+    Only worked for a few widgets, and I don't see much point anyway - 'apply' method still honours 'read_only' status
+    Fixed support for Gtk2::TextView - now we connect to TextBuffer's 'changed' signal
+    Added support for DBI's last_insert_id() method. This brings us one step closer to supporting DB servers other than MySQL.
+    Still requires some *very* small additions ( eg last_insert_id() on Postgres requires some arguments to be passed )
+    Volunteers? I don't use Postgres
+    Added POD documentation - some formatting issues, not enough time to figure out what's up
+    
+Version 0.4, released 22-Oct-2004
+    
+    Fixed 2 *nasty* bugs in apply method that were preventing the fieldlist from being processed and applied to DB Server or in-memory recordset
+    Added 'delete' method
+    
+Version 0.3, released 14-Oct-2004
+    
+    Added DATE-ONLY support for Gnome2::DateEdit ( only tested with MySQL's yyyy-mm-dd format ... BEWARE !!! )
+    Added 'order by' support
+    'revert' method now deletes the current record from the *in-memory* recordset if we are currently inserting a new record
+    *** Added dependancy*** : Gtk2::Ex::Dialogs - used instead of my own ( admittedly dodgy ) msgbox() function
+    Added 'fieldlist' method, which returns a list of fields ( taken from the DB server )
+    'apply' and 'paint' methods now use $self->fieldlist which is far more robust than looking at the current position's fieldlist
+    ( in some cases will only contain the primary key )
+    Removed dependance on 'stuff.pm'. Moved date_from_GtkCalendar and date_to_GtkCalendar functionality back into Gtk2::Ex::DBI ( maybe should be another package? )
+    Added ExtUtils::MakeMaker support for installation
+    
+Version 0.2, released 06-Sep-2004
+
+    Renamed from gtk2-gladexml_DBI_helper to Gtk2::Ex::DBI
+    Added support for Gtk2::TextView
+    Added missing event support for Gtk2::Calendar
+    More comments and documentation
+    Remove fieldlist requirement from 'new' method. Fieldlist is assembled on-the-fly
+    Fixed error if no on_current sub defined
+    Deal with NULL date values when painting form
+    Fixed bug where fields weren't getting their respective 'changed' signal connected if the initial query returned no results
+    Added initial support for calculated fields
+    Better handling of zero values ( don't use undef just because a zero is encountered )
+
+Version 0.1, released 04-Jul-2004
+
+    First Version :)
+    Basic querying
+    Form painting
+    Database updating
+    External callbacks

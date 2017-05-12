@@ -1,0 +1,43 @@
+Record Type S - Polygon Additional Geographic Entity Codes
+
+Field    BV  Fmt Type Beg End Len Description
+RT       No    L  A     1   1   1 Record Type
+VERSION  No    L  N     2   5   4 Version Number
+FILE     No    L  N     6  10   5 File Code
+CENID    No    L  A    11  15   5 Census File Identification Code
+POLYID   No   R   N    16  25  10 Polygon Identification Code
+STATE    No    L  N    26  27   2 FIPS State Code, 2000
+COUNTY   No    L  N    28  30   3 FIPS County Code, 2000
+TRACT    No    L  N    31  36   6 Census Tract, 2000
+BLOCK    No    L  N    37  40   4 Census Block Number, 2000
+BLKGRP   No    L  N    41  41   1 Census Block Group, 2000
+AIANHHFP Yes   L  N    42  46   5 FIPS 55 Code (American Indian/Alaska Native Area/Hawaiian Home Land), 2000
+AIANHH   Yes   L  N    47  50   4 Census Code (American Indian/ Alaska Native Area/Hawaiian Home Land), 2000
+AIHHTLI  Yes   L  A    51  51   1 American Indian/Hawaiian Home Land Trust Land Indicator, 2000
+ANRC     Yes   L  N    52  56   5 FIPS 55 Code (ANRC), 2000
+AITSCE   Yes   L  N    57  59   3 Census Code (American Indian Tribal Subdivision), 2000
+AITS     Yes   L  N    60  64   5 FIPS 55 Code (American Indian Tribal Subdivision), 2000
+CONCIT   Yes   L  N    65  69   5 FIPS 55 Code (Consolidated City), 2000
+COUSUB   No    L  N    70  74   5 FIPS 55 Code (County Subdivision), 2000
+SUBMCD   Yes   L  N    75  79   5 FIPS 55 Code (Subbarrio), 2000
+PLACE    Yes   L  N    80  84   5 FIPS 55 Code (Incorporated Place/CDP), 2000
+SDELM    Yes   L  N    85  89   5 Elementary School District Code, 2000
+SDSEC    Yes   L  N    90  94   5 Secondary School District Code, 2000
+SDUNI    Yes  L   N    95  99   5 Unified School District Code, 2000
+MSACMSA  Yes  L   N   100 103   4 FIPS Consolidated Metropolitan Statistical Area/Metropolitan Statistical Area Code, 2000
+PMSA     Yes  L   N   104 107   4 FIPS Primary Metropolitan Statistical Area Code, 2000
+NECMA    Yes  L   N   108 111   4 FIPS New England County Metropolitan Area (NECMA) Code, 2000
+CD106    No   R   N   112 113   2 Congressional District Code, 106th
+CD108    Yes  R   N   114 115   2 Congressional District Code, 108th
+PUMA5    Yes  L   N   116 120   5 Public Use Microdata Area  5% File, 2000
+PUMA1    Yes  L   N   121 125   5 Public Use Microdata Area  1% File, 2000
+ZCTA5   Yes L A 126 130 5 5-Digit ZIP Code Tabulation Area, 2000
+ZCTA3   Yes L A 131 133 3 3-Digit ZIP Code Tabulation Area, 2000
+TAZ     Yes L A 134 139 6 Traffic Analysis Zone Code, 2000
+TAZCOMB Yes L A 140 145 6 Traffic Analysis Zone Code-State Combined, 2000 (not filled)
+UA      Yes L N 146 150 5 Urban Area, 2000
+UR      Yes L A 151 151 1 Urban/Rural Indicator, 2000
+VTD     Yes R A 152 157 6 Census Voting District Code, 2000
+SLDU    Yes R A 158 160 3 State Legislative District Code (Upper Chamber), 2000
+SLDL    Yes R A 161 163 3 State Legislative District Code (Lower Chamber), 2000
+UGA     Yes L A 164 168 5 Oregon Urban Growth Area, 2000

@@ -1,0 +1,30 @@
+---
+abstract: 'some utility functions around iArea'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom aaaatttt gmail dotottto commmmm>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Coordinates-Converter-iArea
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CDB_File: 0.96
+  File::ShareDir: 1.02
+  Geo::Coordinates::Converter: 0.09
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.14

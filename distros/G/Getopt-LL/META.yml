@@ -1,0 +1,41 @@
+---
+name: Getopt-LL
+version: 1.0.0
+author:
+  - 'Ask Solem <ASKSH@cpan.org>'
+abstract: Flexible argument processing.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Dot: 1
+  version: 0
+build_requires:
+  IO::Capture::Stderr: 0
+  Test::Exception: 0.25
+  Test::Simple: 0.42
+dynamic_config: 0
+provides:
+  Getopt::LL:
+    file: lib/Getopt/LL.pm
+    version: 1.0.0
+  Getopt::LL::DLList:
+    file: lib/Getopt/LL/DLList.pm
+    version: 1.0.0
+  Getopt::LL::DLList::Node:
+    file: lib/Getopt/LL/DLList/Node.pm
+    version: 1.0.0
+  Getopt::LL::Short:
+    file: lib/Getopt/LL/Short.pm
+    version: 1.0.0
+  Getopt::LL::Simple:
+    file: lib/Getopt/LL/Simple.pm
+    version: 1.0.0
+  Getopt::LL::SimpleExporter:
+    file: lib/Getopt/LL/SimpleExporter.pm
+    version: 1.0.0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+distribution_type: Module

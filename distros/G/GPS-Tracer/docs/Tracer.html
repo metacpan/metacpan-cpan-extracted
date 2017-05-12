@@ -1,0 +1,569 @@
+<HTML>
+<HEAD>
+<TITLE>GPS::Tracer</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000000">
+<UL>
+<LI><A HREF="#NAME">NAME
+
+</A><LI><A HREF="#SYNOPSIS">SYNOPSIS
+
+</A><LI><A HREF="#DESCRIPTION">DESCRIPTION
+
+</A><LI><A HREF="#Input%20format">Input format
+
+</A><LI><A HREF="#Outputs">Outputs
+
+</A><LI><A HREF="#METHODS">METHODS
+
+</A><LI><A HREF="#SUPPORTING%20FILES">SUPPORTING FILES
+
+</A><LI><A HREF="#MISSING%20FEATURES">MISSING FEATURES
+
+</A><LI><A HREF="#DEPENDENCIES">DEPENDENCIES
+
+</A><LI><A HREF="#AUTHORS">AUTHORS
+
+</A><LI><A HREF="#COPYRIGHT">COPYRIGHT
+
+</A><LI><A HREF="#DISCLAIMER">DISCLAIMER
+
+</A></UL>
+<HR>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+
+<P>GPS::Tracer - A processor of geographical route information
+
+</P><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1>
+
+<PRE>    # with having an account with Guardian Mobility
+    my $tracer = new GPS::Tracer (user =&gt; 'my.name', passwd =&gt; 'my.password');
+    my @files = $tracer-&gt;create_all;
+    map { print &quot;Created file: &quot;, $_, &quot;\n&quot; } @files;
+
+    # with your own input file
+    my $tracer = new GPS::Tracer (input_data =&gt; 'my-data.csv');
+    my @files = $tracer-&gt;create_all;
+    map { print &quot;Created file: &quot;, $_, &quot;\n&quot; } @files;
+
+    # create only OziExplorer waypoint file
+    my $tracer = new GPS::Tracer (input_data =&gt; 'my-data.csv');
+    my $data = $tracer-&gt;get_data;
+    print &quot;Created file: &quot;, $tracer-&gt;convert2oziwpt ($data), &quot;\n&quot;;</PRE>
+<H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1>
+
+<P>This module reads geographical location data (longitude, latitude and
+time) and converts them into various other formats and pre-processed
+files that can be used to display route information, for example using
+Google Maps.
+
+</P>
+<P>The module was developed primarily to read data from the secure web
+site provided by Guardian Mobility
+(<A HREF="http://www.guardianmobility.com">http://www.guardianmobility.com</A>) for their product &quot;Tracer&quot; (data
+are published there after they are collected from the Globastar
+satellites). However, it was made flexible enough that it can also
+read data from a simple CSV format instead from their web site.
+
+</P>
+<P>Some of the files created by this module were designed to be read by
+JavaScript in order to create/update web pages. Example of such usage
+is on the pages of the Arctic student expedition FrozenFive
+(<A HREF="http://frozenfive.org">http://frozenfive.org</A>) - for whom the module was actually created
+in the first place, and also in the <CODE>examples</CODE> folder of this module
+distribution.
+
+</P>
+<P>One scenario is to use this module in a periodically and automatically
+repeated script (on UNIX machine called a 'cronjob') and let the web
+pages read data from output files anytime they are accessed. This is
+the way how it was used for the FrozenFive expedition.
+
+</P><H1><A NAME="Input%20format">Input format
+
+</A></H1>
+
+<P>The input data are comma-separated values (CSV) (the first line being
+a header line). The only extracted values are those representing
+longitude, latitude, elevation and time. They are expected to be in
+the following format:
+
+</P>
+<PRE>  latitude  = 78.21582
+  longitude = 15.73496
+  time      = 2007-03-29 11:32:32
+  elevation = 532</PRE>
+
+<P>If no format of the input data is specified, only the following field
+indexes are used (indexes starts from 0):
+
+</P>
+<PRE>  index    field contents
+  -----------------------
+    6      time
+    7      longitude
+    8      latitude
+    9      elevation</PRE>
+
+<P>At the moment, Guardian Mobility data do not record any elevation -
+therefore the ninth field is extracted but not used (an therefore also
+not much tested).
+
+</P>
+<P>Example of the Guarding Mobility raw input file is in 'examples' (file
+<CODE>trout-guardian.csv</CODE>).
+
+</P>
+<P>If you use your own input data, you specify your input data file by
+using parameter <CODE>input_data</CODE>, and you can specify your own indexes
+for the mentioned fields, as a comma-separated list of four numbers,
+by using parameter <CODE>input_format</CODE>. For example, if your data are in
+file <CODE>my-input.csv</CODE> with this contents:
+
+</P>
+<PRE>    Time,Longitude,Latitude,Altitude
+    2007-04-21 12:48:27,16.78029,76.66666,
+    2007-04-21 12:36:05,16.78040,76.66668,
+    2007-04-21 12:06:11,16.78067,76.66664,</PRE>
+
+<P>then you create a Tracer object by:
+
+</P>
+<PRE>    my $tracer = new GPS::Tracer (input_data   =&gt; 'my-input.csv',
+                                  input_format =&gt; '0,1,2,3');
+</PRE>
+<H1><A NAME="Outputs">Outputs
+
+</A></H1>
+
+<P>All outputs are created, under various file names, in the current
+directory, or in the directory given by the parameter
+<CODE>result_dir</CODE>. Part of the file names is hard-coded, but you can
+specify how all the file names will start by using parameter
+<CODE>result_basename</CODE> (default value is simply <CODE>output</CODE>).
+
+</P>
+<P>The method <I>create_all</I> creates all of them - but you can also use
+other methods (see below) for selecting only some outputs. All created
+files (showing them with the default prefix <CODE>output</CODE>) are:
+
+</P><H3><A NAME="output-guardian-raw.csv">output-guardian-raw.csv
+
+</A></H3>
+
+<P>This is the copy of the data fetched from the Guardian web site. Such
+file is not created when you use your own inputs.
+
+</P><H3><A NAME="output-all.xml">output-all.xml
+
+</A></H3>
+
+<P>An XML file containing <I>all</I> geographical points from the input. The
+format is easy-to-process by AJAX-based JavaScript page (see
+<CODE>examples</CODE> sub-directory):
+
+</P>
+<PRE>   &lt;markers&gt;
+     &lt;marker elevation=&quot;&quot; lat=&quot;78.21582&quot; lng=&quot;15.73496&quot; time=&quot;2007-03-29 11:32:32&quot; type=&quot;1&quot; /&gt;
+     &lt;marker elevation=&quot;&quot; lat=&quot;78.21057&quot; lng=&quot;15.76251&quot; time=&quot;2007-03-29 11:47:32&quot; type=&quot;0&quot; /&gt;
+     &lt;marker elevation=&quot;&quot; lat=&quot;78.20559&quot; lng=&quot;15.80085&quot; time=&quot;2007-03-29 12:22:58&quot; type=&quot;0&quot; /&gt;
+     ...
+   &lt;/markers&gt;</PRE>
+
+<P>The attribute <CODE>type</CODE> has value 1 for the first point in a day,
+otherwise value 0.
+
+</P><H3><A NAME="output-oneperday.xml">output-oneperday.xml
+
+</A></H3>
+
+<P>An XML file - using the same format as <CODE>output-all.xml</CODE> described
+above - containing only one point per day (the first one recorder each
+day). Plus the last point (if it is far enough from the first point of
+the last day - see below about what &quot;far enough&quot; means).
+
+</P><H3><A NAME="output-distance.xml">output-distance.xml
+
+</A></H3>
+
+<P>Another XML file - again using the same format as <CODE>output-all.xml</CODE>
+described above - containing points that are &quot;far enough&quot; from each
+other, but always also the first point for every day. The &quot;far enough&quot;
+is defined in metres by parameter <CODE>min_distance</CODE> (default value is
+500).
+
+</P><H3><A NAME="output-summary.xml">output-summary.xml
+
+</A></H3>
+
+<P>A very simple XML file containing just a number of days and the total
+distance (in kilometres) of the whole recorded route. For example:
+
+</P>
+<PRE>   &lt;summary&gt;
+     &lt;total days=&quot;23&quot; kms=&quot;302.676710159346&quot; /&gt;
+   &lt;/summary&gt;</PRE>
+<H3><A NAME="output.csv">output.csv
+
+</A></H3>
+
+<P>It contains daily total distances in a comma-separated value
+format. The headers are <CODE>Date</CODE> and <CODE>Metres</CODE>. For example:
+
+</P>
+<PRE>   Date,Metres
+   2007-03-29,8189.15115656143
+   2007-03-30,16177.7833535657
+   2007-03-31,15906.9657189604
+   2007-04-01,16826.279102736
+   2007-04-02,1032.79778451296</PRE>
+<H3><A NAME="output-ozi.wpt">output-ozi.wpt
+
+</A></H3>
+
+<P>It contains points that are &quot;far enough&quot; (see above) in the format of
+OziExplorer (<A HREF="http://www.oziexplorer.com/">http://www.oziexplorer.com/</A>) waypoints. For example:
+
+</P>
+<PRE>   OziExplorer Waypoint File Version 1.1
+   WGS 84
+   Reserved 2
+   magellan
+   -1, Mar-29/11:32, 78.21582, 15.73496, , 10, 1, 4, 0, 4227327, 2007-03-29 11:32:32, 0, 0, 0, -777, 8, 0, 17
+   -1, 11:47, 78.21057, 15.76251, , 2, 1, 4, 0, 5450740, 2007-03-29 11:47:32, 0, 0, 0, -777, 6, 0, 17
+   -1, 12:22, 78.20559, 15.80085, , 2, 1, 4, 0, 5450740, 2007-03-29 12:22:58, 0, 0, 0, -777, 6, 0, 17
+   -1, Mar-30/09:26, 78.15688, 15.82510, , 10, 1, 4, 0, 4227327, 2007-03-30 09:26:08, 0, 0, 0, -777, 8, 0, 17
+   -1, 13:47, 78.09275, 15.78624, , 2, 1, 4, 0, 5450740, 2007-03-30 13:47:26, 0, 0, 0, -777, 6, 0, 17
+   -1, Mar-31/08:53, 78.01713, 15.83664, , 10, 1, 4, 0, 4227327, 2007-03-31 08:53:31, 0, 0, 0, -777, 8, 0, 17
+   -1, 09:24, 78.00934, 15.84894, , 2, 1, 4, 0, 5450740, 2007-03-31 09:24:43, 0, 0, 0, -777, 6, 0, 17</PRE>
+<H3><A NAME="output-chart.png">output-chart.png
+
+</A></H3>
+
+<P>This is a graph showing daily distances. See an example in <CODE>examples</CODE>.
+
+</P><H1><A NAME="METHODS">METHODS
+
+</A></H1>
+<H3><A NAME="new">new
+
+</A></H3>
+
+<PRE>   use GPS::Tracer;
+   my $tracer = new GPS::Tracer (@parameters);</PRE>
+
+<P>The recognized parameters are name-value pairs. The names are:
+
+</P><H4><A NAME="user%2c%20passwd%2c%20login_url%2c%20data_url"><CODE>user</CODE>, <CODE>passwd</CODE>, <CODE>login_url</CODE>, <CODE>data_url</CODE>
+
+</A></H4>
+
+<P>These are used to access Guardian web site. <CODE>login_url</CODE> is a URL of
+the main page where <CODE>user</CODE> and <CODE>passwd</CODE> are used to authenticate to
+get data from the <CODE>data_url</CODE>. Look into the source code how these
+parameters are used.
+
+</P><H4><A NAME="from_date%2c%20to_date"><CODE>from_date</CODE>, <CODE>to_date</CODE>
+
+</A></H4>
+
+<P>These parameters specify the time range of the data they will go to
+the outputs. Their format is <CODE>YYYY-MM-DD hh:mm:ss</CODE> and default values
+allow all data to be processed:
+
+</P>
+<PRE>  from_date: '0000-00-00 00:00:00'
+  to_date:   '9999-99-99 23:59:59'</PRE>
+<H4><A NAME="result_dir%2c%20result_basename"><CODE>result_dir</CODE>, <CODE>result_basename</CODE>
+
+</A></H4>
+
+<P>The <CODE>result_dir</CODE> defines a directory name where all output files will
+be created (default is an empty value which indicates the current
+directory). All files are created with the names starting by
+<CODE>result_basename</CODE>.
+
+</P><H4><A NAME="min_distance"><CODE>min_distance</CODE>
+
+</A></H4>
+
+<P>Its value (in metres) defines the minimal distance between points in
+some outputs (other outputs ignore this parameter and process all
+points). Default is 500.
+
+</P><H4><A NAME="input_data"><CODE>input_data</CODE>
+
+</A></H4>
+
+<P>It is a name of the input file. If it is not given, the program will
+try to fetch data from the Guardian web site (which will fail if other
+parameters (<CODE>user</CODE>, <CODE>passwd</CODE>, <CODE>login_url</CODE>, and <CODE>data_url</CODE>) are not
+given.
+
+</P><H4><A NAME="input_format"><CODE>input_format</CODE>
+
+</A></H4>
+
+<P>A string with four digits, separated by commas, each of them
+indicating an index (column) in the input CSV file. The four indexes
+should indicate columns with time, longitude, latitude, and
+elevation. The first column in the file has index 0. Default value is
+'6,7,8,9'.
+
+</P>
+<P>All described parameters can be also set by the &quot;set&quot; methods and read
+by the &quot;get&quot; methods. The method names are the same as the parameter
+names. If it has a parameter, it is a &quot;set&quot; method, otherwise it is a
+&quot;get&quot; method:
+
+</P><H3><A NAME="user">user
+
+</A></H3>
+
+<PRE>   my $tracer = new GPS::Tracer;
+   $tracer-&gt;user ('my.username');
+   print &quot;My user name is: &quot;, $tracer-&gt;user, &quot;\n&quot;</PRE>
+<H3><A NAME="passwd">passwd
+
+</A></H3>
+<H3><A NAME="from_date">from_date
+
+</A></H3>
+<H3><A NAME="to_date">to_date
+
+</A></H3>
+<H3><A NAME="login_url">login_url
+
+</A></H3>
+<H3><A NAME="data_url">data_url
+
+</A></H3>
+<H3><A NAME="min_distance">min_distance
+
+</A></H3>
+<H3><A NAME="result_dir">result_dir
+
+</A></H3>
+<H3><A NAME="result_basename">result_basename
+
+</A></H3>
+<H3><A NAME="input_data">input_data
+
+</A></H3>
+<H3><A NAME="input_format">input_format
+
+</A></H3>
+<H3><A NAME="create_all">create_all
+
+</A></H3>
+
+<P>It creates all outputs from the given data. This is the most common
+way to use the GPS::Tracer:
+
+</P>
+<PRE>    my $tracer = new GPS::Tracer (input_data =&gt; 'my-data.csv');
+    my @files = $tracer-&gt;create_all;
+    map { print &quot;Created file: &quot;, $_, &quot;\n&quot; } @files;</PRE>
+
+<P>The method returns a list of created file names.
+
+</P><H3><A NAME="get_data">get_data
+
+</A></H3>
+
+<P>This method returns a reference to an array with elements being
+references to hashes, each such hash containing one route point. Key
+names are <CODE>elevation</CODE>, <CODE>lat</CODE>, <CODE>lng</CODE>, <CODE>type</CODE> and <CODE>time</CODE>. For
+example, this code:
+
+</P>
+<PRE>    my $tracer = new GPS::Tracer (input_data =&gt; 'testing-data/small.csv');
+    my @files = $tracer-&gt;get_data;
+    require Data::Dumper;
+    print Data::Dumper-&gt;Dump ( [$data], ['DATA']);</PRE>
+
+<P>prints this:
+
+</P>
+<PRE>  $DATA = [
+            {
+              'elevation' =&gt; '',
+              'lat' =&gt; '76.66664',
+              'time' =&gt; '2007-04-21 12:06:11',
+              'type' =&gt; 1,
+              'lng' =&gt; '16.78067'
+            },
+            {
+              'elevation' =&gt; '',
+              'lat' =&gt; '76.66668',
+              'time' =&gt; '2007-04-21 12:36:05',
+              'type' =&gt; 0,
+              'lng' =&gt; '16.78040'
+            },
+            {
+              'elevation' =&gt; '',
+              'lat' =&gt; '76.66666',
+              'time' =&gt; '2007-04-21 12:48:27',
+              'type' =&gt; 0,
+              'lng' =&gt; '16.78029'
+            }
+          ];</PRE>
+
+<P>This method is the first step if you wish to create only some
+outputs. Each output has its own method whose single parameters is the
+structure produced by <I>get_data</I> method. All of these methods returns
+a created file name:
+
+</P><H3><A NAME="convert2xml">convert2xml
+
+</A></H3>
+
+<P>Creates output <CODE>output-all.xml</CODE>.
+
+</P><H3><A NAME="summary2csv">summary2csv
+
+</A></H3>
+
+<P>Creates output <CODE>output.csv</CODE>.
+
+</P><H3><A NAME="summary2xml">summary2xml
+
+</A></H3>
+
+<P>Creates output <CODE>output-summary.xml</CODE>.
+
+</P><H3><A NAME="summary2graph">summary2graph
+
+</A></H3>
+
+<P>Creates output <CODE>output-chart.png</CODE>.
+
+</P><H3><A NAME="oneperday2xml">oneperday2xml
+
+</A></H3>
+
+<P>Creates output <CODE>output-oneperday.xml</CODE>.
+
+</P><H3><A NAME="min_distance2xml">min_distance2xml
+
+</A></H3>
+
+<P>Creates output <CODE>output-distance.xml</CODE>.
+
+</P><H3><A NAME="convert2oziwpt">convert2oziwpt
+
+</A></H3>
+
+<P>Creates output <CODE>output-ozi.wpt</CODE>.
+
+</P><H1><A NAME="SUPPORTING%20FILES">SUPPORTING FILES
+
+</A></H1>
+
+<P>The distribution of the GPS::Tracer has a script
+<CODE>fetch_and_create.pl</CODE> that can be used to produce just described
+outputs from the command-line parameters:
+
+</P>
+<PRE>  ./fetch_and_create.pl -h</PRE>
+
+<P>will produce a short help. Assuming that you are fetching data from
+Guardian, you can use:
+
+</P>
+<PRE>  ./fetch_and_create -u your.user.name -p your.password</PRE>
+
+<P>which will create all output files in the <CODE>data</CODE>
+sub-directory. However, more often you would need to define a range of
+data for which you are creating &quot;route&quot; files:
+
+</P>
+<PRE>  ./fetch_and_create -u your.user.name -p your.password \
+                     -b '2007-29-03 00:00:00'           \
+                     -e '2007-15-06 23:59:59'</PRE>
+
+<P>Or, you can pass your own input file, and its CSV format (column
+indexes):
+
+</P>
+<PRE>  ./fetch_and_create -i data/otherfields.csv \
+                     -f '0,1,2,3'
+                     </PRE>
+
+<P>Other supporting files and HTML documenttaion are in the <CODE>docs</CODE>
+directory. They show how to use output files together with JavaScript
+to create and enhance web pages.
+
+</P><H1><A NAME="MISSING%20FEATURES">MISSING FEATURES
+
+</A></H1>
+<UL>
+<LI>There could/should be an easier way how to read input data in more
+formats. At the moment, you need to overwrite the full <I>get_data</I> or
+even <I>fetch_data</I> method.
+
+</LI>
+<LI>Sometimes, it would be beneficial to have more filtering options then
+just <CODE>from_date</CODE> and <CODE>to_date</CODE>. For example, for the FrozenFive
+expedition we had to ignore days when they made trips on snow
+mobiles, not on skis.
+
+</LI>
+<LI>There should be a way how to pass user-defined properties for the
+created graph.
+
+</LI>
+<LI>Similarly, there should be a way how to pass user-defined properties
+for the created OziExplorer waypoints (such as what symbols to
+use). As it is already now for the waypoint name (method <I>wpt_name</I>).
+
+</LI>
+</UL>
+<H1><A NAME="DEPENDENCIES">DEPENDENCIES
+
+</A></H1>
+
+<P>The GPS::Tracer module uses the following modules:
+
+</P>
+<PRE>   Text::CSV::Simple
+   XML::Simple
+   LWP::UserAgent
+   File::Temp
+   File::Spec
+   Date::Calc
+   GD::Graph</PRE>
+<H1><A NAME="AUTHORS">AUTHORS
+
+</A></H1>
+
+<P>Martin Senger &lt;martin.senger@gmail.com&gt;,
+Kim Senger &lt;senger.kim@gmail.com&gt;
+
+</P><H1><A NAME="COPYRIGHT">COPYRIGHT
+
+</A></H1>
+
+<P>Copyright (c) 2007, Martin Senger, Kim Senger.
+All Rights Reserved.
+
+</P>
+<P>This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+</P><H1><A NAME="DISCLAIMER">DISCLAIMER
+
+</A></H1>
+
+<P>This software is provided &quot;as is&quot; without warranty of any kind.
+
+
+</P>
+</BODY>
+</HTML>

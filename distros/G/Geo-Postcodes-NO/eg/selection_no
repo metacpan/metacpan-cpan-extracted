@@ -1,0 +1,56 @@
+#! /usr/bin/perl -w
+
+use strict;
+
+use Geo::Postcodes::NO 0.30;
+
+################################################################################
+#                                                                              #
+#                                selection_no                                  #
+#                                ------------                                  #
+#              Arne Sommer - perl@bbop.org - 9. September 2006                 #
+#                                                                              #
+################################################################################
+
+unless (@ARGV == 2)
+{
+  print "Usage: selection_no <field> <string>\n";
+  print "Legal fields: ", join(" ", Geo::Postcodes::NO::get_fields()), ".\n";
+  exit;
+}
+
+my $field = shift(@ARGV);
+my $string = shift(@ARGV);
+
+my @fields;
+
+if (Geo::Postcodes::NO::is_field($field)) # Legal field
+{
+  @fields = Geo::Postcodes::NO::get_fields();
+    # Get all the fields supported by this module.
+
+  foreach my $m (@fields)
+  {
+    printf("%-14s", ucfirst($m)); # Print headers for each column
+  }
+  print "\n";
+
+  Geo::Postcodes::NO->selection_loop(\&print_it, $field, $string);
+    # Call each postcode object on to the 'loop' procedure.
+
+  print "\n";
+}
+else # illegal field.
+{
+  print "Not a legal field '$field'.\n";
+}
+
+sub print_it
+{
+  my $object = shift;
+  foreach my $m (@fields)                # Iterate over the fields for each object
+  {
+    printf("%-14s", $object->$m() || ""); # Print the column data, or nothing if empty
+  }
+  print "\n";
+}

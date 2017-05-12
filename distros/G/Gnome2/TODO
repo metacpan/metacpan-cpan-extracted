@@ -1,0 +1,31 @@
+#
+# $Id$
+#
+
+need examples
+
+these haven't been done yet (going from the reference doc indices):
+
+libbonobo, libbonoboui:
+	not touched.  should it go in a separate module?  (still in this
+	namespace, but...)
+
+libgnome:
+	gnome-exec (perl offers the same features natively)
+	gnome-triggers (failed to implement this one)
+
+libgnomeui:
+	GnomeThemeFile (no GObject, so I'll wait till someone begs for it)
+	gnome-vfs-util
+
+libnautilus-2.0:
+	needed for writing nautilus components in perl, but requires binding
+	for libbonobo/libbonobo-ui
+
+librsvg:
+	this is the library that renders SVG (Scalable Vector Graphics) images;
+	since it will be more and more needed, should go in too (even if not in
+	the Gnome2::* namespace?)
+
+Also, libgstreamer should be wrapped, as soon as it's considered stable.
+	(Brett Kosinki has been working on this for several months)

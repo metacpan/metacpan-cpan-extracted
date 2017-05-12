@@ -1,0 +1,9 @@
+---
+name: one
+aliases:
+    - alias_of_one
+    - alias_of_one2
+---
+name: two
+---
+name: three

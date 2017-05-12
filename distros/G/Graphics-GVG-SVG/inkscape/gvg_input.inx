@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+	<_name>GVG Input</_name>
+	<id>org.inkscape.input.gvg</id>
+	<dependency type="executable" location="extensions">gvg_input.pl</dependency>
+	<input>
+		<extension>.gvg</extension>
+		<mimetype>image/x-svgz</mimetype>
+		<_filetypename>Graphics::GVG (*.gvg)</_filetypename>
+		<_filetypetooltip>Import Game Vector Graphics</_filetypetooltip>
+	</input>
+	<script>
+		<command reldir="extensions" interpreter="perl">gvg_input.pl</command>
+	</script>
+</inkscape-extension>

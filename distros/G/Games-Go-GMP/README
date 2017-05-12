@@ -1,0 +1,25 @@
+Games/Go/GMP version 0.01
+=========================
+
+Low-level and very incomplete interface to the Go Modem Protocol
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module includes the GMP library.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2001 Simon Cozens (The Perl bits are, anyway.)
+Library (C) William Shubert
+

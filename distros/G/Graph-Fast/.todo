@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<todo version="0.1.20">
+    <note priority="medium" time="1247583479">
+        dijkstra: split up to 1. generate a single source shortest path graph and 2. parse a SSSP graph to get a SP between two nodes
+    </note>
+</todo>

@@ -1,0 +1,119 @@
+#!perl
+# PODNAME: git-stitch-repo
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use Git::FastExport::Stitch;
+use File::Spec::Functions qw( rel2abs );
+use File::Basename;
+
+our $VERSION = $Git::FastExport::Stitch::VERSION;
+
+# basic command-line options
+my %option;
+GetOptions( \%option, 'help', 'manual', 'version', 'select=s' )
+    or pod2usage( -verbose => 0 );
+print "git-stitch-repo version $VERSION\n" and exit if $option{version};
+pod2usage( -verbose => 1 ) if $option{help};
+pod2usage( -verbose => 2 ) if $option{manual};
+
+my $export = Git::FastExport::Stitch->new( \%option );
+
+# process command-line parameters
+while (@ARGV) {
+    my ( $repo, $dir ) = split /:/, shift @ARGV, 2;
+    $repo = rel2abs($repo);
+
+    # add the repository to the list of repositories to stitch
+    $export->stitch( $repo => $dir );
+}
+
+# run the stitching algorithm
+while ( my $block = $export->next_block() ) {
+    print $block->as_string;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+git-stitch-repo - Stitch several git repositories into a git fast-import stream
+
+=head1 SYNOPSIS
+
+git-stitch-repo [ options ] repo1:dir1 repo2:dir2 ...
+
+=head1 OPTIONS
+
+    --select < first | last | random >
+                 Algorithm for selection the attachment commit
+
+    --help       Print a short online help and exit
+    --manual     Print the full manual page and exit
+    --version    Print version information and exit
+
+=head1 DESCRIPTION
+
+B<git-stitch-repo> will process the output of C<git fast-export --all
+--date-order> on the git repositories given on the command-line,
+and create a stream suitable for B<git fast-import> that will create
+a new repository containing all the commits in a new commit tree
+that respects the history of all the source repositories.
+
+Typical usage is like this:
+
+    $ ls
+    A  B
+    $ mkdir RESULT
+    $ cd RESULT
+    $ git init
+    $ git-stitch-repo ../A ../B ../C:X ../R: | git fast-import
+
+The F<RESULT> repository will contain all commits from repositories
+F<../A> F<../B> F<../C> & F<../R>, with the paths of the files rewritten:
+the files from the F<../A> repository will be in subdirectory F<A/> of
+the new repository, the files from F<../B> in its subdirectory F<B/>,
+the files from F<../C> in subdirectory F<X/>, and the files from F<../R>
+in its root directory.
+
+    $ git checkout master-A
+    warning: You appear to be on a branch yet to be born.
+    warning: Forcing checkout of master-A.
+    Switched to branch "master-A"
+    $ git checkout master-B
+    Switched to branch "master-B"
+
+Both branches can be seen using C<gitk --all>. It is now possible to
+create the I<master> branch and have it point at the right commit,
+and delete the two I<master-A> and I<master-B> branches.
+
+B<git-stich-repo> works perfectly with repositories that have a B<linear>
+history (no merges). It has successfully been tested with 16 linear
+repositories, and produced the expected result.
+
+The improvements to the stitching algorithm added in version 0.06 should
+make is suitable to work with repositories having branches and merges.
+
+=head1 SEE ALSO
+
+L<Git::FastExport::Stitch>
+
+=head1 ACKNOWLEDGEMENTS
+
+The original version of this script was created as part of my work
+for BOOKING.COM, which authorized its publication/distribution
+under the same terms as Perl itself.
+
+=head1 COPYRIGHT
+
+Copyright 2008-2016 Philippe Bruhat (BooK), All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

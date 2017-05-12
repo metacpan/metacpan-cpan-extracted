@@ -1,0 +1,21 @@
+---
+name: Getopt-Helpful
+version: 0.04
+author: []
+abstract: Integrated option hash / help messages.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Getopt::Long: 2.34
+  IPC::Run: 0.78
+  Test::More: 0.54
+  YAML: 0.39
+provides:
+  Getopt::Helpful:
+    file: lib/Getopt/Helpful.pm
+    version: 0.04
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

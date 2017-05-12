@@ -1,0 +1,22 @@
+# $File: //member/autrijus/AIBots/ChangeLog $
+# $Revision: #2 $ $Change: 693 $ $DateTime: 2002/08/17 09:29:49 $
+
+[Changes for 0.03 - August 18, 2002]
+
+This release adds some POD files and cleaned up a bit code style.
+
+Also, "aibots -h" now shows help, which seems to be a much needed
+command line option everywhere.
+
+[Changes for 0.02 - August 14, 2002]
+
+This release fixed the showstopping bug on recent Tk environments, where
+<Keypress-?> should be written <Keypress-question>.  Thanks for various
+people who wrote in to notify me of this bug.
+
+Essentially, nothing had been changed after one year. :-/  If anybody
+wishes to volunteer maintainership for this module, I'd be really happy.
+
+[Changes for 0.01 - August 28, 2001]
+
+Initial release on CPAN.

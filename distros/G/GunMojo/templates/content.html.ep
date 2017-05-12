@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#">
+<head>
+	% if ( $headTitle ) {
+		<title><%== $headTitle %></title>
+	% }
+
+	% if ( $headMeta ) {
+		% for my $tag ( @{ $headMeta } ) {
+			<!-- [headMeta_Tag:<%== $tag->[0] %>] <%== $tag->[1] %> -->
+			<meta <%== $tag->[2] %>="<%== $tag->[3] %>" value="<%== $tag->[4] %>" />
+			<!-- [/headMeta_Tag:<%== $tag->[0] %>] <%== $tag->[1] %> -->
+		% }
+	% }
+	% if ( $headLink ) {
+		% for my $link ( @{ $headLink } ) {
+			<!-- [headLink_Tag:<%== $tag->[0] %>] <%== $tag->[1] %> -->
+			<link <%== $link->[2] %>="<%== $tag->[3] %>" href="<%== $tag->[4] %>"<%= " type='$tag->[5]'" if $tag->[5] %><%= " media='$tag->[6]'" if $tag->[6] %> />
+			<!-- [/headLink_Tag:<%== $tag->[0] %>] <%== $tag->[1] %> -->
+		% }
+	% }
+	% if ( $headJS ) {
+		% for my $js ( @{ $headJS } ) {
+			<!-- [headJS_Tag:<%== $js->[0] %>] <%== $js->[1] %> -->
+			<script <%= "id=$js->[5]" if $js->[5] %> type="<%== $js->[2] %>" src="<%== $js->[3] %>"<%= " async" if $js->[4] == 1 %>></script>
+			<!-- [/headJS_Tag:<%== $js->[0] %>] <%== $js->[1] %> -->
+		% }
+	% }
+</head>
+
+<body>
+% if ( $bodyJS ) {
+	% for my $jsb ( @{ $bodyJS } ) {
+		<!-- [bodyJS_Tag:<%== $jsb->[0] %>] <%== $jsb->[1] %> -->
+		<%== $jsb->[3] %>
+		<!-- [/bodyJS_Tag:<%== $jsb->[0] %>] <%== $jsb->[1] %> -->
+	% }
+% }
+
+<div class="container">
+	<div class="header">
+		<a href="/"><%== $headTitle %></a>
+	</div>
+	<div class="main_right">
+		<div class="padded">
+			% for my $news_item ( @{$news} ) {
+        			<h1><%== $news_item->[0] %></h1>
+				<p><%== $news_item->[1] %></p>
+			% }
+		</div>
+	</div>
+	<div class="subnav">
+		% if ( $bodyNavSocialLinks ) {
+			% for my $socialLink ( @{ $bodyNavSocialLinks } ) {
+				<!-- [bodyNavSocialLinks_Tag:<%= $socialLink->[0] %>] <%= $socialLink->[1] %> -->
+				<%== $socialLink->[2] %>
+				<br />
+				<!-- [/bodyNavSocialLinks_Tag:<%= $socialLink->[0] %>] <%= $socialLink->[1] %> -->
+			% }
+		% }
+
+		% if ( $bodyNavSectionLinks ) {
+			% for my $section ( keys %{ $bodyNavSectionLinks } ) {
+				<h1><%== $section %></h1>
+				<ul>
+				% for my $item ( @{ values %{ $bodyNavSectionLinks->{$section} }->{content} } ) {
+					<li>
+					<a id='<%= $item->[0] %>' class="ajax" href='<%= $item->[1] %>'><%= $item->[2] %></a>
+					</li>
+				% }
+				</ul>
+			% }
+		% }
+	</div>
+	<div class="main">
+		<div class="padded">
+			<div id="headline"><h1><%== $headline %></h1></div>
+			<div class="meta"><div id="permalink"></div></div><br/>
+			<span id="social-media" style="text-align:center">
+				<script type="IN/Share"></script>
+				<div class="g-plusone" data-size="tall" data-annotation="none" data-href="https://www.x86guns.us/<%= $url %>"></div>
+				<a href="https://twitter.com/share" class="twitter-share-button" style="clear:left" data-via="x86guns" data-hashtags="x86guns">Tweet</a>
+				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+				<div class="fb-like" style="clear:left" data-href="https://www.x86guns.us/<%= $url %>" data-action="recommend" data-send="false" data-layout="button_count" data-show-faces="false" data-font=""></div>
+			</span>
+			<br/>
+			<div id="dyncontent">
+				<%== $content %>
+			</div>
+		</div>
+	</div>
+	<div class="clearer"><span></span></div>
+	<div class="footer">
+		<span class="left">
+			<a href="http://jigsaw.w3.org/css-validator/check/referer"><img style="border:0;" src="/images/css3_valid.png" alt="Valid CSS3!"/></a>
+			<a href="http://validator.w3.org/check?uri=referer"><img style="border:0" src="/images/html5_valid.png" alt="Valid HTML5!"/></a>
+		</span>
+		<span style="text-align:center;">Copyright &copy; 2012 <a href="/">Bryce Porter</a></span>
+		<span class="right">Template design by <a href="http://templates.arcsin.se">Arcsin</a></span>
+		<div class="clearer"><span></span></div>
+	</div>
+</div>
+
+</body>
+
+</html>
+

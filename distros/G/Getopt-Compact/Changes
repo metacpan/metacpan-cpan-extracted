@@ -1,0 +1,22 @@
+Revision history for Perl extension Getopt::Compact.
+
+0.04  Mon Sep 04 2006
+        - bugfix for option key.  using > 2 alternate option names in v0.03
+          incorrectly used the shortest long option name.  The first long
+          option name in the list should be used.  (now documented in POD)
+        - default to ($main::VERSION || '1.0') as the version number
+        - tried to make POD explain things better
+
+0.03  Sat Sep 03 2006
+        - added support for --man option (displays POD)
+        - now supports an arbitrary number of option name alternatives
+          (previously each option required two option names, one short and
+          one long).
+        - added unit tests
+
+0.02  Fri Sep 24 2004
+        - initialising the hashref used to store option values internally.
+          this fixes a bug where the options weren't being stored sometimes.
+
+0.01  Thu Sep 23 2004
+        - original version

@@ -1,0 +1,21 @@
+
+(define-enum GdkRgbDither
+  ( none GDK_RGB_DITHER_NONE)
+  ( normal GDK_RGB_DITHER_NORMAL)
+  ( max GDK_RGB_DITHER_MAX))
+
+(define-flags GtkObjectFlags
+  (destroyed GTK_DESTROYED)
+  (floating GTK_FLOATING)
+  (connected GTK_CONNECTED)
+  (constructed GTK_CONSTRUCTED))
+
+(define-flags GtkSignalRunType
+  (first GTK_RUN_FIRST)
+  (last GTK_RUN_LAST)
+  (both GTK_RUN_BOTH)
+  (no-recurse GTK_RUN_NO_RECURSE)
+  (action GTK_RUN_ACTION)
+  (no-hooks GTK_RUN_NO_HOOKS))
+
+

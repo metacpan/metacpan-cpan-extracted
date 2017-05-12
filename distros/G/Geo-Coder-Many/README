@@ -1,0 +1,53 @@
+Geo::Coder::Many
+=================================
+
+Please see the POD for more information and usage instructions.
+
+INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DOCUMENTATION
+
+    perldoc Geo::Coder::Many
+
+NOTE
+
+During the test stage, some tests will attempt to connect to the
+internet. If successful, it will test a number of remote geocoders. In the
+event of network problems or difficulties with these third-party services, you
+may wish to disable this part of the test.
+
+DEPENDENCIES
+ 
+This module requires these other modules and libraries:
+ 
+  Geo::Coder::* (as required)
+  Geo::Distance::XS
+  HTTP::Request
+  List::MoreUtils
+  List::Util
+  List::Util::WeightedRoundRobin
+  Net::Ping
+  Sort::Versions
+  Test::Exception
+  Test::MockObject
+  Test::Pod::Coverage
+  Test::Simple
+  Time::HiRes
+ 
+COPYRIGHT AND LICENCE
+
+Copyright 2014 Lokku Ltd <cpan@lokku.com>
+
+Parts taken from Geo::Coder::Multiple are copyright 2009 Alistair Francis
+<opensource@alizta.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10 or,
+at your option, any later version of Perl 5 you may have available.

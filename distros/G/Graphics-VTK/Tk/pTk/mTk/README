@@ -1,0 +1,10 @@
+As of release based on vtk31 this 'mTk' directory 
+contains _complete_ sources of the relavent vtk TCL source files 
+in their minimally modified
+forms.
+
+This is because 'munging' to pTk directory from either modified form
+or original Tk becomes very complex now Tk is split unix/generic.
+
+It should also makes merging changes less error prone.
+

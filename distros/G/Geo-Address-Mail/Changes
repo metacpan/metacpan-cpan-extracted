@@ -1,0 +1,18 @@
+Revision history for Geo-Address-Mail
+
+0.04    Thu Jan 13, 2010
+    * Add standardize method as a shortcut for invoking Standardizers
+    * POD reorg
+    * Add new_for_country method as a shortcut (sort of like a factory for
+      creating subclasses, if they are installed
+    * Document MooseX::Clone method 'clone'
+
+0.03    Mon Jan 3, 2010
+  * Add MooseX::Storage depedency (thanks Andreas Koenig)
+
+0.02    Tue Dec 28, 2010
+  * Add MooseX::Storage (holophrastic)
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

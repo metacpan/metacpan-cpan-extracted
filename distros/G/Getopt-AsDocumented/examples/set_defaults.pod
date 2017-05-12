@@ -1,0 +1,30 @@
+
+=head1 Usage
+
+  set_defaults [options] INPUTFILE
+
+=head1 Options
+
+=over
+
+=item -i, --input-file FILENAME
+
+=for positional
+=for isa File::Fu::File
+
+Input file name.
+
+DEFAULT: {File::Fu->home + '.bashrc'}
+
+=back
+
+=cut
+
+$VERSION = 42.7.9;
+use warnings;
+use strict;
+
+use Getopt::AsDocumented;
+my $o = Getopt::AsDocumented->process(\@ARGV) or exit;
+
+warn $o->input_file, " (", ref($o->input_file), ")";

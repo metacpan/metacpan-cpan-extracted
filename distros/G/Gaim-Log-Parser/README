@@ -1,0 +1,71 @@
+######################################################################
+    Gaim::Log::Parser 0.14
+######################################################################
+
+NAME
+    Gaim::Log::Parser - Parse Gaim's Log Files
+
+SYNOPSIS
+        use Gaim::Log::Parser;
+
+        my $parser = Gaim::Log::Parser->new(file => $filename);
+
+        while(my $msg = $parser->next_message()) {
+            print $msg->as_string();
+        }
+
+DESCRIPTION
+    Gaim::Log::Parser parses Gaim/Pidgin's log files. In the 1.4+ series,
+    they are organized in the following way:
+
+        .gaim/logs/protocol/local_user/comm_partner/2005-10-29.230219.txt
+
+    Make sure that your Gaim/Pidgin client has logging turned on and that
+    the logging format is set to 'text' (not html). If you have log files in
+    html format already, run the utility eg/gaimlog-html2text to make text
+    format copies of existing html logs.
+
+  Methods
+    "my $parser = Gaim::Log::Parser-"new(file => $filename)>
+        Create a new log parser.
+
+        The parser will interpret the message time stamps according to a
+        selected time zone.
+
+        By default, the time zone is assumed to be 'local' which will try
+        all kinds of tricks to determine the local time zone. If this is not
+        what you want, a time zone for DateTime::TimeZone can be provided,
+        e.g. "America/Los_Angeles".
+
+    "my $msg = $parser->next_message()"
+        Return the next message in the log. Returns an object of type
+        "Gaim::Log::Message". Check its documentation for details.
+
+    "my $dt = $parser->datetime()"
+        Retrieve the DateTime object used internally by "Gaim::Log::Parser".
+        Can be used to obtain the the start date of the parsed log file or
+        the time zone used.
+
+    "$parser->reset()"
+        Position the parser back to the beginning of the conversation. After
+        this has been completed, the next next_message() will return the
+        first message in the log file.
+
+    "my $str = $parser->as_string()"
+        Return the entire conversation as a nicely formatted text string. By
+        default, Text::Wrap's column with lines will be set to 70, if you
+        prefer a different width, specify it explicitely
+
+            my $str = $parser->as_string( {columns => 30} );
+
+SEE ALSO
+        Gaim::Log::Finder, Gaim::Log::Message in this distribution
+
+LEGALESE
+    Copyright 2005-2008 by Mike Schilli, all rights reserved. This program
+    is free software, you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+AUTHOR
+    Mike Schilli <cpan@perlmeister.com>
+

@@ -1,0 +1,65 @@
+Revision history for Group-Git-Cmd-SinceRelease
+
+0.0.10   2017-03-19
+        Updating for release of version 0.0.10
+        Improved version comparisons (Ivan Wills)
+
+0.0.9   2017-02-12
+        Updating for release of version 0.0.9
+        Updated date (Ivan Wills)
+        Fixed format format (Ivan Wills)
+        Removed debugging statement (Ivan Wills)
+
+0.0.8   2016-12-26
+        Updating for release of version 0.0.8
+        Removed unused dependency (Ivan Wills)
+        Removed incorrect use of Regexp::Common (Ivan Wills)
+        fixed name (Ivan Wills)
+
+0.0.7   2016-11-13
+        Updating for release of version 0.0.7
+        Stopping printing result of process (Ivan Wills)
+
+0.0.6   2016-11-06
+        Updating for release of version 0.0.6
+        Added missing docs (Ivan Wills)
+        Moved command processing to start function (Ivan Wills)
+        Allowing for log format to be passed (Ivan Wills)
+        Fixed so that getting logs only get what is needed (Ivan Wills)
+        Adding verbose option to show log messages since last release (Ivan Wills)
+        Re-organising getting log status (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
+0.0.5   2016-06-13
+        Updating for release of version 0.0.5
+        Added missing dependency (Ivan Wills)
+        Changed formatting numbers to be 13 characters wide (Ivan Wills)
+        Added example usage (Ivan Wills)
+        Added a description (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Changed sorting algorithm to deal with floats (Ivan Wills)
+
+0.0.4   2016-04-03
+        Updating for release of version 0.0.4
+        Updated license date (Ivan Wills)
+        Added sorting tags numerically (Ivan Wills)
+
+0.0.3   2015-08-26
+        Updating for release of version 0.0.3
+        Removed creation of makefile (Ivan Wills)
+
+0.0.2   2015-07-24
+        Updating for release of version 0.0.2
+        Added coveralls config (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.0.1   2015-05-31
+        Added missing dependencies (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Fixed load test (Ivan Wills)
+        Fixed POD (Ivan Wills)
+        Fixed boilerplate (Ivan Wills)
+        Added tagging for future release (Ivan Wills)
+        Added implementation (Ivan Wills)

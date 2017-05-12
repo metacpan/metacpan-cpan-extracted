@@ -1,0 +1,133 @@
+NAME
+    Geo::Weather - Weather retrieval module
+
+SYNOPSIS
+      use Geo::Weather;
+
+      my $weather = new Geo::Weather;
+
+      $weather->get_weather('Folsom','CA');
+
+      print $weather->report();
+
+      -or-
+
+      use Geo::Weather;
+
+      my $weather = new Geo::Weather;
+      $weather->{timeout} = 5; # set timeout to 5 seconds instead of the default of 10
+ 
+      my $current = $weather->get_weather('95630');
+
+      print "The current temperature is $current->{temp} degrees\n";
+
+DESCRIPTION
+    The Geo::Weather module retrieves the current weather from weather.com
+    when given city and state or a US zip code. Geo::Weather relies on
+    LWP::UserAgent to work. In order for the timeout code to work correctly,
+    you must be using a recent version of libwww-perl and IO::Socket.
+    Geo::Weather was developed with libwww-perl 5.53 and IO::Socket 1.26.
+
+FUNCTIONS
+    * new
+        Create and return a new object.
+
+    * get_weather
+        Gets the current weather from weather.com
+
+        Arguments
+
+                city - US city or zip code
+                state - US state, not needed if using zip code
+
+        Sample Code
+
+                my $current = $weather->get_weather('Folsom','CA');
+                if (!ref $current) {
+                        die "Unable to get weather information\n";
+                }
+
+        Returns
+
+                On sucess, get_weather returns a hashref  containing the following keys
+
+                city            - City
+                state           - State
+                zip             - Zipcode of US city
+                pic             - weather.com URL to the current weather image
+                url             - Weather.com URL to the weather results
+                cond            - Current condition
+                temp            - Current temperature (degees F)
+                wind            - Current wind speed
+                dewp            - Current dew point (degrees F)
+                humi            - Current rel. humidity
+                visb            - Current visibility
+                baro            - Current barometric pressure
+                heat            - Current heat index (Feels Like string)
+
+        Errors
+
+                On error, it returns one of the following exported error variables
+
+                $ERROR_QUERY            - Invalid data supplied
+                $ERROR_PAGE_INVALID     - No URL, or incorrectly formatted URL for retrieving the information
+                $ERROR_CONNECT          - Error connecting to weather.com
+                $ERROR_NOT_FOUND        - Weather for the specified city/state or zip could not be found
+                $ERROR_TIMEOUT          - Timed out while trying to connect or get data from weather.com
+                $ERROR_BUSY             - weather.com is too busy to handle requests and is in Severe Weather Alert Mode
+
+    * report
+        Returns an HTML table containing the current weather. Must call
+        get_weather first.
+
+        Sample Code
+
+                print $weather->report();
+
+    * lookup
+        Gets current weather given a full weather.com URL
+
+        Sample Code
+
+                my $current = $weather->lookup('http://www.weather.com/search/search?where=95630');
+
+        Returns
+
+                On sucess, lookup returns a hashref with the same keys as the get_weather function
+
+                On error, lookup returns the same errors defined for get_weather
+
+OBJECT KEYS
+    There are several object hash keys that can be set to manipulate how
+    Geo::Weather works. The hash keys should be set directly following
+    `new'.
+
+    Below is a list of each key and what it does:
+
+    * debug
+    Enable debug output of the connection attempts to weather.com Valid
+    values are 0 to 4, increasing debugging respectivley.
+
+    * timeout
+    Controls the timeout, in seconds, when trying to connect to or get data
+    from weather.com. Default timeout is 10 seconds. Set to 0 to disable
+    timeouts.
+
+    * proxy
+    Use HTTP proxy for the request. Format is http://proxy.server:port/.
+    Default is no proxy.
+
+    * proxy_user
+    Sets the username to use for proxying. Defaults to the HTTP_PROXY_USER
+    environment variable, if set, or don't use authentication if blank.
+
+    * proxy_pass
+    Sets the password to use for proxying. Defaults to the HTTP_PROXY_PASS
+    environment variable, if set.
+
+    * agent_string
+    HTTP User-Agent header for request. Default is Geo::Weather/$VERSION.
+
+AUTHOR
+     Geo::Weather was wrtten by Mike Machado <mike@innercite.com>
+

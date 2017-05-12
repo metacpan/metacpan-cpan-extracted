@@ -1,0 +1,277 @@
+=pod
+
+=head1 NAME
+
+GD::Map::Mercator - Create Mercator projected map images using GD
+
+=head1 SYNOPSIS
+
+    use GD::Map::Mercator;
+    #
+    #    create a new basemap
+    #
+    my $newmap = GD::Map::Mercator->new(
+        basemap_path => './basemaps',
+        basemap_name => 'namer.gif',
+        data_path => './WDB',
+        min_lat => 15.5,
+        min_long => -50,
+        max_lat => 49.5,
+        max_long => -26,
+        width => 800,
+        height => 500,
+        background => '#FF0023',
+        foreground => 'black',
+        thickness => 3,
+        silent => 1,
+    );
+    #
+    #    or load an existing one
+    #
+    my $oldmap = GD::Map::Mercator->new(
+        basemap_path => './basemaps',
+        basemap_name => 'namer.gif'
+    );
+    #
+    #    grab the image as an GD object
+    #
+    my $imager = $newmap->image();
+    #
+    #    draw some stuff on it
+    #
+    $imager->lineTo($here, $there);
+    #
+    #    compute some pixels from lat/long
+    #
+    my ($x,$y) = $newmap->project($lat, $long);
+    #
+    #    or compute lat/long from pixels
+    #
+    my ($lat, $long) = $newmap->translate($x, $y);
+    #
+    #    carve out a section of the map
+    #
+    my $submap = $newmap->extract($minlat, $minlong, $maxlat, $maxlong);
+    #
+    #    create a 1/2 size map
+    #
+    my $scaledmap = $newmap->scale(0.5);
+    #
+    #    and save it
+    #
+    $scaledmap->save('scaledmap.gif');
+
+=head1 DESCRIPTION
+
+Perl module for creating geographic map files with GD using a Mercator
+Projection.
+
+Originally inspired by L<GD::Map>, but significantly modified to 
+
+=over
+
+=item *
+
+support the Mercator projection
+
+=item *
+
+optimize for performance (theres a B<lot> of data
+to convert)
+
+=item *
+
+expose the map image for direct manipulation by the application
+
+=back
+
+=head2 Geospatial Database
+
+The geospatial data is sourced from the CIA World DataBank II
+repository at L<http://www.evl.uic.edu/pape/data/WDB/>. Note that
+this database was created in the mid 1980's, so some of the
+political boundries are not current.
+
+You'll need to download the WDB files and unpack them somewhere.  
+The following files are contained in the archive:
+
+    africa-bdy.txt
+    africa-cil.txt
+    africa-riv.txt
+    asia-bdy.txt
+    asia-cil.txt
+    asia-riv.txt
+    europe-bdy.txt
+    europe-cil.txt
+    europe-riv.txt
+    namer-bdy.txt
+    namer-cil.txt
+    namer-pby.txt
+    namer-riv.txt
+    samer-bdy.txt
+    samer-cil.txt
+    samer-riv.txt
+
+Once unpacked, the files need to be filtered and converted
+via the L<wdb2merc> script included in this bundle. wdb2merc
+
+=over
+
+=item *
+
+filters out some noisy data
+
+=item *
+
+converts the latitude/longitude coordinates into
+Mercator projected distances (for faster loading/computation)
+
+=item *
+
+writes the results out as binary records which can be loaded much
+faster, and compresses the data approx. 35%
+
+=back
+
+=head2 Creating Maps
+
+Map images are rendered by specifying a bounding box defined
+by minimum and maximum latitude and longitudes, and the output
+image dimensions. The resulting image and associated configuration
+data can be saved for future use, avoiding the overhead of
+re-rendering by reloading the basemap image and its data.
+
+To create a new basemap:
+
+    use GD::Map::Mercator;
+
+    my $map = GD::Map::Mercator->new(
+        basemap_path => "/data/basemaps",
+        basemap_name => "testing",
+        data_path => "/usr/local/wdb",
+        width => $width,
+        height => $height,
+        max_long => 162,
+        min_long => 65,
+        max_lat => 70,
+        min_lat => 14,
+        background => '#FF0023',
+        foreground => 'black',
+        thickness => 3,
+    );
+
+This will create testing.png and testing.conf files in /data/basemaps 
+containing a map of the area bounded by 14 deg latitude, 65 deg longitude, and 
+70 deg latitude, 162 deg longitude. The resulting image
+will attempt a best fit for the specified $width and $height, but will adjust
+dimensions as needed to preserve the Mercator scaling.  Note that negative latitude
+values are south of the equator, and negative longitude is west of
+the meridian (Greenwich, GB). If the maximum longitude is negative
+and the minimum is positive, the map is assumed to cross the antipodal
+meridian.
+
+The testing.conf file contains the relevant data for the created map image.
+
+The created base map can be reused later by using the alternate
+constructor:
+
+    use GD::Map::Mercator;
+
+    my $map = GD::Map::Mercator->new(
+        basemap_path => "/data/basemaps",
+        basemap_name => "testing",
+    );
+
+This constructor will attempt to initialize itself from the specified
+basemap file.
+
+=head2 Using Map Images
+
+After creating or loading a basemap image, you can extract portions of the image,
+rescale the image, or decorate the image directly by getting the GD::Image object
+(or rather, a copy of the basemap image):
+
+    my $img = $map->image();
+    
+To compute pixel coordinates from latitude/longitude pairs:
+
+    my ($x,$y) = $map->project($lat, $long);
+
+If the specified latitude or longitude is outside the range of the
+map, it returns undef values. Otherwise, the results are a pixel coordinate.
+
+As a shortcut, multiple sets of lat/long points may be specified:
+
+    my @coords = $map->project($lat1, $long1, $lat2, $long2, $lat3, $long3, .. );
+
+Once you have the map image, and coordinates, the usual GD methods can
+be used to manipulate the image.
+
+Conversely, you can get the latitude/longitude and Mercator projected
+distances for given pixel coordinates:
+
+    my ($lat,$long, $merclat, $merclong) = $map->translate($x, $y);
+
+This might be useful for interactive mapping applications.
+
+The basemap configuration data, including hte bounding box latitude/longitude coordiates,
+the Mercator projected lat/long distance (in meters), and the image dimensions can also be retrieved:
+
+    my ($minlat, $minlong, $maxlat, $maxlong, 
+        $minmerclat, $minmerclong, $maxmerclat, $maxmerclong, $width, $height) = $map->config();
+
+The basemap can also be rescaled:
+
+    my $newmap = $map->scale($scale);
+
+This will create a new GD::Map::Mercator object zoomed in/out as needed, 
+with updated configuration data.
+
+Submaps can be extracted (and optionally scaled):
+
+    my $newmap = $map->extract($minlat, $minlong, $maxlat, $maxlong [, $scale ]);
+
+Once you've created a new map via C<scale> or C<extract> you can save it
+as a basemap using
+
+    $newmap->save('mynewmap.png');
+
+=head1 METHODS
+
+Refer to the classdoc output for detailed method descriptions.
+
+=head1 EXAMPLES
+
+=begin html
+
+Some example maps can be viewed 
+<a href='http://www.presicient.com/gdmapmerc/maps'>here</a>.
+
+=end html
+
+=head1 SEE ALSO
+
+This package was inspired by L<GD::Map>, but
+this package uses a significantly different rendering technique,
+and exposes a different interface.
+
+L<Geo::Mercator> is used to compute the projections.
+
+CIA World DataBank II datasets are at L<http://www.evl.uic.edu/pape/data/WDB/>
+
+US Zip Code Database: L<http://zips.sourceforge.net/>
+
+US Census TIGER/Line Data: L<http://www.census.gov/geo/www/tiger/>
+
+L<Geo::Coder::US> and the several other Geo::Coder packages
+
+=head1 AUTHOR, COPYRIGHT AND LICENSE
+
+Dean Arnold L<mailto:darnold@presicient.com>
+
+Copyright(C) 2008, Dean Arnold, Presicient Corp., USA
+
+Permission is granted to use, copy, modify, and redistribute this software
+under the terms of the L<Perl Artistic|perlartistic> license.
+
+=cut

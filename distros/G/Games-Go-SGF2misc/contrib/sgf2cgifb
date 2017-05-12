@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+use strict;
+use Games::Go::SGF2misc;
+
+my $sgf = new Games::Go::SGF2misc;
+   $sgf->parse($ARGV[0]) or warn "could not parse: " . $sgf->errstr;
+
+$sgf->as_freezerbag( "freezer.pl", join("", <DATA>), $ARGV[1]);
+
+chmod 0755, "freezer.pl";
+
+__DATA__
+use CGI;
+my $cgi = new CGI;
+
+my $list = $sgf->nodelist;
+my $node = $cgi->param('n'); 
+   $node = "1.1-root" unless $node and $sgf->is_node($node);
+
+if( $cgi->param("i") ) {
+    print $cgi->header({type=>"image/png"});
+    print $sgf->as_image($node, {imagesize=>400, filename=>"-.png", gobanColor=>[255, 255, 255]});
+    exit 0;
+}
+
+print $cgi->header;
+print $cgi->start_html;
+
+my $js_array;
+my ($next, $prev);
+for my $g (sort {$a<=>$b} keys %$list) {
+    my $ln;
+    for my $v (@{ $list->{$g} }) {
+        for my $n (@$v) {
+            if( $ln eq $node ) {
+                $next = $n;
+            } elsif( $node eq $n ) {
+                $prev = $ln if $ln;
+                $js_array = $v;
+            }
+
+            $ln = $n;
+        }
+    }
+}
+
+if( $cgi->param("js") and $js_array ) {
+    my $js = q#
+    function flip(x) {
+        var c = document.getElementById('cur');
+        var i = document.getElementById('DuhImage');
+
+        if( x == "previous" ) {
+            switch(c.innerHTML) {
+    #;
+
+    my $ln;
+    for my $n (@$js_array) {
+        $js .= "        case \"$n\": c.innerHTML = \"$ln\"; i.src=\"$ENV{SCRIPT_NAME}?i=1;n=$ln\"; break;\n" if $ln;
+        $ln = $n;
+    }
+
+    $js .= "}} else { switch(c.innerHTML) { ";
+
+    for my $n (reverse @$js_array) {
+        $js .= "        case \"$n\": c.innerHTML = \"$ln\"; i.src=\"$ENV{SCRIPT_NAME}?i=1;n=$ln\"; break;\n" if $n;
+        $ln = $n;
+    }
+
+    $js .= "}}}";
+
+    print $cgi->img({id=>"DuhImage", src=>"$ENV{SCRIPT_NAME}?n=$node;i=1"});
+    print $cgi->script($js);
+    print $cgi->div({id=>'cur', style=>"display: none"}, $node);
+    print $cgi->ul([
+        $cgi->li($cgi->div({onClick=>"flip('previous')"}, "[previous]")),
+        $cgi->li($cgi->div({onClick=>"flip('next')"},     "[next]")),
+    ]);
+    print $cgi->a({href=>"$ENV{SCRIPT_NAME}?js=0"}, "(js off)");
+} else {
+    print $cgi->p($sgf->as_html($node));
+    print $cgi->ul([
+        $cgi->li( $prev ? $cgi->a({href=>"$ENV{SCRIPT_NAME}?n=$prev"}, "previous") : "previous" ),
+        $cgi->li( $next ? $cgi->a({href=>"$ENV{SCRIPT_NAME}?n=$next"}, "next")     : "next"     ),
+    ]);
+    print $cgi->a({href=>"$ENV{SCRIPT_NAME}?js=1"}, "(js on)");
+}

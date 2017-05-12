@@ -1,0 +1,28 @@
+=head2 cleanbody
+
+This module checks the body of an incoming article and cleans it up,
+attempting to enforce standard ISO 8859-1 text.  If it's encoded in
+quoted-printable, that encoding is undone.  Microsoft Word SmartQuotes are
+converted into their ASCII equivalents, any Ctrl-Ms are removed, and the
+module checks to make sure that the message contains no invalid characters
+(outside of the standard ISO 8859-1 range) and that no lines are longer
+than 79 characters.
+
+The messages returned by the checks in the event of failure are:
+
+=over 4
+
+=item Invalid characters in body
+
+The body contains characters outside the range [\s!-~\xa0-\xff].
+
+=item Line over 79 characters
+
+One or more lines in the body are over 79 characters long.
+
+=back
+
+This module takes no arguments or configuration directives.  If the
+original message was in quoted-printable, it will change the
+Content-Transfer-Encoding header to be "8bit".  It recognizes
+quoted-printable from the MIME encoding headers.

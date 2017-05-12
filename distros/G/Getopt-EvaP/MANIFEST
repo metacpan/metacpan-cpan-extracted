@@ -1,0 +1,21 @@
+EvaP.pm
+MANIFEST
+Makefile.PL
+README
+test.pl
+test.err.good
+test.out.good
+genpTk
+DisU.pl
+GUI/README
+GUI/test2.pl
+GUI/withevap
+GUI/withevap.ptk
+GUI/woevap-pdt.out
+GUI/woevap.mm
+GUI/woevap.pdt
+GUI/woevap.ptk
+test.err
+test.out
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

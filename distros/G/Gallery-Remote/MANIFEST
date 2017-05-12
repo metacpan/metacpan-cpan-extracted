@@ -1,0 +1,10 @@
+Changes
+COPYING
+README
+Remote.pm
+Makefile.PL
+MANIFEST
+Gallery-Remote.spec.in
+test.pl
+TODO
+META.yml                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,104 @@
+NAME
+    Graph::Reader::TGF::CSV - Perl class for reading a graph from TGF format
+    with CSV labeling.
+
+SYNOPSIS
+     use Graph::Reader::TGF::CSV;
+     my $obj = Graph::Reader::TGF::CSV->new;
+     my $graph = $obj->read_graph($tgf_csv_file);
+
+METHODS
+    "new()"
+             Constructor.
+             This doesn't take any arguments.
+             Returns Graph::Reader::TGF::CSV object.
+
+    "read_graph($tgf_csv_file)"
+             Read a graph from the specified file.
+             The argument can either be a filename, or a filehandle for a previously opened file.
+             Returns Graph object.
+
+TGF WITH CSV LABELING FILE FORMAT
+     TGF = Trivial Graph Format
+     TGF file format is described on L<English Wikipedia - Trivial Graph Format|https://en.wikipedia.org/wiki/Trivial_Graph_Format>
+     Example with CSV labeling:
+     1 label=First node,color=red
+     2 label=Second node,color=cyan
+     #
+     1 2 label=Edge between the two,color=green
+
+ERRORS
+     new():
+             Cannot create Text::CSV object.
+                     Error: %s
+             Cannot parse edge label.
+                     Error: %s
+                     String: %s
+             Cannot parse vertex label.
+                     Error: %s
+                     String: %s
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Graph::Reader::TGF::CSV;
+     use IO::Barf qw(barf);
+     use File::Temp qw(tempfile);
+
+     # Example data.
+     my $data = <<'END';
+     1 label=First node,green=red
+     2 label=Second node,green=cyan
+     #
+     1 2 label=Edge between the two,color=green
+     END
+
+     # Temporary file.
+     my (undef, $tempfile) = tempfile();
+
+     # Save data to temp file.
+     barf($tempfile, $data);
+
+     # Reader object.
+     my $obj = Graph::Reader::TGF->new;
+
+     # Get graph from file.
+     my $g = $obj->read_graph($tempfile);
+
+     # Print to output.
+     print $g."\n";
+
+     # Clean temporary file.
+     unlink $tempfile;
+
+     # Output:
+     # 1-2
+
+DEPENDENCIES
+    Error::Pure, Graph::Reader::TGF, Text::CSV.
+
+SEE ALSO
+    Graph::Reader
+        base class for Graph file format readers
+
+    Task::Graph::Reader
+        Install the Graph::Reader modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Graph-Reader-TGF-CSV>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

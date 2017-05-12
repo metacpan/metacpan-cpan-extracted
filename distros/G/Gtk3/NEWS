@@ -1,0 +1,241 @@
+Overview of changes in Gtk3 0.031 [2017-04-20]
+==============================================
+
+* Fix a test failure in t/zz-GdkEvent.t
+
+Overview of changes in Gtk3 0.030 [2016-11-23]
+==============================================
+
+* Fix a test failure due to old CSS syntax
+* When marshalling key-value pairs, preserve their order
+* Add an override for Gtk3::Widget::style_get
+* Add overrides for the child property methods of Gtk3::Container
+* Add overrides for Gtk3::Widget::find_style_property and
+  list_style_properties
+* Add overrides for Gtk3::Container::find_child_property and
+  list_child_properties
+
+Overview of changes in Gtk3 0.029 [2016-09-27]
+==============================================
+
+* Docs: fix typo
+
+Overview of changes in Gtk3 0.028 [2016-06-30]
+==============================================
+
+* Gtk3::Dialog, Gtk3::InfoBar: correctly pass user data to 'response' handlers
+  (Maximilian Lika)
+* Test for correct error location reports
+* Gtk3::Clipboard::set_text: make length arg optional
+* Add an implementation of Gtk3::StyleContext::get
+* Mention that Gtk3::Widget::grab_add and grab_remove are methods in Gtk3
+
+Overview of changes in Gtk3 0.027 [2016-06-05]
+==============================================
+
+* Gtk3::FileChooserDialog: fix typo in usage warning (RT#114506)
+
+Overview of changes in Gtk3 0.026 [2015-11-30]
+==============================================
+
+* Add an override for Pango::Layout::set_markup (make the length argument
+  optional)
+
+Overview of changes in Gtk3 0.025 [2015-10-01]
+==============================================
+
+* Added changes since release v0.023 to the NEWS file and re-release
+
+Overview of changes in Gtk3 0.024 [2015-10-01]
+==============================================
+
+* Implement the Gtk3::Stock name corrections in a more compatible way
+* Add documentation for all overrides and customizations
+* Add Gtk3::Gdk::Pixbuf::CHECK_VERSION
+* Gtk3::Gdk::Pixbuf::new_from_inline: do not take a copy_pixels argument
+* Implement Gtk3::Gdk::Pixbuf::new_from_data in terms of new_from_inline
+* Add an override for Gtk3::TextBuffer::insert_markup
+* Fix a test failure when no display is available
+
+Overview of changes in Gtk3 0.023 [2015-08-10]
+==============================================
+
+* Fix a test failure in t/zz-GdkEvent.t
+* Fix warnings from the dialog tests
+* Fix warnings from the Gtk3::Menu tests
+* Test that loading Gtk3 multiple times does not affect vfunc overloading
+
+Overview of changes in Gtk3 0.022 [2015-07-11]
+==============================================
+
+* Support gdk-pixbuf >= 2.31.3 that reverted some annotation changes that came
+  with 2.31.2
+
+Overview of changes in Gtk3 0.021 [2015-01-27]
+==============================================
+
+* Fix handling of 2button-press and 3button-press events
+* Handle double-button-press and triple-button-press event type aliases
+* Fix a test failure with Gtk3::Widget::render_icon
+* Avoid infinite recursion in Gtk3::disable_setlocale
+
+Overview of changes in Gtk3 0.020 [2014-12-25]
+==============================================
+
+* Tighten the GtkRadio* test skip conditions
+* Use Glib::Object::Introspection->CHECK_VERSION in the tests
+* When running tests, display the gtk+ version
+* Fix test failures on unthreaded perls on FreeBSD
+
+Overview of changes in Gtk3 0.019 [2014-11-25]
+==============================================
+
+* Fix test failures with gdk-pixbuf >= 2.31.2
+* Fix test failures with gtk+ 3.0
+
+Overview of changes in Gtk3 0.018 [2014-09-30]
+==============================================
+
+* dist.ini: added x_IRC metadata tag
+* Attempt to reduce false negatives from CPAN testers
+* overrides.t: output current object being tested using note()
+
+Overview of changes in Gtk3 0.017 [2014-07-02]
+==============================================
+
+* Fix compatibility with perl 5.20 and non-dot locales.
+* Fix a test failure due to changes in gtk+ (GtkRecentChooser)
+
+Overview of changes in Gtk3 0.016 [2014-02-19]
+==============================================
+
+* README: added more project contact info/addresses/links
+* README: Added more info on how to report bugs, submit patches
+∗ dist.ini: added Twitter URL to MetaResources block
+
+Overview of changes in Gtk3 0.015 [2013-12-08]
+==============================================
+
+* Add overrides for Gtk3::RadioAction, Gtk3::RadioButton, Gtk3::RadioMenuItem
+  and Gtk3::RadioToolButton.
+* Add an override for Gtk3::SizeGroup::get_widgets.
+* Add an override for Gtk3::Widget::render_icon.
+* Add an override for Pango::Layout::set_text.
+* Require Test::Simple >= 0.96.
+
+Overview of changes in Gtk3 0.014 [2013-10-18]
+==============================================
+
+* dist.ini: document 'is_trial', sets 'testing' in metadata
+* dist.ini: Add MetaJSON, set MetaYAML version = 2
+* dist.ini: Add [MetaResources] block with correct URLs; fixes RT#89118
+
+Overview of changes in Gtk3 0.013 [2013-09-30]
+==============================================
+
+* Add forgotten release notes.
+* Reenable UploadToCPAN Dist::Zilla plugin
+
+Overview of changes in Gtk3 0.012 [2013-09-30]
+==============================================
+
+* Add overrides for Gtk3::Image.
+∗ Fix partial misquoting in croak usage
+* Do not use 'defined' on an array (Spotted by Thierry Vignaud)
+* Add overrides for Gtk3::Image (Based on a patch by Dave M.)
+* Add two more tests for Gtk3::TextBuffer (Zach Morgan)
+
+Overview of changes in Gtk3 0.011 [2013-09-01]
+==============================================
+
+* Add forgotten release notes.
+
+Overview of changes in Gtk3 0.010 [2013-09-01]
+==============================================
+
+* Gtk3::HBox/Gtk3::VBox: use correct defaults in constructors.
+* Gtk3::TextBuffer::create_tag: handle all property pairs.
+* Fix a few test failures for older gtk+.
+
+Overview of changes in Gtk3 0.009 [2013-02-14]
+==============================================
+
+* Add overrides for Gtk3::Container.
+* Add overrides for Gtk3::Dialog and Gtk3::InfoBar, including the conversion of
+  predefined response IDs to nick names.
+* Add overrides for Gtk3::Editable.
+* Add overrides for Gtk3::FileChooserDialog.
+* Add overrides for Gtk3::RecentChooserDialog.
+* Add overrides for Gtk3::TextBuffer.
+* Add overrides for Gtk3::ListStore's and Gtk3::TreeStore's
+  insert_with_values().
+* Add more overrides for Gtk3::TreeView and friends.
+* Add overrides for various button constructors.
+* Add an override for Gtk3::main_level.
+* Add Gtk3::EVENT_PROPAGATE and Gtk3::EVENT_STOP.
+* In Gtk3::TreeModel::get, if no columns are specified, use all columns.
+* Test that no double-frees occur for custom Gtk3::Widget subclasses.
+* Add overrides for Gtk3::Gdk::Atom.
+* Add overrides for Gtk3::Gdk::RGBA.
+* Make Gtk3::Gdk::Pixbuf::save, save_to_buffer and save_to_callback usable.
+* Fix test failures on older versions of gtk+.
+
+Overview of changes in Gtk3 0.008 [2012-08-26]
+==============================================
+
+* Add overrides for Gtk3::Gdk::Event.
+* Add overrides for some Gtk3::RadioMenuItem constructors.
+* Add overrides for Gtk3::CssProvider.
+* Add overrides for Gtk3::UIManager.
+* Always convert GdkRectangle objects to and from Cairo::RectangleInt.
+
+Overview of changes in Gtk3 0.007 [2012-07-05]
+==============================================
+
+* Add overrides for Gtk3::ActionGroup.
+* Add an override for Gtk3::show_about_dialog.
+* Fix some test failures due to older dependencies.
+
+Overview of changes in Gtk3 0.006 [2012-06-04]
+==============================================
+
+* Add overrides for Gtk3::MenuItem, CheckMenuItem and ImageMenuItem.
+* Require Glib 1.260 and Glib::Object::Introspection 0.009 for various
+  improvements.
+
+Overview of changes in Gtk3 0.005 [2012-04-22]
+==============================================
+
+* Require Cairo::GObject and load it automatically.
+* Add overrides for Gtk3::Builder and implement its connect_signals.
+* Add overrides for Gtk3::Menu::popup and popup_for_device.
+* Add some documentation about porting from Gtk2 to Gtk3.
+
+Overview of changes in Gtk3 0.004 [2012-03-18]
+==============================================
+
+* Provide GdkPixbuf bindings under Gtk3::Gdk::Pixbuf.
+* Make Gtk3::[HV]Box::new provide default arg values.
+* Make Gtk3::Gdk::Window::new construct the mask automatically if none is
+  given.
+* Clarify licensing terms.
+
+Overview of changes in Gtk3 0.003 [2012-01-14]
+==============================================
+
+* API change: wrap gtk_stock_* as Gtk3::Stock::*.  Also, make
+  Gtk3::Stock::list_ids return a list and make Gtk3::Stock::lookup skip
+  the sentinel boolean.
+* Correctly handle internal errors on perl < 5.14.  This fixes a test
+  failure.
+
+Overview of changes in Gtk3 0.002 [2011-12-09]
+==============================================
+
+* Add more overrides for the tree objects.
+* Fix a test failure.  (RT #72773)
+
+Overview of changes in Gtk3 0.001 [2011-10-14]
+==============================================
+
+* Initial release.

@@ -1,0 +1,10 @@
+Change log for Graphics::ColorNames::Crayola:
+
+1.01   20 Dec 2007
+	- removed duplicate names, requires Graphics::ColorNames 2.10
+	- fixed typos in Changes
+	- more flexible Perl version requirements
+	- updated documentation
+
+1.00   17 Dec 2007
+	- first release

@@ -1,0 +1,14 @@
+title			=	Goo Trail
+description		=	Thing for accessing the Goo Trail a programmer leaves behind
+buffer_size		=	7
+
+[P]rofile		=	Goo::TrailProfiler.pm
+#[B]ack			=	Goo::TrailGoBack.pm
+#[F]orward		=	Goo::TrailGoForward.pm
+E[X]it			= 	Goo::Exiter.pm
+#[J]ump			=	Goo::JumpManager.pm
+Care[O]Meter 	=	Goo::CareOMeter.pm
+[S]hell			=	Goo::ShellCommander.pm
+[E]dit			= 	Goo::Editor.pm
+
+last_actionid 	 = 	 0 

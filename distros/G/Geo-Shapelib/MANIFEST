@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+README.md
+typemap
+Makefile.PL
+t/00.t
+lib/Geo/Shapelib.pm
+Shapelib.xs
+example/xyz.dbf
+example/xyz.sbn
+example/xyz.sbx
+example/xyz.shp
+example/xyz.shx
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

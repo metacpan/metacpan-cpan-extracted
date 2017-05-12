@@ -1,0 +1,2 @@
+TYPEMAP
+	gtk2_ex_geo_pixbuf * T_PTROBJ

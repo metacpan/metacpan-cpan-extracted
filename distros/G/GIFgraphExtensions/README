@@ -1,0 +1,36 @@
+Copyright (c) 1999 GRL
+All righs reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+This package relies on the MRP bundle and extends GIFgraph.
+
+To install, first install MRP and GIFgraph. Then cd to the directory that contains
+this README file and type the following:
+
+ perl Makefile.PL
+
+If you wish to install this bundle somewhere other than the default
+location then type something like:
+
+ perl Makefile.PL PREFIX=/home/me/perl
+
+Then to build run make
+
+ make
+
+You can then test the module with
+
+ make test
+
+If you have write access to the install directory (or the one
+specified by PREFIX) then you can now type:
+
+ make install
+
+Presuming that the install target is in your PERL5LIB path then you
+are now ready to use GIFgraph::WithMap and
+GIFgraph::EvenlySpaced. Enjoy!
+
+You can contact me directly at mailto:mrp@sanger.ac.uk
+You can brows the Sanger Center web site at http://www.sanger.ac.uk/

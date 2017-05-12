@@ -1,0 +1,96 @@
+Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+
+This file is part of Gtk2-Ex-Xor.
+
+Gtk2-Ex-Xor is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+Gtk2-Ex-Xor is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Gtk2-Ex-Xor.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 22, June 2011
+    - tests Lasso allow for pointer already grabbed
+
+Version 21, May 2011
+    - Lasso use GdkBits draw_rectangle_corners()
+
+Version 20, December 2010
+    - CrossHair new "add-widget" property
+
+Version 19, December 2010
+    - Lasso fix copy cursor object in case caller frees
+
+Version 18, December 2010
+    - CrossHair fix copy out 'widgets' arrayref as it belongs to the caller
+
+Version 17, December 2010
+    - tests more diagnostics
+
+Version 16, November 2010
+    - CrossHair properties foreground-name, foreground-gdk
+    - Lasso properties foreground-name,foreground-gdk,cursor-name,cursor-object
+
+Version 15, November 2010
+    - fix for default foreground colour
+
+Version 14, August 2010
+    - Lasso no swap corners before Gtk 2.8
+    - tests CrossHair allow for no warp_pointer() before Gtk 2.8
+
+Version 13, August 2010
+    - tests allow for perl 5.8.x overload.pm not working on widgets
+
+Version 12, August 2010
+    - use WidgetEvents for make cleanups
+
+Version 11, August 2010
+    - CrossHair fix for adding a widget while active
+    - CrossHair new line-width property, and hide the cursor as
+      originally intended
+    - Lasso docs fix, foreground Gtk2::Gdk::Color object gives R/G/B
+      not pixel
+
+Version 10, May 2010
+    - CrossHair when setting 'widgets' notify the 'widget' property too
+
+Version 9, May 2010
+    - CrossHair undraw when removing a widget while active
+    - CrossHair refaddr() for widget indexing, just in case numize overload
+
+Version 8, December 2009
+    - depend on Gtk2::Ex::SyncCall 12 for gtk XID workaround
+
+Version 7,  September 2009
+    - CrossHair allow widgets in different toplevels of same screen
+
+Version 6,  April 2009
+    - fix for cursor setting on lasso
+    - fix for gc freeing in crosshair
+
+Version 5,  December 2008
+    - oops, don't use the EVENT_PROPAGATE constants yet
+
+Version 4,  December 2008
+    - use SyncCall for smoothness
+    - fix an obscure expose propagation during lasso
+
+Version 3,  September 2008
+    - Goo::Canvas background is style "base", not "bg",
+      reported by zentara
+    - notice style background colour changes
+
+Version 2,  September 2008
+    - cope with resize of widgets while xoring active
+    - draw into subwindows for Gnome2::Canvas and Goo::Canvas,
+      reported by zentara
+
+Version 1,  June 2008
+    - the first version

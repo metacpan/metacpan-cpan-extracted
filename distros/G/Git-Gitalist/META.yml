@@ -1,0 +1,44 @@
+---
+abstract: 'An interface to git influenced by Gitalist'
+author:
+  - 'AND COPYRIGHT'
+  - 'Dan Brook <dan@broquaint.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Git-Gitalist
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime: 0
+  File::Which: 0
+  Git::PurePerl: 0.50
+  IPC::Run: 0
+  List::MoreUtils: 0
+  Method::Signatures: 0
+  Moose: 0
+  MooseX::Storage: 0
+  MooseX::Types: 0
+  MooseX::Types::Common::String: 0
+  MooseX::Types::DateTime: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  Scalar::Util: 0
+  aliased: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/broquaint/Git-Gitalist.git
+version: 0.000003

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>mobile</herd>
+<maintainer>
+  <email>latexer@gentoo.org</email>
+</maintainer>
+<longdescription>ndiswrapper provides a kernel module and utility for
+implementing the Windows(tm) Ndis API. This serves to provide drivers for
+wireless cards that have no naqtive support.</longdescription>
+</pkgmetadata>

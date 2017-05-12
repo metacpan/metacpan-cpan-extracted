@@ -1,0 +1,89 @@
+#!/usr/bin/perl -w
+
+# This is the example code from the module's POD to ensure that
+# it actually works.
+
+use strict;
+use lib '../lib';
+
+# SYNOPSIS:
+
+use Term::GDBUI;
+my $term = new Term::GDBUI(
+		commands => get_commands(),
+		history_file => '~/.gdbui-synopsis-history',
+	);
+print 'Using '.$term->{term}->ReadLine."\n";
+$term->run();
+
+# COMMAND SET:
+
+sub get_commands
+{
+	return {
+		"h" =>		{ syn => "help", exclude_from_completion=>1 },
+		"help" => {
+			desc => "Print helpful information",
+			args => sub { shift->help_args(undef, @_); },
+			meth => sub { shift->help_call(undef, @_); }
+		}, 
+		"history" => { desc => "Prints the command history",
+			doc => "Specify a number to list the last N lines of history\n" .
+				"Pass -c to clear the command history, " .
+				"-d NUM to delete a single item\n",
+			args => "[-c] [-d] [number]",
+			meth => sub { shift->history_call(@_) },
+			exclude_from_history => 1,
+		},
+
+        "exit" => {
+            desc => "Exits the program.",
+            maxargs => 0,
+			meth => sub { shift->exit_requested(1); },
+        },
+		"exists" => {
+			desc => "Shows whether files exist",
+			args => sub { shift->complete_files(@_); },
+			proc => sub {
+				print "exists: " .
+					join(", ", map {-e($_) ? "<$_>":$_} @_) .
+					"\n";
+			},
+			doc => <<EOL,
+Comprehensive documentation for our ls command.
+If a file exists, it is printed in <angle brackets>.
+Otherwise, it is just printed normally.
+The help can\nspan\nmany\nlines
+EOL
+		}, 
+		"show" => {
+			desc => "An example of using subcommands",
+			cmds => {
+				"warranty" => { proc => "You have no warranty!\n" },
+				"args" => {
+					args => [ sub {['create', 'delete']}, \&Term::GDBUI::complete_files ],
+					desc => "Demonstrate method calling",
+					meth => sub {
+						my $self = shift;
+						my $parms = shift;
+						print $self->get_cname($parms->{cname}) .
+							": " . join(" ",@_), "\n";
+					},
+				},
+			},
+		},
+		"quit" => {
+			desc => "Quit using Fileman",
+			maxargs => 0,
+			meth => sub { shift->exit_requested(1); },
+		},
+# Uncomment the default command to see how it is called.
+# It might be a mite confusing so it's disabled by default.
+#		'' => {
+#			proc => "HA ha.  No command here by that name\n",
+#			desc => "HA ha.  No help for unknown commands.",
+#			doc => "Yet more taunting...\n",
+#			args => sub { shift->complete_history(@_) },
+#		},
+	};
+}

@@ -1,0 +1,140 @@
+Games::Chess::Referee
+Version 0.003
+Gregor N. Purdy
+gregor@focusresearch.com
+http://www.focusresearch.com/gregor/
+2006-03-26
+
+Copyright (C) 1999-2006 Gregor N. Purdy. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+This is an early conversion of my first chess-related Perl
+program, chess.pl, which provided just enough functionality to
+permit tracking the movements of pieces throughout a game. One
+notable feature is the ability to provide incomplete ply notation,
+allowing the program to figure out, for example, the type of the
+piece being moved, or whether the ply represents a capture (x) or
+occupation (-). This functionality will be broadened in the futuer
+to permit partial space specification (e.g. `cxd4'), and other
+cases of standard chess move notation.
+
+
+PREREQUISITES
+
+This module uses a patched version of the module Games::Chess,
+version 0.002. The patches are included in the gc-0.002.diff file.
+The diffs were created by the command:
+
+    diff -Naur Games-Chess-0.002 Games-Chess-0.002.patch
+
+They are intended to be used with the patch program (see below).
+
+The patches are to Chess.pm and Chess.pod, and fix a small bug and
+address some discrepancies between the documentation and the code:
+
+ 1. Changed `Games::Piece->new' to `Games::Chess::Piece->new' in
+    one place.
+
+ 2. can_castle() is changed to accept a color and a piece, per the
+    documentation. Its previous implementation accepted a single
+    character code from the set {'K', 'Q', 'k', 'q'} instead.
+
+ 3. A corresponding change later in the code to use can_castle() in
+    this modified way.
+
+ 4. Changed the POD documentation to use the name halfmove_clock()
+    instead of halfmove() for the accessor function for the halfmove
+    clock.
+
+
+INSTALLING
+
+ 1. Download Games::Chess and this package from your favorite CPAN
+    mirror to your favorite staging area ($STAGE below):
+
+    cd $STAGE
+    ftp ...
+    bin
+    cd ...
+    get Games-Chess-0.002.tar.gz
+    cd ...
+    get Games-Chess-Referee-0.002.tar.gz
+	bye
+
+ 2. Unpack your distributions:
+
+    tar xvzf Games-Chess-0.002.tar.gz
+    tar xvzf Games-Chess-Referee-0.002.tar.gz
+
+ 3. Apply the patches to Games::Chess:
+
+    cp -a Games-Chess-0.002 Games-Chess-0.002.patch
+	cd Games-Chess-0.002.patch
+    patch -p1 < $STAGE/Games-Chess-Referee-0.002/gc-0.002.diff
+
+ 4. Make, test and install Games::Chess:
+
+    cd $STAGE/Games-Chess-0.002.patch
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+ 5. Make, test and install Games::Chess::Referee:
+
+    cd $STAGE/Games-Chess-Referee-0.002
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+ 6. Take a look at tryme and the documentation and write some scripts
+    that use the code.
+
+ 7. Send your comments and suggestions to the author of this module
+    and of Games::Chess.
+
+
+FUTURE DIRECTIONS
+
+Eventually, there will be a Games::Chess::Move module/class,
+that will interact with the Position and Piece classes to provide an
+integrated environment for working with chess games. The Referee
+module will be converted into a class.
+
+Very abbreviated notation (such as xb4, c5, dxe7, QxR, etc. would be
+great, with ambiguity detection).
+
+Also, much more work needs to be done to create a fully functional
+referee. Subsequent to that, however, Perl-built chess bots could
+be possible, and the referee could be enhanced to the point that
+it could be used for on-line chess matches.
+
+Interesting future work would be to wrap the GNU chess engine in
+a Perl blanket. This would be most interesting if it was done
+in such a way that we weren't just putting a layer over the
+terminal interface, but rather, turning the core of the C code
+into a Perl-wrapped engine that interfaces with the board via
+the Referee.
+
+
+CHANGES FROM VERSION 0.001
+
+Modified to use Games::Chess by Gareth Rees for the underlying
+board management and operations. Uses a privately modified version
+of Gareth's Games::Chess code, version 0.002. Patches have been
+submitted to Gareth.
+
+Included a small script, tryme, that has the same test game in it
+as the test t/referee.t. Run the tryme script thusly (if running
+before installing the package):
+
+    perl -Iblib/lib tryme
+
+so you can see its output.
+
+Removed the exit() statement that prevented the t/referee.t test from
+doing anything very interesting (:-).
+

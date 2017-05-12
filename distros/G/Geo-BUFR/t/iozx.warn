@@ -1,0 +1,7 @@
+BUFR.pm WARNING: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+BUFR.pm WARNING: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+BUFR.pm WARNING: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+BUFR.pm WARNING: Compression set in section 1 for one subset message at ./bufrread.pl line 143
+BUFR.pm WARNING: Local reference value for compressed CCITTIA5 data hasn't all bits set to zero, but is '000000000000' at ./bufrread.pl line 143
+BUFR.pm WARNING: Local reference value for compressed CCITTIA5 data hasn't all bits set to zero, but is '000000000000' at ./bufrread.pl line 143
+BUFR.pm WARNING: Compression set in section 1 for one subset message at ./bufrread.pl line 143

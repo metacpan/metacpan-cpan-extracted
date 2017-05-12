@@ -1,0 +1,12 @@
+# Avoid version control files.
+\B\.gitignore$
+^.git/
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+^blib/
+
+# Avoid archives of this distribution
+\bGame-Pexeso-[\d\.\_]+

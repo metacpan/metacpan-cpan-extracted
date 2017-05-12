@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Games::Perlwar;
+use XML::Simple;
+use File::Copy;
+use IO::Prompt;
+
+
+# TODO: add color entry for players and default colors
+my @colors = qw( pink lightblue yellow lime maroon purple olive pink gold red
+                    aqua );
+
+my $game_name = shift || "game";
+my $game_dir = "./$game_name";
+
+print "creating game directories $game_dir..\n";
+
+mkdir $game_dir or die "couldn't create directory $game_dir: $!\n";
+chdir $game_dir or die "can't chdir to $game_dir: $!\n";
+
+
+mkdir "history" or die "couldn't create directory history:$!\n";
+
+mkdir 'mobil' or die "couldn't create directory mobil:$!\n";
+
+my ( $location ) = grep -d "$_/Games/Perlwar/web", @INC or die "no installation of Perlwar found\n";
+
+$location = "$location/Games/Perlwar/web";
+
+copy( "$location/htaccess", ".htaccess" ) or die "coudn't copy .htaccess: $!\n";
+for( qw/ submit.epl perlwar.ico upload.epl upload.html/ )
+{
+	copy( "$location/$_", $_ ) or die "coudn't copy $_: $!\n";
+}
+for( qw/ include_config.xps  iteration2html.xps configuration.xps/ )
+{
+	copy( "$location/stylesheets/$_", $_ ) or die "coudn't copy $_: $!\n";	
+}
+
+
+print "\n\ngame configuration\n";
+my %conf;
+
+$conf{gameStatus} = 'ongoing';
+
+my $input = prompt "game title [$game_name]: ", -d => $game_name; 
+
+$game_name = $input || $game_name;
+
+$conf{title} = $game_name;
+
+$conf{theArraySize} = 
+    prompt -integer, "Size of the Array [100]: ", -d => 100;
+
+$conf{gameLength} = prompt 
+                    -integer, 
+                    "game length (0 = open-ended game) [100]: ",
+                    -d => 100;
+
+$conf{currentIteration} = 0;
+
+$conf{snippetMaxLength} = prompt -integer, "snippet max. length [100]: ", 
+                            -d => 100;
+
+$conf{mamboDecrement} = prompt -integer, 
+        "mambo game (0=no, any positive integer is taken as the decrement)[0]: ", 
+        -d => 0;
+
+my %players;
+$conf{player} = \%players;
+
+while(1)
+{
+    my $line = prompt "enter a player (name password [color]), or nothing if done: ";
+	my( $name, $password, $color ) = split ' ', $line, 3;
+        
+    last unless $name;
+
+	$color ||= shift @colors;
+		
+	$players{ $name } = { password => $password, color => $color };
+}
+
+print "notes (empty line to terminate):\n";
+$conf{note} .= $_ while length( $_ = prompt );
+
+print "saving configuration..\n";
+
+Games::Perlwar::saveConfiguration( %conf );
+
+print "creating round 0.. \n";
+
+for my $filename ( qw/ round_current.xml round_00000.xml / )
+{
+	my $fh;
+	open $fh, ">$filename" or die "can't create file $game_dir/$filename: $!\n";
+	print $fh "<round id='0'><theArray>\n";
+	print $fh "<slot id='$_'><owner></owner><code></code></slot>\n" for 0..$conf{theArraySize}-1;
+	print $fh "</theArray><log/></round>";
+	close $fh;
+}
+
+print "\ngame '$game_name' created\n";
+
+exit;
+
+__END__
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#  Application Documentation
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+=head1 NAME
+
+pwcreate - create a new Perlwar game directory
+
+=head1 SYNOPSIS
+
+pwcreate [ I<game_dir> ]
+
+=head1 DESCRIPTION
+
+Creates the directory I<game_dir> and populate it with 
+all the files and sub-directories needed for a
+Perlwar game. If I<game_dir> is not specified,
+'game' is assumed by default. 
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this application.
+Please report problems to Yanick Champoux (yanick@cpan.org)
+Patches are welcome.
+
+=head1 AUTHOR
+
+Yanick Champoux (yanick@cpan.org)
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2006 Yanick Champoux (yanick@cpan.org). All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perldoc perlartistic.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+

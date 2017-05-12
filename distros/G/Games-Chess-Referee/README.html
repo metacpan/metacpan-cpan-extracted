@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Gregor N. Purdy -- Games::Chess::Referee</TITLE>
+</HEAD>
+<BODY>
+
+<H1><TT>Games::Chess::Referee</TT> Perl Module</H1>
+
+<HR>
+
+<TT>Games::Chess::Referee</TT><BR>
+Version 0.003<BR>
+Gregor N. Purdy<BR>
+<A HREF="mailto:gregor@focusresearch.com">mailto:gregor@focusresearch.com </A><BR>
+<A HREF="http://www.focusresearch.com/gregor/">http://www.focusresearch.com/gregor/index</A><BR>
+2006-03-26<BR>
+<P>
+
+Copyright &copy 1999-2006 Gregor N. Purdy. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.<P>
+
+This is an early conversion of my first chess-related Perl
+program, <TT>chess.pl</TT>, which provided just enough functionality to
+permit tracking the movements of pieces throughout a game. One
+notable feature is the ability to provide incomplete ply notation,
+allowing the program to figure out, for example, the type of the
+piece being moved, or whether the ply represents a capture (<TT>x</TT>) or
+occupation (<TT>-</TT>). This functionality will be broadened in the future
+to permit partial space specification (e.g. `<TT>cxd4</TT>'), and other
+cases of standard chess move notation.<P>
+
+
+<H3>PREREQUISITES</H3>
+
+This module uses a patched version of the module <TT>Games::Chess</TT>,
+version 0.002. The patches are included in the <TT>gc-0.002.diff file</TT>.
+The diffs were created by the command:<P>
+
+<BLOCKQUOTE>
+<TT>diff -Naur Games-Chess-0.002 Games-Chess-0.002.patch</TT>
+</BLOCKQUOTE>
+
+They are intended to be used with the <TT>patch</TT> program (see below).<P>
+
+The patches are to <TT>Chess.pm</TT> and <TT>Chess.pod</TT>, and fix a small bug and
+address some discrepancies between the documentation and the code:<P>
+
+<OL>
+<LI>
+Changed `<TT>Games::Piece->new</TT>' to `<TT>Games::Chess::Piece->new</TT>' in one place.
+</LI>
+<LI>
+<TT>can_castle()</TT> is changed to accept a color and a piece, per the
+documentation. Its previous implementation accepted a single
+character code from the set {'K', 'Q', 'k', 'q'} instead.
+</LI>
+<LI>
+A corresponding change later in the code to use <TT>can_castle()</TT> in
+this modified way.
+</LI>
+<LI>
+Changed the POD documentation to use the name <TT>halfmove_clock()</TT>
+instead of <TT>halfmove()</TT> for the accessor function for the halfmove
+clock.
+</LI>
+</OL>
+
+
+<H3>INSTALLING</H3>
+
+<OL>
+<LI>
+Download <TT>Games::Chess</TT> and this package from your favorite CPAN
+mirror to your favorite staging area (<TT>$STAGE</TT> below):
+
+<BLOCKQUOTE><TT>
+cd $STAGE<BR>
+ftp ...<BR>
+bin<BR>
+cd ...<BR>
+get Games-Chess-0.002.tar.gz<BR>
+cd ...<BR>
+get Games-Chess-Referee-0.002.tar.gz<BR>
+bye<BR>
+</TT></BLOCKQUOTE>
+</LI>
+
+<LI>
+Unpack your distributions:
+
+<BLOCKQUOTE><TT>
+tar xvzf Games-Chess-0.002.tar.gz<BR>
+tar xvzf Games-Chess-Referee-0.002.tar.gz<BR>
+</TT></BLOCKQUOTE>
+</LI>
+
+<LI>
+Apply the patches to Games::Chess:
+
+<BLOCKQUOTE><TT>
+cp -a Games-Chess-0.002 Games-Chess-0.002.patch<BR>
+cd Games-Chess-0.002.patch<BR>
+patch -p1 < $STAGE/Games-Chess-Referee-0.002/gc-0.002.diff<BR>
+</TT></BLOCKQUOTE>
+</LI>
+
+<LI>
+Make, test and install <TT>Games::Chess</TT>:
+
+<BLOCKQUOTE><TT>
+cd $STAGE/Games-Chess-0.002.patch<BR>
+perl Makefile.PL<BR>
+make<BR>
+make test<BR>
+make install<BR>
+</TT></BLOCKQUOTE>
+</LI>
+
+<LI>
+Make, test and install <TT>Games::Chess::Referee</TT>:
+
+<BLOCKQUOTE><TT>
+cd $STAGE/Games-Chess-Referee-0.002<BR>
+perl Makefile.PL<BR>
+make<BR>
+make test<BR>
+make install<BR>
+</TT></BLOCKQUOTE>
+</LI>
+
+<LI>
+Take a look at tryme and the documentation and write some scripts
+that use the code.
+</LI>
+
+<LI>
+Send your comments and suggestions to the author of this module
+and the author of <TT>Games::Chess</TT>, as appropriate.
+</LI>
+</OL>
+
+
+<H3>FUTURE DIRECTIONS</H3>
+
+Eventually, there will be a <TT>Games::Chess::Move</TT> module/class,
+that will interact with the <TT>Position</TT> and <TT>Piece</TT> classes to provide an
+integrated environment for working with chess games. The <TT>Referee</TT>
+module will be converted into a class.<P>
+
+Very abbreviated notation (such as <TT>xb4</TT>, <TT>c5</TT>, <TT>dxe7</TT>,
+<TT>QxR</TT>, etc. would be great, with ambiguity detection).<P>
+
+Also, much more work needs to be done to create a fully functional
+referee. Subsequent to that, however, Perl-built chess bots could
+be possible, and the referee could be enhanced to the point that
+it could be used for on-line chess matches.<P>
+
+Interesting future work would be to wrap the GNU chess engine in
+a Perl blanket. This would be most interesting if it was done
+in such a way that we weren't just putting a layer over the
+terminal interface, but rather, turning the core of the C code
+into a Perl-wrapped engine that interfaces with the board via
+the Referee.<P>
+
+
+<H3>CHANGES FROM VERSION 0.001</H3>
+
+Modified to use <TT>Games::Chess</TT> by Gareth Rees for the underlying
+board management and operations. Uses a privately modified version
+of Gareth's <TT>Games::Chess</TT> code, version 0.002. Patches have been
+submitted to Gareth.<P>
+
+Included a small script, <TT>tryme</TT>, that has the same test game in it
+as the test <TT>t/referee.t</TT>. Run the <TT>tryme</TT> script thusly (if running
+before installing the package):<P>
+
+<BLOCKQUOTE><TT>
+perl -Iblib/lib tryme
+</TT></BLOCKQUOTE>
+
+so you can see its output.<P>
+
+Removed the <TT>exit()</TT> statement that prevented the <TT>t/referee.t</TT> test from
+doing anything very interesting [:-)].<P>
+
+
+<H2>Download</H2>
+
+<UL>
+<LI><A HREF="Games-Chess-Referee-0.001.tar.gz">Version 0.001</A> (Released 1999-04-19)</LI>
+<LI><A HREF="Games-Chess-Referee-0.002.tar.gz">Version 0.002</A> (Released 1999-04-26)</LI>
+</UL
+
+<HR>
+
+<FONT SIZE=-1>Copyright &copy; 1999-2006 Gregor N. Purdy</FONT>
+
+</BODY>
+</HTML>
+

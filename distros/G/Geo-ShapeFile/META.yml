@@ -1,0 +1,34 @@
+---
+abstract: 'Perl extension for handling ESRI GIS Shapefiles.'
+author:
+  - 'Shawn Laffan <shawnlaffan@gmail.com>'
+build_requires:
+  rlib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-ShapeFile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  IO::File: '0'
+  List::Util: '0'
+  Math::Trig: '1.04'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Tree::R: '0'
+  autovivification: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/shawnlaffan/Geo-ShapeFile/issues/
+  repository: https://github.com/shawnlaffan/Geo-ShapeFile.git
+version: '2.64'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

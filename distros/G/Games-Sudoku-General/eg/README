@@ -1,0 +1,14 @@
+This directory contains examples of how to use Games::Sudoku::General.
+The following example is provided:
+
+simple
+    This is the simplest script I can come up with. It solves a canned
+    problem, displaying the problem, the solution, and the constraints
+    used.
+
+solver
+    This script solves exactly one Sudoku problem, fed to it on standard
+    input. The solver object can be configured (within limits) based on
+    data parsed out of the input stream. Allowed command qualifiers are
+    -demo (to solve a demonstration problem provided via <DATA>) and
+    -help (guess what).

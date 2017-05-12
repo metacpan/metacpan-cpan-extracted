@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Geo/Formatter/Format/LocaPoint.pm
+lib/Geo/LocaPoint.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_load.t
+t/01_ll2lcp.t
+t/02_lcp2ll.t
+t/03_ll2porterbase.t
+t/04_porterbase2ll.t
+t/05_ll2lcp_formatter.t
+t/06_lcp2ll_formatter.t

@@ -1,0 +1,34 @@
+---
+abstract: 'Geohash support for Geo::Coordinates::Converter'
+author:
+  - 'Kazuhiro Osawa <yappo {at} shibuya {dot} pl>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Base: 0
+  Test::More: 0
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Coordinates-Converter-Format-Geohash
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Accessor::Lite: 0.05
+  Geo::Coordinates::Converter: 0.07
+  Geohash: 0.02
+  parent: 0
+resources:
+  homepage: https://github.com/yappo/p5-Geo-Coordinates-Converter-Format-Geohash/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yappo/p5-Geo-Coordinates-Converter-Format-Geohash.git
+version: 0.05

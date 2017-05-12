@@ -1,0 +1,105 @@
+#! /usr/bin/perl -w
+
+use Geo::Postcodes::Update;
+
+################################################################################
+#                                                                              #
+#                               misc/update_dk                                 #
+#                               --------------                                 #
+#              Arne Sommer - perl@bbop.org - 24. September 2006                #
+#                                                                              #
+################################################################################
+#                                                                              #
+#   This program converts the danish postcodes to a suitable data structure.   #
+#                                                                              #
+#            !!! This is done on the library file 'DK.pm' itself !!!           #
+#                                                                              #
+################################################################################
+#                                                                              #
+#          This program will show the new data on screen by default.           #
+#        Use the '-update' command line argument to update the module.         #
+#                                                                              #
+################################################################################
+
+my $class     = 'DK';
+my $file      = 'postnr.xls';
+my $url       = 'http://www.postdanmark.dk/iis/postnumre/postnr.xls';
+my $procedure = \&parse_dk;
+
+my $update    = @ARGV && $ARGV[0] eq "-update";
+
+Geo::Postcodes::Update::update($class, $file, $url, $procedure, $update);
+
+################################################################################
+
+sub parse_dk
+{
+  ## Step 1. Initialising data ################################################
+
+  my %location;    # postcode      > location
+  my %address;     # postcode      > address
+  my %owner;       # postcode      > owner
+  my %type;        # postcode      > type
+
+  my @codes;
+
+  my @out;
+
+  shift; # Get rid of the first line in the file.
+
+  ## Step 2. Build the internal data structure ################################
+
+  foreach (@_)
+  {
+    s/"/\\"/g; # Escape any double quotes used in the source file.
+
+    my($postcode, $location, $address, $owner) = split('\t', $_);
+
+    push(@codes, $postcode); 
+
+    $location{$postcode} = $location;
+
+    if ($address)
+    {
+      if ($address eq "Postboks")
+      {
+        $type{$postcode} = "BX";
+      }
+      elsif ($address =~ /Ufrankerede svarforsendelser/)
+      {
+        $type   {$postcode} = "PP";
+      }      
+      elsif ($owner)
+      {
+        $type   {$postcode} = "IO"; # Personlig ejer
+      }      
+      else
+      {
+        $type   {$postcode} = "ST"; # gadeadresse
+        $address{$postcode} = $address;
+      }
+    }
+
+    if ($owner)
+    {
+      $owner{$postcode}= $owner;
+    }
+  }
+
+  ## Step 3. Output the main data #############################################
+
+  foreach (@codes) # sort keys %location)
+  {
+    my $line = "\$location{'" . $_ . "'} = \"" . $location{$_} . "\";";
+
+    $line .= " \$address{'"  . $_ . "'} = \"" . $address{$_}  . "\";"  if $address{$_};
+    $line .= " \$owner{'"    . $_ . "'} = \"" . $owner{$_}    . "\";"  if $owner{$_};
+    $line .= " \$type{'"     . $_ . "'} = \"" . $type{$_}     . "\";"  if $type{$_};
+
+    push(@out, "$line\n");
+  }
+
+  ## Step 4. Return the lot ###################################################
+
+  return (@out, "\n");
+}

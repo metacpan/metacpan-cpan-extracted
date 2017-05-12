@@ -1,0 +1,83 @@
+NAME
+    Games::DungeonMaker - Perl front-end to the DungeonMaker library
+    (v2.03), which generates random dungeons for use in isometric games
+
+SYNOPSIS
+      use Games::DungeonMaker qw( :SquareData );
+      my $dm = Games::DungeonMaker->new($designText) || die;
+  
+      foreach my $x (0..$dm->maxX()) {
+              foreach my $y (0..$dm->maxY()) {
+                      my $cell = $dm->getMap($x, $y);
+                      print "$x, $y = $cell\n";
+              }
+      }
+
+PREREQUISITES
+    The default Makefile.PL assumes you have DungeonMaker v2.03 installed as
+    a shared library (libdungeonmaker).  A Makefile.PL.static is also
+    included if you wish to statically link with the DungeonMaker object
+    file.  Simply copy the DungeonMaker.h and .cpp files into the top
+    directory and use Makefile.PL.static instead.
+
+DESCRIPTION
+    This module is in an alpha state!  I promise you the API will change at
+    some point in the future!
+
+    This module acts as a Perl front-end to the Sourceforge DungeonMaker
+    project (v2.03).  DungeonMaker is a C++ shared library that uses
+    artificial life algorithms to randomly generate dungeons for use in
+    games.  The entire public interface is wrapped, but only some of the
+    functionality is currently abstracted and made readily available.
+
+  METHODS
+   new( $designText, [$seed] )
+    This is the constructor.  It requires that you pass it a scalar which
+    contains a well-formed design specification (see the DungeonMaker
+    specs).  An optional random number seed (an unsigned integer) can also
+    be passed.  If omitted, the current system "time()" is used.  This
+    method generates an empty dungeon and returns a blessed
+    Games::DungeonMaker object which can then be queried.
+
+   plonk()
+    This method wraps the PlonkDownStuff() and PutPlonkOnMap() methods which
+    populate the dungeon with MOBs and Treasures as specified in the design
+    document.  All the caveats of these methods explained in the
+    DungeonMaker documentation still exist.  The current Perl front-end is
+    not conducive to creating your own plonking routines, but will be soon. 
+    The default routines do do a fine job though.
+
+   maxX() and maxY()
+    These methods return the index of the furthest X or Y coordinate on the
+    map.  Being a zero-based index, these numbers should always be one less
+    than the actual height and width of the map.
+
+   getMap( $x, $y )
+    Given an (x,y) coordinate, this method returns the type of cell found
+    there.  All valid SquareData types are supported.  Normally you would
+    have to reference them as $Games::DungeonMaker::OPEN, but you can export
+    these types using the SquareData export tag.  "use Games::DungeonMaker
+    qw(:SquareData);"  OPEN  CLOSED  G_OPEN  G_CLOSED  NJ_OPEN  NJ_CLOSED 
+    NJ_G_OPEN  NJ_G_CLOSED  IR_OPEN  IT_OPEN  IA_OPEN  H_DOOR  V_DOOR  MOB1 
+    MOB2  MOB3  TREAS1  TREAS2  TREAS3  COLUMN
+
+Future Development
+    Eventually this interface will be greatly enhanced to include proper
+    wrapping of all internal data thereby giving Perl access to room data
+    among other things.  This is being hampered somewhat by some problems
+    with Swig.  If anyone out there has Swig experience and is willing to
+    help, please let me know.  The Swig interface file used to create this
+    module is included in the distribution.
+
+SEE ALSO
+    <http://sourceforge.net/projects/dungeonmaker>
+
+AUTHOR
+    Aaron Dalton - aaron@daltons.ca This is my first Perl interface to a C
+    module.  Any feedback will be warmly welcomed.
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2005 Aaron Dalton.  All rights reserved.  This library is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

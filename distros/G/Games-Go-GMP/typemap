@@ -1,0 +1,6 @@
+Gmp *						T_PTROBJ
+GmpResult					T_PTROBJ
+const char *					T_PTROBJ
+const char **					T_PTROBJ
+float						T_DOUBLE
+int *						T_PTROBJ

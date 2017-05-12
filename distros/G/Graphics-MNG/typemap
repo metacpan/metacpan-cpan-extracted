@@ -1,0 +1,126 @@
+
+
+# special types
+mng_handle             O_OBJECT
+mng_ptr                T_PV
+mng_pchar              T_PV
+
+# special because I made it up...
+mng_chunkhandle        T_UV
+
+# types
+mng_bool               T_IV
+mng_retcode            T_UV
+mng_speedtype          T_IV
+mng_chunkid            T_UV
+mng_imgtype            T_UV
+mng_chunkidp           T_PTROBJ
+
+
+# integer types
+mng_uint8              T_UV
+mng_uint16             T_UV
+mng_uint32             T_UV
+mng_int8               T_IV
+mng_int16              T_IV
+mng_int32              T_IV
+mng_float              T_DOUBLE
+mngjpeg_dctmethod      T_IV
+
+
+# fixed length char array types (here, represented as strings
+mng_uint8arr           T_PV
+mng_uint8arr4          T_PV
+
+
+# fixed length non-char array types
+mng_palette8           T_PTROBJ
+mng_uint16arr          T_PTROBJ
+mng_uint32arr2         T_PTROBJ
+mng_palette8e*         T_PV
+mng_palette8ep         T_PV
+
+
+# pointers to char arrays 
+mng_uint8p             T_PV
+mng_int8p              T_PV
+mng_uint8 *            T_PV
+mng_int8 *             T_PV
+
+# pointers to integer arrays (here, represented as char arrays)
+# the user will have to know to pack() these...
+mng_uint16p            T_PV
+mng_uint32p            T_PV
+mng_uint16 *           T_PV
+mng_uint32 *           T_PV
+mng_int32 *            T_PV
+
+#
+mng_uint16p *          T_PTROBJ
+mng_uint32p *          T_PTROBJ
+
+
+# pointers to types
+mng_handle *           T_PTROBJ
+mng_bool *             T_PTROBJ
+mng_chunkid *          T_PTROBJ
+mng_chunkidp *         T_PTROBJ
+mng_palette8 *         T_PV
+mng_pchar *            T_PTROBJ
+mng_ptr *              T_PTROBJ
+mng_uint16arr *        T_PTROBJ
+mng_uint32arr2 *       T_PTROBJ
+mng_uint8arr *         T_PTROBJ
+mng_uint8arr4 *        T_PTROBJ
+
+
+# CALLBACK TYPES need not be typemap'd
+# mng_closestream        T_PTROBJ
+# mng_errorproc          T_PTROBJ
+# mng_getalphaline       T_PTROBJ
+# mng_getbkgdline        T_PTROBJ
+# mng_getcanvasline      T_PTROBJ
+# mng_gettickcount       T_PTROBJ
+# mng_iteratechunk       T_PTROBJ
+# mng_memalloc           T_PTROBJ
+# mng_memfree            T_PTROBJ
+# mng_openstream         T_PTROBJ
+# mng_processheader      T_PTROBJ
+# mng_processmend        T_PTROBJ
+# mng_processneed        T_PTROBJ
+# mng_processsave        T_PTROBJ
+# mng_processseek        T_PTROBJ
+# mng_processterm        T_PTROBJ
+# mng_processtext        T_PTROBJ
+# mng_processunknown     T_PTROBJ
+# mng_readdata           T_PTROBJ
+# mng_refresh            T_PTROBJ
+# mng_settimer           T_PTROBJ
+# mng_traceproc          T_PTROBJ
+# mng_writedata          T_PTROBJ
+
+
+INPUT
+O_OBJECT
+   # seems to work...
+   if ( SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV )
+   {
+      $var = (mng_handle) SvIV( _MNG_GET_HANDLE($arg) );
+   }
+   else
+   {
+      my_warn( \"${Package}::$func_name() -- $var is not an object reference\" );
+      XSRETURN_IV(MNG_INVALIDHANDLE);
+   }
+
+T_PTR_INT
+   $var = ($type)SvIV($arg);
+
+OUTPUT
+O_OBJECT
+   sv_setiv( _MNG_GET_HANDLE($arg), (long) $var );
+
+T_PTR_INT
+	sv_setiv($arg, $var);
+
+

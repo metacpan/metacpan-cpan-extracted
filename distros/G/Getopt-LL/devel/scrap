@@ -1,0 +1,49 @@
+
+
+use Getopt::LL qw( getoptions );
+my %argv = getoptions({
+    '--language-force' => sub {
+        my ($self, $arg) = @_;
+        if ($arg eq 'perl') {
+            $use_perl = 1;
+        }
+
+        return $self->dll->delete( $arg->next );
+    },
+    '-f'                => {
+        type    => $GETOPT_STRING,
+        default => 'program.out',
+    },
+    '-v'                => {
+        type    => $GETOPT_INT,
+        default => 0,
+    },
+   
+
+my %argv = getoptions_short({
+'--language-force|f=s' => \$language_force,
+'f=s!'               => \$filename,
+'v=d'                => \$verbose,
+});
+
+
+# required
+
+use Getopt::LL::Simple qw(
+    -f!=s
+    -t(200)=d
+    --verbose
+);
+
+use Getopt::LL qw(getoptions);
+
+%ARGV = getoptions({
+
+    '-f!'            => 'string',
+    '-t  (200)'      => 'digit',
+    '-x              => {
+        type     => 'string',
+        default  => 'normal',
+        required => 0,
+    },
+    

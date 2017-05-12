@@ -1,0 +1,58 @@
+README for Games::Tetris 0.01
+
+=head1 NAME
+
+Games::Tetris - representation of a tetris game state
+
+=head1 SYNOPSIS
+
+ use Games::Tetris;
+ my $well = Games::Tetris->new;
+ my $ess = $well->new_shape(' +',
+                            '++',
+                            '+ ');
+ $well->drop( $ess, 3, 1 );
+ $well->print;
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ String::ShellQuote
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.01	Saturday 4th October, 2003
+
+	initial release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Games::Tetris::Shape
+

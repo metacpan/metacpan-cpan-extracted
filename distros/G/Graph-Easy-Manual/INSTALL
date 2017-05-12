@@ -1,0 +1,41 @@
+
+=pod
+
+=head1 Graph-Easy::Manual
+
+This module provides you with a comprehensive HTML manual for Graph::Easy.
+There is no need to install this package, just read the HTML files in
+C<doc/manual/>.
+
+=head1 DOCUMENTATION
+
+To re-create the HTML version of the manual, do the following:
+
+	cd doc
+	./gen_manual
+
+Afterwards you can change to the output path and view C<index.html>
+in your favourite browser.
+
+You can also give optional an output path:
+
+	./gen_manual --output/path/to/output
+
+Run:
+
+	./gen_manual --help
+
+to get help about other options.
+
+You can also view the manual online at:
+
+        http://bloodgate.com/perl/graph/manual/
+
+=head1 AUTHOR
+
+Copyright (C) 2004 - 2008 by Tels http://bloodgate.com/perl/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL version 2.
+
+=cut

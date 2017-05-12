@@ -1,0 +1,153 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use PDL::LiteF;
+use strict;
+use warnings;
+
+sub static_redeye {
+  my($image, $drawable) = @_;
+  dynamic_redeye($image, $drawable, 0);
+}
+
+sub dynamic_redeye {
+  my($image, $drawable, $threshold) = @_;
+
+  # Stuff we might need in the future.
+  # $image->undo_group_start;
+  # $image->undo_group_end;
+  Gimp->progress_init("Clearing red-eye", -1);
+
+  my $a = pdl [1..10];
+
+  my @bounds = $drawable->bounds;
+
+  my $src = new Gimp::PixelRgn($drawable, @bounds, 0, 0);
+  my $dst = new Gimp::PixelRgn($drawable, @bounds, 1, 1);
+
+  my $iter = Gimp->pixel_rgns_register($src, $dst);
+  my $area = $bounds[2] * $bounds[3];
+  my $progress = 0;
+
+  do {
+    my $data = $src->data;
+    my($depth, $w, $h) = $data->dims;
+    # There's gotta be a better way...
+    my($x, $y);
+    my($r, $g, $b);
+    my($rbrite, $gbrite, $bbrite);
+    for ($y = 0;  $y < $h;  $y++) {
+	for ($x = 0;  $x < $w;  $x++) {
+	  $r = $data->at(0, $x, $y);
+	  $g = $data->at(1, $x, $y);
+	  $b = $data->at(2, $x, $y);
+	  # Useful constants:
+	  #   Contribution of colors to perceived brightness:
+	  #	Red   0.30078125
+	  #	Green 0.58593750
+	  #	Blue  0.11328125
+	  #	(Sums to 1)
+	  #	Red    77
+	  #	Green 150
+	  #	Blue   29
+	  #	(Sums to 256)
+	  #   Brightnesses relative to green:
+	  #	Red   0.51333333
+	  #	Green 1.00000000
+	  #	Blue  0.19333333
+	  #$rbrite = 77 * $r / 256;
+	  #$gbrite = 150 * $g / 256;
+	  #$bbrite = 29 * $b / 256;
+	  $rbrite = $r * 0.5133333;
+	  $gbrite = $g;
+	  $bbrite = $b * 0.1933333;
+	  if ($rbrite >= $gbrite - $threshold
+	    &&  $rbrite >= $bbrite - $threshold) {
+	    $rbrite = ($gbrite + $bbrite) / 2;
+	    $r = int($rbrite / 0.51333333);
+	    $data->set(0, $x, $y, $r);
+	  }
+	}
+    }
+    $dst->data($data);
+
+    $progress += ($src->w * $src->h) / $area;
+    #Gimp->progress_update($progress);
+  } while (Gimp->pixel_rgns_process($iter));
+
+  #Gimp->progress_update (1);
+
+  $drawable->merge_shadow (1);
+  $drawable->update (@bounds);
+
+  ();				# We didn't create a new image
+}
+
+register
+    "auto_red_eye",		# fill in name
+    "Remove red-eye from selection", # a small description
+    '', '', '', '',
+    "<Image>/Filters/Colors/Auto/Auto Red-Eye",	# menu path
+    '',
+    [
+    ],
+    \&static_redeye;
+
+register
+    "red_eye",			# fill in name
+    "Remove red-eye from selection", # a small description
+    '', '', '', '',
+    "<Image>/Filters/Colors/Red-Eye",	# menu path
+    '',
+    [
+     [PF_SLIDER, "sensitivity", "Sensitivity of detection", 0, [-255, 255, 1]],
+    ],
+    \&dynamic_redeye;
+
+exit main();
+__END__
+
+=head1 NAME
+
+red_eye - Remove red-eye from selection
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Colors/Red-Eye
+
+=head1 DESCRIPTION
+
+Searches the selection for pixels in which the red component dominates,
+and removes the red from those components. The sensitivity slider
+selects the sensitivity of the red detection. A value of +255 will cause
+all pixels to be detected as red, while -255 will prevent red-eye
+detection. The default of 0 is usually the best choice.
+
+To speed red-eye correction, the "Auto Red-Eye" menu item will
+automatically choose the default sensitivity of zero.
+
+To use, select the red eyes in the image. It is OK to include bits of
+the iris, highlights in the pupil, and even skin; these will not be
+affected. If you don't like the results, undo and try again with a
+different sensitivity.
+
+=head1 PARAMETERS
+
+=head1 IMAGE TYPES
+
+RGB*
+
+=head1 AUTHOR
+
+Geoff Kuenning
+
+=head1 DATE
+
+2003-04-06
+
+=head1 LICENSE
+
+Copyright 2003, Geoff Kuenning
+
+Distributed under the Gnu Public License v2 or higher.

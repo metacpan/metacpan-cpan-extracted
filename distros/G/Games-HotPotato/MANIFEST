@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/hot-potato
+dist.ini
+lib/Games/HotPotato.pm
+lib/Games/HotPotato/zostay/final_alert.wav
+lib/Games/HotPotato/zostay/rush_alert.wav
+lib/Games/HotPotato/zostay/rush_music.wav
+lib/Games/HotPotato/zostay/start_alert.wav
+lib/Games/HotPotato/zostay/start_music.wav
+t/release-pod-coverage.t
+t/release-pod-syntax.t

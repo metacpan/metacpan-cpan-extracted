@@ -1,0 +1,13 @@
+TYPEMAP
+vtkDecimate*			O_OBJECT
+vtkDividingCubes*			O_OBJECT
+vtkGridSynchronizedTemplates3D*			O_OBJECT
+vtkImageMarchingCubes*			O_OBJECT
+vtkKitwareContourFilter*			O_OBJECT
+vtkMarchingContourFilter*			O_OBJECT
+vtkMarchingCubes*			O_OBJECT
+vtkMarchingSquares*			O_OBJECT
+vtkSliceCubes*			O_OBJECT
+vtkSweptSurface*			O_OBJECT
+vtkSynchronizedTemplates2D*			O_OBJECT
+vtkSynchronizedTemplates3D*			O_OBJECT

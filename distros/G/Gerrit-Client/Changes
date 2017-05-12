@@ -1,0 +1,39 @@
+Revision history for Gerrit-Client
+
+20140611    2014-06-11
+
+    - Fixed several bugs in autotests
+
+20140610    2014-06-10
+
+    - Fixed an error in POD
+    - Speculative fixes for problems reported by cpantesters, and more
+      output from tests to aid debugging.
+
+20140609    2014-06-09
+
+    - for_each_patchset and review may now post reviews using the REST API
+      provided in Gerrit 2.6 and later. This allows reviews to associate
+      comments directly with the relevant lines of a patch set.
+    - Test fixes to resolve some problems reported by cpantesters.
+
+20121218    2012-12-18
+
+    - for_each_patchset new options: on_review, git_work_tree new
+    - variables: $Gerrit::Client::MAX_CONNECTIONS,
+      $Gerrit::Client::MAX_FORKS
+
+20121216    2012-12-16
+
+    - Introduced new function, for_each_patchset, high-level event loop for
+      processing of incoming patchsets
+
+20121123    2012-11-23
+
+    - Documentation fixes
+
+0.1         2012-11-19
+
+    - First version, ported from git://gitorious.org/qt/qtqa 98e8f3b99b9a40c21feb50868da1b93295ed5c38
+    - Additional tests and Gerrit::Client::Test package added
+

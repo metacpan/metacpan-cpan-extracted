@@ -1,0 +1,29 @@
+==================================================
+Changes from 2016-02-22 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2017-02-21 23:27:49 +0000
+------------------------------------------
+
+  Change: 5a583f3cf0b7898ff480b2f3190d2da06c8ba7bb
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-02-22 00:25:10 +0000
+
+    Remove generated files and directories
+
+    from both git and perl distribution. This resolves issue #1. 
+
+------------------------------------------
+version 0.001 at 2017-01-15 21:22:49 +0000
+------------------------------------------
+
+  Change: eb2b9bb7301e61b91603e9afa4be594eeb3b8455
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-01-15 22:22:49 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

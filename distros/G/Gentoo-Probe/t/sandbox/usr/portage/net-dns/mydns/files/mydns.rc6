@@ -1,0 +1,34 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/mydns/files/mydns.rc6,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+depend() {
+	use mysql postgresql
+}
+
+checkconfig() {
+	if [ ! -f /etc/mydns.conf ] ; then
+		eerror "No /etc/mydns.conf file exists!"
+		return 1
+	fi
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting mydnsd"
+	sleep 2
+	/usr/sbin/mydns -b >/dev/null 2>&1 &
+	eend $?
+}
+
+stop () {
+	ebegin "Stopping mydnsd"
+	PIDFILE=`cat /etc/mydns.conf | grep pidfile | awk '{ print $3 }'`
+	if [ $PIDFILE == "" ]; then
+		PIDFILE=/var/run/mydns.pid
+	fi
+	start-stop-daemon --stop --quiet \
+		--pidfile=${PIDFILE}
+	eend $?
+}

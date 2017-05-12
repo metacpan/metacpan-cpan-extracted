@@ -1,0 +1,244 @@
+* make dist in remotetest.pl if not done
+* number of cores in a machine.
+    modify "call" accordingly
+    copy from GRID::cluster
+
+* use Net::OpenSSH
+
+* errors in the REMOTE code due to 'use' etc. errors appear as a premature closed filenadle 
+  fix this. Produce an accurate error message. Make a PIPE signal handler and display the error?
+
+* Inline::C cache the program at the start in the remote machine
+
+* sub method for GRID::Machine::Groups: launch the sub in all machines and then get the results
+  - around and filter and ... 
+  - "eval" and "call" are almost the same in Group objects. Factorize!!!
+    - Write "eval" method for GRID::Machine::Group objects
+  - timer in the select object of the parallel "call" to avoid hanging forever. 
+    The machine will be removed from the group. Exception if 
+    no machines are left in the group
+  - allow arguments in the call method to be an iterator. This way we can have "lazy arguments"
+    "sub sub" can have a "lazy" arg and save memory
+  - We need to kind of calls or subs: one that makes the  call on each machine, like
+              $c->chdir('tutu')
+
+    and the other a farm/master-worker sub
+
+  - divide and conquer and b&b: what to push? the result may imply new calls
+                push @result, ($t{0+$me}, $me->_get_result()); 
+
+                implement sort and other d&c examples
+  - allow Inline::C java, python and others making room for heterogenous programming
+
+  - fault tolerance: once there are no more  tasks to send, poll - from time to time -
+    the machines to see if the remote processes are alive. If not, resend the problem/job
+    to another alive machine
+  - From time to time, store the results in the result file, provide a recover parameter allowing
+    the recovery from a failure
+
+* take from GRID::Cluster the automatic authentication installator
+
+* I'm trying to see how IPC::PerlSSH behaves in case the underlying ssh connection gets disconnected.
+  http://www.perlmonks.org/?node_id=792383
+
+* Write an example of remotelibs in the constructor
+
+* Writing makemethod: make a proxy for an existing sub
+   - factorize
+   - documentation
+   - tests
+
+* allow the user to load remote modules at bootstrap
+  in new: bootstrapmodules => ...
+
+* document method putstringcode
+
+* make the serializer an option: Data::Dumper, Storable, etc.
+
+* Add GRID::Cluster pki to GRID::Machine
+
+* fork: document
+    start, poll, wait, kill, exit_status, kill_on_destruction??
+    arguments to the fork subroutine?
+    fork is the constructor ?
+
+* Documentation: 
+    GRID::Machine::Process
+    'around'  parameter in sub: make a customized proxy
+
+* Optimization: make method "subs" that will install a set of metods (alternative to 'include')
+  use it to install Core, RIOHandlers, etc.
+
+* make an alias of stored subs (DONE)
+
+    *GRID::Machine::subname = \&SERVER()->{stored_procedures}{subname}{sub}
+
+ We need some sort of namespaces.!!!! (NOT DONE)
+
+* Set filter in sub wait
+* Add to "sub include" the parsing of attributes as:
+    - "filter" Filter output
+    - compute line number, set it in sub call
+    - transfer file if debugging
+    - "context" (send the context scalar/list to the remote sub
+
+* a handler for CTRL-C that removes the temporary files and kills the remote
+
+* GRID::Machine::RemoteSub
+   other attributes: source file, source package, source line, etc
+
+* make test with transfer2.pl when the module does not exist!!
+
+* document overloading of bool
+
+* en el new de REMOTE estoy añadiendo reportfile
+  para tener un autentico fichero de log
+  Reutilizo setloganderr. El usuario puede definirlo
+
+
+* make a test for gdb without netcat listening
+* finish gmdb
+      * Write a debugger. Write documentation about debugging
+      * make macros to debug functions bn "name of function"
+      * remotelog msg
+         - make it optional 
+         - where to save it. Temp file
+
+* mmmm. It will be better to save them using the open &> syntax?
+            { # Compatibility with the past: aliases
+              no warnings;
+              *rstdout = \&stdout;
+              *rstderr = \&stderr;
+            }
+
+   -find out how to with netcat
+
+* Do not leave temporary files in the home directory of the remote machine!
+
+* $pid = m->fork 'tutu';
+    Executes a fork and calls remote 'tutu', returns the PID
+    When the remote call finishes, writes to a file the perl result, IO, etc.  serialized via a Data::Dumper
+
+  $r = m->collec($pid) returns undef or a GRID::Machine::Result with the result
+  undef means it hasn't finished
+
+
+* Redirect input of the remote side to a named pipe?
+
+* gmsh.pl 
+   -- preamble (like in remotetest)?
+   -- tmp: use File::Spec
+   -- host file (syntax like clusters)
+   -- interpreter option to specify bash, perl, python, etc.
+   -- option -e ?
+   -- -x exclude option
+
+* cleanfiles option: bug. Esta borrando los scripts antes de tiempo
+   Añadir array de PIDs al estado del objeto GRID:::Machine. 
+   En open, open2, open3 y cualesquiera cosas por el estilo hay
+   que hacer 
+                     push @{$self->{pid}}, $pid
+
+   y luego en el DESTROY sincronizarse con esos procesos.
+   Pero la cosa es compleja. ¿que pasa si esos procesos son matados o
+   fallan? ¿Debemos hacer (waitpid(-1, POSIX::WNOHANG()) > 0)?
+
+   Otra posibilidad es que la supresión de scripts generados se haga
+   en el DESTROY bajo peticiones del maestro. Para cada PID en PROCESSPIDS
+   se comprueba que el script existe y se manda a suprimir.
+
+* factorizar e ir construyendo el módulo GRID::Farm
+* bugs ?
+  * copyandmake: directorios con el open, que pasa si se usan rutas. Estudiar
+  
+* Poner el maestro a trabajar: modificar GRID::Machine para que provea un modo "local"
+de conexion virtual ssh
+
+* Overload bool so that gives the result component idem + and others
+* Write sig handlers for INT, HUP
+* Document 
+     - open (RIO handles) with input and output pipes
+     - copyandmake
+
+* GRID::Machine::IOHandle. Open returns file globs for processes while for 
+    files we have a GRID::Machine::IOHandle object!
+
+* A GRID::Machine object can't "use GRID::Machine". This is a limitation
+     See examples/netsshtelnetgridm2.pl
+    - Quizá la parte remota debería ser también un singleton?
+
+* Optimize "scp", "sftp" open a single session and keep it open then use it to transfer files?
+
+* sub x : public (install a synonym of the sub in the hash)
+
+
+* evalfile: read file and eval
+
+* if exists a file .grid_machine/machine the options will be read from that file?
+
+* RIO: remote files are now an integer. It does not work with IO::select.
+  It is more transparent if it is a "file" on the local side. It will be a process
+  that runs in a pipe.
+  REMEMBER TO CONTROL SIGPIPE
+
+* Be sure to kill nc in the remote machine when hangs
+* Write a loader or booter. 
+  Check if the modules were already written on the remote side and the versions agree.
+  In such case, don't load them again.
+* auxiliary functions (split host, port, etc.)
+
+* Rewrite qx
+* May be an AUTOLOAD for Perl CORE functions?
+    - I can check if the opertor exists using Module::CoreList on the full name
+    of the function
+    - prototype("CORE::length")
+
+
+
+* encapsulate the freeze-thaw method with the subroutine object (for example matrix multiplication with PDL)
+* Parameters for new:
+    -- tar
+    -- untar
+    -- gzip
+    -- gunzip
+    -- etc.
+
+* Define functions "greadline" that - when executed on the remote side - reads from the local 
+side
+
+* Define GRID::Machine::LIOHandle objects as files on the local side that are accesible from the remote side.
+  I.e. s.t. like:
+
+   my $r = $m->sub { tutu => q{
+                       my $f = GRID::Machine::LIOHandle->new("titi.txt");
+                       my $x = <$f>;
+                       gprint $x;
+                     }
+                   }
+
+* Tests
+
+* Documentation
+
+* Method "call" must specify the context: if scalar or list. Important for IO.
+
+* When installing a sub fields "thaw" and "freeze". By default Data::Dumper and eval
+
+* The "rsync" Method
+
+* Deferred DECISION: 
+                allow (or not) pass by reference in RPC?
+  S.t. like a prototype
+    politely=> 1, varref => "0, 3..5, 9.."
+
+  meaning that variables 0,3,4,5, and from 9 to the end are passed by reference
+
+* args{log}: Ahora se fuerza a que sea relativo al HOME. Si es absoluto que se hace?
+  Crearlo si no existe?
+
+* The host variable in "new" can be undef. Fix the bug
+
+* Make code Operating System independent. is_operative rewrite
+
+* Look how slow is package2.pl
+

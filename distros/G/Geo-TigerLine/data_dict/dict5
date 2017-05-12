@@ -1,0 +1,11 @@
+Record Type 5 - Complete Chain Feature Identifiers
+
+Field   BV  Fmt Type Beg End Len Description
+RT      No   L   A    1   1   1  Record Type
+VERSION No   L   N    2   5   4  Version Number
+FILE    No   L   N    6  10   5  File Code
+FEAT    No   R   N   11  18   8  Line Name Identification Number
+FEDIRP  Yes  L   A   19  20   2  Feature Direction, Prefix
+FENAME  Yes  L   A   21  50  30  Feature Name
+FETYPE  Yes  L   A   51  54   4  Feature Type
+FEDIRS  Yes  L   A   55  56   2  Feature Direction, Suffix

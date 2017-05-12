@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:               Graph-Easy-StateMachine
+version:            0.07
+abstract:           create a FSA framework from a Graph::Easy graph
+author:
+    - David Nicol <davidnico@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Graph::Easy:  0.64
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

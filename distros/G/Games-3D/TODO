@@ -1,0 +1,25 @@
+
+* This paekage should be renamed to Sensor::Network and cleaned up and
+  modernized. It also should probably use some standard for the string
+  storage, like YAML.
+* make Games::3D::Signal into an object which can get passed around instead
+  of a simple number, allowing for TTL (TimeToLive - to avoid infinite loops
+  when relaying signals) and the real signal origin to be passed around. Or
+  maybe add this just as parameters to signal() and output() because this
+  saves us the overhead of object creation/destruction!
+* Implement "Objective", to track player objectives per level (some that
+  must be fullfilled, some that are optional, and some that should not
+  be fullfilled, as well as changing them from "must/can fullfill" to "no
+  longer necc."
+* different interpolation formulas for state changes
+* templates are hirachical, e.g. 'Physical::Food' needs to inherit
+  from 'Physical'. However, get_key(), validate() etc are not taking this into
+  account. Also, each template should store everything it inherited, to get
+  rid of the looking up of these values over and over again. (Construct 
+  hirarchy tree after all templates have been loaded? That would avoid that
+  you need to write them out in order (shortest class name first)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

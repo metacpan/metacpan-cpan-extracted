@@ -1,0 +1,21 @@
+GIS::Distance::Lite version 1.0
+===============================
+
+Calculate geographic distances between coordinates in geodetic WGS84 format.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Math::Trig
+
+COPYRIGHT AND LICENCE
+
+http://creativecommons.org/licenses/by-nc-sa/3.0/

@@ -1,0 +1,17 @@
+CHANGES
+GappX-Dialogs.komodoproject
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+example/dialog_traits.pl
+lib/GappX/Dialogs.pm
+lib/GappX/Dialogs/Meta/Widget/Trait/ConfirmDialog.pm
+lib/GappX/Dialogs/Meta/Widget/Trait/ErrorDialog.pm
+lib/GappX/Dialogs/Meta/Widget/Trait/InfoDialog.pm
+lib/GappX/Dialogs/Meta/Widget/Trait/MessageDialog.pm
+lib/GappX/Dialogs/Meta/Widget/Trait/QuestionDialog.pm
+lib/GappX/Dialogs/Meta/Widget/Trait/WarningDialog.pm
+t/01_dialog_traits.t

@@ -1,0 +1,9 @@
+This stage adds a light source (and darkness), a random occurrence and
+aliases for both verbs and nouns.
+
+This stage uses the directives from the previous stage, plus
+C<%lightsource>,
+C<%occur> with an argument,
+C<%nalias>
+and
+C<%valias>.

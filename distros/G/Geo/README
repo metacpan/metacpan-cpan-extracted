@@ -1,0 +1,38 @@
+Geo::GNUPlot
+
+DESCRIPTION
+	This program plots a set of latitude/longitude pairs as a track on a world map
+	using gnuplot. The plot radius is determined by a user defined radius function.
+
+	See the examples and pod documentation for more information.
+
+PREREQUISITES
+	gnuplot
+	IO::File
+
+INSTALLATION
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+	Make sure that you copy the world map file in examples/w2.dat
+	to a useful location where it won't get lost.
+
+TODO
+	The linear interpolation function appears to
+	occassionally have problems.  It may
+	be that a better algorithm is needed, or
+	it may be a problem in how gnuplot visualizes
+	the data.  I simply do not have the time to
+	investigate and resolve the issue.
+
+REVISION HISTORY
+	0.01    Nov 1999 - Initial version.
+
+AUTHOR
+	Jimmy Carpenter, Jimmy.Carpenter@chron.com
+
+COPYRIGHT
+	This program is free software; you can redistribute it and/or modify it
+	under the same terms as Perl itself.

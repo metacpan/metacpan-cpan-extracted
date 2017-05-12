@@ -1,0 +1,45 @@
+
+Message 1  IUPD41 TEST 011432
+
+Section 0:
+    Length of BUFR message:            72
+    BUFR edition:                      2
+
+Section 1:
+    Length of section:                 18
+    BUFR master table:                 0
+    Originating subcentre:             0
+    Originating centre:                82
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           6
+    Data subcategory:                  0
+    Master table version number:       11
+    Local table version number:        4
+    Year of century:                   16
+    Month:                             4
+    Day:                               1
+    Hour:                              14
+    Minute:                            32
+
+Section 3:
+    Length of section:                 22
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       301001 301011 301012 301022 002003 106000 031001
+
+Subset 1
+
+     1  001001                2  WMO BLOCK NUMBER [NUMERIC]
+     2  001002               92  WMO STATION NUMBER [NUMERIC]
+     3  004001             2016  YEAR [YEAR]
+     4  004002                4  MONTH [MONTH]
+     5  004003                1  DAY [DAY]
+     6  004004               14  HOUR [HOUR]
+     7  004005               32  MINUTE [MINUTE]
+     8  005001         65.43090  LATITUDE (HIGH ACCURACY) [DEGREE]
+     9  006001         21.86500  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    10  007001               68  HEIGHT OF STATION (SEE NOTE 1) [M]
+    11  002003                3  TYPE OF MEASURING EQUIPMENT USED [CODE TABLE]
+    12  031001                0  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]

@@ -1,0 +1,460 @@
+Revision history for GO-TermFinder group of modules.
+
+0.86 Thu Nov 19 09:25:53 2009
+
+        Constrain the p-value to not be more than 1, which sometimes
+        happens due to rounding errors on some platforms.
+
+0.85 Thu Oct 29 12:54:55 2009
+
+        Add a missing include file into Distributions.cxx that gets
+        complained about on some platforms
+
+0.84 Thu Oct 29 11:26:46 2009
+
+        Added in some additional error checking, that prevents the C++
+        code that calculates the probability from being called with
+        invalid arguments, which had caused some segfaults on some
+        platforms, and some p-values greater than 1 on others.  Not
+        clear how the C++ code was being called incorrectly, but this
+        should at least provide a more informative error.
+
+0.83 Thu Jan 22 12:51:03 2009
+
+     	Changed the way in which genes are rendomly chosen from the
+     	background distribution, when calculating FDR, due to a bias
+     	that existed in the algorithm.  Thanks to Peter Wentzell for
+     	pointing this out; also see:
+
+	Flight, R.M and Wentzell, P.D. (2009).  Potential Bias in
+	GO::TermFinder.  Briefings in Bioinformatics, in press.
+
+	In my testing, this improves the FDR when having passed in a
+	list of genes as a background population from which the test
+	set were drawn.  For some reason, it seems to make less
+	significant (higher FDR) those values calculated when the
+	background population of genes is not passed in (and is
+	assumed to be all genes).
+
+0.82 Wed May 14 13:34:01 2008
+
+     	No functional changes.  Regenerated swig wrappers using
+     	1.3.35, in the hope that that might see some of the failures I
+     	am seeing from CPAN testers.  I'm not sure if those errors are
+     	specific to a new version of gcc, or to Perl 5.10.0.  If the
+     	last version worked for you without any errors, you don't need
+     	this one.
+
+0.81 Tue May 13 16:06:55 2008
+
+     	- GO::TermFinder
+
+	Made totalNumGenes a public method, which returns the total
+	number of genes that are in the background set of genes from
+	which the genes of interest were drawn.  Unannotated genes are
+	included in this count.  This allowed me to fix a bug in
+	analyze.pl, where it didn't always report the correct number
+	of genes in the background.
+
+     	- GO::AnnotationProvider::AnnotationParser
+
+	Fixed bug in handling a name that was ambiguous when
+	considered in a case-insensitive fashion, but unambiguous when
+	considered in a case-sensitive fashion.  Thanks to Robert
+	Flight for the bug report.
+
+	- GO::OntologyProvider::OboParser
+
+	Added additional logic to detect an error in the obo file if a
+	node and a parent are in different namespaces, as this
+	previously produced a fatal error with a cryptic message.
+
+	- GO::TermFinder
+
+	Prevent crash that could occur when there were no GO nodes
+	tested - assertion that correction factor had to be >=1 was
+	incorrect in this case, which could cause the script to die.
+	Now correctly recognizes this.  Thanks to Mark Schroeder at
+	Princeton for pointing this out.
+
+	- GO::View
+
+	I had previously commented out a check, that resulted in
+	postscript images always being generated.  Now they are only
+	generated when requested.
+
+	GO-TermFinder-Obo.t
+
+	Tweaked test to be regex instead of equality, as different
+	Perls might add different things to exceptions.  This fixes a
+	failure I was seeing on Solaris.
+
+0.80 Thu Mar 22 18:45:29 2007
+
+	- GO::OntologyProvider::OboParser
+
+	New module, contributed by Shuai Weng of SGD.  This allows you
+	to use the .obo files instead of the .ontology files.  The
+	.ontology files have been deprecated for a while, and are much
+	bigger than the .obo version, as they contain redundant
+	information.  The ontology parsing module still ships, but
+	will be deprecated in future versions.  The test suite for the
+	ontology parser no longer ships with the distribution, though
+	I still test it locally.
+
+	Note, the API for the OboParser is slightly different, in that
+	you have to provide the aspect of the ontology that you want
+	(P, C or F), which was not the case when parsing the .ontology
+	files.
+
+	All the example code in the examples/ directory has been
+	updated to work with the obo parser.
+
+	- GO::TermFinder
+
+	Updated to deal with the loss of the 'unknown' nodes in the
+	ontology.  With the removal of those nodes, direct annotation
+	to the aspect node, such as biological_process, is meaningful.
+	Thus, it now tests for significance for genes annotated
+	directly to the aspect nodes, ignoring indirect annotations to
+	those nodes.
+
+	Added an additional check, such that if you provide a
+	background population, but none of the genes in your list of
+	interest are in that population, it dies with a useful error
+	message (as opposed to the previously useless one).
+
+	Corrected a bug in the Bonferroni correction, where it was too
+	conservative - not sure what I was thinking.
+
+	- GO::TermFinderReport::Text
+
+	Can now print out the results in tabular form, instead of the
+	usual text version, to help with automated analyses.  Thanks
+	to Noah Zimmerman for the code changes.
+
+	- Code Quality
+
+	I have started to use Perl::Critic locally, and all the code
+	at least passes level 5.  Future revisions will pass harsher
+	review (with some rules commented out!).
+
+	- Compilation
+
+	The native/Makefile.PL has been modified to hopefully make it
+	compile correctly under Cygwin - thanks to Noah Zimmerman for help
+	with testing.
+
+0.72 Thu Jul 27 16:44:14 2006
+
+	- GO::TermFinder
+
+	Forgot to have the __saveVariables method save the discarded
+	genes when simulations were being run, or the FDR was being
+	calculated.  Consequently, this information was being lost if
+	either FDR or simulations were requested.  This is now fixed.
+
+	Found a minor buglet, concerning how genes were selected for
+	simulations if a population had been used.  This didn't affect
+	the actual results, but now is *slightly* faster.
+
+	- General
+
+	Started using the Test::Spelling module locally, and it found
+	a few typos that have been corrected.
+
+0.71 Sun Jul 23 16:15:20 2006
+
+	- native/Makefile.PL
+
+	Fix for the compilation of the C++ code that carries out the 
+	math.  It is now hard-coded to use g++ as the LD and CC
+	variables, and will complain if it can't find g++.  If it
+	fails, it will tell you what needs editing to hopefully fix
+	it.
+
+	- GO::TermFinder
+
+	Small amount of refactoring on the findTerms() method, to make
+	it easier to follow.  This doesn't change the functionality.
+
+	Added logic such that if a background population is provided,
+	but then the list of genes for which enriched terms are to be
+	found has genes not in that background population, then those
+	genes are discarded from the calculation, and a new method,
+	discardedGenes, allows the identify of those genes to be
+	determined.
+
+	- tests
+
+	Added some new tests, and make sure all code uses strict and
+	warnings
+
+0.70 Thu Nov 18 11:55:10 2004
+
+	- GO::TermFinder
+
+	Now uses an entirely new set of code for calculating the
+	probability based on the hypergeometric distribution (written
+	by Ihab Awad).  The new code is written in C++, and interfaced
+	to Perl using SWIG.  For long running batch jobs, with > 100
+	lists of genes (using for instance analyze.pl in the examples
+	directory), the new code is up to 3 times faster.  Note, that
+	installation now requires an ANSI C++ compiler - see the
+	README for more details.
+
+	Note that the ability to use the binomial distribution for the
+	probability calculation no longer exists - it will always use
+	the hypergeometric distribution now.
+
+	- GO::Utils::File
+
+	fixed small bug in that only one leading space would be
+	stripped from a gene name in GenesFromFile - thanks to Linda
+	McMahan at Princeton for spotting this one.
+
+	- GO::TermFinder
+
+	made error message a little more explicit when a goid used to
+	annotate a gene (as indicated by the annotation provider) does
+	not appear in the provided ontology - thanks to John Matese
+	for the suggestion.
+
+	- GO::View
+
+	small addition that hopefully deals with a problem sometimes
+	seen when running on Windows, that I think is due to line
+	endings produced by the dot program.
+
+0.64 Sun Aug 15 23:30:32 2004
+
+	- GO::View
+
+	Added the ability to create postscript output from
+	GO::View - simply change the makePs attribute in the
+	GoView.conf file to a '1', and if you run batchGoView.pl, you
+	should get a postcript file as well as png or gif images.  The
+	Postscript is not perfect, because the GraphViz interface
+	doesn't seem to allow me to modify the page size (even though
+	it says I should be able to), so I have restricted the size of the
+	image to try and get it to fit on one page.  Suggestions as to how to
+	make the postscript feature more robust would be appreciated.
+
+	Added in copious comments to GO::View, so that most of it can
+	actually be understood my regular programmers - performed some
+	cleanups or unnecessary or obfuscated code in the process.
+	Significant refactoring of this module is next on the agenda.
+
+0.63 Wed Aug 11 11:16:23 2004
+
+	- GO::View
+
+	Fix to bug that was causing some significant nodes to not
+	have the correct color, and thus making the image somewhat
+	misleading - thanks to the folks at Princeton for spotting it,
+	and to Shuai Weng at SGD for providing a fix in record time.
+
+	fixed bug in reading of configuration file, that resulted from
+	minMapWidth being a substring of minMapWidth4OneLineKey.  This
+	now stops a warning being printed.
+
+	Added some comments to GO::View, as a start to begin to fully
+	comment all the code - there's a long way to go until I
+	understand fully how GO::View works.  Then I can add
+	postscript output for publication quality figures...
+
+0.62 Wed Jul 28 11:46:08 2004
+
+	No major new functionality - small bug fix release
+
+	- AnnotationParser.pm
+
+	fixed capitalization bugs when calling goidsByDatabaseId() in
+	nameIsAnnotated() instead of goIdsByDatabaseId() on lines 1592
+	and 1617 - thanks to lfriedl@cs.umass.edu for spotting this.
+
+	- GoView.conf
+
+	Fixed typo in GoView.conf : totalNumGene should be
+	totalNumGenes - thanks to John Matese for spotting this one.
+
+	- GO::TermFinder
+
+	Made __databaseIds() method of GO::TermFinder public, and
+	named it genesDatabaseIds, as I realized it is the only way
+	that a client can determine how many genes were actually used
+	when calculating p-values.  Before, I was using the number of
+	genes that were passed in, but they will get collapsed if more
+	than one maps to the same databaseId.
+
+	- batchGOView.pl
+
+	Modified batchGOView.pl to use the genesDatabaseIds method.
+	Removed its use of the CategorizeGenes function in
+	GO::Utils::General, as I don't think was was any reasonable
+	logic for using it (that I can remember).
+
+	- GO::TermFinder
+
+	Fixed lots of spurious warnings that were due to checking the
+	state of a variable before it had been set, when using a user
+	defined background population - thanks to Jeremy Gollub for
+	spotting this one.
+
+	- GO::TermFinder
+
+	If a gene is padded in multiple times in either the list of
+	genes of interest, or the background population, you should
+	only be warned about that gene once for each list, rather than
+	every time the gene is encountered.
+
+0.61 Fri May  7 11:23:36 2004
+
+	- GO::TermFinder
+
+	Made one line optimization to calculation of p-value using the
+	hypergeometric distribution, such that it is on average about
+	twice as fast.
+
+0.60 Wed May  5 15:04:06 2004
+
+	- GO::TermFinder
+
+	The multiple hypothesis correction is no longer done using the
+        custom method, but instead uses a Bonferroni correction.
+
+	Correcting p-values by running simulations is now available,
+	to allow you to control the Family Wise Error rate.
+
+	Added the ability to calculate the False Discovery Rate, as a
+    	potential means of avoiding the whole p-value problem.
+
+	see the pod for GO::TermFinder, as well as docs/GO-TermFinder.doc
+	for more information on these.
+
+	- tools
+
+	updated the batchGOView.pl tool, and the analyze.pl tool, in
+	the examples directory, to support printing out of the False
+	Discovery Rate if calculated.  They also both use the newly
+	created GO::TermFinderReport::Text object, to consolidate code, and
+	to keep their reports consistent with one another.
+
+	- README
+
+	Tried to make it a little clearer as to how to install the libraries.
+
+0.50 Tue Dec 16 17:34:50 2003
+
+	Big news is that a version of Shuai Weng's (from SGD) GO::View
+	module has been added in, which can create a graphic
+	representation of the results of GO::TermFinder.  This gives a
+	much better way to intuitively look at the results.  A bunch
+	of other stuff was added in to support this, including a batch
+	processor that will generate an html pages with a graphic for
+	any number of input lists of genes.  See batchGOView.pl and
+	examples.html in the examples directory.
+
+	- GO::TermFinder
+
+	Fixed a nasty bug that was actually due to a bug in Perl (I
+	swear!) that meant that clients of the GO::TermFinder would
+	have a runtime error if they did not recognize one or more of
+	the genes that it was provided with.  This should no longer
+	happen, and I have written additional tests to make sure it
+	never happens again!
+
+0.40 Tue Dec  2 18:41:10 2003
+
+	- GO::TermFinder
+
+	Added in the ability to define a subpopulation of genes as the
+	background from which the interesting genes were drawn.  See
+	pod for constuctor of GO::TermFinder for more details.
+
+0.30 Wed Nov 26 11:48:57 2003
+
+	- GO::AnnotationProvider::AnnotationParser
+
+	Extensive reworking of the code, such that it is now case
+	insensitive, with certain caveats.  See the pod for that
+	module for more details.
+
+	- GO::TermFinder
+
+	No longer considers the root node, or its child (the aspect)
+	as hypotheses, as they are known a priori to have a p-value of
+	1.
+
+	- GO::Node
+
+	Added lengthOfShortestPathToRoot and meanLengthOfPathsToRoot
+	methods.
+
+	- added in new tests for the AnnotationParser that make sure
+	  that the behaviour with respect to case insensitivity is
+	  correct.
+
+0.23 Sat Nov  1 11:56:43 2003
+
+	- GO::OntologyProvider::OntologyParser;
+
+	Added in check that a given non-comment line can actually have
+	a GOID extracted, which makes the error a more informative
+	when such a line is encountered, due to an error in an
+	ontology file.
+
+0.22 Sun Oct 19 16:54:38 2003
+
+	- GO::TermFinder
+
+	Fix for test that could occasionally fail that relied on
+        the sort order of the pValue array when two items had the
+        same pvalue.  It now sorts such cases explicitly by goid,
+        so the result should always be the same.
+
+0.21 Thu Oct 16 19:00:14 2003
+
+	- GO::TermFinder
+
+	Fix for situation when a gene identifier wasn't recognized,
+	but wasn't handled properly - thanks to Shuai Weng for bring
+	it to my attention.
+
+	Cleaned up the code that calculates the p-values to make it
+	easier to write a test-suite, which will allow me to make
+	other desired changes with more confidence.
+
+	- tests
+
+	Created tests for the GO::TermFinder module itself, that pass
+	under both OSX and Solaris in my testing - this should make it
+	much easier to modify in future with less concern for failing
+	to notice new bugs.
+
+	- examples
+
+	Added a new example, that makes it easier to analyze multiple
+	files of gene names.
+
+	- suppressed some warnings that occured due to some undefs
+	  being used.
+	
+	- fixed some documentation typos
+
+0.2  Mon Apr 14 17:55:28 2003
+
+	- added in code such that the findTerms() method will return
+	  enough data for you to be able to work out which genes in
+	  the list you provided were annotated to which GO nodes.
+
+	- started some work on Annotation, AnnotatedGene, and
+	  Reference objects.  Nothing is using them yet though.
+	
+	- added in over 100 tests(!).  Still lots more to do, but this
+	  should help keep the code honest...
+
+0.1  Fri Mar  7 13:51:32 2003
+
+	- original version; created by h2xs 1.21 with options
+		-n GO-TermFinder -X

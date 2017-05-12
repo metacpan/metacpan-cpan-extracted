@@ -1,0 +1,36 @@
+
+				  Gnome2::Vte
+				 -------------
+
+This module allows you to use the Virtual Terminal Emulation library (libvte
+for short) from Perl.
+
+The canonical API documentation can be found at:
+
+  http://developer.gnome.org/doc/API/2.0/vte/index.html
+
+Gnome2::Vte also comes with automatically generated API documentation.  Its
+index can be accessed with:
+
+  perldoc Gnome2::Vte::index
+
+				 Installation
+				--------------
+
+To install Gnome2::Vte, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+				 Dependencies
+				--------------
+
+Gnome2::Vte depends on:
+
+  ExtUtils::Depends
+  ExtUtils::PkgConfig
+  Glib >= 1.01
+  Gtk2 >= 1.00
+  libvte >= 0.10

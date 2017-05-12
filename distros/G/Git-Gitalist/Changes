@@ -1,0 +1,12 @@
+This file documents the revision history for Perl extension Git::Gitalist.
+
+0.000003 2014-08-11
+  - This module seems to have disappeared from the CPAN, no idea why, reupping
+    for sanity.
+
+0.000002 2014-02-11
+  - Fixed some POD and dropped some vestigial Gitalist bits.
+
+0.000001 2014-01-26
+  - Initial working version, freshly split out of Gitalist.
+

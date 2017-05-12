@@ -1,0 +1,23 @@
+lib/Gearman/Client/Async.pm
+lib/Gearman/Client/Async/Connection.pm
+Makefile.PL
+CHANGES
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README.txt
+TODO
+t/async.t
+t/err1.t
+t/err2.t
+t/err3.t
+t/err4.t
+t/err5.t
+t/err6.t
+t/err7.t
+t/err8.t
+t/lib/testlib.pl
+t/tests-needed.t
+t/uniq.t
+t/worker.pl
+t/allinone.t

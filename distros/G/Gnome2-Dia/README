@@ -1,0 +1,38 @@
+
+				  Gnome2::Dia
+				 -------------
+
+This module allows a Perl developer to use the DiaCanvas2 library to create all
+kinds of spiffy diagramming tools.
+
+The canonical API documentation can be found at:
+
+  http://diacanvas.sourceforge.net/ref/
+
+Gnome2::Dia also comes with automatically generated API documentation.  Its
+index can be accessed with:
+
+  perldoc Gnome2::Dia::index
+
+				 Installation
+				--------------
+
+To install Gnome2::Dia, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+				 Dependencies
+				--------------
+
+Gnome2::Dia depends on:
+
+  ExtUtils::Depends
+  ExtUtils::PkgConfig
+  Glib >= 1.04
+  Gtk2 >= 1.04
+  Gnome2::Canvas >= 1.00
+  Gnome2::Print >= 0.94
+  diacanvas2 >= 0.13.0

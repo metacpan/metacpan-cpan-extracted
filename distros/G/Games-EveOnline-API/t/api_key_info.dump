@@ -1,0 +1,26 @@
+{
+          'cached_until' => '2014-06-26 18:15:09',
+          'type' => 'Account',
+          'access_mask' => '268435455',
+          'characters' => {
+                            '12345678' => {
+                                          'faction_id' => '0',
+                                          'character_name' => 'Char Name',
+                                          'corporation_name' => 'School of Applied Knowledge',
+                                          'faction_name' => '',
+                                          'alliance_id' => '0',
+                                          'corporation_id' => '1000044',
+                                          'alliance_name' => ''
+                                        },
+                            '87654321' => {
+                                          'faction_id' => '0',
+                                          'character_name' => 'Char Name 2',
+                                          'corporation_name' => 'Corp Name',
+                                          'faction_name' => '',
+                                          'alliance_id' => '1234567890',
+                                          'corporation_id' => '123456789',
+                                          'alliance_name' => 'Alliance Name'
+                                        }
+                          },
+          'expires' => ''
+        }

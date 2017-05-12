@@ -1,0 +1,8 @@
+Revision history for Perl extension Games::Poker::HandEvaluator.
+
+1.0  Thu Oct 16 16:44:19 2003
+	- original version; created by h2xs 1.22 with options
+		-b 5.6.0 -A -n Games::Poker::HandEvaluator
+
+See http://cvs.simon-cozens.org/ for full history.
+

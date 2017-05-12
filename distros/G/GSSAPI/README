@@ -1,0 +1,108 @@
+GSSAPI Perlbindings version 0.28
+=================================
+GSSAPI - Perl extension for using
+GSSAPI C-Bindings as described in RFC 2744.
+
+The module is based on GSSAPI 0.13 written by Philip Guenther
+
+Testing and development was done against
+
+- heimdal 0.6.2
+- heimdal 0.7.1
+- heimdal 1.0.1
+- heimdal 1.3.2
+- MIT Kerberos 5 release 1.5.2
+- MIT Kerberos 5 release 1.4.3
+- MIT Kerberos 5 release 1.3.1
+- MIT Kerberos 5 release 1.2.7
+- MIT Kerberos 5 release 1.6.3
+- VAS 3.0.1
+- Solaris 10 / Opensolaris native gss library
+
+see t/test.t for tests that do not work on Heimdal.
+
+Please let me know if there are buildingproblems with your
+Kerberossoftware.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  An installed Version of GSS-API bindings, e.g
+
+  MIT Kerberos <http://web.mit.edu/kerberos/www/>
+  Heimdal      <http://www.pdc.kth.se/heimdal/>
+  VAS          <http://www.quest.com/>
+
+This GSSAPI-implementations ship with a command called 'krb5-config'.
+Make sure the krb5-config command is present and executeable,
+Makefile.PL needs it to detect the library configuration.
+
+OS specific notes:
+
+- Windows - MIT KfW SDK:
+
+  This SDK does not provide the krb5-config command,
+  <http://www.mail-archive.com/kerberos%40mit.edu/msg12808.html>.
+  Instead of using krb5-config you need to specifiy the compiler and linker flags
+  on the perl Makefile.PL commandline. run
+      perl Makefile.PL --help
+  to see all available configuration options.
+
+- NetBSD:
+
+  since 2006-01-26 krb5-config is present
+  in pkgsrc/security/heimdal, see
+  <http://mail-index.netbsd.org/pkgsrc-changes/2006/01/26/0036.html
+
+
+INSTALLATION
+
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+run
+   perl Makefile.PL -help
+
+to see further install options
+
+PLATFORMS
+
+Building the module was tested on
+
+-Linux (Gentoo, Ubuntu, Suse, Fedora, RHEL)
+-FreeBSD
+-cygwin
+-Solaris
+
+Please let my know if your Platform needs support.
+
+AUTHOR:
+
+GSSAPI.pm is originally written by Philip Guenther.
+
+Maintanance by
+Achim Grolms <perl@grolmsnet.de>,
+
+with help from
+
+-Leif Johansson
+-Merijn Broeren
+
+<http://perlgssapi.sourceforge.net/>
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2006, 2007 by Achim Grolms perl@grolmsnet.de
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,82 @@
+Geo-Ov2
+
+This module provides easy interface for reading and writing TomTom ov2 POI files.
+
+In package is also included scrpt ttn2device, which can do some merging of
+POI groups and also creates pi.dat. Behavior of this script is controled by
+configuration file which must be located in "./", "./etc/", "../etc/", "/etc/",
+"/etc/POI/", "/etc/POIs/", "/etc/local/POI/" or "/usr/local/etc/POI/"
+and it's name must be one of "catgroup.conf", "catgroup.cfg", "catgroup_rc",
+"catgroup".
+Another way of suplying own config file is to use -f commandline parameter,
+followed by path and name of config file.
+
+Syntax of calling ttn2device:
+
+ttn2device [-f configfile] [source [destination]]
+
+If source or destination is not specified on command line, it is taken
+from section _DEFAULT_ in config file.
+
+Example of config file:
+======== cut ==========
+<_DEFAULT_>
+	srcDir=/home/public/POI/data
+	destDir=/home/public/POI/todevice
+</_DEFAULT_>
+
+<category Parkoviste_pujcovny.ov2>
+	id=9930
+	filename=Rent Car Parking.ov2
+</category>
+
+<category GeoCaching.ov2>
+	filename=CZ-Geocaching-multi.ov2
+	filename=CZ-Geocaching-mystery.ov2
+	filename=CZ-Geocaching-traditional.ov2
+	filename=CZ-Geocaching-virtual.ov2
+	filename=CZ-Geocaching-webcam.ov2
+	icon=/somepath/somefile.bmp
+</category>
+======== cut ==========
+If id is specified, category is added to poi.dat and original file is removed.
+If icon is not supplied, script tries to find it in srcDir with name of category,
+but with extension bmp except of ov2.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Geo::Ov2
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Geo-Ov2
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Ov2
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Geo-Ov2
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Geo-Ov2
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Petr Vraník
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,24 @@
+
+=pod
+
+=head1 DESCRIPTION
+
+Foo.
+
+Bar
+
+=over 4
+
+=item foo
+
+    Verbatim text.
+
+=item gah
+
+=back
+
+=head1 AUTHOR
+
+Andrew Stewart Williams
+
+=cut

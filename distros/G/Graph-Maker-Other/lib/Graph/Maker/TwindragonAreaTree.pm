@@ -1,0 +1,279 @@
+# Copyright 2015, 2016, 2017 Kevin Ryde
+#
+# This file is part of Graph-Maker-Other.
+#
+# This file is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Graph-Maker-Other.  See the file COPYING.  If not, see
+# <http://www.gnu.org/licenses/>.
+
+package Graph::Maker::TwindragonAreaTree;
+use 5.004;
+use strict;
+use Graph::Maker;
+
+use vars '$VERSION','@ISA';
+$VERSION = 6;
+@ISA = ('Graph::Maker');
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+
+sub _default_graph_maker {
+  require Graph;
+  Graph->new(@_);
+}
+sub init {
+  my ($self, %params) = @_;
+
+  my $level = delete($params{level}) || 0;
+  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
+  ### $level
+
+  my $graph = $graph_maker->(%params);
+  $graph->set_graph_attribute(name => "Twindragon Area Tree $level");
+  $graph->add_vertex(0);
+  my $directed = $graph->is_directed;
+
+ V: foreach my $v (0 .. 2**$level-1) {
+    # ...1 edge to ...0
+    if ($v & 1) {
+      my $to = $v ^ 1;
+      $graph->add_edge($v, $to);
+      if ($directed) { $graph->add_edge($to, $v); }
+    }
+
+    #  ...10 11...11
+    #        \-----/ zero or more low 1 bits
+    # edge to
+    #  ...01 00...00
+    #
+    my $bit = 1;
+    for (my $pos = 1; ; $pos++) {
+      $pos < $level or next V;
+      $v & $bit or last;
+      $bit <<= 1;
+    }
+    $bit <<= 1;
+    if ($v & $bit) {
+      my $to = $v-$bit+1;
+      $graph->add_edge($v, $to);
+      if ($directed) { $graph->add_edge($to, $v); }
+    }
+  }
+  return $graph;
+}
+
+Graph::Maker->add_factory_type('twindragon_area_tree' => __PACKAGE__);
+1;
+__END__
+
+
+# base i+1
+#         ...0   <-->   ...1            toggle low bit
+# 
+# ...01 00..00   <-->   ...10 11..11   
+#       \----/                \----/   
+#
+# base i-1  bit flip every second starting from second lowest
+# 
+# ...11 10..10    <-->   ...00 01..01    even low run
+# ...00 010..10   <-->   ...11 101..01   odd low run
+#    flip lowest triplet 000 or 111 and all below
+#
+# base i-1  bit flip every second starting from lowest
+# 
+# ...00 01..01   <-->   ...11 10..10     even low run
+# ...11 101..01  <-->   ...00 010..10     odd low run
+#    flip lowest triplet 000 or 111 and all below
+
+
+
+=for stopwords Ryde twindragon chamfered undirected McWorter Tazelaar
+
+=head1 NAME
+
+Graph::Maker::TwindragonAreaTree - create twindragon area tree graph
+
+=for test_synopsis my ($graph)
+
+=head1 SYNOPSIS
+
+ use Graph::Maker::TwindragonAreaTree;
+ $graph = Graph::Maker->new ('twindragon_area_tree', level => 6);
+
+=head1 DESCRIPTION
+
+C<Graph::Maker::TwindragonAreaTree> creates a C<Graph.pm> graph of a
+twindragon area tree.
+
+                        30--31          14--15                             
+    level => 6           |               |                                 
+                    28--29          12--13                                 
+                         |               |                                 
+                        26--27  22--23  10--11   6---7                     
+                         |   |   |   |   |   |   |                         
+                    24--25  20--21   8---9   4---5                         
+                                 |               |                         
+        62--63          46--47  18--19           2---3                     
+         |               |   |   |               |                         
+    60--61          44--45  16--17           0---1                         
+         |               |                                                 
+        58--59  54--55  42--43  38--39                                     
+         |   |   |   |   |   |   |                                         
+    56--57  52--53  40--41  36--37                                         
+                 |               |       
+                50--51          34--35                                     
+                 |               |                                         
+            48--49          32--33                                         
+
+Graph vertices are unit squares inside the twindragon curve.  For a level=k
+curve there are 2^k vertices.  Edges are between squares beside consecutive
+segments of the curve.  Or equivalently if the curve is drawn with corners
+chamfered off to leave little gaps at corners then edges connect squares
+through those gaps.  See the author's long mathematical write-up for more
+
+=over
+
+L<http://user42.tuxfamily.org/dragon/index.html>
+
+=back
+
+Vertices are numbered 0 to 2^level-1 which are complex base i+1 point
+numbers corresponding to the unit squares in the twindragon.  With this
+numbering the edges are between bit patterns
+
+    xxx0  --- xxx1       horizontal, toggle low bit
+
+    xxx 10 11..11    
+        \-------/        vertical, toggle low run + 2    
+            |            when respective bit pattern
+        /-------\   
+    xxx 01 00..00
+
+Level=0 is a single vertex 0 and no edges.
+
+Level=1 is two vertices 0 and 1 and an edge between them by the horizontal
+toggle low bit rule.
+
+    0---1          level => 1
+
+Level=2 has the vertical rule connecting vertices 1 = 01 binary and 2 = 10
+binary.  These are 01 with no trailing 0s connected to 10 with no trailing
+1s.
+
+        2---3  
+        |          level => 2
+    0---1
+
+Level=3 has the first degree-3 vertices.  Vertex 2 = binary 010 is the left
+of a horizontal to 3=011 (toggle low bit), and the upper of a vertical edge
+down to 1=001, and the lower of a further vertical edge up to 5=101.
+
+        6---7
+        |
+    4---5          level => 3
+        |
+        2---3
+        |
+    0---1
+
+Vertices are always degree 1, 2 or 3.  Vertex 0 can be considered as a root.
+Level k+1 is formed by taking level k and extending with a second copy of
+level k connected by a middle edge.  This is between bit patterns 0100..00
+in the first copy and 1011..11 in the second.  In the level=6 example above
+this is vertices 47 and 16.
+
+=for GP-Test  binary(47) == [1,0,1,1,1,1]
+
+=for GP-Test  binary(16) == [  1,0,0,0,0]
+
+=head2 Coordinates
+
+Vertex numbers can be converted to X,Y coordinates in complex base i+1 using
+C<Math::PlanePath::ComplexPlus>.
+
+    use Math::PlanePath::ComplexPlus;
+    my $path = Math::PlanePath::ComplexPlus->new;
+    my $graph = Graph::Maker->new ('twindragon_area_tree', level=>5);
+    foreach my $edge ($graph->edges) {
+      my ($v1,$v2) = @$edge;
+      my ($x1,$y1) = $path->n_to_xy($v1);
+      my ($x2,$y2) = $path->n_to_xy($v2);
+      # draw an edge from ($x1,$y1) to ($x2,$y2) ...
+    }
+
+This is the layout of the level=6 sample above.  Edges are unit lengths
+horizontal or vertical and do not cross.  Of course there's many other
+layouts possible.
+
+=head1 FUNCTIONS
+
+=over
+
+=item C<$graph = Graph::Maker-E<gt>new('twindragon_area_tree', key =E<gt> value, ...)>
+
+The key/value parameters are
+
+    level      =>  integer>=0
+    graph_maker => subr(key=>value) constructor, default Graph->new
+
+Other parameters are passed to the constructor, either C<graph_maker> or
+C<Graph-E<gt>new()>.
+
+Like C<Graph::Maker::BalancedTree>, if the graph is directed (the default)
+then edges are added in both directions between nodes.  Option C<undirected
+=E<gt> 1> creates an undirected graph and for it there is a single edge
+between vertices.
+
+=back
+
+=head1 SEE ALSO
+
+L<Graph::Maker>,
+L<Graph::Maker::BalancedTree>
+
+L<Math::PlanePath::ComplexPlus>
+
+A level 10 twindragon area tree appears in Mandelbrot's "Fractal Geometry of
+Nature", second edition, 1983, page 67, called by Mandelbrot the "twindragon
+river".  Some generated drawings of that level are at the author's page
+above.
+
+A level 9 twindragon area tree is in McWorter and Tazelaar, "Creating
+Fractals", Byte Magazine, August 1987, pages 459-480, figure B.
+
+=over
+
+L<http://www.archive.org/details/byte-magazine-1987-08>
+
+=back
+
+=head1 LICENSE
+
+Copyright 2015, 2016, 2017 Kevin Ryde
+
+This file is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any later
+version.
+
+This file is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+This file.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

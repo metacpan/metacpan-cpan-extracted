@@ -1,0 +1,17 @@
+# ChangeLog for app-shells/rssh
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/rssh/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  25 Apr 2004; Aron Griffis <agriffis@gentoo.org> rssh-2.1.1.ebuild:
+  Add die following econf for bug 48950
+
+  14 Oct 2003; Max Kalika <max@gentoo.org> rssh-2.1.1.ebuild:
+  Comply with Gentoo policies with respect to libexecdir.
+
+  23 Sep 2003; Christian Birchinger <joker@gentoo.org> rssh-2.1.1.ebuild:
+  Added sparc keyword
+
+*rssh-2.1.1 (27 Jul 2003)
+
+  27 Jul 2003; Mike Frysinger <vapier@gentoo.org> :
+  Initial version.  Obtained from gentoo.de Stefan Knoblich <stefan.knoblich@t-online.de>.

@@ -1,0 +1,14 @@
+Changes
+lib/Games/Sudoku/Component/TkPlayer.pm
+lib/Games/Sudoku/Component/TkPlayer/Controller.pm
+lib/Games/Sudoku/Component/TkPlayer/Selector.pm
+lib/Games/Sudoku/Component/TkPlayer/Splashscreen.pm
+lib/Games/Sudoku/Component/TkPlayer/View.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+script/tksudoku.pl
+t/00_load.t
+t/99_pod.t
+t/99_podcoverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

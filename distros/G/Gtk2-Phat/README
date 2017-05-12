@@ -1,0 +1,21 @@
+NAME
+    Gtk2::Phat - Perl interface to the Phat widget collection
+
+DESCRIPTION
+    This module allows a perl developer to access the widgets of the Phat
+    widget collection which is geared toward pro-audio apps. The goal is to
+    eliminate duplication of effort and provide some standardization.
+
+SEE ALSO
+    Gtk2(3pm), Gtk2::Phat::index(3pm)
+
+AUTHOR
+    Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005-2008 by Florian Ragwitz
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License Version 2.1, February 1999
+

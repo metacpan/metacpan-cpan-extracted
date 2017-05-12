@@ -1,0 +1,26 @@
+Geo-Proj-GoogleMaps
+
+Add GoogleMaps projection to Geo::Proj
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+Geo::Proj
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, OHTSUKA Ko-hei
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

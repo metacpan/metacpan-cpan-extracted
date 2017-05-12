@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+  <Document>
+    <name>My Document</name>
+    <Snippet maxLines="0"/>
+    <Placemark>
+      <name>My Name (0)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.005,39,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (1)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.004,39,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (2)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.003,39,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (3)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.002,39,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (4)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.001,39,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (5)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77,39,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (6)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.005,39.001,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (7)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.004,39.001,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (8)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.003,39.001,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (9)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.002,39.001,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (10)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.001,39.001,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (11)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77,39.001,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (12)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.005,39.002,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (13)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.004,39.002,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (14)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.003,39.002,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (15)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.002,39.002,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (16)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.001,39.002,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (17)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77,39.002,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (18)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.005,39.003,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (19)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.004,39.003,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (20)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.003,39.003,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (21)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.002,39.003,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (22)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.001,39.003,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (23)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77,39.003,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (24)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.005,39.004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (25)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.004,39.004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (26)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.003,39.004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (27)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.002,39.004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (28)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.001,39.004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (29)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77,39.004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (30)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.005,39.005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (31)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.004,39.005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (32)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.003,39.005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (33)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.002,39.005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (34)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77.001,39.005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>My Name (35)</name>
+      <Snippet maxLines="0"/>
+      <Point>
+        <coordinates>-77,39.005,0</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>

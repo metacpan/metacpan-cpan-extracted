@@ -1,0 +1,19 @@
+These files are used to build the test scripts. They 
+actually exercise GraphViz::Data:Structure with the
+tests that the scripts in t/ will run, optionally sending the
+output to dotty so it can be checked visually, and rewriting the
+test programs in the t/ directory. 
+
+If you add new features or change old ones, it is
+highly recommended that you run through all of these files
+again to visually verify that the output looks the way 
+you want. 
+
+make_all.pl is provided to do a quick rebuild of all the tests 
+witout running dotty. You *should* retry all the appropriate
+tests (via perl build_test testname) to verify that the output
+is visually OK when you make a change to the output routines.
+
+REMEMBER: there's an 01basic.t test in t/ which isn't related
+to these tests at all! It's just a basic functionality test.
+Don't override it!

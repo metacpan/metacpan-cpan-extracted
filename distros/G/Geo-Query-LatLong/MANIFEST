@@ -1,0 +1,9 @@
+Changes
+LatLong.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Geo-Query-LatLong.t
+lib/Geo/Query/LatLong.pm
+META.yml                                 Module meta-data (added by MakeMaker)

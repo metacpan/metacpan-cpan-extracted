@@ -1,0 +1,34 @@
+
+This package contains Games-Go-AGA-DataObjects.
+
+The American Go Association (AGA) has historically used several types of
+data and data files to represent various aspects of a go tournament
+(Players, Games, Rounds, etc).  This module encapsulates the different
+items and provides object-oriented modules usable in scenarios such as a
+tournament director program.
+
+INSTALLATION
+
+To install this module, run the following incantation
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Games::Go::AGA::DataObjects
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Reid Augustin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

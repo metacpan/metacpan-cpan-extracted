@@ -1,0 +1,288 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR 'Jerome Quelin'
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Games-Risk-ExtraMaps-Imaginary\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-09-26 15:12+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Games/Risk/Map/Godstorm.pm:16
+msgid "Risk GodStorm"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:26
+msgid "Germania"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:27
+msgid "Atlantis"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:28
+msgid "Asia Minor"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:29
+msgid "Africa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:30
+msgid "Europa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:31
+msgid "Hyrkania"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:39
+msgid "Dacia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:40
+msgid "Thracia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:41
+msgid "Dalmatia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:42
+msgid "Liguria"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:43
+msgid "Roma"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:44
+msgid "Apulia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:45
+msgid "Corsica"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:46
+msgid "Sicilia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:47
+msgid "Graecia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:48
+msgid "Minoa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:49
+msgid "Ionia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:50
+msgid "Anatolia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:51
+msgid "Hibernia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:52
+msgid "Caledonia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:53
+msgid "Anglia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:54
+msgid "Thule"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:55
+msgid "Varangia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:56
+msgid "Galicia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:57
+msgid "Alemannia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:58
+msgid "Gaul"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:59
+msgid "Iberia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:60
+msgid "Atlas"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:61
+msgid "Carthage"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:62
+msgid "Gaitulia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:63
+msgid "Cyrenaica"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:64
+msgid "Nubia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:65
+msgid "Egypt"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:66
+msgid "Kush"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:67
+msgid "Parthia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:68
+msgid "Sumer"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:69
+msgid "Assyria"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:70
+msgid "Phoenicia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:71
+msgid "Babylon"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:72
+msgid "Sheba"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:73
+msgid "Hesperide"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:74
+msgid "Tritonis"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:75
+msgid "Poseidonis"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:76
+msgid "Oricalcos"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:77
+msgid "Rus"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:78
+msgid "Scythia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:79
+msgid "Cimmeria"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:80
+msgid "Sarmathia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:151
+msgid "Conquer the continents of Europa and Atlantis."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:152
+msgid ""
+"Conquer the continents of Asia Minor and Hyrkania and a third continent of "
+"your choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:153
+msgid "Conquer the continents of Europa and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:154
+msgid ""
+"Conquer the continents of Asia Minor and Atlantis and a third continent of "
+"your choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:155
+msgid "Conquer the continents of Germania and Hyrkania."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:156
+msgid "Conquer the continents of Germania and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:157
+msgid ""
+"Occupy 18 countries of your choice and occupy each with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:158
+msgid ""
+"Occupy 24 countries of your choice and occupy each with at least 1 army."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:159
+msgid ""
+"Destroy all of Player1's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:160
+msgid ""
+"Destroy all of Player2's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:161
+msgid ""
+"Destroy all of Player3's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:162
+msgid ""
+"Destroy all of Player4's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:163
+msgid ""
+"Destroy all of Player5's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Godstorm.pm:164
+msgid ""
+"Destroy all of Player6's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Query logic for lists of scalars/objects ",
+   "author" : [
+      "Kenneth Olwing <knth@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Grep-Query",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Scalar" : "0",
+            "Parse::RecDescent" : "0",
+            "perl" : "5.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kenneth-olwing/Grep-Query.git",
+         "web" : "https://github.com/kenneth-olwing/Grep-Query"
+      }
+   },
+   "version" : "1.004",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

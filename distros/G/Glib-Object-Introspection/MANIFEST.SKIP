@@ -1,0 +1,13 @@
+~$
+blib
+\.bak$
+\.bs$
+build
+\.git
+\.gitignore$
+Makefile$
+Makefile\.old$
+MYMETA\..*$
+GObjectIntrospection.c$
+TAGS
+\.o$

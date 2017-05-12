@@ -1,0 +1,96 @@
+# ChangeLog for app-shells/sash
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/sash/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  02 Jun 2004; Aron Griffis <agriffis@gentoo.org> sash-3.6.ebuild:
+  Fix use invocation
+
+  01 Jun 2004; Michael Sterrett <mr_bones_@gentoo.org> sash-3.4-r3.ebuild,
+  sash-3.4-r4.ebuild, sash-3.4-r5.ebuild:
+  clean out version 3.4
+
+  15 May 2004; Joshua Kinard <kumba@gentoo.org> sash-3.6.ebuild:
+  Marked stable on mips.
+
+  12 May 2004; Bryan Østergaard <kloeri@gentoo.org> sash-3.6.ebuild:
+  Stable on alpha.
+
+  22 Apr 2004; Travis Tilley <lv@gentoo.org> sash-3.4-r5.ebuild,
+  sash-3.6.ebuild, sash-3.7.ebuild:
+  add missing keywords
+
+  27 Mar 2004; Tom Gall <tgall@gentoo.org> sash-3.6.ebuild:
+  fix for ppc64. (header issues)
+
+*sash-3.7 (03 Mar 2004)
+
+  03 Mar 2004; <agriffis@gentoo.org> sash-3.7.ebuild:
+  Add missing keywords back into this ebuild (where did they go, plasmaroo?) and
+  mark immediately stable on ia64 to clean up compilation issues with the older
+  versions
+
+  14 Feb 2004; <plasmaroo@gentoo.org> files/sash-3.6-readline.patch:
+  Fixed an upstream bug in the readline patch, this should solve
+  issues when sourcing scripts and closes bug #32941. Also updated
+  to 3.7; closes bug #39543.
+
+  06 Feb 2004; <gustavoz@gentoo.org> sash-3.6.ebuild:
+  Marked stable on sparc.
+
+  31 Oct 2003; <plasmaroo@gentoo.org> sash-3.4-r3.ebuild, sash-3.4-r4.ebuild,
+  sash-3.4-r5.ebuild:
+  Mirror change for the readline patch: the old mirror went down...
+
+  18 Oct 2003; <plasmaroo@gentoo.org> files/sash-3.6-fix-includes.patch:
+  Fixed includes patch to get rid of bootstrapping-breakage: e2fsprogs
+  DEPEND should now be un-necessary.
+
+  18 Oct 2003; Jon Portnoy <avenj@gentoo.org> sash-3.6.ebuild :
+  Fixed DEPEND to include sys-fs/e2fsprogs.
+
+*sash-3.6 (18 Oct 2003)
+
+  18 Oct 2003; <plasmaroo@gentoo.org> sash-3.6.ebuild,
+  files/sash-3.6-fix-includes.patch, files/sash-3.6-readline.patch:
+  Added user-contributed sash-3.6 to the tree. Thanks to Peter Gnodde
+  <peter@gnodde.org> for the ebuild. Bug #26272.
+
+  21 Feb 2003; Zach Welch <zwelch@gentoo.org> sash-3.4-r5.ebuild :
+  Added arm to keywords
+
+  15 Feb 2003; Jan Seidel <tuxus@gentoo.org> sash-3.4-r5.ebuild :
+  Added mips to keywords
+
+  08 Feb 2003; Guy Martin <gmsoft@gentoo.org> sash-3.4-r5.ebuild :
+  Added hppa to keywords.
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*sash-3.4-r3.ebuild (25 July 2002)
+
+  25 Jul 2002; Daniel Ahlberg <aliz@gentoo.org> sash-3.4-r3.ebuild :
+  Added LICENSE, SLOT.
+
+*sash-3.4-r5 (14 Mar 2002)
+
+  25 Jul 2002; Daniel Ahlberg <aliz@gentoo.org> sash-3.4-r5.ebuild :
+  Added LICENSE, SLOT.
+
+  15 Jul 2002; Owen Stampflee <owen@gentoo.org> :
+
+  Added KEYWORDS.
+
+  14 Mar 2002; Bruce A. Locke <blocke@shivan.org> sash-3.4-r5.ebuild:
+
+  bump up zlib dep from 1.1.3 to 1.1.4
+  
+*sash-3.4-r4 (8 Mar 2002)
+
+  25 Jul 2002; Daniel Ahlberg <aliz@gentoo.org> sash-3.4-r4.ebuild :
+  Added LICENSE, SLOT.
+
+  8 Mar 2002; Bruce A. Locke <blocke@shivan.org> sash-3.4-r4.ebuild:
+
+  sash is always static now... previous versions were only built statically
+  if 'static' USE keyword was set
+

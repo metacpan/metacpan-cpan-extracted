@@ -1,0 +1,77 @@
+---
+abstract: 'Create Graph.pm graph theory graphs of various kinds.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Graph: '0'
+  Graph::Maker::Complete: '0'
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graph-Maker-Other
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+provides:
+  Graph::Maker::Beineke:
+    file: lib/Graph/Maker/Beineke.pm
+    version: '6'
+  Graph::Maker::BiStar:
+    file: lib/Graph/Maker/BiStar.pm
+    version: '6'
+  Graph::Maker::BinaryBeanstalk:
+    file: lib/Graph/Maker/BinaryBeanstalk.pm
+    version: '6'
+  Graph::Maker::BinomialTree:
+    file: lib/Graph/Maker/BinomialTree.pm
+    version: '6'
+  Graph::Maker::FibonacciTree:
+    file: lib/Graph/Maker/FibonacciTree.pm
+    version: '6'
+  Graph::Maker::Hanoi:
+    file: lib/Graph/Maker/Hanoi.pm
+    version: '6'
+  Graph::Maker::Johnson:
+    file: lib/Graph/Maker/Johnson.pm
+    version: '6'
+  Graph::Maker::Keller:
+    file: lib/Graph/Maker/Keller.pm
+    version: '6'
+  Graph::Maker::Kneser:
+    file: lib/Graph/Maker/Kneser.pm
+    version: '6'
+  Graph::Maker::KnightGrid:
+    file: lib/Graph/Maker/KnightGrid.pm
+    version: '6'
+  Graph::Maker::NoughtsAndCrosses:
+    file: lib/Graph/Maker/NoughtsAndCrosses.pm
+    version: '6'
+  Graph::Maker::Other:
+    file: META.yml
+    version: '6'
+  Graph::Maker::TwinAlternateAreaTree:
+    file: lib/Graph/Maker/TwinAlternateAreaTree.pm
+    version: '6'
+  Graph::Maker::TwindragonAreaTree:
+    file: lib/Graph/Maker/TwindragonAreaTree.pm
+    version: '6'
+requires:
+  Graph::Maker: '0'
+  Graph::Maker::Star: '0'
+  Graph::Maker::Wheel: '0'
+  perl: '5.004'
+resources:
+  homepage: http://user42.tuxfamily.org/graph-maker-other/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '6'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

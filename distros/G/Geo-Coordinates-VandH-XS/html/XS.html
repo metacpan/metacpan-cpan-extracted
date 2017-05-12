@@ -1,0 +1,73 @@
+<HTML>
+<HEAD>
+<TITLE>XS.pm</TITLE>
+<LINK REL="stylesheet" HREF="../html/docs.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;XS.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+    <LI><A HREF="#name">NAME</A></LI>
+    <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+    <LI><A HREF="#description">DESCRIPTION</A></LI>
+    <UL>
+
+        <LI><A HREF="#export">EXPORT</A></LI>
+    </UL>
+
+    <LI><A HREF="#author">AUTHOR</A></LI>
+    <LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Geo::Coordinates::VandH::XS</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Geo::Coordinates::VandH::XS 'all';
+  my( $v, $h ) = toVH( $lat, $lon );
+  my( $lat, $long ) = toLatLon( $v, $h );
+  my $distance = distance( $v1, $h1, $v2, $h2 );
+  my $degrees = degrees($radians);
+  my $radians = radians($degrees);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Convert and Manipulate telco V &amp; H coordinates both to and from Lat/Lon and
+calculate the distance between pairs of V&amp;H co-orods.</P>
+<P>Latitude and longtitude are in degrees. Utility conversion funtions are
+available to convert degrees &lt;-&gt; radians</P>
+<P>
+<H2><A NAME="export">EXPORT</A></H2>
+<P>None by default.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Dr James Freeman, &lt;james.freeman[AT]id3.org.uk&lt;gt&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>perl</EM>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;XS.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,36 @@
+dir /usr
+dir /usr/sbin
+obj /usr/sbin/iwconfig e0491d375ac92e216874797bef3914e9 1087320904
+obj /usr/sbin/iwevent 0aebb634d2ba6e52029344fac16852bd 1087320904
+obj /usr/sbin/iwgetid b77c9900e8db1df7893e980a6aaa3022 1087320904
+obj /usr/sbin/iwpriv d4e3a9c5b76b86001d7368a55fc10641 1087320904
+obj /usr/sbin/iwlist 7aa7612dd06339b10c16d382ef06388a 1087320904
+obj /usr/sbin/iwspy 6ede377ff942e40eb540cbe88814be24 1087320904
+obj /usr/sbin/ifrename 452026e9d8e969038695c6e6dcadcf94 1087320904
+dir /usr/lib
+obj /usr/lib/libiw.so.27 7aaf328d9e8646ef9164efa9ac7d052f 1087320904
+sym /usr/lib/libiw.so -> /usr/lib/libiw.so.27 1087320904
+dir /usr/include
+obj /usr/include/iwlib.h cc5ecd829cbd6e0ee2951b39ce66cadb 1087320904
+dir /usr/share
+dir /usr/share/man
+dir /usr/share/man/man8
+obj /usr/share/man/man8/iwconfig.8.gz 03846e20e72db43f1256602ff45a35ae 1087320904
+obj /usr/share/man/man8/iwlist.8.gz add6c27e3d8192e8c56c4fb97cc73510 1087320904
+obj /usr/share/man/man8/iwpriv.8.gz 217d3e2cac89538b0f4074db492df390 1087320904
+obj /usr/share/man/man8/iwspy.8.gz f2931a5eabe02496da78286d4f389958 1087320904
+obj /usr/share/man/man8/iwgetid.8.gz 9cc6471ac34618e714c7a88b28f506d9 1087320904
+obj /usr/share/man/man8/iwevent.8.gz c8d6c487ad167453129bfb0496a3f8a1 1087320904
+obj /usr/share/man/man8/ifrename.8.gz fd690f641cbef3a37f28d11383e1b17a 1087320904
+dir /usr/share/man/man7
+obj /usr/share/man/man7/wireless.7.gz 7570eb9e30d85038e57d064ab941a4d8 1087320904
+dir /usr/share/man/man5
+obj /usr/share/man/man5/iftab.5.gz 6e23aa9c9313d712770c5dde388827ab 1087320904
+dir /usr/share/doc
+dir /usr/share/doc/wireless-tools-27_pre22
+obj /usr/share/doc/wireless-tools-27_pre22/CHANGELOG.h.gz e527fc9fb6a7d665303516d6cf2bc2a5 1087320904
+obj /usr/share/doc/wireless-tools-27_pre22/COPYING.gz 170110500922e976ac1ac28d05497fb5 1087320904
+obj /usr/share/doc/wireless-tools-27_pre22/INSTALL.gz b3e5f9aa049a7d2de10d9a7e8328e7e4 1087320904
+obj /usr/share/doc/wireless-tools-27_pre22/HOTPLUG.txt.gz 43abda6e10106a89c0468d7a47c38149 1087320904
+obj /usr/share/doc/wireless-tools-27_pre22/PCMCIA.txt.gz 952520c8d6a8980f8fe78bd048e915a1 1087320904
+obj /usr/share/doc/wireless-tools-27_pre22/README.gz bc99c0ee70a3fb9f42da68248aff9bb8 1087320904

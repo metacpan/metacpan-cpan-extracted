@@ -1,0 +1,45 @@
+NAME
+    Graphics::ColorNames::Crayola - the original 48 crayola crayon colors
+
+SYNOPSIS
+      require Graphics::ColorNames::Crayola;
+
+      $NameTable = Graphics::ColorNames::Crayola->NamesRgbTable();
+      $RgbBlack  = $NameTable->{black};
+
+DESCRIPTION
+    A palette based on the original 48 crayola crayon colors.
+
+    These colors are based on scanned images of crayon colors, so they may
+    not correspond with their standard X colors of the same names.
+
+REVISION HISTORY
+    Changes since the last release
+
+    1.01   20 Dec 2007
+            - removed duplicate names, requires Graphics::ColorNames 2.10
+            - fixed typos in Changes
+            - more flexible Perl version requirements
+            - updated documentation
+
+    More details can be found in the Changes file.
+
+SEE ALSO
+    Graphics::ColorNames
+
+AUTHOR
+    Implemented as a plugin for Graphics::ColorNames by Robert Rothenberg
+    <rrwo at cpan.org>.
+
+    This palette comes from Bill ?
+    http://www.auterytech.com/enantiodromos/crayola.html.
+
+LICENSE
+    This software is public domain. No copyright is claimed by the author
+    for it.
+
+    It is possible that Crayola Company (http://www.crayola.com) may claim
+    ownership of some vague intellectual-property-related turf for the
+    crayons, their names, or colors, depending on how insecure or bored
+    their lawyers are feeling at any moment.
+

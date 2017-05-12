@@ -1,0 +1,17 @@
+Content-Type: text/plain
+Content-Disposition: inline
+Mime-Version: 1.0
+To: Original_Sender
+CC: getweb-admin@usa.healthnet.org
+Subject: Internal Error
+
+An unexpected internal error occurred:
+  unsafe filename: ./test/not_there?maxlines=10&all_right=true&is_ok=yes&errors=0&age=&maxfiles=50&query=EBOLA+ZAIRE
+
+____original message follows____
+
+From: Original_Sender
+Subject: 
+Reply-To: terminal
+
+SEARCH GARBAGE_ENGINE 10 EBOLA ZAIRE true

@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+use 5.12.0;
+use warnings;
+use strict;
+use Git::Release;
+
+my $manager = Git::Release->new;
+$|++;
+my $target = shift;
+
+unless ( $target ) {
+    $target = $manager->get_current_branch->name;
+}
+
+unless($target =~ m/^@{[ $manager->config->ready_prefix ]}/ ) {
+    say "Branch $target is not a ready branch.";
+    say "Your ready prefix is: " , $manager->config->ready_prefix;
+    exit(0);
+}
+
+my $cb = $manager->get_current_branch;
+
+say "Checking out release branch to merge ready branch...";
+my $rb = $manager->checkout_release_branch;
+
+# try to merge
+say "Merging branch @{[ $cb->name ]} ...";
+$rb->merge( $cb );
+
+say "Moving to released/...";
+$cb->move_to_released;
+
+say "Done";

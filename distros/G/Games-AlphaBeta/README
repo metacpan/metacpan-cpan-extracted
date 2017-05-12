@@ -1,0 +1,100 @@
+NAME
+    Games::AlphaBeta - game-tree search with object oriented interface
+
+SYNOPSIS
+        package My::GamePos;
+        use base qw(Games::AlphaBeta::Position);
+
+        # initialise starting position
+        sub _init { ... }
+
+        # Methods required by Games::AlphaBeta
+        sub apply { ... }
+        sub endpos { ... }          # optional
+        sub evaluate { ... }
+        sub findmoves { ... }
+
+        # Draw a position in the game (optional)
+        sub draw { ... }
+
+        package main;
+        my $pos = My::GamePos->new;
+        my $game = Games::AlphaBeta->new($pos);
+
+        while ($game->abmove) {
+            print draw($game->peek_pos);
+        }
+
+DESCRIPTION
+    Games::AlphaBeta provides a generic implementation of the AlphaBeta
+    game-tree search algorithm (also known as MiniMax search with alpha beta
+    pruning). This algorithm can be used to find the best move at a
+    particular position in any two-player, zero-sum game with perfect
+    information. Examples of such games include Chess, Othello, Connect4,
+    Go, Tic-Tac-Toe and many, many other boardgames.
+
+    Users must pass an object representing the initial state of the game as
+    the first argument to `new()'. This object must provide the following
+    methods: `copy()', `apply()', `endpos()', `evaluate()' and
+    `findmoves()'. This is explained more carefully in
+    Games::AlphaBeta::Position which is a base class you can use to
+    implement your position object.
+
+INHERITED METHODS
+    The following methods are inherited from Games::Sequential:
+
+    new
+    debug
+    peek_pos
+    peek_move
+    move
+    undo
+METHODS
+    _init [@list]
+        *Internal method.*
+
+        Initialize an AlphaBeta object.
+
+    ply [$value]
+        Return current default search depth and, if invoked with an
+        argument, set to new value.
+
+    abmove [$ply]
+        Perform the best move found after an AlphaBeta game-tree search to
+        depth $ply. If $ply is not specified, the default depth is used (see
+        `ply()'). The best move found is performed and a reference to the
+        resulting position is returned on success, and undef is returned on
+        failure.
+
+        Note that this function can take a long time if $ply is high,
+        particularly if the game in question has many possible moves at each
+        position.
+
+        If `debug()' is set, some basic debugging is printed as the search
+        progresses.
+
+    _alphabeta $pos $alpha $beta $ply
+        *Internal method.*
+
+BUGS
+    The valid range of values `evaluate()' can return is hardcoded to
+    -99_999 - +99_999 at the moment. Probably should provide methods to
+    get/set these.
+
+TODO
+    Implement the missing iterative deepening alphabeta routine.
+
+SEE ALSO
+    The author's website, describing this and other projects:
+    http://brautaset.org/projects/
+
+AUTHOR
+    Stig Brautaset, <stig@brautaset.org>
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2004 by Stig Brautaset
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

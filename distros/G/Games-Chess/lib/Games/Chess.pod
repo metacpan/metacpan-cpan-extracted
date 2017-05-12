@@ -1,0 +1,546 @@
+
+=head1 NAME
+
+Games::Chess - represent chess positions and games
+
+=head1 SYNOPSIS
+
+    use Games::Chess qw(:constants);
+    my $p = Games::Chess::Position->new;
+    $p->at(0,0,BLACK,ROOK);
+    $p->at(7,7,WHITE,ROOK);
+    print $p->to_text;
+
+=head1 DESCRIPTION
+
+The C<Games::Chess> package provides the class C<Games::Chess::Piece> to
+represent chess pieces, and the class C<Games::Chess::Position> to
+represent a position in a chess game.  Objects can be instantiated from
+data in standard formats and exported to these formats.
+
+=head1 NOTATION
+
+See L<Games::Chess::PGN> for full details of the notations.
+
+=over
+
+=item SAN
+
+Standard Algebraic Notation.  The modern international notation for
+chess games.  For example,
+
+    1. e4 e5
+    2. f4 exf4
+    3. Nf3 g5
+
+=item FEN
+
+Forsythe-Edwards Notation.  A compact representation for chess
+positions.  FEN specifies the piece placement, the active color, the
+castling availability, the en passant target square, the halfmove clock,
+and the fullmove number as six fields separated by spaces.  For example,
+the opening position is described in FEN as follows:
+
+    rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+
+=item PGN
+
+Portable Game Notation.  A notation for chess games, including the
+moves, commentary, variations, and metadata such as the players, the
+event, the round number, and the date of the match.  For example,
+
+    [Event "F/S Return Match"]
+    [Site "Belgrade, Serbia JUG"]
+    [Date "1992.11.04"]
+    [Round "29"]
+    [White "Fischer, Robert J."]
+    [Black "Spassky, Boris V."]
+    [Result "1/2-1/2"]
+
+    1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1
+    b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7 11. c4 c6
+    12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5
+    17. dxe5 Nxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6
+    21. Nc4 Nxc4 22. Bxc4 Nb6 23. Ne5 Rae8 24. Bxf7+ Rxf7
+    25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5 hxg5
+    29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8
+    34. Kf2 Bf5 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3
+    39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6 Nf2 42. g4 Bd3 43. Re6
+    1/2-1/2
+
+=item EPD
+
+Extended Position Description.  An extensible notation based on FEN.
+Intended for data interchange between chess-playing programs and for the
+construction of opening databases.  Not used by C<Games::Chess>.
+
+=back
+
+=head1 ERROR HANDLING
+
+All the C<Games::Chess::*> packages share a common error-handling
+protocol, depending on the debugging level passed to the
+C<Games::Chess::debug> function.  (The debugging level is 0 by default.)
+
+At debugging level 0, each function and method returns undefined if it
+is passed invalid arguments or if some other error happens.  A
+description of the error is available by calling
+C<Games::Chess::errmsg>.
+
+At debugging level 1, each function and method returns undefined if it
+is passed invalid arguments or if some other error happens.  A warning
+is also issued.  A description of the error is available by calling
+C<Games::Chess::errmsg>.
+
+At debugging level 2, each function and method calls C<die> if it is
+passed invalid arguments.
+
+=head1 CONSTANTS
+
+Piece colours are represented by the constants C<BLACK> and C<WHITE>.
+Piece values are represented by the constants C<PAWN>, C<KNIGHT>,
+C<BISHOP>, C<ROOK>, C<QUEEN>, and C<KING>.
+
+To import these constants into your namespace, include the tags
+C<:colours> (colours only), C<:pieces> (piece values only), or
+C<:constants> (all constants) in the C<use> statement.  For example:
+
+    use Games::Chess qw(:colours);
+
+(If you C<use strict;>, you'll have to write these constants as function
+calls like C<WHITE()> or C<&WHITE> to satisfy the compiler.)
+
+=head1 FUNCTIONS
+
+To import all these functions into your namespace, include the tag
+C<:functions> in the C<use> statement, for example
+
+    use Games::Chess qw(:functions);
+
+=over 4
+
+=item algebraic_to_xy($square)
+
+If $square represents a square in Standard Algebraic Notation (from a1
+to h8), return a list of two elements ($x,$y) giving the coordinates of
+that square, from (0,0) to (7,7).  Return undefined otherwise.
+
+=item colour_valid($colour)
+
+Return 1 if $colour is a valid colour value, C<WHITE> or C<BLACK>.
+Return undefined otherwise.
+
+=item debug($level)
+
+Set the debugging level.  See L<ERROR HANDLING>.
+
+=item errmsg
+
+Return a description of the most recent error in any of the
+C<Games::Chess::*> packages, or the empty string if no errors have
+occurred.  See L<ERROR HANDLING>.
+
+=item halfmove_valid($halfmove)
+
+Return 1 if $halfmove is a valid value for the halfmove clock, which
+counts the number of ply (moves by either player) since the last pawn
+move or capture.  Return undefined otherwise.
+
+=item move_valid($move)
+
+Return 1 if $move is a valid value for the full move count (the number
+of black moves since the start of the game, plus 1).  Return undefined
+otherwise.
+
+=item piece_valid($piece)
+
+Return 1 if $piece is a valid piece value, from C<PAWN> to C<KING>.
+Return undefined otherwise.
+
+=item xy_to_algebraic($x,$y)
+
+If ($x,$y) is a valid board position, from (0,0) to (7,7), return the
+algebraic notation for that square, from C<a1> to C<h8>.  Return
+undefined otherwise.
+
+=item xy_valid($x,$y)
+
+Return 1 if ($x,$y) is a valid board position, from (0,0) to (7,7).
+Return undefined otherwise.
+
+=back
+
+=head1 CHESS PIECES
+
+A chess piece, or an empty square on a chess board, is represented as an
+object belonging to the C<Games::Chess::Piece> class.
+
+=head2 PIECE REPRESENTATION
+
+A chess piece is represented as a reference to an 8-bit value where bits
+0-2 are the piece type (0 = empty square, 1 = pawn, 2 = knight, 3 =
+bishop, 4 = rook, 5 = queen and 6 = king) and bits 3-4 are the piece
+color (0 = empty square, 1 = white, 2 = black).
+
+Bits 5-7 are reserved for future use.
+
+So for example, a black knight is represented as the binary value
+00010010 (decimal 18).
+
+=head2 PIECE CONSTRUCTORS
+
+=over 4
+
+=item Piece-E<gt>new
+
+With no argument, return an object representing an empty square.
+
+=item Piece-E<gt>new($piece)
+
+With a single argument that is a member of the C<Games::Chess::Piece>
+class, return an object representing the same piece as $piece.
+
+=item Piece-E<gt>new($number)
+
+With a numeric argument, return an object representing a piece with that
+encoding.  Return undefined if $number is not an integer in the range 0
+to 255.
+
+=item Piece-E<gt>new($character)
+
+With a single character string as an argument, return an object
+representing a piece with that encoding in the standard Forsythe-Edwards
+Notation.  A space represents an empty square, and the letters P, N, B,
+R, Q, and K represent pawn, knight, bishop, rook, queen, and king
+respectively.  Upper-case letters represent white pieces and lower-case
+letters black pieces.  Return undefined if $character does not represent
+a piece.
+
+=item Piece-E<gt>new($color,$piece)
+
+Return an object representing the piece described.  Return undefined if
+$color is not WHITE or BLACK, or $piece is not PAWN, KNIGHT, BISHOP,
+ROOK, QUEEN or KING.
+
+=back
+
+=head2 PIECE METHODS
+
+=over 4
+
+=item Piece-E<gt>code
+
+Return the FEN code for the piece as a single character (PNBRQKpnbrqk),
+or a space if the piece represents an empty square.
+
+=item Piece-E<gt>colour
+
+Return C<EMPTY>, C<WHITE> or C<BLACK> as appropriate.
+
+=item Piece-E<gt>colour_name
+
+Return "empty", "white" or "black" as appropriate.
+
+=item Piece-E<gt>name
+
+Return a string describing the piece, for example "black knight", or
+"white king", or "empty square".
+
+=item Piece-E<gt>piece
+
+Return C<EMPTY>, C<PAWN>, C<KNIGHT>, C<BISHOP>, C<ROOK>, C<QUEEN>, or
+C<KING> as appropriate.
+
+=item Piece-E<gt>piece_name
+
+Return "square", "pawn", "knight", "bishop", "rook", "queen", or "king"
+as appropriate.
+
+=back
+
+=head1 CHESS POSITIONS
+
+A chess position represented as an object belonging to the
+C<Games::Chess::Position> class.
+
+=head2 POSITION REPRESENTATION
+
+A chess position is represented as a reference to a hash, whose C<board>
+member is a vector of 64 bytes, where the square at FILE,RANK is at byte
+(FILE*8)+RANK.  For example, square c7 is at byte (2*8)+6 = 22.  Each
+byte is in the format described for the C<Games::Chess::Piece> class,
+above.
+
+The representation is reasonably compact: a position is represented in
+64 bytes.  But more importantly, it is easy and efficient to manipulate
+in C; you can cast the vector to a 2-dimensional array using code like
+
+     unsigned char (*position)[8][8]
+       = (unsigned char(*)[8][8])vector;
+
+and then position[x][y] refers to the square at file x, rank y.
+
+=head2 POSITION CONSTRUCTORS
+
+=over 4
+
+=item Position-E<gt>new
+
+With no argument, return an object representing a position with all 16
+pieces in their initial positions.
+
+=item Position-E<gt>new($position)
+
+With a single argument that is a member of the C<Games::Chess::Position>
+class, return a copy of $position.
+
+=item Position-E<gt>new($FEN)
+
+With one string argument, return an object representing the chess
+position described by the Forsythe-Edwards Notation string $FEN.
+
+The Position constructor does not require $FEN to contain all six FEN
+fields; only the first (the piece placement) is required.  The remaining
+five fields, if missing, take the values C<w - - 0 1>.
+
+=back
+
+=head2 POSITION METHODS
+
+=over 4
+
+=item Position-E<gt>at($x,$y)
+
+If ($x,$y) is a valid board position, return an object of class
+C<Games::Chess::Piece> representing the square at ($x,$y).  Return
+undefined otherwise.
+
+=item Position-E<gt>at($x,$y,@piece)
+
+If ($x,$y) is a valid board position, and @piece would be valid as
+arguments to the C<Games::Chess::Piece> constructor
+(see L<PIECE CONSTRUCTORS>), put the specified piece on the specified
+square and return 1.  Return undefined otherwise.
+
+=item Position-E<gt>board
+
+Return the board position as a vector of 64 bytes.
+
+=item Position-E<gt>can_castle($colour,$piece)
+
+If $colour is a valid colour, and $piece is C<KING> or C<QUEEN>, return
+true if the player given by $colour can castle on the side given by
+$piece, false if they cannot.  Return undefined otherwise.
+
+=item Position-E<gt>can_castle($colour,$piece,$can_castle)
+
+If $colour is a valid colour, and $piece is C<KING> or C<QUEEN>, set the
+castling availability for the player given by $colour and the side given
+by $piece to the truth value of $can_castle, and return 1.  Return
+undefined otherwise.
+
+=item Position-E<gt>clear($x,$y)
+
+If ($x,$y) is a valid board position, clear the specified square and
+return 1.  Return undefined otherwise.  Equivalent to
+
+   Position->at($x,$y,Piece->new);
+
+=item Position-E<gt>en_passant
+
+Return the en passant target square as the list (FILE,RANK), or
+undefined if there is no en passant target square.
+
+=item Position-E<gt>en_passant($x,$y)
+
+If ($x,$y) is a valid board position, set the en passant target square
+to ($x,$y) and return 1.  Return undefined otherwise.
+
+=item Position-E<gt>halfmove_clock
+
+Return the halfmove clock (the number of ply since the last pawn move or
+capture).
+
+=item Position-E<gt>halfmove_clock($halfmove)
+
+If $halfmove is a valid halfmove clock value, set the halfmove clock to
+$halfmove and return 1.  Return undefined otherwise.
+
+=item Position-E<gt>move_number
+
+Return the move number (the number of full moves since the beginning of
+the game, plus 1).
+
+=item Position-E<gt>move_number($move)
+
+If $move is a valid move number, set the move number to $move and return
+1.  Return undefined otherwise.
+
+=item Position-E<gt>player_to_move
+
+Return C<WHITE> if white is to move, C<BLACK> otherwise.
+
+=item Position-E<gt>player_to_move($colour)
+
+If $colour is C<WHITE> or C<BLACK>, set the player to move to $colour
+and return 1.  Return undefined otherwise.
+
+=item Position-E<gt>to_FEN
+
+Return a string representing the board position in Forsythe-Edwards
+notation.  For example, the initial position is returned as the string
+
+    rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+
+=item Position-E<gt>to_GIF(option =E<gt> value, ...)
+
+Return a string representing the board position as a GIF (an image in
+Graphics Interchange Format).  The following options can be passed to
+control the image:
+
+=over 8
+
+=item border
+
+The width of the black border around the chess board, in pixels
+(defaults to 2).
+
+=item letters
+
+If true, draw a margin to the left of the board containing rank numbers,
+and a margin below the board containing file letters (defaults to true).
+
+=item bmargin
+
+The height of the margin to draw below the board (containing the file
+letters), in pixels (defaults to 20).  Ignored if the C<letters> option
+is false.
+
+=item lmargin
+
+The width of the margin to draw to the left of the board (containing the
+rank numbers), in pixels (defaults to 20).  Ignored if the C<letters>
+option is false.
+
+=item font
+
+A reference to a C<GD::Font> object describing the font to use to draw
+the rank numbers and file letters (defaults to C<GD::Font::Giant>).
+Ignored if the C<letters> option is false.
+
+=back
+
+=item Position-E<gt>to_text
+
+Return a string representing the board position as an ASCII diagram.
+For example, the initial position is returned as the string
+
+    r n b q k b n r
+    p p p p p p p p
+      .   .   .   .
+    .   .   .   .  
+      .   .   .   .
+    .   .   .   .  
+    P P P P P P P P
+    R N B Q K B N R
+
+=item Position-E<gt>validate
+
+Apply some simple validation tests to the position.  Return 1 if the
+position passes the tests, undefined otherwise.  If the position fails
+to validate, the reason for failure can be found by calling
+C<Games::Chess::errmsg>.
+
+These tests are applied:
+
+=over 4
+
+=item 1.
+
+The total of pawns plus obviously promoted pieces (for example, a second
+queen or a third rook) must be no more than 8 on each side.
+
+=item 2.
+
+Each side must have exactly one king.
+
+=item 3.
+
+There must be no pawns on ranks 1 and 8.
+
+=item 4.
+
+The en passant target square, if specified, must be plausible.  That is,
+if white is to move, the ep square must be on rank 6, with a black pawn
+on rank 5 and empty squares on ranks 6 and 7 in that file.  If black is
+to move, the ep square must be on rank 3, with a white pawn on rank 4
+and empty squares on ranks 2 and 3 in that file.
+
+=item 5.
+
+The castling availability must be plausible.  For example, if white can
+castle queenside, there must be a white rook on a1 and a white king on
+e1.
+
+=item 6.
+
+The halfmove count must be between 0 and 50 (it can't be greater than 50
+or the game would have been drawn).
+
+=item 7.
+
+The full move number must be 1 or more.
+
+=back
+
+=back
+
+=head1 BUGS
+
+=over 4
+
+=item *
+
+No representation of chess moves.
+
+=item *
+
+No representation of chess games and no support for PGN.
+
+=item *
+
+No simple way to clear the en passant target square.
+
+=item *
+
+No way to choose a different font for the chess pieces when creating a
+GIF (if anyone knows an easy way to do this, I'd love to know about it).
+
+=item *
+
+No way to choose the size of the chess pieces when creating a GIF.
+
+=back
+
+=head1 SEE ALSO
+
+L<Games::Chess::PGN> - a description of the Portable Game Notation (PGN)
+standard, incorporating Standard Algebraic Notation (SAN),
+Forsythe-Edwards Notation (FEN) and Extended Position Description (EPD).
+(Steven J. Edwards)
+
+L<GD> - a Perl interface to Tom Boutell's C<libgd> graphics library.
+(Lincoln Stein)
+
+=head1 AUTHOR
+
+Gareth Rees C<E<lt>garethr@cre.canon.co.ukE<gt>>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999 Gareth Rees.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

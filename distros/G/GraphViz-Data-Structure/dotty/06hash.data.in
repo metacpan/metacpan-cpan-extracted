@@ -1,0 +1,90 @@
+(name=>'ref to zero-element hash',
+ code=>'GraphViz::Data::Structure->new(\{},%title%)->graph->as_canon',
+)
+%%
+(name=>'ref to one-element hash',
+ code=>'GraphViz::Data::Structure->new(\{"test"=>"me"},%title%)->graph->as_canon',
+)
+%%
+(name=>'ref to three-element hash',
+ code=>'GraphViz::Data::Structure->new(\{"larry"=>"fuzz","moe"=>"mop","curly"=>"none"},
+        %title%)->graph->as_canon',
+)
+%%
+(name=>'ref to vertical three-element hash',
+ code=>'GraphViz::Data::Structure->new(\{"larry"=>"fuzz","moe"=>"mop","curly"=>"none"},
+        Orientation=>"vertical",%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element hash ref to empty arrays',
+ code=>'my %a=(Empty=>[]); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element hash ref to empty arrays',
+ code=>'my %a=(Nil=>[],Nada=>[],Zip=>[]); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element hash ref to one-element arrays',
+ code=>'my %a=(Pointer=>["test"]); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element hash ref to one-element arrays',
+ code=>'my %a=(Fuzz=>["larry"],Mop=>["moe"],Bald=>["curly"]); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element hash ref to three-element arrays',
+ code=>'my %a=(Stooges=>["larry","moe","curly"]); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element hash ref to three-element arrays',
+ code=>'my %a=(Stooges=>["larry","moe","curly"],
+               MarxBros=>["groucho","harpo","chico"],
+               Goons=>["seagoon","bloodnok","eccles"]); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element hash ref to empty hashes',
+ code=>'my %a=(Nil=>{}); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element hash ref to empty hashes',
+ code=>'my %a=(Nada=>{},Zilch=>{},Zip=>{}); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element hash ref to one-element hashes',
+ code=>'my %a=(One=>{"test"=>"2"}); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element hash ref to one-element hashes',
+ code=>'my %a=(One=>{"larry"=>"fuzz"},
+               Two=>{"moe"=>"mop"},
+               Three=>{"curly"=>"none"}); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element hash ref to three-element hashes',
+ code=>'my %a=(Stooges=>{"larry"=>"fuzz","moe"=>"mop","curly"=>"none"}); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element hash ref to three-element hashes',
+ code=>'my %a=(Stooges=>{"larry"=>1,"moe"=>2,"curly"=>3},
+               MarxBros=>{"groucho"=>1,"harpo"=>2,"chico"=>3},
+               Goons=>{"seagoon"=>1,"bloodnok"=>2,"eccles"=>3}); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)
+%%
+(name=>'odd characters in parent',
+ code=>'my %a=("<html>"=>{"larry"=>1,"moe"=>2,"curly"=>3},
+               "<script>"=>{"groucho"=>1,"harpo"=>2,"chico"=>3},
+               "<body>"=>{"seagoon"=>1,"bloodnok"=>2,"eccles"=>3}); 
+        GraphViz::Data::Structure->new(\%a,%title%)->graph->as_canon',
+)

@@ -1,0 +1,54 @@
+[% page.load_scripts_at_top = 1 %]
+
+<h2>Editing draft: [% draft.title %]</h2>
+<div id="demo_output_polling"></div>
+<form method="POST" action="[% c.uri_for_action('/draft/publish', [ draft.title ]) %]">
+<div id="form-entry-title">Title: <input type="text" name="title" value="[% draft.title %]"/></div>
+<div id="form-entry-body">
+<textarea name="body" rows=15 cols=45>[% draft.body %]</textarea>
+</div>
+<div id="form-entry-publish">Publish? <input type="checkbox" name="published" /></div>
+<div id="form-entry-submit"><input type="submit" value="Save entry" /></div>
+
+<script type="text/javascript">
+YUI().use("io-base", "node", "dump", "datasource-function", "datasource-polling", "datasource", function(Y) {
+  
+    var saveDraft = function() {
+
+    Y.io('/draft', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      /*data: {
+        title: document.forms[0].title.value,
+        body: document.forms[0].body.value
+      },
+      on: {
+        success: function (id, result) {
+        },
+        failure: function (id, result) {
+        }
+      }
+    })
+  },
+    
+  myDataSource = new Y.DataSource.Function({source:saveDraft}),
+        request = {
+            callback: {
+                success: function(e){
+                    Y.one("#demo_output_polling")
+                     .setContent("Draft saved: " +
+                                Y.dump(e.response.results[0]));
+                },
+                failure: function(e){
+                    Y.one("#demo_output_polling")
+                     .setContent("Could not retrieve data: " + e.error.message);
+                }
+            }
+        },
+        id = myDataSource.setInterval(10000, request); // Starts polling
+
+        myDataSource.clearInterval(id); // Ends polling*/
+});
+
+</script>
+

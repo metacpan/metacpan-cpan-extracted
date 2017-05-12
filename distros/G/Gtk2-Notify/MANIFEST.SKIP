@@ -1,0 +1,13 @@
+^build/
+^Gtk2-Notify-
+^\..*
+\.o$
+\.c$
+^_darcs/
+\.bak$
+\.bs$
+\.hsc$
+^Makefile\.old$
+^Makefile$
+^pm_to_blib$
+\bblib/

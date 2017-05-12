@@ -1,0 +1,10 @@
+<title><%= title %></title>
+%= javascript '/assets/jquery-1.9.1.min.js'
+%= javascript '/assets/bootstrap/js/bootstrap.min.js'
+%= stylesheet '/assets/bootstrap/css/bootstrap.min.css'
+%= humane_include
+
+%= content_for 'header'
+
+%= stylesheet $_ for @{config->{extra_css}}
+%= javascript $_ for @{config->{extra_js}}

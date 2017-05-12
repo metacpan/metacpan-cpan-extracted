@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+our $VERSION = '1.01'; # VERSION
+
+use POSIX qw(setlocale LC_ALL);
+use Getopt::Long;
+use GPX::PlotElevation;
+
+# this script is not localized
+setlocale(LC_ALL, 'C');
+
+our $help = 0;
+our $output;
+our $gpxfile;
+our ($width, $height) = (40, 10);
+
+if(!GetOptions(
+		'output|o=s' => \$output,
+		'gpxfile|i=s' => \$gpxfile,
+		'width|h=i' => \$width,
+		'height|h=i' => \$height,
+		"help" => \$help )) {
+        usage();
+}
+if($help) {
+        usage();
+}
+
+if(!defined($gpxfile) || ! -e $gpxfile) {
+	print "GPX inputfile was not given or does not exist!\n\n";
+	usage();
+}
+if(!defined($output)) {
+	print "No output file was given!\n\n";
+	usage();
+}
+
+sub usage {
+	print "plot-gpx [parameters]\n";
+	print "  -i|--gpxfile     GPX inputfile\n";
+	print "  -o|--output       Output\n";
+	print "  -w|--width       Graph width (in inches at 72dbi)\n";
+	print "  -h|--height      Graph height (in inches at 72dpi)\n";
+	print "  --help           print this.\n";
+	exit(0);
+}
+
+my $plot = GPX::PlotElevation->new(
+	'gpxfile' => $gpxfile,
+	'output' => $output,
+	'width' => $width,
+	'height' => $height,
+);
+$plot->calc();
+$plot->plot();
+

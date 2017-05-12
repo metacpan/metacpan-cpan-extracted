@@ -1,0 +1,43 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Component::RobotRules::Storage::DB_File.ja - robots.txt情報をDB_Fileに格納する
+
+=head1 SYNOPSIS
+
+  # In your config
+  components:
+    - RobotRules
+  robot_rules:
+    storage:
+      module: DB_File
+      config:
+        filename: '/path/to/storage.db'
+
+  # or elsewhere in your code
+  use Gungho::Component::RobotRules::Storage::DB_File;
+
+  my $storage = Gungho::Component::RobotRules::Storage::DB_File->new(
+    config => {
+      filename => '/path/to/storage.db'
+    }
+  );
+
+=head1 DESCRIPTION
+
+DB_File形式のファイルにrobots.txt情報を保存します。
+
+=head1 METHODS
+
+=head2 setup
+
+=head2 get_rule
+
+=head2 put_rule
+
+=head2 get_pending_robots_txt
+
+=head2 push_pending_robots_txt
+
+=cut

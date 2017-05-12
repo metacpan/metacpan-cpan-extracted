@@ -1,0 +1,17 @@
+# havok version=7.19
+ABSTRACT:     
+AUTHOR:    Jeffrey I Cohen (jcohen@cpan.org)
+LICENSE:    gpl
+NAME:    Genezzo::Havok
+PREREQ_HAVOK:    
+
+TABLEDEFS:    
+  havok:    
+    create_table:    hid=n modname=c owner=c creationdate=c flag=c version=c regdate=c
+    dml:    
+      -    i havok 1 Genezzo::Havok SYSTEM 2007-11-20T07:47:07 0 7.19
+
+
+
+UPDATED:    2007-11-20T00:02:48
+VERSION:    7.19

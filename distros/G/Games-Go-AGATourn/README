@@ -1,0 +1,27 @@
+Games::Go::AGATourn - pure-perl extension for AGA files and go tournaments
+===================
+
+The American Go Association (AGA) defines several file formats for
+keeping track of go players and running tournaments.  The
+Games::Go::AGATourn module handles parsing of AGA files.
+
+Note: A separate Games::Go::GoPair module is available for doing the
+work of running the tournament.
+
+
+HOW TO BUILD AND INSTALL
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+COPYRIGHT
+
+Copyright 1999-2005 by Reid Augustin (reid@hellosix.com).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+

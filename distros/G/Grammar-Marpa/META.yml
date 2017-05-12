@@ -1,0 +1,26 @@
+---
+abstract: 'Regexp-overloading wrapper around Marpa::R2::Scanless'
+author:
+  - 'Paul Bennett <paul.w.bennett@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Grammar-Marpa
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Marpa::R2: '2.074000'
+  overload: '0'
+  perl: '5.018000'
+  utf8: '0'
+version: '2.004'

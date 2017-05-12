@@ -1,0 +1,32 @@
+0.13   November 1, 2012
+   Test::Exception added to prereqs.    
+
+0.12   November 1, 2012
+
+0.11   October 28, 2012
+    I don't like how the old version (0.10) stringified to 0.1
+
+0.10   October 28, 2012
+    Default komi of 6.5
+    Scorable has score & winner methods.
+
+0.09   October 27, 2012
+    reanimate/deanimate return values:
+      - true if transanimation occurs, false otherwise.
+    Change scorable->terr to not include dead stones of the other color.
+
+0.08   October 22, 2012
+    Delta captures tracking fixes.
+
+0.07   October 20, 2012
+    New delta class.
+      - Has changes in turn & captures
+
+0.06   October 17, 2012
+    Dependencies fixed, misc minor changes
+
+0.05   October 16, 2012
+    Substantial improvements to basilisk::Rulemap
+      - NodeSets, States, MoveAttempts, Results, & Scorables
+      - Renamed after the cinderblock go server, in Games::Go:: namespace
+

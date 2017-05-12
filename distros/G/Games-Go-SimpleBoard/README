@@ -1,0 +1,110 @@
+NAME
+    Games::Go::SimpleBoard - represent a simple go board
+
+SYNOPSIS
+       use Games::Go::SimpleBoard;
+
+DESCRIPTION
+    Please supply a description )
+
+  EXPORTED CONSTANTS
+    Marker types for each board position (ORed together):
+
+       MARK_B            # normal black stone
+       MARK_W            # normal whit stone
+       MARK_GRAYED       # in conjunction with MARK_[BW], grays the stone
+
+       MARK_SMALL_B      # small stone, used for scoring or marking
+       MARK_SMALL_W      # small stone, used for scoring or marking
+       MARK_SMALL_GRAYED # in conjunction with MARK_SMALL_[BW], grays the stone
+
+       MARK_TRIANGLE     # triangle mark
+       MARK_SQUARE       # square mark
+       MARK_CIRCLE       # circle mark
+       MARK_CROSS        # cross mark
+
+       MARK_LABEL        # a text label
+       MARK_HOSHI        # this is a hoshi point (not used much)
+       MARK_MOVE         # this is a regular move
+       MARK_KO           # this is a ko position
+       MARK_REDRAW       # ignored, can be used for your own purposes
+
+       COLOUR_WHITE      # guaranteed to be 0
+       COLOUR_BLACK      # guaranteed to be 1
+
+       MOVE_HANDICAP     # used as "x-coordinate" for handicap moves
+       MOVE_PASS         # can be used as "x-coordinate" for pass moves
+
+  METHODS
+    my $board = new $size
+        Creates a new empty board of the given size.
+
+        "$board->{size}" stores the board size.
+
+        "$board->{max}" stores the maximum board coordinate (size-1).
+
+        "$board->{captures}[COLOUR_xxx]" stores the number of captured
+        stones for the given colour.
+
+        "$board->{board}" stores a two-dimensional array with board
+        contents.
+
+    $hint = $board->update ([update-structures...])
+        Each update-structure itself is also an array-ref:
+
+           [$x, $y, $clr, $set, $label, $hint] # update or move
+           [MOVE_HANDICAP, $handicap]          # black move, setup handicap
+           [MOVE_PASS]                         # pass
+           []                                  # also pass (deprecated!)
+
+        It changes the board or executes a move, by first clearing the bits
+        specified in $clr, then setting bits specified in $set.
+
+        If $set includes "MARK_LABEL", the label text must be given in
+        $label.
+
+        If $set contains "MARK_MOVE" then surrounded stones will be removed
+        from the board and (simple) Kos are detected and marked with square
+        symbols and "MARK_KO", after removing other marking symbols. The
+        markings are also removed with the next next update structure that
+        uses "MARK_MOVE", so this flag is suited well for marking, well,
+        moves. Note that you can make invalid "moves" (such as suicide) and
+        "update" will try to cope with it. You can use "is_valid_move" to
+        avoid making illegal moves.
+
+        For handicap "moves", currently only board sizes 9, 13 and 19 are
+        supported and only handicap values from 2 to 9. The placement
+        follows the IGS rules, if you want other placements, you have to set
+        it up yourself.
+
+        This function modifies the $hint member of the specified structure
+        to speed up repeated board generation and updates with the same
+        update structures.
+
+        If the hint member is a reference the scalar pointed to by the
+        reference is updated instead.
+
+        If all this hint member thing is confusing, just ignore it and
+        specify it as "undef" or leave it out of the array entirely. Do make
+        sure that you keep your update structures around as long as previous
+        updates don't change, however, as regenerating a full board position
+        from hinted update structures is *much* faster then recreating it
+        from fresh update structures.
+
+        Example, make two silly moves:
+
+          $board->update ([[0, 18, -1, MARK_B | MARK_MOVE],
+                           [0, 17, -1, MARK_W | MARK_MOVE]]);
+
+    $board->is_valid_move ($colour, $x, $y[, $may_suicide])
+        Returns true if the move of the given colour on the given
+        coordinates is valid or not. Kos are taken into account as long as
+        they are marked with "MARK_KO". Suicides are invalid unless
+        $may_suicide is true (e.g. for new zealand rules)
+
+  AUTHOR
+    Marc Lehmann <schmorp@schmorp.de>
+
+  SEE ALSO
+    Gtk2::GoBoard.
+

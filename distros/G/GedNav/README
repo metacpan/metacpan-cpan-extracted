@@ -1,0 +1,55 @@
+
+GedNav - Perl extension for quick navigation of GEDCOM files
+
+COPYRIGHT
+
+Copyright (c) 1999 Rob Fugina. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+IMPORTANT NOTES
+
+THIS IS ALPHA SOFTWARE.
+
+Some testing has been done, and I'm sure there are bugs left.
+
+As for additional features:  tell me what you want...
+
+The GedNav pod section will be the main documentation, but it's not
+really there yet...  :)
+
+DESCRIPTION
+
+This is the alpha release 0.02 of the GedNav module.
+
+REQUIREMENTS
+
+GedNav was developed using Perl 5.005_03.  Maybe it'll work with older
+versions.  Maybe not.
+
+It is written only in Perl, with standard distribution modules, so you
+don't need any compiler nor special modules.  There are several modules
+required that are not included with the standard Pel distribution:
+Text::Soundex and GDBM_File, to name just a couple.  All required modules
+should be noted by running Makefile.PL.
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+WARRANTY
+
+This software comes with absolutly NO WARRANTY of any kind.
+I just hope it can be useful.
+
+FEEDBACK
+
+Send feedback, comments and bug reports to:
+
+Rob Fugina
+robf@fugina.com
+
+

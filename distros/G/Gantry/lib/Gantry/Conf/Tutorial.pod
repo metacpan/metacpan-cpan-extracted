@@ -1,0 +1,314 @@
+=head1 NAME
+
+Gantry::Conf::Tutorial - Tutorial on how to use Gantry::Conf
+
+=head1 INTRO
+
+This document explains both how to use Gantry::Conf to configure
+a set of applications and how to extend Gantry::Conf to suit your needs.
+
+=head1 CONFIGURING
+
+Gantry::Conf uses a central config file to control how a set of applications
+bootstrap their own configuration.  By default, this file live in
+/etc/gantry.conf, but you can control that, see below.  That file is parsed
+by Config::General and looks something like this:
+
+    <global>
+        database_server_name ourdb.ourcompany.com
+    </global>
+
+    <shared appearance>
+        background white
+        foreground blue
+    </shared>
+
+    <instance app1>
+        ConfigureVia FlatFile Config::General /path/to/file
+        use appearance
+    </instance>
+
+    <instance app2>
+        ConfigureVia HTTP Config::General http://conf.oc.com/conf
+        use appearance
+    </instance>
+
+    <instance right_here>
+        var   value
+        color blue
+    </instance>
+
+    include /etc/gantry.d/*.conf
+
+Then in /etc/gantry.d/app3.conf:
+
+    <instance app3>
+        ConfigureVia FlatFile Config::Tiny /path/to/conf
+        ConfigureVia HTTP Config::General http://conf.oc.com/conf
+    </instance>
+
+Each application instance has a section in this file, unless its instance
+can be gleaned from /etc/gantry.d.  This allows not only multiple apps, but
+also multiple instances of the same app running in the same server.  The
+instance name must be unique and is what the app uses to find its conf.
+
+In the instance block, you may choose to define conf variables and their
+values directly (as the C<right_here> instance does above).  Otherwise,
+the core of any instance's configuration is the ConfigureVia
+statement(s).  The form of these statments vary by the configuration
+method.
+
+The methods supported are:
+
+=over 4
+
+=item PerlSetVar
+
+This method is designed for use in a mod_perl setting.  Here's a typical
+example:
+
+    <instance inmod_perl>
+        ConfigureVia PerlSetVar
+        LoadParameters the variables you need here note the \
+                       backslash allowed by Config General
+    </instance>
+
+The listed parameters are loaded using dir_config on the apache
+request object.
+
+In the future, it may be possible to use this method outside of mod_perl.
+In that case, you will have to factor out the part of the apache conf
+relating to this application into a separate file and include:
+
+    ApacheConfigFile /path/to/your.conf
+
+This will only be used outside of mod_perl.
+
+Note that this feature is not yet available and may never be.
+
+=item ParamBuilder
+
+This method is not yet available, but it will work like PerlSetVar above,
+except it will expect to see variables defined for ParamBuilder use.
+
+=item FlatFile
+
+Use this if you keep your conf in one or more flat files somewhere on
+your local system.
+
+    <instance app>
+        ConfigureVia FlatFile Config::General file1 [file2...]
+    </instance>
+
+In this case, I chose to use Config::General to parse the file.  The
+other current choice is Config::Tiny.  If you need a different flat
+file syntax, you need to implement a provider for it, see
+L<EXTENDING Gantry::Conf>.
+
+See the perldoc for your provider for the syntax your conf file must follow.
+
+=item SQL
+
+=item HTTP
+
+If your conf is available through the web, via http or https use
+this method to retrieve your config information from a remote system: 
+
+    <instance app>
+        ConfigureVia HTTP Config::General url [url...]
+    </instance>
+
+You can use all the same providers for the HTTP method as you use for
+the FlatFile method.  That provider is responsible for converting the
+response from the server into a conf hash.
+
+To include apache basic auth information, add it to the url:
+
+    http://user:pass@host.example.com/path/to/conf
+
+Note that ssl is supported (by LWP), so you can use https://... to keep
+your configuration information from traveling in the clear. 
+
+=item Default
+
+Normally, you get the default merely by omitting the ConfigureVia statement
+from an instance block.  Then the configuration must be included
+directly in Gantry::Conf format in the <instance> block.
+
+=back
+
+Any instance can share conf with other instances in three ways:
+
+=over 4
+
+=item repeated ConfigureVia statements
+
+Each instance block can have as many ConfigureVia statements as you want.
+Earlier ones have precedence.  In the example above, the app3 instance has
+its own flat file of conf information, but also refers to the http served
+conf that app2 is using.
+
+I'll say it again: precedence goes the earliest file listed. So if you
+have an instance that looks like this: 
+
+  <instance appoverride> 
+    ConfigureVia FlatFile Config::Tiny /etc/appoverride.conf 
+    ConfigureVia HTTP Config::General http://dev.domain.com/main.conf 
+  </instance> 
+
+then any configuration options in /etc/appoverride.conf 
+will override those found in the remote http://dev.domain.com/main.conf.  
+
+=item global
+
+If you define a global block, all instances will have the variables defined
+in it included in their conf hashes.  To override a global, define the
+same variable in the conf data source of one of your ConfigVia statements.
+In the example above, all three instances share the database_server_name
+variable (unless their individual conf data sources define the same variable).
+
+=item use
+
+If two or more apps need to share a set of configuration options which 
+you want to define directly in the Gantry::Conf file, put them in a 
+shared block.  Then include a use statement in each instance block 
+which should share this data.  To override a shared variable, define 
+the same variable in the conf data source of one of your ConfigVia 
+statements.  In the example above, app1 and app2 share all the variables 
+in the appearance shared block.
+
+=back
+
+The precedence is:
+
+=over 4
+
+=item 1.
+
+ConfigVia statements in the order they appear.
+
+=item 2.
+
+Any variables declared in the global block.
+
+=item 3.
+
+Any shared blocks used by the instance in the order they appear.
+
+=back
+
+Note that you may use C<include> at any point passing it a shell style
+file glob.  Any matching files will be included at that point as if typed
+there.  This is highly convenient for separating config information into
+separate files by app.  Then your master config file (/etc/gantry.conf)
+might be as simple as:
+
+    include /etc/gantr.d/*.conf
+
+=head1 USING A CONFIGURATION
+
+Once you have a configuration for your applications, you can load the
+conf easily through the C<<Gantry::Conf->retrieve method>>:
+
+    use Gantry::Conf;
+
+    my $conf = Gantry::Conf->retrieve(
+        {
+            instance    => 'app1',
+            config_file => '/etc/gantry.confs/standard.conf',
+        }
+    );
+
+When using Gantry::Conf with mod_perl you should specify the
+config file inside of a Perl block or your apache startup file
+as follows:
+
+    use Gantry::Conf qw(-Config=/etc/gantry.conf)
+
+Failure to do so will cause Gantry::Conf to reload its configuration
+on each request.
+
+When calling retrieve, you must provide the parameters by name in a hash
+reference.  The only required key is C<instance>.  Gantry::Conf will look
+for the instance in the C<config_file>.  By default the config_file is
+C</etc/gantry.conf>.  If your config files use GantryLocation blocks,
+like this:
+
+    level_name top
+    all_share 5
+    reset 5
+
+    <GantryLocation /second>
+        level_name second
+        reset 4
+    </GantryLevel>
+
+    <GantryLocation /second/nested>
+        level_name second.nested
+        reset 2
+    </GantryLevel>
+
+You can pass C<location> to retrieve, then you will get the values for
+the specified location.  Note that parameters are not inherited from
+"parent" locations.  All locations are thought to be independent.
+Thus, if C</second/nested> above did not define C<reset>, its value for
+it would be 5 (inherited from the top level) and not 4 (which C</second>
+defined).
+
+=head1 EXTENDING Gantry::Conf
+
+You can implement your own providers for FlatFile and SQL configuration
+methods.  (Note that FlatFile providers are also HTTP providers.)
+
+To implement your own FlatFile provider name it like this:
+
+    package Gantry::Conf::Provider::Module;
+
+Then put a method in it called config which is called as a class method
+taking a single parameter.  For example, here is the whole Config::General
+provider:
+
+    package Gantry::Conf::Provider::FlatFile::Config::General;
+
+    use strict;
+    use warnings;
+
+    use Carp qw(croak);
+
+    use Config::General;
+    use Gantry::Conf::Provider;
+    use base qw( Gantry::Conf::Provider );
+
+    sub config {
+        my $self    =   shift;
+        my $file    =   shift;
+
+        my $config = Config::General->new( $file ) or
+                croak "Unable to create Config::General object: $!";
+
+        my %confs = $config->getall;
+
+        return( \%confs );
+
+    } # END config
+
+=head1 SEE ALSO
+
+Gantry(3), Gantry::Conf(3), Ganty::Conf::FAQ(3)
+
+=head1 AUTHOR
+
+Phil Crow <pcrow@sunflowerbroadband.com>
+
+Frank Wiles <frank@revsys.com> 
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2006, Frank Wiles. 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

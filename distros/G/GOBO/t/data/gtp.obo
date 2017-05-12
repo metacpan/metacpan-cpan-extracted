@@ -1,0 +1,349 @@
+format-version: 1.2
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+
+[Term]
+id: GO:0000166
+name: nucleotide binding
+namespace: molecular_function
+def: "Interacting selectively with a nucleotide, any compound consisting of a nucleoside that is esterified with (ortho)phosphate or an oligophosphate at any hydroxyl group on the ribose or deoxyribose moiety." [GOC:mah, ISBN:0198547684]
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0005488  ! binding
+
+[Term]
+id: GO:0003674
+name: molecular_function
+namespace: molecular_function
+alt_id: GO:0005554
+def: "Elemental activities, such as catalysis or binding, describing the actions of a gene product at the molecular level. A given gene product may exhibit one or more molecular functions." [GOC:go_curators]
+comment: Note that, in addition to forming the root of the molecular function ontology, this term is recommended for use for the annotation of gene products whose molecular function is unknown. Note that when this term is used for annotation, it indicates that no information was available about the molecular function of the gene product annotated as of the date the annotation was made; the evidence code ND, no data, is used to indicate this.
+subset: goslim_candida  ! Candida GO slim
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: goslim_yeast  ! Yeast GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "molecular function" EXACT []
+synonym: "molecular function unknown" NARROW []
+
+[Term]
+id: GO:0005488
+name: binding
+namespace: molecular_function
+def: "The selective, often stoichiometric, interaction of a molecule with one or more specific sites on another molecule." [GOC:ceb, GOC:mah, ISBN:0198506732]
+comment: For ligands that bind to signal transducing receptors, consider the molecular function term 'receptor binding ; GO:0005102' and its children.
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "ligand" NARROW []
+xref: Wikipedia:Binding_(molecular)
+is_a: GO:0003674  ! molecular_function
+
+[Term]
+id: GO:0005525
+name: GTP binding
+namespace: molecular_function
+def: "Interacting selectively with GTP, guanosine triphosphate." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0032561  ! guanyl ribonucleotide binding
+
+[Term]
+id: GO:0006139
+name: nucleobase, nucleoside, nucleotide and nucleic acid metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways involving nucleobases, nucleosides, nucleotides and nucleic acids." [GOC:ai]
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "nucleobase, nucleoside, nucleotide and nucleic acid metabolism" EXACT []
+is_a: GO:0044237  ! cellular metabolic process
+is_a: GO:0044238  ! primary metabolic process
+
+[Term]
+id: GO:0008150
+name: biological_process
+namespace: biological_process
+alt_id: GO:0000004
+alt_id: GO:0007582
+def: "Any process specifically pertinent to the functioning of integrated living units: cells, tissues, organs, and organisms. A process is a collection of molecular events with a defined beginning and end." [GOC:go_curators, GOC:isa_complete]
+comment: Note that, in addition to forming the root of the biological process ontology, this term is recommended for use for the annotation of gene products whose biological process is unknown. Note that when this term is used for annotation, it indicates that no information was available about the biological process of the gene product annotated as of the date the annotation was made; the evidence code ND, no data, is used to indicate this.
+subset: goslim_candida  ! Candida GO slim
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: goslim_yeast  ! Yeast GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "biological process" EXACT []
+synonym: "biological process unknown" NARROW []
+synonym: "physiological process" EXACT []
+xref: Wikipedia:Biological_process
+
+[Term]
+id: GO:0008152
+name: metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways, including anabolism and catabolism, by which living organisms transform chemical substances. Metabolic processes typically transform small molecules, but also include macromolecular processes such as DNA repair and replication, and protein synthesis and degradation." [GOC:go_curators, ISBN:0198547684]
+comment: Note that metabolic processes do not include single functions or processes such as protein-protein interactions, protein-nucleic acids, nor receptor-ligand interactions.
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "metabolic process resulting in cell growth" NARROW []
+synonym: "metabolism" EXACT []
+synonym: "metabolism resulting in cell growth" NARROW []
+is_a: GO:0008150  ! biological_process
+
+[Term]
+id: GO:0009058
+name: biosynthetic process
+namespace: biological_process
+def: "The chemical reactions and pathways resulting in the formation of substances; typically the energy-requiring part of metabolism in which simpler substances are transformed into more complex ones." [GOC:curators, ISBN:0198547684]
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_plant  ! Plant GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "anabolism" EXACT []
+synonym: "biosynthesis" EXACT []
+synonym: "formation" EXACT []
+synonym: "synthesis" EXACT []
+xref: Wikipedia:Anabolism
+is_a: GO:0008152  ! metabolic process
+
+[Term]
+id: GO:0009116
+name: nucleoside metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways involving a nucleoside, a nucleobase linked to either beta-D-ribofuranose (ribonucleoside) or 2-deoxy-beta-D-ribofuranose, (a deoxyribonucleotide), e.g. adenosine, guanosine, inosine, cytidine, uridine and deoxyadenosine, deoxyguanosine, deoxycytidine and thymidine (= deoxythymidine)." [GOC:ma]
+subset: goslim_pir  ! PIR GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "nucleoside metabolism" EXACT []
+is_a: GO:0055086  ! nucleobase, nucleoside and nucleotide metabolic process
+
+[Term]
+id: GO:0009120
+name: deoxyribonucleoside metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways involving any one of a family of organic molecules consisting of a purine or pyrimidine base covalently bonded to a sugar deoxyribose (a deoxyribonucleoside)." [GOC:jl, ISBN:0140512713]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "deoxyribonucleoside metabolism" EXACT []
+is_a: GO:0009116  ! nucleoside metabolic process
+
+[Term]
+id: GO:0009163
+name: nucleoside biosynthetic process
+namespace: biological_process
+def: "The chemical reactions and pathways resulting in the formation of any one of a family of organic molecules consisting of a purine or pyrimidine base covalently bonded to a sugar ribose (a ribonucleoside) or deoxyribose (a deoxyribonucleoside)." [GOC:jl, ISBN:0140512713]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "nucleoside anabolism" EXACT []
+synonym: "nucleoside biosynthesis" EXACT []
+synonym: "nucleoside formation" EXACT []
+synonym: "nucleoside synthesis" EXACT []
+is_a: GO:0009116  ! nucleoside metabolic process
+is_a: GO:0034404  ! nucleobase, nucleoside and nucleotide biosynthetic process
+
+[Term]
+id: GO:0009987
+name: cellular process
+namespace: biological_process
+alt_id: GO:0008151
+alt_id: GO:0050875
+def: "Any process that is carried out at the cellular level, but not necessarily restricted to a single cell. For example, cell communication occurs among more than one cell, but occurs at the cellular level." [GOC:go_curators, GOC:isa_complete]
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "cell growth and/or maintenance" NARROW []
+synonym: "cell physiology" EXACT []
+synonym: "cellular physiological process" EXACT []
+is_a: GO:0008150  ! biological_process
+
+[Term]
+id: GO:0017076
+name: purine nucleotide binding
+namespace: molecular_function
+def: "Interacting selectively with purine nucleotides, any compound consisting of a purine nucleoside esterified with (ortho)phosphate." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0000166  ! nucleotide binding
+relationship: part_of GO:0046123  !  ** FOR TESTING PURPOSES ONLY ** purine deoxyribonucleoside biosynthetic process
+
+[Term]
+id: GO:0019001
+name: guanyl nucleotide binding
+namespace: molecular_function
+def: "Interacting selectively with guanyl nucleotides, any compound consisting of guanosine esterified with (ortho)phosphate." [ISBN:0198506732]
+subset: gosubset_prok  ! Prokaryotic GO subset
+xref: Reactome:6405
+is_a: GO:0017076  ! purine nucleotide binding
+
+[Term]
+id: GO:0032553
+name: ribonucleotide binding
+namespace: molecular_function
+def: "Interacting selectively with a ribonucleotide, any compound consisting of a ribonucleoside that is esterified with (ortho)phosphate or an oligophosphate at any hydroxyl group on the ribose moiety." [GOC:mah]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0000166  ! nucleotide binding
+
+[Term]
+id: GO:0032555
+name: purine ribonucleotide binding
+namespace: molecular_function
+def: "Interacting selectively with a purine ribonucleotide, any compound consisting of a purine ribonucleoside that is esterified with (ortho)phosphate or an oligophosphate at any hydroxyl group on the ribose moiety." [GOC:mah]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0017076  ! purine nucleotide binding
+is_a: GO:0032553  ! ribonucleotide binding
+
+[Term]
+id: GO:0032561
+name: guanyl ribonucleotide binding
+namespace: molecular_function
+def: "Interacting selectively with a guanyl ribonucleotide, any compound consisting of guanosine esterified with (ortho)phosphate or an oligophosphate at any hydroxyl group on the ribose moiety." [GOC:mah]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0019001  ! guanyl nucleotide binding
+is_a: GO:0032555  ! purine ribonucleotide binding
+
+[Term]
+id: GO:0034404
+name: nucleobase, nucleoside and nucleotide biosynthetic process
+namespace: biological_process
+def: "The chemical reactions and pathways resulting in the formation of nucleobases, nucleosides and nucleotides." [GOC:mah]
+synonym: "nucleobase, nucleoside and nucleotide anabolism" EXACT []
+synonym: "nucleobase, nucleoside and nucleotide biosynthesis" EXACT []
+synonym: "nucleobase, nucleoside and nucleotide formation" EXACT []
+synonym: "nucleobase, nucleoside and nucleotide synthesis" EXACT []
+is_a: GO:0034654  ! nucleobase, nucleoside, nucleotide and nucleic acid biosynthetic process
+is_a: GO:0055086  ! nucleobase, nucleoside and nucleotide metabolic process
+
+[Term]
+id: GO:0034654
+name: nucleobase, nucleoside, nucleotide and nucleic acid biosynthetic process
+namespace: biological_process
+def: "The chemical reactions and pathways resulting in the formation of nucleobases, nucleosides, nucleotides and nucleic acids." [GOC:mah]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "nucleobase, nucleoside, nucleotide and nucleic acid anabolism" EXACT []
+synonym: "nucleobase, nucleoside, nucleotide and nucleic acid biosynthesis" EXACT []
+synonym: "nucleobase, nucleoside, nucleotide and nucleic acid formation" EXACT []
+synonym: "nucleobase, nucleoside, nucleotide and nucleic acid synthesis" EXACT []
+is_a: GO:0006139  ! nucleobase, nucleoside, nucleotide and nucleic acid metabolic process
+is_a: GO:0044249  ! cellular biosynthetic process
+
+[Term]
+id: GO:0042278
+name: purine nucleoside metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways involving one of a family of organic molecules consisting of a purine base covalently bonded to a sugar ribose (a ribonucleoside) or deoxyribose (a deoxyribonucleoside)." [GOC:jl, ISBN:0140512713]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "purine metabolic process" BROAD []
+synonym: "purine metabolism" BROAD []
+synonym: "purine nucleoside metabolism" EXACT []
+is_a: GO:0009116  ! nucleoside metabolic process
+
+[Term]
+id: GO:0042451
+name: purine nucleoside biosynthetic process
+namespace: biological_process
+def: "The chemical reactions and pathways resulting in the formation of any purine nucleoside, one of a family of organic molecules consisting of a purine base covalently bonded to a sugar ribose (a ribonucleoside) or deoxyribose (a deoxyribonucleoside)." [GOC:go_curators]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "purine nucleoside anabolism" EXACT []
+synonym: "purine nucleoside biosynthesis" EXACT []
+synonym: "purine nucleoside formation" EXACT []
+synonym: "purine nucleoside synthesis" EXACT []
+is_a: GO:0009163  ! nucleoside biosynthetic process
+is_a: GO:0042278  ! purine nucleoside metabolic process
+
+[Term]
+id: GO:0044237
+name: cellular metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways by which individual cells transform chemical substances." [GOC:go_curators]
+subset: goslim_pir  ! PIR GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "cellular metabolism" EXACT []
+synonym: "intermediary metabolism" RELATED [GOC:mah]
+is_a: GO:0008152  ! metabolic process
+is_a: GO:0009987  ! cellular process
+
+[Term]
+id: GO:0044238
+name: primary metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways involving those compounds which are formed as a part of the normal anabolic and catabolic processes. These processes take place in most, if not all, cells of the organism." [GOC:go_curators, http://www.metacyc.org]
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_pir  ! PIR GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "primary metabolism" EXACT []
+is_a: GO:0008152  ! metabolic process
+
+[Term]
+id: GO:0044249
+name: cellular biosynthetic process
+namespace: biological_process
+def: "The chemical reactions and pathways resulting in the formation of substances, carried out by individual cells." [GOC:jl]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "cellular anabolism" EXACT []
+synonym: "cellular biosynthesis" EXACT []
+synonym: "cellular formation" EXACT []
+synonym: "cellular synthesis" EXACT []
+is_a: GO:0009058  ! biosynthetic process
+is_a: GO:0044237  ! cellular metabolic process
+
+[Term]
+id: GO:0046120
+name: deoxyribonucleoside biosynthetic process
+namespace: biological_process
+def: "The chemical reactions and pathways resulting in the formation of any one of a family of organic molecules consisting of a purine or pyrimidine base covalently bonded to a sugar deoxyribose (a deoxyribonucleoside)." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "deoxyribonucleoside anabolism" EXACT []
+synonym: "deoxyribonucleoside biosynthesis" EXACT []
+synonym: "deoxyribonucleoside formation" EXACT []
+synonym: "deoxyribonucleoside synthesis" EXACT []
+is_a: GO:0009120  ! deoxyribonucleoside metabolic process
+is_a: GO:0009163  ! nucleoside biosynthetic process
+
+[Term]
+id: GO:0046122
+name: purine deoxyribonucleoside metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways involving any one of a family of organic molecules consisting of a purine base covalently bonded to a sugar deoxyribose (a deoxyribonucleoside)." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "purine deoxyribonucleoside metabolism" EXACT []
+is_a: GO:0009120  ! deoxyribonucleoside metabolic process
+is_a: GO:0042278  ! purine nucleoside metabolic process
+
+[Term]
+id: GO:0046123
+name: purine deoxyribonucleoside biosynthetic process
+namespace: biological_process
+def: "The chemical reactions and pathways resulting in the formation of any purine deoxyribonucleoside, one of a family of organic molecules consisting of a purine base covalently bonded to a sugar deoxyribose (a deoxyribonucleoside)." [GOC:ai]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "purine deoxyribonucleoside anabolism" EXACT []
+synonym: "purine deoxyribonucleoside biosynthesis" EXACT []
+synonym: "purine deoxyribonucleoside formation" EXACT []
+synonym: "purine deoxyribonucleoside synthesis" EXACT []
+is_a: GO:0042451  ! purine nucleoside biosynthetic process
+is_a: GO:0046120  ! deoxyribonucleoside biosynthetic process
+is_a: GO:0046122  ! purine deoxyribonucleoside metabolic process
+
+[Term]
+id: GO:0055086
+name: nucleobase, nucleoside and nucleotide metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways involving nucleobases, nucleosides and nucleotides." [GOC:vw]
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "nucleobase, nucleoside and nucleotide metabolism" EXACT []
+is_a: GO:0006139  ! nucleobase, nucleoside, nucleotide and nucleic acid metabolic process
+

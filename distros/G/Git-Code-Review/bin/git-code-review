@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+# PODNAME: git-code-review
+# ABSTRACT: Dispatches commands to the appropriate places
+
+use Git::Code::Review;
+Git::Code::Review->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+git-code-review - Dispatches commands to the appropriate places
+
+=head1 VERSION
+
+version 2.6
+
+=head1 AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

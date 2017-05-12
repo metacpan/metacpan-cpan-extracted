@@ -1,0 +1,25 @@
+---
+abstract: 'Parses git commit information in post-receive hook scripts'
+author:
+  - 'Yo-An Lin'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Hook-PostReceive
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/c9s/Git-Hook-PostReceive/issues
+  homepage: https://github.com/c9s/Git-Hook-PostReceive
+  repository: https://github.com/c9s/Git-Hook-PostReceive.git
+version: '0.3'
+x_contributors:
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Yo-An Lin (林佑安) <cornelius@cpan.org>'
+  - 'c9s <yoanlin93@gmail.com>'

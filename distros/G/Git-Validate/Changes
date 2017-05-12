@@ -1,0 +1,8 @@
+Revision history for Git-Validate
+
+0.001001  2015-05-17 09:17:56-05:00 America/Chicago
+ - Fix grammar and POD errors (GH#2) (Thanks Philippe Bruhat!)
+ - Abandon RT
+
+0.001000 Fri Nov 08 22:19 2013 CST
+ - Initial Release

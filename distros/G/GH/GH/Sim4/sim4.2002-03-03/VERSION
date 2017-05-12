@@ -1,0 +1,92 @@
+Sat Dec 23 05:29:44 EDT 2001
+Xtend1.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+Xtend1.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+align.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+align.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+args.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+args.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+charvec.c:
+
+charvec.h:
+
+discrim.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+discrim.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+dna.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+dna.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+encoding.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+encoding.h:
+
+libc.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+misc.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+misc.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+poly.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+poly.h:
+
+prnt.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+prnt.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+psublast.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+seq.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+seq.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+seq_read.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+sim4.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+sim4.init.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+sim4b1.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+sim4b1.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+splice.c:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+splice.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $
+
+types.h:
+     $Id: VERSION,v 1.1 2002/12/03 20:12:37 hartzell Exp $

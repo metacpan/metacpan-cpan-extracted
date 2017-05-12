@@ -1,0 +1,6 @@
+Revision history for Perl extension Geomag::Kyoto::Dst.
+
+0.01  Fri Oct 21 12:03:17 2005
+	- original version; created by h2xs 1.23 with options
+		-OX -n Geomag::Kyoto::Dst -f -b 5.8.0
+

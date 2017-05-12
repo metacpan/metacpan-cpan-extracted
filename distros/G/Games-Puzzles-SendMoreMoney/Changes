@@ -1,0 +1,11 @@
+######################################################################
+Revision history for Perl extension Games::Puzzles::SendMoreMoney
+
+0.03 2009/03/28
+  (ms) Corrected prereqs in Makefile.PL
+
+0.02 2005/07/07
+  * Updated documentation for eg/smm
+
+0.01 2005/05/08
+  * Where it all began

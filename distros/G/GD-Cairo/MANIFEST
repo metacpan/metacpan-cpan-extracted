@@ -1,0 +1,13 @@
+Changes
+examples/Vera.ttf
+lib/GD/Cairo.pm
+Makefile.PL
+MANIFEST
+README
+t/01-missing.t
+t/02-newfrom.t
+t/03-brush.t
+t/04-getpixel.t
+t/05-export.t
+t/GD-Cairo.t
+META.yml                                 Module meta-data (added by MakeMaker)

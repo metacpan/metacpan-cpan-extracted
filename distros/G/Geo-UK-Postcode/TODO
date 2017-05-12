@@ -1,0 +1,18 @@
+=head1 TODO
+
+=over
+
+=item Handle non-geographic postcodes
+
+=item Handle British overseas territories
+
+=item Handle special case postcodes, like GIR 0AA and SAN TA1
+
+=item Find out which BX non-geographical districts are used.
+
+=item handle BFPO
+
+=item cleanup method to correct common errors
+
+=back
+

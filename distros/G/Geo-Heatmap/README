@@ -1,0 +1,88 @@
+NAME
+    Geo::Heatmap - generate a density map (aka heatmap) overlay layer for
+    Google Maps, see the www directory in the distro how it works
+
+    see the script directory for creating a scale
+
+    for a real life example see
+
+    http://www.trust-box.at/dev/gm/GoogleMapsHeatmap/www/GoogleMapsHeatmap.h
+    tml
+
+    for Dokumentation see
+
+HOMEPAGE
+    http://www.trust-box.at/googlemaps-geoheatmap/
+
+REQUIRES
+      Moose
+      CHI
+      Imager
+
+METHODS
+  tile
+      tile();
+
+      return the tile image in png format
+
+ATTRIBUTES
+      debug
+      cache
+      logfile
+      return_points
+      zoom_scale
+      palette
+
+  USAGE
+    Create a Heatmap layer for GoogleMaps
+
+   The HTML part
+   The (f)cgi part
+    You need a color palette (one is included) to encode values to colors,
+    in Storable Format as an arrayref of arrayrefs eg
+
+        [50] = [34, 45, 56]
+
+    which means that a normalized value of 50 would lead to an RGB color of
+    34% red , 45% blue, 56% green.
+
+    zoom_scale
+        The maximum number of points for a given google zoom scale. You
+        would be able to extract to values from the denisity log or derive
+        them from your data in some cunning way
+
+    cache
+        You need some caching for the tiles otherwise the map would be quite
+        slow. Use a CHI object with the cache you like
+
+    return_points
+        A function reference which expects a single hashref as a parameter
+        which defines two LAT/LONG points to get all data points within this
+        box:
+
+              $r->{LATN}, $r->{LNGW}), $r->{LATS}, $r->{LNGE}
+
+        The function has to return an arrayref of arrayrefs of the points
+        within the box
+
+    tile
+        Returns the rendered image
+
+REPOSITORY
+    <https://github.com/MarkHofstetter/GoogleMapsHeatmap>
+
+AUTHOR
+    Mark Hofstetter <hofstettm@cpan.org>
+
+      Thanks to 
+      brian d foy
+      Marcel Gruenauer
+      David Steinbrunner
+
+TODO
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Mark Hofstetter
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

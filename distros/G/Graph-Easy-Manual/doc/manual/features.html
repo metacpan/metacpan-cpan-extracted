@@ -1,0 +1,560 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+ <title>Graph::Easy - Manual - Features</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <meta name="MSSmartTagsPreventParsing" content="TRUE">
+ <meta http-equiv="imagetoolbar" content="no">
+ <link rel="stylesheet" type="text/css" href="../base.css">
+ <link rel="stylesheet" type="text/css" href="manual.css">
+ <link rel="stylesheet" type="text/css" href="teamwork.css">
+ <link rel="Start" href="index.html">
+ <link href="http://bloodgate.com/mail.html" rev="made">
+ <!-- compliance patch for microsoft browsers -->
+ <!--[if lt IE 7]><script src="http://bloodgate.com/ie7/ie7-standard-p.js" type="text/javascript"></script><![endif]-->
+</head>
+<body bgcolor=white text=black>
+
+<a name="top"></a>
+
+<div class="menu">
+  <a class="menubck" href="index.html" title="Back to the manual index">Index</a>
+  <p style="height: 0.2em">&nbsp;</p>
+
+  <a class="menuext" href="overview.html" title="How everything fits together">Overview</a>
+  <a class="menucur" href="features.html" title="Feature list - what is possible with Graph::Easy">Features</a>
+    <a class="menuind" href="#unicode" title="Graph::Easy supports Unicode">Unicode</a>
+    <a class="menuind" href="#multinode" title="Nodes with the same text displayed">Multi-Node</a>
+    <a class="menuind" href="#anon" title="Anonymous and invisible nodes">Anon Nodes</a>
+    <a class="menuind" href="#multiedge" title="More than one edge from A to B">Multi-Edge</a>
+    <a class="menuind" href="#selfloops" title="From one node back to itself">Self-Loops</a>
+    <a class="menuind" href="#edges" title="A node as edge-part">Node-Edges</a>
+    <a class="menuind" href="#directions" title="Undirected and bidirectional edges">Directions</a>
+    <a class="menuind" href="#clusters" title="Group things together">Clusters</a>
+    <a class="menuind" href="#joints" title="Edges that join or split">Joints</a>
+    <a class="menuind" href="#flow" title="Flow directions">Flow</a>
+    <a class="menuind" href="#colors" title="Colors, shapes and styles">Colors</a>
+  <a class="menuext" href="layouter.html" title="How the layouter works">Layouter</a>
+  <a class="menuext" href="hinting.html" title="Generating specific layouts">Hinting</a>
+  <a class="menuext" href="output.html" title="Output formats and their limitations">Output</a>
+  <a class="menuext" href="syntax.html" title="Syntax rules for the text format">Syntax</a>
+  <a class="menuext" href="attributes.html" title="All possible attributes for graphs, nodes and edges">Attributes</a>
+  <a class="menuext" href="faq.html" title="Frequently Asked Questions and their answers">F.A.Q.</a>
+  <a class="menuext" href="tutorial.html" title="Tutorial for often used graph types and designs">Tutorial</a>
+  <a class="menuext" href="editor.html" title="The interactive interface">Editor</a>
+</div>
+
+<div class="right">
+
+<h1>Graph::Easy - Manual</h1>
+
+<h2>Supported features</h2>
+
+<div class="text">
+
+<p>
+Graph::Easy support a wide array of features, below you will find a brief overview
+of some of them:
+</p>
+
+
+<a name="unicode">
+<h3>Unicode</h3>
+</a>
+
+<p>
+<code>Graph::Easy</code> has full Unicode support, both in input and output:
+</p>
+
+<pre class="graphtext">
+[ العربية ] -- link --> [ 日本語 ] --> [ 中文 ] -- كوردي --> [ English ]
+</pre>
+
+<p class="clear">
+The above example contains Japanese, Chinese, Kurdi and a few other characters.
+Here is the output of Graph::Easy as HTML (no, this is <b>not</b> an image, use the
+text zoom to see it change size :-):
+</p>
+
+<table class="graph" cellpadding=0 cellspacing=0 style="margin-left: 1em; background: white;">
+<tr>
+ <td colspan=4 rowspan=4 class='node'>ﺎﻠﻋﺮﺒﻳﺓ</td>
+ <td rowspan=4 class="edge ve"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px black;">link</td>
+
+ <td rowspan=2 class="edge" style=" color: black;"><span class="sh">&gt;</span></td>
+ <td colspan=4 rowspan=4 class='node'>日本語</td>
+ <td rowspan=4 class="edge ve"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px black;">&nbsp;</td>
+
+ <td rowspan=2 class="edge" style=" color: black;"><span class="sh">&gt;</span></td>
+ <td colspan=4 rowspan=4 class='node'>中文</td>
+ <td rowspan=4 class="edge ve"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px black;">ﻙﻭﺭﺪﻳ</td>
+
+ <td rowspan=2 class="edge" style=" color: black;"><span class="sh">&gt;</span></td>
+ <td colspan=4 rowspan=4 class='node'>English</td>
+</tr>
+
+<tr></tr>
+
+<tr>
+ <td colspan=10 rowspan=2 class="edge eb">&nbsp;</td>
+
+ <td rowspan=2 class="edge eb">&nbsp;</td>
+</tr>
+
+</table>
+
+<p class="clear">
+If you do see little rectangles or diamonds with a question mark inside,
+you need to install the missing fonts on your system, or use a browser
+that fully supports Unicode (<a href="http://www.opera.com/">Opera</a>,
+<a href="http://www.kde.org/">Konqueror</a> and
+<a href="http://www.mozilla.com/firefox/">Firefox</a> do :-)
+</p>
+
+<p>
+Here is a screenshot of the graph from above, showing what it looks like
+on an Unicode-aware browser:
+<br>
+<img src="img/unicode.png" alt="Unicode example" title="Unicode example">
+</p>
+
+<a name="multinode">
+<h3>Nodes with the same text</h3>
+</a>
+
+<p>
+Since each node is unique, there cannot be two nodes with the same name. Since it is sometimes
+desired to have two nodes with the same text appearing in the layout, you can override the
+text displayed with a label:
+</p>
+
+<pre class="graphtext">
+[ Bonn ] { label: Berlin; } -> [ Berlin ]
+</pre>
+
+<p class="clear">
+This will be rendered like this:
+</p>
+
+<img src="img/node_label.png" alt="Same node names" title="Same node names" class="float">
+<pre class="graph">
++--------+     +--------+
+| Berlin | --> | Berlin |
++--------+     +--------+
+</pre>
+
+<a name="anon">
+<h3 class="clear">Anonymous and Invisible Nodes and Edges</h3>
+</a>
+
+<p>
+<code>Graph::Easy</code> supports anonymous nodes,
+normal invisible nodes (with a minimum size) and truly invisible
+nodes (their size is as small as possible), as well as
+invisible edges:
+</p>
+
+<pre class="graphtext">
+[ ] { title: Anonymous Node; }
+  -> [ $sys$Node ] { shape: invisible; title: You don't see me! }
+  -> [ Buna ]
+  -> [ Borna ] { shape: point; point-style: invisible; }
+  -> [ Bremen ]
+  -> { style: invisible; } [ Bonn ]
+  -> [ $sys$Node ]
+</pre>
+
+<p class="clear"></p>
+
+<img src="img/invisible.png" alt="Invisible and anonymous nodes" title="Invisible and anonymous nodes" class="float">
+<pre class="clear graph">
+
+          +------------------------------------------+
+          v                                          |
+                  +------+          +--------+     +------+
+    -->       --> | Buna | -->  --> | Bremen |     | Bonn |
+                  +------+          +--------+     +------+
+</pre>
+
+<p class="clear">
+Please see the <a href="syntax.html#anon">chapter about the syntax</a>
+for details on anonymous and invisible nodes and edges.
+</p>
+
+<a name="multiedge">
+<h3>Multi-Edges</h3>
+</a>
+
+<p>
+Most graphing packages also allow multi-edges. A multi-edge graph simply allows two edges going from the same
+starting node to the same target node:
+</p>
+
+<pre>
+[ Rostock ] -> [ Wismut ]
+[ Rostock ] -> [ Wismut ]
+</pre>
+
+<img src="img/multi_edges.png" alt="Multi-edges" title="Multi-edges" class="float">
+
+<pre class="graph">
+  +---------------+
+  |               v
++---------+     +--------+
+| Rostock | --> | Wismut |
++---------+     +--------+
+</pre>
+
+<p class="clear">&nbsp;</p>
+
+<a name="selfloops">
+<h3>Self-Loops</h3>
+</a>
+
+<p>
+In addition to that, self-loops are usefull for state-machines and flowcharts.
+A self-loop is one edge going from one node back to the same node again:
+</p>
+
+<pre class="graphtext">
+[ Chemnitz ] -> [ Chemnitz ]
+</pre>
+
+<img src="img/self_loop.png" alt="Self-loop" title="Self-loop" class="float">
+
+<pre class="graph">
+  +------+
+  v      |
++----------+
+| Chemnitz |
++----------+
+</pre>
+
+<p class="clear">&nbsp;</p>
+
+<a name="edges">
+<h3>Edge-parts as endpoint of another edges</h3>
+</a>
+
+<p>
+Sometimes you want to point an edge towards the label of another edge.
+Since tradionally edges can only connect nodes with other nodes,
+Graph::Easy features nodes with a shape of <code>edge</code>, these
+nodes will fit seamless into an edge and thus create the illusion that
+you point the edge at the label of another edge:
+</p>
+
+<pre class="graphtext">
+[ car ] { shape: edge; }
+
+[ Bonn ] -- train --> [ Berlin ] -- [ car ] --> [ Ulm ]
+
+[ rented ] --> [ car ]
+</pre>
+
+<pre class="graph">
++------+  train   +--------+      car           +-----+
+| Bonn | -------> | Berlin | -----------------> | Ulm |
++------+          +--------+                    +-----+
+                                   ^
+                                   |
+                                   |
+                                 +--------+
+                                 | rented |
+                                 +--------+
+</pre>
+
+<p class="clear">&nbsp;</p>
+
+<a name="directions">
+<h3>Undirected and bidirectional edges</h3>
+</a>
+
+<p>
+Another often used feature are undirected or bidirectional edges:
+</p>
+
+<pre class="graphtext">
+[ Hamm ] <--> [ Leverkusen ]
+[ Wismut ] -- [ Plauen ]
+</pre>
+
+<img src="img/edge_types.png" alt="Edge types undirected and bidirectional" title="Edge types undirected and bidirectional" class="float">
+
+<pre class="graph">
++--------+      +------------+
+|  Hamm  | <--> | Leverkusen |
++--------+      +------------+
++--------+      +------------+
+| Wismut | ---- |   Plauen   |
++--------+      +------------+
+</pre>
+
+<p class="clear">&nbsp;</p>
+
+<a name="clusters">
+<h3>Groups (Clusters or Subgraphs)</h3>
+</a>
+
+<p>
+Also, subgraphs (called "groups" in Graph::Easy) allow you to cluster nodes together:
+</p>
+
+<pre class="graphtext">
+( Capitals: [ Bonn ], [ Berlin ] )
+</pre>
+
+<img src="img/group.png" alt="Grouping/Clustering/subgraphs" title="Example of grouping/clustering/subgraphs" class="float">
+
+<pre class="graph">
++ - - - - - - +
+' Capitals:   '
+'             '
+' +---------+ '
+' | Berlin  | '
+' +---------+ '
+' +---------+ '
+' |  Bonn   | '
+' +---------+ '
+'             '
++ - - - - - - +
+</pre>
+
+<p class="clear">&nbsp;</p>
+
+<p>
+It is also possible to nest groups (not yet implemented), and to have edges
+going from a group to a node, vice versa, or even from a group to another
+group.
+<br>
+See the appropriate chapter about <a href="hinting.html#flow">Hinting</a>
+for more details and examples.
+</p>
+
+<a name="joints">
+<h3>Joints (Edges Splicing and Splitting)</h3>
+</a>
+
+<p>
+You can also have edges that split or join up:
+</p>
+
+<pre class="graphtext">
+ [ Potsdam ], [ Mannheim ] 
+   --> { end: back,0; }
+ [ Weimar ]
+   --> { start: front,0; } [ Finsterwalde ], [ Aachen ]
+</pre>
+
+<div class="clear"></div>
+
+<img src="img/joints.png" alt="Edge joints" title="Example of edge joints" class="float">
+
+<pre class="graph">
++----------+           +--------+          +--------------+
+| Mannheim | ------+-> | Weimar | -+-----> | Finsterwalde |
++----------+       |   +--------+  |       +--------------+
+                   |               |
+                   |               |
+                   |               |
++----------+       |               |       +--------------+
+| Potsdam  | ------+               +-----> |    Aachen    |
++----------+                               +--------------+
+</pre>
+
+<p class="clear">
+Please see the <a href="hinting.html#joints">section about joints</a> for further reference.
+</p>
+
+<a name="flow">
+<h3>Flow directions</h3>
+</a>
+
+<p>
+Graph::Easy allows you to adjust the flow of the entire graph, as well as
+on any node, or even on a per edge-basis. Flow can be specified
+either <b>absolut</b> (giving absolut directions like <code>south</code> or <code>west</code>),
+or <b>relative</b> (directions <code>left</code>, <code>front</code> etc that
+are relative to the local flow at that node).
+</p>
+
+<pre class="graphtext">
+graph { flow: west; }
+
+[ Duisburg ] -> [ Siegen ] { flow: left; }
+ -> [ Adenau ]
+[ Siegen ] -> { flow: up; } [ Monschau ]
+</pre>
+
+<img src="img/flow.png" alt="Flow directions (partially supported by dot)" title="Flow directions (partially supported by dot)" class="float">
+
+<pre class="graph">
++----------+
+| Monschau |
++----------+
+  ^
+  |
+  |
++----------+     +----------+
+|  Siegen  | <-- | Duisburg |
++----------+     +----------+
+  |
+  |
+  v
++----------+
+|  Adenau  |
++----------+
+</pre>
+
+<p class="clear">&nbsp;</p>
+
+<p>
+For a complete overview of the possibilities of flow control, please
+the see the appropriate chapter about <a href="hinting.html#flow">Hinting</a>.
+</p>
+
+<a name="colors">
+<h3>Colors and Styles</h3>
+</a>
+
+<p>
+<code>Graph::Easy</code> supports colors for all objects, many different shapes,
+plus a wide array of styles for edges, arrows and borders:
+</p>
+
+<style type="text/css">
+ <!--
+table.graph1 .edge {
+  background: inherit;
+  border-style: none;
+  font-family: monospaced, courier-new, courier, sans-serif;
+  margin: 0.1em;
+  padding: 0.2em;
+}
+table.graph1 {
+  text-align: center;
+  background: inherit;
+  empty-cells: show;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+table.graph1 .node {
+  text-align: center;
+  border-color: #404060;
+  border-style: dotted;
+  border-width: 1px;
+  background: #aff0a0;
+  margin: 0.1em;
+  padding: 0.2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+table.graph1 td {
+  padding: 2px;
+  background: inherit;
+  white-space: nowrap;
+  }
+table.graph1 span.l { float: left; }
+table.graph1 span.r { float: right; }
+table.graph1 .va {
+  vertical-align: center;
+  line-height: 1.5em;
+  width: 0.4em;
+  }
+table.graph1 .ve { width: 0em; }
+table.graph1 .el {
+  width: 1em;
+  max-width: 1em;
+  min-width: 1em;
+  }
+table.graph1 .lh, table.graph1 .lv {
+  font-size: 0.8em;
+  padding-left: 0.4em;
+  }
+table.graph1 .v, table.graph1 .hat, table.graph1 .sv {
+  text-align: left;
+  height: 0.5em;
+  line-height: 0.6em;
+  }
+table.graph1 .sv {
+  position: relative;
+  left: -0.5em;
+  overflow: visible;
+  }
+table.graph1 .sh {
+  position: relative;
+  top: 0.8em;
+  vertical-align: bottom;
+  overflow: visible;
+  }
+table.graph1 .hat {
+  padding-top: 0.5em;
+  line-height: 0.5em;
+  }
+table.graph1 .eb {
+  max-height: 0.4em;
+  line-height: 0.4em;
+  }
+ -->
+ </style>
+
+<table class="graph1" cellpadding=0 cellspacing=0 style="float: left;">
+<tr>
+ <td colspan=4 rowspan=4 class='node' style="-moz-border-radius: 100%; border-radius: 100%; height: 4.9em; width: 4.9em">Berlin
+ <br />(Spree)</td>
+ <td rowspan=4 class="edge ve"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px #a0522d;color: #a0522d;">train</td>
+
+ <td rowspan=2 class="edge" style=" color: #a0522d;"><span class="sh">&gt;</span></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #faf0e6; border: dashed 1px #b22222">Frankfurt
+ <br />(Oder)</td>
+ <td rowspan=4 class="edge ve"></td>
+ <td colspan=2 rowspan=2 class="edge lh" style="border-bottom: solid 2px black;">&nbsp;</td>
+
+ <td rowspan=2 class="edge" style=" color: black;"><span class="sh">▶</span></td>
+ <td colspan=4 rowspan=4 class='node' style="background: #8b4513; border: dashed 1px #000080; color: #ffffff">München
+ <br />(Isaar)</td>
+</tr>
+
+<tr></tr>
+
+<tr>
+ <td colspan=3 rowspan=2 class="edge eb">&nbsp;</td>
+
+ <td colspan=3 rowspan=2 class="edge eb">&nbsp;</td>
+</tr>
+
+</table>
+
+<img src="img/colors.png" alt="Different colors, shapes and styles" title="Different colors, shapes and styles" class="float">
+
+<p class="clear">
+Please see the chapter about <a href="attributes.html">attributes</a> for possible values and
+many examples.
+</p>
+
+</div>
+
+<div class="text clear next">
+
+<p>
+Please continue with the chapter about the <a href="layouter.html">layouter</a>.
+</p>
+
+</div>
+
+<div class="footer">
+Page created <span class="date">2005-01-09</span> by <a href="http://bloodgate.com/mail.html">Tels</a>.
+Last update: <span class="date">2006-09-09</span>
+</div>
+
+</div> <!-- end of right cell -->
+
+</body>
+</html>
+
+
+

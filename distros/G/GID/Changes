@@ -1,0 +1,210 @@
+==================================================
+Changes from 1739-07-01 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2013-04-14 13:10:20 +0000
+------------------------------------------
+
+  Change: 387d17e294e14752720801d1ac339e4c0ef17814
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-14 08:00:55 +0000
+
+    Have to remove Unknown::Values, just found it its only Perl 5.12,
+    very..... ineffective 
+
+  Change: cf036acb811282320a1c7610ceb6b83ffc672855
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-13 12:42:48 +0000
+
+    Experimental adding provides of a .pod file (as Perl QA test case) 
+
+  Change: aa506cff2872495bee6d84abe363c6a7cd21681b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-21 03:39:57 +0000
+
+    Added is_unknown (in test and GID main concept) 
+
+  Change: 8f05552e0a158b81b60ac006814bedf85788f070
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-20 00:32:40 +0000
+
+    Added Unknown::Values to GID (and added a test inside GID::Class) 
+
+  Change: a207ff96931abbc60dfabfd5568ae63ef5000e7c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-19 06:38:23 +0000
+
+    Added more absolute usage and documentation, also delete tests 
+
+  Change: 93a51ce8dd80b073b876544d73987b98753f35bd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-19 05:59:13 +0000
+
+    Implemented GID::IO 
+
+  Change: f032d0db15cab12057b86119b020717982f74b19
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-18 19:39:09 +0000
+
+    Ok, changed the import way for Augment/Override to MooX way 
+
+  Change: 31aa7c679148f4d6e286f4efe30475962bc18d9e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-18 19:04:22 +0000
+
+    More requirements, added MooX::{Override|Augment} proper now, fixed
+    the error parsing test for XS and non-XS case 
+
+  Change: 1d4f147ed797cd80682945ba30850890d773019f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-18 18:48:12 +0000
+
+    Ok, no namespace::clean on GID, added MooX::{late|Augment|Override} 
+
+  Change: 127cecd99bc1120831396335fe444e9d363b43dd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-18 18:33:40 +0000
+
+    Removed now unnecessary code from GID::Class, added namespace::clean
+    also to GID itself 
+
+  Change: 98ce3b3afb3d48228cb132f778bc01b4bea7ba35
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-18 18:21:33 +0000
+
+    Merge branch 'master' of github.com:Getty/p5-gid
+
+    Conflicts:
+
+    lib/GID/Class.pm
+
+    First pull, then commit 
+
+  Change: 7aa92db6cae13a2a39e64aed6dfe72ddd2e60052
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-18 18:20:54 +0000
+
+    Yeah, let's use namespace::clean then! 
+
+  Change: 5dc248493d45578c4ec237654a72c9af0588a8f5
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2012-12-18 18:15:39 +0000
+
+    don't expect the method package_stash to exist
+
+    The user might have changed it. 
+
+  Change: 473ee511beacc7bc6b3617e43604375bd2cc7ec0
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2012-12-18 18:10:44 +0000
+
+    a bit of golf to reduce indentation depth 
+
+  Change: 4e7edd0a9075416f9a1fb044dd2c37ee2640eb8e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 05:16:59 +0000
+
+    Oh yeah, strict and warnings... good idea ;) 
+
+  Change: 02525a9729dfa546047b2bb000613d0015c610c0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 05:14:47 +0000
+
+    Added Class::Method::Modifiers to GID (and tests in context of
+    GID::Class) 
+
+  Change: 3ebeca885ee60f1b2efcf08c7070c6ba353577dd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 04:47:56 +0000
+
+    Added include tests for the GID functions 
+
+  Change: 4e539797ce627c5d7df08a484ac1aa6d9a7426a4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 04:44:29 +0000
+
+    Added include/exclude import parameter feature also to internal GID
+    functions and added test for those 
+
+  Change: 90d4e29b1da1a6c886c9ea7e21e528bb5da0e1dc
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 04:22:57 +0000
+
+    Added several new modules for the import of GID 
+
+  Change: a51b75cb06bf85a17fb38a22c4ea9aafd46d7286
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 03:43:17 +0000
+
+    Fixed strictures requirement 
+
+  Change: 953569638b51ed340f84e175ceb4dcc72bc41dc0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 03:42:09 +0000
+
+    Hups, double IO::All 
+
+  Change: a20ac57bf092852596f9a17a0eb4247bc685e96f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 03:41:27 +0000
+
+    More clear import parameter handling 
+
+  Change: f51cbc5e270ca06c5ac7b6d7ba7e1a4dbebbf1c5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 03:40:11 +0000
+
+    Added more detailed requirements 
+
+  Change: 06703a65c303a9daad92e3a57822598c836d83b2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 03:28:54 +0000
+
+    More SYNOPSIS, proper strictures usage 
+
+  Change: 261f3e48e9a5a634912e7d52212b95b04d5108fa
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 03:25:12 +0000
+
+    Added %gid_packages to GID 
+
+  Change: 265aaafdf702f57beeb32c518510444f39762dae
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 03:04:15 +0000
+
+    A bit of reorganisation 
+
+  Change: c01386ad53d00b47ca3e0dceabdbb4cea01bc557
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 02:50:31 +0000
+
+    Also added test for exclusion of class 
+
+  Change: 697d39eba651381c6ffbae12c9e965567531b2cf
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-15 02:41:18 +0000
+
+    Made the GID import now a bit more flexible and effective 
+
+  Change: d6955c7bc8c9246a97fdf565b185cccbfaf6025f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-13 06:09:03 +0000
+
+    Added Carp::Always, more tests 
+
+  Change: 20a81bb56670d1b795195fac215b9e84ce8a738d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-13 05:32:27 +0000
+
+    Yeah, this is pervert... 
+
+  Change: eb67dd1226800c1bada700ef5b7afa8dc7145333
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-12-13 04:07:34 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

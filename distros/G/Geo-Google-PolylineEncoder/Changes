@@ -1,0 +1,43 @@
+Revision history for 'Geo-Google-PolylineEncoder' Perl module
+-------------------------------------------------------------
+
+All changes by Steve Purkis, unless otherwise noted.
+
+0.06
+    +   Added validate_encoded_points method for superficially
+        checking the encoded points string [Robert Rothenberg].
+
+0.05
+    +	Now handles points as arrayrefs [Request by Lee Goddard].  Introduced
+	use_geographic_order() to decide whether it's lons or lats first.
+    +	Introduced decode_points() & decode_levels(), mainly for testing.
+    *	Fixed a subtle bug where signed numbers were being treated as unsigned
+	for bitwise ops, causing two's complement to actually be one's :-/.
+    *	Fixed a rounding bug which caused deltas (and hence points) to be off
+	by up to 3e-5, thus affecting the quality of the encode line.
+    *	Use sprintf() as a round() function, floor() removed.
+    *	RT #49327: applied patch to handle small negative numbers [Slaven Rezić]
+    *	RT #46337: added tests, seems to have been resolved by other fixes.
+	[Reported by Joe Navratil]
+    *	RT #49323, #36181: Geo::Gpx is now a build_reccomends & correct version
+    *	Test::Approx is now a build_reccommends.
+    *	some minor performance improvements
+
+0.04
+    +	Profiled, benchmarked & optimized.  Now almost twice as fast on an AMD
+	Opteron 2GHz CPU.  Got two main performance fixes in:
+	1. Brought distance() calcs into 1 function & cached lots of stuff.
+	2. Brought compute_level() calcs inline.
+    *	Calculate zoom level breaks on encode() in case its deps have changed.
+    *	Fixed a bad bug in the distance calculation (it would always find that
+	'I' was interior to line seg AB, even when it was not, resulting in
+	incorrect distance calcs!)
+
+0.03
+    +	added missing dep on accessors [reported by CPAN Testers]
+
+0.02
+    +	cleaned up & released
+
+0.01
+    +	created Thurs Apr 24 2008

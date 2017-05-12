@@ -1,0 +1,31 @@
+{
+   "abstract" : "Affine Transformation to map 2D coordinates to other 2D coordinates",
+   "author" : [
+      "Marc Liyanage <liyanage@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geometry-AffineTransform",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/liyanage/perl-modules.git",
+         "web" : "https://github.com/liyanage/perl-modules"
+      }
+   },
+   "version" : "1.4"
+}

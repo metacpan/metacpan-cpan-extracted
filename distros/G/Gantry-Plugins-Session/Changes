@@ -1,0 +1,17 @@
+Revision history for Perl extension Gantry::Plugins::Session.
+
+0.01  Thu Jun 26 10:22:47 2008
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Gantry::Plugins::Session
+
+0.02  16-Aug-2008 K.Esteb
+      Made some code cleanups.
+      Removed a few defineds that were not needed.
+
+0.03  19-Aug-2008 K.Esteb
+      Fixed a bug with the dependenices. It now requires Crypt::CBC.
+      
+0.04  24-Jun-2009 K.Esteb
+      Fixed a bug where the current uri was not detected properly.
+      Bug fix supplied by Scott L. Hunter III.
+

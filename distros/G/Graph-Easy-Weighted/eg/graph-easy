@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+#
+# This is how you have to set weights by hand, with Graph::Easy.
+#
+use strict;
+use warnings;
+
+use Graph::Easy;
+
+my $graph = Graph::Easy->new();
+
+my $data = [
+    [ 0, 1, 2, 0, 0 ], # Vertex 0 with 2 edges of weight 3
+    [ 1, 0, 3, 0, 0 ], #    "   1      2 "               4
+    [ 2, 3, 0, 0, 0 ], #    "   2      2 "               5
+    [ 0, 0, 1, 0, 0 ], #    "   3      1 "               1
+    [ 0, 0, 0, 0, 0 ], #    "   4      0 "               0
+];
+
+my $vertex = 0;
+
+for my $row ( @$data ) {
+    my $v = $graph->add_node($vertex);
+
+    my $total_weight = 0;
+
+    my $neighbor = 0;
+
+    for my $weight ( @$row ) {
+        if ( !$weight ) {
+            $neighbor++;
+            next;
+        }
+
+        $total_weight += $weight;
+
+        my $n = $graph->add_node($neighbor);
+
+        my $edge = Graph::Easy::Edge->new();
+        $edge->set_attributes( { label => $weight, 'x-weight' => $weight } );
+
+        $graph->add_edge( $v, $n, $edge );
+
+        $neighbor++;
+    }
+
+    $graph->set_vertex_attribute( $v, 'x-weight', $total_weight );
+
+    $vertex++;
+}
+
+for my $v ( $graph->vertices ) {
+    printf "vertex=%d weight=%d\n", $v->name, $graph->get_vertex_attribute( $v->name, 'x-weight' );
+    for my $e ( $graph->edges ) {
+        next if $e->from->name ne $v->name;
+        printf "\tedge to: %d weight=%d\n", $e->to->name, $e->get_custom_attributes->{'x-weight'};
+    }
+}
+
+print $graph->as_ascii();

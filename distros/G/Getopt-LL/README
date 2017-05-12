@@ -1,0 +1,425 @@
+NAME
+    Getopt::LL - Flexible argument processing.
+
+VERSION
+    This document describes Getopt::LL version 1.0.0
+
+SYNOPSIS
+         use Getopt:LL qw(getoptions);
+     
+     my $use_foo = 0;
+     
+     my $options = getoptions({
+             '-t'            => 'string',
+             '--verbose|-v'  => 'flag',
+             '--debug|-d'    => 'digit',
+             '--use-foo'     => sub {
+                 $use_foo = 1;
+             },
+             '-output|-o'    => sub {
+                 my ($getopt, $node) = @_;
+                 my $next_arg = $getopt->get_next_arg($node);
+     
+             if ($next_arg eq '-') {
+                     $out_to_stdout = 1;
+                 }
+     
+             return $next_arg;
+             };
+         });
+
+DESCRIPTION
+    Getopt::LL provides several ways for defining the arguments you want.
+    There is Getopt::LL::Simple for defining arguments on the -use-line-,
+    Getopt::LL::Short for abbreviated rules (that looks like Getopt::Long).
+
+  RULES
+    -Rules- is the guidelines Getopt::LL follows when it meets new options.
+    The rules defines what options we want, which options are required, and
+    what to do with an option.
+
+    A simple rule-set could be written like this:
+
+         my $rules = {
+             '-foo'      => 'string',
+             '-bar'      => 'string',
+             '--verbose' => 'digit',
+             '--debug'   => 'flag',
+         };
+
+   Rule types/actions.
+    The argument to an rule is what we call a rule type or rule action. It
+    can be one of the following:
+
+    *   'flag'
+
+    The option is a flag. The value of the option will be boolean true.
+
+    *   'string'
+
+    The option is a string. The value of the option will be the next
+    argument in the argument list.
+
+    *   'digit'
+
+    The option is a number. The value of the option will be the next
+    argument in the argument list. The value will be sent to
+    "is_digit($value)" to check that it's really a number. If it's not a
+    number and the "die_on_type_mismatch" option is set, the program will
+    die with a type mismatch error message.
+
+    A digit can also be a hex value if it begins with -0x-, any hex value
+    will be converted to a decimal value.
+
+    *   A regular expression: "qr/ /"
+
+    The next argument will be matched against the regular expression. If it
+    doesn't match the program will die with the message
+
+         Argument [--arg] doesn't match [regular-expression].
+
+    *   An anonymous subroutine. "sub { }"
+
+    The sub-routine will be called with the following arguments
+
+    1.  $_[0] - The Getopt::LL object.
+
+    2.  $_[1] - The current argument node (A Getopt::LL::DLList::Node]
+        object).
+
+    3.  $_[2] - The argument name.
+
+    4.  $_[3] - If an argument value was set by the user with "--arg=value",
+        the value is in this variable.
+
+    The return value of the anonymous subroutine will be the value of the
+    option.
+
+    Here is an example of a rule sub that simply assigns the value of the
+    next argument to the option value:
+
+         my $rules = {
+     
+         '-foo'  => sub {
+                 my ($getopt, $node, $arg_name, $arg_value) = @_;
+                     return $arg_value if $arg_value;
+     
+                 my $next_arg = $getopt->get_next_arg($node);
+     
+                 return $next_arg;
+             },
+         };
+     
+     my $result = getoptions($rules);
+     
+     print 'FOO IS: [', $result->{'-foo'}, "]\n";
+
+    if this program is called with the arguments: "-foo bar" or "-foo=bar"
+    it will print out this message:
+
+         FOO IS [bar]
+
+   Specifying required arguments.
+    There are two ways of specifying required arguments.
+
+    *   Embedded in the rule name, by an exclamation point !.
+
+         my $rules = {
+             '-foo!' => 'string',
+         };
+
+    *   Or by adding the "required" flag.
+
+         my $rules = {
+             '-foo'  => {
+                 type        => 'string',
+                 required    => 1,
+             },
+         }
+
+   Adding default values to non-required arguments.
+    There are two ways of specifying default values.
+
+    *   Embedded in the rule name, inside parens ( .. )
+
+         my $rules = {
+             '-bar(defaultValue)' => 'string',
+         };
+
+    *   Or by adding a "default" key to the spec.
+
+         my $rules = {
+             '-bar'  => {
+                 type    => 'string',
+                 default => 'defaultValue',
+             },
+         };
+
+  DID YOU SAY SIMPLE?
+    With Getopt::LL::Simple you can define the arguments you want on the
+    -use-line-:
+
+         #!/usr/bin/perl
+         use strict;
+         use warnings;
+     
+     # we have three arguments:
+         #   -f!          (our filename, which is a s(tring) the ! means that it's
+         #               a required argument.
+         #   --verbose   (print extra information about what we're doing, is a flag).
+         #   --debug     (the level of debugging information to print. is a
+         #                d(igit).
+         #
+         use Getopt::LL::Simple qw(
+             -f!=s
+             --verbose
+             --debug|d=d
+         );
+     
+     if ($ARGV{'--verbose'}) {
+             print "In verbose mode...\n";
+         }
+     
+     if ($ARGV{'--debug'}) {
+             print 'Debugging level is set to: ', $ARGV{'--debug'}, "\n";
+         }
+     
+     print "The contents of @ARGV is:\n";
+         prnit "\t", join{q{, }, @ARGV), "\n";
+
+    The options that was found is placed into %ARGV, the arguments that is
+    not an option is placed into @ARGV. So say we have run the program with
+    the following arguments:
+
+         ./myprogram -f tmp.log --verbose --debug=3 foo bar
+
+    or
+
+         ./myprogram -f tmp.log --verbose --debug 3 foo bar
+
+    it will give this output:
+
+         In verbose mode...
+         Debugging level is set to: 3
+         The contents of @ARGV is:
+             foo, bar
+
+SUBROUTINES/METHODS
+  CONSTRUCTOR
+   "new(\%rules, \%options, \@opt_argv )"
+    Uses @ARGV if no "\@opt_argv" is present.
+
+  ATTRIBUTES
+   "rules"
+   "set_rules"
+    The list of rules passed to "new".
+
+   "options"
+   "set_options"
+    The options passed to "new".
+
+   "dll"
+   "set_dll"
+    Our arguments converted to a doubly linked list. (is a
+    Getopt::LL::DLList object).
+
+   "result"
+   "set_result"
+    The final argument hash.
+
+   "leftovers"
+   "set_leftovers"
+    Array of items in the argument list that does not start with - or --.
+
+  INSTANCE METHODS
+   "parseoption($argument, $node)"
+    This method is called for each argument to decide what to do with it.
+
+   "find_arg_type($argument)"
+    Find out what kind of argument this is.
+
+    If the argument starts with - (a single dash) it returns "short", but if
+    it starts with -- (two dashes) it returns "long".
+
+   "is_string($value, $option_name)"
+    Check if value is a proper string.
+
+   "is_digit($value, $option_name)"
+    Check if value is a digit. ("0-9+") If value starts with -0x-, it is
+    treated as a hex value.
+
+   "type_mismatch_error($type, $message)"
+    Called whenever a type does not match it's requirements.
+
+   "unknown_argument_error($argument)"
+    Called when a argument that has no rule is found. (turn off by setting
+    the "allow_unspecified" option to a true value).
+
+   "handle_rule($option_name, $rule, $node)"
+    Called when "parseoption()" finds an argument that we have an existing
+    rule for. This function decides what to do with the argument based on
+    it's "RULE_ACTION".
+
+   "get_next_arg($node)"
+    Get and delete the next argument. (Gets the next node in our doubly
+    linked list and deletes the current node)
+
+   "peek_next_arg($node)"
+    Look at the next argument, but don't delete it.
+
+   "get_prev_arg($node)"
+    Get and delete the previous argument.
+
+   "peek_prev_arg($node)"
+    Look at the previous argument, but don't delete it.
+
+  "delete_arg($node)"
+    Deletes the argument.
+
+  "rules_prepare(\%rules)"
+    Find and prepare aliases in the rule set.
+
+  "rules_postactions( )"
+    Things to do with rules after argument processing is done. Like adding
+    default values for arguments with default values defined and checking
+    for required arguments.
+
+  "show_help( )"
+    Print help for arguments to standard error. This is experimental and the
+    implementation is not exactly complete.
+
+  "show_usage( )"
+    Print usage to standard error. This is experimental and the
+    implementation is not exactly complete.
+
+  CLASS METHODS
+   "getoptions(\%rules, \%options, \@opt_argv)"
+    Parses and gets arguments based on the rules in "\%rules". Uses @ARGV if
+    "\@opt_arg" is not specified.
+
+    Returns hash with the arguments it found. @ARGV is replaced with the
+    arguments that does not start with - or --.
+
+   "opt_String($help_for_option)"
+    Shortcut for writing:
+
+         {
+             type => 'string',
+             help => $help_for_option,
+         }
+
+   "opt_Digit($help_for_option)"
+    Shortcut for writing:
+
+         {
+             type => 'digit',
+             help => $help_for_option,
+         }
+
+   "opt_Flag($help_for_option)"
+    Shortcut for writing:
+
+         {
+             type => 'flag',
+             help => $help_for_option,
+         }
+
+  PRIVATE INSTANCE METHODS
+   "_init()"
+    Called by new to traverse and parse the doubly linked list of arguments.
+
+   "_warn(@messages)"
+    Print a warning on the screen, but only if "$options->{silent}" is not
+    set.
+
+  PRIVATE CLASS METHODS
+   "_regex_as_text($regex)"
+    Quoted regexes are not very user-friendly to print directly, so this
+    function turns a quoted regex like:
+
+         (?xmsi:hello)
+
+    into:
+
+         /hello/xmsii
+
+DIAGNOSTICS
+CONFIGURATION AND ENVIRONMENT
+    This module requires no configuration file or environment variables.
+
+DEPENDENCIES
+    *   Class::Dot
+
+    *   version
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to bug-getopt-ll@rt.cpan.org,
+    or through the web interface at CPAN Bugtracker.
+
+SEE ALSO
+    *   Getopt::Long
+
+    *   Getopt::Euclid
+
+    *   Getopt::Declare
+
+    *   Getopt::Attribute
+
+TEST SUITE CODE COVERAGE
+         ---------------------------- ------ ------ ------ ------ ------ ------ ------
+         File                           stmt   bran   cond    sub    pod   time  total
+         ---------------------------- ------ ------ ------ ------ ------ ------ ------
+         lib/Getopt/LL.pm              100.0   98.6   94.4  100.0  100.0   38.2   99.2
+         lib/Getopt/LL/DLList.pm       100.0  100.0  100.0  100.0  100.0   15.1  100.0
+         lib/Getopt/LL/DLList/Node.pm  100.0  100.0    n/a  100.0  100.0    9.9  100.0
+         lib/Getopt/LL/Short.pm        100.0  100.0  100.0  100.0  100.0    1.4  100.0
+         lib/Getopt/LL/Simple.pm       100.0  100.0  100.0  100.0    n/a    0.6  100.0
+         ...topt/LL/SimpleExporter.pm  100.0  100.0    n/a  100.0  100.0    4.6  100.0
+         lib/Getopt/LL/properties.pm   100.0  100.0    n/a  100.0    n/a   30.2  100.0
+         Total                         100.0   99.0   96.2  100.0  100.0  100.0   99.6
+         ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+    The summary was generated by Devel::Cover.
+
+AUTHOR
+    Ask Solem, C<< ask@0x61736b.net >>.
+
+LICENSE AND COPYRIGHT
+    Copyright (c), 2007 Ask Solem C<< ask@0x61736b.net >>.
+
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+
+    # Local Variables: # mode: cperl # cperl-indent-level: 4 # fill-column:
+    78 # End: # vim: expandtab tabstop=4 shiftwidth=4 shiftround
+

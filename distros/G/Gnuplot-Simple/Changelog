@@ -1,0 +1,50 @@
+0.13	2016-08-31
+   - add blank line for dist:zilla PkgVersion
+
+0.12	2016-08-31
+	- use File::Slurper
+   - fix tests on FreeBSD
+	- remove dependency to Modern::Perl (use strictures)
+
+0.11	2016-05-02
+	- Some more release fixes
+
+0.10	2016-05-02
+	- Fix release 
+
+0.09	2015-07-30
+	- Improve tests
+	- Change exec_commands signature
+	- The placeholder can be changed
+	- which should go to /dev/null
+	- Improve error handling
+	[ Documentation ]
+	- fix typo GnuPlot -> Gnuplot
+	- better example for exec_commands
+
+0.08	2015-03-21
+	- use Method-Signatures
+	- fix spelling error
+
+0.07	2015-03-19
+	- fix write_data description
+	- small gnuplot example fix
+	- update mistaken dependency
+
+
+0.05	2015-03-19
+	- Die if pipe cannot be opened.
+	- Capture gnuplot stderr.
+
+0.04	2015-03-19
+	- fix usage of exec_commands
+
+0.03	2015-03-18
+	- fix gnuplot execution
+	- remove obsolete Type-Tiny dependency
+	- use File-Slurp-Tiny instead of File-Slurp
+
+0.02	2015-03-18
+	- check the presence of gnuplot
+	- rename _is_ascii to _is_valid
+	- change error msg for invalid char

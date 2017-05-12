@@ -1,0 +1,47 @@
+Revision history for Perl extension GnuplotIF.
+
+1.0  Thu Jul 28 11:00:14 2005
+  - original version; created by h2xs 1.23 with options
+  -XA -n GnuplotIF
+
+1.1  Aug 27 2006
+  - method gnuplot_set_plot_titles added (thanks to Stephen Marshall)
+
+1.2  Jun 06 2007
+  - tests improved
+
+1.3  Oct 13 2007
+  - Module no longer dies if no display is available (allows batch mode). 
+  - Method gnuplot_plot_xy_style (thanks to Georg Bauhaus)
+
+1.3.1  Nov 10 2007
+  - All prints to pipes will be checked.
+  - New test: 8 pipes open in parallel.
+
+1.4  Nov 28 2007
+  - Plot window can survive after gnuplot exits.
+  - Plot can be stored to a script file instead of beeing executed immediately.
+  - New method gnuplot_plot_3d makes 3-D-plots from arrays.
+  - New method gnuplot_hardcopy writes a plot into a file for printing.
+  - New method gnuplot_restore_terminal restores terminal settings before the
+    last hardcopy.
+
+1.5  June 11 2008
+  - Method gnuplot_plot_many() and gnuplot_plot_many_style for x-y-plots not
+    sharing an x-axis.
+  - Most method calls can now be chained (thanks to Bruce Ravel for both).
+
+1.6  March 3 2011
+  - gnuplot_pause() not working as advertised.
+  - New constructor argument 'plot_also': write all plot commands to a file, in
+    addition show the plots.
+
+1.7  June 3 2011
+  - Windows support  (thanks to Bruce Ravel).
+
+1.8  January 2 2016
+  - Fixes concerning pathes with spaces (thanks to Bruce Ravel).
+  - Fix for situations where the user does not have write privilege for the
+    current working directory (thanks to Bruce Ravel).
+
+

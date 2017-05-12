@@ -1,0 +1,13 @@
+
+As ExtUtils::MakeMaker says, to install, follow this simple mantra:
+
+               perl Makefile.PL
+               make
+               make test
+               make install
+
+This should run on perl5 and later.  It might run on perl4.
+
+Hard dependencies:
+
+	Math::Polygon

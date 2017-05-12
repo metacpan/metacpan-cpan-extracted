@@ -1,0 +1,4 @@
+
+Geo::Location::TimeZone will return the approximate Posix timezone for
+a given latitude and longitude.  
+

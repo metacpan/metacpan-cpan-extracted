@@ -1,0 +1,23 @@
+---
+abstract: 'Implementing a myriad of Go rulesets'
+author:
+  - 'Zach Morgan <zpmorgan@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300026, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Games-Go-Cinderblock
+requires:
+  List::MoreUtils: 0
+  Moose: 0
+  Scalar::Util::Numeric: 0
+  Test::Exception: 0
+resources:
+  homepage: https://metacpan.org/release/Games-Go-Cinderblock
+  repository: https://github.com/zpmorgan/Games-Go-Cinderblock
+version: 0.13

@@ -1,0 +1,385 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR 'Jerome Quelin'
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Games-Risk-ExtraMaps-History\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-09-26 15:43+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Games/Risk/Map/Roman_empire.pm:27
+msgid "Roman Empire Map"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:37
+msgid "Africa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:38
+msgid "Asia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:39
+msgid "Gallia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:40
+msgid "Hispania"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:41
+msgid "Illyrium"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:42
+msgid "Italia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:50
+msgid "Aegyptus"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:51
+msgid "Africa proconsularis"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:52
+msgid "Cyrenaica"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:53
+msgid "Numidia inf."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:54
+msgid "Numidia sup."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:55
+msgid "Arabia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:56
+msgid "Bithynia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:57
+msgid "Cappadocia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:58
+msgid "Cilicia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:59
+msgid "Galatia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:60
+msgid "Lycia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:61
+msgid "Palestina"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:62
+msgid "Phrygia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:63
+msgid "Pontus"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:64
+msgid "Syria"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:65
+msgid "Aquitania"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:66
+msgid "Belgica"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:67
+msgid "Britannia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:68
+msgid "Germania inf."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:69
+msgid "Germania sup."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:70
+msgid "Lugdunensis"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:71
+msgid "Narbonensis"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:72
+msgid "Baetica"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:73
+msgid "Baleares"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:74
+msgid "Gallaecia et Asturia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:75
+msgid "Lusitania"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:76
+msgid "Mauretania"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:77
+msgid "Terraconensis"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:78
+msgid "Achaia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:79
+msgid "Dacia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:80
+msgid "Dalmatia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:81
+msgid "Epirus"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:82
+msgid "Macedonia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:83
+msgid "Moesia inf."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:84
+msgid "Moesia sup."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:85
+msgid "Pannonia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:86
+msgid "Thracia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:87
+msgid "Corsica"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:88
+msgid "Gallia Cisalpinia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:89
+msgid "Noricum"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:90
+msgid "Raetia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:91
+msgid "Roma"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:92
+msgid "Sardinia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:93
+msgid "Sicilia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:160
+msgid "Conquer the dioceses of Asia and Italia."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:161
+msgid ""
+"Conquer the dioceses of Gallia and Hispania and a third diocese of your "
+"choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:162
+msgid "Conquer the dioceses of Illyrium and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:163
+msgid ""
+"Conquer the dioceses of Illyrium and Hispania and a third diocese of your "
+"choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:164
+msgid "Conquer the dioceses of Gallia and Asia."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:165
+msgid "Conquer the dioceses of Italia and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:166
+msgid ""
+"Occupy 14 provinces of your choice and occupy each with at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:167
+msgid ""
+"Occupy 18 provinces of your choice and occupy each with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:168
+msgid ""
+"Occupy 24 provinces of your choice and occupy each with at least 1 army."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:169
+msgid ""
+"Destroy all of Player1's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 14 provinces with "
+"at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:170
+msgid ""
+"Destroy all of Player2's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 14 provinces with "
+"at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:171
+msgid ""
+"Destroy all of Player3's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 14 provinces with "
+"at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:172
+msgid ""
+"Destroy all of Player4's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 14 provinces with "
+"at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:173
+msgid ""
+"Destroy all of Player5's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 14 provinces with "
+"at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:174
+msgid ""
+"Destroy all of Player6's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 14 provinces with "
+"at least 3 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:175
+msgid ""
+"Destroy all of Player1's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 18 provinces with "
+"at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:176
+msgid ""
+"Destroy all of Player2's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 18 provinces with "
+"at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:177
+msgid ""
+"Destroy all of Player3's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 18 provinces with "
+"at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:178
+msgid ""
+"Destroy all of Player4's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 18 provinces with "
+"at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:179
+msgid ""
+"Destroy all of Player5's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 18 provinces with "
+"at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:180
+msgid ""
+"Destroy all of Player6's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 18 provinces with "
+"at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:181
+msgid ""
+"Destroy all of Player1's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:182
+msgid ""
+"Destroy all of Player2's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:183
+msgid ""
+"Destroy all of Player3's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:184
+msgid ""
+"Destroy all of Player4's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:185
+msgid ""
+"Destroy all of Player5's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""
+
+#: lib/Games/Risk/Map/Roman_empire.pm:186
+msgid ""
+"Destroy all of Player6's troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 provinces."
+msgstr ""

@@ -1,0 +1,52 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+keywords:
+  - map
+  - editor
+  - visicalc
+  - grm
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Games-RolePlay-MapGen
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Diff: 0
+  Data::Dump: 0
+  Data::Dumper: 0
+  File::Slurp: 0
+  GD: 0
+  Gtk2: 0
+  Gtk2::Ex::Dialogs: 0
+  Gtk2::Ex::Simple::Menu: 0
+  HTTP::Status: 0
+  List::Util: 0
+  Math::Round: 0
+  Math::Trig: 0
+  Memoize: 0
+  POE: 0
+  POE::Component::Server::HTTP: 0
+  Storable: 0
+  Test: 1.25
+  Tie::IxHash: 0
+  XML::Parser: 0
+  XML::Simple: 0
+  XML::XPath: 0
+  common::sense: 0
+  parent: 0
+  perl: 5.008
+resources:
+  repository: https://github.com/jettero/grm
+version: 1.5008

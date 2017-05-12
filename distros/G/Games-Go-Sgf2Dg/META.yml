@@ -1,0 +1,35 @@
+---
+abstract: Sgf2Dg.pm
+author:
+  - 'Reid Augustin <reid@hellosix.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Games-Go-Sgf2Dg
+requires:
+  Carp: 0
+  Config: 0
+  Exporter: 0
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Slurp: 0
+  File::Spec: 0
+  IO::File: 0
+  PDF::Create: 0
+  POSIX: 0
+  PostScript::File: 0
+  Tk: 0
+  Tk::Canvas: 0
+  Tk::NoteBook: 0
+  constant: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+version: 4.252

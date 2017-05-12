@@ -1,0 +1,21 @@
+Revision history for Perl extension Goo::Canvas.
+
+0.01  Wed Sep 26 16:24:09 2007
+	- original version; created by h2xs 1.23 with options
+		-A -n Goo::Canvas
+
+0.03  Sun Oct  7 22:35:33 2007
+	- Fix for demo/demo.pl create_stipples
+
+0.04  Sun Oct  7 22:36:28 2007
+    - Bindings for goocanvas-0.9
+
+0.05  Sun Nov  4 14:25:34 2007
+    - Fix get_bounds error
+    - Add bin/perltetris.pl
+    - Add bin/perlmine.pl
+
+0.06  Wed, 06 May 2009 22:00:39 -0400
+    - Add Goo:Canvas::get_items_at and Goo::Canvas::get_items_in_area.
+    Thanks to Jeffrey Ratcliffe!
+

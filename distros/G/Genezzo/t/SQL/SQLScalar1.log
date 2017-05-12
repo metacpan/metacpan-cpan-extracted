@@ -1,0 +1,923 @@
+
+t/SQL/SQLScalar1.sql> REM test.sql
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> create table test1 (col1 char, col2 number, col3 char, col4 char);
+Create Table : test1 
+tablename : test1
+	column col1 : c 
+	column col2 : n 
+	column col3 : c 
+	column col4 : c 
+table test1 created 
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> insert into test1 values ('aa', 1, 'I have trailing spaces       ', 'AAA',
+                    >         'bb', 2, '     and many leading spaces too ', 'BBB',
+                    >         'cc', 3,  '   and special chars like %^&*()  ' , 'CCC' );
+inserted 3 rows into table test1.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select * from test1;
+col1	col2	col3	col4	
+____	____	____	____	
+
+aa	1	I have trailing spaces       	AAA	
+bb	2	     and many leading spaces too 	BBB	
+cc	3	   and special chars like %^&*()  	CCC	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM perl functions
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  chomp(col1)||chomp(col3)||col1 from test1;
+chomp(col1)||chomp(col3)||col1	
+______________________________	
+
+aaI have trailing spaces       aa	
+bb     and many leading spaces too bb	
+cc   and special chars like %^&*()  cc	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  chop(col1)||chop(col3)||col1 from test1;
+chop(col1)||chop(col3)||col1	
+____________________________	
+
+aI have trailing spaces      aa	
+b     and many leading spaces toobb	
+c   and special chars like %^&*() cc	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  chr(65) from dual;
+chr(65)	
+_______	
+
+A	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM FIX
+
+t/SQL/SQLScalar1.sql> select  crypt(col3, col1) from test1;
+crypt(col3, col1)	
+_________________	
+
+aa5KO//iCgd62	
+bb3xX2yYycZTU	
+ccvPDYkTj1Tcw	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  index('defabc', 'abc') from dual;
+index('defabc', 'abc')	
+______________________	
+
+3	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> select  index('abc', 'def') from dual;
+index('abc', 'def')	
+___________________	
+
+-1	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  lc(col4) from test1;
+lc(col4)	
+________	
+
+aaa	
+bbb	
+ccc	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  lcfirst(col4) from test1;
+lcfirst(col4)	
+_____________	
+
+aAA	
+bBB	
+cCC	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  length(col1) from test1;
+length(col1)	
+____________	
+
+2	
+2	
+2	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> rem reverse of chr
+
+t/SQL/SQLScalar1.sql> select  ord(col1) from test1;
+ord(col1)	
+_________	
+
+97	
+98	
+99	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select quurl( pack('n/A*',col1)) from test1;
+quurl( pack('n/A*',col1))	
+_________________________	
+
+%00%02aa	
+%00%02bb	
+%00%02cc	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  reverse(col3) from test1;
+reverse(col3)	
+_____________	
+
+       secaps gniliart evah I	
+ oot secaps gnidael ynam dna     	
+  )(*&^% ekil srahc laiceps dna   	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM FIX
+
+t/SQL/SQLScalar1.sql> REM select  rindex(col1) from test1;
+
+t/SQL/SQLScalar1.sql> select  rindex('defabc', 'abc') from dual;
+rindex('defabc', 'abc')	
+_______________________	
+
+3	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> select  rindex('abc', 'def') from dual;
+rindex('abc', 'def')	
+____________________	
+
+-1	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  sprintf('number: %d',col2) from test1;
+sprintf('number: %d',col2)	
+__________________________	
+
+number: 1	
+number: 2	
+number: 3	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  substr(col1, 1, 1) from test1;
+substr(col1, 1, 1)	
+__________________	
+
+a	
+b	
+c	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  substr(col1, -1) from test1;
+substr(col1, -1)	
+________________	
+
+a	
+b	
+c	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  uc(col3) from test1;
+uc(col3)	
+________	
+
+I HAVE TRAILING SPACES       	
+     AND MANY LEADING SPACES TOO 	
+   AND SPECIAL CHARS LIKE %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  ucfirst(col1) from test1;
+ucfirst(col1)	
+_____________	
+
+Aa	
+Bb	
+Cc	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  abs(col2) from test1;
+abs(col2)	
+_________	
+
+1	
+2	
+3	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM FIX
+
+t/SQL/SQLScalar1.sql> select  atan2(2,1) from dual;
+atan2(2,1)	
+__________	
+
+1.10714871779409	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  cos(col2) from test1;
+cos(col2)	
+_________	
+
+0.54030230586814	
+-0.416146836547142	
+-0.989992496600445	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  exp(col2) from test1;
+exp(col2)	
+_________	
+
+2.71828182845905	
+7.38905609893065	
+20.0855369231877	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  hex(col1) from test1;
+hex(col1)	
+_________	
+
+170	
+187	
+204	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM FIX 
+
+t/SQL/SQLScalar1.sql> select  int(234.25) from dual;
+int(234.25)	
+___________	
+
+234	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  log10(col2) from test1;
+log10(col2)	
+___________	
+
+0	
+0.301029995663981	
+0.477121254719662	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM FIX
+
+t/SQL/SQLScalar1.sql> select  oct('0xAE') from dual;
+oct('0xAE')	
+___________	
+
+174	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM need to test rand
+
+t/SQL/SQLScalar1.sql> REM select  rand(col2) from test1;
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  sin(col2) from test1;
+sin(col2)	
+_________	
+
+0.841470984807897	
+0.909297426825682	
+0.141120008059867	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  sqrt(col2) from test1;
+sqrt(col2)	
+__________	
+
+1	
+1.4142135623731	
+1.73205080756888	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  srand(col2) from test1;
+srand(col2)	
+___________	
+
+1	
+1	
+1	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  perl_join('howdy', col1, col4, col3) from test1;
+perl_join('howdy', col1, col4, col3)	
+____________________________________	
+
+aahowdyAAAhowdyI have trailing spaces       	
+bbhowdyBBBhowdy     and many leading spaces too 	
+cchowdyCCChowdy   and special chars like %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM  SQL string functions
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  concat(col1, col2, col3) from test1;
+concat(col1, col2, col3)	
+________________________	
+
+aa1I have trailing spaces       	
+bb2     and many leading spaces too 	
+cc3   and special chars like %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  greatest(col1, col3) from test1;
+greatest(col1, col3)	
+____________________	
+
+aa	
+bb	
+cc	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  initcap(col3) from test1;
+initcap(col3)	
+_____________	
+
+I Have Trailing Spaces       	
+     And Many Leading Spaces Too 	
+   And Special Chars Like %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select initcap('aaaa bbbb aaa bbb aa bb a b') from dual;
+initcap('aaaa bbbb aaa bbb aa bb a b')	
+______________________________________	
+
+Aaaa Bbbb Aaa Bbb Aa Bb A B	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select initcap('hi man how are you,dude,kk*ll123gg&ff') from dual;
+initcap('hi man how are you,dude,kk*ll123gg&ff')	
+________________________________________________	
+
+Hi Man How Are You,Dude,Kk*Ll123gg&Ff	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select initcap('hi man how are you,dude,kk.*()()ll123gg&ff') from dual;
+initcap('hi man how are you,dude,kk.*()()ll123gg&ff')	
+_____________________________________________________	
+
+Hi Man How Are You,Dude,Kk.*()()Ll123gg&Ff	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  least(col1, col3) from test1;
+least(col1, col3)	
+_________________	
+
+I have trailing spaces       	
+     and many leading spaces too 	
+   and special chars like %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  lower(col3) from test1;
+lower(col3)	
+___________	
+
+i have trailing spaces       	
+     and many leading spaces too 	
+   and special chars like %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  'XX'||lpad(col1, 11, 'zz')||'XX' from test1;
+'XX'||lpad(col1, 11, 'zz')||'XX'	
+________________________________	
+
+XXzzzzzzzzzaaXX	
+XXzzzzzzzzzbbXX	
+XXzzzzzzzzzccXX	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  'XX'||ltrim(col3)||'XX' from test1;
+'XX'||ltrim(col3)||'XX'	
+_______________________	
+
+XXI have trailing spaces       XX	
+XXand many leading spaces too XX	
+XXand special chars like %^&*()  XX	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  ltrim('abababcdcddceeeeabababcdcddc', 'abcd') from dual;
+ltrim('abababcdcddceeeeabababcdcddc', 'abcd')	
+_____________________________________________	
+
+eeeeabababcdcddc	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> select  replace(col3, 'a', 'REPLACE') from test1;
+replace(col3, 'a', 'REPLACE')	
+_____________________________	
+
+I hREPLACEve trREPLACEiling spREPLACEces       	
+     REPLACEnd mREPLACEny leREPLACEding spREPLACEces too 	
+   REPLACEnd speciREPLACEl chREPLACErs like %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  'XX'||rpad(col1, 11, 'zz')||'XX' from test1;
+'XX'||rpad(col1, 11, 'zz')||'XX'	
+________________________________	
+
+XXaazzzzzzzzzXX	
+XXbbzzzzzzzzzXX	
+XXcczzzzzzzzzXX	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  'XX'||rtrim(col3)||'XX' from test1;
+'XX'||rtrim(col3)||'XX'	
+_______________________	
+
+XXI have trailing spacesXX	
+XX     and many leading spaces tooXX	
+XX   and special chars like %^&*()XX	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  rtrim('abababcdcddceeeeabababcdcddc', 'abcd') from dual;
+rtrim('abababcdcddceeeeabababcdcddc', 'abcd')	
+_____________________________________________	
+
+abababcdcddceeee	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> select  soundex(col3) from test1;
+soundex(col3)	
+_____________	
+
+I136	
+A535	
+A532	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  translate(col3, 'abcdefghijklmnopqrstuvwxyz', 
+                    >                         '~!@#$%^&*()--+=[]{};:<>012') 
+                    > from test1;
+translate(col3, 'abcdefghijklmnopqrstuvwxyz', 
+                        '~!@#$%^&*()--+=[]{};:<>012')	
+____________________________________________________________________________________________________	
+
+I &~;$ {[~***,^ ]+~@$]       	
+     ~,# +~,> *$~#*,^ ]+~@$] {-- 	
+   ~,# ]+$@*~* @&~[] **)$ %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  upper(col1) from test1;
+upper(col1)	
+___________	
+
+AA	
+BB	
+CC	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM SQL math functions
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  cosh(col2) from test1;
+cosh(col2)	
+__________	
+
+1.54308063481524	
+3.76219569108363	
+10.0676619957778	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  ceil(col2) from test1;
+ceil(col2)	
+__________	
+
+1	
+2	
+3	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  floor(col2) from test1;
+floor(col2)	
+___________	
+
+1	
+2	
+3	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  ln(col2) from test1;
+ln(col2)	
+________	
+
+0	
+0.693147180559945	
+1.09861228866811	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  logN(10, 100) from dual;
+logN(10, 100)	
+_____________	
+
+2	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> select  mod(22, col2) from test1;
+mod(22, col2)	
+_____________	
+
+0	
+0	
+1	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  power(col2, 10) from test1;
+power(col2, 10)	
+_______________	
+
+1	
+1024	
+59049	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  round(col2*1.253) from test1;
+round(col2*1.253)	
+_________________	
+
+1	
+3	
+4	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  round(col2*1.253, 1) from test1;
+round(col2*1.253, 1)	
+____________________	
+
+1.3	
+2.5	
+3.8	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  round(col2*10.253, -1) from test1;
+round(col2*10.253, -1)	
+______________________	
+
+10	
+20	
+30	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  sign(col2) from test1;
+sign(col2)	
+__________	
+
+1	
+1	
+1	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  sign(0) from test1;
+sign(0)	
+_______	
+
+0	
+0	
+0	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  sign(col2*(-5)) from test1;
+sign(col2*(-5))	
+_______________	
+
+-1	
+-1	
+-1	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  sinh(col2) from test1;
+sinh(col2)	
+__________	
+
+1.1752011936438	
+3.62686040784702	
+10.0178749274099	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  tan(col2) from test1;
+tan(col2)	
+_________	
+
+1.5574077246549	
+-2.18503986326152	
+-0.142546543074278	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  tanh(col2) from test1;
+tanh(col2)	
+__________	
+
+0.761594155955765	
+0.964027580075817	
+0.995054753686731	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  trunc(col2*1.243) from test1;
+trunc(col2*1.243)	
+_________________	
+
+1	
+2	
+3	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  trunc(col2*1.243,2) from test1;
+trunc(col2*1.243,2)	
+___________________	
+
+1.24	
+2.48	
+3.72	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> select  trunc(col2*11.243, -1) from test1;
+trunc(col2*11.243, -1)	
+______________________	
+
+10	
+20	
+30	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM  SQL conversion functions
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  ascii(col1) from test1;
+ascii(col1)	
+___________	
+
+97	
+98	
+99	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM FIX
+
+t/SQL/SQLScalar1.sql> REM select  instr(col1) from test1;
+
+t/SQL/SQLScalar1.sql> select  instr('abc', 'defabc') from dual;
+instr('abc', 'defabc')	
+______________________	
+
+0	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> select  instr('abc', 'def') from dual;
+instr('abc', 'def')	
+___________________	
+
+0	
+
+1 row selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  nvl(col1) from test1;
+nvl(col1)	
+_________	
+
+aa	
+bb	
+cc	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> REM  Genezzo functions
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  quurl(col3) from test1;
+quurl(col3)	
+___________	
+
+I%20have%20trailing%20spaces%20%20%20%20%20%20%20	
+%20%20%20%20%20and%20many%20leading%20spaces%20too%20	
+%20%20%20and%20special%20chars%20like%20%25%5E%26%2A%28%29%20%20	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  quurl2(col3) from test1;
+quurl2(col3)	
+____________	
+
+I have trailing spaces       	
+     and many leading spaces too 	
+   and special chars like %25^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> select  unquurl(col3) from test1;
+unquurl(col3)	
+_____________	
+
+I have trailing spaces       	
+     and many leading spaces too 	
+   and special chars like %^&*()  	
+
+3 rows selected.
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> drop table test1;
+dropped table test1 
+
+t/SQL/SQLScalar1.sql> 
+
+t/SQL/SQLScalar1.sql> commit;
+saved tablespace SYSTEM

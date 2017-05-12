@@ -1,0 +1,7 @@
+Revision history for Gtk2-Ex-NumberRange
+
+0.01    Oct 18, 2005
+        First version, released on an unsuspecting world.
+
+0.02    Oct 18, 2005
+        Minor bug fix. Popup was automatically closing on combo drop.

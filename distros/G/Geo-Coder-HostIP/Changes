@@ -1,0 +1,39 @@
+Revision history for Perl module Geo::Coder::HostIP
+
+0.07 2015-10-24 NEILB
+    - Updated repo URL after changing my github username
+    - Explicitly set dyanmic_config to 0
+
+0.06 2014-01-30
+    - Specified min version of perl as 5.6.0
+    - Added "use warnings"
+    - Added strict and warnings to PREREQ_PM
+
+0.05 2013-07-20
+    - Added repository and license details to metadata in Makefile.PL
+    - Added repository and license information to the pod
+
+0.04 2012-01-15
+
+    - Makefile.PL wasn't declaring declaring pre-requisite modules;
+      this resulted in some CPAN Testers failures.
+    - Fixed typo the one-line description in the NAME section
+
+0.03 2012-01-14
+
+    - The testsuite had two tests, but declared one, so it always "failed"
+    - Fixed parsing bug that meant Country() and CountryCode() never worked
+    - Added $VERSION to HostIP.pm
+    - Changed this file to conform to CPAN::Changes::Spec
+    - Neil Bowers (NEILB) has taken over maintenance of the module from
+      Sean Cannon -- thanks Sean.
+
+0.02 2007-04-24
+
+    - Decided some documentation in POD would be nice.
+    - Made the GoogleMap() function a little bit better
+
+0.01 2007-04-24
+
+    - original version; created by h2xs 1.23 with options -X Geo::Coder::HostIP
+

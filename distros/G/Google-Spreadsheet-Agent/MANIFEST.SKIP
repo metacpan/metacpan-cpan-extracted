@@ -1,0 +1,9 @@
+^_build
+^Build$
+^blib
+~$
+\.bak$
+^MANIFEST\.SKIP$
+^config\/agent\.conf\.yml$
+.svn
+^MYMETA.yml$

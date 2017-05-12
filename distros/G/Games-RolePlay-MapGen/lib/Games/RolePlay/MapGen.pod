@@ -1,0 +1,212 @@
+=head1 NAME
+
+Games::RolePlay::MapGen - The base object for generating dungeons and maps
+
+=head1 SYNOPSIS
+
+    use Games::RolePlay::MapGen;
+
+    $map->set_generator("Basic");             # This is actually the default generator,
+    $map->add_generator_plugin("BasicDoors"); # however, you must add the doors.
+    $map->generate("map.txt");                # It'll generate a text map by default.
+
+    $map->set_exporter( "PNG" );              # But a graphical map is probably more useful.
+    $map->export("map.png");
+
+Here are some screenshots of the PNG and XML exporters:
+
+L<http://voltar.org/PerlModules/vis1.map.png>
+
+L<http://voltar.org/PerlModules/vis1.map.xml>
+
+L<http://voltar.org/PerlModules/vis2.map.png>
+
+L<http://voltar.org/PerlModules/vis2.map.xml>
+
+=head1 INSTRUCTIONS
+
+The documentation is pretty light on this, sorry.  I had originally intended
+for this interface to be highly expandable and expected to solicit
+contributions in various ways.
+
+The interface turned out to be pretty confusing to operate even for me: the
+author.  If you wish to write some things, I will definitely assist you with it
+and optionally include them with  the distribution.  However, it's set up so you
+don't need my help to publish new plugins, so that probably isn't necessary.
+
+=head2 new maps
+
+There are basically two ways to get a map.  The first is to create a new object
+and the second is to import xml.  Importing xml is really obvious, so let's
+start there:
+
+    my $map = Games::RolePlay::MapGen->import_xml("map.xml"); 
+
+The more complicated way to do it is only complicated because of all the options
+you'll need to set.  It is in fact enough to simply call C<new> and be done with
+it, as there are sane defaults, but you'll no doubt want something like this:
+
+  my $map = Games::RolePlay::MapGen->new({
+      tile_size    => 10,
+      cell_size    => "23x23", 
+      num_rooms    => "2d4", 
+      bounding_box => "20x20",
+  }); 
+
+Tile Size is in feet (or meters if you prefer, although 10 meter tiles would
+make the rooms rather large) and indicates a metric used to split up tiles in
+one of the modules covered below.  Tile Size indicates the size of the tile when
+the map is exported as an image.
+
+The default generator (named Basic even though it's quite complicated), is
+bounded by a box Bounding Box wide and High.  It drops rooms throughout the map
+and there should be approximately Num Rooms of them.
+
+You can optionally load a few generator plugins.  I usually do.  There are only
+two in the distrubution so far:
+
+  $map->add_generator_plugin( "FiveSplit" );
+
+The Five Split breaks up tiles that are 10x10 into tiles that are 5x5 and tiles
+that are 15x15 into tiles that are 5x5.  (This makes less sense if you're
+working in meters, but you'll survive I hope.)
+
+Since the generators snake around in one tile wide networks, the Five Split is
+intended to make hallways that are 10ft wide (two tiles wide) or 15ft wide
+(three tiles wide).  It very occasionally throws in some areas that are thinner
+than the starting snake-width, but don't count on there being too many of them.
+
+  $map->add_generator_plugin( "BasicDoors" );
+
+You'll probably want doors.  This basic door generator considers which way the
+door open and whether they're locked or stuck -- but doesn't attempt to generate
+any Difficulty Class metrics or other game specific things of that nature.
+
+  $map->generate; # build the map!
+
+This builds the map.  Instructions on accessing the internal storage are listed
+below.  First, we'll briefly cover the exporters.
+
+  $map->export( "map.txt" );
+
+By default, we export text maps.  They're not terribly informative, but they're
+technically correct...  They are astonishingly hard to read though.  Unlike the
+rogue-like games they're meant to replicate, the mapgen tiles have four
+"closures" bounding the tile that are independent of the neighboring tiles.
+
+This means you can have a wall between two open tiles, making the text output
+difficult to draw and to interpret.  Fortunately, we can set the exporter to
+dump in png format.
+  
+  $map->set_exporter( "PNG" );
+  $map->export( "map.png" );
+
+The png exports should be a lot easier to read.  But there's one more way to
+dump, which is the xml exporter.  These files are readable by the
+C<import_xml()>, which lead the section.  
+
+  $map->set_exporter( "XML" );
+  $map->export( "map.xml" );
+
+I have included an XSL transformation that converts the xml to an html table
+with table border colors indicating the different types of closures.  I meant to
+add an XSLT that converts the xml to SVG format, but I never got around to it.
+It's certainly possible to do so, perhaps even using the table transformation as
+a demonstration.
+
+Most of the plugins, exporters, and generators have their own documentation.  If
+you are browsing this on CPAN, it should be immediately obvious where to find
+those documents.  If not, go to CPAN or perldoc the module name.
+
+L<http://search.cpan.org/~jettero/Games-RolePlay-MapGen/>
+
+=head2 _the_map format
+
+There should almost certainly be a method in the C<$map> object to fetch this
+data, but there isn't.  I have no intention of changing the name, so it's safe
+to grab it by hand like so:
+
+    my $m = $map->{_the_map};
+
+It is stored as an array of arrays with various helpful hashes indicating the
+various states of things around the tiles.  The usual way to step through it is
+as follows.
+
+    for my $i ( 0 .. $#m ) {
+        for my $j ( 0 .. $#{$m[$i]} ) {
+            print "I'm at map location (x=$j,y=$i)\n";
+        }
+    }
+
+Please note that the first index is the C<y> location and the second index is
+the C<x> location!
+
+    my $tile = $m->[ $yloc ][ $xloc ];
+    my $od_s = $tile->{od}{s};
+
+If you wish to know about the open-ness of the south facing direction, then
+you'd access the C<{od}{s}>.  It is either a C<0> (meaning a wall), a C<1>
+(meaning an opening) or a reference to a door.
+
+    if( $od_s ) {
+        if( ref $od_s ) {
+            if( $od_s->{'open'} ) {
+                print "There's a door to the south and it's closed. :(\n";
+
+            } else {
+                print "There's a door to the south but it's open. :)\n";
+            }
+
+        } else {
+            print "There's no closure to the south and we'll ",
+             "definitely find another open tile there.\n";
+        }
+    } else {
+        print "There's a wall to the south!\n";
+    }
+
+The C<{od}> elements have keys for C<{'open'}>, C<{locked}>, C<{secret}>, and
+C<{stuck}>.  You can set their chance of occuring as arguments to the C<new()>
+method.  They are documented somewhat in
+L<Games::RolePlay::MapGen::GeneratorPlugin::BaiscDoors>.
+
+The tile to the south is simple to locate.  You do not have to locate it by
+hand.  If there is one to find it'll be stored as the C<{nb}{s}>.
+
+    my $nb_s = $tile->{nb}{s};
+
+And if you lose track, the tiles know where they are.
+
+    print "my souther neighbor: ($nb_s->{x},$nb_s->{y})\n";
+
+=head1 AUTHOR
+
+Paul Miller C<jettero@cpan.org>
+
+I am using this software in my own projects...  If you find bugs, please please
+please let me know.
+
+I normally hang out on #perl on freenode, so you can try to get immediate
+gratification there if you like.  L<irc://irc.freenode.net/perl>
+
+=head1 Special Thanks to Jamis Buck
+
+I emailed Jamis and asked for permission to duplicate the text of portions of
+his "Random Dungeon Design: The Secret Workings of Jamis Buck's Dungeon
+Generator" document (L<http://www.aarg.net/~minam/dungeon_design.html>) and he
+was cool with that.
+
+Really, without his work, I never would have written this module!
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008 Paul Miller -- LGPL [Software::License::LGPL_2_1]
+
+    perl -MSoftware::License::LGPL_2_1 \
+         -e '$l = Software::License::LGPL_2_1->new({
+             holder=>"Paul Miller"});
+             print $l->fulltext' | less
+
+=head1 SEE ALSO
+
+perl(1)

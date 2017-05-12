@@ -1,0 +1,61 @@
+NAME
+
+Graphics::HotMap -- generate thermographic images.
+
+
+DESCRIPTION
+
+Generate thermographic images from a few know points. Others values are
+interpolated. Graphics::HotMap use PDL to work on matrix. PDL can
+compute very very large matrix in a few seconds.
+
+See <http://kumy.org/HotMap/HotMap.png>
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use the
+following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Graphics::HotMap
+
+You can also look for information at:
+
+* Search CPAN
+    http://search.cpan.org/dist/Graphics-HotMap/
+
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2011 Mathieu Alorent 
+
+This program is free software: you can redistribute it and/or modify 
+it under the terms of the GNU General Public License as published by 
+the Free Software Foundation, either version 3 of the License, or 
+(at your option) any later version. 
+
+This program is distributed in the hope that it will be useful, 
+but WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+GNU General Public License for more details. 
+
+You should have received a copy of the GNU General Public License 
+along with this program. If not, see <http://www.gnu.org/licenses/>.

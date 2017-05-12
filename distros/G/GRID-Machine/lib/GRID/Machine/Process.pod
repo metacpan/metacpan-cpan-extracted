@@ -1,0 +1,461 @@
+=for PROGRAMMERS
+Don't write in Machine.pod file!!!!!
+Changes will be lost!!.
+Use Template Toolkit tt2/Group.tt2 instead
+
+=head1 NAME
+
+GRID::Machine::Process - Forking via SSH 
+
+=head1 SYNOPSIS
+
+     use GRID::Machine;
+     
+     my $host = $ENV{GRID_REMOTE_MACHINE};
+     my $machine = GRID::Machine->new( host => $host );
+     
+     my ($N, $np, $pi)  = (1000, 4, 0);
+     for (0..$np-1) {
+        $machine->fork( q{
+            my ($id, $N, $np) = @_;
+              
+            my $sum = 0;
+            for (my $i = $id; $i < $N; $i += $np) {
+                my $x = ($i + 0.5) / $N;
+                $sum += 4 / (1 + $x * $x);
+            }
+            $sum /= $N; 
+         },
+         args => [ $_, $N, $np ],
+       );
+     }
+     
+     $pi += $machine->waitall()->result for 1..$np;
+     
+     print "pi = $pi\n";
+
+
+=head1 DESCRIPTION
+
+
+=head2 The C<fork> method
+
+The C<fork> method of C<GRID::Machine> objects can be used to fork a process in the remote machine,
+as shown in the following example:
+
+  $ cat -n fork5.pl 
+     1  #!/usr/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4  use Data::Dumper;
+     5  
+     6  my $host = $ENV{GRID_REMOTE_MACHINE};
+     7  my $machine = GRID::Machine->new( host => $host );
+     8  
+     9  my $p = $machine->fork( q{
+    10  
+    11     print "stdout: Hello from process $$. args = (@_)\n";
+    12     print STDERR "stderr: Hello from process $$\n";
+    13  
+    14     use List::Util qw{sum};
+    15     return { s => sum(@_), args => [ @_ ] };
+    16   },
+    17   args => [ 1..4 ],
+    18  );
+    19  
+    20  # GRID::Machine::Process objects are overloaded
+    21  print "Doing something while $p is still alive  ...\n" if $p; 
+    22  
+    23  my $r = $machine->waitpid($p);
+    24  
+    25  print "Result from process '$p': ",Dumper($r),"\n";
+    26  print "GRID::Machine::Process::Result objects are overloaded in a string context:\n$r\n";
+
+
+When executed, the former program produces an output similar to this:
+
+  $ perl fork5.pl 
+  Doing something while 5220:5230:some.machine:5234:5237 is still alive  ...
+  Result from process '5220:5230:some.machine:5234:5237': $VAR1 = bless( {
+                   'machineID' => 0,
+                   'stderr' => 'stderr: Hello from process 5237
+  ',
+                   'descriptor' => 'some.machine:5234:5237',
+                   'status' => 0,
+                   'waitpid' => 5237,
+                   'errmsg' => '',
+                   'stdout' => 'stdout: Hello from process 5237. args = (1 2 3 4)
+  ',
+                   'results' => [ { 'args' => [ 1, 2, 3, 4 ], 's' => 10 } ]
+                 }, 'GRID::Machine::Process::Result' );
+
+  GRID::Machine::Process::Result objects are overloaded in a string context:
+  stdout: Hello from process 5237. args = (1 2 3 4)
+  stderr: Hello from process 5237
+
+
+The C<fork> method returns a L<GRID::Machine::Process> object. The first argument must be a string containing
+the code that will be executed by the forked process in the remote machine.
+Such code is always called in a list context.
+The C<fork> method admits the following arguments:
+
+=over 2
+
+=item * C<stdin>
+
+The name of the file to which C<stdin> will be redirected
+
+=item * C<stdout>
+
+The name of the file to which C<stdout> will be redirected. If not specified a temporary file will be used
+
+=item * C<stderr>
+
+The name of the file to which C<stderr> will be redirected. If not specified a temporary file will be used
+
+=item * C<result>
+
+The name of the file to which the result computed by the child process  will be dumped. If not specified a temporary file will be used
+
+=item * C<args>
+
+The arguments for the code executed by the remote child process
+
+=back
+
+=head2 C<GRID::Machine::Process> objects
+
+L<GRID::Machine::Process> objects have been overloaded. In a string context 
+a L<GRID::Machine::Process> object 
+produces the concatenation C<hostname:clientPID:remotePID>. 
+In a boolean context it returns true if the process is alive and false otherwise.
+This way, the execution of line 21 in the program above:
+
+    21  print "Doing something while $p is still alive  ...\n" if $p; 
+
+produces an output like:
+
+  Doing something while 5220:5230:some.machine:5234:5237 is still alive  ...
+
+if the remote process is still alive. The descriptor of the process
+C<5220:5230:some.machine:5234:5237>
+is a colon separated sequence of five components:
+
+=over 2
+
+=item 1 - The PID of the local process executing L<GRID::Machine> 
+
+=item 2 - The PID of the local process in charge of the connection with the remote 
+machine
+
+=item 3 - The name of the remote machine 
+
+=item 4 - The PID of the remote process executing L<GRID::Machine::REMOTE>
+
+=item 5 - The PID of the child process created by C<fork>
+
+=back
+
+When evaluated in a boolean context, a L<GRID::Machine::Process> returns
+1 if it is alive and 0 otherwise.
+
+=head2 The C<waitpid> method
+
+The C<waitpid> method  waits for the L<GRID::Machine::Process> received as first argument 
+to terminate. Additional C<FLAGS> as in perl C<waitpid> can be passed as arguments.
+It returns a L<GRID::Machine::Process::Result> object, whose attributes contain:
+
+
+=over 2 
+
+=item * C<stdout>  
+
+A string containing the output to C<STDOUT> of the remote child process
+
+=item * C<stderr>
+
+A string containing the output to C<STDERR> of the remote child process
+
+=item * C<results>
+
+The list of values returned by the child process. The forking code 
+is always called in a list context.
+
+=item * C<status>
+
+The value associated with C<$?> as returned by the remote child process.
+
+=item * C<waitpid>
+
+The value returned by the Perl C<waitpid> function when synchronized 
+with the remote child process.
+It is usually the value is either the C<pid> of the deceased process, or C<-1> 
+if there was no such child process.  On some systems, a value of C<0> indicates that
+there are processes still running.  
+
+=item * C<errmsg> 
+
+The child error as in C<$@> 
+
+=item * C<machineID>
+
+The logical identifier of the associated L<GRID::Machine>.
+By default, 0 if it was the first L<GRID::Machine> created, 1 if it was the second, etc.
+
+=back 
+
+=head2  The C<waitall> method
+
+It is similar to C<waitpid> but instead waits for any child process.
+
+Behaves like the wait(2) system call on your system: it waits
+for a child process to terminate and returns 
+
+=over 2
+
+=item * The C<GRID::Machine::Process::Result>
+object associated with the  deceased process if it was called via the L<GRID::Machine> 
+C<fork> method, or 
+
+=item * The PID of the deceased process if there is no C<GRID::Machine::Process>
+associated (it was called using an ordinary C<fork>)
+
+=item * C<-1> if there are no child processes.  
+Note that a return value of C<-1> could mean that child processes are
+being automatically reaped, as described in perlipc.
+
+=back
+
+See an example:
+
+  $ cat -n wait1.pl 
+     1  #!/usr/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4  use Data::Dumper;
+     5  
+     6  my $host = $ENV{GRID_REMOTE_MACHINE};
+     7  my $machine = GRID::Machine->new( host => $host );
+     8  
+     9  my $p = $machine->fork( q{
+    10  
+    11     print "stdout: Hello from process $$. args = (@_)\n";
+    12     print STDERR "stderr: Hello from process $$\n";
+    13  
+    14     use List::Util qw{sum};
+    15     return { s => sum(@_), args => [ @_ ] };
+    16   },
+    17   args => [ 1..4 ],
+    18  );
+    19  
+    20  # GRID::Machine::Process objects are overloaded
+    21  print "Doing something while $p is still alive  ...\n" if $p; 
+    22  
+    23  my $r = $machine->waitall();
+    24  
+    25  print "Result from process '$p': ",Dumper($r),"\n";
+    26  print "GRID::Machine::Process::Result objects are overloaded in a string context:\n$r\n";
+
+When executed produces:
+
+  $ perl wait1.pl 
+  Doing something while 1271:1280:local:1284:1287 is still alive  ...
+  Result from process '1271:1280:local:1284:1287': $VAR1 = bless( {
+                   'machineID' => 0,
+                   'stderr' => 'stderr: Hello from process 1287
+  ',
+                   'descriptor' => 'local:1284:1287',
+                   'status' => 0,
+                   'waitpid' => 1287,
+                   'errmsg' => '',
+                   'stdout' => 'stdout: Hello from process 1287. args = (1 2 3 4)
+  ',
+                   'results' => [ { 'args' => [ 1, 2, 3, 4 ], 's' => 10 } ]
+                 }, 'GRID::Machine::Process::Result' );
+
+  GRID::Machine::Process::Result objects are overloaded in a string context:
+  stdout: Hello from process 1287. args = (1 2 3 4)
+  stderr: Hello from process 1287
+
+The following example uses the C<fork> method and C<waitall> to 
+compute in parallel a numerical approach to the value of the number C<pi>:
+
+  $ cat -n waitpi.pl 
+     1  #!/usr/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4  
+     5  my $host = $ENV{GRID_REMOTE_MACHINE};
+     6  my $machine = GRID::Machine->new( host => $host );
+     7  
+     8  my ($N, $np, $pi)  = (1000, 4, 0);
+     9  for (0..$np-1) {
+    10     $machine->fork( q{
+    11         my ($id, $N, $np) = @_;
+    12           
+    13         my $sum = 0;
+    14         for (my $i = $id; $i < $N; $i += $np) {
+    15             my $x = ($i + 0.5) / $N;
+    16             $sum += 4 / (1 + $x * $x);
+    17         }
+    18         $sum /= $N; 
+    19      },
+    20      args => [ $_, $N, $np ],
+    21    );
+    22  }
+    23  
+    24  $pi += $machine->waitall()->result for 1..$np;
+    25  
+    26  print "pi = $pi\n";
+
+=head2  The C<async> method
+
+The C<async> method it is quite similar to the fork method
+but receives as arguments the  name of a L<GRID::Machine> method 
+and the arguments for this method.
+It executes asynchronously the method. 
+It returns a L<GRID::Machine::Process> object.
+Basically, the call
+
+            $m->async($subname => @args) 
+
+is equivalent to:
+
+            $m->fork($subname.'(@_)' args => [ @args ] ) 
+
+The following example uses C<async> to compute in 
+parallel an approximation to the value of pi:
+
+
+  $ cat -n async.pl 
+     1  #!/usr/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4  
+     5  my $host = $ENV{GRID_REMOTE_MACHINE};
+     6  my $machine = GRID::Machine->new( host => $host );
+     7  
+     8  $machine->sub(sumareas => q{
+     9         my ($id, $N, $np) = @_;
+    10           
+    11         my $sum = 0;
+    12         for (my $i = $id; $i < $N; $i += $np) {
+    13             my $x = ($i + 0.5) / $N;
+    14             $sum += 4 / (1 + $x * $x);
+    15         }
+    16         $sum /= $N; 
+    17  });
+    18  
+    19  my ($N, $np, $pi)  = (1000, 4, 0);
+    20  
+    21  $machine->async( sumareas =>  $_, $N, $np ) for (0..$np-1);
+    22  $pi += $machine->waitall()->result for 1..$np;
+    23  
+    24  print "pi = $pi\n";
+
+
+
+=head2 GRID::Machine::Process::Result objects
+
+In a string context a C<GRID::Machine::Process::Result> object produces the concatenation
+of its output to C<STDOUT> followed by its output to C<STDERR>.
+In a boolean context it evaluates according to its C<result> attribute.
+It evaluates to true if it is an array reference with more than one element
+or if the only element is true. Otherwise it is false.
+
+
+
+=head2 About the C<pi> Example Used in this Manual
+
+In this manual we have used several times as an example the 
+computation of an approach to number Pi (3.14159...) using 
+numerical integration. To understand it,
+take into account that the area under the curve 1/(1+x**2) between 0 and 1
+is C<Pi/4 = (3.1415...)/4> as it shows the following debugger session: 
+
+
+  pp2@nereida:~/public_html/cgi-bin$ perl -wde 0
+  main::(-e:1):   0
+    DB<1>  use Math::Integral::Romberg 'integral'
+    DB<2> p integral(sub { my $x = shift; 4/(1+$x*$x) }, 0, 1);
+  3.14159265358972
+
+The module L<Math::Integral::Romberg> provides the function C<integral> 
+that allow us to compute the area of a given function in some 
+interval. In fact - if you remember your high
+school days - it is easy to see the reason: the integral of C<4/(1+$x*$x)> is
+C<4*arctg($x)> and so its area between 0 and 1 is given by:
+
+        4*(arctg(1) - arctg(0)) = 4 * arctg(1) = 4 * Pi / 4 = Pi
+
+
+This is not, in fact, a good way to compute Pi, but makes a good example
+of how to exploit several machines to fulfill a task. 
+
+To compute the area under C<4/(1+$x*$x)> we have divided up the interval C<[0,1]>
+into sub-intervals of size C<1/N> and add up the areas of the small
+rectangles with base C<1/N> and height the value of the curve C<4/(1+$x*$x)> in the middle of
+the interval. The following debugger session illustrates the idea:
+
+  pp2@nereida:~$ perl -wde 0
+  main::(-e:1):   0
+  DB<1> use List::Util qw(sum)
+  DB<2> $N = 6
+  DB<3> @divisions = map { $_/$N } 0..($N-1)
+  DB<4> sub f { my $x = shift; 4/(1+$x*$x) }
+  DB<5> @halves = map { $_+0.5/$N } @divisions
+  DB<6> $area = sum(map { f($_)/$N } @halves)
+  DB<7> p $area
+  3.14390742722244
+
+To optimize the execution time
+we distribute
+the sum in line 6 C<$area = sum(map { f($_)/$N } @halves)> among
+several processes. The processes are numbered from 0 to C<np-1>.
+Each process sums up the areas of roughly C<N/np> intervals. 
+We can spedup the computation if 
+each process is allocated to a different processor (or core).
+
+
+
+
+=head1 AUTHOR
+
+Casiano Rodriguez Leon E<lt>casiano@ull.esE<gt>
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+Support from Gobierno de Canarias was through GC02210601
+(I<Grupos Consolidados>).
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+I wish to thank Paul Evans for his C<IPC::PerlSSH> module: it was the source
+of inspiration for this module. To 
+Alex White,
+Dmitri Kargapolov, 
+Eric Busto
+and
+Erik Welch 
+for their contributions.
+To the Perl Monks, and the Perl Community for generously sharing their knowledge.
+Finally, thanks to Juana, Coro and  my students at La Laguna.
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2007 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+
+

@@ -1,0 +1,29 @@
+Revision History
+
+0.41   Sat Apr 15 12:00:00 2006 EDT
+
+       - Enhanced solver and added tests for previously unsolvable puzzles:
+          - 2 examples by Jean-Pierre Vidal
+          - 6x6 puzzles, example from Brian Helterline
+          - 16x16 puzzle from sudokusolver.com
+          - 15x15 puzzle from sudoku.com's sud.exe
+          - Several "evil" puzzles from WebSudoku
+       - Allows \%config to be passed in, thanks to Brian Helterline
+       - Added board validation
+       - Bugs fixed:
+          _get_or_set_square:
+            Worked for squares but not rectangles.
+             1. Had $x and $y reversed in accessing $self->{board}
+             2. Was using $v_squares instead of $h_squares
+          _array_to_text:
+             3. Wasn't using a copy of $self->{board}, so printing
+                a solution for debugging purposes screwed up later
+                processing.
+          _retry:
+             4. Wasn't correctly copying and restoring $self->{board},
+                so it wasn't able to brute force the solution to some
+                hard problems.
+
+0.10   Wed Jan 31 00:00:00 2006 EST
+       - First Public Release
+

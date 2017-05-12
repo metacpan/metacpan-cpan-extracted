@@ -1,0 +1,27 @@
+This is Perl module GD::Tab::Guitar.
+
+INSTALLATION
+
+GD::Tab::Guitar installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan GD::Tab::Guitar
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+GD::Tab::Guitar documentation is available as in POD. So you can do:
+
+    % perldoc GD::Tab::Guitar
+
+to read the documentation online with your favorite pager.
+
+Koichi Taniguchi (nipotan)

@@ -1,0 +1,38 @@
+examples/README
+20 Dec 2003
+
+
+
+These are some example programs that show how to use Term::GDBUI.
+
+
+
+xmlexer
+
+This is an XML-RPC command execution shell.  It is a proof of
+concept so it needs a lot of clean up.  However, it is fairly
+useful as it is.  See 'perldoc xmlexer' for more.
+
+
+fileman-example
+
+This is a reimplementation of the example that comes with the GNU
+Readline library.  It's a command shell that demonstrates file and
+directory completion.  All dangerous commands are disabled by default.
+
+
+
+synopsys	
+
+This is the code from Term::GDBUI's POD.  It ensures that the
+code in the documentation actually runs.
+
+
+
+tui-sample
+
+The Term::TUI module includes an example of its own.  I have
+re-implemented this example using Term::GDBUI to illustrate the
+similarities and differences between the two modules.
+
+

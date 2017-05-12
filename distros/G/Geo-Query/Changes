@@ -1,0 +1,18 @@
+Revision history for Perl extension Geo::Query.
+
+0.04	08 Jul 2010
+
+	- Fixed distance formula for southern hemisphere
+
+
+0.03	Mon Feb 11 07:42:42 CET 2008
+
+	- Calculates distances.
+	- Installs related Geo-Quey modules.
+
+
+0.01	Thu Jun 14 16:27:06 2007
+
+	- original version; created by h2xs 1.23 with options
+		-A -n Geo::Query
+

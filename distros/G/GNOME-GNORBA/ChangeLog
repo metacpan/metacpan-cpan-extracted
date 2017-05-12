@@ -1,0 +1,11 @@
+Sat Jul  8 13:45:07 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* Version 0.1.0
+
+	* GOAD.pm (_server_list_read): Properly anchor section
+	regular expression to beginning of line.
+
+Sun Sep 19 20:01:57 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* Released version 0.0.1
+

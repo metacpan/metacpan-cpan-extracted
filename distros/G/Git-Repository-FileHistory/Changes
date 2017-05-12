@@ -1,0 +1,19 @@
+Revision history for Perl extension Git::Repository::FileHistory
+
+0.06 2016-04-10T04:42:58Z
+        - Replace has_git by test_requires_git (fix test only) (BooK)
+
+0.05 2013-12-27T02:49:40Z
+        - fix deps again
+
+0.04 2013-12-27T02:42:18Z
+        - fix deps only (tsucchi++)
+
+0.03 2013-07-26T11:06:29Z
+        - add `updated_at` method (alias of `last_modified_at`)
+
+0.02 2013-07-26T09:18:12Z
+        - fix test cases and dependencies
+
+0.01 2013-07-21T14:24:48Z
+        - original version

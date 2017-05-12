@@ -1,0 +1,39 @@
+NAME
+    Graphics::ColorNames::GrayScale - grayscale colors for
+    Graphics::ColorNames
+
+SYNOPSIS
+      require Graphics::ColorNames::GrayScale;
+
+      $NameTable = Graphics::ColorNames::GrayScale->NamesRgbTable();
+      $RgbColor  = $NameTable->{gray80};
+
+DESCRIPTION
+    This module provides grayscale colors for Graphics::ColorNames. The
+    following are valid colors:
+
+      Format  Example  Description
+
+      grayHH  grey80   Gray value in hexidecimal (HH between 00 and ff)
+      grayDDD gray128  Gray value in decimal (DDD between 000 and 255)
+      grayP%  gray50%  Gray value in percentage (P between 0 and 100)
+
+    Besides "gray", on can also use the following colors:
+
+      red
+      green
+      blue
+      yellow
+      cyan
+      purple
+
+    Lower values are darker, higher values are brighter.
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+LICENSE
+    Copyright (c) 2004 Robert Rothenberg. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+

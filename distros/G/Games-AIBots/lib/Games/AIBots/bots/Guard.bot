@@ -1,0 +1,299 @@
+$name   = 'Guard';
+$author = 'Autrijus Tang';
+$team   = 'Clam Clan';
+
+main: {
+    # unless ($snode_x) {
+    #     print "Guardian commited suppuku due to lost of cause.";
+    #     attempt destruct;
+    # }
+    enable shield;
+    goto dock;
+}
+
+go_x: {
+    goto dock if abs($enemy_x - $x) < 2 or abs($enemy_y - $y) < 2 or &onnode;
+    goto go_y unless $delta_x = $snode_x - $x;
+
+    $turn  = &turnto(($delta_x < 0) ? '4' : '6');
+    $front = ($turn eq 'left * 2') ? 'backward' : 'forward';
+    $rear  = ($turn eq 'left * 2') ? 'forward' : 'backward';
+    turn $turn if $turn eq 'right' or $turn eq 'left';
+
+    move $front;
+
+    if (&bumped) {
+        move $rear;
+        goto go_y;
+    }
+
+    goto dock;
+}
+
+go_y: {
+    goto dock if abs($enemy_x - $x) < 2 or abs($enemy_y - $y) < 2 or &onnode;
+    goto go_x unless $delta_y = $snode_y - $y;
+
+    $turn = &turnto(($delta_y < 0) ? '8' : '2');
+    $front = ($turn eq 'left * 2') ? 'backward' : 'forward';
+    $rear  = ($turn eq 'left * 2') ? 'forward' : 'backward';
+    turn $turn if $turn eq 'right' or $turn eq 'left';
+
+    move $front;
+
+    if (&bumped) {
+        move $rear;
+        goto go_y;
+    }
+
+    goto dock;
+}
+
+dock_x: {
+    scan perimeter unless $flag;
+    fire energy if &found('mine');
+    if (&found('enemy')) {
+        fire energy;
+        redo;
+    }
+    call search if &found('vault|flag');
+
+    $flag++;
+    $turn = &turnto(($delta_x < 0 xor (&nearst('enemy') <= 5)) ? '4' : '6');
+    $front = ($turn eq 'left * 2') ? 'backward' : 'forward';
+    $rear  = ($turn eq 'left * 2') ? 'forward' : 'backward';
+    turn $turn if $turn eq 'right' or $turn eq 'left';
+
+    move $front;
+    if (&bumped()) {
+        move $rear * 3;
+    }
+    elsif (&nearst('enemy') > 5) {
+        move $front * 2;
+    }
+
+    redo if abs($delta_x = $enemy_x - $x) < 2;
+    goto dock;
+}
+
+dock_y: {
+    scan perimeter unless $flag;
+    fire energy if &found('mine');
+    if (&found('enemy')) {
+        fire energy;
+        redo;
+    }
+    call search if &found('vault|flag');
+
+    $flag++;
+    $turn = &turnto(($delta_y < 0 xor (&nearst('enemy') <= 5)) ? '8' : '2');
+    $front = ($turn eq 'left * 2') ? 'backward' : 'forward';
+    $rear  = ($turn eq 'left * 2') ? 'forward' : 'backward';
+    turn $turn if $turn eq 'right' or $turn eq 'left';
+
+    move $front;
+    if (&bumped()) {
+        move $rear * 3;
+    }
+    elsif (&nearst('enemy') > 5) {
+        move $front * 2;
+    }
+
+    redo if abs($delta_y = $enemy_y - $y) < 2;
+    goto dock;
+}
+
+dock: {
+    $flag = 0;
+    goto dock_x if abs($delta_x = $enemy_x - $x) < 2; # + (&nearst('enemy') <= 5);
+    goto dock_y if abs($delta_y = $enemy_y - $y) < 2; # + (&nearst('enemy') <= 5);
+    goto guard if not &onnode and $snode_x and (abs($enemy_x - $snode_x) >= 2 and abs($enemy_y - $snode_y) >= 2);
+    goto heal;
+}
+
+heal: {
+    if ($life < $max_life - 4 and &nearst('enemy') > 8) {
+        disable shield;
+        attempt repair;
+        redo;
+    }
+
+    enable shield;
+    goto revenge;
+}
+
+guard: {
+    scan perimeter;
+    fire energy if &found('mine');
+    if (&found('enemy')) {
+        fire energy;
+        redo;
+    }
+    call search if &found('vault|flag');
+
+    if (abs($enemy_x - $snode_x) >= 2 and abs($enemy_y - $snode_y) >= 2) {
+        goto dock if abs($enemy_x - $x) < 2 or abs($enemy_y - $y) < 2;
+        goto go_x if abs($snode_x - $x) > abs($snode_y - $y) - ($h eq '4' or $h eq '6');
+        goto go_y;
+    }
+
+    goto dock;
+}
+
+revenge: {
+    if ($enemy_x == $ex and $enemy_y == $ey and $enemy_h == $eh and $enemy_l == $el) {
+        if ($ec >= 50) {
+            goto hunt_x unless $enemy_x == $x;
+            goto hunt_y;
+        }
+        $ec++;
+    }
+    else {
+        $ex = $enemy_x;
+        $ey = $enemy_y;
+        $eh = $enemy_h;
+        $el = $enemy_l;
+        $ec = 0;
+    }
+
+    scan perimeter;
+    call search if &found('vault|flag');
+    fire energy if &found('mine');
+    attempt destruct if &found('enemy');
+    goto dock;
+}
+
+deadguy: {
+    $el = $enemy_l;
+    disable shield;
+    fire laser;
+    redo if $enemy_l < $el;
+    fire energy unless &damaged;
+    move forward;
+    move forward;
+    goto revenge;
+}
+
+hunt_x: {
+    goto revenge unless $enemy_x == $ex and $enemy_y == $ey and $enemy_h == $eh and $enemy_l == $el;
+
+    scan relative 8;
+    fire energy if &found('mine');
+    if (&found('flag') and not &damaged) {
+        move backward;
+        fire energy;
+        move forward;
+    }
+    if (&found('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+    }
+
+    goto dock if &found('enemy');
+    goto dock if &damaged and &onnode;
+    goto revenge unless $delta_x = $enemy_x - $x - ($enemy_h eq '4' ? 2 : $enemy_h eq '6' ? -2 : 0);;
+
+    $turn = &turnto(($delta_x < 0) ? '4' : '6');
+    turn $turn if $turn;
+    goto deadguy if &nearst('enemy') < 3;
+    move forward;
+    if (&bumped) {
+        move backward;
+        goto hunt_y;
+    }
+    redo;
+}
+
+hunt_y: {
+    goto revenge unless $enemy_x == $ex and $enemy_y == $ey and $enemy_h == $eh and $enemy_l == $el;
+
+    scan relative 8;
+    fire energy if &found('mine');
+    if (&found('flag') and not &damaged) {
+        move backward;
+        fire energy;
+        move forward;
+    }
+    if (&found('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+    }
+
+    goto dock if &found('enemy');
+    goto dock if &damaged and &onnode;
+    goto revenge unless $delta_y = $enemy_y - $y - ($enemy_h eq '8' ? 2 : $enemy_h eq '2' ? -2 : 0);
+
+    $turn = &turnto(($delta_y < 0) ? '8' : '2');
+    turn $turn if $turn;
+    goto deadguy if &nearst('enemy') < 3;
+    move forward;
+    if (&bumped) {
+        move backward;
+        goto hunt_x;
+    }
+    redo;
+}
+
+sub search {
+    $a++;
+    $lastammo = $ammo;
+    $lastlife = $life;
+
+    scan relative 8;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move backward;
+            fire energy;
+            move forward;
+        }
+        move forward;
+    }
+
+    scan relative 2;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move forward;
+            fire energy;
+            move backward;
+        }
+        move backward;
+    }
+
+    scan relative 9;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move backward;
+            fire energy;
+            move forward;
+        }
+        move forward;
+        turn right;
+        move forward;
+    }
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+
+    scan relative 1;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move forward;
+            fire energy;
+            move backward;
+        }
+        move backward;
+        turn right;
+        move backward;
+    }
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+
+    if ($a > 2) {
+        $a = 0;
+        return;
+    }
+
+    turn right;
+    redo;
+}

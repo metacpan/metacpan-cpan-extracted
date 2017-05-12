@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+
+	<!-- SEO tags -->
+	<meta name="description" content="Pittsburgh, PA's finest custom AR-15 and Remington Model 700 builder and customizer." />
+	<meta name="keywords" content="pittsburgh,pennsylvania,x86,guns,rifles,pistols,ar-15,m16,1911,blackout,bryce porter,arms,suppressor,300aac,6.5grendel,6.5mm,6.8mm,6.8spc,PittsburghGuns,guns,rifle,AR15,range,ARbuild,customgun,M4,competition,shootingsports,hunting,safety,sports,2ndammendment,secondammendment" /> 
+	<meta name="author" content="Bryce Porter" />
+	<!-- End SEO tags -->
+
+	<!-- UI specific tags -->
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<!-- End UI specific tags -->
+
+	<!-- Site verification tags --> 
+	<meta name="google-site-verification" content="tJVfXhHa9DksoYXOJekUVCIcbnqw_ssgpjYc-i2SsQs" />
+	<meta name="alexaVerifyID" content="hwOYf05B46UJjYzo1p-O_EcgdS0" />
+	<meta name="msvalidate.01" content="F649B4114F3D4FD163BBC7C0E40739EE" />
+	<!-- End site verification tags -->
+
+	<!-- New Facebook style OG tags -->
+	<meta property="og:title" content="x86Guns" />
+	<meta property="og:type" content="sport" />
+	<meta property="og:url" content="https://www.x86guns.us<%= $url %>" />
+	<!-- End new Facebook style OG tags -->
+
+	<!-- Common UI elements -->
+	<link rel="shortcut icon" href="/images/favicon.ico" />
+	<!-- End common UI elements -->
+
+	<!-- Platform-specific UI elements -->
+	<link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+	<link rel="stylesheet" type="text/css" href="/css/iphone-style.css" media="screen"/>
+	<!-- End platform-specific UI elements -->
+
+	<title>x86Guns</title>
+
+	<!-- Common UI JS -->
+	<script id="jquery" type="text/javascript" src="/js/ui/jquery.js"></script>
+	<script id="gunmojo" type="text/javascript" src="/js/ui/x86-gunmojo.js"></script>
+	<!-- End common UI JS -->
+
+	<!-- Analytics JS -->
+	<script id="quantcast" type="text/javascript" src="/js/analytics/quantcast-analytics.js" async></script>
+	<script id="ganalytics" type="text/javascript" src="/js/analytics/google-analytics.js"></script>
+	<!-- End Analytics JS -->
+
+	<!-- Social media JS -->
+	<script id="gplus" type="text/javascript" src="/js/social/googleplus-social.js" async></script>
+	<script id="linkedin" type="text/javascript" src="/js/social/linkedin-social.js" async></script>
+	<script id="pinterest" type="text/javascript" src="/js/social/pinterest-social.js" async></script>
+	<script id="facebook-jssdk" type="text/javascript" src="/js/social/facebook-social.js" async></script>
+	<script id="twitter-wjs" type="text/javascript" src="/js/social/twitter-social-widgets.js"></script>
+	<script id="twitter-social" type="text/javascript" src="/js/social/twitter-social.js"></script>
+	<!-- End social media JS -->
+
+	<!-- Monitoring JS -->
+	<script id="woopra" type="text/javascript" src="/js/monitoring/woopra-monitoring.js"></script>
+	<!-- End monitoring JS -->
+</head>
+
+<body>
+
+<!-- Facebook Code -->
+<div id="fb-root">&nbsp;</div>
+<!-- End Facebook Code -->
+
+<!-- Quantcast Code -->
+<script type="text/javascript">
+        var _qevents = _qevents || [];
+        _qevents.push({
+                qacct:"p-HuEQFUrWUd2qT"
+        });
+</script>
+<noscript>
+	<img src="https://pixel.quantserve.com/pixel/p-HuEQFUrWUd2qT.gif" style="display:none" border="0" height="1" width="1" />
+</noscript>
+<!-- End Quantcast tag -->
+
+	<div id="wrap">
+		<div id="main">
+			<div class="header">
+				<a class="left" href="/">Home</a>
+				<h1 class="title">x86Guns</h1>
+			</div>
+			<div class="content">
+				<h2 class="title"><div id="headline"><%== $headline %></div></h2>
+				<h3 class="title"><div id="permalink"></div></h3>
+
+				<span id="social-media-follow" style="text-align:center">
+					<script type="IN/FollowCompany" data-id="2674488" data-counter="none"></script>
+					<br/>
+					<a href="https://twitter.com/x86guns" class="twitter-follow-button" data-show-count="false">Follow @x88guns</a>
+					<br/>
+					<a data-pin-do="buttonFollow" href="https://pinterest.com/x86guns/">Follow x86guns</a>
+				</span>
+				<br />
+				<span id="social-media-like" style="text-align:center;clear:right">
+					<script type="IN/Share"></script>
+					<div class="g-plusone" data-size="tall" data-annotation="none" data-href="https://www.x86guns.us<%= $url %>"></div>
+					<a href="https://twitter.com/share" class="twitter-share-button" data-via="x86guns" data-hashtags="PittsburghGuns,guns,rifle,AR15,range,ARbuild,customgun,M4,competition,shootingsports,hunting,safety,sports,2ndammendment,secondammendment">Tweet</a>
+					<div class="fb-like" data-href="https://x86guns.us<%== $url =>" data-action="recommend" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false" data-font="verdana"></div>
+				</span>
+				<br />
+
+				<div id="dyncontent"><%== $content %></div><br/>
+
+				<a href="https://twitter.com/x86guns" class="twitter-follow-button" data-show-count="false">Follow @x86guns</a>
+                		% if ( stash( 'custom_ar_rifles' ) and @$custom_ar_rifles ) {
+                		<h2 class="title2">AR-15 Rifles</h2>
+                		<div class="box-white">
+                        		% for my $ar15_rifle_item ( @{$custom_ar_rifles} ) {
+                        		<p>
+                                        	<a class="ajax" href="<%= $ar15_rifle_item->[0] %>"><%= $ar15_rifle_item->[1] %></a>
+                        		</p>
+                        		% }
+                		</div>
+                		% }
+                		% if ( stash( 'custom_bolt_rifles' ) and @$custom_bolt_rifles ) {
+                		<h2 class="title2">Bolt-Action Rifles</h2>
+                		<div class="box-white">
+					<p>
+                        		% for my $bolt_rifle_item ( @{$custom_bolt_rifles} ) {
+                                        	<a class="ajax" href="<%= $bolt_rifle_item->[0] %>"><%= $bolt_rifle_item->[1] %></a>
+					</p>
+                        		% }
+                		</div>
+                		% }
+                		% if ( stash( 'custom_ar_pistols' ) and @$custom_ar_pistols ) {
+                		<h2 class="title2">AR-15 Pistols</h2>
+                		<div class="box-white">
+                        		% for my $ar15_pistol_item ( @{$custom_ar_pistols} ) {
+					<p>
+                                        	<a class="ajax" href="<%= $ar15_pistol_item->[0] %>"><%= $ar15_pistol_item->[1] %></a>
+					</p>
+                        		% }
+                		</div>
+                		% }
+                		% if ( stash( 'custom_1911_pistols' ) and @$custom_1911_pistols ) {
+                		<h2 class="title2">1911 Pistols</h2>
+                		<div class="box-white">
+                        		% for my $pistol_item ( @{$custom_1911_pistols} ) {
+					<p>
+                                        	<a class="ajax" href="<%= $pistol_item->[0] %>"><%= $pistol_item->[1] %></a>
+					</p>
+                        		% }
+                		</div>
+                		% }
+                		% if ( stash( 'services' ) and @$services ) {
+                		<h2 class="title2">Services</h2>
+                		<div class="box-white">
+                        		% for my $service_item ( @{$services} ) {
+					<p>
+                                        	<a class="ajax" href="<%= $service_item->[0] %>"><%= $service_item->[1] %></a>
+					</p>
+                        		% }
+                		</div>
+                		% }
+                		% if ( stash( 'external_links' ) and @$external_links ) {
+                		<h2 class="title2">Links</h2>
+                		<div class="box-white">
+                        		% for my $link_item ( @{$external_links} ) {
+					<p>
+                                        	<a href="<%= $link_item->[0] %>"><%= $link_item->[1] %></a>
+					</p>
+                        		% }
+                		</div>
+                		% }
+			</div><!--content-->
+		</div><!--main-->
+		<div id="sidebar">
+			<div class="header">
+				<p class="title">News</p>
+			</div><!--header-->
+			<div class="content">
+				% for my $news_item ( @{$news} ) {
+					<p><strong><%== $news_item->[0] %></strong><br /><%== $news_item->[1] %></p>
+				% }
+			</div><!--content-->
+		</div><!--sidebar-->
+	</div><!--wrap-->
+
+<script type="text/javascript">
+        _qevents.push( { qacct:"p-HuEQFUrWUd2qT"} );
+</script>
+<noscript>
+        <div style="display: none;">
+                <img src="//pixel.quantserve.com/pixel/p-HuEQFUrWUd2qT.gif" height="1" width="1" alt="Quantcast"/>
+        </div>
+</noscript>
+
+</body>
+</html>
+

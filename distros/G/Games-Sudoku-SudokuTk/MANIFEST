@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Games-Sudoku-SudokuTk.t
+lib/Games/Sudoku/SudokuTk.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+Revision history for Perl extension Games::Traveller::Animals.
+
+0.01  Mon Feb 28 08:11:58 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n Games::Traveller::Animals
+

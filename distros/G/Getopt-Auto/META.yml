@@ -1,0 +1,32 @@
+---
+abstract: 'An easy way to organize a script to handle whatever option mechanism it requires.'
+author:
+  - 'Geoffrey Leach <geoff@hughes.net>'
+build_requires:
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Getopt-Auto
+provides:
+  Getopt::Auto:
+    file: lib/Getopt/Auto.pm
+    version: 2.0
+  Getopt::Auto::PodExtract:
+    file: lib/Getopt/Auto.pm
+requires:
+  File::Basename: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  Pod::Usage: 0
+  Readonly: 0
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.0

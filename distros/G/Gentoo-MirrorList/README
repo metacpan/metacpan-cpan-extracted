@@ -1,0 +1,201 @@
+NAME
+    Gentoo::MirrorList - A programmatic way to access Gentoo.org Mirror
+    Metadata
+
+VERSION
+    version 1.0.2
+
+SYNOPSIS
+      my @mirrors = Gentoo::MirrorList->region('North America')->country('CA')->ipv4->all;
+      my @mirrors = Gentoo::MirrorList->region('North America')->ipv4->random(3);
+      my $mirror = Gentoo::MirrorList->region('Australia')->ipv4->random();
+      my @all_names = Gentoo::MirrorList->mirrorname_list
+      my @australian_names = Gentoo::MirrorList->country('AU')->mirrorname_list;
+
+DESCRIPTION
+    This module will download the most up-to-date copy of
+    <http://www.gentoo.org/main/en/mirrors3.xml> and parse it into an array
+    of Gentoo::MirrorList::Mirror which you can then filter down
+    progressively using the methods defined below to find, via code, any
+    mirror that meets a given criteria.
+
+    For efficiency, this module uses App::Cache to cache both the mirror
+    list and the parsed representation of that list, and the data files are
+    stored in ~/.gentoo_mirrorlist/cache/
+
+METHODS
+  FILTER METHODS
+    All of the following self-filter the data set they are on.
+
+      my $x = Gentoo::MirrorList->FILTER
+      my $y = Gentoo::MirrorList->new()
+      my $z = $y->FILTER
+
+    x and y will be the same. y and z will be the same object.
+
+  TERMINATOR LIST METHODS
+    If called directly on Gentoo::MirrorList will return all data possible.
+
+    If called on an object that has been filtered, only shows the data that
+    is applicable.
+
+  MIRROR LIST METHODS
+    The following methods will return one or more Gentoo::MirrorList::Mirror
+    objects,
+
+    They can be called directly on Gentoo::MirrorList or on filtered
+    objects.
+
+    On filtered objects, the filtration that has been performed affects the
+    output.
+
+FILTER METHODS
+  "country"
+      ..->country( 'AU' )->..
+      ..->country( qr/AU/ )->..
+
+    See also "country_list"
+
+  "countryname"
+      ..->countryname( 'Australia' )->..
+      ..->countryname( qr/Aus/ )->..
+
+    See also "countryname_list"
+
+  "region"
+      ..->region('North America')->..
+      ..->region(qr/America/)->..
+
+    See also "region_list"
+
+  "mirrorname"
+      ..->mirrorname(qr/^a/i)->..
+
+    See also "mirrorname_list"
+
+  "uri"
+      ..->uri(qr/gentoo/)->..
+
+    See also "uri_list"
+
+  "proto"
+      ..->proto('http')->..
+      ..->proto(qr/^.*tp$/)->..
+
+    See also "proto_list"
+
+  "ipv4"
+      ..->ipv4( 1 )->..
+      ..->ipv4( 0 )->..
+
+  "ipv6"
+      ..->ipv6( 1 )->..
+      ..->ipv6( 0 )->..
+
+  "partial"
+      ..->partial( 1 )->..
+      ..->partial( 0 )->..
+
+  "exclude_country"
+      ..->exclude_country(qr/^K/i)->..
+      ..->exclude_country('AU')->..
+
+    See also "country_list"
+
+  "exclude_countryname"
+      ..->exclude_countryname(qr/America/i)->..
+      ..->exclude_countryname('Australia')->..
+
+    See also "countryname_list"
+
+  "exclude_region"
+      ..->exclude_region(qr/Foo/)->..
+      ..->exclude_region('Foo')->..
+
+    See also "region_list"
+
+  "exclude_mirrorname"
+      ..->exclude_mirrorname(qr/Bad/)->..
+      ..->exclude_mirrorname('Bad')->..
+
+    See also "mirrorname_list"
+
+  "exclude_uri"
+      ..->exclude_uri(qr/Bad\.ip/)->..
+      ..->exclude_uri('Bad.ip')->..
+
+    See also "uri_list"
+
+  "exclude_proto"
+      ..->exclude_proto(qr/sync/)->..
+      ..->exclude_proto('rsync')->..
+
+    See also "proto_list"
+
+  "is_ipv4"
+      ..->is_ipv4->..
+
+  "not_ipv4"
+      ..->not_ipv4->..
+
+  "is_ipv6"
+      ..->is_ipv6->..
+
+  "not_ipv6"
+      ..->not_ipv6->..
+
+  "is_partial"
+      ..->is_partial->..
+
+  "not_partial"
+      ..->not_partial->..
+
+TERMINATOR LIST METHODS
+  "country_list"
+      my ( @foo ) = ...->country_list
+
+  "countryname_list"
+      my ( @foo ) = ...->countryname_list
+
+  "region_list"
+      my ( @foo ) = ...->region_list
+
+  "mirrorname_list"
+      my ( @foo ) = ...->mirrorname_list
+
+  "uri_list"
+      my ( @foo ) = ...->uri_list
+
+  "proto_list"
+      my ( @foo ) = ...->proto_list
+
+MIRROR LIST METHODS
+  "random"
+      my ( $mirror )  = ...->random()
+      my ( @mirrors ) = ...->random( 10 );
+
+  "all"
+    returns all Mirrors in the current filtration.
+
+    There is no explicit sort order, but it will likely resemble parse order
+
+PRIVATE ATTRIBUTES
+  "_cache"
+  "_data"
+  "_xml"
+PRIVATE METHODS
+  "_normalise_mirrorgroup"
+  "__build_mirrorgroup"
+  "_build_data"
+  "_build__xml"
+  "_filter"
+  "_unfilter"
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

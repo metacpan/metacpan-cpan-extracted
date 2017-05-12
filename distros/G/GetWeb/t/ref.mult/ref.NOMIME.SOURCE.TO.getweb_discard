@@ -1,0 +1,104 @@
+Content-Type: text/html; name="promed_new.html"
+Content-Disposition: inline; filename="promed_new.html"
+Mime-Version: 1.0
+To: getweb_discard
+Subject: <URL:file:./test/promed_new.html> ProMED-mail
+From: Original_Sender
+
+<html>
+<html>
+<head>
+<title>ProMED-mail</title>
+</head>
+<IMG  HEIGHT=54 WIDTH=291 SRC="/images/satlogo.jpg">
+<p>
+<p>
+Welcome!
+<p>
+Here is 1k of junk:
+<p>
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foofoo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foofoo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+</body>
+</html>
+
+
+Content-Type: text/html; name="promed_new.html"
+Content-Disposition: inline; filename="promed_new.html"
+Mime-Version: 1.0
+To: getweb_discard
+Subject: <URL:file:./test/promed_new.html> ProMED-mail
+From: Original_Sender
+
+<html>
+<html>
+<head>
+<title>ProMED-mail</title>
+</head>
+<IMG  HEIGHT=54 WIDTH=291 SRC="/images/satlogo.jpg">
+<p>
+<p>
+Welcome!
+<p>
+Here is 1k of junk:
+<p>
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foofoo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foofoo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foofoo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+</body>
+</html>
+
+
+Content-Type: text/html; name="promed.html"
+Content-Disposition: inline; filename="promed.html"
+Mime-Version: 1.0
+To: getweb_discard
+Subject: <URL:file:./test/promed.html> ProMED-mail
+From: Original_Sender
+
+<html>
+<title>ProMED-mail</title>
+<BASE HREF="file:./promed.html">
+<!-- ignore this comment -->
+<IMG  HEIGHT=54 WIDTH=291 SRC="/images/satlogo.jpg">
+<p>
+<p>
+Here we are!  Also visit
+<a href="test/promed_new.html">
+promed_new.html
+</a>
+<p>Here is a binary character: &#212
+<p>Too bad we can't read <a href=news:comp.mail.sendmail>news</a> yet.
+<p>Here is <a href=file://notavalidpath/justtesting/foobarfoobarfoobarfoobarfoobarfoobarfoobar>a really long URL</a>
+</html>

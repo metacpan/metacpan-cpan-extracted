@@ -1,0 +1,3423 @@
+cp bin/go-slimdown.pl blib/script/go-slimdown.pl
+/usr/bin/perl "-MExtUtils::MY" -e "MY->fixin(shift)" blib/script/go-slimdown.pl
+cp bin/gobo-make-lucene-index.pl blib/script/gobo-make-lucene-index.pl
+/usr/bin/perl "-MExtUtils::MY" -e "MY->fixin(shift)" blib/script/gobo-make-lucene-index.pl
+cp bin/go-gaf-inference.pl blib/script/go-gaf-inference.pl
+/usr/bin/perl "-MExtUtils::MY" -e "MY->fixin(shift)" blib/script/go-gaf-inference.pl
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/analysis_test..............ok
+t/classexpr..................Use of uninitialized value in string eq at t/classexpr.t line 19.
+Use of uninitialized value in string eq at t/classexpr.t line 29.
+Use of uninitialized value in string eq at t/classexpr.t line 67.
+ok
+t/dbconnect..................skipped: (no reason given)
+t/gaf_inference_test........."my" variable $w masks earlier declaration in same scope at t/gaf_inference_test.t line 71.
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 2,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [
+                              'FB	FBgn0010339	128up		GO:0005525	FB:FBrf0067209|PMID:8121394	IDA		F	upstream of RpIII128	CG8340|GTP-bp|X71866	gene	taxon:7227	20060803	FlyBase
+'
+                            ],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN1, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0xd32448)',
+                                     'subset_index' => 'HASH(0xd3255c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0xd32400)',
+                                     'formulae' => 'ARRAY(0xd32394)',
+                                     'instance_h' => 'HASH(0xd32100)',
+                                     'term_h' => 'HASH(0xd324d8)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0xd32364)',
+                                     'relation_h' => 'HASH(0xd32340)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+inferred FB:FBgn0010339 "128up" GO:0005525 --> GO:0046123 "purine deoxyribonucleoside biosynthetic process"
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 2,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN1, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0xd44f5c)',
+                                     'subset_index' => 'HASH(0xd457cc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0xd3dc34)',
+                                     'formulae' => 'ARRAY(0xd45088)',
+                                     'instance_h' => 'HASH(0xd45748)',
+                                     'term_h' => 'HASH(0xd452bc)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0xd45430)',
+                                     'relation_h' => 'HASH(0xd45808)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 2,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN1, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0xd45d18)',
+                                     'subset_index' => 'HASH(0xd45b14)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0xd3dafc)',
+                                     'formulae' => 'ARRAY(0xd4843c)',
+                                     'instance_h' => 'HASH(0x87c1b8)',
+                                     'term_h' => 'HASH(0xd45934)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0xd45db4)',
+                                     'relation_h' => 'HASH(0xd116c4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+ok
+t/gaftest....................ok
+t/gaftest_chunked............Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [
+                              'FB	FBgn0043467	064Ya		GO:0048149	FB:FBrf0131396|PMID:11086999	IMP		P	064Ya		gene	taxon:7227	20060803	FlyBase
+'
+                            ],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x81378c)',
+                                     'subset_index' => 'HASH(0x813abc)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813b4c)',
+                                     'formulae' => 'ARRAY(0x813c54)',
+                                     'instance_h' => 'HASH(0xcdd714)',
+                                     'term_h' => 'HASH(0x813bd0)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813be8)',
+                                     'relation_h' => 'HASH(0xcdd8e8)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+ok
+t/gaftest_chunked_gzipped....Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+Header has been parsed!
+parser: $VAR1 = bless( {
+                 'max_chunk' => 10,
+                 'liberal_mode' => 1,
+                 'checked_options' => 1,
+                 'lines' => [],
+                 'line_no' => 0,
+                 'stalled' => 1,
+                 'parsed_header' => 1,
+                 'fh' => bless( \*Symbol::GEN0, 'FileHandle' ),
+                 'graph' => bless( {
+                                     'node_index' => 'GOBO::Indexes::NodeIndex=HASH(0x813a2c)',
+                                     'subset_index' => 'HASH(0x813d5c)',
+                                     'annotation_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813de0)',
+                                     'formulae' => 'ARRAY(0x813ee8)',
+                                     'instance_h' => 'HASH(0xcdd9c0)',
+                                     'term_h' => 'HASH(0x813e64)',
+                                     'link_ix' => 'GOBO::Indexes::StatementIndex=HASH(0x813e7c)',
+                                     'relation_h' => 'HASH(0x8137a4)'
+                                   }, 'GOBO::Graph' )
+               }, 'GOBO::Parsers::GAFParser' );
+
+ok
+t/graph_creation.............graph: $VAR1 = bless( {
+  'annotation_ix' => bless( {
+    'ixN' => {},
+    'ixT' => {}
+  }, 'GOBO::Indexes::StatementIndex' ),
+  'comment' => 'cvs version: $Revision: 1.239 $',
+  'date' => bless( {
+    'formatter' => undef,
+    'local_c' => {
+      'day' => 14,
+      'day_of_quarter' => 14,
+      'day_of_week' => 2,
+      'day_of_year' => 195,
+      'hour' => 13,
+      'minute' => 33,
+      'month' => 7,
+      'quarter' => 3,
+      'second' => 0,
+      'year' => 2009
+    },
+    'local_rd_days' => 733602,
+    'local_rd_secs' => 48780,
+    'locale' => bless( {
+      'default_date_format_length' => 'medium',
+      'default_time_format_length' => 'medium',
+      'en_complete_name' => 'English United States',
+      'en_language' => 'English',
+      'en_territory' => 'United States',
+      'id' => 'en_US',
+      'native_complete_name' => 'English United States',
+      'native_language' => 'English',
+      'native_territory' => 'United States'
+    }, 'DateTime::Locale::en_US' ),
+    'offset_modifier' => 0,
+    'rd_nanosecs' => 0,
+    'tz' => bless( {
+      'name' => 'floating',
+      'offset' => 0
+    }, 'DateTime::TimeZone::Floating' ),
+    'utc_rd_days' => 733602,
+    'utc_rd_secs' => 48780,
+    'utc_year' => 2010
+  }, 'DateTime' ),
+  'formulae' => [],
+  'instance_h' => {},
+  'link_ix' => bless( {
+    'ixN' => {
+      'GO:0000001' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000001',
+            'label' => 'test term GO:0000001',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              bless( {
+                'id' => 'test_goslim',
+                'label' => 'Test GO slim',
+                'strict' => 0,
+                'verbose' => 0
+              }, 'GOBO::Subset' ),
+              bless( {
+                'id' => 'test_next_goslim',
+                'label' => 'Second test set',
+                'strict' => 0,
+                'verbose' => 0
+              }, 'GOBO::Subset' )
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000008',
+            'label' => 'test term GO:0000008',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[1]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' ),
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'},
+          'relation' => bless( {
+            'id' => 'part_of',
+            'label' => 'part_of',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'target'}
+        }, 'GOBO::LinkStatement' ),
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'},
+          'relation' => bless( {
+            'id' => 'regulates',
+            'label' => 'regulates',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'transitive_over' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1]{'relation'},
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000002' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000002',
+            'label' => 'test term GO:0000002',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0],
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[1]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000006',
+            'label' => 'test term GO:0000006',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' ),
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[0]{'node'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000007',
+            'label' => 'test term GO:0000007',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000003' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000003',
+            'label' => 'test term GO:0000003',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0],
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[1]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1]{'relation'},
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[1]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000004' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000004',
+            'label' => 'test term GO:0000004',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000012',
+            'label' => 'test term GO:0000012',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' ),
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[0]{'node'},
+          'relation' => bless( {
+            'id' => 'positively_regulates',
+            'label' => 'positively_regulates',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subrelation_of_list' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[2]{'relation'}
+            ],
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000015',
+            'label' => 'test term GO:0000015',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' ),
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[0]{'node'},
+          'relation' => bless( {
+            'id' => 'negatively_regulates',
+            'label' => 'negatively_regulates',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subrelation_of_list' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[2]{'relation'}
+            ],
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000016',
+            'label' => 'test term GO:0000016',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000005' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000005',
+            'label' => 'test term GO:0000005',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0],
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[1]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[2]{'relation'},
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000006' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[0]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000009',
+            'label' => 'test term GO:0000009',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000007' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[1]{'target'},
+          'relation' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1]{'relation'},
+          'target' => bless( {
+            'id' => 'GO:0000011',
+            'label' => 'test term GO:0000011',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000008' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'target'},
+          'relation' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[2]{'relation'},
+          'target' => bless( {
+            'id' => 'GO:0000010',
+            'label' => 'test term GO:0000010',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000009' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000006'}[0]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000008'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000010' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000008'}[0]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000018',
+            'label' => 'test term GO:0000018',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000011' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000007'}[0]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000008'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000012' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[0]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000013',
+            'label' => 'test term GO:0000013',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[1]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000013' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000012'}[0]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000014',
+            'label' => 'test term GO:0000014',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000014' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000013'}[0]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000010'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000015' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[1]{'target'},
+          'relation' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1]{'relation'},
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000013'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000016' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[2]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000013'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000017' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000017',
+            'label' => 'test term GO:0000017',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => bless( {
+            'id' => 'GO:0000019',
+            'label' => 'test_ontology',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              bless( {
+                'id' => 'goslim_generic',
+                'label' => 'Generic GO slim',
+                'strict' => 0,
+                'verbose' => 0
+              }, 'GOBO::Subset' ),
+              bless( {
+                'id' => 'goslim_goa',
+                'label' => 'GOA and proteome slim',
+                'strict' => 0,
+                'verbose' => 0
+              }, 'GOBO::Subset' ),
+              bless( {
+                'id' => 'goslim_pir',
+                'label' => 'PIR GO slim',
+                'strict' => 0,
+                'verbose' => 0
+              }, 'GOBO::Subset' ),
+              bless( {
+                'id' => 'goslim_plant',
+                'label' => 'Plant GO slim',
+                'strict' => 0,
+                'verbose' => 0
+              }, 'GOBO::Subset' )
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000018' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000010'}[0]{'target'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000021' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000021',
+            'label' => 'test term GO:0000021',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[1]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000022' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000022',
+            'label' => 'test term GO:0000022',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000021'}[0]{'node'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000023' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000023',
+            'label' => 'test term GO:0000023',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000022'}[0]{'node'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000024' => [
+        bless( {
+          'node' => bless( {
+            'id' => 'GO:0000024',
+            'label' => 'test term GO:0000024',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' ),
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000023'}[0]{'node'}
+        }, 'GOBO::LinkStatement' ),
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000024'}[0]{'node'},
+          'relation' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1]{'relation'},
+          'target' => bless( {
+            'id' => 'GO:0000025',
+            'label' => 'test term GO:0000025',
+            'namespace' => 'test_ontology',
+            'strict' => 0,
+            'subsets' => [
+              $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+            ],
+            'verbose' => 0
+          }, 'GOBO::TermNode' )
+        }, 'GOBO::LinkStatement' )
+      ],
+      'GO:0000025' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000024'}[1]{'target'},
+          'relation' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1]{'relation'},
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'negatively_regulates' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[2]{'relation'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[2]{'relation'}
+        }, 'GOBO::LinkStatement' )
+      ],
+      'positively_regulates' => [
+        bless( {
+          'node' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[1]{'relation'},
+          'relation' => bless( {
+            'anti_symmetric' => 1,
+            'id' => 'is_a',
+            'reflexive' => 1,
+            'strict' => 0,
+            'transitive' => 1,
+            'verbose' => 0
+          }, 'GOBO::RelationNode' ),
+          'target' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[2]{'relation'}
+        }, 'GOBO::LinkStatement' )
+      ]
+    },
+    'ixT' => {
+      'GO:0000006' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[0]
+      ],
+      'GO:0000007' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[1],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000003'}[0]
+      ],
+      'GO:0000008' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[2],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000005'}[0]
+      ],
+      'GO:0000009' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000006'}[0]
+      ],
+      'GO:0000010' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000008'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000009'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000011'}[0]
+      ],
+      'GO:0000011' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000007'}[0]
+      ],
+      'GO:0000012' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[0]
+      ],
+      'GO:0000013' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000012'}[0]
+      ],
+      'GO:0000014' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000013'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000015'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000016'}[0]
+      ],
+      'GO:0000015' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[1]
+      ],
+      'GO:0000016' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[2]
+      ],
+      'GO:0000018' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000010'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000014'}[0]
+      ],
+      'GO:0000019' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000018'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000021'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000025'}[0]
+      ],
+      'GO:0000021' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000022'}[0]
+      ],
+      'GO:0000022' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000023'}[0]
+      ],
+      'GO:0000023' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000024'}[0]
+      ],
+      'GO:0000025' => [
+        $VAR1->{'link_ix'}{'ixN'}{'GO:0000024'}[1]
+      ],
+      'regulates' => [
+        $VAR1->{'link_ix'}{'ixN'}{'negatively_regulates'}[0],
+        $VAR1->{'link_ix'}{'ixN'}{'positively_regulates'}[0]
+      ]
+    }
+  }, 'GOBO::Indexes::StatementIndex' ),
+  'node_index' => bless( {
+    'ixLabel' => {},
+    'ixN' => {
+      'GO:0000001' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'},
+      'GO:0000002' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[0]{'node'},
+      'GO:0000003' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000003'}[0]{'node'},
+      'GO:0000004' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[0]{'node'},
+      'GO:0000005' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000005'}[0]{'node'},
+      'GO:0000006' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[0]{'target'},
+      'GO:0000007' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[1]{'target'},
+      'GO:0000008' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'target'},
+      'GO:0000009' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000006'}[0]{'target'},
+      'GO:0000010' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000008'}[0]{'target'},
+      'GO:0000011' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000007'}[0]{'target'},
+      'GO:0000012' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[0]{'target'},
+      'GO:0000013' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000012'}[0]{'target'},
+      'GO:0000014' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000013'}[0]{'target'},
+      'GO:0000015' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[1]{'target'},
+      'GO:0000016' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[2]{'target'},
+      'GO:0000017' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'node'},
+      'GO:0000018' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000010'}[0]{'target'},
+      'GO:0000019' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'},
+      'GO:0000020' => bless( {
+        'id' => 'GO:0000020',
+        'label' => 'test term GO:0000020',
+        'namespace' => 'test_ontology',
+        'obsolete' => 1,
+        'strict' => 0,
+        'subsets' => [
+          $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0]
+        ],
+        'verbose' => 0
+      }, 'GOBO::TermNode' ),
+      'GO:0000021' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000021'}[0]{'node'},
+      'GO:0000022' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000022'}[0]{'node'},
+      'GO:0000023' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000023'}[0]{'node'},
+      'GO:0000024' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000024'}[0]{'node'},
+      'GO:0000025' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000024'}[1]{'target'},
+      'negatively_regulates' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[2]{'relation'},
+      'part_of' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1]{'relation'},
+      'positively_regulates' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[1]{'relation'},
+      'regulates' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[2]{'relation'}
+    }
+  }, 'GOBO::Indexes::NodeIndex' ),
+  'property_value_map' => {
+    'auto-generated-by' => 'OBO-Edit 2.0',
+    'synonymtypedef' => 'systematic_synonym "Systematic synonym" EXACT'
+  },
+  'relation_h' => {
+    'negatively_regulates' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[2]{'relation'},
+    'part_of' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[1]{'relation'},
+    'positively_regulates' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[1]{'relation'},
+    'regulates' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[2]{'relation'}
+  },
+  'subset_index' => {
+    'goslim_candida' => bless( {
+      'id' => 'goslim_candida',
+      'label' => 'Candida GO slim',
+      'strict' => 0,
+      'verbose' => 0
+    }, 'GOBO::Subset' ),
+    'goslim_generic' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'}{'subsets'}[0],
+    'goslim_goa' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'}{'subsets'}[1],
+    'goslim_pir' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'}{'subsets'}[2],
+    'goslim_plant' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'}{'subsets'}[3],
+    'gosubset_prok' => bless( {
+      'id' => 'gosubset_prok',
+      'label' => 'Prokaryotic GO subset',
+      'strict' => 0,
+      'verbose' => 0
+    }, 'GOBO::Subset' ),
+    'test_goslim' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[0],
+    'test_next_goslim' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'}{'subsets'}[1]
+  },
+  'term_h' => {
+    'GO:0000001' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'node'},
+    'GO:0000002' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[0]{'node'},
+    'GO:0000003' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000003'}[0]{'node'},
+    'GO:0000004' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[0]{'node'},
+    'GO:0000005' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000005'}[0]{'node'},
+    'GO:0000006' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[0]{'target'},
+    'GO:0000007' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000002'}[1]{'target'},
+    'GO:0000008' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000001'}[0]{'target'},
+    'GO:0000009' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000006'}[0]{'target'},
+    'GO:0000010' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000008'}[0]{'target'},
+    'GO:0000011' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000007'}[0]{'target'},
+    'GO:0000012' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[0]{'target'},
+    'GO:0000013' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000012'}[0]{'target'},
+    'GO:0000014' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000013'}[0]{'target'},
+    'GO:0000015' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[1]{'target'},
+    'GO:0000016' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000004'}[2]{'target'},
+    'GO:0000017' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'node'},
+    'GO:0000018' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000010'}[0]{'target'},
+    'GO:0000019' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000017'}[0]{'target'},
+    'GO:0000020' => $VAR1->{'node_index'}{'ixN'}{'GO:0000020'},
+    'GO:0000021' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000021'}[0]{'node'},
+    'GO:0000022' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000022'}[0]{'node'},
+    'GO:0000023' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000023'}[0]{'node'},
+    'GO:0000024' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000024'}[0]{'node'},
+    'GO:0000025' => $VAR1->{'link_ix'}{'ixN'}{'GO:0000024'}[1]{'target'}
+  }
+}, 'GOBO::Graph' );
+ok
+t/inference_engine_test......ok
+t/logical_definition_test....ok
+t/node_removal...............ok
+t/oboparsertest..............ok
+t/parsetest..................Subroutine main::ok redefined at t/parsetest.t line 6
+Prototype mismatch: sub main::ok ($;$$) vs ($;$) at t/parsetest.t line 6
+Subroutine main::skip redefined at t/parsetest.t line 6
+Prototype mismatch: sub main::skip ($;$$$) vs none at t/parsetest.t line 6
+Subroutine main::plan redefined at t/parsetest.t line 6
+ok
+t/relation_test..............ok
+t/roundtrip..................Reference found where even-sized list expected at /Users/cjm/cvs/go-moose/blib/lib/GOBO/Writers/Writer.pm line 55, <GEN0> line 130.
+ok
+t/slimmer_test...............options: $VAR1 = {
+          'input' => 't/data/obo_file.obo',
+          'output' => 't/slimmer_test_results.obo',
+          'subset' => {
+                        'test_goslim' => 1
+                      },
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'input' => 't/data/obo_file.obo',
+          'output' => 't/slimmer_test_results.obo',
+          'subset' => {
+                        'test_next_goslim' => 1
+                      },
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'basename' => 't/obo_file_SLIM_NAME.obo',
+          'input' => 't/data/obo_file.obo',
+          'subset' => {},
+          'subset_regexp' => qr/(?-xism:test)/,
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'combined' => 1,
+          'input' => 't/data/obo_file.obo',
+          'output' => 't/slimmer_test_results.obo',
+          'subset' => {},
+          'subset_regexp' => qr/(?-xism:test)/,
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'basename' => 't/obo_file_SLIM_NAME.obo',
+          'input' => 't/data/obo_file.obo',
+          'subset' => {
+                        'test_goslim' => 1,
+                        'test_next_goslim' => 1
+                      },
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'combined' => 1,
+          'input' => 't/data/obo_file.obo',
+          'output' => 't/slimmer_test_results.obo',
+          'subset' => {
+                        'test_goslim' => 1,
+                        'test_next_goslim' => 1
+                      },
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'basename' => 't/obo_file_SLIM_NAME.obo',
+          'get_all_subsets' => 1,
+          'input' => 't/data/obo_file.obo',
+          'subset' => {},
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'combined' => 1,
+          'get_all_subsets' => 1,
+          'input' => 't/data/obo_file.obo',
+          'output' => 't/slimmer_test_results.obo',
+          'subset' => {},
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'basename' => 't/obo_file_SLIM_NAME.obo',
+          'input' => 't/data/obo_file.obo',
+          'subset' => {
+                        'test_goslim' => 1,
+                        'test_next_goslim' => 1
+                      },
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'combined' => 1,
+          'input' => 't/data/obo_file.obo',
+          'output' => 't/slimmer_test_results.obo',
+          'subset' => {
+                        'test_goslim' => 1,
+                        'test_next_goslim' => 1
+                      },
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'basename' => 't/obo_file_SLIM_NAME.obo',
+          'input' => 't/data/obo_file.obo',
+          'subset' => {},
+          'subset_regexp' => qr/(?-xism:test.+goslim)/,
+          'verbose' => 0
+        };
+
+options: $VAR1 = {
+          'combined' => 1,
+          'input' => 't/data/obo_file.obo',
+          'output' => 't/slimmer_test_results.obo',
+          'subset' => {},
+          'subset_regexp' => qr/(?-xism:test.+goslim)/,
+          'verbose' => 0
+        };
+
+ok
+t/union_inference_test.......ok
+All tests successful.
+Files=17, Tests=163, 83 wallclock secs ( 0.62 usr  0.09 sys + 67.20 cusr  4.18 csys = 72.09 CPU)
+Result: PASS

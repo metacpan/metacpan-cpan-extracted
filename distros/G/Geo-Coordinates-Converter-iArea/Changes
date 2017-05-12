@@ -1,0 +1,56 @@
+Revision history for Perl extension Geo::Coordinates::Converter::iArea
+
+0.14
+
+    - refactoring
+
+0.13
+
+    - fixed packaging issue
+
+0.12
+
+    - doc enhancements
+
+0.11
+
+    - fixed deps for CDB_File
+
+0.10
+
+    - added Geo::Coordinates::Converter::iArea->get_name.
+
+0.09
+
+    - modernize the dist package
+
+0.08
+
+    - updated mesh data file(2008-04-08 ver)
+
+0.07
+
+    - document updated. no feature changes.
+
+0.06
+
+    - tune up the performance. use cdb;
+
+0.05
+
+    - this module maybe requires ExtUtils::MakeMaker >= 6.42
+
+0.04
+
+    fixed PREREQ.
+
+0.03
+    - added Format::iArea(Kazuhiro Osawa)
+    - select areacode from position.
+
+0.02
+    - s/yaml/csv/
+      no feature changes.
+
+0.01    Sun Jan  6 02:31:26 2008
+        - original version

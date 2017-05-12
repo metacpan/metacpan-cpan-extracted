@@ -1,0 +1,20 @@
+Revision history for Getopt-Param-Tiny
+
+0.5  Wed Jun 25 23:34:15 2008
+     Do not auto vivify option in hash object
+     Brought in Getopt::Param 0.0.4 funcitonality
+     
+0.4  Tue Apr  1 09:12:33 2008
+     rt 34586: remove Build.PL
+     rt 34586: remove use warnings from Makefile.PL
+     rt 34586: go ahead an re-add use strict
+     
+0.3  Mon Mar 31 10:45:54 2008
+       removed Carp, vars, strict, and warnings to lower memory even more
+
+0.2  Mon Mar 31 07:48:50 2008
+       Fixed "leftover" version references
+    
+0.1  Mon Mar 31 07:43:50 2008
+       Initial release.
+

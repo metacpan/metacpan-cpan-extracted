@@ -1,0 +1,89 @@
+Revision history for Git::DescribeVersion
+
+1.015     2012-08-22T03:11:08Z
+
+  [Documentation]
+  - Attempt to clarify intended usage in pod
+    (module adds 3rd part to a 2-part tag (v1.2 => v1.2.35))
+    to resolve rt-71626.
+    Thanks to Matthew Astley for helping straighten this out.
+
+  [Installation]
+  - Halt installation if git version is less than 1.5.5
+
+1.014     2011-11-06T00:34:15Z
+
+  [Test Fixes]
+  - Attempt to make t/git-repo.t compatible with older git versions
+    in another way.
+
+1.013     2011-10-26T14:45:17Z
+
+  [Test Fixes]
+  - Attempt to make t/git-repo.t compatible with older git versions
+
+1.012     2011-10-24T14:43:20Z
+
+  [Test Fixes]
+  - Configure fake git user name/email for fake/test repo
+
+1.011     2011-10-23T01:29:09Z
+
+  [Tests]
+  - Display git command output upon test failure (for debugging reports)
+
+1.010     2011-10-19T20:31:43Z
+
+  - Fallback to another git wrapper if one fails.
+    Closes rt-71622. Thanks to Matthew (mca1001) for the idea.
+  - Localize $/ to work around Git::Repository bug rt-71621.
+  - Fixes for Windows
+
+1.003     2011-07-15T00:00:55Z
+
+  - Add git-describe-version executable
+  - Make Git::DescribeVersion::App::run look in @ARGV as well
+
+  - Improvements to documentation and tests
+  - Superficial dist/release changes
+
+1.001011  2010-12-17T04:25:14Z
+
+  - Improve handling of trailing zeroes ("0th commit since tag")
+  - Improvements to documentation and tests
+  - use Module::Build
+
+1.001005  2010-12-10T19:29:26Z
+
+  - Require 0.82 of version.pm (instead of 0.77)
+  - Improvements to documentation and tests
+
+1.000010  2010-12-07T21:07:07Z
+
+  - Add option to specify desired version format
+    (dotted-decimal, decimal, or dotted w/o the leading 'v')
+  - Enable module to work with Git::Wrapper, Git::Repository, or `git`
+  - Improvements to documentation and tests
+
+0.007006  2010-11-17T16:22:16Z
+
+  - Moved Dist::Zilla::Plugin::Git::DescribeVersion to a separate dist
+
+0.006013  2010-11-17T03:55:00Z
+
+  - Add example gitconfig usage
+
+0.006012  2010-11-15T21:27:00Z
+
+  - Allow Git::DescribeVersion::App::run() to be called as a class method
+  - Change default 'version_regexp' to catch a wider variety of tag patterns
+  - Improvements to documentation and tests
+
+0.005011  2010-11-09T19:34:00Z
+
+  - Catch 'describe' errors and show a warning
+  - Improvements to documentation and tests
+
+0.004008  2010-10-25T06:09:00Z
+
+  - Initial Release to CPAN

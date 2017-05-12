@@ -1,0 +1,34 @@
+!version: $Revision: 1.3 $
+!date: $Date: 2003/11/26 18:57:41 $
+!
+!this is a fake file, merely for testing purposes to check that the
+!annotation parser works correctly
+!
+!First three entitities that share an alias, which is therefore
+!ambiguous, and should get a 1 from nameIsAmbiguous()
+!
+GOTF	DBID1	GENE1		GO:0005743	PMID:2167309	TAS		C		ALIAS1	gene	taxon:4932	20010118	GOTF
+GOTF	DBID2	GENE2		GO:0006854	PMID:2167309	IDA		P		ALIAS1	gene	taxon:4932	20010118	GOTF
+GOTF	DBID3	GENE3		GO:0005743	PMID:1915842	TAS		C		ALIAS1	gene	taxon:4932	20010118	GOTF
+!
+!Now put in some entries with the same database id, but with a
+!different casing.  GOIDs have arbitrarily had their first digit upped
+!by 1, compared to the previous 'genes' solely for testing
+!
+GOTF	dbid1	gene1		GO:1005743	PMID:2167309	TAS		C		ALIAS2	gene	taxon:4932	20010118	GOTF
+GOTF	dbid2	gene2		GO:1006854	PMID:2167309	IDA		P		ALIAS2	gene	taxon:4932	20010118	GOTF
+GOTF	dbid3	gene3		GO:1005743	PMID:1915842	TAS		C		ALIAS2	gene	taxon:4932	20010118	GOTF
+!
+!Now have something that has two different casings of the same name -
+!neither should be ambiguous, and as the name isn't used elsewhere, a
+!different casing of the name also shouldn't be ambiguous.
+!
+GOTF	DBID4	GENE4		GO:1005743	PMID:2167309	TAS		C		gene4	gene	taxon:4932	20010118	GOTF
+!
+!Now an example of things sharing a name, but with different casings.
+!One of them has the same name twice, but with different casings.  All
+!three versions of the name should be unambiguous, but any differently
+!cased version of the name should be ambiguous.
+!
+GOTF	DBID5	GENE5		GO:1006854	PMID:2167309	IDA		P		gene5	gene	taxon:4932	20010118	GOTF
+GOTF	DBID6	GENE6		GO:1005743	PMID:1915842	TAS		C		Gene5	gene	taxon:4932	20010118	GOTF

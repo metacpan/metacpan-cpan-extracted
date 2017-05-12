@@ -1,0 +1,39 @@
+name = Grades
+version = 0.15
+abstract = A collocation of homework, classwork and exams
+author = Dr Bean <drbean at (a) cpan dot (.) org>
+license = Perl_5
+copyright_holder = Dr Bean
+[GatherDir]
+[PruneCruft]
+[PruneFiles]
+match = script_files/.*~
+[MetaYAML]
+[ManifestSkip]
+[PkgVersion]
+
+[ModuleBuild]
+[ExecDir]
+dir = script_files
+[Manifest]
+[License]
+; [AutoPrereqs] picks up Catalyst prerequisites without ManifestSkip
+[AutoPrereqs]
+
+; ; [@SVK]
+; [SVK::Check]
+; [SVK::Commit]
+; [SVK::Tag]
+; project = ttb/beans
+; [SVK::Push]
+; push_to = //mi
+
+; [FakeRelease]
+; [TestRelease]
+[ConfirmRelease]
+[UploadToCPAN]
+
+[MetaResources]
+homepage    = http://search.cpan.org/dist/Grades/
+repository  = http://svn.openfoundry.org/ttb/beans
+

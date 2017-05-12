@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Games/Dice/Loaded.pm
+lib/Test/Probability.pm
+t/01-sanity.t
+t/02-scale.t
+t/03-sample.t
+t/04-wrongdist.t
+t/05-exactdist.t

@@ -1,0 +1,11 @@
+---
+description: testcase1
+components:
+    one: ONE
+    two: TWO
+    three: THREE
+    four: FOUR
+expected:   |
+    ONE, TWO
+    THREE
+

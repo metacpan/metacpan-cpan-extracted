@@ -1,0 +1,68 @@
+2.0 Wed Aug 13 07:12:29 PDT 2014
+    Reversed order of this file to put latest first.
+    Cleaned up problem with versions in META files.
+
+1.9.9 Wed Aug 13 00:30:45 PDT 2014
+    Fixed presedence problem reported by RT 97726. Thanks Frossie!
+
+1.9.8 Mon Aug  1 16:54:33 PDT 2011
+    Found more embedded 't/' - t/01-help.t and t/03-options-split_partial.t
+
+1.9.6 Thu Jul 28 14:49:26 PDT 2011
+    Changed directory name (_ > -) to avoid confusion with 
+    Simon's original 1.0
+    Fri Jul 29 15:07:26 PDT 2011
+    Respond to Windoze failure. 
+        Failed test 'Check version'at t/02-internals_magic.t line 88
+        STDERR is:
+        This is t/02-internals_magic.t version 1.9.4
+        not:
+        This is t\02-internals_magic.t version 1.9.4
+    The problem is that Windows apparently takes either '/' or '\'
+    in paths, and what was actually used shows up in caller[1].
+    The problem of the ambiguity is resolved by stripping out
+    the directory path when making comparisions. The path is
+    irrelevant in any case. Thanks to Perl Monks ikegami and
+    Corion who commented on node_id=917637.
+
+1.9.5 Tue Jul 26 20:55:31 PDT 2011
+    Fixed un-commented DB::
+    Added example for usage()
+
+1.9.4 Wed Dec 22 15:25:28 PST 2010
+    Added comments.
+    Tue Jul 26 20:13:22 PDT 2011
+    Repair for 69822 (=begin/=end stopwords need blank lines)
+
+1.9.3 Tue Oct  5 11:27:02 PDT 2010
+    Add automatic help for unregistered options, so that you can
+    avoid having to run the program a second time with --help (or
+    is that -h? Oh, bother!)
+
+1.9.2 Thu Jul  1 16:06:58 PDT 2010
+    Remove _ from _test_option so that perlcritic does not complain.
+    It is, after all, intended for external use.
+    Fix bug where command line with _no_ options, but args caused
+    objection. In process made the default option type BARE.
+
+1.9.1 Mon Jan 18 08:31:32 PST 2010
+    Failures of Spec build on 5.6.x and 5.8.1 Perls
+    Mis-application of each() (see `perldoc -f each`). Result is random.
+    Patch courtesy of Bruce Gray <bruce.gray@acm.org>.
+
+1.9.1 Mon Jan 18 08:28:57 PST 2010
+    Windows failure in test t/02-internals_magic.t
+    Construct the path using catfile() to avoid the problem of '/' vs '\'
+
+1.9.1 Sun Jan 10 15:49:08 PST 2010
+    Builtin help does not exit 0. Change 'exists' to 'defined' in test
+
+1.9.0 Thu Dec  3 16:42:08 PST 2009
+    Completed according to original intent of incomplete
+    version 1.0. Version is '1.9.0' in anticipation of going to
+    2.0 when bugs are worked out.
+
+1.0   Fri Jan  3 12:33:09 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Getopt::Auto
+

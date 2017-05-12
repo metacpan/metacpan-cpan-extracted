@@ -1,0 +1,21 @@
+[
+  l("Node a", n("", [],
+   [
+    l("Edge a->b", e("", [],
+      l("Node b", n("", [],
+       [
+        l("Edge b->c", e("", [],
+          l("Node c", n("", [],
+           [
+            l("Edge c->d", e("", [],
+              l("Node d", n("", [], [])))),
+            l("Edge c->e", e("", [],
+              l("Node e", n("", [],
+               [
+                l("Edge e->e", e("", [],
+                  r("Node e")))               ]))))           ])))),
+        l("Edge b->d", e("", [],
+          r("Node d")))       ])))),
+    l("Edge a->c", e("", [],
+      r("Node c")))   ]))
+]

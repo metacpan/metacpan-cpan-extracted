@@ -1,0 +1,22 @@
+graph graph_48
+{
+	node
+	[
+		shape = box
+	]
+	course;
+	institute;
+	student;
+	node
+	[
+		shape = ellipse
+	]
+	{
+	}
+	code;
+	grade;
+	number;
+	name0 -- course;
+	code -- course;
+	fontsize = 20;
+}

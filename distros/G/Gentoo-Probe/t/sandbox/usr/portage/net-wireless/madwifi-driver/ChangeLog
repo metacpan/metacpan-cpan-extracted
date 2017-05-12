@@ -1,0 +1,59 @@
+# ChangeLog for net-wireless/madwifi-driver
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/madwifi-driver/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  15 May 2004; Peter Johanson <latexer@gentoo.org>
+  madwifi-driver-0.1_pre20040514.ebuild:
+  Small fix for 2.6 kernels. Silly me.
+
+*madwifi-driver-0.1_pre20040514 (14 May 2004)
+
+  14 May 2004; Peter Johanson <latexer@gentoo.org>
+  madwifi-driver-0.1_pre20040514.ebuild:
+  Bump with new CVS snapshot. Includes small changes to handing of makefile variables.
+
+*madwifi-driver-0.1_pre20040212 (12 Feb 2004)
+
+  12 Feb 2004; Stephen Diener <sediener@gentoo.org>
+  madwifi-driver-0.1_pre20030702.ebuild,
+  madwifi-driver-0.1_pre20030802.ebuild,
+  madwifi-driver-0.1_pre20031110.ebuild,
+  madwifi-driver-0.1_pre20031213-r1.ebuild,
+  madwifi-driver-0.1_pre20031213.ebuild,
+  madwifi-driver-0.1_pre20040212.ebuild:
+  Cleared out all but the last three monthly snapshots.  Added Febs snap.
+
+*madwifi-driver-0.1_pre20040108 (08 Jan 2004)
+
+  08 Jan 2004; Stephen Diener <sediener@gentoo.org>
+  madwifi-driver-0.1_pre20040108.ebuild:
+  monthly CVS snapshot for Jan
+
+*madwifi-driver-0.1_pre20031213-r1 (19 Dec 2003)
+
+  19 Dec 2003; Stephen Diener <sediener@gentoo.org>
+  madwifi-driver-0.1_pre20031213-r1.ebuild:
+  Modified to work with 2.6 kernels: thanks to flokno@gmx.net and Jani Vaarala
+  <flame@pymgyprojects.com> for debugging
+
+*madwifi-driver-0.1_pre20031213 (13 Dec 2003)
+
+  13 Dec 2003; Stephen Diener <sediener@gentoo.org>
+  madwifi-driver-0.1_pre20031213.ebuild:
+  new monthly snapshot as promised
+
+  11 Nov 2003; Peter Johanson <latexer@gentoo.org> metadata.xml:
+  Now in the better "mobile" herd
+
+*madwifi-driver-0.1_pre20030802 (03 Aug 2003)
+
+  03 Aug 2003; Stephen Diener <sediener@gentoo.org>
+  madwifi-driver-0.1_pre20030802.ebuild:
+  New release
+
+*madwifi-driver-0.1_pre20030702 (18 Jul 2003)
+
+  18 Jul 2003; Peter Johanson <latexer@gentoo.org>
+  madwifi-driver-0.1_pre20030702.ebuild:
+  Initial import. Drivers for the Atheros chipset (a/b/g)
+

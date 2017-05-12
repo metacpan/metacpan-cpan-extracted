@@ -1,0 +1,214 @@
+Revision history for Perl extension Geo::Postcodes
+--------------------------------------------------
+2006-10-01 22:00 Arne Sommer
+ * Released version 0.32.
+
+2006-10-01 14:00 Arne Sommer
+ * Added the new selection modes 'nand', 'nand not', 'xnor', and 'xnor not'.
+
+2006-09-30 22:00 Arne Sommer
+ * Written the 'Geo::Postcodes::Ajax.pod' tutorial, showing how the
+   'Geo::postcodes::*'-modules can be combined with ajax code in a html form
+   to get the location updated automatically. The files in the tutorial are
+   included in the distribution: 'eg/index.html', 'eg/location_u2.cgi' and
+   'postcodecheck.js'.
+
+2006-09-25 22:30 Arne Sommer
+ * Released version 0.311.
+
+2006-09-25 22:00 Arne Sommer
+ * Fixed an error in the documentation for 'Geo::postcodes::Update' that
+   caused an error in the test file 't/2_pod_coverage'.
+
+2006-09-24 14:00 Arne Sommer
+ * Released version 0.31.
+
+2006-09-24 13:00 Arne Sommer
+ * Rewritetten 'selection' to cope with modes as 'and', 'not' (instead of
+   the correct 'and not'), as already done in 'verify_selectionlist'.
+
+2006-09-22 22:00 Arne Sommer
+ * Removed the procedure 'dryrun' in 'Geo::Postcodes::Update', and made it
+   the default mode. Updated the country programs so that they must use
+   '-update' on the command line to actually update the module.
+
+2006-09-16 20:00 Arne Sommer
+ * Added the procedure 'dryrun' to 'Geo::Postcodes::Update'. Use it, instead
+   of 'update', to get the perl code printed to the screen instead of beeing
+   written to the module. This is useful when writing the parsing procedure.
+
+2006-09-15 22:00 Arne Sommer
+ * 'Geo::Postcodes::Update::update' will now offer to download the postcode
+   file from internet, if possible.
+
+2006-09-15 10:00 Arne Sommer
+ * 'Geo::Postcodes::Update::update' will now check the new data against the
+    existing, and only update the file if they differ. Added a version number
+    (0.31) at the same time.
+
+2006-09-14 23:00 Arne Sommer
+ * Added support for 'Build.PL', in addition to the present 'Makefile.PL'.
+   This reqired a new directory lib in the distribution, and the move of
+   the files 'Postcodes*' to it. 
+ * Updated 'Update.pm' to cope with the move of 'bin/update' to 'misc/update'
+   in the child modules.
+
+2006-09-12 21:00 Arne Sommer
+ * Released version 0.30.
+
+2006-09-12 11:00 Arne Sommer
+ * Added support for external procedures in 'selection', specified as
+   'procedure' => \&procedure_name. The procedure is passed the postcode as
+   argument, and must return true or false. 
+ * Updated 'verify_selectionlist' to support this feature. It verifies that
+   the procedures are actually callable.
+ * Added tests in 't/3_validselection.t'.
+
+2006-09-11 22:00 Arne Sommer
+ * Added a comprehensive tutorial 'Postcodes::Tutorial.pod', using a fictiuos 
+   country Utopia and the module name 'Geo::Postcodes::U2'.
+
+2006-09-11 19:00 Arne Sommer
+ * Moved the documentation for the 'selection' family of procedures/methods to
+   a new file 'Postcodes/Selection.pod'.
+
+2006-09-11 13:00 Arne Sommer
+ * Added the test file 't/4_exporter.t' testing that the available methods and
+   procedures really are available.
+
+2006-09-09 11:00 Arne Sommer
+ * Renamed the procedure/method 'get_methods' to 'get_fields', and 'is_method'
+   to 'is_field', to avoid confusion with the generic name 'method'.
+
+2006-09-07 20:00 Arne Sommer
+ * Released version 0.21.
+
+2006-09-07 19:30 Arne Sommer
+ * Added the test file 't/3_validselection.t' testing the
+   'verify_selectionlist' procedure.
+
+2006-09-07 16:00 Arne Sommer
+ * Added the test files 't/2_pod.t' and 't/2_pod_coverage.t' to check the
+   documentation for errors and completeness, and fixed the reported
+   shortcomings (mostly by dummy lines for now - as the documentation is due
+   for a major reorganisation).
+
+2006-09-07 14:30 Arne Sommer
+ * Added the selection mode 'one', which will return just one (or zero)
+   postcodes. It must be used initially, can be used on its own, and
+   will return a random postcode.
+
+2006-09-07 13:00 Arne Sommer
+ * Removed the line 'use 5.008' from 'Makefile.PL', as there was no
+   reason for this restriction.
+
+2006-09-04 18:00 Arne Sommer
+ * Added the procedure 'selection_loop' which will call the specified
+   procedure for each resulting postcode from the 'selection' call. It
+   is callable from the child classes (with some black magic).
+
+2006-09-03 23:30 Arne Sommer
+ * Released version 0.20.
+
+2006-09-03 22:30 Arne Sommer
+ * Fixed the errors and warnings in the documentation, as reported by
+   'podchecker'.
+
+2006-09-03 22:00 Arne Sommer
+ * Added the procedure '_verify_selectionlist', which will return false (0)
+   followed by a list of diagnostic messages if the argument list is invalid
+   for use by the 'selection'-procedure. It will return true (1) followed by a
+   modified argument list if the arguments are valid. The modification process
+   replaces things as 'and', 'not' with 'and not'. The procedure is callable
+   from the child classes (with some black magic).
+
+2006-09-03 19:00 Arne Sommer
+ * Added the modes 'xor not', 'nor' and 'nor not' in the selection procedure.
+
+2006-09-01 17:00 Arne Sommer
+ * Added the procedures 'get_selectionmodes' and 'get_initial_selectionmodes'
+   to get a (sorted) list of the legal selection modes.
+
+2006-09-01 11:00 Arne Sommer
+ * Added the procedures 'is_legal_selectionmode' and
+   'is_legal_initial_selectionmode' so that application programs easily can
+   check for legal selection modes.
+
+2006-09-01 01:00 Arne Sommer
+ * Added the mode 'none' in the selection procedure. It will return absolutely
+   nothing, and is absolutely useless.
+
+2006-08-31 23:00 Arne Sommer
+ * Added support for the mode 'all' as the first parameter in the selection
+   procedure, as the old version of the procedure had it.
+
+2006-08-31 22:00 Arne Sommer
+ * Added support for the mode 'not' as the first parameter in the selection
+   procedure, as it is clearer than 'and or' or 'and not'.
+
+2006-08-31 16:00 Arne Sommer
+ * Reimplemented the selection procedure, with the following modes only:
+   'and', 'or', 'and not' (new), 'or not' (instead of 'not'), and 'xor'
+   (new).
+
+2006-08-17 15:00 Arne Sommer
+ * Released version 0.10.
+
+2006-08-16 22:00 Arne Sommer
+ * Fixed an error that caused a list with one element (a zero) to be returned
+   instead of 'undef' by selection when no matches were found.
+
+2006-08-05 19:00 Arne Sommer
+ * Added support for 'selection('all', ...)'. It does exactly the same as
+   'get_postcodes' (but sorts the postcodes). It can be used to get them as
+   objects, in oo-mode. This will consume a lot of memory - and time.
+
+2006-08-05 19:00 Arne Sommer
+ * Added support for 'selection('not', ...)'. It will include the postcode if
+   it doesn't match any of the specified method/value pairs.
+
+2006-07-30 14:00 Arne Sommer
+ * Added support in 'selection' for multiple sets of method/value. This
+   requires a choice of how to treat the combination, and this is controlled
+   by the new 'and' and 'or' parameter.
+
+2006-07-30 09:00 Arne Sommer
+ * Renamed the 'methods' procedure/method to 'get_methods'.
+
+2006-07-23 14:00 Arne Sommer
+ * Released version 0.03.
+
+2006-07-23 10:00 Arne Sommer
+ * Simplified the 'selection' code by removing the need for passing a list of
+   legal methods. This is now obtained by the selection code itself.
+
+2006-07-19 22:00 Arne Sommer
+ * Added the 'get_types' procedure that returns all the types (of the postal
+   locations). Added the 'type2verbose' procedure to convert the code to an
+   english text.
+
+2006-07-20 18:00 Arne Sommer
+ * Made a major rewrite of the documentation.
+
+2006-07-19 14:00 Arne Sommer
+ * Merged the national (norwegian and danish) postal type codes, and moved
+   them here. 'type' and 'type_of' will now give the code (instead of the
+   description). Use the new prodeure 'type_verbose_of' and method
+   'type_verbose' for the description. The base class has english texts, but
+   this can be overruled by the derived classes.
+
+2006-07-18 23:00 Arne Sommer
+ * Released version 0.02.
+
+2006-07-18 18:00 Arne Sommer
+ * Added the 'methods' and 'is_method' method/procedure.
+
+2006-07-15 12:00 Arne Sommer
+ * Added the 'selection' method/procedure, and made it callable from the child
+   classes (with some black magic).
+
+2006-07-10 16:00 Arne Sommer
+ * Released version 0.01.
+
+2006-07-07 19:00 Arne Sommer
+ * Original version; created by 'h2xs -Xan Geo::Postcodes'.

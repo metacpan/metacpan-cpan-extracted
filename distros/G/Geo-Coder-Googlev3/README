@@ -1,0 +1,7 @@
+Geo::Coder::Googlev3
+--------------------
+
+An implementation of version 3 of Google's Geocoding API. Notable
+difference to version 2: an API key is not needed anymore.
+
+Author: Slaven Rezic

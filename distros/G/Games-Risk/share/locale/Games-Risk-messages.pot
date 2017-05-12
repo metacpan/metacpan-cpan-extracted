@@ -1,0 +1,731 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR 'Jerome Quelin'
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Games-Risk\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-09-26 15:27+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Games/Risk/Controller.pm:528 lib/Games/Risk/GUI/Startup.pm:143
+#: lib/Games/Risk/GUI/Startup.pm:196 lib/Games/Risk/GUI/Startup.pm:215
+msgid "Human"
+msgstr ""
+
+#: lib/Games/Risk/Controller.pm:536 lib/Games/Risk/GUI/Startup.pm:196
+#: lib/Games/Risk/GUI/Startup.pm:215
+msgid "Computer, easy"
+msgstr ""
+
+#: lib/Games/Risk/Controller.pm:545 lib/Games/Risk/GUI/Startup.pm:196
+#: lib/Games/Risk/GUI/Startup.pm:215 lib/Games/Risk/GUI/Startup.pm:451
+msgid "Computer, hard"
+msgstr ""
+
+#: lib/Games/Risk/Tk/GameOver.pm:22
+msgid "Game over"
+msgstr ""
+
+#: lib/Games/Risk/Tk/GameOver.pm:23
+#, perl-format
+msgid "%s won!"
+msgstr ""
+
+#: lib/Games/Risk/Tk/GameOver.pm:24 lib/Games/Risk/Tk/About.pm:24
+#: lib/Games/Risk/Tk/Help.pm:25 lib/Games/Risk/Tk/Continents.pm:51
+#: lib/Games/Risk/Tk/Cards.pm:64
+msgid "Close"
+msgstr ""
+
+#: lib/Games/Risk/Tk/GameOver.pm:41
+msgid ""
+"Congratulations, you won!\n"
+"Maybe the artificial intelligences were not that hard?"
+msgstr ""
+
+#: lib/Games/Risk/Tk/GameOver.pm:42
+msgid ""
+"Unfortunately, you lost...\n"
+"Try harder next time!"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:168 lib/Games/Risk/Tk/Main.pm:923
+msgid "Attacking from ..."
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:185 lib/Games/Risk/Tk/Main.pm:944
+#, perl-format
+msgid "Attacking %s from %s"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:421 lib/Games/Risk/Tk/Main.pm:452
+msgid "Moving armies from..."
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:550 lib/Games/Risk/Tk/Main.pm:587
+#: lib/Games/Risk/Tk/Main.pm:866 lib/Games/Risk/Tk/Main.pm:1147
+#: lib/Games/Risk/Tk/Main.pm:1183
+#, perl-format
+msgid "%s armies left to place"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:636
+msgid "human"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:643
+#, perl-format
+msgid "computer - %s"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:667
+#, perl-format
+msgid "Player %s has lost"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:910
+#, perl-format
+msgid "Attacking ... from %s"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1048
+msgid "Moving armies from ..."
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1072
+#, perl-format
+msgid "Moving armies from %s to ..."
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1091
+#, perl-format
+msgid "Moving armies from %s to %s"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1277
+msgid "Game state: "
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1278
+msgid "place armies"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1279
+msgid "undo all"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1280
+msgid "ready for attack"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1281
+msgid "attack"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1282
+msgid "attack again"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1283
+msgid "consolidate"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1284
+msgid "move armies"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1285
+msgid "turn finished"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1329
+msgid "~New game"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1331
+msgid "~Close game"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1333
+msgid "~Quit"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1335
+msgid "~Game"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1339
+msgid "~Cards"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1340
+msgid "C~ontinents"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1342
+msgid "~View"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1346
+msgid "~Undo all"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1347
+msgid "~Attack"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1348
+msgid "~Re-attack"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1349
+msgid "~Consolidate"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1350
+msgid "~Finish turn"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1352
+msgid "~Actions"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1356 lib/Games/Risk/Tk/Main.pm:1359
+msgid "~Help"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1357
+msgid "~About"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1421 lib/Games/Risk/GUI/Startup.pm:333
+msgid "Players"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1429
+msgid "Dice arena"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1451
+msgid "Auto-reattack"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1457
+msgid ""
+"Automatically re-do last attack if attacker still has more than 3 armies"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1496 lib/Games/Risk/GUI/Startup.pm:310
+msgid "New game"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1498
+msgid "Close game"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Main.pm:1499 lib/Games/Risk/GUI/Startup.pm:348
+msgid "Quit"
+msgstr ""
+
+#: lib/Games/Risk/Tk/About.pm:20
+msgid "about"
+msgstr ""
+
+#: lib/Games/Risk/Tk/About.pm:27
+msgid "Created by Jerome Quelin"
+msgstr ""
+
+#: lib/Games/Risk/Tk/About.pm:28
+msgid "Copyright (c) 2008 Jerome Quelin, all rights reserved"
+msgstr ""
+
+#: lib/Games/Risk/Tk/About.pm:30
+msgid ""
+"prisk is free software; you can redistribute it and/or modify it under the "
+"terms of the GPLv3."
+msgstr ""
+
+#: lib/Games/Risk/Tk/Help.pm:21
+msgid "help"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Help.pm:23
+msgid "How to play?"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Continents.pm:47
+msgid "continents"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Continents.pm:49
+msgid "Continents information"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Continents.pm:214
+msgid "continent"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Continents.pm:215
+msgid "bonus"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Continents.pm:216
+msgid "# countries"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Cards.pm:59
+msgid "cards"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Cards.pm:61
+msgid "Cards available"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Cards.pm:63
+msgid "Exchange"
+msgstr ""
+
+#: lib/Games/Risk/Tk/Cards.pm:120 lib/Games/Risk/Tk/Cards.pm:259
+#: lib/Games/Risk/Tk/Cards.pm:371
+msgid "Select 3 cards"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:16
+msgid "Risk"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:26
+msgid "North America"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:27
+msgid "South America"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:28
+msgid "Europe"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:29
+msgid "Africa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:30
+msgid "Asia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:31
+msgid "Australia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:39
+msgid "Alaska"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:40
+msgid "North West Territory"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:41
+msgid "Alberta"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:42
+msgid "Western United States"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:43
+msgid "Central America"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:44
+msgid "Greenland"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:45
+msgid "Ontario"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:46
+msgid "Quebec"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:47
+msgid "Eastern United States"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:48
+msgid "Venezuela"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:49
+msgid "Peru"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:50
+msgid "Brazil"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:51
+msgid "Argentina"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:52
+msgid "Iceland"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:53
+msgid "Scandinavia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:54
+msgid "Ukraine"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:55
+msgid "Great Britain"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:56
+msgid "Northern Europe"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:57
+msgid "Western Europe"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:58
+msgid "Southern Europe"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:59
+msgid "North Africa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:60
+msgid "Egypt"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:61
+msgid "Congo"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:62
+msgid "East Africa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:63
+msgid "South Africa"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:64
+msgid "Madagascar"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:65
+msgid "Siberia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:66
+msgid "Ural"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:67
+msgid "China"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:68
+msgid "Afghanistan"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:69
+msgid "Middle East"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:70
+msgid "India"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:71
+msgid "Siam"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:72
+msgid "Yakutsk"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:73
+msgid "Irkutsk"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:74
+msgid "Mongolia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:75
+msgid "Japan"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:76
+msgid "Kamchatka"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:77
+msgid "Indonesia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:78
+msgid "New Guinea"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:79
+msgid "Western Australia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:80
+msgid "Eastern Australia"
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:145
+msgid "Conquer the continents of Asia and South America."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:146
+msgid ""
+"Conquer the continents of Europe and Australia and a third continent of your "
+"choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:147
+msgid "Conquer the continents of Asia and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:148
+msgid ""
+"Conquer the continents of Europe and South America and a third continent of "
+"your choice."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:149
+msgid "Conquer the continents of North America and Australia."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:150
+msgid "Conquer the continents of North America and Africa."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:151
+msgid ""
+"Occupy 18 countries of your choice and occupy each with at least 2 armies."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:152
+msgid ""
+"Occupy 24 countries of your choice and occupy each with at least 1 army."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:153
+msgid ""
+"Destroy all of Player1's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:154
+msgid ""
+"Destroy all of Player2's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:155
+msgid ""
+"Destroy all of Player3's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:156
+msgid ""
+"Destroy all of Player4's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:157
+msgid ""
+"Destroy all of Player5's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/Map/Risk.pm:158
+msgid ""
+"Destroy all of Player6's Troops. If they are yours or they have already been "
+"destroyed by another player then your mission is: Occupy 24 countries."
+msgstr ""
+
+#: lib/Games/Risk/GUI/MoveArmies.pm:72
+msgid "Country invasion"
+msgstr ""
+
+#: lib/Games/Risk/GUI/MoveArmies.pm:73
+msgid "A country has been conquered!"
+msgstr ""
+
+#: lib/Games/Risk/GUI/MoveArmies.pm:74
+#, perl-format
+msgid "You have conquered %s while attacking from %s."
+msgstr ""
+
+#: lib/Games/Risk/GUI/MoveArmies.pm:114
+msgid "Moving armies"
+msgstr ""
+
+#: lib/Games/Risk/GUI/MoveArmies.pm:115
+msgid "Consolidate your positions"
+msgstr ""
+
+#: lib/Games/Risk/GUI/MoveArmies.pm:116
+#, perl-format
+msgid "Moving armies from %s to %s."
+msgstr ""
+
+#: lib/Games/Risk/GUI/MoveArmies.pm:175
+msgid "Armies to move"
+msgstr ""
+
+#: lib/Games/Risk/GUI/MoveArmies.pm:184
+msgid "Move armies"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:48
+msgid "Napoleon Bonaparte"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:49
+msgid "Staline"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:50
+msgid "Alexander the Great"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:51
+msgid "Julius Caesar"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:52
+msgid "Attila"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:53
+msgid "Genghis Kahn"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:54
+msgid "Charlemagne"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:55
+msgid "Saladin"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:56
+msgid "Otto von Bismarck"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:57
+msgid "Ramses II"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:132
+msgid "Two players cannot have the same color."
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:139
+msgid "Two players cannot have the same name."
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:144
+msgid "Cannot have more than one human player."
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:145
+msgid "Game without any human player not (yet) supported."
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:148
+msgid "A player cannot have an empty name."
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:152
+msgid "Game should have at least 2 players."
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:294
+msgid "new game"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:322
+msgid "Map"
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:335
+msgid "New player..."
+msgstr ""
+
+#: lib/Games/Risk/GUI/Startup.pm:344
+msgid "Start game"
+msgstr ""
+
+#: lib/Games/Risk/AI/Blitzkrieg.pm:71
+msgid "easy"
+msgstr ""
+
+#: lib/Games/Risk/AI/Blitzkrieg.pm:132
+msgid ""
+"\n"
+"\n"
+"        This artificial intelligence follows a blitzkrieg strategy. It\n"
+"        will piles up new armies in one country, and then follow a\n"
+"        random path from this attack base.\n"
+"\n"
+"    "
+msgstr ""
+
+#: lib/Games/Risk/AI/Hegemon.pm:211
+msgid "hard"
+msgstr ""
+
+#: lib/Games/Risk/AI/Hegemon.pm:454
+msgid ""
+"\n"
+"\n"
+"        This artificial intelligence is optimized to conquer the world.\n"
+"        It checks what countries are most valuable for it, optimizes\n"
+"        attacks and moves for continent bonus and blocking other\n"
+"        players.\n"
+"\n"
+"    "
+msgstr ""
+
+#: lib/Games/Risk/AI/Dumb.pm:35
+msgid "very easy"
+msgstr ""
+
+#: lib/Games/Risk/AI/Dumb.pm:81
+msgid ""
+"\n"
+"\n"
+"        This artificial intelligence does nothing: it just piles up new "
+"armies\n"
+"        randomly, and never ever attacks nor move armies.\n"
+"\n"
+"    "
+msgstr ""

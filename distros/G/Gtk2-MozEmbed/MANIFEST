@@ -1,0 +1,17 @@
+ChangeLog.pre-git
+copyright.pod
+examples/pumzilla
+gtkmozembed.typemap
+gtkmozembed2perl.h
+lib/Gtk2/MozEmbed.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+maps
+NEWS
+perl-Gtk2-MozEmbed.doap
+README
+t/GtkMozEmbed.t
+xs/GtkMozEmbed.xs
+META.yml                                 Module meta-data (added by MakeMaker)

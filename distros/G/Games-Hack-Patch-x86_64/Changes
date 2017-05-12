@@ -1,0 +1,9 @@
+Revision history for Perl extension Games::Hack::Patch::x86_64.
+
+0.12 Thu Nov 15 19:45:45 CET 2007
+	- Copied test had wrong "use" statement; would run on my machine,
+	  as I've both installed.
+
+0.1  Thu Nov 15 10:45:45 CET 2007
+  - first published version.
+

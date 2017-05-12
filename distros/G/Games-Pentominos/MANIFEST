@@ -1,0 +1,10 @@
+bin/pentominos
+Build.PL
+Changes
+lib/Games/Pentominos.pm
+MANIFEST			This list of files
+META.yml
+README
+t/games-pentominos.t
+t/pod-coverage.t
+t/pod.t

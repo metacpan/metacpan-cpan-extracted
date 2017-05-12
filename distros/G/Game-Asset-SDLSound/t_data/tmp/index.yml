@@ -1,0 +1,6 @@
+---
+flac: Game::Asset::SDLSound
+mp3: Game::Asset::SDLSound
+ogg: Game::Asset::SDLSound
+wav: Game::Asset::SDLSound
+

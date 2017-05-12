@@ -1,0 +1,25 @@
+Games/IL2Device/Link version 0.3.1
+==========================
+
+Games::IL2Device::Link and Games::IL2Device::Constants are two perl
+modules to help communicating with IL2 Forgotten Battles client (>=
+2.01) using the 'devicelink' connection. For more information on
+devicelinks see 'DeviceLink.txt' in your IL2 Forgotten battles
+directory.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+This software is free software, you may redistribute it and/or modify
+it under the same license as perl itself. IL2 Forgotten battles is the
+property of Ubisoft Entertainment and 1C:Maddox games.
+
+Copyright (C) 2004 Mathias Jansson

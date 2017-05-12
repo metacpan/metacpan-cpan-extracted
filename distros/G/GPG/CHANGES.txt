@@ -1,0 +1,55 @@
+
+
+--- 2000.09.xx -- 1.00  (FUTURE)
+
+public test passed for key management, version is stable.
+
+add key management (waiting - not possible for now due to gnupg limitations, see BUG)
+
+delete-key / delete-secret-key (waiting - not possible for now due to gnupg limitations, see BUG)
+
+sign-key / lsign-key (waiting - not possible for now due to gnupg limitations, see BUG)
+
+
+--- 2000.08.06 -- 0.05
+
+Makefile.PL search the 'gpg' executable
+
+Makefile.PL check if "Data::Dumper", "IO::Handle" and "IPC::Open3" exist
+
+Makefile.PL warn for Solaris and HP-UX, need entropy
+
+new methods fast_import(), update_trustdb()
+
+better output from import_keys(), accept multiple import
+
+new methods verify_files()
+
+change output format of verify()
+
+new methods fingerprint()
+
+new methods export_key() and export_secret_key()
+
+
+--- 2000.08.03 -- 0.04
+
+add method "detach_sign"
+
+GPG.pm work now with non setuid_root gnupg
+
+README rewritten with an improved english, thanks toma :-)
+
+
+--- 2000.07.31 -- 0.03
+
+improve doc and portability.
+
+add method "list_keys" and "list_sig"
+
+
+--- 2000.07.24 -- 0.02
+
+first public version.
+
+--- End.

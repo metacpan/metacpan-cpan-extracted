@@ -1,0 +1,50 @@
+
+$  Pod::Coverage->new(package => 'Games::Tournament::Swiss::Procedure::FIDE')->covered
+$VAR1 = 'message';
+$VAR2 = 'prev';
+$VAR3 = 'c14';
+$VAR4 = 'c12';
+$VAR5 = 'c6pairs';
+$VAR6 = 'colors';
+$VAR7 = 'paired';
+$VAR8 = 'thisBracket';
+$VAR9 = 'c4';
+$VAR10 = 'index';
+$VAR11 = 'c11';
+$VAR12 = 'nonpaired';
+$VAR13 = 'rejectionTest';
+$VAR14 = 'bracketOrder';
+$VAR15 = 'c1';
+$VAR16 = 'c3';
+$VAR17 = 'c13';
+$VAR18 = 'new';
+$VAR19 = 'firstBracket';
+$VAR20 = 'nextBracket';
+$VAR21 = 'matches';
+$VAR22 = 'c7';
+$VAR23 = 'next';
+$VAR24 = 'c10';
+$VAR25 = 'matchPlayers';
+$VAR26 = 'c9';
+$VAR27 = 'colorClashes';
+$VAR28 = 'c2';
+$VAR29 = 'start';
+$VAR30 = 'byes';
+$VAR31 = 'incompatibles';
+$VAR32 = 'bye';
+$VAR33 = 'lastBracket';
+$VAR34 = 'c6others';
+$VAR35 = 'whoPlayedWho';
+$VAR36 = 'previousBracket';
+$VAR37 = 'logreport';
+$VAR38 = 'byer';
+$VAR39 = 'round';
+$VAR40 = 'c8';
+$VAR41 = 'c5';
+$VAR42 = 'penultpPrime';
+$VAR43 = 'floatCriteriaInForce';
+$VAR44 = 'brackets';
+
+$  Pod::Coverage->new(package => 'Games::Tournament::Swiss::Procedure::FIDE')->naked
+
+$ KKKKK

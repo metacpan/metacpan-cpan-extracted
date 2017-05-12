@@ -1,0 +1,10 @@
+Changes
+lib/Geo/Google.pm
+lib/Geo/Google/Location.pm
+lib/Geo/Google/Path.pm
+lib/Geo/Google/Segment.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/Geo-Google.t

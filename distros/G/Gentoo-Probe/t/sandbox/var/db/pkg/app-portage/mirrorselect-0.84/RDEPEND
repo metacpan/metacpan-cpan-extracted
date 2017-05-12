@@ -1,0 +1,6 @@
+>=dev-util/dialog-0.7
+	sys-apps/grep
+	sys-apps/sed
+	sys-apps/gawk
+	net-misc/wget
+	net-analyzer/netselect 

@@ -1,0 +1,11 @@
+0.04 
+	* TkCanvas from Christian Soeller 
+	* Fig format (not yet working)
+	* doc fixes
+	* image (not supported by all backends yet)
+	  - doesn't work yet but I have to do a quick release to resync.
+
+0.03
+	* Arrows
+	* Line widths
+	* use Graphics::Simple 500,500;

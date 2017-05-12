@@ -1,0 +1,53 @@
+---
+abstract: 'More plugins (Git hooks) for package Git::Hooks.'
+author:
+  - "'Mikko Koivunalho <mikko.koivunalho@iki.fi>'"
+build_requires:
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010000'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-MoreHooks
+provides:
+  Git::MoreHooks:
+    file: lib/Git/MoreHooks.pm
+    version: '0.005'
+  Git::MoreHooks::CheckCommitAuthorFromMailmap:
+    file: lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm
+    version: '0.005'
+  Git::MoreHooks::CheckCommitBase:
+    file: lib/Git/MoreHooks/CheckCommitBase.pm
+    version: '0.005'
+  Git::MoreHooks::CheckIndent:
+    file: lib/Git/MoreHooks/CheckIndent.pm
+    version: '0.005'
+  Git::MoreHooks::TriggerJenkins:
+    file: lib/Git/MoreHooks/TriggerJenkins.pm
+    version: '0.005'
+requires:
+  Carp: '0'
+  Const::Fast: '0'
+  Data::Dumper: '0'
+  Git::Hooks: '0'
+  Git::Mailmap: '0'
+  Jenkins::API: '0'
+  Log::Any: '0'
+  Params::Validate: '0'
+  Path::Tiny: '0'
+  Template: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-MoreHooks
+  homepage: https://metacpan.org/release/Git-MoreHooks
+  repository: https://github.com/mikkoi/git-morehooks.git
+version: '0.005'

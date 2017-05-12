@@ -1,0 +1,15 @@
+# ChangeLog for net-dns/dnswalk
+# Copyright 2002-2003 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/dnswalk/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*dnswalk-2.0.2 (1 Feb 2002)
+
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

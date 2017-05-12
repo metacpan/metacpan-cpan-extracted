@@ -1,0 +1,76 @@
+<script type="text/javascript">
+<!--
+function checkAll() {
+    var field = document.getElementsByTagName( 'input' );
+
+    for ( i = 0; i < field.length; i++ ) {          
+	    field[i].checked = true ;
+	}
+    
+}
+
+function uncheckAll() {
+    var field = document.getElementsByTagName( 'input' );
+
+    for ( i = 0; i < field.length; i++ ) {          
+	    field[i].checked = false ;
+	}
+}
+//  End -->
+</script>
+
+<form method="post" action="[% view.form.action || self.uri %]" 
+	id="[% view.form.name || 'myform' %]">
+
+    <div class="form-box">
+       <h5 class="heading">[% view.form.legend  || 'Make Selection' %]</h5>
+
+       <dl class="checklist">
+       [% IF view.data.type == 'checkbox' %]
+    	   [%- WHILE ( available = view.data.available.next ) %]
+           [%- id = available.id %]
+           <dd>
+               <input type="checkbox" value="1" name="subscribe:[% id %]" 
+               [%- IF view.data.selected.$id %]
+                   checked="checked"
+               [%- END %] />
+           
+               <span class="label">[% available.foreign_display %]</span>            
+           </dd>
+
+           [%- END %]
+           
+       [%- ELSE -%]
+            <dd>
+            <select class="multiselect" name="subscribe" size="5" 
+                multiple="yes">
+        	   
+        	   [%- WHILE ( available = view.data.available.next ) %]
+               [%- id = available.id %]
+                   <option 
+                   [%- IF view.data.selected.$id %]
+                       selected="selected"
+                   [%- END %]
+                   value="[% id %]">[% available.foreign_display %]
+                   </option>
+               [%- END %]
+            </select>
+            </dd>
+        
+        [%- END %]
+        </dl>
+
+       <br style="clear: both" />
+    </div>
+
+    <div class="form-box actions">
+        [% IF view.data.type == 'checkbox' %]
+        <a href="javascript: checkAll();">Check All</a>
+        <a href="javascript: uncheckAll();">Uncheck All</a>
+        [% END %]
+        
+        <input id="submit" type="submit" name="submit" value="Submit" />
+        <input id="cancel" type="submit" name="cancel" value="Cancel" />
+    </div>
+
+</form>

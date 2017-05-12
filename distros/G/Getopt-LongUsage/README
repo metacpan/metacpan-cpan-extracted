@@ -1,0 +1,78 @@
+Getopt-LongUsage
+============================
+
+Getopt::LongUsage - Describe the usage of Getopt::Long options in human readable format
+
+Provide the description for Getopt::Long options in order to generate a descriptive usage for the user.
+
+
+EXAMPLE
+
+Example code:
+
+    use Getopt::Long
+    use Getopt::LongUsage
+    my ($width,$length,$verbose,$help);
+    my @getoptconf = (  'width=i'   => \$width,
+                        'length=i'  => \$length,
+                        'verbose|v' => \$verbose,
+                        'help|h'    => \$help
+                        );
+    my $usage = sub {
+        my @getopt_long_configuration = @_;
+        GetLongUsage (
+            'cli_use'       => ($0 ." [options]"),
+            'descriptions'  =>
+                [   'width'         => "The width",
+                    'length'        => "The length",
+                    'verbose'       => "verbose",
+                    'help'          => "this help message"
+                    ],
+            'Getopt_Long'   => \@getopt_long_configuration,
+        );
+    };
+    GetOptions( @getoptconf ) || die ($usage->( @getoptconf ),"\n");
+    ...etc...
+
+Example output:
+
+    linux$ ./test_it.pl --not-an-option
+    Unknown option: not-an-option
+    ./test_it.pl [options]
+      --width        The width
+      --length       The length
+      -v, --verbose  verbose
+      -h, --help     this help message
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Getopt::Long >= 2.37
+
+
+SUPPORT AND DOCUMENTATION
+
+    http://www.codepin.org/project/perlmod/Getopt-LongUsage
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2010-2013 Russell E Glaue,
+Center for the Application of Information Technologies,
+Western Illinois University.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

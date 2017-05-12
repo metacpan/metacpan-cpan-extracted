@@ -1,0 +1,55 @@
+Revision history for Geo-Distance-XS
+
+0.13  Fri Jun 20 07:10:41 UTC 2014
+    - Restored support for 5.6.2.
+
+0.12  Wed Jun 18 19:01:04 UTC 2014
+    - Remove deprecated usage defined(@array) from a test case.
+    - Optimized the case where both coordinates are identical.
+    - Updated ppport.h.
+
+0.11  Sat Apr 14 03:45:08 UTC 2012
+    - Adjusted constants for better accuracy.
+
+0.10  Fri Apr 13 11:57:14 UTC 2012
+    - Fixed floating point errors.
+    - Fixed for antipodal coordinates.
+    - Fixed formulas for use with multiple Geo::Distance objects.
+    - Added new formula- alt: Andoyer-Lambert-Thomas.
+    - Updated benchmarks.
+
+0.09  Mon Aug  1 21:49:37 UTC 2011
+    - Required XSLoader; stopped falling back to DynaLoader.
+
+0.08  Fri Oct 22 03:44:02 UTC 2010
+    - Added GIS::Distance::Fast to the benchmark.
+
+0.07  Fri Oct 16 17:00:29 UTC 2009
+    - RT #50545: Set minimum required version of Geo::Distance to 0.16.
+
+0.06  Tue Oct 13 17:52:08 UTC 2009
+    - Added more tests.
+    - Added leaktrace, valgrind and file portability author tests.
+    - Renamed some files for better portability.
+    - Added authortest Makefile target and added it to the disttest target.
+
+0.05  Sat Sep 5 18:23:49 UTC 2009
+    - Adjusted Carp level in redefined sub.
+    - Used Carp (from within XS) so error messages are more useful and
+      fully match those of Geo::Distance.
+
+0.04  Wed Jul 15 07:49:07 UTC 2009
+    - Noted in pod that Geo::Distance now calls this module if installed.
+    - Moved author tests into separate directory.
+    - Updated ppport.h.
+    - Added link to repository.
+
+0.03  Wed May 6 07:16:34 UTC 2009
+    - Added support for non-C99 compilers. (Taro Nishino)
+
+0.02  Tue May 5 13:55:49 UTC 2009
+    - (Hopefully) fixed compilation under Solaris by making test for NaN more
+      portable.
+
+0.01  Sat Apr 4 16:59:27 UTC 2009
+    - Initial distribution.

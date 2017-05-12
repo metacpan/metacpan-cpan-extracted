@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="528.2" height="149" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Generated at Sun Aug 20 18:57:36 2006 by:
+  Graph::Easy v0.47
+  Graph::Easy::As_svg v0.20
+-->
+
+<title>Untitled graph</title>
+<defs>
+ <!-- open arrow head -->
+ <g id="ah" stroke-linecap="round" stroke-width="1">
+  <line x1="-8" y1="-4" x2="1" y2="0" />
+  <line x1="1" y1="0" x2="-8" y2="4" />
+ </g>
+
+ <!-- class definitions -->
+ <style type="text/css"><![CDATA[
+ .edge {
+  fill: inherit;
+  font-family: monospaced, courier-new, courier, sans-serif;
+  font-size: 13px;
+  stroke: black;
+  text-anchor: middle;
+ }
+ .node {
+  text-anchor: middle;
+  fill: white;
+  font-size: 16px;
+ }
+ ]]></style>
+</defs>
+
+<!-- graph background with border (mainly for printing) -->
+<rect x="0" y="0" width="536.2" height="157" fill="white" stroke="none" stroke-dasharray="" stroke-width="1" />
+
+<g class="edge">
+ <!-- from car to Hof -->
+ <!-- horizontal -->
+ <line x1="442.2" y1="26" x2="470" y2="26" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" x="471" y="26"/>
+</g>
+
+<g class="edge">
+ <!-- from Ulm to car -->
+ <!-- horizontal -->
+ <line x1="295" y1="26" x2="323.8" y2="26" stroke="#000000" stroke-width="1" />
+</g>
+
+<g class="edge">
+ <!-- from train to Ulm -->
+ <!-- horizontal -->
+ <line x1="211" y1="26" x2="235.6" y2="26" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" x="236.6" y="26"/>
+</g>
+
+<g class="edge">
+ <!-- from #9 to train -->
+ <!-- vertical -->
+ <line x1="153.4" y1="51.4" x2="153.4" y2="100" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" transform="translate(153.4 50.4)rotate(-90)"/>
+ <text x="161" y="76" fill="#000000" stroke="none" text-anchor="start">buy</text>
+</g>
+
+<g class="edge">
+ <!-- from #11 to car -->
+ <!-- vertical -->
+ <line x1="383" y1="51.4" x2="383" y2="100" stroke="#000000" stroke-width="1" />
+ <use stroke="#000000" xlink:href="#ah" transform="translate(383 50.4)rotate(-90)"/>
+ <text x="391" y="76" fill="#000000" stroke="none" text-anchor="start">rent</text>
+</g>
+
+<g class="edge">
+ <!-- from Bonn to train -->
+ <!-- horizontal -->
+ <line x1="70.2" y1="26" x2="95.8" y2="26" stroke="#000000" stroke-width="1" />
+</g>
+
+<g class="node">
+ <!-- Bonn, rect -->
+ <rect fill="#ffffff" height="35" stroke="#000000" width="58" x="8.5" y="8.5" />
+ <text x="37" y="32" fill="#000000" text-anchor="middle">Bonn</text>
+</g>
+
+<g class="node">
+ <!-- train, none -->
+ <text x="153" y="32" fill="#000000" text-anchor="middle">train</text>
+</g>
+
+<g class="node">
+ <!-- Ulm, rect -->
+ <rect fill="#ffffff" height="35" stroke="#000000" width="51" x="240.3" y="8.5" />
+ <text x="265" y="32" fill="#000000" text-anchor="middle">Ulm</text>
+</g>
+
+<g class="node">
+ <!-- car, edge -->
+ <edge fill="#ffffff" height="35" stroke="#000000" width="117.4" x="324.3" y="8.5" />
+ <text x="383" y="32" fill="#000000" text-anchor="middle">car</text>
+</g>
+
+<g class="node">
+ <!-- Hof, rect -->
+ <rect fill="#ffffff" height="35" stroke="#000000" width="46" x="474.7" y="8.5" />
+ <text x="497" y="32" fill="#000000" text-anchor="middle">Hof</text>
+</g>
+
+</svg>

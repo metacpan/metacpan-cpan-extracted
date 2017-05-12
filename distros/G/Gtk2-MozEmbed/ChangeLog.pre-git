@@ -1,0 +1,162 @@
+=== ChangeLog discontinued ===
+
+	With the move to git, we stop maintaining a separate ChangeLog and
+	rely on proper commit messages instead.
+
+2008-11-20  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Catch exceptions thrown by EU::PkgConfig so that we
+	can abort properly.
+
+2008-08-25  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* MozEmbed.pm
+	* NEWS: Version 0.08.
+
+2008-08-25  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL
+	* xs/GtkMozEmbed.xs: When compiling against xulrunner, make sure
+	we call gtk_moz_embed_set_path on the appropriate library
+	directory.  This should make us work with xulrunner-1.9.  Patch by
+	Boris Sukholitko.
+
+2008-03-23  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Say which gtkmozembed provider we compile against.
+
+2008-03-15  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* copyright.pod
+	* MozEmbed.pm
+	* NEWS: Version 0.07.
+
+2008-03-15  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Prefer xulrunner-gtkmozembed over the Mozilla and
+	Firefox packages as the former doesn't have run-time linking
+	problems.  Also, announce our Makefile.PL-time dependencies via
+	META.yml's configure_requires key.
+
+2007-01-31	kaffeetisch
+
+	* t/GtkMozEmbed.t: Remove obsolete TODO block.
+
+2006-08-09	kaffeetisch
+
+	* MozEmbed.pm, NEWS, README, copyright.pod: Version 0.06.
+
+2006/03/07	kaffeetisch
+
+	* Makefile.PL: Patch from Tom Killian adds support for compiling
+	against XULRunner.
+
+2005/12/20	kaffeetisch
+
+	* Makefile.PL: Make our dependencies known so MakeMaker generates
+	a correct META.yml.
+
+	* t/GtkMozEmbed.t, xs/GtkMozEmbed.xs: Bind and test
+	gtk_moz_embed_push_startup and gtk_moz_embed_pop_startup.
+
+2005/10/10	kaffeetisch
+
+	* MozEmbed.pm, NEWS: Version 0.05.
+
+2005/09/28	kaffeetisch
+
+	* Makefile.PL: Apply patches from Scott Lanning and José (RT
+	Ticker 14792) to make the pkg-config interaction more robust and
+	correct.
+
+2005/04/12	kaffeetisch
+
+	* MozEmbed.pm, NEWS, README: Version 0.04.
+
+2005/04/12	kaffeetisch
+
+	* META.yml: Add dependencies.
+
+	* Makefile.PL: Require Gtk2 1.081.  Add support for Firefox'
+	GtkMozEmbed package.
+
+	* MANIFEST, gtkmozembed.typemap, gtkmozembed2perl.h,
+	GtkMozEmbed.xs: Another patch from Scott Lanning adds support for
+	gtk_moz_embed_get_nsIWebBrowser.
+
+	* examples/pumzilla: Remove signal handling code.  The new
+	examples in Mozilla::DOM do a much better job at, and are much
+	better suited for showing off this stuff.
+
+2005/04/03	kaffeetisch
+
+	Large patch from Scott Lanning adds optional Mozilla::DOM support:
+
+	* Makefile.PL, MozEmbed.pm, README, gtkmozembed2perl.h,
+	examples/pumzilla, xs/GtkMozEmbed.xs: Optionally pull in
+	Mozilla::DOM.  Add and register dom_key_* and dom_mouse_*
+	marshallers.  Add documentation for those signals.  Show how to
+	use them in the example.
+
+	* xs/GtkMozEmbed.xs: Cast the return value of
+	gtk_moz_embed_get_chrome_mask to make g++ happy.
+
+2005/03/11	kaffeetisch
+
+	* xs/GtkMozEmbed.xs: Fix an error in the documentation, found by
+	Scott Lanning.
+
+2005/02/27	kaffeetisch
+
+	* META.yml, Makefile.PL, MozEmbed.pm, NEWS, README: Version 0.03.
+
+2005/02/27	kaffeetisch
+
+	* t/GtkMozEmbed.t: Mark the failing test as TODO until we find a
+	solution for the Test::More issue.
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+2004/09/11 17:23 (+0200) kaffeetisch
+
+	* META.yml, MozEmbed.pm, NEWS: Version 0.02.
+
+2004/09/11 17:20 (+0200) kaffeetisch
+
+	* MozEmbed.pm: Add a SYNOPSIS example.
+
+2004/08/27 22:59 (+0200) kaffeetisch
+
+	* Makefile.PL: Generate version macros in
+	gtkmozembed2perl-version.h
+
+	* pumzilla: Some whitespace fixes.
+
+	* GtkMozEmbed.xs: Add lots of POD for nearly all the functions and
+	signals.
+
+	* gtkmozembed2perl.h, maps, t/GtkMozEmbed.t, xs/GtkMozEmbed.xs:
+	Add commented out support for GtkMozEmbedSingle, blocking on an
+	upstream bug.
+
+2004/08/16 19:14 (+0200) kaffeetisch
+
+	* MANIFEST: Add ChangeLog and NEWS.
+
+	* META.yml, Makefile.PL, MozEmbed.pm, NEWS, README: Version 0.01.
+
+2004/08/16 19:03 (+0200) kaffeetisch
+
+	* MANIFEST: Remove Makefile.
+
+	* Makefile.PL: Use LD_RUN_PATH when linking to make sure we work
+	for people whose /etc/ld.so.conf doesn't include Mozilla's libdir.
+
+2004/08/16 02:11 (+0200) kaffeetisch
+
+	* .cvsignore, ChangeLog, LICENSE, MANIFEST, MANIFEST.SKIP,
+	META.yml, Makefile.PL, MozEmbed.pm, README, copyright.pod,
+	gtkmozembed2perl.h, maps, examples/pumzilla, t/GtkMozEmbed.t,
+	xs/GtkMozEmbed.xs: Initial import.

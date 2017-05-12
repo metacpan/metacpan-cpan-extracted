@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d3e3148a1550f2a2bb4429c185d4a65edbc269a6 CONTRIBUTORS
+SHA1 5b12e5eb4237e9bcbab0ac04c5e54c3948acf4b9 Changes
+SHA1 fdaa2f79da8ed0b278df259f65ffdf18f3bb9be1 INSTALL
+SHA1 8e1ec54958c19741b85c23bc850d601374ae4995 LICENSE
+SHA1 0586f41d110a78643b907606e9e3bc3e73ef069c MANIFEST
+SHA1 6dcd5ab93298be339e1c7016d2473a260876284b META.json
+SHA1 f46b675390aa8c6f806b34266745ce34e51439f4 META.yml
+SHA1 5c23b080134309a233af38aa3271b49f27299f1d Makefile.PL
+SHA1 ff9f0f4682b23e0b257bfdc443b82641e09d6bce README
+SHA1 3100b552205163173857426062c16792b57f884f README.mkdn
+SHA1 ca3e65b1efa7500d2f83bc56a0caabd41512e088 cpanfile
+SHA1 ff95d1cc15acb03d236baab003567342b9d7dc3d doap.xml
+SHA1 f4fb412f6bc09037620c57095efc5c56b757c1eb lib/GitStore.pm
+SHA1 fe67c2d2435c3d3a4af0fdb6b0c947fcc144667d lib/GitStore/Revision.pm
+SHA1 750eb58dabe16d8eef92044bbc88efdda998cdbd lib/MooseX/Storage/IO/GitStore.pm
+SHA1 e3ecbd9f6a7b02c8763c7c03c7496ad61d84af07 t/00-compile.t
+SHA1 1b43651f21c184c199194385323aa15b36365ff5 t/00-load.t
+SHA1 21871f5f42b9d195b8d3b803858923b11db72199 t/000-report-versions-tiny.t
+SHA1 44d5ac775bfaf7ab63b26009878db7fd1c34d404 t/01-basic.t
+SHA1 89df9376dc9592a9b6fd06b37f37950c13f51775 t/02-next.t
+SHA1 90dbdf0cc566fdcf69d99161f9fe74621a13a987 t/autocommit.t
+SHA1 1550984a09c86e89ad6e2f1beb440f9c1094ee50 t/deleting-all.t
+SHA1 f294e44d6340f9a4e9597f407198fc12f033a2f1 t/history.t
+SHA1 922b8e152037ec5a2a4809286fdb9e96fae0cbf2 t/invalid-objects.t
+SHA1 83f07d7f4a49eb6790974bad97c55b21ff8ca97b t/lib/Utils.pm
+SHA1 99d6f54749435b5a2ba0233cae7b299cd34e42a7 t/many-commits.t
+SHA1 e1af68c60aa3a65a4edbeefd5bf87b509d7314b7 t/moosex-storage.t
+SHA1 98a81a4c64a3ac0158424e1f43fe892a8e29e4c2 t/no-changes.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 7ad5c60525a4fe9cac4c8cabf3af52154e6cb8e5 t/serializer.t
+SHA1 f161ebd29699d93411cec0915c5133c0f3229a28 t/stores/dummy
+SHA1 3a20be87a47d46b59ead42effb0759373c788ca4 t/subpaths.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlTX3dcACgkQ34Hwf+GwC4zrDACeJc0ndMpZhleSm8WITsvHyAVd
+S3EAoIfg3Y1Uxys1k4FSWCFITineil3g
+=fUD3
+-----END PGP SIGNATURE-----

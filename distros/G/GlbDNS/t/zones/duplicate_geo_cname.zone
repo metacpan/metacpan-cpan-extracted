@@ -1,0 +1,14 @@
+
+$ORIGIN test.local.
+
+600 IN SOA ns1.example.local. dnsmaster.example.local. 2009012606 1200 120 1209600 1
+
+geo 86405 IN CNAME london
+geo 86400 IN CNAME london
+geo 86400 IN CNAME sjc
+geo 86400 IN CNAME singapore
+
+london 60 IN A 127.0.0.10
+london 60 IN A 127.0.0.11
+
+london 60 IN LOC 51 00 00.000 N 0 00 00.000  W 0.00m 0.00m 0.00m 0.00m

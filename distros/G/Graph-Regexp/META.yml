@@ -1,0 +1,18 @@
+abstract: Create graphical flowchart from an regular expression
+author: Tels <nospam-abuse@bloodgate.com>
+build_requires: 
+  Test::Differences: 0.47
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: gpl
+name: Graph-Regexp
+no_index: 
+  directory: 
+    - examples
+    - inc
+    - t
+requires: 
+  Graph::Easy: 0.49
+  Scalar::Util: 1.13
+version: 0.04

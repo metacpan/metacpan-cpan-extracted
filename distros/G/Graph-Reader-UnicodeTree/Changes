@@ -1,0 +1,12 @@
+0.02 2015-09-28T19:56:27+02:00
+ - Fix LICENSE file.
+ - Fix cleaning of temporary file in EXAMPLE section in doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Remove diacritics from author name in Makefile.PL.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.01 2013-11-10
+ - First version.

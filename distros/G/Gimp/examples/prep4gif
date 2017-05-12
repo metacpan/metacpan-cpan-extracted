@@ -1,0 +1,105 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  my $out = $image->duplicate; # only work on duplicate
+  my @layers = $out->get_layers;
+  die __"You need at least 2 layers to perform prep4gif\n" if @layers < 2;
+
+# Show the image early - this makes debugging a breeze
+  eval { Gimp::Display->new($out); };
+# Hide the bottom layer, so it doesn't get into the merge visible later.
+  my $bottomlayer = $layers[$#layers];
+  $bottomlayer->set_visible(FALSE);
+  $bottomlayer->add_alpha;
+  my $foreground;
+  if ($#layers > 1) {
+    $foreground = $out->merge_visible_layers(EXPAND_AS_NECESSARY);
+  } else {
+    $foreground = $layers[0];
+  }
+
+  my $layer_mask = $foreground->create_mask(ADD_ALPHA_MASK);
+  $foreground->add_mask ($layer_mask);
+  $layer_mask->threshold($threshold, 255);
+
+# Transfer layer mask to selection, and grow the selection
+  $out->select_item(CHANNEL_OP_REPLACE, $foreground);
+  $out->selection_grow($growth);
+
+# Apply this selection to the background
+  $bottomlayer->set_visible(TRUE);
+  $out->set_active_layer($bottomlayer);
+  $out->selection_invert;
+  $bottomlayer->edit_cut;
+
+# Clean up after yourself
+  $foreground->remove_mask(MASK_DISCARD);
+  my $outlayer = $out->merge_visible_layers(EXPAND_AS_NECESSARY);
+
+# Convert to indexed
+  $out->convert_indexed(FS_DITHER, MAKE_PALETTE, $colors, $dither, TRUE, "")
+    if $index;
+  ();
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+prep4gif - Prep for gif
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Web/Prepare for GIF...
+
+=head1 DESCRIPTION
+
+Make the image a small-cut-out of the intended background, so your
+transparent text doesn't look blocky.
+
+=head1 PARAMETERS
+
+ [PF_INT32, "threshold", "Lower alpha threshold", 64],
+ [PF_INT32, "growth", "How much growth for safety ",1],
+ [PF_TOGGLE, "index", "Convert image to indexed", 0],
+ [PF_TOGGLE, "dither", "Floyd-Steinberg dithering", 1],
+ [PF_INT32, "colors", "Colors to quantize to", "255"],
+
+=head1 IMAGE TYPES
+
+RGB*
+
+=head1 HISTORY
+
+ prep4gif.pl
+ by Seth Burgess <sjburges@gimp.org>
+ June 29, 1998
+
+ This perl plug-in prepares a multilayer RGB image for use as a
+ transparent gif. To use this properly, you want to have something
+ close to the intended background as the bottom layer. If convert
+ to indexed is not selected, the bottom two options are unused.
+
+ 12/5/03: <sjburges@gimp.org>
+  s/gimp_convert/gimp_image_convert
+
+ 2/25/04: <sjburges@gimp.org>
+  s/gimp_layer_set_visible/gimp_drawable_set_visible/
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+2-15-98
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

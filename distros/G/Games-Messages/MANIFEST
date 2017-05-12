@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+Messages.pm
+README
+t/01-basic.t
+t/02-random-tests.t
+META.yml                                 Module meta-data (added by MakeMaker)
+t/pod.t
+t/pod-coverage.t

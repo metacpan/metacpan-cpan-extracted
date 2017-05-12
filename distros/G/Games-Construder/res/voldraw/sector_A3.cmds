@@ -1,0 +1,14 @@
+mode set
+src_dst 2 2
+   src_blend 0
+   fill 1
+   cantor_dust 2
+
+src_dst 2 1
+   src_blend 1
+   src_range 0.7 1
+   menger_sponge 3
+   src_range 0 0.4
+   fill
+
+   #show_range_sector_type A3 0

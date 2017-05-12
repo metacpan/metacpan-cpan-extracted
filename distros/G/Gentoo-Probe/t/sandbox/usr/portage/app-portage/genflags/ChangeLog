@@ -1,0 +1,34 @@
+# ChangeLog for app-portage/genflags
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/genflags/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+*genflags-0.96 (18 Jan 2004)
+
+  18 Jan 2004; Robin H. Johnson <robbat2@gentoo.org> metadata.xml:
+  fix bugs #26039, #34006, #34054. update metadata.xml. fix various other bugs.
+
+  23 Nov 2003; Michael Sterrett <mr_bones_@gentoo.org>
+  genflags-0.94-r1.ebuild, genflags-0.94.ebuild:
+  Specify which OSL is used.
+
+*genflags-0.94 (14 Nov 2003)
+
+  14 Nov 2003; Seemant Kulleen <seemant@gentoo.org> genflags-0.94-r1.ebuild,
+  genflags-0.94.ebuild:
+  moved from sys-apps to app-portage
+
+  06 Aug 2003; Robin H. Johnson <robbat2@gentoo.org> genflags-0.94-r1.ebuild:
+  fix P/PF mixup in postinst
+
+*genflags-0.94-r1 (27 Jul 2003)
+
+  27 Jul 2003; Robin Hugh Johnson,Room,604-339-5621,604-298-8414
+  <robbat2@gentoo.org> genflags-0.94-r1.ebuild:
+  Add post-install note on what it does wrong. Mark stable on ALL arches (it
+  doesn't get compiled so this is easy).
+
+*genflags-0.94 (27 Jul 2003)
+
+  27 Jul 2003; Robin H. Johnson <robbat2@gentoo.org> genflags-0.94.ebuild:
+  Initial Commit. Application written by Robin H. Johnson.
+

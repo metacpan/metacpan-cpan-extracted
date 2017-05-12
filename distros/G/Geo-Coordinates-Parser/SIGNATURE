@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.50.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e695bf215d484441b039edce373805aaab169bdf Build.PL
+SHA1 a942a0cd472cca37caa2abfd3e38649bde56cf29 Changes
+SHA1 e23d211f44ef36fb93ab28d8dacd54fb26986be0 INSTALL
+SHA1 155aa68fac0b5932bd2b30aef3a2d7f6513c1b9b MANIFEST
+SHA1 a651817e3b8ee710ffd6157cba61167278c08ac0 META.yml
+SHA1 392ac414c6c37b9ea36b39c3a10576f9f709e91f Makefile.PL
+SHA1 50213c15f28936071f3979e0b33739f580b7739f README
+SHA1 24f906c97dbc48989b84175549d5402745c87a6c lib/Geo/Coordinates/Parser.pm
+SHA1 a025e757490c169bfd225b45723806310c7e0853 t/1.t
+SHA1 878fbb36ac0da43ddf203c3817e4378dbde850c6 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDJTW6tdZ1k8uaX50RAqYYAJ9y0uvZJIyU271ZQen6amqutxGrNgCfZrkD
+648yEpkhO+wER+dtsMhR6S4=
+=NzJP
+-----END PGP SIGNATURE-----

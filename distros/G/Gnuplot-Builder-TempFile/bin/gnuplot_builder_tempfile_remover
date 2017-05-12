@@ -1,0 +1,26 @@
+#!perl
+use strict;
+use warnings;
+
+my $SLEEP_TIME = 5;
+my $filename = shift @ARGV;
+
+if(!defined $filename) {
+    die "No filename";
+}
+
+if(! -e $filename) {
+    exit 0;
+}
+
+while(1) {
+    sleep $SLEEP_TIME;
+    if(! -e $filename) {
+        exit 0;
+    }
+    if(unlink $filename) {
+        last;
+    }
+}
+
+exit 0;

@@ -1,0 +1,26 @@
+---
+abstract: 'A parser and compiler for the Gherkin language'
+author:
+  - "['Peter Sergeant <pete@clueball.com>', 'Cucumber Ltd', 'Gaspar Nagy']"
+build_requires:
+  Path::Class: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gherkin
+requires:
+  Class::XSAccessor: '0'
+  Cpanel::JSON::XS: '0'
+  IO::Scalar: '0'
+resources:
+  bugtracker: https://github.com/pjlsergeant/gherkin/issues
+  repository: https://github.com/pjlsergeant/gherkin.git
+version: 4.0.0

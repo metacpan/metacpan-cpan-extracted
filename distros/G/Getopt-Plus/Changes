@@ -1,0 +1,76 @@
+Revision history for Getopt::Plus. 
+
+0.97
+	- correct undefined warning on ->VERSION & incorrect interface check
+	- enable multiple -v flags to accumulate
+
+0.96  Sat Feb  5  4:50PM GMT 2005
+	- Don't allow optional args for single-letter options
+	- Add ERR_INTERNAL, ERR_INPUT
+	- Document Error Codes
+
+0.95  Sun Apr 20  2:23PM GMT 2003
+	- Add human_file_size function
+	- Document commify, ftime, check_run, run, find_exec
+	- Add dry_run option to check_run
+
+0.94  Sat Mar  8 11:24AM GMT 2003
+	- Fix test-script.t to work for perl 5.8.0 (Pod::Text 2.2)
+
+0.93  Fri Dec 20 10:57PM GMT 2002
+	- Fix test2.pm to work on Solaris, too
+	- Indent ::new synopsis so as to get verbatim POD output
+
+0.92  Tue Dec 10 11:50PM GMT 2002
+	- Add args_done hook
+
+0.91  Thu Dec  5  7:49PM GMT 2002
+	- Changes made to protect run sections & log properly
+	- correct long options pod bug that printed only standard options
+
+0.90  Thu Nov 28  8:06PM GMT 2002
+	- First Public Version
+	- Replace explicite requisite handling with generalized modes of
+	  execution
+	- Make package, version args to new mandatory.  Remove recognition
+	  of $main::PACKAGE, $main::VERSION
+	- Remove exec-monitor
+
+0.88  Thu Sep 12  3:38PM GMT 2002
+	- Add commify
+
+0.87  Wed Sep  4 11:27PM GMT 2002
+	- Tweaks to tests for FreeBSD compatibility
+	- Dump @ARGV when @ARGV != 1 and ary == 1
+
+0.86  Tue Aug 20 11:44PM GMT 2002
+	- Change semantics of check, req_check to fail on exception rather
+	  than return code (so we get a message, and it's harder to fail
+	  by accident)
+	- Output error messages for failed check, initialize, etc.
+
+0.85  Wed Aug 14  4:43PM GMT 2002
+	- Handle '*' arg_ary
+
+0.84  Mon Aug 12  1:49PM GMT 2002
+	- Add check, finalize, end calls
+
+0.83  Mon Aug  5 10:33AM GMT 2002
+	- Amend call to Log::Info to use :trap pragma rather than deprecated
+	  trap_warn_die
+
+0.82  Wed Jul 31  3:03PM GMT 2002
+	- Only check global $PACKAGE, $VERSION if corresponding arguments
+	  not passed to new
+
+0.81  Mon Jul 29  3:39PM GMT 2002
+	- Correct options handling for boolean options
+	- Add check_run method
+	- Add ERR_EXTERNAL value
+	- Amend new_exit_value to work backwards (to minimize movement of
+	  numbers as new standard numbers are added)
+	- Handle (scalar) mandatory options
+	- Add exec-monitor executable
+
+0.80  Fri Jul 26  8:00AM GMT 2002
+	- original version 

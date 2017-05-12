@@ -1,0 +1,79 @@
+
+Revision history for Perl extension Getopt::OO.
+
+0.01  Wed Dec 29 14:07:26 2004
+    - original version; created by h2xs 1.23 with options
+        -XA -n Getopt::OO
+0.02  Sun Jan 16, 2005
+    - Cleaned up documentation.
+    - Added test cases and fixed one bad test case.
+    - Fixed problems in required and mutual_exclusive options.
+    - Modified mutual_exclusive so it will accept either a 
+      list of lists or a list as necessary.
+    - Tested with Cygwin under Windows with PERL 5.8 and 
+      under SuSE linux with PERL 5.8.5 and 5.5.4.
+    - Got rid of 'our' keyword so we would work with perl 5.5.
+    - Modified the test case to not use Test::More which isn't
+      available on the older releases.
+0.03  Monday Jan 17, 2005
+    - Added additional error checking so we would catch 
+      invalid multi-character short options.
+    - Added an other_args option to fill out the usage statement.
+    - Modified usage message so we print the required options.
+    - Updated the README and Changes files which were missed
+      in 0.02.
+    - Made changes so we should work under PERL 5.004 but this
+      has not yet been tested.
+0.04 Sunday 1/23/2004
+    - Renamed the other_args to be other_values to make things
+      more consistent.
+    - other_values no takes a number instead of a string and can
+      be used to help the parser know how many arguments are expected
+      after all the options have been parsed.
+    - Changes so we would work under 5.4 perl.
+    - Changes to docs to cleanup and reflect changes to code.
+    - Added multi-valued option.  Syntax is --arg ... - where
+      the final '-' can be either the start of the next argument
+      or a free-standing dash.
+    - Fixed a problem with calculation of the indent for the
+      help strings.
+    - Added code to better check the non-dashed tags for validity.
+    - Fixed a problem that was causing options to be dropped from
+      the first line of the usage output.
+    - Added more test cases for new options and to better check
+      old ones.
+    - Print line numbers for test when test is run as
+      perl -Ilib t/Getopt-OO.t
+0.05 Sun Jan 30 19:48:00 PST 2005
+    - Fixed a problem with indent.
+    - Fixed a problem with Getopt and mulit-value.
+    - Added ability of other_values to use callback and ClientData.
+    - Added several tests.
+    - Modified error message for callback so that name of option 
+      generating error is displayed.
+    - This should be it for feature modifications.
+0.06 Sat Feb  5 09:21:59 PST 2005
+    - Changes involving out other_values works.  It now uses the 
+      required field and behaves in other ways as the rest of the 
+      options parsing works.  Added several tests to make sure
+      things were working correctly.  other_values now accepts
+      both the n_values and multi_value and also works with 
+      callback and client data, but it doesn't accept the 
+      multiple argument.  It also can be added to the required
+      field.
+0.7 Tue Sep 20 19:40:26 PDT 2005
+	- Changed the -multiple_values to be -multiple.  Name
+	  seemed more suitable and hopefully won't affect too
+	  many people.
+	- Fix problem with the Debug and Verbose not detecting 
+	  printf format statement correctly.
+	- fixed minor bug with not catching invalid parameters correctly.
+	- changed some error handling so error messages are more explicit.
+	* Most significant change is in how the 'other_values' parameter
+	  is handled.  We now place any unparsed values in the other_values
+	  so it becomes easier to detect problems with the user's 
+	  command line input.  Also allow setting n_values parameter of
+	  other_values to 0 so you can disallow any unparsed values
+	  if desired.
+
+

@@ -1,0 +1,163 @@
+# these are only the files that implement things that existed in the
+# 2.0.x series of gtk+.  files implementing types introduced in later
+# versions of gtk+ should not be listed here.
+# one filename per line, whitespace and comments are ignored.
+
+# Atk stuff -- commented out for now; scream if you need them.
+# xs/AtkAction.xs
+# xs/AtkComponent.xs
+# xs/AtkDocument.xs
+# xs/AtkEditableText.xs
+# xs/AtkHyperlink.xs
+# xs/AtkHypertext.xs
+# xs/AtkImage.xs
+# xs/AtkImplementor.xs
+# xs/AtkObject.xs
+# xs/AtkSelection.xs
+# xs/AtkStreamableContent.xs
+# xs/AtkTable.xs
+# xs/AtkText.xs
+# xs/AtkValue.xs
+
+# Gdk stuff
+xs/Gdk.xs
+xs/GdkColor.xs
+xs/GdkCursor.xs
+xs/GdkDnd.xs
+xs/GdkDrawable.xs
+xs/GdkEvent.xs
+xs/GdkGC.xs
+xs/GdkImage.xs
+xs/GdkInput.xs
+xs/GdkKeys.xs
+xs/GdkPixbuf.xs
+xs/GdkPixbufLoader.xs
+xs/GdkPixmap.xs
+xs/GdkProperty.xs
+xs/GdkRegion.xs
+xs/GdkRgb.xs
+xs/GdkSelection.xs
+xs/GdkTypes.xs
+xs/GdkVisual.xs
+xs/GdkWindow.xs
+#xs/GdkX11.xs is only built when using the X11 backend
+
+# Gtk+ proper
+xs/Gtk2.xs
+xs/GtkAccelGroup.xs
+xs/GtkAccelLabel.xs
+xs/GtkAccelMap.xs
+xs/GtkAdjustment.xs
+xs/GtkAlignment.xs
+xs/GtkArrow.xs
+xs/GtkAspectFrame.xs
+xs/GtkBin.xs
+xs/GtkBindings.xs
+xs/GtkBox.xs
+xs/GtkButton.xs
+xs/GtkButtonBox.xs
+xs/GtkCalendar.xs
+xs/GtkCellEditable.xs
+xs/GtkCellRenderer.xs
+xs/GtkCellRendererPixbuf.xs
+xs/GtkCellRendererText.xs
+xs/GtkCellRendererToggle.xs
+xs/GtkCheckButton.xs
+xs/GtkCheckMenuItem.xs
+xs/GtkColorSelection.xs
+xs/GtkColorSelectionDialog.xs
+xs/GtkCombo.xs
+xs/GtkContainer.xs
+xs/GtkCurve.xs
+xs/GtkDialog.xs
+xs/GtkDnd.xs
+xs/GtkDrawingArea.xs
+xs/GtkEditable.xs
+xs/GtkEntry.xs
+xs/GtkEventBox.xs
+xs/GtkFileSelection.xs
+xs/GtkFixed.xs
+xs/GtkFontSelection.xs
+xs/GtkFrame.xs
+xs/GtkGC.xs
+xs/GtkGammaCurve.xs
+xs/GtkHBox.xs
+xs/GtkHButtonBox.xs
+xs/GtkHPaned.xs
+xs/GtkHRuler.xs
+xs/GtkHScale.xs
+xs/GtkHScrollbar.xs
+xs/GtkHSeparator.xs
+xs/GtkHandleBox.xs
+xs/GtkIconFactory.xs
+xs/GtkImage.xs
+xs/GtkImageMenuItem.xs
+xs/GtkIMContext.xs
+xs/GtkIMContextSimple.xs
+xs/GtkIMMulticontext.xs
+xs/GtkInputDialog.xs
+xs/GtkInvisible.xs
+xs/GtkItem.xs
+xs/GtkItemFactory.xs
+xs/GtkLabel.xs
+xs/GtkLayout.xs
+xs/GtkList.xs
+xs/GtkListItem.xs
+xs/GtkListStore.xs
+xs/GtkMenu.xs
+xs/GtkMenuBar.xs
+xs/GtkMenuItem.xs
+xs/GtkMenuShell.xs
+xs/GtkMessageDialog.xs
+xs/GtkMisc.xs
+xs/GtkNotebook.xs
+xs/GtkObject.xs
+xs/GtkOptionMenu.xs
+xs/GtkPaned.xs
+xs/GtkPlug.xs
+xs/GtkProgressBar.xs
+xs/GtkRadioButton.xs
+xs/GtkRadioMenuItem.xs
+xs/GtkRange.xs
+xs/GtkRc.xs
+xs/GtkRuler.xs
+xs/GtkScale.xs
+xs/GtkScrolledWindow.xs
+xs/GtkSelection.xs
+xs/GtkSeparatorMenuItem.xs
+xs/GtkSizeGroup.xs
+xs/GtkSocket.xs
+xs/GtkSpinButton.xs
+xs/GtkStatusbar.xs
+xs/GtkStock.xs
+xs/GtkStyle.xs
+xs/GtkTable.xs
+xs/GtkTearoffMenuItem.xs
+xs/GtkTextChildAnchor.xs
+xs/GtkTextBuffer.xs
+xs/GtkTextIter.xs
+xs/GtkTextMark.xs
+xs/GtkTextTag.xs
+xs/GtkTextTagTable.xs
+xs/GtkTextView.xs
+xs/GtkToggleButton.xs
+xs/GtkToolbar.xs
+xs/GtkTooltips.xs
+xs/GtkTreeDnd.xs
+xs/GtkTreeModel.xs
+xs/GtkTreeModelSort.xs
+xs/GtkTreeSelection.xs
+xs/GtkTreeSortable.xs
+xs/GtkTreeStore.xs
+xs/GtkTreeView.xs
+xs/GtkTreeViewColumn.xs
+xs/GtkVBox.xs
+xs/GtkVButtonBox.xs
+xs/GtkVPaned.xs
+xs/GtkVRuler.xs
+xs/GtkVScale.xs
+xs/GtkVScrollbar.xs
+xs/GtkVSeparator.xs
+xs/GtkViewport.xs
+xs/GtkWidget.xs
+xs/GtkWindow.xs

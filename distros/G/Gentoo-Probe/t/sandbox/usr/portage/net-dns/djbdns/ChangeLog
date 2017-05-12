@@ -1,0 +1,161 @@
+# ChangeLog for net-dns/djbdns
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/djbdns/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  09 Jun 2004; Aron Griffis <agriffis@gentoo.org> djbdns-1.05-r10.ebuild,
+  djbdns-1.05-r11.ebuild, djbdns-1.05-r3.ebuild, djbdns-1.05-r7.ebuild,
+  djbdns-1.05-r8.ebuild, djbdns-1.05-r9.ebuild:
+  Fix use invocation
+
+*djbdns-1.05-r12 (06 Jun 2004)
+
+  06 Jun 2004; Danny van Dyk <kugelfang@gentoo.org> djbdns-1.05-r12.ebuild:
+  Marked ~amd64.
+
+*djbdns-1.05-12 (23 May 2004)
+
+  23 May 2004; Jared Hudson <jhhudso@gentoo.org> : Added 4 new use flags: doc
+  (adds dependency for djbdns-man), aliaschain (enables a patch to change the
+  CNAME handling behavior of tinydns and axfrdns), semanticfix (enables a
+  patch to increase the semantic handling of tinydns-data), and cnamefix
+  (enables a patch to change the way dnscache handles CNAME records). For more
+  information on the latter 3 patches please visit:
+  http://homepages.tesco.net./~J.deBoynePollard/FGA/djbdns-problems.html
+  In addition, if you include ipv6 support via the ipv6 use flag dnstrace
+  will be compiled without ipv6 support now, since it was broken with it
+  before. Also, a new setup script has been added, called djbdns-setup. This
+  script can be used instead of dnscache-setup and tinydns-setup. This script
+  was added by Kalin KOZHUHAROV <kalin@ThinRope.net> under bug #50795.
+  Also, tinydns-setup is patched if the fwdzone useflag/patch is added
+  because this patch changes the behavior of tinydns and the old tinydns-setup
+  did not work properly with it. Other fixes and patch suggestions come from
+  bug #19375, 20880, 34446, and 49578. Thanks goes to Nick Palmer
+  <nicholas@slackers.net>, Thilo Bangert <fizzelpark-lists@gmx.net>,
+  Hannes Just <Hannes.Just@fh-stralsund.de>, and Georgi Georgiev
+  <chutz@gg3.net>
+	
+*djbdns-1.05-r11 (02 May 2004)
+
+  02 May 2004; Jared Hudson <jhhudso@gentoo.org> :
+  Added a patch and useflag to allow djbdns bind to multiple IPs per bug #48750
+  thanks to der Ritter <gentoo@candlefire.org>
+
+*djbdns-1.05-r10 (02 May 2004)
+
+  02 May 2004; Jared Hudson <jhhudso@gentoo.org> :
+  Added ipv6arpa use flag and patch to enable ipv6 arpa support per bug
+  #49581 thanks to Georgi Georgiev <chutz@gg3.net>.
+
+*djbdns-1.05-r9 (09 Apr 2004)
+
+  09 Apr 2004; Joshua Kinard <kumba@gentoo.org> djbdns-1.05-r9.ebuild:
+  Marked stable on mips.
+
+  27 Mar 2004; Jared Hudson <jhhudso@gentoo.org> :
+  fwdzone and roundrobin local use flags added to enable their respective
+  patches. ipv6 will not work with roundrobin and fwdzone currently because the
+  only patch we have for that combines all three. The problem with this is that
+  fwdzone and roundrobin do not work together according to bug #31238. Due to this
+  we are now using the original ipv6 patch when applicable.
+
+  16 Nov 2003; Markus Nigbur <pyrania@gentoo.org> djbdns-1.05-r8.ebuild,
+  files/headtail.patch:
+  Coreutils Fix. Thanks to Marc in #33625.
+
+  07 Nov 2003; Ciaran McCreesh <ciaranm@gentoo.org> djbdns-1.05-r8.ebuild:
+  Moved to stable on sparc as -r3 has compile issues on sparc (thanks to
+  aCrackOtter in #gentoo-sparc)
+
+  16 Aug 2003; Tavis Ormandy <taviso@gentoo.org> djbdns-1.05-r8.ebuild:
+  Stable on alpha
+
+  24 May 2003; Jared Hudson <jhhudso@gentoo.org> : Added MAKEOPTS="-j1" to
+  all djbdns ebuilds due to SMP compile problems when -j set higher than 1
+  Bug ID: #18291
+	
+*djbdns-1.05-r8 (9 May 2003)
+
+  09 May 2003; Guy Martin <gmsoft@gentoo.org> :
+  Added installation of dnsip6 and dnsip6q. Fix #20690.
+
+*djbdns-1.05-r7 (26 Feb 2003)
+
+  26 Feb 2003; Mike Frysinger <vapier@gentoo.org> :
+  errno fix for #16396 (#16267).
+
+*djbdns-1.05-r6 (12 Feb 2003)
+
+  18 Feb 2003;  <seemant@gentoo.org> djbdns-1.05-r6.ebuild files/digest-djbdns-1.05-r6 :
+  regenerated the ipv6 patch, thanks to Azarah in bug #15613
+
+  13 Feb 2003; Seemant Kulleen <seemant@gentoo.org> djbdns-1.05-r6.ebuild files/digest-djbdns-1.05-r6 :
+  changed ipv6 patch to actually apply and also using eutils to perform the patch action
+
+  12 Feb 2003; Arcady Genkin <agenkin@gentoo.org> :
+  Added the round-robin patch for dnscache.
+	
+*djbdns-1.05-r5 (17 Nov 2002)
+
+  04 Feb 2003; Joachim Blaabjerg <styx@gentoo.org> djbdns-1.05-r5.ebuild :
+
+  Bumped to stable x86, as it fixes ipv6. Fixes bug #8236 for stable users.
+
+  02 Jan 2002; Martin Holzer <mholzer@gentoo.org> files/dnscache-setup :
+  Changed Line 130 FOWARDONLY into FORWARDONLY. Closes #13108.
+
+  17 Nov 2002; Jared Hudson <jhhudso@gentoo.org> files/ipv6-fix.diff,
+  files/djbdns-1.05-fwd-ipv6.diff : Fixed Bug #8236 & 8236. Added static
+  keyword to ebuild and changed ipv6 patch to work with the forwarding patch
+  added in -r4.
+	
+  20 Oct 2002; Maik Schreiber <blizzy@gentoo.org> djbdns-1.05-r3.ebuild,
+  djbdns-1.05-r4.ebuild: Cleaned up ebuilds. Also removed removal of
+  djbdns users, since this can break your djbdns setup when updating.
+
+  19 Oct 2002; Jared Hudson <jhhudso@gentoo.org> djbdns-1.05-r4.ebuild:
+  changed KEYWORDS to use ~arch for all supported architectures. This is to
+  last until after the freeze.
+	
+*djbdns-1.05-r4 (18 Oct 2002)
+
+  18 Oct 2002; Jared Hudson <jhhudso@gentoo.org>: Added a patch to enable
+  using dnscache to perform resolution or forwarding according to the query
+  zone. This was in response to bug #9154. Credit goes to Stefano Scipioni.
+	
+  10 Sep 2002; Daniel Robbins <drobbins@gentoo.org>: djbdns-1.05-r3: fixed unpack()
+  and made the ipv6 patch dependent upon the setting of the ipv6 USE variable. No
+  rev bump. This closes bug #7236.
+
+*djbdns-1.05-r3 (12 Jul 2002)
+
+  12 Jul 2002; Grant Goodyear <g2boojum@gentoo.org> ChangeLog  : Added ipv6
+  patch if ipv6 in USE; thanks to Sascha Silbe for pointing out this patch
+
+*djbdns-1.05-r2 (13 May 2002)
+
+  12 May 2002; Thilo Bangert <bangert@gentoo.org> .ebuild :
+
+  added LICENSE, added setup scripts (by banger@gentoo.org and gontran@gontran.net)
+  removed old setup scripts
+
+  7 May 2002; Thilo Bangert <bangert@gentoo.org> .ebuild :
+ 
+  added automatic creation of users
+
+
+*djbdns-1.05-r1 (1 Mar 2002)
+
+  1 Mar 2002; Grant Goodyear <g2boojum@gentoo.org> ChangeLog :
+
+  Made ebuild a bit more modern and ditched init script since that's
+  what daemontools is for.
+  
+*djbdns-1.05 (1 Feb 2002)
+
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

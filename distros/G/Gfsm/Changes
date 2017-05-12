@@ -1,0 +1,127 @@
+Change log for perl module Gfsm:
+
+v0.407 Thu, 16 Mar 2017 13:41:14 +0100 moocow
+       + gfsm-make-editor.perl fix for att symbol escapes in parseAuxString()
+
+v0.406 Mon, 22 Feb 2016 11:24:17 +0100 moocow
+	+ added CONFIGURE_REQUIRES to fix RT bug #112321
+
+v0.405 Mon, 22 Feb 2016 11:24:17 +0100 moocow
+	+ external c library dependency now uses new Alien::Gfsm
+
+v0.0404 Fri, 25 Sep 2015 13:01:09 +0200 moocow
+	+ updated for gfsm 0.0.15-1
+	+ added gfsm-make-editor.perl
+	+ renamed to Gfsm for CPAN-friendliness
+
+v0.0403 (r781) Fri, 22 Aug 2014 13:14:43 +0200 moocow
+	+ added minimize(), compact(), encode(), decode() methods
+	+ require at least gfsm-v0.0.14
+
+v0.0402 (r759) Thu, 03 Jul 2014 10:18:51 +0200 moocow
+	+ added access to gfsmAlphabet utf8 flag
+	  - for best results, use in conjunction with perl Sv_UTF8 scalar flag on keys
+
+v0.0401 (r755) Wed, 02 Jul 2014 10:16:50 +0200 moocow
+	+ dumped 3-component versions again
+
+v0.03.* (r???..???)
+	+ switched to 3-component versions X.Y.Z
+
+v0.0217 (r601..???) Mon, 03 Aug 2009 12:17:15 +0200
+	+ fixed Gfsm::Alphabet::labels_to_string(), ...::string_to_labels()
+	  - requires gfsm C lib >= v0.0.10-pre11
+
+v0.0216 (r564..r600) Tue, 25 Nov 2008 11:29:58 +0100
+	+ added some useful utilities in bin/ subdirectory
+
+v0.0215 (r475..r563) 2008-01-11 15:48:13 +0100 (Fri, 11 Jan 2008)
+	+ added Gfsm/Automaton/Indexed.pm
+	+ added basic tests for Gfsm::Automaton::Indexed
+	+ added Gfsm::Semiring::type_name() function
+	+ added OPTIMIZE comment in Makefile.PL for SuSE
+
+v0.0214 (r444..r474) 2007-12-03 14:01:19 +0100 (Mon, 03 Dec 2007)
+	+ added new sort mode constants
+	+ added t/test.lab to MANIFEST
+
+v0.0213 (r340..r444) 2007-10-30 13:45:13 +0100 (Tue, 30 Oct 2007)
+	+ removed composition guts, since they are no longer necessary
+
+v0.0212 (r330..r443) 2007-10-28 12:45:52 +0100 (Sun, 28 Oct 2007)
+	+ removed composition guts, since they are no longer necessary
+
+v0.0211 (r281..r339) 2007-08-21 12:37:02 +0200 (Tue, 21 Aug 2007)
+	+ 64bit / weight-union changes
+
+v0.0210 (r275..r317) 2007-08-07 17:09:42 +0200 (Tue, 07 Aug 2007)
+	+ added ArcIter clone() and copy() methods
+
+v0.0209 (r265..r279) 2007-02-23 18:58:05 +0100 (Fri, 23 Feb 2007)
+	+ added low-level composition API for perl-side cascades
+
+v0.0208 (r244..r268) 2006-05-31 15:03:58 +0200 (Wed, 31 May 2006)
+	+ added native alphabet load/save methods
+	+ fixed alphabet bug w/ utf8 and object keys
+
+v0.0207 (r233..r262) 2006-03-20 11:18:13 +0100 (Mon, 20 Mar 2006)
+	+ alphabet debug fixes for clean compile on SuSE
+	+ added native alphabet load/save methods
+
+v0.0206 (r220..r243) 2006-03-07 12:54:49 +0100 (Tue, 07 Mar 2006)
+	+ added support for full scalars in alphabets
+	+ documentation update, added {labels} options to compile() and print_att()
+	+ updated for libgfsm v0.0.8-pre8
+	+ alphabet debug fixes for clean compile on SuSE
+
+v0.0205 (r211..r220) 2006-02-10 12:45:02 +0100 (Fri, 10 Feb 2006)
+	+ small draw fixes
+	+ more Trie work: this should probably move to a new class.
+	+ also needed/useful: state-path return variable (array, gfsmStateIdVector*) for trie_add_paths()
+	+ also needed/useful: partial lookup in arbitrary automata
+	  - analagous to trie_find_prefixes()
+	  - something like automaton_lookup_prefix() or automaton_lookup_longest()
+	    ~ want: set of states in automaton corresponding to the longest
+	            prefix of input labels for which some path in the fst
+	            is defined
+	+ changed Trie API: added '_states' variants for add_path, find_prefix
+	+ altered testme.perl
+
+v0.0204 (r200..r213) 2006-01-30 15:49:39 +0100 (Mon, 30 Jan 2006)
+	+ documentation / Gfsm::Automaton (?)
+	+ added out_degree()
+	+ added Viterbi test to testme.perl
+	+ small draw fixes
+
+v0.0203 (r192..r204) 2006-01-25 15:14:55 +0100 (Wed, 25 Jan 2006)
+	+ fixed Storable support -- still wasteful (at least doubled), but better
+	+ added text-mode string I/O
+	+ added perl converters (to|from)(Hash|Array) for Gfsm::Alphabet
+	+ documentation / Gfsm::Automaton (?)
+
+v0.0202 (r181..r197) 2006-01-23 13:18:43 +0100 (Mon, 23 Jan 2006)
+	+ added Storable hooks
+	+ fixed Storable support -- still wasteful (at least doubled), but better
+
+v0.0201 (r171..r191) 2005-12-12 16:27:48 +0100 (Mon, 12 Dec 2005)
+	+ more updates for gfsm-0.0.8-pre3
+	 + added load_string(), save_string() using File::Temp
+	+ updated Trie stuff
+	+ added Storable hooks
+
+v0.02 (r158..r176) 2005-11-23 11:42:13 +0100 (Wed, 23 Nov 2005)
+	+ wrapped remaining operations, added rudimenty POD documentation
+	+ fixed typo in Gfsm
+	+ fixed typo in Gfsm
+	+ added MANIFEST, MANIFEST.SKIP
+	+ fixed prune <-> connect
+	+ added Trie.xs : deterministic utilities
+	+ added lookup_full()
+	+ updated for gfsm-0.0.8
+	(official v0.02)
+	+ added Viterbi utilities
+	+ added many tests
+	+ more updates for gfsm-0.0.8-pre3
+
+v0.01 (r123..r158) 2005-11-22 16:36:24 +0100 (Tue, 22 Nov 2005) | 2 lines
+	+ v0.01: initial import

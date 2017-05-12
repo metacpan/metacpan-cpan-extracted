@@ -1,0 +1,338 @@
+Revision history for Group-Git
+
+0.6.0   2017-02-26
+        Updating for release of version 0.6.0
+        Updated dates (Ivan Wills)
+        Making things quieter for repos with no remotes set (Ivan Wills)
+        Fixed issue with spaces in directory names (Ivan Wills)
+
+0.5.10   2016-12-12
+        Updating for release of version 0.5.10
+        Fixing not rapping tag hash (Ivan Wills)
+        Adding a default tags (Ivan Wills)
+        Using the project object to get tags now (Ivan Wills)
+        Added saving tags to config (Ivan Wills)
+        Using sorted tag for repo determination (Ivan Wills)
+        Adding recording FS tags along with a repo object (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
+0.5.9   2016-08-28
+        Updating for release of version 0.5.9
+        Upped minimum perl version (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Cleaned up documentation a bit (Ivan Wills)
+        Better description (Ivan Wills)
+        Fixed references to README (Ivan Wills)
+        Fixed code blocks (Ivan Wills)
+        Converted syntax (Ivan Wills)
+        Converting to Markdown due to githubs woeful POD support (Ivan Wills)
+        More documentation (Ivan Wills)
+        Fied date (Ivan Wills)
+        Adding lots of documentation (Ivan Wills)
+        Added documentation of --max (Ivan Wills)
+        Fixed issue with large number of repositories causing exessive number of threads (Ivan Wills)
+        Added setting the directory when running each thread to stop leaking of directory changes (Ivan Wills)
+        Added threadding output (Ivan Wills)
+        Added separate option (Ivan Wills)
+        Adding README to documentation to keep up to date (Ivan Wills)
+
+0.5.8   2016-08-21
+        Updating for release of version 0.5.8
+        Updated date (Ivan Wills)
+        Updated config (Ivan Wills)
+        Synced manifest (Ivan Wills)
+        Added reminder (Ivan Wills)
+        Cleaned up if statement (Ivan Wills)
+        Worked on pull's documentation (Ivan Wills)
+        Dropped travis builds as it is using an old version of Perl 5.8 (Ivan Wills)
+        VTide and editor configs (Ivan Wills)
+
+0.5.7   2015-10-23
+        Updating for release of version 0.5.7
+        Added comment about mech property (Ivan Wills)
+        Updated other repo type documentation (Ivan Wills)
+        Improving on the comments for Stash (Ivan Wills)
+        Added missing mech object (Ivan Wills)
+
+0.5.6   2015-09-08
+        Updating for release of version 0.5.6
+        Fixed the pull/clone logic (Ivan Wills)
+        Fixed using file rather than path (Ivan Wills)
+
+0.5.5   2015-08-28
+        Updating for release of version 0.5.5
+        Removed creation of makefile (Ivan Wills)
+
+0.5.4   2015-07-19
+        Updating for release of version 0.5.4
+        Converted to Path::Tiny (Ivan Wills)
+        Moved caching out of Stash to Repo so Bitbucket can use it (Ivan Wills)
+        Merge remote-tracking branch 'origin/cacheable' (Ivan Wills)
+
+0.5.3   2015-07-06
+        Updating for release of version 0.5.3
+        Added setting an environment variable GROUP_GIT_NAME with the current repos name (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.5.2   2015-05-30
+        Updating for release of version 0.5.2
+
+0.5.1   2015-05-30
+        Updating for release of version 0.5.1
+        Added missing dependencies (Ivan Wills)
+        Added missing documentation (Ivan Wills)
+        Fixed the itterating over Stashes pages of results (Ivan Wills)
+        No longer need the tag (Ivan Wills)
+        Added verbose mode to show the count of found repositories (Ivan Wills)
+        Fixed loading Taggers (Ivan Wills)
+        Moved loading of "tagger" modules to Module::Plugin (Ivan Wills)
+        Removed previously added suggestion (Ivan Wills)
+        Converted to use Module::Pluggable for loading commands (Ivan Wills)
+        Added reminder to try to use Module::Plugable (Ivan Wills)
+
+0.5.0   2015-04-06
+        Updating for release of version 0.5.0
+        Added missing modules to tests (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Fixed up dependencies (Ivan Wills)
+        Moved from Moose to Moo (Ivan Wills)
+        Cleaned up documentation a little (Ivan Wills)
+        Fixed config file reference (Ivan Wills)
+        More docs (Ivan Wills)
+        Added more documentation about tags (Ivan Wills)
+        Added documentation (Ivan Wills)
+        Fixed issue when there is no tagging module available (Ivan Wills)
+        Fixed manifest files (Ivan Wills)
+        Removed warn statement (Ivan Wills)
+        Added auto tagging Classes (Ivan Wills)
+        Fixed require used file name (Ivan Wills)
+        Implementing tagging base class (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Changed log to better fit Getopt::Alt's capabilities (Ivan Wills)
+        Added using newer version of Getopt::Alt for more flexible arguments (to better match git) (Ivan Wills)
+        Added coveralls coverage badge (Ivan Wills)
+        Added more complete list of pull options (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        Made fetch quiet (Ivan Wills)
+        Added documentation about pull and sh (Ivan Wills)
+        Giving easy to use examples and explanations (Ivan Wills)
+
+0.4.3   2015-01-16
+        Updating for release of version 0.4.3
+        Updated tests with new command (Ivan Wills)
+        Added documentation (Ivan Wills)
+        Added --count option to show the number of repos in each tag (Ivan Wills)
+        Added new files (Ivan Wills)
+        Added task list (Ivan Wills)
+
+0.4.2   2015-01-03
+        Updating for release of version 0.4.2
+        Updated LICENSE (Ivan Wills)
+        Fixed not paginating repo results (and added tagging original and forked repos) (Ivan Wills)
+        Made it possible to have modules that methods with _ treated as - (Ivan Wills)
+        Added "black and white" option for no colouring (Ivan Wills)
+
+0.4.1   2014-12-06
+        Updating for release of version 0.4.1 (Ivan Wills)
+        Licence updated (Ivan Wills)
+        Changed version of Getop::Alt dependency (Ivan Wills)
+        Added documentation about aliases (Ivan Wills)
+        Added setting Getopt::Alt's prefix so that the same config files are shared (Ivan Wills)
+        Moved the config loading earlier so it's values can be used as defaults for command line options (Ivan Wills)
+
+0.4.0   2014-11-22
+        Updating for release of version 0.4.0 (Ivan Wills)
+        Added new dependency (Ivan Wills)
+        Added missing documentation (Ivan Wills)
+        Added using git bash completion variables to complete more git commands (Ivan Wills)
+        Added picking up custom git commands (Ivan Wills)
+        Implementing auto complete helpers (Ivan Wills)
+        Added processing options and a quiet mode (Ivan Wills)
+        Added using quiet to status (Ivan Wills)
+
+0.3.4   2014-09-14
+        Updating for release of version 0.3.4 (Ivan Wills)
+        Fixed manifest (Ivan Wills)
+        Added in new module (Ivan Wills)
+
+0.3.3   2014-09-06
+        Updated test (Ivan Wills)
+        Add in missing documentation (Ivan Wills)
+        Added passing the paging info to sub commands (Ivan Wills)
+        Added ability to do interactive things (ie no cleaning of out put) eg running bash (Ivan Wills)
+        new sub command for listing found repositories (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Group-Git (Ivan Wills)
+        Fixed loading sub-options (Ivan Wills)
+        Removed unused modules (Ivan Wills)
+        Trying to improve performance by removing unused dependencies (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Group-Git (Ivan Wills)
+        Updating for release of version 0.3.2 (Ivan Wills)
+
+0.3.2   2014-08-26
+        Cleaned up manifest (Ivan Wills)
+        Fixed boilerplate test (Ivan Wills)
+        Fixed copyright dates (Ivan Wills)
+        Fixed documentation and removed unnessesary file (Ivan Wills)
+        Fixing syntax (Ivan Wills)
+        Fixed syntax (Ivan Wills)
+        renamed to POD (Ivan Wills)
+        converted to POD (Ivan Wills)
+        Fixed travis-ci config (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Group-Git (Ivan Wills)
+        Added redirecting stderr to stdout for status (Ivan Wills)
+        Changes for next release (Ivan Wills)
+        Revert "Removed Getopt::Alt dependency" (Ivan Wills)
+        Added missing new module (Ivan Wills)
+        Updated versions for next release (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Group-Git (Ivan Wills)
+        Redirected stderr so that it doesn't confuse output (Ivan Wills)
+        Ignoring fatpacker files (Ivan Wills)
+        Tidying up documentation (Ivan Wills)
+        Added ignoring org (Ivan Wills)
+        Worked on the documentation (Ivan Wills)
+        Updated the manifest files (Ivan Wills)
+        Added flat structure option (Ivan Wills)
+
+0.3.1   2014-08-02
+        Revert "Removed Getopt::Alt dependency" (Ivan Wills)
+        Added missing new module (Ivan Wills)
+        Updated versions for next release (Ivan Wills)
+        Redirected stderr so that it doesn't confuse output (Ivan Wills)
+        Ignoring fatpacker files (Ivan Wills)
+        Tidying up documentation (Ivan Wills)
+        Added ignoring org (Ivan Wills)
+        Worked on the documentation (Ivan Wills)
+        Updated the manifest files (Ivan Wills)
+        Added flat structure option (Ivan Wills)
+        Added auto tagging projects (Ivan Wills)
+        New handler to extract Stash based repositories (Ivan Wills)
+        Changed clone to clone to passed name (Ivan Wills)
+        Removed Getopt::Alt dependency (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Added new dependancy (Ivan Wills)
+        Updated date (Ivan Wills)
+        Added new module to load test (Ivan Wills)
+        Updating for release of version 0.3.0 (Ivan Wills)
+
+0.3.0   2014-07-15
+        Fixed typo (how come no error thrown?) (Ivan Wills)
+        changed setting runs to 0 not decrementing it (Ivan Wills)
+        Moved option processing to _start method rather than doing it conditionally (Ivan Wills)
+        Added documentation for --once argument (Ivan Wills)
+        Moved once run to correct position (Ivan Wills)
+        Added option to run watch command only once for any changed repository (Ivan Wills)
+        Code cleanup (Ivan Wills)
+        Added usage documentation (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Added fetching everything (Ivan Wills)
+        Changed output for show as repo name is already displayed (Ivan Wills)
+        Added only saving state if requested (Ivan Wills)
+        Fixed config file name and dumping (Ivan Wills)
+        Adding new command "watch" (Ivan Wills)
+        [1] Fixed documentation about how to use each sub repository type (Ivan Wills)
+        Upped Net::GitHub min version (Ivan Wills)
+        Removed looking for next page as this doesn't seem required any more (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Group-Git (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Updating for release of version 0.2.1 (Ivan Wills)
+
+0.2.1   2013-12-18
+        Actually use the tag filtering code (Ivan Wills)
+
+0.2.0   2013-12-18
+        Added new modules (Ivan Wills)
+        Changed to non-state variable (Ivan Wills)
+        Fixed POD (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Help cmd (Ivan Wills)
+        Added missing files (and sorted) (Ivan Wills)
+        Added documentation about using --tag (Ivan Wills)
+        Added the ability to filter by tag (Ivan Wills)
+        Added support of personal access tokens and documented (Ivan Wills)
+        Stopped falling back to git for start/end methods (Ivan Wills)
+        Fixed undefined warning (Ivan Wills)
+        Fixed running aribitary git sub commands (Ivan Wills)
+        Fixed not being able to run arbitary git commands (Ivan Wills)
+        Added the ability to run a "command" via a script of the form group-git-"command" so that new commands can be created via scripts rather than perl modules (Ivan Wills)
+        Added description of why this is different to using git submodule (Ivan Wills)
+        Added boiler plate code for later option handling (Ivan Wills)
+        Fixed the way running shell scripts works (Ivan Wills)
+        Fixed missing backslash (Ivan Wills)
+        Removed un-nessesary code (Ivan Wills)
+        Fixed Github's bad URL's (Ivan Wills)
+        Tidied up documentation (Ivan Wills)
+        New command to execute arbitary shell commands (Ivan Wills)
+
+0.1.5   2013-07-17
+        Fixed accidentally modifying @ARGV
+        Changed to match changes in Getopt::Alt
+        Merge branch 'master' of github.com:ivanwills/Group-Git
+        Fixed not making name a dir object
+        Fixed not making name a Path::Class::Dir object
+        Fixed sorting function call
+        Added ability to call initialisers and finialisers (action + _start/_end respectively)
+        Added skipping non-existant repos
+        Added numeric sorter
+
+0.1.4   2013-07-07
+        Added documentation about pagination and turned it on by default
+        Added ability to paginate output
+        Fixed trying to pull repositories with no remotes
+        Added default verbosity
+        Added needing Net::GitHub 0.52 as 0.30 doesn't work with the current code
+
+0.1.3   2013-05-13
+        Changed so that the code will work better on Windows
+
+0.1.2   2013-05-11
+        Added documentation for shell_quote
+        Added quoting shell arguments
+        Added documentation about recursing
+        Added the ability to recurse into sub directories to check if they contain git repositories
+        Added quoting of git args
+
+0.1.1   2013-05-05
+        Added missing file in manifest
+        Added coloring project name to make them more distinct
+        Fixed typo
+        Added missing module in load test
+
+0.1.0   2013-06-01
+        Fixed switching directories
+        Fixed some author tests
+        Added inlude key and documented include/exclude in config
+        Added excluding projects if mentioned in the exclude key of the config file, mobed checking for an action
+        Added the ability to exclude projects via the config file
+        Added showing all output if verbose is set
+        Fixed version
+        New command that only returns the status if there are changes to commit
+        Changed code so that commands return their output TODO pipe through less
+
+0.0.5   2013-05-24
+        Fixed spelling
+        Updated documentation
+        Changed default to show project (added --quiet to stop) added --skip or --match to skip or match project before processing
+        Fixed issue when project is local only
+        Gave up of auto generating modules now manually specify them all (fix for windows)
+
+0.0.4   2013-05-19
+        Added new dependency
+        Changed to using Getopt::Alt for sub command handling
+        Added pagination support for github repo listings
+        Fixed executability
+
+0.0.3   2013-05-15
+        Started sorting project order
+        Moved the processing of each repository to one spot, rather than each command doing it
+        Added getting any directory local repos into the list of repos when using one of the standard remote stores
+        Fixed git url to being "git"
+        Changed use_ok to require_ok to fix issues with windows
+
+0.0.2   2013-05-08
+        Fixed bug with Perl 5.12 and older. Dam you perl 5.14 & references being allowed to in keys, values, etc
+        Remved todo from test
+
+0.0.1   2013-05-06
+        First version, released on an unsuspecting world.
+

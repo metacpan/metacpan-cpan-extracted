@@ -1,0 +1,401 @@
+#!/usr/bin/env perl
+# vim:ts=8 sw=4 sts=4 ai
+require v5.6.1;
+$ENV{PATH} ="/bin:/usr/bin:/usr/local/bin";
+delete @ENV{ 'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
+use strict;
+use warnings;
+
+=head1 NAME
+
+colourset - substitute certain tags with generated colour names.
+
+=head1 VERSION
+
+This describes version B<0.02> of colourset.
+
+=cut
+
+our $VERSION = '0.02';
+
+=head1 SYNOPSIS
+
+colourset --help | --manpage | --version
+
+colourset --hue I<number> --numsets I<number>
+[ --huetype I<hue-type> ] [ --shade I<number> ]
+[ --traditional ] file ...
+
+=head1 DESCRIPTION
+
+This uses Graphics::Colourset to generate sets of colours based
+on an input hue.  The input file is processed, substituting certain
+tags for the generated colours.
+
+If the input file has a .col extension, the output file will be the filename
+without the .col extension.  Otherwise all output is printed to standard
+output.
+
+=head1 OPTIONS
+
+=over
+
+=item --help
+
+Print help message and exit.
+
+=item --hue I<n>
+
+The hue of the first colourset; the remaining coloursets will
+be generated to be harmonious with this (by a rule-of-thumb process).
+
+The hue is the hue in a 360 degree colour wheel, from 0 to 360.  As a special
+tweak, if the hue equals 360, it is taken to be no hue at all (grey).  This
+doesn't actually lose any hues, since 360 is normally exactly the same as zero
+(red).
+
+=item --huetype I<hue-type>
+
+This determines how to interpret the 'hue' option.
+
+=over
+
+=item normal
+
+Take the hue as given, and use that value.
+
+=item random
+
+Ignore the hue value and generate a random hue.
+
+=item date
+
+Ignore the hue value and generate a hue value depending on today's
+date.  This requires the use of the unix 'date' command, and thus
+will not work on MS-Windows systems.
+
+=back
+
+=item --manpage
+
+Print the full help documentation (manual page) and exit.
+
+=item --numsets I<n>
+
+The number of coloursets to generate.
+
+=item --shade
+
+Set the shade of a colourset; the first --shade sets the shade of
+the first colourset, and so on for the later coloursets.
+Giving a shade of 0 gives a random shade.
+
+The "shade" is the darkness or lightness of the colourset; 1 is the
+darkest, and 4 is the lightest.
+
+=item --traditional
+
+Make the colours be output in traditional #nnnnnn notation rather than
+the more modern rgb:nn/nn/nn notation.
+
+=item --version
+
+Print version information and exit.
+
+=back
+
+=head1 FILE FORMAT
+
+When the input file(s) are processed, this looks for "Colour Tag" strings
+in the file.
+This is very simple, it does a direct substitution; this is not some
+sophisticated macro language.
+
+Colour tags are in the form 
+
+    COLSETI<colsetnumber>_I<colourname>
+
+The I<colsetnumber> is the number of the colour-set, starting from zero.
+
+The I<colourname> is one of the following colour names:
+
+=over
+
+=item BACKGROUND
+
+The background colour is the main colour of the colourset, to be used
+for the background of the "component" (whatever that may be).
+
+=item TOPSHADOW
+
+The topshadow colour is a colour slightly lighter than the background
+colour, suitable for using to define a "top shadow" colour.
+
+=item BOTTOMSHADOW
+
+The bottomshadow colour is a colour slightly darker than the background
+colour, suitable for using to define a "bottom shadow" colour.
+
+=item FOREGROUND
+
+The foreground colour is the colour designated to be used for the
+foreground, for text and the like.  It is either much lighter or much
+darker than the background colour, in order to contrast suitably.
+
+=item FOREGROUND_INACTIVE
+
+The "inactive" foreground colour is a colour which is intended to be
+used for things which are "greyed out", or not active. It is a colour
+which contrasts with the background, but not as much as the "foreground"
+colour.
+
+=back
+
+=head1 EXAMPLES
+
+This creates a 'decorations' file from the 'decorations.col' file.
+
+    colourset --hue 0 --shade 0 --shade 1 --numsets 4 decorations.col
+
+In the above, the first colourset is of red hue (hue 0 is red), the first
+colourset has a random shade, but the second colourset has the darkest
+shade, and four coloursets are generated.
+
+    colourset --huetype date --shade 0 --shade 1 --numsets 4 decorations.col
+
+The above does the same as the first example, except that the hue is
+determined by today's date.  This can be useful in making your
+window manager gradually change its colours through the days, but
+still look nice.
+
+The following is an extract from a configuration file for the Fvwm window
+manager, with colour-tags placed where the colours would go:
+
+    AddTitleStyle ActiveUp   (VGradient 64 2 COLSET1_TOPSHADOW 40 COLSET1_BACKGROUND 60 COLSET1_BOTTOMSHADOW)
+    AddTitleStyle ActiveDown   (VGradient 64 2 COLSET1_BOTTOMSHADOW 60 COLSET1_BACKGROUND 40 COLSET1_TOPSHADOW)
+    AddTitleStyle Inactive   (VGradient 64 2 COLSET0_TOPSHADOW 40 COLSET0_BACKGROUND 60 COLSET0_BOTTOMSHADOW)
+
+Note that this uses colourset 0 for the "inactive" colours and colourset 1
+for the "active" colours.  You can choose whatever you like when you
+create your files; it probably helps to be consistent, however.
+
+The following is a CSS example:
+
+BODY {
+    background: COLSET0_BACKGROUND;
+    color: COLSET0_FOREGROUND;
+}
+
+.sidebar {
+    background: COLSET1_BACKGROUND;
+    color: COLSET1_FOREGROUND;
+}
+
+This gives the "sidebar" class a different colour set to the main
+page.
+
+=head1 ERROR MESSAGES
+
+    Can't call method "as_rgb_string" on an undefined value
+
+This usually means that there is a COLSET tag in an input file, which
+is referring to a colour-set which doesn't exist.  Try increasing
+the value of the 'numsets' option.
+
+    Can't call method "as_hex_string" on an undefined value
+
+This is the same as the above, only it happens when the 'traditional'
+option is given as well.
+
+    Can't exec "date": No such file or directory
+
+This happens if you try to use the '--huetype date' option and don't
+have the "date" command on your system.
+
+=head1 REQUIRES
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+    Graphics::Colourset;
+
+=head1 SEE ALSO
+
+perl(1)
+Getopt::Long
+Getopt::ArgvFile
+Pod::Usage
+
+=cut
+
+use Getopt::Long 2.34;
+use Getopt::ArgvFile qw(argvFile);
+use Pod::Usage;
+use Graphics::Colourset;
+
+#========================================================
+# Subroutines
+
+sub init_data ($) {
+    my $data_ref = shift;
+
+    $data_ref->{manpage} = 0;
+    $data_ref->{traditional} = 0;
+    $data_ref->{numsets} = 1;
+    $data_ref->{huetype} = 'normal';
+} # init_data
+
+sub process_args ($) {
+    my $data_ref = shift;
+
+    my $ok = 1;
+
+    argvFile(home=>1,current=>1,startupFilename=>'.coloursetrc');
+
+    pod2usage(2) unless @ARGV;
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($data_ref,
+	       'manpage',
+	       'hue=i',
+	       'numsets=i',
+	       'huetype=s',
+	       'traditional!',
+	       'shade=i@',
+	      ) or pod2usage(2);
+
+    if ($data_ref->{'manpage'})
+    {
+	pod2usage({ -message => "$0 version $VERSION",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+
+} # process_args
+
+sub generate_colsets ($) {
+    my $data_ref = shift;
+
+    my $hue = $data_ref->{hue};
+    if ($data_ref->{huetype} eq 'random')
+    {
+	$hue = int(rand(361));
+    }
+    elsif ($data_ref->{huetype} eq 'date')
+    {
+	$hue = dayhue();
+    }
+
+    my @shades = (defined $data_ref->{shade} 
+	? @{$data_ref->{shade}} : ());
+    my @colsets = Graphics::Colourset::make_n_coloursets
+	(number=>$data_ref->{numsets},
+	 hues=>[$hue],
+	 shades=>\@shades);
+
+    $data_ref->{_colsets} = \@colsets;
+
+} # generate_colsets
+
+sub process_file ($$) {
+    my $data_ref = shift;
+    my $infile = shift;
+
+    $infile =~ /(.+)\.col$/;
+    my $outfile = $1;
+    my $old_oh;
+    my $oh;
+    if ($outfile)
+    {
+	open($oh, ">", $outfile)
+	    or die "Couldn't open $outfile for writing: $!";
+	$old_oh = select $oh;
+    }
+
+    my $fh;
+    open($fh, $infile) or die "Couldn't open $infile";
+    my $line;
+    while ($line = <$fh>)
+    {
+	# e.g. COLSET0_FOREGROUND
+	$line =~ s/COLSET(\d+)_(\w+)/do_colour($data_ref,$1,$2)/ego;
+	print $line;
+    }
+    close $fh;
+    if ($outfile)
+    {
+	close($oh);
+	select $old_oh;
+    }
+} # process_file
+
+sub do_colour {
+    my $data_ref = shift;
+    my $colset_num = shift;
+    my $colname = shift;
+
+    $colname = lc($colname);
+
+    if ($data_ref->{traditional})
+    {
+	return $data_ref->{_colsets}->[$colset_num]->as_hex_string($colname);
+    }
+    else
+    {
+	return $data_ref->{_colsets}->[$colset_num]->as_rgb_string($colname);
+    }
+} # do_colour
+
+# pick a hue dependent on today's date:
+# this depends on the unix 'date' command.
+#
+# $hue = dayhue();
+#
+sub dayhue {
+    my $day;
+
+    $day = `date +%j`;
+    chomp $day;
+
+    my $hue = ($day * 10) % 360;
+    return $hue;
+}
+
+#========================================================
+# Main
+
+MAIN: {
+    my %data = ();
+
+    init_data(\%data);
+    process_args(\%data);
+    generate_colsets(\%data);
+    foreach my $file (@ARGV)
+    {
+	process_file(\%data, $file);
+    }
+}
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2005 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+__END__

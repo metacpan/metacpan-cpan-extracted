@@ -1,0 +1,28 @@
+---
+abstract: 'Parse and convert values in Degrees/Minutes/Seconds formats to decimal degrees'
+author:
+  - 'Shawn Laffan <shawnlaffan@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Converter-dms2dd
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  English: '0'
+  Readonly: '0'
+  Regexp::Common: '0'
+resources:
+  repository: https://github.com/shawnlaffan/geo-converter-dms2dd.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

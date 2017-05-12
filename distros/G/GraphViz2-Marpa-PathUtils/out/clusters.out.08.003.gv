@@ -1,0 +1,13 @@
+digraph graph_08
+{
+	graph[rankdir = "LR" nodesep = "0"]
+	node[shape = "point" label = ""]
+	edge[fontsize = "10"]
+	_crow -> crow[arrowhead = "crow" label = "crow"]
+	crow -> crowcrow[arrowhead = "crowcrow" label = "crowcrow"]
+	_crow -> lcrow[arrowhead = "lcrow" label = "lcrow"]
+	lcrow -> lcrowlcrow[arrowhead = "lcrowlcrow" label = "lcrowlcrow"]
+	_crow -> rcrow[arrowhead = "rcrow" label = "rcrow"]
+	rcrow -> rcrowrcrow[arrowhead = "rcrowrcrow" label = "rcrowrcrow"]
+
+}

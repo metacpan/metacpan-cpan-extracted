@@ -1,0 +1,76 @@
+[%#
+    Standard WSDL template.  In view.data, pass:
+        soap_name  - prefix for all service specific names
+        location   - URL relative to app_rootp where SOAP controller lives
+        operations - an array (ref) of hashes.  Each hash has three keys:
+            name - method name
+            expects - array (ref) of hashes of input params with two keys:
+                name - name of parameter
+                type - a valid WSDL type including namespace prefix
+            returns - array (ref) of hashes of return values same as expects
+%]
+[% base_name = self.protocol _ view.data.namespace_base _ view.data.location %]
+[% wsdl_url = base_name _ '/' _ 'wsdl' %]
+<wsdl:definitions name='[% view.data.soap_name %]Service'
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    targetNamespace='[% base_name %]'
+    xmlns:tns='[% base_name %]' >
+
+[% FOREACH op IN view.data.operations %]
+    <message name='[% op.name %]_request'>
+    [% FOREACH input IN op.expects %]
+        <part name='[% input.name %]' type='[% input.type %]' />
+    [% END %]
+    </message>
+    <message name='[% op.name %]_response'>
+    [% FOREACH output IN op.returns %]
+        <part name='[% output.name %]' type='[% output.type %]' />
+    [% END %]
+    </message>
+[% END %]
+
+    <portType name='[% view.data.soap_name %]_PortType'>
+    [% FOREACH op IN view.data.operations %]
+        <operation name='[% op.name %]'>
+            <input message='tns:[% op.name %]_request' />
+            <output message='tns:[% op.name %]_response' />
+        </operation>
+    [% END %]
+    </portType>
+
+    <binding name='[% view.data.soap_name%]_Binding'
+             type='tns:[% view.data.soap_name %]_PortType'>
+        <soap:binding style='rpc'
+            transport='http://schemas.xmlsoap.org/soap/http' />
+        [% FOREACH op IN view.data.operations %]
+        <operation name='[% op.name %]'>
+            <soap:operation soapAction='[% base_name %]' />
+            <input>
+                <soap:body
+                    encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'
+                    namespace='[% base_name %]'
+                    uses='encoded' />
+            </input>
+            <output>
+                <soap:body
+                    encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'
+                    namespace='[% basename %]'
+                    uses='encoded' />
+            </output>
+        </operation>
+        [% END %]
+    </binding>
+
+    <service name='[% view.data.soap_name %]_Service'>
+        <port binding='tns:[% view.data.soap_name %]_Binding'
+              name='[% view.data.soap_name %]_Port'>
+            <soap:address
+                location='[% base_name %]' />
+        </port>
+    </service>
+
+</wsdl:definitions>

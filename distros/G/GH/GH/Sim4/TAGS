@@ -1,0 +1,28 @@
+
+Sim4.c,22
+XS(18,390
+XS(44,905
+
+sim4_helpers.c,636
+sim4_args_t rs;40,1273
+int file_type;41,1289
+sim4_helper(57,1680
+package_sim4_results(177,4858
+package_exons(245,6998
+package_alignment_ops(304,8768
+package_alignment_strings(362,10205
+set_sim4_args(398,11177
+get_int_value(472,13787
+get_char_value(495,14276
+static void init_stats(513,14595
+static uchar *seq_revcomp_helper(521,14731
+static void add_offset_exons(541,15014
+static void add_offset_aligns(554,15249
+format_alignments(570,15653
+static uchar ALINE[615,16807
+static uchar ALINE[51], BLINE[615,16807
+static uchar ALINE[51], BLINE[51], CLINE[615,16807
+MY_IDISPLAY(618,16865
+format_exon_alignments(760,22779
+
+sim4_helpers.h,0

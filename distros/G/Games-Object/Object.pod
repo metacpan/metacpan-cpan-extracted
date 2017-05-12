@@ -1,0 +1,3202 @@
+=head1 NAME
+
+Games::Object - Provide a base class for game objects
+
+=head1 SYNOPSIS
+
+    package MyGameObject;
+    use Games::Object;
+    use vars qw(@ISA);
+    @ISA = qw(Games::Object);
+
+    sub new {
+	# Create object
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
+	my $self = $class->SUPER::new(@_);
+	bless $self, $class;
+
+	# Add attributes
+	$self->new_attr(-name => "hit_points",
+			-type => 'int',
+			-value => 20,
+			-tend_to_rate => 1);
+	$self->new_attr(-name => "strength",
+			-type => 'int',
+			-value => 12,
+			-minimum => 3,
+			-maximum => 18);
+	...
+
+	return $self;
+    }
+
+    package MyObjectManager;
+    use Games::Object::Manager;
+    use vars qw(@ISA);
+    @ISA = qw(Games::Object::Manager);
+
+    sub new {
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
+	my $self = $class->SUPER::new(<my args>, @_);
+	bless $self, $class;
+	...
+	return $self;
+    }
+
+
+    my $world = new MyObjectManager;
+    my $object = new MyGameObject;
+    $world->add($object);
+
+=head1 ABSTRACT
+
+The purpose of this module is to allow a programmer to write a game in Perl
+easily by providing a basic framework in the form of a module that can be
+either subclassed to a module of your own or used directly as its own object
+class. The most important items in this framework are:
+
+=over 4
+
+=item Attributes
+
+You can define arbitrary attributes on objects with rules on how they may
+be updated, as well as set up automatic update of attributes whenever the
+object's C<process()> method is invoked. For example, you could set an
+attribute on an object such that:
+
+=over 4
+
+=item *
+
+It ranges from 0 to 100.
+
+=item *
+
+Internally it tracks fractional changes to the value but accessing the
+attribute will always round the result to an integer.
+
+=item *
+
+It will automatically tend towards the maximum by 1 every time C<process()>
+is called on the object.
+
+=item *
+
+A method in your subclass will be invoked automatically if the value falls
+to 0.
+
+=back
+
+This is just one example of what you can do with attributes.
+
+=item Flags
+
+You can define any number of arbitrarily-named flags on an object. A flag
+is a little like a boolean attribute, in that it can have a value of either
+true or false. Like attributes, flags can be created independently on different
+objects. No "global" flag list is imposed.
+
+=item Load/Save functionality
+
+Basic functionality is provided for saving data from an object to a file, and
+for loading data back into an object. This handles the bulk of load game /
+save game processing, freeing the programmer to worry about the mechanics
+of the game itself.
+
+The load functionality can also be used to create objects from object templates.
+An object template would be a save file that contains a single object.
+
+=item Object Managers
+
+New to version 0.10 of this module is object managers. An object manager is
+a Perl object that allows you to manage groups of related game objects. The
+object manager allows you to relate objects together (for example, you could
+define a relationship that allows certain objects to act as containers for
+other objects). In effect, the object manager acts as your world or universe.
+
+Like the game object class, the manager class can be subclassed, allowing you
+augment its functionality. An object manager can be loaded and saved, which in
+turn performs a load or save of the objects being managed by it.
+
+=back
+
+=head1 NOTE
+
+This documentation is a bit long. I sometimes find it easier to view this in
+HTML format. To do this, in the directory from which you installed the
+module, enter:
+
+    pod2html Object.pod > filename
+
+Replace I<filename> with a filename of your choice in some directory that is
+writable. You should then be able to view it in most browsers by typing
+in the URL "file://I<filename>".
+
+=head1 REQUIREMENTS
+
+Games::Object requires perl 5.6.0 or better. While nothing in the modules
+restrict what Perl is required anymore, I have not tested this under older
+versions and do not support them.
+
+You also will need IO::String, at least version 1.02 or better. You MUST
+have at least this version, as I used features specific to this version.
+
+=head1 CHANGES
+
+Version 0.11 is a patch release only to fix major bugs, no new functionality
+implemented. The following bugs were fixed:
+
+=over 4
+
+=item *
+
+Fixed bug in save() where I<-filename> was not parsed properly.
+
+=item *
+
+Fixed bug in define_relation() where the relate_method was being used
+as the name passed from the relator instead of the actual name of the
+relationship. Changed relate.t test to tickle this bug again if it
+ever resurfaces.
+
+=item *
+
+Adding manager code broke flag inheritance. Fixed. Also added missing
+tests for flag inheritance to inherit.t
+
+=item *
+
+Undefined flags no longer croak(), but instead simply return false,
+in order to be consistent with the way attributes work.
+
+=back
+
+=head1 COMPATIBILITY
+
+Version 0.11 is compatible with version 0.10. Any workarounds you might have
+done to get around the aforementioned bugs should still continue to work.
+
+Version 0.10 was a major restructuring that broke compatibility with earlier
+versions.
+
+=head1 DESCRIPTION
+
+=head2 Using Games::Object as a base class
+
+This is the optimal way to use Games::Object. You define a game object class
+of your own as a subclass of Games::Object. In your constructor, you create
+a Games::Object classed object first, then re-bless it into your class. You
+can then add your object class' customizations. To insure that all your
+customizations can be potentially C<save()>ed at a later time, you should
+add all your data to the object as attributes.
+
+The main reason this is the ideal way to use this class will become clear when
+you reach the section that talks about events. Briefly, an event is defined
+as some change to the object, such as an attribute being modified or a boundary
+condition being reached. If you wish to provide code to be executed when
+the event is triggered, you must define it in the form of a method call. This
+is due to the fact that you would want your event mappings to be C<save()>ed
+as well as your attributes, and CODE references cannot be written out and
+read back in.
+
+=head2 Using Games::Object as a standalone module
+
+Nothing explicitly prohibits the use of this module in this fashion. Indeed,
+the very idea behind OOP is that a class does not need to know if it is being
+subclassed or not. It is permissable to use "raw" Games::Object objects in
+this manner.
+
+The only limitation is that you may not be able to define event mappings,
+due to the limitation stated above.
+
+=head2 Using the object manager class Games::Object::Manager
+
+This is a new feature in 0.10. It allows you to manage your objects in a
+larger object that acts as the "world". Objects you create are added to this
+world, and relationships can be maintained between objects.
+
+One of the main advantages of using an object manager is that it greatly
+reduces the need for circular references. Using the manager, only one circular
+reference exists for each object (the manager contains a reference to the
+game object, the game object back to the manager). This reference is carefully
+broken when removing objects from the manager.
+
+=head1 Creating Game Objects
+
+=head2 Creating an empty object
+
+Creating an empty object can be done simply as follows:
+
+    $obj = new Games::Object;
+
+When an object is created in this fashion, it generally has nothing in it. No
+attributes, no flags, nothing. There are no options at this time in the
+constructor to automatically add such things at object creation.
+
+You can optionally add an ID to the object. The ID matters only when you
+add your object to an object manager. You can either define the ID now when
+you create the object, or wait until you are ready to add the object to a
+manager. If you wish to specify the ID now, you do so like this:
+
+    $obj = new Games::Object(-id => "id-string");
+
+=head2 Creating an object from an open file
+
+You can instantiate a new object from a point in an open file that contains
+Games::Object data that was previous saved with C<save()> by using the
+C<load()> constructor instead of C<new()>:
+
+    $obj = load Games::Object(-file => \*INFILE);
+
+The argument to I<-file> can be a simple GLOB reference or an IO::File object
+or FileHandle object, so long as it has been opened for reading already. You
+can even use an IO::String object, and thus load from a string containing
+an object definition.
+
+The constructor will by default use as the ID of the object the ID that was
+stored in the file when it was saved (if one was defined on the original object
+when it was first saved to the file).
+
+A simple way to implement a load-game functionality that takes place at game
+initialization would thus be to open the save file, and make repeated calls to
+L<load()|"The Constructor"> until the end of file was reached. Note however
+that this functionality is provided in the object manager module, which is
+covered later in this document.
+
+You can choose to override the ID stored in the file by passing an I<-id> option
+to the constructor along with the I<-file> option. This would in essence allow
+you to create duplicate objects if you were so minded. Example:
+
+    my $fpos = tell INFILE;
+    my $obj1 = load Games::Object(-file => \*INFILE);
+    seek(INFILE, $fpos, SEEK_SET);
+    my $obj2 = load Games::Object(-file => \*INFILE, -id => $obj1->id() . "COPY");
+
+=head2 Creating an object from a template file
+
+In this case "template" is simply a fancy term for "a file that contains a
+single object definition". It is simply a convenience; rather than opening
+a file yourself and closing it afterward just to read one object, this does
+those operations for you:
+
+    $obj = new Games::Object(-filename => "creatures/orc.object");
+
+All it really is a wrapper around a call to open(), a call to the constructor
+with a I<-file> argument whose value is the newly opened file, and a call to
+close(). As with I<-file>, it obtains the ID of the object from the file, but
+you can specify an I<-id> option to override this. Example:
+
+    $obj = load Games::Object(-filename => "creatures/orc.object", -id => "Bob");
+
+=head2 Obtaining the ID of a created object
+
+The ID of a valid object is obtained with the C<id()> method. Example:
+
+    if ($obj->id() eq 'HugeRedDragon') {
+	print "Oh-oh, NOW you've done it ...\n";
+	...
+    }
+
+(Note that as of 0.10, you can take advantage of overloaded operators and not
+have to invoke the C<id()> method at all. See next section for details.)
+
+=head2 Destroying objects
+
+If you are not using a manager, you will generally have no need to explicitly
+destroy a game object, as it will be cleaned up when it goes out of scope.
+If you are using a manager, however, which makes the object persistent,
+you can call C<destroy()> as an alternative to calling the manager's
+C<remove()> method. In fact, C<destroy()> will in turn call C<remove()>
+for you if the object is managed.
+
+The C<destroy()> method will also invoke any C<on_destroy> action defined
+on the object before calling the manager C<remove()> method.
+
+=head2 Comparing objects
+
+As of version 0.10, basic string and numeric comparison operators
+(C<cmp> and C<E<lt>=E<gt>>) are overloaded. String comparisons are performed
+against the C<id()> of the object, and numeric comparisons against the
+priority value. For example, this lets you do things like this:
+
+    if ($object1 eq $object2) { ... }
+    if ($object1 eq 'RedDragon') { ... }
+    if ($object1 > $object2) { ... }
+
+Which are the equivalents of:
+
+    if ($object1->id() eq $object2->id()) { ... }
+    if ($object1->id() eq 'RedDragon') { ... }
+    if ($object1->priority() > $object2->priority()) { ... }
+
+Where C<$object1> and C<$object2> are references to Games::Object objects,
+or objects of subclasses of Games::Object.
+
+This overloading is accomplished via the C<use overload> directive. This
+means your subclass is free to override these and provide your own
+overload definitions. This will not alter the operation of Games::Object,
+as these overloaded operators are provided for your convenience and are
+not used internally.
+
+=head1 Using an object manager, the basics
+
+=head2 Why use a manager?
+
+Prior to version 0.10 of this module, all objects that you created were
+inherently managed by the Games::Object module. The main problem with this
+is that it limits your ability to augment or modify the way the module manages
+the objects. It also prevents you from having multiple groups of related
+objects independent of each other. Finally, the way it was implemented violated
+the spirit if not the letter of object-oriented programming rules.
+
+Thus in version 0.10, all management functionality has been moved to a separate
+module called Games::Object::Manager. This module does what the various
+capitalized function calls did in the older versions of the module. Not only
+does this better adhere to OO programming rules, it allows you to much more
+easily augment manager functionality by simply subclassing from it.
+
+Using an object manager will also allow you to establish relationships between
+objects and let the manager do the dirty work of maintaining these relationships
+and triggering the right actions when relationships are forged or broken.
+
+=head2 Creating an Object Manager
+
+To create an object manager is rather like creating a game object:
+
+    my $manager = new Games::Object::Manager;
+
+Likewise, you can subclass from Games::Object::Manager, and instead call the
+constructor of your subclass:
+
+    my $world = new MyGames::Dungeons::World;
+
+Creating an object manager in this manner creates it empty, meaning it has no
+objects in it. It I<does> have one object relationship defined by default,
+which will be described in a later section.
+
+=head2 Adding an Object to a Manager
+
+Once you have a manager created, you can add objects to it. You first create
+an object using the Games::Object constructor (or the appropriate subclass
+constructor), then add it with the C<add()> method:
+
+    $manager->add($object);
+
+In this form of the call, the manager will look on C<$object> for an ID to use
+in its internal index. If you did not define an ID when you created the object,
+the manager will assign a guaranteed unique ID for you.
+
+You can specify the exact ID you want when you call C<add()>:
+
+    $manager->add($object, "brass lantern");
+
+If C<$object> already had an ID defined on it, this will both override it and
+cause the ID to be modified on the object to the new value.
+
+Once you add an object to a manager, that object is now persistent. This means
+that, using the example above, if C<$object> goes out of scope, the object
+will continue to exist, as the manager maintains a reference to the object.
+Thus the manager frees you from having to maintain your own object lists.
+
+=head2 Retrieving a previously created object
+
+As mentioned in the previous section, when using a manager, objects are
+persistent, even after the initial variable containing the reference to it
+goes out of scope. If you have the ID of the object, you can later retrieve a
+reference to the object via C<find()>:
+
+    my $object = $manager->find('Sam the ogre');
+
+If the ID specified is not a valid object, C<find()> will return undef.
+
+The C<find()> method takes an additional optional argument that is the
+assertion flag. Setting this to a true value will cause C<find()> to croak
+with an error of the format:
+
+    Assertion failed: '$id' is not a valid/managed object ID
+
+This is done via a call to C<confess()> rather than C<croak()> so that you
+can see a stack trace of the calls from your program that led to the invalid
+object.
+
+Example:
+
+    $manager->find('The Player', 1);
+
+Note that the C<find()> method can also be passed a game object reference
+instead of an ID. In this case, the method will verify that the passed object
+is indeed one being managed by that manager. If the object is indeed valid,
+it will return the object reference, otherwise it returns undef.
+
+=head2 Removing an object from the manager
+
+You can choose to remove an object from the manager by calling the C<remove()>
+method on the manager, and pass it either the ID or the object reference
+of the object to remove. This method call will return the reference to the
+object it removed, or C<undef> if the object was not found in the manager.
+Examples:
+
+    $manager->remove($creature);
+    $manager->remove("Sam the Ogre");
+
+Naturally, you don't have to store the reference that is returned. You can
+simply call it in a void context (like above) and let the object go out
+of scope and into oblivion.
+
+=head2 Validating an object ID
+
+Likewise, there is an C<id()> method on the manager that also validates
+an object in a manner similar to C<find()>, except that it returns the ID
+on success rather than the object reference.
+
+Using C<id()> and C<find()> allows you to build code that does not have to
+know whether it is receiving an object reference or an ID string as an argument.
+If variable C<$foo> contains either an object or an ID, but you don't know
+which, then this:
+
+    $manager->find($foo);
+
+is guaranteed to return the object reference no matter what C<$foo> is, and
+this:
+
+    $manager->id($foo);
+
+is guaranteed to return the ID no matter what, and both will return undef
+if C<$foo> is neither.
+
+Like C<find()>, C<id()> can take an assertion flag that will bomb the program
+with a stack trace if it is not valid.
+
+=head1 User-defined Flags
+
+=head2 Creating flags
+
+A user-defined flag is any arbitrary string that you wish to use to represent
+some sort of condition on your objects. For example, you might want a flag
+that indicates if an object can be used as a melee weapon. Flags are defined
+on a per-object basis as you need them with the method C<new_flag()>:
+
+    $object->new_flag(-name => "melee_weapon", -value => 1);
+
+The only restriction on flag names is that they cannot contain characters that
+could be interpretted as file-control characters (thus you can't have imbedded
+newlines), or the "!" character (which is reserved for future planned
+functionality). If you stick to printable characters, you
+should be fine.
+
+Note in this example that the initial value of the flag is set. If omitted,
+the default is for the flag to be off (or 0).
+
+Because flags are not defined globally, you will have to define the flag on
+all the objects that require them, whether the initial value is on or off.
+Later, an easy way of doing this for large groups of objects will be presented.
+
+=head2 Setting/clearing flags
+
+You may set a user-defined flag on an object with the C<set()> method:
+
+    $obj->set('melee_weapon');
+
+You can choose to set multiple flags at one time as well by specifying an
+array instead of a scalar:
+
+    $obj->set( [ 'melee_weapon', 'magical', 'bladed' ] );
+
+Setting a flag that is already set has no effect and is not an error. The
+method returns the reference to the object.
+
+Clearing one or more flags is accomplished in similar fashion with the
+C<clear()> method. Like C<set()>, it can clear multiple flags at once:
+
+    $obj->clear('cursed', 'wielded');
+
+=head2 Fetching flag status
+
+Two methods are provided for fetching flag status, C<is()> and C<maybe()>.
+
+The C<is()> method returns true if the flag is set on the object. If more than
+one flag is specified, then ALL flags must be set. If even one is not set,
+false is returned. For example:
+
+    if ($weapon->is('cursed', 'wielded')) {
+	print "It is welded to your hand!\n";
+ 	...
+    }
+
+The C<maybe()> method works the same as C<is()> for a single flag. If multiple
+flags are present, however, it requires only that at least one of the specified
+flags be set to be true. Only if none of the flags are present will it return
+false. Example:
+
+    if ($weapon->maybe('rusted', 'corroded', 'broken')) {
+	print "It's not looking in good shape. Sure you want to use it?\n";
+	...
+    }
+
+=head1 Attributes
+
+This is the heart of the module. Attributes allow you to assign arbitrary data
+to an object in a controlled fashion, as well as dictate the rules by which
+attributes are modified and updated.
+
+=head2 Creating Attributes
+
+=over 4
+
+=item Simple attributes
+
+A simple attribute has a name that uniquely identifies it, a datatype, and the
+starting value. The name needs to be unique only in the confines of the object
+on which the attribute is defined. Two different objects with an attribute
+of the same name retain separate copies of the attribute. They do not even
+need to be the same datatype.
+
+An attribute of type I<number> can take on any valid decimal numeric value
+that Perl recognizes. Such an attribute can be created as follows:
+
+    $obj->new_attr(-name => "price",
+		   -type => "number",
+		   -value => 1.99);
+
+Any attempt to set this to a non-numeric value later would be treated
+as an error.
+
+The datatype of I<int> is similar to I<number> except that it restricts the
+value to integers. Attempting to set the attribute to a numeric that is not
+an integer, either when created or later modified, is not an error, but the
+result will be silently truncated as if using the Perl C<int()> function.
+An I<int> attribute can be created as follows:
+
+    $obj->new_attr(-name => "experience",
+		   -type => "int",
+		   -value => 0);
+
+An attribute of type I<string> is intended to contain any arbitrary, printable
+text. This text can contain newlines and other text formatting characters such
+as tabs. These will be treated correctly if the object is later saved to a
+file. No special interpretation is performed on the data. Such an attribute
+can be created as follows:
+
+    $obj->new_attr(-name => "description",
+		   -type => "string",
+		   -value => "A long blade set in an ornamental scabbard of gold.");
+
+The I<any> datatype is used for data that does not fall into any of the above
+categories. No particular interpretation is performed on the data, and no
+special abilities are associated with it. Use this datatype when you wish to
+store references to arrays or hashes. The only caveat is that these complex
+data structures must eventually work down to simple scalar types for the
+data in the attribute to be C<save()>d correctly later. Do not use this for
+object references, except for objects subclassed to Games::Object (this is
+covered in more detail in an upcoming section). Here is an example of using
+the I<any> datatype:
+
+    $obj->new_attr(-name => "combat_skill_levels",
+		   -type => "any",
+		   -value => {
+			melee		=> 4,
+			ranged		=> 2,
+			hand_to_hand	=> 3,
+			magical		=> 5,
+		   });
+
+There is one more datatype called I<object>, which is intended to provided a
+way for storing an object reference in an attribute. However, as there are
+some special caveats and setup required, this is covered as a separate topic.
+
+=item Split attributes
+
+A "split" attribute is available only to datatypes I<number> and I<int>. An
+attribute that is split maintains two separate values for the attribute, a
+"real value" and a "current value" (or simply the "value"). An attribute that
+is split in this way has the following properties:
+
+=over 4
+
+=item *
+
+By default, when retrieving the value, the current value is returned.
+
+=item *
+
+The current value will "tend towards" the real value when the object's
+C<process()> method is called (covered in a later section).
+
+=item *
+
+Both the current and real values can be manipulated independent of one another
+(except where noted above with regards to the "tend to" processing).
+
+=back
+
+A split attribute is defined by specifying the additional parameter
+I<-tend_to_rate>, as in this example:
+
+    $obj->new_attr(-name => "health",
+		   -type => "int",
+		   -tend_to_rate => 1,
+		   -value => 100);
+
+This indicates that each time the object is processed, the current value will
+tend towards the real by 1. The tend-to rate is always treated as a positive
+number. Its sign is adjusted internally to reflect what direction the current
+needs to go to reach the real (thus in this case if the real were less than
+the current, 1 would be subtracted from the current when the object was
+processed).
+
+Note in the above example that in the absense of specifying what the starting
+real value is, the real value will start off set to the current (in this case,
+the value of 100). If you wish to start off the real at a different value
+than the current, you add the I<-real_value> option, as in this example:
+
+    $obj->new_attr(-name => "power",
+		   -type => "number",
+		   -tend_to_rate => 0.2,
+		   -value => 0,
+		   -real_value => 250);
+
+=item Limited attributes
+
+An attribute's value can be "limited", in that it is not allowed to go beyond
+a certain range or a certain set of values.
+
+Attributes of type I<number> and I<int> can be limited in range by adding the
+I<-minimum> and I<-maximum> options when the attribute is created. Note that
+you can choose to use one or the other or both. Example:
+
+    $obj->new_attr(-name => "hit_points",
+		   -type => "int",
+		   -tend_to_rate => 1,
+		   -value => 20,
+		   -minimum => 0,
+		   -maximum => 50);
+
+By default, attempts to modify the attribute outside the range will cause the
+modifying value to be "used up" as much as possible until the value is pegged
+at the limit, and the remainder ignored. In the above example, if the current
+value were 5, and an attempt to modify it by -7 were attempted, it would be
+modified only by -5 as that would put it at the minimum of 0. This default
+behavior can be modified with the I<-out_of_bounds> option, which is a string
+that has one of the following values:
+
+=over 4
+
+=item use_up
+
+Use up as much of the modifying value as possible (the default).
+
+=item ignore
+
+Ignore the modification entirely. The value of the attribute will not be
+changed.
+
+=item track
+
+Operates like I<use_up>, except that the excess is tracked internally.
+Subsequent attempts to modify the attribute the other way will have to use
+up this amount first.
+
+Using the I<track> option when creating the attribute is exactly like specifying
+the I<-force> option to every call to C<mod_attr()>.
+
+=back
+
+Attributes of type I<string> can be limited by specifying a set of allowed
+values for the attribute. This is done when the attribute is created by
+adding the I<-values> option. This is a reference to an array of strings that
+constitute the only allowable values for this attribute. For example:
+
+    $obj->new_attr(-name => "status",
+		   -type => 'string',
+		   -values => [ 'quiet', 'moving', 'attacking', 'dead' ],
+		   -value => 'quiet');
+
+=item Mapped attributes
+
+This feature is available only to I<string> attributes. This allows you to
+map the actual value of the attribute such that when it is retrieved normally,
+some other text is returned instead. This is done by adding a I<-map> option
+when the attribute is created. The argument to I<-map> is a reference to a hash
+containing the allowed values of the attribute as keys, and the corresponding
+values to be returned when the attribute is fetched as values. For example:
+
+    $obj->new_attr(-name => "status",
+		   -values => [ 'quiet', 'moving', 'attacking', 'dead' ],
+		   -value => 'quiet',
+		   -map => {
+			quiet	=> "It appears quiescent.",
+			moving	=> "It is moving stealthily.",
+			attacking => "It is attacking you!",
+			dead	=> "It's dead, Jim.",
+		   } );
+
+Note that the above example used I<-map> with I<-values>, but you're not
+required to do this. With this setup, retrieving the value of this attribute
+when it is set internally to "dead" will cause "It's dead, Jim." to be
+returned instead.
+
+=item Object reference attributes
+
+Object references have been vastly simplified in version 0.10 of this module.
+Storing a reference is as easy as specifying the C<object> data type:
+
+    $other_obj = new Some::Other::Class;
+    $obj->new_attr(-name => "some_other_object",
+		   -type => "object",
+		   -value => $other_obj);
+
+And you can modify an existing value with C<mod_attr()>:
+
+    $obj->mod_attr(-name => "some_other_object",
+		   -value => $another_obj);
+
+HOWEVER ...
+
+There is one caveat with this. The class for that object MUST define the
+following methods:
+
+=over 4
+
+=item load()
+
+This is responsible for creating a new object of the appropriate class and
+loading its data from the file at the present file position. This is passed
+a single argument, the file object, which you can assume is compatible with
+a file glob, IO::File or related object, or FileHandle object.
+
+This is called as a class method, so the code should expect the first argument
+to be the class name.
+
+=item save()
+
+This is responsible for writing the data of the object to the save file in
+a format that is readable by the corresponding C<load()> method. As with
+C<load>, it is passed a file object.
+
+=back
+
+B<Do not store other Games::Object or Games::Object subclassed objects in
+the attribute>. This will result in a possible infinite loop on a save of
+the file. If you MUST know something about another object, store the ID of
+the object, or set the C<DONTSAVE> flag on the attribute (this flag is covered
+in the next item).
+
+=item Other attribute tricks
+
+There are a few more things you can do with attributes at creation time.
+
+Recall above that I stated that by default, if you assign a fractional value
+to an attribute that is of type I<int> that it stores it as if calling
+the Perl C<int()> function. Well, this behavior can be modified. You can
+specify the I<-on_fractional> option when creating the attribute. This can be
+set to one of "ceil", "floor", or "round". When a fractional
+value results from an assignment or modification, the corresponding function
+in the Perl POSIX module is called on the result (in the case of "round", which
+is not a POSIX function, a function that performs rouding is provided
+internally in the module). Example:
+
+    $obj->new_attr(-name => "time",
+		   -type => "int",
+		   -on_fractional => "round",
+		   -value => 0);
+
+There's even more you can do with fractional amounts on integer attributes. You
+can instruct the object to track the fractional component rather than just
+throw it away. Retrieving the value will still result in an integer, which
+by default is derived by C<int()>ing the factional value. For example, say
+that an attribute is defined like this initially:
+
+    $obj->new_attr(-name => "level",
+		   -type => "int",
+		   -track_fractional => 1,
+		   -value => 1,
+		   -maximum => 10);
+
+Initially, retrieving the value will result in 1. Say you later add 0.5 to it.
+Internally, 1.5 is stored, but 1 still results when retreiving the value. If
+later the value becomes 1.99999, 1 is still returned. Only when it reaches 2.0
+or better will 2 be returned.
+
+You can combine I<-track_fractional> and I<-on_fractional>. In this case,
+I<-on_fractional> refers to how the value is retrieved rather than how it is
+stored. Say we change the above definition to:
+
+    $obj->new_attr(-name => "level",
+		   -type => "int",
+		   -track_fractional => 1,
+		   -on_fractional => "round",
+		   -value => 1,
+		   -maximum => 10);
+
+Now if the internal value is 1.4, retrieving it will result in 1. But if the
+internal value reaches 1.5, now retrieving the value will return 2.
+
+Finally, there is a special option to C<new_attr()> called I<-flags>. This
+allows you to specify one or more flags that affect attribute behavior. These
+flags are defined as single-bit flags, thus multiple flags are bitwise
+or'ed together (using the C<|> operator). Constants for these values are
+defined in C<Games::Object> but are not exported by default. You may import
+them into your namespace by specifying the C<:attrflags> tag in the C<use>
+statement. Example:
+
+    use Games::Object qw(:attrflags);
+
+This will define the following flags:
+
+=over 4
+
+=item ATTR_STATIC
+
+This indicates that the value of this attribute is static, meaning it will
+not change. Any attempt to modify it using C<mod_attr()> will fail. You
+can circumvent this using C<attr_ref()>.
+
+=item ATTR_DONTSAVE
+
+This tells the object not to save this attribute to the save game file
+when the C<save()> method is invoked. Likewise, if you perform a C<load()>
+in place of an existing object, the current values of these attributes will
+be preserved.
+
+=item ATTR_AUTOCREATE
+
+This flag has an effect only when used with C<ATTR_DONTSAVE>. Normally, if
+you create an object with a C<ATTR_DONTSAVE> flag, then destroy and reload
+the object from a file fresh via C<new()> with the I<-file> option, this
+attribute will disappear. If the attribute were created with the
+C<ATTR_AUTOCREATE> flag before it was saved to the file, then loading this
+object will cause the attribute to be auto-created for you.
+
+The initial value of such an auto-created attribute depends on the datatype
+of the attribute:
+
+=over 4
+
+=item C<int> or C<number>
+
+The starting value is 0, unless the attribute specified a I<-minimum>
+attribute, in which case this value is used.
+
+=item C<string>
+
+The starting value is an empty string.
+
+=item C<any>
+
+Dependent on the type of data first assigned to it when it was created. If
+this was a simple scalar, this will be set to an empty string. If an array
+or hash reference, it will be set to an empty array or hash reference.
+
+=item C<object>
+
+Always initialized to undef. This behavior may change in the future.
+
+=back
+
+Think of this feature as similar to autovivication, but extended to the
+attributes.
+
+=item ATTR_NO_INHERIT
+
+Do not allow objects inherting from this one to inherit this attribute. It will
+act as if the attribute does not exist. See the section
+L<"Attribute inheritance"> for details on how this works.
+
+=item ATTR_NO_ACCESSOR
+
+Do not create an accessor method for this attribute if the accessor method
+global option is turned on. See L<"Attribute accessors"> for more details.
+
+=back
+
+Here is an example of creating an attribute that will not be saved to a file
+but will be rereated when the object is created fresh from a previous save
+file:
+
+    $obj->new_attr(
+	-name	=> "widget_table",
+	-type	=> "any",
+	-value	=> {
+	    canvas	=> $mainw->Canvas(...),
+	    title	=> $mainw->Label(...),
+	},
+	-flags	=> ATTR_DONTSAVE | ATTR_AUTOCREATE,
+    );
+
+If this object is later saved to a file, then destroyed, then recreated from
+that file, this attribute will be auto-created and the value set to a hash
+reference pointing to an empty hash.
+
+=back
+
+=head2 Attribute Existence
+
+You can check to see if an attribute exists with C<attr_exists()>:
+
+    if ($obj->attr_exists('encounters')) {
+	$obj->mod_attr(-name => 'encounters', -modify => 1);
+    } else {
+	$obj->new_attr(-name => 'encounters',
+		       -type => 'int',
+		       -value => 1);
+    }
+
+=head2 Fetching Attributes
+
+An attribute's value is fetched with the C<attr()> method:
+
+    $str = $obj->attr('strength');
+
+This is subject to all the interpretations mentioned above, which is summarized
+below:
+
+=over 4
+
+=item *
+
+If the attribute is split, the current value is returned.
+
+=item *
+
+If the attribute is an integer tracking fractionals, an integer is still
+returned, calculated according to the value of the I<-on_fractional> option
+when the attribute was created.
+
+=item *
+
+If the attribute is mapped, and there is a valid entry in the map table, the
+mapped value is returned.
+
+=back
+
+To retrieve the real value as opposed to the current value in a split
+attribute, specify the string "real_value" as the second argument:
+
+    $realhp = $obj->attr('hit_points', 'real_value');
+
+This is still subject to rules of factionals and mapping. To completely
+bypass all of this, retrieve the value with C<raw_attr()> instead:
+
+    $rawlev = $obj->raw_attr('level');
+    $rawlev_real = $obj->raw_attr('level', 'real_value');
+
+An important note when dealing with attributes of datatype I<any> that are
+array or hash references: When you use either C<attr()> or C<raw_attr()> (which
+are effectively the same thing in this case), you get back the reference. This
+means you could use the reference to modify the elements of the array or
+keys of the hash. This is okay, but modifications will not generate events.
+Here is an example (building on the example above for creating an attribute
+of this type):
+
+    $cskill = $obj->attr('combat_skill_levels');
+    $cskill->{melee} ++;
+
+In all cases, if the attribute specified does not exist, undef is returned.
+
+=head2 Retrieving the reference to an attribute value
+
+You may also retrieve a reference to the stored attribute value with the
+C<attr_ref()> method. Example:
+
+    $aref = $obj->attr_ref('hit_points');
+
+This method can be used like C<attr()>, in that you can select either current
+value or the real value in the case of a split attribute. If you attempt
+to retrieve a C<real_value> when none exists, undef is returned instead. If
+you attempt to retrieve a reference to an attribute that does not exist, you
+also get back undef, but a warning is printed to STDERR, so that a
+subsequent "Can't use undef as a <X> reference" Perl error is not so
+mysterious.
+
+This should be used with care. If you modify the value that the reference
+points to, you circumvent the event code (i.e. the change will not spawn
+attribute modified events). The purpose of this method is to allow hooks
+into other Perl modules that act on changes to a variable's value. A perfect
+example of this would be Tk. Say you design an interface to a game in Perl
+Tk and want to use a Tk::ProgressBar widget to show the player's current
+health. The constructor for this widget takes a I<-variable> parameter, which
+is a reference to a variable whose value affects the position of the
+ProgressBar automatically. By specifying this parameter in the following way:
+
+    -variable	=> $player->attr_ref('hit_points'),
+
+You now allow the ProgressBar to update automatically when the current value
+for the player's hit points change. Otherwise, you would have to create
+a package global variable to store the hit points, specify it in the
+the Tk::ProgressBar constructor, write a method to copy the hit points attribute
+value into the variable, and perform a C<bind_event()> to call the method
+when the attribute changes. This is far too much work for something that should
+be simple.
+
+=head2 Modifying Attributes
+
+Modifying attributes is where a lot of the strengths of attributes lie, as the
+module tries to take into account typical modifier situations that are found
+in various games. For example, sometimes an attribute needs to be modified
+only temporarily. Or a modification could be thwarted by some other outside
+force and thus negated. And so on.
+
+=over 4
+
+=item Simple modifiers
+
+A simple modifier is defined as a modification that occurs immediately and is
+not "remembered" in any way. No provisions are made for preventing multiple
+modifications within a given cycle, either through time or code. The value
+of the attribute is changed and the deed is done.
+
+There are two ways to perform a simple modification. One is to set the value
+directly, which would be done as in the following examples:
+
+    $obj->mod_attr(-name => "color", -value => "red");
+    $obj->mod_attr(-name => "price", -value => 2.58);
+    $obj->mod_attr(-name => "description", -value => "A piece of junk.");
+
+If an attribute is split, this would set the current value only. The real
+value could be set by using I<-real_value> instead of I<-value>:
+
+    $obj->mod_attr(-name => "health", -real_value => 0);
+
+The other way is to modify it relative to the current value. This is available
+only to numeric types (I<int> and I<number>) as in these examples:
+
+    $obj->mod_attr(-name => "hit_points", -modify => -4);
+    $obj->mod_attr(-name => "strength", -modify => -1);
+
+In these cases, -modify modifies the current value if the attribute is split.
+To change the real value, you would use I<-modify_real> instead.
+
+=item Persistent modifiers
+
+A persistent modifier is one that the object in question "remembers". This
+means that this modifier can later be cancelled, thus rescinding the
+blessing (or curse) that it bestowed on this attribute.
+
+Currently, this type of modifier is limited to numeric types, and must be
+of the relative modifier type (via I<-modify> or I<-modify_real>). In addition,
+it should be noted that the results of a persistent modifier are NOT applied
+immediately. They are instead applied the next time the object is
+C<process()>ed. That said, all that is needed to turn a modifier into a
+persistent one is adding a I<-persist_as> option:
+
+    $obj->mod_attr(-name => "strength",
+		   -modify => 1,
+		   -persist_as => "spell:increase_strength");
+
+The value of I<-persist_as> becomes the ID for that modifier, which needs to be
+unique for that object. The ID should be chosen such that it describes what
+the modification is, if for no other reason than your programming sanity.
+
+What happens now is that the next time C<process()> is called on the object,
+the "strength" attribute goes up by 1. This modification is done once. In other
+words, the next time after that that C<process()> is called, it does NOT go up
+by another 1.
+
+However, this does not mean you can't have it keep going up by 1 each time if
+that's what you really wanted. In order to accomplish this effect, add the
+I<-incremental> option:
+
+    $obj->mod_attr(-name => "health",
+		   -modify => 3
+		   -persist_as => "spell:super_healing",
+		   -incremental => 1);
+
+In this example, the "health" attribute will indeed increment by 3 EVERY time
+C<process()> is called.
+
+There is another important difference between incremental and non-incremental
+persistent modifiers. A non-incremental modifier's effect is removed when
+the modifer is later cancelled. Thus in the above example, if the "strength"
+modifier caused it to go from 15 to 16, when the modifier is removed, it will
+drop back from 16 to 15. However, in the case of the incremental modifier,
+the effects are permanent. When the "health" modifier goes away, it does not
+"take away" the accumulated additions to the attribute.
+
+Note that the effects of modifiers and tend-to rates are cumulative. This
+needs to be taken into account to make sure modifiers are doing what you
+think they're doing. For instance, if the idea is to add a modifier that
+saps away health by -1 each time C<process()> is called, but the health
+attribute has a I<-tend_to_rate> of 1, the net effect will simply be to cancel
+out the tend-to, which may or may not be what you wanted. Future directions
+for this module may include ways to automatically nullify tend-to rates.
+
+Also note that modifiers are still subject to limitations via I<-minimum> and
+I<-maximum> options on the attribute.
+
+=item Self-limiting modifiers
+
+It was noted above that persistent modifiers stay in effect until they are
+purposely cancelled. However, you can set up a modifier to cancel itself after
+a given amount of time by adding the I<-time> option:
+
+    $obj->mod_attr(-name => "wisdom",
+		   -modify => 2,
+		   -persist_as => "spell:increase_wisdom",
+		   -time => 10);
+
+In this case, -time refers to the number of times C<process()> is called (rather
+than real time). The above indicates that the modification will last through
+the next 10 full calls to C<process()>. These means that after the 10th call
+to C<process()>, the modification is still in effect. Only when the 11th
+call is made is the modifier removed.
+
+A self-limiting modifier can still be manually cancelled like any other
+persistent modifier.
+
+=item Applying persistent modifier effects immediately
+
+As stated above, the usual behavior of persistent modifiers is that they
+do not take effect immediately, but rather when the next process() call is
+made on the object.
+
+With version 0.05 of Games::Object, you can force a persistent modifier to
+take effect immediately. This is done by using the I<-apply_now> option to
+the mod_attr() call. Setting this to a true value will cause mod_attr()
+to apply the effects of the modifier right now. This also means that any
+events associated with modifying the attribute will be triggered at this
+time.
+
+Be careful when using this feature with incremental modifiers. This means
+that the target attribute will be modified now, and then again when the
+process() is next called on the object.
+
+=item Delayed-action modifiers
+
+A persistent modifier, either one that is timed or not, can be set up such
+that it does not take effect for a given number of iterations through the
+C<process()> method. This is done via the I<-delay> option, as in this example:
+
+    $obj->mod_attr(-name => "health",
+		   -modify => -5,
+		   -incremental => 1,
+		   -persist_as => "food_poisoning",
+		   -time => 5,
+		   -delay => 3);
+
+This means: For the next 3 calls to C<process()>, do nothing. On the 4th,
+begin subtracting 5 from health for 5 more times through C<process()>. The
+last decrement to health will take place on the 8th call to C<process()>. On
+the 9th call, the modifier is removed.
+
+Note that while this example combined I<-delay> with I<-time> and
+I<-incremental> to show how they can work together, you do not have to combine
+all these options.
+
+A delayed-action modifier can be cancelled even before it has taken effect.
+
+=item Cancelling persistent modifiers
+
+Any persistent modifier can be cancelled at will. There are two ways to cancel
+modifiers. One is to cancel one specific modifier:
+
+    $obj->mod_attr(-cancel_modify => 'spell:increase_wisdom');
+
+Note that the I<-name> parameter is not needed. This is because this information
+is stored in the internal persistent modifier. You only need the ID that you
+specified when you created the modifier in the first place.
+
+Or, you can choose to cancel a bunch of modifiers at once:
+
+    $obj->mod_attr(-cancel_modify_re => '^spell:.*');
+
+The value of the I<-cancel_modify_re> option is treated as a Perl regular
+expression that is applied to every modifier ID in the object. Each that matches
+will be cancelled. Any matching modifiers on that object will be cancelled,
+no matter what attribute they are modifying. This makes it easy to cancel
+similar modifiers across multiple attributes.
+
+For each non-incremental modifier that is cancelled, C<mod_attr()> will reverse
+the modification that was made to the attribute, but not right away. It will
+instead take place the next time C<process()> is called. To override this
+and force the change at the very moment the cancellation is done, include
+the I<-immediate> option set to true, as in this example:
+
+    $obj->mod_attr(-cancel_modify_re => '^spell:.*',
+		   -immediate => 1);
+
+=back
+
+=head2 The I<-force> option
+
+Any modification of an attribute via C<mod_attr()> may take the I<-force>
+option. Setting this to true will cause the modifier to ignore any bounds
+checking on the attribute value. In this manner you can force an attribute
+to take on a value that would normally be outside the range of the attribute.
+
+For example, the following modification would force the value of the attribute
+to 110, even though the current maximum is 100:
+
+    $obj->new_attr(-name => "endurance",
+		   -value => 90,
+		   -minimum => 0,
+		   -maximum => 100);
+    ...
+    $obj->mod_attr(-name => "endurance",
+		   -modify => 20,
+		   -persist_as => "spell:super_endurance",
+		   -force => 1);
+
+At the same time, however, a call to C<attr()> to return the value of the
+attribute will still only return values in the range of 0 to 100. This can
+be very useful in that you can allow modifications to go above or below
+the bounds internally, but still allow only the proper ranges from the
+point of view of the program.
+
+=head2 Modifying attribute properties
+
+Various properties of an attribute normally set at the time the attribute is
+created can be modified later. These changes always take effect immediately and
+cannot be "remembered". The general format is:
+
+    $obj->mod_attr(-name => ATTRNAME,
+		   -PROPERTY => VALUE);
+
+where PROPERTY is one of "minimum", "maximum", "tend_to_rate", "on_fractional",
+"track_fractional", "out_of_bounds".
+
+=head2 Deleting Attributes
+
+To delete an attribute, use the C<del_attr()> method:
+
+    $obj->del_attr('xzyzzy');
+
+This removes the attribute immediately. Any persistent modifiers on this
+attribute are removed at the same time.
+
+=head2 Attribute accessors
+
+New in version 0.10 is an optional feature called attribute accessors. This
+is a way of automatically defining new object methods when methods are
+first created or loaded into an object from a save file.
+
+To turn on this feature, you will need to see a global variable to a true
+value before creating or loading objects:
+
+    $Games::Object::AccessorMethod = 1;
+
+When you turn this option on, generating a new attribute with C<new_attr()>
+or by loading an object from a file will create two accessor methods to allow
+you to retrieve the value of the attribute and modify it in simple ways. For
+example, if you create an attribute called C<foo> after turning on this
+option, you will be able to make the following calls:
+
+=over 4
+
+=item $object->foo()
+
+Returns the current value of attribute C<foo>. This is the equivalent of:
+
+    $object->attr('foo');
+
+=item $object->foo($value)
+
+Sets the attribute to the new value, which is the equivalent of this:
+
+    $object->mod_attr(-name => "foo", -value => $value);
+
+=item $object->mod_foo($value)
+
+Modifies the value relative to the current value, as if this call were made:
+
+    $object->mod_attr(-name => "foo", -modify => $value);
+
+=back
+
+In the last form described above, if you wish to do things like set up a
+persistent modifier, you can do so by specifying the additional parameters
+that you would normally pass to C<mod_attr()> at the end of the parameter
+list. For example, this:
+
+    $object->mod_foo(2,
+	-persist_as   => "foo_boost",
+	-incremental  => 1,
+        -time         => 5);
+
+is the same as:
+
+    $object->mod_attr(
+        -name         => 'foo',
+        -modify       => 2,
+	-persist_as   => "foo_boost",
+	-incremental  => 1,
+        -time         => 5);
+
+When accessors are turned on, you can selectively choose not to create accessors
+for certain attributes by using the C<ATTR_NO_ACCESSOR> flag.
+
+=head2 A note on using I<-minimum>/I<-maximum> and persistent modifiers
+
+If you choose to use persistent modifiers combined with self-limiting
+attributes, there are a few pitfalls that you need to watch out for.
+
+By default, modifications made to an attribute are done in the I<use_up>
+mode. This means that any modifications beyond what is needed to bring the
+value to minimum or maximum is discarded. When combined with persistent
+modifiers, this may not result in what you want.
+
+For example, say you have an attribute that ranges from 0 to 100 and is
+currently at 95. It was created with the default I<use_up> option for its
+I<-out_of_bounds> parameter. Say you apply a persistent modifier of 10 with
+no special options. Because of the I<use_up> option, only 5 is added to the
+value, resulting in 100. If later you cancel the modifier, or it was timed
+and expires, it will apply -10 to the value, bringing it down to 90. This
+is probably not what you intended.
+
+This problem can be solved one of two ways:
+
+=over 4
+
+=item *
+
+Use the I<-force> option in the C<mod_attr()> call. This will force the
+attribute to 105 internally, but a normal call to C<attr()> will return 100.
+
+=item *
+
+Specify the I<track> option with the I<-out_of_bounds> parameter when the
+attribute was created. This will do the same thing, i.e. allow the value to
+increase intenally to 105 but report 100 to the user.
+
+=back
+
+In retrospect, it appears that perhaps I<track> is better as the default
+rather than I<use_up>.
+
+=head1 Object Actions
+
+=head2 Introduction
+
+Actions are user-defined bits of code that are designed to execute when
+certain things happen to your objects or attributes and flags on objects.
+This allows you to program into your objects a set of bahavior rules that
+automatically trigger when things happen, saving you the trouble of having
+to check for these events yourself.
+
+=head2 Callback programming model
+
+In order to understand how actions work, you must first understand the
+callback programming model.
+
+Callback programming is a technique where you define a chunk of code not to
+be run directly by you, but indirectly when some external event occurs. If
+you've ever done any graphics or signal programming, you've done this before.
+For instance, in Tk you might define a button to call some arbitrary code
+when it is pressed:
+
+    $mainw->Button(
+	-text	=> "Press me!",
+	-command => sub {
+	    print "Hey, the button was pressed!\n";
+	    ...
+	},
+    )->pack();
+
+Or you may have set up a signal handler to do something interesting:
+
+    sub stop_poking_me
+    {
+	my $sig = shift;
+	print "Someone poked me with signal $sig!\n";
+    }
+
+    $SIG{TERM} = \&stop_poking_me;
+    $SIG{INT} = \&stop_poking_me;
+
+These are examples of callback programming. Each example above defines a set
+of code to be run when a particular condition (or "event") occurs. This is
+very similar to the way it works in Games::Object, except you're dealing with
+events that have to do with Game::Object entities. There is only one crucial
+difference, which has to do with the way the module is structured, as you'll
+see in the next section.
+
+=head2 Callback structure
+
+A single callback is represented as a reference to an array that consists of
+the following elements, in this order:
+
+=over 4
+
+=item *
+
+A Games::Object or Games::Object subclassed object.
+
+=item *
+
+A method to call on that object.
+
+=item *
+
+Zero or more arguments to pass to the method call.
+
+=back
+
+The first parameter, the object, is specified symbolically. To understand
+this, you must first understand that each action is considered to have from
+one to three objects involved, which go by the following symbolic names:
+
+=over 4
+
+=item O:self
+
+This refers to the object on which the action callback has been defined.
+This object will B<always> be defined.
+
+=item O:other
+
+This is the object that caused the action to happen. This may or may not be
+defined depending on the nature of your action and the way it was invoked.
+
+=item O:object
+
+If an action involves the interaction of two objects, the other object can
+be referenced in this manner. Again, whether this is defined will depend on
+the action and how it was invoked.
+
+=back
+
+Knowing this, consider this example of a callback:
+
+    [ 'O:self', 'mod_hit_points', 5 ]
+
+Assuming that you define an attribute name C<hit_points> with attribute
+accessors turned on, this would invoke the following when called:
+
+    $self->mod_hit_points(5);
+
+where C<$self> is the object on which the action was defined. You're not
+limited to calling methods defined only in Games::Object; you can call whatever
+methods you may have creating in your subclass.
+
+As well as calling methods on them, you can also pass the other objects as
+parameters to your method call. For example:
+
+    [ 'O:self', 'strike', 'O:object', 'O:other' ]
+
+If we assume that C<strike()> is a method that registers a blow with a weapon
+on a character, C<O:object> could represent the weapon being used and
+C<O:other> the creature striking the blow.
+
+As a convienience, you can also reference C<O:manager> as an object argument.
+This represents C<O:self>'s object manager, thus allowing you to invoke methods
+on the manager as well, if you wish your callback to manipulate the objects
+in the manager in some way.
+
+You can specify arguments as the results of method calls or other calculations
+on object symbols. For example, you could do something like this:
+
+    [ 'O:self', 'mod_hit_points', 'O:object->hit_power(O:other)' ]
+
+This passes to C<mod_hit_points> the result of the following when executed:
+
+    $object->hit_power($other);
+
+In this example, C<hit_power()> could be a method you devised that computes
+the amount of striking power of weapon C<$object> when wielded by C<$other>.
+
+=head2 Multiple callbacks
+
+Anywhere that a callback is called for, you can specify multiple callbacks,
+defined as multiple callback array refs in a larger array. Example:
+
+    [
+      [ 'O:self', 'mod_hit_points', 'O:object->hit_power(O:other)' ],
+      [ 'O:other', 'mod_melee_skill', 1 ],
+    ]
+
+When invoked, the above example will call two callbacks in the order they are
+defined. What's more, you can use the return code of a callback to affect
+whether remaining callbacks in the list will be executed. If a callback in
+a list returns true, the next callback will be invoked. If it returns false,
+no further callbacks on this list will be invoked. Thus, extending the example
+above, you could do something like this:
+
+    [
+      [ 'O:self', 'can_be_hit', 'O:object', 'O:other' ],
+      [ 'O:self', 'mod_hit_points', 'O:object->hit_power(O:other)' ],
+      [ 'O:other', 'mod_melee_skill', 1 ],
+    ]
+
+In this example, it is assumed that you have created a method called
+C<can_be_hit()> in your subclass, which takes the two other object parameters
+and sees if this action can really be done. If C<can_be_hit()> returns false,
+then the remaining two callbacks will not be invoked.
+
+=head2 Failure callbacks
+
+There is another option available to you when defining multiple callbacks:
+failure callbacks.
+
+A failure callback is a callback invoked if and only if the previous callback
+fails (i.e. returns false). This is defined by prefacing the failure callback
+with the string C<FAIL>. We can thus extend the previous example in the
+following manner:
+
+    [
+      [ 'O:self', 'can_be_hit', 'O:object', 'O:other' ],
+      FAIL => [ 'O:manager', 'output', 'Your blow appears to have no effect!' ],
+      [ 'O:self', 'mod_hit_points', 'O:object->hit_power(O:other)' ],
+      [ 'O:other', 'mod_melee_skill', 1 ],
+    ]
+
+(Note that you do not I<have> to use C<=E<gt>>; I use it because it makes it
+so I don't have to put quotes around C<FAIL> and makes the code easier to
+read).
+
+In this example, we assume that you have created a class that you have
+subclassed to Games::Object::Manager, and it contains a method called
+C<output> that sends text output to the player. With this setup, if the call
+to C<can_be_hit()> returns false, then the following is invoked:
+
+    $manager->output("Your blow appears to have no effect!");
+
+The remaining callbacks after the failure callback are not invoked.
+
+Remember when I stated that wherever you have a callback you can specify
+a group of callbacks? The failure callback is no exception:
+
+    [
+      [ 'O:self', 'can_be_hit', 'O:object', 'O:other' ],
+      FAIL => [
+        [ 'O:manager', 'output', 'Your blow appears to have no effect!' ],
+        [ 'O:object', 'does_it_break' ],
+        [ 'O:manager', 'Oh, no, your weapon breaks!' ],
+        [ 'O:object', 'destroy' ],
+      ],
+      [ 'O:self', 'mod_hit_points', 'O:object->hit_power(O:other)' ],
+      [ 'O:other', 'mod_melee_skill', 1 ],
+    ]
+
+In this example, if the failure callback is invoked, it will attempt to
+execute the four callbacks defined in the list in turn. The first one outputs
+the message, then the second one calls a method on the C<O:object> parameter.
+If this returns true, the remaining callbacks are executed (note that this
+assumes that C<output()> will return true all the time). There is no limit
+to how far you can "nest" callbacks in this manner. You could easily put yet
+another C<FAIL> after the C<does_it_break> test and do something else:
+
+    [
+      [ 'O:self', 'can_be_hit', 'O:object', 'O:other' ],
+      FAIL => [
+        [ 'O:manager', 'output', 'Your blow appears to have no effect!' ],
+        [ 'O:object', 'does_it_break' ],
+	FAIL => [ 'O:manager', 'output', 'Lucky for you, your weapon is still intact.' ],
+        [ 'O:manager', 'Oh, no, your weapon breaks!' ],
+        [ 'O:object', 'destroy' ],
+      ],
+      [ 'O:self', 'mod_hit_points', 'O:object->hit_power(O:other)' ],
+      [ 'O:other', 'mod_melee_skill', 1 ],
+    ]
+
+Thus the callback structure can be extremely versatile, allowing you to
+set up complex behavior with a minimum of programming.
+
+=head2 Turning off return code checking
+
+Sometimes you may have a situation where you are not interested in having
+the return code checked for callbacks. Perhaps you know you always want to
+execute every callback in the list, or from a particular point on, but
+some methods inherently return 0 or false. Or you simply don't care if some
+actions fail or not.
+
+To accomplish this, specify the string C<NOCHECK> in the callback list. All
+callbacks after this point will be unconditionally executed, until the end
+of the callback list, or until it hits the string C<CHECK>.
+
+=head2 Defining an action on an object
+
+You can define arbitrary actions on an object by specifying them as parameters
+to the C<new()> constructor. An action callback is recognized as any parameter
+that starts with the characters C<on_> or C<try_>. For example:
+
+    my $object = Games::Object->new(
+        -id       => "expensive camera",
+        -on_use   => [
+            [ 'O:self', 'pictures_left' ],
+	    FAIL => [ 'O:manager', 'output', 'Nothing happens when you press the button' ],
+            [ 'O:self', 'take_picture', 'O:object' ],
+	    [ 'O:manager', 'output', 'Click! The camera takes a picture.' ],
+            [ 'O:self', 'mod_pictures_left', -1 ],
+        ],
+    );
+
+This now defines an arbitrary action called C<on_use> on this particular object.
+This action will be saved on a C<save()> like anything else on the object
+and reloaded with C<load()>. This example assumes you will have an attribute
+on the object called C<pictures_left> that indicates how much film is left
+in the camera.
+
+Note that the first callback on the list above does not actually do anything
+except return the current value of the attribute. But note that any non-zero
+number is considered to be boolean true, thus in this example, if the attribute
+is non-zero, it will allow the camera to be used, otherwise it will do the
+failure callback instead and stop.
+
+=head2 Invoking an action on an object
+
+There are several ways to invoke an action on an object. One way is to use
+the Games::Object C<action()> method, which would be invoked in the following
+manner:
+
+    $self->action(
+        action   => "object:$action",
+        object   => $object,
+        other    => $other,
+    );
+
+C<$self> is the object on which the action is defined, and C<$other> and
+C<$object> are the objects to put in place of C<O:other> and C<O:object>
+respectively in the callbacks.
+
+Using the example of the camera object we defined in the previous example,
+to invoke its C<on_use> action, we would do something like this:
+
+    $camera->action(
+        action   => "object:on_use",
+        object   => $plant,
+        other    => $player,
+    );
+
+The idea here is that C<$player> is taking a picture of a C<$plant> using the
+C<$camera>.
+
+The only problem using the C<action()> method is that it may not seem
+particularly intuitive. A better way is to have the module create action
+methods for you. To turn on this feature, you will need to set a global variable
+to true as you did with attribute accessors:
+
+    $Games::Object::ActionMethod = 1;
+
+What this will do is create two methods, one named after the action and
+one with the C<on_> prefix stripped. The former can be thought of as passive
+syntax, and the latter as active syntax. In the above example, the passive form
+would be expressed this way:
+
+    $camera->on_use($player, $plant);
+
+The active syntax, however, reads more like a subject-verb-object format (and
+yes, I know this is biased towards English language syntax). This format
+swaps C<$self> and C<$other>:
+
+    $player->use($camera, $plant);
+
+Which could be read as "The player uses the camera on the plant."
+
+Thus the general syntax can be expressed as:
+
+    $self->$passive_form($other, $object);
+    $other->$active_form($self, $object);
+
+Use whichever syntax make more sense to you.
+
+It is possible to call either form of the syntax with only one argument. In
+this case, the passive syntax will assume the lone parameter is C<O:other>
+and in the active syntax it will assume it is C<O:self>.
+
+=head2 Passing arbitrary arguments to actions
+
+You may have a situation where you wish to vary what an action callback
+does depending on conditions other than the objects themselves. Using the
+camera example, you may wish to, say, do something different depending on
+whether the player remembered to use the flash or not.
+
+This can be done by passing a reference to a hash of key-value pairs that
+represent the additional arguments. This can be done either by specifying
+the C<args> parameter to C<action()>, like this:
+
+    $self->action(
+        action   => "object:on_use",
+        object   => $plant,
+        other    => $player,
+	args     => { flash => 'on' },
+    );
+
+Or it can be done by specifying the hash ref as the last parameter to an
+action method, like this:
+
+    $camera->on_use($player, $plant, { flash => 'on' });
+
+or this:
+
+    $player->use($camera, $plant, { flash => 'on' });
+
+To utilize this parameter in your callback, simply put C<A:flash> wherever
+you want that argument. Example:
+
+    [ 'O:self', 'take_picture', 'O:object', 'A:flash' ],
+
+You can specify as many key-value pairs as you want in the hash and use as
+few or as many of them as you wish in your callbacks. Note that there is
+automatically one predefined argument, no matter whether you use this
+feature or not. C<A:action> will return the action that triggered this
+callback. In the case of object-based actions, this will always have the format
+C<object:$action>. In the above example, this would be C<object:on_use>.
+This can be useful if you decide to code a method that is invoked for more
+than one action because of the commonality between them, but has a few crucial
+differences depending on the action being invoked.
+
+=head2 Dealing with undefined objects
+
+Note that if you reference an object in a callback, the callback mechanism
+will expect that object to be defined when the callback is invoked via an
+action trigger. If an object referenced from the method parameters is not
+defined, this merely results in C<undef> being passed. But if the undefined
+object is the first member of a callback array (and thus the object on which
+the method call will take place), this is a problem.
+
+By default, Games::Object will simply bomb if you do not define that object.
+For example, if you do not define C<O:object>, then this would not bomb, since
+it is simply referenced in the args to the method call:
+
+    [ 'O:self', 'foo_method', 'O:object' ]
+
+But this would bomb, since there is nothing to call a method on:
+
+    [ 'O:object', 'bar_method', 'O:self' ]
+
+There are two ways you can deal with this. One is to insert a call to the
+manager C<find()> method to validate the object before you attempt to access
+methods on it, like this:
+
+    [
+      [ 'O:manager', 'find', 'O:object' ],
+      [ 'O:object', 'bar_method', 'O:self' ],
+    ]
+
+If C<find()> fails, it will return C<undef>, which is treated as false, and
+no further callbacks execute. Or, you could indicate that callbacks with
+missing objects can be simply skipped over by using the C<ACT_MISSING_OK>
+flag when calling the action. If we take our camera example again, say we
+want to simulate someone taking a picture of the scenery rather than a
+particular object (thus no C<O:object> parameter). We could do this in
+this manner:
+
+    $self->action(
+        action   => "object:on_use",
+        other    => $player,
+	flags    => ACT_MISSING_OK,
+	args     => { flash => 'on' },
+    );
+
+Or as an extra parameter after the objects like this:
+
+    $camera->on_use($player, ACT_MISSING_OK, { flash => 'on' });
+
+or this:
+
+    $player->use($camera, ACT_MISSING_OK, { flash => 'on' });
+
+In the latter two examples, to say that the flag parameter takes the
+place of the object parameter would be wrong. This would also work:
+
+    $player->use($camera, $plant, ACT_MISSING_OK, { flash => 'on' });
+
+and the code is smart enough to know which parameter is what. If C<$plant>
+happens to contain C<undef>, the code works as if you didn't even specify it.
+
+=head2 Special actions
+
+Most actions are abitrary, in that you can conjure up whatever actions you
+need merely by defining them on an object. A few, however, are referenced
+internally and have special meaning:
+
+=over 4
+
+=item on_remove
+
+This is invoked on the object when it is removed from the object manager.
+It is invoke B<before> the object is physically removed or any of its
+object relationships broken. The C<O:object> object is always undefined in
+this case, and whether or not C<O:other> is defined will depend on how
+the original C<remove()> method was invoked.
+
+=item on_destroy
+
+This is invoked if the C<destroy()> method is explicitly invoked on an
+object. Note that an C<on_remove()> action will follow this if the object
+is managed.
+
+=item on_load
+
+This is invoked after an object has been loaded from a file. It allows you
+to do any special processing you may wish to do at this time. For instance,
+if you have special data that you saved with the object that is outside the
+object itself, you can use this to reload that data. C<A:file> is set to the
+open file object.
+
+An especially good use for C<on_load> is when using a GUI with your game.
+For example, your game may have a window that represents the map of your
+world with the player at the center. On a game load, you would most likely
+need to redraw the map. You can trigger this by placing an C<on_load>
+on the object tracking the map.
+
+=item on_save
+
+This is invoked after an object has been saved to a file. It allows you to
+save any special data outside the normal scope of the object.
+
+=back
+
+Be B<VERY> careful using the C<on_load> and C<on_save> actions. You manipulate
+the file at your own risk. In most cases, you can do this better by 
+encapsulating the extra data in a Perl object, defining C<load()> and C<save()>
+methods on it, and storing the object on the game object in an attribute.
+
+=head1 Attribute Actions
+
+=head2 Introduction
+
+As well as defining actions on object, you can also define actions on
+attributes within objects. These actions are defined exactly as they are on
+objects, and the callbacks have the same structure and parameters. There are
+a few important differences, however:
+
+=over 4
+
+=item *
+
+There are a predetermined set of actions, and are not invoked directly by
+the user but indirectly through changes applied to the attribute.
+
+=item *
+
+The argument list (i.e. the C<A:*> parameters) is fixed and is dependent
+on the action type.
+
+=item *
+
+Accessors are not created for them, to discourage attempts to invoke the
+actions independently of the normal mechanism.
+
+=item *
+
+If you wish to reference C<O:object> and C<O:other> in your callbacks, you
+must use an object manager.
+
+=back
+
+=head2 Defining an attribute action
+
+Attribute actions are defined when the attribute is created with C<new_attr()>.
+Like with object actions, these are recognized as parameters that start with
+C<on_> (no C<try_> style actions are currently implemented). The callback
+structure is exactly the same as for objects. C<O:self> is always the object
+on which the attribute is defined. If the attribute action is inherited,
+C<O:self> will always be the actual object that was referenced in the original
+call that modified the attribute, not the inherited object.
+
+As mentioned in the previous section, there are a set number of action types,
+which are described below:
+
+=over 4
+
+=item on_change
+
+This is invoked when the attribute changes value. This is invoked right after
+the value has changed, and every time the value changes. This means if you
+have an attribute with a persistent incremental modifier, each turn it changes
+this action will be invoked.
+
+The action is invoked if and only if the value changes. If you make a call
+to modify the attribute and specify the new value or modifier such that the
+value ultimately does not change, the action is I<not> invoked.
+
+The C<on_change> action has the following fixed argument list:
+
+=over 4
+
+=item A:name
+
+The name of the affected attribute.
+
+=item A:old
+
+The old value before modification.
+
+=item A:new
+
+The new value after modification.
+
+=item A:change
+
+How much the attribute changed by. The sign indicates the direction of the
+change. This is set only for attributes of type C<number> or C<int>.
+
+=back
+
+=item on_minimum
+
+Applicable only to attribute types that can have a minimum value, this is
+invoked when the attribute reaches the minimum value. It is called only once
+when the attribute reaches minimum. It will not be called again until the
+attribute has been modified above minimum and then back down to minimum again.
+
+This shares the same parameters as C<on_change> with the following addition:
+
+=over 4
+
+=item A:excess
+
+How much under the minimum the final value is (or would be if the attribute
+is set up to truncate modifications under the minimum).
+
+=back
+
+=item on_maximum
+
+Applicable only to attribute types that can have a maximum value, this is
+invoked when the attribute reaches the maximum value. It is called only once
+when the attribute reaches maximum. It will not be called again until the
+attribute has been modified below maximum and then back up to maximum again.
+
+This shares the same parameters as C<on_change> with the following addition:
+
+=over 4
+
+=item A:excess
+
+How much over the maximum the final value is (or would be if the attribute
+is set up to truncate modifications over the maximum).
+
+=back
+
+=back
+
+In the case where an attribute was changed and it reached minimum or maximum
+in the same operation, C<on_change> is called first.
+
+In the case of a split attribute, actions are invoked only on changes to the
+current value, never the real value.
+
+=head2 Defining the object parameters on attribute actions
+
+Mentioned previously is the fact that you do not invoke attribute actions
+directly yourself, but indirectly via changes to the attribute. How then
+can you pass in values for C<O:other> or C<O:object>? By specifying them
+when you modify the attribute, that's how.
+
+The C<mod_attr()> method (and any autocreated accessor methods that modify
+the attribute) can take addition parameters to set these values. Say you
+define an attribute called C<hit_points>. To use C<mod_attr()> to modify
+this attribute and pass the other values, simply specify these parameters
+in the call:
+
+    $player->mod_attr(
+	-name	=> "hit_points",
+	-modify	=> 5,
+	-other	=> $wizard,
+	-object	=> $healing_spell,
+    );
+
+Or through the appropriate accessor method:
+
+    $player->mod_hit_points(5, $wizard, $healing_spell);
+
+Note that this is very much like invoking actions (passive syntax). And just
+like the action method, if you leave off an object, the one that is specified
+is assumed to be C<O:other>, while C<O:object> is left undefined.
+
+=head1 Flag Actions
+
+=head2 Introduction
+
+You can define a small set of actions for flags in a similar fashion as you
+do for attributes.
+
+=head2 Defining a flag action
+
+Actions are defined when you create a new flag with the C<new_flag()>
+method, in a manner similar to the way you define actions for attributes.
+Like with object actions, these are recognized as parameters that start with
+C<on_> (no C<try_> style actions are currently implemented). The callback
+structure is exactly the same as for objects. C<O:self> is always the object
+on which the flag is defined. If the flag action is inherited,
+C<O:self> will always be the actual object that was referenced in the original
+call that modified the flag, not the inherited object.
+
+The following is a list of the available actions for flags:
+
+=over 4
+
+=item on_set
+
+Invoked when the flag is set, but only if it was not already set when the
+C<set()> method was called. If the C<set()> call actually had no effect because
+the flag was already set, this action is not invoked.
+
+=item on_clear
+
+Invoked when the flag is cleared, but only if it was not already cleared when
+the C<clear()> method was called. If the C<clear()> call actually had no effect
+because the flag was already cleared, this action is not invoked.
+
+=back
+
+All actions above have a single predefined parameter. C<A:name> refers to the
+name of the flag that was altered.
+
+=head1 Processing objects
+
+=head2 Processing a single object
+
+In order for persistent modifiers and tend-to rate calculations to
+be performed on an object, the object in question must be processed. This is
+done by calling the C<process()> method, which takes no arguments:
+
+    $obj->process();
+
+What this method really is is a wrapper around several other object methods
+and function calls that are invoked to perform the invidual tasks involved
+in processing the object. Specifically, C<process()> performs the following
+sequence:
+
+=over 4
+
+=item process_queue
+
+This processes all queued actions for this object. These actions are generally
+deferred attribute modifications, changes to attributes resulting from
+cancelled persistent modifiers, or arbitrarily queued actions (using the
+queue() method).
+
+The queue is continually processed until it is empty. This means that if
+new items are queued as process_queue() runs, these items will be processed
+as well. However, it is easy to see how such an arrangement could lead
+to an infinite loop (queued method A queues method B, method B queues method A,
+method A queues method B ...). To prevent this, process_queue()
+will not allow the same action to execute more than 100 times by default on
+a given call. If this limit is reached, a warning is issued to STDERR and
+any further invokations of this action are ignored for this time
+through process_queue() .
+
+=item process_pmod
+
+This processes all persistent modifiers in the order that they were defined
+on the object. Changes to attributes resulting from this processing may
+generate events that cause your event handlers to be queued up again for
+processing.
+
+The default order that modifiers are processed can be altered. See the
+section L<"Attribute modifier priority"> for further details.
+
+=item process_tend_to
+
+This processes all split attributes' tend-to rates in no particular order.
+Like the previous phase, this one can also generate events based on attribute
+changes.
+
+You can exert some control over the order in which attributes are processed
+in this phase. See section L<"Attribute tend-to priority"> for details.
+
+=back
+
+=head2 Timing issues
+
+There is a timing issue reguarding persistent modifiers added as a result
+of events generated during the process_pmod() and process_tend_to() phases.
+
+Recall that when a persistent modifier is added, it does not take effect
+until the next call to process() . This means that if an event is generated
+in either of the aforementioned phases, and these events add more persistent
+modifiers, they will not take effect until the I<next> call to process() .
+
+Worse, if you choose to reverse the order and do process_tend_to() first,
+then new mods added from events generated there will be processing this
+turn (since process_pmod() has not yet run), but ones generated from
+process_pmod() will not.
+
+You can work around this problem via the I<-apply_now> option introduced
+in 0.05. Setting this to a true value in your C<mod_attr()> call from the
+event handler will cause the modifier to be applied immediately, as if it had
+been generated before the process() call.
+
+=head2 Processing multiple objects
+
+More likely than not, you are going to want to process all the objects that
+have been created in a particular game at the same time. This can be done if
+you use a Games::Object::Manager-based object manager. If you do, then all
+the objects added to the manager can be processed by using the C<process()>
+method on the manager itself:
+
+    $manager->process();
+
+That's all it takes. This will go through the list of objects (in no particular
+order by default - see section L<"Priorities"> for details on changing this)
+and call the C<process()> method on each object.
+
+The nice thing about the manager's C<process()> method is that it is a generic
+method. With no arguments, it calls the C<process()> method on the individual
+objects. However, if you give it a single argument, it will call this method
+instead. For example, say you defined a method in your subclass called
+C<check_for_spells()> , and you wish to execute it on every object being
+managed. You can call C<process()> thusly:
+
+    $manager->process('check_for_spells');
+
+Then there is yet one more form of this function call that allows you to
+not only call the same method on all objects, but pass arguments to it as
+well. For example:
+
+    $manager->process('check_for_spells', spell_type => 'healing');
+
+As of version 0.10, you can provide a filter that restricts the list of objects
+that are actually processed. This allows you to selectively process your
+objects. To do this, you provide it with a CODE reference before the method
+name that is invoked for each active object. If the code returns boolean true,
+then the object will be processed; boolean false, and the object is skipped.
+
+The CODE reference can be a reference to an existing function or it can be
+an anonymous C<sub>. For example, the following will invoke method
+C<check_creature> for only those objects who's C<object_type> attribute
+is set to "creature":
+
+    $manager->process( sub { shift->attr("object_type") eq "creature" }, "check_creature" );
+
+The following does the same thing, just broken up over more lines for better
+readability:
+
+    sub filter_creature {
+	shift->attr("object_type") eq "creature";
+    }
+
+    $manager->process( \&filter_creature, "check_creature" );
+
+The filter code will also be passed all the arguments that you are passing
+to C<process()> that are in turn passed to the method to be called.
+
+It is permissable to specify a method that may not exist on all of your objects.
+This can happen if your manager consists of objects of several different
+classes. In this way you're not forced to define the method on all classes.
+Thus this acts as a built-in filter (which is done BEFORE any custom filter
+you define is invoked, so you will see only objects for which the method
+really exists).
+
+The return code of the manager's C<process()> is the number of objects that
+was actually processed. Note that this can be zero if your filter eliminated
+all of the objects from consideration, or none had the specified method.
+
+=head2 Modifying the default process sequence
+
+You can modify the order in which the C<process_*()> subfunctions are called,
+or you can define your own methods to be called instead of or in addition to
+the defaults. How do do this depends on how you are managing your objects.
+
+=over 4
+
+=item Managing the objects yourself
+
+If you are managing your objects yourself, you can control the process list
+via the function C<ProcessList()> in Games::Object. This is not exported
+by default, so you will need to import it. Example:
+
+    use Games::Object qw(ProcessList);
+
+This function actually serves a dual purpose. With no arguments, it will
+return an array containing the names of the methods currently called when
+the object's C<process()> method is called. With parameters, this will set
+the process list to that list of methods. Thus if you simply wish to add
+a new method to the existing list, you can do the following:
+
+    ProcessList(ProcessList(), "check_for_spells");
+
+=item Using the Games::Object::Manager object manager
+
+If you use the Games::Object::Manager module to manage your objects, using
+its C<process()> method will always override the settings in Games::Object.
+However, you can set the process list separately for each of your managers.
+
+You can do this when you first construct the manager. For example, say you
+want to create a manager that uses the default Games::Object sequence but
+adds one more method call that you have customized in your game object subclass:
+
+    use Games::Object qw(ProcessList);
+    use Games::Object::Manager;
+
+    my $manager = Games::Object::Manager->new(-process_list => [ ProcessList(), "check_for_spells" ]);
+
+Or, you can modify the process list after the fact using the manager's
+C<process_list()> method. This works like the C<ProcessList()> function from
+Games::Object in that it can either be used to fetch the current list or
+modify it. Example:
+
+    $manager->process_list($manager->process_list(), "check_for_spells");
+
+=back
+
+=head1 Priorities
+
+=head2 Object priority
+
+Each object has what is called a priority value. This value controls what
+order the object is processed in relation to the other objects when the
+objects are managed, and the manager's C<process()> method is called. When an
+object is first created new (as opposed to loading from a file, where it would
+get its priority there), it has a default priority of 0. This default can
+be modified via the priority() method:
+
+    $object->priority(5);
+
+The higher the priority number, the further to the head of the list the object
+is placed when C<process()> is called on the manager. For example, say you
+created a series of objects with IDs C<Player1>, C<RedDragon>, C<PurpleWorm>,
+C<HellHound>, and then performed the following:
+
+    $manager->find('Player1')->priority(5);
+    $manager->find('RedDragon')->priority(3);
+    $manager->find('PurpleWorm')->priority(3);
+    $manager->find('HellHound')->priority(7);
+
+If you then called C<process()>, first the C<HellHound> object would be
+processed, then the C<Player1> object, then the C<RedDragon> and C<PurpleWorm>
+objects (but in no guaranteed or reproducible order for these last two).
+Assuming that all other objects have a default priority, they would be
+processed at this point (again, in no particular order).
+
+Object priority can be changed at will, even from a user action being
+executed from within a C<process()> call (it will not affect the order that
+the objects are processed this time around). The current priority of an object
+can be obtained by specifying C<priority()> with no arguments.
+
+Object priority can be a nice way of defining initiative in dungeon-type games.
+
+B<NOTE: Avoid using extremely large or extremely small priority numbers.>
+Keep your priority numbers in the range of -999_999_999 to +999_999_999,
+which should be more than sufficient. Values outside this range are reserved
+for internal use.
+
+=head2 Controlling order of same-priority objects
+
+Starting in version 0.05 of this module, you can force the module to
+process objects in a more deterministic fashion when the priority values
+are the same. This can be controlled by modifying the exportable variable
+C<$CompareFunction> from the Games::Object::Manager module.
+
+Specifically, this contains the name of a sort subroutine to be passed to
+the Perl C<sort()> function. By default this is set to the string
+C<_CompareDefault>, which reproduces the behavior in 0.04 and prior versions.
+In this manner, compatibility is preserved with previous versions.
+
+If you set C<$CompareFunction> to the string C<_CompareAddOrder>,
+then objects will be processed in the order that they were added to the
+manager when the priorities are the same. Note that this has been changed
+from previous versions, which used to call this C<_CompareCreationOrder>.
+
+Because the value of C<$CompareFunction> is passed to the sort routine verbatim,
+you could theoretically place any function you wish in this variable,
+including one you define in your main program, though be sure to prefix
+it with C<main::>. Example:
+
+    use strict;
+    use Games::Object;
+    use Games::Object::Manager qw($CompareFunction);
+
+    sub MyCompare {
+        # Compare like the normal function (larger priorities go first)
+        # but when same, pick randomly.
+        my $cmp = $b->priority() <=> $a->priority();
+        $cmp == 0 ? ( rand(100) < 50 ? 1 : -1 ) : $cmp;
+    }
+
+    $CompareFunction = 'main::MyCompare';
+
+B<Important note:> This method of altering the sort order is most effective
+when you load and save all of your game objects at the same time. Partial
+loads, saves, and creation of new objects may not lead to a consistent
+object ordering.
+
+=head2 Attribute tend-to priority
+
+By default, tend-to rates on attributes are processed in no particular order
+in process_tend_to(). This can be changed by specifying a I<-priority>
+value when creating the attribute in question. For example:
+
+    $obj->new_attr(-name => "endurance",
+		   -value => 100,
+		   -minimum => 0,
+		   -maximum => 100,
+		   -tend_to_rate => 1,
+		   -priority => 10);
+
+The priority can also be later changed if desired:
+
+    $obj->mod_attr(-name => "endurance",
+		   -priority => 5);
+
+The higher the priority, the sooner it is processed. If a I<-priority> is
+not specified, it defaults to 0. Attributes with the same priority do not
+process in any particular order that can be reliably reproduced between
+calls to process_tend_to() .
+
+=head2 Attribute modifier priority
+
+By default, persistent attribute modifiers are executed in process_pmod()
+in the order that they were created. This is can be altered when the modifier
+is first created by adding the I<-priority> parameter. For example:
+
+    $obj->mod_attr(-name => "health",
+		   -modify => 2,
+		   -incremental => 1,
+		   -persist_as => "ability:extra_healing",
+		   -priority => 10);
+
+Assuming that other modifiers are added with the default priority of 0, or
+with priorities less than 10, this guarantees that the modifier above
+representing healing will execute before all other modifiers (like, for
+example, that -15 health modifier from one angry red dragon ...).
+
+The only drawback is that a modifier priority is currently set in stone when
+it is first added. To change it, you would have to add the same modifier
+back again in its entirety. This will probably be changed in a future release.
+
+=head1 Queueing arbitrary method calls
+
+As explained above, there are many places where method calls are queued up in
+an object for later execution, such as when persistent
+modifiers are added. The module uses the C<queue()> method to accomplish
+this, and you can use this method as well to queue up arbitrary actions. The
+caveat is the same with events, that the action must be a method name defined
+in your module.
+
+The C<queue()> method takes the action method name as the first parameter,
+followed by any arbitrary number of parameters to be passed to your method.
+For example, if you were to make the following call:
+
+    $obj->queue('kill_creature', who => 'Player1', how => "Dragonsbane");
+
+Then when C<process_queue()> is next called on this object, the Games::Object
+module will do the following:
+
+    $obj->kill_creature(who => 'Player1', how => "Dragonsbane");
+
+This is especially useful in conjunction with action methods to achieve
+a delayed effect. For example, let's return to the example of the camera object
+from an earlier section. You could delay execution of the action to when
+C<process()> is next called (maybe to achieve the effect of a timer on the
+camera, or simply to synchonize things with other game actions) by doing
+this:
+
+    $player->queue('use', $camera, $plant, { flash => "on" } );
+
+Which would call this when processed from the queue:
+
+    $player->use($camera, $plant, { flash => "on" } );
+
+=head1 Object relationships
+
+=head2 Introduction
+
+Object relationships refers to the ability to relate objects to one another
+in a well-defined manner. For example, you may wish to define a type of
+object that can contain other objects. The condition of objects being contained
+in another is an object relationship.
+
+In order to use object relationships, you must use the Games::Object::Manager
+module. This is because relationships are tracked in the manager and not in
+the individual objects. This is to minimize the number of circular references
+that need to be maintained, as well as avoid trying to store object state
+information at the class level.
+
+The relationship model used in Games::Object::Manager allows you to control
+how and when relationships occur, as well as trigger additional actions
+on forging or breaking relationships, via action callbacks. For this reason,
+the manager module mirrors the way the Games::Object module works in this
+regard. Specifically, the symbolic object references refer to the following:
+
+=over 4
+
+=item O:object
+
+This is the object being related. Using the example of an object relationship
+in which one object could contain others, this would refer to something you're
+trying to put into a container.
+
+=item O:self
+
+This is the object being related to. In the same example from above, this
+would be the container.
+
+=item O:other
+
+This is the one that instigated the action. Whenever this is not specified,
+this is set to the same object as C<O:self> (i.e. the thing being related
+to is assumed to have triggered the action).
+
+=back
+
+=head2 Defining an object relationship
+
+An object relationship is defined by calling the C<define_relation()> method
+on the manager. The best way to describe the syntax is to define the
+relationship that we've been using as an example, that of a container:
+
+    $manager->define_relation(
+	-name			=> "contain",
+	-relate_method		=> "insert",
+	-unrelate_method	=> "extract",
+	-related_method		=> "contained_in",
+	-related_list_method	=> "contains",
+	-is_related_method	=> "is_contained_in",
+	-flags			=> REL_NO_CIRCLE,
+    );
+
+Here is an explanation for each of the parameters:
+
+=over 4
+
+=item name
+
+This is the unique name for the object relationship. This is the only required
+parameter in the list.
+
+If you use a name that is already in use, you will not receive any warning
+or error. It will instead silently redefine the existing relationship. Note
+that if there are already objects related in this manner when you do this,
+they will continue to be related in this manner.
+
+Other parameters are optional, and some default values are based on this
+one. In these cases, this parameter's value is refered to as C<${name}>
+
+=item relate_method
+
+This defines the name of the method you would like to use to relate two
+objects together in this manner. This is created in the namespace of the
+Games::Object::Manager module, much in the same way accessor methods or
+action methods are created in Games::Object.
+
+If you do not define this parameter, C<${name}> is used instead.
+
+=item unrelate_method
+
+This defines the name of the method you would like to use to break an existing
+relationship from one object to another. If you omit this parameter, it
+defaults to C<un${name}> instead.
+
+=item related_method
+
+This defines the name of the method you want to use to return what an object
+is related to in this manner, if anything. In our running example here, this
+means the container in which the object resides. If you do not define this
+parameter, it defaults to C<${name}_to>.
+
+=item related_list_method
+
+This defines the name of the method you want to use to return a list of
+objects that are related to a specified object. In our example, this means
+a list of objects currently inside the container. If you omit this parameter,
+it defaults to C<${name}_list>.
+
+=item is_related_method
+
+This defines the name of the method you want to use to see if one object
+is related to another in this manner. In our example, it would check to
+see if a specific object is contained in another. If this parameter is
+omitted, it defaults to C<is_${name}>.
+
+=item flags
+
+This allows you to define flags that affect the behavior of the relationship.
+Right now, the only flag that is available is C<REL_NO_CIRCLE>. This tells
+the manager to prohibit circular relationships. For example, if this flag
+is on, and you already have A related to B, and B related to C, an attempt
+to relate C to A will cause an error.
+
+In the example of the container relationship, we do not want this to
+be circular, since it makes no sense to have two objects that are each
+other's container.
+
+In order to use this flag, you will need to import it, like this:
+
+    use Games::Object::Manager qw(REL_NO_CIRCLE);
+
+=back
+
+=head2 Relating an object to another
+
+Once you have your relationship defined, you can now relate two objects
+together. This can be done in one of two ways. One is to use the predefined
+C<relate()> method on the manager. Say for this example we're attempting to
+have the player place an apple in a sack (the sack will contain the apple).
+You would do this:
+
+    $manager->relate(
+	-how	=> "contain",
+	-self	=> $sack,
+	-object	=> $apple,
+	-other	=> $player,
+    );
+
+But just like with object actions, it's easier to use the method that you
+told the manager to create for you to relate objects. Using things, you
+can simplify this to:
+
+    $manager->insert($sack, $apple, $player);
+
+Note something important here: The order of the first two arguments is
+exactly that of action methods. C<O:self> comes before C<O:object>. From a
+"grammatical" point of view (well, English grammar anyway), this may seem
+a little backwards, but it maintains consistency with the way Games::Object
+orders these parameters in the active action syntax.
+
+For example, just like you might do this to take a picture of a plant with
+the camera:
+
+    $player->use($camera, $plant);
+
+You would also do this to put new film in the camera:
+
+    $manager->insert($camera, $film, $player);
+
+That aside, there is something you should know about relating two objects
+together: You can control at the object level whether the relation is allowed.
+
+When you attempt to relate two objects together, the first thing that the
+manager will do is check to see if the relationship is allowed. In our
+example, this is done by invoking the C<try_insert> method on C<$sack>.
+Generically, the manager will look for C<try_> prefixed to the name of the
+relate method on the C<O:self> object.
+
+In the container example, you may wish to limit how much a container can
+hold by, say, comparing the size of the object in question to the total
+size of the container and the collective size of the objects already
+contained within. Thus you can define on C<$sack> something like this:
+
+    try_insert => [
+	[ 'O:self', 'can_hold', 'O:object' ],
+	FAIL => [ 'O:manager', 'output', "It won't fit." ],
+    ]
+
+Assuming that attribute C<size> is the size of an object, C<max_hold>
+is the max size that the container can hold, and C<is_held> is the total
+size it is holding now, we could define C<can_hold> like this:
+
+    sub can_hold {
+	my ($self, $object) = @_;
+	( $self->is_held() + $object->size() ) <= $self->max_hold();
+    }
+
+If, when you try to insert the C<$apple> into the C<$sack>, the C<try_insert>
+action fails, the relate method will return 0. If it succeeds, it returns 1.
+If no C<try_insert> exists on the container, this is treated as success.
+
+If the C<try> action succeeds, the object relationship is formed. But before
+success is returned to the caller, one more thing happens. The manager will
+now invoke C<on_insert> on the C<$sack> object. Generically, the manager
+will invoke an action by the name C<on_> prefixed to the relate method. To
+complete this example, you would define this on C<$sack>:
+
+    on_insert => [ 'O:self', 'mod_is_held', 'O:object->size()' ]
+
+And in this case you don't even have to define a method! This will invoke
+the following if you successfully add the C<$apple> to the C<$sack>:
+
+    $sack->mod_is_held($apple->size());
+
+Now each time you add something to the sack, it automatically updates its
+internal counter that tracks the total size of all the objects in the
+container.
+
+There are some variations on the relate method. You can omit the C<O:other>
+object if you wish to say that the container instigates the action itself
+or it doesn't matter. For example, say we extend the container relationship
+to handle the player carrying objects in his inventory. You could do this
+to indicate the player picking up the apple:
+
+    $manager->insert($player, $apple);
+
+In which case, C<O:other> will be set to C<$player>. Or to indicate that
+the apple is a gift from some other creature:
+
+    $manager->insert($player, $apple, $creature);
+
+Finally, there is one last thing: If you remember the discussion on object
+actions, you can see that relationships follow the same style of syntax.
+So you may be wondering if you can pass arbitrary arguments to the
+C<try_insert> and C<on_insert> actions. Yes, you can, by either specifying
+the C<args> parameter to C<relate()> like this:
+
+    $manager->relate(
+	how	=> "contain",
+	self	=> $sack,
+	object	=> $apple,
+	other	=> $player,
+	args	=> { how => "carefully" },
+    )
+
+Or by adding a hash ref as the final parameter to the relate method you
+defined, like this:
+
+    $manager->insert($sack, $apple, $player, { how => "carefully" });
+
+So you can do something like this on the sack:
+
+    on_insert => [
+	[ 'O:self', 'mod_is_held', 'O:object->size()' ],
+	[ 'O:object', 'dropped', 'A:how' ],
+    ]
+
+And define a C<dropped()> method on the apple object like this:
+
+    sub dropped {
+	my ($object, $how) = @_;
+	if ($how ne 'carefully') {
+	    my $manager = $object->manager();
+	    $manager->output("The apple develops a nice bruise on it.");
+	    $object->set("damaged");
+	}
+    }
+
+=head2 Breaking an object relationship
+
+To break an established relationship between two objects, you can call the
+generic C<unrelate()> method. Say we're going to now remove the apple from the
+sack of the previous example:
+
+    $manager->unrelate(
+	how	=> "contain",
+	object	=> $apple,
+	other	=> $player,
+    );
+
+Note we do not need to define C<self>, since this is already implied to be
+the sack, since this is what it is currently related to. Or, you could use
+the unrelate method you defined:
+
+    $manager->extract($apple, $player);
+
+Like with the relate method, the unrelate method will also attempt to
+call, in this example, C<try_extract> on the sack first to see if the
+action is allowed. Here is an example of such an action definition:
+
+    try_extract => [
+	[ 'O:self', 'is', 'open' ],
+	FAIL => [ 'O:manager', 'output', "You'll have to open the sack first." ],
+    ]
+
+If this succeeds, the unrelate will be done. If not, 0 is returned to the caller
+and the objects remain related.
+
+And just like with relating objects, on a successful unrelate, it will
+call the corresponding C<on_extract> on the sack:
+
+    on_extract => [ 'O:self', 'mod_is_held', '-O:object->size()' ]
+
+which does the opposite of C<on_insert>, namely subtract the size of the
+object being extracted from the sack's running total of contained object sizes.
+
+=head2 Relating an object already related to another
+
+Sometimes you will need to relate one object to another, but need to break
+the existing relationship. You can let the manager do this automatically
+for you. If you attempt to relate an already related object, it will
+automatically unrelate the object first and then relate it to the new target.
+B<IMPORTANT:> It is possible for the unrelate to fail. If this happens,
+the old relationship is left intact.
+
+Using our example, say you have the apple in the sack and wish the player
+to take it out of the sack. Rather than doing two commands like this:
+
+    if ($manager->extract($apple, $player)) {
+        $manager->insert($player, $apple);
+    }
+
+You can just call this:
+
+    $manager->insert($player, $apple);
+
+Here's the sequence of actions taken by the manager:
+
+    1) Invokes try_insert on $player to see if this relationship
+       is allowed. Return 0 if not.
+
+    2) Calls unrelate() to extract $apple from $sack. Return 0 if fails.
+
+       2a) Unrelate first invokes try_extract on $sack. Return 0 if fails.
+
+       2b) Unrelate unrelates $apple from $sack.
+
+       2c) Unrelate invokes on_extract on $sack.
+
+    3) Relate $apple to $player, caused by $player.
+
+    4) Invoke on_insert on $player.
+
+So if we assume a C<try_insert> define on C<$sack> as we had it in a previous
+example, then if the sack is not open, the unrelate will fail, and hence
+the new relate will fail, and C<insert()> will return 0.
+
+Note that this matters only if dealing with the same type of relationship.
+For example, if you have a "contain" relationship and an "owner" relationship,
+one will not affect the other unless you specifically do so in your
+relate C<on_> action. So if A is related to B in sense "owner", and you
+relate A to C in sense "contain", this does not affect A --> B.
+
+=head2 What is this object related to?
+
+To see if an object is related to anything in a particular sense, you can
+either use the C<related()> method:
+
+    my $container = $manager->related(how => "contain", object => $apple);
+
+or using the method you defined for the purpose when you defined the
+relationship:
+
+    my $container = $manager->contained_in($apple);
+
+If the object is not related to anything in this manner, C<undef> is returned.
+
+=head2 What objects are related to this one?
+
+To obtain a list of objects related to this one in a particular manner, use
+either the C<related_list()> method:
+
+    my @items = $manager->related_list($sack);
+
+or the method name you selected:
+
+    my @items = $manager->contains($sack);
+
+=head2 Are these two objects related?
+
+To check to see if one object is related to another, you can call either
+the generic C<is_related()> method:
+
+    $manager->is_related(
+	-how	=> "contain",
+	-self	=> $sack,
+	-object	=> $apple,
+    );
+
+or use the method that you specified when you defined the relationship:
+
+    $manager->is_contained_in($sack, $apple);
+
+=head2 Forcing a relate or unrelate
+
+You can choose to force a relationship to occur, or for an existing one to
+be broken. This means that the C<try_*> actions will not be invoked. The
+C<on_*> actions will still be invoked after the relate or unrelate is done,
+so in the container example, the internal counter will still be updated.
+
+Forcing a relate or unrelate can only be done using the generic C<relate()>
+and C<unrelate()> methods (this may change in future versions of this module).
+This is done by adding C<force =E<gt> 1> to the parameter list:
+
+    $manager->relate(
+	-how	=> "contain",
+	-self	=> $sack,
+	-object	=> $apple,
+	-other	=> $player,
+	-force	=> 1,
+    );
+
+In this example, we would bypass the C<try_insert> action on C<$sack>.
+
+=head2 Removing an object that has relationships
+
+You may sometimes wish to remove an object from the manager (perhaps simulating
+an object being destroyed or a creature being killed), and that object may
+have objects related to it or be related to other objects. In this case, the
+manager needs to break existing relationships.
+
+When removing an object, the manager will first break relationships going
+B<to> the object being removed, then will break relationships B<from> the
+object to be removed to other objects. In each case, the manager goes down
+the list of object relationship types (in no particular order), and for
+each will perform the needed unrelates.
+
+Each unrelate is done with C<force =E<gt> 1>, thus no C<try_*> actions will
+be invoked, so no unrelates can fail. All C<on_*> actions associated with the
+unrelate will be invoked, however.
+
+=head2 How is the object being unrelated?
+
+It can be seen from the above sections that it is possible for an unrelate
+operation to be triggered indirectly, either through relating to another object
+or removing an object. You may want to do something different in your
+C<try_*> or C<on_*> actions depending on what caused the unrelate.
+
+To allow you to do this, your actions associated with the unrelate will be
+passed an argument that can be referenced by C<A:source> in your callback
+parameters. This will be set to one of the following strings:
+
+=over 4
+
+=item direct
+
+This was called directly from the user, thus it can be considered a "pure"
+unrelate operation.
+
+=item relate
+
+This was invoked while attempting to relate an object already related to
+another. This is thus the call to C<unrelate()> to break the existing
+relationship.
+
+=item remove:to
+
+This is being triggered from C<remove()>, and is a result of the manager
+breaking existing relationships to the object being removed. This means that
+C<O:self> is the object being removed, and C<O:object> is an object that was
+related to it.
+
+=item remove:from
+
+This is being triggered from C<remove()>, and is a result of the manager
+breaking existing relationships from the object being removed. This means that
+C<O:object> is the object being removed and C<O:self> is the object from
+which it is being unrelated.
+
+=back
+
+This is most useful when dealing with a relationship broken as the result of
+an object being removed. To illustrate, let's say we decide to extend the
+container relationship to also track items in rooms. Say, then, that the
+sack object is being held by a creature (hence contained in the creature),
+and the creature is removed from the game. We would like to have the objects
+that the creature is holding appear in whatever room the creature was in.
+Assuming that the original C<on_extract> action is defined on the creature,
+you could it like this:
+
+    on_extract => [
+	[ 'O:self', 'mod_is_held', '-O:object->size()' ],
+	[ 'O:object', 'drop_if_removed', 'A:source', 'O:self->contained()' ],
+    ]
+
+The first callback would do as in the original example, which is to update
+the C<is_held> counter. The second callback then invokes C<drop_if_removed()>
+on the object being unrelated from the creature. This method is passed
+the C<A:source> string, plus the object that the creature itself is contained
+in (which would ostensibly be a room). The object's method could be defined
+to do this:
+
+    sub drop_if_removed {
+	my ($object, $source, $contained) = @_;
+	my $manager = $object->manager();
+	if ($source eq 'remove:to') {
+	    if ($contained) {
+		$manager->insert($contained, $object);
+	    } else {
+		# Oops, creature was in limbo, remove the object instead.
+		$manager->remove($object);
+	    }
+	}
+	1;
+    }
+
+This is the reason why C<remove()> always breaks relations to the removed
+object first, thus preserving the relationships from the removed object in
+case you wish to do exactly as we did in the example above.
+
+=head1 Inheritance
+
+=head2 Introduction
+
+Inheritance is an object relationship that is defined automatically for you
+when you create an object manager. This relationship is used in a special
+way in the Games::Object module to allow objects to inherit things from
+other objects.
+
+Inheritance can be used to create classes of objects. You could create an
+object, for example, that represents a master object for all creatures,
+then create specific creature objects that inherit a set of common
+characteristics from this one. Inheritance has the potential to reduce the
+amount of memory that your game objects use.
+
+For convenience, the object from which you are inheriting will be referred
+to as a class.
+
+The inherit relationship can be controlled like any other relationship.
+The following methods are defined for this relationship:
+
+=over 4
+
+=item inherit
+
+Make one object inherit from another. Remember that C<O:self> is the thing
+being inherited from. Thus if wish C<$object> to inherit from C<$class>,
+you would do this:
+
+    $manager->inherit($class, $object);
+
+=item disinherit
+
+Break an inheritance relationship. Example:
+
+    $manager->disinherit($object);
+
+=item inheriting_from
+
+Return the class that an object is inheriting from. In the examples above,
+this:
+
+    $manager->inheriting_from($object);
+
+would return C<$class>.
+
+=item has_inheriting
+
+Returns a list of objects that are inheriting from this one. In our example
+above, this:
+
+    my @items = $manager->has_inheriting($class);
+
+would have C<$object> as one of the array members.
+
+=item is_inheriting_from
+
+Check to see if one object is inheriting from another. In the above examples,
+this would return true:
+
+    $manager->is_inheriting_from($class, $object);
+
+=back
+
+=head2 Attribute inheritance
+
+Once an object is inheriting from another via the C<inherit()> method on the
+manager, you can inherit attributes from the class. For example,
+say you were designing a game that had lots of dragons modeled after a
+particular class, in which many attributes were shared among them. You could
+do something like this:
+
+    my $manager = Games::Object::Manager->new();
+    my $class = Games::Object->new(-id => "Class Dragon");
+    $class->new_attr(-name => "hit_points",
+		     -type => "int",
+		     -value => 50);
+    ...
+
+    my $dragon = Games::Object->new(-id => "Red Dragon");
+    $manager->inherit($class, $dragon);
+
+If you do no further processing with the C<$dragon> object, you can access
+all the attributes defined on C<$class> from here. For example, this:
+
+    my $hp = $dragon->attr("hit_points");
+
+would set C<$hp> to 50. For all intents and purposes, C<hit_points> exists
+on C<$dragon>. Even C<attr_exists()> will tell you that the attribute exists
+even though it is really getting it from C<$class>. If you really need to
+tell whether the attribute really physically exists on the object as
+opposed to being inherited, you can call C<attr_exists_here()> instead. In
+the above example, this method would return false.
+
+Inheritance ceases, however, the moment you modify the attribute. In this case,
+the attribute becomes localized to the inheriting object. If you performed a
+relative modification, it is made relative to the current value of the
+inherited attribute at the time it was modified. For example, if you did this:
+
+    $dragon->mod_attr(-name => "hit_points",
+		      -modify => -8);
+
+Then C<$dragon> will now have its own copy of C<hit_points> set to 42.
+C<attr_exists_here()> will return true. However, if at a later time you
+delete the attribute from the dragon object, it will go back to inheriting
+the attribute from the class object.
+
+You can have mutiple layers of inheritance. For example C<$class> could
+itself inherit from a larger class of objects. When you attempt to access
+an attribute on an object, it will continue checking successive inheritance
+until it finds an object with the attribute defined. This means that
+defined attributes on objects lower down on the chain will mask the values of
+those higher up the chain.
+
+It should be noted that persistent modifiers are NOT inherited. If C<$class>
+has a persistent modifier on C<hit_points> that decreased it by 1 each turn,
+C<$dragon> would see this change in the attribute until such time that it
+attempted a modify, in which case it has its own local copy that has no
+persistent modifiers on it.
+
+You can choose to prohibit objects from inheriting an attribute. In order
+to do this, set the C<ATTR_NO_INHERIT> flag on the attribute when you create
+it on the class object. It will be treated as if it does not exist. You will
+need to import this symbol into your code if you need it, since it is not
+exported by default.
+
+Also be aware that the C<ATTR_STATIC> flag is honored for inherited attributes.
+This means if the class has an attribute that is marked C<ATTR_STATIC>, and
+the inheriting object attempts to modify it, this will be treated as an error
+just as if you attempted to modify it on the class object directly.
+
+=head2 Flag inheritance
+
+Flags are inherited in the exact same way as attributes. Like attributes,
+they do not physically exist on the inheriting object until such time that
+you modify the flag value, in which case the object gets its own copy of
+the flag independent of the class.
+
+=head2 Action inheritance
+
+Actions are inherited in the exact same manner as attributes. In fact, actions
+are stored as attributes with special names.
+
+When you inherit an action, please note that C<O:self> will always refer
+to the inheriting object, NEVER the class. For all intents and purposes,
+everything acts as if the action were defined directly on the inheriting
+object.
+
+=head1 Loading and saving of object data
+
+=head2 Individual objects
+
+This is one of the more powerful features of Games::Object. This essentially
+provides the functionality for a save-game action, freeing you from having
+to worry about how to represent the data and so on.
+
+Saving the data in an object is simple. Open a file for write, and then
+call the save() method on the object:
+
+    $obj->save(-file => \*SAVEFILE);
+
+You can pass it anything that qualifies as a file, so long as it is opened
+for writing. Thus, for example, you could use an IO::File object. Essentially
+anything that can be used between <> in a print() statement is valid.
+
+You can also do this instead:
+
+    $obj->save(-filename => "object.save");
+
+In this case, it will create and open a file for you, save the data, and then
+close it again. This is useful in programs that generate object templates
+for use with the C<load()> constructor, which was covered in an earlier
+section.
+
+=head2 Managed objects
+
+A far more useful way to load and save objects is via the object manager.
+
+The Games::Object::Manager object contains a C<save()> method just like the
+Games::Object module. It is called exactly the same as well, which means you
+can do this:
+
+    $manager->save(-file => \*SAVEFILE);
+
+or this:
+
+    $manager->save(-filename => "game.save");
+
+When you save an object manager, not only will it save all the objects that
+it contains (by calling C<save()> on each), but it will also save its own
+internal settings, including things like the process list, the next available
+unique object ID, object relationships, etc. In effect, it creates a complete
+snapshot of the manager. Assuming that you're using one object manager for
+your game, you can save the game to a file with one command.
+
+You can reload saved managed data in the same way you would load an individual
+object. The Games::Object::Manager module has a C<load()> constructor that
+will completely rebuild the manager and all its objects from a file. Since
+it is called exactly like the Games::Object version, you can do this:
+
+    my $manager = Games::Object::Manager->load(-file => \*LOADFILE);
+
+or this:
+
+    my $manager = Games::Object::Manager->load(-filename => "game.save");
+
+You will then have a manager restored to the exact state it was in when it
+was first saved.
+
+You can also choose to do a "load in place", which means you wish to set an
+existing manager to the contents of a save file. In this case, simply call
+C<load()> as a method from an existing manager object.
+
+=head1 C<destroy()> vs. C<remove()>
+
+Several times in this document, the object method C<destroy()> and the
+manager method C<remove()> are mentioned, both in the doc itself and in
+some of the callback examples. What exactly is the difference between these?
+
+One difference is, assuming the object is managed, calling C<destroy()> will
+cause an exact action to be invoked. C<on_destroy()> will be called on
+the object prior to C<on_remove()>. Besides this, any differences depend on
+how you use it.
+
+If C<destroy()> is invoked from a callback, the object is managed, and you
+are not maintaining any other references to it, then other than the call
+to an additional action, there is no difference between C<destroy()> and
+C<remove()>. The object will go out of scope once the callback finishes
+executing, thus the object and its structures go away.
+
+Where a difference arises is when you call C<remove()> yourself from your
+main program, and preserve the object reference that is returned. In this
+case, even though the object is removed from the manager and will no longer
+interact with it, the object still exists. If it has persistent modifiers
+or split attributes, these will continue to update if you elect to call
+C<process()> on that object. You could even add the object to another
+manager. C<destroy()>, however, will specifically delete all the internal
+structure of the object, including attributes and actions.
+
+=head1 EXAMPLES
+
+Please refer to specific sections above for examples of use.
+
+Example data was chosen to approximate what one might program in a game, but
+is not meant to show how it B<should> be done with regards to attribute names
+or programming style. Most names were chosen out of thin air, but with at
+least the suggestion of how it might look.
+
+=head1 WARNINGS AND CAVEATS
+
+This is currently an alpha version of this module. While the latest major
+changes will hopefully be the last interface changes, there's no guarantees
+while this module is still alpha.
+
+If you look at the code, you will find some extra functionality that is not
+explained in the documentation. This functionality is NOT to be considered
+stable. There are no tests for them in the module's test suite. I left it out
+of the doc for the alpha release until I have had time to refine it. If you
+find it and want to use it, do so at your own risk. I hope to have this
+functionality fully working and documented in the beta.
+
+=head1 BUGS
+
+The load and save features are sorely in need of error checking and diagnostics.
+For instance, saving is an all-or-nothing process on the object manager, so
+your best bet is to run it through eval() to prevent the program from aborting
+on nasty errors. This will be a priority for the next version.
+
+The test suite is getting better, but still has a few gaps, largely the
+result of creeping featurism.
+
+No testing whatsoever has been done on Windows as I don't have access to
+a Windows environment (only Linux and Solaris are available to me). Some of
+the documentation is hence UNIX-centric. The module SHOULD work on Windows, as
+there is nothing UNIX-centric in the code itself. If you get it to work
+(or not) on Windows, please let me know.
+
+=head2 If you find a bug not documented above
+
+Please send email to the author of the module at Peter J. Stewart
+E<lt>p.stewart@comcast.netE<gt> with a description of the bug.
+Please include any error messages you may have received. Snippets of code
+that trigger the bug would be helpful as well.
+
+=head1 TO DO
+
+Top priority for the next set of releases will be performance testing and
+improvement (if needed). I have done very little in this area, so for realtime
+application YMMV with this module.
+
+Cloning an object would be useful functionality to have.
+
+Processing order for objects has improved, but still could use some more
+extensions.
+
+A form of "undo" functionality would be WAY cool. I have something like this
+in another (but non-CPAN) module. I just need to port it over.
+
+=head1 ACKNOWLEDGEMENTS
+
+Many, MANY thanks to Tels (http://bloodgate.com/) for helping me make some great
+improvements to this module and allowing me to pick his brain for ideas.
+
+=head1 AUTHOR
+
+B<Note to users of previous versions:> I have a (yet another) new email address.
+
+Please send all comments and bug reports to Peter J. Stewart
+E<lt>p.stewart@comcast.netE<gt>. Also feel free to drop me a comment if
+you decided to use this module for designing a game. It will help me plan
+for future functionality.
+

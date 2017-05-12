@@ -1,0 +1,9 @@
+Revision history for Perl extension Game::TextPacMonster
+
+0.01    Tue Aug 23 10:30:21 2011
+        - original version
+0.02    Tue Aug 24 10:30:21 2011
+        - test_requires typo fix
+0.03    Tue Aug 25 10:30:21 2011
+        - aim to extend platform
+

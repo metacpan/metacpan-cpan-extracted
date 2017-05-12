@@ -1,0 +1,145 @@
+Revision history for Gnuplot-Builder
+
+0.31    2015-11-29
+        [ENHANCEMENTS]
+        - Now Script, Dataset and JoinDict are Data::Focus-compatible.
+          You can access their fields by focus($obj)->get(...) etc.
+
+0.30    2015-10-18
+        [ENHANCEMENTS]
+        - These enhacements are result of pull-request (gh#2)
+        - Add experimental methods Script#set_plot(), get_plot() and delete_plot().
+
+0.29    2015-10-12
+        [ENHANCEMENTS]
+        - These enhacements are result of pull-request (gh#2)
+        - Add "output" option to Script#run_with() method.
+        - Add "no_stderr" option to Script#plot_with(),
+          splot_with(), multiplot_with() and run_with() methods.
+        - Add $Gnuplot::Builder::Process::NO_STDERR option.
+        - Minor improvements to documentation.
+
+0.28    2015-04-10
+        [ENHANCEMENTS]
+        - Add $Gnuplot::Builder::Process::ENCODING option.
+
+0.27    2014-12-20
+        [ENHANCEMENTS]
+        - JoinDict: Add separator(), get_all_keys(), get_all_values() and set_all() methods.
+          Add filter and validator options. Add joind() exportable function.
+        - PartiallyKeyedList: Add get_all_keys() method.
+        - Add Gnuplot::Builder::Template module.
+
+0.26    2014-11-09
+        [INCOMPATIBLE API CHANGE]
+        - Experimental methods Dataset#set_join() and delete_join()
+          are now deprecated. Use JoinDict instead. Sorry about that.
+        [ENHANCEMENT]
+        - Add Gnuplot::Builder::JoinDict to replace set_join() feature.
+        - Script#set() and Dataset#set() now officially support blessed objects
+          for option values.
+        - Add PartiallyKeyedList#get_all_values() method.
+        [DOCUMENTATION]
+        - Document that PartiallyKeyedList#get_at() method returns the value
+          in scalar context.
+
+0.25    2014-10-27
+        [ENHANCEMENT]
+        - Add Gnuplot::Builder::Dataset#set_join() and delete_join() methods.
+          This is an experimental feature for now.
+
+0.24    2014-10-12
+        [CHANGE]
+        - Change the default value of $Gnuplot::Builder::Process::MAX_PROCESSES from 10 to 2.
+          10 was too large because gnuplot is CPU-intensive.
+        [ENHANCEMENT]
+        - Add $Gnuplot::Builder::Process::ASYNC pacakge variable.
+        - Add Gnuplot::Builder::Process->wait_all() method.
+          It is exported as gwait() by Gnuplot::Builder.
+        [DOCUMENTATION]
+        - Add "DEBUGGING TIPS" section.
+
+0.23    2014-10-05
+        [ENHANCEMENT]
+        - Add $Gnuplot::Builder::Process::TAP package variable. This is useful for debugging.
+        - Add Gnuplot::Builder::Tap module. This is even more useful for debugging.
+        [DOCUMENTATION]
+        - Comment about gnuplot 4.6.6.
+
+0.22    2014-08-17
+        [PACKAGING]
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.21    2014-08-14
+        [ENHANCEMENT]
+        - Add $Gnuplot::Builder::Process::PAUSE_FINISH option parameter.
+          This helps create fully functional plot windows, but it can cause
+          never-ending gnuplot processes in some cases. Use with care.
+        - Now Gnuplot::Builder::Process::* options can be set via environment
+          variables.
+        [DOCUMENTATION]
+        - Update SYNOPSIS of Gnuplot::Builder::Script.
+        - Add section about plot windows to Gnuplot::Builder. It's really tricky.
+
+0.20    2014-03-17
+        [API CHANGES]
+        - Add multiplot(), multiplot_with(), run(), run_with() methods to Script.
+        [DEPENDENCY CHANGES]
+        - Drop dependency on Guard.
+        - Add dependency on Try::Tiny.
+
+0.15    2014-03-09
+        [API CHANGES]
+        - Script, Dataset: you can now call get_option() method in scalar context.
+          It returns the first value for the option name, or undef if the option
+          is empty. It used to return the number of values in some cases, but
+          this behavior is modified.
+
+0.14    2014-03-09
+        [API CHANGES]
+        - Mostly backward-compatible API changes.
+        - Script, Dataset now have get_parent() method for better consistency
+          with other methods. parent() method is deprecated, but supported for
+          backward-compatibility.
+        - Add set(), setq() and unset() methods to Dataset as aliases of
+          *_option() methods for better symmetry to Script API.
+        [BUG FIX]
+        - Script, Dataset: set_parent() now uses blessed() function to check
+          the argument. It's safer.
+        [DOCUMENTATION]
+        - Mention Gnuplot::Builder::Wgnuplot.
+        - Improve SYNOPSIS for Dataset.
+
+0.13    2014-03-02
+        - Project-local update. Fix output of
+          Process::MockTool::receive_from_builder().
+
+0.12    2014-03-02
+        [BUG FIX]
+        - Script plotting methods: if async => 1 and the gnuplot
+          process writes large data to STDOUT, the process wouldn't
+          finish because it exhausts the write buffer. This is fixed
+          now that the output is redirected to the null device if
+          async => 1.
+
+0.11    2014-02-24
+        - Now Gnuplot::Builder inherits Exporter (instead of importing import()),
+          because I want to call export_to_level() on that.
+
+0.10    2014-02-24
+        - Add some easy-to-type functions to Gnuplot::Builder. They are exported by default.
+        - POD update on Gnuplot::Builder.
+
+0.03    2014-02-24
+        - No change to the code.
+        - OK, I give up giving all modules the same version number.
+          Now only Gnuplot::Builder has the version. Others just don't have any version.
+
+0.02    2014-02-24
+        - No change to the code.
+        - Now version numbers refer directly to $Gnuplot::Builder::Version::VERSION.
+          Using an Exported function seemed to mess up something in CPAN...
+
+0.01    2014-02-23
+        First version, released on an unsuspecting world.
+

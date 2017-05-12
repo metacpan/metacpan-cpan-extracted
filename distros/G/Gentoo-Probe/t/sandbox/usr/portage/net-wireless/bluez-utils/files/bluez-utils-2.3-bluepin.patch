@@ -1,0 +1,23 @@
+--- bluez-utils-2.3/scripts/bluepin	2003-03-20 05:58:14.000000000 +0000
++++ bluez-utils-2.3/scripts/bluepin	2003-09-19 12:52:33.301301864 +0100
+@@ -30,7 +30,8 @@
+ 
+ # Set X display before initializing GTK
+ set_display()
+-
++import pygtk
++pygtk.require("1.2")
+ from gtk import *
+ 
+ # Dialog Class
+@@ -119,8 +120,8 @@
+ 	mainloop()
+ 	return dlg.result
+ 
+-def main(*args):
+-	if len(sys.argv) < 2:
++def main():
++	if len(sys.argv) < 3:
+ 		print "ERR"
+ 		sys.exit()
+ 	

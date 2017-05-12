@@ -1,0 +1,3 @@
+graph { flow: 90; }
+
+[ Left ] --> { end: left; start: left; } [ Right ]

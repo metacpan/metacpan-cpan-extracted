@@ -1,0 +1,127 @@
+<HTML>
+<HEAD>
+<TITLE>Searching APStracts</TITLE>
+</HEAD>
+<BODY>
+<H1>How to search through the online APStracts database</H1>
+
+<p>Send a message to apsearch@usa.healthnet.org with the body
+containing the search command.  For example:
+
+<p>SEARCH APS97 cardiac muscle
+
+<p>will search for a 1997 physiological abstract containing the words
+'cardiac' and muscle, while
+
+<p>SEARCH APS95 cardiac or heart
+
+<p>will search for a 1995 abstract containing either the word
+'cardiac' OR the word 'heart'.
+
+<p>See <A HREF=http://www.uth.tmc.edu/apstracts/1996/search.html>the
+APStract online help</A> for info on more complicated queries, like
+"SEARCH APS96 smooth not lung".
+
+<p>On each search, you can search either the 1995, 1996, or the 1997
+database by selecting specifying either APS95, APS96, or APS97 on the
+command-line.
+
+<p>After submitting your search, you will receive an e-mail message
+back containg a list of URL's which match your query.  You can follow
+those URL's by following the directions below.
+
+<p>You can also use the directions below to browse the APStracts web
+page, which sorts all of the abstracts by journal and by month.
+Simply send a message to apsearch@usa.healthnet.org with the body:
+
+<p>GET http://www.uth.tmc.edu/apstracts/
+
+<H1>How to use the GetWeb MailBot server</H1>
+
+<p>This software is currently in beta testing.  Please report any
+problems to getweb-admin@usa.healthnet.org.
+
+<p>Please note all requests are logged; we cannot guarantee that your
+requests will remain private.
+
+<p>To request a document from the World Wide Web, send a message to
+apsearch@usa.healthnet.org with the body containing one or more requests
+like:
+
+<p>GET url
+
+<p>Where url is the URL of the document you request.  If the message
+contains more than one request, separate each request with a blank
+line.
+
+<p>Here is a message which would fetch the HealthNet home page:
+
+<p><code>GET http://www.healthnet.org</code>
+
+<p>After recieving the above message, the GetWeb server would
+format the HealthNet home page as human-readable plain-text and
+send it to you.
+
+<p>You can enclose your commands in a begin/end block, or comment out
+lines with '#':
+
+<PRE>
+This preamble will not be processed by the MailBot...
+begin
+GET http://www.healthnet.org
+# ...neither will this comment
+end
+...and neither will this signature.
+</PRE>
+
+<p>A <A HREF="HOTLIST.html">hotlist</A> of URLs which we consider
+especially interesting is available.
+
+<p>Each hypertext link is represented by a number in brackets.
+Suppose you get a message like this from a GetWeb server:
+
+<hr>
+<PRE>Some important conferences carried by SatelLife include:
+
+     * ProMED: Program for Monitoring Emerging Diseases[1]
+     * ProCAARE: Program for Collaboration Against AIDS[2]
+     * E-Drug: Essential Drugs[3]
+
+** References from this document **
+[1] http://www.healthnet.org/programs/promed.html
+[2] http://www.healthnet.org/programs/procaare.html
+[3] http://www.healthnet.org/programs/edrug.html</PRE>
+<hr>
+
+To get more information about ProCAARE, you would look up link 2 at
+the bottom of the message to find out the URL is
+http://www.healthnet.org/programs/procaare.html.  You would then send
+a message to the GetWeb server:
+
+<p><code>GET http://www.healthnet.org/programs/procaare.html</code>
+
+<p>Follow the links below for more help.
+
+<p>How can I:
+<UL>
+<LI><A HREF="SEARCHING.html">search the Web?</A></LI>
+<LI><A HREF="BREAK.html">break a long command between multiple lines?</A></LI>
+<LI><A HREF="FOLLOWING.html">follow chains of linked documents with a single command?</A></LI>
+<LI><A HREF="FORMAT.html">request raw HTML source rather than formatted text?</A></LI>
+<LI><A HREF="DELIVER.html">configure how documents are delivered?</A></LI>
+<LI><A HREF="AGORA.html">use Agora (w3mail) commands?</A></LI>
+<LI><A HREF="MIME.html">decode binary files?</A></LI>
+</UL>
+
+<p><A HREF="QUOTA.html">How quotas limit server load</A>
+<p><A HREF="PROMED.html">Accessing ProMED archives</A>
+<p><A HREF="INFO.html">About the GetWeb MailBot server software</A>
+
+<p>Also see the <A HREF=http://www.healthnet.org/dist/getweb/>GetWeb
+home page.</A>
+
+<p>Send bugs or suggestions for improvement to
+getweb-admin@usa.healthnet.org.
+
+</BODY>
+</HTML>

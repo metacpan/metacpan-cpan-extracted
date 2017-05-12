@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<herd>no-herd</herd>
+	<maintainer>
+		<email>seemant@gentoo.org</email>
+		<name>Seemant Kulleen</name>
+		<description>I'll maintain this for now.</description>
+	</maintainer>
+	<maintainer>
+		<email>dragonheart@gentoo.org</email>
+		<name>Daniel Black</name>
+		<description>Daniel is also the for-now maintainer.</description>
+	</maintainer>
+	<longdescription>no-ip.com dynamic DNS updater</longdescription>
+</pkgmetadata>

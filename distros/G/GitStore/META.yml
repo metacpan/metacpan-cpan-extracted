@@ -1,0 +1,55 @@
+---
+abstract: 'Git as versioned data store in Perl'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  Exporter: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  lib: '0'
+  parent: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GitStore
+provides:
+  GitStore:
+    file: lib/GitStore.pm
+    version: '0.17'
+  GitStore::Revision:
+    file: lib/GitStore/Revision.pm
+    version: '0.17'
+  MooseX::Storage::IO::GitStore:
+    file: lib/MooseX/Storage/IO/GitStore.pm
+    version: '0.17'
+requires:
+  Carp: '0'
+  DateTime: '0'
+  Git::PurePerl: '0'
+  List::Util: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Path::Class: '0'
+  Path::Tiny: '0'
+  Storable: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/perl-git-store/issues
+  homepage: https://github.com/yanick/perl-git-store
+  repository: https://github.com/yanick/perl-git-store.git
+version: '0.17'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Chris Forbes <chrisf@ijw.co.nz>'

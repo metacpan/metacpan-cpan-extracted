@@ -1,0 +1,32 @@
+---
+abstract: 'Resolve Brazilian city data for a given CEP'
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires:
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-CEP
+recommends:
+  Text::CSV_XS: '0'
+requires:
+  File::ShareDir: '0'
+  Moo: '1.000007'
+  MooX::Types::MooseLike: '0.16'
+  Text::CSV: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/creaktive/Geo-CEP/issues
+  homepage: https://github.com/creaktive/Geo-CEP
+  repository: git://github.com/creaktive/Geo-CEP.git
+version: '1.0'
+x_contributors:
+  - 'Blabos de Blebe <blabos@blabos.org>'
+  - 'Sergey Romanov <sromanov-dev@yandex.ru>'

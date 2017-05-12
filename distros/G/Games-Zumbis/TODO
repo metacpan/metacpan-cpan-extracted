@@ -1,0 +1,12 @@
+TODO:
+-Have Dist::Zilla check for 
+   SDL::Config->has('SDL_image');
+   SDL::Config->has('SDL_mixer');
+
+- Add a check at start for OGG and disable sound if not available
+  my $init_flags = SDL::Mixer::init(MIX_INIT_OGG);                                                                                               
+                if (!($init_flags & MIX_INIT_OGG)) {                                                                                                           
+                        die "OGG support needed to be compiled in SDL::Mixer SDL module. Disabling sound.";                                                    
+                } 
+
+- Clean up animation for bullet speed

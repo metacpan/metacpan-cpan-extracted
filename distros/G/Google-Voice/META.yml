@@ -1,0 +1,26 @@
+---
+abstract: 'Easy interface for google voice'
+author:
+  - 'Glen Hinkle <tempire@cpan.org>'
+build_requires:
+  Test::Mojo: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Google-Voice
+requires:
+  IO::Socket::SSL: 1.37
+  Mojo::Base: 0
+  Mojo::ByteStream: 0
+  Mojo::JSON: 0
+  Mojo::UserAgent: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+version: 0.06

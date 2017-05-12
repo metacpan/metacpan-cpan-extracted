@@ -1,0 +1,13 @@
+CHANGES
+MANIFEST                                 This list of files
+MANIFEST.SKIP
+Makefile.PL
+README.md
+bin/gearmand
+lib/Gearman/Server.pm
+lib/Gearman/Server/Client.pm
+lib/Gearman/Server/Job.pm
+lib/Gearman/Server/Listener.pm
+t/00-use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

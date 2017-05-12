@@ -1,0 +1,51 @@
+TYPEMAP
+
+GCX *		T_GCX
+INGC *		T_INGC
+long double     T_LONG_DOUBLE
+POINT *         T_POINT
+INT_NOT_R       T_INT_NOT_R
+
+INPUT
+
+T_GCX
+        if( !( SvROK( $arg ) && SvOBJECT( SvRV( $arg ) ) && ( SvSTASH( SvRV( $arg ) ) == gv_stashpv(\"Geo::Calc::XS::\", GV_ADD) || sv_derived_from( $arg, \"Geo::Calc::XS\" ) ) ) )
+          croak (\"object is not of type Geo::Calc::XS\");
+        $var = (GCX *)SvPVX( SvRV( $arg ) );
+
+T_LONG_DOUBLE
+        $var = (long double) SvNV($arg)
+
+T_POINT
+        POINT point;
+        if( SvROK( $arg ) && SvOBJECT( SvRV( $arg ) ) && ( SvSTASH( SvRV( $arg ) ) == gv_stashpv(\"Geo::Calc::XS::\", GV_ADD) || sv_derived_from( $arg, \"Geo::Calc::XS\" ) ) ) {
+            GCX * self2 = (GCX *)SvPVX( SvRV( $arg ) );
+            point.lat = self2->latitude;
+            point.lon = self2->longitude;
+            $var = &point;
+        } else if ( SvROK( $arg ) && SvTYPE( SvRV( $arg ) ) == SVt_PVHV ) {
+            SV **sv = hv_fetch((HV *) SvRV($arg), \"lat\", strlen(\"lat\"), 0);
+            if (! sv) {
+                croak(\"${Package}::$func_name() -- expected lat parameter\");
+            }
+            point.lat = SvNV(*sv);
+            sv = hv_fetch((HV *) SvRV($arg), \"lon\", strlen(\"lon\"), 0);
+            if (! sv) {
+                croak(\"${Package}::$func_name() -- expected lon parameter\");
+            }
+            point.lon = SvNV(*sv);
+            $var = &point;
+        } else {
+            croak(\"${Package}::$func_name() -- expected a Geo::Calc::XS or HV reference\");
+        }
+
+T_INT_NOT_R
+        if (SvOK($arg) && SvROK($arg)) {
+            croak(\"${Package}::$func_name() -- expected integer not reference\");
+        }
+        $var = ($type) SvIV($arg);
+
+OUTPUT
+
+T_LONG_DOUBLE
+        sv_setnv($arg, (long double)$var);

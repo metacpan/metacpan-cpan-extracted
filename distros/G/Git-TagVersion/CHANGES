@@ -1,0 +1,50 @@
+==================================================
+Changes from 2014-11-29 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.01 at 2015-11-29 09:40:30 +0000
+-----------------------------------------
+
+  Change: 705d4169c3a0bd2053fce0d63073953d2ef64fc3
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-29 10:39:30 +0000
+
+    small fixes 
+
+  Change: c728b138c08881a80b7e83e5d20e7776589ec3ca
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-29 10:31:37 +0000
+
+    New CLI interface and changelog generation
+
+    The CLI Interface has change to a format with subcommands using
+    MooseX::App::Cmd.
+
+    A new command 'changelog' for generating changlogs has been added. 
+
+  Change: 187822d5ab2f6622123b5cc62c8c3bab963d0258
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-16 09:22:38 +0000
+
+    change email 
+
+-----------------------------------------
+version 1.00 at 2015-11-10 18:04:09 +0000
+-----------------------------------------
+
+  Change: 6fa16e1927e3f1f8d1de74cfa7c9cfdb5edfd6db
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-10 19:04:09 +0000
+
+    some adjustments for first release 
+
+  Change: 8869b02366844f040d52628b3f22d67d9a419eec
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-10 15:06:32 +0000
+
+    initial checkin 
+
+================
+End of releases.
+================

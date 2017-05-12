@@ -1,0 +1,42 @@
+#! perl
+
+package some_plugin;
+
+use Gtk2::CV::Plugin;
+
+sub new_imagewindow {
+   my ($self, $image) = @_;
+
+   warn "new_imagewindow(@_)\n";
+}
+
+sub new_schnauzer {
+   my ($self, $schnauzer) = @_;
+
+   warn "new_schnauzer(@_)\n";
+
+   $schnauzer->signal_connect (key_press_event => sub {
+      my ($self, $event) = @_;
+      my $key = $_[1]->keyval;
+      my $state = $_[1]->state;
+   
+      my $ctrl = grep $_ eq "control-mask", @{$_[1]->state};
+      if ($ctrl && $key == $Gtk2::Gdk::Keysyms{c}) {
+         warn "pressed ctrl-c\n";
+      } else {
+         return 0;
+      }
+
+      1
+   });
+
+   $schnauzer->signal_connect (popup => sub {
+      my ($self, $menu, $cursor, $event) = @_;
+
+      $menu->append (my $item = new Gtk2::MenuItem "select me");
+      $item->signal_connect (activate => sub { warn "activated menu\n" });
+   });
+}
+
+1
+

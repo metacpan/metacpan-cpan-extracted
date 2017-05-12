@@ -1,0 +1,41 @@
+Geo::Postcodes::NO::LESMEG
+-------------------------------------------------------------
+* Lei av stadig å måtte skrive inn poststed, når du vet at postnummeret
+  du allerede har skrevet inn uansett entydig bestemmer det?
+
+* Er kundene dine lei av det samme?
+
+* Har du ansatte, og lurer på hvilken skattekommune de hører hjemme i?
+
+Hvis svaret på minst ett av disse spørsmålene var ja, er denne modulen
+verdt en titt.
+
+Geo::Postcodes::NO tilbyr den offisielle (Posten Norge BA) mappingen mellom
+postnumre og poststeder. I tillegg kan man få vite hvilken kommune og fylke
+postnummeret tilhører. Kommunen gis både som nummer (som brukt av
+skattemyndighetene) og navn, mens fylket kun gis som navn.
+
+Geo::Postcodes::NO kan brukes av produksjonskode for å hente ut poststedet,
+slik at brukerne kun behøver å oppgi postnummeret sitt. Feilstavede poststeder 
+tilhører fortiden.
+
+Geo::Postcodes::NO støtter objektorientering (postnummerobjekter), men kan også
+brukes som prosedyrer hvis man foretrekker det.
+
+Hvis man kun er ute etter poststedet til et gitt postnummer, er prosedyre-
+versjonen å foretrekke. Ellers anbefales den objektorienterte versjonen.
+
+Bruksområder
+------------
+Adresseregister, der man bruker postnummer; og slipper å oppgi og lagre
+poststedet. Ved visning av adresser henter man ut poststedet fra denne
+modulen. Ved inntasting av postnumre kan man få automatisk visning av
+poststedet ved hjelp av AJAX (i praksis heller AHAH) i sanntid.
+
+Oppdatert oversikt
+------------------
+Jeg skal forsøke å å holde postnummerlisten oppdatert, men det er mulig å
+gjøre dette selv ved å taste én kommando (selv om jeg ikke anbefaler det).
+Se filen "./misc/README" for detaljene. 
+
+Arne Sommer - perl@bbop.org

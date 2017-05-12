@@ -1,0 +1,8 @@
+# In V 1.04 this would output a node called 'node_52_2node_52_3'.
+# This bug is fixed in V 1.05. See notes in the CHANGES file.
+
+digraph graph_52
+{
+node_52_1 -> node_52_2
+node_52_3
+}

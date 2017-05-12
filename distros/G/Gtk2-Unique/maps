@@ -1,0 +1,5 @@
+UNIQUE_TYPE_APP             UniqueApp            GObject   Gtk2::UniqueApp
+UNIQUE_TYPE_BACKEND         UniqueBackend        GObject   Gtk2::UniqueBackend
+UNIQUE_TYPE_COMMAND         UniqueCommand        GEnum     Gtk2::UniqueCommand
+UNIQUE_TYPE_RESPONSE        UniqueResponse       GEnum     Gtk2::UniqueResponse
+UNIQUE_TYPE_MESSAGE_DATA    UniqueMessageData    GBoxed    Gtk2::UniqueMessageData

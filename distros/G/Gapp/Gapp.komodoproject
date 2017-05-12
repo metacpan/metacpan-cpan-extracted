@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="dc9c5aab-1c3d-4712-9e5c-fd98a5aba9cf" kpf_version="5" name="Gapp.komodoproject">
+<preference-set idref="dc9c5aab-1c3d-4712-9e5c-fd98a5aba9cf">
+  <boolean id="import_live">1</boolean>
+  <string relative="path" id="perlExtraPaths">lib</string>
+  <string id="phpExtraPaths"></string>
+</preference-set>
+</project>

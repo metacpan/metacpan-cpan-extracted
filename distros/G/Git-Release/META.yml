@@ -1,0 +1,34 @@
+---
+abstract: 'Release Process Manager'
+author:
+  - 'Yo-An Lin <cornelius.howl {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Git-Release
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::Basename: 0
+  File::Path: 0
+  File::Spec: 0
+  Getopt::Long: 0
+  Git: 0
+  Moose: 0
+  Net::Redmine: 0
+  Term::ANSIColor: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.corneltek.com/perl/Git-Release.git
+version: 0.05

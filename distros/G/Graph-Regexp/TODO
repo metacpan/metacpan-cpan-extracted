@@ -1,0 +1,42 @@
+
+* support /a(1|0)+/ aka matching more than one time
+
+* /(foo){1,2}/
+* /(foo|bar){1,2}/
+* /((foo|bar)){1,2}/
+
+* Removing of always matching nodes should only be done on user request
+  for a "simplified" graph:
+
+* we could completely remove STAR() and anything below it:
+  (it will always match)
+
+	# perl -Mre=debug -e '/a1*/'
+	Freeing REx: `","'
+	Compiling REx `a1*'
+	size 6 Got 52 bytes for offset annotations.
+	first at 1
+	rarest char a at 0
+	   1: EXACT <a>(3)
+	   3: STAR(6)
+	   4:   EXACT <1>(0)
+	   6: END(0)
+
+* we could completely remove CURLYM where (left == 0) and anything below it:
+  (it will always match)
+
+	# perl -Mre=debug -e '/a(1|o)*/'
+	Freeing REx: `","'
+	Compiling REx `a(1|o)*'
+	size 17 Got 140 bytes for offset annotations.
+	first at 1
+	rarest char a at 0
+	   1: EXACT <a>(3)
+	   3: CURLYM[1] {0,32767}(17)
+	   7:   BRANCH(10)
+	   8:     EXACT <1>(15)
+	  10:   BRANCH(13)
+	  11:     EXACT <o>(15)
+	  15:   SUCCEED(0)
+	  16:   NOTHING(17)
+	  17: END(0)

@@ -1,0 +1,9 @@
+digraph graph_05
+{
+	rankdir = "LR"
+
+	node[color = "magenta"]
+	A -> B -> C -> D -> A
+	A -> C
+	B -> D
+}

@@ -1,0 +1,88 @@
+Revision history for Perl module Geo::GoogleEarth::Pluggable
+
+TODO
+  - Anybody using IO::Scalar should consider porting to IO::String, which is smaller, lighter, and is implemented to be perfectly compatible with regular seekable filehandles.
+
+my $look=$document->LookAt(datetime=>$datetime || [$datetime1, $datetime2]); #DateTime objects or W3C dateTime formated strings
+
+<LookAt>
+  <gx:TimeStamp><when>2011-05-24T14:08:00Z</when></gx:TimeStamp>
+</LookAt>
+
+<LookAt>
+  <gx:TimeSpan>
+    <begin>2011-05-24T14:07:59Z</begin>
+    <end>2011-05-24T14:08:00Z</end>
+  </gx:TimeSpan>
+</LookAt>
+
+0.15 2011-01-17
+  - Fixed HTTP header incoding for Content-Disposition - same as RT73369
+
+0.14 2011-06-25
+  - Added Package::New capabilities
+  - Dropped core requires from Makefile.PL
+  - Added LookAt capability
+    - Added Geo::GoogleEarth::Pluggable::LookAt package
+    - Added Folder->LookAt constructor
+    - Added Base->lookat property
+  - Updated NetworkLink to support refreshInterval
+  - Updated Documentation
+    - Geo/GoogleEarth/Pluggable/Plugin/Style.pm
+
+0.13 2010-12-27
+  - Updated point_normalize to normalize strings with whitespace and look like numbers as white space is the delimiter in the "cooridnates" element.
+  - Updated Geo::GoogleEarth::Pluggable::Contrib::Point->subnode as well but why is this not using the point_normalize?
+
+0.12 2010-12-26
+  - Added snippet capability
+  - Added Snippet example
+  - Added tests
+
+0.11 2010-08-20
+  - Removed desiredCompressionLevel setting due to bug RT54827 - RT60563
+  - Added kmz option to all example scripts
+  - Added example scripts
+
+0.10 2010-04-19
+  - Added description support in Folder and Placemark
+
+0.09 2009-11-27
+  - Added StyleMap support
+  - Moved id and url methods from Style to StyleBase module
+
+0.08 2009-11-26
+  - Modified document->render method to be a wrapper around folder->node
+
+0.07 2009-11-16
+  - Cleaned up Document->render and Folder->node methods
+
+0.06 2009-11-15
+  - Minor updates to support Geo::GoogleEarth::Pluggable::Plugin::Styles
+
+0.05 2009-11-11
+  - Use XML::LibXML to generate XML via XML::LibXML::LazyBuilder
+  - Implemented IconStyle 
+
+0.04 2009-11-10 - Happy Birthday Marines!
+  - Started work on Style objects and exceeded the capabilites of XML::Simple
+
+0.03 2009-11-02
+  - Changed setting the "packages" property to using the pushPackages method which now allows testing with constructing the Folder object with Folder(packages=>[MyPackage])
+  - Removed "use blib;" from Folder object.
+
+0.02 2009-10-29
+  - Updated prerequisites in Makefile.PL
+  - Removed Address method (does not appear to work anyway)
+  - Removed Address object
+  - Moved LinearRing method to Default plugin
+  - Moved LinearRing object to Contrib folder
+  - Added LinearRing example
+  - Added LineString method to Default plugin
+  - Added LineString object to Contirb folder
+  - Added LineString example
+  - Added default altitude for hash in point_stringify {alt=>0}
+  - Added all packages to test
+
+0.01 2009-10-28
+  - original version

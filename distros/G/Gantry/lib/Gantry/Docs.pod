@@ -1,0 +1,81 @@
+=head1 NAME
+
+Gantry::Docs - Table of Contents for Gantry documentation 
+
+=head1 DESCRIPTION
+
+This is a list of the Gantry documentation pages.
+
+=over 4
+
+=item L<Gantry::Docs::About>
+    About
+
+Describes the history, features, and motivation behind Gantry.
+
+=item L<Gantry::Docs::DBConn>
+    Database connection information
+
+Explains how database connection information flows from app configuration
+to DBI.  The process should be seamless for app developers, but if you
+need to work on the engines or add support for ORMs, you may find
+useful information here.
+
+=item L<Gantry::Docs::FAQ>
+    FAQ
+
+A list of questions we think people are likely to ask along with answers.
+This is not a philosphical document, it is filled with code examples.
+
+=item L<Gantry::Docs::QuickStart> 
+    QuickStart
+
+If you are new Gantry and want to get your first app running with a minimum
+of fuss, this is for you.
+
+=item L<Gantry::Docs::Tutorial>
+    Tutorial
+
+More detailed than the Quick Start, this document walks through building
+a simple application with Gantry.
+
+=item L<Gantry::Docs::Why>
+    Why
+
+Explains you should use a framework at all, whether it is Gantry or
+one of the many others.
+
+=back
+
+=head1 JOIN US
+
+Please visit http://www.usegantry.org for project information, 
+sample applications, documentation and mailing list subscription instructions.
+
+Web:
+L<http://www.usegantry.org>
+
+Mailing List:
+L<http://www.usegantry.org/mailinglists/>
+
+IRC:
+#gantry on irc.slashnet.org
+
+=head1 AUTHOR
+
+Tim Keefer <tkeefer@gmail.com>
+
+Phil Crow <philcrow2000@yahoo.com>
+
+Gantry was branched from Krkit version 0.16 
+Sat Jun 11 15:27:28 CDT 2005
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2005-6, Tim Keefer.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

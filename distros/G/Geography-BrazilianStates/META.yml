@@ -1,0 +1,39 @@
+---
+abstract: 'get information of Brazilian States'
+author:
+  - '@sophia.jp>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geography-BrazilianStates
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Geography::BrazilianStates:
+    file: lib/Geography/BrazilianStates.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/yuzoiwasaki/Geography-BrazilianStates/issues
+  homepage: https://github.com/yuzoiwasaki/Geography-BrazilianStates
+  repository: git://github.com/yuzoiwasaki/Geography-BrazilianStates.git
+version: '0.01'
+x_contributors:
+  - 'yuzoiwasaki <a0556017@sophia.jp>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

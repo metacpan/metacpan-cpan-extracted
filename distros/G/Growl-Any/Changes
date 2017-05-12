@@ -1,0 +1,32 @@
+Revision history for Perl extension Growl::Any
+
+0.09 2011-04-21 18:00:00
+        - Use environment variable $GROWL_ANY_DEFAULT_BACKEND to specify interface.
+
+0.08 2011-04-20 12:00:00
+        - Die when failed to post.
+
+0.07 2011-04-20 12:00:00
+        - Added 'parent' to test_requires.
+
+0.06 2011-03-10 12:00:00
+        - Fixed broken MANIFEST.
+
+0.06 2011-03-08 02:22:02
+        - Avoid test with "A password is required" in Net::Growl.
+
+0.05 2011-02-21 13:00:39
+        - Split into submodules for maintaining (gfx)
+        - Add Null backend for the last fallback (gfx)
+
+0.04    Mon Dec 27 00:58:00 2010
+        - add Cocoa::Growl
+
+0.03    Tue Oct 19 14:00:51 2010
+        - add dependency for LWP::UserAgent
+
+0.02    Mon Oct 18 10:36:35 2010
+        - add dependency for File::Where
+
+0.01    Thu Mar 19 15:23:57 2009
+        - original version

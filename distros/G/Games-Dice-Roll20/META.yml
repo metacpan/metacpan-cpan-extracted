@@ -1,0 +1,34 @@
+---
+abstract: "Simulate dice rolls with Roll20's syntax"
+author:
+  - 'Mario Domgoergen C<< <mario@domgoergen.com> >>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-Dice-Roll20
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  List::Util: '0'
+  Moo: '0'
+  POSIX: '0'
+  Parse::RecDescent: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mdom/Games-Dice-Roll20/issues
+  homepage: https://github.com/mdom/Games-Dice-Roll20
+  repository: https://github.com/mdom/Games-Dice-Roll20.git
+version: '0.03'
+x_contributors:
+  - 'Mario Domgoergen <mdom@taz.de>'

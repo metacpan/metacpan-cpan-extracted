@@ -1,0 +1,57 @@
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%right  '^'
+
+%%
+input:  #empty
+        |   input line  { push(@{$_[1]},$_[2]); $_[1] }
+;
+
+line:       '\n'                { ++$_[0]->YYData->{LINE}; $_[1] }
+        |   exp '\n'            { ++$_[0]->YYData->{LINE}; $_[1] }
+		|	error '\n'  { ++$_[0]->YYData->{LINE}; $_[0]->YYErrok }
+;
+
+exp:        NUM
+        |   VAR                 { $_[0]->YYData->{VARS}{$_[1]} }
+        |   VAR '=' exp         { $_[0]->YYData->{VARS}{$_[1]}=$_[3] }
+        |   exp '+' exp         { $_[1] + $_[3] }
+        |   exp '-' exp         { $_[1] - $_[3] }
+        |   exp '*' exp         { $_[1] * $_[3] }
+        |   exp '/' exp         { $_[1] / $_[3] }
+        |   '-' exp %prec NEG   { -$_[2] }
+        |   exp '^' exp         { $_[1] ** $_[3] }
+        |   '(' exp ')'         { $_[2] }
+;
+
+%%
+
+sub Error {
+    my($parser)=shift;
+
+	push(@{$parser->YYData->{ERRLINES}}, $parser->YYData->{LINE});
+}
+
+sub Lexer {
+    my($parser)=shift;
+
+        exists($parser->YYData->{LINE})
+    or  $parser->YYData->{LINE}=1;
+
+        $parser->YYData->{INPUT}
+    or  return('',undef);
+
+    $parser->YYData->{INPUT}=~s/^[ \t]//;
+
+    for ($parser->YYData->{INPUT}) {
+        s/^([0-9]+(?:\.[0-9]+)?)//
+                and return('NUM',$1);
+        s/^([A-Za-z][A-Za-z0-9_]*)//
+                and return('VAR',$1);
+        s/^(.)//s
+                and return($1,$1);
+    }
+}
+

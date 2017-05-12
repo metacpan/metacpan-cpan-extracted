@@ -1,0 +1,4 @@
+[ ] --> [ Bonn ] -- [ train ] --> [ Ulm ] -- [ car ] --> [ Hof ]
+
+[ ] -- buy --> [ train ]
+[ ] -- rent --> [ car ]

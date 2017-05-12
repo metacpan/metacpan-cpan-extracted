@@ -1,0 +1,143 @@
+#!/usr/local/bin/perl
+
+# (X)Emacs mode: -*- cperl -*-
+
+=head1 DESCRIPTION
+
+No description
+
+=head1 EXAMPLES
+
+Z<>
+
+=head1 BUGS
+
+Z<>
+
+=head1 REPORTING BUGS
+
+Log them in gnats.
+
+=head1 AUTHOR
+
+Martyn J. Pearce C<fluffy@cpan.org>
+
+=head1 SEE ALSO
+
+Z<>
+
+=cut
+
+# Pragmas -----------------------------
+
+require 5.005_62;
+use strict;
+use warnings;
+
+# Utility -----------------------------
+
+use Fatal              1.02 qw( :void close open seek sysopen );
+use Fcntl              1.03 qw( :DEFAULT );
+use Log::Info          1.09 qw( :DEFAULT :default_channels :log_levels );
+
+# Package Master
+use Getopt::Plus qw( :opt_types :exit_codes );
+
+# Constants ---------------------------
+
+my ($arg1, $arg2, $bob);
+my $ERR_WEIRD;
+
+my $RSE;
+use constant OPTIONS => [{
+                          names     => [qw( arg1 a )],
+                          type      => OPT_STRING,
+                          arg_reqd  => 1,
+                          mandatory => 0,
+                          summary   => 'No meaning',
+                          desc      => 'No description',
+                          default   => 'foo',
+                          linkage   => \$arg1,
+                         },
+                         {
+                          names     => [qw( arg2 A )],
+                          type      => OPT_FLOAT,
+                          arg_reqd  => 0,
+                          default   => 1.5,
+                          linkage   => \$arg2,
+                         },
+                         {
+                          names     => [qw( weird )],
+                          hidden    => 1,
+                          linkage   => sub { exit $ERR_WEIRD },
+                         },
+                         {
+                          names    => [qw( S )],
+                          type     => OPT_STRING,
+                          arg_reqd => 1,
+                          hidden   => 1,
+                          linkage  => sub { $RSE->output_suffix($_[2]) },
+                         },
+                         {
+                          names     => [qw( b bob )],
+                          type      => OPT_BOOLEAN,
+                          mandatory => 1,
+                          linkage   => \$bob,
+                         },
+                        ];
+
+$RSE =
+  Getopt::Plus->new(scriptname => 'test-script',
+                 scriptsumm => 'Test Getopt-Plus functionality',
+                 initialize => \&initialize,
+                 main       => \&process_fn,
+                 options    => OPTIONS,
+                 argtype    => 'file',
+                 arg_ary    => '+',
+                 copyright  => 'Copyright __CYEARS__ Martyn J. Pearce',
+                 c_years    => [ 2002 ],
+                 dry_run    => 1,
+                 package    => 'Getopt-Plus',
+                 version    => '0.01',
+                );
+
+$ERR_WEIRD = $RSE->new_exit_value("Weird things goin' daan");
+
+# Subrs ----------------------------------------------------------------------
+
+sub initialize {
+  my $rse = shift;
+  print "ARG1: $arg1\n"
+    if defined $arg1;
+  print "ARG2: $arg2\n"
+    if defined $arg2;
+  print "BOB: $bob\n"
+    if defined $bob;
+  print "Nothing doing\n"
+    if $RSE->dry_run;
+}
+
+sub process_fn {
+
+  my $rse = shift;
+  my ($in_fn) = @_;
+
+  Logf(CHAN_DEBUG, LOG_INFO, "process_fn: %s", join(',', map "-->$_<--", $_[0]));
+
+  if ( -e $in_fn ) {
+    Logf(CHAN_INFO, LOG_INFO,   "$in_fn: %d\n", -s $in_fn);
+    Logf(CHAN_INFO, LOG_INFO+1, "$in_fn: 0%04o\n", (stat($in_fn))[2] & 07777);
+    Logf(CHAN_STATS, LOG_INFO,  "S-$in_fn: %d\n", -s $in_fn);
+    Logf(CHAN_STATS, LOG_INFO+1,"S-$in_fn: 0%04o\n", (stat($in_fn))[2] &07777);
+  } else {
+    Log(CHAN_INFO, LOG_WARNING,   "File $in_fn does not exist\n");
+  }
+}
+
+# Main -----------------------------------------------------------------------
+
+$RSE->run;
+
+
+__END__
+

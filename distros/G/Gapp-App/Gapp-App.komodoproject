@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="d837465e-0cec-49ab-9841-9a5ba3cdeeb0" kpf_version="5" name="Gapp-App.komodoproject">
+<preference-set idref="d837465e-0cec-49ab-9841-9a5ba3cdeeb0">
+  <string id="perlDefaultInterpreter"></string>
+  <string relative="path" id="perlExtraPaths">lib</string>
+</preference-set>
+</project>

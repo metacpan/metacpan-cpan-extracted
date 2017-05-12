@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+lib/Ginger.pm
+lib/Ginger/Reference/Core.pm
+lib/Ginger/Reference/Admin/Default.pm
+lib/Ginger/Reference/Cookie/Manager/Default.pm
+lib/Ginger/Reference/Log/Default.pm
+lib/Ginger/Reference/Permission/Manager/Default.pm
+lib/Ginger/Reference/Request/Default.pm
+lib/Ginger/Reference/Request/IO/HTTP_Server_Simple.pm
+lib/Ginger/Reference/Request/IO/Mongrel2.pm
+lib/Ginger/Reference/Request/Manager/Default.pm
+lib/Ginger/Reference/Router/Default.pm
+lib/Ginger/Reference/RPC/IO/Mongrel2.pm
+lib/Ginger/Reference/Session/Default.pm
+lib/Ginger/Reference/Session/Manager/Default.pm
+lib/Ginger/Reference/Shared/HTTP_Server_Simple_Wrapper.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

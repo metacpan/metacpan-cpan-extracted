@@ -1,0 +1,40 @@
+# README
+
+Geo::Hash::XS - XS (C) Based Implementation of Geo::Hash
+
+## TRAVIS CI
+
+[![Build Status](https://secure.travis-ci.org/lestrrat/Geo-Hash-XS.png?branch=master)](http://travis-ci.org/lestrrat/Geo-Hash-XS)
+
+## PERFORMANCE
+
+
+    Geo::Hash: 0.02
+    Geo::Hash::XS: 0.00014
+
+    precision = auto...
+             Rate  perl    xs
+    perl  18332/s    --  -98%
+    xs   964744/s 5163%    --
+    
+    precision = 5...
+              Rate  perl    xs
+    perl   16500/s    --  -98%
+    xs   1011557/s 6030%    --
+    
+    precision = 10...
+             Rate   perl     xs
+    perl   8650/s     --   -99%
+    xs   980236/s 11232%     --
+    
+    precision = 20...
+             Rate   perl     xs
+    perl   4736/s     --   -99%
+    xs   858875/s 18035%     --
+    
+    precision = 30...
+             Rate   perl     xs
+    perl   3050/s     --  -100%
+    xs   712136/s 23252%     --
+
+

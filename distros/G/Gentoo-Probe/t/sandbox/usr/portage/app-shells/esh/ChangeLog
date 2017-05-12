@@ -1,0 +1,42 @@
+# ChangeLog for app-shells/esh
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/esh/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  02 Jun 2004; Aron Griffis <agriffis@gentoo.org> esh-0.8.5.ebuild:
+  Make clean on all arches, not just non-x86, so we can rebuild with our CFLAGS
+
+  30 Jan 2004; <gustavoz@gentoo.org> esh-0.8.5.ebuild:
+  stable on sparc
+
+  10 Jan 2004; Jason Wever <weeve@gentoo.org> esh-0.8.5.ebuild:
+  Added ~sparc keyword and fix to the ebuild for non-x86 arches since upstream
+  included binary files in source tarball for some odd reason.
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*esh-0.8.5 (26 Apr 2002)
+
+  28 Jul 2002; Calum Selkirk <cselkirk@gentoo.org> esh-0.8.5.ebuild :
+
+  Added -ppc to KEYWORDS.
+
+  25 Jul 2002; Daniel Ahlberg <aliz@gentoo.org> esh-0.8.5.ebuild :
+  Added KEYWORDS, SLOT.
+
+  26 Apr 2002; Seemant Kulleen <seemant@gentoo.org> esh-0.8.5.ebuild
+  files/digest-esh-0.8.5 :
+
+  Version bump
+
+*esh-0.8-r2 (1 Feb 2002)
+
+  25 Jul 2002; Daniel Ahlberg <aliz@gentoo.org> esh-0.8-r2.ebuild :
+  Added KEYWORDS, SLOT.
+
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

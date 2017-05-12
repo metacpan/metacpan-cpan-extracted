@@ -1,0 +1,155 @@
+README for Games::Alak
+
+                          Games::Alak
+
+[Partially excerpted from the POD.]
+
+NAME
+     Games::Alak -- simple game-tree implementation of a gomoku-like game
+
+
+DESCRIPTION
+     This module implements a simple game-tree system for the
+     computer to play against the user in a game of Alak.  You
+     can just play the game for fun; or you can use this module
+     as a starting point for understanding game trees (and
+     implementing smarter strategy -- the module's current logic
+     is fairly simple-minded), particularly after reading my Perl
+     Journal #18 article on trees, which discusses this module's
+     implementation of game trees as an example of general tree-
+     shaped data structures.
+
+RULES
+     Alak was invented by the mathematician A. K.  Dewdney, and
+     described in his 1984 book Planiverse. The rules of Alak are
+     simple -- at least as I've (mis?)understood them and
+     implemented them here:
+
+     * Alak is a two-player game played on a one-dimensional
+     board with eleven slots on it.  Each slot can hold at most
+     one piece at a time.  There's two kinds of pieces, which I
+     represent here as "x" and "o" -- x's belong to one player
+     (called X -- that's the computer), o's to the other (called
+     O -- that's you).
+
+     * The initial configuration of the board is:
+
+        xxxx___oooo
+
+     For sake of reference, the slots are numbered from 1 (on the left) to
+     11 (on the right), and X always has the first move.
+
+     * The players take turns moving.  At each turn, each player
+     can move only one piece, once.  (This is unlike checkers,
+     where you move one piece per move but get to keep moving it
+     if you jump an your opponent's piece.) A player cannot pass
+     up on his turn.  A player can move any one of his pieces to
+     the next unoccupied slot to its right or left, which may
+     involve jumping over occupied slots.  A player cannot move a
+     piece off the side of the board.
+
+     * If a move creates a pattern where the opponent's pieces
+     are surrounded, on both sides, by two pieces of the mover's
+     color (with no intervening unoccupied blank slot), then
+     those surrounded pieces are removed from the board.
+
+     * The goal of the game is to remove all of your opponent's
+     pieces, at which point the game ends.  Removing all-but-one
+     ends the game as well, since the opponent can't surround you
+     with one piece, and so will always lose within a few moves
+     anyway.
+
+SAMPLE GAME
+     A game between X (computer) and a particularly dim O
+     (human):
+
+       xxxx___oooo
+         ^         Move 1: X moves from 3 (shown with caret) to 5
+                    (Note that any of X's pieces could move, but
+                    that the only place they could move to is 5.)
+       xx_xx__oooo
+               ^   Move 2: O moves from 9 to 7.
+       xx_xx_oo_oo
+          ^        Move 3: X moves from 4 to 6.
+       xx__xxoo_oo
+                ^  Move 4: O (stupidly) moves from 10 to 9.
+       xx__xxooo_o
+           ^       Move 5: X moves from 5 to 10, making the board
+                   "xx___xoooxo".  The three o's that X just
+                   surrounded are removed.
+       xx___x___xo
+                   O has only one piece, so has lost.
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Games::Alak uses the module Term::ReadLine, which I understand is a
+standard Perl module these days.
+
+
+INTERFACE
+     This module uses Term::ReadLine to give you a prompt at
+     which you can type commands.
+
+     Entering "h" for help at that prompt will give instructions
+     on how to interact with the game.
+
+     When in doubt, consult the source -- it's made to be fairly
+     clear.
+
+REFERENCES
+     Burke, Sean M.  2000.  "Trees".  (In submission: actual
+     article title may differ.)  Article in The Perl Journal #18.
+     http://www.tpj.com/ [Portions of this POD are excerpted from
+     that article.]
+
+     Dewdney, A[lexander] K[eewatin].  1984.  Planiverse:
+     Computer Contact with a Two-Dimensional World.  Poseidon
+     Press, New York.
+
+
+INSTALLATION
+
+You install Games::Alak, as you would install any Perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Games::Alak in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+POD-format documentation is included in Alak.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a Games directory in your
+MacPerl site_lib or lib directory, and move Alak.pm into there.
+
+
+AVAILABILITY
+
+The latest version of Games::Alak is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+AUTHOR
+     Current maintainer Avi Finkel, avi@finkel.org;
+		 Original author Sean M. Burke, sburke@cpan.org
+
+     Thanks to A. K. Dewdney (http://www.dewdney.com/) for his
+     encouragement in writing my (abovementioned) TPJ article, as
+     well as for having written the enjoyable book where he
+     briefly describes it.

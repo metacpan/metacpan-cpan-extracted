@@ -1,0 +1,4 @@
+# This tests the load time of Gzip::Faster
+
+use Gzip::Faster;
+

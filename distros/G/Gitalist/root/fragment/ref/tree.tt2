@@ -1,0 +1,59 @@
+[% BLOCK tree_table_headfoot %]
+[% SET cell = type == 'head' ? 'th' : 'td' %]
+  <tr>
+   <[% cell %]>Mode</[% cell %]>
+   <[% cell %]>Folder / File</[% cell %]>
+   <[% cell %]>Actions</[% cell %]>
+   <[% cell %]>Message</[% cell %]>
+  </tr>
+[% END %]
+[%-
+	SET counter 	    = 1;
+
+ 	# sort files and folders
+	SET tree_files 		= [];
+	SET tree_folders 	= [];
+	FOREACH item IN entries;
+		IF item.mode != "40000";
+			tree_files.push(item);
+		ELSE;
+			tree_folders.push(item);
+		END;
+	END;
+%]
+
+[% BLOCK output_tree %]
+	[% FOREACH item IN tree_type.sort('filename') %]
+	<tr [% "class='invert'" IF counter % 2 %]>
+		<td class='file-mode'>[% c.stash.mode_string(item.mode) %]</td>
+	  [%-
+	       action_type     = item.mode == '40000' ? 'tree' : 'blob';
+	       action_for_link = item.mode == '40000' ? '/ref/tree' : '/ref/blob';
+	       blob_or_tree_link = c.uri_for_action(action_for_link, c.req.captures, c.req.args.to_path(item.filename))
+	  -%]
+		<td class="file-name"><a href="[% blob_or_tree_link %]" class="[% item.mode == '40000' ? 'folder' : 'file' %]">[% item.filename %]</a></td>
+		<td class='action-list'>
+	<a href="[% blob_or_tree_link %]">[% theact %]</a>
+	  [% IF item.mode != '40000' %]
+	<a href="[% c.uri_for_action('/ref/blob', c.req.captures, c.req.args.to_path(item.filename)) %]" title="Blob" class="button blob">Blob</a>
+	<a href="[% c.uri_for_action('/ref/raw', c.req.captures, c.req.args.to_path(item.filename)) %]" title="Raw" class="button raw">raw</a>
+	<a href="[% c.uri_for_action('/ref/blame', c.req.captures, c.req.args.to_path(item.filename)) %]" title="Blame" class="button blame">blame</a>
+	  [% END %]
+	    <a href="[% c.uri_for_action('/ref/history', c.req.captures, c.req.args.to_path(item.filename)) %]" title="History (Short log)" class="button shortlog">Short log</a>
+		</td>
+          <td class="message"><span class='js-data'>[% c.req.args.to_path(item.filename) %]</span>Loading commit info ...</td>
+	</tr>
+		[% counter = counter + 1 %]
+	[% END %]
+[% END %]
+
+<table class="listing" id="commit-tree">
+<thead>[% PROCESS tree_table_headfoot type = 'head' %]</thead>
+<tbody>
+	[% INCLUDE output_tree tree_type => tree_folders %]
+	[% PROCESS output_tree tree_type => tree_files   %]
+</tbody>
+</table>
+
+<span id='file_commit_info-uri' class='js-data'>[% c.uri_for_action('/fragment/ref/file_commit_info', [ Repository.name, Commit.sha1 ]) %]</span>
+<span id='commit-uri' class='js-data'>[% c.uri_for_action('/ref/commit', [Repository.name, 'HEAD']) %]</span>

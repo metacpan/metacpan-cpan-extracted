@@ -1,0 +1,32 @@
+[%
+    title = view.title;
+    params = self.params();
+    url = params.url;
+    url_params = url.remove('^[^\?]+\?').split('&');
+%]
+<form
+  method="[% view.form.method || 'post' %]" 
+  action="[% view.form.action || self.location _ url.remove('\?(.*)') %]" 
+  name="[% view.form.name %]"
+>
+    [% FOREACH url_param IN url_params %]
+        [%
+            pv = url_param.split('=');
+        %]
+        <input type="hidden" name="[% pv.0 %]" value="[% pv.1 %]" />
+    [% END %]
+    
+    <div>
+        <div style="border: 1px solid gray; padding: .5em;">
+            <p style="color: red">
+                This site requires cookies to be enabled to function
+                properly. Please enable cookies in your browser settings
+                and click OK to continue.
+            </p>
+            <div style="text-align: center;">
+                <label for="submit"</label>
+                <input type="submit" value="OK">
+            </div>
+        </div>
+    </div>
+</form>

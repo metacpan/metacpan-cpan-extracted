@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+README
+bin/sparkline
+examples/ex1.pl
+lib/GD/Sparkline.pm
+t/00-critic.t
+t/00-distribution.t
+t/00-pod.t
+t/00-podcoverage.t
+t/10-sparkline.t
+t/20-script-suppress.t
+t/20-script.t
+Makefile.PL
+Build.PL
+META.yml

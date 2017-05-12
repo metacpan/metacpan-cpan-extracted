@@ -1,0 +1,14 @@
+Changes
+github_creator
+github_creator.ini
+lib/Git/Github/Creator.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/compile.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

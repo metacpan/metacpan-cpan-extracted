@@ -1,0 +1,231 @@
+Glade-Perl - perl source code generator
+# Copyright (c) 1999 Dermot Musgrove <dermot.musgrove at virgin.net>
+#
+# This library is released under the same conditions as Perl, that
+# is, either of the following:
+#
+# a) the GNU General Public License as published by the Free
+# Software Foundation; either version 1, or (at your option) any
+# later version.
+#
+# b) the Artistic License.
+#
+# If you use this library in a commercial enterprise, you are invited,
+# but not required, to pay what you feel is a reasonable fee to perl.org
+# to ensure that useful software is available now and in the future. 
+#
+# (visit http://www.perl.org/ or email donors at perlmongers.org for details)
+
+TODO
+----
+*   Add comments to all options (xml) files that explain the options.
+*   Investigate a 'quick and dirty' generation mode that performs no checks
+    and does not test-eval the code during the run. First tests show only
+    an improvement from 15 secs to 14 secs on a reference form so the loss
+    of validation may not be worth the time savings.
+    
+*   Implement GnomeDb widgets when they are available in Gtk-Perl
+
+*   Make better Examples/tests with docs.
+    1) Simple 'getting started' project, signal handlers and subclass
+    2) UI from string (exists already)
+    3) More complex Gtk UI with subclass and use_modules (exists already)
+    4) Gnome App with example signal handlers and subclass
+    5) Libglade project with signal handlers, use_modules and subclass
+    6) Hierarchical widget structure
+    7) I18N example of gettext app
+        
+*   Generate extract and display subs to give examples of how to set and get
+    widget data. Perhaps not necessary.
+
+*   Recombine into fewer .pm files, possibly fewer packages
+    Possibly move PerlUI subs to PerlGenerate
+    
+*   Fix the signal handling for AccelLabels and pixmaps. Which widget should
+    the signal be connected to?
+
+*   Check all evals for proper exception handling.
+
+*   I use several 'eval's, one allows for dynamic construction
+    of (possibly unknown) widget types and another is only so that the 
+    UI can be built and a source line generated with the same 
+    call (at least they stay in step - if the UI displays then
+    I know that the generated code will work the same way.)
+    However, I am not sure that 'evals' are the best solution but it is
+    probably too late to change now.
+
+*   It is still relatively inefficient. I construct an XML::Parser 'Tree' 
+    and then build a proto hash. Then I recurse through the proto 
+    hash and build the UI and write the perl source. Apart
+    from converting it all to Java and back again I can't think how to slow 
+    it down any more :-). 
+    
+    But I could shorten the journey between XML and constructors, perhaps 
+    libxml would help here although the time spent in XML::Parser is not great.
+    
+    Or perhaps use a streaming approach. I don't think that it is possible to 
+    show the dialog until it is completely constructed so it will just speed 
+    up the building before showing it at the end of the stream.
+    
+    Or perhaps write my own simple parser using regexps.
+
+*   Much inefficiency in the number of diagnostics that can be produced.
+    When it is stable I should comment out the most frequent and expensive 
+    calls to Glade::PerlProject->diag_print() and ->use_par().
+    
+*   Cut out all checks and diagnostics if verbose == 0
+
+    Clean all the debugging stuff out and tidy the code properly.
+
+    Possibly cut out all consistency checks unless 'testing' is set.
+    
+*   Make all my modules object-oriented and remove all the Exporter() stuff.
+    
+*   Investigate using closures in generated code if 'style' => 'closure'
+
+*   Improve the Glade source code generation process - Make Glade::Helper 
+    UI to allow users more control of the whole shebang.
+
+*   Do not generate run() or destroy_Form() subs for the classes, they only
+    cloud the issue and run() causes problems with multiple Gtk->main() calls
+    and destroy_Form calls Gtk->main_quit which usually kills the app.
+
+DONE
+----
+*   Make dist files eg Makefile.PL, MANIFEST, Changelog etc etc
+
+*   Make a widget accessor in ProjectUI.pm so that you can:
+    $widget = $window->lookup_widget('OGFDList');
+    
+*   Document, internally, Glade::PerlRun for app developers
+
+*   Improve options handling
+
+*   Perhaps require at least Gtk-Perl-0.7000 (CVS version after 20000102)
+    then I could remove all version checks for any prior versions.
+    
+*   Look at writing one perl file for each module/class so that, for instance
+    ReferenceForm would be in file Generated/ReferenceForm.pm and fileselection1
+    would be in Generated/fileselection1.pm. You could then use() and new()
+    previously generated forms without having to write handlers and so on.
+    This is possible now by use()ing several generated UI files but inefficient
+    
+*   Fix for XML changes in Glade-0.5.10
+    Allow a null source directory and generate correct 'use' lines to work
+    the same way as Glade.
+    Cater for new Gtk::Button/Gtk::ToggleButton->{'relief'}
+    Cater for (now unused) Gnome::MessageBox->{'type'}
+    
+*   Allow user_option to select the type of code generated. 
+    User option 'style' is implemented for AUTOLOAD, Libglade and split.
+    
+*   Move all handlers to ProjectSIGS.pm and Project.pm (so that run() and
+    about_Form() are editable and easily seen. This needs to be carefully
+    thought out so that existing projects continue to work. Perhaps we
+    need an 'original_version' record so that we know what type of source
+    to generate to work with previously generated code. New sub app_run()
+    generated in App and SIGS for developer to edit.
+
+*   Improve the documentation. Find a way to keep perl source, perldoc
+    tooltips, help text, README, web page etc in step and up to date.
+    Perhaps embed XML in the source - or even source in XML and generate
+    everything from that? Please email me if you know how it should be done.
+    I have resorted to keeping the PerlGenerate perldoc up to date ;->
+    
+*   Spread all pod documentation throughout the files so that they get updated
+    more regularly (eg user options). Perhaps PerlGenerate and PerlProject 
+    should be combined into PerlGenerate for this reason among others.
+    The perldoc is still at the end of Glade::PerlGenerate but at least it is
+    complete and up-to-date.
+    
+*   Sort out Gnome::App accelerators and signals properly Probably it
+    would be best to implement the gnome-app-helper methods and use those when
+    they are available.
+    
+*   Rewrite GtkMenuItem and PixmapMenuItem constructors to simplify and reuse
+    code and to handle underline accelerators properly.
+    
+*   Fix accel key handling so that parse_uline is in generated code so it works
+    after the string is found with gettext.
+    
+*   Internationalise every stage but particularly the source code generation
+    of Gnome::App and Stock stuff
+    
+*   Change 'single' quoted strings to "double" wherever someone might 
+    enter ' eg tooltips, labels, items, text etc. Perhaps decide at run-time so
+    that q(), '', "" etc will always work. This was done by backslash escaping
+    any single quotes (apostrophes) returned by use_par().
+
+*   Check that we are not going to overwrite the existing modules
+    file or find way to insert existing subs into any existing SUBS file
+
+*   Implement Gnome widget 'GnomeAnimator',(in Glade >= 0.5.4)
+
+*   Implement Gnome widget 'GnomeDruid*',(needs Gtk-Perl CVS after 19990925)
+
+*   I have no idea how portable the Makefile.PL is. There are bound to be 
+    problems with Gtk and Gtk-Perl versions, possibly I can handle this via 
+    Gtk-Perl's ./configure and capabilities. 
+
+    I have heard from users on other platforms so I guess that this works OK
+    Please email me with any successes or failures.
+
+*   Add user option 'log_file' (defaulting, as previously, to STDOUT/STDERR)
+
+*   Add some extra generated utilities eg toplevel_hide/destroy/close
+
+*   Make subclass.pm for later use (inc handler stubs)
+
+*   Check for gnome-config before disallowing gnome widgets
+
+*   Do NOT generate Gtk about_Form if 'allow_gnome' is true, use Gnome::About.
+
+*   Add user_option 'description' with description for any about box etc.
+
+*   Finish implementing styles.
+
+*   Store signals and connect after all objects are constructed. This is
+    important when <object> property is specified in widgets eg. AccelLabels
+    but also so that radio buttons don't trigger each other during construction.
+    
+*   Implement version-dependant source code generation so that new features
+    or widgets available in CVS versions don't break the CPAN release.
+
+*   Implement Gnome widget 'GtkAppBar',    (needs Gtk-Perl CVS after 19990914)
+*   Implement Gnome widget 'GtkDock',      (needs Gtk-Perl CVS after 19990914)
+*   Implement Gnome widget 'GtkDockItem',  (needs Gtk-Perl CVS after 19990914)
+*   Implement Gnome widget 'GtkSpell',     (needs Gtk-Perl CVS after 19990914)
+*   Implement Gnome widget 'GtkCalendar',  (needs Gtk-Perl CVS after 19990914)
+*   Implement Gnome widget 'GnomeApp',     (needs Gtk-Perl CVS after 19990922)
+*   Implement Gnome widget 'GnomeAppBar',  (needs Gtk-Perl CVS after 19990922)
+*   Implement Gnome widget 'GnomeDialog',  (needs Gtk-Perl CVS after 19990922)
+*   Implement Gnome widget 'GnomeDock',    (needs Gtk-Perl CVS after 19990922)
+*   Implement Gnome widget 'GnomeDockItem',(needs Gtk-Perl CVS after 19990922)
+*   Implement Gnome widget 'GnomeSpell',   (needs Gtk-Perl CVS after 19990922)
+
+*   Write a &XmlUtf8Encode() sub for PerlXML->QuoteXMLChars()
+
+*   Handle GNOME_STOCK_ITEM and GNOME_STOCK_ICON properties
+
+*   Spearate out Gtk widget constructors (as Gnome widgets already are)
+
+*   Write sub to lookup C defines for GNOME stuff. Either singly at run time
+    or by generating a module at Makefile.PL build. This needs to be done
+    dynamically in case gnome-libs change the defines. This would allow lookup
+    of 'GNOME_STOCK_PIXMAP_SRCHRPL'   => "Search/Replace", for instance.
+    
+*   Sort out pixmap creation, Gtk-Perl has limitations here but is improving
+
+*   Improve PerlRun->create_pixmap() to use new bindings, possibly do in same
+    way that Glade C code in support.c does.
+    
+LONG TERM
+---------
+    Use XML::Parser()s streaming approach or SAX interface to build UI as it 
+    is read. This might be quicker and would also allow 'net delivery
+    of UIs. Write Glade::PerlGenerate->Form_from_(XML_)Stream.
+
+    Since on my 170MHz AMD K6/II a large reference form (136 kb) only takes 3 
+    seconds to read and parse into the glade proto, this might not be worth 
+    the effort. A trivial parser that I wrote in perl does reduce that to 1 
+    second so I remain open to suggestions.

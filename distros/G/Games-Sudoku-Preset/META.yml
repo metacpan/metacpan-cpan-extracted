@@ -1,0 +1,24 @@
+---
+abstract: 'enter, edit or validate the preset values of a Sudoku puzzle.'
+author:
+  - 'Klaus Wittrock <Wittrock#cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Games-Sudoku-Preset
+provides:
+  Games::Sudoku::Preset:
+    file: lib/Games/Sudoku/Preset.pm
+    version: v0.1.0
+requires:
+  Tk: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.1.0

@@ -1,0 +1,9 @@
+Revision history for Perl extension Geo::Coder::YahooJapan::Inverse.
+
+0.02  Sun Jan 14 12:14:00 2007
+        - Repair dependency error on Makefile.PL
+
+0.01  Mon Jan  1 00:59:36 2007
+	- original version; created by h2xs 1.23 with options
+		-X -A Geo::Coder::YahooJapan::Inverse
+

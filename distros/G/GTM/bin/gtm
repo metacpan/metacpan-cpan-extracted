@@ -1,0 +1,41 @@
+#! /usr/bin/perl
+
+use common::sense;
+use Gtk2 -init;
+use GTM qw(save_prefs);
+
+###################################################################################
+# do things only needed for single-binary version (par)
+BEGIN {
+   if (%PAR::LibCache) {
+      @INC = grep ref, @INC; # weed out all paths except pars loader refs
+
+      my $root = $ENV{PAR_TEMP};
+
+      while (my ($filename, $zip) = each %PAR::LibCache) {
+         for ($zip->memberNames) {
+            next unless /^root\/(.*)/;
+            $zip->extractMember ($_, "$root/$1")
+               unless -e "$root/$1";
+         }
+      }
+
+      unshift @INC, $root;
+      push @INC, "$root/inc";
+   }
+}
+
+BEGIN {
+   $ENV{GTK_RC_FILES} = "$ENV{PAR_TEMP}/share/themes/MS-Windows/gtk-2.0/gtkrc"
+      if %PAR::LibCache && $^O eq "MSWin32";
+}
+
+unshift @INC, $ENV{PAR_TEMP};
+###################################################################################
+
+
+my $w = new GTM;
+$w->show_all;
+main Gtk2;
+save_prefs;
+

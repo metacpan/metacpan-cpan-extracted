@@ -1,0 +1,8 @@
+ChangeLog
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Geo/Calc.pm
+t/01calc.t
+t/99pod.t

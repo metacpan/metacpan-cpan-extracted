@@ -1,0 +1,25 @@
+Build.PL
+CHANGES
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+INSTALL
+lib/Graph/Convert.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data
+README
+SIGNATURE
+t/att.t				attribute conversion
+t/convert.t			general basic tests
+t/group.t			test that groups and their attributes survive
+t/undirected.t			test undirected graphs
+t/pod.t				test the POD for correctness
+t/pod_cov.t			test the POD for covering all subroutines

@@ -1,0 +1,7 @@
+TYPEMAP
+Gnome::ColorSelector	T_PTROBJ
+Gnome::DesktopEntry	T_PTROBJ
+
+#Gnome::CanvasItem_Up	T_GtkPTROBJUp
+#Gnome::CanvasItem_Sink_Up	T_GtkPTROBJSinkUp
+#Gnome::CanvasItem_OrNULL_Up	T_GtkPTROBJOrNULLUp

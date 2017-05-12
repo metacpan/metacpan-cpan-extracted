@@ -1,0 +1,11 @@
+Revision history for Getopt-Config-FromPod
+
+v0.0.3    2015-02-27 01:34:54JST+0900 Asia/Tokyo
+    [Non-functional change]
+        - Adapt a test to Getopt::Long::Descriptive 0.99.
+
+v0.0.2    2013-06-29 12:00:41 Asia/Tokyo
+    - Add workaround for PAR::Packer (gh-3).
+
+v0.0.1    2013-06-18 23:37:02 Asia/Tokyo
+    - Initial release.

@@ -1,0 +1,16 @@
+(name => 'depth off',
+ code => 'my ($a); $a=[1,[2,[4,[8]]]]; 
+          my $z = GraphViz::Data::Structure->new(\$a,%title%)->graph->as_canon',
+)
+%%
+(name => 'depth at 2',
+ code => 'my ($a); 
+          $a=[1,[2,[4,[8]]]]; 
+          my $z = GraphViz::Data::Structure->new(\$a,Depth=>2,%title%)->graph->as_canon',
+)
+%%
+(name => 'depth at 1',
+ code => 'my ($a); 
+          $a=[1,[2,[4,[8]]]]; 
+          my $z = GraphViz::Data::Structure->new(\$a,Depth=>1,%title%)->graph->as_canon',
+)

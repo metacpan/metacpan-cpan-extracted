@@ -1,0 +1,203 @@
+---
+league: 日華文大學二甲
+hw: t/league/homework
+member:
+  - id: N9561713
+    Chinese: 袁敏萱
+    name: Crystal
+  - id: N9561725
+    Chinese: 吳凱婷
+    name: Riva
+  - id: N9561741
+    Chinese: 林麗佳
+    name: Rita
+  - id: N9561759
+    Chinese: 古嘉珮
+    name: Jill2
+  - id: N9561761
+    Chinese: 林家伶
+    name: Sophie
+  - id: N9561764
+    Chinese: 郭政勳
+    name: Brian
+  - id: U9693001
+    Chinese: 沈佳其
+    name: Jackie
+  - id: U9693002
+    Chinese: 江佩珊
+    name: Ivy
+  - id: U9693003
+    Chinese: 葉亭妤
+    name: Vicky
+  - id: U9693004
+    Chinese: 葉依柔
+    name: Nancy
+  - id: U9693005
+    Chinese: 葉佳元
+    name: David
+  - id: U9693006
+    Chinese: 官志皇
+    name: Scott1
+  - id: U9693007
+    Chinese: 吳佩儒
+    name: Rien
+  - id: U9693008
+    Chinese: 林漢萭
+    name: Eric
+  - id: U9693009
+    Chinese: 劉佳綺
+    name: Loota
+  - id: U9693011
+    Chinese: 胡譯文
+    name: Wendy
+  - id: U9693012
+    Chinese: 林貞婷
+    name: Karen
+  - id: U9693013
+    Chinese: 吳莉欣
+    name: Lisa
+  - id: U9693015
+    Chinese: 鍾秉成
+    name: Steve
+  - id: U9693016
+    Chinese: 吳純芳
+    name: Vita
+  - id: U9693017
+    Chinese: 莊雅婷
+    name: Tina
+  - id: U9693018
+    Chinese: 童建爵
+    name: Rick
+  - id: U9693020
+    Chinese: 楊鈞茜
+    name: Michelle1
+  - id: U9693021
+    Chinese: 鄧舒帆
+    name: Alice
+  - id: U9693022
+    Chinese: 周育慈
+    name: Judy
+  - id: U9693023
+    Chinese: 吳馨宜
+    name: Dolores
+  - id: U9693024
+    Chinese: 李明翰
+    name: Scott2
+  - id: U9693025
+    Chinese: 李庭萱
+    name: Emma
+  - id: U9693028
+    Chinese: 王祥垣
+    name: Adam
+  - id: U9693029
+    Chinese: 陳婕妤
+    name: Jessica
+  - id: U9693030
+    Chinese: 賴?岑
+    name: Justine
+  - id: U9693031
+    Chinese: 余宛錚
+    name: Helen
+  - id: U9693032
+    Chinese: 李孟頻
+    name: Penny1
+  - id: U9693033
+    Chinese: 林鈺心
+    name: Jill1
+  - id: U9693034
+    Chinese: 彭湘華
+    name: Hua
+  - id: U9693035
+    Chinese: 翁君儀
+    name: Raise
+  - id: U9693036
+    Chinese: 吳姵儀
+    name: Michelle2
+  - id: U9693037
+    Chinese: 李明濬
+    name: Alan
+  - id: U9693038
+    Chinese: 賴逸平
+    name: Penny2
+  - id: U9693039
+    Chinese: 陳姵穎
+    name: Julie
+  - id: U9693040
+    Chinese: 池采逸
+    name: Anny
+  - id: U9693041
+    Chinese: 李欣蔓
+    name: Bella
+  - id: U9693042
+    Chinese: 陳柔妤
+    name: Sherry1
+  - id: U9693043
+    Chinese: 盧蕙芳
+    name: Fang
+  - id: U9693044
+    Chinese: 彭希柔
+    name: Elvy
+  - id: U9693045
+    Chinese: 林怡君
+    name: Elain
+  - id: U9693046
+    Chinese: 蔡逸璇
+    name: Sherry2
+  - id: U9693047
+    Chinese: 張舒涵
+    name: Mary
+  - id: U9693048
+    Chinese: 林琇瑩
+    name: Stella
+  - id: U9693050
+    Chinese: 黃昱傑
+    name: YuChieh
+  - id: U9693052
+    Chinese: 中山成華
+    name: Seika
+  - id: U9693053
+    Chinese: 張綺玲
+    name: Icecream
+  - id: U9693054
+    Chinese: 陳偉生
+    name: Vincent
+  - id: U9693055
+    Chinese: 羅文聰
+    name: Steven
+absent:
+  - Steven
+series:
+  - first
+  - second
+  - third
+  - fourth
+exams:
+  - exam1
+  - exam2
+  - exam3
+  - exam4
+examMax: 15
+regions:
+  FrontRight:
+    A: DarkGreen
+    B: Black
+    C: Gray
+    D: Brown
+  FrontLeft:
+    A: Purple
+    B: LightGreen
+    C: Red
+    D: Orange
+  BackLeft:
+    A: White
+    B: Pink
+    C: Yellow
+  BackRight:
+    A: LightBlue
+    B: DarkBlue
+    C: BlackBlack
+hwMax: 2
+weights:
+  classwork: 20
+  homework : 20
+  exams    : 60

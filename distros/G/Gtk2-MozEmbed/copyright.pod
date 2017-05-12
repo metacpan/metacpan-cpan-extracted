@@ -1,0 +1,4 @@
+Copyright (C) 2004-2011 by the gtk2-perl team.
+
+This software is licensed under the LGPL.  See L<Gtk2::MozEmbed> for a full
+notice.

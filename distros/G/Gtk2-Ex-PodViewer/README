@@ -1,0 +1,37 @@
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Debian packages have been created by James Curbo - get them at
+http://teyandei.net/debian/.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Gtk2
+    IO::Scalar
+    Pod::Parser
+    File::Basename
+    Locale::gettext
+
+BUGS
+
+Something is wrong with the way Unicode characters are handled; it needs
+some attention. The next version will probably address this. Thanks to
+Marc Lehmann to spotting this.
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (C) 2003-2008 Gavin Brown.
+
+--
+$Id: README,v 1.6 2008/10/04 14:00:24 gavin Exp $

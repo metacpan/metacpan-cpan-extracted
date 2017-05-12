@@ -1,0 +1,405 @@
+=head1 NAME
+
+Gtk2::api - Mapping the Gtk+ C API to perl
+
+=head1 ABSTRACT
+
+The Gtk2 module attempts to stick as close as is reasonable to the C API,
+to minimize the need to maintain documentation which is nearly a copy of
+the C API reference documentation.  However, the world is not perfect, and
+the mappings between C and perl are not as clean and predictable as you 
+might wish.  Thus, this page described the basics of how to map the C API to
+the perl API, and lists various points in the API which follow neither the
+C API documentation nor the mapping principles.
+
+=head1 DESCRIPTION
+
+The canonical documentation is the C API reference at
+http://developer.gnome.org/doc/API/gtk/ and
+http://developer.gnome.org/doc/API/gdk/
+
+There are two main sections: 'BINDING BASICS' describes the principles on which
+the bindings work; understanding these can lead you to guess the proper syntax
+to use for any given function described in the C API reference.  The second
+section lists various specific points of difference which don't necessarily
+correspond with what you expect; this section is in three main parts: missing
+methods, renamed methods, and different call signatures.
+
+=head1 BINDING BASICS
+
+We avoid deprecated APIs.  Many functions refer to C concepts which are alien
+to the bindings.  Many things have replacements.
+
+=head2 Deprecated Stuff Isn't Bound
+
+Things that were marked as deprecated at gtk+ 2.0.0 do not appear in the
+bindings.  This means that gtk+-1.x's GtkCList, GtkTree, and GtkText are
+not available.  The notable exception is GtkList, which is available solely
+in support of GtkCombo (which was itself replaced by GtkComboBox in 2.4);
+it should not be used under any other circumstances.  If you I<really> need
+access to these old widgets, search the web for C<Gtk2::Deprecated>.
+
+Some other things were deprecated during the gtk+ 2.x series, e.g.
+GtkOptionMenu was deprecated in favor of GtkComboBox in 2.4.  Things that were
+marked as deprecated during the 2.x series will not be removed, basically
+because older versions do not have the replacements, and removing them would
+break backward compatibility.
+
+=head2 Namespaces and Objects
+
+The namespaces of the C libraries are mapped to perl packages according to
+scope, although in some cases the distinction may seem rather arbitrary:
+
+ g_ => Glib  (the Glib module - distributed separately)
+ gtk_ => Gtk2
+ gdk_ => Gtk2::Gdk
+ gdk_pixbuf_ => Gtk2::Gdk::Pixbuf
+ pango_ => Gtk2::Pango
+
+Objects get their own namespaces, in a way, as the concept of the GType is
+completely replaced in the perl bindings by the perl package name.  This goes
+for GBoxed, GObject, and even things like Glib::String and Glib::Int (which are
+needed for specifying column types in the Gtk2::TreeModel).  (Flags and
+enums are special -- see below.)
+
+ GtkButton => Gtk2::Button
+ GdkPixbuf => Gtk2::Gdk::Pixbuf
+ GtkScrolledWindow => Gtk2::ScrolledWindow
+ PangoFontDescription => Gtk2::Pango::FontDescription
+
+With this package mapping and perl's built-in method lookup, the bindings can
+do object casting for you.  This gives us a rather comfortably object-oriented
+syntax, using normal perl syntax semantics:
+
+  in C:
+    GtkWidget * b;
+    b = gtk_check_button_new_with_mnemonic ("_Something");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (b), TRUE);
+    gtk_widget_show (b);
+
+  in perl:
+    my $b = Gtk2::CheckButton->new ('_Something');
+    $b->set_active (1);
+    $b->show;
+
+You see from this that constructors for most widgets which allow mnemonics
+will use mnemonics by default in their "new" methods.  For those who don't
+guess this right off, Gtk2::Button->new_with_mnemonic is also available.
+Cast macros are not necessary, and your code is a lot shorter.
+
+=head2 Flags and Enums
+
+Constants are handled as strings, because it's much more readable than numbers,
+and because it's automagical thanks to the GType system.  Constants are
+referred to by their nicknames; basically, strip the common prefix, lower-case
+it, and optionally convert '_' to '-':
+
+  GTK_WINDOW_TOPLEVEL => 'toplevel'
+  GTK_BUTTONS_OK_CANCEL => 'ok-cancel' (or 'ok_cancel')
+
+Flags are a special case.  You can't (sensibly) bitwise-or these
+string-constants, so you provide a reference to an array of them instead.
+Anonymous arrays are useful here, and an empty anonymous array is a simple
+way to say 'no flags'.
+
+  FOO_BAR_BAZ | FOO_BAR_QUU | FOO_BAR_QUUX => [qw/baz quu qux/]
+  0 => []
+
+In some cases you need to see if a bit is set in a bitfield; methods
+returning flags therefore return an overloaded object.  See L<Glib> for
+more details on which operations are allowed on these flag objects, but
+here is a quick example:
+
+ in C:
+  /* event->state is a bitfield */
+  if (event->state & GDK_CONTROL_MASK) g_printerr ("control was down\n");
+
+ in perl:
+  # $event->state is a special object
+  warn "control was down\n" if $event->state & "control-mask";
+
+But this also works:
+
+  warn "control was down\n" if $event->state * "control-mask";
+  warn "control was down\n" if $event->state >= "control-mask";
+  warn "control and shift were down\n"
+                            if $event->state >= ["control-mask", "shift-mask"];
+
+And treating it as an array of strings (as in older versions) is still
+supported:
+
+  warn "control was down\n" if grep /control-mask/, @{ $event->state };
+
+The gtk stock item stuff is a little different -- the GTK_STOCK_* constants
+are actually macros which evaluate to strings, so they aren't handled by the
+mechanism described above; you just specify the string, e.g., 
+GTK_STOCK_OK => 'gtk-ok'. The full list of stock items can be found at 
+http://developer.gnome.org/doc/API/2.0/gtk/gtk-Stock-Items.html
+
+=head2 Memory Handling
+
+The functions for ref'ing and unref'ing objects and free'ing boxed structures
+are not even mapped to perl, because it's all handled automagically by the
+bindings.  I could write a treatise on how we're handling reference counts and
+object lifetimes, but all you need to know as perl developer is that it's
+handled for you, and the object will be alive so long as you have a perl scalar
+pointing to it or the object is referenced in another way, e.g. from a container.
+
+The only thing you have to be careful about is the lifespan of non
+reference counted structures, which means most things derived from
+C<Glib::Boxed>.  If it comes from a signal callback it might be good
+only until you return, or if it's the insides of another object then
+it might be good only while that object lives.  If in doubt you can
+C<copy>.  Structs from C<copy> or C<new> are yours and live as long as
+referred to from Perl.
+
+=head2 Callbacks
+
+Use normal perl callback/closure tricks with callbacks.  The most common use
+you'll have for callbacks is with the Glib C<signal_connect> method:
+
+  $widget->signal_connect (event => \&event_handler, $user_data);
+  $button->signal_connect (clicked => sub { warn "hi!\n" });
+
+$user_data is optional, and with perl closures you don't often need it
+(see L<perlsub/Persistent variables with closures>).
+
+The userdata is held in a scalar, initialized from what you give in
+C<signal_connect> etc.  It's passed to the callback in usual Perl
+"call by reference" style which means the callback can modify its last
+argument, ie. $_[-1], to modify the held userdata.  This is a little
+subtle, but you can use it for some "state" associated with the
+connection.
+
+    $widget->signal_connect (activate => \&my_func, 1);
+    sub my_func {
+      print "activation count: $_[-1]\n";
+      $_[-1] ++;
+    }
+
+Because the held userdata is a new scalar there's no change to the
+variable (etc) you originally passed to C<signal_connect>.
+
+If you have a parent object in the userdata (or closure) you have to
+be careful about circular references preventing parent and child being
+destroyed.  See L<perlobj/Two-Phased Garbage Collection> about this
+generally.  In Gtk2-Perl toplevel widgets like C<Gtk2::Window> always
+need an explicit C<< $widget->destroy >> so their C<destroy> signal is
+a good place to break circular references.  But for other widgets it's
+usually friendliest to avoid circularities in the first place, either
+by using weak references in the userdata, or possibly locating a
+parent dynamically with C<< $widget->get_ancestor >>.
+
+A major change from gtk-perl (the bindings for Gtk+-1.x) is that callbacks
+take their arguments in the order proscribed by the C documentation, and only
+one value is available for user data.  gtk-perl allowed you to pass multiple
+values for user_data, and always brought in the user_data immediately after
+the instance reference; this proved to be rather confusing, and did not follow
+the C API reference, so we decided not to do that for gtk2-perl.
+
+=head2 Miscellaneous
+
+In C you can only return one value from a function, and it is a common practice
+to modify pointers passed in to simulate returning multiple values.  In perl,
+you can return lists; any functions which modify arguments have been changed
+to return them instead.  A common idiom in gtk is returning gboolean, and 
+modifying several arguments if the function returns TRUE; for such functions,
+the perl wrapper just returns an empty list on failure.
+
+  in C:  foo_get_baz_and_quux (foo, &baz, &quux);
+  in perl:  ($baz, $quux) = $foo->get_baz_and_quux;
+
+Most things that take or return a GList, GSList, or array of values will use
+native perl arrays (or the argument stack) instead.
+
+You don't need to specify string lengths, although string length
+parameters should still be available for functions dealing with binary
+strings. You can always use C<substr> to pass different parts of a string.
+
+Anything that uses GError in C will C<croak> on failure, setting $@ to a
+magical exception object, which is overloaded to print as the
+returned error message.  The ideology here is that GError is to be used
+for runtime exceptions, and C<croak> is how you do that in perl.  You can
+catch a croak very easily by wrapping the function in an eval:
+
+   eval {
+      my $pixbuf = Gtk2::Gdk::Pixbuf->new_from_file ($filename);
+      $image->set_from_pixbuf ($pixbuf);
+   };
+   if ($@) {
+      print "$@\n"; # prints the possibly-localized error message
+      if (Glib::Error::matches ($@, 'Gtk2::Gdk::Pixbuf::Error',
+                                    'unknown-format')) {
+         change_format_and_try_again ();
+      } elsif (Glib::Error::matches ($@, 'Glib::File::Error', 'noent')) {
+         change_source_dir_and_try_again ();
+      } else {
+         # don't know how to handle this
+         die $@;
+      }
+   }
+
+This has the added advantage of letting you bunch things together as you would
+with a try/throw/catch block in C++ -- you get cleaner code.  By using
+Glib::Error exception objects, you don't have to rely on string matching
+on a possibly localized error message; you can match errors by explicit and
+predictable conditions.  See L<Glib::Error> for more information.
+
+=head1 MISSING METHODS
+
+=over
+
+=item g_object_ref	=> no replacement
+
+=item g_object_unref	=> no replacement
+
+=item g_boxed_free	=> no replacement
+
+The bindings do automatic memory management. You should never need to use these.
+
+=item gtk_timeout_add    => Glib::Timeout->add
+
+=item gtk_timeout_remove => Glib::Source->remove
+
+=item gtk_idle_add       => Glib::Idle->add
+
+=item gtk_idle_remove    => Glib::Source->remove
+
+=item gtk_input_add      => Glib::IO->add_watch
+
+=item gtk_input_remove   => Glib::Source->remove
+
+The gtk_* functions are deprecated in favor of the g_* ones.  Gtk2::Helper
+has a wrapper for Glib::IO->add_watch which makes it behave more
+like gtk_input_add.
+
+=item gtk_accel_group_from_accel_closure => no replacement
+
+Because of the use of Perl subroutine references in place of GClosures, there
+is no way to preserve at the Perl level the one-to-one mapping between
+GtkAccelGroups and GClosures.  Without that mapping, this function is useless.
+
+=back
+
+
+=head1 RENAMED METHODS
+
+=over
+
+=item gtk_aspect_frame_set	=> $aspect_frame->set_params
+
+Avoid a clash with $gobject->set.
+
+=back
+
+
+=head1 DIFFERENT CALL SIGNATURES OR SEMANTICS
+
+As a general rule function that take a pair of parameters, a list and the
+number of elements in that list, will normally omit the number of elements
+and just accept a variable number of arguments that will be converted into
+the list and number of elements.  In many instances parameters have been
+reordered so that this will work.  See below for exceptions and specific
+cases that are not detailed in the generated Perl API reference.
+
+=over
+
+=item Gtk2::ScrollBar vs. GtkScrollbar
+
+These classes were incorrectly written with a capital C<B> in version 1.00
+and below.  They have been renamed in version 1.01 and the old way to
+write them is deprecated, but supported.
+
+=item Gtk2::ItemFactory::create_items
+
+The n_entries parameter has been omitted and callback_data is accepted as the
+first parameter. All parameters after that are considered to be entries.
+
+=item Gtk2::List::insert_items
+
+Position and items parameters flipped order so that an open ended parameter
+list could be used. C<< $list->insert_items($position, $item1, $item2, ...) >>
+(Note that GtkList and GtkListItem are deprecated and only included because
+GtkCombo still makes use of them, they are subject to removal at any point so
+you should not utilize them unless absolutely necessary.)
+
+=item Gtk2::Notebook::append_page
+
+=item Gtk2::Notebook::prepend_page
+
+=item Gtk2::Notebook::insert_page
+
+The C API for these functions requires a GtkWidget for the tab_label, since you
+can set any widget you like to be the tab label.  However, the most common use
+is a plain Gtk2::Label; so these three functions will stringify anything passed
+to tab_label that's not a GtkWidget and wrap a Gtk2::Label around it for you.
+
+Note that the C<_menu> versions of these functions do I<not> do this.
+
+=item Gtk2::AccelGroup::connect
+
+=item Gtk2::AccelGroup::disconnect
+
+Where a GClosure is wanted by the C stuff, a perl subroutine reference
+suffices.  However, because of this, there are a few subtle differences in
+semantics.  a GClosure may be connected to only one GtkAccelGroup; however, a
+perl subroutine may be connected to many GtkAccelGroups (because at the binding
+level, a new GClosure is created on each call to ->connect).  Thus,
+$accel_group->disconnect will disconnect the first group it finds to be
+connected to the given perl subroutine.  To disconnect all groups attached to a
+subroutine, you can call disconnect with the same subroutine reference (or
+name) until it stops returning true.
+
+=item Gtk2::Clipboard::set_with_data
+
+=item Gtk2::Clipboard::set_with_owner
+
+In C, these functions take an array of GtkTargetEntries and the number of
+elements in that array as the second and third parameters.  In Perl, the
+number of target entries is implied by the number of items on the stack,
+and the target entries are supplied as a list at the end of the parameter
+list:
+
+ $clipboard->set_with_data (\&get_func, \&clear_func, $user_data,
+                            @target_entries);
+ $clipboard->set_with_owner (\&get_func, \&clear_func, $owner,
+                             @target_entries);
+
+=back
+
+=head1 SEE ALSO
+
+The canonical documentation is the C API reference at
+http://developer.gnome.org/doc/API/gtk/ and
+http://developer.gnome.org/doc/API/gdk/
+
+Gtk2 includes a full suite of automatically-generated API reference POD for
+the Perl API -- see L<Gtk2::index> for the starting point.
+
+There should be a similar document for Glib --- link to it here when it exists.
+
+=head1 AUTHOR
+
+muppet E<lt>scott at asofyet dot orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003, 2009 by the gtk2-perl team (see the file AUTHORS for the
+full list)
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Library General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option) any
+later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Library General Public License for more
+details.
+
+You should have received a copy of the GNU Library General Public License along
+with this library; if not, write to the Free Software Foundation, Inc., 
+51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+
+=cut
+

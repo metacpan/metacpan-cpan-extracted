@@ -1,0 +1,29 @@
+# ChangeLog for net-dns/ddclient
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/ddclient/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  05 Jun 2004; Bryan Østergaard <kloeri@gentoo.org> ddclient-3.6.3.ebuild:
+  Stable on alpha.
+
+*ddclient-3.6.3 (15 Nov 2003)
+
+  15 Nov 2003; Seemant Kulleen <seemant@gentoo.org> ddclient-3.6.3.ebuild,
+  files/ddclient-3.6.3-gentoo.diff, files/ddclient-3.6.3-mss1.diff:
+  version bump thanks to: Matthew Smith <matthewsmith@iinet.net.au> in bug
+  #32756. Includes two patches he wrote: one for dnspark users; one for putting
+  config files into /etc/ddclient
+
+  21 Oct 2003; Tavis Ormandy <taviso@gentoo.org> ddclient-3.6.2.ebuild:
+  adding ~alpha keyword
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*ddclient-3.6.2 (1 Feb 2002)
+
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

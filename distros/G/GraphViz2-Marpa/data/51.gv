@@ -1,0 +1,16 @@
+digraph graph_51
+{
+	edge [color = blue]
+
+	node [shape = Mdiamond]
+
+	node_51_01
+
+	node [shape = Msquare]
+
+	node_51_02
+
+	graph [label = "Class Demo"]
+
+	node_51_01 -> node_51_02
+}

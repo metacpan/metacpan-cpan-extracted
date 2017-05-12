@@ -1,0 +1,11 @@
+Installation instuctions for Pang Zero
+======================================
+
+1. Download and unpack the archive
+
+2. Go to the unpacked directory
+
+3. ./configure
+
+4. make install
+

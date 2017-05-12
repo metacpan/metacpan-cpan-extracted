@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+# vim: set filetype=perl:
+
+use strict;
+use warnings;
+
+use Google::Search;
+
+#my $search = Google::Search->new(q => "rock", service => "video");
+#my $search = Google::Search->Web(v => "1.0", q => "rock");
+my $search = Google::Search->Web(q => "rock");
+my $result = $search->first;
+while ($result) {
+    print $result->number, " ", $result->uri, "\n";
+    $result = $result->next;
+}
+print $search->error->reason, "\n" if $search->error;
+
+#my $result = $search->match_first(sub { shift->unescapedUrl =~ m/payjunction1/ });
+#if ($result) {
+#    print $result->number, "\n";
+#}
+#else {
+#    print "Not found!\n";
+#}
+##my $search = Google::Search->new(q => "rock color chart");
+#my $result = $search->result(18);
+#while ($result) {
+#    print $result->unescapedUrl, "\n";
+#    $result = $result->next;
+#}
+#print $search->error->reason, "\n" if $search->error;
+
+__END__
+
+##my $responseData = $search->response->responseData;
+#my $results = $search->page(1)->results;
+#for my $result (@$results) {
+#    my ($title, $unescapedUrl) = @$result{qw/title unescapedUrl/};
+#    print "$unescapedUrl - $title\n";
+#}
+
+#print $search->result(7)->unescapedUrl, "\n";
+#print $search->result(2)->unescapedUrl, "\n";
+
+
+use strict;
+use warnings;
+
+use LWP::UserAgent;
+use JSON;
+my $agent = LWP::UserAgent->new;
+
+sub request($);
+
+my $result = request "merchant%20account";
+my $responseData = $result->{responseData};
+my $results = $responseData = $responseData->{results};
+for my $result (@$results) {
+    my ($title, $unescapedUrl) = @$result{qw/title unescapedUrl/};
+    print "$unescapedUrl - $title\n";
+}
+
+#my $response = $agent->get("http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rv=large&q=merchan%20account", { Referer => "http://bravo9.com/test" });
+
+#if ($response->is_success) {
+#    my $content = $response->content;
+#    my $result = decode_json $content;
+#    my $responseData = $result->{responseData};
+#    my $results = $responseData = $responseData->{results};
+#    for my $result (@$results) {
+#        my ($title, $unescapedUrl) = @$result{qw/title unescapedUrl/};
+#        print "$title $unescapedUrl\n";
+#    }
+#    print $content, "\n";
+#}
+#else {
+#    print $response->as_string, "\n";;
+#}
+
+sub request($) {
+    my $query = shift;
+    my $uri = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rv=large&q=$query&start=20";
+
+    my $response = $agent->get("$uri", { Referer => "http://bravo9.com/test" });
+
+    warn $response->status_line;
+
+    if ($response->is_success) {
+        my $content = $response->content;
+        print $content, "\n";
+        my $result = decode_json $content;
+        return $result;
+    }
+
+    die $response->as_string;
+}
+
+1;

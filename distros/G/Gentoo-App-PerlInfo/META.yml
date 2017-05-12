@@ -1,0 +1,31 @@
+---
+abstract: 'gather systems perl info'
+author:
+  - 'Christian Hartmann <ian@gentoo.org>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.013, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gentoo-App-PerlInfo
+provides:
+  Gentoo::App::PerlInfo:
+    file: lib/Gentoo/App/PerlInfo.pm
+    version: '0.17'
+requires:
+  Path::Tiny: '0'
+  PortageXS: v0.3.0
+  Term::ANSIColor: '2.01'
+resources:
+  bugtracker: https://github.com/gentoo-perl/Gentoo-App-PerlInfo/issues
+  repository: https://github.com/gentoo-perl/Gentoo-App-PerlInfo
+version: '0.17'
+x_contributors:
+  - 'Kent Fredric <kentnl@cpan.org>'
+  - 'Torsten Veller <tove@gentoo.org>'
+  - 'Yuval Yaari <yuval@gentoo.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

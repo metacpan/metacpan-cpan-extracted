@@ -1,0 +1,26 @@
+{
+   "abstract" : "methods to calculate common geometry formulas.",
+   "author" : [
+      "Casey Vega <cvega@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geometry-Formula",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}
+

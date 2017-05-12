@@ -1,0 +1,29 @@
+0.94 (2007-05-17)
+
+    -- Make the job_servers list be able to contain raw sockets, or even Gearman::Server
+       objects, so that we can run in the same thread as a Gearman::Server very easily.
+
+0.93 (2007-04-26)
+
+    -- don't break with latest Gearman::Client (package 'Gearman') which added prefix
+       support.
+
+0.92 (2007-04-16)
+
+    -- fix for when a client task timeouts before the server gets a handle back to the client
+
+    -- fix a memory leak on timeouts.  adds a new test for it too.
+
+    -- fix a bogus calling instead of checking of a test variable on
+       connection timeout
+
+0.91
+    -- use Danga::Socket's cancellable timers to kill the timeout
+       timers as soon as possible on success or fail.
+
+0.90
+    -- fix memory leaks
+
+0.80
+    -- initial release, now that it has a nice big passing test suite,
+       does timeouts, and actually handles error conditions.  :)

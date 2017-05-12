@@ -1,0 +1,30 @@
+<html>
+<head>
+<style type=text/css>
+body {
+  background: #ffffff;
+  font-family: Verdana, Geneva, Arial, sans-serif;
+  font-size: 100%;	/* 12 pt = 100%, 11pt = 91.7%, 10pt = 83.3% */
+  color: #000000;
+}
+#change {
+  color: #ffffff;
+  background: #000000;
+  font-size: 1.17em;	/* 14 point */
+  font-weight: bold;
+}
+</style>
+
+<script language=javascript1.2>
+function register() {
+  top.cbID = document.getElementById('change');
+}
+</script>
+
+</head>
+<body onLoad="register();">
+<table cellpadding=5 cellspacing=0 border=0>
+<tr align=center><td id=change>background color = #000000&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;text color = #FFFFFF</td></tr>
+</table>
+</body>
+</html>

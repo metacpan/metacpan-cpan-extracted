@@ -1,0 +1,40 @@
+Revision history for Games-Jumble
+
+0.09   Sat Jun 30 20:53:45 UTC 2007
+       Use AUTOLOAD for getters/setters
+       Changed some function names - not backwards compatible
+       num_words => get_num_words, set_num_words
+       dict => get_dict, set_dict
+       word_length_allow => set_word_lengths_allowed
+       word_lenth_deny => set_word_lengths_not_allowed
+
+0.08   Sat Jun 30 15:21:25 UTC 2007
+       Used module-starter to rebuild package
+       Minor house cleaning...
+
+0.07  Wed Apr 16 09:04:36 2003
+        - Added solve_crossword() method
+        - Fixed bug in solve_word - Now will accept upper-
+          and lower-case words
+
+0.06  Sun Apr 13 12:02:57 2003
+        - Updated typo in documentation
+
+0.05  Sat Apr 12 14:31:22 2003
+        - Disallowed words with single character (ii,ooo,etc)
+        - Added check that jumbled word is actually jumbled
+
+0.04  Sat Apr 12 12:12:52 2003
+        - Added word_length_allow() method
+        - Added word_length_deny() method
+
+0.03  Sat Nov 25 07:14:43 2002
+        - Updated documentation
+
+0.02  Sat Apr  6 08:01:12 2002
+        - Added jumble_word() method
+        - Renamed create_puzzle() method to create_jumble()
+
+0.01  Mon Apr  1 12:31:32 2002
+        - original version; created by h2xs 1.21 with options
+                -X -A -n Games::Jumble

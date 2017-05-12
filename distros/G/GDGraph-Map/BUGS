@@ -1,0 +1,29 @@
+FIXED IN 1.05
+! Issued empty Map with new versions of GD::Graph (v1.3 and later)
+
+
+FIXED IN 1.03
+! For bar chart with two datasets, displayed on top of earch other
+  incorrectly display status information.
+
+FIXED IN 1.02
+
+! In some browsers JavaScript code for showing information in status line 
+  can work incorrectly. It must contain command 'return true' for success,
+  I add ones.
+  (reported by David White <dswhite24@yahoo.com>)
+! Default think that %x, %y, %s and %p is floating numbers, therefore
+  if it decimal numbers, for example 3 or 19, that you get 3.000000 or
+  19.000000 as result. Now default think that its decimal numbers.
+! If in some Hrefs you use JavaScript code and newWindow set to TRUE, 
+  that for them will be open new navigator window too. But often is 
+  dose not necessary. Now if Hrefs contains JavaScript code, that
+  newWindow is ignored.
+
+FIXED IN 1.01
+
+! Percent for pie object calculate incorrectly.
+! For bars, points and linespoints object setting @hrefs array has no
+  effect or working incorrectly.
+  (repoted by Dan Cummings <doc@cnr.com>)
+  

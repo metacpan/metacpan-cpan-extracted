@@ -1,0 +1,47 @@
+Gtk2::Unique
+=========
+
+Perl bindings for the C library "libunique" that provides a mechanism for
+writing single instance applications. If you launch a single instance
+application twice, the second instance will either just quit or will send a
+message to the running instance.
+
+Unique makes it easy to write this kind of applications, by providing a base
+class, taking care of all the IPC machinery needed to send messages to a running
+instance, and also handling the startup notification side.
+
+For more information about libunique refer to the library's web site:
+
+	http://live.gnome.org/LibUnique
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Gtk2::Unique
+
+Also feel free to take a look at the examples in the folder "examples/" and to
+play around with them.
+
+For any kind of help or support simply report a bug or join us in the IRC
+channel #gtk2-perl on freenode.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2010 Emmanuel Rodriguez
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

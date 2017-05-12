@@ -1,0 +1,206 @@
+# ChangeLog for net-wireless/linux-wlan-ng
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/linux-wlan-ng/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+  14 Jun 2004; Aron Griffis <agriffis@gentoo.org>
+  linux-wlan-ng-0.2.0-r1.ebuild, linux-wlan-ng-0.2.0-r2.ebuild,
+  linux-wlan-ng-0.2.0-r3.ebuild, linux-wlan-ng-0.2.1_pre11.ebuild,
+  linux-wlan-ng-0.2.1_pre16.ebuild, linux-wlan-ng-0.2.1_pre17-r1.ebuild,
+  linux-wlan-ng-0.2.1_pre17.ebuild, linux-wlan-ng-0.2.1_pre19.ebuild,
+  linux-wlan-ng-0.2.1_pre20.ebuild, linux-wlan-ng-0.2.1_pre8.ebuild:
+  Fix use invocation
+
+  27 Apr 2004; Aron Griffis <agriffis@gentoo.org>
+  linux-wlan-ng-0.2.1_pre19.ebuild:
+  Add inherit eutils
+
+*linux-wlan-ng-0.2.1_pre20 (01 Mar 2004)
+
+  01 Mar 2004; Peter Johanson <latexer@gentoo.org>
+  linux-wlan-ng-0.2.1_pre20.ebuild:
+  Bump again. This version has the fix for prism2dl merged.
+
+*linux-wlan-ng-0.2.1_pre19 (29 Feb 2004)
+
+  29 Feb 2004; Peter Johanson <latexer@gentoo.org>
+  linux-wlan-ng-0.2.1_pre17-r1.ebuild, linux-wlan-ng-0.2.1_pre19.ebuild,
+  files/linux-wlan-ng-0.2.1_pre19-prism2dl.diff:
+  Bump, and fix pre17-r1 to unset ARCH earlier. This was causing breakage where
+  the topleve Makefile in the kernel was not found, so the kernel version was
+  not being set, and modules ended up in /lib/modules/kernel. Also includes fix so
+  that prism2dl uses includes from /usr/include/linux and not /usr/src/linux/include.
+
+  21 Feb 2004; Luca Barbato <lu_zero@gentoo.org>
+  linux-wlan-ng-0.2.1_pre17-r1.ebuild:
+  Marked ~ppc
+
+  08 Feb 2004; Peter Johanson <latexer@gentoo.org>
+  linux-wlan-ng-0.2.0-r3.ebuild:
+  Marking stable. Needed for module-init-tools fixes.
+
+*linux-wlan-ng-0.2.1_pre17-r1 (07 Feb 2004)
+
+  07 Feb 2004; Peter Johanson <latexer@gentoo.org>
+  linux-wlan-ng-0.2.0-r3.ebuild, linux-wlan-ng-0.2.1_pre17-r1.ebuild:
+  Updates to both 0.2.0 and 0.2.1_pre series to use new pcmcia.eclass to make
+  life easier.
+
+*linux-wlan-ng-0.2.1_pre17 (03 Feb 2004)
+
+  03 Feb 2004; Peter Johanson <latexer@gentoo.org>
+  linux-wlan-ng-0.2.1_pre17.ebuild:
+  Added 0.2.1_pre17 which is ready for pcmcia-cs 3.2.7, unsets ARCH and tells
+  people to not bother with symlinks for 2.6 kernsl, and includes
+  module-init-tools fix for pcmcia-cs configure stage.
+
+*linux-wlan-ng-0.2.0-r3 (01 Feb 2004)
+
+  01 Feb 2004; Peter Johanson <latexer@gentoo.org>
+  linux-wlan-ng-0.1.16_pre4.ebuild, linux-wlan-ng-0.1.16_pre6.ebuild,
+  linux-wlan-ng-0.1.16_pre7.ebuild, linux-wlan-ng-0.1.16_pre8.ebuild,
+  linux-wlan-ng-0.1.16_pre9.ebuild, linux-wlan-ng-0.2.0-r1.ebuild,
+  linux-wlan-ng-0.2.0-r2.ebuild, linux-wlan-ng-0.2.0-r3.ebuild,
+  linux-wlan-ng-0.2.1_pre1.ebuild, linux-wlan-ng-0.2.1_pre2.ebuild,
+  linux-wlan-ng-0.2.1_pre3.ebuild:
+  Added 0.2.0-r3 which works for pcmcia-cs >= 3.2.5 in preparation for 3.2.5
+  getting marked stable and 3.2.7 getting added to portage. Include fix for
+  module-init-tools systems. Cleaned out lots of older dead ebuilds too to make
+  things prettier.
+
+*linux-wlan-ng-0.2.1_pre16 (24 Jan 2004)
+
+  24 Jan 2004; <nerdboy@gentoo.org> linux-wlan-ng-0.2.1_pre16.ebuild:
+  Added pre16 for 2.6.x kernels, with ewarn info
+
+  18 Dec 2003; Peter Johanson <latexer@gentoo.org> metadata.xml:
+  Added metadata.xml
+
+*linux-wlan-ng-0.2.1_pre11 (02 Aug 2003)
+
+  02 Aug 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.0.ebuild,
+  linux-wlan-ng-0.2.1_pre11.ebuild:
+  Clean out the offensive 0.2.0 ebuild, and bump
+
+*linux-wlan-ng-0.2.1_pre8 (13 Jun 2003)
+
+  13 Jun 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.1_pre8.ebuild:
+  New pre version which hopefully fixes pcmcia issues
+
+*linux-wlan-ng-0.2.1_pre3 (29 Apr 2003)
+
+  29 Apr 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.1_pre3.ebuild:
+  Latest pre-release.
+
+*linux-wlan-ng-0.2.1_pre2 (25 Apr 2003)
+
+  25 Apr 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.1_pre2.ebuild:
+  Bump
+
+*linux-wlan-ng-0.2.1_pre1 (25 Apr 2003)
+
+  20 Apr 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.1_pre1.ebuild:
+  Bump
+
+*linux-wlan-ng-0.2.0-r2 (10 Apr 2003)
+
+  15 Apr 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.0-r2.ebuild:
+  Marked stable for x86
+
+  10 Apr 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.0-r2.ebuild:
+  Uses gentoo style init script
+
+  10 Apr 2003; Peter Johanson <latexer@gentoo.org> :
+  Fixed all ebuilds to do check_KV if needed.
+  
+*linux-wlan-ng-0.2.1_pre1 (10 Apr 2003)
+
+  10 Apr 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.1_pre1.ebuild:
+  Version bump, uses gentoo style init script.
+
+*linux-wlan-ng-0.2.0-r1 (03 Apr 2003)
+
+  07 Apr 2003; Peter Johanson <latexer@gentoo.org>
+  linux-wlan-ng-0.2.0-r1.ebuild:
+  Major fix to how the pcmcia-cs version is handled. Much better now.
+
+  03 Apr 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.0-r1.ebuild:
+  Version bump with fixed pcmcia-cs detection
+
+  24 Mar 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.0.ebuild :
+  Using has_version now to resolve the PCMCIA_VERSION issues. no more calling commands that portage
+  doesn't know about. This should fix it.
+
+  8 Mar 2003; Peter Johanson <latexer@gentoo.org> :
+  Added more extensive comment to postinst section.
+
+  4 Mar 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.0.ebuild :
+  Absolute paths for cardmgr and cut. this should solve it once and forall.
+
+*linux-wlan-ng-0.2.0 (4 Mar 2003)
+
+  4 Mar 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.2.0.ebuild :
+  Version bump. bug #16849
+
+  4 Mar 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.1.16_pre9.ebuild :
+  Fixed some sedding to get the man pages in the right spot.
+
+  3 Mar 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.1.16_pre9.ebuild :
+  PCMIA_VERSION seems to work better with double quotes.
+
+  27 Feb 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.1.16_pre9.ebuild :
+  small fix to PCMCIA_VERSION. bug #16537
+
+  27 Feb 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.1.16_pre9.ebuild :
+  Fixed PCMCIA_VERSION definition to work with latest portage
+
+  11 Feb 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.1.16_pre4.ebuild
+  linux-wlan-ng-0.1.16_pre6.ebuild linux-wlan-ng-0.1.16_pre7.ebuild :
+  Added IUSE to older linux-wlan-ng ebuilds. Fixed formatting issues so lintool
+  checks all of these as okay.
+
+*linux-wlan-ng-0.1.16_pre9 (22 Feb 2003)
+
+  28 Feb 2003; Peter Johanson <latexer@gentoo.org>
+  linux-wlan-ng-0.1.16_pre9.ebuild:
+  Hopefully finally fixed PCMCIA_VERSION
+
+  22 Feb 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.1.16_pre9.ebuild :
+  Slightly modified to check which version of pcmcia-cs it should compile against
+
+  22 Feb 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.1.16_pre9.ebuild :
+  version bump
+
+*linux-wlan-ng-0.1.16_pre8 (08 Feb 2003)
+
+  08 Feb 2003; Peter Johanson <latexer@gentoo.org> linux-wlan-ng-0.1.16_pre8.ebuild:
+  Revision bump, plus major overhaul of how things are done. Please test.
+  bugzilla is down for now. Will thanks submitter soon as i figure out who it was.
+
+*linux-wlan-ng-0.1.16_pre7 (09 Apr 2003)
+ 
+  13 Jul 2003; Daniel Ahlberg <aliz@gentoo.org> :
+  Added missing changelog entry.
+
+*linux-wlan-ng-0.1.16_pre6 (11 Nov 2002)
+
+  11 Nov 2002; Chad Huneycutt <chadh@gentoo.org> linux-wlan-ng-0.1.16_pre6.ebuild :
+
+  revision bump and misc fixes, credit to Bret Towe <btowe@gbis.com> and
+  tprado@charter.net
+
+*linux-wlan-ng-0.1.16_pre4 (31 Oct 2002)
+
+  31 Oct 2002; Hannes Mehnert <hannes@gentoo.org>:
+  moved to net-wireless
+
+  31 Oct 2002; Chad Huneycutt <chadh@gentoo.org> linux-wlan-ng-0.1.16_pre4.ebuild :
+
+  add 0.1.16-pre4 ebuild from Tom Prado <tprado@charter.net>
+  
+  31 Oct 2002; Chad Huneycutt <chadh@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

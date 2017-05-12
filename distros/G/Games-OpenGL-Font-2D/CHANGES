@@ -1,0 +1,41 @@
+
+Games::OpenGL::Font::2D:
+
+2006-02-25 v0.07 Tels - 10 tests
+  * fix to work with current SDL_perl
+
+############################################################################## 
+Older changes:
+
+2003-03-17 v0.01 Tels - 2 tests - first version
+2003-03-18 v0.02 Tels - 7 tests
+2003-03-21 v0.03 Tels - 6 tests - first release
+  * adapted to SDL_perl 1.20.2 (see http://bloodgate.com/perl/sdl)
+  * added pre_output() and post_output() for more speed
+  * made my own font map (courier.bmp), which made much more parameters to
+    new() neccessary: chars, chars_per_line, char_width, char_height etc.
+2003-03-23 v0.04 Tels - 8 tests
+  * removed double my's that caused warnings
+  * font.t refered to the wrong texture file, so it failed
+  * removed the set parameter, it does not make sense when you have more then
+    128 chars (no idea how you could access the other characters in the
+    example font from NeHe, I think having only one font per texture is much 
+    cleaner)
+  * added align_x(), align_y() and align(). Also constants FONT_ALIGN_foo, 
+    where foo is LEFT, RIGHT, TOP, BOTTOM or CENTER.
+  * added char_width(), char_height()
+  * fixed: color() takes array ref or 3 values
+2003-04-08 v0.05 Tels - 8 tests
+  * post_output() and pre_output() warn when called in wrong order
+  * post_output() restores flags to pre pre_output() way
+  * document that post_output() disables writes to depth buffer
+  * DESTROY method released OpenGL lists by using glDeleteLists()
+2003-04-27 v0.06 Tels - 10 tests
+  * fixed the DESTROY method
+  * copy(): GLGenLists($self->{chars}), not just 256
+  * added border_x(), border_y() and support for these in new()
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

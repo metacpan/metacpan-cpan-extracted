@@ -1,0 +1,23 @@
+(name => 'add subbing for new',
+ code => 'my ($a); 
+          $a=[1,2,4,8]; 
+          my $z = GraphViz::Data::Structure->new(\$a,%title%)->graph->as_canon',
+)
+%%
+(name => 'add actually adding',
+ code => 'my ($a); 
+          $a=[1,2,4,8]; 
+          my $z = GraphViz::Data::Structure->new(\$a,%title%); 
+          my $b=[10,20,30]; 
+          my $w = $z->add($b)->graph->as_canon',
+)
+%%
+(name => 'tie it together',
+ code => 'my ($a); 
+          $a=[1,2,4,8]; 
+         my $z = GraphViz::Data::Structure->new($a,%title%); 
+         my $b=[10,20,30]; 
+         $z->add($b); 
+         my $c=[$a,$b]; 
+         $z->add($c)->graph->as_canon',
+)

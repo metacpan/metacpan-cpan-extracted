@@ -1,0 +1,40 @@
+package Gideon::Manual::Drivers;
+
+#ABSTRACT: How to create a driver with Gideon
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Gideon::Manual::Drivers - How to create a driver with Gideon
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 DESCRIPTION
+
+The Gideon distribution comes with L<Gideon::Driver::DBI>
+
+=head1 NAME
+
+Supported Drivers
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 AUTHOR
+
+Mariano Wahlmann, Gines Razanov
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mariano Wahlmann, Gines Razanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

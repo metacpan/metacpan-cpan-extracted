@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Geo-GoogleEarth-Pluggable-Plugin-GreatCircle
+version:      0.01
+version_from: lib/Geo/GoogleEarth/Pluggable/Plugin/GreatCircle.pm
+installdirs:  site
+requires:
+    Geo::Forward:                  0
+    Geo::Inverse:                  0
+    GPS::Point:                    0.14
+    strict:                        0
+    Test::Simple:                  0.44
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

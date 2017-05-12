@@ -1,0 +1,76 @@
+NAME
+    GraphViz::DBI - graph database tables and relations
+
+SYNOPSIS
+      use GraphViz::DBI;
+      print GraphViz::DBI->new($dbh)->graph_tables->as_png;
+
+DESCRIPTION
+    This module constructs a graph for a database showing tables and
+    connecting them if they are related. While or after constructing the
+    object, pass an open database handle, then call `graph_tables' to
+    determine database metadata and construct a GraphViz graph from the
+    table and field information.
+
+METHODS
+    The following methods are defined by this class; all other method calls
+    are passed to the underlying GraphViz object:
+
+    new( [$dbh] )
+        Constructs the object; also creates a GraphViz object. The
+        constructor accepts an optional open database handle.
+
+    set_dbh($dbh)
+        Sets the database handle.
+
+    get_dbh()
+        Returns the database handle.
+
+    is_table($table)
+        Checks the database metadata whether the argument is a valid table
+        name.
+
+    is_foreign_key($table, $field)
+        Determines whether the field belonging to the table is a foreign key
+        into some other table. If so, it is expected to return the name of
+        that table. If not, it is expected to return a false value.
+
+        For example, if there is a table called "product" and another table
+        contains a field called "product_id", then to indicate that this
+        field is a foreign key into the product table, the method returns
+        "product". This is the logic implemented in this class. You can
+        override this method in a subclass to suit your needs.
+
+    graph_tables()
+        This method goes through all tables and fields and calls appropriate
+        methods to determine which tables and which dependencies exist, then
+        hand the results over to GraphViz. It returns the GraphViz object.
+
+TODO
+    *   Test with various database drivers to see whether they support the
+        metadata interface.
+
+    *   Make each table a vertical port with dependencies using those ports.
+
+    *   Provide the possibility to name edges to specify the type of
+        relationship ('has-a', 'is-a', etc.).
+
+BUGS
+    None known so far. If you find any bugs or oddities, please do inform
+    the Maintainer. Patches especially welcome.
+
+AUTHOR
+    Marcel Grünauer <marcel@codewerk.com>
+
+MAINTAINER
+    Aaron Trevena  <aaron.trevena@droogs.org>
+
+COPYRIGHT
+    Copyright 2001 Marcel Grünauer. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), GraphViz(3pm).
+

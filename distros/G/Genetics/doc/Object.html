@@ -1,0 +1,268 @@
+<HTML>
+<HEAD>
+<TITLE>Object.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#public methods">Public methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#field">field</A></LI>
+		<LI><A HREF="#print">print</A></LI>
+		<LI><A HREF="#dump">dump</A></LI>
+		<LI><A HREF="#printobjectxml">printObjectXML</A></LI>
+		<LI><A HREF="#tostone">toStone</A></LI>
+		<LI><A HREF="#autoload">AUTOLOAD</A></LI>
+		<LI><A HREF="#destroy">DESTROY</A></LI>
+	</UL>
+
+	<LI><A HREF="#private methods">Private methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#_initialize">_initialize</A></LI>
+		<LI><A HREF="#_setdefaults">_setDefaults</A></LI>
+		<LI><A HREF="#_verifyrequired">_verifyRequired</A></LI>
+		<LI><A HREF="#_generalhtmlparam">_generalHTMLParam</A></LI>
+		<LI><A HREF="#_attr2string">_attr2String</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::Object</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>A synopsis is not appropriate, as one would never normally instantiate 
+an instance of Genetics::Object.</P>
+<P>See the synopses for the individual subclasses.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is the base class for all GenPerl objects.</P>
+<P>For more information, see the GenPerl tutorial and the documentation for the 
+individual sub-classes.  Also, see Genetics::API for a description of the GenPerl 
+database interface.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+  strict                Just to be anal
+  vars                  Global variables
+  Carp                  Error reporting
+  XML::Writer           Used by generateXML methods
+  HTML::Template        Used by asHTML methods</PRE>
+<PRE>
+  Genetics::Cluster     Subclass
+  Genetics::DNASample   Subclass
+  Genetics::FrequencySource Subclass
+  Genetics::Genotype    Subclass
+  Genetics::Haplotype   Subclass
+  Genetics::HtMarkerCollection Subclass
+  Genetics::Kindred     Subclass
+  Genetics::Map         Subclass
+  Genetics::Marker      Subclass
+  Genetics::Phenotype   Subclass
+  Genetics::SNP         Subclass
+  Genetics::StudyVariable Subclass
+  Genetics::Subject     Subclass
+  Genetics::TissueSample Subclass</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public methods</A></H1>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+  Function  : Object constructor
+  Arguments : Class name and hash array
+  Returns   : Blessed hash
+  Scope     : Public
+  Called by : Main
+  Comments  : Creates an empty hash, blesses it into the class name and calls
+              _initialize with the arguments passed</PRE>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+  Function  : Return the object type: Subject, Genotype, etc.
+  Arguments : A Genetics::Object object.
+  Returns   : Scalar
+  Scope     : Public
+  Comments  :</PRE>
+<P>
+<H2><A NAME="field">field</A></H2>
+<PRE>
+  Function  : Get or set specified field data
+  Argument  : Field name and value (both optional)
+  Returns   : Called with a single argument, this returns the value of the field 
+              named by the argument.  Called with tow argumetns, this sets the 
+              value of the field named by the first argument to the value in the 
+              second argument.  Called with no arguments, this returns a list of 
+              all field names.
+  Scope     : Public
+  Called by : 
+  Comments  : As an alternative to using this method, field names can be used as 
+              get/set methods (see AUTOLOAD).</PRE>
+<P>
+<H2><A NAME="print">print</A></H2>
+<PRE>
+  Function  : Print out object in a raw format
+  Argument  : N/A
+  Returns   : N/A
+  Scope     : Public
+  Called by : Main
+  Comments  : This is mostly for debugging purposes.</PRE>
+<P>
+<H2><A NAME="dump">dump</A></H2>
+<PRE>
+  Function  : Same as print, but returns a string instead of printing it.
+  Argument  : N/A
+  Returns   : Scalar text string.
+  Scope     : Public
+  Called by : Main
+  Comments  : This is mostly for debugging purposes.</PRE>
+<P>
+<H2><A NAME="printobjectxml">printObjectXML</A></H2>
+<PRE>
+  Function  : Generate and print XML common to all Genperl objects. 
+  Argument  : A Genetics::Object object and the XML::Writer object being used 
+              to generate the XML.
+  Returns   : N/A
+  Scope     : Public Instance Method
+  Called by : printXML methods of Genetics::Object subclasses.
+  Comments  :</PRE>
+<P>
+<H2><A NAME="tostone">toStone</A></H2>
+<PRE>
+ Function  : 
+ Arguments : 
+ Returns   : 
+ Example   : toStone()
+ Scope     : Public instance method
+ Comments  :</PRE>
+<P>
+<H2><A NAME="autoload">AUTOLOAD</A></H2>
+<PRE>
+  Function  : Allow field names to be used as get/set methods instead of field().
+  Argument  : Optional field value, in which case the field is set to this new 
+              value (see field())
+  Returns   : Field value
+  Scope     : Public
+  Called by : Called automatically when an undefined method - in 
+              Genetics::Object, or any of its subclasses - is invoked.</PRE>
+<P>
+<H2><A NAME="destroy">DESTROY</A></H2>
+<PRE>
+  Function  : Deallocate object storage
+  Argument  : N/A
+  Returns   : N/A
+  Scope     : Public
+  Called by : Called automatically when the object goes out of scope 
+              (ie the internal reference count in the symbol table is 
+              zero).  Can be called explicitly.</PRE>
+<P>
+<HR>
+<H1><A NAME="private methods">Private methods</A></H1>
+<P>
+<H2><A NAME="_initialize">_initialize</A></H2>
+<PRE>
+  Function  : Initialize object
+  Arguments : Hash array of attributes/values passed to new()
+  Returns   : N/A
+  Scope     : Private
+  Called by : 
+  Comments  :</PRE>
+<P>
+<H2><A NAME="_setdefaults">_setDefaults</A></H2>
+<PRE>
+  Function  : Set default attribute values
+  Arguments : 
+  Returns   : N/A
+  Scope     : Private
+  Called by : Genetics::Object-&gt;_initialize
+  Comments  :</PRE>
+<P>
+<H2><A NAME="_verifyrequired">_verifyRequired</A></H2>
+<PRE>
+  Function  : Verify that required attributes are set
+  Arguments : N/A
+  Returns   : N/A
+  Scope     : Private
+  Called by : Genetics::Object-&gt;_initialize()
+  Comments  : Verify that required fields have values.</PRE>
+<P>
+<H2><A NAME="_generalhtmlparam">_generalHTMLParam</A></H2>
+<PRE>
+  Function  : Generate parameter hash, for passing to HTML::Template, 
+              containing data common to all Genperl objects. 
+  Argument  : A Genetics::Object object and a reference to a parameter hash.
+  Returns   : N/A
+  Scope     : Private Instance Method
+  Called by : asHTML methods of Genetics::Object subclasses.
+  Comments  :</PRE>
+<P>
+<H2><A NAME="_attr2string">_attr2String</A></H2>
+<PRE>
+  Function  : Convert a pointer to a complex attribute value into a string 
+              for printing.
+  Arguments : N/A
+  Returns   : N/A
+  Scope     : Private Class Method
+  Called by : print().  _instantiate() and field() also call this method when 
+              the debug flag is set.
+  Comments  : Recurses if nested pointers exist in the data structure.</PRE>
+
+</BODY>
+
+</HTML>

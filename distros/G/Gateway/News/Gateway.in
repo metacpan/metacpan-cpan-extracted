@@ -1,0 +1,235 @@
+# News::Gateway -- Mail and news gatewaying toolkit.  -*- perl -*-
+# $Id: Gateway.in,v 0.43 1998/04/12 17:26:47 eagle Exp $
+#
+# Copyright 1997, 1998 by Russ Allbery <rra@stanford.edu>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
+# "Obviously unlike you people, I don't have time to edit the newsgroups
+# line for every single article I post."
+#                        -- markl@cs.yale.edu, in the midst of a huge
+#                           flamewar about COBOL crossposted to too many
+#                           newsgroups including alt.folklore.computers.
+
+############################################################################
+# Modules, declarations, and site configuration
+############################################################################
+
+package News::Gateway;
+require 5.003;
+
+use News::Article ();
+
+use strict;
+use vars qw($AUTOLOAD $FAILCODE %HOOKS $VERSION);
+
+# The current News::Gateway version number, which is not the same as the RCS
+# revision of this file.  Picked up during build time.
+# @@ VERSION
+
+# Exit code that should be used to indicate permanent failure.  This should
+# be 100 for qmail and probably be 64 for sendmail (EX_USAGE), although you
+# may want to pick some other sendmail status (there are so many to choose
+# from....).
+$FAILCODE = 64;
+
+
+############################################################################
+# Gateway module hooks
+############################################################################
+
+# News::Gateway implements a generic robomoderation framework that provides
+# a series of setup and utility functions and the means for various modules
+# to be easily plugged into a generic framework.  All article checks and
+# rewrites are performed by modules, not this core code.  The following
+# table is used to associate modules with configuration file directives so
+# that configuration information can be passed to the modules, as well as to
+# tell News::Gateway what modules exist.
+#
+# The general syntax is as follows:
+#
+#     module1 => ['config1', 'config2'],
+#     module2 => ['config3'],
+#     module3 => [],
+#
+# This registers message mangling hooks for module1, module2, and module3,
+# and also sets up a callback module1_conf that's called for configuration
+# lines starting with 'config1' or 'config2' and a callback module2_conf
+# that's called for configuration lines starting with 'config3'.
+
+# @@ Begin automatically generated section -- do not edit.
+# @@ End automatically generated section -- do not edit.
+
+
+############################################################################
+# Gateway module loading
+############################################################################
+
+# We can't quite use AutoLoader, although we're going to do something very
+# similar, because the name of the file to be imported isn't going to be the
+# same as the called sub.  We're being very strange, tricky, and subtle.
+# The name of the module to load will be the sub we tried to call, with any
+# trailing underscore and letters after an underscore stripped off and a .al
+# appended.  We'll look in the standard autoload directory for it.  Most of
+# this code is derived from AutoLoader.pm.
+sub AUTOLOAD {
+    my ($package, $module) = ($AUTOLOAD =~ /(.*)::([^:]+)$/);
+    $package =~ s%::%/%;
+    $module =~ s/_[^_]+$//;
+
+    # If our package has been loaded, which it should have been, we can
+    # derive the name of the directory our modules are in from it.
+    # Otherwise, we'll do a full @INC search for the module we're looking
+    # for.
+    my $name = $INC{"$package.pm"};
+    if ($name) {
+        $name =~ s%^(.*)$package\.pm$%$1auto/$package/$module.al%;
+        undef $name unless (-r $name);
+    }
+    unless ($name) { $name = "auto/$package/$module.al" }
+
+    # Now comes the fun.  We try to load the module.  If the routine trying
+    # to be autoloaded is DESTROY or import, we generate a null one on the
+    # fly to avoid annoying error messages at shutdown or use time.
+    #
+    # We have to handle a few things specially here.  First, if the sub that
+    # we're trying and failing to autoload is mail_error() (which may be
+    # called by error()), then we have a major problem and need to avoid
+    # calling more methods.  Second, if the first argument to the sub isn't
+    # a reference (meaning that they're not calling a method), we can't then
+    # call our error() method since we don't have an object.  (This should
+    # really be fixed by making error() robust in that case....)
+    my $save = $@;
+    eval { require $name };
+    if ($@) {
+        $@ =~ s/ at .*\n//;
+        if (substr ($AUTOLOAD, -9) eq '::DESTROY'
+            || substr ($AUTOLOAD, -8) eq '::import') {
+            *$AUTOLOAD = sub {};
+        } elsif (substr ($AUTOLOAD, -12) eq '::mail_error') {
+            warn "Autoload of $AUTOLOAD failed: $@\n";
+            warn "Unable to autoload error methods, aborting\n";
+            exit $FAILCODE;
+        } elsif (not ref $_[0]) {
+            warn "Autoload of $AUTOLOAD failed: $@\n";
+            warn "Attempted to autoload non-method, aborting\n";
+            exit $FAILCODE;
+        } else {
+            $_[0]->error ("Autoload of $AUTOLOAD failed: $@");
+        }
+    }
+    $@ = $save;
+    goto &$AUTOLOAD;
+}
+
+
+############################################################################
+# Creation and initialization of a new gateway
+############################################################################
+
+# This method creates a new gateway object.  It takes arguments specifying
+# whether we're running interactively (if we are, errors can be dealt with
+# by dying; otherwise, we need to send mail), the maintainer (administrative
+# contact address) which defaults to the user we're running as if none is
+# given, and the envelope sender that should be used for any and all replies
+# to articles.
+sub new {
+    my $that = shift;
+    my $class = ref $that || $that;
+    my ($interactive, $maintainer, $envelope) = @_;
+    unless ($maintainer) { $maintainer = (getpwuid ($<))[0] }
+    unless ($envelope) { $envelope = $maintainer }
+    my $self = {
+        confhooks   => {},
+        mesghooks   => [],
+        envelope    => $envelope,
+        interactive => $interactive,
+        maintainer  => $maintainer
+    };
+    bless ($self, $class);
+}
+
+# Takes a list of modules as arguments and installs all of the callbacks for
+# those modules (as determined by the %HOOKS hash defined above).  The
+# arguments to this constructor can just be a list of modules, or can be an
+# intermixed list of modules and module/argument pairs.  Arguments must be
+# anonymous arrays, and if arguments are present for a module, they're
+# passed in to the _init method of the module.
+sub modules {
+    my $self = shift;
+    my $module;
+    while (defined ($module = shift)) {
+        unless (defined $HOOKS{$module}) {
+            $self->error ("Unknown module $module");
+        }
+        my @hook = @{$HOOKS{$module}};
+        if (ref $_[0]) {
+            my $method = $module . '_init';
+            $self->$method (@{+shift});
+        }
+        push (@{$$self{mesghooks}}, $module);
+        for (@hook) { push (@{$$self{confhooks}{$_}}, $module) }
+    }
+}
+
+
+############################################################################
+# Message handling
+############################################################################
+
+# Read in the article from a source, returning undef if this fails (either
+# because no data is available or because the size limits are exceeded) and
+# the number of bytes read if it succeeds.  This is mostly just a wrapper
+# around the News::Article constructor.
+sub read {
+    my $self = shift;
+    $$self{article} = News::Article->new (@_);
+}
+
+# Apply the given modules, or if none are given, apply all of the ones we
+# have pending.  Each hook should return undef on success and a string
+# indicating the error message on failure; as soon as any hook fails, this
+# method aborts and returns a list consisting of the name of the module that
+# failed and the error message in an array context or the message prepended
+# with the name of the module in a scalar context.
+sub apply {
+    my $self = shift;
+    my @modules = @_ ? @_ : @{$$self{mesghooks}};
+    for (@modules) {
+        my $module = $_ . '_mesg';
+        my $error = $self->$module ();
+        if ($error) { return wantarray ? ($_, $error) : "$_: $error" }
+    }
+}
+
+
+############################################################################
+# Error handling
+############################################################################
+
+# Handle a fatal script error.  This shouldn't be used for article
+# rejections, only for syntax errors, fatal system problems, and the like.
+# If we're interactive, we just die with the error message; otherwise, we
+# call mail_error().
+sub error {
+    my ($self, $error) = @_;
+    if ($$self{interactive}) {
+        die $error . "\n";
+    } else {
+        $self->mail_error ($error);
+    }
+}
+
+
+############################################################################
+# Accessors
+############################################################################
+
+# Return a reference to the underlying article.
+sub get_article { $_[0]{article} }
+
+# Replace the current article with a new News::Article reference.
+sub set_article { $_[0]{article} = $_[1] }
+
+1;

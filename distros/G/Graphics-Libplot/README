@@ -1,0 +1,35 @@
+libplot-perl
+libplot-perl is copyrighted by John Lapeyre <lapeyre@physics.arizona.edu>
+
+This program may be distributed only under the terms
+of the Gnu General Public License or the perl Artistic License.
+
+This is a perl module which allows the libplot plotting 
+routines to be called from the perl scripting language.
+libplot currently takes relatively primitive graphics commands.
+Several output formats, including xfig, postscript and
+an X11 driver are available. (All the drivers in libplot seem to
+work.)
+
+In order to build this package, you need the libplot library to
+be built and installed.  It is part of the plotutils package,
+available wherever fine FSF products are sold. 
+http://www.gnu.org/software/plotutils/plotutils.html
+You need the plot.h header file as well as the
+shared library.
+
+On some systems, the module will build with
+
+perl Makefile.PL
+make
+make test
+make install
+
+This has been tested under Debian Gnu/Linux and 
+on a DEC Alpha running Digital Unix.
+
+In the source tree is a directory, "examples" with
+a readme and some sample scripts.
+
+John Lapeyre <lapeyre@physics.arizona.edu>
+

@@ -1,0 +1,7 @@
+CHANGES
+MANIFEST
+META.yml                                Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+lib/Geo/Approx.pm
+t/test.t

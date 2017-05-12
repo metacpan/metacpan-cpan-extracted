@@ -1,0 +1,12 @@
+#!/bin/bash
+tagname=$1
+if [[ -z $tagname ]] ; then
+    tagname=tag-`date +%Y%m%d`
+fi
+hash=`git rev-list HEAD -1`
+
+echo "Creating tag: $tagname"
+git tag -a -m "tagging version $tagname" $tagname
+
+echo "Pushing tags"
+git push --tags

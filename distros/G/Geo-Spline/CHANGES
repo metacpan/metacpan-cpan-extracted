@@ -1,0 +1,34 @@
+2006-02-01 v0.16
+  * Documentation
+2006-01-04 v0.15
+  * Documentation
+2006-01-03 v0.14
+  * Documentation
+2006-12-06 v0.13
+  * added ellipsoid method
+2006-12-06 v0.12
+  * Some how the wrong META.yml got in the distribution
+2006-12-05 v0.11
+  * Require Geo::Ellipsoids => 0.08
+2006-12-05 v0.10
+  * Replaced constants with Geo::Ellipsoids
+2006-12-03 v0.09
+  * Documentation
+2006-11-29 v0.08
+  * Documentation
+  * All methods will return either arrays or references based on wantarray.
+  * Added dependancy on "use constant" to Makefile.PL
+2006-11-05 v0.07
+  * Added Excel Document
+2006-11-04 v0.06
+  * Major interface changes
+2006-11-04 v0.05
+  * Documentation
+2006-11-04 v0.04
+  * Documentation
+2006-11-04 v0.03
+  * Fixed type-O in Meta.yml
+2006-10-31 v0.02
+  * normalized heading to be positive
+2006-10-30 v0.01
+  * Original version

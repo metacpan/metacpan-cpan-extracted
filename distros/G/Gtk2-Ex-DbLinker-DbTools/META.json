@@ -1,0 +1,55 @@
+{
+   "abstract" : "Databases access part of DbLinker ",
+   "author" : [
+      "FranE<ccedil>ois Rappaz (rappazf@gmail.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-Ex-DbLinker-DbTools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.17",
+            "Class::InsideOut" : "1.13",
+            "DBI" : "1.631",
+            "Data::Dumper" : "2.154",
+            "Log::Log4perl" : "1.41",
+            "Scalar::Util" : "1.45",
+            "Test::More" : "1",
+            "Try::Tiny" : "0.22",
+            "interface" : "0.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://sourceforge.net/projects/gtk2-ex-dblinker-dbtools/"
+      }
+   },
+   "version" : "0.111",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

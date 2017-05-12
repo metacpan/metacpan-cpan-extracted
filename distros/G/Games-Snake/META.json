@@ -1,0 +1,55 @@
+{
+   "abstract" : "Snake game",
+   "author" : [
+      "Jeffrey T. Palmer <jtpalmer@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Snake",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "SDL" : "2.500",
+            "SDL::Event" : "0",
+            "SDLx::App" : "0",
+            "Sub::Quote" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jtpalmer/Games-Snake/issues"
+      },
+      "homepage" : "https://github.com/jtpalmer/Games-Snake",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jtpalmer/Games-Snake.git",
+         "web" : "https://github.com/jtpalmer/Games-Snake"
+      }
+   },
+   "version" : "0.000001"
+}
+

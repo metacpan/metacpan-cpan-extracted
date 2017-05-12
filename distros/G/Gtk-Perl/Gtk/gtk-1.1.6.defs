@@ -1,0 +1,17 @@
+
+(define-flags GtkSignalRunType
+  (first GTK_RUN_FIRST)
+  (last GTK_RUN_LAST)
+  (both GTK_RUN_BOTH)
+  (no-recurse GTK_RUN_NO_RECURSE)
+  (action GTK_RUN_ACTION)
+  (no-hooks GTK_RUN_NO_HOOKS))
+
+(define-enum GtkPolicyType
+  (always GTK_POLICY_ALWAYS)
+  (never GTK_POLICY_NEVER)
+  (automatic GTK_POLICY_AUTOMATIC))
+
+(define-enum GtkToolbarSpaceStyle
+  (empty GTK_TOOLBAR_SPACE_EMPTY)
+  (line GTK_TOOLBAR_SPACE_LINE))

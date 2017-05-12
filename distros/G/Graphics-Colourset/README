@@ -1,0 +1,85 @@
+
+==== NAME ====
+
+Graphics::Colourset - create sets of colours.
+
+
+==== VERSION ====
+
+This describes version ``0.01'' of Graphics::Colourset.
+
+
+==== DESCRIPTION ====
+
+This module generates the colour definitions of a set of colours suitable
+for using as the basis of a colour-scheme for an X-Windows window-manager.
+They can also be used for CSS colour descriptions for Web-pages. The colours
+are defined as the usual "hex string", or as the more recent "rgb string".
+
+The aim of this is to avoid having to generate harmonious colour schemes by
+hand but to input a minimum number of parameters and to create all the
+colours from that.
+
+
+==== REQUIRES ====
+
+    Graphics::ColorObject
+    Getopt::Long
+    Getopt::ArgvFile
+    Pod::Usage
+    Test::More
+
+
+==== INSTALLATION ====
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the "./"
+notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+In order to install somewhere other than the default, such as in a directory
+under your home directory, like "/home/fred/perl" go
+
+   perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will then need to make sure that you alter the PERL5LIB variable to find
+the modules, and the PATH variable to find the script.
+
+Therefore you will need to change: your path, to include
+/home/fred/perl/script (where the script will be)
+
+        PATH=/home/fred/perl/script:${PATH}
+
+the PERL5LIB variable to add /home/fred/perl/lib
+
+        PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+
+==== AUTHOR ====
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com
+
+
+==== COPYRIGHT AND LICENCE ====
+
+Copyright (c) 2005 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

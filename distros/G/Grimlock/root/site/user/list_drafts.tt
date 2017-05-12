@@ -1,0 +1,1 @@
+[% INCLUDE 'shared/post_datatable.tt' source_url = '/user/list_drafts' delete_url = '/draft/' update_url = '/draft/' drafts = 1 %] 

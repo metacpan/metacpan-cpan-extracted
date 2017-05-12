@@ -1,0 +1,32 @@
+# havok version=7.19
+ABSTRACT:     
+AUTHOR:    Jeffrey I Cohen (jcohen@cpan.org)
+DML:    
+  -    
+    check:    
+      -    select * from sys_hook where xname='Genezzo::SpaceMan::SMHook'
+
+    install:    
+      -    select add_sys_hook('pkg=Genezzo::Block::RDBlock', 'hook=push_post_hook', 'replace=Push_Hook', 'module=Genezzo::SpaceMan::SMHook', 'function=block_push_hook', 'version=1.30') from dual
+      -    select add_sys_hook('pkg=Genezzo::Block::RDBlock', 'hook=delete_post_hook', 'replace=Delete_Hook', 'module=Genezzo::SpaceMan::SMHook', 'function=block_delete_hook', 'version=1.30') from dual
+      -    select add_sys_hook('pkg=Genezzo::Block::RDBlock', 'hook=realstore_post_hook', 'replace=Store_Hook', 'module=Genezzo::SpaceMan::SMHook', 'function=block_store_hook', 'version=1.30') from dual
+      -    select add_sys_hook('pkg=Genezzo::Row::RSFile', 'hook=untie_block_pre_hook', 'replace=PreUntie_Hook', 'module=Genezzo::SpaceMan::SMHook', 'function=block_pre_untie_hook', 'version=1.30') from dual
+      -    select add_sys_hook('pkg=Genezzo::Row::RSFile', 'hook=untie_block_post_hook', 'replace=PostUntie_Hook', 'module=Genezzo::SpaceMan::SMHook', 'function=block_post_untie_hook', 'version=1.30') from dual
+      -    select add_sys_hook('pkg=Genezzo::Row::RSFile', 'hook=tie_block_post_hook', 'replace=PostTie_Hook', 'module=Genezzo::SpaceMan::SMHook', 'function=block_post_tie_hook', 'version=1.30') from dual
+      -    select add_sys_hook('pkg=Genezzo::SpaceMan::SMExtent', 'hook=smextent_usehooks', 'replace=SMX_Use_Hook', 'module=Genezzo::SpaceMan::SMHook', 'function=spaceman_smx_use_hook', 'version=1.30') from dual
+      -    select add_user_function('sqlname=spacefixup', 'argstyle=HASH', 'function=sql_func_spacefixup', 'creationdate=2007-11-20T07:43:07', 'module=Genezzo::SpaceMan::SMHook') from dual
+      -    select add_user_function('sqlname=extent_fixup', 'argstyle=HASH', 'function=sql_func_extent_fixup', 'creationdate=2007-11-20T07:43:07', 'module=Genezzo::SpaceMan::SMHook') from dual
+      -    select extent_fixup() from dual
+      -    select drop_user_function('extent_fixup') from dual
+      -    select spacefixup() from dual
+
+
+
+LICENSE:    gpl
+NAME:    Genezzo::SpaceMan::SMHook
+PREREQ_HAVOK:    
+  Genezzo::Havok:    0.0
+  Genezzo::Havok::SysHook:    0.0
+
+UPDATED:    2007-11-20T00:02:51
+VERSION:    1.30

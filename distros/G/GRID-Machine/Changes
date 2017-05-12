@@ -1,0 +1,22 @@
+0.124
+  * Allow GRID::Machine objects to extend simple Unix processes: 
+         no SSH connection, simply open2
+0.111
+    * gmdb. Remote debug
+    * added mani.pl to tests
+    * log files (stdout, stderr) in a subdir
+    * setloganderr:
+
+        $logname = "$ENV{HOME}/rperl$args->{clientpid}_$$.$log" unless $logname;
+
+      en vez de usar $ENV{HOME} se debería poder definir un directorio en el que trabajar.
+      Make a test from 
+        examples/synopsisreport.pl
+
+      si "cleanup" se suprime el fichero de report
+
+
+0.01  Wed May 16 13:12:17 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n GRID::Machine
+

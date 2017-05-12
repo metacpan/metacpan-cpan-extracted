@@ -1,0 +1,274 @@
+diff --minimal -ruw csh/csh.c csh/csh.c
+--- csh/csh.c	2003-05-28 21:32:36.000000000 +0100
++++ csh/csh.c	2003-05-28 21:31:51.000000000 +0100
+@@ -102,9 +102,9 @@
+ 
+ extern char **environ;
+ 
+-static int readf(void *, char *, int);
+-static fpos_t seekf(void *, fpos_t, int);
+-static int writef(void *, const char *, int);
++static ssize_t readf(void *, char *, size_t);
++static int     seekf(void *, off_t, int);
++static ssize_t writef(void *, const char *, size_t);
+ static int closef(void *);
+ static int srccat(Char *, Char *);
+ static int srcfile(char *, bool, bool);
+@@ -124,6 +124,7 @@
+     Char *cp;
+     char *tcp, **tempv;
+     const char *ecp;
++	cookie_io_functions_t cookie;
+     sigset_t sigset;
+     int f;
+ 
+@@ -131,7 +132,7 @@
+     cshout = stdout;
+     csherr = stderr;
+ 
+-    setprogname(argv[0]);
++    /* setprogname(argv[0]); */ 
+     settimes();			/* Immed. estab. timing base */
+ 
+     /*
+@@ -215,14 +216,15 @@
+      *	    Fortunately this is not needed under the current implementation
+      *	    of stdio.
+      */
+-    (void)fclose(cshin);
+-    (void)fclose(cshout);
+-    (void)fclose(csherr);
+-    if (!(cshin  = funopen((void *) &SHIN,  readf, writef, seekf, closef)))
++	cookie.read  = readf;
++	cookie.write = writef;
++	cookie.seek  = seekf;
++	cookie.close = closef;
++	if (!(cshin  = fopencookie((void *) &SHIN,  "r", cookie)))
+ 	exit(1);
+-    if (!(cshout = funopen((void *) &SHOUT, readf, writef, seekf, closef)))
++	if (!(cshout = fopencookie((void *) &SHOUT, "w", cookie)))
+ 	exit(1);
+-    if (!(csherr = funopen((void *) &SHERR, readf, writef, seekf, closef)))
++	if (!(csherr = fopencookie((void *) &SHERR, "w", cookie)))
+ 	exit(1);
+     (void)setvbuf(cshin,  NULL, _IOLBF, 0);
+     (void)setvbuf(cshout, NULL, _IOLBF, 0);
+@@ -1241,21 +1243,21 @@
+  */
+ #define DESC(a) (*((int *) (a)) - (didfds && *((int *) a) >= FSHIN ? FSHIN : 0))
+ 
+-static int
+-readf(void *oreo, char *buf, int siz)
++static ssize_t
++readf(void *oreo, char *buf, size_t siz)
+ {
+     return read(DESC(oreo), buf, siz);
+ }
+ 
+ 
+-static int
+-writef(void *oreo, const char *buf, int siz)
++static ssize_t
++writef(void *oreo, const char *buf, size_t siz)
+ {
+     return write(DESC(oreo), buf, siz);
+ }
+ 
+-static fpos_t
+-seekf(void *oreo, fpos_t off, int whence)
++static int
++seekf(void *oreo, off_t off, int whence)
+ {
+     return lseek(DESC(oreo), off, whence);
+ }
+diff --minimal -ruw csh/dir.c csh/dir.c
+--- csh/dir.c	2003-05-28 21:32:36.000000000 +0100
++++ csh/dir.c	2003-05-28 21:31:51.000000000 +0100
+@@ -854,7 +854,7 @@
+     if (p1 && *p1 == '/' &&
+ 	(Strncmp(p1, cp, cc) != 0 || (cp[cc] != '/' && cp[cc] != '\0'))) {
+ 	static ino_t home_ino;
+-	static dev_t home_dev = NODEV;
++	static dev_t home_dev = -1;
+ 	static Char *home_ptr = NULL;
+ 	struct stat statbuf;
+ 
+diff --minimal -ruw csh/extern.h /tmp/csh/extern.h
+--- csh/extern.h	2003-05-28 21:32:36.000000000 +0100
++++ csh/extern.h	2003-05-28 21:31:51.000000000 +0100
+@@ -39,6 +39,13 @@
+ #define _EXTERN_H_
+ 
+ #include <sys/cdefs.h>
++#include <stdio_ext.h>
++
++#define fpurge __fpurge
++
++size_t strlcpy(char *, const char *, size_t);
++
++extern const char *const sys_signame[];
+ 
+ /*
+  * csh.c
+diff --minimal -ruw csh/func.c csh/func.c
+--- csh/func.c	2003-05-28 21:32:36.000000000 +0100
++++ csh/func.c	2003-05-28 21:31:51.000000000 +0100
+@@ -50,6 +50,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <errno.h>
+ 
+ #if __STDC__
+ # include <stdarg.h>
+@@ -63,6 +64,7 @@
+ 
+ extern char **environ;
+ extern int progprintf(int, char **);
++extern int errno;
+ 
+ static void islogin(void);
+ static void reexecute(struct command *);
+@@ -1428,8 +1430,8 @@
+     int ret;
+ 
+     ret = progprintf(blklen(v), c = short2blk(v));
+-    (void)fflush(cshout);
+-    (void)fflush(csherr);
++    (void)fflush(stdout);
++    (void)fflush(stderr);
+ 
+     blkfree((Char **) c);
+     if (ret)
+diff --minimal -ruw csh/glob.c csh/glob.c
+--- csh/glob.c	2003-05-28 21:32:36.000000000 +0100
++++ csh/glob.c	2003-05-28 21:31:51.000000000 +0100
+@@ -402,7 +402,8 @@
+ 
+     do {
+ 	ptr = short2qstr(*vl);
+-	switch (glob(ptr, gflgs, 0, &globv)) {
++	switch (glob(ptr, nonomatch || glob_pattern_p(ptr, 1)
++		? gflgs : gflgs | GLOB_NOCHECK, 0, &globv)) {
+ 	case GLOB_ABORTED:
+ 	    setname(vis_str(*vl));
+ 	    stderror(ERR_NAME | ERR_GLOB);
+@@ -410,17 +411,17 @@
+ 	case GLOB_NOSPACE:
+ 	    stderror(ERR_NOMEM);
+ 	    /* NOTREACHED */
++	case GLOB_NOMATCH:
++		magic = 1;
++		break;
+ 	default:
++		match |= globv.gl_flags & GLOB_MAGCHAR;
+ 	    break;
+ 	}
+-	if (globv.gl_flags & GLOB_MAGCHAR) {
+-	    match |= (globv.gl_matchc != 0);
+-	    magic = 1;
+-	}
+ 	gflgs |= GLOB_APPEND;
+     }
+     while (*++vl);
+-    vl = (globv.gl_pathc == 0 || (magic && !match && !nonomatch)) ?
++	vl = (globv.gl_pathc == 0 || (magic && !match)) ?
+ 	NULL : blk2short(globv.gl_pathv);
+     globfree(&globv);
+     return (vl);
+diff --minimal -ruw csh/pathnames.h csh/pathnames.h
+--- csh/pathnames.h	2003-05-28 21:32:36.000000000 +0100
++++ csh/pathnames.h	2003-05-28 21:31:51.000000000 +0100
+@@ -42,7 +42,7 @@
+ #define	_PATH_DOTCSHRC		"/etc/csh.cshrc"
+ #define	_PATH_DOTLOGIN		"/etc/csh.login"
+ #define	_PATH_DOTLOGOUT		"/etc/csh.logout"
+-#define	_PATH_LOGIN		"/usr/bin/login"
++#define	_PATH_LOGIN		"/bin/login"
+ #define	_PATH_USRBIN		"/usr/bin"
+ 
+ #endif /* !_PATHNAMES_H_ */
+diff --minimal -ruw csh/proc.c csh/proc.c
+--- csh/proc.c	2003-05-28 21:32:36.000000000 +0100
++++ csh/proc.c	2003-05-28 21:31:51.000000000 +0100
+@@ -951,13 +951,21 @@
+ 		    stderror(ERR_NAME | ERR_BADSIG);
+ 		else if (signum == 0)
+ 		    (void)fputc('0', cshout); /* 0's symbolic name is '0' */
++		else if (!sys_signame[signum])
++			(void) fprintf(cshout, "%d", signum);
+ 		else
+ 		    (void)fprintf(cshout, "%s ", sys_signame[signum]);
+ 	    } else {
+-		for (signum = 1; signum < NSIG; signum++) {
+-		    (void)fprintf(cshout, "%s ", sys_signame[signum]);
+-		    if (signum == NSIG / 2)
++			int cur = 0, len;
++			for (signum = 1; signum < NSIG; signum++)
++				if (sys_signame[signum]) {
++					len = strlen (sys_signame[signum]) + 1;
++					cur += len;
++					if (cur >= 80 - 1) {
+ 			(void)fputc('\n', cshout);
++						cur = len;
++					}
++					(void) fprintf(cshout, "%s ", sys_signame[signum]);
+ 	    	}
+ 	    }
+ 	    (void)fputc('\n', cshout);
+@@ -979,9 +987,10 @@
+ 
+ 	    name = short2str(signame);
+ 	    for (signum = 1; signum < NSIG; signum++)
+-		if (!strcasecmp(sys_signame[signum], name) ||
+-		    (!strncasecmp("SIG", name, 3) &&	/* skip "SIG" prefix */
+-		     !strcasecmp(sys_signame[signum], name + 3)))
++		if (sys_signame[signum] && \
++			(!strcasecmp(sys_signame[signum], name) ||
++				(strlen(name) > 3 && !strncasecmp("SIG", name, 3) &&
++					!strcasecmp(sys_signame[signum], name + 3))))
+ 		    break;
+ 
+ 	    if (signum == NSIG) {
+diff --minimal -ruw csh/set.c csh/set.c
+--- csh/set.c	2003-05-28 21:32:36.000000000 +0100
++++ csh/set.c	2003-05-28 21:31:51.000000000 +0100
+@@ -633,7 +633,6 @@
+     Setenv(STRPATH, exppath);
+ }
+ 
+-#ifndef lint
+  /*
+   * Lint thinks these have null effect
+   */
+@@ -650,19 +649,6 @@
+ 	((p)->v_right = t->v_left) ? (t->v_left->v_parent = (p)) : 0,\
+ 	(t->v_left = (p))->v_parent = t,\
+ 	(p) = t)
+-#else
+-struct varent *
+-rleft(struct varent *p)
+-{
+-    return (p);
+-}
+-struct varent *
+-rright(struct varent *p)
+-{
+-    return (p);
+-}
+-#endif				/* ! lint */
+-
+ 
+ /*
+  * Rebalance a tree, starting at p and up.
+@@ -674,10 +660,8 @@
+ {
+     struct varent *pp;
+ 
+-#ifndef lint
+     struct varent *t;	/* used by the rotate macros */
+ 
+-#endif
+     int ff;
+ 
+     /*

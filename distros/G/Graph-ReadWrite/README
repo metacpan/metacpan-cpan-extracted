@@ -1,0 +1,66 @@
+
+			Graph-ReadWrite
+
+This is a collection of perl classes for reading and writing
+directed graphs in a variety of file formats. The graphs are
+represented in Perl using Jarkko Hietaniemi's Graph classes.
+Version 2+ of this distribution works with version 0.5 and
+later of the Graph distribution.
+
+There are two base classes:
+
+	Graph::Reader
+	Base class for classes which read a graph
+	file and create an instance of the Graph class.
+
+	Graph::Writer
+	Base class for classes which take an instance of the
+	Graph class and write it out in a specific file format.
+
+This distribution also defines a simple XML format for storing
+directed graphs, defined to meet the needs of the Graph class.
+A reader and writer are provided for this:
+
+	Graph::Reader::XML
+	Graph::Writer::XML
+
+Writers are also included for Dot, VCG, and daVinci,
+two packages for displaying / rendering graphs.
+Dot and VCG are freely available; daVinci is freely available
+at the moment, but that is going to change soon.
+
+	Graph::Writer::Dot
+	Graph::Writer::VCG
+	Graph::Writer::daVinci
+
+A reader for Dot files has been contributed by Mark Hillebrand:
+
+	Graph::Reader::Dot
+
+A reader and writer for HTK lattices are also included:
+
+	Graph::Reader::HTK
+	Graph::Writer::HTK
+
+These last two will probably only be of interest to people working
+with HTK, or tools which use the same format.
+
+Dependencies:
+	Graph		Jarkko's Graph classes
+	XML::Parser	used by Graph::Reader::XML
+	XML::Writer	used by Graph::Writer::XML
+	IO::File
+
+To install these modules, you should just have to run the following:
+
+	% perl Makefile.PL
+	% make
+	% make test
+	% make install
+
+This distribution contains an early version of a test-suite;
+you may get a warning about an undefined value from one of the tests.
+
+Bugs, suggestions, and new readers and writers will be gratefully received.
+
+Neil Bowers <neil@bowers.com>

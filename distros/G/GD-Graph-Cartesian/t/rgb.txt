@@ -1,0 +1,11 @@
+  0 255 255		cyan
+  0 255   0		green
+255 255   0		yellow
+255 192 203		pink
+255   0   0		red
+255 165   0		orange
+  0   0 255		blue
+255 255 255		white
+  0   0   0		black
+190 190 190		gray
+0     0 139             DarkBlue

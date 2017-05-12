@@ -1,0 +1,16 @@
+0.05      2014-08-17 13:43:43+08:00 Asia/Shanghai
+1. remove some dependence not needed
+
+0.04      2014-08-10 23:39:33+08:00 Asia/Shanghai
+
+0.03      2014-08-07 22:59:21+08:00 Asia/Shanghai
+ - change to unix line ending ,fix the tail has a CR in shebang of bin/frogjump
+
+0.02      2014-08-07 22:15:17+08:00 Asia/Shanghai
+ - fix the tail has a CR in shebang of bin/frogjump
+ - fix the bug : frog will disappear when he jump at the end of stone
+ - now can work on linux
+ - add a SIGINT for reset the cursor when Ctrl-C will cause the cursor disappear or terminal colored
+
+0.01      2014-08-06 13:03:28+08:00 Asia/Shanghai
+ - First release

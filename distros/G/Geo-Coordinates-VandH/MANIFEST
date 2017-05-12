@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+CHANGES
+t/Geo-Coordinates-VandH.t
+VandH.pm
+vhtest.pl
+META.yml                                 Module meta-data (added by MakeMaker)

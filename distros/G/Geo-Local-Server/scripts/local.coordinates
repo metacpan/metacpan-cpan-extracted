@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Std qw{getopts};
+use Geo::Local::Server;
+
+my $opt     = {};
+getopts("f:", $opt);
+
+my $file    = $opt->{"f"};
+my $gls     = Geo::Local::Server->new(configfile=>$file, envname=>"");  #disable env to enable this script to set the environment
+printf "%s %s %s\n", $gls->lonlathae;
+
+__END__
+
+=head1 NAME
+
+local.coordinates - Prints the formatted longitude, latitude and height above ellipsoids from the /etc/local.coordinates file
+
+=head1 SYNOPSIS
+
+local.coordinates
+
+=head1 OPTIONS
+
+=head2 -f FILE - default /etc/local.coordinates
+
+Specify alternate configuration file
+
+=head1 DESCRIPTION
+
+Uses the system coordinates as configured from the perl package Geo::Local::Server to format the string.
+
+=cut

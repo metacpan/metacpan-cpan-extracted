@@ -1,0 +1,6 @@
+Revision history for Perl extension Getopt::Easy.
+
+0.01  Tue Mar 16 20:52:20 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n Getopt::Easy
+

@@ -1,0 +1,12 @@
+Changes
+lib/GSM/ARFCN.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+scripts/perl-GSM-ARFCN-list.pl
+scripts/perl-GSM-ARFCN-listall.pl
+t/001_load.t
+t/002_calculations.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

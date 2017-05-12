@@ -1,0 +1,69 @@
+$Id: README,v 1.7 2005/07/11 15:58:08 joern Exp $
+
+Gtk2::Ex::FormFactory tutorial program
+======================================
+
+The tutorial isn't written yet, but the corrsponding example
+program is ;)
+
+You need the following bits in order to get the program to work:
+
+  * A running MySQL database server and a user with
+    "create database" privileges
+
+  * A bunch of Perl modules:
+    - Gtk2 and Gtk2::Ex::FormFactory (of course ;)
+    - DBI, DBD::mysql and Class::DBI
+    - Optionally: MP3::Info, Ogg::Vorbis::Header for
+      the import.pl program
+
+Just change into the "tutorial" subdirectory and start the
+music.pl program:
+
+  % cd tutorial
+  % perl music.pl
+
+On first startup the program checks for a valid database connection -
+without success. This triggers a preferences dialog asking for the
+MySQL connection settings. Enter username and password here and
+hit the "Test settings button". It should report a missing "gtk2ff"
+database, but no "Access denied message" or something like this.
+Check username and password you entered if that happens.
+
+Then hit the "Create database" button. This will create the "gtk2ff"
+database and tables by executing the SQL commands listed in the
+file "music.sql". You should get a success dialog, or an error dialog
+with a detailed error message.
+
+If the database was created successfully you may hit the "Fill database"
+button. This will add some example entries, so you have something to
+play with and don't need to bootstrap with your own data. Alternatively
+you may use the import.pl command line program to import the tags of
+an existent mp3/ogg collection into the database.
+
+Now close the preferences dialog and play around with the application.
+Create, modify and delete artists, albums and songs. The GUI has always
+a consistent state (e.g. the "Add album" button is greyed out until
+you selected an artist). If you find bugs please report, I tried hard
+avoiding them ;)
+
+Overview of the files
+=====================
+
+  README        The document you're reading
+  music.pl      GUI program using Gtk2::Ex::FormFactory
+  music.sql     MySQL DDL script to create the neccessary tables
+  model.pm      Data model implementation using Class::DBI
+  music.conf    Created by music.pl; contains configuration data
+  config.pm     Tiny module managing the database configuration data
+  import.pl     Script to populate the database from ogg/mp3 tags
+
+The program has no documentation yet, but is a good example of
+how less code is needed to build complex GUI's with Gtk2::Ex::FormFactory
+(about 1000 lines, including code for test data generation) and of
+course Class::DBI, which made implementing the whole data model in
+about 30 lines possible ;).
+
+Have fun.
+
+Jörn Reder <joern AT zyn.de>

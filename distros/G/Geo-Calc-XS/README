@@ -1,0 +1,21 @@
+Documentation:
+--------------
+
+See https://metacpan.org/pod/Geo::Calc::XS
+
+Build instructions:
+-------------------
+
+1. Install the Geo-Calc-XS module if not installed already
+
+2. Extract the Geo-Calc-XS-0.33.tar.gz into directory Geo-Calc-XS-0.33
+
+3. cd Geo-Calc-XS-0.33
+
+4. perl Makefile.PL
+
+5. make
+
+6. make test
+
+7. make install

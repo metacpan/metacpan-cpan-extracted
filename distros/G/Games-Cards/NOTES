@@ -1,0 +1,182 @@
+- Double clicks? Drag! (See stuff/klondike.dragdrop)
+
+- maybe we should set_canvas to the actual canvas, not the frame containing
+it! Because we use Subwidget("canvas") in GC::Tk, but what if someone
+writes a game that doesn't use the scrollbars! (We *do* need to make
+sure it works, though!)
+
+- get_clicked_card? (Just like clicked_cardset)
+
+- Clean up set backgrounds in klondike/freecell, which are the wrong size.
+(And there's no cardrect any more!)
+
+- Really need to get rid of all the constants. GC::Tk::Game (or something)
+needs to have a bunch of fields that store card size, etc.
+While we're at it, create methods for making a set background. Note that
+we require having an image with a set: tag that we can find coordinates
+of for redraw! What if they don't want to make a background? Why not just
+give a CardSet coordinates? (Because then I'd have to give them to cards?)
+
+- should Tk::CardSet->new call $self->Tk_new, so that each Tk class
+  can add its own attributes? This may not be necessary
+
+- I should really separate internal errors from illegal moves.
+
+- Can we redraw only the *cards* that need redrawing? But for piles, it's
+kind of easier to just redraw the set. (Unless it's *really* slow to
+redraw things.)
+
+- expert mode where you're only allowed to undo up to a certain point.
+
+- make print_columns a method of Games::Cards, since there may be a bunch
+of games where we do it? Or might it be different for each game?
+
+- Oxymoron: could we create card images s.t. we can mark with a change
+of background color instead of the black rectangle?
+
+######################################################################
+# Handling images (bitfiles)
+- where do we install image files? How do we make sure GC::Tk can find them?
+Use Tk->findINC
+
+- Do we want to make Oxymoron's necessary? Or should we make you able to
+use different images? If so, we'd probably have to put draw method
+into the images/ directory somehow, and require a file with the right info.
+This is maybe something for long range planning.
+
+######################################################################
+# Pyramid game
+This game is called Pyramid golf. See goodsol.com
+
+Note that pyramid game *does* have columns, even if I don't think of them
+that way. They're just columns with very large delta-y and very small
+delta-x:
+
+      4
+    3   5
+  2   4    6
+1   3   5    7
+
+Can't click on 2 if 3 or 1 has a card further up. (But note that we can't
+just test whether size of covering column is greater than other column.
+E.g., here, if c1 has size 1, it covers c2 with size 1, but if c3 has size
+1 it doesn't cover c2. And due to pyramidness, which columns have more cards
+changes weirdly. OTOH, that's just a question of a smart check-select sub.
+We can still use the standard column drawing techniques. (Except that we
+need a sub to move the correct cards over other cards. If we draw c1, then
+c2, etc., 2nd card in 4 will be covering 2nd card in 3, which it shouldn't.)
+
+   Even cooler would be to allow CardSets to have empty cards in them, which 
+would allow us to store pyramid rows as the actual rows. How difficult would
+this be? This would probably be really useful for games where you have a row of
+cards from which you can take one out of the center, but the row's still its
+own entity (40 thieves?) But if we do this it will screw up the size() method.
+We could change size to grep for not the empty card. However, it would still
+have a chance of screwing up all the places in Cards.pm where we loop over
+@cards. Maybe a separate cards array in Tk::CardSets that stores EITHER
+pointers to cards in @cards or empty values. Then only stuff in GC::Tk that
+looped over the *display* of the CardSet would see the empty slots.
+Hm: not quite good enough -- how would you print that out in the TUI version?
+Note that I could just store the whole pyramid as a Hand with interesting
+criterion for being allowed to remove a card, and an interesting way of 
+drawing it. 40 thieves could similarly store as a hand, but have a separate
+array (in the thieves.pl) that kept track of where cards and empty spaces were.
+
+In fact, the class should be a *subclass* of Hand. It's like a Hand
+in that it can be accessed anywhere, but has the extra feature of
+having holes.
+
+Would it help to create Games::Cards::Card::Empty (or Null, or NoCard...)
+which acts like a card in most circumstances to avoid errors, prints out 
+as "   " in TUI, and other useful things?
+
+######################################################################
+# Games::Server thoughts
+
+For TUI games, it's probably easier just to send the whole "screen" for
+each turn. (Otherwise, we'd have to standardize how to print out games --
+although maybe we should do that anyway. But it may be ahrd to do since for
+TUI you need to fake more stuff.) 
+
+So Games::Cards::Client is going to *really simple! I guess it'll just
+have the hooks to find a GC::Server, start a game. Otherwise it'll just
+be a dumb client.
+
+For GUI it's more complicated. Note that we'll need to send lots of
+information:
+
+- Canvas size (? or just max size?)
+- CardSet sizes/borders/overlap, positions
+- help info? about?
+- Button stuff?
+
+Note that the above info needs to be sent only once!
+
+In addition, we're going to have to be careful about what gets sent TO the
+server. Clicking on cards, buttons, and columns has to send the right info to
+the server.
+
+Could we make it so that client always sent to server what "do_command"
+subs currently get as input? Probably. Other way around is more difficult.
+Maybe we can have a little language that describes things to do. E.g.:
+
+cardset:foo->give_cards(cardset:bar, 3)
+card:8s->face_up
+
+etc. This implies that the client is actually going to create all
+these sets & keep track of them. Hm...
+
+Paranoid version. MOre complicated since we can't just use regular commands!
+Although probably noone would ever think to do this, I guess in theory we
+shouldn't send card information for face-down cards. For each card, we
+can just send $card->print - except that how can the client tell the server
+that the player selected a specific card in that case? Give each
+face_down card a number. (In theory, though, an evil client could then keep
+track of the face_down number to see where the card went)
+
+move "card:8s" "cardset:foo" 
+    (Note that cardset names can have spaces!)
+face_up face_down:35 card:8s 
+    (Note that card will have to be drawn if it hasn't yet been!)
+face_down card:8s face_down:17
+
+
+Why not just send the game state on each turn (it really shouldn't be that
+much info!). E.g.:
+
+Stock
+ ****
+Waste
+ AH 4S
+Joe's Hand
+ AC
+...     
+
+* means a face down card
+empty line means it's empty
+
+GC::Tk::Client has CardSet and Card objects, but they're much simpler.  They've
+got an image and a name and that's about it. For each card (including empty
+cards), the card gets drawn if it wasn't drawn before (or if the image was
+deleted) or moved from its current coords otherwise.
+
+In fact, maybe for face down cards, we should give each a number (like
+a set would have "*37 *38" etc. although if we're really intelligent
+then the client can just give the next sequential number to each *!)
+
+If I'm REALLY smart about this, I can just output the game state
+WHETHER OR NOT we're running server/client! But if we're not running s/c
+then the game state gets "output" to a sub which prints the current
+game state.
+
+---------
+More Client Tk ideas:
+
+It needs to know:
+- what's clickable and draggable. Otherwise, every single time you click it
+has to check with the server to see if you're clickable. Much better would
+be if you only check once you're either done with a *legal* click or drag.
+This can be accomplished with clickable/draggable fields in cards, sets.
+(Note that sometimes dragging drags the rest of a set along -- put a value
+other than 0 or 1 (like "rest_of_set") into draggable?)
+- set coordinates, border, overlap etc., @cards

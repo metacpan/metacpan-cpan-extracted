@@ -1,0 +1,25 @@
+---
+abstract: 'Validate Git Commit Messages'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::More: '1.001002'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Validate
+requires:
+  IPC::System::Simple: '1.25'
+  Module::Runtime: '0.013'
+  Moo: '1.003001'
+  namespace::clean: '0.23'
+resources:
+  bugtracker: https://github.com/frioux/Git-Validate/issues
+  homepage: https://github.com/frioux/Git-Validate
+  repository: https://github.com/frioux/Git-Validate.git
+version: '0.001001'

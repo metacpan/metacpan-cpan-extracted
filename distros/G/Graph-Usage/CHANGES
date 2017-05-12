@@ -1,0 +1,60 @@
+Revision history for gen_graph - generate graphs from Perl package use statements
+
+2006-01-29 v0.11 Tels  21 tests
+  * require Graph::Easy 0.40
+  * fix Makefile.PL to work with newer YAML
+
+2005-12-18 v0.11 Tels  21 tests
+  * first release as Graph::Usage
+  * require Graph::Easy 0.36
+  * gen_graph: print version of used generator
+  * fix up POD 
+  * add pod.t and pod_cov.t
+
+2005-09-24 v0.10 Tels  18 tests
+  * renamed to Graph::Usage
+  * put logic into Graph::Usage class, subclassable and with hooks
+
+2005-09-23 v0.07 Tels  18 tests
+  * require Graph::Easy 0.30
+  * fix LICENSE in POD
+  * add a short DESCRIPTION in POD
+
+2005-09-10 v0.06 Tels  18 tests
+  * include README for real
+  * require Graph::Easy 0.29
+  * handle --extension=.ext (in addition to --extension=ext)
+  * add --format=dot to output raw graphviz code
+  * add --skip='regexp' to exclude packages from output
+  * skip "Your::Module::Here" (from CPANPLUS::Internals::Constants::Report)
+
+2005-09-04 v0.05 Tels  14 tests
+  * add README
+  * require Graph::Easy 0.27
+  * fix fill vs. background
+  * add option --flow
+  * add format --extension (especially usefull for --format=graphviz, this
+    allows you to create ".jpg", ".svg", ".ps" etc via dot et. al.)
+  * on ASCII output, make node borders bold and "require"-edges dotted
+
+2005-07-13 v0.04 Tels  10 tests
+  * fix typos in SYNOPSIS
+  * more tests: generating HTML/ASCII
+  * make tests (hopefully) run under MSWin32
+
+2005-07-10 v0.03 Tels  6 tests
+  * remove doubles from @INC when running w/o --recurse
+  * guard against versions with '"' in them (like sprintf etc)
+  * extract VERSION from "Revision: " style version lines
+  * add --debug
+
+2005-07-10 v0.02 Tels  5 tests
+  * add options: --help, --version, --color=i, --nocolor, --recurse, --versions
+  * implement --recurse, --version
+  * match also things like "use A ;" (note space)
+  * change option "path_to_source" to "inc"
+  * empty --inc uses @INC from Perl
+  * add basic tests
+
+2005-07-09 v0.01 Tels  0 tests
+  * first version

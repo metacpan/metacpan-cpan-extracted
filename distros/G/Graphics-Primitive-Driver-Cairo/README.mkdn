@@ -1,0 +1,121 @@
+# NAME
+
+Graphics::Primitive::Driver::Cairo - Cairo backend for Graphics::Primitive
+
+# VERSION
+
+version 0.47
+
+# SYNOPSIS
+
+    use Graphics::Primitive::Component;
+    use Graphics::Primitive::Driver::Cairo;
+
+    my $driver = Graphics::Primitive::Driver::Cairo->new;
+    my $container = Graphics::Primitive::Container->new(
+        width => 800,
+        height => 600
+    );
+    my $black = Graphics::Primitive::Color->new(red => 0, green => 0, blue => 0);
+    $container->border->width(1);
+    $container->border->color($black);
+    $container->padding(
+        Graphics::Primitive::Insets->new(top => 5, bottom => 5, left => 5, right => 5)
+    );
+    my $comp = Graphics::Primitive::Component->new;
+    $comp->background_color($black);
+    $container->add_component($comp, 'c');
+
+    my $lm = Layout::Manager::Compass->new;
+    $lm->do_layout($container);
+
+    my $driver = Graphics::Primitive::Driver::Cairo->new(
+        format => 'PDF'
+    );
+    $driver->draw($container);
+    $driver->write('/Users/gphat/foo.pdf');
+
+# DESCRIPTION
+
+This module draws Graphics::Primitive objects using Cairo.
+
+# IMPLEMENTATION DETAILS
+
+- **Borders**
+
+    Borders are drawn clockwise starting with the top one.  Since cairo can't do
+    line-joins on different colored lines, each border overlaps those before it.
+    This is not the way I'd like it to work, but i'm opting to fix this later.
+    Consider yourself warned.
+
+# ATTRIBUTES
+
+## antialias\_mode
+
+Set/Get the antialias mode of this driver. Options are default, none, gray and
+subpixel.
+
+## cairo
+
+This driver's Cairo::Context object
+
+## format
+
+Get the format for this driver.
+
+## surface
+
+Get/Set the surface on which this driver is operating.
+
+# METHODS
+
+## data
+
+Get the data in a scalar for this driver.
+
+## write ($file)
+
+Write this driver's data to the specified file.
+
+## get\_text\_bounding\_box ($font, $text, $angle)
+
+Returns two [Rectangles](https://metacpan.org/pod/Graphics::Primitive::Rectangle) that encloses the
+supplied text. The origin's x and y maybe negative, meaning that the glyphs in
+the text extending left of x or above y.
+
+The first rectangle is the bounding box required for a container that wants to
+contain the text.  The second box is only useful if an optional angle is
+provided.  This second rectangle is the bounding box of the un-rotated text
+that allows for a controlled rotation.  If no angle is supplied then the
+two rectangles are actually the same object.
+
+If the optional angle is supplied the text will be rotated by the supplied
+amount in radians.
+
+## get\_textbox\_layout ($tb)
+
+Returns a [Graphics::Primitive::Driver::TextLayout](https://metacpan.org/pod/Graphics::Primitive::Driver::TextLayout) for the supplied
+textbox.
+
+## reset
+
+Reset the driver.
+
+## draw
+
+Draws the specified component.  Container's components are drawn recursively.
+
+# ACKNOWLEDGEMENTS
+
+Danny Luna
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

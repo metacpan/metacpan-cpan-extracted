@@ -1,0 +1,29 @@
+Geo-Formatter 
+
+Encode / decode latitude & longitude in degree to / from other format
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Exporter
+Class::Inspector
+UNIVERSAL::requir
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, OHTSUKA Ko-hei
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

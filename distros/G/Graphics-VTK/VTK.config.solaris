@@ -1,0 +1,22 @@
+#
+#  
+# Sample Perl VTK Config file for Solaris.  (Using Sun's Compiler)
+#   Copy this file to VTK.config and modify for your installation
+#   (Tested on SunOS 5.6, perl5.6.0, built with SUN's compiler,  
+#      VTK and PerlVTK built with g++)
+
+
+%vtkConfigMacro = (
+    'CC' => 'g++',   # Use CC if using SUNs C++ compiler
+#    'LD' => 'g++',  # Only needed if complier used to build Graphics::VTK
+		     #    is different than the compiler used to build perl.
+		     
+    'LIBS' => ['-L/projects/dbteam/vtk/lib/vtk -lvtkCommon -lvtkFiltering -lvtkImaging -lvtkPatented -lvtkRendering -lvtkHybrid -lpthread -L/home/cerney/openGL/lib -L/usr/lib -L/usr/X11R6/lib -lGL -ldl -lXext -lXt -lSM -lICE -lX11 -lm'],
+
+# INC should contain the paths to your VTK include files
+#   Note: Extra hybrid and Rendering path included here, because the standard VTK 4.0
+#     fails to put vtkVRML.h and vtk3DS.h with the rest of the include when 
+#      installing.
+#    Also, vtkXRenderwindow.h is missing from the Rendering directory
+    'INC' => '-I/projects/dbteam/vtk/include/vtk -I/home/cerney/vtk/vtk4.0/Hybrid -I/home/cerney/vtk/vtk4.0/Rendering'
+);

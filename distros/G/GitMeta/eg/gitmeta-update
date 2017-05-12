@@ -1,0 +1,119 @@
+#!/usr/local/bin/perl -w
+###########################################
+# gitmeta-update - Update distributed
+#   git repositories
+# Mike Schilli, 2010 (m@perlmeister.com)
+###########################################
+use strict;
+use GitMeta::GMF;
+use Sysadm::Install qw(:all);
+use File::Basename;
+use Getopt::Std;
+use Log::Log4perl qw(:easy);
+
+getopts("vn", \my %opts);
+
+if($opts{v}) {
+  Log::Log4perl->easy_init($DEBUG);
+} else {
+  Log::Log4perl->easy_init({
+      level    => $INFO,
+      category => "main",
+  });
+}
+
+my($gmf_repo, $gmf_path, 
+   $local_dir) = @ARGV;
+
+if(!defined $local_dir) {
+    # alternative call: $0 $gmf $local_dir
+    undef $gmf_repo;
+    ($gmf_path, $local_dir) = @ARGV;
+}
+
+GitMeta->health_check();
+
+die "usage: $0 [gmf-repo] gmf-path local-dir" 
+  unless defined $local_dir;
+
+main();
+
+###########################################
+sub main {
+###########################################
+  my $gm = GitMeta::GMF->new(
+    repo     => $gmf_repo,
+    gmf_path => $gmf_path );
+  
+  my @urls = $gm->expand();
+  
+  if($opts{n}) {
+    for my $url ( @urls ) {
+      print "$url\n";
+    }
+    return 1;
+  }
+
+  if(! -d $local_dir) {
+      my $yesno = ask "$local_dir doesn't exist, create it ([y]/n)?", "y";
+      if($yesno ne "y") {
+          die "Aborted.\n";
+      }
+      mkd $local_dir;
+  }
+
+  cd $local_dir;
+
+  for my $url ( @urls ) {
+    INFO "Updating $url";
+    my $repo_dir = $gm->repo_dir_from_git_url( $url );
+    if(-d $repo_dir) {
+      cd $repo_dir;
+      my($stdout, $stderr, $rc) =
+        tap "git", "fetch", "origin";
+      INFO "$stdout$stderr";
+      cdback;
+    } else {
+      my($stdout, $stderr, $rc) =
+        tap "git", "clone", $url;
+      INFO "$stdout$stderr";
+    }
+  }
+  return 1;
+}
+
+__END__
+
+=head1 NAME
+
+    gitmeta-update - Update all local git repositories defined in the .gmf
+
+=head1 SYNOPSIS
+
+    gitmeta-update gitmeta-repo-loc meta.gmf /local/git/repo/dir
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-v>
+
+Be verbose.
+
+=back
+
+=head1 DESCRIPTION
+
+For detailed documentation, please run
+
+    perldoc GitMeta
+
+=head1 LEGALESE
+
+Copyright 2010-2011 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2010, Mike Schilli <cpan@perlmeister.com>

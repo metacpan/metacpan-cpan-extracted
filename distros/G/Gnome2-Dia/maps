@@ -1,0 +1,52 @@
+DIA_TYPE_CONSTRAINT		DiaConstraint		GObject		Gnome2::Dia::Constraint
+DIA_TYPE_EXPORT_SVG		DiaExportSVG		GObject		Gnome2::Dia::Export::SVG
+DIA_TYPE_HANDLE			DiaHandle		GObject		Gnome2::Dia::Handle
+DIA_TYPE_HANDLE_LAYER		DiaHandleLayer		GObject		Gnome2::Dia::HandleLayer
+DIA_TYPE_SOLVER			DiaSolver		GObject		Gnome2::Dia::Solver
+DIA_TYPE_VARIABLE		DiaVariable		GObject		Gnome2::Dia::Variable
+
+DIA_TYPE_TOOL			DiaTool			GObject		Gnome2::Dia::Tool
+DIA_TYPE_DEFAULT_TOOL		DiaDefaultTool		GObject		Gnome2::Dia::DefaultTool
+DIA_TYPE_HANDLE_TOOL		DiaHandleTool		GObject		Gnome2::Dia::HandleTool
+DIA_TYPE_ITEM_TOOL		DiaItemTool		GObject		Gnome2::Dia::ItemTool
+DIA_TYPE_PLACEMENT_TOOL		DiaPlacementTool	GObject		Gnome2::Dia::PlacementTool
+DIA_TYPE_SELECTION_TOOL		DiaSelectionTool	GObject		Gnome2::Dia::SelectionTool
+DIA_TYPE_STACK_TOOL		DiaStackTool		GObject		Gnome2::Dia::StackTool
+
+DIA_TYPE_CANVAS			DiaCanvas		GObject		Gnome2::Dia::Canvas
+DIA_TYPE_CANVAS_EDITABLE	DiaCanvasEditable	GObject		Gnome2::Dia::CanvasEditable
+DIA_TYPE_CANVAS_ITEM		DiaCanvasItem		GObject		Gnome2::Dia::CanvasItem
+
+DIA_TYPE_CANVAS_BOX		DiaCanvasBox		GObject		Gnome2::Dia::CanvasBox
+DIA_TYPE_CANVAS_ELEMENT		DiaCanvasElement	GObject		Gnome2::Dia::CanvasElement
+DIA_TYPE_CANVAS_GROUP		DiaCanvasGroup		GObject		Gnome2::Dia::CanvasGroup
+DIA_TYPE_CANVAS_IMAGE		DiaCanvasImage		GObject		Gnome2::Dia::CanvasImage
+DIA_TYPE_CANVAS_LINE		DiaCanvasLine		GObject		Gnome2::Dia::CanvasLine
+DIA_TYPE_CANVAS_TEXT		DiaCanvasText		GObject		Gnome2::Dia::CanvasText
+
+DIA_TYPE_CANVAS_VIEW		DiaCanvasView		GtkObject	Gnome2::Dia::CanvasView
+DIA_TYPE_CANVAS_VIEW_ITEM	DiaCanvasViewItem	GtkObject	Gnome2::Dia::CanvasViewItem
+
+DIA_TYPE_SELECTOR		DiaSelector		GtkObject	Gnome2::Dia::Selector
+
+DIA_TYPE_CANVAS_GROUPABLE	DiaCanvasGroupable	GInterface	Gnome2::Dia::CanvasGroupable
+
+DIA_TYPE_CANVAS_ITER		DiaCanvasIter		GBoxed		Gnome2::Dia::CanvasIter
+DIA_TYPE_EVENT			DiaEvent		GBoxed		Gnome2::Dia::Event
+
+DIA_TYPE_SHAPE_BEZIER		DiaShapeBezier		GBoxed		Gnome2::Dia::Shape::Bezier
+DIA_TYPE_SHAPE_ELLIPSE		DiaShapeEllipse		GBoxed		Gnome2::Dia::Shape::Ellipse
+DIA_TYPE_SHAPE_IMAGE		DiaShapeImage		GBoxed		Gnome2::Dia::Shape::Image
+DIA_TYPE_SHAPE_PATH		DiaShapePath		GBoxed		Gnome2::Dia::Shape::Path
+DIA_TYPE_SHAPE_TEXT		DiaShapeText		GBoxed		Gnome2::Dia::Shape::Text
+
+DIA_TYPE_CAP_STYLE		DiaCapStyle		GEnum		Gnome2::Dia::CapStyle
+DIA_TYPE_EVENT_MASK		DiaEventMask		GEnum		Gnome2::Dia::EventMask
+DIA_TYPE_EVENT_TYPE		DiaEventType		GEnum		Gnome2::Dia::EventType
+DIA_TYPE_FILL_STYLE		DiaFillStyle		GEnum		Gnome2::Dia::FillStyle
+DIA_TYPE_JOIN_STYLE		DiaJoinStyle		GEnum		Gnome2::Dia::JoinStyle
+DIA_TYPE_SHAPE_TYPE		DiaShapeType		GEnum		Gnome2::Dia::ShapeType
+DIA_TYPE_STRENGTH		DiaStrength		GEnum		Gnome2::Dia::Strength
+DIA_TYPE_WRAP_MODE		DiaWrapMode		GEnum		Gnome2::Dia::WrapMode
+
+DIA_TYPE_CANVAS_ITEM_FLAGS	DiaCanvasItemFlags	GFlags		Gnome2::Dia::CanvasItemFlags

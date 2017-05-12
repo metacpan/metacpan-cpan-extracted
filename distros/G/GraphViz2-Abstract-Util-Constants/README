@@ -1,0 +1,92 @@
+NAME
+    GraphViz2::Abstract::Util::Constants - Constants used by
+    "GraphViz2::Abstract::*"
+
+VERSION
+    version 0.001000
+
+CONSTANTS
+    In the GraphViz documentation <http://www.graphviz.org/content/attrs>,
+    there are a few default values which are used multiple times, and the
+    following constants refer to them in one way or another.
+
+    "EMPTY_STRING"
+        This simply returns an empty string, and is not likely to change.
+
+            ""
+
+    "FALSE"
+        Where the specification shows "false" as a default value, this
+        module instead returns the string "false"
+
+        This is because under the hood, GraphViz2 doesn't support values for
+        attributes other than defined ones.
+
+        So its assumed that GraphViz, under the hood, interprets the string
+        "false" the same as the boolean condition "false";
+
+    "TRUE"
+        Where the specification shows "true" as a default value, this module
+        instead returns the string "true"
+
+        Its assumed that GraphViz, under the hood, interprets the string
+        "true" the same as the boolean condition "true", for similar reasons
+        "false" is.
+
+    "NONE"
+        In the GraphViz docs, a few items have a default value specified as:
+
+            <none>
+
+        This item was confusing in the specification, and it wasn't clear if
+        it was some sort of magic string, or what.
+
+        Internally, we use a special value, a reference to a string "none"
+        to represent this default.
+
+        For instance:
+
+            my $v = Edge->new()->target();
+
+            ok( ref $v, 'target returned a ref' );
+            is( ref $v, 'SCALAR', 'target returned a scalar ref' );
+            is( ${ $v }, 'none', 'target returned a scalar ref of "none"' );
+
+        However, because its not known how to canonicalize such forms, those
+        values are presently not returned by either "as_hash" methods.
+
+        So as a result:
+
+            my $v = Edge->new( color => \"none" )->as_hash()
+
+        Will emit an empty hash. ( Despite "none" being different from the
+        default ).
+
+        Also:
+
+            my $v = Edge->new( color => \"none" )->as_canon_hash()
+
+        Will not emit a value for "color" in its output, which may have the
+        undesirable effect of reverting to the default, "black" once
+        rendered.
+
+    "UNKNOWN"
+        On the GraphViz documentations, there were quite a few fields where
+        the defaults were simply not specified, or their values were
+        cryptic.
+
+        Internally, those fields have the default value of "\"unknown""
+
+        Like "none", those fields with those values will not be emitted
+        during hash production.
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

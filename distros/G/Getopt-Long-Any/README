@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     use Getopt::Long::Any;
+    
+     # will first try to use Getopt::Long::More, if unsuccessful then will try
+     # Getopt::Long::Complete, finally will fall back to Getopt::Long
+     GetOptions(
+         'opt1=s' => sub { ... },
+         'opt2=i' => \$opt2,
+     );
+
+DESCRIPTION
+
+    This is an experiment module.
+
+SEE ALSO
+
+    Getopt::Long::More
+
+    Getopt::Long::Complete
+

@@ -1,0 +1,205 @@
+# ChangeLog for net-dns/bind
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/bind/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  02 Jun 2004; Jon Portnoy <avenj@gentoo.org> metadata.xml:
+  Remove metadata.
+
+  27 Apr 2004; Aron Griffis <agriffis@gentoo.org> bind-9.2.2-r3.ebuild:
+  Add inherit eutils
+
+  26 Apr 2004; Aron Griffis <agriffis@gentoo.org> bind-9.2.2-r1.ebuild,
+  bind-9.2.2-r2.ebuild, bind-9.2.2-r3.ebuild, bind-9.2.2.ebuild,
+  bind-9.2.2_rc1-r2.ebuild:
+  Add die following econf for bug 48950
+
+  12 Jan 2004; Martin Holzer <mholzer@gentoo.org> files/named.rc6:
+  changed rc script. this should really close 31125.
+
+  30 Nov 2003; Chris PeBenito <pebenito@gentoo.org> bind-9.2.2-r1.ebuild,
+  bind-9.2.2-r2.ebuild, bind-9.2.2-r3.ebuild, bind-9.2.2.ebuild,
+  bind-9.2.2_rc1-r2.ebuild, bind-9.2.3.ebuild:
+  Add SELinux policy RDEP.
+
+  26 Nov 2003; Stewart Honsberger <blkdeath@gentoo.org> bind-9.2.2.ebuild,
+  bind-9.2.3.ebuild:
+  Marked 9.2.2 stable on PPC
+  Marked 9.2.3 unstable on all arches; critical library conflicts.
+
+*bind-9.2.3 (29 Oct 2003)
+
+  29 Oct 2003; Stewart Honsberger <blkdeath@gentoo.org> bind-9.2.3.ebuild:
+  New BIND version; includes "Delegation-Only" patch, bugfixes
+
+  02 Oct 2003; Brad House <brad_mssw@gentoo.org> bind-9.2.2.ebuild:
+  add ~amd64 flag
+
+*bind-9.2.2-r3 (17 Sep 2003)
+
+  17 Sep 2003; <solar@gentoo.org> bind-9.2.2-r3.ebuild:
+  Recently verisign added a wildcard A record to the .COM and .NET TLD DNS zones
+  making all .com and .net domains appear to be registered. Adding ISC bind
+  patch. Updated ebuild submission by Bryan Stine. Added a few comments from
+  Danny and Corporate Gadfly to pkg_postinst.
+
+  15 Jul 2003; Martin Holzer <mholzer@gentoo.org> files/named.conf-r2:
+  Fixed pid patch. Closes #24497
+
+  15 Jul 2003; Christian Birchinger <joker@gentoo.org> bind-9.2.2-r2.ebuild:
+  Added sparc stable keyword
+
+  29 Jun 2003; Martin Holzer <mholzer@gentoo.org> files/named.rc6:
+  Fixed path to PIDFILE. Closes #23682.
+
+  10 Jun 2003; <msterret@gentoo.org> bind-9.2.2-r2.ebuild:
+  DEPEND on sed >= 4
+
+  01 Jun 2003; Brandon Low <lostlogic@gentoo.org> files/named.rc6:
+  Fix rcfiles
+
+*bind-9.2.2-r2 (27 Apr 2003)
+
+  03 Aug 2003; Guy Martin <gmsoft@gentoo.org> bind-9.2.2-r2.ebuild :
+  Added hppa to KEYWORDS.
+
+  27 Apr 2003; Brandon Low <lostlogic@gentoo.org> bind-9.2.2-r2.ebuild,
+  files/named.rc7:
+  Fix bug 19971.
+
+*bind-9.2.2-r1 (19 Apr 2003)
+
+  19 Apr 2003; Brandon Low <lostlogic@gentoo.org> bind-9.2.2-r1.ebuild,
+  files/127.zone, files/localhost.zone, files/named.conf-r2:
+  Fix bug 14467 WRT to .zone extension for zone files. Also keepdir dirs that
+  need to be kept.
+
+*bind-9.2.2 (04 Mar 2003)
+
+  15 Apr 2003; Martin Holzer <mholzer@gentoo.org> Manifest, bind-9.2.2.ebuild:
+  Now ebuild config recreate chroot if deleted. closes #18290.
+
+  07 Apr 2003; Kyle Manna <nitro@gentoo.org> named.ca:
+  Updated to match a root name server address being changed.
+
+  06 Apr 2003; Zach Welch <zwelch@gentoo.org> bind-9.2.2.ebuild:
+  add arm keyword
+
+  30 Mar 2003; Christian Birchinger <joker@gentoo.org> bind-9.2.2.ebuild:
+  Added sparc stable keyword
+
+  24 Mar 2003; Brandon Low <lostlogic@gentoo.org> bind-9.2.2.ebuild:
+  move to stable on x86, others please follow
+
+  04 Mar 2003; Brandon Low <lostlogic@gentoo.org> bind-9.2.2.ebuild,
+  files/10bind.env:
+  Update to latest version, and add /var/bind to env.d, this should make
+  it behave nicer when merging and no clobber config files.
+
+*bind-9.2.2_rc1-r2 (14 Feb 2003)
+
+  14 Feb 2003; Nick Hadaway <raker@gentoo.org> bind-9.2.2_rc1-r2.ebuild,
+  files/digest-bind-9.2.2_rc1-r2, files/127, files/named.conf-r1 :
+  Updated default config so all 127.* traffic is localhost.  Thanks
+  to Rich Edelman on bug #15637 for noticing this.
+
+  15 Dec 2002; Maik Schreiber <blizzy@gentoo.org> files/named.rc6:
+  Added "use logger" (bug #8771).
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+
+*bind-9.2.2_rc1-r1 (16 Aug 2002)
+
+  12 Oct 2002; Donny Davies <woodchip@gentoo.org> named.rc6 :
+  Help out the #8759 people ;)
+
+  06 Oct 2002; Jack Morgan <jmorgan@gentoo.org> bind-9.2.2_rc1-r1.ebuild :
+  Added sparc/sparc64 to keywords
+
+  02 Oct 2002; Seemant Kulleen <seemant@gentoo.org> bind-9.2.2_rc1-r1.ebuild :
+  Adjustment of files/{localhost,named.rc6} to be more gentoo friendly and
+  usable.  Thanks to j2ee in #gentoo-dev in bug #7872
+
+  19 Aug 2002; Mark Guertin <gerk@gentoo.org> bind-9.2.2_rc1-r1.ebuild :
+  Added ppc to keywords
+
+  16 Aug 2002; Seemant Kulleen <seemant@gentoo.org> bind-9.2.2_rc1-r1.ebuild :
+
+  Many bugfixes with config files, and optional documentation installation
+  (doc USE flag).  Thanks again to kevin@aptbasilicata.it (Maurizio
+  Disimino) in bug #6590.
+
+*bind-9.2.2_rc1 (16 Aug 2002)
+
+  16 Aug 2002; Seemant Kulleen <seemant@gentoo.org> bind-9.2.2_rc1.ebuild
+  files/nslookup.8 files/digest-bind-9.2.2_rc1 :
+
+  Security fix upgrade.  Please see: http://www.kb.cert.org/vuls/id/803539
+  Thanks to kevin@aptbasilicata.it (Maurizio Disimino) in bug #6578.
+
+*bind-9.2.1-r2 (5 Aug 2002)
+
+  8 Aug 2002; Kyle Manna <nitro@gentoo.org> bind-9.2.1-r2.ebuild:
+
+  Minor changes yesterday and today.  Hopefully we can unmask soon.
+
+  6 Aug 2002; Kyle Manna <nitro@gentoo.org> bind-9.2.1-r2.ebuild:
+
+  Minor cosmetic changes.  Nothing big enough to cause a revision bump.
+
+  5 Aug 2002; Kyle Manna <nitro@gentoo.org> bind-9.2.1-r2.ebuild:
+
+  Added support for chroot, updated init script.
+
+*bind-9.2.1-r1 (2 May 2002)
+
+  21 Jul 2002; Owen Stampflee <owen@gentoo.org> :
+
+  Added PPC to KEYWORDS.
+
+  20 Jul 2002; Kyle Manna <nitro@gentoo.org> bind-9.2.1-r1.ebuild:
+
+  Moved away from emake to make.  Parallel builds break on some systems.
+
+  1 Jun 2002; Kyle Manna <nitro@gentoo.org> bind-9.2.1-r1.ebuild:
+
+  *Alot* of bug fixes:
+  	+ We now have a man page for named.conf
+	+ Included a basic /etc/bind/named.conf
+	+ Will automatically create a /etc/bind/rndc.key if file doesn't exist
+	+ With the additon of rndc, we now have '/etc/init.d/named reload'
+	+ Chown /var/run/named and make sure it gets created, bug #2872
+	+ Moved root.cache to named.ca, it was annoying me ;)
+	+ Added multi-threading support to the default configure
+	+ Added support for 'use ssl' and 'use ipv6'
+	+ And other stuff
+
+*bind-9.2.1 (2 May 2002)
+
+  2 May 2002; William McArthur <sandymac@gentoo.org> bind-9.2.1.ebuild:
+
+  New upstream bugfix release, I just bumped the ebuild file name and added
+  a LICENSE line.
+
+*bind-9.1.3-r7 (21 Mar 2002)
+
+  21 Mar 2002; Ferry Meyndert <m0rpheus@gentoo.org> bind-9.2.0.ebuild:
+
+  Updated too new version
+
+*bind-9.1.3-r7 (8 Feb 2002)
+
+  8 Feb 2002; Donny Davies <woodchip@gentoo.org> files/bind.rc6,
+  bind-9.1.3-r7.ebuild :
+
+  Close bug #483.  Use /var/run/named for bind's pidfile.
+
+*bind-9.1.3-r6 (1 Feb 2002)
+
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.
+

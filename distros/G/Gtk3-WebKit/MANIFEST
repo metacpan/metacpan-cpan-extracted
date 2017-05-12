@@ -1,0 +1,11 @@
+COPYING
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/browser.pl
+lib/Gtk3/WebKit.pm
+t/webkit.t

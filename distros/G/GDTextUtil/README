@@ -1,0 +1,132 @@
+The GDTextUtil package contains text utilities for use with the GD
+drawing package. 
+
+This package provides three modules that make it possible to work with
+internal GD fonts as well as TrueType fonts, without having to worry
+about different interface functions to call. Apart from an abstract
+interface to all font types and strings for GD, this library also
+provides some utility in aligning and wrapping your string.
+
+GD::Text:
+    Provides information about a font, irrespective of whether the font
+    is a TTF or builtin font.
+
+GD::Text::Align
+    Align a string around a coordinate, left, right, center, top, bottom
+    or center.
+
+GD::Text::Wrap
+    Wrap a long string between a right and left margin, starting at a
+    certain y coordinate. Layout the text flush left, flush right,
+    center, or justified.
+
+Requirements:
+
+    perl 5.005_03 or higher. It may (and probably will) work on older
+    versions, but it has not been tested, and I won't spend a lot of
+    time trying to support it.
+
+    GD 1.20 or up, if possible built with TTF (freetype) support.
+    GD 2.* has not been tested yet.
+
+    Please note that the freetype version 2 libraries should be at
+    the latest level. Especially version 2.0.3 has an annoying bug
+    that rotates text twice. Later versions of freetype (2.1.2
+    currently) don't render as nicely anymore as earlier ones.
+    Hopefully that will be fixed, because it is _ugly_ right now.
+
+    If you want 'make test' to do something useful, you will need
+    to have Test::More installed. If you don't, all tests will be
+    skipped.
+
+Installation:
+
+    perl Makefile.PL
+    make
+    make test
+    make demo
+    make install
+
+Demo(s) can be found in the demo directory.
+
+    DO NOT PANIC when the tests fail. The various Freetype libraries
+    often have a slightly different implementation of their rendering
+    algorithms, resulting in slightly different bounding boxes for
+    strings, and slightly different looking images. If your tests
+    fail, try a 'make demo', and visually compare demo/GDWrap.png
+    (freshly generated image) and demo/GDWrap.ref.png (reference
+    image). If they look reasonably similar, you can call the tests
+    successful. Even if they don't look entirely similar, it may
+    simply be because your font files are different from the ones I
+    used to create GDWrap.ref.png. Please see the sources.
+
+    Currently, some of the TTF tests in t/* are disabled, specifically
+    because every version of the freetype library seems to render
+    differently enough for sizing to be wrong all the time. I don't
+    think I'll ever re-enable them anymore.
+
+Bug Reports:
+
+    When you report a bug, please include as much information as
+    possible (unless you also supply a patch :)).
+    The minimum set of information I need to be able to correctly
+    assess a bug is:
+
+        GD::Text version
+        Perl version and OS
+        GD version
+
+    If the bug relates to TrueType font rendering, I'll also need to
+    know which version freetype library you linked in.
+
+    If at all possible, submit a small program that demonstrates the
+    problem, together with the output _you_ get on your system
+    (remember that it all works fine on mine).
+
+    If you're using Redhat, and have their freetype 2.0.3 library RPM
+    installed, do not report bugs until you have upgraded to a later
+    version.
+
+    CYGWIN
+
+    If you try to install the GD::Text modules on cygwin, you may see
+    error messages like the following:
+
+    C:\cygwin\bin\cygperl.exe: *** unable to remap 
+        C:\cygwin\usr\X11R6\bin\libfreetype.dll to same address as 
+        parent(0x720000) != 0x74000064 [main] cygperl 4296 sync_with_child: 
+        child 4364(0xFC) died before initialization with status code 0x1
+
+    It has been brought to my attention (by Michael West) that in this
+    case it is necessary to "rebase" the used libraries (Don't ask me,
+    I don't know what that means). There is some more info on the
+    cygwin mailing list:
+
+    http://sources.redhat.com/ml/cygwin/2003-02/msg01484.html
+    http://sources.redhat.com/ml/cygwin/2003-02/msg01789.html
+    http://sources.redhat.com/ml/cygwin/2003-02/msg01833.html
+
+Todo:
+
+    - Make the interface more flexible
+    - Alignment for the wrap boxes as a whole
+    - More demo code
+    
+COPYRIGHT
+
+    Copyright (c) 1999 Martien Verbruggen
+    mgjv@comdyn.com.au
+
+    This package is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+Enclosed fonts: 
+
+    Dustismo Sans and Dustismo Roman
+    http://www.cheapskatefonts.com/
+    see Dustismo,LICENSE for original (GPL) license
+
+    Cetus by Greg Meronek is no longer enclosed, since its copyright
+    status has become unclear (the status is simply not known).
+    http://fontastic.i-n.net/fontastic/greg.htm
+

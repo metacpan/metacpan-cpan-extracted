@@ -1,0 +1,40 @@
+---
+abstract: 'Predict your github contributions using Bayesian inference and Markov chain'
+author:
+  - 'mudler <mudler@dark-lab.net>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.037'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GitInsight
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Carp::Always: '0'
+  GD::Simple: '0'
+  Getopt::Long: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  PDL::Lite: '0'
+  PDL::LiteF: '0'
+  PDL::Stats: '0'
+  Time::Local: '0'
+  feature: '0'
+  perl: 5.008_005
+resources:
+  bugtracker: https://github.com/mudler/GitInsight/issues
+  homepage: https://github.com/mudler/GitInsight
+  repository: https://github.com/mudler/GitInsight.git
+version: '0.06'

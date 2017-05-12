@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+use strict;
+
+use GSM::SMS::NBS;
+use Getopt::Long;
+use Pod::Usage;
+
+my $msisdn;
+my $text;
+my $flash;
+my $transportconfig;
+my $help;
+
+GetOptions( "msisdn=s" 		=> \$msisdn,
+			"text=s"		=> \$text,
+			"flash"			=> \$flash,
+			"config:s"		=> \$transportconfig,
+			"help"			=> \$help
+		  ) || pod2usage( -verbose => 0 );
+
+pod2usage( -verbose => 2 ) if $help;
+pod2usage( -verbose => 0 ) unless ($msisdn && $text );
+
+my $nbs = GSM::SMS::NBS->new( $transportconfig );
+
+print $nbs->sendSMSTextMessage(	$msisdn, 
+								$text, 
+								GSM::SMS::NBS::MULTIPART_NO, 
+								$flash 
+								); 
+exit(0);
+__END__
+
+=head1 NAME
+
+GSsend_text - Send a text message to a mobile phone
+
+=head1 SYNOPSIS
+
+GSsend_text --msisdn=<msisdn> --text=<text> [--flash] [--config=<config_file>] [--help]
+
+  Options:
+    --msisdn        Receving mobile phone number
+    --text          Text to send
+    --flash         Send as a flash message  
+    --config        Configuration file
+    --help          Help page
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--msisdn>
+
+Receiving mobile phone number.
+
+=item B<--text>
+
+The text you want to send to the mobile phone.
+
+=item B<--flash>
+
+This option sends the message as a flash message.
+
+=item B<--config>
+
+This is an optional parameter that points to a configuration file.
+You'll only need this if you did not configure a default configuration.
+
+=item B<--help>
+
+What you're reading now.
+
+=back
+
+=head1 DESCRIPTION
+
+This application allows you to send a text message to a mobile phone.
+This application is part of the GSM::SMS package.
+
+=head1 COPYRIGHT
+
+(c) 1999 - 2002 Johan Van den Brande <johan@vandenbrande.com>
+
+http://www.tektonica.com/projects/gsmsms/
+
+=cut

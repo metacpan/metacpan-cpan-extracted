@@ -1,0 +1,7 @@
+This directory contains sample scripts that use Geo::Coder::Geocode::US.
+Its contents are:
+
+README - This file.
+
+geocode-us - A script to geocode addresses. Documentation is available
+        using the -help option.

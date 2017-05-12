@@ -1,0 +1,134 @@
+<HTML>
+<HEAD>
+<TITLE>Online Help: SEARCHING</TITLE>
+</HEAD>
+<BODY>
+<H1>How can I search the Web?</H1>
+
+<p>SatelLife provides an e-mail gateway for selected WWW search
+engines.  These search engines allow you to search the World Wide Web
+through e-mail.  Currently supported are the Infoseek, Yahoo, and
+AltaVista search engines.
+
+<p><A HREF="PROMED.html">Help on using the ProMED search engine is also
+available.</A>
+
+<hr>
+
+<p>The <A HREF=http://www.yahoo.com>Yahoo</A> search engine allows you to
+search through a carefully indexed list of World-Wide Web sites.  It
+will produce a small list of well-organized sites which may have the
+information you are searching for.
+
+<p>We also provide a gateway into the <A
+HREF="http://www.infoseek.com/">Infoseek</A> and <A
+HREF="http://altavista.digital.com/">AltaVista</A> search engines.  These
+search engines allow you to search through the entire World Wide Web,
+producing a larger set of possible sites, but the probability of any
+given site having the information you're looking for may be lower than
+with Yahoo.  Infoseek also allows you to search through Usenet
+archives.
+
+<hr>
+
+<p>To access one of these search engines, send a message to
+getweb@usa.healthnet.org with the following line:
+
+<p>SEARCH &lt;engine&gt; &lt;keywords...&gt;
+
+<p>with "engine" replaced by either YAHOO, ALTAVISTA, or INFOSEEK
+depending on which search engine you want to use.
+
+<hr>
+
+<p>For example, to search for Yahoo categories relating to the Ebola
+virus outbreak in Zaire, you might send this message to
+getweb@usa.healthnet.org:
+
+<p><code>SEARCH YAHOO ebola zaire</code>
+
+<p>You would receive a message containing these lines:
+
+<pre>Found 3 matches containing ebola zaire.  Displaying matches 1-3.
+
+...
+
+* Ebola Epidemic in Zaire[9]
+* Ebola Outbreak in Zaire - Updates[10]
+* Primary Sources: The Ebola in Zaire[11] - from the Nando Times.
+
+...
+
+[9] http://www.uct.ac.za/microbiology/ebopage.html
+[10] http://www.bocklabs.wisc.edu/outbreak.html
+[11] http://www.nando.net/newsroom/zairesources.html</pre>
+<hr>
+
+<p>To gain more information about entry number 10, labelled 'Ebola
+Outbreak in Zaire', you could then send a message to
+getweb@usa.healthnet.org with the message body:
+
+<p><code>SEND http://www.bocklabs.wisc.edu/outbreak.html</code>
+
+<hr>
+
+<p>We also provide a gateway to the powerful AltaVista search engine.
+To search the entire World-Wide Web for information about tobacco and
+lung cancer, send this message to getweb@usa.healthnet.org:
+
+<p><code>SEARCH ALTAVISTA tobacco "lung cancer"</code>
+
+<p>To search through healthnet.org home pages for information on
+the Ebola virus, send this message:
+
+<p><code>SEARCH ALTAVISTA host:healthnet.org ebola</code>
+
+<p>The <A
+HREF="http://altavista.digital.com/cgi-bin/query?pg=h&what=web">AltaVista
+Help page</A> contains additional information on query syntax.
+
+<hr>
+
+<p>Finally, we also provide a gateway to the popular InfoSeek search
+engine.  To search the entire World-Wide Web for information about
+exercise and rats, type:
+
+<p><code>SEARCH INFOSEEK exercise rats</code>
+
+<o>This can lead to possibly useful information (like a Mouse and Rat
+Research Home Page), as well as to useless information (like the home
+page of someone who refers to himself as "Rat".)
+
+<p>By default, Infoseek will search the World-Wide Web.  However,
+Infoseek recognizes the following keywords:  
+
+<ul>
+<li>NN searches Usenet newsgroups.</li>
+<li>CT searches the Infoseek Company Directory.</li>
+<li>EM searches a database of known e-mail addresses.</li>
+<li>NW searches through the past month of news.</li>
+<li>FQ searches through a collection of FAQ documents.</li>
+</ul>
+
+<p>So, to search for recent news on the 15-year-old search for a cure
+for AIDS, submit this query:
+
+<p><code>SEARCH INFOSEEK NW cure aids</code>
+
+<p>The <A
+HREF="http://guide.infoseek.com/Help?pg=SearchHlp.html&sv=IS&lk=lcd">Infoseek
+Search Tips</A> page explains how to create more complex queries, like
+a query which finds only pages which contain the phrase "San
+Francisco":
+
+<p><code>SEARCH INFOSEEK city guide +San Francisco</code>
+
+<hr>
+
+Please note that SatelLife is in no way affiliated with Infoseek,
+AltaVista, or Yahoo, and cannot be responsible for the accuracy of
+these search engines or for the content of retreived WWW documents.
+
+<p><A HREF=HELP.html>Back to the main help page</A>
+</BODY>
+</HTML>

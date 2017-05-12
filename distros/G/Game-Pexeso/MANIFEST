@@ -1,0 +1,15 @@
+bin/pexeso
+Build.PL
+Changes
+COPYING
+COPYING.LESSER
+inc/MyBuilder.pm
+lib/Game/Pexeso.pm
+lib/Game/Pexeso/Card.pm
+lib/Game/Pexeso/Spinner.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+share/pexeso/back-card.png
+t/pexeso.t

@@ -1,0 +1,112 @@
+BODY { 
+    background-color: black; 
+    color: lightgreen; 
+    font-family: sans-serif;
+    width: 850px;
+}
+
+A:link { text-decoration: overline; color: #00A713  }
+A:visited { text-decoration: overline; color: #00A713  }
+A:active { text-decoration: overline; color: maroon }
+
+
+div.entry { display: block }
+
+.score {
+    left : 95px;
+    position : absolute;
+  }
+
+
+.slotCode, .log {
+    overflow : scroll;
+    visibility : hidden;
+    white-space : pre;
+    height : 300px;
+  }
+
+
+.log {
+    visibility: visible;
+  }
+
+
+.slot {
+    cursor: crosshair;
+    background : #3972b0;
+    font : 8pt sans-serif;
+    padding : 3px;
+    margin : 3px;
+    float : left;
+    height : 12px;
+    overflow : hidden;
+    position : static;
+    vertical-align : middle;
+    text-align: center;
+    width : 30px;
+    z-index : 0;
+    border : yellow ridge;
+    border-width: 0px;
+    color: black;
+  }
+
+
+.activeSlot {
+    background : #3972b0;
+    font : 10pt serif;
+    padding : 3px;
+    margin : 3px;
+    float : left;
+    height : 150px;
+    overflow : scroll;
+    position : static;
+    white-space : pre;
+    width : 150px;
+    z-index: 1;
+  }
+
+
+.summary, .gameLinks {
+    border-style : solid;
+    border-width: 1px;
+    width: 200px;
+    top: 100px;	
+    background-color: #616460;
+	margin: 5px;
+	padding: 5px;
+  }
+
+
+.deadPlayer {
+    text-decoration : line-through;
+  }
+
+.w1nn3r:after {
+    content: "*"; 
+    color: gold;
+}
+
+.leftSide {
+    position: absolute;
+    top: 100px;
+    left: 230px;
+    width: 600px;
+    border-style: dotted;
+    border-width: 1px;
+  }
+
+
+.theArray {
+  }
+
+
+.console {
+    background-color : #616460;
+    border-style : dotted;
+    clear : both;
+    color : #90ee90;
+    height : 300px;
+    margin-top: 15px;
+  }
+
+h1 { float: right; margin-top: 0px; margin-right: 100px;}

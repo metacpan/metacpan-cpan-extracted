@@ -1,0 +1,31 @@
+This file contains changes to DEVELOPMENT dependencies only ( both REQUIRED and OPTIONAL )
+
+0.001002
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0.001002
+ - Dist::Zilla::Plugin::MetaYAML::Minimal
+ - Dist::Zilla::Plugin::Prereqs::Upgrade
+ - Dist::Zilla::Plugin::Readme::Brief
+ - Dist::Zilla::Plugin::RemovePrereqs::Provided
+ - English
+ - Software::License::Perl_5
+ - Test::MinimumVersion
+
+ [Changed / develop recommends]
+ - Test::More 1.001008 → 0.99
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001 → 0.004002
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 0 → 1.004000
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003902
+ - Test::More 0 → 0.96
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001003 → 0.002005
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.022000 → 2.025020
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::MetaYAML
+ - Dist::Zilla::Plugin::ReadmeFromPod
+
+0.001001 2014-10-30T09:12:56Z

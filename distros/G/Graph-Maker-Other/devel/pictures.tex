@@ -1,0 +1,2349 @@
+% Copyright 2014, 2015, 2016, 2017 Kevin Ryde
+%
+
+
+\documentclass{article}
+\usepackage[T1]{fontenc}  % T1 for accents, before babel
+\usepackage{amsmath}
+\allowdisplaybreaks
+
+\usepackage{float}      % for \begin{figure}[H]
+\usepackage{gensymb}    % for \degree
+\usepackage{hyphenat}   % for \hyp hyphenation of words with -
+
+\usepackage[pdfusetitle,
+            pdflang={en}, % RFC3066 style ISO639
+           ]{hyperref}
+\renewcommand\figureautorefname{figure}   % lower case
+\renewcommand\theoremautorefname{theorem} % lower case
+\providecommand*{\lemmaautorefname}{lemma}
+\providecommand*{\corollaryautorefname}{corollary}
+\usepackage[all]{hypcap} % figure links to top of figure
+
+\usepackage{mathtools}  % for \mathclap and showonlyrefs
+\mathtoolsset{showonlyrefs}
+
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}  % for arrow To[length etc
+\usetikzlibrary{bending}      % for arrow [bend]
+\usetikzlibrary{calc}         % for ($(...)$) coordinate calculations
+\usetikzlibrary{decorations}  % for [decoration=]
+\usetikzlibrary{decorations.pathreplacing}  % for decoration=brace
+\usetikzlibrary{shapes}       % for shape aspect=1
+\tikzset{font=\small,         % same as text
+         >=Latex}             % arrowhead style
+  % must be capital Latex for [harpoon] half arrows
+
+\hyphenation{Amer-ican}
+\hyphenation{Pos-it-ive}
+\hyphenation{Calc-ul-at-ions}
+\hyphenation{Rep-lic-at-ions}
+\hyphenation{Twin-drag-on}
+\hyphenation{Pap-er-fold-ing}
+\hyphenation{Bit-Above-Low-est-One}
+\hyphenation{gBit-Above-Low-est-One}
+\hyphenation{Blob-List}
+\hyphenation{Blob-Seg-ments}
+\hyphenation{Blob-Delta}
+\hyphenation{Blob-Delta-Len}
+\hyphenation{Blob-Start}
+\hyphenation{Drag-on-Bord-er}
+\hyphenation{fract-al}
+\hyphenation{trig-on-om-et-ric}
+\hyphenation{co-eff-ic-ients}
+
+%---------------------------------
+% personal preferences
+
+\hypersetup{
+  pdfborderstyle={/W 0},  % no border on hyperlinks
+}
+
+% these must be after \begin{document} to take effect, hence \AtBeginDocument
+\AtBeginDocument{%
+  \setlength\abovedisplayskip{.7\baselineskip}
+  \setlength\belowdisplayskip{.7\baselineskip}
+  \setlength\abovedisplayshortskip{.5\baselineskip}
+  \setlength\belowdisplayshortskip{.5\baselineskip}
+}
+
+% less space after "plain" style \end{theorem} etc
+\makeatletter
+\g@addto@macro\th@plain{\thm@postskip=1\baselineskip}
+\makeatother
+
+%------------------------------------------------------------------------------
+% GP-DEFINE  default(strictargs,1);
+
+\newcommand\MySlash{\slash\hspace{0pt}}
+\newcommand\MyTightDots{.\kern.1em.\kern.1em.}
+
+\newbox\MyNegativePhantomBox
+\newcommand\MyNegativePhantom[1]{%
+  \setbox\MyNegativePhantomBox\hbox{#1}%
+  \hbox to -\wd\MyNegativePhantomBox{}}
+% -\wd\MyNegativePhantomBox
+
+% % Uncomment this to see the bounding box around each picture.
+% \tikzset{
+%   every picture/.append style={
+%     execute at end picture={
+%       \draw (current bounding box.south west)
+%         rectangle (current bounding box.north east);
+% }}}
+
+
+%------------------------------------------------------------------------------
+\begin{document}
+
+binary beanstalk count 1-bits A179016
+  parent = n - number of 1-bits in n
+
+number of runs binary beanstalk A255327=size of subtree, A255056=trunk
+  parent = A236840(vertex)   n - number of runs in n
+
+
+
+%------------------------------------------------------------------------------
+\section{6 Vertices Mean Distance 2/3 of Diameter}
+
+12 total
+
+with one hanging
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (2) at (3,0) [my box] {2};
+  \node (3) at (-2,0) [my box] {3};
+  \node (0) at (0,1) [my box] {0};
+  \node (1) at (0,3) [my box] {1};
+  \node (4) at (0,2) [my box] {4};
+  \node (5) at (2,0) [my box] {5};
+
+  \draw [] (3) to (4);
+  \draw [] (0) to (4);
+  \draw [] (1) to (5);
+  \draw [] (4) to (5);
+  \draw [] (3) to (5);
+  \draw [] (0) to (5);
+  \draw [] (3) to (1);
+  \draw [] (1) to (4);
+  \draw [] (0) to (3);
+  \draw [] (5) to (2);
+
+\end{tikzpicture}
+\end{center}
+
+
+
+
+%------------------------------------------------------------------------------
+\section{Noughts and Crosses 2x2, 1 Player}
+
+Tesseract induced subgraph.
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=27032}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (0,0) [my box] {0000};
+
+  \node (0001) at (2,1.5) [my box] {0001};
+  \node (0010) at (2,.5) [my box] {0010};
+  \node (0100) at (2,-.5) [my box] {0100};
+  \node (1000) at (2,-1.5) [my box] {1000};
+
+  \node (0011) at (4,2.5) [my box] {0011};
+  \node (0101) at (4,1.5) [my box] {0101};
+  \node (1001) at (5.25,0) [my box] {1001};
+  \node (0110) at (4,0) [my box] {0110};
+  \node (1010) at (4,-1.5) [my box] {1010};
+  \node (1100) at (4,-2.5) [my box] {1100};
+
+  \draw [->] (0010) to (0011);
+  \draw [->] (1000) to (1100);
+  \draw [->] (1000) to (1010);
+  \draw [->] (0001) to (0011);
+  \draw [->] (0010) to (0110);
+  \draw [->] (0100) to (1100);
+  \draw [->] (1000) to (1001);
+  \draw [->] (0100) to (0110);
+  \draw [->] (0001) to (1001);
+  \draw [->] (0000) to (0001);
+  \draw [->] (0000) to (1000);
+  \draw [->] (0000) to (0100);
+  \draw [->] (0001) to (0101);
+  \draw [->] (0010) to (1010);
+  \draw [->] (0000) to (0010);
+  \draw [->] (0100) to (0101);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (0,0) [my box] {0000};
+
+  \node (0001) at (2,1.5) [my box] {0001};
+  \node (0010) at (2,.5) [my box] {0010};
+  \node (0100) at (2,-.5) [my box] {0100};
+  \node (1000) at (2,-1.5) [my box] {1000};
+
+  \node (0011) at (4,2.5) [my box] {0011};
+  \node (0110) at (4,1.5) [my box] {0110};
+  \node (1100) at (4, .5) [my box] {1100};
+  \node (1001) at (4,-.5) [my box] {1001};
+  \node (0101) at (4,-1.5) [my box] {0101};
+  \node (1010) at (4,-2.5) [my box] {1010};
+
+  \draw [->] (0010) to (0011);
+  \draw [->] (1000) to (1100);
+  \draw [->] (1000) to (1010);
+  \draw [->] (0001) to (0011);
+  \draw [->] (0010) to (0110);
+  \draw [->] (0100) to (1100);
+  \draw [->] (1000) to (1001);
+  \draw [->] (0100) to (0110);
+  \draw [->] (0001) to (1001);
+  \draw [->] (0000) to (0001);
+  \draw [->] (0000) to (1000);
+  \draw [->] (0000) to (0100);
+  \draw [->] (0001) to (0101);
+  \draw [->] (0010) to (1010);
+  \draw [->] (0000) to (0010);
+  \draw [->] (0100) to (0101);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (0,0) [my box] {0000};
+  \node (0001) at (90*0+90:2) [my box] {0001};
+  \node (0010) at (90*1+90:2) [my box] {0010};
+  \node (0100) at (90*2+90:2) [my box] {0100};
+  \node (1000) at (90*3+90:2) [my box] {1000};
+
+  \node (0011) at (-1,1) [my box] {0011};
+  \node (0110) at (-1,-1) [my box] {0110};
+  \node (1100) at (1,-1) [my box] {1100};
+  \node (1001) at (1,1) [my box] {1001};
+  \node (1010) at (0,-4) [my box] {1010};
+  \node (0101) at (4,0) [my box] {0101};
+
+  \draw [->] (0010) to (0011);
+  \draw [->] (1000) to (1100);
+  \draw [->] (1000) to (1010);
+  \draw [->] (0001) to (0011);
+  \draw [->] (0010) to (0110);
+  \draw [->] (0100) to (1100);
+  \draw [->] (1000) to (1001);
+  \draw [->] (0100) to (0110);
+  \draw [->] (0001) to (1001);
+  \draw [->] (0000) to (0001);
+  \draw [->] (0000) to (1000);
+  \draw [->] (0000) to (0100);
+  \draw [->] (0001) to (0101);
+  \draw [->] (0010) to (1010);
+  \draw [->] (0000) to (0010);
+  \draw [->] (0100) to (0101);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=3,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (0,0) [my box] {0000};
+  \node (0001) at (90*0+90:2) [my box] {0001};
+  \node (0010) at (90*1+90:2) [my box] {0010};
+  \node (0100) at (90*2+90:2) [my box] {0100};
+  \node (1000) at (90*3+90:2) [my box] {1000};
+
+  \node (0011) at (-1,1) [my box] {0011};
+  \node (0110) at (-1,-1) [my box] {0110};
+  \node (1100) at (1,-1) [my box] {1100};
+  \node (1001) at (1,1) [my box] {1001};
+  \node (1010) at (.5,-.5) [my box] {1010};
+  \node (0101) at (-.5,.5) [my box] {0101};
+
+  \draw [->] (0010) to (0011);
+  \draw [->] (1000) to (1100);
+  \draw [->] (1000) to (1010);
+  \draw [->] (0001) to (0011);
+  \draw [->] (0010) to (0110);
+  \draw [->] (0100) to (1100);
+  \draw [->] (1000) to (1001);
+  \draw [->] (0100) to (0110);
+  \draw [->] (0001) to (1001);
+  \draw [->] (0000) to (0001);
+  \draw [->] (0000) to (1000);
+  \draw [->] (0000) to (0100);
+  \draw [->] (0001) to (0101);
+  \draw [->] (0010) to (1010);
+  \draw [->] (0000) to (0010);
+  \draw [->] (0100) to (0101);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=4,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (0,0) [my box] {0000};
+  \node (0001) at (90*0+90:1) [my box] {0001};
+  \node (0010) at (90*1+90:1) [my box] {0010};
+  \node (0100) at (90*2+90:1) [my box] {0100};
+  \node (1000) at (90*3+90:1) [my box] {1000};
+
+  \node (0011) at (-1,1) [my box] {0011};
+  \node (0110) at (-1,-1) [my box] {0110};
+  \node (1100) at (1,-1) [my box] {1100};
+  \node (1001) at (1,1) [my box] {1001};
+  \node (1010) at (.5,-.5) [my box] {1010};
+  \node (0101) at (-.5,.5) [my box] {0101};
+
+  \draw [->] (0010) to (0011);
+  \draw [->] (1000) to (1100);
+  \draw [->] (1000) to (1010);
+  \draw [->] (0001) to (0011);
+  \draw [->] (0010) to (0110);
+  \draw [->] (0100) to (1100);
+  \draw [->] (1000) to (1001);
+  \draw [->] (0100) to (0110);
+  \draw [->] (0001) to (1001);
+  \draw [->] (0000) to (0001);
+  \draw [->] (0000) to (1000);
+  \draw [->] (0000) to (0100);
+  \draw [->] (0001) to (0101);
+  \draw [->] (0010) to (1010);
+  \draw [->] (0000) to (0010);
+  \draw [->] (0100) to (0101);
+
+\end{tikzpicture}
+\end{center}
+
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (0,0) [my box] {0000};
+  \node (0001) at (90*0+90:1) [my box] {0001};
+  \node (0010) at (90*1+90:1) [my box] {0010};
+  \node (0100) at (90*2+90:1) [my box] {0100};
+  \node (1000) at (90*3+90:1) [my box] {1000};
+
+  \node (0011) at (-1,1) [my box] {0011};
+  \node (0110) at (-1,-1) [my box] {0110};
+  \node (1100) at (1,-1) [my box] {1100};
+  \node (1001) at (1,1) [my box] {1001};
+  \node (1010) at (0,-2) [my box] {1010};
+  \node (0101) at (2,0) [my box] {0101};
+
+  \draw [->] (0010) to (0011);
+  \draw [->] (1000) to (1100);
+  \draw [->] (1000) to (1010);
+  \draw [->] (0001) to (0011);
+  \draw [->] (0010) to (0110);
+  \draw [->] (0100) to (1100);
+  \draw [->] (1000) to (1001);
+  \draw [->] (0100) to (0110);
+  \draw [->] (0001) to (1001);
+  \draw [->] (0000) to (0001);
+  \draw [->] (0000) to (1000);
+  \draw [->] (0000) to (0100);
+  \draw [->] (0001) to (0101);
+  \draw [->] (0010) to (1010);
+  \draw [->] (0000) to (0010);
+  \draw [->] (0100) to (0101);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Noughts and Crosses 2x2}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=27017}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (00-00) at (0,0) [my box] {00-00};
+
+  % 1
+  \node (00-01) at (1,0) [my box] {00-01};
+  \node (00-10) at (0,1) [my box] {00-10};
+  \node (01-00) at (-1,0) [my box] {01-00};
+  \node (10-00) at (0,-1) [my box] {10-00};
+
+  % 2
+  \node (02-10) at (2,1) [my box] {02-10};
+  \node (20-10) at (0,2) [my box] {20-10};
+  \node (00-12) at (-2,1) [my box] {00-12};
+
+  \node (21-00) at (-1,2) [my box] {21-00};
+  \node (01-02) at (-2,0) [my box] {01-02};
+  \node (01-20) at (-1,-2) [my box] {01-20};
+
+  \node (10-02) at (-2,-1) [my box] {10-02};
+  \node (10-20) at (0,-2) [my box] {10-20};
+  \node (12-00) at (2,-1) [my box] {12-00};
+
+  \node (00-21) at (1,-2) [my box] {00-21};
+  \node (02-01) at (2,0) [my box] {02-01};
+  \node (20-01) at (1,2) [my box] {20-01};
+
+  % 3
+  \node (12-10) at (3.5,0) [my box] {12-10};
+  \node (02-11) at (3.5,1) [my box] {02-11};
+  \node (12-01) at (3.5,-1) [my box] {12-01};
+
+  \node (20-11) at (1,3.5) [my box] {20-11};
+  \node (21-01) at (0,3.5) [my box] {21-01};
+  \node (21-10) at (-1,3.5) [my box] {21-10};
+
+  \node (01-12) at (-3.5,1) [my box] {01-12};
+
+  \node (10-12) at (-3.5,0) [my box] {10-12};
+  \node (11-02) at (-3.5,-1) [my box] {11-02};
+
+  \node (11-20) at (-1,-3.5) [my box] {11-20};
+  \node (01-21) at (0,-3.5) [my box] {01-21};
+  \node (10-21) at (1,-3.5) [my box] {10-21};
+
+
+  \draw [->] (12-00) to (12-10);
+  \draw [->] (00-12) to (01-12);
+  \draw [->] (00-10) to (02-10);
+  \draw [->] (10-20) to (10-21);
+  \draw [->] (01-00) to (01-20);
+  \draw [->] (00-21) to (10-21);
+  \draw [->] (10-00) to (10-20);
+  \draw [->] (01-02) to (11-02);
+  \draw [->] (21-00) to (21-01);
+  \draw [->] (10-02) to (11-02);
+  \draw [->] (20-01) to (20-11);
+  \draw [->] (00-01) to (20-01);
+  \draw [->] (00-00) to (10-00);
+  \draw [->] (00-00) to (01-00);
+  \draw [->] (00-12) to (10-12);
+  \draw [->] (00-01) to (00-21);
+  \draw [->] (02-01) to (02-11);
+  \draw [->] (12-00) to (12-01);
+  \draw [->] (02-10) to (02-11);
+  \draw [->] (10-00) to (12-00);
+  \draw [->] (20-01) to (21-01);
+  \draw [->] (01-20) to (01-21);
+  \draw [->] (01-20) to (11-20);
+  \draw [->] (20-10) to (21-10);
+  \draw [->] (10-02) to (10-12);
+  \draw [->] (01-00) to (21-00);
+  \draw [->] (00-10) to (20-10);
+  \draw [->] (00-10) to (00-12);
+  \draw [->] (01-02) to (01-12);
+  \draw [->] (10-20) to (11-20);
+  \draw [->] (00-00) to (00-10);
+  \draw [->] (20-10) to (20-11);
+  \draw [->] (02-01) to (12-01);
+  \draw [->] (00-00) to (00-01);
+  \draw [->] (00-21) to (01-21);
+  \draw [->] (01-00) to (01-02);
+  \draw [->] (02-10) to (12-10);
+  \draw [->] (10-00) to (10-02);
+  \draw [->] (21-00) to (21-10);
+  \draw [->] (00-01) to (02-01);
+
+\end{tikzpicture}
+\end{center}
+
+
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (00-00) at (0,0) [my box] {00-00};
+
+  % 1
+  \node (00-01) at (1,0) [my box] {00-01};
+  \node (00-10) at (0,1) [my box] {00-10};
+  \node (01-00) at (-1,0) [my box] {01-00};
+  \node (10-00) at (0,-1) [my box] {10-00};
+
+  % 2
+  \node (20-10) at (0,2) [my box] {20-10};
+  \node (02-10) at ($(0,1) + (45:1)$) [my box] {02-10};
+  \node (00-12) at ($(0,1) + (135:1)$) [my box] {00-12};
+
+  \node (21-00) at ($(-1,0) + (135:1)$) [my box] {21-00};
+  \node (01-02) at (-2,0) [my box] {01-02};
+  \node (01-20) at ($(-1,0) + (-135:1)$) [my box] {01-20};
+
+  \node (10-02) at ($(0,-1) + (-135:1)$) [my box] {10-02};
+  \node (10-20) at (0,-2) [my box] {10-20};
+  \node (12-00) at ($(0,-1) + (-45:1)$) [my box] {12-00};
+
+  \node (00-21) at ($(1,0) + (-45:1)$) [my box] {00-21};
+  \node (02-01) at (2,0) [my box] {02-01};
+  \node (20-01) at ($(1,0) + (45:1)$) [my box] {20-01};
+
+  % 3
+  \node (12-10) at (0*30:4) [my box] {12-10};
+  \node (02-11) at (1*30:4) [my box] {02-11};
+
+  \node (20-11) at (2*30:4) [my box] {20-11};
+  \node (21-01) at (3*30:4) [my box] {21-01};
+
+  \node (21-10) at (4*30:4) [my box] {21-10};
+  \node (01-12) at (5*30:4) [my box] {01-12};
+
+  \node (10-12) at (6*30:4) [my box] {10-12};
+  \node (11-02) at (7*30:4) [my box] {11-02};
+
+  \node (11-20) at (8*30:4) [my box] {11-20};
+  \node (01-21) at (9*30:4) [my box] {01-21};
+
+  \node (10-21) at (10*30:4) [my box] {10-21};
+  \node (12-01) at (11*30:4) [my box] {12-01};
+
+
+  \draw [->] (12-00) to (12-10);
+  \draw [->] (00-12) to (01-12);
+  \draw [->] (00-10) to (02-10);
+  \draw [->] (10-20) to (10-21);
+  \draw [->] (01-00) to (01-20);
+  \draw [->] (00-21) to (10-21);
+  \draw [->] (10-00) to (10-20);
+  \draw [->] (01-02) to (11-02);
+  \draw [->] (21-00) to (21-01);
+  \draw [->] (10-02) to (11-02);
+  \draw [->] (20-01) to (20-11);
+  \draw [->] (00-01) to (20-01);
+  \draw [->] (00-00) to (10-00);
+  \draw [->] (00-00) to (01-00);
+  \draw [->] (00-12) to (10-12);
+  \draw [->] (00-01) to (00-21);
+  \draw [->] (02-01) to (02-11);
+  \draw [->] (12-00) to (12-01);
+  \draw [->] (02-10) to (02-11);
+  \draw [->] (10-00) to (12-00);
+  \draw [->] (20-01) to (21-01);
+  \draw [->] (01-20) to (01-21);
+  \draw [->] (01-20) to (11-20);
+  \draw [->] (20-10) to (21-10);
+  \draw [->] (10-02) to (10-12);
+  \draw [->] (01-00) to (21-00);
+  \draw [->] (00-10) to (20-10);
+  \draw [->] (00-10) to (00-12);
+  \draw [->] (01-02) to (01-12);
+  \draw [->] (10-20) to (11-20);
+  \draw [->] (00-00) to (00-10);
+  \draw [->] (20-10) to (20-11);
+  \draw [->] (02-01) to (12-01);
+  \draw [->] (00-00) to (00-01);
+  \draw [->] (00-21) to (01-21);
+  \draw [->] (01-00) to (01-02);
+  \draw [->] (02-10) to (12-10);
+  \draw [->] (10-00) to (10-02);
+  \draw [->] (21-00) to (21-10);
+  \draw [->] (00-01) to (02-01);
+
+\end{tikzpicture}
+\end{center}
+
+
+%------------------------------------------------------------------------------
+\section{Noughts and Crosses 2x2 up to Rotation}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=27020}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (00-00) at (45:1) [my box] {00-00};
+
+  \node (00-01) at (0,0) [my box] {00-01};
+
+  \node (00-12) at (90:2) [my box] {00-12};
+  \node (00-21) at (90+120:2) [my box] {00-21};
+  \node (01-20) at (90+240:2) [my box] {01-20};
+
+  \node (01-12) at (90+60:2) [my box] {01-12};
+  \node (01-21) at (90+60+120:2) [my box] {01-21};
+  \node (02-11) at (90+60+240:2) [my box] {02-11};
+
+  \draw [->] (00-01) to (00-12);
+  \draw [->] (00-21) to (01-21);
+  \draw [->] (00-12) to (02-11);
+  \draw [->] (01-20) to (02-11);
+  \draw [->] (00-00) to (00-01);
+  \draw [->] (00-12) to (01-12);
+  \draw [->] (00-21) to (01-12);
+  \draw [->] (00-01) to (01-20);
+  \draw [->] (01-20) to (01-21);
+  \draw [->] (00-01) to (00-21);
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{1\baselineskip}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (00-00) at (0,0) [my box] {00-00};
+
+  \node (00-01) at (0,-1) [my box] {00-01};
+
+  \node (00-12) at (1,-2) [my box] {00-12};
+  \node (00-21) at (0,-2) [my box] {00-21};
+  \node (01-20) at (-1,-2) [my box] {01-20};
+
+  \node (01-12) at (1,-3) [my box] {01-12};
+  \node (02-11) at (0,-3) [my box] {02-11};
+  \node (01-21) at (-1,-3) [my box] {01-21};
+
+  \draw [->] (00-01) to (00-12);
+  \draw [->] (00-21) to (01-21);
+  \draw [->] (00-12) to (02-11);
+  \draw [->] (01-20) to (02-11);
+  \draw [->] (00-00) to (00-01);
+  \draw [->] (00-12) to (01-12);
+  \draw [->] (00-21) to (01-12);
+  \draw [->] (00-01) to (01-20);
+  \draw [->] (01-20) to (01-21);
+  \draw [->] (00-01) to (00-21);
+
+\end{tikzpicture}
+\end{center}
+
+
+
+%------------------------------------------------------------------------------
+\section{Noughts and Crosses 2x2, 1 Player, up to Reflection}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=856}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (0,0) [my box] {0000};
+  \node (0010) at (1,0) [my box] {0010};
+  \node (1000) at (-1,0) [my box] {1000};
+
+  \node (0011) at (2,0) [my box] {0011};
+  \node (1010) at (0,-1) [my box] {1010};
+  \node (1001) at (0,1) [my box] {1001};
+  \node (1100) at (-2,0) [my box] {1100};
+
+  \draw [->] (1000) to (1100);
+  \draw [->] (1000) to (1001);
+  \draw [->] (0000) to (0010);
+  \draw [->] (0010) to (1010);
+  \draw [->] (1000) to (1010);
+  \draw [->] (0000) to (1000);
+  \draw [->] (0010) to (0011);
+  \draw [->] (0010) to (1001);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Noughts and Crosses 2x2, 3 Players, up to Rotation}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=27025}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (45:1) [my box] {0000};
+  \node (1000) at (0,0) [my box] {1000};
+  \node (1002) at (3*30:2) [my box] {1002};
+  \node (1020) at (7*30:2) [my box] {1020};
+  \node (1023) at (6*30:2) [my box] {1023};
+  \node (1032) at (2*30:2) [my box] {1032};
+  \node (1123) at (5*30:2) [my box] {1123};
+  \node (1200) at (11*30:2) [my box] {1200};
+  \node (1203) at (0*30:2) [my box] {1203};
+  \node (1213) at (1*30:2) [my box] {1213};
+  \node (1230) at (10*30:2) [my box] {1230};
+  \node (1231) at (9*30:2) [my box] {1231};
+  \node (1302) at (4*30:2) [my box] {1302};
+  \node (1320) at (8*30:2) [my box] {1320};
+
+  \draw [] (1000) to (1200);
+  \draw [] (1123) to (1302);
+  \draw [] (1230) to (1231);
+  \draw [] (1200) to (1230);
+  \draw [] (1000) to (1020);
+  \draw [] (1002) to (1302);
+  \draw [] (1002) to (1032);
+  \draw [] (1231) to (1320);
+  \draw [] (1020) to (1320);
+  \draw [] (1020) to (1023);
+  \draw [] (1200) to (1203);
+  \draw [] (1000) to (1002);
+  \draw [] (1032) to (1213);
+  \draw [] (1123) to (1023);
+  \draw [] (0000) to (1000);
+  \draw [] (1203) to (1213);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0000) at (0,1) [my box] {0000};
+  \node (1000) at (0,0) [my box] {1000};
+
+  \node (1002) at (-2,-1) [my box] {1002};
+  \node (1020) at (0,-1) [my box] {1020};
+  \node (1200) at (2,-1) [my box] {1200};
+
+  \node (1302) at (-2.5,-2) [my box] {1302};
+  \node (1032) at (-1.5,-2) [my box] {1023};
+  \node (1023) at (-.5,-2) [my box] {1320};
+  \node (1320) at (.5,-2) [my box] {1032};
+  \node (1203) at (1.5,-2) [my box] {1230};
+  \node (1230) at (2.5,-2) [my box] {1203};
+
+  \node (1123) at (-2.5,-3) [my box] {1123};
+  \node (1213) at (0,-3) [my box] {1231};
+  \node (1231) at (2.5,-3) [my box] {1213};
+
+  \draw [] (1000) to (1200);
+  \draw [] (1123) to (1302);
+  \draw [] (1230) to (1231);
+  \draw [] (1200) to (1230);
+  \draw [] (1000) to (1020);
+  \draw [] (1002) to (1302);
+  \draw [] (1002) to (1032);
+  \draw [] (1231) to (1320);
+  \draw [] (1020) to (1320);
+  \draw [] (1020) to (1023);
+  \draw [] (1200) to (1203);
+  \draw [] (1000) to (1002);
+  \draw [] (1032) to (1213);
+  \draw [] (1123) to (1023);
+  \draw [] (0000) to (1000);
+  \draw [] (1203) to (1213);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+
+  \node (0000) at (0,1) [my box] {0000};
+  \node (1000) at (0,0) [my box] {1000};
+
+  \node (1002) at (-2,-1) [my box] {1002};
+  \node (1020) at (0,-1) [my box] {1020};
+  \node (1200) at (2,-1) [my box] {1200};
+
+  \node (1302) at (-3,-2) [my box] {1302};
+  \node (1023) at (-2,-2) [my box] {1023};
+  \node (1203) at (-.5,-2) [my box] {1320};
+  \node (1032) at (.5,-2) [my box] {1032};
+  \node (1320) at (2,-2) [my box] {1230};
+  \node (1230) at (3,-2) [my box] {1203};
+
+  \node (1123) at (-3,-3) [my box] {1123};
+  \node (1213) at (0,-3) [my box] {1231};
+  \node (1231) at (3,-3) [my box] {1213};
+
+  \draw [] (1000) to (1200);
+  \draw [] (1123) to (1302);
+  \draw [] (1230) to (1231);
+  \draw [] (1200) to (1230);
+  \draw [] (1000) to (1020);
+  \draw [] (1002) to (1302);
+  \draw [] (1002) to (1032);
+  \draw [] (1231) to (1320);
+  \draw [] (1020) to (1320);
+  \draw [] (1020) to (1023);
+  \draw [] (1200) to (1203);
+  \draw [] (1000) to (1002);
+  \draw [] (1032) to (1213);
+  \draw [] (1123) to (1023);
+  \draw [] (0000) to (1000);
+  \draw [] (1203) to (1213);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Subgraph Non-Relations Among 4-Vertex Graphs}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=26965}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,xscale=1.7,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (complete) at (0,-2) [my box] {complete};
+  \node (cycle across) at (1,-2) [my box] {cycle across};
+  \node (4) at (2,-2) [my box] {p-1};
+  \node (disconnected) at (4,-2) [my box] {disconnected};
+
+  \node (cycle-1 hanging) at (0,0) [my box] {cycle-1 hanging};
+  \node (cycle) at (1,0) [my box] {cycle};
+  \node (5) at (5,0) [my box] {p-3=2edge};
+  \node (7) at (4,0) [my box] {2-sep};
+  \node (cycle-1 disc) at (2,1) [my box] {cycle-1 disc};
+  \node (path) at (2.5,0) [my box] {path};
+  \node (star) at (2,-1) [my box] {claw};
+
+  \draw [] (star) to (path);
+  \draw [] (star) to (cycle);
+  \draw [] (cycle) to (cycle-1 hanging);
+  \draw [] (5) to (7);
+  \draw [] (7) to (star);
+  \draw [] (cycle-1 disc) to (cycle);
+  \draw [] (cycle-1 disc) to (path);
+  \draw [] (star) to (cycle-1 disc);
+  \draw [] (7) to (cycle-1 disc);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Subgraph Relations Among 4-Vertex Graphs, 1-Edge Delta}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=26963}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,xscale=1.7,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \node (complete) at (0, 0) [my box] {compl};
+  \node (cycle across) at (1, 0) [my box,align=center] {cycle \\ across};
+  \node (cycle) at (2, 1) [my box] {cycle};
+  \node (cycle hanging) at (2,0) [my box,align=center] {cycle-1 \\ hanging};
+  \node (path) at (3, 1) [my box] {path};
+  \node (claw) at (3,0) [my box] {claw};
+  \node (cycle-1 disc) at (3,-1) [my box,align=center] {cycle-1 \\ discon};
+  \node (7) at (4,1) [my box] {2-sep};
+  \node (5) at (4,0) [my box] {L};
+  \node (4) at (5,0) [my box] {1-edge};
+  \node (disconnected) at (6,0) [my box] {disc};
+
+  \draw [->] (complete) to (cycle across);
+  \draw [->] (cycle hanging) to (claw);
+  \draw [->] (cycle hanging) to (path);
+  \draw [->] (cycle hanging) to (cycle-1 disc);
+  \draw [->] (path) to (5);
+  \draw [->] (cycle) to (path);
+  \draw [->] (4) to (disconnected);
+  \draw [->] (5) to (4);
+  \draw [->] (7) to (4);
+  \draw [->] (cycle across) to (cycle hanging);
+  \draw [->] (cycle-1 disc) to (5);
+  \draw [->] (cycle across) to (cycle);
+  \draw [->] (claw) to (5);
+  \draw [->] (path) to (7);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,xscale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \node (complete) at (0, 6) [my box] {complete};
+  \node (cycle across) at (0, 5) [my box] {cycle across};
+  \node (cycle) at (-1, 4) [my box] {cycle};
+  \node (cycle hanging) at (0,4) [my box] {cycle-1 hanging};
+  \node (path) at (-1, 3) [my box] {path};
+  \node (claw) at (0,3) [my box] {claw};
+  \node (cycle-1 disc) at (1,3) [my box] {cycle-1 discon};
+  \node (7) at (-1,2) [my box] {2-sep};
+  \node (5) at (0,2) [my box] {L};
+  \node (4) at (0,1) [my box] {1-edge};
+  \node (disconnected) at (0,0) [my box] {disconnected};
+
+  \draw [->] (complete) to (cycle across);
+  \draw [->] (cycle hanging) to (claw);
+  \draw [->] (cycle hanging) to (path);
+  \draw [->] (cycle hanging) to (cycle-1 disc);
+  \draw [->] (path) to (5);
+  \draw [->] (cycle) to (path);
+  \draw [->] (4) to (disconnected);
+  \draw [->] (5) to (4);
+  \draw [->] (7) to (4);
+  \draw [->] (cycle across) to (cycle hanging);
+  \draw [->] (cycle-1 disc) to (5);
+  \draw [->] (cycle across) to (cycle);
+  \draw [->] (claw) to (5);
+  \draw [->] (path) to (7);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Subgraph Relations Among 4-Vertex Connected Graphs}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=748}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,xscale=1.6,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \node (complete)            at (0,1) [my box] {complete};
+  \node (cycle and across)    at (1,1) [my box] {K4 - 1};
+  \node (cycle)               at (1.5,0) [my box] {cycle};
+  \node (claw)                at (-.5,0) [my box] {claw};
+  \node (cycle-1 and hanging) at (0,-1) [my box] {cycle-1 and hang};
+  \node (path)                at (1,-1) [my box] {path};
+
+  \draw [->,bend right=0] (complete) to (path);
+  \draw [->] (complete) to (cycle and across);
+  \draw [->] (complete) to (cycle);
+  \draw [->] (complete) to (cycle-1 and hanging);
+  \draw [->,bend left=0] (complete) to (claw);
+  \draw [->] (cycle and across) to (cycle);
+  \draw [->] (cycle and across) to (path);
+  \draw [->] (cycle and across) to (cycle-1 and hanging);
+  \draw [->] (cycle and across) to (claw);
+  \draw [->] (cycle-1 and hanging) to (path);
+  \draw [->] (cycle-1 and hanging) to (claw);
+  \draw [->] (cycle) to (path);
+\end{tikzpicture}
+\end{center}
+
+% \vspace{2ex}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,xscale=1.8,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \node (complete)            at (0, 1) [my box] {complete};
+  \node (cycle and across)    at (2, 1) [my box] {K4 - 1};
+  \node (cycle)               at (0, -1) [my box] {cycle};
+  \node (claw)                at (2,-1) [my box] {claw};
+  \node (cycle-1 and hanging) at (.5, 0) [my box] {cycle-1 and hang};
+  \node (path)                at (1.5, 0) [my box] {path};
+
+  \draw [->,bend right=0] (complete) to (path);
+  \draw [->] (complete) to (cycle and across);
+  \draw [->] (complete) to (cycle);
+  \draw [->] (complete) to (cycle-1 and hanging);
+  \draw [->,bend left=0] (complete) to (claw);
+  \draw [->] (cycle and across) to (cycle);
+  \draw [->] (cycle and across) to (path);
+  \draw [->] (cycle and across) to (cycle-1 and hanging);
+  \draw [->] (cycle and across) to (claw);
+  \draw [->] (cycle-1 and hanging) to (path);
+  \draw [->] (cycle-1 and hanging) to (claw);
+  \draw [->] (cycle) to (path);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=3.5,rotate=90-72,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \node (complete)            at (0,0) [my box] {complete};
+  \node (claw)                at (0:1) [my box] {claw};
+  \node (cycle)               at (2*72:1) [my box] {cycle};
+  \node (cycle and across)    at (1*72:1) [my box] {cycle and across};
+  \node (cycle-1 and hanging) at (4*72:1) [my box] {cycle-1 and hanging};
+  \node (path)                at (3*72:1) [my box] {path};
+
+  \draw [->,bend right=0] (complete) to (path);
+  \draw [->] (complete) to (cycle and across);
+  \draw [->] (complete) to (cycle);
+  \draw [->] (complete) to (cycle-1 and hanging);
+  \draw [->,bend left=0] (complete) to (claw);
+  \draw [->] (cycle and across) to (cycle);
+  \draw [->] (cycle and across) to (path);
+  \draw [->] (cycle and across) to (cycle-1 and hanging);
+  \draw [->] (cycle and across) to (claw);
+  \draw [->] (cycle-1 and hanging) to (path);
+  \draw [->] (cycle-1 and hanging) to (claw);
+  \draw [->] (cycle) to (path);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \node (complete) at (1,2) [my box] {complete};
+  \node (claw) at (3,0) [my box] {claw};
+  \node (cycle) at (0,1) [my box] {cycle};
+  \node (cycle and across) at (1.5, 1) [my box] {cycle and across};
+  \node (cycle-1 and hanging) at (1,0) [my box] {cycle-1 and hanging};
+  \node (path) at (-1,0) [my box] {path};
+
+  \draw [->,bend right=20] (complete) to (path);
+  \draw [->] (complete) to (cycle and across);
+  \draw [->] (complete) to (cycle);
+  \draw [->] (complete) to (cycle-1 and hanging);
+  \draw [->,bend left=20] (complete) to (claw);
+  \draw [->] (cycle and across) to (cycle);
+  \draw [->] (cycle and across) to (path);
+  \draw [->] (cycle and across) to (cycle-1 and hanging);
+  \draw [->] (cycle and across) to (claw);
+  \draw [->] (cycle-1 and hanging) to (path);
+  \draw [->] (cycle-1 and hanging) to (claw);
+  \draw [->] (cycle) to (path);
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Transpositions 4-Star = Claw}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.6,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \newcommand\MyOuter{3.8}
+  \newcommand\MyInner{2}
+  \newcommand\MyOuterAngle{15}
+  \newcommand\MyInnerAngle{15}
+  \node (0-1-2-3) at (180+\MyOuterAngle:\MyOuter) [my box] {0,1,2,3};
+  \node (0-1-3-2) at (300-\MyOuterAngle:\MyOuter) [my box] {0,1,3,2};
+  \node (1-0-2-3) at (180+\MyInnerAngle:\MyInner) [my box] {1,0,2,3};
+  \node (1-0-3-2) at (300+\MyOuterAngle:\MyOuter) [my box] {1,0,3,2};
+
+  \node (0-2-1-3) at (60-\MyOuterAngle:\MyOuter) [my box] {0,2,1,3};
+  \node (0-2-3-1) at (300-\MyInnerAngle:\MyInner) [my box] {0,2,3,1};
+  \node (2-0-1-3) at (0+\MyOuterAngle:\MyOuter) [my box] {2,0,1,3};
+  \node (2-0-3-1) at (300+\MyInnerAngle:\MyInner) [my box] {2,0,3,1};
+
+  \node (0-3-1-2) at (120-\MyInnerAngle:\MyInner) [my box] {0,3,1,2};
+  \node (0-3-2-1) at (120+\MyInnerAngle:\MyInner) [my box] {0,3,2,1};
+  \node (3-0-1-2) at (0-\MyOuterAngle:\MyOuter) [my box] {3,0,1,2};
+  \node (3-0-2-1) at (60-\MyInnerAngle:\MyInner) [my box] {3,0,2,1};
+
+  \node (1-2-0-3) at (240-\MyInnerAngle:\MyInner) [my box] {1,2,0,3};
+  \node (1-2-3-0) at (60+\MyInnerAngle:\MyInner) [my box] {1,2,3,0};
+  \node (2-1-0-3) at (240-\MyOuterAngle:\MyOuter) [my box] {2,1,0,3};
+  \node (2-1-3-0) at (180-\MyInnerAngle:\MyInner) [my box] {2,1,3,0};
+                                                  
+  \node (1-3-0-2) at (240+\MyInnerAngle:\MyInner) [my box] {1,3,0,2};
+  \node (1-3-2-0) at (120+\MyOuterAngle:\MyOuter) [my box] {1,3,2,0};
+  \node (3-1-0-2) at (240+\MyOuterAngle:\MyOuter) [my box] {3,1,0,2};
+  \node (3-1-2-0) at (180-\MyOuterAngle:\MyOuter) [my box] {3,1,2,0};
+                                                  
+  \node (2-3-0-1) at (0-\MyInnerAngle:\MyInner) [my box] {2,3,0,1};
+  \node (2-3-1-0) at (120-\MyOuterAngle:\MyOuter) [my box] {2,3,1,0};
+  \node (3-2-0-1) at (0+\MyInnerAngle:\MyInner) [my box] {3,2,0,1};
+  \node (3-2-1-0) at (60+\MyOuterAngle:\MyOuter) [my box] {3,2,1,0};
+
+  \draw [] (2-0-3-1) to (3-0-2-1);
+  \draw [] (2-0-3-1) to (1-0-3-2);
+  \draw [] (0-2-1-3) to (3-2-1-0);
+  \draw [] (2-1-3-0) to (0-1-3-2);
+  \draw [] (3-2-0-1) to (0-2-3-1);
+  \draw [] (3-2-1-0) to (2-3-1-0);
+  \draw [] (1-3-0-2) to (0-3-1-2);
+  \draw [] (0-1-2-3) to (2-1-0-3);
+  \draw [] (0-3-2-1) to (1-3-2-0);
+  \draw [] (0-1-2-3) to (1-0-2-3);
+  \draw [] (2-1-3-0) to (1-2-3-0);
+  \draw [] (2-0-1-3) to (3-0-1-2);
+  \draw [] (0-1-2-3) to (3-1-2-0);
+  \draw [] (1-2-0-3) to (0-2-1-3);
+  \draw [] (0-2-3-1) to (2-0-3-1);
+  \draw [] (1-2-0-3) to (2-1-0-3);
+  \draw [] (0-2-1-3) to (2-0-1-3);
+  \draw [] (3-2-1-0) to (1-2-3-0);
+  \draw [] (3-0-1-2) to (1-0-3-2);
+  \draw [] (2-3-1-0) to (1-3-2-0);
+  \draw [] (1-2-0-3) to (3-2-0-1);
+  \draw [] (2-3-1-0) to (0-3-1-2);
+  \draw [] (1-3-0-2) to (3-1-0-2);
+  \draw [] (2-3-0-1) to (0-3-2-1);
+  \draw [] (1-0-2-3) to (3-0-2-1);
+  \draw [] (1-0-2-3) to (2-0-1-3);
+  \draw [] (3-2-0-1) to (2-3-0-1);
+  \draw [] (2-1-0-3) to (3-1-0-2);
+  \draw [] (1-3-0-2) to (2-3-0-1);
+  \draw [] (3-1-2-0) to (1-3-2-0);
+  \draw [] (3-0-2-1) to (0-3-2-1);
+  \draw [] (0-1-3-2) to (3-1-0-2);
+  \draw [] (0-1-3-2) to (1-0-3-2);
+  \draw [] (3-0-1-2) to (0-3-1-2);
+  \draw [] (0-2-3-1) to (1-2-3-0);
+  \draw [] (3-1-2-0) to (2-1-3-0);
+
+\end{tikzpicture}
+\end{center}
+
+
+%------------------------------------------------------------------------------
+\section{Transpositions 4-Cycle}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=1292}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.6,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \newcommand\MyOuter{3.8}
+  \newcommand\MyInner{2}
+  \newcommand\MyOuterAngle{15}
+  \newcommand\MyInnerAngle{15}
+  \node (0-1-2-3) at (180+\MyOuterAngle:\MyOuter) [my box] {0,1,2,3};
+  \node (0-1-3-2) at (180-\MyOuterAngle:\MyOuter) [my box] {0,1,3,2};
+  \node (1-0-2-3) at (180+\MyInnerAngle:\MyInner) [my box] {1,0,2,3};
+  \node (1-0-3-2) at (180-\MyInnerAngle:\MyInner) [my box] {1,0,3,2};
+
+  \node (0-2-1-3) at (240-\MyOuterAngle:\MyOuter) [my box] {0,2,1,3};
+  \node (0-2-3-1) at (240-\MyInnerAngle:\MyInner) [my box] {0,2,3,1};
+  \node (2-0-1-3) at (240+\MyOuterAngle:\MyOuter) [my box] {2,0,1,3};
+  \node (2-0-3-1) at (240+\MyInnerAngle:\MyInner) [my box] {2,0,3,1};
+
+  \node (0-3-1-2) at (120+\MyOuterAngle:\MyOuter) [my box] {0,3,1,2};
+  \node (0-3-2-1) at (120+\MyInnerAngle:\MyInner) [my box] {0,3,2,1};
+  \node (3-0-1-2) at (120-\MyOuterAngle:\MyOuter) [my box] {3,0,1,2};
+  \node (3-0-2-1) at (120-\MyInnerAngle:\MyInner) [my box] {3,0,2,1};
+
+  \node (1-2-0-3) at (300-\MyInnerAngle:\MyInner) [my box] {1,2,0,3};
+  \node (1-2-3-0) at (300+\MyInnerAngle:\MyInner) [my box] {1,2,3,0};
+  \node (2-1-0-3) at (300-\MyOuterAngle:\MyOuter) [my box] {2,1,0,3};
+  \node (2-1-3-0) at (300+\MyOuterAngle:\MyOuter) [my box] {2,1,3,0};
+                                                  
+  \node (1-3-0-2) at (60+\MyInnerAngle:\MyInner) [my box] {1,3,0,2};
+  \node (1-3-2-0) at (60-\MyInnerAngle:\MyInner) [my box] {1,3,2,0};
+  \node (3-1-0-2) at (60+\MyOuterAngle:\MyOuter) [my box] {3,1,0,2};
+  \node (3-1-2-0) at (60-\MyOuterAngle:\MyOuter) [my box] {3,1,2,0};
+                                                  
+  \node (2-3-0-1) at (0-\MyInnerAngle:\MyInner) [my box] {2,3,0,1};
+  \node (2-3-1-0) at (0-\MyOuterAngle:\MyOuter) [my box] {2,3,1,0};
+  \node (3-2-0-1) at (0+\MyInnerAngle:\MyInner) [my box] {3,2,0,1};
+  \node (3-2-1-0) at (0+\MyOuterAngle:\MyOuter) [my box] {3,2,1,0};
+
+  \draw [] (1-0-3-2) to (0-1-3-2);
+  \draw [] (2-1-0-3) to (1-2-0-3);
+  \draw [] (2-0-1-3) to (3-0-1-2);
+  \draw [] (2-0-1-3) to (2-0-3-1);
+  \draw [] (2-1-0-3) to (2-1-3-0);
+  \draw [] (2-3-1-0) to (2-3-0-1);
+  \draw [] (2-1-3-0) to (2-3-1-0);
+  \draw [] (2-3-1-0) to (0-3-1-2);
+  \draw [] (3-1-0-2) to (1-3-0-2);
+  \draw [] (2-0-1-3) to (0-2-1-3);
+  \draw [] (0-2-1-3) to (3-2-1-0);
+  \draw [] (3-1-2-0) to (3-1-0-2);
+  \draw [] (3-2-0-1) to (3-2-1-0);
+  \draw [] (2-1-3-0) to (0-1-3-2);
+  \draw [] (2-1-0-3) to (2-0-1-3);
+  \draw [] (2-3-1-0) to (3-2-1-0);
+  \draw [] (1-2-3-0) to (1-3-2-0);
+  \draw [] (1-0-2-3) to (1-2-0-3);
+  \draw [] (0-3-1-2) to (0-3-2-1);
+  \draw [] (1-0-3-2) to (2-0-3-1);
+  \draw [] (1-0-3-2) to (1-3-0-2);
+  \draw [] (3-1-0-2) to (3-0-1-2);
+  \draw [] (3-2-0-1) to (3-0-2-1);
+  \draw [] (1-2-0-3) to (1-2-3-0);
+  \draw [] (0-2-1-3) to (0-2-3-1);
+  \draw [] (0-3-2-1) to (3-0-2-1);
+  \draw [] (0-1-2-3) to (3-1-2-0);
+  \draw [] (3-0-2-1) to (3-0-1-2);
+  \draw [] (0-3-2-1) to (0-2-3-1);
+  \draw [] (1-2-3-0) to (0-2-3-1);
+  \draw [] (0-3-1-2) to (3-0-1-2);
+  \draw [] (0-3-2-1) to (1-3-2-0);
+  \draw [] (3-1-2-0) to (1-3-2-0);
+  \draw [] (1-2-0-3) to (3-2-0-1);
+  \draw [] (1-0-2-3) to (3-0-2-1);
+  \draw [] (2-3-0-1) to (1-3-0-2);
+  \draw [] (0-1-2-3) to (1-0-2-3);
+  \draw [] (2-3-0-1) to (3-2-0-1);
+  \draw [] (1-0-2-3) to (1-0-3-2);
+  \draw [] (2-1-3-0) to (1-2-3-0);
+  \draw [] (2-1-0-3) to (3-1-0-2);
+  \draw [] (1-3-2-0) to (1-3-0-2);
+  \draw [] (0-3-1-2) to (0-1-3-2);
+  \draw [] (3-1-2-0) to (3-2-1-0);
+  \draw [] (0-1-2-3) to (0-2-1-3);
+  \draw [] (2-3-0-1) to (2-0-3-1);
+  \draw [] (0-1-2-3) to (0-1-3-2);
+  \draw [] (2-0-3-1) to (0-2-3-1);
+
+\end{tikzpicture}
+\end{center}
+
+
+%------------------------------------------------------------------------------
+\section{Transpositions 4-Row}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=1391}
+
+4 by 1, row swap adjacent
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.8,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \newcommand\MyOuter{3}
+  \newcommand\MyInner{2}
+  \newcommand\MyOuterAngle{15}
+  \newcommand\MyInnerAngle{15}
+  \node (0-1-2-3) at (180+\MyOuterAngle:\MyOuter) [my box] {0,1,2,3};
+  \node (0-1-3-2) at (180-\MyOuterAngle:\MyOuter) [my box] {0,1,3,2};
+  \node (1-0-2-3) at (180+\MyInnerAngle:\MyInner) [my box] {1,0,2,3};
+  \node (1-0-3-2) at (180-\MyInnerAngle:\MyInner) [my box] {1,0,3,2};
+
+  \node (0-2-1-3) at (240-\MyOuterAngle:\MyOuter) [my box] {0,2,1,3};
+  \node (0-2-3-1) at (240-\MyInnerAngle:\MyInner) [my box] {0,2,3,1};
+  \node (2-0-1-3) at (240+\MyOuterAngle:\MyOuter) [my box] {2,0,1,3};
+  \node (2-0-3-1) at (240+\MyInnerAngle:\MyInner) [my box] {2,0,3,1};
+
+  \node (0-3-1-2) at (120+\MyOuterAngle:\MyOuter) [my box] {0,3,1,2};
+  \node (0-3-2-1) at (120+\MyInnerAngle:\MyInner) [my box] {0,3,2,1};
+  \node (3-0-1-2) at (120-\MyOuterAngle:\MyOuter) [my box] {3,0,1,2};
+  \node (3-0-2-1) at (120-\MyInnerAngle:\MyInner) [my box] {3,0,2,1};
+
+  \node (1-2-0-3) at (300-\MyInnerAngle:\MyInner) [my box] {1,2,0,3};
+  \node (1-2-3-0) at (300+\MyInnerAngle:\MyInner) [my box] {1,2,3,0};
+  \node (2-1-0-3) at (300-\MyOuterAngle:\MyOuter) [my box] {2,1,0,3};
+  \node (2-1-3-0) at (300+\MyOuterAngle:\MyOuter) [my box] {2,1,3,0};
+                                                  
+  \node (1-3-0-2) at (60+\MyInnerAngle:\MyInner) [my box] {1,3,0,2};
+  \node (1-3-2-0) at (60-\MyInnerAngle:\MyInner) [my box] {1,3,2,0};
+  \node (3-1-0-2) at (60+\MyOuterAngle:\MyOuter) [my box] {3,1,0,2};
+  \node (3-1-2-0) at (60-\MyOuterAngle:\MyOuter) [my box] {3,1,2,0};
+                                                  
+  \node (2-3-0-1) at (0-\MyInnerAngle:\MyInner) [my box] {2,3,0,1};
+  \node (2-3-1-0) at (0-\MyOuterAngle:\MyOuter) [my box] {2,3,1,0};
+  \node (3-2-0-1) at (0+\MyInnerAngle:\MyInner) [my box] {3,2,0,1};
+  \node (3-2-1-0) at (0+\MyOuterAngle:\MyOuter) [my box] {3,2,1,0};
+
+  \draw [] (2-3-1-0) to (2-1-3-0);
+  \draw [] (2-0-3-1) to (2-0-1-3);
+  \draw [] (2-3-1-0) to (3-2-1-0);
+  \draw [] (0-1-3-2) to (0-3-1-2);
+  \draw [] (3-1-0-2) to (3-0-1-2);
+  \draw [] (3-2-1-0) to (3-1-2-0);
+  \draw [] (3-2-0-1) to (3-2-1-0);
+  \draw [] (0-3-2-1) to (3-0-2-1);
+  \draw [] (3-0-1-2) to (3-0-2-1);
+  \draw [] (2-1-3-0) to (1-2-3-0);
+  \draw [] (1-3-2-0) to (3-1-2-0);
+  \draw [] (1-0-2-3) to (1-2-0-3);
+  \draw [] (0-1-2-3) to (0-1-3-2);
+  \draw [] (2-1-0-3) to (1-2-0-3);
+  \draw [] (3-2-0-1) to (3-0-2-1);
+  \draw [] (1-3-0-2) to (1-0-3-2);
+  \draw [] (2-0-1-3) to (0-2-1-3);
+  \draw [] (0-1-2-3) to (1-0-2-3);
+  \draw [] (1-3-0-2) to (3-1-0-2);
+  \draw [] (2-0-3-1) to (0-2-3-1);
+  \draw [] (1-3-2-0) to (1-3-0-2);
+  \draw [] (1-0-2-3) to (1-0-3-2);
+  \draw [] (0-3-1-2) to (3-0-1-2);
+  \draw [] (2-0-1-3) to (2-1-0-3);
+  \draw [] (3-1-2-0) to (3-1-0-2);
+  \draw [] (2-1-0-3) to (2-1-3-0);
+  \draw [] (1-2-3-0) to (1-2-0-3);
+  \draw [] (0-1-3-2) to (1-0-3-2);
+  \draw [] (1-2-3-0) to (1-3-2-0);
+  \draw [] (0-3-2-1) to (0-2-3-1);
+  \draw [] (0-1-2-3) to (0-2-1-3);
+  \draw [] (2-3-0-1) to (2-3-1-0);
+  \draw [] (2-3-0-1) to (3-2-0-1);
+  \draw [] (0-3-1-2) to (0-3-2-1);
+  \draw [] (2-0-3-1) to (2-3-0-1);
+  \draw [] (0-2-1-3) to (0-2-3-1);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.3,xscale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \node (0-1-2-3) at (1,1) [my box] {0,1,2,3};
+  \node (1-0-2-3) at (0,1) [my box] {1,0,2,3};
+  \node (0-1-3-2) at (2,0) [my box] {0,1,3,2};
+  \node (1-0-3-2) at (-1,1) [my box] {1,0,3,2};
+
+  \node (0-2-1-3) at (6,3) [my box] {0,2,1,3};
+  \node (0-2-3-1) at (7,3) [my box] {0,2,3,1};
+  \node (2-0-1-3) at (6,4) [my box] {2,0,1,3};
+  \node (2-0-3-1) at (7,4) [my box] {2,0,3,1};
+
+  \node (0-3-1-2) at (4,0) [my box] {0,3,1,2};
+  \node (0-3-2-1) at (6,0) [my box] {0,3,2,1};
+  \node (3-0-1-2) at (4,1) [my box] {3,0,1,2};
+  \node (3-0-2-1) at (5,1) [my box] {3,0,2,1};
+
+  \node (1-2-0-3) at (2,10) [my box] {1,2,0,3};
+  \node (1-2-3-0) at (1,11) [my box] {1,2,3,0};
+  \node (2-1-0-3) at (3,10) [my box] {2,1,0,3};
+  \node (2-1-3-0) at (3,11) [my box] {2,1,3,0};
+
+  \node (1-3-0-2) at (-1,4) [my box] {1,3,0,2};
+  \node (1-3-2-0) at (-1,7) [my box] {1,3,2,0};
+  \node (3-1-0-2) at (0,5)  [my box] {3,1,0,2};
+  \node (3-1-2-0) at (0,6)  [my box] {3,1,2,0};
+
+  \node (2-3-0-1) at (6,8)  [my box] {2,3,0,1};
+  \node (2-3-1-0) at (5,11) [my box] {2,3,1,0};
+  \node (3-2-0-1) at (5,9)  [my box] {3,2,0,1};
+  \node (3-2-1-0) at (5,10) [my box] {3,2,1,0};
+
+  \draw [] (2-3-1-0) to (2-1-3-0);
+  \draw [] (2-0-3-1) to (2-3-0-1);
+  \draw [] (0-3-2-1) to (0-2-3-1);
+  \draw [] (3-0-1-2) to (3-0-2-1);
+  \draw [] (0-1-2-3) to (0-1-3-2);
+  \draw [] (2-3-0-1) to (2-3-1-0);
+  \draw [] (2-0-1-3) to (2-1-0-3);
+  \draw [] (1-2-3-0) to (1-2-0-3);
+  \draw [] (2-0-3-1) to (2-0-1-3);
+  \draw [] (2-3-1-0) to (3-2-1-0);
+  \draw [] (2-3-0-1) to (3-2-0-1);
+  \draw [] (3-1-2-0) to (3-1-0-2);
+  \draw [] (2-0-1-3) to (0-2-1-3);
+  \draw [] (1-3-0-2) to (3-1-0-2);
+  \draw [] (0-1-3-2) to (0-3-1-2);
+  \draw [] (2-1-0-3) to (1-2-0-3);
+  \draw [] (0-2-1-3) to (0-2-3-1);
+  \draw [] (0-3-2-1) to (3-0-2-1);
+  \draw [] (1-2-3-0) to (1-3-2-0);
+  \draw [] (1-0-2-3) to (1-2-0-3);
+  \draw [] (3-2-0-1) to (3-2-1-0);
+  \draw [] (1-3-0-2) to (1-0-3-2);
+  \draw [] (0-3-1-2) to (0-3-2-1);
+  \draw [] (3-2-0-1) to (3-0-2-1);
+  \draw [] (1-3-2-0) to (3-1-2-0);
+  \draw [] (0-1-3-2) to (1-0-3-2);
+  \draw [] (2-1-0-3) to (2-1-3-0);
+  \draw [] (0-1-2-3) to (1-0-2-3);
+  \draw [] (3-2-1-0) to (3-1-2-0);
+  \draw [] (1-0-2-3) to (1-0-3-2);
+  \draw [] (0-1-2-3) to (0-2-1-3);
+  \draw [] (2-1-3-0) to (1-2-3-0);
+  \draw [] (0-3-1-2) to (3-0-1-2);
+  \draw [] (2-0-3-1) to (0-2-3-1);
+  \draw [] (1-3-2-0) to (1-3-0-2);
+  \draw [] (3-1-0-2) to (3-0-1-2);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Petersen Line Graph}
+
+Petersen 3-regular so line graph $3+3-2=4$ regular
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.3,
+     my box/.style={circle,draw,minimum size=2em,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+  \newcommand\MyOuter{4}
+  \node (1-5)  at (18+3*72:\MyOuter) [my box] {1:5};
+  \node (1-2)  at (18+0*72:\MyOuter) [my box] {1:2};
+  \node (2-3)  at (18+2*72:\MyOuter) [my box] {2:3};
+  \node (3-4)  at (18+4*72:\MyOuter) [my box] {3:4};
+  \node (4-5)  at (18+1*72:\MyOuter) [my box] {4:5};
+  \node (1-6)  at (18+4*72:2.1) [my box] {1:6};
+  \node (5-10) at (18+2*72:2.1) [my box] {5:10};
+  \node (4-9)  at (18+0*72:2.1) [my box] {4:9};
+  \node (2-7)  at (18+1*72:2.1) [my box] {2:7};
+  \node (3-8)  at (18+3*72:2.1) [my box] {3:8};
+  \node (10-7) at (-18+2*72:.8) [my box] {10:7};
+  \node (6-8)  at (-18+4*72:.8) [my box] {6:8};
+  \node (6-9)  at (-18+0*72:.8) [my box] {6:9};
+  \node (7-9)  at (-18+1*72:.8) [my box] {7:9};
+  \node (8-10) at (-18+3*72:.8) [my box] {8:10};
+
+  \draw [] (2-3) to (2-7);
+  \draw [] (7-9) to (10-7);
+  \draw [] (5-10) to (4-5);
+  \draw [] (6-9) to (1-6);
+  \draw [] (2-3) to (3-8);
+  \draw [] (6-8) to (6-9);
+  \draw [] (8-10) to (6-8);
+  \draw [] (2-3) to (1-2);
+  \draw [] (2-3) to (3-4);
+  \draw [] (2-7) to (1-2);
+  \draw [] (4-9) to (6-9);
+  \draw [] (1-2) to (1-5);
+  \draw [] (7-9) to (2-7);
+  \draw [] (7-9) to (6-9);
+  \draw [] (5-10) to (1-5);
+  \draw [] (1-2) to (1-6);
+  \draw [] (4-5) to (1-5);
+  \draw [] (8-10) to (3-8);
+  \draw [] (10-7) to (5-10);
+  \draw [] (3-8) to (6-8);
+  \draw [] (5-10) to (8-10);
+  \draw [] (4-9) to (4-5);
+  \draw [] (10-7) to (2-7);
+  \draw [] (4-5) to (3-4);
+  \draw [] (6-8) to (1-6);
+  \draw [] (3-8) to (3-4);
+  \draw [] (4-9) to (3-4);
+  \draw [] (1-5) to (1-6);
+  \draw [] (7-9) to (4-9);
+  \draw [] (10-7) to (8-10);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.3,
+     my box/.style={circle,draw,minimum size=2em,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (1-5)  at (18+2*72:3.5) [my box] {1:5};
+  \node (1-2)  at (18+1*72:3.5) [my box] {1:2};
+  \node (2-3)  at (18+0*72:3.5) [my box] {2:3};
+  \node (3-4)  at (18+4*72:3.5) [my box] {3:4};
+  \node (4-5)  at (18+3*72:3.5) [my box] {4:5};
+  \node (1-6)  at (-18+2*72:2) [my box] {1:6};
+  \node (5-10) at (-18+3*72:2) [my box] {5:10};
+  \node (4-9)  at (-18+4*72:2) [my box] {4:9};
+  \node (2-7)  at (-18+1*72:2) [my box] {2:7};
+  \node (3-8)  at (-18+0*72:2) [my box] {3:8};
+  \node (10-7) at (-18+2*72:1) [my box] {10:7};
+  \node (6-8)  at (-18+1*72:1) [my box] {6:8};
+  \node (6-9)  at (-18+3*72:1) [my box] {6:9};
+  \node (7-9)  at (-18+0*72:1) [my box] {7:9};
+  \node (8-10) at (-18+4*72:1) [my box] {8:10};
+
+  \draw [] (2-3) to (2-7);
+  \draw [] (7-9) to (10-7);
+  \draw [] (5-10) to (4-5);
+  \draw [] (6-9) to (1-6);
+  \draw [] (2-3) to (3-8);
+  \draw [] (6-8) to (6-9);
+  \draw [] (8-10) to (6-8);
+  \draw [] (2-3) to (1-2);
+  \draw [] (2-3) to (3-4);
+  \draw [] (2-7) to (1-2);
+  \draw [] (4-9) to (6-9);
+  \draw [] (1-2) to (1-5);
+  \draw [] (7-9) to (2-7);
+  \draw [] (7-9) to (6-9);
+  \draw [] (5-10) to (1-5);
+  \draw [] (1-2) to (1-6);
+  \draw [] (4-5) to (1-5);
+  \draw [] (8-10) to (3-8);
+  \draw [] (10-7) to (5-10);
+  \draw [] (3-8) to (6-8);
+  \draw [] (5-10) to (8-10);
+  \draw [] (4-9) to (4-5);
+  \draw [] (10-7) to (2-7);
+  \draw [] (4-5) to (3-4);
+  \draw [] (6-8) to (1-6);
+  \draw [] (3-8) to (3-4);
+  \draw [] (4-9) to (3-4);
+  \draw [] (1-5) to (1-6);
+  \draw [] (7-9) to (4-9);
+  \draw [] (10-7) to (8-10);
+
+\end{tikzpicture}
+\end{center}
+
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.3,
+     my box/.style={circle,draw,minimum size=2em,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (1-5)  at (18+2*72:3.5) [my box] {1:5};
+  \node (1-2)  at (18+1*72:3.5) [my box] {1:2};
+  \node (2-3)  at (18+0*72:3.5) [my box] {2:3};
+  \node (3-4)  at (18+4*72:3.5) [my box] {3:4};
+  \node (4-5)  at (18+3*72:3.5) [my box] {4:5};
+  \node (1-6)  at (-18+2*72:2) [my box] {1:6};
+  \node (5-10) at (-18+3*72:2) [my box] {5:10};
+  \node (4-9)  at (-18+4*72:2) [my box] {4:9};
+  \node (2-7)  at (-18+1*72:2) [my box] {2:7};
+  \node (3-8)  at (-18+0*72:2) [my box] {3:8};
+  \node (10-7) at (18+3*72:1) [my box] {10:7};
+  \node (6-8)  at (18+2*72:1) [my box] {6:8};
+  \node (6-9)  at (18+4*72:1) [my box] {6:9};
+  \node (7-9)  at (18+1*72:1) [my box] {7:9};
+  \node (8-10) at (18+0*72:1) [my box] {8:10};
+
+  \draw [] (2-3) to (2-7);
+  \draw [] (7-9) to (10-7);
+  \draw [] (5-10) to (4-5);
+  \draw [] (6-9) to (1-6);
+  \draw [] (2-3) to (3-8);
+  \draw [] (6-8) to (6-9);
+  \draw [] (8-10) to (6-8);
+  \draw [] (2-3) to (1-2);
+  \draw [] (2-3) to (3-4);
+  \draw [] (2-7) to (1-2);
+  \draw [] (4-9) to (6-9);
+  \draw [] (1-2) to (1-5);
+  \draw [] (7-9) to (2-7);
+  \draw [] (7-9) to (6-9);
+  \draw [] (5-10) to (1-5);
+  \draw [] (1-2) to (1-6);
+  \draw [] (4-5) to (1-5);
+  \draw [] (8-10) to (3-8);
+  \draw [] (10-7) to (5-10);
+  \draw [] (3-8) to (6-8);
+  \draw [] (5-10) to (8-10);
+  \draw [] (4-9) to (4-5);
+  \draw [] (10-7) to (2-7);
+  \draw [] (4-5) to (3-4);
+  \draw [] (6-8) to (1-6);
+  \draw [] (3-8) to (3-4);
+  \draw [] (4-9) to (3-4);
+  \draw [] (1-5) to (1-6);
+  \draw [] (7-9) to (4-9);
+  \draw [] (10-7) to (8-10);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Beineke All as Subgraphs, 12 Edges}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=748}
+
+cf.\@ Introduction to Line Graphs
+Emphasizing their construction, clique decompositions, and regularity
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node at (0,1) [my box,name=1] {1};
+  \node at (0,2) [my box,name=3] {3};
+  \node at (0,3) [my box,name=0] {0};
+  \node at (0,4) [my box,name=2] {2};
+  \node at (-2, .25) [my box,name=4] {4};
+  \node at (2, .25) [my box,name=5] {5};
+
+  \draw [] (0) to (4);
+  \draw [] (0) to (2);
+  \draw [] (2) to (5);
+  \draw [] (1) to (4);
+  \draw [] (0) to (5);
+  \draw [] (3) to (5);
+  \draw [] (4) to (5);
+  \draw [] (0) to (3);
+  \draw [] (3) to (1);
+  \draw [] (3) to (4);
+  \draw [] (2) to (4);
+  \draw [] (1) to (5);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node at (4*72+18:1) [my box,name=0] {0};
+  \node at (2*72+18:1) [my box,name=1] {1};
+  \node at (0*72+18:1) [my box,name=2] {2};
+  \node at (3*72+18:1) [my box,name=3] {3};
+  \node at (0,0) [my box,name=4] {4};
+  \node at (1*72+18:1) [my box,name=5] {5};
+
+  \draw [] (0) to (4);
+  \draw [] (0) to (2);
+  \draw [] (2) to (5);
+  \draw [] (1) to (4);
+  \draw [] (0) to (5);
+  \draw [] (3) to (5);
+  \draw [] (4) to (5);
+  \draw [] (0) to (3);
+  \draw [] (3) to (1);
+  \draw [] (3) to (4);
+  \draw [] (2) to (4);
+  \draw [] (1) to (5);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node at (0,0) [my box,name=0] {0};
+  \node at (2,2) [my box,name=1] {1};
+  \node at (2,0) [my box,name=2] {2};
+  \node at (0,2) [my box,name=3] {3};
+  \node at (1,1) [my box,name=4] {4};
+  \node at (2,1) [my box,name=5] {5};
+
+  \draw [] (0) to (4);
+  \draw [] (0) to (2);
+  \draw [] (2) to (5);
+  \draw [] (1) to (4);
+  \draw [] (0) to (5);
+  \draw [] (3) to (5);
+  \draw [] (4) to (5);
+  \draw [] (0) to (3);
+  \draw [] (3) to (1);
+  \draw [] (3) to (4);
+  \draw [] (2) to (4);
+  \draw [] (1) to (5);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node at (0,0) [my box,name=0] {0};
+  \node at (2,2) [my box,name=1] {1};
+  \node at (2,0) [my box,name=2] {2};
+  \node at (0,2) [my box,name=3] {3};
+  \node at (.5,1) [my box,name=4] {4};
+  \node at (1.5,1) [my box,name=5] {5};
+
+  \draw [] (0) to (4);
+  \draw [] (0) to (2);
+  \draw [] (2) to (5);
+  \draw [] (1) to (4);
+  \draw [] (0) to (5);
+  \draw [] (3) to (5);
+  \draw [] (4) to (5);
+  \draw [] (0) to (3);
+  \draw [] (3) to (1);
+  \draw [] (3) to (4);
+  \draw [] (2) to (4);
+  \draw [] (1) to (5);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node at (1,0) [my box,name=1] {1};
+  \node at (2,0) [my box,name=3] {3};
+  \node at (3,0) [my box,name=0] {0};
+  \node at (4,0) [my box,name=2] {2};
+  \node at (2.5,1) [my box,name=4] {4};
+  \node at (2.5,-1) [my box,name=5] {5};
+
+  \draw [] (0) to (4);
+  \draw [] (0) to (2);
+  \draw [] (2) to (5);
+  \draw [] (1) to (4);
+  \draw [] (0) to (5);
+  \draw [] (3) to (5);
+  \draw [] (4) to (5);
+  \draw [] (0) to (3);
+  \draw [] (3) to (1);
+  \draw [] (3) to (4);
+  \draw [] (2) to (4);
+  \draw [] (1) to (5);
+\end{tikzpicture}
+\end{center}
+
+
+
+
+%------------------------------------------------------------------------------
+\section{Beineke Subgraph Relations}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.5,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node at (0,0) [my box,name=1] {1};
+  \node at (-1,0) [my box,name=2] {2};
+  \node at (-1,-1) [my box,name=3] {3};
+  \node at (1,0) [my box,name=4] {4};
+  \node at (-1,1) [my box,name=5] {5};
+  \node at (0,1) [my box,name=6] {6};
+  \node at (1, -1) [my box,name=7] {7};
+  \node at (1,1) [my box,name=8] {8};
+  \node at (0,-1) [my box,name=9] {9};
+
+  \draw [->] (6) to (8);
+  \draw [->] (6) to (1);
+  \draw [->] (2) to (1);
+  \draw [->] (8) to (4);
+  \draw [->] (4) to (1);
+  \draw [->,bend left=0] (5) to (4);
+  \draw [->] (9) to (4);
+  \draw [->] (6) to (4);
+  \draw [->,bend right=0] (7) to (4);
+  \draw [->] (5) to (2);
+  \draw [->] (3) to (1);
+  \draw [->] (5) to (1);
+  \draw [->] (6) to (5);
+  \draw [->] (9) to (1);
+  \draw [->] (3) to (2);
+  \draw [->] (8) to (1);
+  \draw [->] (9) to (7);
+  \draw [->] (6) to (7);
+  \draw [->] (7) to (1);
+  \draw [->,bend left=0] (6) to (2);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (1) at (0,0)           [my box] {1};
+  \node (4) at (0*45+22.5*1:1) [my box] {4};
+  \node (8) at (1*45+22.5*1:1) [my box] {8};
+  \node (6) at (2*45+22.5*1:1) [my box] {6};
+  \node (5) at (3*45+22.5*1:1) [my box] {5};
+  \node (2) at (4*45+22.5*1:1) [my box] {2};
+  \node (3) at (5*45+22.5*1:1) [my box] {3};
+  \node (9) at (6*45+22.5*1:1) [my box] {9};
+  \node (7) at (7*45+22.5*1:1) [my box] {7};
+
+  \draw [->] (6) to (8);
+  \draw [->] (6) to (1);
+  \draw [->] (2) to (1);
+  \draw [->] (8) to (4);
+  \draw [->] (4) to (1);
+  \draw [->,bend left=0] (5) to (4);
+  \draw [->] (9) to (4);
+  \draw [->] (6) to (4);
+  \draw [->,bend right=0] (7) to (4);
+  \draw [->] (5) to (2);
+  \draw [->] (3) to (1);
+  \draw [->] (5) to (1);
+  \draw [->] (6) to (5);
+  \draw [->] (9) to (1);
+  \draw [->] (3) to (2);
+  \draw [->] (8) to (1);
+  \draw [->] (9) to (7);
+  \draw [->] (6) to (7);
+  \draw [->] (7) to (1);
+  \draw [->,bend left=0] (6) to (2);
+
+\end{tikzpicture}
+\end{center}
+
+
+%------------------------------------------------------------------------------
+\section{Hanoi 2 Discs, 4 Spindles, Star}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=21152}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.25,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\scriptsize,
+    ]
+  % degree=2 count 9
+  % degree=3 count 4
+  % degree=4 count 3
+
+  \node at (0,0)   [my box,name=00] {00};
+  \node at (30:1)  [my box,name=01] {01};
+  \node at (-90:1) [my box,name=02] {02};
+  \node at (150:1) [my box,name=03] {03};
+
+  \begin{scope}[shift={(210:2)}]
+  \node at (0,0)   [my box,name=10] {10};
+  \node at (210:1) [my box,name=11] {11};
+  \node at (-30:1) [my box,name=12] {12};
+  \node at (90:1) [my box,name=13] {13};
+  \end{scope}
+
+  \begin{scope}[shift={(90:2)}]
+  \node at (0,0)   [my box,name=20] {20};
+  \node at (-30:1) [my box,name=21] {21};
+  \node at (90:1) [my box,name=22] {22};
+  \node at (210:1) [my box,name=23] {23};
+  \end{scope}
+
+  \begin{scope}[shift={(-30:2)}]
+  \node at (0,0)   [my box,name=30] {30};
+  \node at (90:1) [my box,name=31] {31};
+  \node at (210:1) [my box,name=32] {32};
+  \node at (-30:1) [my box,name=33] {33};
+  \end{scope}
+
+
+  \draw [] (01) to (21);
+  \draw [] (20) to (21);
+  \draw [] (03) to (23);
+  \draw [] (00) to (01);
+  \draw [] (00) to (02);
+  \draw [] (02) to (12);
+  \draw [] (20) to (23);
+  \draw [] (00) to (03);
+  \draw [] (10) to (12);
+  \draw [] (30) to (33);
+  \draw [] (01) to (31);
+  \draw [] (03) to (13);
+  \draw [] (10) to (11);
+  \draw [] (30) to (32);
+  \draw [] (10) to (13);
+  \draw [] (20) to (22);
+  \draw [] (02) to (32);
+  \draw [] (30) to (31);
+
+\end{tikzpicture}
+\end{center}
+
+Each vertex is a configuration of discs on spindles for a variation by
+Stockmeyer of the towers of Hanoi puzzle.  There are 4 spindles in a
+star pattern and discs can only move between the centre spindle and
+one of the 3 outer spindles (not among those outer spindles).
+
+The present graph is for 2 discs.  The centre claw has big disc on the
+centre spindle and the small disc moving to or from one of the outer
+spindles.  When the small disc is not on the centre spindle the big
+disc can move from there to one of the other outer spindles (where
+further claws are the small disc moving).
+
+The puzzle is to move both discs from one outer spindle to another outer 
+spindle.  This is a path between two of the degree\hyp{}1 vertices. 
+
+Paul K. Stockmeyer, "Variations on the Four-Post Tower of Hanoi
+Puzzle", Congressus Numerantium, volume 102, 1994, pages 3-12,
+\url{http://www.cs.wm.edu/~pkstoc/boca.ps}
+
+
+%------------------------------------------------------------------------------
+\section{Hanoi Graph 2 Discs, 4 Spindles, Linear}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=25143}
+
+% 3, 10, 19, 34, 57, 88
+% A160002
+% my(n=2); 3^n+n-1 == 10
+% my(n=3); 3^n+n-1 == 29
+
+\begin{center}
+\begin{tikzpicture}
+  [scale=1.5,
+   my box/.style={circle,draw,inner sep=.15em,outer sep=.3em,minimum size=1.6em},
+  ]
+
+  \node at (4,-1) [my box,name=0] {0};
+  \node at (4,0) [my box,name=1] {1};
+  \node at (4,1) [my box,name=2] {2};
+  \node at (4,2) [my box,name=3] {3};
+
+  \node at (1,1) [my box,name=4] {4};
+  \node at (2,1) [my box,name=5] {5};
+  \node at (3,1) [my box,name=6] {6};
+  \node at (3,2) [my box,name=7] {7};
+
+  \node at (0,1) [my box,name=8] {8};
+  \node at (0,2) [my box,name=9] {9};
+  \node at (1,2) [my box,name=10] {10};
+  \node at (2,2) [my box,name=11] {11};
+
+  \node at (-1,1) [my box,name=12] {12};
+  \node at (-1,2) [my box,name=13] {13};
+  \node at (-1,3) [my box,name=14] {14};
+  \node at (-1,4) [my box,name=15] {15};
+
+
+  \draw [] (14) to (15);
+  \draw [] (9) to (10);
+  \draw [] (0) to (1);
+  \draw [] (9) to (8);
+  \draw [] (4) to (5);
+  \draw [] (3) to (7);
+  \draw [] (1) to (2);
+  \draw [] (7) to (11);
+  \draw [] (6) to (7);
+  \draw [] (4) to (8);
+  \draw [] (12) to (8);
+  \draw [] (9) to (13);
+  \draw [] (2) to (6);
+  \draw [] (13) to (14);
+  \draw [] (2) to (3);
+  \draw [] (6) to (5);
+  \draw [] (12) to (13);
+  \draw [] (10) to (11);
+
+\end{tikzpicture}
+\end{center}
+
+Each vertex is a configuration of discs on spindles for a variation on the towers of Hanoi puzzle by Stockmeyer where discs can only move forward or backward between adjacent spindles along a row of 4 spindles.
+
+The two degree-1 vertices are the 2 discs on the first or last
+spindle.  The problem is to move the discs from one end to the other.
+This is the graph diameter of 10 moves (OEIS A160002).
+
+Paul K. Stockmeyer, "Variations on the Four-Post Tower of Hanoi
+Puzzle", Congressus Numerantium, volume 102, 1994, pages 3-12,
+\url{http://www.cs.wm.edu/~pkstoc/boca.ps}
+
+
+% my(n=2); 3^n+n-1 == 10
+
+Stockmeyer gives a straightforward recursive solution for the general case n discs along 4 spindles.  This establishes an upper bound of $3^n+n-1$ moves.  The n=2 case here is the last where that solution is optimal.
+
+"The Four-in-a-Row Puzzle"
+
+%------------------------------------------------------------------------------
+\section{Hanoi Graph 2 Discs, 4 Spindles, Cyclic}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=25141}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\scriptsize,
+    ]
+
+  \node at (0,0) [my box,name=0] {0};
+  \node at (0,1) [my box,name=1] {1};
+  \node at (1,1) [my box,name=2] {2};
+  \node at (1,0) [my box,name=3] {3};
+
+  \node at (3,1) [my box,name=4] {4};
+  \node at (3,0) [my box,name=5] {5};
+  \node at (2,0) [my box,name=6] {6};
+  \node at (2,1) [my box,name=7] {7};
+
+  \node at (2,2) [my box,name=8] {8};
+  \node at (2,3) [my box,name=9] {9};
+  \node at (3,3) [my box,name=10] {10};
+  \node at (3,2) [my box,name=11] {11};
+
+  \node at (1,3) [my box,name=12] {12};
+  \node at (1,2) [my box,name=13] {13};
+  \node at (0,2) [my box,name=14] {14};
+  \node at (0,3) [my box,name=15] {15};
+
+  \draw [] (2) to (6);
+  \draw [] (1) to (13);
+  \draw [] (13) to (14);
+  \draw [] (7) to (4);
+  \draw [] (1) to (2);
+  \draw [] (15) to (14);
+  \draw [] (11) to (10);
+  \draw [] (4) to (5);
+  \draw [] (8) to (4);
+  \draw [] (6) to (7);
+  \draw [] (12) to (13);
+  \draw [] (8) to (12);
+  \draw [] (0) to (3);
+  \draw [] (9) to (10);
+  \draw [] (8) to (9);
+  \draw [] (0) to (1);
+  \draw [] (8) to (11);
+  \draw [] (3) to (7);
+  \draw [] (6) to (5);
+  \draw [] (3) to (2);
+  \draw [] (12) to (15);
+  \draw [] (2) to (14);
+  \draw [] (9) to (13);
+  \draw [] (11) to (7);
+
+\end{tikzpicture}
+\end{center}
+
+Each vertex is a configuration of discs on spindles for a variation on the towers of Hanoi puzzle where discs can only move to an adjacent spindle around a cycle of 4 spindles.
+
+The degree-2 vertices are where the 2 discs are on the same spindle so the only moves are the smaller disc back or forward.  The 4-cycle at each of those vertices is the small disc going successively around the 4 spindles.  The cross connections between those cycles are where the big disc moves (where permitted).
+
+%------------------------------------------------------------------------------
+\section{Hanoi 2 Discs 4 Spindles}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=22742}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=.75,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\scriptsize,
+    ]
+  \newcommand\MyOuter{3}
+
+  \begin{scope}[shift={(0,\MyOuter)}]
+    \node at (0,1) [my box,name=0] {0};
+    \node at (-1,0) [my box,name=1] {1};
+    \node at (1,0) [my box,name=2] {2};
+    \node at (0,-1) [my box,name=3] {3};
+  \end{scope}
+
+  \begin{scope}[shift={(\MyOuter,0)}]
+    \node at (0,-1) [my box,name=4] {4};
+    \node at (1,0) [my box,name=5] {5};
+    \node at (-1,0) [my box,name=6] {6};
+    \node at (0,1) [my box,name=7] {7};
+  \end{scope}
+
+  \begin{scope}[shift={(-\MyOuter,0)}]
+    \node at (0,-1) [my box,name=8] {8};
+    \node at (1,0) [my box,name=9] {9};
+    \node at (-1,0) [my box,name=10] {10};
+    \node at (0,1) [my box,name=11] {11};
+  \end{scope}
+
+  \begin{scope}[shift={(0,-\MyOuter)}]
+    \node at (0,1) [my box,name=12] {12};
+    \node at (-1,0) [my box,name=13] {13};
+    \node at (1,0) [my box,name=14] {14};
+    \node at (0,-1) [my box,name=15] {15};
+  \end{scope}
+
+  \draw [] (9) to (11);
+  \draw [] (4) to (6);
+  \draw [] (3) to (11);
+  \draw [] (8) to (9);
+  \draw [] (15) to (14);
+  \draw [] (12) to (15);
+  \draw [] (5) to (6);
+  \draw [] (12) to (14);
+  \draw [] (15) to (13);
+  \draw [] (8) to (12);
+  \draw [] (8) to (11);
+  \draw [] (1) to (13);
+  \draw [] (9) to (13);
+  \draw [] (6) to (14);
+  \draw [] (4) to (7);
+  \draw [] (5) to (7);
+  \draw [] (7) to (11);
+  \draw [] (0) to (2);
+  \draw [] (10) to (9);
+  \draw [] (1) to (9);
+  \draw [] (3) to (7);
+  \draw [] (4) to (12);
+  \draw [] (6) to (7);
+  \draw [] (0) to (1);
+  \draw [] (1) to (2);
+  \draw [] (4) to (5);
+  \draw [] (12) to (13);
+  \draw [] (10) to (11);
+  \draw [] (13) to (14);
+  \draw [] (4) to (8);
+  \draw [] (8) to (10);
+  \draw [] (2) to (6);
+  \draw [] (2) to (3);
+  \draw [] (0) to (3);
+  \draw [] (2) to (14);
+  \draw [] (1) to (3);
+
+\end{tikzpicture}
+\end{center}
+
+Each vertex is a configuration of discs on spindles for a variation on
+the towers of Hanoi puzzle with 2 discs on 4 spindles.
+
+The degree-3 vertices are where the 2 discs are on the same spindle so
+only the smaller disc can move.  The complete-4 clique at each of
+those is the small disc moving among the 4 spindles.  The cross
+connections between those subgraphs are where the big disc moves (to
+one of the 2 spindles different from itself and the smaller disc).
+
+\medskip
+
+Cf. picture in Andreas M. Hinz, Sandi Klav\v{z}ar, Sara Sabrina
+Zemlji\v{c}, ``Sierpinski Graphs as Spanning Subgraphs of Hanoi
+Graphs'', Cent. Eur. J. Math., 11(6), 2013, 1153-1157.
+DOI 10.2478/s11533-013-0227-7
+
+
+
+%------------------------------------------------------------------------------
+\section{Johnson 5,2}
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=21154}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=.74,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+  \newcommand\MyOuter{9}
+  \newcommand\MyInner{6.2}
+  % \newcommand\MyInnerAngle{54+180}
+  \newcommand\MyInnerAngle{54}
+
+  \node at (90-0*72: \MyOuter) [my box,name=1-2] {1,2};
+  \node at (90-1*72: \MyOuter) [my box,name=2-3] {2,3};
+  \node at (90-2*72: \MyOuter) [my box,name=3-4] {3,4};
+  \node at (90-3*72: \MyOuter) [my box,name=4-5] {4,5};
+  \node at (90-4*72: \MyOuter) [my box,name=1-5] {1,5};
+
+  \node at (\MyInnerAngle-0*72: \MyInner) [my box,name=1-3] {1,3};
+  \node at (\MyInnerAngle-1*72: \MyInner) [my box,name=2-4] {2,4};
+  \node at (\MyInnerAngle-2*72: \MyInner) [my box,name=3-5] {3,5};
+  \node at (\MyInnerAngle-3*72: \MyInner) [my box,name=1-4] {1,4};
+  \node at (\MyInnerAngle-4*72: \MyInner) [my box,name=2-5] {2,5};
+
+  \draw (1-2) to (1-3);
+  \draw (1-2) to (1-4);
+  \draw (1-2) to (1-5);
+  \draw (1-2) to (2-3);
+  \draw (1-2) to (2-4);
+  \draw (1-2) to (2-5);
+  
+  \draw (1-4) to (4-5);
+  \draw (2-4) to (3-4);
+  \draw (1-3) to (1-5);
+  \draw (1-5) to (2-5);
+  \draw (1-3) to (2-3);
+  \draw (2-5) to (4-5);
+  \draw (3-5) to (4-5);
+  \draw (1-3) to (3-4);
+  \draw (2-3) to (3-5);
+  \draw (3-4) to (4-5);
+  \draw (1-4) to (1-5);
+  \draw (1-5) to (3-5);
+  \draw (1-4) to (3-4);
+  \draw (1-4) to (2-4);
+  \draw (1-3) to (1-4);
+  \draw (2-3) to (3-4);
+  \draw (3-4) to (3-5);
+  \draw (2-3) to (2-4);
+  \draw (1-3) to (3-5);
+  \draw (2-5) to (3-5);
+  \draw (2-4) to (4-5);
+  \draw (1-5) to (4-5);
+  \draw (2-4) to (2-5);
+  \draw (2-3) to (2-5);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1,
+     my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
+     font=\scriptsize,
+    ]
+
+  \node at (-0*36: 5) [my box,name=1-2] {1,2};    % 3
+  \node at (-1*36: 5) [my box,name=2-5] {2,5};    % 7
+  \node at (-2*36: 5) [my box,name=2-4] {2,4};    % 6
+  \node at (-3*36: 5) [my box,name=2-3] {2,3};    % 5
+  \node at (-4*36: 5) [my box,name=3-5] {3,5};    % 8
+  \node at (-5*36: 5) [my box,name=3-4] {3,4};    % 7
+  \node at (-6*36: 5) [my box,name=1-3] {1,3};    % 4
+
+  \node at (-7*36: 5) [my box,name=1-5] {1,5};    % 6
+  \node at (-8*36: 5) [my box,name=1-4] {1,4};    % 5
+  \node at (-9*36: 5) [my box,name=4-5] {4,5};    % 9
+
+  \draw (1-2) to (1-3);
+  \draw (1-2) to (1-4);
+  \draw (1-2) to (1-5);
+  \draw (1-2) to (2-3);
+  \draw (1-2) to (2-4);
+  \draw (1-2) to (2-5);
+
+  \draw (1-4) to (4-5);
+  \draw (2-4) to (3-4);
+  \draw (1-3) to (1-5);
+  \draw (1-5) to (2-5);
+  \draw (1-3) to (2-3);
+  \draw (2-5) to (4-5);
+  \draw (3-5) to (4-5);
+  \draw (1-3) to (3-4);
+  \draw (2-3) to (3-5);
+  \draw (3-4) to (4-5);
+  \draw (1-4) to (1-5);
+  \draw (1-5) to (3-5);
+  \draw (1-4) to (3-4);
+  \draw (1-4) to (2-4);
+  \draw (1-3) to (1-4);
+  \draw (2-3) to (3-4);
+  \draw (3-4) to (3-5);
+  \draw (2-3) to (2-4);
+  \draw (1-3) to (3-5);
+  \draw (2-5) to (3-5);
+  \draw (2-4) to (4-5);
+  \draw (1-5) to (4-5);
+  \draw (2-4) to (2-5);
+  \draw (2-3) to (2-5);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=.74,
+     my box/.style={circle,draw,minimum width=2.5em,inner sep=.15em,outer sep=.3em},
+     font=\small,
+    ]
+  \newcommand\MyOuter{9}
+  \newcommand\MyInner{5}
+  \newcommand\MyInIn{5}
+  % \newcommand\MyInnerAngle{54+180}
+  \newcommand\MyInnerAngle{54}
+
+  \node at (-0*36: \MyOuter) [my box,name=1-2] {1-2};
+  \node at (-2*36: \MyOuter) [my box,name=2-3] {2-3};
+  \node at (-4*36: \MyOuter) [my box,name=3-4] {3-4};
+  \node at (-6*36: \MyOuter) [my box,name=4-5] {4-5};
+  \node at (-8*36: \MyOuter) [my box,name=1-5] {1-5};
+
+  \node at (-1*36: \MyInner) [my box,name=2-7] {2-7};
+  \node at (-3*36: \MyInner) [my box,name=3-8] {3-8};
+  \node at (-5*36: \MyInner) [my box,name=4-9] {4-9};
+  \node at (-7*36: \MyInner) [my box,name=5-10] {5-10};
+  \node at (-9*36: \MyInner) [my box,name=1-6] {1-6};
+
+  \node at (-4*36: \MyInIn) [my box,name=10-7] {10-7};
+  \node at (-6*36: \MyInIn) [my box,name=6-8] {6-8};
+  \node at (-8*36: \MyInIn) [my box,name=7-9] {7-9};
+  \node at (-10*36: \MyInIn) [my box,name=8-10] {8-10};
+  \node at (-12*36: \MyInIn) [my box,name=6-9] {6-9};
+
+  \draw [] (2-3) to (1-2);
+  \draw [] (2-3) to (3-4);
+  \draw [] (1-5) to (4-5);
+  \draw [] (1-6) to (6-8);
+  \draw [] (1-5) to (1-6);
+  \draw [] (2-3) to (3-8);
+  \draw [] (8-10) to (3-8);
+  \draw [] (1-6) to (6-9);
+  \draw [] (4-5) to (5-10);
+  \draw [] (4-5) to (3-4);
+  \draw [] (4-9) to (7-9);
+  \draw [] (10-7) to (2-7);
+  \draw [] (6-9) to (7-9);
+  \draw [] (4-5) to (4-9);
+  \draw [] (2-7) to (1-2);
+  \draw [] (8-10) to (5-10);
+  \draw [] (6-8) to (3-8);
+  \draw [] (10-7) to (8-10);
+  \draw [] (4-9) to (6-9);
+  \draw [] (1-5) to (5-10);
+  \draw [] (1-5) to (1-2);
+  \draw [] (4-9) to (3-4);
+  \draw [] (1-6) to (1-2);
+  \draw [] (2-7) to (2-3);
+  \draw [] (8-10) to (6-8);
+  \draw [] (2-7) to (7-9);
+  \draw [] (10-7) to (5-10);
+  \draw [] (6-9) to (6-8);
+  \draw [] (3-8) to (3-4);
+  \draw [] (10-7) to (7-9);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+
+\end{document}
+
+% Local variables:
+% compile-command: "latexmk -file-line-error -pdf misc.tex"
+% End:

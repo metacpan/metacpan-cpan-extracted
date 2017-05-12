@@ -1,0 +1,10 @@
+Revision history for Graphics-Primitive-CSS
+
+0.02
+  - Add padding
+  - Add border-color (limited)
+  - Add support for 'textbox' as a selector
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

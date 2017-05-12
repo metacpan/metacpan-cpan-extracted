@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use Git::Open;
+
+# PODNAME: git-open
+# ABSTRACT: wrapper for Git::Open
+
+my $app = Git::Open->new_with_options;
+$app->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+git-open - wrapper for Git::Open
+
+=head1 VERSION
+
+version 0.1.9
+
+=head1 AUTHOR
+
+Pattarawat Chormai <pat.chormai@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Pattarawat Chormai.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,97 @@
+2003-08-05 15:27  chris
+
+	* Makefile.PL, makehtml, lib/Games/Euchre.pm,
+	lib/Games/Euchre/Player.pm: v1.02 Change to use newer Scalar::Util
+	instead of faulty WeakRef (in reponse to bug report by Jost
+	Krieger's Smokehouse)
+
+2003-08-05 10:29  chris
+
+	* Makefile.PL, lib/Games/Euchre.pm: v1.01 Fix missing Makefile.PL
+	prerequisite
+
+2003-02-18 01:01  chris
+
+	* lib/Games/Euchre/: AI.pm, Player.pm, Trick.pm: Fix a few minor
+	documentation errors
+
+2003-02-15 15:10  chris
+
+	* README: Touch up README for 1.00 release
+
+2003-02-15 15:09  chris
+
+	* test.pl: Add tests for AI modules
+
+2003-02-15 15:01  chris
+
+	* MANIFEST, Makefile.PL, euchre.pl, scripts/euchre.pl: Move
+	euchr.pl to scripts subdir
+
+2003-02-15 14:42  chris
+
+	* lib/Games/: Euchre.pm, Euchre/AI.pm, Euchre/Player.pm,
+	Euchre/Trick.pm, Euchre/AI/Human.pm: Polish the human player output
+
+2003-02-14 18:09  chris
+
+	* lib/Games/Euchre.pm: Add getPlayerName() method
+
+2003-02-13 08:25  chris
+
+	* lib/Games/: Euchre.pm, Euchre/AI.pm, Euchre/Player.pm: Apply
+	playernames hash to all passed AI data
+
+2003-02-12 21:09  chris
+
+	* lib/Games/Euchre.pm: bug fix: lead is left of dealer, not bidder
+	(duh)
+
+2003-02-12 20:52  chris
+
+	* README, euchre.pl, lib/Games/Euchre.pm: tweaks: remove explicit
+	end of hand handler, reorder AI arguments
+
+2003-02-12 20:47  chris
+
+	* lib/Games/: Euchre.pm, Euchre/AI.pm, Euchre/Player.pm,
+	Euchre/Team.pm, Euchre/AI/Human.pm: Finish human player, overhaul
+	the event handler triggers
+
+2003-02-12 13:23  chris
+
+	* makehtml: docmaker script
+
+2003-02-11 16:50  chris
+
+	* euchre.pl, lib/Games/Euchre.pm, lib/Games/Euchre/AI.pm,
+	lib/Games/Euchre/Player.pm, lib/Games/Euchre/AI/Human.pm,
+	lib/Games/Euchre/AI/Simple.pm: Docs, some rearranging, some Human
+	coding, added another AI event handler
+
+2003-02-11 03:26  chris
+
+	* lib/Games/: Euchre.pm, Euchre/Player.pm, Euchre/Team.pm,
+	Euchre/Trick.pm: Documentation galore Rearranged and cleaned up a
+	bunch of functions and interfaces
+
+2003-02-10 01:33  chris
+
+	* lib/Games/Euchre.pm: Added documentation, version number
+
+2003-02-10 01:03  chris
+
+	* COPYRIGHT, MANIFEST, Makefile.PL, README, euchre.pl, test.pl,
+	lib/Games/Euchre.pm, lib/Games/Euchre/AI.pm,
+	lib/Games/Euchre/Player.pm, lib/Games/Euchre/Team.pm,
+	lib/Games/Euchre/Trick.pm, lib/Games/Euchre/AI/Human.pm,
+	lib/Games/Euchre/AI/Simple.pm: Initial revision
+
+2003-02-10 01:03  chris
+
+	* COPYRIGHT, MANIFEST, Makefile.PL, README, euchre.pl, test.pl,
+	lib/Games/Euchre.pm, lib/Games/Euchre/AI.pm,
+	lib/Games/Euchre/Player.pm, lib/Games/Euchre/Team.pm,
+	lib/Games/Euchre/Trick.pm, lib/Games/Euchre/AI/Human.pm,
+	lib/Games/Euchre/AI/Simple.pm: Initial import
+

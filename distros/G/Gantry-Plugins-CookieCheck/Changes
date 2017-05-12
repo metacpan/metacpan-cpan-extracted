@@ -1,0 +1,6 @@
+0.02 Thurs July 16 12:15:00 CDT 2009
+    - Add config option for cookie domain.
+    - Add config option to allow paths to be excluded from the cookie check.
+
+0.01 Fri July 10 17:57:00 CDT 2009
+    - Initial version.

@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  $image->undo_group_start;
+  my @b = $image->selection_bounds;
+  my $w = $b[3] - $b[1];
+  my $h = $b[4] - $b[2];
+  $drawable->edit_copy;
+  $image->selection_none;
+  for (my $i = 0; $i < $repeats; $i++) {
+    $b[1] += $xoffset;
+    $b[2] += $yoffset;
+    $image->select_rectangle(CHANNEL_OP_REPLACE, @b[1,2], $w, $h);
+    $drawable->edit_paste(FALSE)->floating_sel_anchor;
+    $image->selection_none
+  }
+  $image->undo_group_end;
+  return;
+};
+exit main;
+__END__
+
+=head1 NAME
+
+repdup - Repeats and duplicates a selection.
+
+=head1 SYNOPSIS
+
+<Image>/Edit/Repeat & Duplicate...
+
+=head1 DESCRIPTION
+
+Hopefully self-explanatory...
+
+=head1 PARAMETERS
+
+  [PF_SPINNER, "repeats", "Number of repeats", 3, [1, 1000, 1] ],
+  [PF_SPINNER, "xoffset", "X-offset", 50, [-1000, 1000, 1] ],
+  [PF_SPINNER, "yoffset", "Y-offset", 50, [-1000, 1000, 1] ],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Claes G Lindblad <claesg@algonet.se>
+
+=head1 DATE
+
+990328
+
+=head1 LICENSE
+
+Distributed under the terms of the GNU Public License, v2 or higher.

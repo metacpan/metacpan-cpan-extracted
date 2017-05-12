@@ -1,0 +1,3 @@
+dir /usr
+dir /usr/sbin
+obj /usr/sbin/mirrorselect 107f2df3a7ca7c368bc9632bb835db2e 1087637847

@@ -1,0 +1,107 @@
+#!/usr/bin/env perl -CADS
+
+# quick wrapper to encode/decode/recover OLC
+
+use strict;
+use Geo::OLC qw(encode decode shorten recover_nearest is_short is_full);
+use Geo::Coder::Google;
+
+my $USAGE = <<EOF;
+usage: $0 [args]
+    lat,lon[,length]  - encode OLC with optional length (default: 10)
+    addr...           - encode address into OLC
+    fullcode          - decode OLC into lat,lon
+    fullcode lat,lon  - shorten OLC based on reference lat,lon
+    fullcode addr...  - shorten OLC based on reference address
+    shortcode lat,lon - recover a full OLC based on reference lat,lon
+    shortcode addr... - recover a full OLC based on reference address
+
+Geocoding addresses uses Geo::Coder::Google, which requires an active
+Internet connection.
+EOF
+
+my @ref;
+($_,@ref) = @ARGV;
+
+die $USAGE unless defined($_);
+die $USAGE if /^-[^\d]/;
+
+if (/[-.0-9],[-.0-9]/) {
+	my ($lat,$lon,$len) = split(/,/);
+	$len ||= 10;
+	print encode($lat,$lon,$len),"\n";
+}elsif (is_full($_)) {
+	if (@ref > 0) {
+		if ($ref[0] =~ /\S,\S/) {
+			print shorten($_,split(/,/,$ref[0])),"\n";
+		}else{
+			my $g = Geo::Coder::Google->new;
+			my $l = $g->geocode(join(" ",@ref));
+			die "$0: reference location '" . join(" ",@ref) . "' not found\n"
+				unless ref $l;
+			my $latref = $l->{geometry}->{location}->{lat};
+			my $lonref = $l->{geometry}->{location}->{lng};
+			print shorten($_,$latref,$lonref),"\n";
+		}
+	}else{
+		print join(",",@{decode($_)->{center}}),"\n";
+	}
+}elsif (is_short($_) and @ref > 0) {
+	if ($ref[0] =~ /\S,\S/) {
+			print recover_nearest($_,split(/,/,$ref[0])),"\n";
+	}else{
+		my $g = Geo::Coder::Google->new;
+		my $l = $g->geocode(join(" ",@ref));
+		die "$0: reference location '" . join(" ",@ref) . "' not found\n"
+			unless ref $l;
+		my $latref = $l->{geometry}->{location}->{lat};
+		my $lonref = $l->{geometry}->{location}->{lng};
+		my $code = recover_nearest($_,$latref,$lonref);
+		print "$code ",join(",",@{decode($code)->{center}}),"\n";
+	}
+}else{
+	if (@ARGV > 0) {
+		my $g = Geo::Coder::Google->new;
+		my $l = $g->geocode(join(" ",@ARGV));
+		die "$0: reference location '" . join(" ",@ref) . "' not found\n"
+			unless ref $l;
+		my $lat = $l->{geometry}->{location}->{lat};
+		my $lon = $l->{geometry}->{location}->{lng};
+		print encode($lat,$lon)," $lat,$lon\n";
+	}else{
+		die $USAGE;
+	}
+}
+exit 0;
+
+=head1 NAME
+
+olc - encode/decode/shorten/recover Open Location Codes
+
+=head1 SYNOPSIS
+
+olc I<lat>,I<lon>[,I<length>] | I<addr>...
+    encode location as OLC, with optional length (default: 10)
+
+olc I<fullcode>
+    decodes a valid full-length  OLC into lat,lon.
+
+olc I<fullcode> I<lat>,I<lon> | I<addr>...
+    shortens a valid full-length OLC based on a reference location,
+    identified either by (lat,lon) or by geocoding an address using
+    Geo::Coder::Google.
+
+olc I<shortcode> I<lat>,I<lon> | I<addr> ...
+    recover a full-length OLC from a shortened code, using a reference
+    location.
+
+=head1 DESCRIPTION
+
+I<olc> is a simple wrapper for I<Geo::OLC>.
+
+=head1 AUTHOR
+
+J Greely, C<< <jgreely at cpan.org> >>
+
+=cut
+

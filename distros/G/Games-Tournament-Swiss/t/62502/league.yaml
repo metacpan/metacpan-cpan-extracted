@@ -1,0 +1,28 @@
+member:
+  - name  : Player1
+    id    : 100
+    rating: 1518
+  - name  : Player2
+    id    : 200
+    rating: 1518
+  - name  : Player3
+    id    : 300
+    rating: 1518
+  - name  : Player4
+    id    : 400
+    rating: 1518
+  - name  : Player5
+    id    : 500
+    rating: 1518
+  - name  : Player6
+    id    : 600
+    rating: 1518
+  - name  : Player7
+    id    : 700
+    rating: 1518
+  - name  : Player8
+    id    : 800
+    rating: 1518
+  - name  : Player9
+    id    : 900
+    rating: 1518

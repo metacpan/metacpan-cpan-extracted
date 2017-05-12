@@ -1,0 +1,132 @@
+Revision history for Games::Pandemic.
+
+1.120510  2012-02-20 17:33:23 Europe/Paris
+ - fix bin/pandemic podname (rt#75160)
+
+1.111030  2011-04-13 10:32:58 Europe/Paris
+ - i18n catalogs now located in share/locale
+
+1.111010  2011-04-11 13:48:43 Europe/Paris
+ - allow too_many_cards to be undefined (Peter Oliver)
+ - using tk::sugar
+ - using tk::action
+ - get rid of moosex::attributehelper, now core moose
+ - using dzil plugin @JQUELIN
+
+**
+
+1.092660 Wed Sep 23 17:49:47 2009
+ - added missing prereq - poe::loop::tk not part of poe anymore
+
+**
+
+1.092640 Mon Sep 21 17:11:14 2009
+ - introducing medic player
+ - japanese translation, courtesy of tomita naoki
+ - using special card now removes too_many_cards condition
+
+**
+
+1.000000 Mon Sep  7 17:56:33 2009
+ - infection rate grows as epidemics strike
+ - displaying infection rate
+ - special event: airlift implemented
+ - special event: forecast implemented
+ - special event: government grant implemented
+ - special event: one quiet night implemented
+ - special event: resilient population implemented
+ - epidemics now shown in past cards
+ - clearing all city decays when closing a game
+ - moving license to gpl2
+
+**
+
+0.8.0 Fri Aug 28 09:45:03 2009
+ - diseases can be eradicated
+ - performing infection outbreaks
+ - detecting game over condition when too many outbreaks
+ - allowing player to choose which disease to treat in multi-infected cities
+ - return/escape bindings for dialogs
+ - tooltips for various game information
+ - fix unfair epidemic repartition
+ - fix never-ending too many cards / deal more cards when dropping a
+   card but still being beyond max number of cards
+ - better dialog for past cards / infections
+
+**
+
+0.7.0 Sat Aug 22 14:43:01 2009
+ - wiping all cubes from a city if a cure has been found for the disease
+ - reacting to winning conditions
+ - reacting to game over condition when no more disease cubes
+ - possibility to see cards already played / discarded
+ - possibility to see past infections
+
+**
+
+0.6.0 Sat Aug  8 14:30:38 2009
+ - introducing epidemic events
+ - closing current game is now supported
+ - player cards now displayed in a window of their own
+ - detecting game over condition when no more cards
+ - sorting cards by type then by disease then by city name
+ - introducing a new "action" menu, with shortcuts for actions
+ - actions now independant of buttons/menu for easier reuse
+
+**
+
+0.5.0 Sun Jul 12 14:45:43 2009
+ - introducing continue button to move game forward
+ - dealing cards after player completed her actions
+ - infecting new cities after player got her cards
+ - checking if a player has too many cards before continuing
+ - allowing player to drop cards
+ - making window large enough to hold map + various bars
+ - info bar now on the right of the map
+ - current player now displayed in toolbar
+
+**
+
+0.4.0 Thu Jul  2 18:48:24 2009
+ - moving license to gpl3
+ - treating a city implemented
+ - sharing card implemented
+ - discovering cure implemented
+ - passing now means finishing one's turn
+ - updating status bar works
+ - updating number of available research station
+ - current player blinks on map
+ - bigger pawns on the map
+ - scrolling player cards
+
+**
+
+0.3.0 Fri Jun 26 12:39:04 2009
+ - player can move to an adjacent city
+ - player can fly directly to a city
+ - player can shuttle to another research station
+ - player can charter from current city
+ - player can build a research center
+ - using a real toolbar
+ - adding menu entries to match toolbar
+ - fix gettext extraction
+ - tracing objects death in debug mode
+ - using real moose roles
+ - caching images
+
+**
+
+0.2.0 Wed Jun 24 17:36:24 2009
+ - introducing player class
+ - creating 2 players, displaying them on gui
+ - dealing cards to players, displaying them
+ - pass action implemented
+ - basic stubs for turn events complete
+ - trimming cruft in archive
+
+**
+
+0.1.0 Fri Jun 19 18:11:39 2009
+ - original version
+ - main window + basic startup
+

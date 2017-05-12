@@ -1,0 +1,277 @@
+{
+          '30032715' => {
+                        'faction_id' => '500004',
+                        'alliance_id' => '0',
+                        'name' => 'Olelon',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30023410' => {
+                        'faction_id' => '500002',
+                        'alliance_id' => '0',
+                        'name' => 'Embod',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30042715' => {
+                        'faction_id' => '500004',
+                        'alliance_id' => '0',
+                        'name' => 'Trossere',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30023489' => {
+                        'faction_id' => '500003',
+                        'alliance_id' => '0',
+                        'name' => 'Fora',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30034971' => {
+                        'faction_id' => '500004',
+                        'alliance_id' => '0',
+                        'name' => 'Henebene',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001603' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => '6-HFD6',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001600' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => '9-BUSQ',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30024971' => {
+                        'faction_id' => '500004',
+                        'alliance_id' => '0',
+                        'name' => 'Hecarrin',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30030141' => {
+                        'faction_id' => '500001',
+                        'alliance_id' => '0',
+                        'name' => 'Uitra',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30043489' => {
+                        'faction_id' => '500003',
+                        'alliance_id' => '0',
+                        'name' => 'Horir',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          'data_time' => '2008-05-26 05:22:01',
+          '30001604' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => 'P3UD-M',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001601' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => 'LQB-TC',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          'cached_until' => '2008-05-26 11:41:57',
+          '30045042' => {
+                        'faction_id' => '500003',
+                        'alliance_id' => '0',
+                        'name' => 'Conoban',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30041407' => {
+                        'faction_id' => '500001',
+                        'alliance_id' => '0',
+                        'name' => 'Ichinumi',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30031407' => {
+                        'faction_id' => '500001',
+                        'alliance_id' => '0',
+                        'name' => 'Hitanishio',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001599' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => '0Z-VHC',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001606' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => 'FX-XMW',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30042547' => {
+                        'faction_id' => '500002',
+                        'alliance_id' => '0',
+                        'name' => 'Loguttur',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001597' => {
+                        'faction_id' => '0',
+                        'alliance_id' => '574100976',
+                        'name' => 'M-NP5O',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '3'
+                      },
+          '30032505' => {
+                        'faction_id' => '500002',
+                        'alliance_id' => '0',
+                        'name' => 'Todeko',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30031392' => {
+                        'faction_id' => '500001',
+                        'alliance_id' => '0',
+                        'name' => 'Komo',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30025305' => {
+                        'faction_id' => '500004',
+                        'alliance_id' => '0',
+                        'name' => 'Channace',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30041392' => {
+                        'faction_id' => '500001',
+                        'alliance_id' => '0',
+                        'name' => 'Laah',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30033410' => {
+                        'faction_id' => '500002',
+                        'alliance_id' => '0',
+                        'name' => 'Erego',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30045305' => {
+                        'faction_id' => '500004',
+                        'alliance_id' => '0',
+                        'name' => 'Clellinon',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30031672' => {
+                        'faction_id' => '500003',
+                        'alliance_id' => '0',
+                        'name' => 'Safilbab',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30025042' => {
+                        'faction_id' => '500003',
+                        'alliance_id' => '0',
+                        'name' => 'Annad',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30042505' => {
+                        'faction_id' => '500002',
+                        'alliance_id' => '0',
+                        'name' => 'Usteli',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30041672' => {
+                        'faction_id' => '500003',
+                        'alliance_id' => '0',
+                        'name' => 'Seitam',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30035042' => {
+                        'faction_id' => '500003',
+                        'alliance_id' => '0',
+                        'name' => 'Chaktaren',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30033489' => {
+                        'faction_id' => '500003',
+                        'alliance_id' => '0',
+                        'name' => 'Hanan',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30035305' => {
+                        'faction_id' => '500004',
+                        'alliance_id' => '0',
+                        'name' => 'Clacille',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30040141' => {
+                        'faction_id' => '500001',
+                        'alliance_id' => '0',
+                        'name' => 'Urhinichi',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30043410' => {
+                        'faction_id' => '500002',
+                        'alliance_id' => '0',
+                        'name' => 'Fildar',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001598' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => '2-NF2Z',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001602' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => 'II-1B3',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30044971' => {
+                        'faction_id' => '500004',
+                        'alliance_id' => '0',
+                        'name' => 'Mesokel',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30001605' => {
+                        'faction_id' => '500005',
+                        'alliance_id' => '0',
+                        'name' => 'LCN-0V',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      },
+          '30032547' => {
+                        'faction_id' => '500002',
+                        'alliance_id' => '0',
+                        'name' => 'Larkugei',
+                        'constellation_sovereignty' => '0',
+                        'sovereignty_level' => '0'
+                      }
+        };

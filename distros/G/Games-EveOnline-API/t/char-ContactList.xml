@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+<eveapi version="2">
+  <currentTime>2014-06-26 18:25:40</currentTime>
+  <result>
+    <rowset name="contactList" key="contactID" columns="contactID,contactName,inWatchlist,standing,contactTypeID">
+      <row contactID="3018938" contactName="Abishi Tian" standing="0" contactTypeID="1383" />
+      <row contactID="3019494" contactName="Aura Todaki" standing="0" contactTypeID="1375" />
+      <row contactID="962693552" contactName="Pyuthon" standing="10" contactTypeID="1384" />
+      <row contactID="1879838281" contactName="libzar" standing="10" contactTypeID="1378" />
+    </rowset>
+    <rowset name="corporateContactList" key="contactID" columns="contactID,contactName,standing,contactTypeID" />
+    <rowset name="allianceContactList" key="contactID" columns="contactID,contactName,standing,contactTypeID" />
+  </result>
+  <cachedUntil>2014-06-26 18:40:40</cachedUntil>
+</eveapi>

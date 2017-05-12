@@ -1,0 +1,320 @@
+NAME
+    Gepok - PSGI server with built-in HTTPS support, Unix sockets,
+    preforking
+
+VERSION
+    This document describes version 0.28 of Gepok (from Perl distribution
+    Gepok), released on 2014-12-11.
+
+SYNOPSIS
+    To run with plackup:
+
+     % plackup -s Gepok --daemonize
+
+    To run standalone:
+
+     #!/usr/bin/perl
+     use Gepok;
+     my $d = Gepok->new(
+         http_ports     => [8081, ':8082', '127.0.0.1:8083'], # default none
+         https_ports    => [8084, '0.0.0.0:8085'],            # default none
+         unix_sockets   => ['/var/run/gepok.sock','/tmp/gepok.sock'], # default none
+         #ssl_key_file  => '/path/to/key.pem', # required if https_ports specified
+         #ssl_cert_file => '/path/to/crt.pem', # required if https_ports specified
+         #max_requests_per_child => 100,       # default is 1000
+         #start_servers          => 0,         # default is 3, 0 means don't prefork
+         #daemonize => 0,       # default is 1, 0 = don't go into background
+     );
+     $d->run($psgi_app);
+
+DESCRIPTION
+    Gepok is a PSGI server implementation. Its features are:
+
+    *   HTTPS support out-of-the-box
+
+        This is the primary (if not the only) reason why I wrote Gepok, and
+        why it uses HTTP::Daemon::* family (because there is
+        HTTP::Daemon::SSL). I needed a pure-Perl standalone webserver with
+        SSL support builtin. Other Perl servers usually recommend running
+        behind Nginx or some other external HTTPS proxy.
+
+    *   Preforking
+
+        Good performance and reliability.
+
+    *   Multiple interface and Unix socket
+
+    *   Runs on Unix platform
+
+    Gepok can run under plackup, or standalone.
+
+PSGI ENVIRONMENT
+    Gepok adds the following server-specific keys in the PSGI environment
+    passed to application/middleware:
+
+    *   gepok.connect_time => ARRAY
+
+        A 2-element arrayref (produced by Time::HiRes' gettimeofday()),
+        clocked at connect time.
+
+    *   gepok.finish_request_time => ARRAY
+
+        A 2-element arrayref (produced by Time::HiRes' gettimeofday()),
+        clocked right after Gepok has received the complete request from
+        client.
+
+    *   gepok.client_protocol => STR
+
+        HTTP protocol version sent by client, e.g. "HTTP/1.0" or "HTTP/1.1".
+        This can be used to avoid sending HTTP/1.1 response to HTTP/1.0 or
+        older clients.
+
+    *   gepok.socket => OBJ
+
+        Raw HTTP::Daemon::ClientConn socket. Can be used to get information
+        about socket, e.g. peerport(), etc. Should not be used to read/write
+        data (use PSGI way for that, e.g. $env->{'psgi.input'}, returning
+        PSGI response, etc).
+
+    *   gepok.httpd_socket => OBJ
+
+        Raw HTTP::Daemon socket. Can be used to get information about
+        socket, e.g. peercred() (for UNIX sockets), etc. Should not be used
+        to return HTTP response directly (use PSGI way for that).
+
+    *   gepok.unix_socket => BOOL
+
+        A boolean value which is set to true if client connects via Unix
+        socket. (Note, you can get Unix socket path from $env->{SERVER_NAME}
+        or $env->{'gepok.socket'}).
+
+ATTRIBUTES
+  name => STR (default is basename of $0)
+    Name of server, for display in process table ('ps ax').
+
+  daemonize => BOOL (default 1)
+    Whether to daemonize (go into background).
+
+  http_ports => ARRAY OF STR (default [])
+    One or more HTTP ports to listen to. Default is none. Each port can be
+    in the form of N, ":N", "0.0.0.0:N" (all means the same thing, to bind
+    to all interfaces) or "1.2.3.4:N" (to bind to a specific network
+    interface).
+
+    A string is also accepted, it will be split (delimiter ,) beforehand.
+
+  https_ports => ARRAY OF STR (default [])
+    Just like http_ports, but for specifying ports for HTTPS.
+
+  unix_sockets => ARRAY OF STR (default [])
+    Location of Unix sockets. Default is none, which means not listening to
+    Unix socket. Each element should be an absolute path.
+
+    A string is also accepted, it will be split (delimiter ,) beforehand.
+
+    You must at least specify one port (either http, https, unix_socket) or
+    Gepok will refuse to run.
+
+  timeout => BOOL (default 120)
+    Socket timeout. Will be passed as Timeout option to HTTP::Daemon's
+    constructor (which will be passed to IO::Socket).
+
+  require_root => BOOL (default 0)
+    Whether to require running as root.
+
+    Passed to Proc::Daemon::Prefork's constructor.
+
+  pid_path => STR (default /var/run/<name>.pid or ~/<name>.pid)
+    Location of PID file.
+
+  scoreboard_path => STR (default /var/run/<name>.scoreboard or ~/<name>.scoreboard)
+    Location of scoreboard file (used for communication between parent and
+    child processes). If you disable this, autoadjusting number of children
+    won't work (number of children will be kept at 'start_servers').
+
+  error_log_path => STR (default /var/log/<name>-error.log or ~/<name>-error.log)
+    Location of error log. Default is /var/log/<name>-error.log. It will be
+    opened in append mode.
+
+  access_log_path => STR (default /var/log/<name>-access.log or ~/<name>-access.log)
+    Location of access log. It will be opened in append mode.
+
+    Default format of access log is the Apache combined format. Override
+    access_log() method if you wan't to customize this.
+
+    If Gepok is run Under plackup, by default it will not write an access
+    log file (unless you specify this attribute) since plackup already
+    writes an access log.
+
+  ssl_key_file => STR
+    Path to SSL key file, to be passed to HTTP::Daemon::SSL. If you specify
+    one or more HTTPS ports, you need to supply this.
+
+  ssl_cert_file => STR
+    Path to SSL cert file, to be passed to HTTP::Daemon::SSL. If you specify
+    one or more HTTPS ports, you need to supply this.
+
+  ssl_verify_mode => INT
+    Level of verification for SSL client certificates, to be passed to
+    HTTP::Daemon::SSL. This is optional.
+
+  ssl_verify_callback => CODEREF
+    Custom verifier for SSL client certificates, to be passed to
+    HTTP::Daemon::SSL. This is optional.
+
+  ssl_ca_file => STR
+    Path for file containing certificates of reputable authorties for
+    certificate verification. This is optional.
+
+  ssl_ca_path => STR
+    According to IO::Socket::SSL this is only of interest if you are
+    "unusually friendly with the OpenSSL documentation". This is optional.
+
+  start_servers => INT (default 3)
+    Number of children to fork at the start of run. If you set this to 0,
+    the server becomes a nonforking one.
+
+    Tip: You can set start_servers to 0 and 'daemonize' to false for
+    debugging.
+
+  max_clients => INT (default 150)
+    Maximum number of children processes to maintain. If server is busy,
+    number of children will be increased from the original 'start_servers'
+    up until this value.
+
+  max_requests_per_child => INT (default 1000)
+    Number of requests each child will serve until it exists.
+
+  product_name => STR
+    Used in 'Server' HTTP response header (<product_name>/<version>).
+    Defaults to class name, e.g. "Gepok".
+
+  product_version => STR
+    Used in 'Server' HTTP response header (<product_name>/<version>).
+    Defaults to $VERSION package variable.
+
+METHODS
+  new(%args)
+    Create a new instance of server. %args can be used to set attributes.
+
+  $gepok->run($app)
+    Start/run server and run the PSGI application $app.
+
+  $gepok->start($app)
+    Alias for run().
+
+  $gepok->stop()
+    Stop running server.
+
+  $gepok->restart()
+    Restart server.
+
+  $gepok->is_running() => BOOL
+    Check whether server is running.
+
+  $gepok->before_prefork()
+    This is a hook provided for subclasses to do something before the daemon
+    is preforking. For example, you can preload Perl modules here so that
+    each child doesn't have to load modules separately (= inefficient).
+
+  $gepok->access_log($req, $res, $sock)
+    The default implementation uses the Apache combined format. Override if
+    you want custom format. $res is HTTP::Request object, $res is PSGI
+    response, $sock is the raw socket.
+
+FAQ
+  Why the name Gepok?
+    Gepok is an Indonesian word, meaning bundle/bunch. This class bundles
+    one or several HTTP::Daemon::* objects to create a stand-alone web
+    server.
+
+  Why use Gepok?
+    The main feature for Gepok is builtin HTTPS support, which means you do
+    not have to setup a separate front-end HTTPS proxy for serving content
+    over HTTPS. This is convenient, especially for development. Builtin
+    HTTPS support also makes some things easier to, e.g. check client
+    certificates you can use the ssl_verify_callback options. Your PSGI
+    application also has direct access to the raw socket
+    ("$env->{'gepok.socket'}").
+
+    However, for heavy traffic use, you might want to check out more
+    battle-tested solution like Perlbal.
+
+    There are now other PSGI servers that support HTTPS, see the SEE ALSO
+    section.
+
+    I personally developed Gepok for two reasons: HTTPS support and
+    listening on Unix sockets.
+
+  Performance notes?
+    Thanks to preforking, Gepok has adequate performance and reliability
+    handling multiple clients. But Gepok is not yet performance-tuned, or
+    very performance-oriented to begin with. For convenience Gepok is based
+    on HTTP::Daemon, which is also not too performance-oriented. For each
+    HTTP request, HTTP::Daemon constructs an HTTP::Request object, which
+    copies request body into a scalar (and, for PSGI, needs to be
+    re-presented as a stream using IO::Scalar). Creating other objects like
+    URI and HTTP::Headers are also involved. Gepok also creates file-based
+    scoreboard, which might or might not be a bottleneck.
+
+    Casual benchmarking on my PC shows that Gepok is about 3-4x slower than
+    Starman for "hello world" PSGI.
+
+    I am using Gepok primarily with Perinci::Access::HTTP::Server for
+    serving remote API requests, in which HTTPS support is required.
+
+  "Bad arg length for Socket::inet_ntoa, length is 16, should be 4" error
+    At the time of this writing, HTTP::Daemon (6.01) might throw this error
+    message when receiving request. For patches/solutions to overcome this
+    problem, see: https://rt.cpan.org/Ticket/Display.html?id=71395
+
+CREDITS
+    Some code portion taken from Starman.
+
+SEE ALSO
+    PSGI and Plack.
+
+    HTTP server classes used: HTTP::Daemon, HTTP::Daemon::SSL,
+    HTTP::Daemon::UNIX.
+
+    Perlbal.
+
+    Other PSGI servers that support Unix sockets: Starman.
+
+    Other PSGI servers that support HTTPS out of the box:
+
+    *   Plack::Handler::AnyEvent::HTTPD
+
+        As of Aug 2012 still needs a patch to allow SSL, see
+        https://github.com/miyagawa/Plack-Handler-AnyEvent-HTTPD/pull/2#issu
+        ecomment-7046948
+
+    Note that any PSGI server can be used if you setup a front-end HTTPS
+    proxy/load balancer.
+
+    Please drop me a message if you think other PSGI servers need to be
+    mentioned.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Gepok>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Gepok>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Gepok>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

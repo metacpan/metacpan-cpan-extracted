@@ -1,0 +1,146 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            241
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                98
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           0
+    International data subcategory:    2
+    Local data subcategory:            2
+    Master table version number:       13
+    Local table version number:        1
+    Year:                              2010
+    Month:                             9
+    Day:                               13
+    Hour:                              6
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 13
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       208035 307080 208000
+
+Subset 1
+
+     1  001001                                   12  WMO BLOCK NUMBER [NUMERIC]
+     2  001002                                  843  WMO STATION NUMBER [NUMERIC]
+     3  001015  Budapest Pestszentlorinc-kulterulet  STATION OR SITE NAME [CCITTIA5]
+     4  002001                                    1  TYPE OF STATION [CODE TABLE]
+     5  004001                                 2010  YEAR [YEAR]
+     6  004002                                    9  MONTH [MONTH]
+     7  004003                                   13  DAY [DAY]
+     8  004004                                    6  HOUR [HOUR]
+     9  004005                                    0  MINUTE [MINUTE]
+    10  005001                             47.42917  LATITUDE (HIGH ACCURACY) [DEGREE]
+    11  006001                             19.18222  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    12  007030                                138.1  HEIGHT OF STATION GROUND ABOVE MEAN SEA LEVEL (SEE NOTE 3) [M]
+    13  007031                                139.5  HEIGHT OF BAROMETER ABOVE MEAN SEA LEVEL (SEE NOTE 4) [M]
+    14  010004                               100250  PRESSURE [PA]
+    15  010051                               101920  PRESSURE REDUCED TO MEAN SEA LEVEL [PA]
+    16  010061                                  -50  3-HOUR PRESSURE CHANGE [PA]
+    17  010063                                    3  CHARACTERISTIC OF PRESSURE TENDENCY [CODE TABLE]
+    18  010062                              missing  24-HOUR PRESSURE CHANGE [PA]
+    19  007004                              missing  PRESSURE [PA]
+    20  010009                              missing  GEOPOTENTIAL HEIGHT [GPM]
+    21  007032                                 2.00  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [M]
+    22  012101                               288.45  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    23  012103                               287.35  DEW-POINT TEMPERATURE [K]
+    24  013003                                   93  RELATIVE HUMIDITY [%]
+    25  007032                                 1.75  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [M]
+    26  020001                                 6000  HORIZONTAL VISIBILITY [M]
+    27  007032                                 1.00  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [M]
+    28  013023                                  0.0  TOTAL PRECIPITATION PAST 24 HOURS [KG/M**2]
+    29  007032                              missing  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [M]
+    30  020010                                   88  CLOUD COVER (TOTAL) [%]
+    31  008002                                    7  VERTICAL SIGNIFICANCE (SURFACE OBSERVATIONS) [CODE TABLE]
+    32  020011                                    2  CLOUD AMOUNT [CODE TABLE]
+    33  020013                                 1500  HEIGHT OF BASE OF CLOUD [M]
+    34  020012                                   35  CLOUD TYPE [CODE TABLE]
+    35  020012                                   28  CLOUD TYPE [CODE TABLE]
+    36  020012                              missing  CLOUD TYPE [CODE TABLE]
+    37  031001                                    1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    38  008002                                    1  VERTICAL SIGNIFICANCE (SURFACE OBSERVATIONS) [CODE TABLE]
+    39  020011                                    2  CLOUD AMOUNT [CODE TABLE]
+    40  020012                                    6  CLOUD TYPE [CODE TABLE]
+    41  020013                                 1500  HEIGHT OF BASE OF CLOUD [M]
+    42  031001                                    0  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+    43  008002                              missing  VERTICAL SIGNIFICANCE (SURFACE OBSERVATIONS) [CODE TABLE]
+    44  020054                              missing  TRUE DIRECTION FROM WHICH CLOUDS ARE MOVING [DEGREE TRUE]
+    45  008002                              missing  VERTICAL SIGNIFICANCE (SURFACE OBSERVATIONS) [CODE TABLE]
+    46  020054                              missing  TRUE DIRECTION FROM WHICH CLOUDS ARE MOVING [DEGREE TRUE]
+    47  008002                              missing  VERTICAL SIGNIFICANCE (SURFACE OBSERVATIONS) [CODE TABLE]
+    48  020054                              missing  TRUE DIRECTION FROM WHICH CLOUDS ARE MOVING [DEGREE TRUE]
+    49  008002                              missing  VERTICAL SIGNIFICANCE (SURFACE OBSERVATIONS) [CODE TABLE]
+    50  005021                              missing  BEARING OR AZIMUTH [DEGREE TRUE]
+    51  007021                              missing  ELEVATION (SEE NOTE 2) [DEGREE]
+    52  020012                              missing  CLOUD TYPE [CODE TABLE]
+    53  005021                              missing  BEARING OR AZIMUTH [DEGREE TRUE]
+    54  007021                              missing  ELEVATION (SEE NOTE 2) [DEGREE]
+    55  020062                                    1  STATE OF THE GROUND (WITH OR WITHOUT SNOW) [CODE TABLE]
+    56  013013                                 0.00  TOTAL SNOW DEPTH [M]
+    57  012113                              missing  GROUND MINIMUM TEMPERATURE, PAST 12 HOURS [K]
+    58  020003                                    3  PRESENT WEATHER (SEE NOTE 1) [CODE TABLE]
+    59  004024                                   -6  TIME PERIOD OR DISPLACEMENT [HOUR]
+    60  020004                                    2  PAST WEATHER (1) (SEE NOTE 2) [CODE TABLE]
+    61  020005                                    2  PAST WEATHER (2) (SEE NOTE 2) [CODE TABLE]
+    62  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+    63  014031                              missing  TOTAL SUNSHINE [MINUTE]
+    64  004024                                  -24  TIME PERIOD OR DISPLACEMENT [HOUR]
+    65  014031                                  114  TOTAL SUNSHINE [MINUTE]
+    66  007032                                 1.00  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [M]
+    67  004024                                  -12  TIME PERIOD OR DISPLACEMENT [HOUR]
+    68  013011                                  0.0  TOTAL PRECIPITATION/TOTAL WATER EQUIVALENT [KG/M**2]
+    69  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+    70  013011                              missing  TOTAL PRECIPITATION/TOTAL WATER EQUIVALENT [KG/M**2]
+    71  007032                                 2.00  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [M]
+    72  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+    73  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+    74  012111                              missing  MAXIMUM TEMPERATURE, AT HEIGHT AND OVER PERIOD SPECIFIED [K]
+    75  004024                                  -12  TIME PERIOD OR DISPLACEMENT [HOUR]
+    76  004024                                    0  TIME PERIOD OR DISPLACEMENT [HOUR]
+    77  012112                               287.45  MINIMUM TEMPERATURE, AT HEIGHT AND OVER PERIOD SPECIFIED [K]
+    78  007032                                14.70  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [M]
+    79  002002                                    8  TYPE OF INSTRUMENTATION FOR WIND MEASUREMENT [FLAG TABLE]
+    80  008021                                    2  TIME SIGNIFICANCE [CODE TABLE]
+    81  004025                                  -10  TIME PERIOD OR DISPLACEMENT [MINUTE]
+    82  011001                                   14  WIND DIRECTION [DEGREE TRUE]
+    83  011002                                  0.8  WIND SPEED [M/S]
+    84  008021                              missing  TIME SIGNIFICANCE [CODE TABLE]
+    85  004025                              missing  TIME PERIOD OR DISPLACEMENT [MINUTE]
+    86  011043                              missing  MAXIMUM WIND GUST DIRECTION [DEGREE TRUE]
+    87  011041                              missing  MAXIMUM WIND GUST SPEED [M/S]
+    88  004025                              missing  TIME PERIOD OR DISPLACEMENT [MINUTE]
+    89  011043                              missing  MAXIMUM WIND GUST DIRECTION [DEGREE TRUE]
+    90  011041                              missing  MAXIMUM WIND GUST SPEED [M/S]
+    91  007032                              missing  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [M]
+    92  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+    93  002004                              missing  TYPE OF INSTRUMENTATION FOR EVAPORATION MEASUREMENT OR TYPE OF C [CODE TABLE]
+    94  013033                              missing  EVAPORATION/EVAPOTRANSPIRATION [KG/M**2]
+    95  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+    96  014002                              missing  LONG-WAVE RADIATION, INTEGRATED OVER PERIOD SPECIFIED [J/M**2]
+    97  014004                              missing  SHORT-WAVE RADIATION, INTEGRATED OVER PERIOD SPECIFIED [J/M**2]
+    98  014016                              missing  NET RADIATION, INTEGRATED OVER PERIOD SPECIFIED [J/M**2]
+    99  014028                              missing  GLOBAL SOLAR RADIATION (HIGH ACCURACY), INTEGRATED OVER PERIOD S [J/M**2]
+   100  014029                              missing  DIFFUSE SOLAR RADIATION (HIGH ACCURACY), INTEGRATED OVER PERIOD [J/M**2]
+   101  014030                              missing  DIRECT SOLAR RADIATION (HIGH ACCURACY), INTEGRATED OVER PERIOD S [J/M**2]
+   102  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+   103  014002                              missing  LONG-WAVE RADIATION, INTEGRATED OVER PERIOD SPECIFIED [J/M**2]
+   104  014004                              missing  SHORT-WAVE RADIATION, INTEGRATED OVER PERIOD SPECIFIED [J/M**2]
+   105  014016                              missing  NET RADIATION, INTEGRATED OVER PERIOD SPECIFIED [J/M**2]
+   106  014028                              missing  GLOBAL SOLAR RADIATION (HIGH ACCURACY), INTEGRATED OVER PERIOD S [J/M**2]
+   107  014029                              missing  DIFFUSE SOLAR RADIATION (HIGH ACCURACY), INTEGRATED OVER PERIOD [J/M**2]
+   108  014030                              missing  DIRECT SOLAR RADIATION (HIGH ACCURACY), INTEGRATED OVER PERIOD S [J/M**2]
+   109  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+   110  004024                              missing  TIME PERIOD OR DISPLACEMENT [HOUR]
+   111  012049                              missing  TEMPERATURE CHANGE OVER SPECIFIED PERIOD [K]

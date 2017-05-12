@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use GFL::Image;
+
+print "\n";
+print "Testing some GFL functions\n";
+print "--------------------------\n";
+
+$a = GFL::Image->new;
+  $a->Set('verbose' => 1);
+  $a->Load("data/test1");
+  $infos = $a->get(BitmapInformations);
+
+print STDERR "BitmapInformations :\n";
+
+  foreach (keys %$infos)
+  {
+  	print "\t$_ => $infos->{$_}\n" if $infos->{$_};
+  }
+
+  $a->Set(Output => 'png');
+  $a->Contrast(-20);
+  $a->Resize(200.23, 299.56);
+  $a->Rotate(30);
+
+print STDERR "Size after Rotate is : " . join('x', $a->get(Width,Height)) . "\n";
+
+  $a->Contrast(12);
+  $a->brightness(10);
+  $a->gamma(2.4);
+  $a->sharpen(12);
+  $a->Filter(MedianBox => 3,
+ 	    GaussianBlur => 5,
+	    Average => 3
+	    ) or print $a->{'lasterror'};
+  $a->ChangeDepth("256");
+  $a->Save("data/test.png");
+  $a->set(
+  	  ReplaceExtension => 1,
+  	  Dither =>1,
+	  BinaryDither => 'floyd',
+	  Quality => 60,
+	  Output => 'jpeg'
+	  );
+   $a->changedepth('binary');
+   $a->changedepth('truecolors');
+   $a->save('data/test.gif');
+   $infos = GFL::Image->GetFileInformations ('data/test.jpg');
+  foreach (keys %$infos)
+  {
+  	print "\t$_ => $infos->{$_}\n" if $infos->{$_};
+  }
+
+undef($a);
+

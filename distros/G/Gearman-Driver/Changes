@@ -1,0 +1,172 @@
+Revision history for Gearman-Driver
+
+0.02008     Thu Jan 16 2014
+            - Do not initialize Log4perl if it was already initialized. (Roman F.)
+            - Use Module::Runtime::use_module instead of Class::MOP::load_class
+
+0.02007     Sun Oct 21 2012
+            - Bundle Module::Install 1.06
+              See also: http://goo.gl/TXzhQ
+
+0.02006     Fri Jan 13 2012
+            - Finish job before killing the processes
+            - Add --daemonize , let gearman-driver run as daemon
+            - Gearman::XS worker run in non-blocking I/O mode, reduce CPU resource a bit.
+            - Don't use Gearman::XS 0.9, this will break compatibility with PHP client.
+            - Implement GLOBAL keyword for attribute 'worker_options'
+
+0.02005     Mon May 10 2010
+            - Add missing YAML dependency required for running the
+              testsuite
+
+0.02004     Wed May 05 2010
+            - Implement --configfile to gearman-driver.pl, allow defined runtime options in this
+              file and applied when startup.
+            - Implement 'worker_options' attribute to Gearman::Driver, initialize worker handy.
+            - Implement 'job_runtime_attributes' attribute, allow define job min_processes,max_processes handy.
+
+0.02003     Sat Apr 24 2010
+            - Fix race condition when using ProcessGroup
+
+0.02002     Fri Apr 16 2010
+            - Only show warning when (Max|Min)Processes are redefined
+            - Graceful shutdown between tests
+            - Add 'ERROR: ' label to console
+
+0.02001     Wed Mar 24 2010
+            - Log error if observer gets disconnected from gearmand
+              and auto-reconnect it
+            - Do not hide class loading errors
+            - Refactor testsuite to be less resource intensive
+
+0.02000     Thu Feb 18 2010
+            - Remove smoker debugging
+
+0.01999_02  Tue Feb 16 2010
+            - Remove crappy tests
+
+0.01999_01  Sun Feb 14 2010
+            - Do not support deprecated (Min|Max)Childs attribute
+              anymore, please use (Min|Max)Processes instead
+            - Be careful, this release has a different add_job()
+              signature!
+            - Possible to group many job methods into one single
+              process (see ProcessGroup)
+            - Parent & childs communication via STDOUT
+            - Remove (useless) extended_status feature
+
+0.01025_01  Sat Feb 13 2010
+            - Check connection before running testsuite
+
+0.01025     Tue Feb 09 2010
+            - Force usage of Gearman::Driver::Adaptor::PP in testsuite
+
+0.01024     Mon Feb 08 2010
+            - Do not use gearman-xs in testlib anymore
+
+0.01023     Fri Feb 05 2010
+            - Remove Try::Tiny from wrapped job method
+
+0.01022     Wed Feb 03 2010
+            - Child/parent communication using unix socket now
+              instead of Cache::FastMmap
+
+0.01021     Tue Feb 02 2010
+            - Fix META.yml
+
+0.01020     Tue Feb 02 2010
+            - Write cache only if necessary
+            - Add adaptors for pure perl Gearman and Gearman::XS
+            - Stop POE::Kernel in childs
+
+0.01019     Mon Feb 01 2010
+            - Make extended status optional
+
+0.01018     Mon Feb 01 2010
+            - Remove crap dot-files from release # osx--
+
+0.01017     Sat Jan 30 2010
+            - Add real world example to convert images
+
+0.01016     Sat Jan 30 2010
+            - New tool: gearman_driver_console.pl (console client)
+            - Every console command ends with ".\n", even errors
+            - Show lastrun/lasterror/lasterror_msg in 'show' command
+            - Command 'killall' accepts 'magic' parameter '*' to kill
+              every job
+
+0.01015     Thu Jan 28 2010
+            - New console commands: show, kill, killall,
+              set_processes
+            - Tidied status output of Gearman::Driver::Console
+            - Method get_jobs is sorted now
+            - New option: max_idle_time
+            - Refactored worker loading: Gearman::Worker::Loader
+
+0.01014     Mon Jan 25 2010
+            - Refactor console for being more extensible
+
+0.01013     Sun Jan 24 2010
+            - If console_port is set to 0 it's disabled at all
+
+0.01012     Sat Jan 23 2010
+            - Rename (Max|Min)Childs to (Max|Min)Processes
+              (Min|Max)Childs still supported
+            - Add shutdown command to management console
+
+0.01011     Fri Jan 22 2010
+            - Implement management console
+            - Ensure enough childs running each 5 seconds (not
+              depending on usage of Gearman::Driver::Observer)
+            - Fix broken module loading
+
+0.01010     Thu Jan 21 2010
+            - Fix no namespaces handling
+            - Use Try::Tiny in Gearman::Driver::Job instead of eval
+            - Add 'wanted' attribute to filter worker classes
+
+0.01009     Tue Jan 19 2010
+            - Refactor add_job method
+            - Refactor inheritance, no attributes required anymore
+
+0.01008     Mon Jan 18 2010
+            - Support single class names in namespaces parameter
+            - Set interval to 0 to disable Observer
+
+0.01007     Sat Jan 16 2010
+            - Add new methods override_attributes and
+              default_attributes to worker base class
+            - Support MinChilds(0)
+
+0.01006     Mon Jan 11 2010
+            - Remove 'CloseOnCall' POE::Wheel::Run option
+
+0.01005     Sat Jan 09 2010
+            - Updated example scripts
+            - Lower dependencies version
+
+0.01004     Fri Jan 01 2010
+            - Added debug logging
+            - Changed default loglayout
+            - Added possibility to change child process name
+
+0.01003     Thu Dec 31 2009
+            - Added script/gearman_driver.pl
+            - Make sure 'end' method in worker class is run even if
+              the worker method dies
+            - Fixed broken subclassing of Gearman::Driver::Worker
+
+0.01002     Wed Dec 30 2009
+            - Added Decoder/Encoder attribute
+            - Refactored parsing of method attributes
+
+0.01001     Wed Dec 30 2009
+            - Added 'server' attribute to Gearman::Driver::Worker
+
+0.01000_02  Wed Dec 30 2009
+            - Renamed Gearman::Driver::Wheel => Gearman::Driver::Job
+            - Fixed wrong arguments passed to begin/end methods in
+              Gearman::Driver::Worker
+
+0.01000_01  Tue Dec 29 2009
+            - Initial developer release.

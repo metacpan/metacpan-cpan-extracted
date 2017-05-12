@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Games::Perlwar::Shell;
+
+Games::Perlwar::Shell::run();

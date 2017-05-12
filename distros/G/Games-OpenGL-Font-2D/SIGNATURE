@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.42.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 0c92090c9d1e077a99b36194277ddc1199582db7 BUGS
+SHA1 3e0c64334f59f5488749dca3f8028b02994794e7 CHANGES
+SHA1 f4f1d6c08424bf7550a95ce6911045a98f69e0a8 CREDITS
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 3b5d1a8692edb069b24708086aa90a156815146f MANIFEST
+SHA1 492a6f5b4abbade1fa77e252cc0333e76267c77a META.yml
+SHA1 07e0d084a90f4bfd0f7c16be959b22cee6396885 Makefile.PL
+SHA1 07c44b07a8fa9704ce07dc42c2d2eff2b0d58a31 README
+SHA1 41f53216265bfaef39688855e48f91475930e600 TODO
+SHA1 fe7311d4b22922ce4a4e666174c0bf9e359d0ff3 data/courier.bmp
+SHA1 a156283e9ceebed4dee5464b099860637ea49691 examples/font.pl
+SHA1 7a1cbbaf215c24d8232f352aba47c608484d6682 examples/lib/SDL/App/FPS/MyFont.pm
+SHA1 44589d4bb593257df0e5abf1d6af0da12eb85de8 examples/lib/SDL/OpenGL/Cube.pm
+SHA1 b6c92e74d247873e593dc2b2ced5067aafce3db2 lib/Games/OpenGL/Font/2D.pm
+SHA1 1f3aaa713f195953b6b5202dfd4215360c4a2097 t/chars.txt
+SHA1 e8084e809ddca1fb0932e92e4d1039567400f717 t/font.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iQEVAwUBRANjq3cLPEOTuEwVAQEe3Qf9GtauKRUw/zv70gX41OOsh9dkVuu9P25o
+HGnBDHrxwbqNmkLFrVAk6MS2r4dkfOvdqAjca3fzGSGUH0Z4X9Zg7OubJe/LjCbQ
+bauA7XFZjO8N+QNMtgp7XhYvIxWUVhZumQ1KkOm0dNnuLZaW44V8ZP7F/sESr7Hv
++76w9C/Dn8MgALtL3Bux9zE/0GwCx54kWAHmz6GZc5GuEYF813VGsD1RYjxvtxmT
+0YS8CtdgN6jX164Im0nt7QjlPAFU5OqJAMwTxOmYijlTmZUnay4OYT+hWd/sLOD7
+NgePnf2K+e7yhlSFhrYtr4MMCE2S40bU0Uv/Zx32zrZVr8Vh89ZLYQ==
+=msqX
+-----END PGP SIGNATURE-----

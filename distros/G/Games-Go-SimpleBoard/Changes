@@ -1,0 +1,16 @@
+Revision history for Perl extension Games::Go::SimpleBoard.
+
+1.01 Tue Jul 29 12:07:53 CEST 2008
+        - added MARK_SMALL_GRAYED flag for small grayed out stones.
+
+1.0  Tue Jul 29 11:42:46 CEST 2008
+	- first release, out-bundled from KGS.
+        - is_valid_move checks for MARK_GRAYED now.
+        - suicide stones are removed now from the board.
+        - marks of the current move were lost, due to removal of the marks
+          of the previous moves.
+
+0.2  Mon May 17 03:35:10 CEST 2004
+	- first release, part of KGS.
+
+

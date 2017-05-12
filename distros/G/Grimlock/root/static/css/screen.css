@@ -1,0 +1,81 @@
+body {
+  background: #000;
+  color: #eee;
+
+  
+}
+/*	Define align-center, left, right cell classes for cell alignment   */
+	.yui3-skin-sam .yui3-datatable td.align-right {
+		text-align:right;
+	}
+
+	.yui3-skin-sam .yui3-datatable td.align-left {
+		text-align:left;
+	}
+
+	.yui3-skin-sam .yui3-datatable td.align-center {
+		text-align:center;
+	}
+
+
+  .yui3-datatable-cell {
+    color: #000
+  }
+/*  define images to be used in TD cell formatters for Edit / Delete  */
+	
+	.cell-delete {
+	    background: url("/static/images/delete.png") no-repeat scroll center center transparent;
+	    cursor: pointer;
+	    height: 8px;
+	    width: 8px;
+	}		
+
+	.cell-edit {
+	    background: url("/static/images/b_edit.png") no-repeat scroll center center transparent;
+	    cursor: pointer;
+	    height: 8px;
+	    width: 8px;
+	}		
+
+	#data-table table tr td {
+		cursor: pointer;
+	}
+/*  CSS for this page display */
+	
+		table #dt_info {
+			border-collapse:collapse;
+		}
+
+		table #dt_info td {
+			border: 1px solid #444;			
+			padding: 8px 8px;
+		} 
+
+		table #dt_info th {
+			border: 1px solid #444;			
+			padding: 8px 8px;
+			background-color: #090;  
+		} 
+
+		#myfieldset {
+			background-color:#FFF5DF;
+			border-radius: 7px;
+			-moz-border-radius: 7px;
+			-webkit-border-radius: 7px;
+		}
+
+		#myfieldset input[type=text]{
+			width: 10em;
+		}
+#banner {
+  float: left;
+  margin: 0;
+}
+
+#banner-text {
+  font: bold small-caps 500%;
+  margin-left: 3em;
+  height: 235px;
+  font-size: 10em;
+  font-family: Impact;
+}

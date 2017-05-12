@@ -1,0 +1,48 @@
+Games-CroqueMonster
+
+This module implements the public API (v0.8.1) from the free CroqueMonster web game (http://www.croquemonster.com).
+More informations about the API canbe found at http://www.croquemonster.com/api/help
+
+This module needs the following dependencies (all available on CPAN if not in Perl distro) :
+ - LWP::Simple
+ - XML::Simple
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Games::CroqueMonster
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-CroqueMonster
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Games-CroqueMonster
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Games-CroqueMonster
+
+    Search CPAN
+        http://search.cpan.org/dist/Games-CroqueMonster
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Arnaud Dupuis
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

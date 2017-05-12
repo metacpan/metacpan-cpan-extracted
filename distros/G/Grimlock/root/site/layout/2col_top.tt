@@ -1,0 +1,37 @@
+[%
+DEFAULT left_column_template  = 'left_column';
+DEFAULT left_column_class     = 'column';
+DEFAULT right_column_template = 'right_column';
+DEFAULT right_column_class    = 'column';
+
+DEFAULT bottom_content_class  = page.content_class;
+bottom_content_class = '' IF bottom_content_class == 'none';
+
+DEFAULT column_wrapper_class  = bottom_content_class;
+column_wrapper_class = '' IF column_wrapper_class == 'none';
+~%]
+<div class="float_container [% column_wrapper_class %]">
+    <div class="left [% left_column_class %]">
+    [%~
+    TRY;
+        PROCESS $left_column_template;
+    CATCH file;
+        '<p>Error rendering left column</p>';
+        IF c.debug;
+            '<p>' _ file.info _ '</p>';
+        END;
+    END;
+    %]</div>
+    <div class="right [% right_column_class %]">
+    [%~
+    TRY;
+        PROCESS $right_column_template;
+    CATCH file;
+        '<p>Error rendering right column</p>';
+        IF c.debug;
+            '<p>' _ file.info _ '</p>';
+        END;
+    END;
+    %]</div>
+</div>
+<div class="[% bottom_content_class %]">[% content %]</div>

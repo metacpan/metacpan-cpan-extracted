@@ -1,0 +1,368 @@
+$Id: Changes,v 1.30 2011-08-11 10:38:17 joern Exp $
+
+Revision history and release notes for Gtk2::Ex::FormFactory:
+
+0.67 Thu Aug 11, 2011, joern
+    Features:
+    - Added parse_tags option to TextView. This way you
+      can easily create tagged text by using a simple
+      HTML based markup syntax: <tag name="...">Tagged text</tag>.
+    - Added HPaned widget
+
+0.66 Sun Nov 11, 2009, joern
+    Features:
+    - image attribute for Button and ToggleButton; set a
+      filename here to put an arbitrary image on a button
+      
+    Bugfixes:
+    - Applied patches from Jeff Hallock fixing a bunch of
+      "Use of uninitialized value" warnings. As well Jeff
+      fixed a bug which renders empty "getter" prefixes
+      unusable.
+    - build() Method now prevents building a Factory twice
+      by itself.
+    - Container->add_child_widget() missed registering
+      children to the Form Factory.
+    - Widget activity tracking called active check callback
+      without an object reference if no object was currently
+      set instead of rendering the widget inactive in that case.
+
+0.65 Sun Jul 2, 2006, joern
+    Bugfixes:
+    - Don't use for() loops with global $_ iterator, which interacts
+      badly with application method calls which modify $_ as well
+
+0.64 Sat Jun 17, 2006, joern
+    Features:
+    - Gtk2::Ex::FormFactory
+      - Added options 'yes_label' and 'no_label' to open_confirm_window().
+    - Gtk2::Ex::FormFactory::Button
+      - Added 'with_repeat' option, which triggers the callback
+        continuously as long button is pressed.
+
+    Bugfixes:
+    - Gtk2::Ex::FormFactory::Label:
+      - Set initial text only if the widget object has no associated
+        object attribute.
+    - Gtk2::Ex::FormFactory::ToggleButton:
+      - Set button label only if no stock icon is given.
+
+0.63 Sun Apr 23, 2006, joern
+    Bugfixes:
+    - Gtk2::Ex::FormFactory::Notebook:
+      - fixed an exception which occured if no object is
+        associated with the Notebook
+    - Gtk2::Ex::FormFactory::Layout
+      - fixed wrong set_gtk_widget/set_gtk_parent_widget for
+        Gtk2::Ex::FormFactory::GtkWidget objects
+
+0.62 Sun Apr 9, 2006, joern
+    Bugfixes:
+    - Associate tab label widgets with the page content widget,
+      so if the page gets inactive the label greys out as well.
+    - Notebook:  show page before switching to it, otherwise
+      page-switching is ignored. This was workarounded until now
+      by a delayed page-switching, which didn't work with recent
+      gtk2 versions anymore, so the true fix for this issue was
+      overdue ;) Thanks to Alex Petkov <alexandphyllis AT excite.com>
+      for the detailed bug report and debugging info.
+
+0.61 Sun Apr 2, 2006, joern
+    Features:
+    - You can check whether an application object was changed
+      with the GUI using the new Proxy's 'object_changed'
+      attribute. Additionally you can control which attributes
+      shouldn't affect the object's changed state with a
+      regex passed as 'changes_attr_filter' when adding the
+      object to the Context.
+    - You can add icons to Notebook tab titles by prefixing the
+      title with the stock item named in square brackets.
+
+    Bugfix:
+    - Prevent double object update triggering when switching
+      Notebook tabs and Radiobuttons.
+
+0.60 Mon Mar 27, 2006, joern
+    Features:
+    - Gtk2::Ex::FormFactory::Menu
+      - Add 'active_cond' and 'active_depends' keys to the
+        menu item definition to control widget activity not
+        just on a per object basis.
+    - Gtk2::Ex::FormFactory::Widget:
+      - active_cond may return not just a boolean but one of
+        the strings 'insensitive', 'invisible', 'sensitive',
+        'visible' to get the corresponding state.
+    - Gtk2::Ex::FormFactory::ExecFlow:
+      - New widget for displaying Event::ExecFlow job plans
+    - Gtk2::Ex::FormFactory::VPaned:
+      - New container widget for Gtk2::VPaned
+    - Gtk2::Ex::FormFactory::ToggleButton:
+      - Stock image support added
+    - Gtk2::Ex::FormFactory::Context
+      - Some internal cleanup to reduce memory footprint
+
+    Bugfixes:
+    - Gtk2::Ex::FormFactory::Menu
+      - On cleanup deregistering of objects the menu
+        depends on was not complete.
+    - Gtk2::Ex::FormFactory::Context
+      - Widgets with active_depends => "object.attr" (not just
+        an object) weren't updated if the object changed.
+
+0.59 Wed Dec 28, 2005, joern
+    Features:
+    - Default layout implementaion for width/height now uses
+      set_size_request() only for non-window widgets and
+      set_default_size() for windows, which is better in
+      general.
+
+    Bugfixes:
+    - Small layout issue of buttons with stock image and
+      a defined but empty label fixed.
+
+0.58 Sun Oct 9, 2005, joern
+    Features:
+    - Gtk2::Ex::FormFactory::Container:
+      - new methods add_child_widget() and remove_child_widget()
+	to add/remove Widgets at runtime. E.g. you can extend
+	a notebook at runtime. Thanks to Kaare Rasmussen for
+	the suggestions.
+    - Buffered context objects: EXPERIMENTAL!
+      - if you specify 'buffered => 1' on Context->add_object
+	a buffering Proxy will be used for this object. That
+	means all attribute updates are buffered in the proxy
+	object instead of passing them through to the underlying
+	application object immediately. This way you can use
+	a synchronized FormFactory (with all the advantages
+	of automatically widget updating/activating stuff)
+	but the possibility to cancel all changes easily.
+	DialogButtons take care of this, so a "Cancel" button
+	is displayed in a FormFactory automatically if all
+	widgets in this factory are connected to a buffered
+	context object. Tested with simpler forms and works
+	for me, but this may not work in very complex forms
+	with a lot of internal dependencies, in particular if
+	your callbacks for activation checking and stuff don't
+	use the Context but access the original object directly,
+	which doesn't see any changes until the FormFactory
+	is applied!
+    - Gtk2::Ex::FormFactory::List: prevent unnecessary selection
+      updates not only for lists with the attr_select_column
+      property set
+    - Gtk2::Ex::FormFactory::Widget: active_cond callback now
+      gets the current application object passed.
+
+    Bugfixes:
+    - Gtk2::Ex::FormFactory::Context: active_depends property
+      didn't work with an array ref of attributes as stated
+      in the docs.
+    - Gtk2::Ex::FormFactory::Label: don't try to update from
+      an object atribute without any set.
+
+0.57 Mon Aug 1, 2005, joern
+    Features:
+    - Gtk2::Ex::FormFactory::Window:
+      - on window close FormFactory->close is called automatically
+	if the Window is the 1st child of the FormFactory,
+	unless a closed_hook is set. Thanks to Kaare Rasmussen
+	for the hint.
+      - added 'quit_on_close' option, which quits the Gtk2
+	main loop as well in that case. 
+    - Gtk2::Ex::FormFactory::List:
+      - scroll to selected row only on first show, to prevent
+	unneccessary scrolling.
+      - trigger selection dependency updates only when the
+	selection really changed (but only for Lists with
+	attr_select and attr_select_column set, because
+	otherwise a selection change can't be detected
+	safely)
+    - Documentation updates & fixes
+
+    Bugfixes:
+    - Gtk2::Ex::FormFactory::Layout: setting 'scrollbars'
+      for non-scrollable widgets didn't work
+    - Gtk2::Ex::FormFactory::Notebook: restore selected page
+      only if an object attribute is associated with the
+      Widget.
+    - Gtk2::Ex::FormFactory: POD typo fixed, thanks for the
+      report to Christian Marillat.
+
+0.56 Wed Jul 20, 2005, joern
+    Features:
+    - Gtk2::Ex::FormFactory::Rules:
+      - added 'zero', 'non-zero', 'positive-zero-integer',
+	'negative-zero-integer', 'positive-zero-float',
+	'negative-zero-float' rules.
+      - added special 'or-empty' rule, refer to the man page
+	for details.
+      - added 'executable-command' rule.
+    - Gtk2::Ex::FormFactory::Context:
+      - added get_object_attr() helper method to retrieve
+	a specific application object attribute
+      - added 'accessor' option to the ->add_object() method
+    - Gtk2::Ex::FormFactory::Widget:
+      - added 'label_for' attribute, so auto-generated labels
+	can be bound to specific widgets as well.
+      - added 'avtive_cond' and 'active_depends' attributes
+	for direct activity control of the widget.
+      - added 'changed_hook_after'
+    - Gtk2::Ex::FormFactory::Popup:
+      - added 'items' attribute for static popup content
+    - Gtk2::Ex::FormFactory::Popup:
+      - default 'scale' to 1 of no other scaling options
+	are given, images would be invisible without this.
+    - Gtk2::Ex::FormFactory:
+      - added 'with_cancel' option to the ->open_confirm_window()
+	helper method
+    - Gtk2::Ex::FormFactory::CheckButtonGroup:
+      - dimensions can be configured through application
+	object attributes. Row and/or column labels may
+	be added.
+    - Gtk2::Ex::FormFactory::Label:
+      - added bold option.
+    - Gtk2::Ex::FormFactory::Layout:
+      - center button icons/labels.
+
+    Bugfixes:
+    - Gtk2::Ex::FormFactory::Combo: rule checking didn't work.
+    - Gtk2::Ex::FormFactory::Widget: rule checking in synchronized
+      FormFactories didn't work if no object attribute was
+      associated with the widget
+    - Gtk2::Ex::FormFactory::Table: due to missing outer whitespace
+      truncation parsing of some table layouts was messed up.
+    - Gtk2::Ex::FormFactory::List: dropped "selects_object"
+      feature introduced in 0.55 because this can be easily done
+      by defining attribute dependencies.
+    - Gtk2::Ex::FormFactory::Layout: setting a label group
+      didn't work for Label widgets, only for implicite labels
+      set through the Widget's label attribute.
+    - Gtk2::Ex::FormFactory::Loader: VSeparator setup was missing.
+
+0.55 Mon Jul 11, 2005, joern
+    Features:
+    - Added a fully functional tutorial program (a simple music
+      database) which makes use of a lot of simple and advanced
+      Gtk2::Ex::FormFactory features. Not documented yet, but
+      nevertheless a good example to learn how Gtk2::Ex::FormFactory
+      works. More details in tutorial/README.
+    - On demand loading of widget modules saves some memory
+    - Gtk2::Ex::FormFactory::Context
+      - pass object aggregation information to define
+	dependencies between objects. This way all dependent
+	objects update automatically if their parent object
+	changes.
+      - defining constant attribute accessors is now possible,
+	e.g. for simple Combo presets not changing at runtime.
+      - new method set_object_attr() sets an specific application
+	object attribute and triggers corresponding GUI updates
+    - Gtk2::Ex::FormFactory::List
+       - new attribute "selects_object" for lists representing
+	 an index of objects to select one of them. The
+	 corresponding widgets are updated automatically
+	 once the list selection changes.
+       - new attribute "visible" to control visibility of columns
+       - new attribute "no_header" to suppress list headers
+       - new attribute "attr_select_column" to have specific
+	 column values instead of selected indices in the
+	 "attr_select" attribute
+    - Gtk2::Ex::FormFactory::Label: declare an arbitrary Label
+      widget as the label of another widget, so this label is
+      deactivated/activated together with the assigned widget
+      automatically, even in complex layouts.
+    - Gtk2::Ex::FormFactory::Popup: additional data model,
+      two dimensional array to define ordered key/value pairs.
+    - Gtk2::Ex::FormFactory::Window: title may be controlled
+      by an application object.
+    - Gtk2::Ex::FormFactory::Widget: moved get_widget() from
+      Gtk2::Ex::FormFactory to here, so it's available for
+      all widgets, not only in a FormFactory.
+
+    Bugfixes:
+    - Removed ok_hook() from Gtk2::Ex::FormFactory::Intro
+      documentation, which was never implemented that way.
+    - Tooltips on combo entries didn't work.
+
+0.54 Sun May 29, 2005, joern
+    Features:
+    - Gtk2::Ex::FormFactory::Table now handles arbitrary
+      alignments of widgets in the cells.
+    - Gtk2::Ex::FormFactory: new convenience method
+      change_mouse_cursor().
+    - Gtk2::Ex::FormFactory::Layout: no frames around
+      forms if placed on a notebook page
+
+0.53 Sun Apr 10, 2005, joern
+    Features:
+    - $ff->get_widget($name) added.
+    - $context->remove_object($name) added.
+    - DialogButtons: control the set of buttons displayed.
+
+    Bugfixes:
+    - Timestamp: placeholders were mixed up, so the calculated
+      timestamp was nonsense for some values.
+    - Widget's changed_hook wasn't called at the appropriate
+      time for some widgets.
+
+0.52 Sun Feb 06, 2005, joern
+    Bugfixes:
+    - Popup: didn't consider custom attribute activity conditions
+      in all cases.
+    - Container: apply_changes() didn't recurse correctly into
+      all children
+
+    Features:
+    - New widgets:
+      - CheckButtonGroup: a table of check buttons representing
+	a multiple selection of predefined values.
+      - GtkWidget: support arbitrary Gtk widgets which aren't worth
+	an own Gtk2::Ex::FormFactory module.
+      - TextView: a Gtk2::TextView
+      - Timestamp: Entries to enter correct timestamps down to minute
+	level, while calculating internally with unix timestamps.
+    - FormFactory: added parent_ff attribute
+    - FormFactory: added hide parameter to open() and show() method
+    - FormFactory: added open_confirm_window() method
+    - FormFactory: added get_image_path() method
+    - Button: added stock attribute
+    - Combo: added presets attribute
+    - DialogButtons: buttons may now be controlled with the object
+      attribute's value
+    - HBox/VBox: added no_frame attribute
+    - List: added update_selection_only attribute
+    - Proxy: get_attr/set_attr consider object.attr notation
+      accordingly and switch to the proxy of the correspondent
+      object for convenience.
+    - Table: warn if table layout string contains tab characters
+    - Widget: added gtk_properties_widget
+    - Widget: added label_markup attribute
+    - Widget: added 'type' option to show_error_message() and
+      error windows are now modal.
+      => WARNING: incompatible API change!
+    - Window: added closed_hook attribute
+
+0.51 Mon Dec 27, 2004, joern
+    Bugfixes:
+    - Container: on cleanup the internal content list was
+      set to undef instead to [].
+
+    Features:
+    - Context: attr_depends_href extended, so it accepts a list
+      reference of attributes an attribute depends on, not
+      only a single attribute.
+    - Image: with a constant scale of 1 all magic regarding scale
+      calculation is switched off
+    - Window: if a window has a FormFactory parent, FormFactory->close()
+      is called automatically when the window is destroyed.
+    - Container: Print a better error message if a child of a
+      container isn't defined.
+
+    Notes:
+    - Added GPL LICENSE file to the distribution
+
+0.50 Sat Nov 20, 2004, joern
+    First public release. Refer to http://www.exit1.org/
+    for comprehensive online documentation.
+
+    WARNING: API is not stable yet and may change incompatibly.
+
+

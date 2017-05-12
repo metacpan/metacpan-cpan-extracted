@@ -1,0 +1,255 @@
+{
+          '1014951181699' => {
+                             'type_id' => '3380',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => undef,
+                             'location_id' => '60015001',
+                             'singleton' => '0',
+                             'item_id' => '1014951181699'
+                           },
+          '1014951190823' => {
+                             'type_id' => '32918',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => undef,
+                             'location_id' => '60015001',
+                             'singleton' => '0',
+                             'item_id' => '1014951190823'
+                           },
+          '1014958051702' => {
+                             'type_id' => '482',
+                             'quantity' => '2',
+                             'flag' => '4',
+                             'raw_quantity' => undef,
+                             'location_id' => '60000715',
+                             'singleton' => '0',
+                             'item_id' => '1014958051702'
+                           },
+          '386946187' => {
+                         'type_id' => '444',
+                         'quantity' => '1',
+                         'flag' => '4',
+                         'raw_quantity' => '-1',
+                         'location_id' => '60000715',
+                         'singleton' => '1',
+                         'item_id' => '386946187'
+                       },
+          '1014950826591' => {
+                             'type_id' => '34',
+                             'quantity' => '5084',
+                             'flag' => '4',
+                             'raw_quantity' => undef,
+                             'location_id' => '60015001',
+                             'singleton' => '0',
+                             'item_id' => '1014950826591'
+                           },
+          '1014950826587' => {
+                             'type_id' => '3638',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => '-1',
+                             'location_id' => '60015001',
+                             'singleton' => '1',
+                             'item_id' => '1014950826587'
+                           },
+          '1014950826588' => {
+                             'type_id' => '3651',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => '-1',
+                             'location_id' => '60015001',
+                             'singleton' => '1',
+                             'item_id' => '1014950826588'
+                           },
+          '1014951104344' => {
+                             'type_id' => '483',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => '-1',
+                             'location_id' => '60000715',
+                             'singleton' => '1',
+                             'item_id' => '1014951104344'
+                           },
+          '1014967932514' => {
+                             'type_id' => '17456',
+                             'quantity' => '72503',
+                             'flag' => '4',
+                             'raw_quantity' => undef,
+                             'location_id' => '60000715',
+                             'singleton' => '0',
+                             'item_id' => '1014967932514'
+                           },
+          '1014951263276' => {
+                             'type_id' => '483',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => '-1',
+                             'location_id' => '60000715',
+                             'singleton' => '1',
+                             'item_id' => '1014951263276'
+                           },
+          '1014951232473' => {
+                             'contents' => {
+                                             '1014957890964' => {
+                                                                'type_id' => '2454',
+                                                                'quantity' => '1',
+                                                                'flag' => '87',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014957890964'
+                                                              },
+                                             '1014973313932' => {
+                                                                'type_id' => '482',
+                                                                'quantity' => '1',
+                                                                'flag' => '27',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014973313932'
+                                                              },
+                                             '1014967921942' => {
+                                                                'type_id' => '2454',
+                                                                'quantity' => '1',
+                                                                'flag' => '87',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014967921942'
+                                                              },
+                                             '1014973314468' => {
+                                                                'type_id' => '482',
+                                                                'quantity' => '1',
+                                                                'flag' => '28',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014973314468'
+                                                              },
+                                             '1014955351911' => {
+                                                                'type_id' => '22542',
+                                                                'quantity' => '1',
+                                                                'flag' => '11',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014955351911'
+                                                              },
+                                             '1014958009242' => {
+                                                                'type_id' => '3829',
+                                                                'quantity' => '1',
+                                                                'flag' => '21',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014958009242'
+                                                              },
+                                             '1014950977200' => {
+                                                                'type_id' => '399',
+                                                                'quantity' => '1',
+                                                                'flag' => '19',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014950977200'
+                                                              },
+                                             '1014958059551' => {
+                                                                'type_id' => '2333',
+                                                                'quantity' => '1',
+                                                                'flag' => '20',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014958059551'
+                                                              }
+                                           },
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'location_id' => '60014680',
+                             'singleton' => '1',
+                             'item_id' => '1014951232473',
+                             'type_id' => '32880',
+                             'raw_quantity' => '-1'
+                           },
+          '1014951385057' => {
+                             'type_id' => '1178',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => '-2',
+                             'location_id' => '60015001',
+                             'singleton' => '1',
+                             'item_id' => '1014951385057'
+                           },
+          '1014951245365' => {
+                             'type_id' => '21858',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => '-2',
+                             'location_id' => '60015001',
+                             'singleton' => '1',
+                             'item_id' => '1014951245365'
+                           },
+          '1014950891769' => {
+                             'type_id' => '601',
+                             'quantity' => '1',
+                             'flag' => '0',
+                             'raw_quantity' => '-1',
+                             'location_id' => '30001407',
+                             'singleton' => '1',
+                             'item_id' => '1014950891769'
+                           },
+          '1014950826582' => {
+                             'contents' => {
+                                             '1014951251460' => {
+                                                                'type_id' => '1317',
+                                                                'quantity' => '1',
+                                                                'flag' => '12',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014951251460'
+                                                              },
+                                             '1014950915036' => {
+                                                                'type_id' => '562',
+                                                                'quantity' => '1',
+                                                                'flag' => '27',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014950915036'
+                                                              },
+                                             '1014955421255' => {
+                                                                'type_id' => '1317',
+                                                                'quantity' => '1',
+                                                                'flag' => '11',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014955421255'
+                                                              },
+                                             '1014951264501' => {
+                                                                'type_id' => '483',
+                                                                'quantity' => '1',
+                                                                'flag' => '28',
+                                                                'raw_quantity' => '-1',
+                                                                'singleton' => '1',
+                                                                'item_id' => '1014951264501'
+                                                              }
+                                           },
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'location_id' => '60015001',
+                             'singleton' => '1',
+                             'item_id' => '1014950826582',
+                             'type_id' => '601',
+                             'raw_quantity' => '-1'
+                           },
+          '1014956703153' => {
+                             'type_id' => '2454',
+                             'quantity' => '3',
+                             'flag' => '4',
+                             'raw_quantity' => undef,
+                             'location_id' => '60000715',
+                             'singleton' => '0',
+                             'item_id' => '1014956703153'
+                           },
+          '1014950910190' => {
+                             'type_id' => '3838',
+                             'quantity' => '1',
+                             'flag' => '4',
+                             'raw_quantity' => undef,
+                             'location_id' => '60015001',
+                             'singleton' => '0',
+                             'item_id' => '1014950910190'
+                           }
+        }

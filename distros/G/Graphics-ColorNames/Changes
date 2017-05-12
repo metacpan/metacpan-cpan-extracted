@@ -1,0 +1,208 @@
+Revision history for Perl extension Graphics::ColorNames (with significant
+updates noted by asterisks, '*'):
+
+2.11    Thu Jan 10 2008
+	- updated version number for release
+	- minor changes of text format
+	- added fix for problems with Graphics::ColorNames::GrayScale
+
+2.10_05 Tue Jan  8 2008
+	* checks if modules already loaded before re-loading them
+	  (uses Module::Loaded for this)
+	- requires changed to load for dynamically loaded modules
+	- updated README
+
+2.10_04 Sun Jan  6 2008
+	- reverted back to standard object-oriented style
+	- Tie::Sub is only loaded when a subroutine is used for scheme
+
+2.10_03 Sat Jan  5 2008
+	- tests use Test::Exception to catch errors
+	- rewrite parts of documentation to emphasize object-oriented
+	  interface rather than the tied interface
+	- implemented a proper DESTROY method
+	- misc code cleanup and reorganization
+
+2.10_02 Fri Jan  4 2008
+	* added support for Color::Library dictionaries
+	- minor changes to error messages
+	- underscores in color names ignored
+	- auto-loading color names in object-oriented interface, e.g.
+	  $obj->black()
+	- stubs for DESTROY and UNTIE methods
+	- 06-obj.t test more flexible
+	- pointless 01-ColourNames test removed
+	- more updates to documentation
+
+2.10_01 Thu Dec 20 2007
+	* non-word characters (spaces, punctuation) now ignored in
+	  color names
+	* smarter handling of comments in rgb.txt files
+	* significant rewrite to parts of the code, requires Tie::Sub
+	* rewritten how FIRSTKEY and NEXTKEY methods work
+	- better error handling
+	- minor updates to documentation
+	- typos in comments
+	- added better checking for minimum Perl version reqs
+	- added aliaes w/out punctuation in Netscape scheme
+
+2.04    Mon Dec 17 2007
+	- fixed inconsistencies in Netscape color scheme
+
+2.03    Mon Dec 17 2007
+	- fixed glitch with version test
+	- cleaned up format of text files
+	- removed unneeded dependency
+
+2.02    Sun Dec 16 2007
+	- renamed developer-related test scripts
+	- removed 90-prereqs.t (it wasn't working properly sometimes)
+	- added DEVEL_TESTS environment variable as requirement for
+	  developer tests
+	- README generated from POD using Pod::Readme
+
+2.01    Sun Dec 16 2007
+	- Changed versions of specific color schemes to match main module
+	* Removed Graphics::ColourNames from the distribution
+	- updated documentation for Netscape.pm
+
+2.0_04  Tue Oct 24 2006
+	- fixed Pod::Coverage tests (RT#20923)
+	- various optimizations
+	- changed to use inside-out object scheme
+	- no longer signing code (too many problems w/Module::Signature)
+
+2.0_03  Fri Apr  8 2005
+	- fixed bug with reading scheme from FileHandle type
+	- fixed glitch in pod-coverage test
+	- corrected version in Graphics::ColourNames
+	- added tests to check versions in sync
+
+2.0_02  Thu Apr  7 2005
+	- lesser-used routines made into autoloaded methods
+	- added Test::Portabiity::Files test
+	- minor updates for Netscape theme
+	- added support for :utility export tag
+	- added support for :all export tag
+
+2.0_01  Mon Apr  4 2005
+	- removed DSLIP information from POD, since it has little meaning
+	- tweaked code
+	- color scheme can be a module name
+	- fixed bug in Pod::Coverage test, uses Test::Pod::Coverage
+	* major change in how schemes are stored, which affects priority
+	  when CODE scheme types are used
+	- can load rgb.txt from GLOB, FileHandle or IO::File
+	- references can be specified as possible schemes in constructor
+	- added public load_scheme method
+	- various optimizations and tweaks
+	- IO::File is loaded only as needed
+	- rgb.txt file must be radable to be loaded
+	- tweaked tests
+	- RGB passthrough now consistently returns lowercase values
+	- minor optimization in FETCH for RGB passthrough
+	- added all_schemes function to query schemes
+
+1.06	Tue Mar 29 2005
+	- cleaned up tests
+	- added DSLIP information to POD
+	- added Test::Pod tests
+        - added Pod::Coverage tests
+	- minor documentation changes
+	- uses Test::Prereq to test distro prereqs
+	- added SIGNATURE to distribution
+
+1.05    Fri Sep  3 2004
+	- correction to Graphics::ColourNames
+	- correction to README
+
+1.04    Fri Sep  3 2004
+	- updates to POD
+	- a filehandle for a rgb.txt file can be specified
+
+1.03    Thu Aug 26 2004
+	- hooks to support CODE scheme types (as with module
+          Graphics::ColorNames::GrayScale 2.00)
+        - ColourNames.pm has same version of ColorNames.pm
+
+1.02    Tue Aug 24 2004
+	- added Graphics::ColourNames alias
+	- minor changes to ColorNames.pm
+
+1.01    Wed Aug 18 2004
+	- corrected typo in REQUIREMENTS (wrong Perl version)
+	- uses Module::Load for improved dynamic loading
+	- EXISTS works across multiple color schemes
+	- bug in FETCH that returned key has been fixed
+
+1.00    Sat Jul 31 2004
+	- changed version to 1.00 as release appears to be stable
+	- corrected bad link in POD
+
+0.39_04 Mon Jul 26 2004
+	- rebuilt distribution with proper META.yml
+
+0.39_03 22 Jul 2004
+	- added required rgb.txt for tests to MANIFEST and distro
+
+0.39_02 22 Jul 2004
+	* now requires Perl 5.6.0
+	- uses IO::File
+	- option to parse an rgb.txt file
+	- removed TODO from distribution
+	- Netscape.pm, HTML.pm and Windows.pm warnings enabled
+	- additions and corrections in POD
+
+0.39_01 21 Jul 2004
+	- added Build.PL to distribution
+	- added hex() and rgb() methods
+	- created object-oriented interface
+	- additions and corrections in POD
+
+0.32   5 Dec 2002
+	- fixed inconsistencies with grey/gray spellings in X.pm
+	- added note in POD about using rt.cpan.org for bug reports
+	- minor changes in POD for Netscape.pm
+        - added TODO file
+
+0.31  23 Oct 2002
+	- fixed mispelling of "fuchsia" in HTML.pm
+
+0.30   4 Oct 2001
+	- fixed bug with non-existent color names
+	- corrected some typos in and updated the documentation
+	- added multiple color naming schemes
+	- when passed a value in the form of '#000000', returns that value
+
+0.24  28 Apr 2001
+	- fixed  colors in X.pm (such as some 'green') defined as 0x000000
+	- removed duplicate grays (ie, 'gray0') from X.pm
+	- renamed test suite files to enforce testing order
+	- v0.23 mistakenly dated 17 Mar instead of 17 April
+
+0.23  17 Apr 2001
+	- X-Windows color names now from rgb.txt (includes names with
+	  spaces, such as 'alice blue' as well as 'aliceblue')
+	- Added Netscape color naming scheme
+
+0.22  15 Mar 2001
+	- added example on how to add your own naming schema
+	- schema files (X.pm, HTML.pm, Windows.pm) were stored in the
+	  wrong subdirectories
+	- removed test.pl and double-testing
+
+0.21  12 Mar 2001
+	- fixed an issue with Test::Harness expecting t/*.t tests
+
+0.20  11 Mar 2001
+	- no longer a Tie::Hash
+	- additional example in POD
+	- added Test::Harness and a better test suite
+	- commented-out 'use warnings' in modules
+	- addition of tuple2hex function
+	- changed the way files are included in the distribution
+
+0.10  19 Feb 2001
+	- original (experimental) version released
+
+

@@ -1,0 +1,72 @@
+Graph::Flowchart
+================
+
+This module helps you to assemble flowcharts for code.
+It will generate Graph::Easy objects, which can then be output in various
+formats like HTML, ASCII, Unicode boxart drawings, graphviz or SVG.
+
+As an example look for Devel::Graph, which uses this package to turn this:
+
+	my $a = shift;
+	my $b = 1;
+	if ($a < 9)
+	  {
+	  $b = $a + 1;
+	  }
+	return $b + 2;
+
+into a Graph::Easy object, which lets you then generate output like
+the following:
+
+	##################
+	#     start      #
+	##################
+	  |
+	  |
+	  v
+	+----------------+
+	| my $a = shift; |
+	| my $b = 1;     |
+	+----------------+
+	  |
+	  |
+	  v
+	+----------------+
+	|  if ($a < 9)   |--+
+	+----------------+  |
+	  |                 |
+	  | true            |
+	  v                 |
+	+----------------+  |
+	|  $b = $a + 1;  |  |
+	+----------------+  |
+	  |                 |
+	  |                 | false
+	  v                 |
+	+----------------+  |
+	| return $b + 2; | <+
+	+----------------+
+	  |
+	  |
+	  v
+	##################
+	#      end       #
+	##################
+
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2006 by Tels C<http://bloodgate.com>
+
+See the LICENSE file for more information.
+

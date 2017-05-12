@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Dstqthism.html
+t/Geomag-Kyoto-Dst.t
+lib/Geomag/Kyoto/Dst.pm
+META.yml                                 Module meta-data (added by MakeMaker)

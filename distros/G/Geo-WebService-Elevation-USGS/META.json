@@ -1,0 +1,67 @@
+{
+   "abstract" : "Get elevation data from the USGS",
+   "author" : [
+      "Tom Wyant (wyant at cpan dot org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-WebService-Elevation-USGS",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Scalar::Util" : "1.1",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::WebService::Elevation::USGS" : {
+         "file" : "lib/Geo/WebService/Elevation/USGS.pm",
+         "version" : "0.106"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-WebService-Elevation-USGS"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Geo-WebService-Elevation-USGS.git",
+         "web" : "https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS"
+      }
+   },
+   "version" : "0.106",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

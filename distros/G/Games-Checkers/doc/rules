@@ -1,0 +1,108 @@
+The Rules of Checkers
+=====================
+
+Board
+-----
+
+The regular checkerboard is comprised of 64 squares of contrasting colors,
+like black and white. The checker pieces may be red and white in color (or
+any combination of contrasting colors), usually grooved.
+
+The black board squares are numbered either 1 to 32 or using the chess a1 to
+h8 notation. The diagram below shows the pieces set up for play, with Black
+occupying squares 1 to 12 (lines 6 to 8 in the chess notation) and White
+occupying squares 21 to 32 (lines 1 to 3 in the chess notation).
+
+Chess notation:
+
+   +-------------------------------+
+ 8 |   |:@:|   |:@:|   |:@:|   |:@:|
+   |---+---+---+---+---+---+---+---|
+ 7 |:@:|   |:@:|   |:@:|   |:@:|   |
+   |---+---+---+---+---+---+---+---|
+ 6 |   |:@:|   |:@:|   |:@:|   |:@:|
+   |---+---+---+---+---+---+---+---|
+ 5 |:::|   |:::|   |:::|   |:::|   |
+   |---+---+---+---+---+---+---+---|
+ 4 |   |:::|   |:::|   |:::|   |:::|
+   |---+---+---+---+---+---+---+---|
+ 3 |:O:|   |:O:|   |:O:|   |:O:|   |
+   |---+---+---+---+---+---+---+---|
+ 2 |   |:O:|   |:O:|   |:O:|   |:O:|
+   |---+---+---+---+---+---+---+---|
+ 1 |:O:|   |:O:|   |:O:|   |:O:|   |
+   +-------------------------------+
+     a   b   c   d   e   f   g   h  
+
+Numerical notation:
+
+         1       2       3       4
+   +-------------------------------+
+   |   |:@:|   |:@:|   |:@:|   |:@:| 4
+   |---+---+---+---+---+---+---+---|
+  5|:@:|   |:@:|   |:@:|   |:@:|   |
+   |---+---+---+---+---+---+---+---|
+   |   |:@:|   |:@:|   |:@:|   |:@:|12
+   |---+---+---+---+---+---+---+---|
+ 13|:::|   |:::|   |:::|   |:::|   |
+   |---+---+---+---+---+---+---+---|
+   |   |:::|   |:::|   |:O:|   |:::|20
+   |---+---+---+---+---+---+---+---|
+ 21|:O:|   |:O:|   |:::|   |:O:|   |
+   |---+---+---+---+---+---+---+---|
+   |   |:O:|   |:O:|   |:O:|   |:O:|28
+   |---+---+---+---+---+---+---+---|
+ 29|:O:|   |:O:|   |:O:|   |:O:|   |
+   +-------------------------------+
+     29      30      31      32
+
+Each player (White and Black) controls its own army of pieces. Pieces move
+only on dark squares which are numbered. The white pieces always move first
+in opening the game. For example, suppose White were to open the game by
+moving the piece on 23 to the square marked 19, like shown above. This would
+be recorded as 23-19. Or e3-f4 in the chess notation. Another possible
+notation is ef4.
+
+The goal
+--------
+
+The goal in the checkers game is either to capture all of the opponent's
+pieces or to blockade them. If neither player can accomplish the above, the
+game is a draw.
+
+Moves
+-----
+
+Starting with White, the players take turns moving one of their own pieces.
+A 'piece' means either a 'man' (other name is 'pawn') - an ordinary single
+checker or a 'king' which is what a man becomes if it reaches the last rank
+(see kings). A man may move one square diagonally only forward - that is,
+toward the opponent - onto an empty square.
+
+Captures
+--------
+
+Checkers rules state that captures or 'jumps' are mandatory. If a square
+diagonally in front of a man is occupied by an opponent's piece, and if the
+square beyond that piece in the same direction is empty, the man may 'jump'
+over the opponent's piece and land on the empty square. The opponent's piece
+is captured and removed from the board.
+
+In some variants, if in the course of single or multiple jumps the man
+reaches the last rank, becoming a king, the turn shifts to the opponent;
+no further 'continuation' jump is possible.
+ 
+The kings
+---------
+
+When a single piece reaches the last rank of the board by reason of a move,
+or as the completion of a 'jump', it becomes a king; and that completes the
+move, or 'jump'.
+
+A king can move in any of the four diagonal directions and skip zero, one or
+more empty cells, as the limits of the board permit. Similarly, the king can
+optionally capture exactly one opponent piece at a time during such jump.
+
+In some variants, a king has the same limits as a man (can't skip empty
+cells), just moves and captures in 4 diagonal directions, as opposed to 2
+forward directions.

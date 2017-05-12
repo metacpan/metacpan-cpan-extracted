@@ -1,0 +1,33 @@
+
+=head1 NAME
+
+Git::ReleaseRepo
+
+=head1 DESCRIPTION
+
+This application is for creating and managing a release repository, filled with Git submodules of all the other repositories that comprise the code in your release.
+
+=head1 USAGE
+
+    # Clone an existing release repository
+    releaserepo clone <release_repo>
+
+    # Or create a new release repository
+    mkdir release;
+    cd release;
+    git init;
+
+    # Add a brand-new submodule to the repository
+    releaserepo add Foo git@github.com:Foo.git
+
+    # Update an existing submodule to the latest master/HEAD
+    releaserepo add Bar
+
+    # Do the release
+    releaserepo release v1.00
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012 Doug Bell (preaction)
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

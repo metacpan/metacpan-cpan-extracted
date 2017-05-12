@@ -1,0 +1,28 @@
+# ChangeLog for app-shells/ash
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/ash/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  12 May 2004; Bryan Østergaard <kloeri@gentoo.org> ash-1.6.ebuild:
+  Stable on alpha.
+
+  07 May 2004; Gustavo Zacarias <gustavoz@gentoo.org> ash-1.6.ebuild:
+  Stable on sparc wrt bug #50378
+
+  07 May 2004; Ilya A. Volynets-Evenbaks <iluxa@gentoo.org> ash-1.6.ebuild:
+  add ~mips
+
+  25 Feb 2004; Jason Wever <weeve@gentoo.org> ash-1.6.ebuild:
+  Added ~sparc keyword.
+
+*ash-1.6 (09 Feb 2003)
+
+  07 Apr 2003; Martin Holzer <mholzer@gentoo.org> :
+  Updated digest. Really closes #18154.
+
+  10 Feb 2003; Seemant Kulleen <seemant@gentoo.org> ash-1.6.ebuild :
+
+  Moved the patch off-site to the mirrors instead, and did some ebuild
+  syntax cleanup.
+
+  09 Feb 2003; Matthew Turk <satai@gentoo.org> :
+  Initial import.  Ebuild submitted by Tavis Ormandy <taviso@sdf.lonestar.org>

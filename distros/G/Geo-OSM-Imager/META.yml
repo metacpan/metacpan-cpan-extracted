@@ -1,0 +1,44 @@
+---
+abstract: 'simplifies plotting onto OpenStreetMap tiles'
+author:
+  - 'Roger Bell_West.'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-OSM-Imager
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Geo::OSM::Imager:
+    file: lib/Geo/OSM/Imager.pm
+    version: '0.03'
+requires:
+  Geo::Ellipsoid: '1.14'
+  HTTP::Request::Common: '6.06'
+  Imager: '1.000'
+  LWP::UserAgent: '6.15'
+  List::MoreUtils: '0.33'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Firedrake/Geo-OSM-Imager/issues
+  homepage: https://github.com/Firedrake/Geo-OSM-Imager
+  repository: git://github.com/Firedrake/Geo-OSM-Imager.git
+version: '0.03'
+x_contributors:
+  - 'Roger Bell_West <roger@firedrake.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

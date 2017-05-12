@@ -1,0 +1,29 @@
+# ChangeLog for app-shells/rrs
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/rrs/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  15 Jun 2004; Daniel Black <dragonheart@gentoo.org> rrs-1.50.ebuild,
+  rrs-1.55.ebuild:
+  x86 stable
+
+*rrs-1.70 (04 Jun 2004)
+
+  04 Jun 2004; Daniel Black <dragonheart@gentoo.org> +rrs-1.70.ebuild:
+  version bump as per bug #52492 thanks to Sven Wegener
+  <sven.wegener+gentoo-bugzilla@stealer.net>
+
+*rrs-1.55 (18 May 2004)
+
+  18 May 2004; Daniel Black <dragonheart@gentoo.org> +rrs-1.55.ebuild:
+  version bump thanks to sven.wegener@stealer.net in bug #51318
+
+  13 May 2004; David Holm <dholm@gentoo.org> rrs-1.50.ebuild:
+  Added to ~ppc.
+
+*rrs-1.50 (13 May 2004)
+
+  13 May 2004; Daniel Black <dragonheart@gentoo.org> +metadata.xml,
+  +files/1.50-include-string.h.patch, +rrs-1.50.ebuild:
+  Initial import thanks Sven Wegener <sven.wegener@stealer.net> for the ebuild
+  in bug #50897
+

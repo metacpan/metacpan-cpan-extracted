@@ -1,0 +1,48 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Alien::Gimp: '0.01'
+  Data::Dumper: '2'
+  ExtUtils::MakeMaker: '0'
+  Gtk2: '1'
+  Gtk2::Ex::PodViewer: '0'
+  HTML::Entities: '0'
+  IO::All: '0'
+  IO::Scalar: '0'
+  PDL: 2.007_04
+  Test::More: '0.88'
+  Web::Scraper: '0'
+configure_requires:
+  Alien::Gimp: '0.01'
+  ExtUtils::Depends: '0.402'
+  ExtUtils::MakeMaker: '7.14'
+  Gtk2: '1'
+  IO::All: '0'
+  PDL: 2.007_04
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gimp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Gimp: '0.01'
+  Data::Dumper: '2'
+  Gtk2: '1'
+  Gtk2::Ex::PodViewer: '0'
+  HTML::Entities: '0'
+  IO::All: '0'
+  IO::Scalar: '0'
+  PDL: 2.007_04
+  Web::Scraper: '0'
+  perl: '5.014001'
+resources:
+  repository: git://git.gnome.org/gimp-perl
+version: '2.32'

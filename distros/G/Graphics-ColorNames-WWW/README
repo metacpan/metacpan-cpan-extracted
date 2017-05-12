@@ -1,0 +1,34 @@
+Graphics::ColorNames::WWW
+
+  The "Graphics:ColorNames::WWW" module provides the full list of
+  color names from various Web specifications and implementations.
+
+INSTALLATION
+
+  To install this module type the following:
+
+     perl Build.PL
+     ./Build
+     ./Build test
+     ./Build install
+
+DEPENDENCIES
+
+  This module requires these other modules and libraries:
+
+     - Graphics::ColorNames
+
+AUTHOR
+
+  Claus Färber <CFAERBER@cpan.org>
+
+  Based on C<Graphics::ColorNames::HTML> by Robert Rothenberg.
+
+LICENSE
+
+  Copyright © 2005-2009 Claus Färber.
+
+  Copyright © 2001-2004 Robert Rothenberg.
+
+  All rights reserved.  This program is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.

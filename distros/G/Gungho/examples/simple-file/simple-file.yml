@@ -1,0 +1,5 @@
+---
+provider:
+    module: File::Simple
+    config:
+        filename: examples/simple-file/url.txt

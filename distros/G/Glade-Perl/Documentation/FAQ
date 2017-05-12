@@ -1,0 +1,200 @@
+This is the Frequently Asked Question list for Glade-Perl source generator
+--------------------------------------------------------------------------
+Q   When I try to update Glade-Perl with 'perl -MCPAN -e shell' I get:
+
+    Warning: Cannot install Glade-Perl, don't know what it is.
+    Try the command
+
+        i /Glade-Perl/
+
+A   I don't think that it is possible to install 'Glade-Perl' but you must
+    install one of the sub modules and CPAN.pm will fetch and build all the
+    Glade-Perl modules for you. There is another problem as CPAN.pm reads
+    the version numbers from 02packages.data.txt and they're not all correct.
+    I don't know whether this my fault or some historical accident but it
+    _is_ possible to get the latest version by installing Glade::PerlRun.
+    
+        perl -MCPAN -e shell
+    
+    and then in the interactive shell you enter:
+    
+        install Glade::PerlRun
+        
+    and this should fetch, build, test and install Glade-Perl for you.
+    You must be superuser to actually install the modules of course.
+
+--------------------------------------------------------------------------
+Q   How do I see diagnostic messages when using glade2perl or from Glade?
+
+A   The simplest way (from version 0.58) is to call glade2perl from the
+    command line and specify a verbosity of 2 so:
+        glade2perl project.glade 2
+    
+    will give you a log file called project.glade2perl.log wherever the
+    project.glade file is.
+    
+    Otherwise copy glade2perl and edit the 'verbose' line to read
+        'verbose' => 2,     # for some diagnostics
+        'verbose' => 4,     # for more diagnostics
+        'verbose' => 6,     # for lots of diagnostics (more than you want ?)
+        'verbose' => 10,    # for every diagnostic message available
+
+    1)  Then either run Glade from a terminal, 
+    2)  call the edited glade2perl directly (and maybe redirect STDOUT to a file)
+    3)  specify a log_file in glade2perl if you want to save the diagnostics.
+        'log_file' => $log_file, # Save diagnostics to Project.glade2perl.log
+        This last option might be best, then all glade2perl runs will save the
+        diagnostics to a file.
+    4)  Edit the project.glade2perl.xml file to specify a line like
+        <diag>
+            <verbose>2</verbose>
+        </diag>
+        This will generate diagnostics every time that you generate this
+        project (but no others)
+        
+--------------------------------------------------------------------------
+Q   How do I get the value of a GtkOptionMenu using Glade-Perl?
+
+A   One way is to connect a handler to the 'hide' signal of the
+    GtkOptionMenu's menu and then inspect the widget. eg. in a Gnome project
+    called 'Reference' with 'optionmenu4' - edit the app_run() method in
+    Reference.pm and write new on_optionmenu4_hide() to be:
+
+    sub app_run {
+        my ($class) = @_;
+        $class->load_translations('Reference');
+        # You can use the line below to load a test .mo file before it is
+        # installed in the normal place 
+        #     (eg /usr/local/share/locale//LC_MESSAGES/Reference.mo)
+    #    $class->load_translations('Reference', 'test', undef, 
+    #        '/home/dermot/Devel/Glade-Perl/Example/Reference/ppo/Reference.mo');
+        Gnome->init('Reference', '0.53');
+        my $window = $class->new;
+        $window->TOPLEVEL->show;
+
+        $window->FORM->{'optionmenu4'}->get_menu->signal_connect( 
+            'hide', "$class\::on_optionmenu4_hide", '', 'optionmenu4', 
+            $window->INSTANCE );
+
+        Gtk->main;
+
+    } # End of sub app_run
+
+    sub on_optionmenu4_hide {
+        my ($class, $data, $object, $instance, $event) = @_;
+        my $me = __PACKAGE__."->on_optionmenu4_hide";
+        # Get ref to hash of all widgets on our form
+        my $form = $__PACKAGE__::all_forms->{$instance};
+
+        my $selected_string = ($class->get_active->children)[0]->get;
+        print "We have selected string $selected_string\n";
+
+    } # End of sub on_optionmenu4_hide    
+
+--------------------------------------------------------------------------
+Q   How do I set fonts, colours and bg-pixmaps of widgets at run time?
+
+A   To change the fonts, colours and bg-pixmaps of widgets at run-time you can
+    use something like the code below. This is for a button so it sets the 
+    style of the button->child (in other words the label in the button) and the 
+    actual way that you set the style will depend on what type of widget you are 
+    working with. 
+    
+    There are many ways to get the colours but this is one approach:
+
+    my $style = new Gtk::Style;
+    my $cm = $form->{'button43'}->get_toplevel->window->get_colormap;
+
+    $style->font(  Gtk::Gdk::Font->load(
+        '-*-times-bold-r-normal-*-*-120-*-*-p-*-iso8859-1'));
+    $style->fg('normal',   $cm->color_alloc(
+        {red=>65000, green=>0,     blue=>0}));
+    $style->fg('prelight', $cm->color_alloc(
+        {red=>0,     green=>30000, blue=>0}));
+    $style->fg('active',   $cm->color_alloc(
+        {red=>0,     green=>0,     blue=>65000 }));
+
+    $form->{'button43'}->child->set_style($style);
+
+--------------------------------------------------------------------------
+Q   How do I write signal handlers in a separate module?
+
+A   As always with Perl, there is more than one way to do it.
+
+    1) The first way is to put your signal handlers in a .pm module and use() 
+    the module from the generated source code. An example of this is the file
+    '$DIST_DIR/Example/Bus/Bus_mySUBS.pm. You then specify this module to 
+    Glade-Perl with the user option 'use_module' which you can check in the
+    distributed script $DIST_DIR/test.pl. This is not the best approach as you
+    have to make sure that you Export the signal_handler names if they are to
+    run when you cause the signal.
+
+    2) The better and simpler way is edit the generated Project.pm module and 
+    put the signal handlers there. See $DIST_DIR/Example/Bus/Generated/Bus.pm.
+    
+    Glade-Perl >= 0.48 generates up to 4 perl files.
+      A) ProjectUI.pm   - the UI constructor class (always written)
+      B) ProjectSIGS.pm - utilities and skeleton signal handlers (always written)
+      C) Project.pm     - a base for your app that you can safely edit
+      D) SubProject.pm  - an example subclass of your app that you can edit
+
+    3) Another way is to subclass the Bus.pm class and put your signal handlers 
+    there. A skeleton subclass is generated in SubProject.pm and you can see a
+    test example generated as $DIST_DIR/Example/Bus/Generated/SubBus.pm and 
+    how to run it by looking at the test script $DIST_DIR/test.pl.
+    
+--------------------------------------------------------------------------
+Q   How do I access widgets to set or get their data/text?
+
+A   Each instance of a form (you can have more than one copy of a UI showing at
+    the same time) stores a complete hash of its widgets in a global anonymous
+    hash (actually defined as $Glade::PerlRun::all_forms) that you can access
+    from your signal handler. One way to get at an entry widget in a signal
+    handler is to look up the widget in this hash.
+
+    The AUTOLOAD()ed signal handler message box shows all the args that would be
+    passed to the relevant signal handler but something like this should work:
+
+      sub my_signal_handler {
+        my ($class, $data, $object, $instance) = @ARG;
+        my $form = $__PACKAGE__::all_forms->{$instance};
+        my $entry_val = $form->{'entry_widget_name'}->get_text;
+        ...
+     }
+
+    This is for the case where the entry widget is on the same form as the 
+    widget that causes the signal. In other cases you will have to store the 
+    $instance value in a global or pass it as an arg somehow.
+
+    Since Glade-Perl-0.59 there is also a sub PerlRun->lookup_widget().
+    It is a new method that accesses a window or a form's widget by name. 
+    It prints an error if the widget does not exist.
+
+      e.g. my $widget = $window->lookup_widget('clist1');
+         
+        OR my $form = $window->FORM;     # or use $form in signal handlers
+           my $widget = $form->lookup_widget('clist1');
+
+    Other unusual ways
+    ------------------
+    Glade-Perl versions >= 0.49 can generate up to 4 different types of
+    hierarchical structure of widgets that can be traversed. The element names
+    will change and I will add object methods so that the implementation can
+    be changed without having to edit your code - but for now beware!
+    This is very alpha but in general you specify a user option 'hierarchy':
+    
+    1) If the option includes 'widget' a structure is generated so you can call 
+       $form->{'__WH'}{'vbox3'}{'frame2'}{'vbox1'}{'entry1'}{'__W'}->get_text;
+
+    2) If the option includes 'class' a structure is generated so you can call 
+       $form->{'__CH'}{'GtkVBox'}{'vbox3'}{'GtkFrame'}{'frame2'}
+          {'GtkVBox'}{'vbox1'}{'GtkEntry'}{'entry1'}{'__W'}->get_text;
+        This allows you to iterate over all widgets of a certain type in any
+        one container - for instance.
+        
+    3) If the option includes 'order' a structure is generated so you can call 
+       my $widget_array = $form->{'__WH'}{'vbox3'}{'frame2'}{'vbox1'}{'__C'};
+       The array ref returned has the widgets in the order they were added to
+       the VBox - in case you need to know :)
+       
+--------------------------------------------------------------------------

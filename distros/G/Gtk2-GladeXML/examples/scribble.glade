@@ -1,0 +1,65 @@
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+
+<glade-interface>
+
+<widget class="GtkWindow" id="main">
+  <property name="visible">True</property>
+  <property name="title" translatable="yes">Scribble GladeXML</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="modal">False</property>
+  <property name="default_width">200</property>
+  <property name="default_height">220</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <signal name="destroy_event" handler="on_main_destroy_event" last_modification_time="Tue, 18 Nov 2003 05:00:04 GMT"/>
+  <signal name="delete_event" handler="on_main_destroy_event" last_modification_time="Tue, 18 Nov 2003 05:10:00 GMT"/>
+
+  <child>
+    <widget class="GtkVBox" id="vbox">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+
+      <child>
+	<widget class="GtkDrawingArea" id="drawing_area">
+	  <property name="width_request">200</property>
+	  <property name="height_request">200</property>
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="has_focus">True</property>
+	  <property name="events">GDK_EXPOSURE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON1_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK</property>
+	  <property name="extension_events">GDK_EXTENSION_EVENTS_CURSOR</property>
+	  <signal name="expose_event" handler="expose_event" last_modification_time="Tue, 18 Nov 2003 05:53:00 GMT"/>
+	  <signal name="configure_event" handler="configure_event" last_modification_time="Tue, 18 Nov 2003 05:53:45 GMT"/>
+	  <signal name="motion_notify_event" handler="motion_notify_event" last_modification_time="Tue, 18 Nov 2003 05:53:58 GMT"/>
+	  <signal name="button_press_event" handler="button_press_event" last_modification_time="Tue, 18 Nov 2003 05:54:10 GMT"/>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkButton" id="button">
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label">gtk-quit</property>
+	  <property name="use_stock">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <signal name="clicked" handler="quit_clicked" last_modification_time="Tue, 18 Nov 2003 05:04:11 GMT"/>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+</glade-interface>

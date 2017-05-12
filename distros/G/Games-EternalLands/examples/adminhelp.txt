@@ -1,0 +1,25 @@
+
+|            Commands only available to admins          
+|-------------------------------------------------------
+|list stock                |show all my stock           
+|list sell                 |show my sell list           
+|list buy                  |show my buy list            
+|give me <N> <Item>        |Give items away             
+|do not sell <Item>        |stop selling <Item>         
+|do not buy <Item>         |stop buying <Item>          
+|tradeing on               |enable tradeing             
+|tradeing off              |disable tradeing            
+|sell <N> <Item> for <G>gc |update sell price and/or qty
+|buy <N> <Item> for <G>gc  |update buy price and/or qty 
+|                                                       
+|          Commands available to everyone               
+|-------------------------------------------------------
+|help                      |this help text             
+|loc                       |tell you my location       
+|owner                     |tell you my owner          
+|inv                       |list what I sell           
+|wanted                    |list what I buy            
+|buy <N> <Item>            |buy <N> <Item> from me     
+|sell <N> <Item>           |sell <N> <Item> to me      
+|donate <N> <Item>         |donate <N> <Item> to me    
+|sto [pattern]             |list storage

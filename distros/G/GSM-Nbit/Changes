@@ -1,0 +1,27 @@
+Revision history for GSM-Nbit
+
+0.01    01.05.2010
+        First version, released on an unsuspecting world.
+
+0.02    02.05.2010
+        Corrected the decode_7bit to handle edge cases correctly.
+        
+0.03    08.05.2010
+        Added few more tests - fixed few bugs.
+        
+0.04    09.05.2010
+        Improved the documentation a bit.
+
+0.05    13.05.2010
+        Some tests fail with old versions of Encode module - suggested updating
+        it in output of fail message.
+
+0.06    14.05.2010
+        Minor typos fixed.
+        
+0.07    15.05.2010
+        More param validation.
+        
+0.08    16.05.2010
+        Made sure it passes "perlcitic --harsh", so minor tweaks. Using cluck
+        instead of warn.

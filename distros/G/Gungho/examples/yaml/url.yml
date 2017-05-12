@@ -1,0 +1,10 @@
+---
+requests:
+    - method: POST
+      url: http://www.technorati.jp/search/Gungho
+      content: |-
+         language=ja
+    - url: http://www.yahoo.co.jp/
+    - url: http://www.perl.com
+      method: GET
+

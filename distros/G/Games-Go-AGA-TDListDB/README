@@ -1,0 +1,38 @@
+
+This package contains Games-Go-AGA-TDListDB.
+
+The American Go Association (AGA) provides a list of currently enrolled
+players.  That list can be fetched from their website as a flat text file
+from:
+
+    https://www.usgo.org/ratings/TDListN.txt
+
+This module (optionally) fetches that file (or any other file specified by
+the caller), parses the information, and places it into a database (SQLite
+by default, but could use others, such as MySQL).
+
+INSTALLATION
+
+To install this module, run the following incantation
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Games::Go::AGA::TDListDB
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Reid Augustin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

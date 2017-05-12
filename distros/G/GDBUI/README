@@ -1,0 +1,43 @@
+Term::GDBUI README
+Scott Bronson
+16 Dec 2003
+
+
+Term::GDBUI makes it easy (almost trivial) to implement a very comprehensive
+Bash or GDB-like user interface.  It supports history, autocompletion,
+quoting, escaping, pretty much everything you would expect of a decent
+shell.
+
+This module would seem similar to Sullivan Beck's Term::TUI module
+except that Term::TUI uses a custom hierarchical-style interface
+and GDBUI tries to behave as much like Bash and GDB as possible.
+
+
+PREREQUISITES
+
+None!  It runs just fine with Perl's default Term::ReadLine.  However,
+you will not be able to use some features such as command history,
+completion, etc.  Install Term::ReadLine::GNU or Term::ReadLine::Perl
+to take full advantage of Term::GDBUI's features.
+
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+LICENSE
+
+Copyright (c) 2003 Scott Bronson, all rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+AUTHOR
+
+Scott Bronson
+bronson@rinspin.com
+

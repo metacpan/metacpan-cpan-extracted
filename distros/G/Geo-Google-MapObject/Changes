@@ -1,0 +1,19 @@
+Revision history for Geo-Google-MapObject
+
+0.01  Tue Sep 29 08:21:04 2009
+       Initial release.
+
+0.02  Fri Sep 30 
+      Added autocalculation of zoom level and center. Went over documentation very carefully.
+
+0.03  Mon Oct 5 2009
+      Added Test::Prereq. Added JSON dependency.
+
+0.04  Sun Oct 18 2009
+      Tried to make deep testing more robust.
+
+0.05  Tue Oct 20 2009
+      Also missed issue with static_map_url
+
+0.06  Wed Nov 18 2009
+      More autozoom static_map_url tests

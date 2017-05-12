@@ -1,0 +1,22 @@
+Revision history for Games-Word
+
+0.06  2012-07-05
+      - make anagrams and subwords_of faster (srollyson)
+      - fix jotto when the word list has non-word characters in it
+      - cleanups, etc
+
+0.05  2009-11-16
+      - A few minor cleanups, convert to Dist::Zilla
+
+0.04  2008-12-18
+      - Fix is_substring
+
+0.03  2008-12-17
+      - More test fixups
+      - Add spook solver
+
+0.02  2008-02-04
+      - Fix up some docs and tests.
+
+0.01  2008-02-03
+      - First version, released on an unsuspecting world.

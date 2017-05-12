@@ -1,0 +1,10 @@
+This file describes the contents of the 'eg' directory, which contains
+examples of the use of the Geo::WebService::Elevation::USGS module. It contains the
+following files:
+
+README - this file.
+
+usgs_ele - A simple command-line interface to Geo::WebService::Elevation::USGS. The
+	commands are Geo::WebService::Elevation::USGS method names, with the
+	parameters being the method arguments. An 'exit' command is
+	added.

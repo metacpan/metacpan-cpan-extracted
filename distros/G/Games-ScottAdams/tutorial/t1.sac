@@ -1,0 +1,7 @@
+%room chamber
+square chamber
+%exit e dungeon
+
+%room dungeon
+gloomy dungeon
+%exit w chamber

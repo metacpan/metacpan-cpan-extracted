@@ -1,0 +1,26 @@
+Revision history for Games-WoW-Armory
+
+0.0.7 Jeu 27 sep 12:56:29 2007  
+    - big update by Andrew Yochum (fix realm, new tests, ...)
+
+0.0.6  Fri Jun 01 21:30:00 2007
+    - pod update (added =item)
+
+0.0.5  Fri Jun 01 16:40:00 2007
+    - a non-case-sensitive regex for matching country 
+        (as suggested by sabine.hurka@freeda.info)
+    - Games::WoW::Armory::Character
+    - Games::WoW::Armory::Guild
+    - Games::WoW::Armory::Team
+    - get informations about a team
+    - store information about a character in $self->character, which is 
+        a Games::WoW::Character object
+    - store information about a guild in $self->guild, which is a
+        Games::WoW::Guild object
+    - store information about a team in $self->team, which is a 
+        Games::WoW::Team object
+    - improve POD
+
+0.0.1  Tue Mar 13 14:35:16 2007
+       Initial release.
+

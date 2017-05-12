@@ -1,0 +1,388 @@
+# -*- Mode: Perl -*-
+
+###############################################################
+#
+#      File: Getopt::Gen::Parser.yp
+#    Author: Bryan Jurish <Gen/cmdline_pod.pm>
+#
+# Description: Yapp parser specification for
+#              DWDS query strings
+#
+###############################################################
+
+###############################################################
+# Header section
+###############################################################
+%{
+
+###############################################################
+#
+#        Source: Getopt::Gen::Parser.yp
+# Source Author: Bryan Jurish <Gen/cmdline_pod.pm>
+#
+#   Description: Yapp parser for DWDS query strings
+#
+###############################################################
+
+#==============================================================
+# * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING *
+#==============================================================
+#  Do *NOT* change Parser.pm directly, change Parser.yp
+#  and re-call 'yapp' instead!
+#==============================================================
+
+package Getopt::Gen::Parser;
+
+#--------------------------------------
+# Package variables
+#--------------------------------------
+our $VERSION = 0.04;
+
+#--------------------------------------
+# Hint routines
+#--------------------------------------
+# undef = $yapp_parser->show_hint($hint_code,$curtok,$curval)
+sub show_hint {
+  $_[0]->{USER}{'hint'} = $_[1];
+  $_[0]->YYCurtok($_[2]) if (defined($_[2]));
+  $_[0]->YYCurval($_[3]) if (defined($_[3]));
+  $_[0]->YYError;
+}
+
+%}
+
+#--------------------------------------
+# Grammar Start symbol
+#--------------------------------------
+%start specs
+
+#---------------------------------------
+# expect some shift/reduce conflicts:
+#---------------------------------------
+%expect 2
+
+%%
+###############################################################
+# Rules Section
+###############################################################
+
+specs:  { 1 } # --EMPTY
+  | EOI { 1 } # --EOI
+  | specs EOI
+  | specs newlines
+  | specs newlines spec # --RECURSIVE
+  ;
+
+spec:
+  basic_spec
+  | ggo_option_spec
+  | extended_spec
+  | user_spec
+  ;
+
+#-------------------------------------------------------------------
+# extensions
+#-------------------------------------------------------------------
+extended_spec:
+  TOK_CODE string {
+    $_[0]->{USER}{og}->add_user_code($_[2]);
+  }
+  | TOK_RCFILE string {
+    $_[0]->{USER}{og}->add_rcfile($_[2]);
+  }
+  | TOK_ARGUMENT string string kw_decls {
+    $_[0]->{USER}{og}->add_argument({name=>$_[2],descr=>$_[3],%{$_[4]}});
+  }
+  | TOK_GROUP string {
+    $_[0]->{USER}{og}->add_group($_[2]);
+  }
+  | TOK_ON_REPARSE reparse_action {
+    $_[0]->{USER}{og}->set_reparse_action($_[2]);
+  }
+  | TOK_UNNAMED string {
+    $_[0]{USER}{og}{unnamed} = $_[2];
+  }
+  | extended_option_type extended_option_body
+  {
+    $_[0]->{USER}{og}->add_option({ type=>$_[1], %{$_[2]}, },
+				  $_[0]);
+  }
+  ;
+
+
+extended_option_type:
+  TOK_FUNCT { 'funct' }
+  | TOK_FLAG { 'flag2' }
+  | TOK_TOGGLE { 'flag' }
+  | TOK_STRING { 'string' }
+  | TOK_INT { 'int' }
+  | TOK_SHORT { 'short' }
+  | TOK_LONG  { 'long' }
+  | TOK_FLOAT { 'float' }
+  | TOK_DOUBLE { 'double' }
+  | TOK_LONGDOUBLE { 'longdouble' }
+  ;
+
+extended_option_body:
+  longname shortname description kw_decls
+  { my %hash = (long=>$_[1],
+		short=>$_[2],
+		descr=>$_[3],
+		%{$_[4]});
+    \%hash;
+  }
+  ;
+
+reparse_action: string
+  ;
+
+
+## -- arbitrary user strings
+user_spec:
+  symbol user_value
+  {
+    $_[0]->{USER}{og}{USER}{$_[1]} = $_[2];
+  }
+  ;
+
+user_value: string
+  ;
+
+#-------------------------------------------------------------------
+# gengetopt-compatible stuff
+#-------------------------------------------------------------------
+basic_spec:
+    TOK_PACKAGE  string { $_[0]->{USER}{og}{package} = $_[2]; }
+  | TOK_VERSION  string { $_[0]->{USER}{og}{version} = $_[2]; }
+  | TOK_PURPOSE  string { $_[0]->{USER}{og}{purpose} = $_[2]; }
+  | TOK_PODPREAMBLE string { $_[0]->{USER}{og}{podpreamble} = $_[2]; }
+  ;
+
+ggo_option_spec:
+  TOK_OPTION longname shortname description ggo_option_body {
+    $_[0]->{USER}{og}->add_option({
+				   long=>$_[2],
+				   short=>$_[3],
+				   descr=>$_[4],
+				   %{$_[5]},
+				  },
+				  $_[0]);
+  };
+
+
+#-------------------------------------------------------------------
+# gengetopt-compatible declarations
+#-------------------------------------------------------------------
+ggo_option_body:
+  functType {
+    ## -- function-option
+    {type=>'funct',default=>0};
+  }
+  | flagType kw_decls onoff_value {
+    ## -- flag option
+    {type=>'flag', %{$_[2]}, default=>$_[3]};
+  }
+  | option_argument_type kw_decls required {
+    ## -- option with an argument
+    {type=>$_[1], %{$_[2]}, required=>$_[3]};
+  }
+  ;
+
+required: yesno
+  ;
+
+yesno:
+  TOK_NO { "0" }
+  | TOK_YES { "1" }
+  ;
+
+kw_decls: { {} }## -- empty
+  | kw_decls symbol EQUALS string
+    {
+      my %hash = (%{$_[1]}, $_[2]=>$_[4]);
+      \%hash;
+    }
+  ;
+
+functType: TOK_NO;
+
+flagType: TOK_FLAG;
+
+option_argument_type:
+  TOK_STRING
+  | TOK_INT
+  | TOK_SHORT
+  | TOK_LONG
+  | TOK_FLOAT
+  | TOK_DOUBLE
+  | TOK_LONGDOUBLE
+  ;
+
+longname: string | MINUS { "-" };
+
+shortname: SYMBOL
+  {
+    if (length("$_[1]") ne 1) {
+      $_[0]->show_hint('NOT_SHORT_ENOUGH','SHORT_OPTION_NAME',$_[1]);
+    }
+    $_[1];
+  }
+  | MINUS { "-" }
+  ;
+
+description: string
+  ;
+
+onoff_value:
+  TOK_ON { "1" }
+  | TOK_OFF { "0" }
+  ;
+
+symbol:
+  SYMBOL
+  | TOK_CODE
+  ;
+
+## -- strings are implicitly dequoted!
+string:
+  DQ_STRING { $_[1] }
+  | SQ_STRING { $_[1] }
+  | BR_STRING { $_[1] }
+  | BQ_STRING { $_[1] }
+  | SYMBOL { $_[1] }
+  ;
+
+newlines:
+  newline
+  | newlines newline
+  ;
+
+newline: NEWLINE
+  ;
+
+%%
+##############################################################
+# Footer Section
+###############################################################
+
+package Getopt::Gen::Parser;
+
+1;
+
+__END__
+# Pod docs
+=pod
+
+=head1 NAME
+
+Getopt::Gen::Parser - Low-level Yapp parser for Getopt::Gen.
+
+=head1 SYNOPSIS
+
+  use Getopt::Gen::Parser;
+
+  $qpp = Getopt::Gen::Parser->new();
+  $qpp->parse(yylex => sub { ... });
+  # ... any other Parse::Yapp parser routine
+
+  $qpp->show_hint($hint_code,$curtok,$curval);
+
+=cut
+
+#-------------------------------------------------------------
+# Description
+#-------------------------------------------------------------
+=pod
+
+=head1 DESCRIPTION
+
+Getopt::Gen::Parser is a parser class for use by Getopt::Gen.
+This class should not need to be accessed directly.  Instead,
+use the interface methods in C<Getopt::Gen>.
+
+=cut
+
+#-------------------------------------------------------------
+# Variables
+#-------------------------------------------------------------
+=pod
+
+=head1 PACKAGE VARIABLES
+
+The following package variables are declared by
+Getopt::Gen::Parser.
+
+(None).
+
+=cut
+
+#-------------------------------------------------------------
+# Tags
+#-------------------------------------------------------------
+=pod
+
+=head1 EXPORTS
+
+None.
+
+=cut
+
+#-------------------------------------------------------------
+# Methods
+#-------------------------------------------------------------
+=pod
+
+=head1 METHODS
+
+Most methods are inherited from C<Parse::Yapp::Driver>.
+See L<Parse::Yapp> for details on these.
+
+=over 4
+
+=item * C<show_hint($hint_code,$curtok,$curval)>
+
+Hack.  Places $hint_code into the 'hint' field of
+the parser object's C<USER> (read "YYData()") hashref,
+sets YYCurtok and YYCurval to $curtok and $curval
+respectively, and calls the parser object's YYError()
+method.  See L<Getopt::Gen> for details on
+the 'hint' convention.
+
+=back
+
+=cut
+
+#-------------------------------------------------------------
+# Bugs and Limitations
+#-------------------------------------------------------------
+=pod
+
+=head1 BUGS AND LIMITATIONS
+
+Probably many.
+
+=cut
+
+#-------------------------------------------------------------
+# Footer
+#-------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+Parse::Yapp by Francois Desarmenien.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>Gen/cmdline_pod.pmE<gt>
+
+=head1 SEE ALSO
+
+perl(1).
+yapp(1).
+Parse::Yapp(3pm).
+Getopt::Gen(3pm).
+
+=cut

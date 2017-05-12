@@ -1,0 +1,34 @@
+---
+abstract: 'database migration utility for git managed sql'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Git: 0
+  Test::More: 0.86
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GitDDL
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DBI: 0
+  File::Path: 2.07
+  Git::Repository: 0
+  Mouse: 0
+  SQL::Translator: 0.11016
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/typester/GitDDL.git
+version: 0.03

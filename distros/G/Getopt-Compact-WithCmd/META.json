@@ -1,0 +1,85 @@
+{
+   "abstract" : "sub-command friendly, like Getopt::Compact",
+   "author" : [
+      "xaicron <xaicron {at} cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Getopt-Compact-WithCmd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.96",
+            "Test::Output" : "0",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Text::ParseWords" : "0"
+         },
+         "requires" : {
+            "Getopt::Long" : "2.38",
+            "Text::Table" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Getopt::Compact::WithCmd" : {
+         "file" : "lib/Getopt/Compact/WithCmd.pm",
+         "version" : "0.22"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xaicron/p5-Getopt-Compact-WithCmd/issues"
+      },
+      "homepage" : "https://github.com/xaicron/p5-Getopt-Compact-WithCmd",
+      "repository" : {
+         "url" : "git://github.com/xaicron/p5-Getopt-Compact-WithCmd.git",
+         "web" : "https://github.com/xaicron/p5-Getopt-Compact-WithCmd"
+      }
+   },
+   "version" : "0.22",
+   "x_contributors" : [
+      "HIROSE Masaaki <hirose31@gmail.com>",
+      "xaicron <xaicron@gmail.com>"
+   ]
+}

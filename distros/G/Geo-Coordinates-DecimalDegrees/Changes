@@ -1,0 +1,44 @@
+Revision history for Perl extension Geo::Coordinates::DecimalDegrees.
+
+0.09  Tue 04 Oct 2011 10:26:05 PM EDT
+        Fixed typos in synopsis
+
+        Updated copyright to 2011
+
+0.08  Sat 12 Jan 2008 09:47:16 PM EST
+        Changed tests from Test::More to Test::Number::Delta to avoid
+        test failures due to floating point roundoff errors
+
+        Set license in to "perl"
+
+0.07  Tue 02 Jan 2007 10:31:20 PM EST
+        Added test for signature
+
+        Changed copyright to 2007
+
+0.06  Thu 28 Dec 2006 10:46:22 PM EST
+        Return sign of $decimal_degrees in decimal2dms() and
+        decimal2dm() to fix bug 22753
+
+        Added tests to decimal2dms() and decimal2dm() for
+        decimal_degrees between 0 and -1
+
+        Signed the module
+
+0.05  Sun 09 Oct 2005 11:27:00 PM EDT
+        Removed division in decimal2dms by converting the decimal part
+        to minutes instead of seconds
+
+0.04  Sat 21 Jun 2003 11:44:44 AM EDT
+        Added decimal2dm and dm2decimal to SYNOPSIS
+
+0.03  Sat 21 Jun 2003 10:30:14 AM EDT
+        Changed tests to avoid floating point roundoff errors on some platforms
+
+0.02  Wed 18 Jun 2003 03:56:54 PM EDT
+	Added dm2decimal and decimal2dm
+	Added Andy Lester's pod.t
+
+0.01  Sun 15 Jun 2003 11:05:40 PM EDT
+	Initial release
+

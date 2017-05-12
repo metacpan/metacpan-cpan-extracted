@@ -1,0 +1,89 @@
+(name=>'ref to zero-element array',
+ code=>'GraphViz::Data::Structure->new(\[],%title%)->graph->as_canon',
+)
+%%
+(name=>'ref to one-element array',
+ code=>'GraphViz::Data::Structure->new(\["test"],%title%)->graph->as_canon',
+)
+%%
+(name=>'ref to three-element array',
+ code=>'GraphViz::Data::Structure->new(\["larry","moe","curly"],%title%)->graph->as_canon',
+)
+%%
+(name=>'ref to vertical three-element array',
+ code=>'GraphViz::Data::Structure->new(\["larry","moe","curly"],Orientation=>"vertical",%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element array ref to empty arrays',
+ code=>'my @a=([]); 
+        GraphViz::Data::Structure->new(\@a,%title)->graph->as_canon',
+)
+%%
+(name=>'three-element array ref to empty arrays',
+ code=>'my @a=([],[],[]); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element array ref to one-element arrays',
+ code=>'my @a=(["test"]); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element array ref to one-element arrays',
+ code=>'my @a=(["larry"],["moe"],["curly"]); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element array ref to three-element arrays',
+ code=>'my @a=(["larry","moe","curly"]); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element array ref to three-element arrays',
+ code=>'my @a=(["larry","moe","curly"],
+               ["groucho","harpo","chico"],
+               ["seagoon","bloodnok","eccles"]); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element array ref to empty hash',
+ code=>'my @a=({}); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element array ref to empty hashes',
+ code=>'my @a=({},{},{}); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element array ref to one-element hashes',
+ code=>'my @a=({"test"=>1}); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element array ref to one-element hashes',
+ code=>'my @a=({"larry"=>2},{"moe"=>1},{"curly"=>3}); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'single-element array ref to three-element hash',
+ code=>'my @a=({"larry"=>2,"moe"=>1,"curly"=>3}); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'three-element array ref to three-element hashes',
+ code=>'my @a=({"larry"=>2,"moe"=>1,"curly"=>3},
+               {"groucho"=>1,"harpo"=>3,"chico"=>2},
+               {"seagoon"=>2,"bloodnok"=>1,"eccles"=>3}); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'verify port assignments',
+ code=>'my @a=(Nil=>[],Nada=>[],Zip=>[]); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)
+%%
+(name=>'odd characters',
+ code=>'my @a=("<html>"=>[],"<script>"=>[],"<body>"=>[]); 
+        GraphViz::Data::Structure->new(\@a,%title%)->graph->as_canon',
+)

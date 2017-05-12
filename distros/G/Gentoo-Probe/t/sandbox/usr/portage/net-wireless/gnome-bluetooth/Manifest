@@ -1,0 +1,5 @@
+MD5 9604bb3d573ecd574998a290fbc9fd83 gnome-bluetooth-0.4.1.ebuild 1215
+MD5 7a66fef4deb08f29b7cf0de1c2e3a4de metadata.xml 254
+MD5 b89352bab1c54f49b23f5946a5f00275 ChangeLog 1151
+MD5 ff63b2b07eb50db8962f544a45028bee files/digest-gnome-bluetooth-0.4.1 73
+MD5 9c859b033ee9e338893bc5bc3ea21d5a files/gnome-bluetooth-0.4.1-gtk24.patch 2340

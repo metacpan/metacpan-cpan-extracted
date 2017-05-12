@@ -1,0 +1,12 @@
+diff -aur linux-wlan-ng-0.2.1-pre19-orig/src/prism2/download/Makefile linux-wlan-ng-0.2.1-pre19/src/prism2/download/Makefile
+--- linux-wlan-ng-0.2.1-pre19-orig/src/prism2/download/Makefile	2002-09-11 14:08:32.000000000 -0400
++++ linux-wlan-ng-0.2.1-pre19/src/prism2/download/Makefile	2004-02-25 16:24:20.344449424 -0500
+@@ -46,7 +46,7 @@
+ 
+ include ../../../config.mk
+ 
+-CPPFLAGS= -I../../include -I../include -I$(LINUX_SRC)/include -D__LINUX_WLAN__
++CPPFLAGS= -I../../include -I../include -D__LINUX_WLAN__
+ 
+ SRCS =	prism2dl.c
+ 

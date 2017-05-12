@@ -1,0 +1,301 @@
+=head1 NAME 
+
+GRID::Machine::Core - Module loaded when bootstraping the remote Perl server
+
+=head1 DESCRIPTION
+
+The creation of a C<GRID::Machine> object through a call to C<GRID::Machine-E<gt>new>
+implies the loading of a I<Remote Module> called  C<GRID::Machine::Core> which is delivered
+with the C<GRID::Machine> distribution. Another module that is being I<included> at 
+construction time is C<GRID::Machine::RIOHandle>.
+
+One of the final goals of the C<GRID::Machine::Core> remote 
+module is to provide homonymous methods per each of the Perl
+C<CORE::> functions. At present time only a few are supported.
+
+
+The following functions defined in the Remote Module C<GRID::Machine::Core> are loaded
+via the C<include> mechanism on the remote machine. Therefore, they work as methods of the
+C<GRID::Machine> object on the local machine. They perform the same operations than their Perl
+aliases:
+
+=head2 Function C<getcwd>
+
+=head2 Function C<chdir>
+
+=head2 Function C<umask>
+
+=head2 Function C<mkdir>
+
+=head2 Function C<system>
+
+Executes C<system> on the remote machine. See an example:
+
+  $ cat -n examples/transfer2.pl 
+     1  #!/usr/local/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine qw(is_operative);
+     4  use Data::Dumper;
+     5  
+     6  my $host = shift || $ENV{GRID_REMOTE_MACHINE};
+     7  
+     8  my $machine = GRID::Machine->new( 
+     9        host => $host,
+    10        cleanup => 1,
+    11        sendstdout => 1,
+    12        startdir => '/tmp/perl5lib',
+    13        prefix => '/tmp/perl5lib/',
+    14     );
+    15  
+    16  my $dir = $machine->getcwd->result;
+    17  print "$dir\n";
+    18  
+    19  $machine->modput('Parse::Eyapp::') or die "can't send module\n";
+    20  
+    21  print $machine->system('tree');
+    22  my $r =  $machine->system('doesnotexist');
+    23  print Dumper $r;
+
+Observe the overloading of C<bool> at line 19. C<modput> returns
+a C<GRID::Machine::Result> object which is evaluated in a Boolean 
+context as a call to the C<result> getter.
+
+When executed produces an output like:
+
+  $ perl -w examples/transfer2.pl 
+  /tmp/perl5lib
+  .
+  `---- Parse
+      `---- Eyapp
+          |---- Base.pm
+          |---- Cleaner.pm
+          |---- Driver.pm
+          |---- Grammar.pm
+          |---- Lalr.pm
+          |---- Node.pm
+          |---- Options.pm
+          |---- Output.pm
+          |---- Parse.pm
+          |---- Scope.pm
+          |---- TokenGen.pm
+          |---- Treeregexp.pm
+          |---- _TreeregexpSupport.pm
+          |---- Unify.pm
+          `---- YATW.pm
+
+  2 directories, 15 files
+  $VAR1 = bless( {
+                   'stderr' => 'Can\'t exec "doesnotexist":',
+                   'errmsg' => '',
+                   'type' => 'RETURNED',
+                   'stdout' => '',
+                   'errcode' => -1,
+                   'results' => [ -1 ]
+                 }, 'GRID::Machine::Result' );
+
+=head2 Function C<qx>
+
+Similar to backtick quotes. The result depends on the context.
+In a list context returns a list with the lines of the output.
+In a scalar context reurns a string with the output. The value of
+C<$"> on the local machine decides the register separator used.
+See an example:
+
+  $ cat -n transfer3.pl
+     1  #!/usr/local/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine qw(is_operative);
+     4  use Data::Dumper;
+     5
+     6  my $host = shift || 'casiano@remote.machine.es';
+     7
+     8  my $machine = GRID::Machine->new( host => $host );
+     9  my $DOC = << "DOC";
+    10  one. two. three.
+    11  four. five. six.
+    12  seven.
+    13  DOC
+    14
+    15  # List context: returns  a list with the lines
+    16  {
+    17    local $/ = '.';
+    18    my @a = $machine->qx("echo '$DOC'");
+    19    local $"= ",";
+    20    print "@a";
+    21  }
+    22
+    23  # scalar context: returns a string with the output
+    24  my $a = $machine->qx("echo '$DOC'");
+    25  print $a;
+
+
+When executed produces the following output:
+
+  $ transfer3.pl
+  one., two., three.,
+  four., five., six.,
+  seven.,
+
+  one. two. three.
+  four. five. six.
+  seven.
+
+
+
+=head2 Function C<glob>
+
+=head2 Function C<tar>
+
+Is equivalent to:
+
+            system('tar', $options, ,'-f', $file)
+
+Where C<$options> is a string containing the options.
+Returns the error code from C<tar>.
+Example:
+
+  $m->tar($dist, '-xz')->ok or warn "$host: Can't extract files from $dist\n";
+
+=head2 Function C<version>
+
+Syntax:
+
+              $machine->version('Some::Module')
+
+Returns the VERSION of the module if the given module is installed on the remote machine
+and has a VERSION number. 
+
+See an example of use:
+
+  $ cat version.pl
+  #!/usr/bin/perl -w
+  use strict;
+  use GRID::Machine;
+  use Data::Dumper;
+
+  my $host = $ENV{GRID_REMOTE_MACHINE} ||shift;
+
+  my $machine = GRID::Machine->new(host => $host,);
+
+  print Dumper($machine->version('Data::Dumper'));
+  print Dumper($machine->version('Does::Not::Exist::Yet'));
+
+When executed the program produces an  output similar to this:
+
+  $ version.pl
+  $VAR1 = bless( {
+                   'stderr' => '',
+                   'errmsg' => '',
+                   'type' => 'RETURNED',
+                   'stdout' => '',
+                   'errcode' => 0,
+                   'results' => [ '2.121_08' ]
+                 }, 'GRID::Machine::Result' );
+  $VAR1 = bless( {
+                   'stderr' => 'Can\'t locate Does/Not/Exist/Yet.pm in @INC \
+                                (@INC contains: /etc/perl /usr/local/lib/perl/5.8.8 ...
+                                BEGIN failed--compilation aborted.
+                               ',
+                   'errmsg' => '',
+                   'type' => 'RETURNED',
+                   'stdout' => '',
+                   'errcode' => 0,
+                   'results' => [ '' ]
+                 }, 'GRID::Machine::Result' );
+
+
+=head2 Function C<installed>
+
+Syntax:
+
+              $machine->installed('Some::Module')
+
+Returns TRUE if the given module is installed on the remote machine.
+Is equivalent to:
+
+            system("$^X -M$module -e 0")
+
+=head2 File Status Methods
+
+Methods that are equivalent to the tests function
+
+      -r -w -e -x -z -s -f -d  -t -T -B -M -A -C
+
+are provided. Since hyphens aren't legal in Perl identifiers
+the hyphen has been substituted by an underscore.
+See an example:
+
+  $ cat -n copyandmkdir.pl
+     1  #!/usr/local/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4
+     5  my $host = 'remote.machine.es';
+     6  my $dir = shift || "somedir";
+     7  my $file = shift || $0; # By default copy this program
+     8
+     9  my $machine = GRID::Machine->new(
+    10    host => $host,
+    11    uses => [qw(Sys::Hostname)],
+    12  );
+    13
+    14  my $r;
+    15  $r = $machine->mkdir($dir, 0777) unless $machine->_w($dir);
+    16  die "Can't make dir\n" unless $r->ok;
+    17  $machine->chdir($dir)->ok or die "Can't change dir\n";
+    18  $machine->put([$file]) or die "Can't copy file\n";
+    19  print "HOST: ",$machine->eval(" hostname ")->result,"\n",
+    20        "DIR: ",$machine->getcwd->result,"\n",
+    21        "FILE: ",$machine->glob('*')->result,"\n";
+
+
+When this program runs we get an output similar to this:
+
+                    $ copyandmkdir.pl
+                    HOST: orion
+                    DIR: /home/casiano/somedir
+                    FILE: copyandmkdir.pl
+
+
+
+
+
+=head1 AUTHOR
+
+Casiano Rodriguez Leon E<lt>casiano@ull.esE<gt>
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+Support from Gobierno de Canarias was through GC02210601
+(I<Grupos Consolidados>).
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+I wish to thank Paul Evans for his C<IPC::PerlSSH> module: it was the source
+of inspiration for this module. To 
+Alex White,
+Dmitri Kargapolov, 
+Eric Busto
+and
+Erik Welch 
+for their contributions.
+To the Perl Monks, and the Perl Community for generously sharing their knowledge.
+Finally, thanks to Juana, Coro and  my students at La Laguna.
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2007 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+

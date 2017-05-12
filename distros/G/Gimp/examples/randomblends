@@ -1,0 +1,86 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+sub randint {
+    my ($int) = @_;
+    return int(rand()*$int +0.5);
+}
+
+podregister {
+    $image->undo_group_start;
+    Gimp::Context->push();
+    my ($sel,$x1,$y1,$x2,$y2) = $image->selection_bounds;
+    srand();
+    my @gradientlist = Gimp::Gradients->get_list("");
+    Gimp::Progress->init("Random blends...");
+    for (my $i=0; $i<$numgradients; $i++) {
+        Gimp::Context->set_gradient(@gradientlist[randint($#gradientlist)]);
+	$drawable->edit_blend(CUSTOM_MODE,
+                       DIFFERENCE_MODE,
+                       randint(10),      # gradient type
+                       randint(100),     # opacity
+                       0,                # offset
+                       randint(2),       # repeat
+		       0,                # reverse
+                       0,                # disable supersampling..
+		       1,
+		       0.1,
+		       0,                # no dithering
+                       randint($x2-$x1)+$x1, # x1
+                       randint($y2-$y1)+$y1, # y1
+                       randint($x2-$x1)+$x1, # x2
+                       randint($y2-$y1)+$y1, # y2
+                       );
+        Gimp::Progress->update($i / (1.0 * $numgradients));
+    }
+    $image->undo_group_end;
+    Gimp::Context->pop();
+    return();
+};
+exit main;
+__END__
+
+=head1 NAME
+
+random_blends - Perform N random blends
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Render/Random Blends...
+
+=head1 DESCRIPTION
+
+A random approach to art, using the blend tool with DIFFERENCE_MODE.
+Alpha is not affected; best used on opaque background.
+Just try it. It might be good.
+
+=head1 PARAMETERS
+
+ [PF_SPINNER, "numgradients", "How many gradients to apply", 7, [1,255,1]],
+
+=head1 IMAGE TYPES
+
+RGB*, GRAY*
+
+=head1 HISTORY
+
+ <sjburges@gimp.org>
+ This is adrian's idea - take random blends and difference them.  You're
+ bound to come up w/ something cool eventually.
+
+=head1 AUTHOR
+
+Seth Burgess <sjburges@gimp.org>
+
+=head1 DATE
+
+1999-03-18
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

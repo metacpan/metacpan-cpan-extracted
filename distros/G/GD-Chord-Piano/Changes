@@ -1,0 +1,27 @@
+Revision history for GD-Chord-Piano
+
+0.061  Sun Oct 14 16:10:00 JST 2012
+        [NO CODE CHANGE]
+        - changed style of version
+        - fixed for kwalitee
+        - support travis-ci(on github)
+
+0.0.6  Sat Oct 11 00:30:00 2010
+       removed version module
+       shipit
+
+0.0.5  Fri Dec 12 13:25:25 2008
+       fixed cord list. fixed etc and added tests
+
+0.0.4  Mon Nov 24 16:16:16 2008
+       fixed pod(Email address)
+
+0.0.3  Fri Nov 07 12:50:50 2008
+       fixed pod(changed Email address)
+
+0.0.2  Mon Oct 27 22:22:22 2008
+       let's play.
+
+0.0.1  Mon Oct 27 14:32:00 2008
+       Initial release.
+

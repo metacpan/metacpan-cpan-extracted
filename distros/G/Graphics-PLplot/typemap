@@ -1,0 +1,39 @@
+PLINT		T_IV
+PLFLT		T_NV
+PLFLT *	 	T_FLTARRAY
+PLFLT2D *	T_FLT2DARR
+PLINT *		T_INTARRAY
+char **		T_1DCHARARR
+PLSTRIPID       T_STRIPINT
+
+INPUT
+
+T_FLTARRAY
+	PLINT ix_$var;
+	$var = ($type)pack1D_sz($arg,(sizeof(PLFLT)==sizeof(double) ? 'd' : 'f'),&ix_$var);
+T_INTARRAY
+	PLINT ix_$var;
+	$var = ($type)pack1D_sz($arg,'i',&ix_$var);
+T_FLT2DARR
+	PLINT nx_$var;
+	PLINT ny_$var;
+	$var = ($type)pack2D_sz($arg, (sizeof(PLFLT)==sizeof(double) ? 'd' : 'f'),&nx_$var,&ny_$var)
+T_1DCHARARR
+        PLINT ix_$var;
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV)
+	    $var = pack1Dchar_sz((AV*)SvRV($arg),&ix_$var);
+	else
+	    Perl_croak(aTHX_ \"$var is not an array reference\")
+T_STRIPINT
+	if (sv_derived_from($arg, \"Graphics::PLplot::StripChart\")) {
+	    $var = ($type)SvIV((SV*)SvRV($arg));
+	}
+	else
+	    Perl_croak(aTHX_ \"$var is not of type Graphics::PLplot::StripChart\")
+
+OUTPUT
+
+T_STRIPINT
+	sv_setiv(newSVrv($arg,\"Graphics::PLplot::StripChart\"), (IV)$var);
+
+	

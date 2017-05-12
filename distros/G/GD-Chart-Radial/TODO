@@ -1,0 +1,12 @@
+TODO
+----
+
+1) Allow user to specify the steps
+2) y_max_value => max_value
+3) y_tick_number => steps
+4) Add more colours, and the ability to specify own
+5) Allow choice of start position as per a clock face (0 .. 12) or via the
+   angle of rotation (0..360), both starting from top dead-centre.
+6) Allow more point types (e.g. cross, unfilled circle, unfilled square,
+   unfilled triangle and unfilled diamond)
+

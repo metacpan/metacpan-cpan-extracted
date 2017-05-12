@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+
+<pkgmetadata>
+<herd>mobile</herd>
+<maintainer>
+  <email>latexer@gentoo.org</email>
+  <name>Peter Johanson</name>
+</maintainer>
+<longdescription>This package provides all the command line tools for configuring wireless devices with drivers that implement the Wireless Extensions (almost all recent 802.11a/b/g drivers).</longdescription>
+</pkgmetadata>

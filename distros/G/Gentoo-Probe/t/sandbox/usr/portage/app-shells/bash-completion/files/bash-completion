@@ -1,0 +1,13 @@
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License, v2 or later
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/bash-completion/files/bash-completion,v 1.1 2004/06/20 09:09:34 linguist Exp $
+#
+# START bash completion -- do not remove this line
+bash=${BASH_VERSION%.*}; bmajor=${bash%.*}; bminor=${bash#*.}
+if [ "$PS1" ] && [ $bmajor -eq 2 ] && [ $bminor '>' 04 ] \
+   && [ -f /etc/bash_completion ]; then # interactive shell
+        # Source completion code
+        . /etc/bash_completion
+fi
+unset bash bmajor bminor
+# END bash completion -- do not remove this line

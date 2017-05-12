@@ -1,0 +1,51 @@
+Revision history for Perl extension GD::Thumbnail.
+
+1.42 Tue Jul  5 02:21:01 2016
+    => Bump version.
+
+1.41 Sun Sep  9 02:48:43 2012
+    => New option dimension_constraint. Requested by "isync".
+
+1.40 Fri Sep 25 19:48:53 2009
+    => Perl::Critic refactoring.
+
+1.35 Fri Sep  4 00:29:03 2009
+    => Fix for RT#49353. Thanks to Alexander Vonk.
+    => Removed the bytes pragma trick for legacy perls. If you still need it,
+       add this code before use()ing GD::Thumbnail in your code:
+       BEGIN { $INC{'bytes.pm'} = 1 if $] <  5.006 && ! exists $INC{'bytes.pm'}; }
+
+1.34 Sat Jul 25 04:05:17 2009
+    => Fixed strip color issue related to true color mode (Patrick Tan).
+
+1.33 Wed Apr 22 19:51:37 2009
+    => Update builder.
+
+1.32 Sat Apr 18 06:20:15 2009
+    => Update distro tools.
+
+1.31 Sun Mar 29 07:06:54 2009
+    => Module will use copyResampled() if available. Request from Dread Deimos.
+
+1.30 Mon Nov 17 23:06:07 2008
+    => Fix square thumbnail option.
+    => Add quality options to png() & jpeg().
+
+1.20 Thu Nov 13 00:19:30 2008
+    => Added "crop"ping support to square option.
+    => Several fixes.
+
+1.10 Sun Dec 31 12:33:08 2006
+    => We need bytes pragma to determine the size of
+       a fh. Added a compatibility layer for older perl.
+
+1.02 Wed Jul  5 19:39:25 2006
+    => Typo in Pod. 
+
+1.01 Thu Jun 15 21:31:52 2006
+    => The famous 'GD path bug' came up again. 
+       Updated the test file 03-simple.t to use 
+       scalars instead of file paths.
+
+1.00 Tue Jun 13 14:41:44 2006
+    => Initial release.

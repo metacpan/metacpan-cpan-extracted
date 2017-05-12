@@ -1,0 +1,5 @@
+---
+provider:
+    module: YAML
+    config:
+        filename: examples/yaml/url.yml

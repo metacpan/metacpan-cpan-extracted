@@ -1,0 +1,78 @@
+NAME
+
+    Gtk2::Ex::DbLinker::DbTools - Databases access part of DbLinker
+
+VERSION
+
+    version 0.111
+
+INSTALLATION
+
+    To install Gtk2::Ex::DbLinker::DbTools, cd to the directory that
+    contains this file and type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    On windows use nmake or dmake instead of make.
+
+    To install this module into a specific directory, do: perl Makefile.PL
+    PREFIX=/name/of/the/directory ...the rest is the same...
+
+    Please also read the perlmodinstall man page, if available.
+
+    Install Gtk2::Ex::DbLinker or Wx::Perl::DbLinker to build your
+    application interface with Gtk2 or Wx. Install one of *
+    Rose::DB::Object * SQL::Abstract::More * DBIx::Class to use one of
+    these orm to access your data.
+
+DEPENDENCIES
+
+            Test::More      1
+            Carp    1.17
+            Try::Tiny       0.22
+            Data::Dumper    2.154
+            interface       0.03
+            Scalar::Util    1.45
+            DBI     1.631
+            Class::InsideOut        1.13
+            Log::Log4perl   1.41
+
+DESCRIPTION
+
+    This module automates the process of tying data from a database to
+    widgets build with Gtk2 or Wx.
+
+    Steps for use:
+
+      * Create a DataManager object that contains the rows to display.
+      Useone of DbiDataManager, SqlADataManager, RdbDataManager or
+      DbcDataManager depending on how you access the database: DBI with
+      plain sql commands or SQL::Abstract::More, DBIx::Class or
+      Rose::DB::Object.
+
+      * Create a Gtk2::GladeXML object to construct the Gtk2 windows or a
+      xrc resource file to build a Wx Window. Names of the fields in the
+      form have to be identical with the fields in the tables.
+
+      * Create a Gtk2::Ex::DbLinker::Form or a Wx::Perl::DbLinker::Wxform
+      object that links the data and the windows
+
+      * Cnnect the buttons to methods that handle common actions such as
+      inserting, moving, deleting, etc.
+
+AUTHOR
+
+      FranE<ccedil>ois Rappaz <rappazf@gmail.com>
+      CPAN ID: RAPPAZF
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

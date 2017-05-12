@@ -1,0 +1,77 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+# Erzeuge ein neues "scratchlayer", d.h. eine Ebene, die graue
+# Streifen einer bestimmten Richtung enthält. Dazu wird ein
+# weisses Bild "verrauscht" und mit motion-blur in einem
+# bestimmten Winkel weichgezeichnet.
+sub new_scratchlayer {
+    my ($image,$drawable,$length,$gamma,$angle) = @_;
+    my $type = $image->layertype(0);
+    my $layer = $image->layer_new ($drawable->width, $drawable->height, $image->layertype(0),
+                                  "displace layer ($angle)", 100, NORMAL_MODE);
+    $layer->insert_layer(0, -1);
+    $layer->fill (WHITE_FILL);
+    $layer->noisify (0, 1, 1, 1, 0);
+    $layer->mblur (0, $length, $angle, 0, 0);
+    $layer->levels (HISTOGRAM_VALUE, 120, 255, 0.3, 0, 255);
+    $layer;
+}
+
+podregister {
+  $image->undo_group_start;
+  # Erzeuge zwei "scratchlayer", die die Verschiebung in X und Y angeben.
+  my $layer1 = new_scratchlayer($image, $drawable, $smoothness, $gamma, $anglex);
+  my $layer2 = new_scratchlayer($image, $drawable, $smoothness, $gamma, $angley);
+  # Verschmiere das Bild.
+  $drawable->displace ($length, $length, 1, 1, $layer1, $layer2, 1);
+  # die beiden Ebenen werden nicht länger benötigt.
+  $layer1->remove_layer;
+  $layer2->remove_layer;
+  $image->undo_group_end;
+  ();
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+scratches - Create a scratch effect
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Distorts/Scratches...
+
+=head1 DESCRIPTION
+
+Add scratches to an existing image. Works best on a metallic-like background.
+
+=head1 PARAMETERS
+
+  [PF_SLIDER, "anglex", "The horizontal angle",  30, [ 0, 360]],
+  [PF_SLIDER, "angley", "The vertical angle",  70, [ 0, 360]],
+  [PF_SLIDER, "gamma", "Scratch map gamma", 0.3, [ 0.1, 10, 0.05]],
+  [PF_SPINNER, "smoothness", "The scratch smoothness", 15, [ 0, 400]],
+  [PF_SPINNER, "length", "The scratch length",  10, [ 0, 400]],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+19990223
+
+=head1 LICENSE
+
+Distributed under the same terms as Gimp-Perl.

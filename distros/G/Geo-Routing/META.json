@@ -1,0 +1,70 @@
+{
+   "abstract" : "Interface to the L<gosmore(1)> and L<OSRM|http://routed.sourceforge.net/> routing libraries",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-Routing",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Any::Moose" : 0,
+            "Class::Load" : 0,
+            "Cwd" : 0,
+            "Data::Dumper" : 0,
+            "File::Basename" : 0,
+            "Geo::Distance::XS" : 0,
+            "IPC::System::Simple" : 0,
+            "JSON::XS" : 0,
+            "Text::Trim" : 0,
+            "WWW::Mechanize" : 0,
+            "autodie" : 0,
+            "namespace::clean" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Geo-Routing@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Routing"
+      },
+      "homepage" : "http://search.cpan.org/dist/Geo-Routing/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avar/geo-routing.git",
+         "web" : "http://github.com/avar/geo-routing"
+      }
+   },
+   "version" : "0.11",
+   "x_authority" : "cpan:AVAR"
+}
+

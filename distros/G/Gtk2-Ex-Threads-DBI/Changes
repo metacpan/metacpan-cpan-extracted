@@ -1,0 +1,23 @@
+Revision history for Gtk2-Ex-Threads-DBI
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02
+	Fixed Makefile.PL to use / in path names (unix style)
+	Fixed the constructor to accept $attr for connection
+	Added a nominal test
+
+0.03	Sep 21, 2005
+	Added real tests
+	
+0.04	Sep 21, 2005
+	Added DBD::CSV based example
+	
+0.05	Sep 27, 2005
+	Handle freezing and thawing internally using references.
+	Users don't have to deal with Storable explicitly.
+
+0.06	Sep 30, 2005
+	The internal while loop now does a sleep for $pollinginterval
+	That should keep you CPU from burning out

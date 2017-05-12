@@ -1,0 +1,13 @@
+This directory contains card images created by Oliver Xymoron
+(oxymoron@waste.org) which are available at:
+http://www.waste.org/~oxymoron/cards
+
+I didn't include the "source code" (PNM files and perl scripts to create
+cards) because it would double the size of the Games::Cards distribution.
+It's all available at the above-mentioned site, however.
+
+As far as license, Oliver told me in an email that he was willing to
+release it either under the GPL or the Artistic license. Which is cool,
+since Games::Cards has the same terms.
+
+-Amir Karger

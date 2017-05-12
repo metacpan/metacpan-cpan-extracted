@@ -1,0 +1,46 @@
+Revision history for Perl extension Games::EveOnline::API.
+
+0.07      2014-09-06
+ - Documentation edits to properly format code and data samples.
+
+0.06      2014-09-06
+ - Add corporation_sheet function (chipsoid)
+ - Fix tests for wallet transactions (chipsoid)
+ - Add tests for character_ids and station_list  (chipsoid)
+ - Add station_list function for player owned outposts (chipsoid)
+ - replace LWP::Simple to LWP::UserAgent cause first module can't return content
+   if response code not equal 200 (chipsoid)
+ - add error code structure in answer to all functions (chipsoid)
+ - add character_name function (chipsoid)
+ - add functions for eve-mails (chipsoid)
+ - add wallet_journal and wallet_transactions functions (chipsoid)
+ - fix character_sheet function and test for it (chipsoid)
+ - add api_key_info, account_status, character_info, asset_list, contact_list
+   functions for API (chipsoid)
+ - add itemID and contactID to forceArray attribute in xml2hash converter
+   (chipsoid)
+
+0.05      2014-06-22
+ - Use Moo and Type::Tiny instead of Moose.
+ - Make this class have immutable attributes.
+ - Remove test code from the core module.
+ - Lots of documentation edits.
+
+0.04      2014-06-22
+ - Fix params for API EveOnline (chipsoid)
+ - Fix tests skill_tree (chipsoid)
+
+0.03
+ - Broke parse_xml() out of load_xml(), just for the sake of separation.
+ - Added Devel::Coverage metrics to the POD.
+ - Commented on WebServer::EveOnline.
+
+0.02 : 2008-05-25
+ - Fix the various feeds - they were totally broke.
+ - Add tests for Perl::Critic and Pod::Coverage.
+ - Add a test that forces the API to use pre-generated XML and compare results.
+ - Upgrade to Module::Install 0.73 for no particular reason.
+
+0.01 : 2008-05-14
+ - First release.
+

@@ -1,0 +1,13 @@
+ChangeLog
+GConf.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+NEWS
+Makefile.PL
+README
+copyright.pod
+gstgconfperl.h
+t/GstGConf.t
+xs/GstGConf.xs
+META.yml                                 Module meta-data (added by MakeMaker)

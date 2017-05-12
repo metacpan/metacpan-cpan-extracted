@@ -1,0 +1,11 @@
+digraph graph_08
+{
+	graph[rankdir = "LR" nodesep = "0"]
+	node[shape = "point" label = ""]
+	edge[fontsize = "10"]
+	_dot -> dot[arrowhead = "dot" label = "dot"]
+	dot -> dotdot[arrowhead = "dotdot" label = "dotdot"]
+	_dot -> odot[arrowhead = "odot" label = "odot"]
+	odot -> odotodot[arrowhead = "odotodot" label = "odotodot"]
+
+}

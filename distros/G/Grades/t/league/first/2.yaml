@@ -1,0 +1,56 @@
+Black     :
+            merits  : 6
+            absences: 1
+            tardies : 1
+Brown     :
+            merits  : 6
+            absences: 2
+            tardies : 0
+DarkBlue  :
+            merits  : 5
+            absences: 1
+            tardies : 1
+DarkGreen :
+            merits  : 7
+            absences: 2
+            tardies : 0
+Gray      :
+            merits  : 6
+            absences: 1
+            tardies : 1
+LightBlue :
+            merits  : 6
+            absences: 2
+            tardies : 2
+LightGreen:
+            merits  : 4
+            absences: 1
+            tardies : 1
+Orange    :
+            merits  : 7
+            absences: 1
+            tardies : 3
+Pink      :
+            merits  : 5
+            absences: 3
+            tardies : 1
+Purple    :
+            merits  : 3
+            absences: 1
+            tardies : 1
+Red       :
+            merits  : 5
+            absences: 0
+            tardies : 0
+White     :
+            merits  : 4
+            absences: 2
+            tardies : 0
+Yellow    :
+            merits  : 0
+            absences: 3
+            tardies : 1
+BlackBlack:
+            merits  : 0
+            absences: 2
+            tardies : 2

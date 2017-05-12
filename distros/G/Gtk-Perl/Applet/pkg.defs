@@ -1,0 +1,16 @@
+
+(define-object AppletWidget (GtkPlug) (perl Gnome::AppletWidget))
+(define-object CappletWidget (GtkPlug) (perl Gnome::CappletWidget))
+;(define-object ButtonWidget (GtkWidget) (perl Gnome::ButtonWidget)))
+;(define-object CornetWidget (GtkWindow)	(perl Gnome::CornerWidget))
+;(define-object DrawerWidget (GtkWindow) (perl Gnome::DrawerWidget))
+;(define-object PanelWidget (GtkFixed) (perl Gnome::PanelWidget))
+;(define-object SnappedWidget (GtkWindow) (perl Gnome::SnappedWidget))
+
+(define-object StatusDocklet (GtkObject) (perl Gnome::StatusDocklet))
+
+(define-enum PanelOrientType
+	(up	ORIENT_UP)
+	(down	ORIENT_DOWN)
+	(left	ORIENT_LEFT)
+	(right	ORIENT_RIGHT))

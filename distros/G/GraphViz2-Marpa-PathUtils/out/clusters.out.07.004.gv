@@ -1,0 +1,9 @@
+digraph graph_07
+{
+	graph[rankdir = "LR"]
+	node[shape = "oval"]
+	edge[color = "slateblue"]
+	node[style = "filled"]
+	A[color = "bisque"]
+
+}

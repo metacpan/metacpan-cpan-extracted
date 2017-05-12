@@ -1,0 +1,8 @@
+2007-04-30  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Changed: a documentation file docs/example.html
+
+2007-04-29  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* original version; created by h2xs 1.23 with options
+	-XA -n GPS::Tracer -v 1.1

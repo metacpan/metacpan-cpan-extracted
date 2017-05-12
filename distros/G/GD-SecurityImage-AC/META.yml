@@ -1,0 +1,20 @@
+---
+name: GD-SecurityImage-AC
+version: 1.11
+author:
+  - 'Benjamin Franz <snowhare@nihongo.org>'
+abstract: A drop-in replacement for Authen::Captcha.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Digest::MD5: 0
+  GD::SecurityImage: 1.60
+provides:
+  GD::SecurityImage::AC:
+    file: lib/GD/SecurityImage/AC.pm
+    version: 1.11
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

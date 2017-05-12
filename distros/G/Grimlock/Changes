@@ -1,0 +1,1117 @@
+==================================================
+Changes from 2011-02-22 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------
+version  at 2012-02-22 21:51:16 +0000
+-------------------------------------
+
+  Change: 060ae1e973f93ac563e44483f39cf9839168d99f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-22 14:51:16 +0000
+
+    fixed up css a little more 
+
+  Change: b451af8dc905bcf2b6ab59f4a8eaf8881d584095
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-22 14:00:25 +0000
+
+    cleaned up css a bit 
+
+  Change: 8f4636b3e2dd7bf3f102e71705e4af0b017b8609
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-22 13:49:57 +0000
+
+    added logo and favicon 
+
+  Change: a7a4ab69d26397a64de7f621dec615bdb0bb332f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-22 13:32:21 +0000
+
+    slight changes to header/footer and title config 
+
+  Change: d60462a6a218edd0e892875c6d80c11570d8bb7c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-22 13:22:51 +0000
+
+    fixed up publishing stuff 
+
+  Change: fa4c18b13fd8b9edfd376242a488a0cd97f4b932
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-20 13:13:58 +0000
+
+    added dbic-diff script, and new sql diff 
+
+  Change: 2a4a1088659001d67eefb3d987993d4a3470b2d9
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-19 20:45:28 +0000
+
+    removed draft table, updated draft controller/api and tests 
+
+  Change: d8ad2c738de579160ea7d6a99f53e25de900301e
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-19 19:01:45 +0000
+
+    slight change to view per debugging options 
+
+-------------------------------------
+version  at 2012-02-18 03:56:35 +0000
+-------------------------------------
+
+  Change: 7b178b2039fd2ab0f0d7fc21f3e18521c9da0571
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 20:56:35 +0000
+
+    removed debug plugin by default 
+
+  Change: 0a1df6660265c1fe30c26eda3583e8d9925fb2db
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 20:56:18 +0000
+
+    fixed up unpublished posts coming through 
+
+  Change: f4750b6c93cce86a0843ff4a5981e1a287494530
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 20:54:17 +0000
+
+    fixed up reply title issue 
+
+  Change: 2a8e169c7f15e0f48dca1b191ce42ebcbae660a4
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 20:32:25 +0000
+
+    doc updates 
+
+  Change: 707f253cc7e9de9283ae44b3fb18450465f853f2
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 15:49:14 +0000
+
+    added DateTime::Format::Pg 
+
+  Change: 7f8b78bcd0d0761f961fbe573b6a1bcb37581d55
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 15:35:08 +0000
+
+    slight fix to script 
+
+-------------------------------------
+version  at 2012-02-17 22:31:45 +0000
+-------------------------------------
+
+  Change: a84927d94cd4d420778b46e0da51d53a395c4bc9
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 15:31:45 +0000
+
+    slight modification to script 
+
+  Change: 3522bac5cba93d0e36ead3db289aa5c6767aafbc
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 15:29:42 +0000
+
+    added psgi script 
+
+  Change: c3932c4906e4746b731fac1f316769972e6449ee
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-17 15:18:15 +0000
+
+    added File::ShareDir to view stuff 
+
+-------------------------------------
+version  at 2012-02-16 22:13:15 +0000
+-------------------------------------
+
+  Change: 9581f009e8a9de12eccfc354ef141f8eb79a4317
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-16 15:13:15 +0000
+
+    added SQL::Translator dep 
+
+  Change: 2f408e3afb1658aeec7fd9f92406a004bf49a77a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-16 15:09:59 +0000
+
+    fixed up small typo in entry test 
+
+  Change: d97f17d9a6d3d3a2fe7575bd168ba80c0a9b33e6
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-16 14:42:38 +0000
+
+    drafts delete ok" 
+
+  Change: 86981899b22121317aa5c5e701f130fa3afbc92a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-15 14:56:45 +0000
+
+    moved datatable stuff to its own template 
+
+  Change: cf226979c5872e1f822d9a3746ed6d0d9d625852
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-15 13:04:17 +0000
+
+    added sane draft saving (ui side at least)" 
+
+  Change: bca3d317b1e4de645c3dded63aea268d90470294
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-14 11:52:06 +0000
+
+    added disply_title column to draft table, updated tests to search for
+    drafts by title 
+
+  Change: 7feb58a5651fbd5faaeb58cb8d12745b3028b8c4
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-14 11:34:54 +0000
+
+    added catalyst 5.9 
+
+  Change: eb5b67365a3a17890ee4005f2b83a525d3efe39c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-14 11:34:37 +0000
+
+    added debug stuff to base chain 
+
+  Change: 703f02b1cce1175b0f509088bb735fcc3b0fa0e0
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-14 11:34:16 +0000
+
+    whoops, left draft name in url instead of entry 
+
+  Change: 6407074258f05eb928c55fcb7e0bf004bbe746e9
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-14 11:26:45 +0000
+
+    added test config, fixed up test config in entry test 
+
+  Change: cae14fc86dbe70b390b556ec4c0c5e124d0cb7fc
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-09 17:31:21 +0000
+
+    checkboxes for edit records works 
+
+  Change: f1c7766ad9e1a69235a3369670ea04baed9fe5be
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-09 13:23:50 +0000
+
+    add draft listing template, listing drafts works 
+
+  Change: f69cdf138010509ae99b05caafb8178d6b6b91d1
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-08 16:23:55 +0000
+
+    managing drafts works, drafts are saved as entries upon modification 
+
+  Change: 089a40adea0ef2c1c01a065961c8254349364aef
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-08 15:52:13 +0000
+
+    added basic draft functionality 
+
+  Change: c65cdc8c43d16e4b26f41e9f62332965d548e860
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-08 15:22:28 +0000
+
+    added polling for draft saving 
+
+  Change: 788792be1b5eec11c722fb6816aecfab273d29b6
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-08 14:16:26 +0000
+
+    added sharedir plugin 
+
+  Change: 422ee14d049452928657580c23b2346890967545
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-07 15:08:02 +0000
+
+    fixed merge conflict 
+
+  Change: edddef2e0d4965740ea9385c6632402180d22330
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-07 15:07:10 +0000
+
+    added test for entry deletion 
+
+  Change: ec3e2fb77767f87406f44a7b6e71cba60ba9d289
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-07 15:06:27 +0000
+
+    entry deletion works 
+
+  Change: 9e9aea2482fed6f9482b2b6a5f91c2a1d14b519f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-07 15:04:17 +0000
+
+    entry deletion works 
+
+  Change: 5e9582e435c1cbb212c5aa4863ef2c6a69d2ed4f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-07 14:51:20 +0000
+
+    editing entries works 
+
+  Change: bc3cb168d2aaf94d1b3736dac562563b307ebdb3
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-07 14:35:50 +0000
+
+    slight doc fix 
+
+  Change: 0ebdad0e889d4ed05ff0e39e2635eda9979a7898
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-07 13:42:32 +0000
+
+    fixed up form fields to save on edit 
+
+  Change: 4437308e86b2cf562982a65c027e6ef3b62b18d6
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 15:57:01 +0000
+
+    body populates properly 
+
+  Change: d801f64884c31cc7cea2a3ec82acb70e7e98210d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 15:52:33 +0000
+
+    adjusted css 
+
+  Change: bbfe13f38e53a87d3c5215db51b55534acee97e6
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 15:46:17 +0000
+
+    fixed up merge errors from no branch 
+
+  Change: d989fe92f3dbcd37f718a2f411f75b1c0ae86ab0
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 15:37:18 +0000
+
+    fixed up entry json to include entry body 
+
+  Change: 41871fe1177c925c60de34c8aceed4e5e863cb91
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 15:24:27 +0000
+
+    fixed onclick stuff 
+
+  Change: 3d7190273055c426f36cbc719b5f0e7726f9cc8a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 13:47:26 +0000
+
+    added a bunch of widgets 
+
+  Change: 69110ceaa3ff22c7439416a95b0c97759b43453f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 13:36:27 +0000
+
+    added helper methods 
+
+  Change: bfda83d6d5f9723ee38011b779f0916d0b3d4190
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 13:33:25 +0000
+
+    added edit/delete buttons 
+
+  Change: fb3955a232a7b2a6b902db93772573eac6743bf2
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 12:40:50 +0000
+
+    fixed merge conflict from stash pop 
+
+  Change: e82a84898ea80ed4b7988701932a00192906bae1
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 12:39:46 +0000
+
+    using ds.after(...) 
+
+  Change: 5a64250be5271d825fb4a634a41a04b00a27a42f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-06 11:29:38 +0000
+
+    basic datatable achieved 
+
+  Change: e49c505a7c683ae4cc3ca18576176c0e49f21f2f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-05 19:18:43 +0000
+
+    new entry dialog renders correctly 
+
+  Change: 5ca9e1f7e00c160cf3bd326348edd2a659112b8f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-05 18:33:51 +0000
+
+    making request properl but not rendering properly 
+
+  Change: a9e632532020538c985a8da745a7870b5fd143b5
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-05 16:27:40 +0000
+
+    added edit/delete images 
+
+  Change: ce613403258f8ffd07b6a59f9db8d8ecf2d3d665
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-05 16:17:56 +0000
+
+    fixed up body class from yui->yui3 
+
+  Change: aad332f71ed1dffd14e7fd96f6046f8720346088
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-05 16:00:56 +0000
+
+    using 3.5 datagrid now 
+
+  Change: b1513b9eb82454d88cdf71e5d978dfc0c3bc7335
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-02 14:32:51 +0000
+
+    added more columns to display 
+
+  Change: f93440144b4aa17acbda8791fa30c6ca2eb22e46
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-01 14:46:41 +0000
+
+    added more column names 
+
+  Change: c8d8f020f0652fcbe75f6e0e7505dc450a02cf4f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-01 14:41:50 +0000
+
+    YUI displays json results properly now 
+
+  Change: f35226fbda8ee4ad5158e8d8b81a5ffd485d9eb4
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-01 14:01:00 +0000
+
+    got YUI3 call working 
+
+  Change: 34b92ec44ebd08c08e6901861a3289ee0d258c52
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-01 13:05:21 +0000
+
+    JSON is rendered properly for user entries 
+
+  Change: 0ef78ee10e113eeef2d3ffaf8996b29a569b7dac
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-01 10:31:16 +0000
+
+    added missing bcrypt dep 
+
+  Change: a7cf667e832522c15966e9bbfe48a7ffd5ab2d82
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-31 15:17:27 +0000
+
+    added a bunch of YUI and authed stuff for nav etc 
+
+  Change: 71f9f948ee22cb96775bb455b67f6d1015fc140b
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-31 13:49:03 +0000
+
+    updated base.tt 
+
+  Change: 84220df50082544a5764733e11cc1abe555c8430
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-31 13:45:36 +0000
+
+    added in new UI changes 
+
+  Change: 45f35a5f4fe62f320ecdc75a119dfef0c974c746
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-31 13:39:30 +0000
+
+    updated to View::TT::Bootstrap::YUI 
+
+-------------------------------------
+version  at 2012-02-07 19:16:02 +0000
+-------------------------------------
+
+  Change: 536122891c9c62c1cfb5097e601499c2c51adf01
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-02-07 12:16:02 +0000
+
+    updated deps to include Crypt::Eksblowfish::Bcrypt and
+    DBIC::EncodedColumn::Crypt::Eksblowfish::Bcrypt v0.00011 
+
+  Change: 5dcabf58104e83ebac10015390e0bead21d63035
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-31 13:27:56 +0000
+
+    POD format fix 
+
+-------------------------------------
+version  at 2012-01-31 18:58:13 +0000
+-------------------------------------
+
+  Change: 6387c3aac480ab05cf476ee62201e10352423336
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-31 11:58:13 +0000
+
+    added TODO and fixed up ExecDir plugin stuff 
+
+  Change: 9f12e2d7b23c93ed21b76de770aa7ca009b79242
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 21:02:57 +0000
+
+    updated dist.ini with prereqs from failures 
+
+-------------------------------------
+version  at 2012-01-30 20:48:51 +0000
+-------------------------------------
+
+  Change: cb6e3315ec5e7c30998e8148981f735d5271561d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 13:48:51 +0000
+
+    updated dist.ini with PkgVersion stuff 
+
+-------------------------------------
+version  at 2012-01-30 17:28:30 +0000
+-------------------------------------
+
+  Change: b83548f9b09956b05e211cb6efbd63a462ac383a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 10:28:30 +0000
+
+    added twitter notifier to dzil and fixed up script installation with
+    ExecDir 
+
+-------------------------------------
+version  at 2012-01-30 17:21:54 +0000
+-------------------------------------
+
+  Change: dc5d6f081c74529b4039bd8b5317307ce1c75d69
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 10:21:54 +0000
+
+    added docs 
+
+  Change: 15f113ef962a21c2628d18c9c216423cb9a691b7
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 10:18:05 +0000
+
+    updated dist.ini and grimlock_web_server.pl 
+
+  Change: bf2af5bd1d3cce47425f925a7b005455a35ea65d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 10:05:20 +0000
+
+
+  Change: e91e3f6189c77aa07e8d61c9e7f74ce376c1d311
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 10:04:34 +0000
+
+    added meta resources info 
+
+  Change: 7c514380446df407f2fb32418562b4b5563b3b3e
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 10:00:12 +0000
+
+    removed Git::Tag plugin 
+
+  Change: 409fca713ce7f62a8b1727374333f53d1a44a049
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 09:58:12 +0000
+
+    added ChangelogFromGit plugin 
+
+  Change: 2b17c4f3843f7185c00e15393ba7149cc6bf1e0d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-30 09:51:14 +0000
+
+    updated dist.ini 
+
+  Change: 82bc93ae9ff7b8550a27b4ce7cc964ee320ee17d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 21:18:28 +0000
+
+    updated gitignotre file 
+
+  Change: 59ac01623d5644165f48e91b9d8cb079bf53a609
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 21:17:37 +0000
+
+    updated dist.ini 
+
+  Change: 59195ec093c296a6b183eafa15ddf8c22c793e70
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 21:07:26 +0000
+
+    moved shit around for szil 
+
+  Change: 5c88c5ea1e1c5e363de5b2dd373222d0353be512
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 20:55:40 +0000
+
+    removed dbicdh shit, again, for some reason 
+
+  Change: 5a82e14ad74bf2cd91811e3532f9dd964346f641
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 20:55:18 +0000
+
+    moved tests around 
+
+  Change: 5a46746554bfea7990bc39c4a482ec0078f5718f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 20:11:48 +0000
+
+    added POD 
+
+  Change: 5e8166e37eb9156c14333bac8c2bcdb63d88bfdf
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 19:55:56 +0000
+
+    fixed tests to reflect new api changes 
+
+  Change: 4d54978a2318e1c716417da2595160d030ad8fbf
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 19:44:01 +0000
+
+    modified reply post so original post is return and confirmation message is
+    shown 
+
+  Change: ee041e77c7635532e094465126ea483a80f13cc3
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 19:37:58 +0000
+
+    got shit rendering properly again 
+
+  Change: 37384973bfe7dfdb8ac4b5d9976579c369063967
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 17:58:04 +0000
+
+    changed front page to fragment 
+
+  Change: febaebe55989de15b16834d5945df222a1d5658b
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 17:52:14 +0000
+
+    nav with link to view entries works 
+
+  Change: 526f869b733d62b8edd0d520ed4c5f92c2ca2099
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 17:43:57 +0000
+
+    user actually auths when you create them 
+
+  Change: d16e3aefbf499d3065b4344d0debde10b53b77cd
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 17:21:23 +0000
+
+    fixed merge conflict on cherry pick of 54b8d3d0106 
+
+  Change: 5d4c8495e663de8640ada536d54b1314f395e4fa
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 17:12:45 +0000
+
+    created_at rendered properly with test 
+
+  Change: 9566a5ea681bbeb4bc2aa70b099276cc19ab3bce
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 16:57:37 +0000
+
+    added test for datetime formatting on posts, added optional module support 
+
+  Change: 7f8927d89574057d02a14c42afb300b8cb20e521
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 16:12:23 +0000
+
+    added tt filter for front page summary, added front page summary template,
+    updated Makefile.PL 
+
+  Change: c240a30e0d534ee148d744b7ad21bd15089b811c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-29 15:30:48 +0000
+
+    front page is displaying posts properly 
+
+  Change: 9a2302294987349d668c814a214174cf980b9100
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 16:25:37 +0000
+
+    got reply count working 
+
+  Change: 429e567560a68d3b81b2fd3409438f83eba48de3
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 16:22:02 +0000
+
+    added user entries listing 
+
+  Change: 70feb6670cc1935db216822d960ad795022e734c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 16:09:44 +0000
+
+    removed debug shit 
+
+  Change: 1ed60f69f0e8ae8f20ef7357f39714363add0a6d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 16:09:28 +0000
+
+    fixed entry shit back up 
+
+  Change: 530f8b29c320234c1873d51aa8f0a8715aa7d2bb
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 15:43:03 +0000
+
+    added updated sql 
+
+  Change: f9082d4a41fd681797852387eeca4966575a37b4
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 15:35:48 +0000
+
+    huehuehue 
+
+  Change: 6aee4ef52c9758ae0400d8d756d51b047afc96ff
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 14:53:23 +0000
+
+    hurp 
+
+  Change: 7531503ec9a6c62d12a7e2b25174b31389adade6
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 14:50:30 +0000
+
+    updated ENtry 
+
+  Change: 75554f35803ddc019a751f977009dc69174a4218
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 14:48:20 +0000
+
+    fixed up sql 
+
+  Change: 7e2fe1a50a63e3556ed6cce431a4b82d66e83780
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 14:47:48 +0000
+
+    added new diff 
+
+  Change: 3623e3aca180c0fcec43ba3a966bbe94b9576971
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 14:21:05 +0000
+
+    added sql directory, deleted dbich shit 
+
+  Change: abe6d11181664b0d8064aeced1babaff279970b5
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 13:53:54 +0000
+
+    added create_entry method to User and added published column to Entry 
+
+  Change: c040455291b2b29e4367f30ec826912ef01e514e
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-27 13:22:21 +0000
+
+    users are authed after they are created, create.tt for entries added 
+
+  Change: 6ab40ef17f985615b335e57b23a958dc24e1e3c3
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-25 16:04:04 +0000
+
+    removed DBICDH stuff 
+
+  Change: ac6ee3f78dc59b89ef518992778ad98b1b5b6f3f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-25 15:47:09 +0000
+
+    updated Makefile.PL, fixed relationship name in Role 
+
+  Change: 4c367b88d2b1d58b1fa2509047423628b8b4f695
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 16:19:02 +0000
+
+    added prefetch to user for entries 
+
+  Change: 0225633b9ab92a61531ce77dad263aeb569a107b
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 16:13:14 +0000
+
+    added reply count for user posts 
+
+  Change: 0513b269b006d6e396e9a61b85898ea32ddfe509
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 16:11:38 +0000
+
+    added post count and role listing to user browse action 
+
+  Change: 3d4c83d4b0f8655cf4350e4c593f93290169c1e5
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 15:29:15 +0000
+
+    added global.tt to get rid of annoying message, added link to user profile
+    after they are created 
+
+  Change: 54b8d3d01064e1436ef0f8367b1164e76099e17d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 15:20:47 +0000
+
+    user is now authed when created 
+
+  Change: 0d7016f3abc378ab8ccc76e22f8d8b9cd00e26c8
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 14:37:36 +0000
+
+    updated schema 
+
+  Change: 192d3357121edae5f1788753c86d5fb2ff15f4fd
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 14:06:33 +0000
+
+    confirmation message added after user creation 
+
+  Change: 8c5f7fdde5a8fc566e0372cdfd54b44019406edc
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 14:02:46 +0000
+
+    removed debug stuff, removed form-encoded mapping to properly render pages
+    after HTTP posts 
+
+  Change: 62f907b8d286d9d50d2bfd5ae0070134a231a829
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-10 13:47:01 +0000
+
+    fixed up deploy stuff 
+
+  Change: 9206850d49d68b350b4c0590e774a73c49f3cb0e
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-09 15:12:04 +0000
+
+    updated Makefile.PL with higher Test::DBIx::Class number, fiddled with
+    View::HTML and tests to fix stupid fat comma error 
+
+  Change: 58479364f92e915ed9bc8d5c60367259910afd5b
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-06 16:59:00 +0000
+
+    worked on UI, fixed incorrect logins 
+
+  Change: 651be5966fcbfefebba978b23d52cb96f0c59dbb
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-06 15:18:59 +0000
+
+    email delivery test passes 
+
+  Change: 5f9d27729c1294f69b0f3ed43300c74000844903
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-05 12:35:40 +0000
+
+    moved to SQLite for more generic testing 
+
+  Change: 1abb0207cba37824e684b71135fe166de7b9c3b8
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-04 15:47:13 +0000
+
+    added email column to user table, added tests and code for retrieving an
+    email 
+
+  Change: df3504cb35fd37915f9113c46a862e339459e347
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-04 15:09:32 +0000
+
+    updated Makefile.PL 
+
+  Change: 65a200ff26878a2eb4534c67f9ccfeda1347e08e
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-04 14:44:06 +0000
+
+    herp 
+
+  Change: 7b0506ba6577f05eb72d35138dffe2b1efa8ee2f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-04 14:10:48 +0000
+
+    added BAIL_OUT call if we can't login 
+
+  Change: 57f380e1509aacdda9c906f661624a96437e3655
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-02 15:26:31 +0000
+
+    fixed up parent->bigint instead of bigserial since the latter is an
+    autoincrement field 
+
+  Change: 5261a6fa47249ff2ef1efb0e39e179129c58da3c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-02 14:11:16 +0000
+
+    added Entry resultset 
+
+  Change: d3f28c55488769551e759a9583002e2f53d5a97a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-29 16:56:28 +0000
+
+    updated clean_params stuff 
+
+  Change: 2f3ef9040a0b4edc3a790c9660213d6e684cbf2e
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-29 12:17:35 +0000
+
+    removed Moo role 
+
+  Change: ac0045c7db7f7ea49fa932e130f54226d26a590c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-28 14:15:59 +0000
+
+    entry scrubbing works 
+
+  Change: 698ce8554fd0b0561a010db2e50679f867acc233
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-28 14:07:07 +0000
+
+    added ScrubsEntry Moo role 
+
+  Change: de18ae3b0cfb7794f0b45fa1c8015c40e5a00df2
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-28 14:06:51 +0000
+
+    added Moo for DBIC roles 
+
+  Change: 29d4bce15e6d268d55850275976939b6e4a0e7f0
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-28 13:24:58 +0000
+
+    fixed up entry controller tests with new title stuff 
+
+  Change: 39df09276c847cc7b6e8ce263bcc9003a5070706
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-28 13:18:59 +0000
+
+    added title formatting bit 
+
+  Change: 7610d39bb0cdd8c5f561c5e88306f29b12b9986a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 15:31:31 +0000
+
+    create/view an entry works 
+
+  Change: 2315e5e34bd0b5548c6373831b0b69c22a46b854
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 14:48:51 +0000
+
+    added test for creating a post unauthed 
+
+  Change: 33b71d6b311f4ffeae5863b890e9aa63c060de7b
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 14:26:07 +0000
+
+    added "user" fixture and modified Entry test 
+
+  Change: 04a941930cca8120069e583d4a48c143df77a2b5
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 14:14:50 +0000
+
+    delete with auth works 
+
+  Change: cfb581cdd710d7f2c56bf63e78b07f9fd6d89aa7
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 14:09:56 +0000
+
+    delete sans auth works 
+
+  Change: 0771020ca70cfbb9b8a2b31bbfd8f8fe74cd7a7d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 13:54:37 +0000
+
+    added logout test 
+
+  Change: 22b0e23cd64c036e3565aa25f48190716eea631c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 13:51:06 +0000
+
+    fixed up session stuff, all tests pass 
+
+  Change: db52f533264b89f73b3be1d3076ede1a77215dc6
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 13:41:06 +0000
+
+    fixed status_ok params 
+
+  Change: aa8e09685c02eee658a7e3e4aad3638064ea0d8c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 13:40:11 +0000
+
+    use password_type => self_check not self_check => 1 
+
+  Change: 95170a4ae5557355317791a1e143e9c43cb1d47d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 13:09:34 +0000
+
+    added check_password test to schema_user.t, removed user migration data
+    from schema.pl, bumped schema version 
+
+  Change: f0969d86ab1698d278ca68fbbe259617c1d090fa
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-27 12:37:02 +0000
+
+    updated authentication stuff, bcrypt wasn't actually being used 
+
+  Change: 060911a9f9c249e5d9175942e10040c065d5c11c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-26 16:10:35 +0000
+
+    renamed read->browse, update with PUT now works 
+
+  Change: 9a291e1316a64f6d1fa77749800d88ee418ec4d1
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-26 14:24:33 +0000
+
+    fixed up read url for users 
+
+  Change: 1dd630518ec334bdc756a27b8da2fa0283df818c
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-25 21:27:34 +0000
+
+    updated user tests 
+
+  Change: 37aadbca381ee439ee6508c0123185595659b894
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-25 12:38:48 +0000
+
+    added tests for user, moved has_role to Result class 
+
+  Change: 979ab16af27d3778bba009616b0aeff76d2d681a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-25 12:33:01 +0000
+
+    added tests for user schema 
+
+  Change: dad98b3611d185953e566641ca9a5fdc864e8f5a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-24 20:27:37 +0000
+
+    added role fixture 
+
+  Change: 01c6c214bf432108618eba4ea108c2b71c3dc579
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-23 16:33:07 +0000
+
+    added create template for users 
+
+  Change: a988ddc12ea9a1febf99b9b84aaeecbc56d24d20
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-23 16:30:22 +0000
+
+    added quote_names stuff, updated DBIC prereq in Makefile.PL 
+
+  Change: b3ea65a7047085d8686ac8b7e5ef62a2f650297d
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-23 14:33:57 +0000
+
+    updated makefile with TWMPSGI, updated tests 
+
+  Change: b4ce71e203f422cd0387e92ba6cd97ac32a3b5f8
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-23 14:14:20 +0000
+
+    added list template, added default content type 
+
+  Change: aa97e56cb100a494c345849b1d8004b748c7c134
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-23 13:49:10 +0000
+
+    fixed up View::HTML so view tests passes 
+
+  Change: eb63ef3beff513f1cfecf27adc3ace0dcdfc19cb
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-23 13:45:20 +0000
+
+    updated config, makefile.pl, added necessary actions to entry and user
+    controllers, added templates 
+
+  Change: 8340aa777e022a1f026ed3daabe86c666dc42776
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-20 15:53:46 +0000
+
+    added user controller and session table with preliminary auth/session
+    config 
+
+  Change: 2ac4efec788459c6b2cddc642e1f8a068a40340f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-20 15:19:25 +0000
+
+    added index and fixed up view paths 
+
+  Change: d9322bbb23120a7c59402153656c4d9af0243c11
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-20 15:01:39 +0000
+
+    schema deploys 
+
+  Change: 417a4111b859f8caf4b292e1805d20648527cff9
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-19 14:55:01 +0000
+
+    updated base candy class and result class 
+
+  Change: 47fb026acad86c34cb4dea7701a6e9056d710520
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-19 14:49:51 +0000
+
+    added db deploy script 
+
+  Change: 95531a28dd618319c5de6ba32fac43d8385eaa16
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-19 14:47:31 +0000
+
+    updated schema 
+
+  Change: cd7533f801ee6d9521e61c91f125929c442a6450
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-16 14:19:29 +0000
+
+    renamed everything 
+
+  Change: 2aafdbbe627b6d21f0aa541b5d77d0711946db12
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 18:08:59 +0000
+
+    updated makefile added unfinished result classes 
+
+  Change: da5eea8372705c459c11ccceb34bcdba7a366328
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:51:40 +0000
+
+    updated config 
+
+  Change: ff621c83408f2e8b736ecdf950da1044e749c7c6
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:48:56 +0000
+
+    updated config added database model 
+
+  Change: bfff4ecc10c6339c4cd220a6eb47568d9732fd13
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:44:03 +0000
+
+    updated Makefile.pl 
+
+  Change: b1bd3c9f4ee487a33ab4739ae027f84a5b3ac987
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:40:48 +0000
+
+    added JSON view 
+
+  Change: bbbade423dfd3f01033c0c867edc9ad4337742a1
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:40:05 +0000
+
+    updated Makefile.pl added HTML view 
+
+  Change: f3bab19c7f9006057ad5e7ba5d7719ded9a1b3f9
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:33:07 +0000
+
+    fixed up makefile.pl 
+
+  Change: a6083c3db67a7133c49e2f1153dba4e72440f36f
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:28:57 +0000
+
+    moved things around 
+
+  Change: 14274f9417133935f45ce02a6d0f3fa12dbd738a
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:28:35 +0000
+
+    updated Makefile.pl 
+
+  Change: 703181848a025e736cd13cdc078d844e19c11c86
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2011-12-15 17:09:21 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

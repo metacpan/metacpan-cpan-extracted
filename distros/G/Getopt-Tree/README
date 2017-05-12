@@ -1,0 +1,320 @@
+NAME
+    Getopt::Tree - Get tree-like options (like the route command).
+
+ABSTRACT
+    Getopt::Tree is a module to help parse and validate command line
+    parameters built on top of Getopt::Long. Getopt::Tree allows the
+    developer to specify an array parameters, including the name,
+    abbreviation, type, description, and any parameters that are applicable
+    to and/or dependent on that parameter.
+
+EXAMPLE
+  Simple "route" example
+     # Accept the commands add, remove, print, and their associated dependent
+     # options.
+     my $p = [
+         {
+             name     => 'add',
+             exists   => 1,
+             descr    => 'Add a new route',
+             params   => [
+                 {
+                     name => 'gateway',
+                     abbr => 'gw',
+                     descr => 'Remote gateway for this network',
+                 },
+                 {
+                     name => 'network',
+                     abbr => 'net',
+                     descr => 'Network address to add route for',
+                 },
+                 {
+                     name => 'subnet',
+                     abbr => 'mask',
+                     descr => 'Subnet mask for the given network',
+                 },
+             ],
+         },
+         {
+             name     => 'remove',
+             abbr     => 'delete',
+             exists   => 1,
+             descr    => 'Delete a route',
+             params   => [
+                 {
+                     name => 'network',
+                     abbr => 'net',
+                     descr => 'Network address to delete',
+                 },
+                 {
+                     name => 'subnet',
+                     abbr => 'mask',
+                     descr => 'Subnet mask for the given network',
+                 },
+             ],
+         },
+         {
+             name     => 'print',
+             exists   => 1,
+             descr    => 'Display routing table',
+         }, 
+     ];
+
+  Complex example
+     my $p = [
+         # Required global parameter.
+         { name => 'user', leaf => 1, eval => sub { my ( $p ) = @_; return 1 if $p =~ /^[a-z]+$/i; },
+         # Optional global parameter.
+         {
+             name     => 'no-cache',
+             abbr     => 'nc',
+             exists   => 1,
+             optional => 1,
+             descr    => 'Don\'t cache your credentials in /tmp/.'
+         },
+         # Start of a branch. If one or more branches exist, at least one must be
+         # followed.
+         {
+             name   => 'search',
+             abbr   => 's',
+             descr  => 'Search for ticket, list tickets in queue, or print contents of a ticket.',
+             params => [
+                {
+                     name   => 'ticket', # field name
+                     abbr   => 't',      # alternate name  
+                     re     => TICKET_REGEX, # field must match re
+                     descr  => 'The ticket number to search for.', # auto-doc
+                     params => [
+                         { # fields that are allowed if this field is set
+                             name     => 'show-all-worklog-fields',
+                             exists   => 1, # I just want a 1 or a 0 if set
+                             optional => 1,
+                             descr    => 'Show all worklog fields.'
+                         },
+                         {
+                             name     => 'show-all-fields',
+                             multi    => 1, # can be set multiple times, returns arrayref
+                             exists   => 1, # unless exists is set too, then you just get the count
+                             descr    => 'Show all ticket fields.'
+                         },
+                     ],
+                },
+             ],
+         }
+     ];
+     my ( $operation, $params ) = parse_command_line( $p );
+     if ( !$operation ) { print_usage( $p ); die; }
+     print "Performing $operation!\n"
+
+USAGE
+    Two functions are exported by default: parse_command_line and
+    print_usage.
+
+  Functions
+   parse_command_line
+    Parses the command line (@ARGV) based on the specified data structure.
+
+    Accepts two parameters. The first is a required array reference
+    describing the possible command line parameters. It returns three
+    values, the "top level" option, a hashref of the other specified
+    options, and an arrayref of any remaining unparsed options (similar to
+    Getopt::Long).
+
+    The second parameter is an optional array reference or string from which
+    the parameters are to be read, rather than reading them from @ARGV. If a
+    string is passed, it will be converted to an array via
+    "Text::ParseWords::shellwords".
+
+    If the command line was unable to be parsed (the passed data structure
+    was inconsistent, etc), parse_command_line will die with an appropriate
+    error message. If the command line was invalid (the user entered
+    something that did not meet the given requirements, etc) a warning will
+    be printed and undef will be returned.
+
+   print_usage
+    Prints usage information based on the specified data structure.
+
+    Takes two parameters, the first is a required array reference describing
+    the possible command line parameters, and the second is an optional file
+    handle to which the usage information will be printed. Alternately, in
+    place of a filehandle, a hashref of options can be passed. Valid options
+    are:
+
+    fh  The filehandle to print to. If not set, no output is printed.
+
+    return
+        A boolean value that determines whether or not the usage should be
+        returned as a string.
+
+    wrap_at
+        Number of characters to wrap the output at. Will be auto-detected
+        from $ENV{COLUMNS} if not set, defaults to 80 if auto-detection
+        fails.
+
+    hide_top_line
+        Hides the top line of output which contains the program name how to
+        pass switches.
+
+    Usage information is generated mostly from the "descr" fields in the
+    data structure, indentation is based on parameter dependence, parameters
+    that accept values are noted, and optional parameters are presented
+    inside of brackets.
+
+  Configuration
+    The "expected command line configuration data structure" will be
+    referred to as "the data structure" because I can't think of a better
+    name for it.
+
+   Concepts
+    The design is similar to the Unix "route" command, in which a "top
+    level" command (such as "add" or "delete") will have zero or more
+    dependent parameters (such as the "gateway" or "subnet"). Getopt::Tree
+    uses Getopt::Long to actually parse the command line, but adds a layer
+    of logic on top to discover which top level command and dependent
+    options the user specified. Conflicting options, parameter types, and
+    usage document generation are all handled by Getopt::Tree based on the
+    data structure supplied by the developer.
+
+    Commands are separated into two types, top level and dependent. At least
+    on top level command is required. Once Getopt::Tree identifies the
+    proper top level command, it will look for the dependent commands that
+    apply to the specified top level command. Since each dependent command
+    can also have dependent commands, the process is repeated until no more
+    commands are found.
+
+    Each set of dependents in the tree is considered a "level", with the top
+    level being the first set of entries in the structure, and each
+    successive level being composed of the dependents of the prior level.
+    Note that a level could simply be described as the distance to the top
+    of a tree, where as a "branch" would be the specific set of dependents
+    for a given command, irrespective of dependents of commands on the same
+    level.
+
+   Data Structure
+    The data structure is composed of an array of hashrefs. Each hashref
+    describes a single parameter. Each hashref in the array contains various
+    options describing the parameter. Valid options are as follows:
+
+   name
+    Full parameter name. Required. Must not contain the characters "@", "|",
+    or "=" and must not conflict with other names or abbreviations in the
+    same branch. This is the name that will be returned, if the parameter is
+    set, by parse_command_line.
+
+   abbr
+    Parameter abbreviation. Will be accepted on the command line in place of
+    the proper name, but must obey the same rules as the proper name.
+
+   optional
+    Defines whether this parameter is optional. Boolean. Defaults to false,
+    ie, the parameter is required.
+
+   exists
+    Defines whether or not the parameter has a value or whether it should
+    simply be checked for existence. Boolean. Defaults to false, ie, the
+    parameter must have a value.
+
+   leaf
+    Defines whether or not the parameter should be considered a "leaf" on
+    the current branch or not. A leaf is a required parameter at the current
+    level and has no dependents. Useful to place a required parameter that
+    applies to multiple branches without specifying the required parameter
+    in each branch. Conflicts with "optional" and "params". Defaults to
+    false, ie, this parameter is not a leaf.
+
+   params
+    An optional arrayref of hashrefs representing parameters dependent on
+    this parameter. Format is exactly the same as for the primary data
+    structure.
+
+   descr
+    Textural description of what the parameter is and does. Used as part of
+    the usage information. If not set, a placeholder is supplied.
+
+   multi
+    Defines whether or not this parameter can be specified multiple times or
+    not. Boolean. Defaults to false.
+
+   re
+    Defines a regular expression to match values against. The result of the
+    first capture of this expression will be treated as the value in place
+    of the user-specified value. If no capture is found or the match fails,
+    the parameter will be treated as invalid. Conflicts with "exists". If
+    both "re" and "eval" are specified, "re" will be processed first and the
+    result passed to "eval".
+
+   eval
+    Defines a subroutine to be called to validate the value passed for this
+    parameter. The returned value from the subroutine will be used in place
+    of the user-specified value. If undef is returned, the parameter is
+    treated as invalid. Conflicts with "exists". If both "re" and "eval" are
+    specified, "re" will be processed first and the result passed to "eval".
+
+VARIABLES
+  $Getopt::Tree::USAGE_HEADER
+    Text to be printed near the top of the "usage" output.
+
+  $Getopt::Tree::USAGE_HEADER
+    Text to be printed at the end of the "usage" output.
+
+  $Getopt::Tree::SWITCH_PREFIX_STR
+    Characters to prefix a switch. Defaults to a single hyphen ('-'). Can be
+    set to an empty string to use switchless options (Note: This option is
+    not well tested!).
+
+NOTES
+    You can't have a dependent parameter of the same name as a non-optional
+    parameter higher in the tree. If the parser sees a two instances of the
+    same parameter it will bail, so you have to make sure that there are no
+    identically named parameters in one part of the tree as in another part
+    of the tree that the parser passes through. Example:
+
+     { name => 'bad' },
+     { name => 'normal', params => [ { name => 'bad' }, { name => 'bad2' } ] }
+     { name => 'normal2', params => [ { name => 'bad2' } ] }
+
+    Both of the 'bad' entries will collide when the user specifies 'normal',
+    since the parser passes through the top level and the normal->params
+    level. However, bad2 will never collide because the parser will never
+    pass through both levels.
+
+    Also, identical abbreviations are not checked for or corrected. They
+    will probably cause problems.
+
+CHANGES
+  Version 1.12, 20100411, jeagle
+    Add ability to return usage as a string.
+
+    Add ability to set the prefix character via
+    $Getopt::Tree::SWITCH_PREFIX_STR
+
+    Remove automatic -help flag.
+
+    Fix a silly bug causing parameter values that evaluate to false to fail.
+
+  Version 1.11, 20100917, jeagle
+    Appease older versions of Perl in print_usage's usage of square brackets
+    in a string.
+
+  Version 1.10, 20100709, jeagle
+    Correct handling of eval flags mixed with other flags.
+
+    Add optional destination filehandle to print_usage.
+
+    Clean up for export to CPAN.
+
+  Version 1.9, 20100428, jeagle
+    Show usage if no parameters are passed.
+
+  Version 1.8, 20100427, jeagle
+    Add $Version variable.
+
+    Give a better error message for parameters passed without a leading '-'.
+
+  Version 1.4, 20100427, jeagle
+    Add automatic -help flag parsing. This feature may cause problems if
+    users wanted to override '-help', so this may change in the future.
+
+    Show required leaf parmeters at the top usage line, reformat usage a
+    little.
+

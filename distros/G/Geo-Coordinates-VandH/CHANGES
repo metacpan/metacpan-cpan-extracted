@@ -1,0 +1,7 @@
+Convert-VH version 1.11
+=======================
+
+	1.0 release, initial release;
+        1.01 release, fixes VandH.pm to use Math::Complex - some V and H coordinates were coming out with negative square root errors, this fixes that.;
+	1.10 release, Adds distance calculations. Results are in miles;
+	1.11 release, fixes prereq_pm directive in Makefile.PL (closes: 16722)

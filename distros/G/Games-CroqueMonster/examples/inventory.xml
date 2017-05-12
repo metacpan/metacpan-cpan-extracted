@@ -1,0 +1,40 @@
+<inventory agency="NOM Agence" id="ID agence">
+    <resource
+        id="1"
+        name="Chaussette sale"
+        qty="2"
+    />
+    <resource
+        id="2"
+        name="petite voiture"
+        qty="1"
+    />
+    <item
+        id="1"
+        name="Crème à acné"
+        qty="3"
+    />
+    <item
+        id="2"
+        name="Ombres portées"
+        qty="3"
+    />
+    <!-- factory n'est présent que si des équipements sont en construction dans l'atelier -->
+    <factory
+        id="1"
+        name="Crème à acné"
+        end="2008-10-28 08:31:50">
+        <!-- les équipement en file d'attente dans l'atelier -->
+        <next
+            id="2"
+            name="Crème à acné"
+            end="2008-10-28 08:33:50"
+        />
+	<next
+            id="3"
+            name="Crème à acné"
+            end="2008-10-28 08:35:50"
+        />
+    </factory>
+
+</inventory>

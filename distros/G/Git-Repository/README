@@ -1,0 +1,43 @@
+Git-Repository
+
+Git::Repository is a Perl interface to Git, allowing scripted
+interactions with one or more repositories. It's a low-level interface,
+allowing to call any Git command, either porcelain or plumbing,
+including bidirectional commands such as git commit-tree.
+
+Since it is a low-level interface, it doesn't provide any fancy way to
+call Git commands. It is up to the programmer to setup any environment
+variables (except GIT_DIR and GIT_WORK_TREE) that the underlying
+Git command may need and use.
+
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Git::Repository
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Repository
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Git-Repository
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Git-Repository
+
+    Search CPAN
+        http://search.cpan.org/dist/Git-Repository
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2010-2016 Philippe Bruhat (BooK)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

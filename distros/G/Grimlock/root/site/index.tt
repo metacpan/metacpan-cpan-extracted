@@ -1,0 +1,4 @@
+<h1>[% c.config.blog.title || "<b>No blog title set in configuration" %] </b></h1>
+[% FOR entry IN rest.entries %]
+  [% INCLUDE 'entry/fragment.tt' %]
+[% END %]

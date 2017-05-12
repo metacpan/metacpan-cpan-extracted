@@ -1,0 +1,6 @@
+GTK_TYPE_CELL_RENDERER_SPINNER	GtkCellRendererSpinner	GtkObject	Gtk2::CellRendererSpinner
+GTK_TYPE_OFFSCREEN_WINDOW	GtkOffscreenWindow	GtkObject	Gtk2::OffscreenWindow
+GTK_TYPE_SPINNER	GtkSpinner	GtkObject	Gtk2::Spinner
+GTK_TYPE_TOOL_ITEM_GROUP	GtkToolItemGroup	GtkObject	Gtk2::ToolItemGroup
+GTK_TYPE_TOOL_PALETTE	GtkToolPalette	GtkObject	Gtk2::ToolPalette	Gtk2::ToolPalette
+GTK_TYPE_TOOL_PALETTE_DRAG_TARGETS	GtkToolPaletteDragTargets	GFlags	Gtk2::ToolPaletteDragTargets

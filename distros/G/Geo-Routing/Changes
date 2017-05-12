@@ -1,0 +1,59 @@
+Revision history for Geo::Routing (previously Geo::Gosmore)
+
+0.11 2011-07-29 07:09:19
+
+    - Alter the OSRM query_string method to use the json protocol by
+      default.
+
+0.10 2011-07-28 11:35:27
+
+    - Support both XML and JSON query methods to OSRM for debugging
+
+    - Use keep-alive with Mechanize
+
+    - More robust tests
+
+0.09 2011-07-26 22:57:34
+
+    - Switch from XML parsing for OSRM to using JSON::XS. Eliminates
+      the entire need for parsing things, and makes things faster.
+
+0.08 2011-06-30 12:12:09
+
+    - Use my own ad-hoc regexp powered XML parser instead of
+      XML::Simple by default. This cut down cpu time in production
+      from 40% per process to 5%.
+
+    - Use curl instead of WWW::Mechanize. Makes it easier to see which
+      process is waiting for what in top(1).
+
+0.07 2011-06-28 14:03:21
+
+    - OSRM can now return the distance & time in the correct format.
+
+    - A bunch of bugfixes and refinements, now faster with a
+      dependency on XML::SAX::Expat.
+
+0.06 2011-06-27 14:10:45
+
+    - Initial version with rudimentary support for multiple backends.
+
+0.05 2011-06-20 15:11:49
+
+    - Support HTTP queries and add documentation
+
+0.04 2011-06-20 08:52:34
+
+    - Add IPC::System::Simple as a dependency
+
+0.03 2011-06-18 19:48:37
+
+    - Documentation, improved API. Travel time API.
+
+0.02 2011-06-18 13:39:17
+
+    - Add the handling of no route found to the API.
+
+0.01 2011-06-18 13:16:41
+
+    - Initial buggy version

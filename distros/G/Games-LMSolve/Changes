@@ -1,0 +1,42 @@
+0.10.1  2017-03-08
+    - Fix a bug with the plank puzzles where a plank could be placed right
+    over itself or a different plank of the same length.
+        - Reported by someone on email - thanks!
+
+0.10.0  2017-02-19
+    - Convert the build system to Dist-Zilla.
+    - Moved the repository to GitHub.
+
+0.8.6   2014-01-30
+    - Minimum perl version set to 5.8.x (CPANTS KWalitee).
+
+0.8.5   2013-05-22
+    - Remove lm-solve.spec.in and lm-solve.spec .
+    - Remove Makefile.PL.
+    - Add t/style-trailing-space.t .
+        - Remove trailing space.
+    - Update URLs and E-mail addresses.
+    - Add t/cpan-changes.t and convert this file to CPAN::Changes format.
+
+0.8.4   2009-06-28
+    - Changed COPYING to read MIT/X11 instead of Public Domain.
+    - Changed the license in Build.PL to "mit".
+    - Updated Test::Run::Builder to include ACTION_tags.
+    - Added use warnings to all lib/**/*.pm files.
+    - Added some "requires" (built-in, but still.).
+    - Added resources and keywords to the META.yml / Build.PL .
+
+0.8.3   2007-08-27
+    - Added the Changes file.
+    - Added the jumping_cards.pl example under examples.
+    - Added the MIT X11 license as the LICENSE file.
+    - Added the t/pod.t and t/pod-coverage.t tests and added full
+    POD coverage.
+    - Converted to Build.PL in order to have a better META.yml
+    and other advantages.
+    - All changes are done to improve:
+        http://cpants.perl.org/dist/Games-LMSolve
+    - Mentioned the subversion repository in the README and the main
+    POD file.
+    - Added the common Module-Starter-like URLs for information under
+    "SUPPORT".

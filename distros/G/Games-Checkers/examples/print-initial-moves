@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Games::Checkers::Constants;
+use Games::Checkers::MoveConstants;
+use Games::Checkers::BoardTree;
+
+my $board = Games::Checkers::Board->new;
+my $color = White;
+
+my $board_node = Games::Checkers::BoardTreeNode->new($board, NO_MOVE);
+
+my $counting_moves = Games::Checkers::CountMoveList->new($board, $color);
+die "Internal problem" unless $counting_moves->{status} == Ok;
+print "There are ", $counting_moves->get_count, " possible initial moves.\n";
+
+my $creating_moves = Games::Checkers::CreateMoveList->new($board_node, $color);
+die "Internal problem" unless $creating_moves->{status} == Ok;
+
+print $board->dump;
+
+foreach (@{$board_node->{sons}}) {
+	print "-" x 78, "\n\n";
+	print "Move: ", $_->{move}->dump, "\n";
+	print $_->dump, "\n";
+}

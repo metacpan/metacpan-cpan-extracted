@@ -1,0 +1,13 @@
+graph,edgedefault=>'undirected'
+node,id=>2,label=>'vadas'
+node,id=>1,label=>'marko'
+node,id=>4,label=>'josh'
+node,id=>3,label=>'lop'
+node,id=>5,label=>'ripple'
+node,id=>6,label=>'peter'
+edge,directed=>'undirected',id=>12,sourceID=>3,targetID=>6,weight=>0.2
+edge,directed=>'undirected',id=>9,sourceID=>1,targetID=>3,weight=>0.4
+edge,directed=>'undirected',id=>8,sourceID=>1,targetID=>4,weight=>1.0
+edge,directed=>'undirected',id=>10,sourceID=>4,targetID=>5,weight=>1.0
+edge,directed=>'undirected',id=>11,sourceID=>4,targetID=>3,weight=>0.4
+edge,directed=>'undirected',id=>7,sourceID=>2,targetID=>1,weight=>0.5

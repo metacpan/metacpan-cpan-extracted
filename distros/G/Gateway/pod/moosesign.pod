@@ -1,0 +1,28 @@
+=head2 moosesign
+
+Does simple PGPMoose signing of messages.  This module is B<not> a full
+implementation of PGPMoose; in particular, it doesn't support all of the
+crosspost handling.  It looks through the groups in the Newsgroups header
+and adds a PGPMoose X-Auth header for every group in the Newsgroups header
+for which a PGP key has been given.
+
+This module takes one configuration directive, which associates a PGP key
+ID and passphrase with a newsgroup:
+
+=over 4
+
+=item pgpkey NEWSGROUP PASSPHRASE KEYID
+
+Associates the given C<KEYID> and C<PASSPHRASE> with C<NEWSGROUP>.
+C<KEYID> is optional and will default to the name of the newsgroup
+surrounded by spaces if not given.  (This default will allow PGP to find
+the key correctly if the key ID is something like "Moderator for
+group.name <address>" while avoiding confusing group.name and
+group.name.other.)
+
+=back
+
+Note that using this module means putting the PGP passphrases for the
+moderation keys in cleartext in the configuration file or in the script.
+
+This module takes no arguments and cannot fail.

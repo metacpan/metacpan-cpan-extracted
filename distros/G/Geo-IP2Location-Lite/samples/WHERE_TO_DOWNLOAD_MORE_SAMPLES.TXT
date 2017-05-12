@@ -1,0 +1,6 @@
+----
+NOTE
+----
+
+You can visit http://www.ip2location.com/developers to download all the samples BIN file.
+

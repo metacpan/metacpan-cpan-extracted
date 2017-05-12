@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Geo-Cartogram.t
+lib/Geo/Cartogram.pm

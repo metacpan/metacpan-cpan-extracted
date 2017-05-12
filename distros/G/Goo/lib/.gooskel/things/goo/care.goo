@@ -1,0 +1,8 @@
+title			=	CareOMeter
+description		=	Display Things I need to care about
+
+[Z]one			= 	Goo::Zone.pm
+Care[O]Meter 	=	Goo::CareOMeter.pm
+[J]ump			=	Goo::JumpManager.pm
+[S]hell 		=	Goo::ShellCommander.pm
+E[X]it			= 	Goo::Exiter.pm

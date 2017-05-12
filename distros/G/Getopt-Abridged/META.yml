@@ -1,0 +1,25 @@
+---
+name: Getopt-Abridged
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: quick and simple full-featured option handling
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Getopt-Abridged
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.scratchcomputing.com/Getopt-Abridged/trunk
+requires:
+  Getopt::Base: v0.0.2
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+provides:
+  Getopt::Abridged:
+    file: lib/Getopt/Abridged.pm
+    version: v0.0.1
+generated_by: Module::Build version 0.3103
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

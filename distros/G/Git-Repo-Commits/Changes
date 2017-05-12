@@ -1,0 +1,11 @@
+2017-02-23  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Git/Repo/Commits.pm (Git): version 0.0.4, extracts also committer information from the log. 
+	Stores the hashes of the commits in the returned object. 
+	(Git): Moves around author tests and changes documentation for 0.0.5.
+
+Revision history for Git-Repo-Commits
+
+0.0.1  Wed Feb 22 17:11:06 2017
+       Initial release.
+

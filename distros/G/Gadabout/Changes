@@ -1,0 +1,11 @@
+Revision history for Perl extension Gadabout.
+
+1.0002  Mon Apr  7 11:01:11 2003
+	- Fix name in Gadabout::Imlib2
+
+1.0001  Mon Apr  7 10:25:15 2003
+	- Fix name in Gadabout::Pie
+
+1.0     Tue Feb 25 20:33:11 2003
+	- original version
+

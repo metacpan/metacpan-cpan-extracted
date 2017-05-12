@@ -1,0 +1,29 @@
+Games::Mines
+-------------
+This module is the basis for mine finding game. It contains the 
+basic methods necessary for a game.
+
+It includes the basic Games::Mines module that does the game itself,
+and a Games::Mines::Play module that lets you play a basic text based game.
+
+There is also a working game, pmine, included, although it is not installed
+with the rest.
+
+Building
+--------
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Author
+------
+
+This module was written by Martyn W. Peck <mwp@mwpnet.com>
+
+Copyright 2002, Martyn Peck. All Rights Reserves.
+
+This program is free software. You may copy or
+redistribute it under the same terms as Perl itself.
+

@@ -1,0 +1,98 @@
+Revision history for Getopt-Complete
+
+0.26    2011-08-23
+        Minor rewrite to use COMP_WORDS instead of COMP_LINE to resolve bug involving redirection.
+        Include bin/getopt_complete.sh which can be sourced in Bash to load the completion function.
+        Updated test case to hopefully not fail for users with an empty home directory.
+
+0.25    2011-03-28
+        Fixed bug with '<>=s@' not taking multiple values.
+        Fixed but with single character options.
+
+0.24    2011-03-02
+        The "version" module makes this difficult to install.  Switching to simple text version "0.24".
+
+0.23    2011-01-19
+        Updated build logic to prevent installation with out a recent version.pm
+
+0.22    2011-01-16
+        Another atch from  Andrei Benea (abenea@github) fixing bug with nonsense argument not generating an error.
+
+0.21    2011-01-12
+        Patch from  Andrei Benea (abenea@github) fixing bug with all bare arguments.
+        Fix to the demoapp test.
+        Switch to Build.PL instead of Makefile.PL so we can install on Mac w/o xcode.
+
+0.20    2010-11-24
+        Updates to cache logic.
+        Replacement for 0.19 which failed to compile.
+
+0.17    2010-11-04
+        Fixed bug in parse_completion_request that was preventing detection of boolean options
+        Support for completing bareargs as files.
+        Support for completing unknown options as files.
+
+0.16    2010-11-02
+        Fixed bug in completing paths beginning with ~
+        Better support for params that are expanded by Bash
+
+0.15    2010-10-24
+        Fixed a failing test with a bad perl interpreter path for the demoapp.
+        Fixed a bug with running tests on a machine with a space in the path to the files.
+
+0.14    2010-09-09
+        Fixed bug that returned completion results even when various errors were encountered.
+        Added t/demoapp*, a test to validate some basic tab completion results.
+
+0.13    2010-07-23
+        Added LazyOptions and Cache for improved handling of nested commands.
+        Refactored for testability.
+        Added stricter failing when cant read opts file.
+
+0.11    2009-11-01
+        Removed the pod test which breaks automatic installs via the CPAN shell.
+
+0.10    2009-08-02
+        Fixed a bug which made file/directory paths at which there is no file "invalid".
+        (This was bad news for apps which want you to specify an output file.)
+
+0.9     2009-07-27
+        Fixed a bug in the last release which allowed the app to continue when there are argument errors.
+        Support for completion values with whitespace.
+        Updates to error messages to do the right thing when showing lists of possible completions in the message.
+        Made "lone dash support" disabled by default until it works correctly.
+        Added OSCON lightning talk to docs.
+
+0.8     2009-07-24
+        Fixed a bug in the last release causing params to dump to the screen upon execution.
+
+0.7     2009-07-18
+        Fixed a critical bug in the last release causing %ARGS and $ARGS to not export.
+
+0.6     2009-07-18
+        Sub-command tree support added.
+
+0.5     2009-07-18
+        The exported results are now called %ARGS instead of %OPTS.
+        Correctly handling spaces, quotes, etc. by using bash itself to parse the command line.
+        Options are no longer shown in the hint list if they have already been used.
+        Refactored into object-orient structure internally.
+
+0.4     2009-07-15
+        Handle negative boolean flags (--no-*) iteratively.
+        Handle other options with dashes in the name correctly.
+        Switch to unpadded version numbers.
+
+0.03    2009-07-12
+        No longer need support for 'complete -F' to see the whole command-line.  Code removed.
+        Tons of documentation.
+        Fixed bugs with completion of file and directory paths.
+        Support for partial completions.
+
+0.02    2009-07-11
+        Added support for "complete -F" in addition to "complete -C".
+        (The app can now examine the entire command-line, not just the option pair currently under consideration.)
+
+0.01    2008-12-19
+        First version, released on an unsuspecting world.
+

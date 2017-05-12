@@ -1,0 +1,142 @@
+Revision history for Game-Theory-TwoPersonMatrix
+
+0.2007 2016-01-20 19:22:22
+    - Simplified code in eg/minimax and eg/maximin.
+    - Cleaned up distribution a bit.
+    - Improved documentation ever so slightly.
+
+0.2006 2015-12-25 18:40:48
+    - Cleaned code a bit.
+    - Improved documentation slightly.
+    - Added eg/play-melody.
+    - Added the Test::Synopsis author plugin.
+
+0.2005 2015-05-02 05:18:21
+    - Removed compiler restriction from eg/ scripts.
+    - Replaced numeric tests with cmp_ok ==.
+
+0.2004 2015-05-01 08:18:02
+    - Enhanced the eg/play script with strategic subroutines.
+    - Improved documentation.
+
+0.2003 2014-12-27 01:40:21
+    - Fixed the syntax of eg/play.
+
+0.2002 2014-12-27 01:23:51
+    - Fixed copy-pasta eg/minimax messages.
+
+0.2001 2014-12-27 01:11:43
+    - Improved documentation.
+    - Added a simplistic play() simulation under eg/.
+
+0.20  2014-12-27 12:29:47
+    - Allowed s_expected_value() to handle non-zero-sum payoffs.
+
+0.1903 2014-12-25 09:43:36
+    - Re-added a non-zero-sum play() test.
+    - Improved documentation.
+    - Fixed play() arguments - hashref to hash.
+
+0.1902 2014-12-24 08:27:02
+    - Return play() as a strategy - outcome set, instead of just the outcome.
+
+0.1901 2014-12-24 03:27:49
+    - Improved documentation! 
+
+0.19  2014-12-24 03:12:36
+    - Return a proper arrayref for non-zero-sum play().
+    - Improved documentation!
+    - Allowed alternate strategies to be given to play(). 
+
+0.18  2014-12-24 12:33:54
+    - Added an actual play() method!
+
+0.17  2014-12-24 09:15:11
+    - Allowed multiple saddlepoints to be found in non-symmetric games.
+
+0.16  2014-12-23 06:07:49
+    - Enabled counter_strategy() computation for non-zero-sum games.
+
+0.1504 2014-12-23 08:42:14
+    - Fixed misleading documentation. 
+
+0.1503 2014-12-22 08:41:40
+    - Improved documentation and added handy code comments.
+
+0.1502 2014-12-21 06:21:21
+    - Handled non-zero-sum expected_payoff().
+
+0.1501 2014-12-21 02:01:12
+    - Improved documentation.
+
+0.15  2014-12-21 01:49:04
+    - Implemented the nash() equilibria method!
+
+0.14  2014-12-21 09:39:33
+    - Made mm_tally() honor non-zero-sum games.
+    - Improved documentation.
+    - Added pareto_optimal().
+
+0.13  2014-12-20 12:12:27
+    - Added mm_tally().
+    - Improved documentation.
+
+0.1202 2014-12-19
+    - Improved documentation.
+
+0.1201 2014-12-19
+    - Fixed strategy pruning logic in *reduce().
+
+0.12  2014-12-19
+    - Split reduce() into row & col reduce() methods.
+
+0.11  2014-12-19
+    - Added reduce() game reduction by strictly dominated rows or columns.
+
+0.10  2014-12-17
+    - Added oddments() computation for 2x2 games.
+
+0.09  2014-12-15
+    - Implemented saddlepoint computation for strictly domainated games.
+
+0.0801 2014-12-14
+    - Fixed documented examples with crucial parens.
+    - Added minimx and maximin examples in eg/
+
+0.08  2014-12-11
+    - Implemented counter_strategy()
+
+0.07  2014-12-10
+    - Correctly enabled expected_value()
+    - Added tests from the cited textbook examples
+
+0.06  2014-12-10
+    - Stripped down everything and starting over...
+
+0.05  2014-12-10
+    - Added tests for mixed().
+    - Added the player_strategy() method, tests and docs.
+    - Added expected_value()
+
+0.04  2014-11-18
+    - Re-added mixed() and Math::Calculus::* deps.
+
+0.03  2014-08-30
+    - Improved documentation.
+    - Removed the broken dependency on the missing Math::Calculus::Expression module.
+
+0.0201 2014-02-02
+    - Enhanced documentation!
+
+0.02  2014-02-02
+    - Implemented optimal strategy equation computation via probabilities over
+      combined opponent strategic utilities.
+
+0.0101 2014-01-29
+    - Improved documentation
+    - Added tests for negative utilities
+
+0.01  2014-01-28
+    - Documented the thing!
+    - Moved functionality from script subs to module methods
+    - Minted by Dist::Zilla

@@ -1,0 +1,49 @@
+GD::SecurityImage::AC
+=====================
+
+This module is a drop-in GD::SecurityImage replacement for 
+Authen::Captcha. Module is mostly compatible with Authen::Captcha,
+but there are some differences.
+
+Read the module's POD for documentation, examples and other 
+information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or under Windows:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+Alternatively, you can use the Build.PL
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+DEPENDENCIES
+
+This module requires this other module:
+
+	GD::SecurityImage 1.60
+	Digest::MD5
+
+Which are available on CPAN.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 Burak Gürsoy <burak@cpan.org>, 2007 Benjamin Franz <snowhare@nihongo.org>. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself, either Perl version 5.8.7 or, 
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,74 @@
+{
+   "abstract" : "A module can alloc 512MB Sysv IPC shared memory for perl",
+   "author" : [
+      "itsusony <itsusony@fout.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Global-IPC-StaticVariable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LeakTrace" : "0.15",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Global::IPC::StaticVariable" : {
+         "file" : "lib/Global/IPC/StaticVariable.pm",
+         "version" : "0.015"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/itsusony/Global-IPC-StaticVariable/issues"
+      },
+      "homepage" : "https://github.com/itsusony/Global-IPC-StaticVariable",
+      "repository" : {
+         "url" : "git://github.com/itsusony/Global-IPC-StaticVariable.git",
+         "web" : "https://github.com/itsusony/Global-IPC-StaticVariable"
+      }
+   },
+   "version" : "0.015",
+   "x_authority" : "cpan:ITSUSONY"
+}

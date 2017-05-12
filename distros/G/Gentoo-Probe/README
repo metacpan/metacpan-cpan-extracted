@@ -1,0 +1,42 @@
+Gentoo-Probe version 0.01
+=========================
+
+Gentoo::Probe is a set of modules to allow the Gentoo package database to be
+queried from perl.  It does alot of the stuff that qpkg did, but faster.
+
+It also includes the following scripts:
+	pkg			# lists packages, with options
+	pkg-files	# given a package regex, list files.
+	pkg-of		# given a file regex, list containing package(s).
+	pkg-faq		# ask questions of portage, like portageq, but much faster
+				# if you ask more than one question.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+	Text::Number    version  0.8,
+	Inline::Python  version  0.22,
+	String::Escape  version  0,
+	Term::ReadLine  version  1.02
+  
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 by Rich Paul
+	cpan@rich-paul.net
+
+	Mail to the above address will bounce.  You can figure it out.
+	Think of it as a crude turing test.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.

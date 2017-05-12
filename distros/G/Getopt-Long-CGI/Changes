@@ -1,0 +1,8 @@
+Revision history for Perl extension Getopt::Long::CGI.
+
+0.02  Sun Mar 05 14:37:00 2017
+	- new UI to allow "not specified"
+
+0.01  Tue Dec 30 11:08:55 2014
+	- original version
+

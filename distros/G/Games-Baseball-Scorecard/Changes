@@ -1,0 +1,29 @@
+0.03  Thu Oct 20 21:48:38 2005
+	- Some syntax changes for play_ball
+	- Add init() parsing/handling to play_ball (see example3.plx)
+	- Put in some sanity-checking for outs, balls, strikes, and fouls
+	- Make sure totals() can be called only once
+	- Make sure that totals are properly tabulated even if a batter's
+	  totals cannot be printed
+	- Allow pdfopen() to take a filename to open as an argument
+	- Moved examples to examples/ directory, and added more
+
+0.02  Fri Sep 16 23:47:38 2005
+	- run actual test
+	- clean up internal path handling
+	- add home_away() method for switching which is active team
+	- adds 'lefties' key for init() method, an array of which pitchers
+	  are lefites
+	- add Wind game info
+	- switch order of K and BB in stats to be more consistent with
+	  box scores I am comparing against
+	- handle more than three batters for each position, up to six extra
+	  total
+	- fix small bug in pitches()
+	- add LABEL argument to hit()
+	- small layout fixes
+	- add play_ball() method, a way of keeping score entirely in
+	  text, insetad of calling methods directly (see example2.plx)
+
+0.01  Wed Sep 14 13:45:51 2005
+	- original version

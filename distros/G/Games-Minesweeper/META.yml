@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Games-Minesweeper
+version:             0.5
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    AnyEvent:                      0
+    File::HomeDir:                 0
+    Gtk2:                          1.043
+    SDL:                           0
+    SDL::Mixer:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

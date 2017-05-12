@@ -1,0 +1,60 @@
+GSM::Nbit - GSM 7bit and 8bit data encoder and decoder.
+
+Throughout GSM world "special" encodings called 7bit and 8bit are used.
+Encoding in 8bit is just plain HEX value and is provided here for completeness
+and ease of use, 7bit packs 8bit data into 7bit HEX value by limiting it to the
+lower 127 characters - and hence gaining 1 extra char every 8 characters.
+
+That's how you get 160 characters limit on plain text (ASCII + few Greek chars)
+messages with only 140 bytes for data.
+
+Since many modules need such encodings in them, those functions are refactored
+here. It's released as separate module and not part of some other distribution
+exactly for that reason.
+
+I personally needed to use it in few different modules.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Note that you might need to update your Encode.pm module beforehand for tests
+to pass since older version had a bug for gsm0338 encode/decode of @ char.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc GSM::Nbit
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=GSM-Nbit
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/GSM-Nbit
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/GSM-Nbit
+
+    Search CPAN
+        http://search.cpan.org/dist/GSM-Nbit/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Aleksandar Petrovic
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,29 @@
+The Geo::WeatherNWS module is used to get the latest METAR encoded 
+observations from the National Weather Service and decode them to a 
+perl-friendly format.  The jump to version 1.01 was made because I
+decided to lock the interface down from the 0.23 version.  There are
+also some minor bug fixes in the remarks section.
+
+The documentation on how to use the module is available via perldoc.
+
+Requirements:
+
+	Net::FTP
+	POSIX
+	Carp
+	LWP::UserAgent (only if http is used)
+    Test::More
+
+Install this module in the normal way:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+Todo:
+	- Adding experimental tie-in to GD::Graph
+	- Adding experimental 12-24 hour forecast system
+	  (this might be somewhat specific to North America,
+	  unless I can find a good way to set the rules for 
+	  the forecast)

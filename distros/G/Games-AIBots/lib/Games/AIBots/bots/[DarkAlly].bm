@@ -1,0 +1,174 @@
+sub search {
+    $a++;
+    $lastammo = $ammo;
+    $lastlife = $life;
+    enable cloak if &nearst('enemy') < 3 and $ammo > 10;
+    disable cloak if &nearst('enemy') > 2;
+
+    call quaterstaff if &inperim('enemy');
+    return if &nearst('enemy') < 4;
+    scan relative 8;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move backward;
+            fire energy;
+            move forward;
+        }
+        move forward;
+    }
+
+    call quaterstaff if &inperim('enemy');
+    return if &nearst('enemy') <= 4;
+    scan relative 2;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move forward;
+            fire energy;
+            move backward;
+        }
+        move backward;
+    }
+
+    call quaterstaff if &inperim('enemy');
+    return if &nearst('enemy') <= 4;
+    scan relative 9;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move backward;
+            fire energy;
+            move forward;
+        }
+        move forward;
+        turn right;
+        move forward;
+    }
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+
+    call quaterstaff if &inperim('enemy');
+    return if &nearst('enemy') <= 4;
+    scan relative 1;
+    if (&found('flag|vault')) {
+        if ($life == $max_life and &found('flag')) {
+            move forward;
+            fire energy;
+            move backward;
+        }
+        move backward;
+        turn right;
+        move backward;
+    }
+    return if $lastammo < $ammo;
+    return if $lastlife != $life;
+
+    if ($a > 2) {
+        $a = 0;
+        return;
+    }
+    turn right;
+    redo;
+}
+
+
+dock_x: {
+    scan perimeter unless $flag;
+    fire energy if &found('mine');
+    if (&found('enemy')) {
+        fire energy;
+        redo;
+    }
+    call search if &found('vault|flag') and &nearst('enemy') > 3;
+
+    $flag++;
+    $turn = &turnto(($delta_x < 0 xor (&nearst('enemy') <= 5)) ? '4' : '6');
+    $front = ($turn eq 'left * 2') ? 'backward' : 'forward';
+    $rear  = ($turn eq 'left * 2') ? 'forward' : 'backward';
+    turn $turn if $turn eq 'right' or $turn eq 'left';
+
+    move $front;
+    if (&bumped()) {
+        move $rear * 3;
+    }
+    elsif (&nearst('enemy') > 5) {
+        move $front * 2;
+    }
+
+    redo if abs($delta_x = $enemy_x - $x) < 2;
+    goto dock;
+}
+
+dock_y: {
+    scan perimeter unless $flag;
+    fire energy if &found('mine');
+    if (&found('enemy')) {
+        fire energy;
+        redo;
+    }
+    call search if &found('vault|flag') and &nearst('enemy') > 3;
+
+    $flag++;
+    $turn = &turnto(($delta_y < 0 xor (&nearst('enemy') <= 5)) ? '8' : '2');
+    $front = ($turn eq 'left * 2') ? 'backward' : 'forward';
+    $rear  = ($turn eq 'left * 2') ? 'forward' : 'backward';
+    turn $turn if $turn eq 'right' or $turn eq 'left';
+
+    move $front;
+    if (&bumped()) {
+        move $rear * 3;
+    }
+    elsif (&nearst('enemy') > 5) {
+        move $front * 2;
+    }
+
+    redo if abs($delta_y = $enemy_y - $y) < 2;
+    goto dock;
+}
+
+go_x: {
+    goto dock if abs($enemy_x - $x) < 2 or abs($enemy_y - $y) < 2 or &onnode;
+    goto go_y unless $delta_x = $snode_x - $x;
+
+    $turn  = &turnto(($delta_x < 0) ? '4' : '6');
+    $front = ($turn eq 'left * 2') ? 'backward' : 'forward';
+    $rear  = ($turn eq 'left * 2') ? 'forward' : 'backward';
+    turn $turn if $turn eq 'right' or $turn eq 'left';
+
+    move $front;
+
+    if (&bumped) {
+        move $rear;
+        goto go_y;
+    }
+
+    goto dock;
+}
+
+go_y: {
+    goto dock if abs($enemy_x - $x) < 2 or abs($enemy_y - $y) < 2 or &onnode;
+    goto go_x unless $delta_y = $snode_y - $y;
+
+    $turn = &turnto(($delta_y < 0) ? '8' : '2');
+    $front = ($turn eq 'left * 2') ? 'backward' : 'forward';
+    $rear  = ($turn eq 'left * 2') ? 'forward' : 'backward';
+    turn $turn if $turn eq 'right' or $turn eq 'left';
+
+    move $front;
+
+    if (&bumped) {
+        move $rear;
+        goto go_y;
+    }
+
+    goto dock;
+}
+
+heal: {
+    if ($life < $max_life - 4 and &nearst('enemy') > 8) {
+        disable shield;
+        attempt repair;
+        redo;
+    }
+
+    enable shield;
+    goto drain;
+}

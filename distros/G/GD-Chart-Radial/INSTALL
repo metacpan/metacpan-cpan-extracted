@@ -1,0 +1,118 @@
+Installation Instructions
+
+The instructions are basically as per any Perl module.
+
+
+INSTALLING AUTOMATICALLY
+------------------------
+
+The easiest way to install is via CPAN, CPANPLUS or cpanminus:
+
+CPAN:
+
+    % perl -MCPAN -e shell                    [as root]
+    > install GD::Chart::Radial
+    > quit
+
+CPANPLUS:
+
+    % cpanp
+    > i GD::Chart::Radial
+    > q
+
+cpanminus:
+
+    % cpanm GD::Chart::Radial
+
+See your local documentation ('perldoc CPAN', 'perldoc CPANPLUS' or 
+'perldoc cpanm') for further instructions on setting up and configuring your
+chosen installer.
+
+
+OBTAINING THE MODULE
+--------------------
+
+The latest release version of GD-Chart-Radial can be downloaded
+from any CPAN site:
+
+    http://search.cpan.org/dist/GD-Chart-Radial/
+
+GD-Chart-Radial is distributed as a gzipped tar archive file:
+
+    GD-Chart-Radial-<version>.tar.gz
+
+where <version> represents the current version number, e.g. 0.01.
+
+To install the module, unpack the distribution archive to
+create an installation directory.  Something like this:
+
+    tar zxf GD-Chart-Radial-0.01.tar.gz
+or
+    gunzip GD-Chart-Radial-0.01.tar.gz
+    tar xf GD-Chart-Radial-0.01.tar
+
+You can then 'cd' into the directory created,
+
+    cd GD-Chart-Radial-0.01
+
+
+INSTALLING MANUALLY
+-------------------
+
+The 'make install' (done later) will install the modules and scripts on
+your system. You may need administrator privileges to perform this task.
+Alternately you can install the module to a local directory (see
+ExtUtils::MakeMaker for full details), e.g.
+
+    % perl Makefile.PL PREFIX=/home/me/
+
+Don't forget to update your PERL5LIB environment variable if you do
+this, or add a line to your script to tell Perl where to find the files,
+e.g.
+
+    use lib qw( /home/me/lib/perl5/site_perl/5.6.0 );
+
+If you're not after a custom location, just do:
+
+    % perl Makefile.PL
+
+If you are lacking any of the prerequisite modules, running that
+program will tell you. All prerequisites are available from CPAN.
+
+When you have them all:
+
+    % make && make test
+
+If there are any failures, either post them to the RT site, or email me
+directly. It's better to post to the RT site, as then others who may be 
+expereincing the same problem can at least add comments or post patches.
+
+When you send your report your trouble, be sure to send the following
+information;
+
+    + result of `perl -V'
+    + output from 'make test TEST_VERBOSE=1 >& errs'
+
+Send those to bug-GD-Chart-Radial@rt.cpan.org and I'll get back to you as
+soon as I'm able.
+
+If it worked, then become root and type:
+
+    # make install
+
+Congratulations. You've just installed GD::Chart::Radial.
+
+If you have a copy of cpantest installed, type:
+
+    % cpantest -g pass -nc -p `basename \`pwd\`` -auto
+
+Or:
+
+    % cpantest -g pass -nc -p GD-Chart-Radial-0.01 -auto
+
+That will tell both me and other potential users that the module
+built correctly on your machine.
+
+Thanks.
+Barbie.
+http://barbie.missbarbell.co.uk/

@@ -1,0 +1,62 @@
+GD/Text/Arc version 0.01
+========================
+
+This package contains GD::Text::Arc, which is a module to provide a
+way to draw TrueType text along a curve (such as around the bottom or
+top of a circle).  It is to be used with GD::Text (version > 1.20) and
+GD graphics objects.
+
+Sample usage could be:
+
+  use GD::Text::Arc;
+
+  my $image = GD::Image->new(600,500);
+
+  my $gray =  $image->colorAllocate(75,75,75);
+  my $boldfont = "Adventure.ttf";
+  my $text = "here's a line.";
+
+  my $ta = GD::Text::Arc->new($image, 
+                              colour => $gray,
+                              ptsize => $size,
+                              font => $boldfont,
+                              radius => $radius,
+                              center_x => $centerX,
+                              center_y => $centerY,
+                              text => $text, 
+                              side => 'inside'
+                              orientation => 'clockwise'
+                              );
+
+  $ta->draw;
+
+  $ta->set('color', $red);
+  $ta->set('ptsize', $huge);
+  $ta->set('orientation', 'counterclockwise');
+
+  $ta->draw;
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   GD (version > 1.20), GD::Text
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Daniel Allen <da@coder.com>. All rights reserved.
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+

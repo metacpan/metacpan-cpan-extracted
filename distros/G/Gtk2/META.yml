@@ -1,0 +1,34 @@
+---
+abstract: 'Perl interface to the 2.x series of the Gimp Toolkit library'
+author:
+  - 'gtk2-perl Team <gtk-perl-list at gnome dot org>'
+build_requires: {}
+configure_requires:
+  Cairo: 1.000
+  ExtUtils::Depends: 0.300
+  ExtUtils::PkgConfig: 1.030
+  Glib: 1.280
+  Pango: 1.220
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gtk2
+no_index:
+  directory:
+    - t
+    - inc
+    - tools
+    - xs
+  file:
+    - Makefile.PL
+    - gtk-demo/main.pl
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Gtk2
+  homepage: http://gtk2-perl.sourceforge.net
+  license: http://www.gnu.org/licenses/lgpl-2.1.html
+  repository: git://git.gnome.org/perl-Gtk2
+  x_MailingList: https://mail.gnome.org/mailman/listinfo/gtk-perl-list
+version: 1.24992

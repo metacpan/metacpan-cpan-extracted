@@ -1,0 +1,68 @@
+NAME
+    Geo::Address::Mail::Standardizer::USPS::AMS - address standardization
+    using the United States Postal Service Address Matching System
+
+SYNOPSIS
+     my $ms   = new Geo::Address::Mail::Standardizer::USPS::AMS;
+     my $addr = new Geo::Address::Mail::US;
+     my $res  = $ms->standardize($addr);
+
+     $addr = $res->standardized_address
+         or die 'unable to standardize address: ' . $res->error;
+
+AMS PATHS
+    by default, the USPS::AMS standardizer assumes AMS paths are configured
+    as follows:
+
+     datadir: /usr/share/uspsams
+     statedir: /var/lib/uspsams
+
+     AMS: datadir/comm
+     DPV: datadir/dpv
+     ELOT: datadir/elot
+     LACSLink: datadir/lacslink
+     SUITELink: datadir/suitelink
+     Z4CXLOG.DAT: statedir/Z4CXLOG.DAT
+
+    you may change datadir or statedir via those attributes, but the other
+    paths are computed and are immutable.
+
+METHODS
+  new
+    the Geo::Address::Mail::Standardizer::USPS::AMS constructor accepts two
+    arguments:
+
+    datadir (default: /usr/share/uspsams)
+        the path to the USPS AMS shared data directory. this directory
+        typically contains all of the database files provided with AMS.
+
+    statedir (defaults to /var/lib/uspsams)
+        the path to the USPS AMS state directory. this directory is expected
+        to contain the Z4CXLOG.DAT date/time file that is written to by AMS.
+        i have no idea what its purpose is; AMS won't initialize without it
+        though.
+
+  init
+    initializes the AMS database. called during construction by the BUILD
+    method.
+
+  standardize($address)
+    attempt to standardize an address. the standardize method accepts a
+    hashref or a Geo::Address::Mail::US object. a results object will be
+    returned. see the documentation for
+    Geo::Address::Mail::Standardizer::USPS::AMS::Results for details on the
+    results object.
+
+AUTHOR
+    Mike Eldridge <diz@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2010 Mike Eldridge
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

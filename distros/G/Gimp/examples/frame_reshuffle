@@ -1,0 +1,91 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use strict;
+use warnings;
+
+podregister {
+  $custom = "-i"            if $function == 1;
+  $custom = "(i+$custom)%n" if $function == 2;
+  my @layers = $image->get_layers;
+  $layers[-1]->add_alpha;
+  # replace vars
+  $custom =~ s/\bn\b/scalar@layers/ge;
+  $custom =~ s/\bi\b/\$i/g;
+  $function = eval "sub { my \$i = shift;\n#line 0 \"expression\"\n$custom\n}";
+  die "syntax error in expression '$custom': $@\n" if $@;
+  # calculate new order
+  my $index = 0;
+  @layers = map $_->[0],
+	       sort { $b->[1] <=> $a->[1] }
+		  map [$_, $function->($index++)],
+		     @layers;
+  # now re-order the layers
+  $image->undo_group_start;
+  for(@layers) {
+    $image->raise_item_to_top($_) unless $$_ == ${($image->get_layers)[0]};
+  }
+  $image->undo_group_end;
+};
+
+exit main;
+__END__
+
+=head1 NAME
+
+layer_reorder - Reshuffle the order of layers in an image according to a function
+
+=head1 SYNOPSIS
+
+<Image>/Layer/Stack/Reorder Layers...
+
+=head1 DESCRIPTION
+
+This function re-orders the layer stack using either a builtin function
+(only reversal is available at the moment, contact me if you find another
+useful function) or a custom one.
+
+REVERSE (1) will reverse the order of layers (it is equivalent to the custom
+function C<-i>).
+
+SHIFT (2) will shift the sequence by the amount (positive or negative)
+indicated in the custom field. It is equivalent to the custom function
+C<( i + custom ) % n>.
+
+If you specify CUSTOM (0) as function than you can use the "custom"
+argument to specify any function you like. Any C<i> is replaced by the
+index of the layer (C<0>..C<n-1>), any C<n> is replaced by the total
+number of layers. The function returns the new position of the layer,
+which is measured relative to all other positions, i.e. your function can
+return values 0.1, 0.7 and 0.3 for layers 0, 1 and 2 respectively, and the
+new order will be 0, 2 and 1.
+
+Examples:
+
+ -i        # reverse the order of layers
+ (i+5)%n   # shift the order of frames by 5
+
+=head1 PARAMETERS
+
+ [PF_RADIO, "function", "Which remapping function to use", 1,
+  [Custom => 0, Reverse => 1, Shift => 2] ],
+ [PF_STRING, "custom", "Optional custom function to use, e.g. 'n-i' reverses the order"],
+
+=head1 IMAGE TYPES
+
+*
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>
+
+=head1 DATE
+
+19990708
+
+=head1 LICENSE
+
+Marc Lehmann <pcg@goof.com>
+
+Distributed under the same terms as Gimp-Perl.

@@ -1,0 +1,50 @@
+GMail::Checker - Provides an adaptative interface to manage gmail accounts
+
+
+Changes :
+
+1.04 2004.12.13 Added MIME support
+		Attachements now come in an encapsuled array of hashes
+		Added msg_to_file() method which writes the raw message to a file.
+		Fixed documentation and test file typos
+		
+1.03 2004.11.29 Building a better test file for make test
+		Added return values for all functions, to check wether they were successfull or not.
+		Added USERNAME and PASSWORD hashes to the class.
+
+1.01 2004.11.28 Initial public release
+
+Description :
+
+This module provides a wrapper that allows you to perform major operations on your gmail account.
+You may create a notifier to know about new incoming messages, get information about a specific e-mail,
+retrieve your mails using the POP3 via SSL interface.
+
+Requirements :
+
+It requires IO::Socket:SSL, you may get it from Peter Behroozi's repository at CPAN : http://search.cpan.org/~behroozi/
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+
+CPAN TESTERS:
+
+You can add a number of tests by modifying the t/use.t file if you have a gmail account.
+You will need to setup your username and password, uncomment the test routines and change the number of tests.
+
+Todo : 
+
+- Include charsets conversions support
+- Search through mails and headers
+- Include mail storing/reading option
+- Headers regexp argument for headers retrieval
+- Correct bugs ?
+
+License :
+
+Copyright 2004 by Faycal Chraibi. All rights reserved.
+This library is a free software. You can redistribute it and/or modify it under the same terms as Perl itself.

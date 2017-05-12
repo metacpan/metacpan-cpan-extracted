@@ -1,0 +1,12 @@
+TYPEMAP
+gdImagePtr	T_IMGPTR
+
+INPUT
+
+T_IMGPTR
+    if (sv_derived_from($arg, \"GD::Image\")) {
+	IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ($type) tmp;
+    }
+    else
+	croak(\"$var is not of type GD::Image\")

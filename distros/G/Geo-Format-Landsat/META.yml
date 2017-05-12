@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Geo-Format-Landsat
+version:             0.03
+abstract:            Decode Landsat meta-data
+license:             perl
+author:              
+    - Mark Overmeer
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Geo::Point:                    0.9
+    Geo::Proj4:                    1.01
+    Test::More:                    0.47
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

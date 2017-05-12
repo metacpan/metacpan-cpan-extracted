@@ -1,0 +1,15 @@
+dir /usr
+dir /usr/bin
+obj /usr/bin/gtkskan a8a086b5c3c5af8bab15a83d95fd46eb 1087578840
+dir /usr/share
+dir /usr/share/gtkskan
+obj /usr/share/gtkskan/stop.xpm 28a4319ff00fdbe427a370a30fb9036d 1087578840
+obj /usr/share/gtkskan/go.xpm 8e50133930829421746a7d0a3dae686e 1087578840
+obj /usr/share/gtkskan/exit.xpm 28a4319ff00fdbe427a370a30fb9036d 1087578840
+obj /usr/share/gtkskan/prefs.xpm 8e50133930829421746a7d0a3dae686e 1087578840
+obj /usr/share/gtkskan/netfound.wav 6d4f0dd8167d67f4a3f64a6ac75b2f2c 1087578840
+dir /usr/share/doc
+dir /usr/share/doc/gtkskan-0.2
+obj /usr/share/doc/gtkskan-0.2/CREDITS.gz 553a5068fcf53ff8425aabcdadb13dde 1087578840
+obj /usr/share/doc/gtkskan-0.2/LICENSE.gz 5b76b8df857897ed947ec2b8c98b72cb 1087578840
+obj /usr/share/doc/gtkskan-0.2/README.gz 3e9ffb9b973020c42dc0320a15aab197 1087578840

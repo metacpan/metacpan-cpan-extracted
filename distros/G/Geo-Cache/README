@@ -1,0 +1,68 @@
+NAME
+
+    Geo::Cache - Object interface for GPS waypoints
+    Geo::Gpx   - Output GPS waypoints in a variety of useful and
+                   quasi-standard formats.
+
+SYNOPSIS
+
+        use Geo::Cache;
+        my $wpt = Geo::Cache->new(
+            lat  => '37.99815',
+            lon  => '-85.302017',
+            time => $time,
+            name => 'GCGVW8',
+            desc => 'Neither Hill nor Dale',
+            sym  => 'geocache',
+            type => 'Geocache|Traditional Cache',
+        );
+        $wpt->url('http://www.geocaching.com/');
+
+        my $wpt_from_xml = Geo::Cache->new( xml => $xml, );
+
+        my $xml = $wpt->xml;
+
+        use Geo::Gpx;
+        my $gpx = Geo::Gpx->new( @waypoints );
+        my $xml = $gpx->gpx;
+        my $loc = $gpx->loc;
+
+DESCRIPTION
+
+    Provide an object interface to Geocaching.com waypoints and/or
+    geocaches, using the Groundspeak GPX file as the reference for what
+    fields are valid.
+
+    Methods are provide for various of the fields that require special
+    treatment.
+
+    The Geo::GPX module allows you to accumulate multiple waypoints, and
+    output the various file formats that are in use for these waypoints.
+    This currently includes GPX, Loc, and GPSDrive files. The first two
+    are generally associated with the Geocaching.com website. The
+    GPSDrive format is for use in the GPSDrive program. More
+    instructions for each will accompany some future version of this
+    module.
+
+AUTHOR
+
+    Rich Bowen
+    rbowen@rcbowen.com
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SUPPORT/BUGS/ETC
+
+    Please contact me at the address above with questions, patches,
+    comments, observations, amusing anecdotes, suggestions, or large
+    cash gifts. Or cache gifts, I suppose.
+
+    There's a reasonable chance that you can see the current cvs version
+    at http://cvs.rcbowen.com/
+

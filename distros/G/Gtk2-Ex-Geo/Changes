@@ -1,0 +1,8 @@
+Revision history for Perl extension Gtk2::Ex::Geo.
+
+0.01  Mon Apr 11 12:22:38 2005
+	- original version; created by h2xs 1.23 with options
+		-X Gtk2::Ex::Geo
+0.50 Oct 30 2006
+0.51 Jul 1 2007
+0.56 March 2008

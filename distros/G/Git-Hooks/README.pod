@@ -1,0 +1,12 @@
+# PODNAME: README
+# ABSTRACT: All you need to know to start using Git::Hooks
+
+=pod
+
+=encoding utf8
+
+=head1 Git::Hooks
+
+=head2 Framework for implementing Git (and Gerrit) hooks
+
+Please, head to the project's L<GitHub Page|http://gnustavo.github.io/Git-Hooks/>.

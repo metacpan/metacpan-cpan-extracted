@@ -1,0 +1,6 @@
+name = "Global-IPC-StaticVariable"
+# badges = ["travis"]
+authority="cpan:ITSUSONY"
+module_maker="ModuleBuild"
+[build]
+build_class="builder::GMBuilder"

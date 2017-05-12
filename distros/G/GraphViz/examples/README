@@ -1,0 +1,5 @@
+There are a number of example uses of GraphViz in this directory to
+show the wide range of things you can do with GraphViz.
+
+To run all the programs and generate all the images, run 'make_all.pl'.
+

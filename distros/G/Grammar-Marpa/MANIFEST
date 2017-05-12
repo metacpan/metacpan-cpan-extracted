@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+lib/Grammar/Marpa.pm
+t/00-sanity.t
+Changes
+LICENSE
+README
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,257 @@
+# ChangeLog for app-shells/zsh
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-shells/zsh/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  02 Jun 2004; Aron Griffis <agriffis@gentoo.org> zsh-4.2.0.ebuild:
+  Fix use invocation
+
+  12 May 2004; Gustavo Zacarias <gustavoz@gentoo.org> zsh-4.2.0.ebuild:
+  Stable on hppa
+
+  07 May 2004; Ciaran McCreesh <ciaranm@gentoo.org> zsh-4.2.0.ebuild:
+  Stable on sparc, #50379
+
+*zsh-4.2.0-r1 (04 May 2004)
+
+  04 May 2004; Mamoru KOMACHI <usata@gentoo.org> zsh-4.2.0-r1.ebuild,
+  zsh-4.2.0.ebuild:
+  Added cjk patch. Marked 4.2.0 stable on x86 and alpha
+
+  27 Mar 2004; Guy Martin <gmsoft@gentoo.org> zsh-4.1.1-r5.ebuild:
+  Marked stable on hppa.
+
+*zsh-4.2.0 (21 Mar 2004)
+
+  21 Mar 2004; Mamoru KOMACHI <usata@gentoo.org> zsh-4.2.0.ebuild,
+  zsh-4.2.0_pre4.ebuild, files/prompt_gentoo_setup:
+  Version bumped.
+
+*zsh-4.2.0_pre4 (13 Mar 2004)
+
+  13 Mar 2004; Mamoru KOMACHI <usata@gentoo.org> zsh-4.2.0_pre3.ebuild,
+  zsh-4.2.0_pre4.ebuild, files/prompt_gentoo_setup:
+  Version bumped. Added cap IUSE flag. Included Gentoo prompt
+  contributed by Tobias Minich <belgabor@gmx.de>. See bug #43753
+
+*zsh-4.2.0_pre3 (06 Mar 2004)
+
+  06 Mar 2004; Markus Nigbur <pyrania@gentoo.org> zsh-4.2.0_pre1.ebuild,
+  zsh-4.2.0_pre2.ebuild, zsh-4.2.0_pre3.ebuild:
+  Version bump. Removed old prerelease ebuilds.
+
+  05 Mar 2004; Gustavo Zacarias <gustavoz@gentoo.org> zsh-4.1.1-r5.ebuild:
+  stable on sparc
+
+*zsh-4.2.0_pre2 (04 Mar 2004)
+
+  04 Mar 2004; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.9-r3.ebuild,
+  zsh-4.1.1-r5.ebuild, zsh-4.2.0_pre2.ebuild:
+  Added pcre local IUSE flag. Marked old ebuilds stable for x86 and alpha.
+
+*zsh-4.2.0_pre1 (27 Feb 2004)
+
+  27 Feb 2004; Mamoru KOMACHI <usata@gentoo.org> zsh-4.2.0_pre1.ebuild:
+  Added prerelease.
+
+*zsh-4.1.1-r5 (05 Feb 2004)
+*zsh-4.1.1-r4 (05 Feb 2004)
+
+  05 Feb 2004; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.9-r3.ebuild,
+  zsh-4.1.1-r4.ebuild, zsh-4.1.1-r5.ebuild, files/_portage-20040204:
+  Added completion functions for rc, rc-update, rc-status, opengl-update and
+  ebuild. Thanks to baptux <bapt@ifrance.com> for polishing zsh completion ;)
+
+  22 Jan 2004; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.9-r1.ebuild,
+  zsh-4.0.9-r2.ebuild, zsh-4.0.9.ebuild, zsh-4.1.1-r2.ebuild,
+  zsh-4.1.1-r3.ebuild, zsh-4.1.1-r4.ebuild:
+  Marked 4.0.9-r2 and 4.1.1-r4 stable because of glibc-2.3.2-r9, see bug #38356
+
+*zsh-4.0.9-r2 (19 Jan 2004)
+
+  19 Jan 2004; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.9-r2.ebuild,
+  zsh-4.1.1-r4.ebuild, files/_portage, files/zsh-strncmp.diff:
+  Fixed bug #38356 and #33130
+
+*zsh-4.0.9-r1 (04 Jan 2004)
+
+  04 Jan 2004; <usata@gentoo.org> zsh-4.0.9-r1.ebuild:
+  Added cjk IUSE flag
+
+*zsh-4.0.9 (29 Dec 2003)
+
+  29 Dec 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.9.ebuild,
+  zsh-4.1.1-r3.ebuild, files/_portage:
+  Version bumped. Added doc IUSE flag and completion function for emerge.
+  Special thanks to baptux <bapt@ifrance.com>, see bug #33130
+
+  17 Dec 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.1.1-r1.ebuild,
+  zsh-4.1.1-r2.ebuild:
+  Stable bump
+
+*zsh-4.0.7-r1 (12 Dec 2003)
+
+  12 Dec 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.6-r1.ebuild,
+  zsh-4.0.6-r4.ebuild, zsh-4.0.7-r1.ebuild:
+  Updated Debian patch to zsh_4.0.7-18.diff (See also bug 19924)
+
+  08 Nov 2003; Brad House <brad_mssw@gentoo.org> zsh-4.1.1-r2.ebuild:
+  add ~amd64 flag
+
+  28 Oct 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.6-r3.ebuild,
+  zsh-4.0.6-r4.ebuild, zsh-4.1.0_pre7.ebuild, zsh-4.1.1.ebuild:
+  Cleaned out old versions. Corrected zshall distfile path in 4.0.6-r4
+
+*zsh-4.1.1-r2 (01 Sep 2003)
+
+  22 Dec 2003; Guy Martin <gmsoft@gentoo.org> zsh-4.1.1-r2.ebuild :
+  Marked stable on hppa.
+
+  01 Sep 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.1.1-r2.ebuild:
+  Statically link libpcre.  For discussion, see Bug #27392 and #27064
+
+*zsh-4.1.1-r1 (28 Aug 2003)
+
+  28 Aug 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.1.1-r1.ebuild,
+  files/zsh-4.1.1-gentoo.diff:
+  Compiles all zsh modules in when USE="static".  Added libcap to DEPEND.
+  See Bug #27392 comment #4
+
+*zsh-4.1.1 (24 Jul 2003)
+
+  20 Aug 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.1.0_pre7.ebuild,
+  zsh-4.1.1.ebuild:
+  Added a little notice about completion for users from zsh 4.0.x.
+  Thanks to Charlton Harrison <charlton@dynet.com> in bug #26776
+
+  15 Aug 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.1.1.ebuild:
+  Changed x86 ~x86 (I've got a bug report that tab completion doesn't
+  work for 4.1.1, while he has no problem with 4.0.x)
+
+  14 Aug 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.1.1.ebuild:
+  Marked stable on x86
+
+  24 Jul 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.1.1.ebuild:
+  New development version. Added cjk support, based on the ebuild
+  submitted by Wayne Davison <gentoo@blorf.net> in bug #23114
+  Added libpcre dependency, thanks to Sean E Russell <ser@germane-software.com>
+  in bug #23978
+  Added static USE flag and removed zshall.1 patch
+
+*zsh-4.0.7 (24 Jul 2003)
+
+  14 Aug 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.7.ebuild:
+  Marked stable on x86, alpha, ppc and sparc
+
+  24 Jul 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.0.7.ebuild,
+  files/zprofile:
+  New version. Added maildir flag to IUSE. Changed Zsh startup file
+  from /etc/zsh/zshenv to /etc/zsh/zprofile suggested by James
+  Michael Fults <jmf@gtcom.net> in bug #19924.
+  Added pkg_preinst() function to help migration of /etc/zsh/zshenv
+  to /etc/zsh/zprofile discussed in #23114
+  Added static USE flag and removed zshall.1 patch
+
+*zsh-4.0.6-r4 (17 Apr 2003)
+
+  17 Apr 2003; Graham Forest <vladimir@gentoo.org> Manifest,
+  zsh-4.0.6-r3.ebuild, zsh-4.0.6-r4.ebuild:
+  Forgot to version bump on last commit
+
+*zsh-4.1.0_pre7 (17 Apr 2003)
+
+  14 Aug 2003; Mamoru KOMACHI <usata@gentoo.org> zsh-4.1.0_pre7.ebuild:
+  Marked x86 ~x86, since it is not stable (pre) version
+
+  17 Apr 2003; Graham Forest <vladimir@gentoo.org> zsh-4.0.6-r3.ebuild,
+  zsh-4.1.0_pre7.ebuild:
+  Version bump, fixed zshall manpage problem, marked 4.0.6-r3 stable on ppc, and
+  changed ncurses to use USE
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*zsh-4.0.6-r3 (15 Oct 2002)
+
+  25 Mar 2003; Seemant Kulleen <seemant@gentoo.org> zsh-4.0.6-r1.ebuild,
+  zsh-4.0.6-r3.ebuild:
+  homepage syntax fix thanks to: Frantz Dhin <tragedy_rm@hotmail.com> in bug
+  #18145
+
+  15 Oct 2002; phoen][x <phoenixk@gentoo.org> zsh-4.0.6-r3.ebuild :
+
+  Fixed a quite serious issues: zsh didnt source /etc/profile.env
+  and /etc/profile. Removed /etc/zsh/zshlogin and /etc/zsh/zshrc 
+  and replaced /etc/zsh/zshenv with a script which sources /etc/profile*.
+  Thanks to James Michael Fultz <jmf@gtcom.net> for the contribution.
+  This closes bug #10724.
+
+*zsh-4.0.6-r2 (05 Oct 2002)
+
+  08 Oct 2002; phoen][x <phoenixk@gentoo.org> zsh-4.0.6-r2.ebuild :
+
+  Put the ebuild into the stable x86 and alpha profile. 
+
+  05 Oct 2002; phoen][x <phoenixk@gentoo.org> zsh-4.0.6-r2.ebuild 
+  files/digest-zsh-4.0.6-r2 :
+ 
+  Incorporated the debian patch to work around a segfault.
+  See bug #9743 for further details.
+
+*zsh-4.0.6-r1 (29 Aug 2002)
+
+  19 Aug 2002; phoen][x <phoenixk@gentoo.org> zsh-4.0.6-r1.ebuild 
+  files/digest-zsh-4.0.6-r1 :
+ 
+  Fixed a sandbox violation. Check bug 6780 for further details.
+
+*zsh-4.0.6 (19 Aug 2002)
+
+  24 Aug 2002; Sascha Schwabbauer <cybersystem@gentoo.org> zsh-4.0.6.ebuild :
+
+  Disabled make check because it violates the sandbox.
+
+  19 Aug 2002; phoen][x <phoenixk@gentoo.org> zsh-4.0.6.ebuild 
+  files/digest-zsh-4.0.6 :
+ 
+  Bumped to new version.
+
+*zsh-4.0.5 (12 Aug 2002)
+
+  12 Aug 2002 Calum Selkirk <cselkirk@gentoo.org> zsh-4.0.5.ebuild 
+  files/digest-zsh-4.0.5 :
+ 
+  New ebuild.
+  Changed --prefix/ to --prefix/usr and added --bindir (this fixes defunct
+  and missing paths in $fpath.
+  Changed --fndir to /usr/share/zsh (--with-function-subdirs).
+
+*zsh-4.0.4-r2 (3 Mar 2002)
+
+  25 Jul 2002; Daniel Ahlberg <aliz@gentoo.org> zsh-4.0.4-r2.ebuild :
+  Added SLOT.
+
+  15 Jul 2002; Owen Stampflee <owen@gentoo.org> :
+
+  Added KEYWORDS.
+
+  3 Mar 2002; Karl Trygve Kalleberg <karltk@gentoo.org> zsh-4.0.4-r2.ebuild zsh-4.0.4-r1.ebuild files/digest-zsh-4.0.4-r1 files/digest-zsh-4.0.4-r2
+
+  /share and all its (empty) directories have been removed.
+
+  Old revisions have been removed.
+
+*zsh-4.0.4-r1 (5 Feb 2002)
+
+  5 Feb 2002; Karl Trygve Kalleberg <karltk@gentoo.org> zsh-4.0.4.ebuild zsh-4.0.4-r1.ebuild files/digest-zsh-4.0.4 files/digest-zsh-4.0.4-r1
+
+  The ebuild now installs the standard zsh functions properly. It can also
+  now be run nicely within the sandbox.
+
+*zsh-4.0.4 (1 Feb 2002)
+
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

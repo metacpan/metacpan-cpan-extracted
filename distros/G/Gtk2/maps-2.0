@@ -1,0 +1,346 @@
+# Copyright (C) 2003-2009 by the gtk2-perl team (see the file AUTHORS for the
+# full list)
+# 
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Library General Public License as published by the Free
+# Software Foundation; either version 2.1 of the License, or (at your option)
+# any later version.
+# 
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
+# more details.
+# 
+# You should have received a copy of the GNU Library General Public License
+# along with this library; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+#
+# $Id$
+#
+
+#
+# this file defines mappings only for types that existed in gtk+ 2.0.x
+#
+
+# Error domains
+# domain	enum type	base type	package
+GDK_PIXBUF_ERROR	GDK_TYPE_PIXBUF_ERROR	GError Gtk2::Gdk::Pixbuf::Error
+
+# the rest of the types
+# typemacro	C type name	base type	package
+# ATK_TYPE_ACTION	AtkAction	GInterface	Gtk2::Atk::Action
+# ATK_TYPE_COMPONENT	AtkComponent	GInterface	Gtk2::Atk::Component
+# ATK_TYPE_COORD_TYPE	AtkCoordType	GEnum		Gtk2::Atk::CoordType
+# ATK_TYPE_DOCUMENT	AtkDocument	GInterface	Gtk2::Atk::Document
+# ATK_TYPE_EDITABLE_TEXT	AtkEditableText	GInterface	Gtk2::Atk::EditableText
+# ATK_TYPE_GOBJECT_ACCESSIBLE	AtkGObjectAccessible	GObject	Gtk2::Atk::GObjectAccessible
+# ATK_TYPE_HYPERLINK	AtkHyperlink	GObject	Gtk2::Atk::Hyperlink
+# ATK_TYPE_HYPERLINK_STATE_FLAGS		AtkHyperlinkStateFlags	GFlags	Gtk2::Atk::HyperlinkStateFlags
+# ATK_TYPE_HYPERTEXT	AtkHypertext	GInterface	Gtk2::Atk::Hypertext
+# ATK_TYPE_IMAGE	AtkImage	GInterface	Gtk2::Atk::Image
+# ATK_TYPE_IMPLEMENTOR	AtkImplementor	GInterface	Gtk2::Atk::Implementor
+# ATK_TYPE_KEY_EVENT_TYPE	AtkKeyEventType	GEnum		Gtk2::Atk::KeyEventType
+# ATK_TYPE_LAYER		AtkLayer	GEnum		Gtk2::Atk::Layer
+# ATK_TYPE_NO_OP_OBJECT	AtkNoOpObject	GObject	Gtk2::Atk::NoOpObject
+# ATK_TYPE_NO_OP_OBJECT_FACTORY	AtkNoOpObjectFactory	GObject	Gtk2::Atk::NoOpObjectFactory
+ATK_TYPE_OBJECT	AtkObject	GObject	Gtk2::Atk::Object
+# ATK_TYPE_OBJECT_FACTORY	AtkObjectFactory	GObject	Gtk2::Atk::ObjectFactory
+# ATK_TYPE_REGISTRY	AtkRegistry	GObject	Gtk2::Atk::Registry
+# ATK_TYPE_RELATION	AtkRelation	GObject	Gtk2::Atk::Relation
+# ATK_TYPE_RELATION_SET	AtkRelationSet	GObject	Gtk2::Atk::RelationSet
+# ATK_TYPE_RELATION_TYPE	AtkRelationType	GEnum	Gtk2::Atk::RelationType
+# ATK_TYPE_ROLE		AtkRole		GEnum	Gtk2::Atk::Role
+# ATK_TYPE_SELECTION	AtkSelection	GInterface	Gtk2::Atk::Selection
+# ATK_TYPE_STATE_SET	AtkStateSet	GObject	Gtk2::Atk::StateSet
+# ATK_TYPE_STATE_TYPE	AtkStateType	GEnum	Gtk2::Atk::StateType
+# ATK_TYPE_STREAMABLE_CONTENT	AtkStreamableContent	GInterface	Gtk2::Atk::StreamableContent
+# ATK_TYPE_TABLE	AtkTable	GInterface	Gtk2::Atk::Table
+# ATK_TYPE_TEXT	AtkText	GInterface	Gtk2::Atk::Text
+# ATK_TYPE_TEXT_ATTRIBUTE	AtkTextAttribute	GEnum	Gtk2::Atk::TextAttribute
+# ATK_TYPE_TEXT_BOUNDARY	AtkTextBoundary		GEnum	Gtk2::Atk::TextBoundary
+# ATK_TYPE_TEXT_CLIP_TYPE	AtkTextClipType		GEnum	Gtk2::Atk::TextClipType
+# ATK_TYPE_UTIL	AtkUtil	GObject	Gtk2::Atk::Util
+# ATK_TYPE_VALUE	AtkValue	GInterface	Gtk2::Atk::Value
+GDK_TYPE_AXIS_USE	GdkAxisUse	GEnum	Gtk2::Gdk::AxisUse
+GDK_TYPE_BYTE_ORDER	GdkByteOrder	GEnum	Gtk2::Gdk::ByteOrder
+GDK_TYPE_CAP_STYLE	GdkCapStyle	GEnum	Gtk2::Gdk::CapStyle
+GDK_TYPE_COLOR	GdkColor	GBoxed	Gtk2::Gdk::Color
+GDK_TYPE_COLORMAP	GdkColormap	GObject	Gtk2::Gdk::Colormap
+GDK_TYPE_COLORSPACE	GdkColorspace	GEnum	Gtk2::Gdk::Colorspace
+GDK_TYPE_CROSSING_MODE	GdkCrossingMode	GEnum	Gtk2::Gdk::CrossingMode
+GDK_TYPE_CURSOR	GdkCursor	GBoxed	Gtk2::Gdk::Cursor
+GDK_TYPE_CURSOR_TYPE	GdkCursorType	GEnum	Gtk2::Gdk::CursorType
+GDK_TYPE_DEVICE	GdkDevice	GObject	Gtk2::Gdk::Device
+GDK_TYPE_DRAG_ACTION	GdkDragAction	GFlags	Gtk2::Gdk::DragAction
+GDK_TYPE_DRAG_CONTEXT	GdkDragContext	GObject	Gtk2::Gdk::DragContext
+GDK_TYPE_DRAG_PROTOCOL	GdkDragProtocol	GEnum	Gtk2::Gdk::DragProtocol
+GDK_TYPE_DRAWABLE	GdkDrawable	GObject	Gtk2::Gdk::Drawable
+GDK_TYPE_EVENT	GdkEvent	GBoxed	Gtk2::Gdk::Event
+GDK_TYPE_EVENT_MASK	GdkEventMask	GFlags	Gtk2::Gdk::EventMask
+GDK_TYPE_EVENT_TYPE	GdkEventType	GEnum	Gtk2::Gdk::EventType
+GDK_TYPE_EXTENSION_MODE	GdkExtensionMode	GEnum	Gtk2::Gdk::ExtensionMode
+GDK_TYPE_FILL	GdkFill	GEnum	Gtk2::Gdk::Fill
+GDK_TYPE_FILL_RULE	GdkFillRule	GEnum	Gtk2::Gdk::FillRule
+GDK_TYPE_FILTER_RETURN	GdkFilterReturn	GEnum	Gtk2::Gdk::FilterReturn
+GDK_TYPE_FONT	GdkFont	GBoxed	Gtk2::Gdk::Font
+GDK_TYPE_FONT_TYPE	GdkFontType	GEnum	Gtk2::Gdk::FontType
+GDK_TYPE_FUNCTION	GdkFunction	GEnum	Gtk2::Gdk::Function
+GDK_TYPE_GC	GdkGC	GObject	Gtk2::Gdk::GC
+GDK_TYPE_GC_VALUES_MASK	GdkGCValuesMask	GFlags	Gtk2::Gdk::GCValuesMask
+GDK_TYPE_GRAB_STATUS	GdkGrabStatus	GEnum	Gtk2::Gdk::GrabStatus
+GDK_TYPE_GRAVITY	GdkGravity	GEnum	Gtk2::Gdk::Gravity
+GDK_TYPE_IMAGE	GdkImage	GObject	Gtk2::Gdk::Image
+GDK_TYPE_IMAGE_TYPE	GdkImageType	GEnum	Gtk2::Gdk::ImageType
+GDK_TYPE_INPUT_CONDITION	GdkInputCondition	GFlags	Gtk2::Gdk::InputCondition
+GDK_TYPE_INPUT_MODE	GdkInputMode	GEnum	Gtk2::Gdk::InputMode
+GDK_TYPE_INPUT_SOURCE	GdkInputSource	GEnum	Gtk2::Gdk::InputSource
+GDK_TYPE_INTERP_TYPE	GdkInterpType	GEnum	Gtk2::Gdk::InterpType
+GDK_TYPE_JOIN_STYLE	GdkJoinStyle	GEnum	Gtk2::Gdk::JoinStyle
+GDK_TYPE_KEYMAP	GdkKeymap	GObject	Gtk2::Gdk::Keymap
+GDK_TYPE_LINE_STYLE	GdkLineStyle	GEnum	Gtk2::Gdk::LineStyle
+GDK_TYPE_MODIFIER_TYPE	GdkModifierType	GFlags	Gtk2::Gdk::ModifierType
+GDK_TYPE_NOTIFY_TYPE	GdkNotifyType	GEnum	Gtk2::Gdk::NotifyType
+GDK_TYPE_OVERLAP_TYPE	GdkOverlapType	GEnum	Gtk2::Gdk::OverlapType
+GDK_TYPE_PIXBUF_ALPHA_MODE	GdkPixbufAlphaMode	GEnum	Gtk2::Gdk::PixbufAlphaMode
+GDK_TYPE_PIXBUF_ANIMATION	GdkPixbufAnimation	GObject	Gtk2::Gdk::PixbufAnimation
+GDK_TYPE_PIXBUF_ANIMATION_ITER	GdkPixbufAnimationIter	GObject	Gtk2::Gdk::PixbufAnimationIter
+GDK_TYPE_PIXBUF_ERROR	GdkPixbufError	GEnum	Gtk2::Gdk::PixbufError
+GDK_TYPE_PIXBUF	GdkPixbuf	GObject	Gtk2::Gdk::Pixbuf
+GDK_TYPE_PIXBUF_LOADER	GdkPixbufLoader	GObject	Gtk2::Gdk::PixbufLoader
+GDK_TYPE_PIXMAP	GdkPixmap	GObject	Gtk2::Gdk::Pixmap
+GDK_TYPE_PROPERTY_STATE	GdkPropertyState	GEnum	Gtk2::Gdk::PropertyState
+GDK_TYPE_PROP_MODE	GdkPropMode	GEnum	Gtk2::Gdk::PropMode
+GDK_TYPE_RECTANGLE	GdkRectangle	GBoxed	Gtk2::Gdk::Rectangle
+GDK_TYPE_RGB_DITHER	GdkRgbDither	GEnum	Gtk2::Gdk::RgbDither
+GDK_TYPE_SCROLL_DIRECTION	GdkScrollDirection	GEnum	Gtk2::Gdk::ScrollDirection
+GDK_TYPE_SETTING_ACTION	GdkSettingAction	GEnum	Gtk2::Gdk::SettingAction
+GDK_TYPE_STATUS	GdkStatus	GEnum	Gtk2::Gdk::Status
+GDK_TYPE_SUBWINDOW_MODE	GdkSubwindowMode	GEnum	Gtk2::Gdk::SubwindowMode
+GDK_TYPE_VISIBILITY_STATE	GdkVisibilityState	GEnum	Gtk2::Gdk::VisibilityState
+GDK_TYPE_VISUAL	GdkVisual	GObject	Gtk2::Gdk::Visual
+GDK_TYPE_VISUAL_TYPE	GdkVisualType	GEnum	Gtk2::Gdk::VisualType
+GDK_TYPE_WINDOW_ATTRIBUTES_TYPE	GdkWindowAttributesType	GFlags	Gtk2::Gdk::WindowAttributesType
+GDK_TYPE_WINDOW_CLASS	GdkWindowClass	GEnum	Gtk2::Gdk::WindowClass
+GDK_TYPE_WINDOW_EDGE	GdkWindowEdge	GEnum	Gtk2::Gdk::WindowEdge
+GDK_TYPE_WINDOW	GdkWindow	GObject	Gtk2::Gdk::Window
+GDK_TYPE_WINDOW_HINTS	GdkWindowHints	GFlags	Gtk2::Gdk::WindowHints
+GDK_TYPE_WINDOW_STATE	GdkWindowState	GFlags	Gtk2::Gdk::WindowState
+GDK_TYPE_WINDOW_TYPE	GdkWindowType	GEnum	Gtk2::Gdk::WindowType
+GDK_TYPE_WINDOW_TYPE_HINT	GdkWindowTypeHint	GEnum	Gtk2::Gdk::WindowTypeHint
+GDK_TYPE_WM_DECORATION	GdkWMDecoration	GFlags	Gtk2::Gdk::WMDecoration
+GDK_TYPE_WM_FUNCTION	GdkWMFunction	GFlags	Gtk2::Gdk::WMFunction
+GTK_TYPE_ACCEL_FLAGS	GtkAccelFlags	GFlags	Gtk2::AccelFlags
+GTK_TYPE_ACCEL_GROUP	GtkAccelGroup	GObject	Gtk2::AccelGroup
+GTK_TYPE_ACCEL_LABEL	GtkAccelLabel	GtkObject	Gtk2::AccelLabel
+GTK_TYPE_ACCESSIBLE	GtkAccessible	GObject	Gtk2::Accessible
+GTK_TYPE_ADJUSTMENT	GtkAdjustment	GtkObject	Gtk2::Adjustment
+GTK_TYPE_ALIGNMENT	GtkAlignment	GtkObject	Gtk2::Alignment
+GTK_TYPE_ANCHOR_TYPE	GtkAnchorType	GEnum	Gtk2::AnchorType
+GTK_TYPE_ARG_FLAGS	GtkArgFlags	GFlags	Gtk2::ArgFlags
+GTK_TYPE_ARROW	GtkArrow	GtkObject	Gtk2::Arrow
+GTK_TYPE_ARROW_TYPE	GtkArrowType	GEnum	Gtk2::ArrowType
+GTK_TYPE_ASPECT_FRAME	GtkAspectFrame	GtkObject	Gtk2::AspectFrame
+GTK_TYPE_ATTACH_OPTIONS	GtkAttachOptions	GFlags	Gtk2::AttachOptions
+GTK_TYPE_BIN	GtkBin	GtkObject	Gtk2::Bin
+GTK_TYPE_BORDER	GtkBorder	GBoxed	Gtk2::Border
+GTK_TYPE_BOX	GtkBox	GtkObject	Gtk2::Box
+GTK_TYPE_BUTTON_BOX	GtkButtonBox	GtkObject	Gtk2::ButtonBox
+GTK_TYPE_BUTTON_BOX_STYLE	GtkButtonBoxStyle	GEnum	Gtk2::ButtonBoxStyle
+GTK_TYPE_BUTTON	GtkButton	GtkObject	Gtk2::Button
+GTK_TYPE_BUTTONS_TYPE	GtkButtonsType	GEnum	Gtk2::ButtonsType
+GTK_TYPE_CALENDAR_DISPLAY_OPTIONS	GtkCalendarDisplayOptions	GFlags	Gtk2::CalendarDisplayOptions
+GTK_TYPE_CALENDAR	GtkCalendar	GtkObject	Gtk2::Calendar
+GTK_TYPE_CELL_EDITABLE	GtkCellEditable	GInterface	Gtk2::CellEditable
+GTK_TYPE_CELL_RENDERER	GtkCellRenderer	GtkObject	Gtk2::CellRenderer
+GTK_TYPE_CELL_RENDERER_MODE	GtkCellRendererMode	GEnum	Gtk2::CellRendererMode
+GTK_TYPE_CELL_RENDERER_PIXBUF	GtkCellRendererPixbuf	GtkObject	Gtk2::CellRendererPixbuf
+GTK_TYPE_CELL_RENDERER_STATE	GtkCellRendererState	GFlags	Gtk2::CellRendererState
+GTK_TYPE_CELL_RENDERER_TEXT	GtkCellRendererText	GtkObject	Gtk2::CellRendererText
+GTK_TYPE_CELL_RENDERER_TOGGLE	GtkCellRendererToggle	GtkObject	Gtk2::CellRendererToggle
+GTK_TYPE_CHECK_BUTTON	GtkCheckButton	GtkObject	Gtk2::CheckButton
+GTK_TYPE_CHECK_MENU_ITEM	GtkCheckMenuItem	GtkObject	Gtk2::CheckMenuItem
+GTK_TYPE_COLOR_SELECTION_DIALOG	GtkColorSelectionDialog	GtkObject	Gtk2::ColorSelectionDialog
+GTK_TYPE_COLOR_SELECTION	GtkColorSelection	GtkObject	Gtk2::ColorSelection
+GTK_TYPE_COMBO	GtkCombo	GtkObject	Gtk2::Combo
+GTK_TYPE_CONTAINER	GtkContainer	GtkObject	Gtk2::Container
+GTK_TYPE_CORNER_TYPE	GtkCornerType	GEnum	Gtk2::CornerType
+GTK_TYPE_CURVE	GtkCurve	GtkObject	Gtk2::Curve
+GTK_TYPE_CURVE_TYPE	GtkCurveType	GEnum	Gtk2::CurveType
+GTK_TYPE_DEBUG_FLAG	GtkDebugFlag	GFlags	Gtk2::DebugFlag
+GTK_TYPE_DELETE_TYPE	GtkDeleteType	GEnum	Gtk2::DeleteType
+GTK_TYPE_DEST_DEFAULTS	GtkDestDefaults	GFlags	Gtk2::DestDefaults
+GTK_TYPE_DIALOG_FLAGS	GtkDialogFlags	GFlags	Gtk2::DialogFlags
+GTK_TYPE_DIALOG	GtkDialog	GtkObject	Gtk2::Dialog
+GTK_TYPE_DIRECTION_TYPE	GtkDirectionType	GEnum	Gtk2::DirectionType
+GTK_TYPE_DRAWING_AREA	GtkDrawingArea	GtkObject	Gtk2::DrawingArea
+GTK_TYPE_EDITABLE	GtkEditable	GInterface	Gtk2::Editable
+GTK_TYPE_ENTRY	GtkEntry	GtkObject	Gtk2::Entry
+GTK_TYPE_EVENT_BOX	GtkEventBox	GtkObject	Gtk2::EventBox
+GTK_TYPE_EXPANDER_STYLE	GtkExpanderStyle	GEnum	Gtk2::ExpanderStyle
+GTK_TYPE_FILE_SELECTION	GtkFileSelection	GtkObject	Gtk2::FileSelection
+GTK_TYPE_FIXED	GtkFixed	GtkObject	Gtk2::Fixed
+GTK_TYPE_FONT_SELECTION_DIALOG	GtkFontSelectionDialog	GtkObject	Gtk2::FontSelectionDialog
+GTK_TYPE_FONT_SELECTION	GtkFontSelection	GtkObject	Gtk2::FontSelection
+GTK_TYPE_FRAME	GtkFrame	GtkObject	Gtk2::Frame
+GTK_TYPE_GAMMA_CURVE	GtkGammaCurve	GtkObject	Gtk2::GammaCurve
+GTK_TYPE_HANDLE_BOX	GtkHandleBox	GtkObject	Gtk2::HandleBox
+GTK_TYPE_HBOX	GtkHBox	GtkObject	Gtk2::HBox
+GTK_TYPE_HBUTTON_BOX	GtkHButtonBox	GtkObject	Gtk2::HButtonBox
+GTK_TYPE_HPANED	GtkHPaned	GtkObject	Gtk2::HPaned
+GTK_TYPE_HRULER	GtkHRuler	GtkObject	Gtk2::HRuler
+GTK_TYPE_HSCALE	GtkHScale	GtkObject	Gtk2::HScale
+GTK_TYPE_HSCROLLBAR	GtkHScrollbar	GtkObject	Gtk2::HScrollbar
+GTK_TYPE_HSEPARATOR	GtkHSeparator	GtkObject	Gtk2::HSeparator
+GTK_TYPE_ICON_FACTORY	GtkIconFactory	GObject	Gtk2::IconFactory
+GTK_TYPE_ICON_SET	GtkIconSet	GBoxed	Gtk2::IconSet
+GTK_TYPE_ICON_SIZE	GtkIconSize	GEnum	Gtk2::IconSize
+GTK_TYPE_ICON_SOURCE	GtkIconSource	GBoxed	Gtk2::IconSource
+# GTK_TYPE_IDENTIFIER	GtkIdentifier	GString	Gtk2::Identifier
+GTK_TYPE_IMAGE	GtkImage	GtkObject	Gtk2::Image
+GTK_TYPE_IMAGE_MENU_ITEM	GtkImageMenuItem	GtkObject	Gtk2::ImageMenuItem
+GTK_TYPE_IMAGE_TYPE	GtkImageType	GEnum	Gtk2::ImageType
+GTK_TYPE_IM_CONTEXT	GtkIMContext	GObject	Gtk2::IMContext
+GTK_TYPE_IM_CONTEXT_SIMPLE	GtkIMContextSimple	GObject	Gtk2::IMContextSimple
+GTK_TYPE_IM_MULTICONTEXT	GtkIMMulticontext	GObject	Gtk2::IMMulticontext
+GTK_TYPE_IM_PREEDIT_STYLE	GtkIMPreeditStyle	GEnum	Gtk2::IMPreeditStyle
+GTK_TYPE_IM_STATUS_STYLE	GtkIMStatusStyle	GEnum	Gtk2::IMStatusStyle
+GTK_TYPE_INPUT_DIALOG	GtkInputDialog	GtkObject	Gtk2::InputDialog
+GTK_TYPE_INVISIBLE	GtkInvisible	GtkObject	Gtk2::Invisible
+GTK_TYPE_ITEM_FACTORY	GtkItemFactory	GtkObject	Gtk2::ItemFactory
+GTK_TYPE_ITEM	GtkItem	GtkObject	Gtk2::Item
+GTK_TYPE_JUSTIFICATION	GtkJustification	GEnum	Gtk2::Justification
+GTK_TYPE_LABEL	GtkLabel	GtkObject	Gtk2::Label
+GTK_TYPE_LAYOUT	GtkLayout	GtkObject	Gtk2::Layout
+# NOTE: GtkList and GtkListItem are deprecated, and only included b/c GtkCombo
+# still makes use of them.  do not use them outside of GtkCombo.
+GTK_TYPE_LIST	GtkList	GtkObject	Gtk2::List
+GTK_TYPE_LIST_ITEM	GtkListItem	GtkObject	Gtk2::ListItem
+GTK_TYPE_LIST_STORE	GtkListStore	GObject	Gtk2::ListStore
+GTK_TYPE_MATCH_TYPE	GtkMatchType	GEnum	Gtk2::MatchType
+GTK_TYPE_MENU_BAR	GtkMenuBar	GtkObject	Gtk2::MenuBar
+GTK_TYPE_MENU_DIRECTION_TYPE	GtkMenuDirectionType	GEnum	Gtk2::MenuDirectionType
+GTK_TYPE_MENU	GtkMenu	GtkObject	Gtk2::Menu
+GTK_TYPE_MENU_ITEM	GtkMenuItem	GtkObject	Gtk2::MenuItem
+GTK_TYPE_MENU_SHELL	GtkMenuShell	GtkObject	Gtk2::MenuShell
+GTK_TYPE_MESSAGE_DIALOG	GtkMessageDialog	GtkObject	Gtk2::MessageDialog
+GTK_TYPE_MESSAGE_TYPE	GtkMessageType	GEnum	Gtk2::MessageType
+GTK_TYPE_METRIC_TYPE	GtkMetricType	GEnum	Gtk2::MetricType
+GTK_TYPE_MISC	GtkMisc	GtkObject	Gtk2::Misc
+GTK_TYPE_MOVEMENT_STEP	GtkMovementStep	GEnum	Gtk2::MovementStep
+GTK_TYPE_NOTEBOOK	GtkNotebook	GtkObject	Gtk2::Notebook
+GTK_TYPE_NOTEBOOK_TAB	GtkNotebookTab	GEnum	Gtk2::NotebookTab
+GTK_TYPE_OBJECT_FLAGS	GtkObjectFlags	GFlags	Gtk2::ObjectFlags
+GTK_TYPE_OBJECT	GtkObject	GtkObject	Gtk2::Object
+GTK_TYPE_OPTION_MENU	GtkOptionMenu	GtkObject	Gtk2::OptionMenu
+GTK_TYPE_ORIENTATION	GtkOrientation	GEnum	Gtk2::Orientation
+GTK_TYPE_PACK_TYPE	GtkPackType	GEnum	Gtk2::PackType
+GTK_TYPE_PANED	GtkPaned	GtkObject	Gtk2::Paned
+GTK_TYPE_PATH_PRIORITY_TYPE	GtkPathPriorityType	GEnum	Gtk2::PathPriorityType
+GTK_TYPE_PATH_TYPE	GtkPathType	GEnum	Gtk2::PathType
+GTK_TYPE_PLUG	GtkPlug	GtkObject	Gtk2::Plug
+GTK_TYPE_POLICY_TYPE	GtkPolicyType	GEnum	Gtk2::PolicyType
+GTK_TYPE_POSITION_TYPE	GtkPositionType	GEnum	Gtk2::PositionType
+GTK_TYPE_PREVIEW_TYPE	GtkPreviewType	GEnum	Gtk2::PreviewType
+GTK_TYPE_PRIVATE_FLAGS	GtkPrivateFlags	GFlags	Gtk2::PrivateFlags
+GTK_TYPE_PROGRESS_BAR	GtkProgressBar	GtkObject	Gtk2::ProgressBar
+GTK_TYPE_PROGRESS_BAR_ORIENTATION	GtkProgressBarOrientation	GEnum	Gtk2::ProgressBarOrientation
+GTK_TYPE_PROGRESS_BAR_STYLE	GtkProgressBarStyle	GEnum	Gtk2::ProgressBarStyle
+GTK_TYPE_RADIO_BUTTON	GtkRadioButton	GtkObject	Gtk2::RadioButton
+GTK_TYPE_RADIO_MENU_ITEM	GtkRadioMenuItem	GtkObject	Gtk2::RadioMenuItem
+GTK_TYPE_RANGE	GtkRange	GtkObject	Gtk2::Range
+GTK_TYPE_RC_FLAGS	GtkRcFlags	GFlags	Gtk2::RcFlags
+GTK_TYPE_RC_STYLE	GtkRcStyle	GObject	Gtk2::RcStyle
+GTK_TYPE_RC_TOKEN_TYPE	GtkRcTokenType	GEnum	Gtk2::RcTokenType
+GTK_TYPE_RELIEF_STYLE	GtkReliefStyle	GEnum	Gtk2::ReliefStyle
+GTK_TYPE_REQUISITION	GtkRequisition	GBoxed	Gtk2::Requisition
+GTK_TYPE_RESIZE_MODE	GtkResizeMode	GEnum	Gtk2::ResizeMode
+GTK_TYPE_RESPONSE_TYPE	GtkResponseType	GEnum	Gtk2::ResponseType
+GTK_TYPE_RULER	GtkRuler	GtkObject	Gtk2::Ruler
+GTK_TYPE_SCALE	GtkScale	GtkObject	Gtk2::Scale
+GTK_TYPE_SCROLLBAR	GtkScrollbar	GtkObject	Gtk2::Scrollbar
+GTK_TYPE_SCROLLED_WINDOW	GtkScrolledWindow	GtkObject	Gtk2::ScrolledWindow
+GTK_TYPE_SCROLL_TYPE	GtkScrollType	GEnum	Gtk2::ScrollType
+GTK_TYPE_SELECTION_DATA	GtkSelectionData	GBoxed	Gtk2::SelectionData
+GTK_TYPE_SELECTION_MODE	GtkSelectionMode	GEnum	Gtk2::SelectionMode
+GTK_TYPE_SEPARATOR	GtkSeparator	GtkObject	Gtk2::Separator
+GTK_TYPE_SEPARATOR_MENU_ITEM	GtkSeparatorMenuItem	GtkObject	Gtk2::SeparatorMenuItem
+GTK_TYPE_SETTINGS	GtkSettings	GObject	Gtk2::Settings
+GTK_TYPE_SHADOW_TYPE	GtkShadowType	GEnum	Gtk2::ShadowType
+GTK_TYPE_SIDE_TYPE	GtkSideType	GEnum	Gtk2::SideType
+GTK_TYPE_SIGNAL_RUN_TYPE	GtkSignalRunType	GFlags	Gtk2::SignalRunType
+GTK_TYPE_SIZE_GROUP	GtkSizeGroup	GObject	Gtk2::SizeGroup
+GTK_TYPE_SIZE_GROUP_MODE	GtkSizeGroupMode	GEnum	Gtk2::SizeGroupMode
+GTK_TYPE_SOCKET	GtkSocket	GtkObject	Gtk2::Socket
+GTK_TYPE_SORT_TYPE	GtkSortType	GEnum	Gtk2::SortType
+GTK_TYPE_SPIN_BUTTON	GtkSpinButton	GtkObject	Gtk2::SpinButton
+GTK_TYPE_SPIN_BUTTON_UPDATE_POLICY	GtkSpinButtonUpdatePolicy	GEnum	Gtk2::SpinButtonUpdatePolicy
+GTK_TYPE_SPIN_TYPE	GtkSpinType	GEnum	Gtk2::SpinType
+GTK_TYPE_STATE_TYPE	GtkStateType	GEnum	Gtk2::StateType
+GTK_TYPE_STATUSBAR	GtkStatusbar	GtkObject	Gtk2::Statusbar
+GTK_TYPE_STYLE	GtkStyle	GObject	Gtk2::Style
+GTK_TYPE_SUBMENU_DIRECTION	GtkSubmenuDirection	GEnum	Gtk2::SubmenuDirection
+GTK_TYPE_SUBMENU_PLACEMENT	GtkSubmenuPlacement	GEnum	Gtk2::SubmenuPlacement
+GTK_TYPE_TABLE	GtkTable	GtkObject	Gtk2::Table
+GTK_TYPE_TARGET_FLAGS	GtkTargetFlags	GFlags	Gtk2::TargetFlags
+GTK_TYPE_TEAROFF_MENU_ITEM	GtkTearoffMenuItem	GtkObject	Gtk2::TearoffMenuItem
+GTK_TYPE_TEXT_ATTRIBUTES	GtkTextAttributes	GBoxed	Gtk2::TextAttributes
+GTK_TYPE_TEXT_BUFFER	GtkTextBuffer	GObject	Gtk2::TextBuffer
+GTK_TYPE_TEXT_CHILD_ANCHOR	GtkTextChildAnchor	GObject	Gtk2::TextChildAnchor
+GTK_TYPE_TEXT_DIRECTION	GtkTextDirection	GEnum	Gtk2::TextDirection
+GTK_TYPE_TEXT_ITER	GtkTextIter	GBoxed	Gtk2::TextIter
+GTK_TYPE_TEXT_MARK	GtkTextMark	GObject	Gtk2::TextMark
+# in versions before 2.4.0, GtkTextSearchFlags was declared in such a way that
+# caused it to be misdetected by glib-mkenums as a GEnum.  gtk2-perl.h accounts
+# for that by redefining the generated macros on those versions. 
+GTK_TYPE_TEXT_SEARCH_FLAGS	GtkTextSearchFlags	GFlags	Gtk2::TextSearchFlags
+GTK_TYPE_TEXT_TAG	GtkTextTag	GObject	Gtk2::TextTag
+GTK_TYPE_TEXT_TAG_TABLE	GtkTextTagTable	GObject	Gtk2::TextTagTable
+GTK_TYPE_TEXT_VIEW	GtkTextView	GtkObject	Gtk2::TextView
+GTK_TYPE_TEXT_WINDOW_TYPE	GtkTextWindowType	GEnum	Gtk2::TextWindowType
+GTK_TYPE_TOGGLE_BUTTON	GtkToggleButton	GtkObject	Gtk2::ToggleButton
+GTK_TYPE_TOOLBAR_CHILD_TYPE	GtkToolbarChildType	GEnum	Gtk2::ToolbarChildType
+GTK_TYPE_TOOLBAR	GtkToolbar	GtkObject	Gtk2::Toolbar
+GTK_TYPE_TOOLBAR_SPACE_STYLE	GtkToolbarSpaceStyle	GEnum	Gtk2::ToolbarSpaceStyle
+GTK_TYPE_TOOLBAR_STYLE	GtkToolbarStyle	GEnum	Gtk2::ToolbarStyle
+GTK_TYPE_TOOLTIPS	GtkTooltips	GtkObject	Gtk2::Tooltips
+GTK_TYPE_TREE_DRAG_DEST	GtkTreeDragDest	GInterface	Gtk2::TreeDragDest
+GTK_TYPE_TREE_DRAG_SOURCE	GtkTreeDragSource	GInterface	Gtk2::TreeDragSource
+GTK_TYPE_TREE_ITER	GtkTreeIter	GBoxed	Gtk2::TreeIter
+GTK_TYPE_TREE_MODEL_FLAGS	GtkTreeModelFlags	GFlags	Gtk2::TreeModelFlags
+GTK_TYPE_TREE_MODEL	GtkTreeModel	GInterface	Gtk2::TreeModel
+GTK_TYPE_TREE_MODEL_SORT	GtkTreeModelSort	GObject	Gtk2::TreeModelSort
+GTK_TYPE_TREE_PATH	GtkTreePath	GBoxed	Gtk2::TreePath
+GTK_TYPE_TREE_ROW_REFERENCE	GtkTreeRowReference	GBoxed	Gtk2::TreeRowReference
+GTK_TYPE_TREE_SELECTION	GtkTreeSelection	GObject	Gtk2::TreeSelection
+GTK_TYPE_TREE_SORTABLE	GtkTreeSortable	GInterface	Gtk2::TreeSortable
+GTK_TYPE_TREE_STORE	GtkTreeStore	GObject	Gtk2::TreeStore
+GTK_TYPE_TREE_VIEW_COLUMN	GtkTreeViewColumn	GtkObject	Gtk2::TreeViewColumn
+GTK_TYPE_TREE_VIEW_COLUMN_SIZING	GtkTreeViewColumnSizing	GEnum	Gtk2::TreeViewColumnSizing
+GTK_TYPE_TREE_VIEW_DROP_POSITION	GtkTreeViewDropPosition	GEnum	Gtk2::TreeViewDropPosition
+GTK_TYPE_TREE_VIEW	GtkTreeView	GtkObject	Gtk2::TreeView
+GTK_TYPE_TREE_VIEW_MODE	GtkTreeViewMode	GEnum	Gtk2::TreeViewMode
+GTK_TYPE_UPDATE_TYPE	GtkUpdateType	GEnum	Gtk2::UpdateType
+GTK_TYPE_VBOX	GtkVBox	GtkObject	Gtk2::VBox
+GTK_TYPE_VBUTTON_BOX	GtkVButtonBox	GtkObject	Gtk2::VButtonBox
+GTK_TYPE_VIEWPORT	GtkViewport	GtkObject	Gtk2::Viewport
+GTK_TYPE_VISIBILITY	GtkVisibility	GEnum	Gtk2::Visibility
+GTK_TYPE_VPANED	GtkVPaned	GtkObject	Gtk2::VPaned
+GTK_TYPE_VRULER	GtkVRuler	GtkObject	Gtk2::VRuler
+GTK_TYPE_VSCALE	GtkVScale	GtkObject	Gtk2::VScale
+GTK_TYPE_VSCROLLBAR	GtkVScrollbar	GtkObject	Gtk2::VScrollbar
+GTK_TYPE_VSEPARATOR	GtkVSeparator	GtkObject	Gtk2::VSeparator
+GTK_TYPE_WIDGET_FLAGS	GtkWidgetFlags	GFlags	Gtk2::WidgetFlags
+GTK_TYPE_WIDGET	GtkWidget	GtkObject	Gtk2::Widget
+GTK_TYPE_WIDGET_HELP_TYPE	GtkWidgetHelpType	GEnum	Gtk2::WidgetHelpType
+GTK_TYPE_WINDOW_GROUP	GtkWindowGroup	GObject	Gtk2::WindowGroup
+GTK_TYPE_WINDOW	GtkWindow	GtkObject	Gtk2::Window
+GTK_TYPE_WINDOW_POSITION	GtkWindowPosition	GEnum	Gtk2::WindowPosition
+GTK_TYPE_WINDOW_TYPE	GtkWindowType	GEnum	Gtk2::WindowType
+GTK_TYPE_WRAP_MODE	GtkWrapMode	GEnum	Gtk2::WrapMode
+
+# not really defined by GTK+, but we'll use it for ourselves.
+GDK_TYPE_REGION	GdkRegion	GBoxed	Gtk2::Gdk::Region
+
+# GTK_TYPE_BINDING_SET not defined as of Gtk 2.16, instead jigged up
+# ourselves in gtk2perl.h
+GTK_TYPE_BINDING_SET	GtkBindingSet	GBoxed	Gtk2::BindingSet

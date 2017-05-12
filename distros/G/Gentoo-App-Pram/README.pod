@@ -1,0 +1,46 @@
+=head1 NAME
+
+Gentoo::App::Pram - Library to fetch a GitHub Pull Request as an am-like patch.
+
+=head1 DESCRIPTION
+
+The purpose of this module is to fetch Pull Requests from GitHub's CDN as
+am-like patches in order to facilitate the merging and closing of Pull
+Requests.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item * fetch_patch($patch_url)
+
+Fetch patch from $patch_url. Return patch as a string.
+
+=item * add_closes_header($close_url, $patch)
+
+Add a "Closes:" header to each commit in $patch using $close_url. If the patch already
+contains such headers, skip this step.
+
+=item * apply_patch($editor, $git_command, $patch)
+
+Apply $patch onto HEAD of the current git repository using $git_command. This
+functions also shows $patch in $editor for a final review.
+
+=back
+
+=head1 VERSION
+
+version 0.004
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Patrice Clement.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 AUTHOR
+
+Patrice Clement <monsieurp@gentoo.org>, Kent Fredric <kentln@gentoo.org>.
+
+=cut

@@ -1,0 +1,235 @@
+
+
+			What is Evaluate Parameters?
+
+Briefly, EvaP() is a table driven command line argument processor that type
+checks values and provides up to three levels of online help on the comamnd
+and its parameters.  You provide the Parameter Description Table (PDT), and,
+optionally, a help Message Module (MM), and call EvaP() with pointers to this
+information, and get in return an option hash with command line values indexed
+by argument name.  When users request help, EvaP() uses the PDT and MM to
+present the help data and exits, all automatically.
+
+EvaP() allows for parameter aliases, defaults values, environment variables,
+and handles these types:
+
+   switch, string, real, integer, boolean, file, key, application, name
+
+Here's a sample PDT:
+
+   PDT my_program
+       date, d: string = `date`
+       list, l: file = stdout
+       color_space, cs: key rgb, cmy, hsb, keyend = $D_CS, rgb
+       scale_factor, sf: real = 1.0
+       debug, d: boolena = true
+   PDTEND optional_file_list
+       
+
+			What's New In Version 2.3.3?
+
+ . The C and Tcl versions of Evaluate Parameters have been removed from this
+   special CPAN distribution, so many auxiliary features and program are not
+   available, nor is EvaP() embeddable.  Nevertheless, `genpTk' is available,
+   a program that writes Perl/Tk code so you can wrap your EvaP() compliant
+   application in a Perl/Tk GUI wrapper.  And with luck, it'll work for your
+   programs that don't use EvaP() as well.
+
+ . Update for Perl 5.005 and Perl/Tk 800.008.
+       
+
+			What's New In Version 2.3.5?
+
+ . Update for Perl 5.005_03 and Perl/Tk 800.013.  Fix a pager problem on
+   MacOS.  Note:  test #23 has been known to fail on Win32 systems due to
+   tab stop differences - this is not an error, per se, but, hey, what can
+   I say?  This is really version 2.3.4, but that 1 line MacOS pager fix
+   forced me to update the version number.  CPAN is watching after us!
+      
+
+			What's New In Version 2.3.6?
+
+ . A patch from Avner Moshkovitz to handle spaces and quotes embeded in string
+      
+
+			What's New In Version 2.5?
+
+ . Essentially just a refresh:  bug fixes for EvaP_PAC, use dashes rather
+   than underscores for -full-help and -usage-help.  See the change log
+   in EvaP.pm.
+      
+
+			What's New In Version 2.6?
+
+ . Use Term::ReadLine in EvaP_PAC if possible.
+      
+
+			What's New In Version 2.7?
+
+ . Replace deprecated &shellwords with Text::ParseWords::quotewords.
+      
+
+			What's New In Version 2.8?
+
+ . Fix 2 defined() warnings.
+
+ 
+Steve Lidie, Lehigh University Computing Center, 2014/11/01.
+
+sol0@Lehigh.EDU
+
+
+				Installation
+
+perl Makefile.PL
+make
+make test
+make install (as root)
+
+
+				    Usage
+
+ . perldoc Getopt::EvaP
+ . genpTk -full-help
+
+
+Here's the Announce file from the complete distribution:
+
+
+		 Evaluate Parameters 2.5 for C, Perl and Tcl
+
+
+    Evaluate Parameters, designed as a replacement for the getopt family of
+functions, is now available.  Briefly, Evaluate Parameters parses a Unix
+command line in a simple and consistent manner, performs type-checking on
+parameter values and provides three levels of help on the command, its
+parameters and their possible values.
+
+    Evaluate Parameters for C, Perl and Tcl is also embeddable in your
+application.  This simply means that you can write an application whose
+subcommand processors each use Evaluate Parameters to handle their argument
+processing, leading to an amazingly consistent and pleasant user interface.
+
+    Evaluate Parameters has been updated for Perl 5.002+, Tcl 7.5+ and
+Tk 4.0+.
+
+    There are several advantages to using Evaluate Parameters in all your C,
+Perl and Tcl programs:
+
+ - Every program or application command calling Evaluate Parameters has a
+   -help switch which lists all the command line arguments and their aliases,
+   the types of parameter values they expect, and their default values.
+   Many commands have no man pages so this first-level help is the only
+   help available to a user.  This is provided automatically as part of
+   Evaluate Parameters; no code is required in your application.  There are
+   also two other levels of help:  -usage_help and -full_help.
+
+   An optional help Message Module can be defined to provide additional
+   help for the command and all its parameters.  This information is
+   displayed when -full_help is specified on the command line.
+
+ - Because Evaluate Parameters allows command line arguments to have an
+   alias, parameters can be given meaningful names which a user can readily
+   understand.  Hackers, on the other hand, can use the abbreviation to
+   speed their work.
+
+ - Evaluate Parameters verifies that the value specified for a command
+   line argument is of the appropriate type. Types currently supported are
+   switch, string, real, integer, boolean, file, key, application and name.
+
+   For C, parameter values are returned in a structure known as the PVT
+   (Parameter Value Table) and are available in two forms; unconverted C
+   strings and type-converted values.
+
+   For Perl, since the language performs type conversion automatically,  you
+   simply get the parameter's value in global variables:  the `old' way in
+   variables of the form $opt_parameter and @opt_parameter, and the `new' 
+   way in the hashes %options and %Options.  If you use the hashes %options
+   or %Options Perl 5 lists are returned as a reference to a list.  (Note,
+   for evap/Perl you can optionally specify a private hash reference to
+   hold option values, which disables this historical namespace bashing.)
+
+   For Tcl, since the language performs type conversion automatically,  you
+   simply get the parameter's value in global variables:  the `old' way in
+   variables of the form $opt_parameter, and the `new' way in  the
+   associative array $options and $Options.  If you use $Options (or
+   $options) lists are returned as a string `joined' by the multi-dimensional
+   array emulation character (\x1C).
+
+ - All parameter types except switch may be lists.
+
+ - Two auxiliary Perl programs called `generate_PerlTk_program' and
+   'generate_TclTk_program' automatically write Tk X11 GUI wrappers for any
+   program using Evaluate Parameters.  Here are the general capabilities
+   of programs created by generate_[Perl|Tk]_program:
+
+   . Command line parameters are specified via a form packed inside a
+     scrollable Text widget.  Most are Entry widgets, except for parameters
+     of type switch and boolean which are Radiobutton widgets, and type key 
+     which can be either Radiobutton widgets or an Optionmenu.
+
+   . For `list of' command line parameters we make these widget distinctions:
+
+  	key		Checkbutton widget
+	switch		not allowed
+	other types	Entry widget with multiple space-separated items
+
+   . Complete command and parameter help (from the Evaluate Parameters Message
+     Module) displayed in a scrollable Text widget.
+
+   . A scrollable Entry widget dynamically displays the command to be executed.
+
+   . After execution the command's standard output is captured in a separate
+     Toplevel window.  This window can be saved to a file or directed to a
+     command pipeline.
+
+   . Parameters are labeled with Button widgets rather than Label widgets so
+     clicking on a command line parameter Button positions the help window
+     automatically to the help text for that parameter.  The scrollable Entry
+     widget is also repositioned to show the specified parameter.
+
+   . Important items that should be highlighted for the user to see are
+     displayed in a configurable background color using the X11 resource name
+     `name.highlight : color'.       	
+
+   . An Undo selection to reset all command line parameters to their original
+     values.
+
+   . Usage help explaining the characteristics of applications generated by
+     generate_[Perl|Tk]_program, and details of Evaluate Parameters.
+
+ - An auxiliary Perl program called `generate_man_page' automatically creates
+   a simple nroff man page for any program using Evaluate Parameters.
+
+ - Evaluate Parameters for C interfaces cleanly with Xlib or Xt.
+
+ - Your job of developing applications is simplified because you don't waste
+   time writing code to process arguments again, and again, and again!
+   Command line parsing is simple, compact and consistent.  Adding or changing
+   command line parameters is extremely easy.
+
+ - Most importantly, as long as you adhere to the Human Interface Guidelines,
+   Evaluate Parameters provides for a consistent user interface across all
+   your C, Perl and Tcl programs.
+
+
+				Availability
+
+All the implementations of Evaluate Parameters are available via anonymous FTP
+from ftp.Lehigh.EDU.  Look in the pub/evap/evap-2.x directory
+for the latest compressed tar file.       
+
+
+Evaluate Parameters/C is known to work on AIX, EP/IX, HP-UX, IRIX, Linux,
+Sony NEWS, SunOS, TitanOS and Ultrix.  It has in the past also worked on VX/VE.
+
+Evaluate Parameters/Perl is known to work on AIX, Linux and MS-DOS.
+
+Evaluate Parameters/Tcl is known to work on AIX.
+
+
+Stephen O. Lidie
+Lehigh University Computing Center
+
+lusol@Lehigh.EDU, 97/01/12
+sol0@lehigh.edu, 2012.04.09

@@ -1,0 +1,9 @@
+2005/08/13	kaffeetisch
+
+	* MANIFEST, NEWS: Release 0.01.
+
+2005/08/13	kaffeetisch
+
+	* gstgconfperl.h, LICENSE, Makefile.PL, copyright.pod, ChangeLog,
+	MANIFEST, t/GstGConf.t, xs/GstGConf.xs, xs/.cvsignore, README,
+	MANIFEST.SKIP, .cvsignore, GConf.pm: Initial import.

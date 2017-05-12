@@ -1,0 +1,113 @@
+
+body {  background: #DEE0DD; /* url(../images/background_gray.gif) 0 0 repeat-x; */ }
+
+#page   { padding: 0 0 0 0; /* width: 92em; background: transparent url(../images/spot.gif) 0 0 no-repeat; */}
+#header { background: #AFAFAF; font-size: 2.7em; color: #333; text-align: right; padding: 2px 15px 0 0; }
+#footer { padding: 3em 0; text-align: center;  }
+#body { padding: 0 0 0 0;}
+.group2 .first { width: 45%;  }
+
+/* Templates-------------------------------------------------------------------------------- */
+
+/* Template 1 */
+.template1 .block {  float: left;  width: 40%;}
+.template1 #primary {  float: right;  width: 57%;}
+
+/* template2 */
+.template2 .block {  width: 29%;}
+.template2 #primary {  width: 68%;}
+
+/* template3 */
+.template3 .block {  float: left;  width: 62%;}
+.template3 #primary {  float: right;  width: 35%;}
+
+/* General type-------------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {  margin: 1em 0 .3em 0;  font-family: 'Lucida Grande', helvetica, arial, sans-serif;  color: #333;}
+
+h1 {  font-size: 2.4em;}
+h2 {  font-size: 2.2em;}
+h3 {  font-size: 2.0em;}
+h4 {  font-size: 1.8em;}
+h5 {  font-size: 1.6em;}
+h6 {  font-size: 1.4em;}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {  color: #3A566B;  text-decoration: none;}
+p {  margin: .3em 0 1em 0;  font-family: 'Lucida Grande', helvetica, arial, sans-serif;  font-size: 1.0em;  line-height: 1.5em;  color: #333;}
+ul {  margin: 1em 0;}
+legend, li, dt, dd, th, td {  font-family: 'Lucida Grande', helvetica, arial, sans-serif;  font-size: 1.0em;  line-height: 1.5em;  color: #333;}
+dd {  font-size: 1em;}
+a {  color: #3A566B;  text-decoration: none;}
+a:hover {  text-decoration: underline;}
+em {  color: #3A566B;}
+
+.currency { text-align: right; }
+
+/* Logo-------------------------------------------------------------------------------- */
+#header h1 {  position: absolute;  margin: 0;  top: 69px;  left: 0;  width: 17em;  height: 7.2em;  overflow: hidden;  clip: rect(0 17em 7.2em 0);}
+#header h1 a {  display: block;  padding-top: 17em; /* background: transparent url(../images/merchspot.gif) top left no-repeat; */ }
+
+/* Header tabs-------------------------------------------------------------------------------- */
+
+#header .tabs {  position: absolute;  margin: 0;  top: 55px;  font-size: 11pt;  left: 12%;  list-style: none;}
+#header .tabs li {  float: left;  margin: 0;}
+#header .tabs li a {  display: inline;  padding: 0.5em 1em;  color: #FFF;}
+
+.overview #header .tabs .overview a,.faq #header .tabs .faq a,.pricing #header .tabs .pricing a,.contact #header .tabs .contact a {  color: #8AA6BB;}
+.overview #header .tabs .overview a:hover,.faq #header .tabs .faq a:hover,.pricing #header .tabs .pricing a:hover,.contact #header .tabs .contact a:hover {  text-decoration: none;  cursor: text;}
+
+/* Tagline-------------------------------------------------------------------------------- */
+.tag {  margin: 0 1em 1em 0;  font-size: 2.6em;  font-weight: normal;  line-height: 1.3em;  text-shadow: #212D37 2px 2px 1px; }
+.tag a {  border-bottom: 2px solid #465D6F;  color: #8AA6BB;}
+.tag a:hover {  border-bottom: 2px solid #628749;  color: #BAFF8A;  text-decoration: none;}
+.template2 .tag {  font-size: 2em;  line-height: 1.3em;}
+
+/* Blockquote-------------------------------------------------------------------------------- */
+blockquote p {  margin: 2em 0 .5em 0;  font-size: 1.6em;  line-height: 1.3em;  color: #BAFF8A;}
+blockquote .from {  margin: 0;  font-size: 1.1em;  color: #8AA6BB;}
+blockquote .from a { color: #8AA6BB; }
+
+/* Feature-------------------------------------------------------------------------------- */
+.feature {  margin: 0 0 2em 0; /* background: transparent url(../images/box-top-left.gif) no-repeat top left; */ }
+.feature dl {  /* background: transparent url(../images/box-bottom-right.gif) no-repeat bottom right; */ }
+.feature h3 {  padding: 1em 1em 0.5em 1.5em;  font-size: 1.2em;  font-weight: normal;  color: #3A566B;  text-shadow: none;}
+.feature dt {  padding: 0.6em 0 0.7em 0;  /* background: transparent url(../images/feature-background.gif) top left repeat-x; */ }
+.feature dt a {  padding: 0 1em 0 2.2em;  /* background: transparent url(../images/arrow.gif) 12px 2px no-repeat; */  color: #3A566B;}
+.feature dd p {  margin: 0;  padding: 0 1.4em 1em 1.4em;  line-height: 1.4em;  color: #333;}
+.lite dt {    padding: 0.6em 0 0 1.4em;  }
+.lite dt a {    display: inline;    padding: 0.6em 1em 0 0;    background: none;  }
+
+/* IE HACK that fixes a spacing issue  * between a feature and a button */
+* html .feature {  padding: 0 0 .1em 0;}
+
+/* Buttons-------------------------------------------------------------------------------- */
+.button { cursor: pointer; padding: 0.4em 1.5em 0.5em 1.5em; /* background: transparent url(../images/button-left.gif) left top no-repeat;  font-size: 1.2em;  font-weight: normal; /* }
+.button a {  display: block;  margin: 0em 0; /* background: transparent url(../images/button-right.pngdd) right top no-repeat; */ }
+
+/* Chart-------------------------------------------------------------------------------- */
+.chart table {  margin: 0 0 2em 0;  width: 100%;  font-size: 1.1em;  color: #FFF;}
+.chart th {  font-size: 1.3em;  font-weight: bold;  color: #97B6CE;  text-align: center;}
+.chart td,.chart th {  padding: .1em 0;  border-bottom: 1px solid #4A6476;  font-size: 1.1em;}
+.chart .title {  width: 15em;}
+.chart .title a {  color: #FFF;}
+.chart .col {  width: 9.5em;  background: #24394A;  border-left: 1px solid #39576A;  text-align: center;}
+.chart .col strong {  display: block;  padding-top: 13px;  height: 13px; height: 0 !important;  overflow: hidden; /* background: url(../images/icons/check.gif) top center no-repeat; */ }
+.chart .price {  padding: .3em 0;  background: #849FB4;  border-left: 1px solid #39576A;  font-size: 1.3em;  font-weight: bold;  color: #24394A;  text-align: center;}
+.chart .empty {  border: none;}
+
+/* Primary lists-------------------------------------------------------------------------------- */
+#primary .unit li {  margin: .2em 0;  padding: 0 0 0 1.2em;  /* background: transparent url(../images/arrow.gif) 0 3px no-repeat;  */ color: #FFF;}
+
+/* FAQ lists-------------------------------------------------------------------------------- */
+.faq #primary dt {  font-size: 1.5em;}
+.faq #primary dd {  margin: 0 0 3em 0;}
+.faq #primary dd p {  color: #FFF;}
+
+/* Forms and Fieldset-------------------------------------------------------------------------------- */
+fieldset p {  margin: 1.5em 0;  font-size: 1.2em;}
+fieldset { margin: .3em 0 1em 0;  font-family: 'Lucida Grande', helvetica, arial, sans-serif;  font-size: 1.2em;  line-height: 1.5em;  color: #333;}
+
+#phone-input {  display: none;}
+.auto {  width: auto;}
+
+/* Footer-------------------------------------------------------------------------------- */
+#footer p {  font-size: 1.1em;  color: #888;}

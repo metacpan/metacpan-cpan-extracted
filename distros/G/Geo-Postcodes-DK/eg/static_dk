@@ -1,0 +1,50 @@
+#! /usr/bin/perl -w
+
+use strict;
+
+use Geo::Postcodes::DK 0.30;
+
+################################################################################
+#                                                                              #
+#                                 static_dk                                    #
+#                                ------------                                  #
+#              Arne Sommer - perl@bbop.org - 12. September 2006                #
+#                                                                              #
+################################################################################
+
+use Digest::SHA1;
+
+my @arg1 = ('postcode' => '.(.)\1.');
+
+print "All danish postcodes where the second and third digits are identical:\n";
+
+my @postcodes = Geo::Postcodes::DK::selection(@arg1);
+
+print join ",", @postcodes; print ".\n\n";
+
+################################################################################
+
+print "As above, but with the addition of a procedure:\n";
+
+my @arg2 = (@arg1, 'procedure' => \&selector_procedure);
+
+@postcodes = Geo::Postcodes::DK::selection(@arg2);
+
+print join ",", @postcodes; print ".\n\n";
+
+################################################################################
+
+## This one computes the SHA1-digest of the postal location, and returns true
+## if the there is a lower case letter a-z among the 11th to 16th characters.
+
+sub selector_procedure
+{
+  my $postcode = shift;
+
+  my $location = Geo::Postcodes::DK::location_of($postcode);
+
+  my $digest = Digest::SHA1::sha1($location);
+
+  return 1 if substr($digest, 10, 5) =~ /[a-z]/;
+  return 0;
+}

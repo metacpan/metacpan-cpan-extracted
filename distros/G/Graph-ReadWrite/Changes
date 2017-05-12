@@ -1,0 +1,127 @@
+Revision history for perl distribution Graph-ReadWrite
+
+2.09 2016-08-05 NEILB
+    - Added the ability to cluster nodes in subgraphs when generating
+      Dot format output. PR from Joenio Costa++.
+
+2.08 2015-10-30 NEILB
+    - Switched to Dist::Zilla
+    - Updated the github repo URL after changing my github username
+    - Removed a spurious =back from Graph::ReadWrite.
+      Thanks to Lucas Kanashiro for RT#106063
+
+2.07 2015-02-21 NEILB
+    - Made mentions in SEE ALSO be links. MANWAR++ for starting this.
+    - Added Graph::ReadWrite module, so there's a module that matches
+      the dist name.
+    - The NAME field in Makefile.PL was set to dist name (Graph-ReadWrite)
+      instead of module name (Graph::ReadWrite).
+
+2.06 2014-01-24
+
+    - Graph::Write::daVinci had a different version number from
+      all the other modules.
+
+2.05 2014-01-22
+
+    - the daVinci writer would sometimes fail due to the random
+      hash order change in Perl 5.18
+    - Specified min perl version as 5.6.0
+    - Added ExtUtils::MakeMaker to CONFIGURE_REQUIRES
+    - Changed Makefile.PL to metaspec 2
+
+2.04 2013-07-27
+
+    - Added license type to Metadata
+    - Ensured all releases in this file have a date, as per CPAN::Changes::Spec
+
+2.03 2012-02-14
+
+    - added ABSTRACT, AUTHOR and github repository info to Makefile.PL
+    - added parent, Carp, and File::Compare as pre-reqs
+
+2.02 2012-02-12
+
+    - Pulled out the Parse::Yapp::Driver code that was embedded in the
+      Dot reader. PAUSE didn't like me uploading code for a module I
+      don't have permission for. Now added as a pre-req.
+
+2.01 2012-02-12
+
+    - Fixed RT bug #39792: trying to call method set_graph_attribute()
+      on Graph::Reader::XML, which should have been set_attribute().
+    - changed calls to File::Compare::compare() to hopefully cope with
+      EOL differences between Windows and Unix. Reported by Philip Potter,
+      and fix noted by Max
+    - Ensured all modules were use'ing strict and warnings. Fixed warnings :-)
+    - Cleaned up formatting of all modules
+    - renamed ChangeLog to Changes and reformatted as per CPAN::Changes::Spec
+
+2.00 2005-01-02
+
+	- made the changes needed to work with version 0.5 of Graph classes
+	- patch to Graph::Reader::Dot from Mark Hillebrand.
+	- fixed warnings "Using a hash as a reference is deprecated"
+	- added support for new Dot attributes to Graph::Reader::Dot
+	- node ids are now quoted in Graph::Writer::Dot,
+	  which means you can safely have space, ':', '-', and other
+	  interesting characters in node ids.
+
+1.07 2002-07-09
+
+	- Added XML::Parser and XML::Writer as dependencies in Makefile.PL.
+	  This was prompted by looking at testers.cpan.org, which has
+	  this distribution as failing.
+
+1.06 2002-03-20
+
+	- Graph::Writer::VCG - common attributes (label, color, and
+	  text color) weren't supported on edges.
+	  Bug and fix reported by Alexandre Cherif.
+
+1.05 2002-01-20
+
+	- Added a basic test-suite.
+	- Commented out debugging output in the HTK Writer. Sorry Phil!
+
+1.04 2001-11-11
+
+	- Added Graph::Reader::Dot, a reader for the Dot format
+	  contributed by Mark Hillebrand.
+
+	- Fixed a bug in Graph::Reader::XML, found by Mark Hillebrand.
+	  The reader would only cope with a single <attribute> element
+	  inside each graph, node or edge element.
+
+	- Changed contact email address to neil at bowers dot com
+
+1.03 2001-04-25
+
+	- Added reader and writer classes for HTK lattice files.
+
+1.02 2001-03-18
+
+	- Fixed a bug in the XML writer module - the way it was using
+	  XML::Writer caused STDOUT to be closed after you've written
+	  a graph. I consider it a bug in XML::Writer, but I was able
+	  to change the way Graph::Writer::XML uses that module.
+
+	  Basically it just means that we construct a new instance
+	  of XML::Writer every time we write out a graph. For most
+	  uses, this won't be a problem, but you'd notice a hit if
+	  you were creating the writer and then writing a lot of graphs.
+
+	  This was noticed by Mike Hayward <hayward@loup.net>
+
+1.01 2001-03-12
+
+	- Added support for URL attribute on nodes in Dot.
+	- Added support for almost all attributes understood by VCG.
+	- Added a rough cut at a Writer class for daVinci: Graph::Writer::daVinci
+
+1.00 2001-02
+
+	- Initial release - has baseclass for Reader and Writer classes.
+	- Reader and Writer for simple XML format.
+	- Writers for Dot and VCG formats.
+

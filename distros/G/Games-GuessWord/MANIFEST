@@ -1,0 +1,12 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+lib/Games/GuessWord.pm
+t/chances.t
+t/pod.t
+t/pod_coverage.t
+t/simple.t
+t/wonlost.t
+t/words
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,3 @@
+#! /bin/sh
+
+perl ./piechart.pl -T X -t 'World Population in 1994' < ./piechart.t

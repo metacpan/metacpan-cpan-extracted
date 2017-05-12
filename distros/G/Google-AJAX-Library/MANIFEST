@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Google/AJAX/Library.pm
+lib/Google/AJAX/Library/Carp.pm
+t/01-basic.t
+t/02-library.t
+t/03-fetch.t

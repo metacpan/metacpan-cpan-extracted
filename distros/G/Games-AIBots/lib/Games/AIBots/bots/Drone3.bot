@@ -1,0 +1,161 @@
+$name   = 'Drone3';
+$author = 'Bestian Tang';
+$team   = 'Free Drones';
+
+require 'drones.bm';
+
+$a = 0;
+
+sub spider {
+    enable shield;
+    scan perimeter;
+
+    goto web if &found('space');
+    goto sweb;
+}
+
+sub web {
+    move forward;
+    turn left;
+    move forward;
+    turn left;
+    enable laymine;
+    call make2mines;
+    turn left;
+    call make2mines;
+    turn left;
+    call make2mines;
+    turn left;
+    move forward;
+    disable laymine;
+    turn right;
+    move backward;
+    $open = $h;
+    goto wait;
+}
+
+sub make2mines {
+    move forward;
+    if (&bumped('enemy')) {
+        call bite;
+        redo;
+    }
+    move forward;
+    if (&bumped('enemy')) {
+        call bite;
+        redo;
+    }
+    return;
+}
+
+sub sweb {
+    scan relative 8;
+    call makemine if &found('space');
+    turn left;
+    scan relative 8;
+    call makemine if &found('space');
+    turn left;
+    scan relative 8;
+    call makemine if &found('space');
+    turn left;
+    $open = $h;
+    goto wait;
+}
+
+sub makemine {
+    move forward;
+
+    if (&bumped('enemy')) {
+        call bite;
+        redo;
+    }
+
+    enable laymine;
+    move backward;
+    disable laymine;
+    return;
+}
+
+sub wait {
+    scan front;
+    if (&found('enemy')) {
+        call bite;
+        redo;
+    }
+    elsif (&found('space')) {
+        goto jump if $h == $open;
+        call makemine;
+        redo;
+    }
+    elsif (&found('flag|vault')) {
+        goto eat;
+    }
+    turn left;
+    enable shield;
+    redo;
+
+}
+
+sub bite {
+    disable shield;
+    if (&nearst('enemy') == 1) {
+        fire laser * 5;
+    }
+    else {
+        fire grenade * 1;
+    }
+    return;
+}
+
+sub jump {
+    if ($ammo < 10 and $ammo > 2) {
+        move forward;
+        enable laymine;
+        move backward;
+        disable laymine;
+        goto wait;
+    }
+
+    scan longrange;
+
+    if (&found('enemy')) {
+        if (&nearst('enemy') == 1) {
+            call bite;
+            redo;
+        }
+        else {
+            disable shield;
+            fire grenade;
+            goto wait;
+        }
+    }
+    elsif (&found('flag|vault')) {
+        goto eat;
+    }
+    elsif ($a == 5) {
+        turn left;
+        $a = 0;
+    }
+    $a++;
+
+    enable shield;
+    goto wait;
+}
+
+sub eat {
+    if (&damaged == 0 and &found('flag')) {
+        move backward;
+        enable laymine;
+        move forward;
+        disable laymine;
+    }
+
+    $ox = $x;
+    $oy = $y;
+    call fetch;
+    $delta = abs($ox - $x) + abs($oy - $y);
+
+    move backward * $delta;
+
+    goto wait;
+}

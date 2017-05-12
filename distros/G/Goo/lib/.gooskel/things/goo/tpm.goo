@@ -1,0 +1,23 @@
+title		=	Perl5 Test Module
+filename	=	tpm.goo
+suffix		=	tpm
+description	=	Test Perl5 modules
+location	=	shared/bin/test
+location	=	bin/test
+
+# specific action handlers
+[E]dit			=	Goo::Thing::pm::ProgramEditor
+[P]rofile		=	Goo::Thing::pm::ProgramProfiler
+[D]elete		=	Goo::Thing::pm::ProgramDeleter
+[A]dd			=	Goo::Thing::pm::ProgramAdder
+[R]un			=	Goo::Thing::pm::ProgramRunner
+[T]est			= 	Goo::Thing::pm::TestRunner
+C[O]mpile		=	Goo::Thing::pm::ProgramCompiler
+
+# generic
+E[X]it			= 	Goo::Exiter
+[J]ump			=	Goo::JumpManager
+[C]lone			= 	Goo::Cloner
+[G]o Live		=	Goo::GoLiveCommand
+[S]hell			=	Goo::Shell
+Back [L]inks	= 	Goo::BackLinkManager

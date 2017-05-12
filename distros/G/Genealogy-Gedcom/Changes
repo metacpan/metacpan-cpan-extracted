@@ -1,0 +1,64 @@
+Revision history for Perl extension Genealogy::Gedcom.
+
+0.88  2016-08-14T11:33:00
+	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
+		See RT#116939. Thanx to Chad Granum.
+	- Update version #s in pre-reqs.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Update .gitignore and MANIFEST.SKIP.
+	- Change licence from Artistic to Perl.
+	- Move File::Spec, File::Temp, Test::Pod and Test::Simple to TEST_REQUIRES within Makefile.PL.
+
+0.87  Sat Nov 14 16:31:00 2015
+	- Parse http://www.tamurajones.net/GEDCOMANSELTable.xhtml and extract all the special characters
+		called ANSEL. See FAQ for details. This is a demonstration of how this code handles UTF-8.
+	- Add scripts/parse.sample.7.pl, data/GEDCOMANSELTable.xhtml (UTF-8) and
+		data/sample.7.ged (UTF-8).
+
+0.86  Sat Nov 14 10:44:00 2015
+	- Remove redundant program scripts/read.pl.
+	- Fix dates in data/sample.[1234].ged which used 10-08-2011 instead of 10 Aug 2011.
+	- Remove Build.PL.
+	- Remove all references to DateTime.
+	- Remove locale().
+	- Upgrade to Genealogy::Gedcom::Date V 2.01 (which handles Unicode).
+	- Switch from Hash::FieldHash to Moo.
+	- Switch from Perl6::Slurp to File::Slurper.
+	- Switch from Test::More to Test::Stream.
+	- Move t/pod.t into xt/author/.
+	- Add scripts/test.all.dates.pl, which parses all date records in data/*.ged, using the newly
+		re-written Genealogy::Gedcom::Date.
+	- Add scripts/pod2html.sh.
+	- Create repo at https://github.com/ronsavage/Genealogy-Gedcom.
+		This includes updating the docs and Makefile.PL.
+	- Update the docs generally.
+
+0.85  Thu Sep 26 09:12:00 2013
+	- Fix typo in docs which referred to Tamura Jones as female. My apologies to him.
+
+0.84  Fri Jun 28 11:51:00 2013
+	- Add data/sample.6.ged to match data/sample.5.ged, to cover the 2 types of dates within the header.
+		One case (sample.5.ged) is used where a TIME is allowed, and the other where it is not.
+	- Active the debug flag in t/date.t to try exposing test failures for '15 Jul 1954'.
+
+0.83  Wed Jun 26 10:56:00 2013
+	- Rename CHANGES to Changes as per CPAN::Changes::SPEC.
+	- Remove the HTML templates called rainbow*, because they were never used.
+	- Update pre-preqs' version #s, especially for DateTime and DateTime::Infinite, to see if that fixes
+		mysterious CPAN Tester failures with t/date.t's use of '15 Jul 1954'.
+		Also, we now require Genealogy::Gedcom::Date V 1.08, which has the same DateTime pre-reqs.
+
+0.82  Mon Feb 27 13:33:00 2012
+	- The switch in V 0.81 from DateTime::Format::Gedcom to Genealogy::Gedcom::Date omitted some edits in t/*.t.
+
+0.81  Thu Sep 29 14:48:00 2011
+	- Switch pre-req from DateTime::Format::Gedcom V 1.01 to Genealogy::Gedcom::Date V 1.00.
+	- Update UUID proposal with use case.
+	- Rename UUID proposal from docs/uuid.txt to docs/uuid.proposal.pod, and add docs/uuid.proposal.html.
+	- Remove obsolete docs/rationale.*.
+	- In the array of hashrefs recording lex results, the type field can now be 'Date' or 'Invalid date'.
+		'Date' means it was successfully parsed, and 'Invalid date' means it could not be parsed.
+
+0.80  Mon Aug 29 12:00:00 2011
+	- Initial release.

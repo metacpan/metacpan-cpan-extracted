@@ -1,0 +1,5 @@
+CVS
+.cvsignore$
+build
+Makefile$
+\.bak$

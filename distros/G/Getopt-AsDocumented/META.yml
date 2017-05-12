@@ -1,0 +1,32 @@
+---
+abstract: 'declare options as pod documentation'
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+build_requires:
+  Module::Build: 0.4005
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131490'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Getopt-AsDocumented
+provides:
+  Getopt::AsDocumented:
+    file: lib/Getopt/AsDocumented.pm
+    version: v0.0.2
+  Getopt::AsDocumented::PodParser:
+    file: lib/Getopt/AsDocumented.pm
+requires:
+  Getopt::Base: v0.0.3
+  Pod::Parser: 0
+  YAML: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Getopt-AsDocumented
+  homepage: http://enobacon.com/
+  license: http://dev.perl.org/licenses/
+  repository: git://git.enobacon.com/Getopt-AsDocumented.pm.git
+version: v0.0.2

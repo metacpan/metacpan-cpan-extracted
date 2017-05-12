@@ -1,0 +1,37 @@
+<h2>[% diff_tree.size %] file[% "s" IF diff_tree.size > 1 %] in this diff <span>([%- Commit.sha1 || HEAD -%])</span></h2>
+
+<table class='diff-tree listing'>
+ <thead>
+  <tr>
+   <th>File</th>
+   <th>Status</th>
+   <th>Actions</th>
+  </tr>
+ </thead>
+ <tbody>
+  [% FOREACH line IN diff_tree -%]
+  <tr>
+   <td class='file-name'>
+    <a href="#diff[% loop.count %]">[% line.file %]</a>
+   </td>
+   <td class='status'>
+    [%
+    SWITCH line.status;
+      CASE 'R';
+        '[moved from ' _ line.src _ ' with ' _ line.sim _ '% similarity]';
+      CASE 'A';
+        '[new file with mode: ' _ line.modedst _ ']';
+      CASE 'D';
+        '[deleted file]';
+    END;
+    %]
+   </td>
+   <td class='action-list'>
+     [% IF !line.is_new %]<a href="[% c.uri_for_action("/ref/diff_fancy", [Repository.name, Commit.sha1], line.file.to_path) %]" title="Difference" class="button diff">diff</a>[% END %]
+     [% IF !line.is_new %]<a href="[% c.uri_for_action("/ref/history", [Repository.name, Commit.sha1], line.file.to_path) %]" title="History (Short Log)" class="button history">history</a>[% END %]
+	<a href="[% c.uri_for_action("/ref/blob", [Repository.name, Commit.sha1], line.file.to_path) %]" title="Blob" class="button blob">blob</a>
+   </td>
+  </tr>
+  [% END %]
+ </tbody>
+</table>

@@ -1,0 +1,54 @@
+{
+   "abstract" : "create elevation graphs from GPX files",
+   "author" : [
+      "Markus Benning <me@w3r3wolf.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GPX-PlotElevation",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Chart::Gnuplot" : "0",
+            "Geo::Distance" : "0",
+            "Geo::Gpx" : "0",
+            "Getopt::Long" : "0",
+            "IO::File" : "0",
+            "POSIX" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-GPX-PlotElevation@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=GPX-PlotElevation"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/GPX-PlotElevation",
+         "web" : "https://github.com/benningm/GPX-PlotElevation.git"
+      }
+   },
+   "version" : "1.01"
+}
+

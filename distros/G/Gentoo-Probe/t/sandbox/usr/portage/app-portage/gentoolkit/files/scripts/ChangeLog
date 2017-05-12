@@ -1,0 +1,63 @@
+# ChangeLog for app-admin/gentoolkit/lintool/scripts
+# Copyright 2002-2003 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/gentoolkit/files/scripts/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+07 Jan 2004 Aron Griffis <agriffis@gentoo.org>
+	* allow echangelog to run in a directory that doesn't contain any
+	  apparently modified files
+	* update copyright years in affected ebuilds and in ChangeLog
+
+26 May 2003 Aron Griffis <agriffis@gentoo.org>
+	* fix bug 21022: echangelog should not be localized
+
+25 May 2003 Aron Griffis <agriffis@gentoo.org>
+	* fix double-reporting of removed ebuilds in echangelog
+
+27 Apr 2003 Aron Griffis <agriffis@gentoo.org>
+	* use older but sanctioned ChangeLog format
+	* add man-page for echangelog
+
+22 Apr 2003 Aron Griffis <agriffis@gentoo.org>
+	* ignore Manifests in file listing
+
+21 Mar 2003 Aron Griffis <agriffis@gentoo.org>
+	* disallow "root" as a valid user for creating ChangeLog entries
+
+12 Mar 2003 Aron Griffis <agriffis@gentoo.org>
+	* update echangelog to work better with new cvs output, which says 
+	  "cvs diff:" instead of "cvs server:"
+
+07 Mar 2003 Aron Griffis <agriffis@gentoo.org>
+	* fix more echangelog things
+		- Try to better determine when to add a new entry
+		- Catch cvs removes
+
+25 Feb 2003 Aron Griffis <agriffis@gentoo.org>
+	* fix more echangelog buglets, reported by Hannes and Weeve
+		- Wrap files listing and separate with commas
+		- Normalize whitespace after an entry
+		- Don't list digests
+
+21 Feb 2003 Aron Griffis <agriffis@gentoo.org>
+	* fix some bugs in echangelog...
+		- make it work with gtk+ (and other ebuilds with regex specials)
+		- recognize (broken) *version with ending "." or ".ebuild"
+		- get trailing spacing right when coming from stdin
+		- use all cmdline args instead of just first for entry
+		- make a new changelog if it seems appropriate
+	* fix some bugs in ekeyword...
+		- don't die if the file hasn't changed
+		- inspect ARGV[0] to see if it looks like a keyword
+
+13 Feb 2003 Aron Griffis <agriffis@gentoo.org>
+	* update ekeyword to fix strange spacing from other keyword tools
+
+12 Feb 2003 Aron Griffis <agriffis@gentoo.org>
+	* update echangelog to insert entry at the correct location in the
+	  ChangeLog
+
+10 Feb 2003 Aron Griffis <agriffis@gentoo.org>
+	* add echangelog and ekeyword
+
+11 Nov 2002 Martin Holzer <mholzer@gentoo.org>
+	* fix emerge-webrsync 0 byte bug  

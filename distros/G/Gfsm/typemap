@@ -1,0 +1,265 @@
+# -*- Mode: Perl -*-
+
+gfsmSemiring*	  O_OBJECT
+gfsmAlphabet*	  O_OBJECT
+gfsmPerlAlphabet* O_OBJECT
+gfsmAutomaton*    O_OBJECT
+gfsmIndexedAutomaton*  O_OBJECT
+gfsmTrie*         O_OBJECT
+gfsmArcIter*      O_OBJECT
+
+gfsmLabelVector*   T_LABELID_VECTOR
+gfsmStateIdVector* T_STATEID_VECTOR
+
+gfsmStateIdMap*    T_STATEID_MAP
+
+gboolean         T_INT
+gint             T_INT
+gchar            T_CHAR
+
+guint            T_UINT
+gfsmLabelId      T_UINT
+gfsmLabelVal     T_UINT
+gfsmStateId      T_UINT
+
+gfsmSRType       T_UINT
+
+#gfsmWeight       T_FLOAT
+gfsmWeightVal    T_FLOAT
+gfsmWeight       T_GFSM_WEIGHT
+
+gfsmArcSortMode  T_UINT
+gfsmLabelSide    T_UINT
+gfsmArcComp      T_UINT
+gfsmArcCompMask  T_UINT
+
+######################################################################
+# perl->C
+INPUT
+
+#T_std_string
+#  {
+#    char *cstr = SvPV_nolen($arg);
+#    $var.assign(cstr, SvCUR($arg));
+#  }
+
+T_CHAR
+  {
+      $var = *( SvPV($arg,1) );
+  }
+
+T_INT
+  {
+      $var = SvIV($arg);
+  }
+
+T_UINT
+  {
+      $var = SvUV($arg);
+  }
+
+T_FLOAT
+  {
+      $var = SvNV($arg);
+  }
+
+T_GFSM_WEIGHT
+  {
+      gfsm_perl_weight_setfloat($var,SvNV($arg));
+  }
+
+T_LABELID_VECTOR
+  {
+      //-------------------------- BEGIN T_LABELID_VECTOR perl->C
+
+      if (SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) ) {
+	//-- AV
+	AV *av = (AV*)SvRV( $arg );
+	int _i, _avlen=av_len(av);
+	$var = g_ptr_array_sized_new(_avlen > 0 ? _avlen : 1);
+	for (_i=0; _i <= _avlen; _i++) {
+	  SV **sv = av_fetch(av,_i,0);
+	  if (sv && *sv) {
+	    g_ptr_array_add($var, GUINT_TO_POINTER(SvUV(*sv)));
+	  } else {
+	    g_ptr_array_add($var, GUINT_TO_POINTER((guint)gfsmNoLabel));
+	  }
+	}
+      }
+      else if (!SvROK($arg)) {
+	//-- string: treat as pack('I*',...)
+	STRLEN plen;
+	char *p = SvPV((SV*)$arg, plen);
+	guint alen = plen/sizeof(gpointer);
+	$var = g_ptr_array_sized_new(alen > 0 ? alen : 1);
+	$var->len = alen;
+	memcpy($var->pdata, p, plen);
+      }
+      else {
+	//-- non-AV
+	warn( \"${Package}::$func_name() -- $var is not an AV reference or a packed string\" );
+	XSRETURN_UNDEF;
+      }
+      //-------------------------- END T_LABELID_VECTOR perl->C
+  }
+
+T_STATEID_VECTOR
+  {
+      //-------------------------- BEGIN T_STATEID_VECTOR perl->C
+      if (SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) ) {
+	//-- AV
+	AV *av = (AV*)SvRV( $arg );
+	int _i, _avlen=av_len(av);
+
+	$var = g_ptr_array_sized_new(_avlen > 0 ? _avlen : 1);
+	for (_i=0; _i <= _avlen; _i++) {
+	  SV **sv = av_fetch(av,_i,0);
+	  if (sv && *sv) {
+	    g_ptr_array_add($var, GUINT_TO_POINTER(SvUV(*sv)));
+	  } else {
+	    g_ptr_array_add($var, GUINT_TO_POINTER(gfsmNoState));
+	  }
+	}
+      }
+      else if (!SvROK($arg)) {
+	//-- string: treat as pack('I*',...)
+	STRLEN plen;
+	char *p = SvPV((SV*)$arg, plen);
+	guint alen = plen/sizeof(gpointer);
+	$var = g_ptr_array_sized_new(alen > 0 ? alen : 1);
+	$var->len = alen;
+	memcpy($var->pdata, p, plen);
+      }
+      else {
+	//-- non-AV
+	warn( \"${Package}::$func_name() -- $var is not an AV reference or a packed string\" );
+	XSRETURN_UNDEF;
+      }
+      //-------------------------- END T_STATEID_VECTOR perl->C
+  }
+
+T_STATEID_MAP
+  {
+    //-------------------------- BEGIN T_STATEID_MAP perl->C
+    if (SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) ) {
+      //-- AV
+      AV *av = (AV*)SvRV( $arg );
+      int _i, _avlen=av_len(av);
+
+      $var = g_array_sized_new(FALSE,FALSE,sizeof(gfsmStateId),(_avlen > 0 ? _avlen : 1));
+      $var->len = _avlen;
+      for (_i=0; _i <= _avlen; _i++) {
+	SV **sv = av_fetch(av,_i,0);
+	if (sv && *sv) {
+	  g_array_index($var, gfsmStateId, _i) = (gfsmStateId)SvUV(*sv);
+	} else {
+	  g_array_index($var, gfsmStateId, _i) = gfsmNoState;
+	}
+      }
+    }
+    else if (!SvROK($arg)) {
+      //-- string: treat as pack('L*',...)
+      STRLEN plen;
+      char *p = SvPV((SV*)$arg, plen);
+      guint alen = plen/sizeof(gfsmStateId);
+      $var = g_array_sized_new(FALSE,FALSE,sizeof(gfsmStateId),(alen > 0 ? alen : 1));
+      $var->len = alen;
+      memcpy($var->data, p, plen);
+    }
+    else {
+      //-- non-AV
+      warn( \"${Package}::$func_name() -- $var is not an AV reference or a packed string\" );
+      XSRETURN_UNDEF;
+    }
+    //-------------------------- END T_STATEID_MAP perl->C
+  }
+
+
+######################################################################
+# C->perl
+OUTPUT
+
+#T_std_string
+#  $arg = newSVpvn($var.data(), $var.length());
+
+T_CHAR
+  {
+      sv_setpvn($arg,&$var,1);
+  }
+
+T_INT
+  {
+      sv_setiv($arg,$var);
+  }
+
+T_UINT
+  {
+      sv_setuv($arg,$var);
+  }
+
+T_FLOAT
+  {
+      sv_setnv($arg,$var);
+  }
+
+T_GFSM_WEIGHT
+  {
+      sv_setnv($arg, gfsm_perl_weight_getfloat($var));
+  }
+
+T_LABELID_VECTOR
+  {
+      //-------------------------- BEGIN T_LABELID_VECTOR C->perl
+      int _i;
+      AV *av = newAV();
+      if ($var) {
+	  for (_i=0; _i < $var->len; _i++) {
+	      av_push(av, newSVuv((UV)GPOINTER_TO_UINT(g_ptr_array_index($var,_i))));
+	  }
+      }
+      sv_2mortal((SV*)av);
+      $arg = newRV((SV*)av);
+      sv_2mortal($arg);
+      //-------------------------- END T_LABELID_VECTOR C->perl
+  }
+
+T_STATEID_VECTOR
+  {
+      //-------------------------- BEGIN T_STATEID_VECTOR C->perl
+      int _i;
+      AV *av = newAV();
+      if ($var) {
+	  for (_i=0; _i < $var->len; _i++) {
+	      av_push(av, newSVuv((UV)GPOINTER_TO_UINT(g_ptr_array_index($var,_i))));
+	  }
+      }
+      sv_2mortal((SV*)av);
+      $arg = newRV((SV*)av);
+      sv_2mortal($arg);
+      //-------------------------- END T_STATEID_VECTOR C->perl
+  }
+
+T_STATEID_MAP
+  {
+    /*-- string version
+    //-------------------------- BEGIN T_STATEID_MAP C->perl
+    if ($var) {
+      $arg = newSVpvn($var->data, $var->len*sizeof(gfsmStateId));
+    } else {
+      $arg = newSVpvn("",0);
+    }
+    sv_2mortal($arg);
+    */
+    /*-- array version */
+    int _i;
+    AV *av = newAV();
+    if ($var) {
+      for (_i=0; _i < $var->len; _i++) {
+	av_push(av, newSVuv((UV)g_array_index($var,gfsmStateId,_i)));
+      }
+    }
+    sv_2mortal((SV*)av);
+    $arg = newRV((SV*)av);
+    sv_2mortal($arg);
+    //-------------------------- END T_STATEID_MAP C->perl
+  }

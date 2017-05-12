@@ -1,0 +1,11 @@
+Changes
+lib/Geo/PostalCode/NoDB.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00_compile.t
+t/01_obtain_data.t
+t/02_basic.t
+t/03_km.t

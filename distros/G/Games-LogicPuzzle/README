@@ -1,0 +1,35 @@
+LogicPuzzle version 0.10
+========================
+
+LogicPuzzle - Perl extension for helping to solve brain teaser puzzles
+
+    use LogicPuzzle;
+    my $p= new LogicPuzzle (
+        num_things => 5
+    );
+    $p->assign( { ... } );
+    $p->possesions( { ... } );
+    $p->verify_proc( \&my_verify );
+
+    $solution = $p->solve();
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+NONE
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Andy Adler <andy at analyti dot ca>
+
+All Rights Reserved. This module is free software. It may be used,
+redistributed and/or modified under the same terms as Perl itself.

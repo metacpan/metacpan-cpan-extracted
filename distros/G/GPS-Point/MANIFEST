@@ -1,0 +1,16 @@
+Changes
+lib/GPS/Point.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_newcopy.t
+t/003_newGPSD.t
+t/004_newMulti.t
+t/005_value.t
+t/007_buffer.t
+scripts/GPS-Point-Example.pl
+Todo
+perl-GPS-Point.spec
+META.yml                                 Module meta-data (added by MakeMaker)

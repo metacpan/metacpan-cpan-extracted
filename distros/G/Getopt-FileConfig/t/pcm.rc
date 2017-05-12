@@ -1,0 +1,9 @@
+# option	option	name-	var		default
+# name		type	space	name		value
+############################################################
+simple		=s	.	SIMPLE		"blak"
+aref		=s	.	AREF		[]
+href		=s	Kazaan	HREF		{}
+dumper		=s	.	DUMPER		sub { print "jebo $_[0]:$_[1]!!\n"; }
+############################################################
+# comments allowed (obviously)

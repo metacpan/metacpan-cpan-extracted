@@ -1,0 +1,68 @@
+Copyright 2008, 2009, 2010, 2011, 2012, 2014 Kevin Ryde
+
+This file is part of Glib-Ex-ObjectBits.
+
+Glib-Ex-ObjectBits is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Glib-Ex-ObjectBits is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Glib-Ex-ObjectBits.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 16, June 2014
+	- SignalIds, FreezeNotify do nothing during global destruction
+	- EnumBits to_display() allow for all dashes like "--"
+
+Version 15, February 2012
+	- oops, correction to test skip
+
+Version 14, February 2012
+	- tests skip scalar() on tied hash before 5.8.3
+
+Version 13, December 2011
+	- EnumBits to_display() tinker with letter/number splitting
+
+Version 12, September 2010
+	- new Glib::Ex::ObjectBits set_property_maybe()
+
+Version 11, September 2010
+	- new EnumBits to_display(), to_description()
+
+Version 10, September 2010
+	- TieProperties scalar() return bucket count style
+
+Version 9, July 2010
+	- new Glib::Ex::Signalbits
+
+Version 8, January 2010
+	- test script fix, SignalIds doesn't have anything against
+	  id==0 and attempting that provokes a g_assert() in glib 2.4
+
+Version 7, January 2010
+	- test script fix, explain() only in new enough Test::More
+
+Version 6, December 2009
+	- SourceIds new add() method
+
+Version 5, December 2009
+	- SignalIds document add() method
+
+Version 4, July 2009
+	- SignalIds new ids() accessor
+	- fix tests to work without Gtk2
+
+Version 3, April 2009
+	- new TieProperties
+
+Version 2, August 2008
+	- new SourceIds helper
+
+Version 1, May 2008
+	- the first version, FreezeNotify and SignalIds

@@ -1,0 +1,21 @@
+Revision history for Perl extension GD::Chart.
+
+0.05  Thu Feb 19 12:40:46 2004
+
+	- Fixed typemap error, handles doubles passed as ints by checkin
+	  both.
+
+0.04  Thu Feb 19 11:48:57 2004
+
+	- Fixed Truetype support, cannot set through globals as
+	  SWIG needs to know at code wrapping time whether to include
+	  them or not. 
+
+0.02  inbetween
+
+	- Updated old swig file to support new gdchart
+
+0.01  Tue Feb 17 12:33:03 2004
+	- original version; created by h2xs 1.22 with options
+		-cn GD::Chart
+

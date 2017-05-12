@@ -1,0 +1,124 @@
+# 修正語法錯誤. if (COND) { EXPR; } 不能打成 if (COND) EXPR; 。
+
+$name   = 'fred';
+$author = 'wct';
+$team   = 'Free fred';
+
+scan front;
+
+if (&found('enemy')){
+    fire bazooka;
+}
+
+sub main {
+    enable shield;
+
+    if (&found('fence')) {
+        disable shield;
+        fire laser;
+        enable shield;
+        redo;
+    }
+    elsif (&found('wall|mine|friend')) {
+        if (int(rand(2))) {
+            turn left;
+        }
+        else {
+            turn right;
+        }
+        redo;
+    }
+    elsif (&found('vault')) {
+        call move;
+        turn left;
+        call move;
+        turn left;
+        call move;
+        call move;
+        turn left;
+        call move;
+        call move;
+        turn left;
+        call move;
+        call move;
+        turn left;
+        call move;
+        turn right;
+        move backward;
+    }
+
+    $a = int(rand(5));
+    if ($a == 0) {
+        move forward;
+        turn right;
+        move forward;
+    }
+    elsif ($a == 1) {
+        move forward;
+        turn left;
+        move forward;
+    }
+    elsif ($a == 2) {
+        move forward * 3;
+        turn left;
+    }
+    elsif ($a == 3){
+        move forward * 2;
+        turn right;
+        move forward;
+    }
+    elsif ($a == 4) {
+        move forward*2;
+    }
+    else {
+        scan front*2;
+        if (&found('enemy')){
+            disable shield;
+            fire bazooka;
+            enable shield;
+        }
+    }
+
+    $b = int(rand(4));
+
+    if ($b==0) {
+        scan front;
+    }
+        
+    if ($b==1) {
+        scan perimeter;
+    }
+
+    if ($b==2) {
+        scan perimeter;
+    }
+    
+    if ($b==3) {
+       scan front;
+    }
+
+    if ((&found('enemy')) and ($b==1 or $b==2)) {
+        disable shield;
+        fire laser;
+        enable shield;
+    }
+
+    if (&found('enemy') and ($b==0 or $b==3)) {
+        disable shield;
+        fire grenade 4;
+        enable shield;
+        redo;
+    }
+    elsif (&found('flag')) {
+        if ($life == $max_life) {
+            move backward;
+            fire energy;
+        }
+    }
+
+    $ff = int(rand(4))+1;
+    move forward * $ff;
+
+    redo;
+}
+

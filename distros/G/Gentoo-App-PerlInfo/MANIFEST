@@ -1,0 +1,9 @@
+Build.PL
+Changes
+Changes.orig
+MANIFEST
+META.json
+META.yml
+lib/Gentoo/App/PerlInfo.pm
+script/perl-info
+t/00-compile.t

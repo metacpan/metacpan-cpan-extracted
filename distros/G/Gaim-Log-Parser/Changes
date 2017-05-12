@@ -1,0 +1,55 @@
+######################################################################
+Revision history for Perl extension Gaim::Log::Parser
+
+0.14 2008/08/12
+    (ms) Applied patch by Thorsten Klein to skip .system directories.
+
+0.13 2008/03/15
+    (ms) Applied patch by Thorsten Klein for parsing EU dates.
+
+0.12 2008/03/08
+    (ms) Added html/txt converter 'gaimlog-html2text', and documentation 
+         note on html vs. txt logs.
+    (ms) fixed 'You tried to run a test without a plan' problem
+
+0.11 2008/03/03
+    (ms) Parse new pidgin date format with am/pm (patch by by
+         Thorsten Klein).
+
+0.10 2008/02/10
+    (ms) Added text formatter as_string()
+
+0.09 2007/06/04
+    (ms) Added .purple directory to find logs in for gaim/pidgin 2.0
+
+0.08  2007/05/13
+    (ms) Patch by Joachim Breitner to add european date format.
+         Added with modifications, plus test cases. 
+    (ms) On a log entry with a specific date, the parser will now
+         assume that to be the default date going forward in the
+         log file.
+
+0.07  2007/04/19
+    (ms) Added support for offline messages with explicit dates,
+         fixing a bug reported by Andrea Carpani.
+
+0.06  2007/04/13
+    (ms) Fixed bug that cut messages containing a ":"
+
+0.05  2007/04/02
+    (ms) Fixed dependency on Strptime
+
+0.04  2007/04/01
+    (ms) Added VERSION back to Gaim::Log::Message
+         since PAUSE indexer complained.
+
+0.03  2007/03/31
+    (ms) Added Gaim::Log::Finder
+    (ms) Added datetime() accessor
+
+0.02  2006/10/17
+    (ms) Improved documentation
+    (ms) Added time zones
+
+0.01  2005/10/30
+    (ms) Where it all began.

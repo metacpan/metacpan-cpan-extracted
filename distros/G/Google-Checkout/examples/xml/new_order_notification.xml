@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<new-order-notification xmlns="http://checkout.google.com/schema/2-beta1" 
+  serial-number="85f54628-538a-44fc-8605-ae62364f6c71">
+  <google-order-number>841171949013218</google-order-number>
+  <buyer-shipping-address>
+    <contact-name>Knikki Beckwell</contact-name>
+    <email>knbw@gmail.com</email>
+    <address1>1250 Shoreline Blvd</address1>
+    <city>Mountain View</city>
+    <region>CA</region>
+    <postal-code>94043</postal-code>
+    <country-code>US</country-code>
+  </buyer-shipping-address>
+  <buyer-billing-address>
+    <contact-name>Knikki Beckwell</contact-name>
+    <email>knikki@gmail.com</email>
+    <address1>1250 Shoreline Blvd</address1>
+    <city>Mountain View</city>
+    <region>CA</region>
+    <postal-code>94043</postal-code>
+    <country-code>US</country-code>
+  </buyer-billing-address>
+  <fulfillment-order-state>NEW</fulfillment-order-state>
+  <financial-order-state>REVIEWING</financial-order-state>
+  <buyer-id>736589010936543</buyer-id>
+  <shopping-cart>
+    <cart-expiration>
+      <good-until-date>2006-12-31T23:59:59</good-until-date>
+    </cart-expiration>
+    <items>
+      <item>
+        <merchant-item-id>GGLAA1453</merchant-item-id>
+        <item-name>Dry Food Pack AA1453</item-name>
+        <item-description>A pack of highly nutritious dried food for emergency</item-description>
+        <quantity>1</quantity>
+        <tax-table-selector>food</tax-table-selector>
+        <unit-price currency="USD">35.00</unit-price>
+      </item>
+      <item>
+        <merchant-item-id>MGS2GBMP3</merchant-item-id>
+        <item-name>MegaSound 2GB MP3 Player</item-name>
+        <item-description>Portable MP3 player - stores 500 songs</item-description>
+        <quantity>1</quantity>
+        <unit-price currency="USD">178.00</unit-price>
+        <merchant-private-item-data>
+          <item-data>Popular item: Check inventory and order more if needed</item-data>
+        </merchant-private-item-data>
+      </item>
+    </items>
+  </shopping-cart>
+  <order-adjustment>
+    <merchant-calculation-successful>true</merchant-calculation-successful>
+    <merchant-codes>
+      <coupon-adjustment>
+        <applied-amount currency="USD">5.00</applied-amount>
+        <code>FirstVisitCoupon</code>
+        <calculated-amount currency="USD">6.00</calculated-amount>
+        <message>Congratulations! You saved $5.00 on your first visit!</message>
+      </coupon-adjustment>
+      <gift-certificate-adjustment>
+        <applied-amount currency="USD">90.00</applied-amount>
+        <code>GiftCert012345</code>
+        <pin>123456</pin>
+        <calculated-amount currency="USD">10.00</calculated-amount>
+        <message>You used your Gift Certificate!</message>
+      </gift-certificate-adjustment>
+    </merchant-codes>
+    <total-tax currency="USD">15.06</total-tax>
+    <shipping>
+      <merchant-calculated-shipping-adjustment>
+        <shipping-name>SuperShip</shipping-name>
+        <shipping-cost currency="USD">13.00</shipping-cost>
+      </merchant-calculated-shipping-adjustment>
+    </shipping>
+  </order-adjustment>
+  <order-total currency="USD">226.06</order-total>
+  <buyer-marketing-preferences>
+    <email-allowed>false</email-allowed>
+  </buyer-marketing-preferences>
+  <timestamp>2006-03-17T12:20:46</timestamp>
+</new-order-notification>

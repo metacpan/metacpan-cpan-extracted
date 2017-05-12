@@ -1,0 +1,15 @@
+Revision history for Perl module Generator-Object
+
+0.04 2016-07-15
+  - Fix bug when next was called in list context without ever calling yield (GH#1)
+
+0.03 2016-07-03
+  - Fix some confusion in the documentation
+
+0.02 2016-07-03
+  - Removed autorestart of the generator
+  - retval returns an empty list in list context before exhaustion
+  - Move to Module::Build::Tiny
+
+0.01 2013-07-10
+  - Initial release

@@ -1,0 +1,147 @@
+NAME
+    Getopt::Fancy - Object approach to handling command line options,
+    focusing on end user happiness
+
+SYNOPSIS
+        use Getopt::Fancy;
+
+        my $opts = Getopt::Fancy->new();
+        $opts->add("db", GT   => "=s",
+                         EX   => "<db_name>",
+                         DESC => "The database to dump. Leave unset for all databases.",
+                         DEF  => "teen_titans",
+                         ALLOWED => ["--all-databases", "mydb", "teen_titans"],
+                         REGEX => '^[a-zA-Z0-9\_]+$',
+                         REQ  => 0,
+                         SECTION => "Required DB Params");
+
+        # Allow just printing out of set options
+        $opts->add("check_args", DESC => "Just print all the options", SECTION => "Misc Params");
+
+        # Allow user to specify list of options s/he needs help with
+        $opts->add("help", GT => ":s@", EX => "[option1,option2..]", 
+                   DESC => "Give option names and it'll print the help for just those options, otherwise all.", 
+                   SECTION=>"Misc Params", COMMAS=>1);
+
+        # Get the command line options
+        my $error_msg = $opts->get_options();
+        print_usage($error_msg) if $error_msg;
+
+        print "Will dump this database: $opts->{db} \n";
+        print "User wants help information on these: " . join(", ", @{$opts->{help}}) . "\n" if ($opts->{help});
+
+        print_usage() if $opts->{help};
+        print_args() if $opts->{check_args};
+
+        sub print_args
+        {
+          print $opts->get_values();
+          exit(0);
+        }
+ 
+        sub print_usage
+        {
+           my $hopts;
+           my $msg = shift;
+
+           $hopts = $opts->{help} unless (scalar @{$opts->{help}} == 0);
+           print "usage: $0 <REQUIRED_ARGS> <OPTIONAL_ARGS>\n";
+           print $opts->get_usage($hopts);
+
+           print "ERROR: $msg\n" if $msg;
+
+           exit(0);
+        }
+
+DESCRIPTION
+    "Getopt::Fancy" Allows command line options to be all in one place in
+    your script including default values, allowed values, user-friendly
+    descriptions, required flags and pattern matching requirements. Ofttimes
+    script writers skimp on the usage information or have out-dated help
+    information. This modules helps script writers to be better citizens.
+
+    This module uses Getopt::Long, so the same rules apply.
+
+METHODS
+    "my $opts = GetOpt::Fancy->new()"
+        Construct a new object.
+
+    "$opts->add($opt_name, %config)"
+        "add()" is where you specify the command line options you want to
+        accept and the configuration for each.
+
+            $opts->add("hostname", GT   => "=s",
+                                   EX   => "<my_hostname>",
+                                   DESC => "The hostname to connect to to do whatever.",
+                                   DEF  => "batcomputer",
+                                   REGEX => '^[a-zA-Z0-9\_\-\.]+$',
+                                   SECTION => "Connection Params");
+
+        The possible config values are ...
+
+        *   GT - The Getopts type specification (=i, :s, =s@, etc)
+
+        *   DEF - The default value for this option if the user running your
+            script doesn't give one. If the option is multivalued, pass in a
+            reference to an array of values.
+
+        *   REQ - A flag (1 or 0) denoting if this option is required. (You
+            can just leave this out if it's 0)
+
+        *   REGEX - A regular expression the value must match.
+
+        *   ALLOWED - A reference to an array of allowed values. This allows
+            you to restrict the set.
+
+        *   COMMAS - A flag (1 or 0) denoting if this multivalued option
+            should allow comma separated values. This only applies to
+            options that have a "@" in their GT (=s@, etc). If this is set,
+            the user of your script can specify multiple values by just
+            doing something like: -colors red,green,blue
+
+        *   EX - A human readable example value for the user of your script
+            that is printed during -help
+
+        *   DESC - A human readable description of the option for the user
+            of your script that is printed during -help
+
+        *   SECTION - A human readable section header for the user of your
+            script that is printed during -help. This allows you to group
+            similar options together
+
+    "$opts->get_options()"
+        Call this when it's time to read and parse the command line options.
+        It will return a human readable string describing to the end user
+        what they did wrong. If all is well, returns undef.
+
+        After you call this, you can then treat $opts as a hash ref:
+        $opts->{my_option}
+
+    "$opts->get_usage([optional,list,of,options])"
+        Returns a pretty, printable string of all the possible options,
+        example values, descriptions, allowed values and default values,
+        grouped by SECTION. If a reference to an array of option names is
+        passed in, only usage information for those options is included.
+
+    "$opts->get_values()"
+        Returns a pretty, printable string of all the options and currently
+        set values.
+
+        The object pretends to be a hash ref, so if you want values
+        themselves, just do:
+
+            $opts->{my_option}
+
+    "$opts->get_error()"
+        Returns the human readable error string describing the error during
+        the options handling. This string is also returned after
+        "get_options"
+
+LEGALESE
+    Copyright 2006 by Robert Powers, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2006, Robert Powers <batman@cpan.org>
+

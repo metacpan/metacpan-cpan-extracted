@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+# psh
+# Scott Bronson
+# 23 Dec 2004
+
+# NOTE: this is extremely unfinished.  It is intended to demonstrate
+# how to handle a fully dynamic command set in GDBUI.
+
+
+# psh is intended to be a fully interactive Perl shell (not in the
+# sense of Bash, but in the sense of running Python with no args).
+#
+# Supply a Perl expression on the command line and Perl will evaluate
+# it and exit.  Otherwise, it will drop you into the interactive shell.
+
+
+if(@ARGV) {
+	print eval join(' ', @ARGV), "\n";
+    exit(0);
+}
+
+# if no arguments then enter interactive shell.
+
+use lib "../lib";
+use Term::GDBUI;
+
+# Our term only has one command: the default command.
+my $term = new Term::GDBUI(prompt => "Perl> ",
+    # todo: add command completion
+    commands => { "" => {
+        meth => sub {
+            my ($self, $parms) = @_;
+            print eval($parms->{rawline}) . "\n";
+            print $@ if $@;
+        },
+    }},
+    debug_complete => 0,
+    );
+$term->run();
+

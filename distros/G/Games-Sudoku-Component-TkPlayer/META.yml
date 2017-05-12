@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Games-Sudoku-Component-TkPlayer
+version:             0.02
+abstract:            Let's play Sudoku
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Games::Sudoku::Component:      0
+    Test::UseAllModules:           0
+    Tk:                            0
+    Tk::JPEG:                      0
+    Tk::ProgressBar:               0
+    Tk::Splashscreen:              0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Kenichi Ishigaki <ishigaki@cpan.org>

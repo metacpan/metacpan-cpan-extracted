@@ -1,0 +1,21 @@
+[% title = view.title %]
+<form
+  method="[% view.form.method || 'post' %]" 
+  action="[% view.form.action || self.uri %]" 
+  name="[% view.form.name %]"
+>
+  <table border="1" frame="box" align="center">
+    <tr>
+      <td><b>Missing Cookies</b></br></br>
+          This site requires cookies for usage.</br>
+          Please permit this! Thank you</br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <label for="submit"</label>
+      <input type="submit" value="OK">
+      </td>
+    </tr>
+  </table>
+</form>

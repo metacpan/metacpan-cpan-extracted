@@ -1,0 +1,4 @@
+# This tests the load time of IO::Uncompress::Gunzip
+
+use IO::Uncompress::Gunzip;
+

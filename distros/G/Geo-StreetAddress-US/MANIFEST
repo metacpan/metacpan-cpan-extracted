@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_parser.t
+US.pm
+eg/get_state_abbrev.pl
+eg/get_state_fips.pl
+eg/get_street_abbrev.pl
+eg/manual_test.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

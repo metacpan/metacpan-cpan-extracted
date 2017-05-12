@@ -1,0 +1,130 @@
+2012-04-04  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.10:
+	* t/01.gdata.t
+	- remove Test::NoWarnings
+
+2010-05-15  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.9:
+	* t/perlcritic.t
+	- check $ENV{TEST_CRITIC} whether to execute this test
+	- remove t/perlcriticrc
+
+2010-05-09  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.8:
+	* t/perlcritic.t
+	- add t/perlcriticrc to access to private vars in other
+	  packages
+	- use eval to avoid a module locating error	
+
+2010-05-06  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.7:
+	* Google/Data/JSON.pm:
+	- fix a bug on t/pod-coverage.t
+	- add a keyword "file" for the non-DWIM constructor, in order
+	  to read the file explicitly
+	- make the DWIM constructor deprecated
+	- thanks Miyagawa
+
+2010-05-05  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.6:
+	* Google/Data/JSON.pm:
+	- fix a bug on the XML namespace conversion rules;
+	  e.g., 'openSearch:startIndex' to 'openSearch$startIndex'
+	- add a non-DWIM constructor
+	- thanks Miyagawa
+
+2008-02-27  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.5:
+	* Google/Data/JSON.pm:
+	- use JSON::Any instead of JSON::Syck
+
+2007-08-21  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.4:
+	* Google/Data/JSON.pm:
+	- fix SYNOPSIS
+
+2007-07-25  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.3:
+	* Google/Data/JSON.pm:
+	- fix to accept XML document without XML declaration
+
+2007-07-24  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.2:
+	* Google/Data/JSON.pm:
+	- fix a bug of XML::Atom conversion
+
+2007-07-22  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.1:
+	* Google/Data/JSON.pm:
+	- fix a bug to convert a JSON to an Atom object
+
+2007-07-21  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.0:
+	* Google/Data/JSON.pm:
+	- eliminate some sensitive operations, and as a result:
+	  - Text values of tags are NOT converted to $t properties
+	  - ARRAYs that have just one element are NOT converted hash
+	    (left as ARRAYs)
+
+2007-07-04  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.7:
+	* Google/Data/JSON.pm:
+	- add an argument ( KeyAttr => {} ) to XMLin, to avoid that
+	  element <id>'s are understood as identities of thier parent
+	  elements
+
+2007-06-10  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.6:
+	* Google/Data/JSON.pm:
+	- change XML version as string ('1.0')
+
+2007-03-23  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.5:
+	* Google/Data/JSON.pm:
+	- use JSON::Syck (instead of JSON)
+
+2007-03-04  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.4:
+	* Google/Data/JSON.pm:
+	- rename hash to hashref
+
+2007-03-02  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.3:
+	* Google/Data/JSON.pm:
+	- change: internal data is stored as Perl reference
+	- add gdata(), a shortcut for Google::Data::JSON->new()
+	- change "push @Elements to add_elements()" to get_elements()
+	   method
+	- remove set() method
+	- remove Storable::dclone from _fix_keys() _force_array() for
+	   performance reason
+	- re-implement as_xxx() methods without AUTOLOAD
+        - add openSearch elements to @Elements
+
+2007-02-22  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.0.2:
+	* Google/Data/JSON.pm
+	- implement OOP interface
+        - add app/gd elements to @Elements
+
+2007-02-20  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.0.1:
+	- created by module-starter --module=Foo:Bar

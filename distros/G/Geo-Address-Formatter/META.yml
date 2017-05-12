@@ -1,0 +1,41 @@
+---
+abstract: 'take structured address data and format it according to the various global/country rules'
+author:
+  - 'edf <edf@opencagedata.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Address-Formatter
+provides:
+  Geo::Address::Formatter:
+    file: lib/Geo/Address/Formatter.pm
+    version: '1.60'
+requires:
+  Clone: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::LWP::Recorder: '0'
+  Test::More: '0.88'
+  Test::Warn: '0'
+  Text::Hogan: '1.01'
+  Text::Trim: '1.02'
+  Try::Tiny: '0'
+  YAML: '0'
+  perl: '5.012'
+resources:
+  homepage: https://github.com/OpenCageData/perl-Geo-Address-Formatter
+  repository: https://github.com/OpenCageData/perl-Geo-Address-Formatter.git
+version: '1.60'
+x_serialization_backend: 'YAML::Tiny version 1.69'

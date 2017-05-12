@@ -1,0 +1,31 @@
+Graphics-Magick-ColorHistogram version 1.00
+===========================================
+
+This module sends syslog messages over a network socket. It works like
+Sys::Syslog in setlogsock's 'udp', 'tcp', or 'unix' modes, but without
+the significant CPU overhead of that module when used for high-volume
+logging. Use of this specialized module is only recommended if 1) you
+must use network syslog as a messaging transport but 2) need to minimize
+the time spent in the logger.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If GraphicsMagick is installed in a non-standard location, pass
+--with-graphics-magick=/location/bin/GraphicsMagick-config to Makefile.PL.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2011 by Say Media, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

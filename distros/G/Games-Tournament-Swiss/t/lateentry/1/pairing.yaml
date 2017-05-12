@@ -1,0 +1,184 @@
+--- !!perl/hash:Games::Tournament::Swiss::Procedure
+badpair: ~
+brackets:
+  0: !!perl/hash:Games::Tournament::Swiss::Bracket
+    floatCheck: None
+    lastS2ids:
+      - 5
+      - 4
+      - 3
+    members:
+      - &1 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floats: []
+        id: 101
+        name: Al
+        oldId: 101
+        pairingNumber: 1
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          sign: Black
+        rating: 2000
+        scores: ~
+        title: Mr.
+      - &2 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floats: []
+        id: 201
+        name: Ally
+        oldId: 201
+        pairingNumber: 2
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          sign: White
+        rating: 1990
+        scores: ~
+        title: Ms.
+      - &3 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floats: []
+        id: 102
+        name: Bert
+        oldId: 102
+        pairingNumber: 3
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          sign: ''
+        rating: 1980
+        scores: ~
+        title: Mr.
+      - &4 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floats: []
+        id: 103
+        name: Carl
+        oldId: 103
+        pairingNumber: 4
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          sign: ''
+        rating: 1960
+        scores: ~
+        title: Mr.
+      - &5 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floats: []
+        id: 104
+        name: Don
+        oldId: 104
+        pairingNumber: 5
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          sign: ''
+        rating: 1940
+        scores: ~
+        title: Mr.
+    number: 1
+    pprime: 2
+    s1:
+      - *1
+      - *2
+    s2:
+      - *3
+      - *4
+      - *5
+    score: 0
+    x: 0
+    xprime: 0
+byer: *5
+byes:
+  104: 1
+colorClashes: ~
+log:
+  C1:
+    strings:
+      - "\tB1,2 test: OK, no unpairables\n"
+    tailpos: 0
+  C2:
+    strings:
+      - "\tx=0\n"
+    tailpos: 0
+  C3:
+    strings:
+      - "\tp=2. Homogeneous.\n"
+    tailpos: 0
+  C4:
+    strings:
+      - "\tS1: 1 2 & S2: 3 4 5\n"
+    tailpos: 0
+  C5:
+    strings:
+      - "\tordered: 1 2\n\t       & 3 4 5\n"
+    tailpos: 0
+  C6OTHERS:
+    strings:
+      - "\tOne unpaired player, 5 in last bracket 1.\n"
+    tailpos: 0
+  C6PAIRS:
+    strings:
+      - "\tB56: OK.\n"
+      - "\t0-Bracket (1) tables 1 2 paired. OK\n"
+      - "\tE1 1&3 E1 4&2 \n"
+    tailpos: 2
+  NEXT:
+    strings:
+      - "\t0-Bracket [1]: 1 2 3 4 5\n"
+    tailpos: 0
+  START:
+    strings:
+      - "\tRound 1:  1 2 3 4 5 (0), \n"
+    tailpos: 0
+logged:
+  ASSIGNPAIRINGNUMBERS: 1
+  C1: 1
+  C10: 1
+  C11: 1
+  C12: 1
+  C13: 1
+  C14: 1
+  C2: 1
+  C3: 1
+  C4: 1
+  C5: 1
+  C6OTHERS: 1
+  C6PAIRS: 1
+  C7: 1
+  C8: 1
+  C9: 1
+  MATCHPLAYERS: 1
+  NEXT: 1
+  PREV: 1
+  START: 1
+matches:
+  0:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *3
+        White: *1
+      floats:
+        Black: ~
+        White: ~
+      result: ~
+      round: 1
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *2
+        White: *4
+      floats:
+        Black: ~
+        White: ~
+      result: ~
+      round: 1
+  0Bye:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Bye: *5
+      result:
+        Bye: Bye
+      round: 1
+nonpaired:
+  - *5
+previousBracket: []
+round: 1
+thisBracket: 0
+whoPlayedWho: ~

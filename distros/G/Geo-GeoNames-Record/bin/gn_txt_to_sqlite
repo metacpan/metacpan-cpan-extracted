@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+######
+# Convert plain GeoNames data files to a SQLite database.
+# Xiangrui Meng <mengxr@stanford.edu>
+####
+
+use strict;
+use warnings;
+
+use File::Basename;
+
+use Geo::GeoNames::File;
+use Geo::GeoNames::DB::SQLite;
+
+unless( @ARGV >= 2 )
+{
+    print STDERR "usage: " . basename(__FILE__) . " geonames_file_1 geonames_file_2 ... geonames_file_n sqlite_file" . "\n";
+    exit;
+}
+
+my $sqlite_file	   = pop @ARGV;
+my @geonames_files = @ARGV;
+
+my $dbh = Geo::GeoNames::DB::SQLite->connect( $sqlite_file );
+
+my $file = Geo::GeoNames::File->open( @geonames_files );
+
+$dbh->insert( $file );
+
+$file->close();
+
+$dbh->commit();
+
+$dbh->disconnect();

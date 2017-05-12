@@ -1,0 +1,637 @@
+--- !!perl/hash:Games::Tournament::Swiss::Procedure
+badpair: ~
+brackets:
+  0: !!perl/hash:Games::Tournament::Swiss::Bracket
+    floatCheck: None
+    lastS2ids:
+      - 8
+    members:
+      - &1 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 4
+        floater: Up
+        floats: []
+        id: 204
+        name: Donna
+        oldId: 204
+        pairingNumber: 8
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          sign: ''
+        rating: 1930
+        scores: ~
+        title: Ms.
+      - &2 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: Down
+        floats:
+          - ~
+          - Not
+          - Not
+          - Not
+        id: 201
+        name: Ally
+        oldId: 201
+        pairingNumber: 2
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 1
+          lastTwo:
+            - White
+            - Black
+          sign: Black
+        rating: 1990
+        roles:
+          - Black
+          - White
+          - Black
+        score: 1
+        scores:
+          1: ~
+          2: ~
+          3: ~
+        title: Ms.
+    number: 3
+    pprime: 1
+    s1:
+      - *2
+    s2:
+      - *1
+    score: 0
+    x: 0
+    xprime: 0
+  1: &3 !!perl/hash:Games::Tournament::Swiss::Bracket
+    badpair: 0
+    biggroupx: 0
+    c10repaired: 1
+    floatCheck: B5Up
+    lastC10Alternate:
+      - 4
+    lastS2ids:
+      - 2
+      - 4
+      - 3
+      - 6
+    lastheteroshuffle: 1
+    lastshuffle: 1
+    lowfloaterlastshuffle: 1
+    members:
+      - &4 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: Down
+        floats:
+          - ~
+          - Down
+          - Not
+          - Down
+        id: 104
+        name: Don
+        oldId: 104
+        pairingNumber: 7
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          lastTwo:
+            - White
+            - Black
+          sign: Black
+        rating: 1940
+        roles:
+          - Bye
+          - White
+          - Black
+        score: 2
+        scores:
+          1: Bye
+          2: ~
+          3: ~
+        title: Mr.
+      - &5 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 2
+        floater: Up
+        floats:
+          - ~
+          - ~
+          - Not
+          - Up
+        id: 202
+        name: Bertha
+        oldId: 202
+        pairingNumber: 4
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 0
+          lastTwo:
+            - Black
+            - White
+          sign: White
+        rating: 1970
+        roles:
+          - Black
+          - White
+        score: 1
+        scores:
+          2: ~
+          3: ~
+        title: Ms.
+    number: 2
+    pprime: 1
+    remainder: &6 !!perl/hash:Games::Tournament::Swiss::Bracket
+      badpair: 0
+      c10repaired: 1
+      c8swapper: !!perl/code '{ "DUMMY" }'
+      floatCheck: None
+      lastS2ids:
+        - 6
+        - 3
+      lastheteroshuffle: 1
+      lastshuffle: 1
+      lowfloaterlastshuffle: 1
+      members:
+        - &7 !!perl/hash:Games::Tournament::Contestant::Swiss
+          firstround: 1
+          floater: ''
+          floats:
+            - ~
+            - Not
+            - Up
+            - Down
+          id: 102
+          name: Bert
+          oldId: 102
+          pairingNumber: 3
+          preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+            difference: 1
+            lastTwo:
+              - White
+              - Black
+            sign: Black
+          rating: 1980
+          roles:
+            - Black
+            - White
+            - Black
+          score: 1
+          scores:
+            1: ~
+            2: ~
+            3: ~
+          title: Mr.
+        - &8 !!perl/hash:Games::Tournament::Contestant::Swiss
+          firstround: 3
+          floater: Up
+          floats:
+            - ~
+            - ~
+            - ~
+            - Down
+          id: 203
+          name: Carla
+          oldId: 203
+          pairingNumber: 6
+          preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+            difference: 0
+            sign: ''
+          rating: 1950
+          roles:
+            - Bye
+          score: 1
+          scores:
+            3: Bye
+          title: Ms.
+      number: 2's Remainder Group
+      pprime: 1
+      remainderof: *3
+      s1:
+        - *7
+      s2:
+        - *8
+        - *2
+      score: 1
+      x: 0
+      xprime: 0
+    s1:
+      - *4
+    s2:
+      - *5
+      - *2
+      - *7
+      - *8
+    score: 1
+    x: 0
+    xdeduction: 0
+    xprime: 0
+  1Remainder: *6
+  2: !!perl/hash:Games::Tournament::Swiss::Bracket
+    floatCheck: None
+    lastS2ids:
+      - 5
+    members:
+      - &9 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: ''
+        floats:
+          - ~
+          - Not
+          - Not
+          - Not
+        id: 101
+        name: Al
+        oldId: 101
+        pairingNumber: 1
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 1
+          lastTwo:
+            - Black
+            - White
+          sign: White
+        rating: 2000
+        roles:
+          - White
+          - Black
+          - White
+        score: 2
+        scores:
+          1: ~
+          2: ~
+          3: ~
+        title: Mr.
+      - &10 !!perl/hash:Games::Tournament::Contestant::Swiss
+        firstround: 1
+        floater: ''
+        floats:
+          - ~
+          - Not
+          - Down
+          - Up
+        id: 103
+        name: Carl
+        oldId: 103
+        pairingNumber: 5
+        preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+          difference: 1
+          lastTwo:
+            - Black
+            - White
+          sign: White
+        rating: 1960
+        roles:
+          - White
+          - Black
+          - White
+        score: 2
+        scores:
+          1: ~
+          2: ~
+          3: ~
+        title: Mr.
+    number: 1
+    pprime: 1
+    s1:
+      - *9
+    s2:
+      - *10
+    score: 2
+    x: 1
+    xprime: 1
+byes:
+  104: 1
+  203: 3
+colorClashes: ~
+log:
+  C1:
+    strings:
+      - "\tNOK. 7 7 B1a/B2a incompatible in 1 (2)\n"
+      - "\tFloating 7 down to 1-Bracket [2]\n"
+      - "\t[1] 1 5 & [2] 2 3 4 6 7\n"
+      - "\tB1,2 test: OK, no unpairables\n"
+      - "\tB1,2 test: OK, no unpairables\n"
+    tailpos: 4
+  C10:
+    strings:
+      - "\tPairing of 7 6 in 1-Bracket [2] failed pairing 3 4 2 in remainder group.\n"
+      - |2
+        	Unpairing lowest downfloater, 104 and 6 in 1-Bracket [2]
+        	Returning 3 4 2 to 1-Bracket [2]
+        	Trying different partner for 104 in 1-Bracket [2]
+      - "\tNo more pairings. Dropping B6 for Upfloats in 1-Bracket [2]\n"
+      - "\tCan't repair lowest downfloater, 7 in 1-Bracket [2]\n"
+      - "\tDropping B5 for Upfloats in 1-Bracket [2]\n"
+      - "\tRepairing whole of 1-Bracket [2]\n"
+    tailpos: 5
+  C2:
+    strings:
+      - "\tx=1\n"
+      - "\tx=0\n"
+      - "\tx=0\n"
+      - "\tx=0\n"
+      - "\tx=0\n"
+      - "\tx=0\n"
+    tailpos: 5
+  C3:
+    strings:
+      - "\tp=1. Homogeneous.\n"
+      - "\tp=1. Heterogeneous.\n"
+      - "\tp=1. Homogeneous.\n"
+      - "\tp=1. Homogeneous.\n"
+      - "\tp=1. Homogeneous.\n"
+      - "\tp=1. Homogeneous.\n"
+    tailpos: 5
+  C4:
+    strings:
+      - "\tS1: 1 & S2: 5\n"
+      - "\tS1: 7 & S2: 2 3 4 6\n"
+      - "\tS1: 7 & S2: 6 2 3 4\n"
+      - "\tS1: 7 & S2: 6 2 3 4\n"
+      - "\tS1: 2 & S2: 3 4\n"
+      - "\tS1: 2 & S2: 3 4\n"
+      - "\tS1: 2 & S2: 3 4\n"
+      - "\tS1: 7 & S2: 6 3 4 2\n"
+      - "\tS1: 2 & S2: 3 4\n"
+      - "\tS1: 2 & S2: 3 4\n"
+      - "\tS1: 2 & S2: 3 4\n"
+      - "\tS1: 7 & S2: 6 3 4 2\n"
+      - "\tS1: 2 & S2: 3 6\n"
+      - "\tS1: 2 & S2: 8\n"
+    tailpos: 13
+  C5:
+    strings:
+      - "\tordered: 1\n\t       & 5\n"
+      - "\tordered: 7\n\t       & 2 3 4 6\n"
+      - "\tordered: 7\n\t       & 2 3 4 6\n"
+      - "\tordered: 7\n\t       & 2 3 4 6\n"
+      - "\tordered: 2\n\t       & 3 4\n"
+      - "\tordered: 3\n\t       & 2 4\n"
+      - "\tordered: 2\n\t       & 3 4\n"
+      - "\tordered: 3\n\t       & 2 4\n"
+      - "\tordered: 2\n\t       & 3 4\n"
+      - "\tordered: 3\n\t       & 2 4\n"
+      - "\tordered: 7\n\t       & 2 3 4 6\n"
+      - "\tordered: 2\n\t       & 3 4\n"
+      - "\tordered: 3\n\t       & 2 4\n"
+      - "\tordered: 2\n\t       & 3 4\n"
+      - "\tordered: 3\n\t       & 2 4\n"
+      - "\tordered: 2\n\t       & 3 4\n"
+      - "\tordered: 3\n\t       & 2 4\n"
+      - "\tordered: 7\n\t       & 2 3 4 6\n"
+      - "\tordered: 2\n\t       & 3 6\n"
+      - "\tordered: 3\n\t       & 2 6\n"
+      - "\tordered: 2\n\t       & 8\n"
+    tailpos: 20
+  C6OTHERS:
+    strings:
+      - |2
+        	Remaindering 2 3 4.
+            [2] 7 6 & [2's Remainder Group] 2 3 4
+      - |2
+        	Remaindering 2 3 4.
+            [2] 7 6 & [2's Remainder Group] 2 3 4
+      - |2
+        	Remaindering 2 3 6.
+            [2] 7 4 & [2's Remainder Group] 2 3 6
+      - "\tFloating remaining 2 Down. [2's Remainder Group] 3 6 & [3] 8 2\n"
+    tailpos: 3
+  C6PAIRS:
+    strings:
+      - "\tB56: OK.\n"
+      - "\t2-Bracket (1) tables 1 paired. OK\n"
+      - "\tE4 5&1 \n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB5Down, table 1: 7 NOK. Floated Down 1 rounds ago\n"
+      - "\tB5Down, table 1: 7 NOK. Floated Down 1 rounds ago\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB5Down, table 1: 7 NOK. Floated Down 1 rounds ago\n"
+      - "\tB5Down, table 1: 7 NOK. Floated Down 1 rounds ago\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB5Up, table 1: 4 NOK. Floated Up 1 rounds ago\n"
+      - "\tB56: OK.\n"
+      - "\t1-Bracket (2) tables 1 paired. OK\n"
+      - "\tE1 7&6 \n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB5Up, table 1: 4 NOK. Floated Up 1 rounds ago\n"
+      - "\tB56: OK.\n"
+      - "\t1-Bracket (2) tables 1 paired. OK\n"
+      - "\tE1 7&6 \n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB1a: table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB56: OK.\n"
+      - "\t1-Bracket (2) tables 1 paired. OK\n"
+      - "\tE1 7&4 \n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB5Down, table 2: 3 NOK. Floated Down 1 rounds ago\n"
+      - "\tB4: x=0, table 1 NOK\n"
+      - "\tB56: OK.\n"
+      - "\t1Remainder-Bracket (2's Remainder Group) tables 1 paired. OK\n"
+      - "\tE1 3&6 \n"
+      - "\tB56: OK.\n"
+      - "\t0-Bracket (3) tables 1 paired. OK\n"
+      - "\tE1 2&8 \n"
+    tailpos: 60
+  C7:
+    strings:
+      - "\t         3 2 4 6\n"
+      - "\t         4 2 3 6\n"
+      - "\t         6 2 3 4\n"
+      - "\tlast transposition in 1-Bracket [2]\n"
+      - "\t         3 2 4 6\n"
+      - "\t         4 2 3 6\n"
+      - "\t         6 2 3 4\n"
+      - "\tlast transposition in 1-Bracket [2]\n"
+      - "\t         3 2 4 6\n"
+      - "\t         4 2 3 6\n"
+      - "\t         6 2 3 4\n"
+      - "\t         4 3\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 2\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 3\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 2\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 3\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 2\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\tlast transposition in 1-Bracket [2]\n"
+      - "\t         3 2 4 6\n"
+      - "\t         4 2 3 6\n"
+      - "\t         6 2 3 4\n"
+      - "\t         4 3\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 2\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 3\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 2\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 3\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         4 2\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         3 2 4 6\n"
+      - "\t         4 2 3 6\n"
+      - "\t         6 3\n"
+      - "\tlast transposition in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t         6 2\n"
+    tailpos: 43
+  C8:
+    strings:
+      - "\texchange a in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t3, 2 4\n"
+      - "\tlast S1,S2 exchange in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\texchange a in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t3, 2 4\n"
+      - "\tlast S1,S2 exchange in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\texchange a in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t3, 2 4\n"
+      - "\tlast S1,S2 exchange in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\texchange a in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t3, 2 4\n"
+      - "\tlast S1,S2 exchange in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\texchange a in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t3, 2 4\n"
+      - "\tlast S1,S2 exchange in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\texchange a in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t3, 2 4\n"
+      - "\tlast S1,S2 exchange in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\texchange a in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\t3, 2 6\n"
+    tailpos: 19
+  C9:
+    strings:
+      - "\tNo pairing with float checks on. Dropping B6 for Downfloats in 1-Bracket [2]\n"
+      - "\tNo pairing with B6 check off. Dropping B5 for Downfloats in 1-Bracket [2]\n"
+      - "\tNo pairing with float checks on. Dropping B6 for Downfloats in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\tNo pairing with B6 check off. Dropping B5 for Downfloats in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\tNo pairing with all Downfloat checks dropped in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\tNo pairing with all Downfloat checks dropped in 1-Bracket [2]\n"
+      - "\tNo pairing with float checks on. Dropping B6 for Downfloats in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\tNo pairing with B6 check off. Dropping B5 for Downfloats in 1Remainder-Bracket [2's Remainder Group]\n"
+      - "\tNo pairing with all Downfloat checks dropped in 1Remainder-Bracket [2's Remainder Group]\n"
+    tailpos: 8
+  NEXT:
+    strings:
+      - "\t2-Bracket [1]: 1 5 7\n"
+      - "\t1-Bracket [2]: 2 3 4 6 7\n"
+      - "\t0-Bracket [3]: 8 2\n"
+    tailpos: 2
+  START:
+    strings:
+      - "\tRound 4:  1 5 7 (2), 2 3 4 6 (1), 8 (0), \n"
+    tailpos: 0
+logged:
+  ASSIGNPAIRINGNUMBERS: 1
+  C1: 1
+  C10: 1
+  C11: 1
+  C12: 1
+  C13: 1
+  C14: 1
+  C2: 1
+  C3: 1
+  C4: 1
+  C5: 1
+  C6OTHERS: 1
+  C6PAIRS: 1
+  C7: 1
+  C8: 1
+  C9: 1
+  MATCHPLAYERS: 1
+  NEXT: 1
+  PREV: 1
+  START: 1
+matches:
+  0:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *1
+        White: *2
+      floats:
+        Black: Up
+        White: Down
+      result: ~
+      round: 4
+  1:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *5
+        White: *4
+      floats:
+        Black: Up
+        White: Down
+      result: ~
+      round: 4
+  1Remainder:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *8
+        White: *7
+      floats:
+        Black: Up
+        White: ''
+      result: ~
+      round: 4
+  2:
+    - !!perl/hash:Games::Tournament::Card
+      contestants:
+        Black: *9
+        White: *10
+      floats:
+        Black: ''
+        White: ''
+      result: ~
+      round: 4
+nonpaired:
+  - *2
+previousBracket: []
+round: 4
+thisBracket: 0
+whoPlayedWho:
+  101:
+    102: 1
+    104: 2
+    201: 3
+  102:
+    101: 1
+    103: 2
+    202: 3
+  103:
+    102: 2
+    104: 3
+    201: 1
+  104:
+    101: 2
+    103: 3
+  201:
+    101: 3
+    103: 1
+    202: 2
+  202:
+    102: 3
+    201: 2
+  203: {}
+  204: {}

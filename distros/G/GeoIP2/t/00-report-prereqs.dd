@@ -1,0 +1,93 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                    'requires' => {
+                                  'Code::TidyAll::Plugin::SortLines::Naturally' => '0',
+                                  'Code::TidyAll::Plugin::Test::Vars' => '0.02',
+                                  'Code::TidyAll::Plugin::UniqueLines' => '0',
+                                  'File::Spec' => '0',
+                                  'IO::Handle' => '0',
+                                  'IPC::Open3' => '0',
+                                  'Parallel::ForkManager' => '1.19',
+                                  'Perl::Critic' => '1.126',
+                                  'Perl::Tidy' => '20160302',
+                                  'Pod::Coverage::Moose' => '0',
+                                  'Pod::Coverage::TrustPod' => '0',
+                                  'Pod::Wordlist' => '0',
+                                  'Test::CPAN::Changes' => '0.19',
+                                  'Test::CPAN::Meta::JSON' => '0.16',
+                                  'Test::CleanNamespaces' => '0.15',
+                                  'Test::Code::TidyAll' => '0.50',
+                                  'Test::EOL' => '0',
+                                  'Test::Mojibake' => '0',
+                                  'Test::More' => '0.96',
+                                  'Test::NoTabs' => '0',
+                                  'Test::Pod' => '1.41',
+                                  'Test::Pod::Coverage' => '1.08',
+                                  'Test::Portability::Files' => '0',
+                                  'Test::Spelling' => '0.12',
+                                  'Test::Synopsis' => '0',
+                                  'Test::Vars' => '0.009',
+                                  'Test::Version' => '2.05',
+                                  'blib' => '1.01',
+                                  'parent' => '0'
+                                }
+                  },
+       'runtime' => {
+                      'requires' => {
+                                      'B' => '0',
+                                      'Data::Dumper' => '0',
+                                      'Data::Validate::IP' => '0.24',
+                                      'Exporter' => '0',
+                                      'Getopt::Long' => '0',
+                                      'HTTP::Headers' => '0',
+                                      'HTTP::Request' => '0',
+                                      'JSON::MaybeXS' => '0',
+                                      'LWP::Protocol::https' => '0',
+                                      'LWP::UserAgent' => '0',
+                                      'List::MoreUtils' => '0',
+                                      'List::Util' => '0',
+                                      'MIME::Base64' => '0',
+                                      'MaxMind::DB::Reader' => '1.000000',
+                                      'Moo' => '0',
+                                      'Moo::Role' => '0',
+                                      'Params::Validate' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Sub::Quote' => '0',
+                                      'Throwable::Error' => '0',
+                                      'Try::Tiny' => '0',
+                                      'URI' => '0',
+                                      'lib' => '0',
+                                      'namespace::clean' => '0',
+                                      'perl' => '5.008',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'HTTP::Response' => '0',
+                                   'HTTP::Status' => '0',
+                                   'IO::Compress::Gzip' => '0',
+                                   'MaxMind::DB::Metadata' => '0',
+                                   'Path::Class' => '0',
+                                   'Test::Builder' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0.96',
+                                   'Test::Number::Delta' => '0',
+                                   'base' => '0',
+                                   'utf8' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

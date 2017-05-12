@@ -1,0 +1,75 @@
+<html>
+<!-- version 1.03 8-17-02 -->
+<head>
+<title>Color Picker</title>
+<script language=javascript1.2>
+var colorhex = 'none';
+function pop() {
+  var w;
+  if (document.forms.color.what.checked){w=180;}else{w=630;}
+  var colorwin = open("","colorpicker",
+  "width=" + w + ",height=440,status=no,directories=no," +
+  "location=no,menubar=no,scrollbars=no,toolbar=no");
+  if (colorwin.opener == null) newin.opener = self;
+  colorwin.document.close();
+  colorwin.focus();
+  return true;
+}
+
+function show() { 
+  document.forms.color.hex.value = colorhex;
+  alert(colorhex);
+  return false;
+}
+</script>
+<style type="text/css">
+  pre {
+    color: black;
+    font-family: VERDANA,ARIAL,HELVETICA,SAN-SERIF;
+    font-size: 12px !important;
+  }
+</style>
+</head>
+<body bgcolor="#ffffff">
+<center>
+<form name="color" onSubmit="return(pop());"
+ action="p_gen.cgi" target="colorpicker">
+<font size=2>
+Enter initial color<br>
+i.e. FA23DB<br></font>
+<input type=text name=hex size=10>
+<br>
+<input type=checkbox name=what value=wo> web safe colors only
+<br>
+<input type=submit value="Pop Picker Window">
+</form>
+<a href="#top" onClick="return(show());">Show Returned VALUE</a>
+<p>
+<font size=+1><b>Sample Code</b></font>
+</center>
+<blockquote><pre>
+&lt;script language=javascript1.2&gt;
+// return value will be here
+var colorhex = '';
+var w;
+function pop() {
+  if (document.forms.color.what.checked){w=180;}else{w=630;}       
+  var colorwin = open("","colorpicker",
+  "width=" + w + ",height=440,status=no,directories=no," +
+  "location=no,menubar=no,scrollbars=no,toolbar=no");
+  if (colorwin.opener == null) newin.opener = self;  
+  colorwin.document.close();
+  colorwin.focus();
+  return true;
+}
+&lt;/script&gt;
+&lt;body&gt;
+&lt;form name="color" onSubmit="return(pop());"
+ action="p_gen.cgi" target="colorpicker"&gt;
+&lt;input type=text name=hex size=10&gt;&lt;br&gt;
+&lt;input type=checkbox name=what value=wo&gt; web safe colors only&lt;br&gt;
+&lt;input type=submit value="Pop Picker Window"&gt;
+&lt;/form&gt;
+</pre></blockquote>
+</body>
+</html>

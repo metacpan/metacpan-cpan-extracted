@@ -1,0 +1,42 @@
+TODO for Games::Bingo
+
+$Id: TODO 1864 2007-08-08 09:12:37Z jonasbn $
+
+- Improve coverage see perldoc Games::Bingo
+
+- Add logging of game sessions (Log::Log4perl)?
+
+- Add cheat to Games::Bingo::play method, we need to be able to control
+  what number is picked, both for test purposes and for fun, computer games
+  SHOULD have cheats
+
+- Write a Tk front-end?
+
+- Implement checksums on cards? - necessary for making an online game
+
+- Write a Windows .NET front-end?
+
+- Check requirements, module version numbers not specified. I suspect the 
+  problems with t/Cover.t was due to differences in Test::More versions?
+
+- Implement test of new constructor
+
+- Implement and use G::B::Card::Generation::Algorithms
+
+  Since Kim Hansen have sent me an alternative card generation
+  algorithm, I plan to change the architecture so one can pick an alternative
+  algorithm (choosing between my scheme and Kim Hansens scheme or your own)
+  
+  I am referring to the algorithms as G::B::Algorithm::Card::Generation
+  
+  ::Random
+
+  for my own and Kim Hansens as
+  
+  ::Distributed
+  
+  my own will be default. So a serious refactoring is coming up.
+
+- Rewrite complete test suite so each sub will have its own test file
+
+- Implement Games::Bingo::Tournament

@@ -1,0 +1,90 @@
+NAME
+    Getopt::Inherited - Handling inherited command-line options
+
+VERSION
+    version 1.100860
+
+SYNOPSIS
+        use base 'Getopt::Inherited';
+
+        use constant GETOPT => qw(foo=s);
+        my $app = __PACKAGE__->new;
+        $app->do_getopt;
+
+DESCRIPTION
+    By subclassing this mixin class, your program gets the ability to
+    inherit command-line option specifications. If you have several programs
+    that share common code and common command-line options you don't want to
+    have to write the command-line processing code again and again. Using
+    this class you can abstract command-line options shared by your programs
+    into a superclass from which your programs then inherit. Additionally,
+    this class defines certain common command-line options itself.
+
+    You can also define defaults for command-line options.
+
+METHODS
+  GETOPT
+    This accessor, which is accumulated across the class hierarchy using
+    Data::Inherited, is used to define command-line options in the same
+    format as Getopt::Long expects. This class, Getopt::Inherited, itself
+    defines the following options:
+
+        use constant GETOPT =>
+            (qw(help man logfile|log=s verbose|v+ version|V));
+
+  GETOPT_DEFAULTS
+    This accessor, which is also accumulated across the class hierarchy, can
+    be used to define defaults for the options given in "GETOPT()". For
+    example, to define a command-line option called <foo> which takes a
+    string and to give it a default, you would use:
+
+        use constant GETOPT => qw(foo=s);
+        use constant GETOPT_DEFAULTS => (foo => 'my_default');
+
+  opt
+    This is a hash accessor per Class::Accessor::Complex in which the option
+    hash is stored when it has been parsed and after default values have
+    been applied.
+
+  usage
+    This method is called by "do_getopt()" after the command-line options
+    have been processed with Getopt::Long's "GetOptions". It uses Pod::Usage
+    to display help information if there was either an error during
+    processing, or if the "--help" or "--man" options have been given.
+
+  do_getopt
+    Does the actual command-line processing. It accumulates the values of
+    GETOPT() across the hierarchy, parses them, calls "usage()" if
+    necessary, applies GETOPT_DEFAULTS(), then assigns the finished options
+    hash to "opt()".
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Inherited>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Getopt-Inherited/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Getopt-Inherited/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

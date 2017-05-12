@@ -1,0 +1,10 @@
+Gtk3::Ex::PdfViewer
+
+Copyright 2013  Robert Wohlfarth <rbwohlfarth@gmail.com>
+
+You can redistribute and/or modify this module under the same terms as Perl
+itself.
+
+
+Pulls together several GTK3 widgets and libraries to display PDF documents.
+Drop this into a container for your own embedded PDF viewer.

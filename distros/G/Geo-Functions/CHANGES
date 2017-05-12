@@ -1,0 +1,15 @@
+2007-10-07 v0.07
+  * Absolutely nothing.  It's a perl testing thing.
+2006-01-15 v0.06
+  * Added mps_knots and knots_mps functions
+2006-01-12 v0.05
+  * Added methods dms_deg and dm_deg 
+2006-12-09 v0.04
+  * Documentation
+2006-12-08 v0.03
+  * Added () for imported Geo::Constants as some systems don't like barewords
+  * Added rad_dms method
+2006-12-05 v0.02
+  * Documentation
+2006-12-02 v0.01
+  * Original version

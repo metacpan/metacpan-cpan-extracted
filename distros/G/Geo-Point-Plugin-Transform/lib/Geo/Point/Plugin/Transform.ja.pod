@@ -1,0 +1,83 @@
+=head1 NAME
+
+Geo::Point::Plugin::Transform - Geo::Pointモジュールに測地系変換メソッドを付加する
+
+
+=head1 VERSION
+
+この文書は Geo::Point::Plugin::Transform バージョン 0.0.2について記述しています。
+
+
+=head1 SYNOPSIS
+
+  use Geo::Point::Plugin::Transform;
+  
+  my $pt_wgs84 = Geo::Point->longlat(135.00,35.00,"wgs84");
+  my $pt_clrk  = $pt_wgs84->transform('clark66');   # Geo::Point オブジェクト
+
+
+=head1 DESCRIPTION
+
+このモジュールを導入する事により、Geo::Pointオブジェクトにtransformメソッドが
+付加され、異なる測地系或いは投影法に変換されたGeo::Pointオブジェクトを得ることが
+できます。
+
+
+=head1 OBJECT METHOD
+
+メソッドはGeo::Pointオブジェクトに加えられます。
+
+=over 4
+
+=item * transform( PROJECTION )
+
+変換したい測地系/投影法名（PROJECTION）を引数にとります。
+測地系/投影法名はGeo::Projモジュールにて定義されているものが利用可能です。
+戻り値は、変換されたGeo::Pointオブジェクトです。
+戻り値のGeo::Pointオブジェクトは、新たに生成されたものとなり、呼び出し元の
+オブジェクトは保持されます。
+
+=back
+
+
+=head1 DEPENDENCIES
+
+Geo::Point
+Geo::Proj
+
+
+=head1 AUTHOR
+
+OHTSUKA Ko-hei  C<< <nene@kokogiko.net> >>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008, OHTSUKA Ko-hei C<< <nene@kokogiko.net> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

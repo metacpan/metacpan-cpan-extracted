@@ -1,0 +1,190 @@
+=head1 NAME
+
+GRID::Machine::Result - The object describing the result of a GRID::Machine RPC
+
+=head1 DESCRIPTION
+
+
+The class C<GRID::Machine::Result> is used by both the local and remote
+sides of the C<GRID::Machine>, though most of its methods are called 
+on the remote side. 
+
+The result of a RPC is a C<GRID::Machine::Result> object. 
+Such object has the following attributes:
+
+=over 2
+
+=item * I<type>
+
+The C<type> of result returned. A string. Fixed by the protocol.
+Common values are C<RETURNED> and C<DIED>.
+
+=item * I<stdout>
+
+A string containing the contents of C<STDOUT>
+produced during the duration of the RPC
+
+=item * I<stderr>
+
+A string containing the contents of C<STDERR>
+produced during the duration of the RPC
+
+=item * I<results>
+
+A reference to an C<ARRAY> containing the results returned by the RPC
+
+=item * I<errcode>
+
+The contents of C<$?> as produced during the RPC
+
+=item * I<errmsg>
+
+The contents of C<$@> as produced during the RPC
+
+=back
+
+=head2 The Constructor C<new>
+
+Syntax:
+
+  GRID::Machine::Result->new(
+    stdout => $rstdout, 
+    errmsg  => $err, 
+    stderr => $rstderr, 
+    results => \@results
+  )
+
+Builds a new result object.  
+
+=head2 The C<ok> Method
+
+Returns C<TRUE> if the RPC didn't died, i.e. if the C<type> attribute is not
+the string C<'DIED'>
+
+=head2 The C<noerr> Method
+
+Returns C<TRUE> if the RPC didn't died and didn't send any messages 
+through stderr.
+See an example. When running the following program:
+
+  $ cat noerrvsok.pl
+  #!/usr/local/bin/perl -w
+  use strict;
+  use GRID::Machine;
+
+  my $machine = shift || $ENV{GRID_REMOTE_MACHINE};
+  my $m = GRID::Machine->new( host => $machine );
+
+  my $r = $m->eval( q{print STDERR "This is the end\n" });
+
+  print "print to STDERR:\n";
+  print "<".$r->ok.">\n";
+  print "<".$r->noerr.">\n";
+
+  $r = $m->eval( q{warn "This is a warning\n" });
+
+  print "Warn:\n";
+  print "<".$r->ok.">\n";
+  print "<".$r->noerr.">\n";
+
+we get the following output:
+
+
+
+                $ errvsok.pl
+                print to STDERR:
+                <1>
+                <>
+                Warn:
+                <1>
+                <>
+
+=head2 The C<result> Method
+
+Returns the first element of the list referenced by the C<results> attribute
+This method is called when a C<GRID::Machine::Result> object is evaluated in a Boolean 
+context (i.e. C<bool> is overloaded).
+
+=head2 The C<Results> Method
+
+Returns the list referenced by the C<results> attribute
+
+=head2 The C<str> Method. Stringification of a C<Result> object
+
+Returns the string made of concatenating C<stdout>, C<stderr> and C<errmsg>.
+The Perl operator C<q("")> is overloaded using this method. Thus,
+wherever a C<GRID::Machine::Result> object is used on a scalar string 
+context the C<str> will be called.
+
+
+
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * L<GRID::Machine>
+
+=item * L<GRID::Machine::IOHandle>
+
+=item * L<GRID::Machine::Group>
+
+=item * L<GRID::Machine::Process>
+
+=item * L<GRID::Machine::perlparintro>
+
+
+=item *  L<Net::OpenSSH> 
+
+=item * L<IPC::PerlSSH>
+
+=item * L<IPC::PerlSSH::Async>
+
+=item * Man pages of C<ssh>, C<ssh-key-gen>, C<ssh_config>, C<scp>, 
+C<ssh-agent>, C<ssh-add>, C<sshd>
+
+=item * L<http://www.openssh.com>
+
+=back
+
+
+
+=head1 AUTHOR
+
+Casiano Rodriguez Leon E<lt>casiano@ull.esE<gt>
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+Support from Gobierno de Canarias was through GC02210601
+(I<Grupos Consolidados>).
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+I wish to thank Paul Evans for his C<IPC::PerlSSH> module: it was the source
+of inspiration for this module. To 
+Alex White,
+Dmitri Kargapolov, 
+Eric Busto
+and
+Erik Welch 
+for their contributions.
+To the Perl Monks, and the Perl Community for generously sharing their knowledge.
+Finally, thanks to Juana, Coro and  my students at La Laguna.
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2007 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+

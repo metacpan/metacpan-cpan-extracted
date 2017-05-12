@@ -1,0 +1,506 @@
+{
+   "abstract" : "cooperative pandemic board game",
+   "author" : [
+      "Jerome Quelin"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Pandemic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::Color" : 0,
+            "Devel::CheckOS" : 0,
+            "Encode" : 0,
+            "Exporter" : 0,
+            "Exporter::Lite" : 0,
+            "File::HomeDir" : 0,
+            "File::ShareDir::PathClass" : 0,
+            "File::Spec::Functions" : 0,
+            "FindBin" : 0,
+            "Geo::Mercator" : 0,
+            "Image::Size" : 0,
+            "List::MoreUtils" : 0,
+            "List::Util" : 0,
+            "Locale::TextDomain" : 0,
+            "Math::Gradient" : 0,
+            "Moose" : "0.92",
+            "Moose::Role" : 0,
+            "MooseX::Has::Sugar" : 0,
+            "MooseX::POE" : 0,
+            "MooseX::SemiAffordanceAccessor" : 0,
+            "MooseX::Singleton" : 0,
+            "MooseX::Traits" : 0,
+            "MooseX::Types::Moose" : 0,
+            "POE" : 0,
+            "POE::Kernel" : 0,
+            "POE::Loop::Tk" : 0,
+            "Readonly" : 0,
+            "Tk" : 0,
+            "Tk::Action" : 0,
+            "Tk::Balloon" : 0,
+            "Tk::Font" : 0,
+            "Tk::JPEG" : 0,
+            "Tk::PNG" : 0,
+            "Tk::Pane" : 0,
+            "Tk::Sugar" : 0,
+            "Tk::Tiler" : 0,
+            "Tk::ToolBar" : 0,
+            "UNIVERSAL::require" : 0,
+            "YAML::Tiny" : 0,
+            "perl" : "5.010",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Games::Pandemic" : {
+         "file" : "lib/Games/Pandemic.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card" : {
+         "file" : "lib/Games/Pandemic/Card.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card::City" : {
+         "file" : "lib/Games/Pandemic/Card/City.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card::Epidemic" : {
+         "file" : "lib/Games/Pandemic/Card/Epidemic.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card::Special" : {
+         "file" : "lib/Games/Pandemic/Card/Special.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card::Special::Airlift" : {
+         "file" : "lib/Games/Pandemic/Card/Special/Airlift.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card::Special::Forecast" : {
+         "file" : "lib/Games/Pandemic/Card/Special/Forecast.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card::Special::GovernmentGrant" : {
+         "file" : "lib/Games/Pandemic/Card/Special/GovernmentGrant.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card::Special::OneQuietNight" : {
+         "file" : "lib/Games/Pandemic/Card/Special/OneQuietNight.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Card::Special::ResilientPopulation" : {
+         "file" : "lib/Games/Pandemic/Card/Special/ResilientPopulation.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::City" : {
+         "file" : "lib/Games/Pandemic/City.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Config" : {
+         "file" : "lib/Games/Pandemic/Config.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Controller" : {
+         "file" : "lib/Games/Pandemic/Controller.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Deck" : {
+         "file" : "lib/Games/Pandemic/Deck.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Disease" : {
+         "file" : "lib/Games/Pandemic/Disease.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::I18n" : {
+         "file" : "lib/Games/Pandemic/I18n.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Map" : {
+         "file" : "lib/Games/Pandemic/Map.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Map::Pandemic" : {
+         "file" : "lib/Games/Pandemic/Map/Pandemic.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Player" : {
+         "file" : "lib/Games/Pandemic/Player.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Role::Dispatcher" : {
+         "file" : "lib/Games/Pandemic/Role/Dispatcher.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Role::Medic" : {
+         "file" : "lib/Games/Pandemic/Role/Medic.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Role::OperationsExpert" : {
+         "file" : "lib/Games/Pandemic/Role/OperationsExpert.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Role::Researcher" : {
+         "file" : "lib/Games/Pandemic/Role/Researcher.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Role::Scientist" : {
+         "file" : "lib/Games/Pandemic/Role/Scientist.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::Action" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/Action.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::Airlift" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/Airlift.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::ChooseDisease" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/ChooseDisease.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::DropCards" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/DropCards.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::Forecast" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/Forecast.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::GiveCard" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/GiveCard.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::GovernmentGrant" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/GovernmentGrant.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::ResilientPopulation" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/ResilientPopulation.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::Simple" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/Simple.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Dialog::ViewCards" : {
+         "file" : "lib/Games/Pandemic/Tk/Dialog/ViewCards.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Main" : {
+         "file" : "lib/Games/Pandemic/Tk/Main.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::PlayerCards" : {
+         "file" : "lib/Games/Pandemic/Tk/PlayerCards.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Tk::Utils" : {
+         "file" : "lib/Games/Pandemic/Tk/Utils.pm",
+         "version" : "1.120510"
+      },
+      "Games::Pandemic::Utils" : {
+         "file" : "lib/Games/Pandemic/Utils.pm",
+         "version" : "1.120510"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-games-pandemic at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Games-Pandemic"
+      },
+      "homepage" : "http://search.cpan.org/dist/Games-Pandemic/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jquelin/games-pandemic.git",
+         "web" : "http://github.com/jquelin/games-pandemic"
+      }
+   },
+   "version" : "1.120510",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::LocaleMsgfmt",
+            "name" : "LocaleMsgfmt",
+            "version" : "1.203"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoVersion",
+            "name" : "@JQUELIN/AutoVersion",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@JQUELIN/GatherDir",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CompileTests",
+            "name" : "@JQUELIN/CompileTests",
+            "version" : "1.112820"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::HasVersionTests",
+            "name" : "@JQUELIN/HasVersionTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::KwaliteeTests",
+            "name" : "@JQUELIN/KwaliteeTests",
+            "version" : "2.03"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumVersionTests",
+            "name" : "@JQUELIN/MinimumVersionTests",
+            "version" : "2.0.1"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@JQUELIN/PodCoverageTests",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@JQUELIN/PodSyntaxTests",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReportVersions::Tiny",
+            "name" : "@JQUELIN/ReportVersions::Tiny",
+            "version" : "1.03"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@JQUELIN/PruneCruft",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneFiles",
+            "name" : "@JQUELIN/PruneFiles",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@JQUELIN/ManifestSkip",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@JQUELIN/AutoPrereqs",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@JQUELIN/ExtraTests",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@JQUELIN/NextRelease",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@JQUELIN/PkgVersion",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@JQUELIN/PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prepender",
+            "name" : "@JQUELIN/Prepender",
+            "version" : "1.112280"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@JQUELIN/ExecDir",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@JQUELIN/ShareDir",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Bugtracker",
+            "name" : "@JQUELIN/Bugtracker",
+            "version" : "1.111080"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Homepage",
+            "name" : "@JQUELIN/Homepage",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Repository",
+            "name" : "@JQUELIN/Repository",
+            "version" : "0.18"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "name" : "@JQUELIN/MetaProvides::Package",
+            "version" : "1.12060501"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@JQUELIN/MetaConfig",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@JQUELIN/License",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@JQUELIN/MetaYAML",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@JQUELIN/MetaJSON",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuild",
+            "name" : "@JQUELIN/ModuleBuild",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@JQUELIN/Readme",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@JQUELIN/Manifest",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangeLog",
+            "name" : "@JQUELIN/CheckChangeLog",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@JQUELIN/Git::Check",
+            "version" : "1.113560"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@JQUELIN/Git::Commit",
+            "version" : "1.113560"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CommitBuild",
+            "name" : "@JQUELIN/Git::CommitBuild",
+            "version" : "1.113560"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@JQUELIN/TagMaster",
+            "version" : "1.113560"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@JQUELIN/TagRelease",
+            "version" : "1.113560"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "@JQUELIN/Git::Push",
+            "version" : "1.113560"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@JQUELIN/UploadToCPAN",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.300006"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "4.300006"
+      }
+   }
+}
+

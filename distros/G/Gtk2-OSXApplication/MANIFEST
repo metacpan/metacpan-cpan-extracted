@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+OSXApplication.xs
+ppport.h
+README
+t/Gtk2-OSXApplication.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Gtk2/OSXApplication.pm
+META.yml                                 Module meta-data (added by MakeMaker)

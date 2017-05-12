@@ -1,0 +1,108 @@
+$name   = 'g';
+$author = 'peter';
+$team   = 'Free g';
+
+sub main {
+    if ($enemy_y < $y and $enemy_x < $x) {
+       if ($h==8) {
+           turn left;
+       }
+       if ($h==6) {
+           turn left;
+           turn left;
+       }
+       if ($h==2) {
+           turn right;
+       }
+       move forward;
+       turn left;
+       move forward;
+
+       scan perimeter;
+        
+       if (&found('enemy') and $life > $enemy_l) {
+           attempt destruct;
+       }
+       if (&found('enemy')) {
+           fire energy * 2;
+       }
+    }
+
+    if ($enemy_y> $y and $enemy_x> $x) {
+       if ($h==8) {
+           turn right;
+       }
+       if ($h==2) {
+           turn left;
+       }
+       if ($h==4) {
+           turn left;
+           turn left;
+       }
+       move forward;
+       turn left;
+       move forward;
+
+       scan perimeter;
+
+       if (&found('enemy') and $life > $enemy_l) {
+           attempt destruct;
+       }
+    }
+
+    if ($enemy_y< $y and $enemy_x> $x) {
+        if ($h==2) {
+            turn left;
+        }  
+        if ($h==4) {
+            turn left;
+            turn left;
+        }
+        if ($h==8) {
+            turn right;
+        }
+        move forward;
+        turn right;
+        move forward;
+
+        scan perimeter;
+
+        if (&found('enemy') and $life > $enemy_l) {
+          attempt destruct;
+        }
+       
+        if (&found('enemy')) {
+           fire energy*2;
+        }
+        
+    }
+        
+    if ($enemy_y> $y and $enemy_x< $x) {
+        if ($h==6) {
+            turn left;
+        }
+        if ($h==2) {
+            turn right;
+            turn right;
+        }
+        if ($h==4) {
+            turn right;
+        }
+        move forward;
+        turn right;
+        move forward;
+
+        scan perimeter;
+        if (&found('enemy') and $life > $enemy_l) {
+          attempt destruct;
+        }
+        if (&found('enemy')) {
+           fire energy*2;
+        }
+
+    }
+
+    redo;
+
+
+}

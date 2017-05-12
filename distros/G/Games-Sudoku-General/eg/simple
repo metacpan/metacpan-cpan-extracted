@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+#	This is about the simplest solver I can come up with
+
+use Games::Sudoku::General;
+
+my $su = Games::Sudoku::General->new ();
+
+my $puzzle = <<eod;
+...4..789
+4.6...1..
+.8.....5.
+2.4..5...
+.95......
+6..9.2.4.
+.3..7.9.8
+.67......
+9....8..2
+eod
+print "\nInput:\n", $puzzle;
+
+$su->problem ($puzzle);
+
+print "\nSolution:\n";
+if (my $soln = $su->solution ()) {
+    print $soln, "\nConstraints used: ", scalar $su->constraints_used, "\n";
+} else {
+    print "No solution found.\n";
+}

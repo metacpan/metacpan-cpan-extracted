@@ -1,0 +1,4 @@
+Changes for Geo::Mercator 
+
+Vers. 1.01	2008-Jan-25		D. Arnold
+	Coded.

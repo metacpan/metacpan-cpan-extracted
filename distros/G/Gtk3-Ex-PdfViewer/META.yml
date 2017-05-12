@@ -1,0 +1,32 @@
+---
+abstract: 'Complete PDF viewer widget for GTK3 applications'
+author:
+  - 'Robert Wohlfarth (rbwohlfarth@gmail.com)'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install::AutoManifest: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gtk3-Ex-PdfViewer
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Slurp: 0
+  Gtk3: 0
+  List::AllUtils: 0
+  Moose: 0
+  Poppler: 0
+  perl: 5.14.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

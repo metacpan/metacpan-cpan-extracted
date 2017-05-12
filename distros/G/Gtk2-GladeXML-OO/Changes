@@ -1,0 +1,48 @@
+Revision history for Perl extension Gtk2::GladeXML::OO.
+
+0.43   Mon, 29 Mar 2010 15:38:27 +0000
+	- Little fix for broken callbacks handling in some versions of Gtk2::GladeXML for Windows OS.
+
+0.421  Thu Jul 15 20:40:06 CEST 2008
+	- Workaround for a little bug in method get_widget in Gtk2::GladeXML.
+
+0.421  Mon May 12 21:24:14 CEST 2008
+	- Little workaround for PAR users (problems with AUTOLOAD partialy fixed)
+
+0.42   Sat May 11 16:05:39 CEST 2008
+	- Fixed behavior in PAR environment (error: Can't locate auto/Gtk2/GladeXML/OO/debug.al in @INC)
+
+0.41   Wed Apr 30 18:17:20 UTC 2008
+	- Fixed little bug in logging function
+
+0.40   Wed Apr 30 13:25:24 UTC 2008
+	- Added multilevel calls to objects of user
+	- Added multilevel calls to objects of GLADE
+
+0.371  Thr Apr 17 19:55:07 CEST 2008
+	- Changed structure of installation package
+
+0.37   Thr Apr 17 18:54:02 CEST 2008
+	- Fixed problem with user define AUTOLOAD
+	- Hook::LexWrap no needed
+	- Added debug levels
+	- Fixed installation warnings
+
+0.361  Wed Apr 16 02:13:59 CEST 2008
+	- Little changes in documentation.
+
+0.36   Sat Apr 12 16:15:43 CEST 2008
+	- Added new method => debug
+	- Removed method 'new_from'. Now 'new' runs OK and Gtk2::GladeXML::OO is realy drop-in repleacement.
+	- Gtk2::GladeXML::OO::LOG removed. Use method 'debug' instead.
+	- Extended example.
+
+0.351  Thr Apr 11 17:33:04 CEST 2008
+	- Fixed some bugs in documentation.
+
+0.35   Wed Apr  9 10:39:03 CEST 2008
+	- Changed interface. Invoking AUTOLOAD is not needed.
+	- Exporter is'nt needed. Only OO interface is used.
+	
+0.01   Sat Oct 29 18:26:19 EDT 2007
+	- First release.

@@ -1,0 +1,52 @@
+{
+   "abstract" : "Turn a GVG file into OpenGL code",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graphics-GVG-OpenGLRenderer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "SDL" : "2.546"
+         },
+         "requires" : {
+            "Data::UUID" : "1.221",
+            "Graphics::GVG" : "0.2",
+            "Imager" : "1.005",
+            "Moose" : "2.1806",
+            "OpenGL" : "0.6704",
+            "namespace::autoclean" : "0.28",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/frezik/Graphics-GVG-OpenGLRenderer"
+      }
+   },
+   "version" : "0.2"
+}
+

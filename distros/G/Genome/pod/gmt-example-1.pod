@@ -1,0 +1,69 @@
+
+
+=pod
+
+=head1 NAME
+
+gmt example-1 - WRITE A ONE-LINE DESCRIPTION HERE
+
+=head1 SYNOPSIS
+
+gmt example-1 --foo=? --infiles=?[,?] --outfiles=?[,?] [--bar] [BARE-ARGS]
+
+gmt example1 --bar
+gmt example1 --foo=hello
+gmt example1 --foo=goodbye --bar
+gmt example1 --foo=hello barearg1 barearg2 barearg3
+gmt example1 --infiles=a,b,c --outfiles=d,e,f 
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item foo  I<Text>
+
+some foozy thing
+
+=item infiles  I<Text>
+
+this is a list of values
+
+=item outfiles  I<Text>
+
+also a list of values
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item bar  I<Boolean>
+
+a flag to turn on and off
+
+=item nobar  I<Boolean>
+
+Make bar 'false'
+
+=item BARE-ARGS  I<Text>
+
+list of bare arguments
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  This is a dummy command.  Copy, paste and modify the module! 
+  CHANGE THIS BLOCK OF TEXT IN THE MODULE TO CHANGE THE HELP OUTPUT.
+
+
+
+=cut
+

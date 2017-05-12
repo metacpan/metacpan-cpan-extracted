@@ -1,0 +1,19 @@
+GTK_TYPE_SOURCE_BUFFER			GtkSourceBuffer			GObject		Gtk2::SourceView::Buffer
+GTK_TYPE_SOURCE_LANGUAGE		GtkSourceLanguage		GObject		Gtk2::SourceView::Language
+GTK_TYPE_SOURCE_LANGUAGES_MANAGER	GtkSourceLanguagesManager	GObject		Gtk2::SourceView::LanguagesManager
+GTK_TYPE_SOURCE_MARKER			GtkSourceMarker			GObject		Gtk2::SourceView::Marker
+GTK_TYPE_SOURCE_PRINT_JOB		GtkSourcePrintJob		GObject		Gtk2::SourceView::PrintJob
+GTK_TYPE_SOURCE_TAG_TABLE		GtkSourceTagTable		GObject		Gtk2::SourceView::TagTable
+
+GTK_TYPE_SOURCE_TAG			GtkSourceTag			GObject		Gtk2::SourceView::Tag
+GTK_TYPE_PATTERN_TAG			GtkPatternTag			GObject		Gtk2::SourceView::PatternTag
+GTK_TYPE_SYNTAX_TAG			GtkSyntaxTag			GObject		Gtk2::SourceView::SyntaxTag
+
+GTK_TYPE_SOURCE_VIEW			GtkSourceView			GtkObject	Gtk2::SourceView::View
+
+GTK_TYPE_SOURCE_STYLE_SCHEME		GtkSourceStyleScheme		GInterface	Gtk2::SourceView::StyleScheme
+
+GTK_TYPE_SOURCE_TAG_STYLE		GtkSourceTagStyle		GBoxed		Gtk2::SourceView::TagStyle
+
+GTK_TYPE_SOURCE_SEARCH_FLAGS		GtkSourceSearchFlags		GEnum		Gtk2::SourceView::SearchFlags
+GTK_TYPE_SOURCE_TAG_STYLE_MASK		GtkSourceTagStyleMask		GFlags		Gtk2::SourceView::TagStyleMask

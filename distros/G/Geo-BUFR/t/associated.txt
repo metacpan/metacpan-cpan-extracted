@@ -1,0 +1,282 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            370
+    BUFR edition:                      3
+
+Section 1:
+    Length of section:                 18
+    BUFR master table:                 0
+    Originating subcentre:             0
+    Originating centre:                98
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           12
+    Data subcategory:                  0
+    Master table version number:       13
+    Local table version number:        1
+    Year of century:                   8
+    Month:                             12
+    Day:                               11
+    Hour:                              19
+    Minute:                            24
+
+Section 3:
+    Length of section:                 154
+    Number of data subsets:            2
+    Observed data:                     1
+    Compressed data:                   1
+    Data descriptors unexpanded:       001007 025060 001033 002048 002048 005040 201134 007001 201000 202131 007005 202000 301011 301012 004007 005001 006001 008029 008074 008012 025095 025096 025097 204001 031021 022070 204000 008023 022070 021128 123002 008076 204001 031021 201129 021062 201000 204000 008023 021062 204001 031021 201134 007001 201000 204000 202131 007005 202000 008023 202131 007001 202000 021128 204001 031021 002173 204000 107003 201130 002121 201000 204001 031021 012163 204000 104002 002023 202129 011012 202000 013090 013091
+
+Subset 1
+
+     1  001007              260  SATELLITE IDENTIFIER [CODE TABLE]
+     2  025060               92  SOFTWARE IDENTIFICATION (SEE NOTE 2) [NUMERIC]
+     3  001033               85  IDENTIFICATION OF ORIGINATING/GENERATING CENTRE [CODE TABLE]
+     4  002048                9  SATELLITE SENSOR INDICATOR [CODE TABLE]
+     5  002048               10  SATELLITE SENSOR INDICATOR [CODE TABLE]
+     6  005040            32310  ORBIT NUMBER [NUMERIC]
+        201134                   CHANGE DATA WIDTH
+     7  007001          1353685  HEIGHT OF STATION (SEE NOTE 1) [M]
+        201000                   CANCEL CHANGE DATA WIDTH
+        202131                   CHANGE SCALE
+     8  007005            0.667  HEIGHT INCREMENT [M]
+        202000                   CANCEL CHANGE SCALE
+     9  004001             2008  YEAR [YEAR]
+    10  004002               12  MONTH [MONTH]
+    11  004003               11  DAY [DAY]
+    12  004004               19  HOUR [HOUR]
+    13  004005               24  MINUTE [MINUTE]
+    14  004007        23.991058  SECONDS WITHIN A MINUTE (MICROSECOND ACCURACY) [SECOND]
+    15  005001         64.62657  LATITUDE (HIGH ACCURACY) [DEGREE]
+    16  006001        156.67580  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    17  008029                3  REMOTLY SENSED SURFACE TYPE [CODE TABLE]
+    18  008074                0  ALTIMETER ECHO TYPE [CODE TABLE]
+    19  008012                1  LAND/SEA QUALIFIER [CODE TABLE]
+    20  025095                0  ALTIMETER STATE FLAG [FLAG TABLE]
+    21  025096                4  RADIOMETER STATE FLAG [FLAG TABLE]
+    22  025097                0  THREE DIMENSIONAL ERROR ESTIMATE OF THE NAVIGATOR ORBIT [CODE TABLE]
+        204001                   ADD ASSOCIATED FIELD
+    23  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    24  999999                1  ASSOCIATED FIELD [NUMERIC]
+    25  022070             4.39  SIGNIFICANT WAVE HEIGHT [M]
+        204000                   ADD ASSOCIATED FIELD
+    26  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+    27  022070             2.45  SIGNIFICANT WAVE HEIGHT [M]
+    28  021128               20  NUMBER OF VALID POINTS PER SECOND USED TO DERIVE PREVIOUS PARAME [NUMERIC]
+    29  008076                0  TYPE OF BAND [CODE TABLE]
+        204001                   ADD ASSOCIATED FIELD
+    30  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+        201129                   CHANGE DATA WIDTH
+    31  999999                1  ASSOCIATED FIELD [NUMERIC]
+    32  021062             0.52  BACKSCATTER [dB]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204000                   ADD ASSOCIATED FIELD
+    33  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+    34  021062             0.06  BACKSCATTER [dB]
+        204001                   ADD ASSOCIATED FIELD
+    35  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+        201134                   CHANGE DATA WIDTH
+    36  999999                1  ASSOCIATED FIELD [NUMERIC]
+    37  007001          1353420  HEIGHT OF STATION (SEE NOTE 1) [M]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204000                   ADD ASSOCIATED FIELD
+        202131                   CHANGE SCALE
+    38  007005            0.142  HEIGHT INCREMENT [M]
+        202000                   CANCEL CHANGE SCALE
+    39  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+        202131                   CHANGE SCALE
+    40  007001            0.703  HEIGHT OF STATION (SEE NOTE 1) [M]
+        202000                   CANCEL CHANGE SCALE
+    41  021128               20  NUMBER OF VALID POINTS PER SECOND USED TO DERIVE PREVIOUS PARAME [NUMERIC]
+    42  008076                1  TYPE OF BAND [CODE TABLE]
+        204001                   ADD ASSOCIATED FIELD
+    43  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+        201129                   CHANGE DATA WIDTH
+    44  999999                1  ASSOCIATED FIELD [NUMERIC]
+    45  021062             5.84  BACKSCATTER [dB]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204000                   ADD ASSOCIATED FIELD
+    46  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+    47  021062             0.09  BACKSCATTER [dB]
+        204001                   ADD ASSOCIATED FIELD
+    48  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+        201134                   CHANGE DATA WIDTH
+    49  999999                1  ASSOCIATED FIELD [NUMERIC]
+    50  007001          1353419  HEIGHT OF STATION (SEE NOTE 1) [M]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204000                   ADD ASSOCIATED FIELD
+        202131                   CHANGE SCALE
+    51  007005            0.750  HEIGHT INCREMENT [M]
+        202000                   CANCEL CHANGE SCALE
+    52  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+        202131                   CHANGE SCALE
+    53  007001            0.904  HEIGHT OF STATION (SEE NOTE 1) [M]
+        202000                   CANCEL CHANGE SCALE
+    54  021128               19  NUMBER OF VALID POINTS PER SECOND USED TO DERIVE PREVIOUS PARAME [NUMERIC]
+        204001                   ADD ASSOCIATED FIELD
+    55  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    56  999999                1  ASSOCIATED FIELD [NUMERIC]
+    57  002173          missing  SQUARE OF THE OFF NADIR ANGLE (7) [DEGREE2]
+        204000                   ADD ASSOCIATED FIELD
+        201130                   CHANGE DATA WIDTH
+    58  002121      18700000000  MEAN FREQUENCY [Hz]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204001                   ADD ASSOCIATED FIELD
+    59  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    60  999999                1  ASSOCIATED FIELD [NUMERIC]
+    61  012163           245.83  BRIGHTNESS TEMPERATURE [K]
+        204000                   ADD ASSOCIATED FIELD
+        201130                   CHANGE DATA WIDTH
+    62  002121      23800000000  MEAN FREQUENCY [Hz]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204001                   ADD ASSOCIATED FIELD
+    63  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    64  999999                1  ASSOCIATED FIELD [NUMERIC]
+    65  012163           239.91  BRIGHTNESS TEMPERATURE [K]
+        204000                   ADD ASSOCIATED FIELD
+        201130                   CHANGE DATA WIDTH
+    66  002121      34000000000  MEAN FREQUENCY [Hz]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204001                   ADD ASSOCIATED FIELD
+    67  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    68  999999                1  ASSOCIATED FIELD [NUMERIC]
+    69  012163           226.08  BRIGHTNESS TEMPERATURE [K]
+        204000                   ADD ASSOCIATED FIELD
+    70  002023                8  SATELLITE DERIVED WIND COMPUTATION METHOD [CODE TABLE]
+        202129                   CHANGE SCALE
+    71  011012            28.39  WIND SPEED AT 10 M [M/S]
+        202000                   CANCEL CHANGE SCALE
+    72  002023                9  SATELLITE DERIVED WIND COMPUTATION METHOD [CODE TABLE]
+        202129                   CHANGE SCALE
+    73  011012            40.94  WIND SPEED AT 10 M [M/S]
+        202000                   CANCEL CHANGE SCALE
+    74  013090              0.0  RADIOMETER WATER VAPOUR CONTENT [KG/M**2]
+    75  013091             0.00  RADIOMETER LIQUID CONTENT [KG/M**2]
+
+Subset 2
+
+     1  001007              260  SATELLITE IDENTIFIER [CODE TABLE]
+     2  025060               92  SOFTWARE IDENTIFICATION (SEE NOTE 2) [NUMERIC]
+     3  001033               85  IDENTIFICATION OF ORIGINATING/GENERATING CENTRE [CODE TABLE]
+     4  002048                9  SATELLITE SENSOR INDICATOR [CODE TABLE]
+     5  002048               10  SATELLITE SENSOR INDICATOR [CODE TABLE]
+     6  005040            32310  ORBIT NUMBER [NUMERIC]
+        201134                   CHANGE DATA WIDTH
+     7  007001          1353689  HEIGHT OF STATION (SEE NOTE 1) [M]
+        201000                   CANCEL CHANGE DATA WIDTH
+        202131                   CHANGE SCALE
+     8  007005            0.766  HEIGHT INCREMENT [M]
+        202000                   CANCEL CHANGE SCALE
+     9  004001             2008  YEAR [YEAR]
+    10  004002               12  MONTH [MONTH]
+    11  004003               11  DAY [DAY]
+    12  004004               19  HOUR [HOUR]
+    13  004005               24  MINUTE [MINUTE]
+    14  004007        25.010637  SECONDS WITHIN A MINUTE (MICROSECOND ACCURACY) [SECOND]
+    15  005001         64.64444  LATITUDE (HIGH ACCURACY) [DEGREE]
+    16  006001        156.79091  LONGITUDE (HIGH ACCURACY) [DEGREE]
+    17  008029                3  REMOTLY SENSED SURFACE TYPE [CODE TABLE]
+    18  008074                0  ALTIMETER ECHO TYPE [CODE TABLE]
+    19  008012                1  LAND/SEA QUALIFIER [CODE TABLE]
+    20  025095                0  ALTIMETER STATE FLAG [FLAG TABLE]
+    21  025096                4  RADIOMETER STATE FLAG [FLAG TABLE]
+    22  025097                0  THREE DIMENSIONAL ERROR ESTIMATE OF THE NAVIGATOR ORBIT [CODE TABLE]
+        204001                   ADD ASSOCIATED FIELD
+    23  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    24  999999                1  ASSOCIATED FIELD [NUMERIC]
+    25  022070             0.00  SIGNIFICANT WAVE HEIGHT [M]
+        204000                   ADD ASSOCIATED FIELD
+    26  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+    27  022070             0.00  SIGNIFICANT WAVE HEIGHT [M]
+    28  021128               13  NUMBER OF VALID POINTS PER SECOND USED TO DERIVE PREVIOUS PARAME [NUMERIC]
+    29  008076                0  TYPE OF BAND [CODE TABLE]
+        204001                   ADD ASSOCIATED FIELD
+    30  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+        201129                   CHANGE DATA WIDTH
+    31  999999                1  ASSOCIATED FIELD [NUMERIC]
+    32  021062             1.36  BACKSCATTER [dB]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204000                   ADD ASSOCIATED FIELD
+    33  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+    34  021062             0.12  BACKSCATTER [dB]
+        204001                   ADD ASSOCIATED FIELD
+    35  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+        201134                   CHANGE DATA WIDTH
+    36  999999                1  ASSOCIATED FIELD [NUMERIC]
+    37  007001          1353444  HEIGHT OF STATION (SEE NOTE 1) [M]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204000                   ADD ASSOCIATED FIELD
+        202131                   CHANGE SCALE
+    38  007005            0.374  HEIGHT INCREMENT [M]
+        202000                   CANCEL CHANGE SCALE
+    39  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+        202131                   CHANGE SCALE
+    40  007001            4.999  HEIGHT OF STATION (SEE NOTE 1) [M]
+        202000                   CANCEL CHANGE SCALE
+    41  021128               13  NUMBER OF VALID POINTS PER SECOND USED TO DERIVE PREVIOUS PARAME [NUMERIC]
+    42  008076                1  TYPE OF BAND [CODE TABLE]
+        204001                   ADD ASSOCIATED FIELD
+    43  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+        201129                   CHANGE DATA WIDTH
+    44  999999                1  ASSOCIATED FIELD [NUMERIC]
+    45  021062             6.54  BACKSCATTER [dB]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204000                   ADD ASSOCIATED FIELD
+    46  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+    47  021062             0.12  BACKSCATTER [dB]
+        204001                   ADD ASSOCIATED FIELD
+    48  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+        201134                   CHANGE DATA WIDTH
+    49  999999                1  ASSOCIATED FIELD [NUMERIC]
+    50  007001          1353444  HEIGHT OF STATION (SEE NOTE 1) [M]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204000                   ADD ASSOCIATED FIELD
+        202131                   CHANGE SCALE
+    51  007005            0.633  HEIGHT INCREMENT [M]
+        202000                   CANCEL CHANGE SCALE
+    52  008023               10  FIRST ORDER STATISTICS [CODE TABLE]
+        202131                   CHANGE SCALE
+    53  007001            7.463  HEIGHT OF STATION (SEE NOTE 1) [M]
+        202000                   CANCEL CHANGE SCALE
+    54  021128               13  NUMBER OF VALID POINTS PER SECOND USED TO DERIVE PREVIOUS PARAME [NUMERIC]
+        204001                   ADD ASSOCIATED FIELD
+    55  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    56  999999                1  ASSOCIATED FIELD [NUMERIC]
+    57  002173          missing  SQUARE OF THE OFF NADIR ANGLE (7) [DEGREE2]
+        204000                   ADD ASSOCIATED FIELD
+        201130                   CHANGE DATA WIDTH
+    58  002121      18700000000  MEAN FREQUENCY [Hz]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204001                   ADD ASSOCIATED FIELD
+    59  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    60  999999                1  ASSOCIATED FIELD [NUMERIC]
+    61  012163           246.09  BRIGHTNESS TEMPERATURE [K]
+        204000                   ADD ASSOCIATED FIELD
+        201130                   CHANGE DATA WIDTH
+    62  002121      23800000000  MEAN FREQUENCY [Hz]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204001                   ADD ASSOCIATED FIELD
+    63  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    64  999999                1  ASSOCIATED FIELD [NUMERIC]
+    65  012163           239.92  BRIGHTNESS TEMPERATURE [K]
+        204000                   ADD ASSOCIATED FIELD
+        201130                   CHANGE DATA WIDTH
+    66  002121      34000000000  MEAN FREQUENCY [Hz]
+        201000                   CANCEL CHANGE DATA WIDTH
+        204001                   ADD ASSOCIATED FIELD
+    67  031021                1  ASSOCIATED FIELD SIGNIFICANCE [CODE TABLE]
+    68  999999                1  ASSOCIATED FIELD [NUMERIC]
+    69  012163           225.73  BRIGHTNESS TEMPERATURE [K]
+        204000                   ADD ASSOCIATED FIELD
+    70  002023                8  SATELLITE DERIVED WIND COMPUTATION METHOD [CODE TABLE]
+        202129                   CHANGE SCALE
+    71  011012            28.39  WIND SPEED AT 10 M [M/S]
+        202000                   CANCEL CHANGE SCALE
+    72  002023                9  SATELLITE DERIVED WIND COMPUTATION METHOD [CODE TABLE]
+        202129                   CHANGE SCALE
+    73  011012            40.94  WIND SPEED AT 10 M [M/S]
+        202000                   CANCEL CHANGE SCALE
+    74  013090              0.0  RADIOMETER WATER VAPOUR CONTENT [KG/M**2]
+    75  013091             0.00  RADIOMETER LIQUID CONTENT [KG/M**2]

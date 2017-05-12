@@ -1,0 +1,2 @@
+>=sys-libs/ncurses-5.2-r2  !bootstrap? ( sys-devel/patch ) sys-devel/gnuconfig
+	!bootstrap? ( sys-devel/libtool )

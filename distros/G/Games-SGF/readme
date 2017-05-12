@@ -1,0 +1,51 @@
+Games-SGF
+
+Games::SGF is a generic Smart Game Format(SGF) Parser. It implements all 
+FF[4] general properties. It is also bundled with some modules for implementing
+some game specific features. There is also a Utility module which contains
+some useful tools that did not fit in Games::SGF.
+
+MODULES INCLUDED
+
+Games::SGF
+Games::SGF::Util
+Games::SGF::Go
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Games::SGF
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-SGF
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Games-SGF
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Games-SGF
+
+    Search CPAN
+        http://search.cpan.org/dist/Games-SGF
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 David Whitcomb
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,15 @@
+Revision history for Perl extension Games::EternalLands::PathFinder.
+
+0.02 Thu Aug 31 13:34:03 EST 2006
+   - Rewrote pathfinding in C for dramatic
+     performance gain
+   - added the ability to turn off the tradeing functions
+   - added inter-map path finding - still buggy but
+     works ok
+   - changed to unbuffered IO - duh !
+   - Change the way PM's are sent to comply with server
+     restrictions
+
+0.01 Sat Jul 29 12:26:50 2006
+   Initial proof of concept version
+

@@ -1,0 +1,3 @@
+Enable regular messages to inform the user of progress made. These may
+be in simple text form, or where appropriate, progress bars or the like
+may be used (when connected to a suitable terminal).

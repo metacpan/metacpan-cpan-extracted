@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.63.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 e657fcb27e8e430a1b233d08c04c8dfba7413e69 Changes
+SHA1 7a10bf3c4cea2210674052df6dd71e26aab71df3 MANIFEST
+SHA1 e6e7c2904ea5d300c0ddf70fc5a80f5005229aa9 MANIFEST.SKIP
+SHA1 b580d2ec8fcadc195891fdf1fe40b306da975be2 META.yml
+SHA1 1c1f5366b77e2bfae5c96f9b2d73987532f59b90 Makefile.PL
+SHA1 cebba7f60e1f333f60ce1a8c568aa9c44854a9d8 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 e19f072c3d8e600c5ec7e9ce6b8d3bc23fe58022 debian/control
+SHA1 2ba69213378a2174725be1c9a3b5012977afdd5f debian/copyright
+SHA1 9dd98eb301fd29eb9e2eb223ca388126eb0b3a24 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 a022b41895e5e4911a22580adab4f7a81b3a4203 debian/watch
+SHA1 d7a15e35494eb68e04506ea48899bc8f4bb2c6fe devel/run.pl
+SHA1 7b83ea3570c34c40400fbcf4cc2ea54527d48608 devel/screenshot.pl
+SHA1 9af8e3b7b4b48a0992f48b34ba0acb6ef25eecdd devel/tearoff.pl
+SHA1 476829da4dc04b8cfb7bbee13ada5a2e77f41cfe devel/vert.pl
+SHA1 1b600ed0563899c740d6abd0fc6910de9be62e37 examples/settings.pl
+SHA1 7dc4c8f846aa7c724efad0516ff7fb6ad46356f0 examples/simple.pl
+SHA1 c1d4db56f7e7c3fb8a1e648703ab23ae2e4c73b9 examples/vertical.pl
+SHA1 78799545010992cffca900fc4e2e96667e069b54 inc/MyMakeMakerExtras.pm
+SHA1 692a1ddc2ca6b98cac7b48ea40bc1ac1509e8ed9 inc/my_pod2html
+SHA1 a4cc3ec57049fb20a6509dfa169ab8b1c76f1dd7 lib/Gtk2/Ex/Dashes.pm
+SHA1 11ce7283804218c1c06072ca978327ab018c8747 lib/Gtk2/Ex/Dashes/MenuItem.pm
+SHA1 16f1216ba22a227ddf3f912ed50112a56ccf5634 t/Dashes-weaken.t
+SHA1 004f28136120b78ef87545cf44c6f55b22b2cb43 t/Dashes.t
+SHA1 a8088b5e76b4c10322aabb769e3ee10f1150ce92 t/MenuItem-weaken.t
+SHA1 c6e8d22ce0dc1781b8cd9325dc36fa24cad4e72e t/MenuItem.t
+SHA1 cc9d34bca6c40211dd6aa8fee844bb1a7f908461 t/MyTestHelpers.pm
+SHA1 9127f78a0dfa04976acbb979dd7862ef59a74c58 xt/0-META-read.t
+SHA1 37abd43b41068804ea4bb099fdd89af21be82926 xt/0-Test-DistManifest.t
+SHA1 8f93fb4c8f0424a4442cc93c9a2e86342ef55281 xt/0-Test-Pod.t
+SHA1 1de8f07883f6bf1a2ef79f2cb8adf1deb3f61cee xt/0-Test-Synopsis.t
+SHA1 fb517c2fae5ddac559318bf6a224949115ea3129 xt/0-Test-YAML-Meta.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFMkUBsLFMCIV9q3ToRAoPnAJsFeYrrF9/PSsjHS7XG0lT2bHAYkACfZhFE
+d5s8xIa50SyK47a0NsoGP8Y=
+=6Q2E
+-----END PGP SIGNATURE-----

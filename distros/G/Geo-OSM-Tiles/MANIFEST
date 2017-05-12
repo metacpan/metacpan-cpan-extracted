@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+downloadosmtiles.pl
+lib/Geo/OSM/Tiles.pm
+t/00-signature.t
+t/10-Geo-OSM-Tiles.t
+t/20-downloadosmtiles.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

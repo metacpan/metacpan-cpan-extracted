@@ -1,0 +1,9 @@
+MANIFEST                        this file
+README                          quick introduction to this package, including installation
+Changes                         change history (such as it is...)
+Makefile.PL                     source for MakeMaker (run "perl Makefile.PL" to build this package)
+AGATourn.pm                     perl module to create American Go Association tournament objects
+t/Games-Go-AGA-AGATourn.t       tests for AGATourn
+t/register.tde                  used during AGATourn test
+t/1.tde                         used during AGATourn test
+META.yml                        Module meta-data (added by MakeMaker)

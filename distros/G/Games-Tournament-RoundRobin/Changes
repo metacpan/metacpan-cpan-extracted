@@ -1,0 +1,9 @@
+Revision history for Games-RoundRobin-Schedule
+
+0.01    10 Feb 2006
+        First version, released to CPAN by Dr Bean.
+	Next version should be able to add members to league, handle venues.
+
+0.02    6 Mar 2009
+        wholeSchedule, byelessSchedule from Richard Möhn
+

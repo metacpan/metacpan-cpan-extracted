@@ -1,0 +1,129 @@
+Revision history for Graph-Weighted:
+
+0.9   2017-03-07
+    - Actually allow non-numeric keys and connections!
+    - Display the node label, if there is one, in dump().
+    - Add the 02-alpha-keys.t test.
+
+0.8   2017-03-01
+    - Add eg/random
+    - Add and use the dump() function.
+
+0.7001 2016-02-03
+    - Fixed multi-attribute tests.
+    - Improved documentation.
+
+0.70  2016-02-02
+    - Allowed a graph to have multiple labels.
+    - Tested hash attribute/label setting.
+
+0.6001 2016-02-01
+    - Improved documentation.
+    - Removed the redundant get_weight() method.
+
+0.60  2015-10-14
+    - Add support for population with Math::MatrixReal objects.
+
+0.5907 2015-10-09
+    - Improved documentation.
+    - Updated code in the eg/ examples directory with MST.
+
+0.5906 2015-10-09
+    - Improved documentation ever so slightly.
+
+0.5905 2015-10-09
+    - Added a handy Shortest Paths example section to the POD.
+    - Updated code in the eg/ examples directory with other SP methods.
+
+0.5904 2015-10-05
+    - Illustrate SP_Dijkstra in eg/.
+    - Improved documentation.
+
+0.5903 2015-10-03
+    - Removed the unneeded new() method.
+
+0.5902 2015-10-03
+    - Improved documentation.
+    - Used Carp::croak instead of warn/die.
+
+0.5901 2015-10-03
+    - Removed the old-school "debug mode."
+    - Added missing attribute to path cost.
+
+0.59  2015-10-03
+    - Added the ability to label nodes.
+    - Skip the dist.ini and github readme files.
+
+0.5802 2015-10-02
+    - Corrected documentation!
+
+0.5801 2015-10-02
+    - Improved documentation.
+
+0.58  2015-10-02
+    - Renamed get_attr() to get_cost().
+    - Renamed path_attr() to path_cost().
+
+0.57  2015-10-02
+    - Renamed span() to vertex_span().
+    - Added the edge_span() method.
+
+0.5601 2015-10-02
+    - Fixed SYNOPSIS typo.
+
+0.56  2015-10-02
+    - Added the path_attr() method.
+
+0.55  2015-09-30
+    - Implemented the span() method that returns the lightest and
+      heaviest vertices.
+    - Vastly simplified the population test.
+
+0.54  2015-09-30
+    - Replaced constant with Readonly and base with parent.
+    - Improved documentation.
+    - Removed the confusing and unnecessary vertex_method and
+      edge_method logic.
+    - Allow population with Math::Matrix objects.
+
+0.5303 2014-08-30
+    - Improved documentation!
+
+0.5301 Aug 8, 2012
+    - Improved documentation.
+    - Tested for terminal values.
+
+0.53 Aug 8, 2012
+    - Added dzil helper plugins to dist creation.
+    - Used (and test) both vertex and edge methods!
+    - Fixed up POD.
+    - Handled terminal nodes for hash datapoints.
+
+0.5201 May 18, 2012
+    - Made get_attr() return zero if no attribute value is found.
+    - Simplified the example script.
+    - Improved POD.
+
+0.52 May 17, 2012
+    - Removed polar chart examples.
+    - Enabled data hash handling.
+    - Improved POD.
+
+0.51 May 15, 2012
+    - Allowed weighting of both edges and vertices.
+
+0.5 May 14, 2012
+    - Starting over with simplified bits and dzil based distribution.
+
+0.0902_1.tar.gz            29-Sep-2004 19:03  3.2K
+0.09.tar.gz                31-Jul-2003 12:18   10K
+0.08.tar.gz                11-Jul-2003 16:43   10K
+0.07.tar.gz                10-Jul-2003 19:16  9.9K
+0.06.tar.gz                10-Jul-2003 09:17  9.0K
+0.05.tar.gz                09-Jul-2003 20:38  8.9K
+0.4.tar.gz                 05-Jul-2003 09:33   59K
+0.3.tar.gz                 04-Jul-2003 19:34   11K
+0.2.tar.gz                 04-Jul-2003 16:50   12K
+0.01.2.tar.gz              04-Jul-2003 13:16  7.4K
+0.01.1.tar.gz              04-Jul-2003 08:39  7.4K
+0.01.tar.gz                03-Jul-2003 17:37  7.2K

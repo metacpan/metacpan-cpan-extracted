@@ -1,0 +1,13 @@
+0.03 2015-09-29T11:58:07+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.02 2014-12-13T11:20:57+01:00
+ - Add tests.
+ - Update LICENSE AND COPYRIGHT section in doc to my standard.
+ - Update Module::Install to 1.14 version.
+
+0.01 2014-08-29T23:50:44+02:00
+ - First version.

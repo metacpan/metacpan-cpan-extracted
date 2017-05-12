@@ -1,0 +1,113 @@
+Glade::Two::Generate Gtk2-Perl UI builder and source generator
+------------------------------------------------------------
+# Copyright (c) 2002 - Dermot Musgrove <dermot.musgrove at virgin.net>
+#
+# This library is released under the same conditions as Perl, that
+# is, either of the following:
+#
+# a) the GNU General Public License as published by the Free
+# Software Foundation; either version 1, or (at your option) any
+# later version.
+#
+# b) the Artistic License.
+#
+# If you use this library in a commercial enterprise, you are invited,
+# but not required, to pay what you feel is a reasonable fee to perl.org
+# to ensure that useful software is available now and in the future. 
+#
+# (visit http://www.perl.org/ or email donors at perlmongers.org for details)
+#
+SEE ALSO
+--------
+Documentation/Changelog          # History of the changes made
+Documentation/COPYING            # How we encourage copying
+Documentation/FAQ                # Frequently asked questions
+Documentation/FAQ.i18n           # FAQs about internationalisation
+Documentation/INSTALL            # How to install the module
+Documentation/Gtk-Perl-Docs.html # Some pointers to Gtk-Perl documentation
+Documentation/NEWS               # What is new in each version
+Documentation/README             # This file
+Documentation/ROADMAP            # Where will the module go?
+Documentation/TODO               # What still must be done <sigh>
+
+bin/glade2perl-1                 # For examples of user options
+
+Also the example projects in Example/ directory
+
+Glade::Two::Generate is a module that will read a glade-interface XML 
+file, build the UI and/or write the perl source to create the UI later and
+handle signals. It also creates an 'App' and an 'App subclass' that
+you can edit and documentation and distribution files.
+
+It is made up of two main packages. Glade::Two::Generate does the clever 
+stuff and Glade::Two::Run has some run-time utilities that are needed 
+by Glade::Two::Generate and also by your generated modules.
+There are several support modules for PerlGenerate that read the XML, build the 
+UI, write the source and handle the project options.
+
+There are several options
+1) Simply show and run the interface. Any missing signal handlers are
+   hijacked to show a simple message box.
+
+2) Write several perl class files. 
+   A) ProjectUI.pm   - the UI constructor class
+   B) ProjectSIGS.pm - utilities and skeleton signal handlers
+   C) Project.pm     - a base for your app that you can edit
+   D) SubProject.pm  - an example subclass of your app that you can edit
+   
+   If you specifiy &STDOUT as the output filename all the generated code will 
+   be written to STDOUT but of course you will have nothing to run later.
+
+3) Do both of the above.
+
+4) Generate (2 above) from Glade's 'Build' button.
+
+EDITING
+-------
+The source code is generated with tabs replacing spaces at the rate specified 
+by the user option 'tabwidth' (default 8) so your editor should be set to the
+same tabwidth if the generated source is to look correct.
+
+Read the file test.pl for some examples of how to use Glade::PerlGenerate.
+
+REQUIREMENTS (what I use but older versions work)
+-------------------------
+Package         I use   available from
+-------         ------  --------------
+Glade           1.1.3   Gnome mirrors or http://glade.gnome.org/
+                        Built with Gnome widgets enabled
+Glib/Gtk+       2.0.7   ftp://ftp.gimp.org/pub/
+gnome-libs              Gnome mirrors or Gnome.org CVS 
+                        If you use RPMs you will need gnome-libs-devel too but 
+                        you probably worked this out while building Glade and 
+                        Gtk-Perl :)
+Gtk-Perl        0.01    CPAN or http://www.sourceforge.net/prdownloads/gtk2-perl
+Perl            5.6.1   CPAN
+XML::Parser     2.31    CPAN
+Unicode::String 2.06    CPAN (optionally used for I18N)
+
+ACKNOWLEDGEMENTS
+----------------
+Doesn't the world seem a richer place with the beautiful contributions of 
+these creative people? I have only mentioned the most obvious names and I
+apologise to those who I have missed out.
+
+Glade       Damon Chaplin <damon at ximian.com> Main author
+            Martijn van Beers <martijn at earthling.net> Part of the source code 
+            output, some popup menu functions, and the widget tree view.
+GTK         Copyright - Peter Mattis, Spencer Kimball and Josh MacDonald
+gnome-libs  Too many to list, check the AUTHORS file in the dist
+Gtk2-Perl   
+
+Perl        Larry Wall <larry at wall.org>, with the help of oodles of other folks
+XML::Parser Larry Wall <larry at wall.org> wrote version 1.0.
+            Clark Cooper <coopercl at sch.ge.com> picked up support, changed the 
+            API for this version (2.x), provided documentation, and added
+            some standard package features.
+
+AUTHOR
+------
+Dermot Musgrove <dermot at glade.perl.connectfree.net>
+Dermot Musgrove <dermot.musgrove at virgin.net>
+
+Errors, omissions and general stupidity are all my fault - sorry.

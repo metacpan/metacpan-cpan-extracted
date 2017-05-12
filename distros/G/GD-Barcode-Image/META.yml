@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                GD-Barcode-Image
+version:             1.03
+abstract:            Script to create images of barcodes
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    GD:                            0
+    GD::Barcode:                   0
+    Image::Magick:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Avinash Chopde <avinash@acm.org>

@@ -1,0 +1,48 @@
+NAME
+    Geo::Coordinates::Converter::Format::Geohash - Geohash support for
+    Geo::Coordinates::Converter
+
+SYNOPSIS
+      use Geo::Coordinates::Converter;
+      use Geo::Coordinates::Converter::Point::Geohash;
+
+      Geo::Coordinates::Converter->add_default_formats('Geohash');
+      my $geo = Geo::Coordinates::Converter->new(
+          point => Geo::Coordinates::Converter::Point::Geohash->new({
+              geohash => 'xn76gg',
+          }),
+      );
+      $geo->format('dms');
+      say $geo->lat; # 35.39.31.948
+      say $geo->lon; # 139.44.26.162
+
+    lat/lng to geohash
+
+      my $geo = Geo::Coordinates::Converter->new(
+          lat => '35.658875', lng => '139.740601',
+      );
+      $geo->format('geohash');
+      say $geo->point->geohash; # xn76ggs00006
+
+DESCRIPTION
+    Geo::Coordinates::Converter::Format::Geohash is encodes and decodes
+    geohash locations.
+
+    Geo::Coordinates::Converter::Format:Geohash uses Geohash as a backend
+    module. You can easy choose of Pure-Perl implement or XS implement by
+    Geohash.
+
+    I attached Geo::Coordinates::Converter::Point::Geohash which expanded
+    Geo::Coordinates::Converter::Point, and could treat geohash.
+
+AUTHOR
+    Kazuhiro Osawa <yappo {at} shibuya {dot} pl>
+
+SEE ALSO
+    Geohash, Geo::Coordinates::Converter::Point::Geohash,
+    Geo::Coordinates::Converter
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

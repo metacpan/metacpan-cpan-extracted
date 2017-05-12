@@ -1,0 +1,3 @@
+EGG_TYPE_TRAY_MANAGER	EggTrayManager	GObject		Gtk2::TrayManager
+EGG_TYPE_TRAY_MANAGER_CHILD	EggTrayManagerChild	GObject		Gtk2::TrayManager::Child
+

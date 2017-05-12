@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>How can I pass in my username and password?</TITLE>
+</HEAD>
+<BODY>
+<H1>How can I pass in my username and password?</H1>
+
+<p>The USER and PASSWORD modifiers are used together, like this:
+
+<p>GET USER myname PASSWORD mypass &lt;rest of command&gt;
+
+<p>For example:
+
+<p>GET USER terry PASSWORD foo http://www.wherever.com
+
+<p>Passwords, like everything else in GetWeb, are not necessarily
+private, because:
+
+<ul>
+<li>GetWeb logs all transactions locally
+<li>GetWeb's HTTP transactions with the server are unencrypted and may be intercepted by people on the internet
+</ul>
+
+<p>Plus, if your email goes through the internet backbone, your email
+may be read by anyone at intermediate internet hosts as it hops from
+host to host on the way to the internet. (Look at the 'Received'
+headers and see all the machines email travels through.) So, don't
+send any sensitive information over this insecure channel.
+
+<p><A HREF=HELP.html>Back to the main help page</A>
+</BODY>
+</HTML>

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Produces charts with GD",
+   "author" : [
+      "Martien Verbruggen <mgjv@tradingpost.com.au>",
+      "Benjamin Warfield <bwarfield@cpan.org>",
+      "Ruslan Zakirov <Ruslan.Zakirov@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GDGraph",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.76"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.76"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GD" : "1.18",
+            "GD::Text" : "0.80"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0.30",
+            "FindBin" : "0",
+            "Test::Exception" : "0.40",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-GDGraph@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=GDGraph"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ruz/GDGraph.git",
+         "web" : "https://github.com/ruz/GDGraph"
+      }
+   },
+   "version" : "1.54",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

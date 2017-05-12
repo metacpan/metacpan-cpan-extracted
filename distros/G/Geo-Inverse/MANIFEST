@@ -1,0 +1,8 @@
+CHANGES
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+lib/Geo/Inverse.pm
+t/base.t

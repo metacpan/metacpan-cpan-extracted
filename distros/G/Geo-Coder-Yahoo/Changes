@@ -1,0 +1,59 @@
+Revision history for Geo-Coder-Yahoo
+
+0.50    November 5, 2010
+        - More utf8.t test trouble (no code changes)
+
+0.49    October 29, 2010
+        - Add JSON requirement for the ygeocode tool
+
+0.48    September 18, 2010
+        - Add `ygeocode` utility
+        - Add note about Placefinder API to documentation 
+
+0.47    August 18, 2010
+        - Require latest Yahoo::Search::XML to fix some parsing bugs (RT#37990)
+        - Disable utf8 test that didn't work on older perls
+
+0.46    August 2, 2010
+        - Add ua method as attribute accessor (Tim Bunce)
+
+0.45    2010/06/14
+        - Require Yahoo::Search::XML 20100612 (Yahoo::Search 1.11.3)
+          which fixes utf8-encoding.
+        - Add on_error callback.
+        - geocode() now always returns scalar, i.e., undef on error.
+
+0.44    2009/01/31
+        - Fix subclass test
+        - Minor documentation updates
+
+0.43    2009/01/12
+        - Allow the module to be subclassed (oops). Thanks to Jay
+          Shirley for noticing.
+
+0.42    2008/11/10
+        - Add another utf8 test (Slaven Rezic)
+        - For more consistent utf8 handling, require URI 1.36
+
+0.41    2008/07/17
+        - Decode utf8 data from Yahoo (Slaven Rezic)
+          (note that the Yahoo API doesn't seem to accept
+           utf8 data in parameters)
+
+0.40    2008/07/13
+        - Add more tests
+        - Update documentation (repository moved to git  etc)
+        - Update Makefile.PL with license and more prereqs
+
+0.03    2007/11/14
+        - Update tests to match the data in the API
+
+0.02    2006/07/23
+        - Use proxy settings from the environment variables, see the
+          ENVIRONMENT section in the LWP documentation (Leonard A Jaffe)
+        - Remove Yahoo::Search::XML hack, require Yahoo::Search 1.5.8.
+        - Documentation tweaks
+
+0.01    2005/11/16
+        - First version, released on an unsuspecting world.
+

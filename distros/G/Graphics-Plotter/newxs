@@ -1,0 +1,46 @@
+#! /usr/bin/perl
+#
+# Include new and DESTROY function for the given class
+
+my $classtop = shift(@ARGV) || die "Usage: $0 class\n";
+my $class = $classtop . "Plotter";
+
+my $xsub =<<'END'; 
+
+MODULE = Graphics::Plotter		PACKAGE = Graphics::Plotter::$classtop
+
+$class *
+$class::new(infile = 0, outfile = 0, errfile = 0)
+   CASE: items == 1
+	CODE:
+	RETVAL = new $class();
+	OUTPUT:
+	RETVAL
+   CASE: items == 2
+	FILE	*	infile;
+	CODE:
+	RETVAL = new $class(infile);
+	OUTPUT:
+	RETVAL
+   CASE: items == 3
+	CODE:
+	croak("Usage: $class::new([outfile = STDOUT]|[infile, outfile, errfile])");
+   CASE: items == 4
+	FILE	*	infile;
+	FILE	*	outfile;
+	FILE	*	errfile;
+	CODE:
+	RETVAL = new $class(infile, outfile, errfile);
+	OUTPUT:
+	RETVAL
+
+void
+$class::DESTROY()
+
+END
+
+$xsub =~ s/\$classtop/$classtop/g;
+$xsub =~ s/\$class/$class/g;
+
+print $xsub;
+

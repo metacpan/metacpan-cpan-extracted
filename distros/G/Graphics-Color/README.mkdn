@@ -1,0 +1,73 @@
+# NAME
+
+Graphics::Color - Device and library agnostic color spaces.
+
+# VERSION
+
+version 0.31
+
+# SYNOPSIS
+
+    my $color = Graphics::Color::RGB->new(
+        red => .5, green => .5, blue => .5, alpha => .5
+    );
+    say $color->as_string;
+
+# DESCRIPTION
+
+Graphics color is a device and library agnostic system for creating and
+manipulating colors in various color spaces.
+
+# DISCLAIMER
+
+I'm not an art student or a wizard of arcane color knowledge.  I'm a normal
+programmer with a penchant for things graphical.  Hence this module is likely
+incomplete in some places.  Patches are encouraged.  I've intentions of adding
+more color spaces as well as conversion routines (where applicable).
+
+# COLOR TYPES
+
+The following color types are supported.
+
+[CMYK](https://metacpan.org/pod/Graphics::Color::CMYK)
+
+[HSL](https://metacpan.org/pod/Graphics::Color::HSL)
+
+[HSV](https://metacpan.org/pod/Graphics::Color::HSV)
+
+[RGB](https://metacpan.org/pod/Graphics::Color::RGB)
+
+[YIQ](https://metacpan.org/pod/Graphics::Color::YIQ)
+
+[YUV](https://metacpan.org/pod/Graphics::Color::YUV)
+
+# METHODS
+
+## derive
+
+Clone this color but allow one of more of it's attributes to change by passing
+in a hashref of options:
+
+    my $new = $color->derive({ attr => $newvalue });
+
+The returned color will be identical to the cloned one, save the attributes
+specified.
+
+## equal\_to
+
+Compares this color to the provided one.  Returns 1 if true, else 0;
+
+## not\_equal\_to
+
+The opposite of equal\_to.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

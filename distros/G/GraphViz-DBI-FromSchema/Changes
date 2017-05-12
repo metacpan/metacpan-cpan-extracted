@@ -1,0 +1,14 @@
+= GraphViz-DBI-FromSchema Changes =
+
+== 0.01 ==
+
+* initial release
+
+== 0.02 ==
+
+* ooops: correctly declare dependency on GraphViz::DBI
+
+== 0.5 ==
+
+* Works with Postgres
+* schema_diagram command

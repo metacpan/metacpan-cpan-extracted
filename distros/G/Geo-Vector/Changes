@@ -1,0 +1,10 @@
+Revision history for Perl extension Geo::Vector.
+
+0.01  Wed Sep  7 16:17:44 2005
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -n Geo::Vector ral_vd -lral
+0.02  Oct 2005
+0.41  Mar 6 2006
+	- version number is the same across libral ... Gtk2::Ex::Geo
+0.50 Oct 30 2006
+0.61 release Jul 1 2007

@@ -1,0 +1,28 @@
+Revision history for Games-Word-PhraseList
+
+0.05    2016-02-05 (PERLANCAR)
+
+        - No functional changes.
+
+        - Re-upload (accidentally removed from CPAN).
+
+
+0.04    2014-08-10 (SHARYANTO)
+
+        - Double derp, wrong dist name.
+
+
+0.03    2014-08-10 (SHARYANTO)
+
+        - Derp, forgot to add one more important method: is_phrase.
+
+
+0.02    2014-08-10 (SHARYANTO)
+
+        - Add & document some methods: phrases, random_phrase, each_phrase,
+          phrases_like.
+
+
+0.01    2014-08-10 (SHARYANTO)
+
+        - First release.

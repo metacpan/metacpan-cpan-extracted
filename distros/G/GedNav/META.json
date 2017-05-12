@@ -1,0 +1,50 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GedNav",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Date::Manip" : "0",
+            "File::Basename" : "0",
+            "FileHandle" : "0",
+            "GDBM_File" : "0",
+            "POSIX" : "0",
+            "Roman" : "0",
+            "Text::Soundex" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

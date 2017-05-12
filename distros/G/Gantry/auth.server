@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use strict;
+
+use lib qw( lib );
+
+use Gantry qw{ -Engine=CGI -TemplateEngine=TT };
+
+use Gantry::Server;
+use Gantry::Engine::CGI;
+
+my $cgi = Gantry::Engine::CGI->new( {
+    config => {
+        auth_dbconn => 'dbi:SQLite:dbname=docs/auth.sqlite.db',
+        auth_dbuser => '',
+        template_wrapper => 'gantry_wrapper.tt',
+        app_name => 'Auth',
+        root => 'root/moxie:root',
+    },
+    locations => {
+        '/users'    => 'Gantry::Control::C::Users',
+        '/groups'   => 'Gantry::Control::C::Groups',
+        '/pages'    => 'Gantry::Control::C::Pages',
+    },
+} );
+
+my $port = shift || 8080;
+
+my $server = Gantry::Server->new( $port );
+$server->set_engine_object( $cgi );
+
+print STDERR "Available urls:\n";
+foreach my $k ( keys %{ $cgi->{locations}     } ) {
+    print STDERR  "  http://localhost:${port}$k\n";
+}
+print STDERR "\n";
+
+$server->run();

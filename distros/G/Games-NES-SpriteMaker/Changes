@@ -1,0 +1,7 @@
+Revision history for Games-NES-SpriteMaker
+
+0.02  2014-10-11
+      - Fix transparency in pgm/ppm files
+
+0.01  2014-10-08
+      - Initial release

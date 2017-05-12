@@ -1,0 +1,29 @@
+---
+abstract: 'use Geography::States without warnings'
+author:
+  - 'Sam Kington <skington@cpan.org>'
+build_requires:
+  Geography::States: 0
+  Test::More: 0
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  perl: 5.010
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geography-States-NoUnicodeWarnings
+requires:
+  Geography::States: 0
+  Module::Load: 0
+  open: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/skington/geography-states-nounicodewarnings
+  repository: https://github.com/skington/geography-states-nounicodewarnings.git
+version: 0.004

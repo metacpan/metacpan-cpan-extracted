@@ -1,0 +1,104 @@
+$name   = 'HD';
+$author = 'Huai-di';
+
+require 'Drones.bm';
+
+$a = int(rand(2));
+sub main {        
+    enable shield;
+    call turn;    
+    move forward;
+    scan front;  
+
+    if (&found('enemy')) {
+        fire energy * 2 if &inperim('enemy');
+        if ($a == 0) {                       
+                disable shield;
+            fire bazooka if $ammo >= 10 and $fuel >= 300;
+            else {     
+                fire grenade;
+                }            
+                enable shield;
+        }                     
+        $b = int(rand(2));
+        if ($b == 0) {    
+            turn right;
+        }              
+        else {
+            turn left;
+        }             
+        redo;
+    }        
+    elsif (&found('vault|flag')) {
+        if (&damaged == 0 and &found('flag')) {
+           move backward;                      
+           fire energy;  
+        }              
+        call fetch;
+    }              
+    elsif (&found('wall|mine')) {
+        fire energy if $a == 1 and &found('mine');
+            $c == int(rand(2));                   
+        if ($c == 0) {         
+            turn right;
+        }              
+        else {
+            turn left;
+        }             
+        redo;
+    }        
+    elsif (&found('fence') and $a == 0) {
+            fire laser;                  
+    }                  
+    redo;
+}        
+
+
+sub turn {
+    fire energy if &inperim('enemy');
+    $xx = $enemy_x - $x;             
+    $yy = $enemy_y - $y;
+    if (abs($xx) > abs($yy)) {
+        if ($xx > 0) {
+            turn left if $h == 2;
+            turn right if $h == 8;
+            if ($h == 4) {        
+                turn right * 2;
+            }                  
+        }    
+        else {
+            turn left if $h == 8;
+            turn right if $h == 2;
+            if ($h == 6) {        
+                turn right * 2;
+            }                  
+        }    
+    }    
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {           
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {        
+                turn right * 2;
+            }                  
+        }    
+    }    
+    elsif (abs($yy) > abs($xx)) {
+        if ($yy > 0) {           
+            turn left if $h == 4;
+            turn right if $h == 6;
+            if ($h == 8) {        
+                turn right * 2;
+            }                  
+        }    
+        else {
+            turn left if $h == 6;
+            turn right if $h == 4;
+            if ($h == 2) {
+                turn right * 2;
+            }
+        }
+    }
+    
+    return;
+}

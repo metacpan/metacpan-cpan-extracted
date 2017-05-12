@@ -1,0 +1,36 @@
+Revision history for Grid-Transform
+
+0.09  Wed May 14 04:13:15 UTC 2014
+    - Removed call to non-standard MAX macro.
+
+0.08  Tue May 13 20:18:29 UTC 2014
+    - Fixed for perl >= 5.19.4. Arrays no longer use &PL_sv_undef to
+      represent unused slots.
+    - Fixed memory leak. Grid resizing is now destructive to extra elements.
+    - Updated ppport.h.
+
+0.07  Mon Sep 24 12:34:35 CDT 2007
+    - Updated ppport.h.
+    - Used warnings in tests.
+
+0.06  Sun Aug 5 20:18:27 GMT 2007
+    - Define PERL_NO_GET_CONTEXT for improved performance.
+    - Made author tests optional.
+
+0.05  Thu Aug 2 07:59:15 GMT 2007
+    - Implemented alternate_row_direciton and spiral in XS.
+    - Added tests for fold_right, fold_left
+
+0.04  Wed Aug 1 16:33:32 GMT 2007
+    - Hopeful fix for 'is not of type AVPtr' error under 5.6.
+
+0.03  Tue Jul 31 05:12:16 GMT 2007
+    - Updated META.yml to comply with new spec.
+    - Added perl implementations of alternate_row_direction and spiral.
+    - Added a kwalitee test.
+
+0.02  Fri Apr 7 16:25:40 GMT 2006
+    - Added fold_right, fold_left.
+
+0.01  Sun Apr 2 16:01:39 GMT 2006
+    - Initial distribution.

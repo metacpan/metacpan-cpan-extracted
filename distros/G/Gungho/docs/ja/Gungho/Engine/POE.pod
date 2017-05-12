@@ -1,0 +1,187 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Engine::POE.ja - Gungho用POEエンジン
+
+=head1 SYNOPSIS
+
+  engine:
+    module: POE
+    config:
+      loop_delay: 5 
+      client:
+        spawn: 2
+        agent:
+          - AgentName1
+          - AgentName2
+        max_size: 16384
+        follow_redirect: 2
+        proxy: http://localhost:8080
+      keepalive:
+        keep_alive: 10
+        max_open: 200
+        max_per_host: 20
+        timeout: 10
+      dns:
+        # disable: 1 If you want to disable DNS resolution by Gungho
+
+=head1 DESCRIPTION
+
+Gunghog::Engine::POEはPOEを用いてGunghoを動かすためのモジュールです。
+
+=head1 CONFIGURATION
+
+Gungho::Engine::POEで使用可能な設定項目は以下の通りです：
+
+=head2 client.loop_delay
+
+C<client.loop_delay> はC<dispatch>が定期的に呼び出されるまでに待つ秒数を
+指定します。
+
+いつどれだけのリクエストが発生するのかわからず、なおかつリクエストが発生した
+直後にGungho内でリクエストを送信したい場合はこの値を小さめに設定する必要が
+あります。
+
+ただしこの値をあまり小さく設定してしまうとHTTP通信を行うより頻繁にC<dispatch>
+を呼び出す事になったり（HTTP通信のほうがおろそかになり、パフォーマンスが低下
+する）、 あまりにも膨大な量のリクエストを送信してしまうとGunghoより先の
+レイヤーでスピードが極端に遅くなったりする原因となり得ます。
+
+基本的にはあまり小さすぎるとかえってパフォーマンスが悪くなりますので注意して
+設定してください。
+
+=head2 client.spawn
+
+C<client.spawn> は内部で使用しているPOE::Component::Client::HTTPの数を指定
+します。POE::Component::Client::HTTPは１セッション毎にある程度以上のリクエスト
+を受け取ると反応が遅くなり始めるのでこれを回避するためにある程度のセッション数
+を作る必要が出てくる事があります。
+
+ただし、その先のネットワーク自体が遅くなっている可能性も高いのでこの値を
+極端に高くしたところでそれほどのパフォーマンスアップは見込めない場合もあります。
+
+ネットワーク帯域が余っている状態で、なおかつGungho単体でのHTTP通信が遅そうな
+場合のみこの値を大きくしてください。
+
+デフォルト値は２です。
+
+=head2 dns.disable
+
+DNS解決をしたい場合はこの値を1にしてください。一部の環境ではクライアント側での
+DNS解決が駄目でも経路にあるプロキシがDNS解決を行う等の設定がされており、これが
+問題となる事もあります。その際はこの項目を1に設定してください。
+
+デフォルト値は0です。
+
+=head2 keepalive
+
+C<keepalive>項目はPOE::Component::Client::Keepaliveを設定するために
+使用します。
+
+プロキシを通した環境でGunghoを使用している場合はこの設定が重要になってくる
+場合があります。Gungho::Engine::POEは内部で接続中のソケットを使い回すように
+作られていますが、もしプロキシにつなげる場合は接続対象サーバーがひとつなので、
+全てのリクエストが同一ソケットを使うようになってしまい、結果的に並列処理が
+できなくなります （透過型プロキシはこの対象に含まれません）。
+
+Gunghoはプロキシの使用を検出した場合はこの設定を自動的にするよう努力しますが、
+明示的に指定する場合は
+
+  keepalive:
+    keep_alive: 0
+
+と指定してください。その他のPOE::Component::Client::Keepalive設定を変更
+する場合は、以下のように設定してください
+
+  keepalive:
+    max_per_host: ....
+    max_open: ...
+    timeout: ...
+
+C<keepalive.timeout>項目を設定する場合はL<USING KEEPALIVE|USING KEEPALIVE>も
+参照してください。
+
+=head1 POE::Component::Client::HTTP AND DECODED CONTENTS
+
+POE::Component::Client::HTTP はバージョン0.80以降、取得したレスポンス内容を
+勝手にPerl Unicodeにデコードしてしまう事があります。その場合、たとえHTTP
+ヘッダー自体が以下のようになっていても、実際に渡ってくるデータ内容は
+正規化されたUnicodeである事があります：
+
+  Content-Type: text/html; charset=euc-jp
+
+これはPOE::Component::Client::HTTPがContent-Encodingをうまく処理しようとして
+行っている一連の動作の副作用なのですが、ヘッダーを信用してデコードをしてみたら
+エラーが起こる、もしくは文字化けが起こる等の現象の原因となり得ます。
+
+Gunghoではこの問題を回避するために以下の環境変数をチェックし、これらが
+正であれば回避策を動作させます。
+
+  GUNGHO_ENGINE_POE_SKIP_DECODE_CONTENT = 1
+  # or
+  GUNGHO_ENGINE_POE_FORCE_ENCODE_CONTENT = 1
+
+それぞれの挙動詳細についてはL<ENVIRONMENT VARIABLES|ENVIRONMENT VARIABLES>
+をご覧ください。
+
+=head1 SPECIFYING USER AGENT
+
+Gungho::Engine::POEはPOE::Component::Client::HTTPがそれを実装しているため、
+複数のユーザーエージェント名を使用する事ができますが、これは使用しないで
+ください。かわりにトップレベルの設定を使用してください：
+
+  user_agent: my_user_agent
+  engine:
+    module: POE
+    ...
+
+これを設定しないとRobotRulesのようなコンポーネントを使用する時に問題が生じる
+事があります。
+
+=head1 USING KEEPALIVE
+
+Gungho::Engine::POEは内部でPOE::Component::Client::Keepaliveを使用して
+ソケット接続を制御しています。
+
+ほとんどの設定はパフォーマンス以外特にユーザーの目に触れるものではありませんが、
+C<timeout>設定はエンジンが終了する時に影響する可能性もあります。C<timeout>値
+が高いとその接続が切れるまでPOE自体が活動を止められないのがその理由ですが、
+これは正常な動作です。
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 GUNGHO_ENGINE_POE_SKIP_DECODE_CONTENT
+
+この値が正となっている場合、GunghoはHTTP::Responseのネームスペース上に
+関数を作成し、decoded_content()を呼んでもデコードが行われないようにします。
+行儀は悪いですが、とりあえずこれでデコードは起こらなくなります。
+
+この回避策はデフォルトで有効になっています。
+
+=head2 GUNGHO_ENGINE_POE_FORCE_ENCODE_CONTENT
+
+この値が正となっている場合、Gunghoはhandle_responnse()に戻ってきたレスポンス
+をHandlerに渡す前にContent-Typeが指定する値にエンコードしなおします。
+
+この回避策はデフォルトで無効になっています。
+
+=head1 METHODS
+
+=head2 setup
+
+エンジンを初期化します。
+
+=head2 run
+
+メインループを開始します。
+
+=head2 send_request
+
+与えられたリクエストを処理します。
+
+=head1 TODO
+
+ファイルシステムへのHTTPレスポンスの格納
+
+=cut

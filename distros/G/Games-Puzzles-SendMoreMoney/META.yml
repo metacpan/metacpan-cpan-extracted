@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Games-Puzzles-SendMoreMoney
+version:             0.03
+abstract:            Solve SEND+MORE=MONEY problems
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Algorithm::FastPermute:        0.07
+    Log::Log4perl:                 1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <cpan@perlmeister.com>

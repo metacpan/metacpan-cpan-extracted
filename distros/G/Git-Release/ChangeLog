@@ -1,0 +1,24 @@
+
+
+0.05 日  8/19 21:13:25 2012
+
+- Added git-release script
+
+0.04 日  8/19 17:49:04 2012
+
+- Improved git-rc script
+- Supports remote tracking branch
+
+0.03 四  8/16 22:31:21 2012
+
+- Added git-site script.
+- Improved branch manager.
+- Added remote manager.
+- Added tracking_ref support.
+
+0.02 四  8/16 12:32:46 2012
+
+- Bug fixs
+- Document update.
+
+0.01 First Release

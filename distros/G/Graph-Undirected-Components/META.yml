@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Graph-Undirected-Components
+version:            0.31
+abstract:           Computes components of undirected graph.
+author:
+    - Jeff Kubina (jeff.kubina@gmail.com)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dump:      1.00
+    File::Path:      2.08
+    Log::Log4perl:   1.30
+    Sort::External:  0.18
+    Test::Simple:    0.44
+    Text::CSV:       1.21
+    Time::HiRes:     1.97
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

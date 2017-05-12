@@ -1,0 +1,140 @@
+Revision history for Perl module Git::PurePerl:
+
+0.53 Mon 19 Sep 2016 16:12:45 BST
+     - Add support for creating merge commits to Git::PurePerl::Object::Commit
+       (Philippe Bruhat (BooK))
+
+0.52 Sat Jun 11 22:22:04 CEST 2016
+     - fix 'Can't redeclare "my" in "my" ...' error in 5.24 (gregor herrmann)
+
+0.51 Fri Mar 6 13:58:39 CET 2015
+     - Fix failing test if there is no internet access (Bugdebugger)
+     - Update repository link in PurePerl.pm (Bugdebugger)
+     - Update repository link (Сергей Романов)
+
+0.50 Sat Jan 25 14:58:16 CET 2014
+     - Now with the changes from 0.49 in CHANGES. That's it.
+
+0.49 Sat Jan 25 14:55:42 CET 2014
+     - qw() in list context is an error now (gregor herrmann)
+     - Fixed RT#90667 (Zoffix Znet)
+
+0.48 Thu Jul 14 22:53:55 BST 2011
+     - Translation from Digest::SHA1 to Digest::SHA (Jonas Genannt)
+     - A git object can also be of zero size. (Christian Walde)
+     - Only the last SHA1 for any given ref is returned from
+       ref_sha1() (Christian Walde)
+     - Make sure zlib data is always read as-is (Christian Walde)
+
+0.47 Wed Aug 11 13:29:06 BST 2010
+     - Lazily build the fh attribute of Git::PurePerl::Pack objects.
+
+0.46_01 Sat 16 Jan 13:42:00 GMT 2010
+     - Add support for ssh:// and file:// protocols (Alex Vandiver)
+
+0.46 Tue 12 Jan 01:09:00 GMT 2010
+     - Add config file handling via Config::GitLike
+     - Fix a couple of memory leaks due to unweakened circular references.
+     - Handle commit object character encoding correctly
+
+0.45 Mon 21st Dec 12:36:29 GMT 2009
+     - Be Win32 compatible (RT#52677), patch contributed by kmx.
+
+0.44 Sat 19th Dec 15:31:00 GMT
+     - Fix ref_sha1 to return rather than calling next as not in a loop. (doy)
+     - Add support for the special HEAD ref, and associated head and
+       head_sha1 methods
+     - Grok symbolic references
+     - Default to the current directory in the checkout method
+
+0.43 Wed 25 Nov 2009 19:46:38 GMT 2009
+     - Switch to Module::Install so we can have repository metadata in
+       META.yml
+     - No other changes from the previous 0.42_01 dev release.
+
+0.42_01 Mon Nov 23 12:12:51 GMT 2009
+     - allow put_object to update other heads than just 'master'
+       (thanks to martijn)
+     - Fix bug when the ref dirs are more than two levels deep
+     - Fix commit object to support multiple parents.  This is seen in merge
+       commits
+     - Add object_kind method to tag objects.
+     - Change to MANIFEST.SKIP based dist building.
+     - Dev release with version bump skipping 0.42 so that Gitalist can depend
+       on >= 0.42 but we don't have to push a real release until I've done
+       a little more maintainance work.
+
+0.41 Tue Apr 21 20:41:07 BST 2009
+     - allow subdirectories in .git/refs/*/ (thanks to martijn)
+     - run protocol.t test with --base-path to not care about where
+       on the filesystem the checkout is (thanks to martijn)
+     - when parsing a commit, split up the author and committer
+       fields into name, email and commit time. This adds two new
+       DateTime fields, authored_time and committed_time to ::Commit
+       and changes the type of the author and committer fields to
+       Git::PurePerl::Actor, which is an object with name and
+       email fields (thanks to martijn)
+     - add the parent field to a new commit when available (thanks
+       to martijn)
+     - allow bare repositories with the gitdir parameter (thanks
+       to martijn)
+     - fill new commits with real author, authored_time, committer,
+       committed_time and comment (thanks to martijn)
+
+0.40 Fri Mar 13 15:29:02 GMT 2009
+     - Skip protocol tests on Win32 (thanks to fayland)
+     - Add description (thanks to fayland)
+
+0.39 Fri Mar 13 10:14:57 GMT 2009
+     - add a method to generate the sha1 of an object
+     - add a raw method to objects
+     - add new set of classes to add objects
+     - add class to talk the git protocol
+     - add a method to checkout the head
+     - add a method to return the references
+     - add a method to return the commit for a reference
+     - fix bug where it would not find an object if there was a
+       mixture of packs and loose objects
+     - fix bug to do with empty files
+     - split methods into those that returns sha1s and those that
+       return objects
+     - add class to index packs
+     - make it work under Win32 (thanks to fayland)
+
+0.38 Thu Dec 18 10:26:49 GMT 2008
+     - add init() method to create a new repository
+     - create Git::PurePerl::Loose to handle loose objects
+     - make Git::PurePerl::Pack's all_sha1s return a stream
+
+0.37 Fri Dec 12 16:18:02 GMT 2008
+     - add minimal docs (thanks to tokuhirom)
+     - speed everything up by making the classes immutable
+     - lazily build packs
+     - simplify the code by splitting pack index reading into
+       Git::PurePerl::PackIndex::Version1 and 
+       Git::PurePerl::PackIndex::Version2
+     - minor tidying of code
+
+0.36 Wed Nov 26 21:49:33 GMT 2008
+     - add a class to represent tags
+     - complain if the directory does not have a .git directory
+     - remove commented-out code
+     - only open a pack file or index once
+     - remove some unnecessary seeks
+
+0.35 Tue Nov 25 17:37:56 GMT 2008
+     - add Data::Stream::Bulk as a prerequisite
+     - add all_sha1s method
+
+0.34 Fri Nov 21 17:20:17 GMT 2008
+     - speed up finding objects in pack files by using a 
+       binary search algorithm
+
+0.33 Thu Nov 20 09:28:36 GMT 2008
+     - add support for version 2 pack index files
+     - add support for ref_delta objects in pack files
+     - add support for ofs_delta objects in pack files
+     - update with cleaner tars
+
+0.32 Fri Nov 14 16:47:59 GMT 2008
+     - initial release

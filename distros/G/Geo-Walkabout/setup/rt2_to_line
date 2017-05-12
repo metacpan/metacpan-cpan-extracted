@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Geo::Walkabout::Line;
+use Geo::Walkabout::Chain;
+use Geo::TigerLine::Record::2;
+use Carp;
+
+sub callback {
+    my($rt2, $num) = @_;
+
+    # Print every 100 records
+    unless( $num % 100 ) { 
+        local $| = 1;
+        printf "%6d records entered\r", $num;
+    }
+
+
+    my $line = Geo::Walkabout::Line->retrieve($rt2->tlid) || 
+      do { carp("Can't find line ". $rt2->tlid);  return; };
+
+    my @points = ();
+    for my $num (1..10) {
+        my $lat_meth = "lat$num";
+        my $long_meth = "long$num";
+
+        my $lat  = $rt2->$lat_meth();
+        my $long = $rt2->$long_meth();
+
+        # Rest of the fields are empty.
+        last if is_null($lat, $long);
+
+        push @points, [$lat, $long];
+    }
+
+    $line->chain->append_shape(@points);
+
+    $line->commit;
+}
+
+sub is_null {
+    my($lat, $long) = @_;
+
+    my $null = 1;
+    foreach my $coord ($lat, $long) {
+        $null = 0 unless $coord =~ /^\+0+$/;
+    }
+
+    return $null;
+}
+        
+Geo::TigerLine::Record::2->parse_file(*STDIN, \&callback);
+Geo::Walkabout::Line->db_Main->commit;

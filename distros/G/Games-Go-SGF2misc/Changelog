@@ -1,0 +1,31 @@
+0.9782: Fri Jul 28 2011
+   - There were some bugs with as_html when rendering boards smaller than 19x19.
+
+0.9781: Fri Jun 04 2010
+   - hrm, there are serious critical flaws in Parse::Lex.  I wish this module
+     wasn't married to it.  Parse::Template::ppregexp intentionally changes !
+     to \! before it's ineserted in the template.  perl5.8.8 doesn't care at
+     all if (?<!blarg) is actually spelled (?<\!blarg) -- although, perhaps it
+     should -- but perl5.10 and up *does* care about that.
+   - I found a way to do blarg(?<!blarg) without a bang -- kindof.
+
+0.9780: Thu Jun 03 2010
+   - I hope CPAN thinkgs 0.9780>0.9.7.i
+
+0.9.7.i: Thu Jun 03 2010
+   - I really haven't worked on this project for a while.  Resurrecting it.
+   - There are problem better choices for SGF parsing on CPAN, but I have
+     this deployed in a lot of places, so it's worth it to keep it working
+     for me.  The largest part of the renewed interest is the fact that
+     Parse::Lex installs/tests correctly now.
+
+2006-05-12 07:28: 
+    To let us parse IGS SGFs out of the box, I made CoPyright[blather blather] equiv to FF[4]... *sigh*
+
+2006-03-09 13:58: 
+    I found a bug in the ref copy routine -- that omits comments from nodes returned by as_perl()!
+
+2005-01-19 16:20ish: 
+    The Many Faces of Go seems to generate SGFs that SGF2misc can't handle!
+    I'm working on it.  MFoG uses [tt] pass format.  Arguably, this is wrong, 
+    but according to the specs it's legal in FF[4].   So added.

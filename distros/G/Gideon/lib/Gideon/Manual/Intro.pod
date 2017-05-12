@@ -1,0 +1,171 @@
+package Gideon::Manual::Intro;
+
+#ABSTRACT: Gideon Manual Intro
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Gideon::Manual::Intro - Gideon Manual Intro
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 DESCRIPTION
+
+Writing code to retrieve objects from data stores, such as databases, is not
+only time consuming, but it is also tedious. Sometimes what it's even worst is
+the fact code is written in a way that only works with a particular data store or
+data store's dialect. This elevates the cost of maintaining that piece of code.
+
+Gideon aims to reduce your need to write, data store specific code in your
+application. It doesn't eliminate the needs to write such code and there are
+still plenty of applications where Gideon (or any other data mapper) will not be
+the best fit.
+
+=head2 Setup
+
+Setting up Gideon is really simple, all you need to do is register a data store
+and associate any Moose class to a particular data store.
+
+  # Registering a database
+  use Gideon::Registry;
+  my $dbh = DBI->connect(...);
+  Gideon::Registry->register_store( mydb => $dbh );
+
+The previous snippet of code is usually found in your application's start-up
+script. In this case we have registered a database connection under the C<mydb>
+name. The following thing you need to do is to associate any Moose class with
+C<mydb> data store. For example consider the following class
+
+  package MusicRecord;
+  use Moose;
+
+  has id => ( is => 'rw', isa => 'Num' );
+  has artist => (is => 'rw', isa => 'Str' );
+
+  1;
+
+In order to make associate that to C<mydb> the code needs to be changed to:
+
+  package MusicRecord;
+  use Gideon driver => 'DBI';
+
+  has id => ( 
+      is => 'rw', 
+      isa => 'Num', 
+      serial => 1, 
+      primary_key => 1,
+      traits => [ 'Gideon::DBI::Column' ]
+  );
+
+  has artist => ( 
+      is => 'rw',
+      column => 'artist_name',
+      isa => 'Str', 
+      traits => [ 'Gideon::DBI::Column' ]
+  );
+
+  __PACKAGE__->meta->store('mydb:musicrecord');
+  1;
+
+The disruption in your model is minimal. The particular details for a each data
+store vary, but the philosophy is the same. Let's break down into smaller pieces.
+
+  use Gideon driver => 'DBI';
+
+First of all, in order to reduce boilerplate code, Gideon exports Moose into your
+model class. The C<driver => 'DBI'> tells Gideon that this object will use the
+DBI driver to access the data store.
+
+  has id => ( 
+      is => 'rw', 
+      isa => 'Num', 
+      serial => 1, 
+      primary_key => 1,
+      traits => [ 'Gideon::DBI::Column' ]
+  );
+
+We added C<serial>, C<primary_key> and C<traits> meta-attributes to the id
+attribute of the class MusicRecord.
+
+In this case C<serial> is a hint for Gideon and tells that for new objects the 
+data store will provide the id. This is very common in the RDB world, in order
+to ensure consistency, the database provides the id for each inserted record.
+
+C<primary_key> is another hint for Gideon telling that this field is required
+to uniquely identify a particular record from another. This is helpful when
+trying to update or remove a particular object.
+
+Finally C<<traits => [ 'Gideon::DBI::Column']>> is necessary for each attribute
+that is persisted in the database and what's adds the other meta-attributes.
+
+  has artist => ( 
+      is => 'rw',
+      column => 'artist_name',
+      isa => 'Str', 
+      traits => [ 'Gideon::DBI::Column' ]
+  );
+
+The only different to the C<id> attribute is the C<column> option, The Gideon
+DBI driver allows you to use a mapping between your column names and attributes,
+in this case the attribute artist will be mapped to the column C<artist_name>. If
+not provided Gideon will assume that the attribute name is the column name.
+
+Finally to associate the class to a registered data store we need to incorporate
+the following code
+
+  __PACKAGE__->meta->store('mydb:musicrecord');
+
+Here C<mydb> is the data store and C<musicrecord> is the resource within the
+data store, in the case of DBI the resource is table name. And that's it, your
+application is ready to use.
+
+=head2 Using Gideon
+
+Gideon exports C<find>, C<find_one>, C<update> and C<remove> methods to your
+model classes and it's the common interface that all your classes will have
+regardless of the data store. Now all you need to do is operate in with your
+model classes using the API provided.
+
+  # Create a record
+  my $new_record = MusicRecord->new( artist => 'Coldplay' );
+  $new_record->save;
+
+  # Finding some records
+  my @beatles_albums = MusicRecord->find( artist => 'The Beatles');
+
+  # Updating records
+  $_->update( artist => 'The Beatles!') for @beatles_albums;
+
+  # Removing records
+  $new_record->remove;
+
+These are really basic use cases and they exhibit the full potential of Gideon,
+please refer to L<Gideon::Manual::Creating>, L<Gideon::Manual::Finding>, 
+L<Gideon::Manual::Updating> and L<Gideon::Manual::Removing> for a complete 
+explanation of those methods.
+
+=head1 NAME
+
+Gideon Intro
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 AUTHOR
+
+Mariano Wahlmann, Gines Razanov
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mariano Wahlmann, Gines Razanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

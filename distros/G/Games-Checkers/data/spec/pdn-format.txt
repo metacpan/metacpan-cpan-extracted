@@ -1,0 +1,160 @@
+[Taken from http://www.chessandcheckers.com/pdn.htm]
+
+PORTABLE DRAUGHTS NOTATION - A PGN FORMAT FOR CHECKERS
+------------------------------------------------------
+
+By A Millett. (This is my original proposal document for the standard)
+
+For my SAGE and DYNAMO programs I have implemented a new database format for
+storing the moves of games, called PDN - Portable Draughts Notation. This is
+based on the "Portable Game Notation" (PGN) standard which is widely used
+for Chess. . I suggest you get the PGNSTD.DOC (ie from
+caissa.onenet.net:/pub/chess/PGN/ ) for a full tech spec.. PDN is already
+used now by many other checkers (8x8 & 10x10) programs, and is becoming the
+standard way to swap games..
+
+I hope this format will get round the mess of different formats between
+programs - at the moment draughts programs cannot talk to each other, and
+there is no easy way for players to EMAIL each other games which can be
+readily imported into the users own program, without tedious re-typing. In
+the Chess world PGN has revolutionised the way game-info is used and
+published - players keep & exchange databases with thousand of games.
+
+Some simple samples are given below. In essence, after playing a game on
+SAGE it can be annotated - either on individual moves, or in the "header"
+detailing Players, Year, ELO, Result code, Event/other details - and then
+exported to a PDN file - if the file already exists, the new game is
+appended to the database. I can then be reloaded later - by selecting the
+nth game from the database, or with more sophisticated DB list/search
+functions. While playing the game, the PDN info is displayed in the
+move-list window.
+
+There are a few differences to the Chess format - moves are given in
+standerd numeric notation - multijumps can either be specified move-by-move
+(11x18 18x25) or in 1 go (11x25). Moves can be formatted thus: 11-18, 11x18,
+1118 - All legal possibilities. I suppose we can support c3-e5 later too.
+
+Move numbers end in a '.' to differenciate from game-moves. The 4 standerd
+result codes "1-0" "1/2-1/2" "0-1" "*" (game unfinished) are given from the
+aspect of the 1st side to move - Black in english draughts, White in Italian
+(SAGE plays DAMA ITALIANA too). The result code MUST appear at the end of
+the game - this is the game-terminator. Comments appear in {} brackets.
+
+If a game starts from a set-up position, a FEN header is given with the
+position - ie.. [SetUp "1"] [FEN "W:WK4,30:B27,22."] The FEN format must be
+"SIDE_TO_MOVE:W(pieces):B(pieces)." A K indicates a king. As I said, get the
+PGNSTD doc for full info on PGN. I welcome feedback on this issue!
+
+To differentiate between the different types of draughts/checkers, an optional
+tag pair "GameType" is added, with one of the above
+values attached. Futher optional information could follow, in this format:
+
+GameType "Type-number [,Start colour (W/B),Board width, Board height, Notation
+[,Invert-flag]]"
+
+Type-number:     this is one of the following type-numbers
+   0: Chess
+   1: Chinese chess
+   2-19: future chess expansion
+  20: 10x10 draughts (international)
+  21: English draughts (kings only move 1 step at a time)
+  22: Italian draughts (as English, Men cannot take kings, must capture max)
+  23: American pool draughts (as 10x10, not obliged to take max)
+  24: Spanish pool  draughts (as 10x10 rules, but men cannot capture backwards)
+  25: Russian draughts 
+  26: Brazilian 8x8  draughts (same as 10x10 rules)
+  27: Canadian 12x12  draughts (same as 10x10 rules)
+  28: Portugese draughts
+  29-49: Future draughts expansion
+  50: Othello
+  51..  Future expansion.
+
+Start-colour:    Either W or B - white/black side starts (can vary in draughts)
+Board-width:     Width of board..
+Board-height:    Height of board..
+Notation:        A=alpha/numeric like chess, N=numeric like draughts.
+                 S=SAN - short-form chess notation.
+                 Then follows a number 0-4 telling where square A1 or 1 is for
+                 the side who starts the game (White or black)
+                 0= Bottom left, 1=Bottom right, 2=Top left, 3=Top right..
+Invert-flag:     0 = play on dark squares (like english & 10x10), 1 = play on light
+                 squares (like italian draughts) This is only needed in draughts.
+
+
+
+Here are some examples..
+                
+[GameType "0"]                   {Straight chess}
+[GameType "0,W,8,8,0,S0"]        {Straight chess, with full spec}
+[GameType "20"]                  {10x10 draughts)
+[GameType "20,W,10,10,N2,0"]     {10x10 draughts, with full spec)
+[GameType "21"]                  {English draughts}
+[GameType "21,B,8,8,N1,0"]       {English draughts, with full spec}
+[GameType "21,B,10,10,N1,0"]     {English draughts, played on a 10x10 board}
+[GameType "22"]                  {Italian draughts}
+[GameType "22,W,8,8,N2,1"]       {Italian draughts, with full spec}
+
+
+SAMPLE PDN FORMAT FILE - TEST.PDN
+---------------------------------
+
+[Event "Double Corner Dyke"]
+[Black "Jordan,A"]
+[White "Tesheliet,F"]
+[Event "This is an 8x8 draughts game"]
+[Result "1/2-1/2"]
+[GameType "21"]
+
+1.  9-14 22-17 2. 11-15 25-22 3. 15-19 {Forms the Double Corner Dyke, With
+ black aiming to occupy sqr 19, attacking white's double corner.} 23x16 
+4. 12x19 24x15 5. 10x19 17x10 6.  6x15 21-17 7.  5-9 29-25 8.  8-12 25-21 
+9.  7-10 17-13 10.  1-6 {It seems unwise to abondon the key back row sqr 1,
+ but it is necessary to prevent 13-9..} 27-24 11.  4-8 32-27 12.  9-14 
+27-23 13.  3-7 23x16 14. 12x19 22-17 15.  7-11 26-23 16. 19x26 30x23 
+17.  8-12 24-20 18. 15-18 23-19 19. 11-15 20-16 20. 15x24 28x19 21.  2-7 
+31-26 22. 18-23 26-22 23. 23-27 16-11 {! a really beautiful escape} 
+24.  7x23 22-18 1/2-1/2
+
+[Event "Demo Game"]
+[Black "Seton,J"]
+[White "Wyllie,J"]
+[Result "1-0"]
+[GameType "21"]
+
+1. 11-15 24-20 2.  8-11 28-24 3.  4-8 23-19 4. 15-18 22x15 5. 11x18 32-28 
+6. 10-14 26-23 7.  9-13 19-15 8.  7-11 31-26 9.  2-7 26-22 10. 13-17 22x13 
+11.  6-9 13x6 12.  1x26 30x23 13. 11-15 25-22 14. 18x25 29x22 15.  7-10 
+23-19 16.  5-9 22-17 17.  9-13 20-16 18. 13x22 16-11 19. 22-26 11x4 
+20. 26-31  4-8 21.  3-7  8-3 22. 31-26 19-16 23. 12x19 27-23 24. 26-22 
+23x16 25. 22-18  3-8 {For the benifit of spectators, Wyllie plays out the
+ nice end shot - can you see it?} 26.  7-11 16x7 27. 15-19 24x6 28. 14-17 
+21x14 29. 18x4 28-24 30.  4-8 24-19 31.  8-11 19-15 32. 11x18 1-0
+
+[Event "Andersons 1st position trunk"]
+[Result "1-0"]
+[SetUp "1"]
+[FEN "W:WK4,30:B27,22."]
+[GameType "21"]
+
+1. 4-8 27-32 2. 8-11 32-27 3. 11-7 27-23 {etc to Black win..} 1-0
+
+
+[White "T. Sijbrands"]
+[Black "Goeljaew"]
+[Event "This is a 10x10 draughts game"]
+[Date "1969.5.29"]
+[GameType "20"]
+[Result "1/2-1/2"]
+
+1. 32-28 17-21 2. 33-29 21-26 3. 39-33 11-17 4. 37-32 26x37
+5. 42x31 6-11 6. 44-39 19-23 7. 28x19 14x23 8. 35-30 13-19
+9. 30-25 19-24 10. 25x14 9x20 11. 50-44 10-14 12. 47-42 14-19
+13. 41-37 4-9 14. 46-41 8-13 15. 32-28 23x32 16. 37x28 18-23
+17. 29x18 12x32 18. 38x27 17-21 19. 42-37 21x32 20. 37x28 7-12
+21. 41-37 2-8 22. 37-32 13-18 23. 43-38 9-13 24. 48-42 11-17
+25. 31-26 17-21 26. 26x17 12x21 27. 49-43 8-12 28. 42-37 18-23
+29. 34-29 23x34 30. 40x29 20-25 31. 29x20 15x24 32. 36-31 21-26
+33. 44-40 5-10 34. 39-34 12-18 35. 34-29 10-15 36. 29x20 15x24
+37. 43-39 3-8 38. 39-34 16-21 39. 34-29 21-27 40. 29x20 25x14
+41. 31x22 18x27 42. 32x21 26x17 43. 40-34 14-20 44. 45-40 1-7
+1/2-1/2

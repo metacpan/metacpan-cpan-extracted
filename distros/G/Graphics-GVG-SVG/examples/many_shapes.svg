@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg height="400" width="400" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<g id="main_group">
+		<circle cx="300" cy="250" r="230" style="fill: none; stroke: #993399" />
+		<line style="fill: none; stroke: #33ff33" x1="250" x2="350" y1="250" y2="350" />
+		<line style="fill: none; stroke: #33ff33" x1="350" x2="350" y1="350" y2="50" />
+		<line style="fill: none; stroke: #33ff33" x1="350" x2="250" y1="50" y2="250" />
+		<polygon points="260,304 140,304 80,200 140,96 260,96 320,200 " style="fill: none; stroke: #88aa88" />
+	</g>
+	<!-- 
+	Generated using the Perl SVG Module V2.64
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+ -->
+</svg>

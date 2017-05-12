@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/GD/Tab/Ukulele.pm
+t/00.load.t
+t/01.methods.t
+t/files/BAR_1987.png
+t/files/C.png
+t/files/D7.png
+t/files/D7_0202.png
+t/files/FOO_15_13_11_14.png

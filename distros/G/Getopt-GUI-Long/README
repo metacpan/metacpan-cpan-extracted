@@ -1,0 +1,90 @@
+MODULE
+
+  Getopt::GUI::Long - a drop in Getopt::Long replacement supporting an
+  optional GUI
+
+SYNOPSIS
+
+  use Getopt::GUI::Long;
+
+  # pass useful config options to Configure
+  Getopt::GUI::Long::Configure(qw(display_help no_ignore_case capture_output));
+  GetOptions(\%opts,
+             ["GUI:separator",   "Important Flags:"],
+	     ["f|some-flag=s",   "A flag based on a string"],
+	     ["o|other-flag",    "A boloean"],
+            );
+
+  # or use references instead of a hash (less tested, however):
+
+  GetOptions(["some-flag=s",  "perform some flag based on a value"] => \$flag,
+             ["other-flag=s", "perform some flag based on a value"] => \$other);
+
+  # displays auto-help given the input above:
+
+  % opttest -h
+  Usage: opttest [OPTIONS] Other Arguments
+
+  OPTIONS:
+
+  Important Flags:
+     -f STRING             A flag based on a string
+     -o                    A boloean
+
+  Help Options:
+     -h                    Display help options -- short flags preferred
+    --help                 Display help options -- long flags preferred
+    --help-full            Display all help options -- short and long
+
+
+
+  # or long help:
+
+  % opttest --help
+  Usage: opttest [OPTIONS] Other Arguments
+
+  OPTIONS:
+
+  Important Flags:
+    --some-flag=STRING     A flag based on a string
+    --other-flag           A boloean
+
+  Help Options:
+     -h                    Display help options -- short flags preferred
+    --help                 Display help options -- long flags preferred
+    --help-full            Display all help options -- short and long
+
+  # or a GUI screen:
+
+  (see http://net-policy.sourceforge.net/images/getopt_example.png )
+
+DESCRIPTION
+
+  This module is a wrapper around Getopt::Long that extends the value of
+  the original Getopt::Long module to:
+
+  1) add a simple graphical user interface option screen if no
+     arguments are passed to the program.  Thus, the arguments to
+     actually use are built based on the results of the user
+     interface. If arguments were passed to the program, the user
+     interface is not shown and the program executes as it normally
+     would and acts just as if Getopt::Long::GetOptions had been
+     called instead.
+
+  2) provide an auto-help mechanism such that -h and --help are
+     handled automatically.  In fact, calling your program with -h
+     will default to showing the user a list of short-style arguments
+     when one exists for the option.  Similarly --help will show the
+     user a list of long-style when possible.  --help-full will list
+     all potential arguments for an option (short and long both).
+
+  It's designed to make the creation of graphical shells trivial
+  without the programmer having to think about it much as well as
+  providing automatic good-looking usage output without the
+  programmer needing to write usage() functions.
+
+EXAMPLE SCREEN SHOTS
+
+  http://www.dnssec-tools.org/ has a bunch of screen shot links on the
+  front page where the GUI interface from it is entirely created
+  through the Getopt::GUI::Long interface.

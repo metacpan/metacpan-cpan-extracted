@@ -1,0 +1,16 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Geo/WKT.pm
+lib/Geo/WKT.pod
+t/01use.t
+t/10point.t
+t/11linestring.t
+t/12poly.t
+t/13multipoint.t
+t/14multiline.t
+t/15multipoly.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

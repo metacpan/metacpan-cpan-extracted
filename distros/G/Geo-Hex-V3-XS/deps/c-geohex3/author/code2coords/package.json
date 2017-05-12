@@ -1,0 +1,16 @@
+{
+  "name": "code2coords",
+  "version": "1.0.0",
+  "description": "create GeoHex code2coords test case.",
+  "main": "dump.js",
+  "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "dump": "node --harmony ./dump.js"
+  },
+  "author": "karupanerura",
+  "license": "MIT",
+  "dependencies": {
+    "co": "^4.5.4",
+    "mz": "^2.0.0"
+  }
+}

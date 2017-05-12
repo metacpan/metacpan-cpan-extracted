@@ -1,0 +1,19 @@
+Changes
+Build.PL
+MANIFEST
+README
+t/01_load.t
+t/02_basic.t
+t/99_pod.t
+lib/Gantry/Plugins/Uaf.pm
+lib/Gantry/Plugins/Uaf/Authenticate.pm
+lib/Gantry/Plugins/Uaf/AuthorizeFactory.pm
+lib/Gantry/Plugins/Uaf/Authorize.pm
+lib/Gantry/Plugins/Uaf/GrantAllRule.pm
+lib/Gantry/Plugins/Uaf/Rule.pm
+lib/Gantry/Plugins/Uaf/User.pm
+root/uaf_denied.tt
+root/uaf_display.tt
+root/uaf_login.tt
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL

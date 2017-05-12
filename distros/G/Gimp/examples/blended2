@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use warnings;
+use strict;
+
+podregister {
+  die "Must have alpha channel\n" unless $drawable->has_alpha;
+  Gimp::Context->push();
+  my $new_image = Gimp::Image->new($drawable->width,$drawable->height, RGB_IMAGE);
+  $drawable->get_image->selection_all;
+  $drawable->edit_copy;
+  $image->selection_none;
+  if ($transparency == 0) {
+    my $bg_layer=$new_image->layer_new($drawable->width,$drawable->height,$image->layertype(1), "Background", 100, NORMAL_MODE);
+    Gimp::Context->set_background ($bg_col);
+    $bg_layer->drawable_fill(BACKGROUND_FILL);
+    $new_image->insert_layer($bg_layer,0,0);
+  }
+  my $text1_lay = $new_image->layer_new(
+    $drawable->width,$drawable->height,
+    $image->layertype(1), "Text -1-", 100, NORMAL_MODE
+  );
+  $new_image->insert_layer($text1_lay,0,-1);
+  $text1_lay->edit_clear;
+  $text1_lay->edit_paste(0)->floating_sel_anchor;
+  $text1_lay->set_lock_alpha(1);
+  Gimp::Context->set_foreground ($bl1);
+  Gimp::Context->set_background ($bl2);
+  my @start = ($text1_lay->width / 2 - 5, 0);
+  my @end = ($text1_lay->width / 2 + 5, $text1_lay->height);
+  $text1_lay->edit_blend(
+		   FG_BG_RGB_MODE,
+		   NORMAL_MODE,
+		   GRADIENT_LINEAR,
+		   100,
+		   FALSE,
+		   REPEAT_NONE,
+		   FALSE, # reverse
+		   FALSE, # supersampling
+		   2, # recursion levels
+		   0.30, # threshold
+		   FALSE, # dithering
+		   @start, @end);
+  my $text2_lay=$text1_lay->copy(TRUE);
+  $text2_lay->add_alpha;
+  $new_image->insert_layer($text2_lay, 0, -1);
+  Gimp::Context->set_background ([255, 255, 255]);
+  $text2_lay->edit_fill(BACKGROUND_FILL);
+  $text1_lay->set_lock_alpha(0);
+  $text2_lay->set_lock_alpha(0);
+  $text2_lay->gauss_rle( 6, 1, 1);
+  $new_image->bump_map($text1_lay, $text2_lay, 110.0, $elev, $depth, 0, 0, 0, 0, FALSE, FALSE, 0);
+  $text2_lay->invert;
+  $new_image->lower_item($text2_lay);
+  $text2_lay->translate(2, 3);
+  $text2_lay->set_opacity(75);
+  $new_image->flatten;
+  if ($transparency == 1) {
+    $new_image->convert_indexed(0, MAKE_PALETTE, 256, 0, 0, "");
+    my $new_layer = $new_image->get_active_layer;
+    $new_layer->add_alpha;
+    Gimp::Context->set_sample_threshold(0.55);
+    Gimp::Context->set_antialias(0);
+    Gimp::Context->set_feather(0);
+    Gimp::Context->set_feather_radius(0,0);
+    Gimp::Context->set_sample_merged(0);
+    $new_image->select_color(CHANNEL_OP_ADD, $new_layer, [255, 255, 255]);
+    $new_layer->edit_clear;
+    $new_image->selection_none;
+  }
+  eval {
+    Gimp::Display->new($new_image);
+  };
+  return $new_image;
+};
+exit main;
+__END__
+
+=head1 NAME
+
+make_bevel_logos - A script to get blended beveled logos
+
+=head1 SYNOPSIS
+
+<Image>/Filters/Render/_Blended Logo...
+
+=head1 DESCRIPTION
+
+This script will produce a new image with a blended beveled logo from
+your alpha layer, which must have black text. You can choose the initial
+and final colours of the blend, the background, and how to tweak the
+bevel effect. It uses a technique quite similar to that in the Inner
+Bevel Logo.
+
+=head1 PARAMETERS
+
+ [PF_COLOUR	, 'bg_col', "Background colour", [255, 255, 255]],
+ [PF_COLOUR	, 'bl1',  "1st blend colour", [247, 231, 9]],
+ [PF_COLOUR	, 'bl2',   "2nd blend colour", [255, 0, 0]],
+ [PF_SLIDER	, 'elev', "Strength of bevel", 45.00, [0.00, 60.00, 0.50]],
+ [PF_SLIDER	, 'depth', "Depth of bevel", 4, [1, 20, 1]],
+ [PF_RADIO	, 'transparency', "Background", 0, [Solid => 0, Transparent => 1]],
+
+=head1 RETURN VALUES
+
+ [PF_IMAGE	, 'image', "Logo"],
+
+=head1 IMAGE TYPES
+
+RGBA
+
+=head1 AUTHOR
+
+Michele Gherlone <michele.gherlone@liceoberchet.it>
+
+=head1 DATE
+
+20140526
+
+=head1 LICENSE
+
+(c) 2014 Michele Gherlone.
+
+Distributed under the same terms as Gimp Perl.

@@ -1,0 +1,13 @@
+Features:
+
+* Gtk2::Ex::Dialogs::ChoosePreviewFile
+    - use nautilus thumbnailing system
+    - add: ask_to_{open,save}_image()
+    - add: ask_to_{open,save}_text()
+    - ability to add arbitrary filters
+
+
+Modules:
+
+* Gtk2::Ex::Dialogs::PickDate
+* Gtk2::Ex::Dialogs::PickTime

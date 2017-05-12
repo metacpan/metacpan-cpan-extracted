@@ -1,0 +1,24 @@
+0.6 Tue Feb 23 21:20:55 MET 2010
+   - added win_size to track the size of windows 
+   - make test works now without DISPLAY
+
+0.5 Thu Feb 18 09:22:42 MET 2010
+   - added Global Output (%GO)
+   - added GTM::Run
+   
+0.4 Fri Feb 12 14:08:49 MET 2010
+   - code cleanup
+   - implemented a global selector
+
+0.3 Thu Feb 11 12:39:25 MET 2010
+   - traffic light blinks if busy 
+   - fixed a lock issue (missing callback)
+   - console defaults to x-terminal-emulator
+       use: update-alternatives --config x-terminal-emulator
+
+0.2 Wed Feb 10 11:16:41 MET 2010
+    - added console (Alt-C)
+
+0.1 Wed Feb 10 09:03:27 MET 2010
+    - initial version
+

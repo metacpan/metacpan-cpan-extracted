@@ -1,0 +1,61 @@
+2004/10/28 20:12 (-0400) rwmcfa1
+	
+	* README, NEWS, Makefile.PL, GLExt.pm: beta release 0.90
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+	* perl-Gtk2-GLExt.spec.in: new scheme that addresses x86_64 problems
+	found by Carl Nygard
+
+2004/04/06 21:13 (-0500) muppetman
+
+	* GLExt.pm: alpha release 0.02
+
+	A NEWS
+	A README
+	M MANIFEST
+	  new files
+
+	* xs/GtkGLExt.xs: pod
+
+	* Makefile.PL: modernize the build system
+
+	* xs/GdkGLConfig.xs, xs/GdkGLPixmap.xs, xs/GdkGLWindow.xs: fix pod
+	and incompatible pointer type warnings
+
+	* xs/GdkGLQuery.xs: hush unused parameter warnings
+ 
+	* xs/GtkGLWidget.xs: there is no Gtk2::Gdk::GLExt::Interface package,
+	don't put it into @ISA.  remove redundant names on the =for apidoc
+	directives -- these are ignored, anyway.
+
+	* AUTHORS: put names in proper order -- ross did most of the work
+	on this extension.
+ 
+2004/02/26 17:31 (-0500) muppetman
+
+	* Makefile.PL: remove a no-op
+
+2004/01/24 21:44 (-0500) rwmcfa1
+
+	* Makefile.PL: removed runtime_reqs stuff, replaced by the pkg-config 
+	trick
+	
+	* perl-Gtk2-GLExt.spec.in: use pkg-config for Requires version
+
+2004/01/02 15:09 (-0500) rwmcfa1
+
+	* Makefile.PL: rpm stuff added
+
+	* perl-Gtk2-GLExt.spec.in: initial import, broken b/c there's no rpms
+	for it
+
+2003/11/24 21:59 (-0500) rwmcfa1
+
+	* bunch: patches by Bjarne Steinsbø applied
+
+2003/11/16 14:55 (-0500) rwmcfa1
+
+	* all: initial import, working, but incomplete

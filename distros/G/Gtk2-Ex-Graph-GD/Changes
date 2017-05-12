@@ -1,0 +1,20 @@
+Revision history for Perl extension Gtk2::Ex::Graph::GD.
+
+0.01  Sat May 14 14:20:23 2005
+    - original version; created by h2xs 1.23 with options
+	-AX Gtk2::Ex::Graph::GD
+    - mouse-over tooltip for bar charts
+
+0.02 May 17, 2005
+    - right-click menu to switch to lines, pie
+    
+0.03 May 18, 2005
+    - mouse-over tooltip for line and linespoints charts
+    - right-click menu to switch to linespoints, to cumulate
+    
+0.04 October 13 2005
+    - fixed a bug with mouse-over
+    - added call-backs for 'mouse-over' and 'clicked'
+    - fixed a bug with lines legend
+    - cleaned up code
+    

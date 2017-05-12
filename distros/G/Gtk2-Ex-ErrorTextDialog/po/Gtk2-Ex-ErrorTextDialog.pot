@@ -1,0 +1,76 @@
+# Copyright 2009, 2010, 2011 Kevin Ryde
+#
+# This file is part of Gtk2-Ex-ErrorTextDialog.
+#
+# Gtk2-Ex-ErrorTextDialog is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 3, or (at your option) any
+# later version.
+#
+# Gtk2-Ex-ErrorTextDialog is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Gtk2-Ex-ErrorTextDialog.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# See the file README for notes on translations.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Gtk2-Ex-ErrorTextDialog @VERSION@\n"
+"POT-Creation-Date: @DATE@\n"
+"PO-Revision-Date: YYYY-MM-DD HH:MM+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Gtk2/Ex/ErrorTextDialog.pm:60
+msgid "Maximum characters"
+msgstr ""
+
+#: lib/Gtk2/Ex/ErrorTextDialog.pm:96
+msgid "Errors"
+msgstr ""
+
+#: lib/Gtk2/Ex/ErrorTextDialog.pm:107
+msgid "_Popup on Error"
+msgstr ""
+
+#: lib/Gtk2/Ex/ErrorTextDialog.pm:112
+msgid ""
+"Whether to popup this dialog when an error occurs.\n"
+"If errors are occurring repeatedly you might not want a popup every time."
+msgstr ""
+
+#: lib/Gtk2/Ex/ErrorTextDialog.pm:122
+msgid ""
+"Save the error messages to a file, perhaps to include in a bug report.\n"
+"(Cut and paste works too, but saving may be better for very long messages.)"
+msgstr ""
+
+#: lib/Gtk2/Ex/ErrorTextDialog.pm:177
+msgid "An error has occurred"
+msgstr ""
+
+#: lib/Gtk2/Ex/ErrorTextDialog.pm:178
+msgid "No errors"
+msgstr ""
+
+#. TRANSLATORS: The code currently assumes this string is 80 chars or less.
+#: lib/Gtk2/Ex/ErrorTextDialog.pm:338
+msgid "[Older messages discarded]"
+msgstr ""
+
+#: lib/Gtk2/Ex/ErrorTextDialog/SaveDialog.pm:70
+msgid "Save Errors"
+msgstr ""
+
+#: lib/Gtk2/Ex/ErrorTextDialog/SaveDialog.pm:86
+msgid "Save error messages to a file (with UTF-8 encoding)"
+msgstr ""

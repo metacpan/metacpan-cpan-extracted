@@ -1,0 +1,63 @@
+NAME
+    Geo::Coordinates::Parser - A coordinate parser class.
+
+SYNOPSIS
+            use Geo::Coordinates::Parser;
+            my $coordinateparser = Geo::Coordinates::Parser->new('.');
+            my $decimaldegree = $coordinateparser->parse(q{E25°42'60"});
+            $decimaldegree = $coordinateparser->parse(q{E25.12346"});
+
+DESCRIPTION
+    This module provides a method for parsing a coordinate string.
+
+METHODS
+    This module provides the following methods:
+
+    new($decimal_delimiter)
+        Returns a new Geo::Coordinates::Parser object. The decimal delimiter
+        can be given as an argument. If no argument is given then period "."
+        character is used as decimal delimiter.
+
+        Usage:
+
+                my $coordinateparser = Geo::Coordinates::Parser->new(); # or
+                my $coordinateparser = Geo::Coordinates::Parser->new('.'); # same as above, or
+                my $coordinateparser = Geo::Coordinates::Parser->new(','); # , is the decimal delimiter
+
+    parse($coordinatestring)
+        Parses the coordinate string and returns it's decimal value. It uses
+        Geo::Coordinates::DecimalDegrees to turn degrees, minutes and
+        seconds into the equivalent decimal degree. The argument can be
+        either a longitude or a latitude. It doesn't test the sanity of the
+        data. The method simply removes all unnecessary characters and then
+        converts the degrees, minutes and seconds to a decimal degree.
+
+        Usage:
+
+                my $decimal = $coordinateparser->parse('E25'42'60');
+
+    decimal_delimiter($decimal_delimiter)
+        Returns the decimal delimiter. If an argument is given then it's
+        sets the delimiter to the given value.
+
+        Usage:
+
+                $coordinateparser->decimal_delimiter; # Returns the delimiter
+                $coordinateparser->decimal_delimiter(','); # Sets and returns , as the delimiter
+                $coordinateparser->decimal_delimiter; # Returns now , as the delimiter
+
+REQUIRES
+    Geo::Coordinates::DecimalDegrees
+
+SEE ALSO
+    Geo::Coordinates::DecimalDegrees
+
+AUTHOR
+    Carl Räihä, <carl.raiha at gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005 by Carl Räihä / Frantic Media
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

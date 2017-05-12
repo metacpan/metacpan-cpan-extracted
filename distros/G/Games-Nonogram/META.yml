@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Games-Nonogram
+version:             0.01
+abstract:            solve and analyze Nonogram
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Getopt::Long:                  0
+    IO::File:                      0
+    Storable:                      0
+    Test::UseAllModules:           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Kenichi Ishigaki <ishigaki@cpan.org>

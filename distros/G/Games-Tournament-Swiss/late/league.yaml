@@ -1,0 +1,56 @@
+---
+late: ~
+member:
+  - firstround: 2
+    id: 1
+    name: A
+    pairingNumber: 1
+    rating: 2000
+    title: M.
+  - firstround: 2
+    id: 5
+    name: a
+    pairingNumber: 2
+    rating: 1999
+    title: M.
+  - firstround: 2
+    id: 2
+    name: B
+    pairingNumber: 3
+    rating: 1998
+    title: M.
+  - firstround: 2
+    id: 6
+    name: b
+    pairingNumber: 4
+    rating: 1997
+    title: M.
+  - firstround: 2
+    id: 3
+    name: C
+    pairingNumber: 5
+    rating: 1996
+    title: M.
+  - firstround: 2
+    id: 4
+    name: D
+    pairingNumber: 6
+    rating: 1994
+    title: M.
+others:
+  - id: 5
+    name: a
+    rating: 1999
+    title: M.
+  - id: 6
+    name: b
+    rating: 1997
+    title: M.
+  - id: 7
+    name: c
+    rating: 1995
+    title: M.
+  - id: 8
+    name: d
+    rating: 1993
+    title: M.

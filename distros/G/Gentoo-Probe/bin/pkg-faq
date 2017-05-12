@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+$|++;
+use Term::ReadLine;
+use Gentoo::Config;
+use UNIVERSAL qw(isa);
+use strict;
+
+my $cfg = new Gentoo::Config;
+if ( @ARGV ) {
+	*nextline = sub() { return shift @ARGV };
+} elsif ( -t 0 ) {
+	my $rl = new Term::ReadLine;
+	my $attr = $rl->Attribs;
+	$attr->{completion_entry_function} = $attr->{list_completion_function};
+	$attr->{completion_word}=[ $cfg->keys() ];
+	*nextline = sub (){ $rl->readline("attr: "); };
+} else {
+	*nextline = sub (){ scalar(<STDIN>); };
+};
+while(defined($_=nextline())){
+	for ( split ) {
+		my $v = $cfg->get($_,undef);
+		if (isa($v,'ARRAY')){
+			print "$_=(\n\t",join("\n\t",@$v).")\n";
+		} elsif (defined $v) {
+			print "$_=\"$v\"\n";
+		} else {
+			print "$_=\n";
+		};
+	};
+};

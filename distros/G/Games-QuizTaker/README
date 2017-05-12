@@ -1,0 +1,17 @@
+To install
+==========
+perl Makefile.PL
+make
+make test
+make install
+
+Module Dependencies
+===================
+Object::InsideOut
+Text::Wrap
+Test::More
+Data::Dumper
+Fcntl
+Test::Pod
+Test::Harness
+

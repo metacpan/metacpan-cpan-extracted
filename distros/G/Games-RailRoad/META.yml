@@ -1,0 +1,396 @@
+---
+abstract: 'a train simulation game'
+author:
+  - 'Jerome Quelin'
+build_requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+generated_by: 'Dist::Zilla version 2.101151'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Games-RailRoad
+provides:
+  Games::RailRoad:
+    file: lib/Games/RailRoad.pm
+    version: 1.101330
+  Games::RailRoad::Node:
+    file: lib/Games/RailRoad/Node.pm
+    version: 1.101330
+  Games::RailRoad::Node::Cross:
+    file: lib/Games/RailRoad/Node/Cross.pm
+    version: 1.101330
+  Games::RailRoad::Node::Cross::E_NE_SW_W:
+    file: lib/Games/RailRoad/Node/Cross/E_NE_SW_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Cross::E_NW_SE_W:
+    file: lib/Games/RailRoad/Node/Cross/E_NW_SE_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Cross::N_NE_S_SW:
+    file: lib/Games/RailRoad/Node/Cross/N_NE_S_SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Cross::N_NW_S_SE:
+    file: lib/Games/RailRoad/Node/Cross/N_NW_S_SE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half:
+    file: lib/Games/RailRoad/Node/Half.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half::E:
+    file: lib/Games/RailRoad/Node/Half/E.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half::N:
+    file: lib/Games/RailRoad/Node/Half/N.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half::NE:
+    file: lib/Games/RailRoad/Node/Half/NE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half::NW:
+    file: lib/Games/RailRoad/Node/Half/NW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half::S:
+    file: lib/Games/RailRoad/Node/Half/S.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half::SE:
+    file: lib/Games/RailRoad/Node/Half/SE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half::SW:
+    file: lib/Games/RailRoad/Node/Half/SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Half::W:
+    file: lib/Games/RailRoad/Node/Half/W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight:
+    file: lib/Games/RailRoad/Node/Straight.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::E_NW:
+    file: lib/Games/RailRoad/Node/Straight/E_NW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::E_SW:
+    file: lib/Games/RailRoad/Node/Straight/E_SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::E_W:
+    file: lib/Games/RailRoad/Node/Straight/E_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::NE_S:
+    file: lib/Games/RailRoad/Node/Straight/NE_S.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::NE_SW:
+    file: lib/Games/RailRoad/Node/Straight/NE_SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::NE_W:
+    file: lib/Games/RailRoad/Node/Straight/NE_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::NW_S:
+    file: lib/Games/RailRoad/Node/Straight/NW_S.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::NW_SE:
+    file: lib/Games/RailRoad/Node/Straight/NW_SE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::N_S:
+    file: lib/Games/RailRoad/Node/Straight/N_S.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::N_SE:
+    file: lib/Games/RailRoad/Node/Straight/N_SE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::N_SW:
+    file: lib/Games/RailRoad/Node/Straight/N_SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Straight::SE_W:
+    file: lib/Games/RailRoad/Node/Straight/SE_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch:
+    file: lib/Games/RailRoad/Node/Switch.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::E_NE_SW:
+    file: lib/Games/RailRoad/Node/Switch/E_NE_SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::E_NE_W:
+    file: lib/Games/RailRoad/Node/Switch/E_NE_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::E_NW_SE:
+    file: lib/Games/RailRoad/Node/Switch/E_NW_SE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::E_NW_W:
+    file: lib/Games/RailRoad/Node/Switch/E_NW_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::E_SE_W:
+    file: lib/Games/RailRoad/Node/Switch/E_SE_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::E_SW_W:
+    file: lib/Games/RailRoad/Node/Switch/E_SW_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::NE_SW_W:
+    file: lib/Games/RailRoad/Node/Switch/NE_SW_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::NE_S_SW:
+    file: lib/Games/RailRoad/Node/Switch/NE_S_SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::NW_SE_W:
+    file: lib/Games/RailRoad/Node/Switch/NW_SE_W.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::NW_S_SE:
+    file: lib/Games/RailRoad/Node/Switch/NW_S_SE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::N_NE_S:
+    file: lib/Games/RailRoad/Node/Switch/N_NE_S.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::N_NE_SW:
+    file: lib/Games/RailRoad/Node/Switch/N_NE_SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::N_NW_S:
+    file: lib/Games/RailRoad/Node/Switch/N_NW_S.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::N_NW_SE:
+    file: lib/Games/RailRoad/Node/Switch/N_NW_SE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::N_S_SE:
+    file: lib/Games/RailRoad/Node/Switch/N_S_SE.pm
+    version: 1.101330
+  Games::RailRoad::Node::Switch::N_S_SW:
+    file: lib/Games/RailRoad/Node/Switch/N_S_SW.pm
+    version: 1.101330
+  Games::RailRoad::Node::Temp:
+    file: lib/Games/RailRoad/Node/Temp.pm
+    version: 1.101330
+  Games::RailRoad::Train:
+    file: lib/Games/RailRoad/Train.pm
+    version: 1.101330
+  Games::RailRoad::Types:
+    file: lib/Games/RailRoad/Types.pm
+    version: 1.101330
+  Games::RailRoad::Vector:
+    file: lib/Games/RailRoad/Vector.pm
+    version: 1.101330
+  Games::RailRoad::Window::Trains:
+    file: lib/Games/RailRoad/Window/Trains.pm
+    version: 1.101330
+recommends: {}
+requires:
+  File::Basename: 0
+  File::HomeDir: 0
+  File::Path: 0
+  File::ShareDir: 0
+  File::Spec::Functions: 0
+  FindBin: 0
+  Getopt::Euclid: 0
+  Module::Pluggable: 0
+  Moose: 0
+  MooseX::Has::Sugar: 0
+  MooseX::SemiAffordanceAccessor: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  POE: 0
+  POE::Kernel: 0
+  POE::Loop::Tk: 0
+  Readonly: 0
+  Tk: 0
+  Tk::PNG: 0
+  Tk::ToolBar: 0
+  UNIVERSAL::require: 0
+  YAML: 0
+  overload: 0
+  perl: 5.010
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Games-RailRoad
+  homepage: http://search.cpan.org/dist/Games-RailRoad/
+  repository: http://github.com/jquelin/games-railroad
+version: 1.101330
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::Prereq
+      config:
+        Dist::Zilla::Plugin::Prereq:
+          phase: runtime
+          type: requires
+      name: Prereq
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::AutoVersion
+      name: '@JQUELIN/AutoVersion'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@JQUELIN/GatherDir'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: '@JQUELIN/CompileTests'
+      version: 1.100740
+    -
+      class: Dist::Zilla::Plugin::CriticTests
+      name: '@JQUELIN/CriticTests'
+      version: 1.100140
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: '@JQUELIN/HasVersionTests'
+      version: 1.100700
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: '@JQUELIN/KwaliteeTests'
+      version: 1.100690
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@JQUELIN/MetaTests'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::MinimumVersionTests
+      name: '@JQUELIN/MinimumVersionTests'
+      version: 1.100700
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@JQUELIN/PodCoverageTests'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@JQUELIN/PodSyntaxTests'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::PortabilityTests
+      name: '@JQUELIN/PortabilityTests'
+      version: 1.100700
+    -
+      class: Dist::Zilla::Plugin::ReportVersions
+      name: '@JQUELIN/ReportVersions'
+      version: 1.100880
+    -
+      class: Dist::Zilla::Plugin::UnusedVarsTests
+      name: '@JQUELIN/UnusedVarsTests'
+      version: 1.100860
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@JQUELIN/PruneCruft'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@JQUELIN/ManifestSkip'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::AutoPrereq
+      name: '@JQUELIN/AutoPrereq'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@JQUELIN/ExtraTests'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@JQUELIN/NextRelease'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@JQUELIN/PkgVersion'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@JQUELIN/PodWeaver'
+      version: 3.100710
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: '@JQUELIN/Prepender'
+      version: 1.100960
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@JQUELIN/ExecDir'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@JQUELIN/ShareDir'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: '@JQUELIN/Bugtracker'
+      version: 1.100701
+    -
+      class: Dist::Zilla::Plugin::Homepage
+      name: '@JQUELIN/Homepage'
+      version: 1.100700
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: '@JQUELIN/Repository'
+      version: 0.11
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: '@JQUELIN/MetaProvides::Package'
+      version: 1.10001919
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@JQUELIN/MetaConfig'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@JQUELIN/License'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@JQUELIN/MetaYAML'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: '@JQUELIN/ModuleBuild'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@JQUELIN/Readme'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@JQUELIN/Manifest'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: '@JQUELIN/CheckChangeLog'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@JQUELIN/UploadToCPAN'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@JQUELIN/Git/Check'
+      version: 1.100970
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@JQUELIN/Git/Commit'
+      version: 1.100970
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@JQUELIN/Git/Tag'
+      version: 1.100970
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@JQUELIN/Git/Push'
+      version: 1.100970
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 2.101151
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 2.101151
+  zilla:
+    class: Dist::Zilla
+    config:
+      is_trial: 0
+    version: 2.101151

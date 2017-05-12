@@ -1,0 +1,47 @@
+---
+abstract: 'Perl extension for the GDAL library for geospatial data'
+author:
+  - 'Ari Jolma <ari.jolma at gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Config: '0'
+  Cwd: '0'
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Fetch: '0'
+  File::ShareDir::Install: '0'
+  LWP::Simple: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Capture::Tiny: '0'
+  Config: '0'
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Fetch: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-GDAL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Encode: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+resources:
+  repository: https://svn.osgeo.org/gdal/trunk/gdal/swig/perl
+version: '2.010301'

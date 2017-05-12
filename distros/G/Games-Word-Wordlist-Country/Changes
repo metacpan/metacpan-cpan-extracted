@@ -1,0 +1,28 @@
+Revision history for Games-Word-Wordlist-Country
+
+0.04    2016-01-13 (PERLANCAR)
+
+	- [Bugfix] Bump prereq version WordList::EN::CountryNames -> 0.04
+	  (requires all_words() from WordList 0.1.1) [CT].
+
+
+0.03    2016-01-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- To avoid duplication of efforts, now source the word list from
+	  WordList::EN::CountryNames.
+
+
+0.02    2014-10-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix referred module name.
+
+	- Rewording/grammar.
+
+
+0.01    2014-10-07 (PERLANCAR)
+
+        - First release.

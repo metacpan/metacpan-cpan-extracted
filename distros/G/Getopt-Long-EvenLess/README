@@ -1,0 +1,101 @@
+DESCRIPTION
+
+    This module (GLEL for short) is a reimplementation of Getopt::Long (GL
+    for short), but with much less features. It's an even more stripped
+    down version of Getopt::Long::Less (GLL for short) and is perhaps less
+    convenient to use for day-to-day scripting work.
+
+    The main goal is minimum amount of code and small startup overhead.
+    This module is an experiment of how little code I can use to support
+    the stuffs I usually do with GL.
+
+    Compared to GL and GLL, it:
+
+      * has minimum Configure() support
+
+      Only these configurations are known: pass_through, no_pass_through
+      (default).
+
+      GLEL is equivalent to GL in this mode: bundling, no_ignore_case,
+      no_getopt_compat, gnu_compat, permute.
+
+      No support for configuring via import options e.g.:
+
+       use Getopt::Long qw(:config pass_through);
+
+      * does not support increment (foo+)
+
+      * no type checking (foo=i, foo=f, foo=s all accept any string)
+
+      * does not support optional value (foo:s), only no value (foo) or
+      required value (foo=s)
+
+      * does not support desttypes (foo=s@)
+
+      * does not support handler other than coderef (so no "foo=s" =>
+      \$scalar, "foo=s" => \@ary, only "foo=s" => sub { ... })
+
+      Also, in coderef handler, code will get a simple hash instead of a
+      "callback" object as its first argument.
+
+      * does not support hashref as first argument
+
+      * does not support bool/negation (no foo!, so you have to declare
+      both foo and no-foo manually)
+
+    The result?
+
+    Amount of code. GLEL 0.07 is about 175 lines of code, while GL is about
+    1500. Sure, if you really want to be minimalistic, you can use this
+    single line of code to get options:
+
+     @ARGV = grep { /^--([^=]+)(=(.*))?/ ? ($opts{$1} = $2 ? $3 : 1, 0) : 1 } @ARGV;
+
+    and you're already able to extract --flag or --opt=val from @ARGV but
+    you also lose a lot of stuffs like autoabbreviation, --opt val syntax
+    support syntax (which is more common, but requires you specify an
+    option spec), custom handler, etc.
+
+    Startup overhead. Here's a sample startup overhead benchmark:
+
+    # COMMAND: perl devscripts/bench-startup 2>&1
+
+FUNCTIONS
+
+ Configure(@configs | \%config) => hash
+
+    Set configuration. Known configurations:
+
+      * pass_through
+
+      Ignore errors (unknown/ambiguous option) and still make GetOptions
+      return true.
+
+      * no_pass_through (default)
+
+    Return old configuration data. To restore old configuration data you
+    can pass it back to Configure(), e.g.:
+
+     my $orig_conf = Getopt::Long::EvenLess::Configure("pass_through");
+     # ...
+     Getopt::Long::EvenLess::Configure($orig_conf);
+
+ GetOptions(%spec) => bool
+
+    Shortcut for:
+
+     GetOptionsFromArray(\@ARGV, %spec)
+
+ GetOptionsFromArray(\@ary, %spec) => bool
+
+    Get (and strip) options from @ary. Return true on success or false on
+    failure (unknown option, etc).
+
+SEE ALSO
+
+    Getopt::Long
+
+    Getopt::Long::Less
+
+    If you want more features intead of less, try Getopt::Long::More.
+

@@ -1,0 +1,398 @@
+Revision history for Perl extension GD::SecurityImage.
+
+Time zone is GMT+2.
+
+1.73 Wed Jan 21 01:36:45 2015
+    => RT#87918.
+
+1.72 Sun Jul  8 01:50:04 2012
+    => Bump version.
+
+1.71 Sun Sep  4 00:58:52 2011
+    => Major Perl::Critic refactoring.
+    => Pod fix by Gregor Herrmann.
+
+1.70 Thu Apr 30 16:56:32 2009
+    => Made a mistake. version checking test is really gone now.
+
+1.69 Thu Apr 30 15:13:19 2009
+    => Re-release without the version check test.
+
+1.68 Wed Apr 22 19:49:46 2009
+    => Update builder.
+
+1.67 Sat Apr 18 05:45:48 2009
+    => Update distro files.
+
+1.66 Sun Jun  8 17:03:24 2008
+    => Fix for RT#35115.
+
+1.65 Wed Feb 27 21:47:38 2008
+    => Fix for RT#33629.
+    => All files unixified (LF).
+
+1.64 Wed Apr 25 21:01:49 2007
+    => Yet another test suite update for Image::Magick.
+    => New style "blank" added for evil purposes.
+    => Fixed a regex in demo.pl
+
+1.63 Sat Feb 24 16:41:03 2007
+    => I didn't check the existence of Image::Magick in 
+       06-version_magick.t and this resulted with FAILs.
+       Fixed this and updated all magick tests. They now
+       show the real number of skipped tests (if they are skipped)
+
+1.62 Fri Feb 23 23:13:37 2007
+    => Minor fixes in Pods. Added an image samples section
+       (as HTML) and CPAN modules that are using GD::SecurityImage.
+       Also added a SUPPORT section.
+    => Updated demo.pl. Added "program" config option.
+    => Refactored and cleaned up some parts and demo.
+       Most parts are "Damianized".
+    => New private methods _versionlt() and _versiongt()
+       for backend version comparison. _versiongt()
+       actually means: "greater than or equal to".
+    => Updated tests.
+    => Optimized styles.
+
+1.61 Thu May 25 21:56:44 2006
+    => Renamed constants in GD::SecurityImage::GD:
+          _X_ is now CH_X
+          _Y_ is now CH_Y
+       There is a bug in the constant pragma that is bundled 
+       with legacy perl ($] < 5.006). In these perls,
+       the code was dying with this message:
+       Can't define "_X_" as constant (name contains invalid 
+       characters or is empty).
+
+1.60 Sun Feb 19 23:33:36 2006
+    => Removed GD::SecurityImage::AC to it's own distribution
+       because of the increasing interest.
+
+1.59 Fri Jan  6 13:56:41 2006
+    => Updated ::AC. Module. It now dies if gdbox_empty().
+       If libgd is compiled without TTF support, we'll get
+       an empty image. Also added this to Pod.
+    => Removed SIGNATURE file and signature test and anything
+       Module::Signature related per RT #15346. I'm tired of
+       Module::Signature.
+
+1.583 Fri Nov 25 23:06:36 2005
+    => Another relase for distro/sig issues. Now all files are CRLF
+       and signature testing is disabled if !MSWin32. 
+       Module::Signature currently (<= 0.50) can not validate CRLF
+       files if it is working under some non-Windows OS. I'm waiting
+       for a response from Module::Signature author on this subject.
+    => Renamed some tests.
+    => Updated pod.
+
+1.582 Sat Oct 29 20:43:04 2005
+    => Updated test suite to increase kwalitee :)
+
+1.581 Wed Oct 26 20:21:09 2005
+    => Fixed Makefile.PL. Build.PL was causing this error:
+       "Too early to specify a build action 'Build'.  Do 'Build Build' instead."
+       Setting "PL_FILES" to an empty hashref solves the problem.
+       This was mentioned in Module::Build::Compat, but I' ve
+       missed it and this error does not seem to happen under 
+       Windows or with the latest version of ExtUtils::MakeMaker,
+       I'm not sure which one is the case.
+
+1.58 Wed Oct 26 13:28:35 2005
+    => Fixed a gdbox issue in ::GD backend.
+    => Pod fixes.
+
+1.57_02 Fri Oct 21 19:46:11 2005
+    => Reworked an undocumented method. New name is info_text().
+       You can now add information strips to the generated image.
+       The demo already uses this undocumented feature for a while.
+       This method can be used to add copyright information. Some 
+       free captcha services are doing that. Alternatively, you can
+       display the image generation time like the demo does.
+    => Added info_text() info to pod and fixed the other pod sections.
+    => Updated test suite.
+
+1.57_01 Wed Oct 19 14:31:22 2005
+    => Converted to Module::Build from ExtUtils::MakeMaker.
+    => Nothing changed in modules. Just a test for PAUSE indexer
+       and Module::Build.
+
+1.57 Tue Oct  4 18:24:12 2005
+    => Fixed typos in pods.
+    => Added RT Wishlist item #14618. 'angle' parameter is now
+       used when scramble is not enabled. But this'll require 
+       a taller image, since the random code is centered
+       inside the image. Added info about this into the pod.
+    => Updated demo.
+
+1.56 Sat Oct  1 14:14:34 2005
+    => Added GD::SecurityImage backend => 'AC';
+    => Updated demo Pod.
+    => Added some tips to the pod.
+    => Updated licenses.
+    => Updated Makefile.PL. Removed Math::Trig from prerequisities,
+       since it is in CORE since perl 5.004.
+    => GD::SecurityImage::AC is now untainted (I hope).
+       Reported by Michael B Krypel. Still no tests for this
+       module.
+    => Existence of setThickness() is now explicitly checked for
+       GD < 2.07.
+
+1.55 Wed Apr 13 17:58:37 2005
+    => New sub-module GD::SecurityImage::AC added as an
+       Authen::Captcha drop-in replacement module.
+       I currently didn't add any tests for this module.
+    => New method 'backends' to list available back-ends.
+
+1.54 Fri Apr  8 23:11:32 2005
+    => Updated pods.
+    => If anyone adds a back-end, one must define a method
+       to deal with colors: 'backend_cconvert'. cconvert()
+       will forward all calls to backend_cconvert() if 
+       $BACKEND is different than /^(GD|Magick)$/. Note that
+       this method must be capable of handling both HEX and RGB.
+    => Finally documented this. See BACKEND_AUTHORS section in
+       the pod (If you have a HTML version, probably you can not
+       see this).
+    => Removed gdbox_empty from GD::SecurityImage::Magick
+    => The module now has an AUTOLOAD method.
+    => Added a check for gdbox_empty in AUTOLOAD for non-GD 
+       backends.
+    => Ooops! ellipse() added in GD 2.07 :p Thanks to ActiveState
+       build logs. I missed that one (looks like all CPAN Testers 
+       are using recent GDs).
+       Added a global mechanism to check this and any incompatibilities.
+       If GD < 2.07 and you call ellipse() it will fall-back to default()
+       style. If you call ec() style, it'll disable ellipse() call and only
+       draw circles.
+    => Updated GD::SecurityImage::Styles.
+    => Updated demo program. Also, changed default type to 'png' after 
+       a little conversation with Eric Gorr. :) (some installations may 
+       have gif() method but don't have gif support enabled. This results
+       with an empty image. Cause: old libgd).
+    => Default image type in GD::SecurityImage::GD::out() changed to 'png'.
+
+1.53 Wed Jan  5 18:21:59 2005
+    => Added a new option 'backend' to import(). With this
+       option you can now include other back-ends:
+
+           use GD::SecurityImage backend => 'Magick';
+
+       will load the GD::SecurityImage::Magick for example.
+       If you wrote a backend for GD::SecurityImage, you can 
+       now combine your back-end with GD::SecurityImage. Like, 
+       if you created a Imager back-end named 'GD::SecurityImage::Imager',
+       you can load it like this:
+
+           use GD::SecurityImage backend => 'Imager';
+
+       No one requested this kind of functionality (yet), but I'm 
+       adding it anyway. And *NO* I will not create an Imager or 
+       any other backend myself (at least not in the near future). 
+       I' m already supporting two different interfaces.
+
+       Probably cconvert() also needs a fix to support such a thing.
+       I'll deal with that later.
+    => If you have loaded Image::Magick outside and then you call 
+       GD::SecurityImage with the GD backend (or simply use it)
+       your code dies with a weird error. Since it setups the 
+       interface for Image::Magick, but you didn't select Image::Magick 
+       as the backend. For example, this simple code dies if you are using
+       1.52 and below:
+
+           use Image::Magick;
+           use GD::SecurityImage;
+           GD::SecurityImage->new->create;
+
+       This bug cought by Dave Rolsky.
+    => New class variable $BACKEND added to deal with this bug.
+       The backend is now completely checked and set in import().
+    => Also, the module is now checking whether you called import()
+       or not. If you didn't, it'll die (it actually checks if $BACKEND
+       has a value).
+    => Added a new test 'backend.t' to check these.
+
+1.52 Tue Dec 21 15:07:37 2004
+    => After implementing HEX colors with cconvert, I forgot to 
+       set default colors in create() which will throw an exception
+       without the default color values. 
+       Reported by Billy Vierra.
+    => Updated pod.
+
+1.51 Sun Dec 19 00:02:13 2004
+    => Updated demo program code.
+    => Updated Makefile.PL.
+    => New private method cconvert for transparent GD/Image::Magick 
+       color conversion.
+    => Removed GD::SecurityImage::Magick::rgbx().
+    => The module now supports hex color codes like "#ffffff".
+    => Updated pod.
+
+    => [NOT DOCUMENTED] New private method add_strip.
+    => [NOT DOCUMENTED] New method set_tl.
+    => [NOT DOCUMENTED] New method change_random.
+    => [NOT DOCUMENTED] New parameter 'text_location' added to new.
+    => [NOT DOCUMENTED] With text_location option, you can now add info boxes to 
+       the 4 corners of the image (or you can use this for something else).
+    => [NOT DOCUMENTED] Behavior of out() changed. If set_tl is used and
+       you change the random code (text option) several times, it may 
+       be an array.
+
+1.5 Sat Oct 30 17:11:53 2004
+    => Fixed pod.
+    => Minor fixes.
+    => rndmax option to new, now controls the minimum random character
+       length, when you supply your own random string.
+    => Updated tests.
+    => Added a demo program to "eg/demo.pl".
+       It needs DBI, DBD::mysql (and a MySQL server), Apache::Session, 
+       String::Random and some CORE modules to run.
+    => GD still needs an absolute path. Fixed pod.
+
+1.4_03 Mon Oct 11 21:55:37 2004
+    => Older GDs do not have setThickness. 
+       "setThickness" added in "GD 2.07 @ 24 Apr 2003". 
+       Fixed thickness option in new. 
+       Updated test api for this.
+       Added this to Pod.
+    => Added "compress" argument to out() for "jpeg" and "png". 
+    => But GD *again* has a problem here. Compression argument for 
+       png is implemented in "GD 2.07". out() silently ignores 
+       compression parameter, if you have an older GD and set output 
+       format to png.
+       Added this to Pod.
+    => Also, jpeg method and quality level for jpeg added 
+       in "GD 1.26 @ 18 Mar 2000". But currently, I didn't add 
+       any controls to detect that and I don't know who can 
+       use that pre-historic versions (other than sf.net!).
+    => It's too hard to stay compatible with older versions!
+
+1.4_02 Sat Oct  9 14:48:18 2004
+    => Fixed a bug in new for the angle parameter.
+    => New private method setThickness.
+    => New option 'thickness' added to new.
+    => Replaced buggy/silly "_charw" with "ttf_info" in GD backend. 
+       Hopefully, this fixes the "scramble" implementation for GD.
+    => Updated test suite. Now, there is a single test api and two
+       test files.
+    => Changed Makefile.PL. "GD" is now hardcoded as a prerequisite.
+       Removed user input codes. The presence of "Image::Magick"
+       is now tested inside the test file and magick test will
+       be skipped if there is no "Image::Magick" 
+       (request from Barbie -- not exactly this, but similar).
+
+1.4_01 Mon Sep 20 16:46:13 2004
+    => It looks like newer versions of GD does not have the path 
+       bug, but I do not know the exact version that this was 
+       fixed. Anyway, it looks like v2.16 does not have that bug. 
+       Also added this to Pod.
+    => The module now automatically drops to 'normal' mode if
+       you are using GD and your GD version is smaller than 1.20
+       and you have selected 'ttf' method.
+       Q: Why?
+       A: v1.19 and below does not have ttf support. (As mentioned
+          in earlier releases) -- also: sf.net has GD v1.19 :).
+       Module does this silently, so you'll not get any warnings about
+       that.
+    => New parameters scramble and angle added to new(). If you enable 
+       scramble, you have to generate a bigger image, since characters 
+       have three spaces between them.
+    => I've decided to change the description of the module. Now it
+       has the word "captcha" in it (for search engines).
+    => Added some new constants to both backends.
+    => Module now requires Math::Trig (which is a CORE module) for 
+       degree to radian calculation.
+    => New tests for scramble.
+    => New private method random_angle.
+
+1.33 Sun Aug 22 16:50:42 2004
+    => Because of libgd's path bug, in some cases,
+       GD::SecurityImage::GD::insert_text() can not get the 
+       boundary list. I've added a workaround there. If we don't 
+       get the list, then we'll use width/2 and height/2 which 
+       will generate wrong values (since the image will not
+       include any string and because the underlying library can not 
+       find the ttf font, that's not the problem), but I can not do 
+       anything about it.
+       GD wants an *exact* path with no spaces in it for TTF Fonts.
+       Just don't put your codes/fonts in paths that have spaces in it.
+       And don't try to "make test" from a location like this.
+       You can blame windowz and/or libgd for this.
+       Also, if Cwd::getcwd() can not get the exact path, we will have
+       the same problem, but after this version, you'll probably not 
+       get "Use of uninitialized value" warnings.
+    => New method gdbox_empty() added to GD::SecurityImage::GD.
+       Also added a fake gdbox_empty() method to 
+       GD::SecurityImage::Magick for compatibility.
+       Under GD::SecurityImage::Magick, this method always returns 
+       false.
+    => Minor fix in create().
+    => Updated Pods. Sub modules have definiton of what they are now.
+
+1.321 Wed Jul 28 21:52:04 2004
+    => Updated tests. Code didn't change.
+
+1.32 Wed Jul 28 15:49:12 2004
+    => Minimal fix in create().
+    => There is a bug in PerlMagicks older than 6.0.4.
+       From <http://www.imagemagick.org/www/Changelog.html>:
+       "PerlMagick's QueryFontMetrics() incorrectly reports 
+       `unrecognized attribute'` for the `font' attribute".
+       Image::Magick test is now skipped if your 
+       $Image::Magick::VERSION is smaller than 6.0.4.
+       Please upgrade to 6.0.4, if you want to use Image::Magick
+       as the backend.
+    => Added this bug to Pod.
+
+1.31 Sun Jun 27 00:08:49 2004
+    => Updated Pod.
+    => send_ctobg is disabled automatically if style is 
+       set to 'box'.
+    => All styles can put a frame around the image now.
+       And this feature is enabled by default.
+    => New option 'frame' added to new().
+    => Renamed constants in GD::SecurityImage::GD.
+    => Changed tests.
+
+1.3 Mon Jun 21 19:11:13 2004
+    => New method particle().
+    => Private method r2h().
+    => Fixed color conversion for Image::Magick.
+    => out() now accepts arguments.
+    => Updated pod.
+
+1.2 Fri Jun 18 21:39:08 2004
+    => Added raw() method.
+    => Fixed gd_font object key.
+    => new style "ec".
+    => Adapted Image::Magick compatibility (request from Mark Fuller).
+       I may add Image::Magick spesific styles in future releases.
+    => New modules added: 
+          GD::SecurityImage::GD
+          GD::SecurityImage::Magick
+          GD::SecurityImage::Styles
+       and GD::SecurityImage is smaller now ;)
+    => Renamed old tests to (added 'gd_' to names):
+          t/gd_01_use.t
+          t/gd_02_normal.t
+          t/gd_03_ttf.t
+    => Added new tests:
+          t/im_01_use.t
+          t/im_02_ttf.t
+    => Altered Makefile.PL and test files to skip tests if the user selects to do so.
+
+1.1 Fri May 14 22:08:39 2004
+    => Added 'send_ctobg' option to new().
+    => After testing the code with a *really* old GD 
+       (1.19 -- which has no ttf support), I've realized 
+       that stringFT was implemented in GD 1.31. 
+       So, the ttf test now has a skip option.
+    => Also added stringTTF check for backward compatibility.
+       stringTTF => (GD 1.20 @ 30 Aug 1999 )
+       stringFT  => (GD 1.31 @ 26 Sep 2001 )
+    => Fixed pod. There was an '=item' instead of '=head'.
+    => Added new styles 'circle' and 'ellipse'.
+    => Updated 03_ttf.t
+
+1.0 Mon Apr 26 21:40:45 2004
+    => First release.

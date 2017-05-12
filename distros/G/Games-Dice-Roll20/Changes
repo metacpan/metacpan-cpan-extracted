@@ -1,0 +1,15 @@
+Revision history for Perl module Games::Dice::Roll20
+
+0.03  2016-02-15 09:27:34 CET
+
+  * Remove dependency on newer versions of List::Util
+  * Use splice to replace double shifts
+  * Use fallback numerify for math operations
+
+0.02  2016-02-12 11:29:46 CET
+
+  * Follow floating point advice from Math::Random in round function
+
+0.01 2016-02-11
+
+  * Initial release

@@ -1,0 +1,508 @@
+<HTML>
+<HEAD>
+<TITLE>Read.pm</TITLE>
+<LINK REV="made" HREF="mailto:smathias1@qwest.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#feedback">FEEDBACK</A></LI>
+	<LI><A HREF="#author  steve mathias">AUTHOR - Steve Mathias</A></LI>
+	<LI><A HREF="#details">DETAILS</A></LI>
+	<LI><A HREF="#imported packages">Imported Packages</A></LI>
+	<LI><A HREF="#inheritance">Inheritance</A></LI>
+	<LI><A HREF="#public methods">Public Methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#getcluster">getCluster</A></LI>
+		<LI><A HREF="#getminicluster">getMiniCluster</A></LI>
+		<LI><A HREF="#getsubject">getSubject</A></LI>
+		<LI><A HREF="#getminisubject">getMiniSubject</A></LI>
+		<LI><A HREF="#getkindred">getKindred</A></LI>
+		<LI><A HREF="#getminikindred">getMiniKindred</A></LI>
+		<LI><A HREF="#getmarker">getMarker</A></LI>
+		<LI><A HREF="#getminimarker">getMiniMarker</A></LI>
+		<LI><A HREF="#getminimarkerbyname">getMiniMarkerByName</A></LI>
+		<LI><A HREF="#getsnp">getSNP</A></LI>
+		<LI><A HREF="#getminisnp">getMiniSNP</A></LI>
+		<LI><A HREF="#getgenotype">getGenotype</A></LI>
+		<LI><A HREF="#getminigenotype">getMiniGenotype</A></LI>
+		<LI><A HREF="#getstudyvariable">getStudyVariable</A></LI>
+		<LI><A HREF="#getministudyvariable">getMiniStudyVariable</A></LI>
+		<LI><A HREF="#getphenotype">getPhenotype</A></LI>
+		<LI><A HREF="#getminiphenotype">getMiniPhenotype</A></LI>
+		<LI><A HREF="#getfrequencysource">getFrequencySource</A></LI>
+		<LI><A HREF="#getminifrequencysource">getMiniFrequencySource</A></LI>
+		<LI><A HREF="#gethtmarkercollection">getHtMarkerCollection</A></LI>
+		<LI><A HREF="#gethaplotype">getHaplotype</A></LI>
+		<LI><A HREF="#getminihaplotype">getMiniHaplotype</A></LI>
+		<LI><A HREF="#getdnasample">getDNASample</A></LI>
+		<LI><A HREF="#gettissuesample">getTissueSample</A></LI>
+		<LI><A HREF="#getmap">getMap</A></LI>
+		<LI><A HREF="#getminimap">getMiniMap</A></LI>
+	</UL>
+
+	<LI><A HREF="#private methods">Private methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#_getobjassocdata">_getObjAssocData</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genetics::API::DB::Read</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Genetics::API ;</PRE>
+<PRE>
+  $api = new Genetics::API(DSN =&gt; {driver =&gt; &quot;mysql&quot;,
+                                   host =&gt; $Host,
+                                   database =&gt; $Database},
+                           user =&gt; $UserName,
+                           password =&gt; $Password) ;</PRE>
+<PRE>
+  $id = 123456 ;
+  $subject = $api-&gt;getSubject($id) ;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Genetics::API::DB packages provide an interface for the manipulation of
+Genperl objects in a relationa; database.  This package contains the methods
+for retrieving objects from a database by id.  To retrieve objects using more
+complex criteria, see Genetics::API::DB::Query.</P>
+<P>Two versions of get methods are provided for most object types.  One returns
+``full'' objects containing all the data in the database associated with an
+object id; the other returns ``mini'' objects containing only a subset of the
+data associated with an object.  Generally, the getMini methods do not return
+any of the general object annotation fields (ie. things like Keywords,
+DBXReferences, etc. are not returned with ``mini'' objects).  In some cases,
+certain class-specific data is also left out of ``mini'' objects.  See the
+individual getMini method descriptions for details on this.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</P>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</P>
+<P>
+<HR>
+<H1><A NAME="feedback">FEEDBACK</A></H1>
+<P>Currently, all feedback should be sent directly to the author.</P>
+<P>
+<HR>
+<H1><A NAME="author  steve mathias">AUTHOR - Steve Mathias</A></H1>
+<P>Email: <A HREF="mailto:mathias@genomica.com">mathias@genomica.com</A></P>
+<P>Phone: (720) 565-4029</P>
+<P>Address: Genomica Corporation 
+         1745 38th Street
+         Boulder, CO 80301</P>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>The rest of the documentation describes each of the object variables and 
+methods. The names of internal variables and methods are preceded with an
+underscore (_).</P>
+<P>
+<HR>
+<H1><A NAME="imported packages">Imported Packages</A></H1>
+<PRE>
+ strict             Just to be anal
+ vars               Global variables
+ Carp               Error reporting</PRE>
+<P>
+<HR>
+<H1><A NAME="inheritance">Inheritance</A></H1>
+<PRE>
+ Exporter           Make methods available to importing packages</PRE>
+<P>
+<HR>
+<H1><A NAME="public methods">Public Methods</A></H1>
+<P>
+<H2><A NAME="getcluster">getCluster</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::Cluster object from the database.
+  Argument  : The Object ID of the Cluster to be returned.
+  Returns   : A Genetics::Object::Cluster object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminicluster">getMiniCluster</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::Cluster object 
+              from the database.
+  Argument  : The Object ID of the Cluster to be returned.
+  Returns   : A Genetics::Object::Cluster object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.</PRE>
+<P>
+<H2><A NAME="getsubject">getSubject</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::Subject object from the database.
+  Argument  : The Object ID of the Subject to be returned.
+  Returns   : A Genetics::Object::Subject object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminisubject">getMiniSubject</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::Subject object from 
+              the database, by id.
+  Argument  : The Object ID of the Subject to be returned.
+  Returns   : A Genetics::Object::Subject object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.  It also has a sub-set of 
+              Subject-specific fields.</PRE>
+<P>
+<H2><A NAME="getkindred">getKindred</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::Kindred object from the database.
+  Argument  : The Object ID of the Kindred to be returned.
+  Returns   : A Genetics::Object::Kindred object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminikindred">getMiniKindred</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::Kindred object from 
+              the database.
+  Argument  : The Object ID of the Kindred to be returned.
+  Returns   : A Genetics::Object::Kindred object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.</PRE>
+<P>
+<H2><A NAME="getmarker">getMarker</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::Marker object from the database.
+  Argument  : The Object ID of the Marker to be returned.
+  Returns   : A Genetics::Object::Marker object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminimarker">getMiniMarker</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::Marker object from the 
+              database.
+  Argument  : The Object ID of the Marker to be returned.
+  Returns   : A Genetics::Object::Marker object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.  It also has a sub-set of 
+              Marker-specific fields.</PRE>
+<P>
+<H2><A NAME="getminimarkerbyname">getMiniMarkerByName</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::Marker object from the 
+              database, by name.
+  Argument  : The name of the Marker to be returned.
+  Returns   : A Genetics::Object::Marker object.
+  Scope     : Public
+  Comments  : If there is more than one Marker object with the same name, this
+              will only return ONE of them.  Which one?  Good question.  Caveat 
+              Programmor!
+              &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.</PRE>
+<P>
+<H2><A NAME="getsnp">getSNP</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::SNP object from the database.
+  Argument  : The Object ID of the SNP to be returned.
+  Returns   : A Genetics::Object::SNP object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminisnp">getMiniSNP</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::SNP object from the 
+              database.
+  Argument  : The Object ID of the SNP to be returned.
+  Returns   : A Genetics::Object::SNP object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.  It also has a sub-set of 
+              SNP-specific fields.</PRE>
+<P>
+<H2><A NAME="getgenotype">getGenotype</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::Genotype object from the database.
+  Argument  : The Object ID of the Genotype to be returned.
+  Returns   : A Genetics::Object::Genotype object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminigenotype">getMiniGenotype</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::Genotype object from 
+              the database.
+  Argument  : The Object ID of the Genotype to be returned.
+  Returns   : A Genetics::Object::Genotype object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.  It also has a sub-set of 
+              Genotype-specific fields.</PRE>
+<P>
+<H2><A NAME="getstudyvariable">getStudyVariable</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::StudyVariable object from the database.
+  Argument  : The Object ID of the StudyVariable to be returned.
+  Returns   : A Genetics::Object::StudyVariable object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getministudyvariable">getMiniStudyVariable</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::StudyVariable object 
+              from the database.
+  Argument  : The Object ID of the StudyVariable to be returned.
+  Returns   : A Genetics::Object::StudyVariable object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.  It also has a sub-set of 
+              StudyVariable-specific fields.
+=cut</PRE>
+<P>sub getMiniStudyVariable {
+  my($self, $id) = @_ ;
+  my($sv, %param, $sth, $sth1, $arrRef, $arrRef1, %init, %init1, $category, 
+     $format, @codesList, @aseList, @lcList, $p11, $p12, $p22, $mp1, $mp2) ;
+  my $dbh = $self-&gt;{dbh} ;
+</P>
+<PRE>
+
+  $DEBUG and carp &quot; -&gt;[getMiniStudyVariable] $id&quot; ;</PRE>
+<PRE>
+  # StudyVariable data
+  $sth = $dbh-&gt;prepare(&quot;select name, id, dateCreated, dateModified, comment, 
+                               category, format, isXLinked, description 
+                        from Object, StudyVariable 
+                        where id = $id 
+                        and id = studyVariableID&quot;) ;
+  $sth-&gt;execute() ;
+  $arrRef = $sth-&gt;fetchrow_arrayref() ;
+  $sth-&gt;finish() ;
+  defined $arrRef or return(undef) ;</PRE>
+<PRE>
+  $param{name} = $$arrRef[0] ;
+  $param{id} = $$arrRef[1] ;
+  $param{dateCreated} = $$arrRef[2] ;
+  $param{dateModified} = $$arrRef[3] ;
+  $param{comment} = $$arrRef[4] ;
+  $category = $param{category} = $$arrRef[5] ;
+  $format = $param{format} = $$arrRef[6] ;
+  $param{isXLinked} = $$arrRef[7] ;
+  defined $$arrRef[8] and $param{description} = $$arrRef[8] ;
+  # CodeDerivation data
+  if ($format eq &quot;Code&quot;) {
+    if ($category eq &quot;StaticLiabilityClass&quot;) {
+      $sth = $dbh-&gt;prepare(&quot;select codeDerivationID, code, description, formula 
+                          from CodeDerivation 
+                          where studyVariableID = $id&quot;) ;
+      $sth-&gt;execute() ;
+      $sth1 = $dbh-&gt;prepare(&quot;select pen11, pen12, pen22, malePen1, malePen2 
+                             from StaticLCPenetrance 
+                             where cdID = ?&quot;) ;
+      while ($arrRef = $sth-&gt;fetchrow_arrayref()) {
+        %init = () ;
+        $sth1-&gt;execute($$arrRef[0]) ;
+        ($p11, $p12, $p22, $mp1, $mp2) = $sth1-&gt;fetchrow_array() ;
+        $init{code} = $$arrRef[1] ;
+        $init{pen11} = $p11 ;
+        $init{pen12} = $p12 ;
+        $init{pen22} = $p22 ;
+        defined $mp1 and $init{malePen1} = $mp1 ;
+        defined $mp2 and $init{malePen2} = $mp2 ;
+        defined $$arrRef[2] and $init{description} = $$arrRef[2] ;
+        defined $$arrRef[3] and $init{formula} = $$arrRef[3] ;
+        push(@codesList, { %init }) ;
+      }
+    } else {
+      $sth = $dbh-&gt;prepare(&quot;select code, description, formula 
+                            from CodeDerivation 
+                            where studyVariableID = $id&quot;) ;
+      $sth-&gt;execute() ;
+      while ($arrRef = $sth-&gt;fetchrow_arrayref()) {
+        %init = () ;
+        $init{code} = $$arrRef[0] ;
+        defined $$arrRef[1] and $init{description} = $$arrRef[1] ;
+        defined $$arrRef[2] and $init{formula} = $$arrRef[2] ;
+        push(@codesList, { %init }) ;
+      }
+    }
+  }
+  defined $codesList[0] and $param{Codes} = \@codesList ;
+</PRE>
+<PRE>
+
+  if ($category =~ /AffectionStatus$/) {
+    # AffectionStatus data
+    $sth = $dbh-&gt;prepare(&quot;select name, diseaseAlleleFreq, pen11, pen12, 
+                                 pen22, malePen1, malePen2, asDefID 
+                          from AffectionStatusDefinition 
+                          where studyVariableID = $id&quot;) ;
+    $sth-&gt;execute() ;
+    if ( defined ($arrRef = $sth-&gt;fetchrow_arrayref()) ) {
+      %init = () ;
+      $init{name} = $$arrRef[0] ;
+      $init{diseaseAlleleFreq} = $$arrRef[1] ;
+      $init{pen11} = $$arrRef[2] ;
+      $init{pen12} = $$arrRef[3] ;
+      $init{pen22} = $$arrRef[4] ;
+      defined $$arrRef[5] and $init{malePen1} = $$arrRef[5] ;
+      defined $$arrRef[6] and $init{malePen2} = $$arrRef[6] ;
+      # Elements
+      $sth1 = $dbh-&gt;prepare(&quot;select code, type, formula 
+                             from AffectionStatusElement 
+                             where asDefID = $$arrRef[7]&quot;) ;
+      $sth1-&gt;execute() ;
+      while ($arrRef1 = $sth1-&gt;fetchrow_arrayref()) {
+        push(@aseList, {code =&gt; $$arrRef1[0],
+                        type =&gt; $$arrRef1[1],
+                        formula =&gt; $$arrRef1[2]}) ;
+      }
+      $init{AffStatElements} = \@aseList ;
+      $param{AffStatDef} = { %init } ;
+    }
+  }</PRE>
+<PRE>
+  $sv = new Genetics::StudyVariable(%param) ;
+</PRE>
+<PRE>
+
+  $DEBUG and carp &quot; -&gt;[getMiniStudyVariable] $sv&quot; ;</PRE>
+<PRE>
+  return($sv) ;
+}</PRE>
+<P>
+<H2><A NAME="getphenotype">getPhenotype</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::Phenotype object from the database.
+  Argument  : The Object ID of the Phenotype to be returned.
+  Returns   : A Genetics::Object::Phenotype object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminiphenotype">getMiniPhenotype</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::Phenotype object from 
+              the database.
+  Argument  : The Object ID of the Phenotype to be returned.
+  Returns   : A Genetics::Object::Phenotype object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.  It also has a sub-set of 
+              Phenotype-specific fields.</PRE>
+<P>
+<H2><A NAME="getfrequencysource">getFrequencySource</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::FrequencySource object from the database.
+  Argument  : The Object ID of the FrequencySource to be returned.
+  Returns   : A Genetics::Object::FrequencySource object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminifrequencysource">getMiniFrequencySource</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::FrequencySource object from the database.
+  Argument  : The Object ID of the FrequencySource to be returned.
+  Returns   : A Genetics::Object::FrequencySource object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="gethtmarkercollection">getHtMarkerCollection</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::HtMarkerCollection object from the database.
+  Argument  : The Object ID of the HtMarkerCollection to be returned.
+  Returns   : A Genetics::Object::HtMarkerCollection object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="gethaplotype">getHaplotype</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::Haplotype object from the database.
+  Argument  : The Object ID of the Haplotype to be returned.
+  Returns   : A Genetics::Object::Haplotype object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminihaplotype">getMiniHaplotype</A></H2>
+<PRE>
+  Function  : Get a &quot;light&quot; version of a Genetics::Object::Haplotype object 
+              from the database.
+  Argument  : The Object ID of the Haplotype to be returned.
+  Returns   : A Genetics::Object::Haplotype object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.</PRE>
+<P>
+<H2><A NAME="getdnasample">getDNASample</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::DNASample object from the database.
+  Argument  : The Object ID of the DNASample to be returned.
+  Returns   : A Genetics::Object::DNASample object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="gettissuesample">getTissueSample</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::TissueSample object from the database.
+  Argument  : The Object ID of the TissueSample to be returned.
+  Returns   : A Genetics::Object::TissueSample object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getmap">getMap</A></H2>
+<PRE>
+  Function  : Get (read) a Genetics::Object::Map object from the database.
+  Argument  : The Object ID of the Map to be returned.
+  Returns   : A Genetics::Object::Map object.
+  Scope     : Public</PRE>
+<P>
+<H2><A NAME="getminimap">getMiniMap</A></H2>
+<PRE>
+  Function  : Get &quot;light&quot; version of a Genetics::Object::Map object from 
+              the database.
+  Argument  : The Object ID of the Map to be returned.
+  Returns   : A Genetics::Object::Map object.
+  Scope     : Public
+  Comments  : &quot;Light&quot; version means that the object has only the name and id 
+              fields from Object, and it does not contain any associated NameAlias, 
+              Contact, DBXReference or Keyword data.  It also has a sub-set of 
+              Map-specific fields.</PRE>
+<P>
+<HR>
+<H1><A NAME="private methods">Private methods</A></H1>
+<P>
+<H2><A NAME="_getobjassocdata">_getObjAssocData</A></H2>
+<PRE>
+  Function  : get (read) data from and associated with the Object table/object.
+  Arguments : Scalar containing an Object.id and a reference to a hash which 
+              will be populated with the data.
+  Returns   : N/A
+  Scope     : Private
+  Called by : The various getObjectSubClass methods.
+  Comments  : The format of the data structure created by this method is 
+              identical to that passed to Object::new().</PRE>
+
+</BODY>
+
+</HTML>

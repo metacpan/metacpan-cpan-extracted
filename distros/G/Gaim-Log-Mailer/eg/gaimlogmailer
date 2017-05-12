@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Std;
+use Pod::Usage;
+use Gaim::Log::Mailer;
+use Log::Log4perl qw(:easy);
+
+getopts("nvhc:", \my %opts);
+
+my $conf_file = "/etc/gaimlogmailer.yml";
+$conf_file = $opts{conf_file} if exists $opts{c};
+
+
+pod2usage() if $opts{h};
+
+my $mailer = Gaim::Log::Mailer->new();
+$mailer->{fake_email} = 1 if $opts{n};
+
+if( $mailer->{conf}->{logfile} ) {
+    my $level = $ERROR;
+    $level = $DEBUG if $opts{v};
+
+    Log::Log4perl->easy_init({level    => $level, 
+                              category => "Gaim::Log::Mailer",
+                              file     => $mailer->{conf}->{logfile},
+                             });
+
+} else {
+    my $level = $INFO;
+    $level = $DEBUG if $opts{v};
+    Log::Log4perl->easy_init({ category => "Gaim::Log::Mailer",
+                               level    => $level,
+                               layout   => "%F{1}-%L %m%n",
+                             });
+}
+
+$mailer->process();
+
+__END__
+
+=head1 NAME
+
+    gaimlogmailer - Have your Gaim/Pidgin logs mailed to you
+
+=head1 SYNOPSIS
+
+    gaimlogmailer [-c /etc/gaimlogmailer.yml]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-h>
+
+Print help.
+
+=item B<-c>
+
+Specify a .yml configuration file (defaults to /etc/gaimlogmailer.yml)
+
+=item B<-v>
+
+Verbose mode. Log more detailed.
+
+=item B<-n>
+
+Don't send emails, just print messages to STDOUT (for testing).
+
+=back
+
+=head2 Reset throttling
+
+If you get throttled, but want to override it, either change the 
+throttle configuration in the configuration file or delete the
+C<~/gaimlogmailer/throttle> file.
+
+=head1 DESCRIPTION
+
+gaimlogmailer is the executing script of Gaim::Log::Mailer. Check the
+Gaim::Log::Mailer for how it works.
+
+=head1 LEGALESE
+
+Copyright 2008 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2008, Mike Schilli <cpan@perlmeister.com>

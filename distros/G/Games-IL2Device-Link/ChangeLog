@@ -1,0 +1,47 @@
+2004-07-22  Mathias Jansson  <mj@pfy.nu>
+
+	- 0.02
+
+	* Link.pm: receive buffer now 4x send_size data.
+
+2004-07-13  Mathias Jansson  <mj@pfy.nu>
+
+	* Changed module name.
+
+2004-07-08  Mathias Jansson  <mj@pfy.nu>
+
+	* Removed Net::UDP and replaced it with IO::Socket
+
+	* IL2Device.pm: cleanup for module packet  creation.
+	added carp usage.
+	added il2disconnect() ( also renamed connect -> il2connect to avoid confusion)
+
+
+2004-07-07  Mathias Jansson  <mj@pfy.nu>
+
+	* IL2Device.pm:
+	ported network method to IO::Socket for win32 compability
+
+2004-07-05  Mathias Jansson  <mj@pfy.nu>
+
+	* IL2Device.pm:
+	changed $self->{REPLY} to hashref, reply now returns hashref.
+
+2004-07-04  Mathias Jansson  <mj@pfy.nu>
+
+	* IL2Device.pm: modified parsedata to exlude key/pair return index.
+	moved debug to a variable.
+
+	* IL2Device.pm:
+	modified get() to take several values, each result is return in an arrayref, key/pair returns are not parsed.
+	set() is now working properly.
+	get() now handles timeouts.
+
+2004-07-02  Mathias Jansson  <mj@pfy.nu>
+
+	* IL2Device.pm: first working version
+
+2004-07-01  Mathias Jansson  <mj@pfy.nu>
+
+	* IL2Device.pm: added to cvs
+

@@ -1,0 +1,31 @@
+Installation Instructions for CPpickPages
+
+  perl Makefile.PL
+  make
+
+  DO NOT make install
+  unless you want to globally install,
+  instead follow the directions below
+
+  cp scripts/p_gen.cgi  /home/you/public_html/
+  cp images/*		/home/you/public_html/my_image_directory
+  edit p_gen.cgi to point to your images directory
+
+  to the appropriate web directory.
+  Rename p_gen.cgi with a mod_perl extension if you 
+  will be using mod_perl.
+
+  you may copy the images to any other directory
+  in the document root if you make the appropriate
+  changes in the configuration of p_gen.cgi
+
+  FOR LOCAL INSTALL ONLY
+  copy -a blib /home/you/public_html/
+
+  you're done
+
+
+  I'd appreciate it if you'd drop me an email if you use
+  this module. I'd like to know how useful it is.
+
+  Michael Robinton michael@bizsystems.com

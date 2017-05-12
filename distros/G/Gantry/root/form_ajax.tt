@@ -1,0 +1,49 @@
+[% title = view.title %]
+[% view.form.ajax_java_script %]
+
+<fieldset>
+	<legend>
+		[% view.form.legend %]
+	</legend>
+	
+	<div id="float_left">
+		<table class="results" cellspacing="[% view.form.cellspacing || 0 %]"
+			 border=0 width="[% view.form.width %]">
+			[% FOREACH field IN view.form.fields %]
+			<tr class="[% 'selected' IF field.checked %]">
+				<td class="shd" style="width: [% field.label_width || '20%' %]">
+					[% field.label %]
+				</td>
+				<td class="dta" style="width: [% field.width || '80%' %]" valign="top">
+					<input type="[% field.type %]" 
+						value="[% params.${field.name} || field.default_value %]" 
+						id="[% field.id %]"
+						name="[% field.name %]" 
+						[% 'checked="checked"' IF field.checked %] />
+					
+					[% field.callback %]
+					
+					[% field.raw %]
+				</td>
+			</tr>
+			[% END %]
+
+        <tr>
+            <td colspan="2">
+                <div id="view"></div>
+            </td>
+        </tr>
+		</table>
+	</div>
+	
+	<br style="clear: both" />
+</fieldset>
+
+[% IF view.form.back %]
+	<br />
+	<input type="button" 
+		name="Back"
+		value="Back"
+		onclick="javascript: location='[% view.form.back %]';" />		
+[% END %]
+

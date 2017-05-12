@@ -1,0 +1,87 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Imager;
+Imager->init;
+use Geo::Walkabout::Utils;
+
+sub max {
+    my($a,$b) = @_;
+    return $a <=> $b ? $a : $b;
+}
+
+sub scale_chain {
+    my($chain, $bound, $scale) = @_;
+    # Normalize relative to the bounding box.
+    @$chain = map { [$_->[0] - $bound->[1][0], 
+                    $_->[1] - $bound->[1][1]] } @$chain;
+    
+    # Scale to match the size of the image.
+    @$chain = map { [$_->[0] * $scale, $_->[1] * $scale] } @$chain;
+
+    return @$chain;
+}
+
+
+my($zip, $file) = @ARGV;
+my $img_size = 600;
+
+my $bound = Geo::Walkabout::Utils::bounding_box_zip($zip);
+my @lines = Geo::Walkabout::Utils::get_zip($zip);
+
+my @range;
+$range[0] = $bound->[0][0] - $bound->[1][0];
+$range[1] = $bound->[0][1] - $bound->[1][1];
+
+my $scale = $img_size / max(@range);
+my @scaled_size = ($scale * $range[0], $scale * $range[1]);
+
+my $img = Imager->new(xsize => $scaled_size[0],
+                      ysize => $scaled_size[1]) || 
+  die "Failed to create: $Imager::ERRSTR";
+
+my $fg_color       = i_color_new(36,144,0,255);
+my $bg_color       = i_color_new(150,150,55,255);
+my $standout_color = i_color_new(200,0,0,255);
+
+# Fill in the background.
+$img->box(color=>$bg_color, xmin=>0, ymin=>0, 
+          xmax=>$scaled_size[0], ymax=>$scaled_size[1], filled=>1);
+
+foreach my $line (@lines) {
+    my @chain = $line->chain->chain;
+
+    scale_chain(\@chain, $bound, $scale);
+
+    $img->polyline(points=>[@chain],color=>$fg_color);
+}
+
+if( $zip == 15212 ) {
+    my $home = Geo::Walkabout::Utils::find_address({fename => "Brighton",
+                                               fetype => "Rd",
+                                               addr_num => 3128,
+                                               zip => 15212});
+    my $psize = 1;
+    my($home_point) = scale_chain([$home->chain->chain], $bound, $scale);
+    $img->box(xmin=>$home_point->[0]-$psize, ymin=>$home_point->[1]-$psize,
+              xmax=>$home_point->[0]+$psize, ymax=>$home_point->[1]+$psize,
+              filled=>1);
+
+    my @brighton = Geo::Walkabout::Utils::get_line_feature({
+                                                       fename => "Brighton",
+                                                       fetype => "Rd",
+                                                       zip    => 15212
+                                                      });
+
+    foreach my $line (@brighton) {
+        my @chain = $line->chain->chain;
+
+        scale_chain(\@chain, $bound, $scale);
+
+        $img->polyline(points=>[@chain],color=>$standout_color);
+    }
+
+}
+    
+$img->write(file=>$file, type=>'png') || 
+  die "Failed to write: ".$img->{ERRSTR};

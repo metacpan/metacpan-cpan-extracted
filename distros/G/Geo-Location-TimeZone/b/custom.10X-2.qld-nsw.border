@@ -1,0 +1,34 @@
+# Section of Queensland's border with NSW between -22.5,142.5 and -37.5,157.5
+# The recomendation for the border by Sir William Denison in 1856 reads:
+#	`Starting from Cape Danger and following the range of hills which 
+#	 now separate the district of Clarence River from that of Moreton 
+#	 Bay, it should continue along the ridge forming the boundary of 
+#	 the basins of the Richmond and the Clarence until it reaches the 
+#	 Parallel of 29 degrees of south latitude, along which it should 
+#	 continue westward till it reaches the meridian of 141 degrees east.'
+# The border in use dates from the Roberts survey from 1863 to 1866, being
+# described as 'the watershed from Point Danger to the Dumaresq
+# River', the Dumaresq to the Macintyre and Barwon Rivers, and the 29th Parallel
+#
+# The 29th Parallel is easy to put in, but accurate data for the river regions
+# is hard to find.  Contributions welcome.
+
+$ndata{'10'} =
+		{
+		  '-2' => {
+			   '1' => {
+				      'p' => [
+					       [142.5,-29.0],
+						# Beginning around here, the
+						# border starts wandering.
+						[148.9,-29.0],
+					       [154.0,-29.0],
+						[154.0,-22.5],
+						[142.5,-22.5],
+						[142.5,-29.0],
+					     ],
+				      'c' => 'GPL - BORDER INCOMPLETE',
+				      'z' => 'Australia/Queensland',
+				    },
+			 },
+		};

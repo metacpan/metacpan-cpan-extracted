@@ -1,0 +1,55 @@
+---
+abstract: 'A Marpa-based parser for Graphviz dot files'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.51'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GraphViz2-Marpa
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Diff: '1.1903'
+  Capture::Tiny: '0.44'
+  Config: '0'
+  Config::Tiny: '2.23'
+  Date::Format: '2.24'
+  Date::Simple: '3.03'
+  File::Basename: '2.85'
+  File::Copy: '0'
+  File::HomeDir: '1'
+  File::Spec: '3.62'
+  File::Temp: '0.2304'
+  File::Which: '1.21'
+  Getopt::Long: '2.38'
+  HTML::Entities::Interpolate: '1.1'
+  Log::Handler: '0.88'
+  Marpa::R2: '3'
+  Moo: '2.002004'
+  Path::Iterator::Rule: '1.012'
+  Path::Tiny: '0.096'
+  Pod::Usage: '1.36'
+  Text::Xslate: v3.3.9
+  Tree::DAG_Node: '1.29'
+  Try::Tiny: '0.27'
+  Types::Standard: '1.000005'
+  perl: '5.010001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=GraphViz2-Marpa
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/GraphViz2-Marpa.git
+version: '2.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

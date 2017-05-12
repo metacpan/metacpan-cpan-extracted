@@ -1,0 +1,33 @@
+---
+abstract: 'An interface to Google cloud speech service'
+author:
+  - 'Prajith NDZ <prajith@ndimensionz.com, prajithpalakkuda@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-Cloud-Speech
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Crypt::OpenSSL::RSA: '0'
+  MIME::Base64: '0'
+  Mojo::File: '0'
+  Mojo::JWT::Google: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious: '0'
+resources:
+  bugtracker: https://github.com/Prajithp/p5-Google-Cloud-Speech/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Prajithp/p5-Google-Cloud-Speech
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

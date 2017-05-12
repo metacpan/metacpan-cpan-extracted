@@ -1,0 +1,6 @@
+Revision history for Perl extension GCC::TranslationUnit.
+
+1.00  Sun Nov  9 22:02:49 2003
+	- original version; created by h2xs 1.22 with options
+		-n GCC::TranslationUnit -X
+

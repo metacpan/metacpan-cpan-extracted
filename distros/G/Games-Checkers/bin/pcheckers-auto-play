@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+# Games::Checkers, Copyright (C) 1996-2012 Mikhael Goikhman, migo@cpan.org
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Try --help for usage.
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use Games::Checkers::Game;
+
+my $script_name = ($0 =~ m:([^/]+)$:, $1);
+my $level = 3;
+my $pause = 1;
+my $random = 'none';  # '' means both, 'w' or 'b' - white or black only
+my $use_term = 0;  # 0 means detect automatically
+my $dumb_term = 0;
+my $dumb_chars = 0;
+my $fullscreen = 0;
+my $max_move_num = 100;
+
+sub show_help (;$) {
+	my $is_error = shift || 0;
+	my $out = $is_error ? \*STDERR : \*STDOUT;
+	my $usage = qq{
+		Usage: $script_name [OPTIONS]
+		The automatic Checkers gameplay.
+
+		Options:
+			-h --help          show this help and exit
+			-l --level N       strength level (default: $level)
+			-p --pause N       pause in seconds between the moves
+			-r --random [w|b]  perform random (not best) moves for both/white/black
+			-t --use-term      use terminal even if graphical frontend is available
+			-T --dumb-term     do not position terminal cursor
+			-C --dumb-chars    do not use fancy drawing characters
+			-f --fullscreen    start in fullscreen mode (incompatible with -t)
+			-m --move-num N    limit the game moves to the number
+			-g --give-away     change rules to "give away"
+	};
+	$usage =~ s/^\n//; $usage =~ s/^\t\t?//mg;
+	print $out $usage;
+	exit $is_error;
+}
+
+GetOptions(
+	"h|help"        => sub { show_help(0) },
+	"l|level=s"     => \$level,
+	"p|pause=s"     => \$pause,
+	"r|random:s"    => \$random,
+	"t|use-term!"   => \$use_term,
+	"T|dumb-term!"  => \$dumb_term,
+	"C|dumb-chars!" => \$dumb_chars,
+	"f|fullscreen!" => \$fullscreen,
+	"m|move-num=s"  => \$max_move_num,
+	"g|give-away!"  => \$Games::Checkers::give_away,
+) || show_help(1);
+
+my $game = Games::Checkers::Game->new(
+	title => join(' - ', ("Computer (lv $level)") x 2),
+	level => $level,
+	random => $random eq 'none' ? 0 : $random || 1,
+	max_move_num => $max_move_num,
+	use_term => $use_term,
+	dumb_term => $dumb_term,
+	dumb_chars => $dumb_chars,
+	fullscreen => $fullscreen,
+);
+
+$game->show_board;
+
+my $num_moves = 0;
+while ($game->can_move) {
+	$game->sleep($pause);
+	last if $game->is_max_move_num_reached;
+	$game->show_move($game->choose_move);
+	$game->show_board;
+}
+
+$game->show_result;

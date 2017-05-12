@@ -1,0 +1,31 @@
+Revision history for Genome::Model::Tools::Music
+
+0.04    2012-08-15
+
+        - Implemented generalized linear models for regression analyses against clinical data
+        - Added tools to generate typical visualizations like Kaplan-Meier survival estimates, and mutation status matrices
+        - Support for TCGA Mutation Annotation Format (MAF) version 2.3
+        - Performance improvements in mutation rate calculations, and more efficient memory usage
+        - Added support for wiggle track format files describing coverage, if BAMs are unavailable
+
+0.03    2012-04-29
+
+        [FEATURES]
+        - All: Added support for updated MAF format v2.2 (Mar 28th, 2012)
+        - All: Output header descriptions are friendlier, and comma-delimited outputs are now tab-delimited
+        - All: Added optional skipping of noncoding and silent muts for most modules
+        - ClinicalCorrelation: Added generalized linear model for phenotype-covariate relationships
+        - ClinicalCorrelation: Optional use of a sample-vs-gene matrix as input, instead of a MAF
+        - SMG: Uses the R multicore package to parallelize its tests
+        - SMG: Provide per-gene BMR modifiers to adjust for varying mutation accumulation rates across the genome
+        - CalcBmr: Use mutation-recurrence rates instead of mutation rates for SMG testing
+        - CalcBmr: Implemented clustered-sample BMRs for subgroup-wise or sample-wise SMG tests
+        - CalcBmr: Added an optional mutation category for truncation mutations
+        - Pfam: Now supports NCBI Build 37 variant loci
+
+        [BUG FIXES]
+        - All: Modules no longer remove chr-prefixes from user-provided chromosome names
+        - CalcBmr: Print a warning if the MAF contains a variant from a sample not in the bam-list
+        - calcRoiCovg: Fixed a potential memory leak
+        - CosmicOmim: Now treats chromosomes 23 and 24 in the COSMIC DB file as chromosomes X and Y, respectively
+        - CosmicOmim: Nucleotide changes corrected for splice site variants

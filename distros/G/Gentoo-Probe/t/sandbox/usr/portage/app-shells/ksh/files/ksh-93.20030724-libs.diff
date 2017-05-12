@@ -1,0 +1,309 @@
+diff -ruN ksh-93.20030724.orig/work/src/cmd/ksh93/Makefile ksh-93.20030724/work/src/cmd/ksh93/Makefile
+--- ksh-93.20030724.orig/work/src/cmd/ksh93/Makefile	2003-06-02 19:31:54.000000000 +0100
++++ ksh-93.20030724/work/src/cmd/ksh93/Makefile	2003-09-06 03:01:51.000000000 +0100
+@@ -78,9 +78,6 @@
+ 	BASH_MACHTYPE == "$(BASH_HOSTTYPE)-unknown-$(CC.HOSTTYPE:B)"
+ end
+ 
+-/* use the following libraries only if they exist */
+-LIBS_opt := +ljobs +li
+-
+ if  CC.HOSTTYPE == "sol[89].*"
+ 	LIBS_opt += -lsecdb
+ 	LDFLAGS  += $(CC.LD.LAZY) $(CC.LD.NORECORD)
+@@ -97,7 +94,7 @@
+ 	/* the linux.sparc linker still has some problems */
+ 	LIBS_opt += -ldll
+ end
+-LIBS_opt += +lintl -ldl
++LIBS_opt += -ldl
+ $(LIBS_opt)	: .DONTCARE
+ 
+ LDLIBRARIES = $(LIBS_opt)
+diff -ruN ksh-93.20030724.orig/work/src/cmd/ksh93/Mamfile ksh-93.20030724/work/src/cmd/ksh93/Mamfile
+--- ksh-93.20030724.orig/work/src/cmd/ksh93/Mamfile	2003-07-25 19:58:41.000000000 +0100
++++ ksh-93.20030724/work/src/cmd/ksh93/Mamfile	2003-09-06 03:03:42.000000000 +0100
+@@ -162,7 +162,7 @@
+ exec - case "" in
+ exec - *?)	echo " " ;;
+ exec - esac
+-exec - for i in shell cmd dll ast m jobs i intl dl
++exec - for i in shell cmd dll ast m dl
+ exec - do	case $i in
+ exec - 	"shell"|shell)
+ exec - 		;;
+@@ -190,12 +190,6 @@
+ bind -lcmd
+ bind -ldll
+ bind -lm dontcare
+-make +ljobs
+-done +ljobs dontcare virtual
+-make +li
+-done +li dontcare virtual
+-make +lintl
+-done +lintl dontcare virtual
+ make ${mam_libdl}
+ done ${mam_libdl} dontcare virtual
+ bind -last
+@@ -213,9 +207,6 @@
+ make features/dynamic
+ done features/dynamic
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/dynamic
+ make ../../../include/ast/fs3d.h implicit
+@@ -227,9 +218,6 @@
+ make features/options.sh
+ done features/options.sh
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/options.sh
+ done FEATURE/options dontcare generated
+@@ -247,9 +235,6 @@
+ make features/sigfeatures
+ done features/sigfeatures
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/sigfeatures
+ done FEATURE/sigfeatures dontcare generated
+@@ -257,9 +242,6 @@
+ make features/setjmp
+ done features/setjmp
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/setjmp
+ done FEATURE/setjmp dontcare generated
+@@ -292,9 +274,6 @@
+ make include/path.h implicit
+ make FEATURE/acct implicit
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : def acct
+ done FEATURE/acct dontcare generated
+@@ -360,9 +339,6 @@
+ make features/ttys
+ done features/ttys
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/ttys
+ done FEATURE/ttys dontcare generated
+@@ -373,9 +349,6 @@
+ make features/locale
+ done features/locale
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/locale
+ done FEATURE/locale dontcare generated
+@@ -471,9 +444,6 @@
+ make features/poll
+ done features/poll
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/poll
+ make cell_sys_headers.h implicit
+@@ -503,9 +473,6 @@
+ make features/externs
+ done features/externs
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/externs
+ done FEATURE/externs generated
+@@ -541,9 +508,6 @@
+ make features/rlimits
+ done features/rlimits
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/rlimits
+ done FEATURE/rlimits dontcare generated
+@@ -603,17 +567,11 @@
+ prev FEATURE/externs implicit
+ make FEATURE/execargs implicit
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : def execargs
+ done FEATURE/execargs generated
+ make FEATURE/pstat implicit
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : def pstat
+ done FEATURE/pstat generated
+@@ -1091,9 +1049,6 @@
+ make features/math
+ done features/math
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/math
+ done FEATURE/math generated
+@@ -1157,9 +1112,6 @@
+ make features/cmds
+ done features/cmds
+ prev shell.req
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libcmd} ${mam_libdll} ${mam_libm} ${mam_libast} ${mam_libm} : run features/cmds
+ done FEATURE/cmds dontcare generated
+@@ -1226,9 +1178,6 @@
+ exec - (ranlib libshell.a) >/dev/null 2>&1 || true
+ done libshell.a generated
+ bind -lshell
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ksh pmain.o ${mam_libshell} ${mam_libast} ${mam_libm}
+ done ksh generated
+@@ -1246,9 +1195,6 @@
+ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -DSH_DICT=\""libshell"\" -DSHOPT_KIA -D_PACKAGE_ast -DSHOPT_DYNAMIC -DSHOPT_OO -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1982-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libshell]"\" -c sh/shcomp.c
+ done shcomp.o generated
+ prev libshell.a archive
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ setv CC.DLL -UCC.DLL
+ setv SH_DICT -DSH_DICT="\"libshell\""
+@@ -1273,9 +1219,6 @@
+ setv _BLD_shell -U_BLD_shell
+ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sh/suid_exec.c
+ done suid_exec.o generated
+-prev +ljobs
+-prev +li
+-prev +lintl
+ prev ${mam_libdl}
+ setv CC.DLL -UCC.DLL
+ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o suid_exec suid_exec.o ${mam_libast} ${mam_libm}
+diff -ruN ksh-93.20030724.orig/work/src/lib/libast/features/iconv ksh-93.20030724/work/src/lib/libast/features/iconv
+--- ksh-93.20030724.orig/work/src/lib/libast/features/iconv	2002-09-16 14:39:13.000000000 +0100
++++ ksh-93.20030724/work/src/lib/libast/features/iconv	2003-09-06 03:00:26.000000000 +0100
+@@ -1,6 +1,6 @@
+ set	prototyped
+ hdr	iconv
+-lib	iconv_open,iconv_close,iconv -liconv
++lib	iconv_open,iconv_close,iconv -lc
+ nxt	iconv
+ 
+ tst	output{
+diff -ruN ksh-93.20030724.orig/work/src/lib/libast/Makefile ksh-93.20030724/work/src/lib/libast/Makefile
+--- ksh-93.20030724.orig/work/src/lib/libast/Makefile	2003-06-24 03:03:59.000000000 +0100
++++ ksh-93.20030724/work/src/lib/libast/Makefile	2003-09-06 03:00:26.000000000 +0100
+@@ -195,8 +195,7 @@
+ 	err.c exp.c exp__E.c expm1.c gamma.c getpass.c lgamma.c log.c log1p.c \
+ 	log__L.c rand48.c random.c rcmd.c rint.c support.c \
+ 	/* obsolete */ \
+-	spawn.c \
+-	-liconv /* this *has* to be wrong */
++	spawn.c 
+ 
+ /*
+  * man is stdio.h problematic
+diff -ruN ksh-93.20030724.orig/work/src/lib/libast/Mamfile ksh-93.20030724/work/src/lib/libast/Mamfile
+--- ksh-93.20030724.orig/work/src/lib/libast/Mamfile	2003-07-25 19:59:21.000000000 +0100
++++ ksh-93.20030724/work/src/lib/libast/Mamfile	2003-09-06 03:00:26.000000000 +0100
+@@ -210,7 +210,7 @@
+ exec - case "" in
+ exec - *?)	echo " " ;;
+ exec - esac
+-exec - for i in ast iconv
++exec - for i in ast
+ exec - do	case $i in
+ exec - 	"ast"|ast)
+ exec - 		;;
+diff -ruN ksh-93.20030724.orig/work/src/lib/libcmd/features/ids ksh-93.20030724/work/src/lib/libcmd/features/ids
+--- ksh-93.20030724.orig/work/src/lib/libcmd/features/ids	1996-05-10 04:18:49.000000000 +0100
++++ ksh-93.20030724/work/src/lib/libcmd/features/ids	2003-09-06 03:00:26.000000000 +0100
+@@ -1,5 +1,4 @@
+ lib	endgrent,getgrent,setgrent
+-lib	fsid,getfsgid,isfsg sys/types.h sys/fss.h fsg.h -lfsg
+ mac	fsid sys/types.h sys/fss.h fsg.h
+ cat{
+ 	#if !_lib_fsid && _mac_fsid
+diff -ruN ksh-93.20030724.orig/work/src/lib/libcmd/Makefile ksh-93.20030724/work/src/lib/libcmd/Makefile
+--- ksh-93.20030724.orig/work/src/lib/libcmd/Makefile	2003-04-15 16:05:19.000000000 +0100
++++ ksh-93.20030724/work/src/lib/libcmd/Makefile	2003-09-06 03:00:26.000000000 +0100
+@@ -18,8 +18,7 @@
+ 	cp.c cut.c dirname.c date.c expr.c fmt.c fold.c getconf.c head.c \
+ 	id.c join.c ln.c logname.c mkdir.c mkfifo.c mv.c paste.c \
+ 	pathchk.c rev.c rm.c rmdir.c stty.c tail.c tee.c tty.c \
+-	uname.c uniq.c wc.c revlib.c wclib.c \
+-	-lfsg
++	uname.c uniq.c wc.c revlib.c wclib.c
+ 
+ $(INCLUDEDIR) :INSTALLPROTO: cmd.h
+ 
+diff -ruN ksh-93.20030724.orig/work/src/lib/libcmd/Mamfile ksh-93.20030724/work/src/lib/libcmd/Mamfile
+--- ksh-93.20030724.orig/work/src/lib/libcmd/Mamfile	2003-07-25 19:59:30.000000000 +0100
++++ ksh-93.20030724/work/src/lib/libcmd/Mamfile	2003-09-06 03:00:26.000000000 +0100
+@@ -48,7 +48,7 @@
+ exec - case "" in
+ exec - *?)	echo " " ;;
+ exec - esac
+-exec - for i in cmd fsg ast
++exec - for i in cmd ast
+ exec - do	case $i in
+ exec - 	"cmd"|cmd)
+ exec - 		;;
+diff -ruN ksh-93.20030724.orig/work/src/lib/libdll/Makefile ksh-93.20030724/work/src/lib/libdll/Makefile
+--- ksh-93.20030724.orig/work/src/lib/libdll/Makefile	2002-07-26 07:43:05.000000000 +0100
++++ ksh-93.20030724/work/src/lib/libdll/Makefile	2003-09-06 03:00:26.000000000 +0100
+@@ -4,7 +4,7 @@
+ 
+ CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
+ 
+-dll 1.0 :LIBRARY: dlfcn.c dllfind.c dllnext.c dlllook.c dllscan.c -ldl -ldld
++dll 1.0 :LIBRARY: dlfcn.c dllfind.c dllnext.c dlllook.c dllscan.c -ldl
+ 
+ $(INCLUDEDIR) :INSTALLPROTO: dlldefs.h
+ 
+diff -ruN ksh-93.20030724.orig/work/src/lib/libdll/Mamfile ksh-93.20030724/work/src/lib/libdll/Mamfile
+--- ksh-93.20030724.orig/work/src/lib/libdll/Mamfile	2003-07-25 19:59:33.000000000 +0100
++++ ksh-93.20030724/work/src/lib/libdll/Mamfile	2003-09-06 03:00:26.000000000 +0100
+@@ -48,7 +48,7 @@
+ exec - case "" in
+ exec - *?)	echo " " ;;
+ exec - esac
+-exec - for i in dll dl dld ast
++exec - for i in dll dl ast
+ exec - do	case $i in
+ exec - 	"dll"|dll)
+ exec - 		;;

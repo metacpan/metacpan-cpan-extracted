@@ -1,0 +1,71 @@
+package Geo::Raster::Layer::Dialogs;
+# @brief A helper module to bring in the GDAL dialogs in Glade XML
+
+use strict;
+use warnings;
+use POSIX;
+
+require Exporter;
+
+our @ISA = qw(Exporter Gtk2::Ex::Geo::DialogMaster);
+
+our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
+
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+our @EXPORT = qw(
+	
+);
+
+=pod
+
+=head1 NAME
+
+Geo::Raster::Layer::Dialogs - Dialogs for raster (gdal) layers
+
+=head1 DESCRIPTION
+
+This module is included from Geo::Raster::Layer and it brings in Glade
+dialogs for Geo::Raster::Layer objects.
+
+=head1 METHODS
+
+=head2 new
+
+=cut
+
+sub new {
+    my($class, %params) = @_;
+
+    my @buffer = <DATA>;
+    pop @buffer unless $buffer[$#buffer] =~ /^\</; # remove the extra content
+
+    my $self = Gtk2::Ex::Geo::DialogMaster::new($class, %params, buffer => \@buffer);
+
+    bless $self => (ref($class) or $class);
+    
+    return $self;
+}
+
+1;
+=pod
+
+=head1 SEE ALSO
+
+Gtk2::Ex::Geo
+
+=head1 AUTHOR
+
+Ari Jolma, E<lt>ajolma at aalto.fiE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006- by Ari Jolma
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+__DATA__

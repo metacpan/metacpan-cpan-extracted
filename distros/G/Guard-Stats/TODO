@@ -1,0 +1,6 @@
+A list of features that may be nice in the future:
+
+* on_destroy/on_end callbacks
+* end_twice counter for end() called twice (currently only emits warnings)
+* Manual on writing new guard classes
+* faster/smaller guard class

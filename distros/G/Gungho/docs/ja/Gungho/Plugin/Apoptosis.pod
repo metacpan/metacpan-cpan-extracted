@@ -1,0 +1,33 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Gungho::Plugin::Apoptosis.ja - プロセスが停止する時間を指定
+
+=head1 SYNOPSIS
+
+  plugins:
+    - module: Apoptosis
+      config:
+        time:
+          timeout: 86400 # Stop execution after 1 day
+
+=head1 DESCRIPTION
+
+Gunghoは一般的に永続的な、もしくは長時間動作しつづけるプロセス内で使用され
+ますが、これによりメモリを常に占有しつづけることにもなりがちです。ここに
+さらにメモリーリーク等が重なってくるとGunghoが動作しているマシン全体にも
+悪影響を及ぼします。
+
+このような状況を回避するにはこのプラグインを読み込んでください。指定した
+秒数だけ時間がたったのち、Gungho-E<gt>shutdownを呼び、プロセスを停止します。
+
+=head1 METHODS
+
+=head2 setup
+
+=head2 check_apoptosis
+
+=head2 is_time_to_die
+
+=cut

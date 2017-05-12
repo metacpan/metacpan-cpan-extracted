@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01sanity.t
+t/02conversions.t
+t/03names.t
+t/04gradients.t
+lib/Graphics/ColorUtils.pm
+META.yml                                 Module meta-data (added by MakeMaker)

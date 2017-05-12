@@ -1,0 +1,348 @@
+{
+   "routes" : [
+      {
+         "bounds" : {
+            "northeast" : {
+               "lat" : 48.158010,
+               "lng" : 11.566590
+            },
+            "southwest" : {
+               "lat" : 48.14808000000001,
+               "lng" : 11.553040
+            }
+         },
+         "copyrights" : "Map data ©2012 COWI, GeoBasis-DE/BKG (©2009), Google",
+         "legs" : [
+            {
+               "distance" : {
+                  "text" : "0.8 km",
+                  "value" : 784
+               },
+               "duration" : {
+                  "text" : "2 mins",
+                  "value" : 96
+               },
+               "end_address" : "Schellingstraße 130, 80797 Munich, Germany",
+               "end_location" : {
+                  "lat" : 48.15458000000001,
+                  "lng" : 11.560830
+               },
+               "start_address" : "Theresienstraße 100, 80333 Munich, Germany",
+               "start_location" : {
+                  "lat" : 48.150460,
+                  "lng" : 11.566590
+               },
+               "steps" : [
+                  {
+                     "distance" : {
+                        "text" : "0.5 km",
+                        "value" : 496
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 27
+                     },
+                     "end_location" : {
+                        "lat" : 48.152210,
+                        "lng" : 11.560440
+                     },
+                     "html_instructions" : "Head \u003cb\u003ewest\u003c/b\u003e on \u003cb\u003eTheresienstraße\u003c/b\u003e toward \u003cb\u003eEnhuberstraße\u003c/b\u003e",
+                     "polyline" : {
+                        "points" : "kk{dHebreA_AjFa@rB_@tBABeBdJsBlK"
+                     },
+                     "start_location" : {
+                        "lat" : 48.150460,
+                        "lng" : 11.566590
+                     },
+                     "travel_mode" : "DRIVING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "0.3 km",
+                        "value" : 258
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 31
+                     },
+                     "end_location" : {
+                        "lat" : 48.15448000000001,
+                        "lng" : 11.56120
+                     },
+                     "html_instructions" : "Turn \u003cb\u003eright\u003c/b\u003e onto \u003cb\u003eSchleißheimer Straße\u003c/b\u003e",
+                     "polyline" : {
+                        "points" : "iv{dHw{peAsBc@uBe@{EmA"
+                     },
+                     "start_location" : {
+                        "lat" : 48.152210,
+                        "lng" : 11.560440
+                     },
+                     "travel_mode" : "DRIVING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "30 m",
+                        "value" : 30
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 38
+                     },
+                     "end_location" : {
+                        "lat" : 48.15458000000001,
+                        "lng" : 11.560830
+                     },
+                     "html_instructions" : "Turn \u003cb\u003eleft\u003c/b\u003e at the 2nd cross street onto \u003cb\u003eSchellingstraße\u003c/b\u003e\u003cdiv style=\"font-size:0.9em\"\u003eDestination will be on the right\u003c/div\u003e",
+                     "polyline" : {
+                        "points" : "od|dHo`qeAShA"
+                     },
+                     "start_location" : {
+                        "lat" : 48.15448000000001,
+                        "lng" : 11.56120
+                     },
+                     "travel_mode" : "DRIVING"
+                  }
+               ],
+               "via_waypoint" : []
+            },
+            {
+               "distance" : {
+                  "text" : "0.3 km",
+                  "value" : 293
+               },
+               "duration" : {
+                  "text" : "1 min",
+                  "value" : 40
+               },
+               "end_address" : "Winzererstraße 42, 80797 Munich, Germany",
+               "end_location" : {
+                  "lat" : 48.156590,
+                  "lng" : 11.560280
+               },
+               "start_address" : "Schellingstraße 130, 80797 Munich, Germany",
+               "start_location" : {
+                  "lat" : 48.15458000000001,
+                  "lng" : 11.560830
+               },
+               "steps" : [
+                  {
+                     "distance" : {
+                        "text" : "0.1 km",
+                        "value" : 99
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 5
+                     },
+                     "end_location" : {
+                        "lat" : 48.154910,
+                        "lng" : 11.559590
+                     },
+                     "html_instructions" : "Head \u003cb\u003ewest\u003c/b\u003e on \u003cb\u003eSchellingstraße\u003c/b\u003e toward \u003cb\u003eWinzererstraße\u003c/b\u003e",
+                     "polyline" : {
+                        "points" : "ce|dHe~peAaAvF"
+                     },
+                     "start_location" : {
+                        "lat" : 48.15458000000001,
+                        "lng" : 11.560830
+                     },
+                     "travel_mode" : "DRIVING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "0.2 km",
+                        "value" : 194
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 35
+                     },
+                     "end_location" : {
+                        "lat" : 48.156590,
+                        "lng" : 11.560280
+                     },
+                     "html_instructions" : "Take the 1st \u003cb\u003eright\u003c/b\u003e onto \u003cb\u003eWinzererstraße\u003c/b\u003e\u003cdiv style=\"font-size:0.9em\"\u003eDestination will be on the right\u003c/div\u003e",
+                     "polyline" : {
+                        "points" : "eg|dHmvpeAcF}Ao@Q{@Y"
+                     },
+                     "start_location" : {
+                        "lat" : 48.154910,
+                        "lng" : 11.559590
+                     },
+                     "travel_mode" : "DRIVING"
+                  }
+               ],
+               "via_waypoint" : []
+            },
+            {
+               "distance" : {
+                  "text" : "1.9 km",
+                  "value" : 1869
+               },
+               "duration" : {
+                  "text" : "5 mins",
+                  "value" : 284
+               },
+               "end_address" : "Nymphenburger Straße 31, 80335 Munich, Germany",
+               "end_location" : {
+                  "lat" : 48.14859000000001,
+                  "lng" : 11.553040
+               },
+               "start_address" : "Winzererstraße 42, 80797 Munich, Germany",
+               "start_location" : {
+                  "lat" : 48.156590,
+                  "lng" : 11.560280
+               },
+               "steps" : [
+                  {
+                     "distance" : {
+                        "text" : "0.2 km",
+                        "value" : 165
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 24
+                     },
+                     "end_location" : {
+                        "lat" : 48.158010,
+                        "lng" : 11.560740
+                     },
+                     "html_instructions" : "Head \u003cb\u003enorth\u003c/b\u003e on \u003cb\u003eWinzererstraße\u003c/b\u003e toward \u003cb\u003eGeorgenstraße\u003c/b\u003e",
+                     "polyline" : {
+                        "points" : "uq|dHwzpeAwDoAqA[A?A?A@A@ABGF"
+                     },
+                     "start_location" : {
+                        "lat" : 48.156590,
+                        "lng" : 11.560280
+                     },
+                     "travel_mode" : "DRIVING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "0.7 km",
+                        "value" : 668
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 79
+                     },
+                     "end_location" : {
+                        "lat" : 48.15423000000001,
+                        "lng" : 11.553740
+                     },
+                     "html_instructions" : "Turn \u003cb\u003eleft\u003c/b\u003e onto \u003cb\u003eLothstraße\u003c/b\u003e",
+                     "polyline" : {
+                        "points" : "qz|dHs}peAZn@h@rAZj@zClGbC|FdCxFzEdLJRBF"
+                     },
+                     "start_location" : {
+                        "lat" : 48.158010,
+                        "lng" : 11.560740
+                     },
+                     "travel_mode" : "DRIVING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "0.5 km",
+                        "value" : 477
+                     },
+                     "duration" : {
+                        "text" : "2 mins",
+                        "value" : 91
+                     },
+                     "end_location" : {
+                        "lat" : 48.150890,
+                        "lng" : 11.557780
+                     },
+                     "html_instructions" : "Turn \u003cb\u003eleft\u003c/b\u003e onto \u003cb\u003eDachauer Straße\u003c/b\u003e",
+                     "polyline" : {
+                        "points" : "}b|dH{qoeA~CiEnA_Bz@iAvIsKV_@"
+                     },
+                     "start_location" : {
+                        "lat" : 48.15423000000001,
+                        "lng" : 11.553740
+                     },
+                     "travel_mode" : "DRIVING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "81 m",
+                        "value" : 81
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 18
+                     },
+                     "end_location" : {
+                        "lat" : 48.15025000000001,
+                        "lng" : 11.557360
+                     },
+                     "html_instructions" : "Turn \u003cb\u003eright\u003c/b\u003e onto \u003cb\u003eSandstraße\u003c/b\u003e",
+                     "polyline" : {
+                        "points" : "an{dHckpeADFBFRPz@t@d@C"
+                     },
+                     "start_location" : {
+                        "lat" : 48.150890,
+                        "lng" : 11.557780
+                     },
+                     "travel_mode" : "DRIVING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "0.3 km",
+                        "value" : 272
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 28
+                     },
+                     "end_location" : {
+                        "lat" : 48.14808000000001,
+                        "lng" : 11.555710
+                     },
+                     "html_instructions" : "Turn \u003cb\u003eright\u003c/b\u003e to stay on \u003cb\u003eSandstraße\u003c/b\u003e",
+                     "polyline" : {
+                        "points" : "aj{dHohpeADNBDDFDF`@VjD|B`Al@jC~A"
+                     },
+                     "start_location" : {
+                        "lat" : 48.15025000000001,
+                        "lng" : 11.557360
+                     },
+                     "travel_mode" : "DRIVING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "0.2 km",
+                        "value" : 206
+                     },
+                     "duration" : {
+                        "text" : "1 min",
+                        "value" : 44
+                     },
+                     "end_location" : {
+                        "lat" : 48.14859000000001,
+                        "lng" : 11.553040
+                     },
+                     "html_instructions" : "Turn \u003cb\u003eright\u003c/b\u003e onto \u003cb\u003eNymphenburger Straße\u003c/b\u003e\u003cdiv style=\"font-size:0.9em\"\u003eDestination will be on the left\u003c/div\u003e",
+                     "polyline" : {
+                        "points" : "o|zdHe~oeASpCOvAOtAg@lD?DGZAD"
+                     },
+                     "start_location" : {
+                        "lat" : 48.14808000000001,
+                        "lng" : 11.555710
+                     },
+                     "travel_mode" : "DRIVING"
+                  }
+               ],
+               "via_waypoint" : []
+            }
+         ],
+         "overview_polyline" : {
+            "points" : "kk{dHebreAcCxMyErViFiA{EmAShAaAvFcF}AkBk@wDoAqA[C?CBIJdAbCvDxHhGvNfFxLBF~CiEjCiDnJsLHNnAfAd@CDNHLf@^lFjDjC~ASpC_@lDg@rDI`@"
+         },
+         "summary" : "Lothstraße",
+         "warnings" : [],
+         "waypoint_order" : [ 0, 1 ]
+      }
+   ],
+   "status" : "OK"
+}

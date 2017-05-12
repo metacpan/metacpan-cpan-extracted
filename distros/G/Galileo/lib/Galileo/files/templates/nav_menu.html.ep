@@ -1,0 +1,20 @@
+%= memorize main => begin
+  % my $menu = schema->resultset('Menu')->single({name => 'main'});
+  % my @pages = @{ Mojo::JSON::decode_json($menu->list) };
+  % my $rs = schema->resultset('Page');
+  <div class="well" id="nav_menu" style="padding: 8px 0;">
+    <ul id="main" class="nav nav-list">
+      <li class="nav-header">Navigation</li>
+      <li><a href="/">Home</a></li>
+      % for my $id (@pages) {
+        % my $page = $rs->single({page_id => $id});
+        % next unless $page;
+        <li>
+          %= tag a => href => "/page/" . $page->name => begin
+            %= $page->title
+          % end
+        </li>
+      % }
+    </ul>
+  </div>
+% end

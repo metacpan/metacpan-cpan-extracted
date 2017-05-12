@@ -1,0 +1,50 @@
+# PODNAME: GeoLocation.pod
+
+=pod
+
+=head1 NAME
+
+Geo::UK::Postcode::Manual::GeoLocation
+
+=head1 DESCRIPTION
+
+Short guide to finding locations of UK postcodes, using the freely available
+Code-Point Open data available from the Ordnance Survey.
+
+=head1 EXAMPLE PROCESS
+
+=head2 Obtaining data
+
+Data is available in CSV format from Ordnance Survey. The free located postcodes
+data is called 'Code-Point Open'.
+
+Follow the steps on the site to be emailed a download link for a ZIP file
+(~15MB).
+
+L<http://www.ordnancesurvey.co.uk/business-and-government/products/code-point-open.html>
+
+The licence the data is provided under is L<http://www.ordnancesurvey.co.uk/business-and-government/licensing/using-creating-data-with-os-products/os-opendata.html>
+
+=head2 Importing the data
+
+L<Geo::UK::Postcode::CodePointOpen> provides a C<read_iterator()> method to
+iterate through the CSV data files, returning a hashref for each postcode.
+
+This data can then be inserted as a row into a data store.
+
+Example database MySQL table definition:
+
+    CREATE TABLE `gb_postcodes` (
+      `outcode` char(4) NOT NULL,
+      `incode` char(3) NOT NULL DEFAULT '',
+      `latitude` decimal(7,5) DEFAULT NULL,
+      `longitude` decimal(7,5) DEFAULT NULL,
+      PRIMARY KEY (`outcode`,`incode`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+For simple lookups, one could alternatively use a key/value store - concatenate
+the outcode and incode (with a separator) into the key, and the latitude and
+longitude (again with a separator) into the value.
+
+=cut
+

@@ -1,0 +1,10 @@
+Build.PL
+lib/Graph/ChartSVG.pm
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.yml
+README
+t/Graph-Chart.t
+Graph-Chart_example.pl
+META.yml
+META.json

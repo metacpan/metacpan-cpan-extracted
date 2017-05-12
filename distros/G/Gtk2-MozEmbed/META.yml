@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Gtk2-MozEmbed
+version:            0.09
+abstract:           Perl interface to the Mozilla embedding widget
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::Depends:    0.20
+    ExtUtils::MakeMaker:  0
+    ExtUtils::PkgConfig:  1.03
+    Gtk2:                 1.081
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    ExtUtils::Depends:    0.20
+    ExtUtils::PkgConfig:  1.03
+    Gtk2:                 1.081
+no_index:
+    directory:
+        - t
+        - inc
+    file:
+        - xs/GtkMozEmbed.xs
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,200 @@
+=== ChangeLog discontinued ===
+
+	With the move to git, we stop maintaining a separate ChangeLog and
+	rely on proper commit messages instead.
+
+2006-12-30	kaffeetisch
+
+	* MANIFEST, NEWS, README, Rsvg.pm: Version 0.10.
+
+2006-12-30	kaffeetisch
+
+	* Makefile.PL, rsvg2perl.h, t/Rsvg.t, xs/Rsvg.xs: If librsvg >=
+	2.14.0, add support for rsvg_handle_render_cairo and
+	rsvg_handle_render_cairo_sub.  This necessitates requiring the
+	Cairo Perl module, of course (if librsvg >= 2.14.0).
+
+2006-12-02	kaffeetisch
+
+	* doctypes, Makefile.PL: Install a doctypes file for
+	Gnome2::Rsvg::Handle.
+
+2006/01/28	kaffeetisch
+
+	* NEWS, Rsvg.pm: Version 0.06.
+
+2006/01/28	kaffeetisch
+
+	* t/Rsvg.t: Make the size callback test more robust.
+
+2005/12/12	kaffeetisch
+
+	* xs/Rsvg.xs. Hush a compiler warning.
+
+2005/09/28	kaffeetisch
+
+	* xs/Rsvg.xs, t/Rsvg.t: Make version checks refer to stable
+	releases.
+
+2005/09/17	kaffeetisch
+
+	* NEWS, README, Rsvg.pm: Version 0.05.
+
+2005/09/17	kaffeetisch
+
+	* Makefile.PL: Require librsvg 2.12.0 -- there were just too many
+	API changes.
+
+	* t/Rsvg.t, xs/Rsvg.xs: Revert the rsvg_set_default_dpi and
+	rsvg_handle_set_dpi change -- it was only valid for HEAD of
+	librsvg, but gnome-2-12-branch is what we care about.
+
+2005/07/28	kaffeetisch
+
+	* MANIFEST, META.yml: Remove META.yml from the repository -- let
+	MakeMaker generate it on 'make dist'.
+
+	* Makefile.PL: Depend on librsvg 2.99.0, i.e. HEAD of CVS.
+
+	* Rsvg.pm: Some comment and email updates.
+
+	* copyright.pod: Update for 2005.
+
+	* MANIFEST, genmaps.pl: Retire genmaps.pl.
+
+	* MANIFEST, Makefile.PL, maps, rsvg.typemap, rsvg2perl.c,
+	rsvg2perl.h: Get rid of the custom GType for the RsvgError enum,
+	and use a custom pointer typemap for RsvgHandle instead of a
+	custom GBoxed type.
+
+	* t/Rsvg.t, xs/Rsvg.xs: Adapt to upstream API changes: Update
+	rsvg_set_default_dpi and rsvg_handle_set_dpi, remove
+	rsvg_pixbuf_from_file_*_ex and rsvg_handle_new_gz.
+
+2005/02/24	kaffeetisch
+
+	* META.yml, NEWS, Rsvg.pm: Version 0.04.
+
+2005/01/27 20:17 (+0100) kaffeetisch
+
+	* Rsvg.t: Use absolute paths to fix test failures.
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+	* perl-Gnome2-Rsvg.spec.in: new scheme that addresses x86_64 problems
+	found by Carl Nygard
+
+2004/09/17 19:36 (+0200) kaffeetisch
+
+	* Makefile.PL, README: Depend on the stable 1.02 instead of the
+	unstable 1.01 series of Glib and Gtk2.
+
+2004/09/15 13:12 (+0200) kaffeetisch
+
+	* t/Rsvg.t, t/window.svg, xs/Rsvg.xs: Bind and test
+	rsvg_handle_set_base_uri, rsvg_handle_get_base_uri and
+	rsvg_handle_get_metadata.  Adjust version checks to refer to
+	stable releases.
+
+2004/09/09 13:53 (+0200) kaffeetisch
+
+	* NEWS: Fix an error.
+
+	* t/Rsvg.t, t/window.svg: Work around a librsvg bug by using
+	<title> and <desc> tags.
+
+2004/07/24 19:34 (+0200) kaffeetisch
+
+	* NEWS, Rsvg.pm: Version 0.03.
+
+2004/07/24 19:29 (+0200) kaffeetisch
+
+	* t/Rsvg.t: Make the tests work on older versions of librsvg.
+
+2004/07/23 21:13 (+0200) kaffeetisch
+
+	* t/Rsvg.t
+	* xs/Rsvg.xs: Bind and test rsvg_set_default_dpi_x_y and
+	rsvg_handle_set_dpi_x_y.  Make using gzip'ed SVGs work by allowing
+	\0s in the data passed to Gnome2::Rsvg::Handle::write.
+
+	* xs/Rsvg.xs: undef RSVG_DISABLE_DEPRECATED to make sure we get
+	some functions that were deprecated.
+
+2004/06/14 19:34 (+0200) kaffeetisch
+
+	* t/Rsvg.t
+	* xs/Rsvg.xs: Bind and test Gnome2::Rsvg::Handle::get_title and
+	get_desc.
+
+2004/06/05 00:49 (+0200) kaffeetisch
+
+	A NEWS
+	* MANIFEST
+	* README
+	* Rsvg.pm: Version 0.02.
+
+2004/05/17 18:03 (+0200) kaffeetisch
+
+	* rsvg2perl.h: Only include <librsvg/rsvg-gz.h> if it's available.
+
+	* t/Rsvg.t: Be a bit more tolerant to pass on older versions.
+	Skip some tests if they're not available in the version we're
+	compiling against.
+
+	* xs/Rsvg.xs: Implement CHECK_VERSION and GET_VERSION_INFO.
+	Protect set_default_dpi, *_ex, new_gz, and set_dpi with version
+	macros.
+
+2004/02/14 16:39 (+0100) kaffeetisch
+
+	A copyright.pod
+	* Makefile.PL: Switch to the new EU::Depends and ::PkgConfig
+	versions.
+
+2004/01/27 20:56 (+0100) kaffeetisch
+
+	* README
+	* Rsvg.pm: Strip the "Raster" in "Raster Scalable Vector
+	Graphics".
+
+2004/01/24 21:44 (-0500) rwmcfa1
+
+	* Makefile.PL: removed runtime_reqs stuff, replaced by the pkg-config 
+	trick
+
+	* perl-Gnome2-Rsvg.spec.in: use pkg-config for Requires version
+
+2004/01/02 15:09 (-0500) rwmcfa1
+
+	* Makefile.PL: rpm stuff added
+
+	* perl-Gnome2-Rsvg.spec.in: initial import
+
+2003/12/29 03:19 (+0100) kaffeetisch
+
+	* t/Rsvg.t
+	* xs/Rsvg.xs: Enable Gnome2::Rsvg::new_gz.  Still untested because
+	it doesn't seem to work.
+
+2003/12/25 02:41 (+0100) kaffeetisch
+
+	A .cvsignore
+	A LICENSE
+	A MANIFEST
+	A MANIFEST.SKIP
+	A META.yml
+	A Makefile.PL
+	A README
+	A Rsvg.pm
+	A genmaps.pl
+	A maps
+	A rsvg2perl.c
+	A rsvg2perl.h
+	A t/Rsvg.t
+	A t/window.svg
+	A t/window.svg.gz
+	A xs/.cvsignore
+	A xs/Rsvg.xs: Initial import.

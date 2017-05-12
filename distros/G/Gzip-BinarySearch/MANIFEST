@@ -1,0 +1,24 @@
+Changes
+lib/Gzip/BinarySearch.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01basic.t
+t/_first_last_line.t
+t/_get_line.t
+t/assoc.t
+t/ctor.t
+t/fixtures/assoc.gz
+t/fixtures/bars.gz
+t/fixtures/dict.gz
+t/fixtures/edge.gz
+t/fixtures/multiple.gz
+t/fixtures/numbersort.gz
+t/key.t
+t/key_func_generators.t
+t/lib/Test/Gzip/BinarySearch.pm
+t/multiple.t
+t/pod.t
+t/pod_coverage.t
+t/sort.t
+META.yml                                 Module meta-data (added by MakeMaker)

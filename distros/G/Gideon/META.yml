@@ -1,0 +1,32 @@
+---
+abstract: 'Data mapper for Moose classes an objects'
+author:
+  - 'Mariano Wahlmann, Gines Razanov'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gideon
+requires:
+  DBD::Mock: 0
+  DBI: 0
+  DateTime: 0
+  DateTime::Format::MySQL: 0
+  JSON: 0
+  Moose: 0
+  MooseX::Test::Role: 0
+  SQL::Abstract: 0
+  SQL::Abstract::Limit: 0
+  Test::Class::Moose: 0
+  Test::Exception: 0
+  Test::MockObject: 0
+  Throwable: 0
+resources:
+  homepage: https://github.com/bluescreen10/Gideon
+  repository: https://github.com/bluescreen10/Gideon.git
+version: 0.0.3

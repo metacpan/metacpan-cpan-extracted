@@ -1,0 +1,7 @@
+octet_string            T_OCTET_STRING
+
+INPUT
+
+T_OCTET_STRING
+	$var = SvPVbyte_nolen ($arg)
+

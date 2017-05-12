@@ -1,0 +1,21 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Git/Crypt.pm
+MYMETA.json
+bin/gitcrypt
+MYMETA.yml
+t/001_load.t
+t/002-crypt.t
+t/003-usage2.t
+t/003-key_change.t
+t/004-cli_tool.t
+t/file1
+t/file2
+README.pod
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

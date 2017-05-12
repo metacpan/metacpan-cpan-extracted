@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Geo/IATA.pm
+lib/Geo/IATA/iata_sqlite.db
+create/iata_wikipedia.pl
+t/00.load.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/01_basic.t
+t/02_simple.t
+META.yml

@@ -1,0 +1,53 @@
+# ChangeLog for net-wireless/airsnort
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/airsnort/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+*airsnort-0.2.3c (06 Feb 2004)
+
+  06 Feb 2004; Peter Johanson <latexer@gentoo.org> airsnort-0.2.3c.ebuild:
+  Version bump to new gtk2 version. Thanks to Florian Schilhabel
+  <fernsehleo@gmx.net> (bug #38914)
+
+  26 Jan 2004; Jason Wever <weeve@gentoo.org> airsnort-0.2.1a.ebuild,
+  airsnort-0.2.1b.ebuild, airsnort-0.2.2.ebuild:
+  Masked on sparc as pcmcia-cs doesn't work for the nell pcmcia controller, and
+  is masked. This may work on sparc, but we have no way to test it currently as
+  there is no working pcmcia support for any devices, and sparc devs don't have
+  the hardware for the in-kernel drivers.
+
+  18 Dec 2003; Peter Johanson <latexer@gentoo.org> metadata.xml:
+  Added metadata.xml
+
+*airsnort-0.2.2 (02 Aug 2003)
+
+  02 Aug 2003; Peter Johanson <latexer@gentoo.org> airsnort-0.2.2.ebuild:
+  New version. added ~x86.
+
+  03 Apr 2003; Peter Johanson <latexer@gentoo.org> airsnort-0.2.1a.ebuild,
+  airsnort-0.2.1b.ebuild:
+  Added a comment about linux-wlan-ng support
+
+  25 Mar 2003; Peter Johanson <latexer@gentoo.org> airsnort-0.2.1b.ebuild :
+  Marked stable for x86
+
+*airsnort-0.2.1b (24 Jan 2003)
+
+  24 Jan 2003; Mike Frysinger <vapier@gentoo.org> :
+  Version bump #14473.
+
+*airsnort-0.2.1a (29 Jun 2002)
+
+  24 Jan 2003; Mike Frysinger <vapier@gentoo.org> :
+  Made pcmcia dependency optional #14263.
+
+  31 Oct 2002; Hannes Mehnert <hannes@gentoo.org>:
+  moved to net-wireless
+
+  25 Oct 2002; Calum Selkirk <cselkirk@gentoo.org> airsnort-0.2.1a.ebuild :
+  Changes DEPEND from x11-libs/gtk+-1.2.10-r8 to x11-libs/gtk+-1.2.10-r9
+  
+  8 Sep 2002; Owen Stampflee <owen@gentoo.org> :
+  Added PPC to KEYWORDS.
+
+  29 Jun 2002; Thilo Bangert <bangert@gentoo.org> :
+  initial release - submitted by Brian Rozmierski <brianr at warped-minds.com>

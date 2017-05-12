@@ -1,0 +1,163 @@
+Revision history for Perl extension Geo::Postcodes::DK
+------------------------------------------------------
+2010-11-16 20:00 Arne Sommer
+ * Updated the postcode data.
+ * Released version 0.32.
+
+2006-09-24 14:00 Arne Sommer
+ * Released version 0.31.
+
+2006-09-24 13:30 Arne Sommer
+ * Rewritten the tests 't/1_procedures.t' and 't_3_selection.t', as the
+   postcode '0999' is not available in 'postnr.xls'.
+
+2006-09-22 22:00 Arne Sommer
+ * Rewritten 'misc/update' to support the '-update' command line argument,
+   caused by by changes in 'Geo::Postcodes::Update'.
+
+2006-09-15 22:00 Arne Sommer
+ * Changed the postcode file used by 'misc/update_dk' to 'postnr.xls', as it
+   is availble for automatic downloading.
+
+2006-09-15 10:30 Arne Sommer
+ * Made some minor changes in 'misc/update', caused by changes in
+   'Geo::Postcodes::Update', and renamed the program to 'misc/update_dk'. 
+
+2006-09-14 23:00 Arne Sommer
+ * Added support for 'Build.PL', in addition to the present 'Makefile.PL'.
+   This reqired moving 'DK.pm' to a new directory 'lib/Geo/Postcodes/' in the
+   distribution.
+ * Renamed the 'bin' directory to 'misc' to avoid installation of the files in
+   it by 'Build.PL'. This caused some changes in the code.
+
+2006-09-12 21:00 Arne Sommer
+ * Released version 0.30.
+
+2006-09-12 13:00 Arne Sommer
+ * Added a sample program 'eg/static_dk', using the new 'procedure'
+   feature of the 'selection' procedure/method.
+
+2006-09-12 01:00 Arne Sommer
+ * Added tests in 't/6_validselection.t' for the new selection feature
+   'procedure' in the 'verify_selectionlist' procedure.
+
+2006-09-11 13:00 Arne Sommer
+ * Added the test file 't/8_exporter.t' testing that the available methods and
+   procedures really are available.
+
+2006-09-09 11:00 Arne Sommer
+ * Renamed the procedure/method 'get_methods' to 'get_fields', and 'is_method'
+   to 'is_field', to avoid confusion with the generic name 'method'. Renamed
+   the test file 't/4_methods.t' to 't/4_fields.t'.
+
+2006-09-07 20:00 Arne Sommer
+ * Released version 0.21.
+
+2006-09-07 19:00 Arne Sommer
+ * Added the test file 't/6_validselection.t' testing the
+   'verify_selectionlist' procedure.
+
+2006-09-07 16:00 Arne Sommer
+ * Added the test files 't/7_pod.t' and 't/7_pod_coverage.t' to
+   check the documentation for errors and completeness, and
+   fixed the reported shortcomings. 
+
+2006-09-07 13:00 Arne Sommer
+ * Translated the remaining norwegian descriptions in some of the test-files
+   to english.
+ * Removed the line 'use 5.008' from 'Makefile.PL', as there was no
+   reason for this restriction.
+
+2006-09-04 18:00 Arne Sommer
+ * Added the procedure wrapper 'selection_loop' around the core
+   '_selection_loop'. 
+ * Rewritten 'eg/selection_dk' to use 'selection_loop'.
+
+2006-09-03 23:30 Arne Sommer
+ * Released version 0.20.
+
+2006-09-03 23:00 Arne Sommer
+ * Fixed the errors and warnings in the documentation, as reported by
+   'podchecker'.
+
+2006-09-03 22:00 Arne Sommer
+*  Removed the error checking code in 'eg/multiselection_dk', using
+   'verify_selectionlist' instead. 
+
+2006-09-03 21:00 Arne Sommer
+*  Added the procedure wrapper 'verify_selectionlist' around the core
+   '_verify_selectionlist'. 
+
+2006-09-01 12:00 Arne Sommer
+ * Rewritten 'eg/multiselection_no' to reflect the syntax changes in the
+   selection procedure. 
+
+2006-08-17 23:00 Arne Sommer
+ * Rewritten '/t/5_selection_list.t' to skip the tests if the module
+   'List::MoreUtils' isn't installed. 
+
+2006-08-17 21:00 Arne Sommer
+ * Updated the documentation, so that 'get_methods' is used instead of
+   'methods'.
+
+2006-08-17 15:00 Arne Sommer
+ * Released version 0.10.
+
+2006-08-15 18:00 Arne Sommer
+ * Fixed an error in 'eg/multiselection_no' that prevented the 'all' modifier
+   from working.
+
+2006-08-05 21:00 Arne Sommer
+ * Added support for the 'not' and 'all' modifiers in the sample program
+   'eg/multiselection_dk'.
+
+2006-07-30 16:00 Arne Sommer
+ * Added the sample program 'eg/multiselection_no', using the new selection
+   syntax.
+
+2006-07-30 13:00 Arne Sommer
+ * Rewritten the tests and sample code to use the new 'and/or' parameter in
+   the core selection procedure/method.
+
+2006-07-30 09:00 Arne Sommer
+ * Renamed the 'methods' procedure/method to 'get_methods'.
+
+2006-07-23 14:00 Arne Sommer
+ * Released version 0.03.
+
+2006-07-23 10:00 Arne Sommer
+ * Removed the reference to the hash of legal methods in the 'selection' call,
+   as the core now uses 'methods()' to get them.
+
+2006-07-21 20:00 Arne Sommer
+* Added the sample programs 'eg/basic_dk' and 'eg/selection_dk', matching the
+  online examples.
+
+2006-07-20 18:00 Arne Sommer
+ * Made a major rewrite of the documentation.
+
+2006-07-19 22:00 Arne Sommer
+ * Added the 'type2verbose' procedure to convert the types (of the postal
+   locations) to a danish text.
+
+2006-07-19 14:00 Arne Sommer
+ * Merged the national (norwegian and danish) postal type codes, and moved
+   them to the base class. 'type' and 'type_of' will now give the code
+   (instead of the description) . Use the new prodeure 'type_verbose_of' and
+   method 'type_verbose' for the description. The base class has english
+   texts, but this is overruled by danish texts by this module.
+
+2006-07-18 23:00 Arne Sommer
+ * Released version 0.02.
+
+2006-07-18 18:00 Arne Sommer
+ * Added the 'methods' and 'is_method' method/procedure.
+
+2006-07-16 10:00 Arne Sommer
+ * Added support for the 'selection' method/procedure in the base class.
+
+2006-07-10 16:00 Arne Sommer
+ * Released version 0.01.
+
+2006-07-10 12:40 Arne Sommer
+ * Original version; created by 'h2xs -Xan Geo::Postcodes::DK'.

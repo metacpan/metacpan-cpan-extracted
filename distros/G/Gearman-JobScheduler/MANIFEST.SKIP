@@ -1,0 +1,30 @@
+.git
+.travis.yml
+
+# OS X
+\.DS_Store
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib
+^MakeMaker-\d
+
+# Avoid configuration metadata file
+^MYMETA\.
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+^MANIFEST\.SKIP
+
+# Avoid archives of this distribution
+\bGearman-JobScheduler-[\d\.\_]+
+^MYMETA\.yml$
+^MYMETA\.json$

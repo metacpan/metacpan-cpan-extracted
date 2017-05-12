@@ -1,0 +1,40 @@
+NAME
+    GD::Barcode - Create barcode image with GD
+
+DESCRIPTION
+    GD::Barcode is a subclass of GD and allows you to create barcode image with GD.
+
+    The module will work on the majority of Windows, UNIX and
+    Macintosh platforms. 
+
+REQUIREMENT
+    This module requires these modules:
+                GD
+    From 1.15, you can use this module even if no GD (except plot method).
+
+INSTALLATION
+    The module can be installed using the standard Perl procedure:
+
+        perl Makefile.PL
+        make
+        make test
+        make install    # You may need to be root
+        make clean      # or make realclean
+
+    Windows users without a working "make" can get nmake from:
+        ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
+SAMPLES
+  There are 2 sample scripts in "sample" directry.
+  smp_all.pl : shows how to make barcode images in PNG with GD::Barcode.
+                  (EAN13, EAN8, UPC-A, UPC-E, NW7, Code39, ITF,
+                   Industrial2of5, IATA2of5, Matrix2of5 and COOP2of5)
+  smp_ind.pl : same as smp_all.pl but uses GD::Barcode subclasses.
+  
+VERSION
+    This document refers to version 1.14 of GD::Barcode
+    released May 31, 2003.
+
+AUTHOR
+    Kawai Takanori (GCD00051@nifty.ne.jp)
+

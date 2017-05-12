@@ -1,0 +1,7 @@
+
+(define-object GnomeDruid (GtkContainer))
+(define-object GnomeDruidPage (GtkBin))
+(define-object GnomeDruidPageStart (GnomeDruidPage))
+(define-object GnomeDruidPageStandard (GnomeDruidPage))
+(define-object GnomeDruidPageFinish (GnomeDruidPage))
+

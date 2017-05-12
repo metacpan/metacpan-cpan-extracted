@@ -1,0 +1,413 @@
+#!/usr/bin/perl -w
+
+use Gimp;
+use Gimp::Fu;
+use Gimp::Util;
+use strict;
+use warnings;
+
+N_"/Xtns/Render"; N_"/Xtns/Render/Logos"; # i18n workaround
+
+sub perl_fu_glowing_steel {
+  my $string = shift;
+  my $font = shift;
+  my $size = shift;
+  my $units = PIXELS;
+  my $glow = shift;
+  my $background = shift;
+  my $radius = shift;
+  my $do_highl = shift;
+  my $antialias = shift;
+
+  Gimp::Context->push();
+
+  my $image = Gimp::Image->new(100, 100, RGB_IMAGE);
+  $image->undo_disable;
+  my $textlayer = $image->text_fontname(-1, $radius*2,
+				     $radius*2, $string, 0, $antialias,
+				     $size, $units, $font);
+  my $width = $textlayer->width+$radius*4;
+  my $height = $textlayer->height+$radius*4;
+  $image->resize($width, $height, 0, 0);
+  my $backlayer = $image->layer_new($width, $height, RGBA_IMAGE,
+				 "Background", 100, NORMAL_MODE);
+  $image->insert_layer($backlayer, 0, 1);
+
+  $textlayer->set_lock_alpha(1);
+
+  perl_fu_brushed_metal($image, $textlayer, 25, 135);
+
+  if ($do_highl) {
+    perl_fu_highlight_edges($image, $textlayer, 1);
+    # Merge in the highlight so that the glow shape will include the 1-pixel
+    # highlight
+    my $hl_layer = ($image->get_layers)[0];
+    $textlayer = $image->merge_down($hl_layer, EXPAND_AS_NECESSARY);
+  }
+  $textlayer->set_name("Text");
+
+  # Fill the background
+  $image->selection_all;
+  Gimp::Context->set_foreground($background);
+  $backlayer->edit_bucket_fill(FG_BUCKET_FILL, NORMAL_MODE, 100, 0, 1, 0, 0);
+
+  # Make the glow:
+  perl_fu_add_glow($image, $textlayer, $glow, $radius);
+
+  $image->undo_enable;
+  $image->selection_none;
+  $image->set_active_layer($backlayer);
+
+  Gimp::Context->pop();
+  eval { Gimp::Display->new($image) };
+  return $image;
+}
+
+sub perl_fu_add_glow {
+  my $image = shift;
+  my $drawable = shift;
+  my $color = shift;
+  my $radius = shift;
+  my $old_draw = $drawable;
+  $drawable->become('Gimp::Layer');
+  my $is_float = 0;
+  my $old_sel = $image->selection_save;
+
+  $image->undo_group_start;
+
+  if (!$drawable->has_alpha) {
+    my($sel, $x1, $y1, $x2, $y2) = $image->selection_bounds;
+    die "add_glow: Need a selection to work on" unless $sel;
+    $is_float = 1;
+    $drawable = $drawable->selection_float(0, 0);
+  }
+
+  my $type = $drawable->type;
+  my $glow = $image->layer_new(
+    $image->width, $image->height, $type, "Glow layer", 100, NORMAL_MODE
+  );
+  my $lnum = $image->get_item_position($drawable);
+  $image->insert_layer($glow, 0, $lnum);
+
+  # Clear out the new layer
+  $image->selection_all;
+  $glow->edit_clear;
+  # Add the glow
+
+  Gimp::Context->push();
+
+  Gimp::Context->set_foreground($color);
+  $image->select_item(CHANNEL_OP_REPLACE, $drawable);
+  $image->selection_grow($radius);
+  $image->selection_feather($radius*1.5);
+  $glow->edit_bucket_fill(FG_BUCKET_FILL, NORMAL_MODE, 100, 255, 0, 0, 0);
+  $image->select_item(CHANNEL_OP_REPLACE, $drawable);
+  $glow->edit_clear;
+  $image->select_item(CHANNEL_OP_REPLACE, $old_sel);
+  $drawable->floating_sel_anchor if $is_float;
+  $image->set_active_layer($old_draw);
+  $image->undo_group_end;
+  Gimp::Context->pop();
+  Gimp::Display->displays_flush();
+}
+
+sub perl_fu_brushed_metal {
+  my $image = shift;
+  my $drawable = shift;
+  my $length = shift;
+  my $angle = shift;
+  my $use_gradient = shift;
+  my $gradient = shift;
+
+  $image->undo_group_start;
+
+  # A whole lot of layer fiddling to get around the fact that
+  # plug_in_mblur does the wrong thing with borders....
+  my($bset, $x1, $y1, $x2, $y2) = $image->selection_bounds;
+  if (!$bset) {
+    if($drawable->has_alpha) {
+      $image->select_item(CHANNEL_OP_REPLACE, $drawable);
+    } else {
+      $image->selection_all;
+    }
+    my $ignore;
+    ($ignore, $x1, $y1, $x2, $y2) = $image->selection_bounds;
+  }
+  $x1-=$length;
+  $y1-=$length;
+  $x2+=$length;
+  $y2+=$length;
+  my $width = abs($x2-$x1);
+  my $height = abs($y2-$y1);
+  my $templ = $image->layer_new($width, $height, RGBA_IMAGE, "Temp",
+			     100, NORMAL_MODE);
+  $image->insert_layer($templ, 0, 0);
+  $templ->set_offsets($x1+$length, $y1+$length);
+  my $target_select = $image->selection_save;
+  $image->selection_none;
+
+  # Render the actual effect into our temporary layer
+  $image->solid_noise($templ, 0, 0, time(), 1, 1.5, 2.5);
+
+  $image->map_to_gradient($templ, $gradient)
+    if $use_gradient && defined($gradient) && $gradient ne '';
+
+  $templ->brightness_contrast(50, 0);
+  $image->noisify($templ, 0, 0.3, 0.3, 0.3, 0);
+  $image->mblur($templ, 0, $length, $angle, 0.0, 0.0);
+
+  # Now put it into the target layer
+  $image->select_item(CHANNEL_OP_REPLACE, $target_select);
+  $templ->edit_copy;
+  my $float = $drawable->edit_paste(0);
+  $float->set_offsets($x1+$length, $y1+$length);
+  $float->floating_sel_anchor;
+  $image->remove_layer($templ);
+  $image->undo_group_end;
+  Gimp::Display->displays_flush();
+}
+
+sub perl_fu_highlight_edges {
+  my $image = shift;
+  my $drawable = shift;
+  my $pixels = shift;
+  $drawable->become('Gimp::Layer');
+  my $old_draw = $drawable;
+  my $is_float = 0;
+  my $old_sel = $image->selection_save;
+
+  $image->undo_group_start;
+
+  die "highlight_edges: The active layer must be visible!"
+    unless $drawable->get_visible;
+
+  if (!$drawable->has_alpha) {
+    my($sel,$x1,$y1,$x2,$y2) = $image->selection_bounds;
+    die "highlight_edges: Need a selection (or alpha layer) to work on"
+      unless $sel;
+    $is_float = 1;
+    $drawable = $drawable->selection_float(0,0);
+  }
+
+  $image->select_item(CHANNEL_OP_REPLACE, $drawable);
+  my $white = $drawable->copy(0);
+  my $black = $drawable->copy(0);
+  my $lnum = $image->get_item_position($drawable);
+  $image->insert_layer($black, 0, $lnum);
+  $image->insert_layer($white, 0, $lnum);
+
+  Gimp::Context->push();
+
+  Gimp::Context->set_foreground([255,255,255]);
+  $white->edit_bucket_fill(FG_BUCKET_FILL, NORMAL_MODE, 100, 255, 0, 0, 0);
+  Gimp::Context->set_foreground([0,0,0]);
+  $black->edit_bucket_fill(FG_BUCKET_FILL, NORMAL_MODE, 100, 255, 0, 0, 0);
+  $white->translate(-1*$pixels, -1*$pixels);
+  $black->translate(1*$pixels, 1*$pixels);
+  $white = $image->merge_down($white, EXPAND_AS_NECESSARY);
+  $white->set_name("Edge Highlight");
+  $image->select_item(CHANNEL_OP_REPLACE, $drawable);
+  $white->edit_clear;
+  $image->select_item(CHANNEL_OP_REPLACE, $old_sel);
+  $drawable->floating_sel_anchor if $is_float;
+  # gimp_image_set_active_layer($image,$old_draw);
+  $image->undo_group_end;
+  Gimp::Context->pop();
+  Gimp::Display->displays_flush();
+}
+
+# Register the plug-ins:
+
+register
+  "highlight_edges",
+  "Frame an alpha layer with black and white edges",
+  "Highlight the edges of an alpha layer and make ".
+	"it appear to have height. Not quite the same as a beveled edge, ".
+	"this is a somewhat more subtle technique.",
+  '', '', '',
+  N_"<Image>/Filters/Render/Highlight Edges...",
+  "*",
+  [
+   [PF_INT32, "edging", "Pixels (non-functional)", 1]
+  ],
+  \&perl_fu_highlight_edges;
+
+register
+  "brushed_metal",
+  "Create a brushed metal surface effect",
+  "Make a surface (selected area) look like ".
+	"brushed metal (kind of like steel).",
+  '', '', '',
+  N_"<Image>/Filters/Render/Pattern/Brushed Metal...",
+  "*",
+  [
+   [PF_SLIDER,   "stroke_length", "Length", 25, [1, 100, 1]],
+   [PF_SLIDER,   "angle", "Angle (0-359)", 135, [0, 359, 1]],
+   [PF_BOOL,     "use_gradient", "use the gradient specified below?", 0],
+   [PF_GRADIENT, "gradient", "Default"],
+  ],
+  \&perl_fu_brushed_metal;
+
+register
+  "add_glow",
+  "Add a glow behind an alpha layer",
+  "Add a glowing layer behind an existing layer. This ".
+	"is very different from drop shadows, as the glow will extend out ".
+	"in the given radius from all edges of the layer.",
+  '', '', '',
+  N_"<Image>/Filters/Render/Add Glow",
+  "*",
+  [
+   [PF_COLOR, "glow_color", "Color", [0,0,1.0]],
+   [PF_SPINNER, "glow_radius", "Radius", 10, [1, 1000, 1]]
+  ],
+  \&perl_fu_add_glow;
+
+register
+  "glowing_steel",
+  "Render metal surface over glowing background",
+  "Create the effect of a metallic surface over ".
+	"a glowing surface. This effect was inspired by a poster for the ".
+	"film \"Lost In Space\".",
+  '', '', '',
+  N_"<Image>/File/Create/Logos/Glowing Steel",
+  undef,
+  [
+   [PF_STRING, "string", "Logo text", "GET LOST"],
+   # The font in the poster was like "cobalt extended"
+   [PF_FONT, "font", "Logo font", "Bitstream Charter Bold"],
+   [PF_SPINNER, "size", "Font size (pixels)", 100, [0, 3000, 1]],
+   [PF_COLOR, "glow_color", "Glow color", [1.0, 0.8157, 0]],
+   [PF_COLOR, "background", "Background color", [0x00, 0x00, 0x00]],
+   [PF_INT32, "glow_radius", "Glow radius", 4],
+   [PF_TOGGLE, "highlight_edges", "Highlight edges", 0],
+   [PF_TOGGLE, "antialias", "Anti-alias text", 1]
+  ],
+  \&perl_fu_glowing_steel;
+
+exit main;
+__END__
+
+=head1 NAME
+
+glowing_steel - Logo plugin for GIMP
+
+=head1 SYNOPSIS
+
+  <Image>/File/Create/Logos/Glowing Steel
+  <Image>/Filters/Render/Brushed Metal
+  <Image>/Filters/Render/Highlight Edges
+  <Image>/Filters/Render/Add Glow
+
+=head1 DESCRIPTION
+
+Produce logos and other such nifty things which appear to be made of
+steel and floating over a glowing cloud.  This plug-in also includes
+several filters for performing the various stages of this logo
+(i.e. brushed steel, add glow, highlight edges).
+
+This plugin renders the given text in the given font and size in a logo
+style that combines the I<Brushed Metal> effect with the I<Highlight Edges>
+and I<Add Glow> effects. The text is surfaced with brushed metal, and
+highlighted, and the glow is added in the background.
+
+This plug-in also includes the effects listed above as separate tools
+which may be used independent of creating a logo. These tools are:
+
+=over 5
+
+=item Brushed Metal
+
+Takes length of brush strokes and angle, and renders a brushed metal surface
+into the target drawable.
+
+PDB call:
+
+  perl_fu_brushed_metal(image, drawable, length, angle)
+
+C<length> must be greater than 1.
+
+=item Highlight Edges
+
+Takes a number of pixels and adds a black/white highlight to the drawable.
+Target drawable must be an alpha layer.
+
+PDB call:
+
+  perl_fu_highlight_edges(image, drawable, pixels)
+
+=item Add Glow
+
+Takes a color and radius, and renders a fuzzy glow in the given color,
+out to the given radius behind the target drawable. This is added as
+a new layer, and the target drawable must be an alpha layer.
+
+PDB call:
+
+  perl_fu_add_glow(image, drawable, color, radius)
+
+=back
+
+=head1 PARAMETERS
+
+The following parameters can be set by the user (or caller) of glowing_steel:
+
+=over 5
+
+=item B<String>
+
+The string to display
+
+=item B<Font>
+
+The Font to render the string in.
+
+=item B<Size>
+
+The size to use for the font.
+
+=item B<Glow Color>
+
+The color to use for the background glow.
+
+=item B<Background Color>
+
+The color to use for the background layer.
+
+=item B<Glow Radius>
+
+The radius in pixels that the glow should emanate from the edge of the text.
+
+=item B<Highlight Edges>
+
+This toggle tells glowing_steel if it should (true) or should not
+(false) add one-pixel black/white edge highlighting. Default is to
+add the highlighting.
+
+=item B<Antialias>
+
+This toggle will turn on (true) or off (false) font antialiasing. This
+should only be used if you find that this plugin crashes because the font
+you chose could not be antialiased (the gimp will display an error suggesting
+that you turn off antialiasing).
+
+=back
+
+PDB call:
+
+  my $image = perl_fu_glowing_metal( string, font, size, glow_color,
+	back_color, glow_radius, highlight, antialias)
+
+=head1 AUTHOR
+
+Aaron Sherman <ajs@ajs.com>
+
+=head1 DATE
+
+Version 1.0a released 1999-06-14
+
+=head1 LICENSE
+
+Written in 1999 (c) by Aaron Sherman <ajs@ajs.com>.
+
+This plugin may be distributed under the same terms as Gimp itself.

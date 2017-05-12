@@ -1,0 +1,9 @@
+Conversation with to_user at 2005-10-29 23:02:19 on from_user (proto)
+(07/29/06 23:04:05) from_user: quack
+(23:03:08) from_user: back
+(23:04:07) from_user: a
+i
+j
+(06:45:05) to_user: reply
+(06:45:05) chat_user: reply
+(06:45:06) to_user: line with : embedded

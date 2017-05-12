@@ -1,0 +1,161 @@
+Revision history for Perl extension GSSAPI.
+
+0.01  Fri Aug 18 22:14:18 2000
+	- original version; created by h2xs 1.4 with options
+		-x -n GSSAPI -p gss_ /home/local/perl/GSSAPI/foo/gssapi.h
+
+0.02  Mon Aug 28 01:07:30 2000
+	- Redid typemaps to separate input, optional-input, output,
+	  optional-output, and const-output.
+	- Add GSSAPI::is_valid() to allow users to test whether a NULL
+	  object was returned.  Made all sub-modules except GSSAPI::Binding
+	  into actual subclasses by setting @ISA in each to include
+	  GSSAPI itself.
+	- Add DESTROY method to GSSAPI::Context that deletes the context,
+	  ignoring any errors.
+
+0.10  Mon Aug 28 18:17:27 2000
+	- Use SvOK() instead of comparing to &PL_sv_undef
+	- Add gss_buffer_desc_out
+	- Don't do the sv_setref_iv on output of PTROBJ_ or PTROBJ_OPT
+	  if the value isn't changing.  This keeps the value from being
+	  destructed while in use.
+	- Because of that change, new() methods now return foo_out types
+	- Newline terminate the stringification of a GSSAPI::Status object
+	- This version has actually worked
+
+0.11  Tue Aug 29 22:03:41 2000
+	- Add a README file and clean up the POD in GSSAPI.pm
+
+0.12  Tue Nov  6 10:48:54 2001
+	- Remove some unused constants from the .xs file.
+	- Added missing '&'s to Context::accept and Context::export
+	  method implementations.  Thanks to Jacob Gorm Hansen <jg@ioi.dk>
+	  for finding this.
+
+0.13  Thu Mar 24 10:46:59 2005
+	- Actually document this module as being under the same
+	  license as Perl (how did I miss this?!?)
+
+0.14 Mo Feb  6 18:46:21 CET 2006
+
+	- Maintanance overtaken by Achim Grolms. Thank you Philip!
+	  our base is
+	  <http://perlgssapi.sourceforge.net/>
+	- deleted gss_mech_set_krb5_v1v2(), gss_mech_set_krb5_v2()
+	  from OID__Set.xs. It makes the compile fail
+	- deleted gss_mech_krb5_v2() from OID.xs
+	- deletd gss_mech_set_krb5_v2, gss_mech_set_krb5_v1v2 from GSSAPI.xs
+	- gss_str_to_oid() and gss_oid_to_str()
+	  are not present in Heimdal implementations.
+	  I've ifdefed them to croak.
+	  Testsuite is adjusted to skip them.
+	- Added patches from Merijn Broeren to typemap file.
+	  this fixes (hopefully) http://rt.cpan.org/Public/Bug/Display.html?id=5681
+	  Just grep the file for "Merijn", I've marked the sections
+	- Added destructor to Cred.xs (Thanks Merijn!)
+0.15
+	- added options (2) (3) (4) to Makefile.PL
+	  to make the configuration more flexible
+	  (if needed). Thanks Merijn!
+
+0.16	- changed Context.xs Destructor to warn only on GSS_S_FAILURE
+	(see <http://sourceforge.net/mailarchive/forum.php?thread_id=9674417&forum_id=47637>)
+	- Makefile.PL passes all the (needed!)
+	  krb5-config --libs gssapi stuff that is
+	  ignored by LIBS to LDDLFLGAS
+	- Tried to add userdocumentation to GSSAPI.pm (GSSAPI::Name)
+
+0.17	So Feb 12 21:52:41 CET 2006
+
+	- use of uppercase GSS_ style import-constants instead of lowercase
+	  gss_ constants. Hope this does not break things, please
+	  let me know if that means problems on your platform!
+	- deleted mechtype sets gss_mech_set_krb5,
+	  gss_mech_set_krb5_old, gss_mech_set_krb5_both, gss_mech_set_krb5.
+	  Please let me know if that breaks your code and needs to be fixed!
+	- added example gss-client.pl and gss-server.pl
+	  (Thanks Merijn!)
+	- added SPNEGO Mechttype to OID.xs
+	- made the test.pl list available Mechtypes
+	- added indicate_mechs Example to POD
+
+0.18	Tu Feb 14 12:53:14 UTC 2006
+
+	- inline definition of
+	  __GSS_KRB5_NT_USER_NAME
+	  __GSS_KRB5_NT_PRINCIPAL_NAME
+	  __gss_mech_krb5_v2 ( gss_mech_krb5_v2 is back)
+	  to make module independent from GSSAPI implementations
+	  which does not export the symbols.
+	  See <http://mailman.mit.edu/pipermail/krbdev/2005-February/003193.html>
+	- splitted tests to separate files in t/
+	  Make tests runable separately.
+
+0.19    We Feb 22 14:39:45 UTC 2006
+
+
+        - GSS_KRB5_NT_MACHINE_UID_NAME is now GSS_C_NT_MACHINE_UID_NAME
+          Thanks to David Leonard!
+        - changed my stupid comments not to be interpreted as precompiler
+          statements...
+          ...seems this is a brown paperbag release...
+
+0.20    Th Mar  9 19:04:33 CET 2006
+
+        - Bugfix of <http://www.nntp.perl.org/group/perl.cpan.testers/290559>
+          (ExtUtils-ParseXS-2.15 triggered broken typemap error)
+          Thanks to  Sébastien Aperghis-Tramoni
+          and Alexandre Ghisoli
+        - changed Constants exporting system.
+          Thanks to Marc Lehmann
+
+0.21    Th Apr  6 20:28:59 CEST 2006
+
+        - Bugfix of zbufixes.t
+          see <http://rt.cpan.org/Public/Bug/Display.html?id=18531>
+
+0.22    Mo Mai 29 21:15:17 CEST 2006
+
+        - Bufix <http://rt.cpan.org/Public/Bug/Display.html?id=18576>
+        - Bugfix of <http://rt.cpan.org/Public/Bug/Display.html?id=19524>
+                    <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=367377>
+          Thanks to Florian Ragwitz and Daniel Schepler
+        - Bugfix of <http://www.nntp.perl.org/group/perl.ldap/2083>
+          Thanks to Quanah Gibson-Mount
+
+0.23    Mi Aug  2 15:48:19 UTC 2006
+
+        - Re-added support of MIT Kerberos 1.2.x
+          (Many have asked for this)
+
+0.24    Wed, 21 Feb 2007 20:59:39 +0100
+
+        - Changed tests as an answer to FAIL 413320
+          <http://www.nntp.perl.org/group/perl.cpan.testers/2007/02/msg413320.html>
+          Thanks to Florian Lindner
+
+0.25    So 3. Feb 20:18:16 UTC 2008
+
+        - Enhancement to use OpenSolaris/Solaris 10 native gss library
+          <http://rt.cpan.org/Public/Bug/Display.html?id=32788>
+          Thanks to Markus Moeller
+
+0.26    Fr 15. Feb 22:32:10 UTC 2008
+
+        - modified Makefile.PL to trigger no FAIL testreports
+          in case of missing prerequirements.
+          Thanks to Andreas Koenig
+
+0.27    Sa 24. Apr 12:39:47 UTC 2010
+        - Testreport 1074976 and 1074843: put "use 5.006;" to Makefile.PL.
+          Thanks to  Slaven Rezic for reporting and doing all the tests on 5.005
+        - Fixed https://bugs.gentoo.org/show_bug.cgi?id=276555.
+          Thanks to Andrew Savchenko bircoph@gmail.com
+        - Changed sizeof(outputtype) to 0 to let Perl calculate the lengh
+          in Name.xs. Thanks to Zoltan BANAI <Zoltan.Banai@morganstanley.com>
+
+0.28    Do 3. Jun 12:11:21 UTC 2010
+        - Fixed Lenght-problem in typemap, T_BUFFER_STR_OUT for Heimdal.
+          Thanks to Slaven Rezic <slaven@rezic.de> for report and patch.
+

@@ -1,0 +1,73 @@
+
+======== version history of Geo::EOP
+
+version 0.50: Tue Jul 21 14:16:14 CEST 2015
+
+	Changes:
+	- pass options of from() to ::Cache::reader, not ::Cache::new(),
+	  which is much simpler.
+	- bump version number to flag changes
+
+	Fixes:
+	- repair used versions report
+
+	Improvements:
+	- permit from() as instance method.
+	- use ::Cache::addPrefixes()
+	- mv t/99pod.t to xt/ ; move dependency on Test::POD
+
+version 0.13: Thu Jan 29 16:47:24 CET 2009
+
+	Improvements:
+
+	- add Geo::EOP::Landsat, which converts some Landsat product
+	  meta-data into the EOP structure.
+
+version 0.12: Wed Jan 28 11:10:21 CET 2009
+
+	Changes:
+
+	- remove 'READER'|'WRITER'|'RW' first parameter from new()
+	  in Geo::EOP and Geo::EOP::Envisat.
+
+	Fixes:
+
+	- do not use /bin/pwd in t/99pod.t
+
+	Improvements:
+
+	- add Geo::EOP::from()
+
+	- included examples/read_eop.pl
+
+version 0.11: Wed Jan 21 12:43:57 CET 2009
+
+	Changes:
+
+	- Geo::EOP is now fully based on a Geo::GML object.
+
+	- Geo::GML uses prefixed keys, so Geo::EOP uses prefixed keys as
+	  well.
+
+	- version() and new(version) renamed to resp. eopVersion() and
+	  new(eop_version) to avoid clash with GML version.
+
+	- remove NS_GML* definitions from Geo::EOP::Util: get them
+	  yourself from Geo::GML::Util.
+
+	Improvements:
+
+	- added eop spec 1.2.1 and tests in t/22eop121.t
+
+	- added Geo::EOP::Envisat as demonstration implementation.  See
+	  also examples/envisat.pl
+
+	- use Geo::GML's version of xlink1.0.0
+
+	- move schematron info from examples (which they aren't) into
+	  a seperate directory.  Schematron information is not (yet)
+	  supported.
+
+version 0.10: Tue Jul  8 13:49:23 CEST 2008
+
+	- initial release

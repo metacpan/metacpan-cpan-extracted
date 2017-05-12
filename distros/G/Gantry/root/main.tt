@@ -1,0 +1,15 @@
+[%#
+    main.tt - gives the base app of a module a way to show links to other
+              app pages
+
+    Your view data should include a single key called pages whose value is
+    an array of hashes with these keys: link and label.
+%]
+[% title = view.title %]
+<ul class="site-link-list">
+[% FOREACH page IN view.data.pages %]
+  <li>
+    <a href='[% page.link %]'> [% page.label %] </a>
+  </li>
+[% END %]
+</ul>

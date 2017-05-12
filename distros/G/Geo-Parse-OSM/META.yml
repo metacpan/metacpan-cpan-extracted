@@ -1,0 +1,26 @@
+---
+abstract: 'OpenStreetMap XML file regexp parser'
+author:
+  - 'liosha <liosha@cpan.org>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-Parse-OSM
+requires:
+  Carp: 0
+  Encode: 0
+  Exporter: 0
+  HTML::Entities: 0
+  IO::Uncompress::AnyUncompress: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  perl: 5.010
+version: 0.42

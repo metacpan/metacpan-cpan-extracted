@@ -1,0 +1,43 @@
+Graphics::Primitive::CSS - Style Graphics::Primitive documents with CSS
+
+SYNOPSIS
+
+    use Graphics::Primitive::CSS;
+
+    my $styler = Graphics::Primitive::CSS->new(
+        style => '
+            .foo {
+                font-size: 12pt;
+                vertical-align: center;
+            }
+        '
+    );
+
+    my $doc = Graphics::Primitive::Container->new;
+    my $textbox = Graphics::Primitive::TextBox->new( class => 'foo' );
+    $doc->add_component($textbox);
+
+    $styler->apply($doc);
+
+DESCRIPTION
+
+Graphics::Primitive::CSS allows you to change the various attributes of a
+Graphics::Primitive document using CSS.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Cold Hard Code, LLC
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

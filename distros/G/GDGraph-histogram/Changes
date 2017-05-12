@@ -1,0 +1,9 @@
+Revision history for Perl module GD::Graph::histogram
+
+1.0 Wed Mar 31 22:34:15 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+1.1 Wed Mar 22 13:44:15 2006
+	- Assorted bug fixes
+
+

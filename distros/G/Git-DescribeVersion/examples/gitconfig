@@ -1,0 +1,3 @@
+# ~/.gitconfig
+[alias]
+	describe-version = "!perl -MGit::DescribeVersion::App -erun"

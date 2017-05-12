@@ -1,0 +1,30 @@
+Getopt/ExPar version 1.00
+=========================
+
+Extended Parameters Command Line Arguments Parser
+
+See POD for documentation.  Also look at t/1.t for examples.
+
+This is a method-based, argumnt parsing and retrieving package.
+Please send feedback to the author at harlinh@cadence.com for any issues.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Currently no dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Harlin Hamilton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

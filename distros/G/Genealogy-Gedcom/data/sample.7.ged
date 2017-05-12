@@ -1,0 +1,145 @@
+0 HEAD
+1   SOUR Genealogy::Gedcom
+2     NAME Genealogy::Gedcom
+2     VERS V 1.00
+2     CORP Ron Savage
+3       ADDR Box 3055
+4         STAE Vic
+4         POST 3163
+4         CTRY Australia
+3       EMAIL ron@savage.net.au
+3       WWW http://savage.net.au
+2     DATA Sample
+1   NOTE
+2     CONT This file is based on test data from the web site of Tamura Jones.
+2     CONT The data is the UTF-8 equivalent of the ANSEL data on this page:
+2     CONT http://www.tamurajones.net/GEDCOMANSELTable.xhtml
+1   GEDC
+2     VERS 5.5.1-5
+1   DATE 15 Nov 2015
+1   CHAR UTF-8
+
+0 @1@ INDI
+1   NAME grave accent /règle/
+
+0 @2@ INDI
+1   NAME acute accent /está/
+
+0 @3@ INDI
+1   NAME circumflex accent /même/
+
+0 @4@ INDI
+1   NAME tilde /niño/
+
+0 @5@ INDI
+1   NAME macron /gājējs/
+
+0 @6@ INDI
+1   NAME breve /altă/
+
+0 @7@ INDI
+1   NAME dot above /żaba/
+
+0 @8@ INDI
+1   NAME umlaut (diaeresis) /öppna/
+
+0 @9@ INDI
+1   NAME hacek /vždy/
+
+0 @10@ INDI
+1   NAME circle above (angstrom) /hår/
+
+0 @11@ INDI
+1   NAME high comma, off center /rozdel̕ ovac/
+
+0 @12@ INDI
+1   NAME double acute accent /időszaki/
+
+0 @13@ INDI
+1   NAME cedilla /ça/
+
+0 @14@ INDI
+1   NAME right hook, ogonek /vietą/
+
+0 @15@ INDI
+1   NAME underscore /s̲amar/
+
+0 @16@ INDI
+1   NAME high comma, centered /ge̓otermika/
+
+0 @17@ INDI
+1   NAME slash L — uppercase /Łódź/
+
+0 @18@ INDI
+1   NAME slash O — uppercase /Øst/
+
+0 @19@ INDI
+1   NAME slash D — uppercase /Đuro/
+
+0 @20@ INDI
+1   NAME thorn — uppercase /Þann/
+
+0 @21@ INDI
+1   NAME ligature AE — uppercase /Ægir/
+
+0 @22@ INDI
+1   NAME ligature OE — uppercase /Œuvre/
+
+0 @23@ INDI
+1   NAME middle dot /novel·la/
+
+0 @24@ INDI
+1   NAME musical flat /B♭/
+
+0 @25@ INDI
+1   NAME registered trademark /ABC®/
+
+0 @26@ INDI
+1   NAME plus or minus /A±B/
+
+0 @27@ INDI
+1   NAME alif /Unʾyusho/
+
+0 @28@ INDI
+1   NAME ayn /faʿil/
+
+0 @29@ INDI
+1   NAME slash l — lowercase /rozbił/
+
+0 @30@ INDI
+1   NAME slash o — lowercase /høj/
+
+0 @31@ INDI
+1   NAME slash d — lowercase /đavola/
+
+0 @32@ INDI
+1   NAME thorn — lowercase /þann/
+
+0 @33@ INDI
+1   NAME ligature ae — lowercase /skæg/
+
+0 @34@ INDI
+1   NAME ligature oe — lowercase /œuvre/
+
+0 @35@ INDI
+1   NAME dotless i — lowercase /masalı/
+
+0 @36@ INDI
+1   NAME British pound /£5.00/
+
+0 @37@ INDI
+1   NAME eth /verður/
+
+0 @38@ INDI
+1   NAME copyright mark /©1993/
+
+0 @39@ INDI
+1   NAME inverted question mark /¿Qué?/
+
+0 @40@ INDI
+1   NAME inverted exclamation mark /¡Esta!/
+
+0 @41@ INDI
+1   NAME Ess Zed /Preußen/
+
+0 TRLR

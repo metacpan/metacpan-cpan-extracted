@@ -1,0 +1,21 @@
+# ChangeLog for net-dns/dns2go
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-dns/dns2go/ChangeLog,v 1.1 2004/06/20 09:09:35 linguist Exp $
+
+  15 Apr 2004; Michael McCabe <randy@gentoo.org> dns2go-1.1-r2.ebuild:
+  adding s390 keywords
+
+  10 Apr 2004; Gustavo Zacarias <gustavoz@gentoo.org> dns2go-1.1-r2.ebuild:
+  x86 binary, just x86 & amd64 are valid, added -* and removed sparc
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*dns2go-1.1-r2 (1 Feb 2002)
+
+  1 Feb 2002; G.Bevin <gbevin@gentoo.org> ChangeLog :
+  
+  Added initial ChangeLog which should be updated whenever the package is
+  updated in any way. This changelog is targetted to users. This means that the
+  comments should well explained and written in clean English. The details about
+  writing correct changelogs are explained in the skel.ChangeLog file which you
+  can find in the root directory of the portage repository.

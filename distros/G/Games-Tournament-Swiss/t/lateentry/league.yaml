@@ -1,0 +1,36 @@
+---
+late: ~
+member:
+  - id: 101
+    name: Al
+    rating: 2000
+    title: Mr.
+  - id: 102
+    name: Bert
+    rating: 1980
+    title: Mr.
+  - id: 103
+    name: Carl
+    rating: 1960
+    title: Mr.
+  - id: 104
+    name: Don
+    rating: 1940
+    title: Mr.
+others:
+  - id: 201
+    name: Ally
+    rating: 1990
+    title: Ms.
+  - id: 202
+    name: Bertha
+    rating: 1970
+    title: Ms.
+  - id: 203
+    name: Carla
+    rating: 1950
+    title: Ms.
+  - id: 204
+    name: Donna
+    rating: 1930
+    title: Ms.

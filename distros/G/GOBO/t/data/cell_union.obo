@@ -1,0 +1,14 @@
+
+[Term]
+id: neuron_or_lymphocyte
+union_of: CL:0000540 ! neuron
+union_of: CL:0000542 ! lymphocyte
+
+[Term]
+id: foo
+relationship: only_in neuron_or_lymphocyte
+
+[Term]
+id: foo2
+is_a: foo
+relationship: part_of z

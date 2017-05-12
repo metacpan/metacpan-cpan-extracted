@@ -1,0 +1,28 @@
+#! /usr/bin/perl
+#---------------------------------------------------------------------
+# examples/flexible
+#
+# Demonstrate the flexible method of using Getopt::Mixed
+#---------------------------------------------------------------------
+
+# This next line is only so you don't have to install Getopt::Mixed first:
+BEGIN {unshift @INC, '../lib'}  # Don't do this in your code
+
+#---------------------------------------------------------------------
+use strict;
+use Getopt::Mixed 1.006, 'nextOption';
+
+Getopt::Mixed::init("apples=f a>apples apricots=f b:i c d:s file=s f>file",
+                    "pears=f help ?>help version V>version");
+
+while (my ($option, $value, $asEntered) = nextOption()) {
+    if (defined $value) {
+        printf "%-9s %7s = %s\n",$asEntered,$option,$value;
+    } else {
+        printf "%-9s %7s\n",$asEntered,$option;
+    }
+}
+
+Getopt::Mixed::cleanup();
+
+print "ARGV = ",join(' ',@ARGV),"\n";

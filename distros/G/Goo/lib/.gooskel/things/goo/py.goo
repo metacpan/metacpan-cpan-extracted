@@ -1,0 +1,33 @@
+###############################################################################
+#
+# /home/goo/src/things/goo/py.goo - goo config file
+#
+###############################################################################
+
+# what is this Thing?
+title			=	Python Programs
+description		=	Python scripts and modules
+
+# actions and the programs that handle them
+[J]ump       =   Goo::JumpManager.pm         
+[P]rofile    =   Goo::Thing::pm::Profiler.pm 
+E[X]it       =   Goo::Exiter.pm              
+[D]elete     =   Goo::FileThing::Deleter.pm  
+Care[O]Meter =   Goo::CareOMeter.pm          
+Comp[I]le    =   Goo::Thing::pm::Compiler.pm 
+[S]hell      =   Goo::ShellCommander.pm      
+[A]dd        =   Goo::Thing::pm::Adder.pm    
+[R]un        =   Goo::Thing::pm::Runner.pm   
+[Z]one       =   Goo::Zone.pm                
+[C]lone      =   Goo::FileThing::Cloner.pm   
+[E]dit       =   Goo::Thing::pm::Editor.pm   
+[M]ake       =   Goo::Thing::pm::Maker.pm    
+Back [L]ink  =   Goo::BackLinkManager.pm     
+
+
+# where is this Thing
+locations =   /home/goo/nige/python 
+
+
+
+

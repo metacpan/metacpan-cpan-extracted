@@ -1,0 +1,73 @@
+{
+   "abstract" : "Dynamically create Perl language bindings",
+   "author" : [
+      "unknown",
+      "Glib::Object::Introspection Team <gtk-perl-list at gnome dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown",
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Glib-Object-Introspection",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : [
+         "GObjectIntrospection.xs"
+      ],
+      "package" : [
+         "MY",
+         "Glib::Object::Introspection::_FuncWrapper"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.3",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "1",
+            "Glib" : "1.32"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.3",
+            "ExtUtils::PkgConfig" : "1",
+            "Glib" : "1.32"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Glib-Object-Introspection [at] rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Glib-Object-Introspection"
+      },
+      "homepage" : "http://gtk2-perl.sourceforge.net",
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-2.1.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnome.org/perl-Glib-Object-Introspection",
+         "web" : "http://git.gnome.org/browse/perl-Glib-Object-Introspection"
+      },
+      "x_IRC" : "irc://irc.gimp.org/#gtk-perl",
+      "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
+   },
+   "version" : "0.042",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

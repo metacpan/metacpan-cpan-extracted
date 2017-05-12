@@ -1,0 +1,55 @@
+---
+abstract: 'regular expressions for handling British postcodes'
+author:
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'
+build_requires:
+  Clone: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  File::ShareDir::Install: '0.03'
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-UK-Postcode-Regex
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+  file:
+    - lib/Geo/UK/Postcode/Regex/Hash.pm
+provides:
+  Geo::UK::Postcode::Regex:
+    file: lib/Geo/UK/Postcode/Regex.pm
+    version: '0.015'
+  Geo::UK::Postcode::Regex::Simple:
+    file: lib/Geo/UK/Postcode/Regex/Simple.pm
+    version: '0.015'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Tie::Hash: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mjemmeson/Geo-UK-Postcode-Regex/issues
+  homepage: https://github.com/mjemmeson/Geo-UK-Postcode-Regex
+  repository: https://github.com/mjemmeson/Geo-UK-Postcode-Regex.git
+version: '0.015'
+x_contributors:
+  - 'Michael Jemmeson <michael.jemmeson@cpan.org>'

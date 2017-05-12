@@ -1,0 +1,94 @@
+#! /usr/bin/perl -w
+
+use strict;
+use Geo::Postcodes::Update;
+
+################################################################################
+#                                                                              #
+#                               misc/update_no                                 #
+#                               --------------                                 #
+#              Arne Sommer - perl@bbop.org - 24. September 2006                #
+#                                                                              #
+################################################################################
+#                                                                              #
+#  This program converts the norwegian postcodes to a suitable data structure. #
+#                                                                              #
+#            !!! This is done on the library file 'NO.pm' itself !!!           #
+#                                                                              #
+################################################################################
+#                                                                              #
+#          This program will show the new data on screen by default.           #
+#        Use the '-update' command line argument to update the module.         #
+#                                                                              #
+################################################################################
+
+my $class     = 'NO';
+my $file      = 'tilbud5';
+my $url       = 'http://epab.posten.no/Norsk/Nedlasting/_Files/tilbud5';
+my $procedure = \&parse_no;
+
+my $update    = @ARGV && $ARGV[0] eq "-update";
+
+Geo::Postcodes::Update::update($class, $file, $url, $procedure, $update);
+
+################################################################################
+
+sub parse_no
+{
+  ## Step 1. Initialising data ################################################
+
+  my %fix_type; $fix_type{B} = 'STBX'; # The keys (e.g. 'B') are used in the  #
+                $fix_type{F} = 'MU';   #   postcode file ('tilbud5').         #
+                $fix_type{G} = 'ST';   # The values (e.g. 'STBX') are the     #
+                $fix_type{K} = 'IO';   #   codes used by the Geo::Postcodes   #
+                $fix_type{P} = 'BX';   #   modules.                           #
+                $fix_type{S} = 'SX';
+
+  my %location;       # postcode       > location       # These hashes are    #
+  my %borough_number; # postcode       > borough number #   used to collect   #
+  my %borough;        # borough number > borough        #   the postcode      #
+  my %type;           # postcode       > type           #   data.             #
+
+  my($postcode, $location, $borough_number, $borough, $type);
+    # Placeholders for the information in the postcode file.
+
+  my @out; # The procedure returns a list of perl code. They are stored here. #
+
+  ## Step 2. Build the internal data structure ################################
+
+  foreach (@_)
+  {
+    # s/"/\\"/g;         # Escape any double quotes used in the source file.
+    tr/í\235\217µ/∆ÿ≈¡/; # Fix curious coding of 8-bit characters in 'tilbud5'.
+
+    ($postcode, $location, $borough_number, $borough, $type) 
+      = unpack("A4A32A4A30A", $_);
+
+    $location      {$postcode}       = $location;
+    $borough_number{$postcode}       = $borough_number;
+    $borough       {$borough_number} = $borough;
+    $type          {$postcode}       = $fix_type{$type};
+  }
+
+  ## Step 3. Output the main data #############################################
+
+  foreach (sort keys %location)
+  {
+    push(@out,  "\$borough_number{'" . $_ . "'} = '" . $borough_number{$_} . "';" .
+               " \$type{'"           . $_ . "'} = '" . $type{$_}           . "';" .
+               " \$location{'"       . $_ . "'} = '" . $location{$_}       . "';\n");
+  }
+
+  push(@out, "\n");
+
+  ## Step 4. Output the borough mappings ######################################
+
+  foreach (sort keys %borough)
+  {
+    push(@out, "\$borough{'" . $_ . "'} = '" . $borough{$_} . "';\n");
+  }
+
+  ## Step 5. Return the lot ###################################################
+
+  return (@out, "\n");
+}

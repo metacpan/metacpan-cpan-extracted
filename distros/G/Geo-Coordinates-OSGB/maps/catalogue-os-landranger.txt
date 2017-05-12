@@ -1,0 +1,204 @@
+A001  9780319228074    1  Shetland – Yell, Unst and Fetlar
+A002  9780319228081    2  Shetland – Sullom Voe & Whalsay
+A003  9780319228098    3  Shetland – North Mainland
+A004  9780319228104    4  Shetland – South Mainland
+A005  9780319228111    5  Orkney – Northern Isles
+A006  9780319228128    6  Orkney – Mainland
+A007  9780319228135    7  Orkney – Southern Isles
+A008  9780319226087    8  Stornoway & North Lewis / Steòrnabhagh agus Ceann a Tuath Leòdhais
+A009  9780319231234    9  Cape Wrath (Durness & Scourie)
+A010  9780319226100   10  Strath Naver / Srath Nabhair (Bettyhill & Tongue)
+A011  9780319231630   11  Thurso & Dunbeath
+A012  9780319226124   12  Thurso & Wick (John O’Groats)
+A013  9780319231241   13  West Lewis & North Harris / Taobh Siar Leòdhais agus Ceann a Tuath na Hearadh
+A014  9780319231258   14  Tarbert & Loch Seaforth / An Tairbeart agus Loch Shìophoirt
+A015  9780319231265   15  Loch Assynt (Lochinver & Kylesku)
+A016  9780319231067   16  Lairg & Loch Shin (Loch Naver)
+A017  9780319226179   17  Helmsdale & Strath of Kildonan
+A018  9780319231272   18  Sound of Harris / Caolas na Hearadh (North Uist, Taransay & St Kilda / Uibhist a Tuath, Tarasaigh agus Hiort)
+A019  9780319231074   19  Gairloch & Ullapool (Loch Maree)
+A020  9780319231081   20  Beinn Dearg & Loch Broom (Ben Wyvis)
+A021  9780319231098   21  Dornoch & Alness (Invergordon & Tain)
+A022  9780319226223   22  Benbecula & South Uist / Beinn na Faoghla agus Uibhist a Deas
+A023  9780319229897   23  North Skye (Dunvegan & Portree)
+A024  9780319231104   24  Raasay & Applecross (Loch Torridon & Plockton)
+A025  9780319231111   25  Glen Carron & Glen Affric
+A026  9780319231128   26  Inverness & Loch Ness (Strathglass)
+A027  9780319231173   27  Nairn & Forres (River Findhorn)
+A028  9780319231029   28  Elgin & Dufftown (Buckie & Keith)
+A029  9780319231043   29  Banff & Huntly (Portsoy & Turriff)
+A030  9780319231692   30  Fraserburgh (Peterhead & Ellon)
+A031  9780319226315   31  Barra & South Uist / Barraigh agus Uibhist a Deas (Vatersay & Eriskay / Bhatarsaigh agus Eirisgeigh)
+A032  9780319229903   32  South Skye & Cuillin Hills
+A033  9780319229910   33  Loch Alsh, Glen Shiel & Loch Hourn
+A034  9780319231012   34  Fort Augustus (Glen Roy & Glen Moriston)
+A035  9780319231180   35  Kingussie & Monadhliath Mountains
+A036  9780319229927   36  Grantown & Aviemore (Cairngorm Mountains)
+A037  9780319229934   37  Strathdon & Alford
+A038  9780319231289   38  Aberdeen (Inverurie & Pitmedden)
+A039  9780319229941   39  Rum, Eigg, Muck & Canna
+A040  9780319231647   40  Mallaig & Glenfinnan (Loch Shiel)
+A041  9780319229958   41  Ben Nevis (Fort William & Glen Coe)
+A042  9780319231296   42  Glen Garry & Loch Rannoch
+A043  9780319231197   43  Braemar & Blair Atholl
+A044  9780319229965   44  Ballater, Glen Clova
+A045  9780319231685   45  Stonehaven & Banchory
+A046  9780319229743   46  Coll & Tiree
+A047  9780319229835   47  Tobermory & North Mull
+A048  9780319229842   48  Iona & West Mull (Ulva)
+A049  9780319229774   49  Oban & East Mull
+A050  9780319229781   50  Glen Orchy & Loch Etive
+A051  9780319229798   51  Loch Tay & Glen Dochart
+A052  9780319229859   52  Pitlochry & Crieff (Aberfeldy)
+A053  9780319231210   53  Blairgowrie & Forest of Alyth
+A054  9780319229804   54  Dundee & Montrose (Forfar & Arbroath)
+A055  9780319231227   55  Lochgilphead & Loch Awe
+A056  9780319229811   56  Loch Lomond & Inveraray
+A057  9780319231562   57  Stirling & The Trossachs
+A058  9780319229972   58  Perth & Alloa (Auchterarder)
+A059  9780319229828   59  St Andrews (Kirkcaldy & Glenrothes)
+A060  9780319229613   60  Islay
+A061  9780319229620   61  Jura & Colonsay
+A062  9780319229682   62  North Kintyre & Tarbert
+A063  9780319229699   63  Firth of Clyde (Greenock & Rothesay)
+A064  9780319228951   64  Glasgow (Motherwell & Airdrie)
+A065  9780319229705   65  Falkirk & Linlithgow (Dunfermline)
+A066  9780319228708   66  Edinburgh (Penicuik & North Berwick)
+A067  9780319228760   67  Duns, Dunbar & Eyemouth
+A068  9780319229637   68  South Kintyre & Campbeltown
+A069  9780319229644   69  Isle of Arran
+A070  9780319242292   70  Ayr, Kilmarnock & Troon
+A071  9780319229712   71  Lanark & Upper Nithsdale
+A072  9780319242087   72  Upper Clyde Valley (Biggar & Lanark)
+A073  9780319229729   73  Peebles, Galashiels & Selkirk (Tweed Valley)
+A074  9780319231388   74  Kelso & Coldstream (Jedburgh & Duns)
+A075  9780319228968   75  Berwick-upon-Tweed (Holy Island & Wooler)
+A076  9780319242308   76  Girvan (Ballantrae & Barrhill)
+A077  9780319229583   77  Dalmellington & New Galloway (Galloway Forest Park)
+A078  9780319229590   78  Nithsdale & Annandale (Sanquhar & Moffat)
+A079  9780319229606   79  Hawick & Eskdale (Langholm)
+A080  9780319229668   80  Cheviot Hills & Kielder Water
+A081  9780319242094   81  Alnwick & Morpeth (Rothbury & Amble)
+A082  9780319229491   82  Stranraer & Glenluce (The Rhins)
+A083  9780319229552   83  Newton Stewart & Kirkcudbright (Gatehouse of Fleet)
+A084  9780319229569   84  Dumfries & Castle Douglas
+A085  9780319231579   85  Carlisle & Solway Firth (Gretna Green)
+A086  9780319231661   86  Haltwhistle & Brampton (Bewcastle & Alston)
+A087  9780319231678   87  Hexham & Haltwhistle
+A088  9780319229989   88  Newcastle upon Tyne (Durham & Sunderland)
+A089  9780319232057   89  West Cumbria (Cockermouth & Wast Water)
+A090  9780319232064   90  Penrith & Keswick (Ambleside)
+A091  9780319231302   91  Appleby-in-Westmorland (Brough & Kirkby Stephen)
+A092  9780319228982   92  Barnard Castle & Richmond (Teesdale)
+A093  9780319228777   93  Middlesbrough (Darlington & Hartlepool)
+A094  9780319228999   94  Whitby & Esk Dale (Robin Hood’s Bay)
+A095  9780319231708   95  Isle of Man
+A096  9780319232071   96  Barrow-in-Furness & South Lakeland
+A097  9780319232088   97  Kendal & Morecambe (Windermere & Lancaster)
+A098  9780319231586   98  Wensleydale & Upper Wharfedale
+A099  9780319231593   99  Northallerton & Ripon (Pateley Bridge & Leyburn)
+A100  9780319231203  100  Malton & Pickering (Helmsley & Easingwold)
+A101  9780319229057  101  Scarborough (Bridlington & Filey)
+A102  9780319228289  102  Preston & Blackpool (Lytham St Anne’s)
+A103  9780319231548  103  Blackburn & Burnley (Clitheroe & Skipton)
+A104  9780319231654  104  Leeds & Bradford (Harrogate & Ilkley)
+A105  9780319229453  105  York & Selby
+A106  9780319229521  106  Market Weighton (Goole & Stamford Bridge)
+A107  9780319229439  107  Kingston upon Hull (Beverley & Driffield)
+A108  9780319228388  108  Liverpool (Southport & Wigan)
+A109  9780319231555  109  Manchester (Bolton & Warrington)
+A110  9780319231876  110  Sheffield & Huddersfield (Glossop & Holmfirth)
+A111  9780319229354  111  Sheffield & Doncaster (Rotherham, Barnsley & Thorne)
+A112  9780319229361  112  Scunthorpe & Gainsborough
+A113  9780319229415  113  Grimsby (Louth & Market Rasen)
+A114  9780319231838  114  Anglesey / Ynys Môn
+A115  9780319231845  115  Snowdon / Yr Wyddfa (Caernarfon)
+A116  9780319231883  116  Denbigh & Colwyn Bay / Dinbych a Bae Colwyn
+A117  9780319231609  117  Chester & Wrexham / Caer a Wrecsam (Ellesmere Port)
+A118  9780319229064  118  Stoke-on-Trent & Macclesfield
+A119  9780319231890  119  Buxton & Matlock (Chesterfield, Bakewell & Dove Dale)
+A120  9780319242100  120  Mansfield & Worksop (Sherwood Forest)
+A121  9780319229422  121  Lincoln & Newark-on-Trent
+A122  9780319229392  122  Skegness & Horncastle
+A123  9780319231852  123  Lleyn Peninsula / Pen Llŷn
+A124  9780319231869  124  Porthmadog & Dolgellau
+A125  9780319229286  125  Bala & Lake Vyrnwy / Y Bala a Llyn Efyrnwy (Berwyn)
+A126  9780319228753  126  Shrewsbury & Oswestry (Amwythig & Chroesoswallt)
+A127  9780319228517  127  Stafford & Telford (Ironbridge)
+A128  9780319231616  128  Derby & Burton upon Trent
+A129  9780319231623  129  Nottingham & Loughborough (Melton Mowbray)
+A130  9780319229293  130  Grantham (Sleaford & Bourne)
+A131  9780319229408  131  Boston & Spalding
+A132  9780319231364  132  North West Norfolk (King’s Lynn & Fakenham)
+A133  9780319231791  133  North East Norfolk (Cromer & Wroxham)
+A134  9780319231807  134  Norwich & The Broads (Great Yarmouth)
+A135  9780319228944  135  Aberystwyth & Machynlleth
+A136  9780319231050  136  Newtown & Llanidloes / Y Drenewydd a Llanidloes
+A137  9780319229071  137  Church Stretton & Ludlow / Llwydlo (Wenlock Edge)
+A138  9780319228340  138  Kidderminster & Wyre Forest
+A139  9780319231753  139  Birmingham & Wolverhampton (including the Black Country)
+A140  9780319231760  140  Leicester, Coventry & Rugby
+A141  9780319229866  141  Kettering & Corby (Market Harborough & Stamford)
+A142  9780319229248  142  Peterborough (Market Deeping & Chatteris)
+A143  9780319231319  143  Ely & Wisbech (Downham Market)
+A144  9780319229255  144  Thetford & Diss (Breckland & Wymondham)
+A145  9780319231005  145  Cardigan & Mynydd Preseli / Aberteifi a Mynydd Preseli
+A146  9780319229460  146  Lampeter & Llandovery / Llanbedr Pont Steffan a Llanymddyfri
+A147  9780319229477  147  Elan Valley & Builth Wells / Cwm Elan a Llanfair-ym-Muallt
+A148  9780319229484  148  Presteigne & Hay-on-Wye / Llanandras a’r Gelli Gandryll
+A149  9780319229538  149  Hereford & Leominster (Bromyard & Ledbury)
+A150  9780319231777  150  Worcester & The Malverns (Evesham & Tewkesbury)
+A151  9780319231784  151  Stratford-upon-Avon (Warwick & Banbury)
+A152  9780319231715  152  Northampton & Milton Keynes (Buckingham & Daventry)
+A153  9780319231722  153  Bedford & Huntingdon (St Neots & Biggleswade)
+A154  9780319231739  154  Cambridge & Newmarket (Saffron Walden)
+A155  9780319242117  155  Bury St Edmunds (Sudbury & Stowmarket)
+A156  9780319231326  156  Saxmundham, Aldeburgh & Southwold
+A157  9780319231036  157  St Davids & Haverfordwest / Tyddewi a Hwlffordd
+A158  9780319231333  158  Tenby & Pembroke / Dinbych-y-pysgod a Penfro
+A159  9780319231340  159  Swansea & Gower / Abertawe a Gŵyr (Carmarthen / Caerfyrddin)
+A160  9780319231357  160  Brecon Beacons / Bannau Brycheiniog
+A161  9780319229873  161  The Black Mountains / Y Mynyddoedd Duon (Abergavenny / Y Fenni)
+A162  9780319229118  162  Gloucester & Forest of Dean (Caerloyw a Fforest y Dena)
+A163  9780319229125  163  Cheltenham & Cirencester (Stow-on-the-Wold)
+A164  9780319229132  164  Oxford (Chipping Norton & Bicester)
+A165  9780319229163  165  Aylesbury & Leighton Buzzard (Thame & Berkhamsted)
+A166  9780319232095  166  Luton & Hertford (Hitchin & St Albans)
+A167  9780319232101  167  Chelmsford (Harlow & Bishop’s Stortford)
+A168  9780319229224  168  Colchester (Halstead & Maldon)
+A169  9780319229231  169  Ipswich & The Naze (Clacton-on-Sea)
+A170  9780319232866  170  Vale of Glamorgan West / Gorllewin Bro Morgannwg (Porthcawl & Rhondda)
+A171  9780319229033  171  Cardiff & Newport / Caerdydd & Casnewydd (Pontypool / Pont-y-pŵl)
+A172  9780319229149  172  Bristol & Bath (Thornbury & Chew Magna)
+A173  9780319231746  173  Swindon & Devizes (Marlborough & Trowbridge)
+A174  9780319228739  174  Newbury & Wantage (Hungerford & Didcot)
+A175  9780319232149  175  Reading & Windsor (Henley-on-Thames & Bracknell)
+A176  9780319232118  176  West London (Rickmansworth & Staines)
+A177  9780319232125  177  East London (Billericay & Gravesend)
+A178  9780319229675  178  Thames Estuary (Rochester & Southend-on-Sea)
+A179  9780319228784  179  Canterbury & East Kent (Dover & Margate)
+A180  9780319230008  180  Barnstaple & Ilfracombe (Lynton & Bideford)
+A181  9780319231814  181  Minehead & Brendon Hills (Dulverton & Tiverton)
+A182  9780319242124  182  Weston-super-Mare (Bridgwater & Wells)
+A183  9780319228616  183  Yeovil & Frome (Shaftesbury & Shepton Mallet)
+A184  9780319228623  184  Salisbury & The Plain (Amesbury)
+A185  9780319228845  185  Winchester & Basingstoke (Andover & Romsey)
+A186  9780319231371  186  Aldershot & Guildford (Camberley & Haslemere)
+A187  9780319229545  187  Dorking & Reigate (Crawley & Horsham)
+A188  9780319228814  188  Maidstone & Royal Tunbridge Wells (Sevenoaks & Tonbridge)
+A189  9780319231159  189  Ashford & Romney Marsh (Rye & Folkestone)
+A190  9780319231456  190  Bude & Clovelly (Boscastle & Holsworthy)
+A191  9780319231821  191  Okehampton & North Dartmoor (Crediton & Bovey Tracey)
+A192  9780319231395  192  Exeter & Sidmouth (Exmouth & Teignmouth)
+A193  9780319231401  193  Taunton & Lyme Regis (Chard & Bridport)
+A194  9780319232132  194  Dorchester & Weymouth (Cerne Abbas & Bere Regis)
+A195  9780319231418  195  Bournemouth & Purbeck (Wimborne Minster & Ringwood)
+A196  9780319231425  196  The Solent & Isle of Wight (Southampton & Portsmouth)
+A197  9780319231166  197  Chichester & The South Downs (Bognor Regis & Arundel)
+A198  9780319231432  198  Brighton & Lewes (Worthing, Horsham & Haywards Heath)
+A199  9780319231449  199  Eastbourne & Hastings (Crowborough, Battle & Heathfield)
+A200  9780319229385  200  Newquay & Bodmin (Camelford & St Austell)
+A201  9780319232873  201  Plymouth & Launceston (Tavistock & Looe)
+A202  9780319232880  202  Torbay & South Dartmoor (Totnes & Salcombe)
+A203  9780319232897  203  Land’s End & Isles of Scilly (St Ives & Lizard Point)
+A204  9780319232903  204  Truro & Falmouth (Roseland Peninsula)

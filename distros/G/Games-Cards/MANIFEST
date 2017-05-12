@@ -1,0 +1,70 @@
+Changes			Major changes between releases
+MANIFEST		This file
+Makefile.PL
+NOTES			Verbose notes on what I'm thinking
+README
+TODO			Less verbose notes on things to do
+lib/Games/Cards.pm	Main module
+lib/Games/Cards/Tk.pm	Module for using Tk GUI in card games
+lib/Games/Cards/Undo.pm	Module for undo/redo in card games
+lib/Games/Cards/images/2c.gif
+lib/Games/Cards/images/2d.gif
+lib/Games/Cards/images/2h.gif
+lib/Games/Cards/images/2s.gif
+lib/Games/Cards/images/3c.gif
+lib/Games/Cards/images/3d.gif
+lib/Games/Cards/images/3h.gif
+lib/Games/Cards/images/3s.gif	Oliver Xymoron's card images
+lib/Games/Cards/images/4c.gif
+lib/Games/Cards/images/4d.gif
+lib/Games/Cards/images/4h.gif
+lib/Games/Cards/images/4s.gif
+lib/Games/Cards/images/5c.gif
+lib/Games/Cards/images/5d.gif
+lib/Games/Cards/images/5h.gif
+lib/Games/Cards/images/5s.gif
+lib/Games/Cards/images/6c.gif
+lib/Games/Cards/images/6d.gif
+lib/Games/Cards/images/6h.gif
+lib/Games/Cards/images/6s.gif
+lib/Games/Cards/images/7c.gif
+lib/Games/Cards/images/7d.gif
+lib/Games/Cards/images/7h.gif
+lib/Games/Cards/images/7s.gif
+lib/Games/Cards/images/8c.gif
+lib/Games/Cards/images/8d.gif
+lib/Games/Cards/images/8h.gif
+lib/Games/Cards/images/8s.gif
+lib/Games/Cards/images/9c.gif
+lib/Games/Cards/images/9d.gif
+lib/Games/Cards/images/9h.gif
+lib/Games/Cards/images/9s.gif
+lib/Games/Cards/images/COPYING
+lib/Games/Cards/images/README
+lib/Games/Cards/images/ac.gif
+lib/Games/Cards/images/ad.gif
+lib/Games/Cards/images/ah.gif
+lib/Games/Cards/images/as.gif
+lib/Games/Cards/images/b.gif
+lib/Games/Cards/images/j.gif
+lib/Games/Cards/images/jc.gif
+lib/Games/Cards/images/jd.gif
+lib/Games/Cards/images/jh.gif
+lib/Games/Cards/images/js.gif
+lib/Games/Cards/images/kc.gif
+lib/Games/Cards/images/kd.gif
+lib/Games/Cards/images/kh.gif
+lib/Games/Cards/images/ks.gif
+lib/Games/Cards/images/qc.gif
+lib/Games/Cards/images/qd.gif
+lib/Games/Cards/images/qh.gif
+lib/Games/Cards/images/qs.gif
+lib/Games/Cards/images/tc.gif
+lib/Games/Cards/images/td.gif
+lib/Games/Cards/images/th.gif
+lib/Games/Cards/images/ts.gif
+script/freecell.tk	Freecell solitaire (orig. by M. Houghton. Changed a lot)
+script/gin.pl		Play gin (not really working: no networking)
+script/klondike.tk	Klondike solitaire
+script/war.pl		Computer plays war against itself and tells you who won
+test.pl

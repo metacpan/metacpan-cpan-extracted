@@ -1,0 +1,23 @@
+dir /usr
+dir /usr/bin
+obj /usr/bin/dsh db786eb682f10b4171d2bc72b89a16f5 1084001193
+dir /usr/share
+dir /usr/share/man
+dir /usr/share/man/ja
+dir /usr/share/man/ja/man1
+obj /usr/share/man/ja/man1/dsh.1.gz 9cabfef3db7b0d92ca9c89ef24349c63 1084001193
+dir /usr/share/man/ja/man5
+obj /usr/share/man/ja/man5/dsh.conf.5.gz 1ecb82379d3964980debe96b50460e2f 1084001193
+dir /usr/share/man/man1
+obj /usr/share/man/man1/dsh.1.gz 1e16c706b189325a0dc467d94a16cd67 1084001193
+dir /usr/share/man/man5
+obj /usr/share/man/man5/dsh.conf.5.gz 8218eac6df6c99e65ba1bf160545285b 1084001193
+dir /usr/share/doc
+dir /usr/share/doc/dsh-0.25.0
+obj /usr/share/doc/dsh-0.25.0/TODO.gz 36e8c26ec317d9c1a79b97d565ccdd6c 1084001193
+obj /usr/share/doc/dsh-0.25.0/README.gz c50de68b53a6abc7d863fdd606a3ca69 1084001193
+obj /usr/share/doc/dsh-0.25.0/ChangeLog.gz 608ed6581d4b81026655185aeeec56f6 1084001193
+dir /etc
+dir /etc/dsh
+obj /etc/dsh/dsh.conf 85ac0125dd2d63b98839acf117733980 1084001193
+dir /etc/dsh/group

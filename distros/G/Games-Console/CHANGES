@@ -1,0 +1,34 @@
+
+############################################################################## 
+Games::Console:
+
+2006-02-25 v0.04 Tels - 42 tests
+  * make to work with newest SDL_Perl
+  * add META.yml
+
+2003-04-19 v0.03 Tels - 42 tests
+  * added the following methods:
+    - scroll(), offset()
+    - messages(), clear()	
+
+2003-04-08 v0.02 Tels - 37 tests
+  * fixed doc, documented all functions
+  * limit speed, width and height to 0..100
+  * enhanced testsuite for more coverage
+  * added methods:
+    - input(), add_input(), last_input(),
+    - autocomplete()
+    - backbuffer_size(),
+    - prompt(),
+    - cursor(),
+
+2003-03-23 v0.01 Tels - 10 tests - first version
+  * Added Games::Console and Games::Console::OpenGL:
+    - can move down/up, display messages,
+    - shows prompt blinking cursor
+    - transparent overlay
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

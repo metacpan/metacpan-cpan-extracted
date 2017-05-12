@@ -1,0 +1,1107 @@
+#!/usr/bin/env python2
+#
+# -*- mode: python; -*-
+#
+# --| Version Information |------------------------------------------
+# 
+#  etcat v0.1.4 (27 Apr 2003)
+#
+#  $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/gentoolkit/files/scripts/etcat,v 1.1 2004/06/20 09:09:34 linguist Exp $
+#
+# --| About |--------------------------------------------------------
+#
+#  etcat is a Portage/Ebuild Information Extractor. Basically, it
+#  provides higher level convienence functions to the Portage system
+#  used by Gentoo Linux. 
+#  
+#  You can use it to quickly find out the recent changes of your
+#  favourite package, the size of installed packages, the
+#  available versions for a package and more.
+#
+# --| License |------------------------------------------------------
+#
+#  Distributed under the terms of the GNU General Public License v2
+#  Copyright (c) 2002 Alastair Tse.
+#
+# --| Usage |--------------------------------------------------------
+#
+#  etcat [options] <command> <package[-ver]|ebuild|category/package[-ver]>
+#
+#  -b/belongs  ) checks what package(s) a file belongs to
+#  -c/changes  ) list the more recent changelog entry
+#  -d/depends  ) list all those that have this in their depends
+#  -f/files    ) list all files that belong to this package
+#  -g/graph    ) graph dependencies
+#  -s/size     ) guesses the size of a installed packaged.
+#  -u/uses     ) list all the use variables used in this package/ebuild
+#  -v/versions ) list all the versions available for a package
+#
+# --| TODO |---------------------------------------------------------
+# 
+# - in ver_cmp: 1.2.10a < 1.2.10, need to fix that
+# 
+# --| Changes |------------------------------------------------------
+#
+#  * etcat-0.2.0 (13 Jun 2003)
+#    - Updated "versions" with PORTAGE_OVERLAY detection
+#    - Added "graph" feature
+#  * etcat-0.1.5 (30 Apr 2003)
+#    - Fixed disappearing short opts. Oops.
+#  * etcat-0.1.4 (27 Apr 2003)
+#    - Cleaned up command execution code to provide a single place
+#      to specify functions
+#    - Added own custom wrapping print code.
+#    - Added "files" feature
+#    - Added "depends" feature
+#  * etcat-0.1.3 (24 Apr 2003)
+#    - Overhaul of commandline interpreter
+#    - Added "belongs" feature
+#    - Reimplemented "uses" to deal with IUSE more cleanly
+#      and sources use.local.desc
+#    - Natural Order Listings for version
+#  * etcat-0.1.2 (29 Mar 2003)
+#    - Added unstable indicator to complement masked
+#    - improved use flag listing
+#  * etcat-0.1.1 (21 Jan 2003)
+#    - Add package to versions listing even if it's not in
+#      the portage anymore (21 Jan 2003)
+#    - Fixed old ehack references (17 Jan 2003)
+#  * etcat-0.1 (31 Oct 2002)
+#    Initial Release;
+#
+# -------------------------------------------------------------------
+
+
+
+import os,sys,string,re,pprint
+import getopt,glob
+import portage
+from stat import *
+from output import *
+
+__author__ = "Alastair Tse"
+__email__ = "liquidx@gentoo.org"
+__version__ = "0.2.0"
+__productname__ = "etcat"
+__description__ = "Portage Information Extractor"
+
+# .-------------------------------------------------------.
+# | Initialise Colour Settings                            |
+# `-------------------------------------------------------'
+if (not sys.stdout.isatty()) or (portage.settings["NOCOLOR"] in ["yes","true"]):
+    nocolor()
+
+# "option": ("shortcommand","desc",["example one", "example two"])
+options = {
+"belongs":("b","Searches for a package that owns a specified file with an option to restrict the search space.",
+["etcat belongs /usr/bin/gimp media-gfx","etcat belongs /usr/lib/libjpeg.so media-*","etcat belongs /usr/lib/libmpeg.so"]),
+"changes":("c","Outputs the changelog entry to screen. It is possible to give a version number along with the package name.",
+["etcat changes mozilla", "etcat changes mozilla-1.1-r1", "etcat changes gkrellm$"]),
+"depends":("d","Finds all packages that are directly dependent to a regex search string.",
+["etcat depends 'gnome-base/libgnome'", "etcat depends '>=dev-lang/python-2.2'"]),
+"files":("f","Lists files that belongs to a package and optionally with version.",[]),
+"graph":("g","Graphs Dependencies (NON WORKING)",[]),
+"size":("s","Lists the installed size of a package.",[]),
+"uses":("u", "Advanced output of USE vars in a package. Tells you flags used by a package at time of installation, flags in current config and flag description.",[]),
+"versions":("v","Displays the versions available for a specific package. Colour coded to indicate installation status and displays slot information.",
+[turquoise("(I)") + "nstalled", yellow("(~)") + "Unstable Testing Branch", red("(M)") + "asked Package"])
+}
+
+# .-------------------------------------------------------.
+# | Small Wrapping Printer with Indent Support            |
+# `-------------------------------------------------------'
+
+def wrap_print(string, indent=0, width=74):
+    line_len = width - indent
+    str_len = len(string)
+    lines = []
+    
+    pos = 0
+    thisline = ""
+    while pos < str_len:
+	# if we still have space stuff the
+	# character in this line
+	if len(thisline) < line_len-1:
+	    thisline += string[pos]
+	    pos += 1
+	# if we're at the end of the line,
+	# check if we should hyphenate or
+	# append
+	elif len(thisline) == line_len -1:
+	    # end of a text
+	    if pos == str_len -1:
+		thisline += string[pos]
+		pos += 1
+	    # end of a word
+	    elif string[pos] != " " and string[pos+1] == " ":
+		thisline += string[pos]		
+		pos += 1
+	    # just a space
+	    elif string[pos] == " ":
+		thisline += string[pos]				
+		pos += 1
+	    # start of a word, we start the word on the next line
+	    elif pos>0 and string[pos-1] == " ":
+		thisline += " "
+	    # needs hyphenating
+	    else:
+		thisline += "-"
+		
+	    # append the line
+	    lines.append(thisline)
+	    thisline = ""
+
+    # append last line
+    if thisline:
+	lines.append(thisline)
+	    
+    for line in lines:
+	print " "*indent + line
+
+# .-------------------------------------------------------.
+# | Smart Pacakge Version Comparison                      |
+# +-------------------------------------------------------+
+# | Does more advanced package sorting hueristics         |
+# `-------------------------------------------------------'
+
+LETTERS=map(lambda x: chr(x), range(ord('a'),ord('z')))
+# find roughly which is the newer version
+def vercmp(a, b):
+    a_ver = []
+    a_min = ""
+    a_pre = ""
+    a_rev = 0
+    b_ver = []
+    b_min = ""
+    b_pre = ""
+    b_rev = 0
+
+    # split into digestable components
+    # eg. 1.2.3b_pre4-r5
+    # 1. get the 1.2.3 bit
+    a_parts = a.split("-")[0].split("_")
+    a_ver = a_parts[0].split(".")
+    b_parts = b.split("-")[0].split("_")
+    b_ver = b_parts[0].split(".")    
+    
+    # 2. get a,b,c.. or whatever letter at the end
+    if a_ver[-1][-1] in LETTERS:
+        a_min = a_ver[-1][-1]
+        a_ver[-1] = a_ver[-1][:-1]
+    if b_ver[-1][-1] in LETTERS:
+        b_min = b_ver[-1][-1]
+        b_ver[-1] = b_ver[-1][:-1]        
+    
+    # 2. get the _pre4 bit and -r5 
+    if len(a_parts) > 1:
+        a_pre = a_parts[1]
+    if len(a.split("-")) > 1:
+        a_rev = int(a.split("-")[1][1:])
+    if len(b_parts) > 1:
+        b_pre = b_parts[1]
+    if len(b.split("-")) > 1:
+        b_rev = int(b.split("-")[1][1:])        
+
+    # 3. do the comparison
+    for x in range(len(a_ver)):
+        # 3a. convert to numbers
+        try:
+            a_num = int(a_ver[x])
+        except (ValueError, IndexError):
+            a_num = 0
+        try:
+            b_num = int(b_ver[x])
+        except (ValueError, IndexError):
+            b_num = 0
+        # 3b. the comparison
+        if a_num == b_num:
+            continue
+        elif a_num > b_num:
+            return 1
+        elif a_num < b_num:
+            return -1
+
+    # 3c. compare minor ver
+    if a_min and not b_min:
+        return -1
+    elif not a_min and b_min:
+        return 1
+    elif a_min and b_min and a_min > b_min:
+        return 1
+    elif a_min and b_min and a_min < b_min:
+        return -1
+
+    # 3d. compare pre ver
+    if a_pre and not b_pre:
+        return -1
+    elif not a_pre and b_pre:
+        return 1
+    elif a_pre and b_pre and a_pre > b_pre:
+        return 1
+    elif a_pre and b_pre and a_pre < b_pre:
+        return -1
+    
+    # 3e. compare rev
+    if a_rev > b_rev:
+        return 1
+    elif a_rev < b_rev:
+        return -1
+    else:
+        return 0
+
+    
+def pkgcmp(a,b):
+    # strips out package name and returns the result of vercmp
+    awords = a.split("-")
+    bwords = b.split("-")
+    apkg = [awords[0]]
+    bpkg = [bwords[0]]
+    DIGITS = ['0','1','2','3','4','5','6','7','8','9']
+    
+    for w in awords[1:]:
+	if w[0] in DIGITS:
+	    break
+	else:
+	    apkg.append(w)
+    aver = awords[len(apkg):]
+    apkg_str = string.join(apkg, "-")
+    aver_str = string.join(aver, "-")
+    
+    for w in bwords[1:]:
+	if w[0] in DIGITS:
+	    break
+	else:
+	    bpkg.append(w)
+    bver = bwords[len(bpkg):]
+    bpkg_str = string.join(bpkg, "-")
+    bver_str = string.join(bver, "-")    
+    
+    if apkg_str > bpkg_str:
+	return 1
+    elif bpkg_str > apkg_str:
+	return -1
+    else:
+	return vercmp(aver_str, bver_str)
+    
+# .-------------------------------------------------------.
+# | Simple Package Search Function                        |
+# +-------------------------------------------------------+
+# | Given a search key, returns a list of packages that   |
+# | satisfy the regex.                                    |
+# | Results are in the form ["net-www/mozilla"]           |
+# `-------------------------------------------------------'
+def search(search_key):
+    
+    matches = []    
+    for package in portage.portdb.cp_all():
+	package_parts=package.split("/")
+	if re.search(search_key.lower(), package_parts[1].lower()):
+	    matches.append(package)
+    return matches
+
+# .-------------------------------------------------------.
+# | Package Name Guesser                                  |
+# +-------------------------------------------------------+
+# | A smart (eg. dodgy) version of portage.catpkgsplit()  |
+# | that determines the category, package, version and    |
+# | revision given a string. If it doesn't know, it'll    |
+# | leave the field blank.                                |
+# |                                                       |
+# | Returns a list like :                                 |
+# |  [ "net-www", "mozilla", "1.1", "r1"]                 |
+# `-------------------------------------------------------'    
+
+def smart_pkgsplit(query):
+    cat = ''
+    pkg = ''
+    ver = ''
+    rev = ''
+    
+    if len(query.split('/')) == 2:
+	cat = query.split('/')[0]
+	query = query.split('/')[1]
+    
+    components = query.split('-')
+    name_components = []
+    ver_components = []
+	
+    # seperate pkg-ver-rev
+    for c in components:
+	if ver_components:
+	    ver_components.append(c)
+	elif ord(c[0]) > 47 and ord(c[0]) < 58:
+	    ver_components.append(c)
+	else:
+	    name_components.append(c)
+    pkg = '-'.join(name_components)
+	
+    # check if there is a revision number
+    if len(ver_components) > 0 and ver_components[-1][0] == 'r':
+	rev = ver_components[-1]
+	ver_components = ver_components[:-1]
+	
+    # check for version number
+    if len(ver_components) > 0:
+	ver = '-'.join(ver_components)
+    
+    return [cat, pkg, ver, rev]
+
+# .-------------------------------------------------------.
+# | Return the Location of the Ebuild                     |
+# +-------------------------------------------------------+
+# | Guesses the version that you want. Eg. if one is      |
+# | specified, then we use it, otherwise, the latest one  |
+# `-------------------------------------------------------'
+
+def smart_ebuild(query):
+    tup = smart_pkgsplit(query)
+    full_pkg = ''
+    
+    # here we have to guess the ebuild we want
+    if tup[0] and tup[1] and tup[2]:
+	# we've got all the required fields
+	if tup[3]:
+	    full_pkg = tup[0] + "/" + tup[1] + "-" + tup[2] + "-" + tup[3]
+	else:
+	    full_pkg = tup[0] + "/" + tup[1] + "-" + tup[2]
+    elif tup[1] and tup[2]:
+	# only got package name and version
+	matches = search(tup[1] + "$")
+	print "[ Applications Found : " + white(str(len(matches))) + " ]"
+	print ">> Using first match only."
+	if len(matches[0].split("/")) == 2:
+	    if tup[3]:
+		full_pkg = matches[0] + "-" + tup[2] + "-" + tup[3]
+	    else:
+		full_pkg = matches[0] + "-" + tup[2]
+    elif not tup[2]:
+	# don't have version, so we find the latest version
+	if tup[0] and tup[1]:
+	    all_vers = portage.portdb.xmatch("match-all",tup[0] + "/" + tup[1])
+	elif tup[1]:
+	    all_vers = portage.portdb.xmatch("match-all",tup[1])
+	# get fullpkg
+	full_pkg = portage.portdb.xmatch("bestmatch-list",tup[1],mylist=all_vers)
+	if not full_pkg:
+	    print "Error: Can't match query:", query
+	    return
+    else:
+	print "Error: Can't match query :", query
+	return
+
+    # find the ebuild
+    cps = portage.catpkgsplit(full_pkg)
+    if len(cps) != 4:
+	print "Error: Something wrong with package found."
+	return
+    if cps[3] == "r0":
+	ebuild = portage.settings["PORTDIR"] + "/" + cps[0]  + "/" + cps[1] + "/" + cps[1] + "-" + cps[2] + ".ebuild"
+    else:
+	ebuild = portage.settings["PORTDIR"] + "/" + cps[0]  + "/" + cps[1] + "/" + cps[1] + "-" + cps[2] + "-" + cps[3] + ".ebuild"
+	
+    if os.path.exists(ebuild):
+	return ebuild
+
+    # can't find it in PORTDIR, so we try the PORTDIR_OVERLAY
+    if cps[3] == "r0":
+	ebuild = portage.settings["PORTDIR_OVERLAY"] + "/" + cps[0]  + "/" + cps[1] + "/" + cps[1] + "-" + cps[2] + ".ebuild"
+    else:
+	ebuild = portage.settings["PORTDIR_OVERLAY"] + "/" + cps[0]  + "/" + cps[1] + "/" + cps[1] + "-" + cps[2] + "-" + cps[3] + ".ebuild"
+	
+    if os.path.exists(ebuild):
+	return ebuild
+    else:
+	return None
+    
+
+# .-------------------------------------------------------.
+# | Pretty Print Log                                      |
+# +-------------------------------------------------------+
+# | Extracts and prints out the log entry corresponding   |
+# | to a certain revision if given. If not supplied,      |
+# | prints out the latest/topmost entry                   |
+# `-------------------------------------------------------'    
+    
+# output the latest entry in changelog
+def output_log(lines, package_ver=""):
+    # using simple rules that all changelog entries have a "*"
+    # as the first char
+    is_log = 0
+    is_printed = 0
+
+    for line in lines:
+	if package_ver:
+	    start_entry = re.search("^[\s]*\*[\s]*(" + package_ver + ")[\s]+.*(\(.*\))",line)
+	else:
+	    start_entry = re.search("^[\s]*\*[\s]*(.*)[\s]+.*(\(.*\))",line)
+	if not is_log and start_entry:
+	    is_printed = 1
+	    is_log = 1
+	    print green("*") + "  " + white(start_entry.group(1)) + "  " + turquoise(start_entry.group(2)) + " :"
+	elif is_log and re.search("^[\s]*\*[\s]*(.*)[\s]+.*(\(.*\))",line):
+	    break
+	elif is_log:
+	    print line.rstrip()
+	else:
+	    pass
+	
+    return is_printed
+
+# .-------------------------------------------------------.
+# | Changes Function                                      |
+# +-------------------------------------------------------+
+# | Print out the ChangeLog entry for package[-version]   |
+# `-------------------------------------------------------'
+
+def changes(query):
+
+    matches = []
+    printed = 0
+
+    tup = smart_pkgsplit(query)
+    if tup[0] and tup[1]:
+	matches = [ tup[0] + "/" + tup[1] ]
+    elif tup[1]:
+	matches = search(tup[1])
+    
+	
+    print "[ Results for search key : " + white(query) + " ]"
+    #print "[ Applications found : " + white(str(len(matches))) + " ]"
+    print 
+    
+    for match in matches:
+	changelog_file = portage.settings["PORTDIR"] + '/' + match + '/ChangeLog'
+	if os.path.exists(changelog_file):
+	    if tup[2] and tup[3]:
+		printed = output_log(open(changelog_file).readlines(),match.split('/')[1] + ".*-" + tup[2] + "-" + tup[3]) or printed
+	    elif tup[2]:
+		printed = output_log(open(changelog_file).readlines(),match.split('/')[1] + ".*-" + tup[2]) or printed
+	    else:
+		printed = output_log(open(changelog_file).readlines()) or printed
+	else:
+	    print "Error: No Changelog for " + match
+	    return
+    
+    if not printed:
+	print "Error: No Changelog entry for " + query
+
+# .-------------------------------------------------------.
+# | Versions Function                                     |
+# +-------------------------------------------------------+
+# | Prints out the available version, masked status and   |
+# | installed status.                                     |
+# `-------------------------------------------------------'	
+	
+def versions(query):
+    tup = smart_pkgsplit(query)
+    if tup[0] and tup[1]:
+	matches = [ tup[0] + "/" + tup[1] ]
+    elif tup[1]:
+	matches = search(tup[1])
+    
+    print "[ Results for search key : " + white(query) + " ]"
+    print "[ Applications found : " + white(str(len(matches))) + " ]"
+    print
+    
+    for package in matches:
+	print green("*") + "  " + white(package) + " :"
+	versions = portage.portdb.xmatch("match-all", package)
+	unmasked = portage.portdb.xmatch("match-visible",package)
+	curver = portage.db["/"]["vartree"].dep_bestmatch(package)
+	if (curver) and (curver not in versions):
+	    versions.append(curver)
+	
+	versions.sort(pkgcmp)
+	
+	for ver in versions:
+            
+            state = []
+            color = green
+            unstable = 0
+	    overlay = ""
+            
+            # check if masked
+            if ver not in unmasked:
+                state.append(red("M"))
+                color = red
+            else:
+                state.append(" ")
+
+            # check if in unstable
+	    try:
+		ver_keywords =  portage.db["/"]["porttree"].dbapi.aux_get(ver,["KEYWORDS"])
+	    except KeyError:
+		ver_keywords = [""]
+            keywords_list = ver_keywords[0].split()
+	    
+            if "~" + portage.settings["ARCH"] in keywords_list:
+                state.append(yellow("~"))
+		if color != red:
+		    color = yellow
+                unstable = 1
+            else:
+                state.append(" ")
+                
+            # check if installed
+            cat, pkg = ver.split("/")            
+            if portage.dblink(cat,pkg,"/").exists():
+                state.append(turquoise("I"))
+                color = turquoise
+            else:
+                state.append(" ")
+		
+	    # check if this is a OVERLAY ebuilds
+	    try:
+		if portage.portdb.oroot:
+		    if os.path.exists(portage.portdb.oroot + "/" + package + "/" + pkg + ".ebuild"):
+			overlay = " OVERLAY"
+	    except AttributeError:
+		pass
+
+            # print
+	    try:
+		slot = portage.db["/"]["porttree"].dbapi.aux_get(ver,["SLOT"])
+		if not slot:
+		    slot = ["0"]
+	    except KeyError:
+		slot = ["?"]
+		
+            print " "*8 + "[" + string.join(state,"") + "] " + color(ver) + " (" + color(slot[0]) + ")" + overlay
+
+        print
+
+# .-------------------------------------------------------.
+# | List USE flags for a single ebuild                    |
+# +-------------------------------------------------------+
+# | Just uses the new IUSE parameter in ebuilds           |
+# `-------------------------------------------------------' 
+def uses(query):
+    
+    tup = smart_pkgsplit(query)
+    if tup[0] and tup[1]:
+	matches = [ tup[0] + "/" + tup[1] ]
+    elif tup[1]:
+	matches = search(tup[1])
+	
+    useflags = portage.config()["USE"].split()    
+    usedesc = {}
+    uselocaldesc = {}
+    # open up use.desc
+    
+    try:
+	# TODO: use portage settings
+	fd = open("/usr/portage/profiles/use.desc")
+	usedesc = {}
+	for line in fd.readlines():
+	    if line[0] == "#":
+		continue
+	    fields = line.split(" - ")
+	    if len(fields) == 2:
+		usedesc[fields[0].strip()] = fields[1].strip()
+    except IOError:
+	pass
+		
+    try:
+	# TODO: use portage.settings
+	fd = open("/usr/portage/profiles/use.local.desc")
+	for line in fd.readlines():
+	    if line[0] == "#":
+		continue
+	    fields = line.split(" - ")
+	    if len(fields) == 2:
+		catpkguse = re.search("([a-z]+-[a-z]+/.*):(.*)", fields[0])
+		if catpkguse:
+		    if not uselocaldesc.has_key(catpkguse.group(1).strip()):
+			uselocaldesc[catpkguse.group(1).strip()] = {catpkguse.group(2).strip() : fields[1].strip()}
+		    else:
+			uselocaldesc[catpkguse.group(1).strip()][catpkguse.group(2).strip()] = fields[1].strip()
+    except IOError:
+	pass
+	
+    print "[ Colour Code : " + green("set") + " " + red("unset") + " ]"
+    print "[ Legend      : (U) Col 1 - Current USE flags        ]"
+    print "[             : (I) Col 2 - Installed With USE flags ]"
+    
+    for p in matches:
+	curver = portage.db["/"]["porttree"].dbapi.match(p)
+	bestver = portage.best(curver)
+	if bestver:
+	    try:
+		iuse = portage.db["/"]["porttree"].dbapi.aux_get(bestver,["IUSE"])
+	    except KeyError:
+		print "[ Error Occured. Ebuild not found for :", white(p), "]"
+		continue
+	else:
+	    print "[ * No USE flags found for :", white(p), "]"
+	    continue
+	
+	if iuse: usevar = iuse[0].split()
+	else: usevar = []
+	
+	# find flags in use for this package if installed
+	inuse = []
+	installed = glob.glob("/var/db/pkg/" + p + "-*")
+	if installed:
+	    try:
+		used = open(installed[-1] + "/USE").read().split()
+	    except IOError:
+		used = []
+	else:
+	    used = []
+
+	# store (inuse, inused, flag, desc)
+	output = []
+	
+	for u in usevar:
+	    inuse = 0
+	    inused = 0
+	    try:
+		desc = usedesc[u]
+	    except KeyError:
+		try:
+		    desc = uselocaldesc[p][u]
+		except KeyError:
+		    desc = ""
+
+	    if u in useflags: inuse = 1
+	    if u in used: inused = 1
+		
+	    output.append((inuse, inused, u, desc))
+
+	# pretty print
+	if output:
+	    print
+	    print white(" U I ") + "[ Found these USE variables in : " + white(bestver) + " ]"
+	    maxflag_len = 0
+	    for inuse, inused, u, desc in output:
+		if len(u) > maxflag_len:
+		    maxflag_len = len(u)
+	
+	    for inuse, inused, u, desc in output:
+		flag = ["-","+"]
+		colour = [red, green]
+		if inuse != inused:
+		    print yellow(" %s %s" % (flag[inuse], flag[inused])),
+		else:
+		    print " %s %s" % (flag[inuse], flag[inused]),
+
+		print colour[inuse](u.ljust(maxflag_len)),
+	    
+		# print description
+		if desc:
+		    print ":", desc
+		else:
+		    print ": unknown"
+	else:
+	    print "[ No USE flags found for :", white(p), "]"	    
+
+    return
+
+    # deprecated - this was a hack anyway
+    #print "[ Can't find IUSE variable in : " + white(os.path.basename(ebuild)[:-7]) + " ]"
+    #print turquoise("*") + " Applying search manually .."
+    #old_uses(query)
+    
+# .-------------------------------------------------------.
+# | Uses a general rules that has all use's with either   |
+# |  `use alsa` or in the DEPENDS/RDEPENDS field of the   |
+# | ebuild suffixed by a "?"                              |
+# `-------------------------------------------------------' 
+
+def old_uses(query):
+    ebuild = smart_ebuild(query)
+    useflags = portage.config()["USE"].split()
+    uses = {}
+    # TODO : can't handle 2 or more 'use blah' in one line
+    re_use_sh = re.compile('`use ([a-zA-Z0-9]*)`')
+    re_depend = re.compile('[R]?DEPEND="')
+    re_use_dep = re.compile('([a-zA-Z0-9]+)\?')
+    is_depend = 0
+    
+    for line in open(ebuild).readlines():
+	if len(line.strip()) and line.strip()[0] == "#":
+	    continue
+	
+	# find uses in DEPEND and RDEPEND variables
+	if is_depend:
+	    if re.search('"[\s]*$',line): is_depend = 0 # end of depend	    
+	    is_use = re_use_dep.search(line)
+	    if is_use: uses[is_use.group(1)] = 1
+	    continue
+	    
+	if re_depend.search(line):
+	    is_depend = 1 # start of depend
+	    is_use = re_use_dep.search(line)
+	    if is_use: uses[is_use.group(1)] = 1
+	    continue
+	
+	# find uses in other places like if [ -n "`use blah`" ]
+	is_use = re_use_sh.search(line)
+	if is_use:
+	    uses[is_use.group(1)] = 1
+    if uses:
+	iuse = uses.keys()
+	iuse.sort()
+	for u in iuse:
+	    if u in useflags:
+		print "+", green(u)
+	    else:
+		print "-", red(u)
+    else:
+	print red("*") + " Unable to find any USE variables."
+
+# .-------------------------------------------------------.
+# | Graphs the Dependency Tree for a package              |
+# +-------------------------------------------------------+
+# | Naive graphing of dependencies
+# `-------------------------------------------------------'
+graphcache = []
+
+def graph(query):
+    print "attempt to graph dependencies"
+    print red("warning, this is BETA, will probably report the wrong results")
+    rgraph(query, [])
+
+# return string of deps that are valid
+def depuseparse(depstring):
+    raw_deps = depstring.strip().split()
+    out_deps = []
+    uselist = portage.config()["USE"].split()
+    
+    dep_len = len(raw_deps)
+    i = 0
+    uselevel = 0
+    orlevel = 0
+    ordone = 0
+    
+    while i < dep_len:
+	#---- if we encounter a use? ( ) 
+	if raw_deps[i][-1] == "?":
+	    if raw_deps[i][:-1] in uselist:
+		uselevel += 1
+	    else:
+		# read until we find a ")"
+		i += 1
+		while i < dep_len:
+		    if raw_deps[i] == ")":
+			break
+		    else:
+			i += 1
+	#---- if we encounter a || or use?
+        elif raw_deps[i] == "||":
+	    orlevel += 1
+	elif orlevel > 0 or uselevel > 0:
+	    if raw_deps[i] == "(":
+		pass
+	    elif raw_deps[i] == ")":
+		if uselevel > 0:
+		    uselevel -= 1
+		elif orlevel > 0:
+		    orlevel -= 1
+		    ordone = 0
+	    else:
+		if orlevel and ordone == 0:
+		    ordone += 1
+		    out_deps.append(raw_deps[i])
+		elif uselevel > 0:
+		    out_deps.append(raw_deps[i])
+	#---- good 'ole plain deps
+        elif raw_deps not in [")","("]:
+	    out_deps.append(raw_deps[i])
+	# increment counter
+	i+=1
+	
+    return out_deps
+	    
+def graph_node_print(path, dep):
+    indent = len(path)-1
+    if path == []:
+	print dep
+    else:
+	print "  " + "  "*indent + "`-- " + dep
+
+def rgraph(dep, path):
+    global graphcache
+    
+    # stop circular deps
+    if dep in path:
+	return "  "*len(path) + "!! circular dependency"
+    
+    # find in portage
+    matches = portage.db["/"]["porttree"].dbapi.match(dep)
+    x = portage.best(matches)
+    
+    # skip if we've already included this in the tree
+    if x in graphcache:
+	return []
+    else:
+	graphcache.append(x)
+
+    # try open up this package's deps
+    try:
+	f = open("/var/cache/edb/dep/%s" % x)
+	f.readline() # read RDEPENDS
+	depends = depuseparse(f.readline())
+	graph_node_print(path, x)
+	for d in depends:
+	    if d in graphcache:
+		continue
+	    if d in portage.db["/"]["virtuals"].keys():
+		virtual = portage.db["/"]["virtuals"][d]
+		graphcache += rgraph(virtual, path + [dep])
+	    else:
+		graphcache += rgraph(d, path + [dep])
+    except IOError:
+	# silent this for the moment
+	#print "! Error findind deps."
+	return []
+
+    return depends
+	
+# .-------------------------------------------------------.
+# | Required By Function                                  |
+# +-------------------------------------------------------+
+# | Find what packages require a given package name       |
+# `-------------------------------------------------------'
+
+def depends(query):
+    
+    print "[ Results for search key : " + white(query) + " ]"
+
+    isdepend = re.compile(r'([^\s]*' + query + '[^\s]*)')
+    
+    match_depend = {}
+    match_rdepend = {}
+    
+    # get all installed packages
+    for x in os.listdir(portage.root + "var/cache/edb/dep"):
+        # for each category, we just grep for the deps, slowly
+        for dep in os.listdir(portage.root + "var/cache/edb/dep/" + x):
+            f = open("%s/var/cache/edb/dep/%s/%s" % (portage.root, x, dep))
+	    depend = f.readline()
+            rdepend = f.readline()
+	    f.close()
+	    match = isdepend.search(rdepend)
+	    if match:
+		match_rdepend[x+"/"+dep] = match.groups()
+	    match = isdepend.search(depend)
+            if match:
+		match_depend[x+"/"+dep] = match.groups()
+		
+	    if match_depend.has_key(x+"/"+dep):
+		print turquoise("*"), white(x+"/"+dep)
+		for line in match_depend[x+"/"+dep]:
+		    print "  " + line
+    
+    
+
+# .-------------------------------------------------------.
+# | Belongs to which package                              |
+# +-------------------------------------------------------+
+# | Finds what package a file belongs to                  |
+# `-------------------------------------------------------'	    
+	    
+def belongs(query):
+    query = query.split()
+    # FIXME: use portage.settings
+    dbdir = "/var/db/pkg"
+
+    q_regex = re.sub(r'\.',r'\.',query[0])
+    q_regex = re.sub(r'\*',r'\[^\s]*', q_regex)
+    
+    reobj = re.compile(r'^[a-zA-Z]{3}[\s](' + q_regex + r')[\s]', re.M)
+    
+    if len(query) >= 2:
+	category = query[1]
+    else:
+	category = "*"
+	
+    print "Searching for", query[0], "in", category, "..."
+	
+    for catdir in glob.glob(dbdir + "/" + category):
+	cat =  catdir.split("/")[-1]
+	for pkg in os.listdir(catdir):
+	    try:
+		contents = open(catdir + "/" + pkg + "/CONTENTS").read()
+		matches = reobj.search(contents)
+		if matches:
+		    print cat + "/" + pkg
+	    except IOError:
+		pass
+    return
+	
+# .-------------------------------------------------------.
+# | Size of a particular package                          |
+# +-------------------------------------------------------+
+# | Finds the size of the installed package               |
+# `-------------------------------------------------------'	    
+def size(query):
+    matches = search(query)
+    # FIXME: use portage.settings
+    dbdir = "/var/db/pkg/"
+    
+    print "[ Results for search key : " + white(query) + " ]"
+    print "[ Applications found : " + white(str(len(matches))) + " ]"
+    print
+    if matches:
+	print " Only printing found installed programs."
+	print 
+    
+    for package in matches:
+	files = glob.glob(dbdir + package + "-[0-9]*")
+	if files:
+	    for pkg in files:
+		# for each package we find
+		size = 0
+		files = 0
+		uncounted = 0
+		if os.path.exists(pkg):
+		    try:
+			f = open(pkg + "/CONTENTS")
+		    except:
+			# fail silently
+			continue
+		    for line in f.readlines():
+			words = line.split()
+			if len(words) > 2 and words[0] == "obj":
+			    try:
+				size = size + os.stat(words[1]).st_size
+				files = files + 1
+			    except OSError:
+				uncounted = uncounted + 1
+		print turquoise("*") + " " + white(os.path.basename(pkg))
+		print string.rjust(" Total Files : ",25) + str(files)
+		if uncounted:
+		    print string.rjust(" Inaccessible Files : ",25) + str(uncounted)
+		print string.rjust(" Total Size : ",25) + "%.2f KB" % (size/1024.0)
+		
+# .-------------------------------------------------------.
+# | Files in a package                                    |
+# +-------------------------------------------------------+
+# | Lists all the files in a package                      |
+# `-------------------------------------------------------'	    
+def files(query):
+    tup = smart_pkgsplit(query)
+    if tup[0] and tup[1]:
+	matches = [ tup[0] + "/" + tup[1] ]
+    elif tup[1]:
+	matches = search(tup[1])
+    
+    # FIXME: use portage.settings
+    dbdir = "/var/db/pkg/"
+    
+    print "[ Results for search key : " + white(query) + " ]"
+    print "[ Applications found : " + white(str(len(matches))) + " ]"
+    print
+    
+    if matches:
+	print " Only printing found installed programs."
+	print
+    else:
+	print "No packages found."
+	return
+    
+    for package in matches:
+	if tup[2]:
+	    files = glob.glob(dbdir + package + "-" + tup[2])
+	else:
+	    files = glob.glob(dbdir + package + "-[0-9]*")
+	    
+	if files:
+	    for pkg in files:
+		# for each package we find
+		size = 0
+		files = 0
+		uncounted = 0
+		if os.path.exists(pkg):
+		    try:
+			f = open(pkg + "/CONTENTS")
+		    except:
+			# fail silently
+			continue
+		    print
+		    print yellow(" * ") + white("/".join(pkg.split("/")[-2:]))
+		    for line in f.readlines():
+			words = line.split()
+			if len(words) < 2:
+			    continue
+			elif words[0] == "obj":
+			    print words[1]
+			elif words[0] == "sym":
+			    print turquoise(words[1])
+			elif words[0] == "dir":
+			    print blue(words[1])
+			else:
+			    print words[1]
+
+# .-------------------------------------------------------.
+# | Help Function                                         |
+# `-------------------------------------------------------'
+def ver():
+    print __productname__ + " (" + __version__ + ") - " + __description__ + " - By: " + __author__
+
+def help():
+    screenwidth = 74
+    margin = 2
+    margin_desc = 4
+    margin_ex = 8
+    
+    ver()
+    print
+    print white("Usage: ") + turquoise(__productname__) + " [ " + green("options") + " ] [ " + turquoise("action") + " ] [ " + turquoise("package") + " ]"
+    print
+    print turquoise("Actions:")
+    print
+    for name,tup in options.items():
+	print " "*margin + green(name) + " (" + green("-" + tup[0]) + " short option)"
+	wrap_print(tup[1],indent=margin_desc)
+	for example in tup[2]:
+	    print " "*margin_ex + example
+	print
+
+# .-------------------------------------------------------.
+# | Main Function                                         |
+# `-------------------------------------------------------'
+def main():
+    
+    action = ''
+    query = ''
+    
+    if len(sys.argv) < 3:
+	help()
+	sys.exit(1)
+	
+    # delegates the commandline stuff to functions
+    pointer = 2
+    # short/long opts mapping
+    shortopts = map(lambda x: "-" + x[0], options.values())
+    short2long = {}
+    for k,v in options.items():
+	short2long[v[0]] = k
+    longopts = options.keys()
+    # loop thru arguments
+    for arg in sys.argv[1:]:
+	if arg[0] == "-" and len(arg) == 2 and arg in shortopts:
+	    action = short2long[arg[1]]
+	    query = ' '.join(sys.argv[pointer:])
+	    break
+	elif arg in longopts:
+	    action = arg
+	    query = ' '.join(sys.argv[pointer:])
+	    break
+	else:
+	    pointer += 1
+	    
+    # abort if we don't have an action or query string
+    if not query or action not in options.keys():
+	help()
+	sys.exit(1)
+    else:
+	function = globals()[action]
+	function(query)
+    
+if __name__ == "__main__":
+    try:
+	main()
+    except KeyboardInterrupt:
+	print "Operation Aborted!"

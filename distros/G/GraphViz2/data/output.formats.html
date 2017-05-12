@@ -1,0 +1,730 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+  <title>Output Formats | Graphviz - Graph Visualization Software</title>
+  <link type="text/css" rel="stylesheet" media="all" href="/modules/node/node.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/system/defaults.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/system/system.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/system/system-menus.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/user/user.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/ckeditor/ckeditor.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/mollom/mollom.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/forum/forum.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/views/css/views.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/themes/bluemarine/gv.css?W" />
+<link type="text/css" rel="stylesheet" media="all" href="/themes/bluemarine/style.css?W" />
+  <script type="text/javascript" src="/misc/jquery.js?W"></script>
+<script type="text/javascript" src="/misc/drupal.js?W"></script>
+<script type="text/javascript" src="/sites/all/modules/mollom/mollom.js?W"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+jQuery.extend(Drupal.settings, { "basePath": "/" });
+//--><!]]>
+</script>
+  <script type="text/javascript"> </script>
+</head>
+
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" id="header">
+  <tr>
+    <td id="logo">
+      <a href="/" title="Home"><img src="/app.png" alt="Home" /></a>      <h1 class='site-name'><a href="/" title="Home">Graphviz - Graph Visualization Software</a></h1>      <div class='site-slogan'>Drawing graphs since 1988</div>    </td>
+    <td id="menu">
+            <ul class="links" id="navlist"><li class="menu-237 first"><a href="/Forum" title="">Forums</a></li>
+<li class="menu-238"><a href="/wiki/" title="Graphviz Wiki">Wiki</a></li>
+<li class="menu-210 last"><a href="/contact" title="Get in touch with us.">Contact Us</a></li>
+</ul>      <form action="/content/output-formats"  accept-charset="UTF-8" method="post" id="search-theme-form">
+<div><div id="search" class="container-inline">
+  <div class="form-item" id="edit-search-theme-form-1-wrapper">
+ <label for="edit-search-theme-form-1">Search this site: </label>
+ <input type="text" maxlength="128" name="search_theme_form" id="edit-search-theme-form-1" size="15" value="" title="Enter the terms you wish to search for." class="form-text" />
+</div>
+<input type="submit" name="op" id="edit-submit-1" value="Search"  class="form-submit" />
+<input type="hidden" name="form_build_id" id="form-262dd1d1a742c4f211afa65f9c5f5e93" value="form-262dd1d1a742c4f211afa65f9c5f5e93"  />
+<input type="hidden" name="form_id" id="edit-search-theme-form" value="search_theme_form"  />
+</div>
+
+</div></form>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><div></div></td>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" id="content">
+  <tr>
+    <td id="sidebar-left">
+        <div class="block block-menu" id="block-menu-menu-menu-user-navigation">
+    <h2 class="title"></h2>
+    <div class="content"><ul class="menu"><li class="leaf first"><a href="/Home.php" title="Home Page">Home</a></li>
+<li class="leaf"><a href="/About.php" title="About">About</a></li>
+<li class="leaf"><a href="/Download.php" title="Download">Download</a></li>
+<li class="leaf"><a href="/News.php" title="News">News</a></li>
+<li class="leaf"><a href="/Gallery.php" title="Gallery">Gallery</a></li>
+<li class="leaf"><a href="/Documentation.php" title="Documentation">Documentation</a></li>
+<li class="leaf"><a href="/Theory.php" title="Theory">Theory</a></li>
+<li class="leaf"><a href="/content/graphviz-issue-tracker" title="Issue and Bug Tracking">Bug and Issue Tracking</a></li>
+<li class="leaf"><a href="/MailingList.php" title="Mailing List">Mailing List</a></li>
+<li class="leaf"><a href="/License.php" title="License">License</a></li>
+<li class="leaf"><a href="/Resources.php" title="Resources">Resources</a></li>
+<li class="leaf"><a href="/Credits.php" title="Credits">Credits</a></li>
+<li class="collapsed"><a href="/Forum" title="Forum Link">Forums</a></li>
+<li class="leaf"><a href="/content/faq" title="Frequently Asked Questions">FAQ</a></li>
+<li class="leaf last"><a href="http://www.graphviz.org/wiki/wiki-main-page" title="Wiki home page">Wiki</a></li>
+</ul></div>
+ </div>
+  <div class="block block-user" id="block-user-0">
+    <h2 class="title">User login</h2>
+    <div class="content"><form action="/content/output-formats?destination=node%2F113"  accept-charset="UTF-8" method="post" id="user-login-form">
+<div><div class="form-item" id="edit-name-wrapper">
+ <label for="edit-name">Username: <span class="form-required" title="This field is required.">*</span></label>
+ <input type="text" maxlength="60" name="name" id="edit-name" size="15" value="" class="form-text required" />
+</div>
+<div class="form-item" id="edit-pass-wrapper">
+ <label for="edit-pass">Password: <span class="form-required" title="This field is required.">*</span></label>
+ <input type="password" name="pass" id="edit-pass"  maxlength="60"  size="15"  class="form-text required" />
+</div>
+<input type="submit" name="op" id="edit-submit" value="Log in"  class="form-submit" />
+<div class="item-list"><ul><li class="first"><a href="/user/register" title="Create a new user account.">Create new account</a></li>
+<li class="last"><a href="/user/password" title="Request new password via e-mail.">Request new password</a></li>
+</ul></div><input type="hidden" name="form_build_id" id="form-5f92596ecf222d941e6be25ad7981593" value="form-5f92596ecf222d941e6be25ad7981593"  />
+<input type="hidden" name="form_id" id="edit-user-login-block" value="user_login_block"  />
+
+</div></form>
+</div>
+ </div>
+    </td>    <td valign="top">
+            <div id="main">
+        <div class="breadcrumb"><a href="/">Home</a></div>        <h1 class="title">Output Formats</h1>
+        <div class="tabs"></div>
+                          <div class="node">
+            <span class="submitted"></span>
+    <div class="taxonomy"></div>
+    <div class="content"><A NAME="top"></a>
+<H1 align=CENTER>Output Formats</h1>
+<HR />
+The output format is specified with the <STRONG>-T</strong><I>lang</i>
+flag on the <A HREF=command.html>command line</a>, where <I>lang</i>
+is one of the parameters listed below.
+<P>
+The formats actually available in a given Graphviz system depend on
+how the system was built and the presence of additional libraries.
+To see what formats <b>dot</b> supports, run <TT>dot -T?</tt>.
+See the <A HREF=command.html#dT> description of the -T</a>
+flag for additional information.
+</p><P>
+Note that the internal coordinate system has the origin
+in the lower left corner.
+Thus, positions in the
+<A HREF=#dcanon>canon</a>,
+<A HREF=#ddot>dot</a>,
+<A HREF=#dxdot>xdot</a>,
+<A HREF=#dplain>plain</a>, and
+<A HREF=#dplain-ext>plain-ext</a>
+formats need to be interpreted in this manner.
+</p><P>
+<TABLE ALIGN=CENTER>
+<TR><TH>Command-line<BR />parameter</th><TH>Format</th></tr>
+ <TR><TD ALIGN=CENTER><A NAME=abmp HREF=#dbmp>bmp</a>
+</td><TD>Windows Bitmap Format</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=acanon HREF=#dcanon>canon</a>
+<BR /><A NAME=adot HREF=#ddot>dot</a>
+<BR /><A NAME=axdot HREF=#dxdot>xdot</a>
+<BR /><A NAME=axdot1.2 HREF=#dxdot1.2>xdot1.2</a>
+<BR /><A NAME=axdot1.4 HREF=#dxdot1.4>xdot1.4</a>
+</td><TD>DOT</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=acmap HREF=#dcmap>cmap</a>
+</td><TD>Client-side imagemap (deprecated)</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=aeps HREF=#deps>eps</a>
+</td><TD>Encapsulated PostScript</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=afig HREF=#dfig>fig</a>
+</td><TD>FIG</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=agd HREF=#dgd>gd</a>
+<BR /><A NAME=agd2 HREF=#dgd2>gd2</a>
+</td><TD>GD/GD2 formats</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=agif HREF=#dgif>gif</a>
+</td><TD>GIF</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=agtk HREF=#dgtk>gtk</a>
+</td><TD>GTK canvas</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=aico HREF=#dico>ico</a>
+</td><TD>Icon Image File Format</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=aimap HREF=#dimap>imap</a>
+<BR /><A NAME=acmapx HREF=#dcmapx>cmapx</a>
+</td><TD>Server-side and client-side imagemaps</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=aimap_np HREF=#dimap_np>imap_np</a>
+<BR /><A NAME=acmapx_np HREF=#dcmapx_np>cmapx_np</a>
+</td><TD>Server-side and client-side imagemaps</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=aismap HREF=#dismap>ismap</a>
+</td><TD>Server-side imagemap (deprecated)</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=ajpg HREF=#djpg>jpg</a>
+<BR /><A NAME=ajpeg HREF=#djpeg>jpeg</a>
+<BR /><A NAME=ajpe HREF=#djpe>jpe</a>
+</td><TD>JPEG</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=apdf HREF=#dpdf>pdf</a>
+</td><TD>Portable Document Format (PDF)</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=aplain HREF=#dplain>plain</a>
+<BR /><A NAME=aplain-ext HREF=#dplain-ext>plain-ext</a>
+</td><TD>Simple text format</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=apng HREF=#dpng>png</a>
+</td><TD>Portable Network Graphics format</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=aps HREF=#dps>ps</a>
+</td><TD>PostScript</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=aps2 HREF=#dps2>ps2</a>
+</td><TD>PostScript for PDF</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=asvg HREF=#dsvg>svg</a>
+<BR /><A NAME=asvgz HREF=#dsvgz>svgz</a>
+</td><TD>Scalable Vector Graphics</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=atif HREF=#dtif>tif</a>
+<BR /><A NAME=atiff HREF=#dtiff>tiff</a>
+</td><TD>TIFF (Tag Image File Format)</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=avml HREF=#dvml>vml</a>
+<BR /><A NAME=avmlz HREF=#dvmlz>vmlz</a>
+</td><TD>Vector Markup Language (VML)</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=avrml HREF=#dvrml>vrml</a>
+</td><TD>VRML</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=awbmp HREF=#dwbmp>wbmp</a>
+</td><TD>Wireless BitMap format</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=awebp HREF=#dwebp>webp</a>
+</td><TD>Image format for the Web</td> </tr>
+ <TR><TD ALIGN=CENTER><A NAME=axlib HREF=#dxlib>xlib</a>
+</td><TD>Xlib canvas</td> </tr>
+</table>
+<HR />
+<H2>Format Descriptions</h2>
+<DL>
+<DT><A NAME=dbmp HREF=#abmp><STRONG>bmp</strong></a>
+<DD>Outputs images in the Windows <A HREF="http://en.wikipedia.org/wiki/Bitmap" target="blank">BMP</a> format.
+
+<DT><A NAME=dcanon HREF=#acanon><STRONG>canon</strong></a>
+,<DT><A NAME=ddot HREF=#adot><STRONG>dot</strong></a>
+,<DT><A NAME=dxdot HREF=#axdot><STRONG>xdot</strong></a>
+,<DT><A NAME=dxdot1.2 HREF=#axdot1.2><STRONG>xdot1.2</strong></a>
+,<DT><A NAME=dxdot1.4 HREF=#axdot1.4><STRONG>xdot1.4</strong></a>
+<DD>These formats produce output in the
+<A HREF=dot-language>dot language</a>.
+Using <B>canon</b> produces a prettyprinted version of the input,
+with no layout performed.
+<P>
+The <B>dot</b> option corresponds to attributed dot output,
+and is the default output format.
+It reproduces the input, along with layout information for the graph.
+In particular, a <A HREF=attrs#dbb>bb</a> attribute is
+attached to the graph, specifying the bounding box of the drawing.
+If the graph has a label, its position is specified by the
+<A HREF=attrs#dlp>lp</a> attribute.
+</p><P>
+Each node gets <A HREF=attrs#dpos>pos</a>,
+<A HREF=attrs#dwidth>width</a> and
+<A HREF=attrs#dheight>height</a> attributes. If the node is a record,
+the record rectangles are given in the
+<A HREF=attrs#drects>rects</a> attribute.
+If the node is a polygon and the
+<A HREF=attrs#dvertices>vertices</a> attribute is defined, this
+attribute contains the vertices of the node.
+</p><P>
+Every edge is
+assigned a <A HREF=attrs#dpos>pos</a> attribute,
+and if the edge has a label, the label position
+is given in <A HREF=attrs#dlp>lp</a>.
+</p><P>
+The <B>xdot</b> format extends the
+<B>dot</b> format by providing much more detailed information about
+how graph components are drawn. It relies on additional attributes
+for nodes, edges and graphs.
+</p><P>
+The format is fluid; comments and
+suggestions for better representations are welcome.
+To allow for changes in the format, Graphviz attaches the attribute
+<TT>xdotversion</tt> to the graph.
+If the <TT>xdotversion</tt> attribute is set in the input graph, the renderer
+will only output features supported by that version. Note that the formats <TT>xdot1.2</tt>
+and <TT>xdot1.4</tt> are equivalent to setting <TT>xdotversion=1.2</tt> and <TT>xdotversion=1.4</tt>,
+respectively.
+</p><P>
+Additional drawing attributes can appear on nodes, edges, clusters and 
+on the graph itself. There are six new attributes: 
+<SPACER TYPE=VERTICAL size=10>
+<TABLE  border bgcolor=beige>
+<TR><TD>_draw_<TD colspan=2>General drawing without labels
+<TR><TD>_ldraw_<TD colspan=2>Label drawing
+<TR><TD>_hdraw_<TD>Head arrowhead<TD>Edge only
+<TR><TD>_tdraw_<TD>Tail arrowhead<TD>Edge only
+<TR><TD>_hldraw_<TD>Head label<TD>Edge only
+<TR><TD>_tldraw_<TD>Tail label<TD>Edge only
+</td></td></td></tr></td></td></td></tr></td></td></td></tr></td></td></td></tr></td></td></tr></td></td></tr></table>
+<P>
+For a given graph object, one will typically a draw directive before the
+label directive. For example, for a node, one would first use the commands
+in <B>_draw_</b> followed by the commands in <B>_ldraw_</b>.
+</p><P>
+The value of these attributes consists of the concatenation of some
+(multi-)set of the following 13 rendering or attribute operations.
+(The number is parentheses gives the xdot version when the operation
+was added to the format. If no version number is given, the operation
+was in the original specification.)
+<SPACER TYPE=VERTICAL size=10>
+<TABLE border bgcolor=beige>
+<TR><TD>E x<sub>0</sub> y<sub>0</sub> w h
+<TD>Filled ellipse ((x-x<sub>0</sub>)/w)<sup>2</sup> + ((y-y<sub>0</sub>)/h)<sup>2</sup> = 1
+<TR><TD>e x<sub>0</sub> y<sub>0</sub> w h
+<TD>Unfilled ellipse ((x-x<sub>0</sub>)/w)<sup>2</sup> + ((y-y<sub>0</sub>)/h)<sup>2</sup> = 1
+<TR><TD>P n x<sub>1</sub> y<sub>1</sub> ... x<sub>n</sub> y<sub>n</sub>
+<TD>Filled polygon using the given n points
+<TR><TD>p n x<sub>1</sub> y<sub>1</sub> ... x<sub>n</sub> y<sub>n</sub>
+<TD>Unfilled polygon using the given n points
+<TR><TD>L n x<sub>1</sub> y<sub>1</sub> ... x<sub>n</sub> y<sub>n</sub>
+<TD>Polyline using the given n points
+<TR><TD>B n x<sub>1</sub> y<sub>1</sub> ... x<sub>n</sub> y<sub>n</sub>
+<TD>B-spline using the given n control points
+<TR><TD>b n x<sub>1</sub> y<sub>1</sub> ... x<sub>n</sub> y<sub>n</sub>
+<TD>Filled B-spline using the given n control points (1.1)
+<TR><TD>T x y j w n -<I>b<sub>1</sub>b<sub>2</sub>...b<sub>n</sub></i>
+<TD>Text drawn using the baseline point (x,y). The text consists of the
+n bytes following '-'. The text should be left-aligned (centered,
+right-aligned) on the point if j is -1 (0, 1), respectively. The value
+w gives the width of the text as computed by the library.
+<TR><TD>t f
+<TD>Set font characteristics. The integer f is the OR of BOLD=1, ITALIC=2, UNDERLINE=4, SUPERSCRIPT=8, SUBSCRIPT=16, and STRIKE-THROUGH=32.
+<TR><TD>C n -<I>b<sub>1</sub>b<sub>2</sub>...b<sub>n</sub></i>
+<TD>Set fill color. The color value consists of the
+n bytes following '-'. (1.1)
+<TR><TD>c n -<I>b<sub>1</sub>b<sub>2</sub>...b<sub>n</sub></i>
+<TD>Set pen color. The color value consists of the
+n bytes following '-'. (1.1)
+<TR><TD>F s n -<I>b<sub>1</sub>b<sub>2</sub>...b<sub>n</sub></i>
+<TD>Set font. The font size is s points. The font name consists of the
+n bytes following '-'. (1.1)
+<TR><TD>S n -<I>b<sub>1</sub>b<sub>2</sub>...b<sub>n</sub></i>
+<TD>Set style attribute. The style value consists of the
+n bytes following '-'. The syntax of the value is the same as
+specified for a <B>styleItem</b> in <A HREF=attrs#kstyle>style</a>. (1.1)
+<TR><TD>I x y w h n -<I>b<sub>1</sub>b<sub>2</sub>...b<sub>n</sub></i>
+<TD>Externally-specified image drawn in the box with lower left
+corner (x,y) and upper right corner (x+w,y+h). The name of the image
+consists of the n bytes following '-'. This is usually a bitmap
+image. Note that the image size, even when converted from pixels to
+points, might be different from the required size (w,h). It is
+assumed the renderer will perform the necessary scaling. (1.2)
+</td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></td></td></tr></table>
+<P>
+Note that the filled figures (ellipses, polygons and B-Splines)
+imply two operations: first, drawing the filled figure with the
+current fill color; second, drawing an unfilled figure with the
+current pen color, pen width and pen style.
+</p><P>
+Within the context of a single drawing attribute, e.g., <TT>_draw_</tt>, there is
+an implicit state for the graphical attributes. That is, once a color, style, font, or
+font characteristic is set, it remains valid for all relevant drawing operations
+until the value is reset by another xdot cmd.
+</p><P>
+Style values which can be incorporated in the graphics model do not
+appear in xdot output. In particular, the style values
+<TT>filled</tt>, <TT>rounded</tt>, <TT>diagonals</tt>, and <TT>invis</tt>
+will not appear. Indeed, if style contains <TT>invis</tt>, 
+there will not be any xdot output at all.
+</p><P>
+With version 1.4 of xdot, color strings may now encode linear and radial gradients. Linear
+gradients have the form <br />
+&nbsp;&nbsp;&nbsp;&nbsp;'[' x<sub>0</sub> y<sub>0</sub> x<sub>1</sub> y<sub>1</sub> n [<I>color-stop</i>]<sup>+</sup> ']'<br />
+where (x<sub>0</sub>,y<sub>0</sub>) and (x<sub>1</sub>,y<sub>1</sub>) define the starting and
+ending points of the gradient line segment, and n gives the number of <I>color-stops</i>. Each
+<I>color-stop</i> has the form<br />
+&nbsp;&nbsp;&nbsp;&nbsp;v m -<I>b<sub>1</sub>b<sub>2</sub>...b<sub>m</sub></i><br />
+where v is a number in the range [0,1] defining a position on the gradient line segment, with
+color specified by the m byte string <I>b<sub>1</sub>b<sub>2</sub>...b<sub>m</sub></i>, 
+the same format as used for colors in the 'c' and 'C' operations.
+</p><P>
+Radial gradients have the form<br />
+&nbsp;&nbsp;&nbsp;&nbsp;'(' x<sub>0</sub> y<sub>0</sub> r<sub>0</sub> x<sub>1</sub> y<sub>1</sub> r<sub>1</sub> n [<I>color-stop</i>]<sup>+</sup> ')' <br />
+where x<sub><i>j</i></sub> y<sub><i>j</i></sub> r<sub><i>j</i></sub>, for <i>j</i>=0,1, specify
+the center and radius of the start and ending circle, and n gives the number of <I>color-stops</i>.
+A <I>color-stop</i> has the same format as defined for linear gradients, again given the fractional
+offset and its associated color. 
+</p><P>
+In handling text alignment, the application may want to recompute the
+string width using its own rendering primitives.
+</p><P>
+The text operation is only used in the label attributes. Normally,
+the non-text operations are only used in the non-label attributes.
+If, however, the <A HREF=attrs#ddecorate>decorate</a>
+attribute is set on an edge, its label
+attribute will also contain a polyline operation.
+In addition, if a label is a complex, HTML-like label, it will also
+contain non-text operations.
+</p><P>
+All coordinates and sizes are in points.
+Note though that if
+an edge or node is invisible, no drawing operations are attached to it.
+</p><P>
+Version info:
+<TABLE  border="1" >
+<TR><TH>Xdot version</th><TH>Graphviz version</th><TH>Modification</th></tr>
+<TR><TD>1.0</td> <TD>1.9</td><TD> </td></tr>
+<TR><TD>1.1</td> <TD>2.8</td><TD>First plug-in version</td></tr>
+<TR><TD>1.2</td><TD>2.13</td><TD>Support image operator <b>I</b></td></tr>
+<TR><TD>1.3</td><TD>2.31</td><TD>Add numerical precision
+<TR><TD>1.4</td><TD>2.32</td><TD>Add gradient colors
+<TR><TD>1.5</td><TD>2.34</td><TD>Fix text layout problem; fix inverted vector in gradient; support version-specific output; new <B>t</b> op for text characteristics
+<TR><TD>1.6</td><TD>2.35</td><TD>Add STRIKE-THROUGH bit for <tt>t</tt>
+</td></tr></td></tr></td></tr></td></tr></table>
+
+<DT><A NAME=dcmap HREF=#acmap><STRONG>cmap</strong></a>
+<DD>Produces map files for client-side image maps. The cmap format is
+mostly identical to cmapx, but the latter is well-formed XML amenable
+to processing by XML tools. In particular, the cmapx output is wrapped in
+&lt;map&gt;&lt;/map&gt;.
+<P>
+See <A HREF=#ID>Note</a>.
+
+<DT><A NAME=deps HREF=#aeps><STRONG>eps</strong></a>
+<DD>Produces Encapsulated PostScript output.
+At present, this is only guaranteed to be correct for a single
+input graph since the Bounding Box information has to appear
+at the beginning of the output, and this will be based on the first graph.
+
+<DT><A NAME=dfig HREF=#afig><STRONG>fig</strong></a>
+<DD>Outputs graphs in the FIG graphics language.
+
+<DT><A NAME=dgd HREF=#agd><STRONG>gd</strong></a>
+,<DT><A NAME=dgd2 HREF=#agd2><STRONG>gd2</strong></a>
+<DD>Output images in the GD and GD2 format. These are the internal
+formats used by the gd library. The latter is compressed.
+
+<DT><A NAME=dgif HREF=#agif><STRONG>gif</strong></a>
+<DD>Outputs GIF bitmap images.
+
+<DT><A NAME=dgtk HREF=#agtk><STRONG>gtk</strong></a>
+<DD>Creates a <A HREF="http://www.gtk.org/" target="_blank">GTK</a> window and displays the output there.
+
+<DT><A NAME=dico HREF=#aico><STRONG>ico</strong></a>
+<DD>Outputs images in the Windows <A HREF="http://en.wikipedia.org/wiki/ICO_(icon_image_file_format)" target="_blank">ICO format</a>.
+
+<DT><A NAME=dimap HREF=#aimap><STRONG>imap</strong></a>
+,<DT><A NAME=dcmapx HREF=#acmapx><STRONG>cmapx</strong></a>
+<DD>Produces map files for server-side and client-side image maps.
+These can be used in a web page with
+a graphical form of the output, e.g. in JPEG, GIF or PNG format, to attach
+links to nodes and edges. 
+Graphviz generates an object's map information only if the object has a non-trival 
+<A HREF=attrs#dURL>URL</a> or <A HREF=attrs#dhref>href</a>
+attribute, or if it has an explicit <A HREF=attrs#dtooltip>tooltip</a> attribute.
+<P>
+For example, to create a server-side map
+given the dot file
+<PRE>
+/* x.gv */
+digraph mainmap {
+  URL="http://www.research.att.com/base.html";
+  command [URL="http://www.research.att.com/command.html"];
+  command -> output [URL="colors.html"];
+}
+</pre>
+one would process the graph and generate two output files:
+<PRE>
+dot -Timap -ox.map -Tgif -ox.gif x.gv
+</pre>
+and then refer to it in a web page:
+<XMP>
+<A HREF="x.map"><IMG SRC="/doc/info/x.gif" ismap="ismap" /></a>
+</xmp>
+For client-side maps, one again generates two output files:
+<PRE>
+dot -Tcmapx -ox.map -Tgif -ox.gif x.gv
+</pre>
+and uses the HTML
+<XMP>
+<IMG SRC="/doc/info/x.gif" USEMAP="#mainmap" />
+... [content of x.map] ...
+</xmp>
+Note that the name given in the USEMAP attribute must be the same
+as the ID attribute of the MAP element. The Graphviz renderer
+uses the name of the graph as the ID. Thus, in the example above,
+where the graph's name is <T>mainmap</t>, we have <T>USEMAP="#mainmap"</t>
+in the IMG attribute, and x.map will look like
+<XMP>
+<map id="mainmap" name="mainmap">
+... 
+</map>
+</xmp>
+</p><P>
+<A HREF=attrs#dURL>URLs</a> can be attached to the root
+graph, nodes and edges. If a node has a URL, clicking in the node
+will activate the link.
+If an edge has a URL, various
+points along the edge (but not necessarily the head or tail)
+will link to it. In addition, if the edge has a
+<A HREF=attrs#dlabel>label</a>, that will link
+to the URL.
+As for the head of the edge, this is linked to the
+<A HREF=attrs#dheadURL>headURL</a>, if set.
+Otherwise, it is linked to the edge's URL if that is defined.
+The analogous description holds for the tail and the
+<A HREF=attrs#dtailURL>tailURL</a>.
+A URL associated with the graph is used as a default link.
+</p><P>
+If the URL
+of a node contains the escape sequence "&#92;N", it will be replaced by
+the node's name.
+If the headURL is defined and contains the escape sequence "&#92;N",
+it will be replaced by
+the <A HREF=attrs#dheadlabel>headlabel</a>, if defined.
+The analogous result holds for the tailURL and the
+<A HREF=attrs#dtaillabel>taillabel</a>.
+</p><P>
+See <A HREF=#ID>Note</a>.
+
+<DT><A NAME=dimap_np HREF=#aimap_np><STRONG>imap_np</strong></a>
+,<DT><A NAME=dcmapx_np HREF=#acmapx_np><STRONG>cmapx_np</strong></a>
+<DD>These are identical to the imap and cmapx formats, except they
+rely solely on rectangles as active areas.
+
+<DT><A NAME=dismap HREF=#aismap><STRONG>ismap</strong></a>
+<DD>Produces HTML image map files. This is a predecessor (circa 1994)
+of the IMAP format.  Most servers now use the latter.
+<A HREF=attrs#dURL>URLs</a> can be attached to the root graph,
+nodes and edges. Since edge
+links are attached to edge labels, an edge must
+have a <A HREF=attrs#dlabel>label</a> for its
+URL to be used. For both nodes and edges, if the URL has the escape
+sequence "&#92;N" embedded in its string, this will be replaced with the
+node or edge name.
+
+<DT><A NAME=djpg HREF=#ajpg><STRONG>jpg</strong></a>
+,<DT><A NAME=djpeg HREF=#ajpeg><STRONG>jpeg</strong></a>
+,<DT><A NAME=djpe HREF=#ajpe><STRONG>jpe</strong></a>
+<DD>Output JPEG compressed image files.
+
+<DT><A NAME=dpdf HREF=#apdf><STRONG>pdf</strong></a>
+<DD>Produces <A HREF="http://www.adobe.com/devnet/pdf/" target="_blank">PDF</a> output.
+(This option assumes Graphviz includes the Cairo renderer.)
+Alternatively, one can use the <A HREF="#dps2">ps2</a> option to
+produce PDF-compatible PostScript, and then use a ps-to-pdf converter.
+<P>
+Note: At present, this option does not support anchors, etc. To get these
+included in your PDF output, use <A HREF="#dps2">ps2</a>.
+
+<DT><A NAME=dplain HREF=#aplain><STRONG>plain</strong></a>
+,<DT><A NAME=dplain-ext HREF=#aplain-ext><STRONG>plain-ext</strong></a>
+<DD>The plain and plain-ext formats produce output using
+a simple, line-based language.
+The latter format differs in that, on edges, it provides port names
+on head and tail nodes when applicable.
+<P>
+There are four types of statements.
+<PRE>
+ <STRONG>graph</strong> <I>scale</i> <I>width</i> <I>height</i>
+ <STRONG>node</strong> <I>name</i> <I>x</i> <I>y</i> <I>width</i> <I>height</i> <I>label</i> <I>style</i> <I>shape</i> <I>color</i> <I>fillcolor</i>
+ <STRONG>edge</strong> <I>tail</i> <I>head</i> <I>n</i> <I>x<sub>1</sub></i> <I>y<sub>1</sub></i> .. <I>x<sub>n</sub></i> <I>y<sub>n</sub></i> [<I>label</i> <I>xl</i> <I>yl</i>] <I>style</i> <I>color</i>
+ <STRONG>stop</strong>
+</pre>
+<DL>
+<DT><STRONG>graph</strong>
+<DD>The <I>width</i> and <I>height</i> values give the width and height
+of the drawing. The lower left corner of the drawing is at the origin.
+The <I>scale</i> value indicates how the drawing should be scaled
+if a <A HREF=attrs#dsize>size</a> attribute was given and the drawing
+needs to be scaled to conform to that size. If no scaling is necessary,
+it will be set to 1.0. Note that all graph, node and edge
+coordinates and lengths are given unscaled.
+<DT><STRONG>node</strong>
+<DD>The <I>name</i> value is the name of the node, and <I>x</i> and <I>y</i>
+give the node's position. The <I>width</i> and <I>height</i> are the
+width and height of the node.
+The <I>label</i>,
+<I>style</i>, <I>shape</i>, <I>color</i> and <I>fillcolor</i> give the
+node's <A HREF=attrs#dlabel>label</a>,
+<A HREF=attrs#dstyle>style</a>, <A HREF=attrs#dshape>shape</a>,
+<A HREF=attrs#dcolor>color</a> and
+<A HREF=attrs#dfillcolor>fillcolor</a>,
+respectively, using attribute default values where necessary. If the
+node does not have a style attribute, "solid" is used.
+<DT><STRONG>edge</strong>
+<DD>The <I>tail</i> and <I>head</i> values give the names of the head and
+tail nodes. In plain-ext format, the head or tail name will be appended
+with a colon and a portname if the edge connects to the node at a port.
+<I>n</i> is the number of control points defining the
+B-spline forming the edge. This is followed by 2*<I>n</i> numbers giving
+the x and y coordinates of the control points in order from tail to head.
+If the edge has a <A HREF=attrs#dlabel>label</a>, this comes next
+followed by the x and y coordinates of the label's position.
+The edge description is completed by the edge's
+<A HREF=attrs#dstyle>style</a> and <A HREF=attrs#dcolor>color</a>.
+As with nodes, if a style is not defined, "solid" is used.
+<P>
+<B>Note:</b> The control points given in an edge statement define the
+body of the edge. In particular, if the edge has an arrowhead to the
+head or tail node,
+there will be a gap between the last or first control points and the
+boundary of the associated node. There are at least 3 possible ways
+of handling this gap:
+<UL>
+<LI> Arrange that the input graph uses <TT>dir=none</tt>,
+<TT>arrowhead=none</tt>, or <TT>arrowtail=none</tt> for all edges.
+In this case, the terminating control points will always touch the node.
+</li><LI> Consider the line segment joining the control point and the center
+of the node, and determine the point where the segment intersects the
+node's boundary. Then use the control point and the intersection point
+as the main axis of an arrowhead. The problem with this approach is
+that, if the edge has a port, the edge will not be pointing to the
+center of the node. In this case, rather than use the control point
+and center point, one can use the control point and its tangent.
+</li><LI> Arrange that the input graph uses <TT>headclip=false</tt> or
+<TT>tailclip=false</tt>. In this case, the edge will terminate at
+the node's center rather than its boundary. If arrowheads are used,
+there will still be a gap, but normally this will occur within the
+node. The application will still need to clip the spline to the node
+boundary. Also, as with the previous item, if the edge points to
+a node port, this technique will fail.
+</li></ul>
+</p></dd></dt></dd></dt></dd></dt></dl>
+The output consists of one <STRONG>graph</strong> line, a sequence of
+<STRONG>node</strong> lines, one per node, a sequence of
+<STRONG>edge</strong> lines, one per edge, and a final <STRONG>stop</strong>
+line. All units are in inches, represented by a floating point number.
+</p><P>
+Note that the plain formats provide minimal information, really giving not
+much more than node positions and sizes, and edge spline control points.
+These formats are usually most useful to applications wanting just this
+geometric information, and willing to fill in all of the graphical details.
+The only real advantages to these formats is their terseness and their
+ease of parsing. In general, the <A HREF=#ddot>dot</a> and
+<A HREF=#dxdot>xdot</a> are preferable in terms of the quantity of
+information provided.
+
+<DT><A NAME=dpng HREF=#apng><STRONG>png</strong></a>
+<DD>Produces output in the PNG (Portable Network Graphics) format.
+
+<DT><A NAME=dps HREF=#aps><STRONG>ps</strong></a>
+<DD>Produces PostScript output.
+<P>
+Note: The default PostScript renderer can only handle the Latin-1
+character set. To get non-Latin-1 characters into PostScript output,
+use <TT>-Tps:cairo</tt>, assuming your version was built with the
+Cairo renderer.
+
+<DT><A NAME=dps2 HREF=#aps2><STRONG>ps2</strong></a>
+<DD>Produces PostScript output with PDF notations. It is assumed the output
+will be directly converted into PDF format. The notations include PDF
+bounding box information, so that the resulting PDF file can be correctly
+used with pdf tools, such as <STRONG>pdflatex</strong>.
+In addition, if a node has a URL
+attribute, this gets translated into PDF code such that the node,
+when viewed in a PDF-viewer, e.g.,
+<STRONG>acroread</strong>,
+is a link to the given URL. If a URL is attached to the graph, this serves
+as a base, such that relative URLs on nodes are derived from it.
+
+<DT><A NAME=dsvg HREF=#asvg><STRONG>svg</strong></a>
+,<DT><A NAME=dsvgz HREF=#asvgz><STRONG>svgz</strong></a>
+<DD>Produce <A HREF="http://www.adobe.com/svg/" target="_blank">SVG</a> output,
+the latter in compressed format.
+<P>
+See <A HREF=#ID>Note</a>.
+
+<DT><A NAME=dtif HREF=#atif><STRONG>tif</strong></a>
+,<DT><A NAME=dtiff HREF=#atiff><STRONG>tiff</strong></a>
+<DD>Produces <A HREF="http://www.libtiff.org/" target="_blank">TIFF</a> output.
+
+<DT><A NAME=dvml HREF=#avml><STRONG>vml</strong></a>
+,<DT><A NAME=dvmlz HREF=#avmlz><STRONG>vmlz</strong></a>
+<DD>Produces <A HREF="http://www.w3.org/TR/NOTE-VML" target="blank">VML</a> output,
+the latter in compressed format.
+<P>
+See <A HREF=#ID>Note</a>.
+
+<DT><A NAME=dvrml HREF=#avrml><STRONG>vrml</strong></a>
+<DD>Outputs graphs in the <A HREF="http://www.vrml.org/" target="blank">VRML</a> format.
+To get a 3D embedding, nodes must have a <A HREF=attrs#dz>z</a>
+attribute. These can either be supplied as part of the input graph, or
+be generated by neato provided <A HREF=attrs#ddim>dim</a><TT>=3</tt>
+and at least one node has a <B>z</b> value.
+<P>
+Line segments are drawn as cylinders.
+In general, VRML output relies on having the PNG library to produce images
+used to texture-fill the node shapes. However, if
+<A HREF=attrs#dshape>shape</a><TT>=point</tt>,
+a node is drawn as a 3D sphere.
+
+<DT><A NAME=dwbmp HREF=#awbmp><STRONG>wbmp</strong></a>
+<DD>Produces output in the Wireless BitMap (WBMP) format, optimized for
+mobile computing.
+
+<DT><A NAME=dwebp HREF=#awebp><STRONG>webp</strong></a>
+<DD>Produces output in the image format for the Web (WEBP) format, optimized for
+web devices such as tablets.
+See Wikipedia's <a href="http://en.wikipedia.org/wiki/Webp">WebP</a>
+or Google's <a href="http://code.google.com/speed/webp/">webp</a> pages.
+
+<DT><A NAME=dxlib HREF=#axlib><STRONG>xlib</strong></a>
+<DD>Creates an <A HREF="http://en.wikipedia.org/wiki/Xlib" target="blank">Xlib</a> window and displays the output there.
+
+</dd></dt></dd></dt></dd></dt></p></dd></dt></p></dd></dt></dt></dd></dt></dt></p></dd></dt></dt></dd></dt></p></dd></dt></dd></dt></p></dd></dt></dt></p></dd></dt></dd></dt></dt></dt></dd></dt></dd></dt></dt></p></dd></dt></dt></dd></dt></dd></dt></dd></dt></dd></dt></dt></dd></dt></dd></dt></p></dd></dt></p></spacer></p></spacer></p></dd></dt></dt></dt></dt></dt></dd></dt></dl>
+<HR />
+<H1 align=CENTER><A NAME=dimage_fmts>Image Formats</a></h1>
+<HR />
+The <A HREF=attrs#aimage>image</a> and <A HREF=attrs#ashapefile>shapefile</a> attributes specify an image file to be included
+as part of the final diagram. Not all image formats can be read. In addition,
+even if read, not all image formats can necessarily be used in a given
+output format.
+</p><P>
+The graph below shows what image formats can be used in which output formats,
+and the required plugins. On the left are the supported image formats. 
+On the right are the supported output formats.
+In the middle are the plugins: image loaders, renderers, drivers, arranged by 
+plugin library.  
+This presents the most general case. A given installation may not provide
+one of the plugins, in which case, that transformation is not possible.
+<BR />
+<IMG WIDTH="80%" SRC="/doc/info/plugins.png" />
+<HR />
+<H2>Notes</h2>
+<OL TYPE="1">
+<LI>
+<A NAME=ID></a>In the formats: -Tcmap, -Tcmapx, -Tsvg, -Tvml, the output generates
+'id="node#"' properties for nodes, 'id="edge#"' properties for edges, and 'id="cluster#"' properties for clusters, with the '#' replaced by an internally assigned integer. These strings can be provided instead by an externally provided "id=xxx" attribute on the object.
+Normal "&#92;N" "&#92;E" "&#92;G" substitutions are applied.
+Externally provided id values are not used internally, and it is the use's reponsibilty to ensure
+that they are sufficiently unique for their intended downstream use.
+Note, in particular, that "&#92;E" is not a unique id for multiedges.
+</li></ol>
+</p></div>
+      </div>
+  <div class="block block-comment" id="block-comment-0">
+    <h2 class="title">Recent comments</h2>
+    <div class="content"><div class="item-list"><ul><li class="first"><a href="/content/draw-and-or-tree-need-draw-arcs-betweenacross-edges#comment-1554">There is no way specify or do</a><br />5 hours 39 min ago</li>
+<li><a href="/content/gvfreelayout-leakage#comment-1553">See</a><br />5 hours 45 min ago</li>
+<li><a href="/content/gvfreelayout-and-bb-attribute#comment-1552">gvFreeLayout</a><br />1 day 6 hours ago</li>
+<li><a href="/content/gvfreelayout-and-bb-attribute#comment-1551">Can you be more specific as</a><br />1 day 7 hours ago</li>
+<li><a href="/content/xdot-versions-etc#comment-1550">I don&#039;t understand. Anyone</a><br />1 day 9 hours ago</li>
+<li><a href="/content/xdot-versions-etc#comment-1549">It looks somehow complicated</a><br />1 day 17 hours ago</li>
+<li><a href="/content/mindist-circo-not-working-library#comment-1548">Your patch has been applied.</a><br />3 days 5 hours ago</li>
+<li><a href="/content/img-tag-padding#comment-1547">workaround: downgrade to 2.20.2, bug #2397 opened</a><br />3 days 9 hours ago</li>
+<li><a href="/content/img-tag-padding#comment-1546">this is regression since graphviz 2.20.2</a><br />3 days 12 hours ago</li>
+<li class="last"><a href="/content/graphviz-iphone#comment-1543">Graphviz on iPhone</a><br />5 days 14 hours ago</li>
+</ul></div></div>
+ </div>
+              </div>
+    </td>
+    <td id="sidebar-right">
+        <div class="block block-forum" id="block-forum-1">
+    <h2 class="title">New forum topics</h2>
+    <div class="content"><div class="item-list"><ul><li class="first"><a href="/content/draw-and-or-tree-need-draw-arcs-betweenacross-edges" title="1 comment">Draw And-Or tree - need to draw arcs between/across edges</a></li>
+<li><a href="/content/gvfreelayout-and-bb-attribute" title="2 comments">gvFreeLayout and bb attribute</a></li>
+<li><a href="/content/gvfreelayout-leakage" title="1 comment">gvFreeLayout leakage</a></li>
+<li><a href="/content/mindist-circo-not-working-library" title="1 comment">Mindist in Circo not working (library)</a></li>
+<li class="last"><a href="/content/using-gvmap-library" title="1 comment">using gvmap as a library</a></li>
+</ul></div><div class="more-link"><a href="/forum" title="Read the latest forum topics.">more</a></div></div>
+ </div>
+    </td>  </tr>
+</table>
+
+<div id="footer">
+    </div>
+</body>
+</html>

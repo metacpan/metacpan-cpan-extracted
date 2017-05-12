@@ -1,0 +1,8 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+Cloudmade.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+t/cloudmade.t
+META.json                                Module JSON meta-data (added by MakeMaker)

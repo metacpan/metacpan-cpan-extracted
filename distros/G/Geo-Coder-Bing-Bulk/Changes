@@ -1,0 +1,16 @@
+Revision history for Geo-Coder-Bing-Bulk
+
+0.04  Tue Mar 29 23:44:23 UTC 2011
+    - Required newer LWP with better HTTPS support.
+
+0.03  Sun Mar 20 12:29:52 UTC 2011
+    - Fixed parsing of the response data to account for extraneous newlines
+      and carriage returns.
+    - Added a location id to the request because the results are not always
+      returned in the same order as requested.
+
+0.02  Thu Jun 24 00:28:16 UTC 2010
+    - Updated documentation to reflect reality.
+
+0.01  Wed Jun 23 21:57:56 UTC 2010
+    - Initial distribution.

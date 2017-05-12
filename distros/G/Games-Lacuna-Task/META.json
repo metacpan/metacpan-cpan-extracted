@@ -1,0 +1,386 @@
+{
+   "abstract" : "Automation framework for the Lacuna Expanse MMPOG",
+   "author" : [
+      "Maroš Kollár <maros@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Games-Lacuna-Task",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Digest::MD5" : "0",
+            "Email::Stuff" : "0",
+            "Games::Lacuna::Client" : "0.003",
+            "IO::Interactive" : "0",
+            "JSON" : "2.00",
+            "LWP" : "0",
+            "Module::Pluggable" : "0",
+            "Moose" : "2.0000",
+            "MooseX::Getopt" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Path::Class" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ReadKey" : "0",
+            "Text::CSV" : "0",
+            "Text::Table" : "0",
+            "Try::Tiny" : "0",
+            "Unicode::Normalize" : "0",
+            "YAML::Any" : "0",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Games::Lacuna::Task" : {
+         "file" : "lib/Games/Lacuna/Task.pm",
+         "version" : "2.05"
+      },
+      "Games::Lacuna::Task::Action" : {
+         "file" : "lib/Games/Lacuna/Task/Action.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Archaeology" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Archaeology.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Astronomy" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Astronomy.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Bleeder" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Bleeder.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::BuildVrbansk" : {
+         "file" : "lib/Games/Lacuna/Task/Action/BuildVrbansk.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::CollectExcavatorBooty" : {
+         "file" : "lib/Games/Lacuna/Task/Action/CollectExcavatorBooty.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::CounterIntelligence" : {
+         "file" : "lib/Games/Lacuna/Task/Action/CounterIntelligence.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Defence" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Defence.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::EmpireCache" : {
+         "file" : "lib/Games/Lacuna/Task/Action/EmpireCache.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::EmpireFind" : {
+         "file" : "lib/Games/Lacuna/Task/Action/EmpireFind.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::EmpireReport" : {
+         "file" : "lib/Games/Lacuna/Task/Action/EmpireReport.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::EvaluateColony" : {
+         "file" : "lib/Games/Lacuna/Task/Action/EvaluateColony.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Excavate" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Excavate.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::FetchSpy" : {
+         "file" : "lib/Games/Lacuna/Task/Action/FetchSpy.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Mining" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Mining.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Mission" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Mission.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::OptimizeProbes" : {
+         "file" : "lib/Games/Lacuna/Task/Action/OptimizeProbes.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Push" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Push.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Repair" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Repair.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::ReportIncoming" : {
+         "file" : "lib/Games/Lacuna/Task/Action/ReportIncoming.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::SendSpy" : {
+         "file" : "lib/Games/Lacuna/Task/Action/SendSpy.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::ShipDispatch" : {
+         "file" : "lib/Games/Lacuna/Task/Action/ShipDispatch.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::ShipUpdate" : {
+         "file" : "lib/Games/Lacuna/Task/Action/ShipUpdate.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Spy" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Spy.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::SpyFetch" : {
+         "file" : "lib/Games/Lacuna/Task/Action/SpyFetch.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::SpySend" : {
+         "file" : "lib/Games/Lacuna/Task/Action/SpySend.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::SpyTraining" : {
+         "file" : "lib/Games/Lacuna/Task/Action/SpyTraining.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::StarCacheBuild" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StarCacheBuild.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::StarCacheExport" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StarCacheExport.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::StarCacheReport" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StarCacheReport.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::StarCacheUnknown" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StarCacheUnknown.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::StationPlanBuilder" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StationPlanBuilder.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Trade" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Trade.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Upgrade" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Upgrade.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::UpgradeBuilding" : {
+         "file" : "lib/Games/Lacuna/Task/Action/UpgradeBuilding.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Vote" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Vote.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::Vrbansk" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Vrbansk.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::VrbanskBuild" : {
+         "file" : "lib/Games/Lacuna/Task/Action/VrbanskBuild.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::VrbanskCombine" : {
+         "file" : "lib/Games/Lacuna/Task/Action/VrbanskCombine.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::WasteDispose" : {
+         "file" : "lib/Games/Lacuna/Task/Action/WasteDispose.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::WasteMonument" : {
+         "file" : "lib/Games/Lacuna/Task/Action/WasteMonument.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::WasteProduction" : {
+         "file" : "lib/Games/Lacuna/Task/Action/WasteProduction.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::WasteRecycle" : {
+         "file" : "lib/Games/Lacuna/Task/Action/WasteRecycle.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::ActionProto" : {
+         "file" : "lib/Games/Lacuna/Task/ActionProto.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Client" : {
+         "file" : "lib/Games/Lacuna/Task/Client.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Constants" : {
+         "file" : "lib/Games/Lacuna/Task/Constants.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Meta::Class::Trait::Deprecated" : {
+         "file" : "lib/Games/Lacuna/Task/Meta/Class/Trait/Deprecated.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Meta::Class::Trait::NoAutomatic" : {
+         "file" : "lib/Games/Lacuna/Task/Meta/Class/Trait/NoAutomatic.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Report::Battle" : {
+         "file" : "lib/Games/Lacuna/Task/Report/Battle.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Report::Fleet" : {
+         "file" : "lib/Games/Lacuna/Task/Report/Fleet.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Report::Glyph" : {
+         "file" : "lib/Games/Lacuna/Task/Report/Glyph.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Report::Inbox" : {
+         "file" : "lib/Games/Lacuna/Task/Report/Inbox.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Report::Incoming" : {
+         "file" : "lib/Games/Lacuna/Task/Report/Incoming.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Report::Intelligence" : {
+         "file" : "lib/Games/Lacuna/Task/Report/Intelligence.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Report::Mining" : {
+         "file" : "lib/Games/Lacuna/Task/Report/Mining.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Actions" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Actions.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Building" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Building.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Captcha" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Captcha.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Client" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Client.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::CommonAttributes" : {
+         "file" : "lib/Games/Lacuna/Task/Role/CommonAttributes.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Helper" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Helper.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Intelligence" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Intelligence.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Logger" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Logger.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Notify" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Notify.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::PlanetRun" : {
+         "file" : "lib/Games/Lacuna/Task/Role/PlanetRun.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::RPCLimit" : {
+         "file" : "lib/Games/Lacuna/Task/Role/RPCLimit.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Ships" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Ships.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Stars" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Stars.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Storage" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Storage.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Waste" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Waste.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Setup" : {
+         "file" : "lib/Games/Lacuna/Task/Setup.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Storage" : {
+         "file" : "lib/Games/Lacuna/Task/Storage.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Table" : {
+         "file" : "lib/Games/Lacuna/Task/Table.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Types" : {
+         "file" : "lib/Games/Lacuna/Task/Types.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Utils" : {
+         "file" : "lib/Games/Lacuna/Task/Utils.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::TaskRunner" : {
+         "file" : "lib/Games/Lacuna/Task/TaskRunner.pm",
+         "version" : 0
+      },
+      "Moose::Meta::Class::Custom::Trait::Deprecated" : {
+         "file" : "lib/Games/Lacuna/Task/Meta/Class/Trait/Deprecated.pm",
+         "version" : 0
+      },
+      "Moose::Meta::Class::Custom::Trait::NoAutomatic" : {
+         "file" : "lib/Games/Lacuna/Task/Meta/Class/Trait/NoAutomatic.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/maros/Games-Lacuna-Task/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/maros/Games-Lacuna-Task.git"
+      }
+   },
+   "version" : "2.05"
+}

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/Geo/GNUPlot.pm
+t/syntax.t
+t/ExtUtils/TBone.pm
+examples/radius_grid
+examples/test_geomap1.pl
+examples/test_geomap2.pl
+examples/test_radius1.pl
+examples/w2.dat

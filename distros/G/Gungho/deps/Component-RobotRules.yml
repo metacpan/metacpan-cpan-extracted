@@ -1,0 +1,7 @@
+---
+name: 'RobotRules Support'
+default: 1
+depends:
+    'WWW::RobotRules::Parser': 0
+    'URI': 0
+    'DB_File': 0

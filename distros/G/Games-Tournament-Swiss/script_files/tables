@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+
+# Last Edit: 2006 Dec 31, 04:31:41 PM
+# $Id$
+
+use strict;
+use warnings;
+
+use Games::Tournament::Swiss -base;
+use Games::Tournament::Contestant::Swiss;
+use Games::Tournament::Card;
+use Games::Tournament::Swiss::Procedure;
+
+use YAML qw/LoadFile DumpFile/;
+use FileHandle;
+
+my $firstRound = 1;
+my %scores = ( win => 1, loss => 0, draw => 0.5, absent => 0, bye => 1 );
+my @roles = qw/Black White/;
+
+
+my $tourney;
+my $table;
+my $players;
+my $games;
+
+my @rounds;
+for my $file ( glob('./*') ) {
+    push @rounds, $1
+      if -d $file
+      and $file =~ m/\/(\d+)$/
+      and glob("$file/*");
+}
+for my $round (@rounds) {
+    $tourney = LoadFile "./$round/tourney.yaml";
+    $players = LoadFile qq{./$round/player.yaml};
+    $games   = LoadFile "./$round/matches.yaml";
+    if ( $tourney->unmarkedCards(@$games) ) {
+        my $results = LoadFile("./scores/$round.yaml");
+        for my $game (@$games) {
+            my %result;
+            my $total;
+            my @roles = keys %{ $game->contestants };
+            my @contestants = map { $_->id } values %{ $game->{contestants} };
+            $tourney->scoreValues( \%scores );
+            for my $role (@roles) {
+                my $player = $game->contestants->{$role};
+                my $result = $results->{ $player->id };
+                $total += $result;
+                $result{$role} =
+                    $role eq 'Bye' ? $player
+                  : $result == $scores{win}    ? 'Win'
+                  : $result == $scores{draw}   ? "Draw"
+                  : $result == $scores{loss}   ? "Loss"
+                  : $result == $scores{absent} ? 'Absent'
+                  : "Error";
+            }
+            die
+"Total scores in round $round game with players @contestants not $scores{win}+$scores{loss}"
+              if $total != $scores{win} + $scores{loss};
+            $game->result( \%result );
+        }
+    }
+    $tourney->collectCards(@$games);
+    for my $player ( @{$tourney->entrants} ) {
+        my $id = $player->id;
+        $table->{$id}->{id}     = $id;
+        $table->{$id}->{name}   = $player->{name};
+        $table->{$id}->{rating} = $player->{rating};
+        my $game     = $player->findCard(@$games);
+        my $opponent = $player->myOpponent($game)
+          || Games::Tournament::Contestant->new( name => "Bye", id => "-" );
+        $table->{$id}->{opponents} .= $opponent->id . ",";
+        my $role = $game->myRole($player);
+        if ( $role eq 'Bye' ) { $role = '-'; }
+        else { $role =~ s/^(.).*$/$1/; }
+        $table->{$id}->{roles} .= $role;
+        my $result = $game->myResult($player);
+        if ( $result eq 'Bye' ) { $result = 'W'; }
+        else { $result =~ s/^(.).*$/$1/; }
+
+        # my @results = $round==1? (): @{ $table->{$id}->{results} };
+        # push @results, $opponent->id . ":" . $result;
+        # $table->{$id}->{results} = \@results;
+        # my @results = $round==1? (): @{ $table->{$id}->{results} };
+        push @{ $table->{$id}->{results} }, $opponent->id . ":" . $result;
+
+        # $table->{$id}->{results} = \@results;
+        $table->{$id}->{score} = $player->score;
+    }
+}
+
+my $playerN = 0;
+my @rankedplayers = $tourney->rank( @{$tourney->entrants} );
+
+local $" = "     ";
+print "
+		Round @{[$#rounds+1]} Crosstable
+-------------------------------------------------------------------------
+Place No Name       Rating Total @rounds
+";
+local $" = " ";
+
+for my $player (@rankedplayers) {
+    my $id      = $player->id;
+    my $place   = ++$playerN;
+    my $entry = $table->{$id};
+    my $results = $table->{$id}->{results};
+    no warnings;
+    format STDOUT =
+@<< @<< @<<<<<<<<<<< @<<<< @<<< @<<<< @<<<< @<<<< @<<<< @<<<< @<<<< @<<<< @<<<<
+$place, $entry->{id}, $entry->{name}, $entry->{rating}, $entry->{score}, @$results
+.
+    write;
+    use warnings;
+}
+
+my @brackets = $tourney->formBrackets;
+$playerN = 0;
+
+print "
+		Round @{[$#rounds+2]} Pairing Groups
+-------------------------------------------------------------------------
+Place  No  Opponents Roles     Score
+";
+for my $bracket (@brackets) {
+    $playerN++;
+    my $place   = $playerN;
+    my @members = @{ $bracket->members };
+    $place .= '-' . ( $playerN + $#members ) if $#members;
+    $playerN += $#members;
+    print "$place\n";
+    foreach my $member (@members) {
+        my $id = $member->id;
+	my $entry = $table->{$id};
+        chop $entry->{opponents};
+        no warnings 'redefine';
+        eval 'format STDOUT =
+@<<<<< @<< @<<<<<<<<<<<<< @<<<<<<<< @<<<
+" ", $id,  "$entry->{opponents}", $entry->{roles}, $entry->{score}
+.';
+        write;
+    }
+}
+
+# vim: set ts=8 sts=4 sw=4 noet:

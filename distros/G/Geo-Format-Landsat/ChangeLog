@@ -1,0 +1,20 @@
+
+============= ChangeLog for Geo::Format::Landsat
+All modifications where created by Mark Overmeer, unless explicitly
+stated differently.
+
+version 0.03: Thu Jan 29 16:52:29 CET 2009
+	- added example output.txt of example/landsat.pl
+	- minor typos in a few fieldnames
+	- added landsat_meta_from_filename()
+	- compute ground-station received time from DATEHOUR_CONTACT_PERIOD
+	- translate some applied correction flags into booleans
+
+version 0.02: Tue Jan 27 23:32:48 CET 2009
+	- added some documentation.
+	- added t/01use.t
+	- added t/99pod.t
+
+version 0.01: Tue Jan 27 16:47:46 CET 2009
+        - initial release, probably quite complete
+

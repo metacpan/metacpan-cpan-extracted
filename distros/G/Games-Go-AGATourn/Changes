@@ -1,0 +1,33 @@
+Revision history for Perl extension Games::Go::AGA.
+
+1.035 Sun Jan 23 20:32:30 PST 2005
+    added parsing of tab-delimited version of TDLIST file.
+    Error method now accepts an argument - can be used to
+        clear the error flag.
+
+1.034 Sun Jan 23 18:35:44 PST 2005
+    split out AGATourn into its own module/package.  other parts went
+        to Games::Go::GoPair and Games::Go::Accelrat.
+    fixed problem with VERSION
+    added EXPORT stuff
+    changed Sigma to check for defined param before using it
+
+
+1.003 Mon Jan 3, 2005
+    lots of changes and additions:
+        added tdfind to find entries in TDLIST and transfer them to register.tde
+        added TDFind.pm and TDEntry.pm to support tdfind
+        added gopair to do tournament pairings
+        added Pair.pm to support gopair
+        added rats to calculate ratings updates (used in gopair)
+        added t/* tests and files for testing
+        added AGA.pm as a documentation only module
+        changed AGATourn.pm to be much more regular and to support
+            parsing all AGA file formats and all the other additions
+            listed above
+
+0.0001  Wed Oct 20 09:39:55 2004
+    original version; created by h2xs 1.23 with options -AX Games::Go::AGA -b 5.0.0
+
+
+

@@ -1,0 +1,166 @@
+NAME
+    Games::Mastermind::Cracker - quickly crack Mastermind
+
+VERSION
+    Version 0.02 released 01 Dec 07
+
+SYNOPSIS
+        use Games::Mastermind::Cracker::Sequential;
+        my $cracker = Games::Mastermind::Cracker::Sequential->new();
+        printf "The solution is %s!\n", $cracker->cracker;
+
+DESCRIPTION
+    Mastermind is a code-breaking game played by two players, the "code
+    maker" and the "code breaker".
+
+    This module plays the role of code breaker. The only requirement is that
+    you provide the answers to how many black pegs and how many white pegs a
+    code gives.
+
+    You must instantiate a subclass of this module to actually break codes.
+    There are a number of different cracker modules, described in
+    "ALGORITHMS".
+
+    Games::Mastermind is the same game, except it plays the role of code
+    maker.
+
+ALGORITHMS
+    Here are the algorithms, in roughly increasing order of quality.
+
+  Games::Mastermind::Cracker::Random
+    This randomly guesses until it gets the right answer. It does not
+    attempt to avoid guessing the same code twice.
+
+  Games::Mastermind::Cracker::Sequential
+    This guesses each code in order until it gets the right answer. It uses
+    no information from the results to prepare its next guesses.
+
+  Games::Mastermind::Cracker::Basic
+    This is the first usable algorithm. It will keep track of all the
+    possible codes. When a result is known, it will go through the possible
+    codes and eliminate any result inconsistent with the result. For
+    example, "BBBB" is not a possible result when "WKYW" is guessed and
+    receives a result of 1 black. This is because "WKYW" would not score 1
+    black if the correct code is "BBBB".
+
+USAGE
+  "new"
+    Creates a new Games::Mastermind::Cracker::* object. Note that you MUST
+    instantiate a subclass of this module. "new" takes a number of
+    arguments:
+
+   "holes"
+    The number of holes. Default: 4.
+
+   "pegs"
+    The representations of the pegs. Default: 'K', 'B', 'G', 'R', 'Y', 'W'.
+
+   "get_result"
+    A coderef to call any time the module wants user input. It passes the
+    coderef $self and the string of the guess (e.g. "KRBK") and expects to
+    receive two numbers, "black pegs" and "white pegs", as return value. I
+    will call this method multiple times if necessary to get sane output, so
+    you don't need to do much processing.
+
+    The default queries the user through standard output and standard input.
+
+  "crack"
+    The method to call to crack a particular game of Mastermind. This takes
+    no arguments. It returns the solution as a string, or "undef" if no
+    solution could be found.
+
+  "holes"
+    This will return the number of holes used in the game.
+
+  "pegs"
+    This will return an array reference of the pegs used in the game.
+
+  "history"
+    This will return an array reference of the guesses made so far in the
+    game. Each item in "history" is an array refrence itself, containing the
+    guess, its black pegs, and its white pegs.
+
+SUBCLASSING
+    This module uses Moose so please use it to extend this module. ":)"
+
+    Your cracker should operate such that any update to its internal state
+    is caused by "result_of", not "make_guess". This is because your
+    "result_of" method may be called (multiple times) before "make_guess" is
+    first called.
+
+    If you absolutely have to entangle your guessing and result processing
+    code, one way to make this work is to have "result_of" do all the
+    calculation and store the next guess to make in an attribute.
+
+  REQUIRED METHODS
+   make_guess
+    This method will receive no arguments, and expects a string representing
+    the guessed code as a result. If your "make_guess" returns "undef", that
+    will be interpreted as "unable to crack this code." If your "make_guess"
+    returns a scalar reference, that will be interpreted as the correct
+    solution.
+
+  OPTIONAL METHODS
+   result_of
+    This method will receive three arguments: the guess made, the number of
+    black pegs, and the number of white pegs. It doesn't have to return
+    anything.
+
+  HELPER METHODS
+   last_guess
+    This returns the last code guessed, or "undef" if no code has been
+    guessed yet.
+
+   random_peg
+    This returns a peg randomly selected from valid pegs.
+
+   all_codes
+    This returns a hash reference of all possible codes. This is not cached
+    in any way, so each call is a large speed penalty.
+
+   score
+    This expects two codes. It will return the black and white marker count
+    as if the first is a guess against the second. (actually, this method is
+    associative, so you could say the second against the first ":)").
+
+SEE ALSO
+    Games::Mastermind, Games::Mastermind::Solver,
+    <http://sartak.katron.org/nh/mastermind>
+
+AUTHOR
+    Shawn M Moore, "<sartak at gmail.com>"
+
+BUGS
+    No known bugs.
+
+    Please report any bugs through RT: email "bug-games-mastermind-cracker
+    at rt.cpan.org", or browse
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-Mastermind-Cracker
+    >.
+
+SUPPORT
+    You can find this documentation for this module with the perldoc
+    command.
+
+        perldoc Games::Mastermind::Cracker
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Games-Mastermind-Cracker>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Games-Mastermind-Cracker>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-Mastermind-Cracker>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Games-Mastermind-Cracker>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 Shawn M Moore.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

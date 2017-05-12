@@ -1,0 +1,55 @@
+$name   = 'Dummy';
+$author = 'Autrijus Tang';
+$team   = 'Toady';
+
+require 'Drones.bm';
+$a = int(rand(11) + 2);
+sub attack {
+    fire grenade $a;
+    fire grenade $a;
+    fire grenade $a;
+    fire grenade $a;
+    goto mine;
+    redo;
+}
+
+sub mine {
+    enable shield;
+    move forward * 2;
+    enable laymine;
+    move backward;
+    disable laymine;
+    move backward;
+    turn left;
+    goto main if $ammo == 2;
+    redo;
+}
+
+sub main {
+    scan perimeter;
+
+    if (&found('enemy')) {
+        fire energy * int(($enemy_life + 1) / 2);
+    }
+    elsif (&found('flag|vault') and $fuel > 100) {
+        move forward;
+        turn left;
+        move forward *2;
+        turn left;
+        move forward *2;
+        turn left;
+        move forward *2;
+        turn left;
+        move forward;
+        turn right;
+        move backward;
+    }
+
+    elsif ($life < $max_life) {
+        disable shield;
+        attempt repair * 3;
+        enable shield;
+    }
+
+    redo;
+}

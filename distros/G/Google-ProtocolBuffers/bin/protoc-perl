@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+Getopt::Long::Configure("pass_through");
+use Data::Dumper;
+use Google::ProtocolBuffers;
+
+our $VERSION = $Google::ProtocolBuffers::VERSION;
+
+my $path            = [];
+my $help            = 0;
+my $debug           = 0;
+my $verbose         = 0;
+my $version         = 0;
+my $decode_raw      = 0;
+my $oFile           = 0;
+my $perl_out        = 0;
+my $package_name    = '';
+my $proto_file      = 0;
+
+GetOptions(
+    'proto_path|I=s@'   => \$path,
+    'help|h'            => \$help,
+    'debug|d'           => \$debug,
+    'verbose+'          => \$verbose,
+    'perl_out=s'        => \$perl_out,
+    'version|v'         => \$version,
+    'package|p=s'       => \$package_name,
+);
+
+## TODO: multi-proto support
+$proto_file = $ARGV[$#ARGV];
+pop(@ARGV);
+
+# test for -Ilib
+foreach (@ARGV){
+    if(/^-I/){    
+        $_ =~ s/^-I//;
+        push(@{$path},$_);
+    }
+}
+
+if($version){
+    print "Google::ProtocolBuffers ".$VERSION."\n";
+    exit(0);
+}
+
+die usage() if($help || !$proto_file);
+
+sub usage {
+    return <<EOF;
+Usage: $0 [OPTION] PROTO_FILE
+Parse PROTO_FILE and generate output based on the options given:
+  -IPATH, --proto_path=PATH   Specify the directory in which to search for
+                              imports.  May be specified multiple times;
+                              directories will be searched in order.  If not
+                              given, the current working directory is used.
+  --version                   Show version info and exit.
+  -h, --help                  Show this text and exit.
+  
+  --perl_out=OUT_FILE         Generate the Perl source file. (eg: lib/App/MyPackage.pm)
+  -p, --package=NANE          Specify a package name (eg: App::MyPackage) to be appended
+                              in header
+  
+Version: $VERSION
+EOF
+}
+
+Google::ProtocolBuffers->parsefile(
+    $proto_file,
+    {
+        generate_code           => $perl_out,
+        create_accessors        => 1,
+        follow_best_practice    => 1,
+        include_dir             => $path,
+        package_name            => $package_name,
+    }
+);

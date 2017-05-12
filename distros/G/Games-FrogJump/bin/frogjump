@@ -1,0 +1,4 @@
+#!/usr/bin/env perl
+use 5.012;
+use Games::FrogJump;
+Games::FrogJump->new->run;

@@ -1,0 +1,9 @@
+Revision history for Perl extension Google::DNS
+
+0.02    Sat May  7 23:06:43 JST 2016
+        - fix dependency PP modules
+        - rename cli script: digoogle -> digle
+        - add fatpacked digle
+
+0.01    Sat May 7 5:56:41 JST 2016
+        - original version

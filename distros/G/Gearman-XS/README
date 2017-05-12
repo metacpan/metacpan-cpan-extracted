@@ -1,0 +1,47 @@
+Gearman::XS version 0.13
+==============================
+
+This is a Perl front end for the Gearman C library. It aims to provide a
+simple interface closely tied to the C library.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+OPTIONAL: If you installed libgearman in a non-standard location, you can set
+the GEARMAN_INCLUDE and GEARMAN_LIB environment variables:
+
+  export GEARMAN_INCLUDE=/opt/gearmand/include
+  export GEARMAN_LIB=/opt/gearmand/lib
+
+To run the complete testsuite make sure you have 'gearmand' in your PATH and
+type:
+   
+  GEARMAN_LIVE_TEST=1 make test
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Storable
+  libgearman 0.12 or later
+
+DEVELOPMENT
+
+Development of Gearman::XS is coordinated on launchpad.
+Visit http://launchpad.net/gearmanxs for more information
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 Data Differential, http://datadifferential.com/
+Copyright (C) 2009-2010 Dennis Schoen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.

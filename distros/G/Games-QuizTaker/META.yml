@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Games-QuizTaker
+version:      2.1
+version_from: lib/Games/QuizTaker.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Fcntl:                         0
+    Object::InsideOut:             0
+    Sub::Override:                 0
+    Test::Harness:                 0
+    Test::More:                    0
+    Test::Pod:                     0
+    Text::Wrap:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

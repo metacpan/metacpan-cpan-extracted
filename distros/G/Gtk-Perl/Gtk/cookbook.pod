@@ -1,0 +1,486 @@
+=head1 NAME
+
+Gtk cookbook - Typical usage of the Gtk module
+
+=head1 SYNOPSIS
+
+	use Gtk '-init';
+	my $window = new Gtk::Window;
+	my $button = new Gtk::Button("Quit");
+	$button->signal_connect("clicked", sub {Gtk->main_quit});
+	$window->add($button);
+	$window->show_all;
+	Gtk->main;
+
+=head1 DESCRIPTION
+
+=head2 Introduction
+
+The first thing you need to do to use the Gtk module in your perl program
+is to load the module and initialize it:
+
+	use Gtk;
+	init Gtk;
+
+This can also be shortened to the one-liner: 
+
+	use Gtk '-init';
+
+Now, how do you build the user interface?
+The basic components to build an interface are the widgets (derived from the
+Gtk::Widget package) and the containers (derived from Gtk::Container).
+Note that a container is a widget itself. So, you usually create a toplevel
+container (for example a Gtk::Window) and the widgets you plan to add to the
+container:
+
+	my $window = new Gtk::Window;
+	my $button = new Gtk::Button("Hello world");
+
+Then, you actually add the widgets to the container and tell the toolkit to
+show them on the users' display:
+
+	$window->add($button);
+	$window->show_all;
+
+Note that there are several different types of containers and each of
+them may lay out the widgets added to them in different ways. For example
+the Gtk::VBox container stacks the widgets one above the other, while
+the Gtk::Layout container requires you to explicitly set the position
+of the child widgets. Note also that some containers may contain only one
+widget (though that widget may be a container itself and hold other widgets).
+
+As you may have noted there is a hierarchy of packages: the base package is
+Gtk::Object and Gtk::Widget derives from it. Here is a bit of ascii art
+that describes a part of the hierarchy:
+
+	Gtk::Object
+	|
+	+- Gtk::Widget
+	  |
+	  +- Gtk::Misc
+	  |  |
+	  |  +- Gtk::Label
+	  |
+	  +- Gtk::Container
+	     |
+		 +- Gtk::Bin
+		    |
+		    +- Gtk::Window
+
+A good introduction to object oriented programming in Perl is available in
+the perltoot manpage.
+
+One fundamental concept in Gtk programming is I<signals>: objects
+emit a signal whenever something interesting happens to them, for
+example when a button is clicked or when a window is closed, or when
+an item in a list is selected and so on (note that these signals have nothing
+to do with POSIX signals). Every kind of widgets has a set of
+signals and you can connect to a signal emission to run your code or
+even to stop the signal. In the same way methods are inherited by derived
+classes, signals may be defined in a base class and they are available to
+derived classes, too.
+
+=head2 Event-driven programming concepts in Gtk
+
+To take advantage of the Gtk module you also need to understand event-driven programming:
+this means that you tell the toolkit to wake your program up whenever
+something interesting happens and then let it wait for the events to happen
+in the so-called main loop (with a call to C<Gtk-E<gt>main()>).
+
+When you tell the library you are interested in an event, you hand it a
+subroutine to be called whenever that event happens. The subroutine
+(often called handler) will receive as arguments the data specific to
+the event (if any) and any additional data you passed in when installing the
+handler. See below for specific examples.
+
+Note that you can use as handler a subroutine name, an anonymous
+subroutine or a subroutine reference.
+
+There are several events that you may be interested in:
+
+=over 4
+
+=item * Timeout events 
+
+To execute code after a certain amount of time.
+
+	sub handler {
+		my ($data) = @_;
+		# do something here ...
+		# return 1 if you want the handler to be called again later
+		# return 0 to stop the handler from being called again
+		return 0;
+	}
+	my $data = "yadda";
+	# execute handler after 1000 milliseconds
+	my $id = Gtk->timeout_add(1000, \&handler, $data);
+
+You may remove the timeout handler by returning a FALSE value from it or
+at any time by calling 
+
+	Gtk->timeout_remove($id);
+
+where C<$id> is the value returned by the C<Gtk-E<gt>timeout_add()> call.
+
+Note that the first value to the C<Gtk-E<gt>timeout_add()> call is the timeout in
+milliseconds.
+
+=item * Idle events 
+
+To execute code whenever the toolkit is not busy handling other events.
+
+	sub handler {
+		my ($data) = @_;
+		# do something here ...
+		# return 1 if you want the handler to be called again
+		# return 0 to stop the handler from being called again
+		return 0;
+	}
+	my $data = "yadda";
+	# execute handler when there aren't other events to service
+	my $id = Gtk->idle_add(\&handler, $data);
+
+You may remove the idle handler by returning a FALSE value from it or
+at any time by calling 
+
+	Gtk->idle_remove($id);
+
+where C<$id> is the value returned by the C<Gtk-E<gt>idle_add()> call.
+
+=item * I/O events
+
+To execute code when a pipe or socket is ready to be read or written to.
+
+	sub io_handler {
+		my ($socket, $fd, $flags) = @_;
+		# check here $flags to see if the events we are
+		# actually interested in happened.
+		# You probably also need a state machine (represented
+		# here with the $need_read and $need_write scalars).
+		if ($flags->{'read'} && $need_read) {
+			$socket->sysread($buffer, 1024);
+		} elsif ($flags->{'write'} && $need_write) {
+			$socket->syswrite($buffer, length($buffer));
+		}
+	}
+	my $socket = new IO::Socket::INET(PeerAddr => 'www.gtk.org:80');
+	my $id = Gtk::Gdk->input_add($socket->fileno, ['read', 'write'], 
+		\&io_handler, $socket);
+
+You may remove an I/O handler at any time by calling
+
+	Gtk::Gdk->input_remove($id);
+
+where C<$id> is the value returned by the C<Gtk::Gdk-E<gt>input_add()> call.
+
+Note that the I/O handler subroutine gets the additional data as first arguments
+and then the handler-specific data, unlike the other more common signal handlers
+the get the signal-specific data first.
+
+The first argument to input_add() is an integer file descriptor (see the fileno()
+function description in the perlfunc manpage). The second argument is an
+array reference that may contain the 'read', 'write' and/or 'exception' strings
+if you want your handler to be called when you can read or write or when you get
+an exception on the file descriptor, respectively.
+
+=item * Perl scalar changes
+
+To execute code whenever the value of a Perl scalar is changed.
+
+=item * Gtk signals
+
+To execute code when something happens in a Gtk::Object or Gtk::Widget
+(for example when a button is clicked). Every signal may have different signal-specific
+params that are handed over to the signal handler: these are detailed below where
+each specific signal is documented.
+
+	$window = new Gtk::Window;
+	$window->signal_connect('destroy', sub {
+		print "Exiting...\n";
+		Gtk->exit(0);
+	});
+
+=back
+
+=head1 Widget descriptions
+
+=head2 Gtk::Object
+
+Gtk::Object is not really a widget, but it is the base class for Gtk::Widget and provides 
+some useful methods and signals.
+
+	# Get a notification when the object is destroyed
+	$object->signal_connect('destroy', \&do_something);
+
+	# Destroy an object (if it is a widget it will be removed from its parent)
+	$object->destroy;
+
+=head2 Gtk::Widget
+
+Base class for all the widgets in Gtk.
+
+	# show and hide a widget
+	$widget->show();
+	$widget->hide();
+
+=head2 Gtk::Window
+
+	# create a toplevel window
+	$window = new Gtk::Window;
+
+	# set the title
+	$window->set_title("My app - version 1-foo");
+
+	# set the default size
+	$window->set_default_size($width, $height);
+
+	# the window should be managed by the window manager as
+	# a client of $parent_window
+	$window->set_transient_for($parent_window);
+
+	# Set some resizing behavior policy
+	# all the values are boolean
+	$window->set_policy($allow_shrink, $allow_grow, $auto_shrink);
+
+	# Quit the main loop (and possibly exit the program) when
+	# the user closes the window using the window manager
+	$window->signal_connect('delete_event', sub {
+		Gtk->main_quit;
+		return 1;
+	});
+
+=head2 Gtk::Misc
+
+This is a base class for Gtk::Label and Gtk::Pixmap widgets.
+
+	# align the widget in it's allocated space
+	# Values are in the range 0.0 .. 1.0
+	$widget->set_alignment($xalign, $yalign);
+
+	# set the space padding (values in pixel units)
+	$widget->set_padding($xpad, $ypad);
+
+=head2 Gtk::Label
+
+	# create a label
+	$label = new Gtk::Label("Text");
+	
+	# change the text in it (embed newlines to get multi-line labels)
+	$label->set_text("Blah!\nSecond line");
+	
+	# justify the lines when there are multiple lines
+	$label->set_justify('right');
+	
+	# align the label in it's allocated space
+	# this is actually a method in the Gtk::Misc package
+	# Values are in the range 0.0 .. 1.0
+	$label->set_alignment($xalign, $yalign);
+
+=head2 Gtk::Entry
+
+A single line text entry widget.
+
+	# create a single line text entry
+	$entry = new Gtk::Entry;
+
+	# set the content
+	$entry->set_text("Hello world");
+
+	# get the content of the entry
+	$text = $entry->get_text;
+
+	# hide the text (useful for password entry)
+	$entry->set_visibility(0);
+
+	# do not allow the user to edit the text
+	$entry->set_editable(0);
+
+=head2 Gtk::Combo
+
+A text entry with a drop down list. This is a compound widget that contains
+a Gtk::Entry (C<$combo-E<gt>entry>) and a Gtk::List (C<$combo-E<gt>list>).
+
+	# create a combo box
+	$combo = new Gtk::Combo;
+
+	# set the string to show in the list
+	$combo->set_popdown_strings(qw(apples oranges bananas));
+
+	# get a notification when the value changes
+	$combo->entry->signal_conenct('changed', sub {
+		my $entry = shift;
+		warn "The text is: ", $entry->get_text, "\n";
+	});
+
+=head2 Gtk::Button
+
+This is a container, but usually it contains just a Gtk::Label, so, if
+you pass a string to the Gtk::Button::new() constructor it will also
+create a label in it with that text, otherwise you will have to create your 
+own widget (maybe a Gtk::Pixmap) and add that to the button later.
+
+	# create a button with a label
+	$button = new Gtk::Button("Ok");
+	
+	# create a button and later add a Gtk::Pixmap widget to it
+	$button = new Gtk::Button;
+	$button->add($pixmap_widget);
+
+	# connect to the "clicked" signal
+	$button->signal_connect("clicked", sub {
+		print "Hello world\n";
+	});
+
+	# do something with the child widget
+	$widget = $button->child;
+
+=head2 Gtk::Frame
+
+A simple container that adds a frame (and optionally a label) around its child.
+
+	# create a frame
+	$frame = new Gtk::Frame("Preferences");
+
+	#
+	$frame->set_shadow_type();
+	
+=head2 Gtk::Table
+
+	# create a table
+	$table = new Gtk::Table($rows, $columns, $homogeneous);
+	
+	# add the child widget (in column $top_attach and row $left_attach)
+	# note that the widget can span multiple rows and columns if
+	# $right_attach-$left_attach or $bottom_attach-$top_attach are
+	# different from 1
+	$table->attach_defaults($child, $left_attach, $right_attach, 
+							$top_attach, $bottom_attach);
+
+=head1 Recipes
+
+=head2 A Splash Screen
+
+B<Problem:>
+
+You want to create a splash page for your Gtk-Perl application.
+
+B<Solution:>
+
+Create a toplevel window, and use it as your splash page.
+
+	sub splash {
+
+		my ($splash, $pixmap ,$xpm, $splashimage $vbox );
+
+		$splash = new Gtk::Window();
+		$pixmap =
+			Gtk::Gdk::Pixmap->create_from_xpm($splash-window,
+				$splash->style->bg('normal'),
+		$xpm = "splash.xpm");
+		$splashimage = new Gtk::Pixmap($p,$xpm);
+
+		# must realize the window to access it
+		$splash->realize();
+
+		$splash->set_position('center');
+		$splash->window->set_decorations(0);
+		$splash->{$vbox} = new Gtk::VBox(0,0);
+		$splash->{'statusbar'} = new Gtk::Statusbar;
+		$splash->add($splash->{$vbox});
+		$splash->{$vbox}->pack_start($splashimage,0,0,0);
+
+		$splash->showall();
+
+		while (Gtk->events_pending) {
+			Gtk->main_iteration
+		}
+		return $splash;
+	}
+
+	sub app_init {
+		my $splash = splash();
+		$splash->{'statusbar'->push(1,"Doing Something ...");
+
+		while (Gtk->events_pending) {
+			Gtk->main_iteration
+		}
+
+		do_something();
+
+		$splash->{'statusbar'}->push(1,"Doing Something Else ...");
+
+		while (Gtk->events_pending) {
+			Gtk->main_iteration
+		}
+
+		do_something_else();
+
+		while (Gtk->events_pending) {
+			Gtk->main_iteration
+		}
+
+		$splash->{'statusbar'}->push(1,"Creating main window ...");
+		init_main_window();
+		$splash->set_transient_for($main_window);
+		while (Gtk->events_pending) {
+			Gtk->main_iteration
+		}
+
+		$splash->destroy();
+	}
+
+B<Discussion:>
+
+By creating a top level window, and loading it with a pixmap (the
+splash image) and a status bar, you've created a splash page.  You can
+then write updates to the status bar as you do things.
+
+When you're done initializing, you can create the main window then
+delete the splash page.
+
+=head2 Validating input in a text entry
+
+B<Problem:>
+
+You want to restrict the characters inserted in a text entry field to a
+set of valid ones.
+
+B<Solution:>
+
+Connect to the C<text-insert> signal, check the text for invalid characters
+and insert only the valid ones.
+
+	use Gtk -init;
+
+	my $window = new Gtk::Window;
+	$window->signal_connect('destroy', sub {Gtk->main_quit});
+	my $entry = new Gtk::Entry;
+	# we store the signal connection id in the entry for later
+	$entry->{signalid} = $entry->signal_connect (
+		insert_text => \&validate);
+	$window->add($entry);
+	$window->show_all;
+	Gtk->main;
+
+	# We allow only uppercase characters in the entry
+	sub validate {
+		my ($entry, $text, $len, $pos) = @_;
+		my $newtext = uc $text;
+		$newtext =~ s/[^A-Z]//g;
+		if (length($newtext)) {
+			# we temporarily block this handler to avoid recursion
+			$entry->signal_handler_block($entry->{signalid});
+			$pos = $entry->insert_text($newtext, $pos);
+			$entry->signal_handler_unblock($entry->{signalid});
+		}
+		# we already inserted the text if it was valid: no need
+		# for the entry to process this signal emission
+		$entry->signal_emit_stop_by_name('insert-text');
+		# return the new position of the cursor here
+		$pos;
+	}
+
+
+=head1 AUTHOR
+
+Paolo Molaro

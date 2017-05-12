@@ -1,0 +1,49 @@
+[% BLOCK shortlog_table_headfoot %]
+[% SET cell = type == 'head' ? 'th' : 'td' %]
+<tr>
+	<[% cell %] colspan="2"><a href="" class="compare-link">Compare</a></[% cell %]>
+	<[% cell %]>ID (sha1)</[% cell %]>
+	<[% cell %]>Last change</[% cell %]>
+	<[% cell %]>Message</[% cell %]>
+	<[% cell %]>By</[% cell %]>
+	<[% cell %]>Actions</[% cell %]>
+</tr>
+[% END %]
+
+<form id="compare-form">
+<table class='listing'>
+<thead>[% PROCESS shortlog_table_headfoot type = 'head' %]</thead>
+<tbody>
+ [% FOREACH line IN log_lines %]
+ <tr [% "class='invert'" IF loop.count % 2 %]>
+ 	<td><input type="radio" name="sha1_a" value="[% line.sha1 %]" [% "checked" IF loop.count == 1 %] /></td>
+	<td><input type="radio" name="sha1_b" value="[% line.sha1 %]" [% "checked" IF loop.count == 2 %]/></td>
+	<td class='sha1' title='[% line.sha1 %]'>[% INCLUDE 'inc/chroma_hash.tt2' sha1 = line.sha1.substr(0, 7) %]</td>
+	<td class='time-since' title='[% line.authored_time %]'>[% time_since(line.authored_time) %]</td>
+	<td><p class='commit-message'>[%-
+        IF longlogformat;
+          line.comment | html;
+	ELSE;
+          short_cmt(line.comment) | html;
+
+        END;
+	-%]</p>[% INCLUDE '_refs.tt2' object = line %]</td>
+	<td class='author'>[% INCLUDE 'inc/gravatar.tt2' email = line.author.email %][% line.author.name | html %]</td>
+	<td class='action-list'>
+ 		<a href="[% c.uri_for_action("/ref/commit", [Repository.name, line.sha1]) %]" title="Commit details" class="button commit">commit</a>
+ 		<a href="[% c.uri_for_action("/ref/diff_fancy", [Repository.name, line.sha1]) %]" title="Commit difference" class="button diff">commitdiff</a>
+ 		<a href="[% c.uri_for_action("/ref/tree", [Repository.name, line.sha1]) %]" title="Tree" class="button tree">tree</a>
+	</td>
+</tr>
+[% END %]
+<tr>
+	<td colspan="2"><a href="" class="compare-link">Compare</a></td>
+	<td colspan="5"></td>
+</tr>
+</tbody>
+</table>
+</form>
+
+<span id="diff-uri" class="js-data">[% c.uri_for_action('/ref/diff_fancy', [Repository.name, 'HEAD']) %]</span>
+
+[% INCLUDE 'inc/log_pager.tt2' %]

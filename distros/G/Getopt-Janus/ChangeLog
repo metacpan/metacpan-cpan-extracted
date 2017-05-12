@@ -1,0 +1,23 @@
+# ChangeLog for Getopt::Janus dist   # Time-stamp: "2003-06-09 02:06:58 ADT"
+
+2003-06-09  Sean M. Burke <sburke@cpan.org>
+        * Release 1.03 -- moderate changes
+	* No changes to the basic API, but some minor changes to internal
+	methods relating to the Review Output screen.
+	* Change in appearance of Review Output (Tk) screen, and added
+	option for copying filespec to clipboard.
+	(The cosmetic change is that the actions are on a "Menubutton"
+	widget now, and take effect upon clicking, instead of the old
+	system, which was Checkboxes that controlled what actions happened
+	when you hit "OK.")
+	
+2003-06-07  Sean M. Burke <sburke@cpan.org>
+        * Release 1.02 -- bugfix
+	* Better MacOS X support, thanks to help from Elaine Ashton and
+	Anno Siegel
+	* Fixed a minor bug in prep_option_new_file, relevent only in
+	"Reviewing Output of..." screen when using filenames other than
+	as suggested by "\e"-replacement.
+
+2003-05-10  Sean M. Burke <sburke@cpan.org>
+        * Release 1.01 -- first public release

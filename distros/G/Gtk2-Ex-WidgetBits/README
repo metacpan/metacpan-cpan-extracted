@@ -1,0 +1,61 @@
+Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+
+This file is part of Gtk2-Ex-WidgetBits.
+
+Gtk2-Ex-WidgetBits is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Gtk2-Ex-WidgetBits is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-WidgetBits.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+This is some helpers for working with Gtk2 widgets and stuff.
+
+* Gtk2::Ex::WidgetBits -- misc funcs
+* Gtk2::Ex::AdjustmentBits -- misc funcs
+* Gtk2::Ex::ContainerBits -- misc funcs
+* Gtk2::Ex::EntryBits -- misc funcs
+* Gtk2::Ex::GdkBits -- misc funcs
+* Gtk2::Ex::MenuBits -- misc funcs
+* Gtk2::Ex::PixbufBits -- misc funcs
+* Gtk2::Ex::TextBufferBits -- misc funcs
+* Gtk2::Ex::ToolbarBits -- misc funcs
+* Gtk2::Ex::TreeModelBits -- misc funcs
+* Gtk2::Ex::TreeViewBits -- misc funcs
+
+* Gtk2::Ex::ActionTooltips -- action tooltips on menu items
+
+* Gtk2::Ex::KeySnooper -- oop style key snooper hook
+
+* Gtk2::Ex::Statusbar::DynamicContext - re-use context IDs and strings
+
+* Gtk2::Ex::Statusbar::MessageUntilKey - message displayed until keypress
+
+* Gtk2::Ex::SyncCall -- callback after X server sync
+
+* Gtk2::Ex::TreeModelFilter::Change -- propagate insert etc to child model
+
+* Gtk2::Ex::ToolItem::CheckButton -- item with CheckButton
+* Gtk2::Ex::ToolItem::OverflowToDialog -- item overflowing to a dialog
+
+* Gtk2::Ex::Units -- widget sizes in units like "em" or "ex"
+
+* Gtk2::Ex::WidgetEvents -- adding and removing widget event mask bits
+
+* Test::Weaken::Gtk2 -- helpers for Test::Weaken
+
+* Test::Without::Gtk2Things -- pretend to lack some features
+
+
+The prerequisites are Gtk2-Perl, Glib-Ex-ObjectBits and Scope::Guard.
+The WidgetBits home page is
+
+  http://user42.tuxfamily.org/gtk2-ex-widgetbits/index.html

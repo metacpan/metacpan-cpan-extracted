@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Geo-Cache
+version:             0.11
+abstract:            Classes for dealing with GeoCaches and the related data files.
+license:             ~
+author:              
+    - Rich Bowen (rbowen@rcbowen.com)
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Test::More:                    0
+    Time::CTime:                   0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

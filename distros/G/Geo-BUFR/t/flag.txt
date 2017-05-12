@@ -1,0 +1,4 @@
+=> bit 1 set: surface
+=> bit 5 set: significant temperature level
+=> bit 6 set: significant humidity level
+=> bit 7 set: significant wind level

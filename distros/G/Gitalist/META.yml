@@ -1,0 +1,140 @@
+---
+abstract: 'A modern git web viewer'
+author:
+  - 'AND COPYRIGHT'
+  - 'Dan Brook <broq@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Exception: 0.31
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gpl2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gitalist
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Gitalist:
+    file: lib/Gitalist.pm
+    version: 0.005001
+  Gitalist::ActionRole::FilenameArgs:
+    file: lib/Gitalist/ActionRole/FilenameArgs.pm
+  Gitalist::ContentMangler::Resolver:
+    file: lib/Gitalist/ContentMangler/Resolver.pm
+  Gitalist::ContentMangler::Resolver::Default:
+    file: lib/Gitalist/ContentMangler/Resolver/Default.pm
+  Gitalist::ContentMangler::Transformer::SyntaxHighlight:
+    file: lib/Gitalist/ContentMangler/Transformer/SyntaxHighlight.pm
+  Gitalist::Controller:
+    file: lib/Gitalist/Controller.pm
+  Gitalist::Controller::Fragment:
+    file: lib/Gitalist/Controller/Fragment.pm
+  Gitalist::Controller::Fragment::Ref:
+    file: lib/Gitalist/Controller/Fragment/Ref.pm
+  Gitalist::Controller::Fragment::Repository:
+    file: lib/Gitalist/Controller/Fragment/Repository.pm
+  Gitalist::Controller::LegacyURI:
+    file: lib/Gitalist/Controller/LegacyURI.pm
+  Gitalist::Controller::OPML:
+    file: lib/Gitalist/Controller/OPML.pm
+  Gitalist::Controller::Ref:
+    file: lib/Gitalist/Controller/Ref.pm
+  Gitalist::Controller::Repository:
+    file: lib/Gitalist/Controller/Repository.pm
+  Gitalist::Controller::Root:
+    file: lib/Gitalist/Controller/Root.pm
+  Gitalist::Git::CollectionOfRepositories:
+    file: lib/Gitalist/Git/CollectionOfRepositories.pm
+  Gitalist::Git::CollectionOfRepositories::FromDirectory:
+    file: lib/Gitalist/Git/CollectionOfRepositories/FromDirectory.pm
+  Gitalist::Git::CollectionOfRepositories::FromDirectory::WhiteList:
+    file: lib/Gitalist/Git/CollectionOfRepositories/FromDirectory/WhiteList.pm
+  Gitalist::Git::CollectionOfRepositories::FromDirectoryRecursive:
+    file: lib/Gitalist/Git/CollectionOfRepositories/FromDirectoryRecursive.pm
+  Gitalist::Git::CollectionOfRepositories::FromListOfDirectories:
+    file: lib/Gitalist/Git/CollectionOfRepositories/FromListOfDirectories.pm
+  Gitalist::Git::CollectionOfRepositories::Role::Context:
+    file: lib/Gitalist/Git/CollectionOfRepositories/Role/Context.pm
+  Gitalist::Git::CollectionOfRepositories::Vhost:
+    file: lib/Gitalist/Git/CollectionOfRepositories/Vhost.pm
+  Gitalist::Git::CollectionOfRepositoriesWithRequestState:
+    file: lib/Gitalist/Git/CollectionOfRepositoriesWithRequestState.pm
+  Gitalist::Git::Types:
+    file: lib/Gitalist/Git/Types.pm
+  Gitalist::Model::CollectionOfRepos:
+    file: lib/Gitalist/Model/CollectionOfRepos.pm
+  Gitalist::Model::ContentMangler:
+    file: lib/Gitalist/Model/ContentMangler.pm
+  Gitalist::TraitFor::Script:
+    file: lib/Gitalist/TraitFor/Script.pm
+  Gitalist::TraitFor::Script::FastCGI:
+    file: lib/Gitalist/TraitFor/Script/FastCGI.pm
+  Gitalist::URIStructure::Fragment::WithLog:
+    file: lib/Gitalist/URIStructure/Fragment/WithLog.pm
+  Gitalist::URIStructure::Ref:
+    file: lib/Gitalist/URIStructure/Ref.pm
+  Gitalist::URIStructure::Repository:
+    file: lib/Gitalist/URIStructure/Repository.pm
+  Gitalist::URIStructure::WithLog:
+    file: lib/Gitalist/URIStructure/WithLog.pm
+  Gitalist::Utils:
+    file: lib/Gitalist/Utils.pm
+  Gitalist::View::Default:
+    file: lib/Gitalist/View/Default.pm
+  Gitalist::View::SyntaxHighlight:
+    file: lib/Gitalist/View/SyntaxHighlight.pm
+requires:
+  CGI: 0
+  Catalyst::Action::REST: 0
+  Catalyst::Action::RenderView: 0
+  Catalyst::Component::InstancePerContext: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::StackTrace: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::Plugin::SubRequest: 0.15
+  Catalyst::Plugin::Unicode::Encoding: 0
+  Catalyst::Runtime: 5.90013
+  Catalyst::View::Component::SubInclude: 0.07
+  Catalyst::View::TT: 0.34
+  Class::Load: 0.20
+  Config::General: 0
+  DateTime: 0
+  File::Copy::Recursive: 0
+  File::Type: 0
+  File::Type::WebImages: 0
+  Git::Gitalist: 0.000002
+  HTML::Entities: 0
+  IPC::Run: 0
+  JSON: 0
+  JSON::XS: 0
+  Moose: 0
+  Moose::Autobox: 0
+  MooseX::Declare: 0.32
+  MooseX::Storage: 0
+  MooseX::Types: 0
+  MooseX::Types::Common: 0
+  MooseX::Types::DateTime: 0.05
+  MooseX::Types::LoadableClass: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0.17
+  Syntax::Highlight::Engine::Kate: 0
+  Sys::Hostname: 0
+  Template: 2.22
+  Template::Plugin::Cycle: 0
+  Template::Plugin::UTF8Decode: 0
+  Try::Tiny: 0
+  aliased: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Gitalist
+  license: http://opensource.org/licenses/gpl-2.0.php
+  repository: git://git.shadowcat.co.uk/catagits/Gitalist.git
+version: 0.005001

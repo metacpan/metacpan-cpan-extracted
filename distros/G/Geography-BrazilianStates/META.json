@@ -1,0 +1,76 @@
+{
+   "abstract" : "get information of Brazilian States",
+   "author" : [
+      "@sophia.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geography-BrazilianStates",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Geography::BrazilianStates" : {
+         "file" : "lib/Geography/BrazilianStates.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yuzoiwasaki/Geography-BrazilianStates/issues"
+      },
+      "homepage" : "https://github.com/yuzoiwasaki/Geography-BrazilianStates",
+      "repository" : {
+         "url" : "git://github.com/yuzoiwasaki/Geography-BrazilianStates.git",
+         "web" : "https://github.com/yuzoiwasaki/Geography-BrazilianStates"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "yuzoiwasaki <a0556017@sophia.jp>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

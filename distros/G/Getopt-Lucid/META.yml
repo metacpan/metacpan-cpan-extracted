@@ -1,0 +1,60 @@
+---
+abstract: 'Clear, readable syntax for command line processing'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  Exception::Class::TryCatch: '1.10'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.62'
+  lib: '0'
+  perl: '5.006'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-Lucid
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Getopt::Lucid:
+    file: lib/Getopt/Lucid.pm
+    version: '1.08'
+  Getopt::Lucid::Exception:
+    file: lib/Getopt/Lucid/Exception.pm
+    version: '1.08'
+requires:
+  Carp: '0'
+  Exception::Class: '1.23'
+  Exporter: '0'
+  Storable: '2.16'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/getopt-lucid/issues
+  homepage: https://github.com/dagolden/getopt-lucid
+  repository: https://github.com/dagolden/getopt-lucid.git
+version: '1.08'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <xdg@xdg.me>'
+  - 'David Precious <davidp@preshweb.co.uk>'
+  - 'James E Keenan <jkeenan@cpan.org>'
+  - 'Kevin McGrath <kmcgrath@cpan.org>'
+  - 'Nova Patch <patch@cpan.org>'
+  - 'Robert Bohne <rbo@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

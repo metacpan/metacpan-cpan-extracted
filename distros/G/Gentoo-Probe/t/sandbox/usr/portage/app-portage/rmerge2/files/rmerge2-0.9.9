@@ -1,0 +1,467 @@
+#!/usr/bin/python
+#
+# rmerge2 is a robust version of "emerge -e" which supports
+# resumption of builds. It was inspired by the original rmerge
+# bash script by Dan Doel <dolio@zoomtown.com> which did basically
+# the same thing (but not quite).
+#
+# Copyright (C) 2002 Bardur Arantsson <bardur@imada.sdu.dk>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# See http://www.gnu.org/copyleft/gpl.html for further information.
+#
+
+VERSION = "0.9.9"
+
+# system configuration (there should be no need to change these)
+STATEDIR="/var/lib/rmerge2"
+EMERGE="/usr/bin/emerge"
+
+# default option values (DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING)
+opt_empty = 0
+opt_pretend = 0
+opt_skip = 0
+opt_resume = 1
+opt_force = 0
+opt_quiet = 0
+opt_statefile = None
+
+# This is an option which is purely for testing.
+# It causes merge_pkg to not do anything dangerous,
+# and in addition randomly fail emerge runs. Useful
+# for testing if resumption of builds works properly.
+opt_test = 0
+
+#
+# Start of the actual code
+#
+import getopt
+import os
+import md5
+import re
+import whrandom
+from popen2 import *
+import cPickle
+pickle = cPickle
+import portage
+
+# read portage configuration to avoid relying on
+# the environment
+portage_config = portage.config()
+
+# fatal error
+def fatal(message):
+    os.sys.stderr.write("rmerge2: %s\n" % (message,))
+    os.sys.stderr.flush()
+    os.sys.exit(1)
+
+class MergeError(Exception):
+    pass
+
+class State:
+    """The state object represents the state of the
+    compilation. It is pickled/unpickled to preserve
+    state information across invocations."""
+
+    def __init__(self, todo, _failed = [], skipped = []):
+        """Create an initially empty state."""
+        self.todo = todo
+        self._failed = _failed
+        self.skipped = skipped
+
+    def skip(self, n):
+        """Skip n packages."""
+        self.skipped.extend(self.todo[:n])
+        self.todo = self.todo[n:]
+
+    def any_left(self):
+        """Are there any packages left to do?"""
+        return len(self.todo) != 0
+
+    def get_next(self):
+        """Return the next package from the to do list."""
+        return self.todo[0]
+
+    def get_failed(self):
+        """Return the list of failed packages."""
+        return self._failed
+
+    def get_todo(self):
+        """Return the list of packages left to do."""
+        return self.todo
+
+    def done(self):
+        """Mark the first package as done."""
+        del self.todo[0]
+
+    def failed(self):
+        """The current package failed (completely)."""
+        self._failed.append(self.todo[0])
+        del self.todo[0]
+
+    def dump(self, fname):
+        """Write state to file named fname in a crashproof way."""
+        f = open("%s.tmp" % fname,"w")
+        try:
+            pickle.dump(self, f)
+            os.rename("%s.tmp" % fname, fname)
+        except:
+            os.unlink("%s.tmp" % fname) # don't need anymore
+            raise
+
+def load_state(fname):
+    return pickle.load(open(fname,"r"))
+
+def split_pkgname(pkgname):
+    """Chops off the version number and returns a tuple
+    of (basename, version) for the given package name."""
+    x = portage.pkgsplit(pkgname)
+    if not x:
+        return (pkgname,None)
+    elif x[2]=="r0":
+        return (x[0], x[1])
+    else:
+        return (x[0],"-".join(x[1:3]))
+
+def get_state_filename(pkgnames, create=1):
+    """Compute the status directory name for the
+    given list of packages."""
+    if opt_statefile:
+        return opt_statefile
+    else:
+        # Generate a state file name if none is given
+        pkgnames = pkgnames[:] # sorting is destructive
+        pkgnames.sort() # we want to ignore ordering
+
+        # hash each of the package names
+        h = md5.new()
+        for pkgname in pkgnames:
+            h.update(pkgname.strip())
+
+        return os.path.join(STATEDIR,h.hexdigest())
+
+def get_prereqs(pkgnames):
+    """Compute prerequisite packages for the given packages and
+    return the list. The list contains full package names (category,
+    package name and version number). If opt_empty is NOT set,
+    only packages which were originally listed are returned. However,
+    this is still useful for determining the proper ordering of those
+    packages."""
+    if not opt_empty:
+        # build a dictionary of package names for quick lookup.
+        # this is used to determine if we should merge a given
+        # package. this is a very crude way of doing this, but
+        # portage doesn't allow us to find out (inexpensively)
+        # whether a given package is part of another which is
+        # really what we need if pkgnames contains virtual
+        # packages. Oh, well.
+        pkgnames_dict = {}
+        for pkgname in pkgnames:
+            pkgnames_dict[pkgname] = None # value doesn't matter
+
+    # If any input packages contain version numbers, we should
+    # repesct them. Do this by adding a '=' in front so that
+    # emerge knows that we want a specific version
+    qpkgnames = pkgnames[:] # copy to avoid overwriting
+    for i in xrange(0,len(pkgnames)):
+        pkgname = pkgnames[i]
+        if split_pkgname(pkgname)[1]!=None: # fixed version?
+            qpkgnames[i] = ("=%s" % pkgname)
+
+    # Evil hack to retrieve list of package names (and versions)
+    r = re.compile("\\[ebuild......\\]\\s+([^\\s]+)")
+
+    # Use emerge to get the canonical package list.
+    # NOTE: If "-e" is not present, emerge will not
+    # compute interdependencies between packages properly
+    emerge = Popen3([EMERGE,"-p","-e"] + qpkgnames)
+    prereqs = [] # current list of prerequisite packages
+    lines = emerge.fromchild.readlines()
+    for line in lines:
+        m = r.match(line)
+        if m:
+            if not opt_empty: # only want requested packages to be merged?
+                # full package name(s)
+                fpkgname = m.group(1)
+                fpkgname_nocat = fpkgname.split("/")[1] # without category
+                # get base name of package
+                pkgname = split_pkgname(fpkgname)[0]
+                pkgname_nocat = pkgname.split("/")[1] # without category
+                if not fpkgname in pkgnames_dict and \
+                   not fpkgname_nocat in pkgnames_dict and \
+                   not pkgname in pkgnames_dict and \
+                   not pkgname_nocat in pkgnames_dict:
+                    continue # move on to next package
+            # append package to list of prereqs
+            prereqs.append(m.group(1))
+
+    # status?
+    status = emerge.wait()
+    if not (os.WIFEXITED(status) and os.WEXITSTATUS(status)==0):
+        os.sys.stderr.write("emerge output:\n\n")
+        os.sys.stderr.writelines(lines)
+        fatal("emerge returned bad exit status. cannot continue.")
+
+    return prereqs
+
+def merge_pkg(pkgname):
+    """This function merges a single package. The package name
+    must be given as a full package name, i.e. with a category
+    and version number."""
+    if opt_test:
+        if whrandom.choice([0,1,1]): # "fail" random packages
+            pass # fake successful merge
+        else:
+            raise MergeError("Fake merge error")
+    else:
+        print "Merging %s..." % pkgname
+        os.sys.stdout.flush()
+        # This is a bit more complicated than using Popen,
+        # but we really don't have any choice if we want
+        # to "forward" the output
+        pid = os.fork()
+        if pid==0: # child?
+            if opt_quiet:
+                try: # pipe to the great void
+                    devnull = open("/dev/null","w")
+                    os.dup2(devnull.fileno(),0)
+                    os.dup2(devnull.fileno(),1)
+                    devnull.close()
+                except os.error,e:
+                    pass # not that important
+            os.execv(EMERGE,[EMERGE,"--oneshot","=%s" % pkgname])
+            fatal("execv() failed: cannot continue")
+
+        # wait for emerge to finish
+        try:
+            status = os.waitpid(pid,0)[1]
+        except os.error,e:
+            status = 0 # child finished already?
+        # abnormal exit?
+        if not (os.WIFEXITED(status) and os.WEXITSTATUS(status)==0):
+            raise MergeError("Failed to merge %s..." % pkgname)
+
+def merge_pkgs(pkgnames):
+    """Merge given packages using emerge. The input list of package names
+    contains package names *without* version numbers. This function
+    maintains state between each merge to avoid having to remerge
+    previously merged packages."""
+
+    # state file
+    state_filename = get_state_filename(pkgnames)
+
+    # start environment (note that the current environment
+    # overrides Portage variables as usual).
+    start_env = { "CFLAGS" : os.environ.get("CFLAGS",
+                                            portage_config["CFLAGS"]),
+                  "CXXFLAGS" : os.environ.get("CXXFLAGS",
+                                              portage_config["CXXFLAGS"]) }
+    
+    # environment to use when a package fails to merge
+    BCFLAGS = os.environ.get("BCFLAGS",None)
+    if BCFLAGS==None and portage_config.has_key("BCFLAGS"):
+        BCFLAGS=portage_config["BCFLAGS"]
+        
+    BCXXFLAGS = os.environ.get("BCXXFLAGS",None)
+    if BCXXFLAGS==None and portage_config.has_key("BCXXFLAGS"):
+        BCXXFLAGS=portage_config["BCXXFLAGS"]
+
+    # backup environment to use when emerge fails
+    if BCFLAGS==None and BCXXFLAGS==None:
+        backup_env = None
+    elif BCFLAGS!=None and BCXXFLAGS!=None:
+        backup_env = { "CFLAGS": BCFLAGS, "CXXFLAGS": BCXXFLAGS }
+    else:
+        raise MergeError("Must either set both BCFLAGS and BCXXFLAGS or neither.")
+
+    # if we want to continue and a saved state exists
+    if opt_resume and os.path.exists(state_filename):
+        state = load_state(state_filename)
+    elif len(pkgnames)==0:
+        raise getopt.error("Please specify at least one package name.","")
+    else:
+        state = State(get_prereqs(pkgnames))
+
+    # skip opt_skip packages
+    state.skip(opt_skip)
+
+    # if we're just pretending, display
+    # a list of packages that would be merged
+    if opt_pretend:
+        print "I would merge the following packages (in order):\n\n"
+        print "\n".join(state.get_todo())
+    else:
+        # merge each package in turn
+        while state.any_left():
+            # get the name of the first package left to do
+            pkgname = state.get_next()
+            tries=0 # how many times have we tried this package?
+            while (tries <= 1):
+                try:
+                    # merge and restore original flags
+                    try:
+                        merge_pkg(pkgname)
+                    finally:
+                        os.environ.update(start_env)
+                    # update the list of packages left to do.
+                    state.done()
+                    break # stop trying this package
+                except MergeError,e:
+                    # Don't retry unless there is a backup_env
+                    if (tries == 0) and backup_env:
+                        # Let's retry with different flags
+                        tries += 1
+                        os.environ.update(backup_env)
+                    else:
+                        if opt_force:
+                            state.failed() # register failure and continue
+                            tries += 1
+                        else:
+                            raise # give up
+            # dump state each time through the loop
+            state.dump(state_filename)
+
+        # list the packages that failed to merge
+        if len(state.get_failed())>0:
+            print
+            print "The following packages failed to merge:"
+            print
+            print "\n".join(state.get_failed())
+
+#
+# Main program
+#
+try:
+    # parse options
+    opts,args = getopt.getopt(os.sys.argv[1:],"epsfqV",
+                              ["emptytree","pretend","skip=","scratch",
+                               "force","quiet","help","statefile=","version"])
+    for (opt,val) in opts:
+        if opt in ["-e","--emptytree"]:
+            opt_empty = 1
+        elif opt in ["-p","--pretend"]:
+            opt_pretend = 1
+        elif opt in ["--skip"]:
+            opt_skip = int(val)
+        elif opt in ["-s","--scratch"]:
+            opt_resume = 0
+        elif opt in ["-f","--force"]:
+            opt_force = 1
+        elif opt in ["-q","--quiet"]:
+            opt_quiet = 1
+        elif opt in ["-h","--help"]:
+            raise getopt.error("",None)
+        elif opt in ["-V","--version"]:
+            print "rmerge2 %s" % (VERSION,)
+            os.sys.exit(0)
+        elif opt in ["--statefile"]:
+            opt_statefile = val
+
+    # anything other than a "pretend" run requires
+    # root privileges.
+    if (not opt_pretend) and (os.getuid() != 0):
+        fatal("root privileges required")
+
+    # merge packages
+    merge_pkgs(args)
+
+except getopt.error,e:
+    # any reason for exception or do we just want
+    # to display usage?
+    if e:
+        print "rmerge2: %s" % (e,)
+        print
+    # print the standard usage
+    print """Usage:
+	
+        rmerge2 [options] package1 ...
+
+Synopsis:
+
+        Robustly merges all the given packages using emerge.
+
+Options:
+
+-h, --help
+        Prints this message.
+
+-e, --emptytree
+        Pretend that no packages (besides glibc) are installed.
+        This will cause all the packages the given package(s)
+        depend on to be remerged. Useful for rebuilding the
+        entire distribution from scratch.
+
+-p, --pretend
+        Do not merge any packages, just display which packages
+        would be merged.
+
+--skip=N
+        Skip the given number of packages. Useful if you are
+        doing a manual merge of a lot of packages and just want
+        to skip a package that is giving you trouble.
+
+-s, --scratch
+        Start a new merge of the given packages from scratch.
+        Forces rmerge2 to ignore any previous progress information.
+        Useful if you want to be absolutely certain that
+        ALL packages are remerged, even after having merged some
+        of them previously. NOTE: This only applies to the given
+        set of packages, you could (in theory at least) have
+        other package batches which could be continued independently
+        of this run.
+
+-f, --force
+        Keep running even after packages fail to merge. The
+        list of packages which failed to merge is displayed
+        at the end of a complete run. Very useful for a
+        completely automated rebuild.
+
+        NOTE: If a package fails to merge with the normal
+        CFLAGS/CXXFLAGS the rmerge2 script will retry merging
+        using BCFLAGS/BCXXFLAGS from your environment or portage
+        configuration files.
+
+-q, --quiet
+        Do not display output from emerge runs. This makes the
+        run almost completely noise-free, but errors from portage
+        will NOT be displayed. Also, watching these compiles can
+        be VERY tedious if the individual packages take a long time
+        to merge.
+
+--statefile=FILENAME
+        Save the program state in this file instead of the standard
+        location (which is determined from package names and versions
+        given on the command line).
+
+-V, --version
+        Show program version.
+
+Examples:
+
+        Remerge all installed packages (except glibc):
+
+                rmerge2 -f -s -e world
+
+        Remerge given packages in the appropriate order
+        (as determined by their dependency lists):
+
+                rmerge2 package1 package2 ...
+
+        Note that this does not work properly on "virtual"
+        packages (e.g. "kde") because of the way portage
+        currently works.
+
+        Remerge given package(s) and all the packages it
+        depend on:
+
+                rmerge2 -e package1 [package2 ...]
+"""

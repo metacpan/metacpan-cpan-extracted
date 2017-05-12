@@ -1,0 +1,9 @@
+Revision history for Geo-Proj-Japan
+
+0.0.2  Mon Feb 04 23:11:00 2008
+       Add Japanese pod
+       Add Test::Base to build_requires
+
+0.0.1  Sun Jan 27 07:19:23 2008
+       Initial release.
+

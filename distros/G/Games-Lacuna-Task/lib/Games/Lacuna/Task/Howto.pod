@@ -1,0 +1,179 @@
+=encoding utf8
+
+=head1 NAME
+
+HOWTO for the Games::Lacuna::Task automation framework
+
+=head1 USERS
+
+After installing Games::Lacuna::Task you need to run C<lacuna_task> once. 
+The programm will guide your through the installation process. After the setup
+is finished you will find a basic configuration file called config.yml in the 
+lacuna directory (Defaults to ~/.lacuna).
+
+The config should have the following format:
+
+ ---
+ connect: 
+    name: "Empire name"         # Required
+    password: "Empire password" # Required
+    api_key: "Api key"          # Optional
+    uri: "Server URL"           # Optional
+ global:
+    # Which tasks should be run (if not provided via commandline options)
+    task:
+      - task1_name
+      - task2_name
+    # Which tasks should be excluded (if not provided via commandline options)
+    exclude:
+      - task2_name
+    # Global task options
+    global_task_opion: ...
+ task1_name:
+   exclude_planet:
+     - Planet A
+     - Planet B
+   task1_option1: 80
+   task1_option2: ...
+ task2_name:
+   task2_option1: 
+     - "some"
+     - "value"
+
+To see which tasks are available type C<lacuna_run help>.
+
+To see options for a specific task type C<lacuna_run TASK --help>.
+
+Once you have a working setup you can start either the C<lacuna_run> or the 
+C<lacuna_task> script. Configure cron to run these tasks regularly. Eg.
+
+    # Run all default tasks every hour
+    0   *    *    *    *     lacuna_task
+    # Collect excavator booty once daily
+    10  8    *    *    *     lacuna_run collect_excavator_booty
+    # Daily empire report
+    20  8    *    *    *     lacuna_run empire_report
+    # Check mining platforms twice daily 
+    30  8,20 *    *    *     lacuna_run mining
+
+=head1 DEVELOPERS
+
+It is easy to create your own tasks. First you need to create a package
+in the C<Games::Lacuna::Task::Action::*> namespace which should inherit from 
+L<Games::Lacuna::Task::Action>.
+
+If your tasks is "planet-centric" you need to implement a C<process_planet>
+method and use the C<Games::Lacuna::Task::Role::PlanetRun> role, otherwise 
+you need to implement the C<run> method. The C<process_planet> method 
+will recieve the planet stats hash as the first argument.
+
+Furthermore your task class has to implement a C<documentation> function
+that returns a short task description string.
+
+If your tasks requires configuration values you can specify moose accessors.
+Accessors should have a documentation string and meaningfull defaults. You
+can add the 'NoGetopt' trait if you do not want to display an accessor in the 
+task info.
+
+Optionall you can set the 'NoAutomatic' class trait, indicating that this task
+should not be run automatically/unatented but requires som sort of
+extra input or human interaction.
+
+ use Moose -traits => 'NoAutomatic';
+
+In your task class you have access to various helper methods that are provided
+by several roles:
+
+=over
+
+=item Games::Lacuna::Task::Role::Client
+
+Basic methods to access the Lacuna API via L<Games::Lacuna::Task::Client>.
+Is always loaded.
+
+=item Games::Lacuna::Task::Role::Logger
+
+Prints log messages. Is always loaded.
+
+=item Games::Lacuna::Task::Role::Helper
+
+Various helper methods. Is always loaded.
+
+=item Games::Lacuna::Task::Role::Stars
+
+Helper methods for working with the star map.
+
+=item Games::Lacuna::Task::Role::Ships
+
+Helper methods for fetching and building ships.
+
+=item Games::Lacuna::Task::Role::Intelligence
+
+Helper methods for working with spies.
+
+=item Games::Lacuna::Task::Role::Notify
+
+Helper methods for sending notification e-mails.
+
+=item Games::Lacuna::Task::Role::Storage
+
+Helper methods for querying the storage
+
+=item Games::Lacuna::Task::Role::Waste
+
+Helper methods for handling waste
+
+=item Games::Lacuna::Task::Role::Building
+
+Helper methods for handling buildings.
+
+=item Games::Lacuna::Task::Role::CommonAttributes
+
+Role providing common attributes used by multiple actions.
+
+=back
+
+Tasks can also be called/embedded/executed directly
+
+ use Games::Lacuna::Task::Action::Archaeology;
+ my $task = Games::Lacuna::Task::Action::Archaeology->new(
+    config_dir      => $path_to_config_dir,       # only needed if client is not provided and if different from default
+    client          => $game_lacuna_task_client,  # will be auto-built if not provided
+    other options ...
+ );
+ $task->execute; # Catches exceptions
+ OR 
+ $task->run; # Does not catch exceptions
+
+=head1 INSTALLING
+
+=head2 From cpan
+
+ # Install cpanmius first (also available as package for debian, fedora, ...)
+ curl -L http://cpanmin.us | perl - App::cpanminus
+ cpanm Games-Lacuna-Task
+
+=head2 From github.com
+
+ git clone git://github.com/maros/Games-Lacuna-Task.git
+ cd Games-Lacuna-Task
+
+Then continue by typing
+
+ perl Build.PL
+ ./Build
+ ./Build test
+ ./Build installdeps
+ ./Build install
+ ./Build clean
+
+Alternatively you can install missing dependencies via cpanminus:
+ 
+ # Install cpanmius first (also available as package for debian, fedora, ...)
+ curl -L http://cpanmin.us | perl - App::cpanminus
+ # Install dependencies via cpanminus
+ cpanm --installdeps .
+ # Install verything via cpanminus
+ cpanm .
+
+=cut

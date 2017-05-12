@@ -1,0 +1,37 @@
+=pod
+
+=head1 SYNOPSIS
+
+test [-h] [-v E<lt>levelE<gt>] ...
+
+=head1 OPTIONS
+
+=head2 C<-h>
+
+Show POD help.
+
+=for getopt 'h'
+
+=head2 C<-v>
+
+Set verbosity level.
+
+=for getopt 'v:'
+
+=head2 C<-s> | C<--server>
+
+Example from Getopt::Long::Descriptive.
+
+=begin getopt
+
+[ 'server|s=s', "the server to connect to"                  ]
+
+=end getopt
+
+=head2 C<-p> | C<--port>
+
+Example from Getopt::Long::Descriptive.
+
+=for getopt [ 'port|p=i',   "the port to connect to", { default => 79 } ]
+
+=cut

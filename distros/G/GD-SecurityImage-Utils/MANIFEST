@@ -1,0 +1,6 @@
+t/00.t
+lib/GD/SecurityImage/Utils.pm
+MANIFEST
+Makefile.PL
+bin/captcha
+META.yml                                 Module meta-data (added by MakeMaker)

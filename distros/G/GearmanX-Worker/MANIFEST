@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+TODO
+README
+lib/GearmanX/Worker.pm
+lib/GearmanX/Client.pm
+lib/GearmanX/Serialization.pm
+t/00-load.t
+t/01-server.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

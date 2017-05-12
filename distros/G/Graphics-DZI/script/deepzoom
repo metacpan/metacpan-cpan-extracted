@@ -1,0 +1,302 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+=pod
+
+=head1 NAME
+
+deepzoom - converting images into the DZI format
+
+=head1 SYNOPSIS
+
+   # everything will be generated in the current directory
+   deepzoom holidays.png
+
+   # creating the relevant files somewhere else
+   deepzoom --path=/var/www/ holidays.jpg
+
+   # also renaming them
+   deepzoom --path=/var/www/ --prefix=vienna holidays.jpg
+
+   # converting a whole album
+   deepzoom day1.jpg day2.jpg day3.jpg ...
+
+   # trying this with a document
+   deepzoom --document=linear page1.png page2.png page3.png ...
+   
+=head1 DESCRIPTION
+
+This program allows to convert one (large) image into a set of specifically designed image tiles, so
+that the image can be viewed with DeepZoom image clients (AJAX or MS SilverLight) with varying
+resolutions. Bootstrap yourself via L<http://en.wikipedia.org/wiki/Deep_Zoom>.
+
+This program accepts image file names on the command line, and generates these tiles at a file
+system location of your choice. It also generates the XML descriptor as file.
+
+=head1 Usage
+
+=head2 Arguments
+
+Arguments are all names of image files. If one of them cannot be read by L<Image::Magick> then the
+program will die.
+
+=head2 Options
+
+Following command line switches are understood:
+
+=cut
+
+my %options;
+
+=over
+
+=item B<prefix> (string, default: file name)
+
+If provided, then the outgoing files (.xml and _files) will be prefixed with this. Otherwise the
+file name is used. In I<document mode> (where all images are part of one larger) the prefix is
+derived from the first image.
+
+=cut
+
+my $prefix;
+$options{'prefix=s'} = \$prefix;
+
+=item B<path> (string, default: current directory)
+
+This option controls where the files are to be generated.
+
+=cut
+
+use Cwd;
+my $path = getcwd . '/';
+$options{'path=s'} = \$path;
+
+=item B<format> (string, default: png)
+
+This controls the format of the image pyramid.
+
+B<NOTE>: TIFF is not yet properly supported, in that each tile currently will be stored into a separate TIFF.
+
+=cut
+
+my $format = 'png';
+$options{'format=s'} = \$format;
+
+=item B<overlap> (integer, default: 4)
+
+This specifies how much the generated tile images will overlap.
+
+=cut
+
+my $overlap = 4;
+$options{'overlap=i'} = \$overlap;
+
+=item B<tilesize> (integer, default: 256)
+
+The smaller the tiles, the more there will be, but the quicker each will load. The default or C<256>
+works well for photos and graphics. For images containing text, a larger tile size is probably
+better.
+
+=cut
+
+my $tilesize = 256;
+$options{'tilesize=i'} = \$tilesize;
+
+=item B<loglevel> (string, default: OFF)
+
+The log level can be set to any of the following values:
+OFF
+FATAL
+ERROR
+WARN
+INFO
+DEBUG
+ALL
+
+=cut
+
+my $loglevel = 'OFF';
+$options{'loglevel=s'} = \$loglevel;
+
+=item B<document> (undef, linear or exponential, default: undef)
+
+In I<document mode> the program will interpret all images as images of pages of a single document. It
+will produce composite images of the first pages (of the document). In I<linear mode> this is pages 1,
+1-4, 1-9, 1-16, in I<exponential mode> this are pages 1, 1-4, 1-16, 1-32, 1-64.
+
+Depending on the resolution within the DeepZoom tiling process the above composites are
+consulted. The overall idea being that at some distance, one only sees the start page of a document,
+and the more you zoom in, the more pages you get to see.
+
+=cut
+
+my $document = undef;
+$options{'document=s'} = \$document;
+
+=item B<stretch> (integer, default: 1)
+
+This integer stretch factor will be applied to the incoming image. It is ok to use if your image
+quality is not that high, but you still want to generate larger pictures. You will see some resizing
+artefacts at high resolutions.
+
+B<NOTE>: Does not work with the document mode (yet).
+
+=cut
+
+my $stretch = 1;
+$options{'stretch=i'} = \$stretch;
+
+=item B<help> 
+
+...does hopefully what you would expect.
+
+=cut
+
+my $help;
+$options{'help|?|man'} = \$help;
+
+=back
+
+=cut
+
+#== here the fun begins ==================================================================
+
+#-- consume the command line options -----------------------------------------------------
+use Getopt::Long;
+if (!GetOptions (%options) || $help) {
+    use Pod::Usage;
+    pod2usage(-exitstatus => 0, -verbose => 2);
+}
+
+#-- Logging ------------------------------------------------------------------------------
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($ERROR);
+our $log = Log::Log4perl->get_logger ("deepzoom");
+$log->level ($loglevel);
+
+
+use File::Path qw(make_path);
+make_path ($path);                                                           # assert path
+
+my @images;
+foreach my $arg (@ARGV) {                                                    # slurp in images from the comment line
+    use Image::Magick;
+    my $image = Image::Magick->new;
+    $image->Read ($arg) && $log->logdie ("something is wrong with '$arg'");  # stop right there
+    push @images, $image;
+}
+
+
+if ($document) {                                                             # document mode tiles the images
+    my $pref;
+    if ($prefix) {
+	$pref = $prefix;
+    } else  {
+	use File::Basename;
+	($pref, undef, undef) = fileparse ($ARGV[0], qr/\.[^.]+$/);
+    }
+
+    use Graphics::DZI::A4;
+    $Graphics::DZI::log    ->level ($loglevel);
+    $Graphics::DZI::A4::log->level ($loglevel);
+    my $dzi = new Graphics::DZI::A4 (A4s      => \@images,
+				     overlap  => $overlap,
+				     tilesize => $tilesize,
+				     path     => $path . $pref . '_files/',
+				     prefix   => $pref,
+				     pack     => $document,
+				     'format' => $format,
+                             );
+
+    $log->info ("writing descriptor to ".$path . $pref . '.xml');
+    use File::Slurp;
+    write_file ($path . $pref . '.xml',
+		$dzi->descriptor
+	);
+    $log->info ("writing tiles to ". $path . $pref . '_files/');
+    $dzi->iterate ();
+
+} else {
+    use List::MoreUtils qw(pairwise);
+    no warnings;
+    my @docs = pairwise {
+	{
+            image => $a,
+	    file  => $b,
+	} } @images, @ARGV;
+
+    foreach my $d (@docs) {
+	my $pref;
+	if ($prefix) {
+	    $pref = $prefix;
+        } else  {
+	    use File::Basename;
+	    ($pref, undef, undef) = fileparse ($d->{file}, qr/\.[^.]+$/);
+	}
+
+	use Graphics::DZI::Files;
+	$Graphics::DZI::log       ->level ($loglevel);
+	$Graphics::DZI::Files::log->level ($loglevel);
+	my $dzi = new Graphics::DZI::Files (image    => $d->{image},
+					    overlap  => $overlap,
+					    tilesize => $tilesize,
+					    scale    => $stretch,
+					    path     => $path . $pref . '_files/',
+					    prefix   => $pref,
+ 					    'format' => $format,
+	    );
+	$log->info ("writing descriptor to ".$path . $pref . '.xml');
+	use File::Slurp;
+	write_file ($path . $pref . '.xml', $dzi->descriptor);
+	$log->info ("writing tiles to ". $path . $pref . '_files/');
+	$dzi->iterate ();
+    }
+}
+
+=head1 PITFALLS
+
+=over
+
+=item You are running out of memory with large maps?
+
+See L<http://www.imagemagick.org/script/resources.php#environment> and
+L<http://kill.devc.at/node/316> .
+
+=item The process takes long time?
+
+Well, that is just so. But one wise thing is to move all newly generated stuff into the target
+location when everything is finished.
+
+=item Should not the package delete files before writing?
+
+I do not think so, Tim. ;-)
+
+=item Tile generation looks fine, but the tiles look completely distorted in the browser?
+
+That happened to me when a PNG image had a "page geometry" which was different from the
+picture geometry. The tiles seem to inherit the page geometry and on the client side things
+get really messed up.
+
+=back
+
+=head1 AUTHOR
+
+Robert Barta, C<< <drrho at cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Robert Barta, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+our $VERSION = '0.03';
+
+__END__
+

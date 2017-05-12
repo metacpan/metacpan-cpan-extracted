@@ -1,0 +1,5 @@
+* SVG -> GVG
+    * Documentation
+    * Handle SVG paths
+    * Inkscape may put the width/height in mm, but the coords on actual shapes 
+      in ux or some other unit. Have fun normalizing them.

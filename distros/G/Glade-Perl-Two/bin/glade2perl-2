@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+package Glade::Two::Generate;
+require 5.000; use strict 'vars', 'refs', 'subs';
+
+my $VERSION = "0.01";
+my $type = 'glade2perl-2';
+
+use lib "/home/dermot/Devel/Glade-Perl-Two";
+use lib "./";
+
+use Glade::Two::Generate;
+
+my $glade_filename = shift;
+my $verbosity = shift;
+
+#===============================================================================
+#==== Documentation
+#===============================================================================
+=pod
+
+=head1 NAME
+
+glade2perl-2 - Builds Gtk2-Perl sources from a Glade-2 file
+
+=head1 SYNOPSIS
+
+ glade2perl-2 MyProject.glade 2;
+
+=head1 DESCRIPTION
+
+This script will read a Glade file (first arg) and generate Gtk-Perl source
+application files for the Glade project. 
+
+This script is called when you click Glade's 'Build' button for a Perl project
+or you can call it directly.
+
+If you do not specify a project file as the first arg, Glade-Perl-Two will work
+on the most recently used file (details kept in the user options file).
+
+Diagnostics are produced if you specify a verbose level as second arg 
+(default level is 0 ie. no messages logged). 
+
+    'verbose'          => 0,   # Turn off diagnostics
+    'verbose'          => 1,   # Errors only
+    'verbose'          => 2,   # Warnings and some diagnostics
+    'verbose'          => 4,   # More diagnostics (you get the idea :)
+    'verbose'          => 10,  # All diagnostics (more than you want)
+
+For a user, probably the most useful verbose level is 2.
+
+To save the diagnostics to disk (default 0 is NO output), you can
+edit the value in glade2perl-2 to change the default verbosity (eg from Glade)
+or you can specify a 2nd arg to glade2perl-2
+if you are calling the script directly.
+
+=cut
+
+#$verbosity ||= 0;
+$verbosity ||= 02;
+
+my $base;
+my $log_file;
+my $project_options_file;
+
+# Tell Glade-Perl-Two to use the default log file name
+$log_file = 'True' if $verbosity;
+
+if ($glade_filename) {
+    $base = $glade_filename;
+
+    # Strip off any suffix (if it exists)
+    $base =~ s/(.+)\..*$/$1/;
+
+    $project_options_file = "$base.$type.xml";
+    # Default $project_options_file is eg 'Example/BusForm.glade2perl-2.xml'
+
+    $log_file = "$base.$type.log" if $verbosity;
+    # Default $log_file is eg 'Example/BusForm.glade2perl-2.log'
+
+} else {
+    $glade_filename = $NOFILE;
+}
+
+use Data::Dumper;
+my $g2p;
+$g2p = __PACKAGE__->new_generator(
+    'diag'      => {
+        'verbose'   => $verbosity,
+        'log'       => $log_file, 
+    },              # Save diagnostics to disk
+    'source'    => {
+        'write'     => 'True',
+    },                  # We DO want source
+    'run_options' => {
+#        'dont_show_UI'  => '0',                      # We DON'T want to show UI
+        'dont_show_UI'  => 'True',                      # We DON'T want to show UI
+        'xml'           => {
+            'options_set'   => $0,                      # glade2perl set the options
+            'project'       => $project_options_file,   # Read/write project_options file
+        },
+    },
+    'glade' => {
+        'file'      => $glade_filename,
+    },
+    'type'  => $type,
+);
+
+$g2p->generate() &&
+
+exit 0; # to return a C or shell type success
+
+1;      # else return a C or shell failure
+
+=head1 SEE ALSO
+
+Glade::Two::Generate(3) Glade::Two::Run(3)
+
+=head1 AUTHOR
+
+Dermot Musgrove <dermot.musgrove@virgin.net>
+
+=cut

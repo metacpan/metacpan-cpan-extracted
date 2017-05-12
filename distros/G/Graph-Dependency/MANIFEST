@@ -1,0 +1,11 @@
+CHANGES
+Makefile.PL
+LICENSE
+MANIFEST
+README
+t/graph.t
+lib/Graph/Dependency.pm
+graph.pl
+scripts/get.pl
+scripts/get_meta.pl
+META.yml                                 Module meta-data (added by MakeMaker)

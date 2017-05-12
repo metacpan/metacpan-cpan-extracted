@@ -1,0 +1,26 @@
+
+
+ Hello folks,
+
+  this is an alpha release of the Geo::E00 module.
+
+  The aim of this module is to allow the user to read
+  E00 files.
+
+  ARC, LAB, PAL, CNT, INFO sections are currently supported.
+
+  Documentation is available right now, you can read
+  the included test.pl program, which tries to convert
+  an E00 file to set of SQL statements, to learn how it works.
+
+  Please be aware that this is an early alpha version
+  so the API is subject to changes.
+
+  Geo::E00 is released under the GPL end its development
+  is funded by Tower Technologies (http://www.towertech.it). 
+
+  Happy hacking!
+
+	Alessandro Zummo <azummo dash e00perl at towertech dot it>
+
+

@@ -1,0 +1,60 @@
+# -*- Mode: Shell-Script -*-
+# gengetopt specification for 'test2'
+
+program "test2"
+program_version "0.01"
+
+purpose	"Test for moogengetopt.perl."
+details "Some details about the program."
+author "Bryan Jurish <examples/config.h>"
+on_reparse "clobber"
+bugs "Is it buggy?"
+
+addenda {
+This addenda section is braced with {} -- they should nest properly.
+}
+
+
+##-- user code
+code { /* This is some test user-code */ }
+
+##-- rc file(s)
+rcfile "/etc/test2rc"
+rcfile "~/test2rc"
+
+##-- arguments
+argument "ARG1" "The first non-option argument"
+
+##-- options
+group "Basic Options"
+funct   "functme"	f	"A funct option"
+flag	"flagme2"	g	"A 'flag2' option"
+toggle	-		x	"A 'toggle' option (with no long name)"
+
+group "Options With Arguments"
+string	"stringme"	s \
+	"A stringy option with an edefault" \
+	edefault="STRINGVAL" \
+	default="my default string value" \
+	details="Some details about the string argument."
+
+string "fileme"  F \
+       "A string option with a named argument." \
+       arg="FILE" \
+       default="file.txt"
+
+int    "verbose" v \
+       "Specify verbosity level" \
+       default="1" \
+       arg="LEVEL" \
+       code={ q( printf("You specified verbose=%d!\n", args_info->verbose_arg); ); }
+
+#      required="1"
+
+float  "floatme" - \
+	"A floating-point argument (no short-option)" \
+	default="1.0" \
+	arg="FLOATARG"
+
+##-- acknowledgements
+acknowledge `cat acknowledge.pod`

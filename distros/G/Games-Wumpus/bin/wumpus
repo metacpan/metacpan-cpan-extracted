@@ -1,0 +1,259 @@
+#!/usr/bin/perl
+
+use 5.010;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+
+use Games::Wumpus;
+use Getopt::Long;
+
+sub prompt;
+sub read_command;
+sub cmd_move;
+sub cmd_shoot;
+sub cmd_help;
+
+GetOptions 'shuffle-names!'  =>  \my $shuffle_names,
+   or die "Failed to parse options";
+
+$shuffle_names //= 0;
+
+our $DEBUG = $ENV {WUMPUS_DEBUG};
+
+my $game = Games::Wumpus -> new -> init (shuffle_names => $shuffle_names);
+
+while (!defined $game -> finished) {
+    print $game -> describe;
+
+    prompt;
+    my ($cmd, @args) = read_command;
+
+    given ($cmd) {
+        when ("Q") {
+            say "Eventually, the Wumpus gets you.";
+            $game -> lose;
+        }
+        when ("M") {
+            cmd_move @args;
+        }
+        when ("S") {
+            cmd_shoot @args;
+        }
+        when (/[H?]/) {
+            cmd_help;
+        }
+        when ("V") {
+            say "Wumpus version $Games::Wumpus::VERSION";
+        }
+        default {
+            say "Unknown command. Type ? for help.";
+        }
+    }
+}
+
+given ($game -> finished) {
+    when (0) {say "You lost the game."; exit 1}
+    when (1) {say "You won the game.";  exit 0}
+    default  {say "Impossible."; exit 255}
+}
+
+
+sub prompt {
+    print "command > ";
+}
+
+sub read_command {
+    my $line = <>;
+    chomp $line;
+    $line =~ s/^\s+//;
+    my ($cmd, @args) = split ' ', $line;
+    $cmd = uc substr $cmd, 0, 1;
+    ($cmd, @args);
+}
+
+sub cmd_move  {
+    my @args = @_;
+    if (@args != 1 || $args [0] !~ /^[0-9]+$/) {
+        say "Usage M <number>";
+    }
+    else {
+        my ($r, @mess) = $game -> move ($args [0]);
+        say for @mess;
+    }
+}
+
+
+sub cmd_shoot {
+    my @args = @_;
+    if (@args < 1 || @args > 5 || grep {$_ !~ /^[0-9]+$/} @args) {
+        say "Usage S <number> {1,5}";
+    }
+    else {
+        my ($r, @mess) = $game -> shoot (@args);
+        say for @mess;
+    }
+}
+
+
+
+
+sub cmd_help  {print <<'--'}
+ Welcome to Hunt the Wumpus!
+
+ You found yourself in a cave system, consisting of rooms, tunnels between
+ the rooms, a Wumpus, bats and bottomless pits. You are equipped with
+ a couple of crooked arrows, and your goal is to shoot the Wumpus before
+ it eats you.
+
+ In each room, you have two options: either you move to an adjacent room,
+ or you shoot an arrow. To move to another room, type 'M', a space, and
+ the room you like to move to (there must be a tunnel from your current
+ room to the room you want to move to). To shoot an arrow, type 'S', a 
+ space, and a list (space separated) of rooms you want to arrow to move
+ through (1-5 rooms). If the arrow hits the Wumpus, you win the game.
+ Otherwise, you may wake up the Wumpus, causing him to move. If he finds
+ you, he'll eat you.
+
+ If you enter a room containing a pit, you fall in the pit and you die.
+ If you enter a room containing a bat, the bat will pick you up, and drop
+ you in a random location. 
+
+ If you are in a room and there's a Wumpus, a pit, or a bat nearby, I'll
+ drop a hint.
+
+ Success!
+--
+
+
+__END__
+
+=head1 NAME
+
+wumpus - Play the Wumpus game.
+
+=head1 SYNOPSIS
+
+  $ wumpus
+  You are in room 2.
+  Tunnels lead to 1 4 6.
+  You have 5 arrows left.
+  command > m 1
+  You are in room 1.
+  Bats nearby!
+  Tunnels lead to 2 12 16.
+  You have 5 arrows left.
+  command > s 16 10
+  Wumpus moves to 6
+  Missed!
+  You are in room 1.
+  Bats nearby!
+  Tunnels lead to 2 12 16.
+  You have 4 arrows left.
+  command >
+
+
+=head1 DESCRIPTION
+
+You are in a cave system, carrying a bow and a set of arrows. A Wumpus 
+hides somewhere in the cave system. It's your task to kill the Wumpus
+before it eats you. 
+
+To kill the Wumpus, you have to move around in the cave system to get
+near the Wumpus, then shoot it with one of your arrows. 
+
+The Wumpus will eat you if you are in the same room as it. The cave system
+also has a number of bottomless pits - you will not survive a fall in a pit.
+Furthermore, a number of large bats live in the cave system. They won't kill
+you, but if you enter a room with a bat, the bat will pick you up, and drop
+you in a random location - which may contain the Wumpus or a pit.
+
+You have the following commands available:
+
+=over 4
+
+=item C<< M <number> >>
+
+This command moves you to the room with the given number. Of course, you
+can only move to a room if there's a tunnel leading to it from your current
+location.
+
+=item C<< S <number> [<number> ...] >>
+
+Shoots an arrow into one or more rooms (up to 5 rooms). All the rooms must
+be connect; if you enter a room number which doesn't form a path, a room
+at random will be choosen. You cannot pick shoot an arrow from one room,
+and then have it fly right back. You win the game if you shoot through the
+room the Wumpus is in. If the arrow flies back into the room you are in,
+you'r dead. Hitting a target (Wumpus or you) immediately stops the flight
+of the arrow. If you run out of arrows without killing the Wumpus, you lose
+the game.
+
+If you shoot an arrow, and don't hit anything, there's a chance the Wumpus
+wakes up and moves to a different location. 
+
+=item C<< Q >>
+
+Quits the game.
+
+=item C<< H >> and C<< ? >>
+
+Displays a help message.
+
+=item C<< V >>
+
+Print version info of the game.
+
+=back
+
+If you are near a hazard (the Wumpus, a pit or a bat), a hint will be dropped.
+
+=head1 BUGS
+
+None currently known.
+
+=head1 TODO
+
+Implement options to allow variations in cave layout and hazard density.
+
+=head1 ACKNOWLEDGEMENTS
+
+Hunt the Wumpus was designed in 1972 by Gregory Yob, and written in BASIC.
+
+=head1 SEE ALSO
+
+L<< http://en.wikipedia.org/wiki/Hunt_the_Wumpus >>
+
+=head1 DEVELOPMENT
+
+The current sources of this module are found on github,
+L<< git://github.com/Abigail/Games--Wumpus.git >>.
+
+=head1 AUTHOR
+
+Abigail, L<< mailto:wumpus@abigail.be >>.
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2009 by Abigail.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),   
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+=cut

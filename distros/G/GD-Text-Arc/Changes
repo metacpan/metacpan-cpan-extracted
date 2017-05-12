@@ -1,0 +1,22 @@
+Revision history for Perl extension GD::Text::Arc.
+
+0.01  Thu Jan 22 13:56:20 2004
+	- original version; created by h2xs 1.21 with options
+		-XA -n GD::Text::Arc
+
+0.02  Thu Mar 4 22:10:01 2004
+    - fixed bugs: 
+      - new() should explicitly call my _init
+      - _init color was set to colorsTotal - 1 (last defined color).
+        This wasn't well defined for true-color GD images, so I set it to 
+        the first defined color, or nearly-black for true-color.
+      - added tests for making a true-color GD image and a default Arc 
+        object.
+      - test comparing get->length() against get_length() turned out
+        to be wrong on Windows- kerning seems to work differently on
+        Windows freetype.  Removed the test because testing kerning
+        wasn't terribly useful anyway.
+    - interface change:
+      - as noted above: default color is now the FIRST defined color
+        for indexed images (instead of the LAST defined color), or 
+        nearly black (0,0,1), for true-color images (instead of undefined).

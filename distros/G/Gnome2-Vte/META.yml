@@ -1,0 +1,44 @@
+--- #YAML:1.0
+name:               Gnome2-Vte
+version:            0.11
+abstract:           Perl interface to the Virtual Terminal Emulation library
+author:
+    - Cairo Perl Team <gtk-perl-list at gnome dot org>
+license:            lgpl_2_1
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    ExtUtils::Depends:    0.20
+    ExtUtils::PkgConfig:  1.03
+    Glib:                 1.01
+    Gtk2:                 1.00
+resources:
+    bugtracker:
+        mailto:  bug-Gnome2-Vte [at] rt.cpan.org
+        web:     http://rt.cpan.org/Public/Dist/Display.html?Name=Gnome2-Vte
+    homepage:       http://gtk2-perl.sourceforge.net
+    license:        http://www.gnu.org/licenses/lgpl-2.1.html
+    repository:
+        type:  git
+        url:   git://git.gnome.org/perl-Gnome2-Vte
+        web:   http://git.gnome.org/browse/perl-Gnome2-Vte
+    x_MailingList:  https://mail.gnome.org/mailman/listinfo/gtk-perl-list
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://search.cpan.org/perldoc?CPAN::Meta::Spec
+    version:  2
+prereqs:
+    configure:
+        requires:
+            ExtUtils::Depends:    0.20
+            ExtUtils::PkgConfig:  1.03
+            Glib:                 1.01
+            Gtk2:                 1.00
+release_status:     stable

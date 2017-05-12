@@ -1,0 +1,12 @@
+ROADMAP Where is Glade::PerlGenerate going?
+
+0.62  Implement any new Glade widgets (eg GnomeDb)
+
+0.64  Glade::Helper GUI options editor and generation control
+
+0.70  Use libxml? Use XML streams or SAX parser ??
+0.71  Some communication with Glade and editor (possibly include a builtin)
+        This depends on Glade offering the control mechanisms
+
+This is only a rough plan so if you have any good ideas or urgent 
+requirements please tell me.

@@ -1,0 +1,32 @@
+
+ Point release 0.5000 of this module (Perl/Gtk+) has been tested with the
+ following Gtk widget sets, with the stated results, as of December 29th,
+ 1998:
+ 
+ Gtk+ 0.99.10 through 1.1.7: success. I've not yet verified that every function
+ of every Gtk+ version is available.
+ 
+ Gtk+ 1.1.8 through Gtk+ 1.1.9: failure, due to Gtk+ not running properly
+ on my system. Compile was fine, and the widget test starts up properly.
+ 
+ Gtk+ 1.1.11: success.
+ 
+ Gtk+ 1.2.0: success.
+
+ Gtk+ 1.2.2: success.
+ 
+ Gnome 0.30 (Bouncing Bonobo): success of the portions that I tried.
+ 
+ Gnome 1.0: success of everything but applet.
+ 
+ Zvt (from Gnome 0.30 & 1.0): success.
+ 
+ XmHTML (from Gnome 0.30 & 1.0): success.
+ 
+ GdkImlib 1.8.1: success.
+ 
+ GtkGLArea 1.1 (with Gtk+ 1.1.5 and Gtk+ 1.1.11): compiled, working, not all of GL bound yet.
+
+
+In addition, this module should has been tested to work with Perl 5.003_07,
+5.004, 5.005, and 5.005_53.

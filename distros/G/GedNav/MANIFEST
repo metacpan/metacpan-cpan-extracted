@@ -1,0 +1,15 @@
+Changes
+GedNav.pm
+GedNav/Event.pm
+GedNav/Family.pm
+GedNav/Individual.pm
+GedNav/Menu.pm
+GedNav/Source.pm
+MANIFEST
+Makefile.PL
+README
+outline.pl
+royal92.ged
+test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

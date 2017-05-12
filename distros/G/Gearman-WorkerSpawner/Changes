@@ -1,0 +1,49 @@
+Revision history for Perl extension Gearman::WorkerSpawner
+2.17  Tue Mar  8 17:37:23 PST 2016
+        - Fix deprecated `defined @array` construct. Thanks @srezic.
+          Closes https://rt.cpan.org/Public/Bug/Display.html?id=112798
+2.16  Fri May  6 16:11:58 PDT 2011
+        - More fixes for fields with newer perls
+2.15  Wed Apr 27 17:11:54 PDT 2011
+        - Work around ithreads leak in perl 5.8
+2.14  Wed Feb 23 12:16:11 PST 2011
+        - Add ->old() for singleton access
+2.13  Thu Jun  3 16:02:18 PDT 2010
+        - Prevent child processes from killing workers
+2.12  Mon May 24 17:51:38 PDT 2010
+        - Fixes for Module::Install
+2.11  Fri Apr 30 16:47:53 PDT 2010
+        - Change $0 a bit sooner
+2.10  Thu Apr 22 16:42:08 PDT 2010
+        - Buffer reads in supervisor to avoid racing
+2.09  Mon Mar 15 17:30:14 PDT 2010
+        - Add run_method_background in sync client
+2.08  Wed Mar  3 11:55:20 PST 2010
+        - Add a modifiable suffix to method names to prevent collisions when switching from Gearman::Worker
+        - Keep @INC in the correct order in workers by copying wholesale from spawner
+2.07  Tue Jan 26 15:31:36 PST 2010
+        - To catch worker compilation failure, notice and bail if supervisors exit uncleanly
+2.06  Mon Jan 25 16:38:57 PST 2010
+        - Add Gearman::WorkerSpawner::BaseWorker::Client
+2.05  Thu Dec 17 17:53:07 PST 2009
+        - Allow ->new(gearmand => ) to take an arrayref
+2.04  Wed Dec 16 19:29:34 PST 2009
+        - Add timeout parameter to ::BaseWorker->register_method
+        - Change marshalling of args and return values to always wrap in an arrayref
+2.03  Wed Nov 18 18:46:33 PST 2009
+        - Add caller_source option to ease putting worker and manager code in the same file
+2.02  Mon Oct 12 18:50:18 PDT 2009
+        - Reset Danga::Socket in auto server to avoid epoll cross-contamination
+2.01  Mon Oct 12 17:36:49 PDT 2009
+        - Rename "external" gearmand parameter to more sensible "auto". Install a SIGCHLD handler for quick reaping.
+2.00  Sun Oct 11 20:30:35 PDT 2009
+        - Rejigger some internals and add Gearman::WorkerSpawner::BaseWorker to alleviate drudgery of writing a worker.
+1.03  Fri Oct  9 14:06:21 PDT 2009
+        - Allow add_taks to take the raw parameters of Gearman::Task->new as a
+          convenience
+1.02  Thu Oct  1 17:30:29 PDT 2009
+        - Add gearmand_pid method
+1.01  Thu Aug 27 01:50:13 PDT 2009
+        - POD fixes
+1.00  Tue Aug 25 16:46:14 PDT 2009
+        - Cpan-ified from svn trunk

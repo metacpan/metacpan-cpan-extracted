@@ -1,0 +1,77 @@
+=head2 crosspost
+
+Limits crossposting and followups.  This module takes, in some ways, the
+opposite approach from the newsgroups module; rather than listing
+newsgroups which are allowed, it allows one to set a limit on the number
+of groups crossposted, on the number of groups to which followups would
+go, and on which groups can be crossposted to or to which followups can be
+directed.
+
+A group can be excluded from the Newsgroups header or from the Followup-To
+header in one of two ways; either messages posted to that group or
+messages that direct followups to a set of newsgroups including that group
+can be rejected, or that group can be silently removed from the Newsgroups
+and/or Followup-To headers.  The latter behavior is generally not
+recommended for robomoderators, since moderators are generally discouraged
+to make decisions about where posts should be posted for the poster.
+Returning the post and asking the poster to choose a more appropriate set
+of groups is generally a better approach.
+
+This module will remove a Followup-To header (and not add one) if its
+content is/would be identical to the Newsgroups header.
+
+This module takes the following configuration directives:
+
+=over 4
+
+=item crosspost max COUNT
+
+Reject any message crossposted to more than C<COUNT> newsgroups.
+
+=item crosspost remove|reject GROUP
+
+Either remove C<GROUP> silently from the Newsgroups header if present or
+reject all articles crossposted to C<GROUP>.
+
+=item followup max COUNT
+
+Reject any messages that would direct followups to more than C<COUNT>
+newsgroups, bearing in mind that if no Followup-To header is present,
+followups would go to all groups in the Newsgroups header.
+
+=item followup remove|reject GROUP
+
+Either remove C<GROUP> silently from the followups if present or reject
+all articles crossposted to C<GROUP>.
+
+=back
+
+This module may return one of the following failure messages:
+
+=over 4
+
+=item Invalid crosspost to %s
+
+The message was crossposted to a group mentioned in a C<crosspost reject>
+directive.
+
+=item Followups would go to %s
+
+Followups to the message would go to a group mentioned in a C<followup
+reject> directive.
+
+=item Excessively crossposted
+
+The message was crossposted to more groups than allowed by a C<crosspost
+max> directive.
+
+=item Followups would go to too many groups
+
+Followups to the message would go to more groups than allowed by a
+C<followup max> directive.
+
+=back
+
+This module works with a Newsgroups header, so if other modules need to be
+applied to construct the Newsgroups header, they should run before this
+one.  This module takes no arguments.

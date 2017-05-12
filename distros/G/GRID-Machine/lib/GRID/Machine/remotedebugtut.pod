@@ -1,0 +1,510 @@
+=head1 NAME
+
+GRID::Machine::remotedebugtut - A simple methodology to debug remote Perl programs with GRID::Machine
+
+=head1 SYNOPSIS 
+
+At the remote machine put C<socat> or C<netcat> to listen in the specified port:
+
+  pp2@nereida:~/doc/book$ ssh beo
+  Linux beowulf ...
+  casiano@beowulf:~$ 
+  casiano@beowulf:~$ socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344,reuseaddr
+
+At the local machine execute the program:
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ synopsis_debug1.pl
+
+The call to the constructor uses the C<debug> option. The debugger output will be forwarded to the specified port:
+
+  my $machine = GRID::Machine->new(
+                  host => $host,
+                  debug => 12344,
+                );
+
+
+=head1 SUMMARY
+
+Debugging a perl program implies to locate and reproduce the problems
+with the added capacity to monitor the execution and have access
+to the internal state of the program. There is a range of tools for that:
+from the humble C<print/warn/die> to the Perl debugger and beyond.
+
+Debugging is hard. Debugging L<GRID::Machine> programs tends to be even harder.
+This is because when several threads/processes/machines intervene,
+the entwine of events depend on more factors:
+may even depend on the speed of the participating processes. 
+
+To debug L<GRID::Machine> programs we will 
+connect to the remote systems over the network and 
+then use the Perl debugger to control the execution and retrieve information about its state.
+
+This tutorial introduces a set of basic techniques to 
+debug L<GRID::Machine> programs.
+
+
+=head1 A SIMPLE EXAMPLE
+
+You can find the full code of the example used along this turorial
+in section L<THE PROGRAM TO DEBUG: FULL CODE>.
+The program starts creating a C<GRID::Machine> SSH connection to a C<host> known as C<beo>
+(lines 8-12):
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ cat -n synopsis_debug1.pl
+     1  #!/usr/local/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4
+     5  my $debugport = $ENV{GMDEBPORT} || 0; # The remote debugger will listen in this port
+     6  my $host = 'beo';        # The machine (symbolic name) to connect. See man ssh_config
+     7
+     8  my $machine = GRID::Machine->new(
+     9                  host => $host,
+    10                  debug => $debugport,
+    11                  uses => [ 'Sys::Hostname' ]
+    12                );
+
+The module L<Sys::Hostname> is loaded into the remote host C<beo> (line 11). Such module provides
+the function C<hostname> that returns a string describing the actual name of the
+machine. This is always convenient since we can identify the source of messages 
+prefixing them with the name of the machine.
+
+The parameters setting the SSH connection C<beo> are described inside 
+the C</home/pp2/.ssh/config> file. This is the paragraph in that file
+containing the section for connection C<beo>:
+
+  pp2@nereida:~/src/perl/GRID_Machine$ cat -n ~/.ssh/config
+     1  # man  ssh_config
+     . ..............
+     5  Host beo beowulf 
+     6  user casiano
+     7  Hostname beowulf.pcg.ull.es
+     8  #ForwardX11 yes
+     9
+    .. ......................
+
+Line 5 defines a set of logical names for this connection: C<beo> and C<beowulf>
+will be accepted as synonyms for C<beowulf.pcg.ull.es>. 
+Line 6 sets the login/user name in the remote machine.
+Line 7 gives the actual internet name or numeric address of the host: C<beowulf.pcg.ull.es>. 
+Line 8 is a comment.  If uncommented it will enable X11 forwarding.
+
+
+The C<debug =E<gt> $debugport> option in the call to the constructor
+
+     8  my $machine = GRID::Machine->new(
+     9                  host => $host,
+    10                  debug => $debugport,
+    11                  uses => [ 'Sys::Hostname' ]
+    12                );
+
+informs to L<GRID::Machine> that the remote Perl interpreter
+must be run with option C<-d> and that the debugger output must be forwarded
+to port C<$debugport>. Assuming the environment variable C<GMDEBPORT>
+was set:
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ export GMDEBPORT=12344
+
+It will produces a C<ssh> connection command similar to this:
+
+  ssh  beo PERLDB_OPTS="RemotePort=localhost:12344" perl -d 
+
+When C<$debugport> does not contain a valid port number or is 0,
+L<GRID::Machine> disables debugging mode. In such case the program will run
+without interruptions:
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ export GMDEBPORT=0
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ synopsis_debug1.pl
+  beowulf: processing row [ 1 2 3 ]
+  beowulf: processing row [ 4 5 6 ]
+  beowulf: processing row [ 7 8 9 ]
+      1    8   27
+     64  125  216
+    343  512  729
+
+Otherwise if a legal port number is provided the output of the perl debugger will be
+forwarded to that port in the remote machine. To make it work a process must
+be listening in such port. See what happens when no process is listening:
+
+  pp2@nereida:~/LGRID_Machine/examples$ export GMDEBPORT=12344
+  pp2@nereida:~/LGRID_Machine/examples$ synopsis_debug1.pl 
+  Debugging with 'ssh  beo PERLDB_OPTS="RemotePort=localhost:12344" perl -d '
+  Remember to run in beo: 'netcat -v -l -p 12344'
+  or 'socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344,reuseaddr'
+
+  Unable to connect to remote host: localhost:12344
+  Compilation failed in require.
+  ....
+  Premature EOF received at /home/pp2/LGRID_Machine/lib/GRID/Machine.pm line 307.
+
+It is therefore necessary to follow the advice and run C<socat> or C<netcat> at C<beo>
+first. Therefore, we open a new terminal and connect to the remote machine:
+
+  pp2@nereida:~/Lbook$ ssh beo
+  Linux beowulf 2.6.15-1-686-smp #2 SMP Mon Mar 6 15:34:50 UTC 2006 i686
+
+  The programs included with the Debian GNU/Linux system are free software;
+  the exact distribution terms for each program are described in the
+  individual files in /usr/share/doc/*/copyright.
+
+  Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+  permitted by applicable law.
+  No mail.
+  Last login: Sat Jun 28 16:48:13 2008 from 213.231.123.148.dyn.user.ono.com
+  casiano@beowulf:~$    
+
+And there we run C<socat> in the remote machine. 
+The program C<socat> provides a wider range of options. The command:
+
+  casiano@beowulf:~$ socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344,reuseaddr
+
+specifies that C<socat> has to listen both to C<STDIN> (using C<READLINE> and providing history
+facilities) and to the TCP port 12344. It will pass data between the two sides, connecting them. 
+The option C<reuseaddr> allows 
+other sockets to bind to the port 12344 
+even if it is already in use.
+
+Alternativaley we can run C<netcat>:
+
+  casiano@beowulf:~$ nc -v -l -p 12344
+  listening on [any] 12344 ...
+
+But then we will not have history edition facilities. Now the execution of the program 
+on the local side produces a message and hangs:
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ GMDEBPORT=12344 synopsis_debug1.pl
+  Debugging with 'ssh  beo PERLDB_OPTS="RemotePort=localhost:12344" perl -d '
+  Remember to run in beo: 'netcat -v -l -p 12344'
+  or 'socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344,reuseaddr'
+
+If we return to the terminal where we ran C<socat/netcat> we can see the remote
+Perl debugger prompt:
+
+  casiano@beowulf:~$ socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344
+
+  Loading DB routines from perl5db.pl version 1.28
+  Editor support available.
+
+  Enter h or `h h' for help, or `man perldebug' for more help.
+
+  GRID::Machine::MakeAccessors::(/home/pp2/src/perl/GRID_Machine/lib/GRID/Machine/MakeAccessors.pm:33):
+  33:     1;
+    DB<1>    
+
+The debugger is now waiting in this terminal for our commands.
+At this point we are in a very early stage of the L<GRID::Machine> 
+algorithm to bootstrap the Perl server on the remote side. A C<c> commands
+the debugger to continue until a predefined L<GRID::Machine> breakpoint:
+
+  DB<1> c
+GRID::Machine::main(/home/pp2/src/perl/GRID_Machine/lib/GRID/Machine/REMOTE.pm:541):
+541:           next unless ($operation eq 'GRID::Machine::CALL' || $operation eq 'GRID::Machine::EVAL');
+  DB<1>   
+
+
+This break point is set by L<GRID::Machine> itself. It indicates that the first stage
+of bootstrapping the Perl server and loading the basic libraries on the remote side
+has finished. Your actual code of L<GRID::Machine> may differ depending on the version, 
+but the important thing is that at this point we are starting the main stage 
+of the L<GRID::Machine> Perl remote server: to listen
+for commands from the local side. Let us issue some debugger commands to see the code:
+
+   DB<1> l GRID::Machine::main
+  526     sub main() {
+  527:      my $server = shift;
+  528
+  529       # Create filter process
+  530       # Check $server is a GRID::Machine
+  531
+  532       {
+  533:      package main;
+  534:      while( 1 ) {
+  535:         my ( $operation, @args ) = $server->read_operation( );
+    DB<2> l 536,541
+  536
+  537:         if ($server->can($operation)) {
+  538:           $server->$operation(@args);
+  539
+  540            # Outermost CALL Should Reset Redirects (-dk-)
+  541==>         next unless ($operation eq 'GRID::Machine::CALL' || $operation eq 'GRID::Machine::EVAL');
+
+The remote server stays in a loop waiting for an C<$operation> code and its arguments
+(line 535) from the local side. When it arrives calls the handler for such operation
+(line 538). In fact we can have a look at which is the current operation:
+
+  DB<3> x $operation
+0  'GRID::Machine::DEBUG_LOAD_FINISHED'
+
+This is the operation that simply signals (when in debugging mode) that 
+the bootstrap process has finished. We can also have a look to the attributes
+of the C<$server> object:
+
+    DB<4> x keys %$server
+  0  'err'
+  1  'writefunc'
+  2  'debug'
+  3  'log'
+  4  'stored_procedures'
+  5  'cleanup'
+  6  'logfile'
+  7  'sendstdout'
+  8  'FILES'
+  9  'cleanfiles'
+  10  'host'
+  11  'errfile'
+  12  'clientpid'
+  13  'prefix'
+  14  'readfunc'
+  15  'cleandirs'
+
+
+But we don't to waddle through L<GRID::Machine> code to find where our code
+is. This is the reason why we have instrumented the code to be loaded on the remote 
+side (see line 16 below). Let us rewrite here - for the sake
+of readability - the first part
+of the code being debugged:
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ cat -n synopsis_debug1.pl
+     1  #!/usr/local/bin/perl -w
+     2  use strict;
+     3  use GRID::Machine;
+     4
+     5  my $debugport = $ENV{GMDEBPORT} || 0; # The remote debugger will listen in this port
+     6  my $host = 'beo';        # The machine (symbolic name) to connect. See man ssh_config
+     7
+     8  my $machine = GRID::Machine->new(
+     9                  host => $host,
+    10                  debug => $debugport,
+    11                  uses => [ 'Sys::Hostname' ]
+    12                );
+    13
+    14  my $r = $machine->sub(
+    15    rmap => q{
+    16      $DB::single = 1 if $DB::rmap;
+    17
+    18      my $f = shift; # function to apply
+    19      die "Code reference expected\n" unless UNIVERSAL::isa($f, 'CODE');
+    20
+    21      my @result;
+    22      for (@_) {
+    23        die "Array reference expected\n" unless UNIVERSAL::isa($_, 'ARRAY');
+    24
+    25        print hostname().": processing row [ @$_ ]\n";
+    26        push @result, [ map { $f->($_) } @$_ ];
+    27      }
+    28      return @result;
+    29    },
+    30  );
+    31  die $r->errmsg unless $r->ok;
+
+The call C<$machine-E<gt>sub( rmap =E<gt> q{ ... })> loads a function C<rmap> 
+with the code specified in lines 15-29 on the remote side. It also
+equips the object C<$machine> with a proxy method named C<rmap> 
+that each times is called will simply issue a call its homonym on the 
+remote side.
+
+This function very much resembles the behavior of C<map>.
+It takes as arguments a function reference (which
+is stored in C<$f> at line 18)
+and a list of array references. The loop in lines 22-27
+traverses such list applying the function C<$f> 
+to each of the referenced lists. The result is pushed 
+in the lexical variable C<@result> which is returned in 
+line 28.
+
+To see the behavior of the remote loading of sub C<rmap> in 
+more detail we will rerun the application but this time
+we run also the local side in debugging mode with the -d switch:
+
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ GMDEBPORT=12344 perl -wd synopsis_debug1.pl
+
+  Loading DB routines from perl5db.pl version 1.28
+  Editor support available.
+
+  Enter h or `h h' for help, or `man perldebug' for more help.
+
+  main::(synopsis_debug1.pl:5):   my $debugport = $ENV{GMDEBPORT} || 0; # The remote debugger will listen in this port
+    DB<1>                                                                                                              
+
+Of course, socat (or netcat) is listening in the other terminal:
+
+  casiano@beowulf:~$ socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344
+
+Now, in the local terminal we run the program up to the point where sub
+C<rmap> is loaded and compiled in the remote side:
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ GMDEBPORT=12344 perl -wd synopsis_debug1.pl
+
+  Loading DB routines from perl5db.pl version 1.28
+  Editor support available.
+
+  Enter h or `h h' for help, or `man perldebug' for more help.
+
+  main::(synopsis_debug1.pl:5):   my $debugport = $ENV{GMDEBPORT} || 0; # The remote debugger will listen in this port
+    DB<1> c 31
+  Debugging with 'ssh  beo PERLDB_OPTS="RemotePort=localhost:12344" perl -d '
+  Remember to run in beo: 'netcat -v -l -p 12344'
+  or 'socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344,reuseaddr'
+
+The process hangs since is waiting for the debugger in the remote side to progress. 
+In the remote side we issue the required continuations commands:
+
+  casiano@beowulf:~$ socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344
+
+  Loading DB routines from perl5db.pl version 1.28
+  Editor support available.
+
+  Enter h or `h h' for help, or `man perldebug' for more help.
+
+  GRID::Machine::MakeAccessors::(/home/pp2/src/perl/GRID_Machine/lib/GRID/Machine/MakeAccessors.pm:33):
+  33:     1;
+    DB<1> c
+  GRID::Machine::main(/home/pp2/src/perl/GRID_Machine/lib/GRID/Machine/REMOTE.pm:541):
+  541:           next unless ($operation eq 'GRID::Machine::CALL' || $operation eq 'GRID::Machine::EVAL');
+    DB<1> c
+               
+The remote side now hangs waiting for the local side to progress.
+Let us see what is the I<local side terminal>:
+
+  Loading DB routines from perl5db.pl version 1.28
+  Editor support available.
+
+  Enter h or `h h' for help, or `man perldebug' for more help.
+
+  main::(synopsis_debug1.pl:5):   my $debugport = $ENV{GMDEBPORT} || 0; # The remote debugger will listen in this port
+    DB<1> c 31
+  Debugging with 'ssh  beo PERLDB_OPTS="RemotePort=localhost:12344" perl -d '
+  Remember to run in beo: 'netcat -v -l -p 12344'
+  or 'socat -d READLINE,history=$HOME/.perldbhistory TCP4-LISTEN:12344,reuseaddr'
+
+  main::(synopsis_debug1.pl:31):  die $r->errmsg unless $r->ok;
+    DB<2>         
+
+Is waiting at line 31. We can inspect now the result of installing
+sub C<rmap>:
+
+    DB<2> x $r
+  0  GRID::Machine::Result=HASH(0x85224d8)
+     'errcode' => 0
+     'errmsg' => ''
+     'results' => ARRAY(0x88e6b5c)
+        0  1
+     'stderr' => ''
+     'stdout' => ''
+     'type' => 'RETURNED
+
+Everything went OK: C<errcode> is 0 and no error messages were issued during the
+compilation. Let us remember the rest of the code to execute. In the local terminal
+we issue the comand C<l>:
+
+    DB<3> l
+  31==>   die $r->errmsg unless $r->ok;
+  32
+  33:     my $cube = sub { $_[0]**3 };
+  34:     $r = $machine->rmap($cube, [1..3], [4..6], [7..9]);
+  35:     print $r;
+  36
+  37:     for ($r->Results) {
+  38:       my $format = "%5d"x(@$_)."\n";
+  39:       printf $format, @$_
+  40      }
+
+
+=head1 THE PROGRAM TO DEBUG: FULL CODE
+
+  pp2@nereida:~/src/perl/GRID_Machine/examples$ cat synopsis_debug1.pl
+  #!/usr/local/bin/perl -w
+  use strict;
+  use GRID::Machine;
+
+  my $debugport = 12344; # Port where the remote debugger will listen
+  my $host = 'beo';      # The machine (symbolic name) to connect
+
+  my $machine = GRID::Machine->new(
+                  host => $host,
+                  debug => $debugport,
+                  uses => [ 'Sys::Hostname' ]
+                );
+
+  my $r = $machine->sub(
+    rmap => q{
+      $DB::single = 1 if $DB::rmap;
+
+      my $f = shift; # function to apply
+      die "Code reference expected\n" unless UNIVERSAL::isa($f, 'CODE');
+
+      my @result;
+      for (@_) {
+        die "Array reference expected\n" unless UNIVERSAL::isa($_, 'ARRAY');
+
+        print hostname().": processing row [ @$_ ]\n";
+        push @result, [ map { $f->($_) } @$_ ];
+      }
+      return @result;
+    },
+  );
+  die $r->errmsg unless $r->ok;
+
+  my $cube = sub { $_[0]**3 };
+  $r = $machine->rmap($cube, [1..3], [4..6], [7..9]);
+  print $r;
+
+  for ($r->Results) {
+    my $format = "%5d"x(@$_)."\n";
+    printf $format, @$_
+  }
+
+
+=head1 CONCLUSIONS, LIMITATIONS AND FUTURE WORK
+
+Debugging remote GRID::Machine Perl programs is not easy but possible.
+A natural target is to have an adapted remote Perl debugger
+that will automate the methodology steps explained
+in this tutorial.
+
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * L<GRID::Machine>
+
+=item * L<GRID::Machine::IOHandle>
+
+=item * L<GRID::Machine::Group>
+
+=item * L<GRID::Machine::Process>
+
+=item * L<GRID::Machine::perlparintro>
+
+
+=item *  L<Net::OpenSSH> 
+
+=item * L<IPC::PerlSSH>
+
+=item * L<IPC::PerlSSH::Async>
+
+=item * Man pages of C<ssh>, C<ssh-key-gen>, C<ssh_config>, C<scp>, 
+C<ssh-agent>, C<ssh-add>, C<sshd>
+
+=item * L<http://www.openssh.com>
+
+=back
+
+
+=over 2
+
+=item * L<perldebtut>
+
+=item * L<perldebug>
+
+=item * L<perldebguts>
+
+=item * L<perl5db.pl>
+
+=item * The book I<Pro Perl Debugging> (L<http://www.apress.com/book/view/9781590594544>)
+ By Richard Foley , Andy Lester # ISBN10: 1-59059-454-1 ISBN13: 978-1-59059-454-4
+
+=back
+

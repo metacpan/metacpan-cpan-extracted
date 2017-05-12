@@ -1,0 +1,27 @@
+dir /usr
+dir /usr/bin
+obj /usr/bin/bashbug f831a9261aa451aade69b64bc0722384 1082960226
+dir /usr/share
+dir /usr/share/man
+dir /usr/share/man/man1
+obj /usr/share/man/man1/rbash.1.gz 0f71df60c4e49f1a3c98dff5935f9570 1082960226
+obj /usr/share/man/man1/bash.1.gz dfdb662d666cd40944d69303f5724c09 1082960226
+obj /usr/share/man/man1/bashbug.1.gz d8f716e97a0eb39ec5e4ce21239cec60 1082960226
+obj /usr/share/man/man1/builtins.1.gz 71cead9d267a3ea0fe2b829fd1c26eff 1082960226
+dir /usr/share/info
+sym /usr/share/info/bashref.info.gz -> bash.info.gz 1082960226
+obj /usr/share/info/bash.info.gz 02d28c473b4ffe17024612eabc54b62a 1082960226
+dir /usr/share/doc
+dir /usr/share/doc/bash-2.05b-r9
+obj /usr/share/doc/bash-2.05b-r9/README.gz 92c5600cad02d1c943a4f1ac1e043c59 1082960226
+obj /usr/share/doc/bash-2.05b-r9/NEWS.gz 65341fd08a7db8ada61c047608df9ba8 1082960226
+obj /usr/share/doc/bash-2.05b-r9/AUTHORS.gz 04b383edd9fde1cfe33ed464c36a1ee9 1082960226
+obj /usr/share/doc/bash-2.05b-r9/CHANGES.gz 84e60dc6089322f75b665a7ed300a6a6 1082960226
+obj /usr/share/doc/bash-2.05b-r9/COMPAT.gz 37061c1df036db10f0759ed659283cb6 1082960226
+obj /usr/share/doc/bash-2.05b-r9/Y2K.gz 01508dc682629640b3eb9405a613c5a1 1082960226
+obj /usr/share/doc/bash-2.05b-r9/FAQ.gz db840d89f0408c0fb43b79928aa36acb 1082960226
+obj /usr/share/doc/bash-2.05b-r9/INTRO.gz c3dfdd06cd63f26284a494f0269a4008 1082960226
+dir /bin
+obj /bin/bash b2bd8d939f9bf408fe45381d33fa6137 1082960226
+sym /bin/sh -> bash 1082960226
+sym /bin/rbash -> bash 1082960226

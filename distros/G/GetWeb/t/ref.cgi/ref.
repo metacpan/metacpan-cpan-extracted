@@ -1,0 +1,46 @@
+Content-Type: text/plain
+
+Here is the message that would be sent in response:
+
+Content-Type: text/plain; name="promed_old.html"
+Content-Disposition: inline; filename="promed_old.html"
+Mime-Version: 1.0
+To: ORIGINAL_SENDER
+Subject: <URL:file:./test/promed_old.html> ProMED-mail
+
+ [IMAGE]
+
+The address of this page has changed, please update your bookmarks.
+
+promed.html [1]
+
+
+*** References from this document ***
+[orig] file:./test/promed_old.html
+[1] file:/test/promed.html
+Here is the message that would be sent in response:
+
+Content-Type: text/html; name="promed_old.html"
+Content-Disposition: inline; filename="promed_old.html"
+Mime-Version: 1.0
+To: ORIGINAL_SENDER
+Subject: <URL:file:./test/promed_old.html> ProMED-mail
+
+<html>
+<html>
+<head>
+<title>ProMED-mail</title>
+</head>
+<IMG  HEIGHT=54 WIDTH=291 SRC="/images/satlogo.jpg">
+<p>
+<p>
+The address of this page has changed, please update your bookmarks.
+<p>
+<a href="promed.html">
+promed.html
+</a>
+<p>
+</body>
+</html>
+
+

@@ -1,0 +1,21 @@
+To get this example running, you need to do a couple of things.
+
+First of all, you have to install the .server file into
+<prefix>/lib/bonobo/servers where the panel will find it.  Afterwards, you
+possibly have to kill the gnome-panel process so it recognizes the new applet
+(the panel will be restarted automatically by the session).
+
+Then you have two options: A) the normal procedure is to let the panel spawn
+the process for you, but B) it's also possible to launch the applet manually
+and then have the panel attach to it.
+
+A) For the normal procedure, you have to specify the full path to the
+   executable Perl program in the .server file.  In case you have the relevant
+   Perl modoules installed in a custom location, you will also have to tell
+   perl where to find them (see the comment in perl-applet).  Now, adding the
+   applet via the panel will start the program.
+
+B) For the manual variant, just start the program from a terminal; it will
+   block if everything's alright.  Then add the applet via the panel normally.
+   The panel will attach to and use the running instance.  This second approach
+   has the advantage that you can actually see debug output.

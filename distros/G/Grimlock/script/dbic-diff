@@ -1,0 +1,219 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $VERSION = '1.0';
+
+=head1 NAME
+
+git-dbic-diff
+
+=head1 DESCRIPTION
+
+git-dbic-diff is a schema management tool for applications utilizing
+DBIx::Class and hosted in a git repository.  dbic-diff will produce
+the differences in a DBIx::Class schema between any two git revisions.
+the diff is presented in the form of SQL statements.  when applied to
+a database deployment matching the source version, these statements
+will yield the target version.
+
+=head1 SYNOPSIS
+
+    $ git dbic-diff [--db <dbtype>] <class> <treeish1> [<treeish2>]
+    $ git-dbic-diff [--db <dbtype>] <class> <treeish1> [<treeish2>]
+
+the second form is invoking the script directly rather than via git.
+this method may be required if you're using perlbrew and git is using
+the system's perl.
+
+dbtype is any database type recognized by SQL::Translator.  the
+default is "MySQL".
+
+if the second treeish is not provided, the diff is executed against
+the current index.  note that modified files must be staged in order
+to appear in the index.
+
+=head1 EXAMPLES
+
+    $ git dbic-diff MyApp::Schema 3.1.6 HEAD
+    $ git dbic-diff MyApp::Schema HEAD^1 HEAD
+    $ git dbic-diff MyApp::Schema fee00055
+
+=head1 AUTHOR
+
+Mike Eldridge <diz@cpan.org>
+
+=cut
+
+=head1 CONTRIBUTORS
+
+Devin Austin <dhoss@cpan.org>
+
+=cut
+
+use Directory::Scratch;
+use SQL::Translator;
+use SQL::Translator::Diff;
+use SQL::Translator::Schema::Constants;
+use Getopt::Attribute;
+use POSIX qw(strftime);
+
+our $db : Getopt(db=s SQLite);
+our $write_to_dir : Getopt(write=s);
+
+
+my $schema = shift;
+my $source = shift;
+my $target = shift;
+
+if (not $schema or not $source) {
+	print "usage: dbic-diff <class> <treeish1> [<treeish2>]\n";
+	exit 1;
+}
+
+# set autoflush and create a temporary directory structure for storing
+# the two trees.
+
+$| = 1;
+
+my $scratch	= new Directory::Scratch;
+my $dirold	= ($source and -d $source) ? $source : $scratch->mkdir('old');
+my $dirnew	= ($target and -d $target) ? $target : $scratch->mkdir('new');
+
+# give the user a synopsis of what source and target we will be using
+# during the diff
+
+print "-- source: $source\n";
+print "-- target: " . ($target || 'index') . "\n";
+
+print "-- exporting $source...";
+system("git archive $source | tar xf - -C $dirold");
+print "done\n";
+
+if ($target) {
+	print "-- exporting $target...";
+	system("git archive $target | tar xf - -C $dirnew");
+} else {
+	print "-- copying contents of index...";
+	system("git checkout-index -a --prefix=$dirnew/");
+}
+print "done\n";
+
+my $collector = sub
+{
+	my $aref = shift;
+
+	return sub {
+		my $path = shift;
+
+		if ($path->is_dir) {
+			my $dir = $path->subdir('lib');
+
+			push @$aref, $dir if $path->contains($dir);
+		}
+	}
+};
+
+# find any library paths
+
+my @pathold;
+my @pathnew;
+
+$dirold->recurse(callback => $collector->(\@pathold));
+$dirnew->recurse(callback => $collector->(\@pathnew));
+
+# build argument list for calls to exec() to create the DDLs
+
+my @argsold =
+(
+	map(('-I', $_->stringify), @pathold),
+	qq{-MSQL::Translator::Schema::Constraint},
+	qq{-M$schema},
+	qq{-e},
+	qq{$schema->connect('dbd:nullp')->create_ddl_dir('$db', 'OLD', '$scratch')}
+);
+
+my @argsnew =
+(
+	map(('-I', $_->stringify), @pathnew),
+	qq{-MSQL::Translator::Schema::Constraint},
+	qq{-M$schema},
+	qq{-e},
+	qq{$schema->connect('dbd:nullp')->create_ddl_dir('$db', 'NEW', '$scratch')}
+);
+
+# fork and create DDLs for both the OLD and the NEW versions
+
+print "-- creating DDLs...";
+
+if (my $pid = fork) {
+	waitpid $pid, 0;
+} else {
+	close STDOUT;
+	close STDERR;
+
+	exec perl => @argsold;
+}
+
+if (my $pid = fork) {
+	waitpid $pid, 0;
+} else {
+	close STDOUT;
+	close STDERR;
+
+	exec perl => @argsnew;
+}
+
+print "done\n";
+
+# then read the two schemas into SQL::Translator objects and
+# perform a diff between the two using SQL::Translator::Diff
+
+print "-- performing diff...";
+
+(my $file = $schema) =~ s/::/-/g;
+
+my $old = new SQL::Translator parser => $db;
+my $new = new SQL::Translator parser => $db;
+
+$old->translate("$scratch/$file-OLD-$db.sql");
+$new->translate("$scratch/$file-NEW-$db.sql");
+
+$old->schema->name($source);
+$new->schema->name($target || 'index');
+my $opts =
+{
+	caseopt						=> 0,
+	ignore_index_names			=> 0,
+	ignore_constraint_names		=> 0,
+	ignore_view_sql				=> 0,
+	ignore_proc_sql				=> 0,
+	output_db					=> $db,
+	no_batch_alters				=> 1,
+	debug						=> 1,
+	trace						=> 1
+};
+
+my $diff = SQL::Translator::Diff::schema_diff($old->schema, $db, $new->schema, $db, $opts);
+
+print "done\n\n";
+
+write_sql_to_directory($write_to_dir) if $write_to_dir;
+
+print $diff;
+
+sub write_sql_to_directory {
+  my $dir = shift;
+  $target ||= 'index';
+  my $file = "$dir/$source-$target"; 
+  $file .= ".sql";
+  print "Writing SQL to $file...\n";
+  open my $fh, ">", $file 
+    || die "Can't open $file: $!";
+
+  print $fh $diff;
+  close $fh;
+  print "Done!\n";
+}
+

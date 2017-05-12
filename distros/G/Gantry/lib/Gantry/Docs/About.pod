@@ -1,0 +1,96 @@
+=head1 Name
+
+Gantry::Docs::About - A document explaining Gantry's features and history
+
+=head1 History
+
+Along about 1997 or so, our company (a cable/ISP owned by a newspaper)
+began serving mod_perl apps to staff and customers.  A framework developed
+and flourished.  It was simple, explicit, and fast enough for the
+high-volume sites run by our parent newspaper.  As time passed,
+improvements were made until a second version was conceived and deployed.
+
+Finally, in August of 2005, a third revision was completed which
+is now available as an open source product (under the standard Perl license).
+The new version has lots of new features and removes some of the arcana
+that built up over the previous six or so years.  Notably, it gained an
+MVC structure and some nifty automated CRUD.  But the newly released
+third version, now called Gantry, retains simplicity, explicitness,
+speedy throughput, and the ability to host complex projects.
+
+=head1 Features
+
+Gantry has these basic features:
+
+=over 4
+
+=item *
+
+a central mod_perl handler all apps may inherit (Gantry.pm)
+
+=item *
+
+CGI/FastCGI support (Gantry::Engine::CGI)
+
+=item *
+
+automated CRUD (create, retrieve, update, delete) for straightforward tables
+(Gantry::Plugins::AutoCRUD)
+
+=item *
+
+flexible CRUD for the sophisticated parts of applications
+(Gantry::Plugins::CRUD)
+
+=item *
+
+easy date entry (via javascript code in form.tt)
+
+=back
+
+Gantry supports these features:
+
+=over 4
+
+=item *
+
+AJAX (via your favorite AJAX module)
+
+=item *
+
+basic apache authentication (Gantry::Control::C::Authen
+Gantry::Control::C::Authz, and other modules)
+
+=back
+
+=head1 The Name
+
+Previous versions of this framework were named for the company that originally
+used it.  To release it into the wild, we needed a new name.  After extensive
+head scratching, and much dictionary and thesaurus examination, we settled
+on Gantry.
+
+"Gantry" can mean the framework on which a rocket is built or serviced.  We
+like that.  Our Gantry is a framework for building things: namely high powered,
+high speed, and often highly complex apps.
+
+But "gantry" also means the framework that holds signs or signals over a road
+or railroad.  As much as I like thinking of rocket powered apps, the sign
+holder is more apt.  Just think of a large metal gantry that holds signs
+over a freeway.  The structure itself is most of the gantry.  The signs are
+small relative to that structure.  Once the signs are up, the structure stays
+with them, supporting them throughout their life.  Even if the signs have
+to change, the gantry is still there to hold the new ones.  We like this
+analogy very much indeed.
+
+=head1 Author
+
+Phil Crow <philcrow2000@yahoo.com>
+
+=head1 Copyright and License
+
+Copyright (c) 2006, Phil Crow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,280 @@
+NAME
+    GraphViz2::Abstract::Edge - Deal with edges independent of a Graph
+
+VERSION
+    version 0.002000
+
+SYNOPSIS
+        use GraphViz2::Abstract::Edge;
+
+        my $edge = GraphViz2::Abstract::Edge->new(
+                color =>  ... ,
+                id    =>  ... ,
+                label =>  ... ,
+        );
+
+        # Mutate $edge
+
+        $edge->label("Asdft");
+
+        my $fillcolor = $edge->fillcolor(); # Knows that the fill color is light grey despite never setting it.
+
+        # Later:
+
+        $graph->add_edge(from => a => to => b => %{ $edge->as_hash }); # Adds only the data that is not the same as GraphViz's defaults
+        $graph->add_edge(from => a => to => b => %{ $edge->as_canon_hash }); # Adds all the data, including hardcoded defaults
+
+DESCRIPTION
+    Working with GraphViz2, I found myself frequently needing shared styles
+    for things, and I often had trouble knowing which fields were and
+    weren't valid for given things, for instance: "Edge"s.
+
+    Its reasonably straight forward to ask the question "What is the
+    attribute "foo" applicable to" using the GraphViz website, but much
+    harder to know "What are all the attributes applicable to "foo"".
+
+    Let alone work with them in a user friendly way from code.
+
+  Naming Rationale
+    I tried to choose a name that was not so likely to threaten GraphViz2 if
+    GraphViz2 wanted to make a different variation of what I'm doing, but as
+    part of GraphViz2 itself.
+
+    As such, I plan on a few "::Abstract" things, that aim to be stepping
+    stones for dealing with complex data independent of "GraphViz2", but in
+    such a way that they make importing that data into "GraphViz2" easy.
+
+METHODS
+  "as_hash"
+    This method returns all the values of all properties that DIFFER from
+    the defaults.
+
+    e.g.
+
+        Edge->new( color => 'black' )->as_hash();
+
+    Will return an empty list, as the default color is normally black.
+
+    See also how special constants work in
+
+  "as_canon_hash"
+    This method returns all the values of all properties, INCLUDING
+    defaults.
+
+    e.g.
+
+        Edge->new( color => 'black' )->as_canon_hash();
+
+    Will return a very large list containing all the properties that we know
+    the default values for.
+
+    See also how special constants work in
+
+ATTRIBUTES
+  "URL"
+    Default: "none"
+
+  "arrowhead"
+    Default: 'normal'
+
+  "arrowsize"
+    Default: 0.0
+
+  "arrowtail"
+    Default: 'normal'
+
+  "color"
+    Default: 'black'
+
+  "colorscheme"
+    Default: ""
+
+  "comment"
+    Default: ""
+
+  "constraint"
+    Default: "true"
+
+  "decorate"
+    Default: "false"
+
+  "dir"
+    Default: "unknown"
+
+  "edgeURL"
+    Default: ""
+
+  "edgehref"
+    Default: ""
+
+  "edgetarget"
+    Default: "none"
+
+  "edgetooltip"
+    Default: ""
+
+  "fillcolor"
+    Default: "unknown"
+
+  "fontcolor"
+    Default: 'black'
+
+  "fontname"
+    Default: 'Times-Roman'
+
+  "fontsize"
+    Default: 14.0
+
+  "headURL"
+    Default: ""
+
+  "head_lp"
+    Default: "unknown"
+
+  "headclip"
+    Default: "true"
+
+  "headhref"
+    Default: ""
+
+  "headlabel"
+    Default: ""
+
+  "headport"
+    Default: 'center'
+
+  "headtarget"
+    Default: "none"
+
+  "headtooltip"
+    Default: ""
+
+  "href"
+    Default: ""
+
+  "id"
+    Default: ""
+
+  "label"
+    Default: ""
+
+  "labelURL"
+    Default: ""
+
+  "labelangle"
+    Default: -25.0
+
+  "labeldistance"
+    Default: 1.0
+
+  "labelfloat"
+    Default: "false"
+
+  "labelfontcolor"
+    Default: 'black'
+
+  "labelfontname"
+    Default: 'Times-Roman'
+
+  "labelfontsize"
+    Default: 14.0
+
+  "labelhref"
+    Default: ""
+
+  "labeltarget"
+    Default: "none"
+
+  "labeltooltip"
+    Default: ""
+
+  "layer"
+    Default: ""
+
+  "len"
+    Default: "unknown"
+
+    Reason: back-end dependent
+
+  "lhead"
+    Default: ""
+
+  "lp"
+    Default: "unknown"
+
+  "ltail"
+    Default: ""
+
+  "minlen"
+    Default: 1
+
+  "nojustify"
+    Default: "false"
+
+  "penwidth"
+    Default: 1.0
+
+  "pos"
+    Default: "unknown"
+
+  "samehead"
+    Default: ""
+
+  "sametail"
+    Default: ""
+
+  "showboxes"
+    Default: 0
+
+  "style"
+    Default: ""
+
+  "tailURL"
+    Default: ""
+
+  "tail_lp"
+    Default: "unknown"
+
+  "tailclip"
+    Default: "true"
+
+  "tailhref"
+    Default: ""
+
+  "taillabel"
+    Default: ""
+
+  "tailport"
+    Default: 'center'
+
+  "tailtarget"
+    Default: "none"
+
+  "tailtooltip"
+    Default: ""
+
+  "target"
+    Default: "none"
+
+  "tooltip"
+    Default: ""
+
+  "weight"
+    Default: 1
+
+  "xlabel"
+    Default: ""
+
+  "xlp"
+    Default: "unknown"
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

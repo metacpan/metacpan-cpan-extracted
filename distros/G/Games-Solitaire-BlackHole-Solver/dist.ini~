@@ -1,0 +1,37 @@
+name    = Games-Solitaire-BlackHole-Solver
+author  = Shlomi Fish <shlomif@cpan.org>
+license = MIT
+copyright_holder = Shlomi Fish
+copyright_year   = 2010
+version = 0.0.4
+
+[@Filter]
+-bundle = @SHLOMIF
+-remove = License
+-remove = MakeMaker
+dist    = Games-Solitaire-BlackHole-Solver
+repository = github
+repository_url = https://github.com/shlomif/black-hole-solitaire
+repository_web = https://github.com/shlomif/black-hole-solitaire
+repository_type = git
+homepage = http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
+[ExecDir]
+dir = bin
+[Keywords]
+keyword = ai
+keyword = automated
+keyword = black
+keyword = card
+keyword = cards
+keyword = command line
+keyword = David Parlett
+keyword = dfs
+keyword = games
+keyword = hole
+keyword = patience
+keyword = solitaire
+keyword = solver
+keyword = solving
+[Prereqs / Runtime]
+-phase = runtime
+Getopt::Long = 2.36

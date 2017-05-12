@@ -1,0 +1,11 @@
+To prepare the package, run from command line:
+
+	% perl Makefile.PL
+	% make
+	% make tests
+
+To install the package (probably as root), run:
+
+	% make install
+
+Good luck.

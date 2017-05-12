@@ -1,0 +1,2 @@
+>=sys-apps/daemontools-0.70
+	sys-apps/ucspi-tcp 

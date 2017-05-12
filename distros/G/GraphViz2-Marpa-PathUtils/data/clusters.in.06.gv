@@ -1,0 +1,48 @@
+strict digraph graph_06
+{
+	label = "Complex Syntax Test"
+
+	A [color = blue]
+
+	node [shape = house]
+	edge [color = purple]
+
+	{
+		rank = same
+		C
+		node [fillcolor = goldenrod shape = circle style = filled]
+		A -> B
+		B [color = mediumseagreen]
+		C [color = firebrick1]
+		B -> C [color = orange penwidth = 5]
+		node [fillcolor = turquoise4]
+		C -> D [arrowtail = obox arrowhead = crow dir = both minlen = 2]
+		D -> E [arrowtail = odot arrowhead = dot dir = both minlen = 2 penwidth = 5]
+		{
+			node [fillcolor = darkorchid shape = pentagon]
+			F [color = darkorchid fillcolor = yellow penwidth = 5 shape = hexagon]
+			G [color = crimson penwidth = 7]
+			F -> G [color = orange]
+		}
+	}
+
+	B [shape = square]
+
+	node [fillcolor = lightblue fontsize = 20 style = filled]
+
+	subgraph cluster_outer
+	{
+		label = Outer
+		H -> I
+
+		subgraph cluster_inner
+		{
+			label = Inner
+			node [fillcolor = magenta fontsize = 26 shape = triangle]
+			edge [color = blue]
+			J [color = yellow shape = square]
+			J -> K
+		}
+	}
+	graph [rankdir = TB]
+}

@@ -1,0 +1,95 @@
+(define-object GnomeFont (GtkObject))
+(define-object GnomeFontSelection (GtkTable))
+(define-object GnomeFontSelectionDialog (GnomeDialog))
+(define-object GnomePrintCopies (GtkVBox))
+(define-object GnomePrintDialog (GnomeDialog))
+(define-object GnomePrintMasterPreview (GnomeApp))
+(define-object GnomePrintMaster (GtkObject))
+(define-object GnomePrintContext (GtkObject))
+(define-object GnomePrintRBuf (GnomePrintContext))
+(define-object GnomePrintPDF (GnomePrintContext))
+(define-object GnomePrintMeta (GnomePrintContext))
+(define-object GnomePrintMultipage (GnomePrintContext))
+(define-object GnomePrintPreview (GnomePrintContext))
+;(define-object GnomePrintPreviewJob (GtkObject))
+(define-object GnomePrintRGBP (GnomePrintContext))
+(define-object GnomePrintFRGBA (GnomePrintContext))
+(define-object GnomePrintPixbuf (GnomePrintContext))
+(define-object GnomePrinterWidget (GtkFrame))
+(define-object GnomePrinterDialog (GnomeDialog))
+(define-object GnomePrinter (GtkObject))
+(define-object GnomeFontFace (GtkObject))
+(define-object GnomeRFont (GtkObject))
+(define-object GnomeGlyphList (GtkObject))
+
+(define-enum GnomeFontWeight
+  (lightest GNOME_FONT_LIGHTEST)
+  (extra-light GNOME_FONT_EXTRA_LIGHT)
+  (thin GNOME_FONT_THIN)
+  (light GNOME_FONT_LIGHT)
+  (book GNOME_FONT_BOOK)
+  (medium GNOME_FONT_MEDIUM)
+  (semi GNOME_FONT_SEMI)
+  (bold GNOME_FONT_BOLD)
+  (heavy GNOME_FONT_HEAVY)
+  (extrabold  GNOME_FONT_EXTRABOLD)
+  (black GNOME_FONT_BLACK)
+  (extrablack GNOME_FONT_EXTRABLACK))
+
+(define-enum GnomePrintRangeType
+  (none GNOME_PRINT_RANGETYPE_NONE)
+  (custom GNOME_PRINT_RANGETYPE_CUSTOM)
+  (pages GNOME_PRINT_RANGETYPE_PAGES)
+  (dates GNOME_PRINT_RANGETYPE_DATES))
+
+; need to typedef the enum
+;(define-flags GnomePrintRangeFlags
+;  (current GNOME_PRINT_RANGE_CURRENT)
+;  (all GNOME_PRINT_RANGE_ALL)
+;  (range GNOME_PRINT_RANGE_RANGE)
+;  (selection GNOME_PRINT_RANGE_SELECTION)
+;  (date-time GNOME_PRINT_RANGE_DATE_TIME)
+;  (date-24hr GNOME_PRINT_RANGE_DATE_24HR)
+;  (date-monday GNOME_PRINT_RANGE_DATE_MONDAY))
+;
+;(define-flags GnomePrintFlags
+;  (range GNOME_PRINT_DIALOG_RANGE)
+;  (copies GNOME_PRINT_DIALOG_COPIES))
+;
+;(define-enum GnomePrintButtons
+;  (print GNOME_PRINT_PRINT)
+;  (preview GNOME_PRINT_PREVIEW)
+;  (cancel GNOME_PRINT_CANCEL))
+
+(define-enum GnomePrinterStatus
+  (active GNOME_PRINTER_ACTIVE)
+  (inactive GNOME_PRINTER_INACTIVE)
+  (offline GNOME_PRINTER_OFFLINE)
+  (net-failure GNOME_PRINTER_NET_FAILURE))
+
+(define-enum GnomeTextAttr
+  (end GNOME_TEXT_END)
+  (font-list GNOME_TEXT_FONT_LIST)
+  (size GNOME_TEXT_SIZE)
+  (xscale GNOME_TEXT_XSCALE)
+  (obliquing-ugh GNOME_TEXT_OBLIQUING_UGH)
+  (weight GNOME_TEXT_WEIGHT)
+  (italics GNOME_TEXT_ITALICS)
+  (kerning GNOME_TEXT_KERNING)
+  (ligatures GNOME_TEXT_LIGATURES)
+  (tracking GNOME_TEXT_TRACKING)
+  (small-caps GNOME_TEXT_SMALL_CAPS)
+  (glyph-alternate GNOME_TEXT_GLYPH_ALTERNATE)
+  (underline-ugh GNOME_TEXT_UNDERLINE_UGH)
+  (strikethrough GNOME_TEXT_STRIKETHROUGH)
+  (rise GNOME_TEXT_RISE)
+  (color GNOME_TEXT_COLOR)
+  (last GNOME_TEXT_LAST))
+
+(define-enum GnomeTextAlign
+  (left GNOME_TEXT_ALIGN_LEFT)
+  (center GNOME_TEXT_ALIGN_CENTER)
+  (right GNOME_TEXT_ALIGN_RIGHT)
+  (just GNOME_TEXT_ALIGN_JUST))
+
+

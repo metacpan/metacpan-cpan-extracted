@@ -1,0 +1,2172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Index of sample files created by GraphViz2::Marpa</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="pragma" content="no-cache">
+	<link rel="stylesheet" type="text/css" href="/assets/css/graphviz2/marpa/default.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/graphviz2/marpa/fancy.table.css">
+</head>
+<body>
+
+<h1>Index of sample files created by <a href="http://metacpan.org/release/GraphViz2-Marpa">GraphViz2::Marpa</a> V 2.03.</h1>
+
+<p>All scripts, input files and output files required to generate these examples are shipped in the GraphViz2::Marpa distro.</p>
+
+<p>Some sample data is deliberately faulty, and so does not produce an image, or produces a faulty one (e.g. data/42.*.gv)</p>
+
+	<p><span class = 'index'>Warning:</span> This is the standard tests page. The <a href = './authortest/index.html'>author tests page</a> is at least 20 times the size</p>
+
+<table border = "1">
+<tr>
+  <td>#</td><td>Result of GraphViz2::Marpa processing *.gv</td><td>Result of dot processing the same file</td>
+</tr>
+<tr>
+  <td>1</td>
+  <td>
+	Input file: data/01.gv (1 byte):<br /> 
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>
+	Input file: data/02.gv (7 bytes):<br />strict
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>
+	Input file: data/03.gv (8 bytes):<br />digraph
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>
+	Input file: data/04.gv (6 bytes):<br />graph
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>
+	Input file: data/05.gv (15 bytes):<br />strict digraph
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>
+	Input file: data/06.gv (3 bytes):<br />{}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>
+	Input file: data/07.gv (11 bytes):<br />strict
+<br />{
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>
+	Input file: data/08.gv (10 bytes):<br />graph
+<br />{
+<br />}
+
+  </td>
+  <td>
+<object data = "./08.svg"></object><br />
+Output file 8: html/08.svg (566 bytes)
+  </td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>
+	Input file: data/09.01.gv (31 bytes):<br />STRICT digraph graph_09_01
+<br />{
+<br />}
+
+  </td>
+  <td>
+<object data = "./09.01.svg"></object><br />
+Output file 9: html/09.01.svg (584 bytes)
+  </td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>
+	Input file: data/09.02.gv (29 bytes):<br />STRICT graph graph_09_02
+<br />{
+<br />}
+
+  </td>
+  <td>
+<object data = "./09.02.svg"></object><br />
+Output file 10: html/09.02.svg (584 bytes)
+  </td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>
+	Input file: data/10.01.gv (196 bytes):<br />STRICT DiGraph graph_10_01
+<br />{
+<br />	node_10_01_1 [fillcolor = red, style = filled]
+<br />	node_10_01_2 [fillcolor = green, style = filled]
+<br />
+<br />	node_10_01_1 -&gt; node_10_01_2 [arrowtail = dot, arrowhead = odot]
+<br />}
+
+  </td>
+  <td>
+<object data = "./10.01.svg"></object><br />
+Output file 11: html/10.01.svg (1473 bytes)
+  </td>
+</tr>
+<tr>
+  <td>12</td>
+  <td>
+	Input file: data/10.02.gv (79 bytes):<br />strict digraph graph_10_02
+<br />{
+<br />	node_10_02_1 [fillcolor = red, style = filled]
+<br />}
+
+  </td>
+  <td>
+<object data = "./10.02.svg"></object><br />
+Output file 12: html/10.02.svg (880 bytes)
+  </td>
+</tr>
+<tr>
+  <td>13</td>
+  <td>
+	Input file: data/11.gv (110 bytes):<br />/* C comment. */
+<br />
+<br />// C++ comment.
+<br />
+<br /># Hash comment.
+<br />
+<br />strict graph graph_11
+<br />{
+<br />	rankdir = LR;
+<br />	ranksep = &quot;0.2&quot;
+<br />}
+
+  </td>
+  <td>
+<object data = "./11.svg"></object><br />
+Output file 13: html/11.svg (578 bytes)
+  </td>
+</tr>
+<tr>
+  <td>14</td>
+  <td>
+	Input file: data/12.gv (131 bytes):<br /># Prefix comment.
+<br />
+<br />graph graph_12
+<br />{
+<br />	size = &quot;6,7&quot;
+<br />
+<br />	node_12_1 [shape = square, color = red; fillcolor = blue]
+<br />}
+<br />
+<br /># Suffix comment.
+
+  </td>
+  <td>
+<object data = "./12.svg"></object><br />
+Output file 14: html/12.svg (846 bytes)
+  </td>
+</tr>
+<tr>
+  <td>15</td>
+  <td>
+	Input file: data/13.gv (19 bytes):<br />strict digraph
+<br />{
+<br />}
+
+  </td>
+  <td>
+<object data = "./13.svg"></object><br />
+Output file 15: html/13.svg (566 bytes)
+  </td>
+</tr>
+<tr>
+  <td>16</td>
+  <td>
+	Input file: data/14.gv (103 bytes):<br />digraph graph_14
+<br />{
+<br />	rankdir = TB
+<br />
+<br />	node_14_1 [label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;HTML table&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;]
+<br />}
+
+  </td>
+  <td>
+<object data = "./14.svg"></object><br />
+Output file 16: html/14.svg (1153 bytes)
+  </td>
+</tr>
+<tr>
+  <td>17</td>
+  <td>
+	Input file: data/15.gv (530 bytes):<br />digraph graph_15
+<br />{
+<br />	edge
+<br />	[
+<br />		&quot;color&quot; = &quot;green&quot;,
+<br />	];
+<br />
+<br />	node_15_1 [fillcolor = red shape = square,];
+<br />	node_15_2 [&quot;size&quot;    = &quot;5,8&quot;]
+<br />	node_15_3 [height    = &quot;2&quot;];
+<br />	node_15_4 [label     = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;HTML table&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;]
+<br />	node_15_5 [label     = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&#39;HTML table&#39;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;];
+<br />	node_15_5 [label     = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;HTML table: &#39;X&#39; &amp;amp; &quot;Y&quot; &amp;amp; &quot;Z&quot;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;]
+<br />	node_15_6 [label     = &quot;Escaped quotes 1: (\&quot;)&quot;];
+<br />	node_15_7 [label     = &quot;Escaped quotes 2: \&quot;&quot;];
+<br />
+<br />	node_15_1 -&gt; node_15_2;
+<br />}
+
+  </td>
+  <td>
+<object data = "./15.svg"></object><br />
+Output file 17: html/15.svg (3416 bytes)
+  </td>
+</tr>
+<tr>
+  <td>18</td>
+  <td>
+	Input file: data/16.01.gv (138 bytes):<br />strict digraph graph_16_01
+<br />{
+<br />	subgraph subgraph_16_01_1
+<br />	{
+<br />		node_16_01_2 -&gt; node_16_01_3
+<br />		[
+<br />			color = blue
+<br />			dir   = &quot;both&quot;,
+<br />		]
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./16.01.svg"></object><br />
+Output file 18: html/16.01.svg (1621 bytes)
+  </td>
+</tr>
+<tr>
+  <td>19</td>
+  <td>
+	Input file: data/16.02.gv (82 bytes):<br />strict digraph graph_16_02
+<br />{
+<br />	node_16_02_1
+<br />	{
+<br />		node_16_02_2 -&gt; node_16_02_3
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./16.02.svg"></object><br />
+Output file 19: html/16.02.svg (1786 bytes)
+  </td>
+</tr>
+<tr>
+  <td>20</td>
+  <td>
+	Input file: data/16.03.gv (121 bytes):<br />strict digraph graph_16_03
+<br />{
+<br />	node_16_03_1
+<br />	{
+<br />		node_16_03_2 -&gt; node_16_03_3
+<br />	}
+<br />	[
+<br />		color = blue
+<br />		dir   = &quot;both&quot;,
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./16.03.svg"></object><br />
+Output file 20: html/16.03.svg (1786 bytes)
+  </td>
+</tr>
+<tr>
+  <td>21</td>
+  <td>
+	Input file: data/16.04.gv (140 bytes):<br />strict digraph graph_16_04
+<br />{
+<br />	node_16_04_1
+<br />	-&gt;
+<br />	{
+<br />		node_16_04_2
+<br />	}
+<br />
+<br />	node_16_04_3 -&gt; node_16_04_4
+<br />	[
+<br />		color = blue
+<br />		dir   = &quot;both&quot;,
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./16.04.svg"></object><br />
+Output file 21: html/16.04.svg (2521 bytes)
+  </td>
+</tr>
+<tr>
+  <td>22</td>
+  <td>
+	Input file: data/17.01.gv (592 bytes):<br />digraph graph_17_01
+<br />{
+<br />	node
+<br />	[
+<br />		shape = &quot;record&quot;
+<br />	]
+<br />	edge
+<br />	[
+<br />		color = &quot;blue&quot;
+<br />		penwidth = 1
+<br />	]
+<br />	node_17_01_1
+<br />	[
+<br />		label = &quot;&lt;p11&gt; left|&lt;p12&gt; middle|&lt;p13&gt; right&quot;
+<br />	]
+<br />	node_17_01_2
+<br />	[
+<br />		label = &quot;&lt;p21&gt; one|&lt;p22&gt; two&quot;
+<br />	]
+<br />	node_17_01_1:p12:n -&gt; node_17_01_2:p22
+<br />	[
+<br />		arrowtail = &quot;empty&quot;
+<br />		arrowhead = &quot;halfopen&quot;
+<br />		dir       = &quot;both&quot;
+<br />	]
+<br />	node_17_01_1:p13 -&gt; node_17_01_2:p22:s
+<br />	[
+<br />		arrowtail = &quot;invdot&quot;
+<br />		arrowhead = &quot;dot&quot;
+<br />		color     = green
+<br />		dir       = &quot;both&quot;
+<br />	]
+<br />	node_17_01_1:p13:ne -&gt; node_17_01_2:p21:s
+<br />	[
+<br />		arrowtail = &quot;crow&quot;
+<br />		arrowhead = &quot;tee&quot;
+<br />		color     = red
+<br />		dir       = &quot;both&quot;
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./17.01.svg"></object><br />
+Output file 22: html/17.01.svg (3861 bytes)
+  </td>
+</tr>
+<tr>
+  <td>23</td>
+  <td>
+	Input file: data/17.02.gv (851 bytes):<br />STRICT digraph graph_17_02
+<br />{
+<br />	fontsize = 16.0
+<br />	label    = &quot;\&quot;Standard\&quot;\rSyntax\lTest&quot;
+<br />	size     = &quot;5,6&quot;
+<br />
+<br />	node
+<br />	[
+<br />		shape = &quot;record&quot;,
+<br />	];
+<br />
+<br />	edge
+<br />	[
+<br />		color = &quot;red&quot;
+<br />		penwidth = 3,
+<br />	];
+<br />
+<br />	node_17_02_1
+<br />	[
+<br />		label    = &quot;&lt;p11&gt; left|&lt;p12&gt; middle|&lt;p13&gt; right&quot;
+<br />		pencolor = blue
+<br />	]
+<br />
+<br />	node_17_02_2
+<br />	[
+<br />		pencolor = green
+<br />		label    = &quot;&lt;p21&gt; one|&lt;p22&gt; two&quot;
+<br />	]
+<br />
+<br />	node_17_02_1:p11 -&gt; node_17_02_2:p22:s
+<br />	[
+<br />		arrowhead = &quot;odiamond&quot;;
+<br />		arrowtail = &quot;odot&quot;,
+<br />		color     = red
+<br />		dir       = both;
+<br />	];
+<br />
+<br />	subgraph subgraph_17_02_3
+<br />	{
+<br />		node [shape = square]
+<br />
+<br />		label = &quot;&quot;
+<br />
+<br />		node_17_02_4 -&gt; { node [shape = circle] node_17_02_5 }
+<br />		[
+<br />			arrowhead = &quot;empty&quot;,
+<br />			arrowtail = &quot;halfopen&quot;
+<br />			color     = green
+<br />			dir       = &quot;both&quot;,
+<br />		]
+<br />
+<br />		node_17_02_6 -&gt; node_17_02_7
+<br />		[
+<br />			arrowhead = &quot;halfopen&quot;,
+<br />			arrowtail = &quot;empty&quot;
+<br />			color     = blue
+<br />			dir       = &quot;both&quot;,
+<br />		]
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./17.02.svg"></object><br />
+Output file 23: html/17.02.svg (4923 bytes)
+  </td>
+</tr>
+<tr>
+  <td>24</td>
+  <td>
+	Input file: data/18.gv (791 bytes):<br />digraph graph_18
+<br />{
+<br />	label = &quot;dot - graphviz version 2.38.0 (20140413.2041), with local patches from Emden&quot;
+<br />
+<br />	node [style = filled]
+<br />
+<br />	# Subgraph 1.
+<br />
+<br />	subgraph cluster_18_1
+<br />	{
+<br />		label = &quot;&quot;
+<br />
+<br />		node [fillcolor = red]
+<br />
+<br />		node_18_2
+<br />		node_18_3
+<br />	}
+<br />
+<br />	-&gt;
+<br />
+<br />	subgraph
+<br />	{
+<br />		node [fillcolor = green]
+<br />
+<br />		node_18_4
+<br />		node_18_5
+<br />	}
+<br />
+<br />	-&gt;
+<br />
+<br />	cluster_18_6
+<br />
+<br />	[
+<br />		arrowhead = &quot;empty&quot;,
+<br />		arrowtail = &quot;halfopen&quot;
+<br />		color     = green
+<br />		dir       = &quot;both&quot;,
+<br />	]
+<br />
+<br />	# The above is just a node, because without the literal &#39;subgraph&#39;,
+<br />	# it does not represent the name of the following subgraph.
+<br />
+<br />	# Subgraph 3.
+<br />
+<br />	{
+<br />		node_18_7 [fillcolor = blue]
+<br />		node_18_8 [fillcolor = blue]
+<br />	}
+<br />
+<br />	-&gt;
+<br />
+<br />	{
+<br />		node_18_9 [fillcolor = yellow]
+<br />	}
+<br />
+<br />	[
+<br />		arrowhead = &quot;halfopen&quot;,
+<br />		arrowtail = &quot;empty&quot;
+<br />		color     = blue
+<br />		dir       = &quot;both&quot;,
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./18.svg"></object><br />
+Output file 24: html/18.svg (6892 bytes)
+  </td>
+</tr>
+<tr>
+  <td>25</td>
+  <td>
+	Input file: data/19.gv (369 bytes):<br />digraph graph_19
+<br />{
+<br />	size = &quot;6,6&quot;
+<br />
+<br />	node [shape = square]
+<br />	edge [color = red]
+<br />
+<br />	node_19_1 -&gt; node_19_2
+<br />
+<br />	subgraph subgraph_19_3
+<br />	{
+<br />		node [shape = star]
+<br />		edge [color = green]
+<br />
+<br />		node_19_4 -&gt; node_19_5
+<br />
+<br />		subgraph subgraph_19_6
+<br />		{
+<br />			node [shape = circle]
+<br />			edge [color = blue]
+<br />
+<br />			node_19_7 -&gt; node_19_8
+<br />		}
+<br />
+<br />		node_19_9 -&gt; node_19_10
+<br />	}
+<br />
+<br />	node_19_11 -&gt; node_19_12
+<br />}
+
+  </td>
+  <td>
+<object data = "./19.svg"></object><br />
+Output file 25: html/19.svg (5577 bytes)
+  </td>
+</tr>
+<tr>
+  <td>26</td>
+  <td>
+	Input file: data/20.gv (73 bytes):<br />digraph graph_20
+<br />{
+<br />	node_20_1 -&gt; node_20_2 -&gt; node_20_3 [penwidth = 3]
+<br />}
+
+  </td>
+  <td>
+<object data = "./20.svg"></object><br />
+Output file 26: html/20.svg (2147 bytes)
+  </td>
+</tr>
+<tr>
+  <td>27</td>
+  <td>
+	Input file: data/21.gv (46 bytes):<br />digraph graph_21
+<br />{
+<br />	attribute_21 = value_21
+<br />}
+
+  </td>
+  <td>
+<object data = "./21.svg"></object><br />
+Output file 27: html/21.svg (578 bytes)
+  </td>
+</tr>
+<tr>
+  <td>28</td>
+  <td>
+	Input file: data/22.gv (56 bytes):<br />digraph graph_22
+<br />{
+<br />	node_22_1
+<br />	[
+<br />		fillcolor = red
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./22.svg"></object><br />
+Output file 28: html/22.svg (866 bytes)
+  </td>
+</tr>
+<tr>
+  <td>29</td>
+  <td>
+	Input file: data/23.gv (43 bytes):<br />digraph graph_23
+<br />{
+<br />	node_23_1
+<br />	node_23_2
+<br />}
+
+  </td>
+  <td>
+<object data = "./23.svg"></object><br />
+Output file 29: html/23.svg (1133 bytes)
+  </td>
+</tr>
+<tr>
+  <td>30</td>
+  <td>
+	Input file: data/24.gv (85 bytes):<br />digraph graph_24
+<br />{
+<br />	node_24_1
+<br />	[
+<br />		color = red
+<br />	]
+<br />	node_24_2
+<br />	[
+<br />		color = green
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./24.svg"></object><br />
+Output file 30: html/24.svg (1131 bytes)
+  </td>
+</tr>
+<tr>
+  <td>31</td>
+  <td>
+	Input file: data/25.gv (72 bytes):<br />digraph graph_25
+<br />{
+<br />	node_25_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./25.svg"></object><br />
+Output file 31: html/25.svg (877 bytes)
+  </td>
+</tr>
+<tr>
+  <td>32</td>
+  <td>
+	Input file: data/26.gv (73 bytes):<br />digraph graph_26
+<br />{
+<br />	node_26_1
+<br />	[
+<br />		color = red,
+<br />		fontcolor = green
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./26.svg"></object><br />
+Output file 32: html/26.svg (877 bytes)
+  </td>
+</tr>
+<tr>
+  <td>33</td>
+  <td>
+	Input file: data/27.gv (147 bytes):<br />digraph graph_27
+<br />{
+<br />	node_27_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />	]
+<br />	node_27_2
+<br />	[
+<br />		color = green
+<br />		fontcolor = red
+<br />	]
+<br />	node_27_1 -&gt; node_27_2
+<br />}
+
+  </td>
+  <td>
+<object data = "./27.svg"></object><br />
+Output file 33: html/27.svg (1496 bytes)
+  </td>
+</tr>
+<tr>
+  <td>34</td>
+  <td>
+	Input file: data/28.gv (172 bytes):<br />digraph graph_28
+<br />{
+<br />	edge
+<br />	[
+<br />		dir = both
+<br />	]
+<br />	node_28_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />	]
+<br />	node_28_2
+<br />	[
+<br />		color = green
+<br />		fontcolor = red
+<br />	]
+<br />	node_28_1 -&gt; node_28_2
+<br />}
+
+  </td>
+  <td>
+<object data = "./28.svg"></object><br />
+Output file 34: html/28.svg (1612 bytes)
+  </td>
+</tr>
+<tr>
+  <td>35</td>
+  <td>
+	Input file: data/29.01.gv (293 bytes):<br />digraph graph_29_01
+<br />{
+<br />	# &#39;one&#39; is a node name, not a subgraph name.
+<br />
+<br />	one { two -&gt; three }
+<br />
+<br />	# &#39;cluster_four&#39; is a node name, not a subgraph name.
+<br />
+<br />	cluster_four { five -&gt; six }
+<br />
+<br />	# &#39;cluster_seven&#39; is a subgraph name, not a node name.
+<br />
+<br />	subgraph cluster_seven { label = &quot;\G&quot; eight -&gt; nine }
+<br />}
+
+  </td>
+  <td>
+<object data = "./29.01.svg"></object><br />
+Output file 35: html/29.01.svg (3683 bytes)
+  </td>
+</tr>
+<tr>
+  <td>36</td>
+  <td>
+	Input file: data/29.02.gv (60 bytes):<br />digraph graph_29_02
+<br />{
+<br />	{
+<br />		node_29_02_1
+<br />		node_29_02_2
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./29.02.svg"></object><br />
+Output file 36: html/29.02.svg (1157 bytes)
+  </td>
+</tr>
+<tr>
+  <td>37</td>
+  <td>
+	Input file: data/29.03.gv (74 bytes):<br />digraph graph_29_03
+<br />{
+<br />	node_29_03_1
+<br />	{
+<br />		node_29_03_2
+<br />		node_29_03_3
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./29.03.svg"></object><br />
+Output file 37: html/29.03.svg (1433 bytes)
+  </td>
+</tr>
+<tr>
+  <td>38</td>
+  <td>
+	Input file: data/29.04.gv (78 bytes):<br />digraph graph_29_3
+<br />{
+<br />	subgraph sub_29_3_1
+<br />	{
+<br />		node_29_3_2
+<br />		node_29_3_3
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./29.04.svg"></object><br />
+Output file 38: html/29.04.svg (1147 bytes)
+  </td>
+</tr>
+<tr>
+  <td>39</td>
+  <td>
+	Input file: data/29.05.gv (97 bytes):<br />digraph graph_29_05
+<br />{
+<br />	{
+<br />		node_29_05_1
+<br />		node_29_05_2
+<br />	}
+<br />
+<br />	{
+<br />		node_29_05_3
+<br />		node_29_05_4
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./29.05.svg"></object><br />
+Output file 39: html/29.05.svg (1709 bytes)
+  </td>
+</tr>
+<tr>
+  <td>40</td>
+  <td>
+	Input file: data/29.06.gv (110 bytes):<br />digraph graph_29_06
+<br />{
+<br />	{
+<br />		node_29_06_1
+<br />		node_29_06_2
+<br />	}
+<br />
+<br />	sub_29_06_3
+<br />	{
+<br />		node_29_06_4
+<br />		node_29_06_5
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./29.06.svg"></object><br />
+Output file 40: html/29.06.svg (1982 bytes)
+  </td>
+</tr>
+<tr>
+  <td>41</td>
+  <td>
+	Input file: data/29.07.gv (119 bytes):<br />digraph graph_29_07
+<br />{
+<br />	{
+<br />		node_29_07_1
+<br />		node_29_07_2
+<br />	}
+<br />
+<br />	subgraph sub_29_07_3
+<br />	{
+<br />		node_29_07_4
+<br />		node_29_07_5
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./29.07.svg"></object><br />
+Output file 41: html/29.07.svg (1709 bytes)
+  </td>
+</tr>
+<tr>
+  <td>42</td>
+  <td>
+	Input file: data/30.gv (134 bytes):<br />digraph graph_30
+<br />{
+<br />	node_30_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />		label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;html-style label&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./30.svg"></object><br />
+Output file 42: html/30.svg (1164 bytes)
+  </td>
+</tr>
+<tr>
+  <td>43</td>
+  <td>
+	Input file: data/31.gv (191 bytes):<br />digraph graph_31
+<br />{
+<br />	node_31_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />		label = &lt;&lt;table border=&#39;0&#39;&gt;&lt;tr&gt;&lt;td&gt;html-style label with literal &amp;lt;br /&amp;gt; and no table border&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./31.svg"></object><br />
+Output file 43: html/31.svg (961 bytes)
+  </td>
+</tr>
+<tr>
+  <td>44</td>
+  <td>
+	Input file: data/32.gv (180 bytes):<br />digraph graph_32
+<br />{
+<br />	node_32_1
+<br />	[
+<br />		arbitrary = attribute
+<br />		color = red
+<br />		fontcolor = green
+<br />		label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;html-style label with literal &amp;lt;&amp;gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./32.svg"></object><br />
+Output file 44: html/32.svg (1155 bytes)
+  </td>
+</tr>
+<tr>
+  <td>45</td>
+  <td>
+	Input file: data/33.gv (374 bytes):<br />digraph graph_33
+<br />{
+<br />	node_33_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />		label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;html-style label for node_33_1&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	]
+<br />	node_33_2
+<br />	[
+<br />		color = green
+<br />		fontcolor = red
+<br />		label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;html-style label for node_33_2&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	]
+<br />	node_33_1 -&gt; node_33_2
+<br />	[
+<br />		arrowhead = crow
+<br />		arrowtail = diamond
+<br />		color = blue
+<br />		dir = both
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./33.svg"></object><br />
+Output file 45: html/33.svg (2208 bytes)
+  </td>
+</tr>
+<tr>
+  <td>46</td>
+  <td>
+	Input file: data/34.gv (173 bytes):<br />digraph graph_34
+<br />{
+<br />	node_34_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />		label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;html-style label with &amp;lt;&amp;gt; embedded angle brackets&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	];
+<br />}
+
+  </td>
+  <td>
+<object data = "./34.svg"></object><br />
+Output file 46: html/34.svg (1203 bytes)
+  </td>
+</tr>
+<tr>
+  <td>47</td>
+  <td>
+	Input file: data/35.gv (377 bytes):<br />digraph graph_35
+<br />{
+<br />	node_35_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />		label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;html-style label for node_35_1&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	];
+<br />	node_35_2
+<br />	[
+<br />		color = green
+<br />		fontcolor = red
+<br />		label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;html-style label for node_35_2&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	];
+<br />	node_35_1 -&gt; node_35_2
+<br />	[
+<br />		arrowhead = crow
+<br />		arrowtail = diamond
+<br />		color = blue
+<br />		dir = both
+<br />	];
+<br />}
+
+  </td>
+  <td>
+<object data = "./35.svg"></object><br />
+Output file 47: html/35.svg (2208 bytes)
+  </td>
+</tr>
+<tr>
+  <td>48</td>
+  <td>
+	Input file: data/36.gv (95 bytes):<br />digraph graph_36
+<br />{
+<br />// C++-style comment.
+<br />	node_36_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />	];
+<br />}
+
+  </td>
+  <td>
+<object data = "./36.svg"></object><br />
+Output file 48: html/36.svg (877 bytes)
+  </td>
+</tr>
+<tr>
+  <td>49</td>
+  <td>
+	Input file: data/37.gv (95 bytes):<br />digraph graph_37
+<br />{
+<br /># Bash-style comment.
+<br />	node_37_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />	];
+<br />}
+
+  </td>
+  <td>
+<object data = "./37.svg"></object><br />
+Output file 49: html/37.svg (877 bytes)
+  </td>
+</tr>
+<tr>
+  <td>50</td>
+  <td>
+	Input file: data/38.gv (252 bytes):<br />digraph graph_38
+<br />{
+<br />	node_38_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />		label = &lt;&lt;table border=&#39;0&#39;&gt;&lt;tr&gt;&lt;td&gt;html-style label with 2 &lt;br align=&#39;center&#39; /&gt; &amp;lt;br /&amp;gt;s in the middle &lt;br align=&#39;center&#39; /&gt; and without a table border.&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./38.svg"></object><br />
+Output file 50: html/38.svg (1209 bytes)
+  </td>
+</tr>
+<tr>
+  <td>51</td>
+  <td>
+	Input file: data/39.gv (122 bytes):<br />digraph graph_39
+<br />{
+<br />	node_39_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />		label = &quot;Quoted label with \n embedded newline&quot;
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./39.svg"></object><br />
+Output file 51: html/39.svg (1048 bytes)
+  </td>
+</tr>
+<tr>
+  <td>52</td>
+  <td>
+	Input file: data/40.gv (85 bytes):<br />digraph &quot;graph_40&quot;
+<br />{
+<br />	&quot;node_40_1&quot;
+<br />	[
+<br />		&quot;color&quot; = &quot;red&quot;,
+<br />		&quot;fontcolor&quot; = &quot;green&quot;
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./40.svg"></object><br />
+Output file 52: html/40.svg (877 bytes)
+  </td>
+</tr>
+<tr>
+  <td>53</td>
+  <td>
+	Input file: data/41.gv (90 bytes):<br />digraph
+<br />{
+<br />	node_41_1
+<br />	[
+<br />		color = red,
+<br />		fontcolor = green
+<br />		label = &quot;ID-less graph&quot;
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./41.svg"></object><br />
+Output file 53: html/41.svg (871 bytes)
+  </td>
+</tr>
+<tr>
+  <td>54</td>
+  <td>
+	Input file: data/42.01.gv (44 bytes):<br />digraph graph_42_01
+<br />{
+<br />	node_42_01_1
+<br />	[
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./42.01.svg"></object><br />
+Output file 54: html/42.01.svg (881 bytes)
+  </td>
+</tr>
+<tr>
+  <td>55</td>
+  <td>
+	Input file: data/42.02.gv (56 bytes):<br />digraph graph_42_02
+<br />{
+<br />	node_42_02_1
+<br />	[
+<br />		fixedsize
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>56</td>
+  <td>
+	Input file: data/42.03.gv (63 bytes):<br />digraph graph_42_03
+<br />{
+<br />	node_42_03_1
+<br />	[
+<br />		fixedsize = true
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./42.03.svg"></object><br />
+Output file 56: html/42.03.svg (854 bytes)
+  </td>
+</tr>
+<tr>
+  <td>57</td>
+  <td>
+	Input file: data/42.04.gv (64 bytes):<br />digraph graph_42_04
+<br />{
+<br />	node_42_04_1
+<br />	[
+<br />		fixedsize
+<br />		width
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>58</td>
+  <td>
+	Input file: data/42.05.gv (68 bytes):<br />digraph graph_42_05
+<br />{
+<br />	node_42_05_1
+<br />	[
+<br />		fixedsize
+<br />		width = 2
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>59</td>
+  <td>
+	Input file: data/42.06.gv (71 bytes):<br />digraph graph_42_06
+<br />{
+<br />	node_42_06_1
+<br />	[
+<br />		fixedsize = true
+<br />		width
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>60</td>
+  <td>
+	Input file: data/42.07.gv (75 bytes):<br />digraph graph_42_07
+<br />{
+<br />	node_42_07_1
+<br />	[
+<br />		fixedsize = true
+<br />		width = 2
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./42.07.svg"></object><br />
+Output file 60: html/42.07.svg (858 bytes)
+  </td>
+</tr>
+<tr>
+  <td>61</td>
+  <td>
+	Input file: data/42.08.gv (73 bytes):<br />digraph graph_42_08
+<br />{
+<br />	node_42_08_1
+<br />	[
+<br />		fixedsize
+<br />		height
+<br />		width
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>62</td>
+  <td>
+	Input file: data/42.09.gv (77 bytes):<br />digraph graph_42_09
+<br />{
+<br />	node_42_09_1
+<br />	[
+<br />		fixedsize
+<br />		height
+<br />		width = 2
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>63</td>
+  <td>
+	Input file: data/42.10.gv (81 bytes):<br />digraph graph_42_10
+<br />{
+<br />	node_42_10_1
+<br />	[
+<br />		fixedsize
+<br />		height = 2
+<br />		width = 2
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>64</td>
+  <td>
+	Input file: data/42.11.gv (84 bytes):<br />digraph graph_42_11
+<br />{
+<br />	node_42_11_1
+<br />	[
+<br />		fixedsize = true
+<br />		height
+<br />		width = 2
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>65</td>
+  <td>
+	Input file: data/42.12.gv (77 bytes):<br />digraph graph_42_12
+<br />{
+<br />	node_42_12_1
+<br />	[
+<br />		fixedsize
+<br />		height = 2
+<br />		width
+<br />	]
+<br />}
+
+  </td>
+  <td>
+Dot result: Error.<br />
+  </td>
+</tr>
+<tr>
+  <td>66</td>
+  <td>
+	Input file: data/43.gv (134 bytes):<br />digraph graph_43
+<br />{
+<br />	node_43_1
+<br />	[
+<br />		color = red
+<br />		fontcolor = green
+<br />		shape = box
+<br />	]
+<br />	node_43_2
+<br />	[
+<br />		fixedsize = true
+<br />		width = 2
+<br />	]
+<br />}
+
+  </td>
+  <td>
+<object data = "./43.svg"></object><br />
+Output file 66: html/43.svg (1125 bytes)
+  </td>
+</tr>
+<tr>
+  <td>67</td>
+  <td>
+	Input file: data/44.gv (76 bytes):<br />graph graph_44
+<br />{
+<br />	node
+<br />	[
+<br />		shape = box
+<br />	]
+<br />	course;
+<br />	institute;
+<br />	student;
+<br />}
+
+  </td>
+  <td>
+<object data = "./44.svg"></object><br />
+Output file 67: html/44.svg (1367 bytes)
+  </td>
+</tr>
+<tr>
+  <td>68</td>
+  <td>
+	Input file: data/45.gv (159 bytes):<br />graph graph_45
+<br />{
+<br />	node
+<br />	[
+<br />		shape = box
+<br />	]
+<br />	course;
+<br />	institute;
+<br />	student;
+<br />	node
+<br />	[
+<br />		shape = ellipse
+<br />	]
+<br />	node
+<br />	[
+<br />		label = &quot;name&quot;
+<br />	]
+<br />	name0;
+<br />	name1;
+<br />	name2;
+<br />}
+
+  </td>
+  <td>
+<object data = "./45.svg"></object><br />
+Output file 68: html/45.svg (2113 bytes)
+  </td>
+</tr>
+<tr>
+  <td>69</td>
+  <td>
+	Input file: data/46.gv (172 bytes):<br />graph graph_46
+<br />{
+<br />	node
+<br />	[
+<br />		shape = box
+<br />	]
+<br />	course;
+<br />	institute;
+<br />	student;
+<br />	node
+<br />	[
+<br />		shape = ellipse
+<br />	]
+<br />	{
+<br />		node
+<br />		[
+<br />			label = &quot;name&quot;
+<br />		]
+<br />		name0;
+<br />		name1;
+<br />		name2;
+<br />	}
+<br />}
+
+  </td>
+  <td>
+<object data = "./46.svg"></object><br />
+Output file 69: html/46.svg (2113 bytes)
+  </td>
+</tr>
+<tr>
+  <td>70</td>
+  <td>
+	Input file: data/47.01.gv (88 bytes):<br />digraph graph_47_01
+<br />{
+<br />	big
+<br />	-&gt;
+<br />	{
+<br />		small
+<br />		smaller
+<br />		smallest
+<br />	}
+<br />	[pencolor = green]
+<br />}
+
+  </td>
+  <td>
+<object data = "./47.01.svg"></object><br />
+Output file 70: html/47.01.svg (2591 bytes)
+  </td>
+</tr>
+<tr>
+  <td>71</td>
+  <td>
+	Input file: data/47.02.gv (88 bytes):<br />digraph graph_47_02
+<br />{
+<br />	{
+<br />		small
+<br />		smaller
+<br />		smallest
+<br />	}
+<br />	-&gt;
+<br />	big
+<br />	[pencolor = green]
+<br />}
+
+  </td>
+  <td>
+<object data = "./47.02.svg"></object><br />
+Output file 71: html/47.02.svg (2581 bytes)
+  </td>
+</tr>
+<tr>
+  <td>72</td>
+  <td>
+	Input file: data/47.03.gv (114 bytes):<br />digraph graph_47_03
+<br />{
+<br />	{
+<br />		small
+<br />		smaller
+<br />		smallest
+<br />	}
+<br />	-&gt;
+<br />	{
+<br />		big
+<br />		bigger
+<br />		biggest
+<br />	}
+<br />	[pencolor = green]
+<br />}
+
+  </td>
+  <td>
+<object data = "./47.03.svg"></object><br />
+Output file 72: html/47.03.svg (5136 bytes)
+  </td>
+</tr>
+<tr>
+  <td>73</td>
+  <td>
+	Input file: data/48.gv (187 bytes):<br />graph graph_48
+<br />{
+<br />	node
+<br />	[
+<br />		shape = box
+<br />	]
+<br />	course;
+<br />	institute;
+<br />	student;
+<br />	node
+<br />	[
+<br />		shape = ellipse
+<br />	]
+<br />	{
+<br />	}
+<br />	code;
+<br />	grade;
+<br />	number;
+<br />	name0 -- course;
+<br />	code -- course;
+<br />	fontsize = 20;
+<br />}
+
+  </td>
+  <td>
+<object data = "./48.svg"></object><br />
+Output file 73: html/48.svg (2904 bytes)
+  </td>
+</tr>
+<tr>
+  <td>74</td>
+  <td>
+	Input file: data/49.gv (247 bytes):<br />graph graph_49
+<br />{
+<br />	node
+<br />	[
+<br />		shape = box
+<br />	]
+<br />	course;
+<br />	institute;
+<br />	student;
+<br />	node
+<br />	[
+<br />		shape = ellipse
+<br />	]
+<br />	{
+<br />		node
+<br />		[
+<br />			label = &quot;name&quot;
+<br />		]
+<br />		name0;
+<br />		name1;
+<br />		name2;
+<br />	}
+<br />	code;
+<br />	grade;
+<br />	number;
+<br />	name0 -- course;
+<br />	code -- course;
+<br />	fontsize = 20;
+<br />}
+
+  </td>
+  <td>
+<object data = "./49.svg"></object><br />
+Output file 74: html/49.svg (3413 bytes)
+  </td>
+</tr>
+<tr>
+  <td>75</td>
+  <td>
+	Input file: data/50.gv (63 bytes):<br />digraph graph_50
+<br />{
+<br /># A node whose name is 0. Can we cope?
+<br />	0
+<br />}
+
+  </td>
+  <td>
+<object data = "./50.svg"></object><br />
+Output file 75: html/50.svg (815 bytes)
+  </td>
+</tr>
+<tr>
+  <td>76</td>
+  <td>
+	Input file: data/51.gv (177 bytes):<br />digraph graph_51
+<br />{
+<br />	edge [color = blue]
+<br />
+<br />	node [shape = Mdiamond]
+<br />
+<br />	node_51_01
+<br />
+<br />	node [shape = Msquare]
+<br />
+<br />	node_51_02
+<br />
+<br />	graph [label = &quot;Class Demo&quot;]
+<br />
+<br />	node_51_01 -&gt; node_51_02
+<br />}
+
+  </td>
+  <td>
+<object data = "./51.svg"></object><br />
+Output file 76: html/51.svg (2268 bytes)
+  </td>
+</tr>
+<tr>
+  <td>77</td>
+  <td>
+	Input file: data/52.gv (183 bytes):<br /># In V 1.04 this would output a node called &#39;node_52_2node_52_3&#39;.
+<br /># This bug is fixed in V 1.05. See notes in the CHANGES file.
+<br />
+<br />digraph graph_52
+<br />{
+<br />node_52_1 -&gt; node_52_2
+<br />node_52_3
+<br />}
+
+  </td>
+  <td>
+<object data = "./52.svg"></object><br />
+Output file 77: html/52.svg (1741 bytes)
+  </td>
+</tr>
+<tr>
+  <td>78</td>
+  <td>
+	Input file: data/53.gv (690 bytes):<br /># Hash comment
+<br />
+<br />strict digraph graph_53
+<br />{
+<br />	label   = &quot;Complex\rSyntax\lTest&quot;
+<br />	rankdir = TB
+<br />
+<br />	A [shape = oval]
+<br />
+<br />	node [shape = house]
+<br />	edge [color = purple]
+<br />
+<br />	{
+<br />		rank = same
+<br />		B
+<br />		C
+<br />		node [shape = oval]
+<br />		D
+<br />		ordering = out
+<br />		A -&gt; B
+<br />		C -&gt; D
+<br />	}
+<br />
+<br />	node [color = green style = filled]
+<br />	E
+<br />	F
+<br />	E -&gt; F [label = &quot;e-&gt;f&quot;, dir = both, arrowhead = dot, arrowtail = odot]
+<br />
+<br />	subgraph cluster_outer
+<br />	{
+<br />		G -&gt; H
+<br />		node [shape = hexagon]
+<br />		node [color = red]
+<br />		label = Outer
+<br />		subgraph cluster_inner
+<br />		{
+<br />			node [shape = triangle]
+<br />			edge [color = blue]
+<br />			I [color = pink shape = square]
+<br />			I -&gt; J
+<br />			label = Inner
+<br />		}
+<br />	}
+<br />	graph [rankdir = TB]
+<br />	node  [color   = orange]
+<br />	K
+<br />	L
+<br />	K -&gt; L [label = &quot;k-&gt;l&quot;]
+<br />}
+
+  </td>
+  <td>
+<object data = "./53.svg"></object><br />
+Output file 78: html/53.svg (6628 bytes)
+  </td>
+</tr>
+<tr>
+  <td>79</td>
+  <td>
+	Input file: data/54.gv (115 bytes):<br /># V 1.05 would mis-parse &#39;A [] B&#39; as &#39;A&#39;.
+<br /># Node B would be lost because [] is empty.
+<br />
+<br />digraph graph_54
+<br />{
+<br />A [] B
+<br />}
+
+  </td>
+  <td>
+<object data = "./54.svg"></object><br />
+Output file 79: html/54.svg (1047 bytes)
+  </td>
+</tr>
+<tr>
+  <td>80</td>
+  <td>
+	Input file: data/55.gv (1024 bytes):<br />strict digraph graph_55
+<br />{
+<br />	label = &quot;Complex Syntax Test&quot;
+<br />
+<br />	A [color = blue]
+<br />
+<br />	node [shape = house]
+<br />	edge [color = purple]
+<br />
+<br />	{
+<br />		rank = same
+<br />		C
+<br />		node [fillcolor = goldenrod shape = circle style = filled]
+<br />		A -&gt; B
+<br />		B [color = mediumseagreen]
+<br />		C [color = firebrick1]
+<br />		B -&gt; C [color = orange penwidth = 5]
+<br />		node [fillcolor = turquoise4]
+<br />		C -&gt; D [arrowtail = obox arrowhead = crow dir = both minlen = 2]
+<br />		D -&gt; E [arrowtail = odot arrowhead = dot dir = both minlen = 2 penwidth = 5]
+<br />		{
+<br />			node [fillcolor = darkorchid shape = pentagon]
+<br />			F [color = darkorchid fillcolor = yellow penwidth = 5 shape = hexagon]
+<br />			G [color = crimson penwidth = 7]
+<br />			F -&gt; G
+<br />		}
+<br />	}
+<br />
+<br />	B [shape = square]
+<br />
+<br />	node [fillcolor = lightblue fontsize = 20 style = filled]
+<br />
+<br />	subgraph cluster_outer
+<br />	{
+<br />		label = Outer
+<br />		H -&gt; I
+<br />
+<br />		subgraph cluster_inner
+<br />		{
+<br />			label = Inner
+<br />			node [fillcolor = magenta fontsize = 26 shape = triangle]
+<br />			edge [color = blue]
+<br />			J [color = yellow shape = square]
+<br />			J -&gt; K [penwidth = 4]
+<br />		}
+<br />	}
+<br />	graph [rankdir = TB]
+<br />}
+
+  </td>
+  <td>
+<object data = "./55.svg"></object><br />
+Output file 80: html/55.svg (6917 bytes)
+  </td>
+</tr>
+<tr>
+  <td>81</td>
+  <td>
+	Input file: data/56.gv (1353 bytes):<br />digraph g {
+<br />	rankdir=LR;
+<br />
+<br />	node [shape=rpromoter colorscheme=rdbu5 color=1 style=filled fontcolor=3]; Hef1a; TRE; UAS; Hef1aLacOid;
+<br />	Hef1aLacOid [label=&quot;Hef1a-LacOid&quot;];
+<br />	node [shape=rarrow colorscheme=rdbu5 color=5 style=filled fontcolor=3]; Gal4VP16; LacI; rtTA3; DeltamCherry;
+<br />	Gal4VP16 [label=&quot;Gal4-VP16&quot;];
+<br />	product [shape=oval style=filled colorscheme=rdbu5 color=2 label=&quot;&quot;];
+<br />	repression [shape=oval label=&quot;LacI repression&quot; fontcolor=black style=dotted];
+<br />	node [shape=oval style=filled colorscheme=rdbu5 color=4 fontcolor=5];
+<br />	combination [label=&quot;rtTA3 + Doxycycline&quot;];
+<br />	LacIprotein [label=&quot;LacI&quot;];
+<br />	rtTA3protein [label=&quot;rtTA3&quot;];
+<br />	Gal4VP16protein [label=&quot;Gal4-VP16&quot;];
+<br />
+<br />
+<br />	subgraph cluster_0 {
+<br />		colorscheme=rdbu5;
+<br />		color=3;
+<br />		node [colorscheme=rdbu5 fontcolor=3];
+<br />		Hef1a -&gt; Gal4VP16 [arrowhead=none];
+<br />		Gal4VP16 -&gt; UAS [arrowhead=none];
+<br />		UAS -&gt; LacI [arrowhead=none];
+<br />		LacI -&gt; Hef1aLacOid [arrowhead=none];
+<br />		Hef1aLacOid -&gt; rtTA3 [arrowhead=none];
+<br />		rtTA3 -&gt; TRE [arrowhead=none];
+<br />		TRE -&gt; DeltamCherry [arrowhead=none]
+<br />	}
+<br />
+<br />	Gal4VP16 -&gt; Gal4VP16protein;
+<br />	Gal4VP16protein -&gt; UAS;
+<br />	LacI -&gt; LacIprotein;
+<br />	LacIprotein -&gt; repression;
+<br />	repression -&gt; Hef1aLacOid [arrowhead=tee];
+<br />	IPTG -&gt; repression [arrowhead=tee];
+<br />	rtTA3 -&gt; rtTA3protein;
+<br />	rtTA3protein -&gt; combination;
+<br />	combination -&gt; TRE;
+<br />	Doxycycline -&gt; combination;
+<br />	DeltamCherry -&gt; product;
+<br />
+<br />
+<br />
+<br />}
+
+  </td>
+  <td>
+<object data = "./56.svg"></object><br />
+Output file 81: html/56.svg (10989 bytes)
+  </td>
+</tr>
+<tr>
+  <td>82</td>
+  <td>
+	Input file: data/57.gv (4389 bytes):<br />digraph G {
+<br />	graph [rankdir=LR nodesep=0]
+<br />	node [shape=point label=&quot;&quot;]
+<br />	edge [fontsize=10]
+<br />	_box -&gt; box [arrowhead=box label=box]
+<br />	box -&gt; boxbox [arrowhead=boxbox label=boxbox]
+<br />	_box -&gt; lbox [arrowhead=lbox label=lbox]
+<br />	lbox -&gt; lboxlbox [arrowhead=lboxlbox label=lboxlbox]
+<br />	_box -&gt; rbox [arrowhead=rbox label=rbox]
+<br />	rbox -&gt; rboxrbox [arrowhead=rboxrbox label=rboxrbox]
+<br />	_box -&gt; olbox [arrowhead=olbox label=olbox]
+<br />	olbox -&gt; olboxolbox [arrowhead=olboxolbox label=olboxolbox]
+<br />	_box -&gt; orbox [arrowhead=orbox label=orbox]
+<br />	orbox -&gt; orboxorbox [arrowhead=orboxorbox label=orboxorbox]
+<br />	_box -&gt; obox [arrowhead=obox label=obox]
+<br />	obox -&gt; oboxobox [arrowhead=oboxobox label=oboxobox]
+<br />	_crow -&gt; crow [arrowhead=crow label=crow]
+<br />	crow -&gt; crowcrow [arrowhead=crowcrow label=crowcrow]
+<br />	_crow -&gt; lcrow [arrowhead=lcrow label=lcrow]
+<br />	lcrow -&gt; lcrowlcrow [arrowhead=lcrowlcrow label=lcrowlcrow]
+<br />	_crow -&gt; rcrow [arrowhead=rcrow label=rcrow]
+<br />	rcrow -&gt; rcrowrcrow [arrowhead=rcrowrcrow label=rcrowrcrow]
+<br />	_diamond -&gt; diamond [arrowhead=diamond label=diamond]
+<br />	diamond -&gt; diamonddiamond [arrowhead=diamonddiamond label=diamonddiamond]
+<br />	_diamond -&gt; ldiamond [arrowhead=ldiamond label=ldiamond]
+<br />	ldiamond -&gt; ldiamondldiamond [arrowhead=ldiamondldiamond label=ldiamondldiamond]
+<br />	_diamond -&gt; rdiamond [arrowhead=rdiamond label=rdiamond]
+<br />	rdiamond -&gt; rdiamondrdiamond [arrowhead=rdiamondrdiamond label=rdiamondrdiamond]
+<br />	_diamond -&gt; oldiamond [arrowhead=oldiamond label=oldiamond]
+<br />	oldiamond -&gt; oldiamondoldiamond [arrowhead=oldiamondoldiamond label=oldiamondoldiamond]
+<br />	_diamond -&gt; ordiamond [arrowhead=ordiamond label=ordiamond]
+<br />	ordiamond -&gt; ordiamondordiamond [arrowhead=ordiamondordiamond label=ordiamondordiamond]
+<br />	_diamond -&gt; odiamond [arrowhead=odiamond label=odiamond]
+<br />	odiamond -&gt; odiamondodiamond [arrowhead=odiamondodiamond label=odiamondodiamond]
+<br />	_dot -&gt; dot [arrowhead=dot label=dot]
+<br />	dot -&gt; dotdot [arrowhead=dotdot label=dotdot]
+<br />	_dot -&gt; odot [arrowhead=odot label=odot]
+<br />	odot -&gt; odotodot [arrowhead=odotodot label=odotodot]
+<br />	_inv -&gt; inv [arrowhead=inv label=inv]
+<br />	inv -&gt; invinv [arrowhead=invinv label=invinv]
+<br />	_inv -&gt; linv [arrowhead=linv label=linv]
+<br />	linv -&gt; linvlinv [arrowhead=linvlinv label=linvlinv]
+<br />	_inv -&gt; rinv [arrowhead=rinv label=rinv]
+<br />	rinv -&gt; rinvrinv [arrowhead=rinvrinv label=rinvrinv]
+<br />	_inv -&gt; olinv [arrowhead=olinv label=olinv]
+<br />	olinv -&gt; olinvolinv [arrowhead=olinvolinv label=olinvolinv]
+<br />	_inv -&gt; orinv [arrowhead=orinv label=orinv]
+<br />	orinv -&gt; orinvorinv [arrowhead=orinvorinv label=orinvorinv]
+<br />	_inv -&gt; oinv [arrowhead=oinv label=oinv]
+<br />	oinv -&gt; oinvoinv [arrowhead=oinvoinv label=oinvoinv]
+<br />	_none -&gt; none [arrowhead=none label=none]
+<br />	none -&gt; nonenone [arrowhead=nonenone label=nonenone]
+<br />	_normal -&gt; normal [arrowhead=normal label=normal]
+<br />	normal -&gt; normalnormal [arrowhead=normalnormal label=normalnormal]
+<br />	_normal -&gt; lnormal [arrowhead=lnormal label=lnormal]
+<br />	lnormal -&gt; lnormallnormal [arrowhead=lnormallnormal label=lnormallnormal]
+<br />	_normal -&gt; rnormal [arrowhead=rnormal label=rnormal]
+<br />	rnormal -&gt; rnormalrnormal [arrowhead=rnormalrnormal label=rnormalrnormal]
+<br />	_normal -&gt; olnormal [arrowhead=olnormal label=olnormal]
+<br />	olnormal -&gt; olnormalolnormal [arrowhead=olnormalolnormal label=olnormalolnormal]
+<br />	_normal -&gt; ornormal [arrowhead=ornormal label=ornormal]
+<br />	ornormal -&gt; ornormalornormal [arrowhead=ornormalornormal label=ornormalornormal]
+<br />	_normal -&gt; onormal [arrowhead=onormal label=onormal]
+<br />	onormal -&gt; onormalonormal [arrowhead=onormalonormal label=onormalonormal]
+<br />	_tee -&gt; tee [arrowhead=tee label=tee]
+<br />	tee -&gt; teetee [arrowhead=teetee label=teetee]
+<br />	_tee -&gt; ltee [arrowhead=ltee label=ltee]
+<br />	ltee -&gt; lteeltee [arrowhead=lteeltee label=lteeltee]
+<br />	_tee -&gt; rtee [arrowhead=rtee label=rtee]
+<br />	rtee -&gt; rteertee [arrowhead=rteertee label=rteertee]
+<br />	_vee -&gt; vee [arrowhead=vee label=vee]
+<br />	vee -&gt; veevee [arrowhead=veevee label=veevee]
+<br />	_vee -&gt; lvee [arrowhead=lvee label=lvee]
+<br />	lvee -&gt; lveelvee [arrowhead=lveelvee label=lveelvee]
+<br />	_vee -&gt; rvee [arrowhead=rvee label=rvee]
+<br />	rvee -&gt; rveervee [arrowhead=rveervee label=rveervee]
+<br />	_curve -&gt; curve [arrowhead=curve label=curve]
+<br />	curve -&gt; curvecurve [arrowhead=curvecurve label=curvecurve]
+<br />	_curve -&gt; lcurve [arrowhead=lcurve label=lcurve]
+<br />	lcurve -&gt; lcurvelcurve [arrowhead=lcurvelcurve label=lcurvelcurve]
+<br />	_curve -&gt; rcurve [arrowhead=rcurve label=rcurve]
+<br />	rcurve -&gt; rcurvercurve [arrowhead=rcurvercurve label=rcurvercurve]
+<br />}
+
+  </td>
+  <td>
+<object data = "./57.svg"></object><br />
+Output file 82: html/57.svg (58546 bytes)
+  </td>
+</tr>
+<tr>
+  <td>83</td>
+  <td>
+	Input file: data/58.gv (203 bytes):<br />digraph graph_58
+<br />{
+<br />	&lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;node_58_1&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;
+<br />
+<br />	&lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;node_58_2&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt; [label = &quot;node_58_2&quot;]
+<br />
+<br />	node_58_3 [label = &lt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;node_58_3&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;]
+<br />}
+
+  </td>
+  <td>
+<object data = "./58.svg"></object><br />
+Output file 83: html/58.svg (2047 bytes)
+  </td>
+</tr>
+<tr>
+  <td>84</td>
+  <td>
+	Input file: data/59.01.gv (32 bytes):<br />digraph graph_59_01
+<br />{
+<br />	A -&gt; B
+<br />}
+
+  </td>
+  <td>
+<object data = "./59.01.svg"></object><br />
+Output file 84: html/59.01.svg (1333 bytes)
+  </td>
+</tr>
+<tr>
+  <td>85</td>
+  <td>
+	Input file: data/59.02.gv (57 bytes):<br /># Comment before graph.
+<br />
+<br />digraph graph_59_02
+<br />{
+<br />	A -&gt; B
+<br />}
+
+  </td>
+  <td>
+<object data = "./59.02.svg"></object><br />
+Output file 85: html/59.02.svg (1333 bytes)
+  </td>
+</tr>
+<tr>
+  <td>86</td>
+  <td>
+	Input file: data/59.03.gv (56 bytes):<br />digraph graph_59_03
+<br />{
+<br />	A -&gt; B
+<br />}
+<br />
+<br /># Comment after graph.
+
+  </td>
+  <td>
+<object data = "./59.03.svg"></object><br />
+Output file 86: html/59.03.svg (1333 bytes)
+  </td>
+</tr>
+<tr>
+  <td>87</td>
+  <td>
+	Input file: data/59.04.gv (81 bytes):<br /># Comment before graph.
+<br />
+<br />digraph graph_59_04
+<br />{
+<br />	A -&gt; B
+<br />}
+<br />
+<br /># Comment after graph.
+
+  </td>
+  <td>
+<object data = "./59.04.svg"></object><br />
+Output file 87: html/59.04.svg (1333 bytes)
+  </td>
+</tr>
+<tr>
+  <td>88</td>
+  <td>
+	Input file: data/59.05.gv (225 bytes):<br />digraph graph_59_05
+<br />{
+<br />	edge [penwidth = 3]
+<br />
+<br />	node [shape = square]
+<br />
+<br />	# Comment within graph.
+<br />
+<br />	A -&gt; B [arrowhead = odot]
+<br />
+<br />	# Comment within graph.
+<br />
+<br />	C -&gt; D
+<br />
+<br />	# Comment within graph.
+<br />
+<br />	label = &quot;Test BNF re comment handling&quot;
+<br />}
+
+  </td>
+  <td>
+<object data = "./59.05.svg"></object><br />
+Output file 88: html/59.05.svg (2353 bytes)
+  </td>
+</tr>
+<tr>
+  <td>89</td>
+  <td>
+	Input file: data/60.gv (51 bytes):<br />digraph graph_60
+<br />{
+<br />	node_60_1 [label = &lt;.    .&gt;]
+<br />}
+
+  </td>
+  <td>
+<object data = "./60.svg"></object><br />
+Output file 89: html/60.svg (852 bytes)
+  </td>
+</tr>
+<tr>
+  <td>90</td>
+  <td>
+	Input file: data/61.gv (90 bytes):<br />digraph graph_61
+<br />{
+<br />	node_61_1 [label = &quot;Backslash used to put \
+<br />this label on 2 lines&quot;]
+<br />}
+
+  </td>
+  <td>
+<object data = "./61.svg"></object><br />
+Output file 90: html/61.svg (900 bytes)
+  </td>
+</tr>
+<tr>
+  <td>91</td>
+  <td>
+	Input file: data/62.gv (207 bytes):<br />// Use double-quotes around &#39;reserved&#39; words.
+<br />
+<br /># &quot;digraph&quot; is a graph name and not a graph type.
+<br />
+<br />digraph &quot;digraph&quot;
+<br />{
+<br />	# &quot;node&quot; is a node name and not a class name.
+<br />
+<br />	&quot;node&quot; [color = green style = filled]
+<br />}
+
+  </td>
+  <td>
+<object data = "./62.svg"></object><br />
+Output file 91: html/62.svg (846 bytes)
+  </td>
+</tr>
+</table>
+
+<h3 class="global_toc_text">Links</h3>
+
+<h2 align="center">Index page for <a href="http://savage.net.au/Graphviz.html">all graph module demos</a></h2>
+
+<hr />
+
+<h3 class="global_toc_text">Environment</h3>
+
+<table align="center" cellspacing="0">
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+Author
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+<a href="http://savage.net.au/">Ron Savage</a>
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="odd_left">
+Date
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="odd_right">
+2014-12-15
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+OS
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+Debian V 7
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="last_odd_left">
+Perl
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="last_odd_right">
+5.18.2
+</div>
+</td>
+</tr>
+</table>
+
+<hr />
+
+</body>
+</html>

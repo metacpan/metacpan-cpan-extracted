@@ -1,0 +1,45 @@
+dir /etc
+obj /etc/dnsroots.global 3970a806494195485b72bfe299a1c672 1082975754
+dir /usr
+dir /usr/bin
+obj /usr/bin/axfrdns-conf 90b32d81a2f5eef63af15d8b72f81ba5 1082975754
+obj /usr/bin/dnscache-conf b9dff60f0f821706af3b32afb1298d16 1082975754
+obj /usr/bin/pickdns-conf 9d127d66817e557945697ea970e16d4a 1082975754
+obj /usr/bin/rbldns-conf d935abffed71772ffd00a435ee11d966 1082975754
+obj /usr/bin/tinydns-conf 93f01c3a2636cd14f9b7bef61d3d36a8 1082975754
+obj /usr/bin/walldns-conf 268509ecdfee0ee281d378c1b2b2dc6e 1082975754
+obj /usr/bin/dnscache 3dac2da0998ddc3e48273950b7551bb4 1082975754
+obj /usr/bin/tinydns d3b3979b748168615b9a2c2386d5d330 1082975754
+obj /usr/bin/walldns a68267d96b535ab81bde859f460a0db1 1082975754
+obj /usr/bin/rbldns aa2ca2127ee12d09ebcd9d63eda86ac8 1082975754
+obj /usr/bin/pickdns e5c328239a12a85d26fa727a588b3a1e 1082975754
+obj /usr/bin/axfrdns 8b91f992eb89a84cec62d00d4e144ba9 1082975754
+obj /usr/bin/axfr-get bfcf333a82d0553299364fdfef582bbf 1082975754
+obj /usr/bin/tinydns-get dc231addafde7400106ca10115fdcbb0 1082975754
+obj /usr/bin/pickdns-data 25a3b81be97379ac853bbf08885ce382 1082975754
+obj /usr/bin/rbldns-data d16b79b215bb451092c09d9c58d6401e 1082975754
+obj /usr/bin/tinydns-data af35f2da7795cb98d66f19da4916c644 1082975754
+obj /usr/bin/tinydns-edit 427a1b629044bcabc2cba6d426f796af 1082975754
+obj /usr/bin/dnsip dfc27aa165b69936a41170e07a06f2dc 1082975754
+obj /usr/bin/dnsipq 3e260676a677a54401a2b6217eec7785 1082975754
+obj /usr/bin/dnsname a887339a1396ffca93f14c6845615dd7 1082975754
+obj /usr/bin/dnstxt 8c729d909af664bfbe29df3f0a3dbe40 1082975754
+obj /usr/bin/dnsmx 190b036f29a049a2e1e5669ee0c34bc9 1082975754
+obj /usr/bin/dnsfilter 7ee421a779547bbe3b4b64368efe09f4 1082975754
+obj /usr/bin/random-ip ae1e408ada9bb43ac59ae160d5e3d123 1082975754
+obj /usr/bin/dnsqr 8a5870fb37c5b802d5377176238c767c 1082975754
+obj /usr/bin/dnsq c29a783651cb8f2bc794a79358960a70 1082975754
+obj /usr/bin/dnstrace ae10199d6889ef5b3a7ab9e94ce0a896 1082975754
+obj /usr/bin/dnstracesort 0829052705cbdd5a1c3a61b5d09311ed 1082975754
+obj /usr/bin/dnscache-setup 2804eedf8bf07dacf67d094c5122c723 1082975754
+obj /usr/bin/tinydns-setup 7c2a17103fedf0325d120a7d254432fa 1082975754
+dir /usr/share
+dir /usr/share/doc
+dir /usr/share/doc/djbdns-1.05-r9
+obj /usr/share/doc/djbdns-1.05-r9/CHANGES.gz 433f8b52f97d5da93c9c3bb8c7748abd 1082975754
+obj /usr/share/doc/djbdns-1.05-r9/FILES.gz f711c5c92141e9b3d37387ffa77faacc 1082975754
+obj /usr/share/doc/djbdns-1.05-r9/README.gz c3e1288a2b32849dd4e9d2a7a1f5a364 1082975754
+obj /usr/share/doc/djbdns-1.05-r9/SYSDEPS.gz 7e7d041287e13250aaf9fe65f3937933 1082975754
+obj /usr/share/doc/djbdns-1.05-r9/TARGETS.gz 6a4a8b65b28eb3d696c3e8f1c44be79f 1082975754
+obj /usr/share/doc/djbdns-1.05-r9/TODO.gz 31fd39cf1c9cf7ff55ae5fec0bae205f 1082975754
+obj /usr/share/doc/djbdns-1.05-r9/VERSION.gz 0c367df5c6be2f5c2659515d12845372 1082975754

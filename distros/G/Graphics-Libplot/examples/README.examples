@@ -1,0 +1,18 @@
+These examples can be run 
+at the command line.  If perl is
+not in /usr/bin/perl, they can be run with
+"perl name"
+
+They are also called by the test.pl script.
+For this reason some of the variables in a script
+are made local when there is no apparant reason.
+
+Some of them take the device type as an optional argument.
+
+eg,
+ccurve X
+ccurve ps
+Possible devices are
+ "png", "pnm", "gif", "svg", "ai", "cgm", "fig", "pcl", "hpgl",
+ "regis", "tek", or "meta" .
+

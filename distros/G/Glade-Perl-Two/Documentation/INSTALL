@@ -1,0 +1,55 @@
+Glade::Two::Generate Gtk2-Perl UI builder and source generator
+--------------------------------------------------------------------
+TO INSTALL
+----------
+There is a standard Makefile.PL to handle some checks and install the package
+
+To install
+    perl Makefile.PL
+    make
+    make test       (if you have X running)
+    su
+    make install    (if test was OK)
+        
+TO BUILD RPMS
+-------------
+Build the RPMs by calling eg.
+    rpm -ta Glade-Perl-Two-0.01.tar.gz
+
+TO INSTALL RPMS
+---------------
+Install the files by calling (default location on my Redhat based distro)
+    rpm -Uvh /usr/src/redhat/RPMS/noarch/Glade-Perl-Two-0.01-1.noarch.rpm
+
+
+TO RUN FROM GLADE
+-----------------
+If you use Glade-2 >= 1.1.4 you can set the project language to Perl and
+Then when you click the 'Build' button or 'File/Build Source Code' menu item 
+the supplied script (called 'glade2perl-2' and installed in a directory in 
+your path) will generate Perl sources for you. 
+
+Glade-Perl-Two uses options files to store information about such things as 
+existing signal handler modules and so on. This means that signal handler 
+stubs are only specified if they are not available at Build time even though 
+Glade-2 knows nothing about them. This approach also allows you to control other 
+options for the Glade-2 build phase.
+
+TO RUN MANUALLY
+---------------
+You need Perl, Glib/Gtk+, Gtk2-Perl and XML::Parser packages and of course
+Glade if you want to edit the interface files.
+
+    glade2perl-2 Project1.glade 2
+    
+Then to run the app:
+    perl -e 'use src::Project1; window1->app_run'
+OR  perl -e 'use src::SubProject1; Subwindow1->app_run'
+
+(Obviously change the project name and window name to whatever you defined
+in your Glade project)
+
+To build a UI from an XML string. Look at the file $DIST_DIR/t/000_Generate.t
+for an example of doing this using a call to Glade::PerlGenerate->Form_from_XML 
+to show a Glade UI.
+

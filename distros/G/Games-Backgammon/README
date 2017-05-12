@@ -1,0 +1,53 @@
+Games/Backgammon version 0.13
+=============================
+
+This module helps to analyze and modelling backgammon games. 
+Most routines are simple wrappers around the open source project gnubg
+of Gary Wong.
+
+Note that it is not finished yet and I'm currently working on the module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You will need the Inline module and a C compiler as there are many routines
+written in C.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Inline            0.44,
+   List::Util        1.07,
+   Carp              
+   Data::Dumper      
+
+For testing also
+
+   Test::More        
+   Test::Differences 
+   Test::Exception   
+   Test::Warn
+   Set::Scalar
+
+   
+CHANGES ON gnubg
+
+Some parts of 
+gnubg 0.13.0 is bundled with this package.
+You find some copied and pasted stuff from it in the *.xc files.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Janek Schleicher
+
+This library is free software under the Gnu Public License.
+Please read the COPYING file for details.

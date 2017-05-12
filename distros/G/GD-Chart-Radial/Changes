@@ -1,0 +1,85 @@
+Revision history for GD-Chart-Radial
+====================================
+
+0.09    2014-10-07
+        - documentation updates.
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+
+0.08    2013-01-13
+        - removed Artistic file.
+        - change file dates changed to meet W3CDTF standards.
+        - updated META files, adding META.json.
+        - updated package files.
+        - updated test suite.
+        - added GitHub repo.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.07    2007-11-02
+        - removed all MD5 tests as they seem to be causing too many problems.
+
+0.06    2007-10-31
+        - simplified colour code checks.
+        - added tests for colour matching.
+        - commented out the debugging as this should only be used as a last 
+          resort if things are going wrong.
+        - added support for using crosses to disquish data sets.
+        - Devel::Cover = 95.8%
+
+0.05    2007-10-31
+        - added support for user colours of the format #abcd12 or '#fd3'
+        - added examples, more to follow
+        - notches now added to filled charts
+        - disabled the Linux MD5 check for the image created with defaults, as 
+          the different variants of Linux appear to create slightly different 
+          files. For OSs without an MD5 check we now print diagnostic info,
+          which can be forwarded to me for future releases.
+        - realigned the scale values and the top label to better positions.
+        - added TODO section in POD.
+        - added checks to ensure PNG and JPEG output support is provided.
+        - added support for output formats GIF and GD.
+        - changed tests to use GD for MD5 checks, as support these is more 
+          likely to exist :)
+
+0.04    2007-06-12
+        - Minor document changes to complete the handover of maintenance from
+          Aaron to Barbie.
+
+0.03    2007-06-10
+        - Fixed image size to be either the width and height specified by the
+          user, or creates a default size based on the minimum allowed.
+        - Scales the graph based on the width and height, rather than always
+          being the minimum.
+        - Scale fonts according to the size of the graph.
+        - Fixed colour list to always be greater than the data sets.
+        - Allow user to specify background colour.
+        - Legend and Title both optional.
+        - Draw spines last if in Fill mode.
+        - Cleaned code to only process scale values once.
+        - Minor POD updates.
+        - Fixed style default back to Notch, as per POD.
+
+0.02    2007-05-31
+        - Maintaince now passes to Barbie.
+        - More POD
+        - width and height passed to new() actually work now!
+        - Added the ability to specify style and colours
+        - Added more colours (yellow and orange)
+        - Made y_max_value and y_tick_number optional, with the defaults 
+          being calculated from the data sets themselves
+        - Added a 'Fill' style, which allows the datasets to be filled
+          polygons rather than a set of lines.
+        - Labels were randomly place, now ordered as per the first data set 
+          and listed clockwise around the chart points.
+        - Repositioned the start point at top dead-centre rather than the 
+          furthest point on the X axis.
+        - Ensure scale number labels are printed on top of the chart. Note
+          that the outer most scale number is omitted due to it conflicting 
+          with the point label.
+        - more tests
+        - Devel::Cover = 95.8%
+
+0.01    2004-07-19T14:21:12
+        - original version; created by h2xs 1.23 with options
+            -X GD::Chart::Radial

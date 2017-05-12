@@ -1,0 +1,59 @@
+{
+   "abstract" : "gnuplot wrapper using temporary files",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Gnuplot-Builder-TempFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Gnuplot::Builder" : "0.13",
+            "IPC::Open3" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/Gnuplot-Builder-TempFile/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/Gnuplot-Builder-TempFile.git",
+         "web" : "https://github.com/debug-ito/Gnuplot-Builder-TempFile"
+      }
+   },
+   "version" : "0.03"
+}

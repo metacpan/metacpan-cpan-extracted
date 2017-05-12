@@ -1,0 +1,17 @@
+Revision history for Perl extension Games::Minesweeper.
+
+0.5     
+        - middle mousebutton support
+
+0.4
+        - moved from Audio::Play to SDL::Mixer
+        - workaround for Gtk2::SimpleMenu problems
+
+0.3
+        - added sound support
+        - load/save prefs
+
+0.2   Wed Jul 16 14:31:53 2008
+	- original version; created by h2xs 1.23 with options
+		-X -c --skip-ppport -n Games::Minesweeper
+        - initial release

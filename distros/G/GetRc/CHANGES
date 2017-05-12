@@ -1,0 +1,46 @@
+Revision history for Perl extension GetRc.
+
+Version 0.23
+  Sat Sep  9 16:33:52 CEST 2000
+    - some documentation added
+    - minor code cleanup
+    
+Version 0.22
+  Wed Jun 21 21:25:06 CEST 2000
+    - rewrite support for find_path
+    - some documentation changes
+    - added O_TRUNC in writerc
+
+Version 0.21
+  Fri Jun 16 23:58:53 CEST 2000
+    - find_path functions added ( pop, push, shift, unshift )
+    - code cleanup
+    - major rewrite of AUTOLOAD
+	( AUTOLOAD is now very ugly )
+
+Version 0.20
+  Wed May 17 17:31:29 CEST 2000
+    - OO version development started
+    - major rewrite of code
+
+Version 0.17
+  Tue Feb 10 15:33:29 MET 1998
+    - a null key not accepted .. 
+      ( thanks to Mike Arms <marms@sandia.gov> )
+
+Version 0.16 
+  Fri Feb  6 08:22:14 MET 1998
+    - A zero value be accepted. ( may be :-{))) 
+      ( thanks to Mike Arms <marms@sandia.gov> )
+
+Version 0.15
+  Mon Jan 26 15:11:13 MET 1998
+    - RC_SEPARATOR is regex-like ( example: $RC_SEPARATOR = '\s*=\s*' )
+      ( used for get_rc and partialy for update_rc)
+    - added RC_OUT_SEPARATOR for write_rc ( not regex sure .. )
+      ( used for write_rc and partialy for update_rc)
+
+Version 0.14
+  Thu Jan 22 16:21:36 MET 1998
+    - added support for locking file 
+    - added $RC_LOCK for enable or disable locking file

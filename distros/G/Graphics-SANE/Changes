@@ -1,0 +1,18 @@
+Revision history for Perl extension Sane.
+
+0.03  Mon Nov 24 21:47:19 2008
+        - adjusted status return mechanism, added package variables
+	  C<err> and C<errstr>
+	- added examples/photocopy.pl
+	- fixed constant routines (they expect #define's but Sane uses
+	  enums
+	- fixed up pod
+
+0.02  Sat Nov 22 21:53:45 2008
+        - renamed to Graphics::SANE
+	- erroneously uploaded to CPAN
+
+0.01  Sat Jan 13 10:00:13 2007
+	- original version; created by h2xs 1.23 with options
+		-n Sane sane.h
+

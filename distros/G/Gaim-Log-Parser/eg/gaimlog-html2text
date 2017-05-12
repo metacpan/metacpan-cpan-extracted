@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Find;
+use Gaim::Log::Finder;
+use HTML::FormatText;
+use HTML::TreeBuilder;
+use Sysadm::Install qw(:all);
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+my $finder = Gaim::Log::Finder->new();
+
+DEBUG "Converting logs under $finder->{start_dir} ...";
+
+find(sub {
+    return unless /html/;
+    print "$File::Find::name\n";
+    (my $newname = $File::Find::name) =~ s/\.html$/.txt/;
+    DEBUG "Converting $File::Find::name to $newname";
+
+    blurt(convert($File::Find::name), $newname);
+}, $finder->{start_dir});
+
+DEBUG "Done processing $finder->{start_dir}";
+
+###########################################
+sub convert {
+###########################################
+    my($file) = @_;
+
+    my $tree = HTML::TreeBuilder->new();
+    $tree->parse_file($file);
+
+    my $formatter = HTML::FormatText->new(rightmargin => 500);
+    my $str = $formatter->format($tree);
+    $str =~ s/^\s+//mg;
+    return $str;
+}
+
+__END__
+
+=head1 NAME
+
+    gaimlog-html2text - Convert html gaim/pidgin logs to plain text
+
+=head1 SYNOPSIS
+
+    gaimlog-html2text
+
+=head1 DESCRIPTION
+
+gaimlog-html2text traverses all Gaim/Pidgin logs and converts html logs
+to text format. It doesn't delete the html logs, but rather creates new
+.txt ones along with them.
+
+=head1 LEGALESE
+
+Copyright 2008 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2008, Mike Schilli <cpan@perlmeister.com>

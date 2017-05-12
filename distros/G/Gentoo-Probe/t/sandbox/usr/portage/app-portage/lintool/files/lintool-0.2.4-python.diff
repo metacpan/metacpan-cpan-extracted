@@ -1,0 +1,21 @@
+--- Makefile.orig	2004-01-23 00:06:38.513638208 +0000
++++ Makefile	2004-01-23 00:13:00.155619808 +0000
+@@ -1,14 +1,14 @@
+ DESTDIR =
++PYVER=`/usr/bin/python -c 'import sys; print sys.version[0:3]'`
+ 
+ all:
+ 	cd src/lintool ; python __init__.py
+ 
+ install: all
+-	
++
+ 	install -m0755 -d $(DESTDIR)/usr/bin/
+ 	install -m0755 src/lintool.py $(DESTDIR)/usr/bin/lintool
+-	install -m0755 -d $(DESTDIR)/usr/lib/python2.2/site-packages/lintool/
+-#	for i in digest.pyc ebuild.pyc changelog.pyc __init__.py test.pyc ; do 
++	install -m0755 -d $(DESTDIR)/usr/lib/python$(PYVER)/site-packages/lintool/
+ 	for i in digest.py ebuild.py changelog.py __init__.py test.py ; do \
+-		install -m0644 src/lintool/$$i $(DESTDIR)/usr/lib/python2.2/site-packages/lintool/$$i ; \
++		install -m0644 src/lintool/$$i $(DESTDIR)/usr/lib/python$(PYVER)/site-packages/lintool/$$i ; \
+ 	done

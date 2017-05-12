@@ -1,0 +1,8 @@
+digraph graph_02
+{
+	rankdir = TB
+
+	node [color = green]
+
+	A B C D
+}

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Perl class for interpreting dates in Gedcom files",
+   "author" : [
+      "Eugene van der Pijll (pijll@gmx.net)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gedcom-Date",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "DateTime" : "1.36",
+            "DateTime::Locale" : "1.05",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Params::Validate" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302052"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Gedcom-Date"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Gedcom-Date.git",
+         "web" : "https://github.com/ronsavage/Gedcom-Date"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,9 @@
+Revision history for Perl extension Games::Go::SGF2misc::SVG.
+
+1.00  Mon May 10 10:43:00 2004
+    - Removed ::SVG from Games::Go::SGF2misc directory for individual
+      distribution.
+0.01  Mon May 10 09:55:11 2004
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.6.0 Games::Go::SGF2misc::SVG
+

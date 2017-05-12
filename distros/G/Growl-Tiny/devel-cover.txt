@@ -1,0 +1,37 @@
+Deleting database /Users/wu/projects/Growl-Tiny/Growl-Tiny-0.0.2/cover_db
+cp lib/Growl/Tiny.pm blib/lib/Growl/Tiny.pm
+PERL_DL_NONLAZY=1 /usr/local/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00.load.t ............... ok
+t/10.growl.t .............. ok
+t/20.growl_broken.t ....... ok
+t/30.growl.singlequote.t .. ok
+t/31.growl.doublequote.t .. ok
+t/32.growl.semicolon.t .... ok
+t/33.growl.utf8.t ......... ok
+t/34.growl.backtick.t ..... ok
+t/35.growl.spaces.t ....... ok
+t/40.growl.name.t ......... ok
+t/50.growl.image.t ........ ok
+t/60.growl.host.t ......... ok
+t/critic.t ................ ok
+t/kwalitee.t .............. ok
+t/meta.t .................. ok
+t/no_tabs.t ............... ok
+t/release-pod-coverage.t .. ok
+t/release-pod-syntax.t .... ok
+All tests successful.
+Files=18, Tests=63, 20 wallclock secs ( 0.07 usr  0.06 sys + 16.34 cusr  1.15 csys = 17.62 CPU)
+Result: PASS
+Reading database from /Users/wu/projects/Growl-Tiny/Growl-Tiny-0.0.2/cover_db
+
+
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+blib/lib/Growl/Tiny.pm        100.0  100.0  100.0  100.0  100.0  100.0  100.0
+Total                         100.0  100.0  100.0  100.0  100.0  100.0  100.0
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+
+Writing HTML output to /Users/wu/projects/Growl-Tiny/Growl-Tiny-0.0.2/cover_db/coverage.html ...
+done.

@@ -1,0 +1,85 @@
+---
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Bye: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floats: []
+      id: 104
+      name: Don
+      oldId: 104
+      pairingNumber: 5
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: ''
+      rating: 1940
+      scores: ~
+      title: Mr.
+  result:
+    Bye: Bye
+  round: 1
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Black: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floats: []
+      id: 102
+      name: Bert
+      oldId: 102
+      pairingNumber: 3
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: ''
+      rating: 1980
+      scores: ~
+      title: Mr.
+    White: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floats: []
+      id: 101
+      name: Al
+      oldId: 101
+      pairingNumber: 1
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: Black
+      rating: 2000
+      scores: ~
+      title: Mr.
+  floats:
+    Black: ~
+    White: ~
+  result: ~
+  round: 1
+- !!perl/hash:Games::Tournament::Card
+  contestants:
+    Black: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floats: []
+      id: 201
+      name: Ally
+      oldId: 201
+      pairingNumber: 2
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: White
+      rating: 1990
+      scores: ~
+      title: Ms.
+    White: !!perl/hash:Games::Tournament::Contestant::Swiss
+      firstround: 1
+      floats: []
+      id: 103
+      name: Carl
+      oldId: 103
+      pairingNumber: 4
+      preference: !!perl/hash:Games::Tournament::Contestant::Swiss::Preference
+        difference: 0
+        sign: ''
+      rating: 1960
+      scores: ~
+      title: Mr.
+  floats:
+    Black: ~
+    White: ~
+  result: ~
+  round: 1

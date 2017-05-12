@@ -1,0 +1,62 @@
+Revision history for GD::Graph::radar
+
+0.01  When?  Good question.  Maybe Brad will fill me in on that.  : )
+    - Modified the original GD::Graph::pie code.
+
+0.02  Tue Jul 8 2003
+    - Fixed a typo and added a defined check before operating.
+    - Added POD.
+    - Added all the files necessary for a proper CPAN distribution.
+    - Made the syntax match my personal, religous fanaticism-I mean
+      preference.
+
+0.03  Tue Jul 8 2003
+    - Added image writing and comparison tests for gif and png.
+      Thanks Ken Williams!  : )
+    - Fixed the README file.
+    - Removed the pie-radar diff file.
+    - Fixed the POD up a bit.
+
+0.03.1  Tue Jul 8 2003  
+    - Fixed the POD up a bit more.
+
+0.04  Wed Jul 9 2003
+    - Added "GD::Image->can('gif') &&" to the comparison test.
+      Thanks again Ken.
+
+0.05  Wed Jul 9 2003
+    - Added binmode to the file slurping done in the test.  Thanks
+      DrForr!
+
+0.06  Thu Jul 10 2003
+    - Holy #@$%!  I totally forgot to run my test, and it had a
+      syntax error in it.
+
+0.07  Thu Jul 10 2003
+    - Excised the unnecessary =head1 ABSTRACT section.
+
+0.08  Sun Aug  3 2003
+    - Cleaned code syntax a bit (not the functionality!).
+    - Fixed POD up.
+    - Removed the file comparison test so that Solaris boxes don't
+      whine.
+
+0.09  Wed Aug  6 2003
+    - No-one will give me an account on a Solaris box, so I added a
+      SKIP if $^O eq 'solaris' for the image comparison, in my test
+      script.
+
+0.10  Wed Aug  6 2003
+    - Aw. I had my tests => number wrong. Stupid me.
+
+0.1001  Sat Dec 1 2007
+    - Cleaning up tests... Hopefully it will pass this time...
+
+0.11  Sun Feb 26 2012
+    - Refactored distribution with Dist::Zilla
+    - Enhanced POD
+    - Simplified methods test
+
+0.1101
+    - Whoops! Left-in t/test.png which defeats the purpose of the existence tests.
+

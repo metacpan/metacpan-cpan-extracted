@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//ajdelore//DTD XHTML 1.0 Strict Modified//EN" 
+ "http://www.sfu.ca/~ajdelore/dtd/xhtml1-strict-modified.dtd"> 
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <title>cgi-Boggle results</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <link rel="stylesheet" 
+        href="http://www.sfu.ca/~ajdelore/anthony.css" 
+        type="text/css" />
+  <link rev="made" href="mailto:ajdelore@sfu.ca" />
+
+  <style type="text/css">
+  <!--
+  #board {
+    margin-top: 3em;
+  }
+  #board td {
+    font-size: xx-large;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    margin: .25em;
+    padding: .5em;
+    text-align: center;
+  }
+
+  -->
+  </style>
+
+</head>
+
+<body>
+
+<div id="navbar">
+  <a href="http://www.sfu.ca/~ajdelore/"
+     title="Home">Home</a>
+  | back to <a href="http://www.sfu.ca/~ajdelore/boggle/"
+               title="Games::Boggle::Board">Games::Boggle::Board</a>
+  | <a href="mailto:ajdelore@sfu.ca" title="E-Mail Link">ajdelore@sfu.ca</a>
+</div>
+
+<h1>cgi-Boggle results</h1>
+
+
+<div style="text-align: center;">
+<table id="board">
+<TMPL_LOOP NAME="board">
+  <tr>
+  <TMPL_LOOP NAME="line">
+    <td><TMPL_VAR NAME="letter"></td>
+  </TMPL_LOOP>
+  </tr>
+</TMPL_LOOP>
+</table>
+</div>
+
+<p><strong>Total score:</strong> <TMPL_VAR NAME="score"></p>
+
+<TMPL_IF good>
+<p>
+<strong>Good<sup>*</sup> words: </strong>
+<TMPL_LOOP NAME="good">
+    <TMPL_VAR NAME="word">
+</TMPL_LOOP>
+</p>
+</TMPL_IF>
+
+<TMPL_IF bad>
+<p>
+<strong>Bad words: </strong>
+<TMPL_LOOP NAME="bad">
+    <TMPL_VAR NAME="word">
+</TMPL_LOOP>
+</p>
+</TMPL_IF>
+
+<p><a href="http://cgi.sfu.ca/~ajdelore/boggle/boggle.cgi">Play again?</a></p>
+
+<hr />
+
+<p><small>* This program first checks to see if a word can be played
+on this board according to the normal rules of boggle. It then 
+checks to see if that word can be found in the Shorter Oxford 
+English Dictionary. It is possible that your word is legal but 
+not found in my dictionary file.</small></p>
+
+</body>
+</html>

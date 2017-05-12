@@ -1,0 +1,32 @@
+#!perl
+
+#port of libgtop-x.xx/examples/mountlist.c
+
+use strict;
+use ExtUtils::testlib;
+use GTop ();
+
+my $gtop = GTop->new(@ARGV);
+
+my($mountlist, $entries) = $gtop->mountlist(1);
+my $number = $mountlist->number;
+
+for (my $i=0; $i < $number; $i++) {
+    printf "Mount Entry: %-30s %-10s %-20s\n",
+    $entries->mountdir($i),
+    $entries->type($i),
+    $entries->devname($i);
+}
+
+printf "\n\n%-23s %9s %9s %9s %9s %9s\n\n",
+  "", "Blocks", "Free", "Avail", "Files", "Free";
+
+for (my $i = 0; $i < $number; $i++) {
+    my $fsusage = $gtop->fsusage($entries->mountdir($i));
+
+    printf "Usage: %-16s %9d %9d %9d %9d %9d\n",
+    $entries->mountdir($i),
+    $fsusage->blocks, $fsusage->bfree,
+    $fsusage->bavail, $fsusage->files,
+    $fsusage->ffree;
+}

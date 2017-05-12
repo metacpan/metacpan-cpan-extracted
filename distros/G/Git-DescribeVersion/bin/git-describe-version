@@ -1,0 +1,75 @@
+#!/usr/local/bin/perl
+#
+# This file is part of Git-DescribeVersion
+#
+# This software is copyright (c) 2010 by Randy Stauner.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use strict;
+use warnings;
+
+# PODNAME: git-describe-version
+# ABSTRACT: Enable "git describe-version" command
+
+use Git::DescribeVersion::App ();
+
+Git::DescribeVersion::App->run();
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=for :stopwords Randy Stauner ACKNOWLEDGEMENTS repo
+
+=head1 NAME
+
+git-describe-version - Enable "git describe-version" command
+
+=head1 VERSION
+
+version 1.015
+
+=head1 DESCRIPTION
+
+This script enables you to execute
+
+	git describe-version
+
+to print the current repository version
+as determined by L<Git::DescribeVersion>.
+
+It is a small wrapper around
+L<Git::DescribeVersion::App/run>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Git::DescribeVersion::App>
+
+=item *
+
+L<Git::DescribeVersion>
+
+=back
+
+=head1 AUTHOR
+
+Randy Stauner <rwstauner@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Randy Stauner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

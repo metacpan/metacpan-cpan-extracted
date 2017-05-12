@@ -1,0 +1,11 @@
+CHANGES
+Changes
+MANIFEST
+Makefile
+Makefile.PL
+TODO
+XQI.pm
+examples/xqi-query.pl
+examples/xqi-submit.pl
+pm_to_blib
+test.pl

@@ -1,0 +1,72 @@
+# ChangeLog for app-portage/lintool
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/lintool/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+  19 Mar 2004; Daniel Ahlberg <aliz@gentoo.org> lintool-0.2.4-r1.ebuild:
+  Adding amd64 keyword.
+
+  23 Jan 2004; Alastair Tse <liquidx@gentoo.org> lintool-0.2.3-r1.ebuild,
+  lintool-0.2.4-r1.ebuild, lintool-0.2.4.ebuild,
+  files/lintool-0.2.4-python.diff:
+  added python 2.3 fixes to makefile
+
+  27 Sep 2003; Robin H. Johnson <robbat2@gentoo.org>
+  files/lintool-0.2.4-fixyear.diff:
+  fix patch yet again. things with cvs tags in them are proving to be a pain
+  when you dont want it to touch the tags
+
+*lintool-0.2.4-r1 (25 Sep 2003)
+
+  25 Sep 2003; Robin H. Johnson <robbat2@gentoo.org> lintool-0.2.4-r1.ebuild,
+  files/lintool-0.2.4-fixyear.diff:
+  add patch for year checking from bug #17992
+
+*lintool-0.2.4 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> lintool-0.2.3-r1.ebuild,
+  lintool-0.2.4.ebuild, metadata.xml:
+  moved from dev-util to app-portage
+
+  11 Feb 2003; Guy Martin <gmsoft@gentoo.org> :
+  Added hppa to keywords.
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*lintool-0.2.3-r1 (17 Feb 2003)
+
+  17 Jul 2003; Jan Seidel <tuxus@gentoo.org> lintool-0.2.3-r1.ebuild :
+  Marked stable on mips
+
+  29 Mar 2003; Seemant Kulleen <seemant@gentoo.org> lintool-0.2.3-r1.ebuild,
+  lintool-0.2.4.ebuild:
+  HOMEPAGE fix by Frantz Dhin <tragedy_rm@hotmail.com> in bug #18299
+
+  17 Feb 2003; Peter Johanson <latexer@gentoo.org> lintool-0.2.3-r1.ebuild files/digest-lintool-0.2.3-r1 :
+  Added a patch to do copyright dates properly
+
+*lintool-0.2.4 (30 Oct 2002)
+
+  12 Feb 2003; Peter Johanson <latexer@gentoo.org> lintool-0.2.4.ebuild :
+  ~alpha in KEYWORDS.
+
+  30 Oct 2002; Karl Trygve Kalleberg <karltk@gentoo.org> lintool-0.2.4.ebuild files/digest-lintoo-0.2.4 :
+  New upstream version.
+
+*lintool-0.2.3 (12 Aug 2002)
+
+  12 Feb 2003; Peter Johanson <latexer@gentoo.org> lintool-0.2.3.ebuild :
+  Moved lintool-0.2.3 to alpha stable.
+
+  11 Feb 2003; Peter Johanson <latexer@gentoo.org> lintool-0.2.3.ebuild :
+  Added ~alpha to KEYWORDS
+
+  14 Aug 2002; Pieter Van den Abeele <pvdabeel@gentoo.org> :
+  Added ppc keyword
+
+  12 Aug 2002; Karl Trygve Kalleberg <karltk@gentoo.org> lintool-0.2.3.ebuild files/digest-lintool-0.2.3 :
+  New upstream release.
+
+*lintool-0.2.2 (12 Aug 2002)
+
+  12 Aug 2002; Karl Trygve Kalleberg <karltk@gentoo.org> lintool-0.2.2.ebuild files/digest-lintool-0.2.2 :
+  New upstream release.

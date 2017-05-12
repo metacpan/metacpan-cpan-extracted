@@ -1,0 +1,752 @@
+Copyright (C) 2003-2006 Jeffrey I Cohen.  All rights reserved, worldwide.
+
+NAME
+
+  Genezzo - an extensible database system
+
+DESCRIPTION
+
+  The Genezzo modules implement a hierarchy of persistent
+  hashes using a fixed amount of memory and disk.  This system is
+  designed to be easily configured and extended with custom functions,
+  persistent storage representations, and novel data access methods.
+  In its current incarnation it supports a limited subset of SQL with
+  a command line tool [gendba] and a partial DBI-style interface.
+
+REQUIREMENTS
+
+ Perl 5.6    
+
+INSTALLATION
+
+  If you can read this, then you figured out how to uncompress and
+  untar the archive.  
+
+  perl Makefile.PL  # constructs the makefile
+  make              
+  make test         
+  make install      # (as superuser [optional])
+
+
+  If you install Genezzo, you should be able to run the line-mode tool
+  directly by typing "gendba.pl" at the command line.
+
+  You also should be able to run scripts from the directory containing
+  this file, something like:
+
+  perl -Iblib/lib lib/Genezzo/gendba.pl
+
+
+USAGE
+
+  line mode available via (/usr/bin) gendba.pl.  
+  Try:
+
+    gendba.pl -help
+    gendba.pl -man 
+
+  or:
+
+    perl -Iblib/lib lib/Genezzo/gendba.pl -help
+    perl -Iblib/lib lib/Genezzo/gendba.pl -man
+
+  for more information.
+
+  The GenDBI module supports a subset of DBI-style calls.  See
+  dbi_example.pl for some sample usage.
+
+  Try:
+
+    perl -Iblib/lib demo/dbi_example.pl # runs an example
+    perldoc Genezzo::GenDBI
+
+  for more information.
+
+  The simplest way to create an instance of a Genezzo database is to use:
+
+    gendba.pl -init
+
+  This command will create a new database and login to the
+  command-line.  
+
+SQL SUPPORT -- see LIMITATIONS
+
+  EXPRESSIONS: The Genezzo parser can handle expressions composed of
+               column names, numeric or quoted string constants,
+               logical constants like TRUE, FALSE and NULL,
+               concatenation, scalar functions, and basic arithmetic
+               like '+', '-', '*', '/'.  However, logical expressions
+               using AND, OR, and NOT are only legal in the WHERE clause.
+
+  INSERT: 
+    INSERT INTO tablename VALUES (expr [, expr ...]);
+    INSERT INTO tablename (colname [, colname ...]) VALUES (expr [, expr ...]);
+    INSERT INTO tablename SELECT ... FROM ...
+
+  UPDATE:
+    UPDATE tablename SET colname = expr [, colname = expr ...] [WHERE ...]
+
+  DELETE:
+    DELETE FROM tablename [WHERE ...]
+
+  SELECT:  The Genezzo parser can parse complex SELECT statements,
+           but the execution engine can only handle simple SELECTS
+           and basic joins.
+
+    SELECT * FROM tablename [WHERE ...]
+    SELECT COUNT(*) FROM tablename 
+    SELECT ECOUNT(*) FROM tablename
+    SELECT * FROM t1, t2 WHERE t1.col1 = t2.col1    
+
+    SELECT expr [[AS] column_alias] [, expr [[AS] column_alias]]
+      FROM tablename
+      [WHERE ...]
+
+  CREATE TABLE: 
+    CREATE TABLE tablename (colname coltype [, colname coltype ...]);
+
+  CREATE INDEX:
+    CREATE INDEX iname on tablename (colname [, colname ...]);
+
+  ALTER TABLE ADD CONSTRAINT: supports primary and unique key and
+    check constraints.  NOT NULL and foreign keys are not currently
+    supported, though you can implement NOT NULL as 
+    CHECK (colname IS NOT NULL).  The CHECK expression is equivalent
+    to a WHERE clause.  A table can have multiple CHECK constraints,
+    but currently only one key constraint.
+
+    ALTER TABLE tablename 
+          ADD [CONSTRAINT constraint_name] 
+              PRIMARY KEY (colname [, colname ...]);
+    ALTER TABLE tablename 
+          ADD [CONSTRAINT constraint_name] 
+              UNIQUE (colname [, colname ...]);
+    ALTER TABLE tablename 
+          ADD [CONSTRAINT constraint_name] 
+              CHECK (conditional_expression);
+
+  ADDFILE: Not really a SQL command, but an extension to grow the 
+           datafiles.  See "addfile help".
+
+  DROP: drop a table or index.
+  COMMIT: write changes to disk.
+  SYNC: write changes to disk like "commit", but don't end a transaction.
+  ROLLBACK: discard all uncommitted changes.
+
+  DESCRIBE: 
+    DESCRIBE tablename
+
+  EXPLAIN PLAN: dump parsing and plan information for any SQL command,
+                including CREATE and ALTER TABLE.  Does not require a
+                "plan table".  Can perform partial explanations for 
+                invalid statements, such as missing tables/columns, etc.
+                Example - "explain plan for select * from t1;"
+                or even complex sql like:
+                Explain plan for
+                  select * from t1 
+                           where c1 in (select avg(c2) from t2)
+                           having avg(c3) > ((select min(c4)
+                                             from (select c5 from t3
+                                                   union    
+                                                   select c6 from t4)
+                                             ) + 5) * 7 / min(c7)     ;
+
+  STARTUP/SHUTDOWN: 
+
+LIMITATIONS
+
+  General: No locking/multiuser support, bind variables,          
+  incomplete DBI support.
+
+  SELECT: Simple queries only -- no ORDER BY, GROUP BY, 
+          HAVING, subqueries, set functions (UNION, INTERSECT).
+          Only basic FROM clause joins: FROM t1, t2, ... are
+          supported.
+          No aggregation functions other than COUNT(*), ECOUNT(*).
+          COUNT and ECOUNT do not accept a WHERE clause.
+  
+  ALTER TABLE: no foreign key, NULL/NOT NULL constraints.
+
+  CREATE TABLE: Only numeric and character datatypes are accepted.
+                Datatype length and precision are not enforced.
+                Numeric columns will accept arbitrary character input,
+                but will attempt to use numeric (versus character) 
+                comparisons.  No table or column constraints.
+                No CREATE TABLE AS SELECT.
+
+EXAMPLES
+        
+  Some very basic SQL create/drop/describe table, select, insert, update
+  and delete syntax is supported, and like standard SQL, table and
+  column names are case-insensitive unless quoted.  More complex SQL
+  parses, but is ignored.  While many scalar SQL functions are available, 
+  the only supported aggregation functions are count(*) and ecount(*),
+  a non-blocking count estimation function.  The database also
+  supports commit to force changes to disk, and a crude rollback. 
+  NOTE: Data definition (such as create table or ct) must be manually
+  committed to keep the database in a consistent state.  Uncommitted
+  inserts and updates will only be block-consistent -- there is no
+  guarantee that the data will get flushed to disk, and no
+  guarantee whether the changes will or will not take effect.
+
+    rem  Some simple SELECTs
+    select * from _col1;
+    select rid, rownum, tname, colname from _col1;
+    select count(*) from _col1;
+    select ecount(*) from _col1;
+
+    rem  SELECTs with WHERE, perl and SQL style.
+    select * from _tab1 where tname =~ m/col/;
+    select * from _tab1 where tid < 5;
+    select * from _tab1 where numcols > 3 AND numcols < 6;
+
+    rem basic joins
+    select * from _tab1, _col1  where _tab1.tid = _col1.tid 
+     and _tab1.tname =~ m/col/;
+
+    rem  Column aliases and Expressions
+    select tid as Table_ID, tname Name, (tid+1)/2 from _tab1;
+
+    rem  Basic INSERT
+    insert into test1 values ('a','b','c','d');
+    insert into test1(col2, col1) values ('a','b','c','d');
+
+    rem CREATE TABLE and INSERT...SELECT
+    create table test2(col1 char, col2 char);
+    insert into test2 (col1) select col1 from test1;
+
+    rem  DELETE with WHERE
+    delete from test1 where col1 < 'bravo' and col2 > 5;
+
+    rem  UPDATE with WHERE (no subqueries supported)
+    update test2 set col2 = 'foo' where col2 is null;
+
+    commit
+
+  By default, the database will autostart -- the gendba.pl command will
+  connect to an active, updateable instance.  The shutdown command will
+  reset the database to a read-only mode that only provides read access
+  to certain dictionary tables.  The startup command will restart the
+  database.
+
+  The Genezzo parser also supports the Feeble query language, as
+  described by gendba.pl -man.  Briefly, the commands are ct (create
+  table), dt (drop table), i (insert), u (update), d (delete), s
+  (select).  The following example creates a table EMP with two
+  columns, ENAME (as character) and ID (as number), inserts five rows,
+  and counts them.
+
+    ct EMP ENAME=c ID=n
+    i EMP bob 1 orville 2 wilbur 3 harry 4 luke 5
+    s EMP count
+    s EMP ecount
+    commit
+
+  While the SQL update and delete commands support a WHERE clause, the
+  Feeble "u" and "d" commands only work via rowid.  For example:
+
+    gendba 10> s EMP rid rownum *
+    rid     rownum  ename   id
+    ___     ______  _____   __
+
+    1/33/1  1       bob     1
+    1/33/2  2       orville 2
+    1/33/3  3       wilbur  3
+    1/33/4  4       harry   4
+    1/33/5  5       luke    5
+
+    5 rows selected.
+
+    gendba 11> d EMP 1/33/1
+    deleted 1 rows from table emp.
+
+    gendba 12> u EMP 1/33/5 margo 66
+    updated 1 rows in table emp.
+
+    gendba 13> !10
+    s EMP rid rownum *
+    rid     rownum  ename   id
+    ___     ______  _____   __
+
+    1/33/2  1       orville 2
+    1/33/3  2       wilbur  3
+    1/33/4  3       harry   4
+    1/33/5  4       margo   66
+
+    4 rows selected.
+
+  The default database is stored in a fixed-size 160K file.  You can
+  change the default filesize and the blocksize at database
+  initialization time.  For example:
+
+    gendba.pl -init -define blocksize=8k -define dbsize=10M
+
+  to create a database with a 10 megabyte datafile using 8K blocks.
+  By default, this file is a fixed size, but it can be set to grow
+  using the "increase_by" settings added in version 0.18.  Also, you can
+  add additional files to your database using the "addfile" command.  By
+  default, each file is double the size of the previous.  Type "addfile
+  help" for more options.
+
+
+NEW FEATURES - Indexed Tables
+
+  Version 0.13 introduces an indexed-table type.  An indexed table
+  treats the first column in the table definition as a unique, not-null
+  primary key.  Note that an "Indexed Table" is distinct from an
+  ordinary table with a separate index, where you can assign a separate
+  index object to a particular column or group of columns.
+
+    gendba 9> ct EMP index id=n name=c
+    Create Table : emp 
+    with unique index option
+    tablename : emp
+    column id : n (primary key)
+    column name : c
+    table emp created 
+
+    gendba 10> i EMP 1 bob 2 orville 3 wilbur 4 harry 5 luke
+    inserted 5 rows into table emp.
+
+    gendba 11> s EMP rid *
+    rid     id      name
+    ___     __      ____
+
+    1       1       bob
+    2       2       orville
+    3       3       wilbur
+    4       4       harry
+    5       5       luke
+
+    5 rows selected.
+
+    gendba 12> i EMP 1 bob 2 orville 3 wilbur 4 harry 5 luke
+    whisper: duplicate key 1
+    Failed to insert row 1 in table emp at lib/Genezzo/gendba.pl line 230
+    inserted 0 rows into table emp.
+
+    gendba 13> select tid, tname, otype from _tab1 where tname = 'emp'
+    tid     tname   otype
+    ___     _____   _____
+
+    14      emp     IDXTAB
+
+    1 row selected.
+
+
+  Notice that the first column is marked as a primary key when the
+  table is created, and the rids for indexed tables are the primary key,
+  not a physical block address.  
+
+  Indexed tables have an object type of IDXTAB in the data dictionary
+  -- conventional tables are marked as TABLE.
+
+  WHERE clause processing has been enhanced to use equality predicates
+  (e.g. "SELECT * from EMP where id = 2") to drive index scans.  Any
+  series of "AND"ed predicates is a candidate for an efficient index
+  search, but the use of an OR currently requires a full table scan.
+
+  CAVEATS:  The index performance is pretty poor, for a couple reasons.
+  It should improve a lot.  
+
+NEW FEATURES - Indexes
+
+  Users can now define their own indexes.  The dictionary
+  automatically maintains indexes on its own tables.  In order to create
+  an index called EMP_I1 on the ID column of table EMP, the command is:
+  
+      Create Index EMP_I1 on EMP (ID)
+
+  You can have arbitrary combinations of numeric and character keys.
+  RESTRICTIONS: only one index per table currently.  Index keys must
+  be less than one-half of the db blocksize.  
+
+  In version 0.15, the query engine will use the index to drive the
+  row fetch for a SELECT if the WHERE clause specifies an equality 
+  predicate on the primary key.  For example:
+
+      Select * from EMP where ID = 5
+ 
+  uses an index.  In general, additional predicates may accompany the
+  equality expression as long as they are ANDed:
+
+      Select * from EMP where ID = 5 and ENAME =~ m/BOB/
+
+  However, the presence of ORs causes the plan to revert to a full
+  table scan:
+
+      Select * from EMP where ID = 5 or ID = 6
+
+  All user-defined indexes are non-unique.  Unique indexes should be
+  created as unique constraints (fixed in version 0.22) using 
+  ALTER TABLE.
+
+NEW FEATURES - automatic tablespace and file growth
+
+  In version 0.18, datafiles are no longer a fixed size.  The column
+  "increase_by" in table _tsfiles controls the behavior: if this column
+  is blank, null, or zero, the datafile size is fixed.  If
+  "increase_by" is a non-zero number, the datafile will attempt to grow by 
+  that many bytes if it runs out of free extents.  If "increase_by" is a
+  percentage like "50%", the datafile is extended by the current size
+  multiplied by this percentage.  The AddFile command now takes
+  "increase_by" as an optional argument.  
+
+  Also in version 0.18, each tablespace can be configured to
+  automatically create new datafiles when the current datafile runs out
+  of free extents.  The column "addfile" in table _tspace controls the
+  behavior: if the column is blank or null, then the tablespace must be
+  extended manually.  If the "addfile" column contains a valid argument 
+  list for the AddFile command, then this command will get invoked when 
+  all of the current datafiles are full.  Note that the datafiles can be 
+  of a fixed size, or use the new "increase_by" parameter to grow to some
+  maximum size (currently 2G).
+
+  Prior to version 0.69, the simplest way to alter tablespace settings
+  was the "bigdb.sql" script.  This script is supplanted in version 0.69
+  by the alter_ts() utility function.  The command:
+    select alter_ts() from dual;
+  will, by default, upgrade the SYSTEM tablespace to use a base file
+  size of 10M which automatically grows in 50% increments.  For more 
+  information, in gendba.pl line-mode please type:
+    help area=utility_functions alter_ts
+  
+NEW FEATURES - ALTER TABLE ADD CONSTRAINT
+
+  Version 0.20 supports ALTER TABLE ADD CONSTRAINT <name> CHECK (<check-text>).
+
+  The check-text is any basic where clause predicate.  Example:
+
+    gendba 3> create table testcon (col1 c, col2 n);
+    table testcon created 
+    
+    gendba 4> alter table testcon add constraint cn1 
+              check ((col2 > 5) AND col1 =~ m/(a|b|c)/)
+    Added constraint cn1 to table testcon
+    
+    gendba 5> insert into testcon values ('a', 7);
+    inserted 1 row into table testcon.
+    
+    gendba 6> insert into testcon values ('b', 8);
+    inserted 1 row into table testcon.
+    
+    gendba 7> insert into testcon values ('d', 8);
+    WARNING: violated constraint cn1
+    must satisfy (col2 > 5) AND col1 =~ m/(a|b|c)/
+    WARNING: Failed to insert row 1 in table testcon
+    inserted 0 rows into table testcon.
+    
+    gendba 8> insert into testcon values ('a', 1);
+    WARNING: violated constraint cn1
+    must satisfy (col2 > 5) AND col1 =~ m/(a|b|c)/
+    WARNING: Failed to insert row 1 in table testcon
+    inserted 0 rows into table testcon.
+
+
+  Version 0.22 supports 
+    ALTER TABLE ADD CONSTRAINT <name> UNIQUE (<column-list>)
+    and
+    ALTER TABLE ADD CONSTRAINT <name> PRIMARY KEY (<column-list>
+
+  Version 0.22 only supports a single constraint or single index per
+  table, but version 0.23 supports multiple constraints and indexes
+  on a table.
+  
+  Need to extend to fully support NULL/NOT NULL, FOREIGN KEY, plus
+  ENABLE/DISABLE.
+
+NEW FEATURES - System/User Extensibility
+
+  Version 0.25 of Genezzo supports database extensibility.  See
+  Genezzo::Havok for more details.  The script "havok.sql" (now
+  deprecated) can be used to add extensibility tables to your database.
+  In version 0.58 a new function HavokUse supercedes the havok.sql
+  script, and the table user_extend is supplanted in version 0.59 by
+  Havok::UserFunctions.
+
+NEW FEATURES - Improved error reporting, handling
+
+  Version 0.31 error reporting has been significantly reworked to be
+  more compatible with DBI.  In particular, Genezzo::GenDBI->connect now
+  takes an optional attribute hash with PrintError and RaiseError, so
+  it will print messages using warn() or die().  In addition, it also
+  supports a GZERR argument is used to replace the internal Genezzo
+  error handlers.  More documentation exists in GenDBI.pm.  The DBI
+  standard err and errstr aren't supported yet.
+
+NEW FEATURES - backward compatiblity
+  
+  Version 0.32 supports a compatibility matrix - it can support version 0.31
+  databases.  Genezzo can now maintain a list of which versions use the same
+  database format.  Need to extend this capability to get automatic upgrade
+  between different database revisions.
+
+NEW FEATURES - database export, rollback, quoted strings,  
+               dynamic system extensions
+  
+  Version 0.33 introduces genexpl.pl, a very, very basic data export 
+  utility.  A "rollback" command is now available, which will discard 
+  all in-memory changes and replace them with the previous committed
+  results.  Note that the buffer cache will automatically flush data
+  to disk when it is full, so rollback will not be able to restore
+  data in this case.  Single-quoted strings in SQL expressions now
+  support backslash quoting, so 'foo\\bar\'s' is interpreted as
+  foo\bar's.  Finally, a new Havok module called SysHook supports 
+  extensions to basic Genezzo database functions.  SysHook is 
+  restructured in version 0.34.
+
+NEW FEATURES - multiline SQL statements
+
+  Version 0.38 allows multiline SQL statements for SELECT, INSERT,
+  UPDATE, DELETE, and EXPLAIN in the gendba interactive line mode.
+  These statements must be terminated by a semicolon.
+
+NEW FEATURES - Improved Parser
+
+  Version 0.39 uses a new parser based upon Parse::RecDescent
+  for SELECT statements.  The new parser is stricter about 
+  quoting conventions and identifier names -- standard identifiers
+  must start with an alpha character, or be specified in double quotes.
+  Only identifiers can be unquoted.  String literals must be in single
+  quotes.  The parser does make an exception for dictionary tables like
+  _tab1 and _col1, which do *not* need to quoted.  Boolean operations
+  must use AND and OR, not && and ||.  || is the SQL string concatenation 
+  operation.  The count estimation function ECOUNT must be specified as
+  ecount(*) in the select list.
+
+  While the parser is smarter, the execution phase is not improved.  The
+  only supported aggregation functions are count(*) or ecount(*) in the
+  select list.  Having, Group By, and Order By are still missing.
+
+  Version 0.40 allows arbitrary expressions in SELECT lists, e.g:
+
+      Select tid+5/2 from _tab1;
+
+  Version 0.41 adds support for the literals TRUE, FALSE, and NULL,
+  and extends the new parser to cover ALTER TABLE, DELETE, and INSERT.
+  INSERT can now handle arbitrary expressions, e.g:
+
+     Insert into mytable values (1+1, 2*2, 3/4);
+  
+  Version 0.42 adds arbitrary expression support to UPDATE, and marks
+  the complete switchover to the new parser.
+
+  Version 0.43 adds case-insensitive table and column names.
+
+NEW FEATURES - Raw Device support
+  Version 0.44 and 0.45 add support for raw io devices.          
+
+NEW FEATURES - Additional User-supplied Preferences and File Header Info
+  In Version 0.47, users can supply arbitrary command-line definitions
+  for the dictionary preference table or fileheader info using
+  -define and -fileheader_define, respectively.
+
+NEW FEATURES - Object-Oriented SysHooks
+  In Version 0.47, a single package can load multiple functions as 
+  a set of class methods, versus package methods.
+
+NEW FEATURES - Tablespaces
+  In Version 0.51, users can create additional tablespaces (collections
+  of datafiles for storage) for tables and indexes.  By default, all
+  tables and indexes are created in the SYSTEM tablespace.  The command
+  "CREATE TABLESPACE tablespace_name" creates a new, empty tablespace.
+  You must add files to the tablespace use "addfile tsname=..." or "af
+  tsname=..." before it can be used.  See "addfile help" for more details.
+  CREATE TABLE and CREATE INDEX now take a new TABLESPACE option.  Note
+  that key constraints on a table inherit its tablespace.  A table or
+  index can only be stored in a single tablespace, and they cannot be
+  moved to a different tablespace.  Additional files may be added to any
+  tablespace at any time.  Currently, there is no support for DROP
+  TABLESPACE, or taking tablespace offline.  Example:
+
+  gendba 1> create tablespace ts1
+  gendba 2> addfile tsname=ts1
+  gendba 3> create table mytab (col1 char) tablespace ts1
+
+NEW FEATURES - Joins
+  In Version 0.52, basic joins are supported.
+
+NEW FEATURES - DUAL table
+
+  In version 0.58, Genezzo provides a single-row DUAL table which is
+  useful for evaluating expressions, e.g.:
+
+  gendba 1>  select (((5+5)/4)*32) from dual;
+  (((5+5)/4)*32)
+  ______________
+
+  80
+
+  1 row selected.
+
+
+NEW FEATURES - HavokUse function for System/User Extensibility
+
+  In version 0.58, the HavokUse function supercedes the havok.sql and
+  syshook.sql scripts.  HavokUse operates on Havok modules in a
+  fashion analogous to the way perl "use" loads perl modules. Havok
+  modules now use a metadata document similar to the MakeMaker META.yml
+  which lists module dependencies, table definitions, etc.  For example,
+  to load Genezzo::Havok::SysHook, use the command:
+
+      Select HavokUse('Genezzo::Havok::SysHook') from dual;
+
+  If the havok and sys_hook tables do not exist, HavokUse will create
+  and update these tables.  If the tables already exist, HavokUse will
+  do nothing, but return successfully.  See the Havok module for more
+  details.  Note that the "select" statement is now invoking
+  dictionary actions which may create and update new tables, and which
+  may need to be committed.  Also, prior to version 0.71, HavokUse
+  only performs partial initialization -- it is still necessary to
+  commit, shutdown and restart to activate the new Havok modules.
+  Modules created after version 0.71 can use add_user_function and
+  add_sys_hook to dynamically load new functionality.
+
+NEW FEATURES - Havok::UserFunctions, standard SQL scalar functions
+
+  Previously, all standard perl functions could be invoked in a SQL
+  statement, and additional SQL functions were optionally added via
+  Havok::UserExtend.  In version 0.59, Havok::UserExtend has been
+  deprecated and replaced with Havok::UserFunctions, and Genezzo only
+  supports functions defined in the new user_functions table.  This
+  table is preloaded when the database is created with many common
+  perl and sql functions.
+
+  The perl functions which are available in SQL are:
+
+    chomp, chop, chr, crypt, index, lc, lcfirst, length, ord, pack,
+    reverse, rindex, sprintf, substr, uc, ucfirst, abs, atan2, cos, exp,
+    hex, int, log10 (to avoid confusion between natural log and base10),
+    oct, rand, sin, sqrt, srand, and perl_join (which is renamed to
+    avoid a conflict with the SQL JOIN operation).
+
+  The SQL string functions are concat, greatest, initcap, least, lower,
+  and upper.  The SQL math functions are cosh, ceil, floor, ln, sinh, tan, 
+  and tanh (also note many standard SQL math functions are identical to their
+  perl counterparts, which are listed above).  The SQL conversion
+  functions are ascii, instr, and nvl.
+
+  Version 0.67 has many fixes plus added support for the string
+  functions lpad, ltrim, rpad, rtrim, translate, replace, and soundex
+  and the math functions mod, power, round, sign, trunc, logN.  Please
+  see Genezzo::Havok::SQLScalar or "help area=sql_functions" for more
+  information.
+
+  Version 0.69 adds the utility function add_user_function() which
+  simplifies the creation of new sql functions. In gendba.pl 
+  line-mode please type:
+    help area=utility_functions add_user_function
+  for more information.
+
+NEW FEATURES - improved genexp.pl
+ 
+  The version 0.60 database export (genexp.pl) now correctly handles table
+  constraints and indexes.
+
+NEW FEATURES - Feeble/SQL compatible case-sensitivity
+
+  Prior to version 0.63, Feeble commands (ct, d, u, s) did not match
+  the SQL behavior for case-insensitive identifiers.  For example, the
+  Feeble command:
+    "ct EMP COL1=c" 
+  would create a table called EMP (uppercase) with a column COL1, while
+  the SQL command:
+    "create table EMP (COL1 char(10))"
+  would create a table called emp (lowercase) with a column col1.
+  This discrepancy would require the use of quoted identifiers in SQL
+  in order to reference uppercase or mixed case table or column names.
+  To facilitate interoperablity between Feeble and SQL, Feeble now
+  matches the SQL usage and legal naming restrictions for unquoted,
+  case-insensitive names, and uppercase or mixed case names are only
+  available using SQL quoted identifiers.  Feeble does not support
+  quoted names.
+
+NEW FEATURES - additional comparison functions IN, LIKE
+
+  In version 0.68, basic support for IN and LIKE comparison is
+  supported.  IN only supports expression lists, not subqueries, e.g:
+
+  Select * from tab1 where col1 IN ('a', 'b', 'c');
+  Select * from tab2 where col2 NOT IN (22,33,44);
+
+  The LIKE operator supported as a function (versus a separate clause),
+  e.g:
+
+  Select * from tab1 where col3 LIKE ('foo%');
+  Select * from tab1 where col3 NOT LIKE ('#_foo_', '#');
+
+  The first argument to LIKE is a pattern which can take two special
+  matching characters -- a percent ('%') which is a wildcard (any number
+  of characters, including zero), and an underscore ('_') which matches
+  a single character.  The optional second argument is an ESCAPE
+  character.  If the '%' or '_' is prefixed with the ESCAPE character it
+  is treated as a literal.  Note that LIKE comparisons are
+  case-sensitive.
+
+NEW FEATURES - additional utility functions add_user_function, alter_ts
+  
+  In version 0.69 utility functions simplify the tasks of adding new
+  user functions, and altering tablespaces for large databases. 
+  In gendba.pl line-mode please type:
+    help area=utility_functions long=alter_ts add_user_function
+  for more information.
+
+NEW FEATURES - improved HELP
+  
+  In version 0.70 the help system is re-organized and enhanced.  The
+  new help supports regex lookup, loadable help modules, and online
+  support for the SQL functions.  In gendba.pl line-mode, try:
+    Help Help
+  or
+    Help area=sql
+  for more information.
+
+NEW FEATURES - dynamic system hooks
+ 
+  Prior to version 0.71, the Genezzo::Havok::SysHook module required
+  direct modification of the sys_hook table.  In version 0.71, the
+  function add_sys_hook can be used to dynamically add system hooks to a
+  running Genezzo instance.  In gendba.pl line-mode please type:
+    help area=system_hooks add_sys_hook
+  for more information.
+
+NEW FEATURES - self-managed extents
+
+  In version 0.72 the extent code keeps better track of block usage,
+  allowing the more efficient re-use of space from deleted rows.
+
+INCOMPATIBLE CHANGES
+
+  Version 0.72 dictionary and block format is incompatible with
+  previous releases.  No upgrade path is supported.
+  Version 0.48 thru 0.50 are compatible.
+
+SEE ALSO
+
+  The project homepage at http://www.genezzo.com
+
+
+AUTHOR
+
+  Original author: Jeffrey I Cohen <jcohen@genezzo.com>
+
+  Copyright (c) 2003-2007 Jeffrey I Cohen.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+Address bug reports and comments to: jcohen@genezzo.com
+
+For more information, please visit the Genezzo homepage 
+at http://www.genezzo.com

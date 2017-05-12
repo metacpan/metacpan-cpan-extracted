@@ -1,0 +1,75 @@
+
+GOOE AND sgf2dg INSTALLATION 
+-----------------------------
+
+This file covers installation of the GOOE TeX fonts and the
+sgf2dg script on UNIX machines, including Linux.  For DOS and
+Windows systems, please read this file and also see the file
+INSTALL.DOS.
+
+
+Sgf2Dg comes as a standard perl extension package.  On most systems,
+assuming perl and TeX are already installed, you can cast the normal
+incantation:
+
+    perl Makefile.PL
+    make
+    make test       (optional)
+    make install
+
+During the 'perl Makefile.PL' step, the Makefile.PL script
+attempts to find the appropriate places on your system to install
+the TeX parts of this package.  Unfortunately, TeX distibutions
+vary widely and the script may not be able to find all the
+correct places in which case it will ask for your help.  If you do
+not wish to install the TeX parts of this package, answer 'q' at
+this time.
+
+'perl Makefile.PL' prints a list of where it plans to install the
+TeX parts.  Please check this list carefully.  It also writes the
+list into the Makefile in the tex subdirectory.  If there are any
+corrections you need to make, you may edit tex/Makefile before
+running 'make install'.  The INSTALL file in the tex
+subdirectory, and the comments in tex/Makefile can help you
+figure out what needs to be fixed.
+
+If you are installing to a non-system TeX installation (ie: your
+own personal TeX hierarchy), you will almost certainly need to
+edit tex/Makefile.
+
+
+Since this installation procedure is significantly different from
+previous releases, you may need to hunt down and delete files from
+any previous installations of sgf2dg (and sgf2tex).  In particular,
+the executable files sgf2dg, sgfsplit, and the manual pages sgf2dg.1
+and sgfsplit.1 may end up in different places so you might reference
+the wrong (old) one.  Also the old sgf2tex script is not deleted
+when installing sgf2dg.  'which' and 'locate' on Unix and linux
+systems can help track them down.  The 'File Find' utility can do
+the same job on Windows systems.
+
+
+The last action during the 'make install' step is to build the
+manual.  The Makefile executes 'tex manual.tex' to create a file
+called manual.dvi which can be printed or viewed (with xdvi or a
+similar DVI viewer).
+
+The first time you print or view each new font character,
+MakeTeXPK will generate and cache the fonts in pk format.  This
+may take a while. Later prints and previews use the cached fonts,
+saving the font generation time.
+
+Completing font installation in TeX may require tools that are not
+included in a standard TeX installation.  If displaying your output
+document fails with "font not found" messages, you may need to install
+some additional TeX 'utils' package.  Examine the error messages for
+'command not found' for more clues (mktexpk may be the culprit).
+
+SGF2MPOST
+-----------------------------
+
+Sgf2mpost is an alternative method of typesetting Go games,
+based on Metapost. To make sgf2mpost, change to the 
+sgf2mpost/ directory, then type 'make'. Use of Sgf2mpost
+is described in the manual.
+

@@ -1,0 +1,24 @@
+---
+name: Gantry-Plugins-Session
+version: 0.04
+author:
+  - 'Kevin L. Esteb <kesteb@wsipc.org>'
+abstract: Plugin for cookie based session management
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Crypt::CBC: 0
+  Gantry: 3.52
+  Gantry::Plugins::Cache: 0
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  Gantry::Plugins::Session:
+    file: lib/Gantry/Plugins/Session.pm
+    version: 0.04
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

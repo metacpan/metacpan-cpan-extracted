@@ -1,0 +1,58 @@
+{
+   "abstract" : "interact with Gerrit code review tool",
+   "author" : [
+      "Rohan McGovern <rohan@mcgovern.id.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gerrit-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Dir::Self" : "0",
+            "Env::Path" : "0",
+            "File::chdir" : "0",
+            "LWP" : "0",
+            "List::MoreUtils" : "0",
+            "Sub::Override" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
+            "autodie" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
+            "Capture::Tiny" : "0",
+            "Data::Alias" : "0",
+            "File::chdir" : "0",
+            "JSON" : "0",
+            "Params::Validate" : "0",
+            "URI" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "20140611"
+}

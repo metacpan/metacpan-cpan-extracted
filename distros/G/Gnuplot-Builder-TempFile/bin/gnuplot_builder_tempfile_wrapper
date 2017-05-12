@@ -1,0 +1,6 @@
+#!perl
+use strict;
+use warnings;
+use Gnuplot::Builder::TempFile;
+
+Gnuplot::Builder::TempFile::run(@ARGV);

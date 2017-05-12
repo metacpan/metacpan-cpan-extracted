@@ -1,0 +1,314 @@
+--- sash.c.orig	Tue Jul  1 22:08:36 1997
++++ sash.c	Tue Jul  1 22:10:48 1997
+@@ -58,73 +58,11 @@
+ 	},
+ 
+ 	{
+-		"-ar",		do_ar,		3,	INFINITE_ARGS,
+-		"Extract or list files from an AR file",
+-		"[txp]v arFileName fileName ..."
+-	},
+-
+-	{
+ 		"cd",		do_cd,		1,	2,
+ 		"Change current directory",
+ 		"[dirName]"
+ 	},
+ 
+-#ifdef	HAVE_EXT2
+-	{
+-		"-chattr",	do_chattr,	3,	INFINITE_ARGS,
+-		"Change ext2 file attributes",
+-		"[+i] [-i] [+a] [-a] fileName ..."
+-	},
+-#endif
+-
+-	{
+-		"-chgrp",	do_chgrp,	3,	INFINITE_ARGS,
+-		"Change the group id of some files",
+-		"gid fileName ..."
+-	},
+-
+-	{
+-		"-chmod",	do_chmod,	3,	INFINITE_ARGS,
+-		"Change the protection of some files",
+-		"mode fileName ..."
+-	},
+-
+-	{
+-		"-chown",	do_chown,	3,	INFINITE_ARGS,
+-		"Change the owner id of some files",
+-		"uid fileName ..."
+-	},
+-
+-	{
+-		"-cmp",		do_cmp,		3,	3,
+-		"Compare two files for equality",
+-		"fileName1 fileName2"
+-	},
+-
+-	{
+-		"-cp",		do_cp,		3,	INFINITE_ARGS,
+-		"Copy files",
+-		"srcName ... destName"
+-	},
+-
+-	{
+-		"-dd",		do_dd,		3,	INFINITE_ARGS,
+-		"Copy data between two files",
+-		"if=name of=name [bs=n] [count=n] [skip=n] [seek=n]"
+-	},
+-
+-	{
+-		"-echo",	do_echo,	1,	INFINITE_ARGS,
+-		"Echo the arguments",
+-		"[args] ..."
+-	},
+-
+-	{
+-		"-ed",		do_ed,		1,	2,
+-		"Edit a fileName using simple line mode commands",
+-		"[fileName]"
+-	},
+-
+ 	{
+ 		"exec",		do_exec,	2,	INFINITE_ARGS,
+ 		"Execute another program in place of this sash process",
+@@ -138,100 +76,12 @@
+ 	},
+ 
+ 	{
+-		"-file",	do_file,	1,	INFINITE_ARGS,
+-		"Describe information about files",
+-		"fileName ..."
+-	},
+-
+-	{
+-		"-find",	do_find,	2,	INFINITE_ARGS,
+-		"Find files in a directory tree meeting some conditions",
+-		"dirName [-xdev] [-type chars] [-name pattern] [-size minSize]"
+-	},
+-
+-	{
+-		"-grep",	do_grep,	3,	INFINITE_ARGS,
+-		"Look for lines containing a word in some files",
+-		"[-in] word fileName ..."
+-	},
+-
+-#ifdef	HAVE_GZIP
+-	{
+-		"-gunzip",	do_gunzip,	2,	INFINITE_ARGS,
+-		"Uncompress files which were saved in GZIP or compress format",
+-		"fileName ... [-o outputPath]"
+-	},
+-
+-	{
+-		"-gzip",	do_gzip,	2,	INFINITE_ARGS,
+-		"Compress files into GZIP format",
+-		"fileName ... [-o outputPath]"
+-	},
+-#endif
+-
+-	{
+ 		"help",		do_help,	1,	2,
+ 		"Print help about a command",
+ 		"[word]"
+ 	},
+ 
+ 	{
+-		"-kill",	do_kill,	2,	INFINITE_ARGS,
+-		"Send a signal to the specified process",
+-		"[-sig] pid ..."
+-	},
+-
+-	{
+-		"-ln",		do_ln,		3,	INFINITE_ARGS,
+-		"Link one fileName to another",
+-		"[-s] srcName ... destName"
+-	},
+-
+-	{
+-		"-ls",		do_ls,		1,	INFINITE_ARGS,
+-		"List information about files or directories",
+-		"[-lidFC] fileName ..."
+-	},
+-
+-#ifdef	HAVE_EXT2
+-	{
+-		"-lsattr",	do_lsattr,	2,	INFINITE_ARGS,
+-		"List ext2 file attributes",
+-		"fileName ..."
+-	},
+-#endif
+-
+-	{
+-		"-mkdir",	do_mkdir,	2,	INFINITE_ARGS,
+-		"Create a directory",
+-		"dirName ..."
+-	},
+-
+-	{
+-		"-mknod",	do_mknod,	5,	5,
+-		"Create a special type of file",
+-		"fileName type major minor"
+-	},
+-
+-	{
+-		"-more",	do_more,	2,	INFINITE_ARGS,
+-		"Type file contents page by page",
+-		"fileName ..."
+-	},
+-
+-	{
+-		"-mount",	do_mount,	3,	INFINITE_ARGS,
+-		"Mount or remount a filesystem on a directory",
+-		"[-t type] [-r] [-m] devName dirName"
+-	},
+-
+-	{
+-		"-mv",		do_mv,		3,	INFINITE_ARGS,
+-		"Move or rename files",
+-		"srcName ... destName"
+-	},
+-
+-	{
+ 		"-printenv",	do_printenv,	1,	2,
+ 		"Print environment variables",
+ 		"[name]"
+@@ -244,30 +94,12 @@
+ 	},
+ 
+ 	{
+-		"-pwd",		do_pwd,		1,	1,
+-		"Print the current working directory",
+-		""
+-	},
+-
+-	{
+ 		"quit",		do_exit,	1,	1,
+ 		"Exit from sash",
+ 		""
+ 	},
+ 
+ 	{
+-		"-rm",		do_rm,		2,	INFINITE_ARGS,
+-		"Remove the specified files",
+-		"fileName ..."
+-	},
+-
+-	{
+-		"-rmdir",	do_rmdir,	2,	INFINITE_ARGS,
+-		"Remove the specified empty directories",
+-		"dirName ..."
+-	},
+-
+-	{
+ 		"setenv",	do_setenv,	3,	3,
+ 		"Set an environment variable value",
+ 		"name value"
+@@ -280,51 +112,9 @@
+ 	},
+ 
+ 	{
+-		"-sum",		do_sum,		2,	INFINITE_ARGS,
+-		"Calculate checksums of the specified files",
+-		"fileName ..."
+-	},
+-
+-	{
+-		"-sync",	do_sync,	1,	1,
+-		"Sync the disks to force cached data to them",
+-		""
+-	},
+-
+-	{
+-		"-tar",		do_tar,		2,	INFINITE_ARGS,
+-		"Create, extract, or list files from a TAR file",
+-		"[cxtv]f tarFileName fileName ..."
+-	},
+-
+-	{
+-		"-touch",	do_touch,	2,	INFINITE_ARGS,
+-		"Update times or create the specified files",
+-		"fileName ..."
+-	},
+-
+-	{
+-		"umask",	do_umask,	1,	2,
+-		"Set the umask value for file protections",
+-		"[mask]"
+-	},
+-
+-	{
+-		"-umount",	do_umount,	2,	2,
+-		"Unmount a filesystem",
+-		"fileName"
+-	},
+-
+-	{
+ 		"unalias",	do_unalias,	2,	2,
+ 		"Remove a command alias",
+ 		"name"
+-	},
+-
+-	{
+-		"-where",	do_where,	2,	2,
+-		"Type the location of a program",
+-		"program"
+ 	},
+ 
+ 	{
+--- sash.h.orig	Tue Jul  1 22:08:44 1997
++++ sash.h	Tue Jul  1 22:10:11 1997
+@@ -59,50 +59,11 @@
+ extern	void	do_exit(int argc, const char ** argv);
+ extern	void	do_prompt(int argc, const char ** argv);
+ extern	void	do_source(int argc, const char ** argv);
+-extern	void	do_umask(int argc, const char ** argv);
+ extern	void	do_unalias(int argc, const char ** argv);
+ extern	void	do_help(int argc, const char ** argv);
+-extern	void	do_ln(int argc, const char ** argv);
+-extern	void	do_cp(int argc, const char ** argv);
+-extern	void	do_mv(int argc, const char ** argv);
+-extern	void	do_rm(int argc, const char ** argv);
+-extern	void	do_chmod(int argc, const char ** argv);
+-extern	void	do_mkdir(int argc, const char ** argv);
+-extern	void	do_rmdir(int argc, const char ** argv);
+-extern	void	do_mknod(int argc, const char ** argv);
+-extern	void	do_chown(int argc, const char ** argv);
+-extern	void	do_chgrp(int argc, const char ** argv);
+-extern	void	do_sum(int argc, const char ** argv);
+-extern	void	do_sync(int argc, const char ** argv);
++extern	void	do_where(int argc, const char ** argv);
+ extern	void	do_printenv(int argc, const char ** argv);
+-extern	void	do_more(int argc, const char ** argv);
+-extern	void	do_cmp(int argc, const char ** argv);
+-extern	void	do_touch(int argc, const char ** argv);
+-extern	void	do_ls(int argc, const char ** argv);
+-extern	void	do_dd(int argc, const char ** argv);
+-extern	void	do_tar(int argc, const char ** argv);
+-extern	void	do_ar(int argc, const char ** argv);
+-extern	void	do_mount(int argc, const char ** argv);
+-extern	void	do_umount(int argc, const char ** argv);
+ extern	void	do_setenv(int argc, const char ** argv);
+-extern	void	do_pwd(int argc, const char ** argv);
+-extern	void	do_echo(int argc, const char ** argv);
+-extern	void	do_kill(int argc, const char ** argv);
+-extern	void	do_grep(int argc, const char ** argv);
+-extern	void	do_file(int argc, const char ** argv);
+-extern	void	do_find(int argc, const char ** argv);
+-extern	void	do_ed(int argc, const char ** argv);
+-extern	void	do_where(int argc, const char ** argv);
+-
+-#ifdef	HAVE_GZIP
+-extern	void	do_gzip(int argc, const char ** argv);
+-extern	void	do_gunzip(int argc, const char ** argv);
+-#endif
+-
+-#ifdef	HAVE_EXT2
+-extern	void	do_lsattr(int argc, const char ** argv);
+-extern	void	do_chattr(int argc, const char ** argv);
+-#endif
+ 
+ 
+ /*

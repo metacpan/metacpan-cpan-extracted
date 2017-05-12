@@ -1,0 +1,75 @@
+If you're looking for something to do, you just found it.
+
+----------------------------------------------------------------------------------------------------
+
+- Move 'decimals' to 'decimal_places' ( PDF::ReportWriter compatibility )
+
+- Copy a combo's model into the find dialog when searching on a field that is represented by a combo
+    
+    Now that we've added a right-click 'find' item to Combo's entries, maybe we should
+    do some magic to get the combo's model in the find dialog. This will allow people to search
+    on values they're used to ( from a combo box ), instead of having to use IDs.
+    
+    This will require somewhat of a rework of the find dialog. What do we do if people change
+    the criteria field? Delete the combo? What if they change the criteria field on a non-current
+    row? There's currently no way of getting to the combo. We'd have to store a hidden value
+    in each row so we can get to the right combo to delete it. See below.
+    
+- Find dialog: better criteria editing
+    
+    We need to store a row id in each criteria row so we can do things like delete the row,
+    delete a widget in the row, etc
+
+ - class variable for date format
+
+ - multi-table queries fail to select because they can't get hold of a primary key
+   - convert to pass-through?
+
+ - add 'sql_in_errors' key to control whether we put SQL strings in error dialogs when an
+ 	error occurs
+
+- Port Gtk3::Ex::DBI::Datasheet's more advanced insert() method
+    ( array of field / value things for inserting a record AND setting values )
+
+- Record Spinner's max value gets set, but the widget doesn't reflect this ( display or behaviour )
+    until the user has clicked a value with their left button ( ie right button doesn't work )
+
+- Create a custom date combo widget
+
+- Create a custom time spinner widget
+
+- Automatically apply formatting for numeric & currency fields
+
+- Document TimeSpinner support?
+    - This is a pretty dodgy solution, as dodgy solutions go.
+
+- Replace TimeSpinner with an actual Gtk2::Perl object?
+
+- Attach set_active_iter_for_broken_combo_box() to all combos?
+
+- Fix creation of self so applications don't have to call paint()
+    to get on_current code to trigger the 1st time
+
+- Create a widget for TIME fields - probably just a collection of 3 spinbuttons, packed into an hbox.
+    We'd attach to an existing hbox in the glade xml file.
+    
+- Create a *compact* widget for DATE fields. Gtk3::Calendar is good, but it's too big.
+    We could have a combo box with a drop-down Gtk2::Calender.
+    Alternatively, we could have a similar approach to the TIME widget ( above )
+    
+- Adding support for more DB servers
+    
+    - Oracle
+	lightly untested
+    
+    - SQL Server
+	Retest periodically - unixODBC and FreeTDS change undermeath us ...
+
+----------------------------------------------------------------------------------------------------
+
+Blue-Sky stuff
+
+- Add 'dump_to_xml' function
+- Create a GUI to create & edit the output of the above :)
+    - What do we do about things like coderefs?
+    - What do we do about DBI handles? Save connection strings in ~/.axis ?

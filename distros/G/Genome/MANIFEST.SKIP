@@ -1,0 +1,16 @@
+^MYMETA.yml$
+^.git
+^debian/
+^ubuntu-lucid/
+^alt/
+^dist-maint/
+^MANIFEST.bak$
+^_build/
+^Build$
+\.tar\.gz$
+^blib
+^genome-bindoc
+^gmt-bindoc
+^cmd-bindoc
+^i
+^.modulebuildrc

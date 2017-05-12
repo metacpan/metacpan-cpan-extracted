@@ -1,0 +1,37 @@
+Geo/Postcode/Valid
+===============================
+
+Hello. This is a very simple module that tests the well-formedness of UK
+postcodes and incidentally splits them into useful parts.
+
+For US zipcodes, you need Geo::Postalcode.
+
+It has been developed for geographical systems that work with postcodes
+at variable resolution: in other words, for people like me who can only
+afford to buy the cheaper postcode data sets. It should also be of use
+to people who want to validate input, as it should be very quick and
+memory efficient and doesn't load the location data or associated libraries
+until you ask for it.
+
+any trouble, write to wross@cpan.org or post a bug at rt.cpan.org.
+
+will
+27 August 2004
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL 
+    make 
+    make test 
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 william ross
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

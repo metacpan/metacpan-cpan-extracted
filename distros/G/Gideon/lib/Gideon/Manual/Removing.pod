@@ -1,0 +1,62 @@
+package Gideon::Manual::Removing;
+
+#ABSTRACT: Removing objects
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Gideon::Manual::Removing - Removing objects
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 DESCRIPTION
+
+Gideon can remove one object or a groups of objects depending on how it is
+invoked, B<please make sure you read and understand the documentation> as missues
+of this method can cause data corruption
+
+=head2 C<remove( [%opts] )> as a Class method
+
+Calling C<remove> as a class method will remove a group of objects from a data
+store, additionally you can filter objects to be remove by providing C<%opts>
+and it works in the same way as C<find> method does.
+
+   # Remove all named John
+   People->remove(name => 'John');
+
+   # Remove all objects
+   People->remove;
+
+=head2 C<remove()> as an Instance method
+
+When C<remove> is called to a particular instance it removes that particular
+instance without affecting other objects
+
+    # Remove first person
+    People->find_one(id =>1)->remove;
+
+=head1 NAME
+
+Removing objects with Gideon
+
+=head1 VERSION
+
+version 0.0.3
+
+=head1 AUTHOR
+
+Mariano Wahlmann, Gines Razanov
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mariano Wahlmann, Gines Razanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

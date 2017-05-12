@@ -1,0 +1,283 @@
+#!/usr/bin/perl
+#
+# Copyright 2011, Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Functional tests for the AdGroupCriterionService.
+#
+# Author: David Torres <api.davidtorres@gmail.com>
+
+use strict;
+use lib qw(t/util);
+
+use Test::More (tests => 51);
+use TestClientUtils qw(get_test_client);
+use TestAPIUtils qw(get_api_package create_campaign delete_campaign
+                    create_ad_group delete_ad_group);
+
+# Getting API client for functional tests.
+my $client = get_test_client();
+if (!$client) {
+  plan skip_all => "Can't create test client, make sure your " .
+      "t/testdata/client.properties is properly set. Skipping functional " .
+      "tests.";
+}
+
+# Test can use AdGroupCriterionService related classes.
+use_ok(get_api_package($client, "AdGroupCriterion"));
+use_ok(get_api_package($client, "AdGroupCriterionPage"));
+use_ok(get_api_package($client, "Keyword"));
+use_ok(get_api_package($client, "AdGroupCriterionOperation"));
+use_ok(get_api_package($client, "BiddableAdGroupCriterion"));
+use_ok(get_api_package($client, "Placement"));
+use_ok(get_api_package($client, "Selector"));
+
+# API dependencies for this test.
+my $campaign = create_campaign($client);
+my $ad_group_keyword = create_ad_group($client, $campaign->get_id());
+my $ad_group_placement = create_ad_group($client, $campaign->get_id());
+
+# Test create Criterion for Keyword.
+my $keyword1 = get_api_package($client, "Keyword")->new({
+  matchType => "BROAD",
+  text => "mars cruise"
+});
+my $biddable_ad_group_criterion =
+    get_api_package($client, "BiddableAdGroupCriterion")->new({
+      adGroupId => $ad_group_keyword->get_id()->get_value(),
+      criterion => $keyword1
+    });
+my $result = $client->AdGroupCriterionService()->mutate({
+  operations => [get_api_package($client, "AdGroupCriterionOperation")->new({
+    operator => "ADD",
+    operand => $biddable_ad_group_criterion
+  })]
+});
+ok($result, "Result from adding Keyword Criterion is valid");
+isa_ok($result, get_api_package($client, "AdGroupCriterionReturnValue"));
+ok($result->get_value()->[0],
+   "Result contains the added BiddableAdGroupCriterion");
+ok($result->get_value()->[0]->get_criterion(),
+   "Added BiddableAdGroupCriterion contains Keyword");
+isa_ok($result->get_value()->[0]->get_criterion(),
+       get_api_package($client, "Keyword"));
+is($result->get_value()->[0]->get_criterion()->get_text(),
+   $keyword1->get_text(), "Added Criterion Keyword text matches original");
+$keyword1 = $result->get_value()->[0]->get_criterion();
+
+# Test create Criterion for Placement.
+my $placement1 = get_api_package($client, "Placement")->new({
+  url => "www.example.com",
+});
+$biddable_ad_group_criterion =
+    get_api_package($client, "BiddableAdGroupCriterion")->new({
+      adGroupId => $ad_group_placement->get_id(),
+      criterion => $placement1
+    });
+$result = $client->AdGroupCriterionService()->mutate({
+  operations => [get_api_package($client, "AdGroupCriterionOperation")->new({
+    operator => "ADD",
+    operand => $biddable_ad_group_criterion,
+  })]
+});
+ok($result, "Result from adding Placement Criterion is valid");
+isa_ok($result, get_api_package($client, "AdGroupCriterionReturnValue"));
+ok($result->get_value()->[0],
+   "Result contains the added BiddableAdGroupCriterion");
+ok($result->get_value()->[0]->get_criterion(),
+   "Added BiddableAdGroupCriterion contains Placement");
+isa_ok($result->get_value()->[0]->get_criterion(),
+       get_api_package($client, "Placement"));
+is($result->get_value()->[0]->get_criterion()->get_url(),
+   $placement1->get_url(), "Added Criterion Placement url matches original");
+$placement1 = $result->get_value()->[0]->get_criterion();
+
+# Test create Criterion cross AdGroups.
+my $keyword2 = get_api_package($client, "Keyword")->new({
+  matchType => "BROAD",
+  text => "mars cruise2"
+});
+$biddable_ad_group_criterion =
+    get_api_package($client, "BiddableAdGroupCriterion")->new({
+      adGroupId => $ad_group_keyword->get_id(),
+      criterion => $keyword2,
+      userStatus => "PAUSED"
+    });
+my $placement2 = get_api_package($client, "Placement")->new({
+  url => "www.example2.com",
+});
+my $biddable_ad_group_criterion2 =
+    get_api_package($client, "BiddableAdGroupCriterion")->new({
+      adGroupId => $ad_group_placement->get_id(),
+      criterion => $placement2,
+      userStatus => "PAUSED"
+    });
+$result = $client->AdGroupCriterionService()->mutate({
+  operations => [get_api_package($client, "AdGroupCriterionOperation")->new({
+    operator => "ADD",
+    operand => $biddable_ad_group_criterion
+  }), get_api_package($client, "AdGroupCriterionOperation")->new({
+    operator => "ADD",
+    operand => $biddable_ad_group_criterion2
+  })]
+});
+ok($result, "Result from adding cross AdGroups Criterion is valid");
+isa_ok($result, get_api_package($client, "AdGroupCriterionReturnValue"));
+is(@{$result->get_value()}, 2,
+   "Result contains the correct number of added Criterion");
+ok($result->get_value()->[0],
+   "Result contains the first added BiddableAdGroupCriterion");
+ok($result->get_value()->[0]->get_criterion(),
+   "Added first BiddableAdGroupCriterion contains Keyword");
+isa_ok($result->get_value()->[0]->get_criterion(),
+       get_api_package($client, "Keyword"));
+is($result->get_value()->[0]->get_criterion()->get_text(),
+   $keyword2->get_text(), "Added Criterion Keyword text matches original");
+ok($result->get_value()->[1],
+   "Result contains the added second BiddableAdGroupCriterion");
+ok($result->get_value()->[1]->get_criterion(),
+   "Added second BiddableAdGroupCriterion contains Placement");
+isa_ok($result->get_value()->[1]->get_criterion(),
+       get_api_package($client, "Placement"));
+is($result->get_value()->[1]->get_criterion()->get_url(),
+   $placement2->get_url(), "Added Criterion Placement url matches original");
+$keyword2 = $result->get_value()->[0]->get_criterion();
+$placement2 = $result->get_value()->[1]->get_criterion();
+
+# Test get a page of biddable and active criteria.
+$result = $client->AdGroupCriterionService()->get({
+  serviceSelector => get_api_package($client, "Selector")->new({
+    fields => ["Id", "Status"],
+    predicates => [
+      get_api_package($client, "Predicate")->new({
+        field => "Status",
+        operator => "IN",
+        values => ["ACTIVE"]
+      }),
+      get_api_package($client, "Predicate")->new({
+        field => "CriterionUse",
+        operator => "IN",
+        values => ["BIDDABLE"]
+      })
+    ],
+    paging => get_api_package($client, "Paging")->new({
+      startIndex => 0,
+      numberResults => 100
+    })
+  })
+});
+ok($result, "Result from getting all active criteria is valid");
+isa_ok($result, get_api_package($client, "AdGroupCriterionPage"));
+ok($result->get_entries(), "Entries from result is valid");
+is(scalar(grep($_->get_userStatus() eq "ACTIVE", @{$result->get_entries()})),
+   scalar(@{$result->get_entries()}), "Retrived criteria statuses are correct");
+
+# Test get criteria by Campaign.
+$result = $client->AdGroupCriterionService()->get({
+  serviceSelector => get_api_package($client, "Selector")->new({
+    fields => ["Id", "AdGroupId"],
+    predicates => [
+      get_api_package($client, "Predicate")->new({
+        field => "AdGroupId",
+        operator => "IN",
+        values => [$ad_group_keyword->get_id()->get_value(),
+                   $ad_group_placement->get_id()->get_value()]
+      })
+    ]
+  })
+});
+ok($result, "Result from getting campaign level criteria is set");
+isa_ok($result, get_api_package($client, "AdGroupCriterionPage"));
+ok($result->get_entries(), "Entries from result is valid");
+my %ad_group_ids = ($ad_group_keyword->get_id() => 1,
+                    $ad_group_placement->get_id() => 1);
+is(scalar(grep(exists $ad_group_ids{$_->get_adGroupId()},
+               @{$result->get_entries()})),
+   scalar(@{$result->get_entries()}), "Retrived criteria belong to campaign");
+
+# Test get criteria by id.
+$result = $client->AdGroupCriterionService()->get({
+  serviceSelector => get_api_package($client, "Selector")->new({
+    fields => ["Id", "KeywordText"],
+    predicates => [
+      get_api_package($client, "Predicate")->new({
+        field => "AdGroupId",
+        operator => "IN",
+        values => [$ad_group_keyword->get_id()->get_value()]
+      }),
+      get_api_package($client, "Predicate")->new({
+        field => "Id",
+        operator => "IN",
+        values => [$keyword1->get_id()->get_value()]
+      })
+    ]
+  })
+});
+ok($result, "Result from getting criteria by id is valid");
+isa_ok($result, get_api_package($client, "AdGroupCriterionPage"));
+ok($result->get_entries(), "Entries from result is set");
+isa_ok($result->get_entries()->[0],
+       get_api_package($client, "BiddableAdGroupCriterion"));
+is($result->get_entries()->[0]->get_criterion()->get_text(),
+   $keyword1->get_text(), "Retrieved keyword criterion text is correct");
+
+# Test update Keyword Criterion.
+$biddable_ad_group_criterion =
+    get_api_package($client, "BiddableAdGroupCriterion")->new({
+      adGroupId => $ad_group_keyword->get_id(),
+      criterion => get_api_package($client, "Criterion")->new({
+        id => $keyword1->get_id()
+      }),
+      userStatus => "PAUSED",
+    });
+$result = $client->AdGroupCriterionService()->mutate({
+  operations => [get_api_package($client, "AdGroupCriterionOperation")->new({
+    operator => "SET",
+    operand => $biddable_ad_group_criterion
+  })]
+});
+ok($result, "Result from update keyword criterion is valid");
+isa_ok($result, get_api_package($client, "AdGroupCriterionReturnValue"));
+ok($result->get_value()->[0], "First result is correct");
+is($result->get_value()->[0]->get_userStatus(), "PAUSED",
+   "Status in update criterion is correct");
+
+# Test delete criterion.
+my @operations = ();
+foreach my $criterion ($keyword1, $keyword2, $placement1, $placement2) {
+  my $ad_group_id = $criterion->isa(get_api_package($client, "Keyword"))?
+      $ad_group_keyword->get_id() : $ad_group_placement->get_id();
+  push(@operations, get_api_package($client, "AdGroupCriterionOperation")->new({
+    operand => get_api_package($client, "BiddableAdGroupCriterion")->new({
+      adGroupId => $ad_group_id,
+      criterion => get_api_package($client, "Criterion")->new({
+        id => $criterion->get_id()
+      })
+    }),
+    operator => "REMOVE"
+  }));
+}
+$result = $client->AdGroupCriterionService()->mutate({
+  operations => \@operations
+});
+ok($result, "Results from deleting Ads is correct");
+ok($result->get_value(), "Value array within result is correct");
+isa_ok($result, get_api_package($client, "AdGroupCriterionReturnValue"));
+is(scalar(@{$result->get_value()}), scalar(@operations),
+   "Deleted criteria returned array size is correct");
+
+# Cleaning up test dependencies.
+delete_ad_group($client, $ad_group_keyword->get_id());
+delete_ad_group($client, $ad_group_placement->get_id());
+delete_campaign($client, $campaign->get_id());

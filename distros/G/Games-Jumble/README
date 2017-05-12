@@ -1,0 +1,37 @@
+Games-Jumble
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Games::Jumble
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Games-Jumble
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-Jumble
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Games-Jumble
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Games-Jumble
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2007 Doug Sparling
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

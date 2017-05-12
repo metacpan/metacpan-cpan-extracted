@@ -1,0 +1,66 @@
+---
+abstract: 'pipelines, tools, and data managment for genomics'
+author: []
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Genome
+provides:
+  Genome:
+    file: lib/Genome.pm
+    version: 0.06
+  Genome::Env::GENOME_DEV_MODE:
+    file: lib/Genome/Env/GENOME_DEV_MODE.pm
+    version: 0
+  Genome::Env::GENOME_MODEL_DATA:
+    file: lib/Genome/Env/GENOME_MODEL_DATA.pm
+    version: 0
+  Genome::Env::GENOME_MODEL_ROOT:
+    file: lib/Genome/Env/GENOME_MODEL_ROOT.pm
+    version: 0
+  Genome::Env::GENOME_MODEL_TESTDIR:
+    file: lib/Genome/Env/GENOME_MODEL_TESTDIR.pm
+    version: 0
+  Genome::Env::GENOME_NO_REQUIRE_USER_VERIFY:
+    file: lib/Genome/Env/GENOME_NO_REQUIRE_USER_VERIFY.pm
+    version: 0
+  Genome::Env::GENOME_VIEW_CACHE:
+    file: lib/Genome/Env/GENOME_VIEW_CACHE.pm
+    version: 0
+  Genome::Model::Tools:
+    file: lib/Genome/Model/Tools.pm
+    version: 0
+  Genome::Model::Tools::Example1:
+    file: lib/Genome/Model/Tools/Example1.pm
+  Genome::Model::Tools::Example2:
+    file: lib/Genome/Model/Tools/Example2.pm
+  Genome::Model::Tools::Install:
+    file: lib/Genome/Model/Tools/Install.pm
+  Genome::Model::Tools::Install::AptGet:
+    file: lib/Genome/Model/Tools/Install/AptGet.pm
+  Genome::Model::Tools::Install::Cpanm:
+    file: lib/Genome/Model/Tools/Install/Cpanm.pm
+  Genome::Site:
+    file: lib/Genome/Site.pm
+    version: 0
+  Genome::Sys:
+    file: lib/Genome/Sys.pm
+  Genome::Vocabulary:
+    file: lib/Genome/Vocabulary.pm
+requires:
+  Carp: ''
+  File::Basename: ''
+  File::Temp: ''
+  Getopt::Complete: ''
+  IO::File: ''
+  IO::String: ''
+  Sys::Hostname: ''
+  UR: 0.29
+  perl: v5.8.7
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+version: 0.06

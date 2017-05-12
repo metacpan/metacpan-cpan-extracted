@@ -1,0 +1,12 @@
+diff -uNr gtk+-2.4.1/gtk/gtksettings.c gtk+-2.4.1.patched/gtk/gtksettings.c
+--- gtk+-2.4.1/gtk/gtksettings.c	2004-03-11 18:54:19.000000000 +0100
++++ gtk+-2.4.1.patched/gtk/gtksettings.c	2004-05-04 23:03:19.423768352 +0200
+@@ -309,7 +309,7 @@
+                                              g_param_spec_string ("gtk-icon-theme-name",
+ 								  P_("Icon Theme Name"),
+ 								  P_("Name of icon theme to use"),
+-								  "hicolor",
++								  "gnome",
+ 								  G_PARAM_READWRITE),
+                                              NULL);
+   g_assert (result == PROP_ICON_THEME_NAME);

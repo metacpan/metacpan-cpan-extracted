@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Games/QuizTaker.pm
+lib/Games/QuizTaker/IO.pm
+t/sampleqa
+t/sample.csv
+t/testqa
+t/01load.t
+t/02generate.t
+t/03test.t
+t/04exceptions.t
+t/05pod.t
+README
+META.yml

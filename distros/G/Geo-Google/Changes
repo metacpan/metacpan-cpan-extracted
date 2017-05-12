@@ -1,0 +1,140 @@
+Revision history for Perl extension Geo::Google.
+
+0.01  Mon May 23 22:05:45 2005
+	- original version; created by h2xs 1.23 with options
+		-Xn Geo::Google
+0.03  Sun Jan 7 10:21:00 2007
+        - Google switched their Maps server response from XML
+            to JSON.  Changed the Geo::Google response parsing
+            from XML to google's JSON data structure.
+        - changed the toString() functions of these objects to
+            toXML() functions:
+               Geo::Google::Location
+               Geo::Google::Segment
+               Geo::Google::Path
+	- Added a toJSON() function to these objects:
+               Geo::Google::Location
+               Geo::Google::Path
+        - Added private function _JSONRenderSkeleton() to support
+            the new toJSON() functions of location and path objects
+        - Simplified control loops for directions segment parsing
+        - Added support for waypoints in directions queries and
+            Geo::Google::Path objects
+        - Updated the test script
+        - Added the levels() and panel() methods of the 
+	    Geo::Google::Path object to allow JSON rendering that 
+	    should be interchangeable with Google Maps' JSON response
+        - Added a locations() method of the Geo::Google::Path
+            object, allowing you to access any array of all 
+	    locations used in the directions query after it has 
+	    been executed
+	- Expanded error handling to include more checks during the 
+	    query process, added new error messages, and re-wrote 
+	    some existing error messages for clarity
+	- Added detailed test failure reporting to t/Geo-Google.t
+20070226:0213:MAT 
+	Partial fix of a bug in extraction and correlation of 
+	driving directions steps.
+20070227:0516:MAT 
+	-Completed fix of Path segments bug reported by
+		Thomas Delaet and Pieter-Jan Speelmans
+	-Added code to automatically accept suggested changes
+		to google maps queries in the Geo::Google->path() 
+		function.
+	-Adjusted path object to include start, stop and all 
+		waypoints as segments
+	-Revised test script to reflect new path data structure
+20070301:0458:MAT
+	-Cleaned up suggestion acceptor in Geo::Google->path()
+		-Based parsing on a style tag instead of English text 
+	-Replaced parsing for html segment descriptions with 
+		a description constructor for waypoints only 
+20070302:1422:MAT
+	-Removed waypoint html segment description contstructor.
+		Replaced it with the official Google title of the 
+		location from from the Geo::Google::Location object
+		for the waypoint.
+20070304:1751:MAT
+	-Fixed parsing bug that caused directions with no waypoints
+		to miss all directions steps, returning only the 
+		start and stop points.
+
+		Special thanks to Pieter Agten <pi8 at pi.be>
+		for zeroing in on the problem line and sending a 
+		patch.
+	-Added 14 new tests to verify that directions with no 
+		waypoints (from: to:) parse correctly.
+20070308:0626:MAT
+	-re-tooled driving directions parsing and adjusted structure 
+		of the path object slightly to comply with Google's 
+		latest changes to the JSON data.  Added a second
+		polyline (because google switched to one polyline per 
+		subpath)
+		-Thanks to Pieter Agten for spotting this and sending
+		 in a bug report
+0.04-rc1 : 9 April 2007 : MAT
+    -Fixed broken distance and time parsing
+    -Re-wrote and added extensive commenting to the polyline decoding
+    	- now it works on 64-bit perl as well
+    -Adjusted HTML segment to polyline points synchronization loops
+     to account for the new polyline decoding algorithm
+0.04-rc2 : MAT : adjusted for slightly different point lat/longs in test script
+0.04-rc3 : MAT
+  - This version requires perl JSON module 1.11 patched with Allen Day's
+      JSON/Parser.pm patch.  Recently added JSON from Google Maps broke 
+      the JSON parser.  The Allen Day patch makes it more flexible for
+      quote handling.
+  - Adjusted the _obj2location() function because Google changed their
+      JSON data structure for locations (address lines specifically).
+0.04-rc4: MAT
+  - Rewrote _encode() for 64 bit CPU compatibility
+  - Wrote _encode_word() function used by new version of _encode()
+  - Fixed Geo::Google::Path->toXML() function (have not tested for KML file
+    compatibility).
+  - Added static unit tests for:
+    _encode_word()
+    _encode()
+    _decode_word()
+    _decode()
+    _decode() to _encode() and comparison of output against input
+  - Added a dynamic unit test that tests both _decode() and _encode() against
+    the actual Google polyline string
+  - Adjusted the correlation algorithm for HTML extracted directions segments and
+    points extracted from the polyline strings.  We now use search locations for
+    points wherever possible.
+    - To make this possible, I adjusted precision of lat/long coords for 
+      Geo::Google::Locations that are used as path search parameters.  They come
+      from Google with millionth degree precision, but polyline points only have
+      hundred-thousandth degree precision.
+    - Points to HTML correlation is spot on for point-to-point directions, but off
+      for point-to-point-to-point directions (waypoints).  Will fix this when I
+      restructure the API for Path->Subpath->Segment directions structure.
+  - Adjusted directions parsing to accommodate Google's naming convention change
+    for driving segments.  It was 'dirsegment_\d+_\d+', but now it's 
+    'panel_\d+_\d+'.
+0.04-rc5 (MAT)
+  - Modified the location() constructor method of of the Geo::Google object to
+    allow it to return Geo::Gooogle::Location objects when Google can't resolve
+    the address you provide but suggests alternate addresses that it can
+    resolve.  It returns these alternate address in the same array of
+    Geo::Google::Location objects that it normally returns.  They are ordered 
+    in the same order Google presents them.
+  - Added unit tests for handling of suggested alternate addresses in the
+    location() constructor method of the Geo::Google object.
+0.04-rc5 (MAT)
+  - Modified Makefile.PL to require JSON version 1.12 or greater (1.11 and
+    earlier don't handle mixes of ' and " as key and field delimiters)
+0.04-rc6 (MAT)
+  - Adjusted parsing to compensate for a in change Google's JSON reponse
+    structure and UTF escaping.
+  - Minor code beautification
+  - Adjusted test script to match slight changes in Google's data
+  - Test script now prints specific error messages when it fails some tests
+0.05-rc1 (MAT)
+  - Updated total directions length parsing to reflect Google's recent 
+    display format change
+  - Re-wrote test script to only test lat/long of Geo::Google::Location objects
+    that don't come from a polyline to the nearest hundred-thousandth of a
+    degree.  In most cases, this difference is a matter of inches on the ground.
+      - Should prevent needless test script changes every time Google gets
+	a database update from Navteq

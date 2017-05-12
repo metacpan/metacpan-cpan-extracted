@@ -1,0 +1,37 @@
+GRID-Machine version 0.07
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+Optionally, if you want to thoroughly test the module do this two steps:
+
+  - Set automatic ssh-authentification with a machine where you have an account
+  - Set on the local machine the environment variable GRID_REMOTE_MACHINE to point
+    to taht machine. For example:
+
+        export GRID_REMOTE_MACHINE=user@machine.domain
+
+Then follow these steps:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Module::Which version '0.0205'
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Casiano Rodriguez-Leon casiano@cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,17 @@
+Revision history for Graph-ChuLiuEdmonds
+
+0.02    Thu May  1 19:42:23 2008
+        First release.
+
+0.03    Thu May  1 19:51:56 2008
+        Added dependency on Graph to Makefile.PL
+
+0.04    Thu May  1 23:32:52 2008
+	Fixed a bug that could cause an infinite loop
+
+0.05    Fri May  2 02:02:18 2008
+	Fixed a bug that caused some edges not appear in the resulting
+	MST.
+
+0.06    Sun Feb 26 20:16:16 2012
+        Fixed some typos in the documentation (reported by Y. Haralambous).

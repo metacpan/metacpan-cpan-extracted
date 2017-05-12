@@ -1,0 +1,48 @@
+=head2 mungeids
+
+Programmatically munges the message IDs in the Message-ID and References
+headers by adding a slash-separated list of newsgroups to which the
+article is going to be posted, followed by a slash, to the beginning of
+them.  We also strip off any prefix that looks like a prefix we'd generate
+(any number of strings that could be a newsgroup name, separated by
+slashes) to prevent threads with replies from readers of multiple
+mungeid'd groups from generating constantly-growing message IDs and to
+hopefully still get threading right.  For the purposes of this check, we
+assume newsgroup names will contain at least one period; this module may
+not work correctly for newsgroup names that do not.
+
+The purpose of this is for use with mailing list to newsgroup gateways.
+Since messages to multiple mailing lists may all have the same message ID,
+and since the same mailing list may be gated to Usenet in multiple places,
+the message IDs of incoming mailing list messages need to be munged in
+some fashion before being passed on to Usenet.  Ideally, however,
+threading should be preserved, and replies to mailing list messages from
+other people on the mailing list won't refer to the munged message ID.
+This module therefore applies the same munge to all of the message IDs in
+the References header as well, in the hope of maintaining threading and
+still getting message ID uniqueness.
+
+If the message doesn't already have a Message-ID header, this module will
+generate one.
+
+Since an accurate Newsgroups header is needed to correctly munge the IDs,
+this module should run after any modules responsible for generating that.
+It also needs the final Message-ID and References header, so it should run
+after the mailtonews module since that module may promote message IDs from
+In-Reply-To into References and discard existing Message-ID headers.
+
+This module takes one optional configuration directive:
+
+=over 4
+
+=item mungeids REGEX [REGEX ...]
+
+C<REGEX> is a regex matching newsgroups which should be used to make up
+the prefix that we'll be adding to message IDs.  If this configuration
+directive is supplied, then only newsgroups matching one of the supplied
+regexes will be used to construct the prefix.  By default, all newsgroups
+in the Newsgroups header will be used in the prefix.
+
+=back
+
+mungeids takes no arguments and cannot fail.

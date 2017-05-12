@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Games-Quake-Stats.t
+lib/Games/Quake/Stats.pm
+lib/Games/Quake/Player.pm
+META.yml                                 Module meta-data (added by MakeMaker)

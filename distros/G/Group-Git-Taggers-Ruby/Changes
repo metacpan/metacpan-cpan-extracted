@@ -1,0 +1,20 @@
+Revision history for Group-Git-Taggers-Ruby
+
+0.0.3   2015-09-01
+        Updating for release of version 0.0.3
+        Removed creation of makefile (Ivan Wills)
+
+0.0.2   2015-07-26
+        Updating for release of version 0.0.2
+        Added coveralls config (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.0.1   2015-05-15
+        Added missing dependencies (Ivan Wills)
+        Added Gemfile to stop words (Ivan Wills)
+        Added missing content (Ivan Wills)
+        Fixed tests (Ivan Wills)
+        Fixed manifest (Ivan Wills)
+        Tagging for future cpan release (Ivan Wills)
+        Implemented ruby tagger (Ivan Wills)
+        Initial commit (Ivan Wills)

@@ -1,0 +1,88 @@
+=== ChangeLog discontinued ===
+
+	With the move to git, we stop maintaining a separate ChangeLog and
+	rely on proper commit messages instead.  A web view of the changes
+	is available at <http://git.gnome.org/browse/perl-Gtk2-Spell/>.
+
+2008-01-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Don't use bogus "MAIN" package.
+
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+	* perl-Gtk2-Spell.spec.in: new scheme that addresses x86_64 problems
+	found by Carl Nygard
+
+2004/01/24 21:44 (-0500) rwmcfa1
+
+	* Makefile.PL: removed runtime_reqs stuff, replaced by the pkg-config
+	trick. use Glib::MakeHelper.
+
+	* perl-Gtk2-Spell.spec.in: use pkg-config for Requires version
+
+	* GtkSpell.xs: class fixes
+
+2003/12/29 16:32 (-0500) rwmcfa1
+
+	* perl-Gtk2-Spell.spec.in: use the new DATE replacement in conjunction
+	with VERSION to create the changlog on the fly, which is better.
+
+2003/12/10 14:54 (-0500) rwmcfa1
+
+	* t/0.GtkSpell.t: set env LANG = c, may prevent/catche some problems
+
+2003/11/25 17:27 (-0500) rwmcfa1
+
+	* Makefile.PL: couple of small fixes, spotted by kaffee.
+
+2003/11/11 00:36 (-0500) muppetman
+
+	* MANIFEST, debian/*: remove the debian packaging files, since having
+	them in the upstream dist makes it difficult for the maintainers
+
+2003/09/21 20:19 rwmcfa1
+
+	* version 1.03
+
+	* Makefile.PL: fixed bug in specfile generation
+
+	* (lots of files): license updates/additions
+
+2003/09/17 10:44 rwmcfa1
+
+	* Makefile.PL: ExtUtils::PkgConfig can now deal with version
+	requirements using pkg-config's interface, make use of it.
+
+	* t/0.GtkSpell.t: skip unless we have a display
+
+2003/09/16 23:50 rwmcfa1
+
+	* Makefile.PL, perl-*spec.in: somewhat automated versioning system
+	implemented for depenancy modules
+
+2003/09/15 22:26 rwmcfa1
+
+	* Makefile.PL: spec file dependancies improved
+
+2003/09/06 19:23 rwmcfa1
+
+	* Makefile.PL: dist-rpms build target added
+
+	* perl-Gtk2-Spell.spec.in: initial import
+
+2003/08/24 19:21 rwmcfa1
+
+	* Spell.pm: bumped version to 1.02. was a small problem with the
+	Makefile.PL rolled into version 1.00, it's on cpan so correcting it
+	requires a new version number/release.
+
+2003/08/18 12:34 muppetman
+
+	* debian/*: patch from james curbo adds debian packaging stuff
+
+2003/05/26 21:04 rwmcfa1
+
+	* *: Initial ChangeLog entry, now has tests preparing for release of
+	ver 0.99.

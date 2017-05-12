@@ -1,0 +1,176 @@
+#!/usr/bin/env perl 
+
+use strict;
+
+use Getopt::Long;
+
+use GH::Status;
+use GH::Msp;
+use GH::EditOp;
+use GH::MspTools qw(findBestOverlap);
+use GH::Align qw(boundedGlobalMinDifferences);
+
+use Data::Dumper;
+
+my($s1Filename, $s2Filename, $outputFormat);
+my($s1, $s1Name, $s1Len);
+my($s2, $s2Name, $s2Len);
+my($status, $realCost, $opsRef, $op);
+
+$outputFormat = 0;
+
+GetOptions('s1=s' => \$s1Filename,
+	   's2=s' => \$s2Filename,
+	   'outputFormat=i' => \$outputFormat,
+	  );
+
+die &usage() if (not defined $s1Filename);
+die &usage() if (not defined $s2Filename);
+die &usage() if (($outputFormat != 0) &&
+		 ($outputFormat != 1) &&
+		 ($outputFormat != 2) &&
+		 ($outputFormat != 3)
+		);
+
+($s1Name, $s1) = getFastaSeq($s1Filename);
+die "Could not read $s1Filename\n" if (not defined ($s1));
+$s1Len = length($s1);
+
+($s2Name, $s2) = getFastaSeq($s2Filename);
+die "Could not read $s2Filename\n" if (not defined ($s2));
+$s2Len = length($s2);
+
+print "s1 name: $s1Name, length: ", length($s1), "\n";
+print "s2 name: $s2Name, length: ", length($s2), "\n";
+print "\n";
+
+($status, $realCost, $opsRef) = doOverlap($s1, $s2);
+
+if ($status == STAT_OK) {
+  if ($outputFormat == 0) {
+    printOps($opsRef, *main::STDOUT);
+  }
+  elsif ($outputFormat == 1) {
+    printPositions($opsRef, *main::STDOUT);
+  }
+  elsif ($outputFormat == 2) {
+    printAlignment($s1, $s2, $opsRef, 50, *main::STDOUT);
+  }
+  elsif ($outputFormat == 3) {
+    $op = shift(@{$opsRef});	# trim the initial and final
+    if ($op->getType == INSERT_S1) {
+      $op->setType(OVERHANG_S1);
+    }
+    elsif ($op->getType == INSERT_S2) {
+      $op->setType(OVERHANG_S2);
+    }
+    unshift(@{$opsRef}, $op);
+
+    $op = pop(@{$opsRef});	# insert_S[12] ops, they're not errors....
+    if ($op->getType == INSERT_S1) {
+      $op->setType(OVERHANG_S1);
+    }
+    elsif ($op->getType == INSERT_S2) {
+      $op->setType(OVERHANG_S2);
+    }
+    push(@{$opsRef}, $op);
+    printProblems($s1, $s2, $opsRef, 50, *main::STDOUT);
+  }
+  else {
+    die "Unsupported output format\n.";
+  } 
+}
+else {
+  print "doOverlap returned status = \"",
+  statusToString($status), "\" ($status)\n";
+}
+  
+exit(0);
+
+################################################################
+# end of main                                                  #
+################################################################
+
+sub usage {
+  my($usage);
+
+  $usage .= $0;
+  $usage .= " -s1 seq1filename -s2 seq2filename [-outputFormat {0,1,2}]\n";
+  return($usage);
+}
+
+sub getFastaSeq {
+  my($filename) = @_;
+  my($SEQFILE);
+  my($name);
+  my($seq);
+  my($oldseparator);
+
+  open $SEQFILE, $filename || return undef;
+  $name = <$SEQFILE>;
+  chomp $name;
+  $name =~ s/^> *//;
+  if (length($name) > 35) {
+    $name = substr($name, 0, 32);
+    $name .= "...";
+  }
+
+  $oldseparator = $/;
+  $/ = undef;
+  $seq = <$SEQFILE>;
+  $/ = $oldseparator;
+
+  $seq =~ s/\n//g;
+
+  close $SEQFILE;
+  return($name, $seq);
+}
+
+sub doOverlap {
+  my($s1, $s2) = @_;
+  my($s1Len, $s2Len);
+  my($subS1, $subS2);
+  my($bbRef, $alignRef);
+  my($cost, $s1s, $s1e, $s2s, $s2e); 
+  my($s1TailLen, $s2TailLen);
+  my($s1Subs, $s1Sube, $s2Subs, $s2Sube);
+  my($status, $realCost, $opsRef, $op) = (STAT_FAIL, undef, undef, undef);
+
+  $GH::MspTools::mspThreshold = 15;
+  $s1Len = length($s1);
+  $s2Len = length($s2);
+
+  $bbRef = findBestOverlap($s1, $s2);
+  
+  if (defined($bbRef)) {
+    ($cost, $s1s, $s1e, $s2s, $s2e) = @{$bbRef};
+    
+    $s1TailLen = $s1Len - $s1e - 1; # offset -> count
+    $s2TailLen = $s2s;
+    
+    $s1Subs = $s1s - $s2TailLen; # back up to account for s2's tail.
+    $s1Sube = undef;		# not used.
+    $s2Subs = 0;
+    $s2Sube = $s2e + $s1TailLen; # scoot forward to account for s1's tail
+    
+    $subS1 = substr($s1, $s1Subs);
+    $subS2 = substr($s2, $s2Subs, $s2Sube+1); # offset -> length.
+    
+    $alignRef = boundedGlobalMinDifferences($subS1, $subS2, $cost);
+    ($status, $realCost, $opsRef) = @{$alignRef};
+    
+    if ($status == STAT_OK) {
+      $op = new GH::EditOp;
+      $op->setType(INSERT_S1);
+      $op->setCount($s1Subs);
+      unshift(@{$opsRef}, $op);
+      
+      $op = new GH::EditOp;
+      $op->setType(INSERT_S2);
+      $op->setCount($s2Len-$s2Sube-1);
+      push(@{$opsRef}, $op);
+    }
+  }
+
+  return($status, $realCost, $opsRef);
+}

@@ -1,0 +1,6 @@
+Revision history for Perl extension Graph::Clique.
+
+0.01  Wed Nov 10 11:59:25 2004
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Graph::Clique
+

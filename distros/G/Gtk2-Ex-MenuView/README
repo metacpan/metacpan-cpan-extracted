@@ -1,0 +1,27 @@
+Copyright 2010 Kevin Ryde
+
+This file is part of Gtk2-Ex-MenuView.
+
+Gtk2-Ex-MenuView is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+Gtk2-Ex-MenuView is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Gtk2-Ex-MenuView.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+Gtk2::Ex::MenuView presents rows from a TreeModel as items in a menu,
+with an "activate" signal when one of them is chosen.  CheckMenuItem
+and RadioMenuItem items can be used too.
+
+The MenuView home page is
+
+    http://user42.tuxfamily.org/gtk2-ex-menuview/index.html

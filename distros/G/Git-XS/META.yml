@@ -1,0 +1,32 @@
+---
+abstract: 'Perl XS binding to libgit2'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Git::XS
+name: Git-XS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Mo: 0.30
+  XS::Object::Magic: 0.04
+  perl: 5.10.0
+resources:
+  homepage: https://github.com/ingydotnet/git-xs-pm/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/ingydotnet/git-xs-pm.git
+    web: https://github.com/ingydotnet/git-xs-pm/tree
+version: 0.02

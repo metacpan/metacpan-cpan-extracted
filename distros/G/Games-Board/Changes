@@ -1,0 +1,20 @@
+Revision history for Games-Board
+
+1.013     2013-09-24 20:52:09 America/New_York
+          replace busted test
+
+1.012     2013-08-24 08:40:40 America/New_York
+          update repo and bugtracker
+
+1.010     2005-04-02
+          minor formatting and packaging changes
+
+1.006     2004-04-27
+          fixed Games::Board::Grid to use strings as hash keys, not a LOL
+          added custom chess subclass tests
+
+1.005     2004-04-12
+          added Games::Board::Grid
+
+1.004     2004-03-28
+          first release

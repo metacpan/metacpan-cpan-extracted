@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+# PODNAME: hot-potato
+# ABSTRACT: timer for hot potato or other games
+use strict;
+use warnings;
+
+use Games::HotPotato;
+use Getopt::Long;
+
+my @opt_spec = qw(
+    minimum-time|t=i
+    maximum-time|T=i
+    minimum-rush|r=i
+    maximum-rush|R=i
+    sound-theme|s=s
+    start-alert=s
+    rush-alert=s
+    final-alert=s
+    start-music=s
+    rush-music=s
+);
+
+s/^([\w\-]+)/$1|$1/ for @opt_spec;
+s/-/_/ for @opt_spec;
+
+my %opt;
+GetOptions(\%opt, @opt_spec);
+
+my @times = qw( minimum_time maximum_time minimum_rush maximum_rush );
+for my $time_name (@times) {
+    if (defined $opt{ $time_name }) {
+        $opt{ $time_name } = { seconds => $opt{ $time_name } };
+    }
+}
+
+my $hot_potato = Games::HotPotato->new(%opt);
+$hot_potato->run;
+
+
+__END__
+=pod
+
+=head1 NAME
+
+hot-potato - timer for hot potato or other games
+
+=head1 VERSION
+
+version 0.110020
+
+=head1 SYNOPSIS
+
+  hot-potato -t 20 -T 40 -r 5 -R 15 -s my_sounds
+
+=head1 DESCRIPTION
+
+This plays some music or a sound for a random amount of time that you can specify. Towards the end, it plays different music for the "rush" to the finish. Finally, it will play a sound to signify that the timer has ended. It's that simple.
+
+There's also a couple of other sounds at the start and between rushes, but those are broken at the moment.
+
+=head1 OPTIONS
+
+=head2 --minumum-time N
+
+=head2 -t N
+
+The timer will never be shorter than this number of seconds.
+
+=head2 --maximum-time N
+
+=head2 -T N
+
+The timer will never be longer thant his number of seconds. This must always be longer than the minimum time.
+
+=head2 --minimum-rush N
+
+=head2 -r N
+
+The rush will start at least this many seconds before the end. This must always be shorter than the minimum time.
+
+=head2 --maximum-rush N
+
+=head2 -R N
+
+The rush will never be longer than this many seconds before the end. This must always be shorter than the minimum time and as long or longer than the minimum rush.
+
+=head2 --sound-theme NAME
+
+=head2 -s NAME
+
+This is the name of the sound theme to use. See L</CONFIGURATION> for details.
+
+=head2 --start-alert
+
+This is the sound to play at the start. Overrides the sound theme. See L</BUGS>.
+
+=head2 --rush-alert
+
+This is the sound to play when the rush starts. Overrides the sound theme. See L</BUGS>.
+
+=head2 --final-alert
+
+This is the sound to play when the timer stops.
+
+=head2 --start-music
+
+This is the music to play when the timer starts.
+
+=head2 --rush-music
+
+This is the music to play during the rush.
+
+=head1 BUGS
+
+I need to fix the start sound and sound between the starting music and rush music.
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Qubling Software LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

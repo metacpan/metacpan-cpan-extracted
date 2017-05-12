@@ -1,0 +1,87 @@
+# ChangeLog for app-portage/gentoo-stats
+# Copyright 2002-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/app-portage/gentoo-stats/ChangeLog,v 1.1 2004/06/20 09:09:34 linguist Exp $
+
+*gentoo-stats-0.5.1 (29 Mar 2004)
+
+  29 Mar 2004; <mksoft@gentoo.org> gentoo-stats-0.5.1.ebuild:
+  Fixed wrong return value in case of succesfull update
+  added portage pym dir to sys.path
+  Modified swap/mem param to sent as string instead of int, close #46016
+  Verbose error message in case of an exception
+
+*gentoo-stats-0.5 (17 Mar 2004)
+
+  17 Mar 2004; <mksoft@gentoo.org> gentoo-stats-0.5.ebuild:
+  New version, rewritten in python
+
+*gentoo-stats-0.4 (15 Aug 2003)
+
+  15 Aug 2003; Heinrich Wendel <lanius@gentoo.org> gentoo-stats-0.4.ebuild:
+  moved from app-admin to app-portage
+
+  06 Dec 2002; Rodney Rees <manson@gentoo.org> : changed sparc ~sparc keywords
+ 
+*gentoo-stats-0.4 (25 Oct 2002)
+
+  09 Apr 2003; Todd Sunderlin <todd@gentoo.org> gentoo-stats-0.4.ebuild:
+  Marked stable for sparc.
+
+  03 Apr 2003; Zach Welch <zwelch@gentoo.org> gentoo-stats-0.4.ebuild:
+  add arm keyword
+
+  28 Feb 2003: Guy Martin <gmsoft@gentoo.org> gentoo-stats-0.4.ebuild :
+  Added hppa to keywords.
+
+  04 Feb 2003; Rodney Rees <manson@gentoo.org>: added ~sparc for testing
+
+  25 Oct 2002; Maik Schreiber <blizzy@gentoo.org> : New version.
+  Changes in this release:
+    - PPC support!
+
+*gentoo-stats-0.3.2 (24 Oct 2002)
+
+  24 Oct 2002; Maik Schreiber <blizzy@gentoo.org> : New version. Fixes a bug in
+  reporting total memory and swap. This closes bug #9545, reported by Xavier
+  <mooh@xavierneys.com>
+
+*gentoo-stats-0.3.1 (15 Oct 2002)
+
+  15 Oct 2002; Maik Schreiber <blizzy@gentoo.org> : New version. Fixes a bug in
+  reporting the profile.
+
+*gentoo-stats-0.3 (15 Oct 2002)
+
+  15 Oct 2002; Maik Schreiber <blizzy@gentoo.org> : New version.
+  Changes in this release:
+    - Reports the Gentoo Linux profile you are using.
+
+  15 Oct 2002; Maik Schreiber <blizzy@gentoo.org>
+  gentoo-stats-0.1.ebuild, gentoo-stats-0.2.ebuild: Added IUSE.
+
+  10 Oct 2002; Maik Schreiber <blizzy@gentoo.org>
+  gentoo-stats-0.1.ebuild, gentoo-stats-0.2.ebuild: Added
+  "-alpha" to KEYWORDS.
+
+*gentoo-stats-0.2 (05 Oct 2002)
+
+  05 Oct 2002; Maik Schreiber <blizzy@gentoo.org> : New version.
+  Changes in this release:
+    - HTTP proxy support
+    - recognition of installed PCI cards
+    - you can decide what data to transmit (see
+      /etc/gentoo-stats/gentoo-stats.conf)
+
+  31 Aug 2002; Maik Schreiber <blizzy@gentoo.org> gentoo-stats-0.1.ebuild:
+  Changed to "-sparc -sparc64" since bug #5822 isn't resolved yet. Also
+  added some information about how to edit cron jobs to make it easier
+  for new users.
+
+*gentoo-stats-0.1 (28 Jul 2002)
+
+  25 Aug 2002; Mark Guertin <gerk@gentoo.org> gentoo-stats-0.1.ebuild :
+  Added -ppc for now, until bug #5822 is resolved
+
+  13 Aug 2002; Pieter Van den Abeele <pvdabeel@gentoo.org> : Added ppc keyword.
+
+  28 Jul 2002; Maik Schreiber <blizzy@gentoo.org> : Initial import.

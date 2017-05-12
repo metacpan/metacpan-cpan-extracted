@@ -1,0 +1,95 @@
+# NAME
+
+Google::Code::Upload - upload files to a Google Code project (deprecated)
+
+# VERSION
+
+version 0.08
+
+# SYNOPSIS
+
+    use Google::Code::Upload;
+    my $gc = Google::Code::Upload->new(
+        project  => 'myproject',
+        username => 'mike',
+        password => 'abc123',
+    );
+    $gc->upload(
+        file        => 'README',
+        summary     => 'README for myproject',
+        labels      => ['Featured'],
+        description => 'Hello world',
+    );
+
+# DESCRIPTION
+
+**DEPRECATED**: Google code [shut down](http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html)
+
+This module allows you to programmatically upload files to [Google Code](https://googlecode.com).
+
+It ships with an executable script for use on the command line: [googlecode\_upload.pl](https://metacpan.org/pod/googlecode_upload.pl).
+
+# METHODS
+
+## new
+
+Constructs a new `Google::Code::Upload` object. Takes the following key-value
+pairs:
+
+- username
+- password (your Google Code password from [https://code.google.com/hosting/settings](https://code.google.com/hosting/settings))
+- project
+- ua - something that works like a [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) (_optional_)
+
+## upload
+
+Upload the given file to Google Code. Requires the following key-value pairs:
+
+- file - the filename of the file to upload
+- summary - the one-line summary to give to the file (defaults to the filename)
+- description - text describing the upload in more detail (for example, the
+changelog entry for this release)
+- labels - an arrayref of labels like `Featured`, `Type-Archive` or `OpSys-All`
+
+Returns the URL where the file can be downloaded if successful - otherwise, dies
+with the HTTP status line.
+
+You can also export the `upload` function, if you don't want to use OO style.
+Instead of key-value pairs, specify the arguments in the following order:
+
+    use Google::Code::Upload qw(upload);
+    upload( $file, $project_name, $username, $password, $summary, $labels, $description );
+
+# EXPORTS
+
+You may optionally export `upload` to use this module in a non-OO manner.
+
+# AVAILABILITY
+
+The project homepage is [http://search.cpan.org/dist/Google-Code-Upload/](http://search.cpan.org/dist/Google-Code-Upload/).
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Google::Code::Upload/](https://metacpan.org/module/Google::Code::Upload/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/fayland/google-code-upload](http://github.com/fayland/google-code-upload)
+and may be cloned from [git://github.com/fayland/google-code-upload.git](git://github.com/fayland/google-code-upload.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/fayland/google-code-upload/issues](https://github.com/fayland/google-code-upload/issues).
+
+# AUTHORS
+
+- Fayland Lam <fayland@gmail.com>
+- Mike Doherty <doherty@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Fayland Lam <fayland@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

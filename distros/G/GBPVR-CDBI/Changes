@@ -1,0 +1,28 @@
+Revision history for GBPVR-CDBI
+
+0.04    2006-03-08
+  + A test from Corion ( http://www.nntp.perl.org/group/perl.cpan.testers/294709 ) showed that it (of course) bombs if the actual gbpvr mdb's don't exist ... trapped this error so that test should run cleanly now ..
+
+0.03    2006-02-26
+  + Added all prereq's to the PREREQ_PM entry in Makefile.PL
+  + Made explicit "Windows only" notes in docs
+  + Added test db and test script for RecTracker
+  + Added test db and test script for VideoArchive
+  + Added test db and test script for RecordingSchedule (and fk's)
+  + bugfixes in RecordingSchedule in last_position(), archivetable(), status_string()
+
+0.02    2006-02-22
+   + Get gbpvr dir dynamically from 'HKEY_LOCAL_MACHINE\software\devnz\GBPVR InstallDir' via Win32::TieRegistry (new dependency). Use it to create path for gbpvr.mdb, video archive.mdb, and rectracker.mdb files.
+   + Added alias favorite() for GBPVR::CDBI::Channel->favourite()
+   + Added date/time accessor aliases to GBPVR::CDBI::RecordingSchedule
+   + Renamed modules RT => RecTracker and VA => VideoArchive
+   + added contrib/pending.pl
+   + added contrib/pending2ical.pl
+   + added contrib/va2rt.pl
+   + added contrib/manual.pl
+   + added contrib/clean_pending*.pl
+
+0.01    2006-02-20
+  + Initial release from 2005-04-27 at http://forums.gbpvr.com/showthread.php?p=35938#poststop
+  + Added RecTracker base class and subclass for RecordedShows table.
+

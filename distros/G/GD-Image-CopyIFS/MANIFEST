@@ -1,0 +1,15 @@
+CopyIFS.pm
+CopyIFS.xs
+libIFS.c
+libIFS.h
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/eye.t
+t/face.t
+t/thumb.t
+t/error.t
+t/lena.jpeg
+typemap
+META.yml
+README

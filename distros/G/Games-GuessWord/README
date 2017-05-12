@@ -1,0 +1,118 @@
+NAME
+    Games::GuessWord - Guess the letters in a word (ie Hangman)
+
+SYNOPSIS
+      use Games::GuessWord;
+
+      my $g = Games::GuessWord->new(file => "/path/to/wordlist");
+      print   "Score: " . $g->score . "\n";
+      print "Chances: " . $g->chances . "\n";
+      print  "Answer: " . $g->answer . "\n";
+      my @guesses = $g->guesses;
+      $g->guess("t");
+      # ...
+      if ($g->won) {
+        print "You won!\n";
+        $g->new_word;
+      }
+
+DESCRIPTION
+    This module is a simple wrapper around a word guessing game. You have to
+    guess the word by guessing letters in the word, and is otherwise known
+    as Hangman.
+
+METHODS
+  new
+
+    This is the constructor. You can either pass in a list of words or a
+    wordlist. A random word is picked:
+
+      my $g = Games::GuessWord->new(words => ["sleepy", "grumpy"]);
+      # or...
+      my $g = Games::GuessWord->new(file => "t/words");
+
+    You can also set the number of chances each game has with the chances
+    parameter
+
+      my $g = Games::GuessWord->new(file    => "t/words",
+                                    chances => 5);
+
+  answer
+
+    This method returns the current word being guessed, with asterisks (*)
+    replacing letters that have not been guessed yet. For example, if trying
+    to guess "buffy" and the letters "b" and "f" have been correctly
+    guessed, this will return "b*ff*".
+
+      print  "Answer: " . $g->answer . "\n";
+
+  chances
+
+    This method returns the number of chances left. You start off with six
+    chances by default and lose a chance everytime you get a guess wrong.
+
+      print "Chances: " . $g->chances . "\n";
+
+  guess
+
+    This methods guesses a letter in the word:
+
+      $g->guess("t");
+
+  guesses
+
+    This method returns the guesses taken so far this turn:
+
+      my @guesses = $g->guesses;
+
+  new_word
+
+    This method throws the current turn away and picks a new word:
+
+        $g->new_word;
+
+  secret
+
+    This method returns the secret word that the user is trying to guess:
+
+      my $secret = $g->secret;
+
+  score
+
+    This method returns the current score. You get a higher score if you
+    guess the word earlier on. The score persists over turns if you win:
+
+      print   "Score: " . $g->score . "\n";
+
+  won
+
+    Returns true if and only if they have won the game, i.e. if the answer
+    equals the secret word.
+
+  lost
+
+    Returns true if and only if they have lost the game, i.e. if they have
+    no more chances left
+
+  starting_chances
+
+    Sets the number of starting chances, i.e. the number of chances the
+    player gets for each game. By default this is six.
+
+SHOWING YOUR APPRECIATION
+    There was a thread on london.pm mailing list about working in a vacumn -
+    that it was a bit depressing to keep writing modules but never get any
+    feedback. So, if you use and like this module then please send me an
+    email and make my day.
+
+    All it takes is a few little bytes.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2001, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

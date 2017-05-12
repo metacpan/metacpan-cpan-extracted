@@ -1,0 +1,77 @@
+GD/SVG version 0.24
+===================
+
+GD::SVG seamlessly enables the scalable vector graphics (SVG) output
+from scripts written using GD.  It accomplishes this by translating GD
+functions into SVG functions.
+
+IMPORTANT NOTES
+
+1. In addition to GD::SVG, Ronan Oger has created a similar module
+(SVG::GD). In principle these modules perform a similar function but
+go about it in slightly different ways.  Ronan and I are now
+concurrently developing these modules which may be merged in the
+future. In particular, Ronan's module ultimately aims to tap into the
+raster editing abilities of GD.  GD::SVG focuses primarily on
+generating SVG-output from scripts written with GD - focusing on
+generating images de novo from stacks of data.
+
+2. See the internal documentation on important notes on how to use
+GD::SVG.
+
+QUICKSTART USAGE GUIDE
+
+To enable SVG output, you must change several elements of your
+script. This includes the use statement and direct calls to the
+classes that GD implements.
+
+In short:
+    
+    # use GD;
+    use GD::SVG;
+  
+    # my $image = GD::Image->new($width,$height);
+    my $image = GD::SVG::Image->new($width,$height);
+   
+    ...
+
+    print $image->svg();
+
+See the full documentation for examples on enabling dynamic selection
+of image output.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+You may need to be root (or sudo) to executre the make install
+command.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD, SVG
+
+ACKNOWLEDGEMENTS
+
+Lincoln Stein, creator of GD and my postdoctoral mentor, desires
+special credit. Ronan Oger, creator of the SVG module and co-creator
+of a similar GD-wrapper, has been very helpful with discussions about
+interfacing GD to SVG.
+
+Patches: srezic (color comparisons), jettero (fixed linecaps).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2008 Todd Harris (harris@cshl.edu) and the Cold Spring
+Harbor Laboratory
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

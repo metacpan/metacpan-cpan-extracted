@@ -1,0 +1,10 @@
+Changes
+GMP.pm
+GMP.xs
+MANIFEST
+Makefile.PL
+README
+gmp.c
+gmp.h
+test.pl
+typemap

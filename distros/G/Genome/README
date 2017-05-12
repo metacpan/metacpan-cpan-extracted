@@ -1,0 +1,42 @@
+
+NAME
+  Genome
+
+  genome SUBCOMMAND ...
+
+SYNOPSIS
+
+genome (list all available commands)
+
+genome project              ...
+genome taxon                ...
+genome population-group     ...
+genome individual           ...
+genome sample               ...
+genome instrument-data      ...
+genome processing-profile   ...
+genome model                ...
+genome tools                ...
+genome disk                 ...
+
+DESCRIPTION
+
+This is the top-level tool for working with the genome modeling system and tools.
+
+Just run it with no parameters to get a list of available commands.
+
+Every command and sub-command supports the --help option.
+
+OPTIONS
+
+These depend on the specific sub-command.
+
+DEVELOPER NOTE
+
+Running this WITHIN a source tree under the Genome namespace will automatically "use lib" your tree.
+
+BUGS
+
+Report bugs to software at genome.wustl.edu
+
+

@@ -1,0 +1,125 @@
+
+
+Module: Games::WordFind.pm 0.02
+Description: generate word-find type puzzles from a list of words.
+
+history:
+This module results from a one-off script I created some time ago
+to generate word-find puzzles from my son's practice word lists
+he received from school.
+
+The design is perhaps sub-optimal, I've merely taken the
+original one-off script and cobbled together a module out
+of the puzzle generating bits, and added a couple things.
+
+There is an included application script 'wordfind.pl' in the
+examples directory.
+
+Plain text puzzles and their solutions appear like:
+
+
+                Words to Find:
+                --------------
+
+      CAMEL           GREAT           LINUX
+      LLAMA           PERL
+
+                W Z J I Q X D L R M
+                O K Z C S T E A O I
+                C Z V Z A M P Y I M
+                D Y P E A M D N I C
+                W R R C T T V L F J
+                A G W E L L R E P O
+                F M A W L I N U X I
+                A S A H Q R Q D U O
+                S G R L F O U C G N
+                V B Y B L K U F W I
+
+Solution:
+                * * * * * * * L * *
+                * * * * * T E * * *
+                * * * * A M * * * *
+                * * * E A * * * * *
+                * * R C * * * * * *
+                A G * * * L R E P *
+                * M * * L I N U X *
+                * * A * * * * * * *
+                * * * L * * * * * *
+                * * * * L * * * * *
+
+latex puzzles are similarly formatted in a tabular environment
+with \huge letters.
+
+html puzzles are formatted using a <table> and a larger font
+<...size=+5>. I don't use html all that often, and only added
+this so that those without latex could still produce large puzzles
+and open and print them from their browser---it may not be a good
+example of html code.
+
+Install:
+    perl Makefile.PL
+    make
+    make install
+
+ought to do it for the module. See below for using the 
+wordfind.pl example script.
+
+please see the embedded pod in WordFind.pm and wordfind.pl
+for documentation.
+
+Examples:
+
+To produce the above example:
+
+#!/usr/bin/perl -w
+use WordFind;
+my @words = qw(linux perl camel llama great);
+my $puzzle = WordFind->new({cols=>10});
+$puzzle->create_puzzle(@words);
+print $puzzle->get_plain({solution=>1});
+__END__
+
+The example directory contains two scripts:
+    simple.pl  : a very simple example script which 
+                 demonstrates using the module to
+                 produce two plain-text puzzles
+    
+    wordfind.pl: a more elaborate script with embedded
+                 documentation: allows various options and can
+                 produce plain, latex or html formatted
+                 puzzles.(see embedded pod for usage)
+
+These example scripts have a C<use lib '../blib/lib';> line
+near the top...so you can try them out after doing a 'make'
+and before 'make install'. Once everything is installed, simply
+copy the wordfind.pl script to somewhere in your PATH and remove
+the C<use lib> line at the top.
+
+   to create plain-text puzzles on stdout:
+
+simple.pl foo bar baz
+simple.pl -s foo bar baz
+
+   to create a dvi file of a latex formatted puzzle
+   in the default output file 'puzzle.dvi':
+
+wordfind.pl -ds foo bar baz
+
+Comments:
+The latex formatting uses quite large letters---this was
+for a 6-year old after all---there is, as yet, no method for 
+passing parameters to adjust letter size here, nor is there
+for html puzzles. Hence, specifying much more than the default
+10 column size will soon go beyond normal page widths.
+
+Copyright:
+WordFind.pm and wordfind.pl are copyright (c) 1997,1998 Andrew L
+Johnson. This is free software and you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Author:
+Andrew L Johnson <ajohnson@gpu.srv.ualberta.ca>
+
+enjoy,
+andrew
+

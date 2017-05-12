@@ -1,0 +1,71 @@
+Revision history for perl module Gerrit-REST. -*- text -*-
+
+0.011     2014-08-16 18:23:19 America/Sao_Paulo
+
+  [Changes]
+
+  - Provide more context to and suppress script line numbers from error
+  messages in the error messages.
+
+  - Released at #cpanday.
+
+0.010     2014-08-09 17:21:42 America/Sao_Paulo
+
+  [Changes]
+
+  - The Gerrit::REST::Exception module was an attempt to provide structured
+  exceptions for this module. But its implementation and usage was becoming
+  more complex than useful. So, we get rid of it and change the interface so
+  that now error messages are consistently formatted and thrown using
+  Carp::croak.
+
+0.009     2013-10-16 10:49:33 America/Sao_Paulo
+
+  [Fixes]
+  - Convert REST::Client exceptions into Gerrit::REST::Exception
+    objects.
+
+0.008     2013-10-12 21:53:29 America/Sao_Paulo
+
+  [Changes]
+  - Throw Gerrit::REST::Exception objects instead of strings.
+
+0.007     2013-10-12 00:19:53 America/Sao_Paulo
+
+  [Fixes]
+  - Avoid the line telling filename and linenumber in the error
+  messages.
+
+0.006     2013-10-12 00:03:58 America/Sao_Paulo
+
+  [Changes]
+  - Standardize the error messages.
+
+0.005     2013-10-04 11:28:40 America/Sao_Paulo
+
+  [Fixes]
+  - Fix a syntax ambiguity.
+
+0.004     2013-09-18 16:25:39 America/Sao_Paulo
+
+  [Changes]
+  - Change the way Gerrit error messages are presented. In particular,
+  HTML messages are converted into text before being presented.
+
+0.003     2013-05-25 11:04:42 America/Sao_Paulo
+
+  [Cleanup]
+  - Placate Perl::Critic warnings.
+
+0.002     2013-05-21 13:34:50 America/Sao_Paulo
+
+  [New features]
+  - Grok authentication credentials from .netrc if the password is not
+    specified in the constructor.
+
+  [Changes]
+  - Configure dzil properly so that it can infer module requirements
+    and recommendations.
+
+0.001     2013-05-20 16:17:22 America/Sao_Paulo
+

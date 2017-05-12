@@ -1,0 +1,17 @@
+Revision history for Geo-StreetAddress-FR
+
+0.0.4  Tue May 29 09:50:00 2007
+        - CPAN release
+
+0.0.3  Mon May 25 16:40:00 2007
+        - updated the regex
+        - new tests
+        - one test marked as TODO
+
+0.0.2  Mon May 25 13:50:00 2007
+        - Updated the regex
+        - modifications in the tests
+
+0.0.1  Thu May 24 09:50:00 2007
+       Initial release.
+

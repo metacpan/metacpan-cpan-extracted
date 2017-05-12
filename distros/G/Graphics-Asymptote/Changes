@@ -1,0 +1,11 @@
+Revision history for Graphics-Asymptote
+
+0.0.1  Thu Oct  8, 2009
+       Initial release.
+
+0.0.2  Tue Oct 20, 2009
+       Added dependency on asy, handled in Build.PL (http://wiki.cpantesters.org/wiki/CPANAuthorNotes)
+       Also fixed a couple of documentation nits.
+
+0.0.3  Wed Oct 21, 2009
+       Added dependency for Perl 5.10 in Build.PL.

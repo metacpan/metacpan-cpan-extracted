@@ -1,0 +1,15 @@
+Changes
+Dockerfile
+MANIFEST
+Makefile.PL
+META.yml
+META.json
+README
+README.md
+Remote.pm
+example/README.md
+example/gqrx-plot.pl
+example/large-demo.jpg
+example/make-chart
+example/small-demo.jpg
+t/GQRX-Remote.t

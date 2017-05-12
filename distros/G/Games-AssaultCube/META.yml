@@ -1,0 +1,207 @@
+---
+name: Games-AssaultCube
+version: 0.04
+author:
+  - 'Apocalypse <APOCAL@cpan.org>'
+abstract: The AssaultCube perl libraries
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-AssaultCube
+  homepage: http://search.cpan.org/dist/Games-AssaultCube
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/apocalypse/perl-games-assaultcube
+build_requires:
+  DateTime: 0
+  HTTP::Response: 0
+  MIME::Base64: 0
+  Storable: 2.18
+  Test::More: 0
+requires:
+  DateTime: 0
+  Exporter: 0
+  HTTP::Request: 0
+  IO::Socket::INET: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::POE::SweetArgs: 0
+  MooseX::StrictConstructor: 0
+  POE::Filter::Stream: 0
+  POE::Wheel::UDP: 0
+  Socket: 0
+  Time::HiRes: 0
+  perl: 5.008
+configure_requires:
+  Module::Build: 0.35
+dynamic_config: 0
+provides:
+  Games::AssaultCube:
+    file: lib/Games/AssaultCube.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line:
+    file: lib/Games/AssaultCube/Log/Line.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::AdminPasswords:
+    file: lib/Games/AssaultCube/Log/Line/AdminPasswords.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::AutoBalance:
+    file: lib/Games/AssaultCube/Log/Line/AutoBalance.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Base:
+    file: lib/Games/AssaultCube/Log/Line/Base.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Base::GameMode:
+    file: lib/Games/AssaultCube/Log/Line/Base/GameMode.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Base::MasterMode:
+    file: lib/Games/AssaultCube/Log/Line/Base/MasterMode.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Base::NickIP:
+    file: lib/Games/AssaultCube/Log/Line/Base/NickIP.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Base::RoleInfo:
+    file: lib/Games/AssaultCube/Log/Line/Base/RoleInfo.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Base::TeamInfo:
+    file: lib/Games/AssaultCube/Log/Line/Base/TeamInfo.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::BlacklistEntries:
+    file: lib/Games/AssaultCube/Log/Line/BlacklistEntries.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::CallVote:
+    file: lib/Games/AssaultCube/Log/Line/CallVote.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ClientAdmin:
+    file: lib/Games/AssaultCube/Log/Line/ClientAdmin.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ClientChangeRole:
+    file: lib/Games/AssaultCube/Log/Line/ClientChangeRole.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ClientConnected:
+    file: lib/Games/AssaultCube/Log/Line/ClientConnected.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ClientDisconnected:
+    file: lib/Games/AssaultCube/Log/Line/ClientDisconnected.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ClientNickChange:
+    file: lib/Games/AssaultCube/Log/Line/ClientNickChange.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ClientStatus:
+    file: lib/Games/AssaultCube/Log/Line/ClientStatus.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ClientVersion:
+    file: lib/Games/AssaultCube/Log/Line/ClientVersion.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ConfigError:
+    file: lib/Games/AssaultCube/Log/Line/ConfigError.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::DNSLookup:
+    file: lib/Games/AssaultCube/Log/Line/DNSLookup.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::DemoStart:
+    file: lib/Games/AssaultCube/Log/Line/DemoStart.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::DemoStop:
+    file: lib/Games/AssaultCube/Log/Line/DemoStop.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FatalError:
+    file: lib/Games/AssaultCube/Log/Line/FatalError.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagDropped:
+    file: lib/Games/AssaultCube/Log/Line/FlagDropped.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagFailedScore:
+    file: lib/Games/AssaultCube/Log/Line/FlagFailedScore.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagForcedPickup:
+    file: lib/Games/AssaultCube/Log/Line/FlagForcedPickup.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagLost:
+    file: lib/Games/AssaultCube/Log/Line/FlagLost.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagReset:
+    file: lib/Games/AssaultCube/Log/Line/FlagReset.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagReturned:
+    file: lib/Games/AssaultCube/Log/Line/FlagReturned.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagScored:
+    file: lib/Games/AssaultCube/Log/Line/FlagScored.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagScoredKTF:
+    file: lib/Games/AssaultCube/Log/Line/FlagScoredKTF.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::FlagStole:
+    file: lib/Games/AssaultCube/Log/Line/FlagStole.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::GameStart:
+    file: lib/Games/AssaultCube/Log/Line/GameStart.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::GameStatus:
+    file: lib/Games/AssaultCube/Log/Line/GameStatus.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Killed:
+    file: lib/Games/AssaultCube/Log/Line/Killed.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::LoadedMap:
+    file: lib/Games/AssaultCube/Log/Line/LoadedMap.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::MapError:
+    file: lib/Games/AssaultCube/Log/Line/MapError.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::MasterserverReply:
+    file: lib/Games/AssaultCube/Log/Line/MasterserverReply.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::MasterserverRequest:
+    file: lib/Games/AssaultCube/Log/Line/MasterserverRequest.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Says:
+    file: lib/Games/AssaultCube/Log/Line/Says.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::ScoreboardStart:
+    file: lib/Games/AssaultCube/Log/Line/ScoreboardStart.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::StartupText:
+    file: lib/Games/AssaultCube/Log/Line/StartupText.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Status:
+    file: lib/Games/AssaultCube/Log/Line/Status.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Suicide:
+    file: lib/Games/AssaultCube/Log/Line/Suicide.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::TeamStatus:
+    file: lib/Games/AssaultCube/Log/Line/TeamStatus.pm
+    version: 0.04
+  Games::AssaultCube::Log::Line::Unknown:
+    file: lib/Games/AssaultCube/Log/Line/Unknown.pm
+    version: 0.04
+  Games::AssaultCube::MasterserverQuery:
+    file: lib/Games/AssaultCube/MasterserverQuery.pm
+    version: 0.04
+  Games::AssaultCube::MasterserverQuery::Response:
+    file: lib/Games/AssaultCube/MasterserverQuery/Response.pm
+    version: 0.04
+  Games::AssaultCube::ServerQuery:
+    file: lib/Games/AssaultCube/ServerQuery.pm
+    version: 0.04
+  Games::AssaultCube::ServerQuery::Response:
+    file: lib/Games/AssaultCube/ServerQuery/Response.pm
+    version: 0.04
+  Games::AssaultCube::Utils:
+    file: lib/Games/AssaultCube/Utils.pm
+    version: 0.04
+  POE::Component::AssaultCube::ServerQuery:
+    file: lib/POE/Component/AssaultCube/ServerQuery.pm
+    version: 0.04
+  POE::Component::AssaultCube::ServerQuery::Server:
+    file: lib/POE/Component/AssaultCube/ServerQuery/Server.pm
+    version: 0.04
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keywords:
+  - POE
+  - AssaultCube

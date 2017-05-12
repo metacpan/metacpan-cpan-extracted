@@ -1,0 +1,11 @@
+Changes
+lib/Graph/NewmanGirvan.pm
+Makefile.PL
+MANIFEST
+NewmanGirvan.xs
+README
+t/00basic.t
+t/98podsyn.t
+t/99podcov.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

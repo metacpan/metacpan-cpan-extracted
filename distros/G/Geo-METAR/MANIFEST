@@ -1,0 +1,7 @@
+METAR.pm
+Makefile.PL
+README
+TODO
+t/metar.t
+examples/fetch_temp.pl
+examples/simple_dump.pl

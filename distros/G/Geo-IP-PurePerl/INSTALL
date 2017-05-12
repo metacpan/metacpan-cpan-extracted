@@ -1,0 +1,11 @@
+To install, run:
+
+# fetch latest GeoIP database, updated monthly
+wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
+gunzip GeoIP.dat.gz
+mv GeoIP.dat /usr/local/share/GeoIP/GeoIP.dat
+
+perl Makefile.PL
+make
+make test
+make install

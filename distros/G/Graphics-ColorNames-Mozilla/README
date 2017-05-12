@@ -1,0 +1,32 @@
+NAME
+    Graphics::ColorNames::Mozilla - Mozilla, Netscape 6.0, Galeon (anything
+    using Gecko) color names and equivalent RGB values
+
+SYNOPSIS
+         require Graphics::ColorNames::Mozilla;
+
+         $NameTable   = Graphics::ColorNames::Mozilla->NamesRgbTable();
+         $RgbSkyBlue  = $NameTable->{deepskyblue};
+
+DESCRIPTION
+    This module defines color names and their associated RGB values used in
+    Mozilla and Netscape 6.0. Names and values were slurped off of
+    http://developer.netscape.com/docs/manuals/js/client/jsref/colors.htm
+
+SEE ALSO
+    "Graphics::ColorNames" - more sets of color names and routines for
+    converting between tuples and hex representation of colors.
+
+    mozilla source tree: /mozilla/layout/tools/ColorNames.txt
+
+AUTHOR
+    Steve Pomeroy <xavier@cpan.org>
+
+    Robert Rothenberg <rrwo@cpan.org> -- the origional
+    "Graphics::ColorNames"
+
+LICENSE
+    Copyright (c) 2002 Steve Pomeroy. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

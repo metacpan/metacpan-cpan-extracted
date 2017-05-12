@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+# reduce-tests:  command-line utility implementing Git::Reduce::Tests
+eval 'exec /usr/local/bin/perl  -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+use strict;
+use warnings;
+use Git::Reduce::Tests;
+use Git::Reduce::Tests::Opts qw( process_options );
+
+my $params = process_options();
+my $self = Git::Reduce::Tests->new($params);
+my $reduced_branch = $self->prepare_reduced_branch();
+$self->push_to_remote($reduced_branch);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+reduce-tests - Create a branch with fewer test files for faster development
+
+=head1 SYNOPSIS
+
+  reduce-tests \
+    --dir=/path/to/git/workdir \
+    --include=t/90-load.t,t/91-unload.t \
+    --branch=master \
+    --prefix=smoke-me \
+    --remote=origin \
+    --verbose
+
+=head1 DESCRIPTION
+
+F<reduce-tests> is a command-line utility which will be useful in the
+following situation:
+
+=over 4
+
+=item *
+
+You have a Perl library stored in a git repository.
+
+=item *
+
+You have a large test suite for that library which takes a non-trivial length
+of time to run.
+
+=item *
+
+You wish to run only a subset of those tests.
+
+=back
+
+F<reduce-tests> enables you to copy a branch, remove files from that
+branch's test suite and run that reduced test suite.  The test suite may be
+reduced either by:
+
+=over 4
+
+=item *
+
+Specifying only those test files you wish to include
+(C<include=t/firstfile,t/secondfile>); or
+
+=item *
+
+Specifying all the test files you wish to exclude
+(C<exclude=t/thirdfile,t/fourthfile>).
+
+=back
+
+This program is likely to be particularly useful in the situation where:
+
+=over 4
+
+=item *
+
+You are required to push all branches to a smoke server for testing.
+
+=item *
+
+That smoke-testing is activated by prefixing your remote branch with a
+string which your smoke-server recognizes as a request for a smoke run.
+
+=item *
+
+The smoke server is taking an inordinately long time to complete its test runs
+and/or is reporting failures in test files which you cannot reproduce in your
+development environment (I<heisenfails>).  If you have no immediate control
+over that smoke server, you can at least speed up your development cycle by
+running only the part of the test suite you need to focus on at a given
+moment.
+
+=back
+
+=head1 IMPLEMENTATION
+
+F<reduce-tests> is implemented by CPAN distribution Git-Reduce-Tests.  See the
+documentation in Git::Reduce::Tests (available after installation, via
+C<perldoc Git::Reduce::Tests> for information about reporting bugs, support,
+author, copyright notice and license.
+
+=cut
+

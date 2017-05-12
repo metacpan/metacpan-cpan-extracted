@@ -1,0 +1,45 @@
+README
+GNU Data Access (GDA)
+Perl Module Library
+
+$Revision: 1.1.1.1 $
+
+Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+
+This program is free software. It can be distributed and/or modified
+under the same terms as Perl itself.
+
+
+
+
+1.0 INTRODUCTION
+
+This is a set of Perl bindings to the GNOME-DB project's GNU Data
+Access (GDA) library (libgda*.a). The implementation requires the
+Inline module, which is available via the Comprehensive Perl Archive
+Network (CPAN) -- see http://www.cpan.org/.
+
+Following usual practice, unpack the tarball, cd into it and do:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+2.0 UTILITIES
+
+In addition to the Perl bindings themselves, the following utility
+programs are provided:
+
+  * gda-ls-providers
+  * gda-ls-log
+
+See the source code (in the script/ directory) and/or manual pages
+for more information.
+
+
+3.0 STATUS
+
+Proof-of-concept only.
+

@@ -1,0 +1,20 @@
+(define-object GtkXmHTML (GtkContainer) (cast GTK_XMHTML))
+
+(define-struct XmAnyCallbackStruct 			Gtk::XmHTML::CallbackStruct ;cast
+)
+
+(define-enum XmHTMLCallbackReason			Gtk::XmHTML::CallbackReason ;cast
+	(anchor-track XmCR_HTML_ANCHORTRACK)
+	(document XmCR_HTML_DOCUMENT)
+	(form XmCR_HTML_FORM)
+	(frame XmCR_HTML_FRAME)
+	(frame-create XmCR_HTML_FRAMECREATE)
+	(frame-destroy XmCR_HTML_FRAMEDESTROY)
+	(imagemap-activate XmCR_HTML_IMAGEMAPACTIVATE)
+	(imagemap XmCR_HTML_IMAGEMAP)
+	(link XmCR_HTML_LINK)
+  	(modifying-text-value XmCR_HTML_MODIFYING_TEXT_VALUE)
+	(motion-track XmCR_HTML_MOTIONTRACK)
+	(parser XmCR_HTML_PARSER)
+	(event XmCR_HTML_EVENT)
+	(event-destroy XmCR_HTML_EVENTDESTROY))

@@ -1,0 +1,65 @@
+{
+   "abstract" : "Create ref/json to show node-edge graph with D3.js ",
+   "author" : [
+      "Shohei Kameda <shoheik@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.0, Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graph-D3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.016"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Graph" : "0.94",
+            "JSON" : "2.53",
+            "Moo" : "1.001000",
+            "perl" : "v5.6.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shoheik/Graph-D3/issues"
+      },
+      "homepage" : "https://github.com/shoheik/Graph-D3",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shoheik/Graph-D3.git",
+         "web" : "https://github.com/shoheik/Graph-D3"
+      }
+   },
+   "version" : "0.03"
+}
+

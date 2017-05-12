@@ -1,0 +1,242 @@
+# NAME
+
+GitStore - Git as versioned data store in Perl
+
+# VERSION
+
+version 0.17
+
+# SYNOPSIS
+
+    use GitStore;
+
+    my $gs = GitStore->new('/path/to/repo');
+    $gs->set( 'users/obj.txt', $obj );
+    $gs->set( ['config', 'wiki.txt'], { hash_ref => 1 } );
+    $gs->commit();
+    $gs->set( 'yyy/xxx.log', 'Log me' );
+    $gs->discard();
+    
+    # later or in another pl
+    my $val = $gs->get( 'user/obj.txt' ); # $val is the same as $obj
+    my $val = $gs->get( 'config/wiki.txt' ); # $val is { hashref => 1 } );
+    my $val = $gs->get( ['yyy', 'xxx.log' ] ); # $val is undef since discard
+
+# DESCRIPTION
+
+It is inspired by the Python and Ruby binding. check SEE ALSO
+
+# CLASS FUNCTIONS
+
+## create( $directory )
+
+Creates the directory, initialize it as a git repository,
+and returns its associated `GitStore` object.
+
+    my $gs = GitStore->create( '/tmp/mystore' );
+
+# METHODS
+
+## new
+
+    GitStore->new('/path/to/repo');
+    GitStore->new( repo => '/path/to/repo', branch => 'mybranch' );
+    GitStore->new( repo => '/path/to/repo', author => 'Someone Unknown <unknown\@what.com>' );
+
+- repo
+
+    your git directory or work directory (_GitStore_ will assume it's a work
+    directory if it doesn't end with `.git`).
+
+- branch
+
+    your branch name, default is 'master'
+
+- author
+
+    It is used in the commit info
+
+- serializer
+
+    Can be used to define a serializing function that will be used if the value to
+    save is a reference.  When invoked, the function will be passed a reference to
+    the store object, the path under which the value will be saved, and the value
+    itself. For example, one could do different serialization via:
+
+        my $store = GitStore->new(
+            repo => '/path/to/repo',
+            serializer => sub {
+                my( $store, $path, $value ) = @_;
+
+                if ( $path =~ m#^json# ) {
+                    return encode_json($value);
+                }
+                else {
+                    # defaults to YAML
+                    return YAML::Dump($value);
+                }
+            },
+        );
+
+    The default serializer uses ["nfreeze" in Storable](https://metacpan.org/pod/Storable#nfreeze).
+
+- deserializer
+
+    Called when a value is picked from the store to be (potentially) deserialized.
+    Just like the serializer function, it is passed three arguments: the store
+    object, the path of the value to deserialize and the value itself. To revisit
+    the example for `serializer`, the full serializer/deserializer dance would
+    be:
+
+        my $store = GitStore->new(
+            repo => '/path/to/repo',
+            serializer => sub {
+                my( $store, $path, $value ) = @_;
+
+                return $path =~ m#^json# 
+                                    ? encode_json($value)
+                                    : YAML::Dump($value)
+                                    ;
+            },
+            deserializer => sub {
+                my( $store, $path, $value ) = @_;
+                
+                return $path =~ #^json#
+                                    ?decode_json($value)
+                                    : YAML::Load($value)
+                                    ;
+            },
+        );
+
+    The default deserializer will try to deserialize the value
+    retrieved from the store via ["thaw" in Storable](https://metacpan.org/pod/Storable#thaw) and, if this fails,
+    return the value verbatim.
+
+- autocommit
+
+    If set to `true`, any call to `set()` or `delete()` will automatically call an
+    implicit `commit()`. Defaults to `false`.
+
+## set($path, $val)
+
+    $gs->set( 'yyy/xxx.log', 'Log me' );
+    $gs->set( ['config', 'wiki.txt'], { hash_ref => 1 } );
+    $gs->set( 'users/obj.txt', $obj );
+
+Store $val as a $path file in Git
+
+$path can be String or ArrayRef. Any leading slashes ('/') in the path
+will be stripped, as to make it a valid Git path.  The same 
+grooming is done for the `get()` and `delete()` methods.
+
+$val can be String or Ref\[HashRef|ArrayRef|Ref\[Ref\]\] or blessed Object
+
+## get($path)
+
+    $gs->get( 'user/obj.txt' );
+    $gs->get( ['yyy', 'xxx.log' ] );
+
+Get $val from the $path file
+
+$path can be String or ArrayRef
+
+## get\_revision( $path )
+
+Like `get()`, but returns the [GitStore::Revision](https://metacpan.org/pod/GitStore::Revision) object corresponding to
+the latest Git revision on the monitored branch for which `$path` changed.
+
+## delete($path)
+
+## remove($path)
+
+remove $path from Git store
+
+## commit
+
+    $gs->commit();
+    $gs->commit('Your Comments Here');
+
+commit the **set** changes into Git
+
+## discard
+
+    $gs->discard();
+
+discard the **set** changes
+
+## exist($path)
+
+Returns _true_ if an object exists at the given path.
+
+## history($path)
+
+Returns a list of [GitStore::Revision](https://metacpan.org/pod/GitStore::Revision) objects representing the changes
+brought to the _$path_. The changes are returned in ascending commit order.
+
+## list($regex)
+
+    @entries = $gs->list( qr/\.txt$/ );
+
+Returns a list of all entries in the repository, possibly filtered by the 
+optional _$regex_.
+
+# FAQ
+
+## why the files are **not** there?
+
+run
+
+    git checkout
+
+## any example?
+
+    # if you just need a local repo, that's all you need.
+    mkdir sandbox
+    cd sandbox
+    git init
+    # use GitStore->new('/path/to/this/sandbox')
+    # set something
+    git checkout
+    
+    # follows are for remote git url
+    git remote add origin git@github.com:fayland/sandbox2.git
+    git push origin master
+    # do more GitStore->new('/path/to/this/sandbox') later
+    git checkout
+    git pull origin master
+    git push
+
+# KNOWN BUGS
+
+If all files are deleted from the repository, a 'dummy' file
+will be created to keep Git happy.
+
+# SEE ALSO
+
+- Article
+
+    [http://www.newartisans.com/2008/05/using-git-as-a-versioned-data-store-in-python.html](http://www.newartisans.com/2008/05/using-git-as-a-versioned-data-store-in-python.html)
+
+- Python binding
+
+    [http://github.com/jwiegley/git-issues/tree/master](http://github.com/jwiegley/git-issues/tree/master)
+
+- Ruby binding
+
+    [http://github.com/georgi/git\_store/tree/master](http://github.com/georgi/git_store/tree/master)
+
+# Git URL
+
+[http://github.com/fayland/perl-git-store/tree/master](http://github.com/fayland/perl-git-store/tree/master)
+
+# AUTHORS
+
+- Fayland Lam <fayland@gmail.com>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Fayland Lam <fayland@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

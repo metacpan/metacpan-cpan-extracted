@@ -1,0 +1,16 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Gpx/Addons/Filter.pm
+build_lib/Module/Build/FilterTests.pm
+t/000-load.t
+t/030-timeframe.t
+t/050-filter_trk.t
+t/060-filter_wp.t
+t/061-outside_wpt.t
+t/boilerplate.t
+t/developer/pod-coverage.t
+t/developer/pod.t
+Makefile.PL
+META.yml

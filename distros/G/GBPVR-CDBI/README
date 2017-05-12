@@ -1,0 +1,74 @@
+GBPVR-CDBI
+
+This set of classes provides an easy to use, robust, and well-documented way to access the GBPVR database via the Class::DBI module.  The major tables are included as well as that of the Video Archive plugin.
+
+THIS IS A WINDOWS-ONLY MODULE since GBPVR is a windows-only application.
+
+What is GBPVR? It is a Personal Video Recorder (PVR) program. The Microsoft Access .mdb database that is creates stores information such as recording schedules and details about completed recordings. GBPVR can be obtained here:
+  http://gbpvr.com
+
+PREREQUISITES
+
+    DBI
+
+    DBD::ODBC
+
+    Class::DBI
+
+    Win32::TieRegistry
+
+    File::Spec
+
+You can install these from a dos prompt with:
+
+    ppm3 install http://theoryx5.uwinnipeg.ca/ppms/DBI.ppd
+    ppm3 install http://theoryx5.uwinnipeg.ca/ppms/DBD-ODBC.ppd
+    ppm3 install http://theoryx5.uwinnipeg.ca/ppms/Class-DBI.ppd
+
+If you have issues, this tutorial 'A guide to installing modules for Win32' is a good starting point:
+    http://perlmonks.org/?node_id=434813
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    nmake
+    nmake test
+    nmake install
+
+nmake can be found here:
+  http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc GBPVR::CDBI
+
+You can also look for information at:
+
+    Perl Monks -- /msg davidrw
+        http://perlmonks.org
+
+    GBPVR Forums -- pm dwestbrook
+        http://forums.gbpvr.com
+
+    Search CPAN
+        http://search.cpan.org/dist/GBPVR-CDBI
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=GBPVR-CDBI
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/GBPVR-CDBI
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/GBPVR-CDBI
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 David Westbrook
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

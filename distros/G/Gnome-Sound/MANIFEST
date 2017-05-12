@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Sound.pm
+Sound.xs
+test.pl
+typemap

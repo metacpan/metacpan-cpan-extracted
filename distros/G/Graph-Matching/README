@@ -1,0 +1,39 @@
+Graph-Matching
+
+Graph::Matching is a Perl module for computing maximum weight matchings
+in general graphs.
+
+Maximum matching is a problem in mathematical graph theory.  This package
+implements a routine which computes maximum weight matchings in a general
+graphs in time O(number_of_nodes ** 3).
+
+This package is not specifically related to the Graph package from CPAN
+by Jarkko Hietaniemi.  Although of course it is possible to use the matching
+algorithm with instances of the Graph class.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Graph::Matching
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Joris van Rantwijk
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

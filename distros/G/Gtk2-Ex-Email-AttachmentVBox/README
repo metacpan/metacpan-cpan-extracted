@@ -1,0 +1,43 @@
+Gtk2-Ex-Email-AttachmentVBox
+
+Creates a Gtk2::VBox that contains the required stuff
+for working with email attachments.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Gtk2::Ex::Email::AttachmentVBox
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Gtk2-Ex-Email-AttachmentVBox
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Gtk2-Ex-Email-AttachmentVBox
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Gtk2-Ex-Email-AttachmentVBox
+
+    Search CPAN
+        http://search.cpan.org/dist/Gtk2-Ex-Email-AttachmentVBox/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Zane C. Bowers-Hadley
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,43 @@
+NAME
+    Graph::MaxFlow - compute maximum flow between 2 vertices in a graph
+
+SYNOPSIS
+      use Graph::MaxFlow qw(max_flow);
+
+      my $g = new Graph;
+      # construct graph
+      my $flow = max_flow($g, "source", "sink");
+
+DESCRIPTION
+    Computes the maximum flow in a graph, represented using Jarkko
+    Hietaniemi's Graph.pm module.
+
+FUNCTIONS
+    This module provides the following function:
+
+    max_flow($g, $s, $t)
+        Computes the maximum flow in the graph $g between vertices $s and $t
+        using the Edmonds-Karp algorithm. $g must be a Graph.pm object, and
+        must be a directed graph where the edge weights indicate the
+        capacity of each edge. The edge weights must be nonnegative. $s and
+        $t must be vertices in the graph. The graph $g must be connected,
+        and for every vertex v besides $s and $t there must be a path from
+        $s to $t that passes through v.
+
+        The return value is a new directed graph which has the same vertices
+        and edges as $g, but where the edge weights have been adjusted to
+        indicate the flow along each edge.
+
+AUTHOR
+    Walt Mankowski, <waltman@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2010 by Walt Mankowski
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+ACKNOWLEDGEMENTS
+    The algorithms are adapted from Introduction to Algorithms, Second
+    Edition, Cormen-Leiserson-Rivest-Stein, MIT Press.
+

@@ -1,0 +1,20 @@
+Changes
+example/01_example.pl
+lib/Getopt/Long/DescriptivePod.pm
+MANIFEST			This list of files
+README
+t/01_basics.t
+t/02_before_and_after.t
+t/03_empty_code_block.t
+t/04_tags_in_blocks.t
+t/05_no_newline_at_eof.t
+t/06_no_change.t
+t/11_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

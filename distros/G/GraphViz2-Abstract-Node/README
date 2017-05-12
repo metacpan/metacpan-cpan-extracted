@@ -1,0 +1,223 @@
+NAME
+    GraphViz2::Abstract::Node - Deal with nodes independent of a Graph
+
+VERSION
+    version 0.002000
+
+SYNOPSIS
+        use GraphViz2::Abstract::Node;
+
+        my $node = GraphViz2::Abstract::Node->new(
+                color =>  ... ,
+                id    =>  ... ,
+                label =>  ... ,
+        );
+
+        # Mutate $node
+
+        $node->label("Asdft");
+
+        my $fillcolor = $node->fillcolor(); # Knows that the fill color is light grey despite never setting it.
+
+        # Later:
+
+        $graph->add_node(%{ $node->as_hash }); # Adds only the data that is not the same as GraphViz's defaults
+        $graph->add_node(%{ $node->as_canon_hash }); # Adds all the data, including hardcoded defaults
+
+DESCRIPTION
+    Working with GraphViz2, I found myself frequently needing shared styles
+    for things, and I often had trouble knowing which fields were and
+    weren't valid for given things, for instance: "Nodes".
+
+    Its reasonably straight forward to ask the question "What is the
+    attribute "foo" applicable to" using the GraphViz website, but much
+    harder to know "What are all the attributes applicable to "foo"".
+
+    Let alone work with them in a user friendly way from code.
+
+  Naming Rationale
+    I tried to choose a name that was not so likely to threaten GraphViz2 if
+    GraphViz2 wanted to make a different variation of what I'm doing, but as
+    part of GraphViz2 itself.
+
+    As such, I plan on a few "::Abstract" things, that aim to be stepping
+    stones for dealing with complex data independent of "GraphViz2", but in
+    such a way that they make importing that data into "GraphViz2" easy.
+
+METHODS
+  "as_hash"
+    This method returns all the values of all properties that DIFFER from
+    the defaults.
+
+    e.g.
+
+        Node->new( color => 'black' )->as_hash();
+
+    Will return an empty list, as the default color is normally black.
+
+    See also how special constants work in
+
+  "as_canon_hash"
+    This method returns all the values of all properties, INCLUDING
+    defaults.
+
+    e.g.
+
+        Node->new( color => 'black' )->as_canon_hash();
+
+    Will return a very large list containing all the properties that we know
+    the default values for.
+
+    See also how special constants work in
+
+ATTRIBUTES
+  "URL"
+    Default: "none"
+
+  "area"
+    Default: 1.0
+
+  "color"
+    Default: "black"
+
+  "colorscheme"
+    Default: ""
+
+  "comment"
+    Default: ""
+
+  "distortion"
+    Default: 0.0
+
+  "fillcolor"
+    Default: "lightgrey"
+
+  "fixedsize"
+    Default: "false"
+
+  "fontcolor"
+    Default: "black"
+
+  "fontname"
+    Default: "Times-Roman"
+
+  "fontsize"
+    Default: 14.0
+
+  "gradientangle"
+    Default: ""
+
+  "group"
+    Default: ""
+
+  "height"
+    Default: 0.5
+
+  "href"
+    Default: ""
+
+  "id"
+    Default: ""
+
+  "image"
+    Default: ""
+
+  "imagescale"
+    Default: "false" ( Yes, really! )
+
+  "label"
+    Default: "\\N" ( Appears to be a magic value for GraphViz )
+
+  "labelloc"
+    Default: "c"
+
+  "layer"
+    Default: ""
+
+  "margin"
+    Default: "unknown" ( Due to being render device specific defaults )
+
+  "nojustify"
+    Default: "false"
+
+  "ordering"
+    Default: ""
+
+  "orientation"
+    Default: 0.0
+
+  "penwidth"
+    Default: 1.0
+
+  "peripheries"
+    Default: "unknown"
+
+  "pos"
+    Default: "unknown"
+
+  "rects"
+    Default: "unknown"
+
+  "regular"
+    Default: "false"
+
+  "root"
+    Default: "false"
+
+  "samplepoints"
+    Default: "unknown"
+
+    Reason: Dependent on render device.
+
+  "shape"
+    Default: "ellipse"
+
+  "shapefile"
+    Default: ""
+
+  "showboxes"
+    Default: 0
+
+  "sides"
+    Default: 4
+
+  "skew"
+    Default: 0.0
+
+  "sortv"
+    Default: 0
+
+  "style"
+    Default: ""
+
+  "target"
+    Default: "none"
+
+  "tooltip"
+    Default: ""
+
+  "vertices"
+    Default: "unknown"
+
+  "width"
+    Default: 0.75
+
+  "xlabel"
+    Default: ""
+
+  "xlp"
+    Default: ""
+
+  "z"
+    Default: 0.0
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

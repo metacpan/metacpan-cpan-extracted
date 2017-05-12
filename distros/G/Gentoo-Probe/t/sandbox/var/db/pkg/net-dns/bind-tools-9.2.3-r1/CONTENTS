@@ -1,0 +1,18 @@
+dir /usr
+dir /usr/share
+dir /usr/share/doc
+dir /usr/share/doc/bind-tools-9.2.3-r1
+obj /usr/share/doc/bind-tools-9.2.3-r1/README.gz d8a08d52c8c333b3a4d829c477a16155 1082707402
+obj /usr/share/doc/bind-tools-9.2.3-r1/CHANGES.gz ee07aad7d55a55ed8037941a56e5d864 1082707402
+obj /usr/share/doc/bind-tools-9.2.3-r1/FAQ.gz f1b2defb47ba5b76f62d36498170720e 1082707402
+obj /usr/share/doc/bind-tools-9.2.3-r1/COPYRIGHT.gz 91cc31e5d6e9cb8272d5d8b73ec0e676 1082707402
+dir /usr/share/man
+dir /usr/share/man/man8
+obj /usr/share/man/man8/nslookup.8.gz 0273b2f4ab30a26fced3cbbd50ab0d59 1082707402
+dir /usr/share/man/man1
+obj /usr/share/man/man1/dig.1.gz b202d3cc00ba75a96c102466992b82ad 1082707402
+obj /usr/share/man/man1/host.1.gz 78719f9a3f121e66f41859474dad80f4 1082707402
+dir /usr/bin
+obj /usr/bin/dig 2563e79c2bff39030eb84bd328dfe3d8 1082707402
+obj /usr/bin/host 08604fea7b722ed5799b0289801f8331 1082707402
+obj /usr/bin/nslookup 23b18177e68a5669b09798459f82414c 1082707402

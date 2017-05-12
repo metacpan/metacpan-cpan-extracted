@@ -1,0 +1,8 @@
+~$
+\#$
+,v$
+\.bak$
+\.old$
+^Makefile$
+^Geo-PostalCode
+blib

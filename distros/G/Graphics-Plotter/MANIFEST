@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+Plotter.pm
+Plotter.xs
+README
+funcxs
+newxs
+test.pl
+typemap
+examples/eliptic.pl
+examples/piechart
+examples/piechart.pl
+examples/piechart.t
+examples/rosette.pl
+examples/rotateA.pl
+examples/rotateAgif.pl
+examples/rotateeye.pl
+examples/rotateeyegif.pl
+META.yml                                 Module meta-data (added by MakeMaker)

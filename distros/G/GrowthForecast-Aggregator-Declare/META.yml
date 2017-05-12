@@ -1,0 +1,41 @@
+---
+abstract: 'Declarative interface for GrowthForecast client'
+author:
+  - 'Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GrowthForecast-Aggregator-Declare
+no_index:
+  directory:
+    - inc
+provides:
+  GrowthForecast::Aggregator::Callback:
+    file: lib/GrowthForecast/Aggregator/Callback.pm
+    version: 0
+  GrowthForecast::Aggregator::DB:
+    file: lib/GrowthForecast/Aggregator/DB.pm
+    version: 0
+  GrowthForecast::Aggregator::DBMulti:
+    file: lib/GrowthForecast/Aggregator/DBMulti.pm
+    version: 0
+  GrowthForecast::Aggregator::Declare:
+    file: lib/GrowthForecast/Aggregator/Declare.pm
+    version: v0.1.1
+requires:
+  Exporter: 0
+  HTTP::Request::Common: 6
+  Mouse: 0
+  parent: 0
+  perl: 5.010001
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.1.1

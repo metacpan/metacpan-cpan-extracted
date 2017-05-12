@@ -1,0 +1,55 @@
+NAME
+    GraphViz::ISA::Multi - Display ISA relations between modules
+
+SYNOPSIS
+        use GraphViz::ISA::Multi;
+
+        my $gnew= GraphViz::ISA::Multi->new(ignore => [ 'Exporter' ]);
+
+        $gnew->add("Curses::UI::TextViewer" );
+        $gnew->add("Curses::UI::Listbox" );
+
+        print $gnew->as_png();
+
+DESCRIPTION
+    GraphViz::ISA::Multi visualizes the ISA relations between multiple
+    modules. It is a addition to GraphViz::ISA, which can only show the ISA
+    tree of one module.
+
+USAGE
+    new( ignore => ARRAYREF )
+            Creates a new GraphViz::ISA::Multi object. Takes as an 
+            additional parameter the 'ignore' => [ 'Module' ] list,
+            which tells the object to not display certain modules
+            in the graphic.
+
+    add( MODULENAMELIST )
+            Adds packages to the graphic. Takes a list of module names
+            and returns the data structure used to display the graphic
+            on success. On error it returns a false value (undef).
+
+    graph( )
+            Used to create the actual GraphViz object and graphic. You
+            usually don't call this directly as it is called when you
+            call one of the as_* methods. You can override if it you
+            subclass the class.
+            It returns the GraphViz object on success.
+
+    as_png( )
+            See GraphViz() for more details.
+
+AUTHOR
+            Marcus Thiesen
+            marcus@cpan.org
+            http://perl.thiesenweb.de
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

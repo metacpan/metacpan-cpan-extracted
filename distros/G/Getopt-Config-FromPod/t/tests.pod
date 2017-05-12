@@ -1,0 +1,21 @@
+=pod
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-h>
+
+=for getopt 'h'
+
+=item C<-v> E<lt>levelE<gt>
+
+=for getopt 'v:'
+
+=item C<-c>
+
+=for getopt 'c'
+
+=back
+
+=cut

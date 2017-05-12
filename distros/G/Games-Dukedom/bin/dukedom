@@ -1,0 +1,256 @@
+#!perl
+
+$| = 1;
+
+use strict;
+use warnings;
+
+use Scalar::Util qw( blessed );
+use Try::Tiny;
+
+use Games::Dukedom;
+
+my $VERSION = '0.1.2';
+
+my %actions = (
+    get_yn    => \&input_yn,
+    get_value => \&input_value,
+);
+
+while (1) {
+    my $details;
+    do {
+        print 'Do you want year-end detail reports [y/N]? ';
+    } until $details = input_yn('N');
+
+    play_game( $details );
+
+    my $play;
+    do {
+        print "Do you want to play again [Y/n]? ";
+    } until $play = input_yn('Y');
+
+    last if $play ne 'y';
+
+    print "Okay, let's go again. Good luck!\n\n";
+}
+
+exit;
+
+sub play_game {
+    my $details = shift;
+
+    my $game = Games::Dukedom->new;
+
+    do {
+        try {
+            $game->play_one_year;
+            print $game->detail_report if $details eq 'y';
+        }
+        catch {
+            if ( blessed($_) && $_->isa('Games::Dukedom::Signal') ) {
+                print $_->msg if $_->msg;
+                return unless defined( $_->action );
+
+                my $action = $_->action;
+                $game->input( &{ $actions{$action} }( $_->default ) );
+            }
+            else {
+                die $_;
+            }
+        };
+    } until ( $game->game_over );
+
+    return;
+}
+
+sub input_yn {
+    my $default = shift || '';
+
+    my $ans = <>;
+    chomp($ans);
+    $ans ||= $default;
+
+    return ( $ans =~ /^(?:q|quit)\s*$/i || $ans =~ /^(?:y|n)$/i )
+      ? lc($ans)
+      : undef;
+}
+
+sub input_value {
+    my $default = shift || 0;
+
+    my $ans = <>;
+    chomp($ans);
+    $ans = $default unless length($ans);
+
+    return ( $ans =~ /^(?:q|quit)\s*$/i || $ans !~ /\D/ ) ? $ans : undef;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+dukedom - The classic big iron game of land management
+
+=head1 SYNOPSIS
+
+  
+ $ dukedom
+   
+  
+=head1 DESCRIPTION
+
+From Wikipedia, the free encyclopedia:
+
+  
+ Dukedom is a turn-based strategy computer game about land management and
+ was created as an expanded version of Hamurabi.
+  
+
+=head1 GAMEPLAY
+
+Again, from Wikipedia, the free encyclopedia:
+
+  
+ You are one of several Dukes chosen by the High King to help run the
+ Kingdom. Your Duchy is not in the best of shape, and your job is to build
+ up its population, land holdings, and grain reserves. Your secret ambition
+ is to become powerful enough to overthrow the High King.
+  
+
+The game will require a number of different inputs. They will require
+either a "Yes/No" or a number which can be "0" and a positive integer.
+
+There will usually be a default answer supplied in brackets.
+
+=over 4
+
+=item Grain for food 
+
+This is asking for a number specifying how grain will be used for food. Some
+number of peasants will starve if each one is not given at least 13 HL of
+grain. They will possibly rise up and revolt if they are offered obvious
+starvation rations.
+
+That being said, their morale will rise if given extra food (up to a point).
+This can affect the outcome of wars.
+
+For convienence, any number less than 100 is assumed to be how much grain
+to supply per peasant rather than the total amount to be used.
+
+=item Land to buy
+
+It is essential to have enough land available to plant crops to feed the
+population, pay expenses and pay the royal tax. Other than capturing land
+through war with neighboring dukedoms, the only way to gain more mand is
+to buy it.
+
+Of course, if one buys too much, then there will be too little grain left
+to use for seed.
+
+=item Land to sell
+
+One can on occassion find themselves with more land than is needed and wish
+to avoid the expense of paying taxes on it. Also, one might also find that
+more grain (currency) is needed to ensure there is enough available for some
+other immediate need.
+
+Or one is simply engaging in market speculation and building up reserves
+after buying excess land at a more reasonable price.
+
+For whatever reason, one can specify the amount of land to sell if one has
+not already purchased land in the same turn. This question will not appear
+if that is the case.
+
+=item Land to plant
+
+Grain production is how one acquires wealth, other than winning wars. This
+requres a numeric response specifying how much of the land should be used
+for crops.
+
+There is a limit to how many HA one peasant can plant. There is also
+a minimum for how much grain is required for seed for each HA of land. These
+two factors combined place a maximum limit on how much land can be planted
+each year.
+
+Also, the land's productivity decreases by 20% of it's original capacity
+each year it is used. This means that some land must be allowed to
+"lie fallow" in order to regain lost capacity.
+
+=item The High King requires peasants for his estates and mines.
+
+This is asking if you will supply the requested number of peasants for the
+King's levy (a "Y" response) or pay some specifired amount of grain in
+exchange (indicated by a "n" response).
+
+There is no advantage or penalty for answering either way at this time other
+than how it affects capacity to plant land or grain resources.
+
+=item A nearby Duke threatens war; Will you attack first?
+
+Pretty obvious, you are inspiring the envy of your neighbors.
+
+If you attack first, you might force peace through negotions. However, should
+your attack fail, you will stil be required to hire mercenaries to help you.
+
+It should be pointed out that the High King will not attack you unless
+you become overly successful in war with your neighbors. (And you cannot
+become High King yourself unless the High King attacks you.)
+
+=item Hire how many mercenaries at 40 HL each?
+
+Either your first strike failed or you elected to wait for your neighbor
+to attack. In either event, you now need help to defend yourself.
+
+The hiring of mercenaries will improve your chances of winning the coming
+battle. (As will the morale of your peasants.)
+
+=item The King demands twice the royal tax in the hope of provoking war
+
+Now you've done it, the High King is royally pissed!
+
+You can either elect to pay double the normal taxes (a 'Y' response) in
+hopes of placating him or refuse and face certain war.
+
+=back
+
+There are also a number of informational messages that might appear. They
+should be self-explanatory (and somewhat disturbing) and do not require
+a response.
+
+=head1 SEE ALSO
+
+L<Games::Dukedom>, L<Games::Dukedom::Signal>
+
+This package is based on the logic found in this C code, which appears to
+have been derived from an older source written in Basic:
+
+L<https://github.com/caryo/Dukedom/blob/master/imports/dukedom.c>
+
+A good description of the goals of the game and how to play is here:
+
+L<http://dukedomsbv.codeplex.com/documentation?
+
+and here:
+
+L<http://www.atariarchives.org/bigcomputergames/showpage.php?page=11>
+
+=head1 BUGS
+
+Seriously? Look at the version number.
+
+=head1 AUTHOR
+
+Jim Bacon, E<lt>jim@nortx.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Jim Bacon
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

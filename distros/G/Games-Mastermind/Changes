@@ -1,0 +1,32 @@
+Revision history for Games-Mastermind
+
+0.06 Thu Aug 22 2013
+        [DOCUMENTATION]
+        - finally learnt how to setup the Changes files for dzil
+
+0.05 Thu Aug 22 2013
+        [DOCUMENTATION]
+        - fixed the Changes file, which got borked during the
+          release process
+
+0.04 Thu Aug 22 2013
+        [DOCUMENTATION]
+        - fixed various minor POD issues (including RT #51736)
+        [PACKAGING]
+        - switch to Dist::Zilla for maintaining the distribution
+
+0.03 Sun Sep 10 23:17:33 CEST 2006
+        [EXAMPLES]
+        - added some examples in eg/ (mostly to get that last Kwalitee
+          point, but check out the eg/mm-table.pl script)
+
+0.02 Wed Aug 23 14:40:31 CEST 2006
+        [DOCUMENTATION]
+        - doc patch by Mike Castle (also reported as RT ticket #21149
+          by David Rigaudiere)
+        [TICKET CLOSED]
+        - #21149: Game::Mastermind in pod (lack of S for Games)
+
+0.01 Fri May 20 13:59:28 CEST 2005
+        - First version, with enough to handle a game
+

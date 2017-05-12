@@ -1,0 +1,637 @@
+# $Id: test.sac,v 1.2 2002/12/24 10:27:02 mike Exp $
+
+# crystal.sa -- Scott Adams source file for _Crystal of Chaos_
+
+# ----------------------------------------------------------------------------
+# Global configuration
+
+%ident 18400
+%version 1
+%wordlen 3
+%maxload 5
+%lighttime 100
+%start clearing
+%treasury empty
+
+
+# ----------------------------------------------------------------------------
+# Infrastructure actions (I don't think any game would ever omit these)
+
+%action inventory
+%result
+inventory
+
+%action take inventory
+%result
+inventory
+
+%action score
+%result
+score
+
+%action save game
+%result
+save_game
+
+%occur
+!flag 1
+%result
+set_flag 1
+msg Welcome to `CRYSTAL OF CHAOS`
+msg Written by Mike Taylor, starting Monday 10th April 2001
+msg This is a demo for the `sac` adventure system --
+msg See http://www.miketaylor.org.uk/tech/advent/sac.html
+
+
+# ----------------------------------------------------------------------------
+# Use of flags
+#	flag 1: True forever once welcome message has been printed.
+#	flag 2: True immediately after balsa wood is lit.
+#	flag 3: True immediately after plywood is lit.
+#	flag 4: True immediately after oak is lit.
+#	flag 5: True while under water.
+#
+# Use of saved locations
+#	location 1: when in vase, contains room player was in before.
+#
+# Use of counters:
+#	counter 1: number of turns remaining to hold breath
+
+# ----------------------------------------------------------------------------
+# Preamble actions (must fire after body actions)
+
+%occur
+at pool
+%result
+set_flag 5
+
+%occur
+at river1
+%result
+set_flag 5
+
+%occur
+at river2
+%result
+set_flag 5
+
+%occur
+at river3
+%result
+set_flag 5
+
+%occur
+at river4
+%result
+set_flag 5
+
+%occur
+at forest2
+%result
+clear_flag 5
+
+%occur
+at chamber
+%result
+clear_flag 5
+
+%occur
+at vase
+%result
+clear_flag 5
+
+%occur
+at dead
+%result
+clear_flag 5
+
+%occur
+counter_eq 1
+%result
+msg I have to breathe NOW!
+
+%occur
+counter_gt 0
+%result
+decrease_counter
+
+%occur
+counter_gt 0
+%result
+msg I can only hold my breath for
+print_counter
+msg more turns.
+
+# Death due to lack of breath
+%occur
+counter_eq 0
+flag 5
+%result
+msg I can't breathe ...
+clear_flag 5
+die
+
+# We'd like the next three %occur's to go after the %action for LIGHT
+# BALSA below.  But that doesn't work, because although any number of
+# %occurs may fire on a given turn, action-and-occur processing stops
+# immediately after the first successful %action.  (I determined this
+# by experiment: I couldn't determine the intent of the scottfree
+# source to save my life.)  Instead, we do these %occur's at the very
+# start of the _next_ turn -- which from the player's perspective is
+# indistinguishable from the end of the previous one.
+
+%occur
+flag 2
+here plywood
+%result
+msg The plywood also catches fire and burns quickly.
+destroy plywood
+set_flag 3
+
+%occur
+flag 3
+here oak
+%result
+msg The oak catches, and becomes a roaring fire.
+msg Smoke pours upwards.
+destroy oak
+drop fire
+set_flag 4
+
+%occur
+flag 4
+at glade
+%result
+destroy bees
+put drowsy_bees beech
+
+%occur
+%result
+clear_flag 2
+clear_flag 3
+clear_flag 4
+%comment Fire-building must happen all in one go
+
+%action chop
+!accessible axe
+%result
+msg I can't chop anything without an axe.
+
+%action ram
+!accessible trunk
+%result
+msg I don't have a battering ram.
+
+%action light
+!accessible match
+%result
+msg I don't have anything to light it with.
+
+
+# ----------------------------------------------------------------------------
+# Rooms, Items and associated Actions
+
+%include clearing.sac
+
+%include glade.sac
+
+%item beech
+Beech tree
+
+%action climb tree
+here beech
+%result
+moveto beech
+
+%room beech
+the top of a beech tree
+%exit d glade
+
+%item nest
+Bees' nest
+
+%item honey
+Wild honey
+%getdrop honey
+
+%action get honey
+here bees
+%result
+msg No!  Bees would sting me!
+
+%item bees
+Killer bees
+
+%item drowsy_bees
+Drowsy bees
+%nowhere
+
+%action help
+here bees
+%result
+msg Smoke 'em out!
+
+%room swamp
+dismal swamp
+%exit e outcrop
+%exit s clearing
+
+%item cypress
+Cypress tree
+
+%action chop tree
+here cypress
+%result
+msg TIMBER!
+destroy cypress
+drop trunk
+drop stump
+
+%item stump
+-SOLID- stump
+%nowhere
+
+%action examine stump
+here stump
+%result
+msg There's nothing there all right! Maybe I should forget it?
+
+%item trunk
+Trunk of cypress tree
+%getdrop trunk
+%nowhere
+
+%item mud
+Evil smelling mud
+%getdrop mud
+
+%item gas
+Swamp gas
+
+%item slime
+Patches of `OILY` slime
+%getdrop oil
+
+%item chiggers
+Chiggers
+%getdrop chiggers
+
+%room outcrop
+rocky area by an outcrop
+%exit w swamp
+%exit s glade
+
+%item bdoor
+Balsa-wood door set into the rock
+
+%action open door
+here bdoor
+%result
+msg It's locked.
+
+%action kick door
+here bdoor
+%result
+destroy bdoor
+drop balsa
+drop tunnel
+msg It splinters easily.
+msg There's a tunnel beyond.
+
+%action chop door
+here bdoor
+%comment no balsa wood
+%result
+destroy bdoor
+drop tunnel
+msg CRUNCH!  It's smashed to smithereens!
+msg There's a tunnel beyond.
+
+%action ram door
+here bdoor
+%comment no balsa wood
+%result
+destroy bdoor
+drop tunnel
+msg DOOSH!  It's absolutely annihilated!
+msg There's a tunnel beyond.
+
+%item balsa
+Balsa wood
+%getdrop balsa
+%nowhere
+
+%item tunnel
+Tunnel disappears into the rock
+%nowhere
+
+%action go tunnel
+here tunnel
+%result
+moveto tunnel
+
+%room tunnel
+dingy north-south tunnel
+%exit s outcrop
+
+%item pdoor
+Plywood door blocks the way north
+
+%action open door
+here pdoor
+%result
+msg It's also locked.
+
+%action kick door
+here pdoor
+%result
+msg Ouch!
+
+%action chop door
+here pdoor
+%result
+destroy pdoor
+drop plywood
+drop passage
+msg CRUNCH!
+msg There's a passage beyond.
+
+%action ram door
+here pdoor
+%comment no plywood
+%result
+destroy pdoor
+drop passage
+msg DOOSH!  It's absolutely annihilated!
+msg There's a passage beyond.
+
+%item plywood
+Plywood
+%getdrop plywood
+%nowhere
+
+%item passage
+Passage disappears into the rock
+%nowhere
+
+%action go passage
+here passage
+%result
+moveto passage
+
+%room passage
+gloomy north-south passage
+%exit s tunnel
+
+%item odoor
+Oak door blocks the way north
+
+%action open door
+here odoor
+%result
+msg OF COURSE it's locked!
+
+%action kick door
+here odoor
+%result
+msg Ouch!
+
+%action chop door
+here odoor
+%result
+msg It's too solid for the axe to make much impression.
+
+%action ram door
+here odoor
+%result
+destroy odoor
+drop oak
+drop entrance
+msg DOOSH!
+msg There's an entrance beyond.
+
+%item oak
+Oak
+%getdrop oak
+%nowhere
+
+%item entrance
+Entrance to the north
+%nowhere
+
+%action go entrance
+here entrance
+%result
+moveto empty
+
+%room empty
+empty room
+%exit s passage
+
+%item note
+Note
+%getdrop note
+
+%action read note
+accessible note
+%result
+msg It says - `Leave *TREASURES* here, the say: SCORE`
+
+%item fire
+Blazing hot fire
+%nowhere
+
+%action light plywood
+carried plywood
+%result
+msg Not while I'm carrying it!
+
+%action light plywood
+here plywood
+%result
+msg I can't get it to catch fire.
+msg My match goes out.
+destroy match
+
+%action light oak
+here oak
+%result
+msg There's no way it will catch fire.
+msg My match goes out.
+destroy match
+
+%action light oak
+carried oak
+%result
+msg Not while I'm carrying it!
+
+%action light balsa
+carried balsa
+%result
+msg Not while I'm carrying it!
+
+%action light balsa
+here balsa
+%result
+msg OK.  It burns up very quickly.
+msg My match goes out.
+destroy match
+destroy balsa
+set_flag 2
+
+%room forest
+forest
+%exit n clearing
+%exit e forest2
+
+%item path
+Path leads south into the forest
+
+%action go path
+here bear
+%result
+msg Bear won't let me
+
+%action go path
+at forest
+%result
+moveto path
+
+%item bear
+Very thin black bear
+
+%action drop honey
+here bear
+%result
+destroy bear
+destroy honey
+drop sleeping
+msg Bear eats the honey and falls asleep.
+
+%item sleeping
+Sleeping bear
+%nowhere
+
+%room path
+forest path
+%exit n forest
+
+%item vase
+*Huge vase*
+%getdrop vase
+
+%action examine vase
+%result
+msg It's bigger than I am.
+
+%action go vase
+here vase
+%result
+swap_loc 1
+moveto vase
+
+%action leave vase
+at vase
+%result
+swap_loc 1
+
+%room vase
+*I'm INSIDE a huge vase!
+
+%item medallion
+*Silver medallion*
+%getdrop medallion
+
+%room forest2
+forest
+%exit n glade
+%exit w forest
+
+%item pool
+Bubbling pool
+
+%action go pool
+here pool
+%result
+moveto pool
+
+%action hold breath
+counter_gt 1
+%result
+msg I'm already holding my breath!
+
+%action hold breath
+%result
+set_counter 6
+msg OK
+
+%room pool
+bubbling pool, just below the water level
+%exit u forest2
+
+%item inflow
+inflow from the south
+
+%action go inflow
+here inflow
+%result
+moveto river1
+
+%room river1
+*I'm swimming in an underground river.
+Light pours from the north.
+%exit n pool
+%exit s river2
+
+%room river2
+*I'm swimming in an underground river.
+There's a faint glimmer of light to the north.
+%exit n river1
+%exit s river3
+
+%room river3
+*I'm swimming in an underground river.
+There's a faint glimmer of light to the south.
+%exit n river2
+%exit s river4
+
+%room river4
+*I'm swimming in an underground river.
+Light pours from the south.
+%exit n river3
+%exit s chamber
+
+%room chamber
+brightly lit underground chamber.
+An underground river disappears into the north wall.
+%exit n river4
+
+%item crown
+*Gold crown*
+%getdrop crown
+
+%room dead
+*I'm dead.  Great.  Try again.
+%exit e clearing
+
+
+# ----------------------------------------------------------------------------
+# Debugging actions (should be removed from distributed game)
+
+%action teleport path
+%result
+msg >Fzing!<
+moveto path
+
+
+# ----------------------------------------------------------------------------
+# Postamble actions (must fire after body actions)
+
+%action help
+%result
+msg You'll have to figure it out for yourself.
+
+%action examine
+%result
+msg It looks like a pretty average
+print_noun

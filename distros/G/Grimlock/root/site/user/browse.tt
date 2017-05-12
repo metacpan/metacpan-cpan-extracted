@@ -1,0 +1,11 @@
+<h2>[% user.name %]'s profile</h2>
+<div id="user-info">
+<p>Joined on [% user.created_at.mdy %]</p>
+<p>Last logged in: [% user.updated_at.mdy %]</p>
+<p>Roles: [% FOR role IN user.roles; role.name; END %]</p>
+</div>
+<div id="user-stats">
+<p>Stats:</p>
+<p>Posts: [% user.entry_count %]</p>
+<p>Replies: [% user.reply_count %]</p>
+</div>

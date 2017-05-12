@@ -1,0 +1,62 @@
+NAME
+    Git::Hooks::PerlCritic - Perl Critic hooks for git
+
+VERSION
+    version 0.001001
+
+DESCRIPTION
+    Allows you to utilize Perl::Critic via git hooks
+    <http://www.kernel.org/pub/software/scm/git/docs/githooks.html> using
+    the Git::Hooks framework.
+
+    First setup git-hooks.pl
+
+    Then you should choose to use only one of the available hooks.
+
+HOOKS
+  pre-commit
+            ln -s git-hooks.pl .git/hooks/pre-commit
+            git config --add githooks.plugin PerlCritic
+
+    This hook will prevent a commit that doesn't pass Perl::Critic from
+    being committed.
+
+  prepare-commit-msg
+            ln -s git-hooks.pl .git/hooks/prepare-commit-msg
+            git config --add githooks.plugin PerlCritic
+
+    This hook will simply append commented out critic warnings to the commit
+    message, so you may review them before committing.
+
+CONFIGURATION AND ENVIRONMENT
+    Option *profile* to define a perlcriticrc file. E.g.:
+
+            git config --add githooks.perlcritic.profile subdir/.perlcriticrc
+
+SEE ALSO
+    Git::Hooks
+    Perl::Critic
+    Alternative way to use Perl::Critic with Git::Hooks package:
+    Git::Hooks::CheckFile.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/hostgator/git-hooks-perlcritic/issues or by email to
+    development@hostgator.com.
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHORS
+    *   Caleb Cushing <xenoterracide@gmail.com>
+
+    *   Mikko Koivunalho <mikkoi@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by HostGator.com
+    <http://hostgator.com>.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

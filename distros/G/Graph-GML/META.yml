@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Graph-GML
+version:            0.01
+abstract:           Perl extension for reading GML files and creating a Graph object
+author:
+    - Leigh Metcalf <leigh@macosforge.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Graph:  0.94
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

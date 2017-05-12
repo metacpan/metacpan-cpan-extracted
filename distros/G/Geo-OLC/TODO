@@ -1,0 +1,43 @@
+-  work out a full set of test cases for recoverNearest(), including
+   failures. Plot out 3x3 grid cells and come up with realistic
+   reference points and short codes that are in/out of their area.
+
+https://plus.codes tries hard to generate codes trimmed to 4 digits,
+and I don't know if it falls back to 6. I'm pretty sure it won't do 2
+or 8, although it can recover them with reasonable references.
+
+The grid size for a 6-digit code is +/- 20 degrees, which is massive
+and unlikely to ever be ambiguous outside of artificial tests.
+
+4-digit short codes are +/- 1 degree, where it's much easier to hit
+a boundary, like Kyoto Station being in a different cell than Kyoto
+City Hall (the split between 34N and 35N is halfway between Gojo and
+Shijo, so the Citadines is in 34N, too).
+
+2-digit codes should be easy to generate test cases for, since it
+will be quite common for something to be more than 0.05 degrees
+away (~3.4 miles at the equator).
+
+0-digit codes (0.0025 degrees) cover about 300 yards, so it should be
+trivial to find examples.
+
+Specifically look for (literal) corner cases, where their +/-0.5
+method will produce the wrong result compared to my "linear distance
+from reference to point in 9 cells"
+
+
+- to describe something that's bigger than one cell but smaller than
+  the next size up, you need a list of covered cells. I suggest a
+  canonical ordering west to east, south to north, with common
+  prefixes deleted. That is, whenever you see a short code,
+  automatically use the prefix from the most recent full code.
+
+So, Mount Fuji is in 8Q7W8P00+, 8Q7W8Q00+, 8Q7W9P00+, and 8Q7W9Q00+,
+so the multicode would be "8Q7W8P00+ Q00+ 9P00+ 9Q00+". Shorten them
+as much as possible, since we're not using the standard recovery
+method.
+
+Codes don't have to be the same length, so you could define a complex
+region with cells of different lengths. A script that took an area
+definition from KML and returned a list of all grid cells out to a
+particular resolution would be perfect.

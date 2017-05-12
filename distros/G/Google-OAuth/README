@@ -1,0 +1,51 @@
+Google-OAuth version 0.05
+=========================
+
+Google::OAuth manages Google's access tokens, and creates HTTP::Request
+objects embodying those tokens.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   perl -MGoogle::OAuth::Install -e config
+   perl -MGoogle::OAuth::Install -e install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+		NoSQL::PL2SQL
+		LWP
+		LWP::Protocol::https
+		File::Copy
+		JSON
+
+Apparently LWP::Protocol::https was unbundled as of v6.02
+
+DOCUMENTATION
+
+Online documentation available at CPAN:
+
+  http://search.cpan.org/~tqisjim/Google-OAuth-0.04/lib/Google/OAuth.pm
+
+SAMPLES
+
+Sample library to access Google Apps objects
+
+Sample library that extends Google::OAuth to Facebook
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Jim Schueler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

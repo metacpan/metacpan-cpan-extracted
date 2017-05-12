@@ -1,0 +1,115 @@
+# ChangeLog for net-wireless/ipw2100
+# Copyright 2000-2004 Gentoo Technologies, Inc.; Distributed under the GPL v2
+# $Header: /var/cvsroot/perl/Gentoo-Probe/t/sandbox/usr/portage/net-wireless/ipw2100/ChangeLog,v 1.1 2004/06/20 09:09:36 linguist Exp $
+
+*ipw2100-0.46-r1 (07 Jun 2004)
+
+  07 Jun 2004; Peter Johanson,,, <peter@gentoo.org> ipw2100-0.46-r1.ebuild:
+  Revision bump to use the new 0.46_3 which fixes some oopses.
+
+*ipw2100-0.46 (07 Jun 2004)
+
+  07 Jun 2004; Peter Johanson,,, <peter@gentoo.org> ipw2100-0.46.ebuild:
+  Bump to new release.
+
+  01 Jun 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.39.ebuild,
+  ipw2100-0.44.ebuild:
+  Mark 0.44 stable on x86, and remove one more old version.
+
+*ipw2100-0.45 (31 May 2004)
+
+  31 May 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.37.ebuild,
+  ipw2100-0.38.ebuild, ipw2100-0.45.ebuild:
+  Bump to latest releaes, and clean out a few old ebuilds.
+
+*ipw2100-0.44 (17 May 2004)
+
+  17 May 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.44.ebuild:
+  Bump. Includes latest firmwares. Now with elementary monitor and ad-hoc mode
+  support.
+
+*ipw2100-0.41 (23 Apr 2004)
+
+  23 Apr 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.33-r1.ebuild,
+  ipw2100-0.34.ebuild, ipw2100-0.35.ebuild, ipw2100-0.41.ebuild,
+  files/hostap_crypt.h:
+  Bump. First version with testing WEP support. Thanks to all on bug #47892.
+  Note added about re-emerging both ipw2100 and hostap-driver after a kernel
+  upgrade. Removed some old versions too.
+
+*ipw2100-0.39 (26 Mar 2004)
+
+  26 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.29.ebuild,
+  ipw2100-0.30.ebuild, ipw2100-0.31.ebuild, ipw2100-0.32.ebuild,
+  ipw2100-0.39.ebuild:
+  Bump, and clean out old ebuilds.
+
+*ipw2100-0.38 (24 Mar 2004)
+*ipw2100-0.37 (24 Mar 2004)
+
+  24 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.37.ebuild,
+  ipw2100-0.38.ebuild, files/ipw2100-0.38-makefile-1.diff,
+  files/ipw2100-0.38-makefile-2.diff, files/ipw2100-0.38-resume.patch:
+  Bump. 0.38 includes a fix for ACPI resume issues. Enjoy.
+
+*ipw2100-0.35 (18 Mar 2004)
+
+  18 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.35.ebuild:
+  Bump. Lots of small fixes.
+
+*ipw2100-0.34 (17 Mar 2004)
+
+  17 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.33-r1.ebuild,
+  ipw2100-0.33.ebuild, ipw2100-0.34.ebuild:
+  Removed a version that was no good, added RDEPEND on hotplug with firmware
+  support, and added a check for CONFIG_FW_LOADER.
+
+*ipw2100-0.34 (17 Mar 2004)
+
+  17 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.34.ebuild:
+  Bump. Includes most of the stuff from 0.33-r1, plus a few new devices in /proc
+  for debugging.
+
+*ipw2100-0.33-r1 (17 Mar 2004)
+
+  17 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.33-r1.ebuild,
+  files/ipw2100-0.33-acpi-fix.diff:
+  Bump. Added a fix to prevent locking when entering C3 state with acpi! (thanks
+  to james for such great work)
+
+*ipw2100-0.33 (16 Mar 2004)
+
+  16 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.33.ebuild,
+  files/ipw2100-0.33-makefile-fix.diff:
+  Bump. New makefile is almost fully usable.
+
+*ipw2100-0.32 (12 Mar 2004)
+
+  12 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.32.ebuild:
+  Bump. Adds support for RF swithc, and fixes nickname setting oops.
+
+*ipw2100-0.31 (12 Mar 2004)
+
+  12 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.31.ebuild,
+  files/ipw2100-0.31-sched-fix.diff:
+  Bump, includes fix for scheduler stuff to fix compilation of 2.4 kernels.
+
+  11 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.29.ebuild,
+  ipw2100-0.30.ebuild:
+  Fixed to add some || die statements.
+
+*ipw2100-0.30 (11 Mar 2004)
+
+  11 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.30.ebuild:
+  Bump. Includes many minor fixes for various oopses.
+
+*ipw2100-0.29 (10 Mar 2004)
+
+  10 Mar 2004; Peter Johanson <latexer@gentoo.org> ipw2100-0.29.ebuild,
+  metadata.xml:
+  Initial commitebuild ipw2100-0.29.ebuild digest! Great thanks to Intel for
+  finally stepping up and delivering this. Ebuild by me, will be submitting
+  better makefiles upstream soon to make life easier. This driver is still in
+  development, and does not support WEP or ad-hoc mode yet, but should work for
+  basic functionality. Consider yourself warned.
+

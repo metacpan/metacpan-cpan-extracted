@@ -1,0 +1,43 @@
+# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# 
+# This file is part of Gtk2-Ex-NoShrink.
+# 
+# Gtk2-Ex-NoShrink is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+# 
+# Gtk2-Ex-NoShrink is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with Gtk2-Ex-NoShrink.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libgtk2-ex-noshrink-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.1
+Homepage: http://user42.tuxfamily.org/gtk2-ex-noshrink/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libgtk2-ex-noshrink-perl
+Architecture: all
+Depends: libglib-perl, libgtk2-perl, ${perl:Depends}, ${misc:Depends}
+Description: Non-shrinking container widget for Gtk2-Perl
+ Gtk2::Ex::NoShrink holds a single child and imposes a "no shrink"
+ policy on the size it requests.  Any request to become smaller is
+ ignored, rather its largest-ever requested size is used.
+ .
+ This is good if small amounts of shrinking cause distracting
+ re-layout, or if a widget's actual desired size is data-dependent and
+ can't be easily calculated in advance (but will quickly reach a peak
+ you'd like it to stick at).
