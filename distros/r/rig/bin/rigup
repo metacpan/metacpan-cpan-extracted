@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+sub usage {
+    print "usage: rigup command [args]\n";
+    exit 0;
+}
+
+sub error_unk_cmd {
+    die "rigup: command unknown: $_[0]\n";
+}
+
+usage() unless @ARGV > 0;
+
+my $cmd = shift @ARGV;
+
+my $help = $cmd =~ m/^-*-h[elp]*$/i;
+$cmd = shift @ARGV if $help;
+
+my @args = @ARGV;
+
+for( $cmd ) {
+    my $module = "rig::cmd::$cmd";
+    ( my $modfile = $module . ".pm" ) =~ s{::}{/}g ;
+    eval "require $module";
+    if( $@ ) {
+        if( $! =~ /No such file/i ) {
+            error_unk_cmd($_);
+        } else {
+            die "$@\n";
+        }
+    } elsif( $help )  {
+        print "MOD=$modfile, $INC{ $modfile } \n";
+        $module->pod_text( $INC{ $modfile } );
+    } else {
+        $module->run(@args);
+    }
+}
+
+=head1 NAME
+
+rigup - Default engine for rig
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+    rigup command <args...>
+
+=head1 DESCRIPTION
+
+A command-line utility to wireup your rigs. 
+
+=cut 

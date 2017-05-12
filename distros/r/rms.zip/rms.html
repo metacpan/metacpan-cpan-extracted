@@ -1,0 +1,566 @@
+<HTML>
+<HEAD>
+<TITLE>rms.pm</TITLE>
+<LINK REV="made" HREF="mailto:jean_claude@alpha1.cellcom">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#Accessing_Open_VMS_RMS_indexed_f">Accessing Open VMS RMS indexed files from Perl</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#COPYRIGHTS">COPYRIGHTS</A>
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A>
+	<LI><A HREF="#open_read">open_read</A>
+	<UL>
+
+		<LI><A HREF="#syntax">syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#open_write">open_write</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax </A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#close">close</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#delete">delete</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#find">find</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#put_index">put_index</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax </A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#put_seq">put_seq</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#read_seq">read_seq</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#sel_index">sel_index</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#unlock">unlock</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+	<LI><A HREF="#update">update</A>
+	<UL>
+
+		<LI><A HREF="#Syntax">Syntax</A>
+		<LI><A HREF="#Description">Description</A>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="Accessing_Open_VMS_RMS_indexed_f">Accessing Open VMS RMS indexed files from Perl</A></H1>
+<P>
+rms - Perl extension for accessing, searching, reading, writing RMS indexed
+files under Open VMS operating system.
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>  use rms;
+</PRE>
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+This package is designed to be used with a minimum of effort, hence it may
+lacks some of the RMS functionalities. But trust my long experience, it
+will fit more than 80% of your usual needs.
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Jean-claude Tebbal (e-mail : <A
+HREF="mailto:jct@tebbal.demon.co.uk)">jct@tebbal.demon.co.uk)</A>
+
+<P>
+I live in England but I am French so if you are a French speaking person
+feel free to send me your comments in French. If you are not French
+speaking send them in English and do not worry: I read English easier than
+I write it :-)
+
+<P>
+I work on VMS systems since 1984 and I am using Perl since 1994 (I
+discovered it by using Linux). While extensions for RDBMS are available
+since a long time, I have been waiting for an interface to RMS indexed
+files. Knowing that Heavens help those who are helping themselves, I built
+this extension. To be faithful to the KISS principle (Keep It Small and
+Simple), I reduced the extension to the main needs and froze some options:
+
+<P>
+When a file is accessed in read mode the read records are not locked.
+
+<P>
+When a file is accessed in write mode the located (rms::find) and read
+records are locked until they are updated (rms::update), explicitely
+unlocked (rms::unlock), deleted (rms::delete) or when another record is
+read.
+
+<P>
+The buffers containing the records must be created before reading and will
+not be null terminated after read ($size will be defining the record end).
+
+<P>
+The return value of the functions is the RMS status of the last RMS
+primitive call in the function or the first faulty primitive call.
+
+<P>
+example: in open_read sys$open service is called and if faulty the RMS
+status is returned; if ok the sys$connect service is called and RMS status
+is returned if it is faulty; if ok the sys$rewind service is called and RMS
+status is returned if faulty; if ok the file access block and record access
+block are updated ans the good RMS status is returned.
+
+<P>
+These status are important and MUST be tested, because if you go on after a
+wrong status, the results may be unpredictable.
+
+<P>
+!!!!! A status is good if its value is odd !!!
+
+<P>
+You can get the message related to this status by doing : exit $status; in
+your perl program.
+
+<P>
+You can test the record locking status with two concurrent users in write
+access and determine in your programs what to do in such a case (error
+message, program termination, wait and retry, ...)
+
+<P>
+If you want to be aware of any new version of this package, just mail <A
+HREF="mailto:rms@tebbal.demon.co.uk">rms@tebbal.demon.co.uk</A>
+
+<P>
+<HR>
+<H1><A NAME="COPYRIGHTS">COPYRIGHTS</A></H1>
+<P>
+This package is released under the artistic licence terms. You can read
+these terms in the file copy.art in this distribution.
+
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<P>
+<CODE>perl(1).</CODE>
+
+<P>
+<HR>
+<H1><A NAME="open_read">open_read</A></H1>
+<P>
+<HR>
+<H2><A NAME="syntax">syntax</A></H2>
+<P>
+<PRE> rms::open_read($file,$fab, $rab)
+ char $file
+ int $fab
+ int $rab
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : open_read                                          
+                                                                           
+   Description        : Opens an indexed file with read access; links the  
+                        record accessblock to the file accessblock then  
+                        resets the record pointers to the beginning of the 
+                        file.                                              
+                                                                           
+   Input Parameters   : $file : Name of the file to be used.                
+   Output Parameters  : $fab : File accessblock pointer 
+                                this block contains the header       
+                                information relative to the file         
+                        $rab : Record accessblock pointer, 
+                                this block contains the header    
+                                information related to the record.       
+   Return value       : RMS return status.                                 
+                                                                           
+</PRE>
+<P>
+<PRE>  Initialize the FAB and RAB before opening and connecting a stream.    
+</PRE>
+<P>
+<HR>
+<H1><A NAME="open_write">open_write</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::open_write ($file, $fab, $rab)
+ char $file
+ int $fab
+ int $rab
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : open_write                                   
+                                                                           
+   Description        : Opens an indexed file with all  access; links the  
+                        record accessblock pointer to the file accessblock pointer then  
+                        resets the record pointers to the beginning of the 
+                        file.                                              
+                                                                           
+   Input Parameters   : $file : Name of the file to be used.             
+   Output Parameters  : $fab : File accessblock pointer 
+                                this block contains the header    
+                                information relative to the file         
+                        $rab : Record accessblock pointer, 
+                                this block contains the header 
+                                information related to the record.       
+   Return value       : RMS return status.                                 
+                                                                           
+</PRE>
+<P>
+<PRE>  Initialize the FAB and RAB before opening and connecting a stream.    
+</PRE>
+<P>
+<PRE>     
+</PRE>
+<P>
+<HR>
+<H1><A NAME="close">close</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::close ($fab,$rab)
+ int $fab
+ int $rab
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : close                                        
+                                                                          
+   Description        : close file.                                       
+                                                                          
+   Input Parameters   : $rab: Record accessblock pointer 
+                              this block contains info related 
+                              to the record.                         
+                      : $fab: File accessblock pointer 
+                              this block contains the header    
+                              information relative to the file      
+   Return value       : RMS return status.                              
+                                                                        
+</PRE>
+<P>
+<HR>
+<H1><A NAME="delete">delete</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::delete ($rab) 
+ int $rab
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : delete                                          
+                                                                        
+   Description        : Delete the last record read or found.           
+                                                                        
+   Input Parameters   : $rab : Record accessblock pointer 
+                               this block contains info related 
+                               to the record.                         
+                                                                        
+   Output Parameters  : none                                            
+                                                                        
+   Return value       : Odd status if OK , even status if record not found 
+</PRE>
+<P>
+<HR>
+<H1><A NAME="find">find</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::find ($rab, $key_val, $match)
+ int $rab
+ char $key_val
+ char $match
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : find                                          
+                                                                            
+   Description        : Find an indexed record matching a specified value   
+                        for the current index number.                       
+                                                                            
+   Input Parameters   : $rab : Record accessblock pointer 
+                               this block contains all info    
+                               related to the record.                     
+                        $key_val: value of the key to find.                  
+                        $match  :-&quot;GE&quot; all records whose key match this      
+                                 value and the following records according  
+                                 to the default sorting order of the key.   
+                               :-&quot;GT&quot; the records matching this key are     
+                                 excluded, but all the following  records   
+                                 are valid (according to the default        
+                                 sorting order).                            
+                               :-&quot;EQ&quot; only exact matches are valid          
+                                                                            
+   Output Parameters  : none                                                
+                                                                            
+   Return value       : Odd status if record found even status if not found 
+</PRE>
+<P>
+<HR>
+<H1><A NAME="put_index">put_index</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::put_index($rab, $buffer, $size, $key_val) 
+ int $rab
+ char $buffer
+ int $size
+ char $key_val
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : put_index                                       
+                                                                              
+   Description        : Write in the file the contents of the                 
+                        buffer.                                               
+                                                                              
+   Input Parameters   : $rab : Record accessblock pointer 
+                               this block contains info related    
+                               to the record.                               
+                        $key_val: value of the key to insert.                
+                                                                              
+                        $buffer : It    contains the record to be written      
+                                                                              
+                        $size   : Size of buffer (note that it is not Null
+                                                  terminated)
+                                                                              
+   Output Parameters  : none                                                  
+                                                                              
+   Return value       : Odd status if OK , even status if record not found    
+                                                                              
+</PRE>
+<P>
+<HR>
+<H1><A NAME="put_seq">put_seq</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::put_seq ($rab, $buffer, $size)                                 
+ int $rab
+ char $buffer
+ int $size
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : put_seq                                         
+                                                                              
+   Description        : Write an indexed file in a sequential way,            
+                        ignoring the keys.                                    
+                                                                              
+   Input Parameters   : $rab : Record accessblock pointer 
+                               this block contains info related    
+                               to the record.                               
+                        $buffer : Contains the record to be written            
+                                                                              
+                        $size   : Size of buffer (note that it is not Null
+                                                  terminated)
+                                                                              
+   Output Parameters  : none                                                  
+                                                                              
+   Return value       : Odd status if OK , even status if an error occurs.    
+                                                                              
+</PRE>
+<P>
+<HR>
+<H1><A NAME="read_seq">read_seq</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::read_seq ($rab, $buffer, $size)                                 
+ int $rab
+ char $buffer
+ int $size
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : read_seq                                        
+                                                                              
+   Description        : Read an indexed file in a sequential order,           
+                        ignoring the keys.                                    
+                                                                              
+   Input Parameters   : $rab : Record accessblock pointer 
+                               this block contains info related    
+                               to the record.                               
+                                                                              
+   Output Parameters  : $buffer : If OK contains at the end of the function    
+                                  the read record.                             
+</PRE>
+<P>
+<PRE>                        $size   : Size of buffer (note that it is not Null
+                                                  terminated)
+                                                                              
+                                                                              
+   Return value       : Odd status if OK , even status if end of file         
+                                                                              
+</PRE>
+<P>
+<HR>
+<H1><A NAME="sel_index">sel_index</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::sel_index ($rab, $key_size, $key_no)
+ int $rab
+ int $key_size
+ int $key_no
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : sel_index                                    
+                                                                           
+   Description        : Select for an index file the number of the key     
+                        which will be used for the next PUT, GET or FIND   
+                        service.                                           
+                                                                           
+   Input Parameters   : $key_size: Size of the key                          
+                        $key_no  : Number of the key selected               
+                      : $rab  : Record accessblock pointer, 
+                                this block contains the header 
+                                information related to the record. 
+   Return value       : RMS return status.                                 
+                                                                           
+</PRE>
+<P>
+<HR>
+<H1><A NAME="unlock">unlock</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::unlock ($rab) 
+ int $rab
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : unlock                                          
+                                                                              
+   Description        : Unlock the last record read or found.                 
+                                                                              
+   Input Parameters   : rab : Record accessblock pointer 
+                              this block contains info related    
+                              to the record.                               
+                                                                              
+   Output Parameters  : none                                                  
+                                                                              
+   Return value       : Odd status if OK , even status if record not found    
+</PRE>
+<P>
+<HR>
+<H1><A NAME="update">update</A></H1>
+<P>
+<HR>
+<H2><A NAME="Syntax">Syntax</A></H2>
+<P>
+<PRE> rms::update ($rab, $buffer, $size) 
+ int $rab
+ char $buffer
+ int $size
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>
+<PRE>   Function           : update                                          
+                                                                              
+   Description        : Replace the last read or found record with the        
+                        buffer.                                               
+                                                                              
+   Input Parameters   : $rab : Record accessblock pointer 
+                               this block contains info related    
+                               to the record.                               
+                                                                              
+                        $buffer : It    contains the record to be updated      
+</PRE>
+<P>
+<PRE>                        $size   : Size of buffer (note that it is not Null
+                                                  terminated)
+                                                                              
+   Output Parameters  : none                                                  
+                                                                              
+   Return value       : Odd status if OK , even status if record not found    
+                                                                              
+</PRE>
+</BODY>
+
+</HTML>

@@ -1,0 +1,238 @@
+<HTML><HEAD><TITLE>Signature.pm Doc</TITLE></HEAD><BODY><center><h1>Signature.pm</h2></center><h1>Modules</h1><ul></ul><h1>Functions:</h1><ul><li><a href="#crc_signature">crc_signature</a><li><a href="#md5_signature">md5_signature</a></ul><hr><h1>Main Script</h1><h2>Variables:</h2> <ul><li>$Id<li>$Revision<li>$VERSION<li>$file<li>$revision<li>%02d<li>%EXPORT_TAGS<li>%d<li>@EXPORT<li>@EXPORT_OK<li>@ISA<li>@r</ul>
+<h2>Calls:</h2><ul><li> AUTOLOAD</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Signature_doc.html,v 1.1 2000/05/04 21:14:19 idsweb Exp $
+#
+#   Description:    Provide encapsulated signature-generation routines for
+#                   use by various release manager and related tools.
+#
+#   Functions:      crc_signature
+#                   md5_signature
+#
+#   Libraries:      IO::File
+#                   MD5
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+###############################################################################
+#
+#   Sub Name:       crc_signature
+#
+#   Description:    Implement the CRC-based checksum used by the release
+#                   manager at www.hp.com.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    Name of the file to be 
+#                                                 checksum'd
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    string (multiple lines are joined by "\n")
+#                   Failure:    undef
+#
+###############################################################################/n</pre>
+<h2>Code:</h2> <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Signature_doc.html,v 1.1 2000/05/04 21:14:19 idsweb Exp $
+#
+#   Description:    Provide encapsulated signature-generation routines for
+#                   use by various release manager and related tools.
+#
+#   Functions:      crc_signature
+#                   md5_signature
+#
+#   Libraries:      IO::File
+#                   MD5
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+package IMS::ReleaseMgr::Signature;
+
+use 5.002;
+use strict;
+use vars qw($VERSION $revision @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use AutoLoader 'AUTOLOAD';
+use Carp;
+require Exporter;
+
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$revision = q$Id: Signature_doc.html,v 1.1 2000/05/04 21:14:19 idsweb Exp $;
+
+@ISA = qw(Exporter);
+@EXPORT = ();
+@EXPORT_OK = qw(crc_signature md5_signature);
+%EXPORT_TAGS = ();
+
+1;
+
+__END__
+
+###############################################################################
+#
+#   Sub Name:       crc_signature
+#
+#   Description:    Implement the CRC-based checksum used by the release
+#                   manager at www.hp.com.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    Name of the file to be 
+#                                                 checksum'd
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    string (multiple lines are joined by "\n")
+#                   Failure:    undef
+#
+###############################################################################
+sub crc_signature
+</pre>
+<br><hr><h1>Function: <a name="crc_signature">crc_signature</a></h1>
+<h2>Variables:</h2> <ul><li>$buffer<li>$crc<li>$fh<li>$file<li>%32C</ul>
+<h2>Calls:</h2><ul><li> close<li>new</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Signature_doc.html,v 1.1 2000/05/04 21:14:19 idsweb Exp $
+#
+#   Description:    Provide encapsulated signature-generation routines for
+#                   use by various release manager and related tools.
+#
+#   Functions:      crc_signature
+#                   md5_signature
+#
+#   Libraries:      IO::File
+#                   MD5
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+###############################################################################
+#
+#   Sub Name:       crc_signature
+#
+#   Description:    Implement the CRC-based checksum used by the release
+#                   manager at www.hp.com.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    Name of the file to be 
+#                                                 checksum'd
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    string (multiple lines are joined by "\n")
+#                   Failure:    undef
+#
+###############################################################################/n/n     $crc %= 32767; # ??? this is a 15-bit mask, not even 16, let alone 32?</pre>
+<h2>Code:</h2> <pre>{
+    my $file = shift;
+
+    require IO::File;
+
+    my $fh = new IO::File "< $file";
+    if (! defined $fh)
+    {
+        carp "Error opening $file for reading: $!, ";
+        return undef;
+    }
+
+    my $crc = 0;
+    my $buffer = '';
+    while (sysread($fh, $buffer, 16384))
+    {
+        $crc += unpack("%32C*", $buffer);
+    }
+    $crc %= 32767; # ??? this is a 15-bit mask, not even 16, let alone 32?
+    $fh->close;
+
+    "CRC: $crc";
+}</pre>
+<br><hr><h1>Function: <a name="md5_signature">md5_signature</a></h1>
+<h2>Variables:</h2> <ul><li>$fh<li>$file<li>$md5<li>$sum</ul>
+<h2>Calls:</h2><ul><li> close<li>new</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       md5_signature
+#
+#   Description:    Generate a checksum using the MD5 algorithm (via the MD5
+#                   extension).
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    Name of the file to be 
+#                                                 checksum'd
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    string (multiple lines are joined by "\n")
+#                   Failure:    undef
+#
+###############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my $file = shift;
+
+    require Digest::MD5;
+
+    my $fh = new IO::File "< $file";
+    if (! defined $fh)
+    {
+        carp "Error: could not open $file for reading: $!, ";
+        return undef;
+    }
+    my $md5 = new Digest::MD5;
+    $md5->addfile($fh);
+    my $sum = $md5->hexdigest;
+    $fh->close;
+
+    $sum;
+}</pre>
+</BODY></HTML>

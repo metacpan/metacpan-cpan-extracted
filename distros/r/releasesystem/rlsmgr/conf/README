@@ -1,0 +1,26 @@
+This directory holds sample configuration files.
+
+My recommendation is to develop a tool that, run on the client side,
+generates these files for all hosts in the mirror-pool database. The function
+and structure of the files needs to include:
+
+* Be named for the virtual host it represents (e.g. www.host.com)
+
+* Be runnable by the sysmonitord tool to restart a "missing" daemon
+
+* Be invocation-selectable as to whether the daemon that gets started reads
+  configuration from the file or directly from DBI (the current scripts don't
+  do this yet, either).
+
+* Be written in a way (probably Bourne shell code) that allows the parameter
+  key/value pairs to be written as "KEY=VALUE", while nothing else in the
+  file matches that pattern. This allows the file to double as a config file
+  for hosts that lack DBMS access, or for cases where the use of a config
+  file is simply preferred. See the existing config files for an illustration
+  of this.
+
+This will be much easier than it sounds from the description above. Fetching
+the entire mirror pool table is already an API call, and the rest of the
+script's body is basically the same from one host to the next, differing only
+in the hostname itself.
+

@@ -1,0 +1,22 @@
+0.04 Sat Aug  6 21:23:29 CEST 2011
+    BUGFIX: rigup cpan/cpanm does not process modules starting with + 
+0.03 Mon Jun 27 13:31:12 CEST 2011
+    * add some standard rigs out-of-the-box: modern, red, green
+    * correct execution of :task (skip .perlrig file)
+
+0.02 Tue Jun 14 10:57:59 CEST 2011
+    * fix for use eval mode - now it doesn't check if it's an Exporter 
+    * rigup -h with Pod text as usage
+
+0.01_04 Thu Dec 30 09:50:22 CET 2010
+	* Fix failing tests
+    * Pod
+
+0.01_03 Tue Dec 21 02:05:34 CET 2010
+	* Pod 
+
+0.01_02 Mon Dec 20 01:25:21 CET 2010
+	* Fixed command line 
+
+0.01_01 Sun Dec 19 21:55:07 CET 2010
+    * Initial release

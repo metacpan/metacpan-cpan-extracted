@@ -1,0 +1,104 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>Checklist for Installing and Configuring Release Manager on New Servers</TITLE>
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4><P>Checklist for Installing and Configuring Client Side Release Manager and CVS on New Servers</P>
+</FONT><I><FONT FACE="Arial"><P>This should be a section in a larger, more comprehensive document.</P>
+</B></I></FONT>
+<P>Last modified: 6/5/00 2:15 PM</P>
+<P>&nbsp;</P>
+
+<UL>
+</FONT><FONT FACE="Arial"><LI>Dependencies</LI></UL>
+
+</FONT><FONT SIZE=2>
+<P>Before packages can be distributed to target servers, the appropriate software must be built and placed into packages.  This document will not cover building software or creating packages in detail as these subjects deserve to have their own documents.  This section will mainly highlight possible problems and necessary steps.</P>
+
+<OL>
+
+<LI>Release Manager Depends on Perl.  Be sure Perl is built correctly.</LI>
+
+
+<UL>
+<LI>Obtain and install the latest versions of the Perl packages </FONT><FONT FACE="Courier New" SIZE=2>IMS-ReleaseMgr</FONT><FONT SIZE=2>.  This is located in the project </FONT><FONT FACE="Courier New" SIZE=2>ReleaseSystem</FONT><FONT SIZE=2> under CVS.</LI>
+
+<UL>
+<LI>Use the command &quot;gzip&nbsp;IMS</FONT><FONT FACE="Courier New" SIZE=2>-ReleaseMgr-X.YY.tar.gz&nbsp;|&nbsp;tar&nbsp;xvf&nbsp;–</FONT><FONT SIZE=2>&quot; to uncompress and unpack the archive. The &quot;X.YY&quot; represents the version number of the package, &quot;1.6&quot; for example.</LI>
+<LI>Change into the newly created directory: &quot;</FONT><FONT FACE="Courier New" SIZE=2>cd IMS-ReleaseMgr-X.YY</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Create the Makefile: &quot;</FONT><FONT FACE="Courier New" SIZE=2>perl Makefile.PL</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Build the package:  &quot;</FONT><FONT FACE="Courier New" SIZE=2>make</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Install the package: &quot;</FONT><FONT FACE="Courier New" SIZE=2>make install</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>The Perl module IMS::ReleaseMgr and all the associated pieces are now installed where Perl scripts can readily find them.</LI></UL>
+
+<LI>Compression for Release Manager depends on the availability of the zlib compression library.  Be sure this is installed and the </FONT><FONT FACE="Courier New" SIZE=2>Compress-Zlib</FONT><FONT SIZE=2> module is installed.</LI>
+</UL>
+
+<LI>Now build the install the ReleaseManager package itself:</LI>
+
+
+<UL>
+<LI>Use the command &quot;gzip&nbsp;ReleaseManager</FONT><FONT FACE="Courier New" SIZE=2>-X.YY.tar.gz&nbsp;|&nbsp;tar&nbsp;xvf&nbsp;–</FONT><FONT SIZE=2>&quot; to uncompress and unpack the archive. The &quot;X.YY&quot; represents the version number of the package, &quot;1.6&quot; for example.</LI>
+<LI>Change into the newly created directory: &quot;</FONT><FONT FACE="Courier New" SIZE=2>cd ReleaseManager-X.YY</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Create the Makefile: &quot;</FONT><FONT FACE="Courier New" SIZE=2>perl Makefile.PL</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Build the package:  &quot;</FONT><FONT FACE="Courier New" SIZE=2>make</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Install the package: &quot;</FONT><FONT FACE="Courier New" SIZE=2>make install</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>The tools that make up the Release Manager are now installed in </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/ahp-bin</FONT><FONT SIZE=2>.</LI></UL>
+
+
+<LI>Make sure Oracle is installed and configured correctly on target server</LI>
+<LI>Make sure all firewall punchthroughs for connecting to mirror database exist. (if needed) </LI></OL>
+
+
+<P>&nbsp;</P>
+
+<UL>
+</FONT><FONT FACE="Arial"><LI>Configuration</LI></UL>
+
+</FONT><FONT SIZE=2>
+<OL>
+
+
+<LI>Verify that </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/repository</FONT><FONT SIZE=2> is a symlink to the nfs-mounted repository.  (probably </FONT><FONT FACE="Courier New" SIZE=2>/nfs/repository</FONT><FONT SIZE=2>)</LI>
+<LI>If there are Oracle connection problems:</LI>
+
+
+<UL>
+<LI>Make sure that DBD::Oracle for perl was built with the same version of oracle on the target host.</LI></UL>
+
+
+<LI>If error "read_hostconfig: Error getting full mirror data table: Error initializing database connect to DATABASE"</LI>
+
+
+<UL>
+<LI>This is an oracle related problem.  Try connecting directly with sqlplus.  Perhaps tnsnames file is not configured?</LI></UL>
+
+<LI>Currently:</LI>
+
+
+
+<UL>
+<LI>Make sure idsweb user is mounted on target machine as necessary files are located there:</LI>
+
+<UL>
+<LI>~idsweb/etc/acl</FONT><FONT SIZE=2> directory</LI></UL>
+</UL>
+
+<LI>Future:</LI> 
+<UL>
+
+<UL>
+<FONT SIZE=2><LI>the </FONT><FONT FACE="Courier New" SIZE=2>acl</FONT><FONT SIZE=2> (access control list) directory is specified in the global config file at </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/local/dev_release.cfg</LI>
+</FONT><FONT SIZE=2><LI>the </FONT><FONT FACE="Courier New" SIZE=2>acl</FONT><FONT SIZE=2> directory should be relocated to some common nfs mounted location such as </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/local/acl</LI></UL>
+</UL>
+
+
+</FONT></OL>
+
+
+<B><I><FONT FACE="Arial"><P>Adding Mirror Specifications and Host Lists to Oracle</P>
+</B></I></FONT><FONT SIZE=2><P>There is now a tool for editing the mirror specification database. It operates on a CGI/HTTP model, and is as secure as can be without using SSL directly. A manual page for the tool is part of the </FONT><FONT FACE="Courier New" SIZE=2>IMS-ReleaseMgr</FONT><FONT SIZE=2> extension package. A link to the tool should probably be put on the webmaster page (where is it thus access-controlled). The tool is called &quot;</FONT><FONT FACE="Courier New" SIZE=2>edit_db.pl</FONT><FONT SIZE=2>&quot;, for those with access to the IMS source code.  </P></FONT></BODY>
+</HTML>

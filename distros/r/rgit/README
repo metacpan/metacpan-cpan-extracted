@@ -1,0 +1,119 @@
+NAME
+    rgit - Recursively execute a command on all the git repositories in a
+    directory tree.
+
+VERSION
+    Version 0.08
+
+SYNOPSIS
+        rgit [-K|-I|-D|-V] [GIT_OPTIONS] COMMAND [COMMAND_ARGS]
+
+DESCRIPTION
+    This utility recursively searches in a root directory (which may be the
+    current working directory or - if it has been set - the directory given
+    by the "GIT_DIR" environment variable) for all git repositories, sort
+    this list by the repository path, "chdir" into each of them, and
+    executes the specified git command. For efficiency reasons, repositories
+    located inside a bare repository or under the .git directory of a work
+    repository won't be searched for.
+
+    Moreover, those formats are substituted in the arguments before running
+    the command :
+
+    *   %n with the current repository name.
+
+    *   %g with the relative path (based from the root directory) to the
+        current repository.
+
+    *   %G with the absolute path to the current repository.
+
+    *   %w with the relative path (based from the root directory) to the
+        current repository's working directory.
+
+    *   %W with the absolute path to the current repository's working
+        directory.
+
+    *   %b with a "bareified" relative path, i.e. %g if this is a bare
+        repository, and "%w.git" otherwise.
+
+    *   %B with an absolute version of the "bareified" path.
+
+    *   %R with the absolute path to the root directory.
+
+    *   "%%" with a bare "%".
+
+    There are actually a few commands that are only executed once in the
+    root directory : "daemon", "gui", "help", "init" and "version". For any
+    of those, no format substitution is done.
+
+    You can specify which "git" executable to use with the "GIT_EXEC_PATH"
+    environment variable.
+
+COMMAND LINE SWITCHES
+    "rgit" takes its options as the capital switches that comes before the
+    git command. It's possible to bundle them together. They are removed
+    from the argument list before calling "git".
+
+    *   "-K"
+
+        Keep processing on error. The default policy is to stop whenever an
+        error occured.
+
+    *   "-I"
+
+        Enables interactive mode when the standard input is a tty. Requires
+        Term::ReadKey to be installed. This lets you choose interactively
+        what to do when one of the commands returns a non-zero status.
+
+    *   "-D"
+
+        Outputs diagnostics.
+
+    *   "-V"
+
+        Outputs the version.
+
+EXAMPLES
+    Execute "git gc" on all the repositories below the current directory :
+
+        rgit gc
+
+    Tag all the repositories with their name :
+
+        rgit tag %n
+
+    Add a remote to all repositories in "/foo/bar" to their bare counterpart
+    in "qux" on host :
+
+        GIT_DIR="/foo/bar" rgit remote add host git://host/qux/%b
+
+DEPENDENCIES
+    The core modules Carp, Config, Cwd, Exporter, File::Find, File::Spec and
+    POSIX.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-rgit at rt.cpan.org",
+    or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=rgit>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc rgit
+
+    Tests code coverage report is available at
+    <http://www.profvince.com/perl/cover/rgit>.
+
+COPYRIGHT & LICENSE
+    Copyright 2008,2009,2010 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

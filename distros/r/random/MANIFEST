@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/random.pm
+t/00-load.t
+t/01rand_integer.t
+t/02rand_fixed.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

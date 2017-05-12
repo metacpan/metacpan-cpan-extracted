@@ -1,0 +1,108 @@
+=head1 NAME
+
+populate - Syncronize the development web server with the CVS tree
+
+=head1 SYNOPSIS
+
+populate { -h | project_name } [ options... ]
+
+=head1 DESCRIPTION
+
+The B<populate> tool is the first stage of the three-tool release process.
+It is used to synchronize the development web server documents area with the
+CVS repository.
+
+=head1 OPTIONS
+
+There are a wide range of options to this tool. Unless using the C<-h>
+option, the command line must include at least one project name. Other
+options are:
+
+=over
+
+=item C<-h>
+
+Print a short usage summary and terse explanation of the available options.
+Exits immediately, even if passed with project names.
+
+=item C<-t title>
+
+When updating the I<topic-list> file, use C<title> in lieu of the project
+name. The topic-list file is used by the release management system during
+other stages, in constructing headers for data transmission, etc.
+
+=item C<-r symbol>
+
+Specificy a particular CVS/RCS tag for the CVS commands to retrieve during
+the update of files from the CVS repository. Without this, CVS will update
+using the most-recent (head) revisions of files.
+
+=item C<-e addr>
+
+If any errors occur that are deemed critical enough to warrant e-mail, this
+will specify additional addresses. The person running the command, the
+listed "owner" of the project, and the Webmaster Team are already targeted in
+the e-mail, so this option need not reference any of those.
+
+=item C<-cvsroot dir>
+
+Specify an alternate CVSROOT value. This is rarely used, as the CVS
+environment is very carefully managed by ATG.
+
+=item C<-debug>
+
+Enable some debugging-related output. This is mostly to keep users abreast
+of what point within the process the tool is currently at.
+
+=item C<-verbose>
+
+Enable some additional informational messages within the tool. This differs
+from C<-debug> in that the messages are more geared towards progress reporting
+than iterating command-line options before command execution, for example.
+
+=item C<-terse>
+
+Suppress the majority of the "normal" output, resulting in less feedback
+from the tool than is usually generated.
+
+=item C<-log file>
+
+Specify a different file name for logging output. The normal run of the
+release tools generates some amount of logging data, used mainly as a
+checklist in the case of problem diagnosis. If you wish the output to go to
+a specific location, use this option. Note that if the file exists, it must
+be writable by the user ID that the tools run B<as>, not your own. This is
+generally I<idsweb>. If the file does not exist, it will be created and owned
+by this UID.
+
+=item C<-h>
+
+Lastly, this option displays a brief summary of these options, then causes
+the tool to exit, even if there are any projects specified.
+
+=back
+
+For any of the options besides C<-h>, one or more project names must be
+specified. If more than one is passed, they are processed in the order
+given. At the end of execution, you will be informed if any were not able
+to successfully complete execution.
+
+=head1 SEE ALSO
+
+L<stage>, L<release>, L<cvs>
+
+=head1 CAVEATS
+
+Rather than always force redundant processing, the B<stage> tool no longer
+runs B<populate> unconditionally. It first checks that it is necessary to
+run this tool.
+
+=head1 AUTHOR
+
+Randy J. Ray <randyr@nafohq.hp.com>
+
+=head1 ENHANCEMENTS
+
+Kevin Greene
+
+=cut

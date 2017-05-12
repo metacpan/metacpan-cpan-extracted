@@ -1,0 +1,17 @@
+0.01    2007-11-25
+    - Initial release
+
+0.02    2007-11-25
+    - Skipped some more tests that cause problems under Debian.
+
+0.03    2007-11-25
+    - Fixed failing Debian tests.
+    - Improved build system - it's now EUMM all the way down.
+
+0.04    2007-12-19
+    - Improvements to flag processing for split special cases.
+      Thanks Ævar!
+
+0.05    2011-07-10 20:54:01
+    - Support for Perl 5.14.0 (gfx)
+

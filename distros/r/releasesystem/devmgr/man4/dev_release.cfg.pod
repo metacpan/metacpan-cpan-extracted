@@ -1,0 +1,147 @@
+=head1 NAME
+
+dev_release.cfg - Configuration file for the developer release tools
+
+=head1 SYNOPSIS
+
+Text file used to control the configuration of developer release tools
+
+=head1 DESCRIPTION
+
+The second-generation release manager tools introduced a more flexible approach
+to system configuration in the form of a central file that manages the various
+parameters that affect the overall system. Each line in the file is one of
+three types:
+
+=over
+
+=item blank
+
+Used for the sake of readability, to separate sections from each other.
+
+=item a comment
+
+Lines that start with the "#" character are treated as comments and ignored.
+
+=item a key/value assignment
+
+All lines of the form, "KEY=VALUE" are treated as assignment lines. The tag
+up to the "=" sign is treated as the key name, and all characters from after
+the (first) "=" to the end of the line are assigned as the value.
+
+=head1 FILE CONTENTS
+
+The following are the fields currently in use, and where applicable the default
+value is shown:
+
+=over
+
+=item ACL_DIR (/home/idsweb/etc/acl)
+
+The directory in which Access Control Lists (ACLs) are kept. If not specified
+as an absolute path, then assumed to be relative to the home directory of the
+user specified below in C<OWNER>.
+
+=item PROJECT_ROOT (/opt/ims/htdocs)
+
+This directory specifies the root directory under which project files are
+checked-out for the B<populate> step.
+
+=item STAGE_ROOT (/opt/ims/staging)
+
+The directory root of the staging area used by projects prior to release.
+
+=item EVENT_LOG (/opt/ims/htdocs/development-log.txt)
+
+All tool actions record one line to this file, to act as a simple log of
+activities.
+
+=item CVSROOT (/opt/ims/repository)
+
+This allows for the specification of the CVS base repository root. This is
+in case the person running the tools has not already set the value in their
+environment.
+
+=item DEVHOST (webdev.nafohq.hp.com)
+
+=item CVS (/opt/ims/bin/cvs)
+
+Path to the base CVS utility B<cvs>. This is used to create the CVS interface
+commands
+
+=item TAR (/opt/ims/bin/tar)
+
+Path to the UNIX B<tar> utility to use in creating archives. Soon to be
+obsoleted by the Perl B<Archive::Tar> package.
+
+=item FTP (/opt/ims/bin/ftp)
+
+The path to the local B<ftp> application to use. Allows for configuration of
+altername tools or versions of B<ftp> compiled with SOCKS support.
+
+=item TOPICLIST (.topiclist)
+
+This file is the internal topiclist file used by the tools. The topiclist is
+used only to define the project name and owner for e-mail purposes.
+
+=item BUILDLIST (.buildlist)
+
+The buildlist file, used to determine automatic building of projects and
+exlude release of specific directories or files (sourcecode).
+
+=item WEBLIST (.weblist)
+
+The internal weblist file, used to track the project manifest and modification
+times of individual files.
+
+=item RELEASE (.release)
+
+The name of the internal release tracking file used by the tools. This file
+marks when the last actual release was done of a given project.
+
+=item HALTFILE_PREFIX (etc/halt-)
+
+This value is used in the construction of the path to a potential "haltfile"
+for a given tool. If a haltfile exists for a tool, then execution of that
+tool is blocked until the halt is removed. If the file has length other than
+zero, then the contents are displayed on the terminal as an informative
+message to the user. If this value is not an absolute path, it is assumed to
+be relative to the home directory of the user specified in C<OWNER>.
+
+=item OWNER (idsweb)
+
+This defines the user ID that internal and system files should be owned by.
+This should be the ID under which all the tools run, so that access to the
+files is always a given.
+
+=item GROUP (idsweb)
+
+As above, this defines a group ID for ownership of any systems files or
+internal files.
+
+=item HTTP_PROXY (http://web-proxy:8088)
+
+When HTTP file upload (the default) is used to send a release package to a
+server, this value is used as the proxy for the connection request. Without
+this it would not be possible to make the connections beyond the corporate
+firewall.
+
+=back
+
+=head1 CAVEATS
+
+None (yet).
+
+=head1 SEE ALSO
+
+L<dev_rls_tool>, L<populate>, L<stage>, L<release>
+
+=head1 AUTHOR
+
+Randy J. Ray <randyr@nafohq.hp.com>
+
+=head1 ENHANCEMENTS
+
+Kevin Greene
+
+=cut

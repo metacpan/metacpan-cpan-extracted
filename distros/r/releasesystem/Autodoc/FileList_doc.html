@@ -1,0 +1,437 @@
+<HTML><HEAD><TITLE>FileList.pm Doc</TITLE></HEAD><BODY><center><h1>FileList.pm</h2></center><h1>Modules</h1><ul><li>Archive::Tar<li>Compress::Zlib<li>IMS::ReleaseMgr</ul><h1>Functions:</h1><ul><li><a href="#error">error</a><li><a href="#upload_files">upload_files</a></ul><hr><h1>Main Script</h1><h2>Variables:</h2> <ul><li>$Id<li>$Revision<li>$TAR<li>$VERSION<li>$basedir<li>$error_text<li>$files<li>$mirror<li>$project<li>$revision<li>$user<li>%02d<li>%d<li>%inc_dirs<li>@EXPORT<li>@EXPORT_OK<li>@ISA<li>@r</ul>
+<h2>Calls:</h2><ul><li> data<li>error<li>new</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: FileList_doc.html,v 1.1 2000/05/04 21:14:15 idsweb Exp $
+#
+#   Description:    Provide an interface by which an application can have files
+#                   written locally while also arranging for them to be
+#                   propagated to any mirrors of this host.
+#
+#   Functions:      upload_files
+#                   error
+#
+#   Libraries:      IMS::ReleaseMgr
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+###############################################################################
+#
+#   Sub Name:       upload_files
+#
+#   Description:    Take the list of files, along with other parameters, and
+#                   create a properly-crafted tar file which is then managed
+#                   via IMS::ReleaseMgr::new().
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $user     in      scalar    Authenticated user name
+#                   $mirror   in      scalar    Mirror group
+#                   $project  in      scalar    Name of the project that data
+#                                                 is for.
+#                   $basedir  in      scalar    Base directory path element(s)
+#                                                 under $project for files to
+#                                                 be put into
+#                   $files    in      hashref   Hash table reference for the
+#                                                 files. Keys are file names
+#                                                 (rel. to $project/$basedir)
+#                                                 and values are either local
+#                                                 file names or IO::File refs.
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################/n</pre>
+<h2>Code:</h2> <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: FileList_doc.html,v 1.1 2000/05/04 21:14:15 idsweb Exp $
+#
+#   Description:    Provide an interface by which an application can have files
+#                   written locally while also arranging for them to be
+#                   propagated to any mirrors of this host.
+#
+#   Functions:      upload_files
+#                   error
+#
+#   Libraries:      IMS::ReleaseMgr
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+package IMS::ReleaseMgr::FileList;
+
+use 5.002;
+use strict;
+use vars           qw(@ISA @EXPORT @EXPORT_OK $VERSION $revision
+                      $error_text $TAR %inc_dirs);
+use subs           qw(upload_files error);
+use Carp;
+use File::Path     qw(mkpath rmtree);
+use File::Copy     qw(copy);
+use File::Basename qw(dirname);
+use Cwd            qw(cwd);
+
+require Exporter;
+require IO::File;
+require IMS::ReleaseMgr;
+
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$revision = q$Id: FileList_doc.html,v 1.1 2000/05/04 21:14:15 idsweb Exp $;
+$error_text = '';
+$TAR = '/bin/tar';
+@ISA = qw(Exporter);
+@EXPORT = qw(upload_files error);
+@EXPORT_OK = @EXPORT;
+%inc_dirs = (
+             'www.interactive.hp.com' => '/opt/ims/incoming',
+             'www.dmo.hp.com'         => '/usr/local/etc/httpd/incoming',
+             'www.shopping.hp.com'    => '/opt/ims/incoming',
+             'www.buy.hp.com',        => '/opt/ims/www.buy.hp.com/incoming'
+            );
+1;
+
+###############################################################################
+#
+#   Sub Name:       upload_files
+#
+#   Description:    Take the list of files, along with other parameters, and
+#                   create a properly-crafted tar file which is then managed
+#                   via IMS::ReleaseMgr::new().
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $user     in      scalar    Authenticated user name
+#                   $mirror   in      scalar    Mirror group
+#                   $project  in      scalar    Name of the project that data
+#                                                 is for.
+#                   $basedir  in      scalar    Base directory path element(s)
+#                                                 under $project for files to
+#                                                 be put into
+#                   $files    in      hashref   Hash table reference for the
+#                                                 files. Keys are file names
+#                                                 (rel. to $project/$basedir)
+#                                                 and values are either local
+#                                                 file names or IO::File refs.
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################
+sub upload_files
+</pre>
+<br><hr><h1>Function: <a name="upload_files">upload_files</a></h1>
+<h2>Variables:</h2> <ul><li>$PKG<li>$TAR<li>$WL<li>$_<li>$basedir<li>$cwd<li>$dir<li>$directory<li>$err<li>$file<li>$files<li>$inc_dirs<li>$line<li>$mirror<li>$project<li>$revision<li>$tmpdir<li>$tmptar<li>$user<li>%s<li>@_</ul>
+<h2>Calls:</h2><ul><li> abort<li>close<li>commit<li>data<li>error<li>new<li>remove<li>validate</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: FileList_doc.html,v 1.1 2000/05/04 21:14:15 idsweb Exp $
+#
+#   Description:    Provide an interface by which an application can have files
+#                   written locally while also arranging for them to be
+#                   propagated to any mirrors of this host.
+#
+#   Functions:      upload_files
+#                   error
+#
+#   Libraries:      IMS::ReleaseMgr
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+###############################################################################
+#
+#   Sub Name:       upload_files
+#
+#   Description:    Take the list of files, along with other parameters, and
+#                   create a properly-crafted tar file which is then managed
+#                   via IMS::ReleaseMgr::new().
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $user     in      scalar    Authenticated user name
+#                   $mirror   in      scalar    Mirror group
+#                   $project  in      scalar    Name of the project that data
+#                                                 is for.
+#                   $basedir  in      scalar    Base directory path element(s)
+#                                                 under $project for files to
+#                                                 be put into
+#                   $files    in      hashref   Hash table reference for the
+#                                                 files. Keys are file names
+#                                                 (rel. to $project/$basedir)
+#                                                 and values are either local
+#                                                 file names or IO::File refs.
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################/n/n     #
+    # basic data sanity checks:
+    #
+    # Make a 'clean' base, without extra // or /./
+    #
+    # Get a name for a temp dir that isn't already in use
+    #
+        # Leading / not really a problem, but remove them along with trailing
+        #
+        # Create any needed subdirectories
+        #
+        # If this is not an ordinary scalar-string (name):
+        # Again, if this is not an ordinary scalar-string (name):
+    # Write a weblist for this soon-to-be tar file
+    print $WL "# weblist generated for $user by $revision, " .
+    #
+    # Now create the tar file
+    #
+    #
+    # Expect to replace this with Archive::Tar soon
+    #
+    #
+    # Later, we'll make this more flexible...
+    #
+    #
+    # Successfully processed
+    #
+    undef $PKG; # Force destructor now, rather than at exit</pre>
+<h2>Code:</h2> <pre>{
+    my ($user, $mirror, $project, $basedir, $files) = @_;
+
+    my ($tmpdir, $tmptar, $cwd, $file, $WL, $PKG, $directory);
+
+    #
+    # basic data sanity checks:
+    #
+    if ($project !~ /^([\w\-\+])+$/o)
+    {
+        error "The project name ($project) may only contain alphanumerics, " .
+            "- and +";
+        return 0;
+    }
+    if ($basedir =~ /\.\./o)
+    {
+        error "The base-directory specification ($basedir) may not contain " .
+            "any occurrances of ``..''";
+        return 0;
+    }
+    if (grep(/\.\./o, (keys %$files)))
+    {
+        error "The file name specifications may not contain any occurrances " .
+            "of ``..''";
+        return 0;
+    }
+    # Make a 'clean' base, without extra // or /./
+    $basedir =~ s|^/||go;
+    $basedir =~ s|/$||go;
+    $basedir =~ s|/\./|/|go;
+    $basedir =~ s|//|/|go;
+
+    #
+    # Get a name for a temp dir that isn't already in use
+    #
+    $tmpdir = "/tmp/irMfL-$$";
+    $tmpdir++ while (-e $tmpdir);
+    umask 02;
+    mkpath("$tmpdir/$project/$basedir", 0, 0775);
+
+    $cwd = cwd;
+    for $file (sort keys %$files)
+    {
+        # Leading / not really a problem, but remove them along with trailing
+        $file =~ s|^/||go;
+        $file =~ s|/$||go;
+
+        #
+        # Create any needed subdirectories
+        #
+        if ($file =~ m|/|o)
+        {
+            my $dir = dirname $file;
+            mkpath "$tmpdir/$project/$basedir/$dir", 0, 0775;
+        }
+        # If this is not an ordinary scalar-string (name):
+        seek($files->{$file}, 0, 0) if (ref $files->{$file});
+        if (! copy($files->{$file}, "$tmpdir/$project/$basedir/$file"))
+        {
+            error "Copy failed to file $tmpdir/$project/$basedir/$file: $!";
+            rmtree $tmpdir;
+            return 0;
+        }
+        # Again, if this is not an ordinary scalar-string (name):
+        seek($files->{$file}, 0, 0) if (ref $files->{$file});
+        chmod 0644, "./$file";
+    }
+
+    # Write a weblist for this soon-to-be tar file
+    $WL = new IO::File "> $tmpdir/$project/weblist";
+    unless (defined $WL)
+    {
+        error "Could not open $tmpdir/$project/weblist for writing: $!";
+        rmtree $tmpdir;
+        return 0;
+    }
+    print $WL "# weblist generated for $user by $revision, " .
+        (scalar localtime) . "\n";
+    print $WL (map
+           {
+               ($file = $_) =~ s|^/||go;
+               $file =~ s|/$||go;
+               $file =~ s|//|/|go;
+               $file =~ s|/\./|/|go;
+               $file = ($basedir) ? "$basedir/$file" : $file;
+
+               sprintf("%s\t%s\t%s\n",
+                       ($file =~ /(jpg|gif|pdf)$/oi) ? 'Fig' : 'Doc',
+                       $file, "/$project/" . dirname $file);
+           }
+               sort (keys %$files));
+    $WL->close;
+
+    #
+    # Now create the tar file
+    #
+    chdir $tmpdir;
+    if ($?)
+    {
+        error "Could not chdir to $tmpdir: $!";
+        chdir $cwd;
+        rmtree $tmpdir;
+        return 0;
+    }
+    #
+    # Expect to replace this with Archive::Tar soon
+    #
+    system("$TAR cf $project.tar $project 2>&1 > /dev/null");
+    $? >>= 8;
+    if ($?)
+    {
+        error "System error executing ``$TAR cf $project.tar $project'': $!";
+        chdir $cwd;
+        rmtree $tmpdir;
+        return 0;
+    }
+
+    #
+    # Later, we'll make this more flexible...
+    #
+    $directory = $inc_dirs{$mirror} || '/tmp';
+    $PKG = new IMS::ReleaseMgr(name      => $project,
+                               user      => $user,
+                               nomail    => 1,
+                               file      => "$tmpdir/$project.tar",
+                               directory => $directory);
+    unless (defined $PKG)
+    {
+        error "Unable to create upload package";
+        chdir $cwd;
+        rmtree $tmpdir;
+        return 0;
+    }
+    unless ($PKG->validate)
+    {
+        my ($err, $file, $line) = $PKG->error;
+        $PKG->abort;
+        error "Package upload error detected at $file, line $line: $err";
+        chdir $cwd;
+        rmtree $tmpdir;
+        return 0;
+    }
+
+    unless ($PKG->commit)
+    {
+        my ($err, $file, $line) = $PKG->error;
+        $PKG->abort;
+        error "Package upload error detected at $file, line $line: $err";
+        chdir $cwd;
+        rmtree $tmpdir;
+        return 0;
+    }
+
+    #
+    # Successfully processed
+    #
+    $PKG->close;
+    undef $PKG; # Force destructor now, rather than at exit
+
+    error '';
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="error">error</a></h1>
+<h2>Variables:</h2> <ul><li>$IMS<li>$text</ul>
+<h2>Calls:</h2><ul><li> </ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       error
+#
+#   Description:    Get/set the message associated with the most recent error
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $text     in      scalar    If passed, set the error text
+#                                                 to this before returning.
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        current error text
+#
+###############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my $text = shift;
+
+    $IMS::ReleaseMgr::FileList::error_text = $text
+        if (defined $text and $text);
+
+    $IMS::ReleaseMgr::FileList::error_text;
+}</pre>
+</BODY></HTML>

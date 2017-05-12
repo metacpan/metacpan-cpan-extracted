@@ -1,0 +1,193 @@
+# -*- text -*-
+
+=head1 NAME
+
+edit_db.pl - A CGI/HTTP based editor for the Release Manager data tables
+
+=head1 SYNOPSYS
+
+edit_db.pl is invoked as a CGI script only
+
+=head1 DESCRIPTION
+
+I got really tired really quickly of making all the changes to the mirror
+database tables using SQL*Net. This tool is the result. It also contains
+a lot of Perl programming tricks that I've picked up over the years from
+various Perl personalities I've had the fortune (good and bad) to meet.
+
+When the tool is invoked, it forks and becomes a daemon process. This
+process in turn starts up a mini-HTTP listener on a random port. It also
+devises a session identifier using several random elements. This session
+ID and the URL to the new HTTP listener are sent back to the browser as a
+HTTP redirect request. Then things get interesting.
+
+The listener opens a DBI connection to the database that holds the tables
+for the mirror specifications and mirror host-lists. It fills internal
+tables with the current state of the DBMS tables, and keeps the DBI
+connection active throughout the lifespan of the process. A main page is
+then presented, with all the data laid out in a series of forms, with a
+range of submit-style buttons for enacting changes or switching to different
+screens. All form actions are directed back at the currently-running server.
+As such, all the Perl code to handle the requests is already in memory
+(though not all of the code is compiled initially; delayed-loading is used
+to reduce overhead and startup time).
+
+=head2 The Main Page
+
+At present, the main page is one large sequence of mirror-blocks (a
+mirror-block is defined at that grouping from one horizontal ruling line
+to the next line, and encompasses the table of specification values, the
+list of hosts that comprise the pool, several buttons, and a link back to
+the top of the page). It is a good candidate for implementation as a 
+frameset, with a main bar that provides the global buttons (exit, add new,
+etc.) and links to bring up a specific mirror pool in the other frame. But
+I didn't get that far.
+
+The page starts with a title (so that you know you're running the right
+application) and a list of all the mirror groups currently in the database.
+Each of this is expressed as a hyperlink. Clicking on one takes the browser
+to the top of that mirror-block. Following this list of links, are two buttons.
+The first takes the user to the screen for adding a new specification. The
+second exits the editor (hereafter referred to as "MDE").
+
+From this point, there is a sequence of mirror-blocks (as defined above), one
+for each host in the current database. The basic structure of these blocks
+is as follows:
+
+    A line with the mirror name, and (currently unused) details
+    A delete button affecting the entire set of mirror data
+    A button to exit MDE
+    A table of specification data:
+        Each line shows the field name, and the value.
+        Because the release manager uses variables and does
+        variable expansion, the expanded value is shown below
+        the entry field (but only if it differs from the real
+        value).
+    A line with two buttons:
+        The leftmost enacts any changes to fields made in the table
+        The rightmost deletes the mirror specification completely
+    A second table, this one listing hosts in the mirror pool:
+        Each table line shows the hostname, port (if not 80) and
+        has a delete button.
+        At the bottom of the table is a button to add more hosts
+        to the pool. Even those "mirror groups" that consist of
+        only one host have the one host entered here.
+    Lastly, a link back to the top of the page.
+
+At the end of the main page is a simple page-footer with the current date
+and time, and the revision of the tool that is executing.       
+
+=head2 Adding a New Mirror Group
+
+Selecting the "Create a New Mirror Pool" button takes the user to a simple
+screen with one entry field and a button to enact the addition of data.
+The name of the new mirror pool is entered into the blank provided. When
+the button is pressed, the mirror specification is created with most of
+the fields filled in with default values. The browser is taken back to the
+main screen, positioned at the top of the mirror-block for the newly-added
+group. At this point, the user can edit any of the fields that stray from
+the defaults (such as the HTTP_AUTH_PASSWD, which is not meant to have a
+usable default value).
+
+If no new mirror group is to be added after all, there is a link just under
+the page title that will return the browser to the main page without making
+any DBMS calls.
+
+=head2 Adding Hosts for the New Group
+
+When a new mirror group is created, there are no hosts automatically added
+to the host list. This is because the hosts may have numbers in their
+names, to distinguish different members of the same mirror pool. Clicking
+on the "add hosts" button takes the user to a screen on which up to four
+hosts may be added at a time. There are four rows of entry fields. The
+fields are for the hostname, port (if different than the default of 80),
+and optionally for the physical hostname (example: dmowebdb.corp.hp.com
+has a physical hostname of hpcc518.corp.hp.com).
+
+When the data is all entered, clicking on the "Add These Hosts" button
+causes the data to be committed to the DBMS. The user is then taken back
+to the main page, with the browser positioned at that mirror-block. As with
+the other add-data page, there is an escape link at the top of the page to
+return to the main page without affecting the database.
+
+=head2 Editing an Existing Mirror Specification
+
+The editing of existing data is done in-place on the main page. Each of the
+mirror-blocks displays the current data for a given specification in editable
+entry fields. Changes may be made to as many fields as desired, for a single
+mirror-block. When editing is complete, clicking on the "Make changes to
+I<host>" (where I<host> is the particular mirror pool) button will commit the
+changes. The browser will return to the main page automatically, positioned
+at the top of the mirror-block that was just edited.
+
+It is not possible to make changes to more than one mirror-block at a time.
+The button clicked is used by the editor to determine which set of entries
+should be examined for changes. There is no confirmation screen for simple
+edits; if an error is made, it is simple to go back and correct it.
+
+=head2 Editing/Changing Hosts in a Mirror Pool
+
+There is not currently any means by which to edit or change mirror pool host
+data. The only approach is to delete the host specification (using the
+"Delete" button beside it) in question, then go to the "Adding Hosts" page
+for that mirror group and re-entering the newer information.
+
+=head2 Deleting Information
+
+Deleting information, whether an individual host from the list of mirrors
+in the pool or an entire mirror specification, is the only truly destructive
+operation that MDE provides. Because of this, each of these operations
+has a confirmation screen before actually making the changes to the DBMS.
+
+Each of the hosts that comprise the mirror pool has a button on the extreme
+right labeled "Delete this mirror". Clicking on it will lead to the removal
+of that one host from the mirror pool host list for that mirror group.
+
+At the end of the table of mirror spec values there is a button labeled
+"Delete specs for I<hostname>" (where I<hostname> is the mirror group in
+question). Clicking on this button will lead to the deletion of the
+specifications, but not the host list.
+
+At the top of each mirror-block is a button labeled "Completely delete
+I<hostname>". Clicking this button will lead to the entire mirror entry
+being removed, specification and host lists alike.
+
+=head2 Exiting
+
+Because the default timeout period is five minutes, the person running this
+tool may not want to simply leave the server running until the timeout
+triggers. To this end, there is a button labeled "Exit MDE" at the top of
+each mirror-block. Clicking this button causes the listener to send one final
+page to the browser, then immediately exit.
+
+Note that if the timeout is reached, the browser does not reflect this. The
+only indication is that clicking on a link or button returns a "server not
+found" error.
+
+=head1 CAVEATS
+
+Tons. But I'm almost certain that this tool will not accidentally destroy
+any data. If the person running it hits the wrong button, that's different.
+But all the destructive operations have confirmation screens, so the
+danger of that should be minimal.
+
+There should also be a better way of tuning certain hard-coded parameters,
+such as what DBMS is being connected to, what the timeout between requests
+should be, etc.
+
+Lastly, B<and very importantly>, most errors result in the immediate exit
+of the WWW server. This is not accidental, this is intentional. The functions
+being performed by this tool are fairly sensitive, and anything suspect
+needs to be treated as a potential crack attempt. From a browser, it is fairly
+trivial to re-start an edit session if a simple mistake causes the termination
+of an existing session.
+
+=head1 SEE ALSO
+
+L<HTTP::Daemon>, L<CGI>, L<DBI>
+
+=head1 AUTHOR
+
+Randy J. Ray <randyr@nafohq.hp.com>
+
+=cut

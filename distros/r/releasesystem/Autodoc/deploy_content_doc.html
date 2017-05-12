@@ -1,0 +1,1043 @@
+<HTML><HEAD><TITLE>deploy_content Doc</TITLE></HEAD><BODY><center><h1>deploy_content</h2></center><h1>Modules</h1><ul><li>Archive::Tar<li>Compress::Zlib<li>HTML::Entities<li>HTML::HeadParser<li>HTML::Parser<li>HTTP::Date<li>HTTP::Headers<li>HTTP::Message<li>HTTP::Request<li>HTTP::Request::Common<li>HTTP::Response<li>HTTP::Status<li>IMS::ReleaseMgr::Signature<li>IMS::ReleaseMgr::Transfer<li>IMS::ReleaseMgr::Utils<li>LWP<li>LWP::Protocol<li>LWP::UserAgent<li>Mail::Header<li>Mail::Internet<li>Net::Domain<li>Text::Tabs<li>Text::Wrap<li>URI<li>URI::Escape<li>URI::URL</ul><h1>Functions:</h1><ul><li><a href="#mirror_propagate">mirror_propagate</a><li><a href="#read_info">read_info</a></ul><hr><h1>Main Script</h1><h2>Variables:</h2> <ul><li>$0<li>$1<li>$DYNAMIC_FILE_UPLOAD<li>$ENV<li>$FH<li>$Id<li>$MIRROR_RETRIES<li>$MIRROR_WAIT_PERIOD<li>$Revision<li>$SIG<li>$USAGE<li>$VERSION<li>$_<li>$basedir<li>$basefile<li>$cmd<li>$command<li>$compression_support<li>$config<li>$email_list<li>$error_email_list<li>$file<li>$hostname<li>$hour<li>$href<li>$htdocs_dir<li>$incoming_dir<li>$info<li>$log_dir<li>$lref<li>$mday<li>$min<li>$mirror_group<li>$month<li>$opts<li>$push_log_dir<li>$push_log_file<li>$revision<li>$script<li>$sec<li>$server_root<li>$signature<li>$stage_dir<li>$tar<li>$tarfile<li>$tfile<li>$time_now<li>$timestamp<li>$trace<li>$webmaster<li>$workfile<li>$year<li>%02d<li>%18s<li>%d<li>%info<li>%m<li>%opts<li>%s<li>%y<li>@ARGV<li>@_<li>@command<li>@info<li>@nafohq<li>@r<li>@res_text</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>DBI_mirror_host_list<li>DBI_mirror_specification<li>POST<li>URI<li>clone<li>content<li>create<li>data<li>date<li>delete<li>end<li>eq<li>error<li>exists<li>extract_archive<li>file_error<li>file_mirror_host_list<li>file_mirror_specification<li>from<li>get<li>header<li>hostfqdn<li>hostname<li>md5_signature<li>message<li>mirror<li>mirror_upload<li>new<li>on<li>path<li>print<li>remove<li>send_mail<li>show_version<li>strict<li>write<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>#!/opt/ims/perl5/bin/perl
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: deploy_content_doc.html,v 1.1 2000/05/04 21:14:28 idsweb Exp $
+#
+#   Description:    Take the info file passed in and manage the verification
+#                   of the fields, the population of data into the staging
+#                   and release areas, and effect the posting of the data to
+#                   other servers in the mirror pool if requested.
+#
+#   Functions:      read_info
+#                   send_mail
+#                   mirror_propagate
+#
+#   Libraries:      IMS::ReleaseMgr::Signature
+#                   Carp                    Core lib (better error messages)
+#                   File::Copy              Core lib (smart 'mv' clone)
+#                   File::Path              Core lib (emulate 'rm -rf' in Perl)
+#                   Fcntl                   Core lib (flock constants)
+#                   IO::File                Core lib (I/O classes)
+#                   Getopt::Long            Core lib (cmd-line parsing)
+#                   Sys::Hostname           Core lib (smart 'hostname' command)
+#                   Net::Domain             CPAN lib for getting FQDN
+#                   Mail::Internet          CPAN lib for sending UNIX mail
+#                   Mail::Header              part of the above
+#                   LWP::UserAgent          \
+#                   HTTP::Request::Common    > CPAN libs, used for mirroring
+#                   URI::URL                /
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  The tool usage error message
+#
+#   Environment:    PATH                    This has to be trimmed drastically
+#                                             for security
+#
+##############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};;
+#
+# The Archive::Tar package handles compression automatically. However, that
+# means that the file could possibly arrive with a ".gz" suffix to the name.
+# Later, when deriving the tarfile name, we only want to accept that suffix
+# as a contender if this mirror is configured to use compression.
+#
+    #
+    # Set up a file for tracing to write to. In absence of -T, we use STDOUT
+    #
+if ($trace & 8) # bxxxx1xxx
+# Make sure that the argument the program was called with is
+# actually a name of a file present in the either $stage_dir or $incoming_dir.
+# If not, exit with an error message.
+# Parse the lines into hash keys, leave only the old-style digital signature
+# (if present) in @info:
+# Take the argument, delete the part of the path which denotes the directory
+# and the suffix ".info".
+# If the tarred file is not there, exit with an error message
+# time calculation - roughly equivalent to date +%y%m%d
+#
+# pick up the info file and move it
+#     Moving it prevents the monitor from trying to run another process to
+#     handle this data.
+#
+    # Hmm... the topic dir is already here...
+        # 36 iterations with a 5-sec sleep-- give them 3 minutes to finish
+#
+# Check again and move things back around if the dir is still there
+#
+#
+# Give a heads-up on whether the content arrived in compressed form
+#
+#
+# Check the MD5 stamp if one is present. This is not yet required, but probably
+# will be once the overall system is finished on both ends.
+#
+        #
+        # Signatures don't match. We cannot release this content.
+        #
+# Untar the topic to be pushed
+#
+# We don't have to actually worry about the "compressed" header, since the
+# Archive::Tar class auto-detects compressed content.
+#
+#
+# At this point, safe to assume that it worked.
+#
+# Use process_content (or user-specified tool) to push out new data
+#
+# $file is the destination, minus leading /. Tar should have left a directory
+# by that name in $stage_dir.
+#
+#
+# Construct the command to execute, based on the value of $script and the
+# command-line args that need to be carried over.
+#
+# Have had some problems with IO::Pipe in the past
+# This routine from File::Path does a clean, recursive deletion
+#
+# Mirror the data if we are using an RDBMS model. If there are no mirrors,
+# this routine won't do anything.
+#
+    #
+    # Remove the staging directory, as we don't want to interfere with future
+    # release attempts (mirrors be darned...)
+    #
+# remove the tar file (info file already moved)
+##############################################################################
+#
+#   Sub Name:       read_info
+#
+#   Description:    Read the info file, converting the Info:xxxx lines into
+#                   hash keys and trimming the input list down to all "extra"
+#                   lines (which will later be treated as the checksum/
+#                   signature of the tar file).
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $href     in      hashref   The hash to store key/value
+#                                                 pairs in
+#                   $lref     in      listref   The lines from the info file.
+#                                                 On exit will be pared down to
+#                                                 just the checksum lines.
+#
+#   Globals:        $trace
+#                   $tfile
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    dies
+#
+##############################################################################/n</pre>
+<h2>Code:</h2> <pre>#!/opt/ims/perl5/bin/perl
+    eval 'exec perl -S $0 "$@"'
+        if 0;
+
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: deploy_content_doc.html,v 1.1 2000/05/04 21:14:28 idsweb Exp $
+#
+#   Description:    Take the info file passed in and manage the verification
+#                   of the fields, the population of data into the staging
+#                   and release areas, and effect the posting of the data to
+#                   other servers in the mirror pool if requested.
+#
+#   Functions:      read_info
+#                   send_mail
+#                   mirror_propagate
+#
+#   Libraries:      IMS::ReleaseMgr::Signature
+#                   Carp                    Core lib (better error messages)
+#                   File::Copy              Core lib (smart 'mv' clone)
+#                   File::Path              Core lib (emulate 'rm -rf' in Perl)
+#                   Fcntl                   Core lib (flock constants)
+#                   IO::File                Core lib (I/O classes)
+#                   Getopt::Long            Core lib (cmd-line parsing)
+#                   Sys::Hostname           Core lib (smart 'hostname' command)
+#                   Net::Domain             CPAN lib for getting FQDN
+#                   Mail::Internet          CPAN lib for sending UNIX mail
+#                   Mail::Header              part of the above
+#                   LWP::UserAgent          \
+#                   HTTP::Request::Common    > CPAN libs, used for mirroring
+#                   URI::URL                /
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  The tool usage error message
+#
+#   Environment:    PATH                    This has to be trimmed drastically
+#                                             for security
+#
+##############################################################################
+use vars qw($cmd);
+($cmd = $0) =~ s|.*/||o;
+
+use 5.004;
+
+use strict;
+use vars qw($USAGE $server_root $incoming_dir $stage_dir $htdocs_dir $log_dir
+            $push_log_dir $timestamp $hostname $file $webmaster $push_log_file
+            $trace $tfile $script %info @info $FH @res_text $basefile $tarfile
+            $workfile @command $email_list $error_email_list $basedir %opts
+            $config $mirror_group $MIRROR_RETRIES $MIRROR_WAIT_PERIOD $tar
+            $VERSION $revision $compression_support);
+use subs qw(read_info send_mail mirror_propagate Archive::Tar::error);
+
+use Carp                   qw(carp croak);
+use Cwd                    'cwd';
+use File::Copy             'move';
+use File::Path             qw(rmtree mkpath);
+use Fcntl                  ':flock';
+use Getopt::Long           'GetOptions';
+use Sys::Hostname          'hostname';
+use Net::Domain            'hostfqdn';
+use LWP::UserAgent;
+use HTTP::Request::Common  qw(POST $DYNAMIC_FILE_UPLOAD);
+use URI::URL;
+require IO::File;
+require Mail::Header;
+require Mail::Internet;
+require Text::Wrap;
+require Archive::Tar;
+
+use IMS::ReleaseMgr::Utils     qw(write_log_line send_mail show_version
+                                  file_mirror_specification
+                                  file_mirror_host_list
+                                  file_error
+                                  DBI_mirror_specification
+                                  DBI_mirror_host_list
+                                  DBI_error);
+use IMS::ReleaseMgr::Transfer  'mirror_upload';
+use IMS::ReleaseMgr::Signature 'md5_signature';
+
+($basedir = $0) =~ s|^(.*)/(.*)$|$1|o;
+$basedir = cwd if ($basedir eq '.');
+$ENV{PATH} = "$basedir:/bin:/usr/bin:/sbin:/opt/ims/bin";
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};;
+$revision = q{$Id: deploy_content_doc.html,v 1.1 2000/05/04 21:14:28 idsweb Exp $ };
+
+$USAGE = "Usage: $cmd mirror_group file [ -H host ] [ -t level ] [ -T file ]
+\t[ -c file ]
+
+Where:
+-H host\t\tUse 'host' for identification (instead of system value)
+-t num\t\tEnable tracing (num sets level)
+-T file\t\tSend trace information to 'file' instead of tty
+-c file\t\tRead configuration from 'file' instead of DBMS
+
+``file'' is the release manager ticket file, and must end in ``.info''.
+``mirror_group'' is the name of the host-pool grouping that this process is
+running as a part of. It is used as a search key in the DBMS.
+";
+if (grep($_ eq '-h', @ARGV))
+{
+    print "$USAGE\n$revision\n";
+    exit 0;
+}
+exit show_version if (grep(/-version/i, @ARGV));
+
+$MIRROR_RETRIES     = 3;
+$MIRROR_WAIT_PERIOD = 30;
+
+$SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /bad free/oi; };
+Getopt::Long::config 'no_ignore_case';
+GetOptions(\%opts, 'H=s', 't=i', 'T=s', 'c=s') or croak "$USAGE\nStopped";
+$mirror_group = shift || croak "$USAGE\nStopped";
+$file         = shift || croak "$USAGE\nStopped";
+
+if (defined $opts{c} and $opts{c})
+{
+    $config = file_mirror_specification(-file => $opts{c});
+    croak "$cmd was unable to get data for $mirror_group from file $opts{c}," .
+        " stopped" unless (defined $config);
+}
+else
+{
+    $config = DBI_mirror_specification(-mirror => $mirror_group);
+    croak "$cmd was unable to get data for $mirror_group from Oracle, stopped"
+        unless (defined $config);
+}
+
+$hostname = hostname;
+
+$trace        = $opts{t}                   || 0;
+$tfile        = $opts{T}                   || '-';
+$server_root  = $config->{SERVER_ROOT}     || '/opt/ims';
+$incoming_dir = $config->{INCOMING_DIR}    || "$server_root/incoming";
+$stage_dir    = $config->{STAGING_DIR}     || "$server_root/staging";
+$htdocs_dir   = $config->{DOCUMENT_ROOT}   || "$server_root/htdocs";
+$log_dir      = $config->{LOGGING_DIR}     || "$server_root/logs";
+$push_log_dir = $config->{PKG_LOGGING_DIR} || "$log_dir/Pushes";
+$webmaster    = $config->{WEBMASTER}       || 'webmaster@nafohq.hp.com';
+$script       = $config->{STAGE_3_TOOL}    || 'process_content';
+#
+# The Archive::Tar package handles compression automatically. However, that
+# means that the file could possibly arrive with a ".gz" suffix to the name.
+# Later, when deriving the tarfile name, we only want to accept that suffix
+# as a contender if this mirror is configured to use compression.
+#
+$compression_support = (defined $config->{COMPRESSION} and
+                        $config->{COMPRESSION} !~ /no|false|0/i);
+
+if ($trace)
+{
+    #
+    # Set up a file for tracing to write to. In absence of -T, we use STDOUT
+    #
+    write_log_line $tfile, sprintf("$cmd [$$] [%s] Started with tracing",
+                                   (scalar localtime));
+}
+
+if ($trace & 8) # bxxxx1xxx
+{
+    write_log_line($tfile,
+                   map {
+                       sprintf("$cmd [$$] CONFIG: %18s => %s",
+                               $_, $config->{$_})
+                   } (sort keys %$config));
+}
+
+write_log_line("$log_dir/$cmd", sprintf("%s [$$] Called to deploy for $file",
+                                        scalar localtime));
+
+# Make sure that the argument the program was called with is
+# actually a name of a file present in the either $stage_dir or $incoming_dir.
+# If not, exit with an error message.
+if (-f "$stage_dir/$file")
+{
+    $workfile = "$stage_dir/$file";
+}
+elsif (-f "$incoming_dir/$file")
+{
+    $workfile = "$incoming_dir/$file";
+}
+else
+{
+    croak "Error: Can't find $stage_dir/$file or $incoming_dir/$file, stopped";
+}
+
+$FH = new IO::File "< $workfile";
+if (! defined $FH)
+{
+    croak "Error opening $file for reading: $!, stopped";
+}
+chomp(@info = <$FH>);
+$FH->close;
+
+# Parse the lines into hash keys, leave only the old-style digital signature
+# (if present) in @info:
+read_info \%info, \@info;
+if ($trace & 1)
+{
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Package destination is %s",
+                           (scalar localtime), $info{dest}));
+}
+$email_list = (defined $info{email} and $info{email}) ? $info{email} : '';
+$email_list =~ tr/, /,/s;
+$email_list =~ s/^,//o;
+$error_email_list = (length $email_list) ?
+    "$error_email_list,$webmaster" : $webmaster;
+
+# Take the argument, delete the part of the path which denotes the directory
+# and the suffix ".info".
+($basefile = $file) =~ s/\.info$//o;
+
+# If the tarred file is not there, exit with an error message
+if (-f "$incoming_dir/$basefile.tar")
+{
+    $tarfile = "$incoming_dir/$basefile.tar";
+}
+elsif ($compression_support and -f "$incoming_dir/$basefile.tar.gz")
+{
+    $tarfile = "$incoming_dir/$basefile.tar.gz";
+}
+elsif (-f "$server_root/$basefile.tar")
+{
+    $tarfile = "$server_root/$basefile.tar";
+}
+elsif ($compression_support and -f "$server_root/$basefile.tar.gz")
+{
+    $tarfile = "$server_root/$basefile.tar.gz";
+}
+else
+{
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Found no tar archive %s.tar",
+                           (scalar localtime), $basefile))
+        if ($trace);
+    write_log_line("$log_dir/$cmd",
+                   sprintf("%s [$$] Fatal error: No $basefile.tar found",
+                           scalar localtime));
+    rename $workfile, "$workfile.NO_TAR";
+    croak "Error: can't find $server_root/$basefile.tar or " .
+        "$incoming_dir/$basefile.tar, stopped";
+}
+
+if ($trace & 4)
+{
+    my $time_now = scalar localtime;
+    write_log_line $tfile, "$cmd [$$] [$time_now] Work file: $workfile";
+    write_log_line $tfile, "$cmd [$$] [$time_now] Tar  file: $tarfile";
+}
+
+# time calculation - roughly equivalent to date +%y%m%d
+{
+    my ($sec, $min, $hour, $mday, $month, $year) = localtime;
+    $month++;
+    $timestamp = sprintf("%02d%02d%02d-%02d%02d",
+                         $year, $month, $mday, $hour, $min);
+}
+
+($file = $info{dest}) =~ s|^/||o;
+mkpath($push_log_dir, 0, 0755);
+$push_log_file = "$push_log_dir/$file.info-$timestamp";
+if ($trace & 2)
+{
+    write_log_line $tfile, sprintf("$cmd [$$] [%s] Detail in $push_log_file",
+                                   scalar localtime);
+}
+
+#
+# pick up the info file and move it
+#     Moving it prevents the monitor from trying to run another process to
+#     handle this data.
+#
+move $workfile, $push_log_file;
+if (move $tarfile, $stage_dir)
+{
+    $tarfile =~ s|^.*/||;
+    $tarfile = "$stage_dir/$tarfile";
+}
+
+chdir $stage_dir;
+
+if (-d $file)
+{
+    # Hmm... the topic dir is already here...
+    for (1 .. 36)
+    {
+        # 36 iterations with a 5-sec sleep-- give them 3 minutes to finish
+        sleep 5;
+        last if (! -d $file);
+    }
+}
+
+#
+# Check again and move things back around if the dir is still there
+#
+if (-d $file)
+{
+    move $push_log_file, "$stage_dir/$file-$timestamp.info";
+    move $tarfile,       "$stage_dir/$file-$timestamp.tar";
+
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] $stage_dir/$file is in use",
+                           scalar localtime))
+        if ($trace);
+    write_log_line("$log_dir/$cmd",
+                   sprintf("%s [$$] Deploy failed: Directory $stage_dir/" .
+                           "$file already exists", scalar localtime));
+
+    send_mail($error_email_list, "$cmd: Deploy failure for $file",
+              [ "The uploaded package intended for project $file could not\n",
+                "be deployed because the directory $stage_dir was already\n",
+                "in use. The info and tar files have been preserved in:\n",
+                "\n",
+                "\t$stage_dir/$file-$timestamp.info\n",
+                "\t$stage_dir/$file-$timestamp.tar\n",
+                "\n",
+                "$revision\n" ]);
+
+    croak "Error: Directory $stage_dir/$file already in use, stopped";
+}
+
+#
+# Give a heads-up on whether the content arrived in compressed form
+#
+if (defined $info{compressed} and ($info{compressed} =~ /^\d+$/))
+{
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Content sent compressed (level %d)",
+                           scalar localtime, $info{compressed}))
+        if (($info{compressed} > 0) && ($trace & 2));
+}
+
+#
+# Check the MD5 stamp if one is present. This is not yet required, but probably
+# will be once the overall system is finished on both ends.
+#
+if (defined $info{md5} and $info{md5})
+{
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Checking MD5 stamp on $tarfile",
+                           scalar localtime))
+        if ($trace & 4);
+
+    my $signature = md5_signature $tarfile;
+    if ($signature ne $info{md5})
+    {
+        #
+        # Signatures don't match. We cannot release this content.
+        #
+        write_log_line($tfile,
+                       sprintf("$cmd [$$] [%s] MD5 stamp did not match",
+                               scalar localtime));
+        if ($trace & 8)
+        {
+            move $push_log_file, "$stage_dir/$file-$timestamp.info";
+            move ($tarfile, "$stage_dir/$file-$timestamp." .
+                            ($tarfile =~ /\.tar\.gz/ ? 'tar.gz' : 'tar'));
+            send_mail($error_email_list, "$cmd: Deploy failure for $file",
+                      [ "The uploaded package intended for project $file was" .
+                        " not deployed due to a mis-match of content\n",
+                        "checksums. The files have been preserved in:\n",
+                        "\n",
+                        "\t$stage_dir/$file-$timestamp.info\n",
+                        "\t$stage_dir/$file-$timestamp.tar\n",
+                        "\n",
+                        "$revision\n" ]);
+        }
+        else
+        {
+            unlink $push_log_file;
+            unlink $tarfile;
+            send_mail($error_email_list, "$cmd: Deploy failure for $file",
+                      [ "The uplaoded package intended for project $file was" .
+                        " not deployed due to a mis-match of content\n",
+                        "checksums. The files have been removed.\n",
+                        "\n",
+                        "$revision\n" ]);
+        }
+        croak "Error: Checksum mismatch for $stage_dir/$file, stopped";
+    }
+    else
+    {
+        write_log_line($tfile,
+                       sprintf("$cmd [$$] [%s] MD5 stamp verified",
+                               scalar localtime))
+            if ($trace & 3);
+    }
+}
+
+# Untar the topic to be pushed
+$tar = new Archive::Tar;
+unless (defined $tar)
+{
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Error creating Archive::Tar " .
+                           "object: %s",
+                           (scalar localtime), Archive::Tar::error));
+    croak "$cmd: make_archive: Error allocating Archive::Tar object: " .
+        Archive::Tar::error . "\n";
+}
+#
+# We don't have to actually worry about the "compressed" header, since the
+# Archive::Tar class auto-detects compressed content.
+#
+unless (defined $tar->extract_archive($tarfile))
+{
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Error reading tar-file: %s",
+                           (scalar localtime), Archive::Tar::error));
+    croak "$cmd: make_archive: Error reading from $tarfile: " .
+        Archive::Tar::error . "\n";
+}
+
+#
+# At this point, safe to assume that it worked.
+#
+# Use process_content (or user-specified tool) to push out new data
+#
+# $file is the destination, minus leading /. Tar should have left a directory
+# by that name in $stage_dir.
+#
+unless (-d $file and -x $file)
+{
+    send_mail($error_email_list, "$cmd: Error: No directory named $file",
+              [ "The archive file $tarfile did not create ``$file'' as a\n",
+                "directory in $stage_dir. Possibly a malformed package.\n",
+                "\n",
+                "$revision\n" ]);
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Found no directory $file in tar " .
+                           "archive", (scalar localtime)))
+        if ($trace);
+    write_log_line("$log_dir/$cmd",
+                   sprintf("%s [$$] Found no directory $file in tar archive",
+                           scalar localtime));
+    croak "Error: The archive file $tarfile did not create a ``$file''\n" .
+        "in the directory $stage_dir. Possibly a malformed package. Stopped";
+}
+chdir $file;
+@res_text = ("$info{name}\n", "\n");
+$FH = new IO::File ">> $push_log_file";
+if (! defined $FH)
+{
+    send_mail($error_email_list,
+              "$cmd: Error opening logging file $push_log_file",
+              [ "Error opening $push_log_file for appending: $!\n",
+                "Package not deployed.\n",
+                "\n",
+                "$revision\n" ]);
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Error opening logging file " .
+                           "$push_log_file: $!", (scalar localtime)))
+        if ($trace);
+    write_log_line("$log_dir/$cmd",
+                   sprintf("%s [$$] Error opening $push_log_file: $!",
+                           scalar localtime));
+    croak "Error opening $push_log_file for appending: $!, stopped";
+}
+
+#
+# Construct the command to execute, based on the value of $script and the
+# command-line args that need to be carried over.
+#
+
+@command = split(/\s+/, $script);
+push(@command, '-t' => $trace)   if ($trace);
+push(@command, '-T' => $tfile)   if ($tfile ne '-');
+push(@command, '-H' => $opts{H}) if (defined $opts{H} and $opts{H});
+push(@command, '-c' => $opts{c}) if (defined $opts{c} and $opts{c});
+push(@command, $mirror_group);
+if ($trace & 3)
+{
+    write_log_line $tfile, sprintf("$cmd [$$] [%s] Running: @command",
+                                   scalar localtime);
+}
+
+# Have had some problems with IO::Pipe in the past
+open(PIPE, "@command 2>&1 |");
+
+while (defined($_ = <PIPE>))
+{
+    print $FH "Info:result\t$_";
+    push(@res_text, $_);
+}
+
+close(PIPE);
+if ($? >> 8)
+{
+    write_log_line $tfile, sprintf("$cmd [$$] [%s] Error from $command[0]: $!",
+                                       scalar localtime)
+        if ($trace);
+    send_mail($error_email_list, "$cmd: Error from processing command",
+              [ "Error from ``@command'': $!\n",
+                "Package contents probably not deployed correctly.\n",
+                "\n",
+                "$revision\n" ]);
+    chdir $stage_dir;
+    rmtree $file;
+    croak "Error from ``@command'': $!, stopped";
+}
+$FH->close;
+
+send_mail($email_list, 'Server Data Updated', \@res_text)
+    unless (defined $info{nomail} and $info{nomail} =~ /1|yes|true/o);
+
+chdir $stage_dir;
+# This routine from File::Path does a clean, recursive deletion
+rmtree $file;
+
+#
+# Mirror the data if we are using an RDBMS model. If there are no mirrors,
+# this routine won't do anything.
+#
+if (! mirror_propagate($tarfile, $mirror_group, \%info, $config,
+                       ((defined $opts{c} and $opts{c}) ?
+                        "$opts{c}.mir" : undef)))
+{
+    write_log_line $tfile, sprintf("$cmd [$$] [%s] Error trying to propagate" .
+                                   " to mirrors for group $mirror_group",
+                                   scalar localtime)
+        if ($trace);
+    write_log_line("$log_dir/$cmd",
+                   sprintf("%s [$$] Unable to mirror package $tarfile.",
+                           scalar localtime));
+    #
+    # Remove the staging directory, as we don't want to interfere with future
+    # release attempts (mirrors be darned...)
+    #
+    chdir $stage_dir;
+    unlink $tarfile;
+    send_mail($error_email_list, 'Mirror Propagation Failure',
+              ["Propagation of the file $tarfile to the elements of\n",
+               "mirror group $mirror_group has failed. Content is only on " .
+               ($opts{H} || hostfqdn) . ".\n" ]);
+    croak "Error occured in mirroring the file $tarfile, stopped";
+}
+# remove the tar file (info file already moved)
+unlink $tarfile;
+
+write_log_line("$log_dir/$cmd",
+               sprintf("%s [$$] Deployment to $info{dest} successful",
+                       scalar localtime));
+write_log_line("$log_dir/$cmd",
+               sprintf("%s [$$] Finished",
+                       scalar localtime));
+
+exit 0;
+
+##############################################################################
+#
+#   Sub Name:       read_info
+#
+#   Description:    Read the info file, converting the Info:xxxx lines into
+#                   hash keys and trimming the input list down to all "extra"
+#                   lines (which will later be treated as the checksum/
+#                   signature of the tar file).
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $href     in      hashref   The hash to store key/value
+#                                                 pairs in
+#                   $lref     in      listref   The lines from the info file.
+#                                                 On exit will be pared down to
+#                                                 just the checksum lines.
+#
+#   Globals:        $trace
+#                   $tfile
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    dies
+#
+##############################################################################
+sub read_info
+</pre>
+<br><hr><h1>Function: <a name="read_info">read_info</a></h1>
+<h2>Variables:</h2> <ul><li>$cmd<li>$href<li>$key<li>$line<li>$lref<li>$tfile<li>$trace<li>$value<li>@_<li>@remnants</ul>
+<h2>Calls:</h2><ul><li> content<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>#!/opt/ims/perl5/bin/perl
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: deploy_content_doc.html,v 1.1 2000/05/04 21:14:28 idsweb Exp $
+#
+#   Description:    Take the info file passed in and manage the verification
+#                   of the fields, the population of data into the staging
+#                   and release areas, and effect the posting of the data to
+#                   other servers in the mirror pool if requested.
+#
+#   Functions:      read_info
+#                   send_mail
+#                   mirror_propagate
+#
+#   Libraries:      IMS::ReleaseMgr::Signature
+#                   Carp                    Core lib (better error messages)
+#                   File::Copy              Core lib (smart 'mv' clone)
+#                   File::Path              Core lib (emulate 'rm -rf' in Perl)
+#                   Fcntl                   Core lib (flock constants)
+#                   IO::File                Core lib (I/O classes)
+#                   Getopt::Long            Core lib (cmd-line parsing)
+#                   Sys::Hostname           Core lib (smart 'hostname' command)
+#                   Net::Domain             CPAN lib for getting FQDN
+#                   Mail::Internet          CPAN lib for sending UNIX mail
+#                   Mail::Header              part of the above
+#                   LWP::UserAgent          \
+#                   HTTP::Request::Common    > CPAN libs, used for mirroring
+#                   URI::URL                /
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  The tool usage error message
+#
+#   Environment:    PATH                    This has to be trimmed drastically
+#                                             for security
+#
+##############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};;
+#
+# The Archive::Tar package handles compression automatically. However, that
+# means that the file could possibly arrive with a ".gz" suffix to the name.
+# Later, when deriving the tarfile name, we only want to accept that suffix
+# as a contender if this mirror is configured to use compression.
+#
+    #
+    # Set up a file for tracing to write to. In absence of -T, we use STDOUT
+    #
+if ($trace & 8) # bxxxx1xxx
+# Make sure that the argument the program was called with is
+# actually a name of a file present in the either $stage_dir or $incoming_dir.
+# If not, exit with an error message.
+# Parse the lines into hash keys, leave only the old-style digital signature
+# (if present) in @info:
+# Take the argument, delete the part of the path which denotes the directory
+# and the suffix ".info".
+# If the tarred file is not there, exit with an error message
+# time calculation - roughly equivalent to date +%y%m%d
+#
+# pick up the info file and move it
+#     Moving it prevents the monitor from trying to run another process to
+#     handle this data.
+#
+    # Hmm... the topic dir is already here...
+        # 36 iterations with a 5-sec sleep-- give them 3 minutes to finish
+#
+# Check again and move things back around if the dir is still there
+#
+#
+# Give a heads-up on whether the content arrived in compressed form
+#
+#
+# Check the MD5 stamp if one is present. This is not yet required, but probably
+# will be once the overall system is finished on both ends.
+#
+        #
+        # Signatures don't match. We cannot release this content.
+        #
+# Untar the topic to be pushed
+#
+# We don't have to actually worry about the "compressed" header, since the
+# Archive::Tar class auto-detects compressed content.
+#
+#
+# At this point, safe to assume that it worked.
+#
+# Use process_content (or user-specified tool) to push out new data
+#
+# $file is the destination, minus leading /. Tar should have left a directory
+# by that name in $stage_dir.
+#
+#
+# Construct the command to execute, based on the value of $script and the
+# command-line args that need to be carried over.
+#
+# Have had some problems with IO::Pipe in the past
+# This routine from File::Path does a clean, recursive deletion
+#
+# Mirror the data if we are using an RDBMS model. If there are no mirrors,
+# this routine won't do anything.
+#
+    #
+    # Remove the staging directory, as we don't want to interfere with future
+    # release attempts (mirrors be darned...)
+    #
+# remove the tar file (info file already moved)
+##############################################################################
+#
+#   Sub Name:       read_info
+#
+#   Description:    Read the info file, converting the Info:xxxx lines into
+#                   hash keys and trimming the input list down to all "extra"
+#                   lines (which will later be treated as the checksum/
+#                   signature of the tar file).
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $href     in      hashref   The hash to store key/value
+#                                                 pairs in
+#                   $lref     in      listref   The lines from the info file.
+#                                                 On exit will be pared down to
+#                                                 just the checksum lines.
+#
+#   Globals:        $trace
+#                   $tfile
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    dies
+#
+##############################################################################/n/n         # Skip comments (blanks might be allowed in @remnants, though)
+        next if $line =~ /^\#/o;
+        if ($line =~ /^Info:/o) # Typical content
+    #
+    # Return the listref containing only those lines we didn't use
+    #</pre>
+<h2>Code:</h2> <pre>{
+    my ($href, $lref) = @_;
+
+    my (@remnants, $line, $key, $value);
+
+    for $line (@{$lref})
+    {
+        # Skip comments (blanks might be allowed in @remnants, though)
+        next if $line =~ /^\#/o;
+
+        if ($line =~ /^Info:/o) # Typical content
+        {
+            ($key, $value) = split(/\s+/, $line, 2);
+            $key =~ s/^Info://o;
+            $href->{$key} = $value;
+        }
+        else
+        {
+            push(@remnants, $line);
+        }
+    }
+
+    if ($trace & 4)
+    {
+        for $key (sort keys %{$href})
+        {
+            write_log_line($tfile, "$cmd [$$] [read_info] $key=$href->{$key}")
+        }
+    }
+
+    #
+    # Return the listref containing only those lines we didn't use
+    #
+    @{$lref} = @remnants;
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="mirror_propagate">mirror_propagate</a></h1>
+<h2>Variables:</h2> <ul><li>$FQDN<li>$UA<li>$URI<li>$bad<li>$cmd<li>$config<li>$date<li>$error_list<li>$file<li>$host<li>$hostfile<li>$hostlist<li>$info<li>$log_dir<li>$mirror<li>$mirror_group<li>$opts<li>$project<li>$res<li>$tfile<li>$trace<li>%s<li>@_</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>DBI_mirror_host_list<li>URI<li>data<li>date<li>eq<li>error<li>file_error<li>file_mirror_host_list<li>from<li>get<li>hostfqdn<li>hostname<li>mirror<li>mirror_upload<li>server<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>##############################################################################
+#
+#   Sub Name:       mirror_propagate
+#
+#   Description:    Query the RDBMS for the other hosts that are a part of this
+#                   mirror pool. Use the upload URL to propagate the tar file
+#                   to the other hosts.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    Pathname of the tar file
+#                   $mirror   in      scalar    Name of the mirror group
+#                   $info     in      hashref   Reference to the infofile vals
+#                   $config   in      hashref   Ref to the configuration vals
+#        (optional) $hostfile in      scalar    If passed, name of the file to
+#                                                 read mirror host list from
+#
+#   Globals:        $cmd
+#                   $basedir
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+##############################################################################/n/n     #
+    # Nasty loops happen if we don't clear this
+    #
+    # Get this machine's fully-qualified hostname + domain
+    else # ftp
+        # Not *really* an error</pre>
+<h2>Code:</h2> <pre>{
+    my ($file, $mirror, $info, $config, $hostfile) = @_;
+
+    my ($hostlist, $FQDN, $host, $URI, $UA, $project, $res, $bad, $error_list);
+
+    return 1 unless
+        (defined $info->{upload} and ($info->{upload} =~ /1|yes|true/i));
+
+    #
+    # Nasty loops happen if we don't clear this
+    #
+    $info->{upload} = 'no';
+
+    if (defined $hostfile and $hostfile)
+    {
+        $hostlist = file_mirror_host_list(-file => $hostfile);
+        unless (defined $hostlist)
+        {
+            write_log_line($tfile,
+                           sprintf("$cmd [$$] [%s] Error getting mirror list" .
+                                   " from file: %s",
+                                   scalar localtime, file_error))
+                if ($trace);
+            write_log_line("$log_dir/$cmd",
+                           sprintf("%s [$$] Error getting mirror list from " .
+                                   "file: %s",
+                                   scalar localtime, file_error));
+            carp "$cmd was unable to get data for $mirror_group from file " .
+                "$hostfile, stopping";
+            return 0;
+        }
+    }
+    else
+    {
+        $hostlist = DBI_mirror_host_list(-mirror => $mirror_group);
+        unless (defined $hostlist)
+        {
+            write_log_line($tfile,
+                           sprintf("$cmd [$$] [%s] Error getting mirror list" .
+                                   " from DBI: %s",
+                                   (scalar localtime), DBI_error))
+                if ($trace);
+            write_log_line("$log_dir/$cmd",
+                           sprintf("%s [$$] Error getting mirror list from " .
+                                   "DBI: %s",
+                                   scalar localtime, DBI_error));
+            carp "$cmd was unable to get data for $mirror_group from " .
+                "Oracle, stopping";
+            return 0;
+        }
+    }
+
+    return 1 unless ((scalar @$hostlist) > 1);
+
+    # Get this machine's fully-qualified hostname + domain
+    $FQDN = $opts{H} || hostfqdn;
+    ($project = $info->{dest}) =~ s|^/||o;
+
+    if ($info->{transport} eq 'http')
+    {
+        ($res, $bad, $error_list) = mirror_upload($file, $project, $FQDN,
+                                                  $hostlist, $config, $info);
+
+        if (! $res)
+        {
+            my $date = scalar localtime;
+
+            for $host (@$bad)
+            {
+                $res = shift(@$error_list);
+
+                write_log_line("$log_dir/$cmd",
+                               "$date [$$] Mirror FAILED to host $host: $res");
+                write_log_line("$tfile",
+                               "$cmd [$$] [$date] Mirroring FAILED to host " .
+                               "$host: $res")
+                    if ($trace);
+            }
+
+            return 0;
+        }
+    }
+    else # ftp
+    {
+        my $date = scalar localtime;
+
+        write_log_line("$log_dir/$cmd",
+                       "$date [$$] FTP mirroring should be done by client");
+        write_log_line("$tfile",
+                       "$cmd [$$] [$date] FTP mirroring is not supported at " .
+                       "the server level")
+            if ($trace);
+
+        # Not *really* an error
+        return 1;
+    }
+
+    1;
+}</pre>
+</BODY></HTML>

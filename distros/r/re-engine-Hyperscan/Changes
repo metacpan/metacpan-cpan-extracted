@@ -1,0 +1,6 @@
+Revision history for re::engine::Hyperscan
+
+0.01 Fri Apr 7 19:27:31 2017 +0200 rurban
+
+    - Started from re-engine-PCRE2.
+      Fails only a few tests.

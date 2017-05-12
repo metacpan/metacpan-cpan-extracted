@@ -1,0 +1,383 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+  <HEAD>
+    <TITLE>Project Plan for Perl 5.005 Upgrade (7-May-1999)</TITLE>
+    <!-- Created by: Randy J. Ray,  7-May-1999 -->
+    <!-- Changed by: Randy J. Ray, 20-Jul-1999 -->
+    <SCRIPT language="JavaScript1.1">
+// Take the document's lastModified property and add a line to the document
+// only if the value is non-zero
+function docupdated ()
+{
+  var lastmod = document.lastModified;
+  var lastmodint = Date.parse(lastmod);
+
+  if (lastmodint != 0)
+    {
+      lastmod = "This page last updated: " + lastmod;
+      document.write(lastmod.bold().fontsize("-1"));
+    }
+  else
+    {
+      document.write(" ");
+    }
+
+  return true;
+}
+    </SCRIPT>
+  </HEAD>
+  <BODY bgcolor=white text=black vlink=green>
+    <DIV ALIGN="center">
+      <H1>Project Plan for Perl 5.005 Upgrade</H1>
+      <hr size=4 width="90%">
+      <table width="70%">
+        <tr>
+          <td>
+            <FONT SIZE=-1>
+              In addition to the changes between Perl 5.004_04 and 5.005,
+              this upgrade will mark the removal of the AT&amp;T Sfio package
+              from the Perl environment. Because of this, the upgrade will
+              have to be handled carefully. However, there will likely be
+              an improvement in performance associated with the upgrade as
+              a result.
+            </FONT>
+          </td>
+        </tr>
+      </table>
+      <HR size=4 width="90%">
+      <FONT SIZE=-1>
+        <A HREF="#overview">[ Overview ]</A>
+        <A HREF="#steps">[ Considerations ]</A>
+        <A HREF="#plan">[ Planning ]</A>
+        <A HREF="#timeline">[ Timeline ]</A>
+        <A HREF="#conclusion">[ Conclusion ]</A>
+      </FONT>
+    </DIV>
+    <H2><A NAME="overview">1. Overview</A></H2>
+    <P>
+      The version of the Perl interpreter currently in use on all ATG machines
+      is 5.004, maintenance patch 4 (hereafter referred to as "5.004_04") with
+      the AT&amp;T Sfio package linked in to support FastCGI. However, the most
+      current version of Perl considered to be stable is 5.005, maintenance
+      patch 3 ("5.005_03") which addresses a large number of bugs and offers
+      improvements in several areas (including, but not limited to:
+      documentation, thread support, regression test suite enhancements). On
+      some platforms, progress is being hindered by the lack of some of these
+      features and/or fixes (such as a need for threads on HPUX 11 for the
+      sake of packages such as DBD::Oracle).
+    </P>
+    <H2><A NAME="steps">2. Necessary Steps and Considerations</A></H2>
+    <P>
+      The upgrade cannot simply be done across all machines without care and
+      attention to several existing issues related to Perl and its deployment
+      within ATG.
+    </P>
+    <H3>2.1. Stabilizing for future upgrade efforts</H3>
+    <P>
+      First and foremost, this upgrade effort should be a vehicle for
+      stabilizing the process of installing, maintaining and upgrading Perl
+      within ATG. Currently, each machine within the sphere of ATG control
+      is updated separately. Despite progress made in the area of centralizing
+      the effort of initial Perl deployment (in the form of ready-to-deploy
+      <B>tar</B>-style archive files), once a machine is set up there is no
+      further synchronization of upgrades to either the core Perl distribution
+      or the additional extensions and modules deployed and used by ATG.
+    </P>
+    <P>
+      To begin with, it is necessary to identify the variables involved in
+      defining machine architectures as they impact the Perl upgrade. These
+      are:
+    </P>
+    <DIV ALIGN="center">
+      <table border=1 cellpadding=4>
+        <tr>
+          <th>Variable</th>
+          <th>Possible Values</th>
+        </tr>
+        <tr>
+          <td>Chip set</td>
+          <td>PA-RISC 1.1, PA-RISC 2.0</td>
+        </tr>
+        <tr>
+          <td>OS Version</td>
+          <td>HPUX 10.X, HPUX 11.X</td>
+        </tr>
+      </table>
+    </DIV>
+    <P>
+      Given this, there are only 4 possible combinations. Besides that, not
+      all combinations may be in use. The only HPUX 11.X machine currently in
+      the support pool is a PA2.0 machine, thus there is no current need
+      for support for PA1.1 on 11.X. Indeed, it is possible to support HPUX
+      10.X without regard to chip set issues due to backwards-compatibility.
+      It is better however to provide the Perl environment as optimized as
+      possible for the target machine.
+    </P>
+    <P>
+      The proposal, then, is that a specific machine be designated as the
+      build/test host for each chip/OS combination that requires support.
+      Said machines will not need to be set aside exclusively for this purpose;
+      at least two of the combinations can be supported using the existing
+      hosts <B>i2496ds4</B> (HPUX 10.X on PA2.0) and <B>i2496ds6</B> (HPUX
+      11.X on PA2.0). Using the designated machines, complete distributions
+      of Perl and the requisite modules can be installed and then archived
+      with the <B>tar</B> command. Updates to either the Perl core or to
+      extra modules should be restricted to these build machines, and updates
+      made to other machines (in particular the servers outside the corporate
+      firewall) made only when enough has changed from the existing deployment
+      version to warrant it and then to all machines at the same time. Updates
+      for such issues as addressing critical bugs in modules would also be
+      done across the boards, hopefully lessening the chance of a critical
+      update being overlooked on a less-visible server.
+    </P>
+    <P>
+      If this is implemented, it will provide the following additional
+      benefits:
+      <UL>
+        <LI>
+          Specific installations can be marked either by date or with an
+          internal version number. A simple (possibly auto-generated) utility
+          script can accompany a distribution to identify the version and
+          build host. This would greatly aid in troubleshooting problems
+          suspected of being Perl-related.
+        </LI>
+        <LI>
+          Production servers (those beyond the corporate firewall) will no
+          longer need the full suite of developer tools (C compiler, etc.)
+          to facilitate the build and installation of Perl.
+        </LI>
+        <LI>
+          Keeping the extensive list of CPAN modules used by ATG's Perl
+          installation would become more centralized, as would keeping all
+          supported sites syncronized.
+        </LI>
+        <LI>
+          Besides the CPAN modules, there are several in-house Perl components
+          that are needed on each host. These lack a centralized location and
+          are generally not as easy to install as the CPAN modules.
+        </LI>
+        <LI>
+          Devising a method for seamless updating of Perl would be much
+          easier with such a stable base to start from. At present, it is
+          often difficult to update Perl itself or certain of the modules
+          due to the binaries being resident in memory. On most machines,
+          Perl is essentially permanently resident due to daemon processes
+          such as the <B><TT>sysmonitord</TT></B> and <B><TT>rlsmgrd</TT></B>
+          tools.
+        </LI>
+      </UL>
+    </P>
+    <H3>2.2. Removal of the sfio package</H3>
+    <P>
+      The other significant window of opportunity brought on by the upgrade
+      of Perl is the phasing-out of the AT&amp;T Sfio (Safe/Fast IO) package.
+      This library had been in use in order to support the <I>FastCGI</I>
+      plug-in for Netscape. Recent versions of <I>FastCGI</I> no longer
+      require the <TT>sfio</TT> library, so this will be dropped from the
+      Perl configuration effective with 5.005_03.
+    </P>
+    <P>
+      The immediate benefits to be had from this step include:
+      <UL>
+        <LI>
+          The <TT>sfio</TT> library can be obsoleted, meaning one less
+          component to track.
+        </LI>
+        <LI>
+          The build and configuration of Perl is simplified, as the support
+          for <TT>sfio</TT> required changing some of the default answers in
+          the configuration process.
+        </LI>
+        <LI>
+          Additionally, use of the library required that one of the core
+          extensions (the <TT>IO</TT> module) be linked statically. It
+          also interfered with linking some other extensions and in-house
+          code due to the experimental nature of the PerlIO abstraction
+          layer that enables use of Sfio.
+        </LI>
+        <LI>
+          Most significantly, the linkage of <TT>sfio</TT> caused Perl versions
+          higher than 5.004_04 (including 5.004_05, as well as the 5.005 line)
+          to fail some of the regression test suite. The specific problem
+          also manifests on other (non-HP) systems that built Perl with Sfio.
+        </LI>
+      </UL>
+      Because of the scale of Perl installation across ATG-supported hosts,
+      backing out Sfio was not a viable option prior to the upgrade to
+      5.005_03.
+    </P>
+    <H2><A NAME="plan">3. Steps and Approach to Deployment</A></H2>
+    <P>
+      The effect of upgrading from 5.004_04 to 5.005_03 should be very
+      minimal, if felt at all. Changes to the core language were primarily
+      the fixing of bugs and the addition of native threads on those systems
+      whose kernel supports threading. Still, it is not advisable to simply
+      make the upgrade without extensive tests and a clear recovery plan.
+    </P>
+    <P>
+      At present, the installation of Perl is already engineered towards the
+      goal of easing installation (and de-installation) of new versions.
+      While developers reference the Perl interpreter as
+      <TT>/opt/ims/perl5/bin/perl</TT>, the currently-installed base is
+      actually housed under the directory <TT>/opt/ims/perl5.004.sfio</TT>.
+      <TT>/opt/ims/perl5</TT> is a symbolic link to this. Many of the current
+      installations still have <TT>/opt/ims/perl5</TT> compiled in as the
+      root of the hierarchy. This will need to be addressed, as well. When
+      the 5.005_03 package is built, it will use <TT>/opt/ims/perl5.005</TT>
+      as a root (note lack of "<TT>sfio</TT>" in the path). This will not
+      only ease installation around issues of in-memory binaries, but will
+      allow the old Perl installation to be left in place until ATG is
+      satisfied that the transition is complete. Merely changing the value
+      of the symbolic link <TT>/opt/ims/perl5</TT> selects between the two.
+    </P>
+    <P>
+      With the assumption that the packages for 5.005_03 (and retro-fit
+      packages for 5.004_04 configured to use a more explicit root path)
+      can be easily built and bundled, ATG need only identify a build host
+      for each hardware/OS permutation that will require support.
+    </P>
+    <DIV ALIGN="center">
+      <table border=0 width="50%">
+        <tr>
+          <td>
+            <B>Step 1:</B> Identify the hosts to be used to build
+            the different Perl distribution bundles.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <B>Step 2:</B> Select a central storage repository for the
+            installable bundles, including creating necessary directories
+            and designing a hierarchy for separating the different
+            hardware/OS permutations.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <B>Step 3:</B> Itemize the list of all modules that will be
+            included in a distribution bundle (including local modules).
+            This also acts as a useful reference if a project developer has
+            questions about what components are available to them.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <B>Step 4:</B> Build distribution bundles for the various
+            permutations and move them to the repository. These bundles
+            must include all components listed above, even those such as
+            <TT><B>DBD::Oracle</B></TT> that may not actually be used on
+            the target machine. This is more maintainable than having
+            bundles with different sets of modules.
+          </td>
+        </tr>
+      </table>
+    </DIV>
+    <P>
+      Once this is done, it will be necessary to enter a period of testing
+      (length to be determined) for the evaluation of individual project's
+      Perl programs and any possible effects from the upgrade. Because of
+      the portable nature of Perl, it should be sufficient to select just
+      one machine for this (possibly a second machine from the stage group
+      of servers, as well). The selected machine will have the symbolic link
+      switched over from 5.004_04 to 5.005_03. Individual projects will then
+      be responsible for testing their Perl application under the new
+      interpreter.
+    </P>
+    <DIV ALIGN="center">
+      <table border=0 width="50%">
+        <tr>
+          <td>
+            <B>Step 5:</B> Identify a testing host. Possibly choose more
+            than one, if there are other issues such as architecture of
+            stage hosts versus development, or for HPUX 11 which will
+            have to have thread support enabled to allow for the
+            <TT><B>DBD::Oracle</B></TT> extension.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <B>Step 6:</B> Announce to project developers the starting time
+            and duration of the testing period on the chosen host(s).
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <B>Step 7:</B> On the chosen date, set Perl on that
+            machine to the new version, and allow projects a reasonable
+            amount of time to test their applications.
+          </td>
+        </tr>
+      </table>
+    </DIV>
+    <P>
+      Once the testing has been deemed satisfactory, all that will remain will
+      be deployment to the full range of ATG-supported machines. Once done,
+      it is recommended that the machines retain the 5.004_04 installation for
+      at least one month after deployment of 5.005_03, in case of critical
+      failure.
+    </P>
+    <DIV ALIGN="center">
+      <table border=0 width="50%">
+        <tr>
+          <td align="center">
+            <font size=-1>
+              (The following steps are iterated over all supported hosts)
+            </font>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <B>Step 8:</B> Deploy the appropriate package to the host
+            being upgraded.
+
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <B>Step 9:</B> Adjust the symbolic link in <TT>/opt/ims</TT>.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <B>Step 10:</B> Restart any resident processes that use the Perl
+            interpreter
+            (<B><TT>sysmonitord</TT></B>, <B><TT>rlsmgrd</TT></B> etc.). Do
+            not use HUP signals in this case, but actually terminate and
+            re-start all relevant processes.
+          </td>
+        </tr>
+      </table>
+    </DIV>
+    <H2><A NAME="timeline">4. Proposed Timeline for Implementation</A></H2>
+    <P>
+      <font size=-1><TT><I>IN PROGRESS</I></TT></font>
+    </P>
+    <H2><A NAME="conclusion">5. Conclusions</A></H2>
+    <P>
+      This plan only provides for the deployment of 5.005 and the phasing
+      out of 5.004. It is highly recommended that an ongoing maintenance plan
+      also be developed to manage the eventual upgrades of the various CPAN
+      and in-house modules. As well, Perl itself will inevitably mature to a
+      version 5.006, at which time this plan should serve as effectively for
+      that migration.
+    </P>
+    <P>
+      <hr>
+      <table border=0 width="100%" cellspacing=0 cellpadding=0>
+        <tr valign=top>
+          <td width="40%">
+            <SCRIPT>docupdated()</SCRIPT>
+          </td>
+          <td width="20%"></td>
+          <td width="40%" align=right>
+            <FONT SIZE=-1>
+              <I>Email:
+                <A HREF="mailto:randyr@nafohq.hp.com">randyr@nafohq.hp.com</A>
+              </I>
+            </FONT>
+          </td>
+        </tr>
+      </table>
+    </P>
+  </BODY>
+</HTML>

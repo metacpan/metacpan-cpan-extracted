@@ -1,0 +1,74 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>Checklist for Installing and Configuring Release Manager on New Servers</TITLE>
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4><P>Checklist for Installing and Configuring Release Manager on New Servers</P>
+</FONT><I><FONT FACE="Arial"><P>This should be a section in a larger, more comprehensive document.</P>
+</B></I></FONT><FONT SIZE=2>
+<P>Last modified: 7/20/99 6:13 PM</P>
+
+<OL>
+
+<LI>First of all, check that the Perl language and related libraries are all installed correctly (see the Perl installation document for details of this).</LI>
+<LI>If this machine is currently running the release manager for another hostname/server, then the software is installed and you can skip to configuration (step 6).</LI>
+<LI>Obtain the latest versions of the Perl packages </FONT><FONT FACE="Courier New" SIZE=2>IMS-ReleaseMgr</FONT><FONT SIZE=2> and </FONT><FONT FACE="Courier New" SIZE=2>ReleaseManager</FONT><FONT SIZE=2> from the designated FTP/WWW site (this will be the subject of a future proposal, and will be filled in then).</LI>
+<LI>Install </FONT><FONT FACE="Courier New" SIZE=2>IMS-ReleaseMgr</FONT><FONT SIZE=2> first, as </FONT><FONT FACE="Courier New" SIZE=2>ReleaseManager</FONT><FONT SIZE=2> depends on it.</LI>
+
+
+<UL>
+<LI>Use the command &quot;gzip&nbsp;IMS</FONT><FONT FACE="Courier New" SIZE=2>-ReleaseMgr-X.YY.tar.gz&nbsp;|&nbsp;tar&nbsp;xvf&nbsp;–</FONT><FONT SIZE=2>&quot; to uncompress and unpack the archive. The &quot;X.YY&quot; represents the version number of the package, &quot;1.6&quot; for example.</LI>
+<LI>Change into the newly created directory: &quot;</FONT><FONT FACE="Courier New" SIZE=2>cd IMS-ReleaseMgr-X.YY</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Create the Makefile: &quot;</FONT><FONT FACE="Courier New" SIZE=2>perl Makefile.PL</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Build the package:  &quot;</FONT><FONT FACE="Courier New" SIZE=2>make</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Install the package: &quot;</FONT><FONT FACE="Courier New" SIZE=2>make install</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>The Perl module IMS::ReleaseMgr and all the associated pieces are now installed where Perl scripts can readily find them.</LI></UL>
+
+
+<LI>Now install the ReleaseManager package itself:</LI>
+
+
+<UL>
+<LI>Use the command &quot;gzip&nbsp;ReleaseManager</FONT><FONT FACE="Courier New" SIZE=2>-X.YY.tar.gz&nbsp;|&nbsp;tar&nbsp;xvf&nbsp;–</FONT><FONT SIZE=2>&quot; to uncompress and unpack the archive. The &quot;X.YY&quot; represents the version number of the package, &quot;1.6&quot; for example.</LI>
+<LI>Change into the newly created directory: &quot;</FONT><FONT FACE="Courier New" SIZE=2>cd ReleaseManager-X.YY</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Create the Makefile: &quot;</FONT><FONT FACE="Courier New" SIZE=2>perl Makefile.PL</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Build the package:  &quot;</FONT><FONT FACE="Courier New" SIZE=2>make</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Install the package: &quot;</FONT><FONT FACE="Courier New" SIZE=2>make install</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>The tools that make up the Release Manager are now installed in </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/ahp-bin</FONT><FONT SIZE=2>.</LI>
+<LI>You are now ready to configure for the new hostname/NES listener.</LI></UL>
+
+
+<LI>Change into the </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/ahp-bin</FONT><FONT SIZE=2> directory.</LI>
+<LI>If the release manager software is already installed, copy one of the existing configuration files with a new name </FONT><FONT FACE="Courier New" SIZE=2>of </FONT><FONT SIZE=2>&quot;</FONT><FONT FACE="Courier New" SIZE=2>www.example.hp.com</FONT><FONT SIZE=2>&quot; (for examples, we’ll continue to use </FONT><FONT FACE="Courier New" SIZE=2>www.example.hp.com</FONT><FONT SIZE=2>). Assume that the file used was &quot;</FONT><FONT FACE="Courier New" SIZE=2>www.buy.hp.com</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Edit the new file, globally replacing all occurrences of </FONT><FONT FACE="Courier New" SIZE=2>www.buy</FONT><FONT SIZE=2> (or the previous server name), with the leading parts of the hostname for the new server (i.e., less the &quot;</FONT><FONT FACE="Courier New" SIZE=2>hp.com</FONT><FONT SIZE=2>&quot; part). Save the file. See also the special notes at the end regarding the mirror specification database in Oracle.</LI>
+<LI>Make this file executable: &quot;</FONT><FONT FACE="Courier New" SIZE=2>chmod 755 www.example.hp.com</FONT><FONT SIZE=2>&quot;</LI>
+<LI>If this server is not part of a larger pool of mirrored servers, create a zero-length file named </FONT><FONT FACE="Courier New" SIZE=2>www.example.hp.com.mir</FONT><FONT SIZE=2> in the same directory as the first file, then skip ahead to step 12.</LI>
+<LI>Edit the file named </FONT><FONT FACE="Courier New" SIZE=2>www.example.hp.com.mir</FONT><FONT SIZE=2> and insert all the unique server names for all hosts in the mirror pool. These are generally numbered from 1, with the number appended to the </FONT><FONT FACE="Courier New" SIZE=2>www</FONT><FONT SIZE=2> portion of the name. Thus, if there were three machines serving the example server name, they would be called </FONT><FONT FACE="Courier New" SIZE=2>www1.example.hp.com</FONT><FONT SIZE=2>, </FONT><FONT FACE="Courier New" SIZE=2>www2.example.hp.com</FONT><FONT SIZE=2> and </FONT><FONT FACE="Courier New" SIZE=2>www3.example.hp.com</FONT><FONT SIZE=2>. Add these into the file, one name per line. Save the file. See also the special notes at the end regarding the mirror specification database in Oracle.</LI>
+<LI>After changing back to the </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims</FONT><FONT SIZE=2> directory, create a directory named after the server: &quot;</FONT><FONT FACE="Courier New" SIZE=2>mkdir&nbsp;www.example.hp.com</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Change the permissions to allow writing by members of the group (the ownership and group of the new directory should have defaulted to </FONT><FONT FACE="Courier New" SIZE=2>wesadm</FONT><FONT SIZE=2> for both values): &quot;</FONT><FONT FACE="Courier New" SIZE=2>chmod&nbsp;775&nbsp;www.example.hp.com</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Change into the new directory and create the following directories: </FONT><FONT FACE="Courier New" SIZE=2>htdocs</FONT><FONT SIZE=2>, </FONT><FONT FACE="Courier New" SIZE=2>cgi-bin</FONT><FONT SIZE=2>, </FONT><FONT FACE="Courier New" SIZE=2>fcgi-bin</FONT><FONT SIZE=2>, </FONT><FONT FACE="Courier New" SIZE=2>local</FONT><FONT SIZE=2>, </FONT><FONT FACE="Courier New" SIZE=2>logs</FONT><FONT SIZE=2>, </FONT><FONT FACE="Courier New" SIZE=2>incoming</FONT><FONT SIZE=2> and </FONT><FONT FACE="Courier New" SIZE=2>staging</FONT><FONT SIZE=2>. Set their permissions as before (mode </FONT><FONT FACE="Courier New" SIZE=2>775</FONT><FONT SIZE=2>). Depending on the architecture of the system and the layout of certain system resources such as disks, some of these directories may instead be symbolic links to a different directory area on a separate device. If this is the case, simple make certain that the ownership and modes are correct on the physical locations, then link to those locations from this directory using &quot;</FONT><FONT FACE="Courier New" SIZE=2>ln –s</FONT><FONT SIZE=2>&quot; (symbolic links).</LI>
+<LI>Change the group ownership of </FONT><FONT FACE="Courier New" SIZE=2>incoming</FONT><FONT SIZE=2> to </FONT><FONT FACE="Courier New" SIZE=2>wesuser</FONT><FONT SIZE=2>: &quot;</FONT><FONT FACE="Courier New" SIZE=2>chgrp wesuser incoming</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Do the same for </FONT><FONT FACE="Courier New" SIZE=2>logs</FONT><FONT SIZE=2>: &quot;</FONT><FONT FACE="Courier New" SIZE=2>chgrp wesuser logs</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Change into the </FONT><FONT FACE="Courier New" SIZE=2>logs</FONT><FONT SIZE=2> directory (&quot;</FONT><FONT FACE="Courier New" SIZE=2>cd&nbsp;logs</FONT><FONT SIZE=2>&quot;) and make a directory called </FONT><FONT FACE="Courier New" SIZE=2>Pushes</FONT><FONT SIZE=2> (note capitalization): &quot;</FONT><FONT FACE="Courier New" SIZE=2>mkdir&nbsp;Pushes</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Change the mode as with the others: &quot;</FONT><FONT FACE="Courier New" SIZE=2>chmod 755 Pushes</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>You should now have a directory structure something like (the two values at front are user and group owners, respectively):</LI>
+</FONT><FONT FACE="Courier New" SIZE=2><P>__ wesadm.wesadm   775   /opt/ims/www.example.hp.com</P>
+<P>__ wesadm.wesadm   775   /opt/ims/www.example.hp.com/cgi-bin</P>
+<P>__ wesadm.wesadm   775   /opt/ims/www.example.hp.com/fcgi-bin</P>
+<P>__ wesadm.wesadm   775   /opt/ims/www.example.hp.com/htdocs</P>
+<P>__ wesadm.wesuser  775   /opt/ims/www.example.hp.com/incoming</P>
+<P>__ wesadm.wesuser  775   /opt/ims/www.example.hp.com/logs</P>
+<P>__ wesadm.wesadm   775   /opt/ims/www.example.hp.com/logs/Pushes</P>
+<P>__ wesadm.wesadm   775   /opt/ims/www.example.hp.com/staging</P>
+</FONT><FONT SIZE=2><LI>If the </FONT><FONT FACE="Courier New" SIZE=2>sysmonitord</FONT><FONT SIZE=2> package is not yet installed, do so according to the documentation on that package (pointer to that documentation). Make sure that </FONT><FONT FACE="Courier New" SIZE=2>sysmonitord</FONT><FONT SIZE=2> is currently running.</LI>
+<LI>Change directory to </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/local/sysmonitor</FONT><FONT SIZE=2>: &quot;</FONT><FONT FACE="Courier New" SIZE=2>cd&nbsp;/opt/ims/local/sysmonitor</FONT><FONT SIZE=2>&quot;.</LI>
+<LI>Add a line to the file </FONT><FONT FACE="Courier New" SIZE=2>syscheck.rc</FONT><FONT SIZE=2> to monitor and restart the release manager process. The restart command should be </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/ahp-bin/www.example.hp.com</FONT><FONT SIZE=2>, and the path for the semaphore file should be </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/www.example.hp.com/logs/rlsmgrd.sem</FONT><FONT SIZE=2> (no </FONT><FONT FACE="Courier New" SIZE=2>ahp-bin</FONT><FONT SIZE=2> component). Generally, the unique ID for the </FONT><FONT FACE="Courier New" SIZE=2>rlsmgrd</FONT><FONT SIZE=2> entry is &quot;</FONT><FONT FACE="Courier New" SIZE=2>rlsmgrd_<I>XXX</I></FONT><FONT SIZE=2>&quot;, where </FONT><I><FONT FACE="Courier New" SIZE=2>XXX</I></FONT><FONT SIZE=2> is the server name. Thus, </FONT><FONT FACE="Courier New" SIZE=2>rlsmgrd_example</FONT><FONT SIZE=2> in this case.</LI>
+<LI>Instruct the running </FONT><FONT FACE="Courier New" SIZE=2>sysmonitord</FONT><FONT SIZE=2> to re-read the configuration file: &quot;</FONT><FONT FACE="Courier New" SIZE=2>kill&nbsp;-HUP&nbsp;`cat&nbsp;pid`</FONT><FONT SIZE=2>&quot;. (The file &quot;</FONT><FONT FACE="Courier New" SIZE=2>pid</FONT><FONT SIZE=2>&quot; should be in the current directory, as you should still be in </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/local/sysmonitor</FONT><FONT SIZE=2>.)</LI>
+<LI>The monitor daemon should have sent out a mail message noting that </FONT><FONT FACE="Courier New" SIZE=2>rlsmgrd</FONT><FONT SIZE=2> had &quot;failed&quot; (because it wasn’t running). A mail message saying that it had been successfully re-started (in this case, initially started) should follow this.</LI></OL>
+
+</FONT><B><I><FONT FACE="Arial"><P>Adding Mirror Specifications and Host Lists to Oracle</P>
+</B></I></FONT><FONT SIZE=2><P>There is now a tool for editing the mirror specification database. It operates on a CGI/HTTP model, and is as secure as can be without using SSL directly. A manual page for the tool is part of the </FONT><FONT FACE="Courier New" SIZE=2>IMS-ReleaseMgr</FONT><FONT SIZE=2> extension package. A link to the tool should probably be put on the webmaster page (where is it thus access-controlled). The tool is called &quot;</FONT><FONT FACE="Courier New" SIZE=2>edit_db.pl</FONT><FONT SIZE=2>&quot;, for those with access to the IMS source code.  </P></FONT></BODY>
+</HTML>

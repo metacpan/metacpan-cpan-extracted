@@ -1,0 +1,20 @@
+COPYRIGHT
+Changes
+LPEG.h
+LPEG.pm
+LPEG.xs
+Makefile.PL
+MANIFEST
+README
+liblpeg/Makefile.PL
+liblua/Makefile.PL
+t/00-compile.t
+t/1-basic.t
+t/capture.t
+t/flags.t
+t/match.t
+t/pod.t
+t/qr.t
+t/split.t
+t/split-null.t
+META.yml                                 Module meta-data (added by MakeMaker)

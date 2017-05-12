@@ -1,0 +1,69 @@
+body
+{
+	font-family:trebuchet ms, verdana, arial, sans-serif;
+	color: black;
+	font-size:14px;
+	line-height:18px;
+	margin: 0px 20px 0px 20px;
+}
+
+a, a:visited
+{
+	color: #c31;
+}
+
+h1
+{
+	font-size: 25px;
+}
+
+h1 a,
+h2 a
+
+{
+	color: #654;
+}
+
+dt, h2
+{
+	font-size: 16px;
+}
+
+hr 
+{
+	border: 0;
+	color: #aaa;
+	background-color: #aaa;
+	height: 1px;
+}
+
+pre, code
+{
+	color: #654;
+	font-size: 14px;
+}
+
+table
+{
+	margin-left: -20px;
+	margin-right: -20px;
+}
+
+table td
+{
+	background-color: #edc;
+	padding: 5px 20px 5px 20px;
+	color: #321;
+	background-image: url(header.gif);
+	background-repeat: repeat-y;
+}
+
+table td strong
+{
+	font-weight: normal;
+}
+
+table p
+{
+	margin: 0px;
+}

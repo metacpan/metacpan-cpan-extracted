@@ -1,0 +1,15 @@
+returning
+=========
+
+Created:      2012-08-01
+Home page:    <https://metacpan.org/release/returning>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=returning>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2013-09-19
+
+ [ Packaging ]
+ - Depend on Scope::Upper 0.24; required for Perl 5.19.4.
+   Vincent Pit++
+
+0.001	2012-08-01	Initial release

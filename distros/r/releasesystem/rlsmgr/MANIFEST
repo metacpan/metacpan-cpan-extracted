@@ -1,0 +1,11 @@
+README			Overview and installation instructions
+ToDo			Tasks yet to be done
+Changes			History of modification
+MANIFEST		This file
+Makefile.PL		MakeMaker frame for creating Makefile
+deploy_content	Second-stage tool; deployment manager
+process_content	Third-stage tool; file manager
+rlsmgrd		First-stage tool; daemon monitor process
+roll_rm_logs		Cron-able script to roll the log files from tools
+upload.pl		A CGI application for uploads; used for mirroring
+upload.dat		Config file for the upload tool

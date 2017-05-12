@@ -1,0 +1,250 @@
+#!/usr/local/bin/perl
+    eval 'exec perl -S $0 "$@"'
+	if 0;
+
+###############################################################################
+#
+#          May be distributed under the terms of the Artistic License
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: roll_rm_logs,v 1.1 1999/08/08 23:19:34 randyr Exp $  
+#
+#   Description:    A cron-able script that shuts down the release manager
+#                   daemon, rolls all log files, and then restarts the daemon.
+#
+#   Functions:      None
+#
+#   Libraries:      IMS::ReleaseMgr::Utils  Utility functions shared by most
+#                                             release-related tools
+#                   IO::File                CORE
+#                   Carp                    CORE
+#                   Getopt::Long            CORE
+#                   File::Basename          CORE
+#                   Mail::Internet          CPAN
+#                   Mail::Header            CPAN
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $mirror_name            The mirror group that the rlsmgrd
+#                                             process is monitoring
+#
+#   Environment:    ORACLE_HOME             Possibly used in reading config
+#
+###############################################################################
+use vars qw($cmd);
+($cmd = $0) =~ s|.*/||o;
+
+use 5.004;
+
+use strict;
+use vars qw($USAGE %opts %processes $mirror_group $rls_tool $dir $config $fh
+            @ps_parts $stage1tool $stage2tool $stage3tool $daemon_pid $suffix
+            @log_files $log_file $child_pid @command);
+
+use Carp                   qw(carp croak);
+use Getopt::Long           'GetOptions';
+use File::Basename         qw(dirname basename);
+require IO::File;
+require Mail::Header;
+require Mail::Internet;
+
+use IMS::ReleaseMgr::Utils ':all';
+
+$USAGE = "Usage: $cmd [ -t level ] [ -T file ] [ -f ] [ -e script ]
+\t[ -c file ] mirror_group
+
+Where:
+-t num\t\tEnable tracing (num sets level)
+-T file\t\tSend trace information to 'file' instead of tty
+-f\t\tFork and run in background as a daemon
+-c file\t\tRead configuration from file rather than from DBMS
+
+``mirror_group'' is the name of the host-pool grouping that this process is
+running as a part of. It is used as a search key in the DBMS.
+
+All arguments are for the benefit of restarting the release manager daemon.
+Only the mirror_group and possibly the -c options are actually used by
+$cmd.
+";
+if (grep($_ eq '-h', @ARGV))
+{
+    print "$USAGE\n" .
+        q{$Id: roll_rm_logs,v 1.1 1999/08/08 23:19:34 randyr Exp $ } . "\n";
+    exit 0;
+}
+Getopt::Long::config 'no_ignore_case';
+GetOptions(\%opts, 't=i', 'T=s', 'f', 'c=s') or croak "$USAGE\nStopped";
+croak "$USAGE\nStopped" unless (defined($mirror_group = $ARGV[0]));
+
+$dir = dirname $0;
+$ENV{PATH} = "$dir:$ENV{PATH}";
+
+if (defined $opts{c} and $opts{c})
+{
+    $config = file_mirror_specification(-file => $opts{c});
+    croak "$cmd was unable to get data for $mirror_group from file $opts{c}," .
+        " stopped" unless (defined $config);
+}
+else
+{
+    $fh = new IO::File "< $dir/$mirror_group.rc";
+    croak "Error opening $dir/$mirror_group.rc for reading: $!, stopped"
+        unless (defined $fh);
+    chomp($_ = <$fh>);
+    my ($user, $pass) = split(/:/, $_, 2);
+    chomp($_ = <$fh>);
+    $fh->close;
+
+    $config = DBI_mirror_specification(-mirror => $mirror_group,
+                                       -user   => $user,
+                                       -password => $pass,
+                                       -database => ($_ || $ENV{ORACLE_SID}));
+    croak "$cmd was unable to get data for $mirror_group from Oracle, stopped"
+        unless (defined $config);
+}
+
+$stage1tool = basename $config->{STAGE_1_TOOL};
+$stage2tool = basename $config->{STAGE_2_TOOL};
+$stage3tool = basename $config->{STAGE_3_TOOL};
+
+#
+# Populate the process hash. I think it's easier to just hash the whole bloody
+# thing than to grep along the way, since we'll be hunting for two different
+# pieces of information at different stages.
+#
+while (1)
+{
+    %processes = ();
+    open(PIPE, "ps -e |");
+    $_ = <PIPE>; # Skip the header line
+    %processes = map { chomp; (split)[0,3]; } (<PIPE>);
+    close(PIPE);
+    if ($?)
+    {
+        croak "Error on the ps pipe: $!, stopped";
+    }
+    if (grep($_ eq $stage2tool, values %processes))
+    {
+        #
+        # Wait a bit and re-read the process table
+        #
+        sleep 10;
+    }
+    else
+    {
+        #
+        # If there are no stage-2 processes running, then there are no stage-3
+        # either, by design. Safe to exit this loop.
+        #
+        last;
+    }
+}
+
+#
+# Read the lockfile for the daemon process in order to get the PID for 
+# verification and signalling.
+#
+if (-e "$config->{INCOMING_DIR}/.$stage1tool")
+{
+    $fh = new IO::File "< $config->{INCOMING_DIR}/.$stage1tool";
+    croak "Error opening $config->{INCOMING_DIR}/.$stage1tool for reading: " .
+        "$!, stopped" unless (defined $fh);
+    chomp($daemon_pid = <$fh>);
+    $fh->close;
+
+    #
+    # Now check that the PID we just read is in fact a running instance of the
+    # daemon (the stage-1 tool). If it isn't, we assume the daemon died badly,
+    # so we unlink the file instead of sending the PID a signal.
+    #
+    if ($processes{$daemon_pid} eq $stage1tool)
+    {
+        kill INT => $daemon_pid;
+        sleep 2; # Give it time to do a clean shut-down
+    }
+    else
+    {
+        unlink "$config->{INCOMING_DIR}/.$stage1tool";
+    }
+}
+
+#
+# Now the daemon has been stopped, and there are no other processes related to
+# the release mgr to worry about. Create a file suffix that incorporates the
+# date, and move the existing files (including the tracelog, if there was a
+# -T option specified) under the new names. Following that, open each file and
+# close it, to create a zero-length file as a place-holder. Compress the rolled
+# files with gzip.
+#
+$suffix = sprintf("%d-%02d%02d", (localtime(time))[5,4,3]);
+@log_files = map { "$config->{LOGGING_DIR}/$_" } ($stage1tool, $stage2tool,
+                                                  $stage3tool);
+push (@log_files, $opts{T}) if (defined $opts{T} and $opts{T});
+
+for $log_file (@log_files)
+{
+    if (-e "$log_file.$suffix" or -e "$log_file.$suffix.gz")
+    {
+        warn "File $log_file.$suffix(.gz) exists and will be overwritten, ";
+        unlink "$log_file.$suffix" || unlink "$log_file.$suffix.gz";
+    }
+    # rename works fine because we're staying in the same directory
+    rename $log_file, "$log_file.$suffix";
+    # We'd prefer this step works, but it's not critical so no check is made
+    system("gzip -9 -q $log_file.$suffix");
+
+    # Create a zero-length file
+    $fh = new IO::File "> $log_file"; $fh->close;
+}
+
+#
+# Restart the daemon, using any arguments that were passed to this script
+#
+@command = ();
+push(@command, $config->{STAGE_1_TOOL});
+push(@command, '-t', $opts{t}) if (defined $opts{t} and $opts{t});
+push(@command, '-T', $opts{T}) if (defined $opts{T} and $opts{T});
+push(@command, '-c', $opts{c}) if (defined $opts{c} and $opts{c});
+push(@command, '-f');
+push(@command, $mirror_group);
+
+$child_pid = fork;
+if (! defined $child_pid)
+{
+    # Uh-oh
+    croak "Error trying to fork to restart $stage1tool: $!, stopped";
+}
+elsif ($child_pid == 0)
+{
+    # This is the child process
+    exec @command;
+}
+else
+{
+    waitpid $child_pid, 0;
+}
+
+# That's it!
+my $hdr = new Mail::Header;
+#
+# Create the headers
+#
+$hdr->add('To', $config->{WEBMASTER});
+$hdr->add('Subject', "$cmd $mirror_group");
+$hdr->add('From', $config->{WEBMASTER});
+$hdr->add('X-Agent', "$cmd, " . q$Revision: 1.1 $ );
+my $body = ["The following (possibly compressed) files were generated:\n",
+            "\n",
+            (map { "\t$_.$suffix(.gz)\n" } @log_files),
+            "\n",
+            "The daemon process $stage1tool was restarted.\n",
+            "\n",
+            sprintf("%s\n", scalar localtime time),
+            q{$Id: roll_rm_logs,v 1.1 1999/08/08 23:19:34 randyr Exp $ } . "\n"];
+my $msg = Mail::Internet->new(Header => $hdr, Body => $body);
+$msg->smtpsend;
+
+exit 0;

@@ -1,0 +1,83 @@
+#!/usr/bin/make -f
+
+export DH_ALWAYS_EXCLUDE=CVS
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+ifndef PERL
+PERL = /usr/bin/perl
+endif
+
+# Allow disabling build optimation by setting noopt in
+# $DEB_BUILD_OPTIONS
+CFLAGS = -Wall -g
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+        CFLAGS += -O0
+else
+        CFLAGS += -O2
+endif
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+
+	# Add commands to compile the package here
+	$(PERL) Makefile.PL INSTALLDIRS=vendor DEFAULTS QUIET
+	$(MAKE) OPTIMIZE="$(CFLAGS)"
+	
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+
+	# Add commands to clean up after the build process here
+	-$(MAKE) distclean
+	
+	dh_clean build-stamp install-stamp
+
+install: install-stamp
+install-stamp: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+
+	$(MAKE) test
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr
+	mkdir -p $(CURDIR)/debian/rrdpoller/usr/share/man/
+	mv $(CURDIR)/debian/tmp/usr/bin $(CURDIR)/debian/rrdpoller/usr/
+	mv $(CURDIR)/debian/tmp/usr/share/man/man1 $(CURDIR)/debian/rrdpoller/usr/share/man/
+	install -m 0755 -D $(CURDIR)/contrib/rrd.monitor $(CURDIR)/debian/rrdpoller/usr/lib/mon/mon.d/rrd.monitor
+	
+	# As this is a architecture independent package, we are not supposed to install
+	# stuff to /usr/lib. MakeMaker creates the dirs, we delete them from the deb:
+	rmdir --ignore-fail-on-non-empty --parents $(CURDIR)/debian/tmp/usr/lib/perl5
+
+	touch install-stamp
+
+binary-arch:
+# We have nothing to do by default.
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	dh_installexamples
+	dh_installinit
+	dh_installdocs 
+	dh_installchangelogs 
+	dh_perl
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+source diff:                                                                  
+	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

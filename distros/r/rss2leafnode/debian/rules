@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+
+# Copyright 2008, 2009, 2014, 2017 Kevin Ryde
+
+# This file is part of RSS2Leafnode.
+#
+# RSS2Leafnode is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# RSS2Leafnode is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with RSS2Leafnode.  If not, see <http://www.gnu.org/licenses/>.
+
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/perl-makemaker.mk
+
+DEB_INSTALL_EXAMPLES_rss2leafnode = examples/*
+
+# instead of makemaker default "rss2leafnode.1p"
+DEB_MAKEMAKER_USER_FLAGS = MAN1EXT=1

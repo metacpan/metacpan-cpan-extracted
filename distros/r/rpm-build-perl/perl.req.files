@@ -1,0 +1,46 @@
+#!/bin/sh -efu
+#
+# Copyright (c) 2007 Alexey Tourbin, ALT Linux Team.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is /usr/lib/rpm/find-requires filter.  It reads << file -NF$'\t' >>
+# output and decides which files should be processed with perl.req.
+#
+
+while IFS=$'\t' read -r f t; do
+	case "$f" in
+		*/auto/share/dist/*) continue ;;
+		*/auto/share/module/*) continue ;;
+	esac
+	case "$t" in
+		# shortcut check for perl scripts
+		*"perl script text"*)
+			echo "$f"
+			continue ;;
+		# symbolic links not needed here?
+		*"symbolic link to "*)
+			continue ;;
+	esac
+	case "$f" in
+		*.pm | *.pl | *.ph ) ;;
+		*) continue ;;
+	esac
+	case "$t" in
+		*" text"*)
+			echo "$f" ;;
+		# file(1) check for text files is not quite reliable
+		# I use perl for '-T $f' heuristic check (see perlfunc for details)
+		*)
+			if perl -e '$f=shift; exit( -T $f ? 0 : 1 )' "$f"; then
+				echo "${0##*/}: $f: $t (PASS)" >&2
+				echo "$f"
+			else
+				echo "${0##*/}: $f: $t (IGNORE)" >&2
+			fi
+			;;
+	esac
+done

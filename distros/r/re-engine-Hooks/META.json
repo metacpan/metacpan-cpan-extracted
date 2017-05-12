@@ -1,0 +1,64 @@
+{
+   "abstract" : "Hookable variant of the Perl core regular expression engine.",
+   "author" : [
+      "Vincent Pit <perl@profvince.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "re-engine-Hooks",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "DynaLoader" : "0",
+            "ExtUtils::Depends" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "POSIX" : "0",
+            "Test::More" : "0",
+            "blib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DynaLoader" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Name=re-engine-Hooks"
+      },
+      "homepage" : "http://search.cpan.org/dist/re-engine-Hooks/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://git.profvince.com/?p=perl%2Fmodules%2Fre-engine-Hooks.git"
+      }
+   },
+   "version" : "0.06"
+}

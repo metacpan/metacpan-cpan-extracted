@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+  <HEAD>
+    <TITLE>Release Manager Project Progress and Status (14-June-1999)</TITLE>
+    <!-- Created by: Randy J. Ray,  4-May-1999 -->
+    <!-- Changed by: Randy J. Ray, 20-Jul-1999 -->
+    <SCRIPT language="JavaScript1.1">
+// Take the document's lastModified property and add a line to the document
+// only if the value is non-zero
+function docupdated ()
+{
+  var lastmod = document.lastModified;
+  var lastmodint = Date.parse(lastmod);
+
+  if (lastmodint != 0)
+    {
+      lastmod = "This page last updated: " + lastmod;
+      document.write(lastmod.bold().fontsize("-1"));
+    }
+  else
+    {
+      document.write(" ");
+    }
+
+  return true;
+}
+    </SCRIPT>
+  </HEAD>
+  <BODY  bgcolor=white text=black vlink=green>
+    <CENTER>
+      <H1>Release Manager Project - Current Status</H1>
+    </CENTER>
+    <P>
+      This is an abbreviated copy of the <A HREF="plan.html">project plan</A>
+      to which changes are made to illustrate progress made:
+    </P>
+    <DIV ALIGN="center">
+      <TABLE border=2 width="75%" cellpadding=2>
+        <TR valign="top">
+          <th>S</th>
+          <TH>Component</TH>
+          <TH>% Complete</TH>
+          <TH>Estimated Time to Complete</TH>
+        </TR>
+        <TR valign="top">
+          <td valign=middle>&nbsp;1&nbsp;</td>
+          <TD bgcolor="silver">Database</TD>
+          <TD bgcolor="silver">100%</TD>
+          <TD bgcolor="silver">
+            Complete. Further development is frozen until the completion
+            of initial deployment.
+          </TD>
+        </TR>
+        <TR valign="top">
+          <td valign=middle>&nbsp;2&nbsp;</td>
+          <TD bgcolor="silver">Library and API</TD>
+          <TD bgcolor="silver">100%</TD>
+          <TD bgcolor="silver">
+            Complete. Further development is frozen until the completion
+            of initial deployment.
+          </TD>
+        </TR>
+        <TR valign="top">
+          <td valign=middle rowspan=2>&nbsp;3&nbsp;</td>
+          <TD bgcolor="silver">Server Side (a)</TD>
+          <TD bgcolor="silver">100%</TD>
+          <TD bgcolor="silver">
+            Complete. All server-side functionality is currently in place.
+            The remaining library call in the Lib/API component does not
+            affect this component (though it will be used here, in the planned
+            next generation). This has been in stable deployment for over 6
+            months. No new work is expected until after the initial stable
+            deployment of the entire system as a whole, including the
+            development of the supplemental documentation.
+          </TD>
+        </TR>
+        <TR valign="top">
+          <TD>Client Side (b)</TD>
+          <TD>70%</TD>
+          <TD>
+            There are three primary branches of this component: a
+            <I>CVS Command Wrapper</I>, the <I>Developer Management Tools</I>
+            and the <I>Path/URL Translation Engine</I>. Of these
+            three:
+            <DL>
+              <DT><B>CVS Command Wrapper</B></DT>
+              <DD>
+                Complete.
+              </DD>
+              <DT><B>Developer Management Tools</B></DT>
+              <DD>
+                <FONT COLOR=red>95% Complete</FONT>.
+                The coding is complete. The FTP support is written and
+		fit into the tool, but still needs testing.
+              </DD>
+              <DT><B>Path/URL Translator</B></DT>
+              <DD>
+                <FONT COLOR=red>Not started</FONT>.
+                Certain points regarding the design are still being
+                finalized. The existing wrapper is functional, though slow
+                and difficult to maintain. Work will commence after that
+                last parts are done on the <TT>release</TT> tool. Given
+                that, a rough estimate places this at
+                <FONT COLOR=red>2 weeks to develop</FONT> and
+                <FONT COLOR=red>1 week for testing</FONT>.
+              </DD>
+            </DL>
+            <br>
+            Besides these, there is a requirement for a command-line to that
+            would allow batch-mode release of small numbers of files, to
+            assist projects that use nightly jobs to generate semi-static
+            content from databases. This tool is still under consideration.
+          </TD>
+        </TR>
+        <TR valign="top">
+          <td valign=middle>&nbsp;4&nbsp;</td>
+          <TD>Additional Documentation</TD>
+          <TD>0%</TD>
+          <TD>
+            Not started. Requires completion of both Server Side and Client
+            Side. Current estimate is for
+            <FONT COLOR=red>two documents</FONT>, tentative topics
+            of "System Setup and Administration" and "User Manual and
+            Process Guide". Approximately
+            <FONT COLOR=red>one week for development of initial draft of each (two weeks total)</FONT>.
+            An additional
+            <FONT COLOR=red>4-5 days for gathering of proofreading feedback and making corrections and clarifications</FONT>
+            is also expected.
+            The first document completed can overlay the majority of
+            proofreading with the development of the second document. All
+            told, expect this component to need
+            <FONT COLOR=red>3-4 weeks, or simply one month, to complete</FONT>.
+          </TD>
+        </TR>
+      </TABLE>
+    </DIV>
+    <P>
+      <hr>
+      <table border=0 width="100%" cellspacing=0 cellpadding=0>
+        <tr valign=top>
+          <td width="40%">
+            <SCRIPT>docupdated()</SCRIPT>
+          </td>
+          <td width="20%"></td>
+          <td width="40%" align=right>
+            <FONT SIZE=-1>
+              <I>Email:
+                <A HREF="mailto:randyr@nafohq.hp.com">randyr@nafohq.hp.com</A>
+              </I>
+            </FONT>
+          </td>
+        </tr>
+      </table>
+    </P>
+  </BODY>
+</HTML>

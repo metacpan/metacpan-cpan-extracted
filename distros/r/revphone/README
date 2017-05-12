@@ -1,0 +1,54 @@
+revphone version 0.01
+=====================
+revphone is  a reverse phone number lookup to return owner information 
+
+I wrote this module , For a future  project and saw that nobody had written a
+module to do this...
+
+It is my first module, so I bet there will be bugs..
+
+if you use it, and like it (or not) please send me an email I would
+love to know how many people use this.
+
+usage ......
+
+use revphone;
+my $revlookup = revphone;
+$revlookup->revlookup('6016841121');
+
+Return-->  Nobody,is_here 555 milky way ln. Clinton, Ms 39056
+
+
+Thank You
+-Joseph Ronie
+phocuser@madbuddhawidom.com
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::Simple i used LWPng-alpha-0.24.tar.gz
+  
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by phocus
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

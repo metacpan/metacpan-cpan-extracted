@@ -1,0 +1,11 @@
+Revision history for ruby-collections-perl
+
+0.10    2013/04
+        First version, enhance Perl ARRAY & HASH by adding methods inspired by
+        Ruby collections to Tie::StdArray & Tie::StdHash.
+
+0.11    2013/07/28
+        Fix Collections.t
+
+0.12    2013/07/29
+        Fix Array.t

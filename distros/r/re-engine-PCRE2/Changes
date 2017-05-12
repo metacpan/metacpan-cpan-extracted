@@ -1,0 +1,85 @@
+Revision history for re::engine::PCRE2
+
+0.13 Thu May 4 13:48:53 2017 +0200 rurban
+
+    - Start handling multi-patterns (#26), like qr + $str + qr
+
+0.12 Wed May 3 09:47:57 2017 +0200 rurban
+
+    - fix op_comp multi patterns without optree, e.g. variable expansion.
+      test by Michael Haas (PR #25)
+    - fix Makefile.PL options handling (Petr Písař PR #20)
+    - fix some META data
+    - add PCRE2_EXTENDED_MORE /xx support (needs current pcre lib)
+    - Fix jitsize() (Petr Písař PR #23)
+
+0.11 Fri Apr 14 21:49:57 2017 +0200 rurban
+
+    - Support \gG anchors: bypass PCRE2, fallback to core.
+    - Partially support /g global matches, passes now all t/perl/pat.t
+      tests with >= 5.22
+    - t/perl/regexp.t: Support testing single tests,
+      Support --core argument without loading PCRE2.
+
+0.10 Wed Apr 12 10:06:21 2017 +0200 rurban
+
+    - Add the new heaplimit method and config option.
+    - Fixed make_nametable heap-buffer-overflow (#10)
+    - Fixup macports usr vs opt precedence
+    - Harmonize the match context names: use the same method name
+      for pattern and match_context fields. Some values are stored locally in the
+      pattern, some globally in the match context, and some are build-time defaults.
+
+0.09 Tue Apr 11 13:49:30 2017 +0200 rurban
+
+    - Fix split / /, " a b c" special case: don't skip starting whitespace.
+
+0.08 Tue Apr 11 08:35:51 2017 +0200 rurban
+
+    - Support all older libpcre2 versions.
+      Tested with 10.00, 10.10, 10.20, 10.21, 10.22, 10.23, 10.30-dev
+    - Return undef on unsupported pattern_info methods, not 0:
+      framesize, hasbackslashc
+
+0.07 Mon Apr 10 19:13:52 2017 +0200 rurban
+
+    - Fix stack corruption with certain rx size methods on 64bit
+    - Added new framesize method if available. If not 0
+    - Prepare for compile and match contexts (import options)
+    - Simplify XS method implementation
+    - Add config and method tests
+
+0.06 Sun Apr 9 11:25:35 2017 +0200 rurban
+
+    - Add BENCHMARKS to documentation: 40% faster
+
+0.05 Sun Apr 9 10:48:20 2017 +0200 rurban
+
+    - Harmonize re_tests with core, add version specifics
+    - Document failing tests, with PCRE2 vs older perls.
+      It's about the same, when the biggest problem, no utf8 patterns
+      with utf8 subjects is fixed. Arguably PCRE2 is even better.
+
+0.04 Fri Apr 7 19:57:46 2017 +0200 rurban
+
+    - add META_MERGE resources, esp. for the bugtracker
+
+0.03 Fri Apr 7 19:38:46 2017 +0200 rurban
+
+    - Minor pod fixes
+    - Add Devel::CheckLib (optional)
+
+0.02 Fri Apr 7 11:22:51 2017 +0200 rurban
+
+    - Add many more config functions and pattern methods.
+    - Enable the full perl regexp testsuite.
+      Only anchored /g regexp's are still failing.
+    - Implemented op_comp, with a fallback to core re_engine
+      with codeblocks.
+    - Add pcre warning when falling back to core re_engine on
+      unsupported patterns.
+
+0.01 Wed Apr 5 11:40:18 2017 +0200 rurban
+
+    - Started from re-engine-PCRE.
+    - fixed tests, added backcompat, changed to PCRE2 API and added jit

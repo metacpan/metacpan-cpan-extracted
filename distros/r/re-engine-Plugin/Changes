@@ -1,0 +1,90 @@
+0.12    2015-12-21 16:20 UTC - Vincent Pit
+        + Upd : The internal XS helpers headers were updated to help uncover
+                some possible future memory-related errors.
+
+0.11    2015-11-05 01:00 UTC - Vincent Pit
+        + Add : It is now possible to specify a re::engine::Plugin object
+                destructor by passing the 'free' option either to
+                re::engine::Plugin->import or to $re->callbacks.
+        + Chg : A large chunk of boilerplate XS code, which is also used in
+                other XS modules, has been factored out of the main .xs file
+                to a collection of .h files in the xsh subdirectory.
+        + Fix : A couple of memory leaks have been plugged.
+
+0.10    2014-10-01 23:55 UTC - Vincent Pit
+        + Fix : [RT #92118] : Testing failed with Perl 5.17.5+
+                The tests have been taught about perls newer than 5.18.0.
+                Thanks Tokuhiro Matsuno for reporting.
+        + Fix : The module should no longer cause segfaults when an END block
+                executed at the end of a pseudo-fork compiles some code with
+                eval STRING.
+        + Fix : Miscellaneous compiler warnings with newer perls have been
+                silenced.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+        + Upd : Package metadata overhaul.
+
+0.09    2011-04-05 16:05 UTC - Vincent Pit
+        + Add : The constants REP_THREADSAFE and REP_FORKSAFE tell you whenever
+                the pragma is thread-safe and fork-safe.
+        + Fix : Compatibility with perl 5.13.6 and upwards.
+        + Fix : The pragma should be much less eager to leak into other scopes.
+        + Fix : Memory leaks of code references stored into the regexp object.
+        + Fix : Work around Kwalitee test misfailures.
+        + Tst : Thread safety is now tested on perl 5.13.4 and greater.
+
+0.08    2009-08-29 16:55 UTC - Vincent Pit
+        + Add : The new ->callbacks method to the regexp object let you specify
+                the 'exec' callback on an individual basis.
+        + Chg : Perl 5.10 is now required (instead of 5.9.5).
+        + Fix : The pragma was leaking into required scopes on 5.10.0.
+        + Fix : If you specified a different re::engine::Plugin between the
+                compilation and the execution of a regular expression, the
+                'exec' callback invoked used to be the one for the second
+                engine. Worse, if the original engine wasn't in scope at the
+                time of execution, nothing happened. This is now fixed.
+        + Fix : The reference count of the callbacks stored wasn't properly
+                decremented.
+        + Fix : Incomplete MANIFEST.
+        + Tst : Subdirectories are now ordered.
+        + Tst : Author tests.
+
+0.07    2009-08-23 09:30 UTC - Vincent Pit
+        + Fix : [perl #38684]: test failures in t/method/mod.t
+        + Fix : Building with blead.
+
+0.06    2008-08-19 - Ævar Arnfjörð Bjarmason <avar@cpan.org>
+        * Plugin.pm: Tweaks
+        * Plugin.xs: Fix prototype mismatch for Plugin_dupe()
+
+0.05    2008-08-19 - Ævar Arnfjörð Bjarmason <avar@cpan.org>
+        * Plugin.pm: dos2unix
+        * Plugin.xs: RT#31635: Be compatable with threaded perls
+
+0.04    2007-12-27 - Ævar Arnfjörð Bjarmason <avar@cpan.org>
+        * Plugin.pm: Setting @ISA instead of using base.pm
+        * Makefile.PL: Now using ExtUtils::MakeMaker instead of Module::Install
+        * Plugin.(xs|h): Fix up prototypes to match the callbacks in the actual
+                         5.10 release
+        * Plugin.xs: Dumped CODE: in favor of PPCODE:, the former is teh sux
+        * Plugin.xs: Minor cleanups here and there
+        * Plugin.pod: New todo and a developer release notice
+        * Plugin.[h|pm]: Named buffer callbacks
+        * t/methods/stash.t: Test return value of $rx->stash({});
+        * t/methods/str/modify.t: New test for modification of ->str when
+                                  a reference is used
+        * t/methods/str/types.t: This was testing pattern types, fixed
+        * t/Example.[t|pm]: Moved to t/usage
+
+0.03    2007-05-17 - Ævar Arnfjörð Bjarmason <avar@cpan.org>
+        * Plugin.xs: The exec callback would call_sv on a NULL value
+          causing a segfault
+        * Plugin.pod: Use %hash ~~ 'i' instead of $hash{i}, more stylish!
+        * inc: Bumping Module::Install to 0.65
+
+0.02    2007-05-17 - Ævar Arnfjörð Bjarmason <avar@cpan.org>
+        * Brought up to date with current blead after lots of hacking on
+          blead itself, too many changes to list
+
+0.01    2007-02-18 - Ævar Arnfjörð Bjarmason <avar@cpan.org>
+        * Initial release

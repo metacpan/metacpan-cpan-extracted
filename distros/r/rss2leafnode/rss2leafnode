@@ -1,0 +1,977 @@
+#!perl -w
+
+# RSS2Leafnode -- copy RSS feeds to a local news spool
+
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+#
+# This file is part of RSS2Leafnode.
+#
+# RSS2Leafnode is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# RSS2Leafnode is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with RSS2Leafnode.  If not, see <http://www.gnu.org/licenses/>.
+
+use 5.010;
+use strict;
+use warnings;
+use Encode;              # for Encode::PERLQQ
+use Encode::Locale 0.02; # version 0.02 for console_in,console_out
+use PerlIO::encoding;    # for fallback
+use App::RSS2Leafnode;
+
+our $VERSION = 79;
+
+# locale encoding conversion on the tty, wide-chars everywhere internally
+# for instance $subject from an item might be wide chars printed when --verbose
+{ no warnings 'once';
+  local $PerlIO::encoding::fallback = Encode::PERLQQ(); # \x{1234} style
+  (binmode (STDOUT, ':encoding(console_out)')
+   && binmode (STDERR, ':encoding(console_out)'))
+    or die "Cannot set :encoding on stdout/stderr: $!\n";
+}
+
+my $r2l = App::RSS2Leafnode->new;
+exit $r2l->command_line;
+
+__END__
+
+=for stopwords rss2leafnode rss leafnode NNTP config leafnode undef charset UTF-8 non-ascii charsets builtins misconfigured Eg Unrendered Google pre-releases Ryde PNG libxml multibyte codings feed's NOAA XHTML unescaping X-From-Url X-RSS-Url X-RSS-Generator eg sn codepage unescape favicon kbytes repost r2l.perl conf ie GPL appication WordPress pre RDF reposted MHTML perl-mode renderer LWP mis-spelling Unrecognised unrecognised multi-author html recoding
+
+=head1 NAME
+
+rss2leafnode -- post RSS or Atom feeds and web pages to newsgroups
+
+=head1 SYNOPSIS
+
+ rss2leafnode [--options]
+
+=head1 DESCRIPTION
+
+RSS2Leafnode downloads RSS or Atom feeds and posts items as messages to an
+NNTP news server.  It's designed to make text items available for reading in
+local newsgroups, not propagating anywhere (though that's not enforced).
+
+Desired feeds are given in a configuration file F<.rss2leafnode.conf> in
+your home directory.  For example to put a feed into group "r2l.perl"
+
+    fetch_rss ('r2l.perl', 'http://log.perl.org/atom.xml');
+
+This is actually Perl code, so comment lines begin with C<#> and you can use
+conditionals, variables, etc (see L<perlintro> or L<perlsyn>).  The target
+newsgroup must exist (see for example L</Leafnode> below).  With that done,
+run C<rss2leafnode> as
+
+    rss2leafnode
+
+You can automate with C<cron> or similar.  If you do it under user C<news>
+it could be just after a normal news fetch.  The C<--config> option below
+lets you run different config files at different times, etc.  Code in the
+conf file could do that too.  See F<examples/rss2leafnode.conf> in the
+RSS2Leafnode sources for a complete sample.
+
+Messages are added to the news spool using NNTP "POST" commands.  When a
+feed is re-downloaded any items previously added are not repeated.  Multiple
+feeds can be put in a single newsgroup.  Each feed is posted as it's
+downloaded, so the first feed's articles appear while other feeds are still
+being downloaded.
+
+The target news server follows the L<Net::NNTP> defaults, or the newsgroup
+name can be in the form of a C<news:> or C<nntp:> URL of a server on a
+different host or port.  For example a personal server on a high port
+number,
+
+    fetch_rss('news://somehost.mydomain.org:8119/r2l.weather',
+              'http://feeds.feedburner.com/PTCC');
+
+=head2 Web Pages
+
+Plain web pages can be downloaded too.  Each time the page changes a new
+article is injected.  This is good for a latest news or status page.  For
+example
+
+    fetch_html ('r2l.music',
+      'http://www.abc.net.au/rage/playlist/print/saturday_print.htm');
+
+The target can be an image or similar directly too.  It's simply put in a
+news message with its indicated MIME type.  How well it displays depends on
+your newsreader.
+
+    fetch_html('r2l.weather',
+               'http://www.bom.gov.au/difacs/IDX0604.gif');
+
+The message "Subject" is the HTML C<< <title> >> or possibly something
+better from C<URI::Title> or C<Image::ExifTool> if you have those.
+C<URI::Title> has special cases for a couple of unhelpful sites and
+C<Image::ExifTool> can get a PNG image title.
+
+If a web page isn't at a fixed location you can write some Perl code in
+F<.rss2leafnode.conf> to construct a URL with a date etc.  It might be worth
+attempting a couple of nearby dates if you're not certain when the new one
+becomes available.
+
+=head2 Re-Downloading
+
+HTTP C<ETag> and C<Last-Modified> headers are used, if provided by the
+server, to avoid re-downloading unchanged content (feeds or web pages).  RSS
+C<< <thr:count> >> or C<< <slash:comments> >> are used to skip unchanged
+comments feeds.  Values seen from the last run are saved in a
+F<.rss2leafnode.status> file in your home directory.  The C<--verbose>
+option shows when a server doesn't have C<ETag> or C<Last-Modified>.
+
+If you have C<XML::RSS::Timing> then it's used for RSS C<< <ttl> >>,
+C<< <updateFrequency> >>, etc from a feed.  This means the feed is not
+re-downloaded until its declared update times.  But only a few feeds have
+good timing info, most merely have a C<ttl> advising for instance 5 minutes
+between rechecks.
+
+With C<--verbose> the next calculated update time is printed, in case you
+wonder why nothing is happening.  The easiest way to force a re-download is
+to delete the F<~/.rss2leafnode.status> file.  Old status file entries are
+automatically dropped if you don't fetch a particular feed for a while, so
+that file should normally need no maintenance.
+
+=head2 Leafnode
+
+C<rss2leafnode> was originally created with the C<leafnode> program in mind,
+but can be used with any server accepting posts.  It's your responsibility
+to be careful where a target newsgroup propagates.  Don't make automated
+postings to the world!
+
+For leafnode version 2 see its F<README> file section "LOCAL NEWSGROUPS" on
+creating local-only groups.  Add a line to the
+F</etc/news/leafnode/local.groups> file like
+
+    r2l.stuff	y	My various feeds
+
+The group name is arbitrary and the description is optional, but note it
+must be a tab character between the name and the "y" and between the "y" and
+any description.  "y" means posting is allowed.
+
+=head2 Small News
+
+The Small News "sn" program is a another possible local server.  Create
+groups in it with command
+
+    snnewgroup r2l.something
+
+When running the C<snntpd> daemon from C<inetd> or similar don't forget a
+logger program argument on the command line as described its F<INSTALL.run>
+file, otherwise log messages go to the client connection and will upset most
+client program code, including C<Net::NNTP> used by C<rss2leafnode>.
+
+=head2 Copyright
+
+It's your responsibility to check the terms of use for any feeds or web
+pages you download with C<rss2leafnode>.  Pay particular attention if
+propagating or re-transmitting resulting messages.
+
+Copyright or license statements in a feed are included in the messages as
+C<X-Copyright> headers.  Unless the content is in the public domain such
+copyright notices should be retained.
+
+The transformations RSS2Leafnode makes to turn feed items into messages are
+purely mechanical and for that reason the author believes the program's
+terms (ie. GPL, per L</"LICENSE"> below) are not imposed on the results.
+
+=head1 COMMAND LINE OPTIONS
+
+The command line options are
+
+=over 4
+
+=item C<--config=/some/filename>
+
+Read the specified configuration file instead of F<~/.rss2leafnode.conf>.
+
+=item C<--help>
+
+Print some brief help information.
+
+=item C<--verbose>
+
+Print some diagnostics about what's being done.  With C<--verbose=2> print
+various technical details.
+
+=item C<--version>
+
+Print the program version number and exit.
+
+=back
+
+=head1 CONFIG OPTIONS
+
+The following config options can be set either in global variables, or on a
+per-feed basis in an individual C<fetch_rss()> or C<fetch_html()>.
+
+=over 4
+
+=item $rss_get_links (default 0)
+
+=item C<fetch_rss ("group", "url", rss_get_links =E<gt> G)>
+
+If set to 1 then download links in each item and include the content in the
+news message.  For example,
+
+    $rss_get_links = 1;
+    fetch_rss ('r2l.finance',
+      'http://au.biz.yahoo.com/financenews/htt/financenews.xml');
+
+Not all feeds have interesting things at their link.  Sometimes the RSS has
+the full item text already.  But if the RSS is a summary then
+C<$rss_get_links> makes the full article ready to read immediately, instead
+of having to click through from the message.
+
+Only the immediate link target URL is retrieved.  No images within the page
+are downloaded, which is often a good thing to reduce bloat or avoid
+occasional advertising in feeds.  You'll probably have trouble if the link
+target uses frames (a set of HTML pages instead of just one).
+
+=item $rss_get_comments (default 0)
+
+=item C<fetch_rss ("group", "url", rss_get_comments =E<gt> G)>
+
+If true then download the comments feeds for items and post as followup news
+articles.  For example,
+
+    fetch_rss ('r2l.food',
+      'http://wickedgooddinner.blogspot.com/feeds/posts/default',
+      rss_get_comments => 1);
+
+To send a followup comment you usually must go to the links in the original
+article (or the followups) and use some sort of web form.  Posting a message
+to the newsgroup goes nowhere.
+
+When a feed is available in both Atom and RSS formats sometimes only the
+Atom one includes a comments feed URL.
+
+Comments feeds are followed for as long as an article appears in the feed,
+though in the current implementation it might be checked for new comments
+only when the originating feed changes.
+
+=item $render (default 0)
+
+=item C<fetch_rss ("group", "url", render =E<gt> R)>
+
+=item C<fetch_html ("group", "url", render =E<gt> R)>
+
+If true then render HTML as plain text in the news messages.  Normally item
+text, downloaded parts from C<$rss_get_links>, and C<fetch_html()> pages are
+all presented as C<text/html>.  If your newsreader doesn't handle HTML very
+well then C<render> is a good way to see just the text.  Setting C<1> uses
+C<HTML::FormatText>,
+
+    $render = 1;    # to use HTML::FormatText
+    fetch_rss ('r2l.weather',
+      'http://xml.weather.yahoo.com/forecastrss?p=ASXX0001&u=f');
+
+Setting C<"WithLinks"> uses the C<HTML::FormatText::WithLinks> variant (you
+must have that module) which shows HTML links as footnotes.
+
+    fetch_rss ('r2l.stuff',
+               'http://rss.sciam.com/sciam/basic-science',
+               render => 'WithLinks');
+
+=cut
+
+# HTML::FormatText::Elinks        yes
+# HTML::FormatText::Html2text     no output_charset
+# HTML::FormatText::Lynx          yes
+# HTML::FormatText::Links         no UTF-8 output_charset
+# HTML::FormatText::Netrik        no UTF-8 output as such
+# HTML::FormatText::Vilistextum   yes if built with UTF-8
+# HTML::FormatText::W3m           yes
+# HTML::FormatText::Zen           no, latin-1 only
+
+=pod
+
+Settings C<"elinks">, C<"lynx"> or C<"w3m">use the respective external
+program.  You must have C<HTML::FormatExternal> and the program.
+
+    fetch_rss ('r2l.sport',
+               'http://fr.news.yahoo.com/rss/rugby.xml',
+               rss_get_links => 1,
+               render => 'lynx');
+
+C<"vilistextum"> can be used too if it is built with C<--enable-multibyte>
+for UTF-8 output.  Other C<HTML::FormatExternal> programs generally can't be
+used as they don't have output charset UTF-8.
+
+=item $render_width (default 60)
+
+The number of columns to use when rendering HTML to plain text or when
+wrapping Atom text.  You can set this to whatever you find easiest to read,
+or any special width needed by a particular feed.
+
+=item $get_icon (default 0)
+
+=item C<fetch_rss ("group", "url", get_icon =E<gt> G)>
+
+=item C<fetch_html ("group", "url", get_icon =E<gt> G)>
+
+Download an RSS/Atom icon or HTML favicon as an image for the C<Face>
+header.  C<Image::Magick> is required for image processing if not already
+PNG format and maximum size 48x48 (in size attributes).
+
+The C<Face> header is shown by Gnus and perhaps only a few other
+news readers.  In Gnus it appears with "From:" in article mode on a
+graphical screen.  It can be a good visual cue to the origin, but may not
+always be worth the extra download.
+
+    $get_icon = 1;
+    fetch_rss ('r2l.whatsnew',
+               'http://www.archive.org/services/collection-rss.php');
+
+Banners much wider than high are suppressed as probably advertising and
+anyway not suited to 48x48 size limit of the C<Face> header specification.
+A 48x48 image might add around 4 kbytes or more to each message.
+
+For plain RSS and Atom feeds an image is normally a per-channel attribute so
+it's the same for all articles from the feed.  An C<itunes:image> or
+C<activity:actor> can be per-item and is used if present.
+
+=item $rss_newest_only (default 0 for all)
+
+=item C<fetch_rss ("group", "url", rss_newest_only =E<gt> $count)>
+
+=item C<fetch_rss ("group", "url", rss_newest_only =E<gt> $period)>
+
+Take only newest items from an RSS feed.  The default is 0 which means take
+all items from the feed.  The value is either a number for the latest few
+items, eg. 10 items,
+
+  fetch_rss('r2l.test',
+            'http://www.cpantesters.org/author/K/KRYDE-nopass.rss',
+            rss_newest_only => 10);
+
+Or it can be a string giving a period of time.  Only items newer than this
+are taken
+
+    "60 minutes"
+    "1 hour"     "36 hours"
+    "1 day"      "2 days"
+    "1 day"      "2 days"
+    "1 month"    "5 months"
+    "1 year"     "0.75 years"
+
+C<rss_newest_only> can be good if you're only interested in the most recent
+item from a status or weather feed, or if you only want to get a few items
+as a random taste of a feed.
+
+If a feed goes back further than the news server retains then giving a
+period such as "90 days" or whatever corresponding to the server time will
+prevent old articles being re-added when the server discards them.  (It'd be
+better if the news server could be asked for its retention time, but this
+option here is better than nothing.)
+
+=item $html_extract_main (default 0, false)
+
+=item C<fetch_html ("group", "url", html_extract_main =E<gt> 1)>
+
+=item C<fetch_rss ("group", "url", html_extract_main =E<gt> 1)>
+
+Use L<HTML::ExtractMain> on downloaded HTML to pick out the "main" text from
+the page.  For C<fetch_rss()> this is applied to downloaded link parts
+(C<rss_get_links> above).  C<HTML::ExtractMain> version 0.63 or higher is
+required.
+
+This is good for removing boilerplate headers or side columns on a page.
+For reading text those things tend to waste space and often look
+particularly poor from a non-tables renderer such as C<HTML::FormatText> or
+C<lynx>.
+
+The algorithm in C<HTML::ExtractMain> is a simple paragraph scoring system
+(as of its version 0.63).  It does a surprisingly good job but you might
+check how much it discards, in case something good was not reckoned part of
+the main text.  Option value "attach_full" includes the full page as an
+attachment
+
+    $html_extract_main = 'attach_full';
+
+=back
+
+=head2 Obscure Options
+
+=over 4
+
+=item $user_agent (string, default undef)
+
+=item C<fetch_rss ("group", "url", user_agent =E<gt> "string")>
+
+=item C<fetch_html ("group", "url", user_agent =E<gt> "string")>
+
+Set the C<User-Agent> string which RSS2Leafnode reports in its download
+requests.  The default is RSS2Leafnode and LWP version numbers,
+
+    RSS2Leafnode/123 libwww-perl/456
+
+Occasionally a HTTP server will look at the C<User-Agent> and do something
+different or perhaps even allow access only for certain kinds of clients.
+Generally speaking this is very bad.  The C<user_agent> option here lets
+RSS2Leafnode masquerade as some other client, for instance as a browser if a
+server will only speak properly to a browser.
+
+    $user_agent = 'Mosaic/1.0';
+
+If the string ends with a space then L<LWP::UserAgent> will append itself to
+the string.
+
+=item $rss_charset_override (string, default undef)
+
+=item C<fetch_rss ("group", "url", rss_charset_override =E<gt> "CHARSET")>
+
+If set then force RSS content to be interpreted in this charset,
+irrespective of what the document says.  See L<XML::Parser/ENCODINGS> for
+the charsets supported (it has some builtins and then F<.enc> files under
+F</usr/lib/perl5/XML/Parser/Encodings/>).
+
+Use this option if the document is wrong, or if it has no charset specified
+and isn't the XML default UTF-8.  Usually you'll only want this for a
+particular offending feed.  For example,
+
+    # AIR is latin-1, but doesn't have a <?xml> saying that
+    fetch_rss ('r2l.finance',
+               'http://www.aireview.com.au/rss.php',
+               rss_charset_override => 'iso-8859-1');
+
+By default RSS2Leafnode tries to cope with bad multibyte sequences by
+re-coding to the feed's claimed charset.  If that works then the text will
+have some substitute characters (either U+FFFD or question marks "?") and a
+warning is given like
+
+    Feed http://example.org/feed.xml
+      recoded utf-8 to parse, expect substitutions for bad non-ascii
+      (line 214, column 75, byte 13196)
+
+Bad single-byte codings generally aren't detected and will just go through
+to display something incorrect (eg. if MS-DOS codepage 1252 used where
+Latin-1 is claimed).  Nose around the raw feed to see where it goes wrong.
+
+=item $html_charset_from_content (default 0)
+
+=item C<fetch_rss ("group", "url", html_charset_from_content =E<gt> H)>
+
+=item C<fetch_html ("group", "url", html_charset_from_content =E<gt> H)>
+
+If true then the charset used for HTML content is taken from the HTML
+itself, rather than the server's HTTP headers.  Normally the server should
+be believed, but if a particular server is misconfigured then you can try
+this.
+
+    fetch_html ('r2l.stuff',
+                'http://www.somebadserver.com/newspage.html',
+                html_charset_from_content => 1);
+
+=back
+
+=head2 Config Extent
+
+Variables take effect from the point they're set, through to the end of the
+file, or until a new setting. 
+
+Options like C<render =E<gt> 'lynx'> in a particular C<fetch_rss()> or
+C<fetch_html()> override the global settings, just for that call.
+
+The Perl C<local> feature and a braces block can confine a variable setting
+to a group of particular feeds.  Eg.
+
+    { local $rss_get_links = 1;
+      fetch_rss ('r2l.debian',
+                 'http://www.debian.org/News/weekly/dwn.en.rdf');
+      fetch_rss ('r2l.finance',
+                 ...);
+    }
+
+=head2 Emacs
+
+In Emacs, F<.rss2leafnode.conf> can be put into C<perl-mode> with the usual
+mode setup in the file
+
+    # -*- mode: perl-mode -*-
+
+Or an C<auto-mode-alist> setup in your F<.emacs>,
+
+    (add-to-list 'auto-mode-alist
+                 '("/\\.rss2leafnode\\.conf\\'" . perl-mode))
+
+The Debian package of C<rss2leafnode> has this setup, plus a completions
+ignore for the C<.rss2leafnode.status> file.  See
+F</etc/emacs/site-start.d/50rss2leafnode.el> in the package, or
+F<debian/emacsen-startup> in the RSS2Leafnode sources.
+
+=head1 OTHER DETAILS
+
+Non-ascii RSS text, Atom text and rendered HTML text are coded as UTF-8 in
+the generated messages so for non-ascii content you'll need a newsreader
+which supports that.  Unrendered HTML is left in the charset the server
+gave, to ensure it matches any C<< <meta http-equiv> >> in the document.  In
+all cases the charset is specified in the MIME message headers or attachment
+parts.  Transfer coding in the message body is chosen by C<MIME::Entity>
+which normally means quoted-printable if any non-ascii or any very long
+lines.  Atom C<< <content> >> already in base64 is left that way.
+
+Links are shown at the end of each message for
+
+    <link>                 RSS and Atom
+    <enclosure>            RSS
+    <comments>             RSS
+    <content>              Atom externals, except other XML feeds
+    <source>               RSS and Atom
+    <prism:url>
+    <sioc:has_creator>
+    <sioc:has_discussion>
+    <sioc:links_to>
+    <sioc:reply_of>
+    <wfw:comment>          well-formed web
+    <wiki:diff> 
+    <wiki:history>
+    Author <url>           Atom and wiki, not downloaded
+
+Comment or reply links show a count of replies from any of
+
+    <thr:total>
+    <link count="123"        attribute
+    <link thr:count="123"    attribute
+    <slash:comments>         sub-element of <comments>
+
+RSS comment feeds for C<$rss_get_comments> are as follows.  "appication" is
+a mis-spelling from WordPress pre 2.5 still sometimes found in use (as of
+Oct 2012).
+
+    <wfw:commentRss>
+    <link rel='replies' type='application/atom+xml' ...>
+    <link rel='replies' type='appication/atom+xml' ...>
+
+Comments links are shown as "Replies" or "RSS Replies".  If an RSS comment
+feed hasn't been detected as RSS it may show up as plain "Replies" instead
+of "RSS Replies".  In that case it won't be downloaded by the
+C<rss_get_comments> option.
+
+C<< <media:group> >> links are shown as blocks of links.  Not sure about the
+quality of the formatting yet, and they're not downloaded by
+C<rss_get_links>.
+
+Common Alerts Protocol (CAP) fields for weather alerts etc are shown if
+present (eg. from the US NOAA).  This can have more detail than just the
+text.  Pseudo-link footnotes are shown for
+
+    <geo:lat>,<geo:long>
+    <geo:Point>
+    <georss:point>
+    <statusnet:origin>      possibly with URL target too
+    <media:credit>
+    <re:rank>
+    <hlxcd:helex-company-data>   symbol and name
+
+Unrecognised item fields are shown in XML at the end of the message.  This
+is a bit technical but tries not to drop information and might suggest extra
+things RSS2Leafnode could present or interpret.
+
+An attempt is made to repair bad XML from a feed with C<XML::Liberal> if you
+have that module.  It uses C<XML::LibXML> and the C<libxml> library and
+often succeeds on annoying things like bad C<&foo;> entities, at least
+enough to present something.  On hopelessly malformed data it might be a bit
+slow.
+
+The most common XML problem is too much or too little C<&foo;> entity
+escaping.  Too little can turn HTML markup into nested XML elements.
+RSS2Leafnode attempts to treat that as if it was XHTML style sub-elements
+but the result is likely to be imperfect.  Too much escaping results in raw
+or semi-raw HTML C<< <p> >> or C<&foo;> coming through.  C<&apos;> may be
+from XHTML instead of HTML, though many browsers support that entity anyway.
+Perhaps an option for extra unescaping could improve some bad feeds but in
+practice is unlikely to be wholly successful.  Every bad feed tends to be
+bad in its own special way.
+
+=head2 Message Headers
+
+For reference the message headers fields are generated roughly as follows,
+
+=over
+
+=item From:
+
+First non-empty of
+
+    <author>
+    <jf:author>
+    <slate:author>
+    <dc:creator>
+    <dc:contributor>
+    <wiki:username>
+    <itunes:author>
+    <managingEditor>
+    <webMaster>
+    <dc:publisher>
+    <itunes:owner>
+    channel <title>
+
+The C<dc> bits in RDF might have sub-elements
+C<< <rdf:description><rdf:value> >> containing the actual text.
+
+    <dc:contributor>
+      <rdf:Description ...>
+        <rdf:value>Joe Bloggs</rdf:value>
+      </rdf:Description>
+    </dc:contributor>
+
+Atom has C<< <name> >> and C<< <email> >> sub-elements.
+C<< <itunes:owner> >> may have an C<< <itunes:email> >> sub-element.  Such
+sub-elements are checked without worrying whether the feed is supposed to be
+Atom or RSS etc.  If there's no email in the item but the name matches the
+channel C<owner> then the email is taken from there.  When there's no
+sub-elements the text is free-form and might be things like
+
+    Name
+    Name <foo@example.com>
+    foo@example.com (Name)
+
+If there's no identifiable email mailbox part in the text and no
+C<< <email> >> element then C<nobody@HOSTNAME> is added to make a valid RFC
+822 address.
+
+The channel C<< <title> >> as a final fallback is meant to at least show
+something about where the message came from if there's no author identified.
+An author C<< <url> >> is shown in the message links as described above.
+
+C<< <dc:creator> >> can appear multiple times for multiple authors.  They're
+combined as a multiple C<From> per RFC 5322, but currently without
+attempting to pick out a C<Sender:> from among them.  Atom feeds can have
+multiple C<< <contributor> >> but for now only the primary author or authors
+are shown.
+
+=item Subject:
+
+First present of
+
+    <title>
+    <dc:title>
+    <dc:subject>
+
+C<< <dc:subject> >> is normally only a keyword but might be better than
+nothing.
+
+=item Date:
+
+First present of
+
+    <pubDate>
+    <dc:date>
+    <jf:creationDate>
+    <modified>
+    <updated>
+    <issued>
+    <dcterms:issued>
+    <created>
+    <lastBuildDate>
+    <published>
+    <prism:publicationDate>
+
+C<dc:date> is ISO format "2000-01-01T12:00:00Z" etc and anything in that
+form is converted to RFC 822 style for the messages.  An unrecognised form
+is put through unmodified.
+
+C<< <jf:creationDate> >> is not used.  It's apparently meant to be
+locale-based for human readability and is probably accompanied by
+C<< <pubDate> >> anyway so not needed.
+
+=item Date-Received:
+
+The date/time when C<rss2leafnode> made the message.
+
+=item Message-ID:
+
+First of
+
+    <id>                         (Atom)
+    <guid isPermaLink="true">
+    <link>                       Yahoo Finance special case
+    <guid isPermaLink="false">   and feed URL
+    MD5 hash                     of various fields and feed URL
+
+Yahoo Finance items repeated in different feeds are noticed using a special
+match of the C<< <link> >> so that just one copy is posted.  (As of March
+2010 those items don't offer RSS C<guid> identifiers.)
+
+=item Keywords:
+
+All of
+
+    <category>
+    <itunes:category>
+    <cap:category>
+    <itunes:keywords>
+    <media:keywords>
+    <dc:subject>
+    <slash:section>
+    <slate:topic>
+
+The sub-category system of C<< <itunes:category> >> is not currently put
+through.
+
+Some blog feeds have a big set of categories, maybe an aggregate of
+everything in the blog or some such, making an unattractively long
+C<Keywords:> header.  It's kept in full for the sake of completeness, but if
+viewing it in a newsreader then some sort of line limit might be wanted.
+
+=item In-Reply-To:
+
+C<< <thr:in-reply-to> >> elements (per RFC 4685) turned into Message-IDs the
+same way as an Atom <id>.  This might help thread display in a news reader
+if the parent item was downloaded too.
+
+C<< <sioc:reply_of> >> is not used.  It'd be a possibility, but would
+probably need a hard-coded mapping of URL to Message-ID.  For now it's just
+shown as a link as described above.
+
+=item Content-Location:
+
+The URL of a C<fetch_html()> or a C<$get_links> attachment part.  Good
+newsreaders can use this to resolve relative links in a HTML part.
+
+This same URL and any C<xml:base> attribute is used as a C<< <base
+href=""> >> when making a HTML fragment, so the location is present when
+saving a message body and when rendering it to plain text.
+
+=item Content-Language:
+
+First of
+
+    <language>
+    <dc:language>
+    <twitter:lang>
+    xml:lang=""
+    HTTP response Content-Language header
+
+C<xml:lang> is the standard XML attribute present on any element and
+sometimes found on Atom C<< <content> >> text.
+
+The language code is also added to a generated HTML body in HTML4 style, but
+whether any renderers/browsers do much with it is another matter.
+
+    <html lang="en">
+
+=item Content-MD5:
+
+From the corresponding HTTP header of a C<fetch_html()> or C<$get_links>
+download part, though in practice this is almost never sent by HTTP servers.
+
+=item Importance:
+
+=item Priority:
+
+These headers are only supposed to be for X.400 inter-operation.  Common
+Alerts Protocol and Wiki (L<http://www.meatballwiki.org/wiki/ModWiki>) are
+treated as
+
+    <cap:severity> "Extreme" and "Severe"
+       -> "Importance: high" and "Priority: urgent"
+
+    <wiki:importance> "minor"
+       -> "Importance: low"
+
+=item Precedence:
+
+"list" for certain Google Groups lists, identified by their link URLs per
+C<List-Post> below.  Perhaps other feeds which come from mailing lists could
+be identified too.
+
+=item Face:
+
+Per the C<$get_icons> option described above, the first item or channel
+element
+
+     <image>           RSS
+     <icon>            Atom
+     <logo>            Atom
+     <itunes:image>
+     <statusnet:postIcon>
+     <media:thumbnail>
+     <activity:actor><link rel="avatar">
+     <author><gd:image>
+     HTML favicon      for fetch_html()
+
+Gnus and perhaps other newsreaders can display C<Face:>, see
+L<http://quimby.gnus.org/circus/face>.
+
+It'd be possible to generate an C<X-Face:> as well or instead, but
+C<X-Face:> is black and white and converting a colour image from the feeds
+is unlikely to look good.
+
+=item List-Post:
+
+Mailbox of a Google Groups mailing list feeds such as
+L<http://groups.google.com/group/cake-php/feed/rss_v2_0_msgs.xml>.  This may
+help post a followup to the list, depending on the newsreader.  (A followup
+to an C<rss2leafnode> newsgroup will normally go nowhere.)
+
+=item PICS-Label:
+
+Channel C<< <rating> >>.  Perhaps C<< <itunes:explicit> >> or
+C<< <media:adult> >> could be turned into a rating too.
+
+=item X-Mailer:
+
+"RSS2Leafnode/VERSION" plus the usual from C<MIME::Entity> (see
+L<MIME::Entity/build PARAMHASH>).
+
+=item X-Copyright:
+
+An RSS2Leafnode extension, being all of following.  See L</Copyright> above.
+
+    <rights>                           Atom
+    <copyright>                        RSS
+    <dc:rights>
+    <dcterms:license>
+    <creativeCommons:license>
+    <link rel="license" href="...">    Atom
+
+These are sought in the channel, the item, and also any Atom style
+C<< <source> >> within the item.
+
+=item X-RSS-Url:
+
+An RSS2Leafnode extension, being the originating C<fetch_rss()> feed URL
+downloaded.  This is handy if an item has come out badly and you want to
+check the raw feed.
+
+=item X-RSS-Generator:
+
+An RSS2Leafnode extension, being the channel C<< <generator> >>.  This might
+help assign blame for bad feed content etc.
+
+=back
+
+Of course all this conversion and endless variant DTDs wouldn't be necessary
+if RSS had been news in the first place.  A news server already serves short
+messages, either read-only or with followups, and if news servers hadn't
+gained a well-deserved reputation for being a pain to administer, and if
+news hadn't been based on transferring gigabytes of "full feed" instead of
+by demand, then RSS might never have been wanted.  Of course the other side
+is that if you're a web page author accustomed to HTTP then everything looks
+like a HTTP and if you like HTML then a ridiculous edifice like XML to
+encapsulate a half dozen lines of text might even seem like a good idea.
+
+=head1 BUGS
+
+The way Message-IDs are checked on the news server means that the server
+should be setup to retain messages for at least as long as the feed retains
+items, or as long as the C<rss_newest_only> option you select for the feed.
+If that's not so then old articles will be re-posted by the next
+C<fetch_rss()> and will look like new articles to a newsreader.  (Letting
+the news server track articles keeps down the amount of state
+C<rss2leafnode> must maintain and means multiple users can insert a feed
+without duplication.)
+
+No retries are attempted if a news server disconnects, at least not unless
+posting to a different news server then coming back.  Not sure if that's
+good or bad, but the current repeated error messages for a disconnect are
+unattractive.  The intention for the future is to attempt a reconnect.
+
+Some pre-releases of leafnode 2 might have trouble posting to local
+newsgroups while a C<fetchnews> run is in progress.  When this happens the
+local articles don't show up until after a subsequent further C<fetchnews>.
+Or was this only for the C<rnews> inject?
+
+No attention is paid to C<< <atom:updated> >> or other changes in an item.
+Should an updated item be re-posted?  Is the C<Supersedes:> header better,
+to replace the article?  Something allowing readers to see or not see
+updates according to user preference might be good.  Currently the item is
+reposted if C<< <atom:id> >> changes or if there's no C<id> and the content
+changes enough to make a new MD5 hash.  Is C<id> supposed to stay the same
+for an update?
+
+The way C<$rss_get_links> only gets the immediate link target could perhaps
+be extended to fetch images or frame sub-parts etc of a HTML page and
+include them in the message as RFC 2557 style "MHTML".  But do any news
+readers actually display that?
+
+Perhaps there should be a limit on the size of links to be downloaded.
+Sometimes podcast links have both a html page and a full audio link.  If the
+audio is bigger than some threshold then might like to download the html but
+not the audio.
+
+The entire XML feed is read into memory, which might be a little too much
+for large feeds.  RSS was conceived as a "site summary" but is used for
+bigger content too.  Twig has a partial-tree parse for one item at a time,
+though applying the C<rss_newest_only> option would require a first pass to
+choose items.  A progressive parse might help show the first few items if
+there's a fatal syntax error or truncation part-way through.  Some care
+would be needed that small changes by the automated charset recoding or by
+C<XML::Liberal> doesn't cause duplicated posts.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item C<NNTPSERVER>
+
+=item C<NEWSHOST>
+
+Default news server as per C<Net::NNTP>.  If unset then C<localhost> is
+used.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.rss2leafnode.conf>
+
+Configuration file.
+
+=item F<~/.rss2leafnode.status>
+
+Status file, recording "last modified" dates for downloads.  This can be
+deleted if something bad seems to have happened to it; the next
+C<rss2leafnode> run will recreate it.
+
+=item F</etc/perl/Net/libnet.cfg>
+
+=item F<~/.libnet.cfg>
+
+Defaults per C<Net::NNTP> and C<Net::Config>.
+
+=back
+
+=head1 SEE ALSO
+
+L<leafnode(8)>,
+L<HTML::FormatText>, L<HTML::FormatText::WithLinks>, L<HTML::FormatExternal>,
+L<lynx(1)>,
+L<URI::Title>, L<XML::Parser>, L<XML::Liberal>, L<Image::Magick>,
+C<Net::NNTP>, C<Net::Config>
+
+L<Plagger>, L<feed2imap(1)>, L<rss2email(1)>, L<rssdrop(1)>, L<toursst(1)>,
+L<http://www.gwene.org>
+
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/rss2leafnode/index.html>
+
+=head1 LICENSE
+
+Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+
+RSS2Leafnode is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+RSS2Leafnode is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+RSS2Leafnode.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

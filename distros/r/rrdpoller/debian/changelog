@@ -1,0 +1,90 @@
+rrdpoller (1.5.0) unstable; urgency=low
+
+  * version 1.5.0
+  * added the --quiet option
+  * added the --lazy option
+  * changed the syntax of sub-commands arguments, can now be express as
+    key=value instead of --key value
+  * added the ability to chain sub-commands with special keywords `or' and `and'
+  * documentation update
+
+ -- Olivier Poitrey <rs@rhapsodyk.net>  Wed, 28 Feb 2005 18:34:33 +0100
+
+rrdpoller (1.3.2) unstable; urgency=low
+
+  * Fix a bug in RPN handling that prevent usage of offset with RPN
+    queries
+  * Added rrd.monitor poller for Mon
+
+ -- Olivier Poitrey <rs@mmania.com>  Wed, 16 Feb 2005 17:41:33 +0100
+
+rrdpoller (1.3.1) unstable; urgency=low
+
+  * Fixed a bug in the algorithm to compute the last put value. This
+    fix a bug with the devel version of rrdtool (1.1.0)
+
+ -- Olivier Poitrey <rs@mmania.com>  Fri,  4 Feb 2005 17:53:45 +0100
+
+rrdpoller (1.3.0) unstable; urgency=low
+
+  * added the --max-last global option
+
+ -- Olivier Poitrey <rs@mmania.com>  Mon, 17 Jan 2005 19:11:52 +0100
+
+rrdpoller (1.2.1) unstable; urgency=low
+
+  * fix a typo in RRD::Query initialization
+
+ -- Olivier Poitrey <rs@mmania.com>  Wed, 12 Jan 2005 11:18:56 +0100
+
+rrdpoller (1.2.0) unstable; urgency=low
+
+  * add new feature: allow to query remote daemon to ask for RRD files
+    information
+  * new rrdpollerd program
+  * Makefile.PL ask for optional module dependency
+
+ -- Olivier Poitrey <rs@mmania.com>  Fri, 10 Dec 2004 18:36:09 +0100
+
+rrdpoller (1.1.2) unstable; urgency=low
+
+  * debian package now depends on the correct library version
+
+ -- Olivier Poitrey <rs@mmania.com>  Wed,  8 Dec 2004 16:32:46 +0100
+
+rrdpoller (1.1.1) unstable; urgency=low
+
+  * test.pl: fix load() test
+  * test.pl: add two tests for RRD::* modules
+  * Query.pm: sort list() output
+  * Query.pm: fix Exporter code for older version compat
+  * Makefile.PL, test.pl: handle case when RRDs library isn't installed
+
+ -- Olivier Poitrey <rs@mmania.com>  Wed,  8 Dec 2004 02:00:56 +0100
+
+rrdpoller (1.1.0) unstable; urgency=low
+
+  * added datasource RPN feature
+  * clean some code/doc
+
+ -- Olivier Poitrey <rs@mmania.com>  Tue,  7 Dec 2004 14:50:00 +0100
+
+rrdpoller (1.0.2) unstable; urgency=low
+
+  * rrdpoller, Query.pm: added list command
+  * test.pl: fix failure in some circonstances
+
+ -- Olivier Poitrey <rs@mmania.com>  Mon,  6 Dec 2004 19:53:07 +0100
+
+rrdpoller (1.0.1) unstable; urgency=low
+
+  * First public release (many doc change and packaging updates)
+
+ -- Olivier Poitrey <rs@mmania.com>  Mon,  6 Dec 2004 13:34:11 +0100
+
+rrdpoller (1.0.0) unstable; urgency=low
+
+  * Initial release.
+
+ -- Olivier Poitrey <rs@mmania.com>  Thu,  2 Dec 2004 12:34:00 +0100
+

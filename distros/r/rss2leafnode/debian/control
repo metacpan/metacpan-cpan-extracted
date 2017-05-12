@@ -1,0 +1,42 @@
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+#
+# This file is part of RSS2Leafnode.
+#
+# RSS2Leafnode is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# RSS2Leafnode is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with RSS2Leafnode.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# "leafnode | news-transport-system" is only "Reccommends" so as not
+# to force removal of rss2leafnode if switching news servers, and
+# since rss2leafnode can be directed to a remote nntp server.
+
+Source: rss2leafnode
+Section: news
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.8
+Homepage: http://user42.tuxfamily.org/rss2leafnode/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: rss2leafnode
+Architecture: all
+Depends: perl (>= 5.10), libconstant-defer-perl, libencode-locale-perl (>= 0.02), libfile-homedir-perl, libhtml-entities-interpolate-perl, libhtml-format-perl, libhtml-parser-perl, libintl-perl (>= 1.17), liblist-moreutils-perl (>= 0.24), libmime-tools-perl, libnumber-format-perl (>= 1.5), libscope-guard-perl, libsort-key-top-perl, libtext-trim-perl (>= 1.02), libtext-wrapi18n-perl, libtimedate-perl, liburi-perl, liburi-tag-perl, libwww-perl (>= 5.832), libhttp-message-perl | libwww-perl (<< 6), libxml-twig-perl (>= 3.34), ${perl:Depends}, ${misc:Depends}
+Recommends: leafnode (>= 2) | news-transport-system, libintl-xs-perl (>= 1.17), libtime-duration-perl, libtime-duration-locale-perl, libxml-rss-timing-perl
+Suggests: libhtml-extractmain-perl, libhtml-formattext-withlinks-perl, libhtml-formatexternal-perl, lynx | w3m | elinks, liburi-title-perl, libxml-liberal-perl
+Description: Post RSS or Atom articles to local newsgroups
+ RSS2Leafnode reads specified RSS or Atom feeds and posts items to
+ local newsgroups.  It's named for the leafnode program, but can post
+ to any NNTP server.  The idea is that articles aren't propagated
+ anywhere, just a convenient way to get them into a local spool for
+ later reading.

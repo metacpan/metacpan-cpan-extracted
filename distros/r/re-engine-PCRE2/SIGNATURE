@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d06a106a56952767ed9d7eff470bc1e618905fe4 Changes
+SHA1 f0afbaabfa2ffc825c78114321582fb241378dce LICENSE
+SHA1 cea0dd1f60f104108ef437c5e7e682f897d56091 MANIFEST
+SHA1 534bd7ff038d58334d320a5705367eee15f506d3 META.json
+SHA1 7422e789a56a918c635ac89c0666e2536a02c35a META.yml
+SHA1 2bb828e6c908bdab0ebb2ac13ce78a6cdf8d5e4c Makefile.PL
+SHA1 f58f1af3d83e8fb210b59b584c5786f966648f54 PCRE2.h
+SHA1 00ee18a074345da368dfba512bdc7ed25e5e8579 PCRE2.pm
+SHA1 5dd3d227731a6a79704bcf70107e108574bc6272 PCRE2.xs
+SHA1 937fb70e11dd2662d850aa9c78e98b051a2b6c95 README.md
+SHA1 ff5e956edeb24cb57bb024c4b4bd2cab09449a6e t/00-compile.t
+SHA1 6bc24f9e1b51b17cc63a2466e17a5cce2377e9f1 t/1-basic.t
+SHA1 2b61ca46407bac0d701391cd3c6c533c7a5d647a t/capture.t
+SHA1 d028d39af35377b34346fa22cf32218b9ff8c5f2 t/config.t
+SHA1 3d1ba40be2458a93b6df6a0c76c5fc6cab18b61b t/import.t
+SHA1 3f62beeec0f40b50a84b9166bedf8adb11d0768e t/match.t
+SHA1 466ae6db35a9b47253ce288e303007ae1610fdba t/perl/pat.t
+SHA1 8850e6b042bc48d8ca109d6e7de4cd79164ffc70 t/perl/re_tests
+SHA1 42d51c783484b7681fe483f18a319a78c8dbdfb7 t/perl/regexp.t
+SHA1 c3a9278cf35428a49376ce169836726505e6fbc9 t/perl/regexp_nc_tie.t
+SHA1 ae3d2593862e99d8d4515544e27268dada582e4d t/qr.t
+SHA1 abdb73d174216fa971d12bcd5682da3fbc673925 t/s.t
+SHA1 8fba6199273b92cb1be5a40e035fae2a03fe4bd7 t/split-null.t
+SHA1 da24fdb3f25eaa4fa4e93558460f6c2767dba3b6 t/split.t
+SHA1 f3d3d53bb61a9ed80320b743aa9e9d8953bbf9db t/subexp.t
+SHA1 ded93764bbe30758b7e045fb15ae7d142d8972a6 t/unimport.t
+SHA1 708c098c5796d37aa4ec1bdd62773cb73d250779 t/variable_expansion.t
+SHA1 9822941cfeeba7fb0e3cd078c26524092cf961e7 t/z_kwalitee.t
+SHA1 23241965abfabfdd2a66f958ab6f456b35fd948d t/z_manifest.t
+SHA1 8805deca00c3154afa447f11338ae65acb723d10 t/z_pod-coverage.t
+SHA1 5005a5e1a999bc1b3df065c6d42de3d24af3060e t/z_pod-spell-mistakes.t
+SHA1 87b067b7f01cd068cfbabeaca6f158b35b712361 t/z_pod-spelling.t
+SHA1 5f435a91dcba00ff9c4f4f434ff80451de71a474 t/z_pod.t
+SHA1 d4f0996b03c5c72e99bc3f0877c23f1ffad66da3 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWQtquwAKCRCabZJij/3J
+QnwtAJ9O59f6F7HEfN1GfLdnPvyJDP3CWQCeK7O2HbsqeqLZre97XQwvUL1+sRo=
+=hFWZ
+-----END PGP SIGNATURE-----

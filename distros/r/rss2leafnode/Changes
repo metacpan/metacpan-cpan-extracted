@@ -1,0 +1,251 @@
+Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+
+This file is part of RSS2Leafnode.
+
+RSS2Leafnode is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+RSS2Leafnode is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with RSS2Leafnode.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 79, January 2017
+    - try channel owner to get item author's email
+
+Version 78, February 2015
+    - show prism:url and hlxcd:helex-company-data
+
+Version 78, October 2014
+    - use Encode::Locale
+
+Version 77, April 2014
+    - new user_agent option
+
+Version 76, December 2013
+    - show re:rank as for example from stackexchange.com
+
+Version 75, October 2013
+    - avoid a bug in Text::Wrap 2012.0818 which comes with Perl 5.18.1
+
+Version 74, September 2013
+    - avoid empty html part if no <media:group> bits
+
+Version 73, August 2013
+    - new option html_extract_main="attach_full"
+
+Version 72, June 2013
+    - use HTML::ExtractMain output_type=>html
+
+Version 71, January 2013
+    - oops, correction to "&apos;"
+
+Version 70, January 2013
+    - avoid XML "&apos;" from html_extract_main
+
+Version 69, December 2012
+    - new option html_extract_main
+    - slate.com topic keywords and author url, guessing at its fields
+
+Version 68, December 2012
+    - multiple authors in From:
+
+Version 67, October 2012
+    - tests allow for msdos bits of IO::HTML
+
+Version 66, October 2012
+    - rss_newest_only option new period "30 days" etc
+
+Version 65, July 2012
+    - tests namespace fix
+
+Version 64, July 2012
+    - <dc:source> as a link
+
+Version 63, June 2012
+    - HTTP::Message 6.03 does "bzip2" vs "x-bzip2" itself now
+
+Version 62, March 2012
+    - show <author><gd:image> as Face
+
+Version 61, February 2012
+    - show media:group links
+    - document the rss_newest_only option
+
+Version 60, October 2011
+    - fix for media:thumbnail icon
+
+Version 59, September 2011
+    - cope with "Content-Encoding: bzip2" from lighttpd
+
+Version 58, August 2011
+    - per-fetch configs
+
+Version 57, August 2011
+    - X-Copyright: from <source> too
+    - dashes in From: mailbox parts
+
+Version 56, July 2011
+    - jf:author for From
+
+Version 55, May 2011
+    - <html lang="..."> in generated rss body
+
+Version 54, May 2011
+    - fix for debian/control depends
+
+Version 53, April 2011
+    - oops, fix for Makefile development bits
+
+Version 52, April 2011
+    - slash:section in Keywords:
+    - slash:department in the links footer for fun
+
+Version 51, April 2011
+    - show <source> attribution
+
+Version 50, March 2011
+    - more of "appication/atom+xml"
+
+Version 49, February 2010
+    - allow "appication/atom+xml" for rss replies, a typo in old
+      WordPress still found in use sometimes
+
+Version 48, January 2010
+    - check comments count to save downloading unchanged
+    - fix some newlines in type="xhtml"
+
+Version 47, January 2010
+    - look for followup comments after initial article post
+
+Version 46, January 2010
+    - atom style <category> for Keywords
+
+Version 45, November 2010
+    - fix Precedence: header value for google groups lists
+
+Version 44, October 2010
+    - show media:credit as footnote, wfw:commentRss as link
+    - try some link name merging for duplicates
+
+Version 43, October 2010
+    - help imagemagick on ico format downloaded icons
+
+Version 42, October 2010
+    - fix for unrecognised downloaded image type
+    - various links from statusnet, sioc and foaf
+
+Version 41, October 2010
+    - new $rss_get_comments option, document $get_icon
+    - foaf:maker as an author link
+
+Version 40, September 2010
+    - author url in links rather than X-From-URL
+    - wiki:importance as Importance: low
+    - wiki:history in links
+    - Precedence: list for google groups mailing list feeds
+
+Version 39, September 2010
+    - pick out cb:category
+
+Version 38, September 2010
+    - show any otherwise unknown item fields from the XML
+
+Version 37, August 2010
+    - add media:thumbnail for get_icon
+    - avoid lc(undef) for perl 5.12
+
+Version 36, August 2010
+    - Email::Address 1.890 $addr_spec is too loose :-(
+    - show geo:lat,geo:long with the links
+
+Version 35, August 2010
+    - fix X-Mailer value and set Date-Received as intended
+    - fix tests leftover Smart::Comments
+
+Version 34, August 2010
+    - depend on new enough Text::Trim for undef handling
+    - add dc:subject to Keywords
+    - PerlIO::locale on stdout/stderr
+
+Version 33, August 2010
+    - experimental $get_icon option
+
+Version 32, August 2010
+    - show CAP common alert protocol fields
+
+Version 31, July 2010
+    - forgot Text::Trim dependency in Makefile.PL
+
+Version 30, July 2010
+    - fetch_html use From dummy mailbox protection, and for images
+      extract X-Copyright from data if possible
+
+Version 29, June 2010
+    - add dummy mailbox to From to protect names with parens
+    - new X-From-URL
+
+Version 28, June 2010
+    - new content:encoded, itunes bits, Keywords header
+
+Version 27, June 2010
+    - some tweaks
+
+Version 26, March 2010
+    - repair bad feed with XML::Liberal if available
+
+Version 25, March 2010
+    - oops, botched rendered html with links
+
+Version 24, March 2010
+    - pass "base" url to WithLinks and external programs
+    - various fixes
+
+Version 23, February 2010
+    - oops, need XML::Twig 3.34
+    - misc message improvements
+
+Version 22, February 2010
+    - show link-type for some Atom things
+    - avoid some twig uninitialized warnings
+
+Version 21, February 2010
+    - test script allow for hostname() without a "."
+
+Version 20, February 2010
+    - newsgroup also as URL
+    - more forgiving of bad non-ascii
+
+Version 19, February 2010
+    - new Atom support, better RDF
+    - switch to XML::Twig
+
+Version 18, February 2010
+    - modularize a bit, prefer XML::RSS::LibXML for guid default
+
+Version 17, January 2010
+    - also try dc:publisher for From
+
+Version 16 - update matching for google groups List-Post
+Version 15 - use latest LWP content_charset and title
+Version 14 - use my Time::Duration::Locale when available
+Version 13 - use post and per-user config instead of rnews
+Version 12 - either XML::RSS or XML::RSS::LibXML suit now
+Version 11 - some split ups to modules, prefer XML::RSS::LibXML
+Version 10 - use XML::RSS::Timing
+Version 9 - add Content-Location
+Version 8 - include Content-Language
+Version 7 - catch parse errors on bad xml
+Version 6 - fix for "w+" error message append
+Version 5 - RSS charset override option
+Version 4 - cope with cookies from aireview.com.au
+Version 3 - better charset handling
+Version 2 - yahoo link id, google groups followup
+Version 1 - the first version

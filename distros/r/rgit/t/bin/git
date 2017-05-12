@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+# This has to work with olde perls
+
+my $filename = shift @ARGV;
+my $cmd = shift @ARGV;
+open FH, ">>$filename" or die "open($filename): $!";
+print FH join '|', $cmd, @ARGV;
+print FH "\n";
+close FH;
+
+exit(($cmd && $cmd eq 'FAIL') ? 1 : 0);

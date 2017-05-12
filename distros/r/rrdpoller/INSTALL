@@ -1,0 +1,7 @@
+To install this perl program, please follow the following steps
+as root:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

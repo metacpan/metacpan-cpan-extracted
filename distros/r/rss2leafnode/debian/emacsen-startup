@@ -1,0 +1,24 @@
+;;; 50rss2leafnode.el -- debian emacs setups for rss2leafnode. -*- mode: emacs-lisp -*-
+
+;; Copyright 2010 Kevin Ryde
+
+;; This file is part of rss2leafnode.
+;;
+;; rss2leafnode is free software; you can redistribute it and/or modify it
+;; under the terms of the GNU General Public License as published by the
+;; Free Software Foundation; either version 3, or (at your option) any later
+;; version.
+;;
+;; rss2leafnode is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+;; Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+(add-to-list 'auto-mode-alist '("/\\.rss2leafnode\\.conf\\'" . perl-mode))
+
+(add-to-list 'auto-mode-alist '("/\\.rss2leafnode\\.status\\'" . perl-mode))
+(add-to-list 'completion-ignored-extensions ".rss2leafnode.status")

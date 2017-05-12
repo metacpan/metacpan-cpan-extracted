@@ -1,0 +1,88 @@
+Mon Jul 19 14:50:59 PDT 1999
+
+# copyright 1999-2000 by hewlett-packard company
+# may be distributed under the terms of the artistic license
+
+This is the IMS::ReleaseMgr package for Perl 5
+
+The code contained in this package is meant to provide common functionality
+between the client-side and server-side components of the Release Management
+System. It evolved from a simple one-file module/class that was implemented
+for the sake of allowing controlled external access to release to HP servers.
+From there, it was expanded to aid in the implementation of server mirroring,
+and as is often the case in this field, it rapidly ballooned from there.
+
+The files are as follows. Each also has a manual page in-lined into it as
+POD directives. The manual gets installed with the modules, and is thus
+available via "perldoc". The files:
+
+    ReleaseMgr.pm
+        This is the base semi-object-oriented interface to receiving a
+        package via HTTP upload. This was originally designed for use
+        with a simple CGI form. It now has better support for more
+        generalized use, and the CGI script (upload.pl within the
+        Release-Manager package) is broader in scope. It is now the basis
+        for multi-host mirroring.
+
+    ReleaseMgr/Access.pm
+        This provides a set of routines to read and test against access
+        control lists (ACLs). These are only used by the client-side tools.
+
+    ReleaseMgr/FileList.pm
+        A quick hack to provide a subroutine entry point for sending one or
+        more files directly into the release system without going through
+        CVS first. Intended for use in the coding of a command-line file
+        release tool that projects could use to release cron-generated files,
+        such as nightly DBMS-based indices.
+
+    ReleaseMgr/Signature.pm
+        Packages are given checksums, or signatures, when generated. These
+        allow the recipient to verify that the contents of the package were
+        not corrupted (either accidentally or purposefully) in transit. Two
+        signature methods are provided: an MD5-based scheme and a backwards-
+        compatibility algorithm for packages being sent to www.hp.com.
+
+    ReleaseMgr/Transfer.pm
+        This provides implementation of the two transport models supported
+        by the tools: HTTP upload and ordinary managed FTP sessions. This
+        allows the same transport code to be used between mirror hosts as is
+        used to initially send the package to the external hosts in the
+        first place.
+
+    ReleaseMgr/Utils.pm
+        Well, call this one "everything else". The contents here range from
+        the set of routines used for DBI access to miscellaneous calls that
+        don't fit anywhere else. This element is used in a few places that
+        are outside the usual release manager realm. The sysmonitord app
+        uses the fork_as_daemon function, and could use more than that. The
+        edit_db.pl script described in more detail below also uses heavily
+        from this lib.
+
+
+The "misc" Directory
+
+This directory holds a couple of files that aren't delivered as part of the
+distribution package, but are there for the sake of the maintainer:
+
+    make_tables.sql
+	Creates the SQL tables from scratch. Executes a "drop table" for
+	each of the two, first, so you may want to work on this one a bit
+	before executing it again. It's kept around for now mainly as a
+	reference to the database schema.
+
+    edit_db.pl
+	I could write a whole manual on this one (and hopefully, I'll have
+	the time to do so). In short, it's a HTTP/CGI-based tool for editing
+	the mirror DBMS tables without having to use SQL*Net. It really needs
+	to be controlled via Basic Authentication or something, but for now
+	it can be invoked as a CGI with the parameters "user=xxx"
+	and "password=xxx". Assuming that it runs from my area:
+
+	    http://www.hostname.com/cgi-bin/edit_db.pl?user=xxx&password=xxx
+
+	in the "Location" field of your favorite browser. From there, the
+	various buttons are pretty self-explanatory. Any docs I have time
+	to write will be in the misc directory alongside the tool.
+
+
+randyr

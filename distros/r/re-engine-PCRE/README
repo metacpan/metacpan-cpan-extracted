@@ -1,0 +1,26 @@
+NAME
+    re::engine::PCRE - Perl-compatible regular expression engine
+
+SYNOPSIS
+        use re::engine::PCRE;
+
+        if ("Hello, world" =~ /(?<=Hello|Hi), (world)/) {
+            print "Greetings, $1!";
+        }
+
+DESCRIPTION
+    Replaces perl's regex engine in a given lexical scope with PCRE regular
+    expressions provided by libpcre.
+
+AUTHORS
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+COPYRIGHT
+    Copyright 2007 Ævar Arnfjörð Bjarmason.
+
+    The original version was copyright 2006 Audrey Tang <cpan@audreyt.org>
+    and Yves Orton.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

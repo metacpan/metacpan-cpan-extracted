@@ -1,0 +1,10 @@
+\.bs$
+\.c$
+\.o$
+^\.git
+^blib/
+\.old$
+\.bak$
+^pm_to_blib$
+^t/90-author/
+^Makefile$

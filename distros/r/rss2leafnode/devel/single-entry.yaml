@@ -1,0 +1,39 @@
+# Copyright 2007, 2008 Kevin Ryde
+
+# RSS2Leafnode is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# RSS2Leafnode is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with RSS2Leafnode.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Usage: plagger -c single-entry.yaml
+#
+# This example fetches the yahoo French rugby feed and writes it with
+# the Rnews module to news group "r2l.test".  BreakEntriesToFeeds
+# splits the feed to one entry per feed, making one news message per
+# entry.
+#
+
+global:
+  log:
+    level: info
+
+plugins:
+  - module: Subscription::Config
+    config:
+      feed:
+        - http://fr.news.yahoo.com/rss/rugby.xml
+
+  - module: Filter::BreakEntriesToFeeds
+
+  - module: Publish::Rnews
+    config:
+      group: r2l.test

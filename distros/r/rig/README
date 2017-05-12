@@ -1,0 +1,253 @@
+NAME
+    rig - import groups of favorite/related modules with a single expression
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+    In your "/home/user/.perlrig" yaml file:
+
+       favorite:
+          use:
+             - strict
+             - warnings
+             - List::Util:
+                - first
+                - max
+             - Data::Dumper
+
+    Back in your code:
+
+       use rig favorite;
+
+       # same as:
+       #   use strict;
+       #   use warnings;
+       #   use List::Util qw/first max/;
+       #   use Data::Dumper;
+
+       # now have a ball:
+
+       print first { $_ > 10 } @ary; # from List::Utils;
+       print Dumper $foo;  # from Data::Dumper
+
+DESCRIPTION
+    This module allows you to organize and bundle your favorite modules,
+    thus reducing the recurring task of "use"ing them in your programs, and
+    implicitly requesting imports by default.
+
+    You can rig your bundles in 2 places:
+
+    *   A file called ".perlrig" in your home or current working directory.
+
+    *   Packages undeneath the "rig::task::<rig_task_name">, for better
+        portability.
+
+IMPLEMENTATION
+    This module uses lots of internal "goto"s to trick modules to think
+    they're being loaded by the original caller, and not by "rig" itself. It
+    also hooks into "import" to keep modules loading after a "goto".
+
+    Modules that don't have an "import()" method are instead "eval"led into
+    the caller's package.
+
+    This is somewhat hacky, there are probably better ways of achieving the
+    same results. We're open to suggestions on how to make loading modules
+    more generic and effective. Just fork me on Github!
+
+USAGE
+  Code
+        use rig -file   => '/tmp/.rig';           # explicitly use a file
+        use rig -engine => 'base';                # chooses the current engine
+        use rig -path   => qw(. /home/me /opt);   # not implemented yet
+
+        use rig moose, strictness, modernity;
+
+        use rig 'kensho';            # loads a rig called kensho
+        use rig ':kensho';           # skips files, goes straight to rig::task::kensho
+        use rig 'kensho::strictive'; # skips files, uses rig::task::kensho::strictive
+        use rig 'signes';
+
+  ".perlrig" YAML structure
+       <task>:
+          use:
+             - <module> [min_version]
+             - +<module> 
+             - <module>:
+                - <export1>
+                - <export2>
+                - ...
+          also: <task2> [, <task3> ... ]
+
+   use section
+    *   Lists modules to be "use"d.
+
+    *   Checks module versions (optional).
+
+    *   Lists exports (optional).
+
+    By default, modules in your rig are imported by calling "import".
+
+    Alternatively, a plus sign "+" can be used in front of the module to
+    force it to be loaded using the "eval" method, as such:
+
+        eval "package <your_package>; use <module>;"
+
+    This may be useful to workaround issues with using import when none is
+    available and "rig" fails to detect a missing import method, or things
+    are just not working as expected.
+
+   also section
+    Used to bundle tasks into each other.
+
+   Examples
+       modernity:
+          use:
+             - strict 
+             - warnings
+             - feature:
+                - say
+                - switch
+       moose:
+          use:
+             - Moose 1.0
+             - Moose::Autobox
+             - autodie
+             - Method::Signatures
+             - Try::Tiny
+       goo:
+          use:
+             - strict
+             - warnings
+             - Data::Dumper
+             - Data::Alias
+             - autodie
+          also: modernity
+       bam:
+          use:
+             - List::Util:
+                - first
+                - max
+                - min
+             - Scalar::Util:
+                - refaddr
+             - Carp:
+                - cluck
+                - croak
+
+The .perlrig file
+    The .perlrig file is where you keep your favorite rigs.
+
+    As mentioned earlier, "rig" looks for a ".perlrig" file in two
+    directories by default:
+
+       * The current working directory.
+       * Your home directory.
+
+    Important: only one rig file is loaded per "perl" interpreter instance.
+    This will probably change in the future, as ".perlrig" file merging
+    should be implemented.
+
+  Structure
+    It could have had room to put your funky startup code, but it doesn't.
+    This module is about order and parseability.
+
+    Having a structured file written in plain yaml makes it easier for
+    worldly parsers to parse the file and understand your configuration.
+
+  Global Configuration
+    Use the $ENV{PERLRIG_FILE} variable to tell "rig" where to find your
+    file.
+
+       $ export PERLRIG_FILE=/etc/myrig
+       $ perl foo_that_rigs.pl
+
+rig::task:: modules
+    A more distribution-friendly way of wiring up module bundles for your
+    application is to ship them as part of the "rig::task::" namespace.
+
+       package rig::task::myfav;
+
+       sub rig {
+            return {
+             use => [
+                'strict',
+                { 'warnings'=> [ 'FATAL','all' ] }
+             ],
+             also => 'somethingelse',
+          };
+       }
+
+    This is the recommended way to ship a rig with your distribution. It
+    makes your distribution portable, no ".perlrig" file is required.
+
+  Out-of-the-box rig tasks
+    This module comes with 2 internal rigs defined:
+
+    *   Modern rig::task::modern
+
+    *   Red rig::task::red
+
+  Writing your own parser
+    Although this distribution only comes with a yaml parser for the
+    .perlrig file. you can still write your own parser if you like:
+
+       package rig::parser::xml;
+       use base 'rig::parser::base';
+
+       sub parse { return .... } 
+
+       # meanwhile in Gotham City:
+
+       package main;
+       use rig -parser => 'xml';
+       use rig 'fav-in-xml';
+
+CAVEATS
+    Although short, the api and yaml specs are still unstable and are
+    subject to change. Mild thought has been put into it as to support
+    modifications without major deprecations.
+
+  Startup Cost
+    There's an upfront load time (on the first "use rig" it finds) while
+    "rig" looks for, parses and processes your ".perlrig" file. Subsequent
+    calls won't look for any more files, as its structure will remain loaded
+    in memory.
+
+  Ordered Load
+    As of right now, module loading order tends to get messed up easily.
+    This will probably be fixed, as the author's intention is to load
+    modules following the order set by the user in the ".perlrig" and "use
+    rig" statements.
+
+ON NAMING THIS PACKAGE
+    The authors feel that "rig" is a short name that is good for one-liners.
+    It's lowercase because we feel it's a pragma-like module that augments
+    the functionality of "use". But "rig" is a unique enough name as to
+    avoid clashing with future Perl pragmas.
+
+    We're sorry if it hurts anyone's lowercase sensibility.
+
+TODO
+    *   Create a class to hold the perlrig definition.
+
+    *   Use Config::Any or similar for more agnostic and advanced file
+        loading.
+
+    *   Straighten out and optimize internals.
+
+    *   Test many more modules for edge cases.
+
+    *   More verbs besides "use" and "also", such as require, etc.
+
+    *   A cookbook of some sort, with everyday examples.
+
+    *   More tests.
+
+    *   Fix load sequence.
+
+SEE ALSO
+    Toolkit - uses filters and "AUTOLOAD" to accomplish its import magic.
+
+    ToolSet - employs "use base" and "package ...; eval ...".
+

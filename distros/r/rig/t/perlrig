@@ -1,0 +1,47 @@
+_t_perlrig:
+    use:
+        - strict
+        - warnings:
+            - FATAL
+            - all
+_t_perlrig_utils:
+    use:
+        - List::Util:
+            - sum
+            - max
+        - List::MoreUtils:
+            - firstval
+            - any
+_t_mooseness:
+  use:
+    - Moose
+_t_version:
+    use:
+       - List::Util 10.0001:
+         - sum
+_t_alias:
+    use:
+       - List::Util:
+          - sum summa1 summa2
+          - max! maxxy
+_t_optional:
+    use:
+       - List::Util
+       - ?Not::A::Module::For::Sure
+_t_also:
+  also: _t_also2, _t_also3
+  use:
+    - Benchmark:
+       - timethis
+       - timeit
+_t_also2:
+  use:
+    - Benchmark:
+       - cmpthese
+_t_also3:
+  use:
+    - List::Util:
+       - first
+    - Benchmark:
+       - timethese
+       - countit

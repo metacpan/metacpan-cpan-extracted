@@ -1,0 +1,47 @@
+---
+abstract: 'Load recommended modules on demand when available'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150002'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: recommended
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  recommended:
+    file: lib/recommended.pm
+    version: '0.003'
+  suggested:
+    file: lib/suggested.pm
+    version: '0.003'
+requires:
+  Carp: '0'
+  Module::Runtime: '0.014'
+  perl: '5.008001'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/recommended/issues
+  homepage: https://github.com/dagolden/recommended
+  repository: https://github.com/dagolden/recommended.git
+version: '0.003'
+x_authority: cpan:DAGOLDEN

@@ -1,0 +1,40 @@
+This is the server-side component of the HTTP/WWW package release management
+system. See also the IMS::ReleaseMgr package and the devmgr package.
+
+Five tools are provided here:
+
+rlsmgrd		A daemon process that monitors a specified repository dir
+		for newly-arrived packages. Packages are passed off to the
+		deploy tool for handling. rlsmgrd monitors the child process
+		and also ensures that limits to the number of concurrent
+		children are honored.
+
+deploy_content	Manages the verification of the data, calls the command to
+		deploy it locally, and effects the mirroring of the data,
+		if such is appropriate.
+
+process_content	Called by the deploy tool to actually move the files around
+		into the proper HTTP server directories. Uses very minimal
+		amount of configuration information and executes within the
+		staging directory for the package.
+
+roll_rm_logs	A tool that can be set up in cron to rotate the logs on a
+		reasonable basis.
+
+upload.pl	A CGI application that permits uploading of packages from a
+		browser, and uses the mirror configurations to deduce where
+		to leave the packages. Requires the upload.dat file in the
+		same directory, and should be protected with HTTP access
+		control. This tool is installed into the same directory as
+		the other tools. It is up to the installer whether to copy
+		it to the individual cgi-bin areas (assuming you have more
+		than one virtual host on the physical host) or simply create
+		symbolic links.
+
+Somewhere around 7/9/99 I decided to drop the files in the conf/ directory
+from the package. They're out of date, and the maturity of the DBI code in
+the IMS::ReleaseMgr package is such that none of the rlsmgrd instances out
+in production should be using config files, anyway. See the ToDo file for
+more details on my unrealized goals.
+
+randyr

@@ -1,0 +1,87 @@
+Security
+========
+
+This document serves to point out some security concerns implementors of 
+the Router::LG module should be aware of.
+
+Overview
+--------
+The whole purpose of the Router::LG class is to run commands on routers 
+from a remote host.  This in itself is a bad idea.  There is no end to 
+the amount of potential abuse that could occur from implementing a 
+Looking Glass.
+
+Keep in mind that when access is opened up to a system, the system is 
+proportionately less secure.  If you are highly concerned about the 
+security of your routers, you may not want to use these modules.   
+If you want to provide tools for outsiders to examine basic information 
+on your routers, you should be aware of the consequences of doing so 
+and take steps to ensure the system can be as secure as possible.
+
+Also note that in some cases the ability to secure your routers may 
+be dependent on the functionality of your router.
+
+Host Security
+-------------
+If you are designing a web-based or CLI based tool for accessing a router, 
+keep the following things in mind.
+
+1. User input should be kept to a minumum.
+
+The end-user should never be allowed to specify options such as the router 
+hostname, commands to execute, authentication information, or cache-file 
+location.
+
+2. Protect the program
+
+If you're implementing a CLI program, keep in mind that end users can 
+read the actual perl script file.  Make sure you don't reveal too much 
+information within your perl code.
+
+3. Usage logs
+
+Log usage of the program, and review it at regular intervals.  Record 
+all parameters that were passed by a user to the program.
+
+Network Security
+----------------
+
+1. Network sniffing
+
+If you are accessing your router by using a non-encrypted protocol 
+(RSH/Telnet), you run the risk of authentication information being 
+sniffed.  Your router vendor may have ways for you to increase 
+the security of your router to minimize the risk.
+
+Consider the following options:
+
+a. Define a seperate protocol for use by Router::LG.
+If engineers always access routers with the "telnet" protocol, have 
+Router::LG use the "rsh" protocol.
+
+b. Define authentication information specific to Router::LG.
+Create a user account/password set just for use by the Router::LG 
+command.
+
+c. Limit command sets and incoming hosts
+If possible, create access lists to make sure that the authenticaiton 
+information and access protocol used by Router::LG can only be sent 
+from the IP address that the front end program is running on.  Also, 
+try to limit what commands Router::LG will be allowed to run.
+
+2. Denial of Service
+
+Theoretically, a user could create a client to attack a 
+web-based LG front end, or they could spawn multiple copies of a CLI 
+based LG front end.  DoS attacks aren't usually caught until it's too 
+late, and it's kind of hard to catch it within the program that is running.
+
+Consider the following ideas to prevent DoS attacks:
+
+a. Strictly monitor the usage of the front-end program.  If it isn't expected 
+to be used often, log program runs to syslog.
+
+b. Limit incoming connections to the router.  If possible, have the router 
+limit the number of incoming connections the front-end can make.  Technically, 
+this could still result in a DoS attack, but it should decrease 
+the impact of the activity on the router CPU.

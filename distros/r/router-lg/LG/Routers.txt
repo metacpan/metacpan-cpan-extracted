@@ -1,0 +1,73 @@
+Routers
+=======
+
+This document is designed to provide information to hardware vendors or 
+anyone for that matter on how to implement a driver module that can be 
+used with the Router::LG module.
+
+For more information, check the source code for one of the modules that 
+come with the Router::LG distribution.
+
+The Router data structure
+-------------------------
+
+When the Router::LG::router() method is called, it expects to be passed an 
+anonymous hash reference with the following structure:
+
+$router={
+	-hostname => "host",
+	-class => "class",
+	-method => "access_method",
+	-args => { },
+};
+
+Key		Explanation
+---		-----------
+hostname	The fully qualified domain name of the router
+
+class		The Router::LG class to use for accessing this router
+
+method		What remote access method/protocol used to communicate with 
+		the remote router.  If omitted, the router class should 
+		specify a default method.
+
+args		Arguements that may be required to communicate with the 
+		router.
+
+The Command data structure
+--------------------------
+
+Public commands that a router can execute are defined with the following 
+structure.
+
+$command={
+	-command => "command string",
+	-cache => (1|0),
+};
+
+Key		Explanation
+---		-----------
+cache		Determines whether or not the command output can be 
+		cached to a local file.  Note that if arguements are 
+		passed to the command, LG.pm cannot cache the output.
+
+label		A descriptive label for the command, to assist in
+		building front-end access tools
+
+command		The actual command string sent to the router with 
+		substitution macros for user input.
+
+		The Macros adhere to the following regex: [!%][ahi]+
+
+		The ! character means that user input must be inserted 
+		at this point.  The % character means the input is optional.
+
+		The characters following relate to the type of data that must 
+		be passed.  "a" refers to AS number, "h" refers to hostname, 
+		and "i" refers to IP address.
+
+		Although I haven't implemented it yet, I have decided to 
+		eliminate this kind of type-checking.  It leads to too 
+		much input possibilities to check, and ideally, the 
+		command line interface of the router itself is best suited 
+		to determine whether or not input passed to it is valid.

@@ -1,0 +1,45 @@
+---
+abstract: 'GNU Regular Expression Engine'
+author:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+build_requires:
+  Capture::Tiny: '0'
+  Config::AutoConf: '0.311'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Thread: '0'
+  blib: '1.01'
+  perl: '5.010000'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010000'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: re-engine-GNU
+no_index:
+  directory:
+    - t
+    - xt
+provides:
+  re::engine::GNU:
+    file: lib/re/engine/GNU.pm
+    version: '0.021'
+requires:
+  XSLoader: '0'
+  perl: '5.010000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=re-engine-GNU
+  homepage: https://metacpan.org/release/re-engine-GNU
+  repository: git://github.com/jddurand/re-engine-gnu.git
+version: '0.021'
+x_authority: cpan:JDDPAUSE

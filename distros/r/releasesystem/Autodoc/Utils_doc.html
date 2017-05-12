@@ -1,0 +1,1573 @@
+<HTML><HEAD><TITLE>Utils.pm Doc</TITLE></HEAD><BODY><center><h1>Utils.pm</h2></center><h1>Modules</h1><ul><li>Net::Domain</ul><h1>Functions:</h1><ul><li><a href="#DBI_all_hostlists">DBI_all_hostlists</a><li><a href="#DBI_all_mirrors">DBI_all_mirrors</a><li><a href="#DBI_error">DBI_error</a><li><a href="#DBI_match_mirror_to_host">DBI_match_mirror_to_host</a><li><a href="#DBI_mirror_host_list">DBI_mirror_host_list</a><li><a href="#DBI_mirror_phys_host_list">DBI_mirror_phys_host_list</a><li><a href="#DBI_mirror_specification">DBI_mirror_specification</a><li><a href="#SIG_dec_trace">SIG_dec_trace</a><li><a href="#SIG_inc_trace">SIG_inc_trace</a><li><a href="#eval_make_target">eval_make_target</a><li><a href="#file_error">file_error</a><li><a href="#file_match_mirror_to_host">file_match_mirror_to_host</a><li><a href="#file_mirror_host_list">file_mirror_host_list</a><li><a href="#file_mirror_specification">file_mirror_specification</a><li><a href="#fork_as_daemon">fork_as_daemon</a><li><a href="#named_params">named_params</a><li><a href="#send_mail">send_mail</a><li><a href="#show_version">show_version</a><li><a href="#variable_substitution">variable_substitution</a><li><a href="#write_log_line">write_log_line</a></ul><hr><h1>Main Script</h1><h2>Variables:</h2> <ul><li>$IMS<li>$Id<li>$Revision<li>$VERSION<li>$file<li>$revision<li>%02d<li>%EXPORT_TAGS<li>%d<li>@EXPORT<li>@EXPORT_OK<li>@ISA<li>@line<li>@lines<li>@r</ul>
+<h2>Calls:</h2><ul><li> AUTOLOAD<li>DBI_all_hostlists<li>DBI_all_mirrors<li>DBI_error<li>DBI_match_mirror_to_host<li>DBI_mirror_host_list<li>DBI_mirror_phys_host_list<li>DBI_mirror_specification<li>SIG_dec_trace<li>SIG_inc_trace<li>Version<li>end<li>eval_make_target<li>file_error<li>file_mirror_host_list<li>file_mirror_specification<li>fork_as_daemon<li>hostfqdn<li>named_params<li>send_mail<li>show_version<li>strict<li>variable_substitution<li>write<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Utils_doc.html,v 1.1 2000/05/04 21:14:23 idsweb Exp $
+#
+#   Description:    Miscellaneous utility routines shared by the release
+#                   manager tools.
+#
+#   Functions:      write_log_line
+#                   SIG_inc_trace
+#                   SIG_dec_trace
+#                   DBI_mirror_specification
+#                   DBI_mirror_host_list
+#                   DBI_mirror_phys_host_list
+#                   DBI_all_mirrors
+#                   DBI_all_hostlists
+#                   DBI_match_mirror_to_host
+#                   DBI_error
+#                   file_mirror_specification
+#                   file_mirror_host_list
+#                   fork_as_daemon
+#                   send_mail
+#                   show_version
+#                   eval_make_target
+#                   named_params
+#                   variable_substitution
+#
+#   Libraries:      None.
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+###############################################################################
+#
+#   Sub Name:       write_log_line
+#
+#   Description:    Open the file $file, lock and seek to end, then write
+#                   @line + \n chars.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    File to write log into
+#                   @lines    in      scalar    Text to write
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    dies
+#
+##############################################################################/n</pre>
+<h2>Code:</h2> <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Utils_doc.html,v 1.1 2000/05/04 21:14:23 idsweb Exp $
+#
+#   Description:    Miscellaneous utility routines shared by the release
+#                   manager tools.
+#
+#   Functions:      write_log_line
+#                   SIG_inc_trace
+#                   SIG_dec_trace
+#                   DBI_mirror_specification
+#                   DBI_mirror_host_list
+#                   DBI_mirror_phys_host_list
+#                   DBI_all_mirrors
+#                   DBI_all_hostlists
+#                   DBI_match_mirror_to_host
+#                   DBI_error
+#                   file_mirror_specification
+#                   file_mirror_host_list
+#                   fork_as_daemon
+#                   send_mail
+#                   show_version
+#                   eval_make_target
+#                   named_params
+#                   variable_substitution
+#
+#   Libraries:      None.
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+package IMS::ReleaseMgr::Utils;
+
+use 5.002;
+use strict;
+use vars qw($VERSION $revision @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use subs qw(write_log_line
+            SIG_inc_trace SIG_dec_trace
+            DBI_mirror_specification DBI_mirror_host_list
+            DBI_mirror_phys_host_list
+              DBI_all_mirrors DBI_all_hostlists DBI_match_mirror_to_host
+              DBI_error
+            file_mirror_specification file_mirror_host_list file_error
+            fork_as_daemon
+            named_params variable_substitution);
+
+use AutoLoader     'AUTOLOAD';
+use Fcntl          ':flock';
+use File::Path     'mkpath';
+use File::Basename 'dirname';
+use Net::Domain    'hostfqdn';
+use Exporter;
+use IO::File;
+
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$revision = q$Id: Utils_doc.html,v 1.1 2000/05/04 21:14:23 idsweb Exp $;
+
+@ISA = qw(Exporter);
+
+@EXPORT = ();
+@EXPORT_OK = qw(write_log_line
+                SIG_inc_trace SIG_dec_trace
+                fork_as_daemon
+                eval_make_target
+                send_mail
+                show_version
+                variable_substitution
+                DBI_mirror_specification DBI_mirror_host_list
+                DBI_mirror_phys_host_list
+                  DBI_all_mirrors DBI_all_hostlists DBI_match_mirror_to_host
+                  DBI_error
+                file_mirror_specification file_mirror_host_list file_error);
+%EXPORT_TAGS = (
+                'signals' => [qw(SIG_inc_trace SIG_dec_trace)],
+                'DBI'     => [qw(DBI_mirror_specification
+                                 DBI_mirror_host_list
+                                 DBI_mirror_phys_host_list
+                                 DBI_all_mirrors
+                                 DBI_all_hostlists
+                                 DBI_match_mirror_to_host
+                                 DBI_error)],
+                'file'    => [qw(file_mirror_specification
+                                 file_mirror_host_list
+                                 file_error)],
+                'all'     => [@EXPORT_OK]
+               );
+
+$IMS::ReleaseMgr::Utils::DBI_error  = '';
+$IMS::ReleaseMgr::Utils::file_error = '';
+
+1;
+
+###############################################################################
+#
+#   Sub Name:       write_log_line
+#
+#   Description:    Open the file $file, lock and seek to end, then write
+#                   @line + \n chars.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    File to write log into
+#                   @lines    in      scalar    Text to write
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    dies
+#
+##############################################################################
+sub write_log_line
+</pre>
+<br><hr><h1>Function: <a name="write_log_line">write_log_line</a></h1>
+<h2>Variables:</h2> <ul><li>$_<li>$dir<li>$fh<li>$file<li>$needs_unlock<li>@_<li>@lines</ul>
+<h2>Calls:</h2><ul><li> close<li>eq<li>new</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Utils_doc.html,v 1.1 2000/05/04 21:14:23 idsweb Exp $
+#
+#   Description:    Miscellaneous utility routines shared by the release
+#                   manager tools.
+#
+#   Functions:      write_log_line
+#                   SIG_inc_trace
+#                   SIG_dec_trace
+#                   DBI_mirror_specification
+#                   DBI_mirror_host_list
+#                   DBI_mirror_phys_host_list
+#                   DBI_all_mirrors
+#                   DBI_all_hostlists
+#                   DBI_match_mirror_to_host
+#                   DBI_error
+#                   file_mirror_specification
+#                   file_mirror_host_list
+#                   fork_as_daemon
+#                   send_mail
+#                   show_version
+#                   eval_make_target
+#                   named_params
+#                   variable_substitution
+#
+#   Libraries:      None.
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#
+#   Environment:    None.
+#
+###############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+###############################################################################
+#
+#   Sub Name:       write_log_line
+#
+#   Description:    Open the file $file, lock and seek to end, then write
+#                   @line + \n chars.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    File to write log into
+#                   @lines    in      scalar    Text to write
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    dies
+#
+##############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my ($file, @lines) = @_;
+
+    my ($fh, $needs_unlock);
+
+    if ($file eq '-')
+    {
+        $fh = \*STDOUT;
+        $needs_unlock = 0;
+    }
+    else
+    {
+        my $dir = dirname $file;
+        mkpath($dir, 0, 0755) or return undef
+            if (! -d $dir);
+        $fh = new IO::File ((-e $file) ? "+< $file" : "> $file");
+        return undef if (! defined $fh);
+        flock($fh, LOCK_EX);
+        seek($fh, 0, 2);
+        $needs_unlock = 1;
+    }
+
+    for (@lines) { print $fh "$_\n" }
+
+    flock($fh, LOCK_UN) if $needs_unlock;
+    $fh->close;
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="SIG_inc_trace">SIG_inc_trace</a></h1>
+<h2>Variables:</h2> <ul><li>$0<li>$SIG<li>$cmd<li>$main<li>$sig<li>%s</ul>
+<h2>Calls:</h2><ul><li> SIG_inc_trace<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       SIG_inc_trace
+#
+#   Description:    Increment the value of $main::trace. No high-end check is
+#                   done, so don't be a dweeb and send a few thousand signals
+#                   to this handler. If $main::trace_file is not set, then
+#                   set it to the command-name with a ".trace" suffix. If there
+#                   is a LOGGING_DIR environment value set, file goes there,
+#                   else it goes in the dir that the calling tool resides in.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $sig      in      scalar    Signal that was caught
+#
+#   Globals:        $main::trace
+#                   $main::tfile
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################/n/n     # If we ever need more than 8 bits of tracing, our problems far exceed a
+    # single hard-coded constant</pre>
+<h2>Code:</h2> <pre>{
+    my $sig = shift;
+
+    $SIG{$sig} = \&SIG_inc_trace;
+
+    my $cmd = $0;
+
+    $cmd =~ s|.*/||o;
+    $main::trace++;
+    # If we ever need more than 8 bits of tracing, our problems far exceed a
+    # single hard-coded constant
+    $main::trace &= 0xff;
+
+    write_log_line(($main::tfile || "$0.trace"),
+                   sprintf("$cmd [$$] [%s] Trace-level changed to $::trace",
+                           scalar localtime time));
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="SIG_dec_trace">SIG_dec_trace</a></h1>
+<h2>Variables:</h2> <ul><li>$0<li>$SIG<li>$cmd<li>$main<li>$sig<li>%s</ul>
+<h2>Calls:</h2><ul><li> SIG_dec_trace<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       SIG_dec_trace
+#
+#   Description:    Decrement the value of $main::trace by 1, but not lower
+#                   than 0. If $main::trace is still greater than 0, send a
+#                   trace message noting the change.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $sig      in      scalar    Signal that was caught
+#
+#   Globals:        $main::trace
+#                   $main::tfile
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my $sig = shift;
+
+    $SIG{$sig} = \&SIG_dec_trace;
+
+    my $cmd = ($main::cmd || $0);
+
+    $cmd =~ s|.*/||o;
+    if (defined $main::trace and $main::trace)
+    {
+        $main::trace--;
+    }
+    else
+    {
+        $main::trace = 0;
+    }
+
+    write_log_line(($main::tfile || "$0.trace"),
+                   sprintf("$cmd [$$] [%s] Trace-level changed to $::trace",
+                           scalar localtime time));
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="DBI_mirror_specification">DBI_mirror_specification</a></h1>
+<h2>Variables:</h2> <ul><li>$dbh<li>$labels<li>$opts<li>$sth<li>$values<li>%opts<li>%results<li>@_<li>@results</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>DBI_mirror_specification<li>data<li>from<li>mirror<li>named_params<li>variable_substitution</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       DBI_mirror_specification
+#
+#   Description:    Query the database and retrieve the full record for the
+#                   mirror pool defined in the the named parameter 'mirror'.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Named param list-- each is
+#                                                 defined when used
+#
+#   Globals:        None.
+#
+#   Environment:    ORACLE_SID (maybe)
+#
+#   Returns:        Success:    hash table reference
+#                   Failure:    undef
+#
+###############################################################################/n/n     #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    #
+    # Prep, execute and reap data from the handle
+    #
+    DBI_error ''; #clear</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IMS::DBConnect; import IMS::DBConnect 'GetDBConnect';
+
+    unless (defined $opts{mirror} and $opts{mirror})
+    {
+        $! = "DBI_mirror_specification must be called with a mirror name";
+        return undef;
+    }
+
+    my ($dbh, $sth, %results, $labels, $values);
+
+    #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    $opts{'system'}    = $opts{'system'}    || 'WEBDB';
+    $opts{application} = $opts{application} || 'RLSMGR';
+    $opts{role}        = $opts{role}        || 'RMGRPRD';
+    unless ($dbh = GetDBConnect($opts{application}, $opts{role},
+                                $opts{'system'}))
+    {
+        DBI_error "Error initializing database connect to $opts{'system'}";
+        return undef;
+    }
+
+    #
+    # Prep, execute and reap data from the handle
+    #
+    unless ($sth = $dbh->prepare("select * from mirror_specification where " .
+                                 "mirror_name = '$opts{mirror}'"))
+    {
+        DBI_error "Error making SQL statement: " . $dbh->errstring;
+        return undef;
+    }
+    $sth->execute;
+    $labels = $sth->{NAME};
+    $values = $sth->fetchrow_arrayref;
+    unless (defined $labels and defined $values)
+    {
+        DBI_error "Error executing SQL: " . $dbh->errstring;
+        return undef;
+    }
+    @results{@$labels} = @$values;
+    $sth->finish;
+    $dbh->disconnect;
+    DBI_error ''; #clear
+
+    variable_substitution \%results unless (defined $opts{noexpand} and
+                                            $opts{noexpand});
+
+    \%results;
+}</pre>
+<br><hr><h1>Function: <a name="DBI_mirror_host_list">DBI_mirror_host_list</a></h1>
+<h2>Variables:</h2> <ul><li>$dbh<li>$host<li>$opts<li>$port<li>$sth<li>%opts<li>@_<li>@results</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>DBI_mirror_host_list<li>data<li>from<li>mirror<li>named_params</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       DBI_mirror_host_list
+#
+#   Description:    Retrieve the list of hostnames/ports for all machines that
+#                   comprise the mirror pool named in 'mirror'.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Named param list-- each is
+#                                                 defined when used
+#
+#   Globals:        None.
+#
+#   Environment:    ORACLE_SID (maybe)
+#
+#   Returns:        Success:    list reference
+#                   Failure:    undef
+#
+###############################################################################/n/n     #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    #
+    # Prep, execute and reap data from the handle
+    #
+    DBI_error ''; #clear</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IMS::DBConnect; import IMS::DBConnect 'GetDBConnect';
+
+    unless (defined $opts{mirror} and $opts{mirror})
+    {
+        DBI_error "DBI_mirror_host_list must be called with a mirror name";
+        return undef;
+    }
+
+    my ($dbh, $sth, @results, $host, $port);
+
+    #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    $opts{'system'}    = $opts{'system'}    || 'WEBDB';
+    $opts{application} = $opts{application} || 'RLSMGR';
+    $opts{role}        = $opts{role}        || 'RMGRPRD';
+    unless ($dbh = GetDBConnect($opts{application}, $opts{role},
+                                $opts{'system'}))
+    {
+        DBI_error "Error initializing database connect to $opts{'system'}";
+        return undef;
+    }
+
+    #
+    # Prep, execute and reap data from the handle
+    #
+    unless ($sth = $dbh->prepare("select host_name, server_port from " .
+                                 "mirror_pool_host_list where mirror_pool = " .
+                                 "'$opts{mirror}'"))
+    {
+        DBI_error "Error making SQL statement: " . $dbh->errstring;
+        return undef;
+    }
+    $sth->execute;
+    unless ($sth->bind_columns(undef, \$host, \$port))
+    {
+        DBI_error "Error binding columns: " . $dbh->errstring;
+        return undef;
+    }
+    while ($sth->fetch)
+    {
+        $host .= ":$port" if (defined $port and $port and $port != 80);
+        push(@results, $host);
+    }
+    $sth->finish;
+    $dbh->disconnect;
+    DBI_error ''; #clear
+
+    \@results;
+}</pre>
+<br><hr><h1>Function: <a name="DBI_mirror_phys_host_list">DBI_mirror_phys_host_list</a></h1>
+<h2>Variables:</h2> <ul><li>$dbh<li>$host<li>$opts<li>$port<li>$sth<li>%opts<li>@_<li>@results</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>DBI_mirror_phys_host_list<li>data<li>from<li>mirror<li>named_params</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       DBI_mirror_phys_host_list
+#
+#   Description:    Retrieve the list of physical hostnames/ports for all
+#                   machines that comprise the mirror pool named in 'mirror'.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Named param list-- each is
+#                                                 defined when used
+#
+#   Globals:        None.
+#
+#   Environment:    ORACLE_SID (maybe)
+#
+#   Returns:        Success:    list reference
+#                   Failure:    undef
+#
+###############################################################################/n/n     #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    #
+    # Prep, execute and reap data from the handle
+    #
+    DBI_error ''; #clear</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IMS::DBConnect; import IMS::DBConnect 'GetDBConnect';
+
+    unless (defined $opts{mirror} and $opts{mirror})
+    {
+        DBI_error "DBI_mirror_phys_host_list must be called with a mirror name";
+        return undef;
+    }
+
+    my ($dbh, $sth, @results, $host, $port);
+
+    #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    $opts{'system'}    = $opts{'system'}    || 'WEBDB';
+    $opts{application} = $opts{application} || 'RLSMGR';
+    $opts{role}        = $opts{role}        || 'RMGRPRD';
+    unless ($dbh = GetDBConnect($opts{application}, $opts{role},
+                                $opts{'system'}))
+    {
+        DBI_error "Error initializing database connect to $opts{'system'}";
+        return undef;
+    }
+
+    #
+    # Prep, execute and reap data from the handle
+    #
+    unless ($sth = $dbh->prepare("select physical_host, server_port from " .
+                                 "mirror_pool_host_list where mirror_pool = " .
+                                 "'$opts{mirror}'"))
+    {
+        DBI_error "Error making SQL statement: " . $dbh->errstring;
+        return undef;
+    }
+    $sth->execute;
+    unless ($sth->bind_columns(undef, \$host, \$port))
+    {
+        DBI_error "Error binding columns: " . $dbh->errstring;
+        return undef;
+    }
+    while ($sth->fetch)
+    {
+        $host .= ":$port" if (defined $port and $port and $port != 80);
+        push(@results, $host);
+    }
+    $sth->finish;
+    $dbh->disconnect;
+    DBI_error ''; #clear
+
+    \@results;
+}</pre>
+<br><hr><h1>Function: <a name="DBI_all_mirrors">DBI_all_mirrors</a></h1>
+<h2>Variables:</h2> <ul><li>$dbh<li>$labels<li>$one_hash<li>$opts<li>$results<li>$sth<li>$values<li>%one_hash<li>%opts<li>%results<li>@_<li>@one_hash</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>data<li>from<li>named_params<li>variable_substitution</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       DBI_all_mirrors
+#
+#   Description:    Return a hash table reference keyed by mirror name that
+#                   holds the full specifications of all mirrors defined in
+#                   the database.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Typical list of optional name/
+#                                                 value pairs used as options
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    hash reference
+#                   Failure:    undef, sets DBI_error
+#
+###############################################################################/n/n     #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    #
+    # Prep, execute and reap data from the handle
+    #
+    DBI_error ''; #clear</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IMS::DBConnect; import IMS::DBConnect 'GetDBConnect';
+
+    my ($dbh, $sth, %results, $labels, $values);
+
+    #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    $opts{'system'}    = $opts{'system'}    || 'WEBDB';
+    $opts{application} = $opts{application} || 'RLSMGR';
+    $opts{role}        = $opts{role}        || 'RMGRPRD';
+    unless ($dbh = GetDBConnect($opts{application}, $opts{role},
+                                $opts{'system'}))
+    {
+        DBI_error "Error initializing database connect to $opts{'system'}";
+        return undef;
+    }
+
+    #
+    # Prep, execute and reap data from the handle
+    #
+    unless ($sth = $dbh->prepare("select * from mirror_specification"))
+    {
+        DBI_error "Error making SQL statement: " . $dbh->errstring;
+        return undef;
+    }
+    $sth->execute;
+    $labels = $sth->{NAME};
+    unless (defined $labels)
+    {
+        DBI_error "Error executing SQL: " . $dbh->errstring;
+        return undef;
+    }
+    while (defined($values = $sth->fetchrow_arrayref))
+    {
+        my %one_hash;
+        @one_hash{@$labels} = @$values;
+        variable_substitution \%one_hash unless (defined $opts{noexpand} and
+                                                 $opts{noexpand});
+        $results{$one_hash{MIRROR_NAME}} = \%one_hash;
+    }
+    $sth->finish;
+    $dbh->disconnect;
+    DBI_error ''; #clear
+
+    \%results;
+}</pre>
+<br><hr><h1>Function: <a name="DBI_all_hostlists">DBI_all_hostlists</a></h1>
+<h2>Variables:</h2> <ul><li>$dbh<li>$labels<li>$opts<li>$sth<li>$values<li>%one_hash<li>%opts<li>@_<li>@one_hash<li>@results</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>data<li>from<li>named_params</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       DBI_all_hostlists
+#
+#   Description:    Return a hash table reference keyed by mirror name that
+#                   holds the full lists of mirror groups (all ancillary hosts
+#                   that comprise a mirror group).
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Typical list of optional name/
+#                                                 value pairs used as options
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    list reference of hashrefs
+#                   Failure:    undef, sets DBI_error
+#
+###############################################################################/n/n     #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    #
+    # Prep, execute and reap data from the handle
+    #
+    DBI_error ''; #clear</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IMS::DBConnect; import IMS::DBConnect 'GetDBConnect';
+
+    my ($dbh, $sth, @results, $labels, $values);
+    @results = ();
+
+    #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    $opts{'system'}    = $opts{'system'}    || 'WEBDB';
+    $opts{application} = $opts{application} || 'RLSMGR';
+    $opts{role}        = $opts{role}        || 'RMGRPRD';
+    unless ($dbh = GetDBConnect($opts{application}, $opts{role},
+                                $opts{'system'}))
+    {
+        DBI_error "Error initializing database connect to $opts{'system'}";
+        return undef;
+    }
+
+    #
+    # Prep, execute and reap data from the handle
+    #
+    unless ($sth = $dbh->prepare("select * from mirror_pool_host_list"))
+    {
+        DBI_error "Error making SQL statement: " . $dbh->errstring;
+        return undef;
+    }
+    $sth->execute;
+    $labels = $sth->{NAME};
+    unless (defined $labels)
+    {
+        DBI_error "Error executing SQL: " . $dbh->errstring;
+        return undef;
+    }
+    while (defined($values = $sth->fetchrow_arrayref))
+    {
+        my %one_hash;
+        @one_hash{@$labels} = @$values;
+        push(@results, \%one_hash);
+    }
+    $sth->finish;
+    $dbh->disconnect;
+    DBI_error ''; #clear
+
+    \@results;
+}</pre>
+<br><hr><h1>Function: <a name="DBI_match_mirror_to_host">DBI_match_mirror_to_host</a></h1>
+<h2>Variables:</h2> <ul><li>$dbh<li>$opts<li>$result<li>$results<li>$sth<li>%opts<li>@_</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>data<li>from<li>mirror<li>named_params</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       DBI_match_mirror_to_host
+#
+#   Description:    Using the mirror name and the physical host name, deduce
+#                   the host's mirror-specific name, i.e.:
+#
+#                     mirror => 'www.interactive.hp.com'
+#                     host   => 'hpcc925.external.hp.com'
+#
+#                   would return (as of 7/7/99) 'www1.interactive.hp.com'
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Named set of parameters
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    host name
+#                   Failure:    undef, sets DBI_error
+#
+###############################################################################/n/n     #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    #
+    # Prep, execute and reap data from the handle
+    #
+    #
+    # Since the HOST_NAME column is unique, There Can, well, Be Only One.
+    #</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IMS::DBConnect; import IMS::DBConnect 'GetDBConnect';
+
+    my ($dbh, $sth, $results, $result);
+
+    #
+    # application - Specific application to look up connection information for
+    # role        - Role (in case of multiple roles with varying access)
+    # system      - The database system to which the connection should be made
+    #
+    $opts{'system'}    = $opts{'system'}    || 'WEBDB';
+    $opts{application} = $opts{application} || 'RLSMGR';
+    $opts{role}        = $opts{role}        || 'RMGRPRD';
+    unless ($dbh = GetDBConnect($opts{application}, $opts{role},
+                                $opts{'system'}))
+    {
+        DBI_error "Error initializing database connect to $opts{'system'}";
+        return undef;
+    }
+
+    #
+    # Prep, execute and reap data from the handle
+    #
+    unless ($sth = $dbh->prepare("select host_name from " .
+                                 "mirror_pool_host_list where " .
+                                 "mirror_pool = '$opts{mirror}' and " .
+                                 "physical_host = '$opts{host}'"))
+    {
+        DBI_error "Error making SQL statement: " . $dbh->errstring;
+        return undef;
+    }
+    $sth->execute;
+
+    #
+    # Since the HOST_NAME column is unique, There Can, well, Be Only One.
+    #
+    $results = $sth->fetchrow_arrayref;
+    if (! defined($result = $results->[0]))
+    {
+        DBI_error "No match in DBMS for $opts{mirror}, $opts{host}";
+    }
+    $sth->finish;
+    $dbh->disconnect;
+
+    $result;
+}</pre>
+<br><hr><h1>Function: <a name="DBI_error">DBI_error</a></h1>
+<h2>Variables:</h2> <ul><li>$IMS<li>$text</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>text</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       DBI_error
+#
+#   Description:    Get/set the error string associated with a failed DB action
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $text     in      scalar    (If passed) Text of new error
+#
+#   Globals:        $IMS::ReleaseMgr::Utils::DBI_error
+#
+#   Environment:    None.
+#
+#   Returns:        text or null
+#
+###############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my $text = shift;
+
+    $IMS::ReleaseMgr::Utils::DBI_error = $text if (defined $text);
+
+    $IMS::ReleaseMgr::Utils::DBI_error;
+}</pre>
+<br><hr><h1>Function: <a name="file_mirror_specification">file_mirror_specification</a></h1>
+<h2>Variables:</h2> <ul><li>$_<li>$fh<li>$label<li>$opts<li>$results<li>$value<li>%opts<li>%results<li>@_</ul>
+<h2>Calls:</h2><ul><li> close<li>error<li>file_error<li>file_mirror_specification<li>named_params<li>new<li>variable_substitution</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       file_mirror_specification
+#
+#   Description:    Retrieve the full record for the mirror pool specified in
+#                   the parameter 'file'.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Named param list-- each is
+#                                                 defined when used
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    hash table reference
+#                   Failure:    undef
+#
+###############################################################################/n/n     # clear the error handler</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IO::File;
+
+    # clear the error handler
+    file_error '';
+
+    unless (defined $opts{file} and $opts{file})
+    {
+        file_error "file_mirror_specification: must be called with file name";
+        return undef;
+    }
+
+    my ($fh, %results, $label, $value);
+
+    unless (defined($fh = new IO::File "< $opts{file}"))
+    {
+        file_error "file_mirror_specification: Error opening file " .
+            "$opts{file} for reading: $!";
+        return undef;
+    }
+    while (defined($_ = <$fh>))
+    {
+        chomp;
+        next unless /^[A-Z0-9_]+=/o;
+
+        ($label, $value) = split(/=/, $_, 2);
+        $results{$label} = $value;
+    }
+    $fh->close;
+    variable_substitution \%results;
+
+    \%results;
+}</pre>
+<br><hr><h1>Function: <a name="file_mirror_host_list">file_mirror_host_list</a></h1>
+<h2>Variables:</h2> <ul><li>$_<li>$fh<li>$host<li>$opts<li>$phost<li>%opts<li>@_<li>@results</ul>
+<h2>Calls:</h2><ul><li> close<li>error<li>file_error<li>file_mirror_host_list<li>hostname<li>named_params<li>new</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       file_mirror_host_list
+#
+#   Description:    Retrieve the list of hostnames/ports for all machines that
+#                   comprise the mirror pool from the file 'file'.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Named param list-- each is
+#                                                 defined when used
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    list reference
+#                   Failure:    undef
+#
+###############################################################################/n/n     # clear the error handler
+        next if /^\#/o;
+        # Just in case they give the physical host as well, we just want the
+        # "alias" hostname</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IO::File;
+
+    # clear the error handler
+    file_error '';
+
+    unless (defined $opts{file} and $opts{file})
+    {
+        file_error "file_mirror_host_list: must be called with a file name";
+        return undef;
+    }
+
+    my ($fh, @results, $host, $phost);
+
+    @results = ();
+    unless (defined($fh = new IO::File "< $opts{file}"))
+    {
+        file_error "file_mirror_host_list: Error opening file $opts{file} " .
+            "for reading: $!";
+        return undef;
+    }
+    while (defined($_ = <$fh>))
+    {
+        chomp;
+        next if /^\#/o;
+        next if /^\s*$/o;
+
+        # Just in case they give the physical host as well, we just want the
+        # "alias" hostname
+        ($host, $phost) = split(/ /, $_, 2);
+        push(@results, $host);
+    }
+    $fh->close;
+
+    \@results;
+}</pre>
+<br><hr><h1>Function: <a name="file_match_mirror_to_host">file_match_mirror_to_host</a></h1>
+<h2>Variables:</h2> <ul><li>$_<li>$fh<li>$host<li>$opts<li>$phost<li>$result<li>%opts<li>@_</ul>
+<h2>Calls:</h2><ul><li> close<li>eq<li>error<li>file_error<li>file_match_mirror_to_host<li>hostname<li>named_params<li>new</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       file_match_mirror_to_host
+#
+#   Description:    Using the physical host name, deduce the host's
+#                   mirror-specific name, i.e.:
+#
+#                     host   => 'hpcc925.external.hp.com'
+#
+#                   would return (as of 7/7/99) 'www1.interactive.hp.com'
+#
+#                   Differs from the DBI version in that it requires a file
+#                   be present, and the file might not have the physical host
+#                   information. Assuming it does, we also don't need the
+#                   actual mirror name. We assume you passed the correct file.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   %opts     in      hash      Named set of parameters
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    host name
+#                   Failure:    undef, sets file_error
+#
+###############################################################################/n/n     # clear the error handler
+    # set this as the fall-through case
+        next if /^\#/o;</pre>
+<h2>Code:</h2> <pre>{
+    my %opts = named_params(@_);
+
+    require IO::File;
+
+    # clear the error handler
+    file_error '';
+
+    unless (defined $opts{file} and $opts{file})
+    {
+        file_error "file_match_mirror_to_host: must be called with file name";
+        return undef;
+    }
+    unless (defined $opts{host} and $opts{host})
+    {
+        file_error "file_match_mirror_to_host: no hostname provided for match";
+        return undef;
+    }
+
+    my ($fh, $result, $host, $phost);
+
+    unless (defined($fh = new IO::File "< $opts{file}"))
+    {
+        file_error "Error opening file $opts{file} for reading: $!";
+        return undef;
+    }
+    # set this as the fall-through case
+    $result = undef;
+    while (defined($_ = <$fh>))
+    {
+        chomp;
+        next if /^\#/o;
+        next if /^\s*$/o;
+
+        ($host, $phost) = split(/ /, $_, 2);
+        if ($phost eq $opts{host})
+        {
+            $result = $host;
+            last;
+        }
+    }
+    $fh->close;
+    file_error "file_match_mirror_to_host: no match for $opts{host} found"
+        unless (defined $result);
+
+    $result;
+}</pre>
+<br><hr><h1>Function: <a name="file_error">file_error</a></h1>
+<h2>Variables:</h2> <ul><li>$IMS<li>$text</ul>
+<h2>Calls:</h2><ul><li> file_error<li>text</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       file_error
+#
+#   Description:    Retrieve/set the error message for the last failed file
+#                   operation.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $text     in      scalar    If defined, set the error to
+#                                                 this.
+#
+#   Globals:        $IMS::ReleaseMgr::Utils::file_error
+#
+#   Environment:    None.
+#
+#   Returns:        Current error text
+#
+###############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my $text = shift;
+
+    $IMS::ReleaseMgr::Utils::file_error = $text if (defined $text);
+
+    $IMS::ReleaseMgr::Utils::file_error;
+}</pre>
+<br><hr><h1>Function: <a name="fork_as_daemon">fork_as_daemon</a></h1>
+<h2>Variables:</h2> <ul><li>$0<li>$SIG<li>$child<li>$dont_die<li>$sig</ul>
+<h2>Calls:</h2><ul><li> close<li>from</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       fork_as_daemon
+#
+#   Description:    Do the necessary process- and signal-handling for the
+#                   running process to act and react properly as a UNIX daemon.
+#                   Mostly lifted from Stevens' books.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $dont_die in      scalar    If passed and true, don't die()
+#                                                 on errors, return the error
+#                                                 message instead.
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    null string
+#                   Failure:    dies or returns error string
+#
+###############################################################################/n/n         # Uh oh.
+        # Only reached if we skipped the die
+        # Parent process
+    #
+    # First-generation child. Close filehandles, clear umask, and set a process
+    # group. This will also disassociate us from any control terminal.
+    #
+    #
+    # Since we're on SysV, we could accidentally re-acquire a control terminal,
+    # so to avoid that, we'll re-spawn, so that the child is not the pgrp
+    # leader. Then *this* parent will exit, and control will continue with the
+    # second-generation child. Ignore HUP for now (restore it in the 2nd-gen
+    # child) so that the 1st-gen child's HUP doesn't kill the 2nd-gen child.
+    #
+        # Uh oh.
+        # Only reached if we skipped the die
+        # Parent process
+    #
+    # We are the second-generation child, and all our file descriptors are
+    # taken care of, our umask is set, our process group is set. All we have
+    # to do is restore HUP (which will probably be set later on, anyway) and
+    # return.</pre>
+<h2>Code:</h2> <pre>{
+    my $dont_die = shift;
+
+    my ($child, $sig);
+
+    $dont_die = 0 unless (defined $dont_die and $dont_die);
+    $child = fork;
+    if (! defined $child)
+    {
+        # Uh oh.
+        die "$0 died in fork: $!, crashing" unless ($dont_die);
+        # Only reached if we skipped the die
+        return "Error in fork: $!";
+    }
+    elsif ($child)
+    {
+        # Parent process
+        exit 0;
+    }
+
+    #
+    # First-generation child. Close filehandles, clear umask, and set a process
+    # group. This will also disassociate us from any control terminal.
+    #
+    setpgrp;
+    close(STDIN);
+    close(STDOUT);
+    close(STDERR);
+    umask 0;
+    for $sig (qw(TSTP TTIN TTOU))
+    {
+        $SIG{$sig} = 'IGNORE' if (exists $SIG{$sig});
+    }
+
+    #
+    # Since we're on SysV, we could accidentally re-acquire a control terminal,
+    # so to avoid that, we'll re-spawn, so that the child is not the pgrp
+    # leader. Then *this* parent will exit, and control will continue with the
+    # second-generation child. Ignore HUP for now (restore it in the 2nd-gen
+    # child) so that the 1st-gen child's HUP doesn't kill the 2nd-gen child.
+    #
+    $sig = $SIG{HUP};
+    $SIG{HUP} = 'IGNORE';
+
+    $child = fork;
+    if (! defined $child)
+    {
+        # Uh oh.
+        die "$0 (1st-generation child) died in fork: $!, crashing"
+            unless ($dont_die);
+        # Only reached if we skipped the die
+        return "Error in (1st-generation child) fork: $!";
+    }
+    elsif ($child)
+    {
+        # Parent process
+        exit 0;
+    }
+
+    #
+    # We are the second-generation child, and all our file descriptors are
+    # taken care of, our umask is set, our process group is set. All we have
+    # to do is restore HUP (which will probably be set later on, anyway) and
+    # return.
+
+    $SIG{HUP} = $sig;
+    return '';
+}</pre>
+<br><hr><h1>Function: <a name="send_mail">send_mail</a></h1>
+<h2>Variables:</h2> <ul><li>$VERSION<li>$agent<li>$body<li>$hdr<li>$maillist<li>$mailsucceed<li>$main<li>$msg<li>$subject<li>$trace<li>%s<li>@_<li>@addresses</ul>
+<h2>Calls:</h2><ul><li> agent<li>from<li>header<li>headers<li>hostfqdn<li>hostname<li>new<li>remove<li>send_mail<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>##############################################################################
+#
+#   Sub Name:       send_mail
+#
+#   Description:    Send the mail message contained in $body (which may be
+#                   either a scalar or a list ref) to the list of addresses
+#                   in $maillist (also a scalar or lref), with subject of
+#                   $subject.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $maillist in      scalar    One or more addresses to mail
+#                                                 to, comma-separated
+#                   $subject  in      scalar    Subject to attach to mail
+#                   $body     in      sc/lref   Message body (could be scalar
+#                                                 or lref)
+#
+#   Globals:        $main::hostname     These are inserted into X-* headers
+#                   $main::cmd            if they are defined in the main
+#                   $main::webmaster      namespace.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+##############################################################################/n/n     #
+    # Create the headers
+    #
+    return 1 unless ($maillist =~ /\@/o); # Empty list unless at least one @
+    # Subject made to refer to what command & hostname we are mailing from
+    # This allows for filtering/processing by giving a unique header
+    # Ident the host in case they didn't
+    eval { @addresses = $msg->smtpsend; };  #if this fails the program dies...so eval
+	$maillist =~ s/\s//g;                     #remove whitespace</pre>
+<h2>Code:</h2> <pre>{
+    my ($maillist, $subject, $body) = @_;
+
+    require Mail::Header;
+    require Mail::Internet;
+
+    my $hdr = new Mail::Header;
+
+    if (! ref($body))
+    {
+        $body = [$body];
+    }
+    #
+    # Create the headers
+    #
+    return 1 unless ($maillist =~ /\@/o); # Empty list unless at least one @
+    $hdr->add('To', $maillist);
+    # Subject made to refer to what command & hostname we are mailing from
+    $hdr->add('Subject', "$subject");
+    $hdr->add('From', $main::webmaster) if (defined $main::webmaster);
+    # This allows for filtering/processing by giving a unique header
+    my $agent;
+    if (defined $main::cmd)
+    {
+        $agent = $main::cmd;
+        $agent .= ", $main::VERSION" if (defined $main::VERSION);
+    }
+    else
+    {
+        $agent = "IMS::ReleaseMgr::Utils::send_mail, $VERSION";
+    }
+    $hdr->add('X-Agent', $agent);
+    # Ident the host in case they didn't
+    $hdr->add('X-Hostname', ((defined $main::hostname) ?
+                             $main::hostname : hostfqdn));
+
+    my $msg = Mail::Internet->new(Header => $hdr, Body => $body);
+   
+    my @addresses;
+
+    eval { @addresses = $msg->smtpsend; };  #if this fails the program dies...so eval
+
+    my $trace = (defined $main::trace) ? $main::trace : 0;
+
+    if ($trace & 2)
+    {
+	$maillist =~ s/\s//g;                     #remove whitespace
+	my $mailsucceed = join ',',@addresses;
+
+        write_log_line($main::tfile,
+                   sprintf("$main::cmd [$$] [%s] Mail sent to: %s",
+                           (scalar localtime time), $mailsucceed));
+        write_log_line($main::tfile,
+                   sprintf("$main::cmd [$$] [%s] Warning! Some addresses failed." .
+		   " Complete mail list: %s",
+                   (scalar localtime time), $maillist)) 
+		       if ($mailsucceed ne $$maillist);
+    }
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="show_version">show_version</a></h1>
+<h2>Variables:</h2> <ul><li></ul>
+<h2>Calls:</h2><ul><li> </ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       show_version
+#
+#   Description:    Output a simple version identification string to STDERR
+#
+#   Arguments:      None
+#
+#   Globals:        $::cmd
+#                   $::VERSION
+#                   $::revision
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    0, was able to display *something*
+#                   Failure:    1, nothing found suitable for output
+#
+###############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    if (defined $::VERSION)
+    {
+        if (defined $::cmd)
+        {
+            print STDERR "$::cmd $::VERSION\n";
+        }
+        else
+        {
+            print STDERR "$::VERSION\n";
+        }
+    }
+    elsif (defined $::revision)
+    {
+        print STDERR "$::revision\n";
+    }
+    else
+    {
+        return 1;
+    }
+
+    0;
+}</pre>
+<br><hr><h1>Function: <a name="eval_make_target">eval_make_target</a></h1>
+<h2>Variables:</h2> <ul><li>$args<li>$dir_root<li>$target<li>@_<li>@args<li>@result</ul>
+<h2>Calls:</h2><ul><li> close<li>code<li>eval_make_target</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       eval_make_target
+#
+#   Description:    Execute "make" on the given target, using eval so as to
+#                   trap any fatal errors
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $target   in      scalar    target to pass to make
+#                   $dir_root in      scalar    If non-null, use this to
+#                                                 construct a set of paths to
+#                                                 pass as command-line values
+#                   @args     in      list      If present, any additional
+#                                                 arguments to make
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    undef
+#                   Failure:    reference to list of error text
+#
+###############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my $target   = shift;
+    my $dir_root = shift || '';
+    my @args     = @_;
+
+    return [ 'eval_make_target: Error, must specify a target for make' ]
+        unless (defined $target);
+
+    if ($dir_root)
+    {
+        push(@args,
+             "WWWDOC=$dir_root/htdocs",
+             "WWWBIN=$dir_root/bin",
+             "WWWCGI=$dir_root/cgi-bin",
+             "WWWFCGI=$dir_root/fcgi-bin",
+             "WWWJAVA=$dir_root/applets",
+             "WWWLOCAL=$dir_root/local");
+    }
+
+    my $args = (scalar @args) ? " @args" : "";
+    my @result = ();
+
+    open(PIPE, "make $target$args 2>&1 |");
+    @result = <PIPE>;
+    close(PIPE);
+    $? >>= 8;
+    if ($?)
+    {
+        unless (grep(/no rule to make/oi, @result))
+        {
+            chomp(@result);
+            push(@result,
+                 "Error executing make, make returned code $? at " . __FILE__);
+
+            return \@result;
+        }
+    }
+
+    undef;
+}</pre>
+<br><hr><h1>Function: <a name="named_params">named_params</a></h1>
+<h2>Variables:</h2> <ul><li>$name<li>$opts<li>$value<li>%opts<li>@_<li>@opts</ul>
+<h2>Calls:</h2><ul><li> </ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       named_params
+#
+#   Description:    (Not exported) Take a list in that is intended to be a
+#                   hash table of named parameters (name/value pairs), delete
+#                   any leading hyphens and force all names to lower-case.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   @opts     in      list      List of name/value pairs
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    hash table (not reference!)
+#                   Failure:    undef, undef (to avoid -w noise)
+#
+###############################################################################/n/n         # Odd one out</pre>
+<h2>Code:</h2> <pre>{
+    my @opts = @_;
+
+    my (%opts, $name, $value);
+
+    if (scalar(@opts) & 1)
+    {
+        # Odd one out
+        pop(@opts);
+        warn "Odd number of parameters passed, ";
+    }
+
+    while (@opts)
+    {
+        $name  = lc shift(@opts);
+        $value = shift(@opts);
+        $name =~ s/^-//o;
+        $opts{$name} = $value;
+    }
+
+    %opts;
+}</pre>
+<br><hr><h1>Function: <a name="variable_substitution">variable_substitution</a></h1>
+<h2>Variables:</h2> <ul><li>$href<li>$i<li>$key<li>$name<li>$num<li>$subs_made<li>$value<li>@keys<li>@vars</ul>
+<h2>Calls:</h2><ul><li> </ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       variable_substitution
+#
+#   Description:    Perform a full-depth variable substition on the contents
+#                   of %{$href}. Loop through the keys no more than (n-1)
+#                   times, stopping after the first iteration that performs
+#                   no substitutions.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $href     in/out  Hash ref  Reference to hash of keys and
+#                                                 values. All substitution is
+#                                                 within this family tree.
+#
+#                                                 You aren't the first to make
+#                                                 that joke.
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        1
+#
+###############################################################################/n/n                 # Don't substitute unless the target is fully-expanded</pre>
+<h2>Code:</h2> <pre>{
+    my $href = shift;
+
+    my ($num, $subs_made, $name, $value, $i, $key, @keys, @vars);
+
+    @keys = sort keys %$href;
+    $num = scalar @keys;
+
+    for ($i = 0; $i < $num; $i++)
+    {
+        $subs_made = 0;
+        for $key (@keys)
+        {
+            @vars = ($href->{$key} =~ /\$([A-Z_-]+)/go);
+            next unless (@vars);
+            for $name (@vars)
+            {
+                # Don't substitute unless the target is fully-expanded
+                next if ($href->{$name} =~ /\$[A-Z_-]+/o);
+                $subs_made += $href->{$key} =~ s/\$$name/$href->{$name}/g;
+            }
+        }
+        last if (! $subs_made);
+    }
+
+    1;
+}</pre>
+</BODY></HTML>

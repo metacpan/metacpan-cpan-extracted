@@ -1,0 +1,496 @@
+=head1 NAME
+
+re::engine::Plugin - API to write custom regex engines
+
+=head1 VERSION
+
+Version 0.12
+
+=head1 DESCRIPTION
+
+As of perl 5.9.5 it's possible to lexically replace perl's built-in
+regular expression engine with your own (see L<perlreapi> and
+L<perlpragma>). This module provides a glue interface to the relevant
+parts of the perl C API enabling you to write an engine in Perl
+instead of the C/XS interface provided by the core.
+
+=head2 The gory details
+
+Each regex in perl is compiled into an internal C<REGEXP> structure
+(see L<perlreapi|perlreapi/The REGEXP structure>), this can happen
+either during compile time in the case of patterns in the format
+C</pattern/> or runtime for C<qr//> patterns, or something inbetween
+depending on variable interpolation etc.
+
+When this module is loaded into a scope it inserts a hook into
+C<$^H{regcomp}> (as described in L<perlreapi> and L<perlpragma>) to
+have each regexp constructed in its lexical scope handled by this
+engine, but it differs from other engines in that it also inserts
+other hooks into C<%^H> in the same scope that point to user-defined
+subroutines to use during compilation, execution etc, these are
+described in L</CALLBACKS> below.
+
+The callbacks (e.g. L</comp>) then get called with a
+L<re::engine::Plugin> object as their first argument. This object
+provies access to perl's internal REGEXP struct in addition to its own
+state (e.g. a L<stash|/stash>). The L<methods|/METHODS> on this object
+allow for altering the C<REGEXP> struct's internal state, adding new
+callbacks, etc.
+
+=head1 CALLBACKS
+
+Callbacks are specified in the C<re::engine::Plugin> import list as
+key-value pairs of names and subroutine references:
+
+    use re::engine::Plugin (
+        comp => sub {},
+        exec => sub {},
+        free => sub {},
+    );
+
+To write a custom engine which imports your functions into the
+caller's scope use use the following snippet:
+
+    package re::engine::Example;
+    use re::engine::Plugin ();
+
+    sub import
+    {
+        # Sets the caller's $^H{regcomp} his %^H with our callbacks
+        re::engine::Plugin->import(
+            comp => \&comp,
+            exec => \&exec,
+            free => \&free,
+        );
+    }
+
+   *unimport = \&re::engine::Plugin::unimport;
+
+    # Implementation of the engine
+    sub comp { ... }
+    sub exec { ... }
+    sub free { ... }
+
+    1;
+
+=head2 comp
+
+    comp => sub {
+        my ($rx) = @_;
+
+        # return value discarded
+    }
+
+Called when a regex is compiled by perl, this is always the first
+callback to be called and may be called multiple times or not at all
+depending on what perl sees fit at the time.
+
+The first argument will be a freshly constructed C<re::engine::Plugin>
+object (think of it as C<$self>) which you can interact with using the
+L<methods|/METHODS> below, this object will be passed around the other
+L<callbacks|/CALLBACKS> and L<methods|/METHODS> for the lifetime of
+the regex.
+
+Calling C<die> or anything that uses it (such as C<carp>) here will
+not be trapped by an C<eval> block that the pattern is in, i.e.
+
+   use Carp 'croak';
+   use re::engine::Plugin(
+       comp => sub {
+           my $rx = shift;
+           croak "Your pattern is invalid"
+               unless $rx->pattern =~ /pony/;
+       }
+   );
+
+   # Ignores the eval block
+   eval { /you die in C<eval>, you die for real/ };
+
+This happens because the real subroutine call happens indirectly at
+compile time and not in the scope of the C<eval> block. This is how
+perl's own engine would behave in the same situation if given an
+invalid pattern such as C</(/>.
+
+=head2 exec
+
+    my $ponies;
+    use re::engine::Plugin(
+        exec => sub {
+            my ($rx, $str) = @_;
+
+            # We always like ponies!
+            if ($str =~ /pony/) {
+                $ponies++;
+                return 1;
+            }
+
+            # Failed to match
+            return;
+        }
+    );
+
+Called when a regex is being executed, i.e. when it's being matched
+against something. The scalar being matched against the pattern is
+available as the second argument (C<$str>) and through the L<str|/str>
+method. The routine should return a true value if the match was
+successful, and a false one if it wasn't.
+
+This callback can also be specified on an individual basis with the
+L</callbacks> method.
+
+=head2 free
+
+    use re::engine::Plugin(
+        free => sub {
+            my ($rx) = @_;
+
+            say 'matched ' ($ponies // 'no')
+                . ' pon' . ($ponies > 1 ? 'ies' : 'y');
+
+            return;
+        }
+    );
+
+Called when the regexp structure is freed by the perl interpreter.
+Note that this happens pretty late in the destruction process, but
+still before global destruction kicks in. The only argument this
+callback receives is the C<re::engine::Plugin> object associated
+with the regexp, and its return value is ignored.
+
+This callback can also be specified on an individual basis with the
+L</callbacks> method.
+
+=head1 METHODS
+
+=head2 str
+
+    "str" =~ /pattern/;
+    # in comp/exec/methods:
+    my $str = $rx->str;
+
+The last scalar to be matched against the L<pattern|/pattern> or
+C<undef> if there hasn't been a match yet.
+
+perl's own engine always stringifies the scalar being matched against
+a given pattern, however a custom engine need not have such
+restrictions. One could write a engine that matched a file handle
+against a pattern or any other complex data structure.
+
+=head2 pattern
+
+The pattern that the engine was asked to compile, this can be either a
+classic Perl pattern with modifiers like C</pat/ix> or C<qr/pat/ix> or
+an arbitary scalar. The latter allows for passing anything that
+doesn't fit in a string and five L<modifier|/mod> characters, such as
+hashrefs, objects, etc.
+
+=head2 mod
+
+    my %mod = $rx->mod;
+    say "has /ix" if %mod =~ 'i' and %mod =~ 'x';
+
+A key-value pair list of the modifiers the pattern was compiled with.
+The keys will zero or more of C<imsxp> and the values will be true
+values (so that you don't have to write C<exists>).
+
+You don't get to know if the C<eogc> modifiers were attached to the
+pattern since these are internal to perl and shouldn't matter to
+regexp engines.
+
+=head2 stash
+
+    comp => sub { shift->stash( [ 1 .. 5 ) },
+    exec => sub { shift->stash }, # Get [ 1 .. 5 ]
+
+Returns or sets a user defined stash that's passed around as part of
+the C<$rx> object, useful for passing around all sorts of data between
+the callback routines and methods.
+
+=head2 minlen
+
+    $rx->minlen($num);
+    my $minlen = $rx->minlen // "not set";
+
+The minimum C<length> a string must be to match the pattern, perl will
+use this internally during matching to check whether the stringified
+form of the string (or other object) being matched is at least this
+long, if not the regexp engine in effect (that means you!) will not be
+called at all.
+
+The length specified will be used as a a byte length (using
+L<SvPV|perlapi/SvPV>), not a character length.
+
+=head2 nparens
+
+=head2 gofs
+
+=head2 callbacks
+
+    # A dumb regexp engine that just tests string equality
+    use re::engine::Plugin comp => sub {
+        my ($re) = @_;
+
+        my $pat = $re->pattern;
+
+        $re->callbacks(
+            exec => sub {
+                my ($re, $str) = @_;
+                return $pat eq $str;
+            },
+        );
+    };
+
+Takes a list of key-value pairs of names and subroutines, and replace the
+callback currently attached to the regular expression for the type given as
+the key by the code reference passed as the corresponding value.
+
+The only valid keys are currently C<exec> and C<free>. See L</exec> and
+L</free> for more details about these callbacks.
+
+=head2 num_captures
+
+    $re->num_captures(
+        FETCH => sub {
+            my ($re, $paren) = @_;
+
+            return "value";
+        },
+        STORE => sub {
+            my ($re, $paren, $rhs) = @_;
+
+            # return value discarded
+        },
+        LENGTH => sub {
+            my ($re, $paren) = @_;
+
+            return 123;
+        },
+    );
+
+Takes a list of key-value pairs of names and subroutines that
+implement numbered capture variables. C<FETCH> will be called on value
+retrieval (C<say $1>), C<STORE> on assignment (C<$1 = "ook">) and
+C<LENGTH> on C<length $1>.
+
+The second paramater of each routine is the paren number being
+requested/stored, the following mapping applies for those numbers:
+
+    -2 => $` or ${^PREMATCH}
+    -1 => $' or ${^POSTMATCH}
+     0 => $& or ${^MATCH}
+     1 => $1
+     # ...
+
+Assignment to capture variables makes it possible to implement
+something like Perl 6 C<:rw> semantics, and since it's possible to
+make the capture variables return any scalar instead of just a string
+it becomes possible to implement Perl 6 match object semantics (to
+name an example).
+
+=head2 named_captures
+
+B<TODO>: implement
+
+perl internals still needs to be changed to support this but when it's
+done it'll allow the binding of C<%+> and C<%-> and support the
+L<Tie::Hash> methods FETCH, STORE, DELETE, CLEAR, EXISTS, FIRSTKEY,
+NEXTKEY and SCALAR.
+
+=head1 CONSTANTS
+
+=head2 C<REP_THREADSAFE>
+
+True iff the module could have been built with thread-safety features
+enabled.
+
+=head2 C<REP_FORKSAFE>
+
+True iff this module could have been built with fork-safety features
+enabled. This will always be true except on Windows where it's false
+for perl 5.10.0 and below.
+
+=head1 TAINTING
+
+The only way to untaint an existing variable in Perl is to use it as a
+hash key or referencing subpatterns from a regular expression match
+(see L<perlsec|perlsec/Laundering and Detecting Tainted Data>), the
+latter only works in perl's regex engine because it explicitly
+untaints capture variables which a custom engine will also need to do
+if it wants its capture variables to be untanted.
+
+There are basically two ways to go about this, the first and obvious
+one is to make use of Perl'l lexical scoping which enables the use of
+its built-in regex engine in the scope of the overriding engine's
+callbacks:
+
+    use re::engine::Plugin (
+        exec => sub {
+            my ($re, $str) = @_; # $str is tainted
+
+            $re->num_captures(
+                FETCH => sub {
+                    my ($re, $paren) = @_;
+
+                    # This is perl's engine doing the match
+                    $str =~ /(.*)/;
+
+                    # $1 has been untainted
+                    return $1;
+                },
+            );
+        },
+    );
+
+The second is to use something like L<Taint::Util> which flips the
+taint flag on the scalar without invoking the perl's regex engine:
+
+    use Taint::Util;
+    use re::engine::Plugin (
+        exec => sub {
+            my ($re, $str) = @_; # $str is tainted
+
+            $re->num_captures(
+                FETCH => sub {
+                    my ($re, $paren) = @_;
+
+                    # Copy $str and untaint the copy
+                    untaint(my $ret = $str);
+
+                    # Return the untainted value
+                    return $ret;
+                },
+            );
+        },
+    );
+
+In either case a regex engine using perl's L<regex api|perlapi> or
+this module is responsible for how and if it untaints its variables.
+
+=head1 SEE ALSO
+
+L<perlreapi>, L<Taint::Util>
+
+=head1 TODO & CAVEATS
+
+I<here be dragons>
+
+=over
+
+=item *
+
+Engines implemented with this module don't support C<s///> and C<split
+//>, the appropriate parts of the C<REGEXP> struct need to be wrapped
+and documented.
+
+=item *
+
+Still not a complete wrapper for L<perlreapi> in other ways, needs
+methods for some C<REGEXP> struct members, some callbacks aren't
+implemented etc.
+
+=item *
+
+Support overloading operations on the C<qr//> object, this allow
+control over the of C<qr//> objects in a manner that isn't limited by
+C<wrapped>/C<wraplen>.
+
+    $re->overload(
+        '""'  => sub { ... },
+        '@{}' => sub { ... },
+        ...
+    );
+
+=item *
+
+Support the dispatch of arbitary methods from the re::engine::Plugin
+qr// object to user defined subroutines via AUTOLOAD;
+
+    package re::engine::Plugin;
+    sub AUTOLOAD
+    {
+        our $AUTOLOAD;
+        my ($name) = $AUTOLOAD =~ /.*::(.*?)/;
+        my $cv = getmeth($name); # or something like that
+        goto &$cv;
+    }
+
+    package re::engine::SomeEngine;
+
+    sub comp
+    {
+        my $re = shift;
+
+        $re->add_method( # or something like that
+            foshizzle => sub {
+                my ($re, @arg) = @_; # re::engine::Plugin, 1..5
+            },
+        );
+    }
+
+    package main;
+    use re::engine::SomeEngine;
+    later:
+
+    my $re = qr//;
+    $re->foshizzle(1..5);
+
+=item *
+
+Implement the dupe callback, test this on a threaded perl (and learn
+how to use threads and how they break the current model).
+
+=item *
+
+Allow the user to specify ->offs either as an array or a packed
+string. Can pack() even pack I32? Only IV? int?
+
+=item *
+
+Add tests that check for different behavior when curpm is and is not
+set.
+
+=item *
+
+Add tests that check the refcount of the stash and other things I'm
+mucking with, run valgrind and make sure everything is destroyed when
+it should.
+
+=item *
+
+Run the debugger on the testsuite and find cases when the intuit and
+checkstr callbacks are called. Write wrappers around them and add
+tests.
+
+=back
+
+=head1 DEPENDENCIES
+
+L<perl> 5.10.
+
+A C compiler.
+This module may happen to build with a C++ compiler as well, but don't rely on it, as no guarantee is made in this regard.
+
+L<XSLoader> (standard since perl 5.6.0).
+
+=head1 BUGS
+
+Please report any bugs that aren't already listed at
+L<http://rt.cpan.org/Dist/Display.html?Queue=re-engine-Plugin> to
+L<http://rt.cpan.org/Public/Bug/Report.html?Queue=re-engine-Plugin>
+
+=head1 AUTHORS
+
+E<AElig>var ArnfjE<ouml>rE<eth> Bjarmason C<< <avar at cpan.org> >>
+
+Vincent Pit C<< <perl at profvince.com> >>
+
+=head1 LICENSE
+
+Copyright 2007,2008 E<AElig>var ArnfjE<ouml>rE<eth> Bjarmason.
+
+Copyright 2009,2010,2011,2013,2014,2015 Vincent Pit.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,68 @@
+Fri Jul 16 11:58:22 PDT 1999
+
+Aside from a complete re-engineering of the release manager to raise the
+abstraction one layer higher, the package is fairly stable and reliable.
+The rlsmgrd tool pretty much does *not* crash. The host has to die for it
+to exit any way other than gracefully. deploy_content has support for MD5
+signatures of packages, and can handle compressed data as input. There is
+room for improvement in the consistency of error- and trace-logging across
+all the tools, but that is usually the case with this sort of thing. The
+uploader script (upload.pl) appears to be tight.
+
+TOOL-SPECIFIC OUTSTANDING ISSUES:
+
+rlsmgrd
+        Consider overloading the lockfile (which currently contains only the
+        rlsmgrd process ID) to contain a dump of the mirror configuration.
+        This would allow passing the filename to deploy_content as a -c
+        option, thus avoiding the need for hitting DBI again and again.
+        Alternately, one could stuff all of the config into environment
+        vars, and signal deploy_content to look there (via a new option
+        such as -E). If the latter approach is taken, I recommend adding
+        subroutines to encode and fetch into the IMS::ReleaseMgr::Utils
+        library, so as to centralize the code.
+
+deploy_content
+        The same remark regarding sending config information as legacy data
+        applies here, save that it would not be necessary to implement it
+        as a file-writing operation. The file would already exist and just
+        need to be signaled to process_content. Or if using the environment
+        approach, the environment variables would already be set.
+
+        Not all of the error cases are handled as well as they need to be.
+        Nor are they consistent in terms of what constitutes a fatal error
+        versus a recoverable error.
+
+process_content
+        This one is hurting pretty badly in the trace/reporting area. Errors
+        that crop up here are almost guaranteed to be lost. Will also require
+        modification if the changes to the passing of config information are
+        applied to the other two tools.
+
+upload.pl
+        This tool is pretty tight and stable. It is presently dependant on
+        the presence of a configured, running web server. This will be
+        addressed below. Also addressed there will be some issues regarding
+        modularization of this tool and its functionality.
+
+GENERAL FUTURE DIRECTION:
+
+Recently it became clear that the use of HTTP as a transport model does have
+a design vulnerability: the need for an existing HTTP server. When first
+designed, these tools were for the deployment of web content. Thus, the
+pre-existence of a web server was a safe assumption. Lately, they've been
+put to use in areas where a web server had to be retro-fitted into place to
+support the upload script. I recommend giving serious thought to writing a
+micro-HTTP server that exists only to answer requests for the upload script.
+This could be launched from (and perhaps be built in to) rlsmgrd. This would
+have the added advantage of being able to draw the Basic Authentication
+information directly from the mirror specification database that the release
+tools already use. Such a daemon would need to issue and validate the Basic
+Authentication challenge, but aside from that it would be a very small bit
+of Perl code (particularly with the HTTP::Daemon class from the LWP package
+already available to you).
+
+I leave the detailed design and architecture of such an application as an
+exercise for the reader.
+
+randyr

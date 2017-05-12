@@ -1,0 +1,54 @@
+Changelog for re-engine-TRE
+
+0.09 2014-06-24T07:30:04
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - Fixed test warnings (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Сергей Романов)
+
+0.08 2012-07-07T14:28:17
+ - version bump (Stanislaw Pusep)
+ - more compatible MakeMaker (Stanislaw Pusep)
+ - compatibility issues fixed (Stanislaw Pusep)
+
+0.07 2012-07-05T14:48:04
+ - Perl 5.12 has no Perl_refcounted_he_fetch_pv() (Stanislaw Pusep)
+ - restored tre/gettext.h (Stanislaw Pusep)
+
+0.06 2012-07-04T18:19:44
+ - documentation enhancement (Stanislaw Pusep)
+ - approximate matching tests (Stanislaw Pusep)
+ - use approximate matching (configurable via import options) (Stanislaw
+   Pusep)
+
+0.05 2012-07-03T21:09:25
+ - Dist::Zillified (Stanislaw Pusep)
+ - version bump (Stanislaw Pusep)
+ - compatible with Perl > v5.10 (Stanislaw Pusep)
+ - libtre upgraded to 0.8.0 (Stanislaw Pusep)
+
+0.04 2008-02-25T17:37:48
+ - Bump to 0.04 (Ævar Arnfjörð Bjarmason)
+ - patch from b_jonas to add pragma tests (Ævar Arnfjörð Bjarmason)
+ - patch from b_jonas that always displays some error message even if it's
+   longer than ERR_STR_LENGTH (Ævar Arnfjörð Bjarmason)
+ - don't do a free() on a value I'm about to use, since I'm using croak() I
+   would either hook into some overly complex perl destruction routine or
+   use a static buffer. (Ævar Arnfjörð Bjarmason)
+
+0.03 2008-02-18T11:22:54
+ - forgot 0.03 version (Ævar Arnfjörð Bjarmason)
+ - Linked to -lpcre removed (kill/yank code in 0.02) (Ævar Arnfjörð
+   Bjarmason)
+ - bumped version to 0.03 (Ævar Arnfjörð Bjarmason)
+ - No META.yml and updated manifest/gitignore to be sane (Ævar Arnfjörð
+   Bjarmason)
+
+0.02 2008-02-12T01:13:46
+ - Patch from Larry Wall to make longest token matching easier (Ævar
+   Arnfjörð Bjarmason)
+ - Makefile.old was accidentally versioned (Ævar Arnfjörð Bjarmason)
+ - Nuked M::I (Ævar Arnfjörð Bjarmason)
+
+0.01 2007-12-19T00:26:44
+ - 0.01 from CPAN (Ævar Arnfjörð Bjarmason)
+

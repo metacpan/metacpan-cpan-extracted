@@ -1,0 +1,35 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+PCRE2.h
+PCRE2.pm
+PCRE2.xs
+README.md
+t/00-compile.t
+t/1-basic.t
+t/capture.t
+t/config.t
+t/import.t
+t/match.t
+t/perl/pat.t
+t/perl/re_tests
+t/perl/regexp.t
+t/perl/regexp_nc_tie.t
+t/qr.t
+t/s.t
+t/split-null.t
+t/split.t
+t/subexp.t
+t/unimport.t
+t/variable_expansion.t
+t/z_kwalitee.t
+t/z_manifest.t
+t/z_pod-coverage.t
+t/z_pod-spell-mistakes.t
+t/z_pod-spelling.t
+t/z_pod.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

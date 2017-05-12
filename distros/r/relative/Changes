@@ -1,0 +1,20 @@
+Revision history for relative
+
+0.04    2008.02.01  (SAPER)
+        [BUGFIX] Really make the errors appear as coming from the caller.
+
+0.03    2007.10.26  (SAPER)
+        [BUGFIX] Fixed a bug in the regexp that resolve parent names.
+        [FEATURE] New short-hand syntax for sibling modules.
+        [FEATURE] Implement alias support (Curtis Poe).
+        [CODE] Check the eval(import) as well (Eric Wilhelm).
+
+0.02    2007.10.07  (SAPER)
+        [FEATURE] import() now returns the list of loaded modules (thanks 
+        to Ken Williams).
+        [API] Changed to short form from "to => ..." to "-to => ..." in 
+        order to avoid module name clash.
+
+0.01    2007.10.06  (SAPER)
+        First version, released on an unsuspecting world.
+

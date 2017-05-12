@@ -1,0 +1,6 @@
+Revision history for Perl extension rubyisms.
+
+0.01  Thu Jan 23 15:04:24 2003
+	- original version; created by h2xs 1.2 with options
+		-AX -n rubyisms
+

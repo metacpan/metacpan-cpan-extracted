@@ -1,0 +1,22 @@
+---
+abstract: 'TRE regular expression engine'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: re-engine-TRE
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/creaktive/re-engine-tre/issues
+  homepage: https://github.com/creaktive/re-engine-tre
+  repository: git://github.com/creaktive/re-engine-tre.git
+version: '0.09'
+x_contributors:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+  - 'Сергей Романов <sromanov-dev@yandex.ru>'

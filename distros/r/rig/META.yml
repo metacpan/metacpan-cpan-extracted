@@ -1,0 +1,27 @@
+---
+abstract: 'Bundle up your favorite modules and imports into one call'
+author:
+  - 'Rodrigo de Oliveira <rodrigolive@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200013, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: rig
+requires:
+  Carp: 0
+  File::HomeDir: 0
+  File::Spec: 0
+  Hook::LexWrap: 0
+  Sub::Delete: 0
+  YAML::XS: 0
+  version: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=rig
+  homepage: http://search.cpan.org/perldoc?rig
+  repository: git://github.com/rodrigolive/rig.git
+version: 0.04

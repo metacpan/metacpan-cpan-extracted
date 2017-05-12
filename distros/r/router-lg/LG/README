@@ -1,0 +1,49 @@
+Router::LG
+version 0.98
+
+NAME
+
+Router::LG - Looking Glass
+
+DESCRIPTION
+
+The Router::LG module is designed to let network administrators give 
+outsiders the ability to execute simple arbitrary commands on routers 
+for the purposes of providing information that would normally have to 
+be obtained by the network administrator directly.
+
+Users of this module should have a basic understanding of the operations 
+of their routers.
+
+INSTALLATION
+
+1. perl Makefile.PL
+2. make 
+3. make test
+4. make install
+
+DOCUMENTATION
+
+All modules included have POD documentation.  Also, there are additional 
+files in the distribution that should be examined.
+
+Routers.txt	Information on data structures and creating additional 
+		modules for Routers::LG
+
+Security.txt	Security concerns on using Router::LG.
+
+AUTHOR
+
+Chris Josephes <chrisj@onvoy.com>
+
+SPECIAL THANKS
+
+Thanks to the following network engineers who assisted in the development 
+of this software:  Dan Boehlke, Dave Bergum, Rob Healey, 
+Bradley Urberg Carlson, and Tom Barron.
+
+COPYRIGHT
+
+Copyright (c) 2000 Chris Josephes.  All rights reserved.  This program is 
+free software; you may redistribute it and/or modify it under the same terms 
+as Perl itself.

@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+  <HEAD>
+    <TITLE>Release Manager Library Components (20-Jul-1999)</TITLE>
+    <!-- Created by: Randy J. Ray, 20-Jul-1999 -->
+    <!-- Changed by: Randy J. Ray, 20-Jul-1999 -->
+    <SCRIPT language="JavaScript1.1">
+// Take the document's lastModified property and add a line to the document
+// only if the value is non-zero
+function docupdated ()
+{
+  var lastmod = document.lastModified;
+  var lastmodint = Date.parse(lastmod);
+
+  if (lastmodint != 0)
+    {
+      lastmod = "This page last updated: " + lastmod;
+      document.write(lastmod.bold().fontsize("-1"));
+    }
+  else
+    {
+      document.write(" ");
+    }
+
+  return true;
+}
+    </SCRIPT>
+  </HEAD>
+  <BODY bgcolor=white text=black vlink=green>
+    <CENTER>
+      <H1>Release Manager Library Components</H1>
+      <hr size=4 width="90%">
+    </CENTER>
+    <P>
+      <TABLE border=0>
+        <tr valign=top>
+          <td>
+            <IMG ALIGN=MIDDLE SRC="sol_gr.gif" ALT="(O)">
+          </td>
+          <td>
+            <table border=0>
+              <tr>
+                <td><TT>Status:</TT></td>
+                <td>Released, maintenance</td>
+              </tr>
+              <tr>
+                <td><TT>Version:</TT></td>
+                <td>1.6</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </TABLE>
+    </P>
+    <P>
+      <hr>
+      <table border=0 width="100%" cellspacing=0 cellpadding=0>
+        <tr valign=top>
+          <td width="40%">
+            <SCRIPT>docupdated()</SCRIPT>
+          </td>
+          <td width="20%"></td>
+          <td width="40%" align=right>
+            <FONT SIZE=-1>
+              <I>Email:
+                <A HREF="mailto:randyr@nafohq.hp.com">randyr@nafohq.hp.com</A>
+              </I>
+            </FONT>
+          </td>
+        </tr>
+      </table>
+    </P>
+  </BODY>
+</HTML>

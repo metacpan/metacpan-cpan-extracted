@@ -1,0 +1,204 @@
+Changelog for re-engine-GNU
+
+0.021 2016-01-22T19:04:23
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dist.ini: Add generated files to clean rule
+ - dist.init: Closes #2
+ - Fix propagation of newline_anchor in GNU_dupe
+
+0.020 2016-01-21T21:46:00Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - regex_engine.rxfree instead of regex_engine.free - RT111311: Closes #3
+
+0.019 2015-04-12T11:36:39Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dist.ini: the correct fix for newSVpvn_flags
+ - Revert "GNU.xs: perl-5.10.0 newSVpvn_flags"
+ - GNU.xs: perl-5.10.0 newSVpvn_flags
+
+0.018 2015-04-04T08:49:04Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - GNU.xs: fixed last parameter (range is a number of characters, bytes I
+   believe)
+
+0.017 2015-04-04T08:05:24Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - GNU.xs: removed the hardcoded NULL character in stringification
+
+0.016 2015-04-04T05:32:04Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - mbrtowc: make sure that wcs buffer is always large enough
+ - More kWalitee and fix Config::AutoConf hardcoded version dependency
+ - Revert "perl-5.10 portability and newSVpvs"
+ - perl-5.10 portability and newSVpvs
+
+0.015 2015-04-03T04:00:25Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - GNU.pm: a note about "[.something.]" and "[=something=]
+ - regex_internal.c: looks like a bug in original implementation -;
+ - GNU.xs: cosmetic changes
+ - remove threads::shared, not needed anymore
+ - re_string_elem_size_at fix
+ - almost working version -;
+ - dev+
+ - tolower/toupper
+ - re_string_elem_size_at: dev+
+ - Propagate SV as a helper
+ - regex_internal.h: removed (wrong) code
+ - regex_internal.c: fix MB_LEN_MAX
+ - regex_internal.h: fix octdump prototype
+ - portability compiler issues
+ - use Config::AutoConf 0.311
+
+0.014 2015-03-28T08:00:49Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - In theory no need anymore for msvcprt.lib
+ - Perl portability issues
+ - UTF8 fixes
+ - POD: revised NOTES section
+ - Add -DNDEBUG
+ - Fix parameters to re_search
+ - dev+
+ - __isascii
+ - utf8 various fixes
+ - Perl_internal_state
+ - utf8n_to_uvchr and NUL byte
+ - mb stuff
+ - Perl mb proxy dev+
+
+0.013 2015-03-21T21:17:16Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - GNU.pm: fix POD
+ - removal of libc_calls.c
+ - .
+ - README.GNU.txt
+ - threaded perl support
+ - GNU.xs: added missing *THX_
+
+0.012 2015-03-21T14:01:50Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - cop* stuff removal
+ - GNU.xs: fix memory leak
+ - general fix with offsets
+ - regex_internal.h; handle bool conflict with perl
+ - Fix access to rx with MATCH macros and double-free
+ - Fix memory errors
+ - regcomp.c: warnings fix
+ - regcomp.orig.c
+ - dev+
+ - use threads::shared
+ - lock macros
+ - aTHX_
+ - back to pure xs
+ - compile regex.c directly in the XS to profit from perl macros
+ - generic calls to libc regardless if in XS or not
+ - Moving the NOT_IN_libc model
+ - GNU.xs
+ - Original regex sources
+ - debug+
+ - t/re-engine-GNU-dev.t removed
+ - t+
+ - utf8: t+
+ - utf8: dev+
+ - utf8 dev+
+ - macros: dev+
+ - Make the code more readable: dev+
+ - dist.ini: generate pl filenames with File::Spec
+ - etc/config_autoconf.pl: removed forced _GNU_SOURCE, handled in config.h
+ - Moved *.pl to etc
+ - config_REGEXP.pl: generate the wrappers
+ - GNU.xs: use of initialized value
+
+0.011 2015-03-15T16:08:22Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - more constants and utf8 fixes
+ - config_autoconf.pl: compile with _GNU_SOURCE and DEBUG
+ - GNU.pm: say that I18N is supported but collations are not
+ - RE_SYNTAX definitions
+
+0.010 2015-03-14T11:11:09Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - #define RE_ENABLE_I18N 1
+
+0.009 2015-03-14T10:34:14Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - GNU.xs: uniform debug
+ - GNU.xs: fixed wrong arguments to re_search
+ - GNU.xs: more verbose debug statement, fix a wrong debug one
+ - Conform to perlvar convention for scoped variables
+
+0.008 2015-03-11T21:41:15Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Some more portability issues
+
+0.007 2015-03-11T21:23:55Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Correct Changes file
+ - Changes: generated
+ - GNU.pm: POD fix
+ - -syntax support
+ - debug if AUTHOR_TEST
+ - GNU.xs: fix GNU_key2int macro
+ - debug mode in AUTHOR_TEST mode
+ - GNU.pm: remove a print
+ - GNU.pm import fix
+ - GNU.xs: GNU_key2int fix
+ - Revert "dist.ini: ExtUtils::MakeMaker = 7.04; fix issue on darwin2-level
+   about cc_runtime.h"
+ - dist.ini: ExtUtils::MakeMaker = 7.04; fix issue on darwin2-level about
+   cc_runtime.h
+ - GNU.xs: get variables dev+
+ - GNU.pm: AUTHOR and COPYRIGHT are done by dzil
+ - README: it is README.pod, not this file
+
+0.006 2015-03-10T22:55:34Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - GNU.xs: fix jump on uninitialized value detected by valgrind
+
+0.005 2015-03-10T21:43:28Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - GNU.pm: use strict; use diagnostics;
+ - GNU.pm: brief documentation
+ - GNU.xs: fixed compilation issues
+ - config.h: ssize_t issue
+ - config_REGEXP.pl: fix struct check
+ - config_autoconf.pl: cl
+ - regex_internal.h: cl
+ - config*pl: cosmetic changes
+ - GNU.xs: revisited with macros
+ - t/re-engine-GNU.t: three differentt ways
+ - GNU.pm: support of debug - TODO
+ - config_REGEXP.pl: added more members
+ - GNU.xs: revisit croak message
+ - dist.ini: add a newline before GNU\$(OBJ_EXT) rule
+
+0.004 2015-03-08T07:38:37Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dist.ini: use $(PERLRUN) instead of perl (#1)
+
+0.003 2015-03-08T07:18:27Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dist:ini: File::Temp and Capture::Tiny
+ - config_autoconf.pl: ac_execute_if_else
+
+0.002 2015-03-08T04:42:04Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dev+
+
+0.001 2015-03-07T19:13:03Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dev+
+ - dzil
+ - GNU.xs: free@libc fix
+ - GNU.xs: fix setting of offsets
+ - GNU.h removal
+ - use Config::AutoConf 0.310
+ - Makefile.PL: cc check first
+ - Makefile.PL: regexp_engine config
+ - XS fixes and first working version -;
+ - t+
+ - av_len instead of av_top_index
+ - GNU_intuit and GNU_checkstr
+ - GNU_exec: free regs
+ - GNU_exec: dev+
+ - GNU_exec

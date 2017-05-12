@@ -1,0 +1,45 @@
+Revision history for re-engine-Hooks
+
+0.06    2014-10-02 13:40 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.05 can skip this update.
+        + Rem : Support for the obsolete perl 5.19 development branch has been
+                removed.
+        + Upd : Support for perl 5.18.[234], 5.20.[01] and 5.21.[01234].
+
+0.05    2013-08-24 19:50 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.04 can skip this update.
+        + Dep : Development releases of perls from the branches 5.11, 5.13,
+                5.15 and 5.17 are no longer supported. Support for the branch
+                5.19 will be removed as soon as the branch 5.21 is available.
+                All stable releases of perl since 5.10.1 are still supported.
+        + Doc : C++ compilers are officially NOT supported.
+        + Doc : POD headings are now properly linkable.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+        + Upd : Support for perl 5.14.4, 5.16.3, 5.18.[01] and 5.19.[0123].
+
+0.04    2013-01-30 19:30 UTC
+        + Tst : t/93-pod-spelling.t does not crash anymore on perl 5.12 and
+                below.
+        + Upd : Support for perl 5.12.5, 5.14.3, 5.16.2 and 5.17.[5678].
+
+0.03    2012-09-24 11:10 UTC
+        + Doc : reh_exec_hook() has been correctly renamed to
+                reh_exec_node_hook() in the documentation.
+        + Fix : The module now links correctly on Windows.
+        + Upd : Support for perl 5.16.[01] and 5.17.[01234] has been added.
+
+0.02    2012-02-31 15:50 UTC
+        + Chg : INCOMPATIBLE CHANGE : Arguments are now passed to
+                reh_register() through a configuration structure.
+        + Chg : The node compilation hook is now called when a branch is
+                converted into a trie.
+        + Fix : The module now builds correctly on perl 5.15.5 and greater.
+        + Fix : Duplicated symbols on Windows should have been pruned.
+        + Fix : The module is now be thread-safe.
+
+0.01    2012-03-29 22:00 UTC
+        First version, released on an unsuspecting world.
+

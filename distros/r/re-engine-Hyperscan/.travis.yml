@@ -1,0 +1,23 @@
+sudo: required
+services:
+  - docker
+# no tag pushes
+branches:
+  except:
+  - /^v?[0-9]+\.[0-9]+/
+
+before_install:
+  - docker build -t yakkety -f .Dockerfile .
+
+script:
+  - docker run -v `pwd`:/build yakkety
+    sh -c "perl Makefile.PL && make test"
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+
+matrix:
+  fast_finish: true
+

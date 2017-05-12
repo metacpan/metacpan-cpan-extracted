@@ -1,0 +1,8 @@
+#
+# The basic format is:
+#
+# username:proj1,proj2,prj3:email1,email2
+#
+# E-mail is optional. Multiple lines may exist for one user.
+#
+test:test,*

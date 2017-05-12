@@ -1,0 +1,96 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e4c35d9b8e8ae41b0858b897185f25f4b01675a4 Changes
+SHA1 4db238229e6e53c1e25418b634e4f6129ff55cce LICENSE
+SHA1 f24a5d5a137e6b814ddf41bcda245c96ef502a02 MANIFEST
+SHA1 48ab308ca13fcaae1dc19e1f34c0de6e698080ce MANIFEST.SKIP
+SHA1 4b8904c9852e1ab31c20b579cf9bfa540e300ade META.yml
+SHA1 6757e5b15652e2ada4fa92bcb42000b60fe11914 Makefile.PL
+SHA1 65839b2065ebced5701845e76daa72624bb0f9d1 README
+SHA1 87931297fbdca73baf5d13d3ce25c60babf409ee TRE.h
+SHA1 17529f6111416f355e28a27cbc7b2312b17e66fb TRE.xs
+SHA1 64704526bccdba992161c5f2b7fe43361df038c5 dist.ini
+SHA1 846d540eaab2a606f92193133cc9bfb1531ce765 inc/TREMakeMaker.pm
+SHA1 15153d98e68b8e01ff92ae276f5e2597b896a2b6 lib/re/engine/TRE.pm
+SHA1 2e29577747790ed280f2264490f3375c66b04dfa perlcritic.rc
+SHA1 2c7dcbeaefdf5bd079b51f76397bc6ad2ef968f1 t/00-compile.t
+SHA1 cb610f09709d063165565aa1844778d948c6a246 t/amatch.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 56d2c8fb50d9fce8c27e943a13449c921e571a85 t/author-test-eol.t
+SHA1 ab9fe542d407423dd79b71922428078e964e4f42 t/captures.t
+SHA1 4f0ffc9673c5f364f33e32b893ec9898bff40e11 t/flags.t
+SHA1 437d88ff5f5be4455d42635e3ef9e9d92aaf8543 t/match.t
+SHA1 77b2ce365a6aa5cee3f600d863aa0491b74f05d9 t/null.t
+SHA1 0cde670b65b86d65ebbe5ad54fb4ae199f2fc2fe t/pragma.t
+SHA1 695a44c117b617d22d2ffa3aa65d7e1c3d4231ef t/qr.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 d165f8ec069354540640243399f536af695046dd t/release-distmeta.t
+SHA1 3d3e9f1370ee4c83d847fe06b77bae14ac1e131a t/release-kwalitee.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 bf4fdda27bd4e8ec177c38cca43083317494cba8 t/release-portability.t
+SHA1 e647f89568819f60f56e2c7202e10b21acb77652 t/release-synopsis.t
+SHA1 b3350d3d17bb2fa4e23075ec8d786505cc565539 t/release-test-version.t
+SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
+SHA1 6d36c0473b0070665291312a160635fbfb02b86b t/s.t
+SHA1 c4ac1c49b569347339e72c4f638abddfca115be7 t/split-null.t
+SHA1 dcb7c8ac10b397ed0941a0914e7bf9fc0f86249b t/split.t
+SHA1 1d99945ce16c8d6c64d0a0da8366990b308c21f7 t/subexp.t
+SHA1 45672a58cad8a288f7935a898065ecdc7da33d18 t/words
+SHA1 cc313e42c95af01215776da85ec42bd2a66bdf98 tre/LICENSE
+SHA1 c4f01a3eced6c29f6f55ae1e4d97d5a0e90f3055 tre/Makefile.PL
+SHA1 22c4566d6fd70f65bb804c9dc01e816c1272d74a tre/config.h
+SHA1 2af797257e79db888d99f1c554cd5ee678222b8f tre/gettext.h
+SHA1 2987f8891cbe2ebf225a771c4a1b3c54e293b46c tre/regcomp.c
+SHA1 c67072b360e76a71f3e9ae14e98e25e67a288b3d tre/regerror.c
+SHA1 4c8e7fa71740f6350aec4c63ee26c00ef87b919a tre/regex.h
+SHA1 c47536601a84bbec0e7acedba32b5c0748bfbbee tre/regexec.c
+SHA1 155a8e02f0e9c01d8ddd8640aed6d3bac440779f tre/tre-ast.c
+SHA1 72dbbf3866c546caa4df92fbd0111008556fc0bd tre/tre-ast.h
+SHA1 afcef528f33766134a0c01b2fe2d3d8b74d18918 tre/tre-compile.c
+SHA1 8ba3c0117065ece016ce13f012e6a41310513e6d tre/tre-compile.h
+SHA1 15008bb9558d4a7abec696d9e823031d3d9bf9cf tre/tre-config.h
+SHA1 7b1c71265fd6fb5aa22e3dce74abec3500b2c0fb tre/tre-internal.h
+SHA1 518dff5f04108d61026113dc4b7666409d919e64 tre/tre-match-approx.c
+SHA1 3e06dae14bf181c718f1c3edecb92a0419577bef tre/tre-match-backtrack.c
+SHA1 88b5761240ee14a38f8f446cdc42aef95aced0ab tre/tre-match-parallel.c
+SHA1 96225d6f89e03f346b2e309e6a6c9aedbf26e4c2 tre/tre-match-utils.h
+SHA1 5370e4c85bbd05894ec9102466bda7cfc753ba1d tre/tre-mem.c
+SHA1 c37ad5e23caffcb945ab3f1aadb4e1c815ed2caf tre/tre-mem.h
+SHA1 a125ba201fa6f8e55e3eebcf9742db47afdcfd56 tre/tre-parse.c
+SHA1 fc022f649fd36406bc953427ca9561b5a58d5d5f tre/tre-parse.h
+SHA1 63e0df307376db4c00f8280db64cbdeda1bcc24b tre/tre-stack.c
+SHA1 80ea4736b702f72f4a74de7e03db9c7bc43784a4 tre/tre-stack.h
+SHA1 6acc420e1ef71c372bbfb65cec8cf771da58a339 tre/tre.h
+SHA1 4f3b91cdb17112f1c2a15a583e2dbea90bf512d6 tre/xmalloc.c
+SHA1 28a14892ab882d115728feaaad36ca3bed5a602c tre/xmalloc.h
+SHA1 cd0d37469e1761a4f309a80bdb39aa31f47adae3 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJTqSj8AAoJEDlxU7ZVUpmiR2sIAKdPyTd+nAcTYlYUMGF/slPl
+3NBjY2EJ/1I5hDWAPTXEWUADYDWkLeooH5IJg09iF68b60hASYZCPFU8YfjnIVPi
+wUe8RTYQLjyRnHSwGgR+WkTljwyCA0Iah1gvcJf2V8wbcNQ3pyJm7c8fU+fAVF91
+ovZQWPPt39vUNiJ9Q149wmH2/2bZqdmK4GXkMUYgsi50eTlxgg42Uec7mxvK17eV
+VNrMCWN2pQt8bWaToriqSyMr5mityBnkLKjR3MERqq+tID0Xyey22pm52GDDIEDF
+rGh1eiLIYbtDcuYdlETzCVkTOqQxvzOCiU8RBxXfmO8d7+7xB6xZznp6POE2cnY=
+=k5QM
+-----END PGP SIGNATURE-----

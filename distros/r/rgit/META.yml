@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name:               rgit
+version:            0.08
+abstract:           Recursively execute a command on all the git repositories in a directory tree.
+author:
+    - Vincent Pit <perl@profvince.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    base:                 0
+    Carp:                 0
+    Cwd:                  0
+    Exporter:             0
+    ExtUtils::MakeMaker:  0
+    File::Find:           0
+    File::Spec:           0
+    File::Temp:           0
+    POSIX:                0
+    Test::More:           0
+requires:
+    base:        0
+    Carp:        0
+    Cwd:         0
+    Exporter:    0
+    File::Find:  0
+    File::Spec:  0
+    perl:        5.008
+    POSIX:       0
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/ReportBug.html?Queue=rgit
+    homepage:    http://search.cpan.org/dist/rgit/
+    license:     http://dev.perl.org/licenses/
+    repository:  http://git.profvince.com/?p=perl%2Fmodules%2Frgit.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+dynamic_config:     0
+recommends:
+    Term::ReadKey:  0

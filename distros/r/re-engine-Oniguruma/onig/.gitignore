@@ -1,0 +1,16 @@
+*.bak
+*.tar.gz
+.lwpcookies
+Build
+HTML-Simple-*
+Makefile
+Makefile.old
+Oniguruma.bs
+Oniguruma.c
+_build*
+blib*
+config.h
+cover_db
+dep
+pm_to_blib*
+tmon.out

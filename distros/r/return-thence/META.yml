@@ -1,0 +1,38 @@
+---
+abstract: 'return values from up above'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+  Try::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: return-thence
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  return::thence:
+    file: lib/return/thence.pm
+    version: '0.003'
+requires:
+  Scope::Upper: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/return-thence/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=return-thence
+  homepage: https://metacpan.org/release/return-thence
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-return-thence.git
+version: '0.003'

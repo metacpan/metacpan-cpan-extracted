@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>Releasing Executables and Automatically Building Projects with Release Manager</TITLE>
+</HEAD>
+<BODY>
+
+<B><FONT FACE="Arial" SIZE=4><P ALIGN="CENTER">Releasing Executables and Automatically Building Projects with Release Manager</P>
+</B></FONT><FONT SIZE=2><P>&nbsp;</P>
+</FONT><B><I><FONT FACE="Arial"><P ALIGN="CENTER">Kevin Greene</P>
+<P ALIGN="CENTER">5/22/2000</P>
+</B></I></FONT><FONT SIZE=2>
+<P>&nbsp;</P>
+<P>There are some cases where a project needs to be released that needs to be compiled and the executable must be released in lieu of the source code.  This can automatically be accomplished by creating and using the buildlist.</P>
+
+<P>The buildlist file is actually named "</FONT><B><FONT FACE="Courier New" SIZE=2>.buildlist</B></FONT><FONT SIZE=2>" and is similar to the "</FONT><B><FONT FACE="Courier New" SIZE=2>.topiclist</B></FONT><FONT SIZE=2>" file in that it sets global preferences for the project.  The </FONT><B><FONT FACE="Courier New" SIZE=2>.buildlist</B></FONT><FONT SIZE=2> file contains information regarding what parts of a project to build to generate executables and what part to exclude from release (ie, source code).  To use the buildlist, created a .buildlist file at the top level of the project.  A Makefile must also be created with make commands to compile and optionally clean up the project during the build.  The Makefile must move the executable to appropriate locations for release. (e.g., servlets or some other directory.)  The buildlist file must contain a 'build' command at the very minimum.  All other lines are optional.  </P>
+
+<P>&nbsp;</P>
+</FONT><FONT FACE="Arial"><P>.buildlist file format:</P>
+</FONT><I><FONT SIZE=2><P>commands are in <B>key = value</B> format</P>
+</I></FONT><FONT FACE="Courier New" SIZE=2><P>#&#9;comments</P>
+<P>build&#9;&#9;=&#9;make build command</P>
+<P>preclean&#9;=&#9;makefile clean command run before build command(optional)</P>
+<P>postclean&#9;=&#9;makefile clean command run after build command (optional)</P>
+<P>exclude&#9;=&#9;file path to exclude from release (source directories to not release) [multiple directories separated by commas]</P>
+</FONT><FONT SIZE=2>
+<P>&nbsp;</P>
+<P>&nbsp;</P>
+</FONT><FONT FACE="Arial"><P>example .buildlist:</P>
+</FONT><FONT SIZE=2>
+</FONT><B><FONT FACE="Courier New" SIZE=2><P>#buildlist example</P>
+<P>#realclean is make command (ie, make realclean)</P>
+<P>preclean&#9;=&#9;realclean</P>
+<P>#make release to build executables</P>
+<P>build&#9;=&#9;release</P>
+<P>#make cleanup after build</P>
+<P>postclean&#9;=&#9;cleanup</P>
+<P>#do not release sourcecode or test dirs!</P>
+<P>exclude&#9;=&#9;src,test,image/test.gif</P>
+</B></FONT><FONT SIZE=2>
+<P>&nbsp;</P>
+</FONT><FONT FACE="Arial"><P>makefile environment:</P>
+</FONT><FONT SIZE=2>
+<P>A makefile variable </FONT><B><FONT FACE="Courier New" SIZE=2>$TARGETHOST</B></FONT><FONT SIZE=2> will allow creators of the makefile to determine appropriate binaries to release based on target host.  </FONT><B><FONT FACE="Courier New" SIZE=2>$TARGETHOST</B></FONT><FONT SIZE=2> is the host passed to stage on the command line.</P>
+<P>&nbsp;</P>
+</FONT><B><I><FONT FACE="Arial"><P>For Release Manager Admin:</P>
+</B></I></FONT><FONT SIZE=2>
+<P>The name of the buildlist file is configured in the global config file usually located at </FONT><B><FONT FACE="Courier New" SIZE=2>/opt/ims/local/dev_release.cfg</B></FONT><FONT SIZE=2>.  The key "</FONT><B><FONT FACE="Courier New" SIZE=2>BUILDLIST</B></FONT><FONT SIZE=2>" is set to the desired name.  The current name is "</FONT><B><FONT FACE="Courier New" SIZE=2>.buildlist</B></FONT><FONT SIZE=2>".</P>
+</FONT></BODY>
+</HTML>

@@ -1,0 +1,221 @@
+$ perldoc -F README.ALT
+
+=head1	NAME
+
+F<rpm-build-perl/README.ALT> - notes on Perl packaging
+
+=head1	DESCRIPTION
+
+This document is an early attempt of Perl policy for ALT Linux Team.
+
+Most of the packages, modules and even files mentioned in this document
+have comprehensive documentation.  Be sure to read it, too!
+
+Blind guess: what you are looking for is probably C<_perl_lib_path>. See below.
+
+=head1	Packages
+
+B<perl-base> is a part of basesystem.
+
+B<perl-devel> is required to build Perl modules that have F<Makefile.PL>.
+
+B<perl-Module-Build> is additionally required to build modules that have F<Build.PL>.
+
+B<perl-CPAN> is useful for finding modules that need updating.
+
+B<rpm-build> is required to build RPM packages.
+
+B<rpm-build-perl> is required to build Perl RPM packages; it contains
+scripts for automatic dependency tracking, RPM macros for Perl, and this
+document.
+
+B<rpm-utils> has C<buildreq> script which automatically inserts/updates
+C<BuildRequires> clause in specfile.
+
+B<sisyphus_check> is to check package acceptability for Sisyphus.
+
+B<hasher> is a build system.
+
+=head1	Files and modules
+
+F</usr/lib/rpm/perl.req>, F</usr/lib/rpm/perl.prov> - scripts for
+automatic dependency tracking.
+
+	$ alias perl.req=/usr/lib/rpm/perl.req
+	$ perl.req --verbose /usr/lib/perl5/perl5db.pl
+	# perl(IO/Handle.pm) at line 492
+	# perl(strict.pm) at line 4582 (builtin SKIP)
+	# perl(Config.pm) at line 1157 inside eval (SKIP)
+	# perl(IO/Socket.pm) at line 1560
+	# perl(Carp.pm) at line 7338 (builtin SKIP)
+	# perl(Term/ReadLine.pm) at line 5725 inside eval (SKIP)
+	# perl(Config.pm) at line 7633
+	# perl(dumpvar.pl) at line 2222
+	# perl(PadWalker.pm) >= 0.080 at line 2409 inside eval (SKIP)
+	# perl(dumpvar.pl) at line 2418
+	# perl(dumpvar.pl) at line 5316
+	# perl(Class/ISA.pm) at line 4576 inside eval (SKIP)
+	# perl(Carp.pm) at line 7278 (builtin SKIP)
+	# perl(Devel/Peek.pm) at line 7487 inside eval (SKIP)
+	/usr/lib/perl5/perl5db.pl syntax OK
+	perl(Config.pm)
+	perl(dumpvar.pl)
+	perl(IO/Handle.pm)
+	perl(IO/Socket.pm)
+	$
+
+F</etc/rpm/macros.d/perl5> - RPM macros for Perl.
+
+B<ExtUtils::MakeMaker> - process Makefile.PL and build Perl module.
+
+	$ cd libnet-1.19
+	$ perl Makefile.PL PRINT_PREREQ=1
+	Checking for Socket...ok
+	Checking for IO::Socket...ok
+	perl(IO::Socket)>=1.05  perl(Socket)>=1.3
+	$
+
+B<Module::Build> - process Build.PL and build Perl module.
+
+B<CPAN> - list modules than need updating:
+
+	$ perl -MCPAN -e 'CPAN::Shell->r'
+
+Download and test a module:
+
+	$ perl -MCPAN -e 'CPAN::Shell->test("Some::Module")'
+
+But don't you run CPAN as root!
+
+=head1	Directories
+
+C<INSTALLDIRS=vendor> is used by default for RPM packages.
+See L<ExtUtils::MakeMaker> for details.
+
+B<%perl_vendor_privlib> - standard RPM directory for
+architecture-independent perl modules.  (Disclaimer: there's no ANSI
+standard so far.)
+
+B<%perl_vendor_privlib/auto> - standard RPM directory for
+architecture-independent autosplitted functions (used rarely).
+
+B<%perl_vendor_archlib> - standard RPM directory for
+architecture-dependent perl modules.
+
+B<%perl_vendor_autolib> - a shortcut for C<%perl_vendor_archlib/auto>,
+standard RPM directory for architecture-dependent autosplitted functions
+and compiled extensions.
+
+Typical %files sections:
+
+	%files # noarch
+	%perl_vendor_privlib/Module*
+
+	%files # i586
+	%perl_vendor_archlib/Module*
+	%perl_vendor_autolib/Module*
+
+Directory ownership!!!
+
+	%files # WRONG, Module/ directory is not owned by any package
+	%perl_vendor_privlib/Module/*
+
+	%files # WRONG, auto/ directory is captured
+	%perl_vendor_privlib/*
+
+B<_perl_lib_path> must be defined when non-standard library path for
+perl modules is used (which is discouraged).
+
+	# from kdoc.spec
+	%define _perl_lib_path %_datadir/%name
+
+	%files # kdoc*.pm are under non-standard location
+	%_datadir/%name
+
+=head1	Scriplets
+
+B<%perl_vendor_build> - basically equivalent to
+C<perl Makefile.PL INSTALLDIRS=vendor; make; make test>.
+
+Typical %build sections:
+
+	%build
+	%perl_vendor_build [arguments for Makefile.PL]
+
+Sample arguments for Makefile.PL:
+
+	INC=-I%_includedir/ncurses LIBS=-lncurses DEFINE=-DHAVE_STRING_H
+
+To disable C<make test> completely:
+
+	# This package is broken but I think that it works.
+	%def_without test
+
+To disable some tests:
+
+	%__rm -fv t/bad-test-1.t t/bad-test-2.t
+
+To disable X-server dependent tests:
+
+	# always run tests for maintainer
+	$ echo '%_build_display :0' >> ~/.rpmmacros
+
+	# don't run tests for others
+	%ifndef _build_display
+	%def_without test
+	%endif
+
+To disable tests in BTE (hasher or sandman):
+
+	%ifdef __BTE
+	%def_without test
+	%endif
+
+To disable tests when syslog is not available:
+
+	%if "%(logger -d -u /dev/log -p user.debug test >/dev/null 2>&1 || echo no)" == "no"
+	%def_without test
+	%endif
+
+To skip tests when /dev/tty is not available:
+
+	%if "%([ -c /dev/tty ] || echo no)" == "no"
+	%def_without test
+	%endif
+
+B<%perl_vendor_install> - basically equivalent to
+C<make install DESTDIR=%buildroot>.
+
+Typical %install section:
+
+	%install
+	%perl_vendor_install [arguments to make]
+
+=head1	Dependencies
+
+B<%add_findreq_skiplist> F<*/Some/Module.pm> -- don't run perl.req
+against files that match the given shell pattern. (Generally discouraged.)
+
+B<%add_findprov_skiplist> F<*/Some/Module.pm> don't run perl.prov
+against files that match the given shell pattern. (Generally discouraged.)
+
+There's no way to skip a particular dependency so far.
+
+=head1	AUTHOR
+
+Written by Alexey Tourbin <at@altlinux.org>.
+
+=head1	COPYING
+
+Copyright (c) 2004 Alexey Tourbin, ALT Linux Team.
+
+What is the best license for such a document, by the way?
+
+=head1	SEE ALSO
+
+Debian Perl Policy,
+L<http://www.debian.org/doc/packaging-manuals/perl-policy/>.
+
+=cut
+
+# vim:ft=pod tw=72

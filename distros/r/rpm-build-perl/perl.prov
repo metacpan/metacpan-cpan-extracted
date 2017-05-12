@@ -1,0 +1,236 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+
+use PerlReq::Utils qw(argv explode inc mod2path path2mod path2dep sv_version verf);
+
+sub pod2usage {
+	eval { require Pod::Usage } or die $@;
+	goto &Pod::Usage::pod2usage;
+}
+
+use Getopt::Long 2.24 qw(GetOptions :config gnu_getopt);
+GetOptions
+	"v|verbose+"	=> \my $Verbose,
+	"h|help"	=> sub { pod2usage("00") }
+		or pod2usage(2);
+$Verbose = 2 if $ENV{RPM_SCRIPTS_DEBUG};
+$| = 1;
+
+# list of provides
+my %prov;
+
+# begin
+process_file($_) foreach argv();
+
+sub process_file {
+	my $fname = shift;
+	warn "# processing $fname\n" if $Verbose > 1;
+
+	my ($prefix, $basename) = explode($fname);
+	unless ($prefix) {
+		warn "# $fname does not match any prefix\n" if $Verbose > 1;
+		return;
+	} else {
+		warn "# $fname has prefix $prefix\n" if $Verbose > 1;
+	}
+
+	if ($fname =~ /\.p[lh]$/) {
+		$prov{$basename}{prov} = 1;
+		warn "# $fname has basename $basename\n" if $Verbose;
+		return;
+	} elsif ($basename =~ /\.pm$/) {
+		$prov{$basename}{prov} = 1;
+		warn "# $fname has basename $basename, checking version\n" if $Verbose;
+	} elsif ($basename =~ /\.(al|ix)$/) {
+		warn "# $fname (autoloaded file SKIP)" if $Verbose > 1;
+		return;
+	} elsif ($basename =~ /\.pod$/) {
+		warn "# $fname (pod file SKIP)" if $Verbose > 1;
+		return;
+	} else {
+		warn "# $fname has basename $basename (SKIP)\n";
+		return;
+	}
+	my $cur_pkg = my $pkg0 = "main"; my $pkg1;
+	my $re_pkg = qr/\b\w+(?:::\w+)*/;
+	open my $fh, $fname or die "$0: $fname: $!\n";
+	local $_;
+	while (<$fh>) {
+		chomp;
+		next if /^\s*#/;
+		next if /^=\w/ .. (/^=cut/ or eof);
+		last if /^__(DATA|END)__\b/;
+		s/\s+#\s.*//; # strip comments
+		if (/^(\s*\{?\s*)package\s+($re_pkg)\s*;/) {
+			if ($1) {
+				# block package
+				$cur_pkg = $pkg1 = $2;
+			}
+			else {
+				# toplevel package
+				$cur_pkg = $pkg0 = $2;
+				undef $pkg1;
+			}
+			warn "# package $cur_pkg at $fname line $.\n" if $Verbose > 1;
+			next;
+		}
+		elsif (/^}/ && $pkg1) {
+			warn "# back from $pkg1 to $pkg0 at $fname line $.\n" if $Verbose > 1;
+			$cur_pkg = $pkg0;
+			undef $pkg1;
+		}
+		/\$(?:($re_pkg)::)?VERSION\s*\)?\s*=/ or next;
+		# it's a version assignemnt
+		my $pkg = $1;
+		my $val = $';
+
+		if ($pkg and mod2path($pkg) ne $basename) {
+			warn "# saw \$$pkg\::VERSION at $fname line $. (SKIP)\n";
+			next;
+		}
+		if (not $pkg and mod2path($cur_pkg) ne $basename) {
+			warn "# saw \$VERSION in package $cur_pkg at $fname line $. (SKIP)\n";
+			next;
+		}
+
+		if ($val =~ /\b\d|\d\./) { # there's a version number
+			# strip e.g. use vars qw($VERSION)
+			s/\buse\s+vars\b[^;]*;//;
+			# check next line if it has e.g. $VERSION = eval $VERSION
+			if ((my $next_line = <$fh>) =~ /\bVERSION\b.*=/) {
+				chomp $next_line;
+				$_ .= "\n" . $next_line;
+			}
+			my $v = extract_version($fname, $_, $pkg);
+			$prov{$basename}{ver}{$v} = 1 if $v;
+			last;
+		}
+		elsif ($val =~ /\$($re_pkg)::VERSION\s*;/) {
+			# holy Jesus! they assign the version from another package
+			warn "# saw \$VERSION reference to \$$1::VERSION at $fname line $.\n" if $Verbose;
+			my $basename2 = mod2path($1);
+			$prov{$basename}{ver} = $prov{$basename2}{ver} ||= {};
+			$prov{$basename}{vref} = $basename2;
+			last;
+		}
+		else {
+			warn "# VERSION assignment not recognized at $fname line $. (SKIP)\n";
+			warn "# $_\n";
+		}
+	}
+}
+
+# end
+foreach my $k (sort { uc($a) cmp uc($b) } keys %prov) {
+	next unless $prov{$k}{prov};
+	my @v = sort keys %{$prov{$k}{ver}||{}};
+	if (not @v and my $k2 = $prov{$k}{vref}) {
+		my $m1 = path2mod($k);
+		my $m2 = path2mod($k2);
+		warn "# unresolved reference from \$$m1\::VERSION to \$$m2\::VERSION\n";
+	}
+	if (@v) {
+		print path2dep($k) . " = $_\n" for @v;
+	}
+	else {
+		print path2dep($k) . "\n";
+	}
+}
+
+sub extract_version {
+	my ($fname, $line, $pkg) = @_;
+	warn "# extracting version at line $.:\n# $line\n" if $Verbose > 1;
+	my $code = "$line\n; \$VERSION";
+	$code =~ s/\$\Q$pkg\E::VERSION/\$VERSION/g if $pkg;
+
+	if ($code =~ s/\buse\s+version\b[^;]*;//g or $code =~ /\bqv\b/
+		or $code =~ /\bversion(?:::)?->new\b/ or $code =~ /\bnew\s+version\b/)
+	{
+		package Sandbox;
+		eval "use version";
+		warn $@ if $@;
+	}
+
+	my $version = do {
+		package Sandbox;
+		no strict;
+		eval $code;
+	};
+	goto bad if not $version;
+
+	use B qw(svref_2object);
+	my $v = sv_version(svref_2object(\$version));
+	if ($v) {
+		$v = verf($v);
+		warn "# VERSION $v at $fname line $.\n" if $Verbose;
+		return $v;
+	}
+bad:
+	warn "# WARNING: failed to extract version at $fname line $.:\n";
+	warn "# $line\n";
+	warn "# $@\n" if $@;
+	return;
+}
+
+__END__
+
+=head1	NAME
+
+perl.prov - list what Perl source files provide
+
+=head1	SYNOPSIS
+
+B<perl.prov>
+[B<-v>|B<--verbose>]
+[I<FILE>...]
+
+=head1	DESCRIPTION
+
+This script calculates conventional name for each Perl source I<file>
+specified on a command line, based on its location relative to standard
+Perl library paths; alternatively, a list of files is obtained from
+standard input, one file per line.  F<*.pm>, F<*.pl>, and F<*.ph> files
+are processed (F<*.pm> files also suffer version extraction).  The
+output of perl.prov is suitable for automatic dependency tracking (e.g.
+for RPM packaging).
+
+For example, F</usr/lib/perl5/i386-linux/DB_File.pm> provides
+C<perl(DB_File.pm) = 1.810> (as of perl-5.8.6).
+
+perl.prov is a counterpart of L<perl.req>.
+
+=head1	OPTIONS
+
+=over
+
+=item	B<-v>, B<--verbose>
+
+Increase verbosity.
+
+=back
+
+The RPM_PERL_LIB_PATH environment variable, if set, must contain the
+list of paths, separated by colons. These paths are considered as
+library paths used to determine relative names of provided perl files
+(in addition to paths from C<@INC> variable).
+
+=head1	AUTHOR
+
+Written by Alexey Tourbin <at@altlinux.org>,
+based on an earlier version by Ken Estes <kestes@staff.mail.com>,
+with contributions from Mikhail Zabaluev <mhz@altlinux.org>.
+
+=head1	COPYING
+
+Copyright (c) 2003, 2004, 2006, 2007, 2008 Alexey Tourbin, ALT Linux Team.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the GNU Library General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+=head1	SEE ALSO
+
+L<perl.req>

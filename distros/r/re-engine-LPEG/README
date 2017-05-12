@@ -1,0 +1,30 @@
+re-engine-LPEG version 0.05
+===========================
+
+    THIS MODULE IS A FAILURE.
+    THE re-engine INTERFACE IS NOT THE RIGHT WAY TO WRAP LPeg.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Needs Perl 5.10 or later for pluggable regex support.
+
+HOMEPAGE
+
+This module is hosted at http://code.google.com/p/re-engine-lpeg/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Francois PERRAD
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Lua & LPeg.
+

@@ -1,0 +1,41 @@
+Revision history for Perl extension IMS::ReleaseMgr.
+
+0.01  Thu Mar 12 16:39:13 1998
+	- original version; created by h2xs 1.18
+
+	Coding completed Tue Mar 17 14:46:06 PST 1998, entered testing
+
+0.1   Tue Mar 24 17:07:20 PST 1998
+	- version number changed to 0.1 for first main internal release.
+
+	Documentation added as POD.
+
+0.3   Fri May 29 18:30:19 PDT 1998
+	- I spaced out documenting whatever comprised 0.2
+
+	Signature.pm module, database support in Utils.pm as well as file
+	support.
+
+	Signature module supports the CRC that www.hp.com uses as well as an
+	MD5-based approach for IMSS machines.
+
+	Added misc/make_tables.sql SQL script, since any machine that has
+	to worry about database support will have also needed this package.
+
+0.5   Mon Jul 13 18:02:14 PDT 1998
+	- 0.4 only used in limited degrees as band-aid patch
+
+	FileUtils.pm module added for users like IWC who need to be able to
+	effect uploads and still have them mirrored, from within an app.
+
+	Some code cleanup.
+
+1.5   Tue Feb 23 15:50:02 PST 1999
+	- No telling what I've forgotten to document up until now
+
+	Some cleanup and bugfixes. IMS::ReleaseMgr no longer generates MD5
+	sums at all, since that is kind of silly to generate it on the same
+	machine that will be validating it. More stuff in
+	IMS::ReleaseMgr::Utils, and added IMS::ReleaseMgr::Transfer to
+	encapsulate the HTTP/FTP uploading.
+

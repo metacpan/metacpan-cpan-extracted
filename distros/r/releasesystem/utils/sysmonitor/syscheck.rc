@@ -1,0 +1,4 @@
+#sample config file
+#id;semaphore file;process regex;url;fail/restart command;email;subject line;threshold;error regex;operating hours
+#testdmo;/tmp/testdmo.sem;;http://www.hostname.com;;user@hostname.com;test dmo web site;1;;wd {Mon- Fri} hr {9am-9pm}
+#testprocess;/tmp/testproc.sem;testprocess;;/usr/bin/testprocess;user@hostname.com;test process ;2;;wd {Mon- Fri} hr {9am-9pm}

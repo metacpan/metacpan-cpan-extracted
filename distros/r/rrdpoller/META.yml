@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         rrdpoller
+version:      1.5.0
+version_from: rrdpoller
+installdirs:  site
+requires:
+    Cwd:                           0
+    Error:                         0.15
+    File::Temp:                    
+    Getopt::Long:                  0
+    RRDs:                          1.000481
+    XMLRPC::Lite:                  0
+    XMLRPC::Transport::HTTP:       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

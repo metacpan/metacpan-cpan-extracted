@@ -1,0 +1,26 @@
+Changes
+ConstOptree/ConstOptree.pm
+ConstOptree/ConstOptree.xs
+ConstOptree/Makefile.PL
+MANIFEST
+META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+README.ALT
+fake.pm
+lib/B/Walker.pm
+lib/B/PerlReq.pm
+lib/B/Clobbers.pm
+lib/PerlReq/Utils.pm
+perl.clean
+perl.prov
+perl.req
+perl.prov.files
+perl.req.files
+perl5-alt-rpm-macros
+macros.env
+rpm-build-perl.spec
+t/01-B-PerlReq.t
+t/02-perlreq.t
+t/03-perlprov.t

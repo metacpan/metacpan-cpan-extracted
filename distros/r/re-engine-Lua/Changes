@@ -1,0 +1,59 @@
+Revision history for Perl extension re::engine::Lua.
+
+0.17  Tue Jun  7 20:30:00 2016
+	- follow Lua 5.3.3
+
+0.16  Wed Dec 30 10:30:00 2015
+	- follow Lua 5.3.2
+
+0.15  Tue Jun  2 20:30:00 2015
+	- no functional change
+
+0.14  Sat Jan 17 20:30:00 2015
+	- follow Lua 5.3
+
+0.13  Mon Oct  7 14:30:00 2013
+	- remove lexical $_ in t/
+	- Test::Warn & Test::Exception become optional
+	- add Travis support
+
+0.12  Fri Mar 29 09:30:00 2013
+	- fix uninitialized matchdepth
+
+0.11  Wed Mar 27 17:30:00 2013
+	- aligned with Lua 5.2.2
+
+0.10  Tue Jan  1 13:30:00 2013
+	- workaround unneeded with Perl 5.17 (RT #112962 fixed)
+
+0.09  Sun May 20 09:30:00 2012
+	- fix build on MSWin32
+
+0.08  Wed May 16 17:30:00 2012
+	- fix qr// with Perl 5.12 & 5.14
+
+0.07  Sat May 12 19:30:00 2012
+	- compat with Perl 5.12 & 5.14
+	- follow Lua 5.2
+
+0.06  Sat Nov  8 15:30:00 2008
+	- remove Module/Install, use old fashion
+	- no behavior change
+
+0.05  Fri Aug  1 14:30:00 2008
+	- tar.gz generate on Linux
+
+0.04  Fri Aug  1 14:00:00 2008
+	- fix split (thanks to Avar)
+	- complete tests
+
+0.03  Tue Jul 22 12:30:00 2008
+	- add some prereq
+
+0.02  Sun Jul 20 00:30:00 2008
+	- first release (incomplete & buggy)
+
+0.01  Wed Dec 26 11:10:24 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n re::engine::Lua
+

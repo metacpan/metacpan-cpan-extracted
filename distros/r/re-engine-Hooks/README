@@ -1,0 +1,175 @@
+NAME
+    re::engine::Hooks - Hookable variant of the Perl core regular expression
+    engine.
+
+VERSION
+    Version 0.06
+
+SYNOPSIS
+    In your XS file :
+
+        #include "re_engine_hooks.h"
+
+        STATIC void dri_comp_node_hook(pTHX_ regexp *rx, regnode *node) {
+         ...
+        }
+
+        STATIC void dri_exec_node_hook(pTHX_
+           regexp *rx, regnode *node, regmatch_info *info, regmatch_state *state) {
+         ...
+        }
+
+        MODULE = Devel::Regexp::Instrument    PACKAGE = Devel::Regexp::Instrument
+
+        BOOT:
+        {
+         reh_config cfg;
+         cfg.comp_node = dri_comp_node_hook;
+         cfg.exec_node = dri_exec_node_hook;
+         reh_register("Devel::Regexp::Instrument", &cfg);
+        }
+
+    In your Perl module file :
+
+        package Devel::Regexp::Instrument;
+
+        use strict;
+        use warnings;
+
+        our ($VERSION, @ISA);
+
+        use re::engine::Hooks; # Before loading our own shared library
+
+        BEGIN {
+         $VERSION = '0.02';
+         require DynaLoader;
+         push @ISA, 'DynaLoader';
+         __PACKAGE__->bootstrap($VERSION);
+        }
+
+        sub import   { re::engine::Hooks::enable(__PACKAGE__) }
+
+        sub unimport { re::engine::Hooks::disable(__PACKAGE__) }
+
+        1;
+
+    In your Makefile.PL
+
+        use ExtUtils::Depends;
+
+        my $ed = ExtUtils::Depends->new(
+         'Devel::Regexp::Instrument' => 're::engine::Hooks',
+        );
+
+        WriteMakefile(
+         $ed->get_makefile_vars,
+         ...
+        );
+
+DESCRIPTION
+    This module provides a version of the perl regexp engine that can call
+    user-defined XS callbacks at the compilation and at the execution of
+    each regexp node.
+
+C API
+    The C API is made available through the re_engine_hooks.h header file.
+
+  "reh_comp_node_hook"
+    The typedef for the regexp node compilation phase hook. Currently
+    evaluates to :
+
+        typedef void (*reh_comp_node_hook)(pTHX_ regexp *, regnode *);
+
+  "reh_exec_node_hook"
+    The typedef for the regexp node_execution phase hook. Currently
+    evaluates to :
+
+        typedef void (*reh_exec_node_hook)(pTHX_ regexp *, regnode *, regmatch_info *, regmatch_state *);
+
+  "reh_config"
+    A typedef'd struct that holds a set of all the different callbacks
+    publicized by this module. It has the following members :
+
+    *   "comp_node"
+
+        A function pointer of type "reh_comp_node_hook" that will be called
+        each time a regnode is compiled. Allowed to be "NULL" if you don't
+        want to call anything for this phase.
+
+    *   "exec_node"
+
+        A function pointer of type "reh_exec_node_hook" that will be called
+        each time a regnode is executed. Allowed to be "NULL" if you don't
+        want to call anything for this phase.
+
+  "reh_register"
+        void reh_register(pTHX_ const char *key, reh_config *cfg);
+
+    Registers the callbacks specified by the "reh_config *" object "cfg"
+    under the given name "key". "cfg" can be a pointer to a static object of
+    type "reh_config". "key" is expected to be a nul-terminated string and
+    should match the argument passed to "enable" and "disable" in Perl land.
+    An exception will be thrown if "key" has already been used to register
+    callbacks.
+
+PERL API
+  "enable"
+        enable $key;
+
+    Lexically enables the hooks associated with the key $key.
+
+  "disable"
+        disable $key;
+
+    Lexically disables the hooks associated with the key $key.
+
+EXAMPLES
+    Please refer to the t/re-engine-Hooks-TestDist/ directory in the
+    distribution. It implements a couple of simple examples.
+
+DEPENDENCIES
+    Any stable release of perl since 5.10.1, or a development release of
+    perl from the 5.19 branch.
+
+    A C compiler. This module may happen to build with a C++ compiler as
+    well, but don't rely on it, as no guarantee is made in this regard.
+
+    ExtUtils::Depends.
+
+SEE ALSO
+    perlreguts.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-re-engine-hooks at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=re-engine-Hooks>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command :
+
+        perldoc re::engine::Hooks
+
+COPYRIGHT & LICENSE
+    Copyright 2012,2013,2014 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Except for the contents of the src/5* directories which are slightly
+    modified versions of files extracted from the "perl" distribution and
+    are
+
+    Copyright 1987-2014, Larry Wall, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either the GNU General Public License (version 1 or,
+    at your option, any later version), or the Artistic License (see
+    perlartistic).
+

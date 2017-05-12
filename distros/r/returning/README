@@ -1,0 +1,122 @@
+NAME
+    returning - define subs that act like `return`
+
+SYNOPSIS
+            use Test::Simple tests => 1;
+        
+            use returning {
+                    Yes   => 1,
+                    No    => 0,
+            };
+        
+            sub beats_sissors
+            {
+                    local $_ = shift;
+                    No  if /paper/i;
+                    Yes if /rock/i;
+                    No  if /scissors/;
+            }
+        
+            ok beats_scissors("rock");
+
+DESCRIPTION
+    The `returning` module allows you to define subs which act like `return`.
+    That is, they break out of their caller sub. In the SYNPOSIS example, the
+    `/scissors/i` regexp is never even evaluated because the `Yes` statement
+    breaks out of the the sub, returning "1". The `beats_scissors` function
+    could have alternatively been written as:
+
+            sub beats_sissors
+            {
+                    local $_ = shift;
+                    return 0 if /paper/i;
+                    return 1 if /rock/i;
+                    return 0 if /scissors/;
+            }
+
+    `returning` may be especially useful for domain-specific languages.
+
+  Usage
+    There are three ways to define a returning sub using this module:
+
+            use returning { subname => 'value' };
+
+    This creates the sub in the caller's namespace called ` subname ` with an
+    empty prototype. (So when calling the sub, you don't need to use
+    parentheses; just like with constant subs, but without as much
+    optimization.)
+
+            use returning { subname => sub { ... } }
+
+    This installs the provided sub into the caller's namespace. This allows
+    you to define non-constant subs, including subs that take parameters and
+    do interesting stuff with them.
+
+            BEGIN {
+                    sub subname { ... }
+            };
+            use returning 'subname'; # look, no hashref!
+
+    This does not install any sub into the caller's namespace, but modifies an
+    existing sub to act in a returning way. Note that because `use` operates
+    at compile time, you need to take a lot of care to ensure that the sub has
+    already been defined.
+
+    These can be combined, a la...
+
+            use constant ZeroButTrue => '0E0';
+            use returning 'ZeroButTrue', {
+                    Affirm   => !!1,
+                    Deny     => !!0,
+                    Mu       => sub { return; },
+            }
+
+  Implementation Notes
+    My first stab at this used Devel::Declare, but I couldn't quite get it
+    working, and nobody in `#devel-declare` seemed sure why it was not. It
+    seems possible that the ability to do this lies slightly beyond what
+    Devel::Declare is capable of.
+
+    Instead Scope::Upper has been used to create wrappers which jump up one
+    more subroutine than expected when they return. This means that some of
+    the magic happens at run-time rather than compile-time, so it perhaps
+    executes slightly slower, but probably compiled slightly faster.
+
+    An advantage of Scope::Upper is that you can re-export your `returning`
+    subs to other packages with no problem, and they'll continue to have their
+    special behaviour with no extra effort.
+
+    A feature I had been hoping to achieve with Devel::Declare would be for
+    calling a sub with an ampersand (`&Affirm()`) to act as a way of avoiding
+    the magic behaviour. This has not been possible with Scope::Upper.
+
+  Class Method
+    `returning->setup_for($package, $subname)`
+        Given the package name and subname of an *existing* sub, sets up the
+        magic.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=returning>.
+
+SEE ALSO
+    `Scope::Upper` takes care of most of the black magic.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+CREDITS
+    Thanks OSFAMERON, Matt S Trout (MSTROUT), and Ash Berlin (ASH), for
+    helping me through some of the tricky bits.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

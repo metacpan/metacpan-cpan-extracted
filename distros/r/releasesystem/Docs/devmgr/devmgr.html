@@ -1,0 +1,548 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.6 [en] (X11; I; Linux 2.2.5-15 i686) [Netscape]">
+   <title>Release Management System: Development Manager Component</title>
+</head>
+<body bgcolor="#FFFFFF">
+
+<center>
+<h1>
+Release Management System: Development Manager Component</h1></center>
+
+<hr>
+<h2>
+<a NAME="overview"></a>1. Overview</h2>
+The scope of this document is limited to those tools that make up the developer
+side of the <b>Release Management System</b>. By definition, these are
+the tools that are used directly by the developers on a project (be they
+applications engineers or content developers). These tools are installed
+on each of the machines designated as development hosts. The primary goal
+of the suite of developer tools is to provide enhanced <tt>CVS</tt> functionality,
+tools (commands) to perform management of files for release, and lastly,
+a "wrapper" utility activated directly by the <tt>CVS</tt> tools that performs
+a series of pathname and <tt>URI</tt> translations on files during check-out
+and commit operations.
+<p>Throughout this document, the following names are used to refer to the
+three distinct sub-parts of the <b>Development Manager</b>:
+<dl>
+<dt>
+<b>front-end</b></dt>
+
+<dd>
+The encapsulator for the <tt>CVS</tt> commands</dd>
+
+<dt>
+<b>release tool</b></dt>
+
+<dd>
+The tool responsible for managing the larger aspects of file management
+and releases</dd>
+
+<dt>
+<b>wrapper</b></dt>
+
+<dd>
+The utility invoked directly by <tt>CVS</tt> to manage path and <tt>URI</tt>
+translations.</dd>
+</dl>
+This is not intended to be a line-by-line dissection of the tools. Where
+it will help, specific variables, parameters or subroutines will be referenced.
+But overall, the primary intent is to focus more on <i>why</i> the tools
+do what they do, without as much emphasis on <i>how</i> it is done (except
+where it contributes to the former).
+<hr>
+<h2>
+<a NAME="design"></a>2. General Design Principle</h2>
+The elements of the <b>Development Manager</b> package follow the same
+design philosophy as the <b>Release Management System</b> as a whole. The
+basic premise is that each of the individual components should be maintainable
+and upgradable independent of the others. Provided a common interface layer
+is maintained, the internal implementation of that interface should not
+be of concern to other tools, or to other top-level components. This will
+be a recurring theme throughout the explanation of the individual scripts
+and their methods of interaction.
+<hr>
+<h2>
+<a NAME="frontend"></a>3. The <tt>cvs_front_end</tt> script</h2>
+The first of the tools to be covered is the script that encapsulates the
+various <tt>CVS</tt> actions, allowing for site-specific configuration
+to be added to all such invocations. This script is called <b><tt>cvs_front_end</tt></b>,
+though it is very rarely invoked under that name. The script is designed
+to be the target of several symbolic links, and the behavior is dictated
+by which name is used to call the tool itself. For many of the <tt>CVS</tt>
+operations, the use of the encapsulating tool merely provides a sort of
+"shorthand" calling convention, freeing the end-users the need to start
+each of the commands with the "<tt>cvs</tt>" prefix.
+<h3>
+3.1. Pass-through invocations</h3>
+The following invocations of the front-end tool are simply convenience
+functions for the sake of the end-user. Each of these passes control directly
+to the underlying <tt>CVS</tt> binary, without any changes to the parameters:
+<ul>
+<li>
+update</li>
+
+<li>
+add</li>
+
+<li>
+remove</li>
+
+<li>
+status</li>
+
+<li>
+tag</li>
+
+<li>
+cdiff (performs "<tt>cvs diff</tt>")</li>
+
+<li>
+clog (performs "<tt>cvs log</tt>")</li>
+</ul>
+
+<h3>
+3.2. The <tt>checkout</tt> invocation</h3>
+The only special operation performed by this invocation is changing into
+the user's <b><tt>public_html</tt></b> directory (in their home directory)
+prior to executing the <tt>cvs checkout</tt> command. It currently has
+as an unfortunate (and undesirable) side-effect in that the automatic changing
+of directory prevents the user from checking out project sub-directories
+from within the project directory hierarchy.
+<p>Once the checkout is complete (assuming there were no errors), the tool
+checks for the presence of a file named "<b><tt>Makefile</tt></b>" in the
+root directory of the project. If such a file exists, then the tool changes
+to the root directory of the project and executes the command, "<tt>make
+checkout</tt>". If the <tt>make</tt> utility reports that no such target
+exists, that error is silently ignored. Any other errors are reported.
+For more on this functionality, see the section titled <a href="#makehooks">Make
+Hooks</a> below.
+<p><font size=-1>Note: Upon examination of the make-hook code in this case,
+I think that it may not currently work correctly. This needs closer scrutiny
+and some degree of unit testing.</font>
+<h3>
+3.3. The <tt>finish</tt> invocation</h3>
+This calling method is provided to perform the tasks of the <tt>CVS</tt>
+command, "<b><tt>cvs release -d</tt></b>". When invoked on a specified
+project, it will first warn the user that a check for modified files is
+being performed in the workspace. The results of the search are presented
+to the user, who is then asked to confirm their desire to cease work in
+the given workspace and authorize its removal. Note that this does not
+remove files from the <tt>CVS</tt> repository itself, nor even mark files
+to be moved to the "attic" (a concept used by <tt>CVS</tt> to denote files
+that are considered deleted, but retained for possible legacy needs).
+<p>Answering in the affirmative will completely remove the specified workspace
+(project) from the user's working area, even if there are uncommitted changes
+pending.
+<h3>
+3.4. The <tt>import</tt> and <tt>new</tt> invocations</h3>
+These two are structured in very similar terms, differing only in the underlying
+<tt>CVS</tt> command that control is passed to. Each checks the repository
+to ensure that the project (internal or third-party) name is not currently
+in use. If not, then control is passed to the relevant <tt>CVS</tt> command.
+If the name is in use, an error is reported to the user.
+<h3>
+3.5. The <tt>xnew</tt> invocation</h3>
+This calling context is an extension to the existing <tt>CVS</tt> suite
+for the sake of specific needs within the development environment. The
+specific problem that this invocation solves is the case in which a third-party
+source tree is maintained using the internal development and release process,
+but is subject to update from the originating party. In simpler terms,
+the project specified when this tool is called is treated as a third-part
+project that is assumed to already exist in the repository. The contents
+of the repository are updated to reflect the user's workspace, and the
+new set of revisions tagged with a specified symbol. This greatly simplifies
+the process of integrating third-party updates.
+<h3>
+3.6. The <tt>commit</tt> invocation</h3>
+Lastly, there is the encapsulation of the <tt>CVS</tt> "commit" operation,
+which is the basic means by which changes are made to the repository itself.
+While the basic commit operation is not altered, it is at this point in
+the process flow that functionality was inserted to ensure that the permissions
+on the user's workspace are kept consistent. Because of the "helpful" nature
+of <tt>CVS</tt> and <tt>RCS</tt> in terms of setting file access permissions,
+the tool performs a quick check on the permissions of the files within
+the user's workspace prior to performing the actual commit. Since discrepancies
+in access permissions are most likely to affect an attempted commit operation,
+this seemed the logical place to insert these tests.
+<h3>
+3.7. General to most invocations</h3>
+Several of the invocations (specifically, those that govern the extraction
+of versioned files from the repository) pass information along to the <i>wrapper</i>
+component of the development system by means of an environment variable
+called <b><tt>WM_CONTROL</tt></b> (the "WM" is a historical reference to
+the team's original charter as simply a web-master team). The new generation
+of the front-end component currently retains this interface until such
+time as the wrapper component is re-engineered.
+<h3>
+3.8. Calling the script by the base name</h3>
+As was said at the start of this section, the <tt>cvs_front_end</tt> script
+is rarely called by that name. The calling of the script under the base
+name is part of the installation process. When called in this fashion,
+the script creates symbolic links in the same directory as that which the
+script resides in. Each of the commands listed above is created as a link
+in this fashion. At present, there is a boolean-style variable declared
+early in the application called <b><tt>$TESTING</tt></b>. If this variable
+has any non-null value, then all commands are also given the numeral "2"
+at the end of the names. This is to allow for the original tools to co-exist
+with the new tools until such time as the new tools can completely replace
+the older set of tools.
+<p>Performing this task should be considered a part of setting up any host
+as a development platform. The current architecture of these tools on hosts
+such as <b>webdev</b> also involves a <i>setuid wrapper</i>, a tool written
+in a lower-level language (in this case, the <tt>C</tt> programming language)
+that performs certain security-related checks and then executes the intended
+program under a different user ID than that of the person running the command.
+This is necessary for the sake of permissions on the <tt>CVS</tt> repository.
+The management of this security application and the means by which it maps
+to the Perl scripts is not directly part of the <b>Release Manager</b>,
+and thus not discussed here.
+<hr>
+<h2>
+<a NAME="release"></a>4. The <tt>dev_rls_tool</tt> script</h2>
+This is a much more complex tool than the wrapper just described. Though
+there are few means of invocation, the actions performed and the depth
+of detail demand greater attention.
+<p>The functions performed by this tool are those vital to the core design
+of the <b>Release Manager</b>: this tool keeps the development <tt>HTTP</tt>
+document area up to date, creates and maintains the staging areas in preparation
+for release to external servers, and most importantly of all, bundles and
+transmits the data that comprises a new release of a given project. As
+with the front-end tool, this is accomplished by one Perl application that
+uses symbolic links in order to be called under different names. This tool
+is invoked as:
+<dl>
+<dt>
+<b>dev_rls_tool</b></dt>
+
+<dd>
+As with the previous tool, this application uses an invocation by the native
+name to perform various installation and maintenance actions.</dd>
+
+<dt>
+<b>populate</b></dt>
+
+<dd>
+A <i>populate</i> operation is one in which the system's <tt>HTTP</tt>
+document tree is brought up-to-date with regards to the <tt>CVS</tt> repository.
+It is during this stage that certain control files (defined and documented
+below) are also brought up-to-date.</dd>
+
+<dt>
+<b>stage</b></dt>
+
+<dd>
+This action is used to create or update the <i>staging</i> area for a particular
+project being released to a particular host. It is during this step that
+file paths and <tt>URI</tt> references are translated based on a set of
+rules that define the target host's server environment. This step utilizes
+the control files maintained by the <i>populate</i> step, and updates some
+of its own in preparation for the actual release of the project.</dd>
+
+<dt>
+<b>release</b></dt>
+
+<dd>
+This last invocation is the form of the tool that actually analyzes a project
+area for changed content, creates a bundle of those files that have changed,
+and transmits the changes to the remote server host.</dd>
+</dl>
+
+<h3>
+4.1. The maintenance invocation: <tt>dev_rls_tool</tt></h3>
+As with the above tool, the maintenance function of this tool is to create
+the symbolic links by which the tool is also known. The names for the <i>populate</i>,
+<i>stage</i> and <i>release</i> invocations are declared towards the top
+of the script, where they are easily identified. They are expressed this
+way so as to simplify switching between the "normal" names, and the currently-used
+practice of appending the numeral "2" to the ends, so as to allow co-existence
+with the legacy tools. When the time comes for these tools to completely
+supersede the older tools, the numbering can be removed from the names.
+<h3>
+4.2. The <tt>populate</tt> invocation</h3>
+
+<h3>
+4.3. The <tt>stage</tt> invocation</h3>
+
+<h3>
+4.4. The <tt>release</tt> invocation</h3>
+
+<h2>
+<a NAME="wrapper"></a>5. Some thoughts on the wrapper utility</h2>
+Though a new-generation <tt>CVS</tt> wrapper has not yet been designed
+or developed, there are some matters that may help to consider:
+<ul>
+<li>
+<tt>CVS</tt> invokes the utility on one file at a time, for each file designated
+to be handled by the wrapper.</li>
+
+<li>
+The same tool <i>does not</i> have to be used for commits into the repository
+as is used for check-outs from the repository. However, since the logic
+is fundamentally the same for both operations, it has made sense from a
+simplicity and maintenance point to have just the one tool.</li>
+
+<li>
+The current tool has all the host-specific data expressed in-line as an
+extremely large data structure. In the past, roughly 90% of the errors
+associated with adding a new external host as a supported system were related
+to updates of this data structure. While the new method uses Oracle database
+tables, not all the data needed by the wrapper is in the current tables
+(necessitating expansion of the tables or design of new tables to accompany
+them). Additionally, the overhead of accessing Oracle on every invocation
+(particularly when one considers that large runs of successive invocations
+will be for one given host) may well be worse than the overhead for parsing
+the data structure each time.</li>
+
+<li>
+The use of these types of wrappers is no longer supported by the maintainers
+of <tt>CVS</tt>. The 1.10 version currently in use was fetched from a third-party
+site where users had re-enabled the functionality in the 1.10 source base.
+Use of the wrappers cannot co-exist with the <tt>CVS</tt> client/server
+model. Future releases of <tt>CVS</tt> won't have wrappers, and the third
+party cannot be counted on to continue re-implementing this.</li>
+
+<li>
+The primary motivation for the wrappers is the legacy need for translating
+the <tt>URI</tt>s of <tt>CGI</tt> applications. When the primary (and practiacally
+only) machine was the host <tt>www.interactive.hp.com</tt>, all projects
+shared a common CGI directory. To avoid name clashes, projects fanned out
+from this point by project name. A <tt>URI</tt> of the form "<tt>/project/cgi-bin/app_name</tt>",
+as it was known on the development machine, became "<tt>/cgi-bin/project/app_name</tt>"
+on delivery. This required support at the <tt>CVS</tt> level, to re-write
+these <tt>URI</tt>s dynamically. If this need can be eliminated, the wrappers
+may be, as well.</li>
+</ul>
+
+<h2>
+<a NAME="config"></a>6. The <tt>dev_release.cfg</tt> file</h2>
+There are a variety of parameters that govern parts of the system's overall
+functionality. These lend themselves to centralization in one file both
+for the sake of sharing between applications and so that these values can
+change independent of the actual program files. The applications look for
+the configuration file by examining their own fully-qualified path within
+the file system, dropping the last element of the path and then appending
+"<tt>local</tt>". This is based on an assumption that the trailing element
+of executables used in this system is "<tt>ahp-bin</tt>". Additionally,
+to accommodate the suid-wrapper/symlink issue described earlier, the path
+component "<tt>suid_scripts</tt>" is also checked for. If present, it is
+simply discarded. In this directory, the file named <tt>dev_release.cfg</tt>
+is expected to exist and contain the settings.
+<p>The structure and format of the file is a simple sequence of lines of
+the form:
+<center><tt>NAME = VALUE</tt></center>
+This should be obvious enough in style and intent. The amount of empty
+space surrounding the equal sign is flexible. From the first non-whitespace
+character to the right of the equal sign to the end of the current line
+is all encompassed at the value of the parameter. This allows for parameters
+with spaces within them. However, extra space <i>after</i> the last non-whitespace
+character is removed. As an additional feature, lines may optionally start
+with either of the special words, <tt>setenv</tt> or <tt>export</tt>. These
+keywords are used by the C-shell and Korn shell, respectively, to set environment
+variables. (The Bourne shell and "Bourne-Again" shell <tt>bash</tt> also
+use <tt>export</tt> for environment variables.) To date, the flexibility
+has not been needed, but it adds negligible overhead or complexity to the
+tool, and leaves the option of future application open. Lastly, blank lines
+are permitted for the sake of readability, and lines whose first character
+is "<tt>#</tt>" are considered commentary and ignored.
+<p>The values currently stored in the file, and their definitions, are:
+<dl>
+<dt>
+<b>ACL_DIR</b></dt>
+
+<dd>
+Default: <tt>etc/acl</tt></dd>
+
+<br>The directory in which the access-control lists (<tt>ACL</tt>) are
+stored on a per-host basis. These files are described in more detail elsewhere,
+but the short definition is that they govern which projects can release
+to a specific target host, and which users are entitled to release a given
+project. If the value is not an absolute path, it is considered relative
+to the home directory of the <b><tt>USER</tt></b> defined below.
+<dt>
+<b>CVS</b></dt>
+
+<dd>
+Default: <tt>/opt/ims/bin/cvs</tt></dd>
+
+<br>This is the fully-qualified path to the executable <tt>cvs</tt> program.
+Specifying it here accomplishes two important goals: (1) the programs are
+not reliant on the running user to have the correct directories in their
+execution path, and (2) the danger of the tools being compromised by placement
+of a dangerous program named <tt>cvs</tt> in an alternate element of the
+execution path is eliminated. It also allows for the explicit selection
+of a binary to use, a feature that was utilized when evaluating version
+1.10 of <tt>CVS</tt>.
+<dt>
+<b>CVSROOT</b></dt>
+
+<dd>
+Default: <tt>/opt/ims/repository</tt></dd>
+
+<br>The <tt>cvs</tt> command relies on either a command-line specification
+of a repository root, or for the value to be defined in an environment
+variable named <b><tt>CVSROOT</tt></b>. Defining it here not only guarantees
+consistency, but also prevents errors or data loss due to an incorrectly-set
+value on the user end.
+<dt>
+<b>DEVHOST</b></dt>
+
+<dd>
+Default: <tt>webdev.nafohq.hp.com</tt></dd>
+
+<br>The fully-qualified-domain name of the development host the tools are
+running on. This is not currently used to any real extent, but was planned
+for use by the <i>wrapper</i> component.
+<dt>
+<b>EVENT_LOG</b></dt>
+
+<dd>
+Default: <tt>/opt/ims/htdocs/development-log.txt</tt></dd>
+
+<br>Many of the actions performed by the tools are check-pointed by an
+entry written to this log as a single line. Not all tools are making maximum
+use of this at present.
+<dt>
+<b>FTP</b></dt>
+
+<dd>
+Default: <tt>/opt/ims/bin/ftp</tt></dd>
+
+<br>This is the full path to the <tt>ftp</tt> binary, defined for the same
+reasons as the <tt>cvs</tt> binary. Additionally, this serves the purpose
+of ensuring that the program used has been built with correct network library
+code to allow it to pass through the firewall.
+<dt>
+<b>GROUP</b></dt>
+
+<dd>
+Default: <tt>idsweb</tt></dd>
+
+<br>When files are created or updated in the project root or staging areas,
+this value (which may also be expressed numerically) is used to set the
+group ownership on such files and the directories that contain them.
+<dt>
+<b>HALTFILE_PREFIX</b></dt>
+
+<dd>
+Default: <tt>etc/halt-</tt></dd>
+
+<br>This prefix is used when checking for "halt files" pertaining to the
+command about to be run. Halt files are explained earlier. If the value
+is not an absolute path, it is considered relative to the home directory
+of the <b><tt>USER</tt></b> defined below.
+<dt>
+<b>HTTP_PROXY</b></dt>
+
+<dd>
+Default: <tt>http://web-proxy:8088</tt></dd>
+
+<br>When the new-generation tools were being designed, <tt>HTTP</tt> file
+upload was favored over <tt>FTP</tt>-based transmission, since the password
+and user name were of less consequence if compromised. Due to limitations
+related to the <tt>HTTP</tt>-based solution, this is gradually being phased
+out and the original <tt>FTP</tt>-based approach is now preferred. This
+parameter is used to define a proxy for the <tt>HTTP</tt> approach, if
+one is needed. Without it, transfers beyond a firewall would not be possible.
+<dt>
+<b>OWNER</b></dt>
+
+<dd>
+Default: <tt>idsweb</tt></dd>
+
+<br>This user name (or numeric ID if expressed as such) is used for several
+purposes: it is the ownership assigned to files both in the <tt>CVS</tt>
+repository and the staging areas, and it is the source for a home directory
+to use as a base directory for the values <b><tt>HALTFILE_PREFIX</tt></b>
+and <b><tt>ACL_DIR</tt></b>. It is also this user that is permitted to
+override certain safeguards such as access-control lists and halt files.
+<dt>
+<b>PROJECT_ROOT</b></dt>
+
+<dd>
+Default: <tt>/opt/ims/htdocs</tt></dd>
+
+<br>This is the area in which the developmental versions of project hierarchies
+are kept. This is the designated document root for the server instance
+that runs on the development host, and each project is kept in its own
+unique directory under this root.
+<dt>
+<b>RELEASE</b></dt>
+
+<dd>
+Default: <tt>.release</tt></dd>
+
+<br>The file which the <i>release</i>-specific tool updates to mark a successful
+release. It is expected to be a simple file, not a path, and will be created/updated
+in the project's directory under <b><tt>PROJECT_ROOT</tt></b>.
+<dt>
+<b>STAGE_ROOT</b></dt>
+
+<dd>
+Default: <tt>/opt/ims/staging</tt></dd>
+
+<br>When a project is being staged in preparation for release to a different
+host, the project directory is under this directory as its root. As explained
+earlier, this directory fans out into a set of directories named for the
+target external hosts, and the projects are staged under these host-specific
+directories on a per-request basis. This allows for projects to be staged
+to multiple hosts (i.e. a testing and a production machine) without concern
+for conflicts in the staging area.
+<dt>
+<b>TAR</b></dt>
+
+<dd>
+Default: <tt>/opt/ims/bin/tar</tt></dd>
+
+<br>See the entries for <b><tt>CVS</tt></b> and <b><tt>FTP</tt></b>. The
+added benefit for this specification is in guaranteeing that the selected
+binary supports on-the-fly compression and decompression of archive files
+(as the <tt>GNU tar</tt> implementation does).
+<dt>
+<b>TOPICLIST</b></dt>
+
+<dd>
+Default: <tt>.topiclist</tt></dd>
+
+<br>This is one of the files updated by the <i>populate</i>-specific tool
+and referenced by the <i>stage</i> tool. The information in it is not generally
+used in guiding the software, but rather for noting informational aspects
+of the project.
+<dt>
+<b>WEBLIST</b></dt>
+
+<dd>
+Default: <tt>.weblist</tt></dd>
+
+<br>Lastly, this file is the basis for the management of the files that
+comprise a project. It is updated by the <i>populate</i> tool and referenced
+by the <i>stage</i> tool. It is explained in greater detail elsewhere.
+As with <b><tt>RELEASE</tt></b> and <b><tt>TOPICLIST</tt></b>, it should
+have no path component, and will be created and updated in the project's
+area under <b><tt>PROJECT_ROOT</tt></b>.</dl>
+
+<h2>
+<a NAME="intertool"></a>7. Inter-tool Communication</h2>
+As was referred to in the section on the <a href="#frontend"><tt>CVS</tt>
+front-end</a>, there are times when tools have to pass information between
+them that can't be passed on the command line. In general, this is limited
+to passing information from the <i>front-end</i> component to the <i>wrapper</i>
+component. This is done by means of an environment variable called <b><tt>WM_CONTROL</tt></b>.
+The front-end function sets this variable with one or more words that describe
+the action currently in progress. The wrapper then knows whether the operation
+is going into the repository, coming out from the repository, etc. It can
+also then tell which specific host is the target of actions like <i>stage</i>.
+Since the wrapper is not called directly by the tools (but rather by the
+actual <tt>cvs</tt> binary), this is the only feasible way of passing this
+information.
+<p>Since the necessary context is apparent from the command-line of the
+front-end tool, the tool that handles population, staging, etc. does not
+use this. By calling the front-end versions of <tt>CVS</tt> commands, the
+information is already present.
+<h2>
+<a NAME="conclusion"></a>8. Conclusion</h2>
+
+</body>
+</html>

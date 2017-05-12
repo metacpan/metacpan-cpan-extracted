@@ -1,0 +1,749 @@
+<HTML><HEAD><TITLE>process_content Doc</TITLE></HEAD><BODY><center><h1>process_content</h2></center><h1>Modules</h1><ul><li>IMS::ReleaseMgr::Utils<li>Net::Domain</ul><h1>Functions:</h1><ul><li><a href="#SetPermissions">SetPermissions</a><li><a href="#SetxPermissions">SetxPermissions</a><li><a href="#setPermissions">setPermissions</a></ul><hr><h1>Main Script</h1><h2>Variables:</h2> <ul><li>$0<li>$ENV<li>$GroupID<li>$Id<li>$OwnerID<li>$PATH<li>$ROOT<li>$Revision<li>$SIG<li>$USAGE<li>$VERSION<li>$WL<li>$_<li>$basedir<li>$basename<li>$cgi_dir<li>$cmd<li>$config<li>$cwd<li>$date<li>$fcgi_dir<li>$file_cnt<li>$file_size<li>$found_makefile<li>$group<li>$hostname<li>$htdocs_dir<li>$in_description<li>$in_file<li>$in_target<li>$in_type<li>$logdir<li>$make_dir<li>$mirror_group<li>$mode<li>$options<li>$opts<li>$owner<li>$project<li>$results<li>$revision<li>$scripts_dir<li>$server_root<li>$servlets_dir<li>$stage_dir<li>$start_scr_dir<li>$target<li>$target_dir<li>$tfile<li>$trace<li>$userid<li>$weblist<li>$webmaster<li>%02d<li>%18s<li>%d<li>%opts<li>%s<li>@ARGV<li>@_<li>@nafohq<li>@r<li>@targets</ul>
+<h2>Calls:</h2><ul><li> DBI_mirror_specification<li>data<li>date<li>end<li>eq<li>error<li>eval_make_target<li>file_mirror_specification<li>from<li>get<li>hostfqdn<li>hostname<li>method<li>mirror<li>new<li>on<li>print<li>strict<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>#!/opt/ims/perl5/bin/perl
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: process_content_doc.html,v 1.1 2000/05/04 21:14:33 idsweb Exp $
+#
+#   Description:    Process the [Ww]eblist in the current directory, doing the
+#                   file juggling as required by the file type specification.
+#
+#   Functions:      setPermissions
+#                   SetPermissions
+#                   SetxPermissions
+#
+#   Libraries:      Carp                    Core, For improved messages
+#                   Getopt::Long            Core, Cmd-line parsing
+#                   File::Basename          Core, For file name utils
+#                   File::Copy              Core, Portable file copy method
+#                   File::Path              Core, Portable directory creation
+#                   Cwd                     Core, Portable cwd function
+#                   Net::Domain             Core, Portable hostname function
+#                   IO::File                Core, Class-based file I/O
+#                   IMS::ReleaseMgr::Utils  Local, utility functions for rlsmgr
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  What you see if you type it wrong
+#
+#   Environment:    Axes $PATH entirely.
+#
+##############################################################################
+$ENV{PATH} = '/bin:/usr/bin:/usr/sbin'; # Yes, I really mean this
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+if ($trace & 16) # bxxx1xxxx
+if ($trace & 4) # bxxxxx1xx
+#process_content is always called in $ROOT/staging/$project -- it's safe to
+#do stuff in that script based on that assumption. - email from randy
+# do prerelease make (while files are in staging, before files are 'released')
+    #chmod 0400, "$found_makefile"; #??? don't do here, perhaps
+        #
+        # Run a make in this dir, care to not kill the running process!
+        #
+            if ($trace & 2); # bxxxxxx1x
+            #
+            # An error (other than "no rule to make release" was detected in
+            # the make sub-process
+            #
+        #
+        # Unable to chdir for some reason. We're probably in bad shape if this
+        # has happened...
+        #
+} #end prerelease make
+    next if /^\s*$/o;  # skip blank lines
+    next if /^\s*\#/o; # and comments
+        "$in_target" if ($trace & 8); # bxxxx1xxx
+        # Strip leading /cgi-bin from Bin targets
+        # Strip leading /cgi-bin from Bin targets
+        # Strip leading /cgi-bin from Bin targets
+        # Strip leading /servlets from Srv targets
+    #
+    # Minor clean-up
+    #
+    # Remove obsolete files
+    # Nothing has to happen because the files are removed before the put out
+    # TODO - fix OBS for bin types
+            if ($trace & 8); # bxxxx1xxx
+        } # no other clause, but this point means that the file didn't exist
+        if ($trace & 8); # bxxxx1xxx
+    # Set perms for CGI to include exec, otherwise no exec
+#do release make (after files are moved from staging to htdocs, cgi-bin, etc)
+        #
+        # Run a make in this dir, care to not kill the running process!
+        #
+            if ($trace & 2); # bxxxxxx1x
+            #
+            # An error (other than "no rule to make release" was detected in
+            # the make sub-process
+            #
+        #
+        # Unable to chdir for some reason. We're probably in bad shape if this
+        # has happened...
+        #
+##############################################################################
+#
+#   Sub Name:       setPermissions
+#
+#   Description:    Meta-routine to set access permissions and user/group
+#                   ownership on files. Uses the constants $OwnerID and
+#                   $GroupID to set those, and the passed-in mode. This is
+#                   wrapped by other routines defined below to set ordinary
+#                   file and directory parameters.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $mode     in      scalar    Numerical mode to set
+#                   @targets  in      list      File(s) to change. Currently
+#                                                 is called once for each file
+#                                                 but this could change.
+#
+#   Globals:        $owner
+#                   $group
+#                   $trace
+#                   $tfile
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+##############################################################################/n</pre>
+<h2>Code:</h2> <pre>#!/opt/ims/perl5/bin/perl
+    eval 'exec perl -S $0 "$@"'
+        if 0;
+
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: process_content_doc.html,v 1.1 2000/05/04 21:14:33 idsweb Exp $
+#
+#   Description:    Process the [Ww]eblist in the current directory, doing the
+#                   file juggling as required by the file type specification.
+#
+#   Functions:      setPermissions
+#                   SetPermissions
+#                   SetxPermissions
+#
+#   Libraries:      Carp                    Core, For improved messages
+#                   Getopt::Long            Core, Cmd-line parsing
+#                   File::Basename          Core, For file name utils
+#                   File::Copy              Core, Portable file copy method
+#                   File::Path              Core, Portable directory creation
+#                   Cwd                     Core, Portable cwd function
+#                   Net::Domain             Core, Portable hostname function
+#                   IO::File                Core, Class-based file I/O
+#                   IMS::ReleaseMgr::Utils  Local, utility functions for rlsmgr
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  What you see if you type it wrong
+#
+#   Environment:    Axes $PATH entirely.
+#
+##############################################################################
+use vars qw($cmd);
+($cmd = $0) =~ s|.*/||;
+
+use 5.004;
+
+use strict;
+use vars qw($USAGE $date $userid $cwd $owner $group $trace $tfile $WL
+            %opts $options $logdir $server_root $stage_dir $config $cgi_dir
+            $htdocs_dir $fcgi_dir $webmaster $file_cnt $file_size $mirror_group
+            $basedir $basename $hostname $in_type $in_file $in_target
+            $in_description $target_dir $target $weblist $found_makefile
+            $scripts_dir $start_scr_dir $VERSION $revision);
+use subs qw(setPermissions SetPermissions SetxPermissions);
+
+use Carp                   qw(croak carp);
+use Getopt::Long           'GetOptions';
+use File::Basename         qw(basename dirname);
+use File::Copy             'copy';
+use File::Path             'mkpath';
+use Cwd                    'cwd';
+use Net::Domain            'hostfqdn';
+require IO::File;
+
+use IMS::ReleaseMgr::Utils qw(write_log_line eval_make_target
+                              file_mirror_specification
+                              DBI_mirror_specification);
+
+umask 0;
+$ENV{PATH} = '/bin:/usr/bin:/usr/sbin'; # Yes, I really mean this
+
+$date = scalar localtime time;
+$userid = getlogin || (getpwuid($>))[0];
+$cwd = cwd;
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$revision = q{$Id: process_content_doc.html,v 1.1 2000/05/04 21:14:33 idsweb Exp $ };
+
+$USAGE = "Usage: $cmd mirror_group [ -H host ] [ -t level ] [ -T file ]
+\t[ -c file ]
+
+Where:
+-H host\t\tUse 'host' for identification (instead of system value)
+-t num\t\tEnable tracing (num sets level)
+-T file\t\tSend trace information to 'file' instead of tty
+-c file\t\tRead configuration from 'file' instead of DBMS
+
+``mirror_group'' is the name of the host-pool grouping that this process is
+running as a part of. It is used as a search key in the DBMS.
+";
+if (grep($_ eq '-h', @ARGV))
+{
+    print "$USAGE\n$revision\n";
+    exit 0;
+}
+$SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /bad free/oi; };
+Getopt::Long::config 'no_ignore_case';
+GetOptions(\%opts, 'H=s', 't=i', 'T=s', 'c=s') or croak "$USAGE\nStopped";
+$mirror_group = shift || croak "$USAGE\nStopped";
+$basedir = dirname($0);
+
+if (defined $opts{c} and $opts{c})
+{
+    $config = file_mirror_specification(-file => $opts{c});
+    croak "$cmd was unable to get data for $mirror_group from file $opts{c}," .
+        " stopped" unless (defined $config);
+}
+else
+{
+    $config = DBI_mirror_specification(-mirror => $mirror_group);
+    croak "$cmd was unable to get data for $mirror_group from Oracle, stopped"
+        unless (defined $config);
+}
+
+$hostname = $opts{H} || hostfqdn;
+$basedir = dirname $0;
+
+$trace         = $opts{t}                 || 0;
+$tfile         = $opts{T}                 || '-';
+$server_root   = $config->{SERVER_ROOT}   || '/opt/ims';
+$stage_dir     = $config->{STAGING_DIR}   || "$server_root/staging";
+$htdocs_dir    = $config->{DOCUMENT_ROOT} || "$server_root/htdocs";
+$logdir        = $config->{LOGGING_DIR}   || "$server_root/logs";
+$webmaster     = $config->{WEBMASTER}     || 'webmaster@nafohq.hp.com';
+$weblist       = $config->{WEBLIST_FILE}  || 'weblist';
+$cgi_dir       = $config->{CGI_ROOT}      || "$server_root/cgi-bin";
+$fcgi_dir      = $config->{FCGI_ROOT}     || "$server_root/fcgi-bin";
+$scripts_dir   = $config->{SCRIPTS_ROOT}  || "$server_root/scripts";
+$start_scr_dir = $config->{START_SCRIPTS_ROOT}
+                                          || "$server_root/startup_scripts";
+$servlets_dir = $config->{SERVLETS_ROOT} || "$server_root/servlets";
+
+$owner = $config->{OWNER_UID}
+    or croak "Specification for $mirror_group MUST include a user name or ID" .
+        ". Stopped";
+$group = $config->{GROUP_GID}
+    or croak "Specification for $mirror_group MUST include a group name or " .
+        "ID. Stopped";
+$owner = getpwnam($owner) unless ($owner =~ /^\d+$/o);
+$group = getgrnam($group) unless ($group =~ /^\d+$/o);
+croak "$config->{OWNER_UID} was not in passwd table, stopped"
+    unless (defined $owner);
+croak "$config->{GROUP_GID} was not in group table, stopped"
+    unless (defined $group);
+
+if ($trace)
+{
+    write_log_line($tfile, "$cmd [$$] [$date] Started with tracing");
+}
+write_log_line("$logdir/$cmd", "$date [$$]: started, working dir=$cwd");
+
+if ($trace & 16) # bxxx1xxxx
+{
+    write_log_line($tfile,
+                   map {
+                       sprintf("$cmd [$$] CONFIG: %18s => %s",
+                               $_, $config->{$_})
+                   } (sort keys %$config));
+}
+
+$file_size = 0;
+$file_cnt  = 0;
+
+if ($trace & 4) # bxxxxx1xx
+{
+    write_log_line($tfile,
+                   (map { "$cmd [$$] [$date] $_" }
+                    ("Server is $mirror_group ($hostname)",
+                     "Server root is $server_root",
+                     "Doc dir is $htdocs_dir", "CGI dir is $cgi_dir",
+                     "FCGI dir is $fcgi_dir")));
+}
+
+#process_content is always called in $ROOT/staging/$project -- it's safe to
+#do stuff in that script based on that assumption. - email from randy
+
+$found_makefile = $cwd; 
+
+# do prerelease make (while files are in staging, before files are 'released')
+
+if (defined $found_makefile and (-e "$found_makefile/Makefile"))
+{
+    #chmod 0400, "$found_makefile"; #??? don't do here, perhaps
+    my $make_dir = $found_makefile;
+
+    if (chdir $make_dir)
+    {
+        #
+        # Run a make in this dir, care to not kill the running process!
+        #
+        write_log_line($tfile,
+                       sprintf("%s [$$] [%s] Makefile detected in " .
+                               "$make_dir; Running ``make prerelease''",
+                               $cmd, scalar localtime time))
+            if ($trace & 2); # bxxxxxx1x
+        my $results = eval_make_target('prerelease', $server_root);
+        if (defined $results)
+        {
+            #
+            # An error (other than "no rule to make release" was detected in
+            # the make sub-process
+            #
+            $date = scalar localtime time;
+            write_log_line($tfile,
+                           "$cmd [$$] [$date] Error from make process:",
+                           (map { "--> $_" } (@$results)))
+                if ($trace);
+            write_log_line("$logdir/$cmd", "$date [$$]: Errors running " .
+                           "``make prerelease'' in $make_dir:",
+                           (map { "--> $_" } (@$results)));
+            carp "Error returned from make:\n\t" . join("\n\t", @$results) .
+                "\n\n";
+        }
+    }
+    else
+    {
+        #
+        # Unable to chdir for some reason. We're probably in bad shape if this
+        # has happened...
+        #
+        write_log_line($tfile,
+                       "$cmd [$$] [" . scalar localtime time . "] Could not " .
+                       "chdir to $make_dir to run make: $!")
+            if ($trace);
+        write_log_line("$logdir/$cmd", scalar localtime time .
+                       " [$$]: Makefile detected in $make_dir but could " .
+                       "not chdir: $!");
+        carp "Unable to chdir to $make_dir: $!,";
+    }
+
+    chdir $cwd;
+} #end prerelease make
+
+if (! defined($WL = new IO::File "< $weblist"))
+{
+    $date = scalar localtime time;
+    write_log_line($tfile, "$cmd [$$] [$date] Error opening $weblist: $!")
+        if ($trace);
+    write_log_line("$logdir/$cmd",
+                   "$date [$$]: Error opening $cwd/$weblist for reading: $!");
+    croak "Error opening $cwd/$weblist for reading: $!, stopped";
+}
+
+$found_makefile = undef;
+while (defined($_ = <$WL>))
+{
+    next if /^\s*$/o;  # skip blank lines
+    next if /^\s*\#/o; # and comments
+
+    ($in_type, $in_file, $in_target, $in_description) = split(/\s+/, $_, 4);
+    $basename = basename $in_file;
+    $in_type = lc $in_type;
+
+    print STDOUT "$cmd [$$] type = $in_type, file = $in_file, target = " .
+        "$in_target" if ($trace & 8); # bxxxx1xxx
+
+    if ($in_type eq 'bin')
+    {
+        # Strip leading /cgi-bin from Bin targets
+        $in_target =~ s:^/cgi-bin::;
+        $target_dir = "$cgi_dir$in_target";
+        $target = "$cgi_dir$in_target/$basename";
+    }
+    elsif ($in_type eq 'scr')
+    {
+        # Strip leading /cgi-bin from Bin targets
+        $in_target =~ s:^/scripts::;
+        $target_dir = "$scripts_dir$in_target";
+        $target = "$scripts_dir$in_target/$basename";
+    }
+    elsif ($in_type eq 'ssc')
+    {
+        # Strip leading /cgi-bin from Bin targets
+        $in_target =~ s:^/startup_scripts::;
+        $target_dir = "$start_scr_dir$in_target";
+        $target = "$start_scr_dir$in_target/$basename";
+    }
+    elsif ($in_type eq 'srv')
+    {
+        # Strip leading /servlets from Srv targets
+        $in_target =~ s:^/servlets::;
+        $target_dir = "$servlets_dir$in_target";
+        $target = "$servlets_dir$in_target/$basename";
+    }
+    else
+    {
+        $target_dir = "$htdocs_dir$in_target";
+        $target = "$htdocs_dir$in_target/$basename";
+    }
+    #
+    # Minor clean-up
+    #
+    $target_dir =~ s|/$||o;
+    $target     =~ s|//|/|go;
+
+    # Remove obsolete files
+    # Nothing has to happen because the files are removed before the put out
+    # TODO - fix OBS for bin types
+    if ($in_type eq 'obs')
+    {
+        print STDOUT "$cmd [$$] $target has been made obsolete"
+            if ($trace & 8); # bxxxx1xxx
+
+        if (-d $target)
+        {
+            unless (rmdir $target)
+            {
+                write_log_line($tfile,
+                               "$cmd [$$] Error: could not rmdir $target: $!")
+                    if ($trace);
+                carp "Error: Could not rmdir $target: $!,";
+            }
+        }
+        elsif (-e $target)
+        {
+            unless (unlink $target)
+            {
+                write_log_line($tfile,
+                               "$cmd [$$] Error: could not unlink $target: $!")
+                    if ($trace);
+                carp "Error: Could not unlink $target: $!,";
+            }
+        } # no other clause, but this point means that the file didn't exist
+        next;
+    }
+
+    if (! -d $target_dir)
+    {
+        write_log_line($tfile, "$cmd [$$] Making $target_dir") if ($trace & 4);
+        mkpath($target_dir, 0, 0755);
+    }
+    print STDOUT "$cmd [$$] move $in_file to $target"
+        if ($trace & 8); # bxxxx1xxx
+    unless (-e $in_file)
+    {
+        write_log_line($tfile,
+                       "$cmd [$$] Error: file $in_file not found in stage dir")
+            if ($trace);
+        carp "File $in_file (targetted to $target) not found in staging area,";
+        next;
+    }
+
+    $file_cnt++;
+    $file_size += -s $in_file;
+    $found_makefile = $target if ($in_file eq 'Makefile');
+    unless (copy($in_file, $target))
+    {
+        write_log_line($tfile,
+                       "$cmd [$$] Error copying $in_file to $target: $!")
+            if ($trace);
+        carp "Error copying $in_file to $target: $!,";
+    }
+    # Set perms for CGI to include exec, otherwise no exec
+    if (($in_type eq 'cgi') or ($in_type eq 'fcgi') or ($in_type eq 'bin') or ($in_type eq 'scr') or ($in_type eq 'ssc'))
+    {
+        SetxPermissions($target);
+    }
+    else
+    {
+        SetPermissions($target);
+    }
+}
+
+$WL->close;
+
+$file_size = int($file_size/1024);
+print <<"_EOT";
+   Ran:   $cmd
+Source:   $cwd
+  When:   $date
+Server:   $hostname
+    By:   $userid
+Result:   $file_cnt files ($file_size Kbytes)
+_EOT
+
+#do release make (after files are moved from staging to htdocs, cgi-bin, etc)
+
+if (defined $found_makefile and (-e "$found_makefile"))
+{
+    chmod 0400, "$found_makefile";
+    my $make_dir = dirname $found_makefile;
+    if (chdir $make_dir)
+    {
+        #
+        # Run a make in this dir, care to not kill the running process!
+        #
+        write_log_line($tfile,
+                       sprintf("%s [$$] [%s] Makefile detected in " .
+                               "$make_dir; Running ``make release''",
+                               $cmd, scalar localtime time))
+            if ($trace & 2); # bxxxxxx1x
+        my $results = eval_make_target('release', $server_root);
+        if (defined $results)
+        {
+            #
+            # An error (other than "no rule to make release" was detected in
+            # the make sub-process
+            #
+            $date = scalar localtime time;
+            write_log_line($tfile,
+                           "$cmd [$$] [$date] Error from make process:",
+                           (map { "--> $_" } (@$results)))
+                if ($trace);
+            write_log_line("$logdir/$cmd", "$date [$$]: Errors running " .
+                           "``make release'' in $make_dir:",
+                           (map { "--> $_" } (@$results)));
+            carp "Error returned from make:\n\t" . join("\n\t", @$results) .
+                "\n\n";
+        }
+    }
+    else
+    {
+        #
+        # Unable to chdir for some reason. We're probably in bad shape if this
+        # has happened...
+        #
+        write_log_line($tfile,
+                       "$cmd [$$] [" . scalar localtime time . "] Could not " .
+                       "chdir to $make_dir to run make: $!")
+            if ($trace);
+        write_log_line("$logdir/$cmd", scalar localtime time .
+                       " [$$]: Makefile detected in $make_dir but could " .
+                       "not chdir: $!");
+        carp "Unable to chdir to $make_dir: $!,";
+    }
+
+    unlink "$found_makefile";
+    chdir $cwd;
+}
+
+$date = scalar localtime time;
+write_log_line($tfile,
+               "$cmd [$$] [$date] Finished, $file_cnt files handled " .
+               "($file_size KBytes)")
+    if ($trace);
+write_log_line("$logdir/$cmd", "$date [$$]: completed ($cwd).");
+exit 0;
+
+##############################################################################
+#
+#   Sub Name:       setPermissions
+#
+#   Description:    Meta-routine to set access permissions and user/group
+#                   ownership on files. Uses the constants $OwnerID and
+#                   $GroupID to set those, and the passed-in mode. This is
+#                   wrapped by other routines defined below to set ordinary
+#                   file and directory parameters.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $mode     in      scalar    Numerical mode to set
+#                   @targets  in      list      File(s) to change. Currently
+#                                                 is called once for each file
+#                                                 but this could change.
+#
+#   Globals:        $owner
+#                   $group
+#                   $trace
+#                   $tfile
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+##############################################################################
+sub setPermissions
+</pre>
+<br><hr><h1>Function: <a name="setPermissions">setPermissions</a></h1>
+<h2>Variables:</h2> <ul><li>$Mode<li>$cmd<li>$group<li>$mode<li>$owner<li>$target<li>$tfile<li>$trace<li>%03o<li>@_<li>@targets</ul>
+<h2>Calls:</h2><ul><li> write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>#!/opt/ims/perl5/bin/perl
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: process_content_doc.html,v 1.1 2000/05/04 21:14:33 idsweb Exp $
+#
+#   Description:    Process the [Ww]eblist in the current directory, doing the
+#                   file juggling as required by the file type specification.
+#
+#   Functions:      setPermissions
+#                   SetPermissions
+#                   SetxPermissions
+#
+#   Libraries:      Carp                    Core, For improved messages
+#                   Getopt::Long            Core, Cmd-line parsing
+#                   File::Basename          Core, For file name utils
+#                   File::Copy              Core, Portable file copy method
+#                   File::Path              Core, Portable directory creation
+#                   Cwd                     Core, Portable cwd function
+#                   Net::Domain             Core, Portable hostname function
+#                   IO::File                Core, Class-based file I/O
+#                   IMS::ReleaseMgr::Utils  Local, utility functions for rlsmgr
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  What you see if you type it wrong
+#
+#   Environment:    Axes $PATH entirely.
+#
+##############################################################################
+$ENV{PATH} = '/bin:/usr/bin:/usr/sbin'; # Yes, I really mean this
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+if ($trace & 16) # bxxx1xxxx
+if ($trace & 4) # bxxxxx1xx
+#process_content is always called in $ROOT/staging/$project -- it's safe to
+#do stuff in that script based on that assumption. - email from randy
+# do prerelease make (while files are in staging, before files are 'released')
+    #chmod 0400, "$found_makefile"; #??? don't do here, perhaps
+        #
+        # Run a make in this dir, care to not kill the running process!
+        #
+            if ($trace & 2); # bxxxxxx1x
+            #
+            # An error (other than "no rule to make release" was detected in
+            # the make sub-process
+            #
+        #
+        # Unable to chdir for some reason. We're probably in bad shape if this
+        # has happened...
+        #
+} #end prerelease make
+    next if /^\s*$/o;  # skip blank lines
+    next if /^\s*\#/o; # and comments
+        "$in_target" if ($trace & 8); # bxxxx1xxx
+        # Strip leading /cgi-bin from Bin targets
+        # Strip leading /cgi-bin from Bin targets
+        # Strip leading /cgi-bin from Bin targets
+        # Strip leading /servlets from Srv targets
+    #
+    # Minor clean-up
+    #
+    # Remove obsolete files
+    # Nothing has to happen because the files are removed before the put out
+    # TODO - fix OBS for bin types
+            if ($trace & 8); # bxxxx1xxx
+        } # no other clause, but this point means that the file didn't exist
+        if ($trace & 8); # bxxxx1xxx
+    # Set perms for CGI to include exec, otherwise no exec
+#do release make (after files are moved from staging to htdocs, cgi-bin, etc)
+        #
+        # Run a make in this dir, care to not kill the running process!
+        #
+            if ($trace & 2); # bxxxxxx1x
+            #
+            # An error (other than "no rule to make release" was detected in
+            # the make sub-process
+            #
+        #
+        # Unable to chdir for some reason. We're probably in bad shape if this
+        # has happened...
+        #
+##############################################################################
+#
+#   Sub Name:       setPermissions
+#
+#   Description:    Meta-routine to set access permissions and user/group
+#                   ownership on files. Uses the constants $OwnerID and
+#                   $GroupID to set those, and the passed-in mode. This is
+#                   wrapped by other routines defined below to set ordinary
+#                   file and directory parameters.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $mode     in      scalar    Numerical mode to set
+#                   @targets  in      list      File(s) to change. Currently
+#                                                 is called once for each file
+#                                                 but this could change.
+#
+#   Globals:        $owner
+#                   $group
+#                   $trace
+#                   $tfile
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+##############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my ($mode, @targets) = @_;
+
+    my ($target, $Mode);
+
+    for my $target (@targets)
+    {
+        $Mode = $mode;
+        $Mode |= 0111 if (-d $target);
+        if (! chmod($Mode, $target))
+        {
+            carp "setPermissions chmod failed for $target: $mode: $!\n"
+                if (! $trace);
+            write_log_line($tfile,
+                           sprintf("$cmd [$$] chmod failed for $target: ".
+                                   "0%03o: $!", $Mode))
+                if ($trace & 2);
+            return 0;
+        }
+        if (! chown($owner, $group, $target))
+        {
+            carp "setPermissions chown failed for $target: $!\n"
+                if (! $trace);
+            write_log_line($tfile, "$cmd [$$] chown failed for $target: $!")
+                if ($trace & 2);
+            return 0;
+        }
+    }
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="SetPermissions">SetPermissions</a></h1>
+<h2>Variables:</h2> <ul><li>@_</ul>
+<h2>Calls:</h2><ul><li> </ul>
+<h2>Comments:</h2> 
+ <pre>/n/n </pre>
+<h2>Code:</h2> <pre>{ setPermissions(0664, @_) }</pre>
+<br><hr><h1>Function: <a name="SetxPermissions">SetxPermissions</a></h1>
+<h2>Variables:</h2> <ul><li>@_</ul>
+<h2>Calls:</h2><ul><li> </ul>
+<h2>Comments:</h2> 
+ <pre>/n/n </pre>
+<h2>Code:</h2> <pre>{ setPermissions(0775, @_) }</pre>
+</BODY></HTML>

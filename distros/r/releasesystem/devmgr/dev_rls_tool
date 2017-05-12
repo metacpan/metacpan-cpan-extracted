@@ -1,0 +1,3265 @@
+#!/usr/local/bin/perl
+    eval 'exec perl -S $0 "$@"'
+        if 0;
+
+###############################################################################
+#
+#         May be distributed under the terms of the artistic license
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: dev_rls_tool,v 1.14 2000/05/26 21:48:31 idsweb Exp $
+#
+#   Description:    This is the core developer release tool. This tool will be
+#                   sym-linked under several different names, each of which
+#                   performs a different function.
+#
+#   Functions:      usage
+#                   do_admin
+#                   do_populate
+#                   do_stage
+#                   do_release
+#                   read_config_file
+#                   read_hostconfig
+#                   lock_project
+#                   unlock_project
+#                   mail_response
+#                   test_for_halt
+#                   read_password
+#                   update_topiclist
+#                   update_weblist
+#                   update_int_weblist
+#                   scan_project
+#                   deduce_host
+#                   validate_user
+#                   cvs_exec
+#                   make_archive
+#                   make_target
+#                   write_info_file
+#
+#        Note:      All subroutines are placed in alphabetical order (for lack
+#                   of any other, clearer, ordering). There are two groups:
+#                   those before __END__ and those after. The former group are
+#                   those functions expected to be used for all (or most) calls
+#                   to the script. The latter group are those expected to only
+#                   be used for certain invocations, and thus are set to be
+#                   loaded on a demand basis. Each group is alphabetized
+#                   separately.
+#
+#   Libraries:      SelfLoader
+#                   File::Basename
+#                   Getopt::Long
+#                   Cwd
+#                   IO::File
+#                   Fcntl
+#                   File::Find
+#                   Archive::Tar
+#                   Term::ReadKey
+#                   IMS::ReleaseMgr::Transfer
+#                   IMS::ReleaseMgr::Utils
+#                   IMS::ReleaseMgr::Signature
+#                   IMS::ReleaseMgr::Access
+#
+#   Global Consts:  $cmd                  The tool name, significant also
+#                                           for which mode is being run
+#                   $VERSION              Numerical version value
+#                   $revision             Full RCS Id string
+#
+#   Environment:    TBD
+#
+###############################################################################
+use vars qw($cmd);
+($cmd = $0) =~ s|.*/||o;
+
+use 5.004;
+
+# pragmas
+use strict;
+use vars qw(%valid_opts $VERSION $revision $MAIN $STAGE $POPULATE $RELEASE
+            %CONFIG %HOSTS %opts $bin_dir $log_dir $DEBUG $LOGFILE $CFGFILE
+            %called_as %exclude_files);
+use subs qw(usage do_admin do_populate do_stage do_release read_config_file
+            read_hostconfig lock_project unlock_project mail_response
+            test_for_halt read_password update_topiclist update_weblist
+            validate_user update_int_weblist scan_project deduce_host cvs_exec
+            noun_form make_target write_info_file);
+
+# core libs
+use SelfLoader;
+use File::Basename qw(basename dirname);
+use File::Find;
+use Getopt::Long;
+use Fcntl          ':flock';
+use IO::File;
+use Time::Local;
+use Cwd            'cwd';
+
+# CPAN libs
+use Archive::Tar;
+use Term::ReadKey;
+
+# locally-developed libs
+use IMS::ReleaseMgr::Transfer  qw(mirror_upload ftp_upload ftp_error);
+use IMS::ReleaseMgr::Utils     qw(write_log_line send_mail show_version
+                                  DBI_all_mirrors DBI_mirror_host_list
+                                  DBI_mirror_phys_host_list
+                                  DBI_error eval_make_target);
+use IMS::ReleaseMgr::Signature qw(crc_signature md5_signature);
+use IMS::ReleaseMgr::Access    qw(ACL_dir ACL_get ACL_error);
+
+$VERSION = do {my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$revision = q{$Id: dev_rls_tool,v 1.14 2000/05/26 21:48:31 idsweb Exp $ };
+
+exit show_version if (grep(/-version/i, @ARGV));
+
+#
+# These are the names that the tool is known by. These pseudo-constants are
+# used instead of strings so that changes can be made, here, once.
+#
+$MAIN     = 'dev_rls_tool';
+$STAGE    = 'stage';
+$POPULATE = 'populate';
+$RELEASE  = 'release';
+
+#
+# Set up a hash table for the valid lists of options keyed by the command name.
+# In case of failure or -h, call a subroutine. With four different names to be
+# called by, a traditional $USAGE string just doesn't hack it...
+#
+%valid_opts = (
+               $RELEASE  => [ qw(-u=s -save -noxfer -update -stage -prod) ],
+               $STAGE    => [ qw(-t=s -r=s -full -notag) ],
+               $POPULATE => [ qw(-t=s -r=s) ],
+               $MAIN     => [ qw(-d=s) ],
+              );
+Getopt::Long::config 'no_ignore_case';
+exists($valid_opts{$cmd}) or die usage('unknown');
+GetOptions(\%opts, (@{$valid_opts{$cmd}},
+                    # These are common options to all forms
+                    qw(-D=i -h -e=s -force -cvsroot=s -debug -verbose -terse
+                       -log=s)))
+    or die usage($cmd) . "\nStopped";
+if ((defined $opts{h} and $opts{h}) or ($cmd ne $MAIN and ! @ARGV))
+{
+    print STDOUT usage($cmd) . "\n";
+    exit 0;
+}
+
+#
+# Force a false for all the boolean options, so that tests involving them
+# don't produce "use of uninitialized value" warnings
+#
+grep($opts{$_} |= 0, qw(update stage prod force debug verbose terse));
+
+#
+# Simple default values used pretty much globally
+#
+$bin_dir = dirname $0;
+($log_dir = $bin_dir) =~ s/ahp-bin/local/o;
+$log_dir =~ s{/?suid_scripts}{};
+$LOGFILE = $opts{'log'} || "$log_dir/dev_release.log";
+# Undocumented incremental debugging option:
+$DEBUG = $opts{D} || 0;
+$DEBUG |= 1 if ($opts{debug});
+STDOUT->autoflush;
+
+#
+# Save ourselves some repeated primitive operations by caching them here:
+#
+$opts{date} = scalar localtime;
+$opts{user} = $ENV{LOGNAME} || (getpwuid($>))[0] || getlogin;
+$opts{wmpassword} = $ENV{WMPASSWD} || '';
+
+#
+# Set up more extensive die()- and warn()-handlers
+#
+$SIG{__DIE__}  = sub {
+                     chomp $_[0];
+                     write_log_line($LOGFILE, "$opts{date} [$$] $_[0]");
+                     die "$_[0]\n";
+                 };
+$SIG{INT}  = sub {
+                     chomp $_[0];
+                     write_log_line($LOGFILE, "$opts{date} [$$] $_[0]");
+                     die "$_[0]\n";
+                 };
+$SIG{HUP}  = sub {
+                     chomp $_[0];
+                     write_log_line($LOGFILE, "$opts{date} [$$] $_[0]");
+                     die "$_[0]\n";
+                 };
+$SIG{__WARN__} = sub {
+                     chomp $_[0];
+                     write_log_line($LOGFILE, "$opts{date} [$$] $_[0]");
+                     warn "$_[0]\n";
+                 };
+
+#
+# Special case: some of the steps below can only be done after the tool is
+# initialized, so we handle the "main" cases specially
+#
+exit (do_admin(@ARGV)) if ($cmd eq $MAIN);
+
+#
+# Set this up so that an error condition doesn't inadvertently leave the 
+# project in a locked state
+#
+END
+{
+    #
+    # This relies on the various do_* routines to put the lockfile name into
+    # %CONFIG under this name.
+    #
+    if (defined($CONFIG{lockfile}) and $CONFIG{lockfile})
+    {
+        unlink $CONFIG{lockfile};
+    }
+}
+
+#
+# Get any host-specific configuration:
+#
+read_config_file \%CONFIG;
+
+#
+# Set the value that the ACL modules used for a base directory:
+#
+if (defined $CONFIG{ACL_DIR})
+{
+    if ($CONFIG{ACL_DIR} !~ m|^/|)
+    {
+        my $homedir = ($CONFIG{OWNER} =~ /^\d+$/) ?
+            (getpwuid($CONFIG{OWNER}))[7] :
+            (getpwnam($CONFIG{OWNER}))[7];
+
+        $CONFIG{ACL_DIR} = "$homedir/$CONFIG{ACL_DIR}";
+    }
+
+    ACL_dir $CONFIG{ACL_DIR};
+}
+elsif (-d "$log_dir/etc/acl")
+{
+    ACL_dir "$log_dir/etc/acl";
+}
+# Else use the default from IMS::ReleaseMgr::Access
+
+#
+# Read the release-host information from the database:
+#
+read_hostconfig \%HOSTS;
+
+#
+# Create the table of files that should be excluded, including a special regex
+# for some cases.
+#
+for (qw(TOPICLIST WEBLIST RELEASE BUILDLIST))
+{
+    unless (exists $CONFIG{$_})
+    {
+        $CONFIG{$_} = '.' . lc $_;
+    }
+    $exclude_files{$CONFIG{$_}} = 1;
+}
+# Regex
+$exclude_files{__RE__} = '(^#.*|~$)';
+
+#
+# Assign any other default %CONFIG values
+#
+$CONFIG{CVS} = $CONFIG{CVS} || 'cvs';
+
+#
+# Force the CVS root to be in the environment variable CVSROOT. This saves a
+# fair amount of overhead in terms of always testing the config/env values.
+#
+if (defined($opts{cvsroot}) and $opts{cvsroot})
+{
+    $ENV{CVSROOT} = $opts{cvsroot};
+}
+elsif (defined($CONFIG{CVSROOT}) and $CONFIG{CVSROOT})
+{
+    $ENV{CVSROOT} = $CONFIG{CVSROOT};
+}
+elsif (! defined($ENV{CVSROOT}))
+{
+    die "$cmd: No CVSROOT found, please set the environment or use -cvsroot\n";
+}
+
+#
+# Use this table to call the apropos routine based on the name by which this
+# tool was called. "$MAIN" was handled earlier, so it is absent here.
+#
+%called_as = (
+              $RELEASE  => \&do_release,
+              $STAGE    => \&do_stage,
+              $POPULATE => \&do_populate,
+             );
+
+exit(&{$called_as{$cmd}}(@ARGV));
+
+###############################################################################
+#
+#   Sub Name:       cvs_exec
+#
+#   Description:    Execute a CVS command with the passed arguments. Return all
+#                   output as a listref. If an error occurs force an 'undef'
+#                   onto the head of the list.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $op       in      scalar    Operation to perform
+#                   @argz     in      list      Any additional arguments (must
+#                                                 include any project specific
+#                                                 values, no defaults are used)
+#
+#   Globals:        %CONFIG
+#                   %opts
+#                   $LOGFILE
+#                   $DEBUG
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1 [list of output]
+#                   Failure:    0 [undef, list of output]
+#
+###############################################################################
+sub cvs_exec
+{
+    my $op   = shift;
+    my @argz = @_;
+
+    my @command = ($CONFIG{CVS}, $op, @argz);
+    write_log_line($LOGFILE, "$opts{date} [$$] cvs_exec: @command")
+        if ($DEBUG & 4); # bxxxxx1xx
+
+    my $ret = system @command;
+    $ret &= 0xffff;
+    #
+    # Check for error conditions
+    #
+    if ($ret == 0xff00)
+    {
+        # Failure-- not found, etc.
+        warn "$cmd: cvs_exec: command 'cvs $op' failed: $!\n";
+        return 0;
+    }
+    elsif ($ret > 0x80)
+    {
+        # Non-zero exit status from cvs itself
+        $ret >>= 8;
+        warn "$cmd: cvs_exec: command 'cvs $op' had non-zero exit status " .
+            "$ret\n";
+        return 0;
+    }
+
+    1;
+}
+
+###############################################################################
+#
+#   Sub Name:       read_config_file
+#
+#                   Since this routine is called for almost all invocations,
+#                   it is not in the SelfLoader section.
+#
+#   Description:    Read the configuration file that specifies developer-host
+#                   specifics, such as the devault repository, CVS root, etc.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $config   in      hashref   Hash in which key/value pairs
+#                                                 are stored
+#                   $file     in      scalar    File to read from, defaults
+#                                                 to dev_release.cfg
+#
+#   Globals:        $LOGFILE
+#                   $DEBUG
+#                   %opts
+#                   $log_dir
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    dies
+#
+###############################################################################
+sub read_config_file
+{
+    my $config = shift;
+    my $file   = shift;
+
+    unless (defined $file and $file)
+    {
+        #
+        # If no specific file was passed, use dev_release.cfg in the usual
+        # config directory (which is either $opts{d} or $log_dir)
+        #
+        $file = $opts{d} || $log_dir;
+        $file .= '/dev_release.cfg';
+    }
+
+    my $fh = new IO::File "< $file";
+    unless (defined $fh)
+    {
+        die "$cmd: read_config_file: Could not open $file for reading: $!\n";
+    }
+
+    my $line;
+    while (defined($line = <$fh>))
+    {
+        chomp $line;
+        # skip blanks and comments
+        next if ($line =~ /^\s*$/o);
+        next if ($line =~ /^\s*\#/o);
+        # lose leading and trail space
+        $line =~ s/^\s+//o;
+        $line =~ s/\s+$//o;
+        # if we let them put export or setenv at the head, csh/ksh can also use
+        $line =~ s/^(export|setenv)\s+//o;
+
+        # Actually do something with the line, now...
+        if ($line =~ /^(.*?)\s*=\s*(.*)$/o)
+        {
+            $config->{$1} = $2;
+        }
+        else
+        {
+            warn "$cmd: read_config_file: Unknown/misformed line in $file, " .
+                "line $.: $line\n";
+        }
+    }
+    $fh->close;
+
+    # success, we hope
+    1;
+}
+
+###############################################################################
+#
+#   Sub Name:       read_hostconfig
+#
+#                   Since this routine is called for almost all invocations,
+#                   it is not in the SelfLoader section.
+#
+#   Description:    Read the web-hosts configuration from the Oracle tables.
+#                   Return a hash reference to the full data structure, keyed
+#                   by host/mirror name.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $table    in/out  hashref   Hash ref to store data into
+#
+#   Globals:        $LOGFILE
+#                   $DEBUG
+#                   $log_dir
+#                   %opts
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    void
+#                   Failure:    dies
+#
+###############################################################################
+sub read_hostconfig
+{
+    my $table = shift;
+
+    my ($buf, $data);
+
+    $data = DBI_all_mirrors;
+    unless (defined $data)
+    {
+        die "$cmd: read_hostconfig: Error getting full mirror data table: " .
+            DBI_error . "\n";
+    }
+    write_log_line($LOGFILE,
+                   sprintf("$opts{date} [$$] DBI mirror data read: %d hosts",
+                           scalar(keys %$data)))
+        if ($DEBUG & 14); # bxxxx111x
+
+    %$table = %$data;
+    return;
+}
+
+###############################################################################
+#
+#   Sub Name:       test_for_halt
+#
+#                   Since this routine is called for almost all invocations,
+#                   it is not in the SelfLoader section.
+#
+#   Description:    Check to see if this particular command has been 
+#                   temporarily disabled with a halt-file. If it has, display
+#                   the halt-file contents (if any) on STDOUT.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $cmd      in      scalar    Name by which we were called
+#
+#   Globals:        $LOGFILE
+#                   $DEBUG
+#                   %opts
+#                   %CONFIG
+#
+#   Environment:    None.
+#
+#                   NOTE NON-STANDARD RETURN LOGIC
+#   Returns:        Success:    0, no halt file
+#                   Failure:    1, program needs to stop
+#
+###############################################################################
+sub test_for_halt
+{
+    my $cmd = shift;
+
+    my $prefix = $CONFIG{HALTFILE_PREFIX};
+    unless (defined $prefix and $prefix)
+    {
+        my $home = ($CONFIG{OWNER} =~ /^\d+$/o) ?
+            (getpwuid($CONFIG{OWNER}))[7] : (getpwnam($CONFIG{OWNER}))[7];
+        unless (defined $home and $home)
+        {
+            warn "$cmd: test_for_halt: Could not find haltfiles area, " .
+                "skipping\n";
+            return 0;
+        }
+
+        $prefix = "$home/etc/halt-";
+    }
+    if (! $prefix =~ m|^/|o)
+    {
+        my $home = ($CONFIG{OWNER} =~ /^\d+$/o) ?
+            (getpwuid($CONFIG{OWNER}))[7] : (getpwnam($CONFIG{OWNER}))[7];
+        unless (defined $home and $home)
+        {
+            warn "$cmd: test_for_halt: Could not find haltfiles area, " .
+                "skipping\n";
+            return 0;
+        }
+
+        $prefix = "$home/$prefix";
+    }
+
+    my $file = "${prefix}$cmd";
+    if (-e $file)
+    {
+        #
+        # There is a haltfile. If it is not zero-length, echo it to STDOUT. If
+        # the user is a member of group $CONFIG{GROUP}, they can use -force to
+        # override this.
+        #
+        if (defined $opts{force})
+        {
+            my $userlist = ($CONFIG{GROUP} =~ /^\d+$/o) ?
+                (getgrgid($CONFIG{GROUP}))[3] : (getgrnam($CONFIG{GROUP}))[3];
+            my @userlist = split(/ /, $userlist);
+
+            return 0 if (grep($_ eq $opts{user}, @userlist));
+            warn "$cmd: You are not authorized to use the -force option\n";
+        }
+        if (-s $file) # size != 0
+        {
+            my $fh = new IO::File "< $file";
+
+            if (! defined $fh)
+            {
+                warn "$cmd haltfile $file exists but is unreadable: $!\n";
+                return 1;
+            }
+
+            print STDOUT "Command $cmd currently under a halt:\n\n";
+            print STDOUT <$fh>;
+            print STDOUT "\nMembers of group $CONFIG{GROUP} can use -force\n";
+            print STDOUT "to override this.\n";
+            $fh->close;
+        }
+
+        return 1;
+    }
+
+    # No haltfile, no worries
+    0;
+}
+
+__END__
+
+###############################################################################
+#
+#   Sub Name:       deduce_host
+#
+#   Description:    Using the known hosts in the global hash %HOSTS, try to
+#                   find the most-recently-staged host for $project
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $project  in      scalar    Project that is being released
+#
+#   Globals:        %HOSTS
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    hostname
+#                   Failure:    null string
+#
+###############################################################################
+sub deduce_host
+{
+    my $project = shift;
+
+    my $host;         # To iterate over the keys of %HOSTS
+    my %matches = (); # For those hosts that have a staged $project
+
+    for $host (keys %HOSTS)
+    {
+        next unless ((-d "$CONFIG{STAGE_ROOT}/$host/$project") &&
+                     (-e "$CONFIG{STAGE_ROOT}/$host/$project/" .
+                         $HOSTS{$host}->{WEBLIST_FILE}));
+
+        $matches{$host} = (stat _)[9];
+    }
+
+    return '' unless (scalar(keys %matches));
+
+    (sort { $matches{$b} <=> $matches{$a} } (keys %matches))[0];
+}
+
+###############################################################################
+#
+#   Sub Name:       do_admin
+#
+#   Description:    These are the administrative tasks that the tool performs
+#                   when called by the native name. Currently, the only one is
+#                   create the symbolic links for alternate names of the tool.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   @argz     in      list      Remainder (if any) from cmdline
+#
+#   Globals:        $bin_dir
+#                   $log_dir
+#                   %opts
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    0
+#                   Failure:    UNIX error code
+#
+###############################################################################
+sub do_admin
+{
+    my (@argz) = @_;
+
+    #
+    # Create the symbolic links
+    #
+    my $target_dir = $opts{d} || $bin_dir;
+    my $errs = 0;
+
+    unless (chdir $target_dir)
+    {
+        # warn instead of die, since our return code is the exit code
+        warn "$cmd: do_admin: Could not chdir to $target_dir: $!\n";
+        return -1;
+    }
+    unless (-e $MAIN and -x $MAIN)
+    {
+        # warn instead of die, since our return code is the exit code
+        warn "$cmd: do_admin: The main script ($MAIN) must be in the " .
+            "same directory as the links\n";
+        return -1;
+    }
+    for ($POPULATE, $STAGE, $RELEASE)
+    {
+        print "Linking $_ to $MAIN\n" if ($opts{verbose});
+        if (symlink $MAIN, $_)
+        {
+            #
+            # This isn't an incremental-debugging line. Whenever we run
+            # this, we want a trail in the logfile to that effect.
+            #
+            write_log_line($LOGFILE,
+                           "$opts{date} [$$] $target_dir/$_ linked to " .
+                           "$target_dir/$MAIN");
+        }
+        else
+        {
+            # Odds are if one fails, more than that will have failed.
+            # Another reason not to use die.
+            warn "$cmd: do_admin: Unable to link $MAIN as $_: $!\n";
+            $errs++;
+        }
+    }
+
+    # If there were any errors, return a code of -1 for exit()
+    return ($errs) ? -1 : 0;
+}
+
+###############################################################################
+#
+#   Sub Name:       do_populate
+#
+#   Description:    Perform the populate action-- use CVS to checkout most
+#                   recent versions of the project files into the development
+#                   server area.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   @argz     in      list      Remainder (if any) from cmdline
+#
+#   Globals:        $cmd
+#                   %CONFIG
+#                   %opts
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    0
+#                   Failure:    UNIX error code
+#
+###############################################################################
+sub do_populate
+{
+    my (@argz) = @_;
+
+    if (! scalar(@argz))
+    {
+        warn "$cmd: do_populate: Must supply at least one project name\n";
+        return 1;
+    }
+
+    my ($project, $top_lvl, $old_mask, $cwd, @cmd, $lock, $weblist_exists,
+        $topiclist_exists, $old_wd, $did_not_populate, $res, $reason);
+
+    $old_mask = umask 0; # Preserve current value
+    $old_wd   = cwd;     # Note where we started from
+    $did_not_populate = 0;
+
+    for $project (@argz)
+    {
+        #
+        # Population execution must be started from the project directory,
+        # but this tool can in fact be used to populate only a sub-set of a
+        # project.
+        #
+        # Well, in theory, at least...
+        #
+        $project =~ m|^(.*?)/|;
+        $top_lvl = (defined $1) ? $1 : $project;
+        print "populate: processing $project ($top_lvl)\n" if ($DEBUG & 2);
+        chdir $CONFIG{PROJECT_ROOT};
+        if ($?)
+        {
+            warn "$cmd: do_populate: Could not change dir to " .
+                "$CONFIG{PROJECT_ROOT}: $!\n";
+            $did_not_populate++;
+            next;
+        }
+        # Clear out the @cmd array between runs
+        @cmd = ();
+        if ($opts{r}) # A specific CVS tag was given
+        {
+            print "populating $CONFIG{PROJECT_ROOT}/$project ($opts{r})\n"
+                unless ($opts{terse});
+            push(@cmd, '-r', $opts{r});
+        }
+        else
+        {
+            print "populating $CONFIG{PROJECT_ROOT}/$project\n"
+                unless ($opts{terse});
+        }
+        push(@cmd, '-P', $project);
+        unshift(@cmd, 'checkout');
+        # This env var is used by the CVS wrappers
+        $ENV{WM_CONTROL} = "populate $project $CONFIG{DEVHOST}";
+        # Establish a project lock, first: Lock at the top-level, not the
+        # (possible) sub-dir level.
+        ($lock, $reason) = lock_project $top_lvl;
+        if (! defined $lock)
+        {
+            warn "$cmd: do_populate: Unable to lock $top_lvl ($reason) - " .
+                "please try again\n";
+            $did_not_populate++;
+            next;
+        }
+        # Recording this here means the END{} block lets go of locks on errors
+        $CONFIG{lockfile} = $lock;
+        # cvs_exec expects the operation followed by args, which we have:
+        if (! cvs_exec(@cmd))
+        {
+            warn "$cmd: do_populate: Operation probably not successful\n";
+            unlock_project $lock;
+            $did_not_populate++;
+            next;
+        }
+        #
+        # Probably fine. Check for weblist. The absence requires a CVS add
+        # operation prior to the commit (but after the update).
+        #
+        $weblist_exists =
+            (-e "$CONFIG{PROJECT_ROOT}/$top_lvl/$CONFIG{WEBLIST}");
+        printf("%s $CONFIG{PROJECT_ROOT}/$top_lvl/$CONFIG{WEBLIST}...\n",
+               ($weblist_exists ? 'Updating' : 'Creating'))
+            if ($opts{verbose});
+        if (! update_int_weblist($top_lvl))
+        {
+            warn "$cmd: do_populate: Update of $CONFIG{WEBLIST} failed\n";
+            unlock_project $lock;
+            $did_not_populate++;
+            next;
+        }
+
+        #
+        # Check to see if we need to create the $CONFIG{TOPICLIST} file
+        #
+        $topiclist_exists =
+            (-e "$CONFIG{PROJECT_ROOT}/$top_lvl/$CONFIG{TOPICLIST}");
+        unless ($topiclist_exists)
+        {
+            print "Creating $CONFIG{PROJECT_ROOT}/$top_lvl/" .
+                "$CONFIG{TOPICLIST}...\n" if ($opts{verbose});
+            my $start_wd = cwd;
+            chdir "$CONFIG{PROJECT_ROOT}/$top_lvl";
+            my $FH = new IO::File "> $CONFIG{TOPICLIST}";
+            if (! defined($FH))
+            {
+                warn "$cmd: do_populate: Error opening $CONFIG{TOPICLIST} " .
+                    "for writing: $!\n";
+                unlock_project $lock;
+                $did_not_populate++;
+                next;
+            }
+            print $FH "project\t/$top_lvl\n";
+            print $FH "title\t$top_lvl\n";
+            print $FH "owner\t$opts{user}\@$CONFIG{DEVHOST}\n";
+            $FH->close;
+
+            #
+            # Do a cvs add and cvs commit
+            #
+            cvs_exec('add', $CONFIG{TOPICLIST});
+            cvs_exec('commit', '-m', 'A file detailing project name and owner',
+                     $CONFIG{TOPICLIST});
+        }
+        #
+        # This routine will check for a Makefile and execute make if it's found
+        #
+        if (! make_target($project, 'populate', $CONFIG{PROJECT_ROOT}, ''))
+        {
+            warn "$cmd: do_populate: Make error, possible problem\n";
+            # The next statement does the unlock, so no need here
+        }
+
+        # Drop the lock and iterate over the loop.
+        ($res, $reason) = unlock_project $lock;
+        unless ($res)
+        {
+            warn "$cmd: do_populate: Failed to release lock $lock: $reason\n";
+        }
+    }
+
+    #
+    # Restore original umask and working dir
+    #
+    umask $old_mask;
+    chdir $old_wd;
+
+    #
+    # Report if there were any failures in the list of projects
+    #
+    if ($did_not_populate)
+    {
+        warn sprintf("$cmd: %d project(s) (of %d) could not populate\n",
+                     $did_not_populate, scalar(@argz));
+        return 1;
+    }
+
+    #
+    # Assuming we made it this far, nothing went wrong. Return back a value of
+    # zero to use as this process' exit code.
+    #
+    0;
+}
+
+###############################################################################
+#
+#   Sub Name:       do_release
+#
+#   Description:    Release the specified project to the host. Create the tar
+#                   file for release, then use the mirror_upload function to
+#                   send the data to the server.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   @argz     in      list      Remainder (if any) from cmdline
+#
+#   Globals:        %opts
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    0
+#                   Failure:    UNIX error code
+#
+###############################################################################
+sub do_release
+{
+    my (@argz) = @_;
+
+    #
+    # One arg minimum
+    #
+    unless (defined $argz[0] and $argz[0])
+    {
+        warn "$cmd: do_release: Must supply at least one project name\n";
+        return 1;
+    }
+
+    my ($acl, $project, $user, $tarfile, $hour, $min, $day, $month, $year,
+        $host, $did_not_release, %info, %addr, $ret, $infofile, $fh, $lock,
+        $key, $val, %seen, $relfile, $skipped_release, $stage_root, $config,
+        $transport, $infofile, $THRESHHOLD, $tar_suffix, $tarfile_remote,
+	$infofile_remote);
+
+    #
+    # Make $opts{save} and $opts{noxfer} testable
+    #
+    $opts{save}   |= 0;
+    $opts{noxfer} |= 0;
+    #
+    # Always save the file if -debug or -noxfer (remember that -debug sets
+    # bit 0 of $DEBUG)
+    #
+    $opts{save} = 1 if ($opts{noxfer} or ($DEBUG & 1));
+
+    $did_not_release = 0;
+    $skipped_release = 0;
+
+    #
+    # See the notes in the loop below. This is the threshhold value above
+    # which we won't attempt to use HTTP at all.
+    #
+    $THRESHHOLD = 24 * 1024 * 1024; # 24 Megabytes
+
+    #
+    # If the first argument does not appear to be a host name, try to use
+    # it (as a project name) to deduce which host the release is for. Use
+    # timestamps on [Ww]eblist files to choose the most-recently-staged.
+    #
+    if (($argz[0] =~ tr/././) > 1)
+    {
+        $host = shift(@argz);
+        unless (defined $HOSTS{$host})
+        {
+            warn "$cmd: do_release: Specified host ($host) does not exist " .
+                "or is unknown\n";
+            return 1;
+        }
+    }
+    else
+    {
+        unless ($host = deduce_host($argz[0]))
+        {
+            warn "$cmd: do_release: No host found for release of $project; " .
+                "Did you stage $project yet?\n";
+            return 1;
+        }
+        print "$cmd: Defaulting release to $host. If this is not correct,\n" .
+            "then re-run $cmd with an explicit hostname\n"
+                unless ($opts{terse});
+        write_log_line($LOGFILE,
+                       "$opts{date} [$$] Release defaulting to $host")
+            if ($DEBUG);
+    }
+
+    #
+    #  hp.com needs specific directions on release
+    #
+    if ($host eq 'www.hp.com')
+    {
+	unless ($opts{$stage} || $opts{prod} || $opts{update})
+	{
+	    warn "$cmd: Must specify one or more of -stage, -prod, -update when" .
+	         " releasing to www.hp.com\n";
+            return 1;
+	}
+
+    }
+
+
+    # Shorthand for all later references to this:
+    $config = $HOSTS{$host};
+
+    #
+    # Fine. Now we know what host we're releasing to. We need to pull the ACL
+    # for that host and use it to verify/validate the user. Then, assuming that
+    # went well, we iterate over the list of projects (that sequence is
+    # documented at the start of the for-loop).
+    #
+    $acl = ACL_get $host;
+    if (! defined($acl))
+    {
+        warn "$cmd: do_release: Error getting access control list for " .
+            "$host: " . ACL_error . "\n";
+        return 1;
+    }
+
+    if (! validate_user($host, $argz[0], $opts{user}))
+    {
+        warn "$cmd: do_release: Authorization failed\n";
+        return 1;
+    }
+
+    #
+    # Set the specific stage-root for this run; the configured base stage
+    # root with the release hostname appended
+    #
+    $stage_root = "$CONFIG{STAGE_ROOT}/$host";
+
+    for $project (@argz)
+    {
+        #
+        # Is this project even in the ACL for this host?
+        #
+        unless (defined $acl->{$project})
+        {
+            warn "$cmd: do_release: Project $project not enabled for release" .
+                " to host $host, skipping\n";
+            $did_not_release++;
+            next;
+        }
+        #
+        # If so, has it been staged?
+        #
+        unless (-d "$stage_root/$project")
+        {
+            warn "$cmd: do_release: Project $project not found in the " .
+                "staging area for host $host, skipping\n";
+            $did_not_release++;
+            next;
+        }
+        #
+        # It has been staged, OK, then is this user authorized to release it?
+        #
+        unless (grep($opts{user}, split(/,/, $acl->{$project}->{USERS})))
+        {
+            warn "$cmd: do_release: User $opts{user} not authorized to " .
+                "release $project on host $host, skipping\n";
+            $did_not_release++;
+            next;
+        }
+
+        # Establish a lock on the project before proceeding
+        if (! defined($lock = lock_project($project)))
+        {
+            warn "$cmd: do_release: Unable to gain lock on $project - " .
+                "skipped\n";
+            $did_not_release++;
+            next;
+        }
+        # Record the lockfile in case a critical failure triggers END {}
+        $CONFIG{lockfile} = $lock;
+
+        #
+        # In order, we:
+        #
+        #    1) Create an archive
+        #    2) Piece together the transport information (e-mail addr, etc.)
+        #    3) Upload of ftp the package
+        #    4) Send notification mail
+        #
+        # 1. Create the archive. Assemble a name for the tarfile and call
+        #    the routine that assembles it from the weblist.
+        #
+        ($min, $hour, $day, $month, $year) = (localtime)[1 .. 5];
+        $month++;     # Was in 0..11 range
+        $year %= 100; # Turn 100 (2000) into 00
+	#
+	# hp.com wants a .pkg suffix instead of .tar
+	#
+	$tar_suffix = ($host eq 'www.hp.com') ? 'pkg' : 'tar';
+        $tarfile = sprintf("%s/%s-%02d%02d%02d-%02d%02d.%s",
+                           $stage_root, $project,
+                           $year, $month, $day, $hour, $min, $tar_suffix);
+        if ($host eq 'www.hp.com')
+	{
+        	$tarfile_remote = sprintf("%s/%s.%s", $stage_root, $project, 
+					$tar_suffix);
+	}
+	else
+	{
+		$tarfile_remote = $tarfile;
+	}
+
+        $tarfile .= '.gz' if ($config->{COMPRESSION});
+        unlink $tarfile if -e $tarfile;
+        unless ($ret = make_archive($project, $host, $tarfile,
+                                    $config->{COMPRESSION}))
+        {
+            warn "$cmd: do_release: Could not create archive, skipping\n";
+            $did_not_release++;
+            unlink $tarfile;
+            next;
+        }
+        #
+        # If the resulting archive file is empty (and devoid even of OBS
+        # entries), skip it:
+        #
+        if ($ret == 2)
+        {
+            print "The archive contains no files and no obsoletion entries." .
+                " Skipping.\n";
+            $skipped_release++;
+            unlink $tarfile;
+            next;
+        }
+        # Clear this value just in case
+        undef $infofile;
+        undef $infofile_remote;
+
+        #
+        # 2. Piece together the transport information. This will be used in
+        #    posting the package via HTTP upload or creating a ticket file
+        #    for ftp.
+        #
+        %info = ();
+        #
+        # Start by opening and reading the TopicList file for this project.
+        # If it isn't here, no big loss.
+        #
+        $fh = new IO::File "$stage_root/$project/TopicList";
+        if (! defined $fh)
+        {
+            warn "$cmd: do_release: Error (non-fatal): No TopicList file " .
+                "found for project $project\n";
+        }
+        else
+        {
+            for (<$fh>)
+            {
+                chomp;
+                next unless /^Info:(.*)$/;
+                # Grabbed the pertinent part in $1 already
+                ($key, $val) = split(/\s+/, $1);
+                $info{lc $key} = $val;
+            }
+            $fh->close;
+        }
+        #
+        # Next, comma-separated list of e-mail addresses to notify
+        # If they specified email via -e, use that instead of their uid
+        #
+        $info{email} .= (defined $opts{e} and $opts{e}) ?
+            ",$opts{e}" : ",$opts{user}\@$CONFIG{DEVHOST}";
+        $info{email} .= ",$acl->{$project}->{EMAIL}"
+            if ($acl->{$project}->{EMAIL});
+        # Launder the list
+        grep($addr{lc $_}++, (split(/[, ]+/, $info{email})));
+        delete $addr{''};
+        %seen = ();
+        for (sort keys %addr)
+        {
+            /^(.*)@/;
+            delete $addr{$_} if ($seen{$1}++);
+        }
+        $info{email} = join(',', (sort keys %addr));
+        #
+        # For the sake of feeling secure, we stamp the package on this end
+        # with an MD5 checksum, which will be checked on the opposite end
+        # by the server tools. Unless we're releasing to hp.com, the really
+        # critical corporate server, in which case we use a much weaker,
+        # almost laughable checksum.
+        # Also, make job directive for hp.com here
+	#
+        if ($host eq 'www.hp.com')
+        {
+            $info{crc} = crc_signature $tarfile;
+	    $info{job} = uc join(' ',grep $_,($opts{update} ? 'UPDATE' : '',
+					      $opts{prod}   ? 'PROD'   : '',
+					      $opts{stage}  ? 'STAGE'  : ''));
+        }
+        else
+        {
+            $info{md5} = md5_signature $tarfile;
+        }
+        #
+        # Some basic elements such as project name, destination directory,
+        # etc.
+        #
+        $info{name} = $project;
+        $info{dest} = "/$project" unless exists $info{dest};
+        $info{compressed} = $config->{COMPRESSION};
+        # Make sure it makes the rounds
+        $info{upload} = 'yes';
+        # Lastly...
+        $info{user} = $opts{user};
+        # Propagate debugging information
+        $info{debug} = 'yes' if ($opts{debug});
+
+        #
+        # Set up a proxy, if needed
+        #
+        $ENV{http_proxy} = $CONFIG{HTTP_PROXY} || $ENV{http_proxy} || '';
+
+        #
+        # Effect the transfer of the package. The conditional here is solely
+        # because of the need to support releases to www.hp.com
+        #
+        # 990702: There are valid cases where one may wish to run the tool
+        #         just to generate the tar file and release ticked. Check for
+        #         this via $opts{noxfer}.
+        #
+        unless ($opts{noxfer})
+        {
+            #
+            # Here lies the challenge: We must select a transport model that
+            # will work, based on some unusual limitations:
+            #
+            #   * HTTP Upload is preferred. Using FTP means using IPC::Open3
+            #     and all the hassle of faking tty modes, etc. This is because
+            #     of problems trying to compile Perl with SOCKS support, so
+            #     we can't use the Net::FTP module, either.
+            #   * The www.hp.com host doesn't run our server software, so we
+            #     can't use HTTP with them.
+            #   * On top of that, packages over a certain size (70Meg fails,
+            #     32Meg succeeded a few times) cause problems with the HTTP
+            #     method, in that perl dies unexpectedly and quietly at that.
+            #   * Why not just use FTP anyway? There are a lot of points at
+            #     which it could catch and hang, plus it's necessary to put
+            #     in sleep() delays before closing the connection to ensure
+            #     that transfer buffers are flushed. Where HTTP lets us send
+            #     the informational parameters as part of the POST-request,
+            #     for FTP we have to write an explict $pkg.info file and ftp
+            #     it, as well.
+            #   * Sounds simple, no? Well, we also have to have a certain
+            #     amount of information for each method. A host can therefore
+            #     be forced into using a given method simply by clearing
+            #     the information fields for the other method. So we have to
+            #     check that, too.
+            #
+            if ($host eq 'www.hp.com')
+            {
+                 $transport = 'ftp';
+            }
+            elsif (((-s $tarfile) > $THRESHHOLD) or
+                   (defined($config->{FTP_USER}) and
+                    defined($config->{FTP_PASSWD})))
+            {
+                $transport = 'ftp';
+            }
+            elsif (defined($config->{HTTP_AUTH_USER}) and
+                   defined($config->{HTTP_AUTH_PASSWD}))
+            {
+                $transport = 'http'; # default
+            }
+            else
+            {
+                warn "$cmd: do_release: Insufficient configuration " .
+                    "information to select FTP or HTTP for host $host.\n" .
+                    "Skipping upload of $project.\n";
+                $did_not_release++;
+                next;
+            }
+            $info{transport} = $transport;
+
+            if ($transport eq 'ftp')
+            {
+                # Create an infofile
+                ($infofile,$infofile_remote) = 
+			write_info_file($tarfile, $tarfile_remote, $host, \%info);
+                if (! defined($infofile))
+                {
+                    warn "$cmd: do_release: Failed to write info-file for " .
+                        "$project, skipped\n";
+                    $did_not_release++;
+                    next;
+                }
+
+                unless (defined($config->{FTP_USER}) and
+                        defined($config->{FTP_PASSWD}))
+                {
+                    warn "$cmd: do_release: Could not FTP: One or both of " .
+                        "username or password missing, skipped\n";
+                    $did_not_release++;
+                    next;
+                }
+                #
+                # Get the host(s) to transfer to:
+                #
+                my @hostlist;
+                if (defined $config->{FTP_HOST} and
+                    ($config->{FTP_HOST} ne $host))
+                {
+                    @hostlist = ($config->{FTP_HOST});
+                }
+                else
+                {
+                    #
+                    # More involved. Since we're using FTP, we want to do
+                    # all the transfers here. Odds are, the package is
+                    # really freakin' huge, and the server-side tools don't
+                    # even START to mirror until they've processed the
+                    # content internally.
+                    #
+                    # my $L = DBI_mirror_host_list(mirror => $host);
+                    my $L = DBI_mirror_phys_host_list(mirror => $host);
+                    unless (defined $L)
+                    {
+                        warn "$cmd: do_release: Failed to get list of " .
+                            "mirrors for pool $host: " . DBI_error .
+                            ", skipped\n";
+                        $did_not_release++;
+                        next;
+                    }
+                    @hostlist = @$L;
+                    # In case any have port specifications
+                    grep(s/:\d+$//, @hostlist);
+                }
+                #
+                # Calling the FTP routine is actually pretty simple. But the
+                # routine itself (and the support send/expect routine) from
+                # the IMS::ReleaseMgr::Transfer package is pretty hairy.
+                #
+                print "Starting FTP transfer to host(s) @hostlist\n"
+                    unless ($opts{terse});
+                my $did_not_ftp = 0;
+                for my $onehost (@hostlist)
+                {
+                    print "FTP of $project to $onehost...\n"
+                        if ($opts{verbose});
+                    if (! ($ret = ftp_upload($tarfile, $infofile,
+                                             $CONFIG{DEVHOST}, $onehost, $CONFIG{FTP},
+                                             $config, $tarfile_remote, $infofile_remote)))
+                    {
+                        warn "$cmd: do_release: FTP of project to $onehost " .
+                            "failed: " . ftp_error . ", skipped\n";
+                        $did_not_ftp++;
+                    }
+                }
+                if ($did_not_ftp)
+                {
+                    warn "$cmd: do_release: Upload of package for $project " .
+                        "had FTP problems with $did_not_ftp " .
+                        noun_form('host', $did_not_ftp) . ", skipped\n";
+                    $did_not_release++;
+                    next;
+                }
+            }
+            else
+            {
+                #
+                # Send it along the pipe. Use the same code that the
+                # deploy_content tool on the server side uses for mirroring.
+                #
+                if (! ($ret = mirror_upload($tarfile, $project,
+                                            $CONFIG{DEVHOST}, [ $host ],
+                                            $config, \%info)))
+                {
+                    warn "$cmd: do_release: Upload of package for $project " .
+                        "failed to host $host, skipped\n";
+                    $did_not_release++;
+                    next;
+                }
+                else
+                {
+                    mail_response($info{email}, $project, $host);
+                }
+            }
+        }
+
+        #
+        # If we are asked to save the file (that's $opts{save}, also set on
+        # bit 0 of the $DEBUG mask) then retain the tar file and dump a dummy
+        # ticket file. Old version used to create a ticket file, but we don't
+        # anymore. The information may yet be needed for troubleshooting.
+        #
+        if (defined $opts{save} and $opts{save})
+        {
+            unless (defined $infofile)
+            {
+                ($infofile,$infofile_remote) = 
+			write_info_file($tarfile, $tarfile_remote, $host, \%info);
+                if (! defined($infofile))
+                {
+                    warn "$cmd: do_release: Could not open $infofile for " .
+                        "writing: $! (for debugging)\n";
+                    next;
+                }
+            }
+        }
+        else
+        {
+            unlink $tarfile;
+        }
+
+        #
+        # Create/update the file ".release"
+        #
+        $relfile = "$stage_root/$project/$CONFIG{RELEASE}";
+        $fh = new IO::File "> $relfile";
+        if (! defined $fh)
+        {
+            warn "$cmd: do_release: Could not open $relfile for writing: $!\n";
+        }
+        else
+        {
+            print $fh "# .release - written by $cmd for $opts{user} - " .
+                "$opts{date}\n";
+            print $fh "target\t$host\n";
+            print $fh "user\t$opts{user}\n";
+            print $fh "project\t$project\n";
+            print $fh "date\t$opts{date}\n";
+            $fh->close;
+        }
+
+        print "$cmd: Project $project successfully released to $host\n"
+            unless ($opts{terse});
+
+        unlock_project $lock;
+    }
+
+    #
+    # Notify the user if one or more of the requested projects did not
+    # release correctly.
+    #
+    if ($skipped_release)
+    {
+        warn sprintf("$cmd: %d %s skipped for no files in archive.\n",
+                     $skipped_release, noun_form('project', $skipped_release));
+    }
+    if ($did_not_release)
+    {
+        warn sprintf("$cmd: %d %s (of %d) did not release\n",
+                     $did_not_release, noun_form('project', $did_not_release),
+                     scalar(@argz));
+        return 1;
+    }
+
+    #
+    # Assuming we made it this far, nothing went wrong. Return back a value of
+    # zero to use as this process' exit code.
+    #
+    0;
+}
+
+###############################################################################
+#
+#   Sub Name:       do_stage
+#
+#   Description:    Stage a project in preparation for release to a specific
+#                   host. Handle cases when a staging area already exists for
+#                   a different host. Create a weblist file for the project
+#                   that itemizes the files that should be included in the
+#                   release.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   @argz     in      list      Remainder (if any) from cmdline
+#
+#   Globals:        %opts
+#                   %CONFIG
+#                   %HOSTS
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    0
+#                   Failure:    UNIX error code
+#
+###############################################################################
+sub do_stage
+{
+    my (@argz) = @_;
+
+    #
+    # We must have at least two arguments, the staging host and the project.
+    # We can have more than one project, but it will be staged to the same
+    # host.
+    #
+    my $host = lc shift(@argz);
+    my @projects = @argz;
+    unless ((defined $host and $host) and (scalar @projects))
+    {
+        warn "$cmd: do_stage: Must supply staging host and at least one " .
+            "project name\n";
+        return 1;
+    }
+
+    unless (exists $HOSTS{$host})
+    {
+        warn "$cmd: do_stage: Host $host is unknown\n";
+        return 1;
+    }
+
+    #
+    # Make certain that there is a staging area for this host
+    #
+    my $stage_root = "$CONFIG{STAGE_ROOT}/$host";
+    unless (-d $stage_root)
+    {
+        # Created directories must be 775, regardless of our umask
+        my $old_mask = umask 0;
+        mkdir $stage_root, 0775;
+        if ($?)
+        {
+            warn "$cmd: do_stage: Could not create directory $stage_root: " .
+                "$!\n";
+            return 1;
+        }
+        umask $old_mask;
+    }
+    my $cwd = cwd;
+    chdir $stage_root;
+    if ($?)
+    {
+        warn "$cmd: do_stage: Could not change to directory $stage_root: $!\n";
+        return 1;
+    }
+
+    my ($project, $ret, $fh, @cmd, @time, $userstamp, $lock, $did_not_stage,
+        $project_weblist_mtime, $stage_weblist_mtime, $session_tag, $reason, 
+	$buildlist, %buildconfig);
+    $did_not_stage = 0;
+
+    for $project (@projects)
+    {
+        if ($project =~ m|/|)
+        {
+            warn "$cmd: do_stage: Projects for staging must be top-level " .
+                "($project)\n";
+            $did_not_stage++;
+            next;
+        }
+
+        # NOTE: There was some problem so now it populates every time!
+        #
+        # Check to see if the internal weblist for the project is newer than
+        # the existing internal weblist for the staging area (if there is
+        # one). If the staging version of the file exists and is newer than
+        # the project version, then populate hasn't been run since the last
+        # time staging was done, so re-populate just in case.
+        #
+        $project_weblist_mtime =
+            (stat("$CONFIG{PROJECT_ROOT}/$project/$CONFIG{WEBLIST}"))[9];
+        $stage_weblist_mtime =
+            (stat("$stage_root/$project/" . (($host eq 'www.hp.com') ?
+                                             # www.hp.com name
+                                             'Weblist' : 'weblist')))[9];
+        # In case there was no file to stat
+        $stage_weblist_mtime = 0 unless (defined $stage_weblist_mtime);
+        if (1)
+        #if ($stage_weblist_mtime > $project_weblist_mtime)
+        {
+            warn "$cmd: do_stage: Running do_populate for syncronization\n"
+                if $opts{verbose};
+            if (do_populate $project) # Returns non-zero only on error
+            {
+                warn "$cmd: do_stage: Error populating $project for stage. " .
+                    "Skipping.\n";
+                $did_not_stage++;
+                next;
+            }
+        }
+
+        # Establish a lock on the project before proceeding
+        ($lock, $reason) = lock_project($project);
+        if (! defined $lock)
+        {
+            warn "$cmd: do_stage: Unable to gain lock on $project ($reason)" .
+                " - please try again\n";
+            $did_not_stage++;
+            next;
+        }
+        # Record the lockfile in case a critical failure triggers END {}
+        $CONFIG{lockfile} = $lock;
+
+        #
+        # Unless the user specifically requests no tag be used or generated,
+        # create a tag or use the existing $opts{tag} from the command line.
+        #
+        if ($opts{notag})
+        {
+            $session_tag = '';
+        }
+        else
+        {
+            if ($opts{tag})
+            {
+                $session_tag = $opts{tag};
+            }
+            else
+            {
+                @time = localtime;
+                $session_tag = sprintf("%s-%s-%02d-%02d-%02d-%02d-%02d",
+                                       $project, $opts{user},
+                                       $time[5] % 100, # year (100 == 2000)
+                                       $time[4] + 1,   # month (comes as 0-11)
+                                       $time[3],       # day (1-31)
+                                       $time[2],       # hour
+                                       $time[1]);      # minute
+            }
+
+            warn "$cmd: do_stage: Marking $project with tag $session_tag\n"
+                unless ($opts{terse});
+            if (! cvs_exec('rtag', $session_tag, $project))
+            {
+                warn "$cmd: do_stage: Operation probably not successful; " .
+                    "skipping.\n";
+                unlock_project $lock;
+                $did_not_stage++;
+                next;
+            }
+        }
+
+        #
+        # Now that the project has been tagged (most likely), set the env
+        # variable that communicates with the CVS wrappers, and effect an
+        # update in the staging area.
+        #
+        # This identifies to the CVS wrappers what phase we're in
+        $ENV{WM_CONTROL} = "export $project $host";
+        write_log_line($LOGFILE, "$cmd: WM_CONTROL set to $ENV{WM_CONTROL}")
+            if ($DEBUG & 8); # bxxxx1xxx
+        unless ($opts{notag})
+        {
+            #
+            # Regardless of debug level, they should see this line unless they
+            # specified -terse
+            #
+            print "$cmd: Retrieving $project with $session_tag for $host\n"
+                unless ($opts{terse});
+            write_log_line($LOGFILE,
+                           "$cmd: Retrieving $project with $session_tag for " .
+                           "$host")
+                if ($DEBUG & 1);
+            @cmd = ('-r', $session_tag);
+        }
+        else
+        {
+            print "$cmd: Retrieving $project for $host\n"
+                unless ($opts{terse});
+            write_log_line($LOGFILE,
+                           "$cmd: Retrieving $project for $host")
+                if ($DEBUG & 1);
+            @cmd = ();
+        }
+        #
+        # Flesh out the command string and execute
+        #
+        @cmd = ('checkout', '-P', @cmd, $project);
+        if (! cvs_exec(@cmd))
+        {
+            warn "$cmd: do_stage: Operation probably not successful; " .
+                "skipping.\n";
+            unlock_project $lock;
+            $did_not_stage++;
+            next;
+        }
+
+	#
+	# if a buildlist exists, build project and then add and remove
+	# specified directories from weblist (by passing add and remove
+	# matches into update_weblist function)
+	#
+
+	$buildlist = "$stage_root/$project/$CONFIG{BUILDLIST}";
+
+	if (-e $buildlist)
+	{
+	    undef %buildconfig;    #just to be sure...
+	    read_config_file (\%buildconfig, $buildlist);
+	    
+	    unless (defined $buildconfig{build} && $buildconfig{build})
+	    {
+                warn "$cmd: do_stage: Build error, 'build' not defined in $buildlist\n";
+	    }
+	    else
+	    {
+
+	        if (defined $buildconfig{preclean} && $buildconfig{preclean})
+		{
+                    if (! make_target($project, $buildconfig{preclean}, $stage_root, $host))
+                    {
+                        warn "$cmd: do_stage: Make $buildconfig{preclean} error, possible problem\n";
+                        unlock_project $lock;
+                        next;
+                    }
+		}
+                    if (! make_target($project, $buildconfig{build}, $stage_root, $host))
+                    {
+                        warn "$cmd: do_stage: Make $buildconfig{build} error, possible problem\n";
+                        unlock_project $lock;
+                        next;
+                    }
+                #
+		# where should postclean be???
+		#
+
+	        if (defined $buildconfig{postclean} && $buildconfig{postclean})
+		{
+                    if (! make_target($project, $buildconfig{postclean}, $stage_root, $host))
+                    {
+                        warn "$cmd: do_stage: Make $buildconfig{postclean} error, possible problem\n";
+                        unlock_project $lock;
+                        next;
+                    }
+                }
+	    }
+            
+	}
+
+        #
+        # It's cake from this point onward. Create/update the weblist file
+        # for do_release() to use, based on what's changed since the last
+        # actual release. Then update the topiclist.
+        #
+        unless (update_weblist($project, $host, \%buildconfig))
+        {
+            warn "$cmd: do_stage: Operation probably not successful; " .
+                "skipping.\n";
+            $did_not_stage++;
+            unlock_project $lock;
+            next;
+        }
+        unless (update_topiclist($project, $host))
+        {
+            warn "$cmd: do_stage: Operation probably not successful; " .
+                "skipping.\n";
+            $did_not_stage++;
+            unlock_project $lock;
+            next;
+        }
+        #
+        # This routine will check for a Makefile and execute make if it's found
+        #
+        if (! make_target($project, 'stage', $CONFIG{STAGE_ROOT}, $host))
+        {
+            warn "$cmd: do_stage: Make error, possible problem\n";
+            unlock_project $lock;
+            next;
+        }
+
+        print "$cmd: Project $project successfully staged for $host\n"
+            unless ($opts{terse});
+
+        unlock_project $lock;
+    }
+
+    #
+    # Notify the user if one or more of the requested projects did not
+    # stage correctly.
+    #
+    if ($did_not_stage)
+    {
+        warn sprintf("$cmd: %d project(s) (of %d) could not stage\n",
+                     $did_not_stage, scalar(@projects));
+        return 1;
+    }
+
+    #
+    # Assuming we made it this far, nothing went wrong. Return back a value of
+    # zero to use as this process' exit code.
+    #
+    0;
+}
+
+###############################################################################
+#
+#   Sub Name:       lock_project
+#
+#   Description:    Attempt to place a lock on a specified project to prevent
+#                   other release-oriented operations from overlapping. Actual
+#                   per-file locks are managed by CVS.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $project  in      scalar    Name of the project to lock
+#
+#   Globals:        %CONFIG
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    name of lockfile
+#                   Failure:    undef, with more information if list context
+#
+###############################################################################
+sub lock_project
+{
+    my $project = shift;
+
+    my ($lock, $file);
+
+    print "lock_project: trying for lock on $project " if ($DEBUG & 8);
+    $project =~ s|/|-|g;
+    $file = "$ENV{CVSROOT}/.$project.lck";
+    print "($file)\n" if ($DEBUG & 8);
+
+    #
+    # If the file exists, then either it is currently in use or a previous
+    # release-related command failed without releasing the lock.
+    #
+    if (-e $file)
+    {
+        #
+        # Find out the PID of the lock-holder and report that as part of the
+        # message.
+        #
+        if (! ($lock = readlink($file)))
+        {
+            return ((wantarray) ?
+                    (undef, sprintf("lock_project: Lockfile %s does not " .
+                                    "appear to be valid, not a symlink",
+                                    $file)) :
+                    (undef));
+        }
+
+        return ((wantarray) ?
+                (undef, sprintf("lock_project: Project %s is currently " .
+                                "locked by process %d: see file %s",
+                                $project, $lock, $file)) :
+                (undef));
+    }
+    #
+    # And if it doesn't, then it is ours to play with
+    #
+    else
+    {
+        #
+        # Implement the lock as a symlink whose "link" is actually our PID.
+        # This allows for all current locks to be examined with "ls -l *.lck"
+        #
+        if (! symlink("$$", $file))
+        {
+            return ((wantarray) ?
+                    (undef, sprintf("lock_project: could not lock project %s" .
+                                    " with lockfile %s: $!",
+                                    $project, $file)) :
+                    (undef));
+        }
+    }
+
+    $file;
+}
+
+###############################################################################
+#
+#   Sub Name:       mail_response
+#
+#   Description:    Use the send_mail utility return to send a canned e-mail
+#                   to the list of receipients. The list is defined as the
+#                   receipients in the ACL for the project, plus the person
+#                   running the command if they are not already on that list.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $to       in      scalar    String of all addresses
+#                   $project  in      scalar    The project being released
+#                   $host     in      scalar    The target host for release
+#
+#   Globals:        $LOGFILE
+#                   $DEBUG
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################
+sub mail_response
+{
+    my ($to, $project, $host) = @_;
+
+    return 1 unless ($to);
+
+    write_log_line($LOGFILE,
+                   sprintf("$opts{date} [$$] Sending mail to (%s) for " .
+                           "project %s", $to, $project))
+        if ($DEBUG & 14); # bxxxx111x
+
+    my $subject = "Project $project released to $host";
+    my $body = [
+                "Project: $project\n",
+                "Host   : $host\n",
+                "\n",
+                "Released by $opts{users} on $opts{date}.\n",
+                "\n",
+                "Watch mailbox for mail notification from the server-side\n",
+                "release agent, indicating successful deployment.\n",
+                "\n",
+                "$revision\n",
+               ];
+
+    return send_mail($to, $subject, $body);
+}
+
+###############################################################################
+#
+#   Sub Name:       make_archive
+#
+#   Description:    Use the Archive::Tar module to create a UNIX-tar-style
+#                   archive of all files referenced in the weblist file as
+#                   slated for delivery. Include weblist itself, of course.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $project  in      scalar    Name of project being prepped
+#                   $host     in      scalar    Host that $project was staged
+#                                                 for release to
+#                   $file     in      scalar    Filename to write the archive
+#                                                 to
+#                   $compress in      scalar    T/F flag whether to compress
+#                                                 the archive (not used yet)
+#
+#   Globals:        $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1, 2 if there were no files or OBS entries
+#                   Failure:    0
+#
+###############################################################################
+sub make_archive
+{
+    my ($project, $host, $file, $compress) = @_;
+
+    my ($tar, $fh, $line, $one_file, $cwd, $num_files, $num_obs, $weblist,
+        $verbose, $project_dir);
+
+    # Force to a testable null value
+    $compress |= 0;
+    warn "$cmd: make_archive: Will attempt to compress at level $compress.\n"
+        if ($opts{debug});
+
+    #
+    # Ease the use/comparison of this command-line option:
+    #
+    $verbose = (defined $opts{verbose} and $opts{verbose}) ? 1 : 0;
+
+    #
+    # We are assuming that $project and $host have been verified, and that
+    # $file is an absolute path.
+    #
+    $cwd = cwd;
+
+    # chdir "$CONFIG{STAGE_ROOT}/$host";
+    # hp.com is different...
+    if ($host eq 'www.hp.com') 
+    {
+      chdir "$CONFIG{STAGE_ROOT}/$host/$project";
+    }
+    else
+    {
+      chdir "$CONFIG{STAGE_ROOT}/$host";
+    }
+
+    if ($?)
+    {
+        warn "$cmd: make_archive: Could not change directory to " .
+            "$CONFIG{STAGE_ROOT}/$host: $!\n";
+        return 0;
+    }
+
+    #
+    # You say Weblist, I say weblist...
+    #
+    $weblist = ($host eq 'www.hp.com') ? 'Weblist' : 'weblist';
+
+    $tar = new Archive::Tar;
+    unless (defined $tar)
+    {
+        warn "$cmd: make_archive: Error allocating Archive::Tar object: " .
+            Archive::Tar::error . "\n";
+        return 0;
+    }
+
+
+    #
+    # remember, hp.com doesn't want the project in the tar archive...
+    #
+    $project_dir = ($host eq 'www.hp.com') ? '' : "$project/";
+
+    $fh = new IO::File "< $project_dir$weblist";
+    unless (defined $fh)
+    {
+        warn "$cmd: make_archive: Error opening $project/$weblist for " .
+            "reading: $!\n";
+        return 0;
+    }
+
+    #
+    # We should be cleared for take-off by this point
+    #
+    print "Building tar archive file from $weblist\n" unless ($opts{terse});
+    print "$cmd: make_archive: Creating archive $file\n" if ($DEBUG & 2);
+    $num_files = 0;
+    while (defined($line = <$fh>))
+    {
+        #
+        # Skip any comments and OBS lines (obviously we aren't adding any
+        # files for these lines, they're only so the client end can delete
+        # the files).
+        #
+        next if $line =~ /^\s*$/;
+        next if $line =~ /^\#/;
+        if ($line =~ /^obs\s+/i)
+        {
+            $num_obs++;
+            if ($verbose)
+            {
+                $one_file = (split(/\s+/, $line))[1];
+                print "o - $one_file\n";
+            }
+            next;
+        }
+
+        # Filename is the second item in the line:
+        $one_file = (split(/\s+/, $line))[1];
+        # ...and is relative to $project from where we sit:
+        $tar->add_files("$project_dir$one_file");
+        if ($verbose)
+        {
+            print "a - $one_file\n";
+        }
+        else
+        {
+            print "$cmd: make_archive: ...Added $one_file\n" if ($DEBUG & 2);
+        }
+        $num_files++;
+    }
+    $fh->close;
+    # Add the weblist itself
+    $tar->add_files("$project_dir$weblist");
+    printf("$cmd: %s %s in archive (plus weblist), %s %s being " .
+           "marked\nfor removal\n",
+           ($num_files ? "$num_files" : 'no'), noun_form('file', $num_files),
+           ($num_obs   ? "$num_obs"   : 'no'), noun_form('file', $num_obs))
+        unless ($opts{terse});
+
+    #
+    # Here we encountered a new sort of problem: previous incarnation of
+    # this code provided "progress status" via the tar command's "v" key
+    # (verbose output). Since we aren't using that directly anymore, we
+    # need to assure the user that things are still functioning and that
+    # the tool hasn't crashed.
+    #
+    if ($opts{terse})
+    {
+        # If they want terse, they can have it...
+        $line = $tar->write($file, $compress);
+    }
+    else
+    {
+        # Preferred-- a 1-second interval ticker
+        my $counter = 0;
+        $SIG{ALRM} = sub {
+            print STDOUT '.';
+            $counter++;
+            $counter %= 75;
+            print STDOUT "\n" unless ($counter);
+            alarm(1);
+        };
+        alarm(1);
+        $line = $tar->write($file, $compress);
+        alarm(0);
+        $SIG{ALRM} = 'IGNORE';
+        print "\n";
+    }
+    if (! defined $line)
+    {
+        warn "$cmd: make_archive: Error writing tar file $file: " .
+            Archive::Tar::error . "\n";
+        return 0;
+    }
+
+    return 1 if ($num_files + $num_obs);
+    return 2;
+}
+
+###############################################################################
+#
+#   Sub Name:       make_target
+#
+#   Description:    Execute a make command for the specified target within
+#                   the project area.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $project  in      scalar    Project name
+#                   $target   in      scalar    Target for make
+#                   $dir      in      scalar    Directory in which to exec
+#                   $host     in      scalar    Host releasing to 
+#
+#   Globals:        $LOGFILE
+#                   $DEBUG
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################
+sub make_target
+{
+    my ($project, $target, $dir, $host) = @_;
+
+    #
+    # Quietly return a success flag if there is no Makefile present
+    #
+    return 1 unless (-e "$dir/$project/Makefile");
+
+    my $cwd = cwd;
+    unless (chdir "$dir/$project")
+    {
+        warn "$cmd: make_target: Could not cd to $dir/$project: $!\n";
+        return 0;
+    }
+
+    #
+    # Run make in this dir, taking care to not kill the running process
+    #
+    write_log_line($LOGFILE,
+                   sprintf("%s [$$] [%s] Makefile detected in " .
+                           "$dir/$project; Running ``make $target''",
+                           $cmd, scalar localtime))
+        if ($DEBUG & 4); # bxxxxx1xx
+    print "Running ``make $target'' in $dir/$project:";
+    my $results = eval_make_target($target, "$dir/$project", $host);
+    if (defined $results)
+    {
+        #
+        # An error (other than "no rule to make $target") was detected in
+        # the make sub-process
+        #
+        my $date = scalar localtime;
+        write_log_line($LOGFILE,
+                       "$cmd [$$] [$date] Error from make process:",
+                       (map { "--> $_" } (@$results)))
+            if ($DEBUG);
+        #
+        # Don't want this multi-line mess going to the logfile twice
+        #
+        print STDERR "\n$cmd: make_target: Error from make:\n\t" .
+            join("\n\t", @$results) . "\n\n";
+        return 0;
+    }
+    else
+    {
+        print " OK\n";
+    }
+
+    chdir $cwd;
+    1;
+}
+
+###############################################################################
+#
+#   Sub Name:       noun_form
+#
+#   Description:    Conditionally pluralize a word
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $word     in      scalar    Word to consider
+#                   $quant    in      scalar    Quantity of $word
+#
+#   Returns:        Success:    plural form of $word
+#
+###############################################################################
+sub noun_form
+{
+    my ($word, $quant) = @_;
+
+    if ($quant != 1)
+    {
+        $word .= 's';
+        $word =~ s/ss$/ses/;
+    }
+
+    $word;
+}
+
+###############################################################################
+#
+#   Sub Name:       read_password
+#
+#   Description:    Emit a prompt ("Password: ") and set term I/O for no echo
+#                   long enough to read and store a password.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $prompt   in      scalar    Optional-- if passed, use this
+#                                                 string as the prompt
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    string
+#                   Failure:    undef
+#
+###############################################################################
+sub read_password
+{
+    my $prompt = shift || 'Password: ';
+
+    print STDOUT $prompt;
+    ReadMode 'noecho';
+    my $passwd = ReadLine 0;
+    ReadMode 'restore';
+
+    chomp $passwd;
+    $passwd;
+}
+
+###############################################################################
+#
+#   Sub Name:       scan_project
+#
+#   Description:    Build a hash table of all the files in the given project's
+#                   staging area using File::Find. Exclude any files specified
+#                   in the hash table %exclude_files. Record the paths as
+#                   relative to the actual basedir (which is dependant on
+#                   whether this is scanning the populate or stage area).
+#                   $exclude and subsequent related processing is local to
+#                   function so that a particular call does not affect others
+#                   (which would happen if global %exclude_files was used)
+#
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $project  in      scalar    Name of project to search
+#                   $which    in      scalar    One of 'stage' or 'populate'
+#                   $host     in      scalar    Host being staged to
+#                   $exclude  in      scalar    relative paths to exclude
+#                   $include  in      scalar    relative paths to include
+#
+#   Globals:        %exclude_files
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    hashref
+#                   Failure:    undef, error message via warn()
+#
+###############################################################################
+sub scan_project
+{
+    my $project = shift;
+    my $which   = lc shift || 'populate'; # Default to the populate function
+    my $host    = shift; 
+    my @exclude = split (',', shift); 
+    my @include = split ',', shift; 
+
+    my ($matches, $wanted, $trim_length, $base_dir, $base, $base2, $type,
+        $dest, $mtime, %files);
+    #
+    # Create a closure version of the regex check, so that Perl still only
+    # compile the regex once, and not ever iteration over File::Find
+    #
+    if (defined $exclude_files{__RE__} and $exclude_files{__RE__})
+    {
+        $matches = eval "sub { \$_[0] =~ /$exclude_files{__RE__}/ }";
+    }
+    else
+    {
+        $matches = sub { 0 };
+    }
+
+    #
+    # Determine the dir we'll be searching from, and save it's length for use
+    # with substr() later on
+    #
+    if ($which eq 'stage')
+    {
+        $base_dir = "$CONFIG{STAGE_ROOT}/$host/$project";
+    }
+    elsif ($which eq 'populate')
+    {
+        $base_dir = "$CONFIG{PROJECT_ROOT}/$project";
+    }
+    else
+    {
+        warn "$cmd: scan_project: Unknown operating mode: $which\n";
+        return undef;
+    }
+    $trim_length = length($base_dir) + 1;
+
+    #
+    # Add $base_dir to all exclude dirs for matching purposes
+    #
+    @exclude = map $base_dir . '/' . $_, @exclude;
+
+    my %exclude_local, %exclude_dirs;
+
+    foreach (@exclude)
+    {
+      if (-d $_)
+      {
+	$exclude_dirs{$_} = 1;
+      }
+      else
+      {
+	$exclude_local{$_} = 1;
+      }
+    }
+
+
+    #
+    # Create the "wanted" routine that gets passed to File::Find::find. It
+    # decides which files get saved and which don't.
+    #
+    $wanted = sub
+    {
+        # $File::Find::dir is the dir path, $_ the leaf, and ::name the whole
+#print "FILE:$_\t$File::Find::dir \t $File::Find::name\n"; #WAMO
+        return ($File::Find::prune = 1) if ($_ eq 'CVS' or $_ eq '_local');
+
+	#don't bother to look any farther in the tree
+        return ($File::Find::prune = 1) if (defined $exclude_dirs{$File::Find::name}); 
+
+        return if (-d $File::Find::name); # only interested in files
+        # Excluded by name?
+        return if (defined $exclude_files{$_});
+        return if (defined $exclude_local{$File::Find::name});
+        # Excluded by a catch-all regex?
+        return if (&$matches($_));
+
+        #
+        # Hook for future handling of external sources via symlinks
+        # (for now just skip links)
+        #
+        return if (-l $_);
+
+        $base = substr($File::Find::name, $trim_length);
+        $base2 = dirname $base;
+        $base2 = ($base2 eq '.') ? '' : "/$base2";
+        $dest = "/$project$base2";
+        $mtime = (lstat($File::Find::name))[9];
+        if ($_ =~ /\.html?$/i)
+        {
+            $type = 'Doc';
+        }
+        elsif ($_ =~ /\.(cgi|pl)$/i or $base =~ /cgi-bin/)
+        {
+            $type = 'Bin';
+        }
+        elsif ($base =~ m|^scripts/|)
+        {
+            $type = 'Scr';
+        }
+        elsif ($base =~ m|^startup_scripts/|)
+        {
+            $type = 'SSc';
+        }
+        elsif ($base =~ m|^servlets/|)
+        {
+            $type = 'Srv';
+        }
+        elsif ($_ =~ /\.map$/) # De we even use these anymore?
+        {
+            $type = 'Map';
+        }
+        else
+        {
+            # Generic catch-all
+            $type = 'Fig';
+        }
+
+        #
+        # The base path provides a unique key. We also want the destination
+        # path, which we worked out earlier, the file type and the mod-time.
+        #
+        $files{$base} = [ $dest, $type, $mtime ];
+    };
+
+    find($wanted, $base_dir);
+    \%files;
+}
+
+###############################################################################
+#
+#   Sub Name:       unlock_project
+#
+#   Description:    Attempt to release a lock placed on a project by
+#                   lock_project.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $projlock in      scalar    Lock, implemented as a scalar
+#                                                 file name
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0, with more information if list context
+#
+###############################################################################
+sub unlock_project
+{
+    my $projlock = shift;
+
+    print "unlock_project: $projlock\n" if ($DEBUG & 8);
+    #
+    # Since we implement the lock as a symlink pointing to a PID, a normal
+    # stat attempts to stat whatever that number is, expecting it to be a
+    # physical file in the same directory. The lstat call gets around this
+    # by stat'ing the link itself, instead.
+    #
+    if (! (lstat($projlock) && -e _))
+    {
+        return ((wantarray) ?
+                (0, 'unlock_project called with non-existant lockfile') : (0));
+    }
+
+    my $pid = readlink($projlock);
+    if (! defined($pid))
+    {
+        return ((wantarray) ?
+                (0, sprintf("unlock_project could not read lock %s: $!",
+                            $projlock)) :
+                (0));
+    }
+    elsif ("$pid" ne "$$")
+    {
+        return ((wantarray) ?
+                (0, "unlock_project: lock %s not owned by this process") :
+                (0));
+    }
+    elsif (! unlink($projlock))
+    {
+        return ((wantarray) ?
+                (0, sprintf("unlock_project was unable to release lock %s: $!",
+                            $projlock)) :
+                (0));
+    }
+
+    1;
+}
+
+###############################################################################
+#
+#   Sub Name:       update_topiclist
+#
+#   Description:    Update the contents of the topic-list file in the project
+#                   root directory. Create it if it doesn't already exist.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $project  in      scalar    The project being operated on
+#                   $host     in      scalar    Host being staged to
+#                   $listfile in      scalar    Name of the topic-list file.
+#                                                 Null defaults to "TopicList"
+#
+#   Globals:        $LOGFILE
+#                   $DEBUG
+#                   %CONFIG
+#                   %opts
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################
+sub update_topiclist
+{
+    my ($project, $host, $listfile) = @_;
+
+    $listfile = 'TopicList' unless (defined $listfile and $listfile);
+
+    my $title = $opts{t} || $project;
+    my ($field, $value, $listpath);
+
+    #
+    # Make sure that the file is an absolute path, defaulting to STAGE_ROOT
+    # It is expected that if STAGE_ROOT is host-sensitive, that the host has
+    # already been post-pended.
+    #
+    $listpath = $listfile;
+    if ($listpath =~ m|^/|o)
+    {
+        ($listfile) = $listpath =~ m|.*/(.*)$|;
+    }
+    else
+    {
+        $listpath = "$CONFIG{STAGE_ROOT}/$host/$project/$listfile";
+    }
+
+    # open target file for writing
+    my $fh = new IO::File "> $listpath";
+    if (! defined($fh))
+    {
+        warn "$cmd: update_topiclist: Could not open $listpath for writing: " .
+            "$!\n";
+        return 0;
+    }
+    # open (current) internal topiclist as source
+    my $fh2 = new IO::File "< $CONFIG{STAGE_ROOT}/$host/$project/" .
+        "$CONFIG{TOPICLIST}";
+    if (! defined($fh2))
+    {
+        warn "$cmd: update_topiclist: Could not open $CONFIG{STAGE_ROOT}" .
+            "/$host/$project/$CONFIG{TOPICLIST} for reading: $!\n";
+        return 0;
+    }
+    write_log_line($LOGFILE,
+                   "$opts{date} [$$] Creating $listfile from " .
+                   "$CONFIG{TOPICLIST}")
+        if ($DEBUG & 12); # bxxxx11xx
+
+    print $fh "# $listfile - written by $cmd for $opts{user} - $opts{date}\n";
+    while (defined($_ = <$fh2>))
+    {
+        chomp;
+        next if /^\s*(\#.*)?$/o;
+
+        ($field, $value) = split(/\t+/, $_, 2);
+        if (lc $field eq 'owner')
+        {
+            #
+            # The -e switch can override the existing value
+            #
+            if (defined $opts{e} and $opts{e})
+            {
+                print $fh "$field\t$opts{e}\n";
+            }
+            else
+            {
+                print $fh "$field\t$opts{user}\@$CONFIG{DEVHOST}\n";
+            }
+        }
+        elsif (lc $field eq 'title')
+        {
+            #
+            # The -t switch can provide a replacement, if passed. We 
+            # accomodated that when we assigned $title
+            #
+            print $fh "$field\t$title\n";
+        }
+        else
+        {
+            print $fh "$_\n";
+        }
+    }
+    $fh2->close;
+    $fh->close;
+    chmod 0664, $listfile;
+
+    1;
+}
+
+###############################################################################
+#
+#   Sub Name:       update_int_weblist
+#
+#   Description:    Update/create the internal weblist file, specified in
+#                   $ENV{WEBLIST}, based on any recent changes made to the
+#                   source base.
+#                   This file has to always contain an entry for every file
+#                   in the project, including the obsoleted ones. This is
+#                   done after each stage operation, and the list of files
+#                   in the directory tree is compared against the existing
+#                   weblist to decide which ones have been recently obsoleted
+#                   or added.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $project  in      scalar    Project being updated
+#
+#   Globals:        $DEBUG
+#                   $LOGFILE
+#                   %CONFIG
+#                   %opts
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################
+sub update_int_weblist
+{
+    my ($project) = @_;
+
+    my (%existing, %current, $pathname, $type, $name, $dest, $mtime, $scanned,
+        @new_added, @new_obs, $fh, $file_exists, @command, $weblist_changes,
+        %file_lines);
+
+    @new_added  = ();
+    @new_obs    = ();
+    %existing   = ();
+    %current    = ();
+    %file_lines = ();
+    my $now     = time; # Used both for legacy weblists and for new OBS entries
+
+    my $cwd = cwd;
+    chdir "$CONFIG{PROJECT_ROOT}/$project";
+    if ($?)
+    {
+        warn "$cmd: update_int_weblist: Could not chdir to " .
+            "$CONFIG{PROJECT_ROOT}/$project: $!\n";
+        return 0;
+    }
+    #
+    # The file (this is always post-populate)
+    #
+    $pathname = $CONFIG{WEBLIST};
+    #
+    # Get the contents of the existing weblist file if there is one
+    #
+    if (-e $pathname)
+    {
+        $file_exists = 1;
+        # Try to ensure that the file is up-to-date before editing it
+        cvs_exec('update', $pathname);
+        $weblist_changes = 0; # Default to assuming it hasn't
+        $fh = new IO::File "< $pathname";
+        if ($?)
+        {
+            warn "$cmd: update_int_weblist: Error opening $pathname for " .
+              "reading: $!\n";
+            return 0;
+        }
+        for (<$fh>)
+        {
+            chomp;
+            next if (/^\#/ or /^\s*$/);
+            ($type, $name, $dest, $mtime) = split /\s+/;
+            # For legacy .weblist files -- this will eventually be unnecessary
+            $mtime = $mtime || $now;
+            if ($type eq 'OBS')
+            {
+                #
+                # Add to the current{} table, to keep a running list. Don't add
+                # to the existing{} table, or we keep reporting the same OBS
+                # entries every time.
+                #
+                $current{$name}  = [$type, $dest, $mtime];
+            }
+            else
+            {
+                # Ordinary handling
+                $existing{$name} = [$type, $dest, $mtime];
+            }
+            $file_lines{$name} = $_;
+        }
+        $fh->close;
+    }
+    else
+    {
+        $file_exists = 0;
+        $weblist_changes = 1; # Well, it will be now...
+    }
+
+    #
+    # Scan the project staging area for a current list of files
+    #
+    $scanned = scan_project $project;
+
+    #
+    # Over this list of files, do the following:
+    #
+    #     Convert the full path into the name/dest pair weblists use
+    #     Check for new files in this staging
+    #     Delete keys from %existing so we can catch newly-OBS files
+    #
+    for (sort keys %$scanned)
+    {
+        #
+        # The iterative value of $_ corresponds to the name part of the quad
+        #
+        ($dest, $type, $mtime) = @{$scanned->{$_}};
+        $current{$_} = [ $type, $dest, $mtime ];
+        if (exists $existing{$_})
+        {
+            #
+            # Delete it from this table so we can later determine what files
+            # have recently been dropped.
+            #
+            delete $existing{$_};
+        }
+        else
+        {
+            #
+            # This file has only just shown up this staging.
+            #
+            push(@new_added, $_);
+        }
+    }
+    #
+    # Any keys remaining in %existing represent files not found in the current
+    # source base, so they are assumed to have been obsoleted.
+    #
+    @new_obs = sort keys %existing;
+
+    #
+    # Inform the user of new additions and deletions
+    #
+    if (scalar @new_added)
+    {
+        print STDOUT "\nThe following files have been added:\n\t/";
+        print STDOUT join("\n\t/", @new_added);
+        print STDOUT "\n";
+
+        #
+        # Whether this flag was set before or not, there were at least this
+        # many changed (added) lines in the weblist
+        #
+        $weblist_changes = scalar @new_added;
+    }
+    if (scalar @new_obs)
+    {
+        print STDOUT "\nThe following files have been removed:\n\t/";
+        print STDOUT join("\n\t/", @new_obs);
+        print STDOUT "\n";
+
+        #
+        # Of course, the OBS entries still have to appear in the current
+        # weblist, with their old type set to OBS:
+        #
+        for (@new_obs)
+        {
+            $current{$_} = ['OBS', @{$existing{$_}}[1..2]];
+        }
+    }
+
+    #
+    # Determine the total changes to the weblist:
+    #
+    # For each entry in %current, compare what its line would look like to
+    # the line from %file_lines. Each differing line inc's $weblist_changes.
+    # At the end, if there are any keys left in %file_lines, add that scalar
+    # to the count, as well. We don't currently use the count, but we could
+    # for a debugging line, maybe.
+    #
+    for (keys %current)
+    {
+        next unless (defined $file_lines{$_}); # Already counted earlier
+
+        $weblist_changes++
+            if ($file_lines{$_} ne sprintf("%s\t$_\t%s\t\t%s",
+                                           @{$current{$_}}));
+    }
+
+    if ($weblist_changes)
+    {
+        #
+        # Create and commit the new $CONFIG{WEBLIST}
+        #
+        $fh = new IO::File "> $pathname";
+        if ($?)
+        {
+            warn "$cmd: update_int_weblist: Error opening $pathname for " .
+              "writing: $!\n";
+            return 0;
+        }
+        print $fh sprintf("# File $CONFIG{WEBLIST} %s by $cmd on %s for %s\n",
+                          ($file_exists) ? 'updated' : 'created',
+                          $opts{date}, $opts{user});
+        for (sort keys %current)
+        {
+            ($type, $dest, $mtime) = @{$current{$_}};
+            print $fh "$type\t$_\t$dest\t\t$mtime\n";
+        }
+        $fh->close;
+
+        if (! $file_exists)
+        {
+            # Do a cvs add before committing
+            @command = ('add');
+            push(@command, $pathname);
+
+            unless (cvs_exec @command)
+            {
+                warn "$cmd: update_int_weblist: CVS 'add' execution failed\n";
+                return 0;
+            }
+        }
+
+        @command = ('commit');
+        push(@command,
+             '-m', sprintf("Automatic %s on $opts{date} by $opts{user}",
+                           ($file_exists) ? 'update' : 'creation'));
+        push(@command, $pathname);
+
+        unless (cvs_exec @command)
+        {
+            warn "$cmd: update_int_weblist: CVS 'commit' execution failed\n";
+            return 0;
+        }
+    }
+    else
+    {
+        print "No change to $CONFIG{WEBLIST} needed\n";
+        $mtime = time;
+        utime $mtime, $mtime, $pathname;
+    }
+
+    chdir $cwd;
+    1;
+}
+
+###############################################################################
+#
+#   Sub Name:       update_weblist
+#
+#   Description:    Create a current "weblist" file for the project based on
+#                   the current state of the internal file ($ENV{WEBLIST}) and
+#                   files that have been updated since the last release.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $project  in      scalar    Project being updated
+#                   $host     in      scalar    Target host for this operation
+#                   $buildconfig in   hash ref  ref to hash listing build config
+#
+#   Globals:        $DEBUG
+#                   $LOGFILE
+#                   %CONFIG
+#                   %opts
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################
+sub update_weblist
+{
+    my $project     = shift;
+    my $host        = shift;
+    my $buildconfig = shift;
+
+    my ($scanned, $fh, $fullpath, $last_release, $name, $dest, $type, $mtime,
+        $weblist, $release_file, @date_parts, $src, @keylist, $fh2);
+
+    $opts{full} |= 0; # Force to a testable true/false value
+    $fullpath = "$CONFIG{STAGE_ROOT}/$host/$project";
+    $weblist = ($host eq 'www.hp.com') ? 'Weblist' : 'weblist';
+    $release_file = $fullpath . '/.release';
+
+    my $cwd = cwd;
+    chdir $fullpath;
+    if ($?)
+    {
+        warn "$cmd: update_weblist: Could not chdir to $fullpath: $!\n";
+        return 0;
+    }
+
+    #
+    # Simple constant for three-letter month <=> number conversion
+    #
+    my $i = 0;
+    my %MONTH = map { $_, $i++ } (qw(Jan Feb Mar Apr May Jun
+                                     Jul Aug Sep Oct Nov Dec));
+
+    #
+    # If there is a file in the project stage area for $CONFIG{WEBLIST}
+    # then read the file info from it, otherwise scan the stage area.
+    #
+    if (defined $buildconfig && defined %$buildconfig && %$buildconfig)
+    {
+        $scanned = scan_project ($project, 'stage', $host, $buildconfig->{exclude});
+    }
+    elsif (-e "$fullpath/$CONFIG{WEBLIST}")
+    {
+        $scanned = {};
+
+        $fh = new IO::File "< $fullpath/$CONFIG{WEBLIST}";
+        if (! defined($fh))
+        {
+            warn "$cmd: update_weblist: Error opening $fullpath/" .
+                "$CONFIG{WEBLIST} for reading: $!\n";
+            return 0;
+        }
+        while (defined($_ = <$fh>))
+        {
+            chomp;
+            next if (/^\s*$/ or /^\#/);
+            ($type, $src, $dest, $mtime) = split;
+            $scanned->{$src} = [$type, $dest, $mtime];
+        }
+        $fh->close;
+    }
+    else
+    {
+        $scanned = scan_project $project;
+    }
+
+    #
+    # Here we are looking to select a subset of the files in %$scanned that
+    # will be written to the weblist. If there is an existing "release" file
+    # we go through it to find the date-stamp and then use that to prune down
+    # the list of files from the full set to only those that have changed 
+    # since the last release.
+    #
+    if ((-e $release_file) && (! $opts{full}))
+    {
+        #
+        # Read the last release information, specifically the release timestamp
+        #
+        $fh = new IO::File "< $release_file";
+        if ($?)
+        {
+            warn "$cmd: update_weblist: Error opening $release_file for " .
+              "reading: $!\n";
+            return 0;
+        }
+        while (defined($_ = <$fh>))
+        {
+            next unless /^date/i;
+            chomp;
+
+            $_ =~ s/^date\s+//i;
+            @date_parts = split;
+            #
+            # timelocal() requires (SS, MM, HH, month-day, month, year) just
+            # like that. We have #4 and #6 already, and can get #5 from %MONTH.
+            # To cheat/save time on #1-3, split that part of the date string
+            # on the ':' characters and reverse the list...
+            #
+            $last_release = timelocal((reverse split(/:/, $date_parts[3])),
+                                      $date_parts[2],         # month-day
+                                      $MONTH{$date_parts[1]}, # month
+                                      $date_parts[4]);        # year
+        }
+        $fh->close;
+
+        #
+        # Select only those keys that have an mtime newer than the last
+        # release. The mtime is at index 2 in the listref stored in $scanned.
+        #
+        for (sort keys %$scanned)
+        {
+            push(@keylist, $_) if ($scanned->{$_}->[2] >= $last_release);
+        }
+    }
+    else
+    {
+        #
+        # There is either no existing release file to rely upon, or the user
+        # requested a full staging. Do a full weblisting, no mtime checks.
+        #
+        @keylist = sort keys %$scanned;
+    }
+
+    #
+    # Now that we have the set of files, we can start creating the weblist
+    # file. We'll start by listing all these files, then add all OBS files
+    # from the $CONFIG{WEBLIST} file. At some point, I want to be able to
+    # distinguish those, as well.
+    #
+    if ($host eq 'www.hp.com')
+    {
+        #
+        # We have to translate the type-markers, use a different filename,
+        # and omit the destination field for the corporate server.
+        #
+        my %map = ( 'Bin' => 'CGI',
+                    'Map' => 'MAP',
+                    'Fig' => 'ASIS',
+                    'Doc' => 'HTML',
+                    'OBS' => 'OBS' );
+        $fh = new IO::File "> $fullpath/$weblist";
+        if ($?)
+        {
+            warn "$cmd: update_weblist: Error opening $weblist for writing: " .
+                "$!\n";
+            return 0;
+        }
+        chmod 0666, $weblist;
+        print $fh "# $weblist - written by $cmd for $opts{user} - " .
+            "$opts{date}\n";
+        for (@keylist)
+        {
+            $type = $map{$scanned->{$_}->[0]} || 'ASIS';
+            $type = 'TEXT' if ($type eq 'ASIS' and $_ =~ /\.txt$/i);
+            print $fh "$type\t./$_\n";
+        }
+        print $fh "# Files below this point are obsoleted from $project\n";
+        #
+        # Open the existing $CONFIG{WEBLIST} file and copy any of the OBS
+        # records over, accounting for the difference in syntax for hp.com
+        #
+        $fh2 = new IO::File "< $fullpath/$CONFIG{WEBLIST}";
+        if ($?)
+        {
+            warn "$cmd: update_weblist: Error opening $fullpath" .
+                "$CONFIG{WEBLIST} for reading: $!\n";
+            return 0;
+        }
+        while (defined($_ = <$fh2>))
+        {
+            next unless /^OBS/;
+            ($type, $src, $dest) = split;
+            print $fh "$type\t./$src\n";
+        }
+        $fh2->close;
+        $fh->close;
+    }
+    else
+    {
+        #
+        # All the other servers are the ones we (IMSS/ATG) manage with our
+        # own package server software.
+        #
+        $fh = new IO::File "> $weblist";
+        if ($?)
+        {
+            warn "$cmd: update_weblist: Error opening $weblist for writing: " .
+                "$!\n";
+            return 0;
+        }
+        chmod 0666, $weblist;
+        print $fh "# $weblist - written by $cmd for $opts{user} - " .
+            "$opts{date}\n";
+        for (@keylist)
+        {
+            $src = $_;
+            ($type, $dest) = @{$scanned->{$src}};
+            next if ($type eq 'OBS'); # We report these later in the file
+            unless ($HOSTS{$host}->{NO_TRANSLATE_CGI})
+            {
+                #
+                # Swap around the project name and cgi-bin path element. This
+                # is something of a throwback to www.interactive, since now
+                # most projects just use their own virtual hostname (hence the
+                # NO_TRANSLATE_CGI database field).
+                #
+                if (($type eq 'Bin') && ($src =~ /^cgi-bin/))
+                {
+                    $dest = dirname $src;
+                    $dest =~ s!cgi-bin!/cgi-bin/$project!;
+                }
+                elsif (($type eq 'Scr') && ($src =~ /^scripts/))
+                {
+                    $dest = dirname $src;
+                    $dest =~ s!scripts!/$project/scripts!;
+                }
+                elsif (($type eq 'SSc') && ($src =~ /^startup_scripts/))
+                {
+                    $dest = dirname $src;
+                    $dest =~ s!startup_scripts!/$project/startup_scripts!;
+                }
+                elsif (($type eq 'Srv') && ($src =~ /^servlets/))
+                {
+                    $dest = dirname $src;
+                    $dest =~ s!servlets!/$project/servlets!;
+                }
+            }
+            print $fh "$type\t$src\t$dest\n";
+        }
+        print $fh "# Files below this point are obsoleted from $project\n";
+        for (@keylist)
+        {
+            $src = $_;
+            ($type, $dest) = @{$scanned->{$src}};
+            next unless ($type eq 'OBS'); # We only want OBS this time
+            print $fh "$type\t$src\t$dest\n";
+        }
+        $fh->close;
+    }
+
+    #
+    # That's it, we should be done at this point
+    #
+    chdir $cwd;
+    return 1;
+}
+
+###############################################################################
+#
+#   Sub Name:       usage
+#
+#   Description:    Construct a USAGE-style string based on the command that
+#                   this script was called as.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $name     in      scalar    Last component of $0
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        text string
+#
+###############################################################################
+sub usage
+{
+    my $name = shift;
+
+    my $common = "\t[ -h ] [ -e addr ] [ -cvsroot dir ] [ -debug ] " .
+        "[ -verbose ] [ -terse ]\n\t[ -log file ]";
+    my $common_desc = "-e addr\t\tAdditional e-mail addresses to send mail to
+-cvsroot dir\tUse dir as the CVS repository root
+-debug\t\tEnable debugging activity (application-dependant)
+-verbose\tProvide more feedback information on console
+-terse\t\tOutput less feedback information on console
+-log file\tUse file as the logging destination
+
+-h\t\tShow this help\n";
+
+    if ($name eq $MAIN)
+    {
+        my ($dir) = $0 =~ m|^(.*)/|o;
+        return "Usage: $name [ -d dir ]
+
+where dir is the directory in which to make links (default is $dir)";
+    }
+    elsif ($name eq $POPULATE)
+    {
+        return "Usage: $name project [ -t title ] [ -r symbol ] [ -tag tag ]
+$common
+
+where:
+project\t\tName of the project in the repository
+-t title\tUse title instead of the project name as the target directory
+-r symbol\tUse symbol with CVS to populate a specific baseline of the files
+$common_desc";
+    }
+    elsif ($name eq $STAGE)
+    {
+        return "Usage: $name host project [ -t title ] [ -r symbol ]
+$common
+
+where:
+host\t\tDestination host to generate URL and path translations for
+project\t\tName of the project in the repository
+-t title\tUse title instead of the project name as the target directory
+-r symbol\tUse symbol with CVS to populate a specific baseline of the files
+$common_desc";
+    }
+    elsif ($name eq $RELEASE)
+    {
+        return
+"Usage: $name [ host ] project [ -save ] [ -noxfer ]
+$common
+For host www.hp.com only:
+\t[ -u userid ] { [ -update ] [ -stage ] [ -prod ] }
+
+where:
+host\t\t(if specified) Release to host only if staged for this host
+project\t\tName of the project in the repository
+-save\t\tSave the archive file and release ticket in the staging area
+-noxfer\t\tCreate the archive, but don't transfer to host (implies -save)
+$common_desc";
+    }
+    else
+    {
+        return "Usage: call as one of $POPULATE, $STAGE, $RELEASE or $MAIN
+
+Call as one of the above names for a summary of options accepted by that tool.
+";
+    }
+}
+
+###############################################################################
+#
+#   Sub Name:       validate_user
+#
+#   Description:    Check that the user attempting to release is authorized
+#                   for release of the given project and the given host. If
+#                   they are, challenge them for their password and verify it
+#                   against the password in their /etc/passwd entry.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $host     in      scalar    The host being released to
+#                   $project  in      scalar    Project being released
+#                   $user     in      scalar    User trying to release
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1, no errors and a valid user
+#                   Failure:    0, either an error or a bad password
+#
+###############################################################################
+sub validate_user
+{
+    my ($host, $project, $user) = @_;
+
+    my $passwd;   # The password entered by the user
+    my $userpass; # The user's encrypted password from getpwnam()
+
+    $userpass = (getpwnam($user))[1];
+    print "Password required for $user release of $project to $host:\n";
+    $passwd = read_password "($user\@$CONFIG{DEVHOST}): ";
+    print "\n";
+    $passwd = crypt($passwd, substr($userpass, 0, 2));
+    unless ($userpass eq $passwd)
+    {
+        warn "$cmd: validate_user: Incorrect password.\n";
+        return 0;
+    }
+
+    1;
+}
+
+###############################################################################
+#
+#   Sub Name:       write_info_file
+#
+#   Description:    Upon request, dump the %info table (passed here as a ref)
+#                   into a file just as the old tools did. This is needed for
+#                   cases where we have to fall back on FTP, or where the
+#                   user requests that the files be saved.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $tar      in      scalar    Tarfile path name, used to
+#                                                 derived an info filename
+#                   $host     in      scalar    Host package is staged for
+#                   $info     in      hashref   Reference to the hash of info
+#                                                 keys/values associated with
+#                                                 the tarfile
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    the name of the new file and remote file
+#                   Failure:    undef
+#
+###############################################################################
+sub write_info_file
+{
+    my ($tar, $tar_remote, $host, $info) = @_;
+
+    my ($infofile, $infofile_remote, $fh);
+
+    #
+    # Yes, yet another hp.com variant...
+    #
+    my $tar_suffix = ($host eq 'www.hp.com') ? 'pkg' : 'tar'; 
+    my $suffix = ($host eq 'www.hp.com') ? 'tix' : 'info'; 
+
+    ($infofile = $tar) =~ s/\.gz$//;
+    $infofile =~ s/$tar_suffix$/$suffix/;
+
+    ($infofile_remote = $tar_remote) =~ s/\.gz$//;
+    $infofile_remote =~ s/$tar_suffix$/$suffix/;
+
+    $fh = new IO::File "> $infofile";
+    if (! defined $fh)
+    {
+        warn "$cmd: write_info_file: Could not open $infofile for " .
+            "writing: $!\n";
+        return undef;
+    }
+
+    #
+    # hp.com gets a nice antiquated format...
+    #
+    if ($host eq 'www.hp.com')
+    {
+	my $email = $info->{email};
+	$email =~ s/,/ /g;  #hp.com wants spaces as delimiter?
+        my $checksum = $info->{crc};
+	$checksum =~ s/CRC: //;
+        print $fh <<"EOT";
+PUBLISH_KEY	:$info->{name}
+CHECKSUM	:$checksum
+JOB		:$info->{job}
+ARCHIVE		:tar
+WEBLIST		:Weblist
+INFORM_EXTRA	:$email
+REL_VERSION	:accessHP1.5
+EOT
+    }
+    else
+    {
+        for (sort keys %$info)
+        {
+            next if $_ eq 'crc';
+            print $fh "Info:$_\t$info->{$_}\n";
+        }
+        print $fh "$info->{crc}\n" if (exists $info->{crc});
+    }
+
+    $fh->close;
+
+    ($infofile, $infofile_remote);
+}

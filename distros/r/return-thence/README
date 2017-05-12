@@ -1,0 +1,63 @@
+NAME
+    return::thence - return values from up above
+
+SYNOPSIS
+    `return` has a seemed inconsistency when used within functions that take a
+    code block, such as `try` below.
+
+            use Try::Tiny;
+        
+            # will return 1
+            sub foo {
+                    try { return(2) };
+                    return 1;
+            }
+
+    This module introduces a `return::thence` keyword which returns from where
+    you really mean:
+
+            # will return 2
+            sub bar {
+                    try { return::thence(2) };
+                    return 1;
+            }
+
+DESCRIPTION
+    This module needs to perform a bit of guesswork to figure out where you
+    want to return from. Looking at the call stack, it returns from the first
+    named function (see Sub::Name, Sub::Identify) that was defined in the same
+    file and same package as its immediate caller.
+
+    `return::thence` doesn't especially differentiate between list and scalar
+    context.
+
+            sub baz { return::thence('a' .. 'z') };
+            my @baz = baz()     # 'a' .. 'z'        
+            my $baz = baz();    # 'z'
+
+    If you need more power, use Scope::Upper which is what this module uses
+    under the hood.
+
+BUGS
+    Skipping over XS stack frames can cause segfaults.
+
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=return-thence>.
+
+SEE ALSO
+    Scope::Upper.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

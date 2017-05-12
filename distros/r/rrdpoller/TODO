@@ -1,0 +1,4 @@
+v rrdpoller daemon with client support in current rrdpoller command
+- Abberant Behavior Detection support 
+  (see http://www.usenix.org/events/lisa2000/full_papers/brutlag/brutlag_html/)
+- Debug mode

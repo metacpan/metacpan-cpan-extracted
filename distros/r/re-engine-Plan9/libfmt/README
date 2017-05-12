@@ -1,0 +1,63 @@
+NAME
+    re::engine::Plan9 - Plan 9 regular expression engine
+
+SYNOPSIS
+        use re::engine::Plan9;
+
+        if ("bewb" =~ /(.)(.)/) {
+            print $1; # b
+            print $2; # e
+            print $'; # wb
+        }
+
+DESCRIPTION
+    Replaces perl's regex engine in a given lexical scope with Plan 9
+    regular expression provided by libregexp9. libregexp9 and the libfmt and
+    libutf it depends on from Plan 9 are shipped with the module.
+
+    The "/s" modifier causes "." to match a newline ("regcompnl") and the
+    "/x" modifier allegedly causes all characters to be treated literally
+    ("regcomplit"), see regexp9(3). The engine will "croak" if it's given
+    other modifier.
+
+    If an invalid pattern is supplied perl will die with an error from
+    regerror(3).
+
+CAVEATS
+    The Plan 9 engine only supports 32 capture buffers, consequently match
+    variables only go up to $31 ($& is number zero).
+
+SEE ALSO
+    regexp9(7) - Plan 9 regular expression notation
+        <http://swtch.com/plan9port/unix/man/regexp97.html>
+
+    regexp9(3) - regcomp, regexec etc.
+        <http://swtch.com/plan9port/unix/man/regexp93.html>
+
+    Unix Software from Plan 9
+        <http://swtch.com/plan9port/unix/>
+
+AUTHOR
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+LICENSE
+    Copyright 2007 Ævar Arnfjörð Bjarmason.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The included libutf, libfmt and libregexp9 libraries are provided under
+    the following license:
+
+        The authors of this software are Rob Pike and Ken Thompson.
+                     Copyright (c) 2002 by Lucent Technologies.
+        Permission to use, copy, modify, and distribute this software for any
+        purpose without fee is hereby granted, provided that this entire notice
+        is included in all copies of any software which is or includes a copy
+        or modification of this software and in all copies of the supporting
+        documentation for such software.
+        THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
+        WARRANTY.  IN PARTICULAR, NEITHER THE AUTHORS NOR LUCENT TECHNOLOGIES MAKE ANY
+        REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
+        OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
+

@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6d64a60e22bd4197fe46381bb870721896e6c1fe .Dockerfile
+SHA1 a75b0b7555dd81e780b50dad1cc3414badc95686 .travis.yml
+SHA1 4ce5b97c8474ebb4d39173ad8c235e8a9c4305fa Changes
+SHA1 017b0a6a88c31e32146d9891e72273e320fbeccf Hyperscan.h
+SHA1 76320bd1f85131e34ea7a89d2cf257cd6cc9026e Hyperscan.pm
+SHA1 66f96d3a4ec4b89c7ba3065f4d655d61d075cb71 Hyperscan.xs
+SHA1 25734697347567619e68499db96865dd3109576c LICENSE
+SHA1 59c2a8e50e12d1c871b22105279206b71ad2b505 MANIFEST
+SHA1 50fca6e75110bb191d6988efe499f441d3191c80 META.json
+SHA1 a6990bfa6c574fe29cab5541f3c1f0963449b65e META.yml
+SHA1 3135740b9533606baf04ff2417ca1a4fba2dd3c0 Makefile.PL
+SHA1 b35bc18d082c3cd3987f103794fbdd93e000941e README.md
+SHA1 62c7dbda2a4593aa2206c22b831d2e1372db79f9 t/00-compile.t
+SHA1 ffd6d3bdc097472df09cfa1775a2495907bdfef0 t/1-basic.t
+SHA1 41d2e2d47c4f2dfbe021287d3fa92f5c6cff98b5 t/capture.t
+SHA1 72685674be9db2eb6668b63c87fdbda74e4b0169 t/import.t
+SHA1 44d09bc5842ee64b0aa33191cafeb1e1fc1e6eac t/match.t
+SHA1 d84927b5cd98d623fcf52ad00423646672f4c058 t/perl/pat.t
+SHA1 84bbe32b9a48cdf8b35154fba7284e6830c31846 t/perl/re_tests
+SHA1 cb3ca92a89a89c6ee6f3b9c83f30b975bef33f09 t/perl/regexp.t
+SHA1 5f8e17a9d968d6cfa93d5b89a2b59494f4641ee4 t/perl/regexp_nc_tie.t
+SHA1 d6eec90241abc835551e64f7404b40270d5fba33 t/qr.t
+SHA1 496451a0d1c738ec3536aec516bff95d550a1274 t/s.t
+SHA1 8236c17e9ca3596c2b838387fb5d643d1f258337 t/split-null.t
+SHA1 6369fb35420115e71aa52827563fcc2dcb40095c t/split.t
+SHA1 faf2b58a23801921cc5245f56cb8bd3c0f0d9059 t/subexp.t
+SHA1 fa1e9e52ae3503fa3eb2e31f22f48fc492402d2e t/unimport.t
+SHA1 4b64fd3f8ce56b2467637088a5f08c0ffdc12cb6 t/z_kwalitee.t
+SHA1 6fc3b8f7e62fe68af3b439f1314a8ae391ab716c t/z_manifest.t
+SHA1 d91cc1b39fcb1dbf23c11ebb5885cfaaeb2c3a50 t/z_pod-coverage.t
+SHA1 98999a8028a140eab3e290952514ad873e29e535 t/z_pod-spell-mistakes.t
+SHA1 66af5a948ecb551fd89b7787674d2be638c6665d t/z_pod-spelling.t
+SHA1 8db603172315dd0853ecc383dba4945c5b673e8f t/z_pod.t
+SHA1 d4f0996b03c5c72e99bc3f0877c23f1ffad66da3 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWOfMQAAKCRCabZJij/3J
+QnKCAJ4wGd3alKagkc1t6W6++5ghfMPZ1gCfcEE2Zl9lExF4CyZj7etLoDWiYHM=
+=vcPB
+-----END PGP SIGNATURE-----

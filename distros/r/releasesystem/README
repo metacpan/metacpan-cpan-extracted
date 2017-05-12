@@ -1,0 +1,46 @@
+This is the whole Release System:
+
+
+Autodoc Automatically generated documentation using the deptree util 
+	under the utils dir.  Useful for determining what functions are 
+	called in a specific function. (though not entirely accurate)
+Docs
+	The HTML documentation thus far. Not complete of course, but I
+	hope better than nothing.
+
+IMS-ReleaseMgr
+	The Perl5 library of common code
+	Also contains oracle schema and tools under /misc
+
+devmgr
+	The client-side (developer) tools
+
+
+rlsmgr
+	The server-side (release manager) tools
+
+utils
+	Misc utils related to release manager
+	Includes sysmonitor utility to monitor uptime of processes and URLS
+
+Additional notes:
+
+IMS::DBConnect::GetDBConnect is a method to connect to oracle.
+Replace any of these calls with a standard DBI->connect call.
+
+LICENSE
+
+You may redistribute this under the terms of the Artistic License,
+as specified in the README file of Perl itself.  Please see the
+file ARTISTIC in your distribution of Perl or view the license at
+http://www.perl.com/pub/language/misc/Artistic.html
+
+You may send bug fixes and updates to webmaster@nafohq.hp.com 
+Please put "OPENSOURCE" in the subject line.
+
+This package is copyright 1998-2000 by Hewlett-Packard Company 
+
+AUTHORS
+
+Randy Ray
+Kevin Greene

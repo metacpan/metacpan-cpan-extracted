@@ -1,0 +1,61 @@
+{
+   "abstract" : "API to write custom regex engines",
+   "author" : [
+      "Ævar Arnfjörð Bjarmason <avar@cpan.org>",
+      "Vincent Pit <perl@profvince.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "re-engine-Plugin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0",
+            "XSLoader" : "0",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Name=re-engine-Plugin"
+      },
+      "homepage" : "http://search.cpan.org/dist/re-engine-Plugin/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://git.profvince.com/?p=perl%2Fmodules%2Fre-engine-Plugin.git"
+      }
+   },
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

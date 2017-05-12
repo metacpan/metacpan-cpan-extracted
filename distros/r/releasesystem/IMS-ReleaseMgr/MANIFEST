@@ -1,0 +1,10 @@
+Changes			Tracking the change history
+MANIFEST		This file
+Makefile.PL		MakeMaker code to create a Makefile
+ReleaseMgr.pm		Library itself
+ReleaseMgr/Access.pm
+ReleaseMgr/FileList.pm
+ReleaseMgr/Signature.pm
+ReleaseMgr/Transfer.pm
+ReleaseMgr/Utils.pm
+t/00_load.t		Tests -- this one just checks that it can load.

@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+#
+# $Id: rrd.monitor,v 1.2 2005/02/18 10:53:41 rs Exp $
+#
+# This script is a monitor to use with the Mon monitoring tool.
+#
+# Usage:
+# 
+#     rrd.monitor <rrdpoller-args> -- host1 [host2 [hostN...]]
+# 
+# See rrdpoller manual to know which args you can use. You will have to replace
+# all <filename> args by a regular expression to transform the hostname into a
+# filename.
+# 
+# Example:
+# 
+#     rrd.monitor bondaries 's!(.*?)\..*!/path/to/rrds/$1.rrd!' load_5 --max 50
+# 
+# This monitor requieres the rrdpoller command. You can find it at
+# http://rs.rhapsodyk.net/deve/rrdpoller/.
+#
+#
+# Copyright (C) 2005, Olivier Poitrey
+# Written by Olivier Poitrey <rs@rhapsodyk.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+use strict;
+
+my @hosts;
+my @args = @ARGV;
+while(@args && $args[-1] ne '--')
+{
+    push(@hosts, pop(@args));
+
+}
+# remove --
+pop(@args);
+
+unless(@hosts or @args)
+{
+    usage(1);
+}
+
+# search for index of hostname2filename arg
+# eg: s!(.*?)\.!/path/to/rrd/$1.rrd!
+my @indexes;
+for(my $index = 0; $index < @args; $index++)
+{
+    if($args[$index] =~ /^s(\W).*\1.*\1$/)
+    {
+        push(@indexes, [$index, $args[$index]]);
+    }
+}
+
+my %details;
+my @errors;
+for my $host (@hosts)
+{
+    # resolv regular expressions
+    for(@indexes)
+    {
+        @args[$_->[0]] = h2f($_->[0], $_->[1]);
+    }
+    open(PROG, '-|', 'rrdpoller', @args) or do
+    {
+        $details{$host} = "can't exec rrdpoller";
+	push(@errors, $host);
+	next;
+    };
+    my $value = <PROG>;
+    chomp($value);
+    close(PROG);
+
+    $details{$host} = $value;
+    if($? != 0)
+    {
+        push(@errors, $host);
+    }
+}
+
+print(join(' ', @errors), "\n");
+
+my($space,$mark);
+for my $host (keys %details)
+{
+    $space = ' ' x (30 - length($host));
+    $mark  = grep($_ eq $host, @errors) ? '!' : ' ';
+    print "$host:$space$mark$details{$host}\n";
+}
+
+exit(scalar @errors);
+
+
+
+sub h2f
+{
+    my($h, $r) = @_;
+    eval('$h =~ '.$r);
+    return $h;
+}
+
+sub usage
+{
+    print <<EOF;
+Usage:
+
+    rrd.monitor <rrdpoller-args> -- host1 [host2 [hostN...]]
+
+See rrdpoller manual to know which args you can use. You will have to replace
+all <filename> args by a regular expression to transform the hostname into a
+filename.
+
+Example:
+
+    rrd.monitor bondaries 's!(.*?)\..*!/path/to/rrds/$1.rrd!' load_5 --max 50
+
+EOF
+    exit shift;
+}

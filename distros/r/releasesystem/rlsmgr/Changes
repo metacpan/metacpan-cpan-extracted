@@ -1,0 +1,8 @@
+Wed Jul 15 11:44:10 PDT 1998
+Version - 0.5
+
+First version to actually have data in the Changes file.
+
+Fairly stable at this point, the version was bumped pasat 0.4 to 0.5 so as to
+be in sync with the IMS::ReleaseMgr package. Once these are both at 1.0,
+their development paths will be more independant.

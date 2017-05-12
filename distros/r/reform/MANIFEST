@@ -1,0 +1,9 @@
+MANIFEST
+LICENSE
+README
+Changes
+lib/reform.pm
+lib/reform/implicit.pm
+lib/reform/Property.pm
+t/001_load.t
+Makefile.PL

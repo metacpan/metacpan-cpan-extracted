@@ -1,0 +1,115 @@
+Revision history for re::engine::Plan9
+
+{{$NEXT}}
+
+    - Use Dist::Zilla to build EU::MM
+
+0.15 2008-02-25
+
+    * Makefile.PL: Delete M::I in favor of EU::MM
+
+0.14 2007-07-17
+
+    * Makefile.PL: Globbing doesn't work on windows, do it explicitly in Perl
+
+0.13 2007-07-16
+
+    * lib*: Don't make dynamic dynamic libs, this should solve RT#28044
+
+0.12 2007-07-13
+
+    * lib*: Removed lib*/Makefile which accidentally snuck in
+    * Makefile.PL: Nuked DOS line endings
+
+0.11 2007-07-12
+
+    * lib*: Removed the Plan 9 build system and replaced it with
+            Makefile.PL's in each of the lib* directories. The
+            software should now port to Windows (and anywhere perl
+            builds). The removed files are lib*/Make.* and
+            lib*/Makefile
+
+0.10 2007-07-07
+
+    * Plan9.xs: Updated the split() special cases described to match blead
+    * t/split.t: More tests for the above, taken from re::engine::PCRE
+    * Plan9.h: Brought up to date with blead
+    * Makefile.PL: { use utf8 } on the non-ASCII author name
+    * inc: Updated to Module::Install 0.67
+    * lib*: patch lib[fmt|utf|regexp] to build on Linux-x86_64 (patch sent
+            to Russ Cox)
+
+0.09 2007-06-17
+
+    * Plan9.pm: Remove irrelevant link
+    * Plan9.xs: stringarg + (strend - stringarg) == strend
+    * Plan9.xs: Handle split " " and split /^/
+    * Plan9.xs: M-x untabify
+    * t/split.t: Test for the above
+    * t/subst-loop.t: Add a note, still failing
+
+0.08 2007-06-17
+
+    * Plan9.xs: PERL_UNUSED_ARG() for all Plan9_intuit arguments 
+    * Plan9.h: Updated engine_plan9 to run on the new blead API
+
+0.07 2007-05-19
+
+    * t/import.t: New test added while trying to write import/unimport
+                  in XS which turned out to be too more trouble than it
+                  was worth
+    * t/unimport.t: ditto
+    * MANIFEST.SKIP: added the TODO file
+
+0.06 2007-05-18
+
+    * Plan9.pm: Fixed typo in POD (spotted by wolverian)
+    * Plan9.xs: Plugged match memory leak
+    * Plan9.xs: const on Plan9_exec & Plan9_dupe prototypes
+    * t/00-compile.t: Test that the object isa Regexp
+    * t/re_tests: Uncommented a lot more tests, now running (approx)
+                  everything it can
+    * TODO: Removed
+    
+0.05 2007-05-18
+
+    * t/capture.t: A test here was actually testing for broken behavior
+    * Plan.xs: split // now works after a discussion with The Bear
+    * Plan.pm: No more BUGS section
+    
+0.04 2007-05-18
+
+    * Plan9.xs: s/// now works, split // still doesn't
+    * Plan9.xs: Thread support, untested but should work
+    * t/s.t: plan 5 tests, not 4
+    * t/pathological.t: Test for speed on pathological regexes
+    * t/re_tests, t/regexp.t: Regexp tests from perl core, commented
+                              out those that don't apply
+    * t/subst.t: limited tests for s/// from core
+    * t/subst-loop.t: Failing test for subst loop
+    * t/s.t: 5 more tests for s/// added during debugging
+    * t/capture.t: More tests for captures
+    * t/split.t: Failing test for split behavior
+    * t/subexp.t: Test for the maximum number of subexpressions
+
+0.03 2007-03-23
+
+    * Plan9.pm: Re-added the bug section
+    * Plan9.xs: Use Zero() instead of memset()
+    * t/capture: Added failing /g capture tests
+    * t/s.t: Added failing s///ge test using captures
+
+0.02 2007-03-23
+
+    * Plan9.xs: Make s/// work
+    * Plan9.xs: Correctly report regcomp errors
+    * Plan9.xs: Map /s and /x to regcompnl and regcomplit
+    * Plan9.pm: Updated docs to match code changes
+    * Plan9.pm: Including the Plan9 Lucent license notice
+    * t/s.t: More s/// tests
+    * Makefile.PL: Fixes to build the Plan 9 libs by Rafael Kitover
+    * Makefile.PL: Document dependency on XSLoader
+
+0.01 2007-03-22
+
+    * Initial release

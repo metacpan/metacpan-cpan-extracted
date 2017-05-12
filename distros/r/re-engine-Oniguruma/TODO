@@ -1,0 +1,8 @@
+Make all the tests run and pass or find out why they don't
+
+Make it possible to select the syntax variant.
+
+Threading support.
+
+Streamline build process for Oniguruma - use $Config instead of
+autoconf.

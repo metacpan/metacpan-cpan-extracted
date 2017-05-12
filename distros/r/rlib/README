@@ -1,0 +1,16 @@
+rlib allows @INC to be modified with relative path names. Where the
+pathname is relative from depends on where the module is used from.
+
+If used from the package main, it is assumed that it is being called from
+a script and so all paths will be treadted relative to where the script
+was found, this is done by using FindBin.
+
+If not called from the package main, but from a different package,
+then all paths are treated as relative to the root of the lib
+directory structure where the file was loaded from.
+
+To use this module you will need to first install the File::Spec
+module, which is avaliable on CPAN from
+
+  http://www.perl.com/CPAN/modules/by-module/File/
+

@@ -1,0 +1,8 @@
+CHANGES
+Makefile.PL
+MANIFEST
+rms.pm
+rms.xs
+rms.html
+copy.art
+test.pl

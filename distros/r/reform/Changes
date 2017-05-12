@@ -1,0 +1,7 @@
+Revision history for Perl module reform
+
+0.1 2004-09-10
+	- original version
+
+0.3 2004-09-10
+	- Fixed default getter/setter methods. Thanks to Brian Franchuk for reporting the problem.

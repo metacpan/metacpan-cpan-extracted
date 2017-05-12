@@ -1,0 +1,129 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 3ed8026aaa2ea859bce7e09ab9c4889583b8027b Changes
+SHA1 942474b9d26ef5bc71cb6aa3b82603c8ae016599 MANIFEST
+SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
+SHA1 8a800a01e93f29ff681053311d33bd0caa62275f META.json
+SHA1 2e578f4afef35a60b61fbeb943c3dce6f1d5abe6 META.yml
+SHA1 faf753ca818dbb8832486cf0427307e5a005f009 Makefile.PL
+SHA1 5fdd0be93373724c03516728f2237e1e403e8fe3 debian/changelog
+SHA1 b6abd567fa79cbe0196d093a067271361dc6ca8b debian/compat
+SHA1 af270694b971e0670741e2735bd5bbfea51416e0 debian/control
+SHA1 cc4a2e278e8ae5c06ceafb504887b665f7f37357 debian/copyright
+SHA1 f43010183073a3c9ee85486372e2be406e6456b6 debian/emacsen-startup
+SHA1 0128c016a525f21fff8083c48e6429041f5223f0 debian/prerm
+SHA1 008f79a519d32dc26bc0436fbc6ddd27637af9a0 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 039ae11f0b1bd7686a38cc08bce9241bb824b78e debian/watch
+SHA1 de3c7ebd38bfe9074a377851e55796476e091fb3 devel/atom.pl
+SHA1 c9f2a32c80c828c38f81346734d7fe5c732bb8f6 devel/audio-wma.pl
+SHA1 613dd68412ea4540ec9a62cc18e6930873b2156e devel/email.pl
+SHA1 82a48e24bc00ca6d5011914f22f88f5356210162 devel/file-temp-debug.pl
+SHA1 058469214c011cd12fa0293a626a4a6223f95b81 devel/grep-author.pl
+SHA1 60a14db1ba479bfddd9e7b806d49ed5a134562ad devel/html-base.html
+SHA1 dac929f2b3ee1f6b92a381373ec2cd0e9da8704c devel/html-enc.pl
+SHA1 7d1780ea8ff51a6cf4bb28edbd394a2f5e88a40a devel/html-extractmain.pl
+SHA1 aafe1573443694ce745fcb7177479e3149f02be5 devel/html-format.pl
+SHA1 df8deba33fe4eff5beda9bd718ee35d0b062eaff devel/html-formattext.pl
+SHA1 6bec07e553c1f43de5c1cd5a2d0b06622ca0ce7b devel/html-withlinks.pl
+SHA1 1566cf99477ea36f89ccc23fcb2b4eed11e7dda0 devel/icons.pl
+SHA1 279b5b752dd1dd76d84a3db580e8082374762104 devel/ihave.pl
+SHA1 7e73e3ae333250d13c06f3c78a28d2bf6353c886 devel/lib/Localize/GetSetMethod.pm
+SHA1 b0635c4018b34b6ae40fa32ce2f6789f50dfc762 devel/lib/Localize/ScalarRef.pm
+SHA1 2fdbad79f6be47eaf3c21daa922f912b1e603110 devel/lib/News/Rnews.pm
+SHA1 c1be16646db3f74ee46e9a7d5567de80cc0deb79 devel/lib/News/Rnews.t
+SHA1 e327903a7281fc7846338d8794a07df82f30f1ae devel/lib/Plagger/Plugin/Filter/FormatText.pm
+SHA1 2b6c97c9a8c695988960c90f395914ac495e7cd6 devel/lib/Plagger/Plugin/Filter/GoogleListPost.pm
+SHA1 848670c82967fad0fa33db8c2b85ad811e5a3941 devel/lib/Plagger/Plugin/Filter/YahooLinks.pm
+SHA1 565dc3d5ba02c9121a9c517a60552bf75f829773 devel/lib/Plagger/Plugin/Publish/Rnews.pm
+SHA1 fefb260be5e6e43e409797c31be6858a955b004b devel/libxml.pl
+SHA1 1f21a8b91602d7b84c9ec72c5bf6ccbf7d9df7a3 devel/lwp-leafnode.pl
+SHA1 8a9456be5453312a39cc67fca6498be7351e51fe devel/lwp-title.html
+SHA1 669ca148ca3df0323691d9ae7d4d9d0affe75ea6 devel/lwp-title.pl
+SHA1 11635c1dc2600a19535a6b89c73dab96263b092b devel/mime-entity.pl
+SHA1 7be810d1ab95788d6067203c3d2233380884d2d4 devel/misc.pl
+SHA1 e611bdebb43b47cf516900c119218d79da05acbd devel/namespace.pl
+SHA1 7d0169d783c7ab21025a875e3496259e882a267b devel/recode.pl
+SHA1 9a7a5554036214185cc2d5f991546656901ca977 devel/render-ascii.pl
+SHA1 44eef5ce8f9314c0b638b1306cdfb7b37e0424a3 devel/rnews.pl
+SHA1 2c7d1b1adfa285eedc5204c6fb6a88ac3e200bd3 devel/rss2leafnode.el
+SHA1 472e7634d3c07a758df1211f358f2e50ed44d46c devel/run-parse.pl
+SHA1 7b3e95bd4dad960b8ad3f5a684d954bba0e6d3f5 devel/samples.pl
+SHA1 2375555072eefc1553f0f5e93b3a01e94446c226 devel/single-entry.yaml
+SHA1 04bc4efd36006b60d1be76a456e63d7a8ff70383 devel/tags.pl
+SHA1 efaa7bcec81f7eadc45ee9884de166ae002f063a devel/top-ref.pl
+SHA1 5b386892b6fd4c5cc4b0fcab75fdaaeb3b351fed devel/tree-parse.pl
+SHA1 3a1576a014b90468f3b24103bb4f3672d11daa41 devel/twig-base.pl
+SHA1 e83882b2191e49f2cf2d79b5f9bb228b16f73aa1 devel/twig-map-default.pl
+SHA1 88944e306a2337eb9d8196effe5dcf00e74b739f devel/unused.pl
+SHA1 5487d67f5869cad69d101f630c28cca671cbffae devel/unused/Leafnode.pm
+SHA1 b57af62c0656bf6df08167ed167d1ac7acc2339e devel/unused/Plagger.t
+SHA1 d4b84132605bee0637d3ff631f2f5821fbe5295d devel/xml-encoding.pl
+SHA1 fbb0acf019ab414916158d498164f8ffade5b6dd devel/xml-liberal.pl
+SHA1 0e4c30729c275279265cb2810621a9f7b5a5b1a8 devel/xml.pl
+SHA1 933d1189ef3e23b87393a056e9264a167a7c2597 devel/yahoolinks.yaml
+SHA1 ab85cd54c32c275a7774beac394985c5c923d69a examples/rss2leafnode.conf
+SHA1 e5782791950e06c0f5a7e06ef72191772f0b8c4b inc/MyMakeMakerGettext.pm
+SHA1 87d779e6509329db5e2f445e2d86f0f54b8f3e61 inc/my_pod2html
+SHA1 774afac762c7f8255426d47ab5d0ae27c52ecebc lib/App/RSS2Leafnode.pm
+SHA1 a89734c36356925de10b47de64e99b5e6955bf0b lib/App/RSS2Leafnode/Conf.pm
+SHA1 b04e6be6921b8c9a510b47e9af155cb9c426b535 lib/App/RSS2Leafnode/XML/Twig/Other.pm
+SHA1 61894d00e19af147b033baaab776ab133689270a po/App-RSS2Leafnode.pot
+SHA1 1cba170b869f05138b4e0f9c9ae281d6518af9fb po/README
+SHA1 307336cdbcb10cd7c7ea2f9f610597e9c681fa35 po/header.pot
+SHA1 0de58ee125fbc9bd6048245fca3e9ebf2224ecb3 rss2leafnode
+SHA1 47ebbf1d71ebdc462f51055161de9cd0838f45dc t/MyTestHelpers.pm
+SHA1 84dc0884f3a76df7469dea667f9c3e7fb2b19b05 t/RSS2Leafnode.t
+SHA1 1f3955ea946440dcaa4f1b423305f83890902037 t/test-weaken.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 42c04ae557ab86d3488c647ea17bd37cd2bd7d6a xt/0-exe-shebang.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
+SHA1 b3472879ff7706f3bc9f70b8fb1b86ae5f6f7e10 xtools/my-check-spelling.sh
+SHA1 d76762639d4ac9a709b1de9d0ad61974aa5026b2 xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 6c48137d49c3619eca39796d49f26332eea55d4a xtools/my-kwalitee.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 eec6a78c6ed57242d151597b048df6ea5efc5cc4 xtools/my-pc.sh
+SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
+SHA1 5c86dd9ca3d2ecf3ee9d90da1537b71e56c8b321 xtools/my-wunused.sh
+SHA1 87d779e6509329db5e2f445e2d86f0f54b8f3e61 xtools/my_pod2html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJYjt1FAAoJEPjQtOfS0hGRRqcP/2ObQHTXCGqtQDFpwkhXCUvE
+13m8sFDscp2kNVOCk13/TkdUflOTqI+xgk5wK40Md1xWmIcheIw/WbsuffZDFva9
+rcJY5zXsdKJbLzj8cSYekoOvRjdYHVjgYP2MiLkq0rzG+dtGFDfjy09gxOSNhvd1
+1fnRHF6XuqpL9HB425TFLKLOYvDbT77sldWUZHoYUeXP6vYgK+/tlIEr96umQTyO
+A8NMCQmV3JrmdOmhiRdkggX+/Kgabh5bivZ/K8nw/RwRA0FsUhlXyHvtXMemypAt
+FBVhvtYTDqIIxMnAw+FR7Fs/cTj33t04TtoMSifyHF5Fe7irWx4u6lkxZmHZFgkZ
+ag3prr/AvhQ+4SR0OpnqiSFYYNmrCSrGGSgRSnMno9DRvm8eljc/e2dUABbNf48A
+zBrNqVWrJxkX31b1DauHcCeeSZrvLT05Psf7QM+GR2uSqcQ21ZiHtELpqXGAEsai
+F9RFe3pty+QD3xhNW6M0BghuWqAlGyundzVGsARm58wN1Dv2wl4M0yu/Bj830PbO
+P9UU/Q1tHs2lle/UfFUk+OgJbaDtg8SKtuqC8EDfdRvdg1oHMOSwGUwbhKWDM3ZA
+wHE1NOErSRVed4gi0M80Ra4BBhq9Ioiq6QCd4I6Nqm35GDwGg4rwgtRJyLViGS+L
+YkV0xJO+jcTivU8Mz9OU
+=M0ob
+-----END PGP SIGNATURE-----

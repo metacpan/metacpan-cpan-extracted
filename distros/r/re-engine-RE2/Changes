@@ -1,0 +1,56 @@
+0.13 2015-01-18
+- Unbreak Windows build
+- Up minimum perl to 5.12
+
+0.12 2015-01-17
+- Fix for `"" =~ {}` crashing
+- Fix for building on perl >= 5.20 (RT #95144, thanks Tony C. for the patch)
+- Fix build with -Werror=format-security (RT #96338)
+
+0.11 2012-07-29
+- Support named capture groups
+- Support perl >= 5.17.1; add a nulled out op_comp to engine struct
+
+0.10 2012-07-24
+- Add missing compat-rx.h file
+
+0.09 2012-04-01 (Brought to you from the 2012 QA Hackathon in Paris)
+- Thread destruction fixes
+
+0.08 2011-04-18
+- Add files I forgot to add
+
+0.07_01 2011-04-16
+- Use cophh API
+- Support -strict mode
+
+0.07 2011-04-11
+- RT #67192: Fix /s support
+- Attempt to compile with -O3 as RE2 does
+- Fix leak in possible_match_range
+- Fix compilation on gcc 4.6 (RE2 issue 35)
+
+0.06 2011-04-02
+- RT #67153: Fix interpolation of RE2 into RE2
+  (qr// stringification included the x flag which RE2 doesn't support)
+
+0.05 2011-02-06
+- Allow setting of RE2's max_mem to control memory bound
+- Improve documentation
+
+0.04 2011-01-29
+- Remove various UNIXisms from RE2, now builds under Win32/Strawberry
+  (still needs gmake installed, which comes with Strawberry)
+
+0.03 2011-01-23
+- Pass more options from MakeMaker to RE2, should now work on x86_64 again
+- Run RE2's own test suite as part of build if we can
+
+0.02 2011-01-22
+- Use ExtUtils::CppGuess and try to find GNU make
+
+0.01 2011-01-16
+- Fixes for //g, captures, generally many things
+
+0.01_01 2010-07-25
+- Initial dev. version

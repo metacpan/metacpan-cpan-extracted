@@ -1,0 +1,21 @@
+Revision history for recommended
+
+0.003     2015-04-23 16:39:23-04:00 America/New_York
+
+    [Fixes]
+
+    - Ensures that has() returns a false value not the empty-list in
+      list context.  This avoids a subtle bug in
+      C<< use if recommended->has("Something"), "Foo" >>.
+
+0.002     2014-11-05 22:03:17-05:00 America/New_York
+
+    [Fixes]
+
+    - Throws an error if a recommended/suggested module fails to compile
+      instead of silently ignoring this case
+
+0.001     2014-11-05 16:37:00-05:00 America/New_York
+
+    - First release
+

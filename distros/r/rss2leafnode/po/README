@@ -1,0 +1,38 @@
+Copyright 2010 Kevin Ryde
+
+This file is part of RSS2Leafnode.
+
+RSS2Leafnode is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+RSS2Leafnode is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with RSS2Leafnode.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+
+This is a place-holder for possible future translations of the few
+messages in the rss2leafnode.
+
+Currently there's nothing translated, and the messages probably aren't
+settled enough to want to put work into translation.
+
+"charset=" in each .po file should be UTF-8, ready for messages to be
+used as Perl wide-char strings.  Other charsets work fine though,
+converted at runtime.  Messages for prints etc (which is almost
+everything) will go to the tty and should probably be restricted to
+characters displayable in the usual locale encoding(s) of the target
+language.  The .pot file itself is all ASCII.
+
+header.pot is the start part of RSS2Leafnode.pot, put there by the
+generate rules in the Makefile (per inc/MyMakeMakerGettext.pm).
+gettext 0.17 doesn't doesn't preserve comments in a .pot header very
+well.

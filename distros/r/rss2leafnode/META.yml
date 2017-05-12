@@ -1,0 +1,109 @@
+---
+abstract: 'Download RSS feeds or web pages to an NNTP news server.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: rss2leafnode
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - po
+    - xt
+optional_features:
+  fetch_html_exiftool:
+    description: ' A better Subject for fetch_html() messages using Image::ExifTool.'
+    requires:
+      Image::ExifTool: '8.22'
+  fetch_html_uri_title:
+    description: ' A better Subject for fetch_html() messages using URI::Title.'
+    requires:
+      URI::Title: '0'
+  maximum_interoperation:
+    description: 'All the optional and possible things RSS2Leafnode can use.'
+    requires:
+      HTML::ExtractMain: '0'
+      HTML::FormatExternal: '16'
+      HTML::FormatText::WithLinks: '0'
+      Image::ExifTool: '8.22'
+      Time::Duration: '0'
+      Time::Duration::Locale: '0'
+      Time::Duration::ja: '0'
+      Time::Duration::sv: '0'
+      URI::Title: '0'
+      XML::Liberal: '0'
+      XML::RSS::Timing: '0'
+  maximum_repair:
+    description: 'Modules for as much XML fixing-up as possible.'
+    requires:
+      XML::Liberal: '0'
+  render_text_external:
+    description: 'Optionally render HTML to text using external programs like lynx.'
+    requires:
+      HTML::FormatExternal: '16'
+  render_text_with_links:
+    description: 'Optionally render HTML to text using FormatText::WithLinks.'
+    requires:
+      HTML::FormatText::WithLinks: '0'
+  xml_rss_timing:
+    description: 'Check RSS feed advertised update times before redownloading.'
+    requires:
+      XML::RSS::Timing: '0'
+  xml_rss_timing_print:
+    description: 'A prettier print of time to next RSS update.'
+    requires:
+      Time::Duration: '0'
+  xml_rss_timing_print_locale:
+    description: 'A prettier print of time to next RSS update, with language-specifics.'
+    requires:
+      Time::Duration::Locale: '0'
+      Time::Duration::en_PIGLATIN: '0'
+      Time::Duration::ja: '0'
+      Time::Duration::sv: '0'
+recommends:
+  HTTP::Message: '6.03'
+requires:
+  Date::Parse: '0'
+  Encode::Locale: '0.06'
+  File::HomeDir: '0'
+  HTML::Entities::Interpolate: '0'
+  HTML::FormatText: '0'
+  HTML::Formatter: '0'
+  HTML::Parser: '0'
+  HTTP::Message: '0'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  LWP: '5.832'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0.24'
+  Locale::Messages: '0'
+  Locale::TextDomain: '1.17'
+  MIME::Entity: '0'
+  MIME::Tools: '0'
+  MIME::Words: '0'
+  Number::Format: '1.5'
+  Scope::Guard: '0'
+  Sort::Key::Top: '0'
+  Text::Trim: '1.02'
+  Text::WrapI18N: '0'
+  URI: '0'
+  URI::Escape: '0'
+  URI::tag: '0'
+  XML::Twig: '3.34'
+  constant::defer: '0'
+  perl: '5.010'
+resources:
+  homepage: http://user42.tuxfamily.org/rss2leafnode/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '79'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

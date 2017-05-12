@@ -1,0 +1,70 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/returning/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.012"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Scalar::Util 1.11"^^doap-deps:CpanId ], [ doap-deps:on "Scope::Upper 0.16"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Install 0.900"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Name 0.03"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=returning>;
+	doap:created         "2012-08-01"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/returning>;
+	doap:homepage        <https://metacpan.org/release/returning>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "returning";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/returning/v_0-001>, <http://purl.org/NET/cpan-uri/dist/returning/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-returning>;
+	];
+	doap:shortdesc       "define subs that act like `return`".
+
+<http://purl.org/NET/cpan-uri/dist/returning/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "returning-0.001"^^xsd:string;
+	dc:issued            "2012-08-01"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/returning-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/returning/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "returning-0.002"^^xsd:string;
+	dc:issued            "2013-09-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Depend on Scope::Upper 0.24; required for Perl 5.19.4.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/vpit>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/returning-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/person/vpit>
+	a                    foaf:Person;
+	foaf:name            "Vincent Pit";
+	foaf:nick            "VPIT";
+	foaf:page            <https://metacpan.org/author/VPIT>.
+

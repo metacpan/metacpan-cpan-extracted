@@ -1,0 +1,25 @@
+#!/bin/sh -eu
+
+PROG="${0##*/}"
+cd "${RPM_BUILD_ROOT:?}"
+
+set -- ./usr/*/perl5/
+[ -d "$1" ] || exit 0
+
+find "$@" -type f -name .packlist -exec \
+	rm -fv -- '{}' '+'
+
+find "$@" -type f -name \*.bs -size 0 -exec \
+	rm -fv -- '{}' '+'
+
+once=
+find "$@" -type f -name \*.bs |
+while read -r f; do
+	[ -n "$once" ] ||
+	echo "WARNING: $PROG: non-empty *.bs file(s) found:"
+	echo "    $f"
+	once=1
+done >&2
+
+find "$@" -type f -name perllocal.pod -exec \
+	rm -fv -- '{}' '+'

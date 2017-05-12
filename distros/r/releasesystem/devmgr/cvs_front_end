@@ -1,0 +1,245 @@
+#!/usr/local/bin/perl
+    eval 'exec perl -S $0 "$@"'
+	if 0;
+
+###############################################################################
+#
+#         May be distributed under the terms of the artistic license
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: cvs_front_end,v 1.1 1999/08/08 21:20:35 randyr Exp $
+#
+#   Description:    The front-end script to several CVS commands, to allow us
+#                   better control and flexibility while still giving
+#                   developers a consistent set of tools.
+#
+#   Functions:      chmod_tree
+#
+#   Libraries:      File::Find
+#                   Getopt::Std
+#
+#   Global Consts:  $cmd                    This tool's name
+#
+#   Environment:    Will set WM_CONTROL for wrapper tool
+#
+# This tool will be known by the following symlinks:
+#
+#  Symlink      Function
+#  -------      --------
+#  checkout     cvs checkout - Initialize a private workspace
+#  update       cvs update   - Synchronize private workspace w/repository
+#  add          cvs add      - Prepare files for addition to the repository
+#  commit       cvs commit   - Commit changes in priv. workspace to repository
+#  cdiff        cvs diff     - Show deltas between workspace & repository
+#  chistory     cvs history  - Show history reports
+#  import       cvs import   - import a package into repository
+#  cexport      cvs export   - Export repository for distribution
+#  tag          cvs tag      - Mark a release with a symbolic tag
+#  new          cvs import   - add a package into the repository
+#
+###############################################################################
+use vars qw($cmd);
+($cmd = $0) =~ s|.*/||o;
+
+use 5.004;
+
+use strict;
+use vars qw($cvs %cvsOP $cvsOP $project $release $public_html %opts);
+use subs qw(chmod_tree);
+
+use File::Find qw(find);
+use Getopt::Std qw(getopts);
+
+use IMS::ReleaseMgr::Utils qw(eval_make_target);
+
+# Set CVSROOT, if not already set
+$ENV{CVSROOT} = '/opt/ims/repository' unless defined($ENV{CVSROOT});
+$ENV{CVSEDITOR} = $ENV{CVSEDITOR} ||$ENV{EDITOR} || 'ved';
+$cvs = '/opt/ims/bin/cvs';
+getopts('d', \%opts);
+
+# Collect all options that are not cvsfe options
+
+# Determine CVS operation from invocation name of cvsfe
+%cvsOP = (
+          'checkout' => 'checkout',     # Initialize a private workspace
+          'finish'   => 'release -d',   # Release a workspace
+          'update'   => 'update',       # Synchronize workspace w/repository
+          'add'      => 'add',          # Add files to the repository
+          'remove'   => 'remove',       # Remove a file or dir from repository
+          'clog'     => 'log',          # Show logs for workspace files
+          'status'   => 'status',       # Display current status of workspace
+          'commit'   => 'commit',       # Commit workspace changes to repos.
+          'cdiff'    => 'diff',         # Report deltas
+#         'cexport'  => 'export',       # Export
+          'tag'      => 'tag',          # Mark a release
+          'import'   => 'import',       # Import an existing package
+          'new'      => 'import',       # Add a new project
+          'xnew'     => 'import',       # update a 3rd-party project
+         );
+
+my $TESTING = 0;
+
+if ($cmd eq 'cvs_front_end')
+{
+    # Create symlinks in execution dir
+    my $dir;
+
+    ($dir = $0) =~ s|^(.*)/(.*)$|$1|o;
+    $dir = '.' unless length($dir);
+    chdir $dir;
+    print "Creating symlinks in $dir\n";
+    for my $x (sort keys %cvsOP)
+    {
+        $x .= '2' if ($TESTING);
+        print "...$x";
+        symlink 'cvs_front_end', $x
+            or print "...Unable to symlink to cvs_front_end: $!";
+        print "\n";
+    }
+    exit 0;
+}
+
+$cmd =~ s/2$// if ($TESTING);
+if (defined($cvsOP{$cmd}))
+{
+    $cvsOP = $cvsOP{$cmd};
+    if ($cmd eq 'import' || $cmd eq 'finish' || $cmd eq 'new')
+    {
+        die "$cmd: too many args, stopped" if (scalar(@ARGV) > 1);
+        die "$cmd: need project name, stopped" if (scalar(@ARGV) != 1);
+
+        $project = shift(@ARGV);
+        die "$cmd: cannot find project $project -- must be in sub-directory," .
+            " stopped" unless (-d $project);
+
+        if ($cmd eq 'import' || $cmd eq 'new')
+        {
+            die "$cmd: /opt/ims/repository/$project already exists, stopped"
+                if (-e "/opt/ims/repository/$project");
+
+            chdir $project
+                or die "$cmd: unable to cd to $project: $!, stopped";
+            $ENV{WM_CONTROL} = "$cmd $project";
+            push(@ARGV,
+                 '-m', "Import of $project", $project, $project, 'start');
+        }
+        else
+        {
+            print "Checking workspace ($project) prior to deletion.\n";
+            print ">>> You will be prompted to confirm. <<<\n";
+            push(@ARGV, $project);
+        }
+    }
+    elsif ($cmd eq 'xnew')
+    {
+        $project = shift(@ARGV);
+        die "$cmd: cannot find project $project -- must be in sub-directory," .
+            " stopped" unless (-d $project);
+
+        $release = shift
+            or die "$cmd: please specify a release tag, stopped";
+        chdir $project
+            or die "$cmd: unable to cd to $project: $!, stopped";
+        $ENV{WM_CONTROL} = "new $project";
+        push(@ARGV,
+             '-m', "Import of $project", $project, $project, $release);
+    }
+    elsif ($cmd eq 'checkout')
+    {
+        $public_html = "$ENV{HOME}/public_html";
+        print "Checking out to $public_html\n";
+        chdir $public_html
+            or die "$cmd: unable to cd to $public_html: $!, stopped";
+    }
+    elsif ($cmd eq 'commit')
+    {
+        print "Opening permissions...";
+        if (scalar(@ARGV))
+        {
+            #print `chmod -R a+rwX @ARGV`;
+            find(\&chmod_tree, @ARGV);
+        }
+        else
+        {
+            find(\&chmod_tree, '.');
+        }
+        print "done.\n";
+    }
+}
+else
+{
+    die "Unknown alias for cvs_front_end: $cmd, stopped";
+}
+
+print STDERR ">>> $cvs $cvsOP @ARGV\n" if $opts{d};
+system $cvs, split(/ /, $cvsOP), @ARGV;
+$? >>= 8;
+if ($?)
+{
+    die "Error executing '$cvs $cvsOP @ARGV' command: $!, stopped";
+}
+
+if ($cmd eq 'checkout')
+{
+    my $makefile = "$ENV{HOME}/public_html/";
+    # Find first argument that is not an option
+    shift(@ARGV) while ($ARGV[0] and (substr($ARGV[0], 0, 1) eq '-'));
+    $makefile .= "$ARGV[0]/Makefile";
+
+    if (-e $makefile)
+    {
+        print "Running ``make checkout'' in $ARGV[0]: ";
+        my $ret = eval_make_target 'checkout';
+
+        if (defined $ret)
+        {
+            #
+            # An error occurred
+            #
+            die "\nMake returned the following error text:\n\t" .
+                join("\n\t", @$ret) . "\n";
+        }
+        else
+        {
+            print " OK\n";
+        }
+    }
+}
+
+exit 0;
+
+###############################################################################
+#
+#   Sub Name:       chmod_tree
+#
+#   Description:    Subroutine used by the File::Find library's find() routine
+#                   to check/act upon files and directories. In this case, will
+#                   be used to set permissions on files and directories.
+#
+#   Arguments:      See the File::Find(3) manpage for the arguments that are
+#                     given to a function used in this fashion.
+#
+#   Globals:        ibid.
+#
+#   Environment:    None.
+#
+#   Returns:        1
+#
+###############################################################################
+sub chmod_tree
+{
+    return 1 unless (-d $_ or -f _);
+    return 1 if (-l $_);
+
+    my $mode = (lstat)[2] & 0777;
+    $mode |= 0664; # Force rw for user and group, read for other
+    $mode |= 0111 if ($mode & 0100); # Add exec bits on others only if set on u
+    chmod $mode, $_;
+
+    1;
+}

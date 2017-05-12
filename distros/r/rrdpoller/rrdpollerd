@@ -1,0 +1,188 @@
+#!/usr/bin/perl -t
+
+=pod
+
+=head1 NAME
+
+rrdpollerd - RRD Poller XML-RPC daemon
+
+=head1 SYNOPSIS
+
+rrdpollerd [B<--root> I</rrd/files/dir>] [B<--nodetach>]
+[B<--host> I<local_address>] [B<--port> I<port_number>]
+
+=head1 DESCRIPTION
+
+This program allow the C<rrdpoller> command to poll RRD files on the
+host where this daemon is started from a remote locatation.
+
+=head1 OPTIONS
+
+=head2 B<-r>, B<--root>=I</path/to/dir>
+
+All queried files will have their root directory starting at the given
+location. B<rrdpollerd> will assure that no files outside of this
+directory will be readable, even via a symlink.
+
+=head2 B<-P>, B<--port>=I<port>
+
+Specify on which port the daemon will listen.
+
+=head2 B<-H>, B<--host>=I<host>
+
+If specified, the daemon will listen only on this address. By default
+the daemon listen on all addresses.
+
+=head2 B<--nodetach>
+
+=cut
+
+use strict;
+use Error qw(:try);
+use Getopt::Long;
+use XMLRPC::Transport::HTTP;
+use RRD::Query;
+use RRD::Threshold;
+use POSIX ();
+use Cwd qw(abs_path);
+our $AUTOLOAD;
+
+# $Id: rrdpollerd,v 1.2 2005/01/17 18:18:06 rs Exp $
+$main::VERSION = sprintf "%d.%03d", q$Revision: 1.2 $ =~ /(\d+)/g;
+
+my $Threshold = new RRD::Threshold();
+my @Methods =
+(qw(
+    last
+    list
+    fetch
+    exact
+    boundaries
+    relation
+    quotient
+    hunt
+));
+
+
+my %options = (Reuse => 1, LocalPort => 8080);
+my $root = '';
+my $nodetach = 0;
+my($port, $host);
+GetOptions
+(
+    'help|h!'   => \&usage,
+    'port|P=i'  => \$options{LocalPort},
+    'host|H=s'  => \$options{LocalAddr},
+    'root|r=s'  => \$root,
+    'nodetach!' => \$nodetach,
+)
+or usage();
+
+if($root)
+{
+    $root = abs_path($root);
+}
+
+if(!$nodetach)
+{
+    # daemonize
+    die "can't detach from tty" if(!POSIX::setsid());
+    chdir('/');
+    umask(0);
+    POSIX::close('STDIN');
+    POSIX::close('STDOUT');
+    POSIX::close('STDERR');
+    open(STDIN,  "+>/dev/null");
+    open(STDOUT, "+>&STDIN");
+    open(STDERR, "+>&STDIN");
+    fork && exit;
+}
+
+my $daemon = XMLRPC::Transport::HTTP::Daemon->new(%options)->dispatch_to(@Methods);
+$daemon->handle();
+
+sub AUTOLOAD
+{
+    my($self, @args) = @_;
+    my $name = $AUTOLOAD;
+    $name =~ s/.*://;   # strip fully-qualified portion
+
+    my $result;
+
+    # check if file path is secure
+    $args[0] = abs_path(join('/', $root, $args[0]));
+    if(index($args[0], $root) != 0)
+    {
+        $result->{success} = 0;
+        $result->{error}->{content} = 
+            new Error::Simple("Ungranted backward reference in file path");
+        $result->{error}->{class} = ref($result->{error}->{content});
+        return $result;
+    }
+
+    try
+    {
+        if($name eq 'list' or $name eq 'fetch' or $name eq 'last')
+        {
+            my $file = shift @args;
+            my $rrd = new RRD::Query($file);
+            $result->{success} = 1;
+            $result->{value} = [$rrd->$name(@_)];
+        }
+        else
+        {
+            $result->{success} = 1;
+            $result->{value} = [$Threshold->$name(@args)];
+        }
+    }
+    otherwise
+    {
+        $result->{success} = 0;
+        $result->{error}->{content} = shift;
+        $result->{error}->{class} = ref($result->{error}->{content});
+    };
+
+    return $result;
+}
+
+sub usage
+{
+    print <<EOF;
+Syntax:
+
+rrdpollerd [--root </rrd/files/dir>] [--nodetach]
+    [--host <local_address>] [--port <port_number>]
+
+EOF
+    exit 1;
+}
+
+=head1 AUTHOR
+
+Olivier Poitrey E<lt>rs@rhapsodyk.netE<gt>
+
+=head1 LICENCE
+
+rrdpoller retrieves RRD file data and apply some threshold algorithm.
+Copyright (C) 2004  Olivier Poitrey
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+=head1 SEE ALSO
+
+L<rrdpoller>, L<RRD::Query>, L<RRD::Threshold>, L<rrdtool>, L<RRDs>
+
+=cut

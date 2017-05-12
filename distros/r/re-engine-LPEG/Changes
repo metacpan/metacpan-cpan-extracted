@@ -1,0 +1,19 @@
+Revision history for Perl extension re::engine::LPEG.
+
+0.05  Fri Jul  9 17:30:00 2010
+	- fix build with Cygwin (patch from Reini Urban)
+
+0.04  Sat Nov  8 11:30:00 2008
+	- Test::Warn is required
+	- no behavior change
+
+0.03  Sun Nov  2 14:30:00 2008
+	- add capture simple
+
+0.02  Fri Oct 31 17:30:00 2008
+	- first release (without capture)
+
+0.01  Tue Aug 12 05:28:14 2008
+	- original version; created by h2xs 1.23 with options
+		-n re::engine::LPEG
+

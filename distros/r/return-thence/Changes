@@ -1,0 +1,23 @@
+return-thence
+=============
+
+Created:      2012-07-28
+Home page:    <https://metacpan.org/release/return-thence>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=return-thence>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2012-12-26
+
+ [ Documentation ]
+ - Document difficulties with XS.
+ - Document test suite.
+
+ [ Other ]
+ - Use Scope::Upper::CALLER instead of repeated applications of SUB UP.
+
+0.001	2012-11-26	Initial release

@@ -1,0 +1,31 @@
+---
+abstract: 'Perl-compatible regular expression engine'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  Test::More: 0
+  vars: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: re-engine-PCRE
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  XSLoader: 0
+  perl: 5.010
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=re-engine-PCRE
+  homepage: http://search.cpan.org/dist/re-engine-PCRE/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/avar/re-engine-pcre.git
+version: 0.17
+x_authority: cpan:AVAR

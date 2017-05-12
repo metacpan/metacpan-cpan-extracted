@@ -1,0 +1,42 @@
+{
+   "abstract" : "Plan 9 regular expression engine",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "build_requires" : {
+      "Data::Dumper" : "0",
+      "Test::More" : "0",
+      "Time::HiRes" : "0",
+      "vars" : "0"
+   },
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   },
+   "generated_by" : "Dist::Zilla version 2.100900",
+   "license" : "perl",
+   "meta-spec" : {
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html",
+      "version" : 1.4
+   },
+   "name" : "re-engine-Plan9",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "recommends" : {},
+   "requires" : {
+      "XSLoader" : "0",
+      "perl" : "5.010"
+   },
+   "resources" : {
+      "Ratings" : "http://cpanratings.perl.org/d/re-engine-Plan9",
+      "bugtracker" : "https://rt.cpan.org/Public/Dist/Display.html?Name=re-engine-Plan9",
+      "homepage" : "http://search.cpan.org/dist/re-engine-Plan9/",
+      "license" : "http://dev.perl.org/licenses/",
+      "repository" : "http://github.com/avar/re-engine-plan9"
+   },
+   "version" : "0.16"
+}
+

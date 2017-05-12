@@ -1,0 +1,18 @@
+MANIFEST
+Makefile.PL
+README
+INSTALL
+TODO
+SIGNATURE
+Threshold.pm
+Query.pm
+debian/control
+debian/rrdpoller.copyright
+debian/librrd-threshold-perl.copyright
+debian/rules
+debian/changelog
+test.pl
+rrdpoller
+rrdpollerd
+contrib/rrd.monitor
+META.yml                                 Module meta-data (added by MakeMaker)

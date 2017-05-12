@@ -1,0 +1,902 @@
+<HTML><HEAD><TITLE>rlsmgrd Doc</TITLE></HEAD><BODY><center><h1>rlsmgrd</h2></center><h1>Modules</h1><ul><li>IMS::ReleaseMgr::Utils<li>Net::Domain</ul><h1>Functions:</h1><ul><li><a href="#check_sanity">check_sanity</a><li><a href="#child_reaper">child_reaper</a><li><a href="#cleanup">cleanup</a><li><a href="#dispatch_job">dispatch_job</a><li><a href="#dump_info">dump_info</a><li><a href="#reread_config">reread_config</a><li><a href="#write_lockfile">write_lockfile</a></ul><hr><h1>Main Script</h1><h2>Variables:</h2> <ul><li>$0<li>$ARGV<li>$ENV<li>$Id<li>$Revision<li>$SIG<li>$USAGE<li>$VERSION<li>$_<li>$a<li>$b<li>$cmd<li>$config<li>$dh<li>$dir<li>$file<li>$fork_requested<li>$in_dir<li>$job_limit<li>$logdir<li>$mirror_group<li>$myhost<li>$opts<li>$period<li>$revision<li>$script<li>$sig<li>$tfile<li>$trace<li>$wdir<li>%02d<li>%18s<li>%child_hash<li>%d<li>%opts<li>%s<li>@ARGV<li>@_<li>@files<li>@r</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>DBI_match_mirror_to_host<li>DBI_mirror_specification<li>SIG_dec_trace<li>SIG_inc_trace<li>cleanup<li>content<li>data<li>eq<li>error<li>file_error<li>file_match_mirror_to_host<li>file_mirror_specification<li>fork_as_daemon<li>from<li>head<li>hostfqdn<li>message<li>mirror<li>new<li>path<li>print<li>read<li>remove<li>show_version<li>strict<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>#!/opt/ims/perl5/bin/perl
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: rlsmgrd_doc.html,v 1.1 2000/05/04 21:14:35 idsweb Exp $
+#
+#   Description:    This is a daemon that periodically looks in the release
+#                   manager's incoming area for new packages that need to be
+#                   deployed into the the HTTP content area.
+#
+#   Functions:      check_sanity
+#                   dispatch_job
+#                   child_reaper
+#                   cleanup
+#                   write_lockfile
+#
+#   Libraries:      Carp                    Core lib, cleaner error reporting
+#                   Getopt::Long            Core lib, cmd-line opts parsing
+#                   File::Basename          Core lib, utility function
+#                   Cwd                     Core lib, portable cwd function
+#                   IO::File                Core lib, file I/O class
+#                   DirHandle               Core lib, clean dir-reading class
+#                   IMS::ReleaseMgr::Utils  Locally-developed lib
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  Error message for bad dash-opts
+#
+#   Environment:    PATH                    Will drastically trim PATH
+#
+#
+#   YET TO DO:      Use a signal (maybe SIGINT or SIGCONT) to signal a need
+#                     to re-read DB config
+#                   Manual page
+#
+##############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$ENV{PATH} = '/bin:/usr/bin:/usr/sbin'; # This is purposeful!!!
+#
+# Global variables:
+#
+#     %opts          Options parsed out from @ARGV by getopts
+#     $trace         True/false whether tracing is enabled
+#     $tfile         Filehandle (class IO::File) for tracefile (STDOUT if ! -T)
+#     $period        Sleep-cycle period, defaults to 120 (measured in seconds)
+#     $script        Script to call to deploy the actual data
+#     $in_dir        Directory to monitor for incoming files
+#     $logdir        Directory in which general tool-action logging is done
+#     $job_limit     Maximum number of child '$script' processes at a time
+#     $mirror_group  The name of the mirror group we belong to. Less important
+#                      for a stand-alone system, critical for a mirror pool.
+#     %child_hash    A hash table whose keys are active child processes. These
+#                      are used by the dispatch_job and child_reaper routines
+#                      to track and manage sub-processes
+#
+    #
+    # I shouldn't do this, since it supports bad habits, but not enough people
+    # (and I forget, too) know that the process changes the working dir. Thus,
+    # the config file may not be readable by sub-processes, or if we receive a
+    # SIGHUP. So, ensure that the file is an absolute path. Add this working
+    # dir if it isn't.
+    #
+reread_config(undef); # Trick the HUP handler into reading the configuration
+#
+# If the sanity check passed, go ahead and fork (if so requested)
+#
+if ($trace & 12) # bxxxx11xx
+#
+# Isolate ourselves in terms of specific hosts and mirror pools. If we were
+# *not* given a -H option, try to deduce our host pseudonym from either the
+# MIRROR_POOL_HOST_LIST Oracle tables or the mirror list file.
+#
+    # Errors were ignored simply because an undef $opts{H} has its own meaning
+        if ($trace & 8); # bxxxx1xxx
+    if (($trace & 4) and (keys %child_hash)) # bxxxxx1xx
+    #
+    # Sort @files by age, oldest first. First come, first severed...
+    #
+        #
+        # The return value from dispatch_job is zero if there were no child
+        # slots available. If there was a legitimate error, then it should
+        # have croaked itself so that the line number reference pointed to it.
+        # dispatch_job waits a reasonable time for slots to open, so if it
+        # comes back 0, we're pretty bogged down and should wait, anyway.
+        #
+    #
+    # Clear this list. If we didn't process all of the jobs, they'll be at the
+    # head of the list next time around.
+    #
+##############################################################################
+#
+#   Sub Name:       child_reaper
+#
+#   Description:    Catch a SIGCHLD and remove the completed child from the
+#                   hash %child_hash, which will free the slot up for the next
+#                   job.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $sig      in      scalar    Signal name
+#
+#   Globals:        %child_hash
+#                   $trace
+#                   $tfile
+#
+#   Environment:    None.
+#
+#   Returns:        void context
+#
+##############################################################################/n</pre>
+<h2>Code:</h2> <pre>#!/opt/ims/perl5/bin/perl
+    eval 'exec perl -S $0 "$@"'
+	if 0;
+
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: rlsmgrd_doc.html,v 1.1 2000/05/04 21:14:35 idsweb Exp $
+#
+#   Description:    This is a daemon that periodically looks in the release
+#                   manager's incoming area for new packages that need to be
+#                   deployed into the the HTTP content area.
+#
+#   Functions:      check_sanity
+#                   dispatch_job
+#                   child_reaper
+#                   cleanup
+#                   write_lockfile
+#
+#   Libraries:      Carp                    Core lib, cleaner error reporting
+#                   Getopt::Long            Core lib, cmd-line opts parsing
+#                   File::Basename          Core lib, utility function
+#                   Cwd                     Core lib, portable cwd function
+#                   IO::File                Core lib, file I/O class
+#                   DirHandle               Core lib, clean dir-reading class
+#                   IMS::ReleaseMgr::Utils  Locally-developed lib
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  Error message for bad dash-opts
+#
+#   Environment:    PATH                    Will drastically trim PATH
+#
+#
+#   YET TO DO:      Use a signal (maybe SIGINT or SIGCONT) to signal a need
+#                     to re-read DB config
+#                   Manual page
+#
+##############################################################################
+use vars qw($cmd);
+($cmd = $0) =~ s|.*/||o;
+
+use 5.004;
+
+use strict;
+use vars qw($USAGE %opts $trace $tfile $period $script $dh %child_hash $file
+            @files $job_limit $in_dir $fork_requested $logdir %opts $dir
+            $mirror_group $config $VERSION $revision);
+use subs qw(fork_this check_sanity dispatch_job child_reaper cleanup
+            show_version write_lockfile write_log_line reread_config
+            dump_info);
+
+use Carp                   'croak';
+use Getopt::Long           'GetOptions';
+use File::Basename         'dirname';
+use Cwd                    'cwd';
+use Net::Domain            'hostfqdn';
+require DirHandle;
+require IO::File;
+
+use IMS::ReleaseMgr::Utils qw(fork_as_daemon write_log_line
+                              file_mirror_specification file_error
+                              DBI_mirror_specification
+                              DBI_match_mirror_to_host
+                              DBI_error);
+
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$revision = q{$Id: rlsmgrd_doc.html,v 1.1 2000/05/04 21:14:35 idsweb Exp $ };
+
+$USAGE = "Usage: $cmd mirror_group [ -H host ] [ -t level ] [ -T file ] [ -f ]
+\t[ -c file ]
+
+Where:
+-H host\t\tHostname for use in a mirror environment
+-t num\t\tEnable tracing (num sets level)
+-T file\t\tSend trace information to 'file' instead of tty
+-f\t\tFork and run in background as a daemon
+-c file\t\tRead configuration from file rather than from DBMS
+
+``mirror_group'' is the name of the host-pool grouping that this process is
+running as a part of. It is used as a search key in the DBMS.
+";
+if (grep($_ eq '-h', @ARGV))
+{
+    print "$USAGE\n" .
+        q{$Id: rlsmgrd_doc.html,v 1.1 2000/05/04 21:14:35 idsweb Exp $ } . "\n";
+    exit 0;
+}
+exit show_version if (grep(/-version/i, @ARGV));
+
+$SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /bad free/oi; };
+Getopt::Long::config 'no_ignore_case';
+GetOptions(\%opts, 'H=s', 't=i', 'T=s', 'f', 'c=s') or croak "$USAGE\nStopped";
+croak "$USAGE\nStopped" unless (defined($mirror_group = $ARGV[0]));
+$ENV{PATH} = '/bin:/usr/bin:/usr/sbin'; # This is purposeful!!!
+$dir = dirname $0;
+$dir = cwd if ((! $dir) or $dir eq '.');
+$ENV{PATH} = "$dir:/bin:/usr/bin:/usr/sbin";
+
+#
+# Global variables:
+#
+#     %opts          Options parsed out from @ARGV by getopts
+#     $trace         True/false whether tracing is enabled
+#     $tfile         Filehandle (class IO::File) for tracefile (STDOUT if ! -T)
+#     $period        Sleep-cycle period, defaults to 120 (measured in seconds)
+#     $script        Script to call to deploy the actual data
+#     $in_dir        Directory to monitor for incoming files
+#     $logdir        Directory in which general tool-action logging is done
+#     $job_limit     Maximum number of child '$script' processes at a time
+#     $mirror_group  The name of the mirror group we belong to. Less important
+#                      for a stand-alone system, critical for a mirror pool.
+#     %child_hash    A hash table whose keys are active child processes. These
+#                      are used by the dispatch_job and child_reaper routines
+#                      to track and manage sub-processes
+#
+
+$trace = $opts{t} || 0;
+
+%child_hash = ();
+if (defined $opts{c} and $opts{c})
+{
+    #
+    # I shouldn't do this, since it supports bad habits, but not enough people
+    # (and I forget, too) know that the process changes the working dir. Thus,
+    # the config file may not be readable by sub-processes, or if we receive a
+    # SIGHUP. So, ensure that the file is an absolute path. Add this working
+    # dir if it isn't.
+    #
+    if ($opts{c} !~ m|^/|o)
+    {
+        my $wdir = cwd;
+        $opts{c} = "$wdir/$opts{c}";
+    }
+}
+reread_config(undef); # Trick the HUP handler into reading the configuration
+
+$period      = $config->{SCAN_PERIOD_SECS} || 120;
+$script      = $config->{STAGE_2_TOOL}     || 'deploy_content';
+$job_limit   = $config->{MAX_CHILD_PROCS}  || 5;
+$in_dir      = $config->{INCOMING_DIR}     || '/opt/ims/incoming';
+$logdir      = $config->{LOGGING_DIR}      || '/opt/ims/logs';
+
+$tfile = $opts{T} || "$logdir/$cmd-trace";
+
+check_sanity;
+#
+# If the sanity check passed, go ahead and fork (if so requested)
+#
+chdir $in_dir;
+fork_as_daemon if (defined $opts{f} and $opts{f});
+
+if ($trace)
+{
+    write_log_line $tfile, sprintf("$cmd [$$] [%s] Started with tracing",
+                                   (scalar localtime));
+}
+
+write_log_line("$logdir/$cmd",
+               sprintf("%s [$$]: started for mirror group $mirror_group",
+                       (scalar localtime)));
+if ($trace & 12) # bxxxx11xx
+{
+    write_log_line($tfile,
+                   map {
+                       sprintf("$cmd [$$] CONFIG: %18s => %s",
+                               $_, $config->{$_})
+                   } (sort keys %$config));
+}
+
+write_lockfile;
+
+$SIG{CHLD} = \&child_reaper;
+$SIG{USR1} = \&SIG_inc_trace;
+$SIG{USR2} = \&SIG_dec_trace;
+$SIG{HUP}  = \&reread_config;
+$SIG{INT}  = \&cleanup;
+$SIG{QUIT} = \&cleanup;
+$SIG{POLL} = \&dump_info;
+
+#
+# Isolate ourselves in terms of specific hosts and mirror pools. If we were
+# *not* given a -H option, try to deduce our host pseudonym from either the
+# MIRROR_POOL_HOST_LIST Oracle tables or the mirror list file.
+#
+if (! defined($opts{H}))
+{
+    my $myhost = hostfqdn;
+    if (defined $opts{c})
+    {
+        $opts{H} = file_match_mirror_to_host(-file => "$opts{c}.mir",
+                                             -host => $myhost);
+    }
+    else
+    {
+        $opts{H} = DBI_match_mirror_to_host(-mirror => $mirror_group,
+                                            -host   => $myhost);
+    }
+    # Errors were ignored simply because an undef $opts{H} has its own meaning
+}
+
+while (1)
+{
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Checking $in_dir for packages",
+                           (scalar localtime)))
+        if ($trace & 8); # bxxxx1xxx
+    if (($trace & 4) and (keys %child_hash)) # bxxxxx1xx
+    {
+        for (sort keys %child_hash)
+        {
+            write_log_line $tfile, "-->\tChild $_ not yet reaped";
+        }
+    }
+
+    $dh = new DirHandle "$in_dir";
+    if (! defined $dh)
+    {
+        write_log_line("$logdir/$cmd",
+                       "$cmd: Could not open $in_dir for reading: $!, exiting.");
+        exit -1;
+    }
+    @files = grep(/\.info$/o, $dh->read);
+    $dh->close;
+    undef $dh;
+
+    #
+    # Sort @files by age, oldest first. First come, first severed...
+    #
+    @files = sort
+             { (stat("$in_dir/$a"))[9] <=> (stat("$in_dir/$b"))[9] }
+             @files;
+    for $file (@files)
+    {
+        #
+        # The return value from dispatch_job is zero if there were no child
+        # slots available. If there was a legitimate error, then it should
+        # have croaked itself so that the line number reference pointed to it.
+        # dispatch_job waits a reasonable time for slots to open, so if it
+        # comes back 0, we're pretty bogged down and should wait, anyway.
+        #
+        last if (! dispatch_job $file);
+    }
+
+    #
+    # Clear this list. If we didn't process all of the jobs, they'll be at the
+    # head of the list next time around.
+    #
+    @files = ();
+
+    sleep $period;
+}
+
+exit 0;
+
+##############################################################################
+#
+#   Sub Name:       child_reaper
+#
+#   Description:    Catch a SIGCHLD and remove the completed child from the
+#                   hash %child_hash, which will free the slot up for the next
+#                   job.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $sig      in      scalar    Signal name
+#
+#   Globals:        %child_hash
+#                   $trace
+#                   $tfile
+#
+#   Environment:    None.
+#
+#   Returns:        void context
+#
+##############################################################################
+sub child_reaper
+</pre>
+<br><hr><h1>Function: <a name="child_reaper">child_reaper</a></h1>
+<h2>Variables:</h2> <ul><li>$SIG<li>$child<li>$child_hash<li>$cmd<li>$sig<li>$tfile<li>$trace<li>%s<li>@_</ul>
+<h2>Calls:</h2><ul><li> delete<li>exists<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>#!/opt/ims/perl5/bin/perl
+##############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+##############################################################################
+#
+#   @(#)$Id: rlsmgrd_doc.html,v 1.1 2000/05/04 21:14:35 idsweb Exp $
+#
+#   Description:    This is a daemon that periodically looks in the release
+#                   manager's incoming area for new packages that need to be
+#                   deployed into the the HTTP content area.
+#
+#   Functions:      check_sanity
+#                   dispatch_job
+#                   child_reaper
+#                   cleanup
+#                   write_lockfile
+#
+#   Libraries:      Carp                    Core lib, cleaner error reporting
+#                   Getopt::Long            Core lib, cmd-line opts parsing
+#                   File::Basename          Core lib, utility function
+#                   Cwd                     Core lib, portable cwd function
+#                   IO::File                Core lib, file I/O class
+#                   DirHandle               Core lib, clean dir-reading class
+#                   IMS::ReleaseMgr::Utils  Locally-developed lib
+#
+#   Global Consts:  $cmd                    This tool's name
+#                   $USAGE                  Error message for bad dash-opts
+#
+#   Environment:    PATH                    Will drastically trim PATH
+#
+#
+#   YET TO DO:      Use a signal (maybe SIGINT or SIGCONT) to signal a need
+#                     to re-read DB config
+#                   Manual page
+#
+##############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$ENV{PATH} = '/bin:/usr/bin:/usr/sbin'; # This is purposeful!!!
+#
+# Global variables:
+#
+#     %opts          Options parsed out from @ARGV by getopts
+#     $trace         True/false whether tracing is enabled
+#     $tfile         Filehandle (class IO::File) for tracefile (STDOUT if ! -T)
+#     $period        Sleep-cycle period, defaults to 120 (measured in seconds)
+#     $script        Script to call to deploy the actual data
+#     $in_dir        Directory to monitor for incoming files
+#     $logdir        Directory in which general tool-action logging is done
+#     $job_limit     Maximum number of child '$script' processes at a time
+#     $mirror_group  The name of the mirror group we belong to. Less important
+#                      for a stand-alone system, critical for a mirror pool.
+#     %child_hash    A hash table whose keys are active child processes. These
+#                      are used by the dispatch_job and child_reaper routines
+#                      to track and manage sub-processes
+#
+    #
+    # I shouldn't do this, since it supports bad habits, but not enough people
+    # (and I forget, too) know that the process changes the working dir. Thus,
+    # the config file may not be readable by sub-processes, or if we receive a
+    # SIGHUP. So, ensure that the file is an absolute path. Add this working
+    # dir if it isn't.
+    #
+reread_config(undef); # Trick the HUP handler into reading the configuration
+#
+# If the sanity check passed, go ahead and fork (if so requested)
+#
+if ($trace & 12) # bxxxx11xx
+#
+# Isolate ourselves in terms of specific hosts and mirror pools. If we were
+# *not* given a -H option, try to deduce our host pseudonym from either the
+# MIRROR_POOL_HOST_LIST Oracle tables or the mirror list file.
+#
+    # Errors were ignored simply because an undef $opts{H} has its own meaning
+        if ($trace & 8); # bxxxx1xxx
+    if (($trace & 4) and (keys %child_hash)) # bxxxxx1xx
+    #
+    # Sort @files by age, oldest first. First come, first severed...
+    #
+        #
+        # The return value from dispatch_job is zero if there were no child
+        # slots available. If there was a legitimate error, then it should
+        # have croaked itself so that the line number reference pointed to it.
+        # dispatch_job waits a reasonable time for slots to open, so if it
+        # comes back 0, we're pretty bogged down and should wait, anyway.
+        #
+    #
+    # Clear this list. If we didn't process all of the jobs, they'll be at the
+    # head of the list next time around.
+    #
+##############################################################################
+#
+#   Sub Name:       child_reaper
+#
+#   Description:    Catch a SIGCHLD and remove the completed child from the
+#                   hash %child_hash, which will free the slot up for the next
+#                   job.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $sig      in      scalar    Signal name
+#
+#   Globals:        %child_hash
+#                   $trace
+#                   $tfile
+#
+#   Environment:    None.
+#
+#   Returns:        void context
+#
+##############################################################################/n/n     my $sig = shift; # ...we don't use it, just clear it out of @_
+    $SIG{$sig} = \&child_reaper; # In case of broken SysV signals
+        if ($trace & 2); # bxxxxxx1x</pre>
+<h2>Code:</h2> <pre>{
+    my $sig = shift; # ...we don't use it, just clear it out of @_
+
+    my $child = wait;
+    $SIG{$sig} = \&child_reaper; # In case of broken SysV signals
+
+    delete $child_hash{$child} if (exists $child_hash{$child});
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] Registered exit of child $child",
+                           (scalar localtime)))
+        if ($trace & 2); # bxxxxxx1x
+    return;
+}</pre>
+<br><hr><h1>Function: <a name="dispatch_job">dispatch_job</a></h1>
+<h2>Variables:</h2> <ul><li>$child_hash<li>$cmd<li>$current_kids<li>$file<li>$i<li>$job_limit<li>$logdir<li>$mirror_group<li>$opts<li>$pid<li>$script<li>$tfile<li>$trace<li>%child_hash<li>%s<li>@cmd</ul>
+<h2>Calls:</h2><ul><li> add<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>##############################################################################
+#
+#   Sub Name:       dispatch_job
+#
+#   Description:    Fork a child process to run the specified script on an
+#                   info file, to cause the deployment of the content file.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $file     in      scalar    Name of info file to use
+#
+#   Globals:        %child_hash
+#                   $script
+#                   $job_limit
+#                   $logdir
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    pid of child
+#                   Failure:    0, could not get a job slot
+#
+##############################################################################/n/n     #
+    # Construct the command to exec. Split the value of $script in case the
+    # caller specified some flags there. Add in the legacy flags that the
+    # child needs, then add in the file itself.
+    #
+        last if ($i++ > 10); # Arbitrary
+        sleep 2; # Arbitrary... could be changed
+            if ($trace & 2); # bxxxxxx1x
+    if ($trace & 4) # bxxxxx1xx
+        #
+        # Spit out the full command for debugging
+        #
+        # parent
+            if ($trace & 2); # bxxxxxx1x
+        # child -- never returns</pre>
+<h2>Code:</h2> <pre>{
+    my $file = shift;
+
+    my ($pid, @cmd, $current_kids, $i);
+
+    #
+    # Construct the command to exec. Split the value of $script in case the
+    # caller specified some flags there. Add in the legacy flags that the
+    # child needs, then add in the file itself.
+    #
+    @cmd = split(/\s+/, $script);
+    push(@cmd, '-H' => $opts{H}) if (defined $opts{H} and $opts{H});
+    push(@cmd, '-t' => $trace)   if ($trace);
+    push(@cmd, '-T' => $tfile)   if ($tfile ne '-');
+    push(@cmd, '-c' => $opts{c}) if (defined $opts{c} and $opts{c});
+    push(@cmd, $mirror_group, $file);
+
+    $current_kids = scalar(keys %child_hash);
+    $i = 0;
+    while ($current_kids >= $job_limit)
+    {
+        last if ($i++ > 10); # Arbitrary
+        sleep 2; # Arbitrary... could be changed
+        $current_kids = scalar(keys %child_hash);
+    }
+
+    if ($current_kids >= $job_limit)
+    {
+        write_log_line($tfile,
+                       sprintf("$cmd [$$] [%s] No child slots available for " .
+                               "$file",
+                               (scalar localtime)))
+            if ($trace & 2); # bxxxxxx1x
+        return 0;
+    }
+    if ($trace & 4) # bxxxxx1xx
+    {
+        #
+        # Spit out the full command for debugging
+        #
+        write_log_line $tfile, sprintf("$cmd [$$] [%s] Running: @cmd",
+                                       scalar localtime);
+    }
+
+    if ($pid = fork)
+    {
+        # parent
+        $child_hash{$pid} = 1;
+        write_log_line($tfile,
+                       sprintf("$cmd [$$] [%s] Launched child $pid for $file",
+                               (scalar localtime)))
+            if ($trace & 2); # bxxxxxx1x
+        write_log_line("$logdir/$cmd",
+                       sprintf("%s [$$]: job $pid launched for $file",
+                               (scalar localtime)));
+        return $pid;
+    }
+    else
+    {
+        # child -- never returns
+        exec @cmd;
+    }
+}</pre>
+<br><hr><h1>Function: <a name="check_sanity">check_sanity</a></h1>
+<h2>Variables:</h2> <ul><li>$_<li>$cmd<li>$fh<li>$in_dir<li>$lockfile<li>$parts<li>$pid<li>@parts</ul>
+<h2>Calls:</h2><ul><li> eq<li>headers<li>new<li>on<li>remove</ul>
+<h2>Comments:</h2> 
+ <pre>##############################################################################
+#
+#   Sub Name:       check_sanity
+#
+#   Description:    Make certain that there is not already a lockfile in the
+#                   directory that we are monitoring.
+#
+#   Arguments:      None.
+#
+#   Globals:        $in_dir
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    exits
+#
+##############################################################################/n/n         #
+        # Read it for a pid and check that it's another rlsmgrd. If the
+        # process $pid isn't another daemon, then it's a stale lockfile and
+        # remove it. If it is, then silently exit.
+        #
+        $_ = <PIPE>;  # Skip line that has column headers
+                # OK, we're already running on this directory
+        # Either not found at all, or not a rlsmgrd process</pre>
+<h2>Code:</h2> <pre>{
+    my $lockfile = "$in_dir/.$cmd";
+
+    my @parts;
+
+    if (-e $lockfile)
+    {
+        #
+        # Read it for a pid and check that it's another rlsmgrd. If the
+        # process $pid isn't another daemon, then it's a stale lockfile and
+        # remove it. If it is, then silently exit.
+        #
+        my $fh = new IO::File "< $lockfile";
+        croak "Could not open $lockfile for reading: $!, stopped"
+            unless (defined $fh);
+        my $pid = <$fh>;
+        $fh->close;
+        chomp $pid;
+        open(PIPE, "ps -e |");
+        $_ = <PIPE>;  # Skip line that has column headers
+        while (defined($_ = <PIPE>))
+        {
+            chomp;
+            s/^\s+//o;
+            @parts = split(/\s+/, $_);
+            next unless ($parts[0] == $pid);
+            if ($parts[3] eq $cmd)
+            {
+                # OK, we're already running on this directory
+                close PIPE;
+                exit 0;
+            }
+        }
+
+        # Either not found at all, or not a rlsmgrd process
+        unlink $lockfile;
+        close(PIPE);
+    }
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="write_lockfile">write_lockfile</a></h1>
+<h2>Variables:</h2> <ul><li>$cmd<li>$fh<li>$in_dir</ul>
+<h2>Calls:</h2><ul><li> new<li>print</ul>
+<h2>Comments:</h2> 
+ <pre>##############################################################################
+#
+#   Sub Name:       write_lockfile
+#
+#   Description:    Create a lockfile for this process in the directory that
+#                   is being monitored. This allows multiple daemons to run,
+#                   as long as none are trying to monitor the same directory.
+#
+#   Arguments:      None.
+#
+#   Globals:        $in_dir
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+##############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my $fh = new IO::File "> $in_dir/.$cmd";
+    if (! defined $fh)
+    {
+        croak "Error opening $in_dir/.$cmd as a lockfile: $!, stopped";
+    }
+    print $fh "$$\n";
+    $fh->close;
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="reread_config">reread_config</a></h1>
+<h2>Variables:</h2> <ul><li>$SIG<li>$cmd<li>$config<li>$logdir<li>$mirror_group<li>$opts<li>$sig<li>$tfile<li>$trace<li>%s</ul>
+<h2>Calls:</h2><ul><li> DBI_error<li>DBI_mirror_specification<li>data<li>file_error<li>file_mirror_specification<li>from<li>get<li>mirror<li>on<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       reread_config
+#
+#   Description:    When the specific signal (probably HUP) is received, go and
+#                   read the configuration again, from file or Oracle,
+#                   depending on whether -c was originally passed. If the value
+#                   of $sig is undef, that's because I hate duplicate code and
+#                   I've called this for the initial configuration read, being
+#                   the sneaky sort that I am.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $sig      in      scalar    Signal that was received
+#
+#   Globals:        %opts
+#                   $config
+#                   $mirror_group
+#                   $cmd
+#                   $dir
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################/n/n             if ($trace); # bxxxxxxxx
+                if ($trace); # bxxxxxxxx
+                if ($trace); # bxxxxxxxx</pre>
+<h2>Code:</h2> <pre>{
+    my $sig = shift;
+
+    if (defined $sig)
+    {
+        $SIG{$sig} = \&reread_config;
+        write_log_line("$logdir/$cmd",
+                       sprintf("%s [$$]: Re-loading configuration on SIG$sig.",
+                               (scalar localtime)));
+        write_log_line($tfile,
+                       sprintf("$cmd [$$] [%s] Re-loading configuration on " .
+                               "SIG$sig", (scalar localtime)))
+            if ($trace); # bxxxxxxxx
+    }
+
+    if (defined $opts{c} and $opts{c})
+    {
+        $config = file_mirror_specification(-file => $opts{c});
+        if (! defined $config)
+        {
+            write_log_line($tfile,
+                           sprintf("$cmd [$$] [%s] Error re-reading config " .
+                                   "file $opts{c}: %s",
+                                   (scalar localtime), file_error))
+                if ($trace); # bxxxxxxxx
+            croak "$cmd was unable to get data for $mirror_group from file " .
+                "$opts{c}, stopped";
+        }
+    }
+    else
+    {
+        $config = DBI_mirror_specification(-mirror => $mirror_group);
+        if (! defined $config)
+        {
+            write_log_line($tfile,
+                           sprintf("$cmd [$$] [%s] Error loading from Oracle" .
+                                   ": %s, stopping.",
+                                   (scalar localtime), DBI_error))
+                if ($trace); # bxxxxxxxx
+            croak "$cmd was unable to get data for $mirror_group from " .
+                "Oracle:" . DBI_error . ", stopped";
+        }
+    }
+
+    if (defined $sig and defined $config->{INCOMING_DIR})
+    {
+        croak "$cmd could not chdir to $config->{INCOMING_DIR}: $!, stopped"
+            unless (chdir $config->{INCOMING_DIR});
+    }
+
+    return;
+}</pre>
+<br><hr><h1>Function: <a name="dump_info">dump_info</a></h1>
+<h2>Variables:</h2> <ul><li>$_<li>$base<li>$cmd<li>$config<li>$date<li>$opts<li>$sig<li>$tfile<li>%s</ul>
+<h2>Calls:</h2><ul><li> base<li>date<li>on<li>write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       dump_info
+#
+#   Description:    Upon receipt of a signal, send a dump of relevant
+#                   configuration information to the trace-file
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $sig      in      scalar    Signal that triggered this
+#
+#   Globals:        $trace
+#                   $tfile
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################/n/n     my $base = "$cmd [$$] [$date]"; # Sort of a prefix used in the output lines</pre>
+<h2>Code:</h2> <pre>{
+    my $sig = shift;
+
+    my $date = scalar localtime;
+    my $base = "$cmd [$$] [$date]"; # Sort of a prefix used in the output lines
+
+    write_log_line($tfile,
+                   "$base Dumping configuration information on signal $sig",
+                   "$base Config source is " .
+                   ((defined $opts{c} and $opts{c}) ? "file $opts{c}" : "DBI"),
+                   (map { sprintf "$base %-24s = %s", $_, $config->{$_} }
+                    (sort keys %{$config})));
+
+    1;
+}</pre>
+<br><hr><h1>Function: <a name="cleanup">cleanup</a></h1>
+<h2>Variables:</h2> <ul><li>$cmd<li>$in_dir<li>$logdir<li>$sig<li>$tfile<li>$trace<li>%s</ul>
+<h2>Calls:</h2><ul><li> write_log_line</ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#   Sub Name:       cleanup
+#
+#   Description:    Clean up any lingering bits on exit.
+#
+#   Arguments:      $sig
+#
+#   Globals:        $in_dir
+#                   $cmd
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################/n/n         if ($trace & 1); # bxxxxxxx1</pre>
+<h2>Code:</h2> <pre>{
+    my $sig = shift;
+
+    write_log_line("$logdir/$cmd",
+                   sprintf("%s [$$]: exiting.", (scalar localtime)));
+    write_log_line($tfile,
+                   sprintf("$cmd [$$] [%s] exiting after receiving SIG$sig",
+                           (scalar localtime)))
+        if ($trace & 1); # bxxxxxxx1
+    unlink "$in_dir/.$cmd" if (-e "$in_dir/.$cmd");
+
+    exit 0;
+}</pre>
+</BODY></HTML>

@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>Using the Build Hooks in the Release Manager System</TITLE>
+<META NAME="Template" CONTENT="C:\data\ms\template\Quirks.dot">
+</HEAD>
+<BODY>
+
+<B><FONT FACE="Arial" SIZE=4><P>Using the Build Hooks in the Release Manager System</P>
+</B></FONT><FONT SIZE=2><P>Last modified:&#9;7/20/99 5:01 PM</P>
+<P>The purpose of the build-hooks functionality within the Release Manager System is to provide to projects a means by which they can effect reasonable alterations to their product base at the four steps of the development process. These steps (for the sake of clarification and definition) are considered to be:</P>
+
+<UL>
+
+<UL>
+<B><LI>checkout</B> – Project files are retrieved from the CVS repository into the user’s private working area.</LI>
+<B><LI>populate</B> – Changes made by a developer are propagated into the document area of the development host’s web server testing area.</LI>
+<B><LI>stage</B> – Project content is deployed to a staging area in a manner similar to <B>checkout</B>, with the filtering utility set to use file-path and URL translation rules appropriate to the target host of the staging operation.</LI>
+<B><LI>release </B>– Content that has been staged is actually bundled and transferred to the intended destination-host. The collection of files is physically copied to a different machine, generally one outside of the corporate firewall.</LI></UL>
+</UL>
+
+<P>The hook interface as it currently stands is designed to provide simple functionality using available tools and techniques.</P>
+</FONT><B><FONT FACE="Arial"><P>Using Make Rules and Actions</P>
+</B></FONT><FONT SIZE=2><P>The base tool for providing this functionality is the UNIX utility called <B>make</B>. It is almost ubiquitous across UNIX platforms, and a freely obtainable version exists should it be necessary for supporting a machine that lacks the utility. The syntax and semantics are generally already a part of a developer’s set of skills.</P>
+<P>For each of the four stages itemized above, the tool used to perform the action (which shares its name with the action) will look for the existence of a file named &quot;</FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2>&quot; in the top-most directory of the project. If that file is present, The <B>make</B> utility will be invoked, with a target rule of the same name (<I>checkout</I>, <I>release</I>, etc.). If that rule does not exist, the error condition is quietly ignored. If the resultant error is due to a cause <I>other than</I> lack of a given rule, the full error message will be presented to the user running the tool for diagnosis.</P>
+<P>In terms of the <B>make</B> utility, a <I>rule</I> is a construct with two parts, the second of which may be empty. The first part is the <I>target</I>, or <I>name</I>. The target need not be unique. If the target appears more than once in the </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2>, then each rule by that name is executed in sequence. The second part of the rule is the action, and it is expressed as a sequence of one or more lines of shell script code (which defaults to the Bourne shell or Korn shell, but can be coerced into using the C shell). The lines may have no blank lines separating them (the blank line is considered a separator by <B>make</B>), and each must be indented with at least one hard tab stop (a sequence of eight space characters is not sufficient). For more detail on how to maximize the usefulness of make and developing Makefiles, consult the book, &quot;<I>Managing Projects with Make</I>&quot;, available from O’Reilly and Associates.</P>
+<P>A rule’s action may also be empty. It is strongly recommended that if a </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2> is added to a project to enable hooks for only one or two of the stages, that the file include rules with empty actions for the remaining targets. This will not only leave the file prepared for future enhancement, but it will bring consistency to the </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2> itself and save processing effort by eliminating &quot;missing rule&quot; errors from make (which are subsequently ignored). Ideally, a prototypical </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2> would start out looking like this:</P>
+</FONT><FONT FACE="Courier New" SIZE=2><P>&#9;checkout::</P>
+<P>&#9;populate::</P>
+<P>&#9;stage::</P>
+<P>&#9;prerelease::</P>
+<P>&#9;release::</P>
+</FONT><FONT SIZE=2><P>The doubled colon characters allow for multiple rules to be defined under the same name. In addition, these rules are empty, bypassing error conditions from <B>make</B>. From here, additional instances of rules may be defined for those rules that need actions assigned to them. At the same time, those rules that still require no action remain present.</P>
+</FONT><B><FONT FACE="Arial"><P>Mechanics of the Hook Execution</P>
+</B></FONT><FONT SIZE=2><P>The hooks for <B>make</B> are only attempted if the presence of a </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2> is detected. This file must be in the root directory of the project, where it will eventually be deployed into the document area of the web server during the <B>release</B> operation. At the end of each of the four defined steps, the tool executing that step tests for this file. When it is found, the <B>make</B> command is executed with the step name as the target. The command is executed from within the directory that the </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2> resides in. Any relative file paths will be relative to this directory. For example, the <B>populate</B> step on the machine </FONT><FONT FACE="Courier New" SIZE=2>webdev</FONT><FONT SIZE=2> currently uses the directory </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/htdocs</FONT><FONT SIZE=2> as the web server documents root, appending the project name for the complete path. For project &quot;phoenix&quot;, the full path would be </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/htdocs/phoenix</FONT><FONT SIZE=2>, and in the presence of a </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2>, the command &quot;</FONT><FONT FACE="Courier New" SIZE=2>make populate</FONT><FONT SIZE=2>&quot; would be run with a working directory of </FONT><FONT FACE="Courier New" SIZE=2>/opt/ims/htdocs/phoenix</FONT><FONT SIZE=2>.</P>
+<P>In addition to specifying a target to <B>make</B>, the tool executing the command provides three variable definitions on the command line. These variables and their values are:</P>
+<P>&#9;<B>HTDOCS</P><DIR>
+<DIR>
+<DIR>
+<DIR>
+
+</B><P>The full path of the document directory with regards to the current step. This will be an absolute path.</P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<P>&#9;<B>CGIBIN</P><DIR>
+<DIR>
+<DIR>
+<DIR>
+
+</B><P>The full path the CGI directory for this project’s executable content. On some steps, the CGI area is a sub-directory of the document area. For other steps, it may be a sibling. This too is an absolute path.</P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<P>&#9;<B>STEP</P><DIR>
+<DIR>
+<DIR>
+<DIR>
+
+</B><P>The name of the step being executed. This is exactly the same as the rule being invoked, but is also provided as a make variable for the convenience of any project that needs to use the value within execution of the rule.</P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<P>The intent is to spare the project the need of hard-coding or guessing at the values of those directory paths. These variables can be assigned default values in the </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2> itself; <B>make</B> will give run-time precedence to the command line values over the hard-coded ones.</P>
+</FONT><I><FONT FACE="Arial" SIZE=2><P>NOTE: This functionality does not yet exist on the &quot;<B>release</B>&quot; step, even though that step does currently support the </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT FACE="Arial" SIZE=2> functionality in general.</P>
+</I></FONT><FONT SIZE=2><P>If an error is reported by the <B>make</B> utility, it is either ignored or reported back to the same list of e-mail addresses that would receive any other error notification. The only error message that is ignored is the message informing the user that no such rule exists. To avoid saddling projects with the necessity of defining all rules, whether needed or not, these errors are discarded, as are diagnostic messages warning that the executed rule had no actions. Any other content (message text from make) is included in the summary message sent upon completion. For the <B>release</B> step, this is electronic mail. For the other steps, it is simply displayed on the terminal.</P>
+<P>As a final note, the <B>release</B> step alone removes (unlinks) the </FONT><FONT FACE="Courier New" SIZE=2>Makefile</FONT><FONT SIZE=2> upon completion of the command. This is to prevent the file being accessed via the web server. The unlink step is not done for any other steps.</P></FONT></BODY>
+</HTML>

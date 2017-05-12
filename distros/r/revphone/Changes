@@ -1,0 +1,7 @@
+Revision history for Perl extension revphone.
+
+0.01  Thu Jun  3 13:41:17 2004
+	- original version; created by h2xs 1.23 with options
+		-AXc -n revphone
+
+First Release, No Change Log

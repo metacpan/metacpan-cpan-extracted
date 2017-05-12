@@ -1,0 +1,61 @@
+Revision history for rgit
+
+0.08    2010-03-06 00:00 UTC
+        + Fix : Only apply abs_path() to paths that are either relative or that
+                contains '..'. This should fix test failures on Mac OS X.
+
+0.07    2010-02-24 19:25 UTC
+        + Chg : Policies earned their own set of classes under the
+                App::Rgit::Policy namespace.
+        + Chg : Object::Tiny is no longer a dependency.
+        + Chg : The module now depends on File::Spec in spite of
+                File::Spec::Functions.
+        + Chg : Also try to append .exe, .com and .cmd to the end of the git
+                path on Win32.
+        + Fix : rgit used to run the command in "/path/foo.git" when the root
+                directory was named "/path/foo/".
+        + Fix : Work around Kwalitee test misfailures.
+        + Opt : The .git directories won't be searched for another repositories
+                anymore.
+        + Tst : Skip tests when the mock git executable can't be run.
+
+0.06    2009-01-04 15:35 UTC
+        + Chg : INCOMPATIBLE CHANGE : since ^ is actually an escape character
+                for cmd.exe, and that there's no good universal escape
+                character, let's use % for our formats instead.
+        + Fix : Tests on Win32.
+        + Doc : Nits and clarifications.
+
+0.05    2008-10-21 21:15 UTC
+        + Add : When a command returned non-zero, you are now ask if you want to
+                fork a shell inside the repository.
+        + Add : The -D command-line switch makes rgit output diagnostics. The
+                default is quieter than before.
+        + Chg : Perl 5.8 is required.
+        + Upd : META.yml spec updated to 1.4.
+
+0.04    2008-10-07 22:05 UTC
+        + Add : Command-line switches -V, -I, -K. List::Util isn't required
+                anymore.
+        + Add : Policies for when a command fail.
+        + Add : Interactive mode.
+        + Fix : Test more portably the returned status of system. POSIX is
+                required.
+        + Fix : git-gui should be ran once too.
+        + Fix : Setting GIT_DIR didn't really work.
+        + Tst : Coverage down to 95%.
+
+0.03    2008-10-06 16:45 UTC
+        + Chg : Repositories are now sorted by path before being visited.
+        + Fix : Prefer to chdir() into the working directory, as commands like
+                pull may need it.
+        + Fix : The root directory can also be a repository.
+        + Tst : Almost reached 98% of coverage.
+
+0.02    2008-10-05 22:40 UTC
+        + Fix : Missing $VERSION in App::Rgit::Config.
+        + Tst : Don't bundle fake repositories, but create them on the fly.
+        + Tst : Improve coverage up to 97%.
+
+0.01    2008-10-05 15:45 UTC
+        First version, released on an unsuspecting world.

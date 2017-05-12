@@ -1,0 +1,53 @@
+Todo
+====
+
+Things todo in the near future.
+
+1. Rethink router "driver" naming hierarchy.
+
+Originally Router::LG.pm was just LG.pm, but the CPAN guys didn't like the 
+idea of a 2 letter top-level name hierarchy (can't say that I blame them).
+So I changed it to Router::LG at their suggestion.
+
+But now I'm thinking that maybe this can lead to bigger and better things 
+down the road.  What if other developers wanted to create modules to 
+manage Router configurations, routing tables, etc, etc.
+
+Ideally, a hierarchy would look something like this
+
+Router::Driver::[Vendor]	- Remote access routines
+Router::LG			- Looking Glass
+Router::Config			- Configuration data structure
+
+In some cases, where Router::* modules require more data than 
+the "Driver" module contains, more hierarchies could be created under the 
+module in question.
+ 
+Router::Driver::Cisco	- Contains strict remote access methods
+Router::LG::Cisco	- Contains a list of accepted "public" commands
+			  and uses "Router::Driver::Cisco" to access the 
+			  router.
+
+I doubt that I could implement all of this myself, but it's an interesting 
+proposal for a framework.  It probably needs to pass the muster of the 
+CPAN maintainers.
+
+2. Rethink the command structure
+
+The defined command structure is pretty complex.  It specifies types of 
+data, yet the Router::LG module doesn't perform any type checking at all.  
+I'm probably going to make this simpler, and depend on the router to 
+remove tainted input.  It shouldn't be too risky. (See "Routers").
+
+3. General code cleanup
+
+Some of the code is a little messy IMHO, and there are probably one or 
+two perl conventions that I am not adhering to.  This will be 
+corrected in a future version.
+
+4. Rethink information retrieval methodology
+
+The Looking Glass is necessary for traceroute and ping functions, but is 
+it needed for information retrieval functions?  If the same information 
+is retrievable by SNMP, should SNMP be used instead of command line access?
+Just something to think about.

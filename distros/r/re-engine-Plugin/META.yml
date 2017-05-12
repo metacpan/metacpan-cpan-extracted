@@ -1,0 +1,35 @@
+---
+abstract: 'API to write custom regex engines'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+  - 'Vincent Pit <perl@profvince.com>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  XSLoader: '0'
+  lib: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: re-engine-Plugin
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+  perl: '5.010'
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Name=re-engine-Plugin
+  homepage: http://search.cpan.org/dist/re-engine-Plugin/
+  license: http://dev.perl.org/licenses/
+  repository: http://git.profvince.com/?p=perl%2Fmodules%2Fre-engine-Plugin.git
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

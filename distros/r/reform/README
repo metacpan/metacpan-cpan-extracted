@@ -1,0 +1,185 @@
+NAME
+    reform - Third millenium syntax for Perl 5 OOP
+
+SYNOPSIS
+        use reform;
+
+        package Class < Base;
+
+        fields foo,
+               bar,
+               baz;
+
+        sub initialize($foo, $bar, $baz)
+        {
+            base->initialize($foo);
+            self->foo = $foo;
+            self->bar = $bar;
+            self->baz = $baz;
+        }
+
+        sub method
+        {
+            print "Hi there";
+            class->static_method();
+        }
+
+        sub get_foo
+        {
+            print "Getting self->foo!";
+            return self->{foo};
+        }
+
+        sub set_foo($value)
+        {
+            print "Setting self->foo!";
+            self->{foo} = $value;
+        }
+
+DESCRIPTION
+    This module provides a less awkward syntax for Perl 5 OOP. "reform" must
+    be the first thing to be used in your code, even above your package
+    declaration.
+
+  Shorthand inheritance
+
+    Rather than using the cumbersome "use base 'Parent'" you may write:
+
+        package Child < Parent;
+
+  Shorthand parameters
+
+    It is no longer necessary to fish method parameters out of "@_":
+
+        sub method($foo, $bar)
+        {
+            print "First param: $foo";
+            print "Second param: $bar";
+        }
+
+  Implicit self, class and base
+
+    References to the instance, the class (package) and the base class are
+    implicitely provided as "self", "class" and "base":
+
+        sub method
+        {
+            self->instance_method();
+            class->static_method();
+            base->super_class_method();
+        }
+
+  Pretty field accessors
+
+    You may omit the curly brackets in "self->{foo}" if you declare your
+    field names using "fields":
+
+        fields foo, bar;
+
+        sub method {
+            self->foo = "some value";
+            print self->foo;
+        }
+
+    You may intercept read and write access to instance fields by
+    overwriting getter and setter methods:
+
+        fields foo;
+
+        sub get_foo
+        {
+            print "Getting foo!";
+            return self->{foo};
+        }
+
+        sub set_foo($value)
+        {
+            print "Setting foo!";
+            self->{foo} = $value;
+        }
+
+    Note that you must wrap the field names in curly brackets to access the
+    actual "self->{foo}" inside of getter and setter methods.
+
+  Clean constructors
+
+    All reformed packages inherit a basic constructor "new" from the "Class"
+    package. When you need custom contructors, don't overwrite "new" -
+    overwrite "initialize":
+
+        use reform;
+        package Amy;
+
+        fields foo,
+               bar;
+
+        sub initialize($foo)
+        {
+            self->foo = $foo;
+        }
+
+    You may call the constructor of a base class by calling
+    "base->initialize()".
+
+  Dynamically adding field accessors
+
+    When you need to dynamically add field accessors, use
+    "self->add_field($field)":
+
+        sub method
+        {
+            self->add_field('boo');
+            self->boo = 55;
+        }
+
+    Note that all objects constructed after a use of "add_field" will also
+    bear the new accessors.
+
+    You may request a list of all fields currently assigned to a class by
+    calling "self->fields" or "class->fields";
+
+INSTALLING
+    This package should have come with three files: "reform.pm",
+    "reform/implicit.pm" and "reform/Property.pm".
+
+    The only somewhat exotic CPAN package you will need to run this is
+    "Filter::Simple"
+    <http://search.cpan.org/~dconway/Filter-Simple-0.79/lib/Filter/Simple.pm
+    >. This package comes included with Perl 5.8, so you only need to act
+    when you're running Perl 5.6.
+
+  Installing Filter::Simple on Windows
+
+    Open a command prompt and type:
+
+        ppm install Filter
+        ppm install Text-Balanced
+
+    Now copy the document at
+    http://search.cpan.org/src/DCONWAY/Filter-Simple-0.79/lib/Filter/Simple.
+    pm to "c:\perl\site\lib\Filter\Simple.pm" or wherever you store your
+    packages.
+
+  Installing Filter::Simple anywhere else
+
+    I guess copying "Filter::Util::Call", "Text::Balanced", "Filter::Simple"
+    and all their prerequisites from CPAN should work.
+
+EXPORTS
+    "self", "class", "base".
+
+BUGS
+    Plenty I'm sure.
+
+UPDATES
+	Will be posted to CPAN.
+
+COPYRIGHT
+    Copyright (C) 2004 Henning Koch. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Henning Koch <jaz@netalive.org>
+

@@ -1,0 +1,230 @@
+<HTML>
+<HEAD>
+<TITLE>reform - Third millenium syntax for Perl 5 OOP</TITLE>
+<LINK REL="stylesheet" HREF="styles.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;reform - Third millenium syntax for Perl 5 OOP</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#shorthand inheritance">Shorthand inheritance</A></LI>
+		<LI><A HREF="#shorthand parameters">Shorthand parameters</A></LI>
+		<LI><A HREF="#implicit self, class and base">Implicit self, class and base</A></LI>
+		<LI><A HREF="#pretty field accessors">Pretty field accessors</A></LI>
+		<LI><A HREF="#clean constructors">Clean constructors</A></LI>
+		<LI><A HREF="#dynamically adding field accessors">Dynamically adding field accessors</A></LI>
+	</UL>
+
+	<LI><A HREF="#installing">INSTALLING</A></LI>
+	<UL>
+
+		<LI><A HREF="#installing filter::simple on windows">Installing Filter::Simple on Windows</A></LI>
+		<LI><A HREF="#installing filter::simple anywhere else">Installing Filter::Simple anywhere else</A></LI>
+	</UL>
+
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#updates">UPDATES</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>reform - Third millenium syntax for Perl 5 OOP</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use reform;</PRE>
+<PRE>
+    package Class &lt; Base;</PRE>
+<PRE>
+    fields foo,
+           bar,
+           baz;</PRE>
+<PRE>
+    sub initialize($foo, $bar, $baz)
+    {
+        base-&gt;initialize($foo);
+        self-&gt;foo = $foo;
+        self-&gt;bar = $bar;
+        self-&gt;baz = $baz;
+    }</PRE>
+<PRE>
+    sub method
+    {
+        print &quot;Hi there&quot;;
+        class-&gt;static_method();
+    }</PRE>
+<PRE>
+    sub get_foo
+    {
+        print &quot;Getting self-&gt;foo!&quot;;
+        return self-&gt;{foo};
+    }</PRE>
+<PRE>
+    sub set_foo($value)
+    {
+        print &quot;Setting self-&gt;foo!&quot;;
+        self-&gt;{foo} = $value;
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides a less awkward syntax for Perl 5 OOP.
+<CODE>reform</CODE> must be the <STRONG>first</STRONG> thing to be used in your code,
+even above your package declaration.</P>
+<P>
+<H2><A NAME="shorthand inheritance">Shorthand inheritance</A></H2>
+<P>Rather than using the cumbersome <CODE>use base 'Parent'</CODE> you may write:</P>
+<PRE>
+    package Child &lt; Parent;</PRE>
+<P>
+<H2><A NAME="shorthand parameters">Shorthand parameters</A></H2>
+<P>It is no longer necessary to fish method parameters out of <CODE>@_</CODE>:</P>
+<PRE>
+    sub method($foo, $bar)
+    {
+        print &quot;First param: $foo&quot;;
+        print &quot;Second param: $bar&quot;;
+    }</PRE>
+<P>
+<H2><A NAME="implicit self, class and base">Implicit self, class and base</A></H2>
+<P>References to the instance, the class (package) and the base class
+are implicitely provided as <CODE>self</CODE>, <CODE>class</CODE> and <CODE>base</CODE>:</P>
+<PRE>
+    sub method
+    {
+        self-&gt;instance_method();
+        class-&gt;static_method();
+        base-&gt;super_class_method();
+    }</PRE>
+<P>
+<H2><A NAME="pretty field accessors">Pretty field accessors</A></H2>
+<P>You may omit the curly brackets in <CODE>self-&gt;{foo}</CODE> if you declare
+your field names using <CODE>fields</CODE>:</P>
+<PRE>
+    fields foo, bar;</PRE>
+<PRE>
+    sub method {
+        self-&gt;foo = &quot;some value&quot;;
+        print self-&gt;foo;
+    }</PRE>
+<P>You may intercept read and write access to instance fields by overwriting
+getter and setter methods:</P>
+<PRE>
+    fields foo;</PRE>
+<PRE>
+    sub get_foo
+    {
+        print &quot;Getting foo!&quot;;
+        return self-&gt;{foo};
+    }</PRE>
+<PRE>
+    sub set_foo($value)
+    {
+        print &quot;Setting foo!&quot;;
+        self-&gt;{foo} = $value;
+    }</PRE>
+<P>Note that you must wrap the field names in curly brackets
+to access the actual <CODE>self-&gt;{foo}</CODE> inside of getter and
+setter methods.</P>
+<P>
+<H2><A NAME="clean constructors">Clean constructors</A></H2>
+<P>All reformed packages inherit a basic constructor <CODE>new</CODE> from the <CODE>Class</CODE> package.
+When you need custom contructors, don't overwrite <CODE>new</CODE> - overwrite <CODE>initialize</CODE>:</P>
+<PRE>
+    use reform;
+    package Amy;</PRE>
+<PRE>
+    fields foo,
+           bar;</PRE>
+<PRE>
+    sub initialize($foo)
+    {
+        self-&gt;foo = $foo;
+    }</PRE>
+<P>You may call the constructor of a base class by calling <CODE>base-&gt;initialize()</CODE>.</P>
+<P>
+<H2><A NAME="dynamically adding field accessors">Dynamically adding field accessors</A></H2>
+<P>When you need to dynamically add field accessors, use <CODE>self-&gt;add_field($field)</CODE>:</P>
+<PRE>
+    sub method
+    {
+        self-&gt;add_field('boo');
+        self-&gt;boo = 55;
+    }</PRE>
+<P>Note that all objects constructed after a use of <CODE>add_field</CODE> will also
+bear the new accessors.</P>
+<P>You may request a list of all fields currently assigned to a class by
+calling <CODE>self-&gt;fields</CODE> or <CODE>class-&gt;fields</CODE>;</P>
+<P>
+<HR>
+<H1><A NAME="installing">INSTALLING</A></H1>
+<P>This package should have come with three files:
+<CODE>reform.pm</CODE>, <CODE>reform/implicit.pm</CODE> and <CODE>reform/Property.pm</CODE>.</P>
+<P>The only somewhat exotic CPAN package you will need to run this
+is <CODE>Filter::Simple</CODE> &lt;<A HREF="http://search.cpan.org/~dconway/Filter-Simple-0.79/lib/Filter/Simple.pm">http://search.cpan.org/~dconway/Filter-Simple-0.79/lib/Filter/Simple.pm</A>&gt;.
+This package comes included with Perl 5.8, so you only need to act when you're running Perl 5.6.</P>
+<P>
+<H2><A NAME="installing filter::simple on windows">Installing Filter::Simple on Windows</A></H2>
+<P>Open a command prompt and type:</P>
+<PRE>
+    ppm install Filter
+    ppm install Text-Balanced</PRE>
+<P>Now copy the document at <A HREF="http://search.cpan.org/src/DCONWAY/Filter-Simple-0.79/lib/Filter/Simple.pm">http://search.cpan.org/src/DCONWAY/Filter-Simple-0.79/lib/Filter/Simple.pm</A>
+to <CODE>c:\perl\site\lib\Filter\Simple.pm</CODE> or wherever you store your packages.</P>
+<P>
+<H2><A NAME="installing filter::simple anywhere else">Installing Filter::Simple anywhere else</A></H2>
+<P>I guess copying <CODE>Filter::Util::Call</CODE>, <CODE>Text::Balanced</CODE>, <CODE>Filter::Simple</CODE> and all their prerequisites
+from CPAN should work.</P>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P><CODE>self</CODE>, <CODE>class</CODE>, <CODE>base</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Plenty I'm sure.</P>
+<P>
+<HR>
+<H1><A NAME="updates">UPDATES</A></H1>
+<P>Updates to this package will be posted to my weblog <A HREF="http://www.netalive.org/swsu/">http://www.netalive.org/swsu/</A>
+and CPAN as soon as I get access there.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (C) 2004 Henning Koch. All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Henning Koch &lt;<A HREF="mailto:jaz@netalive.org">jaz@netalive.org</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;reform - Third millenium syntax for Perl 5 OOP</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,217 @@
+<HTML><HEAD><TITLE>Access.pm Doc</TITLE></HEAD><BODY><center><h1>Access.pm</h2></center><h1>Modules</h1><ul></ul><h1>Functions:</h1><ul><li><a href="#ACL_dir">ACL_dir</a><li><a href="#ACL_error">ACL_error</a><li><a href="#ACL_get">ACL_get</a><li><a href="#ACL_put">ACL_put</a></ul><hr><h1>Main Script</h1><h2>Variables:</h2> <ul><li>$ACL_DIR<li>$ACL_ERROR<li>$Id<li>$Revision<li>$VERSION<li>$dir<li>$revision<li>%02d<li>%EXPORT_TAGS<li>%d<li>@EXPORT<li>@EXPORT_OK<li>@ISA<li>@r</ul>
+<h2>Calls:</h2><ul><li> </ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Access_doc.html,v 1.1 2000/05/04 21:14:13 idsweb Exp $
+#
+#   Description:    Components to read and write access control lists (ACLs)
+#                   for the client-side release manager tools.
+#
+#                   Eventually, I want to move to a model of another table
+#                   within the same Oracle DB that is used for mirror specs
+#                   and other RlsMgr-related data. For now, ACLs are
+#                   implemented as one file per host, named as such, all
+#                   stored under $ACL_DIR.
+#
+#   Functions:      ACL_dir
+#                   ACL_get
+#                   ACL_put
+#
+#   Libraries:      None.
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#                   $ACL_DIR            Pseudo-constant (can be set by calling
+#                                         ACL_dir) defining the dir in which
+#                                         the files reside.
+#
+#   Environment:    None.
+#
+###############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+# This is used to preserve error messages, and is readable via ACL_error
+###############################################################################
+#
+#   Sub Name:       ACL_dir
+#
+#   Description:    Return the current value of $ACL_DIR. If there is a non-
+#                   reference argument passed, then set $ACL_DIR to the new
+#                   value and return the old value.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $dir      in      scalar    If passed, sets the value of
+#                                                 $ACL_DIR
+#
+#   Globals:        $ACL_DIR
+#
+#   Environment:    None.
+#
+#   Returns:        Current value of $ACL_DIR, even if it being re-set.
+#
+###############################################################################/n</pre>
+<h2>Code:</h2> <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Access_doc.html,v 1.1 2000/05/04 21:14:13 idsweb Exp $
+#
+#   Description:    Components to read and write access control lists (ACLs)
+#                   for the client-side release manager tools.
+#
+#                   Eventually, I want to move to a model of another table
+#                   within the same Oracle DB that is used for mirror specs
+#                   and other RlsMgr-related data. For now, ACLs are
+#                   implemented as one file per host, named as such, all
+#                   stored under $ACL_DIR.
+#
+#   Functions:      ACL_dir
+#                   ACL_get
+#                   ACL_put
+#
+#   Libraries:      None.
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#                   $ACL_DIR            Pseudo-constant (can be set by calling
+#                                         ACL_dir) defining the dir in which
+#                                         the files reside.
+#
+#   Environment:    None.
+#
+###############################################################################
+package IMS::ReleaseMgr::Access;
+
+use 5.002;
+use strict;
+use vars qw($VERSION $revision @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS
+            $ACL_DIR $ACL_ERROR);
+use subs qw(ACL_dir ACL_error ACL_get ACL_put);
+
+use AutoLoader 'AUTOLOAD';
+
+require Exporter;
+require IO::File;
+
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+$revision = q$Id: Access_doc.html,v 1.1 2000/05/04 21:14:13 idsweb Exp $;
+
+@ISA = qw(Exporter);
+@EXPORT = ();
+@EXPORT_OK = qw(ACL_dir ACL_error ACL_get ACL_put);
+%EXPORT_TAGS = ();
+
+$ACL_DIR = '/opt/ims/local/acl';
+# This is used to preserve error messages, and is readable via ACL_error
+$ACL_ERROR = '';
+
+1;
+
+###############################################################################
+#
+#   Sub Name:       ACL_dir
+#
+#   Description:    Return the current value of $ACL_DIR. If there is a non-
+#                   reference argument passed, then set $ACL_DIR to the new
+#                   value and return the old value.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $dir      in      scalar    If passed, sets the value of
+#                                                 $ACL_DIR
+#
+#   Globals:        $ACL_DIR
+#
+#   Environment:    None.
+#
+#   Returns:        Current value of $ACL_DIR, even if it being re-set.
+#
+###############################################################################
+sub ACL_dir
+</pre>
+<br><hr><h1>Function: <a name="ACL_dir">ACL_dir</a></h1>
+<h2>Variables:</h2> <ul><li>$ACL_DIR<li>$dir<li>$ret_val</ul>
+<h2>Calls:</h2><ul><li> </ul>
+<h2>Comments:</h2> 
+ <pre>###############################################################################
+#
+#                                Confidential
+#             Disclosure And Distribution Solely to Employees of
+#          Hewlett-Packard and Its Affiliates Having a Need to Know
+#
+#                  Copyright @ 1998, Hewlett-Packard, Inc.,
+#                            All Rights Reserved
+#
+###############################################################################
+#
+#   @(#)$Id: Access_doc.html,v 1.1 2000/05/04 21:14:13 idsweb Exp $
+#
+#   Description:    Components to read and write access control lists (ACLs)
+#                   for the client-side release manager tools.
+#
+#                   Eventually, I want to move to a model of another table
+#                   within the same Oracle DB that is used for mirror specs
+#                   and other RlsMgr-related data. For now, ACLs are
+#                   implemented as one file per host, named as such, all
+#                   stored under $ACL_DIR.
+#
+#   Functions:      ACL_dir
+#                   ACL_get
+#                   ACL_put
+#
+#   Libraries:      None.
+#
+#   Global Consts:  $VERSION            Version information for this module
+#                   $revision           Copy of the RCS revision string
+#                   $ACL_DIR            Pseudo-constant (can be set by calling
+#                                         ACL_dir) defining the dir in which
+#                                         the files reside.
+#
+#   Environment:    None.
+#
+###############################################################################
+$VERSION = do {my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d"x$#r,@r};
+# This is used to preserve error messages, and is readable via ACL_error
+###############################################################################
+#
+#   Sub Name:       ACL_dir
+#
+#   Description:    Return the current value of $ACL_DIR. If there is a non-
+#                   reference argument passed, then set $ACL_DIR to the new
+#                   value and return the old value.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $dir      in      scalar    If passed, sets the value of
+#                                                 $ACL_DIR
+#
+#   Globals:        $ACL_DIR
+#
+#   Environment:    None.
+#
+#   Returns:        Current value of $ACL_DIR, even if it being re-set.
+#
+###############################################################################/n/n </pre>
+<h2>Code:</h2> <pre>{
+    my $dir = shift;
+
+    my $ret_val = $ACL_DIR;
+    $ACL_DIR = $dir if (defined $dir and ! ref($dir));
+
+    $ret_val;
+}</pre>
+</BODY></HTML>

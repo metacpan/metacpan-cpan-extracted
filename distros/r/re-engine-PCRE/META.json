@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl-compatible regular expression engine",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "re-engine-PCRE",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : 0,
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : 0,
+            "Test::More" : 0,
+            "vars" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-re-engine-PCRE@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=re-engine-PCRE"
+      },
+      "homepage" : "http://search.cpan.org/dist/re-engine-PCRE/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avar/re-engine-pcre.git",
+         "web" : "http://github.com/avar/re-engine-pcre"
+      }
+   },
+   "version" : "0.17",
+   "x_authority" : "cpan:AVAR"
+}
+

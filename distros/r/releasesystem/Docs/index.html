@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+  <HEAD>
+    <TITLE>Release Manager Software System</TITLE>
+    <!-- Created by: Randy J. Ray,  5-Nov-1998 -->
+    <!-- Changed by: Randy J. Ray, 20-Jul-1999 -->
+    <SCRIPT language="JavaScript1.1">
+// Take the document's lastModified property and add a line to the document
+// only if the value is non-zero
+function docupdated ()
+{
+  var lastmod = document.lastModified;
+  var lastmodint = Date.parse(lastmod);
+
+  if (lastmodint != 0)
+    {
+      lastmod = "This page last updated: " + lastmod;
+      document.write(lastmod.bold().fontsize("-1"));
+    }
+  else
+    {
+      document.write(" ");
+    }
+
+  return true;
+}
+    </SCRIPT>
+  </HEAD>
+  <BODY bgcolor=white text=black vlink=green>
+    <CENTER>
+      <H1>Release Manager Software System</H1>
+      <hr size=4 width="90%">
+    </CENTER>
+    <P>
+      The following is intended to be a somewhat-complete overview of the
+      various elements of the Release Management System and their current
+      development and/or maintenance status. This probably isn't complete,
+      and it will almost certainly fall behind in being updated. But hopefully
+      it's better than nothing.
+    </P>
+    <CENTER>
+      <hr size=4 width="90%">
+    </CENTER>
+    <H2>Overview</H2>
+    <P>
+      The goal of the <I>Release Management System</I> as a project is to
+      provide libraries and utilities to supercede the existing tools. The
+      replacement tools are to be re-designed from the start, borrowing some
+      from the existing code but being primarily re-written. The intent is to
+      build on the experiences garnered from the original tools, particularly
+      in terms of identifying the areas that require the most processing and
+      I/O time, targeting these for optimization.
+    </P>
+    <P>
+      The system as a whole is divided into three sub-projects. These are
+      as follows:
+      <UL>
+        <DL>
+          <DT><B><A HREF="server-comp.html">Server Components</A></B></DT>
+          <DD>
+            <I><CODE>ReleaseManager-X.YY.tar.gz</CODE></I>
+            &shy; <B>&curren;1.6</B>
+            <br>
+            These are the elements that are deployed to web-hosting machines,
+            those machines that have one or more Netscape (or OpenMarket)
+            instances. This package includes the deployment software itself
+            (a set of three scripts) and an upload tool that utilizes the
+            HTTP already provided by the web servers to receive the content
+            via CGI-enabled file upload.
+          </DD>
+          <DT><B><A HREF="client-comp.html">Client Components</A></B></DT>
+          <DD>
+            <I><CODE>DevelManager-X.YY.tar.gz</CODE></I>
+            &shy; <B>&curren;prerelease</B>
+            <br>
+            This sub-project will provide the tools that content developers
+            use to manage, maintain and deploy content to the web servers.
+            This will include a front-end tool for invoking various CVS
+            commands, tool(s) to perform the basic release-related steps
+            (populate, stage, etc.) and a wrapper utility for use by CVS to
+            perform the critical translations of paths and URLs from 
+            development to deployment preparations.
+            <br>
+            At present, the main three tools are done, implemented as one
+            tool with symbolic links. Additionally, the CVS front-end tool
+            is done. However, the CVS wrapper that does path translation on
+            HTML and CGI files has not been started.
+          </DD>
+          <DT><B><A HREF="library-comp.html">Library of Utility Components</A></B></DT>
+          <DD>
+            <I><CODE>IMS-ReleaseMgr-X.YY.tar.gz</CODE></I>
+            &shy; <B>&curren;1.6</B>
+            <br>
+            It became clear early on that there would be a considerable amount
+            of shared functionality between not only the scripts within a
+            given sub-project, but between the two sub-projects themselves.
+            The elements provided by this Perl module are designed to be
+            flexible enough to be re-used while still being functional enough
+            to solve the specific problem.
+          </DD>
+        </DL>
+      </UL>
+    </P>
+    <H2>Installation Documents</H2>
+    <P>
+      The following installation documents are available in HTML form:
+      <UL>
+        <LI><A HREF="install/RelMgrClientInstall.html">How to install the client portion of release manager</A></LI>
+        <LI><A HREF="install/RelMgrInstall.html">How to install the server portion of release manager</A></LI>
+      </UL>
+    </P>
+    <H2>Additional Project Documents</H2>
+    <P>
+      In addition to the component overviews, the following documents are
+      available in HTML form:
+      <UL>
+        <LI><A HREF="RelMgrBuildProcess.html">How to use the build process</A></LI>
+        <LI><A HREF="RelMgrHooks.html">How to use the makefile process</A></LI>
+        <LI><A HREF="RelMgrPkgFmt.html">How release manager packages are formatted</A></LI>
+        <LI><A HREF="plan.html">Overall Release Manager project plan</A></LI>
+        <LI><A HREF="perl-plan.html">Maintenance and upgrade plan for Perl</A></LI>
+        <LI><A HREF="plan-progress.html">Progress/status on Release Manager</A></LI>
+      </UL>
+      There are also four MicroSoft Word documents and one Visio diagram
+      on the "DMOIMS" share under the Windows environment. These are in
+      my folder on the drive, which is generally mapped to "<B>N:</B>"
+      on most COE environments: <TT>\\I49AFILES\DMOIMS</TT>, with the
+      full path being <TT>\\I49AFILES\DMOIMS\Randy R</TT>:
+      <br>
+      <table align=center width="90%" border=0>
+        <tr>
+          <td>
+            <DL>
+              <DT><TT><B>Building Perl.doc</B></TT></DT>
+              <DD>
+                A detailed descriptive of the process needed to build Perl and
+                the associated modules.
+              </DD>
+              <DT><TT><B>RelMgrPkgFmt.doc</B></TT></DT>
+              <DD>
+                An overview of the format of packages sent to the release
+                manager. Covers the contents of the tar-archive and the
+                special file "weblist".
+              </DD>
+              <DT><TT><B>RelMgrHooks.doc</B></TT></DT>
+              <DD>
+                Documentation of the <TT>make</TT>-functionality built into the
+                release manager tools.
+              </DD>
+              <DT><TT><B>RelMgrInstall.doc</B></TT></DT>
+              <DD>
+                Step-by-step checklist for setting up a new release manager
+                instance on a host. Includes the needed directory structure
+                (paths, ownership and permissions) as well as the required
+                software installation.
+              </DD>
+              <P></P>
+              <DT><TT><B>Rlsmgrd.vsd</B></TT></DT>
+              <DD>
+                A multi-page diagram in Visio that describes the functionality
+                of the release manager daemon process (from the server-side
+                tools) in terms of a flow chart.
+              </DD>
+            </DL>
+          </td>
+        </tr>
+      </table>
+    </P>
+    <P>
+      <hr>
+      <table border=0 width="100%" cellspacing=0 cellpadding=0>
+        <tr valign=top>
+          <td width="40%">
+            <SCRIPT>docupdated()</SCRIPT>
+          </td>
+          <td width="20%"></td>
+          <td width="40%" align=right>
+            <FONT SIZE=-1>
+              <I>Email:
+                <A HREF="mailto:randyr@nafohq.hp.com">randyr@nafohq.hp.com</A>
+              </I>
+            </FONT>
+          </td>
+        </tr>
+      </table>
+    </P>
+  </BODY>
+</HTML>

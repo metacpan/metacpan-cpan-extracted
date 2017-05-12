@@ -1,0 +1,762 @@
+#!/usr/local/bin/perl
+
+# System Process Monitor Daemon
+
+# by Kevin Greene
+
+# copyright 1996-2000 by hewlett-packard company
+
+# may be distributed under the terms of the artistic license
+
+
+use subs qw(fork_this);
+
+use Time::Local;                      # get timelocal function
+use FileHandle;                       # get select methods
+use LWP::UserAgent;
+use HTTP::Request;
+use HTTP::Response;
+use Mail::Send;
+use Sys::Hostname;
+use Time::Period;                     # get inPeriod function
+
+$ALARM_VAR = 0;  #an alarm will set this to 1 - this will initiate a reset
+		 # (reinitialize the variables
+
+fork_this() if (defined $ARGV[0] and $ARGV[0] eq '-f');
+
+$SIG{'HUP'} = sub {&log ("Caught HUP Alarm Signal", "INFO"); $ALARM_VAR=1;}; #trigger reset
+$SIG{'ALRM'} = sub {&log ("Caught Alarm Signal", "INFO"); $ALARM_VAR=1;}; #trigger reset
+
+###############################################################
+# Global Setup
+
+$DEBUG       = 0;            # Normally set to 0. Use 1 for debugging
+$DEBUG_EMAIL = (getlogin || (getpwuid ($<))[0]) . "\@nafohq.hp.com";
+
+if ($DEBUG)                  # debug values
+{
+  $STARTUP_SLEEP = 1;        #  1 seconds
+  $SLEEP_TIME    = 10;       # 10 seconds
+  $CONFIG_FILE   = "$ENV{HOME}/public_html/wmTools/scripts/syscheck/syscheck.rc";
+  $SYSCHECK_LOG  = "$ENV{HOME}/public_html/wmTools/scripts/syscheck/log";
+  $PID_FILE      = "$ENV{HOME}/public_html/wmTools/scripts/syscheck/pid";
+}
+else #standard values
+{
+  $STARTUP_SLEEP = 60 * 10;  # 10 minutes
+  $SLEEP_TIME    = 60 * 3;   #  3 minutes 
+  $CONFIG_FILE   = "/opt/ims/local/sysmonitor/syscheck.rc";
+  $SYSCHECK_LOG  = "/opt/ims/local/sysmonitor/log";
+  $PID_FILE      = "/opt/ims/local/sysmonitor/pid";
+}
+
+# Uncomment this only if running *inside* the firewall
+# $HTTP_PROXY = 'http://web_proxy:8088';
+
+$PS         = '/bin/ps -ef ';
+$HOSTNAME   = hostname;
+
+# $NO_PROXY   = 'hp.com';
+
+#Parameters for config file (1st on line is id, these below follow)
+$SEMAPHORE_PARAMETER       = 0;
+$REGEX_PARAMETER           = 1;
+$URL_PARAMETER             = 2;  
+$COMMAND_PARAMETER         = 3;
+$EMAIL_PARAMETER           = 4;
+$SUBJECT_PARAMETER         = 5;
+$THRESHOLD_PARAMETER       = 6; 
+$ERROR_REGEX_PARAMETER     = 7;
+$OPERATING_HOURS_PARAMETER = 8;
+$DEAD_PARAMETER            = 9; # NOTE! - this must ALWAYS be the last one
+			        # because it does not actually exist in the
+			        # config file
+###############################################################
+
+&main;
+exit;
+
+###############################################################
+sub main
+{
+  my (%idlist);
+
+  &initialize (\%idlist);
+  &event_loop (\%idlist);
+}
+
+###############################################################
+sub initialize
+{
+  my ($listref) = @_;
+  my ($pid) = $$;
+
+  my ($killit) = 1 if $ARGV[0] eq '-kill';  #cheap command line
+					    #processing
+  my ($startup_sleep) = $STARTUP_SLEEP;
+  
+  my ($curpid) = &Get_PID ($PID_FILE);
+  &log ("Current PID: $curpid", "INFO", 1);
+  if ($curpid && (kill 0, $curpid) && (!$killit))  #is pid listed valid?
+  {
+    die "Only one process daemon can be running! Current pid: $curpid\n";
+  }
+  elsif ($curpid && (kill 0, $curpid) && $killit)  #is pid listed valid?
+  {
+    &log ("Current pid: $curpid.  Killing...", "INFO");
+    &log ("Kill successful", "INFO") if kill 'KILL', $curpid;
+  }
+
+  &Set_PID ($PID_FILE, $pid);
+  #print "[" . &Get_PID($PID_FILE) . "]";  ###!!!remove, for debug
+
+  &log ("Loading config file: $CONFIG_FILE", "INFO");
+  &read_config ($CONFIG_FILE, $listref);
+
+  &log ("Removing any old semaphores...", "INFO");
+  &release_all_semaphores ($listref);
+
+  &log ("Initiating startup sleep: " . ($STARTUP_SLEEP / 60) . " minutes", "INFO");
+  sleep $STARTUP_SLEEP;
+  &log ("Starting Daemon activities", "INFO");
+  1;
+}
+
+###############################################################
+sub release_all_semaphores  #removes all semaphores
+{
+  my ($listref) = @_;
+
+  foreach (keys %$listref)
+  {
+    release_semaphore ($listref, $_);
+  }
+}
+
+###############################################################
+sub reset
+{
+  my ($listref) = @_;
+  
+  $ALARM_VAR = 0;
+  &log ("Reset of daemon initiated", "INFO");
+  &log ("Loading config file: $CONFIG_FILE", "INFO");
+  &free_list ($listref);
+  #foreach (keys %$listref)
+  #{
+  #  print "!!!: $_: $$listref{$_}\n";
+  #}
+
+  &read_config ($CONFIG_FILE, $listref);
+}
+
+###############################################################
+sub free_list
+{
+  my ($listref) = @_;
+  #my ($id);
+
+  #foreach $id (keys %$listref)
+  #{
+  #  undef $$listref{$id};
+  #}
+
+  undef %$listref;
+}
+
+###############################################################
+sub read_config
+{
+  my ($configfile, $listref) = @_;
+  #my (%list) = %$listref;
+  my (@line); 
+  my ($key);
+
+  open (CONFIG, '<'.$configfile) || 
+      die "Cannot open config file: $configfile\n";
+  while (<CONFIG>)
+  {
+   chomp $_;
+
+#    &log ($_, 2) if ($DEBUG);
+
+    next if /^#/;
+
+    ($key, @line) = split (';', $_);
+
+#    &log ("[$key] [" . join ('<->', @line) . "]", 2) if ($DEBUG);
+
+    $listref->{$key} = [ @line ]; 
+    $$listref{$key}->[$THRESHOLD_PARAMETER] = 1 if  #threshold at least 1!
+	      ($$listref{$key}->[$THRESHOLD_PARAMETER] < 1); 
+
+  }
+
+#  if ($DEBUG)
+#  {
+#    foreach $key (sort keys %$listref)
+#    {
+#      &log ("ID! : $key: $$listref{$key}", 2);
+#      &log ("ID : $key: @{ $$listref{$key} }", 1);
+#    }
+#  }
+  
+  close CONFIG;
+}
+
+###############################################################
+sub Get_PID
+{
+  my ($file) = @_;
+  my ($pid);
+
+  open (FILE, '<'.$file);
+  $pid = <FILE>;
+  chomp ($pid);
+  close FILE;
+
+  $pid;
+}
+
+###############################################################
+sub Set_PID
+{
+  my ($file, $pid) = @_;
+
+  open (FILE, '>'.$file);
+  print FILE $pid;
+  close FILE;
+}
+
+###############################################################
+# log - Log messages to log file
+# debug parameter - 0 = (always log) and (print during debug)
+#                   1 = log and print during debug
+#                   2 = print during debug
+# (use 0 for normal logging, > 0 for debug messages)
+# Note: opening and closing here because of expected low usage of log
+# -- if log use becomes heavy then open and close elsewhere
+###############################################################
+sub log
+{
+  my ($message, $class, $debug) = @_;
+  my ($logfile) = $SYSCHECK_LOG;
+
+  my ($thetime) = scalar localtime;  #pretty time
+
+  return 1 if (($debug > 0) && ($DEBUG == 0)); #ignore debug messages
+					       #if not debugging
+
+  #now we can assume all messages should be displayed somehow
+
+  if ($DEBUG == 0)
+  {
+    open (LOG, '>>'.$logfile);
+    print LOG "$thetime:  $class: " . $message . "\n";
+    print "$thetime:  $class:  " . $message . "\n" if $DEBUG;
+    close LOG;
+  }
+  elsif (($DEBUG == 1) && (($debug == 1) || ($debug == 0)))
+  {
+    open (LOG, '>>'.$logfile);
+    print LOG "$thetime:  $class: " . $message . "\n";
+    print "$thetime:  $class:  " . $message . "\n";
+    close LOG;
+  }
+  elsif (($DEBUG == 1) && ($debug == 2))
+  {
+    print "$thetime:  $class:  " . $message . "\n";
+  }
+}
+
+###############################################################
+sub event_loop
+{ 
+  my ($listref) = @_;
+  my (%list) = %$listref;
+  my ($event, @report_args);
+
+  while (1)
+  {
+    &reset (\%list) if $ALARM_VAR;   #reload config if alarm
+    &check_process_status (\%list);  #verify all processes exist
+    &check_urls (\%list);            #verify all urls exist
+    $sleep = &get_sleep_time;        #sleep till next check
+    sleep $sleep;
+
+
+    #$event = &get_next_event;  #??? finish???
+    #$event = &get_next_request ($db);
+    #if (defined $event)
+    #{
+      #&do_event ($event);       #??? finish???
+    #}
+    #else
+    #{
+#my ($ctime) = &ctime (time);
+#chop $ctime;
+#my ($sleep) = &get_sleep_time;
+#my ($till) = &ctime (time + $sleep);
+#chop $till;
+#print "sleeping until $till ($sleep sec) [$ctime]\n";
+      #sleep $sleep;
+    #}
+
+  }
+}
+
+###############################################################
+sub do_event
+{
+  my ($event) = @_;
+
+  #make hash or something that pairs "event type" with function to
+  #handle that type
+}
+
+###############################################################
+sub get_next_event
+{
+  my ($mask) = @_;   #mask = regex - only returns event types matching it
+
+  if ($queue [0])
+  {
+    return $queue [0];
+  }
+  else
+  {
+    return undef;
+  }
+}
+
+###############################################################
+sub get_sleep_time   
+{
+  $SLEEP_TIME;
+}
+
+###############################################################
+sub get_next_request
+{
+  my ($db) = @_;
+  my ($request, @requests);
+  my ($sec, $min, $hour, $day, $mon, $year, $wday, $yday, $zone) = localtime (time);
+}
+
+###############################################################
+sub get_ps_list
+{
+  my ($ps_string) = "$PS";
+
+  open (PID, "$ps_string|");
+  my (@raw_pid_output) = <PID>;
+  close (PID);
+  my (@test) = @raw_pid_output;
+  grep (($_) = (split /\s+/, $_, 9)[8], @raw_pid_output); #keep process name
+  @raw_pid_output;
+}
+
+###############################################################
+sub check_process_status
+{
+  my ($listref) = @_;
+  my ($id, %ps);
+  my (@ps) = &get_ps_list;
+  my ($regex, $now, $period);
+
+  foreach (@ps)
+  {
+    $ps{$_} = 1;
+  }
+
+  foreach $id (keys %$listref)
+  {
+    next unless ($regex = $$listref{$id}->[$REGEX_PARAMETER]);  #ignore if no process name regex
+    
+    $now = time;
+    $period = $$listref{$id}->[$OPERATING_HOURS_PARAMETER];
+    next unless (inPeriod ($now, $period));                     #ignore if not in operating hours
+
+    #print "!: $id\n";
+	  
+    unless (grep (m{$$listref{$id}->[$REGEX_PARAMETER]}, @ps)) # missing process
+    {
+      &process_error ($listref, $id, 'process', $regex, 'missing process', 0);
+      #&log ("missing process - grep: $id") unless grep (/$$listref{$id}->[$REGEX_PARAMETER]/, @ps);
+      #search for this process regex in the process list via grep
+    }
+    else  #process in list
+    {
+      if ($$listref{$id}->[$DEAD_PARAMETER])
+      {
+        &process_error ($listref, $id, 'process', $regex, 'success', 1);
+      }
+    }
+  }
+}
+
+###############################################################
+sub get_url_status
+{
+  my ($url, $regex) = @_;
+  my ($ua, $request, $response);
+
+  $ua = new LWP::UserAgent;
+
+  $ua->proxy (('http'), $HTTP_PROXY) if $HTTP_PROXY;
+  $ua->no_proxy ($NO_PROXY) if $NO_PROXY;
+
+  $request = new HTTP::Request 'GET', $url;
+
+  eval {$response = $ua->request ($request);};
+  #eval is a hack to stop timeout from dieing in the program...
+  #(which is called somewhere in IO::Select, I think...)
+
+  #print "error\n" if $response->is_error ();
+
+  if ($regex)
+  {
+    if ($response->content =~ /$regex/) #if error - ie regex matched
+    {
+      return (0, "regex error match:$regex"); #return error, matched err string
+    }
+  }
+  ($response->is_success (), $response->code ());
+}
+
+###############################################################
+sub check_urls
+{
+  my ($listref) = @_;
+  my ($id, $success, $code, $url);
+  my ($now, $period);
+
+  foreach $id (keys %$listref)
+  {
+    next unless ($url = $$listref{$id}->[$URL_PARAMETER]);  # ignore if no url
+    
+    $now = time;
+    $period = $$listref{$id}->[$OPERATING_HOURS_PARAMETER];
+    next unless (inPeriod ($now, $period));                 # ignore if not in operating hours
+
+    ($success, $code) = &get_url_status ($url,
+		       $$listref{$id}->[$ERROR_REGEX_PARAMETER]);
+    unless ($success) 
+    {
+      #&log ("URL error code $code: $id ($$listref{$id}->[$URL_PARAMETER])", "FAILURE", 2);
+      &process_error ($listref, $id, 'URL', $url, $code, 0);
+# Dunno what this does or why it's needed
+#      &log ("URLOUT: $output", "FAILURE", 2);
+    }
+    else  #if success
+    {
+      if ($$listref{$id}->[$DEAD_PARAMETER])
+      {
+        &process_error ($listref, $id, 'URL', $url, $code, 1);
+      }
+    }
+  }
+}
+
+###############################################################
+#listref = reference to syscheck file list,
+#id=item id, $label = type of item (human readable),
+#$name = item value - url or process regex, $code = error 
+#$success = 1 if was failure before and now is working again
+#         = 0 error conditition
+
+sub process_error
+{
+  my ($listref, $id, $label, $name, $error_code, $success) = @_;
+  my ($to, $subject, $body);
+
+  $to = $$listref{$id}->[$EMAIL_PARAMETER];   
+  $subject = $$listref{$id}->[$SUBJECT_PARAMETER];   
+
+  if ($success)  #recovery - remove error states
+  {
+    &log ("SUCCESS: $label $id: failed " . $$listref{$id}->[$DEAD_PARAMETER] . "/" .
+		$$listref{$id}->[$THRESHOLD_PARAMETER] . " times: " . 
+	  ($error_code ? "response: $error_code: " : "") . "[$name]", "STATUS");
+    &release_semaphore ($listref, $id);
+    unless ( $$listref{$id}->[$DEAD_PARAMETER]  <  #less than threshold value?
+	     $$listref{$id}->[$THRESHOLD_PARAMETER]) 
+    { 
+      # only alert success if previously alerted failure
+      $subject = "sysmonitord\@$HOSTNAME $id success " . $subject;
+      $body = "The following job has been recovered successfully:\n\n" .
+      	      "Job ID = $id\n" .
+              "Name = $name\n" .
+              "Type = $label\n" . 
+              (($url = $$listref{$id}->[$URL_PARAMETER]) ? "URL = $url\n" : "") .
+              (($regex = $$listref{$id}->[$REGEX_PARAMETER]) ? "Process regex = $regex\n" : "") .
+              ($error_code ? "Last Error = $error_code" : "") .
+	      ($$listref{$id}->[$COMMAND_PARAMETER] ? 
+	      "\nJob recovered by executing the following command\n" .
+              " $$listref{$id}->[$COMMAND_PARAMETER] " . $success .
+              " $$listref{$id}->[$SEMAPHORE_PARAMETER]\n" : 
+	      "\nWARNING: No command was specified for recovery.\n");
+
+      &send_mail ($to, $subject, $body);  
+      &execute_command ($listref, $id, $success);
+    }
+    $$listref{$id}->[$DEAD_PARAMETER] = 0; #now success again
+  }
+  else  #set error states
+  {
+    $$listref{$id}->[$DEAD_PARAMETER] += 1; #mark as error (increment counter)
+    
+    &log ("FAILURE: $label $id: failed " . $$listref{$id}->[$DEAD_PARAMETER] . "/" . 
+	$$listref{$id}->[$THRESHOLD_PARAMETER] . " times: " .
+	($error_code ? "response: $error_code: " : "") . "[$name]",  "STATUS");
+
+    unless (defined &check_semaphore ($listref, $id)) #set semaphore
+                    #immediately even if not ready to alert (email)
+    {
+      &set_semaphore ($listref, $id, $error_code);
+    }
+
+    if ( $$listref{$id}->[$DEAD_PARAMETER]  ==
+	     $$listref{$id}->[$THRESHOLD_PARAMETER]) #at threshold value?
+    {     
+      #email if at threshold, else already emailed or not yet there
+      $subject = "sysmonitord\@$HOSTNAME $id failure " . $subject;
+
+      $body = "The following job has failed more than the threshold number of times:\n\n" .
+      	      "Job ID = $id\n" .
+              "Name = $name\n" .
+              "Type = $label\n" . 
+              (($url = $$listref{$id}->[$URL_PARAMETER]) ? "URL = $url\n" : "") .
+              (($regex = $$listref{$id}->[$REGEX_PARAMETER]) ? "Process regex = $regex\n" : "") .
+              ($error_code ? "Error = $error_code" : "") .
+              "\nJob has failed $$listref{$id}->[$DEAD_PARAMETER] consecutive ".
+              "time(s) (This is the threshold value.)\n" .
+	      ($$listref{$id}->[$COMMAND_PARAMETER] ? 
+	      "\nAttempting recovery by executing the following command\n" .
+              " $$listref{$id}->[$COMMAND_PARAMETER] " . $success .
+              " $$listref{$id}->[$SEMAPHORE_PARAMETER]\n" : 
+	      "\nWARNING: No command specified for recovery.\n");
+      &send_mail ($to, $subject, $body);  
+      &execute_command ($listref, $id, $success);
+    }
+        
+    elsif (0 && $$listref{$id}->[$DEAD_PARAMETER]  <  #less than threshold value?
+	     $$listref{$id}->[$THRESHOLD_PARAMETER]) 
+    {
+      &log ("Error in $label, Regexp: $name" . 
+	   ($error_code ? " - Error: $error_code" : "") .
+	   " failed $$listref{$id}->[$DEAD_PARAMETER] time(s), ".
+	   "threshold value: $$listref{$id}->[$THRESHOLD_PARAMETER]", "FAILURE");
+    }
+  }
+}
+
+###############################################################
+sub execute_command
+{
+  my ($listref, $id, $success) = @_;
+  my ($semaphore) = $$listref{$id}->[$SEMAPHORE_PARAMETER];
+  my ($command) = $$listref{$id}->[$COMMAND_PARAMETER];
+  my ($count) = $$listref{$id}->[$DEAD_PARAMETER];
+  my ($threshold) = $$listref{$id}->[$THRESHOLD_PARAMETER];
+  my ($to, $subject, $body);
+
+  $to = $$listref{$id}->[$EMAIL_PARAMETER];   
+  $subject = $$listref{$id}->[$SUBJECT_PARAMETER];   
+  
+  return 1 unless $command;
+
+  my ($cmd) = "$command $success $semaphore $id $count $threshold";
+  if (-x $command)
+  {
+    system ("$cmd &");
+    &log ("Executed command: $cmd", "INFO");
+  }
+  else
+  {
+    &log ("Warning - Unable to execute: $cmd", "ERROR");
+
+    $subject = "sysmonitord\@$HOSTNAME $id process exec failure " . $subject;
+
+    $body = "Unable to execute the following command\n" .
+            " $cmd\n" .
+            "needed to restart the following job:\n\n" .
+      	    "Job ID = $id\n" .
+            "Name = $name\n" .
+            "Type = $label\n" . 
+            (($url = $$listref{$id}->[$URL_PARAMETER]) ? "URL = $url\n" : "") .
+            (($regex = $$listref{$id}->[$REGEX_PARAMETER]) ? "Process regex = $regex\n" : "") .
+            ($error_code ? "Last Error = $error_code" : "") .
+            "\nJob has failed $$listref{$id}->[$DEAD_PARAMETER] consecutive ".
+            "time(s)\n" .
+            "\nCheck file: \"$CONFIG_FILE\"\nfor a line like this:\n" .
+            "$id;" . join (";", @{ $$listref{$id} }) .
+            "\n\nNote: The last number & semi-colon are NOT in the file.\n";
+
+    &send_mail ($to, $subject, $body);  
+  }
+}
+
+###############################################################
+sub release_semaphore
+{
+  my ($listref, $id) = @_;
+  my ($semaphore) = $$listref{$id}->[$SEMAPHORE_PARAMETER];
+  
+  &log ("$id: RESET: semaphore: $semaphore", "INFO");
+
+  unlink $semaphore if -e $semaphore; #delete semaphore file
+}
+
+###############################################################
+sub set_semaphore
+{
+  my ($listref, $id, $error) = @_;
+  my ($semaphore) = $$listref{$id}->[$SEMAPHORE_PARAMETER];
+  my ($regex) = $$listref{$id}->[$REGEX_PARAMETER];
+  my ($url) = $$listref{$id}->[$URL_PARAMETER];
+  
+  &log ("$id: SET: semaphore: $semaphore", "INFO");
+  open SEM, '>'.$semaphore || &log ("Could not set semaphore: $semaphore", "ERROR");
+
+  #:: is delimeter
+  print SEM join ('::', (scalar localtime), $id, $regex, $url, $error,
+		$$listref{$id}->[$THRESHOLD_PARAMETER],
+		$$listref{$id}->[$DEAD_PARAMETER]);
+  print SEM "\n";
+
+  close SEM;
+}
+
+###############################################################
+#returns 0 if no semaphore set
+sub check_semaphore
+{
+  my ($listref, $id) = @_;
+  my ($semaphore) = $$listref{$id}->[$SEMAPHORE_PARAMETER];
+  my ($output); 
+
+  if (-e $semaphore)
+  {
+    open SEM, '<'.$semaphore || &log ("Could not check semaphore: $semaphore", "ERROR");
+
+    $output = <SEM>;
+    close SEM;
+  
+    return $output;
+  }
+  else
+  {
+    return undef;
+  }
+}
+
+###############################################################
+sub send_mail
+{
+  my ($to, $subject, $body) = @_;
+  my ($msg, $fh);
+  
+  return 1 unless $to;
+
+  &log ("mail: $to: $subject", "INFO");
+  $msg = new Mail::Send;
+  $msg = new Mail::Send Subject=>$subject, To=>$to;
+
+  my $date = scalar localtime time;
+  $body = "$date\n$body";
+
+  #$msg->to ('user@host');
+  #$msg->subject ('user@host');
+
+  # Launch mailer and set headers. The filehandle returned
+  # by open () is an instance of the Mail::Mailer class.
+
+  $fh = $msg->open;
+  print $fh $body;
+  $fh->close;         # complete the message and send it
+}
+###############################################################
+
+###############################################################################
+#
+#   Sub Name:       fork_this
+#
+#   Description:    Do a proper bit of process-handling if we were requested
+#                   to go to ground as a daemon (copied from rlsmgrd)
+#
+#   Arguments:      None.
+#
+#   Globals:        $in_dir
+#
+#   Environment:    None.
+#
+#   Returns:        void context
+#
+###############################################################################
+sub fork_this
+{
+    my $in_dir = shift || '/';
+
+    my ($child, $sig);
+
+    chdir $in_dir or die "Could not chdir to $in_dir: $!, stopped";
+
+    $child = fork;
+    if (! defined $child)
+    {
+        # Uh oh.
+        die "$cmd died in fork: $!, crashing";
+    }
+    elsif ($child)
+    {
+        # Parent process
+        exit 0;
+    }
+
+    #
+    # First-generation child. Close filehandles, clear umask, and set a process
+    # group. This will also disassociate us from any control terminal.
+    #
+    setpgrp;
+    close(STDIN);
+    close(STDOUT);
+    close(STDERR);
+    umask 0;
+    for $sig (qw(TSTP TTIN TTOU))
+    {
+        $SIG{$sig} = 'IGNORE' if (exists $SIG{$sig});
+    }
+
+    #
+    # Since we're on SysV, we could accidentally re-acquire a control terminal,
+    # so to avoid that, we'll re-spawn, so that the child is not the pgrp
+    # leader. Then *this* parent will exit, and control will continue with the
+    # second-generation child. Ignore HUP for now (restore it in the 2nd-gen
+    # child) so that the 1st-gen child's HUP doesn't kill the 2nd-gen child.
+    #
+    $sig = $SIG{HUP};
+    $SIG{HUP} = 'IGNORE';
+
+    $child = fork;
+    if (! defined $child)
+    {
+        # Uh oh.
+        die "$cmd (1st-gen child) died in fork: $!, crashing";
+    }
+    elsif ($child)
+    {
+        # Parent process
+        exit 0;
+    }
+
+    #
+    # We are the second-generation child, and all our file descriptors are
+    # taken care of, our umask is set, our process group is set. All we have
+    # to do is restore HUP (which will probably be set later on, anyway) and
+    # return.
+
+    $SIG{HUP} = $sig;
+    return;
+}

@@ -1,0 +1,68 @@
+{
+   "abstract" : "return values from up above",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "return-thence",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scope::Upper" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "return::thence" : {
+         "file" : "lib/return/thence.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/return-thence/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=return-thence"
+      },
+      "homepage" : "https://metacpan.org/release/return-thence",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-return-thence.git",
+         "web" : "https://github.com/tobyink/p5-return-thence"
+      }
+   },
+   "version" : "0.003"
+}

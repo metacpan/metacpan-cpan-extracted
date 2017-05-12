@@ -1,0 +1,6 @@
+common:
+   use:
+      - List::Util:
+         - first
+         - max
+      - Data::Dumper

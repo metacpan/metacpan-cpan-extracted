@@ -1,0 +1,108 @@
+%_perl_req_method	normal
+%set_perl_req_method()	%global _perl_req_method %*
+
+#_perl_lib_path		%nil
+%add_perl_lib_path()	%global _perl_lib_path %{?_perl_lib_path} %*
+
+# perl library paths
+%perl_vendor_privlib	%(eval "`%__perl -V:installvendorlib`"; echo "$installvendorlib")
+%perl_vendor_archlib	%(eval "`%__perl -V:installvendorarch`"; echo "$installvendorarch")
+%perl_vendor_autolib	%perl_vendor_archlib/auto
+
+# MDK compatibility
+%perl_vendorlib		%perl_vendor_privlib
+%perl_vendorarch	%perl_vendor_archlib
+%makeinstall_std	%make_install install DESTDIR=%buildroot
+
+# build with the same optimization as perl
+%perl_vendor_optflags	%(eval "`%__perl -V:optimize`"; echo "$optimize")
+
+# automate various rpmbuild stages
+# MM stands for ExtUtils::MakeMaker
+# MB stands for Module::Build
+
+# %%build helpers
+%perl_vendor_build \
+_perl_vendor_MB_build() { \
+	: writing Build script \
+	%__perl Build.PL installdirs=vendor "$@" </dev/null \
+	%__perl -e '$req=require"./_build/prereqs";' \\\
+		-e 'while (my ($k, $v) = each %%{$$req{requires}})	{ print "perl($k)>=$v\\n" }' \\\
+		-e 'while (my ($k, $v) = each %%{$$req{recommends}})	{ print "perl($k)>=$v\\n" }' | tee .perl.req \
+	: running Build script \
+	%__perl Build \
+	%{?!_without_test:%{?!_disable_test:: running tests; LD_BIND_NOW=1 PERL_DL_NONLAZY=1 %__perl Build test %{?_enable_debug:test_verbose=1}}} \
+} \
+_perl_vendor_MM_build() { \
+	%{?_without_smp:NPROCS=1; : NOTE: SMP-incompatible} \
+	%{?_disable_smp:NPROCS=1; : NOTE: SMP-incompatible} \
+	: looking for PREREQ dependencies \
+	%__perl Makefile.PL PRINT_PREREQ=1 "$@" </dev/null | tee .perl.req \
+	: writing Makefile \
+	%__perl Makefile.PL PREFIX=%_prefix INSTALLDIRS=vendor "$@" </dev/null \
+	: running make \
+	%make_build OPTIMIZE="%{!?_enable_debug:%perl_vendor_optflags}%{?_enable_debug:%optflags}%{?_enable_Werror: -Werror}" CP="%__cp -p" \
+	%{?!_without_test:%{?!_disable_test:: running tests; LD_BIND_NOW=1 PERL_DL_NONLAZY=1 %__make test CP="%__cp -p" %{?_enable_debug:TEST_VERBOSE=1} </dev/null}} \
+} \
+_perl_vendor_fixin() { \
+	find . -type f -print0 | xargs -r0 %__subst -p \\\
+	'1s,^#![[:space:]]*\\([^[:space:]]*/\\)\\?perl\\([^/[:alpha:][:space:]][^/[:space:]]*\\)\\?\\([[:space:]]\\|$\\),#!%__perl\\3,' \
+} \
+_perl_vendor_check_dso() { \
+	: checking for undefined symbols \
+	BLIBS="$BLIBS${BLIBS:+ }$(find $PWD/blib -type f -name '*.so' ||:)" \
+	[ -n "$BLIBS" ] || return 0 \
+	echo 'int main(){return 0;}' >ldtest.c \
+	gcc -Wl,--no-as-needed ldtest.c ${LD_LIBRARY_PATH:+-L$LD_LIBRARY_PATH} -lperl $BLIBS $EXTRA_BLIBS \
+	LD_BIND_NOW=1 ./a.out \
+	rm -f ldtest.c ./a.out \
+} \
+perl_vendor_build() { \
+	export PERL_EXTUTILS_AUTOINSTALL="${PERL_EXTUTILS_AUTOINSTALL:---skip}" \
+	export XSUBPP_STATIC_XS=${XSUBPP_STATIC_XS:-1} \
+		_perl_vendor_fixin \
+	if %__grep -qs -Ew '(dist|module)_name' Build.PL; then \
+		_perl_vendor_MB_build "$@" \
+	else \
+		_perl_vendor_MM_build "$@" \
+	fi \
+		#_perl_vendor_check_dso \
+} \
+perl_vendor_build
+
+# %%install helpers
+%perl_vendor_install \
+_perl_vendor_MB_install() { \
+	: installing \
+	%__perl Build install destdir=%buildroot installdirs=vendor "$@" </dev/null \
+} \
+_perl_vendor_MM_install() { \
+	: installing \
+	%make_install CP="%__cp -p" \\\
+		DESTDIR=%buildroot PREFIX=%_prefix INSTALLDIRS=vendor \\\
+ 		pure_install "$@" </dev/null \
+} \
+_perl_vendor_check_buildroot() { \
+	: prompting for files that contain /usr/local \
+	find %buildroot -type f -exec %__grep -FH /usr/local {} ';' \
+	: prompting for files that contain /tmp \
+	find %buildroot -type f -not -name .packlist -exec %__grep -FH /tmp '{}' ';' \
+} \
+_perl_vendor_save_prereq() { \
+	if %__grep -F 'perl(' .perl.req >&2; then \
+	   %__grep -F 'perl(' .perl.req >>%buildroot/.perl.req; fi \
+} \
+perl_vendor_install() { \
+	if %__grep -qs -Ew '(dist|module)_name' Build.PL; then \
+		_perl_vendor_MB_install "$@" \
+	else \
+		_perl_vendor_MM_install "$@" \
+	fi \
+		_perl_vendor_check_buildroot \
+		_perl_vendor_save_prereq \
+} \
+perl_vendor_install
+
+# sugar
+%perl_fix_local %__subst -p 's,/usr/local\\>,/usr,g'
+%CPAN() http://search.cpan.org/dist/%1/%nil

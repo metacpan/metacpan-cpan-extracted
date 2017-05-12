@@ -1,0 +1,53 @@
+=head1 NAME
+
+release - Release staged content to the target server
+
+=head1 SYNOPSIS
+
+release [ B<-debug> ] [ B<-terse> | B<-verbose> ] project [ proj ... ] [ host ]
+
+=head1 DESCRIPTION
+
+The B<release> tool is the third stage of the developer-side release process.
+When run, this tool bundles the content intended for deployment to a web host
+and manages the transaction of sending the data to the target and verifying
+successful delivery.
+
+=head1 OPTIONS
+
+The B<release> tool requires at least one project be specified. Additionally,
+the target host should be specified. This value may be inferred from the
+project name by examining the staging area for those hosts to which the
+project has been previously prepared for deployment. In this case, B<release>
+selects the host that has been most recently staged for. The user is given a
+warning message that a default, inferred host is being used, thus allowing
+them to abort if the host is incorrect. More than one project may be specified
+on the command line, but all projects will be released to the same host, and
+only the first project specified will be used to deduce a target host in
+absence of a command-line value.
+
+The other options recognized in 
+
+=head1 EXAMPLES
+
+=head1 SEE ALSO
+
+L<dev_rls_tool>, L<populate>, L<stage>
+
+=head1 CAVEATS
+
+The tool B<release> is built first around the use of the HTTP mechanism for
+data transportation. The use and support of FTP is secondary. Certain
+additional arguments previously used for release to the corporate server
+are in the process of being re-evaluated as possibly obsoleted in favor of
+configuration values.
+
+=head1 AUTHOR
+
+Randy J. Ray <randyr@nafohq.hp.com>
+
+=head1 ENHANCEMENTS
+
+Kevin Greene
+
+=cut
